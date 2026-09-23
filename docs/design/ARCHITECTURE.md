@@ -9,7 +9,7 @@ This document defines the TRIPWIRE hardware:
 - the pin units, helper units and host interface;
 - timing, pin map and area budget.
 
-It is the contract that the RTL and the golden model are both written from. Where a detail is not final it is marked **OPEN** and gets settled in the P1 spec freeze.
+It is the contract that the RTL and the golden model are both written from. Where a detail is not final it is marked **OPEN** and gets settled in the P1 spec freeze. The lane instruction set (reflex slots, routines, operation table) is specified in `ISA.md`.
 
 Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VERIFICATION.md` (how all of this is checked).
 
@@ -141,61 +141,11 @@ This is an initial proposal, **OPEN**, to be tuned in P1 for routing. Each consu
 | RPC, RRET | 9 + 9 | Routine PC and saved PC for interruption |
 | RUN, HALT, STEP | control | Set from the host |
 
-### 5.2 Reflex slot encoding (~51 bits, stored in a latch array, written only while the lane is halted)
+| K0–K3 | 4 × 16 | Per-lane constants, host-written while halted, read-only to programs (`ISA.md` §2) |
 
-```
-CONDITION (22 bits)
-  [0]      V      slot valid
-  [1]      U      urgent (may interrupt a routine; see 6.3)
-  [2]      SE     state-match enable
-  [6:3]    SV     required STATE value
-  [10:7]   FM     flag mask   (over f3..f0)
-  [14:11]  FV     flag value
-  [16:15]  IN     00 none | 01 I0 available | 10 I1 available | 11 reserved
-  [17]     TE     tag-match enable on the chosen input's head
-  [19:18]  TAG    required tag
-  [21:20]  OUT    00 none | 01 O0 free | 10 O1 free | 11 reserved
-ACTION (29 bits)
-  [25:22]  OP     operation (see 5.3)
-  [28:26]  DST    0-3 r0-r3 | 4 O0 | 5 O1 | 6 none (flags only) | 7 CALL
-  [31:29]  ASRC   0-3 r0-r3 | 4 I0 head | 5 I1 head | 6 zero | 7 global time (low 16)
-  [32]     DQ     dequeue the input used in the condition
-  [33]     BSEL   0: B = r[IMM[1:0]] | 1: B = IMM (zero-extended)
-  [41:34]  IMM    8-bit immediate / sub-fields
-  [42]     NSE    next-STATE enable (static update)
-  [46:43]  NS     next STATE value
-  [47]     DFE    dynamic-flag enable (compare result)
-  [49:48]  DF     which flag f0-f2 receives the result
-  [50]     OTAG   output token tag override: 0 = DATA, 1 = use IMM[7:6] as tag (CTRL/EVENT/ERR)
-```
+### 5.2 Reflex slot encoding and 5.3 operations
 
-**Firing condition:**
-`V && (!SE || STATE==SV) && ((FLAGS ^ FV) & FM)==0 && !(PEND & FM) && (IN==0 || (avail(IN) && (!TE || head.tag==TAG))) && (OUT==0 || free(OUT))`
-
-**Priority:** the lowest slot index wins.
-
-### 5.3 Operations (OP field, 4 bits)
-
-| OP | Name | Effect | Used for |
-|---|---|---|---|
-| 0 | MOV | d = A | Forwarding tokens, loading registers |
-| 1 | ADD | d = A + B | Counters, pointers |
-| 2 | SUB | d = A − B | |
-| 3 | AND | d = A & B | Masking |
-| 4 | OR | d = A \| B | |
-| 5 | XOR | d = A ^ B | Arbitration readback compare |
-| 6 | SHL | d = A << B[3:0] | |
-| 7 | SHR | d = A >> B[3:0] | |
-| 8 | SHOR | d = (A << IMM[3:0]) \| r[IMM[5:4]] | Frame building (start/stop bits, ACK bit) in one action |
-| 9 | EXT | d = (A >> IMM[3:0]) & mask(IMM[7:4]+1) | Pull a field out of a frame |
-| 10 | CMPEQ | f[DF] = (A == B) | Address match, state checks |
-| 11 | CMPM | f[DF] = ((A & r[IMM[1:0]]) == r[IMM[3:2]]) | Check several bits at once (start/stop/ACK) |
-| 12 | PAR | f[DF] = XOR-reduce(A) | UART/PS/2 parity |
-| 13 | TSTZ | f[DF] = (A & B) == 0 | Bit tests |
-| 14 | MKCTL | d = {IMM[7:4], 0, A[10:0]}, tag CTRL | Pin commands whose argument comes from a register |
-| 15 | CALL | start routine number IMM (entry-table lookup); set RB | Hand off to routines |
-
-A output tag is DATA unless `OTAG` is set or OP = MKCTL. Compare ops normally use DST = 6 (none).
+Moved to **`ISA.md`** (§3 operation table, §4 reflex slots), which is now the single description of what a lane executes. Summary: 52-bit slots in a latch array, written only while the lane is halted. Channel readiness is implicit in the operands. The lowest-index ready slot fires, and urgent slots pre-empt a waiting routine step. There are 16 ops, shared with routines, and every op can write a flag result.
 
 ### 5.4 The two-stage lane pipeline
 
@@ -229,18 +179,9 @@ This holds when the reacting slot is the highest-priority ready slot in its lane
 
 ## 6. Routines
 
-### 6.1 Routine instruction set (16-bit words in SRAM)
+### 6.1 Routine instruction set
 
-| Format | Bits | Instructions |
-|---|---|---|
-| R | `op[15:12] rd[11:10] ra[9:8] rb[7:6] -[5:0]` | MOV ADD SUB AND OR XOR SHL SHR (op 0–7) |
-| I | `op[15:12] rd[11:10] imm[9:0]` | LDI (zero-extend 10-bit), ADDI (signed 10-bit), LDIH (r[15:10] = imm[5:0]) |
-| B | `op[15:12] cond[11:9] rel[8:0]` | BF f / BNF f / BRA / DJNZ r (signed 9-bit offset) |
-| M | `op[15:12] rd[11:10] ra[9:8] off[7:0]` | LD rd,[ra+off] / ST rd,[ra+off] (data region) |
-| O | `op[15:12] port[11] tag[10:9] ra[8:7] -` | OUT port, ra, tag (enqueue a token; blocks if full) |
-| S | `op[15:12] kind[11:10] val[3:0]` | SETST v, SETF f, CLRF f, RET |
-
-**OPEN:** exact opcode assignment is settled in P1. Everything is generated from one ISA table (see VERIFICATION.md §4.1).
+Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same operation table as reflexes, plus `LDI/LDIH`, `BR` (on the routine-local `RZ` bit), `DJNZ`, `LD/ST`, `OUT` and `SYS` (`SETST`, `SETF`, `CLRF`, `TSTF`, `CPYF`, `GETT`, `GETK`, `RET`). §6.2–6.3 below describe execution; `ISA.md` §5.3 defines exactly how routine steps and reflexes share EXEC.
 
 ### 6.2 Execution
 - **SRAM access is a fixed rotation:** cycle mod 4 = 0 → L0, 1 → L1, 2 → L2, 3 → MEM/CAPTURE/HOST.
@@ -249,8 +190,7 @@ This holds when the reacting slot is the highest-priority ready slot in its lane
 - **CALL** reads the routine's start address from an entry table in the first 32 SRAM words, taking one slot. It sets RB, and `RET` clears it.
 
 ### 6.3 Interruption and bounds
-- A reflex with **U = 1** can fire while RB is set, and the routine simply continues at its next free step.
-- A reflex with U = 0 can fire only when its condition holds; its condition may include f3 (RB) to wait until the routine is done.
+- Every reflex stays eligible while RB is set. `U` only decides who wins EXEC when a routine step is waiting: an urgent reflex beats it, and a non-urgent one waits one clock (`ISA.md` §5.3). A reflex that must wait for the routine to finish includes f3 (RB) = 0 in its condition.
 - **Routines never wait on pins.** `OUT` may stall while its output register is full, and the compiler reports these stalls separately in the routine's bound.
 - Loops need a static bound (`DJNZ` with a compile-time-known count), so every routine has a compiler-computed worst-case step count.
 
@@ -303,8 +243,10 @@ This holds when the reacting slot is the highest-priority ready slot in its lane
 |---|---|
 | SHIFT_RX | Waits for a start edge on pin A, samples NBITS at PERIOD (first sample at SAMPLEOFS), emits a DATA token; re-arms if AUTOREARM |
 | LINKED_RX | Samples pin A on each LINKEDGE of pin B, emits a DATA token after NBITS |
-| EDGE_TS | Emits an EVENT token per edge: data = {polarity, time[14:0]} |
-| COND_EDGE | Emits EVENT tokens `START`/`STOP` when pin A changes while pin B is high (I2C). Combinable with LINKED_RX on the same unit. |
+| EDGE_TS | Emits an EVENT token per edge: data = {polarity, time[14:0]} (`data[15]` = 1 for a rising edge) |
+| COND_EDGE | Emits EVENT tokens `START` (`data[15]` = 1) / `STOP` (`data[15]` = 0) when pin A changes while pin B is high (I2C). Combinable with LINKED_RX on the same unit. |
+
+EVENT tokens always carry their kind or polarity in `data[15]`, so reflex conditions can test it directly (`ISA.md` §4.2).
 
 ---
 
@@ -373,7 +315,7 @@ This holds when the reacting slot is the highest-priority ready slot in its lane
 | Block | Estimate |
 |---|---|
 | 3 lanes (registers, predicates, pipeline, routine control) | ~0.4K flops |
-| Reflex slots, 3 × 12 × ~51 bits, latch arrays | ~1.8K latch bits (~80K µm²) |
+| Reflex slots, 3 × 12 × 52 bits, plus 3 × 4 × 16 constant (K) bits, latch arrays | ~2.1K latch bits (~90K µm²) |
 | Fabric (16 producer registers, 17 ports, 8-way muxes) | ~0.5K flops + muxes |
 | Pin units ×6 | ~0.55K flops |
 | Helpers + host + time base | ~0.5K flops |
@@ -391,14 +333,7 @@ Setup:
 - L0.I0 ← U0.rx (blocking). L0.O0 → U0.tx.
 - r1 = own address << 1. r2 = 0x00FE (address-bits mask), for comparing against the byte with its R/W bit masked off.
 
-```
-slot 0 (U): when I0 has EVENT(START)                  do STATE:=ADDR, DQ
-slot 1 (U): when STATE==ADDR & I0 has DATA             do f0 := CMPM(I0.head, mask r2, val r1), DQ, STATE:=ACKQ
-slot 2 (U): when STATE==ACKQ & f0==1 & O0 free          do O0 := {SETN 1}(CTRL) ; STATE:=ACK1
-slot 3 (U): when STATE==ACK1 & O0 free                 do O0 := DATA 0 (1-bit shift of 0 at next SCL fall) ; CALL addr_ok
-slot 4 (U): when STATE==ACKQ & f0==0                   do STATE:=IDLE      ; not us: stay released
-...
-```
+The slot program for this example, in the current ISA, is in `ISA.md` §7.2. In outline: START (slot 0) → address byte compared with `CMPM` into f0 (slot 1) → if it matches, `SETN 1` then a single DATA 0 bit to U0.tx (slots 2–3). The timeline below is unchanged by the ISA revision.
 
 **Timeline:** the 8th SCL rising edge at the pad is t = 0.
 

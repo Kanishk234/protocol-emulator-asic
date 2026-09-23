@@ -86,11 +86,11 @@ docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md  docs/WORKLOG.md
 ## 4. Phase exit checklist (all must pass)
 - [ ] Repo public; top module is `tt_um_tripwire`; `info.yaml` says `tiles: "6x4"`, 50 MHz.
 - [ ] `test` workflow green on the trivial design.
-- [ ] `docs` workflow green.
+- [x] `docs` workflow green. *(Evidence: run 35822749773 on bff60b5, 2026-09-23.)*
 - [ ] `gds` workflow: `gds`, `precheck`, `gl_test` and `viewer` all green.
 - [ ] **GitHub Pages shows the GDS viewer** at the repo's Pages URL.
 - [ ] `fpga` workflow has been run once manually; result recorded (green, or the reason it isn't).
-- [ ] gds trigger `paths` filter in place: a docs-only push does **not** start a hardening.
+- [x] gds trigger `paths` filter in place: a docs-only push does **not** start a hardening. *(Evidence: the push ending at bff60b5 touched only `docs/` and `scripts/`; it ran `test` 35822749744 and `docs` 35822749773, and no `gds` run. The running `gds` 35821375890 was not cancelled.)*
 - [x] Local `scripts/check_all.sh` passes in WSL; `sigrok-cli` decodes a UART test VCD. *(Evidence: `scripts/check_all.sh` → `check_all: PASS`, 4/4 tests, 2026-09-23; `scripts/sigrok_smoke.py` → sigrok `uart` decoded "TRIPWIRE".)*
 - [ ] Jane Street sign-up form submitted; tile-size and SRAM questions emailed.
 - [ ] Roles assigned and written in the README.

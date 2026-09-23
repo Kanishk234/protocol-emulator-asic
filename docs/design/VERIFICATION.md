@@ -18,7 +18,7 @@ Companions: `OVERVIEW_TRIPWIRE.md` (overview and schedule) and `ARCHITECTURE.md`
 
 | # | Technique | Status in the field | What it gives us |
 |---|---|---|---|
-| V1 | **Checking programs before they load.** The compiler checks every program: routine worst-case length, reaction bound for every urgent reflex, slot/SRAM usage, and **no deadlock / no overrun** for fixed-rate channel graphs. | New to the competition | Guarantees about the *firmware*, not only the chip. Only possible because a TRIPWIRE program is an explicit graph |
+| V1 | **Checking programs before they load.** The compiler checks every program: routine worst-case length, reaction bound for every urgent reflex, slot/SRAM usage, and **no deadlock / no overrun** for fixed-rate channel graphs. | Timing bounds alone are not new: a Hardcaml entry bounds pin-edge timing by abstract interpretation. Graph-level deadlock/overrun checking across the fabric is ours | Guarantees about the *firmware*, not only the chip. Only possible because a TRIPWIRE program is an explicit graph |
 | V2 | **Formal proofs of the channel fabric**: no loss, duplication or reordering on blocking paths; multicast consistency; taps never block | New (the fabric itself is new) | The multicast network is trustworthy by proof |
 | V3 | **Formal proofs of the reflex scheduler**: 7-clock pin-to-pin bound, pending-flag rule, rotation fairness, lane isolation | New to the competition (others prove ISA decode/ISA semantics) | The headline timing claim is proven, not just measured |
 | V4 | **Program-specific formal checks**: the RTL is checked *with each shipped protocol program loaded*, confirming the compiler's V1 report on real hardware | Our method | Closes the gap between "the compiler says" and "the chip does" |
@@ -234,7 +234,7 @@ Each result must match the compiler's V1 report. Any mismatch is a bug in one of
 
 | Covergroup | Bins | Goal |
 |---|---|---|
-| Slot fields | Every OP × DST × ASRC; every IN/OUT/TE combination; urgent vs normal | 100% |
+| Slot fields | Every OP × DST × ASRC × BSEL; every TE/HE combination; implicit input/output/CALL checks; urgent vs normal, with and without a waiting routine step | 100% |
 | Scheduler | 1–12 ready slots at once; priority winner = each index; pending-flag stall; firing during a routine | 100% |
 | Channels | Blocking subscribers 0–4 × taps 0–2; producer stall; tap drop; overrun | 100% |
 | Pin units | Every TX op and RX mode; LATE; STRETCH wait; AUTOREARM back-to-back; linked on rise and fall | 100% |

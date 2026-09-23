@@ -15,7 +15,7 @@ Companion documents: `ARCHITECTURE.md` (the hardware contract: datapath, formats
 ## 1. What is new: the novelties we are going for
 
 Honesty labels:
-- **[NEW-FIELD]**: not found in any of ~40 surveyed competition entries. It may have academic or industry prior art, which is cited.
+- **[NEW-FIELD]**: not found in any surveyed competition entry. It may have academic or industry prior art, which is cited. The first survey covered ~40 entries; by 2026-09-23 there are more (e.g. Tempo, Metastable, Sophos, PEMU, Cycle, PRISM, a Hardcaml entry). Re-check every label against the current field before submission.
 - **[OURS]**: a design choice of ours not seen elsewhere.
 - **[STANDARD]**: table stakes. We do it, but do not claim it as novel.
 
@@ -47,7 +47,7 @@ Honesty labels:
 
 ### 1.2 Verification
 
-1. **Checking programs before they load [NEW-FIELD].** A program is a graph of channels, reflexes and routines, so the compiler can check it statically:
+1. **Checking programs before they load [OURS].** Not new to the field on its own: a Hardcaml entry (MarcosAsh/protocol-emulator) already bounds pin-edge timing with an abstract-interpretation analyser. What is ours is checking the whole *channel graph* (deadlock and overrun across lanes, fabric and pin units), which only works because a TRIPWIRE program is an explicit graph. A program is a graph of channels, reflexes and routines, so the compiler can check it statically:
    - **no deadlock** and **no overrun**, for fixed-rate graphs;
    - a **worst-case length for every routine**;
    - a **reaction-time bound for every urgent reflex**.
@@ -150,22 +150,24 @@ Software decides which alarm watches what and where the belts go. The watching a
 - **Pin-receiver rule:** a pin never waits. If a blocking subscriber is full when a new token arrives, the token is lost and a sticky `OVERRUN` flag is set.
 
 ### 4.3 Lanes and reflexes
-- **State:** 4 × 16-bit registers, 8 predicate bits, 2 input ports, 2 output ports, a routine PC and a busy flag.
-- **Reflex slot (~51 bits, latch array, written only while halted):**
+The full instruction set is in `ISA.md`.
+- **State:** 4 × 16-bit registers, 4 host-loaded 16-bit constants (K0–K3), 8 predicate bits, 2 input ports, 2 output ports, a routine PC and a busy flag.
+- **Reflex slot (52 bits, latch array, written only while halted):**
   - **Condition:**
-    - predicate mask and value;
-    - optionally, input port *i* not empty, plus a match on its head token's tag;
-    - optionally, output port *j* not full;
+    - STATE and flag mask/value;
+    - optionally, a tag match and a `data[15]` match on the input the action reads;
     - an urgent flag.
+    - Input-available, output-free and routine-idle checks are **implicit**: the hardware adds them from what the action uses.
   - **Action:** one operation.
-    - Sources: a register, an immediate, or an input head (optionally removing it).
+    - Sources: a register, an input head (optionally removing it), zero or time; B is a register, an immediate or a constant.
     - Destination: a register or an output port.
-    - Up to 2 predicate updates.
-    - Optionally `CALL routine`.
-- **Operations:** `ADD SUB AND OR XOR MOV`, plus these, which paper sketches of UART, SPI and I2C showed are needed:
+    - A static STATE update, and a flag result written to one predicate.
+- **Operations:** 16, shared with routines. `MOV ADD SUB AND OR XOR SHL SHR`, plus protocol-shaped ones:
   - `SHOR d=(a<<s)|b` (frame building)
   - `EXT` (bitfield extract)
   - `CMPM p=((a&mask)==val)` (compare into a predicate)
+  - `LTU`, `PAR`, `MKCTL`, `CALL`
+  - Every op can write a flag result (zero, or the compare result), so a counter decrements and tests in one action.
 - **Scheduling:**
   - All 12 conditions are evaluated every clock, and a priority encoder picks one.
   - Static predicate updates apply at select time, so they are visible on the next clock.
@@ -177,7 +179,7 @@ Software decides which alarm watches what and where the belts go. The watching a
 - 16-bit instructions stored in SRAM. They use the same datapath and operations as reflexes, plus local branches, `DJNZ` with a static bound, and `RET`.
 - **Fixed 4-way SRAM rotation:** lane 0 → lane 1 → lane 2 → memory unit/host. That gives 1 routine step per lane every 4 clocks (12.5 M steps/s).
 - A routine cannot wait, since waiting belongs to reflexes. It is bounded, and its worst-case length is proven by the compiler.
-- **Urgent reflexes interrupt routines.** The routine resumes at its next slot. Routine timing is guaranteed only "if not interrupted".
+- **Urgent reflexes pre-empt routines.** A waiting routine step loses EXEC to an urgent reflex and runs on the next free clock; non-urgent reflexes wait at most one clock behind a routine step. Routine timing is guaranteed only "if not pre-empted" (`ISA.md` §5.3).
 
 ### 4.5 Pin units (×6)
 - Each can be attached to a small set of physical pins; open-drain mode is available on the `uio` pins.
@@ -219,7 +221,7 @@ Software decides which alarm watches what and where the belts go. The watching a
 | Same with 1024x16 SRAM (room for a 256-byte EEPROM image plus ~890 routine words) | ~517K µm² | ~57% |
 | 3 lanes × 16 slots | ~519K µm² | ~58% |
 
-Reference: Loom hardens at ~51% utilisation, with 4–5 h gds runs.
+Reference: Loom's README (checked 2026-09-23) reports 78.8% utilisation on 6x4 with its 512x16 SRAM, and 4–5 h gds runs. Jane Street's brief budgets "about 1K logic cells per tile" (~24K cells for 6x4). These estimates need checking against both at the R1 synthesis.
 
 **Pin budget:** 24 pins minus 4 for the host and 1 for IRQ = **19 free** (5 input-only, 6 output-only, 8 bidirectional).
 

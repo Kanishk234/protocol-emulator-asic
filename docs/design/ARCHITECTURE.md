@@ -100,7 +100,9 @@ Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VER
 ### 4.4 Release rule, stated precisely
 `src.all_taken = AND over consumer ports p with (p.en && p.mode==blocking && p.sel==src) of (p.last_seq == src.seq)`
 
-The producer's `valid` clears when `all_taken`. Throughput is one token per clock per producer.
+When `all_taken`, the producer register is free for its next load. (The draft semantics in §14, rules F3–F6, make this exact. `valid` stays set, and a taken token is not seen again because `last_seq == seq`.)
+
+**Throughput (OPEN, Q7):** the original target was one token per clock per producer. That needs a combinational path from a consumer's take back to the producer's load, and lane-to-lane channels would turn that path into a loop. The model therefore uses registered release (§14 F3). Measured cost: a lane can load the same output port at most once every 3 clocks, and HOST_IN can deliver to a lane at most once every 2 clocks. `docs/reports/ARCH_EXPLORATION.md` checks whether any protocol needs more.
 
 ### 4.5 Pin receivers never wait
 If a pin RX half completes a token while its producer register still holds an untaken token for a blocking subscriber:
@@ -354,3 +356,53 @@ SDA is driven low at the next SCL falling edge.
 **Worst case ≈ 10 clocks (200 ns) from the address's last bit to armed.** The SCL high time left before the fall is ≥ 600 ns (400 kHz) or ≥ 260 ns (1 MHz Fm+), so there is margin at both speeds.
 
 **Improvement noted for P1:** preload SETN during the address byte to save 2 clocks. This is also an example of the kind of bound the compiler reports.
+---
+
+## 14. Cycle-exact semantics (DRAFT, from the phase 1 model)
+
+This section is the text that both `tools/tripsim` and the RTL implement. It is a **draft**. Each rule was fixed while writing the model, and each is open to change at the spec freeze. The rule numbers are referenced from the model's source code.
+
+**Conventions:**
+- *Clock n* is a cycle.
+- *Edge n* is the rising edge that ends clock n.
+- All decisions in clock n read registered state as it was at the start of clock n. Their effects become visible in clock n+1.
+
+### Fabric
+- **F1.** A consumer port sees a token when `en && src.valid && last_seq != src.seq`.
+- **F2.** Taking a token sets `last_seq := src.seq` at the edge.
+- **F3.** A producer is **free** in clock n when `!valid`, or when every enabled blocking subscriber has `last_seq == seq` at the start of clock n. Takes made in clock n do not count; there is no combinational path from consumers back to producers.
+- **F4.** At an edge, takes are applied first and loads second (`seq` toggles, `valid := 1`). A tap that had the old token available and did not take it counts a drop (8-bit, saturating). **The drop counts as a take** (`last_seq := old seq`), so a tap never aliases after missing two tokens (BUGS #2).
+- **F5.** Enabling or re-pointing a port sets `last_seq := src.seq`, so a newly enabled port never sees a stale token.
+- **F6.** `valid` stays set until the next load.
+
+### Lanes
+- **L1.** EVAL runs every clock (every 2nd clock in the R1 fallback, `fire_period = 2`).
+- **L2.** Selection order is given in `ISA.md` §4.3: urgent ready slots, then a waiting routine step, then other ready slots, each group lowest index first.
+- **L3.** EXEC in clock n+1 executes the action selected at EVAL in clock n:
+  - registers and K are read in EXEC;
+  - the input head token and global time are latched at EVAL.
+- **L4.** Static updates of the selected slot are applied at edge n: `STATE := NS`, dequeue (the take), output reservation, and `PEND[DF] := 1`.
+- **L5.** EXEC writes are applied at edge n+1: `r[d]`, the output load (which also clears that output's reservation), and `f[DF]` (which also clears `PEND[DF]`).
+- **L6.** `CALL` sets RB, and requests the entry-table read, at its EVAL edge (not at EXEC). A second CALL slot therefore sees RB = 1 on the very next clock.
+- **L7.** An output is free for EVAL when it is not reserved and its producer is free (F3).
+
+### Routines
+- **R1.** SRAM rotation: `cycle mod 4` = 0, 1, 2 → lanes L0, L1, L2; 3 → MEM/CAPTURE/HOST. The SRAM read data is registered, so a word read on slot k is usable from clock k+1.
+- **R2.** On its slot, a lane fetches `SRAM[RPC]` into RIR only when RB = 1, RIR is empty, no routine step is waiting to execute, and no data access is pending. This guarantees RPC is final before the fetch.
+- **R3.** A pending data access (the entry-table read after CALL, or an LD/ST) uses the lane's slot before any fetch.
+  - `LD` returns its data as a second routine step, which competes for EXEC like any step.
+  - `ST` completes on the slot.
+- **R4.** If a reflex's static `NS` and a routine `SETST` land on the same edge, the reflex update wins.
+
+### Pins
+- **P1.** Pad inputs pass through 2-FF synchronisers: the value sampled in clock n is the pad value of clock n−2.
+- **P2.** An RX half samples in clock n and loads its producer at edge n. If the producer is not free, the new token is discarded and `OVERRUN` is set.
+- **P3.** A TX half takes a token in clock n only when all its pending pad actions fall on edges ≤ n+1. The earliest edge a newly taken token can act on is n+1, so a pad output changes at the earliest in clock n+2.
+- **P4.** The TX cursor counts 1/256 clocks.
+  - `LEVEL`/`OE` act at `cursor + d·PRESC`. If that is earlier than the earliest edge, they act at the earliest edge, and `LATE` is set if `d > 0`.
+  - `SYNC` sets `cursor :=` the earliest edge.
+  - A DATA shift starts at `max(cursor, earliest)` and never sets `LATE`.
+  - Bit i changes the pad at edge `(start + i·PERIOD) >> 8`. After the last bit the pad returns to IDLE, unless the next shift's first bit lands on the same edge.
+- **P5.** `SHIFT_RX` shifts raw bits, including start and stop bits, first sample in bit 0 (LSB order). The start edge is the first synchronised sample that differs from IDLE; sample i is taken in clock `t0 + (SAMPLEOFS·PERIOD + i·PERIOD) >> 8`.
+
+With these rules, the §5.5 path is exactly 7 clocks. The model measures it (`tools/tripsim/tests/test_pins.py::test_pin_to_pin_reaction_is_seven_clocks`).

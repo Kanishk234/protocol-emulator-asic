@@ -21,6 +21,33 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1 start: tripsim v0)
+Done:
+- `tools/tripsim` v0 (model-first, D-008), written from `ARCHITECTURE.md` + `ISA.md` only:
+  - encodings and the shared op table, a minimal assembler, the channel fabric, lanes (EVAL/EXEC, pending, implicit checks, urgent pre-emption, routines with the SRAM rotation, LD/ST, CALL/RET);
+  - pin units: TX LEVEL/OE/GAP/SYNC/SETN + SHIFT with a drift-free fractional cursor; RX SHIFT_RX + EDGE_TS;
+  - host FIFOs, pads with 2-FF synchronisers, VCD output.
+- 28 pytest tests (`python -m pytest -q`, now in `check_all.sh`). Headline measurements:
+  - pin-to-pin reaction exactly **7 clocks**;
+  - count loop 3 clocks/byte;
+  - routines 1 step per 4 clocks;
+  - sigrok decodes the model's UART TX at 1 M and 921.6 kbaud;
+  - UART RX framing check via CMPM.
+- Test quality: three injected bugs (no pending rule, TX one clock early, BUGS #2 fix reverted) each caught.
+- `ARCHITECTURE.md` §14: draft cycle-exact semantics (rules F1–F6, L1–L7, R1–R4, P1–P5) fixed while writing the model.
+
+Findings:
+- BUGS #2 (spec): 1-bit `seq` makes a tap alias after two missed tokens; fix: a counted drop is a take.
+- D-009: OP 15 = `MOVB` (d = B), needed to react to an input with a constant in one action; keeps the 7-clock reaction.
+- Q7 (open): registered release limits a lane output to 1 token / 3 clocks and HOST_IN→lane to 1 / 2; §4.4's "1 per clock" is not met.
+
+Checklist boxes ticked (evidence):
+- none yet. Phase 1's tripsim box needs every pin-unit mode, and none of the kernel or risk boxes has started.
+
+Next:
+- Model LINKED_RX, COND_EDGE and CLKGEN, then the I2C target and SPI controller kernels; start `docs/reports/ARCH_EXPLORATION.md` (ISA.md §9 rows, Q7).
+- Risk spike R1 (one lane at 50 MHz) in parallel.
+
 ## 2026-09-23: Krithik + Claude (phase 0)
 Done:
 - Top module renamed to `tt_um_tripwire` (`src/tt_um_tripwire.v`); trivial design = 8-bit counter on `uo_out`, enabled by `ui_in[0]`.

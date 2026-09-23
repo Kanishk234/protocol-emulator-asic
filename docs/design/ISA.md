@@ -87,11 +87,11 @@ Every op also produces a **1-bit result R**:
 | 12 | PAR | A (pass-through) | XOR-reduce(A) | Parity check **while forwarding** the byte |
 | 13 | MKCTL | {F[7:4], A[11:0]}, tag CTRL | d == 0 | Pin command whose argument, *including bit 11*, comes from a register (fixes Q3) |
 | 14 | CALL | — | — | Start routine F[4:0] (reflex only); implicit condition RB == 0 |
-| 15 | — | reserved | | Kept free for what the model shows is missing (§9) |
+| 15 | MOVB | B | d == 0 | **React to an input with a constant.** A reads the input, so the implicit check, tag/`data[15]` tests and dequeue apply to it; the result is B (a K constant, an immediate or a register). Example: on an EVENT, send a fixed pin command. Added from a model finding (DECISIONS D-009) |
 
 Changes from the earlier op table (`ARCHITECTURE.md` §5.3 before DECISIONS D-007):
 - `CMPEQ` and `TSTZ` are gone. `XOR` and `AND` with a zero result do the same job, now that every op produces a flag result.
-- Their codes went to `LTU` and a reserved slot.
+- Their codes went to `LTU` and `MOVB` (D-009).
 - `PAR`, `CMPM` and `LTU` pass A through, so a byte can be checked and forwarded in the same action.
 
 ---
@@ -255,7 +255,7 @@ Setup:
 - All general registers stay free.
 
 ```
-slot 0 U  when I0:EVENT, head[15]=1 (START)     do MOV none := I0 ; deq ; STATE:=ADDR
+slot 0 U  when I0:EVENT, head[15]=1 (START)     do MOV none := I0 ; deq ; STATE:=ADDR   (A = I0 so the tests apply)
 slot 1 U  when STATE=ADDR, I0:DATA              do CMPM none := I0, mask K0, val K1 -> f0 ; deq ; STATE:=ACKQ
 slot 2 U  when STATE=ACKQ, f0=1                 do OR O0 := zero, K2, tag CTRL ; STATE:=ACK1
 slot 3 U  when STATE=ACK1                       do MOV O0 := zero (DATA 0: one ACK bit) ; STATE:=ACKD
@@ -294,7 +294,7 @@ These are deliberately **not** decided by argument. The architecture model (`tri
 |---|---|---|
 | Are 12 slots enough? | Slots used per protocol and per lane | 12 vs 16 slots |
 | Are 4 registers + 4 constants enough? | Register/constant pressure; spills into routines | Keep, or 8 registers |
-| What should OP 15 be? | Ops that recur as 2-action idioms in the protocol programs | Assign OP 15 or leave reserved |
+| ~~What should OP 15 be?~~ | Answered: `MOVB` (D-009). The model's first latency kernel needed "on an input, emit a constant" | Done |
 | Do implicit checks, the zero flag, `K` and `HE/HV` pay off? | Slots and clocks per protocol, with and without each | Keep or drop each (ablation) |
 | What does the R1 fallback cost? | Protocol deadlines met at "fire every other clock" | Whether the fallback is acceptable |
 | Separate TX/RX NBITS in pin units? | ACK and turnaround latency | Pin-unit spec change |

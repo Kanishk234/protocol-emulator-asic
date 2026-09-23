@@ -60,6 +60,12 @@ A spec change is proposed here first and implemented only after the team agrees.
 - **Scope:** still phase 1 work; it starts when phase 0 exits (D-006 covers only `ISA.md`).
 - **Status:** accepted (team).
 
+## D-009 (2026-09-23): OP 15 = `MOVB` (d = B)
+- **Finding (tripsim, first latency kernel):** with implicit readiness checks (D-007), a slot's tag/`data[15]` tests and dequeue apply only to the input it reads as A. "When an EVENT arrives on I0, send a constant pin command" therefore had no one-action form: with A = I0 the result is built from the event's timestamp, and with A = zero the slot ignores I0 and fires without an event. The workaround costs an extra action and would push the 7-clock pin-to-pin reaction to 8.
+- **Decision:** the reserved OP 15 becomes `MOVB`: d = B, flag result d == 0. A reads (and may dequeue) the input; B supplies the constant (K, immediate or register).
+- **Evidence:** `tools/tripsim/tests/test_pins.py::test_pin_to_pin_reaction_is_seven_clocks` uses `MOVB` and measures exactly 7 clocks.
+- **Status:** accepted (draft ISA; the model's ablation can still reverse it).
+
 ---
 
 ## Open questions for the phase 1 spec freeze
@@ -71,4 +77,5 @@ Found while reading the design docs; to be settled in `ARCHITECTURE.md` during P
 - **Q3: `MKCTL` cannot build `LEVEL 1` / `OE 1`.** MKCTL (§5.3) produces `{IMM[7:4], 0, A[10:0]}`, forcing data bit 11 to 0, but the pin-unit `LEVEL` and `OE` ops (§7.3) take their value from bit 11. Options: pass `A[11:0]` through, or take bit 11 from an IMM bit.
 - **Q4: routine B format is too narrow.** `cond[11:9]` is 3 bits, but `BF f` / `BNF f` need a branch kind plus a 2-bit flag index, and `DJNZ r` needs a 2-bit register (§6.1). Needs at least 4 bits, or fewer branch kinds / flags.
 - **Q5: routines have no compare or bitfield ops.** §4.4 of the overview says routines use the same operations as reflexes, but the R format only covers ops 0–7. There is no `CMPEQ`/`CMPM`/`TSTZ`/`PAR`/`EXT`/`SHOR` in routines, so a routine cannot set a flag from data. The 16 routine opcodes are all used, so adding these needs a sub-opcode field or dropping something.
+- **Q7: fabric throughput (found by tripsim).** `ARCHITECTURE.md` §4.4 promised one token per clock per producer. That requires a same-clock path from a consumer's take back to the producer's load, which becomes a combinational loop on lane-to-lane channels. The model uses registered release (§14 F3). Measured: a lane can load one output port at most once every 3 clocks, and HOST_IN can feed a lane at most once every 2 clocks (`test_lane.py` throughput tests). Options: accept this; add a second register (depth 2) on selected producers; or allow a same-clock release only on edges that cannot form loops (pin TX, HOST_OUT). To be decided from the protocol kernels' measured needs.
 - **Q6: `OTAG` shares bits with the immediate.** With `OTAG=1` the output tag comes from `IMM[7:6]`, so a slot that emits a CTRL/EVENT/ERR token with `BSEL=1` is limited to immediates 0–63. Decide whether that is acceptable or give the tag its own bits (the slot is 51 bits in a 64-bit host word space, so there is room).

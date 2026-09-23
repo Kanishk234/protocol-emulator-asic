@@ -15,6 +15,7 @@ TRIPWIRE firmware in the `.trw` language, compiled by `tools/tripc`. The languag
 | `onewire.trw` | 1-Wire controller: reset/presence, byte write/read (AN126 standard speed) | 9 | 1 | DS18B20-like device (READ ROM + CRC-8) and sigrok `onewire_link`/`onewire_network` |
 | `swd.trw` | SWD controller: DP/AP reads and writes, WAIT handling, turnarounds | 12 | 3 | ADIv5 target model and sigrok `swd`, SWCLK up to 8.3 MHz |
 | `jtag.trw` | JTAG scan engine: TMS/TDI chunks in, TDO chunks out | 8 | — | IEEE 1149.1 TAP model (IDCODE, USER, BYPASS) and sigrok `jtag`, TCK up to 12.5 MHz |
+| `can.trw` | CAN 2.0A controller: TX with arbitration, RX, ACK, CRC/stuff errors | 11 + 10 (2 lanes) | 3 | Reference CAN node and sigrok `can`, 125 k / 500 k / 1 Mbit/s |
 
 **Build and run:**
 - `cd tools && python -m tripc ../programs/uart.trw -p BAUD=1000000` prints the report (slot/SRAM usage, routine bounds, pre-emption).

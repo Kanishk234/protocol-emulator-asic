@@ -21,6 +21,25 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1: spec YAML, generator, phase summaries)
+Done:
+- `docs/summaries/` with plain-language PHASE0.md (complete) and PHASE1.md (in progress). CLAUDE.md: every phase ends with a summary there.
+- `spec/tripwire.yaml` (draft 0.1): all encodings in one place.
+- `tools/gen/gen.py`: validates the spec and generates `tools/tripwire_spec.py`, `src/trw_defs.vh` and the ISA/ARCHITECTURE tables; `--check` for CI.
+- tripsim now imports the generated tables (`isa.py`, `asm.py`, `pinunit.py`); its hand-written copies are gone.
+- New CI workflows `lint` (gen check, defs compile, Verilator lint) and `unit` (pytest with sigrok).
+- 15 generator tests; the total is 73 pytest tests, and `check_all: PASS`.
+- A hand-edited generated table is caught by `--check` (demonstrated).
+- Found on the way: YAML 1.1 reads a bare `off` key as `false`. The keys are now quoted, and the generator rejects non-string field names.
+
+Checklist boxes ticked (evidence):
+- none yet. "spec/tripwire.yaml is the only place encodings live; the lint CI regenerates and shows no diff" can be ticked once the `lint` workflow runs green on `main`.
+
+Next:
+- Push (note: `src/trw_defs.vh` is under `src/`, so this push starts one ~45-minute `gds` run; harmless).
+- Tick the spec box from the `lint` run ID.
+- Then either `tripc` v0 or the R1–R3 spikes (fresh session for RTL).
+
 ## 2026-09-23: Krithik + Claude (phase 1 start: tripsim v0)
 Done:
 - `tools/tripsim` v0 (model-first, D-008), written from `ARCHITECTURE.md` + `ISA.md` only:

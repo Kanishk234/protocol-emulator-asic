@@ -27,6 +27,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - Tick checklist boxes only with evidence (a test run, a CI run ID, a proof log, or a file) noted next to the box.
 - Every phase ends with all CI workflows green on `main`.
 - **End every session with a `docs/WORKLOG.md` entry**: what was done, which boxes were ticked (with evidence), and the next step.
+- **End every phase with a plain-language summary** in `docs/summaries/PHASE<N>.md` (goal, what we did, what we found, what's left, one-line takeaway), written for someone who wasn't there. Keep in-progress summaries current at major milestones.
 
 ## Engineering rules
 - **General and optimized (DECISIONS D-012).** No dedicated protocol blocks; protocol logic lives in firmware. Every addition (pin unit, ISA, fabric, anything) should be the most general primitive that is still efficient for any protocol, including ones not yet considered. When a protocol exposes a gap, generalize an existing primitive rather than add a protocol-shaped one, even if that means changing the architecture or ISA. State the general need and the cost of each addition in its DECISIONS entry.

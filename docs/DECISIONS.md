@@ -173,6 +173,20 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - the SPI controller's honest limit with a symmetric clock is 12.5 MHz. The earlier 16.7 MHz relied on a lopsided 2:1 duty cycle from odd-period rounding.
 - **Status:** accepted (draft).
 
+## D-017 (2026-09-23): `spec/tripwire.yaml` + generator, as a draft (not yet frozen)
+- **Decision:**
+  - `spec/tripwire.yaml` now holds every encoding (tags, op table, slot fields and enums, routine formats including signed fields, SYS kinds, pin-unit commands, the TX length-in-token layout), with the descriptions the docs show.
+  - `tools/gen/gen.py` validates it: fields tile exactly, codes are unique and fit, and names are strings (the YAML `off`/`on` boolean trap).
+  - It generates:
+    - `tools/tripwire_spec.py`, which tripsim now imports (its private copies are gone);
+    - `src/trw_defs.vh`;
+    - the ISA/ARCHITECTURE tables between `GENERATED` markers.
+  - `--check` fails on any drift. It runs in `check_all.sh` and the new `lint` workflow; the new `unit` workflow runs pytest.
+- **Deviations from the phase 1 plan (task 3):**
+  - one shared Python module instead of separate `tripc/encoding.py` and `tripsim/decoding.py`. Encodings are shared by design; independence is about behaviour, not bit positions.
+  - `formal/props/dec_props.sv` waits for phase 2: it needs RTL signals to bind to.
+- **Status:** `status: draft` in the YAML. It is flipped to `frozen` at the phase 1 spec freeze, after R1–R3, since the hardware experiments may still change slot widths. After that, spec changes need a DECISIONS entry.
+
 ---
 
 ## Open questions for the phase 1 spec freeze

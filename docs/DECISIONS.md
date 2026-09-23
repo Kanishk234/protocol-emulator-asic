@@ -78,6 +78,7 @@ A spec change is proposed here first and implemented only after the team agrees.
 - **Status:** accepted (draft).
 
 ## D-011 (2026-09-23): TX tag filter per pin unit, and TX preload for linked shifts
+*(The tag-filter part is superseded by D-015: filters now live on every fabric consumer port. TX_PRELOAD stands.)*
 - **Finding (tripsim, SPI controller kernel):**
   - An SPI controller needs three output streams (MOSI data, SCK clock commands, CS), but a lane has only two output ports. Spending a second lane on CS would cost a third of the chip's lanes.
   - SPI mode 0 (CPHA = 0) needs the first data bit on the wire *before* the first clock edge, which a purely edge-linked shift cannot do.
@@ -133,6 +134,43 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - CS setup ≥ 3 clocks (60 ns);
   - MISO released ≤ 3 clocks after CS rises (output-disable time).
   All three come from the 2-clock input synchroniser.
+- **Status:** accepted (draft).
+
+## D-015 (2026-09-23): tag filters on every fabric consumer port (supersedes D-011's TX_ACCEPT)
+- **Finding (tripsim, I2C controller kernel):** one lane output needed to feed a pin unit (SCL: CTRL commands) *and* the host (HOST_OUT: received bytes). The D-011 tag filter lived only in pin units, and HOST_OUT is not a pin unit.
+- **Decision (general form, D-012):** every consumer port has a 4-bit `accept` tag mask, set by the host with the port's source select. Non-accepted tokens are dropped at the port, as if taken (§14 F7). TX_ACCEPT is removed from pin units.
+- **General need:** any multicast where subscribers want different kinds of token: pin units sharing one lane output, host and pin sharing one output, lanes ignoring event streams they do not need.
+- **Cost:** 4 bits per consumer port (17 ports), plus a small compare.
+- **Evidence:**
+  - SPI controller (SCK/MOSI/CS by port filters) and I2C controller (SCL + HOST_OUT on L.O1; SDA events filtered off L.I1) both pass;
+  - all earlier tests unchanged.
+- **Status:** accepted (draft).
+
+## D-016 (2026-09-23): CLKGEN period shape and STRETCH, WAIT command, echo = shifted bits on the pin
+- **Finding (tripsim, I2C controller kernel):**
+  1. CLKGEN periods started with the active edge, so an I2C START had no hold time before the first SCL fall, and SPI had only 1 clock of data setup.
+  2. A controller must follow a target that holds SCL low (clock stretching).
+  3. I2C STOP / repeated START need "SDA changes only after SCL has risen". With stretching, only waiting on the real edge is safe.
+  4. The old echo rule ("TX busy") would have tainted a controller's read bytes, since its ACK token must be queued during the byte.
+- **Decision:**
+  - (1) Each CLKGEN period is **IDLE half, then ACTIVE half** (§14 P11).
+  - (2) STRETCH: the IDLE half is timed from when pin A actually reads IDLE.
+  - (3) New command **WAIT** (op 7): stop taking tokens until pin B shows an edge, then restart the timeline at that edge (§14 P16).
+  - (4) A word is tainted only while one of this unit's *shifted bits* is on the pin (§14 P13).
+- **General need:**
+  - Clock generation that is safe on shared or stretched clock lines (I2C, SMBus, PMBus).
+  - Sequencing one pin's commands against another pin's real edges (STOP/START, SWD/JTAG turnarounds, "wait for ready" lines).
+- **Cost:**
+  - CLKGEN becomes a small state machine instead of a precomputed schedule;
+  - WAIT is a 1-bit edge register + compare;
+  - taint is 1 bit.
+- **Evidence:** `tools/kernels/tests/test_i2c_controller.py`, at 100 kHz / 400 kHz / 1 MHz, each with no stretch, 40-clock stretch and longer-than-a-period stretch:
+  - writes, reads, NACK, repeated START and STOP are correct against the reference target and sigrok;
+  - a bus-timing oracle asserts tLOW and tHIGH ≥ PERIOD/2;
+  - turning off STRETCH fails 4 tests; making WAIT a no-op fails.
+- **Measured costs:**
+  - stretch awareness adds 3 clocks per high phase (943 kHz at a nominal 1 MHz);
+  - the SPI controller's honest limit with a symmetric clock is 12.5 MHz. The earlier 16.7 MHz relied on a lopsided 2:1 duty cycle from odd-period rounding.
 - **Status:** accepted (draft).
 
 ---

@@ -96,6 +96,7 @@ Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VER
 - **Available** to the consumer when `en && src.valid && last_seq != src.seq`.
 - **Taking** sets `last_seq = src.seq`.
 - For a **tap**: if the producer loads a new token before the tap took the old one, the tap's `DROPPED` counter increments (8-bit, saturating).
+- `accept` (4 bits, D-015): a tag mask. A token whose tag is not accepted is dropped at the port without reaching the consumer, so one producer can feed several consumers that each keep only their own kind of token (§14 F7).
 
 ### 4.4 Release rule, stated precisely
 `src.all_taken = AND over consumer ports p with (p.en && p.mode==blocking && p.sel==src) of (p.last_seq == src.seq)`
@@ -225,7 +226,6 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | SAMPLEOFS | For SHIFT_RX: sample position within a bit (fraction of PERIOD) |
 | AUTOREARM | For SHIFT_RX: re-arm on the next start edge automatically |
 | STRETCH | CLKGEN waits for the line to read high before timing the high phase |
-| TX_ACCEPT | 4-bit tag mask. Tokens with other tags are taken and dropped immediately, so one lane output can feed several units, each picking its tokens by tag (D-011, §14 P10) |
 | TX_PRELOAD | Linked shift: bit 0 goes out at once when idle, the rest on TX_EDGE (SPI CPHA = 0) (D-011, §14 P9) |
 
 ### 7.3 TX half: tokens consumed
@@ -238,10 +238,11 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 |---|---|---|---|
 | 1 | LEVEL | [11] v, [10:0] delay (ticks) | Drive v at *cursor + delay* |
 | 2 | OE | [11] oe, [10:0] delay | Change output enable at *cursor + delay* |
-| 3 | CLK | [7:0] n | Generate n clock periods (CLKGEN mode) |
+| 3 | CLK | [7:0] n | Generate n clock periods (CLKGEN mode): each period IDLE for PERIOD/2, then ACTIVE for PERIOD/2; with STRETCH, each IDLE half is timed from when pin A actually reads IDLE (§14 P11) |
 | 4 | GAP | [11:0] ticks | Advance the cursor (idle spacing) |
 | 5 | SYNC | none | Set cursor := now (re-anchor to the present) |
 | 6 | SETN | [4:0] n | Change NBITS for the next DATA token |
+| 7 | WAIT | [0] edge (1 = rise) | Stop taking tokens until pin B shows this edge, then restart the timeline there (cursor := that edge). Arm a WAIT before the edge it waits for (D-016, §14 P16) |
 
 **Drift-free scheduling:** each TX half keeps a **cursor**, the scheduled time of its last action. Delays are relative to the cursor, not to when the token arrived, so a sequence of commands never accumulates error. If a token arrives after its computed time, it executes immediately and sets the sticky **LATE** flag. Lateness is detectable, never silent.
 
@@ -421,14 +422,14 @@ Measured with these rules: the I2C target kernel queues its ACK 7 clocks after t
 
 Pin rules added with the SPI modes (D-011):
 - **P9.** Linked TX with TX_PRELOAD: if the unit is idle when it takes a DATA token, bit 0 goes out at the earliest edge (P3), and the remaining bits on each TX_EDGE. If the previous shift is still waiting for its final TX_EDGE, that edge carries bit 0 instead. This is continuous clocking, and it is how consecutive SPI mode-0 bytes join without a gap.
-- **P10.** TX_ACCEPT: a token whose tag bit is clear in TX_ACCEPT is taken and dropped in the clock it becomes available, whatever the unit's readiness. So an unrelated subscriber never delays the producer.
-- **P11.** CLKGEN, `CLK n`: n periods starting at `max(cursor, earliest)`. Period i drives pin A to `!IDLE` at `start + i·PERIOD` and back to IDLE at `start + i·PERIOD + PERIOD/2` (edges rounded down in 1/256-clock units). Afterwards `cursor = start + n·PERIOD`. A second `CLK` taken before the first ends continues seamlessly. STRETCH is not specified yet (needed for the I2C controller).
+- **P10.** (Superseded by §14 F7, D-015: tag filtering moved from pin units to every fabric consumer port.)
+- **P11.** CLKGEN, `CLK n` (D-016): n periods, each **IDLE for PERIOD/2, then ACTIVE for PERIOD/2**, starting from `max(cursor, earliest)`. The leading IDLE half gives SPI data setup before the first edge and I2C START hold (tHD;STA). Without STRETCH, the IDLE half after each ACTIVE half is timed from the release edge. With STRETCH, it is timed from the first clock in which the synchronised pin A reads IDLE: another device holding the line extends the phase. That costs up to 3 clocks per period (synchroniser + register). After the burst, `cursor` = the time of the final release (or of the line reading IDLE). A `CLK` token taken while a burst runs extends it seamlessly; other tokens wait for the burst to end.
 - **P12.** In LEVEL mode, a DATA or EVENT token drives `data[0]` at `max(cursor, earliest)`.
 
 Measured with these rules: the SPI controller kernel works in mode 0 up to SCK = 16.7 MHz (3 clocks per period). MISO passes through the 2-clock input synchroniser, which is what fails at 25 MHz. It takes about 38 clocks per byte at 12.5 MHz, against 32 for the bits alone.
 
 Pin rules added with the generalized RX/TX primitives (D-013):
-- **P13.** RX word framing: bits accumulate into a word of RX_NBITS bits (or, with RX_NBITS2 ≠ 0, alternately RX_NBITS then RX_NBITS2). The word is emitted right-aligned (LSB order: first bit in `data[0]`; MSB order: last bit in `data[0]`). A word is *tainted* if any of its samples was taken while the unit's TX was active (shifting, or with pad actions pending). With RX_ECHO = 0, tainted words are dropped instead of emitted, but framing still advances.
+- **P13.** RX word framing: bits accumulate into a word of RX_NBITS bits (or, with RX_NBITS2 ≠ 0, alternately RX_NBITS then RX_NBITS2). The word is emitted right-aligned (LSB order: first bit in `data[0]`; MSB order: last bit in `data[0]`). A word is *tainted* if any of its samples was taken while a shifted bit from this unit's own TX was on pin A (from its first bit until its return to IDLE; D-016). A queued shift that has not started, LEVEL commands and released lines do not taint. With RX_ECHO = 0, tainted words are dropped instead of emitted, but framing still advances.
 - **P14.** TX_LENTOK: a DATA token shifts `data[15:12] + 1` bits taken from `data[11:0]`, in ORDER. SETN is not needed, and payloads are limited to 12 bits.
 - **P15.** Pin C (D-014): a unit is *selected* while its synchronised pin C equals C_ACTIVE (always, if no pin C).
   - While deselected, RX framing is held in reset, and no LINKED_RX/SHIFT_RX samples are taken.
@@ -436,3 +437,9 @@ Pin rules added with the generalized RX/TX primitives (D-013):
   - With C_OE, pin A's output enable is on only while selected, taking effect one clock after the synchronised change (3 clocks after the pad edge).
   - Tokens may still be taken while deselected, so a preload can prepare the first bit before selection.
   - With EV_PIN = C, the event generator watches pin C: EVENT `data[15]` = new level of C.
+- **P16.** WAIT (D-016): the TX half takes no further tokens until the synchronised pin B shows the given edge; in that clock, `cursor := earliest`. A WAIT that is taken after its edge has passed waits for the next one, so firmware must arm it first (as the I2C controller does: SCL's WAIT for the START edge before SDA falls).
+
+Fabric rule added (D-015):
+- **F7.** Each consumer port has a 4-bit `accept` tag mask. A token that is available to the port (F1) but whose tag is not accepted is not visible to the consumer, and is dropped at the edge of the clock it is available in (`last_seq := seq`), exactly as if it had been taken. So a filtered subscriber never delays the producer.
+
+Measured with these rules: the I2C controller kernel runs 100 kHz / 400 kHz / 1 MHz with and without clock stretching, meeting tLOW/tHIGH ≥ PERIOD/2 on the bus. Stretch awareness adds 3 clocks to each high phase (943 kHz at a nominal 1 MHz), and the SPI controller's limit is 12.5 MHz with a symmetric clock (§ exploration report).

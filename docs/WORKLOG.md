@@ -82,8 +82,23 @@ Later still (SPI target):
   - my own test helper overrode CS setup; fixed.
 - Removing framing reset, abort or OE gating each fails a test. 48 pytest tests pass.
 
+Later still (I2C controller):
+- D-015: tag filters moved to every fabric consumer port (supersedes D-011's pin-unit filter).
+- D-016: CLKGEN periods are IDLE half then ACTIVE half; STRETCH; new WAIT command (op 7); echo taint = own shifted bits on the pin.
+- `tools/protomodels/i2c.py`: reference I2C target (address, writes, reads, clock stretching).
+- `tools/kernels/i2c_controller.py`: 11 slots + 2 routines (repeated START, STOP). Passes 100 kHz / 400 kHz / 1 MHz × {no stretch, 40-clock stretch, longer-than-a-period stretch}, with sigrok and a bus-timing oracle (tLOW, tHIGH ≥ PERIOD/2).
+- BUGS #4: kernel START race (a WAIT armed after its edge); fixed by ordering + tBUF.
+- Honesty catches along the way:
+  - STRETCH-off survived until the timing oracle and a long stretch were added;
+  - the reversed START order is equivalent under current timing (recorded, not claimed);
+  - the SPI controller limit is 12.5 MHz (the old 16.7 relied on a lopsided duty cycle).
+- R1 fallback re-measured on all kernels: no speed limit changes; SPI controller throughput -8%.
+- 58 pytest tests pass.
+
+**Every required protocol role (UART TX/RX, SPI controller, SPI target, I2C controller, I2C target) now runs on the model, each checked by sigrok.**
+
 Checklist boxes ticked (evidence):
-- none yet. The tripsim box still needs STRETCH and PULSE; the program boxes need `tripc` and the UART/SPI/I2C-controller programs.
+- none yet. The tripsim box still needs PULSE; the program boxes need `tripc` and the UART/SPI/I2C-controller programs.
 
 Next:
 - I2C target read direction (does a full I2C target fit in 12 slots?); SPI target (flash); I2C controller (needs STRETCH).

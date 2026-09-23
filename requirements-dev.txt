@@ -1,0 +1,7 @@
+# Local development Python packages (installed into .venv by scripts/setup_venv.sh).
+# test/requirements.txt is what the template's CI `test` job installs; keep it minimal.
+-r test/requirements.txt
+pyuvm==5.0.0
+cocotb-coverage==2.0
+hypothesis==6.168.1
+pyyaml==6.0.3

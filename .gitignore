@@ -11,6 +11,8 @@ test/sim_build
 test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
+venv/
+.venv/
 
 # --- TRIPWIRE additions: local build/sim/formal output (CI keeps these as artifacts) ---
 build/

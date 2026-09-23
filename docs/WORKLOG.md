@@ -45,6 +45,15 @@ Checklist boxes ticked (evidence):
 - Phase 1 reordered to model-first (D-008); phase 1 doc updated.
 - Honesty fixes: V1 relabelled `[OURS]` (a Hardcaml entry already bounds pin timing statically); survey count marked stale; Loom's utilisation corrected to 78.8% (was ~51%).
 
+- Jane Street sign-up form submitted (team). `fpga` dispatched manually: run 35823310537 on 9fdcf93.
+- `scripts/gl_local.sh`: local gate-level run with the pinned PDK and TT Icarus 13 (cached in `~/.cache/tripwire`); `gl_local: PASS` 4/4, and it fails with the CI error when the UDP line is removed.
+- [x] Jane Street box reworded to "emailed or deferred with a DECISIONS entry" (team decision) and ticked: form submitted, D-003 deferral.
+- Roles: team chose to list Kanishk and Krithik as contributors in the README, no per-role split; box ticked.
+- `gl_test` failed in gds run 35821375890 (BUGS #1): the template's `test/Makefile` omits the PDK's `sg13cmos5l_udp.v`. Added it. Verified locally with TT Icarus 13 and a Yosys cmos5l netlist: template fails identically, fix passes 4/4. `gds`, `viewer` green in the same run; `precheck` was still running.
+- Team: design for 6x4; tile-size and SRAM questions not being emailed for now (D-003); R3 settles the SRAM macro.
+- [x] `fpga` run once: 35823310537 green.
+- [x] Pages viewer live: https://kanishk234.github.io/protocol-emulator-asic/ (gds run 35821375890: `gds` and `viewer` green; `precheck` and `gl_test` still running at time of writing).
+
 Problems / decisions:
 - D-002 keeps `tt_um_tripwire` despite TT's uniqueness advice; rename path noted.
 - `sigrok-cli` not installed yet (needs sudo).

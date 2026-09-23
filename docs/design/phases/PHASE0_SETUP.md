@@ -84,16 +84,16 @@ docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md  docs/WORKLOG.md
 ---
 
 ## 4. Phase exit checklist (all must pass)
-- [ ] Repo public; top module is `tt_um_tripwire`; `info.yaml` says `tiles: "6x4"`, 50 MHz.
-- [ ] `test` workflow green on the trivial design.
+- [x] Repo public; top module is `tt_um_tripwire`; `info.yaml` says `tiles: "6x4"`, 50 MHz. *(Evidence: GitHub API `private: false` for Kanishk234/protocol-emulator-asic; `info.yaml` and `src/tt_um_tripwire.v` at 0786358.)*
+- [x] `test` workflow green on the trivial design. *(Evidence: run 35821375912 on 0786358, and every push since.)*
 - [x] `docs` workflow green. *(Evidence: run 35822749773 on bff60b5, 2026-09-23.)*
 - [ ] `gds` workflow: `gds`, `precheck`, `gl_test` and `viewer` all green.
-- [ ] **GitHub Pages shows the GDS viewer** at the repo's Pages URL.
-- [ ] `fpga` workflow has been run once manually; result recorded (green, or the reason it isn't).
+- [x] **GitHub Pages shows the GDS viewer** at the repo's Pages URL. *(Evidence: https://kanishk234.github.io/protocol-emulator-asic/ serves the TT 3D viewer; deployed by `viewer` in gds run 35821375890, 2026-09-23.)*
+- [x] `fpga` workflow has been run once manually; result recorded (green, or the reason it isn't). *(Evidence: run 35823310537 on 9fdcf93, green, 2026-09-23.)*
 - [x] gds trigger `paths` filter in place: a docs-only push does **not** start a hardening. *(Evidence: the push ending at bff60b5 touched only `docs/` and `scripts/`; it ran `test` 35822749744 and `docs` 35822749773, and no `gds` run. The running `gds` 35821375890 was not cancelled.)*
 - [x] Local `scripts/check_all.sh` passes in WSL; `sigrok-cli` decodes a UART test VCD. *(Evidence: `scripts/check_all.sh` → `check_all: PASS`, 4/4 tests, 2026-09-23; `scripts/sigrok_smoke.py` → sigrok `uart` decoded "TRIPWIRE".)*
-- [ ] Jane Street sign-up form submitted; tile-size and SRAM questions emailed.
-- [ ] Roles assigned and written in the README.
+- [x] Jane Street sign-up form submitted; tile-size and SRAM questions emailed, **or deferred with a `DECISIONS.md` entry** (wording changed 2026-09-23, team decision). *(Evidence: form submitted 2026-09-23; D-003 records the deferral: design for 6x4, SRAM settled by risk spike R3.)*
+- [x] Roles assigned and written in the README. *(Evidence: README "Contributors" lists Kanishk and Krithik. Team decision 2026-09-23: contributors only, no per-role split for now.)*
 - [x] `DECISIONS.md`, `BUGS.md`, `CLAIMS.md`, `WORKLOG.md`, `docs/reports/AREA.md` exist; `.gitignore` excludes build/sim/formal output. *(Evidence: files in `docs/` and `docs/reports/`, 2026-09-23; `.gitignore` covers `build/`, `sim_build/`, `logs/`, `*.vcd`, `*.fst`, `formal/*/`, `.venv/`.)*
 
 ## 5. Risks in this phase

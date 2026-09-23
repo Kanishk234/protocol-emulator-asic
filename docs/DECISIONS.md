@@ -20,7 +20,7 @@ A spec change is proposed here first and implemented only after the team agrees.
 ## D-003 (2026-09-23): questions to Jane Street (tile size, SRAM macro)
 - **Questions:** (a) is 8x4 available, or should we design for 6x4; (b) are IHP SRAM macros accepted on the target shuttle.
 - **Assumption until answered:** 6x4 with the 512x16 SRAM macro, keeping the flop-store fallback (`design/PHYSICAL_DESIGN_AND_CI.md` §3).
-- **Status:** email not yet sent (phase 0 task 18). Record the answers and date here.
+- **Status:** Jane Street sign-up form submitted (2026-09-23). Team decision (2026-09-23): **design for 6x4**; the tile question is not being asked for now. The SRAM question is also open. Until answered, the macro is assumed usable, and risk spike R3 (phase 1) proves or disproves it through the real flow, with the flop-store fallback kept.
 
 ## D-004 (2026-09-23): local toolchain
 - **Decision:**

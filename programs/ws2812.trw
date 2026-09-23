@@ -1,0 +1,16 @@
+# WS2812 / WS2812B / SK6812 LED strip driver. 2 slots, 1 pin unit (PULSE mode).
+#   DIN = uo0. Host: DATA bytes = colour bytes in the strip's order (G, R, B per LED);
+#   EVENT = latch (the strip shows the colours after a >= 50 us low).
+program ws2812
+const LATCH = 0x4000 | 3000             # GAP 3000 clocks = 60 us of idle low
+
+# a 0 bit: 20 clocks high, 43 low (0.40 / 0.86 us); a 1 bit: 40 high, 23 low (0.80 / 0.46 us)
+pin U0: pin_a=uo0 txmode=pulse nbits=8 order=msb idle=0 sym0_first=1 sym0_t1=20 sym0_t2=43 sym1_first=1 sym1_t1=40 sym1_t2=23
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect U0.tx <- L0.O0
+
+lane L0:
+    K0 = LATCH
+    slot: when I0 is DATA       do MOV O0 <- I0, deq                  # one colour byte
+    slot: when I0 is EVENT      do MOVB O0 <- I0, K0, tag CTRL, deq   # latch

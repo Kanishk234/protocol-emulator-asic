@@ -1,0 +1,32 @@
+# DShot motor-control output (DShot150/300/600/1200). 2 slots + 1 routine, 1 pin unit (PULSE mode).
+#   Output = uo0. Host: DATA v = throttle << 1 | telemetry-request (12 bits); the lane builds the
+#   16-bit frame (v << 4 | checksum) in a routine and sends it, followed by an inter-frame gap.
+program dshot
+param RATE = 600                        # kbit/s
+const BIT = 50000 // RATE               # bit period in clocks (83 for DShot600)
+const T0H = BIT * 3 // 8                # 37.5 % duty for a 0
+const T1H = BIT * 3 // 4                # 75 % duty for a 1
+const GAP = 0x4000
+
+pin U0: pin_a=uo0 txmode=pulse nbits=16 order=msb idle=0 sym0_first=1 sym0_t1=T0H sym0_t2=BIT-T0H sym1_first=1 sym1_t1=T1H sym1_t2=BIT-T1H
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect U0.tx <- L0.O0
+
+lane L0:
+    states IDLE GO
+    slot: when IDLE, rb == 0, I0 is DATA      do MOV r0 <- I0, deq      then GO
+    slot: when GO                             do CALL frame             then IDLE
+
+routine frame:                          # frame = v << 4 | ((v ^ v >> 4 ^ v >> 8) & 0xF)
+    SHR r1, r0, 4
+    XOR r1, r1, r0
+    SHR r2, r0, 8
+    XOR r1, r1, r2
+    AND r1, r1, 15
+    SHL r2, r0, 4
+    OR r2, r2, r1
+    out O0, r2, DATA
+    load16 r3, GAP | 2 * BIT
+    out O0, r3, CTRL                    # idle low between frames
+    ret

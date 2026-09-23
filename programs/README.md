@@ -9,6 +9,8 @@ TRIPWIRE firmware in the `.trw` language, compiled by `tools/tripc`. The languag
 | `spi_target.trw` | SPI target, mode 0 | 3 | — | Reference controller and sigrok, up to 12.5 MHz |
 | `i2c_controller.trw` | I2C controller: START/rSTART/STOP, read/write, stretching | 11 | 2 | Reference target and sigrok, 100 kHz / 400 kHz / 1 MHz |
 | `i2c_target.trw` | I2C target: address match, read/write | 12 | — | Reference controller and sigrok, 100 kHz / 400 kHz / 1 MHz |
+| `ws2812.trw` | WS2812/SK6812 LED strips (PULSE mode) | 2 | — | Datasheet-tolerance reference decoder and sigrok `rgb_led_ws281x` |
+| `dshot.trw` | DShot150–1200 motor ESCs; checksum computed in a routine | 2 | 1 | Reference decoder (frames, checksums, bit timing) |
 
 **Build and run:**
 - `cd tools && python -m tripc ../programs/uart.trw -p BAUD=1000000` prints the report (slot/SRAM usage, routine bounds, pre-emption).

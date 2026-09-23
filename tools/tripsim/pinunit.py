@@ -58,6 +58,15 @@ class PinConfig:
     tx_preload: bool = False        # linked TX: put out bit 0 at once, the rest on TX_EDGE (SPI CPHA=0)
     tx_lentok: bool = False         # DATA carries its length: data[15:12] = nbits-1, payload data[11:0]
     stretch: bool = False           # CLKGEN: wait for pin A to read high before timing the high phase
+    # PULSE mode (D-019): each bit b is a two-phase symbol: level symB_first for symB_t1
+    # ticks, then the opposite level for symB_t2 ticks (ticks = PRESC clocks). Pulse-width
+    # (WS2812, DShot), pulse-distance (IR NEC) and Manchester codes are all this shape.
+    sym0_first: int = 1
+    sym0_t1: int = 1
+    sym0_t2: int = 1
+    sym1_first: int = 1
+    sym1_t1: int = 1
+    sym1_t2: int = 1
 
     @property
     def period_q8(self):
@@ -79,8 +88,11 @@ class PinUnit:
 
     def configure(self, **kw):
         self.cfg = PinConfig(**kw)
-        if self.cfg.txmode == "pulse":
-            raise NotImplementedError("TX mode pulse not modelled yet")
+        c = self.cfg
+        for b in (0, 1):
+            t1, t2 = getattr(c, f"sym{b}_t1"), getattr(c, f"sym{b}_t2")
+            if not (0 <= t1 < 4096 and 0 <= t2 < 4096 and t1 + t2 > 0):
+                raise ValueError(f"sym{b}: durations must be 12-bit ticks, not both zero")
         self.reset_state()
 
     def reset_state(self):
@@ -246,6 +258,17 @@ class PinUnit:
                     bits = bits[1:]
                 self.linked_bits = bits
                 self.linked_end = not bits
+            elif c.txmode == "pulse":           # §14 P17: one two-phase symbol per bit
+                t = max(self.cursor_q8, earliest_q8)
+                tick = c.presc * 256
+                for bit in bits:
+                    first = getattr(c, f"sym{bit}_first")
+                    self._schedule(t >> 8, "sbit", first)
+                    t += getattr(c, f"sym{bit}_t1") * tick
+                    self._schedule(t >> 8, "sbit", 1 - first)
+                    t += getattr(c, f"sym{bit}_t2") * tick
+                self._schedule(t >> 8, "send", c.idle)
+                self.cursor_q8 = t
             else:  # timed shift
                 start_q8 = max(self.cursor_q8, earliest_q8)
                 p = c.period_q8

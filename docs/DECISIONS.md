@@ -233,6 +233,32 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - `tools/kernels/tests/test_ps2.py`: host-to-device sends fail without the `SETN rx` restart (only the first byte gets through) and pass with it.
 - **Status:** accepted (draft).
 
+## D-021 (2026-09-23): more verification cross-checks, including Hardcaml
+- **Decision:** add to `design/VERIFICATION.md`:
+  - **L0-ASRT:** in-RTL assertions through one `TRW_ASSERT` macro, used by both formal and simulation;
+  - **L-XSIM:** every cocotb suite runs under both Icarus and Verilator;
+  - **L8-EQY:** equivalence check of the RTL against the netlist with eqy;
+  - **L8-XPROP:** gate-level checks that nothing stays X after reset;
+  - **L9:** Hardcaml as a second verification language:
+    - H0: an import spike;
+    - H1: waveform expect tests and OCaml pin-level tests;
+    - H2: a third, independent OCaml model of the scheduler and fabric, run in lockstep.
+- **RTL language:** the RTL stays Verilog. Hardcaml is used for verification only. This closes `OVERVIEW_TRIPWIRE.md` §13 item 6.
+- **Reason:**
+  - Assertions and eqy are cheap and strong. A simulator mismatch or an X after reset would otherwise reach silicon (BUGS #1 was an X bug).
+  - Hardcaml gives a different language, simulator and author, so a spec misreading shared by tripsim and the RTL has another chance to show up. It is also the judges' own tool.
+- **Cost:**
+  - an opam/OCaml toolchain (pinned) and a `hardcaml/` dune project;
+  - a new `hardcaml` workflow;
+  - OCaml learning time.
+
+  The import path (`hardcaml_of_verilog` through Yosys) is unproven on our RTL, so H0 decides go or no-go before any further investment. The fallback is trace replay against the OCaml model.
+- **Priority:** L9 ranks below L2, L3 and L5 and is cut first if the schedule slips (with a DECISIONS entry).
+- **Alternatives:**
+  - SystemVerilog UVM testbenches: rejected, they need a commercial simulator (pyuvm covers UVM).
+  - Hardcaml RTL: rejected, the RTL, flow and tests are already Verilog.
+- **Status:** accepted (team request, 2026-09-23). H0 is not yet run.
+
 ---
 
 ## Open questions for the phase 1 spec freeze

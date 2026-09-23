@@ -21,6 +21,28 @@ Next:
 
 ---
 
+## 2026-09-23: Kanishk + Claude (phase 1: verification plan additions)
+Done:
+- D-021: verification cross-checks added to `docs/design/VERIFICATION.md`:
+  - L0-ASRT (in-RTL `TRW_ASSERT` for formal and simulation);
+  - L-XSIM (Icarus and Verilator);
+  - L8-EQY (eqy, RTL vs netlist);
+  - L8-XPROP;
+  - L9 Hardcaml (H0 spike, H1 expect tests, H2 independent OCaml model).
+- Tasks added:
+  - Phase 2 §2.5, items 12–15;
+  - Phase 3 §2.8, items 11–13.
+- Other doc updates:
+  - OVERVIEW §13 item 6 resolved (RTL stays Verilog);
+  - `hardcaml` workflow added to the CLAUDE.md list.
+- Docs only; no code or CI changes.
+
+Checklist boxes ticked (evidence):
+- none
+
+Next:
+- Unchanged: remaining phase 1 work (ablations, zero OPEN items + semantics review, R1–R3 in a fresh session, green CI).
+
 ## 2026-09-23: Krithik + Claude (phase 1: PS/2, 1-Wire, SWD, JTAG)
 Done:
 - Four more protocols verified on the model, each against a reference model written from its spec plus sigrok:

@@ -58,6 +58,14 @@
 ### 2.7 Hardening
 10. Harden **each** RTL change from this phase separately, one change per run. Log AREA rows.
 
+### 2.8 Extra cross-checks (D-021, owner: verification)
+11. **L8-EQY** and **L8-XPROP** in CI (the `formal` and `gds` artefacts respectively).
+12. **L9 H1** (if H0 = go):
+    - waveform expect tests for the 7-clock reaction, the channel handshake, the pin cursor/LATE and the rotation;
+    - pin-level UART/SPI/I2C tests from OCaml;
+    - the `hardcaml` workflow.
+13. **L9 H2:** start the independent OCaml model of the scheduler and fabric. Its author reads neither `tools/tripsim` nor `src/`.
+
 ---
 
 ## 3. Deliverables

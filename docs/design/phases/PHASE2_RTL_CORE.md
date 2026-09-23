@@ -58,6 +58,17 @@
 10. Run `gds`. Record cells, utilisation, WNS (typ/slow/fast), Metal3/total overflow, routing time and total time in `docs/reports/AREA.md`.
 11. If routing time is > 4 h or overflow is high, apply the knobs in `../PHYSICAL_DESIGN_AND_CI.md` §5 **before** adding anything else.
 
+### 2.5 Extra cross-checks (D-021, owner: verification)
+12. **L0-ASRT:** a `TRW_ASSERT` macro (assert under `FORMAL`, `$fatal` check under `SIM_ASSERT`); first invariants in the fabric and the pin mux.
+13. **L-XSIM:** run `test/` and `test_internal/` under both Icarus and Verilator.
+14. **L8-EQY feasibility:** try eqy on one module against its cmos5l netlist; log whether the cell models work, or choose the fallback.
+15. **L9 H0 spike:**
+    - pin an opam switch with Hardcaml;
+    - import the channel producer/consumer with `hardcaml_of_verilog`;
+    - run one Cyclesim waveform expect test.
+
+    Log go or no-go in DECISIONS.
+
 ---
 
 ## 3. Deliverables

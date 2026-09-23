@@ -25,6 +25,7 @@ Companions: `OVERVIEW_TRIPWIRE.md` (overview and schedule) and `ARCHITECTURE.md`
 | V5 | **Independent oracles**: sigrok protocol decoders on every waveform; real-world captures from `sigrok-dumps` replayed into our receivers; third-party RTL cores as the other device | New to the competition | Catches misreadings of a spec that our own model shares with our RTL |
 | V6 | **Metamorphic testing**: relations that must hold (loopback identity, time scaling, lane permutation, idle insertion) | New to the competition | Finds bugs without needing a correct expected answer |
 | V7 | **Measured AI-assisted verification**: AI-written tests and code are logged; a separate verification author (human or agent) who never saw the RTL writes the model; test quality is scored by mutation kill rate | Several entries use AI; none measure it | Answers Jane Street's explicit interest in AI-assisted verification with evidence |
+| V8 | **A second verification language (Hardcaml, L9)**: our Verilog imported into Hardcaml, tested in OCaml, and compared against a third, independently written OCaml model | Other entries *design* in Hardcaml; verifying a Verilog chip with it, three-way against two independent models, is our method `[OURS]` | Different language, simulator and author, so a misreading shared by our Python model and our RTL has another chance to show up (D-021) |
 
 **Table stakes we also do** (match the field, don't claim as new):
 - golden-model lockstep
@@ -52,6 +53,8 @@ Companions: `OVERVIEW_TRIPWIRE.md` (overview and schedule) and `ARCHITECTURE.md`
 | Formal | **SymbiYosys** + Yosys; engines `smtbmc` (Yices/Boolector) for BMC and cover, `abc pdr` for unbounded proofs | Open source; runs in CI |
 | Mutation testing | **mcy** (YosysHQ) or a small in-house mutator | Measures whether the test suite would notice a broken RTL |
 | Lint | Verilator `--lint-only -Wall`, Yosys `check` | |
+| Equivalence checking | **eqy** (YosysHQ) | Proves the synthesised netlist equals the RTL, instead of only testing it (L8-EQY) |
+| Second language | **Hardcaml** (OCaml): `hardcaml_of_verilog` to import our RTL through Yosys, Cyclesim, `hardcaml_waveterm` expect tests; OCaml pinned in an opam switch | Independent language, simulator and model (L9, D-021) |
 | Protocol oracles | **sigrok-cli** + libsigrokdecode | Community decoders for UART, SPI, I2C, 1-Wire, CAN, PS/2, JTAG, SWD and more |
 | Real-world stimulus | **sigrok-dumps** repository | Captures from real devices, replayed into our receivers |
 | Third-party peers | Open-source Verilog cores, e.g. an I2C controller/target core and the OpenCores CAN controller (selection finalised in P1; licences checked) | Independent implementations of the same protocol |
@@ -137,6 +140,10 @@ Every test and proof names the check ID it covers. A script lists which IDs have
 - **L0-SYNTH:** Yosys synth sanity: no undriven nets, no unintended latches, no combinational loops.
 - **L0-GEN:** generated files match `spec/tripwire.yaml`.
 - **L0-TT:** `info.yaml` source list matches `test/Makefile`; all outputs assigned.
+- **L0-ASRT:** RTL invariants are written once, inside the modules, with a `TRW_ASSERT(cond, msg)` macro. Under `FORMAL` it becomes an `assert` for SymbiYosys. Under `SIM_ASSERT` it becomes a Verilog-2005 check that prints and calls `$fatal`, so every cocotb run also checks them. Examples: a pad has at most one driver; an open-drain pad never drives high; a producer never loads while full. Synthesis sees neither.
+
+### L-XSIM: two simulators
+- Every cocotb suite (`test/`, `test_internal/`) runs under **both Icarus and Verilator**. A result that differs between them is logged in `BUGS.md`: it is a real bug, or Verilog whose meaning depends on the simulator, and either must be fixed before tapeout.
 
 ### L1: unit (cocotb, white-box)
 
@@ -227,6 +234,27 @@ Each result must match the compiler's V1 report. Any mismatch is a bug in one of
 - **L8-GL:** the TT `gl_test` runs the pin-level suite on the hardened netlist (in the `gds` workflow).
 - **L8-SDF:** timing-annotated gate-level run of the L3 suite, if the gds artefacts include SDF (to check).
 - **L8-STA:** setup/hold clean at the typical sign-off corner; slow-corner status reported honestly.
+- **L8-EQY:** equivalence check (eqy) of the RTL against the synthesised netlist. Whether eqy accepts the cmos5l cell models is checked in phase 2. If it doesn't, the fallback (checking against the Yosys generic netlist before technology mapping) is logged.
+- **L8-XPROP:** at gate level, every flop and every output is known (not X) within a stated number of clocks after reset, and stays known. BUGS #1 was an all-X gate-level failure.
+
+### L9: Hardcaml (second language, D-021)
+Priority: below L2, L3 and L5. If the schedule slips, L9 is cut first, with a DECISIONS entry.
+- **H0 (spike, phase 2):**
+  - import one RTL block (the channel producer/consumer) into Hardcaml with `hardcaml_of_verilog`;
+  - simulate it in Cyclesim;
+  - commit one waveform expect test.
+
+  The result is a go or no-go, logged in DECISIONS. Fallback if the import fails: **trace replay**. The Icarus run dumps a per-clock trace (pins and debug taps), and the OCaml model replays the same stimulus and compares against it. H2 survives either way.
+- **H1 (Hardcaml testbenches):**
+  - **waveform expect tests** for the key contracts: the 7-clock reaction, the channel handshake, the pin cursor and LATE, the SRAM rotation. The ASCII waveforms are committed, so a timing change shows up as a diff in review;
+  - pin-level UART/SPI/I2C tests driven from OCaml.
+- **H2 (third model):**
+  - an OCaml model of the lane scheduler and the fabric (the pin TX cursor if time allows);
+  - written from `ARCHITECTURE.md` by an author who has read neither `tools/tripsim` nor `src/`;
+  - compared every clock against the RTL (Cyclesim) and against `tripsim` (shared traces).
+
+  Three implementations agreeing is stronger evidence than two.
+- **What Cyclesim adds:** it runs the Yosys-elaborated design, so it also catches mismatches between simulation and synthesis that Icarus and Verilator would both miss.
 
 ---
 
@@ -261,7 +289,8 @@ Each result must match the compiler's V1 report. Any mismatch is a bug in one of
 2. **Protocol reference models are written from the protocol specs**, not from our firmware.
 3. **Oracles we did not write** (sigrok decoders, third-party RTL, real captures) are required for every protocol claim.
 4. **AI use is logged:** which files or tests were AI-drafted, who reviewed them, and which bugs AI-written tests found vs missed. The mutation kill rate (L7) is the objective score of test quality, whoever wrote the tests.
-5. **A spec ambiguity found by any layer** becomes a `DECISIONS.md` entry and a spec change, never a silent RTL fix.
+5. **The OCaml model (L9 H2) is a third independent implementation:** its author reads neither `tools/tripsim` nor `src/`.
+6. **A spec ambiguity found by any layer** becomes a `DECISIONS.md` entry and a spec change, never a silent RTL fix.
 
 ---
 
@@ -274,8 +303,9 @@ Each result must match the compiler's V1 report. Any mismatch is a bug in one of
 | `docs` (template) | Datasheet build | Every push |
 | `fpga` (template, manual) | iCE40UP5K bitstream of a reduced build | Manual |
 | `lint` (ours) | L0 checks, generated-file freshness | Every push |
-| `unit` (ours) | L1 + L2 short seeds + L4 + L6 under Verilator | Every push |
-| `formal` (ours) | L5 proofs; L5b for shipped programs | Push to `src/` or `spec/` |
+| `unit` (ours) | L1 + L2 short seeds + L4 + L6 under Verilator; the same suites under Icarus (L-XSIM); `SIM_ASSERT` on | Every push |
+| `formal` (ours) | L5 proofs; L5b for shipped programs; L8-EQY on the Yosys netlist | Push to `src/` or `spec/` |
+| `hardcaml` (ours) | L9: Hardcaml expect tests and the OCaml-model lockstep | Push to `src/`, `spec/` or `hardcaml/` |
 | `nightly` (ours) | Long L2 lockstep, L4-IMP sweeps, L7 mutation | Scheduled |
 
 The template's own jobs are never edited, apart from the `gds` trigger paths. Our workflows are added as separate files.
@@ -287,9 +317,9 @@ The template's own jobs are never edited, apart from the `gds` trigger paths. Ou
 | Phase | Verification exit criteria |
 |---|---|
 | P1 (spec + model) | YAML + generator in place; `tripsim` runs UART/SPI/I2C programs; compiler emits V1 reports; sigrok pipeline works on model waveforms |
-| P2 (RTL core) | L0, L1 green; L2 lockstep ≥ 10⁶ clocks clean; L3 UART/SPI/I2C-controller green in RTL and gate level |
-| P3 (showcase) | L3 targets, 1-Wire, PS/2, pulse; L3b peers + dumps; L4 metamorphic; F-CHAN, F-SCHED, F-ROT, F-OWN proven |
-| P4 (freeze) | L5b for shipped programs; coverage goals met; L2 ≥ 10⁸ clocks clean; all CI workflows green on the freeze commit |
+| P2 (RTL core) | L0 (incl. L0-ASRT), L1 green under both simulators; L2 lockstep ≥ 10⁶ clocks clean; L3 UART/SPI/I2C-controller green in RTL and gate level; L9 H0 decided (go or no-go, logged) |
+| P3 (showcase) | L3 targets, 1-Wire, PS/2, pulse; L3b peers + dumps; L4 metamorphic; F-CHAN, F-SCHED, F-ROT, F-OWN proven; L8-EQY and L8-XPROP running; L9 H1 contracts (if H0 = go) |
+| P4 (freeze) | L5b for shipped programs; coverage goals met; L2 ≥ 10⁸ clocks clean; L9 H2 three-way lockstep clean (unless cut by a DECISIONS entry); all CI workflows green on the freeze commit |
 | P5 (evidence) | L7 mutation table; L4-IMP envelopes; VERIFICATION_REPORT and CLAIMS complete |
 
 ---
@@ -300,3 +330,4 @@ The template's own jobs are never edited, apart from the `gds` trigger paths. Ou
 - V1's deadlock/overrun guarantee covers **fixed-rate** graphs only; data-dependent graphs get warnings.
 - Impairment tolerance numbers come from simulation models of real-world imperfections, not measurements.
 - Gate-level simulation without SDF checks function, not timing; timing is covered by STA.
+- Hardcaml (L9) simulates our RTL as Yosys elaborates it, not as Icarus reads it. It adds an independent view; it does not replace the TT `test`/`gl_test` runs.

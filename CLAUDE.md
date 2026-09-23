@@ -43,7 +43,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - **Honesty:** claims go in `docs/CLAIMS.md` with their evidence. Never claim zero latency, sub-ns timing, USB/Ethernet support, real-hardware testing (we have none yet), or "formally verified" without naming the property and its bound.
 
 ## CI rules
-- Workflows: `test`, `gds` (gds, precheck, gl_test, viewer → GitHub Pages), `docs`, `fpga` (manual), plus our own `lint`, `unit`, `formal`, `nightly`.
+- Workflows: `test`, `gds` (gds, precheck, gl_test, viewer → GitHub Pages), `docs`, `fpga` (manual), plus our own `lint`, `unit`, `formal`, `nightly`, `hardcaml` (L9, D-021; added in phase 3).
 - Never edit the template's jobs. Only the `gds` trigger block (paths filter, concurrency) is ours. Add new workflows as separate files.
 - Edit `src/config.json` only for `CLOCK_PERIOD`, `PL_TARGET_DENSITY_PCT` and the SRAM macro block, each with a DECISIONS entry.
 - Hardening takes ~4–5 h and GitHub stops any single job at 6 h (the `gds` job is the one at risk; the whole workflow may run longer). Make **one hardware change per hardening**, and judge changes by global-routing overflow, not cell count. A push touching `src/`, `info.yaml` or `macro/` cancels a running hardening.

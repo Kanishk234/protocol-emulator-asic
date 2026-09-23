@@ -412,7 +412,7 @@ The dates avoid late-semester crunch: RTL freezes before finals week.
 3. Tag width, reflex slot encoding, routine ISA details (P1 spec).
 4. 12 vs 16 slots per lane; 3 vs 2 lanes (after the first hardening).
 5. Host pin map (confirm the demo board SPI pins, P1).
-6. RTL language: Verilog (default) vs Hardcaml for part of the toolchain (P0).
+6. ~~RTL language: Verilog (default) vs Hardcaml for part of the toolchain (P0).~~ Resolved by D-021: the RTL is Verilog; Hardcaml is used for verification (`VERIFICATION.md` L9).
 
 ---
 

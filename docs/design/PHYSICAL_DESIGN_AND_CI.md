@@ -77,6 +77,9 @@ Credit both in `macro/README.md`.
 ---
 
 ## 5. Routing time is the binding constraint
+
+**What the 6 h limit applies to:** GitHub-hosted runners stop any single **job** at 6 h. A whole workflow can run longer. For example, other entrants report `gds` workflows of ~6.5 h in total, made up of a ~5 h `gds` job followed by `precheck` and `gl_test` as separate jobs. For us the binding job is `gds` (the LibreLane hardening). Measured on the phase 0 counter (run 35821375890): `gds` 30.3 min, `precheck` 13.5 min, `gl_test` 0.8 min, `viewer` 0.3 min. Record both the `gds` job time and the total workflow time in `docs/reports/AREA.md`.
+
 - Detailed routing time grows faster than linearly with congestion. In a comparable public 6x4 design, +2% cells in one corner tripled Metal3 overflow and pushed the run past 6 h.
 - **Judge every RTL change by global-routing overflow** (in the gds logs), not by cell count. Record it in `docs/reports/AREA.md`.
 - **One hardware change per hardening run** after the first full hardening.

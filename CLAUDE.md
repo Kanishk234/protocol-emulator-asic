@@ -44,7 +44,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - Workflows: `test`, `gds` (gds, precheck, gl_test, viewer → GitHub Pages), `docs`, `fpga` (manual), plus our own `lint`, `unit`, `formal`, `nightly`.
 - Never edit the template's jobs. Only the `gds` trigger block (paths filter, concurrency) is ours. Add new workflows as separate files.
 - Edit `src/config.json` only for `CLOCK_PERIOD`, `PL_TARGET_DENSITY_PCT` and the SRAM macro block, each with a DECISIONS entry.
-- Hardening takes ~4–5 h and GitHub's limit is 6 h. Make **one hardware change per hardening**, and judge changes by global-routing overflow, not cell count. A push touching `src/`, `info.yaml` or `macro/` cancels a running hardening.
+- Hardening takes ~4–5 h and GitHub stops any single job at 6 h (the `gds` job is the one at risk; the whole workflow may run longer). Make **one hardware change per hardening**, and judge changes by global-routing overflow, not cell count. A push touching `src/`, `info.yaml` or `macro/` cancels a running hardening.
 - Keep `info.yaml` `source_files` and `test/Makefile` `PROJECT_SOURCES` in sync.
 
 ## Git rules

@@ -67,7 +67,7 @@ class Chip:
         self.fabric.connect(port, producer, mode)
 
     def pin_config(self, unit, **cfg):
-        for key in ("pin_a", "pin_b"):
+        for key in ("pin_a", "pin_b", "pin_c"):
             pad = cfg.get(key)
             if pad is not None and pad in HOST_PADS:
                 raise ValueError(f"pad {pad} belongs to the host port")
@@ -90,6 +90,14 @@ class Chip:
     def halt(self, lanes=None):
         for k in (range(len(self.lanes)) if lanes is None else lanes):
             self.lanes[k].running = False
+
+    def settle_inputs(self, ui=None, uio=None):
+        """Pads held stable through reset: set the inputs and both synchroniser stages."""
+        if ui is not None:
+            self.ui_in = ui
+        if uio is not None:
+            self.uio_in = uio
+        self._sync = [(self.ui_in, self.uio_in)] * 2
 
     def host_push(self, data, tag=0):
         self.host_in.append((tag, data))
@@ -137,7 +145,7 @@ class Chip:
             self.lanes[rot].mem_access(self.sram)
         for u in self.pins:
             b = self.synced(u.cfg.pin_b)
-            u.compute_rx(now, self.synced(u.cfg.pin_a), b)
+            u.compute_rx(now, self.synced(u.cfg.pin_a), b, self.synced(u.cfg.pin_c))
             u.compute_tx(now, b)
         hin = self.fabric.producers["HOST_IN"]
         if self.host_in and hin.free():

@@ -26,6 +26,12 @@ CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN = 1, 2, 3, 4, 5, 6
 class PinConfig:
     pin_a: Optional[int] = None     # pad index (chip.PAD_*), drive and/or sample
     pin_b: Optional[int] = None     # link / condition input
+    # select/frame input (D-014): while pin C != c_active, RX framing is held in reset;
+    # deselecting aborts a linked TX shift; with c_oe, pin A is driven only while selected
+    pin_c: Optional[int] = None
+    c_active: int = 0
+    c_oe: bool = False
+    ev_pin: str = "a"               # event generator source: a | c
     txmode: str = "level"           # level | shift | clkgen | pulse
     rxmode: str = "off"             # off | shift_rx | linked_rx
     # event generator (D-013): EVENT {data[15] = new level of A, data[14:0] = time} on
@@ -94,11 +100,17 @@ class PinUnit:
         self._rx_taint = False
         self._prev_a = None
         self._prev_b = None
+        self._prev_c = None
         self._prev_b_tx = None
+        self._sel = True                # registered "selected" (pin C), used for OE gating
+        self._sel_next = True
+        self._deselect = False          # pin C went inactive this clock
 
     # -------------------------------------------------------------- pads
     def pad_drive(self):
         """(value, oe) this unit drives on pin A, from the registered output."""
+        if self.cfg.c_oe and not self._sel:
+            return self.level, 0
         if self.cfg.od:
             return 0, int(self.level == 0)
         return self.level, self.oe
@@ -126,6 +138,10 @@ class PinUnit:
     def compute_tx(self, now, b=None):
         """b: synchronised level of pin B this clock (for linked shifts)."""
         apply = self._tx_apply = []
+        if self._deselect and (self.linked_bits or self.linked_end):
+            # §14 P15: deselect aborts a linked shift in progress; pin A returns to IDLE
+            self.linked_bits, self.linked_end = [], False
+            apply.append((now, "level", self.cfg.idle))
         port = self.tx_port
         if port is not None and port.avail():
             tag, data = port.head()
@@ -215,23 +231,30 @@ class PinUnit:
         self.actions.sort(key=lambda a: a[0])   # stable: same-edge actions keep command order
 
     # ---------------------------------------------------------------- RX
-    def compute_rx(self, now, a, b=None):
-        """a, b: synchronised levels of pins A and B this clock (None if not attached)."""
+    def compute_rx(self, now, a, b=None, sel_pin=None):
+        """a, b, sel_pin: synchronised levels of pins A, B, C this clock (None if not attached)."""
         c = self.cfg
-        if a is not None:
-            event = (c.ev_edge is not None and self._edge(self._prev_a, a, c.ev_edge)
-                     and (c.ev_qual is None or (b == c.ev_qual and self._prev_b == c.ev_qual)))
-            if event:
-                # §14 P8: EVENT {new level of A, time}; it takes this clock's RX load, so a
-                # sample due in the same clock is skipped. Optionally restarts word framing.
-                self._emit(isa.TAG_EVENT, (a << 15) | (now & 0x7FFF))
-                if c.ev_reset:
-                    self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
-            elif c.rxmode == "shift_rx":
+        sel = True if (c.pin_c is None or sel_pin is None) else sel_pin == c.c_active
+        self._deselect = self._sel_next and not sel
+        self._sel_next = sel
+        if not sel:                                  # §14 P15: framing held in reset
+            self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
+        src, prev_src = (a, self._prev_a) if c.ev_pin == "a" else (sel_pin, self._prev_c)
+        event = (c.ev_edge is not None and src is not None
+                 and self._edge(prev_src, src, c.ev_edge)
+                 and (c.ev_qual is None or (b == c.ev_qual and self._prev_b == c.ev_qual)))
+        if event:
+            # §14 P8: EVENT {new level of the source pin, time}; it takes this clock's RX
+            # load, so a sample due in the same clock is skipped.
+            self._emit(isa.TAG_EVENT, (src << 15) | (now & 0x7FFF))
+            if c.ev_reset:
+                self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
+        elif a is not None and sel:
+            if c.rxmode == "shift_rx":
                 self._shift_rx(now, a)
             elif c.rxmode == "linked_rx" and self._edge(self._prev_b, b, c.rx_edge):
                 self._sample(a)
-        self._prev_a, self._prev_b = a, b
+        self._prev_a, self._prev_b, self._prev_c = a, b, sel_pin
 
     def _word_len(self):
         c = self.cfg
@@ -281,6 +304,7 @@ class PinUnit:
 
     # -------------------------------------------------------------- commit
     def commit(self):
+        self._sel = self._sel_next
         for _, kind, value in self._tx_apply:
             if kind == "level":
                 self.level = value

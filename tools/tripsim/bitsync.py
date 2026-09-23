@@ -1,4 +1,4 @@
-"""BITSYNC pin-unit mode (DECISIONS D-021; ARCHITECTURE.md §14 P20-P26).
+"""BITSYNC pin-unit mode (DECISIONS D-023; ARCHITECTURE.md §14 P20-P26).
 
 One bit clock shared by TX and RX, recovered from the line:
 - hard sync on the first recessive-to-dominant edge at bus idle (or at our own frame start);

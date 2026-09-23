@@ -1,4 +1,4 @@
-"""BITSYNC primitives (D-021) in a non-CAN configuration, to keep them general:
+"""BITSYNC primitives (D-023) in a non-CAN configuration, to keep them general:
 HDLC-style stuffing (a 0 after five 1s, ones only), CRC-16/CCITT, LSB-first words, a drifting
 transmitter, readback and the one-bit override. §14 P20-P26."""
 

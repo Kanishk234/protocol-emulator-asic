@@ -1,6 +1,6 @@
 # CAN 2.0A controller (11-bit IDs, classic frames). 2 lanes: 11 + 10 slots, 3 routines, 1 pin unit.
 #   TXD = uo0, RXD = ui0 (a CAN transceiver). The pin unit does the bit-level work with general
-#   BITSYNC features (D-021): recovered bit clock with resync, bit stuffing, CRC-15, readback.
+#   BITSYNC features (D-023): recovered bit clock with resync, bit stuffing, CRC-15, readback.
 # Host -> chip: EVENT dlc (0..8), DATA id, then dlc DATA bytes: send a frame (retry is the host's).
 #   Push a frame's tokens together: after a lost arbitration the rest are drained, not sent.
 # Chip -> host (every frame on the bus, ours included):

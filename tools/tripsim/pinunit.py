@@ -69,7 +69,7 @@ class PinConfig:
     sym1_first: int = 1
     sym1_t1: int = 1
     sym1_t2: int = 1
-    # BITSYNC (D-021): shared recovered bit clock, line coding, readback (see bitsync.py)
+    # BITSYNC (D-023): shared recovered bit clock, line coding, readback (see bitsync.py)
     sjw: float = 0.0                # max resync step in clocks (0 = hard sync only)
     resync: str = "dom"             # dom: recessive-to-dominant edges only | both
     idle_bits: int = 1              # recessive samples that make the bus idle

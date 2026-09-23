@@ -29,6 +29,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - **End every session with a `docs/WORKLOG.md` entry**: what was done, which boxes were ticked (with evidence), and the next step.
 
 ## Engineering rules
+- **General and optimized (DECISIONS D-012).** No dedicated protocol blocks; protocol logic lives in firmware. Every addition (pin unit, ISA, fabric, anything) should be the most general primitive that is still efficient for any protocol, including ones not yet considered. When a protocol exposes a gap, generalize an existing primitive rather than add a protocol-shaped one, even if that means changing the architecture or ISA. State the general need and the cost of each addition in its DECISIONS entry.
 - **The spec wins.** If the RTL and `ARCHITECTURE.md` disagree, fix the RTL. If the spec is wrong, propose the change in `docs/DECISIONS.md` and ask before implementing.
 - **One source for encodings:** `spec/tripwire.yaml`. Generated files are regenerated, never hand-edited.
 - **Keep model and RTL independent:** when writing `tools/tripsim`, don't read `src/`; when writing RTL, don't read `tools/tripsim`. Tests may use both.

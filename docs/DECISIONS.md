@@ -89,6 +89,31 @@ A spec change is proposed here first and implemented only after the team agrees.
 - **Cost:** 4 filter bits + 1 preload bit per pin unit.
 - **Status:** accepted (draft).
 
+## D-012 (2026-09-23): design principle: general *and* optimized
+- **Principle (team):** everything we add, to the pin units, the ISA, the fabric or anywhere else, should be the most **general** primitive that is still **efficient** for protocols, including ones we have not looked at yet. When a protocol exposes a gap, prefer generalizing an existing primitive over adding a protocol-shaped one, and be willing to change the architecture or ISA to do so. This is a judgement applied to every addition, not a counting rule. No dedicated protocol blocks: protocol logic stays in firmware.
+- **How it is applied:** each new feature's DECISIONS entry says which general need it serves, and what makes it efficient (cost in bits, cells, slots or clocks). `ARCH_EXPLORATION.md` keeps a generality table of pin-unit and ISA features.
+- **Status:** accepted (team, 2026-09-23).
+
+## D-013 (2026-09-23): generalized pin-unit RX/TX primitives, and a head-bit select
+Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots with the protocol-shaped features; it now fits in **12**.
+
+| Change | General need it serves | Cost |
+|---|---|---|
+| EDGE_TS + COND_EDGE → one **event generator** (EV_EDGE, EV_QUAL, EV_RESET) | Any "edge of A, optionally while B is at a level": edge timestamps, I2C START/STOP, frame delimiters, wake-up edges | One edge detector + qualifier per unit (it replaces two) |
+| RX_TAIL → **two-phase framing** (RX_NBITS2) | Any frame of two alternating word lengths: I2C 8 + 1, data + parity/flag bits, command + argument | A second 4-bit length and a phase bit |
+| **Echo suppression** (RX_ECHO = 0) | Any half-duplex shared line (I2C, 1-Wire, SWD, half-duplex UART/LIN): the firmware never sees its own transmission. RX_ECHO = 1 keeps readback for collision/arbitration checks | One taint bit; saves 2–3 slots and an action per byte in the I2C target |
+| **Length in the token** (TX_LENTOK) | Variable-length shifts without extra commands: I2C ACK (1) vs byte (8), SWD/JTAG mixed lengths, odd-length SPI | A 4-bit length mux; removes SETN tokens (a slot and an action each) |
+| **HS** head-bit select (slot bit 52) | Condition on `data[0]` (flags, parity, ACK bits, LSBs) as well as `data[15]` (event polarity) | 1 slot bit + a 2:1 mux per slot; slot is now 53 bits (fits the 64-bit host view) |
+| Event convention: `data[15]` = new pin level | Uniform for every event source, no special START/STOP encoding | None |
+
+- **Evidence:** `tools/kernels/tests/test_i2c_target.py`:
+  - read + write, NACK of other addresses, and the controller's NACK on the last read byte, at 100 kHz / 400 kHz / 1 MHz;
+  - sigrok confirms written and read bytes, 10 ACKs, 3 NACKs and 5 START/STOP pairs;
+  - fastest bus 12 clocks/bit, unchanged.
+- **Tests have teeth:** disabling each of echo suppression, the SCL qualifier, length-in-token or HS makes 5 tests fail.
+- **Supersedes:** the RX_TAIL part of D-010 (RX_EDGE/TX_EDGE stay).
+- **Status:** accepted (draft).
+
 ---
 
 ## Open questions for the phase 1 spec freeze

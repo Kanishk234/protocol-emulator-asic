@@ -192,7 +192,7 @@ The full instruction set is in `ISA.md`.
   - `SHIFT_RX` (start-edge triggered, auto re-arm)
   - sampling on another pin's edges
   - edge timestamps
-  - **conditional edge**, i.e. an edge on this pin while that pin is high (I2C START/STOP)
+  - **qualified edge events**, i.e. an edge on this pin, optionally only while that pin is at a level (edge timestamps, I2C START/STOP)
 - A per-unit prescaler for slow protocols.
 
 ### 4.6 Helper units

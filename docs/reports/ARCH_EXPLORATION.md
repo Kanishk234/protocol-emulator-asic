@@ -10,7 +10,7 @@ Numbers from `tools/tripsim` running protocol kernels (`tools/kernels`). Each ro
 |---|---|---|---|
 | Pin-to-pin reaction (§5.5) | **7 clocks (140 ns)**, exactly as specified | `tripsim/tests/test_pins.py::test_pin_to_pin_reaction_is_seven_clocks` | Claim holds on the model |
 | What should OP 15 be? | `MOVB` (d = B): "on an input, send a constant" had no one-action form, and without it the reaction would be 8 clocks | Same test | D-009 |
-| Are 12 slots enough? | UART TX: 1. UART RX with framing check: 3. SPI controller: 4. I2C target, write direction: **9** | `test_pins.py`, `kernels/tests/test_i2c_target.py` | Not yet decided: I2C read direction, SPI and the EEPROM variant still to measure |
+| Are 12 slots enough? | UART TX: 1. UART RX with framing check: 3. SPI controller: 4. **I2C target, full read + write: 12** (14–18 before D-013) | `test_pins.py`, `kernels/tests/test_i2c_target.py` | Not yet decided: I2C read direction, SPI and the EEPROM variant still to measure |
 | Flag result from every op (D-007) | Count loop: **3 clocks per byte** (4 with the old compare-only flags) | `tripsim/tests/test_lane.py::test_count_loop_three_clocks_per_byte` | Keep |
 | K constants (D-007) | The I2C target keeps its address, mask and pin commands in K, leaving all 4 registers free | `kernels/i2c_target.py` | Keep; register pressure still to measure on larger kernels |
 | `data[15]` head test (D-007) | The I2C target tells START from STOP in the condition, so no compare action is needed | `kernels/i2c_target.py` slots 0–1 | Keep |
@@ -26,12 +26,29 @@ Numbers from `tools/tripsim` running protocol kernels (`tools/kernels`). Each ro
 |---|---|---|
 | A tap with a 1-bit `seq` aliases after missing two tokens and stops seeing new ones | `test_fabric.py` | BUGS #2; §14 F4 (a counted drop is a take) |
 | "React to an input with a constant" needed two actions | `test_pins.py` latency kernel | D-009 `MOVB` |
-| I2C needs different RX and TX link edges, and the 9th bit as a separate token | I2C target kernel | D-010 (RX_EDGE/TX_EDGE, RX_TAIL); §14 P6–P8 |
+| I2C needs different RX and TX link edges, and the 9th bit as a separate token | I2C target kernel | D-010 (RX_EDGE/TX_EDGE), §14 P6–P8 |
+| The full I2C target (read + write) needed 14–18 slots with protocol-shaped features | I2C target kernel | D-012 principle; D-013 generalized primitives, which bring it to 12 slots; §14 P8, P13, P14 |
 | An SPI controller needs 3 output streams from a 2-output lane; mode 0 needs bit 0 before the first clock edge | SPI controller kernel | D-011 (TX_ACCEPT, TX_PRELOAD); §14 P9–P12. BUGS #3 (model preload race, found by the same kernel) |
 | Fabric throughput below the §4.4 target | `test_lane.py` throughput tests | Q7 open: a lane output takes 1 token per 3 clocks; HOST_IN delivers 1 per 2 clocks to a lane |
 
-## 3. Next measurements
-- I2C target read direction, and the EEPROM variant (needs the MEM helper): does it fit in 12 slots?
+## 3. Generality of the primitives (D-012)
+
+Each primitive is judged by the general need it serves and its cost, not by a count. The "uses so far" column is evidence from kernels, not a threshold.
+
+| Primitive | General need | Uses so far (kernels) | Expected elsewhere |
+|---|---|---|---|
+| Timed shift TX / SHIFT_RX | Self-clocked serial at a fractional rate | UART TX, UART RX | LIN, DMX512, MIDI, 1-Wire slots, Manchester via 2x rate |
+| Linked shift TX (+ preload) / LINKED_RX | Serial clocked by another pin | SPI controller (MOSI, MISO), I2C target | SPI target, JTAG, SWD, PS/2, I2S |
+| CLKGEN | Generate n clock periods on a cursor | SPI controller | I2C controller (with STRETCH), JTAG, SWD |
+| Event generator (+ qualifier, framing reset) | Edge events, optionally qualified | Latency kernel (timestamps), I2C START/STOP | Frame starts (CS, sync pulses), IR/PWM capture, wake-up |
+| Two-phase framing | Alternating word lengths | I2C 8 + 1 | Data + parity, command + argument |
+| Echo suppression | Half-duplex shared lines | I2C target | 1-Wire, SWD, half-duplex UART, LIN (with RX_ECHO = 1 for collision checks) |
+| TX tag filter | One lane output → several pin units | SPI controller (SCK, MOSI, CS) | Any protocol with more than 2 output streams |
+| TX length in the token | Variable-length shifts | I2C target (1-bit ACK, 8-bit byte) | SWD (1/3/8/32-bit phases), JTAG, odd SPI |
+| ISA: `MOVB`, `HS`, K constants, flag from every op | React with constants; test flag bits; loop counters | Latency, I2C target, UART RX, count loop | Everywhere |
+
+## 4. Next measurements
+- I2C target EEPROM variant (register pointer, sequential read/write; needs the MEM helper, or routines).
 - SPI target (flash emulation): the maximum SCK when *we* are clocked, and whether Q7 limits streaming.
 - I2C controller (CLKGEN with STRETCH).
 - Run each kernel with `fire_period = 2` to price the R1 fallback.

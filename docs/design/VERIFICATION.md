@@ -148,7 +148,7 @@ Every test and proof names the check ID it covers. A script lists which IDs have
 | L1-CHAN | Producer/consumer | Handshake at every combination of 0–4 blocking + 0–2 tap subscribers; seq toggling; DROPPED counting |
 | L1-OVR | Pin RX overrun | New token dropped, old kept, OVERRUN sticky |
 | L1-PIN-TX | Pin TX | LEVEL/OE/GAP/SYNC/CLK/SETN; cursor arithmetic; LATE flag; fractional period mean and jitter (≤ 1 clock) over 4096 bits; PULSE t0/t1; open-drain never drives high; ownership |
-| L1-PIN-RX | Pin RX | SHIFT_RX sample position, AUTOREARM back-to-back; LINKED_RX on rise/fall; EDGE_TS timestamps; COND_EDGE START/STOP |
+| L1-PIN-RX | Pin RX | SHIFT_RX sample position, AUTOREARM back-to-back; LINKED_RX on rise/fall; two-phase framing; echo suppression; event generator (timestamps, qualified START/STOP) |
 | L1-CRC | CRC | ≥ 20 catalogued CRC-8/16 parameter sets vs a reference library, random messages |
 | L1-MEM | MEM, CAPTURE | Address auto-increment, READ n; rotation slot usage; capture ring wrap |
 | L1-ROT | SRAM rotation | Each requester gets exactly its slot; host writes only while halted |

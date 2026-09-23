@@ -210,7 +210,8 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | Field | Meaning |
 |---|---|
 | TXMODE | LEVEL-only, SHIFT, CLKGEN, PULSE |
-| RXMODE | off, SHIFT_RX, LINKED_RX, EDGE_TS, COND_EDGE |
+| RXMODE | off, SHIFT_RX (timed from a start edge), LINKED_RX (sampled on an edge of pin B) |
+| EV_EDGE, EV_QUAL, EV_RESET | Event generator (D-013): EVENT on rise/fall/both edges of pin A, optionally only while pin B is at level EV_QUAL (stable for 2 samples); EV_RESET restarts word framing. Covers edge timestamps and I2C START/STOP with one mechanism |
 | PERIOD | Bit period in clocks, 16.8 fixed point (fractional divider) |
 | PRESC | Tick prescaler for LEVEL delays (1–256 clocks per tick) |
 | NBITS | Shift length, 1–16 |
@@ -218,7 +219,9 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | OD, IDLE | Open-drain enable, idle level |
 | T0, T1 | PULSE high times (ticks) for bit 0 / bit 1 |
 | RX_EDGE, TX_EDGE | For linked modes, separately for each half: the edge of pin B on which RX samples and TX changes pin A (rise, fall). I2C samples on SCL rise and drives on SCL fall, so one shared field is not enough (D-010) |
-| RX_NBITS, RX_TAIL | RX word length, if different from TX NBITS. RX_TAIL = 1: after RX_NBITS bits, the next linked bit is emitted as its own DATA token with the bit in `data[15]` (the I2C ACK/NACK bit) (D-010) |
+| RX_NBITS, RX_NBITS2 | RX word length, if different from TX NBITS. RX_NBITS2 ≠ 0: words alternate between RX_NBITS and RX_NBITS2 bits (two-phase framing, e.g. I2C 8 + 1), right-aligned in `data` (D-013, replaces D-010's RX_TAIL) |
+| RX_ECHO | 0: RX words sampled while this unit's own TX was shifting are dropped (echo suppression on half-duplex lines: I2C, 1-Wire, SWD, half-duplex UART). 1: keep them (readback for collision checks) (D-013) |
+| TX_LENTOK | DATA tokens carry their bit count: `data[15:12]` = NBITS − 1, payload `data[11:0]`. Variable-length shifts need no SETN (D-013) |
 | SAMPLEOFS | For SHIFT_RX: sample position within a bit (fraction of PERIOD) |
 | AUTOREARM | For SHIFT_RX: re-arm on the next start edge automatically |
 | STRETCH | CLKGEN waits for the line to read high before timing the high phase |
@@ -247,11 +250,10 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | RXMODE | Produces |
 |---|---|
 | SHIFT_RX | Waits for a start edge on pin A, samples NBITS at PERIOD (first sample at SAMPLEOFS), emits a DATA token; re-arms if AUTOREARM |
-| LINKED_RX | Samples pin A on each RX_EDGE of pin B, emits a DATA token after RX_NBITS (plus a tail token if RX_TAIL). A START/STOP from COND_EDGE resets the bit count |
-| EDGE_TS | Emits an EVENT token per edge: data = {polarity, time[14:0]} (`data[15]` = 1 for a rising edge) |
-| COND_EDGE | Emits EVENT tokens `START` (`data[15]` = 1) / `STOP` (`data[15]` = 0) when pin A changes while pin B is high (I2C). Combinable with LINKED_RX on the same unit. |
+| LINKED_RX | Samples pin A on each RX_EDGE of pin B, emits a DATA token per word (RX_NBITS, or alternating with RX_NBITS2) |
+| Event generator (any RXMODE) | EVENT `{new level of A, time[14:0]}` on EV_EDGE of pin A, qualified by EV_QUAL. Edge timestamps: EV_EDGE = both. I2C START/STOP: EV_EDGE = both, EV_QUAL = 1 (SCL high), EV_RESET; START is `data[15]` = 0 (SDA fell), STOP `data[15]` = 1 |
 
-EVENT tokens always carry their kind or polarity in `data[15]`, so reflex conditions can test it directly (`ISA.md` §4.2).
+EVENT tokens from pin units always carry the new level of pin A in `data[15]`, so reflex conditions can test it directly (`ISA.md` §4.2, `HS` = 0). Short words keep their low bit in `data[0]` (`HS` = 1), for example the I2C ACK/NACK bit.
 
 ---
 
@@ -334,7 +336,7 @@ The hard-deadline rule for physical design: the full gds run must finish routing
 ## 13. Worked example: I2C target ACK, cycle by cycle
 
 Setup:
-- U0: pin A = SDA (`uio0`, open-drain), pin B = SCL (`uio1`); RXMODE = LINKED_RX (8 bits on SCL rise) + COND_EDGE; TX linked to SCL fall.
+- U0: pin A = SDA (`uio0`, open-drain), pin B = SCL (`uio1`); RXMODE = LINKED_RX (8 + 1 bits on SCL rise) + qualified events (START/STOP); TX linked to SCL fall.
 - L0.I0 ← U0.rx (blocking). L0.O0 → U0.tx.
 - r1 = own address << 1. r2 = 0x00FE (address-bits mask), for comparing against the byte with its R/W bit masked off.
 
@@ -413,7 +415,7 @@ With these rules, the §5.5 path is exactly 7 clocks. The model measures it (`to
 Pin rules added with the I2C modes:
 - **P6.** A linked TX shift changes pin A at the edge of the clock in which the synchronised pin B shows TX_EDGE, which is 3 clocks after the pad edge. The TX half takes a new DATA token as soon as the previous shift has put out all its bits. The new shift's first bit then replaces the pending return-to-IDLE on the next TX_EDGE, so consecutive bytes have no gap.
 - **P7.** Pin B may be a `uo` output pad (for example, SPI data linked to our own SCK). The unit then sees the driven value directly, without a synchroniser.
-- **P8.** COND_EDGE: when pin A changes while the synchronised pin B was high in both this clock and the previous one, an EVENT is emitted: START (`data[15] = 1`) when A falls, STOP (`data[15] = 0`) when A rises, with `data[14:0]` = time. It takes precedence over LINKED_RX sampling in the same clock and resets the LINKED_RX bit count.
+- **P8.** Event generator (D-013): an EVENT `{new level of A, time[14:0]}` is emitted when the synchronised pin A shows EV_EDGE, and, if EV_QUAL is set, pin B was at EV_QUAL in both this clock and the previous one. It uses this clock's RX load, so a sample due in the same clock is skipped. With EV_RESET it restarts word framing (phase 0, no bits).
 
 Measured with these rules: the I2C target kernel queues its ACK 7 clocks after the 8th SCL rise, and SDA goes low 3 clocks after the SCL fall. It works for SCL high times ≥ 6 clocks (`tools/kernels/tests/test_i2c_target.py`). This is on an ideal bus in simulation; no rise times are modelled.
 
@@ -424,3 +426,7 @@ Pin rules added with the SPI modes (D-011):
 - **P12.** In LEVEL mode, a DATA or EVENT token drives `data[0]` at `max(cursor, earliest)`.
 
 Measured with these rules: the SPI controller kernel works in mode 0 up to SCK = 16.7 MHz (3 clocks per period). MISO passes through the 2-clock input synchroniser, which is what fails at 25 MHz. It takes about 38 clocks per byte at 12.5 MHz, against 32 for the bits alone.
+
+Pin rules added with the generalized RX/TX primitives (D-013):
+- **P13.** RX word framing: bits accumulate into a word of RX_NBITS bits (or, with RX_NBITS2 ≠ 0, alternately RX_NBITS then RX_NBITS2). The word is emitted right-aligned (LSB order: first bit in `data[0]`; MSB order: last bit in `data[0]`). A word is *tainted* if any of its samples was taken while the unit's TX was active (shifting, or with pad actions pending). With RX_ECHO = 0, tainted words are dropped instead of emitted, but framing still advances.
+- **P14.** TX_LENTOK: a DATA token shifts `data[15:12] + 1` bits taken from `data[11:0]`, in ORDER. SETN is not needed, and payloads are limited to 12 bits.

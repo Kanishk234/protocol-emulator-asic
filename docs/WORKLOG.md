@@ -61,6 +61,15 @@ Later still (SPI):
 - R1 fallback priced on the kernels: no loss in the I2C/SPI speed limits; SPI byte rate -9%.
 - 38 pytest tests pass.
 
+Later still (generalization, D-012/D-013):
+- Team principle recorded: every addition general *and* optimized; no dedicated protocol blocks (D-012, CLAUDE.md, memory).
+- Pin units generalized: event generator (replaces EDGE_TS + COND_EDGE), two-phase framing (replaces RX_TAIL), echo suppression, TX length-in-token. ISA: HS head-bit select (slot now 53 bits).
+- `tools/kernels/i2c_target.py` is now a full read + write I2C target in **12 slots** (14–18 before):
+  - passes at 100 kHz / 400 kHz / 1 MHz and under sigrok;
+  - fastest 12 clocks/bit;
+  - disabling any of the 4 new primitives fails 5 tests.
+- Docs updated in one pass of exact replacements (ARCHITECTURE §7/§14 P8, P13–P14; ISA §2/§4; VERIFICATION; OVERVIEW; PHASE2); generality table added to ARCH_EXPLORATION.
+
 Checklist boxes ticked (evidence):
 - none yet. The tripsim box still needs STRETCH and PULSE; the program boxes need `tripc` and the UART/SPI/I2C-controller programs.
 

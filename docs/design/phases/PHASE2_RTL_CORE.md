@@ -25,7 +25,7 @@
 | `trw_lane.v` | EVAL (conditions, priority, static updates, pending, reservation), EXEC (operand mux, ALU, writeback), routine controller (RPC, RB, interruption) |
 | `trw_alu.v` | The 16 operations |
 | `trw_sram.v` | Macro wrapper plus the fixed 4-way rotation arbiter; fallback implementation behind a parameter |
-| `trw_pin_unit.v` | TX (cursor, LEVEL/OE/GAP/SYNC/CLK/SETN, SHIFT, CLKGEN with stretch, PULSE, LATE) and RX (SHIFT_RX + autorearm, LINKED_RX, EDGE_TS, COND_EDGE, OVERRUN) |
+| `trw_pin_unit.v` | TX (cursor, LEVEL/OE/GAP/SYNC/CLK/SETN, SHIFT, CLKGEN with stretch, PULSE, LATE) and RX (SHIFT_RX + autorearm, LINKED_RX, two-phase framing, echo suppression, event generator, OVERRUN), TX tag filter and length-in-token |
 | `trw_pins.v` | Pin owner registers, open-drain handling, pad mapping |
 | `trw_crc.v`, `trw_match.v`, `trw_mem.v`, `trw_capture.v` | Helper units |
 | `trw_host.v` | SPI slave, command FSM, address spaces, debug readback, IRQ, FIFOs |

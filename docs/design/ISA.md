@@ -55,7 +55,7 @@ The earlier draft did have a real problem here. The routine tier had its **own**
 
 Tokens (unchanged from `ARCHITECTURE.md` §4.1): 16-bit data + 2-bit tag, `00 DATA`, `01 CTRL`, `10 EVENT`, `11 ERR`.
 
-**Convention for EVENT tokens:** `data[15]` carries the event's kind or polarity: rising/falling for EDGE_TS, START (1) / STOP (0) for COND_EDGE. Reflex conditions can test this bit directly (§4.2 `HE/HV`).
+**Convention for EVENT tokens:** `data[15]` carries the new level of the pin (rising = 1). So I2C START (SDA falls) is `data[15]` = 0 and STOP is 1. Short RX words, such as the I2C ACK/NACK bit, are right-aligned, so their bit is `data[0]`. Reflex conditions can test either bit directly (§4.2 `HE/HV/HS`).
 
 ---
 
@@ -98,7 +98,7 @@ Changes from the earlier op table (`ARCHITECTURE.md` §5.3 before DECISIONS D-00
 
 ## 4. Reflex slots
 
-### 4.1 Encoding (52 bits; host writes 4 × 16-bit words)
+### 4.1 Encoding (53 bits; host writes 4 × 16-bit words)
 
 ```
 CONDITION (20 bits)
@@ -110,8 +110,8 @@ CONDITION (20 bits)
   [14:11]  FV     flag values
   [15]     TE     tag match on the A input's head
   [17:16]  TAG    required tag
-  [18]     HE     head data[15] match enable
-  [19]     HV     required head data[15]
+  [18]     HE     head-bit match enable
+  [19]     HV     required head bit (data[15], or data[0] if HS)
 ACTION (32 bits)
   [23:20]  OP     operation (§3)
   [26:24]  DST    0-3 r0-r3 | 4 O0 | 5 O1 | 6 none | 7 reserved
@@ -125,9 +125,10 @@ ACTION (32 bits)
   [48:47]  DF     which flag: 0-2 = f0-f2, 3 = reserved
   [50:49]  OT     output tag (when DST is O0/O1; ignored for MKCTL and when KT)
   [51]     KT     keep the A input head's tag on the output (forwarding)
+  [52]     HS     head-bit select for HE/HV: 0 = data[15] (event polarity), 1 = data[0] (D-013)
 ```
 
-Host words: w0 = bits [15:0], w1 = [31:16], w2 = [47:32], w3[3:0] = [51:48].
+53 bits. Host words: w0 = bits [15:0], w1 = [31:16], w2 = [47:32], w3[4:0] = [52:48].
 
 ### 4.2 When a slot is ready
 
@@ -140,7 +141,7 @@ ready(s) =  V
          && (PEND & FM) == 0                                    // pending rule, §4.4
          && (ASRC ∉ {I0,I1} || ( avail(ASRC)                    // implicit
                                  && (!TE || head.tag == TAG)
-                                 && (!HE || head.data[15] == HV) ))
+                                 && (!HE || (HS ? head.data[0] : head.data[15]) == HV) ))
          && (DST  ∉ {O0,O1} || free(DST))                       // implicit, includes reservation
          && (OP != CALL || !RB)                                 // implicit
 ```
@@ -249,13 +250,14 @@ slot 2    when STATE=SEND, f0=1                 do MOV O1 := zero, tag EVENT ; S
 
 ### 7.2 I2C target: address match and ACK
 Setup:
-- U0: pin A = SDA (`uio0`, open-drain), pin B = SCL (`uio1`); RXMODE = LINKED_RX (8 bits on SCL rise) + COND_EDGE; TX linked to SCL fall.
+- U0: pin A = SDA (`uio0`, open-drain), pin B = SCL (`uio1`); LINKED_RX on SCL rise, 8 + 1 bit framing, echo suppression; events on SDA edges while SCL is high (START/STOP); TX linked to SCL fall, length in the token.
+- The full read + write kernel (12 slots) is `tools/kernels/i2c_target.py`; the listing below is the address/ACK part as first drafted.
 - L0.I0 ← U0.rx (blocking); L0.O0 → U0.tx.
 - `K0 = 0x00FE` (address-bit mask), `K1 = own address << 1`, `K2 = 0x6001` (`SETN 1`).
 - All general registers stay free.
 
 ```
-slot 0 U  when I0:EVENT, head[15]=1 (START)     do MOV none := I0 ; deq ; STATE:=ADDR   (A = I0 so the tests apply)
+slot 0 U  when I0:EVENT, head[15]=0 (START)     do MOV none := I0 ; deq ; STATE:=ADDR   (A = I0 so the tests apply)
 slot 1 U  when STATE=ADDR, I0:DATA              do CMPM none := I0, mask K0, val K1 -> f0 ; deq ; STATE:=ACKQ
 slot 2 U  when STATE=ACKQ, f0=1                 do OR O0 := zero, K2, tag CTRL ; STATE:=ACK1
 slot 3 U  when STATE=ACK1                       do MOV O0 := zero (DATA 0: one ACK bit) ; STATE:=ACKD

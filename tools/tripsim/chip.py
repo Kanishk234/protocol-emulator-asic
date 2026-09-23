@@ -69,7 +69,7 @@ class Chip:
         self.fabric.connect(port, producer, mode, accept)
 
     def pin_config(self, unit, **cfg):
-        for key in ("pin_a", "pin_b", "pin_c"):
+        for key in ("pin_a", "pin_b", "pin_c", "pin_s"):
             pad = cfg.get(key)
             if pad is not None and pad in HOST_PADS:
                 raise ValueError(f"pad {pad} belongs to the host port")
@@ -146,7 +146,8 @@ class Chip:
         if rot < len(self.lanes) and self.lanes[rot].running:
             self.lanes[rot].mem_access(self.sram)
         for u in self.pins:
-            a, b = self.synced(u.cfg.pin_a), self.synced(u.cfg.pin_b)
+            sense = u.cfg.pin_a if u.cfg.pin_s is None else u.cfg.pin_s
+            a, b = self.synced(sense), self.synced(u.cfg.pin_b)
             u.compute_rx(now, a, b, self.synced(u.cfg.pin_c))
             u.compute_tx(now, b, a)
         hin = self.fabric.producers["HOST_IN"]

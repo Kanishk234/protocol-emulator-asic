@@ -23,6 +23,7 @@ import tripwire_spec as _S
 
 CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN, CMD_WAIT, CMD_SAMPLE = (
     _S.PIN_CMD[n] for n in ("LEVEL", "OE", "CLK", "GAP", "SYNC", "SETN", "WAIT", "SAMPLE"))
+_BITSYNC_CMDS = {n: _S.PIN_CMD[n] for n in ("FRAME", "LINE", "SYNC", "SETN", "WAIT")}
 
 
 @dataclass
@@ -32,11 +33,12 @@ class PinConfig:
     # select/frame input (D-014): while pin C != c_active, RX framing is held in reset;
     # deselecting aborts a linked TX shift; with c_oe, pin A is driven only while selected
     pin_c: Optional[int] = None
+    pin_s: Optional[int] = None     # sense pad: read instead of pin A (split TXD/RXD transceivers)
     c_active: int = 0
     c_oe: bool = False
     ev_pin: str = "a"               # event generator source: a | c
-    txmode: str = "level"           # level | shift | clkgen | pulse
-    rxmode: str = "off"             # off | shift_rx | linked_rx
+    txmode: str = "level"           # level | shift | clkgen | pulse | bitsync
+    rxmode: str = "off"             # off | shift_rx | linked_rx | bitsync
     # event generator (D-013): EVENT {data[15] = new level of A, data[14:0] = time} on
     # ev_edge of pin A, optionally only while pin B is at level ev_qual (stable for 2 samples)
     ev_edge: Optional[str] = None   # None | rise | fall | both
@@ -67,6 +69,16 @@ class PinConfig:
     sym1_first: int = 1
     sym1_t1: int = 1
     sym1_t2: int = 1
+    # BITSYNC (D-021): shared recovered bit clock, line coding, readback (see bitsync.py)
+    sjw: float = 0.0                # max resync step in clocks (0 = hard sync only)
+    resync: str = "dom"             # dom: recessive-to-dominant edges only | both
+    idle_bits: int = 1              # recessive samples that make the bus idle
+    stuff_n: int = 0                # after n equal bits the next is a complement (0 = off)
+    stuff_lvl: Optional[int] = None # None: runs of either level | 0 | 1
+    crc_width: int = 0              # 0 = no CRC; else 1..16
+    crc_poly: int = 0
+    crc_init: int = 0
+    crc_res: int = 0                # expected CRC register after the whole frame
 
     @property
     def period_q8(self):
@@ -93,6 +105,10 @@ class PinUnit:
             t1, t2 = getattr(c, f"sym{b}_t1"), getattr(c, f"sym{b}_t2")
             if not (0 <= t1 < 4096 and 0 <= t2 < 4096 and t1 + t2 > 0):
                 raise ValueError(f"sym{b}: durations must be 12-bit ticks, not both zero")
+        if (c.txmode == "bitsync") != (c.rxmode == "bitsync"):
+            raise ValueError("bitsync: txmode and rxmode must both be bitsync")
+        if not 0 <= c.crc_width <= 16:
+            raise ValueError("crc_width must be 0..16")
         self.reset_state()
 
     def reset_state(self):
@@ -121,6 +137,10 @@ class PinUnit:
         self._sel = True                # registered "selected" (pin C), used for OE gating
         self._sel_next = True
         self._deselect = False          # pin C went inactive this clock
+        self.bs = None
+        if c.txmode == "bitsync":
+            from .bitsync import BitSync
+            self.bs = BitSync(self)
 
     # -------------------------------------------------------------- pads
     def pad_drive(self):
@@ -152,6 +172,9 @@ class PinUnit:
     def compute_tx(self, now, b=None, a=None):
         """b: synchronised pin B (linked shifts, WAIT); a: synchronised pin A (CLKGEN STRETCH)."""
         c = self.cfg
+        if self.bs is not None:
+            self.bs.accept(now, self.tx_port, _BITSYNC_CMDS)
+            return
         apply = self._tx_apply = []
         if self._deselect and (self.linked_bits or self.linked_end):
             # §14 P15: deselect aborts a linked shift in progress; pin A returns to IDLE
@@ -307,6 +330,11 @@ class PinUnit:
     def compute_rx(self, now, a, b=None, sel_pin=None):
         """a, b, sel_pin: synchronised levels of pins A, B, C this clock (None if not attached)."""
         c = self.cfg
+        if self.bs is not None:
+            self._tx_apply = []
+            if a is not None:
+                self.bs.step(now, a)
+            return
         sel = True if (c.pin_c is None or sel_pin is None) else sel_pin == c.c_active
         self._deselect = self._sel_next and not sel
         self._sel_next = sel

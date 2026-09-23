@@ -40,7 +40,7 @@ from .expr import ExprError, evaluate
 LANE_SLOTS = 12
 SRAM_WORDS = 512
 _PIN_KEYS = {f.name for f in dataclasses.fields(PinConfig)}
-_PAD_KEYS = {"pin_a", "pin_b", "pin_c"}
+_PAD_KEYS = {"pin_a", "pin_b", "pin_c", "pin_s"}
 
 
 class TrwError(Exception):

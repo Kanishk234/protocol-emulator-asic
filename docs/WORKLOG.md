@@ -21,6 +21,24 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1: CAN via BITSYNC)
+Done:
+- D-023: BITSYNC pin-unit mode (recovered bit clock with hard sync + SJW resync, bit stuffing, CRC ≤ 16 bits with append/check, readback abort/report, `FRAME n`, one-bit override, TX status events) and `pin_s` (sense pad). Spec YAML: `FRAME` (op 9), `LINE` (op 10), `WAIT` [1], `SYNC` text. §14 P20–P26. `tools/tripsim/bitsync.py`.
+- `programs/can.trw`: CAN 2.0A controller on 2 lanes (11 + 10 slots, 3 routines), 1 pin unit.
+- `tools/protomodels/can.py`: reference CAN 2.0A node (bit timing, stuffing, CRC-15, arbitration, ACK).
+- Tests: `test_can.py` (16) and `tripsim/tests/test_bitsync.py` (6, an HDLC-style configuration). sigrok `can` agrees on every frame and ACK. 155 pytest pass; `check_all.sh` PASS; `gen.py --check` clean.
+- Engine mutations: 8 of 9 caught; "resync on own dominant edges" is not (a gap, noted in D-023).
+- BUGS #10–#15: test-harness host FIFO, two CAN firmware design problems, a pending-flag slot mistake, reference model stuff-after-CRC, override armed by a stuff bit.
+- Confirmed last session's open item: the 1-Wire sigrok leg runs and agrees (READ ROM, ROM code).
+- Noted: the ARCHITECTURE §4.6 connectivity table does not match the programs (HOST_OUT from O1); marked for the freeze.
+
+Checklist boxes ticked (evidence):
+- none new (CAN is a stretch goal beyond the phase 1 checklist).
+
+Next:
+- CAN follow-ups if wanted: error frames and error counters, extended IDs, remote frames; a multi-transmitter propagation-delay test for the resync rule.
+- Remaining phase 1: ablations, zero OPEN items (incl. the §4.6 table) + semantics review, R1–R3 (fresh session), green CI.
+
 ## 2026-09-23: Kanishk + Claude (planning: protocol coverage, FPGA target)
 Done:
 - Reviewed the model's protocol coverage against the competition brief:

@@ -61,3 +61,7 @@ SYS = {'NOP': 0, 'RET': 1, 'SETST': 2, 'SETF': 3, 'CLRF': 4, 'TSTF': 5, 'CPYF': 
 
 PIN_CMD = {'LEVEL': 1, 'OE': 2, 'CLK': 3, 'GAP': 4, 'SYNC': 5, 'SETN': 6, 'WAIT': 7}
 TX_LENTOK = {'len': (15, 12), 'payload': (11, 0)}
+
+PAD_GROUPS = {'ui': (0, 8, 'in'), 'uo': (8, 8, 'out'), 'uio': (16, 8, 'inout')}
+PADS = {'ui0': 0, 'ui1': 1, 'ui2': 2, 'ui3': 3, 'ui4': 4, 'ui5': 5, 'ui6': 6, 'ui7': 7, 'uo0': 8, 'uo1': 9, 'uo2': 10, 'uo3': 11, 'uo4': 12, 'uo5': 13, 'uo6': 14, 'uo7': 15, 'uio0': 16, 'uio1': 17, 'uio2': 18, 'uio3': 19, 'uio4': 20, 'uio5': 21, 'uio6': 22, 'uio7': 23}
+HOST_PADS = (4, 5, 6, 14, 15)

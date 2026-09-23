@@ -102,6 +102,15 @@ def validate(s):
         _check(len(set(vals.values())) == len(vals), f"routine.enums.{enum}: duplicate codes")
     _check(set(rt["sys_desc"]) == set(rt["enums"]["SYS"]), "routine.sys_desc must describe every SYS kind")
 
+    groups, used = s["pads"]["groups"], set()
+    for g in groups:
+        span = set(range(g["base"], g["base"] + g["count"]))
+        _check(not span & used, f"pads: group {g['name']} overlaps another group")
+        used |= span
+    names = {f"{g['name']}{i}" for g in groups for i in range(g["count"])}
+    for h in s["pads"]["host"]:
+        _check(h in names, f"pads.host: unknown pad {h!r}")
+
     _unique(s["pin_commands"], "code", "pin_commands")
     _unique(s["pin_commands"], "name", "pin_commands")
     for c in s["pin_commands"]:
@@ -133,6 +142,10 @@ def gen_python(s):
     lines += [f"{name} = " + fmt(vals) for name, vals in rt["enums"].items()]
     lines += ["", "PIN_CMD = " + fmt({c["name"]: c["code"] for c in s["pin_commands"]}),
               "TX_LENTOK = " + fmt(s["tx_lentok"]), ""]
+    pads = {f"{g['name']}{i}": g["base"] + i for g in s["pads"]["groups"] for i in range(g["count"])}
+    lines += ["PAD_GROUPS = " + fmt({g["name"]: (g["base"], g["count"], g["dir"]) for g in s["pads"]["groups"]}),
+              "PADS = " + fmt(pads),
+              f"HOST_PADS = {tuple(pads[h] for h in s['pads']['host'])!r}", ""]
     return "\n".join(lines)
 
 

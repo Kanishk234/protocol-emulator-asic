@@ -116,5 +116,13 @@ pin_commands:
   - {code: 6, name: SETN,  arg: "[4:0] n",                      desc: "NBITS for the following DATA tokens (1..16)"}
   - {code: 7, name: WAIT,  arg: "[0] edge (1 = rise)",          desc: "take no tokens until pin B shows the edge; cursor := that edge"}
 
+# Pad numbering for pin-unit pin A/B/C selects and output ownership (ARCHITECTURE.md §10).
+pads:
+  groups:
+    - {name: ui,  base: 0,  count: 8, dir: in}
+    - {name: uo,  base: 8,  count: 8, dir: out}
+    - {name: uio, base: 16, count: 8, dir: inout}
+  host: [ui4, ui5, ui6, uo6, uo7]      # host SPI (CS_n, SCK, MOSI, MISO) and IRQ
+
 # DATA to a TX half with TX_LENTOK (D-013): data[15:12] = nbits - 1, payload data[11:0].
 tx_lentok: {len: [15, 12], payload: [11, 0]}

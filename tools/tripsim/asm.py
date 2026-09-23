@@ -36,13 +36,17 @@ def cmpm_field(mask: str, val: str) -> int:
 
 
 def reflex(*, op="MOV", dst="none", a="zero", b=None, f=None,
-           urgent=False, state=None, flags=None, tag=None, head15=None,
+           urgent=False, state=None, flags=None, tag=None, head15=None, head0=None,
            deq=False, ns=None, flag=None, ot="DATA", keep_tag=False) -> int:
     """Encode one reflex slot.
 
     flags: {index: value} over f0..f3 (f3 = RB). flag: flag index that receives
     the op's flag result. f: field operand (IMM) for SHOR/EXT/CMPM/MKCTL/CALL.
+    head15 / head0: required value of the A input head's data[15] / data[0].
     """
+    if head15 is not None and head0 is not None:
+        raise ValueError("a slot tests one head bit: head15 or head0")
+    head = head15 if head15 is not None else head0
     fm = fv = 0
     for idx, val in (flags or {}).items():
         fm |= 1 << idx
@@ -60,7 +64,7 @@ def reflex(*, op="MOV", dst="none", a="zero", b=None, f=None,
         SE=int(state is not None), SV=state or 0,
         FM=fm, FV=fv,
         TE=int(tag is not None), TAG=isa.TAGS[tag] if tag else 0,
-        HE=int(head15 is not None), HV=head15 or 0,
+        HE=int(head is not None), HV=head or 0, HS=int(head0 is not None),
         OP=isa.OP[op], DST=_DST[dst], ASRC=_ASRC[a], DQ=int(deq),
         BSEL=bsel, IMM=imm,
         NSE=int(ns is not None), NS=ns or 0,

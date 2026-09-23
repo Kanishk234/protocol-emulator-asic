@@ -10,7 +10,7 @@ The TRIPWIRE token-level, cycle-accurate model. In phase 1 it is the **architect
 | `asm.py` | Minimal assembler: `reflex(...)` slot builder, `Routine` builder, `link_routines` |
 | `fabric.py` | Producer registers and consumer ports (blocking, tap) |
 | `lane.py` | Reflex slots, EVAL/EXEC pipeline, routine sequencer |
-| `pinunit.py` | Pin units: TX (LEVEL/OE/GAP/SYNC/SETN, timed or linked SHIFT with preload, CLKGEN, tag filter), RX (SHIFT_RX, EDGE_TS, LINKED_RX with tail bit, COND_EDGE) |
+| `pinunit.py` | Pin units: TX (LEVEL/OE/GAP/SYNC/SETN, timed or linked SHIFT with preload, CLKGEN, tag filter, length-in-token), RX (SHIFT_RX or LINKED_RX with two-phase framing and echo suppression; qualified edge-event generator) |
 | `chip.py` | Top level: pads, synchronisers, ownership, SRAM rotation, host FIFOs |
 | `vcd.py` | Pad activity to VCD for sigrok |
 

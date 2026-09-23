@@ -1,11 +1,13 @@
 """Pin units U0..U5 (ARCHITECTURE.md §7): a TX half (consumer) and an RX half (producer).
 
-Modelled:
-- TX: LEVEL/OE/GAP/SYNC/SETN commands; DATA tokens shifted at PERIOD (timed) or on
-  edges of pin B (linked, tx_edge).
-- RX: SHIFT_RX, EDGE_TS, LINKED_RX (sample A on rx_edge of B, optional tail bit), and
-  COND_EDGE (START/STOP: A changes while B is high), combinable with LINKED_RX.
-Not yet: CLKGEN, PULSE (raise NotImplementedError).
+Modelled (general primitives, DECISIONS D-012/D-013):
+- TX: LEVEL/OE/GAP/SYNC/SETN/CLK commands; DATA shifted at PERIOD (timed) or on edges of
+  pin B (linked, optional preload); CLKGEN; tag filter; optional length-in-token.
+- RX: SHIFT_RX (timed from a start edge) or LINKED_RX (sample A on an edge of B), with
+  one- or two-phase word framing and optional echo suppression; plus an event generator
+  (edges of A, optionally qualified by B's level) that covers edge timestamps and I2C
+  START/STOP alike.
+Not yet: CLKGEN STRETCH, PULSE (raise NotImplementedError).
 
 Time: "edge t" is the clock edge at the end of clock t; a pad output changed at edge t
 is visible from clock t+1. The TX cursor is kept in 1/256-clock units so fractional
@@ -25,13 +27,18 @@ class PinConfig:
     pin_a: Optional[int] = None     # pad index (chip.PAD_*), drive and/or sample
     pin_b: Optional[int] = None     # link / condition input
     txmode: str = "level"           # level | shift | clkgen | pulse
-    rxmode: str = "off"             # off | shift_rx | linked_rx | edge_ts
-    cond_edge: bool = False         # also emit START/STOP EVENTs (A changes while B high)
+    rxmode: str = "off"             # off | shift_rx | linked_rx
+    # event generator (D-013): EVENT {data[15] = new level of A, data[14:0] = time} on
+    # ev_edge of pin A, optionally only while pin B is at level ev_qual (stable for 2 samples)
+    ev_edge: Optional[str] = None   # None | rise | fall | both
+    ev_qual: Optional[int] = None   # None | 0 | 1
+    ev_reset: bool = False          # an event restarts RX word framing
     period: float = 1.0             # bit period in clocks (16.8 fixed point in hardware)
     presc: int = 1                  # clocks per tick for LEVEL/OE/GAP delays (1..256)
     nbits: int = 8                  # TX shift length (SETN changes it)
     rx_nbits: Optional[int] = None  # RX shift length; None = same as nbits (ISA.md §9 question)
-    rx_tail: int = 0                # LINKED_RX: after rx_nbits, emit the next bit as its own token
+    rx_nbits2: int = 0              # two-phase framing: words alternate rx_nbits, rx_nbits2 (0 = off)
+    rx_echo: bool = True            # False: drop RX words sampled while this unit's TX was shifting
     order: str = "lsb"              # lsb | msb
     od: bool = False                # open drain: 1 releases (OE=0), 0 drives low
     idle: int = 1
@@ -41,6 +48,7 @@ class PinConfig:
     tx_edge: Optional[str] = None   # linked TX shift: change pin A on this edge of pin B
     tx_preload: bool = False        # linked TX: put out bit 0 at once, the rest on TX_EDGE (SPI CPHA=0)
     tx_accept: int = 0xF            # tag mask (bit = tag); other tokens are taken and dropped (D-011)
+    tx_lentok: bool = False         # DATA carries its length: data[15:12] = nbits-1, payload data[11:0]
     stretch: bool = False           # CLKGEN: wait for pin A to read high before timing the high phase
 
     @property
@@ -82,7 +90,8 @@ class PinUnit:
         self._rx = "wait_idle"
         self._rx_t0_q8 = 0
         self._rx_bits = []
-        self._rx_tail = False
+        self._rx_phase = 0
+        self._rx_taint = False
         self._prev_a = None
         self._prev_b = None
         self._prev_b_tx = None
@@ -98,7 +107,11 @@ class PinUnit:
     def _edge(prev, cur, kind):
         if prev is None or cur is None or prev == cur:
             return False
-        return (cur == 1) if kind == "rise" else (cur == 0)
+        return kind == "both" or ((cur == 1) if kind == "rise" else (cur == 0))
+
+    def tx_active(self):
+        """TX is mid-shift or has pad actions pending (used for echo suppression)."""
+        return bool(self.linked_bits or self.linked_end or self.actions)
 
     # ---------------------------------------------------------------- TX
     def _linked(self):
@@ -174,6 +187,8 @@ class PinUnit:
             self._schedule(start_q8 >> 8, "level", data & 1)
         elif tag == isa.TAG_DATA:
             n = self.tx_nbits
+            if c.tx_lentok:                    # D-013: length in the token
+                n, data = (data >> 12) + 1, data & 0x0FFF
             bits = [(data >> i) & 1 for i in range(n)] if c.order == "lsb" else \
                    [(data >> (n - 1 - i)) & 1 for i in range(n)]
             if self._linked():
@@ -204,36 +219,42 @@ class PinUnit:
         """a, b: synchronised levels of pins A and B this clock (None if not attached)."""
         c = self.cfg
         if a is not None:
-            if c.cond_edge and self._prev_b == 1 and b == 1 and self._prev_a is not None and a != self._prev_a:
-                # START: A falls while B high (data[15] = 1); STOP: A rises (data[15] = 0)
-                self._emit(isa.TAG_EVENT, ((1 - a) << 15) | (now & 0x7FFF))
-                self._rx_bits, self._rx_tail = [], False
-            elif c.rxmode == "edge_ts":
-                if self._prev_a is not None and a != self._prev_a:
-                    self._emit(isa.TAG_EVENT, (a << 15) | (now & 0x7FFF))
+            event = (c.ev_edge is not None and self._edge(self._prev_a, a, c.ev_edge)
+                     and (c.ev_qual is None or (b == c.ev_qual and self._prev_b == c.ev_qual)))
+            if event:
+                # §14 P8: EVENT {new level of A, time}; it takes this clock's RX load, so a
+                # sample due in the same clock is skipped. Optionally restarts word framing.
+                self._emit(isa.TAG_EVENT, (a << 15) | (now & 0x7FFF))
+                if c.ev_reset:
+                    self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
             elif c.rxmode == "shift_rx":
                 self._shift_rx(now, a)
             elif c.rxmode == "linked_rx" and self._edge(self._prev_b, b, c.rx_edge):
-                self._linked_rx(a)
+                self._sample(a)
         self._prev_a, self._prev_b = a, b
 
-    def _linked_rx(self, a):
+    def _word_len(self):
         c = self.cfg
-        if self._rx_tail:
-            self._rx_tail = False
-            self._emit(isa.TAG_DATA, a << 15)          # tail bit (e.g. I2C ACK) in data[15]
+        return c.rx_nbits2 if (self._rx_phase and c.rx_nbits2) else (c.rx_nbits or c.nbits)
+
+    def _sample(self, bit):
+        """Add one sampled bit to the current word; emit it when complete (§14 P13)."""
+        c = self.cfg
+        self._rx_taint |= self.tx_active()
+        self._rx_bits.append(bit)
+        if len(self._rx_bits) < self._word_len():
             return
-        self._rx_bits.append(a)
-        n = c.rx_nbits or c.nbits
-        if len(self._rx_bits) == n:
-            bits = self._rx_bits if c.order == "lsb" else self._rx_bits[::-1]
-            self._emit(isa.TAG_DATA, sum(bit << k for k, bit in enumerate(bits)))
-            self._rx_bits = []
-            self._rx_tail = bool(c.rx_tail)
+        bits = self._rx_bits if c.order == "lsb" else self._rx_bits[::-1]
+        if self._rx_taint and not c.rx_echo:
+            self.stats["echo_dropped"] = self.stats.get("echo_dropped", 0) + 1
+        else:
+            self._emit(isa.TAG_DATA, sum(b << k for k, b in enumerate(bits)))
+        self._rx_bits, self._rx_taint = [], False
+        if c.rx_nbits2:
+            self._rx_phase ^= 1
 
     def _shift_rx(self, now, sample):
         c = self.cfg
-        n = c.rx_nbits or c.nbits
         if self._rx == "wait_idle":
             if sample == c.idle:
                 self._rx = "armed"
@@ -245,10 +266,9 @@ class PinUnit:
         if self._rx == "shift":
             i = len(self._rx_bits)
             if now == (self._rx_t0_q8 + i * c.period_q8) >> 8:
-                self._rx_bits.append(sample)
-                if len(self._rx_bits) == n:
-                    bits = self._rx_bits if c.order == "lsb" else self._rx_bits[::-1]
-                    self._emit(isa.TAG_DATA, sum(b << k for k, b in enumerate(bits)))
+                last = i + 1 == self._word_len()
+                self._sample(sample)
+                if last:
                     self._rx = "wait_idle" if c.autorearm else "off"
 
     def _emit(self, tag, data):

@@ -33,8 +33,9 @@ SLOT_FIELDS = {
     "OP": (20, 4), "DST": (24, 3), "ASRC": (27, 3), "DQ": (30, 1),
     "BSEL": (31, 2), "IMM": (33, 8), "NSE": (41, 1), "NS": (42, 4),
     "DFE": (46, 1), "DF": (47, 2), "OT": (49, 2), "KT": (51, 1),
+    "HS": (52, 1),          # head-bit select for HE/HV: 0 = data[15], 1 = data[0] (D-013)
 }
-SLOT_BITS = 52
+SLOT_BITS = 53
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,7 @@ class Slot:
     DF: int = 0
     OT: int = 0
     KT: int = 0
+    HS: int = 0
 
 
 def encode_slot(slot: Slot) -> int:
@@ -75,7 +77,7 @@ def encode_slot(slot: Slot) -> int:
 
 def decode_slot(word: int) -> Slot:
     if not 0 <= word < (1 << SLOT_BITS):
-        raise ValueError("slot word wider than 52 bits")
+        raise ValueError(f"slot word wider than {SLOT_BITS} bits")
     return Slot(**{name: (word >> lsb) & ((1 << width) - 1)
                    for name, (lsb, width) in SLOT_FIELDS.items()})
 

@@ -16,7 +16,7 @@ LEVEL1, LEVEL0 = 0x1800, 0x1000          # LEVEL v=1 / v=0, delay 0
 def test_pin_to_pin_reaction_is_seven_clocks():
     """§5.5: pad edge -> sync (2) -> RX (1) -> EVAL (1) -> EXEC (1) -> TX accept (1) -> pad (1)."""
     chip = Chip(lanes=1)
-    chip.pin_config(0, pin_a=PAD_UI + 0, rxmode="edge_ts")
+    chip.pin_config(0, pin_a=PAD_UI + 0, ev_edge="both")          # edge events on ui0
     chip.pin_config(1, pin_a=PAD_UO + 0, txmode="level", idle=0)
     chip.own(PAD_UO + 0, 1)
     chip.connect("L0.I0", "U0.rx")

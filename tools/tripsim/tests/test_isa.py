@@ -13,13 +13,14 @@ def test_slot_roundtrip(word):
     assert isa.encode_slot(isa.decode_slot(word)) == word
 
 
-def test_slot_fields_tile_52_bits():
+def test_slot_fields_tile_all_bits():
     covered = 0
     for lsb, width in isa.SLOT_FIELDS.values():
         mask = ((1 << width) - 1) << lsb
         assert covered & mask == 0, "overlapping slot fields"
         covered |= mask
-    assert covered == (1 << 52) - 1
+    assert covered == (1 << isa.SLOT_BITS) - 1
+    assert isa.SLOT_BITS <= 64                     # fits the 4 host words (ISA.md §4.1)
 
 
 @given(u16, u16)

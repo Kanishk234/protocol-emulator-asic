@@ -1,54 +1,70 @@
-"""I2C target kernel (write direction): address match, ACK, received bytes to the host.
+"""I2C target kernel, read and write: address match, ACK/NACK, bytes to and from the host.
 
 Exploration firmware for tripsim (DECISIONS D-008), assembled with tripsim.asm. It will
-be rewritten as programs/i2c_target_eeprom.trw once tripc exists.
+be rewritten as programs/i2c_target.trw once tripc exists. 12 reflex slots, one lane,
+one pin unit, using only general pin-unit primitives (D-012, D-013):
+- event generator: edges of SDA while SCL is high -> START (SDA new level 0) / STOP (1),
+  and each event restarts word framing;
+- LINKED_RX on SCL rise, two-phase framing 8 + 1 bits (byte, then the ACK/NACK bit);
+- echo suppression: words sampled while we drive SDA (our ACKs, our read bytes) are
+  dropped by the pin unit, so the firmware only sees the other side's bits;
+- TX linked shift on SCL fall, open drain, length in the token (ACK = 1 bit, byte = 8).
 
-Wiring: SDA = uio[sda], SCL = uio[scl], one pin unit, one lane.
-- Pin unit: LINKED_RX (8 bits MSB-first on SCL rise, plus a tail token for the 9th/ACK
-  bit), COND_EDGE (START/STOP), TX linked shift on SCL fall, open drain.
-- L.I0 <- U.rx (blocking); L.O0 -> U.tx (ACK bits); L.O1 -> HOST_OUT (received bytes).
-
-Token stream per transaction: EVENT START, DATA address, DATA tail, {DATA byte, DATA tail}*,
-EVENT STOP. A tail token carries the sampled 9th bit in data[15] (here: our own ACK).
+Wiring: L.I0 <- U.rx; L.I1 <- HOST_IN (bytes to send on reads); L.O0 -> U.tx;
+L.O1 -> HOST_OUT (bytes received on writes). No clock stretching: read data must be
+waiting in HOST_IN before the controller asks for it.
 """
 
 from tripsim import PAD_UIO
 from tripsim.asm import cmpm_field, reflex
 
-IDLE, ADDR, ACKQ, TAIL, WR, FWD = range(6)
+IDLE, ADDR, ACKQ, RW, XFER, FWD, RT = range(7)
+LEN8 = 0x7000                  # TX length-in-token: 8 bits
 
 
 def slots():
+    U = True
     return [
-        # START / STOP from any state (lowest indices: highest priority)
-        reflex(urgent=True, op="MOV", a="I0", tag="EVENT", head15=1, deq=True, ns=ADDR),
-        reflex(urgent=True, op="MOV", a="I0", tag="EVENT", head15=0, deq=True, ns=IDLE),
-        # address byte: f0 = (byte & K0) == K1   (K1 = our address, write bit 0)
-        reflex(urgent=True, op="CMPM", a="I0", f=cmpm_field("K0", "K1"), flag=0,
-               state=ADDR, tag="DATA", deq=True, ns=ACKQ),
-        reflex(urgent=True, op="MOV", dst="O0", a="zero", state=ACKQ, flags={0: 1}, ns=TAIL),   # ACK bit
-        reflex(urgent=True, op="MOV", a="zero", state=ACKQ, flags={0: 0}, ns=IDLE),            # not us
-        # the tail token after each ACK clock is our own ACK read back: drop it
-        reflex(urgent=True, op="MOV", a="I0", state=TAIL, tag="DATA", deq=True, ns=WR),
-        # data byte: ACK first (MOVB: peek the byte, send DATA 0), then forward it to the host
-        reflex(urgent=True, op="MOVB", dst="O0", a="I0", b=0, state=WR, tag="DATA", ns=FWD),
-        reflex(op="MOV", dst="O1", a="I0", state=FWD, tag="DATA", deq=True, ns=TAIL),
-        # not addressed: drop bus traffic until the next START
-        reflex(op="MOV", a="I0", state=IDLE, tag="DATA", deq=True),
+        # 0-1: START / STOP from any state (lowest indices win)
+        reflex(urgent=U, op="MOV", a="I0", tag="EVENT", head15=0, deq=True, ns=ADDR),
+        reflex(urgent=U, op="MOV", a="I0", tag="EVENT", head15=1, deq=True, ns=IDLE),
+        # 2: address byte: f0 = our address (R/W bit masked off); keep the byte for R/W
+        reflex(urgent=U, op="CMPM", a="I0", f=cmpm_field("K0", "K1"), flag=0,
+               state=ADDR, tag="DATA", ns=ACKQ),
+        # 3: ours -> ACK (a 1-bit token of value 0), still holding the byte
+        reflex(urgent=U, op="MOVB", dst="O0", a="I0", b=0, state=ACKQ, flags={0: 1}, ns=RW),
+        # 4: not ours -> drop it and ignore the bus until the next START
+        reflex(urgent=U, op="MOV", a="I0", deq=True, state=ACKQ, flags={0: 0}, ns=IDLE),
+        # 5: f1 = write (R/W bit is 0)
+        reflex(urgent=U, op="AND", a="I0", b=1, flag=1, deq=True, state=RW, ns=XFER),
+        # 6-7: write: ACK the byte first (peek), then forward it to the host
+        reflex(urgent=U, op="MOVB", dst="O0", a="I0", b=0, tag="DATA",
+               state=XFER, flags={1: 1}, ns=FWD),
+        reflex(op="MOV", dst="O1", a="I0", deq=True, state=FWD, ns=XFER),
+        # 8: read: send the next host byte (8-bit token); SDA is released for the ACK clock
+        reflex(urgent=U, op="OR", dst="O0", a="I1", b="K2", deq=True,
+               state=XFER, flags={1: 0}, ns=RT),
+        # 9-10: the controller's ACK (data[0] = 0): send more; NACK: done
+        reflex(urgent=U, op="MOV", a="I0", tag="DATA", head0=0, deq=True, state=RT, ns=XFER),
+        reflex(urgent=U, op="MOV", a="I0", tag="DATA", head0=1, deq=True, state=RT, ns=IDLE),
+        # 11: not addressed: drop bus traffic
+        reflex(op="MOV", a="I0", tag="DATA", deq=True, state=IDLE),
     ]
 
 
 def load(chip, addr, lane=0, unit=0, sda=0, scl=1):
-    """Configure the chip as an I2C target at 7-bit `addr` (write direction only)."""
+    """Configure the chip as an I2C target at 7-bit `addr`."""
     chip.pin_config(unit, pin_a=PAD_UIO + sda, pin_b=PAD_UIO + scl,
-                    rxmode="linked_rx", cond_edge=True, rx_edge="rise", rx_nbits=8, rx_tail=1,
-                    order="msb", txmode="shift", tx_edge="fall", nbits=1, od=True, idle=1)
+                    rxmode="linked_rx", rx_edge="rise", rx_nbits=8, rx_nbits2=1, order="msb",
+                    ev_edge="both", ev_qual=1, ev_reset=True, rx_echo=False,
+                    txmode="shift", tx_edge="fall", tx_lentok=True, od=True, idle=1)
     chip.own(PAD_UIO + sda, unit)
     chip.connect(f"L{lane}.I0", f"U{unit}.rx")
+    chip.connect(f"L{lane}.I1", "HOST_IN")
     chip.connect(f"U{unit}.tx", f"L{lane}.O0")
     chip.connect("HOST_OUT", f"L{lane}.O1")
     ln = chip.lanes[lane]
-    ln.k[:] = [0x00FF, addr << 1, 0, 0]
+    ln.k[:] = [0x00FE, addr << 1, LEN8, 0]
     for n, s in enumerate(slots()):
         ln.load_slot(n, s)
     chip.run([lane])

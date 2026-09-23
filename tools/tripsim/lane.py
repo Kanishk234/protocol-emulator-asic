@@ -180,7 +180,7 @@ class Lane:
             tag, data = port.head()
             if s.TE and tag != s.TAG:
                 return False
-            if s.HE and ((data >> 15) & 1) != s.HV:
+            if s.HE and ((data & 1) if s.HS else ((data >> 15) & 1)) != s.HV:
                 return False
         if s.DST in (DST_O0, DST_O1) and not self._out_free(s.DST - DST_O0):
             return False

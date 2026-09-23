@@ -1,0 +1,62 @@
+# PS/2 host (e.g. talking to a keyboard or mouse). 2 pin units, no new primitives.
+#   DATA = uio0, CLK = uio1, both open drain. The device generates the clock.
+#   Host: HOST_IN DATA byte = send it to the device; HOST_OUT = bytes from the device (DATA), or the
+#   raw 11-bit frame tagged ERR when its start/stop/parity is wrong; ERR 0 = the device did not ACK a send.
+program ps2_host
+# 12 slots + 1 routine.
+const SYNC = 0x5000
+const LEVEL0 = 0x1000
+const LEVEL1 = 0x1800
+const LEN10 = 0x9000                    # TX length-in-token: 10 bits
+const RX11 = 0x602B                     # SETN rx=1, n=11: restart RX framing
+
+# DATA: LINKED_RX on the device's CLK fall (11-bit frames); TX shifts on CLK fall (host-to-device).
+# Echo is kept: the word captured during a send ends with the device's ACK bit.
+pin U0: pin_a=uio0 pin_b=uio1 od=true idle=1 order=lsb presc=50 rxmode=linked_rx rx_edge=fall rx_nbits=11 txmode=shift tx_edge=fall tx_lentok=true
+# CLK: the host only drives it low (inhibit / request to send); 1 tick = 1 us
+pin U1: pin_a=uio1 od=true idle=1 presc=50 txmode=level
+own uio0 U0
+own uio1 U1
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U0.rx
+connect U0.tx <- L0.O0
+connect U1.tx <- L0.O1 accept=CTRL
+connect HOST_OUT <- L0.O1 accept=DATA|ERR
+
+lane L0:
+    K0 = 0x401                          # frame check mask: start and stop bits
+    K1 = 0x400                          # expected: start 0, stop 1
+    K2 = LEN10 | 0x200                  # data | stop bit, parity bit 0
+    K3 = LEN10 | 0x300                  # data | stop bit, parity bit 1
+    states RX CHK CHK2 SEND P1 WACK ACKC
+    # device to host: check start/stop, then odd parity (a valid 11-bit frame has even parity overall)
+    slot: when RX, I1 is DATA                   do CMPM none <- I1, mask K0 val K1 -> f0   then CHK
+    slot: when CHK                              do PAR none <- I1 -> f1                     then CHK2
+    slot: when CHK2, f0 == 1, f1 == 0           do EXT O1 <- I1, f=0x71, deq                then RX
+    slot: when CHK2, f0 == 0                    do MOV O1 <- I1, tag ERR, deq               then RX
+    slot: when CHK2, f1 == 1                    do MOV O1 <- I1, tag ERR, deq               then RX
+    # host to device: request to send (routine), then data + odd parity + stop on the device's clock
+    slot: when RX, rb == 0, I0 is DATA          do CALL rts <- I0                           then SEND
+    slot: when SEND, rb == 0                    do PAR none <- I0 -> f2                     then P1
+    slot: when P1, f2 == 1                      do OR O0 <- I0, K2, deq                     then WACK
+    slot: when P1, f2 == 0                      do OR O0 <- I0, K3, deq                     then WACK
+    # the send's own 11-bit word: start bit 0 ... ACK bit 0 (bit 10) means the device took it
+    slot: when WACK, I1 is DATA                 do AND none <- I1, K0, deq -> f0            then ACKC
+    slot: when ACKC, f0 == 0                    do MOV O1 <- zero, tag ERR                  then RX
+    slot: when ACKC, f0 == 1                    do MOV none <- zero                         then RX
+
+# Our own CLK-low edge is a fall LINKED_RX would count; SETN rx restarts the framing at 100 us,
+# while CLK is still held low, so the send's word starts with the start bit.
+routine rts:                            # CLK low 110 us, DATA low (start bit) at 100 us, release CLK
+    load16 r1, SYNC
+    out O1, r1, CTRL
+    out O0, r1, CTRL
+    load16 r1, LEVEL0
+    out O1, r1, CTRL
+    load16 r1, LEVEL1 | 110
+    out O1, r1, CTRL
+    load16 r1, LEVEL0 | 100
+    out O0, r1, CTRL
+    load16 r1, RX11
+    out O0, r1, CTRL
+    ret

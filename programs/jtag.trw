@@ -1,0 +1,35 @@
+# JTAG controller: a generic scan engine (like CMSIS-DAP / MPSSE sequences). 8 slots, 4 pin units.
+#   TCK = uo0 (CLKGEN), TMS = uo1, TDI = uo2 (linked shifts on TCK falls), TDO = ui0 (sampled on TCK rises).
+#   Host: a chunk of n <= 12 clocks is two TX_LENTOK tokens, EVENT (n-1) << 12 | TMS bits, then
+#   DATA (n-1) << 12 | TDI bits (LSB = first clock). HOST_OUT: one EVENT per chunk, the n TDO bits.
+#   The host walks the TAP state machine with the TMS bits, so any IR/DR length or chain works.
+# TCK stops between chunks (JTAG is static), and each chunk restarts the TDO framing, so words stay
+# aligned to chunks.
+program jtag
+param PERIOD = 20                       # TCK period in clocks (20 = 2.5 MHz)
+
+pin U0: pin_a=uo0 txmode=clkgen period=PERIOD idle=0                                                    # TCK
+pin U1: pin_a=uo1 pin_b=uo0 txmode=shift tx_edge=fall tx_preload=true tx_lentok=true order=lsb idle=1    # TMS
+pin U2: pin_a=uo2 pin_b=uo0 txmode=shift tx_edge=fall tx_preload=true tx_lentok=true order=lsb idle=1    # TDI
+pin U3: pin_a=ui0 pin_b=uo0 rxmode=linked_rx rx_edge=rise order=lsb rx_nbits=12                            # TDO
+own uo0 U0
+own uo1 U1
+own uo2 U2
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U3.rx
+connect U1.tx <- L0.O0 accept=DATA
+connect U0.tx <- L0.O0 accept=CTRL
+connect U2.tx <- L0.O1 accept=DATA
+connect U3.tx <- L0.O1 accept=CTRL
+connect HOST_OUT <- L0.O1 accept=EVENT
+
+lane L0:
+    states IDLE T1 T2 T3 T4 T5 T6 RX
+    slot: when IDLE, I0 is EVENT                do MOV O0 <- I0, deq, tag DATA          then T1     # TMS bits
+    slot: when T1, I0 is DATA                   do EXT r0 <- I0, f=0x3C                 then T2     # r0 = n - 1
+    slot: when T2                               do MOV O1 <- I0, deq                    then T3     # TDI bits
+    slot: when T3                               do ADD r1 <- r0, 0x21                   then T4
+    slot: when T4                               do MKCTL O1 <- r1, f=0x60               then T5     # SETN rx n (restart)
+    slot: when T5                               do ADD r2 <- r0, 1                      then T6
+    slot: when T6                               do MKCTL O0 <- r2, f=0x30               then RX     # CLK n
+    slot: when RX, I1 is DATA                   do MOV O1 <- I1, deq, tag EVENT         then IDLE   # TDO bits

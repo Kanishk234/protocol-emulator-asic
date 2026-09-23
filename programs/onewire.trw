@@ -1,0 +1,52 @@
+# 1-Wire controller, standard speed (timings from Maxim AN126). 9 slots + 1 routine, 1 pin unit.
+#   DQ = uio0, open drain. Host: DATA byte = write it (LSB first); CTRL 0 = reset + presence
+#   detect; CTRL 1 = read a byte. HOST_OUT: a 1-bit DATA word after each reset (0 = a device
+#   answered with a presence pulse), and a DATA byte per read.
+program onewire
+const LEVEL0 = 0x1000
+const LEVEL1 = 0x1800
+const GAP = 0x4000
+const SAMPLE = 0x8000
+const RXLEN1 = 0x6021                   # SETN rx: 1-bit words, framing restarts
+const RXLEN8 = 0x6028                   # SETN rx: 8-bit words
+
+# Writes are PULSE symbols (1 tick = 1 us): a 0 is 60 us low + 10 us recovery, a 1 is 6 us low + 64 us.
+# Reads are timed commands: 6 us low, release, SAMPLE 9 us later (15 us into the slot), 55 us rest.
+pin U0: pin_a=uio0 od=true idle=1 presc=50 txmode=pulse nbits=8 order=lsb rx_nbits=8 sym0_first=0 sym0_t1=60 sym0_t2=10 sym1_first=0 sym1_t1=6 sym1_t2=64
+own uio0 U0
+connect L0.I0 <- HOST_IN
+connect U0.tx <- L0.O0
+connect HOST_OUT <- U0.rx
+
+lane L0:
+    K0 = LEVEL0                         # one read slot = these four commands
+    K1 = LEVEL1 | 6
+    K2 = SAMPLE | 9
+    K3 = GAP | 55
+    states IDLE R0 R1 R2 R3 R4
+    slot: when IDLE, rb == 0, I0 is DATA                do MOV O0 <- I0, deq                       # write a byte
+    slot: when IDLE, rb == 0, I0 is CTRL, head0 == 0    do CALL reset <- I0, deq
+    slot: when IDLE, rb == 0, I0 is CTRL, head0 == 1    do MOVB r0 <- I0, 8, deq -> f0            then R0
+    slot: when R0, f0 == 0                              do MOVB O0 <- zero, K0, tag CTRL          then R1
+    slot: when R0, f0 == 1                              do MOV none <- zero                       then IDLE
+    slot: when R1                                       do MOVB O0 <- zero, K1, tag CTRL          then R2
+    slot: when R2                                       do MOVB O0 <- zero, K2, tag CTRL          then R3
+    slot: when R3                                       do MOVB O0 <- zero, K3, tag CTRL          then R4
+    slot: when R4                                       do SUB r0 <- r0, 1 -> f0                  then R0
+
+# The rest after the sample is 420 us, not AN126's 410: the next slot then starts 490 us after the
+# release, 10 us above the tRSTH minimum (at exactly 480 us sigrok's decoder misses the edge).
+routine reset:                          # 480 us low, sample 70 us after release, 420 us rest
+    load16 r1, RXLEN1
+    out O0, r1, CTRL
+    load16 r1, LEVEL0
+    out O0, r1, CTRL
+    load16 r1, LEVEL1 | 480
+    out O0, r1, CTRL
+    load16 r1, SAMPLE | 70
+    out O0, r1, CTRL
+    load16 r1, GAP | 420
+    out O0, r1, CTRL
+    load16 r1, RXLEN8
+    out O0, r1, CTRL
+    ret

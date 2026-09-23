@@ -1,0 +1,118 @@
+# SWD controller (ARM Serial Wire Debug). 12 slots + 4 routines, 2 pin units, no SWD-specific hardware.
+#   SWCLK = uo0 (CLKGEN), SWDIO = uio0 (push-pull; OE switched at the turnarounds).
+#   Host: DATA 0x7000 | request byte starts a transaction (the 0x7000 is the 8-bit length for TX_LENTOK).
+#   A write then needs its 32 data bits and parity as TX_LENTOK tokens: DATA 0xB000 | d[11:0],
+#   DATA 0xB000 | d[23:12], EVENT 0x8000 | parity << 8 | d[31:24].
+#   HOST_OUT: the 3-bit ACK of each request (OK = 0b001), then for a
+#   read with ACK OK: data[15:0], data[31:16], and a 2-bit word with the parity bit in [0].
+# Timing follows ADIv5 / CMSIS-DAP: the host changes SWDIO on SWCLK falls and samples on falls; the
+# target samples on rises. Between phases the clock stops (SWD is fully static), so no phase races
+# the lane. RX words sampled while we drive SWDIO are dropped (rx_echo=false), and every phase
+# restarts the RX framing, so no stale word can reach the lane.
+program swd
+param PERIOD = 20                       # SWCLK period in clocks (20 = 2.5 MHz)
+const OE0 = 0x2000
+const OE1 = 0x2800
+const WAITF = 0x7000                    # WAIT for a SWCLK fall
+const RX3 = 0x6023                      # SETN rx (restart framing): 3-bit words
+const RX16 = 0x6030
+const RX2 = 0x6022
+const CLK2 = 0x3002
+const CLK11 = 0x300B
+const CLK32 = 0x3020
+
+pin U0: pin_a=uo0 txmode=clkgen period=PERIOD idle=0                                                   # SWCLK
+pin U1: pin_a=uio0 pin_b=uo0 idle=0 order=lsb txmode=shift tx_edge=fall tx_preload=true tx_lentok=true rxmode=linked_rx rx_edge=fall rx_nbits=3 rx_echo=false
+own uo0 U0
+own uio0 U1
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U1.rx
+connect U1.tx <- L0.O0
+connect U0.tx <- L0.O1 accept=CTRL
+connect HOST_OUT <- L0.O1 accept=DATA|ERR
+
+lane L0:
+    K0 = 0x7                            # ACK mask
+    K1 = 0x1                            # ACK OK
+    K2 = 0x3021                         # CLK 33: write data + parity
+    states IDLE Q A D R1 R2 R3 R4 W1 W2 W3
+    slot: when IDLE, rb == 0, I0 is DATA        do MOV r0 <- I0, deq                        then Q
+    slot: when Q, rb == 0                       do CALL req                                 then A
+    slot: when A, I1 is DATA                    do CMPM r2 <- I1, mask K0 val K1, deq -> f0 then D
+    slot: when D, rb == 0                       do CALL disp                                # sets the state
+    # read: data[15:0], data[31:16], then parity + turnaround
+    slot: when R1, I1 is DATA                   do MOV O1 <- I1, deq                        then R2
+    slot: when R2, I1 is DATA                   do MOV O1 <- I1, deq                        then R3
+    slot: when R3, rb == 0                      do CALL rdp                                 then R4
+    slot: when R4, I1 is DATA                   do MOV O1 <- I1, deq                        then IDLE
+    # write: the first token is on SWDIO before its clocks are started
+    slot: when W1, rb == 0, I0 is DATA          do MOV O0 <- I0, deq                        then W2
+    slot: when W2                               do MOVB O1 <- zero, K2, tag CTRL            then W3
+    slot: when W3, I0 is DATA                   do MOV O0 <- I0, deq
+    slot: when W3, I0 is EVENT                  do MOV O0 <- I0, deq, tag DATA              then IDLE
+
+# Request + ACK: 8 bits out, release SWDIO at the 8th fall (turnaround), then a 3-bit ACK word.
+# After a write the request follows its last bit seamlessly (the burst continues).
+# The constants are loaded first so the last three outs follow each other: OE0 must land before the
+# 9th rise and the ACK restart before the 9th fall.
+routine req:
+    and r1, r0, 4                       # RnW: f1 = 1 for a write
+    cpyf 1
+    load16 r1, CLK11
+    load16 r2, WAITF
+    load16 r3, OE0
+    out O0, r0, DATA
+    load16 r0, RX3
+    out O1, r1, CTRL
+    out O0, r2, CTRL                    # queued after the request: waits for the 8th fall
+    out O0, r3, CTRL
+    out O0, r0, CTRL                    # the ACK framing starts after the 8th fall
+    ret
+
+routine disp:
+    out O1, r2, DATA                    # ACK to the host
+    tstf 0
+    br ok if rz
+    load16 r1, WAITF                    # WAIT/FAULT: 2 turnaround cycles, then drive again
+    out O0, r1, CTRL
+    load16 r1, CLK2
+    out O1, r1, CTRL
+    load16 r1, WAITF
+    out O0, r1, CTRL
+    load16 r1, OE1
+    out O0, r1, CTRL
+    setst IDLE
+    ret
+  ok:
+    tstf 1                              # write?
+    br wr if rz
+    load16 r1, RX16                     # read: 32 bits as two 16-bit words
+    out O0, r1, CTRL
+    load16 r1, CLK32
+    out O1, r1, CTRL
+    setst R1
+    ret
+  wr:
+    load16 r1, WAITF                    # write: 2 turnaround cycles, then drive
+    out O0, r1, CTRL
+    load16 r1, CLK2
+    out O1, r1, CTRL
+    load16 r1, WAITF
+    out O0, r1, CTRL
+    load16 r1, OE1
+    out O0, r1, CTRL
+    setst W1
+    ret
+
+routine rdp:                            # read parity, then the turnaround; drive again after it
+    load16 r1, RX2
+    out O0, r1, CTRL
+    load16 r1, WAITF
+    out O0, r1, CTRL
+    load16 r1, CLK2
+    out O1, r1, CTRL
+    load16 r1, WAITF
+    out O0, r1, CTRL
+    load16 r1, OE1
+    out O0, r1, CTRL
+    ret

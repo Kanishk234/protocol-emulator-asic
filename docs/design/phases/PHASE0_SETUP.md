@@ -24,7 +24,7 @@
    - a placeholder pinout.
 4. Replace the example logic with a **trivial but real design**, e.g. an 8-bit counter on `uo_out` enabled by `ui_in[0]`, with all outputs assigned and unused inputs in `_unused`.
 5. Update the cocotb test in `test/` to check the counter through the pins only, so it is gate-level safe.
-6. Create the folder layout (empty files with a one-line header are fine):
+6. The folder layout below is the target. Each folder is created when its first real file lands, not as an empty placeholder (DECISIONS D-005):
 
 ```
 src/                 RTL (tt_um_tripwire.v + trw_*.v later)
@@ -94,7 +94,7 @@ docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md  docs/WORKLOG.md
 - [ ] Local `scripts/check_all.sh` passes in WSL; `sigrok-cli` decodes a UART test VCD.
 - [ ] Jane Street sign-up form submitted; tile-size and SRAM questions emailed.
 - [ ] Roles assigned and written in the README.
-- [ ] `DECISIONS.md`, `BUGS.md`, `CLAIMS.md`, `WORKLOG.md`, `docs/reports/AREA.md` exist; `.gitignore` excludes build/sim/formal output.
+- [x] `DECISIONS.md`, `BUGS.md`, `CLAIMS.md`, `WORKLOG.md`, `docs/reports/AREA.md` exist; `.gitignore` excludes build/sim/formal output. *(Evidence: files in `docs/` and `docs/reports/`, 2026-09-23; `.gitignore` covers `build/`, `sim_build/`, `logs/`, `*.vcd`, `*.fst`, `formal/*/`, `.venv/`.)*
 
 ## 5. Risks in this phase
 | Risk | Response |

@@ -21,6 +21,30 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 0)
+Done:
+- Top module renamed to `tt_um_tripwire` (`src/tt_um_tripwire.v`); trivial design = 8-bit counter on `uo_out`, enabled by `ui_in[0]`.
+- `info.yaml` filled (title, authors Kanishk and Krithik, 50 MHz, 6x4, placeholder pinout); `test/Makefile` and `test/tb.v` updated.
+- `test/test.py`: 4 pin-level tests (reset, count, hold, wrap), gate-level safe (relative counts only).
+- `gds.yaml` trigger: `paths` filter (`src/**`, `info.yaml`, `macro/**`, the workflow) + `concurrency` cancel-in-progress. Template jobs untouched.
+- Folder skeleton created, then removed at the team's request: folders now appear with their first real file (D-005).
+- `docs/DECISIONS.md` (D-001..D-005 + open spec questions Q1–Q6 for the P1 freeze), `BUGS.md`, `CLAIMS.md`, `docs/reports/AREA.md`.
+- Local loop: `.venv` via `scripts/setup_venv.sh` (versions pinned in `requirements-dev.txt`); OSS CAD Suite 20260914 appended to PATH in `~/.bashrc`; `scripts/check_all.sh` (L0-TT source sync, Verilator lint, Yosys synth/no-latch, cocotb suite).
+- CLAUDE.md: venv rule added.
+
+Checklist boxes ticked (evidence):
+- [x] Ledgers exist and `.gitignore` excludes build/sim/formal output: files in `docs/`.
+- Not ticked yet but passing locally: `scripts/check_all.sh` → `check_all: PASS` (4/4 tests; an injected "ignore enable" bug made 1 test fail). That box also needs the sigrok UART VCD decode.
+
+Problems / decisions:
+- D-002 keeps `tt_um_tripwire` despite TT's uniqueness advice; rename path noted.
+- `sigrok-cli` not installed yet (needs sudo).
+
+Next:
+- User: `sudo apt install sigrok-cli`; commit and push (triggers first `test`, `docs`, `gds`); enable Pages (Source = GitHub Actions); run `fpga` once by hand; confirm the repo is public.
+- User: Jane Street sign-up form + email (D-003); assign roles (then Claude writes them into the README).
+- Claude: sigrok UART VCD decode check in `check_all.sh`; record CI results and AREA row 1.
+
 ## 2026-09-22: team (phase 0, not started)
 Done:
 - Research and idea selection (TRIPWIRE).

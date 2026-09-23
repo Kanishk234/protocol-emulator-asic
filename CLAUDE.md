@@ -59,5 +59,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 
 ## Environment
 - Development in **WSL (Ubuntu)** with the OSS CAD Suite (Icarus, Verilator 5, Yosys, SymbiYosys) and Python 3.11+ (cocotb, pyuvm, cocotb-coverage, hypothesis, pyyaml, pytest), plus `sigrok-cli`.
+- **Python always runs in the project venv.** Activate `.venv` (`source .venv/bin/activate`) before running any Python, pip, pytest, cocotb or `make` in `test/`. Never install packages into the system Python. Create or refresh the venv with `scripts/setup_venv.sh`; pin new packages in `requirements-dev.txt` (or `test/requirements.txt` if CI's `test` job needs them).
+- OSS CAD Suite lives at `~/oss-cad-suite`; its `bin` is **appended** to PATH so the system Icarus (the one CI uses) stays first (DECISIONS D-004).
 - One local command runs lint and all simulation tests: `scripts/check_all.sh`.
 - No lab hardware is available at the moment. Everything is verified in simulation and formal.

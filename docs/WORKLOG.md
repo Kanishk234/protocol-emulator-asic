@@ -34,7 +34,10 @@ Done:
 
 Checklist boxes ticked (evidence):
 - [x] Ledgers exist and `.gitignore` excludes build/sim/formal output: files in `docs/`.
-- Not ticked yet but passing locally: `scripts/check_all.sh` → `check_all: PASS` (4/4 tests; an injected "ignore enable" bug made 1 test fail). That box also needs the sigrok UART VCD decode.
+- [x] `check_all.sh` passes and sigrok decodes a UART VCD: `check_all: PASS` (4/4 tests; an injected "ignore enable" bug made 1 test fail), `sigrok_smoke.py` ok.
+
+- After the first push (commit 0786358): `test` green (run 35821375912); `docs` red on every push so far (run 35821375894). Cause: TT `--check-docs` rejects the template placeholder text in `docs/info.md`. Filled in `docs/info.md` for the placeholder counter; `tt_tool.py --check-docs` now passes locally.
+- `scripts/sigrok_smoke.py`: writes a UART 8N1 VCD and checks that `sigrok-cli`'s `uart` decoder returns "TRIPWIRE"; added to `check_all.sh`. `check_all.sh` → PASS.
 
 Problems / decisions:
 - D-002 keeps `tt_um_tripwire` despite TT's uniqueness advice; rename path noted.

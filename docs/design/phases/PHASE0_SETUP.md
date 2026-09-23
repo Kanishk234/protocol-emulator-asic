@@ -91,7 +91,7 @@ docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md  docs/WORKLOG.md
 - [ ] **GitHub Pages shows the GDS viewer** at the repo's Pages URL.
 - [ ] `fpga` workflow has been run once manually; result recorded (green, or the reason it isn't).
 - [ ] gds trigger `paths` filter in place: a docs-only push does **not** start a hardening.
-- [ ] Local `scripts/check_all.sh` passes in WSL; `sigrok-cli` decodes a UART test VCD.
+- [x] Local `scripts/check_all.sh` passes in WSL; `sigrok-cli` decodes a UART test VCD. *(Evidence: `scripts/check_all.sh` → `check_all: PASS`, 4/4 tests, 2026-09-23; `scripts/sigrok_smoke.py` → sigrok `uart` decoded "TRIPWIRE".)*
 - [ ] Jane Street sign-up form submitted; tile-size and SRAM questions emailed.
 - [ ] Roles assigned and written in the README.
 - [x] `DECISIONS.md`, `BUGS.md`, `CLAIMS.md`, `WORKLOG.md`, `docs/reports/AREA.md` exist; `.gitignore` excludes build/sim/formal output. *(Evidence: files in `docs/` and `docs/reports/`, 2026-09-23; `.gitignore` covers `build/`, `sim_build/`, `logs/`, `*.vcd`, `*.fst`, `formal/*/`, `.venv/`.)*

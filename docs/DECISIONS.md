@@ -36,6 +36,12 @@ A spec change is proposed here first and implemented only after the team agrees.
 - **Note:** `macro/` is in the `gds` trigger paths, so adding it starts a hardening.
 - **Status:** accepted.
 
+## D-006 (2026-09-23): phase-gate exception for `ISA.md`
+- **Decision:** start `docs/design/ISA.md` (a phase 1 spec task) before the phase 0 exit checklist is complete.
+- **Reason:** the remaining phase 0 items are waiting on CI (`gds`, `viewer`/Pages), manual steps (`fpga` run, Jane Street form/email, roles) or a push; none needs design work. Team decision (Krithik).
+- **Scope:** design documentation only. No RTL, model, compiler or `spec/tripwire.yaml` work until phase 0 exits. Phase 0 boxes are still ticked only with evidence.
+- **Status:** accepted.
+
 ---
 
 ## Open questions for the phase 1 spec freeze

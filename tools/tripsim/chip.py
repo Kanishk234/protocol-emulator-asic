@@ -96,12 +96,20 @@ class Chip:
 
     # ---------------------------------------------------------------- pads
     def synced(self, pad):
+        """Level a pin unit sees on `pad` this clock.
+
+        ui/uio pads: through the 2-FF synchroniser (§14 P1). uo pads are output-only;
+        a unit linked to one (e.g. SPI data linked to our own SCK) sees its driven
+        value directly, with no synchroniser (§14 P7, draft).
+        """
+        if pad is None:
+            return None
         ui, uio = self._sync[1]
         if PAD_UI <= pad < PAD_UO:
             return (ui >> pad) & 1
         if PAD_UIO <= pad < PAD_UIO + 8:
             return (uio >> (pad - PAD_UIO)) & 1
-        return None
+        return (self.outputs()[0] >> (pad - PAD_UO)) & 1
 
     def outputs(self):
         """(uo_out, uio_out, uio_oe) from the registered pin-unit outputs."""
@@ -128,9 +136,9 @@ class Chip:
         if rot < len(self.lanes) and self.lanes[rot].running:
             self.lanes[rot].mem_access(self.sram)
         for u in self.pins:
-            a = u.cfg.pin_a
-            u.compute_rx(now, self.synced(a) if a is not None else None)
-            u.compute_tx(now)
+            b = self.synced(u.cfg.pin_b)
+            u.compute_rx(now, self.synced(u.cfg.pin_a), b)
+            u.compute_tx(now, b)
         hin = self.fabric.producers["HOST_IN"]
         if self.host_in and hin.free():
             hin.load(*self.host_in.popleft())

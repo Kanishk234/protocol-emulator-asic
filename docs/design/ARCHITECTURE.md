@@ -217,14 +217,15 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | ORDER | LSB- or MSB-first |
 | OD, IDLE | Open-drain enable, idle level |
 | T0, T1 | PULSE high times (ticks) for bit 0 / bit 1 |
-| LINKEDGE | For linked modes: rise, fall |
+| RX_EDGE, TX_EDGE | For linked modes, separately for each half: the edge of pin B on which RX samples and TX changes pin A (rise, fall). I2C samples on SCL rise and drives on SCL fall, so one shared field is not enough (D-010) |
+| RX_NBITS, RX_TAIL | RX word length, if different from TX NBITS. RX_TAIL = 1: after RX_NBITS bits, the next linked bit is emitted as its own DATA token with the bit in `data[15]` (the I2C ACK/NACK bit) (D-010) |
 | SAMPLEOFS | For SHIFT_RX: sample position within a bit (fraction of PERIOD) |
 | AUTOREARM | For SHIFT_RX: re-arm on the next start edge automatically |
 | STRETCH | CLKGEN waits for the line to read high before timing the high phase |
 
 ### 7.3 TX half: tokens consumed
 - **DATA token:** the payload for the configured TXMODE.
-  - SHIFT sends NBITS of data at PERIOD, or on pin B's LINKEDGE if linked.
+  - SHIFT sends NBITS of data at PERIOD, or on pin B's TX_EDGE if linked.
   - PULSE sends NBITS pulse-coded bits.
 - **CTRL token:** `data[15:12]` is the op.
 
@@ -244,7 +245,7 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | RXMODE | Produces |
 |---|---|
 | SHIFT_RX | Waits for a start edge on pin A, samples NBITS at PERIOD (first sample at SAMPLEOFS), emits a DATA token; re-arms if AUTOREARM |
-| LINKED_RX | Samples pin A on each LINKEDGE of pin B, emits a DATA token after NBITS |
+| LINKED_RX | Samples pin A on each RX_EDGE of pin B, emits a DATA token after RX_NBITS (plus a tail token if RX_TAIL). A START/STOP from COND_EDGE resets the bit count |
 | EDGE_TS | Emits an EVENT token per edge: data = {polarity, time[14:0]} (`data[15]` = 1 for a rising edge) |
 | COND_EDGE | Emits EVENT tokens `START` (`data[15]` = 1) / `STOP` (`data[15]` = 0) when pin A changes while pin B is high (I2C). Combinable with LINKED_RX on the same unit. |
 
@@ -406,3 +407,10 @@ This section is the text that both `tools/tripsim` and the RTL implement. It is 
 - **P5.** `SHIFT_RX` shifts raw bits, including start and stop bits, first sample in bit 0 (LSB order). The start edge is the first synchronised sample that differs from IDLE; sample i is taken in clock `t0 + (SAMPLEOFS·PERIOD + i·PERIOD) >> 8`.
 
 With these rules, the §5.5 path is exactly 7 clocks. The model measures it (`tools/tripsim/tests/test_pins.py::test_pin_to_pin_reaction_is_seven_clocks`).
+
+Pin rules added with the I2C modes:
+- **P6.** A linked TX shift changes pin A at the edge of the clock in which the synchronised pin B shows TX_EDGE, which is 3 clocks after the pad edge. The TX half takes a new DATA token as soon as the previous shift has put out all its bits. The new shift's first bit then replaces the pending return-to-IDLE on the next TX_EDGE, so consecutive bytes have no gap.
+- **P7.** Pin B may be a `uo` output pad (for example, SPI data linked to our own SCK). The unit then sees the driven value directly, without a synchroniser.
+- **P8.** COND_EDGE: when pin A changes while the synchronised pin B was high in both this clock and the previous one, an EVENT is emitted: START (`data[15] = 1`) when A falls, STOP (`data[15] = 0`) when A rises, with `data[14:0]` = time. It takes precedence over LINKED_RX sampling in the same clock and resets the LINKED_RX bit count.
+
+Measured with these rules: the I2C target kernel queues its ACK 7 clocks after the 8th SCL rise, and SDA goes low 3 clocks after the SCL fall. It works for SCL high times ≥ 6 clocks (`tools/kernels/tests/test_i2c_target.py`). This is on an ideal bus in simulation; no rise times are modelled.

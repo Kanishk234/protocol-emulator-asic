@@ -66,6 +66,17 @@ A spec change is proposed here first and implemented only after the team agrees.
 - **Evidence:** `tools/tripsim/tests/test_pins.py::test_pin_to_pin_reaction_is_seven_clocks` uses `MOVB` and measures exactly 7 clocks.
 - **Status:** accepted (draft ISA; the model's ablation can still reverse it).
 
+## D-010 (2026-09-23): separate RX/TX link edges and an RX tail bit
+- **Finding (tripsim, I2C target kernel):**
+  - I2C samples SDA on SCL rise and changes it on SCL fall, so one shared LINKEDGE field cannot serve both halves of one pin unit.
+  - I2C sends 9 clocks per byte. The target must see the 8 data bits *before* the 9th clock (to decide ACK/NACK in time), and must also see the 9th bit (the controller's ACK/NACK when the target transmits).
+- **Decision:**
+  - LINKEDGE is split into RX_EDGE and TX_EDGE.
+  - New RX_TAIL: after RX_NBITS bits, the next bit is emitted as its own DATA token with the bit in `data[15]`, so a reflex can branch on ACK vs NACK with the `HE/HV` test.
+  - Rules §14 P6–P8.
+- **Evidence:** `tools/kernels/tests/test_i2c_target.py`: the target works against the reference controller at 100 kHz / 400 kHz / 1 MHz and checks out under sigrok `i2c`; 9 of 12 slots used.
+- **Status:** accepted (draft).
+
 ---
 
 ## Open questions for the phase 1 spec freeze

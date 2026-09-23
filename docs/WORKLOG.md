@@ -41,12 +41,22 @@ Findings:
 - D-009: OP 15 = `MOVB` (d = B), needed to react to an input with a constant in one action; keeps the 7-clock reaction.
 - Q7 (open): registered release limits a lane output to 1 token / 3 clocks and HOST_IN→lane to 1 / 2; §4.4's "1 per clock" is not met.
 
+Later the same day (I2C):
+- Pin units: LINKED_RX (with RX_TAIL), COND_EDGE, linked TX shift; separate RX/TX link edges (D-010, §14 P6–P8).
+- `tools/protomodels/i2c.py`: reference I2C controller written from UM10204.
+- `tools/kernels/i2c_target.py`: write-direction I2C target, 9 of 12 slots:
+  - passes at 100 kHz, 400 kHz and 1 MHz against the reference controller, and under sigrok `i2c`;
+  - ACK queued 7 clocks after the 8th SCL rise; works down to 12 clocks/bit, so about 2x margin on the Fm+ SCL-high minimum;
+  - two injected kernel bugs (ACK on the wrong edge, wrong address bits) are caught.
+- `docs/reports/ARCH_EXPLORATION.md` started. 33 pytest tests pass.
+
 Checklist boxes ticked (evidence):
-- none yet. Phase 1's tripsim box needs every pin-unit mode, and none of the kernel or risk boxes has started.
+- none yet. The tripsim box needs CLKGEN/PULSE; the program boxes need `tripc` and the UART/SPI/I2C-controller programs.
 
 Next:
-- Model LINKED_RX, COND_EDGE and CLKGEN, then the I2C target and SPI controller kernels; start `docs/reports/ARCH_EXPLORATION.md` (ISA.md §9 rows, Q7).
-- Risk spike R1 (one lane at 50 MHz) in parallel.
+- CLKGEN (+STRETCH), then SPI controller/target and I2C controller kernels; I2C target read direction.
+- Measure R1 fallback cost on the kernels and run the ablations.
+- R1 risk spike (lane RTL at 50 MHz): best done in a fresh session that has not read `tools/tripsim` (independence rule).
 
 ## 2026-09-23: Krithik + Claude (phase 0)
 Done:

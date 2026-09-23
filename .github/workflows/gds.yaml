@@ -1,8 +1,19 @@
 name: gds
 
+# TRIPWIRE: trigger block is ours (see docs/design/PHYSICAL_DESIGN_AND_CI.md §6).
+# Only harden when hardware-relevant files change; a newer push cancels a running hardening.
 on:
   push:
+    paths:
+      - 'src/**'
+      - 'info.yaml'
+      - 'macro/**'
+      - '.github/workflows/gds.yaml'
   workflow_dispatch:
+
+concurrency:
+  group: gds-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   gds:

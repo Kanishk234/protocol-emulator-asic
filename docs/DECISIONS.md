@@ -114,6 +114,27 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Supersedes:** the RX_TAIL part of D-010 (RX_EDGE/TX_EDGE stay).
 - **Status:** accepted (draft).
 
+## D-014 (2026-09-23): pin C, a select/frame input per pin unit
+- **Finding (tripsim, SPI target kernel):** a clocked target needs a third pin besides data (A) and clock (B): the select (CS). It must restart bit framing, abort a transfer in progress on deselect, tri-state the output while deselected, and tell the firmware where transactions begin and end. None of this could come from pins A/B.
+- **Decision (general form, D-012):** optional pin C per unit, with:
+  - C_ACTIVE (the level that means selected);
+  - while deselected, RX framing is held in reset;
+  - the transition to deselected aborts a linked TX shift (pin A back to IDLE);
+  - C_OE: pin A is driven only while selected;
+  - EV_PIN: the event generator can watch C instead of A.
+- **General need:** any select- or frame-delimited serial stream: SPI target CS, I2S word select, PCM/TDM frame sync, chip-enable-gated buses, and output-enable gating on shared lines.
+- **Cost:** one more pad select (5 bits) and a few gates per unit.
+- **Evidence:** `tools/kernels/tests/test_spi_target.py`:
+  - both directions correct against the reference controller and sigrok;
+  - an aborted 4-bit transfer leaves the next transfer byte-aligned;
+  - removing framing reset, abort or OE gating each fails at least one test.
+- **Measured limits of the SPI target (simulation):**
+  - SCK ≤ 12.5 MHz with MISO changing just after the SCK rise; 8.33 MHz with the textbook "change on the fall";
+  - CS setup ≥ 3 clocks (60 ns);
+  - MISO released ≤ 3 clocks after CS rises (output-disable time).
+  All three come from the 2-clock input synchroniser.
+- **Status:** accepted (draft).
+
 ---
 
 ## Open questions for the phase 1 spec freeze

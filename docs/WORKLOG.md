@@ -70,6 +70,18 @@ Later still (generalization, D-012/D-013):
   - disabling any of the 4 new primitives fails 5 tests.
 - Docs updated in one pass of exact replacements (ARCHITECTURE §7/§14 P8, P13–P14; ISA §2/§4; VERIFICATION; OVERVIEW; PHASE2); generality table added to ARCH_EXPLORATION.
 
+Later still (SPI target):
+- D-014: pin C (select/frame) per pin unit: framing reset, abort on deselect, OE gating, events on C (§14 P15). `Chip.settle_inputs()` models pads held stable through reset.
+- `tools/protomodels/spi.py`: reference SPI controller (mode 0, edge-exact MISO sampling, configurable CS setup, partial transfers).
+- `tools/kernels/spi_target.py`: 3 slots, 2 pin units. Correct both ways vs the reference controller and sigrok. Measured:
+  - SCK ≤ 12.5 MHz (MISO on the rise) or 8.33 MHz (on the fall);
+  - CS setup ≥ 3 clocks; MISO released ≤ 3 clocks after deselect.
+- Honesty catches along the way:
+  - the first reference controller sampled MISO one clock late, which flattered us (12.5 MHz with MISO on the fall); fixed to edge-exact;
+  - a "lucky" first byte (0xA5 starting with 1) hid the CS-setup limit; test data changed so an undriven line shows;
+  - my own test helper overrode CS setup; fixed.
+- Removing framing reset, abort or OE gating each fails a test. 48 pytest tests pass.
+
 Checklist boxes ticked (evidence):
 - none yet. The tripsim box still needs STRETCH and PULSE; the program boxes need `tripc` and the UART/SPI/I2C-controller programs.
 

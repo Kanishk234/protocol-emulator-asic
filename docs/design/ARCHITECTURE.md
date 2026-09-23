@@ -430,3 +430,9 @@ Measured with these rules: the SPI controller kernel works in mode 0 up to SCK =
 Pin rules added with the generalized RX/TX primitives (D-013):
 - **P13.** RX word framing: bits accumulate into a word of RX_NBITS bits (or, with RX_NBITS2 ≠ 0, alternately RX_NBITS then RX_NBITS2). The word is emitted right-aligned (LSB order: first bit in `data[0]`; MSB order: last bit in `data[0]`). A word is *tainted* if any of its samples was taken while the unit's TX was active (shifting, or with pad actions pending). With RX_ECHO = 0, tainted words are dropped instead of emitted, but framing still advances.
 - **P14.** TX_LENTOK: a DATA token shifts `data[15:12] + 1` bits taken from `data[11:0]`, in ORDER. SETN is not needed, and payloads are limited to 12 bits.
+- **P15.** Pin C (D-014): a unit is *selected* while its synchronised pin C equals C_ACTIVE (always, if no pin C).
+  - While deselected, RX framing is held in reset, and no LINKED_RX/SHIFT_RX samples are taken.
+  - In the clock pin C becomes inactive, a linked TX shift in progress is aborted: its remaining bits are dropped and pin A returns to IDLE.
+  - With C_OE, pin A's output enable is on only while selected, taking effect one clock after the synchronised change (3 clocks after the pad edge).
+  - Tokens may still be taken while deselected, so a preload can prepare the first bit before selection.
+  - With EV_PIN = C, the event generator watches pin C: EVENT `data[15]` = new level of C.

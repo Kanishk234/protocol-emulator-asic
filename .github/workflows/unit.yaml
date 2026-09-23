@@ -1,0 +1,24 @@
+name: unit
+# TRIPWIRE's own workflow (VERIFICATION.md §10): model, kernel and generator tests (pytest).
+on: [push, workflow_dispatch]
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install sigrok-cli (independent protocol decoders)
+        run: sudo apt-get update && sudo apt-get install -y sigrok-cli
+
+      - name: Install Python packages
+        run: pip install -r requirements-dev.txt
+
+      - name: pytest (tripsim, kernels, generator)
+        run: python -m pytest -q

@@ -42,6 +42,16 @@ if [ "$yaml_src" != "$make_src" ]; then
 fi
 echo "ok: $yaml_src"
 
+step "L0-GEN: generated files match spec/tripwire.yaml"
+python tools/gen/gen.py --check
+
+step "L0-GEN: src/trw_defs.vh compiles (Icarus -g2005, Verilator)"
+defs_tb="$(mktemp -d)/defs_tb.v"
+printf '`include "trw_defs.vh"\nmodule defs_tb; wire [`TRW_SLOT_BITS-1:0] s = 0; wire [3:0] op = `TRW_OP_MOVB; endmodule\n' > "$defs_tb"
+iverilog -g2005 -Isrc -o /dev/null "$defs_tb"
+verilator --lint-only -Wno-UNUSEDSIGNAL -Isrc "$defs_tb"
+echo "ok"
+
 step "L0-LINT: verilator --lint-only -Wall"
 verilator --lint-only -Wall -Isrc --top-module tt_um_tripwire "${SOURCES[@]}"
 echo "ok"

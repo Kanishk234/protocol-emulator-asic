@@ -1,0 +1,35 @@
+name: lint
+# TRIPWIRE's own workflow (VERIFICATION.md §10): L0 static checks.
+on: [push, workflow_dispatch]
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install Python packages
+        run: pip install pyyaml==6.0.3
+
+      - name: Generated files match spec/tripwire.yaml (L0-GEN)
+        run: python tools/gen/gen.py --check
+
+      - name: Install Verilator and Icarus
+        run: sudo apt-get update && sudo apt-get install -y verilator iverilog
+
+      - name: src/trw_defs.vh compiles (L0-GEN)
+        run: |
+          printf '`include "trw_defs.vh"\nmodule defs_tb; wire [`TRW_SLOT_BITS-1:0] s = 0; wire [3:0] op = `TRW_OP_MOVB; endmodule\n' > /tmp/defs_tb.v
+          iverilog -g2005 -Isrc -o /dev/null /tmp/defs_tb.v
+          verilator --lint-only -Wno-UNUSEDSIGNAL -Isrc /tmp/defs_tb.v
+
+      - name: Verilator lint of the RTL (L0-LINT)
+        run: |
+          SOURCES=$(python -c 'import yaml; print(" ".join("src/" + f for f in yaml.safe_load(open("info.yaml"))["project"]["source_files"]))')
+          verilator --lint-only -Wall -Isrc --top-module tt_um_tripwire $SOURCES

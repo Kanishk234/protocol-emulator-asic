@@ -199,5 +199,6 @@
 `define TRW_CMD_SYNC 4'd5
 `define TRW_CMD_SETN 4'd6
 `define TRW_CMD_WAIT 4'd7
+`define TRW_CMD_SAMPLE 4'd8
 
 `endif

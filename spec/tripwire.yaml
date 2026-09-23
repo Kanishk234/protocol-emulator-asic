@@ -113,8 +113,9 @@ pin_commands:
   - {code: 3, name: CLK,   arg: "[7:0] n",                      desc: "CLKGEN: n periods, each IDLE half then ACTIVE half; STRETCH waits for the line"}
   - {code: 4, name: GAP,   arg: "[11:0] ticks",                 desc: "advance the cursor (idle spacing)"}
   - {code: 5, name: SYNC,  arg: "none",                         desc: "cursor := earliest (re-anchor to the present)"}
-  - {code: 6, name: SETN,  arg: "[4:0] n",                      desc: "NBITS for the following DATA tokens (1..16)"}
+  - {code: 6, name: SETN,  arg: "[5] rx, [4:0] n",              desc: "rx = 0: TX NBITS for the following DATA tokens; rx = 1: RX word length, and RX framing restarts (1..16)"}
   - {code: 7, name: WAIT,  arg: "[0] edge (1 = rise)",          desc: "take no tokens until pin B shows the edge; cursor := that edge"}
+  - {code: 8, name: SAMPLE, arg: "[11:0] delay (ticks)",      desc: "at cursor + delay, sample pin A into the RX word framing; cursor := that time"}
 
 # Pad numbering for pin-unit pin A/B/C selects and output ownership (ARCHITECTURE.md §10).
 pads:

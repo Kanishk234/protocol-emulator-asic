@@ -219,6 +219,20 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - injected bugs (per-bit level ignored, phases swapped) are caught.
 - **Status:** accepted (draft). Area: to be checked at synthesis. If 50 bits × 6 units is too much, the symbol tables could be shared between units.
 
+## D-020 (2026-09-23): timed RX control: `SETN rx` (restart framing) and `SAMPLE`
+- **Decision (general form, D-012):** two TX-stream commands that act on the unit's RX framing, timed by the same cursor as LEVEL/GAP (§14 P18, P19):
+  - `SETN` arg bit 5 = 1: set the RX word length (1..16) and restart the RX framing at `max(cursor, earliest)`. Bit 5 = 0 keeps the old meaning (TX NBITS).
+  - `SAMPLE delay` (op 8): at `cursor + delay`, sample pin A into the RX framing; `cursor :=` that time.
+- **General need:**
+  - Protocols where our own line activity, or a phase change, would otherwise misalign word framing: PS/2 host-to-device (the host's CLK-low inhibit is a counted falling edge), SWD/JTAG (turnaround and ACK/data phases of different lengths), half-duplex buses in general.
+  - Protocols where the *controller* decides when a bit is sampled, with no clock edge to link to: 1-Wire read slots, open-drain "read a bit N µs after I pulled the line", presence detection.
+  - Variable RX word lengths at run time without reconfiguration (ACK 3 bits, then data 32 + parity).
+- **Cost:** an RX length register (5 bits), a restart strobe from the TX action queue, and one more action kind in the timed queue. No new pins, no new ports.
+- **Evidence:**
+  - `tools/tripsim/tests/test_pins.py`: `test_setn_rx_restarts_framing_at_the_cursor`, `test_sample_reads_pin_a_at_timed_points`;
+  - `tools/kernels/tests/test_ps2.py`: host-to-device sends fail without the `SETN rx` restart (only the first byte gets through) and pass with it.
+- **Status:** accepted (draft).
+
 ---
 
 ## Open questions for the phase 1 spec freeze

@@ -243,8 +243,9 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | 3 | CLK | [7:0] n | CLKGEN: n periods, each IDLE half then ACTIVE half; STRETCH waits for the line |
 | 4 | GAP | [11:0] ticks | advance the cursor (idle spacing) |
 | 5 | SYNC | none | cursor := earliest (re-anchor to the present) |
-| 6 | SETN | [4:0] n | NBITS for the following DATA tokens (1..16) |
+| 6 | SETN | [5] rx, [4:0] n | rx = 0: TX NBITS for the following DATA tokens; rx = 1: RX word length, and RX framing restarts (1..16) |
 | 7 | WAIT | [0] edge (1 = rise) | take no tokens until pin B shows the edge; cursor := that edge |
+| 8 | SAMPLE | [11:0] delay (ticks) | at cursor + delay, sample pin A into the RX word framing; cursor := that time |
 <!-- /GENERATED:pin_commands -->
 
 **Drift-free scheduling:** each TX half keeps a **cursor**, the scheduled time of its last action. Delays are relative to the cursor, not to when the token arrived, so a sequence of commands never accumulates error. If a token arrives after its computed time, it executes immediately and sets the sticky **LATE** flag. Lateness is detectable, never silent.
@@ -447,3 +448,5 @@ Fabric rule added (D-015):
 
 Measured with these rules: the I2C controller kernel runs 100 kHz / 400 kHz / 1 MHz with and without clock stretching, meeting tLOW/tHIGH ≥ PERIOD/2 on the bus. Stretch awareness adds 3 clocks to each high phase (943 kHz at a nominal 1 MHz), and the SPI controller's limit is 12.5 MHz with a symmetric clock (§ exploration report).
 - **P17.** PULSE (D-019): a DATA token of n bits (NBITS, or length-in-token) starts at `max(cursor, earliest)`. Bit b drives SYMb_FIRST at t, the opposite level at t + T1_b·PRESC, and the next bit starts at t + (T1_b + T2_b)·PRESC. After the last bit pin A returns to IDLE and `cursor` = the end time, so back-to-back tokens join with no gap. Timing is exact to the clock (integer ticks); `GAP` gives latch/reset times.
+- **P18.** SETN with arg bit 5 = 1 (D-020): at `max(cursor, earliest)` (and `cursor :=` that time) the RX word length becomes n (1..16, overriding RX_NBITS/RX_NBITS2 until the next such SETN) and the framing restarts: partial bits and the two-phase position are cleared, and a sample taken in that same clock is discarded. It is ordered with LEVEL/GAP in the TX stream, so firmware can place the restart between its own line activity and the first bit it wants counted.
+- **P19.** SAMPLE delay (D-020): at `t = max(cursor + delay·PRESC, earliest)` the synchronised pin A is added to the RX framing as one bit (P13 applies: taint, echo, word emission); `cursor := t`. It works in any RXMODE. If a LINKED_RX or SHIFT_RX sample completes a word in the same clock, both words are emitted in order; the second one may overrun (§4.5).

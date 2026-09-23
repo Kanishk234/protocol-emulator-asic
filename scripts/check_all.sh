@@ -19,7 +19,7 @@ source .venv/bin/activate
 if ! command -v verilator >/dev/null && [ -d "$HOME/oss-cad-suite/bin" ]; then
   export PATH="$PATH:$HOME/oss-cad-suite/bin"
 fi
-for tool in iverilog verilator yosys; do
+for tool in iverilog verilator yosys sigrok-cli; do
   command -v "$tool" >/dev/null || { echo "error: $tool not found" >&2; exit 1; }
 done
 
@@ -49,6 +49,9 @@ echo "ok"
 step "L0-SYNTH: yosys synth sanity"
 yosys -q -p "read_verilog -Isrc ${SOURCES[*]}; synth -top tt_um_tripwire; check -assert; select -assert-none t:\$dlatch t:\$_DLATCH_*"
 echo "ok"
+
+step "sigrok: UART decode of a VCD (toolchain smoke test)"
+python scripts/sigrok_smoke.py
 
 step "test/: pin-level cocotb suite (RTL)"
 make -C test clean >/dev/null

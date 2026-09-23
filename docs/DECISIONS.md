@@ -289,6 +289,27 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Honesty:** FPGA results are labelled "tested on FPGA (Basys 3)", never silicon; the clock source and the latch-to-flop change are stated with them.
 - **Status:** board choice accepted (Kanishk, 2026-09-23). CI mechanism open.
 
+## D-023 (2026-09-23): BITSYNC pin-unit mode (recovered bit clock + line coding + readback), `pin_s`
+- **Decision (general form, D-012):** a pin-unit mode where TX and RX share one bit clock recovered from the line, with a line-coding stage between the bit clock and the words (§14 P20–P26):
+  - bit timing: hard sync at a frame start (another node's first dominant edge at bus idle, or our own frame start), resync on later edges limited to SJW, once per bit, never on edges we cause while driving dominant; sample point SAMPLEOFS; bus idle after IDLE_BITS recessive samples;
+  - bit stuffing (STUFF_N, optionally only runs of one level: STUFF_LVL), inserted on TX and removed on RX, with stuff errors reported;
+  - a CRC register (any polynomial ≤ 16 bits, init, expected residue) over the destuffed RX bits; `LINE` appends it to TX; `FRAME n` ends a frame after n destuffed bits, checks the residue and flushes the last word (EVENT if good, ERR if not);
+  - readback: compare each driven bit with the sensed line: off / abort on mismatch / report every bit;
+  - a one-bit override (`LINE` [4]): drive one bit in another node's frame (ignored in a frame this unit transmits), bypassing the TX queue;
+  - TX status events: our frame started / aborted / reported bit;
+  - `pin_s` (any mode): sense a different pad than the one driven (TXD/RXD transceivers).
+- **General need:** self-clocked NRZ buses with clock tolerance and in-frame responses. CAN (5-bit stuffing, CRC-15, arbitration, ACK); HDLC/SDLC (ones-only stuffing, CRC-16); USB low-speed (6-ones stuffing, CRC5/16, with a future NRZI option); LIN and DMX (resync only); 1-Wire search and multi-controller I2C (readback). The same test suite runs an HDLC-style configuration (`tripsim/tests/test_bitsync.py`) so the mode cannot quietly become CAN-shaped.
+- **Rejected alternatives:**
+  - A CAN controller block: protocol-shaped (D-012).
+  - A length-field extractor in the unit, so DLC-dependent frame lengths need no lane: saves a lane round trip but encodes one family of frame formats; `FRAME n` from the lane is general.
+  - A second command port per unit, for RX-side commands from another lane: a bigger fabric change. The CAN program avoids needing one by never parking TX data in front of the unit while a frame waits for the bus (the "started" event).
+- **Cost (estimate, to check at synthesis):** a 16-bit CRC register + 16-bit polynomial/init/residue configuration (~64 config bits), two stuffing counters, resync arithmetic on the existing 16.8 period accumulator, a one-token TX bit queue, a 2-token RX skid buffer, a `pin_s` mux (5 bits). One BITSYNC engine could be shared by 2 units if area is tight.
+- **Evidence:**
+  - `tools/kernels/tests/test_can.py` (16 tests): our frames at 125 k / 500 k / 1 Mbit/s received by a reference CAN 2.0A node and decoded by sigrok `can`; the reference's frames received and ACKed at 3 rates × (nominal, ±0.4 %) clock; arbitration lost then retried; bad CRC reported and not ACKed; the ACK in the right slot when a stuff bit follows the CRC (100 ns and 300 ns loop delay).
+  - `tools/tripsim/tests/test_bitsync.py` (6 tests): HDLC-style ones-stuffing + CRC-16/CCITT with ±2 % drift, CRC and stuff errors, TX encoding against a reference encoder, the override in another node's frame vs our own.
+  - Mutations caught: no resync, no TX stuffing, no RX destuffing, CRC polynomial ignored, no readback abort, override in our own frame, no post-CRC stuff check, override armed by a stuff bit. **Not caught:** resync on our own dominant edges (it needs a multi-transmitter propagation-delay scenario; noted as a gap).
+- **Status:** accepted (draft).
+
 ---
 
 ## Open questions for the phase 1 spec freeze

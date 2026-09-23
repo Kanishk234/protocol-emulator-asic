@@ -200,5 +200,7 @@
 `define TRW_CMD_SETN 4'd6
 `define TRW_CMD_WAIT 4'd7
 `define TRW_CMD_SAMPLE 4'd8
+`define TRW_CMD_FRAME 4'd9
+`define TRW_CMD_LINE 4'd10
 
 `endif

@@ -74,6 +74,13 @@ def reflex(*, op="MOV", dst="none", a="zero", b=None, f=None,
     return isa.encode_slot(slot)
 
 
+def _imm6(v):
+    """LDIH uses imm[5:0] (ISA.md §5.1)."""
+    if not 0 <= v < 64:
+        raise ValueError(f"LDIH immediate {v} does not fit 6 bits")
+    return v
+
+
 class Routine:
     """Builder for one routine. Branch targets are labels resolved at assembly."""
 
@@ -97,10 +104,10 @@ class Routine:
         return self._emit("word", word=isa.enc_alu(op, rd, ra, b, 1))
 
     def ldi(self, rd, imm):
-        return self._emit("word", word=isa.enc_ctrl(isa.SUB_LDI, (int(rd[1]) << 10) | isa._field(imm, 10, "imm")))
+        return self._emit("word", word=isa.enc_ctrl("LDI", rd=int(rd[1]), imm=imm))
 
     def ldih(self, rd, imm6):
-        return self._emit("word", word=isa.enc_ctrl(isa.SUB_LDIH, (int(rd[1]) << 10) | isa._field(imm6, 6, "imm6")))
+        return self._emit("word", word=isa.enc_ctrl("LDIH", rd=int(rd[1]), imm=_imm6(imm6)))
 
     def load16(self, rd, value):
         """Pseudo-op: full 16-bit constant as LDI + LDIH."""
@@ -117,16 +124,16 @@ class Routine:
         return self._emit("djnz", target=target, rd=int(rd[1]))
 
     def ld(self, rd, ra, off=0):
-        return self._emit("word", word=isa.enc_ctrl(isa.SUB_LD, (int(rd[1]) << 10) | (int(ra[1]) << 8) | isa._field(off, 8, "off")))
+        return self._emit("word", word=isa.enc_ctrl("LD", rd=int(rd[1]), ra=int(ra[1]), off=off))
 
     def st(self, rd, ra, off=0):
-        return self._emit("word", word=isa.enc_ctrl(isa.SUB_ST, (int(rd[1]) << 10) | (int(ra[1]) << 8) | isa._field(off, 8, "off")))
+        return self._emit("word", word=isa.enc_ctrl("ST", rd=int(rd[1]), ra=int(ra[1]), off=off))
 
     def out(self, port, ra, tag="DATA"):
-        return self._emit("word", word=isa.enc_ctrl(isa.SUB_OUT, (int(port[1]) << 11) | (isa.TAGS[tag] << 9) | (int(ra[1]) << 7)))
+        return self._emit("word", word=isa.enc_ctrl("OUT", port=int(port[1]), tag=isa.TAGS[tag], ra=int(ra[1])))
 
     def sys(self, kind, arg=0):
-        return self._emit("word", word=isa.enc_ctrl(isa.SUB_SYS, (isa.SYS[kind] << 8) | (arg & 0xFF)))
+        return self._emit("word", word=isa.enc_ctrl("SYS", fn=isa.SYS[kind], arg=arg & 0xFF))
 
     def ret(self):
         return self.sys("RET")
@@ -160,9 +167,9 @@ class Routine:
                 continue
             off = self._labels[args["target"]] - (pc + 1)   # relative to next instruction
             if kind == "br":
-                words.append(isa.enc_ctrl(isa.SUB_BR, (args["cond"] << 9) | isa._field(off, 9, "off", True)))
+                words.append(isa.enc_ctrl("BR", cond=args["cond"], off=off))
             else:
-                words.append(isa.enc_ctrl(isa.SUB_DJNZ, (args["rd"] << 10) | isa._field(off, 10, "off", True)))
+                words.append(isa.enc_ctrl("DJNZ", rd=args["rd"], off=off))
         return words
 
 

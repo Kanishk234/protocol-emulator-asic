@@ -146,7 +146,7 @@ class Lane:
             self.out[w["port"]].load(w["tag"], regs[w["ra"]])
             x["unreserve"] = w["port"]
         else:  # SYS
-            name, arg = isa.SYS_NAMES.get(w["sys"]), w["arg"]
+            name, arg = isa.SYS_NAMES.get(w["fn"]), w["arg"]
             if name == "RET":
                 x["ret"] = True
             elif name == "SETST":

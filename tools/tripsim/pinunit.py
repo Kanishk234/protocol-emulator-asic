@@ -19,7 +19,10 @@ from typing import Optional
 
 from . import isa
 
-CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN, CMD_WAIT = 1, 2, 3, 4, 5, 6, 7
+import tripwire_spec as _S
+
+CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN, CMD_WAIT = (
+    _S.PIN_CMD[n] for n in ("LEVEL", "OE", "CLK", "GAP", "SYNC", "SETN", "WAIT"))
 
 
 @dataclass

@@ -1,71 +1,39 @@
 """TRIPWIRE lane encodings and operation semantics.
 
-Transcribed from docs/design/ISA.md (draft, DECISIONS D-007). Hand-written until
-tools/gen generates it from spec/tripwire.yaml at the phase 1 spec freeze; after
-that this file is replaced by the generated decoder.
+Every bit position and code comes from the generated `tripwire_spec` module (from
+spec/tripwire.yaml via tools/gen/gen.py). Only the *meaning* of each operation (alu())
+is written here, from docs/design/ISA.md §3.
 """
 
-from dataclasses import dataclass
+from dataclasses import make_dataclass
 
-MASK16 = 0xFFFF
+import tripwire_spec as S
 
-# Token tags (ARCHITECTURE.md §4.1)
-TAG_DATA, TAG_CTRL, TAG_EVENT, TAG_ERR = 0, 1, 2, 3
-TAGS = {"DATA": TAG_DATA, "CTRL": TAG_CTRL, "EVENT": TAG_EVENT, "ERR": TAG_ERR}
+MASK16 = (1 << S.DATA_BITS) - 1
 
-# Operation table (ISA.md §3), shared by reflexes and routines
-OPS = ["MOV", "ADD", "SUB", "AND", "OR", "XOR", "SHL", "SHR",
-       "SHOR", "EXT", "CMPM", "LTU", "PAR", "MKCTL", "CALL", "MOVB"]
-OP = {name: code for code, name in enumerate(OPS) if name}
+# Token tags
+TAGS = dict(S.TAGS)
+TAG_DATA, TAG_CTRL, TAG_EVENT, TAG_ERR = (TAGS[n] for n in ("DATA", "CTRL", "EVENT", "ERR"))
 
-# DST (ISA.md §4.1)
-DST_O0, DST_O1, DST_NONE = 4, 5, 6
-# ASRC
-A_I0, A_I1, A_ZERO, A_TIME = 4, 5, 6, 7
-# BSEL
-B_REG, B_IMM, B_K = 0, 1, 2
+# Operation table (shared by reflexes and routines)
+OP = dict(S.OPS)
+OPS = [None] * len(OP)
+for _name, _code in OP.items():
+    OPS[_code] = _name
 
-# Reflex slot fields: name -> (lsb, width). ISA.md §4.1, 52 bits.
-SLOT_FIELDS = {
-    "V": (0, 1), "U": (1, 1), "SE": (2, 1), "SV": (3, 4),
-    "FM": (7, 4), "FV": (11, 4), "TE": (15, 1), "TAG": (16, 2),
-    "HE": (18, 1), "HV": (19, 1),
-    "OP": (20, 4), "DST": (24, 3), "ASRC": (27, 3), "DQ": (30, 1),
-    "BSEL": (31, 2), "IMM": (33, 8), "NSE": (41, 1), "NS": (42, 4),
-    "DFE": (46, 1), "DF": (47, 2), "OT": (49, 2), "KT": (51, 1),
-    "HS": (52, 1),          # head-bit select for HE/HV: 0 = data[15], 1 = data[0] (D-013)
-}
-SLOT_BITS = 53
+# Slot enums
+DST_O0, DST_O1, DST_NONE = S.DST["O0"], S.DST["O1"], S.DST["none"]
+A_I0, A_I1, A_ZERO, A_TIME = S.ASRC["I0"], S.ASRC["I1"], S.ASRC["zero"], S.ASRC["time"]
+B_REG, B_IMM, B_K = S.BSEL["reg"], S.BSEL["imm"], S.BSEL["k"]
+
+# Reflex slot: name -> (lsb, width)
+SLOT_FIELDS = dict(S.SLOT_FIELDS)
+SLOT_BITS = S.SLOT_BITS
+_SLOT_DEFAULTS = {"DST": DST_NONE, "ASRC": A_ZERO}
+Slot = make_dataclass("Slot", [(n, int, _SLOT_DEFAULTS.get(n, 0)) for n in SLOT_FIELDS], frozen=True)
 
 
-@dataclass(frozen=True)
-class Slot:
-    V: int = 0
-    U: int = 0
-    SE: int = 0
-    SV: int = 0
-    FM: int = 0
-    FV: int = 0
-    TE: int = 0
-    TAG: int = 0
-    HE: int = 0
-    HV: int = 0
-    OP: int = 0
-    DST: int = DST_NONE
-    ASRC: int = A_ZERO
-    DQ: int = 0
-    BSEL: int = 0
-    IMM: int = 0
-    NSE: int = 0
-    NS: int = 0
-    DFE: int = 0
-    DF: int = 0
-    OT: int = 0
-    KT: int = 0
-    HS: int = 0
-
-
-def encode_slot(slot: Slot) -> int:
+def encode_slot(slot) -> int:
     word = 0
     for name, (lsb, width) in SLOT_FIELDS.items():
         value = getattr(slot, name)
@@ -75,7 +43,7 @@ def encode_slot(slot: Slot) -> int:
     return word
 
 
-def decode_slot(word: int) -> Slot:
+def decode_slot(word: int):
     if not 0 <= word < (1 << SLOT_BITS):
         raise ValueError(f"slot word wider than {SLOT_BITS} bits")
     return Slot(**{name: (word >> lsb) & ((1 << width) - 1)
@@ -83,19 +51,19 @@ def decode_slot(word: int) -> Slot:
 
 
 def slot_to_host_words(word: int) -> list:
-    """The four 16-bit host words of a slot (ISA.md §4.1)."""
-    return [(word >> (16 * i)) & MASK16 for i in range(4)]
+    """The 16-bit host words of a slot, w0 = bits [15:0] first."""
+    return [(word >> (16 * i)) & 0xFFFF for i in range(S.SLOT_HOST_WORDS)]
 
 
 # ---------------------------------------------------------------------------
 # Operation semantics (ISA.md §3)
 # ---------------------------------------------------------------------------
 
-@dataclass
 class AluResult:
-    d: int          # data result
-    r: int          # 1-bit flag result
-    ctrl: bool = False  # result is a CTRL token (MKCTL)
+    __slots__ = ("d", "r", "ctrl")
+
+    def __init__(self, d, r, ctrl=False):
+        self.d, self.r, self.ctrl = d, r, ctrl
 
 
 def alu(op: int, a: int, b: int, f: int, regs, kregs) -> AluResult:
@@ -142,14 +110,18 @@ def alu(op: int, a: int, b: int, f: int, regs, kregs) -> AluResult:
 
 
 # ---------------------------------------------------------------------------
-# Routine words (ISA.md §5.1)
+# Routine words (ISA.md §5.1), positions from the spec
 # ---------------------------------------------------------------------------
 
-SUB_LDI, SUB_LDIH, SUB_BR, SUB_DJNZ, SUB_LD, SUB_ST, SUB_OUT, SUB_SYS = range(8)
-BR_ALWAYS, BR_RZ, BR_NRZ = 0, 1, 2
-SYS = {"NOP": 0, "RET": 1, "SETST": 2, "SETF": 3, "CLRF": 4, "TSTF": 5,
-       "CPYF": 6, "GETT": 7, "GETK": 8}
+BR_ALWAYS, BR_RZ, BR_NRZ = S.BR_COND["always"], S.BR_COND["rz"], S.BR_COND["nrz"]
+SYS = dict(S.SYS)
 SYS_NAMES = {v: k for k, v in SYS.items()}
+_CTRL_BY_CODE = {code: name for name, (code, _) in S.ROUTINE_CTRL.items()}
+_SELECT_BIT = S.ROUTINE_BITS - 1
+
+
+def _get(word, msb, lsb):
+    return (word >> lsb) & ((1 << (msb - lsb + 1)) - 1)
 
 
 def _signed(value: int, bits: int) -> int:
@@ -157,42 +129,46 @@ def _signed(value: int, bits: int) -> int:
     return value - (1 << bits) if value & (1 << (bits - 1)) else value
 
 
-def _field(value: int, bits: int, name: str, signed: bool = False) -> int:
+def _put(value, msb, lsb, name, signed=False):
+    bits = msb - lsb + 1
     lo, hi = (-(1 << (bits - 1)), (1 << (bits - 1)) - 1) if signed else (0, (1 << bits) - 1)
     if not lo <= value <= hi:
         raise ValueError(f"routine field {name}={value} out of range [{lo}, {hi}]")
-    return value & ((1 << bits) - 1)
+    return (value & ((1 << bits) - 1)) << lsb
 
 
 def enc_alu(op: str, rd: int, ra: int, b: int, bs: int) -> int:
-    code = OP[op]
     if op == "CALL":
         raise ValueError("CALL is not allowed in routines")
-    return (_field(code, 4, "op") << 11) | (_field(rd, 2, "rd") << 9) | \
-           (_field(ra, 2, "ra") << 7) | (_field(bs, 1, "bs") << 6) | _field(b, 6, "b")
+    vals = {"op": OP[op], "rd": rd, "ra": ra, "bs": bs, "b": b}
+    word = S.ROUTINE_ALU_SELECT << _SELECT_BIT
+    for name, (msb, lsb) in S.ROUTINE_ALU_FIELDS.items():
+        word |= _put(vals[name], msb, lsb, name)
+    return word
 
 
-def enc_ctrl(sub: int, payload: int) -> int:
-    return 0x8000 | (sub << 12) | (payload & 0x0FFF)
+def enc_ctrl(kind: str, **vals) -> int:
+    """Encode a CTRL-class routine word, e.g. enc_ctrl("LD", rd=1, ra=2, off=5)."""
+    code, fields = S.ROUTINE_CTRL[kind]
+    if set(vals) != set(fields):
+        raise ValueError(f"{kind}: expects fields {sorted(fields)}, got {sorted(vals)}")
+    smsb, slsb = S.ROUTINE_CTRL_SUB
+    word = (S.ROUTINE_CTRL_SELECT << _SELECT_BIT) | _put(code, smsb, slsb, "sub")
+    for name, (msb, lsb) in fields.items():
+        word |= _put(vals[name], msb, lsb, name, signed=name in S.ROUTINE_SIGNED[kind])
+    return word
 
 
 def decode_routine(word: int) -> dict:
-    word &= MASK16
-    if not word & 0x8000:
-        return {"kind": "ALU", "op": (word >> 11) & 15, "rd": (word >> 9) & 3,
-                "ra": (word >> 7) & 3, "bs": (word >> 6) & 1, "b": word & 0x3F}
-    sub = (word >> 12) & 7
-    if sub in (SUB_LDI, SUB_LDIH):
-        return {"kind": "LDI" if sub == SUB_LDI else "LDIH", "rd": (word >> 10) & 3,
-                "imm": word & 0x3FF}
-    if sub == SUB_BR:
-        return {"kind": "BR", "cond": (word >> 9) & 7, "off": _signed(word, 9)}
-    if sub == SUB_DJNZ:
-        return {"kind": "DJNZ", "rd": (word >> 10) & 3, "off": _signed(word, 10)}
-    if sub in (SUB_LD, SUB_ST):
-        return {"kind": "LD" if sub == SUB_LD else "ST", "rd": (word >> 10) & 3,
-                "ra": (word >> 8) & 3, "off": word & 0xFF}
-    if sub == SUB_OUT:
-        return {"kind": "OUT", "port": (word >> 11) & 1, "tag": (word >> 9) & 3,
-                "ra": (word >> 7) & 3}
-    return {"kind": "SYS", "sys": (word >> 8) & 15, "arg": word & 0xFF}
+    word &= (1 << S.ROUTINE_BITS) - 1
+    if _get(word, _SELECT_BIT, _SELECT_BIT) == S.ROUTINE_ALU_SELECT:
+        out = {"kind": "ALU"}
+        out.update({n: _get(word, *r) for n, r in S.ROUTINE_ALU_FIELDS.items()})
+        return out
+    kind = _CTRL_BY_CODE[_get(word, *S.ROUTINE_CTRL_SUB)]
+    _, fields = S.ROUTINE_CTRL[kind]
+    out = {"kind": kind}
+    for name, (msb, lsb) in fields.items():
+        v = _get(word, msb, lsb)
+        out[name] = _signed(v, msb - lsb + 1) if name in S.ROUTINE_SIGNED[kind] else v
+    return out

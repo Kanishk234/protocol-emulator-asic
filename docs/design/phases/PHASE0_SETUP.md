@@ -37,40 +37,41 @@ programs/            protocol sources (.trw)
 macro/               SRAM macro views (phase 1)
 docs/design/         OVERVIEW_TRIPWIRE, ARCHITECTURE, VERIFICATION, PHYSICAL_DESIGN_AND_CI, phases/
 docs/reports/        AREA.md, VERIFICATION_REPORT.md (later)
-docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md
+docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md  docs/WORKLOG.md
 ```
 
-7. Add the gds trigger `paths` filter and `concurrency` block (`../PHYSICAL_DESIGN_AND_CI.md` §6). Leave the template's jobs untouched.
-8. Enable **GitHub Pages**: Settings → Pages → Source = **GitHub Actions**.
+7. Append the TRIPWIRE lines to `.gitignore`: local build, simulation and formal output, and waveforms are never committed.
+8. Add the gds trigger `paths` filter and `concurrency` block (`../PHYSICAL_DESIGN_AND_CI.md` §6). Leave the template's jobs untouched.
+9. Enable **GitHub Pages**: Settings → Pages → Source = **GitHub Actions**.
 
 ### 2.2 First CI run
-9. Push and watch:
+10. Push and watch:
    - `test`
    - `docs`
    - `gds` (gds, precheck, gl_test, viewer)
-10. Trigger `fpga` manually once to see whether the trivial design builds.
-11. Record the first row in `docs/reports/AREA.md`: cells, utilisation, slack and gds wall time.
+11. Trigger `fpga` manually once to see whether the trivial design builds.
+12. Record the first row in `docs/reports/AREA.md`: cells, utilisation, slack and gds wall time.
 
 ### 2.3 Local toolchain (WSL)
-12. Install the OSS CAD Suite (Icarus, Verilator 5, Yosys, SymbiYosys with Yices/Boolector) and Python 3.11+ with `cocotb`, `pytest`, `pyuvm`, `cocotb-coverage`, `hypothesis`, `pyyaml`.
-13. Install `sigrok-cli` (with libsigrokdecode). Check that `sigrok-cli -L` lists the `uart`, `spi` and `i2c` decoders.
-14. Write `scripts/check_all.sh`. It runs lint, the pin-level tests and the internal tests locally in one command.
-15. Optional: pull the iic-osic-tools Docker image for local LibreLane runs later.
+13. Install the OSS CAD Suite (Icarus, Verilator 5, Yosys, SymbiYosys with Yices/Boolector) and Python 3.11+ with `cocotb`, `pytest`, `pyuvm`, `cocotb-coverage`, `hypothesis`, `pyyaml`.
+14. Install `sigrok-cli` (with libsigrokdecode). Check that `sigrok-cli -L` lists the `uart`, `spi` and `i2c` decoders.
+15. Write `scripts/check_all.sh`. It runs lint, the pin-level tests and the internal tests locally in one command.
+16. Optional: pull the iic-osic-tools Docker image for local LibreLane runs later.
 
 ### 2.4 Competition and team
-16. Submit the Jane Street sign-up form.
-17. Email asic-competition@janestreet.com asking:
+17. Submit the Jane Street sign-up form.
+18. Email asic-competition@janestreet.com asking:
     - (a) is 8x4 available, or should we design for 6x4;
     - (b) are IHP SRAM macros accepted on the target shuttle.
 
     Log the answers in `DECISIONS.md`.
-18. Assign roles. The verification lead **does not write RTL**.
+19. Assign roles. The verification lead **does not write RTL**.
     - architecture/RTL
     - verification
     - compiler/tools
     - physical/CI
-19. Start `docs/DECISIONS.md` (entry D-001: the chosen architecture, TRIPWIRE) and `docs/BUGS.md`.
-20. Commit the four design docs to `docs/design/`.
+20. Start `docs/DECISIONS.md` (entry D-001: the chosen architecture, TRIPWIRE) and `docs/BUGS.md`.
+21. Commit the four design docs to `docs/design/`.
 
 ---
 
@@ -93,7 +94,7 @@ docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md
 - [ ] Local `scripts/check_all.sh` passes in WSL; `sigrok-cli` decodes a UART test VCD.
 - [ ] Jane Street sign-up form submitted; tile-size and SRAM questions emailed.
 - [ ] Roles assigned and written in the README.
-- [ ] `DECISIONS.md`, `BUGS.md`, `CLAIMS.md`, `docs/reports/AREA.md` exist.
+- [ ] `DECISIONS.md`, `BUGS.md`, `CLAIMS.md`, `WORKLOG.md`, `docs/reports/AREA.md` exist; `.gitignore` excludes build/sim/formal output.
 
 ## 5. Risks in this phase
 | Risk | Response |

@@ -11,3 +11,16 @@ test/sim_build
 test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
+
+# --- TRIPWIRE additions: local build/sim/formal output (CI keeps these as artifacts) ---
+build/
+sim_build/
+logs/
+*.vcd
+*.fst
+results.xml
+__pycache__/
+.pytest_cache/
+# SymbiYosys work directories (the .sby files and props/ stay tracked)
+formal/*/
+!formal/props/

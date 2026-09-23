@@ -13,6 +13,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - Contact: asic-competition@janestreet.com
 
 ## Read before working
+0. `docs/WORKLOG.md`: the latest entries, to see where the last session stopped.
 1. `docs/design/OVERVIEW_TRIPWIRE.md`: what we're building and why, protocols, schedule.
 2. The current phase doc in `docs/design/phases/`: find the first unchecked box.
 3. `docs/design/ARCHITECTURE.md`: the hardware contract. RTL and model both follow it.
@@ -25,6 +26,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - **A phase is complete only when every item in its "Phase exit checklist" passes.** Do not start the next phase's tasks until then. If an item cannot pass, stop and explain why, then propose a fix or a fallback. Never tick a box that hasn't actually passed.
 - Tick checklist boxes only with evidence (a test run, a CI run ID, a proof log, or a file) noted next to the box.
 - Every phase ends with all CI workflows green on `main`.
+- **End every session with a `docs/WORKLOG.md` entry**: what was done, which boxes were ticked (with evidence), and the next step.
 
 ## Engineering rules
 - **The spec wins.** If the RTL and `ARCHITECTURE.md` disagree, fix the RTL. If the spec is wrong, propose the change in `docs/DECISIONS.md` and ask before implementing.
@@ -34,6 +36,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
   - `default_nettype none`; synchronous active-low reset; no `initial` in synthesisable code.
   - Latches only in `trw_slots.v`; one module per file; `trw_` prefix; top level `tt_um_tripwire`.
 - **Tests in `test/` touch only top-level ports.** They also run on the gate-level netlist (`gl_test`). White-box tests go in `test_internal/`.
+- **Logs:** don't commit raw logs, waveforms or build/formal output (they're in `.gitignore`; CI keeps them as artifacts). Commit summaries with CI run IDs in `docs/reports/`.
 - **Log every bug** in `docs/BUGS.md`: symptom, root cause, the check that caught it, the check that now covers it.
 - **Honesty:** claims go in `docs/CLAIMS.md` with their evidence. Never claim zero latency, sub-ns timing, USB/Ethernet support, real-hardware testing (we have none yet), or "formally verified" without naming the property and its bound.
 

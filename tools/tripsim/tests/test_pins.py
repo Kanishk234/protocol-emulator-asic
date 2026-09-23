@@ -135,6 +135,48 @@ def test_setn_changes_shift_length():
     assert highs == 2                                    # 2 bits, not the configured 4
 
 
+def rx_unit(**cfg):
+    chip = Chip(lanes=1)
+    chip.pin_config(0, pin_a=PAD_UI + 0, pin_b=PAD_UI + 1, presc=1, order="lsb", **cfg)
+    chip.connect("U0.tx", "HOST_IN")
+    chip.connect("HOST_OUT", "U0.rx")
+    return chip
+
+
+def test_setn_rx_restarts_framing_at_the_cursor():
+    """§14 P18: SETN rx=1 sets the RX word length and restarts framing, timed at the cursor."""
+    chip = rx_unit(rxmode="linked_rx", rx_edge="rise", rx_nbits=4)
+    chip.run_for(10)
+    chip.ui_in = 0b10                                    # a stray rising edge: bit 0 of a 4-bit word
+    chip.run_for(5)
+    chip.ui_in = 0
+    chip.host_push(0x5000, tag=1)                        # SYNC
+    chip.host_push(0x4000 | 20, tag=1)                   # GAP 20
+    chip.host_push(0x6020 | 3, tag=1)                    # SETN rx, 3 bits: at cursor = +20
+    chip.run_for(30)
+    for bit in (1, 0, 1):                                # a 3-bit word after the restart
+        chip.ui_in = bit
+        chip.run_for(4)
+        chip.ui_in = bit | 0b10
+        chip.run_for(4)
+        chip.ui_in = bit
+    chip.run_for(10)
+    assert list(chip.host_out) == [(0, 0b101)]           # the stray bit was dropped
+
+
+def test_sample_reads_pin_a_at_timed_points():
+    """§14 P19: SAMPLE puts pin A's level at cursor + delay into the RX framing."""
+    chip = rx_unit(rx_nbits=3)
+    chip.host_push(0x5000, tag=1)                        # SYNC at accept (clock ~2): cursor ~3
+    for _ in range(3):
+        chip.host_push(0x8000 | 20, tag=1)               # SAMPLE 20 ticks after the previous one
+    levels = [1] * 33 + [0] * 20 + [1] * 30              # sampled at ~23, ~43, ~63 (+2 sync)
+    for v in levels:
+        chip.ui_in = v
+        chip.step()
+    assert list(chip.host_out) == [(0, 0b101)]           # 1, 0, 1 in LSB order
+
+
 def test_consumer_port_tag_filter():
     """§14 F7: a port drops tags it does not accept, without blocking the producer."""
     from tripsim.fabric import Fabric

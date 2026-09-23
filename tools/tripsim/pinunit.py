@@ -21,8 +21,8 @@ from . import isa
 
 import tripwire_spec as _S
 
-CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN, CMD_WAIT = (
-    _S.PIN_CMD[n] for n in ("LEVEL", "OE", "CLK", "GAP", "SYNC", "SETN", "WAIT"))
+CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN, CMD_WAIT, CMD_SAMPLE = (
+    _S.PIN_CMD[n] for n in ("LEVEL", "OE", "CLK", "GAP", "SYNC", "SETN", "WAIT", "SAMPLE"))
 
 
 @dataclass
@@ -113,6 +113,7 @@ class PinUnit:
         self._rx_bits = []
         self._rx_phase = 0
         self._rx_taint = False
+        self._rx_len = None             # SETN rx: RX word length set at run time (None = config)
         self._prev_a = None
         self._prev_b = None
         self._prev_c = None
@@ -170,7 +171,15 @@ class PinUnit:
                 self._accept(now, tag, data)
         due = [x for x in self.actions if x[0] <= now]
         self.actions = [x for x in self.actions if x[0] > now]
-        apply.extend(due)
+        for _, kind, value in due:
+            if kind == "rxlen":                   # after this clock's RX: its sample is dropped
+                self._rx_len = value
+                self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
+            elif kind == "sample":
+                if a is not None:
+                    self._sample(a)
+            else:
+                apply.append((_, kind, value))
         if self.clk is not None:
             self._clk_step(now, a, apply)
         if self._linked() and self._edge(self._prev_b_tx, b, c.tx_edge):
@@ -228,7 +237,17 @@ class PinUnit:
                 self.cursor_q8 = earliest_q8
             elif op == CMD_SETN:
                 n = arg & 0x1F
-                self.tx_nbits = n if 1 <= n <= 16 else 16
+                n = n if 1 <= n <= 16 else 16
+                if arg & 0x20:                    # §14 P18: RX length + restart, at the cursor
+                    t_q8 = max(self.cursor_q8, earliest_q8)
+                    self.cursor_q8 = t_q8
+                    self._schedule(t_q8 >> 8, "rxlen", n)
+                else:
+                    self.tx_nbits = n
+            elif op == CMD_SAMPLE:                # §14 P19: sample pin A at cursor + delay
+                t_q8 = max(self.cursor_q8 + arg * c.presc * 256, earliest_q8)
+                self.cursor_q8 = t_q8
+                self._schedule(t_q8 >> 8, "sample", 0)
             elif op == CMD_CLK and c.txmode == "clkgen":
                 n = arg & 0xFF
                 if self.clk is not None:
@@ -312,6 +331,8 @@ class PinUnit:
 
     def _word_len(self):
         c = self.cfg
+        if self._rx_len is not None:
+            return self._rx_len
         return c.rx_nbits2 if (self._rx_phase and c.rx_nbits2) else (c.rx_nbits or c.nbits)
 
     def _sample(self, bit):

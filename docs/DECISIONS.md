@@ -187,6 +187,24 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - `formal/props/dec_props.sv` waits for phase 2: it needs RTL signals to bind to.
 - **Status:** `status: draft` in the YAML. It is flipped to `frozen` at the phase 1 spec freeze, after R1–R3, since the hardware experiments may still change slot widths. After that, spec changes need a DECISIONS entry.
 
+## D-018 (2026-09-23): tripc v0 and the `.trw` language; programs/ is the firmware source
+- **Decision:**
+  - A line-oriented language whose slot syntax mirrors `ISA.md` (`slot urgent: when ADDR, I0 is DATA do CMPM none <- I0, mask K0 val K1 -> f0 then ACKQ`).
+  - `#` is always a comment; immediates are plain expressions.
+  - Params (overridable, including strings like `MISO_EDGE`) and consts.
+- **Output:** a JSON-able image (pins, ownership, connections, per-lane slots/K/registers, SRAM with the entry table) plus a Markdown report:
+  - slot/SRAM usage;
+  - routine worst-case steps (forward branches + non-nested constant-count DJNZ loops; anything else gets "no static bound");
+  - which urgent slots can pre-empt which.
+- **Static checks:** undeclared states, a tag/head test on an input the action does not read, f3 writes, >12 slots, 16-bit K/registers, host/unknown pads, unknown pin keys and tags, undefined routines.
+- **Source of truth:** `programs/*.trw`; `tools/kernels/*.load()` compiles them. The Python-assembled slots stay only as a bit-exact reference (`tools/tripc/tests`).
+- **Also:** pad numbering and host pads moved into `spec/tripwire.yaml` (encodings belong there).
+- **Known limits (v0):**
+  - pin placement is fixed per program;
+  - pin-config keys are validated against tripsim's PinConfig (the host config map is still OPEN in `ARCHITECTURE.md` §9 and belongs in the spec at the freeze);
+  - reaction bounds are listed, not computed (phase 3, L6).
+- **Status:** accepted.
+
 ---
 
 ## Open questions for the phase 1 spec freeze

@@ -93,16 +93,16 @@ The §2.4 risk spikes run in parallel from the start.
 ## 4. Phase exit checklist (all must pass)
 - [ ] `docs/reports/ARCH_EXPLORATION.md` answers every row of `ISA.md` §9 with measured numbers; resulting ISA changes are logged in `DECISIONS.md`.
 - [ ] `ARCHITECTURE.md` and `ISA.md` have **zero OPEN items**; the semantics section is reviewed by at least two people.
-- [ ] `spec/tripwire.yaml` is the only place encodings live; the `lint` CI regenerates and shows no diff.
+- [x] `spec/tripwire.yaml` is the only place encodings live; the `lint` CI regenerates and shows no diff. *(Evidence: `lint` run 35921199653 and `unit` run 35921199432 green on 0e0028d, 2026-09-23. tripsim imports the generated tables; `tools/gen/tests/test_gen.py::test_model_uses_the_spec`.)*
 - [ ] `tripsim` passes its own unit tests (every op, the channel rules, the pending rule, the rotation, pin-unit modes).
-- [ ] UART (TX+RX), SPI controller and I2C controller programs run on `tripsim` and pass:
-  - [ ] against the protocol reference models;
-  - [ ] against **sigrok** decoding of the model's VCD.
-- [ ] `tripc` report produced for all three programs, and slot usage fits (≤ 12 per lane).
+- [x] UART (TX+RX), SPI controller and I2C controller programs run on `tripsim` and pass: *(Evidence, 2026-09-23, local `python -m pytest -q`: 106 passed. Programs `programs/uart.trw`, `spi_controller.trw`, `i2c_controller.trw` compiled by tripc: `tools/kernels/tests/test_uart.py`, `test_spi_controller.py`, `test_i2c_controller.py` against `tools/protomodels/` (UART line model, SPI target, I2C target); confirmed in CI by the `unit` workflow on the next push.)*
+  - [x] against the protocol reference models; *(UART: `protomodels/uart.py` decode/encode incl. a framing error and a 256-byte loopback; SPI: `protomodels/spi.py` SPITarget; I2C: `protomodels/i2c.py` I2CTarget with clock stretching.)*
+  - [x] against **sigrok** decoding of the model's VCD. *(`test_uart_tx` (uart), `test_spi_controller_sigrok` (spi), `test_i2c_controller_sigrok` (i2c).)*
+- [x] `tripc` report produced for all three programs, and slot usage fits (≤ 12 per lane). *(`tools/tripc/tests/test_tripc.py::test_reports_and_slot_budget` over all `programs/*.trw`: uart 4, spi_controller 4, i2c_controller 11 + 2 bounded routines; plus spi_target 3, i2c_target 12.)*
 - [ ] **R1 decided:** EVAL path timing measured; fire rate chosen and logged.
 - [ ] **R2 decided:** the latch-array test project passed precheck and `gl_test`, or the flop fallback is chosen and logged.
 - [ ] **R3 decided:** the SRAM smoke project passed precheck and `gl_test`, or the fallback is chosen and logged.
-- [ ] Jane Street answers logged, or the assumptions stated.
+- [x] Jane Street answers logged, or the assumptions stated. *(DECISIONS D-003: design for 6x4; SRAM macro assumed usable, settled by R3 with the flop-store fallback kept.)*
 - [ ] All CI workflows still green on `main`.
 
 ## 5. Risks in this phase

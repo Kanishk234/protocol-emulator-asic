@@ -52,9 +52,23 @@ We also broke the model on purpose many times to prove the tests notice. When on
 
 A check runs on every push and fails if anything drifts, so the documents, the model and (later) the hardware can't quietly disagree. The simulator now reads its encodings from this file instead of keeping its own copy. It's still marked *draft*: it gets "frozen" after the hardware experiments, which might still change a field width.
 
+**9. We built a compiler, so programs are real firmware.** `tripc` turns a small, readable language (`.trw`) into exactly what gets loaded into the chip, and writes a report:
+- how many rule slots and how much memory each program uses;
+- the worst-case length of every routine;
+- which rules can delay which.
+
+It also catches mistakes before anything runs, such as testing an input the rule doesn't read, or using an undeclared state. The protocol programs now live in `programs/`. We proved the compiler right by checking that its output is **bit-for-bit identical** to the hand-built versions, and all the protocol tests now run on the compiled programs.
+
+**10. We mapped which other protocols are within reach** (`docs/reports/PROTOCOL_SUPPORT.md`):
+- **Expected with today's features** (the programs are still to be written): SWD, JTAG, PS/2, 1-Wire, I2S, MIDI, DMX, SMBus, IR.
+- **One planned feature away:** WS2812 and DShot.
+- **CAN** needs a few more general features: re-syncing the receiver on every edge, bit stuffing, detecting a lost arbitration, and a CRC unit.
+- **USB low-speed** needs the CAN features plus a couple more, and is only studied for feasibility.
+- **10 Mbit Ethernet** is honestly out of reach at a 50 MHz clock.
+
 ## What's left in Phase 1
 1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.
-2. **A first compiler (`tripc`),** so programs are written in the `.trw` language instead of Python.
+2. **Finish the checklist items the model still owes:** PULSE mode (for WS2812/DShot), turning each new feature off one at a time to measure its value, and a second person reviewing the cycle-by-cycle rules.
 3. **Three hardware experiments**, each a small separate hardening run:
    - R1: build one lane in Verilog and check it runs at 50 MHz;
    - R2: check that latch-based slot memory survives Tiny Tapeout's flow;

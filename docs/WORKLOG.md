@@ -21,6 +21,27 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1: tripc v0, programs, protocol roadmap)
+Done:
+- `tools/tripc` v0 (D-018): the `.trw` language, compiler with static checks and report, JSON image, loader, CLI (`python -m tripc`).
+- `programs/`: uart, spi_controller, spi_target, i2c_controller, i2c_target. Compiled images are bit-identical to the reference kernels (slots, K, registers, routines at 3 periods). `tools/kernels/*.load()` now compile the programs, so every protocol test runs on compiled firmware.
+- `tools/protomodels/uart.py` (8N1 line model). `test_uart.py`: TX vs the model + sigrok at 4 baud rates; RX with a framing error; 256-byte loopback.
+- Pad numbering moved into `spec/tripwire.yaml`.
+- BUGS #5: the VCD writer dropped a final steady level, so sigrok missed the last byte; fixed.
+- `docs/reports/PROTOCOL_SUPPORT.md`: honest roadmap (verified / expected / needs primitive / not feasible).
+- 106 pytest tests pass.
+
+Checklist boxes ticked (evidence):
+- [x] Spec only place of encodings; lint CI no diff: lint 35921199653, unit 35921199432.
+- [x] UART/SPI-controller/I2C-controller programs pass vs reference models and sigrok (and the two sub-boxes): `tools/kernels/tests/test_uart.py`, `test_spi_controller.py`, `test_i2c_controller.py` (local pytest, 106 passed).
+- [x] tripc reports for all programs, slots ≤ 12: `test_tripc.py::test_reports_and_slot_budget`.
+- [x] Jane Street assumptions stated: D-003.
+
+Next:
+- PULSE mode (unlocks WS2812/DShot/servo/IR, and the `tripsim` unit-test box).
+- The primitives for CAN (edge-resync RX, bit stuffing, readback compare, CRC helper), then a CAN kernel.
+- Remaining phase 1 boxes: ablation rows in ARCH_EXPLORATION, zero OPEN items + a two-person semantics review, R1–R3 (fresh session for RTL), green CI.
+
 ## 2026-09-23: Krithik + Claude (phase 1: spec YAML, generator, phase summaries)
 Done:
 - `docs/summaries/` with plain-language PHASE0.md (complete) and PHASE1.md (in progress). CLAUDE.md: every phase ends with a summary there.

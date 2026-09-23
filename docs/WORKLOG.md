@@ -21,6 +21,28 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1: PULSE mode, WS2812, DShot)
+Done:
+- D-019: PULSE mode as two-phase symbols per bit value (pulse-width, pulse-distance, Manchester); §14 P17.
+- `programs/ws2812.trw` (2 slots) and `programs/dshot.trw` (2 slots + checksum routine).
+- `tools/protomodels/pulse.py`: WS2812B datasheet-tolerance decoder and DShot decoder (checksum, timing).
+- Tests:
+  - WS2812: two frames, zero tolerance violations, sigrok `rgb_led_ws281x` agrees;
+  - DShot 150/300/600/1200;
+  - a corrupted checksum routine is caught;
+  - new unit tests for OE, SYNC, LATE, SETN and the fabric port filter.
+- Two injected PULSE bugs are caught. 117 pytest tests pass.
+- Honesty notes:
+  - my first guard test assumed a checksum bit that wasn't set; it now asserts its premise;
+  - sigrok shows WS281x colours reordered to RGB, which the test now accounts for.
+
+Checklist boxes ticked (evidence):
+- [x] tripsim passes its own unit tests (every op, channel rules, pending rule, rotation, pin-unit modes): `tools/tripsim/tests/` + `tools/kernels/tests/`, local pytest 117 passed.
+
+Next:
+- CAN feature set (edge-resync RX, bit stuffing, readback compare, CRC helper) + a CAN kernel; or quick "expected" programs (SWD, JTAG, PS/2, 1-Wire).
+- Remaining phase 1: ablations, zero OPEN items + semantics review, R1–R3 (fresh session), green CI.
+
 ## 2026-09-23: Krithik + Claude (phase 1: tripc v0, programs, protocol roadmap)
 Done:
 - `tools/tripc` v0 (D-018): the `.trw` language, compiler with static checks and report, JSON image, loader, CLI (`python -m tripc`).

@@ -218,7 +218,7 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | NBITS | Shift length, 1–16 |
 | ORDER | LSB- or MSB-first |
 | OD, IDLE | Open-drain enable, idle level |
-| T0, T1 | PULSE high times (ticks) for bit 0 / bit 1 |
+| SYM0, SYM1 | PULSE symbols (D-019): for bit value b, a first level held T1_b ticks, then the opposite level for T2_b ticks (12-bit tick counts, ticks = PRESC clocks). Pulse-width (WS2812, DShot), pulse-distance (IR NEC) and Manchester codes |
 | RX_EDGE, TX_EDGE | For linked modes, separately for each half: the edge of pin B on which RX samples and TX changes pin A (rise, fall). I2C samples on SCL rise and drives on SCL fall, so one shared field is not enough (D-010) |
 | RX_NBITS, RX_NBITS2 | RX word length, if different from TX NBITS. RX_NBITS2 ≠ 0: words alternate between RX_NBITS and RX_NBITS2 bits (two-phase framing, e.g. I2C 8 + 1), right-aligned in `data` (D-013, replaces D-010's RX_TAIL) |
 | RX_ECHO | 0: RX words sampled while this unit's own TX was shifting are dropped (echo suppression on half-duplex lines: I2C, 1-Wire, SWD, half-duplex UART). 1: keep them (readback for collision checks) (D-013) |
@@ -231,7 +231,7 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 ### 7.3 TX half: tokens consumed
 - **DATA token:** the payload for the configured TXMODE.
   - SHIFT sends NBITS of data at PERIOD, or on pin B's TX_EDGE if linked.
-  - PULSE sends NBITS pulse-coded bits.
+  - PULSE sends NBITS bits, each as its two-phase symbol, then returns to IDLE (§14 P17).
 - **CTRL token:** `data[15:12]` is the op.
 
 <!-- GENERATED:pin_commands -->
@@ -446,3 +446,4 @@ Fabric rule added (D-015):
 - **F7.** Each consumer port has a 4-bit `accept` tag mask. A token that is available to the port (F1) but whose tag is not accepted is not visible to the consumer, and is dropped at the edge of the clock it is available in (`last_seq := seq`), exactly as if it had been taken. So a filtered subscriber never delays the producer.
 
 Measured with these rules: the I2C controller kernel runs 100 kHz / 400 kHz / 1 MHz with and without clock stretching, meeting tLOW/tHIGH ≥ PERIOD/2 on the bus. Stretch awareness adds 3 clocks to each high phase (943 kHz at a nominal 1 MHz), and the SPI controller's limit is 12.5 MHz with a symmetric clock (§ exploration report).
+- **P17.** PULSE (D-019): a DATA token of n bits (NBITS, or length-in-token) starts at `max(cursor, earliest)`. Bit b drives SYMb_FIRST at t, the opposite level at t + T1_b·PRESC, and the next bit starts at t + (T1_b + T2_b)·PRESC. After the last bit pin A returns to IDLE and `cursor` = the end time, so back-to-back tokens join with no gap. Timing is exact to the clock (integer ticks); `GAP` gives latch/reset times.

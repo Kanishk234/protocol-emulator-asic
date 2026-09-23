@@ -23,6 +23,8 @@ Phase 0 proved the *tools* work. Phase 1 asks whether the *idea* works, before w
 | SPI target (we are clocked by someone else) | ✅ up to 12.5 MHz |
 | I2C controller | ✅ 100 kHz / 400 kHz / 1 MHz, including a slow target stretching the clock |
 | I2C target (reads and writes) | ✅ 100 kHz / 400 kHz / 1 MHz, about 2x margin on the ACK deadline |
+| WS2812 LED strips | ✅ every datasheet timing tolerance met (added with PULSE mode, point 11) |
+| DShot150–1200 motor control | ✅ frames, checksums and bit timing correct (point 11) |
 | The headline "reaction time" claim | ✅ exactly 7 clocks (140 ns), as designed |
 
 All numbers are from simulation with ideal wires. The full table, with the test behind each number, is `docs/reports/ARCH_EXPLORATION.md`.
@@ -61,14 +63,16 @@ It also catches mistakes before anything runs, such as testing an input the rule
 
 **10. We mapped which other protocols are within reach** (`docs/reports/PROTOCOL_SUPPORT.md`):
 - **Expected with today's features** (the programs are still to be written): SWD, JTAG, PS/2, 1-Wire, I2S, MIDI, DMX, SMBus, IR.
-- **One planned feature away:** WS2812 and DShot.
+- **One planned feature away:** WS2812 and DShot (since done, see 11).
 - **CAN** needs a few more general features: re-syncing the receiver on every edge, bit stuffing, detecting a lost arbitration, and a CRC unit.
 - **USB low-speed** needs the CAN features plus a couple more, and is only studied for feasibility.
 - **10 Mbit Ethernet** is honestly out of reach at a 50 MHz clock.
 
+**11. We added PULSE mode, and two more protocols work.** One general feature (each bit is a short "level A for a while, then level B for a while" pattern) covers LED strips (WS2812), drone motor controllers (DShot), IR remotes and Manchester codes. WS2812 and DShot now run on the model, checked against their datasheet timing and, for WS2812, sigrok. For DShot the chip computes the frame checksum itself in a routine.
+
 ## What's left in Phase 1
 1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.
-2. **Finish the checklist items the model still owes:** PULSE mode (for WS2812/DShot), turning each new feature off one at a time to measure its value, and a second person reviewing the cycle-by-cycle rules.
+2. **Finish the checklist items the model still owes:** turning each new feature off one at a time to measure its value, and a second person reviewing the cycle-by-cycle rules.
 3. **Three hardware experiments**, each a small separate hardening run:
    - R1: build one lane in Verilog and check it runs at 50 MHz;
    - R2: check that latch-based slot memory survives Tiny Tapeout's flow;

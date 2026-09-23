@@ -205,6 +205,20 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - reaction bounds are listed, not computed (phase 3, L6).
 - **Status:** accepted.
 
+## D-019 (2026-09-23): PULSE mode as two-phase symbols
+- **Decision (general form, D-012):** the architecture's original "T0/T1 high times" becomes a two-phase symbol per bit value: SYMb = (first level, T1 ticks, T2 ticks), for b = 0 and 1 (§14 P17).
+- **General need:**
+  - pulse-width codes: WS2812/SK6812 LEDs, DShot ESCs;
+  - pulse-distance codes: IR NEC, many RF remotes;
+  - Manchester, where the first level differs per bit value (DALI, some RF).
+  Stateful codes (biphase-mark, NRZI) belong to the line-coding primitive (PROTOCOL_SUPPORT.md item 3).
+- **Cost:** 2 × (1 + 12 + 12) = 50 configuration bits per pin unit. Symbol timing uses the existing cursor, so back-to-back tokens join exactly.
+- **Evidence:**
+  - `tools/tripsim/tests/test_pins.py`: exact symbols, back-to-back join, Manchester and pulse-distance forms;
+  - `tools/kernels/tests/test_pulse_protocols.py`: WS2812 (two frames; every datasheet tolerance; sigrok `rgb_led_ws281x`) and DShot150/300/600/1200 (frames, checksum computed by a lane routine, bit timing);
+  - injected bugs (per-bit level ignored, phases swapped) are caught.
+- **Status:** accepted (draft). Area: to be checked at synthesis. If 50 bits × 6 units is too much, the symbol tables could be shared between units.
+
 ---
 
 ## Open questions for the phase 1 spec freeze

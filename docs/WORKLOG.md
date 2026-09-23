@@ -21,6 +21,23 @@ Next:
 
 ---
 
+## 2026-09-23: Kanishk + Claude (planning: protocol coverage, FPGA target)
+Done:
+- Reviewed the model's protocol coverage against the competition brief:
+  - required UART/SPI/I2C and the suggested JTAG/SWD/PS/2 are verified on the model;
+  - CAN, USB low-speed and 10BASE-T are not.
+- D-012 check on the CAN/USB primitives: resync, bit stuffing (N as a setting), NRZI, readback compare and CRC are general. SE0 detection and the complementary pair must be generalized first (multi-pin pattern match, pin-pair mode). Firmware-only CAN to be tried first.
+- D-022: the FPGA target is a Basys 3 running the full design; the reduced iCE40 build is dropped (it could not run I2C). Updated PHYSICAL_DESIGN_AND_CI §6/§8, phase 3 items 8–9 and exit box, the phase 4 freeze box, phase 7, and the OVERVIEW/VERIFICATION CI tables. The template's `fpga` workflow is untouched and informational.
+- Docs only; no code or CI changes.
+
+Checklist boxes ticked (evidence):
+- none
+
+Next:
+- CAN on current primitives (firmware-first), then only the primitives it proves necessary.
+- Remaining phase 1: ablations, zero OPEN items + semantics review, R1–R3 (fresh session), green CI.
+- Phase 3: choose the Basys 3 build path (openXC7 workflow vs local Vivado) and record it in D-022.
+
 ## 2026-09-23: Kanishk + Claude (phase 1: verification plan additions)
 Done:
 - D-021: verification cross-checks added to `docs/design/VERIFICATION.md`:

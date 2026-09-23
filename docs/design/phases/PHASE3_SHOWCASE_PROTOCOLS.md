@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Dates** | Nov 9 → Nov 29, 2026 |
-| **Goal** | Demonstrate what makes TRIPWIRE different (fast device emulation, multicast, fixed reaction) with more protocols, and build the novel verification layers: independent oracles, metamorphic tests, core formal proofs and the compiler's deadlock/overrun analysis. Make the `fpga` workflow green with a reduced build. |
-| **Devices needed** | None. The `fpga` workflow builds a bitstream without a board. Phase 7 is where a board comes in, if one becomes available. |
+| **Goal** | Demonstrate what makes TRIPWIRE different (fast device emulation, multicast, fixed reaction) with more protocols, and build the novel verification layers: independent oracles, metamorphic tests, core formal proofs and the compiler's deadlock/overrun analysis. Build the full design for the Basys 3 FPGA (D-022). |
+| **Devices needed** | None. The Basys 3 bitstream builds without a board. Phase 7 is where a board comes in, if one becomes available. |
 | **References** | `../ARCHITECTURE.md` §7–8, 13; `../VERIFICATION.md` §6 (L3–L6); `../PHYSICAL_DESIGN_AND_CI.md` §8 |
 
 ---
@@ -52,8 +52,8 @@
 7. **L6-FUZZ:** random programs through `tripc` → `tripsim`. Any program marked deadlock-free must never deadlock in simulation, and every reported reaction bound must be met.
 
 ### 2.6 FPGA build (owner: physical/CI)
-8. A reduced-build parameter set: 1 lane, 8 slots, 2 pin units, SRAM mapped to FPGA RAM.
-9. Make the `fpga` workflow build it, or add our own `fpga_reduced` workflow if the template's action can't select the reduced build (`../PHYSICAL_DESIGN_AND_CI.md` §8). Log the decision.
+8. An FPGA synthesis define (slot latches → flops, SRAM → block RAM, MMCM 100 → 50 MHz) and a Basys 3 constraints file. The **full** design, not a reduced one (DECISIONS D-022).
+9. Build it for the Basys 3: our own `fpga_basys3` workflow (openXC7) or a local Vivado script with its report in `docs/reports/` (`../PHYSICAL_DESIGN_AND_CI.md` §8). Record the choice in D-022.
 
 ### 2.7 Hardening
 10. Harden **each** RTL change from this phase separately, one change per run. Log AREA rows.
@@ -73,7 +73,7 @@
 - Peer co-simulation and dumps replay in CI.
 - L4 metamorphic suite; the listed formal proofs in `formal/`.
 - `tripc` deadlock/overrun analysis + L6-FUZZ.
-- Green `fpga` build (template or ours).
+- A full-design Basys 3 bitstream (D-022).
 
 ---
 
@@ -86,7 +86,7 @@
 - [ ] **L4:** all five metamorphic relations pass for UART, SPI and I2C.
 - [ ] **Formal:** F-CHAN-1..4, F-SCHED-1..2, F-ROT-1, F-OWN-1, F-PIN-1, F-HOST-1 and F-DEC-1 proven, with each result's bounded/unbounded status recorded in `CLAIMS.md`.
 - [ ] `tripc` deadlock/overrun analysis in place; L6-FUZZ has run ≥ 10⁴ random programs with no contradiction.
-- [ ] `fpga` workflow (or `fpga_reduced`) green.
+- [ ] Full-design Basys 3 bitstream builds with timing met at 50 MHz: `fpga_basys3` run ID, or the local Vivado report in `docs/reports/` (D-022).
 - [ ] The latest `gds` run is fully green (gds, precheck, gl_test, viewer); routing < 4 h.
 - [ ] `formal` and `unit` workflows green on `main`.
 

@@ -59,7 +59,7 @@
 - [ ] Functional coverage goals met (every covergroup at target); line coverage ≥ 95%, gaps explained.
 - [ ] L2 lockstep ≥ 10⁸ clocks with zero divergences.
 - [ ] F-SCHED-3 and F-ISO-1 completed (bounded is acceptable; depth recorded).
-- [ ] **Freeze commit:** `test`, `docs`, `gds` (gds, precheck, gl_test, viewer), `lint`, `unit`, `formal` and `fpga` all green on the same commit.
+- [ ] **Freeze commit:** `test`, `docs`, `gds` (gds, precheck, gl_test, viewer), `lint`, `unit` and `formal` all green on the same commit, and the Basys 3 build (D-022) passes on it. The template's iCE40 `fpga` workflow is informational only.
 - [ ] `gds` on the freeze commit completed within the 6 h limit; final AREA row recorded.
 - [ ] Tag `freeze-rtl` pushed; gds artefacts attached to a release.
 - [ ] GitHub Pages shows the frozen design.

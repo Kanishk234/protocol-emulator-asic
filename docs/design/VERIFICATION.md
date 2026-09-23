@@ -301,7 +301,8 @@ Priority: below L2, L3 and L5. If the schedule slips, L9 is cut first, with a DE
 | `test` (template, unchanged) | Pin-level cocotb suite under Icarus; fails on any failure in `results.xml` | Every push |
 | `gds` (template) → `gds`, `precheck`, `gl_test`, `viewer` | Hardening, TT precheck, pin-level suite on the netlist, GitHub Pages viewer | Only when `src/`, `info.yaml` or `macro/` change (one hardware change per run) |
 | `docs` (template) | Datasheet build | Every push |
-| `fpga` (template, manual) | iCE40UP5K bitstream of a reduced build | Manual |
+| `fpga` (template, manual) | iCE40UP5K bitstream; informational only (D-022) | Manual |
+| `fpga_basys3` or local Vivado script (ours, D-022) | Full-design Artix-7 bitstream, timing met | Manual / phase 3 |
 | `lint` (ours) | L0 checks, generated-file freshness | Every push |
 | `unit` (ours) | L1 + L2 short seeds + L4 + L6 under Verilator; the same suites under Icarus (L-XSIM); `SIM_ASSERT` on | Every push |
 | `formal` (ours) | L5 proofs; L5b for shipped programs; L8-EQY on the Yosys netlist | Push to `src/` or `spec/` |

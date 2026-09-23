@@ -106,7 +106,8 @@ Credit both in `macro/README.md`.
 | `gds` → `gl_test` | Template | After `gds` | Pin-level suite passes on the netlist |
 | `gds` → `viewer` | Template | After `gds` | 3D viewer deployed to GitHub Pages |
 | `docs` | Template | Every push | `info.yaml` valid, `docs/info.md` builds |
-| `fpga` | Template (manual; `branches: none`) | Manual dispatch | iCE40UP5K bitstream builds (§8) |
+| `fpga` | Template (manual; `branches: none`) | Manual dispatch | iCE40UP5K bitstream builds. Informational only; does not gate phases (D-022) |
+| `fpga_basys3` (or local Vivado script) | Ours (phase 3, D-022) | Manual / see §8 | Full-design Artix-7 bitstream builds with timing met (§8) |
 | `lint`, `unit`, `formal`, `nightly` | Ours (separate files) | See `VERIFICATION.md` §10 | Their checks pass |
 
 **Rules:**
@@ -128,14 +129,17 @@ Credit both in `macro/README.md`.
 ---
 
 ## 8. FPGA build (`fpga` workflow)
-- The template's action builds the project for an iCE40UP5K (the Tiny Tapeout "ASIC simulator" board).
-  - The UP5K has ~5.3K LUT4s, 30 × 4 Kbit block RAMs and 1 Mbit of single-port RAM.
-  - The full TRIPWIRE build will likely not fit.
+- **Target: Digilent Basys 3** (Artix-7 XC7A35T: 20,800 LUT6, 41,600 flops, 1,800 Kbit block RAM, 100 MHz oscillator, 4 Pmod ports), running the **full** design (DECISIONS D-022).
+- The template's action builds for an iCE40UP5K (~5.3K LUT4s), which the full design will very likely not fit. That workflow is left untouched but no longer gates any phase. The earlier reduced iCE40 build (1 lane, 8 slots, 2 pin units) is dropped: it could not run I2C.
+- **FPGA-only differences**, behind one synthesis define (the ASIC build is unchanged):
+  - slot latches (`trw_slots.v`) become flops;
+  - the `trw_sram` wrapper maps to block RAM;
+  - 50 MHz comes from the 100 MHz oscillator through an MMCM.
 - **Plan (phase 3):**
-  1. Add a synthesis-time parameter set for a **reduced build**: 1 lane, 8 slots, 2 pin units, SRAM mapped to FPGA RAM.
-  2. Check whether the template's action can select it. If it cannot, add our own `fpga_reduced` workflow (Yosys + nextpnr-ice40 with a define), and record the decision.
-  3. Goal: a bitstream builds in CI.
-- A physical board is only needed in the optional hardware phase.
+  1. Add the FPGA define and a Basys 3 constraints file (clock, Pmod pin map).
+  2. Build path: our own `fpga_basys3` workflow (openXC7, open source) if it handles the design; otherwise a local Vivado script, with its utilisation and timing report committed to `docs/reports/`. Record the choice in D-022.
+  3. Goal: a full-design bitstream builds with timing met at 50 MHz.
+- The board itself is used in the optional hardware phase (7A).
 
 ---
 

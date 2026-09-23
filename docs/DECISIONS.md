@@ -259,6 +259,36 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - Hardcaml RTL: rejected, the RTL, flow and tests are already Verilog.
 - **Status:** accepted (team request, 2026-09-23). H0 is not yet run.
 
+## D-022 (2026-09-23): FPGA target is a Basys 3 running the full design; the reduced iCE40 build is dropped
+- **Decision:**
+  - The FPGA target for the build check (phase 3) and for hardware validation (phase 7A) is a **Digilent Basys 3** (Xilinx Artix-7 XC7A35T), running the **full** design: 3 lanes, 12 slots, 6 pin units.
+  - The reduced iCE40UP5K build (1 lane, 8 slots, 2 pin units; PHYSICAL_DESIGN_AND_CI §8, phase 3 items 8–9) is dropped.
+- **Reason:**
+  - The team has easy access to a Basys 3, so there is no board to buy.
+  - The reduced build was specified before the programs existed and cannot run most of them:
+    - 8 slots excludes the I2C controller (11), I2C target (12), PS/2 (12), SWD (12) and 1-Wire (9);
+    - 2 pin units excludes the SPI controller and JTAG (4 each).
+    
+    It could not have exercised I2C, a required protocol.
+  - The XC7A35T (20,800 LUT6, 41,600 flops, 1,800 Kbit block RAM) should hold the full design. The UP5K (5,280 LUT4) very likely cannot. Both are estimates until the phase 2 RTL is synthesized.
+  - Testing the design we tape out is stronger evidence than testing a cut-down copy.
+- **FPGA-only differences** (behind a synthesis define; the ASIC build is unchanged):
+  - the slot latches in `trw_slots.v` become flops;
+  - the SRAM wrapper maps to block RAM;
+  - 50 MHz comes from the board's 100 MHz oscillator through an MMCM.
+- **CI:**
+  - The template's `fpga` workflow (iCE40UP5K, manual dispatch) is left untouched (CLAUDE.md) but **no longer gates any phase**. It is expected to fail once the full design outgrows the UP5K.
+  - Its place in the phase 3 and phase 4 exit checklists is taken by a full-design Artix-7 build. There are two ways to run it:
+    - our own `fpga_basys3` workflow, using an open-source Artix-7 flow (openXC7);
+    - a local Vivado build script whose utilisation and timing report goes in `docs/reports/`.
+    
+    The choice is open until phase 3 and will be recorded here.
+- **Cost:**
+  - one synthesis define and a Basys 3 constraints file;
+  - a build path outside the template (Vivado is large and awkward on GitHub Actions; openXC7 is less mature).
+- **Honesty:** FPGA results are labelled "tested on FPGA (Basys 3)", never silicon; the clock source and the latch-to-flop change are stated with them.
+- **Status:** board choice accepted (Kanishk, 2026-09-23). CI mechanism open.
+
 ---
 
 ## Open questions for the phase 1 spec freeze

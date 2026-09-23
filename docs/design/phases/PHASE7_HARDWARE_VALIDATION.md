@@ -21,7 +21,7 @@ Use the same programs, the same `tools/host` API and the same sigrok decoders as
 
 | Item | Needed for | Rough cost | Notes |
 |---|---|---|---|
-| iCE40UP5K board (e.g. iCEBreaker) | 7A | ~$70–100 | Matches the `fpga` workflow's target; runs the reduced build |
+| Digilent Basys 3 (Artix-7 XC7A35T) | 7A | Team has access | Runs the full design (D-022); peers connect through the Pmod ports |
 | Raspberry Pi Pico (or similar) | 7A host bridge | ~$5 | Speaks the host SPI protocol; MicroPython or C |
 | USB logic analyzer (8 ch, ≥ 24 MS/s, sigrok-supported) | 7A, 7B | ~$10–20 | Captures pins for sigrok decoding |
 | 24C02 EEPROM, W25Qxx SPI flash | 7A | ~$5 | Real I2C/SPI peers |
@@ -35,7 +35,7 @@ Use the same programs, the same `tools/host` API and the same sigrok decoders as
 ## 3. Tasks
 
 ### 7A: pre-silicon, on FPGA
-1. Build the reduced bitstream from the `fpga` workflow artefact; pin constraints for the chosen board.
+1. Build the full-design Basys 3 bitstream (phase 3 item 9); Pmod pin constraints for the peers.
 2. Host bridge firmware on the Pico; the `tools/host` transport for it.
 3. Board-level loopback first: UART TX → RX on the same FPGA, checked with the logic analyzer + sigrok.
 4. Interop matrix, one row at a time:
@@ -50,7 +50,7 @@ Use the same programs, the same `tools/host` API and the same sigrok decoders as
 | WS2812 | TX | LED strip | Visual + capture |
 | CAN | Node | 2 × MCP2515 | sigrok `can`; peers' error counters stay 0 |
 
-5. Note FPGA-specific differences (the reduced build, the clock source) in the report, so FPGA results are not confused with silicon results.
+5. Note FPGA-specific differences (slot latches as flops, SRAM in block RAM, the MMCM clock) in the report, so FPGA results are not confused with silicon results.
 
 ### 7B: post-silicon, on the chip
 6. Power-up and ID read over the host port.
@@ -59,10 +59,10 @@ Use the same programs, the same `tools/host` API and the same sigrok decoders as
 
 ## 4. Phase exit checklist
 **7A:**
-- [ ] Reduced bitstream running on the board; host bridge working; the ID register reads correctly.
+- [ ] Full-design bitstream running on the Basys 3; host bridge working; the ID register reads correctly.
 - [ ] Board loopback UART verified with sigrok.
 - [ ] At least UART, SPI controller, I2C controller and I2C target interoperate with real parts, each with a saved capture.
-- [ ] Results added to `CLAIMS.md` as "tested on FPGA with real parts" (distinct from silicon).
+- [ ] Results added to `CLAIMS.md` as "tested on FPGA (Basys 3) with real parts" (distinct from silicon).
 
 **7B:**
 - [ ] Chip ID read; all lanes run.
@@ -73,5 +73,5 @@ Use the same programs, the same `tools/host` API and the same sigrok decoders as
 ## 5. Risks
 | Risk | Response |
 |---|---|
-| The reduced FPGA build differs from the chip | Label FPGA evidence clearly; never present it as silicon |
+| The FPGA build differs from the chip (flops for latches, block RAM, clocking) | Label FPGA evidence clearly; never present it as silicon |
 | Level/voltage mismatches with peers | Check each peer's I/O voltage; use level shifters where needed |

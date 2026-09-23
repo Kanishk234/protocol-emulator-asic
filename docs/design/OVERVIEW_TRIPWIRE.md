@@ -99,7 +99,7 @@ Honesty labels:
 | Clock | 50 MHz sign-off default; pads specified to ~66 MHz with up to ~10 ns insertion delay | Tiny Tapeout docs, via Loom's facts file |
 | Pins | `ui_in[7:0]` in, `uo_out[7:0]` out, `uio[7:0]` bidirectional (with `uio_oe`), plus `clk`, `rst_n`, `ena` | Template `project.v` |
 | SRAM | IHP macros such as 512x16 (45.3K µm²) and 1024x16 (79.7K µm²); integrated on cmos5l by Loom | Loom `docs/tt_cmos5l_facts.md` |
-| CI | Workflows `test`, `gds` (gds + precheck + gl_test + viewer → GitHub Pages), `docs`, `fpga` (manual, iCE40UP5K bitstream) | Template |
+| CI | Workflows `test`, `gds` (gds + precheck + gl_test + viewer → GitHub Pages), `docs`, `fpga` (manual, iCE40UP5K bitstream; informational since D-022) | Template |
 | CI limit | A 6x4 hardening takes ~4–5 h; GitHub kills jobs at 6 h; routing time grows sharply with congestion | Loom `docs/AREA.md` |
 | Lab hardware | **None available.** Everything is verified in simulation; the FPGA workflow only builds a bitstream | Team constraint |
 
@@ -304,7 +304,7 @@ Reference: Loom's README (checked 2026-09-23) reports 78.8% utilisation on 6x4 w
 | `gds` → `gl_test` | The same tests pass on the netlist (no X after reset, no `initial` dependence) | P2 onward |
 | `gds` → `viewer` | Repo Settings → Pages → Source = **GitHub Actions**; the gds job passed | P0 (enable), P4 |
 | `docs` | `info.yaml` valid, `docs/info.md` filled in | P0 (placeholder), P5 (final) |
-| `fpga` (manual) | iCE40UP5K bitstream builds; needs an FPGA build parameter (fewer lanes/slots, SRAM mapped to FPGA block RAM) | P3 |
+| Basys 3 build (D-022) | Full-design Artix-7 bitstream builds with timing met; FPGA define (latches → flops, SRAM → block RAM). The template's iCE40 `fpga` workflow is informational | P3 |
 
 **Rules for CI:**
 - Only run `gds` when `src/`, `info.yaml` or `macro/` changes.

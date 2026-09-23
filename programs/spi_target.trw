@@ -1,0 +1,21 @@
+# SPI target, mode 0, MSB first: TRIPWIRE as the peripheral. 3 slots, 2 pin units.
+#   MOSI = ui0, SCK = ui1, CS = ui2, MISO = uio0 (driven only while selected).
+#   Host: HOST_IN bytes are sent on MISO; HOST_OUT gets MOSI bytes framed by CS events
+#   (EVENT data[15] = 0 at select, 1 at deselect).
+program spi_target
+param MISO_EDGE = "rise"                # MISO moves after the SCK rise (12.5 MHz max) or "fall" (8.33 MHz)
+const LEN8 = 0x7000
+
+pin U0: pin_a=ui0 pin_b=ui1 pin_c=ui2 c_active=0 order=msb rxmode=linked_rx rx_edge=rise rx_nbits=8 ev_pin=c ev_edge=both
+pin U1: pin_a=uio0 pin_b=ui1 pin_c=ui2 c_active=0 order=msb txmode=shift tx_edge=MISO_EDGE tx_preload=true tx_lentok=true c_oe=true idle=1
+own uio0 U1
+connect L0.I0 <- U0.rx
+connect L0.I1 <- HOST_IN
+connect U1.tx <- L0.O0
+connect HOST_OUT <- L0.O1
+
+lane L0:
+    K0 = LEN8
+    slot: when I0 is EVENT      do MOV O1 <- I0, deq, keep      # CS markers to the host
+    slot: when I0 is DATA       do MOV O1 <- I0, deq            # MOSI byte to the host
+    slot:                       do OR O0 <- I1, K0, deq         # next MISO byte (8-bit token)

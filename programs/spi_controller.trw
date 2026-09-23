@@ -1,0 +1,29 @@
+# SPI controller, mode 0, MSB first. 4 slots, 4 pin units.
+#   SCK = uo0, MOSI = uo1, CS = uo2, MISO = ui0.
+#   Host: EVENT data[0] = CS level; DATA byte = transfer it (the MISO byte comes back on HOST_OUT).
+program spi_controller
+param PERIOD = 10                       # SCK period in clocks (10 = 5 MHz)
+const CLK8 = 0x3008
+
+pin U0: pin_a=uo0 txmode=clkgen period=PERIOD idle=0                                        # SCK
+pin U1: pin_a=uo1 pin_b=uo0 txmode=shift tx_edge=fall tx_preload=true nbits=8 order=msb idle=0   # MOSI
+pin U2: pin_a=ui0 pin_b=uo0 rxmode=linked_rx rx_edge=rise rx_nbits=8 order=msb                    # MISO
+pin U3: pin_a=uo2 txmode=level idle=1                                                       # CS
+own uo0 U0
+own uo1 U1
+own uo2 U3
+# one lane output multicast to three pin units; each port keeps only its kind of token
+connect U0.tx <- L0.O0 accept=CTRL
+connect U1.tx <- L0.O0 accept=DATA
+connect U3.tx <- L0.O0 accept=EVENT
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U2.rx
+connect HOST_OUT <- L0.O1
+
+lane L0:
+    K0 = CLK8
+    states IDLE CLK WAITRX
+    slot: when IDLE, I0 is DATA          do MOV O0 <- I0, deq, keep          then CLK       # MOSI byte
+    slot: when CLK                       do MOVB O0 <- zero, K0, tag CTRL    then WAITRX    # 8 clocks
+    slot: when WAITRX, I1 is DATA        do MOV O1 <- I1, deq                then IDLE      # MISO byte
+    slot: when IDLE, I0 is EVENT         do MOV O0 <- I0, deq, keep                         # CS level

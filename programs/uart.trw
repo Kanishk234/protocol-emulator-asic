@@ -1,0 +1,26 @@
+# UART, 8N1, both directions in one lane. 4 slots, 2 pin units.
+#   TX = uo0, RX = ui0. Host: HOST_IN bytes are sent; HOST_OUT gets received bytes (DATA)
+#   or, for a frame with a bad start/stop bit, the raw 10-bit frame tagged ERR.
+program uart
+param BAUD = 115200
+const PERIOD = 50000000 / BAUD          # bit period in clocks (fractional)
+
+pin U0: pin_a=uo0 txmode=shift nbits=10 period=PERIOD idle=1        # TX: raw 10-bit frames, LSB first
+pin U1: pin_a=ui0 rxmode=shift_rx nbits=10 period=PERIOD idle=1     # RX: start, 8 data, stop
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U1.rx
+connect U0.tx <- L0.O0
+connect HOST_OUT <- L0.O1
+
+lane L0:
+    K0 = 0x201                          # frame check mask: start and stop bits
+    K1 = 0x200                          # expected: start 0, stop 1
+    r1 = 0x200                          # the stop bit, OR-ed in by SHOR
+    states RX CHK
+    # TX: frame = stop | byte << 1 | start(0), in one action
+    slot: when I0 is DATA               do SHOR O0 <- I0, f=0x11, deq
+    # RX: check framing, then pass the data bits on (or report the frame)
+    slot: when RX, I1 is DATA           do CMPM none <- I1, mask K0 val K1 -> f0       then CHK
+    slot: when CHK, f0 == 1             do EXT O1 <- I1, f=0x71, deq                   then RX
+    slot: when CHK, f0 == 0             do MOV O1 <- I1, tag ERR, deq                  then RX

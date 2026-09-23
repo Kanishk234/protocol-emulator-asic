@@ -1,0 +1,38 @@
+# I2C target, read and write: address match, ACK/NACK, bytes to and from the host. 12 slots.
+#   SDA = uio0, SCL = uio1. Host: HOST_IN = bytes to send on reads, HOST_OUT = bytes received.
+#   No clock stretching: read data must be waiting in HOST_IN.
+program i2c_target
+param ADDR = 0x50
+const LEN8 = 0x7000                     # TX length-in-token: 8 bits
+
+# one pin unit: LINKED_RX on SCL rise (8 + 1 bit framing, our own echoes dropped),
+# START/STOP events on SDA while SCL is high, TX shifts on SCL fall, open drain
+pin U0: pin_a=uio0 pin_b=uio1 order=msb od=true idle=1 rxmode=linked_rx rx_edge=rise rx_nbits=8 rx_nbits2=1 rx_echo=false ev_edge=both ev_qual=1 ev_reset=true txmode=shift tx_edge=fall tx_lentok=true
+own uio0 U0
+connect L0.I0 <- U0.rx
+connect L0.I1 <- HOST_IN
+connect U0.tx <- L0.O0
+connect HOST_OUT <- L0.O1
+
+lane L0:
+    K0 = 0x00FE                         # address bits (R/W masked off)
+    K1 = ADDR << 1
+    K2 = LEN8
+    states IDLE ADDR ACKQ RW XFER FWD RT
+    # START (SDA fell) and STOP (SDA rose) from any state
+    slot urgent: when I0 is EVENT, head15 == 0         do MOV none <- I0, deq                    then ADDR
+    slot urgent: when I0 is EVENT, head15 == 1         do MOV none <- I0, deq                    then IDLE
+    # address byte: ours? keep the byte for its R/W bit
+    slot urgent: when ADDR, I0 is DATA                 do CMPM none <- I0, mask K0 val K1 -> f0  then ACKQ
+    slot urgent: when ACKQ, f0 == 1                    do MOVB O0 <- I0, 0                       then RW
+    slot urgent: when ACKQ, f0 == 0                    do MOV none <- I0, deq                    then IDLE
+    slot urgent: when RW                               do AND none <- I0, 1, deq -> f1           then XFER
+    # write: ACK first (a 1-bit 0), then forward the byte to the host
+    slot urgent: when XFER, f1 == 1, I0 is DATA        do MOVB O0 <- I0, 0                       then FWD
+    slot:        when FWD                              do MOV O1 <- I0, deq                      then XFER
+    # read: send the next host byte; SDA is released for the controller's ACK
+    slot urgent: when XFER, f1 == 0                    do OR O0 <- I1, K2, deq                   then RT
+    slot urgent: when RT, I0 is DATA, head0 == 0       do MOV none <- I0, deq                    then XFER
+    slot urgent: when RT, I0 is DATA, head0 == 1       do MOV none <- I0, deq                    then IDLE
+    # not addressed: ignore the bus until the next START
+    slot:        when IDLE, I0 is DATA                 do MOV none <- I0, deq

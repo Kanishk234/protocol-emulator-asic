@@ -87,7 +87,7 @@ docs/BUGS.md  docs/DECISIONS.md  docs/CLAIMS.md  docs/WORKLOG.md
 - [x] Repo public; top module is `tt_um_tripwire`; `info.yaml` says `tiles: "6x4"`, 50 MHz. *(Evidence: GitHub API `private: false` for Kanishk234/protocol-emulator-asic; `info.yaml` and `src/tt_um_tripwire.v` at 0786358.)*
 - [x] `test` workflow green on the trivial design. *(Evidence: run 35821375912 on 0786358, and every push since.)*
 - [x] `docs` workflow green. *(Evidence: run 35822749773 on bff60b5, 2026-09-23.)*
-- [ ] `gds` workflow: `gds`, `precheck`, `gl_test` and `viewer` all green.
+- [x] `gds` workflow: `gds`, `precheck`, `gl_test` and `viewer` all green. *(Evidence: run 35824649426 on 9bd6f7d, manual dispatch, 2026-09-23: gds 30.3 min, precheck 12.7 min, gl_test 0.6 min, viewer 0.2 min.)*
 - [x] **GitHub Pages shows the GDS viewer** at the repo's Pages URL. *(Evidence: https://kanishk234.github.io/protocol-emulator-asic/ serves the TT 3D viewer; deployed by `viewer` in gds run 35821375890, 2026-09-23.)*
 - [x] `fpga` workflow has been run once manually; result recorded (green, or the reason it isn't). *(Evidence: run 35823310537 on 9fdcf93, green, 2026-09-23.)*
 - [x] gds trigger `paths` filter in place: a docs-only push does **not** start a hardening. *(Evidence: the push ending at bff60b5 touched only `docs/` and `scripts/`; it ran `test` 35822749744 and `docs` 35822749773, and no `gds` run. The running `gds` 35821375890 was not cancelled.)*

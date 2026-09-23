@@ -1,0 +1,120 @@
+# TRIPWIRE encodings: the single source (CLAUDE.md "One source for encodings").
+#
+# Everything that has a bit position or a code lives here. tools/gen/gen.py generates:
+#   - tools/tripwire_spec.py      Python tables (tripsim now, tripc later)
+#   - src/trw_defs.vh             Verilog `define constants (RTL, phase 2)
+#   - tables in docs/design/ISA.md and ARCHITECTURE.md (between GENERATED markers)
+# Never edit generated files; edit this file and run `python tools/gen/gen.py`.
+# CI (lint workflow) regenerates and fails on any difference.
+#
+# Status: DRAFT, not frozen. Contents match DECISIONS D-007 ... D-016. The phase 1 spec
+# freeze changes `status` to frozen; after that, every change needs a DECISIONS entry.
+
+version: 0.1
+status: draft
+
+token:
+  data_bits: 16
+  tag_bits: 2
+  tags:
+    - {code: 0, name: DATA,  desc: "payload bytes/words"}
+    - {code: 1, name: CTRL,  desc: "commands to pin units and helpers: data[15:12] = op, data[11:0] = argument"}
+    - {code: 2, name: EVENT, desc: "things that happened; from pin units data[15] = new pin level, data[14:0] = time"}
+    - {code: 3, name: ERR,   desc: "error reports (framing error, overrun, NACK, arbitration lost)"}
+
+# Shared operation table (ISA.md §3): the same 4-bit OP in reflex slots and routine ALU words.
+ops:
+  - {code: 0,  name: MOV,   d: "A",                               r: "d == 0", use: "Forwarding tokens, loading registers"}
+  - {code: 1,  name: ADD,   d: "A + B",                           r: "d == 0", use: "Counters, pointers"}
+  - {code: 2,  name: SUB,   d: "A − B",                           r: "d == 0", use: "Count-down with zero test in one action"}
+  - {code: 3,  name: AND,   d: "A & B",                           r: "d == 0", use: "Masking; bit test"}
+  - {code: 4,  name: OR,    d: "A \\| B",                         r: "d == 0", use: "Setting bits; placing constants (`zero \\| K`)"}
+  - {code: 5,  name: XOR,   d: "A ^ B",                           r: "d == 0", use: "Equality test; arbitration readback"}
+  - {code: 6,  name: SHL,   d: "A << B[3:0]",                     r: "d == 0", use: ""}
+  - {code: 7,  name: SHR,   d: "A >> B[3:0]",                     r: "d == 0", use: ""}
+  - {code: 8,  name: SHOR,  d: "(A << F[3:0]) \\| r[F[5:4]]",     r: "d == 0", use: "Frame building (start/stop/ACK bits) in one action"}
+  - {code: 9,  name: EXT,   d: "(A >> F[3:0]) & mask(F[7:4] + 1)", r: "d == 0", use: "Pull a field out of a frame"}
+  - {code: 10, name: CMPM,  d: "A (pass-through)",                r: "(A & M) == V; M, V = K[F[1:0]], K[F[3:2]] if F[4] else r[F[1:0]], r[F[3:2]]", use: "Address match, multi-bit checks"}
+  - {code: 11, name: LTU,   d: "A (pass-through)",                r: "A < B (unsigned)", use: "Bounds: buffer ends, EEPROM wrap"}
+  - {code: 12, name: PAR,   d: "A (pass-through)",                r: "XOR-reduce(A)", use: "Parity check while forwarding"}
+  - {code: 13, name: MKCTL, d: "{F[7:4], A[11:0]}, tag CTRL",      r: "d == 0", use: "Pin command with a register argument"}
+  - {code: 14, name: CALL,  d: "—",                               r: "—",      use: "Start routine F[4:0] (reflex only); implicit RB == 0"}
+  - {code: 15, name: MOVB,  d: "B",                               r: "d == 0", use: "React to an input with a constant (D-009)"}
+
+# Reflex slot (ISA.md §4.1). Host view: 4 × 16-bit words, w0 = bits [15:0] ...
+slot:
+  bits: 53
+  host_words: 4
+  fields:
+    - {name: V,    lsb: 0,  width: 1, group: condition, desc: "slot valid"}
+    - {name: U,    lsb: 1,  width: 1, group: condition, desc: "urgent: pre-empts a waiting routine step"}
+    - {name: SE,   lsb: 2,  width: 1, group: condition, desc: "STATE-match enable"}
+    - {name: SV,   lsb: 3,  width: 4, group: condition, desc: "required STATE"}
+    - {name: FM,   lsb: 7,  width: 4, group: condition, desc: "flag mask over f3..f0 (f3 = RB)"}
+    - {name: FV,   lsb: 11, width: 4, group: condition, desc: "required flag values"}
+    - {name: TE,   lsb: 15, width: 1, group: condition, desc: "tag match on the A input's head"}
+    - {name: TAG,  lsb: 16, width: 2, group: condition, desc: "required tag"}
+    - {name: HE,   lsb: 18, width: 1, group: condition, desc: "head-bit match enable"}
+    - {name: HV,   lsb: 19, width: 1, group: condition, desc: "required head bit"}
+    - {name: OP,   lsb: 20, width: 4, group: action,    desc: "operation (ops table)"}
+    - {name: DST,  lsb: 24, width: 3, group: action,    desc: "destination (enum DST)"}
+    - {name: ASRC, lsb: 27, width: 3, group: action,    desc: "A source (enum ASRC)"}
+    - {name: DQ,   lsb: 30, width: 1, group: action,    desc: "dequeue the A input (only if ASRC is I0/I1)"}
+    - {name: BSEL, lsb: 31, width: 2, group: action,    desc: "B source (enum BSEL)"}
+    - {name: IMM,  lsb: 33, width: 8, group: action,    desc: "8-bit immediate; also the field operand F"}
+    - {name: NSE,  lsb: 41, width: 1, group: action,    desc: "next-STATE enable (static update)"}
+    - {name: NS,   lsb: 42, width: 4, group: action,    desc: "next STATE"}
+    - {name: DFE,  lsb: 46, width: 1, group: action,    desc: "write the flag result R"}
+    - {name: DF,   lsb: 47, width: 2, group: action,    desc: "which flag: 0-2 = f0-f2, 3 = none"}
+    - {name: OT,   lsb: 49, width: 2, group: action,    desc: "output tag (DST O0/O1; ignored for MKCTL and when KT)"}
+    - {name: KT,   lsb: 51, width: 1, group: action,    desc: "keep the A input head's tag on the output"}
+    - {name: HS,   lsb: 52, width: 1, group: condition, desc: "head-bit select for HE/HV: 0 = data[15], 1 = data[0]"}
+  enums:
+    DST:  {r0: 0, r1: 1, r2: 2, r3: 3, O0: 4, O1: 5, none: 6}
+    ASRC: {r0: 0, r1: 1, r2: 2, r3: 3, I0: 4, I1: 5, zero: 6, time: 7}
+    BSEL: {reg: 0, imm: 1, k: 2}
+
+# Routine words (ISA.md §5.1): 16 bits. Bit 15 selects ALU (0) or CTRL (1).
+routine:
+  bits: 16
+  alu:
+    select: 0
+    fields: {op: [14, 11], rd: [10, 9], ra: [8, 7], bs: [6, 6], b: [5, 0]}
+  ctrl:
+    select: 1
+    sub: [14, 12]
+    formats:
+      - {name: LDI,  code: 0, fields: {rd: [11, 10], imm: [9, 0]},             desc: "rd := zext(imm10)"}
+      - {name: LDIH, code: 1, fields: {rd: [11, 10], imm: [9, 0]},             desc: "rd := {imm[5:0], rd[9:0]}"}
+      - {name: BR,   code: 2, fields: {cond: [11, 9], "off": [8, 0]},            desc: "branch if cond (enum BR_COND); off signed, from the next word", signed: ["off"]}
+      - {name: DJNZ, code: 3, fields: {rd: [11, 10], "off": [9, 0]},             desc: "rd := rd - 1; branch if rd != 0; off signed", signed: ["off"]}
+      - {name: LD,   code: 4, fields: {rd: [11, 10], ra: [9, 8], "off": [7, 0]}, desc: "rd := SRAM[r[ra] + off]"}
+      - {name: ST,   code: 5, fields: {rd: [11, 10], ra: [9, 8], "off": [7, 0]}, desc: "SRAM[r[ra] + off] := rd"}
+      - {name: OUT,  code: 6, fields: {port: [11, 11], tag: [10, 9], ra: [8, 7]}, desc: "enqueue r[ra] with tag on O0/O1; waits while full"}
+      - {name: SYS,  code: 7, fields: {fn: [11, 8], arg: [7, 0]},            desc: "system op (enum SYS)"}
+  enums:
+    BR_COND: {always: 0, rz: 1, nrz: 2}
+    SYS: {NOP: 0, RET: 1, SETST: 2, SETF: 3, CLRF: 4, TSTF: 5, CPYF: 6, GETT: 7, GETK: 8}
+  sys_desc:
+    NOP: "no operation"
+    RET: "return: RB := 0"
+    SETST: "STATE := arg[3:0]"
+    SETF: "f[arg[1:0]] := 1"
+    CLRF: "f[arg[1:0]] := 0"
+    TSTF: "RZ := f[arg[1:0]]"
+    CPYF: "f[arg[1:0]] := RZ"
+    GETT: "r[arg[1:0]] := time"
+    GETK: "r[arg[1:0]] := K[arg[3:2]]"
+
+# CTRL tokens to pin-unit TX halves (ARCHITECTURE.md §7.3): data[15:12] = code, data[11:0] = arg.
+pin_commands:
+  - {code: 1, name: LEVEL, arg: "[11] v, [10:0] delay (ticks)", desc: "drive v at cursor + delay (LATE if already past and delay > 0)"}
+  - {code: 2, name: OE,    arg: "[11] oe, [10:0] delay",        desc: "change output enable at cursor + delay"}
+  - {code: 3, name: CLK,   arg: "[7:0] n",                      desc: "CLKGEN: n periods, each IDLE half then ACTIVE half; STRETCH waits for the line"}
+  - {code: 4, name: GAP,   arg: "[11:0] ticks",                 desc: "advance the cursor (idle spacing)"}
+  - {code: 5, name: SYNC,  arg: "none",                         desc: "cursor := earliest (re-anchor to the present)"}
+  - {code: 6, name: SETN,  arg: "[4:0] n",                      desc: "NBITS for the following DATA tokens (1..16)"}
+  - {code: 7, name: WAIT,  arg: "[0] edge (1 = rise)",          desc: "take no tokens until pin B shows the edge; cursor := that edge"}
+
+# DATA to a TX half with TX_LENTOK (D-013): data[15:12] = nbits - 1, payload data[11:0].
+tx_lentok: {len: [15, 12], payload: [11, 0]}

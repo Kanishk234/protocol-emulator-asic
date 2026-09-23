@@ -23,6 +23,7 @@ logs/
 results.xml
 __pycache__/
 .pytest_cache/
+.hypothesis/
 # SymbiYosys work directories (the .sby files and props/ stay tracked)
 formal/*/
 !formal/props/

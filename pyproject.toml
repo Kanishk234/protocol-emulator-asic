@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+# Python tool tests (tripsim, later tripc/gen). The cocotb suites in test/ and
+# test_internal/ run through their Makefiles, not through pytest.
+pythonpath = ["tools"]
+testpaths = ["tools"]

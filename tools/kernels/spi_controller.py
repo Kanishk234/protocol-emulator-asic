@@ -34,18 +34,17 @@ def slots():
 def load(chip, period, lane=0, sck=0, mosi=1, cs=2, miso=0, units=(0, 1, 2, 3)):
     """period: SCK period in clocks (>= 2)."""
     u_sck, u_mosi, u_miso, u_cs = units
-    chip.pin_config(u_sck, pin_a=PAD_UO + sck, txmode="clkgen", period=period, idle=0,
-                    tx_accept=1 << TAG_CTRL)
+    chip.pin_config(u_sck, pin_a=PAD_UO + sck, txmode="clkgen", period=period, idle=0)
     chip.pin_config(u_mosi, pin_a=PAD_UO + mosi, pin_b=PAD_UO + sck, txmode="shift",
-                    tx_edge="fall", tx_preload=True, nbits=8, order="msb", idle=0,
-                    tx_accept=1 << TAG_DATA)
-    chip.pin_config(u_cs, pin_a=PAD_UO + cs, txmode="level", idle=1, tx_accept=1 << TAG_EVENT)
+                    tx_edge="fall", tx_preload=True, nbits=8, order="msb", idle=0)
+    chip.pin_config(u_cs, pin_a=PAD_UO + cs, txmode="level", idle=1)
     chip.pin_config(u_miso, pin_a=PAD_UI + miso, pin_b=PAD_UO + sck, rxmode="linked_rx",
                     rx_edge="rise", rx_nbits=8, order="msb")
     for pad, unit in ((sck, u_sck), (mosi, u_mosi), (cs, u_cs)):
         chip.own(PAD_UO + pad, unit)
-    for unit in (u_sck, u_mosi, u_cs):
-        chip.connect(f"U{unit}.tx", f"L{lane}.O0")          # multicast, blocking
+    # one lane output multicast to three pin units; each port keeps only its tag (D-015)
+    for unit, tag in ((u_sck, TAG_CTRL), (u_mosi, TAG_DATA), (u_cs, TAG_EVENT)):
+        chip.connect(f"U{unit}.tx", f"L{lane}.O0", accept=1 << tag)
     chip.connect(f"L{lane}.I0", "HOST_IN")
     chip.connect(f"L{lane}.I1", f"U{u_miso}.rx")
     chip.connect("HOST_OUT", f"L{lane}.O1")

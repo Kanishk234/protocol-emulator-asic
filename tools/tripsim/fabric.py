@@ -47,12 +47,21 @@ class ConsumerPort:
         self.blocking = 1
         self.last_seq = 0
         self.dropped = 0
+        self.accept = 0xF       # tag mask (D-015): other tags are dropped at the port
+        self.filtered = 0
         self._take = False
         self.takes = 0
 
-    def avail(self) -> bool:
+    def _pending(self) -> bool:
         s = self.src
         return bool(self.en and s is not None and s.valid and self.last_seq != s.seq)
+
+    def avail(self) -> bool:
+        return self._pending() and bool((self.accept >> self.src.tag) & 1)
+
+    def filtered_pending(self) -> bool:
+        """A token this port does not accept is waiting: the fabric drops it (§14 F7)."""
+        return self._pending() and not (self.accept >> self.src.tag) & 1
 
     def head(self):
         """(tag, data) of the available token."""
@@ -78,9 +87,12 @@ class Fabric:
         c = self.ports[name] = ConsumerPort(name)
         return c
 
-    def connect(self, port_name, producer_name, mode="blocking"):
-        """Host configuration (only while the affected blocks are halted)."""
+    def connect(self, port_name, producer_name, mode="blocking", accept=0xF):
+        """Host configuration (only while the affected blocks are halted).
+
+        accept: tag mask; tokens with other tags are dropped at this port (D-015)."""
         port, prod = self.ports[port_name], self.producers[producer_name]
+        port.accept = accept
         if self.legal is not None and producer_name not in self.legal.get(port_name, ()):
             raise ValueError(f"{producer_name} is not a legal source for {port_name}")
         if port.src is not None:
@@ -98,6 +110,9 @@ class Fabric:
                 if c._take:
                     c.last_seq = p.seq
                     c.takes += 1
+                elif c.filtered_pending():
+                    c.last_seq = p.seq          # §14 F7: not for this port; dropped, never blocks
+                    c.filtered += 1
                 elif new is not None and not c.blocking and c.avail():
                     # A drop counts as a take (BUGS #2): with a 1-bit seq, a tap that
                     # missed two tokens would otherwise alias and lose the new one.

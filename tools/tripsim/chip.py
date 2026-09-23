@@ -63,8 +63,8 @@ class Chip:
         self.observers = []
 
     # ------------------------------------------------------------ host API
-    def connect(self, port, producer, mode="blocking"):
-        self.fabric.connect(port, producer, mode)
+    def connect(self, port, producer, mode="blocking", accept=0xF):
+        self.fabric.connect(port, producer, mode, accept)
 
     def pin_config(self, unit, **cfg):
         for key in ("pin_a", "pin_b", "pin_c"):
@@ -144,9 +144,9 @@ class Chip:
         if rot < len(self.lanes) and self.lanes[rot].running:
             self.lanes[rot].mem_access(self.sram)
         for u in self.pins:
-            b = self.synced(u.cfg.pin_b)
-            u.compute_rx(now, self.synced(u.cfg.pin_a), b, self.synced(u.cfg.pin_c))
-            u.compute_tx(now, b)
+            a, b = self.synced(u.cfg.pin_a), self.synced(u.cfg.pin_b)
+            u.compute_rx(now, a, b, self.synced(u.cfg.pin_c))
+            u.compute_tx(now, b, a)
         hin = self.fabric.producers["HOST_IN"]
         if self.host_in and hin.free():
             hin.load(*self.host_in.popleft())

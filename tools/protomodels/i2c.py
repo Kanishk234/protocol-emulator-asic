@@ -12,6 +12,86 @@ x2 (data sampled in the middle), SCL low.
 """
 
 
+class I2CTarget:
+    """Reference I2C target: 7-bit address, write bytes stored, read bytes served.
+
+    From UM10204:
+    - SDA is sampled on SCL rising edges, and changed only after SCL falls.
+    - The receiver ACKs a byte by pulling SDA low for the 9th clock.
+    - A transmitting target releases SDA for the controller's ACK/NACK.
+    - Clock stretching: holding SCL low after the ACK clock (`stretch` clocks, 0 = none).
+    Clock-level: step(scl_bus, sda_bus) -> (scl_release, sda_release).
+    """
+
+    def __init__(self, addr, read_data=(), stretch=0):
+        self.addr = addr
+        self.read_data = list(read_data)
+        self.stretch = stretch
+        self.received = []
+        self.log = []                 # ("START",) ("STOP",) ("ADDR", byte, acked)
+        self.state = "idle"
+        self._prev = (1, 1)
+        self._bits = self._byte = 0
+        self._rw = 0
+        self._out = 0xFF
+        self._master_ack = True
+        self._hold = 0
+        self.scl, self.sda = 1, 1
+
+    def step(self, scl, sda):
+        pscl, psda = self._prev
+        self._prev = (scl, sda)
+        if self._hold:
+            self._hold -= 1
+            self.scl = 0 if self._hold else 1
+        if pscl and scl and psda != sda:                       # START / STOP
+            if not sda:
+                self.state, self._bits, self._byte = "addr", 0, 0
+                self.log.append(("START",))
+            else:
+                self.state = "idle"
+                self.log.append(("STOP",))
+            self.sda = 1
+        elif scl and not pscl:                                 # rising edge: sample
+            if self.state in ("addr", "write"):
+                if self._bits < 8:
+                    self._byte = (self._byte << 1) | sda
+                self._bits += 1
+            elif self.state == "read":
+                if self._bits == 8:
+                    self._master_ack = sda == 0
+                self._bits += 1
+        elif pscl and not scl:                                 # falling edge: drive
+            self._falling()
+        return self.scl, self.sda
+
+    def _falling(self):
+        if self.state in ("addr", "write") and self._bits == 8:
+            if self.state == "addr":
+                ours = self._byte >> 1 == self.addr
+                self.log.append(("ADDR", self._byte, ours))
+                if not ours:
+                    self.state = "idle"
+                    return
+                self._rw = self._byte & 1
+            else:
+                self.received.append(self._byte)
+            self.sda = 0                                      # ACK
+        elif self._bits == 9:                                  # end of the ACK clock
+            self.sda, self._bits, self._byte = 1, 0, 0
+            if self.state == "addr":
+                self.state = "read" if self._rw else "write"
+            elif self.state == "read" and not self._master_ack:
+                self.state = "idle"                          # controller NACKed: done
+            if self.state == "read":
+                self._out = self.read_data.pop(0) if self.read_data else 0xFF
+                self.sda = (self._out >> 7) & 1
+            if self.stretch and self.state in ("read", "write"):
+                self.scl, self._hold = 0, self.stretch
+        elif self.state == "read":
+            self.sda = (self._out >> (7 - self._bits)) & 1 if self._bits < 8 else 1
+
+
 class I2CController:
     def __init__(self, clocks_per_bit):
         if clocks_per_bit < 8:

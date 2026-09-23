@@ -19,7 +19,7 @@ from typing import Optional
 
 from . import isa
 
-CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN = 1, 2, 3, 4, 5, 6
+CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN, CMD_WAIT = 1, 2, 3, 4, 5, 6, 7
 
 
 @dataclass
@@ -53,7 +53,6 @@ class PinConfig:
     rx_edge: str = "rise"           # LINKED_RX sampling edge of pin B
     tx_edge: Optional[str] = None   # linked TX shift: change pin A on this edge of pin B
     tx_preload: bool = False        # linked TX: put out bit 0 at once, the rest on TX_EDGE (SPI CPHA=0)
-    tx_accept: int = 0xF            # tag mask (bit = tag); other tokens are taken and dropped (D-011)
     tx_lentok: bool = False         # DATA carries its length: data[15:12] = nbits-1, payload data[11:0]
     stretch: bool = False           # CLKGEN: wait for pin A to read high before timing the high phase
 
@@ -79,8 +78,6 @@ class PinUnit:
         self.cfg = PinConfig(**kw)
         if self.cfg.txmode == "pulse":
             raise NotImplementedError("TX mode pulse not modelled yet")
-        if self.cfg.stretch:
-            raise NotImplementedError("CLKGEN STRETCH not modelled yet")
         self.reset_state()
 
     def reset_state(self):
@@ -92,6 +89,9 @@ class PinUnit:
         self.actions = []               # timed: pending (edge, kind, value), sorted by edge
         self.linked_bits = []           # linked: bits still to put out, one per tx_edge
         self.linked_end = False         # linked: return to IDLE on the next tx_edge
+        self.clk = None                 # CLKGEN burst state
+        self.wait_edge = None           # WAIT: edge of pin B the command stream waits for
+        self.driving = False            # a shifted bit is on pin A (echo suppression, §14 P13)
         self._tx_apply = []
         self._rx = "wait_idle"
         self._rx_t0_q8 = 0
@@ -121,49 +121,76 @@ class PinUnit:
             return False
         return kind == "both" or ((cur == 1) if kind == "rise" else (cur == 0))
 
-    def tx_active(self):
-        """TX is mid-shift or has pad actions pending (used for echo suppression)."""
-        return bool(self.linked_bits or self.linked_end or self.actions)
-
     # ---------------------------------------------------------------- TX
     def _linked(self):
         return self.cfg.txmode == "shift" and self.cfg.tx_edge is not None
 
     def _tx_ready(self, now):
+        if self.wait_edge is not None or self.clk is not None:
+            return False                      # WAIT pending, or a CLK burst running
         timed_done = all(t <= now + 1 for t, _, _ in self.actions)
         if self._linked():
             return timed_done and not self.linked_bits   # a pending return-to-idle may be replaced
         return timed_done
 
-    def compute_tx(self, now, b=None):
-        """b: synchronised level of pin B this clock (for linked shifts)."""
+    def compute_tx(self, now, b=None, a=None):
+        """b: synchronised pin B (linked shifts, WAIT); a: synchronised pin A (CLKGEN STRETCH)."""
+        c = self.cfg
         apply = self._tx_apply = []
         if self._deselect and (self.linked_bits or self.linked_end):
             # §14 P15: deselect aborts a linked shift in progress; pin A returns to IDLE
             self.linked_bits, self.linked_end = [], False
-            apply.append((now, "level", self.cfg.idle))
+            apply.append((now, "send", c.idle))
+        if self.wait_edge is not None and self._edge(self._prev_b_tx, b, self.wait_edge):
+            # §14 P16: WAIT satisfied; the unit's timeline restarts at this edge
+            self.wait_edge = None
+            self.cursor_q8 = (now + 1) << 8
         port = self.tx_port
         if port is not None and port.avail():
             tag, data = port.head()
-            if not (self.cfg.tx_accept >> tag) & 1:
-                port.take()                    # D-011: not for this unit; drop at once, never block
-                self.stats["tx_filtered"] = self.stats.get("tx_filtered", 0) + 1
-            elif self._tx_ready(now):
+            clk_more = (self.clk is not None and tag == isa.TAG_CTRL and data >> 12 == CMD_CLK)
+            if self._tx_ready(now) or clk_more:
                 port.take()
                 self.stats["tx_tokens"] += 1
                 self._accept(now, tag, data)
-        due = [a for a in self.actions if a[0] <= now]
-        self.actions = [a for a in self.actions if a[0] > now]
+        due = [x for x in self.actions if x[0] <= now]
+        self.actions = [x for x in self.actions if x[0] > now]
         apply.extend(due)
-        if self._linked() and self._edge(self._prev_b_tx, b, self.cfg.tx_edge):
+        if self.clk is not None:
+            self._clk_step(now, a, apply)
+        if self._linked() and self._edge(self._prev_b_tx, b, c.tx_edge):
             # §14 P6: a linked shift changes pin A at the edge of the clock that sees pin B's edge
             if self.linked_bits:
-                apply.append((now, "level", self.linked_bits.pop(0)))
+                apply.append((now, "sbit", self.linked_bits.pop(0)))
                 self.linked_end = not self.linked_bits
             elif self.linked_end:
-                apply.append((now, "level", self.cfg.idle))
+                apply.append((now, "send", c.idle))
                 self.linked_end = False
         self._prev_b_tx = b
+
+    def _clk_step(self, now, a, apply):
+        """CLKGEN (§14 P11): each period is IDLE for PERIOD/2, then ACTIVE for PERIOD/2."""
+        c, k, p = self.cfg, self.clk, self.cfg.period_q8
+        if k["phase"] == "idle" and (k["t"] >> 8) <= now:
+            apply.append((now, "level", 1 - c.idle))
+            k["phase"], k["t"] = "active", k["t"] + p // 2
+        elif k["phase"] == "active" and (k["t"] >> 8) <= now:
+            apply.append((now, "level", c.idle))
+            k["n"] -= 1
+            if c.stretch:
+                k["phase"] = "release"            # the IDLE half starts when the line gets there
+            else:
+                self._clk_next(k["t"])
+        elif k["phase"] == "release" and a == c.idle:
+            self._clk_next(now << 8)              # STRETCH: another device held the line
+
+    def _clk_next(self, idle_from_q8):
+        k = self.clk
+        if k["n"] > 0:
+            k["phase"], k["t"] = "idle", idle_from_q8 + self.cfg.period_q8 // 2
+        else:
+            self.cursor_q8 = idle_from_q8
+            self.clk = None
 
     def _accept(self, now, tag, data):
         c = self.cfg
@@ -188,13 +215,14 @@ class PinUnit:
                 n = arg & 0x1F
                 self.tx_nbits = n if 1 <= n <= 16 else 16
             elif op == CMD_CLK and c.txmode == "clkgen":
-                # n periods: leading edge (to !IDLE) at start + i*P, trailing edge at + P/2
-                n, p = arg & 0xFF, c.period_q8
-                start_q8 = max(self.cursor_q8, earliest_q8)
-                for i in range(n):
-                    self._schedule((start_q8 + i * p) >> 8, "level", 1 - c.idle)
-                    self._schedule((start_q8 + i * p + p // 2) >> 8, "level", c.idle)
-                self.cursor_q8 = start_q8 + n * p
+                n = arg & 0xFF
+                if self.clk is not None:
+                    self.clk["n"] += n                # continues the running burst seamlessly
+                elif n:
+                    start_q8 = max(self.cursor_q8, earliest_q8)
+                    self.clk = {"n": n, "phase": "idle", "t": start_q8 + c.period_q8 // 2}
+            elif op == CMD_WAIT:
+                self.wait_edge = "rise" if arg & 1 else "fall"
             else:
                 self.stats["bad_tokens"] += 1
         elif tag in (isa.TAG_DATA, isa.TAG_EVENT) and c.txmode == "level":
@@ -211,7 +239,7 @@ class PinUnit:
                 # CPHA=0: bit 0 goes out at once only if the unit is idle. If the previous
                 # shift is still waiting for its final edge, that edge carries bit 0 (§14 P9).
                 if c.tx_preload and not self.linked_end:
-                    self._schedule(earliest_q8 >> 8, "level", bits[0])
+                    self._schedule(earliest_q8 >> 8, "sbit", bits[0])
                     bits = bits[1:]
                 self.linked_bits = bits
                 self.linked_end = not bits
@@ -219,9 +247,9 @@ class PinUnit:
                 start_q8 = max(self.cursor_q8, earliest_q8)
                 p = c.period_q8
                 for i, bit in enumerate(bits):
-                    self._schedule((start_q8 + i * p) >> 8, "level", bit)
+                    self._schedule((start_q8 + i * p) >> 8, "sbit", bit)
                 end_q8 = start_q8 + n * p
-                self._schedule(end_q8 >> 8, "level", c.idle)
+                self._schedule(end_q8 >> 8, "send", c.idle)
                 self.cursor_q8 = end_q8
         else:
             self.stats["bad_tokens"] += 1
@@ -263,7 +291,7 @@ class PinUnit:
     def _sample(self, bit):
         """Add one sampled bit to the current word; emit it when complete (§14 P13)."""
         c = self.cfg
-        self._rx_taint |= self.tx_active()
+        self._rx_taint |= self.driving
         self._rx_bits.append(bit)
         if len(self._rx_bits) < self._word_len():
             return
@@ -306,8 +334,12 @@ class PinUnit:
     def commit(self):
         self._sel = self._sel_next
         for _, kind, value in self._tx_apply:
-            if kind == "level":
-                self.level = value
-            else:
+            if kind == "oe":
                 self.oe = value
+            else:
+                self.level = value
+                if kind == "sbit":
+                    self.driving = True
+                elif kind == "send":
+                    self.driving = False
         self._tx_apply = []

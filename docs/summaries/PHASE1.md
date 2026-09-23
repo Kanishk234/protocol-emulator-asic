@@ -25,6 +25,10 @@ Phase 0 proved the *tools* work. Phase 1 asks whether the *idea* works, before w
 | I2C target (reads and writes) | ✅ 100 kHz / 400 kHz / 1 MHz, about 2x margin on the ACK deadline |
 | WS2812 LED strips | ✅ every datasheet timing tolerance met (added with PULSE mode, point 11) |
 | DShot150–1200 motor control | ✅ frames, checksums and bit timing correct (point 11) |
+| PS/2 keyboard/mouse (host side) | ✅ both directions, parity errors caught (point 12) |
+| 1-Wire (e.g. temperature sensors) | ✅ reset, presence, read/write with exact standard timing (point 12) |
+| SWD (ARM chip debugging) | ✅ reads, writes, "wait" replies, up to 8.3 MHz (point 12) |
+| JTAG (chip debugging/testing) | ✅ any scan sequence, up to 12.5 MHz (point 12) |
 | The headline "reaction time" claim | ✅ exactly 7 clocks (140 ns), as designed |
 
 All numbers are from simulation with ideal wires. The full table, with the test behind each number, is `docs/reports/ARCH_EXPLORATION.md`.
@@ -62,13 +66,15 @@ A check runs on every push and fails if anything drifts, so the documents, the m
 It also catches mistakes before anything runs, such as testing an input the rule doesn't read, or using an undeclared state. The protocol programs now live in `programs/`. We proved the compiler right by checking that its output is **bit-for-bit identical** to the hand-built versions, and all the protocol tests now run on the compiled programs.
 
 **10. We mapped which other protocols are within reach** (`docs/reports/PROTOCOL_SUPPORT.md`):
-- **Expected with today's features** (the programs are still to be written): SWD, JTAG, PS/2, 1-Wire, I2S, MIDI, DMX, SMBus, IR.
+- **Expected with today's features** (the programs are still to be written): I2S, MIDI, DMX, SMBus, IR. (SWD, JTAG, PS/2 and 1-Wire have since been done, see 12.)
 - **One planned feature away:** WS2812 and DShot (since done, see 11).
 - **CAN** needs a few more general features: re-syncing the receiver on every edge, bit stuffing, detecting a lost arbitration, and a CRC unit.
 - **USB low-speed** needs the CAN features plus a couple more, and is only studied for feasibility.
 - **10 Mbit Ethernet** is honestly out of reach at a 50 MHz clock.
 
 **11. We added PULSE mode, and two more protocols work.** One general feature (each bit is a short "level A for a while, then level B for a while" pattern) covers LED strips (WS2812), drone motor controllers (DShot), IR remotes and Manchester codes. WS2812 and DShot now run on the model, checked against their datasheet timing and, for WS2812, sigrok. For DShot the chip computes the frame checksum itself in a routine.
+
+**12. Four debug and peripheral protocols now work: PS/2, 1-Wire, SWD and JTAG.** Each ran against its own reference device, written from its spec (for example an ARM debug port for SWD and an IEEE 1149.1 test port for JTAG), and sigrok agreed. Two needed one small general addition (D-020): the chip can now say *when* to start counting bits on an input, and it can sample an input at a time it picks rather than on a clock edge. PS/2 needed the first because the chip's own "please wait" signal looked like a data bit; 1-Wire needed the second because its read slots have no clock at all. SWD and JTAG needed nothing new. Along the way the tests caught a real mistake in the SWD program (leftover data leaking into the next transaction) and an off-by-one bug in sigrok's own PS/2 decoder.
 
 ## What's left in Phase 1
 1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.

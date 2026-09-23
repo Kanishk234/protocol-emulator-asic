@@ -21,10 +21,10 @@ Per CLAUDE.md, nothing here claims USB or Ethernet *support*. Those rows are fea
 | I2C target (read + write) | **Verified (model)** | 100 kHz / 400 kHz / 1 MHz, 12 slots |
 | MIDI, DMX512 TX, UART with other framings (7/9 bits, parity) | Expected (firmware) | UART variants: NBITS, `PAR`. A DMX/LIN *break* is a long low, detectable from edge timestamps |
 | SMBus / PMBus | Expected (firmware) | I2C + PEC (CRC-8) computed in a routine; the CRC helper would make it cheaper |
-| SWD (controller) | Expected (firmware) | CLKGEN + linked shift/RX on one bidirectional pin; turnaround via `OE`/`WAIT`; mixed 3/8/33-bit phases via length-in-token and `PAR` |
-| JTAG (controller) | Expected (firmware) | TCK = CLKGEN; TDI/TMS = linked shifts; TDO = LINKED_RX. TMS and TDI are both DATA streams, so they need the two lane outputs (routing to plan) |
-| PS/2 (host side) | Expected (firmware) | LINKED_RX on the device's clock fall, 11-bit frames, `PAR`; host-to-device via open-drain LEVEL + linked TX |
-| 1-Wire (controller) | Expected (firmware) | Reset/write slots via LEVEL with delays; a read slot samples via SHIFT_RX started by our own falling edge |
+| SWD (controller) | **Verified (model)** | `programs/swd.trw`, 12 slots + 3 routines: request, ACK (OK/WAIT), read with parity, write, posted AP reads; no bus contention; sigrok `swd`. SWCLK up to 8.3 MHz (fails at 10 MHz: the ACK framing restart must land within one SWCLK period of the 8th fall). The host computes the write parity and checks the read parity |
+| JTAG (controller) | **Verified (model)** | `programs/jtag.trw`, 8 slots: a generic scan engine (TMS + TDI chunks of ≤ 12 clocks, TDO back per chunk), so any TAP path, IR/DR length or chain works. Checked against an IEEE 1149.1 TAP model (IDCODE, USER register, BYPASS) and sigrok `jtag`; TCK up to 12.5 MHz (ideal wires, zero-delay target) |
+| PS/2 (host side) | **Verified (model)** | `programs/ps2_host.trw`, 12 slots + 1 routine: both directions, start/stop/parity checks, device ACK check, interleaved traffic; sigrok `ps2`. Needed the RX framing restart (D-020) after the host's own inhibit edge |
+| 1-Wire (controller) | **Verified (model)** | `programs/onewire.trw`, 9 slots + 1 routine: reset/presence, PULSE write slots, read slots with `SAMPLE` (D-020), AN126 standard-speed timing; READ ROM with CRC-8 against a DS18B20-like device model; sigrok `onewire_link` + `onewire_network` |
 | I2S / PCM / TDM | Expected (firmware) | Linked shifts + pin C as word select/frame sync; 16/24-bit words via NBITS (SETN) |
 | IR (NEC) TX/RX | Expected (firmware) | TX: PULSE symbols in pulse-distance form (a fixed mark, then a space that encodes the bit), with the carrier from CLKGEN or an external modulator; RX from edge timestamps |
 | Slow Manchester (DALI, etc.) | Expected (firmware) | Encode/decode in routines or from edge timestamps; fine at kbit/s rates |
@@ -44,5 +44,7 @@ Per CLAUDE.md, nothing here claims USB or Ethernet *support*. Those rows are fea
 4. **Readback compare:** stop driving and raise an EVENT when the sampled bit differs from the driven bit (CAN arbitration, multi-controller I2C, 1-Wire search).
 5. **CRC helper** (planned): CRC-5/8/15/16/32 with any polynomial, fed by the fabric in parallel with the protocol lane.
 6. Runtime PERIOD command (auto-baud), parallel multi-pin shift.
+
+Timed RX control (`SETN rx`, `SAMPLE`, D-020) was added the same way, for PS/2 and 1-Wire.
 
 Each will go through the model first: build it, write the protocol kernel, measure slots, speed and cost, then decide. That is the same loop that produced D-009 to D-016.

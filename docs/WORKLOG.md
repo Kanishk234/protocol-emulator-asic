@@ -21,6 +21,30 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1: PS/2, 1-Wire, SWD, JTAG)
+Done:
+- Four more protocols verified on the model, each against a reference model written from its spec plus sigrok:
+  - `programs/ps2_host.trw` (12 slots + 1 routine);
+  - `programs/onewire.trw` (9 + 1);
+  - `programs/swd.trw` (12 + 3; SWCLK up to 8.3 MHz);
+  - `programs/jtag.trw` (8; TCK up to 12.5 MHz).
+- D-020: `SETN rx` (timed RX framing restart + run-time RX length) and `SAMPLE` (sample pin A at a chosen time). Spec YAML + generated files, §14 P18/P19, tripsim, unit tests.
+- Reference models: `tools/protomodels/ps2.py`, `onewire.py`, `swd.py`, `jtag.py`.
+- Mutation checks: SAMPLE delay ignored, SETN rx length ignored, SETN rx without restart, SWD echo kept / no ACK restart / no WAIT before release, JTAG no TDO restart are all caught. "JTAG samples TDO on the fall" is not caught and is benign on this model (zero-delay target + input synchroniser); rise sampling stays.
+- BUGS #6–#9 (sigrok ps2 decoder off by one, PS/2 device model, SWD firmware stale words, a test waveform).
+- Docs: PROTOCOL_SUPPORT, ARCH_EXPLORATION, programs/README, PHASE1 summary.
+- 133 pytest tests pass; `scripts/check_all.sh` PASS; `gen.py --check` clean.
+
+Checklist boxes ticked (evidence):
+- none new (these protocols are beyond the phase 1 checklist).
+
+Problems / decisions:
+- D-020. The regenerated `src/trw_defs.vh` means the push touches `src/` and starts a gds hardening run.
+
+Next:
+- CAN primitive set (edge-resync RX, bit-stuffing codec, readback compare, CRC helper) and a CAN program.
+- Remaining phase 1: ablations, zero OPEN items + semantics review, R1–R3 (fresh session), green CI.
+
 ## 2026-09-23: Krithik + Claude (phase 1: PULSE mode, WS2812, DShot)
 Done:
 - D-019: PULSE mode as two-phase symbols per bit value (pulse-width, pulse-distance, Manchester); §14 P17.

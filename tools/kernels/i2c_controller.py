@@ -18,7 +18,7 @@ Pins: SDA = uio[sda], SCL = uio[scl], both open drain.
 Fabric: L.O1 feeds the SCL unit (CTRL only) and HOST_OUT (DATA only) (D-015 port filters).
 """
 
-from tripsim import PAD_UIO
+from kernels import load_program
 from tripsim.asm import Routine, link_routines, reflex
 from tripsim.isa import TAG_CTRL, TAG_DATA
 
@@ -74,28 +74,10 @@ def routines(period):
 
 
 def load(chip, period, lane=0, units=(0, 1), sda=0, scl=1):
-    """period: SCL period in clocks (even, >= 8)."""
-    u_sda, u_scl = units
+    """Load programs/i2c_controller.trw; period: SCL period in clocks (even, >= 8)."""
+    if (lane, tuple(units), sda, scl) != (0, (0, 1), 0, 1):
+        raise ValueError("pin placement is fixed in programs/i2c_controller.trw")
     if period // 2 > 0x3FF:
-        raise ValueError("period too long for the LEVEL delay in this kernel")
-    chip.pin_config(u_sda, pin_a=PAD_UIO + sda, pin_b=PAD_UIO + scl, od=True, idle=1, order="msb",
-                    txmode="shift", tx_edge="fall", tx_lentok=True,
-                    rxmode="linked_rx", rx_edge="rise", rx_nbits=8, rx_nbits2=1, rx_echo=False,
-                    ev_edge="both", ev_qual=1, ev_reset=True)
-    chip.pin_config(u_scl, pin_a=PAD_UIO + scl, pin_b=PAD_UIO + sda, od=True, idle=1,
-                    txmode="clkgen", period=period, stretch=True)
-    chip.own(PAD_UIO + sda, u_sda)
-    chip.own(PAD_UIO + scl, u_scl)
-    chip.connect(f"L{lane}.I0", "HOST_IN")
-    chip.connect(f"L{lane}.I1", f"U{u_sda}.rx", accept=1 << TAG_DATA)    # START/STOP events dropped
-    chip.connect(f"U{u_sda}.tx", f"L{lane}.O0")
-    chip.connect(f"U{u_scl}.tx", f"L{lane}.O1", accept=1 << TAG_CTRL)
-    chip.connect("HOST_OUT", f"L{lane}.O1", accept=1 << TAG_DATA)
-    ln = chip.lanes[lane]
-    ln.k[:] = [LEVEL0, LEN8, CLK9, CLK8]
-    ln.regs[0] = 1
-    for n, s in enumerate(slots()):
-        ln.load_slot(n, s)
-    chip.load_sram(link_routines(routines(period)))
-    chip.run([lane])
-    return len(slots())
+        raise ValueError("period too long for the LEVEL delay in this program")
+    image = load_program(chip, "i2c_controller", PERIOD=period)
+    return len(image["lanes"]["L0"]["slots"])

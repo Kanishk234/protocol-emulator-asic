@@ -10,12 +10,14 @@ to the host port (§10) and cannot be attached to pin units.
 
 from collections import deque
 
+import tripwire_spec as _S
+
 from .fabric import Fabric
 from .lane import Lane
 from .pinunit import PinUnit
 
-PAD_UI, PAD_UO, PAD_UIO = 0, 8, 16
-HOST_PADS = {PAD_UI + 4, PAD_UI + 5, PAD_UI + 6, PAD_UO + 6, PAD_UO + 7}
+PAD_UI, PAD_UO, PAD_UIO = (_S.PAD_GROUPS[g][0] for g in ("ui", "uo", "uio"))
+HOST_PADS = set(_S.HOST_PADS)
 
 
 class Sram:

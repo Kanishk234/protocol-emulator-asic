@@ -10,9 +10,11 @@ class VcdRecorder:
         self.signals = signals
         self.changes = []            # (time_ns, index, value)
         self._last = [None] * len(signals)
+        self.end_ns = 0
 
     def __call__(self, chip):
         t = chip.cycle * CLK_NS
+        self.end_ns = t
         for i, fn in enumerate(self.signals.values()):
             v = fn(chip)
             if v != self._last[i]:
@@ -33,4 +35,6 @@ class VcdRecorder:
                     last_t = t
                 f.write(f"{v}{ids[i]}\n")
             if self.changes:
-                f.write(f"#{self.changes[-1][0] + CLK_NS}\n")
+                # end at the last observed clock, not the last change: a steady level at the
+                # end (e.g. a final UART stop bit) must still be in the file for decoders
+                f.write(f"#{max(self.end_ns, self.changes[-1][0]) + CLK_NS}\n")

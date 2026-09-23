@@ -14,7 +14,7 @@ and each unit's tag filter picks its tokens (SCK: CTRL, MOSI: DATA, CS: EVENT). 
 bytes come back through the lane (L.I1), so CS can only rise after the last byte is in.
 """
 
-from tripsim import PAD_UI, PAD_UO
+from kernels import load_program
 from tripsim.asm import reflex
 from tripsim.isa import TAG_CTRL, TAG_DATA, TAG_EVENT
 
@@ -32,28 +32,11 @@ def slots():
 
 
 def load(chip, period, lane=0, sck=0, mosi=1, cs=2, miso=0, units=(0, 1, 2, 3)):
-    """period: SCK period in clocks (>= 2)."""
-    u_sck, u_mosi, u_miso, u_cs = units
-    chip.pin_config(u_sck, pin_a=PAD_UO + sck, txmode="clkgen", period=period, idle=0)
-    chip.pin_config(u_mosi, pin_a=PAD_UO + mosi, pin_b=PAD_UO + sck, txmode="shift",
-                    tx_edge="fall", tx_preload=True, nbits=8, order="msb", idle=0)
-    chip.pin_config(u_cs, pin_a=PAD_UO + cs, txmode="level", idle=1)
-    chip.pin_config(u_miso, pin_a=PAD_UI + miso, pin_b=PAD_UO + sck, rxmode="linked_rx",
-                    rx_edge="rise", rx_nbits=8, order="msb")
-    for pad, unit in ((sck, u_sck), (mosi, u_mosi), (cs, u_cs)):
-        chip.own(PAD_UO + pad, unit)
-    # one lane output multicast to three pin units; each port keeps only its tag (D-015)
-    for unit, tag in ((u_sck, TAG_CTRL), (u_mosi, TAG_DATA), (u_cs, TAG_EVENT)):
-        chip.connect(f"U{unit}.tx", f"L{lane}.O0", accept=1 << tag)
-    chip.connect(f"L{lane}.I0", "HOST_IN")
-    chip.connect(f"L{lane}.I1", f"U{u_miso}.rx")
-    chip.connect("HOST_OUT", f"L{lane}.O1")
-    ln = chip.lanes[lane]
-    ln.k[:] = [CLK8, 0, 0, 0]
-    for n, s in enumerate(slots()):
-        ln.load_slot(n, s)
-    chip.run([lane])
-    return len(slots())
+    """Load programs/spi_controller.trw; period: SCK period in clocks (>= 2)."""
+    if (lane, sck, mosi, cs, miso, tuple(units)) != (0, 0, 1, 2, 0, (0, 1, 2, 3)):
+        raise ValueError("pin placement is fixed in programs/spi_controller.trw")
+    image = load_program(chip, "spi_controller", PERIOD=period)
+    return len(image["lanes"]["L0"]["slots"])
 
 
 def push_transfer(chip, data):

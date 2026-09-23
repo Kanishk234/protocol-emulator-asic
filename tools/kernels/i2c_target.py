@@ -15,7 +15,7 @@ L.O1 -> HOST_OUT (bytes received on writes). No clock stretching: read data must
 waiting in HOST_IN before the controller asks for it.
 """
 
-from tripsim import PAD_UIO
+from kernels import load_program
 from tripsim.asm import cmpm_field, reflex
 
 IDLE, ADDR, ACKQ, RW, XFER, FWD, RT = range(7)
@@ -53,19 +53,8 @@ def slots():
 
 
 def load(chip, addr, lane=0, unit=0, sda=0, scl=1):
-    """Configure the chip as an I2C target at 7-bit `addr`."""
-    chip.pin_config(unit, pin_a=PAD_UIO + sda, pin_b=PAD_UIO + scl,
-                    rxmode="linked_rx", rx_edge="rise", rx_nbits=8, rx_nbits2=1, order="msb",
-                    ev_edge="both", ev_qual=1, ev_reset=True, rx_echo=False,
-                    txmode="shift", tx_edge="fall", tx_lentok=True, od=True, idle=1)
-    chip.own(PAD_UIO + sda, unit)
-    chip.connect(f"L{lane}.I0", f"U{unit}.rx")
-    chip.connect(f"L{lane}.I1", "HOST_IN")
-    chip.connect(f"U{unit}.tx", f"L{lane}.O0")
-    chip.connect("HOST_OUT", f"L{lane}.O1")
-    ln = chip.lanes[lane]
-    ln.k[:] = [0x00FE, addr << 1, LEN8, 0]
-    for n, s in enumerate(slots()):
-        ln.load_slot(n, s)
-    chip.run([lane])
-    return len(slots())
+    """Load programs/i2c_target.trw (7-bit `addr`). Pin placement is fixed in the program."""
+    if (lane, unit, sda, scl) != (0, 0, 0, 1):
+        raise ValueError("pin placement is fixed in programs/i2c_target.trw")
+    image = load_program(chip, "i2c_target", ADDR=addr)
+    return len(image["lanes"]["L0"]["slots"])

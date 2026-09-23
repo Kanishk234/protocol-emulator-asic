@@ -10,7 +10,7 @@ The TRIPWIRE token-level, cycle-accurate model. In phase 1 it is the **architect
 | `asm.py` | Minimal assembler: `reflex(...)` slot builder, `Routine` builder, `link_routines` |
 | `fabric.py` | Producer registers and consumer ports (blocking, tap) |
 | `lane.py` | Reflex slots, EVAL/EXEC pipeline, routine sequencer |
-| `pinunit.py` | Pin units: TX (LEVEL/OE/GAP/SYNC/SETN, timed or linked SHIFT), RX (SHIFT_RX, EDGE_TS, LINKED_RX with tail bit, COND_EDGE) |
+| `pinunit.py` | Pin units: TX (LEVEL/OE/GAP/SYNC/SETN, timed or linked SHIFT with preload, CLKGEN, tag filter), RX (SHIFT_RX, EDGE_TS, LINKED_RX with tail bit, COND_EDGE) |
 | `chip.py` | Top level: pads, synchronisers, ownership, SRAM rotation, host FIFOs |
 | `vcd.py` | Pad activity to VCD for sigrok |
 
@@ -18,6 +18,6 @@ The TRIPWIRE token-level, cycle-accurate model. In phase 1 it is the **architect
 
 Related: `tools/kernels/` (exploration firmware, e.g. the I2C target) and `tools/protomodels/` (reference protocol models written from the protocol specs, e.g. the I2C controller). Results go to `docs/reports/ARCH_EXPLORATION.md`.
 
-**Not modelled yet:** CLKGEN, PULSE (the SPI/I2C controllers and WS2812 need them); the helper units CRC, MATCH, MEM and CAPTURE; the host SPI transport (the host is modelled as direct register access); the legal-source table.
+**Not modelled yet:** CLKGEN STRETCH (I2C controller), PULSE (WS2812/DShot); the helper units CRC, MATCH, MEM and CAPTURE; the host SPI transport (the host is modelled as direct register access); the legal-source table.
 
 **Run the tests:** `source .venv/bin/activate && python -m pytest -q` (also part of `scripts/check_all.sh`).

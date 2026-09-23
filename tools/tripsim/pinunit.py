@@ -39,6 +39,9 @@ class PinConfig:
     autorearm: bool = True
     rx_edge: str = "rise"           # LINKED_RX sampling edge of pin B
     tx_edge: Optional[str] = None   # linked TX shift: change pin A on this edge of pin B
+    tx_preload: bool = False        # linked TX: put out bit 0 at once, the rest on TX_EDGE (SPI CPHA=0)
+    tx_accept: int = 0xF            # tag mask (bit = tag); other tokens are taken and dropped (D-011)
+    stretch: bool = False           # CLKGEN: wait for pin A to read high before timing the high phase
 
     @property
     def period_q8(self):
@@ -60,8 +63,10 @@ class PinUnit:
 
     def configure(self, **kw):
         self.cfg = PinConfig(**kw)
-        if self.cfg.txmode in ("clkgen", "pulse"):
-            raise NotImplementedError(f"TX mode {self.cfg.txmode} not modelled yet")
+        if self.cfg.txmode == "pulse":
+            raise NotImplementedError("TX mode pulse not modelled yet")
+        if self.cfg.stretch:
+            raise NotImplementedError("CLKGEN STRETCH not modelled yet")
         self.reset_state()
 
     def reset_state(self):
@@ -100,19 +105,24 @@ class PinUnit:
         return self.cfg.txmode == "shift" and self.cfg.tx_edge is not None
 
     def _tx_ready(self, now):
+        timed_done = all(t <= now + 1 for t, _, _ in self.actions)
         if self._linked():
-            return not self.linked_bits        # a pending return-to-idle may be replaced
-        return all(t <= now + 1 for t, _, _ in self.actions)
+            return timed_done and not self.linked_bits   # a pending return-to-idle may be replaced
+        return timed_done
 
     def compute_tx(self, now, b=None):
         """b: synchronised level of pin B this clock (for linked shifts)."""
         apply = self._tx_apply = []
         port = self.tx_port
-        if port is not None and port.avail() and self._tx_ready(now):
+        if port is not None and port.avail():
             tag, data = port.head()
-            port.take()
-            self.stats["tx_tokens"] += 1
-            self._accept(now, tag, data)
+            if not (self.cfg.tx_accept >> tag) & 1:
+                port.take()                    # D-011: not for this unit; drop at once, never block
+                self.stats["tx_filtered"] = self.stats.get("tx_filtered", 0) + 1
+            elif self._tx_ready(now):
+                port.take()
+                self.stats["tx_tokens"] += 1
+                self._accept(now, tag, data)
         due = [a for a in self.actions if a[0] <= now]
         self.actions = [a for a in self.actions if a[0] > now]
         apply.extend(due)
@@ -148,21 +158,32 @@ class PinUnit:
             elif op == CMD_SETN:
                 n = arg & 0x1F
                 self.tx_nbits = n if 1 <= n <= 16 else 16
-            elif op == CMD_CLK:
-                raise NotImplementedError("CLK command (CLKGEN) not modelled yet")
+            elif op == CMD_CLK and c.txmode == "clkgen":
+                # n periods: leading edge (to !IDLE) at start + i*P, trailing edge at + P/2
+                n, p = arg & 0xFF, c.period_q8
+                start_q8 = max(self.cursor_q8, earliest_q8)
+                for i in range(n):
+                    self._schedule((start_q8 + i * p) >> 8, "level", 1 - c.idle)
+                    self._schedule((start_q8 + i * p + p // 2) >> 8, "level", c.idle)
+                self.cursor_q8 = start_q8 + n * p
             else:
                 self.stats["bad_tokens"] += 1
+        elif tag in (isa.TAG_DATA, isa.TAG_EVENT) and c.txmode == "level":
+            start_q8 = max(self.cursor_q8, earliest_q8)   # LEVEL mode: drive data[0]
+            self.cursor_q8 = start_q8
+            self._schedule(start_q8 >> 8, "level", data & 1)
         elif tag == isa.TAG_DATA:
             n = self.tx_nbits
             bits = [(data >> i) & 1 for i in range(n)] if c.order == "lsb" else \
                    [(data >> (n - 1 - i)) & 1 for i in range(n)]
-            if c.txmode == "level":
-                start_q8 = max(self.cursor_q8, earliest_q8)
-                self.cursor_q8 = start_q8
-                self._schedule(start_q8 >> 8, "level", data & 1)
-            elif self._linked():
+            if self._linked():
+                # CPHA=0: bit 0 goes out at once only if the unit is idle. If the previous
+                # shift is still waiting for its final edge, that edge carries bit 0 (§14 P9).
+                if c.tx_preload and not self.linked_end:
+                    self._schedule(earliest_q8 >> 8, "level", bits[0])
+                    bits = bits[1:]
                 self.linked_bits = bits
-                self.linked_end = False
+                self.linked_end = not bits
             else:  # timed shift
                 start_q8 = max(self.cursor_q8, earliest_q8)
                 p = c.period_q8

@@ -50,12 +50,23 @@ Later the same day (I2C):
   - two injected kernel bugs (ACK on the wrong edge, wrong address bits) are caught.
 - `docs/reports/ARCH_EXPLORATION.md` started. 33 pytest tests pass.
 
+Later still (SPI):
+- Pin units: CLKGEN, TX_ACCEPT tag filter, TX_PRELOAD (D-011, §14 P9–P12).
+- `tools/protomodels/spi.py`: reference SPI target, mode 0.
+- `tools/kernels/spi_controller.py`: 4 slots, 1 lane, 4 pin units; one lane output multicast to SCK/MOSI/CS by tag:
+  - mode 0 correct both ways against the reference target and sigrok `spi`;
+  - fastest SCK 16.7 MHz (the MISO synchroniser limits it); 38 clocks/byte at 12.5 MHz.
+- BUGS #3: preload race in the model, found by the SPI kernel at 2 of 3 speeds; fixed (P9).
+- Test hardening: every unit must end with zero bad tokens. Injected removal of each tag filter or of the preload fix is caught (one earlier "survivor" was a broken injection script).
+- R1 fallback priced on the kernels: no loss in the I2C/SPI speed limits; SPI byte rate -9%.
+- 38 pytest tests pass.
+
 Checklist boxes ticked (evidence):
-- none yet. The tripsim box needs CLKGEN/PULSE; the program boxes need `tripc` and the UART/SPI/I2C-controller programs.
+- none yet. The tripsim box still needs STRETCH and PULSE; the program boxes need `tripc` and the UART/SPI/I2C-controller programs.
 
 Next:
-- CLKGEN (+STRETCH), then SPI controller/target and I2C controller kernels; I2C target read direction.
-- Measure R1 fallback cost on the kernels and run the ablations.
+- I2C target read direction (does a full I2C target fit in 12 slots?); SPI target (flash); I2C controller (needs STRETCH).
+- Ablations of the D-007 features.
 - R1 risk spike (lane RTL at 50 MHz): best done in a fresh session that has not read `tools/tripsim` (independence rule).
 
 ## 2026-09-23: Krithik + Claude (phase 0)

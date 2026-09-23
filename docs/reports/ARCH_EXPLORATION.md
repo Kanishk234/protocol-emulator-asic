@@ -10,13 +10,15 @@ Numbers from `tools/tripsim` running protocol kernels (`tools/kernels`). Each ro
 |---|---|---|---|
 | Pin-to-pin reaction (§5.5) | **7 clocks (140 ns)**, exactly as specified | `tripsim/tests/test_pins.py::test_pin_to_pin_reaction_is_seven_clocks` | Claim holds on the model |
 | What should OP 15 be? | `MOVB` (d = B): "on an input, send a constant" had no one-action form, and without it the reaction would be 8 clocks | Same test | D-009 |
-| Are 12 slots enough? | UART TX: 1. UART RX with framing check: 3. I2C target, write direction: **9** | `test_pins.py`, `kernels/tests/test_i2c_target.py` | Not yet decided: I2C read direction, SPI and the EEPROM variant still to measure |
+| Are 12 slots enough? | UART TX: 1. UART RX with framing check: 3. SPI controller: 4. I2C target, write direction: **9** | `test_pins.py`, `kernels/tests/test_i2c_target.py` | Not yet decided: I2C read direction, SPI and the EEPROM variant still to measure |
 | Flag result from every op (D-007) | Count loop: **3 clocks per byte** (4 with the old compare-only flags) | `tripsim/tests/test_lane.py::test_count_loop_three_clocks_per_byte` | Keep |
 | K constants (D-007) | The I2C target keeps its address, mask and pin commands in K, leaving all 4 registers free | `kernels/i2c_target.py` | Keep; register pressure still to measure on larger kernels |
 | `data[15]` head test (D-007) | The I2C target tells START from STOP in the condition, so no compare action is needed | `kernels/i2c_target.py` slots 0–1 | Keep |
 | I2C ACK deadline | ACK queued **7 clocks** after the 8th SCL rise; SDA goes low 3 clocks after the SCL fall. Works down to 12 clocks per SCL period (SCL high ≥ 6 clocks). Fm+ (1 MHz) guarantees ≥ 13 clocks high, so the margin is about 2x | `test_i2c_target.py::test_i2c_target_speed_margin` | Meets 100 kHz / 400 kHz / 1 MHz with margin |
+| SPI controller, mode 0 | Works up to **SCK = 16.7 MHz** (3 clocks per period). At 25 MHz, MISO through the 2-clock synchroniser misses. About 38 clocks per byte at 12.5 MHz (32 for the bits alone); **4 slots**, 4 pin units, 1 lane | `kernels/tests/test_spi_controller.py` | Meets typical SPI flash/peripheral speeds for reads up to 16.7 MHz. The Q7 fabric limit is not the bottleneck here |
+| Lane outputs (2) vs protocol outputs | SPI controller needs 3 output streams (MOSI, SCK, CS) | SPI kernel | D-011: tag filters let one lane output feed several pin units |
 | Routine rate | 1 step per 4 clocks. Urgent reflexes that are ready every clock starve a routine; non-urgent ones do not | `test_lane.py` routine tests | As designed (ISA.md §5.3) |
-| R1 fallback (every other clock) | Not measured on the protocol kernels yet | — | To do |
+| R1 fallback (every other clock) | I2C target: fastest still 12 clocks/bit (the sweep steps in 2-clock units). SPI controller: fastest SCK still 16.7 MHz (the synchroniser is the limit); at 12.5 MHz, 41.5 vs 38.2 clocks per byte (about 9% slower). The 7-clock pin-to-pin reaction does grow with the fallback: every EVAL waits for an even clock | `fastest_*` helpers in `kernels/tests` with `Chip(fire_period=2)` | For the kernels so far, the fallback is **cheap**. That lowers the stakes of R1: if lane timing does not close at 50 MHz, the protocols still meet their speeds. The headline reaction claim would change |
 
 ## 2. Findings that changed the spec
 
@@ -25,11 +27,12 @@ Numbers from `tools/tripsim` running protocol kernels (`tools/kernels`). Each ro
 | A tap with a 1-bit `seq` aliases after missing two tokens and stops seeing new ones | `test_fabric.py` | BUGS #2; §14 F4 (a counted drop is a take) |
 | "React to an input with a constant" needed two actions | `test_pins.py` latency kernel | D-009 `MOVB` |
 | I2C needs different RX and TX link edges, and the 9th bit as a separate token | I2C target kernel | D-010 (RX_EDGE/TX_EDGE, RX_TAIL); §14 P6–P8 |
+| An SPI controller needs 3 output streams from a 2-output lane; mode 0 needs bit 0 before the first clock edge | SPI controller kernel | D-011 (TX_ACCEPT, TX_PRELOAD); §14 P9–P12. BUGS #3 (model preload race, found by the same kernel) |
 | Fabric throughput below the §4.4 target | `test_lane.py` throughput tests | Q7 open: a lane output takes 1 token per 3 clocks; HOST_IN delivers 1 per 2 clocks to a lane |
 
 ## 3. Next measurements
 - I2C target read direction, and the EEPROM variant (needs the MEM helper): does it fit in 12 slots?
-- SPI controller and SPI target (needs CLKGEN, linked TX on SCK): the maximum SCK, and whether Q7 limits streaming.
+- SPI target (flash emulation): the maximum SCK when *we* are clocked, and whether Q7 limits streaming.
 - I2C controller (CLKGEN with STRETCH).
 - Run each kernel with `fire_period = 2` to price the R1 fallback.
 - Ablation: turn off each D-007 feature (implicit checks, K, `HE/HV`, flag-from-every-op) and count slots and clocks.

@@ -77,6 +77,18 @@ A spec change is proposed here first and implemented only after the team agrees.
 - **Evidence:** `tools/kernels/tests/test_i2c_target.py`: the target works against the reference controller at 100 kHz / 400 kHz / 1 MHz and checks out under sigrok `i2c`; 9 of 12 slots used.
 - **Status:** accepted (draft).
 
+## D-011 (2026-09-23): TX tag filter per pin unit, and TX preload for linked shifts
+- **Finding (tripsim, SPI controller kernel):**
+  - An SPI controller needs three output streams (MOSI data, SCK clock commands, CS), but a lane has only two output ports. Spending a second lane on CS would cost a third of the chip's lanes.
+  - SPI mode 0 (CPHA = 0) needs the first data bit on the wire *before* the first clock edge, which a purely edge-linked shift cannot do.
+- **Decision:**
+  - **TX_ACCEPT**: a 4-bit tag mask per pin unit. A token whose tag is not accepted is taken and dropped at once, without waiting for the unit to be ready, so it never blocks the other subscribers. One lane output can then be multicast to several units, each picking its tokens by tag. In the SPI kernel: SCK takes CTRL, MOSI takes DATA, CS takes EVENT.
+  - **TX_PRELOAD**: a linked shift puts bit 0 out at once when the unit is idle. If the previous shift is still waiting for its final edge, that edge carries bit 0 instead (§14 P9), which is continuous SPI clocking.
+  - LEVEL mode also accepts EVENT tokens (drives `data[0]`), so CS can be an EVENT.
+- **Evidence:** `tools/kernels/tests/test_spi_controller.py`: mode 0, both directions correct against the reference target and sigrok `spi`, up to SCK = 16.7 MHz. Removing any one unit's filter makes a test fail.
+- **Cost:** 4 filter bits + 1 preload bit per pin unit.
+- **Status:** accepted (draft).
+
 ---
 
 ## Open questions for the phase 1 spec freeze

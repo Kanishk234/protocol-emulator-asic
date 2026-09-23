@@ -222,6 +222,8 @@ Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same opera
 | SAMPLEOFS | For SHIFT_RX: sample position within a bit (fraction of PERIOD) |
 | AUTOREARM | For SHIFT_RX: re-arm on the next start edge automatically |
 | STRETCH | CLKGEN waits for the line to read high before timing the high phase |
+| TX_ACCEPT | 4-bit tag mask. Tokens with other tags are taken and dropped immediately, so one lane output can feed several units, each picking its tokens by tag (D-011, §14 P10) |
+| TX_PRELOAD | Linked shift: bit 0 goes out at once when idle, the rest on TX_EDGE (SPI CPHA = 0) (D-011, §14 P9) |
 
 ### 7.3 TX half: tokens consumed
 - **DATA token:** the payload for the configured TXMODE.
@@ -414,3 +416,11 @@ Pin rules added with the I2C modes:
 - **P8.** COND_EDGE: when pin A changes while the synchronised pin B was high in both this clock and the previous one, an EVENT is emitted: START (`data[15] = 1`) when A falls, STOP (`data[15] = 0`) when A rises, with `data[14:0]` = time. It takes precedence over LINKED_RX sampling in the same clock and resets the LINKED_RX bit count.
 
 Measured with these rules: the I2C target kernel queues its ACK 7 clocks after the 8th SCL rise, and SDA goes low 3 clocks after the SCL fall. It works for SCL high times ≥ 6 clocks (`tools/kernels/tests/test_i2c_target.py`). This is on an ideal bus in simulation; no rise times are modelled.
+
+Pin rules added with the SPI modes (D-011):
+- **P9.** Linked TX with TX_PRELOAD: if the unit is idle when it takes a DATA token, bit 0 goes out at the earliest edge (P3), and the remaining bits on each TX_EDGE. If the previous shift is still waiting for its final TX_EDGE, that edge carries bit 0 instead. This is continuous clocking, and it is how consecutive SPI mode-0 bytes join without a gap.
+- **P10.** TX_ACCEPT: a token whose tag bit is clear in TX_ACCEPT is taken and dropped in the clock it becomes available, whatever the unit's readiness. So an unrelated subscriber never delays the producer.
+- **P11.** CLKGEN, `CLK n`: n periods starting at `max(cursor, earliest)`. Period i drives pin A to `!IDLE` at `start + i·PERIOD` and back to IDLE at `start + i·PERIOD + PERIOD/2` (edges rounded down in 1/256-clock units). Afterwards `cursor = start + n·PERIOD`. A second `CLK` taken before the first ends continues seamlessly. STRETCH is not specified yet (needed for the I2C controller).
+- **P12.** In LEVEL mode, a DATA or EVENT token drives `data[0]` at `max(cursor, earliest)`.
+
+Measured with these rules: the SPI controller kernel works in mode 0 up to SCK = 16.7 MHz (3 clocks per period). MISO passes through the 2-clock input synchroniser, which is what fails at 25 MHz. It takes about 38 clocks per byte at 12.5 MHz, against 32 for the bits alone.

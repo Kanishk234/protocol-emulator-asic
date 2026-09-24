@@ -48,6 +48,12 @@ Next:
   - Routing stalled at 8 Metal2 violations in the 27th stubborn-tile pass (live log, D-032).
 - Run 3 prepared (D-034): `PL_TARGET_DENSITY_PCT` 52 (not 45: the placer's utilisation is 48.9 %) and `DRT_OPT_ITERS` 20. A non-converging run now fails with `GDS_logs` instead of timing out without them.
 - D-034 also states the branch-only config-rule exceptions (DRT_OPT_ITERS, and the SDC keys from run 2) that I had not flagged.
+- R2 run 3 (`gds` 36039323359):
+  - routing started 4 min in (SDC fix confirmed);
+  - pin access clean;
+  - density 52 cut the first-pass violations from 8,297 to 33, but the tail held at 26–27 (Metal2/Metal3);
+  - pass 5 was a ~1 h stubborn pass, so a cap of 20 would still time out (kill at 00:09 UTC; I first misstated it as 22:09).
+- Run 4 prepared: `DRT_OPT_ITERS` 3 only, so the run fails with `GDS_logs` (violation locations).
 
 ## 2026-09-24: Krithik + Claude (phase 1: R1 spec gaps G1–G8, model side)
 Done:

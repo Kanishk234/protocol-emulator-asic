@@ -41,11 +41,11 @@
   "PNR_SDC_FILE": "dir::pnr.sdc",
   "SIGNOFF_SDC_FILE": "dir::signoff.sdc",
 
-  "//": "TRIPWIRE R2 run 3 (D-034): cap detailed routing at 20 iterations (default 64). A runtime guard,",
-  "//": "not a design change: runs 1-2 reached their stall point by about iteration 20, then spent hours",
-  "//": "in stubborn-tile passes until the 6 h kill, which uploads no logs. With the cap, a run that does",
-  "//": "not converge FAILS (routing DRC check), and GDS_logs is uploaded with the violation locations.",
-  "DRT_OPT_ITERS": 20,
+  "//": "TRIPWIRE R2 run 4 (D-034): cap detailed routing at 3 iterations (default 64; run 3 had 20). A",
+  "//": "runtime guard, not a design change. Run 3 hit its first ~1 h stubborn-tile pass at iteration 5,",
+  "//": "too early for a cap of 20 to end the run before the 6 h kill (which uploads no logs). With 3, the",
+  "//": "run FAILS at the routing DRC check and uploads GDS_logs with every violation's location.",
+  "DRT_OPT_ITERS": 3,
 
   "//": "Configuration docs: https://librelane.readthedocs.io/en/latest/reference/configuration.html",
 

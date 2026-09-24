@@ -94,7 +94,8 @@ module trw_lane (
             wire [1:0] h_tag   = hsel ? in_head[35:34] : in_head[17:16];
             wire       h_bit   = hs ? (hsel ? in_head[18] : in_head[0])      // data[0]
                                     : (hsel ? in_head[33] : in_head[15]);    // data[15]
-            wire       d_out   = (dst[2:1] == 2'b10);           // O0 or O1
+            // O0 or O1; CALL ignores DST, so it never waits for an output (§14 L10)
+            wire       d_out   = (dst[2:1] == 2'b10) && (op != `TRW_OP_CALL);
 
             wire explicit_ok = v
                             && (!se || (state == sv))
@@ -141,7 +142,10 @@ module trw_lane (
     wire       s_kt   = ss[`TRW_SLOT_KT_LSB];
 
     wire s_a_in  = (s_asrc[2:1] == 2'b10);
-    wire s_d_out = (s_dst[2:1] == 2'b10);
+    // §14 L10: CALL ignores DST (no reservation, no output load) and DFE (no PEND, no flag write).
+    wire s_is_call = (s_op == `TRW_OP_CALL);
+    wire s_d_out   = (s_dst[2:1] == 2'b10) && !s_is_call;
+    wire s_fw      = s_dfe && (s_df != 2'd3) && !s_is_call;
     assign in_take[0] = fire && s_dq && s_a_in && !s_asrc[0];
     assign in_take[1] = fire && s_dq && s_a_in &&  s_asrc[0];
 
@@ -205,14 +209,14 @@ module trw_lane (
     assign rt_nz = rt_djnz && !alu_r;
 
     wire       ex_d_reg  = ex_slot && !ex_dst[2] && (ex_op != `TRW_OP_CALL);
-    wire       ex_d_out  = ex_slot && (ex_dst[2:1] == 2'b10);
+    wire       ex_d_out  = ex_slot && (ex_dst[2:1] == 2'b10) && (ex_op != `TRW_OP_CALL);
     // §14 L8: MKCTL always emits CTRL; KT keeps the latched head tag only when ASRC is I0 or I1,
     // otherwise KT is ignored and OT gives the tag.
     wire       ex_a_in   = (ex_asrc[2:1] == 2'b10);
     wire [1:0] ex_out_tag = (ex_op == `TRW_OP_MKCTL) ? `TRW_TAG_CTRL
                           : (ex_kt && ex_a_in)       ? a_tag
                           :                            ex_ot;
-    wire       ex_fw     = ex_slot && ex_dfe && (ex_df != 2'd3);
+    wire       ex_fw     = ex_slot && ex_dfe && (ex_df != 2'd3) && (ex_op != `TRW_OP_CALL);
 
     wire rt_alu  = ex_rt && !rt_ctl && (a_lat[14:11] != `TRW_OP_CALL);
     wire rt_ldi  = ex_rt &&  rt_ctl && (rt_sub == `TRW_RT_SUB_LDI);
@@ -313,7 +317,7 @@ module trw_lane (
                     state <= s_ns;                              // R4: the reflex update wins
                 if (s_d_out)
                     resv[s_dst[0]] <= 1'b1;
-                if (s_dfe && (s_df != 2'd3))
+                if (s_fw)
                     pend[s_df] <= 1'b1;                         // a new pending result wins
                 if (s_op == `TRW_OP_CALL) begin
                     rb       <= 1'b1;

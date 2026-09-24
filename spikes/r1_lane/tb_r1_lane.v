@@ -7,7 +7,7 @@
 
 module tb_r1_lane;
     localparam N = 4;                                   // bytes to forward
-    localparam [3:0] INIT = 4'd0, SEND = 4'd1, DEC = 4'd2, IDLE = 4'd3;
+    localparam [3:0] INIT = 4'd0, SEND = 4'd1, DEC = 4'd2, IDLE = 4'd3, CALLED = 4'd4;
 
     reg clk = 1'b0;
     always #10 clk = ~clk;
@@ -96,6 +96,15 @@ module tb_r1_lane;
                              | fld(`TRW_OP_MOVB, `TRW_SLOT_OP_LSB) | fld(`TRW_DST_R0, `TRW_SLOT_DST_LSB)
                              | fld(`TRW_BSEL_IMM, `TRW_SLOT_BSEL_LSB) | fld(N, `TRW_SLOT_IMM_LSB)
                              | fld(1, `TRW_SLOT_NSE_LSB) | fld(SEND, `TRW_SLOT_NS_LSB) | fld(3, `TRW_SLOT_DF_LSB);
+                // slot 4: when STATE=IDLE do CALL 5 ; STATE:=CALLED, with DST = O0 and DFE on f0.
+                //         O0 still holds the last, untaken byte, and f0 = 1. Under §14 L10 (CALL
+                //         ignores DST and DFE) it must fire anyway: no wait for O0, no reservation,
+                //         no load, no PEND, and f0 stays 1 (a flag write would store R = 0).
+                4: slot_word = fld(1, `TRW_SLOT_V_LSB) | fld(1, `TRW_SLOT_SE_LSB) | fld(IDLE, `TRW_SLOT_SV_LSB)
+                             | fld(`TRW_OP_CALL, `TRW_SLOT_OP_LSB) | fld(`TRW_DST_O0, `TRW_SLOT_DST_LSB)
+                             | fld(`TRW_ASRC_ZERO, `TRW_SLOT_ASRC_LSB) | fld(5, `TRW_SLOT_IMM_LSB)
+                             | fld(1, `TRW_SLOT_DFE_LSB) | fld(0, `TRW_SLOT_DF_LSB)
+                             | fld(1, `TRW_SLOT_NSE_LSB) | fld(CALLED, `TRW_SLOT_NS_LSB);
                 default: slot_word = 53'd0;
             endcase
         end
@@ -123,11 +132,12 @@ module tb_r1_lane;
         end
     end
 
-    // ---- subscribers: take and check
+    // ---- subscribers: take and check. O0 takes the first N-1 bytes only, so the last byte stays in
+    // O0 and the output is full when the CALL (slot 4) is evaluated.
     integer cycle = 0, got0 = 0, got1 = 0, last_t = -1, errors = 0;
     always @(posedge clk) cycle <= cycle + 1;
     always @(posedge clk) begin
-        if (out_valid[0] && sub_last[0] != out_seq[0]) begin
+        if (out_valid[0] && sub_last[0] != out_seq[0] && got0 < N - 1) begin
             sub_last[0] <= out_seq[0];
             if (out_tok[15:0] !== 16'h00A1 + got0 || out_tok[17:16] !== `TRW_TAG_DATA) begin
                 $display("FAIL: O0 token %0d = %h tag %0d", got0, out_tok[15:0], out_tok[17:16]);
@@ -143,11 +153,33 @@ module tb_r1_lane;
         end
         if (out_valid[1] && sub_last[1] != out_seq[1]) begin
             sub_last[1] <= out_seq[1];
-            if (out_tok[35:34] !== `TRW_TAG_EVENT || got0 != N) begin
-                $display("FAIL: O1 token tag %0d after %0d bytes", out_tok[35:34], got0);
+            if (out_tok[35:34] !== `TRW_TAG_EVENT)      // slot 2: KT with A = zero -> OT (§14 L8)
+                begin
+                $display("FAIL: O1 token tag %0d (expected EVENT: KT ignored when A is not an input)",
+                         out_tok[35:34]);
                 errors = errors + 1;
             end
             got1 = got1 + 1;
+        end
+    end
+
+    // §14 L10, checked in the CALL's own EXEC clock: its EVAL edge must not have reserved O0 or set
+    // PEND (the old behaviour set both and cleared them again at EXEC, invisible at the end).
+    always @(posedge clk) begin
+        if (u_lane.ex_slot && u_lane.ex_op == `TRW_OP_CALL && (u_lane.resv !== 2'b00 || u_lane.pend !== 3'b000)) begin
+            $display("FAIL: CALL in EXEC with resv %b pend %b", u_lane.resv, u_lane.pend);
+            errors = errors + 1;
+        end
+    end
+
+    // §14 H1: halted after reset; nothing fires, is taken or loaded before RUN, while the slots are
+    // still being written (unwritten latches are X in simulation).
+    always @(posedge clk) begin
+        if (rst_n && !run && (u_lane.ex_slot !== 1'b0 || u_lane.ex_rt !== 1'b0 || in_take !== 2'b00
+                              || out_valid !== 2'b00 || u_lane.state !== INIT)) begin
+            $display("FAIL: activity while halted: ex_slot %b ex_rt %b take %b out_valid %b STATE %0d",
+                     u_lane.ex_slot, u_lane.ex_rt, in_take, out_valid, u_lane.state);
+            errors = errors + 1;
         end
     end
 
@@ -170,12 +202,22 @@ module tb_r1_lane;
         @(negedge clk);
         run = 1'b1;
         repeat (60) @(posedge clk);
-        if (got0 != N || got1 != 1 || u_lane.state !== IDLE) begin
-            $display("FAIL: %0d bytes, %0d events, STATE %0d", got0, got1, u_lane.state);
+        // O0: N loads in all (seq back to N mod 2); the last byte is still there, untaken, unchanged.
+        if (got0 != N - 1 || got1 != 1 || !out_valid[0] || sub_last[0] == out_seq[0]
+            || out_seq[0] !== N[0] || out_tok[15:0] !== 16'h00A1 + N - 1 || out_tok[17:16] !== `TRW_TAG_DATA) begin
+            $display("FAIL: taken %0d + %0d; O0 valid %b seq %b data %h tag %0d", got0, got1,
+                     out_valid[0], out_seq[0], out_tok[15:0], out_tok[17:16]);
+            errors = errors + 1;
+        end
+        // §14 L10: the CALL fired although O0 was full; no reservation, no PEND, f0 not written.
+        if (u_lane.state !== CALLED || !rb || call_idx !== 5'd5 || u_lane.resv !== 2'b00
+            || u_lane.pend !== 3'b000 || u_lane.f[0] !== 1'b1) begin
+            $display("FAIL: CALL: STATE %0d rb %b idx %0d resv %b pend %b f %b", u_lane.state, rb,
+                     call_idx, u_lane.resv, u_lane.pend, u_lane.f);
             errors = errors + 1;
         end
         if (errors == 0)
-            $display("tb_r1_lane: PASS (%0d bytes at 3 clocks each, then EVENT)", got0);
+            $display("tb_r1_lane: PASS (%0d bytes at 3 clocks each, EVENT; KT per L8, CALL per L10, H1)", N);
         else
             $display("tb_r1_lane: FAIL (%0d errors)", errors);
         $finish;

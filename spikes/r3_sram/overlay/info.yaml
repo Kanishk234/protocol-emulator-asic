@@ -1,0 +1,60 @@
+# Tiny Tapeout project information
+# R3 SRAM smoke test: branch spike/r3-sram only, never merged (DECISIONS D-031).
+project:
+  title:        "TRIPWIRE R3: SRAM macro smoke test"      # Project title
+  author:       "Kanishk, Krithik"      # Your name
+  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
+  description:  "Walking-ones BIST and pin-level word access for the IHP 512x16 SRAM macro on sg13cmos5l"      # One line description of what your project does
+  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
+  clock_hz:     50000000       # Clock frequency in Hz (or 0 if not applicable)
+
+  # How many tiles your design occupies? A single tile is about 167x108 uM.
+  tiles: "2x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+
+  # Your top module name must start with "tt_um_". Make it unique by including your github username:
+  top_module:  "tt_um_tripwire"
+
+  # List your project's source files here.
+  # Source files must be in ./src and you must list each source file separately, one per line.
+  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
+  # The SRAM macro is not a source file: src/config.json brings it in through MACROS, and
+  # src/RM_IHPSG13_1P_512x16_c2_bm_bist.v (its port-only blackbox) is the MACROS "nl" entry.
+  source_files:
+    - "tt_um_tripwire.v"
+    - "trw_sram.v"
+
+# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
+# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
+pinout:
+  # Inputs
+  ui[0]: "START (BIST)"
+  ui[1]: "RSEL[0]"
+  ui[2]: "REG_WR"
+  ui[3]: "REGSEL[0]"
+  ui[4]: "REGSEL[1]"
+  ui[5]: "MEM_WR"
+  ui[6]: "MEM_RD"
+  ui[7]: "RSEL[1]"
+
+  # Outputs
+  uo[0]: "OUT[0] (STATUS / ERRCNT / RDATA byte, by RSEL)"
+  uo[1]: "OUT[1]"
+  uo[2]: "OUT[2]"
+  uo[3]: "OUT[3]"
+  uo[4]: "OUT[4]"
+  uo[5]: "OUT[5]"
+  uo[6]: "OUT[6]"
+  uo[7]: "OUT[7]"
+
+  # Bidirectional pins
+  uio[0]: "DIN[0] (byte register data)"
+  uio[1]: "DIN[1]"
+  uio[2]: "DIN[2]"
+  uio[3]: "DIN[3]"
+  uio[4]: "DIN[4]"
+  uio[5]: "DIN[5]"
+  uio[6]: "DIN[6]"
+  uio[7]: "DIN[7]"
+
+# Do not change!
+yaml_version: 6

@@ -43,7 +43,11 @@ Done:
 - Not re-applied to `spike/r2-latch`.
 
 Next:
-- R2 run 2 in progress.
+- R2 run 2 (`gds` 36017019520): cancelled after ~3 h, no artifacts.
+  - The resizer fix worked: routing started within minutes.
+  - Routing stalled at 8 Metal2 violations in the 27th stubborn-tile pass (live log, D-032).
+- Run 3 prepared (D-034): `PL_TARGET_DENSITY_PCT` 52 (not 45: the placer's utilisation is 48.9 %) and `DRT_OPT_ITERS` 20. A non-converging run now fails with `GDS_logs` instead of timing out without them.
+- D-034 also states the branch-only config-rule exceptions (DRT_OPT_ITERS, and the SDC keys from run 2) that I had not flagged.
 
 ## 2026-09-24: Krithik + Claude (phase 1: R1 spec gaps G1–G8, model side)
 Done:

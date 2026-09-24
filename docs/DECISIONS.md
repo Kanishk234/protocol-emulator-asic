@@ -498,6 +498,28 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - Checked locally with OpenSTA on the Yosys netlist: the 700 latch pins leave setup repair (worst remaining setup +10.6 ns, slow), and hold on them is still checked (+10.45 ns).
   - Expected: the resizer drops from 3 h 21 min to minutes; routing then either clears the last violations or the flow stops at the routing-DRC check with artifacts showing where they are (~3 h either way).
 
+## D-033 (2026-09-24): the R1 spec gaps G1–G8 answered in §14 from the model
+- **Context:** writing the R1 lane from the documents alone found eight places where the text left a choice open or contradicted itself (`docs/reports/R1_LANE_TIMING.md` §6). Each was answered from what `tools/tripsim` does, and written into `ARCHITECTURE.md` §14 (new rules L8–L11, R5–R6, H1), §5.1–5.2, and the slot and routine field descriptions in `spec/tripwire.yaml`. This was done in the model-side session, so the RTL session still reads only the spec.
+
+| Gap | Answer | Rule | Spike agreed? |
+|---|---|---|---|
+| G1 B for `BSEL = reg / k` | `r[IMM[1:0]]` / `K[IMM[1:0]]` | L8 | yes |
+| G2 routine step timing | selected at EVAL in clock n, executed in n+1 | L11 | yes |
+| G3 `OUT` with a full output | not a candidate; does not hold back non-urgent slots | R5 | yes |
+| G4 PEND set and clear on one edge | set wins | L9 | yes |
+| G5 DJNZ and RZ | RZ unchanged; branch straight to RPC | R6 | yes |
+| G6 `KT` with a non-input A | ignored, `OT` applies (tripc rejects `keep` without an input) | L8 | **no**: the spike used the latched head tag. The RTL must follow L8 |
+| G6 `CALL` with a `DST` | CALL ignores DST: no write, no reservation, no wait | L10 | yes for the write. The model reserved the output (BUGS #32, fixed) |
+| G6 f3 writes (`DF = 3`, SETF/CLRF/CPYF 3) | no effect | L10 | yes |
+| G7 slot latches have no reset | halted at reset; the host writes all 12 slots (48 words, unused V = 0) before RUN | H1 | yes. `tripc.load` wrote only used slots (BUGS #33, fixed) |
+| G8 inconsistent numbers | PEND 3 bits; 53-bit slots; RPC + RIR | §5.1, §5.2 | yes (the ISA values) |
+
+- **Cost:** none in hardware. Three tool changes, each with a test:
+  - the model no longer reserves an output for CALL (`test_call_ignores_dst`);
+  - tripc rejects `keep` without an input operand;
+  - `tripc.load` writes every slot (`test_load_writes_every_slot`).
+- **Still needed:** a second person reviews §14 (the phase 1 "zero OPEN items" box). The spike's G6 `KT` choice must change before its lane becomes the phase 2 RTL.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

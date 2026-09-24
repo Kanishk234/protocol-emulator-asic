@@ -21,6 +21,23 @@ Next:
 
 ---
 
+## 2026-09-24: Krithik + Claude (phase 1: R1 spec gaps G1–G8, model side)
+Done:
+- Answered the eight spec gaps from the R1 report (§6) from what `tools/tripsim` does, and wrote them into `ARCHITECTURE.md` §14 (new L8–L11, R5–R6, H1), §5.1/§5.2, and the `spec/tripwire.yaml` field descriptions (regenerated ISA tables). D-033.
+- The spike agrees with every answer except G6 `KT` with a non-input A (the spec says ignore it; the spike used the latched head tag).
+- Two latent tool bugs found by the review and fixed: BUGS #32 (model reserved an output for CALL), #33 (`tripc.load` left unused slots unwritten). tripc now rejects `keep` without an input operand.
+- Tests: 197 fast tests pass (`pytest -n auto -m "not slow"`), `gen --check` clean.
+
+Checklist boxes ticked (evidence):
+- None. "Zero OPEN items" still needs the second person's §14 review.
+
+Problems / decisions:
+- D-033. DECISIONS numbering: D-031/D-032 came from the R2/R3 session; this is D-033, so that session should use D-034 next.
+
+Next:
+- Kanishk: review §14, including the new rules, then the "zero OPEN items" box can be ticked.
+- R2/R3 session: change the spike's `KT` handling to §14 L8 before the lane becomes phase 2 RTL.
+
 ## 2026-09-24: Krithik + Claude (phase 1: R1 risk spike)
 Fresh session, RTL context only: read `ARCHITECTURE.md`, `ISA.md`, `spec/tripwire.yaml` and `PHYSICAL_DESIGN_AND_CI.md`; did not read `tools/tripsim` or `tools/kernels`.
 

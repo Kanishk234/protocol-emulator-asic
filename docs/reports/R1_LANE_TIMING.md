@@ -102,6 +102,8 @@ Wire delay, clock skew and a long route to producers in other blocks all eat int
 
 ## 6. Spec gaps found by writing RTL from the documents alone
 
+**Answered in D-033 (2026-09-24):** `ARCHITECTURE.md` §14 rules L8–L11, R5–R6 and H1. The spike matches every answer except G6 `KT` (§14 L8: with a non-input A, `KT` is ignored and `OT` applies). That must change before this lane becomes the phase 2 RTL.
+
 The RTL had to pick an answer for each of these. The model has presumably picked one too; the text of `ARCHITECTURE.md` §14 / `ISA.md` should say which, so the RTL and the model provably agree. None of them affects the timing result.
 
 | # | Gap | Where | Spike's choice |

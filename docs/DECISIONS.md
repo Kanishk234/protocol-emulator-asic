@@ -420,7 +420,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 **Cost:** documentation and a 4-bit select on the three I1 muxes. Items 6 and 8 change `spec/tripwire.yaml`.
 
 ## D-030 (2026-09-24): R1 result: lanes fire every clock
-- **Decision (proposed):** keep ARCHITECTURE §14 L1 as written: EVAL runs every clock at 50 MHz. The fire-every-other-clock fallback is not needed and is not built into the phase 2 RTL.
+- **Decision:** keep ARCHITECTURE §14 L1 as written: EVAL runs every clock at 50 MHz. The fire-every-other-clock fallback is not needed and is not built into the phase 2 RTL.
 - **Evidence:** `docs/reports/R1_LANE_TIMING.md`. A spike lane (`spikes/r1_lane/`), written from the spec only: 12 slots, full `ready()` with implicit checks, the urgent/routine rule, one priority encoder, static updates, EXEC with the 16-op ALU, and real consumer ports and release terms in front of it. Synthesized with Yosys onto the cmos5l cells and timed with OpenSTA at 20 ns (before layout):
   - EVAL arrival 3.7–7.3 ns (typ), 5.8–11.4 ns (slow 1.08 V / 125 °C);
   - worst EVAL slack +8.2 ns (flop slots, unbuffered, slow);
@@ -431,7 +431,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Check:** the R2 hardening (a 2x2 project around this lane's latch array) reports post-route timing of the same logic. If its EVAL slack at the slow corner falls below 2 ns, revisit this entry.
 - **Also found** (report §6, G1–G8): eight places where the spec text leaves an RTL choice open or disagrees with itself, for example which register `BSEL = reg` selects, and whether a routine step executes one clock after it is chosen. They do not affect timing. They should be answered in §14 / `ISA.md` from the model's behaviour before the phase 2 RTL.
 - **Area** (one lane, latch slots, before layout): ~67K µm². Three lanes ~202K µm² (22 % of the 6x4 core). Latch slots save ~26K µm² per lane over flops.
-- **Status:** proposed; needs team acceptance to tick the R1 box.
+- **Status:** accepted (Krithik, 2026-09-24: "accept D-030"). G1–G8 remain to be answered in §14 / `ISA.md`.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

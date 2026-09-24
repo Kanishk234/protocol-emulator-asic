@@ -40,20 +40,20 @@ Done:
   - EXEC at most 10.6 ns.
   - Report: `docs/reports/R1_LANE_TIMING.md`.
 - **Area:** ~67K µm² per lane with latch slots (slots 25.5K vs 51.7K as flops). Recorded in `AREA.md` (synthesis-only section).
-- **DECISIONS D-030 (proposed):** fire every clock; no fallback in the phase 2 RTL. Recheck against R2's post-route slack.
+- **DECISIONS D-030 (accepted):** fire every clock; no fallback in the phase 2 RTL. Recheck against R2's post-route slack.
 - **Spec gaps G1–G8** (report §6): places where the text leaves an RTL choice open or disagrees with itself (BSEL reg/k index, routine step pipeline position, blocked routine OUT, PEND set/clear on the same edge, DJNZ and RZ, KT/CALL/f3 corner cases, slot latches without reset, PEND/slot-width/RRET inconsistencies). None affects timing.
 - `docs/summaries/PHASE1.md` item 16.
 
 Checklist boxes ticked (evidence):
-- none. The R1 box has its measurement evidence noted and waits for D-030 to be accepted.
+- [x] R1 decided: `docs/reports/R1_LANE_TIMING.md` (run_r1.sh), D-030 accepted by Krithik ("accept D-030").
 
 Problems / decisions:
 - Before layout only: no wires, no CTS. R2's hardening gives post-route numbers for the same logic.
 - The clock gate in `trw_slots` is a behavioural latch + AND. For R2 and phase 2, instantiate `sg13cmos5l_lgcp_1`.
 
 Next:
-- Team: accept or reject D-030; answer G1–G8 in §14 / ISA (the model owner can say what tripsim does).
-- R2: a 2x2 TT project around `trw_slots` + `trw_lane` (library ICG, host-write path from pins). It needs its own repo or branch from the cmos5l template, because hardening in this repo means touching `src/`.
+- Team: answer G1–G8 in §14 / ISA (the model owner can say what tripsim does).
+- R2: a 2x2 TT project around `trw_slots` + `trw_lane` (library ICG, host-write path from pins). Plan: spike branches in this repo (`spike/r2-latch`, `spike/r3-sram`) with `tiles: "2x2"`, never merged; `gds` concurrency is per ref, so they don't cancel `main`.
 - R3: the SRAM macro smoke project (PHYSICAL §3 recipe).
 
 ## 2026-09-23: Krithik + Claude (phase 1: CI speed, ISA §9 answers, freeze proposals)

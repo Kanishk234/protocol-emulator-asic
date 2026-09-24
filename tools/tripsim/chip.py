@@ -8,6 +8,7 @@ Pads are numbered 0-7 ui_in, 8-15 uo_out, 16-23 uio. ui[4..6] and uo[6..7] belon
 to the host port (§10) and cannot be attached to pin units.
 """
 
+import os
 from collections import deque
 
 import tripwire_spec as _S
@@ -36,7 +37,9 @@ class Sram:
 
 class Chip:
     def __init__(self, lanes=3, slots=12, pin_units=6, sram_words=512,
-                 fire_period=1, host_fifo_depth=16):
+                 fire_period=None, host_fifo_depth=16):
+        if fire_period is None:                 # R1 experiments: TRIPSIM_FIRE_PERIOD=2 for every chip
+            fire_period = int(os.environ.get("TRIPSIM_FIRE_PERIOD", "1"))
         self.fabric = f = Fabric()
         for u in range(pin_units):
             f.producer(f"U{u}.rx")

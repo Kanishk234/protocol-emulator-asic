@@ -38,14 +38,18 @@ Done:
   - no helper units in phase 2;
   - host MISO moves to `uo_out[3]` (RP2350 SPI0 RX); pin map follows.
 
+- **D-029 accepted and applied** (Krithik: "go with your recommendations for both").
+  - `spec/tripwire.yaml`: host pads `ui4 ui5 ui6 uo3 uo6` (MISO moved from `uo7`, checked against RP2350 datasheet Table 645), and a new `fabric` legal-source table (4-bit `sel`; Lk.I1 has 9 sources).
+  - The generator expands the table into `LEGAL_SOURCES` (Python) and a generated table in ARCHITECTURE §4.6. There is no Verilog output yet, so `src/` is unchanged; it is added when the phase 2 RTL needs it.
+  - tripc rejects a `connect` outside the table; every program passes (`test_every_program_uses_only_legal_sources`). New gen and tripc tests: 189 fast tests pass in 18 s.
+  - ARCHITECTURE §4.3–4.6, §8 (helpers deferred), §9 host pins, §10 pin map, block diagram; ISA §8–9. Zero OPEN items remain.
+
 Checklist boxes ticked (evidence):
-- None.
-  - "ARCH_EXPLORATION answers every row" is written, but the box also needs its ISA changes logged: D-029 is only proposed until the review.
-  - "Zero OPEN items" waits for the D-029 review, then the doc and spec edits.
+- [x] ARCH_EXPLORATION answers every ISA §9 row, with decisions logged (D-029 accepted). Evidence is next to the box.
+- "Zero OPEN items" is done, but the box also needs the second person's §14 semantics review, so it stays open.
 
 Next:
-- Team: review D-029 (both of us). Double-check the RP2350 SPI0 pin functions, and the §14 semantics review.
-- Then Claude applies D-029 to `ARCHITECTURE.md`, `ISA.md` and `spec/tripwire.yaml` (connectivity table, pins), adds a tripc legal-source check, and removes the OPEN markers.
+- Kanishk: review ARCHITECTURE §14 (cycle-exact semantics), and read D-029.
 - R1–R3 spikes (fresh session, RTL-only context); area estimate and cut list for the pin-unit options.
 - Check the first `nightly` run (start it by hand with workflow_dispatch).
 

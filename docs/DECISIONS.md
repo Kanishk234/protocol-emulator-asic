@@ -362,8 +362,8 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 
 ---
 
-## D-029 (2026-09-23): spec-freeze proposals from the phase 1 measurements (PROPOSED, needs the two-person review)
-**Status: proposed.** Nothing below is applied to `ARCHITECTURE.md`, `ISA.md` or `spec/tripwire.yaml` yet. Each item closes an OPEN item once both of us agree; then the docs change and the OPEN markers go. Evidence: `docs/reports/ARCH_EXPLORATION.md` §1 and §1a (all 20 programs in `programs/`).
+## D-029 (2026-09-23): spec-freeze decisions from the phase 1 measurements
+**Status: accepted** (Krithik, 2026-09-23: "go with your recommendations for both": 9 sources on Lk.I1, MISO on `uo_out[3]`). Applied to `ARCHITECTURE.md` (§4.3–4.6, §8–10), `ISA.md` (§8, §9) and `spec/tripwire.yaml` (`pads.host`, new `fabric` table); tripc rejects illegal connections. The RP2350 pin functions in item 8 were checked against the RP2350 datasheet, Table 645. The §14 semantics review by a second person is separate and still pending. Evidence: `docs/reports/ARCH_EXPLORATION.md` §1 and §1a (all 20 programs in `programs/`).
 
 1. **Lane size stays: 12 slots, 4 registers, 4 K constants, every D-007 feature.**
    - All 23 lanes fit 12 slots. Six sit at exactly 12, so there is no headroom. 16 slots would cost 212 latch bits per lane; we revisit only if R2 leaves area.
@@ -397,9 +397,9 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 
    - Lane-to-lane links in use: CAN `L0.I1 <- L1.O0` and `L1.I1 <- L0.O1`; LIN `L1.I1 <- L0.O1`.
    - Unit RX on I1 appears in 11 connections.
-   - `Lk.I1` breaks the ≤ 8 rule by one: a 4-bit select and one more mux level on 3 ports. The alternative is 4 units per lane on I1, which needs a unit-allocation pass in tripc. **Recommendation: allow 9.**
+   - `Lk.I1` breaks the ≤ 8 rule by one: a 4-bit select and one more mux level on 3 ports. The alternative was 4 units per lane on I1, which needs a unit-allocation pass in tripc. **Chosen: allow 9** (`sel` is 4 bits on every port).
    - The helper sources (CRC, MATCH, MEM, CAPTURE) leave the table; see item 7.
-   - tripc should check the table once it is frozen.
+   - tripc checks every `connect` against the generated table (`LEGAL_SOURCES`).
 7. **Helper units (§8): none goes into the phase 2 RTL.** No program needed one:
    - CRC: in BITSYNC for serial streams; table routines for SMBus PEC and the LIN checksum.
    - MATCH: CMPM in slots.
@@ -409,7 +409,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 8. **Host SPI pins (§9): move MISO from `uo_out[7]` to `uo_out[3]`.**
    - On the current TT demo board (RP2350, `tt-demo-pcb` README), `ui_in[4..6]` are GPIO21–23, which are SPI0 CSn, SCK and TX.
    - `uo_out[3]` is GPIO36, SPI0 RX. `uo_out[7]` is GPIO40, SPI1 RX, which would not work with hardware SPI0.
-   - The GPIO function numbers come from the RP2350 datasheet's function table (SPI instance = ⌊n/8⌋ mod 2, role = n mod 4). They need a second check by the team.
+   - Checked in the RP2350 datasheet, Table 645 (GPIO function select, F1): GPIO21 SPI0 CSn, GPIO22 SPI0 SCK, GPIO23 SPI0 TX, GPIO36 SPI0 RX, GPIO40 SPI1 RX.
    - PIO could use any pins, but hardware SPI is simpler.
 9. **Pin map (§10), following item 8:**
    - host: `ui_in[4..6]`, MISO `uo_out[3]`, IRQ `uo_out[6]`;
@@ -420,7 +420,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 **Cost:** documentation and a 4-bit select on the three I1 muxes. Items 6 and 8 change `spec/tripwire.yaml`.
 
 ## Open questions for the phase 1 spec freeze
-Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **D-029 proposes closing Q1–Q7** (pending review).
+Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 
 Found while reading the design docs; to be settled in `ARCHITECTURE.md` during P1.
 - **Q1: routine steps vs. reflexes.** §6.2 says a routine step runs only on a clock when *no* reflex fires; §6.3 and the overview say *urgent* reflexes interrupt routines. What exactly does `U=0` block while RB is set?

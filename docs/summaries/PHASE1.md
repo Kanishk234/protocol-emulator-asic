@@ -103,7 +103,7 @@ We also made the per-push tests about 20 times faster locally by moving the five
 
 ## What's left in Phase 1
 1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.
-2. **Review and apply the freeze decision (D-029)**, and have a second person review the cycle-by-cycle rules. The measurements the model owed are done (see 15).
+2. **A second person reviews the cycle-by-cycle rules.** The freeze decision (D-029) is accepted and applied: the connection table is in the spec and the compiler enforces it, the host's MISO pin moved so the demo board's hardware SPI can reach it, and no open questions remain in the design documents.
 3. **Three hardware experiments**, each a small separate hardening run:
    - R1: build one lane in Verilog and check it runs at 50 MHz;
    - R2: check that latch-based slot memory survives Tiny Tapeout's flow;

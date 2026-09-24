@@ -9,7 +9,7 @@ This document defines the TRIPWIRE hardware:
 - the pin units, helper units and host interface;
 - timing, pin map and area budget.
 
-It is the contract that the RTL and the golden model are both written from. Where a detail is not final it is marked **OPEN** and gets settled in the P1 spec freeze. The lane instruction set (reflex slots, routines, operation table) is specified in `ISA.md`.
+It is the contract that the RTL and the golden model are both written from. The phase 1 OPEN items were closed by DECISIONS D-029 (after the model measurements); any new open point is marked **OPEN** and needs a DECISIONS entry to close. The lane instruction set (reflex slots, routines, operation table) is specified in `ISA.md`.
 
 Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VERIFICATION.md` (how all of this is checked).
 
@@ -40,7 +40,7 @@ Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VER
 | Lane ports | 2 inputs (I0, I1), 2 outputs (O0, O1) | |
 | Token | 16-bit data + 2-bit tag | Tags: 00 DATA, 01 CTRL, 10 EVENT, 11 ERR |
 | Pin units | 6 (U0–U5), each with a TX half and an RX half | |
-| Helper units | CRC, MATCH, MEM, CAPTURE | |
+| Helper units | None in phase 2 (CRC, MATCH, MEM, CAPTURE deferred, §8) | D-029 |
 | SRAM | IHP 512x16 macro (1024x16 optional) | Routines + data + capture ring |
 | Global time | 16-bit free-running counter, +1 per clock | Wraps every 1.31 ms; pin units have prescalers for longer times |
 
@@ -56,16 +56,16 @@ Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VER
  └──────────────────────────────────────────────────────────────────────────────────────────────┘
           ▲▼                                   ▲▼                                   ▲▼
  ┌──────────────────────────────── CHANNEL FABRIC (tokens: 16b data + 2b tag) ──────────────────────┐
- │ producer registers:  U0..U5.rx · L0..L2.{O0,O1} · CRC · MATCH · MEM · HOST_IN        (16)        │
- │ consumer ports:      U0..U5.tx · L0..L2.{I0,I1} · CRC · MATCH · MEM · HOST_OUT · CAPTURE (17)   │
- │ each consumer port: select (≤8 legal sources) · enable · blocking/tap · last-seq bit             │
+ │ producer registers:  U0..U5.rx · L0..L2.{O0,O1} · HOST_IN                            (13)        │
+ │ consumer ports:      U0..U5.tx · L0..L2.{I0,I1} · HOST_OUT                           (13)       │
+ │ each consumer port: 4-bit select (≤9 legal sources, §4.6) · enable · blocking/tap · last-seq     │
  └──────────────────────────────────────────────────────────────────────────────────────────────────┘
           ▲▼                          ▲▼                           ▲▼
    ┌──────────────┐        ┌───────────────────┐        ┌───────────────────────┐
    │ LANE L0..L2  │        │ HELPERS           │        │ SRAM 512x16            │
-   │ 12 slots     │ ◄──────┤ CRC, MATCH, MEM,  │        │ rotation (clk mod 4):  │
-   │ EVAL → EXEC  │ routine│ CAPTURE           │ ◄──────┤ 0:L0 1:L1 2:L2 3:MEM/  │
-   │ r0-r3, p7-p0 │ steps  └───────────────────┘        │   CAPTURE/HOST         │
+   │ 12 slots     │ ◄──────┤ (deferred, §8)    │        │ rotation (clk mod 4):  │
+   │ EVAL → EXEC  │ routine│                   │ ◄──────┤ 0:L0 1:L1 2:L2 3:HOST  │
+   │ r0-r3, p7-p0 │ steps  └───────────────────┘        │                        │
    └──────────────┘ ◄─────────────────────────────────── └───────────────────────┘
           ▲
    HOST CONTROLLER (SPI slave): load slots/SRAM/config, run/halt/step, debug readback, host FIFOs, IRQ
@@ -92,7 +92,7 @@ Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VER
 - Taps never hold a producer back.
 
 ### 4.3 Consumer port (one per consumer)
-- Registers: `sel` (3 bits, indexing the port's legal-source list), `en`, `mode` (blocking/tap), `last_seq`.
+- Registers: `sel` (4 bits, indexing the port's legal-source list, §4.6), `en`, `mode` (blocking/tap), `last_seq`.
 - **Available** to the consumer when `en && src.valid && last_seq != src.seq`.
 - **Taking** sets `last_seq = src.seq`.
 - For a **tap**: if the producer loads a new token before the tap took the old one, the tap's `DROPPED` counter increments (8-bit, saturating).
@@ -103,7 +103,7 @@ Companion documents: `OVERVIEW_TRIPWIRE.md` (the overview and schedule) and `VER
 
 When `all_taken`, the producer register is free for its next load. (The draft semantics in §14, rules F3–F6, make this exact. `valid` stays set, and a taken token is not seen again because `last_seq == seq`.)
 
-**Throughput (OPEN, Q7):** the original target was one token per clock per producer. That needs a combinational path from a consumer's take back to the producer's load, and lane-to-lane channels would turn that path into a loop. The model therefore uses registered release (§14 F3). Measured cost: a lane can load the same output port at most once every 3 clocks, and HOST_IN can deliver to a lane at most once every 2 clocks. `docs/reports/ARCH_EXPLORATION.md` checks whether any protocol needs more.
+**Throughput (Q7, closed by D-029):** release is registered (§14 F3). A same-clock release would need a combinational path from a consumer's take back to the producer's load, and lane-to-lane channels would turn that path into a loop. Cost: a lane can load the same output port at most once every 3 clocks, and HOST_IN can deliver to a lane at most once every 2 clocks. The densest stream in any program is one token per 32 clocks (`docs/reports/ARCH_EXPLORATION.md`), so producers stay depth 1.
 
 ### 4.5 Pin receivers never wait
 If a pin RX half completes a token while its producer register still holds an untaken token for a blocking subscriber:
@@ -115,17 +115,26 @@ The old token is kept so that sequence order is never violated.
 
 ### 4.6 Legal sources (connectivity table)
 
-This is an initial proposal, **OPEN**, to be tuned in P1 for routing. Each consumer port selects among at most 8 sources, and the multiplexer sits next to the consumer.
+Each consumer port selects among at most 16 sources with its 4-bit `sel`; the multiplexer sits next to the consumer. The table comes from what the 20 programs in `programs/` use (D-029) and is symmetric across lanes and units, so tripc can place a program on any lane or unit. `Lk.I1` has 9 sources (the 6 units, the host, and the neighbouring lanes, for the two-lane CAN and LIN programs). The other ports have at most 8. tripc rejects a `connect` that is not in this table. The helper units of §8 are not in phase 2, so they have no sources here.
 
-| Consumer | Legal sources (≤8) |
-|---|---|
-| Lk.I0 | U0–U5.rx, HOST_IN, MATCH |
-| Lk.I1 | the other two lanes' O0/O1 (4), CRC, MEM, HOST_IN, MATCH |
-| Un.tx | L0–L2.O0/O1 (6), HOST_IN, MEM |
-| CRC.in / MATCH.in | U0–U5.rx, Lk.O1 of 2 lanes (a set chosen per build) |
-| MEM.in | L0–L2.O1, HOST_IN |
-| HOST_OUT | L0–L2.O0, U0–U3.rx, MEM (note: the phase 1 programs also use L0.O1/L1.O1 here; the model does not enforce this table yet, so it must be revisited before the freeze) |
-| CAPTURE | U0–U5.rx, L0.O0, HOST_IN |
+<!-- GENERATED:legal_sources -->
+<!-- GENERATED by tools/gen/gen.py from spec/tripwire.yaml. DO NOT EDIT. Edit spec/tripwire.yaml. -->
+| Consumer | Legal sources, in `sel` order (4-bit `sel`) | Count |
+|---|---|---|
+| L0.I0 | 0 U0.rx, 1 U1.rx, 2 U2.rx, 3 U3.rx, 4 U4.rx, 5 U5.rx, 6 HOST_IN, 7 L2.O1 | 8 |
+| L1.I0 | 0 U0.rx, 1 U1.rx, 2 U2.rx, 3 U3.rx, 4 U4.rx, 5 U5.rx, 6 HOST_IN, 7 L0.O1 | 8 |
+| L2.I0 | 0 U0.rx, 1 U1.rx, 2 U2.rx, 3 U3.rx, 4 U4.rx, 5 U5.rx, 6 HOST_IN, 7 L1.O1 | 8 |
+| L0.I1 | 0 U0.rx, 1 U1.rx, 2 U2.rx, 3 U3.rx, 4 U4.rx, 5 U5.rx, 6 HOST_IN, 7 L1.O0, 8 L2.O1 | 9 |
+| L1.I1 | 0 U0.rx, 1 U1.rx, 2 U2.rx, 3 U3.rx, 4 U4.rx, 5 U5.rx, 6 HOST_IN, 7 L2.O0, 8 L0.O1 | 9 |
+| L2.I1 | 0 U0.rx, 1 U1.rx, 2 U2.rx, 3 U3.rx, 4 U4.rx, 5 U5.rx, 6 HOST_IN, 7 L0.O0, 8 L1.O1 | 9 |
+| U0.tx | 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN | 7 |
+| U1.tx | 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN | 7 |
+| U2.tx | 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN | 7 |
+| U3.tx | 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN | 7 |
+| U4.tx | 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN | 7 |
+| U5.tx | 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN | 7 |
+| HOST_OUT | 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 U0.rx, 7 U1.rx | 8 |
+<!-- /GENERATED:legal_sources -->
 
 ---
 
@@ -187,7 +196,7 @@ This holds when the reacting slot is the highest-priority ready slot in its lane
 Moved to **`ISA.md`** §5. Routines use 16-bit words in SRAM with the same operation table as reflexes, plus `LDI/LDIH`, `BR` (on the routine-local `RZ` bit), `DJNZ`, `LD/ST`, `OUT` and `SYS` (`SETST`, `SETF`, `CLRF`, `TSTF`, `CPYF`, `GETT`, `GETK`, `RET`). §6.2–6.3 below describe execution; `ISA.md` §5.3 defines exactly how routine steps and reflexes share EXEC.
 
 ### 6.2 Execution
-- **SRAM access is a fixed rotation:** cycle mod 4 = 0 → L0, 1 → L1, 2 → L2, 3 → MEM/CAPTURE/HOST.
+- **SRAM access is a fixed rotation:** cycle mod 4 = 0 → L0, 1 → L1, 2 → L2, 3 → HOST (and MEM/CAPTURE if they return, §8).
 - A lane with RB set fetches one routine word on its slot and executes it in its EXEC stage on a clock when no reflex fires. So a routine gets **1 step per 4 clocks** (12.5 M steps/s), or fewer if reflexes fire.
 - `LD`/`ST` use the lane's next slot for the data access, so they cost 2 steps.
 - **CALL** reads the routine's start address from an entry table in the first 32 SRAM words, taking one slot. It sets RB, and `RET` clears it.
@@ -265,11 +274,13 @@ EVENT tokens from pin units always carry the new level of pin A in `data[15]`, s
 
 ---
 
-## 8. Helper units
+## 8. Helper units (deferred, D-029)
+
+None of the helper units below is in the phase 2 RTL: no program in `programs/` needed one. CRC is covered by BITSYNC for serial streams and by table routines for byte checksums (SMBus PEC, LIN); MATCH by `CMPM` in slots; MEM by routines with `ld`/`st` and tripc `table`s. Any of them can return in phase 4 with its own DECISIONS entry if a showcase needs it and the area allows (MEM is the likeliest, for SPI flash / EEPROM emulation). CRC-32 is dropped with the CRC helper. The descriptions are kept as the starting point:
 
 | Unit | Input tokens | Output tokens | Configuration |
 |---|---|---|---|
-| **CRC** | DATA (width set by config, 1–16 bits); CTRL RESET; CTRL READ | EVENT with the CRC value | poly (16), init (16), refin, refout, xorout. CRC-32 only if area allows (OPEN) |
+| **CRC** | DATA (width set by config, 1–16 bits); CTRL RESET; CTRL READ | EVENT with the CRC value | poly (16), init (16), refin, refout, xorout |
 | **MATCH** | DATA | EVENT: index of the first matching entry (0–3) or NOMATCH; optionally forwards the original token | 4 × (value, mask) |
 | **MEM** | CTRL ADDR a; DATA (write at addr++); CTRL READ n | n DATA tokens from addr++ | Base/limit of the data region; uses rotation slot 3 |
 | **CAPTURE** | Any tap token | None. Writes {time, tag, data} into a ring in SRAM; the host reads it back | Ring base/length; shares slot 3 (MEM has priority, and capture counts its drops) |
@@ -278,7 +289,7 @@ EVENT tokens from pin units always carry the new level of pin A in `data[15]`, s
 
 ## 9. Host interface
 
-- **Physical:** SPI slave, mode 0. Proposed pins: `ui_in[4]` CS_n, `ui_in[5]` SCK, `ui_in[6]` MOSI, `uo_out[7]` MISO, `uo_out[6]` IRQ (**OPEN**: confirm against the TT demo board's RP2040 SPI0 mapping). SCK ≤ clk/8.
+- **Physical:** SPI slave, mode 0. Pins (D-029): `ui_in[4]` CS_n, `ui_in[5]` SCK, `ui_in[6]` MOSI, `uo_out[3]` MISO, `uo_out[6]` IRQ. On the TT demo board (RP2350) these are GPIO21 SPI0 CSn, GPIO22 SPI0 SCK, GPIO23 SPI0 TX and GPIO36 SPI0 RX (RP2350 datasheet, Table 645), so the board's hardware SPI0 drives the host link. SCK ≤ clk/8.
 - **Transaction:** `CMD[7:0]` (bit 7 = write), `ADDR[15:0]`, then 16-bit data words with auto-increment. Reads insert one dummy byte.
 
 | Address range | Space |
@@ -287,7 +298,7 @@ EVENT tokens from pin units always carry the new level of pin A in `data[15]`, s
 | 0x1000–0x1FFF | Reflex slots: `lane[9:8] slot[7:4] word[1:0]` (4 × 16-bit words per slot) |
 | 0x2000–0x20FF | Fabric consumer port registers (sel, en, mode) |
 | 0x3000–0x30FF | Pin unit configuration + pin owner registers |
-| 0x4000–0x40FF | Helper configuration (CRC, MATCH, MEM, CAPTURE) |
+| 0x4000–0x40FF | Reserved (helper configuration, if a helper returns; §8) |
 | 0x5000–0x50FF | Debug readback: r0–r3, STATE, FLAGS, PEND, RPC, per-channel valid/seq, head tokens |
 | 0x6000 / 0x6001 | HOST_IN push / HOST_OUT pop (+ status) |
 | 0x8000–0x81FF | SRAM words (routines, entry table, data, capture ring) |
@@ -299,17 +310,17 @@ EVENT tokens from pin units always carry the new level of pin A in `data[15]`, s
 
 ---
 
-## 10. Pin map (proposal, OPEN)
+## 10. Pin map (D-029)
 
 | Pads | Use |
 |---|---|
-| `ui_in[4..6]`, `uo_out[7]` | Host SPI |
+| `ui_in[4..6]`, `uo_out[3]` | Host SPI (CS_n, SCK, MOSI, MISO) |
 | `uo_out[6]` | IRQ |
 | `ui_in[0..3]`, `ui_in[7]` | 5 input-only pins (sample-only for pin units) |
-| `uo_out[0..5]` | 6 output-only pins |
+| `uo_out[0..2]`, `uo_out[4..5]`, `uo_out[7]` | 6 output-only pins |
 | `uio[0..7]` | 8 bidirectional pins (open-drain capable) |
 
-**19 free pins** for protocols, plus the IRQ output.
+**19 free pins** for protocols, plus the IRQ output. The pad numbering and the host pads are in `spec/tripwire.yaml` (`pads`).
 
 ---
 
@@ -400,7 +411,7 @@ This section is the text that both `tools/tripsim` and the RTL implement. It is 
 - **L7.** An output is free for EVAL when it is not reserved and its producer is free (F3).
 
 ### Routines
-- **R1.** SRAM rotation: `cycle mod 4` = 0, 1, 2 → lanes L0, L1, L2; 3 → MEM/CAPTURE/HOST. The SRAM read data is registered, so a word read on slot k is usable from clock k+1.
+- **R1.** SRAM rotation: `cycle mod 4` = 0, 1, 2 → lanes L0, L1, L2; 3 → HOST (and MEM/CAPTURE if they return, §8). The SRAM read data is registered, so a word read on slot k is usable from clock k+1.
 - **R2.** On its slot, a lane fetches `SRAM[RPC]` into RIR only when RB = 1, RIR is empty, no routine step is waiting to execute, and no data access is pending. This guarantees RPC is final before the fetch.
 - **R3.** A pending data access (the entry-table read after CALL, or an LD/ST) uses the lane's slot before any fetch.
   - `LD` returns its data as a second routine step, which competes for EXEC like any step.

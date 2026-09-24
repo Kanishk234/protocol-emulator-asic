@@ -228,7 +228,7 @@ This resolves:
 - Every loop is a `DJNZ` with a compile-time-known count, so the compiler can compute each routine's worst-case step count.
 
 ### 5.3 Routines and reflexes share EXEC (resolves Q1)
-- SRAM access rotates `cycle mod 4`: 0 → L0, 1 → L1, 2 → L2, 3 → MEM/CAPTURE/HOST (`ARCHITECTURE.md` §6.2).
+- SRAM access rotates `cycle mod 4`: 0 → L0, 1 → L1, 2 → L2, 3 → HOST (`ARCHITECTURE.md` §6.2; MEM/CAPTURE are deferred, D-029).
 - On its rotation slot, a lane with RB set and an empty RIR fetches `SRAM[RPC]` into RIR.
 - A valid RIR is a **candidate for EXEC**. It is beaten only by an **urgent** ready slot (§4.3). A non-urgent slot waits behind it.
 - Once the step executes, RIR empties and the next fetch happens at the next rotation slot.
@@ -297,9 +297,9 @@ slot 6 U  when I0:EVENT, head[15]=0 (STOP)      do MOV none := I0 ; deq ; STATE:
 
 ---
 
-## 8. Open questions Q1–Q6: proposed resolutions
+## 8. Open questions Q1–Q6: resolutions (closed by D-029)
 
-| Q | Issue | Resolution in this draft |
+| Q | Issue | Resolution (implemented in `spec/tripwire.yaml`, used by `programs/`) |
 |---|---|---|
 | Q1 | When do routine steps run vs. reflexes; what does `U` block? | §5.3: all reflexes stay eligible; `U` only decides who wins EXEC when a routine step is waiting |
 | Q2 | CALL encoded twice | CALL is OP 14 only; DST 7 is reserved |
@@ -312,17 +312,19 @@ slot 6 U  when I0:EVENT, head[15]=0 (STOP)      do MOV none := I0 ; deq ; STATE:
 
 ## 9. What the model must measure before the freeze
 
+**All rows answered** in `docs/reports/ARCH_EXPLORATION.md` §1 and §1a, over the 20 programs in `programs/`; the decisions are in D-029.
+
 These are deliberately **not** decided by argument. The architecture model (`tripsim`, DECISIONS D-008) runs UART, SPI and I2C (controller and target), SPI flash emulation and 1-Wire on the ISA above, and reports:
 
 | Question | Metric | Decision it drives |
 |---|---|---|
-| Are 12 slots enough? | Slots used per protocol and per lane | 12 vs 16 slots |
-| Are 4 registers + 4 constants enough? | Register/constant pressure; spills into routines | Keep, or 8 registers |
+| Are 12 slots enough? | Slots used per protocol and per lane | 12 vs 16 slots. **Answered: keep 12** (all 23 lanes fit; six use exactly 12) |
+| Are 4 registers + 4 constants enough? | Register/constant pressure; spills into routines | Keep, or 8 registers. **Answered: keep 4 + 4** (only CAN L0 uses all four registers) |
 | ~~What should OP 15 be?~~ | Answered: `MOVB` (D-009). The model's first latency kernel needed "on an input, emit a constant" | Done |
-| Do implicit checks, the zero flag, `K` and `HE/HV` pay off? | Slots and clocks per protocol, with and without each | Keep or drop each (ablation) |
-| What does the R1 fallback cost? | Protocol deadlines met at "fire every other clock" | Whether the fallback is acceptable |
-| Separate TX/RX NBITS in pin units? | ACK and turnaround latency | Pin-unit spec change |
-| Routine rate | Worst-case routine steps vs. protocol gaps | SRAM rotation and routine features |
+| Do implicit checks, the zero flag, `K` and `HE/HV` pay off? | Slots and clocks per protocol, with and without each | Keep or drop each (ablation). **Answered: keep all** (dropping any one overflows 2–5 lanes) |
+| What does the R1 fallback cost? | Protocol deadlines met at "fire every other clock" | Whether the fallback is acceptable. **Answered: acceptable** (all 103 kernel tests pass; the reaction time grows) |
+| Separate TX/RX NBITS in pin units? | ACK and turnaround latency | Pin-unit spec change. **Answered: `SETN rx`** (D-020) |
+| Routine rate | Worst-case routine steps vs. protocol gaps | SRAM rotation and routine features. **Answered: keep 1 step / 4 clocks**; sub-bit deadlines live in the pin unit |
 
 ---
 

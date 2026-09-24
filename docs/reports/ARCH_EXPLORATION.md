@@ -2,7 +2,7 @@
 
 Numbers from `tools/tripsim` running protocol kernels (`tools/kernels`). Each row names the test that produces it, so every number can be re-run with `python -m pytest -q`.
 
-**Status: every `ISA.md` §9 row answered (2026-09-23); resulting proposals in DECISIONS D-029, pending the two-person review.** All numbers are from simulation on the model, with ideal pads and buses (no rise times, no metastability).
+**Status: every `ISA.md` §9 row answered (2026-09-23); the resulting decisions are DECISIONS D-029 (accepted 2026-09-23).** All numbers are from simulation on the model, with ideal pads and buses (no rise times, no metastability).
 
 ## 1. Answers to `ISA.md` §9 so far
 

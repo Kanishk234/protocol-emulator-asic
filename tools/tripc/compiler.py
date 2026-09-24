@@ -15,6 +15,8 @@ Language (line oriented; '#' starts a comment; blocks are indented under a 'name
         slot [urgent]: [when COND, ...] do ACTION [then STATE]
     routine NAME:
         <instruction> | label:
+    table NAME:                  # constant words in SRAM (lookup tables); NAME = its address
+        EXPR, EXPR, ...          # placed after the entry table, before the routines
 
 Slot conditions:  STATE | fN == V | rb == V | I0 is TAG | head15 == V | head0 == V
 Slot action:      OP DST <- A [, B] [, mask X val Y] [, f=EXPR] [, deq] [, keep] [, tag TAG] [-> fN]
@@ -40,7 +42,7 @@ from .expr import ExprError, evaluate
 LANE_SLOTS = 12
 SRAM_WORDS = 512
 _PIN_KEYS = {f.name for f in dataclasses.fields(PinConfig)}
-_PAD_KEYS = {"pin_a", "pin_b", "pin_c", "pin_s"}
+_PAD_KEYS = {"pin_a", "pin_b", "pin_c", "pin_s", "pin_n"}
 
 
 class TrwError(Exception):
@@ -70,6 +72,7 @@ class Compiler:
         self.program = None
         self.pins, self.owns, self.connects = {}, [], []
         self.lanes, self.routines = {}, {}        # routines: name -> (lineno, [lines])
+        self.tables = []                           # SRAM words of all tables, from address 32
         self.warnings = []
 
     # -------------------------------------------------------------- helpers
@@ -119,7 +122,7 @@ class Compiler:
                 self.owns.append((self._pad(parts[1], n), self._unit(parts[2], n)))
             elif head == "connect":
                 self._connect(line, n)
-            elif head in ("lane", "routine"):
+            elif head in ("lane", "routine", "table"):
                 m = re.fullmatch(rf"{head}\s+(\w+)\s*:", line)
                 if not m:
                     self.err(f"expected '{head} NAME:'", n)
@@ -130,6 +133,13 @@ class Compiler:
                     i += 1
                 if head == "lane":
                     self._lane(m.group(1), body, n)
+                elif head == "table":
+                    if m.group(1) in self.names:
+                        self.err(f"{m.group(1)} is already defined", n)
+                    self.names[m.group(1)] = 32 + len(self.tables)
+                    for ln, text in body:
+                        for item in filter(None, (x.strip() for x in text.split(","))):
+                            self.tables.append(self.int16(item, ln, "table word"))
                 else:
                     if m.group(1) in self.routines:
                         self.err(f"routine {m.group(1)} defined twice", n)
@@ -327,7 +337,7 @@ class Compiler:
                 elif op == "djnz":
                     r.djnz(a[0], a[1])
                 elif op in ("ld", "st"):
-                    getattr(r, op)(a[0], a[1], self.ev(a[2], ln) if len(a) > 2 else 0)
+                    getattr(r, op)(a[0], a[1], self.ev(" ".join(a[2:]), ln) if len(a) > 2 else 0)
                 elif op == "out":
                     r.out(a[0], a[1], a[2] if len(a) > 2 else "DATA")
                 elif op in ("ret", "nop"):
@@ -355,48 +365,51 @@ class Compiler:
     # -------------------------------------------------------------- analysis
     @staticmethod
     def routine_bound(words):
-        """Worst-case steps: forward branches and non-nested DJNZ loops with a constant count.
-
-        Returns (steps, None) or (None, reason). LD counts 2 steps (its write-back is a step)."""
+        """Worst-case steps over every path: forward branches and non-nested DJNZ loops with a
+        constant count. Returns (steps, None) or (None, reason). LD counts 2 steps (its write-back
+        is a step). The bound is the longest path through the routine's branch graph, so early
+        RETs never hide a longer path (BUGS #17)."""
         dec = [isa.decode_routine(w) for w in words]
-        consts = {}                                 # register -> constant known before the loop
-        steps, pc, loops_done = 0, 0, set()
-        visited = 0
-        while pc < len(dec):
-            visited += 1
-            if visited > 100_000:
-                return None, "does not terminate"
-            w = dec[pc]
+        n = len(dec)
+        cost = [2 if w["kind"] == "LD" else 1 for w in dec]
+        consts = {}                                 # register -> constant (straight-line order)
+        for pc, w in enumerate(dec):
             k = w["kind"]
-            steps += 2 if k == "LD" else 1
             if k == "LDI":
                 consts[w["rd"]] = w["imm"]
             elif k in ("ALU", "LDIH", "LD", "SYS") and "rd" in w:
                 consts.pop(w["rd"], None)
-            if k == "SYS" and isa.SYS_NAMES.get(w["fn"]) == "RET":
-                return steps, None
-            if k == "BR":
-                if w["off"] < 0:
-                    return None, f"backward branch at word {pc} (only DJNZ loops are bounded)"
-                pc += 1                            # worst case: count the fall-through path too
-                continue
+            if k == "BR" and w["off"] < 0:
+                return None, f"backward branch at word {pc} (only DJNZ loops are bounded)"
             if k == "DJNZ":
                 if w["off"] >= 0:
                     return None, f"DJNZ at word {pc} jumps forward"
-                if pc in loops_done:
-                    pc += 1
-                    continue
                 count = consts.get(w["rd"])
                 if count is None:
                     return None, f"loop count of r{w['rd']} at word {pc} is not a known constant"
                 start = pc + 1 + w["off"]
-                body = sum(2 if dec[j]["kind"] == "LD" else 1 for j in range(start, pc + 1))
                 if any(dec[j]["kind"] == "DJNZ" for j in range(start, pc)):
                     return None, f"nested loops at word {pc}"
-                steps += body * (max(count, 1) - 1)
-                loops_done.add(pc)
-            pc += 1
-        return None, "falls off the end without RET"
+                cost[pc] += sum(cost[j] for j in range(start, pc + 1)) * (max(count, 1) - 1)
+        best = [None] * (n + 1)                     # longest path from pc to a RET; None = invalid
+        for pc in range(n - 1, -1, -1):
+            w = dec[pc]
+            k = w["kind"]
+            if k == "SYS" and isa.SYS_NAMES.get(w["fn"]) == "RET":
+                best[pc] = cost[pc]
+                continue
+            if k == "BR":
+                target = pc + 1 + w["off"]
+                succ = [target] if w["cond"] == isa.BR_ALWAYS else [target, pc + 1]
+            else:
+                succ = [pc + 1]
+            if any(t > n or best[t] is None for t in succ):
+                best[pc] = None                     # some path falls off the end
+                continue
+            best[pc] = cost[pc] + max(best[t] for t in succ)
+        if best[0] is None:
+            return None, "a path falls off the end without RET"
+        return best[0], None
 
     # -------------------------------------------------------------- build
     def build(self):
@@ -414,7 +427,7 @@ class Compiler:
                 self.warnings.append(f"routine {name}: no static bound ({why})")
             rinfo.append((name, len(words), steps))
             rwords.append(words)
-        sram = [0] * 32                              # entry table (ISA.md §5.2), then routines
+        sram = [0] * 32 + self.tables                # entry table (ISA.md §5.2), tables, routines
         for i, words in enumerate(rwords):
             sram[i] = len(sram)
             sram.extend(words)
@@ -456,7 +469,8 @@ class Compiler:
             for name, nw, st in rinfo:
                 t = f"≤ {4 * st + 8} clocks" if st is not None else "unbounded"
                 L.append(f"| {name} | {nw} | {st if st is not None else '—'} | {t} |")
-            L.append(f"\nSRAM: {len(image['sram'])} of {SRAM_WORDS} words (entry table 32 + routines).")
+            L.append(f"\nSRAM: {len(image['sram'])} of {SRAM_WORDS} words (entry table 32"
+                     + (f" + tables {len(self.tables)}" if self.tables else "") + " + routines).")
         L += ["", "## Pins", "", "| Unit | Settings |", "|---|---|"]
         L += [f"| {u} | " + ", ".join(f"{k}={v}" for k, v in cfg.items()) + " |" for u, cfg in image["pins"].items()]
         L += ["", "## Reaction", "",

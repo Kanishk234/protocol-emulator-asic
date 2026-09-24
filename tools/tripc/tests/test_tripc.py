@@ -96,8 +96,46 @@ lane L0:
     assert "no static bound" in report
 
 
+def test_routine_bound_is_the_longest_path_not_the_first_ret():
+    """BUGS #17: an early RET must not hide a longer path."""
+    src = """program t
+routine early:
+    add r1, r1, 0
+    br long if nrz
+    ret
+  long:
+    add r1, r1, 1
+    add r1, r1, 1
+    add r1, r1, 1
+    ld r2, r1, 0
+    ret
+lane L0:
+    slot: do CALL early
+"""
+    image, _ = tripc.compile_text(src)
+    assert image["routines"]["early"]["max_steps"] == 2 + 3 + 2 + 1
+
+
 def test_params_override_and_unknown():
     image, _ = compiled("uart", BAUD=1_000_000)
     assert image["pins"]["U0"]["period"] == 50.0
     with pytest.raises(tripc.TrwError, match="unknown params"):
         compiled("uart", NOPE=1)
+
+
+def test_ld_st_offset_is_a_whole_expression():
+    """BUGS #22: `ld r2, r3, BASE + 1` used to load BASE (the rest was dropped)."""
+    src = """program t
+const BASE = 16
+routine r:
+    ld r2, r3, BASE + 1
+    st r2, r3, BASE * 2 + 3
+    ret
+lane L0:
+    slot: do CALL r
+"""
+    image, _ = tripc.compile_text(src)
+    from tripsim import isa
+    words = image["sram"][32:35]
+    assert isa.decode_routine(words[0])["off"] == 17
+    assert isa.decode_routine(words[1])["off"] == 35

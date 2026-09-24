@@ -21,6 +21,34 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1: CI speed, ISA §9 answers, freeze proposals)
+Done:
+- **CI speed.** The `unit` workflow took about 20 min. Five tests (servo, IR NEC TX/RX, two LIN tests) took 785 of the 906 s, because they simulate 3–10 M clocks each.
+  - Marked those five `@pytest.mark.slow` (the marker is registered in `pyproject.toml`).
+  - `unit` now runs `pytest -n auto -m "not slow"` with pytest-xdist 3.8.0 (pinned in `requirements-dev.txt`): 183 passed in 37 s locally with 4 workers.
+  - New `nightly` workflow (daily plus manual), with two jobs: `full` (everything) and `r1-fallback` (kernels at `TRIPSIM_FIRE_PERIOD=2`).
+- **R1 fallback measured.** `Chip` reads `TRIPSIM_FIRE_PERIOD`. All 103 kernel tests pass at fire period 2, in 656 s, including every speed-limit test.
+- **`tools/explore/metrics.py`** (`cd tools && python -m explore.metrics`) reports per-lane slots, registers, K, head tests, ALU-flag uses, readiness and ablation bounds for every program. Its table is now `ARCH_EXPLORATION.md` §1a.
+- **`ARCH_EXPLORATION.md`** answers every `ISA.md` §9 row: slots, registers + K, ablation, R1, TX/RX NBITS, routine rate, and Q7 throughput.
+- **DECISIONS D-029 (proposed):**
+  - keep 12 slots, 4 + 4, and every D-007 feature;
+  - the R1 fallback is acceptable;
+  - close Q1–Q7;
+  - a new connectivity table (Lk.I1 needs 9 sources);
+  - no helper units in phase 2;
+  - host MISO moves to `uo_out[3]` (RP2350 SPI0 RX); pin map follows.
+
+Checklist boxes ticked (evidence):
+- None.
+  - "ARCH_EXPLORATION answers every row" is written, but the box also needs its ISA changes logged: D-029 is only proposed until the review.
+  - "Zero OPEN items" waits for the D-029 review, then the doc and spec edits.
+
+Next:
+- Team: review D-029 (both of us). Double-check the RP2350 SPI0 pin functions, and the §14 semantics review.
+- Then Claude applies D-029 to `ARCHITECTURE.md`, `ISA.md` and `spec/tripwire.yaml` (connectivity table, pins), adds a tripc legal-source check, and removes the OPEN markers.
+- R1–R3 spikes (fresh session, RTL-only context); area estimate and cut list for the pin-unit options.
+- Check the first `nightly` run (start it by hand with workflow_dispatch).
+
 ## 2026-09-23: Krithik + Claude (phase 1: every remaining protocol)
 Done:
 - New programs, each against a reference model written from its spec (+ sigrok where it has a decoder): MIDI (UART at 31 250 baud), DMX512 TX/RX, servo PWM, IR NEC TX/RX, SMBus with PEC, LIN 2.x commander + monitor, I2S out/in, HDLC, CAN part B + error handling, USB low-speed device (feasibility only).

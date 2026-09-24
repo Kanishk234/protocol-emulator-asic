@@ -84,9 +84,26 @@ It also catches mistakes before anything runs, such as testing an input the rule
 
 **14. We added every remaining protocol on the list.** MIDI (the UART program at MIDI speed), DMX512 lighting, RC servos, NEC infrared remotes, SMBus with its checksum computed on chip, LIN (the car body bus), I2S audio, HDLC framing, the rest of CAN (29-bit IDs, remote frames, error flags, error counters and bus-off), and a USB low-speed feasibility study where a reference PC-side host enumerates the chip. Where a protocol exposed a real gap we added one general feature, never a protocol block: timestamps in coarser ticks and an IR/RF carrier (D-024), flag-delimited framing and a separate transmit CRC (D-025), error signalling and a listen-only mode (D-026), NRZI coding, a complementary output and end-of-packet handling (D-027), and lookup tables in the compiler (D-028). Every feature is now also tested outside its first protocol, and deliberately breaking each one makes a test fail. The independent checks found real mistakes again: several in my programs (a race that stretched servo frames, a register overwritten mid-routine in CAN, branches the wrong way round in USB), in the compiler (a timing bound that hid long paths, an address expression cut short), in the chip model (a transmitter re-syncing to its own echo, caught by sigrok decoding our USB packets), and in two of sigrok's own decoders. All are logged (BUGS #16-#31). USB stays a feasibility study: no hardware, one endpoint, and our rules forbid claiming USB support.
 
+**15. We measured whether the lane is the right size, and wrote down what to freeze.** A new script (`tools/explore/metrics.py`) counts what every program uses. All 23 lanes fit in 12 rules. Six use exactly 12, so the lane is right-sized with no room to spare. Only one lane (CAN) uses all four registers.
+
+Turning each shortcut off on paper shows that each one earns its place:
+- Without testing a bit of the incoming word directly in the rule, five lanes would no longer fit.
+- Without getting a flag from any arithmetic result, two lanes would no longer fit.
+- Without the four built-in constants, five lanes would run out of registers.
+
+We also reran every protocol test with each lane working only every other clock, the fallback if the real chip turns out too slow. All 103 still pass. So even the fallback would lose no protocol; what it costs is the fast reaction time we advertise.
+
+All of this is proposed as one freeze decision (D-029) for both of us to review:
+- close the seven early open questions;
+- set a connection table that fits every program;
+- leave out the four optional helper blocks, which no program needed;
+- move one host pin so the demo board's standard SPI hardware can talk to the chip.
+
+We also made the per-push tests about 20 times faster locally by moving the five longest simulations to a nightly run.
+
 ## What's left in Phase 1
 1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.
-2. **Finish the checklist items the model still owes:** turning each new feature off one at a time to measure its value, and a second person reviewing the cycle-by-cycle rules.
+2. **Review and apply the freeze decision (D-029)**, and have a second person review the cycle-by-cycle rules. The measurements the model owed are done (see 15).
 3. **Three hardware experiments**, each a small separate hardening run:
    - R1: build one lane in Verilog and check it runs at 50 MHz;
    - R2: check that latch-based slot memory survives Tiny Tapeout's flow;

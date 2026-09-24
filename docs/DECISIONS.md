@@ -362,8 +362,65 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 
 ---
 
+## D-029 (2026-09-23): spec-freeze proposals from the phase 1 measurements (PROPOSED, needs the two-person review)
+**Status: proposed.** Nothing below is applied to `ARCHITECTURE.md`, `ISA.md` or `spec/tripwire.yaml` yet. Each item closes an OPEN item once both of us agree; then the docs change and the OPEN markers go. Evidence: `docs/reports/ARCH_EXPLORATION.md` §1 and §1a (all 20 programs in `programs/`).
+
+1. **Lane size stays: 12 slots, 4 registers, 4 K constants, every D-007 feature.**
+   - All 23 lanes fit 12 slots. Six sit at exactly 12, so there is no headroom. 16 slots would cost 212 latch bits per lane; we revisit only if R2 leaves area.
+   - Only CAN L0 uses all four registers.
+   - Ablation, static lower bounds:
+     - without head tests, 5 lanes overflow;
+     - without flags from ALU ops, 2 lanes overflow;
+     - without K, 5 lanes run out of registers;
+     - 149 of 154 slots rely on the implicit readiness checks.
+2. **R1 fallback is acceptable at the protocol level.**
+   - All 103 kernel tests pass at `TRIPSIM_FIRE_PERIOD=2`, including every speed-limit test.
+   - The cost is the headline pin-to-pin reaction, which is 7 clocks today and grows under the fallback, plus about 8 % SPI controller throughput.
+   - The R1 hardware spike still decides the rate. This item only says a fallback would not lose a protocol.
+3. **Routine rate stays at 1 step per 4 clocks.** Sub-bit deadlines belong in the pin unit, not in routines (CAN ACK and error flags use JAM/override; USB turnaround is met at 6.1–7.1 of 7.5 bit times; SWD is limited to 8.3 MHz).
+4. **Q1–Q6 closed as resolved by `ISA.md` §8.** They are implemented in `spec/tripwire.yaml` and used by the programs:
+   - Q1: the U rule is `test_lane.py`.
+   - Q2: CALL is OP 14 only.
+   - Q3: MKCTL takes `A[11:0]`.
+   - Q4: DJNZ has its own format, and `TSTF` exists.
+   - Q5: routines use the shared operation table.
+   - Q6: OT and KT are separate fields.
+5. **Q7: accept registered release.** One load per 3 clocks per output port, and HOST_IN feeds a lane once per 2 clocks. The densest stream in any program is one token per 32 clocks. No depth-2 producers are needed.
+6. **Connectivity table (§4.6) from real use.** The programs use lanes 0–1 and units 0–3. The table is symmetric, so tripc can place a program on any lane or unit.
+
+   | Consumer | Legal sources | Count |
+   |---|---|---|
+   | Lk.I0 | U0–U5.rx, HOST_IN, L(k−1).O1 | 8 |
+   | Lk.I1 | U0–U5.rx, HOST_IN, L(k+1).O0, L(k−1).O1 | **9** |
+   | Un.tx | L0–L2.O0/O1, HOST_IN | 7 |
+   | HOST_OUT | L0–L2.O0/O1, U0.rx, U1.rx | 8 |
+
+   - Lane-to-lane links in use: CAN `L0.I1 <- L1.O0` and `L1.I1 <- L0.O1`; LIN `L1.I1 <- L0.O1`.
+   - Unit RX on I1 appears in 11 connections.
+   - `Lk.I1` breaks the ≤ 8 rule by one: a 4-bit select and one more mux level on 3 ports. The alternative is 4 units per lane on I1, which needs a unit-allocation pass in tripc. **Recommendation: allow 9.**
+   - The helper sources (CRC, MATCH, MEM, CAPTURE) leave the table; see item 7.
+   - tripc should check the table once it is frozen.
+7. **Helper units (§8): none goes into the phase 2 RTL.** No program needed one:
+   - CRC: in BITSYNC for serial streams; table routines for SMBus PEC and the LIN checksum.
+   - MATCH: CMPM in slots.
+   - MEM: routines with `ld`/`st` and `table`.
+   - CAPTURE: not needed yet.
+   - Any of them can return in phase 4 with its own entry, if a showcase needs it and R2/R3 leave area. MEM is the likely one, for SPI flash and EEPROM emulation. CRC-32 is dropped with the CRC helper.
+8. **Host SPI pins (§9): move MISO from `uo_out[7]` to `uo_out[3]`.**
+   - On the current TT demo board (RP2350, `tt-demo-pcb` README), `ui_in[4..6]` are GPIO21–23, which are SPI0 CSn, SCK and TX.
+   - `uo_out[3]` is GPIO36, SPI0 RX. `uo_out[7]` is GPIO40, SPI1 RX, which would not work with hardware SPI0.
+   - The GPIO function numbers come from the RP2350 datasheet's function table (SPI instance = ⌊n/8⌋ mod 2, role = n mod 4). They need a second check by the team.
+   - PIO could use any pins, but hardware SPI is simpler.
+9. **Pin map (§10), following item 8:**
+   - host: `ui_in[4..6]`, MISO `uo_out[3]`, IRQ `uo_out[6]`;
+   - protocols: inputs `ui_in[0..3,7]`, outputs `uo_out[0..2,4,5,7]`, bidirectional `uio[0..7]`;
+   - still 19 protocol pins.
+   - The programs use `uo0–uo2`, `ui0–ui2` and `uio0–uio1`, so none moves.
+
+**Cost:** documentation and a 4-bit select on the three I1 muxes. Items 6 and 8 change `spec/tripwire.yaml`.
+
 ## Open questions for the phase 1 spec freeze
-Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them.
+Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **D-029 proposes closing Q1–Q7** (pending review).
 
 Found while reading the design docs; to be settled in `ARCHITECTURE.md` during P1.
 - **Q1: routine steps vs. reflexes.** §6.2 says a routine step runs only on a clock when *no* reflex fires; §6.3 and the overview say *urgent* reflexes interrupt routines. What exactly does `U=0` block while RB is set?

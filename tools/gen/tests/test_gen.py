@@ -49,10 +49,20 @@ def field(s, name):
     ("YAML boolean key (bare off)", lambda s: s["routine"]["ctrl"]["formats"][2]["fields"].__setitem__(False, [8, 0])),
     ("duplicate pin command", lambda s: s["pin_commands"][1].__setitem__("code", 1)),
     ("signed field missing", lambda s: s["routine"]["ctrl"]["formats"][2].__setitem__("signed", ["nope"])),
+    ("fabric port over its sel bits", lambda s: s["fabric"].__setitem__("sel_bits", 3)),
+    ("fabric source listed twice", lambda s: s["fabric"]["sources"]["HOST_OUT"].append("U0.rx")),
+    ("fabric bad source pattern", lambda s: s["fabric"]["sources"]["HOST_OUT"].append("CRC")),
+    ("unknown host pad", lambda s: s["pads"]["host"].__setitem__(3, "uo9")),
 ])
 def test_validation_catches(label, mutate):
     with pytest.raises(gen.SpecError):
         gen.validate(broken(mutate))
+
+
+def test_legal_sources_expand_per_lane():
+    ls = gen.legal_sources(SPEC["fabric"])
+    assert ls["L0.I1"][-2:] == ("L1.O0", "L2.O1") and ls["L2.I1"][-2:] == ("L0.O0", "L1.O1")
+    assert len(ls["L1.I1"]) == 9 and max(len(v) for k, v in ls.items() if not k.endswith("I1")) == 8
 
 
 def test_a_spec_change_reaches_every_output():

@@ -64,4 +64,21 @@ TX_LENTOK = {'len': (15, 12), 'payload': (11, 0)}
 
 PAD_GROUPS = {'ui': (0, 8, 'in'), 'uo': (8, 8, 'out'), 'uio': (16, 8, 'inout')}
 PADS = {'ui0': 0, 'ui1': 1, 'ui2': 2, 'ui3': 3, 'ui4': 4, 'ui5': 5, 'ui6': 6, 'ui7': 7, 'uo0': 8, 'uo1': 9, 'uo2': 10, 'uo3': 11, 'uo4': 12, 'uo5': 13, 'uo6': 14, 'uo7': 15, 'uio0': 16, 'uio1': 17, 'uio2': 18, 'uio3': 19, 'uio4': 20, 'uio5': 21, 'uio6': 22, 'uio7': 23}
-HOST_PADS = (4, 5, 6, 14, 15)
+HOST_PADS = (4, 5, 6, 11, 14)
+
+FABRIC_SEL_BITS = 4
+LEGAL_SOURCES = {  # consumer port: sources in sel order (ARCHITECTURE.md §4.6)
+    'L0.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L2.O1'),
+    'L1.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L0.O1'),
+    'L2.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L1.O1'),
+    'L0.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L1.O0', 'L2.O1'),
+    'L1.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L2.O0', 'L0.O1'),
+    'L2.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L0.O0', 'L1.O1'),
+    'U0.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
+    'U1.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
+    'U2.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
+    'U3.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
+    'U4.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
+    'U5.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
+    'HOST_OUT': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'U0.rx', 'U1.rx'),
+}

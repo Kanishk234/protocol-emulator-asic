@@ -111,10 +111,44 @@ def validate(s):
     for h in s["pads"]["host"]:
         _check(h in names, f"pads.host: unknown pad {h!r}")
 
+    fab = s["fabric"]
+    for port, srcs in legal_sources(fab).items():
+        _check(0 < len(srcs) <= 1 << fab["sel_bits"], f"fabric: {port} has {len(srcs)} sources for {fab['sel_bits']} sel bits")
+        _check(len(set(srcs)) == len(srcs), f"fabric: {port} lists a source twice")
+
     _unique(s["pin_commands"], "code", "pin_commands")
     _unique(s["pin_commands"], "name", "pin_commands")
     for c in s["pin_commands"]:
         _check(1 <= c["code"] <= 15, f"pin command {c['name']}: code must be 1..15")
+
+
+def legal_sources(fab):
+    """Expand the fabric patterns into {consumer port: (source, ...)} in sel order."""
+    lanes, units = fab["lanes"], fab["units"]
+
+    def expand(src, k):
+        m = re.fullmatch(r"L\(k([+-])1\)\.(O[01])", src)
+        if m:
+            return [f"L{(k + (1 if m.group(1) == '+' else -1)) % lanes}.{m.group(2)}"]
+        if src.startswith("L*."):
+            return [f"L{i}.{src[3:]}" for i in range(lanes)]
+        if src.startswith("U*."):
+            return [f"U{i}.{src[3:]}" for i in range(units)]
+        _check(re.fullmatch(r"(L\d\.O[01]|U\d\.rx|HOST_IN)", src), f"fabric: bad source pattern {src!r}")
+        return [src]
+
+    out = {}
+    for port, srcs in fab["sources"].items():
+        if port.startswith("Lk."):
+            ports = [(f"L{k}.{port[3:]}", k) for k in range(lanes)]
+        elif port.startswith("Un."):
+            ports = [(f"U{u}.{port[3:]}", None) for u in range(units)]
+        else:
+            ports = [(port, None)]
+        for name, k in ports:
+            _check(k is not None or not any("(k" in s for s in srcs), f"fabric: {port} uses L(k...) without a lane")
+            out[name] = tuple(x for s in srcs for x in expand(s, k))
+    return out
 
 
 # ----------------------------------------------------------------------------- outputs
@@ -145,7 +179,11 @@ def gen_python(s):
     pads = {f"{g['name']}{i}": g["base"] + i for g in s["pads"]["groups"] for i in range(g["count"])}
     lines += ["PAD_GROUPS = " + fmt({g["name"]: (g["base"], g["count"], g["dir"]) for g in s["pads"]["groups"]}),
               "PADS = " + fmt(pads),
-              f"HOST_PADS = {tuple(pads[h] for h in s['pads']['host'])!r}", ""]
+              f"HOST_PADS = {tuple(pads[h] for h in s['pads']['host'])!r}", "",
+              f"FABRIC_SEL_BITS = {s['fabric']['sel_bits']}",
+              "LEGAL_SOURCES = {  # consumer port: sources in sel order (ARCHITECTURE.md §4.6)"]
+    lines += [f"    {p!r}: {srcs!r}," for p, srcs in legal_sources(s["fabric"]).items()]
+    lines += ["}", ""]
     return "\n".join(lines)
 
 
@@ -215,11 +253,16 @@ def gen_tables(s):
     rows = ["| Op | Name | Argument | Effect |", "|---|---|---|---|"]
     rows += [f"| {c['code']} | {c['name']} | {c['arg']} | {c['desc']} |" for c in s["pin_commands"]]
     t["pin_commands"] = rows
+    fab = s["fabric"]
+    rows = [f"| Consumer | Legal sources, in `sel` order ({fab['sel_bits']}-bit `sel`) | Count |", "|---|---|---|"]
+    rows += [f"| {port} | " + ", ".join(f"{i} {x}" for i, x in enumerate(srcs)) + f" | {len(srcs)} |"
+             for port, srcs in legal_sources(fab).items()]
+    t["legal_sources"] = rows
     return {k: "\n".join(v) for k, v in t.items()}
 
 
 DOC_TABLES = {"docs/design/ISA.md": ["ops", "slot_fields", "routine_formats"],
-              "docs/design/ARCHITECTURE.md": ["pin_commands"]}
+              "docs/design/ARCHITECTURE.md": ["legal_sources", "pin_commands"]}
 
 
 def splice(text, name, body, path):

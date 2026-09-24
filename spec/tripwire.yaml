@@ -7,7 +7,7 @@
 # Never edit generated files; edit this file and run `python tools/gen/gen.py`.
 # CI (lint workflow) regenerates and fails on any difference.
 #
-# Status: DRAFT, not frozen. Contents match DECISIONS D-007 ... D-023. The phase 1 spec
+# Status: DRAFT, not frozen. Contents match DECISIONS D-007 ... D-029. The phase 1 spec
 # freeze changes `status` to frozen; after that, every change needs a DECISIONS entry.
 
 version: 0.1
@@ -126,7 +126,22 @@ pads:
     - {name: ui,  base: 0,  count: 8, dir: in}
     - {name: uo,  base: 8,  count: 8, dir: out}
     - {name: uio, base: 16, count: 8, dir: inout}
-  host: [ui4, ui5, ui6, uo6, uo7]      # host SPI (CS_n, SCK, MOSI, MISO) and IRQ
+  # Host SPI CS_n, SCK, MOSI, MISO, then IRQ (D-029). On the TT demo board (RP2350) these are
+  # GPIO21-23 = SPI0 CSn/SCK/TX and GPIO36 = SPI0 RX (RP2350 datasheet, Table 645).
+  host: [ui4, ui5, ui6, uo3, uo6]
+
+# Fabric legal sources (ARCHITECTURE.md §4.6, D-029). Each consumer port's `sel` indexes its
+# list in this order. Patterns: `Lk` = the consumer's own lane k, `L(k+1)` / `L(k-1)` = the next /
+# previous lane (mod lanes), `L*` = every lane, `U*` = every pin unit.
+fabric:
+  lanes: 3
+  units: 6
+  sel_bits: 4
+  sources:
+    Lk.I0: [U*.rx, HOST_IN, L(k-1).O1]
+    Lk.I1: [U*.rx, HOST_IN, L(k+1).O0, L(k-1).O1]
+    Un.tx: [L*.O0, L*.O1, HOST_IN]
+    HOST_OUT: [L*.O0, L*.O1, U0.rx, U1.rx]
 
 # DATA to a TX half with TX_LENTOK (D-013): data[15:12] = nbits - 1, payload data[11:0].
 tx_lentok: {len: [15, 12], payload: [11, 0]}

@@ -206,7 +206,12 @@ module trw_lane (
 
     wire       ex_d_reg  = ex_slot && !ex_dst[2] && (ex_op != `TRW_OP_CALL);
     wire       ex_d_out  = ex_slot && (ex_dst[2:1] == 2'b10);
-    wire [1:0] ex_out_tag = (ex_op == `TRW_OP_MKCTL) ? `TRW_TAG_CTRL : ex_kt ? a_tag : ex_ot;
+    // §14 L8: MKCTL always emits CTRL; KT keeps the latched head tag only when ASRC is I0 or I1,
+    // otherwise KT is ignored and OT gives the tag.
+    wire       ex_a_in   = (ex_asrc[2:1] == 2'b10);
+    wire [1:0] ex_out_tag = (ex_op == `TRW_OP_MKCTL) ? `TRW_TAG_CTRL
+                          : (ex_kt && ex_a_in)       ? a_tag
+                          :                            ex_ot;
     wire       ex_fw     = ex_slot && ex_dfe && (ex_df != 2'd3);
 
     wire rt_alu  = ex_rt && !rt_ctl && (a_lat[14:11] != `TRW_OP_CALL);

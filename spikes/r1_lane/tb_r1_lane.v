@@ -74,7 +74,9 @@ module tb_r1_lane;
                              | fld(`TRW_OP_MOV, `TRW_SLOT_OP_LSB) | fld(`TRW_DST_O0, `TRW_SLOT_DST_LSB)
                              | fld(`TRW_ASRC_I0, `TRW_SLOT_ASRC_LSB) | fld(1, `TRW_SLOT_DQ_LSB)
                              | fld(1, `TRW_SLOT_NSE_LSB) | fld(DEC, `TRW_SLOT_NS_LSB)
-                             | fld(`TRW_TAG_DATA, `TRW_SLOT_OT_LSB) | fld(3, `TRW_SLOT_DF_LSB);
+                             | fld(`TRW_TAG_ERR, `TRW_SLOT_OT_LSB) | fld(1, `TRW_SLOT_KT_LSB)
+                             | fld(3, `TRW_SLOT_DF_LSB);
+                //         (KT with A = I0: the head's DATA tag is kept, OT = ERR is not used; §14 L8)
                 // slot 1: when STATE=DEC do SUB r0 := r0, #1 -> f0 ; STATE:=SEND
                 1: slot_word = fld(1, `TRW_SLOT_V_LSB) | fld(1, `TRW_SLOT_SE_LSB) | fld(DEC, `TRW_SLOT_SV_LSB)
                              | fld(`TRW_OP_SUB, `TRW_SLOT_OP_LSB) | fld(`TRW_DST_R0, `TRW_SLOT_DST_LSB)
@@ -82,10 +84,12 @@ module tb_r1_lane;
                              | fld(1, `TRW_SLOT_IMM_LSB) | fld(1, `TRW_SLOT_DFE_LSB) | fld(0, `TRW_SLOT_DF_LSB)
                              | fld(1, `TRW_SLOT_NSE_LSB) | fld(SEND, `TRW_SLOT_NS_LSB);
                 // slot 2: when STATE=SEND, f0=1 do MOV O1 := zero, tag EVENT ; STATE:=IDLE
+                //         KT is set too: with A = zero it must be ignored (§14 L8), so the tag stays EVENT
                 2: slot_word = fld(1, `TRW_SLOT_V_LSB) | fld(1, `TRW_SLOT_SE_LSB) | fld(SEND, `TRW_SLOT_SV_LSB)
                              | fld(4'b0001, `TRW_SLOT_FM_LSB) | fld(4'b0001, `TRW_SLOT_FV_LSB)
                              | fld(`TRW_OP_MOV, `TRW_SLOT_OP_LSB) | fld(`TRW_DST_O1, `TRW_SLOT_DST_LSB)
                              | fld(`TRW_ASRC_ZERO, `TRW_SLOT_ASRC_LSB) | fld(`TRW_TAG_EVENT, `TRW_SLOT_OT_LSB)
+                             | fld(1, `TRW_SLOT_KT_LSB)
                              | fld(1, `TRW_SLOT_NSE_LSB) | fld(IDLE, `TRW_SLOT_NS_LSB) | fld(3, `TRW_SLOT_DF_LSB);
                 // slot 3 (setup): when STATE=INIT do MOVB r0 := #N ; STATE:=SEND
                 3: slot_word = fld(1, `TRW_SLOT_V_LSB) | fld(1, `TRW_SLOT_SE_LSB) | fld(INIT, `TRW_SLOT_SV_LSB)

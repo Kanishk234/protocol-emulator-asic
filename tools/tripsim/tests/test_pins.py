@@ -177,6 +177,35 @@ def test_sample_reads_pin_a_at_timed_points():
     assert list(chip.host_out) == [(0, 0b101)]           # 1, 0, 1 in LSB order
 
 
+def test_carrier_toggles_only_while_active():
+    """§14 P30 (D-024): CARRIER modulates pin A's active level, phase restarting with each mark."""
+    chip = Chip(lanes=1)
+    chip.pin_config(0, pin_a=PAD_UO + 0, txmode="level", idle=0, carrier=10)
+    chip.own(PAD_UO + 0, 0)
+    chip.connect("U0.tx", "HOST_IN")
+    chip.host_push(0x5000, tag=1)                        # SYNC
+    chip.host_push(0x1800 | 20, tag=1)                   # active at +20
+    chip.host_push(0x1000 | 55, tag=1)                   # idle at +75
+    out = trace(chip, 120)
+    start = out.index(1)
+    burst = out[start:start + 55]
+    assert burst == ([1] * 5 + [0] * 5) * 5 + [1] * 5    # 10-clock period, 50 %, from a high half
+    assert not any(out[start + 55:])                     # idle: no carrier
+
+
+def test_event_time_counts_presc_ticks():
+    """§14 P8 (D-024): EVENT time[14:0] is in PRESC ticks."""
+    chip = Chip(lanes=1)
+    chip.settle_inputs(ui=1)
+    chip.pin_config(0, pin_a=PAD_UI + 0, ev_edge="both", presc=25)
+    chip.connect("HOST_OUT", "U0.rx")
+    for level, clocks in ((0, 1000), (1, 2500), (0, 300)):
+        chip.ui_in = level
+        chip.run_for(clocks)
+    times = [d & 0x7FFF for t, d in chip.host_out]
+    assert [b - a for a, b in zip(times, times[1:])] == [40, 100]      # 1000 / 25, 2500 / 25
+
+
 def test_consumer_port_tag_filter():
     """§14 F7: a port drops tags it does not accept, without blocking the producer."""
     from tripsim.fabric import Fabric

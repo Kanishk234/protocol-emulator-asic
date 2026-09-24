@@ -69,7 +69,7 @@ class Chip:
         self.fabric.connect(port, producer, mode, accept)
 
     def pin_config(self, unit, **cfg):
-        for key in ("pin_a", "pin_b", "pin_c", "pin_s"):
+        for key in ("pin_a", "pin_b", "pin_c", "pin_s", "pin_n"):
             pad = cfg.get(key)
             if pad is not None and pad in HOST_PADS:
                 raise ValueError(f"pad {pad} belongs to the host port")
@@ -127,7 +127,8 @@ class Chip:
         for pad, unit in enumerate(self.owner):
             if unit is None:
                 continue
-            v, e = self.pins[unit].pad_drive()
+            u_ = self.pins[unit]
+            v, e = u_.pad_drive_n() if pad == u_.cfg.pin_n else u_.pad_drive()
             if PAD_UO <= pad < PAD_UIO:
                 uo |= v << (pad - PAD_UO)
             else:

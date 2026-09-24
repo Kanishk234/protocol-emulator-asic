@@ -112,13 +112,13 @@ def test_tx_stuffing_crc_append_matches_reference_encoder():
     trace = []
     for i in range(40 * PERIOD):
         if i == 16 * PERIOD:                                 # mid-frame: an override is ignored
-            chip.host_push(0xA010, tag=TAG_CTRL)             # in a frame we transmit ourselves
+            chip.host_push(0xB000, tag=TAG_CTRL)             # in a frame we transmit ourselves
         chip.step()
         trace.append(chip.outputs()[0] & 1)
     start = trace.index(0)
     sampled = [trace[start + PERIOD // 2 + k * PERIOD] for k in range(len(line_frame(payload)[0]))]
     assert sampled == line_frame(payload)[0]
-    assert chip.pins[0].bs.override is None             # it was consumed, not applied
+    assert chip.pins[0].bs.jam is None                  # it was consumed, not applied
 
 
 def test_override_drives_exactly_one_bit_in_another_nodes_frame():
@@ -138,7 +138,7 @@ def test_override_drives_exactly_one_bit_in_another_nodes_frame():
     levels = run_line(line)
     for i, v in enumerate(levels):
         if i == 10 * PERIOD + 3 * PERIOD:
-            chip.host_push(0xA010, tag=TAG_CTRL)             # override: dominant (0) for one bit
+            chip.host_push(0xB000, tag=TAG_CTRL)             # JAM: dominant (0) for one bit, now
         chip.ui_in = v
         chip.step()
         if (chip.outputs()[0] & 1) == 0:

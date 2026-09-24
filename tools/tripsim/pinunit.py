@@ -23,7 +23,7 @@ import tripwire_spec as _S
 
 CMD_LEVEL, CMD_OE, CMD_CLK, CMD_GAP, CMD_SYNC, CMD_SETN, CMD_WAIT, CMD_SAMPLE = (
     _S.PIN_CMD[n] for n in ("LEVEL", "OE", "CLK", "GAP", "SYNC", "SETN", "WAIT", "SAMPLE"))
-_BITSYNC_CMDS = {n: _S.PIN_CMD[n] for n in ("FRAME", "LINE", "SYNC", "SETN", "WAIT")}
+_BITSYNC_CMDS = {n: _S.PIN_CMD[n] for n in ("FRAME", "LINE", "SYNC", "SETN", "WAIT", "JAM")}
 
 
 @dataclass
@@ -34,6 +34,7 @@ class PinConfig:
     # deselecting aborts a linked TX shift; with c_oe, pin A is driven only while selected
     pin_c: Optional[int] = None
     pin_s: Optional[int] = None     # sense pad: read instead of pin A (split TXD/RXD transceivers)
+    pin_n: Optional[int] = None     # complement output of pin A (differential pairs); SE0 drives it low
     c_active: int = 0
     c_oe: bool = False
     ev_pin: str = "a"               # event generator source: a | c
@@ -69,6 +70,9 @@ class PinConfig:
     sym1_first: int = 1
     sym1_t1: int = 1
     sym1_t2: int = 1
+    # carrier (D-024): while pin A is at its active (non-IDLE) level it toggles with this period
+    # in clocks, 50 % duty, restarting with every mark (IR LEDs, on-off-keyed RF). 0 = off
+    carrier: float = 0.0
     # BITSYNC (D-023): shared recovered bit clock, line coding, readback (see bitsync.py)
     sjw: float = 0.0                # max resync step in clocks (0 = hard sync only)
     resync: str = "dom"             # dom: recessive-to-dominant edges only | both
@@ -79,6 +83,11 @@ class PinConfig:
     crc_poly: int = 0
     crc_init: int = 0
     crc_res: int = 0                # expected CRC register after the whole frame
+    crc_xor: int = 0                # XOR-ed into the CRC when it is appended to TX
+    delim: Optional[str] = None     # None | flag (stuffing violations, HDLC) | se0 (pins S and B low)
+    nrzi: bool = False              # BITSYNC line coding: a 0 is a transition, a 1 is none (D-027)
+    oe_auto: bool = False           # BITSYNC half duplex: drive only while transmitting
+    crc_skip: int = 0               # BITSYNC RX: the CRC starts after this many frame bits
 
     @property
     def period_q8(self):
@@ -137,6 +146,7 @@ class PinUnit:
         self._sel = True                # registered "selected" (pin C), used for OE gating
         self._sel_next = True
         self._deselect = False          # pin C went inactive this clock
+        self._car_n = 0                 # clocks since pin A became active (carrier phase)
         self.bs = None
         if c.txmode == "bitsync":
             from .bitsync import BitSync
@@ -145,11 +155,23 @@ class PinUnit:
     # -------------------------------------------------------------- pads
     def pad_drive(self):
         """(value, oe) this unit drives on pin A, from the registered output."""
+        c = self.cfg
+        if c.carrier and self.level != c.idle:
+            p = round(c.carrier * 256)
+            v = self.level if ((self._car_n << 8) % p) < p // 2 else c.idle
+            return (0, int(v == 0)) if c.od else (v, self.oe)
         if self.cfg.c_oe and not self._sel:
             return self.level, 0
         if self.cfg.od:
             return 0, int(self.level == 0)
         return self.level, self.oe
+
+    def pad_drive_n(self):
+        """(value, oe) on pin N: the complement of pin A, or low during SE0."""
+        v, e = self.pad_drive()
+        if self.bs is not None and self.bs.se0:
+            return 0, e
+        return 1 - v, e
 
     @staticmethod
     def _edge(prev, cur, kind):
@@ -333,7 +355,7 @@ class PinUnit:
         if self.bs is not None:
             self._tx_apply = []
             if a is not None:
-                self.bs.step(now, a)
+                self.bs.step(now, a, b)
             return
         sel = True if (c.pin_c is None or sel_pin is None) else sel_pin == c.c_active
         self._deselect = self._sel_next and not sel
@@ -347,7 +369,8 @@ class PinUnit:
         if event:
             # §14 P8: EVENT {new level of the source pin, time}; it takes this clock's RX
             # load, so a sample due in the same clock is skipped.
-            self._emit(isa.TAG_EVENT, (src << 15) | (now & 0x7FFF))
+            # §14 P8 (D-024): the time is in PRESC ticks, so long pulses fit in 15 bits
+            self._emit(isa.TAG_EVENT, (src << 15) | ((now // c.presc) & 0x7FFF))
             if c.ev_reset:
                 self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
         elif a is not None and sel:
@@ -408,6 +431,7 @@ class PinUnit:
     # -------------------------------------------------------------- commit
     def commit(self):
         self._sel = self._sel_next
+        self._car_n = self._car_n + 1 if self.level != self.cfg.idle else 0
         for _, kind, value in self._tx_apply:
             if kind == "oe":
                 self.oe = value

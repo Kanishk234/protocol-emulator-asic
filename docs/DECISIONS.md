@@ -480,6 +480,23 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Local evidence:** `spikes/r2_latch/check_local.sh` PASS: lint; 2/2 cocotb tests on RTL and on a Yosys gate-level netlist (700 latches, 52 `lgcp`, TT Icarus 13); pre-layout STA +10.8 ns setup slack on flop endpoints at the slow corner.
 - **Pass criteria:** `gds`, `precheck`, `gl_test` green, with latch timing checks in the flow's STA. Otherwise the flop fallback (8 slots per lane).
 - **Status:** accepted (Krithik, 2026-09-24: "should we set up a concurrent branch for r2 as well?"); result pending.
+- **Run 1 (2026-09-24): timed out.** `gds` run 35962617201 on `spike/r2-latch` (06d0f3d):
+  - the Build GDS step ran 06:02 → 12:03 UTC and was cancelled at GitHub's 6 h job limit;
+  - no artifacts; precheck, gl_test and viewer skipped; lint, test, unit and docs green.
+  - For scale, R3's whole flow took 8 min.
+  - **Diagnosis from the job log** (`build/ci/r2/`, not committed). Two slow steps, no hang:
+    1. **Post-CTS resizer, 06:06 → 09:27 (3 h 21 min).** "Found 700 endpoints with setup violations", WNS 0.000: the 700 latch data pins. A posedge-launched write into a high-transparent latch borrows time, and STA reports its slack as exactly 0. `repair_timing -setup_margin 0.05` counts that as a violation and cannot fix it (area +0.0 %, WNS unchanged for thousands of iterations).
+    2. **Detailed routing, 09:28 → killed at 12:03.**
+       - Violations after each iteration: 8,297 → 4,860 → 4,506 → 918 → … → 21 by 10:35.
+       - Then "stubborn tiles" passes (55 min, then 21 min) left **14 Metal2 spacing violations** that never cleared.
+       - Global routing had no overflow, but Metal2 was 58 % used and Metal3 55 % (R3: 9 % / 14 %). Wire length 367 mm (R3: 28 mm), at 49 % placement utilisation (effective 43 %) on a 3x2 core of 631 × 306 µm.
+       - Repair inserted 860 buffers, 364 hold buffers and 313 tie cells.
+  - **What this means:** the latch array works with the flow's tools but trips two things.
+    - (a) The resizer needs an exception for latch data pins. This will be needed on the real chip too.
+    - (b) One lane's slot array and its muxes are wire-dense on four metal layers. That is a direct warning for the 3-lane 6x4 (PHYSICAL §5), to be quantified before the phase 2 floorplan.
+- **Run 2 (one change, `spike/r2-latch`):** `PNR_SDC_FILE` = LibreLane's `base.sdc` + `set_false_path -setup -to [all_registers -level_sensitive -data_pins]`; `SIGNOFF_SDC_FILE` = plain `base.sdc`, so sign-off still reports the latch setup/borrow check.
+  - Checked locally with OpenSTA on the Yosys netlist: the 700 latch pins leave setup repair (worst remaining setup +10.6 ns, slow), and hold on them is still checked (+10.45 ns).
+  - Expected: the resizer drops from 3 h 21 min to minutes; routing then either clears the last violations or the flow stops at the routing-DRC check with artifacts showing where they are (~3 h either way).
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

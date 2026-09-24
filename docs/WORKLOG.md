@@ -21,6 +21,25 @@ Next:
 
 ---
 
+## 2026-09-23: Krithik + Claude (phase 1: every remaining protocol)
+Done:
+- New programs, each against a reference model written from its spec (+ sigrok where it has a decoder): MIDI (UART at 31 250 baud), DMX512 TX/RX, servo PWM, IR NEC TX/RX, SMBus with PEC, LIN 2.x commander + monitor, I2S out/in, HDLC, CAN part B + error handling, USB low-speed device (feasibility only).
+- General features (DECISIONS D-024..D-028; §14 P8, P21-P30): event timestamps in PRESC ticks, carrier; BITSYNC flag framing, TX CRC register + CRC_XOR, own-edge rule; JAM, readback modes 0-3, listen-only, own-frame bit; NRZI, pin N, OE auto, SE0, DELIM = se0, CRC_SKIP; tripc `table`.
+- Reference models: dmx, nec, smbus, lin, i2s, hdlc, can (rewritten: part B, error frames), usb (low-speed host).
+- Fixes: BUGS #16-#31 (servo race, IR padding, CAN register race and level-bit test, USB branch polarity, LIN slot pacing, tripc bound and ld/st offsets, BITSYNC own-edge resync and EOP gap, I2S ADC model, HDLC abort, sigrok DMX and CAN decoder limits).
+- Mutation checks: 13 of 13 new features caught (carrier, tick timestamps, flag hold-back and abort, CRC_XOR, armed JAM, strict readback, listen-only, NRZI, CRC_SKIP, OE auto, own-edge resync, half-duplex echo). Two first survived (armed JAM, listen-only): the CAN tests now watch our TXD for the error flag and for silence (no ACK) in bus-off. New fast unit tests for carrier and tick timestamps.
+- Full suite: 186 passed (before the last two test edits, which pass on their own); `check_all.sh` and `gen.py --check` below.
+
+Checklist boxes ticked (evidence):
+- none new (these are stretch protocols beyond the phase 1 checklist).
+
+Problems / decisions:
+- The spec YAML and `src/trw_defs.vh` changed (new commands): pushing starts a gds run.
+- SRAM use: CAN 353, USB 335, LIN 208 of 512 words; lane slots at most 12 of 12 (CAN, SMBus).
+
+Next:
+- Close phase 1: ablations (now with a much longer feature list, and area estimates to decide cuts), zero OPEN items (incl. the §4.6 connectivity table), semantics review, R1-R3 (fresh session), green CI.
+
 ## 2026-09-23: Krithik + Claude (phase 1: CAN via BITSYNC)
 Done:
 - D-023: BITSYNC pin-unit mode (recovered bit clock with hard sync + SJW resync, bit stuffing, CRC ≤ 16 bits with append/check, readback abort/report, `FRAME n`, one-bit override, TX status events) and `pin_s` (sense pad). Spec YAML: `FRAME` (op 9), `LINE` (op 10), `WAIT` [1], `SYNC` text. §14 P20–P26. `tools/tripsim/bitsync.py`.

@@ -12,7 +12,7 @@ It hardens on the branch **`spike/r2-latch`**, which is never merged. It can run
   - a producer register feeding I0 through a real consumer port;
   - blocking subscribers for O0 and O1 that take a token on a strobe;
   - a routine instruction register, loaded from the pins.
-- **`src/config.json`:** the template's, plus `PNR_SDC_FILE` / `SIGNOFF_SDC_FILE` (added after run 1, D-032) and, for run 3 (D-034), `PL_TARGET_DENSITY_PCT` 52 and `DRT_OPT_ITERS` 20. `pnr.sdc` stops the post-CTS resizer chasing the latch data pins; they borrow time, so STA reports slack 0.000. `signoff.sdc` is the plain default. This is a 3x2 tile, not the 2x2 in the phase doc: the lane is about 79K µm² before layout, which would be tight on a 2x2 core (~150K µm²) with four metal layers.
+- **`src/config.json`:** the template's, plus `PNR_SDC_FILE` / `SIGNOFF_SDC_FILE` (added after run 1, D-032) and, from run 3 (D-034), a lower `PL_TARGET_DENSITY_PCT` and a `DRT_OPT_ITERS` cap. Run 4: tile 4x2, density 42, cap 8. `pnr.sdc` stops the post-CTS resizer chasing the latch data pins; they borrow time, so STA reports slack 0.000. `signoff.sdc` is the plain default. This is a 3x2 tile, not the 2x2 in the phase doc: the lane is about 79K µm² before layout, which would be tight on a 2x2 core (~150K µm²) with four metal layers.
 
 ## Tests (pin-level, so they also run in `gl_test`)
 - `test_latch_array_holds_two_patterns`: all 52 words (636 slot bits + 64 K bits) with a pattern and its complement, read back.

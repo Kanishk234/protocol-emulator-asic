@@ -2,9 +2,9 @@
 
 Phase 1 task 13. **Question:** can a lane evaluate all 12 reflex conditions, pick a slot and apply its static updates in one 20 ns clock (EVAL every clock), or must it fall back to firing every other clock? **Decision it drives:** the fire rate (ARCHITECTURE §14 L1). Decision: DECISIONS D-030.
 
-**Answer: fire every clock.** Before layout, the worst EVAL path is 3.7–7.3 ns at the typical corner and 5.8–11.4 ns at the slow corner. The worst variant (flop slots, no buffering, configuration treated as changing, slow corner) still has 8.2 ns of slack. The path could grow by 72 % before it fails; the planned build (latch slots) has more margin (table below).
+**Answer: fire every clock.** Before layout, the worst EVAL path is 3.5–6.9 ns at the typical corner and 5.4–10.8 ns at the slow corner (committed RTL; up to 11.4 ns in earlier runs, see the mapping-noise note in §3). The worst case seen in any run (no buffering, configuration treated as changing, slow corner) still has 8.2 ns of slack: the path could grow by 72 % before it fails. The buffered latch build has 3.5× margin.
 
-Date: 2026-09-24. Reproduce: `spikes/r1_lane/run_r1.sh` (outputs in `spikes/r1_lane/build/`, not committed).
+Date: 2026-09-24 (final run with the library clock gate `sg13cmos5l_lgcp_1` and the slot read port, see §3 and §5). Reproduce: `spikes/r1_lane/run_r1.sh` (outputs in `spikes/r1_lane/build/`, not committed).
 
 ---
 
@@ -43,56 +43,61 @@ Arrival = data arrival at the endpoint (ns); slack against 20 ns minus uncertain
 
 | Slots | Mapping | Corner | Config | EVAL arrival | EVAL slack | EXEC arrival | EXEC slack |
 |---|---|---|---|---|---|---|---|
-| latch | plain | typ | 0 | 6.44 | 13.19 | 6.95 | 12.66 |
-| latch | plain | typ | 1 | 5.84 | 13.79 | 6.95 | 12.66 |
-| latch | plain | slow | 0 | 9.94 | 9.62 | 10.61 | 8.88 |
-| latch | plain | slow | 1 | 9.02 | 10.54 | 10.61 | 8.88 |
-| latch | sized | typ | 0 | 3.69 | 15.94 | 4.14 | 15.49 |
-| latch | sized | typ | 1 | 3.69 | 15.94 | 3.86 | 15.76 |
-| latch | sized | slow | 0 | 5.79 | 13.77 | 6.43 | 13.12 |
-| latch | sized | slow | 1 | 5.79 | 13.77 | 6.01 | 13.53 |
-| flop | plain | typ | 0 | 7.34 | 12.29 | 6.46 | 13.15 |
-| flop | plain | typ | 1 | 6.44 | 13.19 | 6.46 | 13.15 |
-| flop | plain | slow | 0 | **11.39** | **8.16** | 10.03 | 9.47 |
-| flop | plain | slow | 1 | 10.02 | 9.53 | 10.03 | 9.47 |
-| flop | sized | typ | 0/1 | 4.07 | 15.56 | 4.37 | 15.26 |
-| flop | sized | slow | 0/1 | 6.40 | 13.15 | 6.77 | 12.78 |
+| latch | plain | typ | 0 | 6.94 | 12.69 | 5.27 | 14.34 |
+| latch | plain | typ | 1 | 5.95 | 13.68 | 5.27 | 14.34 |
+| latch | plain | slow | 0 | **10.78** | **8.78** | 8.26 | 11.24 |
+| latch | plain | slow | 1 | 9.26 | 10.29 | 8.26 | 11.24 |
+| latch | sized | typ | 0 | 3.58 | 16.04 | 4.10 | 15.52 |
+| latch | sized | typ | 1 | 3.48 | 16.15 | 4.10 | 15.52 |
+| latch | sized | slow | 0 | 5.62 | 13.91 | 6.41 | 13.12 |
+| latch | sized | slow | 1 | 5.45 | 14.11 | 6.41 | 13.12 |
+| flop | plain | typ | 0 | 6.45 | 13.18 | 6.91 | 12.70 |
+| flop | plain | typ | 1 | 5.83 | 13.79 | 6.91 | 12.70 |
+| flop | plain | slow | 0 | 10.06 | 9.49 | 10.69 | 8.80 |
+| flop | plain | slow | 1 | 9.12 | 10.43 | 10.69 | 8.80 |
+| flop | sized | typ | 0/1 | 3.68 | 15.95 | 3.94 | 15.68 |
+| flop | sized | slow | 0/1 | 5.78 | 13.77 | 6.17 | 13.36 |
+
+**Mapping noise.** These are the numbers for the committed RTL. Two earlier runs of the same lane differed only outside the critical path (first a behavioural clock gate instead of the library ICG, then no slot read port). They gave EVAL values up to 11.39 ns (flop, plain, slow, slack +8.16) and moved individual rows by up to ±1.2 ns. ABC restructures the logic differently whenever the netlist changes, so read every number here as ±1.5 ns. The conclusion is the same in every run.
 
 **Margin.** How much the EVAL path could grow before it fails at 20 ns:
 
 | Case | Growth allowed |
 |---|---|
-| Worst case (flop slots, plain, slow, cfg 0) | 1.72× |
-| Planned build before resizing (latch, plain, slow, cfg 1) | 2.2× |
-| Latch, sized, slow | 3.4× |
+| Worst case in any run (flop, plain, slow, cfg 0: 11.39 ns) | 1.72× |
+| Worst row of the final run (latch, plain, slow, cfg 0) | 1.81× |
+| Planned build before resizing (latch, plain, slow, cfg 1) | 2.1× |
+| Latch, sized, slow | 3.5× |
 
 Wire delay, clock skew and a long route to producers in other blocks all eat into this margin; none of them is plausibly 70 %.
 
 **The critical paths:**
-- **EVAL (plain):** the consumer-port `sel` register or a producer's tag register → source mux → `accept` filter → `avail` → `ready[i]` → group mask → priority encoder → the selected slot's ASRC → the A-latch data mux (`a_lat`). This is the §11 EVAL path (conditions → encoder → mux), with the fabric source mux in front of it. About 3 ns of the 6.4 ns (typ) is three unbuffered nets with fanout 31–35, which buffering removes (the "sized" rows).
+- **EVAL (plain):** the consumer-port `sel` register or a producer's tag register → source mux → `accept` filter → `avail` → `ready[i]` → group mask → priority encoder → the selected slot's ASRC → the A-latch data mux (`a_lat`). This is the §11 EVAL path (conditions → encoder → mux), with the fabric source mux in front of it. In the first run, about 3 ns of the 6.4 ns (typ) was three unbuffered nets with fanout 31–35, which buffering removes (the "sized" rows).
 - **EVAL (sized):** O1's `out_seq` → the 9-subscriber release term → `ofree` → `ready` → encoder → the CALL index mux.
-- **EXEC:** `ex_rt` (routine or slot) → operand muxes (fanout 107 when unbuffered) → ALU → the zero/compare flag → RZ. At 10.6 ns (slow, plain) it is slightly longer than EVAL, and it is also comfortably inside 20 ns.
-- **Latch writes:** the latch array times cleanly. Write data borrows 0.8 ns into the transparent phase, the clock-gate check passes, and the hold on the gate is +0.15 ns (ideal clock).
+- **EXEC:** `ex_rt` (routine or slot) → operand muxes (fanout 107 when unbuffered) → ALU → the zero/compare flag → RZ. At 8.3–10.7 ns (slow, plain) it is about as long as EVAL, and it is also comfortably inside 20 ns.
+- **Latch writes:** the latch array times cleanly: write data borrows under 1 ns into the transparent phase. With the first, behavioural clock gate the gating check passed with +0.15 ns hold (ideal clock); the library ICG now used has its own checks inside the cell.
 
 ## 4. Area (Yosys, typ liberty, plain mapping, before placement)
 
 | Block (one lane) | Cells | Flops | Latches | Area (µm²) |
 |---|---|---|---|---|
-| `trw_lane` (control, registers, EXEC muxes) | ~2,450 | 170 | 0 | 36,051 |
+| `trw_lane` (control, registers, EXEC muxes) | ~2,450 | 170 | 0 | 34,978 |
 | `trw_alu` | ~580 | 0 | 0 | 5,850 |
-| `trw_slots`, latch array | 952 | 16 | 752 (636 slot + 64 K + 52 clock-gate) | 25,492 |
-| `trw_slots`, flop fallback | 2,840 | 700 | 0 | 51,721 |
+| `trw_slots`, latch array (no read port) | ~950 | 16 | 700 (636 slot + 64 K), + 52 `lgcp` clock gates | 24,549 |
+| `trw_slots` debug read port (52 × 16-bit word mux, used by R2) | | | | +9,350 |
+| `trw_slots`, flop fallback (no read port) | 2,840 | 700 | 0 | 51,721 |
 | Two consumer ports | 307 | 2 | 0 | 3,255 |
-| **Lane total, latch slots** | | | | **~67,400** |
+| **Lane total, latch slots** | | | | **~65,400** |
 
-- **Three lanes, latch slots:** ~202K µm², 22 % of the 902K µm² 6x4 core, before placement density.
-- **Latch vs flop slots:** latches save ~26K µm² and ~1,900 cells per lane (~79K µm² for three lanes).
-- **Against ARCHITECTURE §12:** the slot estimate (~90K µm² for three lanes) holds at ~76K. Lane control needs 3 × 170 = 510 flops against the "~0.4K" estimate, plus ~42K µm² per lane of logic. §12 should be updated after R2 with post-layout numbers.
+- **Three lanes, latch slots:** ~196K µm², 22 % of the 902K µm² 6x4 core, before placement density.
+- **Latch vs flop slots:** latches save ~27K µm² and ~1,900 cells per lane (~80K µm² for three lanes).
+- **Debug read port:** reading slots back (useful for host debug and for R2's test) costs ~9.4K µm² per lane, about 14 % of a lane. The final area numbers need a decision on whether phase 2 keeps it.
+- **Against ARCHITECTURE §12:** the slot estimate (~90K µm² for three lanes) holds at ~74K. Lane control needs 3 × 170 = 510 flops against the "~0.4K" estimate, plus ~42K µm² per lane of logic. §12 should be updated after R2 with post-layout numbers.
 
 ## 5. What this does not show
 - **Before layout.** No wire RC, no clock tree and skew, no placement. The TT flow's resizer will buffer and size the plain netlist, and routing will add wire delay. The "sized" rows bound the first effect; the margin above covers the second. The R2 hardening, a 2x2 project built around this lane's latch array, will give post-route numbers.
 - **One lane and a harness,** not the chip. In the real floorplan the producer registers sit in pin units and other lanes, so the fabric part of the EVAL path gets longer wires. In the plain typical path that part (select decode, source mux, tag filter) takes about the first 1.9 ns.
-- **Hold** is not meaningful before CTS. The clock gate is a behavioural latch + AND. The phase 2 RTL should instantiate the library ICG `sg13cmos5l_lgcp_1` (R2).
+- **Hold** is not meaningful before CTS. The slot store's clock gate is the library ICG `sg13cmos5l_lgcp_1` in synthesis (`ifdef SYNTHESIS` in `trw_slots.v`) and a behavioural latch + AND in simulation and lint. The first run used the behavioural gate in synthesis too; the latch rows above are from the re-run with the library cell (EVAL within ±0.4 ns of the first run).
 - **Area** is Yosys's, not LibreLane's. LibreLane synthesizes with its own strategy and then resizes.
 
 ## 6. Spec gaps found by writing RTL from the documents alone

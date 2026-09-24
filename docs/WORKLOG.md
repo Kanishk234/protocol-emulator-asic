@@ -61,8 +61,19 @@ Later (R3 set-up):
 - `check_local.sh`: PASS. Lint; 3/3 tests on the RTL and on a Yosys gate-level netlist (TT Icarus 13); flattened instance `u_sram.sram`.
 - Mutations: a wrong BIST write is caught (1 test fails); address aliasing is caught (2 tests fail).
 
+- User pushed `spike/r3-sram`; its `gds` run is in progress.
+
+Later (R2 set-up, D-032):
+- `spikes/r2_latch/`: branch overlay for the whole R1 lane on 3x2, with pin-driven I0 producer, O0/O1 subscribers and RIR. Also `test.py` (latch array: two patterns over all 52 words; a program with §7.1, a routine step pair and a K constant), `check_local.sh` and `apply_to_branch.sh`.
+- Shared `trw_slots.v`:
+  - library ICG `sg13cmos5l_lgcp_1` under `ifdef SYNTHESIS`;
+  - a debug read port (~9.4K µm² per lane: a phase 2 question);
+  - the upper 11 bits of each slot's 4th word are no longer stored (132 latches that R2's readback had kept).
+- `check_local.sh`: PASS. Lint; 2/2 on RTL and gate level (700 latches, 52 `lgcp`); STA pre-layout +10.8 ns (slow, flop endpoints).
+- R1 re-run: same conclusion. The ABC mapping moves rows by up to ±1.2 ns between such edits, so the report now uses the final run and carries a ±1.5 ns note. D-030, AREA and the summary are updated to match.
+
 Next:
-- User: commit, then create `spike/r3-sram`, run `apply_to_branch.sh`, commit and push the branch (spikes/r3_sram/README.md); then record the gds run.
+- User: commit, then create `spike/r2-latch` and push it (spikes/r2_latch/README.md). Record both gds runs when they finish.
 - Team: answer G1–G8 in §14 / ISA (the model owner can say what tripsim does).
 - R2: a 2x2 TT project around `trw_slots` + `trw_lane` (library ICG, host-write path from pins). Plan: spike branches in this repo (`spike/r2-latch`, `spike/r3-sram`) with `tiles: "2x2"`, never merged; `gds` concurrency is per ref, so they don't cancel `main`.
 - R3: the SRAM macro smoke project (PHYSICAL §3 recipe).

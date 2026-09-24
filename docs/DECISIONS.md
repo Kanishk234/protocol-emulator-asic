@@ -422,15 +422,16 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 ## D-030 (2026-09-24): R1 result: lanes fire every clock
 - **Decision:** keep ARCHITECTURE §14 L1 as written: EVAL runs every clock at 50 MHz. The fire-every-other-clock fallback is not needed and is not built into the phase 2 RTL.
 - **Evidence:** `docs/reports/R1_LANE_TIMING.md`. A spike lane (`spikes/r1_lane/`), written from the spec only: 12 slots, full `ready()` with implicit checks, the urgent/routine rule, one priority encoder, static updates, EXEC with the 16-op ALU, and real consumer ports and release terms in front of it. Synthesized with Yosys onto the cmos5l cells and timed with OpenSTA at 20 ns (before layout):
-  - EVAL arrival 3.7–7.3 ns (typ), 5.8–11.4 ns (slow 1.08 V / 125 °C);
-  - worst EVAL slack +8.2 ns (flop slots, unbuffered, slow);
-  - the planned latch build has 2.2× (unbuffered) to 3.4× (buffered) margin at the slow corner;
-  - EXEC is similar: at most 10.6 ns (slow, unbuffered).
+  - EVAL arrival 3.5–6.9 ns (typ), 5.4–10.8 ns (slow 1.08 V / 125 °C) for the committed RTL; up to 11.4 ns in earlier runs (ABC mapping moves rows by up to ±1.2 ns);
+  - worst EVAL slack in any run +8.2 ns (unbuffered, slow);
+  - the planned latch build has 2.1× (unbuffered) to 3.5× (buffered) margin at the slow corner;
+  - EXEC is similar: at most 10.7 ns (slow, unbuffered).
 - **Reason:** the margin covers wire delay and clock skew with room to spare, and firing every clock keeps the 7-clock pin-to-pin reaction (§5.5) and full SPI throughput (D-029 item 2).
 - **Alternatives:** the fallback (EVAL every other clock). It costs reaction time and ~8 % SPI controller throughput, and would only be justified if the post-route R2 numbers disagreed badly.
-- **Check:** the R2 hardening (a 2x2 project around this lane's latch array) reports post-route timing of the same logic. If its EVAL slack at the slow corner falls below 2 ns, revisit this entry.
+- **Check:** the R2 hardening (a 3x2 project with this lane and its latch array, D-032) reports post-route timing of the same logic. If its EVAL slack at the slow corner falls below 2 ns, revisit this entry.
 - **Also found** (report §6, G1–G8): eight places where the spec text leaves an RTL choice open or disagrees with itself, for example which register `BSEL = reg` selects, and whether a routine step executes one clock after it is chosen. They do not affect timing. They should be answered in §14 / `ISA.md` from the model's behaviour before the phase 2 RTL.
-- **Area** (one lane, latch slots, before layout): ~67K µm². Three lanes ~202K µm² (22 % of the 6x4 core). Latch slots save ~26K µm² per lane over flops.
+- **Area** (one lane, latch slots, before layout): ~65K µm². Three lanes ~196K µm² (22 % of the 6x4 core). Latch slots save ~27K µm² per lane over flops.
+- **Update (2026-09-24):** the latch rows were re-run with the library clock gate `sg13cmos5l_lgcp_1` (report §5); the numbers above are from the final run (library ICG + slot read port), and the conclusion is unchanged.
 - **Status:** accepted (Krithik, 2026-09-24: "accept D-030"). G1–G8 remain to be answered in §14 / `ISA.md`.
 
 ## D-031 (2026-09-24): R2/R3 hardening spikes run on throwaway branches; R3 first
@@ -452,6 +453,23 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - The `config.json` changes follow the CLAUDE.md rule (SRAM macro block, with this entry). The `FP_PDN_V*` keys sit in the template's "do not change" part, so they are called out here. They are part of the macro recipe (PHYSICAL §3: "stripe pitch and offset derived from the macro LEF").
 - **Pass criteria:** `gds`, `precheck` and `gl_test` green on the branch. Otherwise the documented fallback (a flop/latch store behind `trw_sram`), after at most 3 days on the flow.
 - **Status:** accepted for the method (Krithik, 2026-09-24: "you recommend and ill execute"); R3 result pending.
+
+## D-032 (2026-09-24): R2 set-up: the whole R1 lane on 3x2, concurrent with R3
+- **Decision:** R2 hardens the whole R1 lane with its latch slot array on branch `spike/r2-latch` (3x2, template `config.json`), at the same time as R3.
+  - One source: the lane files are `spikes/r1_lane/*.v`, copied onto the branch by `spikes/r2_latch/apply_to_branch.sh`.
+  - The chip is driven and checked from the pins.
+- **Why the whole lane, and 3x2:**
+  - one run answers R2 (latches through the flow) and gives the post-route EVAL slack that D-030 asks for;
+  - the lane is ~79K µm² before layout, too tight for a 2x2 core (~150K µm²) with four metal layers.
+- **Changes to the shared R1 files:**
+  - `trw_slots` instantiates the library ICG `sg13cmos5l_lgcp_1` in synthesis (`ifdef SYNTHESIS`); simulation and lint keep the behavioural gate;
+  - a debug read port;
+  - the unused upper bits of each slot's 4th host word are no longer stored.
+  - R1 was re-run: same conclusion. Numbers are in `R1_LANE_TIMING.md` §3, with a ±1.5 ns mapping-noise note.
+- **Finding:** the slot read port costs ~9.4K µm² per lane (~14 % of a lane). Phase 2 must decide whether host debug readback of slots is worth that.
+- **Local evidence:** `spikes/r2_latch/check_local.sh` PASS: lint; 2/2 cocotb tests on RTL and on a Yosys gate-level netlist (700 latches, 52 `lgcp`, TT Icarus 13); pre-layout STA +10.8 ns setup slack on flop endpoints at the slow corner.
+- **Pass criteria:** `gds`, `precheck`, `gl_test` green, with latch timing checks in the flow's STA. Otherwise the flop fallback (8 slots per lane).
+- **Status:** accepted (Krithik, 2026-09-24: "should we set up a concurrent branch for r2 as well?"); result pending.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

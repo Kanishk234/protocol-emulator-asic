@@ -32,11 +32,17 @@ Done:
 - Not re-applied to `spike/r2-latch`: R2's result does not depend on it, and a push would restart the running hardening.
 - `run_r1.sh` re-run: sims PASS, lint clean. ABC mapping noise moved the worst EVAL row to 11.68 ns (flop, unbuffered, slow), slack +7.87. That is below the +8.2 ns the docs claimed, so `R1_LANE_TIMING.md` §3, D-030, the phase checklist evidence, `AREA.md` and `PHASE1.md` now carry the corrected figures (margin 1.67×). The conclusion is unchanged.
 
-Found, not fixed (waiting for Krithik):
-- **L10 CALL: the spike still deviates** (the same latent issue as the model's BUGS #32). With DST = O0/O1, a CALL slot waits for that output, reserves it at EVAL and loads it at EXEC. With DFE = 1 it sets PEND and writes f[DF]. L10 says CALL ignores DST and DFE: no wait, no reservation, no output or flag write. The fix is four guards in `trw_lane.v`.
+- **L10 CALL: fixed on `main`** after Krithik's OK. CALL now ignores DST (no wait, no reservation, no output load) and DFE (no PEND, no flag write). Both fixes are one BUGS entry, #34 (references D-033 and the model's twin #32).
+- **Sim checks** (`tb_r1_lane.v`, both slot stores PASS):
+  - KT with A = zero gives OT (EVENT); KT with A = I0 keeps the head's DATA over OT = ERR.
+  - A CALL with DST = O0 while O0 holds the last, untaken byte, and DFE on f0 = 1: it must fire; O0 stays unchanged; `resv` and `PEND` are 0 in the CALL's own EXEC clock (the old behaviour set and cleared both, invisible at the end); f0 stays 1 (a flag write would store R = 0).
+  - H1: nothing fires, is taken or loaded while halted and the slots are being written.
+- **Mutation checks:** removing each of the five L10 guards alone fails the tb, and so does the old KT rule. A lane that ignores RUN fails the H1 check (the X from unwritten latches shows as `take xx`).
+- **H1 confirmed:** RUN resets to 0 in the harness, the R2 top and the tb; every lane flop has a synchronous reset; the tb writes all 48 slot words plus K0–K3 before RUN, and the R2 test writes all 52 words before RUN.
+- `run_r1.sh` re-run: sims PASS, lint clean; worst EVAL this run 10.76 ns (slow). The report's table is this run; the headline keeps the worst across runs (11.68 ns, +7.87).
+- Not re-applied to `spike/r2-latch`.
 
 Next:
-- Krithik: OK the L10 fix.
 - R2 run 2 in progress.
 
 ## 2026-09-24: Krithik + Claude (phase 1: R1 spec gaps G1–G8, model side)

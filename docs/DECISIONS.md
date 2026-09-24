@@ -422,9 +422,9 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 ## D-030 (2026-09-24): R1 result: lanes fire every clock
 - **Decision:** keep ARCHITECTURE §14 L1 as written: EVAL runs every clock at 50 MHz. The fire-every-other-clock fallback is not needed and is not built into the phase 2 RTL.
 - **Evidence:** `docs/reports/R1_LANE_TIMING.md`. A spike lane (`spikes/r1_lane/`), written from the spec only: 12 slots, full `ready()` with implicit checks, the urgent/routine rule, one priority encoder, static updates, EXEC with the 16-op ALU, and real consumer ports and release terms in front of it. Synthesized with Yosys onto the cmos5l cells and timed with OpenSTA at 20 ns (before layout):
-  - EVAL arrival 3.5–7.5 ns (typ), 5.5–11.7 ns (slow 1.08 V / 125 °C) for the committed RTL (ABC mapping moves rows by up to ±1.3 ns between runs);
+  - EVAL arrival 3.4–7.5 ns (typ), 5.3–11.7 ns (slow 1.08 V / 125 °C) across the runs of this lane (ABC mapping moves rows by up to ±1.3 ns between runs);
   - worst EVAL slack in any run +7.9 ns (flop slots, unbuffered, slow; corrected 2026-09-24 from +8.2 after the KT re-run);
-  - the planned latch build has 2.4× (unbuffered) to 3.3× (buffered) margin at the slow corner;
+  - the planned latch build has 2.0× (unbuffered) to 3.2× (buffered) margin at the slow corner (worst across runs);
   - EXEC is similar: at most 10.7 ns (slow, unbuffered) across the runs.
 - **Reason:** the margin covers wire delay and clock skew with room to spare, and firing every clock keeps the 7-clock pin-to-pin reaction (§5.5) and full SPI throughput (D-029 item 2).
 - **Alternatives:** the fallback (EVAL every other clock). It costs reaction time and ~8 % SPI controller throughput, and would only be justified if the post-route R2 numbers disagreed badly.

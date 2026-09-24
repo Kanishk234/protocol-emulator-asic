@@ -2,9 +2,9 @@
 
 Phase 1 task 13. **Question:** can a lane evaluate all 12 reflex conditions, pick a slot and apply its static updates in one 20 ns clock (EVAL every clock), or must it fall back to firing every other clock? **Decision it drives:** the fire rate (ARCHITECTURE §14 L1). Decision: DECISIONS D-030.
 
-**Answer: fire every clock.** Before layout, the worst EVAL path is 3.5–7.5 ns at the typical corner and 5.5–11.7 ns at the slow corner (committed RTL; see the mapping-noise note in §3). The worst case seen in any run (flop slots, no buffering, configuration treated as changing, slow corner) still has 7.9 ns of slack: the path could grow by 67 % before it fails. The buffered latch build has 3.3–3.5× margin.
+**Answer: fire every clock.** Before layout, the worst EVAL path is 3.4–7.5 ns at the typical corner and 5.3–11.7 ns at the slow corner across the runs of this lane (§3 has the committed RTL's run and the mapping-noise note). The worst case seen in any run (flop slots, no buffering, configuration treated as changing, slow corner) still has 7.9 ns of slack: the path could grow by 67 % before it fails. The buffered latch build has 3.3–3.5× margin.
 
-Date: 2026-09-24 (final run: library clock gate `sg13cmos5l_lgcp_1`, slot read port, KT per §14 L8; see §3 and §5). Reproduce: `spikes/r1_lane/run_r1.sh` (outputs in `spikes/r1_lane/build/`, not committed).
+Date: 2026-09-24 (final run: library clock gate `sg13cmos5l_lgcp_1`, slot read port, KT per §14 L8, CALL per L10; see §3 and §5). Reproduce: `spikes/r1_lane/run_r1.sh` (outputs in `spikes/r1_lane/build/`, not committed).
 
 ---
 
@@ -43,33 +43,33 @@ Arrival = data arrival at the endpoint (ns); slack against 20 ns minus uncertain
 
 | Slots | Mapping | Corner | Config | EVAL arrival | EVAL slack | EXEC arrival | EXEC slack |
 |---|---|---|---|---|---|---|---|
-| latch | plain | typ | 0 | 5.90 | 13.73 | 5.65 | 13.97 |
-| latch | plain | typ | 1 | 5.30 | 14.33 | 5.65 | 13.97 |
-| latch | plain | slow | 0 | 9.19 | 10.36 | 8.83 | 10.68 |
-| latch | plain | slow | 1 | 8.29 | 11.27 | 8.83 | 10.68 |
-| latch | sized | typ | 0 | 3.76 | 15.86 | 4.15 | 15.47 |
-| latch | sized | typ | 1 | 3.51 | 16.11 | 4.15 | 15.47 |
-| latch | sized | slow | 0 | 5.90 | 13.63 | 6.48 | 13.06 |
-| latch | sized | slow | 1 | 5.52 | 14.01 | 6.48 | 13.06 |
-| flop | plain | typ | 0 | 7.53 | 12.10 | 6.07 | 13.54 |
-| flop | plain | typ | 1 | 6.76 | 12.87 | 6.07 | 13.54 |
-| flop | plain | slow | 0 | **11.68** | **7.87** | 9.39 | 10.11 |
-| flop | plain | slow | 1 | 10.45 | 9.10 | 9.39 | 10.11 |
-| flop | sized | typ | 0 | 3.93 | 15.69 | 4.18 | 15.44 |
-| flop | sized | typ | 1 | 3.50 | 16.13 | 4.18 | 15.44 |
-| flop | sized | slow | 0 | 6.15 | 13.38 | 6.53 | 13.01 |
-| flop | sized | slow | 1 | 5.48 | 14.05 | 6.53 | 13.01 |
+| latch | plain | typ | 0 | 6.82 | 12.81 | 5.35 | 14.26 |
+| latch | plain | typ | 1 | 6.35 | 13.28 | 5.35 | 14.26 |
+| latch | plain | slow | 0 | 10.61 | 8.94 | 8.43 | 11.07 |
+| latch | plain | slow | 1 | 9.90 | 9.65 | 8.43 | 11.07 |
+| latch | sized | typ | 0 | 3.42 | 16.21 | 4.09 | 15.54 |
+| latch | sized | typ | 1 | 3.40 | 16.23 | 4.09 | 15.54 |
+| latch | sized | slow | 0 | 5.40 | 14.16 | 6.40 | 13.15 |
+| latch | sized | slow | 1 | 5.33 | 14.22 | 6.40 | 13.15 |
+| flop | plain | typ | 0 | 6.93 | 12.70 | 5.32 | 14.27 |
+| flop | plain | typ | 1 | 6.05 | 13.58 | 5.32 | 14.27 |
+| flop | plain | slow | 0 | 10.76 | 8.79 | 8.18 | 11.29 |
+| flop | plain | slow | 1 | 9.42 | 10.13 | 8.18 | 11.29 |
+| flop | sized | typ | 0 | 3.75 | 15.87 | 3.96 | 15.66 |
+| flop | sized | typ | 1 | 3.61 | 16.02 | 3.96 | 15.66 |
+| flop | sized | slow | 0 | 5.90 | 13.64 | 6.20 | 13.35 |
+| flop | sized | slow | 1 | 5.67 | 13.88 | 6.20 | 13.35 |
 
-**Mapping noise.** These are the numbers for the committed RTL (after the §14 L8 KT fix, 2026-09-24). Three earlier runs of the same lane differed only outside the critical path: a behavioural clock gate instead of the library ICG, no slot read port, and KT as it was before L8. Between runs, individual rows moved by up to ±1.3 ns; the worst EVAL row across all runs is this table's 11.68 ns (flop, plain, slow, slack +7.87). ABC restructures the logic differently whenever the netlist changes, so read every number here as ±1.5 ns. The conclusion is the same in every run.
+**Mapping noise.** These are the numbers for the committed RTL (after the §14 L8 KT and L10 CALL fixes, 2026-09-24). Four earlier runs of the same lane differed only outside the critical path: a behavioural clock gate instead of the library ICG, no slot read port, KT before L8, and CALL before L10. Between runs, individual rows moved by up to ±1.3 ns. **The worst EVAL row across all runs is 11.68 ns** (flop, plain, slow, slack +7.87, in the run just before the L10 fix); the margin figures below use it. ABC restructures the logic differently whenever the netlist changes, so read every number here as ±1.5 ns. The conclusion is the same in every run.
 
 **Margin.** How much the EVAL path could grow before it fails at 20 ns:
 
 | Case | Growth allowed |
 |---|---|
 | Worst case in any run (flop, plain, slow, cfg 0: 11.68 ns) | 1.67× |
-| Latch, plain, slow, cfg 0 | 2.1× |
-| Planned build before resizing (latch, plain, slow, cfg 1) | 2.4× |
-| Latch, sized, slow | 3.3–3.5× |
+| Latch, plain, slow, cfg 0 (worst across runs: 10.78 ns) | 1.8× |
+| Planned build before resizing (latch, plain, slow, cfg 1; worst across runs 9.90 ns) | 2.0× |
+| Latch, sized, slow (worst across runs 6.15 ns) | 3.2× |
 
 Wire delay, clock skew and a long route to producers in other blocks all eat into this margin; none of them is plausibly 67 %.
 
@@ -115,6 +115,6 @@ The RTL had to pick an answer for each of these. The model has presumably picked
 | G3 | A routine `OUT` whose output is full: is it still a "waiting step" that holds back non-urgent slots? | ISA §5.3 | no: it is not a candidate until its output is free |
 | G4 | PEND[x] set by EVAL and cleared by EXEC on the same edge | §14 L4/L5 | set wins |
 | G5 | How DJNZ reports "rd ≠ 0" to the sequencer; does it write RZ? | ISA §5.1 | RZ untouched; a separate signal |
-| G6 | `KT` when ASRC is not an input; `CALL` with a register DST; `SETF/CLRF/CPYF` with arg 3 (RB is read-only) | ISA §3, §4.1, §5.1 | the latched I0/I1 head tag (**changed to §14 L8**: KT ignored, OT used); CALL writes no register; writes to f3 ignored |
+| G6 | `KT` when ASRC is not an input; `CALL` with a register DST; `SETF/CLRF/CPYF` with arg 3 (RB is read-only) | ISA §3, §4.1, §5.1 | the latched I0/I1 head tag (**changed to §14 L8**: KT ignored, OT used); CALL writes no register (**extended to §14 L10**: CALL also ignores an output DST and DFE); writes to f3 ignored |
 | G7 | Slot latches have no reset, so V is unknown after power-up | §5.2, PHYSICAL §4 | the host must write all 48 slot words before RUN; RUN resets to 0 |
 | G8 | Inconsistent numbers: PEND 4 bits (ARCH §5.1) vs 3 (ISA §2); "52-bit slots" (ARCH §5.2) vs 53; "RPC, RRET" (ARCH §5.1) vs "RPC, RIR" (ISA §2) | ARCH §5.1, §5.2 | ISA's values |

@@ -429,6 +429,10 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Reason:** the margin covers wire delay and clock skew with room to spare, and firing every clock keeps the 7-clock pin-to-pin reaction (§5.5) and full SPI throughput (D-029 item 2).
 - **Alternatives:** the fallback (EVAL every other clock). It costs reaction time and ~8 % SPI controller throughput, and would only be justified if the post-route R2 numbers disagreed badly.
 - **Check:** the R2 hardening (a 3x2 project with this lane and its latch array, D-032) reports post-route timing of the same logic. If its EVAL slack at the slow corner falls below 2 ns, revisit this entry.
+- **Post-layout recheck (2026-09-24): confirmed.**
+  - Hardened R2 lane (run 36060938609, 4x2), OpenSTA on the routed netlist with extracted parasitics: EVAL slack **+11.75 / +6.94 / +13.65 ns** (typ / slow / fast), against the 2 ns threshold.
+  - This R2 lane is the pre-L8/L10 RTL; those fixes are outside EVAL's timing path.
+  - Wires and the clock tree cost ~1–3 ns against the pre-layout estimates.
 - **Also found** (report §6, G1–G8): eight places where the spec text leaves an RTL choice open or disagrees with itself, for example which register `BSEL = reg` selects, and whether a routine step executes one clock after it is chosen. They do not affect timing. They should be answered in §14 / `ISA.md` from the model's behaviour before the phase 2 RTL.
 - **Area** (one lane, latch slots, before layout): ~65K µm². Three lanes ~196K µm² (22 % of the 6x4 core). Latch slots save ~27K µm² per lane over flops.
 - **Update (2026-09-24):** the latch rows were re-run with the library clock gate `sg13cmos5l_lgcp_1` (report §5); the numbers above are from the final run (library ICG + slot read port), and the conclusion is unchanged.
@@ -540,7 +544,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Outcomes:**
   - (a) routing clears: R2 passes; density 52 becomes a phase 2 floorplan input; post-route EVAL slack goes to the D-030 recheck;
   - (b) the run fails at the routing-DRC check: read the violation locations and congestion from `GDS_logs`, then choose the design fix for run 4 (first candidate: remove or narrow the 52-word slot read port, ~9.4K µm² of muxing across the array).
-- **Status:** accepted.
+- **Status:** accepted. **R2 PASSED on run 4 (below).**
 - **Run 3 (2026-09-24): density worked, routing still stalls; stopped for run 4.** `gds` run 36039323359 (7f60356), started 18:09:54 UTC.
   - Detailed routing started at 18:13:59: 4 min in (the D-032 latch SDC fix confirmed).
   - Pin access clean (`#stdCellPinNoAp = 0`: every latch, clock-gate and standard-cell pin reachable).
@@ -554,6 +558,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - The earlier run-4 plan (cap 3, nothing else) was queued as `gds` #18 and is superseded; the push of this change cancels it.
   - If it passes, the phase 2 floorplan must give the slot-array logic a local density near 42 %, not the template's 60.
   - The slot read-back mux stays: removing it is a phase 2 area/wiring option, not needed to answer R2.
+- **Run 4 result: PASS.** `gds` run 36060938609 (c4ef059), 1 h 30 min in total:
+  - jobs: `gds` 73.0 min, `precheck` 16.7 min, `gl_test` 0.8 min, `viewer` green;
+  - routing reached 0 violations at iteration 5 (54 min);
+  - DRC, LVS and antenna all 0;
+  - post-CTS resizer 9.5 s.
+  - Numbers are in `AREA.md` row 3.
+  - **Decision: latch slots are kept** (the 8-flop-slot fallback is not needed).
+  - **Phase 2 inputs:** the latch SDC exception; local density ~42 % for the slot arrays (Metal3 66 % used even so); the read-back mux as the first wiring cut.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

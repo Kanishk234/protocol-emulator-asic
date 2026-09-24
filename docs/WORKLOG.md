@@ -54,6 +54,12 @@ Next:
   - density 52 cut the first-pass violations from 8,297 to 33, but the tail held at 26–27 (Metal2/Metal3);
   - pass 5 was a ~1 h stubborn pass, so a cap of 20 would still time out (kill at 00:09 UTC; I first misstated it as 22:09).
 - Run 4 first planned as a diagnostic-only run (cap 3). Revised at Krithik's question ("why run a workflow we know will fail?") into an attempt to pass: tile 4x2, density 42, cap 8 (D-034). No RTL or test change.
+- **R2 PASSED (run 4, `gds` 36060938609, c4ef059):** gds 73 min, precheck 16.7 min, gl_test 0.8 min, viewer green.
+  - Routing reached 0 violations at iteration 5; DRC, LVS and antenna 0; post-CTS resizer 9.5 s.
+  - `AREA.md` row 3; latch slots kept.
+  - [x] R2 box ticked (run 36060938609).
+- **D-030 post-layout recheck:** OpenSTA on the routed netlist + SPEF (hold slacks match the flow's) gives EVAL +11.75 / +6.94 / +13.65 ns (typ/slow/fast), above the 2 ns threshold. Confirmed.
+- Phase 2 inputs recorded (D-034, AREA row 3): the latch SDC exception; ~42 % local density for the slot arrays (Metal3 still 66 % used); the read-back mux as the first wiring cut.
 
 ## 2026-09-24: Krithik + Claude (phase 1: R1 spec gaps G1–G8, model side)
 Done:

@@ -116,7 +116,7 @@ So the "every other clock" fallback isn't needed (D-030, accepted). These number
 2. **A second person reviews the cycle-by-cycle rules.** The freeze decision (D-029) is accepted and applied: the connection table is in the spec and the compiler enforces it, the host's MISO pin moved so the demo board's hardware SPI can reach it, and no open questions remain in the design documents.
 3. **Hardware experiments:**
    - R1: done (item 16); D-030 accepted;
-   - R2: check that latch-based rule memory survives Tiny Tapeout's flow (a small separate hardening run, reusing the R1 lane);
+   - R2: done. One lane with its latch-based rule memory passed the full flow on a 4x2 test chip, on the 4th attempt. The first three attempts showed that the latches need one timing-tool exception and that their wiring needs room: about 42 % placement density instead of the usual 60 %. After layout, the lane still has about 7 ns to spare per clock in the worst case, which confirms the every-clock decision (D-030, D-032, D-034);
    - R3: done. The SRAM macro passed Tiny Tapeout's full flow (hardening, precheck and the gate-level test) on a small test chip, so the routine memory uses the real macro (D-031).
 4. **Answer the eight open choices** R1 found (`docs/reports/R1_LANE_TIMING.md` §6) in the cycle-by-cycle rules.
 

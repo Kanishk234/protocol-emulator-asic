@@ -452,7 +452,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - The `viewer` job may fail on a branch.
   - The `config.json` changes follow the CLAUDE.md rule (SRAM macro block, with this entry). The `FP_PDN_V*` keys sit in the template's "do not change" part, so they are called out here. They are part of the macro recipe (PHYSICAL §3: "stripe pitch and offset derived from the macro LEF").
 - **Pass criteria:** `gds`, `precheck` and `gl_test` green on the branch. Otherwise the documented fallback (a flop/latch store behind `trw_sram`), after at most 3 days on the flow.
-- **Status:** accepted for the method (Krithik, 2026-09-24: "you recommend and ill execute"); R3 result pending.
+- **Status:** accepted for the method (Krithik, 2026-09-24: "you recommend and ill execute").
+- **R3 result (2026-09-24): PASS, the macro is kept; the flop-store fallback is not needed.**
+  - `gds` workflow run 35961480554 on `spike/r3-sram` (09e8697): `gds` 7.9 min, `precheck` 1.7 min, `gl_test` 0.8 min, `viewer` 0.3 min, all green.
+  - `gl_test` ran the pin-level suite on the hardened netlist: reset state; every address line and data bit; the 18-pass walking-ones BIST with an independent read-back.
+  - `lint`, `test`, `unit`, `docs` are also green on the branch.
+  - Detailed numbers (timing, utilisation, overflow, DRC/LVS) go into `docs/reports/AREA.md` from the `GDS_logs` artifact.
+  - Side effect: `viewer` deployed from the branch, so GitHub Pages shows the R3 test chip until the next `main` hardening.
 
 ## D-032 (2026-09-24): R2 set-up: the whole R1 lane on 3x2, concurrent with R3
 - **Decision:** R2 hardens the whole R1 lane with its latch slot array on branch `spike/r2-latch` (3x2, template `config.json`), at the same time as R3.

@@ -61,7 +61,10 @@ Later (R3 set-up):
 - `check_local.sh`: PASS. Lint; 3/3 tests on the RTL and on a Yosys gate-level netlist (TT Icarus 13); flattened instance `u_sram.sram`.
 - Mutations: a wrong BIST write is caught (1 test fails); address aliasing is caught (2 tests fail).
 
-- User pushed `spike/r3-sram`; its `gds` run is in progress.
+- User pushed `spike/r3-sram`. **R3 PASS:** `gds` run 35961480554 (09e8697): gds 7.9 min, precheck 1.7 min, gl_test 0.8 min, viewer green; lint/test/unit/docs green. The macro is kept (D-031).
+  - [x] R3 box ticked (run 35961480554).
+  - Pages now shows the R3 chip until the next `main` hardening.
+  - Pending: numbers from the `GDS_logs` / `precheck_reports` artifacts (they need a GitHub login).
 
 Later (R2 set-up, D-032):
 - `spikes/r2_latch/`: branch overlay for the whole R1 lane on 3x2, with pin-driven I0 producer, O0/O1 subscribers and RIR. Also `test.py` (latch array: two patterns over all 52 words; a program with §7.1, a routine step pair and a K constant), `check_local.sh` and `apply_to_branch.sh`.

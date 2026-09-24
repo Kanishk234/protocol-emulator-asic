@@ -101,15 +101,24 @@ All of this is proposed as one freeze decision (D-029) for both of us to review:
 
 We also made the per-push tests about 20 times faster locally by moving the five longest simulations to a nightly run.
 
+**16. The first hardware experiment (R1): a lane can decide every clock at 50 MHz.** In a fresh session that never looked at the model, we wrote one lane in Verilog from the design documents alone: the 12 rules, the logic that picks one, the arithmetic unit, and the channel ports that feed it. A small simulation checked that it works; it forwards bytes at exactly the 3 clocks each the documents promise. We then turned it into real IHP 130 nm cells with Yosys and timed it with OpenSTA, the timing tool the chip flow uses.
+
+| | Typical chip | Slow chip (hot, low voltage) |
+|---|---|---|
+| Time to decide (worst case we could build) | 7.3 ns | 11.4 ns |
+| Time to decide (planned design, buffered) | 3.7 ns | 5.8 ns |
+| Time available per clock | 20 ns | 20 ns |
+
+So the "every other clock" fallback isn't needed (proposed as D-030). These numbers are before layout: real wires will add delay, but the worst case would have to grow by more than 70 % to fail. The R2 run will measure it after layout. One lane with latch-based rule memory comes to about 67K µm², so three lanes use about a fifth of the chip. Writing the Verilog without the model also turned up eight places where the documents leave a choice open or contradict themselves (for example, which register one field selects). None of them affects timing, but they need answering in the rules before the real Verilog is written.
+
 ## What's left in Phase 1
 1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.
 2. **A second person reviews the cycle-by-cycle rules.** The freeze decision (D-029) is accepted and applied: the connection table is in the spec and the compiler enforces it, the host's MISO pin moved so the demo board's hardware SPI can reach it, and no open questions remain in the design documents.
-3. **Three hardware experiments**, each a small separate hardening run:
-   - R1: build one lane in Verilog and check it runs at 50 MHz;
-   - R2: check that latch-based slot memory survives Tiny Tapeout's flow;
-   - R3: check that the SRAM macro is usable.
-
-   These need real Verilog, which should be written in a fresh session that hasn't seen the model, so the two stay independent.
+3. **Hardware experiments:**
+   - R1: done (item 16); the team still has to accept D-030;
+   - R2: check that latch-based rule memory survives Tiny Tapeout's flow (a small separate hardening run, reusing the R1 lane);
+   - R3: check that the SRAM macro is usable (another small hardening run).
+4. **Answer the eight open choices** R1 found (`docs/reports/R1_LANE_TIMING.md` §6) in the cycle-by-cycle rules.
 
 ## In one line
 Phase 1 so far has shown, in a faithful simulation, that the architecture handles every required protocol at the speeds that matter, and it has corrected the design along the way. What's left is locking that design down and testing the riskiest hardware assumptions.

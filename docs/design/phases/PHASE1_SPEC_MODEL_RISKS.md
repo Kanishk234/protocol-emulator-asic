@@ -99,7 +99,7 @@ The §2.4 risk spikes run in parallel from the start.
   - [x] against the protocol reference models; *(UART: `protomodels/uart.py` decode/encode incl. a framing error and a 256-byte loopback; SPI: `protomodels/spi.py` SPITarget; I2C: `protomodels/i2c.py` I2CTarget with clock stretching.)*
   - [x] against **sigrok** decoding of the model's VCD. *(`test_uart_tx` (uart), `test_spi_controller_sigrok` (spi), `test_i2c_controller_sigrok` (i2c).)*
 - [x] `tripc` report produced for all three programs, and slot usage fits (≤ 12 per lane). *(`tools/tripc/tests/test_tripc.py::test_reports_and_slot_budget` over all `programs/*.trw`: uart 4, spi_controller 4, i2c_controller 11 + 2 bounded routines; plus spi_target 3, i2c_target 12.)*
-- [ ] **R1 decided:** EVAL path timing measured; fire rate chosen and logged.
+- [ ] **R1 decided:** EVAL path timing measured; fire rate chosen and logged. *(Measured 2026-09-24: `spikes/r1_lane/run_r1.sh`, `docs/reports/R1_LANE_TIMING.md`: EVAL ≤ 7.3 ns typ, ≤ 11.4 ns slow at 20 ns, worst slack +8.2 ns, before layout. Fire rate "every clock" proposed in D-030; tick when the team accepts it.)*
 - [ ] **R2 decided:** the latch-array test project passed precheck and `gl_test`, or the flop fallback is chosen and logged.
 - [ ] **R3 decided:** the SRAM smoke project passed precheck and `gl_test`, or the fallback is chosen and logged.
 - [x] Jane Street answers logged, or the assumptions stated. *(DECISIONS D-003: design for 6x4; SRAM macro assumed usable, settled by R3 with the flop-store fallback kept.)*

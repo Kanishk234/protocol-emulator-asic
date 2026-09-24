@@ -21,6 +21,41 @@ Next:
 
 ---
 
+## 2026-09-24: Krithik + Claude (phase 1: R1 risk spike)
+Fresh session, RTL context only: read `ARCHITECTURE.md`, `ISA.md`, `spec/tripwire.yaml` and `PHYSICAL_DESIGN_AND_CI.md`; did not read `tools/tripsim` or `tools/kernels`.
+
+Done:
+- **`spikes/r1_lane/`** (throwaway RTL, outside `src/`, no CI reads it). It contains:
+  - `trw_lane` (12 ready terms, the §4.3 rule, one priority encoder, static updates, EXEC, routine steps);
+  - `trw_alu` (16 ops);
+  - `trw_slots` (Ibex-style latch array, with a flop variant);
+  - `trw_cport` (source mux, F7);
+  - `trw_r1_top` (harness: all lane neighbours are registers);
+  - `tb_r1_lane` and `run_r1.sh`, `sta.tcl`, README.
+- **Tools:** OpenSTA 2.6.0, the standalone `sta` extracted from the OpenROAD 2024-12-14 Ubuntu 22.04 package plus `libtcl8.6` / `tcl-tclreadline` via `apt-get download`, into `~/.cache/tripwire/openroad`. No root needed; `run_r1.sh` does it.
+- **Sanity sim** (Icarus, latch and flop slots): ISA §7.1 at 3 clocks per byte, then EVENT: PASS. Verilator `-Wall` clean.
+- **Timing at 20 ns** (Yosys onto cmos5l, OpenSTA, before layout):
+  - EVAL 3.7–7.3 ns typ, 5.8–11.4 ns slow;
+  - worst slack +8.2 ns (flop slots, unbuffered, slow);
+  - EXEC at most 10.6 ns.
+  - Report: `docs/reports/R1_LANE_TIMING.md`.
+- **Area:** ~67K µm² per lane with latch slots (slots 25.5K vs 51.7K as flops). Recorded in `AREA.md` (synthesis-only section).
+- **DECISIONS D-030 (proposed):** fire every clock; no fallback in the phase 2 RTL. Recheck against R2's post-route slack.
+- **Spec gaps G1–G8** (report §6): places where the text leaves an RTL choice open or disagrees with itself (BSEL reg/k index, routine step pipeline position, blocked routine OUT, PEND set/clear on the same edge, DJNZ and RZ, KT/CALL/f3 corner cases, slot latches without reset, PEND/slot-width/RRET inconsistencies). None affects timing.
+- `docs/summaries/PHASE1.md` item 16.
+
+Checklist boxes ticked (evidence):
+- none. The R1 box has its measurement evidence noted and waits for D-030 to be accepted.
+
+Problems / decisions:
+- Before layout only: no wires, no CTS. R2's hardening gives post-route numbers for the same logic.
+- The clock gate in `trw_slots` is a behavioural latch + AND. For R2 and phase 2, instantiate `sg13cmos5l_lgcp_1`.
+
+Next:
+- Team: accept or reject D-030; answer G1–G8 in §14 / ISA (the model owner can say what tripsim does).
+- R2: a 2x2 TT project around `trw_slots` + `trw_lane` (library ICG, host-write path from pins). It needs its own repo or branch from the cmos5l template, because hardening in this repo means touching `src/`.
+- R3: the SRAM macro smoke project (PHYSICAL §3 recipe).
+
 ## 2026-09-23: Krithik + Claude (phase 1: CI speed, ISA §9 answers, freeze proposals)
 Done:
 - **CI speed.** The `unit` workflow took about 20 min. Five tests (servo, IR NEC TX/RX, two LIN tests) took 785 of the 906 s, because they simulate 3–10 M clocks each.

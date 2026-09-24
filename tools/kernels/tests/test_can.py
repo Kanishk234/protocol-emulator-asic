@@ -9,7 +9,7 @@ import pytest
 from kernels import load_program
 from protomodels.can import CANNode, crc15
 from tripsim import Chip
-from tripsim.isa import TAG_DATA, TAG_ERR, TAG_EVENT
+from tripsim.isa import TAG_CTRL, TAG_DATA, TAG_ERR, TAG_EVENT
 from tripsim.vcd import VcdRecorder
 
 LOOP = 5                                # transceiver loop delay TXD -> bus -> RXD, clocks (100 ns)
@@ -47,21 +47,31 @@ def make(period):
     chip = Chip(lanes=2)
     chip.settle_inputs(ui=1)
     load_program(chip, "can", PERIOD=period)
+    chip.host_push(0, tag=TAG_CTRL)                     # init: error-active, flags armed, TX on
     return chip
 
 
-def send(chip, can_id, data):
-    chip.host_push(len(data), tag=TAG_EVENT)
-    chip.host_push(can_id)
+def send(chip, can_id, data=(), ext=False, rtr=False, dlc=None):
+    dlc = len(data) if dlc is None else dlc
+    chip.host_push(dlc | rtr << 4 | ext << 15, tag=TAG_EVENT)
+    if ext:
+        chip.host_push(can_id >> 18)
+        chip.host_push((can_id >> 12) & 0x3F)
+        chip.host_push(can_id & 0xFFF)
+    else:
+        chip.host_push(can_id)
     for b in data:
         chip.host_push(b)
+    chip.host_push(0, tag=TAG_EVENT)                    # end of the frame
 
 
 def frames_seen(bus):
     """Host-side decode of the chip's reports: [(id, data, crc_ok)], plus TX results."""
     frames, words, results = [], [], []
     for tag, d in bus.got:
-        if tag == TAG_EVENT and d == 0x9001:            # our frame started
+        if tag == TAG_EVENT and d in (0x9001, 0xC001):  # our frame started / refused
+            continue
+        if tag == TAG_ERR and d & 0x8000:               # our error state
             continue
         if tag == TAG_EVENT and d & 0x8000:             # our frame's result
             results.append(d)
@@ -192,6 +202,6 @@ def test_bad_crc_is_reported_and_not_acked():
     bus.run(12 * period)
     ref.pending = [(0x321, [9, 8, 7])]
     bus.run(frame_clocks(period, 3) + 10 * period)
-    errs = [d for t, d in bus.got if t == TAG_ERR]
+    errs = [d for t, d in bus.got if t == TAG_ERR and not d & 0x8000]
     assert errs and errs[0] >> 12 == 0                  # CRC error report
     assert ref.results[0] == (0x321, "noack")

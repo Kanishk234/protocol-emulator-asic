@@ -310,6 +310,56 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - Mutations caught: no resync, no TX stuffing, no RX destuffing, CRC polynomial ignored, no readback abort, override in our own frame, no post-CRC stuff check, override armed by a stuff bit. **Not caught:** resync on our own dominant edges (it needs a multi-transmitter propagation-delay scenario; noted as a gap).
 - **Status:** accepted (draft).
 
+## D-024 (2026-09-23): event timestamps in PRESC ticks; carrier modulation on pin A
+- **Decision (general form, D-012):**
+  - The event generator's 15-bit timestamp counts PRESC ticks instead of clocks (§14 P8). With PRESC = 1 nothing changes.
+  - CARRIER (clocks, fractional): while pin A is at its active (non-IDLE) level it toggles with that period, 50 % duty, restarting with every mark (§14 P30).
+- **General need:** timestamps: IR remotes (13.5 ms leaders), servo/PWM capture, LIN breaks, any pulse longer than 655 µs. Carrier: IR LEDs (36–56 kHz), on-off-keyed RF, ultrasonic bursts.
+- **Cost:** timestamp: the prescaler already exists; one mux on the counter input. Carrier: a 16.8 period accumulator reused from TX timing plus a 1-bit phase; about 24 config bits.
+- **Evidence:** `tools/kernels/tests/test_simple_protocols.py`: IR NEC TX (carrier 38 kHz ± 1 clock, 108 ms frames, sigrok `ir_nec` with carrier detection) and RX (frames and repeat codes from edge timestamps).
+- **Status:** accepted (draft).
+
+## D-025 (2026-09-23): BITSYNC flag-delimited framing (HDLC), a TX CRC register, and the own-edge rule
+- **Decision (general form, D-012):**
+  - DELIM = flag: STUFF_N ones then a 0 is a stuff bit; one more one followed by a 0 is a flag, which closes the frame (CRC verdict, last word) and opens the next; seven or more ones abort it. The receiver holds back STUFF_N + 1 destuffed bits so a flag's own bits never reach the frame or its CRC (§14 P27).
+  - TX has its own CRC register (reset by SYNC or `LINE` [6]), fed by the data bits we send, appended XOR CRC_XOR (`LINE` [3]). TX no longer depends on reading its own line.
+  - A stuff bit that falls due after the last stuffed bit goes out before the next `LINE` change; stuffing runs count every bit sent.
+  - A frame started by the echo of our own first bit keeps our bit timing, and the unit never resyncs on an edge to the level it is driving itself (§14 P21, P22).
+- **General need:** HDLC/SDLC/PPP/AX.25/X.25 framing; the own-edge rule is needed by every self-clocked TX (CAN transmitters, USB, HDLC over a loopback).
+- **Cost:** a 6-bit hold-back shift register and a small flag/abort detector; a second 16-bit CRC register; the CRC_XOR config (16 bits).
+- **Evidence:** `tools/kernels/tests/test_hdlc.py` (TX decoded by a reference ISO/IEC 13239 codec using the standard reflected FCS; RX at ±1 % drift, bad FCS, abort). The own-edge rule was found by sigrok decoding our USB packets (BUGS #29).
+- **Status:** accepted (draft).
+
+## D-026 (2026-09-23): BITSYNC error signalling: JAM, readback modes, listen-only
+- **Decision (general form, D-012):**
+  - `JAM` (op 11): drive a level for n bits, bypassing the TX queue; either after d more sample points (a response: skipped in a frame this unit transmits), or armed to fire at the bit after the next detected error (§14 P28). It replaces the one-bit `LINE` override of D-023.
+  - Readback modes: 0 off, 1 arbitration (stop quietly on a mismatch), 2 expect an override (report; an error if nobody drove the other level), 3 strict (a mismatch is a bit error). TX status events: arbitration lost, started, reported bit, bit error, refused.
+  - Listen-only (`JAM` [1]/[2]): nothing is driven; a frame's SYNC is refused with an EVENT.
+  - The last-word EVENT of a FRAME-length frame carries "our own frame" in data[14].
+- **General need:** error flags and acknowledgements inside another node's frame (CAN error flags and ACK, J1850-style in-frame responses), silent bus monitors, error confinement (bus-off) in firmware.
+- **Rejected:** a CAN error-counter block (protocol-shaped: the counters are 30 lines of routine).
+- **Cost:** a 4-bit JAM counter + armed register, 2 more readback states, a TX-off flag.
+- **Evidence:** `tools/kernels/tests/test_can_errors.py`: CRC error → error flag after the ACK delimiter and a retransmission; a bit error in our frame → error flag, reported; TEC/REC through error-passive (128) to bus-off (TX refused) and host recovery; 29-bit IDs and remote frames.
+- **Status:** accepted (draft).
+
+## D-027 (2026-09-23): BITSYNC for USB-style links (feasibility): NRZI, pin N, OE auto, SE0, CRC skip
+- **Decision (general form, D-012):**
+  - NRZI line coding (a 0 is a transition), between the line and stuffing/CRC (§14 P29).
+  - PIN_N: a complement output of pin A (differential pairs); SE0 (`LINE` [4]) drives pin A and pin N low for n bits, then idle for 1 bit, then releases.
+  - OE_AUTO: drive only while transmitting (half duplex); our own frames are not reported back.
+  - DELIM = se0: a frame ends when pin S and pin B both read low (only SE0 ends it: NRZI 1s are runs of the idle level).
+  - CRC_SKIP: the RX CRC starts after that many frame bits (USB's CRC skips SYNC and PID).
+- **General need:** USB low-speed, some RF and SDLC links (NRZI), differential outputs, RS-485-style half duplex. Only USB low-speed is exercised so far, as a feasibility study.
+- **Cost:** a NRZI flip-flop on each side, a pad mux for PIN_N, an SE0 state, the OE-auto gate, an 8-bit CRC_SKIP.
+- **Evidence:** `tools/kernels/tests/test_usb_ls.py`: a reference USB 2.0 low-speed host enumerates `programs/usb_ls.trw` (GET_DESCRIPTOR over three IN transactions with DATA1/DATA0 toggles, status stage, SET_ADDRESS, the new address works and the old one is silent), no bus contention, every turnaround ≤ 7.14 bit times (USB: 7.5), bad CRC-5/CRC-16 get no answer; sigrok `usb_signalling` + `usb_packet` decode every device payload byte for byte.
+- **Claims:** per CLAUDE.md this is not USB support: one endpoint, no suspend/resume, no electrical signalling, no hardware.
+- **Status:** accepted (draft).
+
+## D-028 (2026-09-23): tripc `table` directive; routine bounds over every path
+- **Decision:** `table NAME:` places constant words in SRAM after the routine entry table (NAME = its address): lookup tables (CRC nibbles, descriptors) and initialised variables. The routine worst-case bound is now the longest path through the branch graph (BUGS #17), and `ld`/`st` offsets are whole expressions (BUGS #22).
+- **Evidence:** `tools/tripc/tests/test_tripc.py` (new tests for both fixes); SMBus PEC (CRC-8 nibble table), USB (descriptor, variables).
+- **Status:** accepted.
+
 ---
 
 ## Open questions for the phase 1 spec freeze

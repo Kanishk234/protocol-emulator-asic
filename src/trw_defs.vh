@@ -202,5 +202,6 @@
 `define TRW_CMD_SAMPLE 4'd8
 `define TRW_CMD_FRAME 4'd9
 `define TRW_CMD_LINE 4'd10
+`define TRW_CMD_JAM 4'd11
 
 `endif

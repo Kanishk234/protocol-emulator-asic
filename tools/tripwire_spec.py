@@ -59,7 +59,7 @@ ROUTINE_SIGNED = {'LDI': (), 'LDIH': (), 'BR': ('off',), 'DJNZ': ('off',), 'LD':
 BR_COND = {'always': 0, 'rz': 1, 'nrz': 2}
 SYS = {'NOP': 0, 'RET': 1, 'SETST': 2, 'SETF': 3, 'CLRF': 4, 'TSTF': 5, 'CPYF': 6, 'GETT': 7, 'GETK': 8}
 
-PIN_CMD = {'LEVEL': 1, 'OE': 2, 'CLK': 3, 'GAP': 4, 'SYNC': 5, 'SETN': 6, 'WAIT': 7, 'SAMPLE': 8, 'FRAME': 9, 'LINE': 10}
+PIN_CMD = {'LEVEL': 1, 'OE': 2, 'CLK': 3, 'GAP': 4, 'SYNC': 5, 'SETN': 6, 'WAIT': 7, 'SAMPLE': 8, 'FRAME': 9, 'LINE': 10, 'JAM': 11}
 TX_LENTOK = {'len': (15, 12), 'payload': (11, 0)}
 
 PAD_GROUPS = {'ui': (0, 8, 'in'), 'uo': (8, 8, 'out'), 'uio': (16, 8, 'inout')}

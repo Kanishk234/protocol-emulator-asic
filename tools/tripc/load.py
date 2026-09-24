@@ -12,8 +12,9 @@ def load(chip, image, run=True):
         ln = chip.lanes[int(name[1:])]
         ln.k[:] = lane["k"]
         ln.regs[:] = lane["regs"]
-        for n, word in enumerate(lane["slots"]):
-            ln.load_slot(n, int(word, 16))
+        # §14 H1: slot latches have no reset, so write every slot; unused ones get V = 0
+        for n in range(len(ln.slots)):
+            ln.load_slot(n, int(lane["slots"][n], 16) if n < len(lane["slots"]) else 0)
     if image["routines"]:
         chip.load_sram(image["sram"])
     if run:

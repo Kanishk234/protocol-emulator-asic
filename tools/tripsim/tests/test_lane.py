@@ -101,6 +101,17 @@ def test_call_waits_for_rb_and_routine_rate():
     assert lane.stats["routine_steps"] == 2 * steps
 
 
+def test_call_ignores_dst():
+    """§14 L10: a CALL slot with DST = O0 neither waits for nor reserves O0."""
+    chip, lane = host_lane([
+        reflex(op="CALL", f=0, dst="O0", state=0, ns=1),
+        reflex(op="OR", dst="O0", a="zero", b=7, state=1, ns=2),
+    ])
+    chip.load_sram(link_routines([Routine().ret()]))
+    chip.run_for(60)
+    assert outputs(chip) == [7] and lane.reserved == [0, 0]
+
+
 def test_routine_step_rate_is_one_per_four_clocks():
     body = Routine().ldi("r0", 40).label("l").djnz("r0", "l").ret()
     chip, lane = host_lane([reflex(op="CALL", f=0, state=0, ns=1)])

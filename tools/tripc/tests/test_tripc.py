@@ -68,6 +68,7 @@ def errors(src):
     ("connect U0.tx <- U1.rx\n", "cannot take U1.rx"),
     ("connect HOST_OUT <- U2.rx\n", "cannot take U2.rx"),
     ("connect L3.I0 <- HOST_IN\n", "unknown consumer port"),
+    ("lane L0:\n    slot: do MOV O0 <- r0, keep\n", "keep needs an input"),   # §14 L8
     ("lane L0:\n    slot: do CALL missing\n", "CALL needs a defined routine"),
     ("lane L0:\n    slot: do FOO r0 <- zero\n", "unknown operation"),
 ])
@@ -87,6 +88,18 @@ def test_neighbour_lane_links_are_legal():
     for k in range(3):
         tripc.compile_text(f"program t\nconnect L{k}.I1 <- L{(k + 1) % 3}.O0\n"
                            f"connect L{(k + 1) % 3}.I1 <- L{k}.O1\n")
+
+
+def test_load_writes_every_slot():
+    """§14 H1: unused slots are written with V = 0, whatever the latches held before."""
+    from tripsim import Chip
+    chip = Chip(lanes=1)
+    for n in range(12):
+        chip.lanes[0].load_slot(n, 1)                 # V = 1: stale contents from a previous program
+    image, _ = tripc.compile_file(PROGRAMS / "uart.trw")
+    tripc.load(chip, image, run=False)
+    used = len(image["lanes"]["L0"]["slots"])
+    assert used < 12 and not any(s.V for s in chip.lanes[0].slots[used:])
 
 
 def test_error_carries_line_number():

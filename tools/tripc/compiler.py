@@ -321,6 +321,8 @@ class Compiler:
                 kw["b"] = it
             else:                                    # anything else is an immediate B
                 kw["b"] = self.ev(it, n)
+        if kw.get("keep_tag") and kw.get("a") not in ("I0", "I1"):
+            self.err("keep needs an input operand (A = I0 or I1): §14 L8", n)
 
     # -------------------------------------------------------------- routines
     def _routine(self, name, n, body, lane_states):

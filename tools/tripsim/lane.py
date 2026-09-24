@@ -182,9 +182,10 @@ class Lane:
                 return False
             if s.HE and ((data & 1) if s.HS else ((data >> 15) & 1)) != s.HV:
                 return False
-        if s.DST in (DST_O0, DST_O1) and not self._out_free(s.DST - DST_O0):
-            return False
-        if isa.OPS[s.OP] == "CALL" and self.rb:
+        call = isa.OPS[s.OP] == "CALL"
+        if s.DST in (DST_O0, DST_O1) and not call and not self._out_free(s.DST - DST_O0):
+            return False                # rule L10: CALL ignores DST
+        if call and self.rb:
             return False
         return True
 
@@ -250,7 +251,7 @@ class Lane:
         e["latch"] = latch
         if s.NSE:
             e["state"] = s.NS
-        if s.DST in (DST_O0, DST_O1):
+        if s.DST in (DST_O0, DST_O1) and isa.OPS[s.OP] != "CALL":
             e["reserve"] = s.DST - DST_O0
         if s.DFE and s.DF < 3 and isa.OPS[s.OP] != "CALL":
             e["pend"] = s.DF

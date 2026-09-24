@@ -75,7 +75,7 @@ for variant in latch flop; do
     [ "$map" = sized ] && abc="abc -D 4000 -constr build/abc.constr -liberty $TYP"
     net="build/r1_net_${variant}_$map.v"
     echo "=== synthesis: $variant slots, $map mapping, $(basename "$TYP")"
-    yosys -q -l "build/yosys_${variant}_$map.log" -p "read_verilog $def -I$ROOT/src $SRC; \
+    yosys -q -l "build/yosys_${variant}_$map.log" -p "read_liberty -lib $TYP; read_verilog $def -I$ROOT/src $SRC; \
       synth -top trw_r1_top -flatten; dfflibmap -liberty $TYP; $abc; opt_clean; \
       tee -o build/stat_flat_${variant}_$map.txt stat -liberty $TYP; write_verilog -noattr -noexpr $net" \
       >/dev/null 2>&1 || { tail -20 "build/yosys_${variant}_$map.log"; exit 1; }
@@ -98,7 +98,7 @@ for variant in latch flop; do
     done
   done
   # Hierarchical run (plain mapping), only for the per-module area split.
-  yosys -q -p "read_verilog $def -I$ROOT/src $SRC; synth -top trw_r1_top; \
+  yosys -q -p "read_liberty -lib $TYP; read_verilog $def -I$ROOT/src $SRC; synth -top trw_r1_top; \
     dfflibmap -liberty $TYP; abc -liberty $TYP; opt_clean; tee -o build/stat_hier_$variant.txt stat -liberty $TYP" \
     >/dev/null 2>&1
   grep -E "Chip area for module" "build/stat_hier_$variant.txt" | sed 's/^ */  /'

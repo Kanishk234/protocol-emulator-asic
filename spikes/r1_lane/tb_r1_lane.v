@@ -37,7 +37,7 @@ module tb_r1_lane;
     wire [4:0]  call_idx;
 
     trw_slots u_slots (.clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata),
-                       .slots (slots), .k (k));
+                       .slots (slots), .k (k), .raddr (6'd0), .rdata ());
     trw_cport #(.N(1)) u_i0 (
         .clk (clk), .rst_n (rst_n), .en (1'b1), .sel (4'd0), .accept (4'b1111),
         .src_valid (p_valid), .src_seq (p_seq), .src_tag (`TRW_TAG_DATA), .src_data (p_data),

@@ -5,7 +5,8 @@
 //   waddr 48..51 K0..K3
 //
 // ASIC build: a latch array, Ibex style (PHYSICAL_DESIGN_AND_CI.md §4). The write data is registered;
-// each word has its own clock gate (a latch transparent while clk is low, ANDed with clk), so a word's
+// each word has its own clock gate (sg13cmos5l_lgcp_1 in synthesis: a latch transparent while clk is
+// low, ANDed with clk), so a word's
 // latches are transparent during the high phase of the clock after the write request, while the
 // registered data is stable. Written only while the lane is halted.
 // TRW_SLOTS_FLOPS: the flop fallback (and the FPGA build), same interface and timing.
@@ -21,11 +22,16 @@ module trw_slots (
     input  wire [5:0]                   waddr,
     input  wire [15:0]                  wdata,
     output wire [12*`TRW_SLOT_BITS-1:0] slots,
-    output wire [63:0]                  k        // {K3, K2, K1, K0}
+    output wire [63:0]                  k,       // {K3, K2, K1, K0}
+    // debug read of one host word (same addressing as waddr; slot word 3 reads its 5 bits)
+    input  wire [5:0]                   raddr,
+    output wire [15:0]                  rdata
 );
     localparam NWORDS = 52;
 
     wire [16*NWORDS-1:0] words;
+    wire [15:0] rword = (raddr < NWORDS) ? words[16*raddr +: 16] : 16'h0000;
+    assign rdata = ((raddr < 6'd48) && (raddr[1:0] == 2'd3)) ? {11'd0, rword[4:0]} : rword;
 
 `ifdef TRW_SLOTS_FLOPS
     genvar w;
@@ -38,7 +44,8 @@ module trw_slots (
                 else if (we && (waddr == w))
                     mem <= wdata;
             end
-            assign words[16*w +: 16] = mem;
+            // Host word 3 of a slot holds 5 bits (slot bits [52:48]); the rest is never stored.
+            assign words[16*w +: 16] = ((w < 48) && (w % 4 == 3)) ? {11'd0, mem[4:0]} : mem;
         end
     endgenerate
 `else
@@ -54,22 +61,30 @@ module trw_slots (
     generate
         for (w = 0; w < NWORDS; w = w + 1) begin : g_word
             wire dec = we && (waddr == w);
-            reg  en_l;
+            wire gclk;
             reg  [15:0] mem;
             /* verilator lint_off LATCH */
-            // Clock gate: enable latch, transparent while clk is low (intentional latch).
+`ifdef SYNTHESIS
+            // Synthesis (Yosys, LibreLane): the library's integrated clock gate.
+            sg13cmos5l_lgcp_1 u_icg (.GCLK (gclk), .CLK (clk), .GATE (dec));
+`else
+            // Simulation and lint: the same function, an enable latch transparent while clk is
+            // low, ANDed with clk (intentional latch).
+            reg en_l;
             always @* begin
                 if (!clk)
                     en_l = dec;
             end
-            wire gclk = clk & en_l;
+            assign gclk = clk & en_l;
+`endif
             // Word latch, transparent while the gated clock is high (intentional latch).
             always @* begin
                 if (gclk)
                     mem = wdata_q;
             end
             /* verilator lint_on LATCH */
-            assign words[16*w +: 16] = mem;
+            // Host word 3 of a slot holds 5 bits (slot bits [52:48]); the rest is never stored.
+            assign words[16*w +: 16] = ((w < 48) && (w % 4 == 3)) ? {11'd0, mem[4:0]} : mem;
         end
     endgenerate
 `endif

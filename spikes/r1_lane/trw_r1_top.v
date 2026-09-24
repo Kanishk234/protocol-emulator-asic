@@ -101,11 +101,12 @@ module trw_r1_top (
 
     // ---- slot store and lane
     wire [12*`TRW_SLOT_BITS-1:0] slots;
+    wire [15:0] slot_rd;
     wire [63:0] k;
     trw_slots u_slots (
         .clk (clk), .rst_n (rst_n),
         .we (chain[O_HOST]), .waddr (chain[O_HOST+1 +: 6]), .wdata (chain[O_HOST+7 +: 16]),
-        .slots (slots), .k (k)
+        .slots (slots), .k (k), .raddr (6'd0), .rdata (slot_rd)   // debug read unused here
     );
 
     wire [35:0] out_tok;
@@ -122,5 +123,5 @@ module trw_r1_top (
     );
 
     assign dout = ^{out_tok, out_valid, out_seq, in_take, cp_last, rt_take, rt_nz, rz,
-                    call_req, call_idx, rb, chain[CH-1]};
+                    call_req, call_idx, rb, chain[CH-1], slot_rd};
 endmodule

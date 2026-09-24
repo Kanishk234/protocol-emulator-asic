@@ -209,6 +209,11 @@ class Compiler:
                     accept |= 1 << S.TAGS[tag]
             else:
                 self.err(f"unknown connect option {opt!r}", n)
+        legal = S.LEGAL_SOURCES.get(port)
+        if legal is None:
+            self.err(f"unknown consumer port {port!r}", n)
+        if prod not in legal:
+            self.err(f"{port} cannot take {prod}: legal sources are {', '.join(legal)} (ARCHITECTURE.md §4.6)", n)
         self.connects.append((port, prod, mode, accept))
 
     def _lane(self, name, body, n):

@@ -3,6 +3,7 @@
 import pytest
 
 import tripc
+import tripwire_spec as S
 from kernels import PROGRAMS, i2c_controller, i2c_target, spi_controller, spi_target
 from tripsim.asm import link_routines
 
@@ -63,11 +64,29 @@ def errors(src):
     ("pin U0: pin_a=uio9\n", "unknown pad"),
     ("pin U0: bogus=1\n", "unknown pin setting"),
     ("connect L0.I0 <- HOST_IN accept=NOPE\n", "unknown tag"),
+    ("connect L0.I0 <- L1.O0\n", "cannot take L1.O0"),            # fabric legal sources (§4.6)
+    ("connect U0.tx <- U1.rx\n", "cannot take U1.rx"),
+    ("connect HOST_OUT <- U2.rx\n", "cannot take U2.rx"),
+    ("connect L3.I0 <- HOST_IN\n", "unknown consumer port"),
     ("lane L0:\n    slot: do CALL missing\n", "CALL needs a defined routine"),
     ("lane L0:\n    slot: do FOO r0 <- zero\n", "unknown operation"),
 ])
 def test_static_checks(src, needle):
     assert needle in errors(src)
+
+
+def test_every_program_uses_only_legal_sources():
+    for path in sorted(PROGRAMS.glob("*.trw")):
+        image, _ = tripc.compile_file(path)
+        for port, prod, *_ in image["connect"]:
+            assert prod in S.LEGAL_SOURCES[port], (path.stem, port, prod)
+
+
+def test_neighbour_lane_links_are_legal():
+    # the two-lane CAN/LIN pattern, placed on every lane pair
+    for k in range(3):
+        tripc.compile_text(f"program t\nconnect L{k}.I1 <- L{(k + 1) % 3}.O0\n"
+                           f"connect L{(k + 1) % 3}.I1 <- L{k}.O1\n")
 
 
 def test_error_carries_line_number():

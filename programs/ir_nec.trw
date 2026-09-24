@@ -1,0 +1,130 @@
+# IR remote control, NEC protocol: transmitter (38 kHz carrier) and receiver (demodulated input).
+# 2 lanes: TX 1 slot + 1 routine, RX 1 slot + 1 routine; 2 pin units. Timing unit: 1 tick = 0.5 us.
+#   TX = uo0 to an IR LED (active high, 38 kHz carrier, D-024). Host: DATA = address | command << 8.
+#   RX = ui0 from an IR receiver module (active low, carrier already removed). HOST_OUT: two 16-bit
+#   words per frame, address | ~address << 8 and command | ~command << 8 (LSB first, as sent);
+#   EVENT 0 = a repeat code.
+# NEC: leader = 9 ms mark + 4.5 ms space; bit 0 = 562.5 us mark + 562.5 us space; bit 1 = 562.5 us
+# mark + 1687.5 us space; a final 562.5 us mark. Repeat = 9 ms mark + 2.25 ms space + mark.
+program ir_nec
+const CARRIER = 50000000 / 38000        # clocks per carrier period
+const LEVEL1 = 0x1800
+const LEVEL0 = 0x1000
+const GAP = 0x4000
+const MARK = 1125                       # 562.5 us in ticks
+
+pin U0: pin_a=uo0 txmode=pulse presc=25 idle=0 nbits=16 order=lsb carrier=CARRIER sym0_first=1 sym0_t1=1125 sym0_t2=1125 sym1_first=1 sym1_t1=1125 sym1_t2=3375
+pin U1: pin_a=ui0 presc=25 idle=1 ev_edge=both
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect U0.tx <- L0.O0
+connect L1.I0 <- U1.rx
+connect HOST_OUT <- L1.O1
+
+lane L0:
+    states IDLE GO
+    slot: when IDLE, rb == 0, I0 is DATA        do MOV r0 <- I0, deq                then GO
+    slot: when GO                               do CALL send                        then IDLE
+
+lane L1:
+    r3 = 0                              # SRAM base for the decoder's variables
+    states IDLE GO
+    slot: when IDLE, rb == 0, I0 is EVENT       do MOV r0 <- I0, deq                then GO
+    slot: when GO                               do CALL edge                        then IDLE
+
+routine send:
+    load16 r3, 0xFF
+    and r1, r0, r3                      # address
+    xor r2, r1, r3
+    shl r2, r2, 8
+    or r1, r1, r2                       # address | ~address << 8
+    load16 r2, LEVEL1                   # leader: 9 ms mark
+    out O0, r2, CTRL
+    load16 r2, GAP | 4000
+    out O0, r2, CTRL
+    out O0, r2, CTRL
+    out O0, r2, CTRL
+    out O0, r2, CTRL
+    load16 r2, GAP | 2000
+    out O0, r2, CTRL
+    load16 r2, LEVEL0                   # 4.5 ms space
+    out O0, r2, CTRL
+    load16 r2, GAP | 4000
+    out O0, r2, CTRL
+    out O0, r2, CTRL
+    load16 r2, GAP | 1000
+    out O0, r2, CTRL
+    out O0, r1, DATA                    # 16 bits as PULSE symbols
+    shr r1, r0, 8                       # command
+    xor r2, r1, r3
+    shl r2, r2, 8
+    or r1, r1, r2
+    out O0, r1, DATA
+    load16 r2, LEVEL1                   # final mark
+    out O0, r2, CTRL
+    load16 r2, LEVEL0 | MARK
+    out O0, r2, CTRL
+    load16 r1, GAP | 4050               # every NEC frame is 68.0625 ms (16 ones and 16 zeros, then
+    ldi r2, 19                          # the final mark): pad to the 108 ms repetition period,
+  pad:                                  # 79875 ticks = 19 x 4050 + 2925
+    out O0, r1, CTRL
+    djnz r2, pad
+    load16 r1, GAP | 2925
+    out O0, r1, CTRL
+    ret
+
+# Decoder, one call per edge. SRAM: 240 = time of the last edge, 241 = bits, 242 = count
+# (>= 32: not in a frame), 243 = 1 after a leader mark. Times are 15-bit tick counts.
+routine edge:
+    ld r1, r3, 240
+    st r0, r3, 240
+    sub r1, r0, r1
+    load16 r2, 0x7FFF
+    and r1, r1, r2                      # duration of the level that just ended
+    shr r2, r0, 15
+    br fall if rz                       # data[15] = new level; 0 = a mark starts: a space ended
+    load16 r2, 12000                    # rise: a mark ended; > 6 ms = a leader mark
+    ltu r2, r2, r1
+    br lead if rz
+    ret
+  lead:
+    ldi r2, 1
+    st r2, r3, 243
+    ret
+  fall:
+    ld r2, r3, 243
+    add r2, r2, 0
+    br bit if rz
+    st r3, r3, 243                      # the space after a leader
+    load16 r2, 6750
+    ltu r2, r2, r1
+    br start if rz
+    out O1, r3, EVENT                   # 2.25 ms: a repeat code
+    ret
+  start:
+    st r3, r3, 242                      # 4.5 ms: 32 data bits follow
+    ret
+  bit:
+    ld r2, r3, 242
+    ltu r2, r2, 32
+    br inframe if rz
+    ret
+  inframe:
+    ld r0, r3, 241                      # bits so far (LSB first: shift in at the top)
+    shr r0, r0, 1
+    load16 r2, 2250                     # > 1.125 ms space: a 1
+    ltu r2, r2, r1
+    br zero if nrz
+    load16 r2, 0x8000
+    or r0, r0, r2
+  zero:
+    st r0, r3, 241
+    ld r2, r3, 242
+    add r2, r2, 1
+    st r2, r3, 242
+    and r2, r2, 15
+    br word if rz
+    ret
+  word:
+    out O1, r0, DATA
+    ret

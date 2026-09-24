@@ -1,0 +1,343 @@
+# USB low-speed device, FEASIBILITY STUDY (not a claim of USB support): control endpoint 0 only,
+# enough to be enumerated: SETUP + DATA0 -> ACK; GET_DESCRIPTOR (device) over IN transactions with
+# DATA0/DATA1 toggling; the OUT status stage; SET_ADDRESS. 5 slots + 2 routines, 1 pin unit.
+#   D- = uio0 (pin A, sensed too), D+ = uio1 (pin N: its complement; sensed as pin B for SE0).
+#   Low speed: J = D- high, D+ low (idle, the device's pull-up); K = the opposite; SE0 = both low.
+# The pin unit (BITSYNC, D-023/D-027) does NRZI, bit stuffing (a 0 after six 1s), CRC-16 of data
+# packets (append and check, after SYNC and PID: CRC_SKIP = 16), end-of-packet (SE0), half-duplex OE.
+# A token is ours when it equals the token expected for our address and EP0 (its CRC-5 included):
+# one compare, so the reply can start within 7.5 bit times. The expected token is recomputed (CRC-5
+# in firmware) when SET_ADDRESS takes effect.
+program usb_ls
+const PERIOD = 50000000 / 1500000       # 1.5 Mbit/s: 33.3 clocks per bit
+const SYNCC = 0x5000                    # SYNC: a new packet when the bus is idle
+const LINE_ON = 0xA004                  # stuffing on
+const LINE_DATA = 0xA044                # stuffing on, CRC reset (after SYNC and PID)
+const LINE_CRC = 0xA00C                 # stuffing on, append CRC-16
+const LINE_EOP = 0xA110                 # SE0 for 2 bits, then J, then release
+const IDX = 0                           # bytes of the packet so far (SYNC included)
+const PID = 1
+const EXPTOK = 2                        # the token expected for our address and EP0
+const TOKW = 3                          # token: address | endpoint << 7 | CRC-5 << 11
+const PEND = 4                          # the last token for us: 0 none, 0xD SETUP, 1 OUT
+const ADDR = 5
+const NEWADDR = 6
+const TOGGLE = 7                        # DATA0 / DATA1 for our next IN data packet
+const OFFSET = 8
+const REMAIN = 9
+const REQ = 10                          # 1 GET_DESCRIPTOR data stage, 2 SET_ADDRESS status stage
+const WAIT = 11                         # bytes in our last data packet + 1 (0: nothing to confirm)
+const FORUS = 12                        # the token just received is ours
+const SETUP = 16                        # the 8 setup bytes
+
+pin U0: pin_a=uio0 pin_n=uio1 pin_s=uio0 pin_b=uio1 txmode=bitsync rxmode=bitsync period=PERIOD sampleofs=0.5 sjw=PERIOD/4 resync=both idle=1 idle_bits=2 order=lsb nbits=8 rx_nbits=8 stuff_n=6 stuff_lvl=1 crc_width=16 crc_poly=0x8005 crc_init=0xFFFF crc_xor=0xFFFF crc_res=0x800D crc_skip=16 nrzi=true oe_auto=true delim=se0
+own uio0 U0
+own uio1 U0
+connect L0.I1 <- U0.rx
+connect U0.tx <- L0.O0
+connect HOST_OUT <- L0.O1
+
+# the variables, initialised: address 0, EXPTOK = address 0, EP0, CRC-5 0b00010 -> 0x1000
+table VARS:
+    0, 0, 0x1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0
+# the device descriptor (USB 2.0 table 9-8): USB 1.1, class per interface, EP0 size 8,
+# vendor 0x1234, product 0x5678, device 1.00, no strings, 1 configuration
+table DESC:
+    0x12, 0x01, 0x10, 0x01, 0x00, 0x00, 0x00, 0x08, 0x34, 0x12, 0x78, 0x56, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01
+
+lane L0:
+    states W B P
+    slot: when W, rb == 0, I1 is DATA           do MOV r1 <- I1                     then B
+    slot: when B                                do CALL byte <- I1, deq             then W
+    slot: when W, rb == 0, I1 is EVENT, head15 == 0   do MOVB r1 <- I1, 1, deq      then P    # CRC-16 good
+    slot: when I1 is EVENT, head15 == 1         do MOV none <- I1, deq                        # our TX status
+    slot: when W, rb == 0, I1 is ERR            do MOVB r1 <- I1, 0, deq            then P    # (or no CRC-16)
+    slot: when P                                do CALL pkt                         then W
+
+routine byte:                           # r1 = one received byte
+    load16 r3, VARS
+    ld r2, r3, IDX
+    add r2, r2, 1
+    st r2, r3, IDX
+    xor r0, r2, 2
+    br pid if rz
+    xor r0, r2, 3
+    br tok0 if rz
+    xor r0, r2, 4
+    br tok1 if rz
+    br setup
+  pid:
+    st r1, r3, PID
+    ret
+  tok0:
+    st r1, r3, TOKW
+    br setup
+  tok1:                                 # the token is complete: ours if it is the expected one
+    ld r0, r3, TOKW
+    shl r2, r1, 8
+    or r0, r0, r2
+    ld r2, r3, EXPTOK
+    xor r0, r0, r2
+    ldi r2, 0
+    br mine if nrz
+    ldi r2, 1
+  mine:
+    st r2, r3, FORUS
+    ldi r2, 4
+  setup:                                # bytes 3..10 of a data packet: keep the first 8
+    sub r2, r2, 3
+    ltu r0, r2, 8                       # RZ = (r2 < 8), unsigned
+    br keep if rz
+    ret
+  keep:
+    add r2, r2, r3
+    st r1, r2, SETUP
+    ret
+
+routine pkt:                            # a packet ended; r1 = 1 if its CRC-16 was good
+    load16 r3, VARS
+    ldi r0, 0
+    st r0, r3, IDX
+    ld r0, r3, PID
+    and r2, r0, 15                      # IN (0x69) first: the reply must start within 7.5 bits
+    xor r2, r2, 9
+    br maybe if rz
+    br other
+  maybe:
+    shr r2, r0, 4
+    xor r2, r2, 6
+    br infast if rz
+    br other
+  infast:
+    ld r2, r3, FORUS
+    add r2, r2, 0
+    br in if nrz
+    ret
+  other:
+    shr r2, r0, 4                       # PID check: the high nibble is the complement
+    xor r2, r2, r0
+    and r2, r2, 15
+    xor r2, r2, 15
+    br valid if rz
+    ret
+  valid:
+    and r0, r0, 15                      # PID type
+    xor r2, r0, 0x2
+    br ack if rz
+    xor r2, r0, 0x3
+    br data if rz
+    xor r2, r0, 0xB
+    br data if rz
+    xor r2, r0, 0xD                     # SETUP
+    br token if rz
+    xor r2, r0, 0x1                     # OUT
+    br token if rz
+    xor r2, r0, 0x9                     # IN
+    br token if rz
+    ret
+  token:                                # SETUP / OUT (IN took the fast path)
+    ld r2, r3, FORUS
+    add r2, r2, 0
+    br ep0 if nrz
+  notus:
+    ldi r2, 0
+    st r2, r3, PEND
+    ret
+  ep0:
+    xor r2, r0, 0x9
+    br in if rz
+    st r0, r3, PEND                     # SETUP or OUT: the data packet follows
+    ret
+  data:                                 # DATA0 / DATA1 from the host
+    ld r2, r3, PEND
+    add r2, r2, 0
+    br dfor if nrz
+    ret
+  dfor:
+    add r1, r1, 0
+    br dok if nrz
+    ret                                 # a bad CRC-16: no handshake
+  dok:
+    ldi r1, 0
+    st r1, r3, PEND
+    xor r2, r2, 0xD
+    br setupd if rz
+    st r1, r3, REQ                      # OUT: the status stage is over
+    br sendack
+  setupd:                               # parse the setup packet
+    ldi r2, 1
+    st r2, r3, TOGGLE
+    ld r2, r3, SETUP + 1                # bRequest
+    xor r1, r2, 6
+    br getd if rz
+    xor r1, r2, 5
+    br seta if rz
+    ldi r1, 0
+    st r1, r3, REQ
+    br sendack
+  getd:
+    ldi r1, 1
+    st r1, r3, REQ
+    ldi r1, 0
+    st r1, r3, OFFSET
+    ld r1, r3, SETUP + 6                # wLength (low byte), at most 18
+    ltu r2, r1, 18
+    br lenok if rz
+    ldi r1, 18
+  lenok:
+    st r1, r3, REMAIN
+    br sendack
+  seta:
+    ldi r1, 2
+    st r1, r3, REQ
+    ld r1, r3, SETUP + 2                # the new address
+    st r1, r3, NEWADDR
+    ldi r1, 0
+    st r1, r3, REMAIN
+  sendack:
+    load16 r2, SYNCC
+    out O0, r2, CTRL
+    load16 r2, LINE_ON
+    out O0, r2, CTRL
+    ldi r2, 0x80
+    out O0, r2, DATA
+    ldi r2, 0xD2                        # ACK
+    out O0, r2, DATA
+    load16 r2, LINE_EOP
+    out O0, r2, CTRL
+    ld r2, r3, REQ                      # report the request to our host
+    out O1, r2, EVENT
+    ret
+  ack:                                  # the host confirmed our last data packet
+    ld r2, r3, WAIT
+    add r2, r2, 0
+    br acked if nrz
+    ret
+  acked:
+    sub r2, r2, 1                       # bytes in it
+    ld r1, r3, OFFSET
+    add r1, r1, r2
+    st r1, r3, OFFSET
+    ld r1, r3, REMAIN
+    sub r1, r1, r2
+    st r1, r3, REMAIN
+    ld r1, r3, TOGGLE
+    xor r1, r1, 1
+    st r1, r3, TOGGLE
+    ldi r1, 0
+    st r1, r3, WAIT
+    ld r2, r3, REQ
+    xor r2, r2, 2
+    br setnow if rz
+    ret
+  setnow:                               # SET_ADDRESS takes effect after its status stage
+    ld r1, r3, NEWADDR
+    st r1, r3, ADDR
+    ldi r0, 0
+    st r0, r3, REQ
+    ldi r0, 0x1F                        # CRC-5, reflected x^5 + x^2 + 1, over 11 bits
+    ldi r3, 11
+  c5:
+    xor r2, r0, r1
+    and r2, r2, 1                       # (crc ^ bit) & 1, kept in r2 ...
+    shr r0, r0, 1
+    add r2, r2, 0                       # ... and tested after the shift (which sets RZ itself)
+    br c5z if rz
+    xor r0, r0, 0x14
+  c5z:
+    shr r1, r1, 1
+    djnz r3, c5
+    xor r0, r0, 0x1F
+    shl r0, r0, 11
+    load16 r3, VARS
+    ld r1, r3, NEWADDR
+    or r0, r0, r1
+    st r0, r3, EXPTOK
+    ret
+  in:                                   # IN for us: the next chunk (0..8 bytes) of the data stage
+    ld r2, r3, REQ
+    add r2, r2, 0
+    br dstage if nrz
+    load16 r2, SYNCC                    # nothing to send: NAK
+    out O0, r2, CTRL
+    load16 r2, LINE_ON
+    out O0, r2, CTRL
+    ldi r2, 0x80
+    out O0, r2, DATA
+    ldi r2, 0x5A                        # NAK
+    out O0, r2, DATA
+    load16 r2, LINE_EOP
+    out O0, r2, CTRL
+    ret
+  dstage:
+    ld r2, r3, REMAIN
+    ltu r1, r2, 9
+    br le8 if rz
+    ldi r2, 8
+  le8:
+    add r1, r2, 1
+    st r1, r3, WAIT
+    load16 r1, SYNCC
+    out O0, r1, CTRL
+    load16 r1, LINE_ON
+    out O0, r1, CTRL
+    ldi r1, 0x80
+    out O0, r1, DATA
+    ld r1, r3, TOGGLE
+    add r1, r1, 0
+    br d1 if nrz
+    ldi r1, 0xC3                        # DATA0
+    br dpid
+  d1:
+    ldi r1, 0x4B                        # DATA1
+  dpid:
+    out O0, r1, DATA
+    load16 r1, LINE_DATA
+    out O0, r1, CTRL
+    ld r0, r3, OFFSET                   # up to 8 bytes of the descriptor (unrolled: bounded)
+    add r2, r2, 0
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+    add r0, r0, 1
+    sub r2, r2, 1
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+    add r0, r0, 1
+    sub r2, r2, 1
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+    add r0, r0, 1
+    sub r2, r2, 1
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+    add r0, r0, 1
+    sub r2, r2, 1
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+    add r0, r0, 1
+    sub r2, r2, 1
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+    add r0, r0, 1
+    sub r2, r2, 1
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+    add r0, r0, 1
+    sub r2, r2, 1
+    br done if rz
+    ld r1, r0, DESC
+    out O0, r1, DATA
+  done:
+    load16 r1, LINE_CRC
+    out O0, r1, CTRL
+    load16 r1, LINE_EOP
+    out O0, r1, CTRL
+    ret

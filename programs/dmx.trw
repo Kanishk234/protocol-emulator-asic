@@ -1,0 +1,44 @@
+# DMX512 (USITT DMX512-A) transmitter and receiver: 250 kbaud 8N2 over RS-485. 5 slots + 1 routine, 2 pin units.
+#   TX = uo0, RX = ui0 (an RS-485 transceiver). Host: EVENT = start a packet (BREAK 100 us + MARK AFTER
+#   BREAK 12 us); DATA = next slot byte (the first one is the start code, 0 for dimmer data).
+#   HOST_OUT: received slot bytes (DATA); ERR = a frame with bad start/stop bits, raw 11 bits;
+#   ERR 0x000 = a BREAK (the line held low for the whole frame), i.e. the start of a packet.
+program dmx
+param BAUD = 250000
+param STOPS = 2                         # stop bits sent; > 2 adds a mark between frames (MTBF)
+param MTBP = 0                          # mark before BREAK, us (0 is legal)
+const PERIOD = 50000000 / BAUD          # bit period in clocks
+const BREAK = 0x1800 | 100              # LEVEL 1 after 100 us: the BREAK length
+const MAB = 0x4000 | 12                 # GAP 12 us: the MARK AFTER BREAK
+
+pin U0: pin_a=uo0 txmode=shift nbits=9+STOPS period=PERIOD idle=1 presc=50  # 1 tick = 1 us
+pin U1: pin_a=ui0 rxmode=shift_rx nbits=11 period=PERIOD idle=1
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U1.rx
+connect U0.tx <- L0.O0
+connect HOST_OUT <- L0.O1
+
+lane L0:
+    K0 = 0x601                          # frame check mask: start and both stop bits
+    K1 = 0x600                          # expected: start 0, stops 1
+    r1 = ((1 << STOPS) - 1) << 9        # the stop bits, OR-ed in by SHOR
+    states RX CHK
+    # TX: a slot byte = stops | byte << 1 | start (0), in one action; BREAK + MAB from a routine
+    slot: when rb == 0, I0 is DATA              do SHOR O0 <- I0, f=0x11, deq
+    slot: when rb == 0, I0 is EVENT             do CALL brk <- I0, deq
+    # RX: check framing, pass the byte on, or report the frame (BREAK = 0)
+    slot: when RX, I1 is DATA                   do CMPM none <- I1, mask K0 val K1 -> f0   then CHK
+    slot: when CHK, f0 == 1                     do EXT O1 <- I1, f=0x71, deq               then RX
+    slot: when CHK, f0 == 0                     do MOV O1 <- I1, tag ERR, deq              then RX
+
+routine brk:                            # starts after the last slot's stop bits
+    load16 r2, 0x4000 | MTBP            # mark time between packets
+    out O0, r2, CTRL
+    load16 r2, 0x1000                   # LEVEL 0 at the cursor
+    out O0, r2, CTRL
+    load16 r2, BREAK
+    out O0, r2, CTRL
+    load16 r2, MAB
+    out O0, r2, CTRL
+    ret

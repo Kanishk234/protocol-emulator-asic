@@ -1,0 +1,39 @@
+# I2S controller (Philips format), 16-bit stereo out and in. 7 slots, 4 pin units, no I2S-specific hardware.
+#   BCLK = uo0 (CLKGEN), SD out = uo1 and WS = uo2 (linked shifts on BCLK falls), SD in = ui0 (BCLK rises).
+#   Host: DATA samples, alternately left and right (16 bits). HOST_OUT: received samples as EVENTs,
+#   in the same left/right order, one sample period behind.
+# WS is a second bit pattern shifted beside the data: it changes on the fall before each MSB, one BCLK
+# ahead of the word, as the Philips spec requires. BCLK keeps running while samples keep coming.
+program i2s
+param FS = 48000                        # sample rate
+const PERIOD = 50000000 / (32 * FS)     # BCLK period in clocks (fractional; 1.536 MHz at 48 kHz)
+const CLK16 = 0x3010
+const WS_L = 0x0001                     # WS for the left word's 16 bits: low, then high on its LSB
+const WS_R = 0xFFFE                     # WS for the right word's 16 bits: high, then low on its LSB
+
+pin U0: pin_a=uo0 txmode=clkgen period=PERIOD idle=0                                                  # BCLK
+pin U1: pin_a=uo1 pin_b=uo0 txmode=shift tx_edge=fall tx_preload=true nbits=16 order=msb idle=0        # SD out
+pin U2: pin_a=uo2 pin_b=uo0 txmode=shift tx_edge=fall tx_preload=true nbits=16 order=msb idle=0        # WS
+pin U3: pin_a=ui0 pin_b=uo0 rxmode=linked_rx rx_edge=rise rx_nbits=16 order=msb                         # SD in
+own uo0 U0
+own uo1 U1
+own uo2 U2
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U3.rx
+connect U1.tx <- L0.O0 accept=DATA
+connect U0.tx <- L0.O0 accept=CTRL
+connect U2.tx <- L0.O1 accept=DATA
+connect HOST_OUT <- L0.O1 accept=EVENT
+
+lane L0:
+    K0 = WS_L
+    K1 = WS_R
+    K2 = CLK16
+    states L L2 L3 R R2 R3
+    slot: when L, I0 is DATA                    do MOV O0 <- I0, deq                then L2   # left sample
+    slot: when L2                               do MOVB O1 <- zero, K0              then L3   # its WS bits
+    slot: when L3                               do MOVB O0 <- zero, K2, tag CTRL    then R    # 16 BCLKs
+    slot: when R, I0 is DATA                    do MOV O0 <- I0, deq                then R2   # right sample
+    slot: when R2                               do MOVB O1 <- zero, K1              then R3
+    slot: when R3                               do MOVB O0 <- zero, K2, tag CTRL    then L
+    slot: when I1 is DATA                       do MOV O1 <- I1, deq, tag EVENT                # received sample

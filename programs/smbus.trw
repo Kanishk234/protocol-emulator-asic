@@ -1,0 +1,125 @@
+# SMBus controller: the I2C controller plus Packet Error Checking (PEC, CRC-8 x^8 + x^2 + x + 1)
+# computed on chip over every byte of a transaction. 12 slots + 4 routines + a 16-word table.
+#   SDA = uio0, SCL = uio1. Host commands on HOST_IN (as i2c_controller):
+#     EVENT data[15]=0  START (repeated if the bus is ours)    EVENT data[15]=1  STOP
+#     DATA byte         write it; the ACK bit comes back       DATA 0x8000       write the PEC byte
+#     CTRL data[0]=n    read a byte, answer ACK (0) / NACK (1)
+#   HOST_OUT: ACK bits and read bytes (DATA); at STOP, EVENT = the CRC over the whole transaction:
+#   0 means the PEC (the last byte written or read) was correct.
+program smbus
+param PERIOD = 500                      # SCL period in clocks (500 = 100 kHz at 50 MHz)
+const LEVEL0 = 0x1000
+const LEVEL1 = 0x1800
+const LEN8 = 0x7000
+const WAIT_FALL = 0x7000
+const WAIT_RISE = 0x7001
+const CLK1 = 0x3001
+const CLK8 = 0x3008
+const CLK9 = 0x3009
+const GAP = 0x4000
+
+pin U0: pin_a=uio0 pin_b=uio1 od=true idle=1 order=msb txmode=shift tx_edge=fall tx_lentok=true rxmode=linked_rx rx_edge=rise rx_nbits=8 rx_nbits2=1 rx_echo=false ev_edge=both ev_qual=1 ev_reset=true
+pin U1: pin_a=uio1 pin_b=uio0 od=true idle=1 txmode=clkgen period=PERIOD stretch=true
+own uio0 U0
+own uio1 U1
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U0.rx accept=DATA
+connect U0.tx <- L0.O0
+connect U1.tx <- L0.O1 accept=CTRL
+connect HOST_OUT <- L0.O1 accept=DATA|EVENT
+
+# CRC-8 (poly 0x07) of a nibble shifted through the register: one lookup per 4 bits
+table CRCT:
+    0x00, 0x07, 0x0E, 0x09, 0x1C, 0x1B, 0x12, 0x15, 0x38, 0x3F, 0x36, 0x31, 0x24, 0x23, 0x2A, 0x2D
+
+lane L0:
+    K0 = LEVEL0
+    K1 = LEN8
+    K3 = CLK8
+    r0 = 1
+    r3 = 0                              # running CRC of the transaction
+    states IDLE START2 BUSY WR1 WACK RD1 RDC RD2 RD3
+    slot: when IDLE, rb == 0, I0 is EVENT, head15 == 0     do MOVB O1 <- I0, K1, tag CTRL         then START2
+    slot: when START2, I0 is EVENT, head15 == 0            do MOVB O0 <- I0, K0, tag CTRL, deq    then BUSY
+    slot: when BUSY, rb == 0, I0 is EVENT, head15 == 0     do CALL rstart <- I0, deq
+    slot: when BUSY, rb == 0, I0 is EVENT, head15 == 1     do CALL stop <- I0, deq                then IDLE
+    # write: the routine folds the byte into the CRC (or sends the CRC itself as the PEC)
+    slot: when BUSY, rb == 0, I0 is DATA                   do MOV r1 <- I0, deq                   then WR1
+    slot: when WR1                                         do CALL wbyte                          then WACK
+    slot: when WACK, rb == 0, I1 is DATA                   do MOV O1 <- I1, deq                   then BUSY
+    # read: byte into the CRC and to the host, then our ACK/NACK and the 9th clock
+    slot: when BUSY, rb == 0, I0 is CTRL                   do MOVB O1 <- I0, K3, tag CTRL         then RD1
+    slot: when RD1, I1 is DATA                             do MOV r1 <- I1, deq                   then RDC
+    slot: when RDC                                         do CALL rbyte                          then RD2
+    slot: when RD2, rb == 0                                do MOV O0 <- I0, tag DATA, deq         then RD3
+    slot: when RD3                                         do MKCTL O1 <- r0, f=0x30              then BUSY
+
+routine wbyte:                          # r1 = byte, or 0x8000 = send the PEC
+    shr r2, r1, 15
+    br data if rz
+    or r1, r3, 0
+  data:
+    xor r3, r3, r1                      # CRC update, a nibble at a time
+    shr r2, r3, 4
+    ld r2, r2, CRCT
+    shl r3, r3, 4
+    xor r3, r3, r2
+    load16 r2, 0xFF
+    and r3, r3, r2
+    shr r2, r3, 4
+    ld r2, r2, CRCT
+    shl r3, r3, 4
+    xor r3, r3, r2
+    load16 r2, 0xFF
+    and r3, r3, r2
+    load16 r2, LEN8
+    or r2, r1, r2
+    out O0, r2, DATA
+    load16 r2, CLK9
+    out O1, r2, CTRL
+    ret
+
+routine rbyte:                          # r1 = the byte read
+    xor r3, r3, r1
+    shr r2, r3, 4
+    ld r2, r2, CRCT
+    shl r3, r3, 4
+    xor r3, r3, r2
+    load16 r2, 0xFF
+    and r3, r3, r2
+    shr r2, r3, 4
+    ld r2, r2, CRCT
+    shl r3, r3, 4
+    xor r3, r3, r2
+    load16 r2, 0xFF
+    and r3, r3, r2
+    out O1, r1, DATA
+    ret
+
+routine rstart:                         # repeated START (the CRC continues across it)
+    ldi r1, 1
+    out O0, r1, DATA
+    load16 r2, CLK1
+    out O1, r2, CTRL
+    load16 r2, WAIT_FALL
+    out O1, r2, CTRL
+    load16 r2, WAIT_RISE
+    out O0, r2, CTRL
+    load16 r2, LEVEL0 | PERIOD // 2
+    out O0, r2, CTRL
+    ret
+
+routine stop:
+    ldi r1, 0
+    out O0, r1, DATA
+    load16 r2, CLK1
+    out O1, r2, CTRL
+    load16 r2, WAIT_RISE
+    out O0, r2, CTRL
+    load16 r2, LEVEL1 | PERIOD // 2
+    out O0, r2, CTRL
+    load16 r2, GAP | PERIOD
+    out O0, r2, CTRL
+    out O1, r3, EVENT                   # the transaction's CRC: 0 = PEC good
+    ldi r3, 0
+    ret

@@ -1,0 +1,235 @@
+# LIN 2.x commander (master) node with an on-chip bus monitor. 2 lanes: 4 + 5 slots, 4 routines, 2 pin units.
+#   TXD = uo0, RXD = ui0 (a LIN transceiver; RXD also shows our own bits).
+#   Host: EVENT = send a header: data[5:0] = frame ID, data[11:8] = response length n (1..8),
+#   data[15] = 1: we publish the response (then n DATA bytes follow), 0: a responder sends it.
+#   HOST_OUT: the n response bytes seen on the bus (DATA), then EVENT 0 if the checksum was right,
+#   or ERR 0x1nn bad sync, 0x200 bad PID, 0x3nn bad checksum (nn = the checksum byte), 0x400 no response.
+# The protected ID's parity bits and the checksum (enhanced; classic for IDs 60/61) are computed on chip.
+# Frame slots are paced by the pin unit: after each frame a LEVEL 1 (no change on the line) is queued
+# at the end of the slot, and the unit takes the next header only after it.
+program lin
+param BAUD = 19200
+const PERIOD = 50000000 / BAUD
+const BIT_US = 1000000 // BAUD
+const LEVEL0 = 0x1000
+const LEVEL1 = 0x1800
+const GAP = 0x4000
+const STOP = 0x200
+
+# the rest of a subscribed frame's slot after its header, as 4 equal LEVEL delays (us): 1.4 x the
+# nominal response time of n bytes + checksum (LIN 2.2A TFrame_Maximum), for n = 0..8
+table SLOT:
+    (14 * 1 * BIT_US) // 4 + 1, (14 * 2 * BIT_US) // 4 + 1, (14 * 3 * BIT_US) // 4 + 1
+    (14 * 4 * BIT_US) // 4 + 1, (14 * 5 * BIT_US) // 4 + 1, (14 * 6 * BIT_US) // 4 + 1
+    (14 * 7 * BIT_US) // 4 + 1, (14 * 8 * BIT_US) // 4 + 1, (14 * 9 * BIT_US) // 4 + 1
+
+pin U0: pin_a=uo0 txmode=shift nbits=10 period=PERIOD idle=1 presc=50       # 1 tick = 1 us
+pin U1: pin_a=ui0 rxmode=shift_rx nbits=10 period=PERIOD idle=1
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect U0.tx <- L0.O0
+connect L1.I0 <- U1.rx
+connect L1.I1 <- L0.O1
+connect HOST_OUT <- L1.O1
+
+# L0: headers and published responses. r0 = command, r1 = byte, r2 = bytes left, r3 = checksum sum
+lane L0:
+    states IDLE H P P2
+    slot: when IDLE, rb == 0, I0 is EVENT       do MOV r0 <- I0, deq                then H
+    slot: when H, rb == 0                       do CALL header
+    slot: when P, rb == 0, I0 is DATA           do MOV r1 <- I0, deq                then P2
+    slot: when P2, rb == 0                      do CALL pub
+
+# L1: the frame on the bus after our header: break, sync, PID, n bytes, checksum.
+# r0 = expected PID | n << 8 | classic << 15, r1 = byte, r2 = phase (0 break, 1 sync, 2 PID, then 3 + bytes
+# left; 3 = the checksum), r3 = checksum sum
+lane L1:
+    states W X Y
+    slot: when W, I1 is CTRL                    do MOV r0 <- I1, deq                then X
+    slot: when X, rb == 0, I1 is CTRL           do CALL nores <- I1                 then W    # new header: none came
+    slot: when X, rb == 0, I0 is DATA           do MOV r1 <- I0, deq                then Y
+    slot: when Y                                do CALL rxb                         then X
+    slot: when W, I0 is DATA                    do MOV none <- I0, deq                        # not ours: skip
+
+routine header:                         # break (after the last slot ends), PID, tell L1, sync, PID
+    load16 r1, LEVEL0                   # waits in the unit until the previous slot is over
+    out O0, r1, CTRL
+    load16 r1, 0x3F
+    and r1, r0, r1                      # ID
+    shr r2, r1, 1                       # P0 = ID0 ^ ID1 ^ ID2 ^ ID4
+    xor r2, r2, r1
+    shr r3, r1, 2
+    xor r2, r2, r3
+    shr r3, r1, 4
+    xor r2, r2, r3
+    and r2, r2, 1
+    shl r2, r2, 6
+    or r1, r1, r2
+    shr r2, r1, 1                       # P1 = ~(ID1 ^ ID3 ^ ID4 ^ ID5)
+    shr r3, r1, 3
+    xor r2, r2, r3
+    shr r3, r1, 4
+    xor r2, r2, r3
+    shr r3, r1, 5
+    xor r2, r2, r3
+    and r2, r2, 1
+    xor r2, r2, 1
+    shl r2, r2, 7
+    or r1, r1, r2                       # r1 = PID
+    shr r2, r0, 8                       # the token for L1: PID | n << 8 | classic << 15
+    and r2, r2, 15
+    shl r2, r2, 8
+    or r2, r2, r1
+    or r3, r1, 0                        # enhanced checksum: the sum starts with the PID
+    and r1, r1, 62
+    xor r1, r1, 60
+    br enh if nrz                       # ID 60/61 (diagnostic frames): classic checksum
+    load16 r3, 0x8000
+    or r2, r2, r3
+    ldi r3, 0
+  enh:
+    out O1, r2, CTRL
+    shl r1, r2, 8                       # r1 = PID again
+    shr r1, r1, 8
+    load16 r2, LEVEL1 | 13 * BIT_US + 1   # break: 13 bits dominant, then a 2-bit delimiter
+    out O0, r2, CTRL
+    load16 r2, GAP | 2 * BIT_US
+    out O0, r2, CTRL
+    load16 r2, 0x55 << 1 | STOP
+    out O0, r2, DATA                    # sync
+    shl r1, r1, 1
+    load16 r2, STOP
+    or r1, r1, r2
+    out O0, r1, DATA                    # protected ID
+    shr r2, r0, 8
+    and r2, r2, 15                      # n
+    shr r1, r0, 15
+    br pubs if nrz
+    ld r1, r2, SLOT                     # a responder answers: pace its slot
+    load16 r3, LEVEL1
+    or r1, r1, r3
+    out O0, r1, CTRL
+    out O0, r1, CTRL
+    out O0, r1, CTRL
+    out O0, r1, CTRL
+    setst IDLE
+    ret
+  pubs:
+    setst P
+    ret
+
+routine pub:                            # one published byte; the checksum after the last
+    add r3, r3, r1
+    shr r0, r3, 8
+    br nc if rz
+    shl r3, r3, 8                       # carry folds back in: (sum & 0xFF) + 1
+    shr r3, r3, 8
+    add r3, r3, 1
+  nc:
+    shl r1, r1, 1
+    load16 r0, STOP
+    or r1, r1, r0
+    out O0, r1, DATA
+    sub r2, r2, 1
+    br more if nrz
+    load16 r0, 0xFF
+    xor r1, r3, r0                      # checksum = ~sum
+    shl r1, r1, 1
+    load16 r0, STOP
+    or r1, r1, r0
+    out O0, r1, DATA
+    load16 r0, LEVEL1 | 2 * BIT_US      # inter-frame space before the next header
+    out O0, r0, CTRL
+    setst IDLE
+    ret
+  more:
+    setst P
+    ret
+
+routine nores:
+    load16 r1, 0x400
+    out O1, r1, ERR
+    ldi r2, 0
+    ret
+
+routine rxb:                            # r1 = one received frame: start, 8 data bits, stop
+    add r2, r2, 0
+    br notbrk if nrz
+    add r1, r1, 0                       # phase 0: the break reads as an all-zero frame
+    br adv if rz
+    ret
+  notbrk:
+    shl r1, r1, 7                       # the byte (drops start and stop bits)
+    shr r1, r1, 8
+    xor r2, r2, 1
+    br sync if rz
+    xor r2, r2, 1
+    xor r2, r2, 2
+    br pid if rz
+    xor r2, r2, 2
+    xor r2, r2, 3
+    br cks if rz
+    xor r2, r2, 3
+    out O1, r1, DATA                    # a response byte
+    add r3, r3, r1
+    shr r1, r3, 8
+    br nc if rz
+    shl r3, r3, 8
+    shr r3, r3, 8
+    add r3, r3, 1
+  nc:
+    sub r2, r2, 1
+    ret
+  sync:
+    ldi r2, 1
+    sub r1, r1, 63
+    sub r1, r1, 22                      # 0x55
+    br adv if rz
+    load16 r1, 0x155
+    br fail
+  pid:
+    ldi r2, 2
+    xor r1, r1, r0
+    shl r1, r1, 8
+    br pidok if rz
+    load16 r1, 0x200
+    br fail
+  pidok:
+    shl r3, r0, 8                       # sum = PID (enhanced) or 0 (classic)
+    shr r3, r3, 8
+    shr r1, r0, 15
+    br enh if rz
+    ldi r3, 0
+  enh:
+    shr r1, r0, 8                       # 3 + n: the phase counts the response bytes down
+    and r1, r1, 15
+    ldi r2, 3
+    add r2, r2, r1
+    ret
+  cks:
+    add r3, r3, r1
+    shr r2, r3, 8
+    br nc2 if rz
+    shl r3, r3, 8
+    shr r3, r3, 8
+    add r3, r3, 1
+  nc2:
+    add r3, r3, 1
+    shl r3, r3, 8                       # sum + checksum == 0xFF
+    br good if rz
+    load16 r3, 0x300
+    or r1, r1, r3
+    br fail
+  good:
+    out O1, r3, EVENT
+    ldi r2, 0
+    setst W
+    ret
+  adv:
+    add r2, r2, 1
+    ret
+  fail:
+    out O1, r1, ERR
+    ldi r2, 0
+    setst W
+    ret

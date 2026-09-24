@@ -1,0 +1,49 @@
+# HDLC / SDLC framing (ISO/IEC 13239): flags 0x7E, zero insertion after five 1s, FCS-16 (CRC-CCITT,
+# as X.25/PPP), aborts. 4 slots + 2 routines, 1 pin unit in BITSYNC mode with DELIM = flag (D-025).
+#   TX = uo0, RX = ui0 (NRZ, self-clocked by the stuffing's guaranteed transitions).
+#   Host: DATA bytes of a frame, then EVENT = end of frame (the chip appends the FCS and a flag).
+#   HOST_OUT: every received frame's bytes (DATA, FCS included), then EVENT if the FCS is good,
+#   ERR 0x0nnn if not, ERR 0x2nnn for an abort (seven 1s).
+# The FCS is a reflected CRC sent LSB first and complemented; on the wire that is an MSB-first
+# CRC-CCITT register over the wire bits with init 0xFFFF and final XOR 0xFFFF, residue 0x1D0F.
+program hdlc
+param BAUD = 1000000
+const PERIOD = 50000000 / BAUD
+const FLAG = 0x7E
+const LINE_FLAG = 0xA000                # stuffing off (flags are sent as they are)
+const LINE_OPEN = 0xA044                # stuffing on, reset the TX CRC
+const LINE_CLOSE = 0xA00C               # stuffing on, append the FCS
+
+pin U0: pin_a=uo0 pin_s=ui0 txmode=bitsync rxmode=bitsync period=PERIOD sampleofs=0.5 sjw=PERIOD/4 idle=1 idle_bits=8 order=lsb nbits=8 rx_nbits=8 stuff_n=5 stuff_lvl=1 crc_width=16 crc_poly=0x1021 crc_init=0xFFFF crc_xor=0xFFFF crc_res=0x1D0F delim=flag
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect L0.I1 <- U0.rx
+connect U0.tx <- L0.O0
+connect HOST_OUT <- L0.O1
+
+lane L0:
+    states IDLE F
+    slot: when IDLE, rb == 0, I0 is DATA        do CALL open <- I0                  then F
+    slot: when F, rb == 0, I0 is DATA           do MOV O0 <- I0, deq
+    slot: when F, rb == 0, I0 is EVENT          do CALL close <- I0, deq            then IDLE
+    slot: when I1 is DATA                       do MOV O1 <- I1, deq, keep
+    slot: when I1 is EVENT                      do MOV O1 <- I1, deq, keep
+    slot: when I1 is ERR                        do MOV O1 <- I1, deq, keep
+
+routine open:                           # opening flag, then stuffing on and a fresh FCS
+    load16 r1, LINE_FLAG
+    out O0, r1, CTRL
+    ldi r1, FLAG
+    out O0, r1, DATA
+    load16 r1, LINE_OPEN
+    out O0, r1, CTRL
+    ret
+
+routine close:                          # FCS (stuffed), then the closing flag
+    load16 r1, LINE_CLOSE
+    out O0, r1, CTRL
+    load16 r1, LINE_FLAG
+    out O0, r1, CTRL
+    ldi r1, FLAG
+    out O0, r1, DATA
+    ret

@@ -1,0 +1,38 @@
+# RC servo / ESC PWM: a pulse of 500..4000 us every 20 ms (50 Hz). 2 slots + 1 routine, 1 pin unit.
+#   Output = uo0. Host: DATA = pulse width in us (takes effect from the next frame; 1500 at reset).
+# The pin unit times everything from its cursor (1 tick = 1 us), so the period is exact and the
+# lane only has to keep the unit's queue fed.
+program servo
+const LEVEL1 = 0x1800
+const LEVEL0 = 0x1000
+const GAP = 0x4000
+
+pin U0: pin_a=uo0 txmode=level idle=0 presc=50
+own uo0 U0
+connect L0.I0 <- HOST_IN
+connect U0.tx <- L0.O0
+
+lane L0:
+    r0 = 1500                           # pulse width, us
+    slot: when I0 is DATA                       do MOV r0 <- I0, deq
+    slot: when rb == 0                          do CALL frame
+
+routine frame:                          # high for w us, low for 20000 - w us
+    or r3, r0, 0                        # w: one copy per frame (the host may change r0 meanwhile)
+    load16 r1, LEVEL1
+    out O0, r1, CTRL
+    load16 r1, GAP
+    or r2, r3, r1                       # GAP w
+    out O0, r2, CTRL
+    load16 r2, LEVEL0
+    out O0, r2, CTRL
+    load16 r2, GAP | 4000
+    out O0, r2, CTRL
+    out O0, r2, CTRL
+    out O0, r2, CTRL
+    out O0, r2, CTRL
+    load16 r2, 4000
+    sub r2, r2, r3                      # GAP 4000 - w
+    or r2, r2, r1
+    out O0, r2, CTRL
+    ret

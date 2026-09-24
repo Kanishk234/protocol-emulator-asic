@@ -1,29 +1,40 @@
-# CAN 2.0A controller (11-bit IDs, classic frames). 2 lanes: 11 + 10 slots, 3 routines, 1 pin unit.
-#   TXD = uo0, RXD = ui0 (a CAN transceiver). The pin unit does the bit-level work with general
-#   BITSYNC features (D-023): recovered bit clock with resync, bit stuffing, CRC-15, readback.
-# Host -> chip: EVENT dlc (0..8), DATA id, then dlc DATA bytes: send a frame (retry is the host's).
-#   Push a frame's tokens together: after a lost arbitration the rest are drained, not sent.
+# CAN 2.0A/B controller: 11- and 29-bit IDs, data and remote frames, ACK, arbitration, error flags,
+# error counters (error-active / error-passive / bus-off). 2 lanes: 12 + 12 slots, 7 routines, 1 pin unit.
+#   TXD = uo0, RXD = ui0 (a CAN transceiver). The pin unit does the bit-level work with general BITSYNC
+#   features (D-023, D-026): recovered bit clock, stuffing, CRC-15, readback, JAM, listen-only.
+# Host -> chip:
+#   CTRL 0 first (and to recover from bus-off): counters 0, error-active, error flags armed, TX on.
+#   A frame: EVENT cmd (cmd[3:0] = DLC, [4] = remote (RTR), [15] = 29-bit ID), DATA ID[10:0] (for a
+#   29-bit ID: ID[28:18]), then for a 29-bit ID DATA ID[17:12] and DATA ID[11:0], then the data bytes
+#   (none for a remote frame), then EVENT (end). Push a frame's tokens together; retries are the host's.
 # Chip -> host (every frame on the bus, ours included):
-#   DATA w0 = SOF + ID (12 bits), DATA w1 = RTR IDE r0 DLC + 5 data bits, more DATA 12-bit words,
-#   then EVENT = the last partial word if the CRC is good (we ACK it), or ERR 0x0nnn if it is bad;
-#   ERR 0x1nnn = stuff error at line bit nnn.
-#   For our own frame: EVENT 0x9001 = started, then 0xA000 | bit << 1 = ACKed, 0xE000 | bit << 1 =
-#   no ACK, or 0x8000 | bit << 1 = lost arbitration / bit error (abort). Words: MSB first, destuffed.
-# While our frame waits for the bus, only its first token is in the pin unit, so L0's output is
-# never blocked and the FRAME / ACK commands for other nodes' frames always get through.
+#   DATA 12-bit words, MSB first, destuffed: w0 = SOF + ID[10:0] (or ID[28:18]), w1 = the next 12
+#   bits, ...; then EVENT = the last partial word if the CRC is good (bit 14 = our own frame), or ERR
+#   0x0www (CRC error) / 0x1nnn (stuff error at line bit nnn).
+#   Our frames: EVENT 0x9001 started, then 0xA000 | b << 1 = ACKed, 0xE000 | b << 1 = no ACK,
+#   0x8000 | b << 1 = lost arbitration, 0xB000/0xF000 | b << 1 = bit error; 0xC001 = refused (bus-off).
+#   ERR 0x8000 | s: our error state changed: s = 0 error-active, 1 error-passive, 2 bus-off.
 program can
 param PERIOD = 50                       # bit time in clocks (50 = 1 Mbit/s)
 const SYNC = 0x5000
 const LEN8 = 0x7000
 const LEN12 = 0xB000
-const LEN7 = 0x6000
+const LEN6 = 0x5000
 const FRAME_NEXT = 0x9800
 const FRAME_NOW = 0x9000
-const LINE_TX = 0xA005                  # readback: abort; stuffing on
-const LINE_CRC = 0xA00D                 # ... then append the CRC
+const LINE_ARB = 0xA005                 # readback: arbitration; stuffing on
+const LINE_STRICT = 0xA007              # readback: strict (a mismatch is a bit error); stuffing on
+const LINE_CRC = 0xA00F                 # ... then append the CRC
+const LINE_TRAIL = 0xA003               # strict, stuffing off
+const LINE_ACK = 0xA002                 # expect an override (the ACK slot)
 const LINE_OFF = 0xA000
-const LINE_REPORT = 0xA002              # readback: report (the ACK slot)
-const ACK = 0xA010                      # LINE override: dominant for one bit (the ACK slot)
+const JAM_ACK = 0xB000                  # dominant for 1 bit, from the next bit
+const JAM_CRC = 0xB580                  # dominant for 6 bits, after the ACK delimiter
+const JAM_ARM = 0xB510                  # armed: 6 dominant bits from the bit after the next error
+const JAM_DISARM = 0xB011
+const TX_OFF = 0xB002
+const TX_ON = 0xB004
+const VARS = 256                        # SRAM: +0 word count, +1 w1, +2 w2, +3 TEC, +4 REC, +5 state
 
 pin U0: pin_a=uo0 pin_s=ui0 txmode=bitsync rxmode=bitsync period=PERIOD sampleofs=0.75 sjw=PERIOD/8 idle=1 idle_bits=11 order=msb tx_lentok=true rx_nbits=12 stuff_n=5 crc_width=15 crc_poly=0x4599
 own uo0 U0
@@ -34,89 +45,386 @@ connect L1.I0 <- U0.rx
 connect L1.I1 <- L0.O1
 connect HOST_OUT <- L1.O1
 
-# L0: transmit, and the only writer of U0's command stream.
+# L0: transmit, and the only writer of U0's command stream. r0 = cmd, r1 = ID[10:0] or ID[28:18],
+# r2 = ID[17:12], r3 = ID[11:0]
 lane L0:
     K0 = LEN8
-    states IDLE S1 S2 WS C S3 S4 T
-    slot: when IDLE, f2 == 0, rb == 0, I0 is EVENT     do MOV r0 <- I0, deq                then S1   # dlc
-    slot: when S1, I0 is DATA                          do MOV r1 <- I0, deq                then S2   # id
-    slot: when S2, rb == 0                             do CALL txhdr                       then WS
-    slot: when WS, I1 is EVENT, head0 == 1             do MOV O1 <- I1, deq, keep          then C    # started -> host
-    slot: when C                                       do MOV O0 <- r3                     then S3   # RTR IDE r0 DLC
-    slot: when S3, rb == 0, f0 == 0, I0 is DATA        do OR O0 <- I0, K0, deq             then S4   # data byte
-    slot: when S4                                      do SUB r2 <- r2, 1 -> f0            then S3
-    slot: when S3, rb == 0, f0 == 1                    do CALL txtail                      then T
-    slot: when T, rb == 0                              do MOV none <- zero                 then IDLE
-    # the TX result (ACK / no ACK / abort) ends "transmitting" (f2) at once, even mid-frame
-    slot: when I1 is EVENT, head0 == 0                 do MOV O1 <- I1, deq, keep -> f2
-    # FRAME and ACK from L1: both are unit commands that bypass the TX queue (the unit ignores
-    # an ACK override in a frame it transmits itself)
-    slot: when I1 is CTRL                              do MOV O0 <- I1, deq, keep
+    states IDLE S1 S2 X1 X2 WS C S3
+    slot: when IDLE, rb == 0, I0 is EVENT          do MOV r0 <- I0, deq                then S1
+    slot: when S1, I0 is DATA                      do MOV r1 <- I0, deq                then S2
+    slot: when S2, rb == 0                         do CALL txhdr                                   # -> X1 or WS
+    slot: when X1, rb == 0, I0 is DATA             do MOV r2 <- I0, deq                then X2
+    slot: when X2, I0 is DATA                      do MOV r3 <- I0, deq                then WS
+    # the rest of the frame only after it started (or was refused), so our output is never
+    # blocked while other nodes' frames need FRAME / JAM commands
+    slot: when WS, I1 is EVENT, head0 == 1         do MOV O1 <- I1, deq, keep          then C
+    slot: when C, rb == 0                          do CALL txrest                      then S3
+    slot: when S3, rb == 0, I0 is DATA             do OR O0 <- I0, K0, deq                         # a data byte
+    slot: when S3, rb == 0, I0 is EVENT            do CALL txtail <- I0, deq                       # -> IDLE
+    slot: when I1 is EVENT, head0 == 0             do MOV O1 <- I1, deq, keep                      # a result
+    slot: when I1 is CTRL                          do MOV O0 <- I1, deq, keep                      # L1's commands
+    slot: when IDLE, rb == 0, I0 is CTRL           do MOV O1 <- I0, deq, keep                      # host -> L1
 
-# L1: receive (every frame, ours included), ask L0 for FRAME length and ACK, report to the host.
+# L1: receive every frame, ask for FRAME lengths, ACK, error flags; keep the error counters.
+# Slots that load r1 wait for rb == 0: the routines use r1 too (BUGS #20).
 lane L1:
-    K0 = ACK
-    states W0 W1 W2 W3 W4 W5
-    slot: when I0 is ERR                               do MOV O1 <- I0, deq, keep          then W0
-    slot: when I0 is EVENT, head15 == 1                do MOV O0 <- I0, deq, keep                    # readback -> L0
-    slot: when I1 is EVENT                             do MOV O1 <- I1, deq, keep                    # TX result -> host
-    slot: when W0, I0 is DATA                          do MOV O1 <- I0, deq                then W1   # SOF + ID
-    slot: when W1, I0 is DATA                          do EXT r0 <- I0, f=0x35             then W2   # DLC
-    slot: when W2                                      do MOV O1 <- I0, deq                then W3
-    slot: when W3, rb == 0                             do CALL frame                       then W4
-    slot: when W4, I0 is DATA                          do MOV O1 <- I0, deq
-    slot: when W4, I0 is EVENT, head15 == 0            do MOV O1 <- I0, deq, keep          then W5   # CRC good
-    slot: when W5                                      do MOVB O0 <- zero, K0, tag CTRL    then W0   # ACK it
+    K0 = JAM_ACK
+    states W D E T R2 F
+    slot: when W, rb == 0, I0 is ERR               do MOV r1 <- I0                     then E
+    slot: when E, rb == 0                          do CALL rxerr <- I0, deq            then W
+    slot: when W, rb == 0, I0 is EVENT, head15 == 1   do MOV r1 <- I0                  then T     # TX status
+    slot: when T, I0 is EVENT, head0 == 1          do MOV O0 <- I0, deq, keep          then W     # started -> L0
+    slot: when T, I0 is EVENT, head0 == 0          do MOV O0 <- I0, deq, keep          then R2    # a result -> L0
+    slot: when R2, rb == 0                         do CALL tec                         then W
+    slot: when I1 is EVENT                         do MOV O1 <- I1, deq, keep                      # -> host
+    slot: when rb == 0, I1 is CTRL                 do CALL recover <- I1, deq
+    slot: when W, rb == 0, I0 is DATA              do MOV r1 <- I0                     then D
+    slot: when D, rb == 0                          do CALL word <- I0, deq             then W
+    slot: when W, rb == 0, I0 is EVENT, head15 == 0   do MOV r1 <- I0                  then F
+    slot: when F, rb == 0                          do CALL rxok <- I0, deq             then W
 
-routine frame:                          # FRAME = 19 + 8 * min(dlc, 8) + 15 destuffed bits
-    ltu r3, r0, 9
-    br ok if rz
-    ldi r0, 8
-  ok:
-    shl r1, r0, 3
-    add r1, r1, 34
-    load16 r2, FRAME_NOW
-    or r1, r1, r2
-    out O0, r1, CTRL
-    ret
-
-routine txhdr:                          # r0 = dlc, r1 = id
-    load16 r3, SYNC
-    out O0, r3, CTRL
-    ltu r3, r0, 9
-    br ok if rz
-    ldi r0, 8
-  ok:
-    shl r2, r0, 3
-    add r2, r2, 34
+routine txhdr:                          # SYNC, FRAME (next), arbitration readback, SOF + first 11 ID bits
+    load16 r2, SYNC
+    out O0, r2, CTRL
+    and r2, r0, 15                      # payload bytes: min(DLC, 8), 0 for a remote frame
+    ltu r3, r2, 9
+    br le8 if rz
+    ldi r2, 8
+  le8:
+    shr r3, r0, 4
+    and r3, r3, 1
+    br data if rz
+    ldi r2, 0
+  data:
+    shl r2, r2, 3
+    add r2, r2, 34                      # 19 + 15 destuffed bits around the data
+    shr r3, r0, 15
+    br std if rz
+    add r2, r2, 20                      # a 29-bit ID adds SRR, IDE, ID[17:0]
+  std:
     load16 r3, FRAME_NEXT
     or r2, r2, r3
     out O0, r2, CTRL
-    load16 r3, LINE_TX
-    out O0, r3, CTRL
-    load16 r3, LEN12                    # SOF (0) + 11-bit ID
-    or r1, r1, r3
-    out O0, r1, DATA
-    load16 r3, LEN7                     # RTR, IDE, r0 (all 0) + DLC: sent once the frame starts
-    or r3, r3, r0
-    add r2, r0, 0                       # bytes to send; f0 = none
-    cpyf 0
-    setf 2                              # transmitting
+    load16 r2, LINE_ARB
+    out O0, r2, CTRL
+    load16 r2, LEN12
+    or r2, r1, r2
+    out O0, r2, DATA
+    shr r3, r0, 15
+    br ext if nrz
+    setst WS
+    ret
+  ext:
+    setst X1
     ret
 
-routine txtail:                         # CRC, then CRC delimiter, ACK slot (reported), ACK delimiter + EOF
-    load16 r3, LINE_CRC
-    out O0, r3, CTRL
-    load16 r3, LINE_OFF
-    out O0, r3, CTRL
-    ldi r3, 1
-    out O0, r3, DATA
-    load16 r3, LINE_REPORT
-    out O0, r3, CTRL
-    ldi r3, 1
-    out O0, r3, DATA
-    load16 r3, LINE_OFF
-    out O0, r3, CTRL
-    load16 r3, LEN8 | 0xFF
-    out O0, r3, DATA
+routine txrest:                         # after the start: the rest of the arbitration field, then control
+    shr r1, r0, 15
+    br ext if nrz
+    shr r1, r0, 4                       # standard: RTR (1 bit)
+    and r1, r1, 1
+    out O0, r1, DATA
+    br ctl
+  ext:
+    load16 r1, 0x70C0                   # SRR = 1, IDE = 1, ID[17:12]
+    or r1, r1, r2
+    out O0, r1, DATA
+    load16 r1, LEN12                    # ID[11:0]
+    or r1, r1, r3
+    out O0, r1, DATA
+    shr r1, r0, 4                       # RTR (1 bit)
+    and r1, r1, 1
+    out O0, r1, DATA
+  ctl:
+    load16 r2, LINE_STRICT              # arbitration is over: any mismatch is a bit error
+    out O0, r2, CTRL
+    and r1, r0, 15                      # IDE/r1 = 0, r0 = 0, DLC (6 bits)
+    load16 r2, LEN6
+    or r1, r1, r2
+    out O0, r1, DATA
+    ret
+
+routine txtail:                         # CRC; delimiter; ACK slot (expect an override); ACK delimiter + EOF
+    load16 r1, LINE_CRC
+    out O0, r1, CTRL
+    load16 r1, LINE_TRAIL
+    out O0, r1, CTRL
+    ldi r2, 1
+    out O0, r2, DATA
+    load16 r1, LINE_ACK
+    out O0, r1, CTRL
+    out O0, r2, DATA
+    load16 r1, LINE_TRAIL
+    out O0, r1, CTRL
+    load16 r1, LEN8 | 0xFF
+    out O0, r1, DATA
+    load16 r1, LINE_OFF
+    out O0, r1, CTRL
+    setst IDLE
+    ret
+
+routine word:                           # r1 = a 12-bit word: forward it; send FRAME when the length is known
+    out O1, r1, DATA
+    load16 r3, VARS
+    ld r2, r3, 0
+    add r2, r2, 1
+    st r2, r3, 0
+    xor r2, r2, 2
+    br w1 if rz
+    xor r2, r2, 1                       # 3
+    br w2 if rz
+    xor r2, r2, 7                       # 4
+    br w3 if rz
+    ret
+  w2:
+    st r1, r3, 2
+    ret
+  w1:
+    st r1, r3, 1
+    shr r2, r1, 10
+    and r2, r2, 1
+    br std if rz                        # IDE = 1: the length comes with w3
+    ret
+  std:
+    shr r0, r1, 11                      # RTR
+    shr r2, r1, 5
+    and r2, r2, 15                      # DLC
+    br len
+  w3:
+    ld r0, r3, 1
+    shr r0, r0, 10
+    and r0, r0, 1
+    br stdf if rz
+    ld r2, r3, 2                        # w2: RTR at bit 3, DLC[3] at bit 0; DLC[2:0] = w3[11:9]
+    shr r0, r2, 3
+    and r0, r0, 1
+    and r2, r2, 1
+    shl r2, r2, 3
+    shr r1, r1, 9
+    and r1, r1, 7
+    or r2, r2, r1
+    br len
+  stdf:
+    ret
+  len:                                  # r0 = RTR, r2 = DLC; frame = 34 (+20 for IDE) + 8 * bytes
+    ltu r1, r2, 9
+    br le8 if rz
+    ldi r2, 8
+  le8:
+    add r0, r0, 0
+    br dat if rz
+    ldi r2, 0
+  dat:
+    shl r2, r2, 3
+    add r2, r2, 34
+    ld r1, r3, 1
+    shr r1, r1, 10
+    and r1, r1, 1
+    br sf if rz
+    add r2, r2, 20
+  sf:
+    load16 r1, FRAME_NOW
+    or r2, r2, r1
+    out O0, r2, CTRL
+    ret
+
+routine rxok:                           # r1 = the last word, CRC good
+    getk r2, K0                         # ACK first: it must reach the unit within one bit
+    out O0, r2, CTRL                    # (the unit ignores it in a frame we transmit)
+    out O1, r1, EVENT
+    load16 r3, VARS
+    ldi r2, 0
+    st r2, r3, 0
+    shr r2, r1, 14
+    br own if nrz                       # our own frame: no REC change
+    ld r2, r3, 4                        # REC - 1 (not below 0)
+    add r2, r2, 0
+    br state if rz
+    sub r2, r2, 1
+    st r2, r3, 4
+    br state
+  own:
+    ret
+  state:
+    ld r0, r3, 3
+    shr r2, r0, 8
+    br off if nrz
+    shr r2, r0, 7
+    br pas if nrz
+    ld r0, r3, 4
+    shr r2, r0, 7
+    br pas if nrz
+    ldi r0, 0
+    br set
+  pas:
+    ldi r0, 1
+    br set
+  off:
+    ldi r0, 2
+  set:
+    ld r2, r3, 5
+    xor r2, r2, r0
+    br same if rz
+    st r0, r3, 5
+    load16 r2, 0x8000
+    or r2, r2, r0
+    out O1, r2, ERR
+    add r2, r0, 0
+    br act if rz
+    xor r2, r0, 1
+    br pasv if rz
+    load16 r2, TX_OFF
+    out O0, r2, CTRL
+    ret
+  pasv:
+    load16 r2, JAM_DISARM               # error-passive: a passive flag drives nothing
+    out O0, r2, CTRL
+    ret
+  act:
+    load16 r2, JAM_ARM
+    out O0, r2, CTRL
+  same:
+    ret
+
+routine rxerr:                          # r1 = ERR from the unit: CRC 0x0www / stuff 0x1nnn
+    out O1, r1, ERR
+    load16 r3, VARS
+    ldi r2, 0
+    st r2, r3, 0
+    ld r2, r3, 4                        # REC + 1
+    add r2, r2, 1
+    st r2, r3, 4
+    ld r0, r3, 5
+    add r0, r0, 0
+    br state if nrz                     # passive / bus-off: no active flags
+    shr r2, r1, 12
+    br rearm if nrz
+    load16 r2, JAM_CRC                  # CRC error: our flag starts after the ACK delimiter
+    out O0, r2, CTRL
+  rearm:
+    load16 r2, JAM_ARM                  # the armed flag may have fired: arm it again
+    out O0, r2, CTRL
+  state:
+    ld r0, r3, 3
+    shr r2, r0, 8
+    br off if nrz
+    shr r2, r0, 7
+    br pas if nrz
+    ld r0, r3, 4
+    shr r2, r0, 7
+    br pas if nrz
+    ldi r0, 0
+    br set
+  pas:
+    ldi r0, 1
+    br set
+  off:
+    ldi r0, 2
+  set:
+    ld r2, r3, 5
+    xor r2, r2, r0
+    br same if rz
+    st r0, r3, 5
+    load16 r2, 0x8000
+    or r2, r2, r0
+    out O1, r2, ERR
+    add r2, r0, 0
+    br same if rz
+    xor r2, r0, 1
+    br pasv if rz
+    load16 r2, TX_OFF
+    out O0, r2, CTRL
+    ret
+  pasv:
+    load16 r2, JAM_DISARM
+    out O0, r2, CTRL
+  same:
+    ret
+
+routine tec:                            # r1 = our frame's result
+    load16 r3, VARS
+    shr r0, r1, 12
+    and r0, r0, 3
+    xor r0, r0, 2
+    br rep if rz
+    xor r0, r0, 1                       # 3: bit error
+    br berr if rz
+    ret                                 # lost arbitration: not an error
+  rep:
+    shr r0, r1, 14                      # the sampled level (bit 15 is the status marker)
+    and r0, r0, 1
+    br ackerr if nrz                    # the ACK slot stayed recessive: an ACK error
+    ld r2, r3, 3                        # ACKed: TEC - 1
+    add r2, r2, 0
+    br state if rz
+    sub r2, r2, 1
+    st r2, r3, 3
+    br state
+  ackerr:
+    ld r0, r3, 5                        # an error-passive transmitter does not count ACK errors
+    xor r0, r0, 1                       # (it may be alone on the bus)
+    br state if rz
+  berr:
+    ld r2, r3, 3                        # TEC + 8
+    add r2, r2, 8
+    st r2, r3, 3
+    ld r0, r3, 5
+    add r0, r0, 0
+    br state if nrz
+    load16 r2, JAM_ARM
+    out O0, r2, CTRL
+  state:
+    ld r0, r3, 3
+    shr r2, r0, 8
+    br off if nrz
+    shr r2, r0, 7
+    br pas if nrz
+    ld r0, r3, 4
+    shr r2, r0, 7
+    br pas if nrz
+    ldi r0, 0
+    br set
+  pas:
+    ldi r0, 1
+    br set
+  off:
+    ldi r0, 2
+  set:
+    ld r2, r3, 5
+    xor r2, r2, r0
+    br same if rz
+    st r0, r3, 5
+    load16 r2, 0x8000
+    or r2, r2, r0
+    out O1, r2, ERR
+    add r2, r0, 0
+    br act if rz
+    xor r2, r0, 1
+    br pasv if rz
+    load16 r2, TX_OFF
+    out O0, r2, CTRL
+    ret
+  pasv:
+    load16 r2, JAM_DISARM
+    out O0, r2, CTRL
+    ret
+  act:
+    load16 r2, JAM_ARM
+    out O0, r2, CTRL
+  same:
+    ret
+
+routine recover:                        # host CTRL: counters 0, error-active, flags armed, TX on
+    load16 r3, VARS
+    ldi r2, 0
+    st r2, r3, 0
+    st r2, r3, 3
+    st r2, r3, 4
+    st r2, r3, 5
+    load16 r2, TX_ON
+    out O0, r2, CTRL
+    load16 r2, JAM_ARM
+    out O0, r2, CTRL
+    load16 r2, 0x8000
+    out O1, r2, ERR
     ret

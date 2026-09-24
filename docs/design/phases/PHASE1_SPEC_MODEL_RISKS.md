@@ -101,7 +101,7 @@ The §2.4 risk spikes run in parallel from the start.
 - [x] `tripc` report produced for all three programs, and slot usage fits (≤ 12 per lane). *(`tools/tripc/tests/test_tripc.py::test_reports_and_slot_budget` over all `programs/*.trw`: uart 4, spi_controller 4, i2c_controller 11 + 2 bounded routines; plus spi_target 3, i2c_target 12.)*
 - [x] **R1 decided:** EVAL path timing measured; fire rate chosen and logged. *(Evidence, 2026-09-24: `spikes/r1_lane/run_r1.sh`, `docs/reports/R1_LANE_TIMING.md`: EVAL ≤ 7.3 ns typ, ≤ 11.4 ns slow at 20 ns, worst slack +8.2 ns, before layout. Fire rate "every clock": D-030, accepted 2026-09-24. Rechecked against R2's post-route slack.)*
 - [ ] **R2 decided:** the latch-array test project passed precheck and `gl_test`, or the flop fallback is chosen and logged.
-- [ ] **R3 decided:** the SRAM smoke project passed precheck and `gl_test`, or the fallback is chosen and logged.
+- [ ] **R3 decided:** the SRAM smoke project passed precheck and `gl_test`, or the fallback is chosen and logged. *(In progress 2026-09-24: `spikes/r3_sram/`, branch `spike/r3-sram` (D-031); local RTL + gate-level PASS, CI hardening pending.)*
 - [x] Jane Street answers logged, or the assumptions stated. *(DECISIONS D-003: design for 6x4; SRAM macro assumed usable, settled by R3 with the flop-store fallback kept.)*
 - [ ] All CI workflows still green on `main`.
 

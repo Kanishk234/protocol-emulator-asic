@@ -51,7 +51,18 @@ Problems / decisions:
 - Before layout only: no wires, no CTS. R2's hardening gives post-route numbers for the same logic.
 - The clock gate in `trw_slots` is a behavioural latch + AND. For R2 and phase 2, instantiate `sg13cmos5l_lgcp_1`.
 
+Later (R3 set-up):
+- D-031: R2/R3 hardenings on throwaway branches (per-ref `gds` concurrency keeps `main` safe); R3 first.
+- `spikes/r3_sram/`:
+  - branch overlay: 2x2 `info.yaml`, test top with direct word access and an 18-pass walking-ones BIST, `trw_sram` wrapper, macro blackbox, `config.json` with the macro block, Loom's `pdn_cfg.tcl` verbatim (commit c7000671), `test/Makefile` + `test.py`;
+  - `fetch_macro.sh` (IHP-Open-PDK 2bbec75, byte counts checked);
+  - `check_local.sh`;
+  - `apply_to_branch.sh` (refuses to run off `spike/r3-sram`).
+- `check_local.sh`: PASS. Lint; 3/3 tests on the RTL and on a Yosys gate-level netlist (TT Icarus 13); flattened instance `u_sram.sram`.
+- Mutations: a wrong BIST write is caught (1 test fails); address aliasing is caught (2 tests fail).
+
 Next:
+- User: commit, then create `spike/r3-sram`, run `apply_to_branch.sh`, commit and push the branch (spikes/r3_sram/README.md); then record the gds run.
 - Team: answer G1–G8 in §14 / ISA (the model owner can say what tripsim does).
 - R2: a 2x2 TT project around `trw_slots` + `trw_lane` (library ICG, host-write path from pins). Plan: spike branches in this repo (`spike/r2-latch`, `spike/r3-sram`) with `tiles: "2x2"`, never merged; `gds` concurrency is per ref, so they don't cancel `main`.
 - R3: the SRAM macro smoke project (PHYSICAL §3 recipe).

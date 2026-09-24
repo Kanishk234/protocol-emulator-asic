@@ -433,6 +433,26 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Area** (one lane, latch slots, before layout): ~67K µm². Three lanes ~202K µm² (22 % of the 6x4 core). Latch slots save ~26K µm² per lane over flops.
 - **Status:** accepted (Krithik, 2026-09-24: "accept D-030"). G1–G8 remain to be answered in §14 / `ISA.md`.
 
+## D-031 (2026-09-24): R2/R3 hardening spikes run on throwaway branches; R3 first
+- **Decision:**
+  - The R2 and R3 hardenings run on branches of this repo (`spike/r3-sram`, later `spike/r2-latch`), never merged.
+  - `main` keeps the spike sources and scripts in `spikes/`, and the results (run IDs, numbers) in `docs/`.
+  - R3 goes first: it is the flow-bound risk, and its fallback changes the routine store.
+- **Why a branch works:**
+  - `gds` triggers on any branch that touches `src/**`, `info.yaml` or `macro/**`;
+  - its concurrency group is per ref (`gds-${{ github.ref }}`), so a branch run never cancels a `main` run, and the reverse.
+- **R3 setup** (`spikes/r3_sram/`):
+  - 2x2 tile, macro at (12, 40) FS;
+  - on the branch only, `src/config.json` gets the SRAM macro block (MACROS, PDN_MACRO_CONNECTIONS, PDN_CFG, Magic/LVS settings) and the four `FP_PDN_V*` stripe keys, which align the Metal4 stripes with the macro's power columns;
+  - this follows the Loom entry's `sram-smoke` recipe (Apache-2.0, credited in `macro/.../README.md`); its `pdn_cfg.tcl` is used verbatim.
+- **Local evidence:** `spikes/r3_sram/check_local.sh` PASS (lint; 3/3 cocotb tests on RTL and on a Yosys gate-level netlist with TT Icarus 13); two injected faults are caught.
+- **Costs and caveats:**
+  - The macro views (~1 MB) live on the branch only.
+  - The `viewer` job may fail on a branch.
+  - The `config.json` changes follow the CLAUDE.md rule (SRAM macro block, with this entry). The `FP_PDN_V*` keys sit in the template's "do not change" part, so they are called out here. They are part of the macro recipe (PHYSICAL §3: "stripe pitch and offset derived from the macro LEF").
+- **Pass criteria:** `gds`, `precheck` and `gl_test` green on the branch. Otherwise the documented fallback (a flop/latch store behind `trw_sram`), after at most 3 days on the flow.
+- **Status:** accepted for the method (Krithik, 2026-09-24: "you recommend and ill execute"); R3 result pending.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

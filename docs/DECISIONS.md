@@ -547,7 +547,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - Density 52 cut the violations after the first routing pass from 8,297 (run 1) to 33. The tail then held at 26–27 (Metal2 15, Metal3 11) through pass 4. Wire length rose to 385 mm (spread cells, longer wires).
   - Pass 5 was a stubborn-tile pass at ~1 h per pass, with more of those to come, so a cap of 20 would not end the run before the 6 h kill at 00:09 UTC.
   - Stopped by pushing run 4 (cancel-in-progress).
-- **Run 4:** `DRT_OPT_ITERS` 3, nothing else. Routing ends before the stubborn passes; the run fails at the routing-DRC check and uploads `GDS_logs`. Purpose: the location of each remaining violation, to choose the design fix (first suspect: the wiring around the slot array and its 52-word read-back mux).
+- **Run 4 (revised before it started, after Krithik asked why run a job designed to fail):** aim to pass, and still get logs if not.
+  - Tile 3x2 → **4x2** and `PL_TARGET_DENSITY_PCT` 52 → **42**: more of the one knob that worked. 60 → 52 cut the first-pass violations 8,297 → 33. On 4x2 the placer's utilisation drops to ~36 %, so 42 is legal.
+  - `DRT_OPT_ITERS` **8**: never reached if routing converges; ends a stall well before the 6 h kill, so a failure still uploads `GDS_logs`.
+  - No RTL or test change: R2 still tests the same lane.
+  - The earlier run-4 plan (cap 3, nothing else) was queued as `gds` #18 and is superseded; the push of this change cancels it.
+  - If it passes, the phase 2 floorplan must give the slot-array logic a local density near 42 %, not the template's 60.
+  - The slot read-back mux stays: removing it is a phase 2 area/wiring option, not needed to answer R2.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

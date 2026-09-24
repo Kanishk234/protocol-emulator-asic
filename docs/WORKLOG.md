@@ -53,7 +53,7 @@ Next:
   - pin access clean;
   - density 52 cut the first-pass violations from 8,297 to 33, but the tail held at 26–27 (Metal2/Metal3);
   - pass 5 was a ~1 h stubborn pass, so a cap of 20 would still time out (kill at 00:09 UTC; I first misstated it as 22:09).
-- Run 4 prepared: `DRT_OPT_ITERS` 3 only, so the run fails with `GDS_logs` (violation locations).
+- Run 4 first planned as a diagnostic-only run (cap 3). Revised at Krithik's question ("why run a workflow we know will fail?") into an attempt to pass: tile 4x2, density 42, cap 8 (D-034). No RTL or test change.
 
 ## 2026-09-24: Krithik + Claude (phase 1: R1 spec gaps G1–G8, model side)
 Done:

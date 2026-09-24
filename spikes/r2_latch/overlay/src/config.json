@@ -13,10 +13,11 @@
 
   "//": "PL_TARGET_DENSITY_PCT - You can increase this if Global Placement fails with error GPL-0302.",
   "//": "Users have reported that values up to 80 worked well for them.",
-  "//": "TRIPWIRE R2 run 3 (D-034): 52, from the template's 60, to spread the latch array and its muxes",
-  "//": "and thin the Metal2 hot spots where runs 1-2 stalled in routing. It must stay above the global",
-  "//": "placer's utilisation (GPL-0019: 48.87 % in run 1), or placement stops with GPL-0302.",
-  "PL_TARGET_DENSITY_PCT": 52,
+  "//": "TRIPWIRE R2 run 4 (D-034): 42 (template 60; run 3 used 52, which cut first-pass routing",
+  "//": "violations from 8,297 to 33 but left ~26 that would not clear). The tile is 4x2 for this run, so the",
+  "//": "global placer's utilisation drops from 48.9 % (3x2) to ~36 %; the density must stay above it, or",
+  "//": "placement stops with GPL-0302.",
+  "PL_TARGET_DENSITY_PCT": 42,
 
   "//": "CLOCK_PERIOD - Increase this in case you are getting setup time violations.",
   "//": "The value is in nanoseconds, so 20ns == 50MHz.",
@@ -41,11 +42,11 @@
   "PNR_SDC_FILE": "dir::pnr.sdc",
   "SIGNOFF_SDC_FILE": "dir::signoff.sdc",
 
-  "//": "TRIPWIRE R2 run 4 (D-034): cap detailed routing at 3 iterations (default 64; run 3 had 20). A",
-  "//": "runtime guard, not a design change. Run 3 hit its first ~1 h stubborn-tile pass at iteration 5,",
-  "//": "too early for a cap of 20 to end the run before the 6 h kill (which uploads no logs). With 3, the",
-  "//": "run FAILS at the routing DRC check and uploads GDS_logs with every violation's location.",
-  "DRT_OPT_ITERS": 3,
+  "//": "TRIPWIRE R2 run 4 (D-034): cap detailed routing at 8 iterations (default 64). A runtime guard, not a",
+  "//": "design change: if routing converges (the goal of the density change) the cap is never reached and",
+  "//": "the run goes on to pass; if it stalls, run 3's pace (a ~1 h stubborn-tile pass from iteration 5)",
+  "//": "still ends routing well before the 6 h kill, and the run FAILS with GDS_logs (a timeout uploads none).",
+  "DRT_OPT_ITERS": 8,
 
   "//": "Configuration docs: https://librelane.readthedocs.io/en/latest/reference/configuration.html",
 

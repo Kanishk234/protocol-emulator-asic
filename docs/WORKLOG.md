@@ -21,6 +21,24 @@ Next:
 
 ---
 
+## 2026-09-24: Krithik + Claude (phase 1: spike lane vs. D-033)
+Worked from `ARCHITECTURE.md` §14 as pulled (26bdc86: L8–L11, R5–R6, H1); did not read `tools/`.
+
+Done:
+- Checked `spikes/r1_lane/trw_lane.v` against the new rules. It agrees with L8 (BSEL, MKCTL), L9, L11, R5, R6 and H1 (RUN = 0 and all flops reset; the harness, the R2 top and the tb write all 48 slot words before RUN).
+- **L8 KT: fixed on `main`** (BUGS #34). KT now keeps the head tag only when ASRC is I0/I1; otherwise OT gives the tag.
+  - `tb_r1_lane.v` covers both halves: slot 0 has KT with A = I0 and OT = ERR, and must keep DATA; slot 2 has KT with A = zero, and must emit EVENT.
+  - The old behaviour fails the tb ("O1 token tag 0"); the fixed lane passes.
+- Not re-applied to `spike/r2-latch`: R2's result does not depend on it, and a push would restart the running hardening.
+- `run_r1.sh` re-run: sims PASS, lint clean. ABC mapping noise moved the worst EVAL row to 11.68 ns (flop, unbuffered, slow), slack +7.87. That is below the +8.2 ns the docs claimed, so `R1_LANE_TIMING.md` §3, D-030, the phase checklist evidence, `AREA.md` and `PHASE1.md` now carry the corrected figures (margin 1.67×). The conclusion is unchanged.
+
+Found, not fixed (waiting for Krithik):
+- **L10 CALL: the spike still deviates** (the same latent issue as the model's BUGS #32). With DST = O0/O1, a CALL slot waits for that output, reserves it at EVAL and loads it at EXEC. With DFE = 1 it sets PEND and writes f[DF]. L10 says CALL ignores DST and DFE: no wait, no reservation, no output or flag write. The fix is four guards in `trw_lane.v`.
+
+Next:
+- Krithik: OK the L10 fix.
+- R2 run 2 in progress.
+
 ## 2026-09-24: Krithik + Claude (phase 1: R1 spec gaps G1–G8, model side)
 Done:
 - Answered the eight spec gaps from the R1 report (§6) from what `tools/tripsim` does, and wrote them into `ARCHITECTURE.md` §14 (new L8–L11, R5–R6, H1), §5.1/§5.2, and the `spec/tripwire.yaml` field descriptions (regenerated ISA tables). D-033.

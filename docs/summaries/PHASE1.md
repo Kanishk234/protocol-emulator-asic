@@ -105,11 +105,11 @@ We also made the per-push tests about 20 times faster locally by moving the five
 
 | | Typical chip | Slow chip (hot, low voltage) |
 |---|---|---|
-| Time to decide (worst case we could build) | 7.3 ns | 11.4 ns |
-| Time to decide (planned design, buffered) | 3.6 ns | 5.6 ns |
+| Time to decide (worst case we could build) | 7.5 ns | 11.7 ns |
+| Time to decide (planned design, buffered) | 3.8 ns | 5.9 ns |
 | Time available per clock | 20 ns | 20 ns |
 
-So the "every other clock" fallback isn't needed (D-030, accepted). These numbers are before layout: real wires will add delay, but the worst case would have to grow by more than 70 % to fail. The R2 run will measure it after layout. One lane with latch-based rule memory comes to about 65K µm², so three lanes use about a fifth of the chip. Writing the Verilog without the model also turned up eight places where the documents leave a choice open or contradict themselves (for example, which register one field selects). None of them affects timing, but they need answering in the rules before the real Verilog is written.
+So the "every other clock" fallback isn't needed (D-030, accepted). These numbers are before layout: real wires will add delay, but the worst case would have to grow by about two-thirds to fail. The R2 run will measure it after layout. One lane with latch-based rule memory comes to about 65K µm², so three lanes use about a fifth of the chip. Writing the Verilog without the model also turned up eight places where the documents leave a choice open or contradict themselves (for example, which register one field selects). None of them affects timing, but they need answering in the rules before the real Verilog is written.
 
 ## What's left in Phase 1
 1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.

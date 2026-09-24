@@ -11,7 +11,7 @@ One row per `gds` hardening (see `../design/PHYSICAL_DESIGN_AND_CI.md` §10). Ju
 
 | Date | What | Source | Result |
 |---|---|---|---|
-| 2026-09-24 | R1 spike: one lane (12 slots, EVAL/EXEC, ALU) + 2 consumer ports, Yosys onto cmos5l typ, no layout | `spikes/r1_lane/run_r1.sh`; `R1_LANE_TIMING.md` §4 | Latch slots: ~65K µm² per lane (lane 35.0K, ALU 5.9K, slots 24.5K = 636 + 64 latch bits + 52 `lgcp` clock gates); 170 lane flops. Flop slots: slots 51.7K. Three lanes with latches ~196K µm² (22 % of the core). EVAL at 20 ns: worst slack +8.2 ns (slow corner) |
+| 2026-09-24 | R1 spike: one lane (12 slots, EVAL/EXEC, ALU) + 2 consumer ports, Yosys onto cmos5l typ, no layout | `spikes/r1_lane/run_r1.sh`; `R1_LANE_TIMING.md` §4 | Latch slots: ~65K µm² per lane (lane 35.0K, ALU 5.9K, slots 24.5K = 636 + 64 latch bits + 52 `lgcp` clock gates); 170 lane flops. Flop slots: slots 51.7K. Three lanes with latches ~196K µm² (22 % of the core). EVAL at 20 ns: worst slack +7.9 ns (slow corner, worst of the re-runs) |
 
 ## Row notes
 

@@ -2,9 +2,9 @@
 
 Phase 1 task 13. **Question:** can a lane evaluate all 12 reflex conditions, pick a slot and apply its static updates in one 20 ns clock (EVAL every clock), or must it fall back to firing every other clock? **Decision it drives:** the fire rate (ARCHITECTURE §14 L1). Decision: DECISIONS D-030.
 
-**Answer: fire every clock.** Before layout, the worst EVAL path is 3.5–6.9 ns at the typical corner and 5.4–10.8 ns at the slow corner (committed RTL; up to 11.4 ns in earlier runs, see the mapping-noise note in §3). The worst case seen in any run (no buffering, configuration treated as changing, slow corner) still has 8.2 ns of slack: the path could grow by 72 % before it fails. The buffered latch build has 3.5× margin.
+**Answer: fire every clock.** Before layout, the worst EVAL path is 3.5–7.5 ns at the typical corner and 5.5–11.7 ns at the slow corner (committed RTL; see the mapping-noise note in §3). The worst case seen in any run (flop slots, no buffering, configuration treated as changing, slow corner) still has 7.9 ns of slack: the path could grow by 67 % before it fails. The buffered latch build has 3.3–3.5× margin.
 
-Date: 2026-09-24 (final run with the library clock gate `sg13cmos5l_lgcp_1` and the slot read port, see §3 and §5). Reproduce: `spikes/r1_lane/run_r1.sh` (outputs in `spikes/r1_lane/build/`, not committed).
+Date: 2026-09-24 (final run: library clock gate `sg13cmos5l_lgcp_1`, slot read port, KT per §14 L8; see §3 and §5). Reproduce: `spikes/r1_lane/run_r1.sh` (outputs in `spikes/r1_lane/build/`, not committed).
 
 ---
 
@@ -43,38 +43,40 @@ Arrival = data arrival at the endpoint (ns); slack against 20 ns minus uncertain
 
 | Slots | Mapping | Corner | Config | EVAL arrival | EVAL slack | EXEC arrival | EXEC slack |
 |---|---|---|---|---|---|---|---|
-| latch | plain | typ | 0 | 6.94 | 12.69 | 5.27 | 14.34 |
-| latch | plain | typ | 1 | 5.95 | 13.68 | 5.27 | 14.34 |
-| latch | plain | slow | 0 | **10.78** | **8.78** | 8.26 | 11.24 |
-| latch | plain | slow | 1 | 9.26 | 10.29 | 8.26 | 11.24 |
-| latch | sized | typ | 0 | 3.58 | 16.04 | 4.10 | 15.52 |
-| latch | sized | typ | 1 | 3.48 | 16.15 | 4.10 | 15.52 |
-| latch | sized | slow | 0 | 5.62 | 13.91 | 6.41 | 13.12 |
-| latch | sized | slow | 1 | 5.45 | 14.11 | 6.41 | 13.12 |
-| flop | plain | typ | 0 | 6.45 | 13.18 | 6.91 | 12.70 |
-| flop | plain | typ | 1 | 5.83 | 13.79 | 6.91 | 12.70 |
-| flop | plain | slow | 0 | 10.06 | 9.49 | 10.69 | 8.80 |
-| flop | plain | slow | 1 | 9.12 | 10.43 | 10.69 | 8.80 |
-| flop | sized | typ | 0/1 | 3.68 | 15.95 | 3.94 | 15.68 |
-| flop | sized | slow | 0/1 | 5.78 | 13.77 | 6.17 | 13.36 |
+| latch | plain | typ | 0 | 5.90 | 13.73 | 5.65 | 13.97 |
+| latch | plain | typ | 1 | 5.30 | 14.33 | 5.65 | 13.97 |
+| latch | plain | slow | 0 | 9.19 | 10.36 | 8.83 | 10.68 |
+| latch | plain | slow | 1 | 8.29 | 11.27 | 8.83 | 10.68 |
+| latch | sized | typ | 0 | 3.76 | 15.86 | 4.15 | 15.47 |
+| latch | sized | typ | 1 | 3.51 | 16.11 | 4.15 | 15.47 |
+| latch | sized | slow | 0 | 5.90 | 13.63 | 6.48 | 13.06 |
+| latch | sized | slow | 1 | 5.52 | 14.01 | 6.48 | 13.06 |
+| flop | plain | typ | 0 | 7.53 | 12.10 | 6.07 | 13.54 |
+| flop | plain | typ | 1 | 6.76 | 12.87 | 6.07 | 13.54 |
+| flop | plain | slow | 0 | **11.68** | **7.87** | 9.39 | 10.11 |
+| flop | plain | slow | 1 | 10.45 | 9.10 | 9.39 | 10.11 |
+| flop | sized | typ | 0 | 3.93 | 15.69 | 4.18 | 15.44 |
+| flop | sized | typ | 1 | 3.50 | 16.13 | 4.18 | 15.44 |
+| flop | sized | slow | 0 | 6.15 | 13.38 | 6.53 | 13.01 |
+| flop | sized | slow | 1 | 5.48 | 14.05 | 6.53 | 13.01 |
 
-**Mapping noise.** These are the numbers for the committed RTL. Two earlier runs of the same lane differed only outside the critical path (first a behavioural clock gate instead of the library ICG, then no slot read port). They gave EVAL values up to 11.39 ns (flop, plain, slow, slack +8.16) and moved individual rows by up to ±1.2 ns. ABC restructures the logic differently whenever the netlist changes, so read every number here as ±1.5 ns. The conclusion is the same in every run.
+**Mapping noise.** These are the numbers for the committed RTL (after the §14 L8 KT fix, 2026-09-24). Three earlier runs of the same lane differed only outside the critical path: a behavioural clock gate instead of the library ICG, no slot read port, and KT as it was before L8. Between runs, individual rows moved by up to ±1.3 ns; the worst EVAL row across all runs is this table's 11.68 ns (flop, plain, slow, slack +7.87). ABC restructures the logic differently whenever the netlist changes, so read every number here as ±1.5 ns. The conclusion is the same in every run.
 
 **Margin.** How much the EVAL path could grow before it fails at 20 ns:
 
 | Case | Growth allowed |
 |---|---|
-| Worst case in any run (flop, plain, slow, cfg 0: 11.39 ns) | 1.72× |
-| Worst row of the final run (latch, plain, slow, cfg 0) | 1.81× |
-| Planned build before resizing (latch, plain, slow, cfg 1) | 2.1× |
-| Latch, sized, slow | 3.5× |
+| Worst case in any run (flop, plain, slow, cfg 0: 11.68 ns) | 1.67× |
+| Latch, plain, slow, cfg 0 | 2.1× |
+| Planned build before resizing (latch, plain, slow, cfg 1) | 2.4× |
+| Latch, sized, slow | 3.3–3.5× |
 
-Wire delay, clock skew and a long route to producers in other blocks all eat into this margin; none of them is plausibly 70 %.
+Wire delay, clock skew and a long route to producers in other blocks all eat into this margin; none of them is plausibly 67 %.
 
 **The critical paths:**
 - **EVAL (plain):** the consumer-port `sel` register or a producer's tag register → source mux → `accept` filter → `avail` → `ready[i]` → group mask → priority encoder → the selected slot's ASRC → the A-latch data mux (`a_lat`). This is the §11 EVAL path (conditions → encoder → mux), with the fabric source mux in front of it. In the first run, about 3 ns of the 6.4 ns (typ) was three unbuffered nets with fanout 31–35, which buffering removes (the "sized" rows).
 - **EVAL (sized):** O1's `out_seq` → the 9-subscriber release term → `ofree` → `ready` → encoder → the CALL index mux.
-- **EXEC:** `ex_rt` (routine or slot) → operand muxes (fanout 107 when unbuffered) → ALU → the zero/compare flag → RZ. At 8.3–10.7 ns (slow, plain) it is about as long as EVAL, and it is also comfortably inside 20 ns.
+- **EXEC:** `ex_rt` (routine or slot) → operand muxes (fanout 107 when unbuffered) → ALU → the zero/compare flag → RZ. At 8.3–10.7 ns (slow, plain) across the runs it is about as long as EVAL, and it is also comfortably inside 20 ns.
 - **Latch writes:** the latch array times cleanly: write data borrows under 1 ns into the transparent phase. With the first, behavioural clock gate the gating check passed with +0.15 ns hold (ideal clock); the library ICG now used has its own checks inside the cell.
 
 ## 4. Area (Yosys, typ liberty, plain mapping, before placement)
@@ -113,6 +115,6 @@ The RTL had to pick an answer for each of these. The model has presumably picked
 | G3 | A routine `OUT` whose output is full: is it still a "waiting step" that holds back non-urgent slots? | ISA §5.3 | no: it is not a candidate until its output is free |
 | G4 | PEND[x] set by EVAL and cleared by EXEC on the same edge | §14 L4/L5 | set wins |
 | G5 | How DJNZ reports "rd ≠ 0" to the sequencer; does it write RZ? | ISA §5.1 | RZ untouched; a separate signal |
-| G6 | `KT` when ASRC is not an input; `CALL` with a register DST; `SETF/CLRF/CPYF` with arg 3 (RB is read-only) | ISA §3, §4.1, §5.1 | the latched I0/I1 head tag; CALL writes nothing; writes to f3 ignored |
+| G6 | `KT` when ASRC is not an input; `CALL` with a register DST; `SETF/CLRF/CPYF` with arg 3 (RB is read-only) | ISA §3, §4.1, §5.1 | the latched I0/I1 head tag (**changed to §14 L8**: KT ignored, OT used); CALL writes no register; writes to f3 ignored |
 | G7 | Slot latches have no reset, so V is unknown after power-up | §5.2, PHYSICAL §4 | the host must write all 48 slot words before RUN; RUN resets to 0 |
 | G8 | Inconsistent numbers: PEND 4 bits (ARCH §5.1) vs 3 (ISA §2); "52-bit slots" (ARCH §5.2) vs 53; "RPC, RRET" (ARCH §5.1) vs "RPC, RIR" (ISA §2) | ARCH §5.1, §5.2 | ISA's values |

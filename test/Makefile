@@ -1,12 +1,13 @@
 # Makefile
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
+# R2 branch (spike/r2-latch): the template Makefile with the lane sources (spikes/r1_lane).
 
 # defaults
 SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
-SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_tripwire.v
+SRC_DIR ?= $(PWD)/../src
+PROJECT_SOURCES = tt_um_tripwire.v trw_lane.v trw_alu.v trw_slots.v trw_cport.v
 
 ifneq ($(GATES),yes)
 

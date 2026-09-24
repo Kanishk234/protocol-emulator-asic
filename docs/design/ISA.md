@@ -118,17 +118,17 @@ Changes from the earlier op table (`ARCHITECTURE.md` §5.3 before DECISIONS D-00
 | [18] | HE | condition | head-bit match enable |
 | [19] | HV | condition | required head bit |
 | [23:20] | OP | action | operation (ops table) |
-| [26:24] | DST | action | destination (enum DST) |
+| [26:24] | DST | action | destination (enum DST); CALL ignores it (tripc emits none) |
 | [29:27] | ASRC | action | A source (enum ASRC) |
 | [30] | DQ | action | dequeue the A input (only if ASRC is I0/I1) |
-| [32:31] | BSEL | action | B source (enum BSEL) |
+| [32:31] | BSEL | action | B source (enum BSEL): reg = r[IMM[1:0]], imm = IMM, k = K[IMM[1:0]] |
 | [40:33] | IMM | action | 8-bit immediate; also the field operand F |
 | [41] | NSE | action | next-STATE enable (static update) |
 | [45:42] | NS | action | next STATE |
 | [46] | DFE | action | write the flag result R |
 | [48:47] | DF | action | which flag: 0-2 = f0-f2, 3 = none |
 | [50:49] | OT | action | output tag (DST O0/O1; ignored for MKCTL and when KT) |
-| [51] | KT | action | keep the A input head's tag on the output |
+| [51] | KT | action | keep the A input head's tag on the output; only when ASRC is I0/I1 (otherwise ignored, OT applies) |
 | [52] | HS | condition | head-bit select for HE/HV: 0 = data[15], 1 = data[0] |
 
 | Enum | Codes |
@@ -193,7 +193,7 @@ Routines are bounded, non-urgent sequential code in SRAM (setup, bookkeeping, er
 | LDI | 1 | 000 | rd[11:10] imm[9:0] | rd := zext(imm10) |
 | LDIH | 1 | 001 | rd[11:10] imm[9:0] | rd := {imm[5:0], rd[9:0]} |
 | BR | 1 | 010 | cond[11:9] off[8:0] | branch if cond (enum BR_COND); off signed, from the next word |
-| DJNZ | 1 | 011 | rd[11:10] off[9:0] | rd := rd - 1; branch if rd != 0; off signed |
+| DJNZ | 1 | 011 | rd[11:10] off[9:0] | rd := rd - 1; branch if rd != 0; off signed; RZ unchanged |
 | LD | 1 | 100 | rd[11:10] ra[9:8] off[7:0] | rd := SRAM[r[ra] + off] |
 | ST | 1 | 101 | rd[11:10] ra[9:8] off[7:0] | SRAM[r[ra] + off] := rd |
 | OUT | 1 | 110 | port[11] tag[10:9] ra[8:7] | enqueue r[ra] with tag on O0/O1; waits while full |
@@ -206,10 +206,10 @@ BR conditions: 0 = always, 1 = rz, 2 = nrz.
 | 0 | NOP | no operation |
 | 1 | RET | return: RB := 0 |
 | 2 | SETST | STATE := arg[3:0] |
-| 3 | SETF | f[arg[1:0]] := 1 |
-| 4 | CLRF | f[arg[1:0]] := 0 |
+| 3 | SETF | f[arg[1:0]] := 1 (arg 3 = RB: no effect) |
+| 4 | CLRF | f[arg[1:0]] := 0 (arg 3 = RB: no effect) |
 | 5 | TSTF | RZ := f[arg[1:0]] |
-| 6 | CPYF | f[arg[1:0]] := RZ |
+| 6 | CPYF | f[arg[1:0]] := RZ (arg 3 = RB: no effect) |
 | 7 | GETT | r[arg[1:0]] := time |
 | 8 | GETK | r[arg[1:0]] := K[arg[3:2]] |
 <!-- /GENERATED:routine_formats -->

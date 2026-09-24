@@ -147,17 +147,17 @@ Each consumer port selects among at most 16 sources with its 4-bit `sel`; the mu
 | r0–r3 | 4 × 16 | General registers |
 | STATE (p7..p4) | 4 | Current protocol state, 16 states |
 | FLAGS (p3..p0) | 4 | f0–f2 are compare results and user flags; f3 = RB (routine busy, read-only) |
-| PEND | 4 | Per-flag "result pending" bits (see 5.4) |
+| PEND | 3 | Per-flag "result pending" bits for f0–f2 (f3 = RB has none; `ISA.md` §4.4) |
 | I0/I1 head latch | 2 × 18 | Token captured at select time |
 | O0/O1 | producer registers | Owned by the lane (see §4) |
-| RPC, RRET | 9 + 9 | Routine PC and saved PC for interruption |
+| RPC, RIR | 9 (10 with 1K SRAM) + 16 | Routine PC and fetched-instruction register (`ISA.md` §2) |
 | RUN, HALT, STEP | control | Set from the host |
 
 | K0–K3 | 4 × 16 | Per-lane constants, host-written while halted, read-only to programs (`ISA.md` §2) |
 
 ### 5.2 Reflex slot encoding and 5.3 operations
 
-Moved to **`ISA.md`** (§3 operation table, §4 reflex slots), which is now the single description of what a lane executes. Summary: 52-bit slots in a latch array, written only while the lane is halted. Channel readiness is implicit in the operands. The lowest-index ready slot fires, and urgent slots pre-empt a waiting routine step. There are 16 ops, shared with routines, and every op can write a flag result.
+Moved to **`ISA.md`** (§3 operation table, §4 reflex slots), which is now the single description of what a lane executes. Summary: 53-bit slots in a latch array, written only while the lane is halted. Channel readiness is implicit in the operands. The lowest-index ready slot fires, and urgent slots pre-empt a waiting routine step. There are 16 ops, shared with routines, and every op can write a flag result.
 
 ### 5.4 The two-stage lane pipeline
 
@@ -165,7 +165,7 @@ Moved to **`ISA.md`** (§3 operation table, §4 reflex slots), which is now the 
 clock n   EVAL : evaluate 12 conditions → priority encode → selected slot s
                  apply s's static updates now: STATE := NS (if NSE), dequeue the input (DQ), reserve the output
                  latch the chosen input head into the operand latch
-                 if DFE: PEND[DF] := 1
+                 if DFE and DF != 3: PEND[DF] := 1
 clock n+1 EXEC : read s's action fields → ALU → write r[d] / load O0|O1 / write f[DF] and clear PEND[DF]
 ```
 
@@ -382,9 +382,9 @@ SDA is driven low at the next SCL falling edge.
 **Improvement noted for P1:** preload SETN during the address byte to save 2 clocks. This is also an example of the kind of bound the compiler reports.
 ---
 
-## 14. Cycle-exact semantics (DRAFT, from the phase 1 model)
+## 14. Cycle-exact semantics (from the phase 1 model)
 
-This section is the text that both `tools/tripsim` and the RTL implement. It is a **draft**. Each rule was fixed while writing the model, and each is open to change at the spec freeze. The rule numbers are referenced from the model's source code.
+This section is the text that both `tools/tripsim` and the RTL implement. Each rule was fixed while writing the model; rules L8–L11, R5–R6 and H1 answer the gaps G1–G8 found by writing the R1 lane RTL from these documents alone (`docs/reports/R1_LANE_TIMING.md` §6, D-033). A change to any rule needs a DECISIONS entry. The rule numbers are referenced from the model's source code.
 
 **Conventions:**
 - *Clock n* is a cycle.
@@ -409,6 +409,10 @@ This section is the text that both `tools/tripsim` and the RTL implement. It is 
 - **L5.** EXEC writes are applied at edge n+1: `r[d]`, the output load (which also clears that output's reservation), and `f[DF]` (which also clears `PEND[DF]`).
 - **L6.** `CALL` sets RB, and requests the entry-table read, at its EVAL edge (not at EXEC). A second CALL slot therefore sees RB = 1 on the very next clock.
 - **L7.** An output is free for EVAL when it is not reserved and its producer is free (F3).
+- **L8.** Operand B (G1): `BSEL = reg` reads `r[IMM[1:0]]`, `BSEL = k` reads `K[IMM[1:0]]`, `BSEL = imm` is `IMM`. `KT` keeps the head tag latched at EVAL only when `ASRC` is I0 or I1; otherwise `KT` is ignored and `OT` gives the tag. `MKCTL` always emits CTRL (G6).
+- **L9.** If EXEC clears `PEND[x]` (writing `f[x]`) on the same edge that EVAL sets it for another slot, the set wins (G4).
+- **L10.** `CALL` writes nothing at EXEC: no register, output or flag. It ignores `DST`, so it reserves no output and does not wait for one; `DFE` is ignored. Writes to f3 (RB) from a slot (`DF = 3`) or from `SETF`/`CLRF`/`CPYF` with arg 3 have no effect (G6).
+- **L11.** Routine steps use the same pipeline as slots (G2): a step selected at EVAL in clock n executes in clock n+1, and its writes land at edge n+1.
 
 ### Routines
 - **R1.** SRAM rotation: `cycle mod 4` = 0, 1, 2 → lanes L0, L1, L2; 3 → HOST (and MEM/CAPTURE if they return, §8). The SRAM read data is registered, so a word read on slot k is usable from clock k+1.
@@ -417,6 +421,11 @@ This section is the text that both `tools/tripsim` and the RTL implement. It is 
   - `LD` returns its data as a second routine step, which competes for EXEC like any step.
   - `ST` completes on the slot.
 - **R4.** If a reflex's static `NS` and a routine `SETST` land on the same edge, the reflex update wins.
+- **R5.** A waiting `OUT` step whose output is not free (L7) is not a candidate. It does not hold back non-urgent slots; it waits until the output frees (G3). When selected, it reserves the output at edge n like a slot.
+- **R6.** `DJNZ` leaves `RZ` unchanged; its branch goes straight to RPC at EXEC. Only ALU steps and `TSTF` write `RZ` (G5).
+
+### Reset and loading
+- **H1.** After reset every lane is halted (RUN = 0). Flops (registers, STATE, flags, PEND, RB, RIR state, producers, ports) reset to 0. Slot latches have no reset, so slot contents, including `V`, are undefined. The host must write all 12 slots of a lane (4 words each, 48 words; unused slots with `V = 0`) before setting RUN (G7). `tripc.load` does this.
 
 ### Pins
 - **P1.** Pad inputs pass through 2-FF synchronisers: the value sampled in clock n is the pad value of clock n−2.

@@ -57,17 +57,17 @@ slot:
     - {name: HE,   lsb: 18, width: 1, group: condition, desc: "head-bit match enable"}
     - {name: HV,   lsb: 19, width: 1, group: condition, desc: "required head bit"}
     - {name: OP,   lsb: 20, width: 4, group: action,    desc: "operation (ops table)"}
-    - {name: DST,  lsb: 24, width: 3, group: action,    desc: "destination (enum DST)"}
+    - {name: DST,  lsb: 24, width: 3, group: action,    desc: "destination (enum DST); CALL ignores it (tripc emits none)"}
     - {name: ASRC, lsb: 27, width: 3, group: action,    desc: "A source (enum ASRC)"}
     - {name: DQ,   lsb: 30, width: 1, group: action,    desc: "dequeue the A input (only if ASRC is I0/I1)"}
-    - {name: BSEL, lsb: 31, width: 2, group: action,    desc: "B source (enum BSEL)"}
+    - {name: BSEL, lsb: 31, width: 2, group: action,    desc: "B source (enum BSEL): reg = r[IMM[1:0]], imm = IMM, k = K[IMM[1:0]]"}
     - {name: IMM,  lsb: 33, width: 8, group: action,    desc: "8-bit immediate; also the field operand F"}
     - {name: NSE,  lsb: 41, width: 1, group: action,    desc: "next-STATE enable (static update)"}
     - {name: NS,   lsb: 42, width: 4, group: action,    desc: "next STATE"}
     - {name: DFE,  lsb: 46, width: 1, group: action,    desc: "write the flag result R"}
     - {name: DF,   lsb: 47, width: 2, group: action,    desc: "which flag: 0-2 = f0-f2, 3 = none"}
     - {name: OT,   lsb: 49, width: 2, group: action,    desc: "output tag (DST O0/O1; ignored for MKCTL and when KT)"}
-    - {name: KT,   lsb: 51, width: 1, group: action,    desc: "keep the A input head's tag on the output"}
+    - {name: KT,   lsb: 51, width: 1, group: action,    desc: "keep the A input head's tag on the output; only when ASRC is I0/I1 (otherwise ignored, OT applies)"}
     - {name: HS,   lsb: 52, width: 1, group: condition, desc: "head-bit select for HE/HV: 0 = data[15], 1 = data[0]"}
   enums:
     DST:  {r0: 0, r1: 1, r2: 2, r3: 3, O0: 4, O1: 5, none: 6}
@@ -87,7 +87,7 @@ routine:
       - {name: LDI,  code: 0, fields: {rd: [11, 10], imm: [9, 0]},             desc: "rd := zext(imm10)"}
       - {name: LDIH, code: 1, fields: {rd: [11, 10], imm: [9, 0]},             desc: "rd := {imm[5:0], rd[9:0]}"}
       - {name: BR,   code: 2, fields: {cond: [11, 9], "off": [8, 0]},            desc: "branch if cond (enum BR_COND); off signed, from the next word", signed: ["off"]}
-      - {name: DJNZ, code: 3, fields: {rd: [11, 10], "off": [9, 0]},             desc: "rd := rd - 1; branch if rd != 0; off signed", signed: ["off"]}
+      - {name: DJNZ, code: 3, fields: {rd: [11, 10], "off": [9, 0]},             desc: "rd := rd - 1; branch if rd != 0; off signed; RZ unchanged", signed: ["off"]}
       - {name: LD,   code: 4, fields: {rd: [11, 10], ra: [9, 8], "off": [7, 0]}, desc: "rd := SRAM[r[ra] + off]"}
       - {name: ST,   code: 5, fields: {rd: [11, 10], ra: [9, 8], "off": [7, 0]}, desc: "SRAM[r[ra] + off] := rd"}
       - {name: OUT,  code: 6, fields: {port: [11, 11], tag: [10, 9], ra: [8, 7]}, desc: "enqueue r[ra] with tag on O0/O1; waits while full"}
@@ -99,10 +99,10 @@ routine:
     NOP: "no operation"
     RET: "return: RB := 0"
     SETST: "STATE := arg[3:0]"
-    SETF: "f[arg[1:0]] := 1"
-    CLRF: "f[arg[1:0]] := 0"
+    SETF: "f[arg[1:0]] := 1 (arg 3 = RB: no effect)"
+    CLRF: "f[arg[1:0]] := 0 (arg 3 = RB: no effect)"
     TSTF: "RZ := f[arg[1:0]]"
-    CPYF: "f[arg[1:0]] := RZ"
+    CPYF: "f[arg[1:0]] := RZ (arg 3 = RB: no effect)"
     GETT: "r[arg[1:0]] := time"
     GETK: "r[arg[1:0]] := K[arg[3:2]]"
 

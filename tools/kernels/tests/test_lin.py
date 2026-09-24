@@ -49,6 +49,7 @@ def header(chip, fid, n, publish=None):
         chip.host_push(b)
 
 
+@pytest.mark.slow  # ~50 s: 19200 baud frames, clock by clock
 def test_subscribe_publish_and_classic(tmp_path):
     node = LINResponder(T, publish={0x10: [1, 2, 3, 4], 0x3D: [9, 8, 7, 6, 5, 4, 3, 2]},
                         subscribe={0x22: 2, 0x3C: 8})
@@ -81,6 +82,7 @@ def test_subscribe_publish_and_classic(tmp_path):
         assert "invalid" not in out.lower() and "Parity: " in out, out
 
 
+@pytest.mark.slow
 def test_bad_checksum_and_no_response():
     node = LINResponder(T, publish={0x05: [0x55, 0xAA]}, bad_checksum={0x05})
     chip, bus = make(node)

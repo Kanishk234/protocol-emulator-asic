@@ -119,6 +119,7 @@ def pulses(line):
     return out
 
 
+@pytest.mark.slow  # ~3 min: nine 20 ms frames, clock by clock
 def test_servo_widths_and_period(tmp_path):
     chip = Chip(lanes=1)
     load_program(chip, "servo")
@@ -145,6 +146,7 @@ def test_servo_widths_and_period(tmp_path):
 CARRIER = 50e6 / 38000
 
 
+@pytest.mark.slow  # ~5 min: two 108 ms frame periods
 def test_ir_nec_tx_carrier_and_frames(tmp_path):
     chip = Chip(lanes=2)
     load_program(chip, "ir_nec")
@@ -167,6 +169,7 @@ def test_ir_nec_tx_carrier_and_frames(tmp_path):
         assert "Address: 0xA5" in out and "Command: 0x3C" in out, out
 
 
+@pytest.mark.slow  # ~3.5 min
 def test_ir_nec_rx_frames_and_repeat():
     chip = Chip(lanes=2)
     chip.settle_inputs(ui=1)

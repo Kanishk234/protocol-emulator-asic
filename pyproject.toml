@@ -3,3 +3,6 @@
 # test_internal/ run through their Makefiles, not through pytest.
 pythonpath = ["tools"]
 testpaths = ["tools"]
+# `slow`: simulates millions of clocks (servo, IR NEC, LIN). The per-push `unit` workflow skips
+# them (-m "not slow"); `nightly` runs everything.
+markers = ["slow: long clock-by-clock runs; nightly only"]

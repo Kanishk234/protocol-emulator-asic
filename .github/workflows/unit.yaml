@@ -20,5 +20,5 @@ jobs:
       - name: Install Python packages
         run: pip install -r requirements-dev.txt
 
-      - name: pytest (tripsim, kernels, generator)
-        run: python -m pytest -q
+      - name: pytest (tripsim, kernels, generator; slow tests run in nightly)
+        run: python -m pytest -q -n auto -m "not slow"

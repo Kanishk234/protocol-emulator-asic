@@ -1,0 +1,52 @@
+name: nightly
+# TRIPWIRE's own workflow (VERIFICATION.md §10): everything `unit` skips.
+# - full: the whole pytest suite, including the `slow` tests (servo, IR NEC, LIN: millions of clocks each).
+# - r1-fallback: every protocol kernel with lanes firing every other clock (TRIPSIM_FIRE_PERIOD=2),
+#   so the R1 fallback (ARCH_EXPLORATION §1) stays priced as the firmware changes.
+on:
+  schedule:
+    - cron: '17 7 * * *'
+  workflow_dispatch:
+
+jobs:
+  full:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install sigrok-cli (independent protocol decoders)
+        run: sudo apt-get update && sudo apt-get install -y sigrok-cli
+
+      - name: Install Python packages
+        run: pip install -r requirements-dev.txt
+
+      - name: pytest (everything, including slow)
+        run: python -m pytest -q -n auto --durations=15
+
+  r1-fallback:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install sigrok-cli (independent protocol decoders)
+        run: sudo apt-get update && sudo apt-get install -y sigrok-cli
+
+      - name: Install Python packages
+        run: pip install -r requirements-dev.txt
+
+      - name: Protocol kernels at fire period 2
+        env:
+          TRIPSIM_FIRE_PERIOD: '2'
+        run: python -m pytest -q -n auto tools/kernels/tests

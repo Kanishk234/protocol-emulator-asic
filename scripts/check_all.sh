@@ -64,7 +64,7 @@ step "sigrok: UART decode of a VCD (toolchain smoke test)"
 python scripts/sigrok_smoke.py
 
 step "tools: pytest (tripsim model tests)"
-python -m pytest -q
+python -m pytest -q -n auto          # everything, slow tests included, in parallel
 
 step "test/: pin-level cocotb suite (RTL)"
 make -C test clean >/dev/null

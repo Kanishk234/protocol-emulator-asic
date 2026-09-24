@@ -64,7 +64,11 @@ Later (R3 set-up):
 - User pushed `spike/r3-sram`. **R3 PASS:** `gds` run 35961480554 (09e8697): gds 7.9 min, precheck 1.7 min, gl_test 0.8 min, viewer green; lint/test/unit/docs green. The macro is kept (D-031).
   - [x] R3 box ticked (run 35961480554).
   - Pages now shows the R3 chip until the next `main` hardening.
-  - Pending: numbers from the `GDS_logs` / `precheck_reports` artifacts (they need a GitHub login).
+  - Numbers from `GDS_logs` (copied to the git-ignored `build/ci/r3/`) are now `AREA.md` row 2:
+    - setup +10.95 / +9.23 / +11.23 ns, hold +0.33 / +0.67 / +0.14 ns;
+    - 47 % utilisation, 0 overflow, LVS / routing DRC / antenna all 0.
+  - The macro's clock-to-output is **6.59 ns slow** (4.29 typ): a phase 2 constraint on the routine decode.
+- `docs` on `main` (db974df): one of two identical push-triggered runs failed inside the TT docs action (35962848241), the other passed (35962849222), so the failure is flaky, not ours. Re-run requested.
 
 Later (R2 set-up, D-032):
 - `spikes/r2_latch/`: branch overlay for the whole R1 lane on 3x2, with pin-driven I0 producer, O0/O1 subscribers and RIR. Also `test.py` (latch array: two patterns over all 52 words; a program with §7.1, a routine step pair and a K constant), `check_local.sh` and `apply_to_branch.sh`.

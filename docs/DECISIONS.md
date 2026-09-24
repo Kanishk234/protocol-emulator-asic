@@ -457,7 +457,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - `gds` workflow run 35961480554 on `spike/r3-sram` (09e8697): `gds` 7.9 min, `precheck` 1.7 min, `gl_test` 0.8 min, `viewer` 0.3 min, all green.
   - `gl_test` ran the pin-level suite on the hardened netlist: reset state; every address line and data bit; the 18-pass walking-ones BIST with an independent read-back.
   - `lint`, `test`, `unit`, `docs` are also green on the branch.
-  - Detailed numbers (timing, utilisation, overflow, DRC/LVS) go into `docs/reports/AREA.md` from the `GDS_logs` artifact.
+  - Numbers (`docs/reports/AREA.md` row 2):
+    - setup slack +10.95 / +9.23 / +11.23 ns (typ/slow/fast), hold +0.33 / +0.67 / +0.14 ns;
+    - 47 % utilisation (the macro is 45K of the 60K µm²);
+    - zero routing overflow, 0 routing DRC, LVS 0, antenna 0.
+  - **For phase 2:** the macro's clock-to-output is 6.59 ns at the slow corner (4.29 typ), so the routine decode after an SRAM read has about 13 ns of the clock.
   - Side effect: `viewer` deployed from the branch, so GitHub Pages shows the R3 test chip until the next `main` hardening.
 
 ## D-032 (2026-09-24): R2 set-up: the whole R1 lane on 3x2, concurrent with R3

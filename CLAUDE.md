@@ -14,12 +14,13 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 
 ## Read before working
 0. `docs/WORKLOG.md`: the latest entries, to see where the last session stopped.
-1. `docs/design/OVERVIEW_TRIPWIRE.md`: what we're building and why, protocols, schedule.
-2. The current phase doc in `docs/design/phases/`: find the first unchecked box.
-3. `docs/design/ARCHITECTURE.md`: the hardware contract. RTL and model both follow it. `docs/design/ISA.md`: the lane instruction set (reflex slots, routines, shared op table).
-4. `docs/design/VERIFICATION.md`: layers, check IDs, tools.
-5. `docs/design/PHYSICAL_DESIGN_AND_CI.md`: TT flow, SRAM macro, routing limits, workflows.
-6. The latest entries in `docs/DECISIONS.md` and `docs/BUGS.md`.
+1. `docs/HOW_IT_WORKS.md`: the plain-language introduction (pin units, tokens, fabric, lanes, routines, host). Use its words when explaining the chip to people.
+2. `docs/design/OVERVIEW_TRIPWIRE.md`: what we're building and why, protocols, schedule.
+3. The current phase doc in `docs/design/phases/`: find the first unchecked box.
+4. `docs/design/ARCHITECTURE.md`: the hardware contract. RTL and model both follow it. `docs/design/ISA.md`: the lane instruction set (reflex slots, routines, shared op table).
+5. `docs/design/VERIFICATION.md`: layers, check IDs, tools.
+6. `docs/design/PHYSICAL_DESIGN_AND_CI.md`: TT flow, SRAM macro, routing limits, workflows.
+7. The latest entries in `docs/DECISIONS.md` and `docs/BUGS.md`.
 
 ## Phase gates (hard rules)
 - Work in phase order: 0 setup → 1 spec/model/risks → 2 RTL core → 3 showcase protocols → 4 stretch + freeze → 5 evidence/docs → 6 submission. Phase 7 (hardware) is optional and off the critical path.

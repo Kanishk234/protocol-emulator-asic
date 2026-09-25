@@ -1,0 +1,35 @@
+name: lint
+# WARP's own workflow: static checks on the RTL and the TT source lists.
+on: [push, workflow_dispatch]
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install Python packages
+        run: pip install pyyaml==6.0.3
+
+      - name: Install Verilator and Icarus
+        run: sudo apt-get update && sudo apt-get install -y verilator iverilog
+
+      - name: info.yaml source_files match test/Makefile PROJECT_SOURCES
+        run: |
+          yaml_src=$(python -c 'import yaml; print(" ".join(yaml.safe_load(open("info.yaml"))["project"]["source_files"]))')
+          make_src=$(sed -n 's/^PROJECT_SOURCES *= *//p' test/Makefile)
+          echo "info.yaml: $yaml_src"; echo "Makefile:  $make_src"
+          test "$yaml_src" = "$make_src"
+
+      - name: Verilator and Icarus lint of the RTL
+        run: |
+          TOP=$(python -c 'import yaml; print(yaml.safe_load(open("info.yaml"))["project"]["top_module"])')
+          SOURCES=$(python -c 'import yaml; print(" ".join("src/" + f for f in yaml.safe_load(open("info.yaml"))["project"]["source_files"]))')
+          verilator --lint-only -Wall -Isrc --top-module "$TOP" $SOURCES
+          iverilog -g2005 -Isrc -s "$TOP" -o /dev/null $SOURCES

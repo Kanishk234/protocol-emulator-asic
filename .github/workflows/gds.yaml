@@ -2,7 +2,21 @@ name: gds
 
 on:
   push:
+    # WARP: only changes that can affect the hardened design or the TT checks start a hardening.
+    paths:
+      - 'src/**'
+      - 'arch/**'
+      - 'macro/**'
+      - 'test/**'
+      - 'info.yaml'
+      - 'docs/info.md'
+      - '.github/workflows/gds.yaml'
   workflow_dispatch:
+
+# WARP: one hardening per branch at a time; a newer push queues instead of cancelling a running one.
+concurrency:
+  group: gds-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   gds:

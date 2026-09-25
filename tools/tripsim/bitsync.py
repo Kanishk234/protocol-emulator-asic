@@ -22,7 +22,7 @@ from . import isa
 
 # TX status EVENTs: data[15] = 1, [14] sampled level, [13:12] kind, [11:1] line bit, [0] = started
 # kinds: 0 arbitration lost, 1 our frame started, 2 reported bit, 3 bit error
-# (kind 0 with level 1 = 0xC000: a frame refused because TX is off)
+# (kind 0 with level 1 and bit 0 = 0xC001: a frame refused because TX is off)
 EV_ABORT, EV_STARTED, EV_REPORT, EV_BITERR, EV_REFUSED = 0x8000, 0x9001, 0xA000, 0xB000, 0xC001
 ERR_CRC, ERR_STUFF, ERR_ABORT = 0, 1, 2      # ERR data[15:12]
 
@@ -201,7 +201,7 @@ class BitSync:
             if self.rx_on and not (c.oe_auto and self.own):
                 ok = not c.crc_width or self.crc == c.crc_res
                 w = self._word(self.bits) & 0xFFF
-                self._emit(isa.TAG_EVENT if ok else isa.TAG_ERR, w if ok else ERR_CRC << 12 | w)
+                self._emit(isa.TAG_EVENT if ok else isa.TAG_ERR, w | self.own << 14 if ok else ERR_CRC << 12 | w)
             self.in_frame = self.rx_on = False
             self.idle_cnt = 0
             return False
@@ -273,7 +273,7 @@ class BitSync:
         if not self.hunting and (self.frame_bits or self.bits):
             ok = not c.crc_width or self.crc == c.crc_res
             w = self._word(self.bits) & 0xFFF
-            self._emit(isa.TAG_EVENT if ok else isa.TAG_ERR, w if ok else ERR_CRC << 12 | w)
+            self._emit(isa.TAG_EVENT if ok else isa.TAG_ERR, w | self.own << 14 if ok else ERR_CRC << 12 | w)
         self.held, self.bits, self.frame_bits, self.hunting = [], [], 0, False
         self.crc = c.crc_init
 
@@ -438,7 +438,8 @@ class BitSync:
                 else:
                     self.u.flags["LATE"] = 1    # no frame, or already past n bits
             else:
-                self.rx_len = (arg & 0x1F) or 16
+                n = arg & 0x1F
+                self.rx_len = n if 1 <= n <= 16 else 16     # §14 P4 (BUGS #38)
                 self.bits = []
             return
         if self.tx_off:                         # listen-only: every TX token is dropped

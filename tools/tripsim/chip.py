@@ -4,10 +4,11 @@ Token-level and cycle-accurate, parameterised for architecture exploration
 (DECISIONS D-008). The host interface is modelled at the register level (direct
 calls); the SPI transport of ARCHITECTURE.md §9 is not modelled here.
 
-Pads are numbered 0-7 ui_in, 8-15 uo_out, 16-23 uio. ui[4..6] and uo[6..7] belong
-to the host port (§10) and cannot be attached to pin units.
+Pads are numbered 0-7 ui_in, 8-15 uo_out, 16-23 uio. The host port's pads (§10:
+ui[4..6], uo[3], uo[6]) cannot be attached to pin units.
 """
 
+import dataclasses
 import os
 from collections import deque
 
@@ -15,7 +16,8 @@ import tripwire_spec as _S
 
 from .fabric import Fabric
 from .lane import Lane
-from .pinunit import PinUnit
+from . import pinregs
+from .pinunit import PinConfig, PinUnit
 
 PAD_UI, PAD_UO, PAD_UIO = (_S.PAD_GROUPS[g][0] for g in ("ui", "uo", "uio"))
 HOST_PADS = set(_S.HOST_PADS)
@@ -62,6 +64,7 @@ class Chip:
         self.host_out = deque()
         self.host_fifo_depth = host_fifo_depth
         self.owner = [None] * 24
+        self.pin_regs = [pinregs.encode(PinConfig()) for _ in range(pin_units)]
         self.ui_in = 0
         self.uio_in = 0xFF              # environment drives the resolved uio wires
         self._sync = [(0, 0xFF), (0, 0xFF)]  # 2-FF synchronisers: (ui, uio) of clocks n-1, n-2
@@ -76,7 +79,10 @@ class Chip:
             pad = cfg.get(key)
             if pad is not None and pad in HOST_PADS:
                 raise ValueError(f"pad {pad} belongs to the host port")
-        self.pins[unit].configure(**cfg)
+        # §7.2 (D-036): through the register encoding, so only representable values run
+        words = pinregs.encode(PinConfig(**cfg))
+        self.pin_regs[unit] = words
+        self.pins[unit].configure(**dataclasses.asdict(pinregs.decode(words)))
 
     def own(self, pad, unit):
         """Output ownership (§7.1): only the owner's TX half drives the pad."""
@@ -95,6 +101,14 @@ class Chip:
     def halt(self, lanes=None):
         for k in (range(len(self.lanes)) if lanes is None else lanes):
             self.lanes[k].running = False
+
+    def step_lane(self, k):
+        """STEP (§14 H2): on a halted lane, one EVAL now and its EXEC in the next clock."""
+        lane = self.lanes[k]
+        if lane.running:
+            raise RuntimeError("STEP needs a halted lane")
+        lane.stepping = True
+        self.step()
 
     def settle_inputs(self, ui=None, uio=None):
         """Pads held stable through reset: set the inputs and both synchroniser stages."""
@@ -147,7 +161,7 @@ class Chip:
         for lane in self.lanes:
             lane.compute_eval(now)
         rot = now % 4
-        if rot < len(self.lanes) and self.lanes[rot].running:
+        if rot < len(self.lanes) and (self.lanes[rot].running or self.lanes[rot].stepping):
             self.lanes[rot].mem_access(self.sram)
         for u in self.pins:
             sense = u.cfg.pin_a if u.cfg.pin_s is None else u.cfg.pin_s

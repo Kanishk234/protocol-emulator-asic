@@ -7,7 +7,7 @@ Modelled (general primitives, DECISIONS D-012/D-013):
   one- or two-phase word framing and optional echo suppression; plus an event generator
   (edges of A, optionally qualified by B's level) that covers edge timestamps and I2C
   START/STOP alike.
-Not yet: CLKGEN STRETCH, PULSE (raise NotImplementedError).
+Also CLKGEN STRETCH, PULSE symbols (D-019), carrier (D-024) and BITSYNC (bitsync.py, D-023).
 
 Time: "edge t" is the clock edge at the end of clock t; a pad output changed at edge t
 is visible from clock t+1. The TX cursor is kept in 1/256-clock units so fractional
@@ -146,6 +146,7 @@ class PinUnit:
         self._sel = True                # registered "selected" (pin C), used for OE gating
         self._sel_next = True
         self._deselect = False          # pin C went inactive this clock
+        self._loaded = False            # the RX producer was loaded this clock (§14 P19)
         self._car_n = 0                 # clocks since pin A became active (carrier phase)
         self.bs = None
         if c.txmode == "bitsync":
@@ -156,12 +157,12 @@ class PinUnit:
     def pad_drive(self):
         """(value, oe) this unit drives on pin A, from the registered output."""
         c = self.cfg
+        if c.c_oe and not self._sel:              # §14 P15: C_OE gates every TX mode (BUGS #37)
+            return self.level, 0
         if c.carrier and self.level != c.idle:
             p = round(c.carrier * 256)
             v = self.level if ((self._car_n << 8) % p) < p // 2 else c.idle
             return (0, int(v == 0)) if c.od else (v, self.oe)
-        if self.cfg.c_oe and not self._sel:
-            return self.level, 0
         if self.cfg.od:
             return 0, int(self.level == 0)
         return self.level, self.oe
@@ -221,7 +222,7 @@ class PinUnit:
                 self._rx_len = value
                 self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
             elif kind == "sample":
-                if a is not None:
+                if a is not None and self._sel_next:   # §14 P15: discarded while deselected
                     self._sample(a)
             else:
                 apply.append((_, kind, value))
@@ -362,6 +363,8 @@ class PinUnit:
         self._sel_next = sel
         if not sel:                                  # §14 P15: framing held in reset
             self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
+            if self._rx != "off":
+                self._rx = "wait_idle"                # and SHIFT_RX re-arms (BUGS #36)
         src, prev_src = (a, self._prev_a) if c.ev_pin == "a" else (sel_pin, self._prev_c)
         event = (c.ev_edge is not None and src is not None
                  and self._edge(prev_src, src, c.ev_edge)
@@ -421,8 +424,11 @@ class PinUnit:
                     self._rx = "wait_idle" if c.autorearm else "off"
 
     def _emit(self, tag, data):
-        if self.rx_prod.free():
+        # §14 P19: one RX load per clock. Call order gives the priority: EVENT, then the
+        # LINKED_RX/SHIFT_RX word (compute_rx), then the SAMPLE word (compute_tx). BUGS #35
+        if self.rx_prod.free() and not self._loaded:
             self.rx_prod.load(tag, data)
+            self._loaded = True
             self.stats["rx_tokens"] += 1
         else:                                   # §4.5: pins never wait; keep the old token
             self.flags["OVERRUN"] = 1
@@ -431,6 +437,7 @@ class PinUnit:
     # -------------------------------------------------------------- commit
     def commit(self):
         self._sel = self._sel_next
+        self._loaded = False
         self._car_n = self._car_n + 1 if self.level != self.cfg.idle else 0
         for _, kind, value in self._tx_apply:
             if kind == "oe":

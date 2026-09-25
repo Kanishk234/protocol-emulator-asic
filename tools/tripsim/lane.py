@@ -35,6 +35,7 @@ class Lane:
         self.rstep_inflight = False
         self.mem_req = None             # ("ENTRY", idx) | ("LD", addr, rd) | ("ST", addr, value)
         self.running = False
+        self.stepping = False           # §14 H2: one EVAL (+ its EXEC) on a halted lane
         # effects recorded this clock
         self._x = {}
         self._e = {}
@@ -48,6 +49,24 @@ class Lane:
         if self.running:
             raise RuntimeError("slots are writable only while the lane is halted")
         self.slots[n] = isa.decode_slot(word)
+
+    def _halted(self, what):
+        if self.running:
+            raise RuntimeError(f"{what} are writable only while the lane is halted")
+
+    def write_reg(self, i, value):
+        """Host write of r0-r3 (§9 lane register block, D-035 E2)."""
+        self._halted("registers")
+        self.regs[i] = value & isa.MASK16
+
+    def write_state(self, value):
+        self._halted("STATE")
+        self.state = value & 15
+
+    def write_k(self, i, value):
+        """Host write of K0-K3 (slot index 12, words 0-3; §14 H1)."""
+        self._halted("constants")
+        self.k[i] = value & isa.MASK16
 
     def flag_value(self, i):
         return self.rb if i == 3 else self.flags[i]
@@ -204,10 +223,10 @@ class Lane:
 
     def compute_eval(self, now):
         e = self._e = {}
-        if not self.running:
+        if not (self.running or self.stepping):
             return
         self.stats["clocks"] += 1
-        if now % self.fire_period:
+        if now % self.fire_period and not self.stepping:
             return
         ready = [n for n, s in enumerate(self.slots) if self._ready(s)]
         urgent = [n for n in ready if self.slots[n].U]
@@ -322,4 +341,5 @@ class Lane:
         if e.get("consume_rir"):
             self.rir = None
             self.rstep_inflight = True
+        self.stepping = False
         self._x, self._e, self._m = {}, {}, {}

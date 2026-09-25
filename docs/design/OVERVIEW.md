@@ -1,5 +1,9 @@
 # WARP overview
 
+The [September 25 architecture review](ANISH_RESEARCH_PLAN.md) adds the
+experiment order, comparison rules, host-bandwidth budget and configuration
+risks. Its proposals do not replace the phase-1 hardware contract.
+
 ## What we're building
 A protocol emulator chip for the Jane Street ASIC competition (Tiny Tapeout, IHP 130 nm CMOS5L, 6x4 tiles, deadline 2027-01-18, our target 2027-01-11).
 
@@ -22,7 +26,7 @@ The brief says the judges favor novel designs, unique functionality, and novel d
 1. **Profile** real protocol RTL and measure which resources it actually uses.
 2. **Specialize** the fabric where the profile shows a common need across several protocols.
 3. **Compare at equal area** against a generic fabric, showing the coverage/performance tradeoff (a Pareto chart).
-4. **Prove generality** on a held-out protocol set that was sealed before any architecture decision.
+4. **Evaluate generality** on a held-out set sealed before profiling. Disclose prior TRIPWIRE exposure; this cannot establish that the team had no earlier knowledge of those protocols.
 5. **Verify end to end**: from user Verilog, through the compiler and bitstream, to the loaded gate-level netlist.
 
 ## Protocol sets

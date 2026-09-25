@@ -1,42 +1,41 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+# WARP — programmable protocol fabric
 
-# Tiny Tapeout Verilog Project Template
+Research branch for the Jane Street Protocol Emulator ASIC Competition.
+WARP explores a small FABulous-based eFPGA with a fixed configuration and
+host-data shell, targeting Tiny Tapeout IHP CMOS5L in 6x4 tiles.
 
-- [Read the documentation for project](docs/info.md)
+**Status:** phase 0. The tapeout top is still a placeholder counter.
+Protocol implementations, the management shell and a physically validated
+WARP fabric are not implemented yet. `anish_branch` starts from the
+separate `efpga` history; `main` contains the team's TRIPWIRE direction.
 
-## What is Tiny Tapeout?
+Start with the [architecture review and experiment plan](docs/design/ANISH_RESEARCH_PLAN.md),
+then the [phase checklist](docs/design/phases/PHASE0_SETUP.md) and
+[worklog](docs/WORKLOG.md).
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+* [Configuration census and its limits](docs/reports/REFERENCE_CONFIG_CENSUS.md)
+* [Tiny FABulous integration research](docs/notes/tiny_fabulous.md)
+* [PRISM and other prior art](docs/notes/prior_art.md)
+* [Organizer questions — draft, not sent](docs/notes/organizer_questions.md)
+* [Architecture overview](docs/design/OVERVIEW.md)
+* [Versions](docs/VERSIONS.md), [decisions](docs/DECISIONS.md), [claims](docs/CLAIMS.md)
 
-To learn more and get started, visit https://tinytapeout.com.
+## Development
 
-## Set up your Verilog project
+Use Linux/WSL and Python **3.12 or 3.13** for the pinned FABulous/cocotb
+combination. `WARP_PYTHON=/path/to/python3.12 bash scripts/setup_venv.sh`
+selects an interpreter when creating `.venv`; it does not replace an
+existing incompatible environment. Install the documented EDA tools,
+activate the venv, then run `bash scripts/check_all.sh`.
 
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
+The configuration auditor can run without EDA tools or third-party Python
+packages in a Python venv:
 
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
+```sh
+python -m unittest discover -s tools/fabric_audit -p 'test_*.py' -v
+python -m tools.fabric_audit.configmem path/to/LUT4AB_ConfigMem.csv \
+  --frame-width 32 --frames 20 --expected-bits 616
+```
 
-## Enable GitHub actions to build the results page
-
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
-
-## Resources
-
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
-
-## What next?
-
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+The project uses the [Tiny Tapeout CMOS5L template](https://github.com/TinyTapeout/ttihp-verilog-template/tree/cmos5l).
+See [the project datasheet](docs/info.md) and [simulation instructions](test/README.md).

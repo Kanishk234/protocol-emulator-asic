@@ -1,0 +1,19 @@
+name: unit
+
+on: [push, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Create isolated environment
+        run: python -m venv .venv
+      - name: Configuration mapping audit and negative controls
+        run: .venv/bin/python -m unittest discover -s tools/fabric_audit -p 'test_*.py' -v

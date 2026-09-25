@@ -46,14 +46,15 @@ step "lint: iverilog -g2005"
 iverilog -g2005 -Isrc -s "$TOP" -o /dev/null "${SOURCES[@]}"
 echo "ok"
 
-step "synth: yosys sanity (no latches outside configuration storage)"
-# Latches are allowed only in generated fabric config storage and wp_cfg_* modules (CLAUDE.md).
+step "synth: yosys structural sanity"
+# check -assert validates connectivity, not the configuration-only latch policy.
+# A dedicated latch-policy check is still needed when configuration RTL is added.
 yosys -q -p "read_verilog -Isrc ${SOURCES[*]}; synth -top $TOP; check -assert"
 echo "ok"
 
-if compgen -G "tools/**/test_*.py" >/dev/null || compgen -G "tools/*/tests/test_*.py" >/dev/null; then
+if [ -d tools ]; then
   step "tools: pytest"
-  python -m pytest -q -n auto
+  python -m pytest -q tools
 fi
 
 step "test/: pin-level cocotb suite (RTL)"

@@ -21,6 +21,47 @@ Next:
 
 ---
 
+## 2026-09-24: Krithik + Claude (phase 1: pin-unit registers, spec freeze)
+Done:
+- **D-036: pin-unit configuration register layout** in `spec/tripwire.yaml` (`pin_config`):
+  - 22 words per unit at `0x3000 + u·0x20`, owners at `0x30C0`;
+  - all times are 16.8 clocks, and the sample point is an offset in 1/256 clocks;
+  - the generator validates it and emits the ARCHITECTURE §7.2 table;
+  - the model runs every configuration through `tripsim/pinregs.py`, and tripc emits `pin_regs` and rejects values that do not fit;
+  - `test_pinregs.py`, plus 5 generator validation cases.
+- **Area input:** 307 config bits per unit (~1,840 for six units), comparable to all the slot latches. Noted in D-036 for the phase 2 area estimate.
+- **D-037: spec frozen, v1.0.**
+- Tests: 220 fast tests pass (`-m "not slow"`); `gen --check` clean; full suite result below.
+
+Checklist boxes ticked (evidence):
+- None new. "All CI green on `main`" waits for these commits' CI runs.
+
+Next:
+- User: commit and push. Then send the run IDs of `test`, `unit`, `lint`, `docs` on the new HEAD, plus one manual `nightly`. `gds` does not run: `src/` is unchanged since run 35942676979.
+- Claude: tick the CI box with the run IDs and close Phase 1.
+- Kanishk: read D-036 and the §7.2 table.
+
+## 2026-09-24: Kanishk, Krithik + Claude (phase 1: §14 second-person review, D-035)
+Done:
+- **Kanishk reviewed §14** (with Claude reading `tools/`). He found gaps G9–G24 and model bugs #35–#37, and proposed D-035 items A–P.
+- **Krithik accepted D-035.** The two choices went to Claude: E2 = host-writable r0–r3 and STATE while halted; F = one RX load per clock, the loser sets OVERRUN.
+- **Applied (model side):**
+  - ARCHITECTURE §4.5, §5.1, §6.2, §9 (K at slot index 12; lane register block), §11, §12, §14 (new L12, H2, and text for B, C, E, F–M); ISA §4.4, §5.3; YAML JAM/FRAME text.
+  - Model: BUGS #35–#37 fixed; `Chip.step_lane` (H2), and a halted lane makes no SRAM accesses; `Lane.write_reg/write_state/write_k`, which `tripc.load` uses.
+- **Second pass over P20–P29, line by line:** G25–G31, answered in the §14 text; BUGS #38 (BITSYNC SETN rx n > 16) and #39 (own-frame bit missing on flag/SE0 frame ends), both fixed.
+- **Tests:** new `tools/tripsim/tests/test_semantics.py` (18 tests). A 12-mutation check (each fix reverted in turn) fails a test every time. Full suite: 220 passed, slow tests included; `gen --check` clean.
+
+Checklist boxes ticked (evidence):
+- [x] Zero OPEN items + §14 reviewed by two people: D-033, D-035 (accepted), `test_semantics.py`.
+
+Problems / decisions:
+- D-035. BUGS #35–#39.
+- Kanishk's review found that `spec/tripwire.yaml` has no pin-unit configuration register layout (PERIOD 16.8, SAMPLEOFS, SJW, CRC fields and so on). That is an encoding the RTL, host tools and area estimate all need, so it is done before the spec freeze (next).
+
+Next:
+- Pin-unit configuration register layout in `spec/tripwire.yaml` (+ generator, host map), reviewed by both.
+- Then the Phase 1 wrap-up: spec `status: frozen`, the CI box with run IDs, the final PHASE1 summary.
+
 ## 2026-09-24: Krithik + Claude (phase 1: spike lane vs. D-033)
 Worked from `ARCHITECTURE.md` §14 as pulled (26bdc86: L8–L11, R5–R6, H1); did not read `tools/`.
 

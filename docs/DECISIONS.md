@@ -568,7 +568,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - **Phase 2 inputs:** the latch SDC exception; local density ~42 % for the slot arrays (Metal3 66 % used even so); the read-back mux as the first wiring cut.
 
 ## D-035 (2026-09-24): §14 second-person review: new gaps G9–G24 and proposed rule changes
-- **Status: PROPOSED, awaiting Kanishk's approval item by item.** Nothing below has been applied to `ARCHITECTURE.md`, `ISA.md`, `spec/tripwire.yaml` or `tools/`.
+- **Status: ACCEPTED (2026-09-24), all items A–P.** Krithik: "you decide what's best" for the two open choices. E2 = host-writable r0–r3 and STATE (not the tripc rewrite: six lanes have no free slots for init code). F = the losing word sets OVERRUN. Applied to `ARCHITECTURE.md` §4.5, §5.1, §6.2, §9, §11, §12, §14; `ISA.md` §4.4, §5.3; `spec/tripwire.yaml` (JAM, FRAME text); and the model. Details under **Outcome** below.
 - **Context:** Kanishk's review of `ARCHITECTURE.md` §14 (with Claude, which read `tools/`), as the phase 1 checklist requires. Each rule was checked for ambiguity, for consistency with `ISA.md`, the rest of `ARCHITECTURE.md` and the YAML, and against `tools/tripsim` and its tests. Model edge cases were probed with throwaway scripts (not committed). Baseline: `pytest -n auto -m "not slow"`: 191 passed, 6 skipped; `gen --check` clean.
 - **Proposed changes.** Each item states the general need and its cost (D-012). "Model" means what `tools/tripsim` does today.
 
@@ -594,6 +594,46 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 
 - **Tests to add with the approved items** (rules no test pins today): L3 (time at EVAL, registers at EXEC), L8 KT with a non-input A in the model, L9, L10 f3 writes, R4, R5, R6, P2/§4.5 overrun (every test asserts OVERRUN = 0), P18 and P19 edges, H2 STEP.
 - **Approval:** pending (Kanishk).
+- **Outcome (2026-09-24, Krithik + Claude, model side):**
+  - Every item A–P is applied as proposed. For J, the text also states the limit: the model computes event time from reset, while the RTL restarts the tick counter on a PRESC write. They agree because pin units are configured before RUN.
+  - Model changes:
+    - BUGS #35–#37 fixed (one RX load per clock; SHIFT_RX re-arms after a deselect; C_OE gates the carrier);
+    - H2 STEP (`Chip.step_lane`), with halted lanes making no SRAM accesses;
+    - E2 host writes (`Lane.write_reg/write_state/write_k`, halted only), which `tripc.load` now uses;
+    - stale comments fixed (N, P).
+  - Tests: `tools/tripsim/tests/test_semantics.py` pins L3, L8, L9, L10, R4, R5, R6, H2, E2, P15, P18 and P19. Reverting each fix (12 mutations) fails a test.
+  - **Second pass over P20–P29, line by line** (Kanishk's review covered them at structure level only). Gaps found, each answered in the §14 text:
+    - G25: P20 said idle ends any frame, while P27 said idle does not end a flag frame. Answer: idle ends a frame without a verdict, only while we are not driving and never with DELIM = se0; configurations need IDLE_BITS above the longest legal in-frame recessive run (≥ STUFF_N + 2 for flags; HDLC uses 8 with STUFF_N 5).
+    - G26: P22 resync also applies before the bus is idle again, not only inside a frame.
+    - G27: P24's last word is its low 12 bits, and a CRC mismatch is not a P26 error (no abort, no armed JAM).
+    - G28: FRAME is LATE when the count is already *at* n, or word framing has stopped.
+    - G29: in BITSYNC, TX tokens also wait for SE0/J items and `WAIT` [1]; `SETN` rx applies at once; non-BITSYNC CTRL ops are ignored; within one `LINE`, [6] acts before [3] and the CRC goes out before the SE0.
+    - G30: the discard after an arbitration loss ends at `WAIT` [1], not any WAIT.
+    - G31: JAM disarm is [4] together with [0] (what `can.trw` sends: 0xB011); with [1] and [2] both set, [1] wins; a response JAM in our own frame is dropped; a new JAM replaces one in progress.
+    - Two model bugs, fixed: BUGS #38 (BITSYNC `SETN` rx n = 17–31 was not 16) and #39 (frame-end EVENTs from a flag or SE0 lacked data[14] = own frame).
+  - Full suite: 220 passed (slow tests included); `gen --check` clean.
+
+## D-036 (2026-09-24): pin-unit configuration register layout in the spec
+- **Context:** Kanishk's §14 review (D-035) found that `spec/tripwire.yaml` gave the pin-unit settings no bit layout: PERIOD's 16.8 format, SAMPLEOFS, CARRIER, SJW, the CRC fields and the rest. Without a layout, P5 and P11 rounding could not be bit-exact between model and RTL, and there was nothing to size for the area estimate.
+- **Decision:** a `pin_config` section in `spec/tripwire.yaml`. One 32-word block per unit at `0x3000 + u·0x20`, of which 22 words are used; output owners at `0x30C0 + (pad − 8)`. The generator validates it (no overlaps, word-aligned wide fields, pads 5 bits, enum codes fit) and emits `PIN_CFG_*` tables plus the ARCHITECTURE §7.2 table. There is no Verilog output yet, so `src/` is unchanged; it comes with the phase 2 RTL.
+  - All times are exact 16.8 clock counts (PERIOD, CARRIER and SJW: 24 bits each).
+  - The sample point is stored as an offset in 1/256 clocks, `round(SAMPLEOFS·PERIOD·256)`, not as a fraction. The rounding happens in the host, and the hardware needs no multiplier.
+  - Lengths are stored as n − 1 or n with 0 = default; pads use 31 = not attached.
+- **The model is held to the registers:** `Chip.pin_config` runs every configuration through `tools/tripsim/pinregs.py` (encode, then decode), and tripc emits each unit's register words (`pin_regs`) and rejects values that do not fit. Every program and test runs unchanged through the round trip. `test_pinregs.py` checks that the layout covers exactly the model's settings, that all 20 programs round-trip exactly, a known encoding, and the range errors.
+- **Cost (input to the phase 2 area estimate):** 307 configuration bits per unit, so about 1,840 for six units plus 48 owner bits. That is comparable to the 1.9K slot latch bits of three lanes.
+  - Written only while halted, so they could be latches like the slots.
+  - They are the main term behind the "not every unit needs every option" idea (heterogeneous units). The BITSYNC and CRC fields alone are 112 bits per unit.
+  - Any width reduction needs a DECISIONS entry now that the spec is frozen (D-037).
+- **Review:** Krithik delegated the choice. Kanishk should read this entry and the §7.2 table; a change after the freeze goes through a new entry.
+
+## D-037 (2026-09-24): phase 1 spec freeze (spec v1.0)
+- **Decision:** `spec/tripwire.yaml` is **frozen** at version 1.0. From now on every change to an encoding, a field, a command, the fabric table or the pin-unit registers needs its own DECISIONS entry, and the generated files follow.
+- **Basis:**
+  - every `ISA.md` §9 row is answered (D-029);
+  - zero OPEN items;
+  - §14 reviewed by two people (D-033, D-035);
+  - R1–R3 decided (D-030, D-031, D-032, D-034);
+  - the pin-unit register layout is in the spec (D-036).
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

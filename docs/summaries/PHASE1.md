@@ -111,14 +111,25 @@ We also made the per-push tests about 20 times faster locally by moving the five
 
 So the "every other clock" fallback isn't needed (D-030, accepted). These numbers are before layout: real wires will add delay, but the worst case would have to grow by about two-thirds to fail. The R2 run will measure it after layout. One lane with latch-based rule memory comes to about 65K µm², so three lanes use about a fifth of the chip. Writing the Verilog without the model also turned up eight places where the documents leave a choice open or contradict themselves (for example, which register one field selects). None of them affects timing, but they need answering in the rules before the real Verilog is written.
 
+**17. Two people checked the cycle-by-cycle rules, and we froze the spec.** The rules that say exactly what happens on each clock are what the Verilog and the model must both follow, so gaps there turn into mismatches later.
+- Writing R1's lane from the documents alone found 8 gaps (D-033).
+- Kanishk's review of every rule found 16 more, plus 3 bugs in the model (D-035).
+- A line-by-line pass over the most complex pin-unit mode (BITSYNC, used for CAN, HDLC and USB) found 7 more, plus 2 small model bugs.
+
+All are now answered in the rules, and each answer has a test. We checked the tests by breaking each fix on purpose and confirming a test fails.
+
+Two decisions came out of the review:
+- the host can now write a lane's registers while it is stopped, because five programs start with nonzero register values;
+- a pin unit loads at most one word per clock, and a word that loses sets the overrun flag.
+
+The review also found that the pin units' settings had no register layout at all. That's now in the spec (D-036): 22 host words per unit, with all times as exact fixed-point clock counts. The model runs every setting through that layout, so it can only use values the chip can hold.
+
+The layout also gave a useful number for Phase 2: the settings take about 307 bits per pin unit, comparable to all the lanes' rule memory. That makes "not every pin unit needs every option" the first idea to price when we estimate area.
+
+With every question answered, the rules reviewed and the three hardware risks retired, the spec is frozen as version 1.0 (D-037). Every change from now on needs a written decision.
+
 ## What's left in Phase 1
-1. **Freeze the spec:** flip `spec/tripwire.yaml` from draft to frozen once the hardware experiments below have had their say.
-2. **A second person reviews the cycle-by-cycle rules.** The freeze decision (D-029) is accepted and applied: the connection table is in the spec and the compiler enforces it, the host's MISO pin moved so the demo board's hardware SPI can reach it, and no open questions remain in the design documents.
-3. **Hardware experiments:**
-   - R1: done (item 16); D-030 accepted;
-   - R2: done. One lane with its latch-based rule memory passed the full flow on a 4x2 test chip, on the 4th attempt. The first three attempts showed that the latches need one timing-tool exception and that their wiring needs room: about 42 % placement density instead of the usual 60 %. After layout, the lane still has about 7 ns to spare per clock in the worst case, which confirms the every-clock decision (D-030, D-032, D-034);
-   - R3: done. The SRAM macro passed Tiny Tapeout's full flow (hardening, precheck and the gate-level test) on a small test chip, so the routine memory uses the real macro (D-031).
-4. **Answer the eight open choices** R1 found (`docs/reports/R1_LANE_TIMING.md` §6) in the cycle-by-cycle rules.
+1. **CI green on the final commit:** push these changes and record the run IDs of every workflow, including one `nightly` run.
 
 ## In one line
-Phase 1 so far has shown, in a faithful simulation, that the architecture handles every required protocol at the speeds that matter, and it has corrected the design along the way. What's left is locking that design down and testing the riskiest hardware assumptions.
+In simulation, the architecture handles every required protocol and many stretch ones at the speeds that matter. Its riskiest hardware assumptions held up on real chip tooling: the lane fires every clock, and both the latch memory and the SRAM survive Tiny Tapeout's flow. The spec is now frozen, and Phase 2 starts with an area estimate, because space, not speed, is the next constraint.

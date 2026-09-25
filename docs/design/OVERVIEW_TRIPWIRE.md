@@ -6,7 +6,7 @@ This is the single overarching document for the idea. It starts with what is new
 
 Status: **concept stage.** All numbers are paper estimates until synthesis.
 
-Companion documents: `ARCHITECTURE.md` (the hardware contract: datapath, formats, instruction sets) and `VERIFICATION.md` (tools, layers, proofs, CI).
+Companion documents: `ARCHITECTURE.md` (the hardware contract: datapath, formats, instruction sets) and `VERIFICATION.md` (tools, layers, proofs, CI). New to the project? Start with `docs/HOW_IT_WORKS.md`, the plain-language introduction.
 
 **The name.** A tripwire does nothing until something crosses it, then it fires at once. TRIPWIRE's instructions work the same way: each one waits on a condition and fires the instant that condition becomes true.
 

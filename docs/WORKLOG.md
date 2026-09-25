@@ -21,6 +21,28 @@ Next:
 
 ---
 
+## 2026-09-25: Krithik + Claude (phase 2 start: plan update, area estimate)
+Done:
+- `docs/HOW_IT_WORKS.md`: plain-language introduction (kitchen analogy); linked from OVERVIEW and CLAUDE.md.
+- `PHASE2_RTL_CORE.md` updated with phase 1's findings:
+  - helpers out (D-029);
+  - pin-unit scope per §7 and the P-rules;
+  - R2/R3 physical inputs (latch SDC exception, density ~42 % for the slot arrays, SRAM macro);
+  - new task 2.0: area estimate first.
+- **Area estimate (task 2.0), `docs/reports/AREA_ESTIMATE.md`:**
+  - building blocks synthesized alone (`spikes/area/`), multiplied by counts from the spec;
+  - **the frozen spec does not fit: ~109-120 % of the 6x4 core placed.** Pin units are ~84K µm² each, about half of the chip;
+  - options priced (latch config, heterogeneous units, a leaner core, 4 units, 2 lanes, no read-back); only nearly all of them together reach a routable ~56-61 %.
+- The project `.venv` was missing; recreated with `scripts/setup_venv.sh`.
+
+Checklist boxes ticked (evidence):
+- Phase 2 entry criteria (phase 1 complete, CI green on `367aacc`).
+
+Next:
+- Team decision on the area options (AREA_ESTIMATE §8): latch config, no slot/config read-back, heterogeneous units now; the rest after measuring.
+- RTL session: write `trw_pin_unit` first and synthesize it, to replace the glue guess.
+- Ask Jane Street / Tiny Tapeout whether 8x4 will be offered.
+
 ## 2026-09-25: Krithik + Claude (phase 1 closed)
 Done:
 - Pushed the D-035/D-036/D-037 commits (`ffb7d7d`..`367aacc`). The two tripc files missed in the tools commit went in separately as `367aacc`.

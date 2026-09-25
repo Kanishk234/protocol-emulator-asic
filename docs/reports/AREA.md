@@ -13,6 +13,7 @@ One row per `gds` hardening (see `../design/PHYSICAL_DESIGN_AND_CI.md` §10). Ju
 | Date | What | Source | Result |
 |---|---|---|---|
 | 2026-09-24 | R1 spike: one lane (12 slots, EVAL/EXEC, ALU) + 2 consumer ports, Yosys onto cmos5l typ, no layout | `spikes/r1_lane/run_r1.sh`; `R1_LANE_TIMING.md` §4 | Latch slots: ~65K µm² per lane (lane 35.0K, ALU 5.9K, slots 24.5K = 636 + 64 latch bits + 52 `lgcp` clock gates); 170 lane flops. Flop slots: slots 51.7K. Three lanes with latches ~196K µm² (22 % of the core). EVAL at 20 ns: worst slack +7.9 ns (slow corner, worst of the re-runs) |
+| 2026-09-25 | Whole chip at the frozen spec (v1.0), before any chip RTL: building blocks synthesized alone (`spikes/area/ae_prims.v`) x counts from the spec, R1 lane, R3 macro; layout growth x1.30 from R2 | `spikes/area/run_area.sh`, `estimate.py`; `AREA_ESTIMATE.md` | Placed ~984K-1,083K µm², **109-120 % of the core** (pin units ~84K each, ~504K for six; lanes 196K). Options and savings in `AREA_ESTIMATE.md` §7 |
 
 ## Row notes
 

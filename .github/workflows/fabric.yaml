@@ -1,0 +1,66 @@
+name: fabric
+# WARP's own workflow: build a FABulous fabric, compile user designs to bitstreams, and run them
+# on the fabric simulation. Phase 0: the stock-fabric two-bitstream demo (spikes/fab_demo).
+# Tool versions: docs/VERSIONS.md (FABulous 2.2.0 needs OSS CAD Suite 2026-06-29).
+on:
+  push:
+    paths:
+      - 'arch/**'
+      - 'protocols/**'
+      - 'spikes/fab_demo/**'
+      - 'tools/**'
+      - 'requirements-dev.txt'
+      - '.github/workflows/fabric.yaml'
+  workflow_dispatch:
+
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+
+jobs:
+  fab_demo:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      # Ubuntu 24.04's own Python 3.12 (as in local WSL); FABulous needs >= 3.12 and imports tkinter.
+      - name: Install Icarus, Python venv and Tk
+        run: sudo apt-get update && sudo apt-get install -y iverilog python3-venv python3-tk
+
+      - name: Cache OSS CAD Suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+
+      - name: Install OSS CAD Suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+
+      - name: Create venv
+        run: |
+          /usr/bin/python3 -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements-dev.txt
+
+      - name: Tool versions
+        run: |
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          yosys -V; nextpnr-generic --version 2>&1 | head -1; iverilog -V 2>&1 | head -1
+          .venv/bin/pip show FABulous-FPGA | head -2
+
+      - name: Two bitstreams in one fabric (spikes/fab_demo/run.sh)
+        run: spikes/fab_demo/run.sh
+
+      - name: Upload logs
+        if: success() || failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fab_demo_logs
+          path: |
+            build/fab_demo_logs/
+            build/fab_demo/user_design/*_npnr_log.txt

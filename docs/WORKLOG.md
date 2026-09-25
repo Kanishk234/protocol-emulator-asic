@@ -21,6 +21,19 @@ Next:
 
 ---
 
+## 2026-09-25: Krithik + Claude (phase 1 closed)
+Done:
+- Pushed the D-035/D-036/D-037 commits (`ffb7d7d`..`367aacc`). The two tripc files missed in the tools commit went in separately as `367aacc`.
+- Collected CI on `367aacc`: every workflow passed.
+
+Checklist boxes ticked (evidence):
+- "All CI workflows still green on `main`": `test` 36079759567, `unit` 36079759530, `lint` 36079759569, `docs` 36079759587, `gds` 36079759590 (all four jobs), `nightly` 36079785059 (manual) and 36136704498 (scheduled).
+- That was the last box: **Phase 1 is complete.** Summary: `docs/summaries/PHASE1.md`.
+
+Next:
+- Phase 2, first task: area estimate for pin units, fabric and host, pricing heterogeneous pin units first (D-036).
+- Kanishk: read D-036 and the §7.2 table.
+
 ## 2026-09-24: Krithik + Claude (phase 1: pin-unit registers, spec freeze)
 Done:
 - **D-036: pin-unit configuration register layout** in `spec/tripwire.yaml` (`pin_config`):

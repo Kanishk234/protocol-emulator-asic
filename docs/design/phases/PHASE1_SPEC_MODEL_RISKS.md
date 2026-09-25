@@ -103,7 +103,7 @@ The §2.4 risk spikes run in parallel from the start.
 - [x] **R2 decided:** the latch-array test project passed precheck and `gl_test`, or the flop fallback is chosen and logged. *(Evidence, 2026-09-24: `gds` run 36060938609 on `spike/r2-latch` (c4ef059): gds, precheck, gl_test green; latch slots kept (D-032, D-034); `AREA.md` row 3. Post-route EVAL slack +6.94 ns at the slow corner confirms D-030.)*
 - [x] **R3 decided:** the SRAM smoke project passed precheck and `gl_test`, or the fallback is chosen and logged. *(Evidence, 2026-09-24: `gds` run 35961480554 on `spike/r3-sram` (09e8697): gds, precheck, gl_test green; the macro is kept (D-031). Project: `spikes/r3_sram/`.)*
 - [x] Jane Street answers logged, or the assumptions stated. *(DECISIONS D-003: design for 6x4; SRAM macro assumed usable, settled by R3 with the flop-store fallback kept.)*
-- [ ] All CI workflows still green on `main`.
+- [x] All CI workflows still green on `main`. *(Evidence: all on `367aacc`, the frozen-spec HEAD: `test` 36079759567, `unit` 36079759530, `lint` 36079759569, `docs` 36079759587, `gds` 36079759590 (gds, precheck, gl_test, viewer all passed), `nightly` 36079785059 (manual; `full` and `r1-fallback` passed) and 36136704498 (scheduled).)*
 
 ## 5. Risks in this phase
 | Risk | Response |

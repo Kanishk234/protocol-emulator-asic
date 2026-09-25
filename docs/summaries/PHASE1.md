@@ -129,7 +129,11 @@ The layout also gave a useful number for Phase 2: the settings take about 307 bi
 With every question answered, the rules reviewed and the three hardware risks retired, the spec is frozen as version 1.0 (D-037). Every change from now on needs a written decision.
 
 ## What's left in Phase 1
-1. **CI green on the final commit:** push these changes and record the run IDs of every workflow, including one `nightly` run.
+Nothing. Every workflow passed on the final commit `367aacc`: `test`, `unit`, `lint`, `docs`, `gds` (including precheck and the gate-level test) and `nightly` (run IDs in the checklist). **Phase 1 is complete (2026-09-25).**
+
+Carried into Phase 2:
+- An area estimate for the pin units, fabric and host interface, starting with the price of heterogeneous pin units (D-036).
+- Kanishk reads D-036 and the §7.2 register table.
 
 ## In one line
 In simulation, the architecture handles every required protocol and many stretch ones at the speeds that matter. Its riskiest hardware assumptions held up on real chip tooling: the lane fires every clock, and both the latch memory and the SRAM survive Tiny Tapeout's flow. The spec is now frozen, and Phase 2 starts with an area estimate, because space, not speed, is the next constraint.

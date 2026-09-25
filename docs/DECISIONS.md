@@ -64,3 +64,9 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** use `mole99/fabulous-tiles` at 7999e5a (the Tiny FABulous tile library) with `spikes/tile_cmos5l/cmos5l.patch`, applied to a fresh clone in `build/`, never to the upstream checkout. The patch (1) gives `ihp-sg13cmos5l` its own routing-obstruction list (Metal1–Metal4 + TopMetal1) ahead of the `ihp-sg13*` entry, which lists Metal5/TopMetal2; (2) adds a `pdk::ihp-sg13cmos5l` section to the tiny library's `common.yaml`, with the power grid of the PDK's own LibreLane config (Metal4 vertical, TopMetal1 horizontal, 50 µm pitch) and `RT_MAX_LAYER: TopMetal1`.
 - **Reason:** CMOS5L has only 5 metal layers (`libs.tech/librelane/config.tcl`: "M1-M4-TM1, no Metal5/TopMetal2"). The upstream IHP settings are for SG13G2 (7 layers) and reference layers that don't exist.
 - **Consequence to watch:** one fewer signal layer than SG13G2, so the SG13G2 tile size and 96 % density may not route. Measured in `docs/reports/tile_cmos5l.md`.
+
+## D-011: The `unit` workflow arrives with the first Python tool
+- **Date:** 2026-09-25 · **Status:** Accepted
+- **Decision:** phase 0's "add `lint` and `unit` workflows" is met by `lint` now; `unit` (pytest over `tools/`) is added in the same commit as the first Python tool with tests (phase 1: `tools/areamodel/` or `tools/refmodels/`). The phase 0 box is ticked for `lint`, the `gds` paths filter and concurrency, and marked as deferred for `unit` with this reference.
+- **Reason:** there is no Python code yet; a `unit` workflow with nothing to test would pass without checking anything.
+- **Meanwhile:** `fabric` (added early) runs the FABulous flow in CI.

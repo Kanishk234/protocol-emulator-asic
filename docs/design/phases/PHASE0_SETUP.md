@@ -20,7 +20,7 @@
 ### Template flow
 - [x] The template's trivial design passes `test`, `gds` (including precheck and `gl_test`) on CI. (a63877d: `test` 36170807382, `gds` 36170807513 with precheck + `gl_test` green, `docs` 36170807355)
 - [ ] Record the hardening time and resource usage in `PHYSICAL_DESIGN_AND_CI.md`.
-- [ ] Add `lint` and `unit` workflows as separate files; set the `gds` paths filter and concurrency.
+- [x] Add `lint` and `unit` workflows as separate files; set the `gds` paths filter and concurrency. (`lint` green, e.g. 36201114473; `gds` filter + non-cancelling concurrency in `gds.yaml`; `unit` deferred to the first Python tool, D-011; `fabric` added early, 36196784852)
 
 ### FABulous flow
 - [x] Pick one FABulous release (or known-working commit set) and record every tool version in `docs/VERSIONS.md`. (FABulous 2.2.0 + OSS CAD Suite 2026-06-29; CI LibreLane version still to fill in from the `gds` log)
@@ -33,12 +33,12 @@
 - [x] Read PRISM's documentation: what it does, how its programming model differs from ours. Notes in `docs/notes/prior_art.md`. (done 2026-09-25, from its TT page)
 
 ## Phase exit checklist
-- [ ] Template trivial design green on all template workflows (CI run IDs: …)
+- [x] Template trivial design green on all template workflows (CI run IDs: `test` 36201114424, `docs` 36201114418, `fpga` 36201219254 on 548c5d0; `gds` + precheck + `gl_test` 36170807513 on a63877d, `src/` unchanged since)
 - [x] FABulous reference: two different bitstreams loaded and run in the same fabric simulation (log summary in `docs/reports/`) (`docs/reports/fab_demo.md`; local 2026-09-25 and CI `fabric` 36196784852)
-- [ ] `docs/VERSIONS.md` complete and matches what was run
+- [x] `docs/VERSIONS.md` complete and matches what was run (every tool used by the template flow, the FABulous demo and the tile spike, 2026-09-25)
 - [x] Hardening time recorded (`PHYSICAL_DESIGN_AND_CI.md`, run 36170807513: `gds` job 35 min, precheck 12 min)
 - [ ] Organizer email sent (date noted); answer logged when it arrives
 - [x] Tiny FABulous integration method understood and written down (`docs/notes/tiny_fabulous.md`)
 - [x] Decision point: is there a known path to put a FABulous fabric through the TT CMOS5L flow? (answer in DECISIONS) (D-009: yes; tile hardening on cmos5l still to be shown)
 - [ ] All CI workflows green on `efpga`
-- [ ] `docs/summaries/PHASE0.md` written
+- [x] `docs/summaries/PHASE0.md` written (in-progress version 2026-09-25; finalize at the phase close)

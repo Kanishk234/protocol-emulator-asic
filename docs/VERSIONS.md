@@ -14,6 +14,9 @@ Every tool used by any flow must be listed. Local PATH order: DECISIONS D-007.
 | Verilator | 5.020 (local and CI `lint`: Ubuntu 24.04 apt) | apt | matches CI |
 | SymbiYosys | from OSS CAD Suite 2026-06-29 | | |
 | LibreLane | CI `gds`: **3.1.0.dev3** (default `librelane-version` of `tt-gds-action@ihp-cmos5l`, 3412659, pip); 3.0.14 in the venv (FABulous dependency); 3.0.0 in the FABulous LibreLane plugin (Nix) | tt-gds-action `action.yml` | Tile hardening uses the plugin's pin |
+| Nix | 2.35.2 (multi-user, systemd) | nixos.org installer; FOSSi binary cache in `/etc/nix/nix.conf` | Tile/fabric hardening only |
+| FABulous tile library | `mole99/fabulous-tiles` 7999e5a + `spikes/tile_cmos5l/cmos5l.patch` (D-010) | GitHub | Its flake pins `librelane_plugin_fabulous/1.10.2` (the plugin reports itself as 1.2.0) |
+| Tile-flow tools (from that flake) | LibreLane 3.0.0; OpenROAD dcf36133; KLayout 0.30.7; Magic 8.3.623; Netgen 1.5.316; Yosys 0.62 | Nix, FOSSi cache | Differs from the CI `gds` job's LibreLane (3.1.0.dev3) |
 | PDK (IHP CMOS5L) | IHP-Open-PDK 2bbec755dc67ca3db0261c3d6163e15735d66710 | same revision as `tt-gds-action@ihp-cmos5l` | used by `scripts/gl_local.sh` |
 | Python | 3.12.3 (WSL); CI `test`/`lint` use 3.11 | | FABulous needs >= 3.12 |
 | cocotb | 2.0.1 | `test/requirements.txt` | |

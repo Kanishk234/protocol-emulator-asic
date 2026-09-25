@@ -1,0 +1,44 @@
+diff --git a/tiles.py b/tiles.py
+index c86f9fe..ece592f 100755
+--- a/tiles.py
++++ b/tiles.py
+@@ -205,6 +205,10 @@ tile_obstruction_layers = {
+         "gf180mcu*": {
+             "*"         : ["Metal1", "Metal2", "Metal3", "Metal4", "Metal5"],
+         },
++        # WARP: CMOS5L has M1-M4 + TopMetal1 only; must match before "ihp-sg13*"
++        "ihp-sg13cmos5l": {
++            "*"         : ["Metal1", "Metal2", "Metal3", "Metal4", "TopMetal1"],
++        },
+         "ihp-sg13*": {
+             "*"         : ["Metal1", "Metal2", "Metal3", "Metal4", "Metal5", "TopMetal1", "TopMetal2"],
+         },
+diff --git a/tiles/tiny/common/common.yaml b/tiles/tiny/common/common.yaml
+index e2fa610..c6d2075 100644
+--- a/tiles/tiny/common/common.yaml
++++ b/tiles/tiny/common/common.yaml
+@@ -60,6 +60,24 @@ pdk::ihp-sg13g2:
+     PDN_HPITCH: 75.6
+     PDN_HOFFSET: 13.57
+ 
++# WARP: CMOS5L has M1-M4 + TopMetal1 only (no Metal5/TopMetal2).
++# Power grid as in the PDK's LibreLane config: Metal4 vertical, TopMetal1 horizontal.
++pdk::ihp-sg13cmos5l:
++    RT_MAX_LAYER: TopMetal1
++    FP_PDN_VERTICAL_LAYER: Metal4
++    FP_PDN_HORIZONTAL_LAYER: TopMetal1
++    PDN_MULTILAYER: True
++
++    PDN_VWIDTH: 1.0
++    PDN_VSPACING: 2.0
++    PDN_VPITCH: 50.0
++    PDN_VOFFSET: 10.0
++
++    PDN_HWIDTH: 2.0
++    PDN_HSPACING: 4.0
++    PDN_HPITCH: 50.0
++    PDN_HOFFSET: 10.0
++
+ pdk::gf180mcuD:
+     # Routing
+     RT_MAX_LAYER: Metal4

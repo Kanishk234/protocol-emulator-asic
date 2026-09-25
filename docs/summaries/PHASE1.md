@@ -1,6 +1,6 @@
 # Phase 1: will the idea actually work?
 
-**Status:** in progress. The feasibility work is done; the spec freeze, the compiler and the hardware experiments remain (see the end). The plan and checklist are in `docs/design/phases/PHASE1_SPEC_MODEL_RISKS.md`.
+**Status:** complete (2026-09-25). Every checklist item passed, with all CI workflows green on `367aacc`. The plan and checklist are in `docs/design/phases/PHASE1_SPEC_MODEL_RISKS.md`.
 
 ## The goal
 Phase 0 proved the *tools* work. Phase 1 asks whether the *idea* works, before we spend weeks building hardware. We changed the plan's order to answer that first ("model first", DECISIONS D-008): build a faithful software copy of the chip, run real protocols on it, and let the results shape the design before it is frozen.
@@ -110,6 +110,10 @@ We also made the per-push tests about 20 times faster locally by moving the five
 | Time available per clock | 20 ns | 20 ns |
 
 So the "every other clock" fallback isn't needed (D-030, accepted). These numbers are before layout: real wires will add delay, but the worst case would have to grow by about two-thirds to fail. The R2 run will measure it after layout. One lane with latch-based rule memory comes to about 65K µm², so three lanes use about a fifth of the chip. Writing the Verilog without the model also turned up eight places where the documents leave a choice open or contradict themselves (for example, which register one field selects). None of them affects timing, but they need answering in the rules before the real Verilog is written.
+
+**16b. The other two hardware experiments (R2, R3) passed.**
+- **R2** put the lane, with its latch-based rule memory, through the full Tiny Tapeout layout flow on a 4x2-tile test area. It placed and routed cleanly, and after layout the slow-chip timing still had +6.94 ns to spare out of 20 ns (D-032, D-034).
+- **R3** checked that the 512x16 IHP SRAM block, which holds the routines, survives the same flow. It did, so we keep it (D-031).
 
 **17. Two people checked the cycle-by-cycle rules, and we froze the spec.** The rules that say exactly what happens on each clock are what the Verilog and the model must both follow, so gaps there turn into mismatches later.
 - Writing R1's lane from the documents alone found 8 gaps (D-033).

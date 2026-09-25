@@ -11,3 +11,13 @@ test/sim_build
 test/__pycache__/
 test/results.xml
 test/gate_level_netlist.v
+.venv/
+
+# WARP: local build/sim/formal output (CI keeps these as artifacts)
+build/
+sim_build/
+logs/
+results.xml
+__pycache__/
+.pytest_cache/
+.hypothesis/

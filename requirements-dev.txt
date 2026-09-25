@@ -1,0 +1,8 @@
+# Local development Python packages (installed into .venv by scripts/setup_venv.sh).
+# test/requirements.txt is what the template's CI `test` job installs; keep it minimal.
+-r test/requirements.txt
+hypothesis==6.168.1
+pyyaml==6.0.3
+pytest-xdist==3.8.0
+# Fabric generation, mapping, place and route, bitstream (D-001; versions in docs/VERSIONS.md)
+FABulous-FPGA==2.2.0

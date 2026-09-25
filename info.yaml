@@ -1,56 +1,57 @@
 # Tiny Tapeout project information
 project:
-  title:        ""      # Project title
-  author:       ""      # Your name
+  title:        "WARP"      # Project title
+  author:       "Kanishk Sama"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  ""      # One line description of what your project does
+  description:  "Reprogrammable protocol emulator: an eFPGA fabric specialized for UART, SPI, I2C and other serial protocols"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+  clock_hz:     50000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+  tiles: "6x4"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_example"
+  top_module:  "tt_um_warp"
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
-    - "project.v"
+    - "tt_um_warp.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
+# Provisional (DECISIONS D-006) until ARCHITECTURE.md section 1 is written.
 pinout:
   # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  ui[0]: "HOST_CS_N"
+  ui[1]: "HOST_SCK"
+  ui[2]: "HOST_MOSI"
+  ui[3]: "FAB_IN0"
+  ui[4]: "FAB_IN1"
+  ui[5]: "FAB_IN2"
+  ui[6]: "FAB_IN3"
+  ui[7]: "FAB_IN4"
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "HOST_MISO"
+  uo[1]: "HOST_IRQ"
+  uo[2]: "FAB_OUT0"
+  uo[3]: "FAB_OUT1"
+  uo[4]: "FAB_OUT2"
+  uo[5]: "FAB_OUT3"
+  uo[6]: "FAB_OUT4"
+  uo[7]: "FAB_OUT5"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "FAB_IO0"
+  uio[1]: "FAB_IO1"
+  uio[2]: "FAB_IO2"
+  uio[3]: "FAB_IO3"
+  uio[4]: "FAB_IO4"
+  uio[5]: "FAB_IO5"
+  uio[6]: "FAB_IO6"
+  uio[7]: "FAB_IO7"
 
 # Do not change!
 yaml_version: 6

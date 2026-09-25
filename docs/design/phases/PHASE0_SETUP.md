@@ -30,7 +30,7 @@
 
 ### Prior art study
 - [x] Read Tiny FABulous: how the fabric is integrated into Tiny Tapeout (flat or macro), how configuration is loaded, how tests are organized. Notes in `docs/notes/tiny_fabulous.md`. (done 2026-09-25)
-- [ ] Read PRISM's documentation: what it does, how its programming model differs from ours. Notes in `docs/notes/prior_art.md`.
+- [x] Read PRISM's documentation: what it does, how its programming model differs from ours. Notes in `docs/notes/prior_art.md`. (done 2026-09-25, from its TT page)
 
 ## Phase exit checklist
 - [ ] Template trivial design green on all template workflows (CI run IDs: …)

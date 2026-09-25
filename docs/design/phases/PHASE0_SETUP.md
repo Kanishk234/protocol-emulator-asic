@@ -6,16 +6,16 @@
 ## Tasks
 
 ### Repository and competition
-- [ ] Create the repo from the CMOS5L template; set `info.yaml` tiles to 6x4 and the top module to `tt_um_warp`.
+- [x] Create the repo from the CMOS5L template; set `info.yaml` tiles to 6x4 and the top module to `tt_um_warp`. (template commit beb67c3; `info.yaml` 6x4 / `tt_um_warp`, local `tt_tool.py --check-docs` passes 2026-09-25; CI run ID pending push)
 - [ ] Fill in the competition sign-up form.
 - [ ] Email asic-competition@janestreet.com: (1) is an eFPGA-based emulator with no CPU eligible, (2) is a separately hardened fabric macro allowed inside the template flow. Log the question and answer in DECISIONS.
-- [ ] Create `docs/` skeleton files (WORKLOG, DECISIONS, BUGS, CLAIMS, VERSIONS, summaries/, reports/).
+- [x] Create `docs/` skeleton files (WORKLOG, DECISIONS, BUGS, CLAIMS, VERSIONS, summaries/, reports/). (all present; `notes/` too)
 
 ### Environment
-- [ ] `scripts/setup_venv.sh` creates `.venv` from `requirements-dev.txt`.
-- [ ] OSS CAD Suite installed; local Icarus version matches CI's; PATH order recorded in DECISIONS.
-- [ ] `scripts/check_all.sh` runs lint and all simulation tests (trivially passing at this point).
-- [ ] `scripts/gl_local.sh` runs a gate-level simulation the way CI's `gl_test` does.
+- [x] `scripts/setup_venv.sh` creates `.venv` from `requirements-dev.txt`. (run 2026-09-25, Python 3.12.3)
+- [x] OSS CAD Suite installed; local Icarus version matches CI's; PATH order recorded in DECISIONS. (OSS CAD Suite 2026-09-25; Icarus 12.0 = CI; D-007)
+- [x] `scripts/check_all.sh` runs lint and all simulation tests (trivially passing at this point). (PASS 2026-09-25, local)
+- [x] `scripts/gl_local.sh` runs a gate-level simulation the way CI's `gl_test` does. (PASS 2026-09-25: Yosys netlist on cmos5l typ lib, TT Icarus 13, PDK 2bbec75)
 
 ### Template flow
 - [ ] The template's trivial design passes `test`, `gds` (including precheck and `gl_test`) on CI.

@@ -116,10 +116,33 @@ def validate(s):
         _check(0 < len(srcs) <= 1 << fab["sel_bits"], f"fabric: {port} has {len(srcs)} sources for {fab['sel_bits']} sel bits")
         _check(len(set(srcs)) == len(srcs), f"fabric: {port} lists a source twice")
 
+    pc = s["pin_config"]
+    _unique(pc["fields"], "name", "pin_config.fields")
+    used = 0
+    for f in pc["fields"]:
+        name, bit, w = f["name"], f["bit"], f["width"]
+        _check(f["kind"] in PIN_KINDS, f"pin_config.{name}: unknown kind {f['kind']!r}")
+        _check(bit + w <= 16 * pc["stride"], f"pin_config.{name}: outside the unit's block")
+        _check(w <= 16 - bit % 16 or bit % 16 == 0, f"pin_config.{name}: a field wider than its word must start a word")
+        span = ((1 << w) - 1) << bit
+        _check(not used & span, f"pin_config.{name}: overlaps another field")
+        used |= span
+        if f["kind"] == "enum":
+            vals = f["values"]
+            _check(len(set(vals.values())) == len(vals), f"pin_config.{name}: duplicate codes")
+            for k, v in vals.items():
+                _fits(v, w, f"pin_config.{name}.{k}")
+        if f["kind"] == "pad":
+            _check(w == 5, f"pin_config.{name}: pads are 5 bits (31 = none)")
+    _check(pc["base"] + 6 * pc["stride"] <= pc["owner_base"], "pin_config: unit blocks overlap the owner registers")
+
     _unique(s["pin_commands"], "code", "pin_commands")
     _unique(s["pin_commands"], "name", "pin_commands")
     for c in s["pin_commands"]:
         _check(1 <= c["code"] <= 15, f"pin command {c['name']}: code must be 1..15")
+
+
+PIN_KINDS = {"bool", "uint", "m1", "pad", "enum", "q8", "sofs"}
 
 
 def legal_sources(fab):
@@ -183,6 +206,14 @@ def gen_python(s):
               f"FABRIC_SEL_BITS = {s['fabric']['sel_bits']}",
               "LEGAL_SOURCES = {  # consumer port: sources in sel order (ARCHITECTURE.md §4.6)"]
     lines += [f"    {p!r}: {srcs!r}," for p, srcs in legal_sources(s["fabric"]).items()]
+    lines += ["}", ""]
+    pc = s["pin_config"]
+    lines += [f"PIN_CFG_BASE = {pc['base']:#06x}", f"PIN_CFG_STRIDE = {pc['stride']}",
+              f"PIN_OWNER_BASE = {pc['owner_base']:#06x}",
+              "PIN_CFG_FIELDS = {  # name: (bit, width, kind) inside a unit's block (ARCHITECTURE.md §7.2)"]
+    lines += [f"    {f['name']!r}: ({f['bit']}, {f['width']}, {f['kind']!r})," for f in pc["fields"]]
+    lines += ["}", "PIN_CFG_ENUMS = {"]
+    lines += [f"    {f['name']!r}: {f['values']!r}," for f in pc["fields"] if f["kind"] == "enum"]
     lines += ["}", ""]
     return "\n".join(lines)
 
@@ -258,11 +289,23 @@ def gen_tables(s):
     rows += [f"| {port} | " + ", ".join(f"{i} {x}" for i, x in enumerate(srcs)) + f" | {len(srcs)} |"
              for port, srcs in legal_sources(fab).items()]
     t["legal_sources"] = rows
+    pc = s["pin_config"]
+    kinds = {"bool": "0/1", "uint": "value", "m1": "value − 1", "pad": "pad number, 31 = none",
+             "q8": "16.8 clocks", "sofs": "16.8 clocks from the bit start"}
+    rows = [f"Unit u's block: `{pc['base']:#06x} + u·{pc['stride']:#04x}`; output owners: `{pc['owner_base']:#06x} + (pad − 8)`, "
+            "`[2:0]` = unit, 7 = none.", "", "| Word | Bits | Field | Encoding | Meaning |", "|---|---|---|---|---|"]
+    for f in pc["fields"]:
+        w, lsb = divmod(f["bit"], 16)
+        hi = lsb + f["width"] - 1
+        where = _bits(hi, lsb) if hi < 16 else f"[15:0] + {w + 1}{_bits(hi - 16, 0)}"
+        enc = ", ".join(f"{v} {k}" for k, v in f["values"].items()) if f["kind"] == "enum" else kinds[f["kind"]]
+        rows.append(f"| {w} | {where} | {f['name'].upper()} | {enc} | {f['desc']} |")
+    t["pin_config"] = rows
     return {k: "\n".join(v) for k, v in t.items()}
 
 
 DOC_TABLES = {"docs/design/ISA.md": ["ops", "slot_fields", "routine_formats"],
-              "docs/design/ARCHITECTURE.md": ["legal_sources", "pin_commands"]}
+              "docs/design/ARCHITECTURE.md": ["legal_sources", "pin_config", "pin_commands"]}
 
 
 def splice(text, name, body, path):

@@ -7,11 +7,11 @@
 # Never edit generated files; edit this file and run `python tools/gen/gen.py`.
 # CI (lint workflow) regenerates and fails on any difference.
 #
-# Status: DRAFT, not frozen. Contents match DECISIONS D-007 ... D-029. The phase 1 spec
-# freeze changes `status` to frozen; after that, every change needs a DECISIONS entry.
+# Status: FROZEN at the end of phase 1 (DECISIONS D-037). Contents match D-007 ... D-036.
+# Every change from now on needs its own DECISIONS entry.
 
-version: 0.1
-status: draft
+version: 1.0
+status: frozen
 
 token:
   data_bits: 16
@@ -116,9 +116,9 @@ pin_commands:
   - {code: 6, name: SETN,  arg: "[5] rx, [4:0] n",              desc: "rx = 0: TX NBITS for the following DATA tokens; rx = 1: RX word length, and RX framing restarts (1..16)"}
   - {code: 7, name: WAIT,  arg: "[1] sample point, [0] edge (1 = rise)", desc: "take no tokens until pin B shows the edge (or, with [1] in BITSYNC, until the next sample point); cursor := that time"}
   - {code: 8, name: SAMPLE, arg: "[11:0] delay (ticks)",      desc: "at cursor + delay, sample pin A into the RX word framing; cursor := that time"}
-  - {code: 9, name: FRAME, arg: "[11] next frame, [10:0] n",    desc: "BITSYNC RX: the frame (in progress, or the next one with [11]) has n destuffed bits; then stuffing stops, the CRC is checked and the last word is flushed. LATE if already past n. An RX command: never waits behind TX data"}
+  - {code: 9, name: FRAME, arg: "[11] next frame, [10:0] n",    desc: "BITSYNC RX: the frame (in progress, or the next one with [11]) has n destuffed bits; then stuffing stops, the CRC is checked and the last word is flushed. LATE if none is in progress or it is already at or past n. An RX command: never waits behind TX data"}
   - {code: 10, name: LINE, arg: "[11:8] SE0 bits - 1, [6] reset TX CRC, [4] SE0, [3] append CRC, [2] stuff, [1:0] readback", desc: "BITSYNC TX, in stream order: [4] ends the frame with SE0 (pin A and pin N low) for n bits, then idle for 1 bit, then releases; readback 0 off / 1 arbitration (stop quietly on a mismatch) / 2 expect an override (report; error if nobody drove the other level) / 3 strict (a mismatch is a bit error); stuffing on/off; reset the TX CRC; then optionally shift out the TX CRC XOR CRC_XOR"}
-  - {code: 11, name: JAM, arg: "[11:8] n-1, [7:6] d, [5] level, [4] on error, [2] TX on, [1] TX off, [0] disarm", desc: "BITSYNC: drive level for n bits, bypassing the TX queue. [4]=0: after d more sample points (a response: skipped in a frame this unit transmits); [4]=1: armed, fires from the next bit after the next detected error (stuff error, bit error, missing override). [1]/[2] (alone): listen-only off/on switch: while off nothing is driven and a frame's SYNC is refused with EVENT 0xC000"}
+  - {code: 11, name: JAM, arg: "[11:8] n-1, [7:6] d, [5] level, [4] on error, [2] TX on, [1] TX off, [0] disarm (with [4])", desc: "BITSYNC: drive level for n bits, bypassing the TX queue. [4]=0: after d more sample points (a response: skipped in a frame this unit transmits); [4]=1: armed, fires from the next bit after the next detected error (stuff error, bit error, missing override). [1]/[2] (alone): TX off/on switch (off = listen-only): while off nothing is driven and a frame's SYNC is refused with EVENT 0xC001"}
 
 # Pad numbering for pin-unit pin A/B/C selects and output ownership (ARCHITECTURE.md §10).
 pads:
@@ -145,3 +145,75 @@ fabric:
 
 # DATA to a TX half with TX_LENTOK (D-013): data[15:12] = nbits - 1, payload data[11:0].
 tx_lentok: {len: [15, 12], payload: [11, 0]}
+
+# Pin-unit configuration registers (ARCHITECTURE.md §7.2, §9; D-036). Host-written while the
+# lanes are halted. Unit u's block is PIN_CFG base + u * stride (16-bit host words); `bit` is the
+# position inside the block (word = bit div 16, so a 24-bit field fills one word and the low byte
+# of the next). Kinds: bool; uint; m1 (stores value - 1); pad (pad number, 31 = not attached);
+# enum; q8 (a time in 1/256 clocks, 16.8 fixed point); sofs (the sample offset from the bit or
+# start edge in 1/256 clocks, round(SAMPLEOFS * PERIOD * 256), so rounding is fixed by the host).
+pin_config:
+  base: 0x3000
+  stride: 32
+  owner_base: 0x30C0          # + (pad - 8) for uo0..uio7: [2:0] owning unit, 7 = none (host pads ignore writes)
+  fields:
+    # word 0: modes and flags
+    - {name: txmode,     bit: 0,   width: 3,  kind: enum, values: {level: 0, shift: 1, clkgen: 2, pulse: 3, bitsync: 4}, desc: "TX mode"}
+    - {name: rxmode,     bit: 3,   width: 2,  kind: enum, values: {"off": 0, shift_rx: 1, linked_rx: 2, bitsync: 3}, desc: "RX mode (bitsync with txmode bitsync)"}
+    - {name: order,      bit: 5,   width: 1,  kind: enum, values: {lsb: 0, msb: 1}, desc: "bit order of shifted words"}
+    - {name: od,         bit: 6,   width: 1,  kind: bool, desc: "open drain on pin A: 1 releases, 0 drives low"}
+    - {name: idle,       bit: 7,   width: 1,  kind: uint, desc: "idle level of pin A (BITSYNC: the recessive level)"}
+    - {name: autorearm,  bit: 8,   width: 1,  kind: bool, desc: "SHIFT_RX re-arms after each word"}
+    - {name: rx_echo,    bit: 9,   width: 1,  kind: bool, desc: "keep RX words sampled while our own TX shifted (0: drop them)"}
+    - {name: tx_lentok,  bit: 10,  width: 1,  kind: bool, desc: "DATA carries its length: data[15:12] = n - 1"}
+    - {name: tx_preload, bit: 11,  width: 1,  kind: bool, desc: "linked TX: bit 0 at once when idle (SPI CPHA = 0)"}
+    - {name: stretch,    bit: 12,  width: 1,  kind: bool, desc: "CLKGEN waits for the line to read IDLE"}
+    - {name: nrzi,       bit: 13,  width: 1,  kind: bool, desc: "BITSYNC NRZI line coding"}
+    - {name: oe_auto,    bit: 14,  width: 1,  kind: bool, desc: "BITSYNC: drive the pads only while sending"}
+    # word 1: pins A, B and the linked edges
+    - {name: pin_a,      bit: 16,  width: 5,  kind: pad,  desc: "drive and/or sample pad"}
+    - {name: pin_b,      bit: 21,  width: 5,  kind: pad,  desc: "link / condition pad"}
+    - {name: rx_edge,    bit: 26,  width: 1,  kind: enum, values: {rise: 0, fall: 1}, desc: "LINKED_RX samples on this edge of pin B"}
+    - {name: tx_edge,    bit: 27,  width: 2,  kind: enum, values: {none: 0, rise: 1, fall: 2}, desc: "linked TX shifts on this edge of pin B (none = timed)"}
+    # word 2: pin C (select) and pin S (sense)
+    - {name: pin_c,      bit: 32,  width: 5,  kind: pad,  desc: "select / frame pad"}
+    - {name: c_active,   bit: 37,  width: 1,  kind: uint, desc: "pin C level that selects the unit"}
+    - {name: c_oe,       bit: 38,  width: 1,  kind: bool, desc: "drive pin A only while selected"}
+    - {name: pin_s,      bit: 39,  width: 5,  kind: pad,  desc: "sense pad, read instead of pin A"}
+    # word 3: pin N and the event generator
+    - {name: pin_n,      bit: 48,  width: 5,  kind: pad,  desc: "complement output of pin A"}
+    - {name: ev_pin,     bit: 53,  width: 1,  kind: enum, values: {a: 0, c: 1}, desc: "event source pin"}
+    - {name: ev_edge,    bit: 54,  width: 2,  kind: enum, values: {none: 0, rise: 1, fall: 2, both: 3}, desc: "event on this edge"}
+    - {name: ev_qual,    bit: 56,  width: 2,  kind: enum, values: {none: 0, 0: 2, 1: 3}, desc: "only while pin B is at this level (2 samples)"}
+    - {name: ev_reset,   bit: 58,  width: 1,  kind: bool, desc: "an event restarts RX word framing"}
+    # words 4-5: PERIOD and PRESC
+    - {name: period,     bit: 64,  width: 24, kind: q8,   desc: "bit period, 16.8 clocks, 1.0 to < 65536"}
+    - {name: presc,      bit: 88,  width: 8,  kind: m1,   desc: "clocks per tick, 1..256"}
+    # words 6-7: sample offset and word lengths
+    - {name: sampleofs,  bit: 96,  width: 24, kind: sofs, desc: "sample point after the bit start / start edge, 16.8 clocks"}
+    - {name: nbits,      bit: 120, width: 4,  kind: m1,   desc: "TX shift length, 1..16"}
+    - {name: rx_nbits,   bit: 128, width: 5,  kind: uint, desc: "RX word length, 1..16 (0 = NBITS)"}
+    - {name: rx_nbits2,  bit: 133, width: 5,  kind: uint, desc: "two-phase framing second length, 0 = off"}
+    # words 9-12: PULSE symbols
+    - {name: sym0_t1,    bit: 144, width: 12, kind: uint, desc: "bit 0: first level, ticks"}
+    - {name: sym0_first, bit: 156, width: 1,  kind: uint, desc: "bit 0: first level"}
+    - {name: sym0_t2,    bit: 160, width: 12, kind: uint, desc: "bit 0: second level, ticks"}
+    - {name: sym1_t1,    bit: 176, width: 12, kind: uint, desc: "bit 1: first level, ticks"}
+    - {name: sym1_first, bit: 188, width: 1,  kind: uint, desc: "bit 1: first level"}
+    - {name: sym1_t2,    bit: 192, width: 12, kind: uint, desc: "bit 1: second level, ticks"}
+    # words 13-14: carrier
+    - {name: carrier,    bit: 208, width: 24, kind: q8,   desc: "carrier period, 16.8 clocks (0 = off)"}
+    # words 15-17: BITSYNC timing and line coding
+    - {name: sjw,        bit: 240, width: 24, kind: q8,   desc: "max resync step, 16.8 clocks (0 = hard sync only)"}
+    - {name: idle_bits,  bit: 264, width: 5,  kind: uint, desc: "recessive samples that make the bus idle, 1..31"}
+    - {name: resync,     bit: 269, width: 1,  kind: enum, values: {dom: 0, both: 1}, desc: "resync on recessive-to-dominant edges only, or both"}
+    - {name: delim,      bit: 270, width: 2,  kind: enum, values: {none: 0, flag: 1, se0: 2}, desc: "frame delimiter"}
+    - {name: stuff_n,    bit: 272, width: 4,  kind: uint, desc: "stuff after n equal bits, 0 = off"}
+    - {name: stuff_lvl,  bit: 276, width: 2,  kind: enum, values: {none: 0, 0: 2, 1: 3}, desc: "stuff only runs of this level"}
+    - {name: crc_width,  bit: 278, width: 5,  kind: uint, desc: "CRC width, 0 = none, 1..16"}
+    - {name: crc_skip,   bit: 283, width: 5,  kind: uint, desc: "RX CRC starts after this many frame bits"}
+    # words 18-21: CRC
+    - {name: crc_poly,   bit: 288, width: 16, kind: uint, desc: "CRC polynomial (MSB-first LFSR)"}
+    - {name: crc_init,   bit: 304, width: 16, kind: uint, desc: "CRC register at frame start"}
+    - {name: crc_res,    bit: 320, width: 16, kind: uint, desc: "expected RX CRC register after the frame"}
+    - {name: crc_xor,    bit: 336, width: 16, kind: uint, desc: "XOR-ed into the TX CRC when appended"}

@@ -169,7 +169,7 @@ One action per clock per lane.
 ```
 clock n    EVAL : evaluate all slots, pick one (§4.3)
                   static updates now: STATE := NS (if NSE), dequeue (if DQ), reserve the output (if DST is O0/O1)
-                  latch the A input head; if DFE: PEND[DF] := 1
+                  latch the A input head; if DFE and DF != 3 and OP != CALL: PEND[DF] := 1
 clock n+1  EXEC : read registers/K, ALU, write r[d] or load O0/O1, write f[DF] and clear PEND[DF]
 ```
 
@@ -233,13 +233,13 @@ This resolves:
 - A valid RIR is a **candidate for EXEC**. It is beaten only by an **urgent** ready slot (§4.3). A non-urgent slot waits behind it.
 - Once the step executes, RIR empties and the next fetch happens at the next rotation slot.
   - `LD`/`ST` use the following rotation slot for the data access.
-  - `OUT` stays in RIR (and retries) while its output is full.
+  - `OUT` stays in RIR while its output is full, and is not a candidate meanwhile, so it does not hold back non-urgent slots (`ARCHITECTURE.md` §14 R5).
 
 Consequences, which the compiler reports:
 - **Urgent reflexes** are never delayed by a routine.
 - **Non-urgent reflexes** are delayed by at most one clock per routine step, i.e. at most 1 clock in every 4.
 - **A routine** makes one step per rotation (4 clocks), unless urgent reflexes are firing on the clocks when its step is waiting.
-- Routine writes to STATE/flags (`SETST`, `SETF`, `CLRF`, `CPYF`) take effect at the routine's EXEC. Reflex conditions see them from the next clock. If a reflex's static `NS` and a routine `SETST` hit the same clock, the ordering is fixed in the cycle-exact semantics section (P1). The proposal is that the reflex update wins.
+- Routine writes to STATE/flags (`SETST`, `SETF`, `CLRF`, `CPYF`) take effect at the routine's EXEC. Reflex conditions see them from the next clock. If a reflex's static `NS` and a routine `SETST` hit the same clock, the reflex update wins (`ARCHITECTURE.md` §14 R4, decided).
 
 ---
 

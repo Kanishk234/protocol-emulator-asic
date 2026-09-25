@@ -53,6 +53,11 @@ def field(s, name):
     ("fabric source listed twice", lambda s: s["fabric"]["sources"]["HOST_OUT"].append("U0.rx")),
     ("fabric bad source pattern", lambda s: s["fabric"]["sources"]["HOST_OUT"].append("CRC")),
     ("unknown host pad", lambda s: s["pads"]["host"].__setitem__(3, "uo9")),
+    ("pin config fields overlap", lambda s: s["pin_config"]["fields"][1].__setitem__("bit", 2)),
+    ("pin config field crosses a word", lambda s: s["pin_config"]["fields"][0].__setitem__("bit", 14)),
+    ("pin config pad not 5 bits", lambda s: next(f for f in s["pin_config"]["fields"] if f["kind"] == "pad").__setitem__("width", 4)),
+    ("pin config enum too wide", lambda s: s["pin_config"]["fields"][0]["values"].__setitem__("x", 8)),
+    ("pin config outside the block", lambda s: s["pin_config"].__setitem__("stride", 16)),
 ])
 def test_validation_catches(label, mutate):
     with pytest.raises(gen.SpecError):

@@ -18,5 +18,5 @@
 - [ ] `docs/CLAIMS.md` audited
 - [ ] Clean-checkout reproduction succeeded (date, environment, notes)
 - [ ] User guide and datasheet written
-- [ ] All CI workflows green on `main`
+- [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE5.md` written

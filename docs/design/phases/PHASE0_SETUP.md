@@ -40,5 +40,5 @@
 - [ ] Organizer email sent (date noted); answer logged when it arrives
 - [x] Tiny FABulous integration method understood and written down (`docs/notes/tiny_fabulous.md`)
 - [x] Decision point: is there a known path to put a FABulous fabric through the TT CMOS5L flow? (answer in DECISIONS) (D-009: yes; tile hardening on cmos5l still to be shown)
-- [ ] All CI workflows green on `main`
+- [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE0.md` written

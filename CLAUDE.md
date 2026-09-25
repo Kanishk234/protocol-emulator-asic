@@ -30,7 +30,7 @@ Architecture in one line: a small **embedded FPGA fabric specialized for protoco
 - Work in phase order: 0 setup → 1 profile/specify/de-risk → 2 baseline fabric + shell → 3 specialize, compare, hardware freeze → 4 protocols, showcase, held-out evaluation → 5 evidence/docs → 6 submission. Phase 7 (hardware prototyping) is optional and off the critical path.
 - **A phase is complete only when every item in its "Phase exit checklist" passes.** Do not start the next phase's tasks until then. If an item cannot pass, stop and explain why, then propose a fix or a fallback. Never tick a box that hasn't actually passed.
 - Tick checklist boxes only with evidence (a test run, a CI run ID, a proof log, a report, or a file) noted next to the box.
-- Every phase ends with all CI workflows green on `main`.
+- Every phase ends with all CI workflows green on `efpga` (WARP's branch; `main` holds the separate TRIPWIRE design).
 - **End every session with a `docs/WORKLOG.md` entry**: what was done, which boxes were ticked (with evidence), and the next step.
 - **End every phase with a plain-language summary** in `docs/summaries/PHASE<N>.md` (goal, what we did, what we found, what's left, one-line takeaway), written for someone who wasn't there. Keep in-progress summaries current at major milestones.
 
@@ -78,7 +78,7 @@ Architecture in one line: a small **embedded FPGA fabric specialized for protoco
   - `test: uart bitstream pin-level tests`
   - `docs: phase 1 checklist updates`
   - `ci: gds trigger paths filter`
-- Before suggesting a push during a hardening run, remind the user to check `git log origin/main..main -- src info.yaml arch macro`.
+- Before suggesting a push during a hardening run, remind the user to check `git log origin/efpga..efpga -- src info.yaml arch macro`.
 
 ## Environment
 - Development in **WSL (Ubuntu)** with the OSS CAD Suite (Icarus, Verilator 5, Yosys, nextpnr, SymbiYosys) and Python 3.11+ (cocotb, pytest, pyyaml, hypothesis), plus `sigrok-cli`. FABulous and its tool dependencies are pinned to the versions recorded in `docs/VERSIONS.md`.

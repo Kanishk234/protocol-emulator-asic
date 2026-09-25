@@ -29,5 +29,5 @@
 - [ ] Reconfiguration test suite green (run ID: …)
 - [ ] Fault-injection results recorded; no unexplained surviving faults
 - [ ] No hardware changes since `hw-freeze` except logged bug fixes
-- [ ] All CI workflows green on `main`
+- [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE4.md` written

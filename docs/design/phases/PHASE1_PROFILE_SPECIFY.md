@@ -44,5 +44,5 @@
 - [ ] Area-per-cell measurement and capacity estimate recorded
 - [ ] Capacity go/no-go decision recorded in DECISIONS
 - [ ] ARCHITECTURE, VERIFICATION and PHYSICAL_DESIGN_AND_CI v1 written
-- [ ] All CI workflows green on `main`
+- [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE1.md` written

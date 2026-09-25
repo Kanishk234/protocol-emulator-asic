@@ -39,5 +39,5 @@
 - [ ] Formal properties pass with named bounds (proof log summary in `docs/reports/`)
 - [ ] The `fabric` workflow is green
 - [ ] Decision point recorded: G0 is a valid fallback submission (or what's missing)
-- [ ] All CI workflows green on `main`
+- [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE2.md` written

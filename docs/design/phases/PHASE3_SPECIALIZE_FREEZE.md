@@ -34,5 +34,5 @@ Stop adding features by Nov 30 regardless of how many remain.
 - [ ] `gl_test` green on the final netlist with two real bitstreams (CI run ID: …)
 - [ ] All design-set protocols recompiled and passing on the final architecture
 - [ ] `hw-freeze` tag created (by the user)
-- [ ] All CI workflows green on `main`
+- [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE3.md` written

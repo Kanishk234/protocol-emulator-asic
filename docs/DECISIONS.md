@@ -44,3 +44,17 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** System `/usr/bin` comes first; `~/oss-cad-suite/bin` is appended to the end of PATH (`scripts/check_all.sh` and `scripts/gl_local.sh` do this themselves). Python runs only in `.venv`.
 - **Reason:** CI's `test` and `lint` jobs use Ubuntu 24.04's apt Icarus 12.0 and Verilator 5.020, which are also the WSL system versions. The OSS CAD Suite ships its own newer Icarus and Verilator; appending it keeps the CI versions in front while still providing Yosys, nextpnr and SymbiYosys.
 - **Evidence:** local `iverilog -V` 12.0, `verilator --version` 5.020 (Debian 5.020-1); `scripts/check_all.sh` and `scripts/gl_local.sh` pass (2026-09-25). Versions in `docs/VERSIONS.md`.
+
+## D-008: A generic fabric is probably not a viable fallback at 6x4; revisit D-005
+- **Date:** 2026-09-25 · **Status:** Proposed (needs the user's decision; firm up with the phase 1 tile hardening and profiling)
+- **Finding:** `docs/reports/capacity_early.md`. The stock FABulous LUT4AB tile costs ~4.5K µm² of cells per LUT4 on cmos5l (77 config bits per LUT, 53 % of the area). At 42–60 % density a generic 6x4 fabric holds roughly **60–90 LUT4s**. A scratch UART (TX + RX, 16-bit divisor) needs **~215 logic cells**.
+- **Proposal:** the fallback submission becomes **G1 = G0 + the smallest set of general hard primitives that lets the design set fit** (first candidates: loadable counter/timer, shift register), instead of pure G0. G0 stays the baseline for the equal-area comparison (D-004), measured at equal area, even if it fits nothing.
+- **Also worth trying before adding hard blocks:** a slimmer routing architecture and tile (fewer wires per channel, fewer config bits per LUT) than the stock general-purpose one.
+- **Alternatives:** keep D-005 and shrink the design set (e.g. UART TX only); go to the hybrid fallback (OVERVIEW decision points) now.
+- **Cost:** the fallback depends on hard-block integration (Yosys mapping, nextpnr, bitstream) working, which is a known risk (OVERVIEW top risks).
+
+## D-009: Phase 0 decision point: a known path exists to put a FABulous fabric through Tiny Tapeout
+- **Date:** 2026-09-25 · **Status:** Accepted (answer to the phase 0 decision point); integration choice Proposed
+- **Answer:** yes. Tiny FABulous (`docs/notes/tiny_fabulous.md`) hardened tiles with LibreLane's `FABulousTile` flow, stitched them with `FABulousFabric`, integrated the fabric as a macro in a top-level LibreLane run, and submitted through TT's `custom_gds` action. Its tile library already has IHP-specific tiles.
+- **Our plan (proposed):** harden the fabric as a macro locally (or in our own workflow), commit it under `macro/`, and integrate it in the **template's** `gds` job with a `MACROS` block. The TRIPWIRE R3 spike integrated the IHP SRAM macro this way and passed precheck and `gl_test`. This keeps the template's jobs, precheck and `gl_test` intact (CLAUDE.md CI rules). Fall back to Tiny FABulous's `custom_gds` route only if the template flow can't integrate the fabric; that needs a DECISIONS entry and the organizers' OK (phase 0 email question 2).
+- **Next evidence:** harden one tile on cmos5l with `FABulousTile` (needs OpenROAD/KLayout/Magic locally: Nix or the LibreLane container).

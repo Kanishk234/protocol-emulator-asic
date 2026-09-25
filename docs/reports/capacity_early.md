@@ -35,6 +35,6 @@ The divisor register and the two 16-bit bit-timers are 48 of the 87 flops and mo
 - So specialization is **not an optimization at this size; it is what makes the design set fit at all.** This challenges D-005 (G0, a generic fabric, as the fallback): see D-008.
 
 ## Next measurements (to firm this up)
-1. Harden one LUT4AB tile on cmos5l with the `FABulousTile` flow: real area including routing and density.
+1. ~~Harden one tile on cmos5l~~ done: `tile_cmos5l.md` measured ~5.1K µm² per LUT4 at 97 % density, so ~96 LUT4s fit at 6x4 with margin (not 60–90).
 2. Profile the four design-set protocols (phase 1) on LUT4, with and without hard counters/shift registers.
 3. Try smaller routing (fewer wires per channel) and fewer config bits per LUT; the stock tile is sized for a general-purpose FPGA.

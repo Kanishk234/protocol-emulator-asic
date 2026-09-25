@@ -13,7 +13,7 @@ Every tool used by any flow must be listed. Local PATH order: DECISIONS D-007.
 | Icarus Verilog | 12.0 (local `/usr/bin`, CI `test`: Ubuntu 24.04 apt) | apt | matches CI. `gl_local.sh` and CI `gl_test` use TT's Icarus 13.0 build |
 | Verilator | 5.020 (local and CI `lint`: Ubuntu 24.04 apt) | apt | matches CI |
 | SymbiYosys | from OSS CAD Suite 2026-06-29 | | |
-| LibreLane | set by `tt-gds-action@ihp-cmos5l` (CI); 3.0.14 in the venv (FABulous dependency) | | Fill in the CI version from the first `gds` run log |
+| LibreLane | CI `gds`: **3.1.0.dev3** (default `librelane-version` of `tt-gds-action@ihp-cmos5l`, 3412659, pip); 3.0.14 in the venv (FABulous dependency); 3.0.0 in the FABulous LibreLane plugin (Nix) | tt-gds-action `action.yml` | Tile hardening uses the plugin's pin |
 | PDK (IHP CMOS5L) | IHP-Open-PDK 2bbec755dc67ca3db0261c3d6163e15735d66710 | same revision as `tt-gds-action@ihp-cmos5l` | used by `scripts/gl_local.sh` |
 | Python | 3.12.3 (WSL); CI `test`/`lint` use 3.11 | | FABulous needs >= 3.12 |
 | cocotb | 2.0.1 | `test/requirements.txt` | |

@@ -1,6 +1,6 @@
 # Phase 0: FABulous reference demo (two bitstreams, one fabric)
 
-**Date:** 2026-09-25 · **Commit:** working tree on `efpga` after a63877d · **Local run** (WSL Ubuntu, no CI yet)
+**Date:** 2026-09-25 · **Commit:** 1a3ba74 (spike), local run in WSL; **CI:** `fabric` run 36196784852 on bc46bff, green
 **Reproduce:** `spikes/fab_demo/run.sh` (work dir `build/fab_demo`, git-ignored). Tool versions: `docs/VERSIONS.md` (FABulous 2.2.0, OSS CAD Suite 2026-06-29).
 
 ## What was run

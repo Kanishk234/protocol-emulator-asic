@@ -34,7 +34,7 @@
 
 ## Phase exit checklist
 - [ ] Template trivial design green on all template workflows (CI run IDs: …)
-- [x] FABulous reference: two different bitstreams loaded and run in the same fabric simulation (log summary in `docs/reports/`) (`docs/reports/fab_demo.md`, local run 2026-09-25)
+- [x] FABulous reference: two different bitstreams loaded and run in the same fabric simulation (log summary in `docs/reports/`) (`docs/reports/fab_demo.md`; local 2026-09-25 and CI `fabric` 36196784852)
 - [ ] `docs/VERSIONS.md` complete and matches what was run
 - [x] Hardening time recorded (`PHYSICAL_DESIGN_AND_CI.md`, run 36170807513: `gds` job 35 min, precheck 12 min)
 - [ ] Organizer email sent (date noted); answer logged when it arrives

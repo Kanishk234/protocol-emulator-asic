@@ -10,8 +10,9 @@ def load(chip, image, run=True):
         chip.connect(port, producer, mode, accept)
     for name, lane in image["lanes"].items():
         ln = chip.lanes[int(name[1:])]
-        ln.k[:] = lane["k"]
-        ln.regs[:] = lane["regs"]
+        for i in range(4):                  # §14 H1: K latches and registers through the host (§9)
+            ln.write_k(i, lane["k"][i])
+            ln.write_reg(i, lane["regs"][i])
         # §14 H1: slot latches have no reset, so write every slot; unused ones get V = 0
         for n in range(len(ln.slots)):
             ln.load_slot(n, int(lane["slots"][n], 16) if n < len(lane["slots"]) else 0)

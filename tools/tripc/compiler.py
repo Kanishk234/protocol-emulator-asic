@@ -34,7 +34,7 @@ import pathlib
 import re
 
 import tripwire_spec as S
-from tripsim import asm, isa
+from tripsim import asm, isa, pinregs
 from tripsim.pinunit import PinConfig
 
 from .expr import ExprError, evaluate
@@ -191,6 +191,12 @@ class Compiler:
         if unit in self.pins:
             self.err(f"U{unit} configured twice", n)
         self.pins[unit] = cfg
+
+    def _regs(self, u, cfg):
+        try:
+            return pinregs.encode(PinConfig(**cfg))
+        except ValueError as e:                    # a value that does not fit its register (§7.2)
+            raise TrwError(f"U{u}: {e}", file=self.file) from None
 
     def _connect(self, line, n):
         m = re.fullmatch(r"connect\s+(\S+)\s*<-\s*(\S+)((?:\s+\S+)*)", line)
@@ -453,6 +459,8 @@ class Compiler:
             "pins": {f"U{u}": cfg for u, cfg in sorted(self.pins.items())},
             "own": [[pad, u] for pad, u in self.owns],
             "connect": [list(c) for c in self.connects],
+            "pin_regs": {f"U{u}": [f"{w:04x}" for w in self._regs(u, cfg)]
+                         for u, cfg in sorted(self.pins.items())},
             "lanes": {f"L{i}": {"slots": [f"0x{w:014x}" for w in l.words], "k": l.k, "regs": l.regs,
                                 "states": l.states} for i, l in sorted(self.lanes.items())},
             "sram": sram,

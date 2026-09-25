@@ -44,7 +44,7 @@ Dates are targets. Missing a date cuts feature scope before it cuts verification
 |---|---|---|
 | 0 Setup | Sep 25 – Oct 4 | Repo, pinned tools, template flow and FABulous demo both working |
 | 1 Profile, specify, de-risk | Oct 5 – Oct 25 | Held-out set sealed, design-set RTL, profiling data, tiny fabric hardened on CMOS5L, capacity go/no-go |
-| 2 Baseline fabric + shell | Oct 26 – Nov 15 | Generic fabric (G0) + shell hardened at 6x4, design set running from real bitstreams — this is our fallback submission |
+| 2 Baseline fabric + shell | Oct 26 – Nov 15 | G1 (generic fabric + hard counter/timer + shift register, D-008) + shell hardened at 6x4, design set running from real bitstreams: our fallback submission. G0 (plain fabric) is built and measured as the comparison baseline |
 | 3 Specialize, compare, freeze | Nov 16 – Dec 6 | Specialized features added one at a time, equal-area comparison, hardware freeze |
 | 4 Protocols and held-out | Dec 7 – Dec 22 | Showcase, held-out results, stretch protocols, reconfiguration and fault tests |
 | 5 Evidence and docs | Dec 23 – Jan 5 | Evidence report, user guide, clean-checkout reproduction |
@@ -56,7 +56,7 @@ Dates are targets. Missing a date cuts feature scope before it cuts verification
 |---|---|---|
 | End of phase 0 | Does a FABulous fabric fit into the TT CMOS5L template flow at all (flat or as a macro)? | Investigate how Tiny FABulous did it; escalate to organizers; if blocked by Oct 10, consider the hybrid fallback |
 | End of phase 1 | Using measured area per cell, does the design set fit in the estimated 6x4 capacity with plausible specialization? | Switch to the **hybrid fallback**: small PIO-style sequencers plus a small specialized LUT fabric for bit-level datapath (CRC, bit-stuffing, edge logic). Record in DECISIONS |
-| End of phase 2 | Does G0 harden at 6x4, pass precheck, and run the design set? | Shrink the fabric; cut the I2C target to a smaller register map |
+| End of phase 2 | Does G1 harden at 6x4, pass precheck, and run the design set? | Shrink the fabric; cut the I2C target to a smaller register map |
 | End of phase 3 | Does any specialization beat G0 at equal area? | Report it honestly; freeze the best measured variant (possibly G0) |
 
 ## Top risks

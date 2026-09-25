@@ -1,7 +1,7 @@
 # Phase 2: Baseline fabric and shell
 
 **Dates:** Oct 26 – Nov 15, 2026
-**Goal:** a complete, submittable chip with a generic fabric (G0): shell, loader and fabric hardened at 6x4, running the design set from real bitstreams loaded through the real host interface. G0 is our fallback submission and the baseline every specialization is compared against.
+**Goal:** a complete, submittable chip: shell, loader and fabric hardened at 6x4, running the design set from real bitstreams loaded through the real host interface. Per D-008 the fallback submission is **G1** = the generic fabric plus the minimum general hard blocks the design set needs (first: loadable counter/timer, shift register), because a plain fabric (~96 LUT4s) cannot fit one UART (~215 cells). The plain fabric **G0** is still generated and measured as the baseline every specialization is compared against (D-004).
 
 ## Tasks
 
@@ -33,11 +33,11 @@
 - [ ] Loader state machine: aborted or corrupt loads never reach the run state.
 
 ## Phase exit checklist
-- [ ] Shell + G0 hardened at 6x4, precheck passed (CI run ID: …)
+- [ ] Shell + G1 hardened at 6x4, precheck passed (CI run ID: …)
 - [ ] `gl_test` green with two different real bitstreams (CI run ID: …)
 - [ ] `docs/reports/g0_results.md` shows fit/resources/timing for every design-set protocol
 - [ ] Formal properties pass with named bounds (proof log summary in `docs/reports/`)
 - [ ] The `fabric` workflow is green
-- [ ] Decision point recorded: G0 is a valid fallback submission (or what's missing)
+- [ ] Decision point recorded: G1 is a valid fallback submission (or what's missing)
 - [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE2.md` written

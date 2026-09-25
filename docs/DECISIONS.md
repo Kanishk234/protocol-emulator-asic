@@ -27,7 +27,7 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Reason:** A variant using fewer LUTs is not better if its hard blocks cost more area than the LUTs saved.
 
 ## D-005: G0 is the fallback submission
-- **Date:** 2026-09-25 · **Status:** Accepted
+- **Date:** 2026-09-25 · **Status:** Superseded by D-008 (a generic fabric holds ~96 LUT4s at 6x4; one UART needs ~215)
 - **Decision:** The generic baseline fabric with the complete shell (phase 2) must be a valid, submittable chip before any specialization work.
 - **Reason:** Guarantees a working entry if specialization runs late.
 
@@ -46,7 +46,7 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Evidence:** local `iverilog -V` 12.0, `verilator --version` 5.020 (Debian 5.020-1); `scripts/check_all.sh` and `scripts/gl_local.sh` pass (2026-09-25). Versions in `docs/VERSIONS.md`.
 
 ## D-008: A generic fabric is probably not a viable fallback at 6x4; revisit D-005
-- **Date:** 2026-09-25 · **Status:** Proposed (needs the user's decision; firm up with the phase 1 tile hardening and profiling)
+- **Date:** 2026-09-25 · **Status:** Accepted (Kanishk, 2026-09-25): G1 is the fallback only; the goal is still the full specialized architecture from phase 3. Supersedes D-005
 - **Finding:** `docs/reports/capacity_early.md`, updated by the tile hardening `docs/reports/tile_cmos5l.md`: measured ~5.1K µm² per LUT4 at 97 % density on CMOS5L, so **~96 LUT4s** fit at 6x4 with margin. Earlier synthesis-only numbers follow. The stock FABulous LUT4AB tile costs ~4.5K µm² of cells per LUT4 on cmos5l (77 config bits per LUT, 53 % of the area). At 42–60 % density a generic 6x4 fabric holds roughly **60–90 LUT4s**. A scratch UART (TX + RX, 16-bit divisor) needs **~215 logic cells**.
 - **Proposal:** the fallback submission becomes **G1 = G0 + the smallest set of general hard primitives that lets the design set fit** (first candidates: loadable counter/timer, shift register), instead of pure G0. G0 stays the baseline for the equal-area comparison (D-004), measured at equal area, even if it fits nothing.
 - **Also worth trying before adding hard blocks:** a slimmer routing architecture and tile (fewer wires per channel, fewer config bits per LUT) than the stock general-purpose one.

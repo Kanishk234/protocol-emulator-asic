@@ -18,4 +18,5 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Root cause:** not yet known. The 4 via rules are the power-grid vias OpenROAD generates for the Metal4/TopMetal1 grid; Magic's CMOS5L tech file (PDK 2bbec75) apparently has no matching via rule.
 - **Caught by:** the tile hardening spike (manual).
 - **Now covered by:** nothing yet. Next: KLayout stream-out for tiles and the fabric (as Tiny FABulous does), and a check that the flow finishes in bounded time.
-- **Fix:** pending.
+- **Update (run 2):** hung again in the same way; skipping the step through the tile's `meta.substituting_steps` had no effect, because `tiles.py` builds the flow from a dict and does not apply them.
+- **Fix (workaround):** our patch to the tile driver applies step removals; tiles skip Magic and use KLayout stream-out (run 3: GDS written, KLayout DRC 0). Root cause in Magic still open; Magic LEF writing is also skipped, so the fabric needs another LEF source. Fix commit: pending (spike).

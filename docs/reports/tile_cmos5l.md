@@ -42,3 +42,35 @@ So a generic fabric at 6x4 holds about **96 LUT4s** with margin. That is ~1.5× 
 1. Fix or bypass the stream-out (KLayout), then DRC (KLayout, the deck the TT precheck uses) and STA on the tile.
 2. The die shape of the 6x4 tile (aspect ratio) decides which grid fits; read it from the template DEF.
 3. Phase 1 profiling with hard counters/shift registers against a ~96-LUT budget.
+
+## Update: the TT top level stops at Metal4
+The CI hardening of the placeholder (run 36170807513, `resolved.json`) uses `RT_MAX_LAYER: Metal4`; TopMetal1 carries TT's power grid. This tile used TopMetal1 for signals, so it may clash when placed as a macro in the TT top level. **Next run: the same tile with signals on Metal2–Metal4 only** (one change). If it doesn't route at 219.84 × 185.22 µm, grow the tile until it does; that size is the real cost per LUT for our chip.
+
+## Run 2: signals on Metal2–Metal4 only (TT-compatible)
+`RUN_2026-09-25_18-39-05`, same tile, size and density; one hardware change: `RT_MAX_LAYER: Metal4` (D-010 revision).
+
+| Metric | Run 1 (to TopMetal1) | **Run 2 (to Metal4)** |
+|---|---|---|
+| Die | 40,718.8 µm² | 40,718.8 µm² |
+| Utilisation | 97.0 % | 94.5 % |
+| Routing violations by iteration | 3497 … 0 (12 iterations) | 1790, 1006, 778, 30, 15, 15, **0** (6 iterations) |
+| Routed wirelength (estimate) | 141 mm (88 mm) | 119 mm (89 mm) |
+| Antenna violations / diodes inserted | 0 / 171 | 0 / 0 |
+
+**The tile routes within TT's layer limit, at the same size, more easily than run 1.** The capacity result stands: ~5,090 µm² per LUT4, **~96 LUT4s** at 6x4 with margin.
+
+Stream-out: `Magic.StreamOut` ran again and hung (BUGS #2), although the tile config lists it under `meta.substituting_steps`. `resolved.json` shows the substitutions, so `tiles.py` (which builds the flow with `Flow.factory.get(...)` and a config dict) does not apply them. Still no GDS, KLayout DRC or STA. Next: apply the step substitutions in our own driver (or run the remaining steps from this run with LibreLane directly).
+
+## Run 3: complete (layout file + DRC clean)
+`RUN_2026-09-25_20-04-53`: same hardware as run 2 (`RT_MAX_LAYER: Metal4`); flow fix only: our `tiles.py` now applies the tile's step removals (Magic stream-out/DRC/LEF/extraction, XOR, LVS), so KLayout does the stream-out. **5 min 35 s end to end, no hang.** Routing identical in kind to run 2 (0 violations).
+
+| Check | Result |
+|---|---|
+| GDS | `50-klayout-streamout/LUT4x8_ha.klayout.gds` (KLayout) |
+| KLayout DRC, PDK deck `ihp-sg13cmos5l.drc` (2bbec75), deep mode, `no_recommended` | **0 violations**, 328 rules run, 39 s |
+| Routing / antenna | 0 / 0 |
+| LVS | not run: the PDK has no CMOS5L LVS yet (`config.tcl`) |
+| STA | not run: the tile flow has no STA step and a lone tile has no clock; timing comes with the stitched fabric |
+| LEF | not written (was `Magic.WriteLEF`); needed for the fabric macro: next, OpenROAD `write_abstract_lef` or a fixed Magic |
+
+**Conclusion:** a FABulous LUT4 tile builds on CMOS5L within TT's layer limit, DRC-clean, at ~5,090 µm² per LUT4. The 6x4 chip holds ~96 LUT4s with room for the shell.

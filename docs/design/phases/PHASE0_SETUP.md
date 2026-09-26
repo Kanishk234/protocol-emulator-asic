@@ -19,7 +19,7 @@
 
 ### Template flow
 - [x] The template's trivial design passes `test`, `gds` (including precheck and `gl_test`) on CI. (a63877d: `test` 36170807382, `gds` 36170807513 with precheck + `gl_test` green, `docs` 36170807355)
-- [ ] Record the hardening time and resource usage in `PHYSICAL_DESIGN_AND_CI.md`.
+- [x] Record the hardening time and resource usage in `PHYSICAL_DESIGN_AND_CI.md`. (run 36170807513: 35.1 min; area/cells/timing from `GDS_logs`)
 - [x] Add `lint` and `unit` workflows as separate files; set the `gds` paths filter and concurrency. (`lint` green, e.g. 36201114473; `gds` filter + non-cancelling concurrency in `gds.yaml`; `unit` deferred to the first Python tool, D-011; `fabric` added early, 36196784852)
 
 ### FABulous flow

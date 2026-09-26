@@ -6,7 +6,7 @@ SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_warp.v
+PROJECT_SOURCES = tt_um_warp.v wp_fabric_cfg.v warp_tiny.v fabric_gen/bitbang.v fabric_gen/ConfigFSM.v fabric_gen/Frame_Data_Reg.v fabric_gen/Frame_Select.v
 
 ifneq ($(GATES),yes)
 
@@ -28,6 +28,9 @@ VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilo
 
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+# WARP (D-018): the fabric macro is a black box in the chip netlist; its gate-level model with
+# real bitstreams comes with the phase 2 gl_test
+VERILOG_SOURCES += $(SRC_DIR)/warp_tiny.v
 
 endif
 

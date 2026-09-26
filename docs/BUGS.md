@@ -45,3 +45,19 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Now covered by:** `check_bus()` in `protocols/i2c_ctrl/test` (SDA may change while SCL is high only at START/STOP) and every reply check. It cannot see zero hold time at one sample per clock, so the fix is structural: a separate `S_B_SET` phase of Q clocks after SCL falls before SDA changes.
 - **Also:** the I2C model test `test_nack_on_data_byte` first expected 4 replies for 5 bytes (the test miscounted; the model was right).
 - **Fix:** before the first commit of the I2C controller.
+
+## 6: I2C target test harness read host replies one clock late
+- **Date:** 2026-09-25
+- **Symptom:** `protocols/i2c_target/test`: three tests got `[]` from the host register reads.
+- **Root cause:** test code. The design presents a read reply right after the clock edge that takes the command; with `h_rready` held high the reply is consumed at the next edge. The helper looked after that next edge.
+- **Caught by:** `test_bus_write_then_host_reads`, `test_auto_increment_wraps`, `test_other_address_ignored`.
+- **Now covered by:** the same tests; the helper samples `h_rvalid` right after the accepting edge.
+- **Fix:** in the same commit as the tests.
+
+## 7: `tools/profile` package broke every cocotb test
+- **Date:** 2026-09-25
+- **Symptom:** `protocols/uart/test`: `AttributeError: module 'profile' has no attribute 'run'`, no test ran.
+- **Root cause:** the protocol test Makefiles put `tools/` on `PYTHONPATH`; a package named `profile` there shadowed Python's standard-library `profile` module, which cocotb imports.
+- **Caught by:** the UART RTL suite (run after resizing the UART counters).
+- **Now covered by:** every protocol suite (they import cocotb with `tools/` on the path); the package is `tools/profiling/`.
+- **Fix:** renamed before the first commit of the profiler.

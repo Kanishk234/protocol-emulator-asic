@@ -21,6 +21,19 @@ Next:
 
 ---
 
+## 2026-09-26: Krithik + Claude (phase 2: 4-bit timer fraction, measurement)
+Done:
+- `FRAC` parameter (default 8) on `trw_pin_unit/tx/rx`: the cursor fraction, the burst timer, the SHIFT_RX timer, and the PERIOD/SAMPLEOFS inputs (top FRAC bits). No spec change.
+- Threaded through the L1 harness (`make FRAC=4`) and `synth/pin/run_pin.sh` (`FRAC=4`, outputs in `build/frac4/`).
+- `PIN_UNIT_RTL.md` §7: lean unit 29,790 → 27,903 µm² (−1.9K, −6 %), 216 → 204 flops, slow-corner slack +6.42 → +6.94 ns. Worth ~1.5 % of the core for six units, so not a big lever; recommendation: don't adopt it on its own.
+- Tests: FRAC = 8, 27/27 (same function); FRAC = 4, 24/27 (the three 5.4-clock-period tests fail, as expected on a 1/16 grid). `scripts/check_all.sh` PASS.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Task 2: the R4 full-size routability spike at 6x4 (branch `spike/r4-floorplan`).
+
 ## 2026-09-25: Krithik + Claude (phase 2: pin unit RTL, milestone A)
 RTL session: worked from the documents and `spec/tripwire.yaml` only; did not read `tools/tripsim` or `spikes/area/ae_prims.v`.
 

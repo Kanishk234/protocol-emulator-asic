@@ -115,7 +115,7 @@ The wide timers dominate. The burst timer, the SHIFT_RX timer and the cursor are
 **What the numbers say:**
 1. **No free lunch from the glue guess.** The real lean unit is within 6 % of the estimate, so the gap to a routable 50–60 % must be closed by real cuts, as `AREA_ESTIMATE.md` §7 feared.
 2. **The pin-unit core is timer-bound.** A shrink of the core ("option 3") should go after the wide timers, not after the features:
-   - **8-bit → 4-bit fractions** (not measured yet) (PERIOD, SAMPLEOFS, the cursor fraction, the burst and sample timers): every timer and adder loses 4 bits, and each unit stores 8 fewer latch bits. Rough guess: 2–3K per unit, to measure. Cost: period resolution 1/16 clock. At 50 MHz a 115 200 baud UART period is 434.028 clocks: 1/16 gives ~64 ppm error (1/256 gives ~1 ppm), far inside a UART's ~2 % tolerance. It is a spec change (D-036 fields).
+   - **8-bit → 4-bit fractions** (measured in §7: ~1.8K per lean unit, so smaller than guessed here) (PERIOD, SAMPLEOFS, the cursor fraction, the burst and sample timers): every timer and adder loses 4 bits, and each unit stores 8 fewer latch bits. Rough guess: 2–3K per unit, to measure. Cost: period resolution 1/16 clock. At 50 MHz a 115 200 baud UART period is 434.028 clocks: 1/16 gives ~64 ppm error (1/256 gives ~1 ppm), far inside a UART's ~2 % tolerance. It is a spec change (D-036 fields).
    - **Narrower timers**: the 16-bit integer part allows periods up to 65 535 clocks (1.3 ms). A 12-bit integer (4 095 clocks, 82 µs) would save ~8 flops and adder bits per timer, but UART would then stop at ~12.2 kbaud, so **9600 baud would be lost** unless PERIOD were also prescaled. Slow protocols (IR, servo) already use PULSE/LEVEL with PRESC. Needs a check against the 20 programs. Probably not worth it.
    - **Share one timer between TX and RX** only where full duplex is not needed. Not general (UART needs both), so not recommended.
 3. **Fewer units or lanes still move the most area.** With the measured lean unit: 4 units ≈ 74 %, 4 units + 2 lanes ≈ 64 %; a core shrink of ~3–5K per unit on top of H brings it to ~60 %.
@@ -153,7 +153,39 @@ Each was decided in the RTL to keep going, and is marked `P-G<n>` in the source 
 
 P-G15 and P-G16 are also proposals: they need a sentence in §14 H1 (and P-G19 a register in §9), so they go through a DECISIONS entry, not a silent RTL choice.
 
-## 7. Next
+## 7. Measurement: a 4-bit timer fraction (2026-09-26)
+
+**Question:** how much would the lean unit shrink if its time arithmetic used 4 fraction bits instead of the spec's 8 (§5, point 2)? **Measurement only**: `spec/tripwire.yaml` and the §7.2 layout are unchanged.
+
+**How:** a parameter `FRAC` (default 8) on `trw_pin_unit`, `trw_pin_tx` and `trw_pin_rx` sets the fraction width of:
+- the cursor fraction;
+- the burst timer (16.(FRAC+1));
+- the SHIFT_RX sample timer (16.FRAC);
+- the PERIOD / SAMPLEOFS inputs, of which the unit uses the top FRAC bits of the 8-bit fraction fields.
+
+With FRAC = 8 the RTL is the same function as before: all 27 L1 tests pass. With FRAC = 4, the 3 tests that use a 5.4-clock period fail, since 5.4 is not a multiple of 1/16 clock; the other 24 pass. Same recipe: `FRAC=4 synth/pin/run_pin.sh` (outputs in `synth/pin/build/frac4/`).
+
+| Lean unit (FULL = 0) | FRAC = 8 | FRAC = 4 | Saving |
+|---|---|---|---|
+| `trw_pin_unit` area µm² | 29,790 | 27,903 | **1,887 (6.3 %)** |
+| — TX half / RX half / pin selects | 18,393 / 9,407 / 1,488 | 17,570 / 8,995 / 1,446 | 823 / 412 / 42 |
+| flops | 216 | 204 | 12 (TX 8: burst timer 4, cursor fraction 4; RX 4: sample timer) |
+| wrapper (unit + config + producer) µm² | 35,723 | 33,977 | 1,747 |
+| configuration latches the unit reads | 114 | 106 | 8 (the unused low bits of PERIOD and SAMPLEOFS) |
+| slack at 20 ns, typ / slow (config static) | +11.21 / +6.42 ns | +11.51 / +6.94 ns | +0.3 / +0.5 ns |
+| slack at 20 ns, typ / slow (config timed) | +9.66 / +4.06 ns | +10.39 / +5.24 ns | |
+
+The critical path is the same at both widths: burst timer → cursor → `eq`.
+
+**Noise:** the FRAC = 8 unit synthesized 395 µm² larger than in §3 (29,790 against 29,395) for an unchanged function, only because the source was parameterized. So ABC mapping moves this block by ~1–1.5 %, and the saving is **~1.7–1.9K µm² per lean unit** before layout, ~2.3–2.5K placed.
+
+**What it means:**
+- For the chip: six units at ~1.8K each is ~11K µm² before layout, ~14K placed, **~1.5 % of the core**. It would take scenario E from ~85 % to ~83.5 %. The full units would save a little more (CARRIER and SJW are 16.8 fields too; milestone B), but that doesn't change the picture.
+- **Not a big lever.** It is a real but small saving, below the §5 guess of 2–3K. The fraction bits are a small part of the timers: the 16-bit integer parts and the adders around them remain.
+- **Precision cost:** periods on a 1/16-clock grid. At 50 MHz a 115 200 baud UART gets ~64 ppm error (1/256: ~1 ppm); fine for any UART, but a spec change to the D-036 fields.
+- **My recommendation:** don't adopt it on its own. It is worth doing only as part of a spec revision that is happening anyway. The cuts that move the chip are still fewer units or lanes (§5).
+
+## 8. Next
 
 - **Team decision on the cuts, with these numbers** (§5): fractions and timer widths (a spec change per D-037), 4 units, 2 lanes.
 - Milestone B (PULSE P17, carrier P30, BITSYNC P20–P29) for U0–U1, then the same measurements. If a cut changes the timers, do it before B, since BITSYNC reuses them.

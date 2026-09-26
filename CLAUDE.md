@@ -37,7 +37,7 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - **Keep model and RTL independent:** when writing `tools/tripsim`, don't read `src/`; when writing RTL, don't read `tools/tripsim`. Tests may use both.
 - **Verilog:** Verilog-2005 subset that Icarus, Verilator, Yosys and LibreLane all accept.
   - `default_nettype none`; synchronous active-low reset; no `initial` in synthesisable code.
-  - Latches only in `trw_slots.v`; one module per file; `trw_` prefix; top level `tt_um_tripwire`.
+  - Latches only in `trw_slots.v` and `trw_pin_cfg.v` (D-038); one module per file; `trw_` prefix; top level `tt_um_tripwire`.
 - **Tests in `test/` touch only top-level ports.** They also run on the gate-level netlist (`gl_test`). White-box tests go in `test_internal/`.
 - **Logs:** don't commit raw logs, waveforms or build/formal output (they're in `.gitignore`; CI keeps them as artifacts). Commit summaries with CI run IDs in `docs/reports/`.
 - **Log every bug** in `docs/BUGS.md`: symptom, root cause, the check that caught it, the check that now covers it.

@@ -49,7 +49,7 @@ The recipe book (routines) is for jobs that aren't urgent. A cook works on a rec
 
 ## Our kitchen's size
 
-- **6 waiters** (pin units), who share **19 serving windows** (pins)
+- **6 waiters** (pin units), who share **19 serving windows** (pins). Two are all-rounders; the other four do the common jobs, which is all most protocols need (DECISIONS D-040)
 - **3 cooks** (lanes), each with **12 reflexes**
 - **1 recipe book** (512 lines of SRAM), which the cooks take turns reading
 - **1 manager** (host), who talks to the chip over SPI from the Tiny Tapeout demo board

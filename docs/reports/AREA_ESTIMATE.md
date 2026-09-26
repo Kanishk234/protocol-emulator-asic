@@ -4,6 +4,8 @@
 
 **Answer: no, not as frozen.** The estimate puts the placed design at about **1.0–1.1 M µm², 109–120 % of the 902K µm² core**, where a routable design needs roughly 50–60 %. The lanes (~196K) and the SRAM (45K) are as expected. The surprise is the **pin units: ~84K µm² each, ~500K for six**, about half of the chip. The phase 1 budget (ARCHITECTURE §12) assumed ~0.55K flops for all six units; the spec now needs about 500 state and configuration bits *per unit*. No single cheap option closes the gap, so the scope decision goes to the team (see "Options").
 
+**Decided (2026-09-25):** options 1, 2 and 6 (D-038, D-039, D-040), which is scenario E: ~781K µm² placed, 87 % of the core. Next: measure a real `trw_pin_unit` (§8).
+
 Date: 2026-09-25. Reproduce: `spikes/area/run_area.sh`, then `python spikes/area/estimate.py` in the venv (outputs in `spikes/area/build/`, not committed).
 
 ---

@@ -635,6 +635,36 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - R1–R3 decided (D-030, D-031, D-032, D-034);
   - the pin-unit register layout is in the spec (D-036).
 
+## D-038 (2026-09-25): pin-unit configuration in latches
+- **Context:** the pre-RTL area estimate (`docs/reports/AREA_ESTIMATE.md`) puts the frozen spec at 109–120 % of the 6x4 core. Pin-unit configuration is 307 bits per unit; in flops that is 73.4 µm² per bit (measured), in a latch array 35.1 µm² per bit (the R1 slot array, with clock gates and write path).
+- **Decision:** the §7.2 configuration blocks are a latch array, like the slots (`spec/tripwire.yaml`: `pin_config.storage: latch`). A new RTL file `trw_pin_cfg.v` holds them, and it joins `trw_slots.v` as the only files allowed latches (CLAUDE.md).
+- **Rule change (§14 H1):** the latches have no reset, so before RUN the host writes the block of every unit; units a program does not use get the default (modes off, pads 31 = none). `tripc.load` does this. Output owners stay flops that reset to none, so an unwritten unit can never drive a pad.
+- **General need:** any protocol's settings are written once while halted and then only read, which is exactly what the slot latches already do.
+- **Cost:** none in function. Saves ~92K µm² placed (scenario A → C). The latch timing exception from R2 (D-032) is needed anyway; configuration writes happen only while halted, so the latch outputs are static while running (a false-path candidate, as for the slots).
+- **Evidence:** `test_load_writes_every_pin_unit` (tripc.load writes all six blocks and clears a stale one); the model records which blocks were written (`Chip.pin_written`).
+- **Approval:** Krithik and Kanishk, 2026-09-25 ("go ahead with tier 1 (we both agree)").
+
+## D-039 (2026-09-25): slots, K and pin configuration are write-only from the host
+- **Context:** reading back what the host wrote costs a read mux over every word: ~9.4K µm² per lane for the slots (D-032, measured) and ~4.4K µm² per unit for the configuration blocks (estimate), ~71K µm² placed in total.
+- **Decision:** the slot/K space (0x1000) and the pin unit blocks (0x3000–0x30BF) are write-only; reads return 0. Everything that changes while running stays readable: lane registers, STATE, FLAGS, PEND, RPC, channel state, head tokens, sticky flags, counters, output owners and SRAM (`pin_config.readable: false`).
+- **General need:** debugging needs the state that changes; what the host wrote is known to the host (tripc keeps the image). Behavioural checks (lockstep, `gl_test`) catch a wrong load.
+- **Cost:** a load can't be verified by reading it back. If silicon debugging needs that later, a checksum of the writes is the cheap alternative (a new entry).
+- **Approval:** Krithik and Kanishk, 2026-09-25.
+
+## D-040 (2026-09-25): two full pin units and four lean ones
+- **Context:** the optional pin-unit features are large: BITSYNC with its two CRCs ~20.5K µm² per unit, PULSE ~4.8K, carrier ~5.7K (with latch configuration, before layout). Across all 20 programs, at most **one** unit uses each of them at a time (AREA_ESTIMATE §4).
+- **Decision:** U0 and U1 are **full** (every feature); U2–U5 are **lean**: every core mode (LEVEL, SHIFT, CLKGEN, SHIFT_RX, LINKED_RX), the cursor, events and pins A/B/C/S/N, but no PULSE, carrier or BITSYNC. In `spec/tripwire.yaml`, `pin_config.features` names each optional feature's fields and modes, and `pin_config.units` lists each unit's features; the generator validates both and marks every field's units in the §7.2 table.
+  - On a lean unit the optional fields are not stored (writes are ignored, the hardware treats them as 0), and the modes TXMODE pulse/bitsync and RXMODE bitsync are not decoded (they act as LEVEL / off).
+  - tripc and the model reject a configuration that uses a feature its unit lacks ("U3 has no PULSE ...; only U0, U1 do"), so that hardware case never runs.
+- **General need:** the same primitives as before, on fewer units. Two full units still run two such protocols at once (e.g. CAN and WS2812).
+- **Cost:**
+  - Saves ~161K µm² placed (scenario C → E).
+  - A program must put its PULSE, carrier or BITSYNC unit on U0 or U1. All seven such programs already use U0, so no program changed.
+  - Three protocols needing these features cannot run at once.
+- **Evidence:** `test_units_follow_the_spec`, `test_lean_units_do_not_store_optional_fields`, `test_lean_unit_rejects_optional_features` (6 cases, each at the encoding and at `Chip.pin_config`), `test_tripc_rejects_a_feature_on_a_lean_unit`, 6 new generator validation cases.
+- **Where this leaves the area:** with D-038–D-040, scenario E: ~781K µm² placed (744–817K), **87 % of the core**. Still above a routable 50–60 %: the next step is to measure a real `trw_pin_unit` (AREA_ESTIMATE §8).
+- **Approval:** Krithik and Kanishk, 2026-09-25.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

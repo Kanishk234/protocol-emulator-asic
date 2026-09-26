@@ -21,6 +21,26 @@ Next:
 
 ---
 
+## 2026-09-25: Krithik, Kanishk + Claude (phase 2: tier 1 area decisions)
+Done:
+- **D-038:** pin configuration in a latch array (`trw_pin_cfg.v`); §14 H1: the host writes every unit's block before RUN; CLAUDE.md latch rule updated.
+- **D-039:** slots, K and pin configuration are write-only from the host.
+- **D-040:** U0–U1 full, U2–U5 lean (no PULSE, carrier, BITSYNC):
+  - `pin_config.features` / `units` in the spec, validated by the generator; the §7.2 table shows each field's units;
+  - the model and tripc reject a missing feature;
+  - lean units don't store the optional fields;
+  - `tripc.load` writes all six blocks.
+- Area with tier 1: ~781K µm² placed, 87 % of the core (AREA_ESTIMATE scenario E).
+- Tests: full suite 251 passed (slow included); `scripts/check_all.sh` PASS; `gen --check` clean. Spec bumped to v1.1 (still frozen).
+
+Checklist boxes ticked (evidence):
+- None. The task 2.0 box stays open until the design fits a routable budget.
+
+Next:
+- RTL session: `trw_pin_unit` (full and lean) first, synthesized, to replace the estimate's glue guess.
+- Then choose the next cuts (a leaner core, 4 units, or 2 lanes) with real numbers.
+- Ask Jane Street / Tiny Tapeout about 8x4.
+
 ## 2026-09-25: Krithik + Claude (phase 2 start: plan update, area estimate)
 Done:
 - `docs/HOW_IT_WORKS.md`: plain-language introduction (kitchen analogy); linked from OVERVIEW and CLAUDE.md.

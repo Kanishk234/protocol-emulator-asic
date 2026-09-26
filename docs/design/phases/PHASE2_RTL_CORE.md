@@ -32,6 +32,8 @@ Tasks:
 3. Price the options (heterogeneous pin units, slot read-back, configuration storage in latches, 2 lanes) and record them in `docs/reports/AREA_ESTIMATE.md`.
 4. Any change to the frozen spec goes through a DECISIONS entry.
 
+**Status (2026-09-25):** estimate done (`docs/reports/AREA_ESTIMATE.md`). The frozen spec came to ~115 % of the core. Tier 1 decided: D-038 (configuration in latches), D-039 (slots, K and configuration write-only), D-040 (U0–U1 full, U2–U5 lean), which brings it to ~87 %. Next: write and synthesize `trw_pin_unit` first, to replace the estimate's biggest guess, then choose the next cuts (AREA_ESTIMATE §8).
+
 ### 2.1 RTL (owner: architecture/RTL; written from the spec, not from `tripsim`)
 
 | Module | Contents |
@@ -39,11 +41,12 @@ Tasks:
 | `trw_sync.v` | 2-FF synchronisers for all inputs |
 | `trw_chan_prod.v`, `trw_chan_port.v` | Producer register (valid/tag/data/seq) and consumer port (sel/en/mode/accept/last_seq, DROPPED); registered release per `ARCHITECTURE.md` §4 and §14 F1–F7 |
 | `trw_fabric.v` | Instantiates all producers and ports and the per-consumer legal-source muxes (§4.6, generated table) |
-| `trw_slots.v` | Latch slot array (D-034) with library clock gates, plus K0–K3; host write path. Read-back port only if task 2.0 keeps it |
+| `trw_slots.v` | Latch slot array (D-034) with library clock gates, plus K0–K3; host write path. No read-back port (D-039) |
 | `trw_lane.v` | EVAL (conditions, priority, static updates, pending, reservation), EXEC (operand mux, ALU, writeback), routine controller (RPC, RIR, RB, interruption, CALL), STEP, host register writes (§14 L, R, H rules) |
 | `trw_alu.v` | The 16 operations |
 | `trw_sram.v` | IHP 512x16 macro wrapper (D-031) plus the fixed 4-way rotation |
-| `trw_pin_unit.v` | Everything in `ARCHITECTURE.md` §7 and the §14 P-rules: the configuration registers of §7.2 (D-036); TX modes LEVEL, SHIFT, CLKGEN (with STRETCH), PULSE and BITSYNC; the cursor and LATE; CTRL ops 1–11; carrier; RX modes SHIFT_RX, LINKED_RX and BITSYNC (resync, SJW, stuffing, CRC, readback, JAM, NRZI, frame delimiters); the event generator; OVERRUN; pins A, B, C, S and N. Split into sub-modules as needed (`trw_pin_*`) |
+| `trw_pin_unit.v` | Parameterised full (U0–U1) or lean (U2–U5, no PULSE, carrier or BITSYNC; D-040). Everything in `ARCHITECTURE.md` §7 and the §14 P-rules: the configuration registers of §7.2 (D-036); TX modes LEVEL, SHIFT, CLKGEN (with STRETCH), PULSE and BITSYNC; the cursor and LATE; CTRL ops 1–11; carrier; RX modes SHIFT_RX, LINKED_RX and BITSYNC (resync, SJW, stuffing, CRC, readback, JAM, NRZI, frame delimiters); the event generator; OVERRUN; pins A, B, C, S and N. Split into sub-modules as needed (`trw_pin_*`) |
+| `trw_pin_cfg.v` | Pin configuration latch array (D-038): the §7.2 blocks, write-only (D-039); U2–U5 store only their core fields (D-040) |
 | `trw_pins.v` | Pin owner registers, open-drain handling, pad mapping |
 | `trw_host.v` | SPI slave, command FSM, the §9 address spaces (including the §7.2 pin configuration and the lane register block), run/halt/step, debug readback, IRQ, HOST_IN/HOST_OUT |
 | `tt_um_tripwire.v` | Top level: pad mapping, `_unused` wire |
@@ -57,7 +60,7 @@ Not in this phase: the helper units CRC, MATCH, MEM and CAPTURE (deferred by D-0
 **Coding rules:**
 - Verilog-2005 subset accepted by Icarus, Verilator, Yosys and LibreLane.
 - `default_nettype none`; synchronous active-low reset; no `initial` in synthesisable code.
-- Latches only in `trw_slots.v` (and in the pin configuration storage, if task 2.0 chooses latches for it; that needs a DECISIONS entry and a CLAUDE.md update).
+- Latches only in `trw_slots.v` and `trw_pin_cfg.v` (D-038).
 - Every module header states its timing contract.
 
 ### 2.2 Verification (owner: verification)
@@ -106,7 +109,7 @@ Not in this phase: the helper units CRC, MATCH, MEM and CAPTURE (deferred by D-0
 ---
 
 ## 4. Phase exit checklist (all must pass)
-- [ ] Area estimate done (`docs/reports/AREA_ESTIMATE.md`) and its budget decisions recorded in DECISIONS.
+- [ ] Area estimate done (`docs/reports/AREA_ESTIMATE.md`) and its budget decisions recorded in DECISIONS. *(Estimate done; tier 1 decided (D-038–D-040); open until the design fits a routable budget.)*
 - [ ] All modules in the table exist and lint clean (`verilator --lint-only -Wall`); latches only where allowed, waived.
 - [ ] **L1** unit tests all green (ALU, EVAL, PIPE, CHAN, OVR, PIN-TX, PIN-RX including BITSYNC, ROT, HOST).
 - [ ] **L2** lockstep ≥ 10⁶ clocks with zero divergences; L2-INJECT catches both injected bugs.

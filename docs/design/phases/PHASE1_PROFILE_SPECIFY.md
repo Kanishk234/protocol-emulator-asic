@@ -31,10 +31,10 @@
 - [x] Decide in DECISIONS: continue with the pure specialized eFPGA, cut showcase scope, or switch to the hybrid fallback. (D-016: GO specialized eFPGA; I2C target/showcase open)
 
 ### Specs
-- [ ] `ARCHITECTURE.md` v1: shell, host interface, pin allocation, load/start/stop/parking contract, clocking, fabric resource list for G0, and the candidate architecture variants to compare in phase 3.
-- [ ] `VERIFICATION.md` v1: layers, check IDs, tools, what runs in which CI workflow.
-- [ ] `PHYSICAL_DESIGN_AND_CI.md` v1: how the fabric is hardened and integrated, clock target, known limits.
-- [ ] Risk register updated in `OVERVIEW.md`.
+- [x] (v1 written 2026-09-26; open items marked for phase 2) `ARCHITECTURE.md` v1: shell, host interface, pin allocation, load/start/stop/parking contract, clocking, fabric resource list for G0, and the candidate architecture variants to compare in phase 3.
+- [x] `VERIFICATION.md` v1: layers, check IDs, tools, what runs in which CI workflow. (v1 written 2026-09-26: V0–V7, F1–F4 with bounds)
+- [x] `PHYSICAL_DESIGN_AND_CI.md` v1: how the fabric is hardened and integrated, clock target, known limits. (v1 written 2026-09-26; chip-level numbers added from the first fabric `gds` run)
+- [x] Risk register updated in `OVERVIEW.md`. (2026-09-26: statuses + 4 new risks)
 
 ## Phase exit checklist
 - [x] `HELDOUT.md` committed before profiling (commit hash: 0171cf7; no profiling existed before it)
@@ -43,6 +43,6 @@
 - [ ] Tiny fabric hardened on CMOS5L, precheck passed (CI run ID: …)
 - [x] Area-per-cell measurement and capacity estimate recorded (`tile_cmos5l.md`, `capacity.md`)
 - [x] Capacity go/no-go decision recorded in DECISIONS (D-016)
-- [ ] ARCHITECTURE, VERIFICATION and PHYSICAL_DESIGN_AND_CI v1 written
+- [x] ARCHITECTURE, VERIFICATION and PHYSICAL_DESIGN_AND_CI v1 written (2026-09-26)
 - [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE1.md` written

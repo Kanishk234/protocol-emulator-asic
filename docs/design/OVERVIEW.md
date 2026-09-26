@@ -59,12 +59,20 @@ Dates are targets. Missing a date cuts feature scope before it cuts verification
 | End of phase 2 | Does G1 harden at 6x4, pass precheck, and run the design set? | Shrink the fabric; cut the I2C target to a smaller register map |
 | End of phase 3 | Does any specialization beat G0 at equal area? | Report it honestly; freeze the best measured variant (possibly G0) |
 
+Decision point outcomes so far: end of phase 0 → a known path exists (D-009); end of phase 1 → GO for the specialized eFPGA, not the hybrid (D-016).
+
 ## Top risks
-| Risk | Early warning | Response |
-|---|---|---|
-| FABulous fabric does not fit the TT CMOS5L flow | Phase 0/1 tiny fabric fails hardening or precheck | Smallest reproducer, ask organizers/TT community, fall back as above |
-| Capacity too small for the design set | Phase 1 profiling vs. measured area per cell | Specialize harder, reduce showcase scope, or hybrid fallback |
-| Custom blocks not usable by the tools | Compiled designs don't use the block | Explicit instantiation first; drop the block if integration stalls |
-| Routing congestion | Global-routing overflow in hardening | Reduce routing or fabric size; one change per hardening |
-| Timing model optimistic | Gate-level/STA disagree with nextpnr estimates | Recharacterize, lower supported clock and rates |
-| One builder, finals season | Phases slipping | Recruit a teammate early; cut stretch scope first |
+Updated 2026-09-26 (end of phase 1). Status: **retired**, **open**, **new**.
+
+| Risk | Status and evidence | Early warning | Response |
+|---|---|---|---|
+| FABulous fabric does not fit the TT CMOS5L flow | **Mostly retired:** tiles and a 16-LUT fabric harden on CMOS5L, DRC clean (`fabric_tiny.md`); chip-level `gds` + precheck with the fabric macro: pending CI | Chip-level run fails on the macro power grid or precheck | Power grid designed for it (D-017, D-019); fallback: TT `custom_gds` route (D-009 option a) |
+| Capacity too small for the design set | **Open, quantified:** ~96 LUT4 generic; UART/SPI/I2C controller fit with timer + shift-register primitives, the **I2C target does not** (`capacity.md`) | Phase 2 place-and-route needs more LUTs than synthesis | Register-file primitive, smaller register map, or showcase on the I2C controller (D-016) |
+| Custom blocks not usable by the tools | Open | Compiled designs don't use the block | Explicit instantiation first; drop the block if integration stalls |
+| **Magic too old for the CMOS5L tech file** | **New, worked around:** Magic 8.3.623 vs the required 8.3.657 (BUGS #2) | A step needs Magic (e.g. LEF) | KLayout GDS + DRC, OpenROAD LEF; a newer Magic when LibreLane's pin moves |
+| **Macro power grid in TT's CMOS5L block rules** | **New:** Metal4-only stripes, 2.1 µm, full height; the fabric's power columns must sit under them | `pdn_cfg.tcl` checks fail in CI | Gridded tile power stripes (D-017) and the R3 spike's checked script (D-019) |
+| Routing congestion | Low for tiles (0 DRC at 95 % utilisation within Metal2–4) | Global-routing overflow in hardening | Reduce routing or fabric size; one change per hardening |
+| Timing model optimistic | Open: no fabric timing yet | Gate-level/STA disagree with nextpnr estimates | Recharacterize, lower supported clock and rates; shell clock enable (ARCHITECTURE §5) |
+| Host channel needs many fabric IO BELs | **New:** ~18–29 IOBUFs on the north edge (ARCHITECTURE §7.3) | Not enough IO tiles in the 4 × 3 grid | Narrow `h_status`, serialize the channel, or add IO tiles |
+| **Prior art (PRISM)** | **New:** Verilog-programmed protocol engine on IHP exists (`docs/notes/prior_art.md`) | Judges see no difference | Claims rest on the parallel fabric, no CPU, and the measured, held-out-tested method |
+| One builder, finals season | Open | Phases slipping | Cut stretch scope first |

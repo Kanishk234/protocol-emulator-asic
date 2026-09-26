@@ -163,6 +163,19 @@ def validate(s):
 PIN_KINDS = {"bool", "uint", "m1", "pad", "enum", "q8", "sofs"}
 
 
+def pin_cfg_masks(pc):
+    """Bit masks over a unit's block: {'core': m, <feature>: m, ...}, and the used length in words.
+
+    A field not named by any feature is core (every unit stores it, D-040)."""
+    span = lambda f: ((1 << f["width"]) - 1) << f["bit"]
+    owner = {n: feat for feat, spec in pc["features"].items() for n in spec["fields"]}
+    masks = {"core": 0, **{feat: 0 for feat in pc["features"]}}
+    for f in pc["fields"]:
+        masks[owner.get(f["name"], "core")] |= span(f)
+    words = max((f["bit"] + f["width"] + 15) // 16 for f in pc["fields"])
+    return masks, words
+
+
 def legal_sources(fab):
     """Expand the fabric patterns into {consumer port: (source, ...)} in sel order."""
     lanes, units = fab["lanes"], fab["units"]
@@ -273,8 +286,39 @@ def gen_verilog(s):
     L += [f"`define TRW_SYS_{k} 4'd{v}" for k, v in rt["enums"]["SYS"].items()]
     L += ["", "// pin-unit CTRL commands: data[15:12]"]
     L += [f"`define TRW_CMD_{c['name']} 4'd{c['code']}" for c in s["pin_commands"]]
+    L += _verilog_pin_config(s)
     L += ["", "`endif", ""]
+    names = [line.split()[1] for line in L if line.startswith("`define ")]
+    dup = sorted({n for n in names if names.count(n) > 1})
+    _check(not dup, f"generated Verilog defines collide: {', '.join(dup)}")
     return "\n".join(L)
+
+
+def _verilog_pin_config(s):
+    """Pin-unit configuration (ARCHITECTURE.md §7.2): field positions inside a unit's block
+    (bit = 16 * word + bit in word), enum codes, and which bits each unit stores (D-040)."""
+    pc = s["pin_config"]
+    masks, words = pin_cfg_masks(pc)
+    nbits = 16 * words
+    L = ["", "// pin-unit configuration (ARCHITECTURE.md §7.2): positions inside a unit's block,",
+         "// bit = 16 * word + bit in word; the block is TRW_PC_WORDS host words",
+         f"`define TRW_PC_BASE 16'h{pc['base']:04x}", f"`define TRW_PC_STRIDE {pc['stride']}",
+         f"`define TRW_PC_OWNER_BASE 16'h{pc['owner_base']:04x}",
+         f"`define TRW_PC_WORDS {words}", f"`define TRW_PC_BITS {nbits}",
+         "`define TRW_PAD_NONE 5'd31"]
+    for f in pc["fields"]:
+        n, b, w = f["name"].upper(), f["bit"], f["width"]
+        L += [f"`define TRW_PC_{n}_LSB {b}", f"`define TRW_PC_{n}_MSB {b + w - 1}", f"`define TRW_PC_{n}_W {w}"]
+        if f["kind"] == "enum":
+            L += [f"`define TRW_PCE_{n}_{str(k).upper()} {w}'d{v}" for k, v in f["values"].items()]
+    L += ["// bits stored per feature (a lean unit stores only CORE, D-040)"]
+    L += [f"`define TRW_PC_MASK_{k.upper()} {nbits}'h{m:0{nbits // 4}x}" for k, m in masks.items()]
+    L += ["// units that have each optional feature, bit u = unit u"]
+    nu = len(pc["units"])
+    for feat in pc["features"]:
+        bits = "".join("1" if feat in pc["units"][u] else "0" for u in reversed(range(nu)))
+        L += [f"`define TRW_PC_UNITS_{feat.upper()} {nu}'b{bits}"]
+    return L
 
 
 def _bits(msb, lsb):

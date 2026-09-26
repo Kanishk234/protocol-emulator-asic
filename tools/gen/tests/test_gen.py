@@ -1,6 +1,7 @@
 """L0-GEN: the spec validates, catches malformed specs, and every generated output is current."""
 
 import copy
+import re
 import subprocess
 import sys
 
@@ -92,3 +93,61 @@ def test_model_uses_the_spec():
     from tripsim import isa
     assert isa.SLOT_FIELDS == S.SLOT_FIELDS and isa.SLOT_BITS == S.SLOT_BITS
     assert isa.OP == S.OPS and isa.TAGS == S.TAGS
+
+
+def _defines(text):
+    """`define NAME value lines of a generated Verilog header, as {NAME: value string}."""
+    return dict(m.groups() for m in re.finditer(r"^`define (\w+) (\S+)$", text, re.M))
+
+
+def _vint(v):
+    """A Verilog literal such as 5'd31, 352'h00ff or 6'b000011, as an int."""
+    if "'" not in v:
+        return int(v)
+    base, digits = v.split("'")[1][0], v.split("'")[1][1:]
+    return int(digits, {"d": 10, "h": 16, "b": 2}[base])
+
+
+def test_verilog_pin_config_matches_the_spec():
+    """The RTL takes §7.2 positions from src/trw_defs.vh; every field, enum code and stored-bit mask
+    there is the spec's (the RTL's source for trw_pin_cfg.v / trw_pin_unit.v, not a hand copy)."""
+    d = _defines(gen.gen_verilog(SPEC))
+    pc = SPEC["pin_config"]
+    for f in pc["fields"]:
+        n = f["name"].upper()
+        assert _vint(d[f"TRW_PC_{n}_LSB"]) == f["bit"]
+        assert _vint(d[f"TRW_PC_{n}_W"]) == f["width"]
+        assert _vint(d[f"TRW_PC_{n}_MSB"]) == f["bit"] + f["width"] - 1
+        for k, v in f.get("values", {}).items():
+            assert _vint(d[f"TRW_PCE_{n}_{str(k).upper()}"]) == v
+    assert _vint(d["TRW_PC_WORDS"]) == 22 and _vint(d["TRW_PC_BITS"]) == 352
+    core = _vint(d["TRW_PC_MASK_CORE"])
+    opt = {k: _vint(d[f"TRW_PC_MASK_{k.upper()}"]) for k in pc["features"]}
+    # D-036/D-040: 307 bits in a full unit, of which the lean units keep the core
+    assert bin(core).count("1") + sum(bin(m).count("1") for m in opt.values()) == 307
+    assert bin(core).count("1") == 119
+    for feat, m in opt.items():
+        assert not m & core
+        want = 0
+        for f in pc["fields"]:
+            if f["name"] in pc["features"][feat]["fields"]:
+                want |= ((1 << f["width"]) - 1) << f["bit"]
+        assert m == want, feat
+        units = _vint(d[f"TRW_PC_UNITS_{feat.upper()}"])
+        assert units == sum(1 << u for u, fs in enumerate(pc["units"]) if feat in fs)
+
+
+def test_verilog_pin_masks_follow_a_feature_change():
+    """Moving a field into a feature moves its bits out of the core mask."""
+    s = broken(lambda s: s["pin_config"]["features"]["carrier"]["fields"].append("stretch"))
+    d = _defines(gen.gen_verilog(s))
+    bit = next(f["bit"] for f in SPEC["pin_config"]["fields"] if f["name"] == "stretch")
+    assert not _vint(d["TRW_PC_MASK_CORE"]) >> bit & 1
+    assert _vint(d["TRW_PC_MASK_CARRIER"]) >> bit & 1
+
+
+def test_colliding_verilog_defines_are_rejected():
+    """Two spec names that map to one `define (here DST 'o0' next to 'O0') fail instead of shadowing."""
+    s = broken(lambda s: s["slot"]["enums"]["DST"].__setitem__("o0", 7))
+    with pytest.raises(gen.SpecError, match="TRW_DST_O0"):
+        gen.gen_verilog(s)

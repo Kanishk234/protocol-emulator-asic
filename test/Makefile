@@ -1,18 +1,28 @@
 # Makefile
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
+# R4 branch (spike/r4-floorplan): the template Makefile plus the SRAM macro's simulation model (as R3).
 
 # defaults
 SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
-SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_tripwire.v
+SRC_DIR ?= $(PWD)/../src
+PROJECT_SOURCES = tt_um_tripwire.v r4_host.v r4_seq.v r4_port.v r4_fabric.v \
+                  trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_unit.v \
+                  trw_lane.v trw_alu.v trw_slots.v trw_sram.v
+
+# The macro's behavioural model, in RTL and gate-level runs alike (the blackbox in src/ is for synthesis).
+MACRO_DIR ?= $(PWD)/../macro/RM_IHPSG13_1P_512x16_c2_bm_bist
+MACRO_MODELS  = $(MACRO_DIR)/RM_IHPSG13_1P_core_behavioral_bm_bist.v
+MACRO_MODELS += $(MACRO_DIR)/RM_IHPSG13_1P_512x16_c2_bm_bist.v
 
 ifneq ($(GATES),yes)
 
 # RTL simulation:
 SIM_BUILD				= sim_build/rtl
+COMPILE_ARGS    += -DFUNCTIONAL
 VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
+VERILOG_SOURCES += $(MACRO_MODELS)
 
 else
 
@@ -25,6 +35,7 @@ VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_io/verilog/sg1
 VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog/sg13cmos5l_stdcell.v
 # TRIPWIRE (BUGS #1): the flip-flop primitives (ihp_dff_r, ...) live in a separate UDP file; the template omits it
 VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog/sg13cmos5l_udp.v
+VERILOG_SOURCES += $(MACRO_MODELS)
 
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES += $(PWD)/gate_level_netlist.v

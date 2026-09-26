@@ -1,8 +1,10 @@
 diff --git a/tiles.py b/tiles.py
-index c86f9fe..6015526 100755
+old mode 100755
+new mode 100644
+index c86f9fe..edfe3a8
 --- a/tiles.py
 +++ b/tiles.py
-@@ -205,6 +205,10 @@ tile_obstruction_layers = {
+@@ -205,12 +205,38 @@ tile_obstruction_layers = {
          "gf180mcu*": {
              "*"         : ["Metal1", "Metal2", "Metal3", "Metal4", "Metal5"],
          },
@@ -13,13 +15,50 @@ index c86f9fe..6015526 100755
          "ihp-sg13*": {
              "*"         : ["Metal1", "Metal2", "Metal3", "Metal4", "Metal5", "TopMetal1", "TopMetal2"],
          },
-@@ -365,6 +369,15 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+     },
+ }
+ 
++def strip_unused_vias(lef_path):
++    """WARP: OpenROAD's abstract LEF starts with the generated VIA definitions of the design
++    (with 'CUTSIZE' lines). The FABulousFabric flow reads the tile size from any line containing
++    'SIZE', so drop VIA definitions that no PIN/OBS geometry uses."""
++    import re as _re
++    lines = open(lef_path).read().split("\n")
++    used = {m.group(1) for l in lines for m in [_re.match(r"^\s+VIA\s+\S+\s+\S+\s+(\S+)", l)] if m}
++    out, skip = [], None
++    for l in lines:
++        m = _re.match(r"^VIA\s+(\S+)", l)
++        if skip is None and m and m.group(1) not in used:
++            skip = m.group(1)
++            continue
++        if skip is not None:
++            if l.strip() == f"END {skip}":
++                skip = None
++            continue
++        out.append(l)
++    with open(lef_path, "w") as f:
++        f.write("\n".join(out))
++
++
+ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=None, gui=None):
+     target_flow = Flow.factory.get("FABulousTile")
+ 
+@@ -365,6 +391,24 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
          pdk_root = version.get_dir(ciel_home)
      
      
 +    # WARP: the librelane CLI applies meta.substituting_steps (Flow.Substitute); this driver
 +    # did not. Apply the step removals (value None) for steps that exist in the flow.
-+    subs = (config.get("meta") or {}).get("substituting_steps") or {}
++    subs = dict((config.get("meta") or {}).get("substituting_steps") or {})
++    if pdk == "ihp-sg13cmos5l":
++        # Magic cannot read OpenROAD's generated via arrays in CMOS5L (docs/BUGS.md #2): KLayout
++        # writes the GDS, OpenROAD the LEF (below). The PDK has no CMOS5L LVS yet.
++        # Odb.CheckDesignAntennaProperties reads that LEF; OpenROAD's routing antenna check stays.
++        for step in ("Magic.StreamOut", "Magic.WriteLEF", "Odb.CheckDesignAntennaProperties",
++                     "Magic.DRC", "Checker.MagicDRC",
++                     "Magic.SpiceExtraction", "Checker.IllegalOverlap", "Netgen.LVS",
++                     "Checker.LVS", "KLayout.XOR", "Checker.XOR"):
++            subs[step] = None
 +    step_ids = {s.id for s in target_flow.Steps}
 +    removals = {k: None for k, v in subs.items() if v is None and k in step_ids}
 +    if removals and gui is None:
@@ -29,37 +68,40 @@ index c86f9fe..6015526 100755
      flow = target_flow(
          config,
          design_dir=design_dir,
+@@ -374,6 +418,25 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+     
+     state_out = flow.start(tag=tag, last_run=last_run)
+ 
++    # WARP: when steps were removed, the substituted flow no longer runs FABulousTile's final
++    # "save views" and Magic.WriteLEF is gone (docs/BUGS.md #2). Save the views here and write
++    # the LEF abstract with OpenROAD instead.
++    if removals and gui is None:
++        from librelane.state import DesignFormat
++        import subprocess as _sp
++        views = os.path.join(design_dir, "macro", pdk)
++        state_out.save_snapshot(views)
++        lef_dir = os.path.join(views, "lef")
++        os.makedirs(lef_dir, exist_ok=True)
++        odb = str(state_out[DesignFormat.ODB])
++        tcl = os.path.join(views, "write_lef.tcl")
++        with open(tcl, "w") as f:
++            f.write(f"read_db {{{odb}}}\n"
++                    f"write_abstract_lef -bloat_occupied_layers {{{os.path.join(lef_dir, tile + '.lef')}}}\n")
++        _sp.run(["openroad", "-exit", "-no_splash", tcl], check=True)
++        strip_unused_vias(os.path.join(lef_dir, tile + ".lef"))
++        print(f"Saved views and OpenROAD LEF to {views}")
++
+     print("Done!")
+ 
+ if __name__ == "__main__":
 diff --git a/tiles/tiny/LUT4x8_ha/config.yaml b/tiles/tiny/LUT4x8_ha/config.yaml
 old mode 100755
 new mode 100644
-index e7ca92a..2aebd0e
---- a/tiles/tiny/LUT4x8_ha/config.yaml
-+++ b/tiles/tiny/LUT4x8_ha/config.yaml
-@@ -8,6 +8,19 @@ meta:
- 
-     +OpenROAD.GlobalPlacement: OpenROAD.AddBuffers
- 
-+    # WARP (CMOS5L): Magic hangs reading the TopMetal1 power vias (docs/BUGS.md #2),
-+    # and the PDK has no LVS for CMOS5L yet; KLayout does stream-out and DRC.
-+    Magic.StreamOut: null
-+    Magic.WriteLEF: null
-+    KLayout.XOR: null
-+    Checker.XOR: null
-+    Magic.DRC: null
-+    Checker.MagicDRC: null
-+    Magic.SpiceExtraction: null
-+    Checker.IllegalOverlap: null
-+    Netgen.LVS: null
-+    Checker.LVS: null
-+
- FABULOUS_TILE_DIR: dir::.
- 
- # Basics
 diff --git a/tiles/tiny/common/common.yaml b/tiles/tiny/common/common.yaml
-index e2fa610..86c982e 100644
+index e2fa610..bf4e6af 100644
 --- a/tiles/tiny/common/common.yaml
 +++ b/tiles/tiny/common/common.yaml
-@@ -60,6 +60,27 @@ pdk::ihp-sg13g2:
+@@ -60,6 +60,30 @@ pdk::ihp-sg13g2:
      PDN_HPITCH: 75.6
      PDN_HOFFSET: 13.57
  
@@ -68,11 +110,14 @@ index e2fa610..86c982e 100644
 +pdk::ihp-sg13cmos5l:
 +    # The TT CMOS5L top level routes signals only up to Metal4 (TopMetal1 = TT power grid)
 +    RT_MAX_LAYER: Metal4
-+    # Magic stream-out hangs on the TopMetal1 power vias (docs/BUGS.md #2); use KLayout
++    # KLayout stream-out is the primary GDS (TT precheck uses KLayout)
 +    PRIMARY_GDSII_STREAMOUT_TOOL: klayout
++    # Tiles get vertical Metal4 power stripes only; the chip top level connects to them with
++    # its own TopMetal1 grid (as Tiny FABulous does on SKY130). No Metal4->TopMetal1 vias in the
++    # tile, which Magic could not read (docs/BUGS.md #2).
 +    FP_PDN_VERTICAL_LAYER: Metal4
 +    FP_PDN_HORIZONTAL_LAYER: TopMetal1
-+    PDN_MULTILAYER: True
++    PDN_MULTILAYER: False
 +
 +    PDN_VWIDTH: 1.0
 +    PDN_VSPACING: 2.0

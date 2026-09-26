@@ -1,0 +1,47 @@
+# LibreLane FABulousFabric flow: stitch the hardened tiles of warp_tiny.csv into one macro.
+# Adapted from Tiny FABulous (fabrics/tiny_fabric_10x4/config.yaml) for IHP CMOS5L.
+# run.sh copies this next to the generated fabric CSV in build/fabric_tiny/.
+meta:
+  version: 2
+  flow: FABulousFabric
+  substituting_steps:
+    # Magic 8.3.623 (this Nix environment) is older than the CMOS5L tech file requires
+    # (8.3.657, docs/BUGS.md #2): KLayout writes the GDS, run.sh writes the LEF with OpenROAD.
+    Magic.StreamOut: null
+    Magic.WriteLEF: null
+    Odb.CheckDesignAntennaProperties: null
+    Magic.DRC: null
+    Checker.MagicDRC: null
+    Magic.SpiceExtraction: null
+    Checker.IllegalOverlap: null
+    # no CMOS5L LVS in the PDK yet; XOR needs both GDS writers
+    Netgen.LVS: null
+    Checker.LVS: null
+    KLayout.XOR: null
+    Checker.XOR: null
+
+# No antenna repair: there are no standard cells at the fabric level
+GRT_ANTENNA_REPAIR_ITERS: 0
+DRT_ANTENNA_REPAIR_ITERS: 0
+
+DESIGN_NAME: warp_tiny
+VERILOG_FILES: []
+
+# Power straps are connected in the chip top level
+MAGIC_EXT_UNIQUE: notopports
+GRT_ALLOW_CONGESTION: true
+
+FABULOUS_FABRIC_CONFIG: dir::warp_tiny.csv
+FABULOUS_TILE_LIBRARY: dir::fabulous-tiles/tiles/tiny/
+FABULOUS_TILE_SPACING: 0
+FABULOUS_HALO_SPACING: [0, 0, 0, 0]
+
+IO_PIN_H_LENGTH: null
+IO_PIN_V_LENGTH: null
+
+PRIMARY_GDSII_STREAMOUT_TOOL: klayout
+
+pdk::ihp-sg13cmos5l:
+    # The TT CMOS5L top level routes to Metal4; TopMetal1 is its power grid
+    RT_MAX_LAYER: Metal4
+    FABULOUS_TIMING_MODEL: PHYSICAL

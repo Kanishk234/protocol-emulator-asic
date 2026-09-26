@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): built and checked locally; run 1 not started** (the branch push is Krithik's). The results sections below are filled in after the `gds` run.
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4.
 
 ---
 
@@ -38,15 +38,36 @@ Branch `spike/r4-floorplan`, built by `spikes/r4_floorplan/apply_to_branch.sh` f
 | `PNR_SDC_FILE` / `SIGNOFF_SDC_FILE` | R2's latch exception | the resizer otherwise spins on latch pins (D-032) |
 | `DRT_OPT_ITERS` | 3 | a stalled route ends and uploads `GDS_logs` inside 6 h (D-034) |
 
-## 3. Results
+## 3. Results: run 1 (2026-09-26) — failed at placement, before routing
 
-*Pending run 1.* To record (also in `AREA.md`):
-- utilisation (global placement, GPL-0019, and final);
-- global routing: overflow per layer (Metal2, Metal3, Metal4), usage per layer;
-- detailed routing: violations per iteration, route time;
-- total `gds` time; timing typ / slow (post-route STA on the routed netlist, as `spikes/r2_latch/post_route_sta.sh`);
-- where the congestion is: the GRT congestion report and the DRT violation locations, mapped to lanes, pin units, fabric and host.
+`gds` on `spike/r4-floorplan` (1ca1bdc), run ID: *to add*. Logs: the `GDS_logs` artifact, unpacked in `build/ci/r4/` (not committed). The flow stopped at step 37, `OpenROAD.ResizerTimingPostCTS`, with **DPL-0036: detailed placement failed**. It never reached global or detailed routing, so there are no overflow or routing-violation numbers. The whole flow took about 5 minutes of step time.
+
+**Area through the flow** (core 902,417 µm²; the macro is 45,309 µm² of it):
+
+| Stage | Standard cells µm² | Utilisation (cells + macro) | Source |
+|---|---|---|---|
+| Our Yosys (typ, flat) | 498.8K | — | `check_local.sh` |
+| LibreLane synthesis | 521.4K (36,896 cells: 2,598 flops, 2,814 latches, 210 clock gates) | — | step 06 `stat.rpt` |
+| Global placement | 593.2K movable, incl. tap/endcap and pin padding | **70.0 %** (GPL-0019; D-043 predicted ~71 %) | step 28 |
+| After design repair (4,470 fanout/slew buffers, 2,661 tie cells) | 559.8K | 67.1 % | step 34 metrics |
+| After CTS (30.1K of clock buffers; `clk` has 2,598 register sinks + 211 macro/clock-gate sinks) | 590.9K | 70.5 % | step 35 metrics |
+| After post-CTS hold repair (**3,921 hold buffers, +10.1 % area**) | ~650K | **~77 %** | step 37 log |
+
+Then legalization failed on 43 instances (hold buffers and fanout buffers): the rows around them were full. The log does not give their coordinates, so which block they sit in is not known from this run.
+
+**Timing** (mid-PnR STA after CTS, typical corner only): setup +8.94 ns worst (no setup violations at any corner, RSZ-0098). Hold: 99 violations at typ, worst −0.65 ns, nearly all on the SRAM macro's inputs (`A_DIN`, `A_ADDR` from the host write registers: flop → macro, with −0.46 ns clock skew between the register clock tree and the macro/clock-gate tree). The resizer, repairing all corners with the template's 0.1 ns hold margin, saw **2,315 endpoints** with hold violations (mostly at the fast corner) and fixed them all, costing 3,921 buffers.
 
 ## 4. What it means
 
-*Pending.* The answers to look for: does it route at all; if not, at what utilisation it would ("fits at X %"); and whether the congestion is local (the slot arrays, as R2 suggested, which a lower local density or 2 lanes would fix) or global (the fabric multiplexers and the pad muxes, which fewer units would fix).
+1. **At ~70 % placement utilisation the full chip does not even place.** The flow's own growth after global placement (clock tree +5.6 %, hold buffers +10.1 %) takes it to ~77 %, and legalization fails. So the real ceiling is below 70 % at global placement, before any question of routing. R2's ~42 % remains the only density we know routes.
+2. **The layout growth assumption holds.** Flow synthesis to post-hold was ×1.25 (521K → ~650K); AREA_ESTIMATE used ×1.30 from R2. Our Yosys numbers are ~4.5 % under LibreLane's own synthesis.
+3. **Hold repair is the largest part of the layout growth at full size:** +10 % area on its own (R2 needed 364 hold buffers for one lane; here 3,921). Most of it is fast-corner hold across the whole design with the template's 0.1 ns margin, on top of the clock skew between the big register tree and the gated/macro tree. It is inside the ×1.30 factor, not on top of it, but it is the part that grows fastest with size.
+4. **Failing runs are cheap:** ~5 min of flow time, so several configurations can be tried in a day.
+5. **Routability is still unmeasured.** The next run has to get past placement to answer the question R4 was for.
+
+**Run 2 candidates (one change, D-034 rule):**
+- (a) **4 pin units instead of 6** (drop two lean units: ~−75K µm², GPL ~62 %, after growth ~70 %). This is also a real candidate cut. It needs a unit-count parameter in the R4 top.
+- (b) Same design, `PL_RESIZER_HOLD_SLACK_MARGIN` 0.1 → 0.03: fewer hold buffers. It only moves the failure point a few percent, and it weakens hold margin, so it doesn't answer the routing question.
+- (c) 2 lanes instead of 3 (~−70K). Also a real cut, but lanes are the area that routed in R2; units and the fabric are the unknowns.
+
+Recommendation: (a), with density = its reported GPL utilisation + 2.

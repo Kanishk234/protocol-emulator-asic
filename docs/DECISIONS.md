@@ -83,3 +83,14 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** `docs/design/HELDOUT.md`: H1 WS2812 TX, H2 1-Wire controller, H3 SWD host, H4 CAN 2.0A. PS/2 and JTAG stay free (stretch/design set).
 - **Reason:** phase 1's criteria: a spread of timing-coded (H1, H2), clocked with turnaround (H3), bidirectional/open-drain (H2, H3, H4), and CRC plus bit-stuffing (H4). PS/2 and JTAG are too close to the design set (a device-clocked shift register, SPI-like shifting) to test generality.
 - **Seal:** the commit that adds `HELDOUT.md` (hash recorded in the phase 1 checklist).
+
+## D-014: Provisional user-design interface
+- **Date:** 2026-09-25 · **Status:** Proposed (formalized in `ARCHITECTURE.md` v1, phase 1)
+- **Decision:** every protocol user design exposes: `clk`, `rst_n` (from the shell; held low while the fabric is stopped or loading); its pins as input / output / output-enable signals; a host → design byte channel `h_wdata/h_wvalid/h_wready`; a design → host byte channel `h_rdata/h_rvalid/h_rready`; and an 8-bit `h_status` the host can read at any time. Settings (e.g. a UART divisor) are Verilog parameters fixed in the bitstream by default; a design may also offer a run-time register (`RUNTIME_*`) so both can be profiled.
+- **Reason:** protocols have to be written and profiled before the shell exists; a byte channel in each direction plus status is the smallest host path that serves UART, SPI and I2C. Fixing settings in the bitstream is how an FPGA is normally used, and it is much cheaper: the UART is 171 LUTs with a fixed divisor and 262 with a run-time one.
+- **Alternatives:** a memory-mapped register window (more flexible, more fabric logic); wider channels.
+- **Cost:** the shell must provide both byte channels and the status read (ARCHITECTURE §2).
+
+## D-015: The `unit` workflow (closes D-011)
+- **Date:** 2026-09-25 · **Status:** Accepted
+- **Decision:** `.github/workflows/unit.yaml` added with the first Python tool (`tools/refmodels/uart.py`): pytest over `tools/`, and the cocotb RTL tests of every design-set protocol (UART now, others as they land), with sigrok installed as the second decoder.

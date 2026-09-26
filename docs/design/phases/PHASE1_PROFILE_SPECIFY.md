@@ -6,11 +6,11 @@
 ## Tasks
 
 ### Seal the held-out set (do this first)
-- [ ] Choose 3–4 held-out protocols (candidates: 1-Wire, WS2812, SWD, PS/2, JTAG, CAN). Pick a spread: timing-coded, clocked, bidirectional, and one with CRC or bit-stuffing if possible.
-- [ ] Write `docs/design/HELDOUT.md` with the list, the scope of each, and the rule that nothing is written or profiled for them until the hardware freeze. Commit it before any profiling (the commit hash is the seal).
+- [x] Choose 3–4 held-out protocols (candidates: 1-Wire, WS2812, SWD, PS/2, JTAG, CAN). Pick a spread: timing-coded, clocked, bidirectional, and one with CRC or bit-stuffing if possible. (WS2812, 1-Wire, SWD, CAN; D-013)
+- [x] Write `docs/design/HELDOUT.md` with the list, the scope of each, and the rule that nothing is written or profiled for them until the hardware freeze. Commit it before any profiling (the commit hash is the seal). (seal 0171cf7)
 
 ### Design-set protocol RTL (as user designs)
-- [ ] `protocols/uart/`: TX and RX, configurable baud divisor, framing error.
+- [x] `protocols/uart/`: TX and RX, configurable baud divisor, framing error. (8 cocotb tests vs `tools/refmodels/uart.py` + sigrok, DIV 16/13 and runtime divisor, all pass locally 2026-09-25; CI `unit` run ID after push)
 - [ ] `protocols/spi_ctrl/`: all four modes, chip select, full duplex.
 - [ ] `protocols/i2c_ctrl/`: start, repeated start, stop, ACK/NACK, clock stretching, open-drain outputs.
 - [ ] `protocols/i2c_target/`: address match, small register map, read/write.
@@ -37,7 +37,7 @@
 - [ ] Risk register updated in `OVERVIEW.md`.
 
 ## Phase exit checklist
-- [ ] `HELDOUT.md` committed before profiling (commit hash: …)
+- [x] `HELDOUT.md` committed before profiling (commit hash: 0171cf7; no profiling existed before it)
 - [ ] All four design-set protocols pass their RTL tests against independent reference models (run IDs: …)
 - [ ] `docs/reports/profiling.md` complete with a ranked specialization list
 - [ ] Tiny fabric hardened on CMOS5L, precheck passed (CI run ID: …)

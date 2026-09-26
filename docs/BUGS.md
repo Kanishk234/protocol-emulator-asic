@@ -20,3 +20,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Now covered by:** nothing yet. Next: KLayout stream-out for tiles and the fabric (as Tiny FABulous does), and a check that the flow finishes in bounded time.
 - **Update (run 2):** hung again in the same way; skipping the step through the tile's `meta.substituting_steps` had no effect, because `tiles.py` builds the flow from a dict and does not apply them.
 - **Fix (workaround):** our patch to the tile driver applies step removals; tiles skip Magic and use KLayout stream-out (run 3: GDS written, KLayout DRC 0). Root cause in Magic still open; Magic LEF writing is also skipped, so the fabric needs another LEF source. Fix commit: pending (spike).
+
+## 3: UART test harness: first byte invisible to sigrok, writes during ReadOnly
+- **Date:** 2026-09-25
+- **Symptom:** `protocols/uart/test`: sigrok decoded `[FF 55 A5 3C 81]` instead of `[00 FF 55 A5 3C 81]` (our model decoded all six); two tests failed with "Attempting settings a value during the ReadOnly phase".
+- **Root cause:** test code, not RTL. (a) The recorded TX line started at the edge where the first start bit began, so the VCD had no idle-high → low edge before it and sigrok skipped the frame. (b) The record/collect helpers returned in the ReadOnly phase and the caller then drove a signal.
+- **Caught by:** the sigrok leg of `test_tx_back_to_back` (an independent decoder) and cocotb's phase check.
+- **Now covered by:** the same tests: the VCD gets 2 bit times of idle first; helpers end with `NextTimeStep()`.
+- **Fix:** in the same commit as the tests.

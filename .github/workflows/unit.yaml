@@ -47,3 +47,12 @@ jobs:
             make $args
             ! grep -q failure results.xml
           done
+
+      - name: SPI controller RTL tests (four modes, two speeds)
+        run: |
+          cd protocols/spi_ctrl/test
+          for args in "MODE=0" "MODE=1" "MODE=2" "MODE=3" "MODE=1 HALF=5" "MODE=2 HALF=7"; do
+            rm -f results.xml
+            make $args
+            ! grep -q failure results.xml
+          done

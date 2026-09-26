@@ -34,6 +34,8 @@ Tasks:
 
 **Status (2026-09-25):** estimate done (`docs/reports/AREA_ESTIMATE.md`). The frozen spec came to ~115 % of the core. Tier 1 decided: D-038 (configuration in latches), D-039 (slots, K and configuration write-only), D-040 (U0–U1 full, U2–U5 lean), which brings it to ~87 %. Next: write and synthesize `trw_pin_unit` first, to replace the estimate's biggest guess, then choose the next cuts (AREA_ESTIMATE §8).
 
+**Status (2026-09-25, later):** `trw_pin_unit` milestone A (lean) is written, tested (27 L1 tests) and synthesized (`docs/reports/PIN_UNIT_RTL.md`): 38.7K µm² per lean unit with config, producer and port, 6 % under the estimate, so the chip is still ~85 %. The team chooses the next cuts from §5 of that report; milestone B (full units) follows.
+
 ### 2.1 RTL (owner: architecture/RTL; written from the spec, not from `tripsim`)
 
 | Module | Contents |

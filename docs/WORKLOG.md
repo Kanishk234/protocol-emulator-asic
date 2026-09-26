@@ -21,6 +21,34 @@ Next:
 
 ---
 
+## 2026-09-25: Krithik + Claude (phase 2: pin unit RTL, milestone A)
+RTL session: worked from the documents and `spec/tripwire.yaml` only; did not read `tools/tripsim` or `spikes/area/ae_prims.v`.
+
+Done:
+- `tools/gen/gen.py`: Verilog output for `pin_config` (field positions, `TRW_PCE_*` enum codes, stored-bit masks per feature, units per feature) and a check that no two defines collide; 3 new generator tests. `src/trw_defs.vh` regenerated.
+- RTL, not yet in `info.yaml`/`test/Makefile`: `trw_pin_cfg.v` (latch array, a clock gate per stored word, write-only, `FULL`), `trw_pin_io.v`, `trw_pin_tx.v`, `trw_pin_rx.v`, `trw_pin_unit.v`. Lean feature set for both builds; PULSE, carrier and BITSYNC are milestone B.
+- The cursor needs no multiplier: it is kept relative to now in ticks (`PIN_UNIT_RTL.md` §1).
+- `test_internal/pin/`: cocotb harness plus 27 L1 tests (L1-PIN-TX 13, L1-PIN-RX 12, L1-OVR 2), expected values from the §14 rules; `mutate.sh` (12 injected bugs, all caught).
+- `synth/pin/`: `run_pin.sh` (lint, Yosys area, OpenSTA typ/slow), `ablate.sh` (price per feature), measurement wrapper with a stand-in producer.
+- `docs/reports/PIN_UNIT_RTL.md`: numbers, the budget, gaps P-G1–P-G23. AREA.md synthesis row; BUGS #40 (generator define collision, caught by the new test before any RTL used it).
+
+Results:
+- Lean unit 29.4K µm² (216 flops), config 5.1K lean / 11.4K full, producer 1.5K. With the estimated port: **38.7K vs the estimate's 41.2K (−6 %)**. The chip at scenario E is ~85 % of the core, so the cuts are still needed.
+- The wide timers dominate: the burst timer alone is 8.5K, the SHIFT_RX timer 3.9K.
+- Slack at 20 ns +10.8 typ / +5.8 slow with config static. Critical path: burst timer → cursor subtract → `eq`.
+- Tests: `make FULL=0` and `FULL=1` both 27/27; `scripts/check_all.sh` PASS; 34 generator tests pass; `gen --check` clean; lint clean.
+
+Checklist boxes ticked (evidence):
+- None. "All modules exist and lint clean" needs the whole table; "L1 all green" needs the other blocks and BITSYNC.
+
+Problems / decisions:
+- P-G15 (restart on a config write) and P-G16 (`live`) change §14 H1; P-G19 adds a clear mechanism to §9. They need a DECISIONS entry (not written: the user decides; D-041 is still free).
+
+Next:
+- Team: choose the next area cuts with `PIN_UNIT_RTL.md` §5 (fraction width, 4 units, 2 lanes).
+- Model session: answer P-G1–P-G23 in §14.
+- RTL: milestone B (PULSE, carrier, BITSYNC) after the cut decision, since a timer-width change touches BITSYNC too.
+
 ## 2026-09-25: Krithik, Kanishk + Claude (phase 2: tier 1 area decisions)
 Done:
 - **D-038:** pin configuration in a latch array (`trw_pin_cfg.v`); §14 H1: the host writes every unit's block before RUN; CLAUDE.md latch rule updated.

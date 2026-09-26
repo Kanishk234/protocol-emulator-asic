@@ -244,3 +244,22 @@ async def test_event_beats_word(dut):
     await tb.until(40)
     assert tb.loads == [(22, DATA, 1), (32, EVENT, int(tb.loads[1][2]) & 0x7FFF)]
     assert tb.log[32]["ovr"] == 0 and tb.log[33]["ovr"] == 1
+
+
+@cocotb.test()
+async def test_ev_reset_before_the_sample(dut):
+    """P38 / P8 (P-G12): in an event clock with EV_RESET, the framing restarts first and that clock's
+    sample becomes bit 0 of the new word (no word is lost, no OVERRUN)."""
+    tb = PinTb(dut)
+    await tb.start(encode(rxmode=LRX, pin_a=UI0, pin_b=UI1, rx_nbits=2, ev_edge=enum("ev_edge", "both"),
+                          ev_reset=1), pads=0xFFFFFC)
+    tb.drive(20, UI1, 1)                    # rise seen in 22: bit 0 = 0 (partial word)
+    tb.drive(25, UI1, 0)
+    tb.drive(30, UI1, 1)
+    tb.drive(30, UI0, 1)                    # A rises with the clock: event + sample in clock 32
+    tb.drive(35, UI1, 0)
+    tb.drive(40, UI1, 1)                    # rise seen in 42: second bit of the new word
+    await tb.until(50)
+    assert [(c, t) for c, t, _ in tb.loads] == [(32, EVENT), (42, DATA)]
+    assert tb.loads[1][2] == 0b11
+    assert tb.log[49]["ovr"] == 0

@@ -1,0 +1,72 @@
+# Tiny Tapeout project information
+# R4 spike (branch spike/r4-floorplan only, never merged; DECISIONS D-043): a full-size TRIPWIRE
+# floorplan at 6x4 to measure routability. Sources: spikes/r4_floorplan on main.
+project:
+  title:        "TRIPWIRE R4: full-size floorplan spike"      # Project title
+  author:       "Kanishk, Krithik"      # Your name
+  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
+  description:  "3 lanes, 6 pin units, the channel fabric, the SRAM rotation and a host SPI stub, to learn how full a 6x4 core can be and still route"      # One line description of what your project does
+  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
+  clock_hz:     50000000       # Clock frequency in Hz (or 0 if not applicable)
+
+  # How many tiles your design occupies? A single tile is about 167x108 uM.
+  tiles: "6x4"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+
+  # Your top module name must start with "tt_um_". Make it unique by including your github username:
+  top_module:  "tt_um_tripwire"
+
+  # List your project's source files here.
+  # Source files must be in ./src and you must list each source file separately, one per line.
+  # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
+  # The SRAM macro is not a source file: src/config.json brings it in through MACROS (as R3).
+  source_files:
+    - "tt_um_tripwire.v"
+    - "r4_host.v"
+    - "r4_seq.v"
+    - "r4_port.v"
+    - "r4_fabric.v"
+    - "trw_pin_cfg.v"
+    - "trw_pin_io.v"
+    - "trw_pin_tx.v"
+    - "trw_pin_rx.v"
+    - "trw_pin_unit.v"
+    - "trw_lane.v"
+    - "trw_alu.v"
+    - "trw_slots.v"
+    - "trw_sram.v"
+
+# The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
+# This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
+pinout:
+  # Inputs
+  ui[0]: "PIN (ui0)"
+  ui[1]: "PIN (ui1)"
+  ui[2]: "PIN (ui2)"
+  ui[3]: "PIN (ui3)"
+  ui[4]: "HOST CS_n"
+  ui[5]: "HOST SCK"
+  ui[6]: "HOST MOSI"
+  ui[7]: "PIN (ui7)"
+
+  # Outputs
+  uo[0]: "PIN (uo0)"
+  uo[1]: "PIN (uo1)"
+  uo[2]: "PIN (uo2)"
+  uo[3]: "HOST MISO"
+  uo[4]: "PIN (uo4)"
+  uo[5]: "PIN (uo5)"
+  uo[6]: "IRQ"
+  uo[7]: "PIN (uo7)"
+
+  # Bidirectional pins
+  uio[0]: "PIN (uio0)"
+  uio[1]: "PIN (uio1)"
+  uio[2]: "PIN (uio2)"
+  uio[3]: "PIN (uio3)"
+  uio[4]: "PIN (uio4)"
+  uio[5]: "PIN (uio5)"
+  uio[6]: "PIN (uio6)"
+  uio[7]: "PIN (uio7)"
+
+# Do not change!
+yaml_version: 6

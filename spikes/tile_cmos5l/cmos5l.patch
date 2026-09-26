@@ -1,5 +1,5 @@
 diff --git a/tiles.py b/tiles.py
-index c86f9fe..ece592f 100755
+index c86f9fe..6015526 100755
 --- a/tiles.py
 +++ b/tiles.py
 @@ -205,6 +205,10 @@ tile_obstruction_layers = {
@@ -13,18 +13,63 @@ index c86f9fe..ece592f 100755
          "ihp-sg13*": {
              "*"         : ["Metal1", "Metal2", "Metal3", "Metal4", "Metal5", "TopMetal1", "TopMetal2"],
          },
+@@ -365,6 +369,15 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+         pdk_root = version.get_dir(ciel_home)
+     
+     
++    # WARP: the librelane CLI applies meta.substituting_steps (Flow.Substitute); this driver
++    # did not. Apply the step removals (value None) for steps that exist in the flow.
++    subs = (config.get("meta") or {}).get("substituting_steps") or {}
++    step_ids = {s.id for s in target_flow.Steps}
++    removals = {k: None for k, v in subs.items() if v is None and k in step_ids}
++    if removals and gui is None:
++        print(f"Removing steps: {sorted(removals)}")
++        target_flow = target_flow.Substitute(removals)
++
+     flow = target_flow(
+         config,
+         design_dir=design_dir,
+diff --git a/tiles/tiny/LUT4x8_ha/config.yaml b/tiles/tiny/LUT4x8_ha/config.yaml
+old mode 100755
+new mode 100644
+index e7ca92a..2aebd0e
+--- a/tiles/tiny/LUT4x8_ha/config.yaml
++++ b/tiles/tiny/LUT4x8_ha/config.yaml
+@@ -8,6 +8,19 @@ meta:
+ 
+     +OpenROAD.GlobalPlacement: OpenROAD.AddBuffers
+ 
++    # WARP (CMOS5L): Magic hangs reading the TopMetal1 power vias (docs/BUGS.md #2),
++    # and the PDK has no LVS for CMOS5L yet; KLayout does stream-out and DRC.
++    Magic.StreamOut: null
++    Magic.WriteLEF: null
++    KLayout.XOR: null
++    Checker.XOR: null
++    Magic.DRC: null
++    Checker.MagicDRC: null
++    Magic.SpiceExtraction: null
++    Checker.IllegalOverlap: null
++    Netgen.LVS: null
++    Checker.LVS: null
++
+ FABULOUS_TILE_DIR: dir::.
+ 
+ # Basics
 diff --git a/tiles/tiny/common/common.yaml b/tiles/tiny/common/common.yaml
-index e2fa610..c6d2075 100644
+index e2fa610..86c982e 100644
 --- a/tiles/tiny/common/common.yaml
 +++ b/tiles/tiny/common/common.yaml
-@@ -60,6 +60,24 @@ pdk::ihp-sg13g2:
+@@ -60,6 +60,27 @@ pdk::ihp-sg13g2:
      PDN_HPITCH: 75.6
      PDN_HOFFSET: 13.57
  
 +# WARP: CMOS5L has M1-M4 + TopMetal1 only (no Metal5/TopMetal2).
 +# Power grid as in the PDK's LibreLane config: Metal4 vertical, TopMetal1 horizontal.
 +pdk::ihp-sg13cmos5l:
-+    RT_MAX_LAYER: TopMetal1
++    # The TT CMOS5L top level routes signals only up to Metal4 (TopMetal1 = TT power grid)
++    RT_MAX_LAYER: Metal4
++    # Magic stream-out hangs on the TopMetal1 power vias (docs/BUGS.md #2); use KLayout
++    PRIMARY_GDSII_STREAMOUT_TOOL: klayout
 +    FP_PDN_VERTICAL_LAYER: Metal4
 +    FP_PDN_HORIZONTAL_LAYER: TopMetal1
 +    PDN_MULTILAYER: True

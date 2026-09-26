@@ -21,3 +21,6 @@ results.xml
 __pycache__/
 .pytest_cache/
 .hypothesis/
+
+# Downloaded CI artifacts
+*.zip

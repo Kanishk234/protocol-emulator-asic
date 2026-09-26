@@ -11,7 +11,7 @@
 
 ### Design-set protocol RTL (as user designs)
 - [x] `protocols/uart/`: TX and RX, configurable baud divisor, framing error. (8 cocotb tests vs `tools/refmodels/uart.py` + sigrok, DIV 16/13 and runtime divisor, all pass locally 2026-09-25; CI `unit` run ID after push)
-- [ ] `protocols/spi_ctrl/`: all four modes, chip select, full duplex.
+- [x] `protocols/spi_ctrl/`: all four modes, chip select, full duplex. (4 cocotb tests × 6 configurations vs `tools/refmodels/spi.py` + sigrok, 24/24 pass locally 2026-09-25; CI `unit` run ID after push)
 - [ ] `protocols/i2c_ctrl/`: start, repeated start, stop, ACK/NACK, clock stretching, open-drain outputs.
 - [ ] `protocols/i2c_target/`: address match, small register map, read/write.
 - [ ] Independent reference models in `tools/refmodels/` (written without reading the RTL) and RTL-level tests for each.

@@ -89,7 +89,8 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** every protocol user design exposes: `clk`, `rst_n` (from the shell; held low while the fabric is stopped or loading); its pins as input / output / output-enable signals; a host → design byte channel `h_wdata/h_wvalid/h_wready`; a design → host byte channel `h_rdata/h_rvalid/h_rready`; and an 8-bit `h_status` the host can read at any time. Settings (e.g. a UART divisor) are Verilog parameters fixed in the bitstream by default; a design may also offer a run-time register (`RUNTIME_*`) so both can be profiled.
 - **Reason:** protocols have to be written and profiled before the shell exists; a byte channel in each direction plus status is the smallest host path that serves UART, SPI and I2C. Fixing settings in the bitstream is how an FPGA is normally used, and it is much cheaper: the UART is 171 LUTs with a fixed divisor and 262 with a run-time one.
 - **Alternatives:** a memory-mapped register window (more flexible, more fabric logic); wider channels.
-- **Cost:** the shell must provide both byte channels and the status read (ARCHITECTURE §2).
+- **Revision (SPI controller):** the host → design channel carries a 1-bit `h_wlast` flag with each byte, marking the end of a transaction (e.g. SPI chip-select release); designs that don't need it ignore it.
+- **Cost:** the shell must provide both byte channels (the write side with `h_wlast`) and the status read (ARCHITECTURE §2).
 
 ## D-015: The `unit` workflow (closes D-011)
 - **Date:** 2026-09-25 · **Status:** Accepted

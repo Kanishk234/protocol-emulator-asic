@@ -28,3 +28,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** the sigrok leg of `test_tx_back_to_back` (an independent decoder) and cocotb's phase check.
 - **Now covered by:** the same tests: the VCD gets 2 bit times of idle first; helpers end with `NextTimeStep()`.
 - **Fix:** in the same commit as the tests.
+
+## 4: SPI target model skipped a response byte; SPI controller spec allowed a too-fast SCK
+- **Date:** 2026-09-25
+- **Symptom:** (a) `tools/refmodels/spi.py` with the CS-fall and first SCK edge in the same clock missed that edge (CPHA 1); (b) across CS transactions the model skipped a response byte (e.g. host got `C3` instead of `5A`); (c) the SPI controller at `HALF=3` read wrong MISO bytes in every mode.
+- **Root cause:** (a, b) model: it handled only one event per clock, and it loaded the next response both when a byte completed and when the next transaction started (CPHA 0 puts the next byte's MSB on the line before knowing whether the transaction continues). (c) spec: MISO passes a two-flop synchronizer (2 clocks) and a target may take 1 clock after its change edge, so the sampling edge must be ≥ 4 clocks after the change edge. The RTL comment said `HALF >= 3`.
+- **Caught by:** (a) the model's own hypothesis round-trip test; (b, c) `protocols/spi_ctrl/test` (multi-transaction tests, `HALF=3` run).
+- **Now covered by:** `test_target_roundtrip`, `test_responses_continue_across_transactions` (model); the SPI RTL suite at MODE 0–3 with `HALF` 4, 5, 7. Spec changed to `HALF >= 4` (SCK ≤ clk/8).
+- **Fix:** in the same commit as the SPI tests.

@@ -11,7 +11,9 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - Provisional user-design interface (D-014): pins + host byte channels + status; settings as bitstream parameters by default.
 - UART: independent model `tools/refmodels/uart.py` (6 pytest incl. hypothesis) written first; then RTL `protocols/uart/` (tx, rx, top); 8 cocotb tests vs the model and sigrok, DIV 16/13/runtime, all pass; Verilator/Icarus lint clean. First profile: 171 LUTs fixed divisor, 262 runtime (budget ~96). BUGS #3 (harness). `unit` workflow added (D-015); `check_all` runs protocol tests.
 **Boxes ticked:** phase 1: held-out chosen + sealed (0171cf7), `protocols/uart/`.
-**Next step:** SPI controller (model first, then RTL + tests), then I2C controller and target; then `tools/profile/`.
+**Later:** `protocols/README.md` states that protocol designs are soft user logic, never silicon (user asked; D-002). SPI controller: model `tools/refmodels/spi.py` (7 pytest) then RTL `protocols/spi_ctrl/`; 24/24 cocotb runs (MODE 0–3, HALF 4/5/7) vs model + sigrok; lint clean; 85 LUTs / 42 FFs. BUGS #4 (model skipped a response; spec `HALF >= 4`, not 3). D-014 revised (`h_wlast`). `check_all` PASS.
+**Boxes ticked:** `protocols/spi_ctrl/`.
+**Next step:** I2C controller (model first), then I2C target; then `tools/profile/`.
 
 ## 2026-09-25 (session 3, continued)
 **Done:** fetched the CI `GDS_logs` (user download): die 1289.28 × 710.64 µm, 0 DRC/LVS/antenna, timing met, **top level routes only to Metal4** (TopMetal1 is TT power); recorded in `PHYSICAL_DESIGN_AND_CI.md`. `fpga` run 36201219254 green. D-008 accepted (G1 fallback; goal still full specialization). D-011 (`unit` arrives with the first Python tool). `VERSIONS.md` complete. Phase 0 summary written (in progress).

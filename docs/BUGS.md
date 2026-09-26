@@ -15,7 +15,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 ## 2: Magic stream-out hangs on a FABulous tile in CMOS5L
 - **Date:** 2026-09-25
 - **Symptom:** LibreLane step `Magic.StreamOut` on the `LUT4x8_ha` tile (`spikes/tile_cmos5l`) prints `DEF read, Line 67..70 (Error): No cut layer specified in VIARULE` (4 errors), then runs at 100 % CPU with an empty log for 9+ minutes; stopped by hand. No GDS produced.
-- **Root cause:** not yet known. The 4 via rules are the power-grid vias OpenROAD generates for the Metal4/TopMetal1 grid; Magic's CMOS5L tech file (PDK 2bbec75) apparently has no matching via rule.
+- **Root cause (found 2026-09-26):** a **Magic version mismatch**. The PDK's CMOS5L tech file (2bbec75) says `Magic version 8.3.657 is required by this techfile, but this version of magic is 8.3.623` (the LibreLane 3.0.0 / FABulous-plugin Nix environment), and then fails to parse its `cifinput` section. With a partly loaded tech file Magic cannot read the generated via arrays (`No cut layer specified in VIARULE`) and hangs. Removing the TopMetal1 power grid (4 → 3 errors) did not help, as expected given this cause.
 - **Caught by:** the tile hardening spike (manual).
 - **Now covered by:** nothing yet. Next: KLayout stream-out for tiles and the fabric (as Tiny FABulous does), and a check that the flow finishes in bounded time.
 - **Update (run 2):** hung again in the same way; skipping the step through the tile's `meta.substituting_steps` had no effect, because `tiles.py` builds the flow from a dict and does not apply them.

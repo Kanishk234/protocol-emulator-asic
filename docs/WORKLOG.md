@@ -4,6 +4,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-26 (session 5: tiny fabric)
+**Done:**
+- Magic hang root cause found (BUGS #2): the CMOS5L Magic tech file needs Magic >= 8.3.657; the LibreLane 3.0.0 Nix environment has 8.3.623. Workaround everywhere: skip Magic; KLayout writes the GDS and runs the DRC, OpenROAD writes the LEF (`write_abstract_lef`), unused VIA definitions stripped (the FABulous fabric flow misreads them as the tile size).
+- All 9 tile types hardened on CMOS5L (0 routing DRC, 0 antenna each); **16-LUT fabric `warp_tiny` stitched: 357 × 484 µm, KLayout DRC 0**, bitstream spec generated (`docs/reports/fabric_tiny.md`).
+- Line endings: my Windows-side Python edits had written CRLF into 14 committed files; all converted back to LF (content unchanged, checked with `git diff --ignore-cr-at-eol`). Edits now go through WSL or the Edit tool.
+- The first background tile run was stopped by Claude Code for low memory on the Windows side (not a job failure).
+**Boxes ticked:** none yet (the tiny-fabric box needs the chip-level integration + precheck).
+**Next step:** put `warp_tiny` into the TT chip: macro files under `macro/`, a minimal Verilog configuration loader + top, `config.json` MACROS/PDN (DECISIONS entries), a placement boundary in the KLayout GDS, then a CI `gds` run with precheck.
+
 ## 2026-09-25 (session 4: phase 1 starts)
 **Done:**
 - Phase 0 closed (D-012: organizer email waived by the user). CI green on 7405a2e.

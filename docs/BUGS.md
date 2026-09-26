@@ -61,3 +61,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** the UART RTL suite (run after resizing the UART counters).
 - **Now covered by:** every protocol suite (they import cocotb with `tools/` on the path); the package is `tools/profiling/`.
 - **Fix:** renamed before the first commit of the profiler.
+
+## 8: First D-017 stripe offsets put the east tiles' ground stripe outside the tile
+- **Date:** 2026-09-26
+- **Symptom:** `OpenROAD.GeneratePDN failed` for E_IO4, NE_term, SE_term (68.64 µm wide) after the tile stripe grid change.
+- **Root cause:** arithmetic: offset 61.28 put the VPWR stripe at local 63.11–65.21 and VGND 4.1 µm further right, past the core edge (65.76). I had checked the power stripe position but not the ground stripe and the 2.88 µm core margins.
+- **Caught by:** the tile flow's power-grid step.
+- **Now covered by:** the same step, plus a written constraint in D-017 (every column type must fit a full VPWR+VGND pair: grid phase between 3.9 and 19.3 µm; chosen 12.00) and a pin-position check of every tile LEF before stitching.
+- **Fix:** grid phase 12.00 (offsets 9.12 west / 50.40 others), before any commit.

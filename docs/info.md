@@ -14,19 +14,20 @@ protocols, behind a fixed management shell. A protocol (UART, SPI, I2C, ...) is 
 Verilog, compiled on a host computer into a bitstream, and loaded into the chip over the host interface. Changing the
 protocol changes the bitstream, not the silicon.
 
-The shell owns the host interface (an SPI-like port on `ui[0..2]`/`uo[0]`), loads and checks the bitstream, and
-starts and stops the fabric. While the fabric is stopped or unconfigured, all fabric outputs are parked and every
-bidirectional pin is an input. The remaining pins belong to the loaded protocol.
-
-**Status:** design in progress. The current silicon is a placeholder (`uo_out = ui_in + uio_in`); the pinout above
-is provisional until the architecture spec is written.
+**Status: phase 1 spike.** The current design is a 16-LUT FABulous fabric (2 LUT4x8 tiles plus IO tiles) behind a
+minimal shell: a bit-bang configuration port (`CFG_CLK`, `CFG_DATA`) feeding FABulous's frame-based configuration
+logic, and run control. Fabric outputs and output enables are parked (0) unless `RUN` is high and no configuration
+session is running. The full shell (SPI-like host interface, checked loading, host byte channels) and the larger,
+specialized fabric come later.
 
 ## How to test
 
-Placeholder design: drive `ui_in` and `uio_in`; `uo_out` shows their 8-bit sum.
+1. Hold `RUN` low. Send the bitstream words over `CFG_CLK`/`CFG_DATA` (FABulous bit-bang protocol: each data bit on a
+   rising edge of `CFG_CLK`, a control bit on each falling edge; control pattern `0xFAB1` marks a word, `0xFAB0` ends
+   the session). `CFG_ACTIVE` is high during the session.
+2. Raise `RUN`. The fabric's outputs drive `uo[2..5]` and the `uio` pins as the loaded design says.
 
-The final design will be tested by loading a protocol bitstream over the host interface with the host software in
-`tools/host/`, starting the fabric, and exercising the protocol pins with a peer device or logic analyzer.
+Bitstream generation for this fabric is part of the next development phase.
 
 ## External hardware
 

@@ -103,3 +103,25 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Fit:** UART (~50 LUT4 with glue), SPI controller (~45) and I2C controller (~77) each fit 88. The I2C target (~220) does not; options in order: register-file primitive, smaller register map, showcase on the I2C controller. Running two protocols at once does not fit.
 - **Primitive rules (D-002):** timer and shift register are used by 4 of 4 design-set protocols; host channel and I/O features are shell/I/O, not fabric blocks; the register file has one user so far and needs its own justification before it is built.
 - **Alternatives:** hybrid (PIO-style sequencers + small fabric): not needed for 3 of 4; generic-only fabric: fits nothing (D-008).
+
+## D-017: Tile power stripes on a global grid that the TT chip grid can land on
+- **Date:** 2026-09-26 · **Status:** Accepted (spike; verified by the chip-level hardening)
+- **Problem:** in TT's CMOS5L flow a user block has only vertical Metal4 power stripes (no TopMetal1), each ≥ 2.1 µm wide and running the full block height (precheck). A macro's Metal4 power pins must therefore be overlapped, same net, by those stripes; any chip stripe that crosses the macro anywhere else shorts to its wiring. Lessons from the TRIPWIRE R3 spike on `main` (IHP SRAM macro, 6 CI runs, `spikes/r3_sram/overlay/src/pdn_cfg.tcl`).
+- **Decision:** the tiles' Metal4 power stripes are 2.1 µm wide at a pitch of **109.92 µm (half the LUT tile width, 219.84 = 2 × 109.92)**, with a tile-type offset so that, in the stitched fabric, every column's stripes sit on one global grid: fabric-local x = 20.00 + 109.92 k (VPWR) and + 4.1 (VGND). West-column tiles (W_IO4, NW_term, SW_term) use local offset 20.00; LUT-width tiles (LUT4x8_ha, N_term, S_IO2) and east-column tiles (E_IO4, NE_term, SE_term) use 61.28 (= 20.00 + 109.92 − 68.64, since every LUT-width column starts at 68.64 + 219.84 j). Tiles stacked in a column form continuous full-height power columns. The chip level uses the same pitch and width, offset to the macro's x position, with the R3 spike's pdn_cfg.tcl (it releases the macro during stripe generation and checks that every stripe crossing a macro lies inside same-net pins).
+- **Why not per-tile 50 µm stripes:** tile widths (219.84, 68.64) are not multiples of 50, so no uniform chip grid can hit the stripes of every column.
+- **Cost:** wider stripes take Metal4 routing tracks inside the tiles (2 × 2.1 µm per 109.92 µm, vs 2 × 1.0 per 50: about the same share, 3.8 % vs 4.0 %). IR drop with a 110 µm pitch: to check at chip level.
+
+## D-018: Phase 1 spike top: 16-LUT fabric behind a minimal shell
+- **Date:** 2026-09-26 · **Status:** Accepted (spike; replaced by the phase 2 shell)
+- **Decision:** `tt_um_warp` = the fabric macro `warp_tiny` + `wp_fabric_cfg` (FABulous's bit-bang receiver and frame-configuration FSM, copied unmodified into `src/fabric_gen/`, + per-row frame registers and per-column frame selects). Pins: `ui[0]` RUN, `ui[1]`/`ui[2]` bit-bang config clock/data, `ui[3..6]` fabric inputs, `uo[0]` config active, `uo[2..5]` fabric outputs, `uio[0..7]` fabric bidirectional pins. Outputs and output enables are parked (0) unless RUN is high and no configuration session runs; the user design's reset and SYS_RESET are held during a session. Supersedes the D-006 pinout for this spike.
+- **Reason:** phase 1 must harden a small fabric through the TT flow with live configuration (configuration latches driven from pins, not tied off). FABulous's own loader matches its bitstream format by construction.
+- **Not yet:** the SPI-like host interface, loader checks (length, checksum, version) and host byte channels (ARCHITECTURE, phase 2).
+
+## D-019: `src/config.json`: fabric macro placement and power grid
+- **Date:** 2026-09-26 · **Status:** Accepted (spike; verified by the CI `gds` run and precheck)
+- **Changes** (one entry per change, CLAUDE.md):
+  1. `MACROS.warp_tiny`: instance `u_fabric` at (11.52, 7.56), orientation N; GDS/LEF from `macro/warp_tiny/`; netlists of the fabric and its 9 tile types. Location on the Metal2 (0.48) and Metal3 (0.42) track grids.
+  2. `PDN_MACRO_CONNECTIONS`: `u_fabric VPWR VGND VPWR VGND`.
+  3. `PDN_CFG`: `src/pdn_cfg.tcl`, the TRIPWIRE R3 spike's script (from `main`, unmodified below a WARP note). It releases the macro while stripes are built and fails the step unless every stripe over the macro lies inside same-net power pins and every macro pin is reached.
+  4. `FP_PDN_VPITCH` 50 → **109.92**, `FP_PDN_VSPACING` **2.0**, `FP_PDN_VOFFSET` **20.64** (`FP_PDN_VWIDTH` stays 2.1): the chip stripes land on the fabric's power columns (D-017). The template marks these keys "do not change"; the R3 spike changed the same keys for the same reason and passed precheck.
+- **Risk:** a 109.92 µm stripe pitch is wider than the template's 50 µm for the shell's standard cells (IR drop); PSM/IR report to be checked in the run.

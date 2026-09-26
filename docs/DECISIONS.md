@@ -95,3 +95,11 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 ## D-015: The `unit` workflow (closes D-011)
 - **Date:** 2026-09-25 · **Status:** Accepted
 - **Decision:** `.github/workflows/unit.yaml` added with the first Python tool (`tools/refmodels/uart.py`): pytest over `tools/`, and the cocotb RTL tests of every design-set protocol (UART now, others as they land), with sigrok installed as the second decoder.
+
+## D-016: Capacity go/no-go: GO for the specialized eFPGA (4 x 3 tiles + primitives)
+- **Date:** 2026-09-25 · **Status:** Accepted (phase 1 decision point; revisit with the phase 3 measurements)
+- **Evidence:** `docs/reports/capacity.md` (area model `tools/areamodel/`, tile hardening, profiling).
+- **Decision:** continue with the pure specialized eFPGA, not the hybrid fallback. Planned G1: a 4 × 3 grid of LUT-size tiles next to a shell column; one tile slot holds primitives (2 loadable timers + 2 shift registers with bit count, settings in configuration bits); the host byte channel (holding register/FIFO, valid/ready, overrun) lives in the shell; I/O cells get input synchronizers, registered outputs and open-drain mode. That leaves 88 LUT4s.
+- **Fit:** UART (~50 LUT4 with glue), SPI controller (~45) and I2C controller (~77) each fit 88. The I2C target (~220) does not; options in order: register-file primitive, smaller register map, showcase on the I2C controller. Running two protocols at once does not fit.
+- **Primitive rules (D-002):** timer and shift register are used by 4 of 4 design-set protocols; host channel and I/O features are shell/I/O, not fabric blocks; the register file has one user so far and needs its own justification before it is built.
+- **Alternatives:** hybrid (PIO-style sequencers + small fabric): not needed for 3 of 4; generic-only fabric: fits nothing (D-008).

@@ -194,8 +194,9 @@ class Compiler:
 
     def _regs(self, u, cfg):
         try:
-            return pinregs.encode(PinConfig(**cfg))
-        except ValueError as e:                    # a value that does not fit its register (§7.2)
+            return pinregs.encode(PinConfig(**cfg), u)
+        except ValueError as e:                    # a value that does not fit its register (§7.2),
+            #                                        or a feature this unit lacks (D-040)
             raise TrwError(f"U{u}: {e}", file=self.file) from None
 
     def _connect(self, line, n):

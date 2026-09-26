@@ -2,8 +2,10 @@
 
 
 def load(chip, image, run=True):
-    for unit, cfg in image["pins"].items():
-        chip.pin_config(int(unit[1:]), **cfg)
+    # §14 H1 (D-038): pin configuration latches have no reset, so write every unit's block;
+    # units the program does not use get the default (off, no pads)
+    for u in range(len(chip.pins)):
+        chip.pin_config(u, **image["pins"].get(f"U{u}", {}))
     for pad, unit in image["own"]:
         chip.own(pad, unit)
     for port, producer, mode, accept in image["connect"]:

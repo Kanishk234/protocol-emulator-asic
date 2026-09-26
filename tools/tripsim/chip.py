@@ -64,7 +64,8 @@ class Chip:
         self.host_out = deque()
         self.host_fifo_depth = host_fifo_depth
         self.owner = [None] * 24
-        self.pin_regs = [pinregs.encode(PinConfig()) for _ in range(pin_units)]
+        self.pin_regs = [pinregs.encode(PinConfig(), u) for u in range(pin_units)]
+        self.pin_written = set()        # §14 H1 (D-038): units whose configuration block the host wrote
         self.ui_in = 0
         self.uio_in = 0xFF              # environment drives the resolved uio wires
         self._sync = [(0, 0xFF), (0, 0xFF)]  # 2-FF synchronisers: (ui, uio) of clocks n-1, n-2
@@ -79,10 +80,12 @@ class Chip:
             pad = cfg.get(key)
             if pad is not None and pad in HOST_PADS:
                 raise ValueError(f"pad {pad} belongs to the host port")
-        # §7.2 (D-036): through the register encoding, so only representable values run
-        words = pinregs.encode(PinConfig(**cfg))
+        # §7.2 (D-036): through the register encoding, so only representable values run;
+        # a lean unit (D-040) rejects the features it does not have
+        words = pinregs.encode(PinConfig(**cfg), unit)
         self.pin_regs[unit] = words
-        self.pins[unit].configure(**dataclasses.asdict(pinregs.decode(words)))
+        self.pin_written.add(unit)
+        self.pins[unit].configure(**dataclasses.asdict(pinregs.decode(words, unit)))
 
     def own(self, pad, unit):
         """Output ownership (§7.1): only the owner's TX half drives the pad."""

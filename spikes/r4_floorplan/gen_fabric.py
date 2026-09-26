@@ -7,10 +7,14 @@ spec/tripwire.yaml, ARCHITECTURE.md §4.6), so the multiplexers are the real one
   consumers  0-5 L0.I0, L0.I1, L1.I0, L1.I1, L2.I0, L2.I1, 6-11 U0-U5.tx, 12 HOST_OUT
 Release (§4.4, §14 F3): all_taken[p] = AND over the ports that list p of
   !(blocking && sel == p's index in that port's list) || last_seq == p.seq.
+Unit count: NU, read from `localparam NU` in overlay/src/tt_um_tripwire.v (run 2 of D-043: 4). The
+numbering above stays; units NU-5 are absent: their producers are tied off in the top (constant,
+so synthesis removes them from every multiplexer) and their U<u>.tx ports are not built.
 
 Usage: python spikes/r4_floorplan/gen_fabric.py [--check]
 """
 import pathlib
+import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -20,6 +24,10 @@ import tripwire_spec as S  # noqa: E402
 PROD = [f"U{u}.rx" for u in range(6)] + [f"L{k}.O{o}" for k in range(3) for o in range(2)] + ["HOST_IN"]
 CONS = [f"L{k}.I{i}" for k in range(3) for i in range(2)] + [f"U{u}.tx" for u in range(6)] + ["HOST_OUT"]
 OUT = pathlib.Path(__file__).resolve().parent / "overlay" / "src" / "r4_fabric.v"
+TOP = OUT.with_name("tt_um_tripwire.v")
+NU = int(re.search(r"localparam\s+NU\s*=\s*(\d+)\s*;", TOP.read_text()).group(1))
+assert 1 <= NU <= 6
+ABSENT = {f"U{u}.tx" for u in range(NU, 6)}
 
 
 def generate():
@@ -30,6 +38,7 @@ def generate():
          "// release terms (ARCHITECTURE.md §4, §4.6). The producer registers live with their owners.",
          "// Producers: " + ", ".join(f"{i} {p}" for i, p in enumerate(PROD)),
          "// Consumers: " + ", ".join(f"{i} {c}" for i, c in enumerate(CONS)),
+         f"// Units: {NU} (from tt_um_tripwire.v); absent ports: " + (", ".join(sorted(ABSENT)) or "none"),
          "`default_nettype none", "",
          "module r4_fabric (",
          "    input  wire             clk,",
@@ -50,6 +59,17 @@ def generate():
          f"    wire [{4 * nc - 1}:0] sel;", ""]
     users = {p: [] for p in range(np_)}
     for c, name in enumerate(CONS):
+        if name in ABSENT:
+            L += [f"    // {name}: absent (units = {NU})",
+                  f"    assign avail[{c}] = 1'b0;",
+                  f"    assign head[{18 * c + 17}:{18 * c}] = 18'd0;",
+                  f"    assign blk[{c}] = 1'b0;",
+                  f"    assign sel[{4 * c + 3}:{4 * c}] = 4'd0;",
+                  f"    assign lseq[{c}] = 1'b0;",
+                  f"    assign dropped[{8 * c + 7}:{8 * c}] = 8'd0;",
+                  f"    wire _unused_c{c} = &{{1'b0, port_cfg[{10 * c + 9}:{10 * c}], port_wr[{c}], take[{c}],"
+                  f" blk[{c}], lseq[{c}], sel[{4 * c + 3}:{4 * c}]}};", ""]
+            continue
         srcs = [PROD.index(s) for s in S.LEGAL_SOURCES[name]]
         n = len(srcs)
         for idx, p in enumerate(srcs):

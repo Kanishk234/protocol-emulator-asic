@@ -4,7 +4,7 @@
 // On the chip:
 //   - 3 lanes: the R1 lane with its latch slot array and K (spikes/r1_lane), no slot read-back (D-039),
 //     each with a routine sequencer stub (r4_seq) on the SRAM rotation;
-//   - 6 lean pin units (src/trw_pin_unit.v, FULL = 0) with their configuration latch blocks
+//   - NU lean pin units (src/trw_pin_unit.v, FULL = 0; run 2: 4 of the 6) with their configuration latch blocks
 //     (src/trw_pin_cfg.v) and producer registers; output owners per pad (reset: none);
 //   - the fabric: 13 producers, 13 consumer ports with the spec's legal-source multiplexers
 //     (r4_fabric.v, generated from spec/tripwire.yaml) and the release terms;
@@ -47,6 +47,9 @@ module tt_um_tripwire (
 );
     localparam SB = `TRW_SLOT_BITS;
     localparam PB = `TRW_PC_BITS;
+    // Pin units built (run 1: 6; run 2: 4, D-043). Units NU-5 keep their numbers but are absent: their
+    // producers are constant, gen_fabric.py reads NU here and leaves out their U<u>.tx ports.
+    localparam NU = 4;
 
     // ---------------------------------------------------------------- pads in, time, host
     reg [7:0] ui_s1, ui_s2, uio_s1, uio_s2;
@@ -74,7 +77,7 @@ module tt_um_tripwire (
     wire w_clr  = hwr && (wa == 16'h0002);
     wire w_slot = hwr && (wa[15:10] == 6'b000100);
     wire w_port = hwr && (wa[15:4] == 12'h200) && (wa[3:0] < 4'd13);
-    wire w_pcfg = hwr && (wa[15:8] == 8'h30) && (wa[7:5] < 3'd6);
+    wire w_pcfg = hwr && (wa[15:8] == 8'h30) && (wa[7:5] < NU);
     wire w_own  = hwr && (wa[15:4] == 12'h30c) && (wa[3:0] != 4'd3) && (wa[3:0] != 4'd6);
     wire w_hin  = hwr && (wa[15:2] == 14'h1800);
     wire w_sram = hwr && (wa[15:9] == 7'b1000000);
@@ -218,7 +221,20 @@ module tt_um_tripwire (
     wire [29:0] pin_a, pin_n;
     genvar u;
     generate
-        for (u = 0; u < 6; u = u + 1) begin : g_unit
+        for (u = NU; u < 6; u = u + 1) begin : g_absent
+            assign p_valid[u] = 1'b0;
+            assign p_seq[u]   = 1'b0;
+            assign p_load[u]  = 1'b0;
+            assign p_tok[18*u +: 18] = 18'd0;
+            assign a_out[u] = 1'b0;  assign a_oe[u] = 1'b0;
+            assign n_out[u] = 1'b0;  assign n_oe[u] = 1'b0;
+            assign late[u]  = 1'b0;  assign ovr[u]  = 1'b0;
+            assign pin_a[5*u +: 5] = `TRW_PAD_NONE;
+            assign pin_n[5*u +: 5] = `TRW_PAD_NONE;
+            assign take[6+u] = 1'b0;
+            wire _unused_u = &{1'b0, all_taken[u], avail[6+u], head[18*(6+u) +: 18], clr_late[u], clr_ovr[u]};
+        end
+        for (u = 0; u < NU; u = u + 1) begin : g_unit
             wire [PB-1:0] cfg;
             wire          restart, rx_load;
             wire [1:0]    rx_tag;
@@ -269,7 +285,7 @@ module tt_um_tripwire (
         pv_o = 16'd0;
         pe_o = 16'd0;
         for (i = 0; i < 16; i = i + 1)
-            for (j = 0; j < 6; j = j + 1)
+            for (j = 0; j < NU; j = j + 1)
                 if ({29'd0, own[3*i +: 3]} == j) begin
                     if ({27'd0, pin_a[5*j +: 5]} == i + 8) begin
                         pv_o[i] = a_out[j];  pe_o[i] = a_oe[j];

@@ -13,7 +13,9 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 **Boxes ticked:** phase 1: held-out chosen + sealed (0171cf7), `protocols/uart/`.
 **Later:** `protocols/README.md` states that protocol designs are soft user logic, never silicon (user asked; D-002). SPI controller: model `tools/refmodels/spi.py` (7 pytest) then RTL `protocols/spi_ctrl/`; 24/24 cocotb runs (MODE 0–3, HALF 4/5/7) vs model + sigrok; lint clean; 85 LUTs / 42 FFs. BUGS #4 (model skipped a response; spec `HALF >= 4`, not 3). D-014 revised (`h_wlast`). `check_all` PASS.
 **Boxes ticked:** `protocols/spi_ctrl/`.
-**Next step:** I2C controller (model first), then I2C target; then `tools/profile/`.
+I2C controller: model `tools/refmodels/i2c.py` (bus, target, decoder; 5 pytest incl. stretching) then RTL `protocols/i2c_ctrl/` (command byte stream); 18/18 cocotb runs (Q 4/2/7) vs model + sigrok; lint clean; 164 LUTs / 65 FFs at ~100 kHz. BUGS #5 (hold time, found in review).
+**Boxes ticked:** `protocols/i2c_ctrl/`.
+**Next step:** I2C target (model first: an I2C controller model), then `tools/profile/`.
 
 ## 2026-09-25 (session 3, continued)
 **Done:** fetched the CI `GDS_logs` (user download): die 1289.28 × 710.64 µm, 0 DRC/LVS/antenna, timing met, **top level routes only to Metal4** (TopMetal1 is TT power); recorded in `PHYSICAL_DESIGN_AND_CI.md`. `fpga` run 36201219254 green. D-008 accepted (G1 fallback; goal still full specialization). D-011 (`unit` arrives with the first Python tool). `VERSIONS.md` complete. Phase 0 summary written (in progress).

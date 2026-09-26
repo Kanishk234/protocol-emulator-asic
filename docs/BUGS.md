@@ -36,3 +36,12 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** (a) the model's own hypothesis round-trip test; (b, c) `protocols/spi_ctrl/test` (multi-transaction tests, `HALF=3` run).
 - **Now covered by:** `test_target_roundtrip`, `test_responses_continue_across_transactions` (model); the SPI RTL suite at MODE 0–3 with `HALF` 4, 5, 7. Spec changed to `HALF >= 4` (SCK ≤ clk/8).
 - **Fix:** in the same commit as the SPI tests.
+
+## 5: I2C controller changed SDA in the same clock as SCL fell (found in review, before any test)
+- **Date:** 2026-09-25
+- **Symptom:** none observed; found by reading the first draft of `protocols/i2c_ctrl/i2c_ctrl_top.v`: the next data bit (and the ACK release) was driven in the same clock that SCL was pulled low, i.e. zero hold time. The draft also returned the wrong bits of the 9-bit shift register as the reply.
+- **Root cause:** the bit sequence had no phase between "SCL low" and "SDA change"; reply bits were taken before the 9th sample was shifted in.
+- **Caught by:** design review of the draft.
+- **Now covered by:** `check_bus()` in `protocols/i2c_ctrl/test` (SDA may change while SCL is high only at START/STOP) and every reply check. It cannot see zero hold time at one sample per clock, so the fix is structural: a separate `S_B_SET` phase of Q clocks after SCL falls before SDA changes.
+- **Also:** the I2C model test `test_nack_on_data_byte` first expected 4 replies for 5 bytes (the test miscounted; the model was right).
+- **Fix:** before the first commit of the I2C controller.

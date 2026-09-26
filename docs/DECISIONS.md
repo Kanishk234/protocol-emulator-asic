@@ -71,3 +71,15 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** phase 0's "add `lint` and `unit` workflows" is met by `lint` now; `unit` (pytest over `tools/`) is added in the same commit as the first Python tool with tests (phase 1: `tools/areamodel/` or `tools/refmodels/`). The phase 0 box is ticked for `lint`, the `gds` paths filter and concurrency, and marked as deferred for `unit` with this reference.
 - **Reason:** there is no Python code yet; a `unit` workflow with nothing to test would pass without checking anything.
 - **Meanwhile:** `fabric` (added early) runs the FABulous flow in CI.
+
+## D-012: Close phase 0 with the organizer email outstanding
+- **Date:** 2026-09-25 · **Status:** Accepted (Kanishk: "start phase 1, email doesn't matter")
+- **Decision:** phase 0 is closed with its two email items marked waived, not passed. Phase 1 starts.
+- **Reason:** the email's answers (eFPGA eligibility, a hardened macro inside the template flow) don't change phase 1's work. Every other phase 0 exit item has evidence.
+- **Follow-up:** if the email is sent, log the date and the answer here.
+
+## D-013: Held-out set sealed: WS2812, 1-Wire, SWD, CAN
+- **Date:** 2026-09-25 · **Status:** Accepted
+- **Decision:** `docs/design/HELDOUT.md`: H1 WS2812 TX, H2 1-Wire controller, H3 SWD host, H4 CAN 2.0A. PS/2 and JTAG stay free (stretch/design set).
+- **Reason:** phase 1's criteria: a spread of timing-coded (H1, H2), clocked with turnaround (H3), bidirectional/open-drain (H2, H3, H4), and CRC plus bit-stuffing (H4). PS/2 and JTAG are too close to the design set (a device-clocked shift register, SPI-like shifting) to test generality.
+- **Seal:** the commit that adds `HELDOUT.md` (hash recorded in the phase 1 checklist).

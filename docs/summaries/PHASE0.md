@@ -1,6 +1,6 @@
-# Phase 0 summary: setup (in progress)
+# Phase 0 summary: setup
 
-**Status:** nearly complete (2026-09-25). Open: organizer email (parked by the user), cell/utilisation numbers from the `gds` logs (need a GitHub login to download), and "all CI green on `efpga`" at the phase close.
+**Status:** complete (2026-09-25). Every exit item passed except the organizer email, which the user waived (D-012).
 
 ## Goal
 Get a working repository where both flows run end to end on trivial designs: Tiny Tapeout's chip flow (RTL to layout, on IHP CMOS5L at 6x4 tiles) and the FABulous FPGA flow (fabric, user Verilog, bitstream, simulation). Pin every tool version. Find out whether a FABulous fabric can go through Tiny Tapeout at all.
@@ -20,7 +20,7 @@ Get a working repository where both flows run end to end on trivial designs: Tin
 - Tool pitfalls, now documented: FABulous 2.2 needs an older Yosys (OSS CAD Suite 2026-06-29); its wrapper generator only wires its own demo design; Magic hangs exporting a CMOS5L tile (BUGS #2).
 
 ## What's left
-Organizer email; the `gds` log numbers; the phase close. Then phase 1: seal the held-out protocols, write the design-set protocols, profile them against a ~96-LUT budget, and harden a small fabric.
+Nothing in phase 0 (the organizer email is waived, D-012). Phase 1: seal the held-out protocols, write the design-set protocols, profile them against a ~96-LUT budget, and harden a small fabric.
 
 ## One-line takeaway
 Both flows work and a FABulous tile builds on CMOS5L, but only ~96 LUTs fit, so specialization is what makes the chip work at all, not an optional improvement.

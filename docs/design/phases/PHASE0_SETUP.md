@@ -8,7 +8,7 @@
 ### Repository and competition
 - [x] Create the repo from the CMOS5L template; set `info.yaml` tiles to 6x4 and the top module to `tt_um_warp`. (template commit beb67c3; `info.yaml` 6x4 / `tt_um_warp`, local `tt_tool.py --check-docs` passes 2026-09-25; CI on a63877d: `docs` 36170807355 success, `gds` 36170807513 pending)
 - [x] Fill in the competition sign-up form. (done by Kanishk, confirmed 2026-09-25)
-- [ ] Email asic-competition@janestreet.com: (1) is an eFPGA-based emulator with no CPU eligible, (2) is a separately hardened fabric macro allowed inside the template flow. Log the question and answer in DECISIONS.
+- [~] (waived, D-012) Email asic-competition@janestreet.com: (1) is an eFPGA-based emulator with no CPU eligible, (2) is a separately hardened fabric macro allowed inside the template flow. Log the question and answer in DECISIONS.
 - [x] Create `docs/` skeleton files (WORKLOG, DECISIONS, BUGS, CLAIMS, VERSIONS, summaries/, reports/). (all present; `notes/` too)
 
 ### Environment
@@ -37,8 +37,8 @@
 - [x] FABulous reference: two different bitstreams loaded and run in the same fabric simulation (log summary in `docs/reports/`) (`docs/reports/fab_demo.md`; local 2026-09-25 and CI `fabric` 36196784852)
 - [x] `docs/VERSIONS.md` complete and matches what was run (every tool used by the template flow, the FABulous demo and the tile spike, 2026-09-25)
 - [x] Hardening time recorded (`PHYSICAL_DESIGN_AND_CI.md`, run 36170807513: `gds` job 35 min, precheck 12 min)
-- [ ] Organizer email sent (date noted); answer logged when it arrives
+- [~] Organizer email sent (date noted); answer logged when it arrives. **Waived by the user (D-012)**
 - [x] Tiny FABulous integration method understood and written down (`docs/notes/tiny_fabulous.md`)
 - [x] Decision point: is there a known path to put a FABulous fabric through the TT CMOS5L flow? (answer in DECISIONS) (D-009: yes; tile hardening on cmos5l still to be shown)
-- [ ] All CI workflows green on `efpga`
+- [x] All CI workflows green on `efpga` (7405a2e: `test` 36207702855, `lint` 36207702860, `docs` 36207702949; latest `gds` 36170807513 and `fabric` 36196784852 green, their inputs unchanged since; `fpga` 36201219254)
 - [x] `docs/summaries/PHASE0.md` written (in-progress version 2026-09-25; finalize at the phase close)

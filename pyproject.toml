@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+# Python tool tests (reference models, later area model and compile tools). The cocotb suites in
+# test/, test_internal/ and protocols/*/test run through their Makefiles, not through pytest.
+pythonpath = ["tools"]
+testpaths = ["tools"]

@@ -138,3 +138,33 @@ def test_roundtrip_with_stretching(addr, ptr, data, stretch, q):
     if stretch:
         # the target really held SCL low while the controller had released it
         assert any(c.scl[i] == 0 for i in range(len(c.scl)))
+
+
+# --- the generator-based reference controller (refmodels.i2c.Controller) against the model target
+from refmodels.i2c import run_bus  # noqa: E402
+
+
+def ops_write(addr, ptr, data):
+    return [("start",), ("write", addr << 1), ("write", ptr)] + [("write", d) for d in data] + [("stop",)]
+
+
+def ops_read(addr, ptr, n):
+    return ([("start",), ("write", addr << 1), ("write", ptr), ("start",), ("write", (addr << 1) | 1)]
+            + [("read", k != n - 1) for k in range(n)] + [("stop",)])
+
+
+def test_controller_model_write_read():
+    t = Target(0x3A)
+    c, sda, scl = run_bus(ops_write(0x3A, 2, [9, 8, 7]) + ops_read(0x3A, 2, 3), [t])
+    assert t.regs == {2: 9, 3: 8, 4: 7}
+    assert c.results == [True] * 5 + [True] * 3 + [9, 8, 7]
+    kinds = [e.kind for e in decode(sda, scl) if e.kind != "byte"]
+    assert kinds == ["start", "stop", "start", "restart", "stop"]
+
+
+@settings(max_examples=30)
+@given(st.integers(0, 12), st.integers(2, 6))
+def test_controller_model_honours_stretching(stretch, q):
+    t = Target(0x50, stretch=stretch)
+    c, _, _ = run_bus(ops_write(0x50, 0, [0xA5]) + ops_read(0x50, 0, 1), [t], q=q)
+    assert c.results[-1] == 0xA5

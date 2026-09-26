@@ -202,3 +202,110 @@ def data_changes_only_when_scl_low(sda: Sequence[int], scl: Sequence[int]) -> Li
     Returns the indices of START/STOP-like transitions for the caller to compare with the
     decoded events; a well-formed controller produces them only when it means to."""
     return [i for i in range(1, len(sda)) if scl[i] == 1 and scl[i - 1] == 1 and sda[i] != sda[i - 1]]
+
+
+class Controller:
+    """A cycle-level I2C controller written from the bus rules, as a generator.
+
+    `run(ops)` is a generator: each `send((sda_bus, scl_bus))` gives it this clock's resolved
+    bus levels and returns its open-drain drives `(sda_out, scl_out)` for the next clock
+    (1 = released). Start it with `next()`. Ops:
+      ("start",)            START, or a repeated START when the bus is ours
+      ("write", byte)       -> appends True (ACK) / False (NACK) to `results`
+      ("read", ack: bool)   -> appends the byte read; answers ACK (more to come) or NACK
+      ("stop",)
+      ("idle", n)           n clocks with both lines released (only between transactions)
+    Each SCL low and high phase lasts `q` clocks; SDA changes only while SCL is low, half a
+    low phase after SCL fell. Waiting for SCL high honours clock stretching.
+    """
+
+    def __init__(self, q: int = 4):
+        self.q = q
+        self.results: list = []
+        self._sda = self._scl = 1
+        self._bus = (1, 1)
+        self.owned = False
+
+    def _tick(self, n: int = 1):
+        for _ in range(n):
+            self._bus = yield (self._sda, self._scl)
+
+    def _scl_high(self):
+        self._scl = 1
+        yield from self._tick()
+        while self._bus[1] == 0:          # a target is stretching the clock
+            yield from self._tick()
+        yield from self._tick(self.q - 1)
+        return self._bus[0]               # SDA at the end of the high phase
+
+    def _bit(self, b: int):
+        half = max(1, self.q // 2)
+        yield from self._tick(half)       # SCL low, hold SDA
+        self._sda = b
+        yield from self._tick(self.q - half)
+        v = yield from self._scl_high()
+        self._scl = 0
+        yield from self._tick()
+        return v
+
+    def run(self, ops):
+        self._bus = yield (self._sda, self._scl)
+        for op in ops:
+            kind = op[0]
+            if kind == "start":
+                if self.owned:
+                    self._sda = 1
+                    yield from self._tick(self.q)
+                    yield from self._scl_high()
+                self._sda = 0
+                yield from self._tick(self.q)
+                self._scl = 0
+                yield from self._tick(self.q)
+                self.owned = True
+            elif kind == "write":
+                for k in range(8):
+                    yield from self._bit((op[1] >> (7 - k)) & 1)
+                ack = (yield from self._bit(1)) == 0
+                self.results.append(ack)
+            elif kind == "read":
+                v = 0
+                for _ in range(8):
+                    v = (v << 1) | (yield from self._bit(1))
+                yield from self._bit(0 if op[1] else 1)
+                self.results.append(v)
+            elif kind == "stop":
+                half = max(1, self.q // 2)
+                yield from self._tick(half)
+                self._sda = 0
+                yield from self._tick(self.q - half)
+                yield from self._scl_high()
+                self._sda = 1
+                yield from self._tick(2 * self.q)
+                self.owned = False
+            elif kind == "idle":
+                yield from self._tick(op[1])
+            else:
+                raise ValueError(f"unknown op {op!r}")
+        while True:                        # released bus from now on
+            yield from self._tick()
+
+
+def run_bus(controller_ops, targets, q: int = 4, max_clocks: int = 200_000):
+    """Pure-model helper: run a Controller against model Targets on a wired-AND bus.
+    Returns (controller, sda_trace, scl_trace)."""
+    c = Controller(q)
+    gen = c.run(controller_ops + [("idle", 4 * q)])
+    drives = next(gen)
+    tdrives = [(1, 1)] * len(targets)
+    sda_t, scl_t = [], []
+    nres = sum(1 for op in controller_ops if op[0] in ("write", "read"))
+    for _ in range(max_clocks):
+        sda = wired_and(drives[0], *[d[0] for d in tdrives])
+        scl = wired_and(drives[1], *[d[1] for d in tdrives])
+        sda_t.append(sda)
+        scl_t.append(scl)
+        tdrives = [t.step(sda, scl) for t in targets]
+        drives = gen.send((sda, scl))
+        if len(c.results) == nres and not c.owned and len(sda_t) > 8 * q and all(x == 1 for x in sda_t[-4 * q:]):
+            break
+    return c, sda_t, scl_t

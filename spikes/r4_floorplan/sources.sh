@@ -12,7 +12,10 @@ ROOT="$(cd "$HERE/../.." && pwd)"
 DST="$1"
 mkdir -p "$DST"
 cp "$HERE"/overlay/src/* "$DST/"
-cp "$ROOT"/src/trw_defs.vh "$ROOT"/src/trw_pin_{cfg,io,tx,rx,unit}.v "$DST/"
+# On the branch DST is src/ itself: those files are already in place (cp refuses to copy onto itself).
+if [ "$(cd "$DST" && pwd)" != "$ROOT/src" ]; then
+  cp "$ROOT"/src/trw_defs.vh "$ROOT"/src/trw_pin_{cfg,io,tx,rx,unit}.v "$DST/"
+fi
 cp "$ROOT"/spikes/r1_lane/{trw_lane,trw_alu,trw_slots}.v "$DST/"
 cp "$ROOT"/spikes/r3_sram/overlay/src/{trw_sram.v,RM_IHPSG13_1P_512x16_c2_bm_bist.v,pdn_cfg.tcl} "$DST/"
 cp "$ROOT"/spikes/r2_latch/overlay/src/{pnr.sdc,signoff.sdc} "$DST/"

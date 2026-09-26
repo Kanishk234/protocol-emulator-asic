@@ -707,6 +707,27 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** 2 flops per unit already exist; the decode is a few gates.
 - **Status:** proposed; waits for Krithik and Kanishk. Then §9 and the spec get the address.
 
+## D-043 (2026-09-26): R4 spike: a full-size floorplan at 6x4, to learn the routable utilisation
+- **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile? R2 (one lane, 4x2) routed only at ~42 % placement density. The area estimate puts the plan of record at ~74–85 % of the core, so this limit decides every further cut.
+- **Decision:** as R2/R3 (D-031), a branch **`spike/r4-floorplan`**, never merged. `main` keeps the sources in `spikes/r4_floorplan/` and the results in `docs/reports/R4_FLOORPLAN.md` and `AREA.md`. `apply_to_branch.sh` builds the branch from single sources (`sources.sh`: the pin unit from `src/`, the lane from `spikes/r1_lane/`, the SRAM wrapper and PDN recipe from `spikes/r3_sram/`, the latch SDC from `spikes/r2_latch/`).
+- **What is on the chip** (area-equivalent to scenario G, since the full units do not exist yet):
+  - 3 lanes: the R1 lane and its latch slot array with K, **no slot read-back** (D-039), plus a register debug read. Each lane has a routine sequencer stub (RPC, fetch, CALL entry table; no branches or LD/ST) on the SRAM rotation;
+  - 6 lean pin units (`trw_pin_unit`, FULL = 0) with their configuration latch blocks and producer registers, and output owners per pad;
+  - the fabric: 13 producers and 13 consumer ports (en, tap, sel, accept, last_seq, DROPPED; F1–F7), with the legal-source multiplexers generated from the spec (`gen_fabric.py`);
+  - the IHP 512x16 SRAM macro, R3 recipe and location, with the 4-way rotation;
+  - a host SPI stub (the §9 transaction format) that writes every slot, K, port, configuration word, owner and SRAM word, pushes HOST_IN and pops HOST_OUT, and reads back lane registers, producer heads, pin outputs, sticky flags, drop counters and SRAM. Everything is controlled and observed from the pins, so synthesis keeps it.
+- **Size (Yosys onto cmos5l typ, flat):** 498.8K µm² of standard cells plus the 45.3K macro; 2,592 flops, 2,814 latches, 210 clock gates. The per-module sums agree with the earlier block measurements (lane 35.1K + ALU 5.9K + slots 24.5K; lean unit 29.8K + config 5.1K). Scenario G was ~483K.
+- **`src/config.json` on the branch, every change from the template:**
+  - the SRAM macro block and the four `FP_PDN_V*` stripe keys: R3's (D-031), unchanged, same macro location (12, 40) FS;
+  - `PL_TARGET_DENSITY_PCT` **73**: just above the expected global-placement utilisation, the lowest legal value, as asked. Derivation: LibreLane's placer counted ~1.19× our Yosys area on R2 (79K → ~94K), so ~594K + 45K macro ≈ 71 % of the 902K core. If GPL-0302 still fires (too low), the log's GPL-0019 gives the real figure, and run 2 uses that + 2;
+  - `PNR_SDC_FILE` / `SIGNOFF_SDC_FILE`: R2's latch exception (D-032). It is needed on `main` too, with its own entry then;
+  - `DRT_OPT_ITERS` **3**: a runtime guard (D-034), so a stalled detailed route stops and uploads `GDS_logs` well before GitHub's 6 h limit. At this size one pass may take an hour or more.
+  - Outside the CLAUDE.md list (CLOCK_PERIOD, density, SRAM block): the `FP_PDN_V*` keys, the SDC files and `DRT_OPT_ITERS`. All are branch-only and never reach `main`.
+- **Changes on `main` for this:** `trw_lane` gains a `dbg` output (registers, STATE, FLAGS, PEND), which the §9 lane register block needs anyway. The R1 harness, its tb and the R2 overlay connect it. `run_r1.sh` re-run: sims PASS, lint clean.
+- **Local evidence** (`spikes/r4_floorplan/check_local.sh`): lint clean; 5/5 pin-level tests on the RTL and 5/5 on the Yosys gate-level netlist with TT Icarus 13 (SRAM words, a lane forwarding HOST_IN to HOST_OUT, a pin unit sending a UART frame, a pin-unit event to the host, a routine fetched through the rotation). Pre-layout STA at 20 ns: +10.63 ns typ, +5.50 ns slow (configuration latches static). BUGS #44 was found and fixed this way.
+- **Expected outcome and what it decides:** at ~71 % utilisation before layout growth, routing on four metal layers will probably not converge (R2 needed ~42 %). The run is for learning: global-routing overflow per layer, where the congestion sits (lanes, pin units, fabric, host), and the detailed-routing violations per iteration. Then choose one change for run 2: fewer units, 2 lanes, or a lower density with less logic.
+- **Status:** ready; Krithik runs the branch commands (`spikes/r4_floorplan/README.md`).
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

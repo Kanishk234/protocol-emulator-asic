@@ -21,6 +21,29 @@ Next:
 
 ---
 
+## 2026-09-26: Krithik + Claude (phase 2: R4 full-size floorplan spike, prepared)
+RTL session; did not read `tools/tripsim` or `spikes/area/ae_prims.v`.
+
+Done:
+- **D-043:** R4 on branch `spike/r4-floorplan` (never merged), sources in `spikes/r4_floorplan/`. Contents: 3 R1 lanes without slot read-back, with routine sequencer stubs; 6 lean pin units with config latches; the fabric (13 producers, 13 ports, legal-source muxes generated from the spec by `gen_fabric.py`); the SRAM macro with the rotation; a host SPI stub that writes and reads back every block.
+- Branch `config.json`: R3's macro block, density 73 (lowest legal, from the R2 synthesis-to-placement ratio), R2's latch SDC, `DRT_OPT_ITERS` 3. Every exception is listed in D-043.
+- Size (Yosys, flat): **498.8K µm² + the 45.3K macro, ~71 % of the core at placement**; 2,592 flops, 2,814 latches, 210 clock gates; the per-module numbers match the earlier blocks. Pre-layout slack at 20 ns: +10.63 typ / +5.50 slow.
+- `spikes/r4_floorplan/check_local.sh`: lint; 5 pin-level tests through the host stub, on RTL and on the Yosys gate-level netlist; Yosys area; pre-layout STA.
+- `trw_lane` (spikes/r1_lane) gains a register debug output, connected in the R1 harness, its tb and the R2 overlay; `run_r1.sh` re-run: PASS, lint clean.
+- BUGS #44 (host stub address assembly, caught by the local suite before any push). BUGS: moved the "Note on #1" below rows 41–43, which had landed outside the table.
+- `docs/reports/R4_FLOORPLAN.md` (setup; results pending); AREA.md synthesis row.
+
+Results:
+- Local: lint clean; RTL 5/5; gate level 5/5 (evidence run of `check_local.sh` at the end of the session, below); `scripts/check_all.sh` on `main`.
+
+Checklist boxes ticked (evidence):
+- None (R4 answers a planning question; phase 2 task 2.0 stays open until the budget is decided).
+
+Next:
+- Krithik: run the branch commands (`spikes/r4_floorplan/README.md`). The push starts a `gds` run on the branch.
+- Then: collect `GDS_logs`, fill `R4_FLOORPLAN.md` §3–4 and the AREA.md hardening row, and choose one change for run 2.
+- RTL follow-ups from D-041: P-G7 (CLK in the final-release clock extends the burst), P-G9 (an edge in the clock after a preload is also ignored), and checks of P-G12, P-G20 (unnamed enum codes act as code 0) and P-G22.
+
 ## 2026-09-26: Krithik + Claude (phase 2: pin-unit RTL gaps answered, 4-bit fraction check)
 Done:
 - **The 23 pin-unit RTL gaps (P-G1 to P-G23) are answered in §14** as new rules P31 to P45 (plus edits to P8 and P13), recorded in **D-041**. Where the RTL's reading was better, the model now follows it.

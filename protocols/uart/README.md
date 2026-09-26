@@ -19,10 +19,10 @@ make RUNTIME_DIV=1         # runtime divisor
 ```
 Covered: back-to-back TX (model + sigrok), random TX, RX with gaps, RX with ±3 % baud error, framing error, glitch rejection, overrun, runtime divisor change.
 
-## Resource use (first profile, 2026-09-25, `synth_fabulous`, Yosys 0.66+179)
+## Resource use (2026-09-25, `synth_fabulous`, Yosys 0.66+179)
 | Variant | LUTs | FFs |
 |---|---|---|
-| `RUNTIME_DIV=0`, `DIV=434` | 171 | 82 |
+| `RUNTIME_DIV=0`, `DIV=434` | 144 | 68 |
 | `RUNTIME_DIV=1`, `DIV=434` | 262 | 98 |
 
-The counters are 16 bits (`DIV_W`) even when a smaller fixed `DIV` would fit; the full profile is in `docs/reports/profiling.md` (phase 1).
+With a fixed divisor the counters are only as wide as `DIV` needs (9 bits for 434); the first version used 16 bits (171 LUTs). Full breakdown: `docs/reports/profiling.md`.

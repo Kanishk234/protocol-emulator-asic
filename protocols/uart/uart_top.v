@@ -33,7 +33,9 @@ module uart_top #(
     input  wire [DIV_W-1:0] cfg_div,
     input  wire             cfg_we
 );
-    wire [DIV_W-1:0] div;
+    // Counter width: DIV_W for a run-time divisor, otherwise just wide enough for DIV.
+    localparam CW = (RUNTIME_DIV != 0) ? DIV_W : $clog2(DIV + 1);
+    wire [CW-1:0] div;
 
     generate
         if (RUNTIME_DIV != 0) begin : g_rt
@@ -44,13 +46,15 @@ module uart_top #(
             end
             assign div = div_q;
         end else begin : g_fixed
-            assign div = DIV;
+            localparam integer  DIV_I = DIV;
+            localparam [CW-1:0] DIV_C = DIV_I[CW-1:0];
+            assign div = DIV_C;
             wire _unused_cfg = &{cfg_div, cfg_we, 1'b0};
         end
     endgenerate
 
     wire tx_ready;
-    uart_tx #(.DIV_W(DIV_W)) u_tx (
+    uart_tx #(.DIV_W(CW)) u_tx (
         .clk(clk), .rst_n(rst_n), .div(div),
         .data(h_wdata), .valid(h_wvalid), .ready(tx_ready), .tx(tx_o)
     );
@@ -59,7 +63,7 @@ module uart_top #(
 
     wire [7:0] rx_data;
     wire       rx_valid, rx_ferr;
-    uart_rx #(.DIV_W(DIV_W)) u_rx (
+    uart_rx #(.DIV_W(CW)) u_rx (
         .clk(clk), .rst_n(rst_n), .div(div), .rx(rx_i),
         .data(rx_data), .valid(rx_valid), .ferr(rx_ferr)
     );

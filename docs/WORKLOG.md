@@ -21,6 +21,22 @@ Next:
 
 ---
 
+## 2026-09-26: Krithik + Claude (phase 2: R4 run 2 setup)
+Done:
+- Run 1 ID found with `gh`: 36269756517; added to AREA.md and R4_FLOORPLAN.md.
+- **R4 run 2 (approved): 4 pin units.** `localparam NU` in the R4 top; `gen_fabric.py` reads it and leaves out the absent units' TX ports; density 73 → 62.
+- `check_local.sh`: PASS (lint clean, 5/5 RTL, 5/5 gate level). Yosys 417.7K µm² (−81K); expected GPL ~60 %; slack +10.28 typ / +5.08 slow.
+- D-043 run 2 entry, `R4_FLOORPLAN.md` §5, AREA.md synthesis row.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- The `gds` run 36278610622 on `main` came from the P34/P38/P43 RTL push; the pin-unit files are not in `info.yaml`, so it rebuilds the same chip.
+
+Next:
+- Krithik: push run 2 on `spike/r4-floorplan`; collect `GDS_logs` into `build/ci/r4/`.
+
 ## 2026-09-26: Krithik + Claude (phase 2: R4 run 1 result)
 Done:
 - Read `GDS_logs` of R4 run 1 (`spike/r4-floorplan`, 1ca1bdc; unpacked in `build/ci/r4/`, not committed).

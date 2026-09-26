@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4.
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62) is set up; §5.**
 
 ---
 
@@ -71,3 +71,24 @@ Then legalization failed on 43 instances (hold buffers and fanout buffers): the 
 - (c) 2 lanes instead of 3 (~−70K). Also a real cut, but lanes are the area that routed in R2; units and the fabric are the unknowns.
 
 Recommendation: (a), with density = its reported GPL utilisation + 2.
+
+## 5. Run 2: 4 pin units (approved 2026-09-26)
+
+One change from run 1 (D-034 rule): **4 pin units instead of 6**, and the density that follows from it.
+
+- `localparam NU = 4` in `overlay/src/tt_um_tripwire.v`. Units 4–5 keep their numbers (host addresses, fabric numbering and tests are unchanged) but are absent: their producers are tied to constants, host writes to their configuration blocks are ignored, and `gen_fabric.py` reads NU and leaves out the `U4.tx` and `U5.tx` ports. The lane ports' multiplexers lose those two inputs in synthesis, as a real 4-unit fabric would.
+- `PL_TARGET_DENSITY_PCT` 73 → **62**.
+- Also on the branch, from `main`: the pin-unit rule changes P34/P38/P43 (eec4fcf), a few gates per unit. They are included in the numbers below, so they are not a second layout change.
+
+| | Run 1 (6 units) | Run 2 (4 units) |
+|---|---|---|
+| Yosys flat, standard cells | 498.8K µm² | **417.7K µm²** (−81K) |
+| Flops / latches / clock gates | 2,592 / 2,814 / 210 | 2,076 / 2,576 / 192 |
+| Pre-layout slack typ / slow | +10.63 / +5.50 ns | +10.28 / +5.08 ns |
+| Expected GPL utilisation (1.19 × Yosys + macro) | ~71 % (measured 70.0 %) | **~60 %** |
+| Expected after CTS and hold repair (× 1.10, run 1's rate) | ~77 % (failed) | ~66 % |
+| `PL_TARGET_DENSITY_PCT` | 73 | 62 |
+
+`check_local.sh`: lint clean, 5/5 on the RTL and 5/5 on the Yosys gate-level netlist (TT Icarus 13).
+
+If it places, this run gives the first routing numbers for a full-size floorplan: global-routing overflow per layer and detailed-routing violations per iteration. If GPL-0302 fires (density below the real utilisation), use the logged GPL-0019 figure + 2.

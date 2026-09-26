@@ -135,6 +135,24 @@ def validate(s):
         if f["kind"] == "pad":
             _check(w == 5, f"pin_config.{name}: pads are 5 bits (31 = none)")
     _check(pc["base"] + 6 * pc["stride"] <= pc["owner_base"], "pin_config: unit blocks overlap the owner registers")
+    _check(pc["storage"] in ("latch", "flop"), "pin_config.storage must be latch or flop")
+    _check(isinstance(pc["readable"], bool), "pin_config.readable must be true or false")
+    fields = {f["name"]: f for f in pc["fields"]}
+    owned = set()
+    for feat, spec in pc["features"].items():
+        for name in spec["fields"]:
+            _check(name in fields, f"pin_config.features.{feat}: unknown field {name!r}")
+            _check(name not in owned, f"pin_config.features.{feat}: {name} is in two features")
+            owned.add(name)
+        for field, modes in spec["modes"].items():
+            _check(field in fields and fields[field]["kind"] == "enum",
+                   f"pin_config.features.{feat}: {field} is not an enum field")
+            for m in modes:
+                _check(m in fields[field]["values"], f"pin_config.features.{feat}: unknown {field} {m!r}")
+    _check(len(pc["units"]) == s["fabric"]["units"], "pin_config.units: one entry per pin unit")
+    for u, feats in enumerate(pc["units"]):
+        for feat in feats:
+            _check(feat in pc["features"], f"pin_config.units[{u}]: unknown feature {feat!r}")
 
     _unique(s["pin_commands"], "code", "pin_commands")
     _unique(s["pin_commands"], "name", "pin_commands")
@@ -214,7 +232,13 @@ def gen_python(s):
     lines += [f"    {f['name']!r}: ({f['bit']}, {f['width']}, {f['kind']!r})," for f in pc["fields"]]
     lines += ["}", "PIN_CFG_ENUMS = {"]
     lines += [f"    {f['name']!r}: {f['values']!r}," for f in pc["fields"] if f["kind"] == "enum"]
-    lines += ["}", ""]
+    lines += ["}", f"PIN_CFG_STORAGE = {pc['storage']!r}", f"PIN_CFG_READABLE = {pc['readable']!r}",
+              "PIN_FEATURES = {  # optional feature: (fields, {enum field: modes}) (D-040)"]
+    lines += [f"    {k!r}: ({tuple(v['fields'])!r}, {({f: tuple(m) for f, m in v['modes'].items()})!r}),"
+              for k, v in pc["features"].items()]
+    lines += ["}", "PIN_UNIT_FEATURES = (  # U0, U1, ...: the optional features each unit has"]
+    lines += [f"    {tuple(u)!r}," for u in pc["units"]]
+    lines += [")", ""]
     return "\n".join(lines)
 
 
@@ -293,13 +317,24 @@ def gen_tables(s):
     kinds = {"bool": "0/1", "uint": "value", "m1": "value − 1", "pad": "pad number, 31 = none",
              "q8": "16.8 clocks", "sofs": "16.8 clocks from the bit start"}
     rows = [f"Unit u's block: `{pc['base']:#06x} + u·{pc['stride']:#04x}`; output owners: `{pc['owner_base']:#06x} + (pad − 8)`, "
-            "`[2:0]` = unit, 7 = none.", "", "| Word | Bits | Field | Encoding | Meaning |", "|---|---|---|---|---|"]
+            "`[2:0]` = unit, 7 = none.", ""]
+    feat_units = {k: [u for u, fs in enumerate(pc["units"]) if k in fs] for k in pc["features"]}
+    field_feat = {n: k for k, v in pc["features"].items() for n in v["fields"]}
+    rows.append("Optional features (D-040); every other field and mode is on all units:")
+    for k, us in feat_units.items():
+        modes = "; ".join(f"{f.upper()} {', '.join(m)}" for f, m in pc["features"][k]["modes"].items())
+        rows.append(f"- **{k}** (units " + ", ".join(f"U{u}" for u in us) + ")"
+                    + (f": modes {modes}" if modes else ""))
+    store = {"latch": "latch array, no reset (D-038)", "flop": "flops, reset to 0"}[pc["storage"]]
+    rows += ["", f"Storage: {store}. Host-readable: {'yes' if pc['readable'] else 'no (D-039)'}.", "",
+             "| Word | Bits | Field | Encoding | Units | Meaning |", "|---|---|---|---|---|---|"]
     for f in pc["fields"]:
         w, lsb = divmod(f["bit"], 16)
         hi = lsb + f["width"] - 1
         where = _bits(hi, lsb) if hi < 16 else f"[15:0] + {w + 1}{_bits(hi - 16, 0)}"
         enc = ", ".join(f"{v} {k}" for k, v in f["values"].items()) if f["kind"] == "enum" else kinds[f["kind"]]
-        rows.append(f"| {w} | {where} | {f['name'].upper()} | {enc} | {f['desc']} |")
+        units = "all" if f["name"] not in field_feat else ", ".join(f"U{u}" for u in feat_units[field_feat[f["name"]]])
+        rows.append(f"| {w} | {where} | {f['name'].upper()} | {enc} | {units} | {f['desc']} |")
     t["pin_config"] = rows
     return {k: "\n".join(v) for k, v in t.items()}
 

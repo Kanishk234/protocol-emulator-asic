@@ -7,10 +7,10 @@
 # Never edit generated files; edit this file and run `python tools/gen/gen.py`.
 # CI (lint workflow) regenerates and fails on any difference.
 #
-# Status: FROZEN at the end of phase 1 (DECISIONS D-037). Contents match D-007 ... D-036.
+# Status: FROZEN at the end of phase 1 (DECISIONS D-037); v1.1 adds D-038 to D-040. Contents match D-007 ... D-040.
 # Every change from now on needs its own DECISIONS entry.
 
-version: 1.0
+version: 1.1
 status: frozen
 
 token:
@@ -156,6 +156,20 @@ pin_config:
   base: 0x3000
   stride: 32
   owner_base: 0x30C0          # + (pad - 8) for uo0..uio7: [2:0] owning unit, 7 = none (host pads ignore writes)
+  storage: latch              # D-038: latches, no reset; the host writes every unit's block before RUN (§14 H1)
+  readable: false             # D-039: the unit blocks are write-only from the host (owners stay readable)
+  features:                   # D-040: optional features. A field not listed here is core (every unit has it)
+    pulse:   {fields: [sym0_t1, sym0_first, sym0_t2, sym1_t1, sym1_first, sym1_t2], modes: {txmode: [pulse]}}
+    carrier: {fields: [carrier], modes: {}}
+    bitsync: {fields: [nrzi, oe_auto, sjw, idle_bits, resync, delim, stuff_n, stuff_lvl, crc_width, crc_skip,
+                       crc_poly, crc_init, crc_res, crc_xor], modes: {txmode: [bitsync], rxmode: [bitsync]}}
+  units:                      # D-040: the optional features of U0, U1, ... (U0-U1 full, U2-U5 lean)
+    - [pulse, carrier, bitsync]
+    - [pulse, carrier, bitsync]
+    - []
+    - []
+    - []
+    - []
   fields:
     # word 0: modes and flags
     - {name: txmode,     bit: 0,   width: 3,  kind: enum, values: {level: 0, shift: 1, clkgen: 2, pulse: 3, bitsync: 4}, desc: "TX mode"}

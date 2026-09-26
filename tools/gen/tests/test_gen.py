@@ -58,6 +58,12 @@ def field(s, name):
     ("pin config pad not 5 bits", lambda s: next(f for f in s["pin_config"]["fields"] if f["kind"] == "pad").__setitem__("width", 4)),
     ("pin config enum too wide", lambda s: s["pin_config"]["fields"][0]["values"].__setitem__("x", 8)),
     ("pin config outside the block", lambda s: s["pin_config"].__setitem__("stride", 16)),
+    ("pin feature with an unknown field", lambda s: s["pin_config"]["features"]["carrier"]["fields"].append("nope")),
+    ("pin field in two features", lambda s: s["pin_config"]["features"]["carrier"]["fields"].append("crc_poly")),
+    ("pin feature with an unknown mode", lambda s: s["pin_config"]["features"]["pulse"]["modes"]["txmode"].append("x")),
+    ("pin units not one per unit", lambda s: s["pin_config"]["units"].pop()),
+    ("pin unit with an unknown feature", lambda s: s["pin_config"]["units"][2].append("usb")),
+    ("pin config storage", lambda s: s["pin_config"].__setitem__("storage", "sram")),
 ])
 def test_validation_catches(label, mutate):
     with pytest.raises(gen.SpecError):

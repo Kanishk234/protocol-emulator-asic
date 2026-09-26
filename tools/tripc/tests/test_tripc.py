@@ -102,6 +102,19 @@ def test_load_writes_every_slot():
     assert used < 12 and not any(s.V for s in chip.lanes[0].slots[used:])
 
 
+def test_load_writes_every_pin_unit():
+    """§14 H1 (D-038): pin configuration latches have no reset, so every unit's block is written."""
+    from tripsim import Chip
+    chip = Chip()
+    chip.pin_config(3, pin_a=8, txmode="level")        # stale: a previous program used U3
+    image, _ = tripc.compile_file(PROGRAMS / "uart.trw")
+    assert set(image["pins"]) == {"U0", "U1"}
+    chip.pin_written.clear()
+    tripc.load(chip, image, run=False)
+    assert chip.pin_written == set(range(6))
+    assert chip.pins[3].cfg.pin_a is None
+
+
 def test_error_carries_line_number():
     msg = errors("lane L0:\n    states A\n    slot: when A do MOV r0 <- zero then B\n")
     assert ":4:" in msg

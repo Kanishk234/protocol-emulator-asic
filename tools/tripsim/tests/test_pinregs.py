@@ -7,7 +7,7 @@ import pytest
 import tripc
 import tripwire_spec as S
 from kernels import PROGRAMS
-from tripsim import pinregs
+from tripsim import Chip, pinregs
 from tripsim.pinunit import PinConfig
 
 
@@ -19,10 +19,11 @@ def test_every_program_round_trips_exactly():
     for path in sorted(PROGRAMS.glob("*.trw")):
         image, _ = tripc.compile_file(path)
         for unit, cfg in image["pins"].items():
-            words = pinregs.encode(PinConfig(**cfg))
+            u = int(unit[1:])
+            words = pinregs.encode(PinConfig(**cfg), u)
             assert [f"{w:04x}" for w in words] == image["pin_regs"][unit]
-            back = pinregs.decode(words)
-            assert pinregs.encode(back) == words, (path.stem, unit)
+            back = pinregs.decode(words, u)
+            assert pinregs.encode(back, u) == words, (path.stem, unit)
             orig = PinConfig(**cfg)
             # the quantities the model computes with are identical after the round trip
             assert back.period_q8 == orig.period_q8
@@ -53,6 +54,47 @@ def test_known_encoding():
 def test_values_that_do_not_fit_are_rejected(bad):
     with pytest.raises(ValueError):
         pinregs.encode(PinConfig(**bad))
+
+
+def test_units_follow_the_spec():
+    """D-040: U0-U1 have every optional feature, U2-U5 none."""
+    assert [set(pinregs.features(u)) for u in range(6)] == [set(S.PIN_FEATURES)] * 2 + [set()] * 4
+
+
+def test_lean_units_do_not_store_optional_fields():
+    """D-040: on U2-U5 the PULSE, carrier and BITSYNC field bits are never set, and read as defaults."""
+    opt = {f for fields, _ in S.PIN_FEATURES.values() for f in fields}
+    full = PinConfig(pin_a=8, period=10.5, idle_bits=11, sym0_first=1, crc_poly=0x1021, carrier=3.0)
+    for u in range(2, 6):
+        cfg = PinConfig(pin_a=8, period=10.5)
+        words = pinregs.encode(cfg, u)
+        for name in opt:
+            bit, width, _ = S.PIN_CFG_FIELDS[name]
+            assert not any(words[(bit + i) // 16] >> ((bit + i) % 16) & 1 for i in range(width)), name
+        assert pinregs.decode(words, u) == cfg
+    words = pinregs.encode(full, 0)
+    assert pinregs.decode(words, 0).crc_poly == 0x1021 and pinregs.decode(words, 0).carrier == 3.0
+
+
+@pytest.mark.parametrize("bad, feature", [
+    (dict(txmode="pulse"), "PULSE"), (dict(sym1_t2=5), "PULSE"),
+    (dict(carrier=2.0), "CARRIER"),
+    (dict(txmode="bitsync", rxmode="bitsync"), "BITSYNC"), (dict(crc_width=8), "BITSYNC"),
+])
+def test_lean_unit_rejects_optional_features(bad, feature):
+    for u in (0, 1):
+        pinregs.encode(PinConfig(**bad), u)
+    with pytest.raises(ValueError, match=f"U4 has no {feature}.*only U0, U1"):
+        pinregs.encode(PinConfig(**bad), 4)
+    chip = Chip()
+    with pytest.raises(ValueError, match=f"U2 has no {feature}"):
+        chip.pin_config(2, **bad)
+    chip.pin_config(1, **bad)
+
+
+def test_tripc_rejects_a_feature_on_a_lean_unit():
+    with pytest.raises(tripc.TrwError, match="U3 has no PULSE"):
+        tripc.compile_text("program t\npin U3: pin_a=uo0 txmode=pulse\n")
 
 
 def test_tripc_reports_a_value_that_does_not_fit():

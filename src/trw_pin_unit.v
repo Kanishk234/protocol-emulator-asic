@@ -19,7 +19,9 @@
 `include "trw_defs.vh"
 
 module trw_pin_unit #(
-    parameter FULL = 0
+    parameter FULL = 0,
+    parameter FRAC = 8           // time fraction bits; 8 is the spec (16.8). FRAC < 8 is a measurement
+                                 // variant only: it uses the top FRAC bits of the fraction fields
 ) (
     input  wire                    clk,
     input  wire                    rst_n,
@@ -93,7 +95,7 @@ module trw_pin_unit #(
     // ------------------------------------------------------------------ TX half
     wire lvl, oe, echo, rxset, smp, late_set;
     wire [4:0] rxset_n;
-    trw_pin_tx u_tx (
+    trw_pin_tx #(.FRAC (FRAC)) u_tx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
         .txmode (txmode), .order (order), .idle (idle), .tx_lentok (tx_lentok), .tx_preload (tx_preload),
         .stretch (stretch), .tx_edge (tx_edge), .period (period), .presc (presc), .nbits (nbits),
@@ -105,7 +107,7 @@ module trw_pin_unit #(
 
     // ------------------------------------------------------------------ RX half
     wire ovr_set;
-    trw_pin_rx u_rx (
+    trw_pin_rx #(.FRAC (FRAC)) u_rx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
         .rxmode (rxmode), .order (order), .idle (idle), .autorearm (autorearm), .rx_echo (rx_echo),
         .rx_edge (rx_edge), .ev_pin (ev_pin), .ev_edge (ev_edge), .ev_qual (ev_qual), .ev_reset (ev_reset),

@@ -21,7 +21,9 @@
 `default_nettype none
 `include "trw_defs.vh"
 
-module trw_pin_tx (
+module trw_pin_tx #(
+    parameter FRAC = 8           // fraction bits of time arithmetic (8 = the spec's 16.8; less = measurement only)
+) (
     input  wire        clk,
     input  wire        rst_n,
     input  wire        restart,     // a configuration write to this unit: restart (P-G15)
@@ -93,14 +95,18 @@ module trw_pin_tx (
 
     reg  [15:0] eq;          // signed ticks (see above)
     reg  [7:0]  er;
-    reg  [7:0]  cf;
+    localparam BW = 17 + FRAC;                 // burst timer: 16 integer bits, FRAC + 1 fraction bits
+    localparam [BW-1:0] BT_ONE = 1 << (FRAC + 1);
+    wire [15+FRAC:0] per = period[23:8-FRAC];  // PERIOD, top FRAC bits of its fraction
+
+    reg  [FRAC-1:0] cf;
     reg         e_own;       // a take during a burst's tail made eq/er authoritative again
     reg         pend_v;      // one timed action waiting for its time (P3 allows no more)
     reg  [2:0]  pend_k;
     reg  [4:0]  pend_a;
     reg         due_lvl_v, due_lvl, due_oe_v, due_oe;
     reg         p_act;       // a timed shift or clock burst is running
-    reg  [24:0] bt;          // 16.9 clocks from this clock to the next boundary
+    reg  [BW-1:0] bt;        // 16.(FRAC+1) clocks from this clock to the next boundary
     reg  [4:0]  rem;         // bits still to drive (timed or linked shift)
     reg  [3:0]  bi;          // index of the next bit in sreg
     reg  [15:0] sreg;
@@ -118,11 +124,11 @@ module trw_pin_tx (
     assign lvl = lvx ^ idle;
 
     // ------------------------------------------------------------------ the running shift / burst
-    wire [15:0] bt_i    = bt[24:9];
+    wire [15:0] bt_i    = bt[BW-1:FRAC+1];
     wire        fire    = p_act && !p_sw && (bt_i == 16'd0);
-    wire [24:0] step    = m_clk ? {1'b0, period} : {period, 1'b0};  // CLKGEN: half periods (P11)
-    wire [25:0] bt_add  = {1'b0, bt} + {1'b0, step};
-    wire [15:0] bt_add_i = bt_add[24:9];
+    wire [BW-1:0] step  = m_clk ? {1'b0, per} : {per, 1'b0};  // CLKGEN: half periods (P11)
+    wire [BW:0] bt_add  = {1'b0, bt} + {1'b0, step};
+    wire [15:0] bt_add_i = bt_add[BW-1:FRAC+1];
     wire        a_idle  = (a_in == idle);
 
     wire s_tail  = tshift && p_act && (rem == 5'd0);                  // next boundary: return to IDLE
@@ -137,17 +143,17 @@ module trw_pin_tx (
     wire tail_ok = (tail && (bt_i <= 16'd1)) || (lastb && (bt_add_i == 16'd1)) || c_swend;
     wire pe_m1   = (tail && (bt_i == 16'd1)) || (lastb && (bt_add_i == 16'd1));
     wire pe_fv   = lastb || c_swend;                                   // the end time is known now
-    wire [7:0] pe_f = c_swend ? 8'd0 : bt_add[8:1];
+    wire [FRAC-1:0] pe_f = c_swend ? {FRAC{1'b0}} : bt_add[FRAC:1];
 
     // ------------------------------------------------------------------ the cursor, this clock
     wire use_pe = p_act && !e_own;
     wire [15:0] q_eff = use_pe ? (pe_m1 ? 16'hffff : 16'h0000) : eq;
     wire [7:0]  r_eff = use_pe ? (pe_m1 ? presc : 8'h00) : er;
-    wire [7:0]  cf_eff = pe_fv ? pe_f : cf;
+    wire [FRAC-1:0] cf_eff = pe_fv ? pe_f : cf;
     wire w_fire = w_v && (w_rise ? b_rise : b_fall);                   // P16: cursor := earliest
     wire [15:0] q_b  = w_fire ? 16'hffff : q_eff;
     wire [7:0]  r_b  = w_fire ? presc : r_eff;
-    wire [7:0]  cf_b = w_fire ? 8'h00 : cf_eff;
+    wire [FRAC-1:0] cf_b = w_fire ? {FRAC{1'b0}} : cf_eff;
 
     wire [16:0] q_sub = {q_b[15], q_b} - {5'd0, h_d};                   // cursor + d * PRESC
     wire        q_uf  = (q_sub[16:15] == 2'b10);                       // below -32768 ticks (P-G3)
@@ -174,7 +180,7 @@ module trw_pin_tx (
     wire tk_late   = tk_timed && late;
     wire start_new = (h_shift || (h_clk && !h_ext));
     wire load_proc = (pend_go && (pend_k == K_START)) || (tk_now && start_new);
-    wire [7:0] p_frac = tk_late ? 8'h00 : cf_b;
+    wire [FRAC-1:0] p_frac = tk_late ? {FRAC{1'b0}} : cf_b;
 
     assign late_set = tk_late && (c_lvl || c_oe) && (arg[10:0] != 11'd0);   // P4
 
@@ -223,11 +229,11 @@ module trw_pin_tx (
 
     always @(posedge clk) begin
         if (!rst_n || restart) begin
-            eq <= 16'h0000;  er <= 8'h00;  cf <= 8'h00;  e_own <= 1'b0;
+            eq <= 16'h0000;  er <= 8'h00;  cf <= {FRAC{1'b0}};  e_own <= 1'b0;
             pend_v <= 1'b0;  pend_k <= K_LVL;  pend_a <= 5'd0;
             due_lvl_v <= 1'b0;  due_lvl <= 1'b0;  due_oe_v <= 1'b0;  due_oe <= 1'b0;
             rxset <= 1'b0;  rxset_n <= 5'd0;  smp <= 1'b0;
-            p_act <= 1'b0;  bt <= 25'd0;  rem <= 5'd0;  bi <= 4'd0;  sreg <= 16'h0000;
+            p_act <= 1'b0;  bt <= {BW{1'b0}};  rem <= 5'd0;  bi <= 4'd0;  sreg <= 16'h0000;
             cn <= 9'd0;  ph <= 1'b0;  p_first <= 1'b0;  p_sw <= 1'b0;
             lk_ret <= 1'b0;  lk_pre <= 1'b0;  w_v <= 1'b0;  w_rise <= 1'b0;
             ntx_v <= 1'b0;  ntx <= 4'd0;
@@ -236,7 +242,7 @@ module trw_pin_tx (
             // cursor
             eq <= q_inc;
             er <= r_inc;
-            cf <= ((tk && !h_ext && (c_sync || tk_late)) || w_fire) ? 8'h00 : cf_eff;
+            cf <= ((tk && !h_ext && (c_sync || tk_late)) || w_fire) ? {FRAC{1'b0}} : cf_eff;
             if (load_proc)
                 e_own <= 1'b0;
             else if (tk && !h_ext)
@@ -330,10 +336,10 @@ module trw_pin_tx (
                     if (a_idle) begin
                         p_sw <= 1'b0;
                         ph   <= 1'b1;
-                        bt   <= step - 25'd512;
+                        bt   <= step - BT_ONE;
                     end
                 end else if (fire) begin
-                    bt <= bt_add[24:0] - 25'd512;
+                    bt <= bt_add[BW-1:0] - BT_ONE;
                     if (m_clk) begin
                         p_first <= 1'b0;
                         if (ph) begin
@@ -345,11 +351,11 @@ module trw_pin_tx (
                         end
                     end
                 end else begin
-                    bt <= bt - 25'd512;
+                    bt <= bt - BT_ONE;
                 end
             end
         end
     end
 
-    wire _unused = &{1'b0, pend_a[4:1], bt_add[25]};
+    wire _unused = &{1'b0, pend_a[4:1], bt_add[BW], period};
 endmodule

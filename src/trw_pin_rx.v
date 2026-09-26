@@ -16,7 +16,9 @@
 `default_nettype none
 `include "trw_defs.vh"
 
-module trw_pin_rx (
+module trw_pin_rx #(
+    parameter FRAC = 8           // fraction bits of the sample timer (see trw_pin_tx.v)
+) (
     input  wire        clk,
     input  wire        rst_n,
     input  wire        restart,
@@ -91,12 +93,15 @@ module trw_pin_rx (
     // ------------------------------------------------------------------ SHIFT_RX (P5, P15)
     localparam S_IDLE = 2'd0, S_START = 2'd1, S_SAMP = 2'd2, S_STOP = 2'd3;
     reg [1:0]  sst;
-    reg [23:0] rt;                              // 16.8 clocks from this clock to the next sample
+    localparam RW = 16 + FRAC;
+    wire [RW-1:0] per  = period[23:8-FRAC];
+    wire [RW-1:0] sofs = sampleofs[23:8-FRAC];
+    reg [RW-1:0] rt;                            // 16.FRAC clocks from this clock to the next sample
     wire       srx_on  = m_srx && sel;
     wire       start   = srx_on && (sst == S_START) && (a_in != idle);
-    wire [23:0] rt_cur = start ? sampleofs : rt;
-    wire       srx_smp = srx_on && (start || (sst == S_SAMP)) && (rt_cur[23:8] == 16'd0);
-    wire [24:0] rt_add = {1'b0, rt_cur} + (srx_smp ? {1'b0, period} : 25'd0);
+    wire [RW-1:0] rt_cur = start ? sofs : rt;
+    wire       srx_smp = srx_on && (start || (sst == S_SAMP)) && (rt_cur[RW-1:FRAC] == 16'd0);
+    wire [RW:0] rt_add = {1'b0, rt_cur} + (srx_smp ? {1'b0, per} : {(RW+1){1'b0}});
 
     // ------------------------------------------------------------------ LINKED_RX, SAMPLE
     wire lrx_smp = m_lrx && sel && (rx_edge ? (b_prev && !b_in) : (!b_prev && b_in));
@@ -133,7 +138,7 @@ module trw_pin_rx (
         if (!rst_n || restart) begin
             fw <= 16'h0000;  fc <= 5'd0;  fph <= 1'b0;  ftaint <= 1'b0;
             fo_v <= 1'b0;  fo_n <= 5'd0;
-            sst <= S_IDLE;  rt <= 24'd0;
+            sst <= S_IDLE;  rt <= {RW{1'b0}};
         end else begin
             if (rst_fr || done) begin
                 fw <= 16'h0000;
@@ -151,7 +156,7 @@ module trw_pin_rx (
             end
 
             // SHIFT_RX state
-            rt <= rt_add[23:0] - 24'd256;
+            rt <= rt_add[RW-1:0] - (1 << FRAC);
             if (!srx_on)
                 sst <= S_IDLE;
             else case (sst)
@@ -170,5 +175,5 @@ module trw_pin_rx (
     assign rx_data = ev ? {es, tick} : fw_add;
     assign ovr_set = live && ((want && !rx_free) || (ev && emit) || smp_lost);
 
-    wire _unused = &{1'b0, rt_add[24]};
+    wire _unused = &{1'b0, rt_add[RW], period, sampleofs};
 endmodule

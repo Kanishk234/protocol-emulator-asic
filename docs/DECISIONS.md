@@ -44,3 +44,19 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** System `/usr/bin` comes first; `~/oss-cad-suite/bin` is appended to the end of PATH (`scripts/check_all.sh` and `scripts/gl_local.sh` do this themselves). Python runs only in `.venv`.
 - **Reason:** CI's `test` and `lint` jobs use Ubuntu 24.04's apt Icarus 12.0 and Verilator 5.020, which are also the WSL system versions. The OSS CAD Suite ships its own newer Icarus and Verilator; appending it keeps the CI versions in front while still providing Yosys, nextpnr and SymbiYosys.
 - **Evidence:** local `iverilog -V` 12.0, `verilator --version` 5.020 (Debian 5.020-1); `scripts/check_all.sh` and `scripts/gl_local.sh` pass (2026-09-25). Versions in `docs/VERSIONS.md`.
+
+## ANISH-D1: Isolated reference-flow toolchain
+- **Date:** 2026-09-25 · **Status:** local experiment tooling on `anish_branch`
+- **Decision:** `scripts/fabric_reference.sh` uses FABulous 2.2 in the project
+  `.venv-fabric` (or an equivalent activated project venv) with OSS CAD Suite
+  2026-06-29 first on PATH. Install the suite in a Linux path without spaces.
+  This is an explicit reference-experiment exception to D-007; template CI
+  simulator versions and `check_all.sh` retain their own settings.
+- **Reason:** September's `synth_fabulous` is incompatible with the released
+  FABulous mapping flow. Hand-written replacement maps introduce avoidable
+  correctness risk. The supported suite also avoids launcher paths split at
+  spaces. Pin manifests are retained in the experiment evidence directory.
+- **Scope:** no chip RTL, physical constraints or architecture contract is
+  changed. Generic nextpnr timing is not CMOS5L timing signoff.
+- **Evidence:** upstream report at `origin/efpga` `b45a1d8`, local reference
+  compilation logs, and `docs/reports/ANISH_REFERENCE.md` for completed checks.

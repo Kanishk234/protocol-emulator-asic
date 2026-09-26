@@ -2,6 +2,13 @@
 
 2026-09-25 · `anish_branch` · phase-0 research and tooling.
 
+Update: [upstream checkpoint](../reports/ANISH_UPSTREAM_REVIEW.md) reviews
+`main` at `43282b4` and `efpga` at `b45a1d8`. The newer capacity results
+strengthen the case for measured timer/shift specialization, but leave
+I2C-target storage and routed margin unresolved. Reference experiments use
+OSS CAD Suite 2026-06-29 with FABulous 2.2; September's synthesis interface
+is incompatible.
+
 ## Recommendation
 
 Continue with a **small FABulous-based eFPGA plus a fixed management and
@@ -171,6 +178,12 @@ analysis. Release only a documented user-HDL subset with supported clock,
 reset and inference rules.
 
 ## Immediate next actions
+
+The September 26 [reload investigation](../reports/ANISH_REFERENCE.md)
+demonstrates intermediate LUT oscillation in the stock reference model.
+Follow the [repair experiments](../reports/ANISH_RELOAD_PLAN.md) before
+treating runtime reload as solved; budget isolation and recovery overhead
+alongside shell and routing costs.
 
 Finish the phase-0 reference flow and configuration census, add unit CI,
 record exact successes/failures, and send the draft organizer questions

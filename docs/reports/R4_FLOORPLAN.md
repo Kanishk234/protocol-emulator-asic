@@ -40,7 +40,7 @@ Branch `spike/r4-floorplan`, built by `spikes/r4_floorplan/apply_to_branch.sh` f
 
 ## 3. Results: run 1 (2026-09-26) — failed at placement, before routing
 
-`gds` on `spike/r4-floorplan` (1ca1bdc), run ID: *to add*. Logs: the `GDS_logs` artifact, unpacked in `build/ci/r4/` (not committed). The flow stopped at step 37, `OpenROAD.ResizerTimingPostCTS`, with **DPL-0036: detailed placement failed**. It never reached global or detailed routing, so there are no overflow or routing-violation numbers. The whole flow took about 5 minutes of step time.
+`gds` on `spike/r4-floorplan` (1ca1bdc), run [36269756517](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36269756517). Logs: the `GDS_logs` artifact, unpacked in `build/ci/r4/` (not committed). The flow stopped at step 37, `OpenROAD.ResizerTimingPostCTS`, with **DPL-0036: detailed placement failed**. It never reached global or detailed routing, so there are no overflow or routing-violation numbers. The whole flow took about 5 minutes of step time.
 
 **Area through the flow** (core 902,417 µm²; the macro is 45,309 µm² of it):
 

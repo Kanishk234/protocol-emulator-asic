@@ -151,6 +151,16 @@ Each was decided in the RTL to keep going, and is marked `P-G<n>` in the source 
 | P-G22 | P6, P3 | Other tokens in linked mode | Taken once all linked bits are out. A LEVEL landing on the same edge as a linked bit loses; it beats a pending return to IDLE |
 | P-G23 | P12 | Does a LEVEL-mode DATA/EVENT move the cursor? | Yes, like LEVEL with delay 0 (cursor := its action time) |
 
+**Resolution (D-041, ARCHITECTURE §14 P31–P45; RTL updated 2026-09-26):**
+- **P-G7 → P34, changed.** A CLK taken in any clock of a burst, the final-release clock included (and, with STRETCH, the clock the line reads IDLE), now extends it: the next IDLE half starts at that release. `trw_pin_tx.v`: the burst counts as running through its last clock, and the end is cancelled by an extension taken in it.
+- **P-G9 → P36, already compliant.** A TX_EDGE in the take clock n finds the unit idle and does nothing; in clock n + 1 the preload has priority and consumes the edge. Now pinned by a test for both clocks.
+- **P-G12 → P38 / P8, changed.** EV_RESET now restarts framing *before* the event clock's sample, which becomes bit 0 of the new word. The RTL used to add the sample and then clear it.
+- **P-G20 → P43, one change.** TX_EDGE code 3 now acts as none (a timed shift); it used to make the unit linked on the falling edge. The other lean fields were already right: EV_QUAL 1 → none, TXMODE 3–7 → LEVEL. DELIM and STUFF_LVL are BITSYNC fields (milestone B).
+- **P-G22 → P44, already compliant.** A LEVEL on an earlier edge leaves the pending return to IDLE in place; on one edge a linked bit beats a LEVEL, which beats the return. Now pinned by a test.
+- **Tests:** 7 new (34 L1 tests in all), passing on the lean and full builds. Four new mutants restore the old P34, P38, P43 and P44 behaviour (`mutate.sh`).
+- **Cost:** lean unit 30,257 µm² (was 29,790 at FRAC 8, +1.6 %: mostly the P38 base-state multiplexers, at the edge of the ABC noise); still 216 flops. Slow-corner slack at 20 ns +5.50 ns (config static). `run_pin.sh`, 2026-09-26.
+- Proposals A (P-G15) and B (P-G16) and D-042 (P-G19) still wait for approval; the RTL already does A, B and write-1-to-clear.
+
 P-G15 and P-G16 are also proposals: they need a sentence in §14 H1 (and P-G19 a register in §9), so they go through a DECISIONS entry, not a silent RTL choice.
 
 ## 7. Measurement: a 4-bit timer fraction (2026-09-26)

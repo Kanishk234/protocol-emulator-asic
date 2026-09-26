@@ -33,7 +33,8 @@ module meas_prod (
 endmodule
 
 module trw_pin_meas #(
-    parameter FULL = 0
+    parameter FULL = 0,
+    parameter FRAC = 8
 ) (
     input  wire        clk,
     input  wire        rst_n,
@@ -67,7 +68,7 @@ module trw_pin_meas #(
     trw_pin_cfg #(.FULL (FULL)) u_cfg (
         .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg), .restart (restart)
     );
-    trw_pin_unit #(.FULL (FULL)) u_unit (
+    trw_pin_unit #(.FULL (FULL), .FRAC (FRAC)) u_unit (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .rx_free (free), .rx_load (load), .rx_tag (tag), .rx_data (data),

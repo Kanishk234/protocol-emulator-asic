@@ -31,6 +31,38 @@
   "//": "https://tinytapeout.com/faq/#how-can-i-map-an-additional-external-clock-to-one-of-the-gpios",
   "CLOCK_PORT": "clk",
 
+  "//": "WARP (DECISIONS D-019): the fabric macro warp_tiny (macro/warp_tiny/, 357.12 x 483.84 um).",
+  "//": "x = 24 x 0.48 (Metal2 pitch), y = 18 x 0.42 (Metal3 pitch) = 2 rows: routing tracks line up;",
+  "//": "its power columns then sit under the chip stripes set by FP_PDN_V* below (D-017).",
+  "MACROS": {
+    "warp_tiny": {
+      "instances": {
+        "u_fabric": {
+          "location": [11.52, 7.56],
+          "orientation": "N"
+        }
+      },
+      "gds": ["dir::../macro/warp_tiny/warp_tiny.gds"],
+      "lef": ["dir::../macro/warp_tiny/warp_tiny.lef"],
+      "nl": [
+        "dir::../macro/warp_tiny/warp_tiny.nl.v",
+        "dir::../macro/warp_tiny/tiles/LUT4x8_ha.nl.v",
+        "dir::../macro/warp_tiny/tiles/N_term.nl.v",
+        "dir::../macro/warp_tiny/tiles/S_IO2.nl.v",
+        "dir::../macro/warp_tiny/tiles/E_IO4.nl.v",
+        "dir::../macro/warp_tiny/tiles/W_IO4.nl.v",
+        "dir::../macro/warp_tiny/tiles/NE_term.nl.v",
+        "dir::../macro/warp_tiny/tiles/NW_term.nl.v",
+        "dir::../macro/warp_tiny/tiles/SE_term.nl.v",
+        "dir::../macro/warp_tiny/tiles/SW_term.nl.v"
+      ]
+    }
+  },
+  "PDN_MACRO_CONNECTIONS": ["u_fabric VPWR VGND VPWR VGND"],
+
+  "//": "WARP (D-019): the macro power grid script from the TRIPWIRE R3 spike (src/pdn_cfg.tcl header).",
+  "PDN_CFG": "dir::pdn_cfg.tcl",
+
   "//": "Configuration docs: https://librelane.readthedocs.io/en/latest/reference/configuration.html",
 
   "//": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
@@ -58,8 +90,12 @@
   "FP_IO_HLENGTH": 2,
   "FP_IO_VLENGTH": 2,
 
-  "FP_PDN_VPITCH": 50.0,
+  "//": "WARP (D-019): pitch = the fabric's power-column pitch (D-017); VPWR centres at",
+  "//": "2.88 (core x) + 20.64 + 109.92 k = macro x 11.52 + 12.00 + 109.92 k; VGND 4.1 um right.",
+  "FP_PDN_VPITCH": 109.92,
   "FP_PDN_VWIDTH": 2.1,
+  "FP_PDN_VSPACING": 2.0,
+  "FP_PDN_VOFFSET": 20.64,
 
   "//": "Clock",
   "RUN_CTS": 1,

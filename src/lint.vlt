@@ -1,0 +1,10 @@
+`verilator_config
+// Lint waivers, scoped to files we must not edit (CLAUDE.md: upstream/generated code is never
+// hand-edited). WARP's own RTL is linted with -Wall and no waivers.
+
+// FABulous configuration RTL, copied unmodified (src/fabric_gen/NOTICE.md)
+lint_off -file "*fabric_gen/*"
+
+// Black-box view of the hardened fabric macro: its outputs are driven by the macro, not here
+lint_off -rule UNDRIVEN -file "*warp_tiny.v"
+lint_off -rule UNUSEDSIGNAL -file "*warp_tiny.v"

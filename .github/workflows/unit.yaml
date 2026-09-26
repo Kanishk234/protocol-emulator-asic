@@ -1,0 +1,49 @@
+name: unit
+# WARP's own workflow: Python tool tests (pytest over tools/) and the RTL tests of every
+# design-set protocol user design (protocols/*/test, cocotb + Icarus) against the
+# independent reference models in tools/refmodels/, with sigrok as a second decoder.
+on: [push, workflow_dispatch]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install Python packages
+        run: pip install -r test/requirements.txt hypothesis==6.168.1 pyyaml==6.0.3 pytest-xdist==3.8.0
+
+      - name: pytest (tools)
+        run: python -m pytest -q -n auto
+
+  protocols:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Install Icarus and sigrok-cli
+        run: sudo apt-get update && sudo apt-get install -y iverilog sigrok-cli
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install Python packages
+        run: pip install -r test/requirements.txt
+
+      - name: UART RTL tests (three configurations)
+        run: |
+          cd protocols/uart/test
+          for args in "DIV=16" "DIV=13" "DIV=16 RUNTIME_DIV=1"; do
+            rm -f results.xml
+            make $args
+            ! grep -q failure results.xml
+          done

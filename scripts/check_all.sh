@@ -56,6 +56,19 @@ if compgen -G "tools/**/test_*.py" >/dev/null || compgen -G "tools/*/tests/test_
   python -m pytest -q -n auto
 fi
 
+for mk in protocols/*/test/Makefile; do
+  [ -f "$mk" ] || continue
+  d=$(dirname "$mk")
+  step "$d: protocol RTL tests (default configuration)"
+  rm -f "$d/results.xml"
+  make -C "$d" >/dev/null
+  if grep -q failure "$d/results.xml"; then
+    echo "error: failures in $d/results.xml" >&2
+    exit 1
+  fi
+  echo "ok"
+done
+
 step "test/: pin-level cocotb suite (RTL)"
 make -C test clean >/dev/null
 make -C test

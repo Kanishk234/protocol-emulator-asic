@@ -39,7 +39,7 @@ fi
 echo "ok: $yaml_src"
 
 step "lint: verilator --lint-only -Wall"
-verilator --lint-only -Wall -Isrc --top-module "$TOP" "${SOURCES[@]}"
+verilator --lint-only -Wall -Isrc --top-module "$TOP" src/lint.vlt "${SOURCES[@]}"
 echo "ok"
 
 step "lint: iverilog -g2005"

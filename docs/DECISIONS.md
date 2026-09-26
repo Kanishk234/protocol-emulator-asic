@@ -665,6 +665,48 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Where this leaves the area:** with D-038–D-040, scenario E: ~781K µm² placed (744–817K), **87 % of the core**. Still above a routable 50–60 %: the next step is to measure a real `trw_pin_unit` (AREA_ESTIMATE §8).
 - **Approval:** Krithik and Kanishk, 2026-09-25.
 
+## D-041 (2026-09-26): the pin-unit RTL gaps P-G1–P-G23 answered in §14; two proposals
+- **Context:** writing `trw_pin_unit` (milestone A) from the documents alone found 23 places where the text left a choice open or contradicted itself (`docs/reports/PIN_UNIT_RTL.md` §6). As for R1 (D-033), each is answered in `ARCHITECTURE.md` §14, new rules **P31–P45** plus edits to P8 and P13, from the model's side. The RTL's choice was usually the better one: where it was, the model now follows it.
+
+| Gap | Answer | Rule | RTL agrees? |
+|---|---|---|---|
+| P-G1 OE after reset | IDLE, OE = 1; the owners keep a unit off the pads | P31 | yes |
+| P-G2 pin N with OD | complement of A *before* OD (carrier included), A's OE before OD | P31 | yes (the model drove N open-drain-like; changed) |
+| P-G3 cursor range | at most 32 767 ticks behind (moved up when a command is taken) and 32 768 ahead (the command waits) | P32 | yes (the model was unbounded; changed) |
+| P-G4 odd PERIOD in CLKGEN | edges exact to 1/512 clock | P33 | yes (**BUGS #43**: the model lost 1/256 clock per period) |
+| P-G5 tokens a mode does not use | taken and ignored, including DATA/EVENT at CLKGEN | P34 | yes (the model shifted DATA in CLKGEN; changed) |
+| P-G6 CLKGEN PERIOD < 2 | rejected by tripc and the model | P34 | yes |
+| P-G7 CLK in the final-release clock; count width | **extends** the burst; 9-bit count, a CLK over 511 waits | P34 | count yes; **extension no: the RTL starts a new burst there, and must change** |
+| P-G8 token in the WAIT edge clock | allowed, `cursor := n + 1` | P35 | yes |
+| P-G9 linked TX and selection; the preload clock | shifts only while selected; a TX_EDGE in the take clock **or the next** is used by the preload | P36 | selection yes; **the RTL must also ignore an edge in clock n + 1** (BUGS #42: in the model such an edge put bit 1 on bit 0's edge) |
+| P-G10 SHIFT_RX without AUTOREARM | stops; `SETN` rx re-arms (and restarts a word in progress) | P37 | yes |
+| P-G11 mode sample + SAMPLE in one clock | the SAMPLE bit is dropped, OVERRUN | P38 | yes |
+| P-G12 P8 vs P19 | P19 wins: the sample enters framing, only a word it completes loses the load; EV_RESET acts before that sample | P38, P8 edited | yes (**BUGS #41**: the model skipped the sample, which stalled SHIFT_RX); the RTL should confirm the EV_RESET order |
+| P-G13 timed RX actions and P3 | pending actions; a late SAMPLE never sets LATE | P39 | yes |
+| P-G14 taint with open drain | a shifted bit taints whatever OD/OE; return to IDLE, LEVEL or abort ends it | P40, P13 edited | yes (the model let a LEVEL keep the taint; changed) |
+| P-G15 restart after configuration | **proposal A below** | — | — |
+| P-G16 half-written configuration | **proposal B below** | — | — |
+| P-G17 RX_NBITS 0 and 17–31 | 0 = the configured NBITS; 17–31 mean 16, and the tools reject them | P41 | yes |
+| P-G18 unattached pins, pad codes 24–30 | 24–30 act as 31 (the tools reject them); A/S read IDLE, B reads 0, C selects always | P42 | yes (the model did not sample an unattached A; changed) |
+| P-G19 clearing sticky flags | **D-042** | — | — |
+| P-G20 EV_QUAL code 1 | acts as none, generalised: every unnamed enum code acts as code 0 | P43 | yes for EV_QUAL; **the RTL should check** TX_EDGE 3, DELIM 3, STUFF_LVL 1, TXMODE 5–7 |
+| P-G21 WAIT [1] outside BITSYNC | ignored | P35 | yes |
+| P-G22 linked mode and other tokens | taken once the bits are out; on one edge a bit beats a LEVEL and a LEVEL beats the pending return to IDLE | P44 | yes; **same edge only**: a LEVEL due earlier does not cancel the return |
+| P-G23 LEVEL-mode DATA moves the cursor | yes | P45 | yes |
+
+- **Evidence:** 18 new tests in `tools/tripsim/tests/test_semantics.py` (one or two per changed rule, `test_p31_*` to `test_p44_*`); all 20 programs and the full suite pass.
+- **For the RTL session:** change P-G7 and P-G9 as marked, and check P-G12, P-G20 and P-G22 against the rule text. Lockstep (L2) will then compare the two independently.
+- **Proposal A (P-G15, needs approval): a configuration write restarts the unit.** Any write to a unit's §7.2 block restarts all of the unit's state: TX and RX, the cursor, the tick counter and its prescaler (P8 then counts from the last write), and the sticky LATE / OVERRUN flags. It generalises D-035 J (the PRESC-write restart) to the whole block. It is what the RTL does, and it keeps gate-level simulation free of X once the latches are written. Cost: none in hardware. Model change: the event time counts from the last configuration write, not from reset.
+- **Proposal B (P-G16, needs approval): pin units are live only after the first RUN or STEP.** Until some lane has been RUN or STEPped since reset, no pin unit takes a TX token or loads its producer. Half-written configuration latches can otherwise push X tokens into the fabric at gate level. Cost: one flop. A host-only setup (tokens from HOST_IN straight to a unit, no lane) must RUN an empty lane first; tripc and `tools/host` will do it. The alternative, a host "pins live" bit, costs an address and one more step to forget.
+- **Approval:** the gap answers follow the D-033 precedent (model session, from the model and the RTL's report). Proposals A and B change behaviour and wait for Krithik and Kanishk.
+
+## D-042 (2026-09-26): clearing the sticky pin-unit flags (proposed)
+- **Context:** §9 lists sticky flags (OVERRUN, LATE) in the control space, but not how the host clears them (P-G19). The RTL used write-1-to-clear strobes.
+- **Proposal:** one status word per unit at `0x0010 + u`: [0] OVERRUN, [1] LATE. A read returns the flags; writing 1 to a bit clears it; writing 0 leaves it. The words are part of the readable state (D-039 keeps them readable).
+- **General need:** any protocol's firmware and host tooling needs to see and reset overrun and lateness without reconfiguring the unit.
+- **Cost:** 2 flops per unit already exist; the decode is a few gates.
+- **Status:** proposed; waits for Krithik and Kanishk. Then §9 and the spec get the address.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

@@ -21,6 +21,30 @@ Next:
 
 ---
 
+## 2026-09-26: Krithik + Claude (phase 2: pin-unit RTL gaps answered, 4-bit fraction check)
+Done:
+- **The 23 pin-unit RTL gaps (P-G1 to P-G23) are answered in §14** as new rules P31 to P45 (plus edits to P8 and P13), recorded in **D-041**. Where the RTL's reading was better, the model now follows it.
+- The model changed in 14 places, each pinned by a test (18 new tests in `test_semantics.py`), and each change was reverted once on purpose to confirm a test fails.
+- The review found three real model bugs:
+  - BUGS #41: SHIFT_RX stalled when a sample fell in an event clock;
+  - BUGS #42: a preloaded bit hidden by a same-edge shift;
+  - BUGS #43: CLKGEN drift with an odd PERIOD.
+- Evidence: the full suite passed (271); the fast suite passes after the last test change (266); injected reverts of the 18 model changes are all caught (18 of 18); `gen --check` is clean.
+- **The RTL must change in two places** (P-G7: a CLK in the final-release clock extends the burst; P-G9: an edge in the clock after a preload is also ignored), and should check three others (P-G12, P-G20, P-G22). Listed in D-041.
+- **Proposed, awaiting approval:**
+  - D-041 A: a config write restarts the unit;
+  - D-041 B: pin units are live only after the first RUN/STEP;
+  - D-042: write-1-to-clear status word per unit.
+- **4-bit timer fraction, model side:** a new exploration knob, `TRIPSIM_FRAC=4`, rounds every time setting to 1/16 clock. With it, the full suite passes except the one test that checks the encoding is exact at 1/256 (253 of 254). So all 20 protocols work with 4-bit fractions. The RTL session is measuring the area side.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Krithik/Kanishk: approve or change D-041 A/B and D-042.
+- RTL session: the fraction measurement, then R4. Pass it the D-041 changes for the pin unit.
+- 4-bit fraction: the RTL measured -1.9K µm² per lean unit (about 1.5 % of the core for six units). Not adopted; kept as a late option, since the model shows every protocol still works.
+
 ## 2026-09-26: Krithik + Claude (phase 2: 4-bit timer fraction, measurement)
 Done:
 - `FRAC` parameter (default 8) on `trw_pin_unit/tx/rx`: the cursor fraction, the burst timer, the SHIFT_RX timer, and the PERIOD/SAMPLEOFS inputs (top FRAC bits). No spec change.

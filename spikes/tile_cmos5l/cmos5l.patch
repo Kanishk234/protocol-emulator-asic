@@ -1,7 +1,7 @@
 diff --git a/tiles.py b/tiles.py
 old mode 100755
 new mode 100644
-index c86f9fe..edfe3a8
+index c86f9fe..885e989
 --- a/tiles.py
 +++ b/tiles.py
 @@ -205,12 +205,38 @@ tile_obstruction_layers = {
@@ -43,7 +43,21 @@ index c86f9fe..edfe3a8
  def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=None, gui=None):
      target_flow = Flow.factory.get("FABulousTile")
  
-@@ -365,6 +391,24 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+@@ -315,6 +341,13 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+     print(f"Tile target density: {target_density}")
+     print(f"Tile obstructions: {obs}")
+     
++    # WARP (D-017): west-column tiles put their VPWR stripe centre at local x = 12.00 (offset 9.12
++    # from the 2.88 um core edge) so the whole fabric's stripes sit on one grid
++    # (12.00 + 109.92 k fabric-local); other tiles use offset 50.40 (common.yaml).
++    if pdk == "ihp-sg13cmos5l" and tile in ("W_IO", "W_IO2", "W_IO4", "NW_term", "SW_term"):
++        # set it inside the pdk:: section, which LibreLane applies after the top-level keys
++        config.setdefault("pdk::ihp-sg13cmos5l", {})["PDN_VOFFSET"] = 9.12
++
+     config["FP_SIZING"] = "absolute"
+     config["DIE_AREA"] = [0, 0, tile_size[0], tile_size[1]]
+     
+@@ -365,6 +398,24 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
          pdk_root = version.get_dir(ciel_home)
      
      
@@ -68,7 +82,7 @@ index c86f9fe..edfe3a8
      flow = target_flow(
          config,
          design_dir=design_dir,
-@@ -374,6 +418,25 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+@@ -374,6 +425,25 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
      
      state_out = flow.start(tag=tag, last_run=last_run)
  
@@ -98,10 +112,10 @@ diff --git a/tiles/tiny/LUT4x8_ha/config.yaml b/tiles/tiny/LUT4x8_ha/config.yaml
 old mode 100755
 new mode 100644
 diff --git a/tiles/tiny/common/common.yaml b/tiles/tiny/common/common.yaml
-index e2fa610..bf4e6af 100644
+index e2fa610..609b83d 100644
 --- a/tiles/tiny/common/common.yaml
 +++ b/tiles/tiny/common/common.yaml
-@@ -60,6 +60,30 @@ pdk::ihp-sg13g2:
+@@ -60,6 +60,34 @@ pdk::ihp-sg13g2:
      PDN_HPITCH: 75.6
      PDN_HOFFSET: 13.57
  
@@ -119,10 +133,14 @@ index e2fa610..bf4e6af 100644
 +    FP_PDN_HORIZONTAL_LAYER: TopMetal1
 +    PDN_MULTILAYER: False
 +
-+    PDN_VWIDTH: 1.0
++    # D-017: stripes on a global grid the TT chip grid can land on: 2.1 um (TT precheck minimum),
++    # pitch = half a LUT tile width. VPWR centres at fabric x = 12.00 + 109.92 k. pdngen measures
++    # the offset from the core edge (2.88 um in) to the stripe centre: 50.40 here (centre 53.28)
++    # for LUT-width and east-column tiles; tiles.py sets 9.12 (centre 12.00) for west-column tiles.
++    PDN_VWIDTH: 2.1
 +    PDN_VSPACING: 2.0
-+    PDN_VPITCH: 50.0
-+    PDN_VOFFSET: 10.0
++    PDN_VPITCH: 109.92
++    PDN_VOFFSET: 50.40
 +
 +    PDN_HWIDTH: 2.0
 +    PDN_HSPACING: 4.0

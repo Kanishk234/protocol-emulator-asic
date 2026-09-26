@@ -59,4 +59,21 @@ for l in lines:
     out.append(l)
 open(p, "w").write("\n".join(out))
 EOF
-echo "fabric macro: $W/macro (GDS: $(ls "$W"/macro/gds/*.gds), LEF: $W/macro/lef/warp_tiny.lef)"
+# Placement boundary (IHP 189/4) over the whole macro, from the LEF size
+read -r MW MH < <(sed -n 's/^ *SIZE \([0-9.]*\) BY \([0-9.]*\) ;/\1 \2/p' "$W/macro/lef/warp_tiny.lef" | head -1)
+nix develop --accept-flake-config --command klayout -b -r "$HERE/add_prboundary.py" \
+  -rd gds="$W/macro/gds/warp_tiny.gds" -rd out="$W/macro/gds/warp_tiny.gds" -rd w="$MW" -rd h="$MH" 2>/dev/null
+
+# Export the macro views the chip flow uses into the repo (macro/warp_tiny/)
+OUT="$ROOT/macro/warp_tiny"
+mkdir -p "$OUT"
+cp "$W/macro/gds/warp_tiny.gds" "$W/macro/lef/warp_tiny.lef" "$OUT/"
+cp "$W"/macro/nl/warp_tiny.nl.v "$OUT/warp_tiny.nl.v"
+cp "$W/macro/fabulous/warp_tiny.v" "$OUT/warp_tiny.v"              # RTL of the fabric (simulation)
+cp "$W/macro/fabulous/bitStreamSpec.csv" "$OUT/"
+# gate-level netlists of the tiles the fabric netlist instantiates (for LVS and gate-level sim)
+mkdir -p "$OUT/tiles"
+for t in $TILES; do
+  cp "$LIB/tiles/tiny/$t/macro/ihp-sg13cmos5l/nl/$t.nl.v" "$OUT/tiles/"
+done
+echo "fabric macro: $OUT ($MW x $MH um)"

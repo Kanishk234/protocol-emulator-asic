@@ -12,7 +12,8 @@
 `include "trw_defs.vh"
 
 module tb_pin #(
-    parameter FULL = 0
+    parameter FULL = 0,
+    parameter FRAC = 8
 ) (
     input  wire        clk,
     input  wire        rst_n,
@@ -90,7 +91,7 @@ module tb_pin #(
         end
     end
 
-    trw_pin_unit #(.FULL (FULL)) u_unit (
+    trw_pin_unit #(.FULL (FULL), .FRAC (FRAC)) u_unit (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .rx_free (free), .rx_load (rload), .rx_tag (rtag), .rx_data (rdata),

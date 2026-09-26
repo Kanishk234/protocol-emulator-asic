@@ -12,12 +12,16 @@ non-default field, or one of its modes) is a ValueError.
 """
 
 import dataclasses
+import os
 
 import tripwire_spec as S
 
 from .pinunit import PinConfig
 
 PAD_NONE = 31
+# Exploration knob (phase 2 task 2.0): TRIPSIM_FRAC=4 rounds every time setting to 1/16 clock,
+# as a 4-bit-fraction timer would. The encoding keeps its 8-bit fraction fields.
+_QSTEP = 1 << (8 - int(os.environ.get("TRIPSIM_FRAC", "8")))
 _DEFAULT = PinConfig()
 
 
@@ -58,6 +62,8 @@ def _code(name, kind, value, cfg):
     if kind == "m1":
         return int(value) - 1
     if kind == "pad":
+        if value is not None and not 0 <= value <= 23:        # §14 P42: 24-30 are not pads
+            raise ValueError(f"{name} = {value}: pads are 0..23 (or unset)")
         return PAD_NONE if value is None else int(value)
     if kind == "enum":
         vals = S.PIN_CFG_ENUMS[name]
@@ -66,9 +72,9 @@ def _code(name, kind, value, cfg):
             raise ValueError(f"{name} = {value!r}: not one of {sorted(map(str, vals))}")
         return vals[key]
     if kind == "q8":
-        return round(value * 256)
+        return round(value * 256 / _QSTEP) * _QSTEP
     if kind == "sofs":
-        return round(value * cfg.period_q8)
+        return round(value * cfg.period_q8 / _QSTEP) * _QSTEP
     raise ValueError(kind)
 
 
@@ -80,9 +86,10 @@ def _value(name, kind, code, fields):
     if kind == "m1":
         return code + 1
     if kind == "pad":
-        return None if code == PAD_NONE else code
+        return None if code >= 24 else code                    # §14 P42: 24-30 act as 31
     if kind == "enum":
-        key = {v: k for k, v in S.PIN_CFG_ENUMS[name].items()}[code]
+        names = {v: k for k, v in S.PIN_CFG_ENUMS[name].items()}
+        key = names.get(code, names[0])                        # §14 P43: unnamed codes act as 0
         return None if key == "none" else key
     if kind == "q8":
         return code / 256

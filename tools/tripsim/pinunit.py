@@ -118,6 +118,10 @@ class PinUnit:
             raise ValueError("bitsync: txmode and rxmode must both be bitsync")
         if not 0 <= c.crc_width <= 16:
             raise ValueError("crc_width must be 0..16")
+        if c.txmode == "clkgen" and c.period < 2:          # §14 P34 (D-041)
+            raise ValueError("clkgen needs period >= 2 clocks")
+        if not (c.rx_nbits is None or 1 <= c.rx_nbits <= 16) or not 0 <= c.rx_nbits2 <= 16:
+            raise ValueError("rx_nbits must be 1..16 (or unset), rx_nbits2 0..16")   # §14 P41
         self.reset_state()
 
     def reset_state(self):
@@ -147,6 +151,8 @@ class PinUnit:
         self._sel_next = True
         self._deselect = False          # pin C went inactive this clock
         self._loaded = False            # the RX producer was loaded this clock (§14 P19)
+        self._framed = False            # a bit entered RX framing this clock (§14 P38)
+        self._preload_clk = None        # clock a linked DATA was preloaded (§14 P36)
         self._car_n = 0                 # clocks since pin A became active (carrier phase)
         self.bs = None
         if c.txmode == "bitsync":
@@ -154,22 +160,24 @@ class PinUnit:
             self.bs = BitSync(self)
 
     # -------------------------------------------------------------- pads
-    def pad_drive(self):
+    def pad_drive(self, od=None):
         """(value, oe) this unit drives on pin A, from the registered output."""
         c = self.cfg
+        od = c.od if od is None else od
         if c.c_oe and not self._sel:              # §14 P15: C_OE gates every TX mode (BUGS #37)
             return self.level, 0
+        v = self.level
         if c.carrier and self.level != c.idle:
             p = round(c.carrier * 256)
             v = self.level if ((self._car_n << 8) % p) < p // 2 else c.idle
-            return (0, int(v == 0)) if c.od else (v, self.oe)
-        if self.cfg.od:
-            return 0, int(self.level == 0)
-        return self.level, self.oe
+        if od:
+            return 0, int(v == 0)
+        return v, self.oe
 
     def pad_drive_n(self):
-        """(value, oe) on pin N: the complement of pin A, or low during SE0."""
-        v, e = self.pad_drive()
+        """(value, oe) on pin N: the complement of pin A before open drain, or low during
+        SE0 (§14 P31)."""
+        v, e = self.pad_drive(od=False)
         if self.bs is not None and self.bs.se0:
             return 0, e
         return 1 - v, e
@@ -210,8 +218,9 @@ class PinUnit:
         port = self.tx_port
         if port is not None and port.avail():
             tag, data = port.head()
-            clk_more = (self.clk is not None and tag == isa.TAG_CTRL and data >> 12 == CMD_CLK)
-            if self._tx_ready(now) or clk_more:
+            clk_more = (self.clk is not None and tag == isa.TAG_CTRL and data >> 12 == CMD_CLK
+                        and self.clk["n"] + (data & 0xFF) <= 511)       # §14 P34: 9-bit count
+            if (self._tx_ready(now) and self._cursor_fits(now, tag, data)) or clk_more:
                 port.take()
                 self.stats["tx_tokens"] += 1
                 self._accept(now, tag, data)
@@ -221,52 +230,85 @@ class PinUnit:
             if kind == "rxlen":                   # after this clock's RX: its sample is dropped
                 self._rx_len = value
                 self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
+                if c.rxmode == "shift_rx":            # §14 P37: back to wait-for-start, re-armed
+                    self._rx = "wait_idle"
             elif kind == "sample":
                 if a is not None and self._sel_next:   # §14 P15: discarded while deselected
-                    self._sample(a)
+                    if self._framed:                   # §14 P38: one framing bit per clock
+                        self.flags["OVERRUN"] = 1
+                        self.stats["overruns"] += 1
+                    else:
+                        self._sample(a)
             else:
                 apply.append((_, kind, value))
         if self.clk is not None:
             self._clk_step(now, a, apply)
-        if self._linked() and self._edge(self._prev_b_tx, b, c.tx_edge):
-            # §14 P6: a linked shift changes pin A at the edge of the clock that sees pin B's edge
+        if (self._linked() and self._sel_next
+                and (self._preload_clk is None or now - self._preload_clk > 1)
+                and self._edge(self._prev_b_tx, b, c.tx_edge)):
+            # §14 P6: a linked shift changes pin A at the edge of the clock that sees pin B's edge,
+            # only while selected, and not in the preload clock or the next (§14 P36)
             if self.linked_bits:
-                apply.append((now, "sbit", self.linked_bits.pop(0)))
+                apply.append((now, "sbit", self.linked_bits.pop(0)))    # beats a LEVEL (P44)
                 self.linked_end = not self.linked_bits
             elif self.linked_end:
-                apply.append((now, "send", c.idle))
+                apply.insert(0, (now, "send", c.idle))                  # a LEVEL beats it (P44)
                 self.linked_end = False
         self._prev_b_tx = b
 
     def _clk_step(self, now, a, apply):
         """CLKGEN (§14 P11): each period is IDLE for PERIOD/2, then ACTIVE for PERIOD/2."""
+        # times in 1/512 clock (q9), so each half is exactly PERIOD/2 (§14 P33); a half
+        # period in q9 is the period in q8
         c, k, p = self.cfg, self.clk, self.cfg.period_q8
-        if k["phase"] == "idle" and (k["t"] >> 8) <= now:
+        if k["phase"] == "idle" and (k["t9"] >> 9) <= now:
             apply.append((now, "level", 1 - c.idle))
-            k["phase"], k["t"] = "active", k["t"] + p // 2
-        elif k["phase"] == "active" and (k["t"] >> 8) <= now:
+            k["phase"], k["t9"] = "active", k["t9"] + p
+        elif k["phase"] == "active" and (k["t9"] >> 9) <= now:
             apply.append((now, "level", c.idle))
             k["n"] -= 1
             if c.stretch:
                 k["phase"] = "release"            # the IDLE half starts when the line gets there
             else:
-                self._clk_next(k["t"])
+                self._clk_next(k["t9"])
         elif k["phase"] == "release" and a == c.idle:
-            self._clk_next(now << 8)              # STRETCH: another device held the line
+            self._clk_next(now << 9)              # STRETCH: another device held the line
 
-    def _clk_next(self, idle_from_q8):
+    def _clk_next(self, idle_from_q9):
         k = self.clk
         if k["n"] > 0:
-            k["phase"], k["t"] = "idle", idle_from_q8 + self.cfg.period_q8 // 2
+            k["phase"], k["t9"] = "idle", idle_from_q9 + self.cfg.period_q8
         else:
-            self.cursor_q8 = idle_from_q8
+            self.cursor_q8 = idle_from_q9 >> 1    # on the 1/256 grid (§14 P33)
             self.clk = None
+
+    # §14 P32: the cursor stays within 32 767 ticks before / 32 768 ticks after the present
+    def _cursor_floor(self, now):
+        floor = (now - 32767 * self.cfg.presc) << 8
+        if self.cursor_q8 < floor:
+            self.cursor_q8 = floor
+
+    def _cursor_fits(self, now, tag, data):
+        if tag != isa.TAG_CTRL or self.bs is not None:
+            return True
+        op, arg = data >> 12, data & 0x0FFF
+        if op in (CMD_LEVEL, CMD_OE):
+            d = arg & 0x7FF
+        elif op in (CMD_GAP, CMD_SAMPLE):
+            d = arg
+        else:
+            return True
+        c = self.cfg
+        cur = max(self.cursor_q8, (now - 32767 * c.presc) << 8)
+        return cur + d * c.presc * 256 <= (now + 32768 * c.presc) << 8
 
     def _accept(self, now, tag, data):
         c = self.cfg
         earliest_q8 = (now + 1) << 8          # §14 P3: accept at clock n, earliest pad edge n+1
         if tag == isa.TAG_CTRL:
             op, arg = data >> 12, data & 0x0FFF
+            if op in (CMD_LEVEL, CMD_OE, CMD_GAP, CMD_SAMPLE) or (op == CMD_SETN and arg & 0x20):
+                self._cursor_floor(now)                           # §14 P32
             if op in (CMD_LEVEL, CMD_OE):
                 delay = arg & 0x7FF
                 t_q8 = self.cursor_q8 + delay * c.presc * 256
@@ -300,7 +342,7 @@ class PinUnit:
                     self.clk["n"] += n                # continues the running burst seamlessly
                 elif n:
                     start_q8 = max(self.cursor_q8, earliest_q8)
-                    self.clk = {"n": n, "phase": "idle", "t": start_q8 + c.period_q8 // 2}
+                    self.clk = {"n": n, "phase": "idle", "t9": 2 * start_q8 + c.period_q8}
             elif op == CMD_WAIT:
                 self.wait_edge = "rise" if arg & 1 else "fall"
             else:
@@ -309,7 +351,7 @@ class PinUnit:
             start_q8 = max(self.cursor_q8, earliest_q8)   # LEVEL mode: drive data[0]
             self.cursor_q8 = start_q8
             self._schedule(start_q8 >> 8, "level", data & 1)
-        elif tag == isa.TAG_DATA:
+        elif tag == isa.TAG_DATA and c.txmode != "clkgen":      # §14 P34: ignored in CLKGEN
             n = self.tx_nbits
             if c.tx_lentok:                    # D-013: length in the token
                 n, data = (data >> 12) + 1, data & 0x0FFF
@@ -321,6 +363,7 @@ class PinUnit:
                 if c.tx_preload and not self.linked_end:
                     self._schedule(earliest_q8 >> 8, "sbit", bits[0])
                     bits = bits[1:]
+                    self._preload_clk = now               # §14 P36: this clock's edge is used
                 self.linked_bits = bits
                 self.linked_end = not bits
             elif c.txmode == "pulse":           # §14 P17: one two-phase symbol per bit
@@ -371,12 +414,13 @@ class PinUnit:
                  and (c.ev_qual is None or (b == c.ev_qual and self._prev_b == c.ev_qual)))
         if event:
             # §14 P8: EVENT {new level of the source pin, time}; it takes this clock's RX
-            # load, so a sample due in the same clock is skipped.
+            # load. A sample in the same clock still enters framing (after EV_RESET); only a
+            # word it completes loses the load (§14 P38, P19).
             # §14 P8 (D-024): the time is in PRESC ticks, so long pulses fit in 15 bits
             self._emit(isa.TAG_EVENT, (src << 15) | ((now // c.presc) & 0x7FFF))
             if c.ev_reset:
                 self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
-        elif a is not None and sel:
+        if a is not None and sel:
             if c.rxmode == "shift_rx":
                 self._shift_rx(now, a)
             elif c.rxmode == "linked_rx" and self._edge(self._prev_b, b, c.rx_edge):
@@ -392,6 +436,7 @@ class PinUnit:
     def _sample(self, bit):
         """Add one sampled bit to the current word; emit it when complete (§14 P13)."""
         c = self.cfg
+        self._framed = True
         self._rx_taint |= self.driving
         self._rx_bits.append(bit)
         if len(self._rx_bits) < self._word_len():
@@ -438,14 +483,13 @@ class PinUnit:
     def commit(self):
         self._sel = self._sel_next
         self._loaded = False
+        self._framed = False
         self._car_n = self._car_n + 1 if self.level != self.cfg.idle else 0
         for _, kind, value in self._tx_apply:
             if kind == "oe":
                 self.oe = value
             else:
                 self.level = value
-                if kind == "sbit":
-                    self.driving = True
-                elif kind == "send":
-                    self.driving = False
+                # §14 P40: a shifted bit taints; the return to IDLE, a LEVEL or an abort ends it
+                self.driving = kind == "sbit"
         self._tx_apply = []

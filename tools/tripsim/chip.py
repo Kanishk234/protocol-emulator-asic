@@ -168,7 +168,9 @@ class Chip:
             self.lanes[rot].mem_access(self.sram)
         for u in self.pins:
             sense = u.cfg.pin_a if u.cfg.pin_s is None else u.cfg.pin_s
-            a, b = self.synced(sense), self.synced(u.cfg.pin_b)
+            # §14 P42: an unattached pin A/S reads IDLE and pin B reads 0 (C: always selected)
+            a = u.cfg.idle if sense is None else self.synced(sense)
+            b = 0 if u.cfg.pin_b is None else self.synced(u.cfg.pin_b)
             u.compute_rx(now, a, b, self.synced(u.cfg.pin_c))
             u.compute_tx(now, b, a)
         hin = self.fabric.producers["HOST_IN"]

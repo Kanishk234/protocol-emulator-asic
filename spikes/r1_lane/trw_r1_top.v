@@ -112,6 +112,7 @@ module trw_r1_top (
     wire [35:0] out_tok;
     wire        rt_take, rt_nz, rz, call_req, rb;
     wire [4:0]  call_idx;
+    wire [74:0] lane_dbg;
     trw_lane u_lane (
         .clk (clk), .rst_n (rst_n), .run (chain[O_RUN]),
         .slots (slots), .k (k), .time_now (time_now),
@@ -119,9 +120,9 @@ module trw_r1_top (
         .out_all_taken (out_all_taken), .out_valid (out_valid), .out_seq (out_seq), .out_tok (out_tok),
         .rir_valid (chain[O_RIR]), .rir (chain[O_RIR+1 +: 16]),
         .rt_take (rt_take), .rt_nz (rt_nz), .rz (rz),
-        .call_req (call_req), .call_idx (call_idx), .rb_o (rb)
+        .call_req (call_req), .call_idx (call_idx), .rb_o (rb), .dbg (lane_dbg)
     );
 
     assign dout = ^{out_tok, out_valid, out_seq, in_take, cp_last, rt_take, rt_nz, rz,
-                    call_req, call_idx, rb, chain[CH-1], slot_rd};
+                    call_req, call_idx, rb, chain[CH-1], slot_rd, lane_dbg};
 endmodule

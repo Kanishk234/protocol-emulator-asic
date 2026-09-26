@@ -36,7 +36,9 @@ module trw_lane (
     output reg                          rz,
     output reg                          call_req,
     output reg  [4:0]                   call_idx,
-    output wire                         rb_o
+    output wire                         rb_o,
+    // host debug read (ARCHITECTURE.md §9, lane register block): {pend, f3..f0, state, r3..r0}
+    output wire [74:0]                  dbg
 );
     localparam SB = `TRW_SLOT_BITS;
 
@@ -60,6 +62,7 @@ module trw_lane (
 
     wire [3:0] flags = {rb, f};
     assign rb_o = rb;
+    assign dbg  = {pend, flags, state, regs};
 
     // ---------------------------------------------------------------- EVAL
     // L7: an output is free when it is not reserved and its producer is free (F3).

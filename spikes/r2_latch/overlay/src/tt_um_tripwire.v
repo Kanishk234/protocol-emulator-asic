@@ -153,13 +153,14 @@ module tt_um_tripwire (
     reg  [1:0]  sub_last;
     wire        rt_nz, rz, call_req, rb;
     wire [4:0]  call_idx;
+    wire [74:0] lane_dbg;
     trw_lane u_lane (
         .clk (clk), .rst_n (rst_n), .run (run), .slots (slots), .k (k), .time_now (time_now),
         .in_avail ({1'b0, i0_avail}), .in_head ({18'd0, i0_head}), .in_take (in_take),
         .out_all_taken (~(sub_last ^ out_seq)), .out_valid (out_valid), .out_seq (out_seq),
         .out_tok (out_tok),
         .rir_valid (rir_valid), .rir (rir), .rt_take (rt_take), .rt_nz (rt_nz), .rz (rz),
-        .call_req (call_req), .call_idx (call_idx), .rb_o (rb)
+        .call_req (call_req), .call_idx (call_idx), .rb_o (rb), .dbg (lane_dbg)
     );
 
     // ---- subscribers of O0 / O1 (blocking; take on a strobe)
@@ -197,5 +198,5 @@ module tt_um_tripwire (
     assign uio_out = 8'h00;
     assign uio_oe  = 8'h00;
 
-    wire _unused = &{1'b0, ena, in_take[1], rt_nz, call_idx};
+    wire _unused = &{1'b0, ena, in_take[1], rt_nz, call_idx, lane_dbg};
 endmodule

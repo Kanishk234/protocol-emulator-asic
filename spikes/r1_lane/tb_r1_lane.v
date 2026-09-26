@@ -35,6 +35,7 @@ module tb_r1_lane;
     wire [35:0] in_head;
     wire        rt_take, rt_nz, rz, call_req, rb;
     wire [4:0]  call_idx;
+    wire [74:0] lane_dbg;
 
     trw_slots u_slots (.clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata),
                        .slots (slots), .k (k), .raddr (6'd0), .rdata ());
@@ -52,7 +53,7 @@ module tb_r1_lane;
         .out_all_taken (~(sub_last ^ out_seq)), .out_valid (out_valid), .out_seq (out_seq),
         .out_tok (out_tok),
         .rir_valid (1'b0), .rir (16'd0), .rt_take (rt_take), .rt_nz (rt_nz), .rz (rz),
-        .call_req (call_req), .call_idx (call_idx), .rb_o (rb)
+        .call_req (call_req), .call_idx (call_idx), .rb_o (rb), .dbg (lane_dbg)
     );
 
     // ---- slot images

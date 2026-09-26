@@ -64,7 +64,8 @@ module trw_pin_tx #(
     wire m_shift = (txmode == `TRW_PCE_TXMODE_SHIFT);
     wire m_clk   = (txmode == `TRW_PCE_TXMODE_CLKGEN);
     wire m_level = !m_shift && !m_clk;           // lean: the PULSE / BITSYNC codes act as LEVEL (D-040)
-    wire linked  = m_shift && (tx_edge != `TRW_PCE_TX_EDGE_NONE);
+    // P43: TX_EDGE code 3 has no name and acts as none (timed)
+    wire linked  = m_shift && ((tx_edge == `TRW_PCE_TX_EDGE_RISE) || (tx_edge == `TRW_PCE_TX_EDGE_FALL));
     wire tshift  = m_shift && !linked;
 
     wire [3:0]  op  = tx_data[15:12];
@@ -163,8 +164,8 @@ module trw_pin_tx #(
     // ------------------------------------------------------------------ take
     wire h_timed = h_lvl || c_oe || h_rxs || c_smp || h_shift || h_clk;
     wire h_cur   = h_timed || c_gap || c_sync;
-    wire clk_run = m_clk && p_act && !p_end;
-    wire h_ext   = h_clk && clk_run;                                   // P11: extends the burst
+    wire clk_run = m_clk && p_act;                                     // P34: up to and including the final release
+    wire h_ext   = h_clk && clk_run;                                   // P11, P34: extends the burst
     wire [9:0] cn_sum = {1'b0, cn} + {2'b0, arg[7:0]};
     wire pend_go = pend_v && (eq == 16'hffff) && (er == presc);        // due at the next edge
     wire pend_ok = !pend_v || (pend_go && (pend_k != K_START));
@@ -328,7 +329,7 @@ module trw_pin_tx #(
                 p_first <= 1'b1;
                 p_sw    <= 1'b0;
             end else if (p_act) begin
-                if (p_end) begin
+                if (p_end && !(tx_take && h_ext)) begin   // a CLK in the release clock continues it (P34)
                     p_act <= 1'b0;
                     p_sw  <= 1'b0;
                 end else if (p_sw) begin

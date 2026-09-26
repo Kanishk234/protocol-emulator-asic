@@ -118,21 +118,28 @@ module trw_pin_rx #(
     wire [4:0] n1  = (rx_nbits == 5'd0) ? {1'b0, nbits} + 5'd1 : (rx_nbits > 5'd16) ? 5'd16 : rx_nbits;
     wire [4:0] n2  = (rx_nbits2 > 5'd16) ? 5'd16 : rx_nbits2;
     wire       two = !fo_v && (rx_nbits2 != 5'd0);
-    wire [4:0] len = fo_v ? fo_n : (two && fph) ? n2 : n1;
+    // P8, P38: an event's EV_RESET restarts framing before this clock's sample enters it, so the
+    // sample becomes bit 0 of a fresh word (the *_b values are the framing state it sees).
+    wire        evr      = ev && ev_reset;
+    wire [15:0] fw_b     = evr ? 16'h0000 : fw;
+    wire [4:0]  fc_b     = evr ? 5'd0 : fc;
+    wire        fph_b    = !evr && fph;
+    wire        ftaint_b = !evr && ftaint;
+    wire [4:0] len = fo_v ? fo_n : (two && fph_b) ? n2 : n1;
 
     reg [15:0] fw_add;
     integer i;
     always @* begin
         if (order)
-            fw_add = {fw[14:0], a_in};           // MSB first: the last bit ends in data[0]
+            fw_add = {fw_b[14:0], a_in};         // MSB first: the last bit ends in data[0]
         else
             for (i = 0; i < 16; i = i + 1)
-                fw_add[i] = fw[i] || (a_in && (fc[3:0] == i[3:0]));
+                fw_add[i] = fw_b[i] || (a_in && (fc_b[3:0] == i[3:0]));
     end
-    wire done  = bit_v && ((fc + 5'd1) == len);
-    wire taint = ftaint || echo;
+    wire done  = bit_v && ((fc_b + 5'd1) == len);
+    wire taint = ftaint_b || echo;
     wire emit  = done && (!taint || rx_echo);
-    wire rst_fr = !sel || rxset || (ev && ev_reset);
+    wire rst_fr = !sel || rxset;               // after the sample (P15, P18: RX runs before the TX stream)
 
     always @(posedge clk) begin
         if (!rst_n || restart) begin
@@ -144,11 +151,16 @@ module trw_pin_rx #(
                 fw <= 16'h0000;
                 fc <= 5'd0;
                 ftaint <= 1'b0;
-                fph <= rst_fr ? 1'b0 : (two ? !fph : fph);
+                fph <= rst_fr ? 1'b0 : (two ? !fph_b : fph_b);
             end else if (bit_v) begin
                 fw <= fw_add;
-                fc <= fc + 5'd1;
+                fc <= fc_b + 5'd1;
                 ftaint <= taint;
+            end else if (evr) begin
+                fw <= 16'h0000;
+                fc <= 5'd0;
+                ftaint <= 1'b0;
+                fph <= 1'b0;
             end
             if (rxset) begin
                 fo_v <= 1'b1;

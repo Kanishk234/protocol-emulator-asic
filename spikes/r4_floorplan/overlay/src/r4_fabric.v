@@ -3,6 +3,7 @@
 // release terms (ARCHITECTURE.md §4, §4.6). The producer registers live with their owners.
 // Producers: 0 U0.rx, 1 U1.rx, 2 U2.rx, 3 U3.rx, 4 U4.rx, 5 U5.rx, 6 L0.O0, 7 L0.O1, 8 L1.O0, 9 L1.O1, 10 L2.O0, 11 L2.O1, 12 HOST_IN
 // Consumers: 0 L0.I0, 1 L0.I1, 2 L1.I0, 3 L1.I1, 4 L2.I0, 5 L2.I1, 6 U0.tx, 7 U1.tx, 8 U2.tx, 9 U3.tx, 10 U4.tx, 11 U5.tx, 12 HOST_OUT
+// Units: 4 (from tt_um_tripwire.v); absent ports: U4.tx, U5.tx
 `default_nettype none
 
 module r4_fabric (
@@ -153,31 +154,23 @@ module r4_fabric (
         .dropped (dropped[79:72])
     );
 
-    // U4.tx: 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN
-    r4_port #(.N(7)) u_c10 (
-        .clk (clk), .rst_n (rst_n),
-        .cfg (port_cfg[109:100]), .cfg_wr (port_wr[10]),
-        .src_valid ({p_valid[12], p_valid[11], p_valid[9], p_valid[7], p_valid[10], p_valid[8], p_valid[6]}),
-        .src_seq ({p_seq[12], p_seq[11], p_seq[9], p_seq[7], p_seq[10], p_seq[8], p_seq[6]}),
-        .src_load ({p_load[12], p_load[11], p_load[9], p_load[7], p_load[10], p_load[8], p_load[6]}),
-        .src_tok ({p_tok[233:216], p_tok[215:198], p_tok[179:162], p_tok[143:126], p_tok[197:180], p_tok[161:144], p_tok[125:108]}),
-        .take (take[10]), .avail (avail[10]), .head (head[197:180]),
-        .blocking (blk[10]), .sel (sel[43:40]), .last_seq (lseq[10]),
-        .dropped (dropped[87:80])
-    );
+    // U4.tx: absent (units = 4)
+    assign avail[10] = 1'b0;
+    assign head[197:180] = 18'd0;
+    assign blk[10] = 1'b0;
+    assign sel[43:40] = 4'd0;
+    assign lseq[10] = 1'b0;
+    assign dropped[87:80] = 8'd0;
+    wire _unused_c10 = &{1'b0, port_cfg[109:100], port_wr[10], take[10], blk[10], lseq[10], sel[43:40]};
 
-    // U5.tx: 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 HOST_IN
-    r4_port #(.N(7)) u_c11 (
-        .clk (clk), .rst_n (rst_n),
-        .cfg (port_cfg[119:110]), .cfg_wr (port_wr[11]),
-        .src_valid ({p_valid[12], p_valid[11], p_valid[9], p_valid[7], p_valid[10], p_valid[8], p_valid[6]}),
-        .src_seq ({p_seq[12], p_seq[11], p_seq[9], p_seq[7], p_seq[10], p_seq[8], p_seq[6]}),
-        .src_load ({p_load[12], p_load[11], p_load[9], p_load[7], p_load[10], p_load[8], p_load[6]}),
-        .src_tok ({p_tok[233:216], p_tok[215:198], p_tok[179:162], p_tok[143:126], p_tok[197:180], p_tok[161:144], p_tok[125:108]}),
-        .take (take[11]), .avail (avail[11]), .head (head[215:198]),
-        .blocking (blk[11]), .sel (sel[47:44]), .last_seq (lseq[11]),
-        .dropped (dropped[95:88])
-    );
+    // U5.tx: absent (units = 4)
+    assign avail[11] = 1'b0;
+    assign head[215:198] = 18'd0;
+    assign blk[11] = 1'b0;
+    assign sel[47:44] = 4'd0;
+    assign lseq[11] = 1'b0;
+    assign dropped[95:88] = 8'd0;
+    wire _unused_c11 = &{1'b0, port_cfg[119:110], port_wr[11], take[11], blk[11], lseq[11], sel[47:44]};
 
     // HOST_OUT: 0 L0.O0, 1 L1.O0, 2 L2.O0, 3 L0.O1, 4 L1.O1, 5 L2.O1, 6 U0.rx, 7 U1.rx
     r4_port #(.N(8)) u_c12 (
@@ -236,64 +229,52 @@ module r4_fabric (
         && (!blk[3] || (sel[15:12] != 4'd5) || (lseq[3] == p_seq[5]))
         && (!blk[4] || (sel[19:16] != 4'd5) || (lseq[4] == p_seq[5]))
         && (!blk[5] || (sel[23:20] != 4'd5) || (lseq[5] == p_seq[5]));
-    // L0.O0: subscribers L2.I1 (sel 7), U0.tx (sel 0), U1.tx (sel 0), U2.tx (sel 0), U3.tx (sel 0), U4.tx (sel 0), U5.tx (sel 0), HOST_OUT (sel 0)
+    // L0.O0: subscribers L2.I1 (sel 7), U0.tx (sel 0), U1.tx (sel 0), U2.tx (sel 0), U3.tx (sel 0), HOST_OUT (sel 0)
     assign all_taken[6] = (!blk[5] || (sel[23:20] != 4'd7) || (lseq[5] == p_seq[6]))
         && (!blk[6] || (sel[27:24] != 4'd0) || (lseq[6] == p_seq[6]))
         && (!blk[7] || (sel[31:28] != 4'd0) || (lseq[7] == p_seq[6]))
         && (!blk[8] || (sel[35:32] != 4'd0) || (lseq[8] == p_seq[6]))
         && (!blk[9] || (sel[39:36] != 4'd0) || (lseq[9] == p_seq[6]))
-        && (!blk[10] || (sel[43:40] != 4'd0) || (lseq[10] == p_seq[6]))
-        && (!blk[11] || (sel[47:44] != 4'd0) || (lseq[11] == p_seq[6]))
         && (!blk[12] || (sel[51:48] != 4'd0) || (lseq[12] == p_seq[6]));
-    // L0.O1: subscribers L1.I0 (sel 7), L1.I1 (sel 8), U0.tx (sel 3), U1.tx (sel 3), U2.tx (sel 3), U3.tx (sel 3), U4.tx (sel 3), U5.tx (sel 3), HOST_OUT (sel 3)
+    // L0.O1: subscribers L1.I0 (sel 7), L1.I1 (sel 8), U0.tx (sel 3), U1.tx (sel 3), U2.tx (sel 3), U3.tx (sel 3), HOST_OUT (sel 3)
     assign all_taken[7] = (!blk[2] || (sel[11:8] != 4'd7) || (lseq[2] == p_seq[7]))
         && (!blk[3] || (sel[15:12] != 4'd8) || (lseq[3] == p_seq[7]))
         && (!blk[6] || (sel[27:24] != 4'd3) || (lseq[6] == p_seq[7]))
         && (!blk[7] || (sel[31:28] != 4'd3) || (lseq[7] == p_seq[7]))
         && (!blk[8] || (sel[35:32] != 4'd3) || (lseq[8] == p_seq[7]))
         && (!blk[9] || (sel[39:36] != 4'd3) || (lseq[9] == p_seq[7]))
-        && (!blk[10] || (sel[43:40] != 4'd3) || (lseq[10] == p_seq[7]))
-        && (!blk[11] || (sel[47:44] != 4'd3) || (lseq[11] == p_seq[7]))
         && (!blk[12] || (sel[51:48] != 4'd3) || (lseq[12] == p_seq[7]));
-    // L1.O0: subscribers L0.I1 (sel 7), U0.tx (sel 1), U1.tx (sel 1), U2.tx (sel 1), U3.tx (sel 1), U4.tx (sel 1), U5.tx (sel 1), HOST_OUT (sel 1)
+    // L1.O0: subscribers L0.I1 (sel 7), U0.tx (sel 1), U1.tx (sel 1), U2.tx (sel 1), U3.tx (sel 1), HOST_OUT (sel 1)
     assign all_taken[8] = (!blk[1] || (sel[7:4] != 4'd7) || (lseq[1] == p_seq[8]))
         && (!blk[6] || (sel[27:24] != 4'd1) || (lseq[6] == p_seq[8]))
         && (!blk[7] || (sel[31:28] != 4'd1) || (lseq[7] == p_seq[8]))
         && (!blk[8] || (sel[35:32] != 4'd1) || (lseq[8] == p_seq[8]))
         && (!blk[9] || (sel[39:36] != 4'd1) || (lseq[9] == p_seq[8]))
-        && (!blk[10] || (sel[43:40] != 4'd1) || (lseq[10] == p_seq[8]))
-        && (!blk[11] || (sel[47:44] != 4'd1) || (lseq[11] == p_seq[8]))
         && (!blk[12] || (sel[51:48] != 4'd1) || (lseq[12] == p_seq[8]));
-    // L1.O1: subscribers L2.I0 (sel 7), L2.I1 (sel 8), U0.tx (sel 4), U1.tx (sel 4), U2.tx (sel 4), U3.tx (sel 4), U4.tx (sel 4), U5.tx (sel 4), HOST_OUT (sel 4)
+    // L1.O1: subscribers L2.I0 (sel 7), L2.I1 (sel 8), U0.tx (sel 4), U1.tx (sel 4), U2.tx (sel 4), U3.tx (sel 4), HOST_OUT (sel 4)
     assign all_taken[9] = (!blk[4] || (sel[19:16] != 4'd7) || (lseq[4] == p_seq[9]))
         && (!blk[5] || (sel[23:20] != 4'd8) || (lseq[5] == p_seq[9]))
         && (!blk[6] || (sel[27:24] != 4'd4) || (lseq[6] == p_seq[9]))
         && (!blk[7] || (sel[31:28] != 4'd4) || (lseq[7] == p_seq[9]))
         && (!blk[8] || (sel[35:32] != 4'd4) || (lseq[8] == p_seq[9]))
         && (!blk[9] || (sel[39:36] != 4'd4) || (lseq[9] == p_seq[9]))
-        && (!blk[10] || (sel[43:40] != 4'd4) || (lseq[10] == p_seq[9]))
-        && (!blk[11] || (sel[47:44] != 4'd4) || (lseq[11] == p_seq[9]))
         && (!blk[12] || (sel[51:48] != 4'd4) || (lseq[12] == p_seq[9]));
-    // L2.O0: subscribers L1.I1 (sel 7), U0.tx (sel 2), U1.tx (sel 2), U2.tx (sel 2), U3.tx (sel 2), U4.tx (sel 2), U5.tx (sel 2), HOST_OUT (sel 2)
+    // L2.O0: subscribers L1.I1 (sel 7), U0.tx (sel 2), U1.tx (sel 2), U2.tx (sel 2), U3.tx (sel 2), HOST_OUT (sel 2)
     assign all_taken[10] = (!blk[3] || (sel[15:12] != 4'd7) || (lseq[3] == p_seq[10]))
         && (!blk[6] || (sel[27:24] != 4'd2) || (lseq[6] == p_seq[10]))
         && (!blk[7] || (sel[31:28] != 4'd2) || (lseq[7] == p_seq[10]))
         && (!blk[8] || (sel[35:32] != 4'd2) || (lseq[8] == p_seq[10]))
         && (!blk[9] || (sel[39:36] != 4'd2) || (lseq[9] == p_seq[10]))
-        && (!blk[10] || (sel[43:40] != 4'd2) || (lseq[10] == p_seq[10]))
-        && (!blk[11] || (sel[47:44] != 4'd2) || (lseq[11] == p_seq[10]))
         && (!blk[12] || (sel[51:48] != 4'd2) || (lseq[12] == p_seq[10]));
-    // L2.O1: subscribers L0.I0 (sel 7), L0.I1 (sel 8), U0.tx (sel 5), U1.tx (sel 5), U2.tx (sel 5), U3.tx (sel 5), U4.tx (sel 5), U5.tx (sel 5), HOST_OUT (sel 5)
+    // L2.O1: subscribers L0.I0 (sel 7), L0.I1 (sel 8), U0.tx (sel 5), U1.tx (sel 5), U2.tx (sel 5), U3.tx (sel 5), HOST_OUT (sel 5)
     assign all_taken[11] = (!blk[0] || (sel[3:0] != 4'd7) || (lseq[0] == p_seq[11]))
         && (!blk[1] || (sel[7:4] != 4'd8) || (lseq[1] == p_seq[11]))
         && (!blk[6] || (sel[27:24] != 4'd5) || (lseq[6] == p_seq[11]))
         && (!blk[7] || (sel[31:28] != 4'd5) || (lseq[7] == p_seq[11]))
         && (!blk[8] || (sel[35:32] != 4'd5) || (lseq[8] == p_seq[11]))
         && (!blk[9] || (sel[39:36] != 4'd5) || (lseq[9] == p_seq[11]))
-        && (!blk[10] || (sel[43:40] != 4'd5) || (lseq[10] == p_seq[11]))
-        && (!blk[11] || (sel[47:44] != 4'd5) || (lseq[11] == p_seq[11]))
         && (!blk[12] || (sel[51:48] != 4'd5) || (lseq[12] == p_seq[11]));
-    // HOST_IN: subscribers L0.I0 (sel 6), L0.I1 (sel 6), L1.I0 (sel 6), L1.I1 (sel 6), L2.I0 (sel 6), L2.I1 (sel 6), U0.tx (sel 6), U1.tx (sel 6), U2.tx (sel 6), U3.tx (sel 6), U4.tx (sel 6), U5.tx (sel 6)
+    // HOST_IN: subscribers L0.I0 (sel 6), L0.I1 (sel 6), L1.I0 (sel 6), L1.I1 (sel 6), L2.I0 (sel 6), L2.I1 (sel 6), U0.tx (sel 6), U1.tx (sel 6), U2.tx (sel 6), U3.tx (sel 6)
     assign all_taken[12] = (!blk[0] || (sel[3:0] != 4'd6) || (lseq[0] == p_seq[12]))
         && (!blk[1] || (sel[7:4] != 4'd6) || (lseq[1] == p_seq[12]))
         && (!blk[2] || (sel[11:8] != 4'd6) || (lseq[2] == p_seq[12]))
@@ -303,7 +284,5 @@ module r4_fabric (
         && (!blk[6] || (sel[27:24] != 4'd6) || (lseq[6] == p_seq[12]))
         && (!blk[7] || (sel[31:28] != 4'd6) || (lseq[7] == p_seq[12]))
         && (!blk[8] || (sel[35:32] != 4'd6) || (lseq[8] == p_seq[12]))
-        && (!blk[9] || (sel[39:36] != 4'd6) || (lseq[9] == p_seq[12]))
-        && (!blk[10] || (sel[43:40] != 4'd6) || (lseq[10] == p_seq[12]))
-        && (!blk[11] || (sel[47:44] != 4'd6) || (lseq[11] == p_seq[12]));
+        && (!blk[9] || (sel[39:36] != 4'd6) || (lseq[9] == p_seq[12]));
 endmodule

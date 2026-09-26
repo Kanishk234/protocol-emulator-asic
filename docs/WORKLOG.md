@@ -21,6 +21,60 @@ Next:
 
 ---
 
+## 2026-09-26: Krithik + Claude (phase 2: R4 run 2 setup)
+Done:
+- Run 1 ID found with `gh`: 36269756517; added to AREA.md and R4_FLOORPLAN.md.
+- **R4 run 2 (approved): 4 pin units.** `localparam NU` in the R4 top; `gen_fabric.py` reads it and leaves out the absent units' TX ports; density 73 → 62.
+- `check_local.sh`: PASS (lint clean, 5/5 RTL, 5/5 gate level). Yosys 417.7K µm² (−81K); expected GPL ~60 %; slack +10.28 typ / +5.08 slow.
+- D-043 run 2 entry, `R4_FLOORPLAN.md` §5, AREA.md synthesis row.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- The `gds` run 36278610622 on `main` came from the P34/P38/P43 RTL push; the pin-unit files are not in `info.yaml`, so it rebuilds the same chip.
+
+Next:
+- Krithik: push run 2 on `spike/r4-floorplan`; collect `GDS_logs` into `build/ci/r4/`.
+
+## 2026-09-26: Krithik + Claude (phase 2: R4 run 1 result)
+Done:
+- Read `GDS_logs` of R4 run 1 (`spike/r4-floorplan`, 1ca1bdc; unpacked in `build/ci/r4/`, not committed).
+- **Result: failed at placement, before routing** (DPL-0036 in `ResizerTimingPostCTS`).
+  - Global placement utilisation 70.0 % (predicted ~71 %); 70.5 % after the fanout repair and CTS.
+  - The hold repair added 3,921 buffers (+10.1 %, 2,315 endpoints), taking it to ~77 %; 43 instances could not be legalized.
+  - Setup clean (typ +8.94 ns mid-PnR). Hold at typ is mostly on the SRAM inputs (−0.65 ns, 0.46 ns clock skew).
+  - ~5 min of flow time.
+- `R4_FLOORPLAN.md` §3–4, AREA.md hardening row, D-043 outcome and the run 2 proposal.
+- Also fixed `sources.sh` (it failed when writing into `src/` itself on the branch).
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- The run ID is not in the logs; to add to AREA.md and R4_FLOORPLAN.md.
+
+Next:
+- Krithik: approve run 2. Proposed: 4 pin units (a unit-count parameter in the R4 top), density = the new GPL utilisation + 2.
+
+## 2026-09-26: Krithik + Claude (phase 2: pin unit follows D-041)
+RTL session, from `ARCHITECTURE.md` §14 P31–P45 (D-041); `tools/tripsim` not read. R4 launched first (branch `spike/r4-floorplan`, 1ca1bdc).
+
+Done:
+- **P-G7 → P34 (changed):** a CLK taken in a burst's final-release clock (with STRETCH: the clock the line reads IDLE) extends the burst instead of starting a new one.
+- **P-G12 → P38 / P8 (changed):** EV_RESET restarts framing before the event clock's sample, which becomes bit 0 of the new word.
+- **P-G20 → P43 (changed):** TX_EDGE code 3 acts as none (timed shift); it made the unit linked on the fall.
+- **P-G9 → P36, P-G22 → P44:** the RTL already complied; both are now pinned by tests.
+- 7 new L1 tests (34 in all), passing on the lean and full builds. `mutate.sh`: 4 new mutants (old P34/P38/P43/P44), 3 stale ones updated to the FRAC/P38 source, and an `ONLY=` filter; **16 of 16 caught**.
+- `PIN_UNIT_RTL.md` §6: the resolution of each gap.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- R4 run 1: collect `GDS_logs`, fill `R4_FLOORPLAN.md` §3–4 and the AREA.md row.
+- Proposals A/B (D-041) and D-042 wait for Krithik and Kanishk; the RTL already does A, B and write-1-to-clear.
+
 ## 2026-09-26: Krithik + Claude (phase 2: R4 full-size floorplan spike, prepared)
 RTL session; did not read `tools/tripsim` or `spikes/area/ae_prims.v`.
 

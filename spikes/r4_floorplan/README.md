@@ -6,12 +6,12 @@ It hardens on the branch **`spike/r4-floorplan`**, which is never merged (as R2/
 
 ## What is on the chip
 - 3 lanes (R1 lane, latch slots and K, no slot read-back, register debug read) with routine sequencer stubs on the SRAM rotation.
-- 6 lean pin units with their configuration latch blocks, producers and pad owners.
+- `NU` lean pin units (`localparam NU` in the top; run 1: 6, run 2: 4) with their configuration latch blocks, producers and pad owners. Absent units keep their numbers.
 - The fabric: 13 producers, 13 consumer ports, legal-source multiplexers generated from the spec (`gen_fabric.py` → `overlay/src/r4_fabric.v`).
 - The IHP 512x16 SRAM macro (R3 recipe) with the 4-way rotation.
 - A host SPI stub (§9 format). The address map is in `overlay/src/tt_um_tripwire.v`.
 
-Yosys (cmos5l typ): 498.8K µm² of standard cells + the 45.3K macro, ~71 % of the core at the flow's placement.
+Yosys (cmos5l typ): 498.8K µm² of standard cells with 6 units (run 1), 417.7K with 4 (run 2), + the 45.3K macro.
 
 ## Files
 | Path | What |

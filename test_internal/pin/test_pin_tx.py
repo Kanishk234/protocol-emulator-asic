@@ -291,3 +291,74 @@ async def test_ignored_tokens(dut):
     await tb.until(30)
     assert [t[0] for t in tb.takes] == list(range(10, 17))
     check_wave(tb, UO0, waveform([(17, 0)], 1, 5, 30))
+
+
+@cocotb.test()
+async def test_clk_in_the_release_clock_extends(dut):
+    """P34 (D-041, P-G7): a CLK taken in the clock of the final release extends the burst: the next
+    IDLE half starts at that release (a new burst would start one clock later)."""
+    tb = PinTb(dut)
+    await tb.start(encode(txmode=CLKGEN, idle=0, pin_a=UO0, period=q8(6)))
+    tb.send(ctrl("CLK", 1), at=10)
+    tb.send(ctrl("CLK", 1), at=17)          # start 11: ACTIVE 14, release 17
+    await tb.until(40)
+    assert [t[0] for t in tb.takes] == [10, 17]
+    check_wave(tb, UO0, waveform([(14, 1), (17, 0), (20, 1), (23, 0)], 0, 5, 40))
+
+
+@cocotb.test()
+async def test_clk_at_the_stretch_end_extends(dut):
+    """P34 with STRETCH: a CLK taken in the clock the line reads IDLE after the final release starts
+    the next IDLE half there."""
+    tb = PinTb(dut)
+    await tb.start(encode(txmode=CLKGEN, idle=1, od=1, stretch=1, pin_a=UIO0, period=q8(10)))
+    tb.drive(20, UIO0, 0)
+    tb.drive(41, UIO0, 1)                   # the unit sees the line high in 43: the burst would end
+    tb.send(ctrl("CLK", 1), at=10)
+    tb.send(ctrl("CLK", 1), at=43)
+    await tb.until(70)
+    assert [t[0] for t in tb.takes] == [10, 43]
+    drv = [r["n"] for r in tb.log if r["aoe"]]
+    assert drv == list(range(17, 22)) + list(range(49, 54)), drv
+
+
+@cocotb.test()
+@cocotb.parametrize(seen=[10, 11])
+async def test_preload_uses_the_edge_in_clock_n_and_n1(dut, seen):
+    """P36 (P-G9): with TX_PRELOAD, a TX_EDGE seen in the take clock n or in n + 1 is used by the
+    preload: bit 0 goes out at edge n + 1 and stays until the next TX_EDGE."""
+    tb = PinTb(dut)
+    await tb.start(encode(txmode=SHIFT, idle=0, order=1, nbits=7, tx_preload=1, pin_a=UO0, pin_b=UI1,
+                          tx_edge=enum("tx_edge", "fall")))
+    tb.drive(seen - 2, UI1, 0)              # a fall the unit sees in clock `seen`
+    tb.drive(14, UI1, 1)
+    tb.drive(18, UI1, 0)                    # the next fall, seen in 20
+    tb.send((DATA, 0x80), at=10)
+    await tb.until(30)
+    assert tb.takes[0][0] == 10
+    check_wave(tb, UO0, waveform([(11, 1), (20, 0)], 0, 5, 30))
+
+
+@cocotb.test()
+async def test_unnamed_tx_edge_code_is_timed(dut):
+    """P43 (P-G20): TX_EDGE code 3 has no name and acts as code 0 (none): a timed shift."""
+    tb = PinTb(dut)
+    await tb.start(encode(txmode=SHIFT, idle=0, pin_a=UO0, pin_b=UI1, tx_edge=3, period=q8(4), nbits=3))
+    tb.send((DATA, 0b1011), at=10)
+    await tb.until(40)
+    a, e = shift_actions(11 * 256, [1, 1, 0, 1], 1024)
+    check_wave(tb, UO0, waveform(a + [(edge(e), 0)], 0, 5, 40))
+
+
+@cocotb.test()
+async def test_linked_level_does_not_cancel_the_return(dut):
+    """P44 (P-G22): a token other than DATA is taken once all linked bits are out; a LEVEL due on an
+    earlier edge does not cancel the pending return to IDLE on the next TX_EDGE."""
+    tb = PinTb(dut)
+    await tb.start(encode(txmode=SHIFT, idle=0, nbits=1, pin_a=UO0, pin_b=UI1,
+                          tx_edge=enum("tx_edge", "fall")), pads=0xFFFFFD)
+    falls = sck_falls(tb, UI1, 20, 3)       # seen in 26, 34, 42
+    tb.send((DATA, 0b01), level(1), at=5)
+    await tb.until(50)
+    assert [t[0] for t in tb.takes] == [5, falls[1] + 1]
+    check_wave(tb, UO0, waveform([(falls[0], 1), (falls[1], 0), (falls[1] + 2, 1), (falls[2], 0)], 0, 5, 50))

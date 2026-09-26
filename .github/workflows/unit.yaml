@@ -65,3 +65,12 @@ jobs:
             make $args
             ! grep -q failure results.xml
           done
+
+      - name: I2C target RTL tests (three bus speeds)
+        run: |
+          cd protocols/i2c_target/test
+          for args in "Q=4" "Q=6" "Q=11"; do
+            rm -f results.xml
+            make $args
+            ! grep -q failure results.xml
+          done

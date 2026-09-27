@@ -21,6 +21,22 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: R4 run 2 result)
+Done:
+- R4 run 2 (36279959944, ed3b949) read from the job log with `gh api` (cancelled at the 6 h limit, so no `GDS_logs`).
+- **Placed at 58.9 %; CTS, hold repair (3,067 buffers) and detailed placement passed; global routing never ended.** It had overflow after 50 iterations and then relaxed the clock NDR one net at a time (GRT-0273) for 5 h 51 min. No overflow figures were printed.
+- `R4_FLOORPLAN.md` §6, AREA.md hardening row, D-043 run 2 result and run 3 proposal.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- Any run with global-routing overflow will time out the same way while clock NDRs are on (LibreLane `CTS_APPLY_NDR` = `half` by default).
+- Proposed run 3: `CTS_APPLY_NDR` = `none`, same design, to get the overflow numbers (D-043).
+
+Next:
+- Krithik: approve or change run 3; then Claude edits the branch `config.json` and gives the commands.
+
 ## 2026-09-26: Krithik + Claude (phase 2: R4 run 2 setup)
 Done:
 - Run 1 ID found with `gh`: 36269756517; added to AREA.md and R4_FLOORPLAN.md.

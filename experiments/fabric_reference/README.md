@@ -7,6 +7,11 @@ The runner intentionally fails this gate;
 see `docs/reports/ANISH_REFERENCE.md`. A wall timeout is a failure, never
 an expected-pass condition.
 
+Follow-up: the reference-only LUT/carry hold candidate passes quick A/B/A
+and B/A/B. See `docs/reports/ANISH_RELOAD_EXPERIMENTS.md` for its validation
+and limits. It uses a separately patched fabric copy; the ordinary stock
+runner and its failing regression remain unchanged.
+
 This experiment generates the stock FABulous fabric once, compiles a counter
 and an LFSR using the same wrapper, then loads counter / LFSR / counter into
 one persistent RTL simulation. It checks reset priority, disabled hold,
@@ -72,3 +77,61 @@ timing, actual chip capacity, shell safety, load corruption recovery or
 physical correctness. The stock reference has 672 logic cells and is much
 larger than the proposed tapeout fabric. See the architecture checkpoint
 in `docs/reports/ANISH_UPSTREAM_REVIEW.md` for the remaining gates.
+
+Candidate experiments reuse the cached images:
+
+```bash
+bash scripts/fabric_order.sh build/fabric-reference-warp-reference.OBUfXfus reverse
+bash scripts/fabric_order.sh build/fabric-reference-warp-reference.OBUfXfus clear-columns
+bash scripts/fabric_order.sh build/fabric-reference-warp-reference.OBUfXfus hold
+bash scripts/fabric_order.sh build/fabric-reference-warp-reference.OBUfXfus hold validate
+bash scripts/fabric_order.sh build/fabric-reference-warp-reference.OBUfXfus guarded validate
+bash scripts/fabric_guard_cost.sh build/fabric-reference-warp-reference.OBUfXfus
+bash scripts/fabric_validator.sh build/fabric-reference-warp-reference.OBUfXfus
+bash scripts/fabric_validated.sh build/fabric-reference-warp-reference.OBUfXfus
+bash scripts/fabric_validator.sh build/fabric-reference-warp-reference.OBUfXfus byte
+bash scripts/fabric_validated.sh build/fabric-reference-warp-reference.OBUfXfus byte
+bash scripts/fabric_handshake.sh build/fabric-reference-warp-reference.OBUfXfus
+bash scripts/fabric_management_cost.sh build/fabric-reference-warp-reference.OBUfXfus
+```
+
+`hold` adds a fixed external control through a hash-checked copy of the
+reference hierarchy; it does not force internal nets or change the installed
+FABulous package. `validate` adds full counter wraparound, interrupted-load
+recovery after 33 and 199 frames, and a wrong-image control. Source patch,
+hashes, runner and logs are retained. A production design still needs output
+parking, reset/release sequencing, broader path coverage and physical cost.
+
+`guarded` tests a fixed output-parking and reset sequencer around the copied
+fabric. It still trusts `image_valid` and uses the two demos' reset pin ABI.
+The cost runner maps the guard and original/held LUT primitives separately
+to CMOS5L and runs functional gate-level controller/primitive checks. See
+`docs/reports/ANISH_GUARDED_RELOAD.md` for measurements and exclusions.
+
+The validator runner tests a separate synchronous validator/guard boundary
+against exact-length canonical images and malformed transactions in RTL
+and mapped CMOS5L simulation. It does not yet replace `ImageValid` in the
+full-fabric wrapper. See `docs/reports/ANISH_IMAGE_VALIDATOR.md` for the
+experimental format, 41-case evidence, area and remaining integration gate.
+
+The separate validated-fabric runner connects this boundary to the real
+loader with word pacing and coordinated reset, sends exactly 12,024 bytes,
+and checks reload/rejection/recovery. It preserves the trusted wrapper as
+a baseline. Its read-only word/frame witness is distinct from the pin-level
+oracle. See `docs/reports/ANISH_VALIDATED_FABRIC.md` for scope and results.
+
+Both validator runners accept `word` (default) or `byte` as the second
+argument. Byte CRC exposes backpressure and checks the last CRC byte before
+allowing commit. The matched isolated cost comparison and integration
+evidence are in `docs/reports/ANISH_BYTE_CRC.md`; physical timing is open.
+
+The handshake runner substitutes a small fixture for programmable logic but
+uses the actual pinned loader and row registers. Both CRC modes check
+continuous-valid backpressure, busy cancellation priorities and all frame
+payloads. This is separate loader RTL evidence, not full-fabric acceptance;
+see `docs/reports/ANISH_LOADER_HANDSHAKE.md`.
+
+The management cost runner preserves the fabric as a synthesis black box,
+maps both CRC modes including pacing/parking muxes, then checks each mapped
+wrapper with the RTL loader fixture. See `ANISH_MANAGEMENT_COST.md` in
+`docs/reports/` for the explicit area boundary and mixed GL/RTL limitations.

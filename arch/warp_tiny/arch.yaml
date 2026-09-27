@@ -1,0 +1,13 @@
+# Architecture identity (ARCHITECTURE.md §3): the compile flow stamps arch_version into every
+# bitstream file, the host checks it against READ_ID, and the shell's LOAD_BEGIN check rejects a
+# mismatch. Must equal ARCH_VERSION in src/tt_um_warp.v (checked by tools/compile tests).
+name: warp_tiny
+arch_version: 0x0001
+macro: macro/warp_tiny          # hardened fabric + tool files (fabulous/)
+fabric_rtl: macro/warp_tiny/warp_tiny.v
+luts: 16
+# The edge rows (N_term, S_IO2 with the clock/reset IO, SW_term with the GBUFs) have configuration
+# latches, and the shell's ConfigFSM writes all 4 rows per frame (src/wp_fabric_cfg.v). FABulous
+# 2.2's bitgen leaves border rows out unless told otherwise.
+include_border_rows: true
+config_rows: 4

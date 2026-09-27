@@ -1,0 +1,19 @@
+pin,bel,direction,chip_pin
+clk,X1Y3/A,clock,clk
+rst_n,X1Y3/B,in,shell user reset (low while not RUNNING and on USER_RESET)
+FAB_IN0,X2Y2/A,in,ui[3]
+FAB_IN1,X2Y2/B,in,ui[4]
+FAB_IN2,X2Y2/C,in,ui[5]
+FAB_IN3,X2Y2/D,in,ui[6]
+FAB_OUT0,X2Y1/A,out,uo[2]
+FAB_OUT1,X2Y1/B,out,uo[3]
+FAB_OUT2,X2Y1/C,out,uo[4]
+FAB_OUT3,X2Y1/D,out,uo[5]
+FAB_IO0,X0Y1/A,inout,uio[0]
+FAB_IO1,X0Y1/B,inout,uio[1]
+FAB_IO2,X0Y1/C,inout,uio[2]
+FAB_IO3,X0Y1/D,inout,uio[3]
+FAB_IO4,X0Y2/A,inout,uio[4]
+FAB_IO5,X0Y2/B,inout,uio[5]
+FAB_IO6,X0Y2/C,inout,uio[6]
+FAB_IO7,X0Y2/D,inout,uio[7]

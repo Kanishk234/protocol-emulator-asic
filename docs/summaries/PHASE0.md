@@ -10,8 +10,26 @@ These are reference-fabric results, not measurements of our eventual chip.
 
 Loading the second circuit into the already-running fabric fails. Frame
 analysis and a live diagnostic show an intermediate LUT feedback loop.
-The failure is preserved as a regression, and the next work is to develop
-and price a reliable loading/isolation mechanism. See the
+The failure is preserved as a regression. A reference-only LUT/carry hold
+candidate now passes both reload directions, full counter wraparound and
+recovery from two interrupted loads. This is a useful repair candidate;
+broader path coverage, safe output release and physical cost remain open.
+The later [guarded-wrapper experiment](../reports/ANISH_GUARDED_RELOAD.md)
+demonstrates parked outputs and reset before pad release, with functional
+checks on mapped guard/LUT netlists and initial isolated area measurements.
+That full-fabric wrapper still trusts image validity. A separate
+[validator/guard experiment](../reports/ANISH_IMAGE_VALIDATOR.md) now passes
+41 cases in RTL and on a mapped CMOS5L netlist, checking image format,
+completeness and checksum. The later
+[validated fabric wrapper](../reports/ANISH_VALIDATED_FABRIC.md) connects it
+to the real loader and passes both reload directions and selected bad-load
+recovery cases. Reducing management area, covering broader isolation paths
+and complete physical validation remain open.
+An optional [byte-at-a-time CRC](../reports/ANISH_BYTE_CRC.md) reduces the
+matched isolated validator/guard area by 5.88%, with the same rejection
+suite passing in RTL and gate-level simulation. This is a block-level
+tradeoff, not a demonstrated full-chip area or timing improvement.
+See the [candidate results](../reports/ANISH_RELOAD_EXPERIMENTS.md), the
 [evidence report](../reports/ANISH_REFERENCE.md) and
 [repair plan](../reports/ANISH_RELOAD_PLAN.md).
 

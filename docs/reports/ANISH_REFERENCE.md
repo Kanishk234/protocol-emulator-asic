@@ -3,6 +3,11 @@
 **Status: compilation and individual-image checks pass; persistent reload
 fails to complete. Do not mark the reference reload gate passed.**
 
+This status refers to the unmodified stock fabric. The later
+[isolation experiment](ANISH_RELOAD_EXPERIMENTS.md) tests a separate source
+copy with a fixed LUT/carry hold input; its passing cases do not change the
+stock regression's result or establish a production solution.
+
 Local run: 2026-09-25, `warp-reference.OBUfXfus`, based on `anish_branch`
 `4dd023b` plus the uncommitted experiment sources. Reproduce with
 `bash scripts/fabric_reference.sh` after activating the venv and supported

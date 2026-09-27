@@ -38,6 +38,15 @@ also clears configuration before loading to avoid transient logic loops.
 WARP needs an explicit initialization/reload protocol, not just output
 masking: masking a pad does not stop an internal combinational loop.
 
+September 26 clarification from the pinned helper's implementation:
+`zero_bitstream` sets all parallel `FrameData` bits to zero and asserts all
+`FrameStrobe` bits together, then deasserts them. Despite its docstring
+mentioning reverse upload, this helper does not serialize a reversed image
+through the top-level loader. Our stock reference loader selects one column
+per address but passes a multi-bit frame mask, allowing all-frame clearing
+within one column. Test that distinct sequence explicitly; do not transfer
+the direct-interface helper's behavior into a claim about public-port reload.
+
 ## WARP consequence
 
 Use FABulous as infrastructure, start with a small live-configured reference,

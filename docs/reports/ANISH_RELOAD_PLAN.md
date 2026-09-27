@@ -23,6 +23,11 @@ does not make intermediate routing safe.
 
 ## Experiments, in order
 
+Progress: [the loading/isolation report](ANISH_RELOAD_EXPERIMENTS.md)
+records failed reverse-order and column-clear attempts, and passing quick
+A/B/A and B/A/B with a minimal LUT/carry hold candidate. That is a useful
+witness-level result, not evidence that every active path is isolated.
+
 1. **Minimal witness:** retain the failing column 1/frame 12 boundary and
    X1Y8/LC probe. The same configuration transition must fail before a fix
    and complete after it. Keep the ordinary public-port A/B/A test separate

@@ -42,6 +42,40 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
   No fix is claimed. Safe load ordering or fabric
   isolation must be tested before closing the reconfiguration gate.
 
+## ANISH-FAB-3: Editing a live experiment runner corrupts later shell parsing
+- **Date:** 2026-09-26 · **Status:** runner snapshot fix implemented.
+- **Symptom:** after timing out the intended simulator subprocesses, two
+  exploratory ordering runs produced shell syntax errors; one repeated a
+  status line. Individual simulation logs remain useful, but the aggregate
+  runner result is not a clean regression result.
+- **Root cause:** Bash was reading a script that changed during execution.
+- **Fix:** `scripts/fabric_order.sh` copies itself into ignored `build/`
+  and executes that immutable snapshot. The evidence includes the runner.
+- **Coverage:** the hold validation run uses a captured runner while the
+  working script receives a later manifest-only edit; its completion is
+  recorded in `ANISH_RELOAD_EXPERIMENTS.md`. No synthesis/RTL bug is implied.
+
+## ANISH-FAB-4: Area reporter rejects valid CMOS5L mappings
+- **Date:** 2026-09-26 · **Status:** fixed in the local cost runner.
+- **Symptom:** synthesis and functional gate-level checks passed, but the
+  initial area reporter rejected valid cells and later hierarchy metadata.
+- **Root cause:** it expected the `sg13g2_` prefix instead of `sg13cmos5l_`,
+  and counted Yosys `$scopeinfo` metadata as an unmapped hardware cell.
+- **Fix/coverage:** allow the correct library prefix, exclude only that
+  metadata type, and still reject any other unmapped type. Successful run
+  `warp-guard-cost.3TVEQJRI` records all three area summaries and both
+  functional gate-level checks. Failed attempts remain separate evidence.
+
+## ANISH-FAB-5: Mapped validator check lacks standard-cell directions
+- **Date:** 2026-09-27 · **Status:** fixed in the new validator runner.
+- **Symptom:** `warp-validator.RbPFjlt3` passes RTL but Yosys `check -assert`
+  flags eight apparently undriven nets after mapping.
+- **Cause:** Liberty was provided to mapping but not loaded as cell module
+  definitions, so the checker could not resolve mapped output directions.
+- **Fix/coverage:** `read_liberty -lib cells.lib` before mapping, keeping
+  strict checks both before and after mapping. `warp-validator.x2xpdWlS`
+  reports zero check problems and passes all 41 functional GL cases.
+
 ## 1: Template gate-level source list omits the flip-flop UDPs
 - **Date:** 2026-09-25
 - **Symptom:** `gl_test` fails at elaboration with `Unknown module type: ihp_dff_r` as soon as the design has flip-flops. (Seen on the TRIPWIRE branch, gds run 35821375890; carried over preemptively since WARP uses the same template.)

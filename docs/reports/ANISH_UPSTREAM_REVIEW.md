@@ -85,3 +85,24 @@ The simulator checks logical reconfiguration through the reference loader.
 It does not prove safe physical partial configuration, output parking,
 metastability behavior, failed-load recovery or gate-level timing. Those
 remain shell and physical-verification gates.
+
+## September 26 follow-up: main at e1305e4
+
+The new [R4 floorplan report](https://github.com/Kanishk234/protocol-emulator-asic/blob/e1305e4/docs/reports/R4_FLOORPLAN.md)
+describes a full-size TRIPWIRE integration spike: three lanes, six lean pin
+units, a host stub, routine stubs and SRAM. Upstream reports 498.8K square
+micrometres of flattened standard cells plus a 45.3K macro. Its estimated
+placed occupancy is about 71%, with target density 73%. These numbers are
+for the spike's configuration, not every proposed TRIPWIRE feature.
+
+The report lists five passing local RTL tests and five passing synthesized
+gate-level tests. Ideal-clock, pre-layout slack at a 20 ns period is +10.63 ns
+typical and +5.50 ns slow; wires and routed clock effects are absent.
+Physical run results are explicitly pending in this revision. We fetched
+and read these sources; we did not reproduce the run or merge the branch.
+
+Useful method for WARP: assemble the real shell, memory and interconnect
+before judging fit; exercise the public host interface on both RTL and a
+mapped netlist; report routing overflow and post-route timing separately
+from synthesis estimates. R4 strengthens the comparison baseline but does
+not yet establish that either architecture routes at the required area.

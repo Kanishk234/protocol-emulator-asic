@@ -4,6 +4,89 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 
 ---
 
+## ANISH-D6: Compare byte CRC within the existing four-clock word budget
+- **Date:** 2026-09-27 · **Status:** measured candidate, not production adoption
+- **Decision:** retain word-wide CRC as default and add `SERIAL_CRC=1` to
+  process one byte per cycle, with explicit CRC backpressure. Completion
+  alone cannot release the guard; final checksum validity is required.
+- **Reason:** D5 already spaces accepted words four clocks apart. Byte CRC
+  can use that interval, reducing XOR logic while adding a 24-bit holding
+  register and control. It is shared management cost for all protocols.
+- **Evidence/cost:** matched validator-plus-guard maps: word 14,078.3832 µm²
+  / 905 cells, byte 13,250.3742 µm² / 828 cells, a 5.88% isolated area saving.
+  Both pass 41 RTL and 41 functional GL cases, including CRC-busy stalls
+  and cancellation. See `ANISH_BYTE_CRC.md` for runs and integration evidence.
+- **Limits/alternatives:** full management/physical cost unmeasured; no
+  maximum-clock claim. Word CRC remains useful for a future faster loader.
+  Bit-serial CRC has not been compared and is not implicitly ruled out.
+
+## ANISH-D5: Couple validated words to the reference loader with pacing
+- **Date:** 2026-09-27 · **Status:** reference integration experiment
+- **Decision:** add a separate validated wrapper with a ready/valid word
+  boundary. Forward the same accepted stream to validator and loader until
+  completion/error. Begin/abort/reset coordinate both transaction lifetimes;
+  commit waits for all pending writes. Preserve trusted/stock baselines.
+- **Reason:** the pinned loader stretches each frame write for two cycles.
+  Allowing a new address before that pulse drains could select the wrong
+  frame. Conservatively allow one word every four clocks; three idle edges
+  follow each forwarded word. Remove the TB's 100-cycle final settle delay.
+- **Cost/alternatives:** two pacing flops and associated gates plus the
+  existing validator/guard/parking logic; integrated CMOS5L cost unmeasured.
+  Selective frame-boundary pacing could improve throughput but is untested.
+- **Evidence/limits:** `ANISH_VALIDATED_FABRIC.md`. Two compiled demo designs,
+  synchronous management interface, no host CDC or physical timing signoff.
+  This is not a production fabric/generator or architecture-contract change.
+
+## ANISH-D4: Strict reference-image validation at a synchronous word boundary
+- **Date:** 2026-09-27 · **Status:** isolated experiment, not a production ABI
+- **Decision:** derive validity from pinned architecture/version/length,
+  canonical frame completeness and CRC. Reject padding and extra words;
+  allow release only on an idle commit after successful validation.
+- **Reason:** the D3 guard's trusted host validity signal cannot detect a
+  truncated or corrupted upload. Canonical order avoids frame-coverage RAM
+  at the cost of rejecting selective or reordered uploads.
+- **Cost/alternatives:** word-parallel CRC plus validator/guard maps to 904
+  CMOS5L cells, 14,123.7054 µm² before physical overhead. Compare byte/bit-
+  serial CRC at the host's required throughput before production adoption.
+- **Evidence/limits:** `ANISH_IMAGE_VALIDATOR.md`, run `warp-validator.x2xpdWlS`:
+  41 RTL and 41 functional GL cases pass. Full-fabric connection, host CDC,
+  physical timing and production format remain unvalidated. All protocols
+  would share this management cost; no protocol resource is specialized.
+
+## ANISH-D3: Reference reload guard and isolated mapping measurement
+- **Date:** 2026-09-26 · **Status:** experiment, not a production shell contract
+- **Decision:** separate internal hold release from pad release. Keep pads
+  parked while the configured user reset propagates, reject invalid/busy
+  commit requests, and disable word writes outside the loading state.
+- **Reason:** the D2 hold-only test reset user state after release; that did
+  not demonstrate a clean first visible output. Holding every LUT output
+  at zero also prevents user-reset logic from propagating through the fabric.
+- **Limits:** the demo wrapper reserves pins 0/1 for reset/enable and trusts
+  `image_valid`. A real transaction validator and production reset ABI are
+  required. Isolation remains limited to the D2 LUT/carry paths.
+- **Evidence/cost:** `ANISH_GUARDED_RELOAD.md`: full guarded A/B/A and recovery
+  pass; functional guard/primitive gate-level checks pass; controller
+  665.8848 µm² and isolation increment 9.072 µm² per primitive as isolated
+  Liberty area sums, with all physical and integration exclusions documented.
+
+## ANISH-D2: Reference-only reload isolation experiment
+- **Date:** 2026-09-26 · **Status:** experiment; not an accepted chip architecture
+- **Decision:** test a fixed `ReloadHold` input that clamps LUT outputs and
+  carry outputs to zero during upload. The proposed production shell and
+  generator are unchanged. A hash-checked transformer in
+  `patches/reference_reload_hold.py` creates a separate generated-source copy,
+  a patch and before/after hashes; it never edits the upstream installation.
+- **Reason:** ANISH-FAB-2 demonstrates a LUT feedback loop during live reload.
+  This experiment asks whether cutting LUT/carry paths removes the observed
+  failure when using the same bitstreams and public loader.
+- **Cost and limits:** two output clamps per reference LUT cell before
+  optimization, plus a new distributed control net. No CMOS5L area/timing
+  measurement yet. Routing-only loops, DSP/RAM paths, pin parking, user-state
+  reset before release and control skew are not solved by this patch.
+- **Acceptance:** even a two-image pass is a diagnostic result, not complete
+  reload signoff. Preserve the unmodified failing control and require the
+  broader recovery and physical checks in `ANISH_RELOAD_PLAN.md`.
+
 ## D-001: Build on FABulous
 - **Date:** 2026-09-25 · **Status:** Proposed (confirm in phase 0)
 - **Decision:** Use FABulous for fabric generation, synthesis mapping, place and route, and bitstream generation, pinned to one release.

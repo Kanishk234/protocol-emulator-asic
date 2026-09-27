@@ -185,6 +185,16 @@ Follow the [repair experiments](../reports/ANISH_RELOAD_PLAN.md) before
 treating runtime reload as solved; budget isolation and recovery overhead
 alongside shell and routing costs.
 
+A [reference-only LUT/carry hold candidate](../reports/ANISH_RELOAD_EXPERIMENTS.md)
+now passes both reload directions, wraparound and recovery at two interrupted
+frame boundaries. The subsequent [guarded wrapper](../reports/ANISH_GUARDED_RELOAD.md)
+adds parking/reset-before-pad-release and isolated CMOS5L mapping costs.
+The [validated integration](../reports/ANISH_VALIDATED_FABRIC.md) now derives
+validity from length/frame/checksum checks and passes both reload directions
+and selected bad-load recovery cases in the full reference RTL. Compare
+serial CRC area, expand isolation/handshake coverage and measure physical
+distribution costs before adopting this as the production flow.
+
 Finish the phase-0 reference flow and configuration census, add unit CI,
 record exact successes/failures, and send the draft organizer questions
 when a team member is ready. Then finish the existing phase-0 exit checks.

@@ -4,6 +4,259 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-27 (user-authorized commit and push preparation)
+- User explicitly requested pushing this branch. Fetched `origin/anish_branch`:
+  local history is ahead with no divergent remote commits. No force push or
+  main-branch update is needed.
+- Committed experimental RTL, tests, patch and runners as `485b725`; package
+  the evidence/decisions/worklog in a separate documentation commit. Earlier
+  local commits `36acbb7` and `58d027f` are also included in the planned push.
+- Author and committer verified as `anishvivek16` with the account's noreply
+  address. Twenty Python regressions, all six new runner syntax checks and
+  staged whitespace checks pass. Prior HDL/GL evidence is retained; large
+  builds were not repeated for this administrative step.
+- Only source and reports are staged. Ignored raw builds, logs and generated
+  images remain local. No phase gate changes. Verify the remote head after
+  the ordinary `anish_branch` push; continue technical work at the next
+  usage-eligible run from the management-wrapper checkpoint below.
+
+## 2026-09-27 05:28 UTC (`anish_branch`: mapped management wrapper)
+**Done:**
+- Usage 80% five-hour / 28% weekly at start. Completed one bounded cached
+  cost/validation run; no competing jobs found. Afterward usage is 86%/29%,
+  so defer further substantial work until a later eligible run. No reset
+  credits consumed.
+- `warp-management.xWb9WYPm`: mapped the actual reference wrapper with
+  eFPGA_top preserved as exactly one empty black box, preventing constant
+  fixture outputs from eliminating pad muxes. Verified only CMOS5L cells
+  outside that boundary; strict synthesis checks report zero problems.
+- Word CRC: 981 cells / 14,773.3740 µm². Byte CRC: 886 cells /
+  13,869.1224 µm². Saving 904.2516 µm² (6.12%). Includes pacing, parking
+  and demo reset muxes; excludes the fabric AND its configuration loader,
+  host/CDC, physical buffers and routing. See `ANISH_MANAGEMENT_COST.md`.
+- Both mapped wrappers pass the 12,129-step handshake regression with the
+  actual RTL loader fixture: 15 cancellation cases, 3,006 words, 200 exact
+  frame payload checks. This is mixed gate/RTL simulation without SDF,
+  not full-fabric GL or physical timing validation. Evidence retained.
+
+**Boxes ticked:** none. All jobs finished. Existing work/branch/identity
+  preserved; edits remain uncommitted. No push or history rewrite.
+
+**Next eligible run:** include the actual configuration loader in a bounded
+  cost/test target. Then expand routing/DSP/RAM isolation and physical
+  control-distribution evidence. A future host/CDC block remains unspecified;
+  do not claim complete-chip or complete-shell area from current results.
+
+## 2026-09-27 (user continuation: focused loader handshake regression)
+**Done:**
+- Usage was 71% five-hour / 27% weekly at start, 75%/28% after the first
+  focused check. Kept this milestone small and reused cached loader/images.
+  No active jobs were found and no reset credits were consumed.
+- Added a small fixture around the actual pinned configuration loader and
+  row registers; programmable fabric is replaced by constant user outputs
+  solely to test parking. No production RTL was changed.
+- `warp-handshake.rw1QbkFj`: both word and byte CRC modes pass 12,129 steps,
+  15 busy cancellation/priority cases, a continuously asserted valid stream
+  of 3,006 words and exact address/row-payload checks for 200 frame writes.
+  Includes begin during CRC work, concurrent commit/write/reset/abort,
+  stale-validity clearing, minimum word spacing and no write/frame overlap.
+- The original byte-only run `warp-handshake.X4N5oQLx` also passed. Test
+  sources, actual loader files, hashes, tool versions and logs are retained.
+  Runner syntax and whitespace checks pass. See `ANISH_LOADER_HANDSHAKE.md`.
+
+**Boxes ticked:** none. These are sampled loader/control RTL diagnostics,
+  not full-fabric execution, exhaustive proofs or physical timing. All jobs
+  finished; previous work and Git identity are preserved. Changes remain
+  uncommitted; nothing pushed or rewritten.
+
+**Next:** measure the complete management/pacing/parking wrapper with
+  variable fabric-facing ports, so fixture constants cannot undercount its
+  hardware. Keep physical timing and broader isolation as separate gates;
+  check remaining usage before the next substantial milestone.
+
+## 2026-09-27 04:27 UTC (`anish_branch`: byte CRC area comparison)
+**Done:**
+- Usage gate passed: five-hour 45%, weekly 23% at start; 66%/26% after
+  validation. No active build jobs were found. Reused images/PDK/simulators;
+  compiled one byte-mode full-fabric executable for nine cases. No credits
+  or resets consumed.
+- Added optional `SERIAL_CRC=1`, explicit CRC readiness and pending-byte
+  cancellation. Word CRC remains default. Guard release requires the last
+  checksum byte to be checked, not just receipt of the last word. The
+  integration wrapper combines CRC readiness with its existing pacing.
+- Matched isolated RTL/GL runs: byte `warp-validator.Yc1dlz11` passes 41
+  cases / 296,422 steps; word `warp-validator.YLYLyxNZ` passes 41 cases /
+  116,831 steps. Updated tests hold valid/data through CRC stalls, reject
+  forwarding while busy, try early commit and cancel pending CRC work.
+- CMOS5L validator-plus-guard area: word 14,078.3832 µm² / 905 cells;
+  byte 13,250.3742 µm² / 828 cells. Saving 828.009 µm² (5.88%) against
+  matched current source, not the older 14,123.7054 µm² snapshot. No full-
+  wrapper/physical-area or maximum-clock claim. Recorded ANISH-D6.
+- Byte full-fabric `warp-validated.VxA9xvJv` passes all nine expected outcomes:
+  A/B/A 67,987 checks; B/A/B 2,479; six interruption/rejection/reset recovery
+  cases 1,322 each; semantic wrong-image control fails as expected. Logged
+  load times, word/frame/parked counts match the prior word-wide suite in
+  every case; comparison JSON retained. CRC fits the four-clock word budget.
+- Twenty Python tests, both runner syntax checks, legacy conditional TB
+  syntax and whitespace checks pass. All jobs finished and evidence is
+  retained. See `ANISH_BYTE_CRC.md` for measurements and exclusions.
+
+**Boxes ticked:** none. Byte CRC is a measured candidate, not a production
+  default or chip-level area win. Full-fabric GL, physical timing and broader
+  isolation remain open. Pending changes remain uncommitted; branch/identity
+  preserved as `anish_branch` / `anishvivek16`. No push/history rewrite.
+
+**Next:** build a small loader-focused regression for held-valid requests,
+  begin during CRC work and coincident commit/reset/abort, then price the
+  complete management/pacing/parking wrapper. Use the usage gate before
+  substantial work. Expand routing/DSP/RAM isolation and physical validation
+  before treating runtime reload as a production capability.
+
+## 2026-09-27 03:27 UTC (`anish_branch`: validated full-fabric integration)
+**Done:**
+- Usage gate passed: five-hour 22%, weekly 19% at start; 42%/22% after
+  validation. No active simulation/build jobs were found. Reused cached
+  bitstreams and pinned fabric, compiling once for nine scenarios. No
+  reset credits consumed.
+- Added a separate validated wrapper with synchronous ready/valid words,
+  coordinated loader/validator reset, and conservative four-clock word
+  spacing. Commit waits for pending frame writes; removed the validated
+  TB's 100-cycle post-load wait. Documented pinned ConfigFSM timing in D5.
+- `warp-validated.soYb2Cvu`: all nine full-fabric RTL scenarios meet expected
+  exits/markers. A/B/A passes 67,987 independent checks and 45,186 parked
+  samples; B/A/B at maximum accepted word rate passes 2,479 checks. Every
+  accepted image has 3,006 accepted/forwarded words and 200 frame pulses.
+- Recovery after interruption at frames 33 and 199, payload corruption,
+  duplicate frame with recomputed CRC, extra padding, and loader reset each
+  passes 1,322 functional checks. Bad images remain held/parked. Correctly
+  checksummed wrong-function image still fails the semantic oracle at first
+  release (expected exit 1). Separate read-only word/frame diagnostics do
+  not force/deposit internal state.
+- Twenty Python tests, runner shell syntax, legacy TB conditional syntax
+  and whitespace checks pass. Preserved all previous experimental modes.
+  Results and exclusions: `ANISH_VALIDATED_FABRIC.md`.
+
+**Boxes ticked:** none. Only two compiled reference designs, selected faults
+  and RTL integration are covered. New wrapper has no mapped area/timing
+  result; prior isolated GL evidence is not full-fabric GL signoff. Working
+  changes remain uncommitted; branch/identity preserved as `anish_branch` /
+  `anishvivek16`. No push or history rewrite.
+
+**Next:** compare byte/bit-serial CRC at the required host throughput, price
+  the complete management wrapper, and add a small loader-focused regression
+  for held-valid stalls, commit/reset/abort edge cases. Broader routing/DSP/RAM
+  isolation, physical distribution and remaining phase-0 gates stay open.
+
+## 2026-09-27 02:26 UTC (`anish_branch`: isolated image validation)
+**Done:**
+- Usage gate passed (five-hour 0%, weekly 16% at start; 17%/18% at the
+  post-build check). Reused cached images, PDK and simulator; no active
+  synthesis/simulation jobs were found. No reset credits consumed.
+- Added experimental Verilog-2005 validator and guard composition. It
+  checks architecture/version/12,024-byte length, canonical 200-frame
+  structure and CRC before accepting an idle commit. Extra/padded words
+  invalidate a completed transaction; reset/abort/begin suppress writes.
+- `warp-validator.x2xpdWlS`: 41 transaction cases / 116,831 steps pass in
+  both RTL and mapped CMOS5L functional simulation. Cases include real
+  images, randomized payloads, independent zlib checksums, truncation,
+  malformed/duplicate/swapped frames, corruption, metadata errors, commit
+  races and abort/reset recovery. Verilog-2005 parsing and strict Yosys
+  pre/post-mapping checks pass. No SDF or physical timing claim.
+- Validator plus guard maps to 904 cells / 14,123.7054 µm² of Liberty area;
+  host, fabric, output muxes and physical overhead are excluded. Documented
+  the throughput/area tradeoff and a future serial-CRC comparison (D4).
+- Fixed missing cell-direction definitions in the new mapping runner
+  (ANISH-FAB-5); first failed attempt retained separately. Twenty existing
+  Python checks and runner syntax pass. See `ANISH_IMAGE_VALIDATOR.md`.
+
+**Boxes ticked:** none. This is isolated reference de-risking; the existing
+  full-fabric wrapper still trusts `ImageValid`. No production ABI or phase
+  gate changed. Pending work is preserved and remains uncommitted; Git
+  identity remains `anishvivek16`. No push/history rewrite.
+
+**Next:** connect this synchronous boundary to a validated full-fabric mode;
+  prove identical word consumption/reset handling and final-write settling.
+  Re-run both reload directions, interrupted/corrupt image recovery and
+  semantic wrong-image detection. Then compare serial CRC cost at the host
+  throughput requirement before allocating production shell area.
+
+## 2026-09-26 22:23 UTC (continuation usage checkpoint)
+Codex usage is 90% of the five-hour window and 14% of the weekly window.
+Deferred substantial work per the automation's 85% five-hour threshold.
+Reviewed the latest checkpoint; preserved pending changes, started no builds,
+and consumed no reset credits. No phase boxes changed. Next eligible run:
+implement image length/frame/checksum validation and malformed-load tests.
+
+23:23 UTC recheck: five-hour usage 97%, weekly usage 15%; still above the
+configured threshold. Deferred builds and implementation again, preserving
+the same next step and all pending work. No reset credits consumed.
+
+## 2026-09-26 (`anish_branch`: guarded release and mapped cost)
+**Done:**
+- Added an experimental synchronous reload guard and a synthesizable
+  reference wrapper that parks data/tristate outputs, permits writes only
+  during loading, and resets the two demo designs before pad release.
+  Invalid/busy commits cannot release the fabric; abort/reset take priority.
+- `warp-order.v5IBJS6u`: guarded full A/B/A passes 67,987 cycles and 61,848
+  parked output samples; interrupted loads at 33/199 frames recover with
+  1,322 checks each; wrong image fails immediately on guarded release.
+  Controller unit check passes 120 steps; LUT/carry unit check passes 256
+  vectors plus unknown-input isolation. `image_valid` is still a trusted
+  input, not a checksum implementation.
+- `warp-guard-cost.3TVEQJRI`: mapped guard and isolated LUT pass functional
+  tests using CMOS5L cell/UDP models and TT Icarus 13. Liberty area sums:
+  guard 665.8848 µm²; base primitive 344.736 µm²; held primitive 353.808 µm²
+  (increment 9.072 µm²). These exclude routing, control buffering, config
+  storage, parking muxes and host/validator cost. No timing signoff claim.
+- Fixed the area reporter's namespace/metadata handling; retained earlier
+  attempts separately. Twenty Python tests, five runner syntax checks and
+  whitespace checks pass. See `ANISH_GUARDED_RELOAD.md` and ANISH-D3.
+- At the user's request to report milestones and continue afterward,
+  enabled hourly continuation in this chat (`continue-asic-design-work`).
+  It reuses cached work, reports meaningful changes, and defers heavy work
+  at 85% five-hour or 90% weekly Codex usage; it never spends reset credits.
+
+**Boxes ticked:** none. Stock fabric reload still fails; the guarded
+prototype is not a complete production shell. New edits remain uncommitted.
+
+**Next:** replace trusted `image_valid` with a real transaction validator
+  (length/frame completeness/checksum/version); test malformed/truncated
+  input and restart. Then expand isolation coverage and physical timing.
+
+## 2026-09-26 (`anish_branch`: successful reference isolation candidate)
+**Done:**
+- Reused cached bitstreams to test reverse frame order and all-frame
+  column clearing. Both directions timed out in each experiment. The latter
+  also stalls when loading the LFSR from cleared startup state. Clarified
+  that Tiny FABulous's pinned clear helper instead drives the parallel
+  fabric interface, asserting all frame strobes simultaneously.
+- Added ANISH-D2 and a hash-checked transformer in `patches/` that clamps
+  LUT and carry outputs under a fixed hold input in a separate RTL copy.
+  Installed upstream sources, chip RTL and user bitstreams are unchanged.
+- Candidate quick run `warp-order.Q6ZUMUHn`: A/B/A and B/A/B each pass
+  2,479 independent checks. Extended run `warp-order.eg3GdZkQ`: full A/B/A
+  passes 67,987 checks; interrupted B at 33 and 199 frames recovers to A
+  with 1,322 checks each; wrong-image control fails as expected (exit 1).
+  Both runs pass the 256-vector primitive test plus unknown-input hold.
+- Added order/payload preservation tests: 20 Python tests now pass across
+  experiment tooling and the existing configuration audit. Four shell
+  runners pass syntax checks; whitespace checks pass.
+- Fixed ANISH-FAB-3: a live shell script was edited during exploratory runs,
+  causing parsing errors after the recorded simulator timeouts. Subsequent
+  runs execute immutable copies and retain the runner with their evidence.
+- Fetched main at `e1305e4` and reviewed its R4 integration report: physical
+  routing results are still pending at that revision. Updated the upstream
+  comparison without merging or repeating another branch's measurements.
+
+**Boxes ticked:** none. The unmodified stock reload remains a failing
+control. A patched reference RTL pass is not a production isolation proof,
+CMOS5L signoff, or a complete phase-0 exit. New changes are uncommitted.
+
+**Next:** define shell-controlled output parking and reset-before-release;
+extend isolation to every potentially cyclic path and test control skew;
+measure CMOS5L cost before adopting the patch in the generator. Keep the
+specialized eFPGA candidate conditional on total-area and routing evidence.
+
 ## 2026-09-26 (`anish_branch`: user-authorized commits)
 The user explicitly authorized committing the pending work. Reviewed the
 experiment sources, runners and reports, retaining the documented failing

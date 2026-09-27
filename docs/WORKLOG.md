@@ -21,6 +21,18 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: tools/host)
+Done:
+- **`tools/host`** (phase 2 task 2.3 item 7): §9 frames (`frame_write`, `frame_read`), the D-046 map from `tripwire_spec.py`, `load_sequence(image)` (every §14 H1 write: halt, all 6 unit blocks, all owners, all 13 ports, each used lane's 12 slots + K + r0–r3/STATE, SRAM, RUN), a `Host(xfer)` client (run/halt/step, lane debug block, unit flags, HOST_IN push with the busy check, HOST_OUT pop) and a `RegisterModel` to check sequences offline.
+- `tripc` now emits `pin_regs` for every unit (defaults for unused ones), so a load writes every block (task 2.3 item 8 with the ports and owners in `load_sequence`).
+- Tests (`tools/host/tests`): frames, encodings, the load sequence of all 20 programs checked register by register, the client against a fake chip. `pytest -m "not slow"`: 292 passed.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Run 4 result, then the real top: the pin-level tests in `test/` will drive it through `tools/host` frames.
+
 ## 2026-09-27: Krithik + Claude (phase 2: host map in the spec, host RTL)
 RTL session; `tools/tripsim` not read. R4 run 4 still running.
 

@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62) is set up; §5.**
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6.
 
 ---
 
@@ -92,3 +92,26 @@ One change from run 1 (D-034 rule): **4 pin units instead of 6**, and the densit
 `check_local.sh`: lint clean, 5/5 on the RTL and 5/5 on the Yosys gate-level netlist (TT Icarus 13).
 
 If it places, this run gives the first routing numbers for a full-size floorplan: global-routing overflow per layer and detailed-routing violations per iteration. If GPL-0302 fires (density below the real utilisation), use the logged GPL-0019 figure + 2.
+
+## 6. Results: run 2 (2026-09-26/27) — placed, stuck in global routing
+
+`gds` on `spike/r4-floorplan` (ed3b949), run [36279959944](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36279959944). The `gds` job was stopped by GitHub's 6 h limit (23:36 → 05:36 UTC). Because the job was cancelled, `GDS_logs` was not uploaded; everything below is from the job log (`gh api …/actions/jobs/108509785917/logs`, not committed).
+
+| Step | Time (UTC) | Result |
+|---|---|---|
+| Floorplan | 23:40 | effective utilisation 54.1 % (IFP-0104) |
+| Global placement | 23:40 | **58.9 %** (GPL-0019; predicted ~60 %) |
+| Design repair | 23:42 | 106 slew, 1,293 fanout, 6 capacitance violations repaired |
+| CTS | 23:42 → 23:43 | ~1 min, as in run 1 |
+| Post-CTS resizer | 23:43 → 23:45 | no setup violations; **1,869 hold endpoints, 3,067 hold buffers**; detailed placement **passed** (run 1 failed here) |
+| Global routing | 23:45 → cancelled 05:36 | **never finished** (5 h 51 min) |
+
+**What the global router did:** the Metal2–Metal4 resources after the 30 % derate were 154.7K / 184.9K / 152.8K. The router ran its 50 overflow-removal iterations (`GRT_OVERFLOW_ITERS`), still had overflow, disabled the 2×-spacing non-default rule (NDR) on one clock net (GRT-0273, first `clknet_0_clk_regs`), and ran another 50 iterations. It repeated this every ~5.5 min for the rest of the job, one clock net at a time: `clk`, the `delaynet_*_clk` hold-delay nets, and the gated clocks of lane slot words and pin-unit configuration words. The design has **1,307 clock nets** (GRT-0019), and the NDR goes on the non-leaf ones (`CTS_APPLY_NDR` = `half`, LibreLane's default), so this loop could not end inside 6 h. The overflow figures are printed only when global routing ends, so **they were never printed**. GRT-0102 also hit its 1,000-message limit at 01:31.
+
+**What it means:**
+1. **4 pin units at 58.9 % placement fit through placement, CTS and hold repair.** Run 1's failure point (~77 % after hold repair) is gone. Hold repair was again the largest growth: 3,067 buffers (run 1: 3,921).
+2. **At 58.9 % the global router had overflow on the first pass and was still reporting it after ~65 rounds.** That is the first direct routing evidence for the full chip: congested. How much, and on which layers, is still unknown.
+3. **The timeout came from the flow, not only the design.** Clock NDRs let the router keep trying to relax one net at a time. With a job limit, every future run with global-routing overflow will end the same way, with no numbers.
+4. Still the only known routable point is R2's ~42 %.
+
+**Run 3 proposal (one change, flow setting only):** same design, `CTS_APPLY_NDR` = `none` in the branch `config.json`. The router then runs its 50 iterations once and ends (`GRT_ALLOW_CONGESTION` is already on), so the run reports the overflow per layer, and detailed routing runs under `DRT_OPT_ITERS` 3. Removing the clock NDR also frees a little clock-routing space; the run is still valid for measuring the data-signal congestion. Needs Krithik's approval (D-043).

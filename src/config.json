@@ -45,24 +45,28 @@
       },
       "gds": ["dir::../macro/warp_tiny/warp_tiny.gds"],
       "lef": ["dir::../macro/warp_tiny/warp_tiny.lef"],
-      "nl": [
-        "dir::../macro/warp_tiny/warp_tiny.nl.v",
-        "dir::../macro/warp_tiny/tiles/LUT4x8_ha.nl.v",
-        "dir::../macro/warp_tiny/tiles/N_term.nl.v",
-        "dir::../macro/warp_tiny/tiles/S_IO2.nl.v",
-        "dir::../macro/warp_tiny/tiles/E_IO4.nl.v",
-        "dir::../macro/warp_tiny/tiles/W_IO4.nl.v",
-        "dir::../macro/warp_tiny/tiles/NE_term.nl.v",
-        "dir::../macro/warp_tiny/tiles/NW_term.nl.v",
-        "dir::../macro/warp_tiny/tiles/SE_term.nl.v",
-        "dir::../macro/warp_tiny/tiles/SW_term.nl.v"
-      ]
+      "//": "Port-only black box (not in info.yaml source_files), as the R3 SRAM spike did: synthesis",
+      "//": "and STA see only the macro's pins; its layout is checked by KLayout DRC, its logic by",
+      "//": "its own flow and simulation (D-019 revision 2).",
+      "nl": ["dir::warp_tiny.v"]
     }
   },
   "PDN_MACRO_CONNECTIONS": ["u_fabric VPWR VGND VPWR VGND"],
 
   "//": "WARP (D-019): the macro power grid script from the TRIPWIRE R3 spike (src/pdn_cfg.tcl header).",
   "PDN_CFG": "dir::pdn_cfg.tcl",
+
+  "//": "WARP (D-019 rev 2), settings the R3 SRAM spike needed for a macro on CMOS5L:",
+  "//": "cap detailed-routing iterations so a run that cannot converge fails in minutes, not hours",
+  "DRT_OPT_ITERS": 16,
+  "//": "Magic reads standard cells from the PDK, not from the macro GDS",
+  "MAGIC_MACRO_STD_CELL_SOURCE": "PDK",
+  "//": "Magic's CMOS5L deck reports false errors inside macros; the precheck's KLayout DRC is sign-off",
+  "ERROR_ON_MAGIC_DRC": false,
+  "//": "chip Metal4 stripes cross the macro's Metal4 obstruction over its power columns",
+  "ERROR_ON_ILLEGAL_OVERLAPS": false,
+  "//": "LVS treats the fabric macro as a black box",
+  "MAGIC_EXT_ABSTRACT_CELLS": ["warp_tiny"],
 
   "//": "Configuration docs: https://librelane.readthedocs.io/en/latest/reference/configuration.html",
 

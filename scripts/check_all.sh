@@ -39,16 +39,17 @@ fi
 echo "ok: $yaml_src"
 
 step "lint: verilator --lint-only -Wall"
-verilator --lint-only -Wall -Isrc --top-module "$TOP" src/lint.vlt "${SOURCES[@]}"
+# src/warp_tiny.v: the fabric macro's black box, not in source_files (D-019)
+verilator --lint-only -Wall -Isrc --top-module "$TOP" src/lint.vlt "${SOURCES[@]}" src/warp_tiny.v
 echo "ok"
 
 step "lint: iverilog -g2005"
-iverilog -g2005 -Isrc -s "$TOP" -o /dev/null "${SOURCES[@]}"
+iverilog -g2005 -Isrc -s "$TOP" -o /dev/null "${SOURCES[@]}" src/warp_tiny.v
 echo "ok"
 
 step "synth: yosys sanity (no latches outside configuration storage)"
 # Latches are allowed only in generated fabric config storage and wp_cfg_* modules (CLAUDE.md).
-yosys -q -p "read_verilog -Isrc ${SOURCES[*]}; synth -top $TOP; check -assert"
+yosys -q -p "read_verilog -Isrc ${SOURCES[*]} src/warp_tiny.v; synth -top $TOP; check -assert"
 echo "ok"
 
 if compgen -G "tools/**/test_*.py" >/dev/null || compgen -G "tools/*/tests/test_*.py" >/dev/null; then

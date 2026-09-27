@@ -31,5 +31,6 @@ jobs:
         run: |
           TOP=$(python -c 'import yaml; print(yaml.safe_load(open("info.yaml"))["project"]["top_module"])')
           SOURCES=$(python -c 'import yaml; print(" ".join("src/" + f for f in yaml.safe_load(open("info.yaml"))["project"]["source_files"]))')
-          verilator --lint-only -Wall -Isrc --top-module "$TOP" src/lint.vlt $SOURCES
-          iverilog -g2005 -Isrc -s "$TOP" -o /dev/null $SOURCES
+          # src/warp_tiny.v: the fabric macro's port-only black box, not in source_files (D-019)
+          verilator --lint-only -Wall -Isrc --top-module "$TOP" src/lint.vlt $SOURCES src/warp_tiny.v
+          iverilog -g2005 -Isrc -s "$TOP" -o /dev/null $SOURCES src/warp_tiny.v

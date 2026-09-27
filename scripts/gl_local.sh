@@ -74,6 +74,7 @@ EOF
 )
   TOP=$(python -c 'import yaml; print(yaml.safe_load(open("info.yaml"))["project"]["top_module"])')
   LIB="$REF/sg13cmos5l_stdcell/lib/$LIB_CORNER"
+  [ -f src/warp_tiny.v ] && SOURCES="$SOURCES src/warp_tiny.v"   # fabric macro black box (D-019)
   yosys -q -p "read_verilog -Isrc $SOURCES; synth -top $TOP -flatten; dfflibmap -liberty $LIB; abc -liberty $LIB; opt_clean; write_verilog -noattr -noexpr $NETLIST"
 fi
 

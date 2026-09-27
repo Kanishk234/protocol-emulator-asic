@@ -19,7 +19,6 @@ project:
   source_files:
     - "tt_um_warp.v"
     - "wp_fabric_cfg.v"
-    - "warp_tiny.v"
     - "fabric_gen/bitbang.v"
     - "fabric_gen/ConfigFSM.v"
     - "fabric_gen/Frame_Data_Reg.v"

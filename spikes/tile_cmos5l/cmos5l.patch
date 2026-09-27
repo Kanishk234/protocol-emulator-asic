@@ -1,10 +1,18 @@
 diff --git a/tiles.py b/tiles.py
 old mode 100755
 new mode 100644
-index c86f9fe..885e989
+index c86f9fe..73a5a86
 --- a/tiles.py
 +++ b/tiles.py
-@@ -205,12 +205,38 @@ tile_obstruction_layers = {
+@@ -135,6 +135,7 @@ tile_sizes = {
+             # Standard cell row height: 3.78 (9 Metal3 tracks)
+ 
+             "LUT4x8_ha" : (219.84, 185.22),
++            "PRIM2T2S"  : (219.84, 185.22),   # WARP G1 primitive tile (D-026): a LUT-tile slot
+ 
+             "NE*"       : ( 68.64,  56.70),
+             "NW*"       : ( 68.64,  56.70),
+@@ -205,12 +206,38 @@ tile_obstruction_layers = {
          "gf180mcu*": {
              "*"         : ["Metal1", "Metal2", "Metal3", "Metal4", "Metal5"],
          },
@@ -43,7 +51,7 @@ index c86f9fe..885e989
  def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=None, gui=None):
      target_flow = Flow.factory.get("FABulousTile")
  
-@@ -315,6 +341,13 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+@@ -315,6 +342,13 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
      print(f"Tile target density: {target_density}")
      print(f"Tile obstructions: {obs}")
      
@@ -57,7 +65,7 @@ index c86f9fe..885e989
      config["FP_SIZING"] = "absolute"
      config["DIE_AREA"] = [0, 0, tile_size[0], tile_size[1]]
      
-@@ -365,6 +398,24 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+@@ -365,6 +399,24 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
          pdk_root = version.get_dir(ciel_home)
      
      
@@ -82,7 +90,7 @@ index c86f9fe..885e989
      flow = target_flow(
          config,
          design_dir=design_dir,
-@@ -374,6 +425,25 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
+@@ -374,6 +426,25 @@ def main(tile, pdk_root=None, pdk=None, tag=None, tile_library=None, last_run=No
      
      state_out = flow.start(tag=tag, last_run=last_run)
  

@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'formal/**'
+      - 'arch/prims/**'
       - 'scripts/formal.sh'
       - '.github/workflows/formal.yaml'
   workflow_dispatch:
@@ -19,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job: [f1_isolation, f2_loader]
+        job: [f1_isolation, f2_loader, f4_prims]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6

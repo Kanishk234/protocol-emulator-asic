@@ -30,5 +30,16 @@ if [ ! -d "$W/fabulous-tiles/.git" ]; then
   git -C "$W/fabulous-tiles" apply "$HERE/cmos5l.patch"
 fi
 
+# WARP's own tiles and hard primitives (arch/tiles, arch/prims, D-026) are copied into the
+# library build next to its tiles, the way the library's own tiles sit: tiles/tiny/<TILE>/ and
+# primitives/WARP/fabulous/ (the fabric flow's timing model collects primitives/*/fabulous/*.v).
+# Build copies only; the sources stay in arch/.
+if [ -d "$ROOT/arch/tiles/$TILE" ]; then
+  rm -rf "$W/fabulous-tiles/tiles/tiny/$TILE" "$W/fabulous-tiles/primitives/WARP"
+  cp -r "$ROOT/arch/tiles/$TILE" "$W/fabulous-tiles/tiles/tiny/$TILE"
+  mkdir -p "$W/fabulous-tiles/primitives/WARP/fabulous"
+  cp "$ROOT"/arch/prims/*.v "$W/fabulous-tiles/primitives/WARP/fabulous/"
+fi
+
 cd "$W/fabulous-tiles"
 nix develop --accept-flake-config --command bash -c "python3 tiles.py $TILE" 2>&1 | tee "$W/$TILE.log" | grep -E -i 'error|warn|Tile size|density|Done|Flow complete|failed' | tail -40

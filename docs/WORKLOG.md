@@ -21,6 +21,23 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: R4 run 3 result)
+Done:
+- R4 run 3 (36327551624, 462bf06, `CTS_APPLY_NDR` = `none`) ran the full flow in 5 h 25 min; `GDS_logs` read locally (`build/ci/r4/run3/`, not committed).
+- **Global routing ended (4 min): overflow 4,883, 4,651 on Metal3 (92.8 % usage). Detailed routing: 6,004 violations after the first pass, 12,872 at the end. The full chip does not route at 58.9 % / 65.9 %.** ~74 % of the violations are in the lanes' area (approximate, by net names).
+- `R4_FLOORPLAN.md` §7, AREA.md row, D-043 result and run 4 proposal.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- GitHub's live log stops at ~38.6K lines (in CTS), so a running R4 job cannot be followed; wait for the end.
+- LibreLane failed parsing netgen's JSON after the LVS mismatch, so precheck did not run (tool issue, only when LVS already fails).
+- Proposed run 4: 2 lanes instead of 3 (D-043). The routable ceiling bears on D-041.
+
+Next:
+- Team: decide run 4 (2 lanes, or an alternative in `R4_FLOORPLAN.md` §7) and revisit D-041 with these numbers.
+
 ## 2026-09-27: Krithik + Claude (phase 2: R4 run 2 result)
 Done:
 - R4 run 2 (36279959944, ed3b949) read from the job log with `gh api` (cancelled at the 6 h limit, so no `GDS_logs`).

@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6.
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7.
 
 ---
 
@@ -115,3 +115,57 @@ If it places, this run gives the first routing numbers for a full-size floorplan
 4. Still the only known routable point is R2's ~42 %.
 
 **Run 3 proposal (one change, flow setting only):** same design, `CTS_APPLY_NDR` = `none` in the branch `config.json`. The router then runs its 50 iterations once and ends (`GRT_ALLOW_CONGESTION` is already on), so the run reports the overflow per layer, and detailed routing runs under `DRT_OPT_ITERS` 3. Removing the clock NDR also frees a little clock-routing space; the run is still valid for measuring the data-signal congestion. Approved by Krithik 2026-09-27 (D-043).
+
+## 7. Results: run 3 (2026-09-27) — routed through, not clean
+
+`gds` on `spike/r4-floorplan` (462bf06: run 2's design with `CTS_APPLY_NDR` = `none`), run [36327551624](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36327551624), `gds` job 5 h 25 min (14:53 → 20:18 UTC). The flow ran to LVS and then stopped on a LibreLane error (below). `GDS_logs` uploaded (1.8 GB unpacked; local copy in `build/ci/r4/run3/`, not committed).
+
+| Step | Time (UTC) | Result |
+|---|---|---|
+| Global placement | 14:57 | 58.9 % (as run 2); the placer's own congestion estimate: 6.9–9.0 % of tiles overflowed |
+| CTS, post-CTS resizer | 14:58 → 15:00 | no setup violations; 1,869 hold endpoints, 3,067 hold buffers (as run 2) |
+| Global routing | 15:00 → 15:05 | **ended in 4 min 22 s** (50 iterations, overflow allowed). Cells + macro 594.6K µm² = **65.9 %** of the core |
+| Antenna repair | 15:05 → 15:07 | 45 → 1 violation |
+| Detailed routing | 15:08 → 19:31 | first pass 3 h 15 min; then two antenna re-routes (below) |
+| Signoff | 19:32 → 20:18 | STA, Magic DRC (42 min), LVS |
+
+**Global routing, final congestion (GRT-0096):**
+
+| Layer | Direction | Resource | Demand | Usage | Overflow |
+|---|---|---|---|---|---|
+| Metal2 | vertical | 154,688 | 131,856 | 85.2 % | 72 |
+| Metal3 | horizontal | 184,901 | 171,595 | **92.8 %** | **4,651** |
+| Metal4 | vertical | 152,817 | 67,808 | 44.4 % | 160 |
+| Total | | 492,406 | 371,259 | 75.4 % | **4,883** |
+
+Wirelength 3.84 m; 39,050 nets. For comparison, R2 (one lane at ~42 %) routed with 0 overflow at 66.1 % Metal3 usage.
+
+**Detailed routing (violations after each optimisation iteration, `DRT_OPT_ITERS` 3):**
+
+| Pass | Iter 0 | Iter 1 | Iter 2 | Iter 3 | Time |
+|---|---|---|---|---|---|
+| First route | 46,596 | 25,219 | 23,102 | **6,004** | 15:13 → 18:22 |
+| Re-route after antenna repair 1 (48 nets) | 17,027 | 12,926 | 12,741 | 9,769 | 18:29 → 19:01 |
+| Re-route after antenna repair 2 (9 nets) | 14,349 | 13,689 | 13,697 | **12,872** | 19:07 → 19:31 |
+
+Final: 8,673 shorts and 4,190 spacing violations, mostly on Metal2 (6,531 shorts, 3,596 spacing), then Metal3 (1,865 / 591), Metal4 (277 / 3). The antenna re-routes (`DRT_ANTENNA_REPAIR_ITERS` 3) cleared the antennas but doubled the violations and added 1 h 10 min.
+
+**Where the violations are.** Synthesis flattens the design, so cells were assigned to blocks through the hierarchical net names they connect to (about a third of the cells get a block this way), and each violation to the block with the most cells in its 40 µm square. Approximate: **lanes 9,491 (74 %)**, pin units 2,650 (21 %), port configuration and the rest 730. The lanes fill the lower two thirds of the die and the pin units the top third; the densest squares (up to ~1,300 violations per 80 µm square) are in the middle of the die, in lanes 0 and 2, near the fabric and port configuration.
+
+**Timing after routing** (STAPostPNR): typ and fast meet setup; **slow corner −10.89 ns worst, 706 violating paths** (worst: a slot latch → flop). Hold met at all corners (worst +0.10 ns, fast). 43 max-capacitance and 514 max-slew violations (slow). Before routing the resizer found no setup violations at any corner, so this comes from the routes (detours and shorts); it is not a timing result for the design until routing is clean.
+
+**Signoff and the stop:** Magic DRC 60,326 (the tool says divide by 3–4), consistent with the routing shorts. LVS: same device count (39,341) but 38,433 nets in the layout against 39,219 in the netlist (**786 nets merged by shorts**), "Top level cell failed pin matching". LibreLane then failed reading netgen's JSON (`JSONDecodeError: Invalid \escape`, probably an escaped `g_lane\[…\]` net name in the mismatch list), so precheck and gl_test did not run. This is a tool problem that shows only when LVS already fails, not a design bug.
+
+**What it means:**
+1. **The NDR change worked:** global routing ended in 4 min and the full flow fits in 5 h 25 min. That leaves ~35 min under the 6 h limit, so every R4 run at this size is close to it.
+2. **The full chip with 3 lanes and 4 pin units does not route at 58.9 % placement (65.9 % after the flow's growth).** Global-routing overflow is 4,883, and detailed routing ends at 6,004 violations before the antenna re-routes and 12,872 after. That is not a near miss.
+3. **Horizontal routing is the limit.** Metal3 is the only horizontal routing layer (Metal1 has no routing resource here; Metal2 and Metal4 are vertical). It holds 95 % of the overflow at 92.8 % usage, while Metal4 is only 44 % used. The die is wide (1289 × 711 µm), which lengthens horizontal wires.
+4. **The lanes, not the pin units or the fabric, carry most of the violations** (~74 %, approximate attribution). That goes against run 1's reading that the lanes were the known-routable part: one lane routes at 42 %, but three lanes packed at ~59 % do not.
+5. For Metal3 to come down to R2's range (~66–80 % usage), horizontal demand has to fall by ~15–30 %. Density cannot do it (`PL_TARGET_DENSITY_PCT` cannot go below the utilisation), so the lever is less logic, or a different block arrangement.
+
+**Run 4 candidates (one change, D-034 rule):**
+- (a) **2 lanes instead of 3** (~−70K µm², GPL ~51 %). Takes out area where ~3/4 of the violations are. Also a real candidate cut for the chip (D-041).
+- (b) Same design, `DRT_ANTENNA_REPAIR_ITERS` 0: gives the first-pass result (6,004) without the re-routes and saves ~1 h. Measures nothing new about routability.
+- (c) Same 3 lanes, fewer slots per lane (the latch slot array is the densest part of a lane). A design change to the R1 lane, more work than (a).
+
+Recommendation: (a). Decision: team (D-043).

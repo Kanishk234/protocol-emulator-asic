@@ -29,6 +29,7 @@ for yml in tools/compile/examples/*.yaml; do
     fi
   else
     cp "$work/$name.wbit" "$OUT/"
+    cp "$work/design.fasm" "$OUT/$name.fasm"
     cp "$work/report.json" "$OUT/$name.report.json"
   fi
 done

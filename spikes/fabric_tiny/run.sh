@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
-# Phase 1 spike: stitch a tiny FABulous fabric (2 x LUT4x8_ha = 16 LUT4 + IO and edge tiles) on
-# IHP CMOS5L with LibreLane's FABulousFabric flow. The tiles must be hardened first with
-# spikes/tile_cmos5l/run.sh <TILE> (same patched tile library in build/tile_cmos5l/).
+# Stitch a FABulous fabric defined in arch/<NAME>/fabric.csv into one macro on IHP CMOS5L with
+# LibreLane's FABulousFabric flow (phase 1: warp_tiny, 2 x LUT4x8_ha; phase 2: warp_g0). The tiles
+# must be hardened first with spikes/tile_cmos5l/run.sh <TILE> (patched library in build/tile_cmos5l/).
 #
-# Usage: spikes/fabric_tiny/run.sh [--tiles]     --tiles: harden every tile type first
-# Output: build/fabric_tiny/ (GDS, LEF, netlist of the fabric macro + bitstream spec)
+# Usage: [FABRIC=warp_g0] spikes/fabric_tiny/run.sh [--tiles]   (default FABRIC=warp_tiny)
+#        --tiles: harden every tile type first
+# Output: build/fabric_<NAME>/, exported to macro/<NAME>/ (GDS, LEF, netlists, RTL, tool files)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 HERE="$ROOT/spikes/fabric_tiny"
 LIB="$ROOT/build/tile_cmos5l/fabulous-tiles"
-W="$ROOT/build/fabric_tiny"
+NAME="${FABRIC:-warp_tiny}"
+W="$ROOT/build/fabric_$NAME"
 export PDK=ihp-sg13cmos5l
 export PDK_ROOT="${PDK_ROOT:-$HOME/.cache/warp/pdk-full}"
 # shellcheck disable=SC1091
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
-ARCH="$ROOT/arch/warp_tiny"
+ARCH="$ROOT/arch/$NAME"
 TILES=$(sed -n 's#^Tile,TILES/\([^/]*\)/.*#\1#p' "$ARCH/fabric.csv")
 if [ "${1:-}" = "--tiles" ]; then
   for t in $TILES; do
@@ -28,8 +30,9 @@ fi
 rm -rf "$W"
 mkdir -p "$W"
 ln -s "$LIB" "$W/fabulous-tiles"
-sed 's#TILES/#fabulous-tiles/tiles/tiny/#' "$ARCH/fabric.csv" > "$W/warp_tiny.csv"
-cp "$HERE/config.yaml" "$W/config.yaml"
+sed 's#TILES/#fabulous-tiles/tiles/tiny/#' "$ARCH/fabric.csv" > "$W/$NAME.csv"
+sed "s/^DESIGN_NAME: warp_tiny/DESIGN_NAME: $NAME/; s/dir::warp_tiny.csv/dir::$NAME.csv/" \
+  "$HERE/config.yaml" > "$W/config.yaml"
 
 cd "$LIB"
 nix develop --accept-flake-config --command bash -c \
@@ -40,11 +43,11 @@ nix develop --accept-flake-config --command bash -c \
 ODB=$(ls "$W"/macro/odb/*.odb)
 cat > "$W/write_lef.tcl" <<EOF
 read_db {$ODB}
-write_abstract_lef -bloat_occupied_layers {$W/macro/lef/warp_tiny.lef}
+write_abstract_lef -bloat_occupied_layers {$W/macro/lef/$NAME.lef}
 EOF
 mkdir -p "$W/macro/lef"
 nix develop --accept-flake-config --command openroad -exit -no_splash "$W/write_lef.tcl" > "$W/lef.log" 2>&1
-python3 - "$W/macro/lef/warp_tiny.lef" <<'EOF'
+python3 - "$W/macro/lef/$NAME.lef" <<'EOF'
 import re, sys
 p = sys.argv[1]
 lines = open(p).read().split("\n")
@@ -61,16 +64,16 @@ for l in lines:
 open(p, "w").write("\n".join(out))
 EOF
 # Placement boundary (IHP 189/4) over the whole macro, from the LEF size
-read -r MW MH < <(sed -n 's/^ *SIZE \([0-9.]*\) BY \([0-9.]*\) ;/\1 \2/p' "$W/macro/lef/warp_tiny.lef" | head -1)
+read -r MW MH < <(sed -n 's/^ *SIZE \([0-9.]*\) BY \([0-9.]*\) ;/\1 \2/p' "$W/macro/lef/$NAME.lef" | head -1)
 nix develop --accept-flake-config --command klayout -b -r "$HERE/add_prboundary.py" \
-  -rd gds="$W/macro/gds/warp_tiny.gds" -rd out="$W/macro/gds/warp_tiny.gds" -rd w="$MW" -rd h="$MH" 2>/dev/null
+  -rd gds="$W/macro/gds/$NAME.gds" -rd out="$W/macro/gds/$NAME.gds" -rd w="$MW" -rd h="$MH" 2>/dev/null
 
-# Export the macro views the chip flow uses into the repo (macro/warp_tiny/)
-OUT="$ROOT/macro/warp_tiny"
+# Export the macro views the chip flow uses into the repo (macro/<NAME>/)
+OUT="$ROOT/macro/$NAME"
 mkdir -p "$OUT"
-cp "$W/macro/gds/warp_tiny.gds" "$W/macro/lef/warp_tiny.lef" "$OUT/"
-cp "$W"/macro/nl/warp_tiny.nl.v "$OUT/warp_tiny.nl.v"
-cp "$W/macro/fabulous/warp_tiny.v" "$OUT/warp_tiny.v"              # RTL of the fabric (simulation)
+cp "$W/macro/gds/$NAME.gds" "$W/macro/lef/$NAME.lef" "$OUT/"
+cp "$W"/macro/nl/$NAME.nl.v "$OUT/$NAME.nl.v"
+cp "$W/macro/fabulous/$NAME.v" "$OUT/$NAME.v"              # RTL of the fabric (simulation)
 cp "$W/macro/fabulous/bitStreamSpec.csv" "$OUT/"
 # tool files for the compile flow (tools/compile): nextpnr model and bitstream spec
 mkdir -p "$OUT/fabulous/.FABulous"

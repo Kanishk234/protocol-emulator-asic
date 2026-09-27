@@ -13,9 +13,10 @@ Pin map (YAML):
       sda_o: FAB_IO0.o            # bidirectional pins: .o value, .oe output enable, .i input
       sda_oe: FAB_IO0.oe
       sda_i: FAB_IO0.i
+      h_rdata[0]: h_rdata0        # host channel (architectures that have it, D-024)
 
-Steps: a generated wrapper `warp_top` (ports named after WARP pins, pads as real tristates) around
-the user top; Yosys `synth_fabulous` with the tile library's primitives; nextpnr-generic
+Steps: a generated wrapper `warp_top` (one explicit IOBUF per used IO cell, wired as in the
+fabric) around the user top; Yosys `synth_fabulous` with the tile library's primitives; nextpnr-generic
 `--uarch fabulous` with the fabric's pips/bels (timing from the hardened tiles' corners); WARP's
 bitgen (compile/bitgen.py, the FABulous frame format); the words go into a .wbit stamped with the
 ARCH_VERSION.
@@ -86,8 +87,14 @@ def user_ports(sources, top, work):
     return {n: (p["direction"], len(p["bits"])) for n, p in mod["ports"].items()}
 
 
+ROLE_OF = {"clock": "i", "in": "i", "out": "o", "out_en": "oe"}
+
+
 def resolve(pinmap, ports, arch_pins):
-    """Map every user port bit to a WARP pin role. Returns {pin: {role: 'port[bit]'}}."""
+    """Map every user port bit to a WARP pin role. Returns {pin: {role: 'port[bit]'}}.
+    Roles are the IO cell's fabric-side ports: i (pad -> fabric, the cell's OUT), o (the cell's
+    IN) and oe (the cell's EN). Pin directions in pins.csv: clock/in (i), out (o), out_en (oe:
+    an output carried on a cell's enable wire, e.g. host-channel bits) and inout (.o/.oe/.i)."""
     use = {}
     for key, target in pinmap.items():
         m = re.fullmatch(r"(\w+)(?:\[(\d+)\])?", key)
@@ -110,7 +117,7 @@ def resolve(pinmap, ports, arch_pins):
         elif role:
             raise CompileError(f"pin map: {pin} takes no role suffix")
         else:
-            role = {"clock": "i", "in": "i", "out": "o"}[kind]
+            role = ROLE_OF[kind]
         want = "input" if role == "i" else "output"
         if direction != want:
             raise CompileError(f"pin map: {key} is an {direction}, {target} needs an {want}")
@@ -119,46 +126,53 @@ def resolve(pinmap, ports, arch_pins):
         use[pin][role] = ref
     if "clk" not in use:
         raise CompileError("pin map: the user design must map its clock to `clk`")
+    cells = {}
+    for pin, roles in use.items():
+        bel = arch_pins[pin]["bel"]
+        for role in roles:
+            if role in cells.setdefault(bel, {}):
+                raise CompileError(f"pin map: {pin} and {cells[bel][role]} share IO cell {bel} ({role})")
+            cells[bel][role] = pin
     return use
 
 
+def cell_id(bel):
+    return bel.replace("/", "_")
+
+
 def wrapper(top, ports, use, arch_pins):
-    """`warp_top`: ports named after WARP pins; bidirectional pins as real tristate pads."""
-    decl, body = [], []
+    """`warp_top`: one port per used IO cell (pad_<cell>), with the tile library's IOBUF
+    instantiated explicitly, so its fabric-side ports are wired exactly as in the fabric: IN (o),
+    EN (oe) and OUT (i) are independent signals (the pad logic is in the shell, not the fabric).
+    An output without an enable gets EN = 1. The clock reaches the LCs through a GBUF."""
+    cells = {}                                   # cell -> {role: pin}
     for pin, roles in use.items():
-        kind = arch_pins[pin]["direction"]
-        if kind in ("clock", "in"):
-            decl.append(f"input wire {pin}")
-        elif kind == "out":
-            decl.append(f"output wire {pin}")
-        else:
-            decl.append(f"inout wire {pin}")
-            if "o" in roles or "oe" in roles:
-                o = f"w_{pin}_o" if "o" in roles else "1'b0"
-                oe = f"w_{pin}_oe" if "oe" in roles else "1'b1"
-                body.append(f"assign {pin} = {oe} ? {o} : 1'bz;")
+        for role in roles:
+            cells.setdefault(arch_pins[pin]["bel"], {})[role] = pin
+    decl, wires, body = [], [], []
+    for bel, roles in cells.items():
+        c = cell_id(bel)
+        decl.append(f"inout wire pad_{c}")
+        for r in roles:
+            wires.append(f"wire w_{c}_{r};")
+        o = f"w_{c}_o" if "o" in roles else "1'b0"
+        oe = f"w_{c}_oe" if "oe" in roles else ("1'b1" if "o" in roles else "1'b0")
+        i = f"w_{c}_i" if "i" in roles else ""
+        body.append(f"(* keep *) IOBUF u_{c} (.PAD(pad_{c}), .IN({o}), .EN({oe}), .OUT({i}));")
+        if "i" in roles and arch_pins[roles["i"]]["direction"] == "clock":
+            wires.append(f"wire w_{c}_gclk;")
+            body.append(f"GBUF u_{c}_gbuf (.IN(w_{c}_i), .OUT(w_{c}_gclk));")
     conn = {}   # port -> list of bit expressions (LSB first)
     for name, (direction, width) in ports.items():
         conn[name] = ["1'b0" if direction == "input" else None] * width
-    unmapped_in, unmapped_out = [], []
     for pin, roles in use.items():
+        c = cell_id(arch_pins[pin]["bel"])
         for role, ref in roles.items():
             m = re.fullmatch(r"(\w+)(?:\[(\d+)\])?", ref)
             name, bit = m.group(1), int(m.group(2) or 0)
-            kind = arch_pins[pin]["direction"]
-            if kind == "inout" and role in ("o", "oe"):
-                conn[name][bit] = f"w_{pin}_{role}"
-            elif kind == "clock":
-                conn[name][bit] = f"{pin}_gbuf"
-            else:
-                conn[name][bit] = pin
-    wires = [f"wire w_{p}_{r};" for p, rs in use.items() for r in rs
-             if arch_pins[p]["direction"] == "inout" and r in ("o", "oe")]
-    for p in use:
-        if arch_pins[p]["direction"] == "clock":   # the clock reaches the LCs through a global buffer
-            wires.append(f"wire {p}_gbuf;")
-            body.append(f"GBUF u_{p}_gbuf (.IN({p}), .OUT({p}_gbuf));")
-    inst = []
+            clock = arch_pins[pin]["direction"] == "clock"
+            conn[name][bit] = f"w_{c}_gclk" if clock else f"w_{c}_{role}"
+    unmapped_in, unmapped_out, inst = [], [], []
     for name, bits in conn.items():
         direction = ports[name][0]
         for i, b in enumerate(bits):
@@ -170,18 +184,17 @@ def wrapper(top, ports, use, arch_pins):
             if all(b is None for b in bits):
                 inst.append(f".{name}()")
                 continue
-            # unmapped output bits go to dummy wires
+            wires += [f"wire nc_{name}_{i};" for i, b in enumerate(bits) if b is None]
             bits = [b if b is not None else f"nc_{name}_{i}" for i, b in enumerate(bits)]
-            wires += [f"wire nc_{name}_{i};" for i, b in enumerate(conn[name]) if b is None]
         inst.append(f".{name}({{{', '.join(reversed(bits))}}})")
     text = ["// Generated by tools/compile/compile.py; do not edit.", "`default_nettype none",
             f"module {WRAPPER_TOP} (", "    " + ",\n    ".join(decl), ");"]
     text += ["    " + w for w in wires] + ["    " + b for b in body]
     text += [f"    {top} u_user (", "        " + ",\n        ".join(inst), "    );", "endmodule", ""]
-    return "\n".join(text), unmapped_in, unmapped_out
+    return "\n".join(text), unmapped_in, unmapped_out, cells
 
 
-def synth_script(sources, out: Path, prim: Path) -> str:
+def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=None) -> str:
     """Yosys script. The pinned Yosys (0.66, docs/VERSIONS.md) has the older synth_fabulous,
     without the -ff/-clkbuf-map options the tile library's flow uses and with IO pad mapping
     hard-wired to the stock FABulous IO cell; so the IO pads (tile library IOBUF, output enable
@@ -190,16 +203,19 @@ def synth_script(sources, out: Path, prim: Path) -> str:
     plibs = ("FABULOUS_LC/yosys/primitives/prims.v", "IOBUF/yosys/primitives/IOBUF.v",
              "GBUF/yosys/primitives/GBUF.v", "SYS_RESET/yosys/primitives/SYS_RESET.v")
     maps = ("FABULOUS_LC/yosys/techmap/lut_map.v", "FABULOUS_LC/yosys/techmap/ff_map.v")
-    opts = (f"-top {WRAPPER_TOP} -lut 4 -carry ha -complex-dff -noregfile "
+    opts = (f"-top {top} -lut 4 -carry ha -complex-dff -noregfile "
             + " ".join(f"-extra-plib {prim / p}" for p in plibs) + " "
             + " ".join(f"-extra-map {prim / m}" for m in maps))
     lines = [f"read_verilog -sv {Path(s).resolve()}" for s in sources]
+    if top == WRAPPER_TOP:
+        lines.append(f"read_verilog -sv {out / 'warp_top.v'}")
+    if params:
+        lines.append("chparam " + " ".join(f"-set {k} {v}" for k, v in params.items()) + f" {top}")
     lines += [
-        f"read_verilog -sv {out / 'warp_top.v'}",
         f"synth_fabulous {opts} -run begin:map_iopad",
         "opt -full",
         "iopadmap -bits -outpad $__FABULOUS_OBUF IN:PAD -inpad $__FABULOUS_IBUF OUT:PAD "
-        f"-toutpad $__FABULOUS_TBUF EN:IN:PAD -tinoutpad $__FABULOUS_IOBUF EN:OUT:IN:PAD {WRAPPER_TOP}",
+        f"-toutpad $__FABULOUS_TBUF EN:IN:PAD -tinoutpad $__FABULOUS_IOBUF EN:OUT:IN:PAD {top}",
         f"techmap -map {prim / 'IOBUF/yosys/techmap/IOBUF_map.v'}",
         f"synth_fabulous {opts} -run map_iopad:check",
         # ABC maps the FF enable/reset logic once per FF; merge the identical LUTs it leaves
@@ -210,6 +226,51 @@ def synth_script(sources, out: Path, prim: Path) -> str:
         f"write_json {out / 'design.json'}",
     ]
     return "\n".join(lines) + "\n"
+
+
+def cell_estimate(design_json: Path, top: str) -> dict:
+    """Resource estimate from the synthesized netlist, before place and route: LUTs (LUT1–4 and
+    carry LUT4_HA, each one FABULOUS_LC), flip-flops, IO cells, and the logic cells they need.
+    An LC has one output (the LUT or its flip-flop), so a flip-flop shares an LC only with the
+    LUT that drives its D and nothing else; every other flip-flop takes an LC of its own."""
+    mod = json.loads(design_json.read_text())["modules"][top]
+    cells = [c for c in mod["cells"].values() if c["type"] != "$scopeinfo"]
+    luts = [c for c in cells if re.fullmatch(r"LUT[1-4](_HA)?", c["type"])]
+    ffs = [c for c in cells if c["type"].startswith("LUTFF")]
+    ios = [c for c in cells if c["type"] == "IOBUF"]
+    sinks = {}
+    for c in cells:
+        for p, bits in c["connections"].items():
+            if c["port_directions"].get(p) == "input":
+                for b in bits:
+                    sinks[b] = sinks.get(b, 0) + 1
+    for n in mod["ports"].values():
+        if n["direction"] == "output":
+            for b in n["bits"]:
+                sinks[b] = sinks.get(b, 0) + 1
+    lut_out = {c["connections"]["O"][0]: i for i, c in enumerate(luts) if c["connections"].get("O")}
+    paired = set()
+    for f in ffs:
+        d = f["connections"]["D"][0]
+        i = lut_out.get(d)
+        if i is not None and i not in paired and sinks.get(d, 0) == 1:
+            paired.add(i)
+    other = sorted({c["type"] for c in cells} - {c["type"] for c in luts + ffs + ios})
+    return {"luts": len(luts), "carry_luts": sum(c["type"] == "LUT4_HA" for c in luts),
+            "ffs": len(ffs), "lcs": len(luts) + len(ffs) - len(paired), "io": len(ios),
+            "other_cells": other}
+
+
+def synth_only(sources, top, out, params=None) -> dict:
+    """Synthesis for this fabric's cells only (no pins, no place and route), for designs whose
+    ports cannot be placed on the current fabric (e.g. the host channel). Returns cell_estimate."""
+    out = Path(out).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    tiles = Path(os.environ.get("WARP_TILES") or subprocess.check_output(
+        [str(ROOT / "scripts" / "fetch_tiles.sh")], text=True).strip())
+    (out / "synth.ys").write_text(synth_script(sources, out, tiles / "primitives", top, params))
+    run([tool("yosys"), "-s", str(out / "synth.ys")], out / "synth.log", out)
+    return cell_estimate(out / "design.json", top)
 
 
 def check_frames(words, rows):
@@ -250,10 +311,10 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1):
 
     ports = user_ports(sources, top, out)
     use = resolve(spec["pins"], ports, arch_pins)
-    wtext, unmapped_in, unmapped_out = wrapper(top, ports, use, arch_pins)
+    wtext, unmapped_in, unmapped_out, cells = wrapper(top, ports, use, arch_pins)
     (out / "warp_top.v").write_text(wtext)
 
-    pcf = "\n".join(f"set_io {pin} {arch_pins[pin]['bel']}" for pin in use) + "\n"
+    pcf = "\n".join(f"set_io pad_{cell_id(bel)} {bel}" for bel in cells) + "\n"
     (out / "pins.pcf").write_text(pcf)
 
     (out / "synth.ys").write_text(synth_script(sources, out, prim))

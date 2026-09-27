@@ -14,6 +14,7 @@
   "//": "- PL_TARGET_DENSITY_PCT 62: run 2 (4 pin units), 2 above the expected ~60 % global-placement utilisation;",
   "//": "- PNR_SDC_FILE / SIGNOFF_SDC_FILE: the R2 latch exception (D-032);",
   "//": "- DRT_OPT_ITERS 3: so a non-converging route ends and uploads GDS_logs before the 6 h job limit (D-034).",
+  "//": "- CTS_APPLY_NDR none: run 3; with clock NDRs the global router relaxes them one net at a time and never ends (run 2, D-043).",
 
   "//": "Here are some of the variables you may want to change:",
 
@@ -95,6 +96,9 @@
   "SIGNOFF_SDC_FILE": "dir::signoff.sdc",
 
   "DRT_OPT_ITERS": 3,
+
+  "//": "Run 3 (D-043): no 2x-spacing rule on clock nets, so global routing ends after GRT_OVERFLOW_ITERS and reports overflow.",
+  "CTS_APPLY_NDR": "none",
 
   "//": "SRAM GDS has no PR boundary layer; read the full GDS instead of a blackbox.",
   "MAGIC_MACRO_STD_CELL_SOURCE": "PDK",

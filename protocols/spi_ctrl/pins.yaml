@@ -1,0 +1,13 @@
+# spi_ctrl on the current architecture (arch/CURRENT); h_* ports map by name.
+top: spi_ctrl_top
+params:
+  CPOL: 0
+  CPHA: 0
+  HALF: 25
+pins:
+  clk: clk
+  rst_n: rst_n
+  sck_o: FAB_OUT0
+  mosi_o: FAB_OUT1
+  cs_n_o: FAB_OUT2
+  miso_i: FAB_IN0

@@ -1,0 +1,12 @@
+TILE,PRIM2T2S,,,,,#carry out
+#direction,source_name,X-offset,Y-offset,destination_name,wires,
+NORTH,N_GBUF_BEG,0,-1,N_GBUF_END,4,# global buffers
+INCLUDE,../common/Base.csv,,,,,
+JUMP,GCLK_BEG,0,0,GCLK_END,1,
+NORTH,CO,0,-1,CI,1,# carry
+BEL,../../../primitives/WARP/fabulous/wp_timer.v,TA_,,,,
+BEL,../../../primitives/WARP/fabulous/wp_timer.v,TB_,,,,
+BEL,../../../primitives/WARP/fabulous/wp_shift.v,SA_,,,,
+BEL,../../../primitives/WARP/fabulous/wp_shift.v,SB_,,,,
+MATRIX,./PRIM2T2S_switch_matrix.list,,,,,
+EndTILE,,,,,,

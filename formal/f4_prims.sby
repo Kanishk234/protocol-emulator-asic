@@ -1,0 +1,25 @@
+# F4 (docs/design/VERIFICATION.md): the G1 hard primitives equal their cycle-exact specs
+# (ARCHITECTURE §8), all configurations, all input sequences. Unbounded: k-induction.
+# Run: scripts/formal.sh f4_prims.sby
+[tasks]
+timer
+shift
+
+[options]
+mode prove
+depth 4
+
+[engines]
+smtbmc yices
+
+[script]
+timer: read -formal wp_timer.v f4_timer.sv
+timer: prep -top f4_timer
+shift: read -formal wp_shift.v f4_shift.sv
+shift: prep -top f4_shift
+
+[files]
+timer: ../arch/prims/wp_timer.v
+timer: f4_timer.sv
+shift: ../arch/prims/wp_shift.v
+shift: f4_shift.sv

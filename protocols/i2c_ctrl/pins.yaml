@@ -1,0 +1,11 @@
+# i2c_ctrl on the current architecture (arch/CURRENT); h_* ports map by name.
+top: i2c_ctrl_top
+params:
+  Q: 125
+pins:
+  clk: clk
+  rst_n: rst_n
+  sda_i: FAB_IO0.i
+  sda_oe: FAB_IO0.oe
+  scl_i: FAB_IO1.i
+  scl_oe: FAB_IO1.oe

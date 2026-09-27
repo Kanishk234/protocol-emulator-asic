@@ -1,0 +1,10 @@
+# uart on the current architecture (arch/CURRENT); h_* ports map by name.
+top: uart_top
+params:
+  DIV: 434
+  RUNTIME_DIV: 0
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  tx_o: FAB_OUT0

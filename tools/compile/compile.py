@@ -81,11 +81,16 @@ def load_arch(arch_dir: Path):
     return meta, pins
 
 
-def user_ports(sources, top, work):
-    """Port names, directions and widths of the user top, via Yosys."""
+def chparam(params, module):
+    return ("chparam " + " ".join(f"-set {k} {v}" for k, v in params.items()) + f" {module}") if params else ""
+
+
+def user_ports(sources, top, work, params=None):
+    """Port names, directions and widths of the user top (with its parameters), via Yosys."""
     js = work / "ports.json"
     script = " ".join(f"read_verilog -sv {Path(s).resolve()};" for s in sources)
-    run([tool("yosys"), "-q", "-p", f"{script} hierarchy -top {top}; proc; write_json {js}"],
+    cp = chparam(params, top)
+    run([tool("yosys"), "-q", "-p", f"{script} {cp + ';' if cp else ''} hierarchy -top {top}; proc; write_json {js}"],
         work / "ports.log", work)
     mod = json.loads(js.read_text())["modules"].get(top)
     if mod is None:
@@ -210,7 +215,8 @@ def wrapper(top, ports, use, arch_pins):
     return "\n".join(text), unmapped_in, unmapped_out, cells
 
 
-def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=None) -> str:
+def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=None,
+                 param_module=None) -> str:
     """Yosys script. The pinned Yosys (0.66, docs/VERSIONS.md) has the older synth_fabulous,
     without the -ff/-clkbuf-map options the tile library's flow uses and with IO pad mapping
     hard-wired to the stock FABulous IO cell; so the IO pads (tile library IOBUF, output enable
@@ -226,10 +232,12 @@ def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=
     if top == WRAPPER_TOP:
         lines.append(f"read_verilog -sv {out / 'warp_top.v'}")
     if params:
-        lines.append("chparam " + " ".join(f"-set {k} {v}" for k, v in params.items()) + f" {top}")
+        lines.append(chparam(params, param_module or top))
     lines += [
         f"synth_fabulous {opts} -run begin:map_iopad",
-        "opt -full",
+        # not `opt -full`: its opt_share would create coarse $mux cells after gate mapping,
+        # which nothing maps afterwards (seen in the I2C target)
+        "opt",
         "iopadmap -bits -outpad $__FABULOUS_OBUF IN:PAD -inpad $__FABULOUS_IBUF OUT:PAD "
         f"-toutpad $__FABULOUS_TBUF EN:IN:PAD -tinoutpad $__FABULOUS_IOBUF EN:OUT:IN:PAD {top}",
         f"techmap -map {prim / 'IOBUF/yosys/techmap/IOBUF_map.v'}",
@@ -327,7 +335,8 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1):
         [str(ROOT / "scripts" / "fetch_tiles.sh")], text=True).strip())
     prim = tiles / "primitives"
 
-    ports = user_ports(sources, top, out)
+    params = spec.get("params") or {}                 # parameters of the user top
+    ports = user_ports(sources, top, out, params)
     use = resolve(spec["pins"], ports, arch_pins)
     wtext, unmapped_in, unmapped_out, cells = wrapper(top, ports, use, arch_pins)
     (out / "warp_top.v").write_text(wtext)
@@ -335,7 +344,7 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1):
     pcf = "\n".join(f"set_io pad_{cell_id(bel)} {bel}" for bel in cells) + "\n"
     (out / "pins.pcf").write_text(pcf)
 
-    (out / "synth.ys").write_text(synth_script(sources, out, prim))
+    (out / "synth.ys").write_text(synth_script(sources, out, prim, params=params, param_module=top))
     run([tool("yosys"), "-s", str(out / "synth.ys")], out / "synth.log", out)
 
     env = dict(os.environ, FAB_ROOT=str(fab))

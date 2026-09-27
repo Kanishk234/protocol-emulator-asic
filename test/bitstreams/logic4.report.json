@@ -1,0 +1,74 @@
+{
+  "design": "logic4",
+  "arch": "warp_tiny",
+  "arch_version": "0x0001",
+  "words": 302,
+  "crc32": "0x69E58B63",
+  "timing_corner": "nom_slow_1p08V_125C",
+  "fmax_mhz": null,
+  "meets_50mhz": false,
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 5,
+      "available": 16
+    },
+    "IOBUF": {
+      "used": 12,
+      "available": 18
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "pins": {
+    "clk": {
+      "i": "clk"
+    },
+    "rst_n": {
+      "i": "rst_n"
+    },
+    "FAB_IN0": {
+      "i": "a[0]"
+    },
+    "FAB_IN1": {
+      "i": "a[1]"
+    },
+    "FAB_IN2": {
+      "i": "a[2]"
+    },
+    "FAB_IN3": {
+      "i": "a[3]"
+    },
+    "FAB_OUT0": {
+      "o": "y[0]"
+    },
+    "FAB_OUT1": {
+      "o": "y[1]"
+    },
+    "FAB_OUT2": {
+      "o": "y[2]"
+    },
+    "FAB_OUT3": {
+      "o": "y[3]"
+    },
+    "FAB_IO2": {
+      "oe": "od_oe",
+      "i": "od_i"
+    },
+    "FAB_IO3": {
+      "o": "echo"
+    }
+  },
+  "unmapped_inputs_tied_0": [],
+  "unmapped_outputs_open": [],
+  "tools": {
+    "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
+    "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.10-82-g2b560ad0)",
+    "bitgen": "tools/compile/bitgen.py"
+  }
+}

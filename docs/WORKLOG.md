@@ -26,6 +26,9 @@ Done:
 - R4 run 3 (36327551624, 462bf06, `CTS_APPLY_NDR` = `none`) ran the full flow in 5 h 25 min; `GDS_logs` read locally (`build/ci/r4/run3/`, not committed).
 - **Global routing ended (4 min): overflow 4,883, 4,651 on Metal3 (92.8 % usage). Detailed routing: 6,004 violations after the first pass, 12,872 at the end. The full chip does not route at 58.9 % / 65.9 %.** ~74 % of the violations are in the lanes' area (approximate, by net names).
 - `R4_FLOORPLAN.md` §7, AREA.md row, D-043 result and run 4 proposal.
+- Run 4 approved and set up: `localparam NL = 2` in the R4 top, `gen_fabric.py` reads it; density 51. Yosys 337.4K µm² (−80.3K); `check_local.sh` PASS (lint, 5/5 RTL, 5/5 gate level). `R4_FLOORPLAN.md` §8.
+- Checked: all 20 programs use at most 2 lanes (CAN, LIN, IR NEC use 2), so every protocol still runs with 2 lanes, only fewer at once.
+- Fixed: the run 3 docs cited D-041 for the area budget; it is `AREA_ESTIMATE.md` / D-038–D-040.
 
 Checklist boxes ticked (evidence):
 - None.
@@ -33,10 +36,11 @@ Checklist boxes ticked (evidence):
 Problems / decisions:
 - GitHub's live log stops at ~38.6K lines (in CTS), so a running R4 job cannot be followed; wait for the end.
 - LibreLane failed parsing netgen's JSON after the LVS mismatch, so precheck did not run (tool issue, only when LVS already fails).
-- Proposed run 4: 2 lanes instead of 3 (D-043). The routable ceiling bears on D-041.
+- Proposed run 4: 2 lanes instead of 3 (D-043). The routable ceiling bears on the area budget (`AREA_ESTIMATE.md`, D-038–D-040).
 
 Next:
-- Team: decide run 4 (2 lanes, or an alternative in `R4_FLOORPLAN.md` §7) and revisit D-041 with these numbers.
+- Krithik: commit, then push `spike/r4-floorplan` for run 4; collect `GDS_logs` into `build/ci/r4/run4/`.
+- Team: revisit the area budget (`AREA_ESTIMATE.md`) with run 3 and run 4.
 
 ## 2026-09-27: Krithik + Claude (phase 2: R4 run 2 result)
 Done:

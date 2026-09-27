@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7.
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7. **Run 4 (2 lanes, density 51) set up 2026-09-27.** §8.
 
 ---
 
@@ -164,8 +164,30 @@ Final: 8,673 shorts and 4,190 spacing violations, mostly on Metal2 (6,531 shorts
 5. For Metal3 to come down to R2's range (~66–80 % usage), horizontal demand has to fall by ~15–30 %. Density cannot do it (`PL_TARGET_DENSITY_PCT` cannot go below the utilisation), so the lever is less logic, or a different block arrangement.
 
 **Run 4 candidates (one change, D-034 rule):**
-- (a) **2 lanes instead of 3** (~−70K µm², GPL ~51 %). Takes out area where ~3/4 of the violations are. Also a real candidate cut for the chip (D-041).
+- (a) **2 lanes instead of 3** (~−70K µm², GPL ~51 %). Takes out area where ~3/4 of the violations are. Also a real candidate cut for the chip (area budget: `AREA_ESTIMATE.md`, D-038–D-040).
 - (b) Same design, `DRT_ANTENNA_REPAIR_ITERS` 0: gives the first-pass result (6,004) without the re-routes and saves ~1 h. Measures nothing new about routability.
 - (c) Same 3 lanes, fewer slots per lane (the latch slot array is the densest part of a lane). A design change to the R1 lane, more work than (a).
 
 Recommendation: (a). Decision: team (D-043).
+
+## 8. Run 4: 2 lanes (approved 2026-09-27)
+
+One change from run 3 (D-034 rule): **2 lanes instead of 3**, and the density that follows. Everything else as run 3 (4 pin units, `CTS_APPLY_NDR` = `none`, `DRT_OPT_ITERS` 3).
+
+- `localparam NL = 2` in `overlay/src/tt_um_tripwire.v`. Lane 2 keeps its number (host addresses, fabric numbering and tests are unchanged) but is absent: its producers `L2.O0`/`L2.O1` are constant, host writes to its slots are ignored, its SRAM rotation slot stays idle, and `gen_fabric.py` reads NL and leaves out the `L2.I0`/`L2.I1` ports. The other ports' multiplexers lose lane 2's inputs in synthesis, as a real 2-lane fabric would.
+- `PL_TARGET_DENSITY_PCT` 62 → **51**.
+
+| | Run 2/3 (3 lanes) | Run 4 (2 lanes) |
+|---|---|---|
+| Yosys flat, standard cells | 417.7K µm² | **337.4K µm²** (−80.3K) |
+| Flops / latches / clock gates | 2,076 / 2,576 / 192 | 1,829 / 1,876 / 140 |
+| Pre-layout slack typ / slow | +10.28 / +5.08 ns | +10.27 / +5.05 ns |
+| GPL utilisation (1.164 × Yosys + macro, run 2's measured ratio) | 58.9 % (measured) | **~48.5 %** |
+| After CTS, hold repair and global routing (run 3: ×1.12) | 65.9 % (measured) | ~54 % |
+| `PL_TARGET_DENSITY_PCT` | 62 | 51 |
+
+`check_local.sh`: lint clean, 5/5 on the RTL and 5/5 on the Yosys gate-level netlist (TT Icarus 13).
+
+**Protocols with 2 lanes:** All 20 programs in `programs/` use at most 2 lanes: CAN, LIN and IR NEC use 2, the other 17 use 1 (and every program fits in 4 pin units). So every protocol still runs on a 2-lane chip; what is lost is running them together: at most two 1-lane protocols at once, and a 2-lane program (CAN, LIN, IR NEC) alone, where 3 lanes allowed a 2-lane program plus a 1-lane one, or three 1-lane protocols.
+
+**What to look for:** Metal3 usage and overflow against run 3 (92.8 %, 4,651), and whether detailed routing gets to 0 violations. R2 routed clean at 66 % Metal3 usage. If it routes, the next question is how far between ~48.5 % and 58.9 % the density can go back up (for example, by adding back logic), since this is below the plan of record. Expect ~5 h for the job again if routing does not converge.

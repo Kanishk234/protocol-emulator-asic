@@ -18,7 +18,7 @@
 | V3 | Source vs. fabric | A protocol's source RTL and the configured fabric behave the same at the pins, cycle by cycle (the FABulous demo method), then bounded equivalence for one small design | cocotb, SymbiYosys/EQY | `fabric`, `formal` | phase 2 |
 | V4 | Protocol peer (chip level) | Protocols running from bitstreams on the whole chip, against the reference models and sigrok, through the host interface | cocotb | `test`, `fabric` | phase 2 |
 | V5 | Reconfiguration and robustness | Stop, partial transfer, wrong ARCH_VERSION, bad length, bad CRC, reload, restart; outputs parked until a valid RUN; input edges at varied phases | cocotb | `test`, `nightly` | phase 4 (basic parking/config-session tests exist in `test/` for the spike) |
-| V6 | Gate level | `test/` on the hardened netlist with real bitstreams | TT `gl_test`, `scripts/gl_local.sh` | `gds` | running for the spike shell (fabric black-boxed); real bitstreams phase 2 |
+| V6 | Gate level | `test/` on the hardened chip netlist with real bitstreams; the fabric macro modelled by its RTL (D-023), its own netlist to be checked by per-tile equivalence | TT `gl_test`, `scripts/gl_local.sh` | `gds` | running: 16/16 with real bitstreams (CI 36342012141 with the macro netlist; since D-023 with the macro RTL) |
 | V7 | Fault injection | Deliberate faults (config bit position, timer off-by-one, lost FIFO item, inverted OE, parking gate removed) must each fail a check | scripts + mutated RTL | `nightly` | phase 4 |
 
 ## Formal properties (name, property, bound)

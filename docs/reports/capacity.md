@@ -25,6 +25,18 @@ LUT4 after the primitives (ranks 1–4 of `profiling.md`: timer, shift register,
 
 Generic fabric alone (96 LUT4): only the SPI controller (100 LUTs) comes close; nothing else fits. This confirms D-008.
 
+### Check with the real compile flow (2026-09-27, phase 2)
+The same designs and parameters through `tools/compile`'s synthesis (`python -m compile.fit`: the tile library's cells, half-adder carry, flip-flops with enable/reset in the LC) instead of profiling's generic `synth_fabulous`. Logic cells (LCs) are estimated the way the FABULOUS_LC packs (one output per LC: a flip-flop shares an LC only with the LUT that drives its D and nothing else). The estimate matches nextpnr exactly on `counter4` (7 LCs), the one design both could run. Place and route of the protocols waits for a fabric with host-channel IO (G0).
+
+| Protocol | Profiling LUT4 | Real flow: LUTs (carry) | FFs | **LCs** | vs G0's 96 LCs |
+|---|---|---|---|---|---|
+| SPI controller | 100 | 75 (11) | 45 | **96** | 100 %: no routing slack, not a realistic fit |
+| UART | 144 | 100 (28) | 68 | **129** | 134 % |
+| I2C controller | 164 | 137 (14) | 65 | **154** | 160 % |
+| I2C target | 240 | 194 (14) | 79 | **208** | 217 %; one `$mux` cell is left unmapped (to fix before it can be placed) |
+
+The real flow is 4–13 % smaller than profiling (enable/reset logic absorbed into the LC), which does not change the conclusion: **plain G0 fits nothing with margin**, so the primitives (G1, D-008) and phase 3's specialization are required, as D-016 assumed. These LC counts still include each design's own input synchronizers, which the shell's I/O cells make redundant (ARCHITECTURE §6); removing them from the protocol sources is a phase 2 cleanup.
+
 ## Decision (D-016)
 - **GO: pure specialized eFPGA**, not the hybrid fallback. A 4 × 3 fabric with one primitive tile (2 timers + 2 shift registers), the host byte channel in the shell and synchronizer/registered/open-drain I/O cells fits three of the four design-set protocols with margin.
 - **Open: the I2C target** (and so the phase 4 showcase, which builds on it). Its register map is ~100 LUTs of storage plus access muxes. Options, to be measured in phase 3 in this order:

@@ -75,5 +75,6 @@ Local equivalents: `scripts/check_all.sh` (lint + all simulation tests), `script
 | 2026-09-27 | (docs: bugs 9) | macro moved to (890.88, 113.40) | 3 min, fail | — | — | 36292542000 | Config load: `"//"` keys inside MACROS (BUGS #10) |
 | 2026-09-27 | (no comment keys) | same, config fixed | 32.6 min | 9.9 min, **fail** | pass | 36293031051 | Pin check: pdngen short channel stripes beside the macro (BUGS #11) |
 | 2026-09-27 | dea2150 | **macro at (780.96, 113.40)** | **32.5 min** | **10.7 min, pass (9/9)** | **1.2 min, pass** | **36327510268** | **First fabric chip through TT's flow**: DRC/LVS/antenna 0, Magic DRC 0, timing met |
+| 2026-09-27 | acc3af3 | phase 2 shell (SPI host, checked loader, run control) + same 16-LUT macro | 35.6 min | 12.3 min, pass | 2.4 min, **pass 16/16** | 36342012141 | First CI run of real bitstreams on the hardened chip netlist (counter4, logic4, reload). 3,239 std cells / 51,066 µm², 24.8 % utilisation; setup WS +12.04 ns (slow), hold WS +0.117 ns (fast); DRC/LVS/antenna 0, Magic DRC 0 |
 
 Budget: GitHub stops a job at 6 h. The empty 6x4 tile already costs about 35 min, most of it fixed-cost steps over the empty area, so a filled fabric will take longer; re-measure after the first fabric hardening.

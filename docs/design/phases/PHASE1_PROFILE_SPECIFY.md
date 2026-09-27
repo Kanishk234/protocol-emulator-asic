@@ -22,7 +22,7 @@
 - [x] Report in `docs/reports/profiling.md`: what dominates, which functions recur across protocols, and a ranked list of specialization candidates with the expected saving for each. (2026-09-25)
 
 ### Physical de-risking
-- [ ] Harden a tiny (~16 LUT) FABulous fabric through the TT CMOS5L flow, with live configuration storage (not optimized away), passing precheck.
+- [x] Harden a tiny (~16 LUT) FABulous fabric through the TT CMOS5L flow, with live configuration storage (not optimized away), passing precheck. (16-LUT `warp_tiny` macro in `tt_um_warp`, configuration latches loaded from pins through FABulous's bit-bang loader; CI run 36327510268 on dea2150: `gds`, precheck 9/9, `gl_test` green; DRC/LVS/antenna 0, timing met at 50 MHz. `docs/reports/fabric_tiny.md`)
 - [x] From it, measure area per logic cell including configuration and routing; build a simple area model in `tools/areamodel/`. (5,090 µm² per LUT4 from the hardened tile, `tile_cmos5l.md`; `tools/areamodel/model.py` + 5 pytest. The fabric-level number comes with the tiny fabric hardening below.)
 - [x] Estimate fabric capacity (logic cells) for 6x4 with the shell, leaving routing margin. (4 × 3 tiles: 96 LUT4, or 88 with one primitive tile; `capacity.md`)
 
@@ -40,9 +40,9 @@
 - [x] `HELDOUT.md` committed before profiling (commit hash: 0171cf7; no profiling existed before it)
 - [x] All four design-set protocols pass their RTL tests against independent reference models (run IDs: `unit` 36211778569 on a858b2a: UART 3 configs, SPI 6, I2C controller 3, I2C target 3, + pytest)
 - [x] `docs/reports/profiling.md` complete with a ranked specialization list (timer/counter, shift register, host channel in the shell, I/O cell features, register file)
-- [ ] Tiny fabric hardened on CMOS5L, precheck passed (CI run ID: …)
+- [x] Tiny fabric hardened on CMOS5L, precheck passed (CI run ID: 36327510268; three earlier runs failed and are logged: BUGS #9 routing, #10 config, #11 pin check)
 - [x] Area-per-cell measurement and capacity estimate recorded (`tile_cmos5l.md`, `capacity.md`)
 - [x] Capacity go/no-go decision recorded in DECISIONS (D-016)
 - [x] ARCHITECTURE, VERIFICATION and PHYSICAL_DESIGN_AND_CI v1 written (2026-09-26)
-- [ ] All CI workflows green on `efpga`
-- [ ] `docs/summaries/PHASE1.md` written
+- [x] All CI workflows green on `efpga` (dea2150: `gds` + precheck + `gl_test` 36327510268, `test` 36327510213, `lint` 36327510231, `unit` 36327510252, `docs` 36327510245; `fabric` 36274443123, inputs unchanged since. Template `fpga` (manual iCE40 build) is not applicable to a design with a hard macro: D-020)
+- [x] `docs/summaries/PHASE1.md` written (2026-09-27, final)

@@ -40,6 +40,12 @@ For 16 LUT4s the edge and IO tiles are ~42 % of the macro; in the planned 4 × 3
 2. **OpenROAD's LEF confuses the FABulous fabric flow:** its unused `VIA … CUTSIZE` definitions are read as the tile size (the plugin takes any line containing `SIZE`). **Workaround:** drop VIA definitions that no pin or obstruction uses (none do).
 3. **Step removal loses the tile flow's final "save views"** in some runs; our driver saves the views itself.
 
+## Inside the Tiny Tapeout chip (CI run 36327510268, 2026-09-27)
+The macro (power stripes re-gridded per D-017, placement boundary 189/4) inside `tt_um_warp` with the spike shell (D-018: FABulous bit-bang loader driving FrameData/FrameStrobe from pins, run control, parking), placed at (780.96, 113.40) with `src/config.json` per D-019:
+- `gds` 32.5 min, **precheck 9/9 pass**, **`gl_test` pass** (shell tests on the hardened netlist).
+- DRC (KLayout, Magic), LVS (fabric abstract), antenna, routing: all 0. Timing met at 50 MHz (setup +12.47 ns, hold +0.106 ns; shell paths). IR drop 0.38 mV.
+- Three failed runs on the way, all placement/config (BUGS #9–#11).
+
 ## What this retires, and what it doesn't
-- Retired: FABulous tiles and a stitched fabric can be built on CMOS5L, within TT's Metal4 signal limit, DRC clean, with the tools we have.
-- Not yet: the fabric inside the TT chip (`gds` job, precheck), with live configuration loaded through pins. That is the remaining part of this phase 1 task.
+- **Retired:** a FABulous fabric can be built on CMOS5L, within TT's Metal4 signal limit and power-grid rules, and submitted through TT's own template flow and precheck, with its configuration storage live (driven from pins by the loader).
+- **Not yet:** a real bitstream loaded into this fabric on the gate-level netlist (needs the compile flow for our fabric, phase 2), fabric timing (phase 2), and the real-size 4 × 3 fabric with primitives (phases 2–3).

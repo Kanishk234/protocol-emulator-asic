@@ -1,6 +1,8 @@
 # Physical design and CI
 
-Status: v1, written 2026-09-26 (end of phase 1). Chip-level results of the first fabric hardening are added when CI run 36277723397 finishes.
+Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
+
+**Macro placement rules learned the hard way (D-019, BUGS #9–#11):** (1) on the power-grid phase, x = 11.52 + 109.92 k; (2) the macro's pin-heavy faces (west, south for this fabric) toward open core; (3) beside the macro, no channel or one wide enough for a full grid stripe pair; (4) no `"//"` keys inside `MACROS`. Check all four locally with TT's merged config before pushing (the local flow reaches detailed routing in ~2 min).
 
 ## Hardening flow (how the fabric is integrated: flat or macro)
 **Macro, three levels** (the Tiny FABulous method, D-009), all on IHP CMOS5L:
@@ -23,7 +25,21 @@ Why a committed macro instead of hardening the fabric in CI: tile + fabric harde
 - Power: the chip stripe pitch is 109.92 µm instead of the template's 50 µm (D-019); IR drop to be read from the chip-level run.
 - The 16-LUT spike fabric's edge/IO tiles are ~42 % of its area; the 4 × 3 fabric ~20 % (`capacity.md`).
 ## Area breakdown (latest hardening)
-Run 36170807513 (a63877d, placeholder adder), from `GDS_logs` `final/metrics.json`:
+**Run 36327510268 (dea2150): 16-LUT fabric macro + spike shell**, from `GDS_logs` `final/metrics.json`:
+
+| Metric | Value |
+|---|---|
+| Die / core | 916,214 / 902,417 µm² (1289.28 × 710.64 µm) |
+| Fabric macro `warp_tiny` | 172,789 µm² (357.12 × 483.84 µm) at (780.96, 113.40) |
+| Shell standard cells | 1,380 cells, 27,900 µm² |
+| Utilisation (cells + macro) | 22.2 % of the core |
+| Routed wirelength | 103.3 mm; routing DRC 0; antenna 0 |
+| KLayout DRC (precheck) / Magic DRC / LVS | 0 / 0 / 0 (fabric abstract in LVS) |
+| Timing at 20 ns, worst corner | setup WS +12.47 ns (slow), hold WS +0.106 ns (fast); 0 slew/cap violations. Shell only: the fabric is a black box to STA |
+| IR drop (worst) | 0.38 mV with the 109.92 µm stripe pitch |
+| Power | 1.19 mW |
+
+**Earlier: run 36170807513 (a63877d, placeholder adder):**
 
 | Metric | Value |
 |---|---|
@@ -55,5 +71,9 @@ Local equivalents: `scripts/check_all.sh` (lint + all simulation tests), `script
 | Date | Commit | Design | `gds` job | precheck | `gl_test` | CI run | Notes |
 |---|---|---|---|---|---|---|---|
 | 2026-09-25 | a63877d | placeholder adder, 6x4, template `config.json` | 35.1 min | 12.3 min | 0.7 min, pass | 36170807513 | All green. LibreLane 3.1.0.dev3 |
+| 2026-09-26 | e41f05f | 16-LUT fabric macro at (11.52, 7.56) + spike shell | cancelled after ~4.8 h | — | — | 36277723397 | Detailed routing stuck at ~10.5K violations: fabric pin faces against the die edges (BUGS #9) |
+| 2026-09-27 | (docs: bugs 9) | macro moved to (890.88, 113.40) | 3 min, fail | — | — | 36292542000 | Config load: `"//"` keys inside MACROS (BUGS #10) |
+| 2026-09-27 | (no comment keys) | same, config fixed | 32.6 min | 9.9 min, **fail** | pass | 36293031051 | Pin check: pdngen short channel stripes beside the macro (BUGS #11) |
+| 2026-09-27 | dea2150 | **macro at (780.96, 113.40)** | **32.5 min** | **10.7 min, pass (9/9)** | **1.2 min, pass** | **36327510268** | **First fabric chip through TT's flow**: DRC/LVS/antenna 0, Magic DRC 0, timing met |
 
 Budget: GitHub stops a job at 6 h. The empty 6x4 tile already costs about 35 min, most of it fixed-cost steps over the empty area, so a filled fabric will take longer; re-measure after the first fabric hardening.

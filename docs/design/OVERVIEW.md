@@ -66,7 +66,7 @@ Updated 2026-09-26 (end of phase 1). Status: **retired**, **open**, **new**.
 
 | Risk | Status and evidence | Early warning | Response |
 |---|---|---|---|
-| FABulous fabric does not fit the TT CMOS5L flow | **Mostly retired:** tiles and a 16-LUT fabric harden on CMOS5L, DRC clean (`fabric_tiny.md`); chip-level `gds` + precheck with the fabric macro: pending CI | Chip-level run fails on the macro power grid or precheck | Power grid designed for it (D-017, D-019); fallback: TT `custom_gds` route (D-009 option a) |
+| FABulous fabric does not fit the TT CMOS5L flow | **Retired:** a 16-LUT fabric macro passes TT's template flow, precheck 9/9 and `gl_test` (run 36327510268, `fabric_tiny.md`) | The 4 × 3 fabric (larger macro) fails where the small one passed | Same placement rules (PHYSICAL_DESIGN_AND_CI), local pre-flight with TT's merged config |
 | Capacity too small for the design set | **Open, quantified:** ~96 LUT4 generic; UART/SPI/I2C controller fit with timer + shift-register primitives, the **I2C target does not** (`capacity.md`) | Phase 2 place-and-route needs more LUTs than synthesis | Register-file primitive, smaller register map, or showcase on the I2C controller (D-016) |
 | Custom blocks not usable by the tools | Open | Compiled designs don't use the block | Explicit instantiation first; drop the block if integration stalls |
 | **Magic too old for the CMOS5L tech file** | **New, worked around:** Magic 8.3.623 vs the required 8.3.657 (BUGS #2) | A step needs Magic (e.g. LEF) | KLayout GDS + DRC, OpenROAD LEF; a newer Magic when LibreLane's pin moves |

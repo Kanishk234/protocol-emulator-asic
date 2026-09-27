@@ -204,6 +204,13 @@
 `define TRW_CMD_LINE 4'd10
 `define TRW_CMD_JAM 4'd11
 
+// chip size and fabric numbering (fabric_numbering: units, then lanes' O0/O1, then HOST_IN;
+// lanes' I0/I1, then units' tx, then HOST_OUT)
+`define TRW_LANES 3
+`define TRW_UNITS 6
+`define TRW_NPROD 13
+`define TRW_NCONS 13
+
 // pin-unit configuration (ARCHITECTURE.md §7.2): positions inside a unit's block,
 // bit = 16 * word + bit in word; the block is TRW_PC_WORDS host words
 `define TRW_PC_BASE 16'h3000

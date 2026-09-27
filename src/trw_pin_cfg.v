@@ -34,7 +34,7 @@ module trw_pin_cfg #(
 );
     localparam NW = `TRW_PC_WORDS;
     localparam [`TRW_PC_BITS-1:0] OPT = `TRW_PC_MASK_PULSE | `TRW_PC_MASK_CARRIER | `TRW_PC_MASK_BITSYNC;
-    localparam [`TRW_PC_BITS-1:0] STORE = `TRW_PC_MASK_CORE | (FULL ? OPT : {`TRW_PC_BITS{1'b0}});
+    localparam [`TRW_PC_BITS-1:0] STORE = `TRW_PC_MASK_CORE | ((FULL != 0) ? OPT : {`TRW_PC_BITS{1'b0}});
 
     always @(posedge clk) begin
         if (!rst_n)

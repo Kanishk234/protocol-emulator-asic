@@ -332,6 +332,12 @@ def gen_verilog(s):
     L += [f"`define TRW_SYS_{k} 4'd{v}" for k, v in rt["enums"]["SYS"].items()]
     L += ["", "// pin-unit CTRL commands: data[15:12]"]
     L += [f"`define TRW_CMD_{c['name']} 4'd{c['code']}" for c in s["pin_commands"]]
+    fab = s["fabric"]
+    prods, cons = fabric_numbering(fab)
+    L += ["", "// chip size and fabric numbering (fabric_numbering: units, then lanes' O0/O1, then HOST_IN;",
+          "// lanes' I0/I1, then units' tx, then HOST_OUT)",
+          f"`define TRW_LANES {fab['lanes']}", f"`define TRW_UNITS {fab['units']}",
+          f"`define TRW_NPROD {len(prods)}", f"`define TRW_NCONS {len(cons)}"]
     L += _verilog_pin_config(s)
     L += _verilog_host_map(s)
     L += ["", "`endif", ""]

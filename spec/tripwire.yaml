@@ -7,10 +7,10 @@
 # Never edit generated files; edit this file and run `python tools/gen/gen.py`.
 # CI (lint workflow) regenerates and fails on any difference.
 #
-# Status: FROZEN at the end of phase 1 (DECISIONS D-037); v1.1 adds D-038 to D-040. Contents match D-007 ... D-040.
+# Status: FROZEN at the end of phase 1 (DECISIONS D-037); v1.1 adds D-038 to D-040; v1.2 adds the host map (D-042, D-044, D-046).
 # Every change from now on needs its own DECISIONS entry.
 
-version: 1.1
+version: 1.2
 status: frozen
 
 token:
@@ -231,3 +231,34 @@ pin_config:
     - {name: crc_init,   bit: 304, width: 16, kind: uint, desc: "CRC register at frame start"}
     - {name: crc_res,    bit: 320, width: 16, kind: uint, desc: "expected RX CRC register after the frame"}
     - {name: crc_xor,    bit: 336, width: 16, kind: uint, desc: "XOR-ed into the TX CRC when appended"}
+
+# Host register map (ARCHITECTURE.md §9; DECISIONS D-046 with D-042 and D-044). Every host address.
+# `count` = words in a block (absent: one word). Access: R read, W write, W1C write 1 to clear.
+# Unlisted addresses read 0 and ignore writes. Lane k's block is lanes.addr + lane_stride * k, words in
+# lane_words order. The IRQ pad is the OR of (irq_status & irq_en).
+host_map:
+  id: 0x7157                  # "TW"
+  lane_stride: 32
+  lane_words: [r0, r1, r2, r3, state, flags, rpc, rir_status, rir, channels,
+               i0_tag, i0_data, i1_tag, i1_data, o0_tag, o0_data, o1_tag, o1_data]
+  irq_bits: {units: 0, host_out: 8, host_in: 9, dropped: 10}
+  run_live_bit: 15
+  entries:
+    - {name: run,         addr: 0x0000,             access: RW,       desc: "[2:0] RUN per lane (1 = run); reads [15] = pin units live (D-041 B)"}
+    - {name: step,        addr: 0x0001,             access: W,        desc: "[2:0] lanes to step once; ignored for a running lane (§14 H2)"}
+    - {name: time,        addr: 0x0002,             access: R,        desc: "the 16-bit global time"}
+    - {name: irq_en,      addr: 0x0003,             access: RW,       desc: "IRQ enable, bit layout of irq_status"}
+    - {name: irq_status,  addr: 0x0004,             access: R,        desc: "live: [5:0] unit u OVERRUN or LATE, [8] HOST_OUT has a token, [9] HOST_IN free, [10] a DROPPED is nonzero"}
+    - {name: unit_flags,  addr: 0x0010, count: 6,   access: "R, W1C", desc: "unit u: [0] OVERRUN, [1] LATE (D-042)"}
+    - {name: version,     addr: 0x00FE,             access: R,        desc: "spec version: [15:8] major, [7:0] minor"}
+    - {name: id,          addr: 0x00FF,             access: R,        desc: "chip ID (host_map.id)"}
+    - {name: slots,       addr: 0x1000, count: 1024, access: W,       desc: "reflex slots and K: lane [9:8], slot [7:4] (12 = K), word [1:0]; [3:2] = 0. Written while the lane is halted"}
+    - {name: ports,       addr: 0x2000, count: 13,  access: RW,       desc: "fabric port c: [0] en, [1] tap, [5:2] sel, [9:6] accept (D-044)"}
+    - {name: dropped,     addr: 0x2040, count: 13,  access: "R, W clears", desc: "DROPPED of port c, [7:0] (D-044)"}
+    - {name: pin_cfg,     addr: 0x3000, count: 192, access: W,        desc: "pin-unit blocks, unit u at + 32u (§7.2)"}
+    - {name: owners,      addr: 0x30C0, count: 16,  access: RW,       desc: "owner of pad 8 + i: [2:0] unit, 7 = none (§7.1)"}
+    - {name: lanes,       addr: 0x5000, count: 96,  access: "R; W 0-4 while halted", desc: "lane k at + 32k, words in lane_words order (see below)"}
+    - {name: host_in,     addr: 0x6000, count: 4,   access: W,        desc: "HOST_IN push, tag = addr[1:0]; refused while HOST_IN is not free"}
+    - {name: host_status, addr: 0x6004,             access: R,        desc: "[15] HOST_OUT has a token, [14] HOST_IN free, [1:0] HOST_OUT tag"}
+    - {name: host_out,    addr: 0x6005,             access: R,        desc: "HOST_OUT data; the read takes the token"}
+    - {name: sram,        addr: 0x8000, count: 512, access: RW,       desc: "SRAM words, through the host rotation slot (§14 R1)"}

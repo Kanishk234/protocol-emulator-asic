@@ -120,6 +120,7 @@ def validate(s):
     _check(set(legal_sources(fab)) == set(cons), "fabric: the consumer ports must be Lk.I0, Lk.I1, Un.tx and HOST_OUT")
     _check(all(x in prods for srcs in legal_sources(fab).values() for x in srcs), "fabric: unknown source")
     _check(fab["sel_bits"] == 4, "fabric: sel_bits is 4 (trw_chan_port)")
+    _validate_host_map(s)
 
     pc = s["pin_config"]
     _unique(pc["fields"], "name", "pin_config.fields")
@@ -210,6 +211,28 @@ def legal_sources(fab):
     return out
 
 
+def _validate_host_map(s):
+    hm, fab, pc = s["host_map"], s["fabric"], s["pin_config"]
+    _unique(hm["entries"], "name", "host_map.entries")
+    spans = sorted((e["addr"], e["addr"] + e.get("count", 1), e["name"]) for e in hm["entries"])
+    for (a0, a1, n0), (b0, _, n1) in zip(spans, spans[1:]):
+        _check(a1 <= b0, f"host_map: {n0} overlaps {n1}")
+    _check(spans[-1][1] <= 0x10000, "host_map: beyond 16-bit addresses")
+    e = {x["name"]: x for x in hm["entries"]}
+    for name in ("run", "step", "time", "irq_en", "irq_status", "unit_flags", "version", "id", "slots", "ports",
+                 "dropped", "pin_cfg", "owners", "lanes", "host_in", "host_status", "host_out", "sram"):
+        _check(name in e, f"host_map: missing {name}")
+    nc = len(fabric_numbering(fab)[1])
+    _check(e["ports"]["count"] == nc and e["dropped"]["count"] == nc, "host_map: one port/dropped word per consumer")
+    _check(e["unit_flags"]["count"] == fab["units"], "host_map: one unit_flags word per unit")
+    _check(e["lanes"]["count"] == fab["lanes"] * hm["lane_stride"], "host_map: lanes = lanes * lane_stride")
+    _check(len(hm["lane_words"]) <= hm["lane_stride"], "host_map: lane_words exceed the stride")
+    _check(e["pin_cfg"]["addr"] == pc["base"] and e["pin_cfg"]["count"] == fab["units"] * pc["stride"],
+           "host_map: pin_cfg must match pin_config base/stride")
+    _check(e["owners"]["addr"] == pc["owner_base"], "host_map: owners must match pin_config.owner_base")
+    _check(e["host_in"]["count"] == 4, "host_map: host_in takes the tag from addr[1:0]")
+
+
 def fabric_numbering(fab):
     """Producer and consumer numbers used by the RTL (trw_fabric.v) and the host map:
     producers U0.rx.., L0.O0, L0.O1, L1.O0, .., HOST_IN; consumers L0.I0, L0.I1, L1.I0, .., U0.tx.., HOST_OUT."""
@@ -268,6 +291,13 @@ def gen_python(s):
     lines += ["}", "PIN_UNIT_FEATURES = (  # U0, U1, ...: the optional features each unit has"]
     lines += [f"    {tuple(u)!r}," for u in pc["units"]]
     lines += [")", ""]
+    hm = s["host_map"]
+    lines += [f"HOST_ID = {hm['id']:#06x}", f"HOST_LANE_STRIDE = {hm['lane_stride']}",
+              f"HOST_LANE_WORDS = {tuple(hm['lane_words'])!r}", "HOST_IRQ_BITS = " + fmt(hm["irq_bits"]),
+              f"HOST_RUN_LIVE_BIT = {hm['run_live_bit']}",
+              "HOST_MAP = {  # name: (address, words) (ARCHITECTURE.md §9, D-046)"]
+    lines += [f"    {e['name']!r}: ({e['addr']:#06x}, {e.get('count', 1)})," for e in hm["entries"]]
+    lines += ["}", ""]
     return "\n".join(lines)
 
 
@@ -303,6 +333,7 @@ def gen_verilog(s):
     L += ["", "// pin-unit CTRL commands: data[15:12]"]
     L += [f"`define TRW_CMD_{c['name']} 4'd{c['code']}" for c in s["pin_commands"]]
     L += _verilog_pin_config(s)
+    L += _verilog_host_map(s)
     L += ["", "`endif", ""]
     names = [line.split()[1] for line in L if line.startswith("`define ")]
     dup = sorted({n for n in names if names.count(n) > 1})
@@ -383,6 +414,27 @@ def gen_fabric_verilog(s):
               f"    assign all_taken[{p}] = " + ("\n        && ".join(terms) if terms else "1'b1") + ";"]
     L += ["endmodule", ""]
     return "\n".join(L)
+
+
+def _spec_version(s):
+    major, minor = (int(x) for x in str(s["version"]).split("."))
+    return major << 8 | minor
+
+
+def _verilog_host_map(s):
+    """Host register map (ARCHITECTURE.md §9, D-046): TRW_HA_<name> addresses, TRW_HA_<name>_N word
+    counts, TRW_HL_<word> lane-block offsets, TRW_IRQ_<bit> status bit positions."""
+    hm = s["host_map"]
+    L = ["", "// host register map (ARCHITECTURE.md §9, D-046)",
+         f"`define TRW_HOST_ID 16'h{hm['id']:04x}", f"`define TRW_SPEC_VERSION 16'h{_spec_version(s):04x}",
+         f"`define TRW_HA_LANE_STRIDE {hm['lane_stride']}", f"`define TRW_HA_RUN_LIVE_BIT {hm['run_live_bit']}"]
+    for e in hm["entries"]:
+        L.append(f"`define TRW_HA_{e['name'].upper()} 16'h{e['addr']:04x}")
+        if "count" in e:
+            L.append(f"`define TRW_HA_{e['name'].upper()}_N {e['count']}")
+    L += [f"`define TRW_HL_{w.upper()} 5'd{j}" for j, w in enumerate(hm["lane_words"])]
+    L += [f"`define TRW_IRQ_{k.upper()} {v}" for k, v in hm["irq_bits"].items()]
+    return L
 
 
 def _verilog_pin_config(s):
@@ -471,11 +523,21 @@ def gen_tables(s):
         units = "all" if f["name"] not in field_feat else ", ".join(f"U{u}" for u in feat_units[field_feat[f["name"]]])
         rows.append(f"| {w} | {where} | {f['name'].upper()} | {enc} | {units} | {f['desc']} |")
     t["pin_config"] = rows
+    hm = s["host_map"]
+    rows = ["| Address | Name | Access | Contents |", "|---|---|---|---|"]
+    for e in sorted(hm["entries"], key=lambda e: e["addr"]):
+        a = f"{e['addr']:#06x}" + (f"–{e['addr'] + e['count'] - 1:#06x}" if e.get("count", 1) > 1 else "")
+        rows.append(f"| {a} | {e['name']} | {e['access']} | {e['desc']} |")
+    rows += ["", f"Lane k's block (`lanes` + {hm['lane_stride']}·k), word offsets: "
+             + ", ".join(f"{j} {w}" for j, w in enumerate(hm["lane_words"])) + ".",
+             f"IRQ status bits: " + ", ".join(f"{k} [{v}]" for k, v in hm["irq_bits"].items())
+             + f". Chip ID {hm['id']:#06x}. Unlisted addresses read 0 and ignore writes."]
+    t["host_map"] = rows
     return {k: "\n".join(v) for k, v in t.items()}
 
 
 DOC_TABLES = {"docs/design/ISA.md": ["ops", "slot_fields", "routine_formats"],
-              "docs/design/ARCHITECTURE.md": ["legal_sources", "pin_config", "pin_commands"]}
+              "docs/design/ARCHITECTURE.md": ["legal_sources", "pin_config", "pin_commands", "host_map"]}
 
 
 def splice(text, name, body, path):

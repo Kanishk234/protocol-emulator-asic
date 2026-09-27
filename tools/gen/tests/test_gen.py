@@ -177,3 +177,16 @@ def test_fabric_verilog_follows_the_lane_count():
     v = gen.gen_fabric_verilog(s)
     assert "input  wire [10:0] p_valid," in v and "input  wire [10:0] take," in v
     assert "L2." not in v
+
+
+def test_host_map_is_consistent_and_generated():
+    """D-046: the host map reaches the Verilog defines and the Python tables; overlapping blocks and a
+    pin-config mismatch are rejected."""
+    d = _defines(gen.gen_verilog(SPEC))
+    for e in SPEC["host_map"]["entries"]:
+        assert _vint(d[f"TRW_HA_{e['name'].upper()}"]) == e["addr"]
+    assert _vint(d["TRW_HOST_ID"]) == SPEC["host_map"]["id"]
+    with pytest.raises(gen.SpecError, match="overlaps"):
+        gen.validate(broken(lambda s: s["host_map"]["entries"][1].__setitem__("addr", 0x0000)))
+    with pytest.raises(gen.SpecError, match="pin_config"):
+        gen.validate(broken(lambda s: s["pin_config"].__setitem__("base", 0x3100)))

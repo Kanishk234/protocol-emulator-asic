@@ -27,3 +27,6 @@ formal/*.log
 
 # Downloaded CI artifacts
 *.zip
+
+# TT support tools (CI checks them out here; scripts/preflight.sh links the local copy)
+/tt

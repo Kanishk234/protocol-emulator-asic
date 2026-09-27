@@ -69,7 +69,7 @@ jobs:
             build/fab_demo_logs/
             build/fab_demo/user_design/*_npnr_log.txt
 
-  # WARP's own fabric (arch/warp_tiny, macro/warp_tiny): compile the example user designs with
+  # WARP's own fabric (arch/CURRENT, macro/<fabric>): compile the example user designs with
   # tools/compile (must reproduce the committed test/bitstreams), then run the whole pin-level
   # suite with the generated fabric RTL in place of the black box, loading the real bitstreams
   # through the host SPI interface (test/test_bitstream.py).

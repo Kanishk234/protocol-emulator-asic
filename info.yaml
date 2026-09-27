@@ -19,34 +19,38 @@ project:
   source_files:
     - "tt_um_warp.v"
     - "wp_fabric_cfg.v"
-    - "fabric_gen/bitbang.v"
+    - "wp_shell.v"
+    - "wp_spi_target.v"
+    - "wp_sync.v"
+    - "wp_crc32.v"
+    - "wp_fifo.v"
     - "fabric_gen/ConfigFSM.v"
     - "fabric_gen/Frame_Data_Reg.v"
     - "fabric_gen/Frame_Select.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
-# Phase 1 spike pinout (DECISIONS D-018); the phase 2 shell replaces it (ARCHITECTURE.md section 1).
+# ARCHITECTURE.md section 1. The current 16-LUT fabric connects FAB_IN0..3 and FAB_OUT0..3 only.
 pinout:
   # Inputs
-  ui[0]: "RUN"
-  ui[1]: "CFG_CLK"
-  ui[2]: "CFG_DATA"
+  ui[0]: "HOST_CS_N"
+  ui[1]: "HOST_SCK"
+  ui[2]: "HOST_MOSI"
   ui[3]: "FAB_IN0"
   ui[4]: "FAB_IN1"
   ui[5]: "FAB_IN2"
   ui[6]: "FAB_IN3"
-  ui[7]: ""
+  ui[7]: "FAB_IN4"
 
   # Outputs
-  uo[0]: "CFG_ACTIVE"
-  uo[1]: ""
+  uo[0]: "HOST_MISO"
+  uo[1]: "HOST_IRQ"
   uo[2]: "FAB_OUT0"
   uo[3]: "FAB_OUT1"
   uo[4]: "FAB_OUT2"
   uo[5]: "FAB_OUT3"
-  uo[6]: ""
-  uo[7]: ""
+  uo[6]: "FAB_OUT4"
+  uo[7]: "FAB_OUT5"
 
   # Bidirectional pins
   uio[0]: "FAB_IO0"

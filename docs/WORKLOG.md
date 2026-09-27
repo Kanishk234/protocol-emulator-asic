@@ -21,6 +21,24 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: host map in the spec, host RTL)
+RTL session; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- Krithik approved D-042, D-044, D-046. `spec/tripwire.yaml` v1.2 gets `host_map`; `gen.py` generates the Verilog constants (`TRW_HA_*`, `TRW_HL_*`, `TRW_IRQ_*`, ID, version), the Python tables (`HOST_MAP`, …) and the §9 table, with validation (no overlapping blocks, consistent with `pin_config` and the fabric). 1 new generator test; `pytest -m "not slow"`: 269 passed.
+- `src/trw_spi.v` (SPI engine from the R4 stub) and `src/trw_host.v` (the map: control, IRQ, write strobes, read multiplexer, SRAM host slot). Verilator `-Wall` clean. 24.8K µm².
+- BUGS #47: a prefetch of the next read word took the HOST_OUT token; now taken only when the word is shifted out.
+- L1-HOST (`test_internal/host/`): 5 tests through the pads (2-FF, SCK = clk/8), 12/12 mutants killed. All L1 suites re-run after the defs change: chan 7, alu 4, lane 6, slots 2, pins 1, host 5, pin 34 + 34, all pass.
+
+Checklist boxes ticked (evidence):
+- None yet: every module of the §2.1 table now exists except the real top; the box needs them wired and linted as one design.
+
+Problems / decisions:
+- The R4 branch's host stub still has BUGS #47 (it does not affect run 4, which measures routing).
+
+Next:
+- Run 4 result; then the real top (`tt_um_tripwire.v`) with the lane count it gives, `info.yaml`/`test/Makefile`, the SRAM macro and latch SDC in `config.json` (DECISIONS entries), and `tools/host`.
+
 ## 2026-09-27: Krithik + Claude (phase 2: slots, pads, host map proposal)
 RTL session; `tools/tripsim` not read. R4 run 4 still running.
 

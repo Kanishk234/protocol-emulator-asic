@@ -21,6 +21,26 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: lane and ALU RTL)
+RTL session, from `ISA.md` §2–§5 and `ARCHITECTURE.md` §5, §6, §14; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- `src/trw_alu.v` (from the R1 spike, unchanged) and **`src/trw_lane.v`**: the R1 lane checked against D-035 and §14 L12, plus the routine controller (RPC, RIR, CALL entry read, BR, DJNZ, LD/ST, OUT, SYS), STEP (H2), host writes to r0–r3/STATE (E2), `out_load` for the fabric (F4). Verilator `-Wall` and Icarus clean.
+- Two latent spike bugs fixed on the way: BUGS #45 (BSEL 3), #46 (GETT time).
+- L1-ALU (`test_internal/alu/`): 4 tests, 8/8 mutants killed. L1 lane (`test_internal/lane/`): 6 tests covering L1-EVAL (400 random cases against ISA §4.2–4.3) and L1-PIPE, the routine controller, urgent vs routine, halt/STEP/host writes; 15/15 mutants killed.
+- Yosys: 51.5K µm² per lane with the ALU (+9.6K vs the spike). AREA.md.
+
+Checklist boxes ticked (evidence):
+- None (L1 still lacks OVR, ROT and HOST; the lane is not in the top yet).
+
+Problems / decisions:
+- D-045: three readings for the model side (fetched word competes in clock k+1; no fetch while a step is in EXEC or waiting; STEP/host writes ignored while running).
+- The fetched-word path (macro clock-to-output into EVAL) is not timed yet.
+
+Next:
+- Run 4 result.
+- `trw_slots.v` to `src/`, then a top that wires lanes, fabric, pin units and SRAM (and the host), so pre-layout STA and a real `gds` run can start.
+
 ## 2026-09-27: Krithik + Claude (phase 2: channel fabric RTL)
 RTL session, from `ARCHITECTURE.md` §4 and §14 F1–F7; `tools/tripsim` not read. R4 run 4 (2 lanes) running on the branch meanwhile (`gds` 36349736069).
 

@@ -760,6 +760,18 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Evidence:** L1-CHAN (`test_internal/chan/`): 7 tests, including every combination of 0–4 blocking and 0–2 tap subscribers and 6,000 random clocks against a model of F1–F7, all passing; `mutate.sh` 10 of 10 mutants killed. Yosys: fabric 44.4K µm², producer register 1.5K.
 - **Approval:** the layout and the clear are new host-visible behaviour: Krithik and Kanishk. The three readings go to the model side for confirmation.
 
+## D-045 (2026-09-27): the lane in `src/`, with the routine controller; three readings for the model side
+- **Context:** phase 2 task 2.1 `trw_lane.v`: the R1 spike lane (D-030) plus what it lacked: the routine controller (RPC, RIR, CALL entry read, BR, DJNZ, LD/ST, OUT, SYS), STEP (§14 H2), host writes to r0–r3 and STATE (D-035 E2), and a producer-load output for tap drop counting (F4). Checked against §14 L1–L12, R1–R6, H1–H2 and D-035; written without reading `tools/tripsim`. `trw_alu.v` moves to `src/` unchanged.
+- **Found in the spike (fixed in `src/`):** BUGS #45 (`BSEL = 3` gave 0, not imm, L12) and #46 (`GETT` read the time at EXEC, not at the step's EVAL, R3). The R4 branch still uses the spike lane; neither changes area.
+- **Readings where §14 leaves a choice (for the model side to confirm; each is pinned by a test and a mutant):**
+  - **R1 "usable from clock k+1":** a word read on slot k (a fetched step, or an `LD` result) competes at EVAL in clock k+1, straight from the macro's registered output; if it loses, it is held in RIR. So a routine's first step after its fetch on slot k executes in k+2 at the earliest. (The R4 stub registered it first: one clock later.)
+  - **R2 "no routine step is waiting to execute":** no fetch while a step is in EXEC (it may branch) or while a step (or an `LD` result) is waiting. `RPC` advances at the fetch, so branch offsets count from the next word.
+  - **STEP on a running lane** is ignored; a host register write while running is ignored (§9: writable while halted).
+- **Interfaces:** the lane drives the SRAM in its rotation clock (`my_slot`, `mem_*`), takes `step`, `host_we/sel/wdata`, and gives the §9 readback fields (`dbg_*`: r0–r3, STATE, flags, PEND, RPC, RIR, RZ) and `out_load`.
+- **Cost:** 51.5K µm² per lane with the ALU (Yosys, cmos5l typ), +9.6K over the spike lane (41.9K) and +6.7K over the spike plus R4's sequencer stub. 242 flops. The fetched-word path adds the macro's clock-to-output (4.3 ns typ, R3) in front of EVAL; it is not measured yet (pre-layout STA once a top wires the lane to the macro).
+- **Evidence:** `test_internal/alu/` 4 tests, 8/8 mutants; `test_internal/lane/` 6 tests (400 random EVAL cases against ISA §4.2–4.3, the pipeline timing of L3–L5 and the pending rule, output reservation with the 3-clock reload, a routine using every word kind and every reserved code, urgent vs routine, halt/STEP/host writes), 15/15 mutants.
+- **Approval:** the readings go to the model side; nothing here changes the spec.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

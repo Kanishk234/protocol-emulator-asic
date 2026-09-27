@@ -1,0 +1,14 @@
+top: counter4
+pins:
+  clk: clk
+  rst_n: rst_n
+  en: FAB_IN0
+  dir: FAB_IN1
+  q[0]: FAB_OUT0
+  q[1]: FAB_OUT1
+  q[2]: FAB_OUT2
+  q[3]: FAB_OUT3
+  io0_o: FAB_IO0.o
+  io0_oe: FAB_IO0.oe
+  io0_i: FAB_IO0.i
+  io1_o: FAB_IO1.o

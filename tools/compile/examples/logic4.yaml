@@ -1,0 +1,15 @@
+top: logic4
+pins:
+  clk: clk
+  rst_n: rst_n
+  a[0]: FAB_IN0
+  a[1]: FAB_IN1
+  a[2]: FAB_IN2
+  a[3]: FAB_IN3
+  y[0]: FAB_OUT0
+  y[1]: FAB_OUT1
+  y[2]: FAB_OUT2
+  y[3]: FAB_OUT3
+  od_oe: FAB_IO2.oe       # no .o: the value is 0, so the pin is open drain
+  od_i: FAB_IO2.i
+  echo: FAB_IO3.o

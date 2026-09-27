@@ -14,7 +14,8 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          # 3.12: fabulous-fasm 0.2.0 requires it (as FABulous does; local venv is 3.12)
+          python-version: '3.12'
 
       - name: Install Python packages
         # fabulous-fasm / fabulous-bit-gen: the versions FABulous-FPGA 2.2.0 pins (tools/compile tests)

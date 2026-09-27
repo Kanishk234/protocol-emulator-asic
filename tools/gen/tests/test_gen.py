@@ -151,3 +151,29 @@ def test_colliding_verilog_defines_are_rejected():
     s = broken(lambda s: s["slot"]["enums"]["DST"].__setitem__("o0", 7))
     with pytest.raises(gen.SpecError, match="TRW_DST_O0"):
         gen.gen_verilog(s)
+
+
+def test_fabric_verilog_follows_the_legal_sources():
+    """src/trw_fabric.v: one trw_chan_port per consumer, in the numbering tripwire_spec.py exports, with
+    N = its legal-source count and the sources wired in sel order (ARCHITECTURE.md §4.6)."""
+    v = gen.gen_fabric_verilog(SPEC)
+    prods, cons = gen.fabric_numbering(SPEC["fabric"])
+    ls = gen.legal_sources(SPEC["fabric"])
+    ports = re.findall(r"trw_chan_port #\(\.N\((\d+)\)\) u_c(\d+) \(.*?\.src_valid \(\{([^}]*)\}\)", v, re.S)
+    assert [int(c) for _, c, _ in ports] == list(range(len(cons)))
+    for n, c, srcs in ports:
+        want = [prods.index(x) for x in ls[cons[int(c)]]]
+        assert int(n) == len(want)
+        assert [int(x) for x in re.findall(r"p_valid\[(\d+)\]", srcs)] == list(reversed(want)), cons[int(c)]
+    for p, name in enumerate(prods):
+        users = [c for c in cons if name in ls[c]]
+        term = re.search(rf"assign all_taken\[{p}\] = (.*?);", v, re.S).group(1)
+        assert term.count("!blk[") == len(users), name
+
+
+def test_fabric_verilog_follows_the_lane_count():
+    """Two lanes (the D-043 fallback) in the spec give a 2-lane fabric: 11 producers, 11 ports."""
+    s = broken(lambda s: s["fabric"].__setitem__("lanes", 2))
+    v = gen.gen_fabric_verilog(s)
+    assert "input  wire [10:0] p_valid," in v and "input  wire [10:0] take," in v
+    assert "L2." not in v

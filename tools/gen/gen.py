@@ -4,6 +4,7 @@
 Outputs:
   tools/tripwire_spec.py   Python tables for tripsim (and tripc later)
   src/trw_defs.vh          Verilog `define constants for the RTL
+  src/trw_fabric.v         the channel fabric: consumer ports, legal-source multiplexers, release terms
   docs/design/ISA.md, docs/design/ARCHITECTURE.md
                            tables between <!-- GENERATED:name --> and <!-- /GENERATED:name -->
 
@@ -115,6 +116,10 @@ def validate(s):
     for port, srcs in legal_sources(fab).items():
         _check(0 < len(srcs) <= 1 << fab["sel_bits"], f"fabric: {port} has {len(srcs)} sources for {fab['sel_bits']} sel bits")
         _check(len(set(srcs)) == len(srcs), f"fabric: {port} lists a source twice")
+    prods, cons = fabric_numbering(fab)
+    _check(set(legal_sources(fab)) == set(cons), "fabric: the consumer ports must be Lk.I0, Lk.I1, Un.tx and HOST_OUT")
+    _check(all(x in prods for srcs in legal_sources(fab).values() for x in srcs), "fabric: unknown source")
+    _check(fab["sel_bits"] == 4, "fabric: sel_bits is 4 (trw_chan_port)")
 
     pc = s["pin_config"]
     _unique(pc["fields"], "name", "pin_config.fields")
@@ -205,6 +210,15 @@ def legal_sources(fab):
     return out
 
 
+def fabric_numbering(fab):
+    """Producer and consumer numbers used by the RTL (trw_fabric.v) and the host map:
+    producers U0.rx.., L0.O0, L0.O1, L1.O0, .., HOST_IN; consumers L0.I0, L0.I1, L1.I0, .., U0.tx.., HOST_OUT."""
+    lanes, units = fab["lanes"], fab["units"]
+    prods = [f"U{u}.rx" for u in range(units)] + [f"L{k}.O{o}" for k in range(lanes) for o in range(2)] + ["HOST_IN"]
+    cons = [f"L{k}.I{i}" for k in range(lanes) for i in range(2)] + [f"U{u}.tx" for u in range(units)] + ["HOST_OUT"]
+    return prods, cons
+
+
 # ----------------------------------------------------------------------------- outputs
 def gen_python(s):
     sl, rt = s["slot"], s["routine"]
@@ -237,7 +251,9 @@ def gen_python(s):
               f"FABRIC_SEL_BITS = {s['fabric']['sel_bits']}",
               "LEGAL_SOURCES = {  # consumer port: sources in sel order (ARCHITECTURE.md §4.6)"]
     lines += [f"    {p!r}: {srcs!r}," for p, srcs in legal_sources(s["fabric"]).items()]
-    lines += ["}", ""]
+    prods, cons = fabric_numbering(s["fabric"])
+    lines += ["}", f"FABRIC_PRODUCERS = {tuple(prods)!r}  # producer numbers in the RTL (trw_fabric.v)",
+              f"FABRIC_CONSUMERS = {tuple(cons)!r}  # consumer port numbers in the RTL", ""]
     pc = s["pin_config"]
     lines += [f"PIN_CFG_BASE = {pc['base']:#06x}", f"PIN_CFG_STRIDE = {pc['stride']}",
               f"PIN_OWNER_BASE = {pc['owner_base']:#06x}",
@@ -291,6 +307,81 @@ def gen_verilog(s):
     names = [line.split()[1] for line in L if line.startswith("`define ")]
     dup = sorted({n for n in names if names.count(n) > 1})
     _check(not dup, f"generated Verilog defines collide: {', '.join(dup)}")
+    return "\n".join(L)
+
+
+def gen_fabric_verilog(s):
+    """src/trw_fabric.v: every consumer port (trw_chan_port) with its legal-source multiplexer in sel
+    order (ARCHITECTURE.md §4.6) and every producer's release term (§4.4, §14 F3)."""
+    fab = s["fabric"]
+    prods, cons = fabric_numbering(fab)
+    ls = legal_sources(fab)
+    np_, nc = len(prods), len(cons)
+    L = [f"// {HEADER}",
+         "// Channel fabric (ARCHITECTURE.md §4): the consumer ports (trw_chan_port.v) with their legal-source",
+         "// multiplexers (§4.6) and each producer's release term (§4.4, §14 F3). The producer registers belong",
+         "// to their owners (trw_chan_prod.v for pin units and HOST_IN; trw_lane.v for lane outputs).",
+         "//",
+         "// Timing contract: all_taken[p] is combinational from registered state only (the ports' en, tap, sel,",
+         "// last_seq and the producer's seq), so a take never reaches a producer in the same clock (F3).",
+         "// Configuration: cfg_we[c] writes port c from the shared cfg_* fields (F5). port_state[c] =",
+         "// {accept, sel, tap, en} for host readback.",
+         "//",
+         "// Producers: " + ", ".join(f"{i} {p}" for i, p in enumerate(prods)),
+         "// Consumers: " + ", ".join(f"{i} {c}" for i, c in enumerate(cons)),
+         "`default_nettype none", "",
+         "module trw_fabric (",
+         "    input  wire clk,",
+         "    input  wire rst_n,",
+         f"    input  wire [{np_ - 1}:0] p_valid,",
+         f"    input  wire [{np_ - 1}:0] p_seq,",
+         f"    input  wire [{np_ - 1}:0] p_load,",
+         f"    input  wire [{18 * np_ - 1}:0] p_tok,",
+         f"    output wire [{np_ - 1}:0] all_taken,",
+         f"    input  wire [{nc - 1}:0] take,",
+         f"    output wire [{nc - 1}:0] avail,",
+         f"    output wire [{18 * nc - 1}:0] head,",
+         f"    input  wire [{nc - 1}:0] cfg_we,",
+         "    input  wire cfg_en,",
+         "    input  wire cfg_tap,",
+         "    input  wire [3:0] cfg_sel,",
+         "    input  wire [3:0] cfg_accept,",
+         f"    input  wire [{nc - 1}:0] clr_dropped,",
+         f"    output wire [{10 * nc - 1}:0] port_state,",
+         f"    output wire [{8 * nc - 1}:0] dropped",
+         ");",
+         f"    wire [{nc - 1}:0] en, tap, blk, lseq;",
+         f"    wire [{4 * nc - 1}:0] sel, acc;", ""]
+    users = {p: [] for p in range(np_)}
+    for c, name in enumerate(cons):
+        srcs = [prods.index(x) for x in ls[name]]
+        for idx, p in enumerate(srcs):
+            users[p].append((c, idx))
+
+        def cat(sig, w):
+            parts = [f"{sig}[{w * p + w - 1}:{w * p}]" if w > 1 else f"{sig}[{p}]" for p in reversed(srcs)]
+            return "{" + ", ".join(parts) + "}"
+        L += [f"    // {c} {name}: " + ", ".join(f"{i} {prods[p]}" for i, p in enumerate(srcs)),
+              f"    trw_chan_port #(.N({len(srcs)})) u_c{c} (",
+              "        .clk (clk), .rst_n (rst_n),",
+              f"        .cfg_we (cfg_we[{c}]), .cfg_en (cfg_en), .cfg_tap (cfg_tap), .cfg_sel (cfg_sel),",
+              f"        .cfg_accept (cfg_accept), .clr_dropped (clr_dropped[{c}]),",
+              f"        .src_valid ({cat('p_valid', 1)}),",
+              f"        .src_seq ({cat('p_seq', 1)}),",
+              f"        .src_load ({cat('p_load', 1)}),",
+              f"        .src_tok ({cat('p_tok', 18)}),",
+              f"        .take (take[{c}]), .avail (avail[{c}]), .head (head[{18 * c + 17}:{18 * c}]),",
+              f"        .en (en[{c}]), .tap (tap[{c}]), .sel (sel[{4 * c + 3}:{4 * c}]), .accept (acc[{4 * c + 3}:{4 * c}]),",
+              f"        .blocking (blk[{c}]), .last_seq (lseq[{c}]), .dropped (dropped[{8 * c + 7}:{8 * c}])",
+              "    );",
+              f"    assign port_state[{10 * c + 9}:{10 * c}] = {{acc[{4 * c + 3}:{4 * c}], sel[{4 * c + 3}:{4 * c}], tap[{c}], en[{c}]}};",
+              ""]
+    for p in range(np_):
+        terms = [f"(!blk[{c}] || (sel[{4 * c + 3}:{4 * c}] != 4'd{i}) || (lseq[{c}] == p_seq[{p}]))"
+                 for c, i in users[p]]
+        L += [f"    // {prods[p]}: subscribers " + (", ".join(f"{cons[c]} (sel {i})" for c, i in users[p]) or "none"),
+              f"    assign all_taken[{p}] = " + ("\n        && ".join(terms) if terms else "1'b1") + ";"]
+    L += ["endmodule", ""]
     return "\n".join(L)
 
 
@@ -396,7 +487,8 @@ def splice(text, name, body, path):
 
 
 def outputs(s):
-    out = {"tools/tripwire_spec.py": gen_python(s), "src/trw_defs.vh": gen_verilog(s)}
+    out = {"tools/tripwire_spec.py": gen_python(s), "src/trw_defs.vh": gen_verilog(s),
+           "src/trw_fabric.v": gen_fabric_verilog(s)}
     tables = gen_tables(s)
     for path, names in DOC_TABLES.items():
         text = (ROOT / path).read_text()

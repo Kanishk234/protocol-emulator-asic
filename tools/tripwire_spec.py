@@ -82,6 +82,8 @@ LEGAL_SOURCES = {  # consumer port: sources in sel order (ARCHITECTURE.md §4.6)
     'U5.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
     'HOST_OUT': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'U0.rx', 'U1.rx'),
 }
+FABRIC_PRODUCERS = ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'L0.O0', 'L0.O1', 'L1.O0', 'L1.O1', 'L2.O0', 'L2.O1', 'HOST_IN')  # producer numbers in the RTL (trw_fabric.v)
+FABRIC_CONSUMERS = ('L0.I0', 'L0.I1', 'L1.I0', 'L1.I1', 'L2.I0', 'L2.I1', 'U0.tx', 'U1.tx', 'U2.tx', 'U3.tx', 'U4.tx', 'U5.tx', 'HOST_OUT')  # consumer port numbers in the RTL
 
 PIN_CFG_BASE = 0x3000
 PIN_CFG_STRIDE = 32

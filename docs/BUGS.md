@@ -69,3 +69,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** the tile flow's power-grid step.
 - **Now covered by:** the same step, plus a written constraint in D-017 (every column type must fit a full VPWR+VGND pair: grid phase between 3.9 and 19.3 µm; chosen 12.00) and a pin-position check of every tile LEF before stitching.
 - **Fix:** grid phase 12.00 (offsets 9.12 west / 50.40 others), before any commit.
+
+## 9: Chip-level routing could not finish: fabric pins faced the die edge
+- **Date:** 2026-09-27
+- **Symptom:** CI `gds` run 36277723397: detailed routing still at ~10,500 violations (Metal1 3.6K, Metal2 5.4K, Metal3 1.5K) after 27 iterations, > 3.5 h into the job (log excerpt pasted by the user).
+- **Root cause:** placement. The fabric macro sat at (11.52, 7.56), with its west face 8.6 µm from the die edge and its south face 3.8 µm from the bottom, but 152 of its 243 signal pins are on the west face (FrameData[127:0], west IO) and 67 on the south face (FrameStrobe[59:0], clock/reset). Every wire had to escape through a few tracks. I chose the location for the power and track grids only and did not check the macro's pin faces.
+- **Caught by:** the chip-level `gds` job (detailed routing did not converge).
+- **Now covered by:** the placement rule in D-019 (revision): pin-heavy macro faces must face open core; the pin-face count of the macro LEF is checked before choosing a location. The next `gds` run is the check.
+- **Fix:** macro at (890.88, 113.40), same power-grid phase.

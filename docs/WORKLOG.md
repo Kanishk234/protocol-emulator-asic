@@ -21,6 +21,28 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: channel fabric RTL)
+RTL session, from `ARCHITECTURE.md` §4 and §14 F1–F7; `tools/tripsim` not read. R4 run 4 (2 lanes) running on the branch meanwhile (`gds` 36349736069).
+
+Done:
+- `src/trw_chan_port.v` (consumer port: legal-source mux, en/tap/sel/accept registers, last_seq, DROPPED; F1, F2, F4, F5, F7) and `src/trw_chan_prod.v` (producer register; F3, F6).
+- `src/trw_fabric.v` **generated** by `tools/gen/gen.py` from the spec's legal sources (13 ports, 13 release terms); `gen.py` also exports `FABRIC_PRODUCERS` / `FABRIC_CONSUMERS` in `tools/tripwire_spec.py`. 2 new generator tests (38 in `tools/gen/tests`).
+- L1-CHAN in `test_internal/chan/`: fabric plus a producer register on all 13 producers, checked against a model of F1–F7 every clock. 7 tests: 0–4 blocking × 0–2 tap subscribers (delivery exactly once and in order, DROPPED exact), registered release, DROPPED saturation and clear, accept filter, re-pointing, sel past the list, 6,000 random clocks. **7/7 pass; `mutate.sh` 10/10 killed.**
+- Yosys: fabric 44.4K µm² (AREA.md).
+- Not in `info.yaml` / `test/Makefile` yet: the modules join when the top wires them.
+
+Checklist boxes ticked (evidence):
+- None (L1 is not complete until ALU, EVAL, PIPE, OVR, ROT and HOST exist).
+
+Problems / decisions:
+- D-044 (proposed): port registers at `0x2000 + c`, DROPPED at `0x2040 + c` (write clears), and three readings of F5 / sel / write-vs-take for the model side.
+- `pytest -m "not slow"`: 268 passed; `lint`: Verilator `-Wall` and Icarus clean on the three files.
+
+Next:
+- Krithik/Kanishk: D-044 (and still D-041 A/B, D-042).
+- Run 4 result when it finishes.
+- RTL: the host (`trw_host.v`, §9) or moving the R1 lane into `src/` (with an `out_load` output for F4 tap drops on lane producers).
+
 ## 2026-09-27: Krithik + Claude (phase 2: R4 run 3 result)
 Done:
 - R4 run 3 (36327551624, 462bf06, `CTS_APPLY_NDR` = `none`) ran the full flow in 5 h 25 min; `GDS_logs` read locally (`build/ci/r4/run3/`, not committed).

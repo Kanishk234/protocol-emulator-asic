@@ -1,0 +1,13 @@
+# Architecture identity (ARCHITECTURE.md §3): the compile flow stamps arch_version into every
+# bitstream file, the host checks it against READ_ID, and the shell's LOAD_BEGIN check rejects a
+# mismatch. Must equal ARCH_VERSION in src/tt_um_warp.v (checked by tools/compile tests).
+name: warp_g0
+arch_version: 0x0002
+macro: macro/warp_g0            # hardened fabric + tool files (fabulous/)
+fabric_rtl: macro/warp_g0/warp_g0.v
+luts: 96
+# All 5 rows have configuration latches (edge rows: north/south IO, GBUFs), and the shell's
+# ConfigFSM writes all of them per frame (src/wp_fabric_cfg.v, ROWS = 5).
+include_border_rows: true
+config_rows: 5
+config_cols: 6

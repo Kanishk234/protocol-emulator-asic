@@ -21,6 +21,24 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: the whole chip, trw_chip)
+RTL session; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- **`src/trw_chip.v`**: every block wired (D-047), lane/unit counts generated from the spec (`TRW_LANES` etc.). `src/trw_sram.v` from R3. `trw_pin_cfg.v`: `FULL` test made width-clean for Verilator. Whole chip Verilator `-Wall` clean.
+- **Chip tests** (`test_internal/chip/`, pins only, `tools/host` frames at SCK = clk/8): identity/time/SRAM/E2, lane forwarding, UART TX on U0 (full) and U3 (lean), a routine with LD/ST, and `uart.trw` loaded with `tools/host.load_sequence` and looped back. **5/5 RTL, 5/5 gate level** (Yosys netlist, TT Icarus 13).
+- `synth/chip/run_chip.sh`: **517.4K µm² + macro (~62 % of the core, ~72 % at placement)**; +10.36 typ / +4.94 slow pre-layout, worst slow path from the SRAM output into EVAL.
+- All L1 suites and `pytest` re-run: pass.
+
+Checklist boxes ticked (evidence):
+- None. "All modules exist and lint clean" waits for `tt_um_tripwire.v` to become the wrapper (the switch, D-047).
+
+Problems / decisions:
+- The chip at spec counts does not fit (~72 % at placement vs. a routable ceiling below ~59 %). `info.yaml` stays on the placeholder until the budget is set.
+
+Next:
+- Run 4 result → the area budget (lanes, full units, slots) → the switch: wrapper, `info.yaml`/`test/`, `config.json` (SRAM block, latch SDC, density) with their entries → the first real hardening on `main`.
+
 ## 2026-09-27: Krithik + Claude (phase 2: tools/host)
 Done:
 - **`tools/host`** (phase 2 task 2.3 item 7): §9 frames (`frame_write`, `frame_read`), the D-046 map from `tripwire_spec.py`, `load_sequence(image)` (every §14 H1 write: halt, all 6 unit blocks, all owners, all 13 ports, each used lane's 12 slots + K + r0–r3/STATE, SRAM, RUN), a `Host(xfer)` client (run/halt/step, lane debug block, unit flags, HOST_IN push with the busy check, HOST_OUT pop) and a `RegisterModel` to check sequences offline.

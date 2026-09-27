@@ -3,7 +3,7 @@
   "arch": "warp_tiny",
   "arch_version": "0x0001",
   "words": 302,
-  "crc32": "0x69E58B63",
+  "crc32": "0xDAC6C95D",
   "timing_corner": "nom_slow_1p08V_125C",
   "fmax_mhz": null,
   "meets_50mhz": false,

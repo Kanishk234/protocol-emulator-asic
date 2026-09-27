@@ -36,13 +36,13 @@ module tb ();
 
   // WARP (D-023): with a real fabric model (gate level or RTL), 4-state handling of the fabric's
   // unused routing loops (scripts/gen_fabric_settle.py); test_bitstream.py pulses
-  // unsettle_routing before a load and settle_routing after it.
+  // hold_x high for the whole of a load and settle_routing after it.
   reg settle_routing = 1'b0;
-  reg unsettle_routing = 1'b0;
-`ifdef GL_TEST
-  `include "fabric_settle_gl.vh"
-`elsif WARP_FABRIC_RTL
+  reg hold_x = 1'b0;
+`ifdef WARP_FABRIC_RTL
   `include "fabric_settle_rtl.vh"
+`elsif GL_TEST
+  `include "fabric_settle_gl.vh"
 `endif
 
 endmodule

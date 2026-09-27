@@ -1,54 +1,89 @@
-# routing for net '$FAB_IO2$iobuf_i'
+# routing for net '$pad_X2Y2_D$iobuf_i'
 
 
-# routing for net 'FAB_OUT1'
+# routing for net '$pad_X2Y2_C$iobuf_i'
 
 
-# routing for net 'rst_n'
+# routing for net 'pad_X2Y2_B'
 
 
-# routing for net 'FAB_OUT0'
+# routing for net '$pad_X2Y2_B$iobuf_i'
 
 
-# routing for net '$PACKER_GND'
-
-X0Y1.GND0.C_IN
-X2Y2.GND0.A_EN
-X2Y2.GND0.B_EN
-X2Y2.GND0.C_EN
-X2Y2.GND0.D_EN
-X1Y3.GND0.A_EN
-X1Y3.GND0.B_EN
-
-# routing for net 'FAB_IO3'
+# routing for net '$pad_X2Y2_A$iobuf_i'
 
 
-# routing for net '$techmap147$iopadmap$warp_top.FAB_IO3[0].OUT'
+# routing for net 'pad_X2Y2_A'
 
 
-# routing for net 'clk'
+# routing for net '$pad_X2Y1_D$iobuf_i'
 
 
-# routing for net 'FAB_IO2'
+# routing for net '$pad_X2Y1_C$iobuf_i'
 
 
-# routing for net 'w_FAB_IO3_o'
+# routing for net 'pad_X2Y1_D'
 
-X0Y1.C_OUT.E1BEG6
-X0Y1.W2MID1.D_IN
-X0Y1.E1BEG6.E1END6
-X1Y1.JW2END1.W2BEG1
-X1Y1.E1END6.JW2BEG1
-X1Y1.W2BEG1.W2MID1
-X1Y1.JW2BEG1.JW2END1
 
-# routing for net '$iopadmap$clk'
+# routing for net '$pad_X2Y1_B$iobuf_i'
+
+
+# routing for net 'pad_X2Y1_C'
+
+
+# routing for net '$pad_X2Y1_A$iobuf_i'
+
+
+# routing for net 'pad_X2Y1_B'
+
+
+# routing for net '$pad_X1Y3_B$iobuf_i'
+
+
+# routing for net 'pad_X2Y1_A'
+
+
+# routing for net '$pad_X1Y3_A$iobuf_i'
+
+
+# routing for net 'pad_X1Y3_B'
+
+
+# routing for net '$pad_X0Y1_D$iobuf_i'
+
+
+# routing for net '$pad_X0Y1_C$iobuf_i'
+
+
+# routing for net 'pad_X1Y3_A'
+
+
+# routing for net 'w_X1Y3_A_i'
 
 X0Y3.W_GBUF_FEED_END0.GBUF_A_IN
 X1Y3.A_OUT.W_GBUF_FEED_BEG0
 X1Y3.W_GBUF_FEED_BEG0.W_GBUF_FEED_END0
 
-# routing for net 'FAB_IN3'
+# routing for net 'pad_X2Y2_D'
+
+
+# routing for net '$PACKER_GND'
+
+X0Y1.GND0.C_IN
+X2Y2.GND0.A_IN
+X2Y2.GND0.A_EN
+X2Y2.GND0.B_IN
+X2Y2.GND0.B_EN
+X2Y2.GND0.C_IN
+X2Y2.GND0.C_EN
+X2Y2.GND0.D_IN
+X2Y2.GND0.D_EN
+X1Y3.GND0.A_IN
+X1Y3.GND0.A_EN
+X1Y3.GND0.B_IN
+X1Y3.GND0.B_EN
+
+# routing for net 'pad_X0Y1_D'
 
 
 # routing for net '$PACKER_VCC'
@@ -59,37 +94,35 @@ X2Y1.VCC0.B_EN
 X2Y1.VCC0.C_EN
 X2Y1.VCC0.D_EN
 
-# routing for net 'FAB_IN2'
+# routing for net 'pad_X0Y1_C'
 
 
-# routing for net 'FAB_OUT3'
+# routing for net 'w_X0Y1_C_i'
+
+X0Y1.C_OUT.E2BEGb2
+X0Y1.W2MID1.D_IN
+X0Y1.E2BEGb2.E2END2
+X1Y1.JW2END1.W2BEG1
+X1Y1.E2END2.JW2BEG1
+X1Y1.W2BEG1.W2MID1
+X1Y1.JW2BEG1.JW2END1
+
+# routing for net 'pad_X2Y2_C'
 
 
-# routing for net 'FAB_IN1'
+# routing for net 'w_X2Y1_D_o'
 
+X1Y1.JE2END1.E2BEG1
+X1Y1.N1END2.JE2BEG1
+X1Y1.E2BEG1.E2MID1
+X1Y1.JE2BEG1.JE2END1
+X2Y1.E2MID1.D_IN
+X1Y2.LE_O.N1BEG2
+X1Y2.N1BEG2.N1END2
 
-# routing for net '$FAB_IO3$iobuf_i'
+# routing for net 'w_X1Y3_A_gclk'
 
-
-# routing for net 'FAB_IN0'
-
-
-# routing for net 'FAB_OUT2'
-
-
-# routing for net 'u_user.r'
-
-X1Y1.J_l_GH_END3.E1BEG2
-X1Y1.N1END4.J_l_GH_BEG3
-X1Y1.E1BEG2.E1END2
-X1Y1.J_l_GH_BEG3.J_l_GH_END3
-X2Y1.E1END2.D_IN
-X1Y2.LG_O.N1BEG4
-X1Y2.N1BEG4.N1END4
-
-# routing for net 'clk_gbuf'
-
-X1Y2.GCLK_END0.LG_CLK
+X1Y2.GCLK_END0.LE_CLK
 X1Y2.N_GBUF_END0.GCLK_BEG0
 X1Y2.GCLK_BEG0.GCLK_END0
 X0Y3.GBUF_A_OUT.E_GBUF_BEG0
@@ -97,204 +130,214 @@ X0Y3.E_GBUF_BEG0.E_GBUF_END0
 X1Y3.E_GBUF_END0.N_GBUF_BEG0
 X1Y3.N_GBUF_BEG0.N_GBUF_END0
 
-# routing for net '$abc$188$auto$rtlil.cc:3501:NotGate$183'
+# routing for net '$abc$174$auto$rtlil.cc:3501:NotGate$169'
 
-X1Y2.J_SR_END0.LG_SR
-X1Y2.LE_O.JS2BEG1
-X1Y2.JS2END1.J_SR_BEG0
-X1Y2.JS2BEG1.JS2END1
+X1Y2.J_SR_END0.LE_SR
+X1Y2.JN2END6.J2MID_GHa_BEG0
+X1Y2.LB_O.JN2BEG6
+X1Y2.J2MID_GHa_END0.J_SR_BEG0
+X1Y2.J2MID_GHa_BEG0.J2MID_GHa_END0
+X1Y2.JN2BEG6.JN2END6
 X1Y2.J_SR_BEG0.J_SR_END0
 
-# routing for net 'u_user.rst_n'
+# routing for net 'w_X1Y3_B_i'
 
-X1Y2.J2MID_EFb_END0.LE_I0
-X1Y2.N2MID7.J2MID_EFb_BEG0
-X1Y2.J2MID_EFb_BEG0.J2MID_EFb_END0
-X1Y3.B_OUT.N2BEG7
-X1Y3.N2BEG7.N2MID7
+X1Y2.J2MID_ABb_END3.LB_I3
+X1Y2.N2MID1.J2MID_ABb_BEG3
+X1Y2.J2MID_ABb_BEG3.J2MID_ABb_END3
+X1Y3.B_OUT.N2BEG1
+X1Y3.N2BEG1.N2MID1
 
-# routing for net 'u_user.y[2]'
+# routing for net 'w_X2Y1_C_o'
 
-X1Y1.JE2END1.E2BEG1
-X1Y1.LF_O.JE2BEG1
-X1Y1.E2BEG1.E2MID1
-X1Y1.JE2BEG1.JE2END1
-X2Y1.E2MID1.C_IN
+X1Y1.J_l_CD_END2.E1BEG4
+X1Y1.N1END5.J_l_CD_BEG2
+X1Y1.E1BEG4.E1END4
+X1Y1.J_l_CD_BEG2.J_l_CD_END2
+X2Y1.E1END4.C_IN
+X1Y2.LH_O.N1BEG5
+X1Y2.N1BEG5.N1END5
 
-# routing for net '$abc$188$flatten\u_user.$xor$/home/younix/protocol-emulator-asic/tools/compile/examples/logic4.v:18$3_Y'
+# routing for net '$abc$174$flatten\u_user.$xor$/home/younix/protocol-emulator-asic/tools/compile/examples/logic4.v:18$3_Y'
 
 
-# routing for net 'w_FAB_IO2_oe'
+# routing for net 'w_X0Y1_C_oe'
 
+X1Y0.N2END4.S2BEG3
+X1Y0.S2BEG3.S2MID3
 X0Y1.W1END2.E2BEGb5
 X0Y1.W2MID4.C_EN
 X0Y1.E2BEGb5.E2END5
-X1Y1.J2MID_GHb_END1.S1BEG2
+X1Y1.N2MID4.N2BEGb4
 X1Y1.J2MID_GHb_END1.W1BEG2
 X1Y1.JW2END4.W2BEG4
-X1Y1.N2MID3.J2MID_GHb_BEG1
+X1Y1.S2MID3.J2MID_GHb_BEG1
 X1Y1.E2END5.JW2BEG4
-X1Y1.S1BEG2.S1END2
+X1Y1.N2BEGb4.N2END4
 X1Y1.W1BEG2.W1END2
 X1Y1.W2BEG4.W2MID4
 X1Y1.J2MID_GHb_BEG1.J2MID_GHb_END1
 X1Y1.JW2BEG4.JW2END4
-X0Y2.W2MID1.E2BEG6
-X0Y2.E2BEG6.E2MID6
-X1Y2.JN2END3.N2BEG3
-X1Y2.JW2END1.W2BEG1
-X1Y2.J2MID_GHa_END0.LG_I0
-X1Y2.E2MID6.J2MID_GHa_BEG0
-X1Y2.W2END4.JN2BEG3
-X1Y2.S1END2.JW2BEG1
-X1Y2.N2BEG3.N2MID3
-X1Y2.W2BEG1.W2MID1
-X1Y2.J2MID_GHa_BEG0.J2MID_GHa_END0
-X1Y2.JN2BEG3.JN2END3
-X1Y2.JW2BEG1.JW2END1
-X2Y2.D_OUT.W2BEGb4
-X2Y2.W2BEGb4.W2END4
+X0Y2.W1END2.E2BEGb5
+X0Y2.E2BEGb5.E2END5
+X1Y2.JN2END4.N2BEG4
+X1Y2.J_l_GH_END3.E1BEG2
+X1Y2.J_l_GH_END3.W1BEG2
+X1Y2.J_l_EF_END3.LE_I3
+X1Y2.E2END5.JN2BEG4
+X1Y2.W1END5.J_l_EF_BEG3
+X1Y2.W2END0.J_l_GH_BEG3
+X1Y2.N2BEG4.N2MID4
+X1Y2.E1BEG2.E1END2
+X1Y2.W1BEG2.W1END2
+X1Y2.JN2BEG4.JN2END4
+X1Y2.J_l_EF_BEG3.J_l_EF_END3
+X1Y2.J_l_GH_BEG3.J_l_GH_END3
+X2Y2.E1END2.W1BEG5
+X2Y2.D_OUT.W2BEGb0
+X2Y2.W1BEG5.W1END5
+X2Y2.W2BEGb0.W2END0
 
-# routing for net 'u_user.a[2]'
+# routing for net 'w_X2Y2_C_i'
 
-X1Y1.J2MID_EFa_END1.LF_I1
-X1Y1.N2MID2.J2MID_EFa_BEG1
-X1Y1.J2MID_EFa_BEG1.J2MID_EFa_END1
-X0Y2.W2END2.E1BEG5
-X0Y2.E1BEG5.E1END5
-X1Y2.JN2END2.N2BEG2
-X1Y2.W2MID2.W2BEGb2
-X1Y2.J2MID_GHa_END1.LG_I1
-X1Y2.W2MID2.J2MID_GHa_BEG1
-X1Y2.E1END5.JN2BEG2
-X1Y2.N2BEG2.N2MID2
-X1Y2.W2BEGb2.W2END2
-X1Y2.J2MID_GHa_BEG1.J2MID_GHa_END1
-X1Y2.JN2BEG2.JN2END2
-X2Y2.C_OUT.W2BEG2
-X2Y2.W2BEG2.W2MID2
+X1Y2.JE2END3.E2BEG3
+X1Y2.J_l_EF_END1.LE_I1
+X1Y2.J2MID_GHa_END2.LH_I2
+X1Y2.W2MID4.J2MID_GHa_BEG2
+X1Y2.W1END6.JE2BEG3
+X1Y2.JE2END3.J_l_EF_BEG1
+X1Y2.E2BEG3.E2MID3
+X1Y2.J2MID_GHa_BEG2.J2MID_GHa_END2
+X1Y2.JE2BEG3.JE2END3
+X1Y2.J_l_EF_BEG1.J_l_EF_END1
+X2Y2.C_OUT.W1BEG6
+X2Y2.E2MID3.W2BEG4
+X2Y2.W1BEG6.W1END6
+X2Y2.W2BEG4.W2MID4
 
-# routing for net 'u_user.y[1]'
-
-X1Y1.LD_O.E1BEG0
-X1Y1.E1BEG0.E1END0
-X2Y1.E1END0.B_IN
-
-# routing for net 'u_user.y[0]'
+# routing for net 'w_X2Y1_B_o'
 
 X1Y1.JE2END0.E2BEG0
-X1Y1.LC_O.JE2BEG0
+X1Y1.LH_O.JE2BEG0
 X1Y1.E2BEG0.E2MID0
 X1Y1.JE2BEG0.JE2END0
-X2Y1.E2MID0.A_IN
+X2Y1.E2MID0.B_IN
 
-# routing for net 'u_user.a[1]'
+# routing for net 'w_X2Y1_A_o'
 
-X1Y1.J_l_CD_END2.LC_I2
-X1Y1.J_l_CD_END2.LD_I2
-X1Y1.N1END7.JS2BEG2
-X1Y1.JS2END2.J_l_CD_BEG2
-X1Y1.JS2BEG2.JS2END2
-X1Y1.J_l_CD_BEG2.J_l_CD_END2
-X1Y2.J_l_AB_END1.N1BEG7
-X1Y2.W1END5.JE2BEG1
-X1Y2.JE2END1.J_l_AB_BEG1
-X1Y2.N1BEG7.N1END7
-X1Y2.JE2BEG1.JE2END1
-X1Y2.J_l_AB_BEG1.J_l_AB_END1
-X2Y2.B_OUT.W1BEG5
-X2Y2.W1BEG5.W1END5
+X1Y1.LA_O.E1BEG6
+X1Y1.E1BEG6.E1END6
+X2Y1.E1END6.A_IN
 
-# routing for net 'u_user.a[0]'
+# routing for net 'w_X2Y2_B_i'
 
-X1Y0.N2END6.S2BEGb3
-X1Y0.S2BEGb3.S2END3
-X1Y1.N2MID6.N2BEGb6
-X1Y1.J_l_CD_END0.LC_I0
-X1Y1.J_l_CD_END0.LD_I0
-X1Y1.S2END3.JN2BEG2
-X1Y1.JN2END2.J_l_CD_BEG0
-X1Y1.N2BEGb6.N2END6
-X1Y1.JN2BEG2.JN2END2
-X1Y1.J_l_CD_BEG0.J_l_CD_END0
-X1Y2.JN2END6.N2BEG6
-X1Y2.W2END7.JN2BEG6
-X1Y2.N2BEG6.N2MID6
-X1Y2.JN2BEG6.JN2END6
-X2Y2.A_OUT.W2BEGb7
-X2Y2.W2BEGb7.W2END7
+X1Y0.N2END5.S2BEGb2
+X1Y0.S2BEGb2.S2END2
+X1Y1.N2MID5.N2BEGb5
+X1Y1.J2END_AB_END1.LA_I1
+X1Y1.J2MID_GHb_END2.LH_I2
+X1Y1.N2MID5.J2MID_GHb_BEG2
+X1Y1.S2END2.J2END_AB_BEG1
+X1Y1.N2BEGb5.N2END5
+X1Y1.J2MID_GHb_BEG2.J2MID_GHb_END2
+X1Y1.J2END_AB_BEG1.J2END_AB_END1
+X1Y2.JN2END5.N2BEG5
+X1Y2.W2END6.JN2BEG5
+X1Y2.N2BEG5.N2MID5
+X1Y2.JN2BEG5.JN2END5
+X2Y2.B_OUT.W2BEGb6
+X2Y2.W2BEGb6.W2END6
 
-# config for cell '$PACKER_VCC_DRV'
+# routing for net 'w_X2Y2_A_i'
 
+X1Y0.N2END2.S2BEG5
+X1Y0.S2BEG5.S2MID5
+X1Y1.N2MID2.N2BEGb2
+X1Y1.J2MID_ABb_END2.LA_I2
+X1Y1.J2MID_GHa_END1.LH_I1
+X1Y1.N2MID2.J2MID_GHa_BEG1
+X1Y1.S2MID5.J2MID_ABb_BEG2
+X1Y1.N2BEGb2.N2END2
+X1Y1.J2MID_GHa_BEG1.J2MID_GHa_END1
+X1Y1.J2MID_ABb_BEG2.J2MID_ABb_END2
+X1Y2.JN2END2.N2BEG2
+X1Y2.W2END3.JN2BEG2
+X1Y2.N2BEG2.N2MID2
+X1Y2.JN2BEG2.JN2END2
+X2Y2.A_OUT.W2BEGb3
+X2Y2.W2BEGb3.W2END3
 
-# config for cell '$iopadmap$warp_top.FAB_OUT0'
-
-
-# config for cell '$iopadmap$warp_top.clk'
-
-
-# config for cell '$iopadmap$warp_top.FAB_IO3[0]'
-
-
-# config for cell 'u_clk_gbuf'
+# config for cell 'u_X2Y1_B'
 
 
-# config for cell '$iopadmap$warp_top.FAB_IO2[0]'
+# config for cell 'u_X2Y2_C'
 
 
-# config for cell '$iopadmap$warp_top.FAB_OUT3'
+# config for cell 'u_X2Y1_A'
 
 
-# config for cell '$iopadmap$warp_top.FAB_IN3'
+# config for cell 'u_X2Y1_D'
+
+
+# config for cell 'u_X2Y2_B'
+
+
+# config for cell 'u_X1Y3_B'
+
+
+# config for cell 'u_X1Y3_A_gbuf'
 
 
 # config for cell '$PACKER_GND_DRV'
 
 
-# config for cell '$iopadmap$warp_top.FAB_IN2'
+# config for cell '$PACKER_VCC_DRV'
 
 
-# config for cell '$iopadmap$warp_top.FAB_OUT2'
+# config for cell 'u_X1Y3_A'
 
 
-# config for cell '$iopadmap$warp_top.FAB_IN1'
+# config for cell 'u_X2Y2_D'
 
 
-# config for cell '$iopadmap$warp_top.rst_n'
+# config for cell 'u_X0Y1_D'
 
 
-# config for cell '$iopadmap$warp_top.FAB_IN0'
+# config for cell 'u_X2Y1_C'
 
 
-# config for cell '$iopadmap$warp_top.FAB_OUT1'
+# config for cell 'u_X0Y1_C'
 
 
-# config for cell '$abc$188$auto$blifparse.cc:557:parse_blif$193'
+# config for cell 'u_X2Y2_A'
 
- # permute phys 0 log 0
-X1Y2.E.INIT[15:0] = 16'b0101010101010101
 
-# config for cell '$abc$188$auto$blifparse.cc:557:parse_blif$192'
+# config for cell '$abc$174$auto$blifparse.cc:557:parse_blif$179'
+
+ # permute phys 3 log 0
+X1Y2.B.INIT[15:0] = 16'b0000000011111111
+
+# config for cell '$abc$174$auto$blifparse.cc:557:parse_blif$178'
+
+ # permute phys 2 log 0
+X1Y2.H.INIT[15:0] = 16'b0000111100001111
+
+# config for cell '$abc$174$auto$blifparse.cc:557:parse_blif$177'
 
  # permute phys 1 log 0
-X1Y1.F.INIT[15:0] = 16'b0011001100110011
+ # permute phys 3 log 1
+X1Y2.E.INIT[15:0] = 16'b0011001111001100
+X1Y2.E.FF
 
-# config for cell '$abc$188$auto$blifparse.cc:557:parse_blif$191'
+# config for cell '$abc$174$auto$blifparse.cc:557:parse_blif$176'
 
- # permute phys 0 log 1
  # permute phys 1 log 0
-X1Y2.G.INIT[15:0] = 16'b0110011001100110
-X1Y2.G.FF
-
-# config for cell '$abc$188$auto$blifparse.cc:557:parse_blif$190'
-
- # permute phys 0 log 0
  # permute phys 2 log 1
-X1Y1.D.INIT[15:0] = 16'b0101101001011010
+X1Y1.H.INIT[15:0] = 16'b0011110000111100
 
-# config for cell '$abc$188$auto$blifparse.cc:557:parse_blif$189'
+# config for cell '$abc$174$auto$blifparse.cc:557:parse_blif$175'
 
- # permute phys 0 log 0
- # permute phys 2 log 1
-X1Y1.C.INIT[15:0] = 16'b1010000010100000
+ # permute phys 1 log 1
+ # permute phys 2 log 0
+X1Y1.A.INIT[15:0] = 16'b1100000011000000
 

@@ -31,14 +31,16 @@ VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 
 endif
 
-# WARP (D-019, D-022): the fabric macro model. The macro is not in info.yaml source_files /
+# WARP (D-019, D-022, D-023): the fabric macro model. The macro is not in info.yaml source_files /
 # PROJECT_SOURCES (it is the MACROS entry in src/config.json), so the tests add it here:
-#   gl   (GATES=yes, CI gl_test): the hardened macro's gate-level netlists (macro/warp_tiny)
-#   rtl  (WARP_FABRIC=rtl):       the generated fabric RTL + the pinned tile library's primitives
-#   stub (default, CI test job):  the port-only black box src/warp_tiny.v; bitstream tests skip
+#   rtl  (GATES=yes default, CI gl_test; or WARP_FABRIC=rtl): the generated fabric RTL the macro
+#        was hardened from + the pinned tile library's primitives (fetched by scripts/fetch_tiles.sh)
+#   gl   (WARP_FABRIC=gl, local): the hardened macro's gate-level netlists; zero-delay simulation of
+#        the fabric's unused routing loops can hang on LUT static hazards (D-023)
+#   stub (default without GATES, CI test job): the port-only black box; bitstream tests skip
 MACRO_DIR = $(PWD)/../macro/warp_tiny
 ifeq ($(GATES),yes)
-WARP_FABRIC = gl
+WARP_FABRIC ?= rtl
 else
 WARP_FABRIC ?= stub
 endif

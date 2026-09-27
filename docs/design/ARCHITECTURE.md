@@ -113,20 +113,26 @@ Each direction has a 2-entry FIFO in the shell (D-021; revisit with the fabric's
 
 ## 8. Hard primitives
 
-**Candidates only in v1** (profiling ranks 1–2, D-016). Each becomes part of the architecture only through the phase 3 method: DECISIONS entry (profiling data, users, area, cost to non-users), Yosys mapping, nextpnr placement, bitstream configuration, and a compiled user design using it after loading through §3.
+**Candidates** (profiling ranks 1–2, D-016; G1 builds them, D-026). Each becomes part of the architecture only through the phase 3 method: DECISIONS entry (profiling data, users, area, cost to non-users), Yosys mapping, nextpnr placement, bitstream configuration, and a compiled user design using it after loading through §3.
 
-### 8.1 Timer (loadable down-counter)
-- Config bits (per bitstream): `RELOAD[15:0]`, `MODE` (free-running / one-shot).
-- Inputs: `en`, `load`, `half`. Outputs: `tc`.
-- Behaviour (sketch; cycle-exact spec in phase 3): on `load`, count := `half` ? RELOAD/2 : RELOAD; while `en`, count decrements; `tc` = en ∧ count = 0; at 0 it reloads (free-running) or stops (one-shot).
-- Users (design set): UART (2), SPI controller (1), I2C controller (1).
+### 8.1 Timer (loadable down-counter), `wp_timer`
+- Config bits (per bitstream): `RELOAD[15:0]`, `ONESHOT`.
+- Inputs (from routing): `rst`, `load`, `half`, `en`. Output: `tc`. Clock: the tile's global clock.
+- **Cycle-exact behaviour** (state `count[15:0]`, `armed`; priority rst > load > en; v2 of this section, 2026-09-27):
+  - `tc` = `en` ∧ `armed` ∧ (`count` = 0) (combinational from the current state and `en`);
+  - on the clock edge: `rst` → `count` := RELOAD, `armed` := 1; else `load` → `count` := (`half` ? RELOAD ≫ 1 : RELOAD), `armed` := 1; else if `en` ∧ `armed`: `count` = 0 → (`count` := RELOAD, `armed` := ¬ONESHOT), otherwise `count` := `count` − 1.
+  - So with `en` held high a free-running timer pulses `tc` every RELOAD + 1 cycles (a divider by N uses RELOAD = N − 1), and `load` with `half` gives the first `tc` after RELOAD/2 + 1 cycles (sampling at mid-bit).
+- Users (design set): UART (2: TX bit timer, RX bit timer), SPI controller (1: SCK half-period), I2C controller (1: quarter period).
 
-### 8.2 Shift register with bit count
-- Config bits: `LEN[3:0]` (1–10 bits), `MSB_FIRST`.
-- Inputs: `load`, `d[7:0]`, `step`, `sin`. Outputs: `sout`, `q[7:0]`, `done`.
-- Behaviour (sketch): `load` takes `d` and clears the count; each `step` shifts one bit in from `sin` and out on `sout`; `done` after LEN steps.
-- Users (design set): all four.
-- **OPEN:** parallel port width (8 vs 10) against the tile's port budget.
+### 8.2 Shift register with bit count, `wp_shift`
+- Config bits: `LEN[3:0]` (steps until `done`, 1–15), `MSB_FIRST`.
+- Inputs: `rst`, `load`, `d[7:0]`, `step`, `sin`. Outputs: `sout`, `q[7:0]`, `done`.
+- **Cycle-exact behaviour** (state `sr[7:0]`, `n[3:0]`; priority rst > load > step):
+  - `sout` = MSB_FIRST ? `sr[7]` : `sr[0]`; `q` = `sr`; `done` = (`n` = LEN) (combinational from the state);
+  - on the clock edge: `rst` → `sr` := 0, `n` := 0; else `load` → `sr` := `d`, `n` := 0; else `step` → `sr` := MSB_FIRST ? {`sr[6:0]`, `sin`} : {`sin`, `sr[7:1]`}, `n` := (`n` = LEN ? `n` : `n` + 1).
+  - Transmit: `load` a byte, then `step` LEN times, `sout` carries each bit. Receive: `step` with `sin` = the line, `q` holds the byte when `done`.
+- Users (design set): all four (UART TX/RX data, SPI MOSI/MISO, I2C controller and target data).
+- Parallel width 8 (the design set moves bytes; frames longer than 8 bits, such as UART start/stop, are sequenced by user logic). **OPEN:** how many timers and shift registers one primitive tile holds, set by the tile's port budget (§9, D-026).
 
 ## 9. Architecture variants under evaluation
 All compared at equal total area and the same clock target (D-004); results in `docs/reports/architecture_comparison.md` (phase 3).

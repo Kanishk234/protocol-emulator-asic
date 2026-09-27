@@ -85,3 +85,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** LibreLane config loading in CI.
 - **Now covered by:** a local run of TT's merged config (`src/config_merged.json` from `tt_tool --create-user-config`) with the Nix LibreLane before pushing: it loads the config and runs through synthesis, floorplan, macro placement, the power grid (all LOOMPDN checks pass), global routing (0 overflow, 3.5 % usage) and detailed routing (0 violations, < 2 min). A comment in `config.json` warns against nested `"//"`.
 - **Fix:** comments moved above the block.
+
+## 11: Precheck pin check: pdngen added short power stripes beside the fabric
+- **Date:** 2026-09-27
+- **Symptom:** CI run 36293031051: `gds` and `gl_test` passed, precheck failed the pin check: `Port VGND/VDPWR is too far from bottom/top edge of module: 98.06 > 10 um` (4 errors).
+- **Root cause:** with the fabric at x 890.88, the standard-cell rails in the 38 µm channel between the fabric and the core's east edge were not crossed by any grid stripe (the last pair runs inside the fabric, the next would be off the die). pdngen then adds a short "channel" stripe pair (x 1270.08 / 1274.40, y 98.06–612.58, the fabric's height plus halo), and TT requires every power port to span the block height.
+- **Caught by:** TT precheck pin check (`pin_check.py`).
+- **Now covered by:** a local stripe check after the power grid (every vertical Metal4 power stripe must reach within 10 µm of the top and bottom edges), run on TT's merged config before pushing. It flags both short stripes in the failed run's final DEF and finds none with the fix. Rule added to D-019: leave either no channel or one wide enough for a full grid stripe pair beside a macro.
+- **Fix:** fabric at x = 780.96 (one grid step left): the 148 µm east channel holds a regular stripe pair; 24 full-height stripes, 0 short; routing 0 overflow, 0 DRC locally.

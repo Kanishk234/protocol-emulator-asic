@@ -3,7 +3,7 @@
 # For WARP the macro is the fabric `warp_tiny` (macro/warp_tiny/): its Metal4 power pins are
 # full-height columns at macro-local x centres 12.00 + 109.92 k (VPWR) and 16.10 + 109.92 k (VGND),
 # and src/config.json sets FP_PDN_VPITCH 109.92 / VWIDTH 2.1 / VSPACING 2.0 / VOFFSET 20.64 with
-# the macro at x = 890.88 (= 11.52 + 8 x 109.92), so every chip stripe that crosses the macro runs inside one of those
+# the macro at x = 780.96 (= 11.52 + 7 x 109.92), so every chip stripe that crosses the macro runs inside one of those
 # columns. The wrapper's checks below (stripes inside same-net pins, every pin reached,
 # check_power_grid) apply unchanged. The SRAM-specific geometry notes below do not apply.
 #

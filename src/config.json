@@ -32,9 +32,11 @@
   "CLOCK_PORT": "clk",
 
   "//": "WARP (DECISIONS D-019): the fabric macro warp_tiny (macro/warp_tiny/, 357.12 x 483.84 um).",
-  "//": "Placed at the east side, centred vertically: its 152 west-face pins (FrameData, west IO) and",
-  "//": "67 south-face pins (FrameStrobe, clock/reset) face open core (BUGS #9). x = 11.52 + 8 x 109.92",
-  "//": "(power columns under the chip stripes, D-017) = 1856 x 0.48; y = 270 x 0.42 = 30 rows.",
+  "//": "Placed right of centre, centred vertically: its 152 west-face pins (FrameData, west IO) and",
+  "//": "67 south-face pins (FrameStrobe, clock/reset) face open core (BUGS #9). x = 11.52 + 7 x 109.92",
+  "//": "(power columns under the chip stripes, D-017) = 1627 x 0.48; y = 270 x 0.42 = 30 rows.",
+  "//": "The 148 um channel east of it holds a full-height stripe pair, so pdngen adds no short",
+  "//": "channel stripe there (TT pin check: power ports must span the block height, BUGS #11).",
   "//": "Its nl is the port-only black box src/warp_tiny.v (not in info.yaml source_files), as the",
   "//": "R3 SRAM spike did: synthesis and STA see only its pins (D-019 revision 2).",
   "//": "No '//' keys inside MACROS: LibreLane rejects unknown keys in a Macro (BUGS #10).",
@@ -42,7 +44,7 @@
     "warp_tiny": {
       "instances": {
         "u_fabric": {
-          "location": [890.88, 113.40],
+          "location": [780.96, 113.40],
           "orientation": "N"
         }
       },

@@ -1,0 +1,182 @@
+# routing for net '$pad_X2Y0_A$iobuf_i'
+
+
+# routing for net 'pad_X2Y4_A'
+
+
+# routing for net '$pad_X1Y4_B$iobuf_i'
+
+
+# routing for net '$pad_X1Y4_A$iobuf_i'
+
+
+# routing for net 'pad_X2Y0_A'
+
+
+# routing for net '$pad_X1Y0_A$iobuf_i'
+
+
+# routing for net '$pad_X0Y3_D$iobuf_i'
+
+
+# routing for net 'pad_X1Y4_B'
+
+
+# routing for net 'w_X1Y4_B_i'
+
+
+# routing for net '$pad_X0Y3_C$iobuf_i'
+
+
+# routing for net '$pad_X0Y3_B$iobuf_i'
+
+
+# routing for net 'w_X1Y4_A_gclk'
+
+
+# routing for net 'pad_X1Y4_A'
+
+
+# routing for net 'w_X1Y4_A_i'
+
+X0Y4.W_GBUF_FEED_END2.GBUF_C_IN
+X1Y4.A_OUT.W_GBUF_FEED_BEG2
+X1Y4.W_GBUF_FEED_BEG2.W_GBUF_FEED_END2
+
+# routing for net '$pad_X0Y3_A$iobuf_i'
+
+
+# routing for net 'pad_X4Y0_A'
+
+
+# routing for net 'pad_X1Y0_A'
+
+
+# routing for net '$PACKER_GND'
+
+X1Y0.N1END7.A_IN
+X1Y0.GND0.A_EN
+X2Y0.N1END5.A_IN
+X2Y0.GND0.A_EN
+X3Y0.N1END5.A_IN
+X3Y0.GND0.A_EN
+X4Y0.N1END7.A_IN
+X4Y0.GND0.A_EN
+X1Y1.LB_O.N1BEG7
+X1Y1.N1BEG7.N1END7
+X2Y1.LH_O.N1BEG5
+X2Y1.N1BEG5.N1END5
+X3Y1.LH_O.N1BEG5
+X3Y1.N1BEG5.N1END5
+X4Y1.LB_O.N1BEG7
+X4Y1.N1BEG7.N1END7
+X0Y3.GND0.A_IN
+X0Y3.GND0.A_EN
+X0Y3.GND0.B_IN
+X0Y3.GND0.B_EN
+X0Y3.GND0.C_IN
+X0Y3.GND0.C_EN
+X0Y3.GND0.D_IN
+X0Y3.GND0.D_EN
+X1Y4.GND0.A_IN
+X1Y4.GND0.A_EN
+X1Y4.GND0.B_IN
+X1Y4.GND0.B_EN
+X2Y4.GND0.A_IN
+X2Y4.GND0.B_IN
+X3Y4.GND0.A_IN
+X1Y1.B.INIT[15:0] = 16'b0000000000000000
+X2Y1.H.INIT[15:0] = 16'b0000000000000000
+X3Y1.H.INIT[15:0] = 16'b0000000000000000
+X4Y1.B.INIT[15:0] = 16'b0000000000000000
+
+# routing for net '$PACKER_VCC'
+
+X2Y4.VCC0.A_EN
+X2Y4.VCC0.B_EN
+X3Y4.VCC0.A_EN
+
+# routing for net 'pad_X0Y3_D'
+
+
+# routing for net 'pad_X3Y4_A'
+
+
+# routing for net '$pad_X4Y0_A$iobuf_i'
+
+
+# routing for net 'pad_X0Y3_C'
+
+
+# routing for net '$pad_X3Y4_A$iobuf_i'
+
+
+# routing for net 'pad_X3Y0_A'
+
+
+# routing for net 'pad_X0Y3_B'
+
+
+# routing for net '$pad_X3Y0_A$iobuf_i'
+
+
+# routing for net '$pad_X2Y4_B$iobuf_i'
+
+
+# routing for net 'pad_X0Y3_A'
+
+
+# routing for net 'pad_X2Y4_B'
+
+
+# routing for net '$pad_X2Y4_A$iobuf_i'
+
+
+# config for cell 'u_X1Y4_A'
+
+
+# config for cell '$PACKER_VCC_DRV'
+
+
+# config for cell 'u_X4Y0_A'
+
+
+# config for cell 'u_X1Y0_A'
+
+
+# config for cell 'u_X2Y4_B'
+
+
+# config for cell 'u_X2Y4_A'
+
+
+# config for cell 'u_X0Y3_D'
+
+
+# config for cell 'u_X3Y4_A'
+
+
+# config for cell 'u_X1Y4_B'
+
+
+# config for cell 'u_X0Y3_C'
+
+
+# config for cell 'u_X1Y4_A_gbuf'
+
+
+# config for cell 'u_X3Y0_A'
+
+
+# config for cell 'u_X0Y3_B'
+
+
+# config for cell 'u_X2Y0_A'
+
+
+# config for cell '$PACKER_GND_DRV'
+
+
+# config for cell 'u_X0Y3_A'
+
+

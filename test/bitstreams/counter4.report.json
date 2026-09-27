@@ -1,20 +1,20 @@
 {
   "design": "counter4",
-  "arch": "warp_tiny",
-  "arch_version": "0x0001",
-  "words": 302,
-  "crc32": "0x9DEBAF9E",
+  "arch": "warp_g0",
+  "arch_version": "0x0002",
+  "words": 722,
+  "crc32": "0x3821C608",
   "timing_corner": "nom_slow_1p08V_125C",
   "fmax_mhz": 162.6,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {
       "used": 7,
-      "available": 16
+      "available": 96
     },
     "IOBUF": {
       "used": 10,
-      "available": 18
+      "available": 36
     },
     "GBUF": {
       "used": 1,

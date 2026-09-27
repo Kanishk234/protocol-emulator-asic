@@ -17,15 +17,15 @@ from cocotb.triggers import ClockCycles, Timer
 
 from warp_host import bit, expect, parked, reset
 from compile.bitfile import BitFile
-from host.protocol import (Op, State, checked_load_transactions, parse_read_id, tx_read_id,
-                           tx_simple)
+from host.protocol import (Op, State, checked_load_transactions, parse_byte, parse_read_id,
+                           tx_ch_read, tx_ch_write, tx_read_id, tx_simple, tx_user_status)
 
 BITS = Path(__file__).resolve().parent / "bitstreams"
 REAL_FABRIC = os.environ.get("WARP_FABRIC", "stub") in ("rtl", "gl")
 
 
 def fab_out(dut):
-    return (int(dut.uo_out.value) >> 2) & 0xF          # FAB_OUT0..3 (the current fabric's four)
+    return (int(dut.uo_out.value) >> 2) & 0xF          # FAB_OUT0..3 (the example designs' four)
 
 
 async def settle_routing_loops(dut):
@@ -159,4 +159,31 @@ async def test_logic4(dut):
     host = await reset(dut)
     await load_and_run(host, "logic4")
     await check_logic4(dut, host)
+    await leave_fabric(dut)
+
+
+@cocotb.test(skip=not REAL_FABRIC)
+async def test_host_channel(dut):
+    """ARCHITECTURE §7.3 end to end through the fabric (hostecho): bytes written with CH_WRITE
+    come back plus one from CH_READ; USER_STATUS counts them; a byte marked last raises the
+    design's attention (STATUS bit 1 and HOST_IRQ)."""
+    host = await reset(dut)
+    await load_and_run(host, "hostecho")
+    st = await host.status()
+    assert st.tx_ready and not st.rx_valid and not st.user_attention
+    sent = [0x10, 0x7F, 0xFF]
+    for i, b in enumerate(sent):
+        await host.xfer(tx_ch_write(b, last=(i == len(sent) - 1)))
+        await ClockCycles(dut.clk, 8)
+        st = await host.status()
+        assert st.rx_valid, f"no reply to byte {i}"
+        assert parse_byte(await host.xfer(tx_ch_read())) == (b + 1) & 0xFF
+    st = await host.status()
+    assert not st.rx_valid and st.user_attention and bit(dut.uo_out, 1) == 1
+    assert parse_byte(await host.xfer(tx_user_status())) == len(sent)
+    await host.xfer(tx_simple(Op.USER_RESET))
+    await ClockCycles(dut.clk, 4)
+    assert not (await host.status()).user_attention
+    assert parse_byte(await host.xfer(tx_user_status())) == 0
+    await host.xfer(tx_simple(Op.STOP))
     await leave_fabric(dut)

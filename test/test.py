@@ -10,13 +10,30 @@
 import cocotb
 from cocotb.triggers import ClockCycles
 
+import re
+from pathlib import Path
+
 from warp_host import expect, irq, parked, reset
+from compile.bitfile import BitFile
 from host.protocol import (ARCH_VERSION, SYNC_WORD, ErrorCode, Op, State, crc32_words,
                            parse_byte, parse_read_id, parse_status, tx_ch_write, tx_load_begin,
                            tx_load_data, tx_load_end, tx_read_id, tx_simple, tx_user_status)
 
 
-def bitstream(frames=2, rows=4):
+ROOT = Path(__file__).resolve().parents[1]
+# configuration rows of the current fabric (arch.yaml; no YAML package in the CI test jobs)
+ROWS = int(re.search(r"^config_rows:\s*(\d+)", (ROOT / "arch" / (ROOT / "arch/CURRENT").read_text()
+                                                .strip() / "arch.yaml").read_text(), re.M).group(1))
+
+
+def idle():
+    """The compiled `idle` design (tools/compile/examples): every host-channel output 0. Tests
+    that RUN load it, so the shell sees defined values from whatever fabric model is simulated
+    (an unconfigured fabric's outputs are arbitrary)."""
+    return BitFile.load(Path(__file__).resolve().parent / "bitstreams" / "idle.wbit").words
+
+
+def bitstream(frames=2, rows=ROWS):
     """A well-formed FABulous frame bitstream: sync word, per frame a header and one data word per
     row, then the desync header (bit 20). Data words are 0 (all-default configuration), so that
     with a real fabric model (RTL or gate level) no random routing loop is configured."""
@@ -47,7 +64,7 @@ async def test_read_id(dut):
 @cocotb.test()
 async def test_load_run_stop(dut):
     host = await reset(dut)
-    await host.load(bitstream())
+    await host.load(idle())
     await expect(host, State.LOADED)
     assert parked(dut)
     await host.xfer(tx_simple(Op.RUN))
@@ -69,7 +86,7 @@ async def test_wrong_arch_version(dut):
     await host.xfer(tx_simple(Op.RUN))
     await expect(host, State.ERROR, ErrorCode.BAD_COMMAND)
     assert parked(dut)
-    await host.load(bitstream())                # a correct load recovers
+    await host.load(idle())                     # a correct load recovers
     await expect(host, State.LOADED)
     assert not irq(dut)
 
@@ -121,7 +138,7 @@ async def test_bad_commands_change_nothing(dut):
     for op in (Op.RUN, Op.STOP, Op.LOAD_DATA, 0x7F):
         await host.xfer([op])
         await expect(host, State.UNCONFIGURED, ErrorCode.BAD_COMMAND)
-    await host.load(bitstream())
+    await host.load(idle())
     await host.xfer(tx_simple(Op.RUN))
     await host.xfer(tx_load_begin(4))           # never starts a load while running
     await expect(host, State.RUNNING, ErrorCode.BAD_COMMAND)
@@ -155,7 +172,7 @@ async def test_host_channel_overflow(dut):
     """The current fabric never takes channel bytes, so the 2-entry FIFO fills and the third write
     overflows (ch_overflow sticky until READ_STATUS)."""
     host = await reset(dut)
-    await host.load(bitstream())
+    await host.load(idle())
     await host.xfer(tx_simple(Op.RUN))
     st = await host.status()
     assert st.tx_ready and not st.rx_valid and not st.ch_overflow

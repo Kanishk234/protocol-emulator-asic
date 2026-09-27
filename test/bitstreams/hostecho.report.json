@@ -1,0 +1,133 @@
+{
+  "design": "hostecho",
+  "arch": "warp_g0",
+  "arch_version": "0x0002",
+  "words": 722,
+  "crc32": "0x938E736D",
+  "timing_corner": "nom_slow_1p08V_125C",
+  "fmax_mhz": 143.88,
+  "meets_50mhz": true,
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 25,
+      "available": 96
+    },
+    "IOBUF": {
+      "used": 13,
+      "available": 36
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "pins": {
+    "clk": {
+      "i": "clk"
+    },
+    "rst_n": {
+      "i": "rst_n"
+    },
+    "h_wdata[0]": {
+      "i": "h_wdata[0]"
+    },
+    "h_wdata[1]": {
+      "i": "h_wdata[1]"
+    },
+    "h_wdata[2]": {
+      "i": "h_wdata[2]"
+    },
+    "h_wdata[3]": {
+      "i": "h_wdata[3]"
+    },
+    "h_wdata[4]": {
+      "i": "h_wdata[4]"
+    },
+    "h_wdata[5]": {
+      "i": "h_wdata[5]"
+    },
+    "h_wdata[6]": {
+      "i": "h_wdata[6]"
+    },
+    "h_wdata[7]": {
+      "i": "h_wdata[7]"
+    },
+    "h_wlast": {
+      "i": "h_wlast"
+    },
+    "h_wvalid": {
+      "i": "h_wvalid"
+    },
+    "h_wready": {
+      "o": "h_wready"
+    },
+    "h_rdata[0]": {
+      "o": "h_rdata[0]"
+    },
+    "h_rdata[1]": {
+      "o": "h_rdata[1]"
+    },
+    "h_rdata[2]": {
+      "o": "h_rdata[2]"
+    },
+    "h_rdata[3]": {
+      "o": "h_rdata[3]"
+    },
+    "h_rdata[4]": {
+      "o": "h_rdata[4]"
+    },
+    "h_rdata[5]": {
+      "o": "h_rdata[5]"
+    },
+    "h_rdata[6]": {
+      "o": "h_rdata[6]"
+    },
+    "h_rdata[7]": {
+      "o": "h_rdata[7]"
+    },
+    "h_rvalid": {
+      "o": "h_rvalid"
+    },
+    "h_rready": {
+      "i": "h_rready"
+    },
+    "h_status[0]": {
+      "oe": "h_status[0]"
+    },
+    "h_status[1]": {
+      "oe": "h_status[1]"
+    },
+    "h_status[2]": {
+      "oe": "h_status[2]"
+    },
+    "h_status[3]": {
+      "oe": "h_status[3]"
+    },
+    "h_status[4]": {
+      "oe": "h_status[4]"
+    },
+    "h_status[5]": {
+      "oe": "h_status[5]"
+    },
+    "h_status[6]": {
+      "oe": "h_status[6]"
+    },
+    "h_status[7]": {
+      "oe": "h_status[7]"
+    },
+    "h_attention": {
+      "o": "h_attention"
+    }
+  },
+  "unmapped_inputs_tied_0": [],
+  "unmapped_outputs_open": [],
+  "tools": {
+    "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
+    "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.10-82-g2b560ad0)",
+    "bitgen": "tools/compile/bitgen.py"
+  }
+}

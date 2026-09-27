@@ -1,20 +1,20 @@
 {
   "design": "logic4",
-  "arch": "warp_tiny",
-  "arch_version": "0x0001",
-  "words": 302,
-  "crc32": "0xDAC6C95D",
+  "arch": "warp_g0",
+  "arch_version": "0x0002",
+  "words": 722,
+  "crc32": "0x6963D04B",
   "timing_corner": "nom_slow_1p08V_125C",
   "fmax_mhz": null,
   "meets_50mhz": false,
   "utilisation": {
     "FABULOUS_LC": {
       "used": 5,
-      "available": 16
+      "available": 96
     },
     "IOBUF": {
       "used": 12,
-      "available": 18
+      "available": 36
     },
     "GBUF": {
       "used": 1,

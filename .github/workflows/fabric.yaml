@@ -6,6 +6,10 @@ on:
   push:
     paths:
       - 'arch/**'
+      - 'macro/**'
+      - 'src/**'
+      - 'test/**'
+      - 'scripts/**'
       - 'protocols/**'
       - 'spikes/fab_demo/**'
       - 'tools/**'
@@ -64,3 +68,58 @@ jobs:
           path: |
             build/fab_demo_logs/
             build/fab_demo/user_design/*_npnr_log.txt
+
+  # WARP's own fabric (arch/warp_tiny, macro/warp_tiny): compile the example user designs with
+  # tools/compile (must reproduce the committed test/bitstreams), then run the whole pin-level
+  # suite with the generated fabric RTL in place of the black box, loading the real bitstreams
+  # through the host SPI interface (test/test_bitstream.py).
+  warp_fabric:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Install Icarus and Python venv
+        run: sudo apt-get update && sudo apt-get install -y iverilog python3-venv python3-tk
+
+      - name: Cache OSS CAD Suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+
+      - name: Install OSS CAD Suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+
+      - name: Create venv
+        run: |
+          /usr/bin/python3 -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements-dev.txt
+
+      - name: Compile the example designs (must match test/bitstreams)
+        run: scripts/build_test_bitstreams.sh --check
+
+      - name: Pin-level suite on the fabric RTL with real bitstreams
+        run: |
+          source .venv/bin/activate
+          # the system Icarus (as in the test job) first; OSS CAD Suite only for the compile flow
+          make -C test clean
+          make -C test WARP_FABRIC=rtl
+          ! grep failure test/results.xml
+          grep -q 'test_two_bitstreams' test/results.xml
+
+      - name: Upload results
+        if: success() || failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: warp_fabric
+          path: |
+            test/results.xml
+            build/compile/*/report.json
+            build/compile/*/*.log

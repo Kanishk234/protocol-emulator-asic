@@ -17,7 +17,8 @@ jobs:
           python-version: '3.11'
 
       - name: Install Python packages
-        run: pip install -r test/requirements.txt hypothesis==6.168.1 pyyaml==6.0.3 pytest-xdist==3.8.0
+        # fabulous-fasm / fabulous-bit-gen: the versions FABulous-FPGA 2.2.0 pins (tools/compile tests)
+        run: pip install -r test/requirements.txt hypothesis==6.168.1 pyyaml==6.0.3 pytest-xdist==3.8.0 fabulous-fasm==0.2.0 fabulous-bit-gen==0.3.1
 
       - name: pytest (tools)
         run: python -m pytest -q -n auto

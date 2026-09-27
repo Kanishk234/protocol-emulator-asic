@@ -1,0 +1,32 @@
+# F1 (docs/design/VERIFICATION.md): output isolation. If STATE != RUNNING, every fabric output pin
+# and every uio_oe bit is 0, whatever the fabric macro drives: its outputs are left unconstrained
+# (the black box is emptied and its undriven outputs become free inputs every cycle).
+# Unbounded: k-induction (mode prove). Run: sby -f formal/f1_isolation.sby
+[options]
+mode prove
+depth 4
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal tt_um_warp.v wp_shell.v wp_spi_target.v wp_sync.v wp_crc32.v wp_fifo.v
+read -formal wp_fabric_cfg.v ConfigFSM.v Frame_Data_Reg.v Frame_Select.v warp_tiny.v
+hierarchy -top tt_um_warp
+setattr -mod -unset blackbox =warp_tiny
+prep -top tt_um_warp
+flatten
+setundef -undriven -anyseq
+
+[files]
+../src/tt_um_warp.v
+../src/wp_shell.v
+../src/wp_spi_target.v
+../src/wp_sync.v
+../src/wp_crc32.v
+../src/wp_fifo.v
+../src/wp_fabric_cfg.v
+../src/fabric_gen/ConfigFSM.v
+../src/fabric_gen/Frame_Data_Reg.v
+../src/fabric_gen/Frame_Select.v
+../src/warp_tiny.v

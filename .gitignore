@@ -21,6 +21,9 @@ results.xml
 __pycache__/
 .pytest_cache/
 .hypothesis/
+# SymbiYosys work directories and logs (formal/<job>[_<task>]/, formal/*.log)
+formal/*/
+formal/*.log
 
 # Downloaded CI artifacts
 *.zip

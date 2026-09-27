@@ -1,0 +1,34 @@
+# F2 (docs/design/VERIFICATION.md): aborted or corrupt loads never reach RUNNING. The shell's
+# SPI receiver is cut (its outputs are free every cycle), so the controller sees arbitrary
+# transaction starts and bytes; a shadow loader in wp_shell.v (`ifdef FORMAL_F2) with its own CRC-32,
+# word count and sync check must agree whenever LOADED is entered from LOADING.
+# Run: sby -f formal/f2_loader.sby          (bmc: bounded; cover: a full load + RUN is reachable)
+# Bound: 84 cycles. The shortest accepted load (1 word) followed by RUN takes 52 (cover trace;
+# the CRC engine needs 32 cycles per word), so every trace up to one complete load plus 30 cycles
+# of arbitrary bytes before or after it is checked; step time grows fast past ~85 (abc bmc3).
+[tasks]
+bmc
+cover
+
+[options]
+bmc: mode bmc
+bmc: depth 84
+cover: mode cover
+cover: depth 60
+
+[engines]
+bmc: abc bmc3
+cover: smtbmc yices
+
+[script]
+read -formal -DFORMAL_F2 wp_shell.v wp_spi_target.v wp_sync.v wp_crc32.v wp_fifo.v
+prep -top wp_shell
+cutpoint wp_spi_target
+flatten
+
+[files]
+../src/wp_shell.v
+../src/wp_spi_target.v
+../src/wp_sync.v
+../src/wp_crc32.v
+../src/wp_fifo.v

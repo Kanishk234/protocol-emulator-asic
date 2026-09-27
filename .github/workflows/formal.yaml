@@ -1,0 +1,52 @@
+name: formal
+# WARP's own workflow: SymbiYosys proofs of the shell (docs/design/VERIFICATION.md F1–F3).
+# Same OSS CAD Suite pin as `fabric` (docs/VERSIONS.md). Logs and traces are kept as artifacts.
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'formal/**'
+      - 'scripts/formal.sh'
+      - '.github/workflows/formal.yaml'
+  workflow_dispatch:
+
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+
+jobs:
+  formal:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        job: [f1_isolation, f2_loader]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Cache OSS CAD Suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+
+      - name: Install OSS CAD Suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+
+      - name: Run ${{ matrix.job }}
+        run: scripts/formal.sh ${{ matrix.job }}.sby
+
+      - name: Upload logs and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-${{ matrix.job }}
+          path: |
+            formal/*.log
+            formal/*/logfile.txt
+            formal/*/engine_*/*.vcd

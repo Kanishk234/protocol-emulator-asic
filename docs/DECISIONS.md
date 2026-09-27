@@ -180,7 +180,7 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Evidence (local, 2026-09-27):** `scripts/gl_local.sh` (Yosys gate-level shell + fabric RTL + real bitstreams) 16/16; `WARP_FABRIC=rtl` 16/16; black box 13 + 3 skipped.
 
 ## D-024: G0 fabric layout and where the host channel enters the fabric
-- **Date:** 2026-09-27 · **Status:** Proposed (confirm when the G0 macro stitches and places in the 6x4 chip)
+- **Date:** 2026-09-27 · **Status:** Accepted (G0 stitched 1016.64 × 669.06 µm; chip placement D-025)
 - **Decision:** `arch/warp_g0/fabric.csv`: 4 × 3 `LUT4x8_ha` (96 LUT4+FF) framed by `W_IO4` (west), `E_IO4` (east), `N_IO` (north) and `S_IO2` (south) columns/rows plus corner terms. All tile types are already hardened on CMOS5L (N_IO added 2026-09-27: 219.84 × 56.7 µm like N_term, 0 DRC, 0 antenna). IO cells (BELs): west 12, east 12, north 4, south 8 = 36. Allocation:
   - user pins (ARCHITECTURE §1): FAB_IO0..7 on 8 west cells; FAB_IN0..4 and FAB_OUT0..5 on 11 east cells; clock and user reset on 2 south cells (as in warp_tiny);
   - host channel (§7.3): 11 signals into the fabric (h_wdata[7:0], h_wlast, h_wvalid, h_rready) and 19 out (h_wready, h_rdata[7:0], h_rvalid, h_status[7:0], h_attention). Each IO cell gives the fabric one input (its pad side) and two outputs (value and enable, both plain wires into the shell), so the 15 spare cells (4 west, 1 east, 4 north, 6 south) carry 15 in / 30 out: enough without narrowing h_status (resolves the §7.3 OPEN item).
@@ -188,3 +188,16 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Alternatives:** a new N_IO4 tile; narrowing h_status to fit fewer cells; host channel only on the north edge (4 cells: too few).
 - **Cost:** the enable output of a host-channel cell is used as a data bit, so the compile flow's pin map must name both roles (already supported: `.o`/`.oe`); the shell's host-channel wires spread over three fabric edges (chip-level routing, to watch in the 6x4 hardening).
 - **Evidence:** pending the G0 stitch (`FABRIC=warp_g0 spikes/fabric_tiny/run.sh`) and the design-set synthesis check in `docs/reports/capacity.md` (only the SPI controller comes close to 96 LCs; G1 needs the primitives, D-008).
+
+## D-025: G0 in the 6x4 chip: placement, placement density, routing derate, per-column frame decode
+- **Date:** 2026-09-27 · **Status:** Accepted (evidence: local pre-flight; CI hardening pending)
+- **Context:** the 6x4 CMOS5L chip routes only on Metal2–Metal4, and **Metal3 is the only horizontal layer**. The G0 macro (1016.64 × 669.06 µm) fills the core's height except 34 µm, and nothing routes over it. All TT pins are in the top-left corner (x 30–191 µm). So every wire between the west (shell, TT pins) and the fabric's far faces shares a few Metal3 tracks in the strips above and below the fabric. The first placement's global routing had 9,290 overflows, almost all *over* the macro: the router pushed ~118 crossing nets through it.
+- **Decision (`src/config.json`, `src/wp_frame_select.v`):**
+  1. Macro at **(121.44, 30.24)**: x on the power-grid phase (11.52 + 109.92 k, D-017) with a 148 µm east channel that holds a full stripe pair (BUGS #11; x = 231.36 would leave 38 µm with none); y leaves 26.46 µm below (frame-strobe logic) and 7.56 µm above.
+  2. **No standard cells in the east channel** (`FP_OBSTRUCTIONS` x ≥ 1148.16): the shell stays west, so shell-internal wires do not cross the fabric.
+  3. **`PL_TARGET_DENSITY_PCT` 75** (default 60): the shell packs into the west column instead of spilling into the strips around the macro, where every cell adds crossing wires.
+  4. **`GRT_ADJUSTMENT` 0.15** (default 0.3): global routing reserves less of each track for detailed routing; the strips are the scarce resource and the design is small (25 % of tracks used).
+  5. **Per-column frame decode:** FABulous's `Frame_Select` needs all 20 one-hot frame bits at every column; `wp_frame_select` takes a 5-bit frame number and decodes it under its column, so 11 wires run along the fabric instead of 26. Same behaviour for every bitstream with one frame per header (all the compile flow writes).
+- **Measured (global-routing overflow, local LibreLane):** first placement 9,290 → y moved up 8,210 → east channel blocked 4,734 → per-column decode 4,153 → **density 75 % + derate 0.15: 23**.
+- **Alternatives:** no IO on the fabric's east face (all user pins on west/north/south cells: needs an east edge tile without IO, a rebuilt macro, and one fewer fabric input; kept as the fallback if detailed routing fails); a larger TT tile (cost; the crossing problem stays).
+- **Evidence:** local `scripts/preflight.sh` 2026-09-27 (Nix LibreLane 3.0.0, TT merged config): global-routing overflow 23, **detailed routing 0 violations, 0 antenna**, 22 vertical Metal4 power stripes all full height. G0 RTL suite 17/17 with the per-column decode. CI hardening: to be recorded here.

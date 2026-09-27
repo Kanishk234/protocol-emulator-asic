@@ -109,7 +109,7 @@ The shell's host byte channels and status reach the user design through dedicate
 - host → design: `h_wdata[7:0]`, `h_wlast`, `h_wvalid` (into the fabric), `h_wready` (out of the fabric);
 - design → host: `h_rdata[7:0]`, `h_rvalid` (out), `h_rready` (in);
 - `h_status[7:0]` (out, read by USER_STATUS) and `h_attention` (out, STATUS bit 1).
-Each direction has a 2-entry FIFO in the shell (D-021; revisit with the fabric's area), emptied whenever STATE ≠ RUNNING. **OPEN:** the north IO tile type and whether `h_status` is narrowed to fit the IOBUF budget (~18–29 BELs needed).
+Each direction has a 2-entry FIFO in the shell (D-021; revisit with the fabric's area), emptied whenever STATE ≠ RUNNING. In G0 (`arch/warp_g0`) the signals use 15 IO cells on the west, north, south and east edges; each cell carries one signal into the fabric and two out (value and enable wires), so `h_status` keeps its 8 bits (D-024). Pin map: `arch/warp_g0/pins.csv`; user designs' `h_*` ports map by name.
 
 ## 8. Hard primitives
 

@@ -10,11 +10,11 @@
 - [x] Loader: length check, transport checksum, architecture-version tag, error handling. (ARCH_VERSION, LENGTH, CRC-32, sync word, empty load (BUGS #12); tests `test_wrong_arch_version`, `test_bad_crc`, `test_length_mismatch`, `test_bad_sync_word`, `test_empty_load_rejected`, `test_aborted_transaction_keeps_whole_words`)
 - [x] Run control: stop, start, reset of user state; outputs parked and output enables off whenever the fabric is stopped or unconfigured. (RUN/STOP/USER_RESET: `test_load_run_stop`, `test_counter4` on the fabric RTL; parking: F1 proof)
 - [x] Input synchronizers, registered outputs, open-drain support on bidirectional pins. (`src/tt_um_warp.v`; open drain exercised by logic4 on FAB_IO2, `test_logic4`, fabric RTL)
-- [ ] Host data path to and from the fabric (FIFOs if the budget allows; record the decision).
+- [x] Host data path to and from the fabric (FIFOs if the budget allows; record the decision). (2-entry FIFOs each way, D-021; wired through 15 IO cells, D-024; `test_host_channel` with `hostecho`: bytes in, bytes + 1 out, USER_STATUS count, attention/IRQ, RTL 17/17 local 2026-09-27)
 - [x] Host software: one Python API used by both simulation tests and future board software (`tools/host/`). (`tools/host/protocol.py`, 10 pytest; used by `test/warp_host.py`)
 
 ### Fabric G0
-- [ ] Generic fabric at the size chosen in phase 1, defined in `arch/`, generated into `src/fabric_gen/`.
+- [x] Generic fabric at the size chosen in phase 1, defined in `arch/`, generated into `src/fabric_gen/`. (`arch/warp_g0`: 4 × 3 LUT4x8 = 96 LUT4+FF, IO on all four sides, D-024; stitched on CMOS5L 1016.64 × 669.06 µm into `macro/warp_g0/` by `FABRIC=warp_g0 spikes/fabric_tiny/run.sh`, N_IO tile hardened 0 DRC; the fabric is a hard macro, so its generated RTL lives with the macro and `src/fabric_gen` keeps the configuration path. RTL suite 17/17 incl. host channel end to end, local 2026-09-27)
 - [x] Protocol compile flow: `tools/compile/` turns a user design + pin constraints into a bitstream and a report (architecture version, tool versions, resource use, timing, pins, checksum). (D-022; runs on the current 16-LUT fabric; own bitgen, BUGS #13; example reports in `test/bitstreams/*.report.json`)
 - [x] The host rejects bitstreams built for a different architecture version. (`checked_load_transactions` + `test_host_refuses_other_architecture`; the shell too: `test_wrong_arch_version`)
 

@@ -109,3 +109,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** `test/test_bitstream.py::test_counter4` on the fabric RTL, then tracing the clock hop by hop from the pad to the LC (GBUF feed, SW_term, N_GBUF, the GCLK mux).
 - **Now covered by:** `tools/compile/bitgen.py` (no skip, all rows); `test_gclk_mux_select_is_written`; `test_counter4` (clock through GBUF C). `test_matches_fabulous_bit_gen_except_clk_features` checks our generator equals upstream's on everything else.
 - **Fix:** WARP's own bitgen in the compile flow. Upstream not edited (worth reporting to FABulous).
+
+## 14: Compile flow merged two carry chains' start cells
+- **Date:** 2026-09-27
+- **Symptom:** `hostecho` (two 8-bit adders) failed place and route: `Carry cell ... carry_statrt has illegal multiple fanout on Co net`.
+- **Root cause:** the compile flow's `opt_merge -share_all` (added to merge the identical enable/reset LUTs ABC duplicates per flip-flop, D-022) also merged the two adders' identical carry-start `LUT4_HA` cells; one carry output then fed two chains, which the fabric's carry wiring cannot do.
+- **Caught by:** building `tools/compile/examples/hostecho` (nextpnr packing).
+- **Now covered by:** `opt_merge -share_all t:LUT1 t:LUT2 t:LUT3 t:LUT4` (plain LUTs only); `hostecho` is a committed test bitstream, rebuilt and checked by the `fabric` workflow.
+- **Fix:** `tools/compile/compile.py` synthesis script.

@@ -22,14 +22,14 @@ Gate level: the inter-tile wires of the macro netlist and every internal net of 
 netlist (macro/<fabric>/tiles/*.nl.v). RTL: the inter-tile wires only (the RTL LUT model resolves
 don't-care X by itself; test_bitstream.py orders the RTL reloads, D-023).
 
-Usage: scripts/gen_fabric_settle.py [fabric]      (default warp_tiny)
+Usage: scripts/gen_fabric_settle.py [fabric]      (default: arch/CURRENT)
 """
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FABRIC = sys.argv[1] if len(sys.argv) > 1 else "warp_tiny"
+FABRIC = sys.argv[1] if len(sys.argv) > 1 else (ROOT / "arch/CURRENT").read_text().strip()
 MACRO = ROOT / "macro" / FABRIC
 HIER = "user_project.u_fabric"
 CONFIG_PORTS = ("FrameData", "FrameStrobe")

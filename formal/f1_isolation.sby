@@ -11,9 +11,9 @@ smtbmc yices
 
 [script]
 read -formal tt_um_warp.v wp_shell.v wp_spi_target.v wp_sync.v wp_crc32.v wp_fifo.v
-read -formal wp_fabric_cfg.v ConfigFSM.v Frame_Data_Reg.v Frame_Select.v warp_tiny.v
+read -formal wp_fabric_cfg.v ConfigFSM.v Frame_Data_Reg.v wp_frame_select.v warp_g0.v
 hierarchy -top tt_um_warp
-setattr -mod -unset blackbox =warp_tiny
+setattr -mod -unset blackbox =warp_g0
 prep -top tt_um_warp
 flatten
 setundef -undriven -anyseq
@@ -28,5 +28,5 @@ setundef -undriven -anyseq
 ../src/wp_fabric_cfg.v
 ../src/fabric_gen/ConfigFSM.v
 ../src/fabric_gen/Frame_Data_Reg.v
-../src/fabric_gen/Frame_Select.v
-../src/warp_tiny.v
+../src/wp_frame_select.v
+../src/warp_g0.v

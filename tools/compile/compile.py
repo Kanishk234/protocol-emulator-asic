@@ -1,7 +1,7 @@
 """WARP compile flow (PHASE2 "Protocol compile flow"): user Verilog + pin map -> .wbit + report.
 
-    python -m compile.compile --arch arch/warp_tiny --pins pins.yaml -o build/compile/uart \
-        protocols/uart/src/*.v
+    python -m compile.compile [--arch arch/warp_g0] --pins pins.yaml -o build/compile/uart \
+        protocols/uart/*.v                            (default --arch: arch/CURRENT)
 
 Pin map (YAML):
     top: uart_top                 # user top module
@@ -13,7 +13,8 @@ Pin map (YAML):
       sda_o: FAB_IO0.o            # bidirectional pins: .o value, .oe output enable, .i input
       sda_oe: FAB_IO0.oe
       sda_i: FAB_IO0.i
-      h_rdata[0]: h_rdata0        # host channel (architectures that have it, D-024)
+                                  # h_* host channel ports map by name where the architecture
+                                  # has them (arch/warp_g0, D-024)
 
 Steps: a generated wrapper `warp_top` (one explicit IOBUF per used IO cell, wired as in the
 fabric) around the user top; Yosys `synth_fabulous` with the tile library's primitives; nextpnr-generic
@@ -66,6 +67,11 @@ def run(cmd, log, cwd, env=None):
         raise CompileError(f"{Path(cmd[0]).name} failed (log {log}):\n" + "\n".join(tail))
 
 
+def current_arch() -> Path:
+    """The architecture the chip is built with (arch/CURRENT, one line: its directory name)."""
+    return ROOT / "arch" / (ROOT / "arch" / "CURRENT").read_text().strip()
+
+
 def load_arch(arch_dir: Path):
     meta = yaml.safe_load((arch_dir / "arch.yaml").read_text())
     pins = {}
@@ -96,6 +102,16 @@ def resolve(pinmap, ports, arch_pins):
     IN) and oe (the cell's EN). Pin directions in pins.csv: clock/in (i), out (o), out_en (oe:
     an output carried on a cell's enable wire, e.g. host-channel bits) and inout (.o/.oe/.i)."""
     use = {}
+    pinmap = dict(pinmap)
+    # host channel ports (ARCHITECTURE §7.3, D-014) map by name on architectures that have them
+    targets = {str(t).partition(".")[0] for t in pinmap.values()}
+    for name, (direction, width) in ports.items():
+        if not name.startswith("h_"):
+            continue
+        for b in range(width):
+            ref = f"{name}[{b}]" if width > 1 else name
+            if ref in arch_pins and ref not in targets and ref not in pinmap and name not in pinmap:
+                pinmap[ref] = ref
     for key, target in pinmap.items():
         m = re.fullmatch(r"(\w+)(?:\[(\d+)\])?", key)
         if not m or m.group(1) not in ports:
@@ -218,8 +234,10 @@ def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=
         f"-toutpad $__FABULOUS_TBUF EN:IN:PAD -tinoutpad $__FABULOUS_IOBUF EN:OUT:IN:PAD {top}",
         f"techmap -map {prim / 'IOBUF/yosys/techmap/IOBUF_map.v'}",
         f"synth_fabulous {opts} -run map_iopad:check",
-        # ABC maps the FF enable/reset logic once per FF; merge the identical LUTs it leaves
-        "opt_merge -share_all",
+        # ABC maps the FF enable/reset logic once per FF; merge the identical LUTs it leaves.
+        # Plain LUTs only: two carry chains start with identical LUT4_HA cells, and one carry
+        # output cannot feed two chains.
+        "opt_merge -share_all t:LUT1 t:LUT2 t:LUT3 t:LUT4",
         "clean",
         "hierarchy -check",
         "stat",
@@ -370,7 +388,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("sources", nargs="+")
     ap.add_argument("--pins", required=True, help="pin map YAML (top + pins)")
-    ap.add_argument("--arch", default=str(ROOT / "arch" / "warp_tiny"))
+    ap.add_argument("--arch", default=str(current_arch()))
     ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--seed", type=int, default=1)
     a = ap.parse_args(argv)

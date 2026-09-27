@@ -1,0 +1,5 @@
+top: hostecho
+pins:
+  clk: clk
+  rst_n: rst_n
+  # h_* ports map to the host channel by name

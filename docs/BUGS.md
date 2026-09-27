@@ -77,3 +77,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** the chip-level `gds` job (detailed routing did not converge).
 - **Now covered by:** the placement rule in D-019 (revision): pin-heavy macro faces must face open core; the pin-face count of the macro LEF is checked before choosing a location. The next `gds` run is the check.
 - **Fix:** macro at (890.88, 113.40), same power-grid phase.
+
+## 10: `"//"` comment keys inside a MACROS entry stopped LibreLane at config load
+- **Date:** 2026-09-27
+- **Symptom:** CI `gds` run 36292542000 failed after 3 min: `One or more keys unrecognized for dataclass Macro: //`.
+- **Root cause:** I put `"//"` comment keys inside `MACROS.warp_tiny` in `src/config.json`. LibreLane accepts them at the top level only.
+- **Caught by:** LibreLane config loading in CI.
+- **Now covered by:** a local run of TT's merged config (`src/config_merged.json` from `tt_tool --create-user-config`) with the Nix LibreLane before pushing: it loads the config and runs through synthesis, floorplan, macro placement, the power grid (all LOOMPDN checks pass), global routing (0 overflow, 3.5 % usage) and detailed routing (0 violations, < 2 min). A comment in `config.json` warns against nested `"//"`.
+- **Fix:** comments moved above the block.

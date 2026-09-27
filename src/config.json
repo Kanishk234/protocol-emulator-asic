@@ -35,6 +35,9 @@
   "//": "Placed at the east side, centred vertically: its 152 west-face pins (FrameData, west IO) and",
   "//": "67 south-face pins (FrameStrobe, clock/reset) face open core (BUGS #9). x = 11.52 + 8 x 109.92",
   "//": "(power columns under the chip stripes, D-017) = 1856 x 0.48; y = 270 x 0.42 = 30 rows.",
+  "//": "Its nl is the port-only black box src/warp_tiny.v (not in info.yaml source_files), as the",
+  "//": "R3 SRAM spike did: synthesis and STA see only its pins (D-019 revision 2).",
+  "//": "No '//' keys inside MACROS: LibreLane rejects unknown keys in a Macro (BUGS #10).",
   "MACROS": {
     "warp_tiny": {
       "instances": {
@@ -45,9 +48,6 @@
       },
       "gds": ["dir::../macro/warp_tiny/warp_tiny.gds"],
       "lef": ["dir::../macro/warp_tiny/warp_tiny.lef"],
-      "//": "Port-only black box (not in info.yaml source_files), as the R3 SRAM spike did: synthesis",
-      "//": "and STA see only the macro's pins; its layout is checked by KLayout DRC, its logic by",
-      "//": "its own flow and simulation (D-019 revision 2).",
       "nl": ["dir::warp_tiny.v"]
     }
   },

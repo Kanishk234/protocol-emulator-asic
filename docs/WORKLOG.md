@@ -21,6 +21,24 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: slots, pads, host map proposal)
+RTL session; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- `src/trw_slots.v` from the spike: write-only (the debug read port is gone, D-039), slot word 3 stores its 5 bits. 24.5K µm² (700 latch bits, 52 clock gates), as before. L1 (`test_internal/slots/`): 2 tests on the latch array and the flop build (`FLOPS=1`), both pass.
+- `src/trw_sync.v` (2-FF, P1) and `src/trw_pins.v` (owner registers and the pad multiplexer, §7.1; host pads ignore owner writes). L1 (`test_internal/pins/`): 1,500 random clocks against the ownership rule, pass. Verilator `-Wall` clean on all three.
+- D-046 (proposed): the full host register map (control/status, lane debug block, HOST_IN/HOST_OUT status, IRQ), so `trw_host.v` can be written.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- The host RTL waits for D-046, D-044 and D-042 (all proposed).
+
+Next:
+- Krithik/Kanishk: D-042, D-044, D-046. Then `trw_host.v` and `tools/host`.
+- Run 4 result; then the top that wires everything (lane count from run 4).
+
 ## 2026-09-27: Krithik + Claude (phase 2: lane and ALU RTL)
 RTL session, from `ISA.md` §2–§5 and `ARCHITECTURE.md` §5, §6, §14; `tools/tripsim` not read. R4 run 4 still running.
 

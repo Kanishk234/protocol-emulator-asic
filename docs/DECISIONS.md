@@ -772,6 +772,35 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Evidence:** `test_internal/alu/` 4 tests, 8/8 mutants; `test_internal/lane/` 6 tests (400 random EVAL cases against ISA §4.2–4.3, the pipeline timing of L3–L5 and the pending rule, output reservation with the 3-clock reload, a routine using every word kind and every reserved code, urgent vs routine, halt/STEP/host writes), 15/15 mutants.
 - **Approval:** the readings go to the model side; nothing here changes the spec.
 
+## D-046 (2026-09-27): the host register map in full (proposed)
+- **Context:** `trw_host.v` (phase 2 task 2.1) is the last module without RTL. §9 gives the address ranges and the transaction format, but no layout for the control/status words, the lane debug block beyond r0–r3/STATE, or the HOST_IN/HOST_OUT status. Together with D-042 (unit flags) and D-044 (fabric ports) this entry fixes every address, so the host RTL, `tools/host` (task 2.3 item 7) and `tripc.load` share one map. Where the R4 host stub (`spikes/r4_floorplan`) already chose, the proposal keeps its choice, so the R4 tests stay valid.
+- **Proposal** (R = read, W = write; unlisted addresses read 0 and ignore writes):
+
+| Address | Access | Contents |
+|---|---|---|
+| 0x0000 | RW | `[2:0]` RUN per lane (1 = run). Reads also `[15]` = pin units live (§14 P-G16, D-041 B) |
+| 0x0001 | W | STEP: `[2:0]` lanes to step; ignored for a running lane (§14 H2, D-045) |
+| 0x0002 | R | time (the 16-bit global counter) |
+| 0x0003 | RW | IRQ enable, same bit layout as 0x0004 |
+| 0x0004 | R | IRQ status (live, not latched): `[5:0]` unit u has OVERRUN or LATE, `[8]` HOST_OUT has a token, `[9]` HOST_IN is free, `[10]` any DROPPED ≠ 0. IRQ pad = OR of (status & enable) |
+| 0x0010 + u | R, W1C | unit u flags (D-042): `[0]` OVERRUN, `[1]` LATE; writing 1 clears |
+| 0x00FF | R | ID: `0x7157` ("TW" 1.x); 0x00FE: spec version (major, minor) |
+| 0x1000–0x13FF | W | slots and K (§9, unchanged): `lane[9:8] slot[7:4] word[1:0]`, slot 12 = K |
+| 0x2000 + c | RW | fabric port c (D-044) |
+| 0x2040 + c | R, W clears | DROPPED of port c (D-044) |
+| 0x3000–0x30BF | W | pin-unit blocks (§7.2, unchanged) |
+| 0x30C0 + i | RW | owner of pad 8 + i (§7.1, unchanged) |
+| 0x5000 + 32·k + j | | lane k: j = 0–3 r0–r3 and 4 STATE (R; W while halted, E2); 5 `{PEND[6:4], FLAGS[3:0]}`; 6 RPC; 7 `{RIR valid [15], RZ [14]}`; 8 RIR; 9 `{O1 valid, O1 seq, O0 valid, O0 seq, I1 avail, I0 avail}` in `[5:0]`; 10/11 I0 head `{tag}` / data; 12/13 I1 head; 14/15 O0 token `{tag}` / data; 16/17 O1 token. All R except 0–4 |
+| 0x6000–0x6003 | W | HOST_IN push with tag = `addr[1:0]`. Refused (nothing loaded) while HOST_IN is not free: the host checks 0x6004 `[14]` first |
+| 0x6004 | R | HOST_OUT/HOST_IN status: `[15]` HOST_OUT has a token, `[14]` HOST_IN free, `[1:0]` HOST_OUT tag |
+| 0x6005 | R | HOST_OUT data; the read takes the token (it is consumer port 12, blocking or tap as configured) |
+| 0x8000–0x81FF | RW | SRAM, through the host's rotation slot (§14 R1) |
+
+- **Changes from §9 as written:** HOST_IN/HOST_OUT move from 0x6000/0x6001 to 0x6000–0x6005 (the tag needs two address bits; the R4 stub already does this). Everything else fills in what §9 left open.
+- **General need:** one map for the RTL, the host library and tripc; every debug field §9 lists becomes readable; the host can run any protocol's traffic through HOST_IN/HOST_OUT with flow control and an IRQ instead of polling.
+- **Cost:** the read multiplexer (~50 readable words) and a few decode terms; no new state beyond the IRQ enable (11 flops).
+- **Approval:** Krithik and Kanishk, together with D-042 and D-044. Then §9 and `spec/tripwire.yaml` get the map (the addresses become generated constants, as the pin configuration's are), and `trw_host.v` follows.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

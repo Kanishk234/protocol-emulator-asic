@@ -24,9 +24,9 @@ project:
     - "wp_sync.v"
     - "wp_crc32.v"
     - "wp_fifo.v"
+    - "wp_frame_select.v"
     - "fabric_gen/ConfigFSM.v"
     - "fabric_gen/Frame_Data_Reg.v"
-    - "fabric_gen/Frame_Select.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).

@@ -13,7 +13,10 @@
 
   "//": "PL_TARGET_DENSITY_PCT - You can increase this if Global Placement fails with error GPL-0302.",
   "//": "Users have reported that values up to 80 worked well for them.",
-  "PL_TARGET_DENSITY_PCT": 60,
+  "//": "WARP (D-025): Metal3 is the only horizontal layer and nothing routes over the fabric, so",
+  "//": "the shell is packed densely into the west column (fewer wires around the fabric) and",
+  "//": "global routing reserves less of each track (global-routing overflow 4153 -> 23)",
+  "PL_TARGET_DENSITY_PCT": 75,
 
   "//": "CLOCK_PERIOD - Increase this in case you are getting setup time violations.",
   "//": "The value is in nanoseconds, so 20ns == 50MHz.",
@@ -31,28 +34,32 @@
   "//": "https://tinytapeout.com/faq/#how-can-i-map-an-additional-external-clock-to-one-of-the-gpios",
   "CLOCK_PORT": "clk",
 
-  "//": "WARP (DECISIONS D-019): the fabric macro warp_tiny (macro/warp_tiny/, 357.12 x 483.84 um).",
-  "//": "Placed right of centre, centred vertically: its 152 west-face pins (FrameData, west IO) and",
-  "//": "67 south-face pins (FrameStrobe, clock/reset) face open core (BUGS #9). x = 11.52 + 7 x 109.92",
-  "//": "(power columns under the chip stripes, D-017) = 1627 x 0.48; y = 270 x 0.42 = 30 rows.",
-  "//": "The 148 um channel east of it holds a full-height stripe pair, so pdngen adds no short",
-  "//": "channel stripe there (TT pin check: power ports must span the block height, BUGS #11).",
-  "//": "Its nl is the port-only black box src/warp_tiny.v (not in info.yaml source_files), as the",
+  "//": "WARP (DECISIONS D-019, D-025): the fabric macro warp_g0 (macro/warp_g0/, 1016.64 x 669.06 um,",
+  "//": "arch/warp_g0, 96 LUT4). All TT pins are in the top-left corner (x 30-191 um), so the shell",
+  "//": "sits in a west column under them. x = 11.52 + 1 x 109.92 (power columns under the chip",
+  "//": "stripes, D-017) leaves a 148 um east channel that holds a full-height stripe pair (BUGS #11);",
+  "//": "x = 11.52 + 2 x 109.92 would leave 38 um with no stripe. Its pin-heavy west (160 FrameData +",
+  "//": "IO) and east (IO) faces face those columns (BUGS #9). y = 30.24 (8 rows): 26.5 um below for",
+  "//": "the per-column frame-strobe logic, 7.6 um above. Routing numbers: D-025.",
+  "//": "Its nl is the port-only black box src/warp_g0.v (not in info.yaml source_files), as the",
   "//": "R3 SRAM spike did: synthesis and STA see only its pins (D-019 revision 2).",
   "//": "No '//' keys inside MACROS: LibreLane rejects unknown keys in a Macro (BUGS #10).",
   "MACROS": {
-    "warp_tiny": {
+    "warp_g0": {
       "instances": {
         "u_fabric": {
-          "location": [780.96, 113.40],
+          "location": [121.44, 30.24],
           "orientation": "N"
         }
       },
-      "gds": ["dir::../macro/warp_tiny/warp_tiny.gds"],
-      "lef": ["dir::../macro/warp_tiny/warp_tiny.lef"],
-      "nl": ["dir::warp_tiny.v"]
+      "gds": ["dir::../macro/warp_g0/warp_g0.gds"],
+      "lef": ["dir::../macro/warp_g0/warp_g0.lef"],
+      "nl": ["dir::warp_g0.v"]
     }
   },
+  "//": "WARP (D-025): no standard cells in the east channel (shell stays west of the fabric)",
+  "FP_OBSTRUCTIONS": [[1148.16, 3.78, 1286.4, 706.86]],
+  "GRT_ADJUSTMENT": 0.15,
   "PDN_MACRO_CONNECTIONS": ["u_fabric VPWR VGND VPWR VGND"],
 
   "//": "WARP (D-019): the macro power grid script from the TRIPWIRE R3 spike (src/pdn_cfg.tcl header).",
@@ -68,7 +75,7 @@
   "//": "chip Metal4 stripes cross the macro's Metal4 obstruction over its power columns",
   "ERROR_ON_ILLEGAL_OVERLAPS": false,
   "//": "LVS treats the fabric macro as a black box",
-  "MAGIC_EXT_ABSTRACT_CELLS": ["warp_tiny"],
+  "MAGIC_EXT_ABSTRACT_CELLS": ["warp_g0"],
 
   "//": "Configuration docs: https://librelane.readthedocs.io/en/latest/reference/configuration.html",
 

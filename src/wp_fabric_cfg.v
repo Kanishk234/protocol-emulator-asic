@@ -1,7 +1,9 @@
-// Configuration path (ARCHITECTURE.md §3): FABulous's frame-based configuration FSM
-// (src/fabric_gen, unmodified) with one frame-data register per fabric row and one frame-select
-// decoder per column, the way FABulous's generated eFPGA_top wires them. All ROWS rows of the
-// macro are written (the edge rows have configuration bits too).
+// Configuration path (ARCHITECTURE.md §3): FABulous's frame-based configuration FSM and frame-data
+// registers (src/fabric_gen, unmodified), one register per fabric row, as FABulous's generated
+// eFPGA_top wires them; all ROWS rows of the macro are written (the edge rows have configuration
+// bits too). Frame strobes: the one-hot frame bits of the frame header are encoded to a frame
+// number here and each column decodes it itself (wp_frame_select, D-025), so the wires shared by
+// all columns are 11 instead of MAX_FRAMES + 6.
 //
 // Words come from the shell's checked loader (wp_shell): `word` is valid with a one-cycle
 // `word_strobe`; a one-cycle `restart` at LOAD_BEGIN returns the FSM to waiting for the sync word.
@@ -47,6 +49,16 @@ module wp_fabric_cfg #(
     // frame_address bits between the frame strobes and the column select are not used
     wire _unused = &{frame_address[FRAME_BITS-FRAME_SEL_W-1:MAX_FRAMES], 1'b0};
 
+    // one-hot frame bits -> frame number (the lowest set bit; the compile flow sets exactly one)
+    reg [FRAME_SEL_W-1:0] frame_idx;
+    integer i;
+    always @(*) begin
+        frame_idx = {FRAME_SEL_W{1'b0}};
+        for (i = MAX_FRAMES - 1; i >= 0; i = i - 1)
+            if (frame_address[i])
+                frame_idx = i[FRAME_SEL_W-1:0];
+    end
+
     genvar r, c;
     generate
         for (r = 0; r < ROWS; r = r + 1) begin : g_row
@@ -62,15 +74,16 @@ module wp_fabric_cfg #(
             );
         end
         for (c = 0; c < COLS; c = c + 1) begin : g_col
-            Frame_Select #(
-                .MaxFramesPerCol (MAX_FRAMES),
-                .FrameSelectWidth(FRAME_SEL_W),
-                .Col             (c)
+            wp_frame_select #(
+                .MAX_FRAMES(MAX_FRAMES),
+                .IDX_W     (FRAME_SEL_W),
+                .COL_W     (FRAME_SEL_W),
+                .COL       (c)
             ) u_col (
-                .FrameStrobe_I (frame_address[MAX_FRAMES-1:0]),
-                .FrameStrobe_O (frame_strobe[c*MAX_FRAMES +: MAX_FRAMES]),
-                .FrameSelect   (frame_address[FRAME_BITS-1 -: FRAME_SEL_W]),
-                .FrameStrobe   (long_frame_strobe)
+                .frame_idx    (frame_idx),
+                .col          (frame_address[FRAME_BITS-1 -: FRAME_SEL_W]),
+                .strobe       (long_frame_strobe),
+                .frame_strobe (frame_strobe[c*MAX_FRAMES +: MAX_FRAMES])
             );
         end
     endgenerate

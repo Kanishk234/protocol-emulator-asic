@@ -6,5 +6,5 @@
 lint_off -file "*fabric_gen/*"
 
 // Black-box view of the hardened fabric macro: its outputs are driven by the macro, not here
-lint_off -rule UNDRIVEN -file "*warp_tiny.v"
-lint_off -rule UNUSEDSIGNAL -file "*warp_tiny.v"
+lint_off -rule UNDRIVEN -file "*warp_*.v"
+lint_off -rule UNUSEDSIGNAL -file "*warp_*.v"

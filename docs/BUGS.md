@@ -93,3 +93,19 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** TT precheck pin check (`pin_check.py`).
 - **Now covered by:** a local stripe check after the power grid (every vertical Metal4 power stripe must reach within 10 µm of the top and bottom edges), run on TT's merged config before pushing. It flags both short stripes in the failed run's final DEF and finds none with the fix. Rule added to D-019: leave either no channel or one wide enough for a full grid stripe pair beside a macro.
 - **Fix:** fabric at x = 780.96 (one grid step left): the 148 µm east channel holds a regular stripe pair; 24 full-height stripes, 0 short; routing 0 overflow, 0 DRC locally.
+
+## 12: A zero-length load reached LOADED
+- **Date:** 2026-09-27
+- **Symptom:** the F2 cover run reached RUNNING in 15 cycles, too few for any real load: LOAD_BEGIN with LENGTH 0, then LOAD_END with the CRC of no words (0x00000000), passed every check.
+- **Root cause:** the sync-word check ran on the first LOAD_DATA word; with no words there was no first word, so nothing flagged the load. A host could then RUN whatever partial configuration an earlier failed load left in the latches, which ARCHITECTURE §3 forbids.
+- **Caught by:** `formal/f2_loader.sby` cover task (the trace length, not an assertion: the shadow loader had the same blind spot).
+- **Now covered by:** LOAD_END rejects a load with no words as a format error (0x13); the F2 shadow requires at least one word; pin-level test `test_empty_load_rejected`.
+- **Fix:** `src/wp_shell.v` LOAD_END check `fmt_err || wcount == 0`.
+
+## 13: FABulous bitgen drops the global-clock mux selects
+- **Date:** 2026-09-27
+- **Symptom:** with the real fabric RTL, `counter4` loaded and reached RUNNING but its outputs stayed X; `logic4`, also clocked, worked.
+- **Root cause:** `fabulous_bit_gen` 0.3.1 (`_apply_fasm_features`) skips every FASM feature whose name contains "CLK", meant for the bit-less `GCLK_END0.Lx_CLK` pips. It also drops `Xn Ym.N_GBUF_ENDk.GCLK_BEG0`, the select of the LUT tile's 4-input global-clock mux in the tile library. nextpnr routed counter4's clock through GBUF C (mux input 2); the select stayed 0, so the flip-flops never saw a clock. logic4's clock happened to use GBUF A (input 0, the all-zeros default). Stock FABulous fabrics have no such mux, which is presumably why upstream has not hit it; Tiny FABulous's own copy of the script has the skip commented out.
+- **Caught by:** `test/test_bitstream.py::test_counter4` on the fabric RTL, then tracing the clock hop by hop from the pad to the LC (GBUF feed, SW_term, N_GBUF, the GCLK mux).
+- **Now covered by:** `tools/compile/bitgen.py` (no skip, all rows); `test_gclk_mux_select_is_written`; `test_counter4` (clock through GBUF C). `test_matches_fabulous_bit_gen_except_clk_features` checks our generator equals upstream's on everything else.
+- **Fix:** WARP's own bitgen in the compile flow. Upstream not edited (worth reporting to FABulous).

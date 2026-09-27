@@ -6,17 +6,17 @@
 ## Tasks
 
 ### Shell
-- [ ] Host interface (SPI-like, polled status) per `ARCHITECTURE.md`.
-- [ ] Loader: length check, transport checksum, architecture-version tag, error handling.
-- [ ] Run control: stop, start, reset of user state; outputs parked and output enables off whenever the fabric is stopped or unconfigured.
-- [ ] Input synchronizers, registered outputs, open-drain support on bidirectional pins.
+- [x] Host interface (SPI-like, polled status) per `ARCHITECTURE.md`. (`src/wp_spi_target.v`, `src/wp_shell.v`; 13 pin-level tests in `test/test.py`, local 2026-09-27, RTL and gate level; spec clarifications D-021. CI run: pending push)
+- [x] Loader: length check, transport checksum, architecture-version tag, error handling. (ARCH_VERSION, LENGTH, CRC-32, sync word, empty load (BUGS #12); tests `test_wrong_arch_version`, `test_bad_crc`, `test_length_mismatch`, `test_bad_sync_word`, `test_empty_load_rejected`, `test_aborted_transaction_keeps_whole_words`)
+- [x] Run control: stop, start, reset of user state; outputs parked and output enables off whenever the fabric is stopped or unconfigured. (RUN/STOP/USER_RESET: `test_load_run_stop`, `test_counter4` on the fabric RTL; parking: F1 proof)
+- [x] Input synchronizers, registered outputs, open-drain support on bidirectional pins. (`src/tt_um_warp.v`; open drain exercised by logic4 on FAB_IO2, `test_logic4`, fabric RTL)
 - [ ] Host data path to and from the fabric (FIFOs if the budget allows; record the decision).
-- [ ] Host software: one Python API used by both simulation tests and future board software (`tools/host/`).
+- [x] Host software: one Python API used by both simulation tests and future board software (`tools/host/`). (`tools/host/protocol.py`, 10 pytest; used by `test/warp_host.py`)
 
 ### Fabric G0
 - [ ] Generic fabric at the size chosen in phase 1, defined in `arch/`, generated into `src/fabric_gen/`.
-- [ ] Protocol compile flow: `tools/compile/` turns a user design + pin constraints into a bitstream and a report (architecture version, tool versions, resource use, timing, pins, checksum).
-- [ ] The host rejects bitstreams built for a different architecture version.
+- [x] Protocol compile flow: `tools/compile/` turns a user design + pin constraints into a bitstream and a report (architecture version, tool versions, resource use, timing, pins, checksum). (D-022; runs on the current 16-LUT fabric; own bitgen, BUGS #13; example reports in `test/bitstreams/*.report.json`)
+- [x] The host rejects bitstreams built for a different architecture version. (`checked_load_transactions` + `test_host_refuses_other_architecture`; the shell too: `test_wrong_arch_version`)
 
 ### Integration and physical
 - [ ] Full 6x4 hardening of shell + G0 passes precheck; record area breakdown, routing overflow, and timing at the chosen clock.
@@ -29,8 +29,8 @@
 - [ ] Add the `fabric` CI workflow: compile every protocol and run it on the fabric simulation.
 
 ### Formal
-- [ ] Output isolation: no protocol output or output enable is active while stopped or loading (property and bound recorded).
-- [ ] Loader state machine: aborted or corrupt loads never reach the run state.
+- [x] Output isolation: no protocol output or output enable is active while stopped or loading (property and bound recorded). (F1, `formal/f1_isolation.sby`: unbounded, k-induction PASS, fabric outputs unconstrained; local 2026-09-27. CI `formal` pending push)
+- [x] Loader state machine: aborted or corrupt loads never reach the run state. (F2, `formal/f2_loader.sby`: BMC depth 84 PASS with an independent shadow CRC/length/sync check and arbitrary host bytes, cover reaches RUN in 52; bounded, not unbounded. Local 2026-09-27; found BUGS #12)
 
 ## Phase exit checklist
 - [ ] Shell + G1 hardened at 6x4, precheck passed (CI run ID: …)

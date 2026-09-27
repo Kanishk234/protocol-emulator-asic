@@ -29,7 +29,7 @@ Top module `tt_um_warp`, TT 6x4 tiles, IHP CMOS5L, clock `clk` (§5).
 ## 2. Host interface
 
 ### 2.1 Physical
-SPI target, **mode 0** (sample MOSI on SCK rising, change MISO on SCK falling), MSB first, 8-bit bytes. SCK, MOSI and CS_N are synchronized to `clk` (two flops), so **SCK ≤ clk/8** (6.25 MHz at 50 MHz). A transaction is everything between CS_N falling and rising; the first byte is the opcode.
+SPI target, **mode 0** (sample MOSI on SCK rising, change MISO on SCK falling), MSB first, 8-bit bytes. SCK, MOSI and CS_N are synchronized to `clk` (two flops), so **SCK ≤ clk/8** (6.25 MHz at 50 MHz), CS_N falling to the first SCK rising edge ≥ 8 clk, and CS_N high between transactions ≥ 4 clk (D-021). A transaction is everything between CS_N falling and rising; the first byte is the opcode.
 
 ### 2.2 Framing
 - During the opcode byte the chip shifts out the **STATUS byte** (§2.4), so every transaction also polls status.
@@ -41,7 +41,7 @@ SPI target, **mode 0** (sample MOSI on SCK rising, change MISO on SCK falling), 
 |---|---|---|---|---|
 | `0x01` | READ_ID | — | 4 bytes: `0x57 0x50` ("WP"), ARCH_VERSION (2) | any |
 | `0x02` | READ_STATUS | — | STATUS, then ERROR_CODE | any |
-| `0x10` | LOAD_BEGIN | ARCH_VERSION (2), LENGTH in 32-bit words (2) | — | UNCONFIGURED, LOADED, ERROR |
+| `0x10` | LOAD_BEGIN | ARCH_VERSION (2), LENGTH in 32-bit words (2) | — | any but RUNNING (in LOADING it restarts the load, D-021) |
 | `0x11` | LOAD_DATA | n × 4 bytes (bitstream words) | — | LOADING |
 | `0x12` | LOAD_END | CRC-32 of all LOAD_DATA words (4) | — | LOADING |
 | `0x20` | RUN | — | — | LOADED |
@@ -61,24 +61,24 @@ A command not allowed in the current state is ignored and sets ERROR_CODE `0x01`
 | [3] | tx_ready: the host → design channel has space (CH_WRITE) |
 | [2] | ch_overflow (sticky until READ_STATUS): a CH_WRITE arrived while full, byte dropped |
 | [1] | user_attention: the user design raised its attention output (§7.3) |
-| [0] | error_pending: ERROR_CODE ≠ 0 (cleared by READ_STATUS) |
+| [0] | error_pending: ERROR_CODE ≠ 0 (cleared by READ_STATUS once its ERROR_CODE byte is sent) |
 
 HOST_IRQ = rx_valid | user_attention | (STATE == ERROR).
 
-ERROR_CODE (second response byte of READ_STATUS): `0x00` none, `0x01` bad command, `0x10` wrong ARCH_VERSION, `0x11` LENGTH mismatch, `0x12` CRC mismatch, `0x13` bitstream sync/format error.
+ERROR_CODE (second response byte of READ_STATUS): `0x00` none, `0x01` bad command, `0x10` wrong ARCH_VERSION, `0x11` LENGTH mismatch, `0x12` CRC mismatch, `0x13` bitstream sync/format error. A load error always replaces ERROR_CODE; a bad command sets it only when it is 0 (D-021).
 
 ## 3. Configuration loading
 
 - **Bitstream:** the FABulous frame-based bitstream for the current architecture (`tools/compile/` output), a sequence of 32-bit words starting with the sync word `0xFAB0FAB1`, then per frame a header word (frame select + column) and one data word per fabric row, ending with a desync header (bit 20). The shell forwards words to FABulous's `ConfigFSM` (`src/fabric_gen/`) as they arrive.
-- **Checks:** LOAD_BEGIN's ARCH_VERSION must equal the chip's (else ERROR `0x10`, no word is forwarded). LOAD_END's CRC-32 (IEEE 802.3 polynomial, over all LOAD_DATA words in order, big-endian bytes) must match, and exactly LENGTH words must have arrived (else ERROR `0x11`/`0x12`). The first word must be the sync word (else `0x13`).
+- **Checks:** LOAD_BEGIN's ARCH_VERSION must equal the chip's (else ERROR `0x10`, no word is forwarded). LOAD_END's CRC-32 (IEEE 802.3 polynomial, over all LOAD_DATA words in order, big-endian bytes) must match, and exactly LENGTH words must have arrived (else ERROR `0x11`/`0x12`). The first word must be the sync word (else `0x13`; forwarding stops at once; a load with no words is also `0x13`, BUGS #12). Wrong ARCH_VERSION is reported at LOAD_BEGIN; sync, LENGTH and CRC at LOAD_END, in that order (D-021). Words beyond LENGTH are not forwarded.
 - **Consequence of streaming:** words are written into configuration latches before the CRC is known, so after any load error the fabric holds partial configuration. The shell then stays in ERROR (fabric stopped, outputs parked) until a new complete, correct load. **A load that fails any check never reaches RUNNING** (formal property F2, VERIFICATION).
 - **Time:** ~(bitstream words × 32) SCK cycles; the 96-LUT fabric's bitstream is estimated at ~2–3 K words (≈ 15–25 ms at 6 MHz). To measure in phase 2.
 
 ## 4. Run control and output parking
 
-States (§2.4): UNCONFIGURED → (LOAD_BEGIN) LOADING → (LOAD_END ok) LOADED → (RUN) RUNNING → (STOP) LOADED. Any load error → ERROR; LOAD_BEGIN from LOADED or ERROR starts a new load (the design is stopped first). `rst_n` low → UNCONFIGURED.
+States (§2.4): UNCONFIGURED → (LOAD_BEGIN) LOADING → (LOAD_END ok) LOADED → (RUN) RUNNING → (STOP) LOADED. Any load error → ERROR; LOAD_BEGIN from LOADING, LOADED or ERROR starts a new load (the design is stopped first). `rst_n` low → UNCONFIGURED.
 
-**Parking (hard rule):** unless STATE is RUNNING, every fabric output pin is 0 and every `uio_oe` bit is 0 (all `uio` pins inputs), and the user design is held in reset. The parking gate is in the shell's output registers (§6), after the fabric, so no configuration state can override it (formal property F1).
+**Parking (hard rule):** unless STATE is RUNNING, every fabric output pin is 0 and every `uio_oe` bit is 0 (all `uio` pins inputs), and the user design is held in reset. The parking gate is an AND after the shell's output registers (§6), so pins are 0 in the same cycle STATE leaves RUNNING, and it sits after the fabric, so no configuration state can override it (formal property F1).
 
 ## 5. Clocking and reset
 - One clock, `clk`, target **50 MHz** (`CLOCK_PERIOD` 20 ns). The shell and the user design both run on it; the fabric receives it through a global buffer (south IO tile → GBUF, as in the spike).
@@ -109,7 +109,7 @@ The shell's host byte channels and status reach the user design through dedicate
 - host → design: `h_wdata[7:0]`, `h_wlast`, `h_wvalid` (into the fabric), `h_wready` (out of the fabric);
 - design → host: `h_rdata[7:0]`, `h_rvalid` (out), `h_rready` (in);
 - `h_status[7:0]` (out, read by USER_STATUS) and `h_attention` (out, STATUS bit 1).
-Each direction has a small FIFO in the shell (**OPEN:** depth 2–4, decided by area). **OPEN:** the north IO tile type and whether `h_status` is narrowed to fit the IOBUF budget (~18–29 BELs needed).
+Each direction has a 2-entry FIFO in the shell (D-021; revisit with the fabric's area), emptied whenever STATE ≠ RUNNING. **OPEN:** the north IO tile type and whether `h_status` is narrowed to fit the IOBUF budget (~18–29 BELs needed).
 
 ## 8. Hard primitives
 

@@ -14,22 +14,26 @@ protocols, behind a fixed management shell. A protocol (UART, SPI, I2C, ...) is 
 Verilog, compiled on a host computer into a bitstream, and loaded into the chip over the host interface. Changing the
 protocol changes the bitstream, not the silicon.
 
-**Status: phase 1 spike.** The current design is a 16-LUT FABulous fabric (2 LUT4x8 tiles plus IO tiles) behind a
-minimal shell: a bit-bang configuration port (`CFG_CLK`, `CFG_DATA`) feeding FABulous's frame-based configuration
-logic, and run control. Fabric outputs and output enables are parked (0) unless `RUN` is high and no configuration
-session is running. The full shell (SPI-like host interface, checked loading, host byte channels) and the larger,
-specialized fabric come later.
+**Status: phase 2 in progress.** The shell is complete: an SPI host interface, a checked bitstream loader
+(architecture version, length, CRC-32, sync word) feeding FABulous's frame-based configuration logic, run control,
+and host byte channels. Fabric outputs and output enables are parked (0) unless a correctly loaded design is running.
+The fabric is still the 16-LUT phase 1 macro (2 LUT4x8 tiles plus IO tiles), connected to `FAB_IN0..3`,
+`FAB_OUT0..3` and all 8 `uio` pins; the larger fabric comes next.
 
 ## How to test
 
-1. Hold `RUN` low. Send the bitstream words over `CFG_CLK`/`CFG_DATA` (FABulous bit-bang protocol: each data bit on a
-   rising edge of `CFG_CLK`, a control bit on each falling edge; control pattern `0xFAB1` marks a word, `0xFAB0` ends
-   the session). `CFG_ACTIVE` is high during the session.
-2. Raise `RUN`. The fabric's outputs drive `uo[2..5]` and the `uio` pins as the loaded design says.
+The host is an SPI controller (mode 0, MSB first, SCK at most clk/8) on `HOST_CS_N`, `HOST_SCK`, `HOST_MOSI`,
+`HOST_MISO`. Each transaction starts with an opcode byte, during which the chip returns its STATUS byte
+(state in bits 7..5: 0 unconfigured, 1 loading, 2 loaded, 3 running, 4 error).
 
-Bitstream generation for this fabric is part of the next development phase.
+1. `0x01` READ_ID: the chip answers `0x57 0x50` ("WP") and the architecture version (2 bytes).
+2. Load: `0x10` LOAD_BEGIN (version, length in words), `0x11` LOAD_DATA (bitstream words, big-endian), `0x12`
+   LOAD_END (CRC-32 of the words). STATUS shows 2 (loaded), or 4 (error; `0x02` READ_STATUS gives the error code).
+3. `0x20` RUN: the loaded design drives `uo[2..7]` and the `uio` pins. `0x21` STOP parks them again.
+
+The Python host library (`tools/host/protocol.py` in the repository) builds every transaction.
 
 ## External hardware
 
-None for the placeholder. For protocols: the peer device under test (e.g. a UART adapter, SPI or I2C device) and a
-host that can drive the SPI-like host interface.
+A host that can drive SPI (a microcontroller or USB-SPI adapter), and the peer device for the loaded protocol
+(e.g. a UART adapter, SPI or I2C device).

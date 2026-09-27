@@ -4,7 +4,7 @@
 **Reproduce:** `spikes/tile_cmos5l/run.sh <TILE>` for each tile type, then `spikes/fabric_tiny/run.sh` (or `run.sh --tiles` for both). Tile library: `mole99/fabulous-tiles` 7999e5a + `spikes/tile_cmos5l/cmos5l.patch` (D-010).
 
 ## Fabric
-`spikes/fabric_tiny/warp_tiny.csv`, 3 × 4 FABulous tiles, **16 LUT4+FF**:
+`arch/warp_tiny/fabric.csv` (was `spikes/fabric_tiny/warp_tiny.csv`), 3 × 4 FABulous tiles, **16 LUT4+FF**:
 ```
 NW_term  N_term     NE_term
 W_IO4    LUT4x8_ha  E_IO4

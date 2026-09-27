@@ -4,6 +4,19 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-27 (session 7: phase 2 started: shell, compile flow, real bitstreams)
+**Done:**
+- **Shell** (ARCHITECTURE §2–6): `wp_spi_target`, `wp_shell` (commands, checked loader, run control, 2-entry host channel FIFOs), `wp_crc32` (bit-serial), `wp_fifo`, `wp_sync`; new top-level pinout; FABulous's bit-bang receiver removed. Spec clarifications D-021.
+- **Host software** `tools/host/protocol.py` (from the spec): transactions, STATUS decode, CRC, architecture check before loading.
+- **Formal:** F1 output isolation proven unbounded (k-induction); F2 bounded (BMC 84) against an independent shadow loader. The F2 cover trace exposed **BUGS #12** (an empty load reached LOADED), now fixed. New `formal` workflow.
+- **Compile flow** `tools/compile/` (D-022): pin map → wrapper → Yosys → nextpnr (slow-corner timing) → WARP bitgen → `.wbit` + report. `arch/warp_tiny/` (fabric.csv, pins.csv, arch.yaml). **BUGS #13**: FABulous's bitgen drops the global-clock mux selects; our generator fixes it and matches upstream word for word elsewhere.
+- **Real bitstreams on the whole chip:** `test/test_bitstream.py` loads `counter4` and `logic4` over SPI and checks them at the pins, on the fabric RTL (`WARP_FABRIC=rtl`, new job in `fabric`) and on the hardened macro's gate-level netlists (`GATES=yes`, what CI `gl_test` runs). Gate level needed D-023 (settle X routing loops; no reload over a running configuration).
+**Boxes ticked (local evidence; CI run IDs to add after push):** host interface, loader, run control, IO cells, host software, compile flow, host rejects other architectures, F1, F2.
+**Not yet:** host data path into the fabric (FIFOs exist, the current fabric has no channel BELs), G0/G1 fabric, 6x4 hardening, timing model documentation, protocols on G0, `gl_test` evidence from CI.
+**Next:** push, get CI green (lint, unit, test, fabric, formal, gds + gl_test); then the G0 4×3 fabric in `arch/` with north IO for the host channel.
+
+---
+
 ## 2026-09-27 (session 6: fabric through TT's flow; phase 1 complete)
 **Done:**
 - Three CI iterations on the chip-level integration, each failure logged: routing stuck because the fabric's pin faces pointed at the die edges (BUGS #9, run cancelled after ~4.8 h); `"//"` keys inside MACROS (BUGS #10); precheck pin check failed on pdngen's short channel stripes beside the fabric (BUGS #11). Adopted the R3 SRAM spike's macro settings (D-019 rev 2: routing-iteration cap, Magic/LVS handling, port-only black box). Added a local pre-flight: TT's merged config through LibreLane (Nix) up to detailed routing + a full-height power-stripe check (~3 min).

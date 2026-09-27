@@ -10,6 +10,8 @@ Release (§4.4, §14 F3): all_taken[p] = AND over the ports that list p of
 Unit count: NU, read from `localparam NU` in overlay/src/tt_um_tripwire.v (run 2 of D-043: 4). The
 numbering above stays; units NU-5 are absent: their producers are tied off in the top (constant,
 so synthesis removes them from every multiplexer) and their U<u>.tx ports are not built.
+Lane count: NL, read from `localparam NL` the same way (run 4 of D-043: 2). Lanes NL-2 are absent in the
+same way: L<k>.O0/O1 tied off in the top, L<k>.I0/I1 ports not built.
 
 Usage: python spikes/r4_floorplan/gen_fabric.py [--check]
 """
@@ -26,8 +28,9 @@ CONS = [f"L{k}.I{i}" for k in range(3) for i in range(2)] + [f"U{u}.tx" for u in
 OUT = pathlib.Path(__file__).resolve().parent / "overlay" / "src" / "r4_fabric.v"
 TOP = OUT.with_name("tt_um_tripwire.v")
 NU = int(re.search(r"localparam\s+NU\s*=\s*(\d+)\s*;", TOP.read_text()).group(1))
-assert 1 <= NU <= 6
-ABSENT = {f"U{u}.tx" for u in range(NU, 6)}
+NL = int(re.search(r"localparam\s+NL\s*=\s*(\d+)\s*;", TOP.read_text()).group(1))
+assert 1 <= NU <= 6 and 1 <= NL <= 3
+ABSENT = {f"U{u}.tx" for u in range(NU, 6)} | {f"L{k}.I{i}" for k in range(NL, 3) for i in range(2)}
 
 
 def generate():
@@ -38,7 +41,7 @@ def generate():
          "// release terms (ARCHITECTURE.md §4, §4.6). The producer registers live with their owners.",
          "// Producers: " + ", ".join(f"{i} {p}" for i, p in enumerate(PROD)),
          "// Consumers: " + ", ".join(f"{i} {c}" for i, c in enumerate(CONS)),
-         f"// Units: {NU} (from tt_um_tripwire.v); absent ports: " + (", ".join(sorted(ABSENT)) or "none"),
+         f"// Units: {NU}, lanes: {NL} (from tt_um_tripwire.v); absent ports: " + (", ".join(sorted(ABSENT)) or "none"),
          "`default_nettype none", "",
          "module r4_fabric (",
          "    input  wire             clk,",
@@ -60,7 +63,7 @@ def generate():
     users = {p: [] for p in range(np_)}
     for c, name in enumerate(CONS):
         if name in ABSENT:
-            L += [f"    // {name}: absent (units = {NU})",
+            L += [f"    // {name}: absent (units = {NU}, lanes = {NL})",
                   f"    assign avail[{c}] = 1'b0;",
                   f"    assign head[{18 * c + 17}:{18 * c}] = 18'd0;",
                   f"    assign blk[{c}] = 1'b0;",

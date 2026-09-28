@@ -37,7 +37,7 @@
 - [x] `gl_test` green with two different real bitstreams (CI run ID: 36367067731, 19/19: counter4, logic4, two_bitstreams, host_channel, prims, uart)
 - [x] `docs/reports/g0_results.md` shows fit/resources/timing for every design-set protocol (all four; G1 in `g1_results.md`)
 - [x] Formal properties pass with named bounds (proof log summary in `docs/reports/`) (`docs/reports/formal.md`: F1 unbounded, F2 BMC 84, F4 unbounded; CI `formal` 36367067725)
-- [x] The `fabric` workflow is green (36367067735 on d6f5dcd; the protocol-compile step goes green with the next push, to be re-checked)
+- [x] The `fabric` workflow is green (36367067735 on d6f5dcd; with the protocol-compile step: 36376994866 on 2befd16)
 - [x] Decision point recorded: G1 is a valid fallback submission (or what's missing) (D-029)
-- [ ] All CI workflows green on `efpga`
-- [ ] `docs/summaries/PHASE2.md` written
+- [x] All CI workflows green on `efpga` (2befd16: lint 36376994840, docs 36376994820, test 36376994824, unit 36376994823, fabric 36376994866, gds + precheck + gl_test 21/21 36376994834; formal last ran on the chip RTL at d6f5dcd, 36367067725, nothing it covers changed since)
+- [x] `docs/summaries/PHASE2.md` written

@@ -3,9 +3,9 @@
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0x4CF79D42",
+  "crc32": "0x764B8411",
   "timing_corner": "nom_slow_1p08V_125C",
-  "fmax_mhz": 58.01,
+  "fmax_mhz": 52.97,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {

@@ -1,0 +1,15 @@
+# Test bitstream (test/test_bitstream.py::test_uart): the design-set UART on the hard primitives,
+# at 16 clocks per bit so a simulated frame is short. Sources: the protocol's own files.
+sources: [../../../protocols/uart/uart_top.v, ../../../protocols/uart/uart_tx.v,
+          ../../../protocols/uart/uart_rx.v, ../../../protocols/uart/uart_tx_p.v,
+          ../../../protocols/uart/uart_rx_p.v]
+top: uart_top
+params:
+  DIV: 16
+  RUNTIME_DIV: 0
+  PRIMS: 1
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  tx_o: FAB_OUT0

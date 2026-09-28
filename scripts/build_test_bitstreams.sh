@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Compile the example user designs (tools/compile/examples) into test/bitstreams/*.wbit, the real
+# Compile the example user designs (tools/compile/examples; a yaml with `sources:` names files
+# elsewhere, e.g. a design-set protocol) into test/bitstreams/*.wbit, the real
 # bitstreams test/test_bitstream.py loads through the host interface (RTL fabric model and CI's
 # gl_test, which cannot run the compile flow itself). Deterministic (fixed nextpnr seed);
 # `--check` rebuilds and fails if the committed files differ.
@@ -20,8 +21,14 @@ mkdir -p "$OUT"
 for yml in tools/compile/examples/*.yaml; do
   name=$(basename "$yml" .yaml)
   work="build/compile/$name"
-  (cd tools && python -m compile.compile --pins "compile/examples/$name.yaml" -o "../$work" \
-      "compile/examples/$name.v")
+  # sources: the example's own .v, or the yaml's `sources:` list (relative to the yaml)
+  if [ -f "tools/compile/examples/$name.v" ]; then
+    srcs="compile/examples/$name.v"
+  else
+    srcs=$(python -c "import yaml; print(' '.join('compile/examples/' + s for s in yaml.safe_load(open('$yml'))['sources']))")
+  fi
+  # shellcheck disable=SC2086
+  (cd tools && python -m compile.compile --pins "compile/examples/$name.yaml" -o "../$work" $srcs)
   if [ "${1:-}" = "--check" ]; then
     if ! cmp -s "$work/$name.wbit" "$OUT/$name.wbit"; then
       echo "error: $OUT/$name.wbit differs from a fresh build" >&2

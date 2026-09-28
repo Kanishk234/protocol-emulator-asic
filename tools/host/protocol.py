@@ -13,7 +13,7 @@ from enum import IntEnum
 from typing import Iterable, List, Sequence
 import zlib
 
-ARCH_VERSION = 0x0002   # the chip being built (arch/CURRENT: warp_g0); 0x0001 was warp_tiny
+ARCH_VERSION = 0x0003   # the chip being built (arch/CURRENT: warp_g1); 0x0002 was warp_g0, 0x0001 warp_tiny
 ID_MAGIC = (0x57, 0x50)  # "WP"
 SYNC_WORD = 0xFAB0FAB1
 

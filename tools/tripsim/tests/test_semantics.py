@@ -524,6 +524,165 @@ def test_p25_own_frame_opens_at_next_bit_boundary_with_started_event():
     assert chip.pins[0].rx_prod._load == (S.TAGS["EVENT"], 0x9001)  # D-054 P-G32
 
 
+def test_p23_due_stuff_bit_is_suppressed_when_tx_queue_is_empty():
+    chip = bitsync_unit(stuff_n=2)
+    bs = chip.pins[0].bs
+    bs.tx_stuff, bs.tx_run_lvl, bs.tx_run_n = True, 0, 2
+    bs._tx_bit_start(0)
+    assert bs.tx_bit is None and bs.u._tx_apply[-1] == (0, "level", bs.rec)
+    # D-054 P-G33 reads that a due stuff bit is sent even when no later DATA bit follows.
+
+
+def test_p25_tx_stuffing_run_restarts_at_frame_start():
+    bs = bitsync_unit().pins[0].bs
+    bs.tx_run_lvl, bs.tx_run_n = 0, 4
+    bs._start_frame(12 * 256)
+    assert bs.tx_run_lvl is None and bs.tx_run_n == 0          # D-054 P-G34
+
+
+def test_p25_released_line_is_not_own_edge_and_allows_idle_close():
+    chip = bitsync_unit(idle_bits=2)
+    bs = chip.pins[0].bs
+    bs.prev, bs.idle_cnt, bs.tx_line, bs.tx_bit = bs.rec, 2, None, None
+    bs.step(1, 0, 1)                                          # external dominant edge
+    assert bs.in_frame and not bs.own                       # release did not claim this edge
+
+    bs2 = bitsync_unit(idle_bits=2).pins[0].bs
+    bs2.in_frame = bs2.rx_on = True
+    bs2.idle_cnt = 1
+    bs2.tx_line = None                                      # line released by our unit
+    bs2._sample_bit(bs2.rec)
+    assert not bs2.in_frame                                  # idle can end the observed frame
+
+
+def test_p28_response_jam_taken_in_own_frame_is_deferred_in_current_model():
+    chip = bitsync_unit()
+    unit = chip.pins[0]
+    bs = unit.bs
+    bs.in_frame = bs.own = True
+    p = chip.fabric.producers["HOST_IN"]
+    jam_word = (S.PIN_CMD["JAM"] << 12) | (1 << 5)         # response JAM, level 1, one bit
+    p.valid, p.seq, p.tag, p.data = 1, 1, S.TAGS["CTRL"], jam_word
+    cmds = {n: S.PIN_CMD[n] for n in ("FRAME", "JAM", "SETN")}
+    bs.accept(0, unit.tx_port, cmds)
+    assert bs.jam == [1, 1, 1, False]                       # P-G36 says judge at take
+    bs.in_frame = bs.own = False                            # frame ends before its next bit
+    bs.jam[2] = 0
+    bs._tx_bit_start(1)
+    assert bs.tx_bit == 1                                   # the deferred response now fires
+
+
+def test_p28_flag_abort_error_carries_current_line_bit_count():
+    bs = bitsync_unit(delim="flag", stuff_n=5, stuff_lvl=1).pins[0].bs
+    bs.in_frame = bs.rx_on = True
+    bs.after6, bs.hunting = True, False
+    bs.frame_bits, bs.bits, bs.bitno = 1, [0], 8
+    bs._sample_bit(1)                                       # seventh one aborts at count 9
+    assert list(bs.out) == [(S.TAGS["ERR"], 0x2009)]        # D-055 P-G37
+
+
+def test_p28_jam_bit_zero_without_armed_bit_starts_response_in_current_model():
+    chip = bitsync_unit()
+    unit = chip.pins[0]
+    bs = unit.bs
+    p = chip.fabric.producers["HOST_IN"]
+    p.valid, p.seq, p.tag = 1, 1, S.TAGS["CTRL"]
+    p.data = S.PIN_CMD["JAM"] << 12 | 1                    # [0] set, [4] clear
+    cmds = {n: S.PIN_CMD[n] for n in ("FRAME", "JAM", "SETN")}
+    bs.accept(0, unit.tx_port, cmds)
+    assert bs.jam == [0, 1, 1, False]                       # P28 says [0] alone is ignored
+
+
+def test_p28_jam_bits_do_not_enable_readback():
+    bs = bitsync_unit().pins[0].bs
+    bs.rb = 2
+    bs.jam = [1, 1, 0, False]
+    bs._tx_bit_start(0)
+    assert bs.tx_bit == 1 and bs.tx_rb == 0                 # D-055 P-G39
+
+
+def test_p23_foreign_frame_stuff_error_aborts_queued_tx_in_current_model():
+    bs = bitsync_unit(stuff_n=1, stuff_lvl=0).pins[0].bs
+    bs.in_frame, bs.rx_on, bs.rx_stuff, bs.own = True, True, True, False
+    bs.run_lvl, bs.run_n = 0, 1
+    bs.q.append(("b", 1, True))
+    bs._sample_bit(0)
+    assert not bs.q and not bs.own                        # D-055 P-G40 says preserve other TX
+
+
+def test_p26_status_event_wait_queue_holds_two_pending_events():
+    bs = bitsync_unit().pins[0].bs
+    bs._emit(S.TAGS["EVENT"], 0xA001)
+    bs._emit(S.TAGS["EVENT"], 0xA002)
+    assert list(bs.out) == [(S.TAGS["EVENT"], 0xA001), (S.TAGS["EVENT"], 0xA002)]
+    bs._emit(S.TAGS["EVENT"], 0xA003)
+    assert list(bs.out) == [(S.TAGS["EVENT"], 0xA001), (S.TAGS["EVENT"], 0xA002)]
+    assert bs.u.flags["OVERRUN"]                           # D-055 P-G41's one-entry wait
+
+
+def test_p26_each_tx_bit_carries_the_readback_mode_at_bit_start():
+    bs = bitsync_unit().pins[0].bs
+    bs.q.extend([("line", 2), ("b", 0, True), ("line", 0), ("b", 1, True)])
+    bs._tx_bit_start(0)
+    assert bs.tx_rb == 2
+    bs._sample_bit(1)                                       # mode 2 reports even without error
+    bs._tx_bit_start(1)
+    assert bs.tx_rb == 0
+    bs._sample_bit(0)
+    assert list(bs.out) == [(S.TAGS["EVENT"], 0xE000)]     # D-055 P-G42
+
+
+def test_p28_jam_delay_counts_to_bit_start_then_disarms_when_fired():
+    bs = bitsync_unit().pins[0].bs
+    bs.jam = [1, 1, 1, False]                               # one more sample point
+    bs._sample(1)
+    assert bs.jam[2] == 0
+    bs._tx_bit_start(1)
+    assert bs.tx_bit == 1 and bs.jam is None                # D-055 P-G43
+
+
+def test_p23_stuff_run_counts_started_bits_not_queued_bits():
+    bs = bitsync_unit(delim="flag", stuff_n=5).pins[0].bs
+    bs.q.extend([("b", 1, True), ("b", 1, True)])
+    assert bs.tx_run_n == 0
+    bs._tx_bit_start(0)
+    assert bs.tx_bit == 1 and bs.tx_run_n == 1               # D-055 P-G44
+
+
+def test_p28_listen_only_clears_tx_queue_and_both_jam_states():
+    chip = bitsync_unit()
+    unit = chip.pins[0]
+    bs = unit.bs
+    bs.q.append(("b", 1, True))
+    bs.jam, bs.jam_armed = [0, 2, 0, False], (1, 3)
+    p = chip.fabric.producers["HOST_IN"]
+    p.valid, p.seq, p.tag = 1, 1, S.TAGS["CTRL"]
+    p.data = (S.PIN_CMD["JAM"] << 12) | 2                 # JAM [1]: listen-only
+    cmds = {n: S.PIN_CMD[n] for n in ("FRAME", "JAM", "SETN")}
+    bs.accept(0, unit.tx_port, cmds)
+    assert bs.tx_off and not bs.q and bs.jam is None and bs.jam_armed is None  # P-G45
+
+
+def test_p26_readback_abort_event_carries_level_and_line_bit_index():
+    bs = bitsync_unit().pins[0].bs
+    bs.tx_bit, bs.tx_rb, bs.bitno = 0, 1, 4
+    bs._sample_bit(1)
+    assert list(bs.out) == [(S.TAGS["EVENT"], 0xC008)]     # D-055 P-G46
+    assert not bs.own
+
+
+def test_p29_se0_ends_frame_only_when_both_sampled_lines_are_low():
+    bs = bitsync_unit(delim="se0", stuff_n=0).pins[0].bs
+    bs.in_frame = bs.rx_on = bs.own = True
+    bs.bits, bs.sense_b = [1, 0, 1], 1
+    bs._sample_bit(0)
+    assert bs.in_frame and not bs.out
+    bs.sense_b = 0
+    bs._sample_bit(0)
+    assert not bs.in_frame and list(bs.out) == [(S.TAGS["EVENT"], 0b0101 | (1 << 14))]
+    # D-055 P-G47: SE0 ends after the second line is also low; its sample is not frame data.
+
+
 @pytest.mark.parametrize("delim", ["flag", "se0"])
 def test_bitsync_frame_end_event_carries_own_bit(delim):
     """BUGS #39: frames ended by a flag or by SE0 lacked EVENT data[14] = own frame (§14 P24)."""

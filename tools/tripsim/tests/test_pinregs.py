@@ -62,6 +62,15 @@ def test_units_follow_the_spec():
         set(features) for features in S.PIN_UNIT_FEATURES]
 
 
+def test_chip_default_lane_and_unit_counts_follow_generated_spec(monkeypatch):
+    # Exercise a smaller generated shape so hard-coded 3/6 defaults cannot pass.
+    monkeypatch.setattr(S, "LEGAL_SOURCES", {"L0.I0": (), "L1.I0": ()})
+    monkeypatch.setattr(S, "PIN_UNIT_FEATURES", ((), (), (), ()))
+    chip = Chip()
+    assert len(chip.lanes) == 2
+    assert len(chip.pins) == 4
+
+
 def test_lean_units_do_not_store_optional_fields():
     """D-040: on U2-U5 the PULSE, carrier and BITSYNC field bits are never set, and read as defaults."""
     opt = {f for fields, _ in S.PIN_FEATURES.values() for f in fields}

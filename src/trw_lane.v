@@ -237,6 +237,16 @@ module trw_lane #(
     wire rt_out  = rt_word &&  rt_ctl && (rt_sub == `TRW_RT_SUB_OUT);
     wire rt_sys  = rt_word &&  rt_ctl && (rt_sub == `TRW_RT_SUB_SYS);
 
+    // Register read ports (area: one index mux per port instead of one 16-bit register mux per use). The
+    // step in EXEC is a slot or a routine word, never both, and each routine word reads at most these two.
+    //   A: routine control word -> rd (DJNZ, LDIH, ST data); routine ALU word -> ra; slot -> ASRC[1:0]
+    //   B: routine OUT -> ra; LD/ST -> the base; routine ALU word -> b; slot -> IMM[1:0] (BSEL reg)
+    wire [1:0]  ia   = ex_rt ? (rt_ctl ? rt_crd : rt_ara) : ex_asrc[1:0];
+    wire [1:0]  ib   = ex_rt ? (rt_ctl ? ((rt_sub == `TRW_RT_SUB_OUT) ? rt_ora : rt_mra) : rt_b[1:0])
+                             : ex_imm[1:0];
+    wire [15:0] rd_a = regs[16*ia +: 16];
+    wire [15:0] rd_b = regs[16*ib +: 16];
+
     reg  [3:0]  alu_op;
     reg  [15:0] alu_a, alu_b;
     reg  [7:0]  alu_f;
@@ -244,22 +254,22 @@ module trw_lane #(
         if (ex_rt) begin
             if (rt_ctl) begin                   // DJNZ: rd - 1 (other control words do not use the ALU)
                 alu_op = `TRW_OP_SUB;
-                alu_a  = regs[16*rt_crd +: 16];
+                alu_a  = rd_a;
                 alu_b  = 16'd1;
                 alu_f  = 8'd0;
             end else begin
                 alu_op = rt_aop;
-                alu_a  = regs[16*rt_ara +: 16];
-                alu_b  = rt_bs ? {10'd0, rt_b} : regs[16*rt_b[1:0] +: 16];
-                alu_f  = rt_bs ? {2'd0, rt_b}  : regs[16*rt_b[1:0] +: 8];
+                alu_a  = rd_a;
+                alu_b  = rt_bs ? {10'd0, rt_b} : rd_b;
+                alu_f  = rt_bs ? {2'd0, rt_b}  : rd_b[7:0];
             end
         end else begin
             alu_op = ex_op;
-            alu_a  = !ex_asrc[2] ? regs[16*ex_asrc[1:0] +: 16]
+            alu_a  = !ex_asrc[2] ? rd_a
                    : (ex_asrc == `TRW_ASRC_ZERO) ? 16'd0 : a_lat;
             // L8: B = r[IMM[1:0]], K[IMM[1:0]] or IMM; L12: BSEL 3 means IMM.
             case (ex_bsel)
-                `TRW_BSEL_REG: alu_b = regs[16*ex_imm[1:0] +: 16];
+                `TRW_BSEL_REG: alu_b = rd_b;
                 `TRW_BSEL_K:   alu_b = k[16*ex_imm[1:0] +: 16];
                 default:       alu_b = {8'd0, ex_imm};
             endcase
@@ -295,7 +305,20 @@ module trw_lane #(
     wire dj_go   = rt_djnz && !alu_r;
     wire [AW-1:0] br_off = {{(AW-9){rt_boff[8]}}, rt_boff};
     wire [AW-1:0] dj_off = rt_joff[AW-1:0];              // 10-bit signed, taken modulo 2^AW
-    wire [AW-1:0] m_addr = regs[16*rt_mra +: AW] + {{(AW-8){1'b0}}, rt_moff};   // R3, modulo the size
+    wire [AW-1:0] m_addr = rd_b[AW-1:0] + {{(AW-8){1'b0}}, rt_moff};           // R3, modulo the size
+
+    // One register write port for the step in EXEC (they are mutually exclusive: a slot, the LD result step,
+    // or one routine word); the host's write while halted comes after it and wins (E2).
+    wire        w_gett = rt_sys && (rt_fn == `TRW_SYS_GETT);
+    wire        w_getk = rt_sys && (rt_fn == `TRW_SYS_GETK);
+    wire        w_en   = ex_d_reg || ex_ld || rt_alu || rt_ldi || rt_ldih || rt_djnz || w_gett || w_getk;
+    wire [1:0]  w_idx  = ex_slot ? ex_dst[1:0] : ex_ld ? ld_rd : rt_alu ? rt_ard : rt_sys ? rt_fi : rt_crd;
+    wire [15:0] w_dat  = rt_ldi  ? {6'd0, rt_imm}
+                       : rt_ldih ? {rt_imm[5:0], rd_a[9:0]}
+                       : ex_ld   ? a_lat
+                       : w_gett  ? t_lat
+                       : w_getk  ? k[16*rt_arg[3:2] +: 16]
+                       :           alu_d;                    // slot, routine ALU word, DJNZ (R6: RZ unchanged)
 
     assign out_load[0] = (ex_d_out && (ex_dst[0] == 1'b0)) || (rt_out && !rt_port);
     assign out_load[1] = (ex_d_out && (ex_dst[0] == 1'b1)) || (rt_out &&  rt_port);
@@ -367,8 +390,8 @@ module trw_lane #(
             end
 
             // ---- EXEC writes (L5); EVAL's static updates below win where both apply
-            if (ex_d_reg)
-                regs[16*ex_dst[1:0] +: 16] <= alu_d;
+            if (w_en)
+                regs[16*w_idx +: 16] <= w_dat;
             if (ex_d_out) begin
                 out_valid[ex_dst[0]]         <= 1'b1;
                 out_seq[ex_dst[0]]           <= ~out_seq[ex_dst[0]];
@@ -379,18 +402,8 @@ module trw_lane #(
                 f[ex_df]    <= alu_r;
                 pend[ex_df] <= 1'b0;
             end
-            if (ex_ld)                                              // R3: the LD result step
-                regs[16*ld_rd +: 16] <= a_lat;
-            if (rt_alu) begin
-                regs[16*rt_ard +: 16] <= alu_d;
+            if (rt_alu)
                 rz <= alu_r;
-            end
-            if (rt_ldi)
-                regs[16*rt_crd +: 16] <= {6'd0, rt_imm};
-            if (rt_ldih)
-                regs[16*rt_crd +: 16] <= {rt_imm[5:0], regs[16*rt_crd +: 10]};
-            if (rt_djnz)
-                regs[16*rt_crd +: 16] <= alu_d;                     // R6: RZ unchanged
             if (br_go)
                 rpc <= rpc + br_off;
             if (dj_go)
@@ -399,13 +412,13 @@ module trw_lane #(
                 acc_v    <= 1'b1;
                 acc_kind <= rt_ldw ? 2'd1 : 2'd2;
                 acc_addr <= m_addr;
-                acc_wd   <= regs[16*rt_crd +: 16];
+                acc_wd   <= rd_a;
                 ld_rd    <= rt_crd;
             end
             if (rt_out) begin
                 out_valid[rt_port]        <= 1'b1;
                 out_seq[rt_port]          <= ~out_seq[rt_port];
-                out_tok[18*rt_port +: 18] <= {rt_otag, regs[16*rt_ora +: 16]};
+                out_tok[18*rt_port +: 18] <= {rt_otag, rd_b};
                 resv[rt_port]             <= 1'b0;
             end
             if (rt_sys) begin
@@ -416,9 +429,7 @@ module trw_lane #(
                     `TRW_SYS_CLRF:  if (rt_fi != 2'd3) f[rt_fi] <= 1'b0;
                     `TRW_SYS_TSTF:  rz <= flags[rt_fi];
                     `TRW_SYS_CPYF:  if (rt_fi != 2'd3) f[rt_fi] <= rz;
-                    `TRW_SYS_GETT:  regs[16*rt_fi +: 16] <= t_lat;
-                    `TRW_SYS_GETK:  regs[16*rt_fi +: 16] <= k[16*rt_arg[3:2] +: 16];
-                    default: ;
+                    default: ;                                      // GETT, GETK: the write port
                 endcase
             end
 

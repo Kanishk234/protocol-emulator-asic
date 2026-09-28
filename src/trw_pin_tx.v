@@ -156,6 +156,9 @@ module trw_pin_tx #(
     wire [BW-1:0] step  = m_clk ? {1'b0, per} : {per, 1'b0};  // CLKGEN: half periods (P11)
     wire [BW:0] bt_add  = {1'b0, bt} + {1'b0, step};
     wire [15:0] bt_add_i = bt_add[BW-1:FRAC+1];
+    // the burst timer's next value before the clock's decrement (area: one decrement for all three cases)
+    wire          sw_go = p_sw && a_idle;                                // STRETCH: the IDLE half starts now
+    wire [BW-1:0] bt_pre = sw_go ? step : fire ? bt_add[BW-1:0] : bt;
     wire        a_idle  = (a_in == idle);
 
     wire s_tail  = tshift && p_act && (rem == 5'd0);                  // next boundary: return to IDLE
@@ -412,10 +415,10 @@ module trw_pin_tx #(
                     if (a_idle) begin
                         p_sw <= 1'b0;
                         ph   <= 1'b1;
-                        bt   <= step - BT_ONE;
+                        bt   <= bt_pre - BT_ONE;
                     end
                 end else if (fire) begin
-                    bt <= bt_add[BW-1:0] - BT_ONE;
+                    bt <= bt_pre - BT_ONE;
                     if (m_clk) begin
                         p_first <= 1'b0;
                         if (ph) begin
@@ -427,7 +430,7 @@ module trw_pin_tx #(
                         end
                     end
                 end else begin
-                    bt <= bt - BT_ONE;
+                    bt <= bt_pre - BT_ONE;
                 end
             end
         end

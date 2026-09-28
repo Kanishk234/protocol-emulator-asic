@@ -261,7 +261,8 @@ module trw_pin_bs (
     wire        ab_tok   = ab_s && words_on && (dcnt != 11'd0); // P27/P-G37: ERR 0x2nnn, nnn = line bit
 
     // ------------------------------------------------------------------ TX queue (P25) and JAM (P28)
-    reg  [15:0] q;             // queued bits, the next one in q[15]
+    reg  [15:0] q;             // queued bits, right-aligned: the next one is q[qn-1] (q_hi) or q[0]
+    reg         q_hi;          // MSB first (ORDER, or TX CRC bits); else LSB first, shifting right
     reg         q_crc;         // they are TX CRC bits (not fed back into the TX CRC)
     reg         sync_p;        // SYNC: the queued bits start a new frame at bus idle (P21)
     reg         ts_on;         // LINE [2]: TX stuffing
@@ -294,7 +295,9 @@ module trw_pin_bs (
     wire        j_bit     = j_start_a || j_start_r || j_cont;
     wire        j_lvl     = j_start_a ? al : jl;
     // the next bit from the queue: its data level, then its line level (P29: NRZI, a 0 is a change)
-    wire        nd       = ts_p ? !trl : q[15];
+    wire [3:0]  q_top    = qn[3:0] - 4'd1;
+    wire        q_out    = q_hi ? q[q_top] : q[0];
+    wire        nd       = ts_p ? !trl : q_out;
     wire        nl       = nrzi ? (nd ? cur : !cur) : nd;
     // P21: another node's frame starts while ours waits for idle and our first bit is dominant: join it
     wire        jn       = f_start && sync_p && q_any && !ts_p && (nl != idle) && !j_bit;
@@ -318,14 +321,8 @@ module trw_pin_bs (
     wire [15:0] pay      = tx_lentok ? {4'h0, tx_data[11:0]} : tx_data;
     wire [15:0] crc_src  = arg[6] ? (crc_init & cmask) : tcrc;  // [6] acts before [3]
     wire        k_crc    = k_line && arg[3];
-    reg  [15:0] pay_r;                                          // LSB first: bit 0 goes out first
-    integer i;
-    always @(*)
-        for (i = 0; i < 16; i = i + 1)
-            pay_r[15 - i] = pay[i];
-    wire [15:0] ld_src   = k_crc ? ((crc_src ^ crc_xor) & cmask) : (order ? pay : pay_r);
-    wire [4:0]  ld_shf   = k_crc ? (5'd16 - cw) : (order ? (5'd16 - nb) : 5'd0);
-    wire [15:0] ld_q     = ld_src << ld_shf;
+    // right-aligned (area: no barrel shifter); bits above the word's length are never read
+    wire [15:0] ld_q     = k_crc ? ((crc_src ^ crc_xor) & cmask) : pay;
 
     assign tx_lvl = cur;                                        // no bit: released (recessive)
     assign tx_se0 = drv && se0_r;
@@ -387,7 +384,7 @@ module trw_pin_bs (
             rl <= 1'b0;  rc <= 4'd0;  stuff_on <= 1'b0;  words_on <= 1'b0;  lcnt <= 11'd0;  dcnt <= 11'd0;
             crc <= 16'd0;  fr_v <= 1'b0;  fr_n <= 11'd0;  fnx_v <= 1'b0;  fnx_n <= 11'd0;  post <= 1'b0;
             rxl <= idle;  hb <= 16'd0;  hbn <= 5'd0;  f6 <= 1'b0;
-            q <= 16'd0;  qn <= 5'd0;  q_crc <= 1'b0;  sync_p <= 1'b0;  wt_p <= 1'b0;  ts_on <= 1'b0;
+            q <= 16'd0;  q_hi <= 1'b0;  qn <= 5'd0;  q_crc <= 1'b0;  sync_p <= 1'b0;  wt_p <= 1'b0;  ts_on <= 1'b0;
             ts_p <= 1'b0;  trl <= 1'b0;  trc <= 4'd0;  tcrc <= 16'd0;  drv <= 1'b0;  tlv <= 1'b0;
             rbm <= 2'd0;  rbm_s <= 2'd0;  tmode <= 2'd0;  jbit <= 1'b0;  se0_r <= 1'b0;  sq <= 5'd0;  jq <= 1'b0;
             dsc <= 1'b0;  txoff <= 1'b0;  own <= 1'b0;  st_v <= 1'b0;  st_d <= 16'd0;
@@ -460,13 +457,14 @@ module trw_pin_bs (
                 own    <= 1'b1;
             end
             if (q_dbit) begin
-                q  <= {q[14:0], 1'b0};
+                if (!q_hi)
+                    q <= {1'b0, q[15:1]};
                 qn <= qn - 5'd1;
                 if (!q_crc)
                     tcrc <= tcrc1;                             // P25: data bits only
             end
             if (k_data) begin
-                q <= ld_q;  qn <= nb;  q_crc <= 1'b0;
+                q <= ld_q;  q_hi <= order;  qn <= nb;  q_crc <= 1'b0;
             end
             if (k_sync && !txoff) begin                        // SYNC also ends a readback abort (P26)
                 sync_p <= 1'b1;
@@ -479,7 +477,7 @@ module trw_pin_bs (
                 if (arg[6])
                     tcrc <= crc_init & cmask;
                 if (arg[3]) begin
-                    q <= ld_q;  qn <= cw;  q_crc <= 1'b1;
+                    q <= ld_q;  q_hi <= 1'b1;  qn <= cw;  q_crc <= 1'b1;
                 end
                 if (arg[4]) begin                              // P29: SE0 for [11:8] + 1 bits, then J
                     sq <= {1'b0, arg[11:8]} + 5'd1;

@@ -103,26 +103,31 @@ class PinUnit:
         self.tx_port = tx_port
         self.rx_prod = rx_prod
         self.cfg = PinConfig()
+        self.t_cfg = 0
         self.reset_state()
         self.flags = {"LATE": 0, "OVERRUN": 0}
         self.stats = {"tx_tokens": 0, "rx_tokens": 0, "overruns": 0, "bad_tokens": 0}
 
-    def configure(self, **kw):
+    def configure(self, now=0, validate=True, **kw):
         self.cfg = PinConfig(**kw)
         c = self.cfg
-        for b in (0, 1):
-            t1, t2 = getattr(c, f"sym{b}_t1"), getattr(c, f"sym{b}_t2")
-            if not (0 <= t1 < 4096 and 0 <= t2 < 4096 and t1 + t2 > 0):
-                raise ValueError(f"sym{b}: durations must be 12-bit ticks, not both zero")
-        if (c.txmode == "bitsync") != (c.rxmode == "bitsync"):
-            raise ValueError("bitsync: txmode and rxmode must both be bitsync")
-        if not 0 <= c.crc_width <= 16:
-            raise ValueError("crc_width must be 0..16")
-        if c.txmode == "clkgen" and c.period < 2:          # §14 P34 (D-041)
-            raise ValueError("clkgen needs period >= 2 clocks")
-        if not (c.rx_nbits is None or 1 <= c.rx_nbits <= 16) or not 0 <= c.rx_nbits2 <= 16:
-            raise ValueError("rx_nbits must be 1..16 (or unset), rx_nbits2 0..16")   # §14 P41
+        if validate:
+            for b in (0, 1):
+                t1, t2 = getattr(c, f"sym{b}_t1"), getattr(c, f"sym{b}_t2")
+                if not (0 <= t1 < 4096 and 0 <= t2 < 4096 and t1 + t2 > 0):
+                    raise ValueError(f"sym{b}: durations must be 12-bit ticks, not both zero")
+            if (c.txmode == "bitsync") != (c.rxmode == "bitsync"):
+                raise ValueError("bitsync: txmode and rxmode must both be bitsync")
+            if not 0 <= c.crc_width <= 16:
+                raise ValueError("crc_width must be 0..16")
+            if c.txmode == "clkgen" and c.period < 2:      # §14 P34 (D-041)
+                raise ValueError("clkgen needs period >= 2 clocks")
+            if not (c.rx_nbits is None or 1 <= c.rx_nbits <= 16) or not 0 <= c.rx_nbits2 <= 16:
+                raise ValueError("rx_nbits must be 1..16 (or unset), rx_nbits2 0..16")   # §14 P41
+        self.t_cfg = now
         self.reset_state()
+        self.flags["LATE"] = 0
+        self.flags["OVERRUN"] = 0
 
     def reset_state(self):
         c = getattr(self, "cfg", PinConfig())
@@ -417,7 +422,7 @@ class PinUnit:
             # load. A sample in the same clock still enters framing (after EV_RESET); only a
             # word it completes loses the load (§14 P38, P19).
             # §14 P8 (D-024): the time is in PRESC ticks, so long pulses fit in 15 bits
-            self._emit(isa.TAG_EVENT, (src << 15) | ((now // c.presc) & 0x7FFF))
+            self._emit(isa.TAG_EVENT, (src << 15) | (((now - self.t_cfg) // c.presc) & 0x7FFF))
             if c.ev_reset:
                 self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
         if a is not None and sel:

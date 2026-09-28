@@ -80,6 +80,14 @@ module trw_pin_unit #(
     wire [3:0]  nbits      = cfg[`TRW_PC_NBITS_MSB:`TRW_PC_NBITS_LSB];
     wire [4:0]  rx_nbits   = cfg[`TRW_PC_RX_NBITS_MSB:`TRW_PC_RX_NBITS_LSB];
     wire [4:0]  rx_nbits2  = cfg[`TRW_PC_RX_NBITS2_MSB:`TRW_PC_RX_NBITS2_LSB];
+    // PULSE and carrier (FULL units; on a lean unit these bits are not stored and read 0, D-040)
+    wire [11:0] sym0_t1    = cfg[`TRW_PC_SYM0_T1_MSB:`TRW_PC_SYM0_T1_LSB];
+    wire        sym0_first = cfg[`TRW_PC_SYM0_FIRST_LSB];
+    wire [11:0] sym0_t2    = cfg[`TRW_PC_SYM0_T2_MSB:`TRW_PC_SYM0_T2_LSB];
+    wire [11:0] sym1_t1    = cfg[`TRW_PC_SYM1_T1_MSB:`TRW_PC_SYM1_T1_LSB];
+    wire        sym1_first = cfg[`TRW_PC_SYM1_FIRST_LSB];
+    wire [11:0] sym1_t2    = cfg[`TRW_PC_SYM1_T2_MSB:`TRW_PC_SYM1_T2_LSB];
+    wire [23:0] carrier    = cfg[`TRW_PC_CARRIER_MSB:`TRW_PC_CARRIER_LSB];
     // PIN_N only matters to the pad owner mux (trw_pins.v), which reads it from the same block.
 
     // ------------------------------------------------------------------ pins in
@@ -96,10 +104,12 @@ module trw_pin_unit #(
     // ------------------------------------------------------------------ TX half
     wire lvl, oe, echo, rxset, smp, late_set;
     wire [4:0] rxset_n;
-    trw_pin_tx #(.FRAC (FRAC)) u_tx (
+    trw_pin_tx #(.FULL (FULL), .FRAC (FRAC)) u_tx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
         .txmode (txmode), .order (order), .idle (idle), .tx_lentok (tx_lentok), .tx_preload (tx_preload),
         .stretch (stretch), .tx_edge (tx_edge), .period (period), .presc (presc), .nbits (nbits),
+        .sym0_t1 (sym0_t1), .sym0_first (sym0_first), .sym0_t2 (sym0_t2),
+        .sym1_t1 (sym1_t1), .sym1_first (sym1_first), .sym1_t2 (sym1_t2), .carrier (carrier),
         .a_in (a_in), .b_rise (b_rise), .b_fall (b_fall), .sel (sel), .sel_fall (sel_fall),
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .lvl (lvl), .oe (oe), .echo (echo),

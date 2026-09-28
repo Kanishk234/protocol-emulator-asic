@@ -1,6 +1,8 @@
-// Pin unit, TX half (ARCHITECTURE.md §7.3, §14 P3, P4, P6, P9, P11, P12, P14-P16, P18, P19): takes tokens
+// Pin unit, TX half (ARCHITECTURE.md §7.3, §14 P3, P4, P6, P9, P11, P12, P14-P19, P30): takes tokens
 // from the unit's consumer port and drives pin A's level and output enable. Lean feature set: modes
 // LEVEL, SHIFT (timed or linked to pin B) and CLKGEN; ops LEVEL, OE, CLK, GAP, SYNC, SETN, WAIT, SAMPLE.
+// FULL = 1 (U0-U1, D-040) adds PULSE (P17) and the carrier (P30); on a lean unit the PULSE code acts as
+// LEVEL and the carrier fields are not stored.
 //
 // Timing contract:
 //   - Clock n: `tx_take` = 1 takes the head token (the port applies it at edge n). It is combinational
@@ -17,11 +19,20 @@
 // runs, its own bit timer `bt` (16.9 clocks to the next boundary) gives the cursor instead (the burst
 // ends at a boundary, so E there is -1 or 0).
 //
-// Choices the documents leave open are marked P-G<n> (docs/reports/PIN_UNIT_RTL.md §6).
+// PULSE (P17) runs as a burst of whole ticks: each bit is two phases (SYMb_FIRST for T1_b ticks, then the
+// opposite level for T2_b ticks), counted as `pt` ticks and `ps` clocks of the current tick, so no
+// multiplier is needed. The burst's end is exact to the clock, and the next DATA token's first bit lands
+// on that edge (back-to-back tokens join). A phase of 0 ticks lasts one clock (P-G24).
+// The carrier (P30) is a 16.9-clock half-period timer `ct` that toggles `cph` while pin A's registered
+// level is not IDLE; `lvl` shows IDLE during the off halves. It restarts at every change to the active
+// level. A CARRIER below 2 clocks acts as off (P-G25).
+//
+// Choices the documents leave open are marked P-G<n> (docs/reports/PIN_UNIT_RTL.md §6, §9).
 `default_nettype none
 `include "trw_defs.vh"
 
 module trw_pin_tx #(
+    parameter FULL = 0,          // 1: PULSE and carrier (U0-U1, D-040)
     parameter FRAC = 8           // fraction bits of time arithmetic (8 = the spec's 16.8; less = measurement only)
 ) (
     input  wire        clk,
@@ -39,6 +50,13 @@ module trw_pin_tx #(
     input  wire [23:0] period,      // 16.8 clocks
     input  wire [7:0]  presc,       // clocks per tick - 1
     input  wire [3:0]  nbits,       // TX shift length - 1
+    input  wire [11:0] sym0_t1,     // PULSE (FULL): bit 0 first level for T1 ticks, then T2 ticks
+    input  wire        sym0_first,
+    input  wire [11:0] sym0_t2,
+    input  wire [11:0] sym1_t1,
+    input  wire        sym1_first,
+    input  wire [11:0] sym1_t2,
+    input  wire [23:0] carrier,     // carrier period, 16.8 clocks (FULL; 0 = off)
     // pins
     input  wire        a_in,
     input  wire        b_rise,
@@ -63,7 +81,8 @@ module trw_pin_tx #(
     // ------------------------------------------------------------------ modes and the head token
     wire m_shift = (txmode == `TRW_PCE_TXMODE_SHIFT);
     wire m_clk   = (txmode == `TRW_PCE_TXMODE_CLKGEN);
-    wire m_level = !m_shift && !m_clk;           // lean: the PULSE / BITSYNC codes act as LEVEL (D-040)
+    wire m_pulse = (FULL != 0) && (txmode == `TRW_PCE_TXMODE_PULSE);
+    wire m_level = !m_shift && !m_clk && !m_pulse;   // lean: the PULSE / BITSYNC codes act as LEVEL (D-040)
     // P43: TX_EDGE code 3 has no name and acts as none (timed)
     wire linked  = m_shift && ((tx_edge == `TRW_PCE_TX_EDGE_RISE) || (tx_edge == `TRW_PCE_TX_EDGE_FALL));
     wire tshift  = m_shift && !linked;
@@ -85,7 +104,7 @@ module trw_pin_tx #(
     wire h_lvl   = c_lvl || (m_level && (t_data || t_ev));   // P12: DATA/EVENT drive data[0] in LEVEL
     wire h_rxs   = c_setn && arg[5];                          // P18
     wire h_setn  = c_setn && !arg[5];
-    wire h_shift = t_data && tshift;
+    wire h_shift = t_data && (tshift || m_pulse);             // a timed burst: SHIFT or PULSE (P17)
     wire h_lk    = t_data && linked;
     wire h_clk   = c_clk && m_clk && (arg[7:0] != 8'd0);     // P-G5: CLK outside CLKGEN, or n = 0, is ignored
     wire [11:0] h_d = (c_lvl || c_oe) ? {1'b0, arg[10:0]} : (c_gap || c_smp) ? arg : 12'd0;
@@ -121,12 +140,19 @@ module trw_pin_tx #(
     reg         ntx_v;       // SETN tx override of NBITS
     reg  [3:0]  ntx;
     reg         lvx;         // pin A level XOR IDLE, so an idle unit shows IDLE whatever IDLE is
+    reg  [11:0] pt;          // PULSE: whole ticks left in this phase after the current one
+    reg  [7:0]  ps;          // PULSE: clocks left in the current tick
+    reg         pl_ph;       // PULSE: the next boundary drives the bit's second level
+    reg  [24:0] ct;          // carrier: 16.9 clocks from this clock to the next toggle
+    reg         cph;         // carrier: in an off (IDLE) half
 
-    assign lvl = lvx ^ idle;
+    wire car_on = (FULL != 0) && (carrier[23:9] != 15'd0);           // P-G25: below 2 clocks = off
+    assign lvl = (lvx && !(car_on && cph)) ^ idle;
 
     // ------------------------------------------------------------------ the running shift / burst
     wire [15:0] bt_i    = bt[BW-1:FRAC+1];
-    wire        fire    = p_act && !p_sw && (bt_i == 16'd0);
+    wire        pl_zero = (pt == 12'd0) && (ps == 8'd0);
+    wire        fire    = p_act && !p_sw && (m_pulse ? pl_zero : (bt_i == 16'd0));
     wire [BW-1:0] step  = m_clk ? {1'b0, per} : {per, 1'b0};  // CLKGEN: half periods (P11)
     wire [BW:0] bt_add  = {1'b0, bt} + {1'b0, step};
     wire [15:0] bt_add_i = bt_add[BW-1:FRAC+1];
@@ -137,14 +163,25 @@ module trw_pin_tx #(
     wire c_tail  = m_clk && p_act && !stretch && !p_sw && !ph && !p_first && (cn == 9'd0);
     wire c_lasta = m_clk && fire && ph && !stretch && (cn == 9'd1);   // the last ACTIVE half starts now
     wire c_swend = m_clk && p_act && p_sw && (cn == 9'd0) && a_idle;  // STRETCH: burst ends now
-    wire tail    = s_tail || c_tail;
+    // PULSE (P17): the current bit's symbol; phases in clocks are T * (PRESC + 1), a 0-tick phase 1 clock
+    wire        p_bit   = sreg[bi];
+    wire        pl_first = p_bit ? sym1_first : sym0_first;
+    wire [11:0] p_t1    = p_bit ? sym1_t1 : sym0_t1;
+    wire [11:0] p_t2    = p_bit ? sym1_t2 : sym0_t2;
+    wire [11:0] p_tn    = pl_ph ? p_t2 : p_t1;                           // the phase this fire starts
+    wire        p_t2one = (p_t2 == 12'd0) || ((p_t2 == 12'd1) && (presc == 8'd0));
+    wire p_tail  = m_pulse && p_act && !pl_ph && (rem == 5'd0);         // next boundary: return to IDLE
+    wire p_lastb = m_pulse && fire && pl_ph && (rem == 5'd1);          // the last bit's second level starts now
+    wire tail    = s_tail || c_tail || p_tail;
     wire lastb   = s_lastb || c_lasta;
     wire p_end   = (tail && fire) || c_swend;                          // the burst ends at this edge
     // P3: all pending pad actions at edges <= n+1
-    wire tail_ok = (tail && (bt_i <= 16'd1)) || (lastb && (bt_add_i == 16'd1)) || c_swend;
-    wire pe_m1   = (tail && (bt_i == 16'd1)) || (lastb && (bt_add_i == 16'd1));
-    wire pe_fv   = lastb || c_swend;                                   // the end time is known now
-    wire [FRAC-1:0] pe_f = c_swend ? {FRAC{1'b0}} : bt_add[FRAC:1];
+    wire tail_ok = (!m_pulse && tail && (bt_i <= 16'd1)) || (lastb && (bt_add_i == 16'd1)) || c_swend
+                || (p_tail && (pt == 12'd0) && (ps <= 8'd1)) || (p_lastb && p_t2one);
+    wire pe_m1   = (!m_pulse && tail && (bt_i == 16'd1)) || (lastb && (bt_add_i == 16'd1))
+                || (p_tail && (pt == 12'd0) && (ps == 8'd1)) || (p_lastb && p_t2one);
+    wire pe_fv   = lastb || c_swend || p_lastb;                        // the end time is known now
+    wire [FRAC-1:0] pe_f = (c_swend || m_pulse) ? {FRAC{1'b0}} : bt_add[FRAC:1];   // PULSE: whole clocks
 
     // ------------------------------------------------------------------ the cursor, this clock
     wire use_pe = p_act && !e_own;
@@ -203,11 +240,15 @@ module trw_pin_tx #(
     wire s_end  = tshift && fire && (rem == 5'd0);
     wire k_hi   = m_clk && fire && (ph || p_first);                    // first IDLE, or ACTIVE
     wire k_rel  = m_clk && fire && !ph && !p_first;                    // release (IDLE)
-    wire d_hi   = s_bit || lk_bit || k_hi;
-    wire d_hi_v = (s_bit || lk_bit) ? bit_o : (ph ? !idle : idle);
-    wire d_lo   = s_end || lk_idle || k_rel;
+    wire pb1    = m_pulse && fire && !pl_ph && (rem != 5'd0);          // PULSE: a bit starts, SYMb_FIRST
+    wire pb2    = m_pulse && fire && pl_ph;                            // PULSE: its second level
+    wire pb_end = m_pulse && fire && !pl_ph && (rem == 5'd0);          // PULSE: return to IDLE
+    wire d_hi   = s_bit || lk_bit || k_hi || pb1 || pb2;
+    wire d_hi_v = (s_bit || lk_bit) ? bit_o : pb1 ? pl_first : pb2 ? !pl_first : (ph ? !idle : idle);
+    wire d_lo   = s_end || lk_idle || k_rel || pb_end;
     wire [0:0] nlvx = d_hi ? (d_hi_v ^ idle) : due_lvl_v ? (due_lvl ^ idle) : d_lo ? 1'b0 : lvx;
-    wire       necho = d_hi ? (s_bit || lk_bit) : (due_lvl_v || d_lo) ? 1'b0 : echo;
+    // P13/P40: a PULSE bit taints like a shifted one
+    wire       necho = d_hi ? (s_bit || lk_bit || pb1 || pb2) : (due_lvl_v || d_lo) ? 1'b0 : echo;
 
     // ------------------------------------------------------------------ next cursor
     reg [15:0] qn;
@@ -239,6 +280,7 @@ module trw_pin_tx #(
             lk_ret <= 1'b0;  lk_pre <= 1'b0;  w_v <= 1'b0;  w_rise <= 1'b0;
             ntx_v <= 1'b0;  ntx <= 4'd0;
             lvx <= 1'b0;  oe <= 1'b1;  echo <= 1'b0;      // P-G1: output enabled after reset
+            pt <= 12'd0;  ps <= 8'd0;  pl_ph <= 1'b0;  ct <= 25'd0;  cph <= 1'b0;
         end else begin
             // cursor
             eq <= q_inc;
@@ -289,7 +331,7 @@ module trw_pin_tx #(
             if (tk && (h_shift || h_lk)) begin
                 sreg <= pay;
                 bi   <= order ? lenm1 : 4'd0;
-            end else if (s_bit || lk_bit) begin
+            end else if (s_bit || lk_bit || pb2) begin      // PULSE: after the bit's second level
                 bi <= bi_nx;
             end
 
@@ -298,8 +340,41 @@ module trw_pin_tx #(
                 rem <= {1'b0, lenm1} + 5'd1;
             else if (lk_abort)
                 rem <= 5'd0;
-            else if (s_bit || lk_bit)
+            else if (s_bit || lk_bit || pb2)
                 rem <= rem - 5'd1;
+
+            // PULSE phase timer (P17): a fire loads the phase it starts, T * (PRESC + 1) - 1 clocks to go
+            if (load_proc) begin
+                pt    <= 12'd0;
+                ps    <= 8'd0;
+                pl_ph <= 1'b0;
+            end else if (m_pulse && p_act) begin
+                if (pb1 || pb2) begin
+                    pt    <= (p_tn == 12'd0) ? 12'd0 : p_tn - 12'd1;
+                    ps    <= (p_tn == 12'd0) ? 8'd0 : presc;
+                    pl_ph <= pb1;
+                end else if (!pl_zero) begin
+                    if (ps == 8'd0) begin
+                        ps <= presc;
+                        pt <= pt - 12'd1;
+                    end else begin
+                        ps <= ps - 8'd1;
+                    end
+                end
+            end
+
+            // carrier (P30): toggles while pin A is not IDLE; restarts at every change to the active level
+            if (!car_on || !nlvx[0]) begin
+                cph <= 1'b0;
+            end else if (!lvx) begin
+                cph <= 1'b0;
+                ct  <= {1'b0, carrier} - 25'd512;
+            end else if (ct[24:9] == 16'd0) begin
+                cph <= !cph;
+                ct  <= ct + {1'b0, carrier} - 25'd512;
+            end else begin
+                ct <= ct - 25'd512;
+            end
 
             // linked return-to-IDLE and preload
             if (lk_abort) begin
@@ -358,5 +433,5 @@ module trw_pin_tx #(
         end
     end
 
-    wire _unused = &{1'b0, pend_a[4:1], bt_add[BW], period};
+    wire _unused = &{1'b0, pend_a[4:1], bt_add[BW], period, carrier[8:0]};
 endmodule

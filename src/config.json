@@ -16,6 +16,7 @@
   "//": "- DRT_OPT_ITERS 64 (the default): runs 5-6; runs 1-4 used 3 as a 6 h guard (D-034), which stopped run 4 at 874 violations (D-043).",
   "//": "- the SRAM instance path: u_chip.u_sram.sram from run 6 (tt_um_tripwire wraps trw_chip; checked with a local Yosys flatten).",
   "//": "- CTS_APPLY_NDR none: run 3; with clock NDRs the global router relaxes them one net at a time and never ends (run 2, D-043).",
+  "//": "- pnr.sdc / signoff.sdc: hold uncertainty 0.10 ns (run 7, D-056 proposed); the design is run 6's.",
 
   "//": "Here are some of the variables you may want to change:",
 

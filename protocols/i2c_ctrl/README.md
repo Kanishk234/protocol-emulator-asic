@@ -3,9 +3,10 @@
 User design for the WARP fabric (soft logic; see `../README.md`): the I2C side that drives SCL and starts transactions.
 
 - **File:** `i2c_ctrl_top.v` (user-design top, provisional interface D-014).
-- **Bus:** open drain (`sda_oe`/`scl_oe` pull low, external pull-ups); inputs two-flop synchronized.
+- **Bus:** open drain (`sda_oe`/`scl_oe` pull low, external pull-ups); inputs used as they arrive (the shell synchronizes every input, ARCHITECTURE §6).
+- **Implementation:** `PRIMS = 1` puts the phase timing in a WARP hard timer and the data byte in a hard shift register (ARCHITECTURE §8, G1; `docs/reports/g1_results.md`); `PRIMS = 0` is plain logic. Same behaviour and tests.
 - **Features:** START, repeated START, STOP, byte write with ACK/NACK reply, byte read with ACK or NACK, **clock stretching** (every wait for SCL high reads the bus, so a target holding SCL low simply delays the controller). SDA changes only while SCL is low, Q clocks after SCL falls.
-- **Timing:** each SCL low and high phase lasts 2·`Q` clocks (+ synchronizer delay); SCL ≈ clk / (4·`Q` + 3). `Q = 125` → ~100 kHz at 50 MHz. `Q` ≥ 2.
+- **Timing:** each SCL low and high phase lasts 2·`Q` clocks (+ the time until SCL reads high after release, a few clocks on the chip); SCL ≈ clk / (4·`Q` + a few). `Q = 125` → ~100 kHz at 50 MHz. `Q` ≥ 2.
 - **Host side:** a command byte stream on `h_w*`:
 
   | Byte | Command | Reply on `h_r*` |

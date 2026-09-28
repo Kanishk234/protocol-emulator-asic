@@ -3,6 +3,7 @@ top: uart_top
 params:
   DIV: 434
   RUNTIME_DIV: 0
+  PRIMS: 1                     # hard timer + shift register (G1; D-026)
 pins:
   clk: clk
   rst_n: rst_n

@@ -2,7 +2,7 @@
 
 User design for the WARP fabric: an 8N1 UART transmitter and receiver.
 
-- **Files:** `uart_tx.v`, `uart_rx.v`, `uart_top.v` (user-design top, provisional interface D-014).
+- **Files:** `uart_tx.v`, `uart_rx.v` (plain logic), `uart_tx_p.v`, `uart_rx_p.v` (on the WARP hard timer and shift register, ARCHITECTURE §8, G1), `uart_top.v` (user-design top, provisional interface D-014; `PRIMS` selects, fixed divisor only; `docs/reports/g1_results.md`).
 - **Format:** 8 data bits, no parity, 1 stop bit, LSB first, idle high.
 - **Baud:** `DIV` clocks per bit (≥ 4). `RUNTIME_DIV = 0` fixes it in the bitstream (recompile to change); `RUNTIME_DIV = 1` loads it from `cfg_div` at run time.
 - **RX:** two-flop synchronizer; a start bit is confirmed half a bit after the falling edge (shorter glitches ignored); bits sampled one bit time apart; framing error when the stop bit is 0.
@@ -16,6 +16,7 @@ User design for the WARP fabric: an 8N1 UART transmitter and receiver.
 cd test && make            # DIV=16
 make DIV=13                # odd divisor
 make RUNTIME_DIV=1         # runtime divisor
+make PRIMS=1               # on the hard primitives (fixed divisor)
 ```
 Covered: back-to-back TX (model + sigrok), random TX, RX with gaps, RX with ±3 % baud error, framing error, glitch rejection, overrun, runtime divisor change.
 

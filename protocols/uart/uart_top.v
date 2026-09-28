@@ -7,11 +7,14 @@
 // Baud:      RUNTIME_DIV = 0: the divisor is the parameter DIV, fixed in the bitstream.
 //            RUNTIME_DIV = 1: the divisor is a register loaded from cfg_div when cfg_we = 1.
 //            Either way: clocks per bit, >= 4.
+// PRIMS:     1: bit timers and data shifting in the WARP hard primitives (uart_tx_p/uart_rx_p,
+//            ARCHITECTURE §8; fixed divisor only; with RUNTIME_DIV = 1 the plain logic is used). 0: plain logic.
 `default_nettype none
 
 module uart_top #(
     parameter DIV         = 434,  // 115200 baud at 50 MHz
     parameter RUNTIME_DIV = 0,
+    parameter PRIMS       = 0,
     parameter DIV_W       = 16
 ) (
     input  wire             clk,
@@ -53,20 +56,33 @@ module uart_top #(
         end
     endgenerate
 
-    wire tx_ready;
-    uart_tx #(.DIV_W(CW)) u_tx (
-        .clk(clk), .rst_n(rst_n), .div(div),
-        .data(h_wdata), .valid(h_wvalid), .ready(tx_ready), .tx(tx_o)
-    );
-    assign h_wready = tx_ready;
-    assign tx_oe    = 1'b1;
-
+    wire       tx_ready;
     wire [7:0] rx_data;
     wire       rx_valid, rx_ferr;
-    uart_rx #(.DIV_W(CW)) u_rx (
-        .clk(clk), .rst_n(rst_n), .div(div), .rx(rx_i),
-        .data(rx_data), .valid(rx_valid), .ferr(rx_ferr)
-    );
+    generate
+        if (PRIMS != 0 && RUNTIME_DIV == 0) begin : g_prims
+            uart_tx_p #(.DIV(DIV)) u_tx (
+                .clk(clk), .rst_n(rst_n),
+                .data(h_wdata), .valid(h_wvalid), .ready(tx_ready), .tx(tx_o)
+            );
+            uart_rx_p #(.DIV(DIV)) u_rx (
+                .clk(clk), .rst_n(rst_n), .rx(rx_i),
+                .data(rx_data), .valid(rx_valid), .ferr(rx_ferr)
+            );
+            wire _unused_div = &{div, 1'b0};
+        end else begin : g_logic
+            uart_tx #(.DIV_W(CW)) u_tx (
+                .clk(clk), .rst_n(rst_n), .div(div),
+                .data(h_wdata), .valid(h_wvalid), .ready(tx_ready), .tx(tx_o)
+            );
+            uart_rx #(.DIV_W(CW)) u_rx (
+                .clk(clk), .rst_n(rst_n), .div(div), .rx(rx_i),
+                .data(rx_data), .valid(rx_valid), .ferr(rx_ferr)
+            );
+        end
+    endgenerate
+    assign h_wready = tx_ready;
+    assign tx_oe    = 1'b1;
 
     reg ferr_q, overrun_q;
     always @(posedge clk) begin

@@ -4,6 +4,7 @@ params:
   CPOL: 0
   CPHA: 0
   HALF: 25
+  PRIMS: 1                     # hard timer + shift register (G1; D-026)
 pins:
   clk: clk
   rst_n: rst_n

@@ -5,6 +5,7 @@ User design for the WARP fabric (soft logic; see `../README.md`): the SPI side t
 - **File:** `spi_ctrl_top.v` (user-design top, provisional interface D-014).
 - **Modes:** `CPOL`, `CPHA` parameters, all four modes; MSB first; 8-bit bytes; full duplex.
 - **Speed:** SCK half period = `HALF` clocks, **`HALF` ≥ 4** (SCK ≤ clk/8): MISO goes through a two-flop synchronizer and a target may take up to one clock to change MISO after its change edge.
+- **Implementation:** `PRIMS = 1` puts SCK timing in a WARP hard timer and the byte (both directions) in a hard shift register (ARCHITECTURE §8, G1; `docs/reports/g1_results.md`); `PRIMS = 0` is plain logic. Same behaviour and tests (`make PRIMS=1`).
 - **Host side:** bytes to send on `h_w*`; `h_wlast` ends the transaction after that byte (CS released, then CS stays high for half a period). Between bytes of a transaction CS stays low and SCK idle until the host sends the next byte. Each transfer's received byte goes to a one-byte holding register on `h_r*`. `h_status = {6'b0, overrun, cs_active}` (overrun sticky; the new byte is dropped).
 - **Rates:** RTL simulation only; no chip rates claimed.
 - **Known limits:** one chip-select; 8-bit words only; no 3-wire (bidirectional MOSI) mode; mode fixed in the bitstream.

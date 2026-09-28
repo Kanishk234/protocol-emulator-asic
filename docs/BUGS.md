@@ -133,3 +133,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** a Verilator `-Wall` lint of the design, run by hand; CI linted only `src/`.
 - **Now covered by:** the `lint` workflow lints every protocol user design in both forms (`PRIMS=0/1`) with `-Wall`; all 8 are clean (Verilator 5.020, the CI version).
 - **Fix:** the assign restored.
+
+## 17: Fmax of designs using the hard primitives left out every path through them
+- **Date:** 2026-09-27 (found in review; no rate was claimed from these numbers)
+- **Symptom:** `compile` reports and `docs/reports/g1_results.md` gave Fmax for UART (123.5 MHz), SPI (88.9) and I2C controller (69.2) on G1; the critical paths shown were all LUT to LUT, although these designs have paths from the timer's `tc` and the shift register's `q` into logic, and from logic into the blocks' `load`, `step` and `en`.
+- **Root cause:** nextpnr's FABulous back end gives timing arcs only to the tile library's own cells (LUT 3.00 ns, clock-to-Q 1.00 ns, setup 2.50 ns, fixed) and times routing with the fabric's extracted pip delays. The WARP primitive BELs (`wp_timer`, `wp_shift`) get no arcs, so their pins are neither start nor end points and every path through them is dropped from the analysis.
+- **Caught by:** reading the critical-path reports while documenting the timing model (PHASE2 item).
+- **Now covered by:** the report marks the column as incomplete and no rate is claimed; OVERVIEW risk updated; the phase 2 timing-model item stays open until the primitives have timing arcs (or a documented conservative bound) and a configured design is cross-checked by STA.
+- **Fix (2026-09-27, D-028):** primitive timing arcs from OpenSTA of each primitive synthesized alone (slow corner, ×1.5 margin, `tools/timing/README.md`), written to `placement_estimate.txt`; the compile flow uses nextpnr 0.11.1 (OSS CAD Suite 2026-09-27), which reads it (upstream nextpnr reads per-BEL arcs since 2026-07), and refuses a fabric with primitives but no arcs. With the arcs: UART 94.5 MHz, SPI 83.2, I2C controller 58.0 (were 122.0, 88.9, 69.2 with those paths untimed), all above 50 MHz. Still open: a cross-check against STA of the hardened tile or of a configured design.

@@ -9,7 +9,8 @@ Every tool used by any flow must be listed. Local PATH order: DECISIONS D-007.
 | FABulous | FABulous-FPGA 2.2.0 (2026-09-11) | PyPI, `requirements-dev.txt` | Pulls FABulous-bit-gen 0.3.1, librelane 3.0.14. Needs Python >= 3.12 and the `python3-tk` apt package |
 | OSS CAD Suite | release **2026-06-29** | YosysHQ/oss-cad-suite-build, unpacked to `~/oss-cad-suite` | The release FABulous 2.2 pins (`OSS_CAD_SUITE_VERSION` in `fabulous_repl/helper.py`: "Yosys master broke FABulous"). 2026-09-25 was tried first: its `synth_fabulous` no longer ships `prims.v`, so the demo fails in Yosys |
 | Yosys | 0.66+179 (e74db6dea) | OSS CAD Suite 2026-06-29 | |
-| nextpnr | nextpnr-generic 0.10-82-g2b560ad0 | OSS CAD Suite 2026-06-29 | FABulous uses `--uarch fabulous` |
+| nextpnr | nextpnr-generic 0.10-82-g2b560ad0 | OSS CAD Suite 2026-06-29 | FABulous uses `--uarch fabulous`; FABulous's own flows (spikes) |
+| nextpnr (compile flow) | nextpnr-generic 0.11.1-34-gc4fbb55a | OSS CAD Suite **2026-09-27**, `~/.cache/warp/ocs-2026-09-27` (`scripts/fetch_nextpnr.sh`) | D-028: reads timing arcs for the WARP hard primitives (`placement_estimate.txt`); same FASM as 0.10-82 on the G1 designs without them. Only nextpnr is taken from this suite |
 | Icarus Verilog | 12.0 (local `/usr/bin`, CI `test`: Ubuntu 24.04 apt) | apt | matches CI. `gl_local.sh` and CI `gl_test` use TT's Icarus 13.0 build |
 | Verilator | 5.020 (local and CI `lint`: Ubuntu 24.04 apt) | apt | matches CI |
 | SymbiYosys | from OSS CAD Suite 2026-06-29 | | |

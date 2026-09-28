@@ -4,15 +4,19 @@
 
 ## Result
 
-| Protocol | Fits? | LCs (nextpnr) | LUTs (carry) | FFs | timers, shifts | IO cells | Fmax (slow corner) | G0, same sources (`PRIMS=0`) |
+| Protocol | Fits? | LCs (nextpnr) | LUTs (carry) | FFs | timers, shifts | IO cells | nextpnr Fmax, slow corner (see Timing) | G0, same sources (`PRIMS=0`) |
 |---|---|---|---|---|---|---|---|---|
-| UART (115200 baud) | **yes** | 29 (33 %) | 19 (0) | 19 | 2, 2 | 15 | 123.5 MHz | 124 LCs, no fit |
-| SPI controller (mode 0, 1 MHz SCK) | **yes** | 47 (53 %) | 38 (5) | 25 | 1, 1 | 17 | 88.9 MHz | 86 LCs, fits |
-| I2C controller (~100 kHz) | **yes** | 70 (80 %) | 70 (0) | 32 | 1, 1 | 15 | 69.2 MHz | 115 LCs, no fit |
+| UART (115200 baud) | **yes** | 29 (33 %) | 19 (0) | 19 | 2, 2 | 15 | 93.2 MHz | 124 LCs, no fit |
+| SPI controller (mode 0, 1 MHz SCK) | **yes** | 47 (53 %) | 38 (5) | 25 | 1, 1 | 17 | 83.2 MHz | 86 LCs, fits |
+| I2C controller (~100 kHz) | **yes** | 70 (80 %) | 70 (0) | 32 | 1, 1 | 15 | 58.0 MHz | 115 LCs, no fit |
 | I2C target (4 registers) | **no** | 169 | 127 (11) | 61 | 0, 1 | 15 | - | 184 LCs, no fit |
 | I2C target (2 registers) | **no** | 123 | 97 (8) | 41 | 0, 1 | 15 | - | 142 LCs, no fit |
 
 The two fabrics take the same chip area: the primitive tile is 0.97 × a LUT tile in the same footprint (D-026), and the macros have identical size. This is a like-for-like comparison of the two fabrics under one compile flow, in the spirit of D-004; the full phase-3 comparison (routing, shell and configuration included, more variants) is still to come.
+
+## Timing
+
+Fmax is nextpnr's estimate at the slow corner (`nom_slow_1p08V_125C`), from nextpnr 0.11.1 (D-028): routing from the pip delays the fabric flow extracted from the hardened tiles; tile library cells at nextpnr's fixed values (LUT 3.00 ns, clock-to-Q 1.00 ns, setup 2.50 ns); the hard primitives from OpenSTA of each primitive at the same corner with a ×1.5 margin (`tools/timing/README.md`). All three designs are above the chip's 50 MHz. The first version of this table left every path through a primitive untimed (BUGS #17: UART 123.5, SPI 88.9, I2C controller 69.2 MHz). This is a model, not a measurement: no cross-check against STA of the hardened primitive tile or of a configured design yet, and no rate is claimed from it (`docs/CLAIMS.md`).
 
 ## How the designs use the blocks
 

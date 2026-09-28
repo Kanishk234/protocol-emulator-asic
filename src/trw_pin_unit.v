@@ -2,9 +2,9 @@
 // an RX half that loads the unit's fabric producer register. The port and the producer belong to the
 // fabric (§4); the configuration block is trw_pin_cfg.v.
 //
-// FULL = 1 is U0-U1, FULL = 0 is U2-U5 (D-040). Milestone A implements the lean feature set for both;
-// PULSE, carrier and BITSYNC (FULL only) come in milestone B, so for now FULL only changes which
-// configuration bits exist (trw_pin_cfg.v).
+// FULL = 1 is U0-U1, FULL = 0 is U2-U5 (D-040). Both have the lean feature set (milestone A). FULL adds
+// PULSE and the carrier in the TX half (milestone B1) and the BITSYNC engine trw_pin_bs.v (milestone B2/B3,
+// in progress), which owns takes, pin A and loads while TXMODE and RXMODE are both `bitsync`.
 //
 // Timing contract:
 //   - `cfg` is static while running (written while halted, §14 H1). `restart` (clock after a write to
@@ -88,6 +88,12 @@ module trw_pin_unit #(
     wire        sym1_first = cfg[`TRW_PC_SYM1_FIRST_LSB];
     wire [11:0] sym1_t2    = cfg[`TRW_PC_SYM1_T2_MSB:`TRW_PC_SYM1_T2_LSB];
     wire [23:0] carrier    = cfg[`TRW_PC_CARRIER_MSB:`TRW_PC_CARRIER_LSB];
+    // BITSYNC (FULL)
+    wire [23:0] sjw        = cfg[`TRW_PC_SJW_MSB:`TRW_PC_SJW_LSB];
+    wire [4:0]  idle_bits  = cfg[`TRW_PC_IDLE_BITS_MSB:`TRW_PC_IDLE_BITS_LSB];
+    wire        resync     = cfg[`TRW_PC_RESYNC_LSB];
+    wire        bs_on      = (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
+                                         && (rxmode == `TRW_PCE_RXMODE_BITSYNC);
     // PIN_N only matters to the pad owner mux (trw_pins.v), which reads it from the same block.
 
     // ------------------------------------------------------------------ pins in
@@ -102,7 +108,7 @@ module trw_pin_unit #(
     wire b_fall = !b_in && b_prev;
 
     // ------------------------------------------------------------------ TX half
-    wire lvl, oe, echo, rxset, smp, late_set;
+    wire lvl_t, oe, echo_t, rxset, smp, late_set, take_t;
     wire [4:0] rxset_n;
     trw_pin_tx #(.FULL (FULL), .FRAC (FRAC)) u_tx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
@@ -111,13 +117,19 @@ module trw_pin_unit #(
         .sym0_t1 (sym0_t1), .sym0_first (sym0_first), .sym0_t2 (sym0_t2),
         .sym1_t1 (sym1_t1), .sym1_first (sym1_first), .sym1_t2 (sym1_t2), .carrier (carrier),
         .a_in (a_in), .b_rise (b_rise), .b_fall (b_fall), .sel (sel), .sel_fall (sel_fall),
-        .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
-        .lvl (lvl), .oe (oe), .echo (echo),
+        .tx_avail (tx_avail && !bs_on), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (take_t),
+        .lvl (lvl_t), .oe (oe), .echo (echo_t),
         .rxset (rxset), .rxset_n (rxset_n), .smp (smp), .late_set (late_set)
     );
 
+    // B2a: pin A stays recessive (IDLE) in BITSYNC until the engine's TX queue exists (B2c)
+    wire lvl  = bs_on ? idle : lvl_t;
+    wire echo = bs_on ? 1'b0 : echo_t;
+
     // ------------------------------------------------------------------ RX half
-    wire ovr_set;
+    wire ovr_set, load_h, ovr_h;
+    wire [1:0]  tag_h;
+    wire [15:0] data_h;
     trw_pin_rx #(.FRAC (FRAC)) u_rx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
         .rxmode (rxmode), .order (order), .idle (idle), .autorearm (autorearm), .rx_echo (rx_echo),
@@ -127,8 +139,38 @@ module trw_pin_unit #(
         .a_in (a_in), .a_prev (a_prev), .b_in (b_in), .b_prev (b_prev), .c_in (c_in), .c_prev (c_prev),
         .sel (sel),
         .echo (echo), .rxset (rxset), .rxset_n (rxset_n), .smp (smp),
-        .rx_free (rx_free), .rx_load (rx_load), .rx_tag (rx_tag), .rx_data (rx_data), .ovr_set (ovr_set)
+        .rx_free (rx_free), .rx_load (load_h), .rx_tag (tag_h), .rx_data (data_h), .ovr_set (ovr_h)
     );
+
+    // ------------------------------------------------------------------ BITSYNC engine (FULL)
+    // P-G28: the RX half's event generator keeps working in BITSYNC and wins a clock it loads in (EVENT
+    // first, P19); the engine's token then counts as lost (OVERRUN).
+    wire        load_b, ovr_b, bs_idle, bs_frame, bs_bnd, bs_smp;
+    wire [1:0]  tag_b;
+    wire [15:0] data_b;
+    generate
+        if (FULL != 0) begin : g_bs
+            trw_pin_bs u_bs (
+                .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .active (bs_on),
+                .idle (idle), .order (order), .period (period), .sampleofs (sampleofs), .sjw (sjw),
+                .idle_bits (idle_bits), .resync_both (resync), .nbits (nbits), .rx_nbits (rx_nbits),
+                .a_in (a_in), .a_prev (a_prev),
+                .rx_free (rx_free && !load_h), .rx_load (load_b), .rx_tag (tag_b), .rx_data (data_b),
+                .ovr_set (ovr_b), .bus_idle (bs_idle), .in_frame (bs_frame), .bnd (bs_bnd), .smp (bs_smp)
+            );
+        end else begin : g_nobs
+            assign load_b = 1'b0;  assign ovr_b = 1'b0;  assign tag_b = 2'd0;  assign data_b = 16'd0;
+            assign bs_idle = 1'b0;  assign bs_frame = 1'b0;  assign bs_bnd = 1'b0;  assign bs_smp = 1'b0;
+            wire _unused_bs = &{1'b0, sjw, idle_bits, resync};
+        end
+    endgenerate
+    assign rx_load = load_h || load_b;
+    assign rx_tag  = load_h ? tag_h : tag_b;
+    assign rx_data = load_h ? data_h : data_b;
+    assign ovr_set = ovr_h || ovr_b;
+
+    // B2a: the engine has no TX queue yet: in BITSYNC nothing is taken (see the TX half above)
+    assign tx_take = take_t && !bs_on;
 
     // ------------------------------------------------------------------ pins out (§7.1, P15, P29)
     // C_OE gates the output enable one clock after the synchronised change of pin C (sel_q).
@@ -162,5 +204,5 @@ module trw_pin_unit #(
     /* verilator lint_off UNUSEDPARAM */
     localparam HAS_OPT = FULL;
     /* verilator lint_on UNUSEDPARAM */
-    wire _unused = &{1'b0, cfg};
+    wire _unused = &{1'b0, cfg, bs_idle, bs_frame, bs_bnd, bs_smp};
 endmodule

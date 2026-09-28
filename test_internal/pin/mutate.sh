@@ -56,7 +56,7 @@ MUTANTS=(
   "trw_pin_bs.v#s/k_crc ? ((crc_src ^ crc_xor) \& cmask)/k_crc ? (crc_src \& cmask)/#B2: P25 CRC_XOR ignored"
   "trw_pin_bs.v#s/    wire \[15:0\] crc_src  = arg\[6\] ? (crc_init \& cmask) : tcrc;/    wire [15:0] crc_src  = tcrc;/#B2: P25 LINE [3] before [6]"
   "trw_pin_bs.v#s/                if (arg\[6\])$/                if (1'b0)/#B2: P25 LINE [6] does not reset the TX CRC"
-  "trw_pin_bs.v#s/: (order ? pay : pay_r);/: pay;/#B2: P25 TX ORDER ignored"
+  "trw_pin_bs.v#s/q <= ld_q;  q_hi <= order;/q <= ld_q;  q_hi <= 1'b1;/#B2: P25 TX ORDER ignored"
   "trw_pin_bs.v#s/    wire \[4:0\]  nb       = (tx_lentok ? /    wire [4:0]  nb       = (1'b0 ? /#B2: P25 TX_LENTOK ignored"
   "trw_pin_bs.v#s/    wire        tx_ok   = (qn == 5'd0) \&\& /    wire        tx_ok   = /#B2: P25 a TX token taken while bits are queued"
   "trw_pin_bs.v#s/            if (k_wait) begin/            if (1'b0) begin/#B2: P25 WAIT [1] ignored"
@@ -102,7 +102,7 @@ for m in "${MUTANTS[@]}"; do
   IFS="#" read -r file expr what <<< "$m"
   [ -n "${ONLY:-}" ] && [[ "$what" != *"$ONLY"* ]] && continue
   # milestone B feature mutants need the full build; the D-040 fallback mutant needs the lean one
-  if [ "${FULL:-0}" = 1 ]; then [[ "$what" == "B1: D-040"* ]] && continue; else [[ "$what" == B[0-9]*": P"* ]] && continue; fi      # ONLY=<text>: just the matching mutants
+  if [ "${FULL:-0}" = 1 ]; then [[ "$what" == "B1: D-040"* ]] && continue; else [[ "$what" == B[0-9]*":"* && "$what" != "B1: D-040"* ]] && continue; fi
   rm -rf "$WORK/src"; cp -r "$ROOT/src" "$WORK/src"
   sed -i "$expr" "$WORK/src/$file"
   if cmp -s "$ROOT/src/$file" "$WORK/src/$file"; then echo "NOT APPLIED: $what"; continue; fi

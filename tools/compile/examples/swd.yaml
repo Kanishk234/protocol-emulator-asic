@@ -1,0 +1,14 @@
+# Test bitstream (test/test_bitstream.py::test_swd): held-out H3, the SWD host bit engine on the
+# hard primitives, SWCLK = clk / 8. Sources: the protocol's own file.
+sources: [../../../protocols/swd/swd_top.v]
+top: swd_top
+params:
+  HALF: 4
+  PRIMS: 1
+pins:
+  clk: clk
+  rst_n: rst_n
+  swclk_o: FAB_OUT0
+  swdio_o: FAB_IO0.o
+  swdio_oe: FAB_IO0.oe
+  swdio_i: FAB_IO0.i

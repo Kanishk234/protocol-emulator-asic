@@ -1,0 +1,13 @@
+# Test bitstream (test/test_bitstream.py::test_ws2812): held-out H1, the WS2812 transmitter on the
+# hard primitives, standard timing at 50 MHz. Sources: the protocol's own file.
+sources: [../../../protocols/ws2812/ws2812_top.v]
+top: ws2812_top
+params:
+  TBIT: 62
+  T1H: 40
+  RESET_BITS: 45
+  PRIMS: 1
+pins:
+  clk: clk
+  rst_n: rst_n
+  dout_o: FAB_OUT0

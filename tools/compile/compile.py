@@ -401,6 +401,7 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None):
     util, fmax = parse_pnr_log(out / "pnr.log")
     report = {
         "design": top,
+        "params": params,
         "arch": meta["name"],
         "arch_version": f"0x{bf.arch_version:04X}",
         "words": len(words),
@@ -437,9 +438,17 @@ def main(argv=None):
     ap.add_argument("--arch", default=str(current_arch()))
     ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--set", nargs="*", default=[], metavar="NAME=VALUE",
+                    help="override a parameter of the user top (e.g. DIV=87 for 115200 baud at 10 MHz)")
     a = ap.parse_args(argv)
     try:
-        path, rep = compile_design(a.sources, a.pins, a.arch, a.out, a.seed)
+        overrides = {}
+        for kv in a.set:
+            name, sep, value = kv.partition("=")
+            if not sep or not name:
+                raise CompileError(f"--set {kv!r}: expected NAME=VALUE")
+            overrides[name] = int(value, 0) if re.fullmatch(r"-?(0[xXbBoO])?[0-9a-fA-F_]+", value) else value
+        path, rep = compile_design(a.sources, a.pins, a.arch, a.out, a.seed, set_params=overrides)
     except CompileError as e:
         print(f"compile: error: {e}", file=sys.stderr)
         return 1

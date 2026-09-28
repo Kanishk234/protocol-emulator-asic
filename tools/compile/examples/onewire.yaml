@@ -1,0 +1,12 @@
+# Test bitstream (test/test_bitstream.py::test_onewire): held-out H2, the 1-Wire controller on the
+# hard primitives, standard speed at 50 MHz. Sources: the protocol's own file.
+sources: [../../../protocols/onewire/onewire_top.v]
+top: onewire_top
+params:
+  US: 50
+  PRIMS: 1
+pins:
+  clk: clk
+  rst_n: rst_n
+  dq_i: FAB_IO0.i
+  dq_oe: FAB_IO0.oe

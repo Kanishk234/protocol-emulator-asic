@@ -165,6 +165,8 @@ class Warp:
         chip = self.read_id()
         if arch != chip:
             raise WarpError("bitstream is for architecture 0x%04X, the chip is 0x%04X" % (arch, chip))
+        if self.status()["state"] == "RUNNING":
+            raise WarpError("the chip is RUNNING: stop() before loading (ARCHITECTURE §3)")
         for tx in load_transactions(words, arch, chunk):
             self.xfer(tx)
         st, err = self.read_status()

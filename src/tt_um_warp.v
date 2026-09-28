@@ -14,10 +14,11 @@
  *   uo[2..7]   FAB_OUT0..5 fabric outputs, registered, parked unless RUNNING
  *   uio[0..7]  FAB_IO0..7  fabric bidirectional pins, registered out/oe, parked unless RUNNING
  *
- * Fabric: G0 (arch/warp_g0, D-024), 4 x 3 LUT4x8 tiles = 96 LUT4+FF, macro `warp_g0`. Its 36 IO
+ * Fabric: G1 (arch/warp_g1, D-024, D-026): G0's 4 x 3 grid with one LUT4x8 slot (X2Y2) holding the
+ * primitive tile PRIM2T2S (2 timers + 2 shift registers) = 88 LUT4+FF, macro `warp_g1`. Its 36 IO
  * cells are numbered below (cell_*[i]); each has a pad side into the fabric (cell_pad, the tile's
  * OUT_top) and two fabric outputs (cell_val = IN_top, cell_en = EN_top). The pin map for user
- * designs is arch/warp_g0/pins.csv; this file must match it (tools/compile tests check).
+ * designs is arch/warp_g1/pins.csv (same as G0's); this file must match it (tools/compile tests check).
  *    0- 7  west X0Y1/X0Y2 A-D   FAB_IO0..7 (uio)
  *    8-11  west X0Y3 A-D        host channel H0-H3
  *   12-16  east X5Y1 A-D, X5Y2 A  FAB_IN0..4
@@ -66,7 +67,7 @@ module tt_um_warp (
     wire [7:0]  h_wdata, h_rdata, h_status;
     wire        h_wlast, h_wvalid, h_wready, h_rvalid, h_rready, h_attention;
 
-    wp_shell #(.ARCH_VERSION(16'h0002)) u_shell (
+    wp_shell #(.ARCH_VERSION(16'h0003)) u_shell (
         .clk         (clk),
         .rst_n       (rst_n),
         .host_cs_n   (ui_in[0]),
@@ -147,7 +148,7 @@ module tt_um_warp (
     assign h_attention = cell_val[hcell(10)];
 
     // ---- fabric
-    warp_g0 u_fabric (
+    warp_g1 u_fabric (
         .Tile_X0Y1_A_OUT_top(cell_pad[0]), .Tile_X0Y1_A_IN_top(cell_val[0]), .Tile_X0Y1_A_EN_top(cell_en[0]),
         .Tile_X0Y1_B_OUT_top(cell_pad[1]), .Tile_X0Y1_B_IN_top(cell_val[1]), .Tile_X0Y1_B_EN_top(cell_en[1]),
         .Tile_X0Y1_C_OUT_top(cell_pad[2]), .Tile_X0Y1_C_IN_top(cell_val[2]), .Tile_X0Y1_C_EN_top(cell_en[2]),

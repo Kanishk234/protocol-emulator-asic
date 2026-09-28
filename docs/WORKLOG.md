@@ -26,6 +26,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 **Boxes ticked:** exit items: shell + G1 hardened, gl_test with real bitstreams, g0_results for every protocol, formal summary, fabric workflow green, decision point.
 - **Timing cross-check** (`tools/timing/tile_check.sh`): STA of the hardened `PRIM2T2S` tile against the model. Clock-to-out bounded (6.79 vs 15.17 ns); the timer's in-tile setup (4.0 ns, a NOR with 33 loads) exceeded the standalone arc ×1.5, so setup/combinational margins are now ×3.0 (input side 8.06 vs 12.06 ns). Timed estimates: UART 90.7, SPI 78.0, I2C controller 53.0 MHz. Timing-model box ticked (documented conservative model).
 - CI on fe4cac8: `fabric` failed with exit 126: `scripts/fetch_nextpnr.sh` committed without the executable bit (created from Windows); the workflow now runs it with `bash`, and the three new scripts get `git update-index --chmod=+x`. gds (21-test gl_test) running.
+- CI gds on fe4cac8 (36372341186): gl_test **21/21** incl. `test_spi_ctrl`, `test_i2c_ctrl` on the hardened chip; pin-level protocol tests box ticked.
 **Next:** push the margin fix + fabric fix + rebuilt bitstreams; all CI green closes phase 2 (then PHASE2.md final).
 **Next (superseded):** after the G1 hardening result, push the protocol chip tests + timing work (touches `test/` and `macro/`, so one more hardening, which also gives gl_test evidence for the 21 tests); then phase 2 exit: timing cross-check, per-tile equivalence plan, PHASE2 summary.
 

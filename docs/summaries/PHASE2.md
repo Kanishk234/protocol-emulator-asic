@@ -1,6 +1,6 @@
 # Phase 2 summary: baseline fabric and shell
 
-**Status:** in progress (2026-09-28). Six of the eight exit items pass; left: all CI workflows green on `efpga` after the last push, and this summary's final version. One task item waits for CI (protocol pin-level tests in `gl_test`).
+**Status:** in progress (2026-09-28). Six of the eight exit items pass; left: all CI workflows green on `efpga` after the last push, and this summary's final version. All task items pass (protocol chip tests: CI `gl_test` 21/21, 36372341186).
 
 ## Goal
 Build the real chip around a real fabric: the shell (SPI host interface, checked configuration loading, run control, host byte channels), a full-size fabric with and without the planned primitives (G0, G1), a compile flow from user Verilog to our bitstream, and tests that load real bitstreams into the hardened chip. Then answer the phase's decision question: is shell + G1 a valid fallback submission?
@@ -21,7 +21,7 @@ Build the real chip around a real fabric: the shell (SPI host interface, checked
 - **Simulation of an FPGA fabric has traps silicon does not:** unused routing forms loops that stay X or never settle in a zero-delay simulator, so chip tests run the gate-level shell with the fabric's RTL and settle the routing explicitly (D-023).
 
 ## What's left
-- Phase 2: the last CI run on `efpga`, and the protocol chip tests in CI `gl_test`.
+- Phase 2: the last CI run on `efpga` (after the timing-margin and `fabric` fixes).
 - Phase 3: specialize and compare variants at equal area (D-004), including whatever lets the I2C target fit (a register-file tile, a larger fabric), and freeze the hardware.
 
 ## One-line takeaway

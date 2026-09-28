@@ -25,7 +25,7 @@
 
 ### Protocols on G0
 - [x] Compile all design-set protocols onto G0. For each: fits or not, resources, achieved timing. Report in `docs/reports/g0_results.md`. (local, `python -m compile.protocols --arch arch/warp_g0 --set PRIMS=0`, 2026-09-27: SPI fits (86 LCs, 68.0 MHz), UART 124, I2C controller 115, I2C target 205 do not; G1 numbers in `docs/reports/g1_results.md`)
-- [ ] Pin-level tests (top-level ports only) for each protocol that fits, loaded through the host interface. (Written for G1, the chip's fabric (D-027): `test/test_bitstream.py` `test_uart` (uart16), `test_spi_ctrl` (spi8, against `refmodels/spi.py`), `test_i2c_ctrl` (i2c8, open-drain bus with `refmodels/i2c.py`); pass on the fabric RTL locally 2026-09-27; tick with the CI `gl_test` run of the G1 chip)
+- [x] Pin-level tests (top-level ports only) for each protocol that fits, loaded through the host interface. (G1, the chip's fabric (D-027): `test/test_bitstream.py` `test_uart` (uart16), `test_spi_ctrl` (spi8, against `refmodels/spi.py`), `test_i2c_ctrl` (i2c8, open-drain bus with `refmodels/i2c.py`); CI `gl_test` 36372341186 on fe4cac8: 21/21 on the hardened chip netlist)
 - [ ] Add the `fabric` CI workflow: compile every protocol and run it on the fabric simulation. (`warp_fabric` now also compiles every design-set protocol with `--require uart spi_ctrl i2c_ctrl` and runs the three protocol bitstreams in the pin-level suite; tick with its first green CI run)
 
 ### Formal

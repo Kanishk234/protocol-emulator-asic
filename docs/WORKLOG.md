@@ -21,6 +21,32 @@ Next:
 
 ---
 
+## 2026-09-28: Codex (phase 2: D-044/D-045 model confirmation)
+Done:
+- Added focused D-044 coverage for a port reconfiguration cancelling a same-clock take, and D-045 coverage for no fetch during EXEC/waiting plus RPC advance at fetch.
+- Recorded the model confirmation of the D-044 and D-045 readings in `docs/DECISIONS.md`.
+- Added a fractional CARRIER check for D-051 P-G26. It exposes a model/spec-reading disagreement for 5.5-clock periods; recorded as proposed D-058 without changing behavior.
+
+Evidence:
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py`: **48 passed**.
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **67 passed**.
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py -k fractional_carrier`: **1 passed**; rounding the period to whole clocks killed the test.
+- Revert mutation removing D-044's take cancellation failed (`port.takes` became 1); removing the D-045 fetch guard failed during EXEC; removing the RPC increment failed the RPC assertion.
+- `git diff --check`: clean.
+
+Checklist boxes ticked:
+- None. L2 remains unstarted; D-051–D-055 and the count/budget decision are still pending.
+
+Problems / decisions:
+- No disagreement with D-044/D-045 readings found. D-057's P-G24/P-G25/P-G28 proposals and D-058's P-G26 proposal remain unresolved; none of their semantics changed.
+- The Phase 2 RTL checklist L1 edit is an existing, separate workspace change and is not part of this model session's code changes.
+
+Next:
+- Continue focused tests and revert mutations for P-G24–P-G47, recording any contested reading through DECISIONS before changing semantics.
+- Obtain the count/budget decision, then audit remaining count-bound tests. Start L2 only after all prerequisites are ready.
+
+---
+
 ## 2026-09-28: Codex (phase 2: implement approved D-041 A/B)
 Done:
 - Recorded Krithik's approval on behalf of both teammates for D-041 A (every pin-config word write restarts that unit and clears sticky flags) and B (pin units stay inactive until the first valid RUN or STEP) in `docs/DECISIONS.md`.

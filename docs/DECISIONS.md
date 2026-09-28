@@ -765,6 +765,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** nothing beyond the port registers themselves (10 flops per port, in `trw_chan_port`); a 13-way readback mux and a clear strobe per port.
 - **Evidence:** L1-CHAN (`test_internal/chan/`): 7 tests, including every combination of 0–4 blocking and 0–2 tap subscribers and 6,000 random clocks against a model of F1–F7, all passing; `mutate.sh` 10 of 10 mutants killed. Yosys: fabric 44.4K µm², producer register 1.5K.
 - **Approval:** layout and clear approved by Krithik 2026-09-27 (spec v1.2 `host_map.ports` / `dropped`). The three readings still go to the model side for confirmation.
+- **Model confirmation (2026-09-28):** all three readings are confirmed by focused checks in `tools/tripsim/tests/test_semantics.py`: F5 same-edge source load, invalid `sel`, and a port configuration write cancelling a same-clock take. Revert mutations for F5 and config-vs-take fail the corresponding checks.
 
 ## D-045 (2026-09-27): the lane in `src/`, with the routine controller; three readings for the model side
 - **Context:** phase 2 task 2.1 `trw_lane.v`: the R1 spike lane (D-030) plus what it lacked: the routine controller (RPC, RIR, CALL entry read, BR, DJNZ, LD/ST, OUT, SYS), STEP (§14 H2), host writes to r0–r3 and STATE (D-035 E2), and a producer-load output for tap drop counting (F4). Checked against §14 L1–L12, R1–R6, H1–H2 and D-035; written without reading `tools/tripsim`. `trw_alu.v` moves to `src/` unchanged.
@@ -777,6 +778,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** 51.5K µm² per lane with the ALU (Yosys, cmos5l typ), +9.6K over the spike lane (41.9K) and +6.7K over the spike plus R4's sequencer stub. 242 flops. The fetched-word path adds the macro's clock-to-output (4.3 ns typ, R3) in front of EVAL; it is not measured yet (pre-layout STA once a top wires the lane to the macro).
 - **Evidence:** `test_internal/alu/` 4 tests, 8/8 mutants; `test_internal/lane/` 6 tests (400 random EVAL cases against ISA §4.2–4.3, the pipeline timing of L3–L5 and the pending rule, output reservation with the 3-clock reload, a routine using every word kind and every reserved code, urgent vs routine, halt/STEP/host writes), 15/15 mutants.
 - **Approval:** the readings go to the model side; nothing here changes the spec.
+- **Model confirmation (2026-09-28):** R1/R2 fetch timing, waiting/EXEC suppression, RPC advance at fetch, ignored STEP while running, and ignored host register writes while running are confirmed by focused checks in `tools/tripsim/tests/test_semantics.py`. Revert mutations removing the fetch guard and RPC increment fail their checks.
 
 ## D-046 (2026-09-27): the host register map in full (approved 2026-09-27)
 - **Context:** `trw_host.v` (phase 2 task 2.1) is the last module without RTL. §9 gives the address ranges and the transaction format, but no layout for the control/status words, the lane debug block beyond r0–r3/STATE, or the HOST_IN/HOST_OUT status. Together with D-042 (unit flags) and D-044 (fabric ports) this entry fixes every address, so the host RTL, `tools/host` (task 2.3 item 7) and `tripc.load` share one map. Where the R4 host stub (`spikes/r4_floorplan`) already chose, the proposal keeps its choice, so the R4 tests stay valid.
@@ -908,6 +910,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **P-G24:** the RTL reading says a PULSE phase configured for 0 ticks occupies one clock. `tripsim` schedules both transitions at the same edge and commits the latter, so the phase has no observable duration. This also follows the literal P17 duration (`T1_b·PRESC` / `T2_b·PRESC`); decide whether P17 should explicitly impose a one-clock minimum.
 - **P-G25:** the RTL reading treats CARRIER below 2 clocks as off. `tripsim` currently applies every nonzero carrier and can alternate on periods below 2 clocks. P30 currently says CARRIER > 0 applies; clarify whether the minimum is 2 clocks.
 - **P-G28:** the RTL reading keeps the event generator active in BITSYNC and gives its output priority on a coincident producer load. The model's `PinUnit.compute_rx()` delegates to `BitSync.step()` and returns before the ordinary event generator. P8 does not state a BITSYNC exception; confirm the reading and specify same-clock arbitration.
+
+## D-058 (2026-09-28, proposed): resolve fractional carrier phase for P-G26
+- **Context:** adding a model-only P-G26 check from D-051, without inspecting RTL.
+- **Finding:** for CARRIER = 5.5 clocks, `tools/tripsim` samples the active/inactive phase as `[1,1,1,0,0,0,1,1,1,0,0,1]` over elapsed clocks 0–11, so the transitions appear on clocks 3, 6, 9, and 11. D-051 states the k-th toggle is at `t + floor(k·CARRIER/2)`, which gives clocks 2, 5, 8, and 11. The two readings disagree for fractional half periods.
+- **Proposal:** specify whether the half-period boundaries use floor or a phase-accumulated 50% duty schedule, and define how a fractional boundary is sampled at integer clock edges. No model behavior changed pending team agreement.
+- **Cost:** none if the current rule is retained; a different rule changes only carrier phase arithmetic and its model tests.
 - **Proposal:** confirm the three RTL readings and amend P17, P30 and P8 with their minimum-duration, carrier-disable and event-priority rules. Until accepted, keep the behavior question visible and do not change the model to match an unconfirmed reading.
 - **Evidence:** source review only; no new focused tests or mutation checks for these readings yet. Those are prerequisites before D-057 can be accepted.
 - **Decision:** Krithik + Kanishk.

@@ -13,7 +13,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - **Protocols on the primitives** (`PRIMS=1`; plain form kept): UART, SPI controller, I2C controller rewritten; all RTL tests pass in both forms (UART DIV 16/13/5 + sigrok, SPI 4 modes × 2 speeds, I2C Q 2/4/5). I2C controller also lost its own synchronizers (ARCHITECTURE §6) and three wait states. Unit CI runs the `PRIMS=1` configurations.
 - **Results:** G1 places UART 29, SPI 47, I2C controller 70 of 88 LCs (69–124 MHz slow corner); G0 places only SPI (86/96). `docs/reports/g1_results.md`, `g0_results.md` rewritten.
 **Boxes ticked:** full 6x4 hardening of shell + G0 (CI 36353540402); protocols compiled onto G0 (`g0_results.md`).
-**Next:** G1 into the chip (arch/CURRENT, top, black box, stub/settle files, config.json with a DECISIONS entry, test bitstreams incl. a primitives design and UART through the host channel, F1), local pre-flight, then one CI hardening. Then the I2C target.
+**Later the same session:**
+- CI on b438814: `fabric` failed: the committed test bitstreams predate the BUGS #15 flow change, and `prims2` needs G1 (fixed by the G1 switch, which rebuilds them). The `gds` run it started re-hardens the unchanged G0 (arch/prims touched `arch/**`).
+- **G1 into the chip (D-027):** `arch/CURRENT` = warp_g1, ARCH_VERSION 0x0003 (shell, host software), `src/warp_g1.v` black box, `config.json` macro files, test stub and settle files regenerated, RTL fabric model includes `arch/prims`. New chip tests `test_prims` (both block types configured by a real bitstream) and `test_uart` (the design-set UART on the primitives through the host interface; test bitstream `uart16`). Local: RTL suite **19/19**, stub 13 + 6 skipped, F1 PASS (k-induction), pytest 63, lint clean.
+- **I2C target** rewritten (hard shift register for the bus byte, shared register ports, no own synchronizers): 6/6 tests in both forms at Q 4/6/11; 205 → 184 LCs (G0), 169 (G1); does not fit either, even with 2 registers (123 on G1) — generic Yosys LUT4 mapping agrees, so it is the design's size: phase 3 (register-file tile or larger fabric).
+- BUGS #16 (`sda_o` undriven after the rewrite, found by lint): `lint` now checks all protocol designs in both forms.
+**Next:** local pre-flight of the G1 chip, then push for one CI hardening (gds + precheck + gl_test with 19 tests).
 
 ---
 

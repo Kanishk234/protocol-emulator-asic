@@ -139,8 +139,8 @@ All compared at equal total area and the same clock target (D-004); results in `
 
 | Variant | Content | Status |
 |---|---|---|
-| G0 | 12 LUT tiles (96 LUT4), shell with synchronizers/registered outputs | baseline |
-| G1 | G0 with one slot = primitive tile (2 timers + 2 shift regs), 88 LUT4 | planned fallback (D-008) |
+| G0 | 12 LUT tiles (96 LUT4), shell with synchronizers/registered outputs | baseline; hardened in the chip (CI 36353540402), now `arch/warp_g0` only |
+| G1 | G0 with one slot = primitive tile (2 timers + 2 shift regs), 88 LUT4 | the chip's fabric (D-027); fallback (D-008): UART, SPI and I2C controller fit (`docs/reports/g1_results.md`) |
 | G1 + regfile | + a register-file tile (FABulous `RegFile`) for the I2C target's map | only with a second user or a DECISIONS justification (D-016) |
 | IO-tile features | synchronizers/registers moved from the shell into fabric IO tiles | phase 3 experiment |
 | No carry | LUT tiles without the carry chain | phase 3 experiment (profiling: carry saves 0–18 LUTs per design) |

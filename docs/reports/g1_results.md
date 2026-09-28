@@ -9,7 +9,8 @@
 | UART (115200 baud) | **yes** | 29 (33 %) | 19 (0) | 19 | 2, 2 | 15 | 123.5 MHz | 124 LCs, no fit |
 | SPI controller (mode 0, 1 MHz SCK) | **yes** | 47 (53 %) | 38 (5) | 25 | 1, 1 | 17 | 88.9 MHz | 86 LCs, fits |
 | I2C controller (~100 kHz) | **yes** | 70 (80 %) | 70 (0) | 32 | 1, 1 | 15 | 69.2 MHz | 115 LCs, no fit |
-| I2C target (4 registers) | **no** | 205 | 195 (16) | 79 | 0, 0 | 15 | - | 205 LCs, no fit (not rewritten for the primitives yet) |
+| I2C target (4 registers) | **no** | 169 | 127 (11) | 61 | 0, 1 | 15 | - | 184 LCs, no fit |
+| I2C target (2 registers) | **no** | 123 | 97 (8) | 41 | 0, 1 | 15 | - | 142 LCs, no fit |
 
 The two fabrics take the same chip area: the primitive tile is 0.97 × a LUT tile in the same footprint (D-026), and the macros have identical size. This is a like-for-like comparison of the two fabrics under one compile flow, in the spirit of D-004; the full phase-3 comparison (routing, shell and configuration included, more variants) is still to come.
 
@@ -19,6 +20,7 @@ Each protocol keeps a plain-logic form (`PRIMS=0`, for G0 and for run-time setti
 
 - **UART:** TX: bit timer (RELOAD = DIV − 1) + shift register (LEN 9: 8 data bits, then the stop bit shifted in); RX: bit timer loaded with `half` for mid-bit sampling + shift register (LEN 8) holding the byte. Run-time baud (`RUNTIME_DIV=1`) uses the plain logic. Tests: DIV 16, 13, 5.
 - **SPI controller:** SCK half-period timer + one shift register for both directions (MSB first; each change edge shifts in the bit sampled at the previous sampling edge). Tests: all four modes, HALF 4 and 7.
+- **I2C target:** the bus byte (in and out) and its bit count in one shift register (its `done` replaces the bit counter and a state); rewritten at the same time with one shared read and write port for bus and host (the host waits a clock when the bus uses them), plain flip-flops instead of an inferred memory, and no own synchronizers (205 → 184 LCs on G0, 169 on G1). Tests: Q 4, 6, 11.
 - **I2C controller:** one one-shot timer (RELOAD = 2Q − 1; its `half` load gives Q − 1, the other phase length) + a shift register for the data byte, two flip-flops for the ACK bit. Tests: Q 2, 4, 5 (incl. clock stretching, NACK, two targets).
 
 User designs instantiate `WP_TIMER #(.RELOAD, .ONESHOT)` and `WP_SHIFT #(.LEN, .MSB_FIRST)` (`tools/compile/prims/warp_prims.v`); the compile flow maps them to the BELs with one configuration bit per parameter bit, nextpnr places them, and the bitstream sets those bits (checked on `tools/compile/examples/prims2`: RELOAD 5 → `A.RELOAD0`, `A.RELOAD2`; LEN 6 → `C.LEN1`, `C.LEN2`).
@@ -35,5 +37,5 @@ The first G1 run placed UART and SPI but not the I2C controller (78 of 88 LCs): 
 | 8 | 29 | 48 | 70 |
 
 ## Open
-- I2C target on the primitives (205 LCs, needs about 2.5 × G1's logic even before rewriting; its register map is the largest part, D-016).
+- **I2C target does not fit G1** even with 2 registers (123 of 88 LCs). Yosys's generic LUT4 mapping of the same source gives about the same size (82 LUTs at 2 registers, 103 at 4), so the compile flow is not the cause: the design (bus state machine, host command decoder, register ports, status) is about twice G1's logic. Options for phase 3: the register-file tile variant (ARCHITECTURE §9, D-016) or a larger fabric; I2C itself is covered by the controller.
 - The same bitstreams loaded through the host interface on the chip: needs G1 in the chip (next hardware change).

@@ -125,3 +125,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** `python -m compile.protocols` on G1 (place and route), then counting the flip-flops' (E, R) nets in the synthesized netlist.
 - **Now covered by:** the compile flow runs `dfflegalize -mince 4 -minsrst 4` between `synth_fabulous`'s stages (`MIN_CTRL` in `tools/compile/compile.py`): an enable or synchronous reset used by fewer than 4 flip-flops becomes LUT logic. The same designs also got smaller (uart 37 → 29 LCs, spi_ctrl 51 → 47, i2c_ctrl places at 70; thresholds 2, 4 and 8 compared, `docs/reports/g1_results.md`). The protocol fit tables are the regression check.
 - **Fix:** `tools/compile/compile.py` synthesis script. Consequence for architecture work: LC count alone is not capacity on this tile; the number of control sets is a second limit (phase 3 input).
+
+## 16: I2C target rewrite left sda_o undriven
+- **Date:** 2026-09-27 (caught before commit)
+- **Symptom:** Verilator: `Signal is not driven: 'sda_o'` in the rewritten `protocols/i2c_target/i2c_target_top.v`; the RTL tests all passed.
+- **Root cause:** the rewrite (shared register ports, hard shift register) dropped `assign sda_o = 1'b0`, the open-drain pin's output value. Undriven, it would float in simulation and be left to synthesis on the chip. The tests drive and watch only `sda_oe` (the open-drain model), so they could not see it.
+- **Caught by:** a Verilator `-Wall` lint of the design, run by hand; CI linted only `src/`.
+- **Now covered by:** the `lint` workflow lints every protocol user design in both forms (`PRIMS=0/1`) with `-Wall`; all 8 are clean (Verilator 5.020, the CI version).
+- **Fix:** the assign restored.

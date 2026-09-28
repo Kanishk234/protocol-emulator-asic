@@ -9,7 +9,7 @@
 | SPI controller (mode 0, 1 MHz SCK) | **yes** | 86 (90 %) | 76 (11) | 45 | 17 | 68.0 MHz |
 | UART (115200 baud) | **no** | 124 (129 %) | 98 (30) | 68 | 15 | - |
 | I2C controller (~100 kHz) | **no** | 115 (120 %) | 106 (14) | 58 | 15 | - |
-| I2C target (4 registers) | **no** | 205 (214 %) | 195 (16) | 79 | 15 | - |
+| I2C target (4 registers) | **no** | 184 (192 %) | 142 (16) | 73 | 15 | - |
 
 IO cells include the host channel (`h_*` ports, mapped by name, D-024). Timing is not reported for designs that do not place. All designs in their plain-logic form (`PRIMS=0`), the same sources as on G1 (`docs/reports/g1_results.md`).
 
@@ -22,8 +22,9 @@ IO cells include the host channel (`h_*` ports, mapped by name, D-024). Timing i
 ## History
 
 - **First run** (same date): SPI 95 LCs, no legal placement at 98 %; UART 127, I2C controller 160, I2C target 205. The SPI failure was BUGS #15 (the 8 LCs of a tile share one clock enable and one set/reset; one-flip-flop enables used up tiles). The flow now turns enables and resets used by fewer than 4 flip-flops into logic, which also shrank every design.
+- **I2C target 205 → 184:** shared register ports for bus and host, plain flip-flops instead of an inferred memory, no own synchronizers (`protocols/i2c_target/test` passes).
 - **I2C controller 160 → 115:** the design lost its own input synchronizers (the shell synchronizes every input, ARCHITECTURE §6) and three wait states (the high-phase timer is held until SCL reads high); same tests pass (`protocols/i2c_ctrl/test`).
 - A first run left one `$mux` cell unmapped in the I2C target: the compile flow's `opt -full` after gate mapping ran `opt_share`, which creates coarse muxes nothing maps afterwards. The flow runs plain `opt` there.
 
 ## Open
-- UART, SPI and the I2C target still carry their own input synchronizers (ARCHITECTURE §6 makes them unnecessary); removing them saves a few LCs each.
+- UART and SPI still carry their own input synchronizers (ARCHITECTURE §6 makes them unnecessary); removing them saves a few LCs each.

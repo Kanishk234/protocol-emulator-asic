@@ -14,7 +14,9 @@ import tripwire_spec as S  # noqa: E402
 
 HM = {k: v[0] for k, v in S.HOST_MAP.items()}
 LW = {w: j for j, w in enumerate(S.HOST_LANE_WORDS)}
-NL, NU, NC, LDW = 3, 6, 13, 180
+NL = S.HOST_MAP["lanes"][1] // S.HOST_LANE_STRIDE        # the spec's counts (tb_host takes them from trw_defs.vh)
+NU, NC, LDW = len(S.PIN_UNIT_FEATURES), len(S.FABRIC_CONSUMERS), 180
+LT, UT = NL - 1, NU - 1                                 # the last lane and unit
 H = 4                                                   # SCK half period in clocks (SCK = clk/8)
 STROBES = ("slot_we", "lane_hwe", "port_we", "clr_dropped", "pcfg_we", "clr_overrun", "clr_late", "hin_load",
            "hout_take", "step")
@@ -111,9 +113,9 @@ async def test_control_id_step_irq(dut):
     await h.write(HM["run"], [0b001])
     assert int(dut.run.value) == 1 and int(dut.live.value) == 1
     assert await h.read(HM["run"]) == [1 << S.HOST_RUN_LIVE_BIT | 1]
-    await h.write(HM["step"], [0b111])                  # lane 0 runs: only lanes 1 and 2 step
+    await h.write(HM["step"], [(1 << NL) - 1])          # lane 0 runs: only the other lanes step
     st = h.events("step")
-    assert len(st) == 1 and st[0][2] == 0b110
+    assert len(st) == 1 and st[0][2] == (1 << NL) - 2
     await h.write(HM["run"], [0])
     assert int(dut.live.value) == 1, "live stays set once any lane has run (D-041 B)"
     # IRQ: status is live, the pad is registered and follows the enable
@@ -137,7 +139,7 @@ async def test_step_makes_units_live(dut):
     assert int(dut.live.value) == 0
     await h.write(HM["step"], [0])
     assert int(dut.live.value) == 0
-    await h.write(HM["step"], [0b100])
+    await h.write(HM["step"], [1 << LT])
     assert int(dut.live.value) == 1 and int(dut.run.value) == 0
     assert (await h.read(HM["run"]))[0] >> S.HOST_RUN_LIVE_BIT & 1
 
@@ -148,23 +150,23 @@ async def test_write_decode(dut):
     await h.write(HM["run"], [0b001])                   # lane 0 running
     a = HM["slots"]
     await h.write(a | 1 << 8 | 5 << 4 | 2, [0xBEEF])    # lane 1, slot 5, word 2
-    await h.write(a | 2 << 8 | 12 << 4 | 3, [0x1234])   # lane 2, K3
+    await h.write(a | LT << 8 | 12 << 4 | 3, [0x1234])  # the last lane, K3
     await h.write(a | 1 << 8 | 5 << 4 | 1 << 2, [0x1111])   # [3:2] != 0: ignored
     await h.write(a | 0 << 8 | 1 << 4, [0x2222])        # lane 0 is running: dropped
     ev = h.events("slot_we")
-    assert [(e[2], e[3], e[6]) for e in ev] == [(0b010, 5 * 4 + 2, 0xBEEF), (0b100, 12 * 4 + 3, 0x1234)], ev
-    await h.write(HM["lanes"] + 2 * S.HOST_LANE_STRIDE + LW["state"], [0x7])
+    assert [(e[2], e[3], e[6]) for e in ev] == [(0b010, 5 * 4 + 2, 0xBEEF), (1 << LT, 12 * 4 + 3, 0x1234)], ev
+    await h.write(HM["lanes"] + LT * S.HOST_LANE_STRIDE + LW["state"], [0x7])
     await h.write(HM["lanes"] + 1 * S.HOST_LANE_STRIDE + LW["flags"], [0x7])   # read-only: no strobe
     ev = h.events("lane_hwe")
-    assert [(e[2], e[4], e[6]) for e in ev] == [(0b100, 4, 7)]
+    assert [(e[2], e[4], e[6]) for e in ev] == [(1 << LT, 4, 7)]
     await h.write(HM["ports"], [0x3FF, 0x001, 0x2A5])   # auto-increment: ports 0, 1, 2
     ev = h.events("port_we")
     assert [(e[2], e[6]) for e in ev] == [(1, 0x3FF), (2, 0x001), (4, 0x2A5)]
     await h.write(HM["dropped"] + 3, [0])
     assert [e[2] for e in h.events("clr_dropped")] == [1 << 3]
-    await h.write(HM["pin_cfg"] + 32 * 4 + 17, [0xABCD])
+    await h.write(HM["pin_cfg"] + 32 * UT + 17, [0xABCD])
     ev = h.events("pcfg_we")
-    assert [(e[2], e[5], e[6]) for e in ev] == [(1 << 4, 17, 0xABCD)]
+    assert [(e[2], e[5], e[6]) for e in ev] == [(1 << UT, 17, 0xABCD)]
     await h.write(HM["unit_flags"] + 2, [0b11])
     await h.write(HM["unit_flags"] + 3, [0b10])
     assert [e[2] for e in h.events("clr_overrun")] == [1 << 2]
@@ -201,15 +203,15 @@ async def test_read_map(dut):
             it, ot = (f["ihead"] >> 18 * p) & 0x3FFFF, (f["otok"] >> 18 * p) & 0x3FFFF
             assert (w[f"i{p}_tag"], w[f"i{p}_data"]) == (it >> 16, it & 0xFFFF)
             assert (w[f"o{p}_tag"], w[f"o{p}_data"]) == (ot >> 16, ot & 0xFFFF)
-    assert await h.read(HM["lanes"] + 3 * S.HOST_LANE_STRIDE) == [0]   # no lane 3
+    assert await h.read(HM["lanes"] + NL * S.HOST_LANE_STRIDE) == [0]  # no lane past the last
     ps = [rng.randrange(1 << 10) for _ in range(NC)]
     dr = [rng.randrange(256) for _ in range(NC)]
     dut.port_state.value = sum(v << 10 * c for c, v in enumerate(ps))
     dut.dropped.value = sum(v << 8 * c for c, v in enumerate(dr))
     assert await h.read(HM["ports"], NC) == ps
     assert await h.read(HM["dropped"], NC) == dr
-    dut.overrun.value, dut.late.value = 0b100001, 0b000011
-    assert await h.read(HM["unit_flags"], NU) == [3, 2, 0, 0, 0, 1]
+    dut.overrun.value, dut.late.value = 1 << UT | 1, 0b11
+    assert await h.read(HM["unit_flags"], NU) == [3, 2] + [0] * (NU - 3) + [1]
     assert await h.read(0x4000, 2) == [0, 0]
 
 

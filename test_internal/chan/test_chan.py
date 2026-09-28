@@ -269,7 +269,8 @@ async def test_repoint_never_sees_a_stale_token(dut):
     that producer is not delivered; the next one is."""
     h = await Harness.start(dut)
     c = CONS.index("L1.I1")
-    a, b = PROD.index("U3.rx"), PROD.index("L2.O0")
+    src = S.LEGAL_SOURCES["L1.I1"]                         # U*.rx, HOST_IN, L2.O0 (L0.O0 with 2 lanes), L0.O1
+    a, b = PROD.index(src[-4]), PROD.index(src[-2])        # the last unit's rx, then the next lane's O0
     await h.clock(load={a: 0x0AAA, b: 0x0BBB})            # both hold a token nobody subscribed to
     await h.connect(c, a)
     r = await h.clock()
@@ -297,7 +298,7 @@ async def test_sel_beyond_the_list(dut):
 
 @cocotb.test()
 async def test_random_against_model(dut):
-    """Random loads, takes, configuration writes and clears on all 13 producers and ports, compared with
+    """Random loads, takes, configuration writes and clears on every producer and port, compared with
     the model every clock (the harness asserts every output)."""
     rng = random.Random(7)
     h = await Harness.start(dut)

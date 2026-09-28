@@ -2,7 +2,7 @@
 
 **Question:** how big is a real `trw_pin_unit`, and was the pre-RTL estimate (`AREA_ESTIMATE.md`) right? The estimate's biggest guess was the pin units' control logic ("glue", 45 % ± 15 % of the datapath), and the chip is at ~87 % of the 6x4 core against a routable ~50–60 %.
 
-**Status (2026-09-25): milestone A (lean feature set) done; milestone B (PULSE, carrier, BITSYNC for U0–U1) not started.**
+**Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier) done, B2/B3 (BITSYNC) next (§9).**
 
 **Answer so far:** the lean unit came in **~6 % under the estimate**: 38.7K µm² before layout (unit 29.4K + configuration 5.1K + producer 1.5K + the estimate's 2.7K for the consumer port) against 41.2K. The glue share was ~38 %, inside the guessed range. So the estimate holds, and **the chip is still ~85 % of the core** with real lean units. There is no hidden slack: getting to 50–60 % still needs real cuts. The per-feature prices below say where the lean unit's area goes.
 
@@ -200,3 +200,25 @@ The critical path is the same at both widths: burst timer → cursor → `eq`.
 - **Team decision on the cuts, with these numbers** (§5): fractions and timer widths (a spec change per D-037), 4 units, 2 lanes.
 - Milestone B (PULSE P17, carrier P30, BITSYNC P20–P29) for U0–U1, then the same measurements. If a cut changes the timers, do it before B, since BITSYNC reuses them.
 - The model session: answer P-G1–P-G23 in §14.
+
+## 9. Milestone B: the full units (U0–U1)
+
+**Why now:** the protocol floor (D-049) keeps U0 full whatever the budget: 7 programs need PULSE, the carrier or BITSYNC (CAN, HDLC, USB-LS, DShot, 1-Wire, WS2812, IR NEC). Written from `ARCHITECTURE.md` §7 and §14 P17–P30 only; `tools/tripsim` not read.
+
+**Plan (each stage with its L1 tests and mutants before the next):**
+| Stage | Rules | Contents | State |
+|---|---|---|---|
+| B1 | P17, P30 | PULSE (per-bit symbols in whole ticks, back-to-back join, cursor = end time); the carrier (50 % toggle while pin A is not IDLE, restart at each change to the active level, fractional period) | **done** |
+| B2 | P20–P25 | BITSYNC core: bit clock, idle detection, frame start and hard sync, resync (SJW), stuffing, RX framing and `FRAME`, the RX/TX CRC, the TX queue with `LINE`/`SYNC`, `WAIT` [1] | next |
+| B3 | P26–P29 | readback modes and arbitration, errors, flag delimiters, `JAM` and listen-only, NRZI, SE0, pin N, OE auto | after B2 |
+
+**B1 as built** (`src/trw_pin_tx.v`, parameter `FULL`): PULSE runs as a burst of whole ticks, each bit two phases counted as `pt` ticks and `ps` clocks of the tick (no multiplier); P3's "take when all pending actions are at edges ≤ n+1" extends to the burst's end, so the next DATA token's first bit lands on the end edge. PULSE bits set the echo flag (P40). The carrier is a 16.9-clock half-period timer in the TX half; `lvl` shows IDLE in the off halves (so pin N follows, and C_OE still gates the pad, D-035 H). On a lean unit the PULSE code acts as LEVEL and the carrier fields read 0 (D-040).
+
+**Verification:** `test_internal/pin/test_pin_full.py` (4 tests, both builds): two back-to-back 8-bit PULSE tokens with PRESC = 1, every edge where P17 puts it, the second token joined; MSB order, a GAP after a token (cursor = end time) and a 0-tick phase; the carrier at 10 clocks and at 7.5 clocks (fractional), with IDLE steady and a restart on each activation; the carrier on a PULSE stream (IR NEC style); on the lean build the D-040 fallbacks. Pin suite 38/38 on both builds; `mutate.sh` 17/17 (lean) and 21/21 (full) with 6 new B1 mutants (one first-round survivor was an equivalent mutant and was replaced). Chip lint and chip tests unchanged (10/10).
+
+**Cost:** the full unit's logic grows from 30.2K to **37.9K µm²** (+7.7K for PULSE and the carrier; Yosys cmos5l typ, flat, without the configuration block). The estimate's projection for all three features was ~24.4K, which leaves ~16.7K for BITSYNC.
+
+**Readings where the text leaves a choice (for the model side, D-051):**
+- **P-G24** PULSE phase of 0 ticks: lasts one clock (the RTL counts phases in clocks; programs use ≥ 6 ticks).
+- **P-G25** CARRIER below 2 clocks: the carrier is off.
+- **P-G26** carrier edges: the k-th toggle after a change to the active level lands on edge `t + floor(k · CARRIER / 2)` (CARRIER in 1/256 clocks, accumulated exactly), so the duty is 50 % to within one clock.

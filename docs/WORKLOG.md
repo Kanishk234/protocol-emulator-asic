@@ -21,6 +21,22 @@ Next:
 
 ---
 
+## 2026-09-28: Krithik + Claude (phase 2: pin-unit milestone B1, PULSE and carrier)
+RTL session, from `ARCHITECTURE.md` §7 and §14 P17, P30; `tools/tripsim` not read.
+
+Done:
+- Milestone B planned in three stages (`PIN_UNIT_RTL.md` §9): B1 PULSE + carrier, B2 BITSYNC core (P20–P25), B3 BITSYNC readback/JAM/flags/NRZI/SE0 (P26–P29). Krithik agreed that verification-infrastructure items (pyuvm, L9) can wait while the RTL phase needs RTL.
+- **B1 done:** `trw_pin_tx.v` (`FULL`): PULSE bursts in whole ticks with back-to-back joining; the carrier with a fractional half-period timer. `trw_pin_unit.v` passes the fields. Lint clean both builds; chip lint and chip tests unchanged.
+- `test_internal/pin/test_pin_full.py` (4 tests, both builds); pin suite 38/38 lean and full; `mutate.sh` handles `FULL` and the B1 mutants: 17/17 lean, 21/21 full.
+- Area: full unit logic 37.9K µm² (+7.7K).
+- D-051: three readings (P-G24–P-G26) for the model side.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- B2: the BITSYNC core (P20–P25).
+
 ## 2026-09-28: Krithik + Claude (phase 2: protocol floor, L1-ROT, L0-ASRT, L-XSIM, L8-EQY)
 Done:
 - **D-049 (proposed), the protocol floor**, from Krithik's constraint that every protocol must stay supported (not at the same time). From the 20 compiled programs: ≥ 2 lanes, ≥ 4 units with U0 full (U1 may be lean), 12 slots, the 512-word SRAM. That is ≈ 395K µm² ≈ 56 % at placement, inside the window R4 has not measured (run 4 47.6 % routed globally, run 3 58.9 % did not).

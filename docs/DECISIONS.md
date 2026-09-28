@@ -854,6 +854,15 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Not covered yet:** sequential modules. They need a miter with matched state, i.e. induction via `sby` on the miter, or `eqy` with explicit `[match]` rules for the flops. The whole chip needs the same, plus the latches (`dlhq`) and clock gates (`lgcp`), whose liberty models must be checked. A candidate for the `formal` workflow once its name is settled with the `efpga` branch, which has its own `formal.yaml`.
 - **Cost:** none in hardware.
 
+## D-051 (2026-09-28): milestone B1 (PULSE, carrier) in the RTL; three readings for the model side
+- **Context:** pin-unit milestone B starts (D-049 keeps U0 full in any budget). B1 adds PULSE (§14 P17) and the carrier (P30) to `trw_pin_tx.v` under `FULL`; details in `PIN_UNIT_RTL.md` §9. B2/B3 (BITSYNC, P20–P29) follow.
+- **Readings (each pinned by a test in `test_internal/pin/test_pin_full.py`):**
+  - **P-G24:** a PULSE phase of 0 ticks lasts one clock.
+  - **P-G25:** a CARRIER below 2 clocks means the carrier is off.
+  - **P-G26:** the k-th carrier toggle after a change to the active level is on edge `t + floor(k · CARRIER / 2)`, CARRIER in 1/256 clocks, accumulated exactly (50 % duty to within a clock).
+- **Model side:** confirm or contest each (a §14 sentence and a `test_semantics.py` test), as for D-041. tripc could also reject a 0-tick phase and a CARRIER below 2 clocks.
+- **Cost:** +7.7K µm² per full unit (logic 30.2K → 37.9K).
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

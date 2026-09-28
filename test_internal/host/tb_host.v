@@ -8,7 +8,7 @@
 `include "trw_defs.vh"
 
 module tb_host #(
-    parameter NL = 3, parameter NU = 6, parameter NC = 13, parameter LDW = 180
+    parameter NL = `TRW_LANES, parameter NU = `TRW_UNITS, parameter NC = `TRW_NCONS, parameter LDW = 180
 ) (
     input  wire              clk,
     input  wire              rst_n,

@@ -26,19 +26,27 @@ Done:
 - Added focused D-044 coverage for a port reconfiguration cancelling a same-clock take, and D-045 coverage for no fetch during EXEC/waiting plus RPC advance at fetch.
 - Recorded the model confirmation of the D-044 and D-045 readings in `docs/DECISIONS.md`.
 - Added a fractional CARRIER check for D-051 P-G26. It exposes a model/spec-reading disagreement for 5.5-clock periods; recorded as proposed D-058 without changing behavior.
+- Added checks for D-051 P-G24/P-G25 and D-052 P-G29, documenting differences from the milestone readings in D-057/D-059 without changing behavior.
+- Added a D-052 P-G28 event-generator check and confirmed D-053 P-G27/P-G30 (stuff-error bit count and FRAME verdict). P-G28 is proposed in D-060; P-G27/P-G30 have focused mutation evidence.
+- Added D-054 P-G31 focused coverage: WAIT [1] clears at the sample point and permits TX DATA acceptance that clock; a revert mutation fails.
+- Added D-054 P-G32 coverage for opening our frame on the next bit boundary and loading EVENT `0x9001` on that clock; a boundary mutation fails.
 
 Evidence:
-- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py`: **48 passed**.
-- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **67 passed**.
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **75 passed**.
 - `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py -k fractional_carrier`: **1 passed**; rounding the period to whole clocks killed the test.
+- Revert mutations for zero-tick pulse timing, sub-two-clock carrier suppression, and inclusion of the BITSYNC idle-making sample each failed the focused check.
+- Revert mutations for BITSYNC event bypass, stuff-error bit count, and FRAME verdict threshold each failed the focused check.
+- Reverting P-G31's wait clear also fails its focused check.
+- Delaying the P-G32 frame-open condition by one clock fails its focused check.
 - Revert mutation removing D-044's take cancellation failed (`port.takes` became 1); removing the D-045 fetch guard failed during EXEC; removing the RPC increment failed the RPC assertion.
 - `git diff --check`: clean.
+- Pushed workflow run [36484905620](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36484905620): unit, lint, test, docs and all RTL/Verilator jobs completed successfully.
 
 Checklist boxes ticked:
 - None. L2 remains unstarted; D-051–D-055 and the count/budget decision are still pending.
 
 Problems / decisions:
-- No disagreement with D-044/D-045 readings found. D-057's P-G24/P-G25/P-G28 proposals and D-058's P-G26 proposal remain unresolved; none of their semantics changed.
+- No disagreement with D-044/D-045 readings found. D-057's P-G24/P-G25/P-G28, D-058's P-G26, D-059's P-G29 and D-060's P-G28 proposals remain unresolved; none of their semantics changed. D-053 P-G27/P-G30 are confirmed.
 - The Phase 2 RTL checklist L1 edit is an existing, separate workspace change and is not part of this model session's code changes.
 
 Next:

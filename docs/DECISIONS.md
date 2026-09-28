@@ -878,12 +878,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 ## D-053 (2026-09-28): milestone B2b (BITSYNC RX stuffing, CRC, FRAME) in the RTL; two readings
 - **Context:** B2b of pin-unit milestone B in `src/trw_pin_bs.v` (§14 P23, P24; RX commands of P25). Details and tests in `PIN_UNIT_RTL.md` §9 (the CAN and HDLC reference models drive the tests).
 - **Readings for the model side:** P-G27 (ERR `0x1nnn` carries the index of the offending line bit in the frame) and P-G30 (at FRAME's n the verdict carries the current word, and no DATA word is emitted for it).
+- **Model confirmation (2026-09-28):** focused checks in `tools/tripsim/tests/test_semantics.py` confirm the current one-based line-bit count in the stuffing ERR and the FRAME verdict for the current word without a coincident DATA load. Revert mutations to the bit counter and frame limit fail those tests.
 - **Size:** engine 25.1K µm², full unit logic 62.3K (D-052's trend holds: BITSYNC will be well above the estimate's ~16.7K).
 - **Cost:** as above; no spec change.
 
 ## D-054 (2026-09-28): milestone B2c (BITSYNC TX queue) in the RTL, the engine retimed; five readings
 - **Context:** B2c of pin-unit milestone B in `src/trw_pin_bs.v` (§14 P21, P22, P25). Details, tests and numbers in `PIN_UNIT_RTL.md` §9. B2 is now complete; B3 (P26–P29) is next.
 - **Readings for the model side:** P-G31 (WAIT [1] release clock), P-G32 (where our frame opens, and EVENT `0x9001`'s clock), P-G33 (a due stuff bit goes out with nothing after it), P-G34 (the TX run restarts at our frame start), P-G35 (a released line is not "driven" for the own-edge and idle rules).
+- **Model confirmation (2026-09-28):** P-G31's wait releases at the sample point, and a queued TX DATA token is accepted in that same model clock. P-G32 opens our frame at the next bit boundary after bus idle and loads EVENT `0x9001` in that clock. Focused tests and mutations pin both readings in `tools/tripsim/tests/test_semantics.py`.
 - **Timing:** the chip's slow corner had fallen to −9.8 ns: the pin can come straight from a uo pad (P7) into the engine's bit-clock arithmetic. The engine now computes its sums from registered state and lets the pin only select (BUGS #51). No behaviour change. The chip is +7.65 ns typ and +0.87 ns slow pre-layout.
 - **Size:** engine 34.8K µm², full unit logic 73.8K, chip 616.7K at spec counts. D-052's trend holds: BITSYNC is about twice the estimate.
 - **Cost:** as above; no spec change.
@@ -916,6 +918,18 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Finding:** for CARRIER = 5.5 clocks, `tools/tripsim` samples the active/inactive phase as `[1,1,1,0,0,0,1,1,1,0,0,1]` over elapsed clocks 0–11, so the transitions appear on clocks 3, 6, 9, and 11. D-051 states the k-th toggle is at `t + floor(k·CARRIER/2)`, which gives clocks 2, 5, 8, and 11. The two readings disagree for fractional half periods.
 - **Proposal:** specify whether the half-period boundaries use floor or a phase-accumulated 50% duty schedule, and define how a fractional boundary is sampled at integer clock edges. No model behavior changed pending team agreement.
 - **Cost:** none if the current rule is retained; a different rule changes only carrier phase arithmetic and its model tests.
+
+## D-059 (2026-09-28, proposed): idle-making sample in BITSYNC (P-G29)
+- **Context:** model-side test for the D-052 reading, using `BitSync._sample_bit()` and `ARCHITECTURE.md` P20 only.
+- **Finding:** when the sample raises the consecutive-recessive count to `IDLE_BITS`, the current model processes it through `_frame_bit()` before closing the frame. A two-sample threshold therefore counts the second recessive sample in the frame. D-052 reads the idle-making sample as excluded.
+- **Proposal:** decide whether the threshold sample ends the frame before RX framing, or remains the final sampled frame bit as the current model does. No behavior changed pending agreement.
+- **Cost:** no added hardware if clarified either way; changing the rule alters BITSYNC RX sample ordering and its model test.
+
+## D-060 (2026-09-28, proposed): event generator in BITSYNC (P-G28)
+- **Context:** model-side test for the D-052 reading, using the model's ordinary P8 event configuration and `BitSync.step()` path only.
+- **Finding:** `PinUnit.compute_rx()` delegates to `BitSync.step()` and returns before evaluating `ev_edge`; a pin-A rising edge therefore does not load an EVENT in BITSYNC. D-052 reads the event generator as active in BITSYNC, with priority on a coincident RX load.
+- **Proposal:** decide whether P8 events remain enabled in BITSYNC, and if so explicitly state their priority against bit-synchronous RX outputs on the same clock. No behavior changed pending agreement.
+- **Cost:** no added storage if event tokens use the existing load path; enabling this behavior changes model scheduling and same-clock producer-load priority.
 - **Proposal:** confirm the three RTL readings and amend P17, P30 and P8 with their minimum-duration, carrier-disable and event-priority rules. Until accepted, keep the behavior question visible and do not change the model to match an unconfirmed reading.
 - **Evidence:** source review only; no new focused tests or mutation checks for these readings yet. Those are prerequisites before D-057 can be accepted.
 - **Decision:** Krithik + Kanishk.

@@ -11,7 +11,7 @@
 - [ ] Compare held-out resource use on the final architecture vs. G0 (from a G0 build) to show whether specialization generalized.
 
 ### Software side (D-032: required by the organizers)
-- [ ] Loader for the Tiny Tapeout demo board: a MicroPython module for its RP2040 that speaks the host protocol (ARCHITECTURE §2–3) through the board's pins, sharing its transaction encoding with `tools/host/protocol.py` (tested in simulation against the chip's RTL/gate-level netlist through the same transactions; on hardware only when a board exists).
+- [ ] Loader for the Tiny Tapeout demo board: a MicroPython module for its RP2040 that speaks the host protocol (ARCHITECTURE §2–3) through the board's pins, sharing its transaction encoding with `tools/host/protocol.py` (tested in simulation against the chip's RTL/gate-level netlist through the same transactions; on hardware only when a board exists). (`tools/board/warp.py` + README; pytest 270 (equal to the reference, byte for byte); `test_board_loader` passes on the fabric RTL locally 2026-09-28; tick with CI `gl_test`)
 - [ ] One command per step, from source to running protocol: compile (`tools/compile`), load, run, read status; documented end-to-end examples for UART, SPI and I2C (source, pin map, bitstream, host session).
 
 ### Showcase

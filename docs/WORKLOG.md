@@ -42,7 +42,10 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - `docs/reports/architecture_comparison.md` + chart; D-033 final architecture G1.
 - User kept hardware open for the I2C target: D-034 register-file tile measured (169 → 123 LCs, still no fit); user then chose to freeze and drop the I2C target (D-035).
 - Phase 3 exit boxes ticked except the tag; `docs/summaries/PHASE3.md` drafted.
-**Next:** user tags `hw-freeze` on 3047dea; then phase 4 (unseal the held-out set; demo-board loader; end-to-end examples).
+- User tagged `hw-freeze` → 3047dea. CI on a578359 all green: **phase 3 complete**; `docs/summaries/PHASE3.md` final.
+**Phase 4 started:**
+- Demo-board loader `tools/board/warp.py` (MicroPython + CPython): checked load, run control, host channel, FAB_IN pins, ttboard glue; `tools/board/tests` 270 pass (equal to the reference host); `test_board_loader` (the module's own code drives the chip model through cocotb bridge/resume) passes on the fabric RTL. Not tested on hardware.
+**Next:** end-to-end examples (UART, SPI, I2C: source → bitstream → load → run); then unseal the held-out set.
 **Next (superseded):** after the G1 hardening result, push the protocol chip tests + timing work (touches `test/` and `macro/`, so one more hardening, which also gives gl_test evidence for the 21 tests); then phase 2 exit: timing cross-check, per-tile equivalence plan, PHASE2 summary.
 
 ---

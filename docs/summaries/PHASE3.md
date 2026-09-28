@@ -1,6 +1,6 @@
 # Phase 3 summary: specialize, compare, hardware freeze
 
-**Status:** in progress (2026-09-28). All exit items pass except the `hw-freeze` tag (the user tags 3047dea, D-035) and CI on the last docs push.
+**Status:** complete (2026-09-28). Every exit item passed; `hw-freeze` → 3047dea; all CI green on `efpga` at a578359.
 
 ## Goal
 Specialize the fabric one measured change at a time, compare every variant at equal area, and freeze the hardware on the best one the data supports.
@@ -19,7 +19,6 @@ Specialize the fabric one measured change at a time, compare every variant at eq
 - Timing margin is thin for the I2C controller (53 MHz model vs the 50 MHz clock).
 
 ## What's left
-- The `hw-freeze` tag (user) and green CI on the last push.
 - Phase 4: held-out protocols on the frozen chip, the demo-board loader and end-to-end examples (D-032), robustness tests.
 
 ## One-line takeaway

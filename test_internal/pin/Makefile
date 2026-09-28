@@ -8,7 +8,7 @@ SRC_DIR ?= $(PWD)/../../src
 SIM_BUILD = sim_build/full$(FULL)_frac$(FRAC)
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_pin_cfg.v $(SRC_DIR)/trw_pin_io.v $(SRC_DIR)/trw_pin_tx.v \
-                  $(SRC_DIR)/trw_pin_rx.v $(SRC_DIR)/trw_pin_unit.v $(PWD)/tb_pin.v
+                  $(SRC_DIR)/trw_pin_rx.v $(SRC_DIR)/trw_pin_bs.v $(SRC_DIR)/trw_pin_unit.v $(PWD)/tb_pin.v
 COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT
 ifeq ($(SIM),verilator)
 COMPILE_ARGS += -GFULL=$(FULL) -GFRAC=$(FRAC)

@@ -9,7 +9,7 @@ MACRO_DIR ?= $(HOME)/.cache/tripwire/macro-$(PDK_REV)/RM_IHPSG13_1P_512x16_c2_bm
 
 CHIP_SOURCES = trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v trw_host.v trw_spi.v \
                trw_lane.v trw_alu.v trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v \
-               trw_pin_rx.v trw_pin_unit.v trw_pins.v
+               trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v trw_pins.v
 MACRO_MODELS = $(MACRO_DIR)/RM_IHPSG13_1P_core_behavioral_bm_bist.v $(MACRO_DIR)/RM_IHPSG13_1P_512x16_c2_bm_bist.v
 ifneq ($(GATES),yes)
 # RTL

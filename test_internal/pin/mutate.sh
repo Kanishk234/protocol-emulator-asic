@@ -30,6 +30,13 @@ MUTANTS=(
   "trw_pin_tx.v#s/            end else if (!lvx) begin/            end else if (1'b0) begin/#B1: P30 carrier phase does not restart"
   "trw_pin_tx.v#s/                ct  <= ct + {1'b0, carrier} - 25'd512;/                ct  <= {ct[24:9], 9'd0} + {1'b0, carrier} - 25'd512;/#B1: P30 carrier fraction dropped"
   "trw_pin_tx.v#s/    wire m_pulse = (FULL != 0) \&\& (txmode == \`TRW_PCE_TXMODE_PULSE);/    wire m_pulse = (txmode == \`TRW_PCE_TXMODE_PULSE);/#B1: D-040 a lean unit runs PULSE"
+  "trw_pin_bs.v#s/    wire        rs_do = rs_edge \&\& (d != 25'd0);/    wire        rs_do = 1'b0 \&\& rs_edge \&\& (d != 25'd0);/#B2: P22 no resync"
+  "trw_pin_bs.v#s/    wire \[24:0\] tb0  = f_start ? per : tb;/    wire [24:0] tb0  = tb;/#B2: P21 no hard sync of the bit clock"
+  "trw_pin_bs.v#s/    wire        done = !f_start \&\& smp_done;/    wire        done = smp_done;/#B2: P21 hard sync does not re-arm the sample"
+  "trw_pin_bs.v#s/    wire        goes_idle = smp \&\& rec \&\& (icnt1 >= idle_bits)/    wire        goes_idle = 1'b0 \&\& smp \&\& rec \&\& (icnt1 >= idle_bits)/#B2: P20 idle never ends a frame"
+  "trw_pin_bs.v#s/    wire \[15:0\] w1     = order ? {w\[14:0\], bit_in} : (w | ({15'd0, bit_in} << wn));/    wire [15:0] w1     = {w[14:0], bit_in};/#B2: RX word ORDER ignored"
+  "trw_pin_bs.v#s/    wire \[24:0\] d    = !done ? ((e < sj) ? e : sj)/    wire [24:0] d    = !done ? sj/#B2: P22 resync moves by SJW, not by the phase error"
+  "trw_pin_bs.v#s/    wire        w_done = take_bit \&\& (wn1 == wlen) \&\& !goes_idle;/    wire        w_done = take_bit \&\& (wn1 == wlen);/#B2: P-G29 the idle-making sample completes a word"
 )
 killed=0
 survived=0
@@ -37,7 +44,7 @@ for m in "${MUTANTS[@]}"; do
   IFS="#" read -r file expr what <<< "$m"
   [ -n "${ONLY:-}" ] && [[ "$what" != *"$ONLY"* ]] && continue
   # milestone B feature mutants need the full build; the D-040 fallback mutant needs the lean one
-  if [ "${FULL:-0}" = 1 ]; then [[ "$what" == "B1: D-040"* ]] && continue; else [[ "$what" == "B1: P"* ]] && continue; fi      # ONLY=<text>: just the matching mutants
+  if [ "${FULL:-0}" = 1 ]; then [[ "$what" == "B1: D-040"* ]] && continue; else [[ "$what" == B[0-9]*": P"* ]] && continue; fi      # ONLY=<text>: just the matching mutants
   rm -rf "$WORK/src"; cp -r "$ROOT/src" "$WORK/src"
   sed -i "$expr" "$WORK/src/$file"
   if cmp -s "$ROOT/src/$file" "$WORK/src/$file"; then echo "NOT APPLIED: $what"; continue; fi

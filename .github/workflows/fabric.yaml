@@ -110,7 +110,7 @@ jobs:
           key: oss-cad-suite-nextpnr-2026-09-27
 
       - name: Fetch nextpnr
-        run: scripts/fetch_nextpnr.sh
+        run: bash scripts/fetch_nextpnr.sh
 
       - name: Compile the example designs (must match test/bitstreams)
         run: scripts/build_test_bitstreams.sh --check

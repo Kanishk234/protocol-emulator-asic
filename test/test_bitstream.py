@@ -10,6 +10,7 @@
 # macro's netlists). With the default black box (CI `test` job) these tests are skipped.
 
 import os
+import sys
 from pathlib import Path
 
 import cocotb
@@ -408,4 +409,92 @@ async def test_i2c_ctrl(dut):
     stop = True
     await b
     await host.xfer(tx_simple(Op.STOP))
+    await leave_fabric(dut)
+
+
+@cocotb.test(skip=not REAL_FABRIC)
+async def test_board_loader(dut):
+    """The demo-board loader itself (tools/board/warp.py, the code that runs on the board's
+    RP2040, D-032) drives the chip's pins: a checked load of uart16, RUN, bytes to the design
+    that leave on FAB_OUT0 as UART frames, and a frame into FAB_IN0 read back over the host
+    channel. The loader is plain blocking code; cocotb's bridge/resume run it against the chip."""
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools" / "board"))
+    import warp
+    from types import SimpleNamespace
+    try:
+        from cocotb import bridge, resume
+    except ImportError:                                  # cocotb 2.0.x: not yet public
+        from cocotb._bridge import bridge, resume
+
+    await reset(dut)
+
+    @resume
+    async def write_ui(v):
+        dut.ui_in.value = v
+        await Timer(1, "ns")
+
+    @resume
+    async def wait(n):
+        await ClockCycles(dut.clk, n)
+
+    @resume
+    async def read_uo():
+        return bit(dut.uo_out, 0)                       # only HOST_MISO matters to the loader
+
+    pins = SimpleNamespace(write_ui=write_ui, read_uo=read_uo, wait=wait)
+    board = {}
+
+    @bridge
+    def board_load():
+        w = warp.Warp(pins)
+        w.set_fab_in(1)                                  # UART RX line idle high
+        w.load_file(str(BITS / "uart16.wbit"), chunk=16)
+        board["w"] = w
+
+    hold_x(dut, True)                                    # D-023, as load_and_run
+    await Timer(1, "ns")
+    await board_load()
+    hold_x(dut, False)
+    await Timer(1, "ns")
+    await settle_routing_loops(dut)
+
+    wave = []
+
+    async def record(n):
+        for _ in range(n):
+            await ClockCycles(dut.clk, 1)
+            wave.append(bit(dut.uo_out, 2))
+
+    sent = [0x5A, 0xC3]
+
+    @bridge
+    def board_session():
+        w = board["w"]
+        w.run()
+        for b in sent:
+            w.ch_write(b)
+        # a frame into the design's RX pin: start bit, 8 data bits LSB first, stop bit
+        for level in [0] + [(0x96 >> i) & 1 for i in range(8)] + [1]:
+            w.set_fab_in(level)
+            pins.wait(UART_DIV)
+        pins.wait(4 * UART_DIV)
+        got = w.ch_read()
+        return got, w.user_status(), w.status()
+
+    rec = cocotb.start_soon(record(60 * UART_DIV + 6000))
+    got, ustat, st = await board_session()
+    await rec
+
+    # 8N1 frames on FAB_OUT0, from the first idle-high level (the pin is parked low until RUN)
+    frames, i = [], wave.index(1)
+    while i < len(wave) - 10 * UART_DIV:
+        if wave[i] == 0:
+            mid = i + UART_DIV // 2
+            frames.append(sum(wave[mid + (k + 1) * UART_DIV] << k for k in range(8)))
+            i = mid + 9 * UART_DIV
+        else:
+            i += 1
+    assert frames[:len(sent)] == sent, f"TX frames {[hex(f) for f in frames]}"
+    assert got == 0x96, f"host read {got}"
+    assert ustat & 0x06 == 0 and st["state"] == "RUNNING"
     await leave_fabric(dut)

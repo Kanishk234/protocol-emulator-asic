@@ -19,6 +19,7 @@
 //   - Host (E2): r0-r3 and STATE are written only while halted (`host_we` is ignored while running).
 `default_nettype none
 `include "trw_defs.vh"
+`include "trw_assert.vh"
 
 module trw_lane #(
     parameter AW = 9                                   // SRAM address bits (512 words)
@@ -465,6 +466,13 @@ module trw_lane #(
             end
         end
     end
+
+`ifdef TRW_ASSERT_ON
+    wire take_unavail = |(in_take & ~in_avail);
+    wire load_full    = |(out_load & out_valid & ~out_all_taken);
+    `TRW_ASSERT(!take_unavail, "a lane takes an input that is not available")
+    `TRW_ASSERT(!load_full, "a lane loads an output whose producer is not free (L7, F3)")
+`endif
 
     wire _unused = &{1'b0, rt_arg[7:4], ss[`TRW_SLOT_V_LSB], ss[`TRW_SLOT_U_LSB],
                      ss[`TRW_SLOT_SE_LSB], ss[`TRW_SLOT_SV_MSB:`TRW_SLOT_SV_LSB],

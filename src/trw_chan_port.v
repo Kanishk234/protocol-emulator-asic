@@ -20,6 +20,7 @@
 //   - `clr_dropped` clears DROPPED at the edge (a drop in the same clock wins). How the host reaches it
 //     is the host's address map.
 `default_nettype none
+`include "trw_assert.vh"
 
 module trw_chan_port #(
     parameter N = 9                      // legal sources, 1..16
@@ -109,4 +110,5 @@ module trw_chan_port #(
         else if (clr_dropped)
             dropped <= 8'd0;
     end
+    `TRW_ASSERT(!(avail && !en), "a disabled port shows a token (F1)")
 endmodule

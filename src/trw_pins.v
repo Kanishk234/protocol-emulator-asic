@@ -14,6 +14,7 @@
 // and their static pin configuration.
 `default_nettype none
 `include "trw_defs.vh"
+`include "trw_assert.vh"
 
 module trw_pins #(
     parameter NU = 6
@@ -66,4 +67,17 @@ module trw_pins #(
                     end
                 end
     end
+
+`ifdef TRW_ASSERT_ON
+    // at most one driver per pad: an enabled pad has a valid owner (the multiplexer picks only the owner)
+    reg bad_drive;
+    integer bi;
+    always @* begin
+        bad_drive = 1'b0;
+        for (bi = 0; bi < 16; bi = bi + 1)
+            if (pad_oe[bi] && ({29'd0, own[3*bi +: 3]} >= NU))
+                bad_drive = 1'b1;
+    end
+    `TRW_ASSERT(!bad_drive, "a pad is driven without an owner")
+`endif
 endmodule

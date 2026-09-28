@@ -17,6 +17,7 @@
 //     clock wins).
 `default_nettype none
 `include "trw_defs.vh"
+`include "trw_assert.vh"
 
 module trw_pin_unit #(
     parameter FULL = 0,
@@ -128,6 +129,13 @@ module trw_pin_unit #(
     assign a_oe  = od ? (en && !lvl) : en;
     assign n_out = !lvl;
     assign n_oe  = en;
+
+`ifdef TRW_ASSERT_ON
+    wire od_drives_high = od && a_oe && a_out;
+    wire load_not_free  = rx_load && !rx_free;
+    `TRW_ASSERT(!od_drives_high, "an open-drain pin A drives high")
+    `TRW_ASSERT(!load_not_free, "the RX half loads a producer that is not free (4.5)")
+`endif
 
     // ------------------------------------------------------------------ sticky flags
     always @(posedge clk) begin

@@ -10,6 +10,7 @@
 //     discards the token and sets OVERRUN, §4.5; HOST_IN reports busy to the host).
 //   - `valid` stays set until the next load (F6).
 `default_nettype none
+`include "trw_assert.vh"
 
 module trw_chan_prod (
     input  wire        clk,
@@ -37,4 +38,5 @@ module trw_chan_prod (
             tok   <= tok_in;
         end
     end
+    `TRW_ASSERT(!(load && !free), "a producer loads while full (F3)")
 endmodule

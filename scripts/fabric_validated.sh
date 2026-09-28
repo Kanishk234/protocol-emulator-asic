@@ -12,17 +12,21 @@ shift
 INPUT=$(realpath "${1:?Usage: fabric_validated.sh build/fabric-reference-RUN}")
 VARIANT=${2:-word}
 case "$VARIANT" in word) defines=() ;; byte) defines=(-DBYTE_CRC) ;; *) echo 'CRC variant must be word or byte' >&2; exit 2 ;; esac
+LOADER=${3:-all-ports}
+case "$LOADER" in all-ports) patch_args=() ;; word-only) patch_args=(--word-only-loader) ;; *) echo 'Loader must be all-ports or word-only' >&2; exit 2 ;; esac
 WORK=$(mktemp -d /tmp/warp-validated.XXXXXXXX)
 OUT="$ROOT/build/$(basename "$WORK")"
 mkdir -p "$OUT"
 trap 'cp -a "$WORK"/. "$OUT"/; echo "Validated fabric evidence: $OUT"' EXIT
 cp "${BASH_SOURCE[0]}" "$WORK/runner.sh"
-printf 'CRC variant=%s\n' "$VARIANT" > "$WORK/run.txt"
+printf 'CRC variant=%s\nLoader=%s\n' "$VARIANT" "$LOADER" > "$WORK/run.txt"
 for file in reload_tb.v wp_image_validator.v wp_validated_reload.v wp_reload_guard.v reference_validated_top.v validated_images.py frame_snapshot.py; do
   cp "$ROOT/experiments/fabric_reference/$file" "$WORK/"
 done
 python "$WORK/validated_images.py" "$INPUT" "$WORK"
-python "$ROOT/patches/reference_reload_hold.py" "$INPUT/reference/Test/build/fabric_files" "$WORK/fabric_files"
+cp "$ROOT/patches/reference_reload_hold.py" "$WORK/reference_reload_hold.py"
+python "$WORK/reference_reload_hold.py" "$INPUT/reference/Test/build/fabric_files" "$WORK/fabric_files" "${patch_args[@]}"
+sha256sum "$WORK/fabric_files"/*.v > "$WORK/fabric-sha256.txt"
 sha256sum "$WORK"/*.v "$WORK"/*.py "$WORK/runner.sh" "$ROOT/patches/reference_reload_hold.py" "$INPUT/counter.bin" "$INPUT/lfsr.bin" > "$WORK/input-sha256.txt"
 iverilog -V > "$WORK/versions.txt" 2>&1
 source "$WORK/crc.env"

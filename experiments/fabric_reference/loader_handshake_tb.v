@@ -60,7 +60,13 @@ module loader_handshake_tb;
                 if (cycle-last_write<4) $fatal(1,"Word pacing violation");
                 if (dut.fabric.LongFrameStrobe !== 0)
                     $fatal(1,"New write overlaps a frame pulse");
+`ifdef MAPPED_LOADER
+                // Mapping absorbs private mux-output wires. Check loader input
+                // ports here, then all captured payload bits at frame writes.
+                if (dut.fabric.SelfWriteStrobe !== 1 || dut.fabric.SelfWriteData !== words[accepted])
+`else
                 if (dut.fabric.LocalWriteStrobe !== 1 || dut.fabric.LocalWriteData !== words[accepted])
+`endif
                     $fatal(1,"Held-valid stream duplicated/lost a word");
                 accepted=accepted+1; last_write=cycle;
             end

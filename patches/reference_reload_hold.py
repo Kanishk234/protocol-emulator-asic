@@ -19,6 +19,31 @@ EXPECTED = {
     "eFPGA.v": "d7c51cc49e1644cfac0d1698eebab563e2f4c07ed1f4551411650ad45dcd4fd2",
     "eFPGA_top.v": "e5b9fa8c87ad4732a8753a177f0654b3084a4aecb741a14752d4d3b488906126",
 }
+FSM_SHA256 = "ef05899e196333ab9297ff7213a0c1358bc4dad441e1595370bf22b0f8bfe4e2"
+
+
+def word_only_loader(text):
+    """ANISH-D8: replace only the frontend instance; preserve real row/fabric RTL."""
+    pattern = r"\neFPGA_Config\n[\s\S]*?\n\);"
+    replacement = """
+// ANISH-D8: management owns configuration; serial bypass is omitted.
+assign LocalWriteData = SelfWriteData;
+assign LocalWriteStrobe = SelfWriteStrobe;
+assign ComActive = 1'b0;
+assign ReceiveLED = 1'b0;
+ConfigFSM #(
+    .NumberOfRows(NumberOfRows), .RowSelectWidth(RowSelectWidth),
+    .FrameBitsPerRow(FrameBitsPerRow), .desync_flag(desync_flag)
+) word_config_inst (
+    .CLK(CLK), .reset_n(resetn),
+    .write_data(SelfWriteData), .write_strobe(SelfWriteStrobe),
+    .fsm_reset(1'b0), .frame_address_register(FrameAddressRegister),
+    .long_frame_strobe(LongFrameStrobe), .row_select(RowSelect)
+);"""
+    result, count = re.subn(pattern, replacement, text)
+    if count != 1:
+        raise ValueError(f"Expected one configuration frontend, got {count}")
+    return result
 
 
 def replace_once(text, old, new):
@@ -56,16 +81,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--word-only-loader", action="store_true")
     args = parser.parse_args()
     # Validate every original before creating any output.
     for name, expected in EXPECTED.items():
         if hashlib.sha256((args.source / name).read_bytes()).hexdigest() != expected:
             raise ValueError(f"Unsupported reference source: {name}")
+    if args.word_only_loader:
+        if hashlib.sha256((args.source / "ConfigFSM.v").read_bytes()).hexdigest() != FSM_SHA256:
+            raise ValueError("Unsupported reference source: ConfigFSM.v")
     shutil.copytree(args.source, args.output)  # Refuses an existing destination.
     patches, manifest = [], {}
     for name in EXPECTED:
         before = (args.source / name).read_text()
         after = transform(name, before)
+        if args.word_only_loader and name == "eFPGA_top.v":
+            after = word_only_loader(after)
         (args.output / name).write_text(after)
         manifest[name] = {"original": EXPECTED[name], "patched": hashlib.sha256((args.output / name).read_bytes()).hexdigest()}
         patches.extend(difflib.unified_diff(before.splitlines(True), after.splitlines(True), fromfile="original/" + name, tofile="candidate/" + name))

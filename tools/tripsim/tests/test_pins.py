@@ -47,6 +47,7 @@ def pulse_chip(**sym):
     chip.pin_config(0, pin_a=PAD_UO + 0, txmode="pulse", nbits=4, order="msb", idle=0, **sym)
     chip.own(PAD_UO + 0, 0)
     chip.connect("U0.tx", "HOST_IN")
+    chip.run([0])                                           # D-041 B: first RUN makes units live
     return chip
 
 
@@ -103,6 +104,7 @@ def level_unit(od=False):
     chip.pin_config(0, pin_a=PAD_UIO + 0, txmode="level", idle=0, od=od, nbits=4, order="lsb")
     chip.own(PAD_UIO + 0, 0)
     chip.connect("U0.tx", "HOST_IN")
+    chip.run([0])
     return chip
 
 
@@ -140,6 +142,7 @@ def rx_unit(**cfg):
     chip.pin_config(0, pin_a=PAD_UI + 0, pin_b=PAD_UI + 1, presc=1, order="lsb", **cfg)
     chip.connect("U0.tx", "HOST_IN")
     chip.connect("HOST_OUT", "U0.rx")
+    chip.run([0])
     return chip
 
 
@@ -183,6 +186,7 @@ def test_carrier_toggles_only_while_active():
     chip.pin_config(0, pin_a=PAD_UO + 0, txmode="level", idle=0, carrier=10)
     chip.own(PAD_UO + 0, 0)
     chip.connect("U0.tx", "HOST_IN")
+    chip.run([0])
     chip.host_push(0x5000, tag=1)                        # SYNC
     chip.host_push(0x1800 | 20, tag=1)                   # active at +20
     chip.host_push(0x1000 | 55, tag=1)                   # idle at +75
@@ -199,6 +203,7 @@ def test_event_time_counts_presc_ticks():
     chip.settle_inputs(ui=1)
     chip.pin_config(0, pin_a=PAD_UI + 0, ev_edge="both", presc=25)
     chip.connect("HOST_OUT", "U0.rx")
+    chip.run([0])
     for level, clocks in ((0, 1000), (1, 2500), (0, 300)):
         chip.ui_in = level
         chip.run_for(clocks)

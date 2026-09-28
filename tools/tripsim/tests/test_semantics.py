@@ -15,6 +15,158 @@ from test_lane import host_lane, outputs
 from test_pins import rx_unit, uart_wave
 
 
+def test_d042_unit_flags_are_readable_and_write_one_to_clear():
+    chip = Chip()
+    chip.pins[0].flags.update(OVERRUN=1, LATE=1)
+    base = S.HOST_MAP["unit_flags"][0]
+    assert chip.host_read(base) == 3
+    chip.host_write(base, 1)
+    assert chip.host_read(base) == 2
+    chip.host_write(base, 0)
+    assert chip.host_read(base) == 2
+
+
+def test_d044_host_port_map_f5_and_dropped_clear():
+    chip = Chip(lanes=1, pin_units=1)
+    ports = S.HOST_MAP["ports"][0]
+    dropped = S.HOST_MAP["dropped"][0]
+    consumer = chip.fabric.ports["L0.I0"]
+    p = chip.fabric.producers["HOST_IN"]
+    p.valid, p.seq, p.tag, p.data = 1, 1, 0, 0x55
+    # HOST_IN's index in the generated legal source list is the address encoding.
+    sel = S.LEGAL_SOURCES["L0.I0"].index("HOST_IN")
+    chip.host_write(ports, 1 | (sel << 2) | (0xF << 6))
+    assert consumer.last_seq == 1 and not consumer.avail()  # F5 suppresses the stale head
+    p.load(2, 0x66)
+    chip.step()                                               # source load at this same edge
+    assert consumer.avail() and consumer.head() == (2, 0x66)
+    consumer.dropped = 9
+    assert chip.host_read(dropped) == 9
+    chip.host_write(dropped, 0xFFFF)
+    assert chip.host_read(dropped) == 0
+
+
+def test_d044_out_of_range_sel_disables_source_selection():
+    chip = Chip(lanes=1, pin_units=1)
+    addr = S.HOST_MAP["ports"][0]
+    chip.host_write(addr, 1 | (15 << 2) | (15 << 6))
+    c = chip.fabric.ports["L0.I0"]
+    assert c.src is None and not c.avail()
+    assert (chip.host_read(addr) >> 2) & 15 == 15
+
+
+def test_d046_host_map_tagged_host_in_and_lane_debug_reads():
+    chip = Chip(lanes=1, pin_units=1)
+    hin = S.HOST_MAP["host_in"][0]
+    status = S.HOST_MAP["host_status"][0]
+    assert chip.host_read(status) & (1 << 14)
+    assert chip.host_write(hin + 3, 0x1234)
+    assert not chip.host_read(status) & (1 << 14)
+    assert not chip.host_write(hin + 2, 0x5678)
+    chip.step()
+    p = chip.fabric.producers["HOST_IN"]
+    assert (p.tag, p.data) == (3, 0x1234)
+    lane = chip.lanes[0]
+    lane.regs[:] = [0x10, 0x11, 0x12, 0x13]
+    base = S.HOST_MAP["lanes"][0]
+    assert [chip.host_read(base + i) for i in range(4)] == lane.regs
+    assert chip.host_read(base + 4) == lane.state
+    lane.rpc, lane.rz = 0x123, 1
+    assert chip.host_read(base + 6) == 0x123
+    assert chip.host_read(base + 7) == (1 << 14)
+
+
+def test_d046_slot_k_and_owner_host_addresses():
+    chip = Chip(lanes=1, pin_units=1)
+    lane = chip.lanes[0]
+    slot_base = S.HOST_MAP["slots"][0]
+    lane_word = (S.SLOT_HOST_WORDS - 1)  # write the top half of one reflex slot
+    assert chip.host_write(slot_base + (lane_word), 0x1234)
+    assert lane.slots[0].V == 0  # partial slot remains invalid until its V word is written
+    assert chip.host_write(slot_base + (12 << 4), 0x5678)  # K0, slot 12, word 0
+    assert lane.k[0] == 0x5678
+    owner_base = S.HOST_MAP["owners"][0]
+    assert chip.host_write(owner_base, 0)
+    assert chip.host_read(owner_base) == 0
+    assert not chip.host_write(owner_base + (S.HOST_PADS[3] - 8), 0)
+
+
+def test_d041_a_configuration_write_restarts_unit_and_resets_event_epoch():
+    chip = Chip(lanes=1, pin_units=1)
+    cfg = dict(pin_a=PAD_UI, rxmode="linked_rx", ev_edge="both", presc=4)
+    chip.pin_config(0, **cfg)
+    unit = chip.pins[0]
+    unit.flags.update(LATE=1, OVERRUN=1)
+    unit.cursor_q8, unit.tx_nbits, unit._car_n = 0x1234, 2, 9
+    chip.run_for(20)
+    configured_at = chip.cycle
+    chip.pin_config(0, **cfg)
+    assert unit.t_cfg == configured_at
+    assert unit.flags == {"LATE": 0, "OVERRUN": 0}
+    assert unit.cursor_q8 == 0 and unit.tx_nbits == unit.cfg.nbits and unit._car_n == 0
+    unit._prev_a = 0
+    unit._emit = lambda tag, data: setattr(unit, "_test_event", (tag, data))
+    unit.compute_rx(configured_at + 7, 1, 0)
+    assert unit._test_event[1] & 0x7FFF == 1            # (cycle - t_cfg) // PRESC
+
+
+def test_d041_b_units_wait_for_first_run_or_step():
+    chip = Chip(lanes=1, pin_units=1)
+    chip.pin_config(0, pin_a=PAD_UO, txmode="level", idle=0)
+    chip.connect("U0.tx", "HOST_IN")
+    chip.host_push(0x5000, tag=1)                         # SYNC
+    chip.host_push(0x1800 | 3, tag=1)                     # LEVEL 1
+    chip.run_for(20)
+    assert not chip.live and chip.pins[0].stats["tx_tokens"] == 0
+    assert chip.fabric.producers["U0.rx"].loads == 0
+    assert chip.host_read(S.HOST_MAP["run"][0]) & (1 << S.HOST_RUN_LIVE_BIT) == 0
+    chip.run([0])                                         # empty lane RUN is sufficient
+    chip.run_for(20)
+    assert chip.live and chip.pins[0].stats["tx_tokens"] > 0
+    assert chip.host_read(S.HOST_MAP["run"][0]) & (1 << S.HOST_RUN_LIVE_BIT)
+    stepped = Chip(lanes=1, pin_units=1)
+    assert stepped.host_write(S.HOST_MAP["step"][0], 1)
+    assert stepped.live and stepped.host_read(S.HOST_MAP["run"][0]) & (1 << S.HOST_RUN_LIVE_BIT)
+
+
+def test_d041_a_host_pin_cfg_word_write_restarts_and_clears_flags():
+    chip = Chip(lanes=1, pin_units=1)
+    unit = chip.pins[0]
+    unit.flags.update(LATE=1, OVERRUN=1)
+    unit.cursor_q8 = 0x4321
+    base = S.HOST_MAP["pin_cfg"][0]
+    assert chip.host_write(base, 1 << 7)                    # word 0: IDLE=1
+    assert unit.cfg.idle == 1 and unit.cursor_q8 == 0
+    assert unit.flags == {"LATE": 0, "OVERRUN": 0}
+    assert unit.t_cfg == chip.cycle
+
+
+def test_d045_lane_fetch_timing_matches_r1_and_r2_reading():
+    body = Routine().ldi("r0", 7).out("O0", "r0").ret()
+    chip, lane = host_lane([reflex(op="CALL", f=0, state=0, ns=1)])
+    chip.load_sram(link_routines([body]))
+    lane.running = True
+    chip.run_for(4)                                           # reach L0's SRAM rotation slot
+    assert lane.rb and lane.mem_req is not None               # CALL requested entry fetch
+    observed = []
+    chip.observers.append(lambda c: observed.append((c.cycle, lane.stats["routine_steps"], lane.regs[0])))
+    chip.run_for(12)                                          # entry read, routine-word fetch/EVAL/EXEC
+    assert lane.regs[0] == 7
+    first_eval = next(c for c, n, _ in observed if n)
+    first_exec = next(c for c, _, r in observed if r == 7)
+    assert first_exec == first_eval + 1                      # k+1 EVAL, k+2 EXEC
+
+
+def test_d045_step_and_host_lane_writes_are_ignored_while_running():
+    chip, lane = host_lane([reflex(op="ADD", dst="r0", a="r0", b=1)])
+    lane.running = True
+    before = lane.regs[0]
+    assert not chip.host_write(S.HOST_MAP["lanes"][0], 0x1234)
+    assert lane.regs[0] == before
+    assert chip.host_write(S.HOST_MAP["step"][0], 1)
+    assert not lane.stepping
+
+
 # ------------------------------------------------------------------ lanes
 def test_l3_registers_read_at_exec_time_latched_at_eval():
     chip, _ = host_lane([
@@ -176,6 +328,7 @@ def test_p15_c_oe_gates_the_carrier():
     chip.connect("U0.tx", "HOST_IN")
     chip.host_push(0x5000, tag=1)                            # SYNC
     chip.host_push(0x1800 | 5, tag=1)                        # active from +5
+    chip.run([0])
     oe = []
     for _ in range(60):
         chip.step()
@@ -210,6 +363,7 @@ def bitsync_unit(**cfg):
                     period=20, idle=1, idle_bits=8, rx_nbits=8, **cfg)
     chip.connect("U0.tx", "HOST_IN")
     chip.connect("HOST_OUT", "U0.rx")
+    chip.run([0])                                           # D-041 B: first RUN makes units live
     return chip
 
 
@@ -244,6 +398,7 @@ def _unit(**cfg):
         chip.own(cfg["pin_a"], 0)
     chip.connect("U0.tx", "HOST_IN")
     chip.connect("HOST_OUT", "U0.rx")
+    chip.run([0])
     return chip, chip.pins[0]
 
 

@@ -45,6 +45,7 @@ def rx_chip():
     chip.own(PAD_UO + 0, 0)
     chip.connect("U0.tx", "HOST_IN")
     chip.connect("HOST_OUT", "U0.rx")
+    chip.run([0])                                           # D-041 B: first RUN makes units live
     return chip
 
 
@@ -100,6 +101,7 @@ def test_tx_stuffing_crc_append_matches_reference_encoder():
     chip.own(PAD_UO + 0, 0)
     chip.connect("U0.tx", "HOST_IN")
     chip.connect("HOST_OUT", "U0.rx")
+    chip.run([0])
     chip.run_for(12 * PERIOD)                                # bus idle
     payload = [0xFF, 0x3C]
     chip.host_push(0x5000, tag=TAG_CTRL)                     # SYNC: a new frame at bus idle

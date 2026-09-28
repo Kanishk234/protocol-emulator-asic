@@ -45,7 +45,7 @@ def test_known_encoding():
     assert words[6] | (words[7] & 0xFF) << 16 == round(0.5 * (433 * 256 + 192))
     assert (words[7] >> 8) & 0xF == 9                                  # NBITS - 1
     base, stride = S.PIN_CFG_BASE, S.PIN_CFG_STRIDE
-    assert base + 6 * stride <= S.PIN_OWNER_BASE
+    assert base + len(S.PIN_UNIT_FEATURES) * stride <= S.PIN_OWNER_BASE
 
 
 @pytest.mark.parametrize("bad", [dict(period=70000), dict(presc=300), dict(nbits=17),
@@ -57,15 +57,17 @@ def test_values_that_do_not_fit_are_rejected(bad):
 
 
 def test_units_follow_the_spec():
-    """D-040: U0-U1 have every optional feature, U2-U5 none."""
-    assert [set(pinregs.features(u)) for u in range(6)] == [set(S.PIN_FEATURES)] * 2 + [set()] * 4
+    """D-040: each unit stores exactly its generated optional-feature set."""
+    assert [set(pinregs.features(u)) for u in range(len(S.PIN_UNIT_FEATURES))] == [
+        set(features) for features in S.PIN_UNIT_FEATURES]
 
 
 def test_lean_units_do_not_store_optional_fields():
     """D-040: on U2-U5 the PULSE, carrier and BITSYNC field bits are never set, and read as defaults."""
     opt = {f for fields, _ in S.PIN_FEATURES.values() for f in fields}
     full = PinConfig(pin_a=8, period=10.5, idle_bits=11, sym0_first=1, crc_poly=0x1021, carrier=3.0)
-    for u in range(2, 6):
+    lean = [u for u, features in enumerate(S.PIN_UNIT_FEATURES) if not features]
+    for u in lean:
         cfg = PinConfig(pin_a=8, period=10.5)
         words = pinregs.encode(cfg, u)
         for name in opt:
@@ -82,19 +84,23 @@ def test_lean_units_do_not_store_optional_fields():
     (dict(txmode="bitsync", rxmode="bitsync"), "BITSYNC"), (dict(crc_width=8), "BITSYNC"),
 ])
 def test_lean_unit_rejects_optional_features(bad, feature):
-    for u in (0, 1):
+    full = [u for u, features in enumerate(S.PIN_UNIT_FEATURES) if set(S.PIN_FEATURES) <= set(features)]
+    lean = [u for u, features in enumerate(S.PIN_UNIT_FEATURES) if feature.lower() not in features]
+    for u in full:
         pinregs.encode(PinConfig(**bad), u)
-    with pytest.raises(ValueError, match=f"U4 has no {feature}.*only U0, U1"):
-        pinregs.encode(PinConfig(**bad), 4)
+    target = lean[0]
+    with pytest.raises(ValueError, match=f"U{target} has no {feature}"):
+        pinregs.encode(PinConfig(**bad), target)
     chip = Chip()
-    with pytest.raises(ValueError, match=f"U2 has no {feature}"):
-        chip.pin_config(2, **bad)
-    chip.pin_config(1, **bad)
+    with pytest.raises(ValueError, match=f"U{target} has no {feature}"):
+        chip.pin_config(target, **bad)
+    chip.pin_config(full[0], **bad)
 
 
 def test_tripc_rejects_a_feature_on_a_lean_unit():
-    with pytest.raises(tripc.TrwError, match="U3 has no PULSE"):
-        tripc.compile_text("program t\npin U3: pin_a=uo0 txmode=pulse\n")
+    lean = next(u for u, features in enumerate(S.PIN_UNIT_FEATURES) if "pulse" not in features)
+    with pytest.raises(tripc.TrwError, match=f"U{lean} has no PULSE"):
+        tripc.compile_text(f"program t\npin U{lean}: pin_a=uo0 txmode=pulse\n")
 
 
 def test_tripc_reports_a_value_that_does_not_fit():

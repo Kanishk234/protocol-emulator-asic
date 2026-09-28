@@ -863,6 +863,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Model side:** confirm or contest each (a §14 sentence and a `test_semantics.py` test), as for D-041. tripc could also reject a 0-tick phase and a CARRIER below 2 clocks.
 - **Cost:** +7.7K µm² per full unit (logic 30.2K → 37.9K).
 
+## D-052 (2026-09-28): milestone B2a (BITSYNC receive core) in the RTL; readings; the engine's size
+- **Context:** B2a of pin-unit milestone B: `src/trw_pin_bs.v` (bit clock, idle, frame start and hard sync, resync, RX words; §14 P20–P22), active in full units when TXMODE and RXMODE are `bitsync`. Details in `PIN_UNIT_RTL.md` §9.
+- **Readings for the model side:** P-G28 (the event generator keeps working in BITSYNC and wins a load clock), P-G29 (the idle-making sample is not a frame bit). P-G27 (what ERR `0x1nnn` carries) is open and gets its reading with B2b.
+- **Size:** engine 16.1K µm² after one optimisation (20.2K with two timers); full unit logic 54.0K. The whole BITSYNC engine is heading for ~30K against the estimate's ~16.7K, which raises the D-049 floor by ~13K (~2 % of the core). Levers are listed in `PIN_UNIT_RTL.md` §9; none is taken yet.
+- **Cost:** as above; no spec change.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

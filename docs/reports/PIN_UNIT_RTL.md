@@ -2,7 +2,7 @@
 
 **Question:** how big is a real `trw_pin_unit`, and was the pre-RTL estimate (`AREA_ESTIMATE.md`) right? The estimate's biggest guess was the pin units' control logic ("glue", 45 % ± 15 % of the datapath), and the chip is at ~87 % of the 6x4 core against a routable ~50–60 %.
 
-**Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier) done, B2/B3 (BITSYNC) next (§9).**
+**Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier) and B2a (the BITSYNC receive core) done; B2b, B2c and B3 next (§9).**
 
 **Answer so far:** the lean unit came in **~6 % under the estimate**: 38.7K µm² before layout (unit 29.4K + configuration 5.1K + producer 1.5K + the estimate's 2.7K for the consumer port) against 41.2K. The glue share was ~38 %, inside the guessed range. So the estimate holds, and **the chip is still ~85 % of the core** with real lean units. There is no hidden slack: getting to 50–60 % still needs real cuts. The per-feature prices below say where the lean unit's area goes.
 
@@ -209,7 +209,9 @@ The critical path is the same at both widths: burst timer → cursor → `eq`.
 | Stage | Rules | Contents | State |
 |---|---|---|---|
 | B1 | P17, P30 | PULSE (per-bit symbols in whole ticks, back-to-back join, cursor = end time); the carrier (50 % toggle while pin A is not IDLE, restart at each change to the active level, fractional period) | **done** |
-| B2 | P20–P25 | BITSYNC core: bit clock, idle detection, frame start and hard sync, resync (SJW), stuffing, RX framing and `FRAME`, the RX/TX CRC, the TX queue with `LINE`/`SYNC`, `WAIT` [1] | next |
+| B2a | P20–P22 | BITSYNC engine `trw_pin_bs.v`: bit clock, bus idle, frame start with hard sync, resync (SJW), RX word framing | **done** |
+| B2b | P23, P24 | stuffing (RX removal, stuff errors), the RX CRC, `FRAME n` and the frame verdict | next |
+| B2c | P25 | the TX queue with `LINE`/`SYNC`, the TX CRC, `WAIT` [1]; driving pin A from the engine | after B2b |
 | B3 | P26–P29 | readback modes and arbitration, errors, flag delimiters, `JAM` and listen-only, NRZI, SE0, pin N, OE auto | after B2 |
 
 **B1 as built** (`src/trw_pin_tx.v`, parameter `FULL`): PULSE runs as a burst of whole ticks, each bit two phases counted as `pt` ticks and `ps` clocks of the tick (no multiplier); P3's "take when all pending actions are at edges ≤ n+1" extends to the burst's end, so the next DATA token's first bit lands on the end edge. PULSE bits set the echo flag (P40). The carrier is a 16.9-clock half-period timer in the TX half; `lvl` shows IDLE in the off halves (so pin N follows, and C_OE still gates the pad, D-035 H). On a lean unit the PULSE code acts as LEVEL and the carrier fields read 0 (D-040).
@@ -217,6 +219,17 @@ The critical path is the same at both widths: burst timer → cursor → `eq`.
 **Verification:** `test_internal/pin/test_pin_full.py` (4 tests, both builds): two back-to-back 8-bit PULSE tokens with PRESC = 1, every edge where P17 puts it, the second token joined; MSB order, a GAP after a token (cursor = end time) and a 0-tick phase; the carrier at 10 clocks and at 7.5 clocks (fractional), with IDLE steady and a restart on each activation; the carrier on a PULSE stream (IR NEC style); on the lean build the D-040 fallbacks. Pin suite 38/38 on both builds; `mutate.sh` 17/17 (lean) and 21/21 (full) with 6 new B1 mutants (one first-round survivor was an equivalent mutant and was replaced). Chip lint and chip tests unchanged (10/10).
 
 **Cost:** the full unit's logic grows from 30.2K to **37.9K µm²** (+7.7K for PULSE and the carrier; Yosys cmos5l typ, flat, without the configuration block). The estimate's projection for all three features was ~24.4K, which leaves ~16.7K for BITSYNC.
+
+**B2a as built:** `src/trw_pin_bs.v`, instantiated in full units only; while TXMODE and RXMODE are both `bitsync` it loads the producer (the RX half's event generator keeps priority, P-G28) and, until B2c, the unit takes no tokens and holds pin A recessive. One 1/256-clock timer to the next bit boundary; the sample falls in the clock containing bit start + SAMPLEOFS; hard sync sets the bit start to the frame-start clock; a resync is one signed correction of the timer by min(phase error, SJW).
+
+**B2a verification:** `test_internal/pin/test_pin_bs.py` (3 tests, both builds): frames at PERIOD = 20.5 clocks starting at arbitrary phases, every byte a DATA word, a trailing partial word dropped at idle; a sender 2 % fast then 2 % slow over 48-bit frames: received intact with SJW = 0.15 PERIOD and misread with SJW = 0 (the resync is what saves it); one edge 1 clock late with SJW = 0.3 PERIOD (a resync by the whole SJW would sample the next bit). On the lean build nothing is received. Pin suite 41/41 on both builds; 7 B2 mutants, all killed; chip lint and chip tests unchanged.
+
+**B2a cost, and what it means:** the first version (separate boundary and sample timers) was 20.2K µm²; with one timer and one signed correction the engine is **16.1K**, and the full unit's logic **54.0K** (B1 37.9K). The estimate had ~16.7K for all of BITSYNC; at B2a's rate the finished engine will be nearer 30K. For the protocol floor (D-049, U0 full) that is roughly +13K, about +2 % of the core. Levers, if the budget needs them: only U0 needs the engine (D-049 lets U1 be lean); timer arithmetic in whole clocks for SJW; the CRC width capped by what the programs use (CRC-16, CRC-15, CRC-5).
+
+**B2a readings (D-052):**
+- **P-G27** (open, for B2b): ERR `0x1nnn` "nnn = line bit" (P23) is read as the frame's line-bit count at the stuff error.
+- **P-G28** in BITSYNC the RX half's event generator stays active and wins a clock it loads in; the engine's token is then lost with OVERRUN (P19's "EVENT first").
+- **P-G29** the sample that makes the bus idle (the IDLE_BITS-th recessive one) is not a frame bit: a word it would complete is dropped with the frame.
 
 **Readings where the text leaves a choice (for the model side, D-051):**
 - **P-G24** PULSE phase of 0 ticks: lasts one clock (the RTL counts phases in clocks; programs use ≥ 6 ticks).

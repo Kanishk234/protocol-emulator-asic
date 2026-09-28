@@ -21,6 +21,20 @@ Next:
 
 ---
 
+## 2026-09-28: Krithik + Claude (phase 2: milestone B2a, the BITSYNC receive core)
+RTL session, from `ARCHITECTURE.md` §14 P20–P22 and D-023–D-027; `tools/tripsim` not read.
+
+Done:
+- `src/trw_pin_bs.v` (new): bit clock, bus idle, frame start with hard sync, resync limited to SJW, RX words. `trw_pin_unit.v` instantiates it in full units and muxes loads (event generator first) and, until B2c, holds pin A recessive and takes nothing in BITSYNC. Added to every source list (pin/chip Makefiles, synthesis scripts, CI lint).
+- `test_internal/pin/test_pin_bs.py` (3 tests, both builds): phases, idle drop, ±2 % drift with and without SJW, a 1-clock-late edge. Pin 41/41 both builds; 7 B2 mutants killed; chip lint and tests unchanged.
+- Area: a first version was 20.2K; one timer and one signed correction brought it to 16.1K. Full unit logic 54.0K. BITSYNC is heading for ~30K vs ~16.7K estimated (D-052); this raises the D-049 floor by ~2 % of the core.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- B2b: stuffing, the RX CRC, `FRAME` and the verdict (P23, P24).
+
 ## 2026-09-28: Krithik + Claude (phase 2: pin-unit milestone B1, PULSE and carrier)
 RTL session, from `ARCHITECTURE.md` §7 and §14 P17, P30; `tools/tripsim` not read.
 

@@ -26,6 +26,7 @@ One row per `gds` hardening (see `../design/PHYSICAL_DESIGN_AND_CI.md` §10). Ju
 | 2026-09-27 | Host RTL: `trw_host.v` (D-046 map, RUN/STEP/IRQ, SRAM host slot, read mux over 3 lanes) + `trw_spi.v`; Yosys onto cmos5l typ, flat | `test_internal/host/`; D-046 | **24.8K µm²** (1,829 cells, 174 flops); the estimate's host interface was 23.3K |
 | 2026-09-27 | **Whole chip RTL** (`trw_chip`, spec counts: 3 lanes, 6 units, U0–U1 full), Yosys onto cmos5l typ, flat; pre-layout OpenSTA | `synth/chip/run_chip.sh`; D-047 | **517.4K µm²** standard cells (34,923 cells; 2,689 flops, 2,814 latches, 210 clock gates) + 45.3K macro ≈ 62 % of the core; ~72 % expected at global placement (R4's 1.164×). Slack +10.36 typ / +4.94 slow; the slow-corner worst path starts at the SRAM output (fetched word into EVAL, D-045). Chip tests 5/5 RTL and 5/5 gate level |
 | 2026-09-28 | Pin-unit milestone B1 (PULSE P17, carrier P30) in the full unit, Yosys onto cmos5l typ, flat, unit logic without the configuration block | `PIN_UNIT_RTL.md` §9; D-051 | Full unit logic **37.9K µm²** (was 30.2K; lean 29.7K): +7.7K for PULSE and the carrier. The estimate had ~24.4K for PULSE + carrier + BITSYNC, so ~16.7K is left for BITSYNC |
+| 2026-09-28 | Pin-unit milestone B2a (BITSYNC engine `trw_pin_bs.v`: bit clock, idle, hard sync, resync, RX words), Yosys cmos5l typ, flat | `PIN_UNIT_RTL.md` §9; D-052 | Engine **16.1K µm²** (20.2K before merging its two timers); full unit logic **54.0K**. BITSYNC heading for ~30K vs the estimate's ~16.7K |
 
 ## Row notes
 

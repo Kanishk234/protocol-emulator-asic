@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7. **Run 4 (2 lanes, density 51) set up 2026-09-27.** §8.
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7. **Run 4 (2 lanes, density 51, 2026-09-27): global routing with 0 overflow (Metal3 74.2 %); detailed routing reached 874 violations in its 4 allowed iterations, 1,428 after the antenna re-routes; job 2 h 55 min.** §9.
 
 ---
 
@@ -191,3 +191,34 @@ One change from run 3 (D-034 rule): **2 lanes instead of 3**, and the density th
 **Protocols with 2 lanes:** All 20 programs in `programs/` use at most 2 lanes: CAN, LIN and IR NEC use 2, the other 17 use 1 (and every program fits in 4 pin units). So every protocol still runs on a 2-lane chip; what is lost is running them together: at most two 1-lane protocols at once, and a 2-lane program (CAN, LIN, IR NEC) alone, where 3 lanes allowed a 2-lane program plus a 1-lane one, or three 1-lane protocols.
 
 **What to look for:** Metal3 usage and overflow against run 3 (92.8 %, 4,651), and whether detailed routing gets to 0 violations. R2 routed clean at 66 % Metal3 usage. If it routes, the next question is how far between ~48.5 % and 58.9 % the density can go back up (for example, by adding back logic), since this is below the plan of record. Expect ~5 h for the job again if routing does not converge.
+
+## 9. Results: run 4 (2026-09-27) — no global overflow, detailed routing stopped early
+
+`gds` on `spike/r4-floorplan` (3fc5b1a), run [36349736069](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36349736069), `gds` job 2 h 55 min (20:54 → 23:49 UTC). Stopped after LVS on the same LibreLane JSON error as run 3. `GDS_logs` in `build/ci/r4/run4/` (not committed).
+
+| | Run 3 (3 lanes) | **Run 4 (2 lanes)** |
+|---|---|---|
+| Yosys (flat) | 417.7K µm² | 337.4K µm² |
+| Global placement | 58.9 % | **47.6 %** (predicted ~48.5 %) |
+| Hold repair | 1,869 endpoints, 3,067 buffers | 1,662 endpoints, 2,860 buffers |
+| After global routing (cells + macro) | 594.6K µm² = 65.9 % | 493.8K µm² = **54.7 %** |
+| Global-routing usage M2 / M3 / M4 | 85.2 / 92.8 / 44.4 % | 56.9 / **74.2** / 15.4 % |
+| Global-routing overflow | 4,883 (M3 4,651) | **0** |
+| Global routing time | 4 min 22 s | 22 s |
+| Detailed routing, first pass (iterations 0–3) | 46,596 → 25,219 → 23,102 → 6,004 | 19,924 → 12,101 → 10,799 → **874** |
+| After antenna re-route 1 / 2 | 9,769 / 12,872 | 1,196 / **1,428** (Metal2 1,244, Metal3 183, Metal4 1) |
+| Detailed routing time | 4 h 23 min | 1 h 55 min (first pass 58 min) |
+| Post-route setup typ / slow | met / −10.89 ns (706 paths) | met / **−5.98 ns** (425 paths, slot latch → flop) |
+| Hold | met | met (worst +0.11 ns, fast) |
+| LVS | 786 nets merged | 50 nets merged (the shorts) |
+| Magic DRC | 60,326 | 58,188 (R3's macro alone: 57,923, inside the macro) |
+
+**Where the violations are** (same method as §7): lanes 641 (45 %), pin units 511 (36 %), port configuration 265 (19 %). No hotspot: they are spread over the die, mostly Metal2 shorts and spacing.
+
+**What it means:**
+1. **At 47.6 % placement (54.7 % after the flow's growth) the full floorplan is routable in global routing: 0 overflow, Metal3 at 74 %,** close to R2's clean 66 %. Run 3 at 58.9 % was not. So the routable ceiling for this design lies between ~48 % and ~59 % at placement.
+2. **Detailed routing was stopped by our own guard, not by congestion.** `DRT_OPT_ITERS` 3 (D-034, set to keep a non-converging route under 6 h) ends the first pass after 4 iterations, still falling steeply (10,799 → 874 in the last one). The antenna re-routes (`DRT_ANTENNA_REPAIR_ITERS` 3) then start from that unfinished route and end higher (1,428). With 0 global overflow, more iterations are the expected fix, and the remaining iterations are short (the last first-pass iteration took 9 min).
+3. **Timing:** typ met; the slow corner's −5.98 ns comes from routes around unresolved shorts (−10.89 in run 3); pre-layout slack at slow was +5.05 ns.
+4. **For the chip:** the RTL chip at 2 lanes and 6 units (2 full) is ~442K µm² (D-047 numbers), ~62 % at placement: above this window. The budget has to come down to roughly R4 run 4's size, or the ceiling has to be found between 48 % and 59 %.
+
+**Run 5 proposal (one change, flow setting only):** same design, **`DRT_OPT_ITERS` back to LibreLane's default (64)**. With no global overflow the route should converge; the job is expected to take well under run 3's 5 h 25 min. It answers whether 47.6 % routes clean (0 DRC, LVS clean), which the budget needs before the switch (D-047). Decision: team (D-043).

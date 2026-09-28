@@ -21,6 +21,23 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: L3 on the chip RTL, R4 run 4 result)
+Done:
+- **R4 run 4** (36349736069, 2 lanes, density 51) read from `GDS_logs` (`build/ci/r4/run4/`): GPL 47.6 %, **0 global-routing overflow** (Metal3 74.2 %); detailed routing 874 violations after the 4 iterations `DRT_OPT_ITERS` 3 allows (still falling), 1,428 after the antenna re-routes; typ met, slow −5.98 ns; job 2 h 55 min. `R4_FLOORPLAN.md` §9, AREA.md row, D-043 result and run 5 proposal.
+- **L3 on the chip RTL** (`test_internal/chip/test_l3.py`, pins only, programs compiled by tripc and loaded with `tools/host`): UART TX at 1 Mbaud and 115200 (reference line model + sigrok `uart`), UART RX at 460800 with a framing error, SPI controller mode 0 at 5 MHz against the reference target (+ sigrok `spi`, both directions), I2C controller at ~400 kHz with 40-clock stretching: writes, a NACKed address, repeated START, reads (+ sigrok `i2c`). **4/4 pass.** Shared helpers in `test_internal/chip/chiplib.py` (host polling that drains HOST_OUT, a pad environment stepping the reference models, a VCD writer, sigrok).
+- **BUGS #48** found by L3 and fixed in `trw_host.v`: a status+data burst could take a token the status had not shown. New L1-HOST test and mutant; L1-HOST 6/6.
+
+Checklist boxes ticked (evidence):
+- None. L3 passes on the RTL for the cases above, but VERIFICATION.md §6 asks for more (UART 9600 and 8E1/parity, SPI modes 1–3 and 16-bit, I2C 100k/1M and arbitration loss), and the tests belong in `test/` once the top is switched.
+
+Problems / decisions:
+- UART RX faster than ~460 kbaud overruns: the host at SCK = clk/8 needs ~560 clocks per HOST_OUT read. A protocol limit of the host link, not of the chip; worth a CLAIMS note.
+- Run 5 (proposed): `DRT_OPT_ITERS` back to 64.
+
+Next:
+- Team: run 5; then the area budget (the RTL chip at 2 lanes / 6 units is ~62 % at placement; run 4 routed globally at 47.6 %).
+- L3: the remaining §6 cases.
+
 ## 2026-09-27: Krithik + Claude (phase 2: the whole chip, trw_chip)
 RTL session; `tools/tripsim` not read. R4 run 4 still running.
 

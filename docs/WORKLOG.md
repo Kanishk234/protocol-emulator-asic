@@ -21,6 +21,21 @@ Next:
 
 ---
 
+## 2026-09-27: Krithik + Claude (phase 2: CI for the RTL suites, first claim, BUGS #49)
+Done:
+- R4 run 5 launched on the branch (`gds` 36363295528, `DRT_OPT_ITERS` 64, e20d390).
+- Gate-level run of the chip after the BUGS #48 fix: `test_chip` 5 + `test_l3` 4, **9/9 pass** (TT Icarus 13).
+- `docs/CLAIMS.md`: claim 1 (the three L3 programs on the chip RTL, simulated only) and a "Known limits" section (host link throughput: continuous UART RX above ~460 kbaud overruns at SCK = clk/8).
+- `unit` workflow: new job `rtl` (VERIFICATION.md §10 puts L1 there): whole-chip Verilator lint, every L1 suite, the pin unit lean and full, the macro model fetch, and `test_chip` + `test_l3` on the chip RTL; results uploaded. First run will show whether Ubuntu 24.04's Verilator 5.020 agrees with the local 5.053.
+- BUGS #49: STEP now also makes the pin units live (D-041 B). L1-HOST 7/7, mutant killed.
+- `docs/HANDOFF.md` (local, not committed) for the next agent.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- R4 run 5 result; the area budget; L3 coverage (UART 9600/parity, SPI modes 1–3 and 16-bit, I2C 100k/1M, arbitration loss).
+
 ## 2026-09-27: Krithik + Claude (phase 2: L3 on the chip RTL, R4 run 4 result)
 Done:
 - **R4 run 4** (36349736069, 2 lanes, density 51) read from `GDS_logs` (`build/ci/r4/run4/`): GPL 47.6 %, **0 global-routing overflow** (Metal3 74.2 %); detailed routing 874 violations after the 4 iterations `DRT_OPT_ITERS` 3 allows (still falling), 1,428 after the antenna re-routes; typ met, slow −5.98 ns; job 2 h 55 min. `R4_FLOORPLAN.md` §9, AREA.md row, D-043 result and run 5 proposal.

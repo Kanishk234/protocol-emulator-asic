@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7. **Run 4 (2 lanes, density 51, 2026-09-27): global routing with 0 overflow (Metal3 74.2 %); detailed routing reached 874 violations in its 4 allowed iterations, 1,428 after the antenna re-routes; job 2 h 55 min.** §9. **Run 5 (the same with `DRT_OPT_ITERS` 64, 2026-09-28): routes clean. 0 DRC, LVS match, 0 antenna, typ timing met, gl_test and precheck pass; `gds` job 2 h 58 min, precheck 1 h 56 min.** §10. **Run 6 (the real chip at the protocol floor, 2026-09-28): placed at 56.1 %, global-routing overflow 5,350 (Metal3 87.3 %); detailed routing reached 16 violations after its 64 iterations (4 h 53 min), then GitHub's 6 h limit stopped the antenna re-route. No artifacts.** §11–12.
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7. **Run 4 (2 lanes, density 51, 2026-09-27): global routing with 0 overflow (Metal3 74.2 %); detailed routing reached 874 violations in its 4 allowed iterations, 1,428 after the antenna re-routes; job 2 h 55 min.** §9. **Run 5 (the same with `DRT_OPT_ITERS` 64, 2026-09-28): routes clean. 0 DRC, LVS match, 0 antenna, typ timing met, gl_test and precheck pass; `gds` job 2 h 58 min, precheck 1 h 56 min.** §10. **Run 6 (the real chip at the protocol floor, 2026-09-28): placed at 56.1 %, global-routing overflow 5,350 (Metal3 87.3 %); detailed routing reached 16 violations after its 64 iterations (4 h 53 min), then GitHub's 6 h limit stopped the antenna re-route. No artifacts.** §11–12. **Flow growth analysed: hold repair at a 0.25 ns hold uncertainty is ~50K µm²; run 7 (hold uncertainty 0.10 ns, run 6's design) prepared, §13. RTL area pass on `main`: 407.6K → 391.7K at the floor, §14.**
 
 ---
 
@@ -281,3 +281,40 @@ Asked for by Krithik (D-043's next measurement). One change of design, and the d
 5. The 2,148 tie cells are the flops' unused asynchronous reset pins tied high (sync reset; run 5 had 1,852). They are not a problem to fix.
 
 **Next (needs a decision, D-049/D-043):** the choices and the recommendation are in `docs/HANDOFF.md` §3 and the session's WORKLOG entry. No run 7 is prepared yet.
+
+## 13. Where the flow's growth comes from, and run 7 (prepared 2026-09-28)
+
+**The growth after synthesis is larger than the design's own margin.** Run 6's cell reports, step by step (cells + macro):
+
+| After | Cell area | Repair buffers |
+|---|---|---|
+| synthesis / floorplan | 466.2K µm² | — |
+| post-GPL design repair (1,145 fanout violations, `MAX_FANOUT_CONSTRAINT` 10) | 491.6K (+25.3K) | 3,470 |
+| CTS (clock tree: ~1,100 clock buffers and inverters) and the post-CTS resizer (hold repair, 1,891 endpoints) | **567.7K** (+24K clock tree, **+52.3K hold**, "+10.1 %") | 6,670 |
+
+Run 5 shows the same pattern (2,873 fanout buffers, 2,860 hold buffers). So hold repair alone adds about as much as the whole R4 run 5 → run 6 difference in logic.
+
+**Why hold repair is so large.** Our constraints (the branch's `pnr.sdc` sources LibreLane's `base.sdc`) set `set_clock_uncertainty 0.25`, which applies to hold as well as setup, and the resizer repairs hold at all three corners with a 0.1 ns margin. Timing run 5's post-CTS netlist (`35-openroad-cts/tt_um_tripwire.nl.v`, propagated clock, no wire parasitics) locally at the fast corner (−40 °C, 1.32 V):
+
+| Hold uncertainty | Endpoints violating | Endpoints below the 0.1 ns repair margin |
+|---|---|---|
+| **0.25 ns (now)** | **1,546** (median slack −0.05 ns; 1,517 flop D pins spread over the whole design) | 1,834 |
+| 0.10 ns | 29 | 581 |
+| 0.05 ns | 28 | 60 |
+
+The ~28 that remain are real (mostly the SRAM macro's input hold, −0.52 ns). Almost all the rest are ordinary short flop-to-flop paths that fail only because of the 0.25 ns hold uncertainty. After CTS the flow times with the propagated clock tree, so the skew is modelled, and clock jitter does not affect hold (launch and capture are the same edge); 0.1 ns on top of the fast corner is a normal, still conservative, hold uncertainty. Setup keeps 0.25 ns.
+
+**Run 7 (prepared in the worktree `~/tw-r4`, one change):** run 6's design unchanged, with `set_clock_uncertainty -hold 0.10` added to `pnr.sdc` and `signoff.sdc` (sign-off must use the same value, or it would report hold violations the flow did not repair). DECISIONS D-056 (proposed). What to look for: the hold endpoints and buffers after the post-CTS resizer (run 6: 1,891 and +52.3K), the utilisation after global routing (run 6: 62.9 %), the global-routing overflow (run 6: 5,350), whether detailed routing finishes inside the job, and hold met at sign-off at every corner. If it routes, the RTL area pass (§14, on `main`) is margin on top.
+
+## 14. The RTL area pass (2026-09-28, on `main`)
+
+Behaviour-preserving changes, each with the unchanged tests and mutants passing (floor = 2 lanes, 4 units, U0 full; Yosys cmos5l typ):
+
+| Change | Saving at the floor |
+|---|---|
+| Lanes: one read port per ALU operand side and one register write port for the step in EXEC (they are mutually exclusive), instead of a 16-bit register mux per use and an 8-source write mux per register | −13.0K (51.5K → 45.0K per lane) |
+| Pin TX: one burst-timer decrement for the three cases | −1.3K |
+| BITSYNC engine: the TX queue loads right-aligned and reads bit `qn−1` (MSB first, CRC) or bit 0 (LSB first), no barrel shifter | −1.1K |
+| **Total: the floor chip 407.6K → 391.7K µm²** (timing +7.32 typ / +0.47 slow) | **−15.9K** |
+
+Measured and not worth it: an indexed source select in the fabric ports (+0.35–0.5K), the host's address decode without subtractors (+0.04K, synthesis already folds them). Measured and required by the spec: the routine machinery (15.9K of a lane), the engine's parallel resync arithmetic (8.5K, B2c's timing fix), the host's lane-debug readback (4.1K). The remaining behaviour-preserving opportunities are small (a few K), so the RTL pass ends around 385K; the flow's hold repair (§13) is the larger lever.

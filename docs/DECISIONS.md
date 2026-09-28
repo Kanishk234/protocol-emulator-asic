@@ -894,6 +894,15 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Size:** engine 43.2K µm² (+8.4K), full unit logic ~81.9K; chip 632.2K at spec counts, **407.6K at the protocol floor** (B2c: 398.7K), ~57.6 % expected at global placement. R4 run 6 showed the floor at 398.7K does not harden inside the 6 h job (D-043), so this is the number the area pass starts from.
 - **Cost:** as above; no spec change.
 
+## D-056 (2026-09-28, proposed): hold clock uncertainty 0.10 ns (setup stays 0.25 ns)
+- **Context:** R4 run 6 (the real chip at the protocol floor) did not finish inside the 6 h `gds` job. The layout flow grew the design from 466.2K to 567.7K µm² before routing; 52.3K of that was hold repair at 1,891 endpoints (`R4_FLOORPLAN.md` §13). The constraints come from LibreLane's `base.sdc`, whose `set_clock_uncertainty 0.25` applies to hold as well as setup.
+- **Finding:** timing run 5's post-CTS netlist at the fast corner: 1,546 hold violations at 0.25 ns (median −0.05 ns, spread over every block), 29 at 0.10 ns, 28 at 0.05 ns (the SRAM macro's input hold and a few others: real, and still repaired).
+- **Proposal:** `set_clock_uncertainty -hold 0.10 [all_clocks]` after `base.sdc`, in both the place-and-route and the sign-off constraints. Reasoning: after CTS the flow times with the propagated clock tree, so skew is modelled; clock jitter does not affect hold (same edge); 0.10 ns on top of the fast corner (−40 °C, 1.32 V) remains conservative. Setup keeps 0.25 ns.
+- **Why it is fair to the competition's intent:** it is a design constraint in our own SDC file inside the same Tiny Tapeout `gds` workflow every entry uses; no flow code or template job changes.
+- **Evidence plan:** R4 run 7 on `spike/r4-floorplan` (run 6's design, this change only). Accept for `main` (at the switch, with the latch SDC of D-032) only if run 7 shows hold met at sign-off at all corners and `gl_test` passes.
+- **Cost:** none in area; it removes most of ~50K µm² of delay cells. Risk: a real hold failure in silicon if the modelled skew is off by more than the margin; mitigated by the fast corner, the 0.1 ns repair margin, and the sign-off check at 0.10 ns.
+- **Decision:** Krithik + Kanishk (a sign-off assumption, CLAUDE.md: `src/` constraint changes each with an entry).
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

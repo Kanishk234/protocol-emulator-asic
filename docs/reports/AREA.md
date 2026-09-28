@@ -32,6 +32,7 @@ One row per `gds` hardening (see `../design/PHYSICAL_DESIGN_AND_CI.md` §10). Ju
 | 2026-09-28 | Pin-unit milestone B2b (BITSYNC RX stuffing, CRC, FRAME), Yosys cmos5l typ, flat | `PIN_UNIT_RTL.md` §9; D-053 | Engine **25.1K µm²** (+9.0K), full unit logic **62.3K** |
 | 2026-09-28 | Pin-unit milestone B2c (BITSYNC TX queue) and the engine's retiming, Yosys cmos5l typ, flat | `PIN_UNIT_RTL.md` §9; D-054 | Engine **34.8K µm²** (+9.7K), full unit logic **73.8K**; chip at spec counts **616.7K**, pre-layout +7.65 typ / +0.87 slow (before the retiming +0.84 / −9.80, BUGS #51); chip at the protocol floor (2 lanes, 4 units, U0 full) **398.7K**, +7.35 / +0.42 |
 | 2026-09-28 | Pin-unit milestone B3 (readback, JAM, listen-only, flags, NRZI, SE0, OE auto), Yosys cmos5l typ | `PIN_UNIT_RTL.md` §9; D-055 | Engine **43.2K µm²** (+8.4K), full unit logic **~81.9K**; chip at spec counts **632.2K**, pre-layout +7.09 typ / +0.02 slow; chip at the protocol floor (2 lanes, 4 units, U0 full) **407.6K** (~57.6 % at global placement), +8.49 / +2.21 |
+| 2026-09-28 | RTL area pass (behaviour-preserving): lane register ports, TX burst-timer decrement, BITSYNC queue without a barrel shifter, Yosys cmos5l typ | `R4_FLOORPLAN.md` §14 | Lane **45.0K** (−6.5K each), lean TX 18.2K, engine 42.2K; chip at the protocol floor **391.7K** (−15.9K), pre-layout +7.32 typ / +0.47 slow |
 
 ## Row notes
 

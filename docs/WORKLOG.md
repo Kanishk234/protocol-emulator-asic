@@ -28,6 +28,9 @@ Done:
 - Area by block at the floor (Yosys, `synth/chip/run_chip.sh`): pin units ~201K, lanes 150K, fabric + producers 35K, host 22K.
 - **Milestone B3** (Krithik: B3 first, then the area pass): readback and arbitration, bit errors, JAM responses and armed flags, listen-only, DELIM = flag with the hold-back and aborts, NRZI, SE0 with J, pin N low in SE0, DELIM = se0, OE auto, data[14] "own frame", a one-entry status EVENT register. Tests `test_pin_bs_b3.py` (7) against the reference CANNode (arbitration, ACK, error flags), `protomodels.hdlc` (±1 % drift, bad FCS, abort) and `protomodels.usb` line states (TX bit for bit, RX of four packets). Pin suites 59/59 on both builds under Icarus and Verilator; chip tests 10/10; mutants B3 34/34 and B2 31/31 killed; `scripts/check_all.sh` PASS. Engine 43.2K, full unit ~81.9K; chip 632.2K at spec counts (+7.09 typ / +0.02 slow), **407.6K at the protocol floor**. D-055 (readings P-G36–P-G47). Milestone B is complete.
 
+- **RTL area pass** (behaviour-preserving, Krithik's order after B3): lanes −6.5K each (merged register read/write ports), TX −0.3K each, engine −1.1K; the floor chip 407.6K → **391.7K**. Lane 6/6 + 15/15 mutants; pin 59/59 both builds; milestone-B mutants 70/70 (the lean/full mutant filter fixed: B2/B3 mutants no longer run on the lean build). `R4_FLOORPLAN.md` §14.
+- **Flow growth found:** run 6 grew 466.2K → 567.7K before routing (fanout repair +25.3K, clock tree +24K); hold repair was +52.3K at 1,891 endpoints, caused by the 0.25 ns clock uncertainty applying to hold. Locally at the fast corner (run 5's post-CTS netlist): 1,546 violations at 0.25 ns, 29 at 0.10 ns. **D-056 (proposed): hold uncertainty 0.10 ns.** R4 run 7 prepared (run 6's design + that change) in `~/tw-r4`. §13.
+
 Checklist boxes ticked (evidence):
 - None.
 
@@ -36,7 +39,7 @@ Problems / decisions:
 - 7 `test_pinregs` cases still hard-code U1 full (in `tools/tripsim/`, not read in this RTL session).
 
 Next:
-- The area pass (Krithik's order: after B3), starting from 407.6K at the floor; target ~340–360K, then R4 run 7.
+- Push R4 run 7 (hold uncertainty 0.10 ns); read hold endpoints, utilisation after GRT, overflow, DRT time, sign-off hold at every corner. Then D-056 for the team.
 
 ## 2026-09-28: Krithik + Claude (phase 2: milestone B2c; engine retimed; R4 run 6 prepared)
 Done:

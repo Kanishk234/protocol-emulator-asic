@@ -21,6 +21,21 @@ Next:
 
 ---
 
+## 2026-09-28: Krithik + Claude (phase 2: milestone B2c; engine retimed; R4 run 6 prepared)
+Done:
+- **Milestone B2c** in `trw_pin_bs.v`: the TX queue (DATA, SYNC, LINE [2]/[6]/[3], WAIT [1]), TX stuffing, the TX CRC with CRC_XOR, our frame start and the join, the own-edge rules; pin A from the engine. Tests `test_pin_bs_tx.py` (5), including three CAN frames decoded and ACKed by the reference `CANNode` on a wired-AND bus. Pin 52/52 on both builds and under Verilator; B2 mutants 30/30 killed; chip tests 10/10. Engine 34.8K, full unit logic 73.8K. D-054 (readings P-G31 to P-G35).
+- **Timing:** chip STA showed slow −9.80 ns through the engine (pin → bit-clock sums). Retimed with no behaviour change: +7.65 typ / +0.87 slow at spec counts (BUGS #51).
+- **Host** at unit counts other than 6: width fixes (BUGS #50).
+- **R4 run 6 prepared** on `spike/r4-floorplan` (worktree `~/tw-r4`, not committed): the real `trw_chip` at the protocol floor, 398.7K µm², ~56.4 % expected, density 59. Lint clean, `test/` 4/4, chip tests 10/10 at the floor's counts. `R4_FLOORPLAN.md` §11, D-043.
+- R4 run 5's precheck **passed** (1 h 56 min, the KLayout DRC of the full GDS): run 5 is green end to end, 4 h 54 min in all.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Push R4 run 6 (branch) when the user decides; read GRT overflow and DRC.
+- B3: readback and arbitration, errors, flags, JAM, listen-only, NRZI, SE0, OE auto (P26–P29).
+
 ## 2026-09-28: Krithik + Claude (phase 2: milestone B2b; R4 run 5 routes clean)
 Done:
 - **R4 run 5 routes clean** (36363295528): 0 DRC, LVS match, 0 antenna, typ timing met, slow −6.0 ns (slot latch → flop), `gl_test` pass, `gds` job 2 h 58 min (detailed routing 1 h 58 min). The routable ceiling is between 47.6 % and 58.9 %. `R4_FLOORPLAN.md` §10, AREA row, D-043 result and the next proposal (a run at the protocol floor's size).

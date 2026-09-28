@@ -2,7 +2,7 @@
 
 **Question:** how big is a real `trw_pin_unit`, and was the pre-RTL estimate (`AREA_ESTIMATE.md`) right? The estimate's biggest guess was the pin units' control logic ("glue", 45 % ± 15 % of the datapath), and the chip is at ~87 % of the 6x4 core against a routable ~50–60 %.
 
-**Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier), B2a (the BITSYNC receive core) and B2b (RX stuffing, CRC, FRAME) done; B2c and B3 next (§9).**
+**Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier), B2a (the BITSYNC receive core), B2b (RX stuffing, CRC, FRAME) and B2c (the TX queue) done; B3 next (§9).**
 
 **Answer so far:** the lean unit came in **~6 % under the estimate**: 38.7K µm² before layout (unit 29.4K + configuration 5.1K + producer 1.5K + the estimate's 2.7K for the consumer port) against 41.2K. The glue share was ~38 %, inside the guessed range. So the estimate holds, and **the chip is still ~85 % of the core** with real lean units. There is no hidden slack: getting to 50–60 % still needs real cuts. The per-feature prices below say where the lean unit's area goes.
 
@@ -211,8 +211,8 @@ The critical path is the same at both widths: burst timer → cursor → `eq`.
 | B1 | P17, P30 | PULSE (per-bit symbols in whole ticks, back-to-back join, cursor = end time); the carrier (50 % toggle while pin A is not IDLE, restart at each change to the active level, fractional period) | **done** |
 | B2a | P20–P22 | BITSYNC engine `trw_pin_bs.v`: bit clock, bus idle, frame start with hard sync, resync (SJW), RX word framing | **done** |
 | B2b | P23, P24 | stuffing (RX removal, stuff errors), the RX CRC, `FRAME n` and the frame verdict | **done** |
-| B2c | P25 | the TX queue with `LINE`/`SYNC`, the TX CRC, `WAIT` [1]; driving pin A from the engine | next |
-| B3 | P26–P29 | readback modes and arbitration, errors, flag delimiters, `JAM` and listen-only, NRZI, SE0, pin N, OE auto | after B2 |
+| B2c | P25 | the TX queue with `LINE`/`SYNC`, the TX CRC, `WAIT` [1]; driving pin A from the engine | **done** |
+| B3 | P26–P29 | readback modes and arbitration, errors, flag delimiters, `JAM` and listen-only, NRZI, SE0, pin N, OE auto | next |
 
 **B1 as built** (`src/trw_pin_tx.v`, parameter `FULL`): PULSE runs as a burst of whole ticks, each bit two phases counted as `pt` ticks and `ps` clocks of the tick (no multiplier); P3's "take when all pending actions are at edges ≤ n+1" extends to the burst's end, so the next DATA token's first bit lands on the end edge. PULSE bits set the echo flag (P40). The carrier is a 16.9-clock half-period timer in the TX half; `lvl` shows IDLE in the off halves (so pin N follows, and C_OE still gates the pad, D-035 H). On a lean unit the PULSE code acts as LEVEL and the carrier fields read 0 (D-040).
 
@@ -236,6 +236,29 @@ The critical path is the same at both widths: burst timer → cursor → `eq`.
 - **P-G27** ERR `0x1nnn` (stuff error): nnn = the index of the offending line bit in the frame (line bits, stuff bits included, from the first bit = 0).
 - **P-G30** at FRAME's bit n the verdict token carries the current word, whether bit n completed it or not; no separate DATA word is emitted for that word.
 - The verdict EVENT is `word[11:0]` with data[15:12] = 0 until B3 adds data[14] (our own frame).
+
+**B2c as built:** in `trw_pin_bs.v`: a 16-bit TX shift register (next bit on top) loaded by a DATA word (NBITS or length-in-token, ORDER) or by `LINE` [3] (the TX CRC XOR CRC_XOR, CRC_WIDTH bits, MSB first); a TX token is taken only with no bits queued, so `LINE` [2] (stuffing), [6] (TX CRC := CRC_INIT, before [3]) and [3] act when taken, which is their place in the stream. At each bit boundary the engine drives a due stuff bit, else the next queued bit, else releases the line. The TX CRC takes the data bits sent (not stuff or CRC bits); SYNC also resets it. `SYNC`: the queued bits wait for bus idle and start our frame at the next boundary (EVENT `0x9001`, our bit timing kept); if another node's first bit arrives first and ours is dominant, we join it. The own-edge rules: no resync on an edge to the level we are driving, and no idle while we drive a bit. `WAIT` [1] holds TX tokens until the next sample point. `JAM` is taken at once and ignored, and `LINE` [1:0] and [4] are ignored, until B3. The unit drives pin A from the engine in BITSYNC.
+
+**B2c verification:** `test_internal/pin/test_pin_bs_tx.py` (5 tests, both builds). Pin A on an open-drain pad forms a wired-AND bus with a second node:
+- **CAN end to end:** `tools/protomodels/can.py`'s clock-level `CANNode` (the Bosch reference, with its own bit timing, destuffing, CRC-15 check and ACK) sits on the bus and decodes three frames we send with SYNC / LINE / DATA and the TX CRC (standard, extended, and one whose CRC ends in five equal bits, so a stuff bit must precede the `LINE` that stops stuffing). All three are received with a good CRC and ACKed. Every bit of ours is on the PERIOD grid from the start edge, and our own RX reports the start, the words and the verdict.
+- **HDLC style:** LSB first, ones-only stuffing, CRC-16 XOR 0xFFFF against `protomodels.hdlc`'s stuffing, the stuff 0 before the flag.
+- **Idle:** a 16-bit recessive run of ours does not make the bus idle.
+- **Ignored ops and WAIT [1]:** the ignored ops are taken and do nothing; `WAIT` [1] releases in the sample-point clock.
+- **Join:** another node's first bit arrives two clocks after bus idle; we join it, and our bits follow the hard-synced clock.
+- **CRC reset:** `LINE` [6] in mid-frame (a header outside the CRC) and [6]+[3] in one `LINE`, on a CRC-5.
+
+Pin suites 52/52 on both builds (and under Verilator); mutants: all 30 B2 mutants killed (16 new for B2c); chip tests 10/10.
+
+**Timing (found at chip level, fixed; BUGS #51):** the chip's pre-layout STA after B2c showed the worst path from U0's TX level register through uo0 (which pin units read directly, P7) into the engine's bit-clock arithmetic (four 25-bit sums and compares in series after the pin) and on into a fabric drop counter: typ **+0.84 ns**, slow **−9.80 ns** (D-047 had +10.36 / +4.94). The engine now computes every sum from registered state in parallel (with and without a resync, and the hard-sync case from the configuration), and the edge terms only select among them. Likewise the CRC comparisons for a 0 and a 1 bit and the idle count. No behaviour change: the same 52 tests and 30 mutants pass. The chip is now **+7.65 ns typ, +0.87 ns slow** (spec counts), and the worst path is inside the engine's timer.
+
+**B2c cost:** the engine is **34.8K µm²** (+9.7K, about 1K of it the retiming), the full unit's logic **73.8K**. The whole chip at spec counts is 616.7K µm² (Yosys, flat).
+
+**B2c readings (D-054):**
+- **P-G31** `WAIT` [1] releases at the first sample point in a clock after the one it is taken in, and the next token may be taken in that sample point's clock (as P35).
+- **P-G32** our frame opens at the bit boundary where we drive a SYNC frame's first bit, or a dominant bit at bus idle. Our bit timing is kept, and the echo of that bit is no frame start. EVENT `0x9001` is loaded at that edge (at a join: in the frame-start clock). Bits without a SYNC do not wait for idle.
+- **P-G33** a stuff bit due after the last queued bit goes out at the next bit start even when nothing more is queued.
+- **P-G34** the TX run restarts at our frame start: the first bit is a run of 1.
+- **P-G35** "a bit we drive" (P20 idle, P22 own edges) means a bit from our queue or a stuff bit; a released line is not driven.
 
 **B2a readings (D-052):**
 - **P-G27** (open, for B2b): ERR `0x1nnn` "nnn = line bit" (P23) is read as the frame's line-bit count at the stuff error.

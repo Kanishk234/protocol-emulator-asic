@@ -5,7 +5,7 @@ TOPLEVEL_LANG ?= verilog
 SRC_DIR ?= $(PWD)/../../src
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_alu.v $(SRC_DIR)/trw_lane.v $(PWD)/tb_lane.v
-COMPILE_ARGS += -I$(SRC_DIR)
+COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT
 TOPLEVEL = tb_lane
 COCOTB_TEST_MODULES ?= test_lane
 

@@ -7,7 +7,7 @@ SRC_DIR ?= $(PWD)/../../src
 SIM_BUILD = sim_build/flops$(FLOPS)
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_slots.v
-COMPILE_ARGS += -I$(SRC_DIR)
+COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT
 ifeq ($(FLOPS),1)
 COMPILE_ARGS += -DTRW_SLOTS_FLOPS
 endif

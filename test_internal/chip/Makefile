@@ -15,7 +15,7 @@ ifneq ($(GATES),yes)
 # RTL
 SIM_BUILD = sim_build/rtl
 VERILOG_SOURCES = $(addprefix $(SRC_DIR)/,$(CHIP_SOURCES)) $(MACRO_MODELS) $(PWD)/tb_chip.v
-COMPILE_ARGS += -I$(SRC_DIR) -DFUNCTIONAL
+COMPILE_ARGS += -I$(SRC_DIR) -DFUNCTIONAL -DSIM_ASSERT
 else
 # Gate level: the Yosys netlist from synth/chip/run_chip.sh and the cmos5l cell models (with the UDP file,
 # BUGS #1). Run with Tiny Tapeout's Icarus 13 (ICARUS_BIN_DIR=...), as scripts/gl_local.sh does.
@@ -28,6 +28,10 @@ COMPILE_ARGS += -DFUNCTIONAL -DGL_TEST -DSIM
 COCOTB_RESULTS_FILE = results_gl.xml
 endif
 TOPLEVEL = tb_chip
+ifeq ($(SIM),verilator)
+# L-XSIM: the macro's behavioural model has # delays (honour them, as Icarus does); its warnings are not ours
+EXTRA_ARGS += --timing -Wno-fatal
+endif
 COCOTB_TEST_MODULES ?= test_chip
 
 include $(shell cocotb-config --makefiles)/Makefile.sim

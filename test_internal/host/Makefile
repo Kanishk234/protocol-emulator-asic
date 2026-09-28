@@ -6,7 +6,7 @@ SRC_DIR ?= $(PWD)/../../src
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_sync.v $(SRC_DIR)/trw_spi.v $(SRC_DIR)/trw_host.v $(SRC_DIR)/trw_pins.v \
                   $(SRC_DIR)/trw_chan_prod.v $(PWD)/tb_host.v
-COMPILE_ARGS += -I$(SRC_DIR)
+COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT
 TOPLEVEL = tb_host
 COCOTB_TEST_MODULES ?= test_host
 

@@ -5,7 +5,7 @@ TOPLEVEL_LANG ?= verilog
 SRC_DIR ?= $(PWD)/../../src
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_pins.v $(SRC_DIR)/trw_sync.v
-COMPILE_ARGS += -I$(SRC_DIR)
+COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT
 TOPLEVEL = trw_pins
 COCOTB_TEST_MODULES ?= test_pins
 

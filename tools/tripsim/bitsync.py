@@ -77,7 +77,7 @@ class BitSync:
 
     # ------------------------------------------------------------ helpers
     def _emit(self, tag, data):
-        if len(self.out) < 2:                   # 2-token skid buffer in front of the producer
+        if len(self.out) < 1:                   # one-entry wait register before the producer
             self.out.append((tag, data))
         else:
             self.u.flags["OVERRUN"] = 1
@@ -169,7 +169,7 @@ class BitSync:
             self.wait_sp = False
         self.prev = s
         prod = self.u.rx_prod
-        if self.out and prod.free():
+        if self.out and prod.free() and prod._load is None:
             prod.load(*self.out.popleft())
             self.u.stats["rx_tokens"] += 1
 
@@ -212,12 +212,17 @@ class BitSync:
             if self.idle_cnt >= c.idle_bits and self.tx_bit is None:
                 self.in_frame = self.rx_on = False
             return stuff
+        if self.idle_cnt >= c.idle_bits and self.tx_bit is None and c.delim != "se0":
+            # The sample that establishes idle closes the frame before entering
+            # word framing, CRC, or the returned DATA stream.
+            self.in_frame = self.rx_on = False
+            return False
         if self.rx_on or self.post_check:
             if self.rx_stuff and self._stuff_due():
                 if s == self.run_lvl:
                     self._emit(isa.TAG_ERR, ERR_STUFF << 12 | (self.bitno & 0xFFF))
                     self.rx_on = self.post_check = False
-                    self._error()
+                    self._error(abort_tx=self.own)
                     return False
                 self.run_lvl, self.run_n = s, 1 if c.stuff_lvl in (None, s) else 0
                 if self.post_check:
@@ -311,10 +316,11 @@ class BitSync:
             self.bits = []
 
     # ------------------------------------------------------------ TX
-    def _error(self):
+    def _error(self, abort_tx=True):
         """A detected error (stuff error, bit error, missing override): stop our TX and fire the
         armed JAM, if any, from the next bit (§14 P28)."""
-        self._abort()
+        if abort_tx:
+            self._abort()
         if self.jam_armed is not None:
             lvl, n = self.jam_armed
             self.jam_armed = None
@@ -427,6 +433,10 @@ class BitSync:
                         self.discard = False
                 elif arg & 0x10:
                     self.jam_armed = (lvl, n) if arg & 1 == 0 else None     # [0] = disarm
+                elif arg & 1:
+                    pass                                                # [0] alone is ignored
+                elif self.own and self.in_frame:
+                    pass                                                # response JAM refused now
                 else:
                     self.jam = [lvl, n, d + 1, False]
             elif op == cmds["FRAME"]:

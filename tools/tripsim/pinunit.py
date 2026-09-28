@@ -174,7 +174,12 @@ class PinUnit:
         v = self.level
         if c.carrier and self.level != c.idle:
             p = round(c.carrier * 256)
-            v = self.level if ((self._car_n << 8) % p) < p // 2 else c.idle
+            if p >= 2 * 256:
+                # P30: toggle k occurs at floor(k * CARRIER / 2) clocks. Count
+                # all boundaries reached by this elapsed integer clock; this keeps
+                # fractional periods on the specified phase schedule.
+                toggles = (((self._car_n + 1) * 512) - 1) // p
+                v = self.level if toggles % 2 == 0 else c.idle
         if od:
             return 0, int(v == 0)
         return v, self.oe
@@ -192,6 +197,23 @@ class PinUnit:
         if prev is None or cur is None or prev == cur:
             return False
         return kind == "both" or ((cur == 1) if kind == "rise" else (cur == 0))
+
+    def _event(self, now, a, b, sel_pin):
+        """Emit P8 events before mode-specific RX output for same-clock priority."""
+        c = self.cfg
+        src, prev_src = (a, self._prev_a) if c.ev_pin == "a" else (sel_pin, self._prev_c)
+        event = (c.ev_edge is not None and src is not None
+                 and self._edge(prev_src, src, c.ev_edge)
+                 and (c.ev_qual is None or (b == c.ev_qual and self._prev_b == c.ev_qual)))
+        if event:
+            # P8: EVENT has priority over another RX producer load this clock.
+            self._emit(isa.TAG_EVENT, (src << 15) | (((now - self.t_cfg) // c.presc) & 0x7FFF))
+            if c.ev_reset:
+                if self.bs is None:
+                    self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
+                else:
+                    self.bs.bits = []
+        return event
 
     # ---------------------------------------------------------------- TX
     def _linked(self):
@@ -373,13 +395,12 @@ class PinUnit:
                 self.linked_end = not bits
             elif c.txmode == "pulse":           # §14 P17: one two-phase symbol per bit
                 t = max(self.cursor_q8, earliest_q8)
-                tick = c.presc * 256
                 for bit in bits:
                     first = getattr(c, f"sym{bit}_first")
                     self._schedule(t >> 8, "sbit", first)
-                    t += getattr(c, f"sym{bit}_t1") * tick
+                    t += max(1, getattr(c, f"sym{bit}_t1") * c.presc) * 256
                     self._schedule(t >> 8, "sbit", 1 - first)
-                    t += getattr(c, f"sym{bit}_t2") * tick
+                    t += max(1, getattr(c, f"sym{bit}_t2") * c.presc) * 256
                 self._schedule(t >> 8, "send", c.idle)
                 self.cursor_q8 = t
             else:  # timed shift
@@ -402,9 +423,11 @@ class PinUnit:
         """a, b, sel_pin: synchronised levels of pins A, B, C this clock (None if not attached)."""
         c = self.cfg
         if self.bs is not None:
+            self._event(now, a, b, sel_pin)
             self._tx_apply = []
             if a is not None:
                 self.bs.step(now, a, b)
+            self._prev_a, self._prev_b, self._prev_c = a, b, sel_pin
             return
         sel = True if (c.pin_c is None or sel_pin is None) else sel_pin == c.c_active
         self._deselect = self._sel_next and not sel
@@ -413,18 +436,7 @@ class PinUnit:
             self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
             if self._rx != "off":
                 self._rx = "wait_idle"                # and SHIFT_RX re-arms (BUGS #36)
-        src, prev_src = (a, self._prev_a) if c.ev_pin == "a" else (sel_pin, self._prev_c)
-        event = (c.ev_edge is not None and src is not None
-                 and self._edge(prev_src, src, c.ev_edge)
-                 and (c.ev_qual is None or (b == c.ev_qual and self._prev_b == c.ev_qual)))
-        if event:
-            # §14 P8: EVENT {new level of the source pin, time}; it takes this clock's RX
-            # load. A sample in the same clock still enters framing (after EV_RESET); only a
-            # word it completes loses the load (§14 P38, P19).
-            # §14 P8 (D-024): the time is in PRESC ticks, so long pulses fit in 15 bits
-            self._emit(isa.TAG_EVENT, (src << 15) | (((now - self.t_cfg) // c.presc) & 0x7FFF))
-            if c.ev_reset:
-                self._rx_bits, self._rx_phase, self._rx_taint = [], 0, False
+        self._event(now, a, b, sel_pin)
         if a is not None and sel:
             if c.rxmode == "shift_rx":
                 self._shift_rx(now, a)

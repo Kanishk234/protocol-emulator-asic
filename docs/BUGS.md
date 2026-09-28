@@ -157,3 +157,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** `test/test_bitstream.py::test_board_examples_spi` (a reference target on the pins from reset on).
 - **Now covered by:** the test asserts the behaviour (at most one empty transaction before RUN); `docs/EXAMPLES.md` documents it and the fix at the pin-map level.
 - **Fix:** user-level: put active-low outputs on bidirectional pins (`FAB_IO*.o` with an enable, plus a pull-up), which park released (high through the pull-up). No hardware change.
+
+## 20: Fabric RTL test reused the idle-fabric simulator from the previous command
+- **Date:** 2026-09-28
+- **Symptom:** following the README from a clean source export, `scripts/check_all.sh` passed, but the next command, `make -C test WARP_FABRIC=rtl`, failed `test_counter4`: the counter stayed at zero. The second command's log had no Icarus compile step.
+- **Root cause:** `test/Makefile` put both the default `stub` model and the `rtl` fabric model in `test/sim_build/rtl`. Cocotb's Makefile saw the executable built for `stub` as current and reused it, even though `WARP_FABRIC` changed.
+- **Caught by:** the Phase 5 clean-source README reproduction, in the documented command order.
+- **Now covered by:** `test/Makefile` uses `sim_build/$(WARP_FABRIC)` for RTL simulations, so a change between `stub` and `rtl` requires a new compile. The clean-source reproduction reruns the two commands in order.
+- **Fix:** separate simulator build directories by fabric model. No chip RTL change.

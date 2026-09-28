@@ -11,7 +11,7 @@ PROJECT_SOURCES = tt_um_warp.v wp_fabric_cfg.v wp_shell.v wp_spi_target.v wp_syn
 ifneq ($(GATES),yes)
 
 # RTL simulation:
-SIM_BUILD				= sim_build/rtl
+SIM_BUILD				= sim_build/$(WARP_FABRIC)
 VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
 
 else

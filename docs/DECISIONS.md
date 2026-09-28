@@ -884,7 +884,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 
 ## D-054 (2026-09-28): milestone B2c (BITSYNC TX queue) in the RTL, the engine retimed; five readings
 - **Context:** B2c of pin-unit milestone B in `src/trw_pin_bs.v` (§14 P21, P22, P25). Details, tests and numbers in `PIN_UNIT_RTL.md` §9. B2 is now complete; B3 (P26–P29) is next.
-- **Readings for the model side:** P-G31 (WAIT [1] release clock), P-G32 (where our frame opens, and EVENT `0x9001`'s clock), P-G33 (a due stuff bit goes out with nothing after it), P-G34 (the TX run restarts at our frame start), P-G35 (a released line is not "driven" for the own-edge and idle rules).
+- **Readings for the model side:** P-G31 (WAIT [1] release clock), P-G32 (where our frame opens, and EVENT `0x9001`'s clock), P-G33 (a due stuff bit requires a following queued bit), P-G34 (the TX run restarts at our frame start), P-G35 (a released line is not "driven" for the own-edge and idle rules).
 - **Model confirmation (2026-09-28):** P-G31's wait releases at the sample point, and a queued TX DATA token is accepted in that same model clock. P-G32 opens our frame at the next bit boundary after bus idle and loads EVENT `0x9001` in that clock. Focused tests and mutations pin both readings in `tools/tripsim/tests/test_semantics.py`.
 - **Model confirmation (2026-09-28):** P-G34 resets the stuffing run at frame start. P-G35 treats `tx_line = None` as released for both own-edge detection and idle frame close. Both readings have focused mutation checks in `tools/tripsim/tests/test_semantics.py`.
 - **Timing:** the chip's slow corner had fallen to −9.8 ns: the pin can come straight from a uo pad (P7) into the engine's bit-clock arithmetic. The engine now computes its sums from registered state and lets the pin only select (BUGS #51). No behaviour change. The chip is +7.65 ns typ and +0.87 ns slow pre-layout.
@@ -899,7 +899,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Model confirmation (2026-09-28):** P-G46 readback abort EVENT data includes the sampled line level and the current line-bit index; P-G47 emits the SE0 frame verdict only when both sampled lines are low, before adding that ending sample to frame data. Focused mutation tests cover both.
 - **Model disagreement:** P-G41's pending status-event capacity is proposed in D-065; no model behavior changed pending agreement.
 - **Model disagreements:** P-G36, P-G38 and P-G40 are proposed in D-062–D-064; no model changes were made pending team agreement.
-- **Two choices worth the team's eye:** (1) arming a JAM does not replace a pending response, because the CAN program sends a CRC-error flag and re-arms in the same routine; "a new JAM replaces one in progress" is read as a new response. (2) Status EVENTs get a one-entry wait register (P-G41) rather than being dropped on a clash, because an arbitration loss on the bit that completes a word is common in CAN and the program needs both tokens.
+- **P-G41 design note:** status EVENTs use a one-entry wait register. If a second token collides while it is occupied, the second token is dropped and OVERRUN is set.
 - **Timing:** the flag hold-back first sat on the frame-start path (slow −1.58 ns pre-layout); it now shifts outside the frame's priority chain. Chip +7.09 ns typ / +0.02 ns slow at spec counts, +8.49 / +2.21 at the protocol floor.
 - **Size:** engine 43.2K µm² (+8.4K), full unit logic ~81.9K; chip 632.2K at spec counts, **407.6K at the protocol floor** (B2c: 398.7K), ~57.6 % expected at global placement. R4 run 6 showed the floor at 398.7K does not harden inside the 6 h job (D-043), so this is the number the area pass starts from.
 - **Cost:** as above; no spec change.
@@ -912,56 +912,73 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Evidence plan:** R4 run 7 on `spike/r4-floorplan` (run 6's design, this change only). Accept for `main` (at the switch, with the latch SDC of D-032) only if run 7 shows hold met at sign-off at all corners and `gl_test` passes.
 - **Cost:** none in area; it removes most of ~50K µm² of delay cells. Risk: a real hold failure in silicon if the modelled skew is off by more than the margin; mitigated by the fast corner, the 0.1 ns repair margin, and the sign-off check at 0.10 ns.
 - **Decision:** Krithik + Kanishk (a sign-off assumption, CLAUDE.md: `src/` constraint changes each with an entry).
+- **Run 7 result (36455532221):** at 0.10 ns, post-CTS hold violations fell to 540 endpoints (637 inserted buffers), and global-routing overflow fell from 5,350 to 4,198 (3,909 on Metal3). The six-hour `gds` job timed out in detailed routing with 143 violations; signoff and `gl_test` did not run and no artifact was uploaded. The evidence plan above was not met, so this run does **not** validate the proposed hold setting for use on `main`. Revisit D-056 together with the D-049 budget decision before any switch.
 
-## D-057 (2026-09-28, proposed): reconcile pin-unit model readings P-G24, P-G25 and P-G28
+## D-057 (2026-09-28, approved): reconcile pin-unit model readings P-G24, P-G25 and P-G28
 - **Context:** model-side review of D-051/D-052 found three differences between the RTL readings and existing `tripsim` behavior. No RTL was inspected during this model review; the comparisons use D-051/D-052, `ARCHITECTURE.md` and the model alone.
-- **P-G24:** the RTL reading says a PULSE phase configured for 0 ticks occupies one clock. `tripsim` schedules both transitions at the same edge and commits the latter, so the phase has no observable duration. This also follows the literal P17 duration (`T1_b·PRESC` / `T2_b·PRESC`); decide whether P17 should explicitly impose a one-clock minimum.
-- **P-G25:** the RTL reading treats CARRIER below 2 clocks as off. `tripsim` currently applies every nonzero carrier and can alternate on periods below 2 clocks. P30 currently says CARRIER > 0 applies; clarify whether the minimum is 2 clocks.
-- **P-G28:** the RTL reading keeps the event generator active in BITSYNC and gives its output priority on a coincident producer load. The model's `PinUnit.compute_rx()` delegates to `BitSync.step()` and returns before the ordinary event generator. P8 does not state a BITSYNC exception; confirm the reading and specify same-clock arbitration.
+- **P-G24 decision:** a zero-duration PULSE phase lasts one clock; P17 now states a one-clock minimum.
+- **P-G25 decision:** CARRIER below 2 clocks is off; P30 now states the minimum.
+- **P-G28 decision:** events stay enabled during BITSYNC and win a coincident RX producer load; a BITSYNC result waits in the one-entry output register. P8 now states this arbitration.
+- **Decision:** approved by Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_semantics.py` pins the one-clock PULSE minimum, carrier-off threshold, BITSYNC event priority, and fractional schedule. Revert mutations for P-G24/P-G25/P-G28 fail their focused checks. BUGS #53 records the same-clock event/output collision caught while implementing P-G28.
 
-## D-058 (2026-09-28, proposed): resolve fractional carrier phase for P-G26
+## D-058 (2026-09-28, approved): resolve fractional carrier phase for P-G26
 - **Context:** adding a model-only P-G26 check from D-051, without inspecting RTL.
 - **Finding:** for CARRIER = 5.5 clocks, `tools/tripsim` samples the active/inactive phase as `[1,1,1,0,0,0,1,1,1,0,0,1]` over elapsed clocks 0–11, so the transitions appear on clocks 3, 6, 9, and 11. D-051 states the k-th toggle is at `t + floor(k·CARRIER/2)`, which gives clocks 2, 5, 8, and 11. The two readings disagree for fractional half periods.
-- **Proposal:** specify whether the half-period boundaries use floor or a phase-accumulated 50% duty schedule, and define how a fractional boundary is sampled at integer clock edges. No model behavior changed pending team agreement.
+- **Decision:** use the floor schedule already stated by D-051/P30: toggle k occurs at `t + floor(k·CARRIER/2)`, sampled at integer clock edges. `tripsim` now follows this rule.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p30_fractional_carrier_toggles_at_floor_half_period_boundaries`; the previous phase-threshold implementation fails this focused check.
 - **Cost:** none if the current rule is retained; a different rule changes only carrier phase arithmetic and its model tests.
 
-## D-059 (2026-09-28, proposed): idle-making sample in BITSYNC (P-G29)
+## D-059 (2026-09-28, approved): idle-making sample in BITSYNC (P-G29)
 - **Context:** model-side test for the D-052 reading, using `BitSync._sample_bit()` and `ARCHITECTURE.md` P20 only.
 - **Finding:** when the sample raises the consecutive-recessive count to `IDLE_BITS`, the current model processes it through `_frame_bit()` before closing the frame. A two-sample threshold therefore counts the second recessive sample in the frame. D-052 reads the idle-making sample as excluded.
-- **Proposal:** decide whether the threshold sample ends the frame before RX framing, or remains the final sampled frame bit as the current model does. No behavior changed pending agreement.
+- **Decision:** the threshold sample ends a non-flag frame before it enters word framing or CRC. Flag delimiter recognition still processes the line sample first so P27's abort rule can act. `tripsim` now follows this ordering.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p20_idle_making_sample_closes_frame_before_word_framing`; disabling the pre-framing close makes the test fail.
 - **Cost:** no added hardware if clarified either way; changing the rule alters BITSYNC RX sample ordering and its model test.
 
-## D-060 (2026-09-28, proposed): event generator in BITSYNC (P-G28)
+## D-060 (2026-09-28, approved): event generator in BITSYNC (P-G28)
 - **Context:** model-side test for the D-052 reading, using the model's ordinary P8 event configuration and `BitSync.step()` path only.
 - **Finding:** `PinUnit.compute_rx()` delegates to `BitSync.step()` and returns before evaluating `ev_edge`; a pin-A rising edge therefore does not load an EVENT in BITSYNC. D-052 reads the event generator as active in BITSYNC, with priority on a coincident RX load.
-- **Proposal:** decide whether P8 events remain enabled in BITSYNC, and if so explicitly state their priority against bit-synchronous RX outputs on the same clock. No behavior changed pending agreement.
+- **Decision:** P8 events remain enabled in BITSYNC and have priority over another RX producer load in the same clock. See D-057; the one-entry BITSYNC output register retains the losing output if available.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p8_event_generator_runs_in_bitsync_and_wins_same_clock_load`; bypassing P8 in BITSYNC fails the focused test.
 - **Cost:** no added storage if event tokens use the existing load path; enabling this behavior changes model scheduling and same-clock producer-load priority.
 
-## D-061 (2026-09-28, proposed): terminal BITSYNC stuff bit (P-G33)
+## D-061 (2026-09-28, approved): terminal BITSYNC stuff bit (P-G33)
 - **Context:** model-side test of the D-054 reading, using `BitSync._tx_bit_start()` and P23/P25 only.
 - **Finding:** when the stuffing run reaches its threshold but the TX queue is empty, the model does not send a terminal stuff bit; it releases the line. D-054 reads that the due stuff bit is sent with nothing following it. P25's “with no bits queued the line is released” supports the current model reading.
-- **Proposal:** confirm that a terminal stuff bit requires a following queued bit, or approve sending the final due stuff bit before release. No behavior changed pending agreement.
+- **Decision:** a due stuff bit is sent only when a following data or CRC bit is queued. Otherwise the line is released per P25. The existing model behavior stands; P23/P25 now state the rule.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p23_due_stuff_bit_waits_for_following_data`; removing the queue guard to send a terminal stuff bit fails this check.
 - **Cost:** no added state; the choice affects the terminal TX bit sequence.
 
-## D-062 (2026-09-28, proposed): response JAM taken during our own frame (P-G36)
+## D-062 (2026-09-28, approved): response JAM taken during our own frame (P-G36)
 - **Finding:** the model stores a response JAM taken during an own frame, then checks `own && in_frame` only when a later bit starts. If the frame ends first, that response can drive the bus. D-055 reads that own-frame eligibility is judged when the command is taken.
-- **Proposal:** discard the response JAM at acceptance while an own frame is active, or approve the model's deferred check. No behavior changed pending agreement.
+- **Decision:** discard the response JAM if this unit owns an active frame when the command is taken. `tripsim` now checks eligibility at acceptance.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p28_response_jam_taken_in_own_frame_is_discarded`; deferring eligibility until bit start fails this check.
 
-## D-063 (2026-09-28, proposed): JAM [0] without [4] (P-G38)
+## D-063 (2026-09-28, approved): JAM [0] without [4] (P-G38)
 - **Finding:** with [0] set and [4] clear, the model starts an unarmed response JAM. ARCHITECTURE.md P28 says [0] without [4] is ignored.
-- **Proposal:** fix the model to ignore the command as P28 specifies, or change P28 if the RTL reading is intended. No behavior changed pending agreement.
+- **Decision:** ignore JAM [0] when [4] is clear, as P28 states. `tripsim` now ignores that command.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p28_jam_bit_zero_without_armed_bit_is_ignored`; restoring the old response-JAM behavior fails this check.
 
-## D-064 (2026-09-28, proposed): receive stuff error while another frame is queued for TX (P-G40)
+## D-064 (2026-09-28, approved): receive stuff error while another frame is queued for TX (P-G40)
 - **Finding:** any receive stuff error calls `_abort()` and clears queued TX, even when `own` is false. D-055 reads that a stuff error stops only the TX of our own frame.
-- **Proposal:** abort TX only when the offending frame is ours, or approve the model's unconditional abort. No behavior changed pending agreement.
+- **Decision:** a receive stuff error aborts queued TX only when this unit owns the offending frame. Unrelated queued TX is preserved; `tripsim` now follows this rule. Readback errors still abort TX under P26.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p23_foreign_frame_stuff_error_preserves_queued_tx`; aborting queued TX on a foreign-frame stuff error fails this check.
 
-## D-065 (2026-09-28, proposed): BITSYNC status-event wait capacity (P-G41)
+## D-065 (2026-09-28, approved): BITSYNC status-event wait capacity (P-G41)
 - **Finding:** the model buffers two pending BITSYNC output tokens in `BitSync.out` before the producer register, then raises OVERRUN on a third. D-055 describes a one-entry wait register for status EVENTs.
-- **Proposal:** match one waiting token in the model, or confirm the model's two-token queue as the intended capacity. No behavior changed pending agreement.
+- **Decision:** use one waiting token before the RX producer. A second colliding token is dropped and sets OVERRUN. `tripsim` now uses this capacity.
+- **Approval:** Krithik and Kanishk (2026-09-28).
+- **Model evidence:** `test_p26_status_event_wait_register_holds_one_pending_event`; restoring a two-entry wait queue fails this check.
 - **Cost:** a smaller model queue changes only overflow timing; increasing RTL buffering would add state and event ordering logic.
-- **Proposal:** confirm the three RTL readings and amend P17, P30 and P8 with their minimum-duration, carrier-disable and event-priority rules. Until accepted, keep the behavior question visible and do not change the model to match an unconfirmed reading.
-- **Evidence:** source review only; no new focused tests or mutation checks for these readings yet. Those are prerequisites before D-057 can be accepted.
-- **Decision:** Krithik + Kanishk.
+- **Approval:** Krithik and Kanishk approved all recommendations on 2026-09-28. The model changes and focused mutation evidence are recorded in the phase 2 worklog.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

@@ -21,6 +21,73 @@ Next:
 
 ---
 
+## 2026-09-28: Codex (phase 2: R4 run 7 review)
+Done:
+- Read the completed R4 run 7 logs and recorded its physical result in `R4_FLOORPLAN.md`, `AREA.md` and D-056.
+- Run 7 reduced hold-violation endpoints (1,891 → 540) and global-routing overflow (5,350 → 4,198), but timed out in detailed routing at 143 violations. No signoff, precheck, viewer or `gl_test` evidence was produced; D-056's evidence plan remains unmet.
+- Identified the R4 branch unit failure: seven `test_pinregs.py` failures on the old count-bound assumptions; the branch RTL and Verilator jobs passed. Main workflows for `59dec5f` (unit/test/lint/docs) are green.
+
+Checklist boxes ticked:
+- None. No Phase 2 exit condition was newly satisfied.
+
+Problems / decisions:
+- Do not treat 0.10 ns hold uncertainty or the D-049 protocol floor as validated by this run. The floor still needs a new, team-selected physical experiment.
+- The other session's tripsim edits remain shared and untouched by this RTL review.
+
+Next:
+- Compare run 7's route diagnostics with run 6 and make the D-049/D-056 budget and physical-design decision with Krithik and Kanishk before preparing another hardening.
+
+---
+
+## 2026-09-28: Codex (phase 2: implement approved D-057–D-065 model readings)
+Done:
+- Krithik and Kanishk approved the recommendations. Updated P8/P17/P20/P23/P25/P26/P28/P30 in `docs/design/ARCHITECTURE.md` and recorded approvals/evidence under D-057–D-065.
+- Updated `tripsim` for the approved PULSE minimum, carrier threshold/phase, BITSYNC idle sample, P8 event priority, response-JAM acceptance, bare JAM [0], foreign-frame stuff errors and one-entry output wait. P-G33 already matched the approved rule; its spec clarification and focused test were retained.
+- Fixed BUGS #53: a P8 event plus a queued BITSYNC output could request two same-clock producer loads.
+
+Evidence:
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **91 passed**.
+- Tripsim suite with sigrok hidden from PATH: **133 passed, 2 skipped**; the two skipped UART sigrok cases and the four deselected kernel SPI/I2C sigrok cases were then run unsandboxed with the project venv: **6 passed**.
+- Under the sandbox, `sigrok-cli` returned no UART/SPI/I2C annotations and reported `libusb_init() returned LIBUSB_ERROR_OTHER`; outside the sandbox, all six annotation checks passed. This isolates the discrepancy to sandboxed sigrok/libusb initialization, not the model waveforms.
+- Required UART/SPI/I2C and I2C/SPI target suites: **34 passed** (the four sigrok checks were separately run unsandboxed and passed).
+- PULSE/IR carrier/HDLC/selected CAN regressions: **15 passed**; CAN error-handling suite: **5 passed**; USB-LS feasibility suite: **2 passed**.
+- Revert mutations for P-G24, P-G25, P-G26, P-G28, P-G29, P-G33, P-G36, P-G38, P-G40 and P-G41 all failed their focused tests.
+- `git diff --check`: clean.
+
+Checklist boxes ticked:
+- None. L2 remains unstarted; count/budget selection still waits for GDS.
+
+Problems / decisions:
+- D-049/D-056 count/budget decisions remain with the RTL session pending its run 7 review; this model session left the generated 3/6 counts unchanged. USB-LS remains a feasibility study, not a support claim.
+- The test-backed resource floor in D-049 retains the 20 compiled programs at 2 lanes, 4 units with U0 full, 12 slots and 512 SRAM words. Physical routability is not established by this model session.
+
+Next:
+- After the team freezes counts, rerun model count checks and obtain green CI for these changes; only then hand off to the separate L2 test-side session.
+
+---
+
+## 2026-09-28: Codex (phase 2: protocol compatibility check before approved model updates)
+Done:
+- Checked the approved D-057–D-065 recommendations against the stated protocol scope and D-049's measured program resource floor; no feature or resource is removed by the recommendations.
+- Confirmed the required UART, SPI controller and I2C controller, plus the I2C/SPI target showcases, against their tripsim reference tests before changing the disputed readings.
+
+Evidence:
+- `PATH=/home/younix/protocol-emulator-asic/.venv/bin python -m pytest -q tools/kernels/tests/test_uart.py tools/kernels/tests/test_spi_controller.py tools/kernels/tests/test_spi_target.py tools/kernels/tests/test_i2c_controller.py tools/kernels/tests/test_i2c_target.py -k 'not sigrok'`: **34 passed, 4 deselected**. Used the project venv and deselected external sigrok annotation checks because the local decoder returned no annotations.
+- `docs/design/OVERVIEW_TRIPWIRE.md` lists UART/SPI/I2C as required; I2C/SPI targets as core showcases; CAN as stretch; USB-LS as not planned. `programs/README.md` explicitly labels `usb_ls.trw` a feasibility study, not a support claim.
+- D-049 records the 20-program floor: 2 lanes, 4 units with U0 full, 12 slots and 512 SRAM words. The all-kernel test run was interrupted before a summary; no result is claimed for it.
+
+Checklist boxes ticked:
+- None. No model semantics changed and L2 remains unstarted.
+
+Problems / decisions:
+- Krithik and Kanishk approved the recommendations; implementation and post-change regression remain next. GDS/budget outcome still decides whether the floor or larger frozen counts are used.
+- USB low-speed remains an unclaimed feasibility study, consistent with the overview's “not planned” scope.
+
+Next:
+- Apply the approved D-057–D-065 clarifications/model updates with focused tests and revert mutations; rerun protocol model regressions before beginning L2.
+
+---
+
 ## 2026-09-28: Codex (phase 2: complete pin-reading review through P-G47)
 Done:
 - Added focused P-G33–P-G47 tests to `tools/tripsim/tests/test_semantics.py` and revert-mutation checks for each behavior.

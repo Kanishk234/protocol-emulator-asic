@@ -65,8 +65,8 @@ jobs:
       - name: SRAM macro model (IHP-Open-PDK, pinned revision)
         run: spikes/r3_sram/fetch_macro.sh
 
-      - name: Chip-level tests and L3 on the chip RTL
-        run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3
+      - name: Chip-level tests, L3 and L1-ROT on the chip RTL
+        run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot
 
       - name: Upload results
         if: always()
@@ -76,3 +76,57 @@ jobs:
           path: |
             test_internal/**/results*.xml
             test_internal/chip/*.vcd
+
+  # L-XSIM (VERIFICATION.md §6): the same RTL suites under Verilator. cocotb 2 needs Verilator >= 5.036, newer than
+  # Ubuntu's, so this job uses the OSS CAD Suite (pinned and cached the same way as the efpga branch's workflows).
+  rtl-verilator:
+    runs-on: ubuntu-24.04
+    env:
+      OSS_CAD_SUITE_TAG: '2026-06-29'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Cache OSS CAD Suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+
+      - name: Install OSS CAD Suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+
+      - name: Install sigrok-cli and Python packages
+        run: |
+          sudo apt-get update && sudo apt-get install -y sigrok-cli
+          pip install -r requirements-dev.txt
+
+      - name: RTL suites under Verilator
+        run: |
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"          # appended: our Python and cocotb stay first
+          verilator --version
+          for d in chan alu lane slots pins host; do
+            make -C test_internal/$d SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml
+          done
+          make -C test_internal/pin SIM=verilator FULL=0 SIM_BUILD=sim_build/vl0 COCOTB_RESULTS_FILE=results_vl0.xml
+          make -C test_internal/pin SIM=verilator FULL=1 SIM_BUILD=sim_build/vl1 COCOTB_RESULTS_FILE=results_vl1.xml
+          spikes/r3_sram/fetch_macro.sh
+          make -C test_internal/chip SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml \
+            COCOTB_TEST_MODULES=test_chip,test_l3,test_rot
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rtl-verilator-results
+          path: test_internal/**/results_vl*.xml

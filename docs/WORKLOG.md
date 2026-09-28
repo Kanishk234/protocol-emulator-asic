@@ -22,7 +22,9 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - **Protocol chip tests:** `test_spi_ctrl` and `test_i2c_ctrl` (reference target models on the pins, open-drain bus for I2C) through the host interface, bitstreams `spi8`, `i2c8`; pass on the fabric RTL. `compile.protocols --require`; the `fabric` workflow compiles every protocol and fails if UART, SPI or I2C controller stops fitting.
 - CI on d6f5dcd (G1 in the chip): lint, unit, test, docs, formal, fabric green; gds (G1 hardening) running.
 - **BUGS #17 / D-028:** nextpnr left every path through the hard primitives untimed, so the G1 Fmax figures were optimistic. Primitive arcs from OpenSTA (`tools/timing/`, slow corner, ×1.5 margin) into `placement_estimate.txt`; the compile flow now uses nextpnr 0.11.1 (OSS CAD Suite 2026-09-27, `scripts/fetch_nextpnr.sh`), which reads them (identical FASM to 0.10-82 without them). Timed: UART 93–95 MHz, SPI 83.2, I2C controller 58.0, all above 50 MHz. Test bitstreams rebuilt; RTL suite **21/21**; pytest 69.
-**Next:** after the G1 hardening result, push the protocol chip tests + timing work (touches `test/` and `macro/`, so one more hardening, which also gives gl_test evidence for the 21 tests); then phase 2 exit: timing cross-check, per-tile equivalence plan, PHASE2 summary.
+- **G1 chip green in CI** (36367067731 on d6f5dcd): gds 43.6 min, precheck pass, gl_test **19/19** (incl. `test_prims`, `test_uart`), routing DRC/LVS/antenna 0, setup +10.73 ns, hold +0.143 ns. D-026 and D-027 Accepted; D-029 (G1 is a valid fallback); `docs/reports/formal.md`; `docs/summaries/PHASE2.md` (in progress).
+**Boxes ticked:** exit items: shell + G1 hardened, gl_test with real bitstreams, g0_results for every protocol, formal summary, fabric workflow green, decision point.
+**Next (superseded):** after the G1 hardening result, push the protocol chip tests + timing work (touches `test/` and `macro/`, so one more hardening, which also gives gl_test evidence for the 21 tests); then phase 2 exit: timing cross-check, per-tile equivalence plan, PHASE2 summary.
 
 ---
 

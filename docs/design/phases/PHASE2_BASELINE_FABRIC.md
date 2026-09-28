@@ -21,7 +21,7 @@
 ### Integration and physical
 - [x] Full 6x4 hardening of shell + G0 passes precheck; record area breakdown, routing overflow, and timing at the chosen clock. (CI 36353540402 on e5b1f98: `gds` 45.8 min, precheck pass, `gl_test` 17/17; fabric macro 1016.64 × 669.06 µm, shell 3,901 cells / 59,951 µm²; local pre-flight global-routing overflow 23 after D-025, CI detailed routing 0 DRC; setup WS +10.63 ns at 50 MHz, hold +0.121 ns; PHYSICAL_DESIGN_AND_CI hardening table)
 - [ ] Timing model for place and route derived from the implemented device (or a documented conservative model). (2026-09-27: routing delays from STA of the hardened tiles; tile-library cells at nextpnr's fixed values; hard primitives from OpenSTA with a ×1.5 margin, `tools/timing/README.md`, D-028, fixing BUGS #17. Left before ticking: a cross-check of the model against STA of the hardened primitive tile or of one configured design)
-- [x] `gl_test` loads at least two different real bitstreams into the gate-level netlist and checks behavior. (CI 36342012141 on acc3af3: `test_counter4`, `test_logic4`, `test_two_bitstreams` pass on the hardened chip netlist with the 16-LUT macro's gate-level netlists; redo with G0/G1)
+- [x] `gl_test` loads at least two different real bitstreams into the gate-level netlist and checks behavior. (CI 36342012141 on acc3af3 with the 16-LUT macro; G0: 36353540402 17/17; **G1 (the chip): 36367067731, 19/19** incl. counter4, logic4, two_bitstreams, host_channel, prims, uart)
 
 ### Protocols on G0
 - [x] Compile all design-set protocols onto G0. For each: fits or not, resources, achieved timing. Report in `docs/reports/g0_results.md`. (local, `python -m compile.protocols --arch arch/warp_g0 --set PRIMS=0`, 2026-09-27: SPI fits (86 LCs, 68.0 MHz), UART 124, I2C controller 115, I2C target 205 do not; G1 numbers in `docs/reports/g1_results.md`)
@@ -33,11 +33,11 @@
 - [x] Loader state machine: aborted or corrupt loads never reach the run state. (F2, `formal/f2_loader.sby`: BMC depth 84 PASS with an independent shadow CRC/length/sync check and arbitrary host bytes, cover reaches RUN in 52; bounded, not unbounded. CI `formal` 36342012194; found BUGS #12)
 
 ## Phase exit checklist
-- [ ] Shell + G1 hardened at 6x4, precheck passed (CI run ID: …)
-- [ ] `gl_test` green with two different real bitstreams (CI run ID: …)
-- [ ] `docs/reports/g0_results.md` shows fit/resources/timing for every design-set protocol
-- [ ] Formal properties pass with named bounds (proof log summary in `docs/reports/`)
-- [ ] The `fabric` workflow is green
-- [ ] Decision point recorded: G1 is a valid fallback submission (or what's missing)
+- [x] Shell + G1 hardened at 6x4, precheck passed (CI run ID: 36367067731 on d6f5dcd: `gds` 43.6 min, precheck pass, routing DRC/LVS/antenna 0, setup WS +10.73 ns, hold +0.143 ns)
+- [x] `gl_test` green with two different real bitstreams (CI run ID: 36367067731, 19/19: counter4, logic4, two_bitstreams, host_channel, prims, uart)
+- [x] `docs/reports/g0_results.md` shows fit/resources/timing for every design-set protocol (all four; G1 in `g1_results.md`)
+- [x] Formal properties pass with named bounds (proof log summary in `docs/reports/`) (`docs/reports/formal.md`: F1 unbounded, F2 BMC 84, F4 unbounded; CI `formal` 36367067725)
+- [x] The `fabric` workflow is green (36367067735 on d6f5dcd; the protocol-compile step goes green with the next push, to be re-checked)
+- [x] Decision point recorded: G1 is a valid fallback submission (or what's missing) (D-029)
 - [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE2.md` written

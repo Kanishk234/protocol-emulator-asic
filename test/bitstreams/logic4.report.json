@@ -1,20 +1,28 @@
 {
   "design": "logic4",
-  "arch": "warp_g0",
-  "arch_version": "0x0002",
+  "arch": "warp_g1",
+  "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0x6963D04B",
+  "crc32": "0xECC306AF",
   "timing_corner": "nom_slow_1p08V_125C",
   "fmax_mhz": null,
   "meets_50mhz": false,
   "utilisation": {
     "FABULOUS_LC": {
-      "used": 5,
-      "available": 96
+      "used": 4,
+      "available": 88
     },
     "IOBUF": {
       "used": 12,
       "available": 36
+    },
+    "wp_timer": {
+      "used": 0,
+      "available": 2
+    },
+    "wp_shift": {
+      "used": 0,
+      "available": 2
     },
     "GBUF": {
       "used": 1,

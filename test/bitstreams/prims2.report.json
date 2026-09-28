@@ -1,27 +1,27 @@
 {
-  "design": "counter4",
+  "design": "prims2",
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0x42BFD462",
+  "crc32": "0x4FDFC102",
   "timing_corner": "nom_slow_1p08V_125C",
-  "fmax_mhz": 162.6,
+  "fmax_mhz": 208.33,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {
-      "used": 7,
+      "used": 2,
       "available": 88
     },
     "IOBUF": {
-      "used": 10,
+      "used": 14,
       "available": 36
     },
     "wp_timer": {
-      "used": 0,
+      "used": 1,
       "available": 2
     },
     "wp_shift": {
-      "used": 0,
+      "used": 1,
       "available": 2
     },
     "GBUF": {
@@ -44,27 +44,37 @@
       "i": "en"
     },
     "FAB_IN1": {
-      "i": "dir"
+      "i": "load"
+    },
+    "FAB_IN2": {
+      "i": "step"
+    },
+    "FAB_IN3": {
+      "i": "sin"
     },
     "FAB_OUT0": {
-      "o": "q[0]"
+      "o": "out[0]"
     },
     "FAB_OUT1": {
-      "o": "q[1]"
+      "o": "out[1]"
     },
     "FAB_OUT2": {
-      "o": "q[2]"
+      "o": "out[2]"
     },
     "FAB_OUT3": {
-      "o": "q[3]"
+      "o": "out[3]"
+    },
+    "FAB_OUT4": {
+      "o": "out[4]"
+    },
+    "FAB_OUT5": {
+      "o": "out[5]"
     },
     "FAB_IO0": {
-      "o": "io0_o",
-      "oe": "io0_oe",
-      "i": "io0_i"
+      "o": "io[0]"
     },
     "FAB_IO1": {
-      "o": "io1_o"
+      "o": "io[1]"
     }
   },
   "unmapped_inputs_tied_0": [],

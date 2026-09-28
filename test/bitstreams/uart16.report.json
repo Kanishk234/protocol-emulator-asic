@@ -1,27 +1,27 @@
 {
-  "design": "hostecho",
+  "design": "uart_top",
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0x83AA41B6",
+  "crc32": "0xC12C2336",
   "timing_corner": "nom_slow_1p08V_125C",
-  "fmax_mhz": 143.88,
+  "fmax_mhz": 121.95,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {
-      "used": 23,
+      "used": 29,
       "available": 88
     },
     "IOBUF": {
-      "used": 13,
+      "used": 15,
       "available": 36
     },
     "wp_timer": {
-      "used": 0,
+      "used": 2,
       "available": 2
     },
     "wp_shift": {
-      "used": 0,
+      "used": 2,
       "available": 2
     },
     "GBUF": {
@@ -39,6 +39,12 @@
     },
     "rst_n": {
       "i": "rst_n"
+    },
+    "FAB_IN0": {
+      "i": "rx_i"
+    },
+    "FAB_OUT0": {
+      "o": "tx_o"
     },
     "h_wdata[0]": {
       "i": "h_wdata[0]"
@@ -63,9 +69,6 @@
     },
     "h_wdata[7]": {
       "i": "h_wdata[7]"
-    },
-    "h_wlast": {
-      "i": "h_wlast"
     },
     "h_wvalid": {
       "i": "h_wvalid"
@@ -126,13 +129,30 @@
     },
     "h_status[7]": {
       "oe": "h_status[7]"
-    },
-    "h_attention": {
-      "o": "h_attention"
     }
   },
-  "unmapped_inputs_tied_0": [],
-  "unmapped_outputs_open": [],
+  "unmapped_inputs_tied_0": [
+    "cfg_div[0]",
+    "cfg_div[1]",
+    "cfg_div[2]",
+    "cfg_div[3]",
+    "cfg_div[4]",
+    "cfg_div[5]",
+    "cfg_div[6]",
+    "cfg_div[7]",
+    "cfg_div[8]",
+    "cfg_div[9]",
+    "cfg_div[10]",
+    "cfg_div[11]",
+    "cfg_div[12]",
+    "cfg_div[13]",
+    "cfg_div[14]",
+    "cfg_div[15]",
+    "cfg_we"
+  ],
+  "unmapped_outputs_open": [
+    "tx_oe"
+  ],
   "tools": {
     "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
     "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.10-82-g2b560ad0)",

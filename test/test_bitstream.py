@@ -187,3 +187,111 @@ async def test_host_channel(dut):
     assert parse_byte(await host.xfer(tx_user_status())) == 0
     await host.xfer(tx_simple(Op.STOP))
     await leave_fabric(dut)
+
+
+def fab_out6(dut):
+    return (int(dut.uo_out.value) >> 2) & 0x3F         # FAB_OUT0..5
+
+
+@cocotb.test(skip=not REAL_FABRIC)
+async def test_prims(dut):
+    """The hard primitives (D-026, ARCHITECTURE §8) configured by a real bitstream (prims2): a
+    timer with RELOAD 5 pulses every 6 enabled clocks (tick toggles FAB_OUT0); a 6-step LSB-first
+    shift register loads 0xA5, shifts on each `step` pulse and raises `done` after 6."""
+    host = await reset(dut)
+    host.set_fab_in(0)
+    await load_and_run(host, "prims2")
+
+    # timer: with en high, FAB_OUT0 toggles exactly every 6 clocks
+    host.set_fab_in(0b0001)
+    await ClockCycles(dut.clk, 10)
+    edges, prev, t = [], fab_out6(dut) & 1, 0
+    while len(edges) < 4 and t < 60:
+        await ClockCycles(dut.clk, 1)
+        t += 1
+        v = fab_out6(dut) & 1
+        if v != prev:
+            edges.append(t)
+        prev = v
+    assert len(edges) == 4, f"tick toggled {len(edges)} times in 60 clk"
+    assert [b - a for a, b in zip(edges, edges[1:])] == [6, 6, 6], f"toggle times {edges}"
+    host.set_fab_in(0)                                   # en low: no more ticks
+    await ClockCycles(dut.clk, 6)
+    held = fab_out6(dut) & 1
+    await ClockCycles(dut.clk, 20)
+    assert fab_out6(dut) & 1 == held
+
+    def shift_state():
+        o = fab_out6(dut)
+        q = ((o >> 4) & 1) | ((o >> 5) & 1) << 1 | (bit(dut.uio_out, 0) << 2) | (bit(dut.uio_out, 1) << 3)
+        return (o >> 2) & 1, (o >> 3) & 1, q            # sout, done, q[3:0]
+
+    host.set_fab_in(0b0010)                              # load 0xA5
+    await ClockCycles(dut.clk, 2)
+    host.set_fab_in(0)
+    await ClockCycles(dut.clk, 6)
+    assert shift_state() == (1, 0, 0x5), f"after load: {shift_state()}"
+    sr = 0xA5
+    for n in range(1, 7):                                # sin = 0
+        host.set_fab_in(0b0100)                          # one step (a 1-clock pulse at the pin)
+        await ClockCycles(dut.clk, 1)
+        host.set_fab_in(0)
+        await ClockCycles(dut.clk, 6)
+        sr >>= 1
+        want = (sr & 1, int(n == 6), sr & 0xF)
+        assert shift_state() == want, f"after step {n}: {shift_state()} != {want}"
+    await host.xfer(tx_simple(Op.STOP))
+    assert parked(dut)
+    await leave_fabric(dut)
+
+
+UART_DIV = 16                                           # tools/compile/examples/uart16.yaml
+
+
+@cocotb.test(skip=not REAL_FABRIC)
+async def test_uart(dut):
+    """The design-set UART on the hard primitives (uart16) through the host interface: bytes
+    written with CH_WRITE leave on FAB_OUT0 as 8N1 frames; frames driven into FAB_IN0 arrive
+    through CH_READ."""
+    host = await reset(dut)
+    host.set_fab_in(1)                                   # RX line idle high
+    await load_and_run(host, "uart16")
+
+    wave = []
+
+    async def record(n):
+        for _ in range(n):
+            await ClockCycles(dut.clk, 1)
+            wave.append(bit(dut.uo_out, 2))
+
+    def decode(w):
+        """8N1 frames in a line sampled once per clock (mid-bit sampling)."""
+        out, i = [], 0
+        while i < len(w) - 10 * UART_DIV:
+            if w[i] == 0:
+                mid = i + UART_DIV // 2
+                assert w[mid] == 0, "start bit too short"
+                out.append(sum(w[mid + (k + 1) * UART_DIV] << k for k in range(8)))
+                assert w[mid + 9 * UART_DIV] == 1, "stop bit"
+                i = mid + 9 * UART_DIV
+            else:
+                i += 1
+        return out
+
+    sent = [0x55, 0x00, 0xC3]
+    rec = cocotb.start_soon(record(40 * UART_DIV + 2000))
+    for b in sent:
+        await host.xfer(tx_ch_write(b))
+    await rec
+    assert decode(wave) == sent
+
+    for b in (0xA5, 0x3C):
+        for level in [0] + [(b >> i) & 1 for i in range(8)] + [1]:
+            host.set_fab_in(level)
+            await ClockCycles(dut.clk, UART_DIV)
+        await ClockCycles(dut.clk, 4 * UART_DIV)
+        assert (await host.status()).rx_valid, f"byte {b:#04x} not received"
+        assert parse_byte(await host.xfer(tx_ch_read())) == b
+    assert parse_byte(await host.xfer(tx_user_status())) & 0x06 == 0   # no overrun, no framing error
+    await host.xfer(tx_simple(Op.STOP))
+    await leave_fabric(dut)

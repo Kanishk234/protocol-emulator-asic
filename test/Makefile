@@ -52,6 +52,7 @@ else ifeq ($(WARP_FABRIC),rtl)
 WARP_TILES ?= $(shell $(CURDIR)/../scripts/fetch_tiles.sh)
 VERILOG_SOURCES += $(MACRO_DIR)/$(FABRIC).v $(wildcard $(MACRO_DIR)/rtl/*.v) $(WARP_TILES)/models_pack.v
 VERILOG_SOURCES += $(foreach p,FABULOUS_LC IOBUF GBUF SYS_RESET,$(WARP_TILES)/primitives/$(p)/fabulous/$(p).v)
+VERILOG_SOURCES += $(wildcard $(CURDIR)/../arch/prims/*.v)   # WARP hard primitives (D-026)
 COMPILE_ARGS += -DWARP_FABRIC_RTL
 else
 VERILOG_SOURCES += $(CURDIR)/fabric_stub.v

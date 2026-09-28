@@ -1,7 +1,7 @@
 {
   "design": "idle",
-  "arch": "warp_g0",
-  "arch_version": "0x0002",
+  "arch": "warp_g1",
+  "arch_version": "0x0003",
   "words": 722,
   "crc32": "0x71F675FC",
   "timing_corner": "nom_slow_1p08V_125C",
@@ -10,11 +10,19 @@
   "utilisation": {
     "FABULOUS_LC": {
       "used": 0,
-      "available": 96
+      "available": 88
     },
     "IOBUF": {
       "used": 13,
       "available": 36
+    },
+    "wp_timer": {
+      "used": 0,
+      "available": 2
+    },
+    "wp_shift": {
+      "used": 0,
+      "available": 2
     },
     "GBUF": {
       "used": 1,

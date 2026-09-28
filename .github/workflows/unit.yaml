@@ -68,6 +68,42 @@ jobs:
             ! grep -q failure results.xml
           done
 
+      - name: WS2812 RTL tests (held-out H1; plain logic and hard primitives)
+        run: |
+          cd protocols/ws2812/test
+          for args in "PRIMS=0" "PRIMS=1"; do
+            rm -f results.xml
+            make $args
+            ! grep -q failure results.xml
+          done
+
+      - name: 1-Wire controller RTL tests (held-out H2; plain logic and hard primitives)
+        run: |
+          cd protocols/onewire/test
+          for args in "PRIMS=0" "PRIMS=1"; do
+            rm -f results.xml
+            make $args
+            ! grep -q failure results.xml
+          done
+
+      - name: SWD host engine RTL tests (held-out H3, with tools/board/swd.py; plain logic and hard primitives)
+        run: |
+          cd protocols/swd/test
+          for args in "PRIMS=0" "PRIMS=1"; do
+            rm -f results.xml
+            make $args
+            ! grep -q failure results.xml
+          done
+
+      - name: CAN 2.0A RTL tests (held-out H4; plain logic and hard primitives)
+        run: |
+          cd protocols/can/test
+          for args in "PRIMS=0" "PRIMS=1"; do
+            rm -f results.xml
+            make $args
+            ! grep -q failure results.xml
+          done
+
       - name: I2C target RTL tests (three bus speeds; plain logic and hard primitives)
         run: |
           cd protocols/i2c_target/test

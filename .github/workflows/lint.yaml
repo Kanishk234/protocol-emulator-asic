@@ -40,7 +40,7 @@ jobs:
         # the designs users compile to bitstreams, with the primitives' simulation wrappers
         run: |
           P="tools/compile/prims/warp_prims_sim.v arch/prims/wp_timer.v arch/prims/wp_shift.v"
-          for spec in uart:uart_top spi_ctrl:spi_ctrl_top i2c_ctrl:i2c_ctrl_top i2c_target:i2c_target_top; do
+          for spec in uart:uart_top spi_ctrl:spi_ctrl_top i2c_ctrl:i2c_ctrl_top i2c_target:i2c_target_top ws2812:ws2812_top onewire:onewire_top swd:swd_top can:can_top; do
             d=${spec%%:*}; top=${spec##*:}
             for p in 0 1; do
               verilator --lint-only -Wall -Wno-DECLFILENAME --top-module $top $P protocols/$d/*.v -GPRIMS=$p

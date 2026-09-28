@@ -120,7 +120,7 @@ jobs:
           source .venv/bin/activate
           export PATH="$PATH:$HOME/oss-cad-suite/bin"
           cd tools
-          python -m compile.protocols -o ../build/protocols --require uart spi_ctrl i2c_ctrl
+          python -m compile.protocols -o ../build/protocols --require uart spi_ctrl i2c_ctrl ws2812 onewire swd
 
       - name: Pin-level suite on the fabric RTL with real bitstreams
         run: |
@@ -130,7 +130,14 @@ jobs:
           make -C test WARP_FABRIC=rtl
           ! grep failure test/results.xml
           grep -q 'test_two_bitstreams' test/results.xml
-          for t in test_prims test_uart test_spi_ctrl test_i2c_ctrl; do grep -q "$t" test/results.xml; done
+          for t in test_prims test_uart test_spi_ctrl test_i2c_ctrl test_ws2812 test_onewire test_swd test_board_loader test_board_examples_spi test_board_examples_i2c test_corrupt_load_over_running_design test_uart_input_phase test_showcase_protocol_switching; do grep -q "$t" test/results.xml; done
+
+      - name: Co-simulation, UART source RTL vs the same design as a bitstream on the fabric
+        run: |
+          source .venv/bin/activate
+          make -C test_internal/cosim
+          ! grep failure test_internal/cosim/results.xml
+          grep -q test_uart_rtl_vs_fabric test_internal/cosim/results.xml
 
       - name: Upload results
         if: success() || failure()

@@ -698,7 +698,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **For the RTL session:** change P-G7 and P-G9 as marked, and check P-G12, P-G20 and P-G22 against the rule text. Lockstep (L2) will then compare the two independently.
 - **Proposal A (P-G15, needs approval): a configuration write restarts the unit.** Any write to a unit's §7.2 block restarts all of the unit's state: TX and RX, the cursor, the tick counter and its prescaler (P8 then counts from the last write), and the sticky LATE / OVERRUN flags. It generalises D-035 J (the PRESC-write restart) to the whole block. It is what the RTL does, and it keeps gate-level simulation free of X once the latches are written. Cost: none in hardware. Model change: the event time counts from the last configuration write, not from reset.
 - **Proposal B (P-G16, needs approval): pin units are live only after the first RUN or STEP.** Until some lane has been RUN or STEPped since reset, no pin unit takes a TX token or loads its producer. Half-written configuration latches can otherwise push X tokens into the fabric at gate level. Cost: one flop. A host-only setup (tokens from HOST_IN straight to a unit, no lane) must RUN an empty lane first; tripc and `tools/host` will do it. The alternative, a host "pins live" bit, costs an address and one more step to forget.
-- **Approval:** the gap answers follow the D-033 precedent (model session, from the model and the RTL's report). Proposals A and B change behaviour and wait for Krithik and Kanishk.
+- **Approval:** A and B approved by Krithik, with Kanishk's agreement, 2026-09-28. `tripsim` implements both: each configuration-word write restarts the unit and clears its sticky flags; units and their producers remain inactive until the first valid RUN or STEP. The host RUN word reports `live` in bit 15.
 
 ## D-042 (2026-09-26): clearing the sticky pin-unit flags (approved 2026-09-27)
 - **Context:** §9 lists sticky flags (OVERRUN, LATE) in the control space, but not how the host clears them (P-G19). The RTL used write-1-to-clear strobes.
@@ -902,6 +902,15 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Evidence plan:** R4 run 7 on `spike/r4-floorplan` (run 6's design, this change only). Accept for `main` (at the switch, with the latch SDC of D-032) only if run 7 shows hold met at sign-off at all corners and `gl_test` passes.
 - **Cost:** none in area; it removes most of ~50K µm² of delay cells. Risk: a real hold failure in silicon if the modelled skew is off by more than the margin; mitigated by the fast corner, the 0.1 ns repair margin, and the sign-off check at 0.10 ns.
 - **Decision:** Krithik + Kanishk (a sign-off assumption, CLAUDE.md: `src/` constraint changes each with an entry).
+
+## D-057 (2026-09-28, proposed): reconcile pin-unit model readings P-G24, P-G25 and P-G28
+- **Context:** model-side review of D-051/D-052 found three differences between the RTL readings and existing `tripsim` behavior. No RTL was inspected during this model review; the comparisons use D-051/D-052, `ARCHITECTURE.md` and the model alone.
+- **P-G24:** the RTL reading says a PULSE phase configured for 0 ticks occupies one clock. `tripsim` schedules both transitions at the same edge and commits the latter, so the phase has no observable duration. This also follows the literal P17 duration (`T1_b·PRESC` / `T2_b·PRESC`); decide whether P17 should explicitly impose a one-clock minimum.
+- **P-G25:** the RTL reading treats CARRIER below 2 clocks as off. `tripsim` currently applies every nonzero carrier and can alternate on periods below 2 clocks. P30 currently says CARRIER > 0 applies; clarify whether the minimum is 2 clocks.
+- **P-G28:** the RTL reading keeps the event generator active in BITSYNC and gives its output priority on a coincident producer load. The model's `PinUnit.compute_rx()` delegates to `BitSync.step()` and returns before the ordinary event generator. P8 does not state a BITSYNC exception; confirm the reading and specify same-clock arbitration.
+- **Proposal:** confirm the three RTL readings and amend P17, P30 and P8 with their minimum-duration, carrier-disable and event-priority rules. Until accepted, keep the behavior question visible and do not change the model to match an unconfirmed reading.
+- **Evidence:** source review only; no new focused tests or mutation checks for these readings yet. Those are prerequisites before D-057 can be accepted.
+- **Decision:** Krithik + Kanishk.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

@@ -21,6 +21,79 @@ Next:
 
 ---
 
+## 2026-09-28: Codex (phase 2: implement approved D-041 A/B)
+Done:
+- Recorded Krithik's approval on behalf of both teammates for D-041 A (every pin-config word write restarts that unit and clears sticky flags) and B (pin units stay inactive until the first valid RUN or STEP) in `docs/DECISIONS.md`.
+- Implemented restart state and `t_cfg` event epoch in `tools/tripsim/pinunit.py`; pin-config writes through the host map now apply the same rule. The RUN readback reports `live` at generated `HOST_RUN_LIVE_BIT`.
+- Gated pin-unit RX/TX compute and commit until `Chip.run()` or an eligible STEP. Updated direct pin-only model fixtures to RUN an empty lane first. Updated P8/H1 in `ARCHITECTURE.md` to record the approved semantics.
+- Added D-041 A/B tests; mutation checks that zeroed `t_cfg` and bypassed live gating both failed their focused tests.
+
+Evidence:
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py`: **45 passed**.
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **64 passed**.
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests -k 'not uart_tx_shift_decoded_by_sigrok'`: **106 passed, 2 deselected**.
+- With sigrok present, high-rate UART decode and CAN sigrok assertions produce empty decoder output despite passing model-side protocol/reference assertions. A protocol-kernel run without the sigrok assertions was started but interrupted before a final result; kernel-suite status remains unverified.
+
+Checklist boxes ticked:
+- None. L2 remains unstarted and no CI run was performed.
+
+Problems / decisions:
+- D-041 A/B are approved and implemented. D-046 host pin-config writes now work while all lanes are halted and trigger A; valid RUN/STEP activates units and the RUN status exposes B.
+- The initial D-044 F5/invalid-select checks and D-045 fetch timing/ignored-write tests remain, but D-044 same-edge config-vs-take and D-045 no-fetch-while-waiting/RPC mutation coverage are still open.
+- D-051–D-055 still need per-reading `test_semantics.py` tests and revert mutations. D-057 records P-G24/P-G25/P-G28 discrepancies as a proposal; no behavior change made for them.
+- Lane/unit counts remain the frozen 3/6. The count-bound test assumptions found in `test_pinregs.py` now use the generated feature list; the team budget decision is still needed before any spec count change.
+- No BUGS entry was added for empty sigrok output because its root cause was not established in this model session.
+
+Next:
+- Complete D-044/D-045 focused tests and mutations; review every P-G24–P-G47 reading in D-051–D-055 and add focused tests/mutations, resolving disagreements through DECISIONS before behavior changes.
+- Obtain the area/count decision, audit count-bound tests, and begin L2 only when all model prerequisites pass.
+
+---
+
+## 2026-09-28: Codex + Krithik (phase 2: L1 checklist)
+Done:
+- Marked Phase 2 exit box 3 (L1 unit tests) complete using the green `unit` workflow on `main` at c2a1c04.
+
+Checklist boxes ticked (evidence):
+- [x] L1 unit tests all green: GitHub Actions `unit` run 36456739733.
+
+Problems / decisions:
+- None.
+
+Next:
+- Run the model-side L2 prerequisites in a session that does not read `src/`; wait for R4 run 7 before deciding the area budget and D-056.
+
+## 2026-09-28: Codex (phase 2: model-side L2 prerequisites)
+Done:
+- Added address-based `Chip.host_read()` / `host_write()` for the approved D-042 flags, D-044 port/DROPPED registers, and D-046 control/status, lane debug, HOST_IN/HOST_OUT, and SRAM map. Address ranges and names come from generated `HOST_MAP`; port source ordering comes from generated `LEGAL_SOURCES`.
+- Made default lane/unit counts derive from the frozen generated fabric and pin feature definitions. Changed `test_pinregs.py` count assumptions to use `PIN_UNIT_FEATURES`.
+- Added focused semantics checks for flag W1C, D-044 F5/same-edge load and clear, out-of-range `sel`, D-046 tagged HOST_IN and lane debug, plus D-045 fetch/EXEC timing and ignored running-lane writes.
+
+Evidence:
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **61 passed**.
+- Full `tools/tripsim/tests`: **103 passed, 2 failed** (the same high-rate UART sigrok cases; 1,000,000 and 921,600 baud).
+- Mutation checks: forcing D-042 reads to zero failed `test_d042_unit_flags_are_readable_and_write_one_to_clear`; inverting the D-044 F5 sequence snapshot failed `test_d044_host_port_map_f5_and_dropped_clear`.
+- Full `tools/tripsim/tests`: **102 passed, 2 failed** in high-rate UART TX sigrok cases (1,000,000 and 921,600 baud, sigrok decoded no bytes); failure reproduced in isolation. Root cause not established, so no BUGS entry or claim that this was pre-existing.
+
+Checklist boxes ticked:
+- None. L2 has not started; this session did not establish the required million-clock lockstep or injection evidence.
+
+Problems / decisions:
+- D-044 readings are consistent with model behavior: source `seq` is snapshotted when the host writes the port, an out-of-list `sel` resolves to no source, and config takes precedence because the host configuration is applied before the model's next fabric edge. F5 and invalid `sel` have focused tests; the config/take case still needs a precise same-edge model test and mutation.
+- D-045 readings are consistent with the model's registered SRAM rotation and pipeline; focused tests cover fetch-to-EVAL/EXEC and ignored STEP/host writes while running. Mutation coverage is still needed.
+- D-051–D-055 readings have not yet each been reviewed and pinned by new `test_semantics.py` tests/mutations. Do not count this prerequisite complete. P-G24, P-G25 and P-G28 were checked in source and recorded in D-057, but still lack focused test/mutation evidence.
+- D-057 now records three concrete proposed clarifications from the review: P-G24 zero-tick duration, P-G25 sub-2-clock carrier, and P-G28 BITSYNC event generation/priority. No model behavior was changed for these unresolved comparisons.
+- D-041 A/B remain pending. The exact missing decision is Krithik and Kanishk's approval or rejection of: **A**, any write to a pin-unit config word restarts TX/RX/cursor/tick/prescaler and clears sticky flags; **B**, pin units and their producers remain inactive until the first RUN or STEP, including STEP setting `live`.
+- Lane/unit spec counts remain 3/6. The team area/budget result (including the pending R4 run 7 / D-056 decision) is still needed before changing those frozen counts. Dynamic count handling is in place; the requested seven count-bound `test_pinregs` cases were not identified in this checkout and remain to audit against the settled budget.
+- `host_read`/`host_write` model the register map, not SPI bit timing. Slot/K and owner writes plus packed channel debug readback are now covered. Pin-config writes still await D-041 A/B so their restart/live semantics are not guessed; full D-046 map support is therefore incomplete.
+
+Next:
+- Finish the D-046 host address paths and add focused D-044 configuration-vs-take coverage.
+- Review every P-G24–P-G47 model reading in D-051–D-055, add one semantics test and a revert mutation per rule, and record disagreements as proposed DECISIONS/spec changes before changing model semantics.
+- Obtain D-041 A/B and area/count decisions, finish count-bound tests, then begin L2 lockstep only after all prerequisites pass.
+
+---
+
 ## 2026-09-28 (later): Krithik + Claude (phase 2: R4 run 6 result; count-generic tests; milestone B3)
 Done:
 - **R4 run 6** (gds 36384571157, the real `trw_chip` at the protocol floor): GPL 56.1 %, **global-routing overflow 5,350** (Metal3 87.3 %), detailed routing 16 violations after 64 iterations in 4 h 53 min, then cancelled by GitHub's 6 h limit in the antenna re-route; no artifacts. Read from the job log. `R4_FLOORPLAN.md` §12, AREA, D-043. The floor as built does not harden inside the TT `gds` job (a local hardening would not count: every entry uses the same workflow).

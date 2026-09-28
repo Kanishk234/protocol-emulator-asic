@@ -117,3 +117,11 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** building `tools/compile/examples/hostecho` (nextpnr packing).
 - **Now covered by:** `opt_merge -share_all t:LUT1 t:LUT2 t:LUT3 t:LUT4` (plain LUTs only); `hostecho` is a committed test bitstream, rebuilt and checked by the `fabric` workflow.
 - **Fix:** `tools/compile/compile.py` synthesis script.
+
+## 15: Placement failed with free logic cells: too many clock-enable nets for the tiles
+- **Date:** 2026-09-27
+- **Symptom:** the I2C controller on G1 needed 78 of 88 LCs but nextpnr found no legal placement (`Unable to find legal placement for cell ... FABULOUS_LC`), for every seed. On G0, the SPI controller (95 of 96) failed the same way.
+- **Root cause:** the 8 LCs of a `LUT4x8_ha` tile share one clock-enable and one set/reset wire (`J_EN`, `J_SR` in the tile's switch matrix). Yosys mapped every enable it found onto the flip-flops (`-complex-dff`), so the I2C controller had 12 distinct enable/reset pairs, most of them used by a single flip-flop, for 11 LUT tiles. Each pair needs a tile of its own, whatever the LC count says.
+- **Caught by:** `python -m compile.protocols` on G1 (place and route), then counting the flip-flops' (E, R) nets in the synthesized netlist.
+- **Now covered by:** the compile flow runs `dfflegalize -mince 4 -minsrst 4` between `synth_fabulous`'s stages (`MIN_CTRL` in `tools/compile/compile.py`): an enable or synchronous reset used by fewer than 4 flip-flops becomes LUT logic. The same designs also got smaller (uart 37 → 29 LCs, spi_ctrl 51 → 47, i2c_ctrl places at 70; thresholds 2, 4 and 8 compared, `docs/reports/g1_results.md`). The protocol fit tables are the regression check.
+- **Fix:** `tools/compile/compile.py` synthesis script. Consequence for architecture work: LC count alone is not capacity on this tile; the number of control sets is a second limit (phase 3 input).

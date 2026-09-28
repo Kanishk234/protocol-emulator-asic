@@ -4,6 +4,19 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-27 (session 8: G0 chip green in CI; G1 primitives usable; UART, SPI, I2C controller fit G1)
+**Done:**
+- **G0 chip in CI, all green** (e5b1f98): `gds` + precheck + `gl_test` 17/17 in 36353540402 (45.8 min; setup +10.63 ns, hold +0.121 ns, DRC/LVS/antenna 0, IR drop 0.77 mV); lint, unit, test, docs, formal, fabric green. D-025 evidence and the hardening table updated.
+- **G1 hard primitives** (D-026): `wp_timer`, `wp_shift` (`arch/prims/`), proven equal to a spec model (F4, `formal/f4_prims.sby`, k-induction), white-box tested against `tools/refmodels/prims.py`; primitive tile `PRIM2T2S` hardened at 0.97 × a LUT tile; G1 fabric stitched (`macro/warp_g1`, same size and ports as G0, KLayout DRC 0, antenna 0).
+- **Compile flow support:** `WP_TIMER`/`WP_SHIFT` wrappers and BEL cell library (`tools/compile/prims/`), mapped, placed and configured (`examples/prims2`: RELOAD and LEN bits in the FASM, accepted by bitgen). `compile.protocols` takes `--arch`, `--only`, `--set`.
+- **BUGS #15:** placement failed with free LCs because each LUT tile has one clock enable and one set/reset; the flow now turns enables/resets used by < 4 flip-flops into logic (`dfflegalize -mince/-minsrst`). Every design got smaller.
+- **Protocols on the primitives** (`PRIMS=1`; plain form kept): UART, SPI controller, I2C controller rewritten; all RTL tests pass in both forms (UART DIV 16/13/5 + sigrok, SPI 4 modes × 2 speeds, I2C Q 2/4/5). I2C controller also lost its own synchronizers (ARCHITECTURE §6) and three wait states. Unit CI runs the `PRIMS=1` configurations.
+- **Results:** G1 places UART 29, SPI 47, I2C controller 70 of 88 LCs (69–124 MHz slow corner); G0 places only SPI (86/96). `docs/reports/g1_results.md`, `g0_results.md` rewritten.
+**Boxes ticked:** full 6x4 hardening of shell + G0 (CI 36353540402); protocols compiled onto G0 (`g0_results.md`).
+**Next:** G1 into the chip (arch/CURRENT, top, black box, stub/settle files, config.json with a DECISIONS entry, test bitstreams incl. a primitives design and UART through the host channel, F1), local pre-flight, then one CI hardening. Then the I2C target.
+
+---
+
 ## 2026-09-27 (session 7: phase 2 started: shell, compile flow, real bitstreams)
 **Done:**
 - **Shell** (ARCHITECTURE §2–6): `wp_spi_target`, `wp_shell` (commands, checked loader, run control, 2-entry host channel FIFOs), `wp_crc32` (bit-serial), `wp_fifo`, `wp_sync`; new top-level pinout; FABulous's bit-bang receiver removed. Spec clarifications D-021.

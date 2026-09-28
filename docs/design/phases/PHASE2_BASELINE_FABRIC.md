@@ -19,12 +19,12 @@
 - [x] The host rejects bitstreams built for a different architecture version. (`checked_load_transactions` + `test_host_refuses_other_architecture`; the shell too: `test_wrong_arch_version`)
 
 ### Integration and physical
-- [ ] Full 6x4 hardening of shell + G0 passes precheck; record area breakdown, routing overflow, and timing at the chosen clock.
+- [x] Full 6x4 hardening of shell + G0 passes precheck; record area breakdown, routing overflow, and timing at the chosen clock. (CI 36353540402 on e5b1f98: `gds` 45.8 min, precheck pass, `gl_test` 17/17; fabric macro 1016.64 × 669.06 µm, shell 3,901 cells / 59,951 µm²; local pre-flight global-routing overflow 23 after D-025, CI detailed routing 0 DRC; setup WS +10.63 ns at 50 MHz, hold +0.121 ns; PHYSICAL_DESIGN_AND_CI hardening table)
 - [ ] Timing model for place and route derived from the implemented device (or a documented conservative model).
 - [x] `gl_test` loads at least two different real bitstreams into the gate-level netlist and checks behavior. (CI 36342012141 on acc3af3: `test_counter4`, `test_logic4`, `test_two_bitstreams` pass on the hardened chip netlist with the 16-LUT macro's gate-level netlists; redo with G0/G1)
 
 ### Protocols on G0
-- [ ] Compile all design-set protocols onto G0. For each: fits or not, resources, achieved timing. Report in `docs/reports/g0_results.md`.
+- [x] Compile all design-set protocols onto G0. For each: fits or not, resources, achieved timing. Report in `docs/reports/g0_results.md`. (local, `python -m compile.protocols --arch arch/warp_g0 --set PRIMS=0`, 2026-09-27: SPI fits (86 LCs, 68.0 MHz), UART 124, I2C controller 115, I2C target 205 do not; G1 numbers in `docs/reports/g1_results.md`)
 - [ ] Pin-level tests (top-level ports only) for each protocol that fits, loaded through the host interface.
 - [ ] Add the `fabric` CI workflow: compile every protocol and run it on the fabric simulation. (Partly: `fabric` job `warp_fabric` compiles the example designs and runs them on the fabric RTL, CI 36342012182; protocols need G0's host-channel IO)
 

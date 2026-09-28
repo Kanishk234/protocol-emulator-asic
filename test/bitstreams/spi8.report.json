@@ -1,27 +1,27 @@
 {
-  "design": "hostecho",
+  "design": "spi_ctrl_top",
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0x83AA41B6",
+  "crc32": "0x6CA1538F",
   "timing_corner": "nom_slow_1p08V_125C",
-  "fmax_mhz": 143.88,
+  "fmax_mhz": 83.23,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {
-      "used": 23,
+      "used": 47,
       "available": 88
     },
     "wp_timer": {
-      "used": 0,
+      "used": 1,
       "available": 2
     },
     "wp_shift": {
-      "used": 0,
+      "used": 1,
       "available": 2
     },
     "IOBUF": {
-      "used": 13,
+      "used": 17,
       "available": 36
     },
     "GBUF": {
@@ -39,6 +39,18 @@
     },
     "rst_n": {
       "i": "rst_n"
+    },
+    "FAB_OUT0": {
+      "o": "sck_o"
+    },
+    "FAB_OUT1": {
+      "o": "mosi_o"
+    },
+    "FAB_OUT2": {
+      "o": "cs_n_o"
+    },
+    "FAB_IN0": {
+      "i": "miso_i"
     },
     "h_wdata[0]": {
       "i": "h_wdata[0]"
@@ -126,13 +138,14 @@
     },
     "h_status[7]": {
       "oe": "h_status[7]"
-    },
-    "h_attention": {
-      "o": "h_attention"
     }
   },
   "unmapped_inputs_tied_0": [],
-  "unmapped_outputs_open": [],
+  "unmapped_outputs_open": [
+    "out_oe[0]",
+    "out_oe[1]",
+    "out_oe[2]"
+  ],
   "tools": {
     "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
     "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)",

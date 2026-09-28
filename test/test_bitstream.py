@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 
 import cocotb
-from cocotb.triggers import ClockCycles, Timer
+from cocotb.triggers import ClockCycles, RisingEdge, Timer
 
 from warp_host import bit, expect, parked, reset
 from compile.bitfile import BitFile
@@ -293,5 +293,119 @@ async def test_uart(dut):
         assert (await host.status()).rx_valid, f"byte {b:#04x} not received"
         assert parse_byte(await host.xfer(tx_ch_read())) == b
     assert parse_byte(await host.xfer(tx_user_status())) & 0x06 == 0   # no overrun, no framing error
+    await host.xfer(tx_simple(Op.STOP))
+    await leave_fabric(dut)
+
+
+async def ch_send(host, byte, last=False):
+    """CH_WRITE once the shell's host->design FIFO has room."""
+    for _ in range(200):
+        if (await host.status()).tx_ready:
+            await host.xfer(tx_ch_write(byte, last=last))
+            return
+    raise AssertionError(f"host channel never ready for {byte:#04x}")
+
+
+async def ch_recv(host):
+    """CH_READ once the design has put a byte in the design->host FIFO."""
+    for _ in range(400):
+        if (await host.status()).rx_valid:
+            return parse_byte(await host.xfer(tx_ch_read()))
+    raise AssertionError("no byte from the design")
+
+
+@cocotb.test(skip=not REAL_FABRIC)
+async def test_spi_ctrl(dut):
+    """The design-set SPI controller on the hard primitives (spi8, mode 0) through the host
+    interface, against the reference SPI target (tools/refmodels/spi.py) on the pins: the
+    target receives the bytes the host wrote, and the host reads back the target's replies."""
+    from refmodels.spi import Target
+    host = await reset(dut)
+    host.set_fab_in(1)                                   # MISO idle high
+    await load_and_run(host, "spi8")
+    tgt = Target(cpol=0, cpha=0, responses=[0xC3, 0x3C, 0x81])
+    stop = False
+
+    async def bench():
+        while not stop:
+            await RisingEdge(dut.clk)
+            o = int(dut.uo_out.value)
+            sck, mosi, cs_n = (o >> 2) & 1, (o >> 3) & 1, (o >> 4) & 1
+            host.set_fab_in(tgt.step(cs_n, sck, mosi))
+
+    b = cocotb.start_soon(bench())
+    sent = [0xA5, 0x5A, 0xF0]
+    for i, byte in enumerate(sent):
+        await ch_send(host, byte, last=(i == len(sent) - 1))
+    got = [await ch_recv(host) for _ in sent]
+    await ClockCycles(dut.clk, 40)                       # CS released, end gap
+    stop = True
+    await b
+    assert tgt.transactions == [sent], f"target saw {tgt.transactions}"
+    assert got == [0xC3, 0x3C, 0x81], f"host read {[hex(g) for g in got]}"
+    assert (int(dut.uo_out.value) >> 4) & 1 == 1, "CS_N released after the last byte"
+    await host.xfer(tx_simple(Op.STOP))
+    await leave_fabric(dut)
+
+
+@cocotb.test(skip=not REAL_FABRIC)
+async def test_i2c_ctrl(dut):
+    """The design-set I2C controller on the hard primitives (i2c8) through the host interface,
+    on an open-drain bus (wired-AND of the chip's output enables and the reference register-map
+    target, tools/refmodels/i2c.py): write a register, read it back through a repeated START,
+    and see an unknown address NACKed."""
+    from refmodels.i2c import Target, wired_and
+    START, WRITE, READ_NACK, STOP = 0x00, 0x40, 0x81, 0xC0
+    host = await reset(dut)
+    dut.uio_in.value = 0b11                              # both lines pulled up
+    await load_and_run(host, "i2c8")
+    tgt = Target(0x42)
+    stop = False
+
+    async def bench():
+        drive = (1, 1)
+        while not stop:
+            await RisingEdge(dut.clk)
+            oe = int(dut.uio_oe.value)
+            sda = wired_and(1 - (oe & 1), drive[0])
+            scl = wired_and(1 - ((oe >> 1) & 1), drive[1])
+            drive = tgt.step(sda, scl)
+            dut.uio_in.value = sda | scl << 1
+
+    b = cocotb.start_soon(bench())
+
+    async def cmd(*bytes_):
+        for x in bytes_:
+            await ch_send(host, x)
+
+    await cmd(START, WRITE, 0x42 << 1)                   # address, write
+    assert await ch_recv(host) == 0x00, "address not ACKed"
+    await cmd(WRITE, 0x03)                               # register pointer
+    assert await ch_recv(host) == 0x00
+    await cmd(WRITE, 0x5A)                               # data
+    assert await ch_recv(host) == 0x00
+    await cmd(STOP)
+    await ClockCycles(dut.clk, 200)
+    assert tgt.regs.get(3) == 0x5A, f"target registers {tgt.regs}"
+
+    await cmd(START, WRITE, 0x42 << 1)
+    assert await ch_recv(host) == 0x00
+    await cmd(WRITE, 0x03)
+    assert await ch_recv(host) == 0x00
+    await cmd(START, WRITE, 0x42 << 1 | 1)               # repeated START, read
+    assert await ch_recv(host) == 0x00
+    await cmd(READ_NACK)
+    assert await ch_recv(host) == 0x5A, "read back"
+    await cmd(STOP)
+
+    await cmd(START, WRITE, 0x50 << 1)                   # nobody there
+    assert await ch_recv(host) == 0x01, "unknown address must be NACKed"
+    await cmd(STOP)
+    await ClockCycles(dut.clk, 200)
+    status = parse_byte(await host.xfer(tx_user_status()))
+    assert status & 0x0C == 0, f"err/overrun set: {status:#04x}"
+    assert status & 0x01 == 0, "bus released after STOP"
+    stop = True
+    await b
     await host.xfer(tx_simple(Op.STOP))
     await leave_fabric(dut)

@@ -1,27 +1,27 @@
 {
-  "design": "hostecho",
+  "design": "i2c_ctrl_top",
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0x83AA41B6",
+  "crc32": "0x4CF79D42",
   "timing_corner": "nom_slow_1p08V_125C",
-  "fmax_mhz": 143.88,
+  "fmax_mhz": 58.01,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {
-      "used": 23,
+      "used": 70,
       "available": 88
     },
     "wp_timer": {
-      "used": 0,
+      "used": 1,
       "available": 2
     },
     "wp_shift": {
-      "used": 0,
+      "used": 1,
       "available": 2
     },
     "IOBUF": {
-      "used": 13,
+      "used": 15,
       "available": 36
     },
     "GBUF": {
@@ -39,6 +39,14 @@
     },
     "rst_n": {
       "i": "rst_n"
+    },
+    "FAB_IO0": {
+      "i": "sda_i",
+      "oe": "sda_oe"
+    },
+    "FAB_IO1": {
+      "i": "scl_i",
+      "oe": "scl_oe"
     },
     "h_wdata[0]": {
       "i": "h_wdata[0]"
@@ -126,13 +134,13 @@
     },
     "h_status[7]": {
       "oe": "h_status[7]"
-    },
-    "h_attention": {
-      "o": "h_attention"
     }
   },
   "unmapped_inputs_tied_0": [],
-  "unmapped_outputs_open": [],
+  "unmapped_outputs_open": [
+    "out_o[0]",
+    "out_o[1]"
+  ],
   "tools": {
     "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
     "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)",

@@ -12,10 +12,6 @@
       "used": 4,
       "available": 88
     },
-    "IOBUF": {
-      "used": 12,
-      "available": 36
-    },
     "wp_timer": {
       "used": 0,
       "available": 2
@@ -23,6 +19,10 @@
     "wp_shift": {
       "used": 0,
       "available": 2
+    },
+    "IOBUF": {
+      "used": 12,
+      "available": 36
     },
     "GBUF": {
       "used": 1,
@@ -76,7 +76,7 @@
   "unmapped_outputs_open": [],
   "tools": {
     "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
-    "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.10-82-g2b560ad0)",
+    "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)",
     "bitgen": "tools/compile/bitgen.py"
   }
 }

@@ -1,0 +1,14 @@
+# Test bitstream (test/test_bitstream.py::test_i2c_ctrl): the design-set I2C controller on the
+# hard primitives, Q = 8 (SCL phases of 16 clocks), open drain on FAB_IO0 (SDA) and FAB_IO1 (SCL).
+sources: [../../../protocols/i2c_ctrl/i2c_ctrl_top.v]
+top: i2c_ctrl_top
+params:
+  Q: 8
+  PRIMS: 1
+pins:
+  clk: clk
+  rst_n: rst_n
+  sda_i: FAB_IO0.i
+  sda_oe: FAB_IO0.oe
+  scl_i: FAB_IO1.i
+  scl_oe: FAB_IO1.oe

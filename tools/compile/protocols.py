@@ -22,6 +22,8 @@ def main(argv=None):
     ap.add_argument("-o", "--out", default=str(ROOT / "build" / "protocols"))
     ap.add_argument("--arch", default=str(current_arch()))
     ap.add_argument("--only", nargs="*", help="protocol names (default: all)")
+    ap.add_argument("--require", nargs="*", default=[], metavar="NAME",
+                    help="exit 1 unless these protocols place and route (CI: the fallback set)")
     ap.add_argument("--set", nargs="*", default=[], metavar="NAME=VALUE",
                     help="override a parameter of every design (e.g. PRIMS=0 for a fabric without primitives)")
     a = ap.parse_args(argv)
@@ -63,7 +65,12 @@ def main(argv=None):
     for n, r in rows.items():
         if not r["fits"]:
             print(f"{n}: {r['error']}")
+    missing = [n for n in a.require if not rows.get(n, {}).get("fits")]
+    if missing:
+        print(f"error: required protocols do not fit {meta['name']}: {', '.join(missing)}")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

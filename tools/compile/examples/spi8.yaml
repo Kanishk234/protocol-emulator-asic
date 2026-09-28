@@ -1,0 +1,17 @@
+# Test bitstream (test/test_bitstream.py::test_spi_ctrl): the design-set SPI controller on the
+# hard primitives, mode 0, SCK half period 8 clocks (MISO's round trip through the shell's
+# output register and input synchronizer stays well inside a half period).
+sources: [../../../protocols/spi_ctrl/spi_ctrl_top.v]
+top: spi_ctrl_top
+params:
+  CPOL: 0
+  CPHA: 0
+  HALF: 8
+  PRIMS: 1
+pins:
+  clk: clk
+  rst_n: rst_n
+  sck_o: FAB_OUT0
+  mosi_o: FAB_OUT1
+  cs_n_o: FAB_OUT2
+  miso_i: FAB_IN0

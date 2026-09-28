@@ -49,7 +49,16 @@ class CompileError(Exception):
     pass
 
 
+NEXTPNR_TAG = "2026-09-27"   # D-028: nextpnr from this OSS CAD Suite (primitive timing arcs)
+
+
 def tool(name):
+    if name == "nextpnr-generic":
+        np = Path(os.environ.get("WARP_NEXTPNR") or
+                  Path.home() / ".cache" / "warp" / f"ocs-{NEXTPNR_TAG}" / "oss-cad-suite" / "bin" / name)
+        if not np.exists():
+            raise CompileError(f"{np} not found: run scripts/fetch_nextpnr.sh (D-028)")
+        return str(np)
     path = shutil.which(name)
     if not path:
         oss = Path.home() / "oss-cad-suite" / "bin" / name
@@ -354,6 +363,9 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None):
     spec = yaml.safe_load(Path(pins_file).read_text())
     top = spec["top"]
     fab = (ROOT / meta["macro"] / "fabulous").resolve()
+    if meta.get("primitives") and not (fab / ".FABulous" / "placement_estimate.txt").exists():
+        raise CompileError(f"{fab}/.FABulous/placement_estimate.txt missing: without it paths through "
+                           "the hard primitives are not timed (scripts/gen_prim_timing.py, BUGS #17)")
     tiles = Path(os.environ.get("WARP_TILES") or subprocess.check_output(
         [str(ROOT / "scripts" / "fetch_tiles.sh")], text=True).strip())
     prim = tiles / "primitives"

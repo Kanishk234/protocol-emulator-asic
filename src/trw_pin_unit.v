@@ -3,8 +3,8 @@
 // fabric (§4); the configuration block is trw_pin_cfg.v.
 //
 // FULL = 1 is U0-U1, FULL = 0 is U2-U5 (D-040). Both have the lean feature set (milestone A). FULL adds
-// PULSE and the carrier in the TX half (milestone B1) and the BITSYNC engine trw_pin_bs.v (milestone B2/B3,
-// in progress), which owns takes, pin A and loads while TXMODE and RXMODE are both `bitsync`.
+// PULSE and the carrier in the TX half (milestone B1) and the BITSYNC engine trw_pin_bs.v (milestone B2 done,
+// B3 in progress), which owns takes, pin A and loads while TXMODE and RXMODE are both `bitsync`.
 //
 // Timing contract:
 //   - `cfg` is static while running (written while halted, §14 H1). `restart` (clock after a write to
@@ -99,6 +99,7 @@ module trw_pin_unit #(
     wire [15:0] crc_poly   = cfg[`TRW_PC_CRC_POLY_MSB:`TRW_PC_CRC_POLY_LSB];
     wire [15:0] crc_init   = cfg[`TRW_PC_CRC_INIT_MSB:`TRW_PC_CRC_INIT_LSB];
     wire [15:0] crc_res    = cfg[`TRW_PC_CRC_RES_MSB:`TRW_PC_CRC_RES_LSB];
+    wire [15:0] crc_xor    = cfg[`TRW_PC_CRC_XOR_MSB:`TRW_PC_CRC_XOR_LSB];
     wire        bs_on      = (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
                                          && (rxmode == `TRW_PCE_RXMODE_BITSYNC);
     // PIN_N only matters to the pad owner mux (trw_pins.v), which reads it from the same block.
@@ -129,8 +130,9 @@ module trw_pin_unit #(
         .rxset (rxset), .rxset_n (rxset_n), .smp (smp), .late_set (late_t)
     );
 
-    // B2a: pin A stays recessive (IDLE) in BITSYNC until the engine's TX queue exists (B2c)
-    wire lvl  = bs_on ? idle : lvl_t;
+    // In BITSYNC the engine drives pin A (B2c); the RX half's echo flag belongs to the other modes
+    wire lvl_b;
+    wire lvl  = bs_on ? lvl_b : lvl_t;
     wire echo = bs_on ? 1'b0 : echo_t;
 
     // ------------------------------------------------------------------ RX half
@@ -159,22 +161,24 @@ module trw_pin_unit #(
         if (FULL != 0) begin : g_bs
             trw_pin_bs u_bs (
                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .active (bs_on),
-                .idle (idle), .order (order), .period (period), .sampleofs (sampleofs), .sjw (sjw),
+                .idle (idle), .order (order), .tx_lentok (tx_lentok), .period (period),
+                .sampleofs (sampleofs), .sjw (sjw),
                 .idle_bits (idle_bits), .resync_both (resync), .nbits (nbits), .rx_nbits (rx_nbits),
                 .stuff_n (stuff_n), .stuff_lvl (stuff_lvl), .crc_width (crc_width), .crc_skip (crc_skip),
-                .crc_poly (crc_poly), .crc_init (crc_init), .crc_res (crc_res),
+                .crc_poly (crc_poly), .crc_init (crc_init), .crc_res (crc_res), .crc_xor (crc_xor),
                 .a_in (a_in), .a_prev (a_prev),
                 .tx_avail (tx_avail && bs_on), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (take_b),
                 .late_set (late_b),
                 .rx_free (rx_free && !load_h), .rx_load (load_b), .rx_tag (tag_b), .rx_data (data_b),
-                .ovr_set (ovr_b), .bus_idle (bs_idle), .in_frame (bs_frame), .bnd (bs_bnd), .smp (bs_smp)
+                .ovr_set (ovr_b), .tx_lvl (lvl_b),
+                .bus_idle (bs_idle), .in_frame (bs_frame), .bnd (bs_bnd), .smp (bs_smp)
             );
         end else begin : g_nobs
             assign load_b = 1'b0;  assign ovr_b = 1'b0;  assign tag_b = 2'd0;  assign data_b = 16'd0;
             assign bs_idle = 1'b0;  assign bs_frame = 1'b0;  assign bs_bnd = 1'b0;  assign bs_smp = 1'b0;
-            assign take_b = 1'b0;  assign late_b = 1'b0;
+            assign take_b = 1'b0;  assign late_b = 1'b0;  assign lvl_b = 1'b0;
             wire _unused_bs = &{1'b0, sjw, idle_bits, resync, stuff_n, stuff_lvl, crc_width, crc_skip,
-                                crc_poly, crc_init, crc_res};
+                                crc_poly, crc_init, crc_res, crc_xor};
         end
     endgenerate
     assign rx_load = load_h || load_b;
@@ -182,7 +186,7 @@ module trw_pin_unit #(
     assign rx_data = load_h ? data_h : data_b;
     assign ovr_set = ovr_h || ovr_b;
 
-    // In BITSYNC the engine takes (RX commands so far; its TX queue comes with B2c)
+    // In BITSYNC the engine takes every token (RX commands at once, TX tokens into its queue)
     assign tx_take  = bs_on ? take_b : take_t;
     wire   late_set = late_t || late_b;
 

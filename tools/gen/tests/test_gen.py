@@ -72,9 +72,13 @@ def test_validation_catches(label, mutate):
 
 
 def test_legal_sources_expand_per_lane():
+    """L(k+1) and L(k-1) wrap around the spec's lane count; U* and L* expand to every unit and lane."""
+    n, u = SPEC["fabric"]["lanes"], SPEC["fabric"]["units"]
     ls = gen.legal_sources(SPEC["fabric"])
-    assert ls["L0.I1"][-2:] == ("L1.O0", "L2.O1") and ls["L2.I1"][-2:] == ("L0.O0", "L1.O1")
-    assert len(ls["L1.I1"]) == 9 and max(len(v) for k, v in ls.items() if not k.endswith("I1")) == 8
+    for k in range(n):
+        assert ls[f"L{k}.I1"][-2:] == (f"L{(k + 1) % n}.O0", f"L{(k - 1) % n}.O1")
+        assert len(ls[f"L{k}.I1"]) == u + 3 and len(ls[f"L{k}.I0"]) == u + 2
+    assert len(ls["U0.tx"]) == 2 * n + 1 and len(ls["HOST_OUT"]) == 2 * n + 2
 
 
 def test_a_spec_change_reaches_every_output():
@@ -172,10 +176,11 @@ def test_fabric_verilog_follows_the_legal_sources():
 
 
 def test_fabric_verilog_follows_the_lane_count():
-    """Two lanes (the D-043 fallback) in the spec give a 2-lane fabric: 11 producers, 11 ports."""
+    """Two lanes (the D-043 fallback) in the spec give a 2-lane fabric: units + 5 producers and ports."""
     s = broken(lambda s: s["fabric"].__setitem__("lanes", 2))
     v = gen.gen_fabric_verilog(s)
-    assert "input  wire [10:0] p_valid," in v and "input  wire [10:0] take," in v
+    n = s["fabric"]["units"] + 5 - 1
+    assert f"input  wire [{n}:0] p_valid," in v and f"input  wire [{n}:0] take," in v
     assert "L2." not in v
 
 

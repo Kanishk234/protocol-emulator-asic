@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # L7-style mutation check of the pin unit: each mutant is one injected bug in a copy of src/; the L1
-# suite must fail on every one. Usage (in the venv): test_internal/pin/mutate.sh
+# suite must fail on every one. Usage (in the venv): [FULL=1] [ONLY=<text>] test_internal/pin/mutate.sh
+# (the milestone B mutants, labelled "B1:", need FULL=1: FULL=1 ONLY=B1 test_internal/pin/mutate.sh)
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 WORK="$(mktemp -d)"
 # file # sed expression # what it breaks
 MUTANTS=(
-  "trw_pin_tx.v#s/(tail \&\& (bt_i <= 16'd1))/(tail \&\& (bt_i == 16'd0))/#P3: take one clock late after a shift"
+  "trw_pin_tx.v#s/(!m_pulse \&\& tail \&\& (bt_i <= 16'd1))/(!m_pulse \&\& tail \&\& (bt_i == 16'd0))/#P3: take one clock late after a shift"
   "trw_pin_tx.v#s/assign late_set = tk_late/assign late_set = 1'b0 \&\& tk_late/#P4: LATE never set"
   "trw_pin_tx.v#s/wire \[FRAC-1:0\] p_frac = tk_late ? {FRAC{1'b0}} : cf_b;/wire [FRAC-1:0] p_frac = {FRAC{1'b0}};/#P4: cursor fraction dropped"
   "trw_pin_rx.v#s/wire taint = ftaint_b || echo;/wire taint = ftaint_b;/#P13: echo taint ignored"
@@ -23,17 +24,26 @@ MUTANTS=(
   "trw_pin_rx.v#s/    wire        evr      = ev \&\& ev_reset;/    wire        evr      = 1'b0;/; s/    wire rst_fr = !sel || rxset; /    wire rst_fr = !sel || rxset || (ev \&\& ev_reset); /#P38: EV_RESET after the event clock's sample"
   "trw_pin_tx.v#s/    wire linked  = m_shift \&\& ((tx_edge == \`TRW_PCE_TX_EDGE_RISE) || (tx_edge == \`TRW_PCE_TX_EDGE_FALL));/    wire linked  = m_shift \&\& (tx_edge != 2'd0);/#P43: TX_EDGE 3 acts as linked"
   "trw_pin_tx.v#s/                else if (lk_idle || (lk_edge/                else if (due_lvl_v || lk_idle || (lk_edge/#P44: a LEVEL cancels the pending return to IDLE"
+  "trw_pin_tx.v#s/    wire d_hi_v = (s_bit || lk_bit) ? bit_o : pb1 ? pl_first : pb2 ? !pl_first : (ph ? !idle : idle);/    wire d_hi_v = (s_bit || lk_bit) ? bit_o : pb1 ? pl_first : pb2 ? pl_first : (ph ? !idle : idle);/#B1: P17 PULSE second level not inverted"
+  "trw_pin_tx.v#s/                    ps    <= (p_tn == 12'd0) ? 8'd0 : presc;/                    ps    <= 8'd0;/#B1: P17 PULSE phases ignore PRESC"
+  "trw_pin_tx.v#s/                || (p_tail \&\& (pt == 12'd0) \&\& (ps <= 8'd1)) || (p_lastb \&\& p_t2one);/                ;/#B1: P17 back-to-back PULSE tokens leave a gap"
+  "trw_pin_tx.v#s/            end else if (!lvx) begin/            end else if (1'b0) begin/#B1: P30 carrier phase does not restart"
+  "trw_pin_tx.v#s/                ct  <= ct + {1'b0, carrier} - 25'd512;/                ct  <= {ct[24:9], 9'd0} + {1'b0, carrier} - 25'd512;/#B1: P30 carrier fraction dropped"
+  "trw_pin_tx.v#s/    wire m_pulse = (FULL != 0) \&\& (txmode == \`TRW_PCE_TXMODE_PULSE);/    wire m_pulse = (txmode == \`TRW_PCE_TXMODE_PULSE);/#B1: D-040 a lean unit runs PULSE"
 )
 killed=0
+survived=0
 for m in "${MUTANTS[@]}"; do
   IFS="#" read -r file expr what <<< "$m"
-  [ -n "${ONLY:-}" ] && [[ "$what" != *"$ONLY"* ]] && continue      # ONLY=<text>: just the matching mutants
+  [ -n "${ONLY:-}" ] && [[ "$what" != *"$ONLY"* ]] && continue
+  # milestone B feature mutants need the full build; the D-040 fallback mutant needs the lean one
+  if [ "${FULL:-0}" = 1 ]; then [[ "$what" == "B1: D-040"* ]] && continue; else [[ "$what" == "B1: P"* ]] && continue; fi      # ONLY=<text>: just the matching mutants
   rm -rf "$WORK/src"; cp -r "$ROOT/src" "$WORK/src"
   sed -i "$expr" "$WORK/src/$file"
   if cmp -s "$ROOT/src/$file" "$WORK/src/$file"; then echo "NOT APPLIED: $what"; continue; fi
-  (cd "$HERE" && make SRC_DIR="$WORK/src" SIM_BUILD="$WORK/build" COCOTB_RESULTS_FILE="$WORK/r.xml" >"$WORK/log" 2>&1)
-  if grep -q "FAIL=0" "$WORK/log"; then echo "SURVIVED: $what"; else
+  (cd "$HERE" && make FULL="${FULL:-0}" SRC_DIR="$WORK/src" SIM_BUILD="$WORK/build" COCOTB_RESULTS_FILE="$WORK/r.xml" >"$WORK/log" 2>&1)
+  if grep -q "FAIL=0" "$WORK/log"; then echo "SURVIVED: $what"; survived=$((survived+1)); else
     echo "killed ($(grep -o 'FAIL=[0-9]*' "$WORK/log")): $what"; killed=$((killed+1)); fi
 done
-echo "mutation: $killed of ${#MUTANTS[@]} killed"
+echo "mutation: $killed killed, $survived survived (FULL=${FULL:-0})"
 rm -rf "$WORK"

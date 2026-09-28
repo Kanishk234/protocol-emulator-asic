@@ -16,7 +16,8 @@ else
 COMPILE_ARGS += -Ptb_pin.FULL=$(FULL) -Ptb_pin.FRAC=$(FRAC)
 endif
 TOPLEVEL = tb_pin
-COCOTB_TEST_MODULES ?= test_pin_tx,test_pin_rx
+COCOTB_TEST_MODULES ?= test_pin_tx,test_pin_rx,test_pin_full
+export FULL
 COCOTB_RESULTS_FILE = results_full$(FULL)_frac$(FRAC).xml
 
 include $(shell cocotb-config --makefiles)/Makefile.sim

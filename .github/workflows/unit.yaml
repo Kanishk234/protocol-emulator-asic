@@ -41,28 +41,28 @@ jobs:
       - name: Install Python packages
         run: pip install -r test/requirements.txt
 
-      - name: UART RTL tests (three configurations)
+      - name: UART RTL tests (plain logic and hard primitives)
         run: |
           cd protocols/uart/test
-          for args in "DIV=16" "DIV=13" "DIV=16 RUNTIME_DIV=1"; do
+          for args in "DIV=16" "DIV=13" "DIV=16 RUNTIME_DIV=1" "DIV=16 PRIMS=1" "DIV=13 PRIMS=1" "DIV=5 PRIMS=1"; do
             rm -f results.xml
             make $args
             ! grep -q failure results.xml
           done
 
-      - name: SPI controller RTL tests (four modes, two speeds)
+      - name: SPI controller RTL tests (four modes, two speeds; plain logic and hard primitives)
         run: |
           cd protocols/spi_ctrl/test
-          for args in "MODE=0" "MODE=1" "MODE=2" "MODE=3" "MODE=1 HALF=5" "MODE=2 HALF=7"; do
+          for args in "MODE=0" "MODE=1" "MODE=2" "MODE=3" "MODE=1 HALF=5" "MODE=2 HALF=7"                       "MODE=0 PRIMS=1" "MODE=1 PRIMS=1" "MODE=2 PRIMS=1" "MODE=3 PRIMS=1" "MODE=3 HALF=7 PRIMS=1"; do
             rm -f results.xml
             make $args
             ! grep -q failure results.xml
           done
 
-      - name: I2C controller RTL tests (three speeds)
+      - name: I2C controller RTL tests (three speeds; plain logic and hard primitives)
         run: |
           cd protocols/i2c_ctrl/test
-          for args in "Q=4" "Q=2" "Q=7"; do
+          for args in "Q=4" "Q=2" "Q=7" "Q=4 PRIMS=1" "Q=2 PRIMS=1" "Q=7 PRIMS=1"; do
             rm -f results.xml
             make $args
             ! grep -q failure results.xml

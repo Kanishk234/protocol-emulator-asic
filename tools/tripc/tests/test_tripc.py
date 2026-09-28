@@ -84,10 +84,11 @@ def test_every_program_uses_only_legal_sources():
 
 
 def test_neighbour_lane_links_are_legal():
-    # the two-lane CAN/LIN pattern, placed on every lane pair
-    for k in range(3):
-        tripc.compile_text(f"program t\nconnect L{k}.I1 <- L{(k + 1) % 3}.O0\n"
-                           f"connect L{(k + 1) % 3}.I1 <- L{k}.O1\n")
+    # the two-lane CAN/LIN pattern, placed on every lane pair (the spec's lane count)
+    n = sum(c.endswith(".I0") for c in S.FABRIC_CONSUMERS)
+    for k in range(n):
+        tripc.compile_text(f"program t\nconnect L{k}.I1 <- L{(k + 1) % n}.O0\n"
+                           f"connect L{(k + 1) % n}.I1 <- L{k}.O1\n")
 
 
 def test_load_writes_every_slot():

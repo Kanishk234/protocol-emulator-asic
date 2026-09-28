@@ -17,22 +17,22 @@ Work through the ranked specialization list from `docs/reports/profiling.md`, to
 Stop adding features by Nov 30 regardless of how many remain.
 
 ## Tasks
-- [ ] Candidate 1 (from profiling): full method above.
-- [ ] Candidate 2: full method above.
+- [x] Candidate 1 (from profiling): full method above. (Ranks 1–2 of the profiling list, timer and shift register, were built as G1 in phase 2, D-026. First phase 3 candidate from the G1 measurements, `docs/reports/g1_limits.md`: registered terminal count, D-030: F4 re-proved, measured, not kept alone)
+- [x] Candidate 2: full method above. (Primitive tile with design repair, D-031: three tile runs, not feasible in the tile's footprint)
 - [ ] Candidate 3 (only if time allows): full method above.
 - [ ] Optional experiment, only if profiling points to it: multi-context configuration (store 2 contexts and switch between them). Measure configuration-storage cost vs. capacity gained.
-- [ ] Equal-area comparison of all variants: coverage × performance chart (Pareto front) in `docs/reports/architecture_comparison.md`.
-- [ ] Choose the final architecture from the data; DECISIONS entry.
-- [ ] Final hardening: precheck, timing at the chosen clock, routing overflow within limits.
-- [ ] `gl_test` with at least two real bitstreams on the final netlist.
-- [ ] Tag the commit `hw-freeze`. After this, hardware changes only for bugs, each with a DECISIONS and BUGS entry.
+- [x] Equal-area comparison of all variants: coverage × performance chart (Pareto front) in `docs/reports/architecture_comparison.md`. (with `architecture_comparison.svg`)
+- [x] Choose the final architecture from the data; DECISIONS entry. (D-033: G1)
+- [x] Final hardening: precheck, timing at the chosen clock, routing overflow within limits. (CI 36383587262 on 3047dea: precheck pass, setup WS +12.48 ns at 50 MHz, routing DRC 0)
+- [x] `gl_test` with at least two real bitstreams on the final netlist. (36383587262: 21/21, eight real bitstreams)
+- [ ] Tag the commit `hw-freeze`. After this, hardware changes only for bugs, each with a DECISIONS and BUGS entry. (D-035: tag 3047dea, by the user)
 
 ## Phase exit checklist
-- [ ] Each attempted specialization has a DECISIONS entry with its measured result (kept or dropped)
-- [ ] `docs/reports/architecture_comparison.md` with the equal-area comparison and chart
-- [ ] Final architecture hardened, precheck passed, timing met (CI run ID: …)
-- [ ] `gl_test` green on the final netlist with two real bitstreams (CI run ID: …)
-- [ ] All design-set protocols recompiled and passing on the final architecture
+- [x] Each attempted specialization has a DECISIONS entry with its measured result (kept or dropped) (D-030, D-031; not-built candidates with their data in D-033)
+- [x] `docs/reports/architecture_comparison.md` with the equal-area comparison and chart
+- [x] Final architecture hardened, precheck passed, timing met (CI run ID: 36383587262)
+- [x] `gl_test` green on the final netlist with two real bitstreams (CI run ID: 36383587262)
+- [x] All design-set protocols recompiled and passing on the final architecture (amended by D-035 to every *supported* design-set protocol: UART, SPI controller, I2C controller, `gl_test` 21/21 in 36383587262 and `fabric` 36383587292 on 3047dea; the I2C target does not fit and is not supported, D-033–D-035)
 - [ ] `hw-freeze` tag created (by the user)
 - [ ] All CI workflows green on `efpga`
 - [ ] `docs/summaries/PHASE3.md` written

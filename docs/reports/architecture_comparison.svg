@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="360" viewBox="0 0 560 360" font-family="sans-serif" font-size="12">
+<rect width="560" height="360" fill="white"/>
+<line x1="70" y1="310" x2="540" y2="310" stroke="black"/>
+<line x1="70" y1="30" x2="70" y2="310" stroke="black"/>
+<line x1="70.0" y1="310" x2="70.0" y2="315" stroke="black"/><text x="70.0" y="330" text-anchor="middle">0</text>
+<line x1="187.5" y1="310" x2="187.5" y2="315" stroke="black"/><text x="187.5" y="330" text-anchor="middle">1</text>
+<line x1="305.0" y1="310" x2="305.0" y2="315" stroke="black"/><text x="305.0" y="330" text-anchor="middle">2</text>
+<line x1="422.5" y1="310" x2="422.5" y2="315" stroke="black"/><text x="422.5" y="330" text-anchor="middle">3</text>
+<line x1="540.0" y1="310" x2="540.0" y2="315" stroke="black"/><text x="540.0" y="330" text-anchor="middle">4</text>
+<line x1="65" y1="310.0" x2="70" y2="310.0" stroke="black"/><text x="62" y="314.0" text-anchor="end">40</text>
+<line x1="65" y1="240.0" x2="70" y2="240.0" stroke="black"/><text x="62" y="244.0" text-anchor="end">50</text>
+<line x1="65" y1="170.0" x2="70" y2="170.0" stroke="black"/><text x="62" y="174.0" text-anchor="end">60</text>
+<line x1="65" y1="100.0" x2="70" y2="100.0" stroke="black"/><text x="62" y="104.0" text-anchor="end">70</text>
+<line x1="65" y1="30.0" x2="70" y2="30.0" stroke="black"/><text x="62" y="34.0" text-anchor="end">80</text>
+<line x1="70" y1="240.0" x2="540" y2="240.0" stroke="#c00" stroke-dasharray="4 3"/>
+<text x="536" y="235.0" text-anchor="end" fill="#c00">50 MHz chip clock</text>
+<text x="305.0" y="348" text-anchor="middle">design-set protocols that place and route (of 4)</text>
+<text x="18" y="170.0" text-anchor="middle" transform="rotate(-90 18 170.0)">worst-case Fmax, MHz (nextpnr, slow corner)</text>
+<circle cx="187.5" cy="114.0" r="6" fill="#1f77b4" stroke="#1f77b4" stroke-width="2"/>
+<text x="197.5" y="102.0" text-anchor="start">G0 (96 LUT4)</text>
+<circle cx="422.5" cy="219.0" r="6" fill="#1f77b4" stroke="#1f77b4" stroke-width="2"/>
+<text x="412.5" y="207.0" text-anchor="end">G1 (88 LUT4 + 2 timers + 2 shift regs)</text>
+<circle cx="422.5" cy="225.29999999999998" r="6" fill="white" stroke="#1f77b4" stroke-width="2"/>
+<text x="412.5" y="245.29999999999998" text-anchor="end">G1 + D-030 registered tc (model)</text>
+<text x="78" y="42" fill="#555">filled: hardened in the chip; open: model only. Equal area (same macro).</text>
+</svg>

@@ -32,7 +32,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - TT linter warnings reviewed: `PINMISSING` VPWR/VGND on the macro (TT's black box has power pins; power via PDN_MACRO_CONNECTIONS, LVS 0: harmless), `WIDTHTRUNC` on Frame_Data_Reg's Row (32-bit genvar expression into a 5-bit parameter; values fit), `SYNCASYNCNET` on rst_n: BUGS #18.
 - BUGS #18 fixed locally: reset synchronizer (+ separate config-path reset flop); full-top lint without waivers clean of SYNCASYNCNET/WIDTHTRUNC; suites 21/21 (RTL) and 13+8 skipped (stub); F1 PASS.
 - Pre-flight of the fix: overflow 37, stripes 22/22, 36 detailed-routing violations, all on `clk` where it reaches the fabric's clock pin on the macro's west face (y ≈ 640 µm) and the local router cuts onto the macro's Metal4 blockage. Same net and area as the 21 of the G1 switch, which CI (LibreLane 3.1) routed with 0 violations three times on this floorplan: a local-vs-CI router difference for this net; CI decides. Fallback if CI fails there: room for the clock pin (macro one row lower or a keep-out west of the pin) as its own hardening.
-**Next:** push the fix as its own hardening; then phase 3 (measure G1's remaining capacity limits, then candidate 1).
+**Phase 3 started (2026-09-28):**
+- `tools/profiling/limits.py` + `docs/reports/g1_limits.md`: on G1 the counters/shifting are absorbed; control logic is what is left; control sets (3–7) and primitive count are not limits; every critical path goes through a primitive; the I2C target would not fit even with a register file.
+- D-030 candidate 1 (registered terminal count): F4 re-proved, `tc` 2.98 → 0.88 ns at no area cost, but the I2C controller (the worst design) is limited by paths into the timer: 53.0 → 52.1 MHz: not kept alone (parked in build/c1/parked).
+- Root of the timer's slow input path: the primitive tile's hardening config (copied from the tile library) disables resizer/repair, so a NOR drives 33 loads unbuffered.
+- D-031 candidate 2 (primitive tile with design repair): three local tile runs; repair works only once inserted as a step (the tile driver applied removals only), then detailed placement fails: the 92 %-full tile has no room for buffers. Not feasible; config restored; `tile_check.sh` now picks the newest completed tile run.
+- CI on 3047dea (BUGS #18 fix): all green; gds/precheck/gl_test 21/21 (36383587262), setup WS +12.48 ns.
+- Organizers' reply (D-032): eFPGA accepted; software side required (flow, loading, UART/SPI/I2C examples); phase 4/5 plans updated.
+- `docs/reports/architecture_comparison.md` + chart; D-033 final architecture G1.
+- User kept hardware open for the I2C target: D-034 register-file tile measured (169 → 123 LCs, still no fit); user then chose to freeze and drop the I2C target (D-035).
+- Phase 3 exit boxes ticked except the tag; `docs/summaries/PHASE3.md` drafted.
+**Next:** user tags `hw-freeze` on 3047dea; then phase 4 (unseal the held-out set; demo-board loader; end-to-end examples).
 **Next (superseded):** after the G1 hardening result, push the protocol chip tests + timing work (touches `test/` and `macro/`, so one more hardening, which also gives gl_test evidence for the 21 tests); then phase 2 exit: timing cross-check, per-tile equivalence plan, PHASE2 summary.
 
 ---

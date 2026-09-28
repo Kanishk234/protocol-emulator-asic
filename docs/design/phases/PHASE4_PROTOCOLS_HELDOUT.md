@@ -10,6 +10,10 @@
 - [ ] Report every result honestly in `docs/reports/heldout_results.md`: fits or not, resources, rate reached, what limited it. Failures are results too.
 - [ ] Compare held-out resource use on the final architecture vs. G0 (from a G0 build) to show whether specialization generalized.
 
+### Software side (D-032: required by the organizers)
+- [ ] Loader for the Tiny Tapeout demo board: a MicroPython module for its RP2040 that speaks the host protocol (ARCHITECTURE §2–3) through the board's pins, sharing its transaction encoding with `tools/host/protocol.py` (tested in simulation against the chip's RTL/gate-level netlist through the same transactions; on hardware only when a board exists).
+- [ ] One command per step, from source to running protocol: compile (`tools/compile`), load, run, read status; documented end-to-end examples for UART, SPI and I2C (source, pin map, bitstream, host session).
+
 ### Showcase
 - [ ] I2C target with fault injection: normal register-map operation, plus host-selected NACK and clock-stretch insertion, with host-readable status.
 - [ ] Concurrency demo if resources allow (e.g. I2C target plus UART at the same time).

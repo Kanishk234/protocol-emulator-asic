@@ -32,8 +32,10 @@ def test_frames():
 def test_encodings():
     w = (1 << 53) - 1
     assert slot_words(w) == [0xFFFF, 0xFFFF, 0xFFFF, 0x1F]
-    assert port_word("L0.I1", "L1.O0", "tap", 0b0101) == 1 | 1 << 1 | 7 << 2 | 0b0101 << 6
-    assert PC_WORDS == 22 and UNITS == 6 and LANES == 3
+    sel = UNITS + 1                                     # L0.I1: U*.rx, HOST_IN, then L1.O0
+    assert port_word("L0.I1", "L1.O0", "tap", 0b0101) == 1 | 1 << 1 | sel << 2 | 0b0101 << 6
+    assert PC_WORDS == 22
+    assert (UNITS, LANES) == (len(S.PIN_UNIT_FEATURES), sum(c.endswith(".I0") for c in S.FABRIC_CONSUMERS))
 
 
 @pytest.mark.parametrize("path", PROGRAMS, ids=lambda p: p.stem)

@@ -9,6 +9,7 @@ import pytest
 import tripwire_spec as S
 from tripsim import PAD_UI, PAD_UIO, PAD_UO, Chip, pinregs
 from tripsim.pinunit import PinConfig
+from tripsim.isa import TAG_DATA
 from tripsim.asm import Routine, link_routines, reflex
 
 from test_lane import host_lane, outputs
@@ -398,6 +399,30 @@ def test_p30_fractional_carrier_phase_accumulates_without_drift():
     assert levels == [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
 
 
+def test_p17_zero_tick_pulse_phase_is_unobservable_in_current_model():
+    chip = Chip(lanes=1, pin_units=1)
+    unit = chip.pins[0]
+    unit.configure(validate=False, txmode="pulse", idle=0, nbits=1,
+                    sym0_first=0, sym0_t1=0, sym0_t2=0)
+    unit._accept(0, TAG_DATA, 0)                            # one DATA bit, earliest edge 1
+    assert unit.actions == [(1, "sbit", 0), (1, "sbit", 1), (1, "send", 0)]
+    unit.compute_tx(1)
+    unit.commit()
+    assert unit.level == 0                                  # same-edge order hides both phases
+
+
+def test_p30_sub_two_clock_carrier_is_applied_in_current_model():
+    chip = Chip(lanes=1, pin_units=1)
+    chip.pin_config(0, txmode="level", idle=0, carrier=1.5)
+    unit = chip.pins[0]
+    unit.level = 1
+    levels = []
+    for elapsed in range(6):
+        unit._car_n = elapsed
+        levels.append(unit.pad_drive()[0])
+    assert levels == [1, 0, 1, 1, 0, 1]
+
+
 @pytest.mark.parametrize("partial, emitted", [([0], [(0, 0b10)]), ([], [])])
 def test_p18_restart_clock_sample_is_kept_only_if_it_completes_a_word(partial, emitted):
     chip = rx_unit(rxmode="linked_rx", rx_edge="rise", rx_nbits=2)
@@ -415,8 +440,10 @@ def test_p18_restart_clock_sample_is_kept_only_if_it_completes_a_word(partial, e
 # ------------------------------------------------------- BITSYNC (P20-P29)
 def bitsync_unit(**cfg):
     chip = Chip(lanes=1)
-    chip.pin_config(0, pin_a=PAD_UIO + 0, pin_s=PAD_UI + 0, txmode="bitsync", rxmode="bitsync",
-                    period=20, idle=1, idle_bits=8, rx_nbits=8, **cfg)
+    config = dict(pin_a=PAD_UIO + 0, pin_s=PAD_UI + 0, txmode="bitsync", rxmode="bitsync",
+                  period=20, idle=1, idle_bits=8, rx_nbits=8)
+    config.update(cfg)
+    chip.pin_config(0, **config)
     chip.connect("U0.tx", "HOST_IN")
     chip.connect("HOST_OUT", "U0.rx")
     chip.run([0])                                           # D-041 B: first RUN makes units live
@@ -429,6 +456,72 @@ def test_bitsync_setn_rx_out_of_range_means_16():
     chip.host_push(0x6020 | 20, tag=1)
     chip.run_for(5)
     assert chip.pins[0].bs.rx_len == 16
+
+
+def test_p20_idle_making_sample_is_counted_as_frame_data_in_current_model():
+    chip = bitsync_unit(idle_bits=2, rx_nbits=8)
+    bs = chip.pins[0].bs
+    bs.in_frame = bs.rx_on = True
+    bs.idle_cnt = 1
+    bs.frame_bits = 0
+    bs.bits = []
+    bs._sample_bit(1)                                       # reaches IDLE_BITS and ends frame
+    assert bs.frame_bits == 1 and bs.bits == [1]
+    assert not bs.in_frame                                  # D-052 P-G29 says it is excluded
+
+
+def test_p8_event_generator_is_bypassed_in_bitsync_by_current_model():
+    chip = bitsync_unit(ev_edge="rise")
+    unit = chip.pins[0]
+    unit._prev_a = 0
+    unit.compute_rx(chip.cycle, 1, 1)                        # pin A rises
+    assert unit.rx_prod._load is None                        # D-052 P-G28 says event still loads
+
+
+def test_p23_stuff_error_reports_one_based_line_bit_count():
+    chip = bitsync_unit(stuff_n=1, stuff_lvl=0)
+    bs = chip.pins[0].bs
+    bs.in_frame = bs.rx_on = bs.rx_stuff = True
+    bs.bitno = 0
+    bs.run_lvl, bs.run_n = 0, 1                              # next zero violates stuffing
+    bs._sample_bit(0)
+    assert list(bs.out) == [(S.TAGS["ERR"], 0x1001)]        # D-053 P-G27 calls this an index
+
+
+def test_p24_frame_limit_emits_verdict_for_current_word_only():
+    chip = bitsync_unit(rx_nbits=8)
+    bs = chip.pins[0].bs
+    bs.in_frame = bs.rx_on = True
+    bs.frame_n = 1
+    bs.rx_stuff = False
+    bs._sample_bit(1)
+    assert list(bs.out) == [(S.TAGS["EVENT"], 1)]          # D-053 P-G30: no DATA on verdict clock
+
+
+def test_p25_wait_sp_releases_and_accepts_tx_token_on_sample_clock():
+    chip = bitsync_unit()
+    unit = chip.pins[0]
+    bs = unit.bs
+    bs.wait_sp = True
+    p = chip.fabric.producers["HOST_IN"]
+    p.valid, p.seq, p.tag, p.data = 1, 1, TAG_DATA, 0x01
+    bs.step(10, 1, 1)                                       # sample point at half of P=20
+    bs.accept(10, unit.tx_port, {})
+    assert not bs.wait_sp and unit.tx_port._take
+    assert list(bs.q)[0] == ("b", 1, True)                  # D-054 P-G31
+
+
+def test_p25_own_frame_opens_at_next_bit_boundary_with_started_event():
+    chip = bitsync_unit()
+    bs = chip.pins[0].bs
+    bs.newframe, bs.idle_cnt, bs.sampled = True, chip.pins[0].cfg.idle_bits, True
+    bs.t = 0
+    bs.q.append(("b", 0, True))
+    bs.step(19, 1, 1)                                        # one clock before t + P
+    assert not bs.in_frame and not bs.out
+    bs.step(20, 1, 1)                                        # exact next bit boundary
+    assert bs.in_frame and bs.own and bs.t == 20 * 256
+    assert chip.pins[0].rx_prod._load == (S.TAGS["EVENT"], 0x9001)  # D-054 P-G32
 
 
 @pytest.mark.parametrize("delim", ["flag", "se0"])

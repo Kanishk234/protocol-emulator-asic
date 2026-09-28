@@ -21,6 +21,23 @@ Next:
 
 ---
 
+## 2026-09-28: Krithik + Claude (phase 2: protocol floor, L1-ROT, L0-ASRT, L-XSIM, L8-EQY)
+Done:
+- **D-049 (proposed), the protocol floor**, from Krithik's constraint that every protocol must stay supported (not at the same time). From the 20 compiled programs: ≥ 2 lanes, ≥ 4 units with U0 full (U1 may be lean), 12 slots, the 512-word SRAM. That is ≈ 395K µm² ≈ 56 % at placement, inside the window R4 has not measured (run 4 47.6 % routed globally, run 3 58.9 % did not).
+- **L1-ROT** (`test_internal/chip/test_rot.py`): all three lanes store/load through the SRAM while the host reads; every clock only the slot's owner drives the SRAM; every store lands. `test_internal/chip/mutate.sh`: 2/2 mutants killed. Added to the CI `rtl` job. L1-OVR already existed (`test_pin_rx.py::test_overrun_keeps_the_old_token`).
+- **L0-ASRT**: `src/trw_assert.vh` (`TRW_ASSERT`, `TRW_ASSERT_ON`); invariants in `trw_pin_unit` (open drain never drives high; RX never loads a full producer), `trw_pins` (a driven pad has an owner), `trw_lane` (never takes an unavailable input; never loads a full output), `trw_chan_port` (a disabled port shows no token), `trw_chan_prod` (no load while full). `SIM_ASSERT` is on in every `test_internal` Makefile; all suites pass with it; two planted bugs trip their assertions. Under `FORMAL`: `formal/l0_asrt.sby` proves the pads and producer invariants unbounded (k-induction); a planted bug fails the proof. Plain and `SIM_ASSERT` builds lint clean.
+- **L-XSIM**: every suite passes under Verilator 5.053 (venv cocotb 2.0.1) as under Icarus: 101 L1 + 10 chip/L3/ROT. The pin Makefile passes parameters per simulator; the chip Makefile uses `--timing -Wno-fatal` for the macro model under Verilator. New CI job `rtl-verilator` (OSS CAD Suite pinned and cached like the `efpga` branch).
+- **L8-EQY feasibility (D-050)**: the PDK's Verilog cell models are not readable by Yosys; liberty-derived models + a SAT miter prove the ALU's netlist equivalent (and reject a wrong RTL). `formal/equiv.sh`.
+
+Checklist boxes ticked (evidence):
+- None (L1 still needs BITSYNC cases, which wait for milestone B / the budget).
+
+Problems / decisions:
+- **Not added: a `formal` workflow.** The `efpga` branch (a separate eFPGA design) already has `.github/workflows/formal.yaml` and `formal/*.sby`; a second one on `main` would collide if it is ever merged. Krithik and the teammate decide the naming.
+
+Next:
+- R4 run 5; the budget with D-049 as its floor; the pyuvm skeleton; the L9 Hardcaml spike.
+
 ## 2026-09-27: Krithik + Claude (phase 2: CI for the RTL suites, first claim, BUGS #49)
 Done:
 - R4 run 5 launched on the branch (`gds` 36363295528, `DRT_OPT_ITERS` 64, e20d390).

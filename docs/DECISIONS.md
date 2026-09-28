@@ -821,6 +821,39 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** none in hardware.
 - **Approval:** Krithik and Kanishk.
 
+## D-049 (2026-09-28): the protocol floor for the area budget (proposed)
+- **Context:** Krithik (2026-09-28): whatever the chip gives up, every protocol must still be supported, not necessarily at the same time. The budget decision (after R4 run 5) needs that as a hard floor. Measured from the 20 compiled programs (`tripc`, default parameters), one program at a time:
+
+| Resource | Most any one program needs | Programs at that limit |
+|---|---|---|
+| Lanes | 2 | CAN, IR NEC, LIN |
+| Pin units | 4 | I2S, JTAG, SPI controller |
+| Full units (PULSE / carrier / BITSYNC, D-040) | 1, always U0 | CAN, HDLC, USB-LS (BITSYNC); DShot, 1-Wire, WS2812 (PULSE); IR NEC (carrier + PULSE) |
+| Slots per lane | 12 | CAN, I2C target, PS/2, SMBus, SWD |
+| SRAM words | 354 of 512 | CAN |
+
+- **Proposal (a constraint on the budget, not a design change):** the chip keeps at least **2 lanes, 4 pin units of which U0 is full, 12 slots per lane, and the 512-word SRAM**. Below any of these, named protocols are lost: 1 lane loses CAN, IR NEC and LIN; 3 units lose I2S, JTAG and the SPI controller; no full unit loses 7 protocols; 8 slots lose 5. U1 can be lean (no program needs two full units). Running protocols at the same time is what the extra lanes and units buy; it is not required.
+- **Size of that floor** (RTL numbers from D-047, Yosys cmos5l typ): 2 × (lane 50.5K + slots 24.5K) = 150K; U0 full with milestone B ≈ 67K (lean 36.6K − lean config 5.1K + full config 11.4K + the PULSE/carrier/BITSYNC projection 24.4K, `PIN_UNIT_RTL.md`); 3 lean units 110K; fabric with 9 ports ≈ 34K; host ≈ 22K; pad owners ≈ 8K; synchronisers, time, glue ≈ 4K. **≈ 395K µm², ≈ 56 % at global placement** (× 1.164 + the 45.3K macro).
+- **Where that sits:** R4 run 4 (337K, 47.6 %) routed with 0 global overflow; run 3 (417.7K, 58.9 %) did not. The floor is inside the untested window, nearer the failing side. So after run 5, the budget needs either a measurement at ~56 % (an R4 run 6 at the floor's size, best with the real `trw_chip` at 2 lanes / 4 units on the branch), or area saved elsewhere without losing a protocol:
+  - the 4-bit timer fraction (measured, −1.9K per lean unit, not adopted yet);
+  - trimming fabric legal sources to what the 20 programs use at the new counts;
+  - lane logic (the routine controller added 9.6K per lane; RIR and the entry path can be looked at);
+  - the host read multiplexer;
+  - and, outside the design, Jane Street's answer on a larger tile (the 8x4 inquiry, not sent).
+- **General need:** the chip's claim is "any of these protocols"; the budget must not quietly drop one.
+- **Cost:** none by itself; it bounds the budget options.
+- **Approval:** Krithik and Kanishk (with the budget decision).
+
+## D-050 (2026-09-28): L8-EQY feasibility: liberty cell models and a SAT miter work; the PDK's Verilog models do not
+- **Context:** phase 2 task 2.5 item 16 and VERIFICATION.md L8-EQY: try equivalence checking of one module against its cmos5l netlist and log whether the cell models work, or choose the fallback.
+- **Tried on `trw_alu`** (Yosys onto cmos5l typ, the R1/R4 recipe; 575 cells of 24 types):
+  - `eqy` with the PDK's Verilog cell models (`sg13cmos5l_stdcell.v` + `_udp.v`): **does not work**. Yosys cannot parse them (syntax error at the UDP/`specify` sections).
+  - `eqy` with cell models built by Yosys from the liberty `function`s (`read_liberty -ignore_miss_func`; every cell the netlist uses has a function): the flag output `r` is proved equivalent, but `d` reports "not equivalent". This comes from `eqy`'s partitioning, which matches internal nets by name, and names do not survive `abc`. Matching only the ports leaves `eqy` nothing to partition.
+  - **A whole-module miter with the liberty models, proved by Yosys `sat`: equivalent over all inputs.** A deliberately wrong RTL (LTU as `<=`) is reported not equivalent. So the netlist is right and the method discriminates.
+- **Decision:** L8-EQY uses liberty-derived cell models and a miter (`formal/equiv.sh <module> <files>`, exit 0 = proved), not the PDK's Verilog models. The "fallback to the generic netlist" in VERIFICATION.md is not needed for combinational logic.
+- **Not covered yet:** sequential modules. They need a miter with matched state, i.e. induction via `sby` on the miter, or `eqy` with explicit `[match]` rules for the flops. The whole chip needs the same, plus the latches (`dlhq`) and clock gates (`lgcp`), whose liberty models must be checked. A candidate for the `formal` workflow once its name is settled with the `efpga` branch, which has its own `formal.yaml`.
+- **Cost:** none in hardware.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

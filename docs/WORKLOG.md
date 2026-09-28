@@ -21,11 +21,12 @@ Next:
 
 ---
 
-## 2026-09-28 (later): Krithik + Claude (phase 2: R4 run 6 result; count-generic tests)
+## 2026-09-28 (later): Krithik + Claude (phase 2: R4 run 6 result; count-generic tests; milestone B3)
 Done:
 - **R4 run 6** (gds 36384571157, the real `trw_chip` at the protocol floor): GPL 56.1 %, **global-routing overflow 5,350** (Metal3 87.3 %), detailed routing 16 violations after 64 iterations in 4 h 53 min, then cancelled by GitHub's 6 h limit in the antenna re-route; no artifacts. Read from the job log. `R4_FLOORPLAN.md` §12, AREA, D-043. The floor as built does not harden inside the TT `gds` job (a local hardening would not count: every entry uses the same workflow).
 - **Count-generic tests** (BUGS #52): `tb_chan.v`, `tb_host.v`/`test_host.py`, `test_gen`, `tools/host` and `tripc` tests take the lane/unit counts from the spec. Pass at 3/6 (main: pytest 292, chan 7/7, host 7/7 under Icarus and Verilator) and at 2/4 (branch copy: pytest 285 + the 7 `test_pinregs` cases, all `rtl` suites, pin 52/52 ×2, chip 10/10).
 - Area by block at the floor (Yosys, `synth/chip/run_chip.sh`): pin units ~201K, lanes 150K, fabric + producers 35K, host 22K.
+- **Milestone B3** (Krithik: B3 first, then the area pass): readback and arbitration, bit errors, JAM responses and armed flags, listen-only, DELIM = flag with the hold-back and aborts, NRZI, SE0 with J, pin N low in SE0, DELIM = se0, OE auto, data[14] "own frame", a one-entry status EVENT register. Tests `test_pin_bs_b3.py` (7) against the reference CANNode (arbitration, ACK, error flags), `protomodels.hdlc` (±1 % drift, bad FCS, abort) and `protomodels.usb` line states (TX bit for bit, RX of four packets). Pin suites 59/59 on both builds under Icarus and Verilator; chip tests 10/10; mutants B3 34/34 and B2 31/31 killed; `scripts/check_all.sh` PASS. Engine 43.2K, full unit ~81.9K; chip 632.2K at spec counts (+7.09 typ / +0.02 slow), **407.6K at the protocol floor**. D-055 (readings P-G36–P-G47). Milestone B is complete.
 
 Checklist boxes ticked (evidence):
 - None.
@@ -35,8 +36,7 @@ Problems / decisions:
 - 7 `test_pinregs` cases still hard-code U1 full (in `tools/tripsim/`, not read in this RTL session).
 
 Next:
-- The team's choice on run 6 (area pass on the pin units and lanes vs a floor change), then run 7.
-- B3 (P26–P29).
+- The area pass (Krithik's order: after B3), starting from 407.6K at the floor; target ~340–360K, then R4 run 7.
 
 ## 2026-09-28: Krithik + Claude (phase 2: milestone B2c; engine retimed; R4 run 6 prepared)
 Done:

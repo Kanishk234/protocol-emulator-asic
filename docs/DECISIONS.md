@@ -886,6 +886,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Size:** engine 34.8K µm², full unit logic 73.8K, chip 616.7K at spec counts. D-052's trend holds: BITSYNC is about twice the estimate.
 - **Cost:** as above; no spec change.
 
+## D-055 (2026-09-28): milestone B3 (BITSYNC readback, JAM, listen-only, flags, NRZI, SE0, OE auto) in the RTL; twelve readings
+- **Context:** B3, the last stage of pin-unit milestone B, in `src/trw_pin_bs.v` and `src/trw_pin_unit.v` (§14 P24, P26–P29). Details, tests and numbers in `PIN_UNIT_RTL.md` §9. Milestone B is complete: U0 (and U1 at spec counts) has PULSE, the carrier and all of BITSYNC. Written from the spec text and the CAN, HDLC and USB programs; `tools/tripsim` not read.
+- **Readings for the model side:** P-G36 (a response JAM in our own frame is judged when taken), P-G37 (ERR `0x2nnn`'s nnn), P-G38 (JAM [0] without [4]), P-G39 (no readback of JAM bits), P-G40 (a stuff error stops only our own frame's TX), P-G41 (the status EVENT register), P-G42 (each bit carries its readback mode; mode 2 reports every bit), P-G43 (JAM start clocks; firing disarms), P-G44 (flag mode counts committed bits), P-G45 (what listen-only clears), P-G46 (what "our own frame" spans; the readback EVENT fields), P-G47 (the SE0 end of frame). Each is pinned by a test in `test_internal/pin/test_pin_bs_b3.py` or a mutant.
+- **Two choices worth the team's eye:** (1) arming a JAM does not replace a pending response, because the CAN program sends a CRC-error flag and re-arms in the same routine; "a new JAM replaces one in progress" is read as a new response. (2) Status EVENTs get a one-entry wait register (P-G41) rather than being dropped on a clash, because an arbitration loss on the bit that completes a word is common in CAN and the program needs both tokens.
+- **Timing:** the flag hold-back first sat on the frame-start path (slow −1.58 ns pre-layout); it now shifts outside the frame's priority chain. Chip +7.09 ns typ / +0.02 ns slow at spec counts, +8.49 / +2.21 at the protocol floor.
+- **Size:** engine 43.2K µm² (+8.4K), full unit logic ~81.9K; chip 632.2K at spec counts, **407.6K at the protocol floor** (B2c: 398.7K), ~57.6 % expected at global placement. R4 run 6 showed the floor at 398.7K does not harden inside the 6 h job (D-043), so this is the number the area pass starts from.
+- **Cost:** as above; no spec change.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

@@ -31,6 +31,7 @@ One row per `gds` hardening (see `../design/PHYSICAL_DESIGN_AND_CI.md` §10). Ju
 | 2026-09-28 | Pin-unit milestone B2a (BITSYNC engine `trw_pin_bs.v`: bit clock, idle, hard sync, resync, RX words), Yosys cmos5l typ, flat | `PIN_UNIT_RTL.md` §9; D-052 | Engine **16.1K µm²** (20.2K before merging its two timers); full unit logic **54.0K**. BITSYNC heading for ~30K vs the estimate's ~16.7K |
 | 2026-09-28 | Pin-unit milestone B2b (BITSYNC RX stuffing, CRC, FRAME), Yosys cmos5l typ, flat | `PIN_UNIT_RTL.md` §9; D-053 | Engine **25.1K µm²** (+9.0K), full unit logic **62.3K** |
 | 2026-09-28 | Pin-unit milestone B2c (BITSYNC TX queue) and the engine's retiming, Yosys cmos5l typ, flat | `PIN_UNIT_RTL.md` §9; D-054 | Engine **34.8K µm²** (+9.7K), full unit logic **73.8K**; chip at spec counts **616.7K**, pre-layout +7.65 typ / +0.87 slow (before the retiming +0.84 / −9.80, BUGS #51); chip at the protocol floor (2 lanes, 4 units, U0 full) **398.7K**, +7.35 / +0.42 |
+| 2026-09-28 | Pin-unit milestone B3 (readback, JAM, listen-only, flags, NRZI, SE0, OE auto), Yosys cmos5l typ | `PIN_UNIT_RTL.md` §9; D-055 | Engine **43.2K µm²** (+8.4K), full unit logic **~81.9K**; chip at spec counts **632.2K**, pre-layout +7.09 typ / +0.02 slow; chip at the protocol floor (2 lanes, 4 units, U0 full) **407.6K** (~57.6 % at global placement), +8.49 / +2.21 |
 
 ## Row notes
 

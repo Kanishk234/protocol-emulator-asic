@@ -1,0 +1,16 @@
+top: prims2
+pins:
+  clk: clk
+  rst_n: rst_n
+  en: FAB_IN0
+  load: FAB_IN1
+  step: FAB_IN2
+  sin: FAB_IN3
+  out[0]: FAB_OUT0
+  out[1]: FAB_OUT1
+  out[2]: FAB_OUT2
+  out[3]: FAB_OUT3
+  out[4]: FAB_OUT4
+  out[5]: FAB_OUT5
+  io[0]: FAB_IO0.o
+  io[1]: FAB_IO1.o

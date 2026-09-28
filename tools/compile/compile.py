@@ -89,6 +89,8 @@ def user_ports(sources, top, work, params=None):
     """Port names, directions and widths of the user top (with its parameters), via Yosys."""
     js = work / "ports.json"
     script = " ".join(f"read_verilog -sv {Path(s).resolve()};" for s in sources)
+    if any(Path(s).name == "warp_prims.v" for s in sources):
+        script = f"read_verilog -lib {PRIMS / 'warp_plib.v'}; " + script
     cp = chparam(params, top)
     run([tool("yosys"), "-q", "-p", f"{script} {cp + ';' if cp else ''} hierarchy -top {top}; proc; write_json {js}"],
         work / "ports.log", work)
@@ -215,8 +217,18 @@ def wrapper(top, ports, use, arch_pins):
     return "\n".join(text), unmapped_in, unmapped_out, cells
 
 
+PRIMS = Path(__file__).resolve().parent / "prims"
+MIN_CTRL = int(os.environ.get("WARP_MIN_CTRL", "4"))   # see synth_script
+
+
+def prim_sources(meta) -> list:
+    """The WARP hard-primitive wrappers (WP_TIMER, WP_SHIFT) on architectures that have the blocks
+    (arch.yaml `primitives`, D-026); read before the user sources."""
+    return [PRIMS / "warp_prims.v"] if meta.get("primitives") else []
+
+
 def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=None,
-                 param_module=None) -> str:
+                 param_module=None, warp_prims=False) -> str:
     """Yosys script. The pinned Yosys (0.66, docs/VERSIONS.md) has the older synth_fabulous,
     without the -ff/-clkbuf-map options the tile library's flow uses and with IO pad mapping
     hard-wired to the stock FABulous IO cell; so the IO pads (tile library IOBUF, output enable
@@ -225,8 +237,9 @@ def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=
     plibs = ("FABULOUS_LC/yosys/primitives/prims.v", "IOBUF/yosys/primitives/IOBUF.v",
              "GBUF/yosys/primitives/GBUF.v", "SYS_RESET/yosys/primitives/SYS_RESET.v")
     maps = ("FABULOUS_LC/yosys/techmap/lut_map.v", "FABULOUS_LC/yosys/techmap/ff_map.v")
+    plibs = [prim / p for p in plibs] + ([PRIMS / "warp_plib.v"] if warp_prims else [])
     opts = (f"-top {top} -lut 4 -carry ha -complex-dff -noregfile "
-            + " ".join(f"-extra-plib {prim / p}" for p in plibs) + " "
+            + " ".join(f"-extra-plib {p}" for p in plibs) + " "
             + " ".join(f"-extra-map {prim / m}" for m in maps))
     lines = [f"read_verilog -sv {Path(s).resolve()}" for s in sources]
     if top == WRAPPER_TOP:
@@ -241,7 +254,13 @@ def synth_script(sources, out: Path, prim: Path, top: str = WRAPPER_TOP, params=
         "iopadmap -bits -outpad $__FABULOUS_OBUF IN:PAD -inpad $__FABULOUS_IBUF OUT:PAD "
         f"-toutpad $__FABULOUS_TBUF EN:IN:PAD -tinoutpad $__FABULOUS_IOBUF EN:OUT:IN:PAD {top}",
         f"techmap -map {prim / 'IOBUF/yosys/techmap/IOBUF_map.v'}",
-        f"synth_fabulous {opts} -run map_iopad:check",
+        f"synth_fabulous {opts} -run map_iopad:map_ffs",
+        # The 8 LCs of a LUT4x8 tile share one clock enable and one set/reset wire (J_EN, J_SR),
+        # so every distinct enable or synchronous reset net takes a tile of its own. Enables and
+        # resets used by fewer than MIN_CTRL flip-flops become LUT logic instead (BUGS #15).
+        f"dfflegalize -cell $_DFF_P_ x -cell $_DFFE_PP_ x -cell $_SDFF_PP?_ x -cell $_SDFFE_PP?P_ x "
+        f"-cell $_SDFFCE_PP?P_ x -mince {MIN_CTRL} -minsrst {MIN_CTRL}",
+        f"synth_fabulous {opts} -run map_ffs:check",
         # ABC maps the FF enable/reset logic once per FF; merge the identical LUTs it leaves.
         # Plain LUTs only: two carry chains start with identical LUT4_HA cells, and one carry
         # output cannot feed two chains.
@@ -281,20 +300,24 @@ def cell_estimate(design_json: Path, top: str) -> dict:
         i = lut_out.get(d)
         if i is not None and i not in paired and sinks.get(d, 0) == 1:
             paired.add(i)
-    other = sorted({c["type"] for c in cells} - {c["type"] for c in luts + ffs + ios})
+    hard = {t: sum(c["type"] == t for c in cells) for t in ("wp_timer", "wp_shift")}
+    other = sorted({c["type"] for c in cells} - {c["type"] for c in luts + ffs + ios} - set(hard))
     return {"luts": len(luts), "carry_luts": sum(c["type"] == "LUT4_HA" for c in luts),
             "ffs": len(ffs), "lcs": len(luts) + len(ffs) - len(paired), "io": len(ios),
-            "other_cells": other}
+            "timers": hard["wp_timer"], "shifts": hard["wp_shift"], "other_cells": other}
 
 
-def synth_only(sources, top, out, params=None) -> dict:
+def synth_only(sources, top, out, params=None, arch_dir=None) -> dict:
     """Synthesis for this fabric's cells only (no pins, no place and route), for designs whose
     ports cannot be placed on the current fabric (e.g. the host channel). Returns cell_estimate."""
     out = Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     tiles = Path(os.environ.get("WARP_TILES") or subprocess.check_output(
         [str(ROOT / "scripts" / "fetch_tiles.sh")], text=True).strip())
-    (out / "synth.ys").write_text(synth_script(sources, out, tiles / "primitives", top, params))
+    meta = load_arch(Path(arch_dir or current_arch()))[0]
+    extra = prim_sources(meta)
+    (out / "synth.ys").write_text(synth_script(extra + list(sources), out, tiles / "primitives", top,
+                                               params, warp_prims=bool(extra)))
     run([tool("yosys"), "-s", str(out / "synth.ys")], out / "synth.log", out)
     return cell_estimate(out / "design.json", top)
 
@@ -324,7 +347,7 @@ def parse_pnr_log(log: Path):
     return util, (fmax[-1] if fmax else None)
 
 
-def compile_design(sources, pins_file, arch_dir, out, seed=1):
+def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None):
     arch_dir, out = Path(arch_dir).resolve(), Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     meta, arch_pins = load_arch(arch_dir)
@@ -335,7 +358,8 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1):
         [str(ROOT / "scripts" / "fetch_tiles.sh")], text=True).strip())
     prim = tiles / "primitives"
 
-    params = spec.get("params") or {}                 # parameters of the user top
+    params = dict(spec.get("params") or {}, **(set_params or {}))   # parameters of the user top
+    sources = prim_sources(meta) + list(sources)
     ports = user_ports(sources, top, out, params)
     use = resolve(spec["pins"], ports, arch_pins)
     wtext, unmapped_in, unmapped_out, cells = wrapper(top, ports, use, arch_pins)
@@ -344,7 +368,8 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1):
     pcf = "\n".join(f"set_io pad_{cell_id(bel)} {bel}" for bel in cells) + "\n"
     (out / "pins.pcf").write_text(pcf)
 
-    (out / "synth.ys").write_text(synth_script(sources, out, prim, params=params, param_module=top))
+    (out / "synth.ys").write_text(synth_script(sources, out, prim, params=params, param_module=top,
+                                               warp_prims=bool(meta.get("primitives"))))
     run([tool("yosys"), "-s", str(out / "synth.ys")], out / "synth.log", out)
 
     env = dict(os.environ, FAB_ROOT=str(fab))

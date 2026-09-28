@@ -1,20 +1,21 @@
 {
-  "design": "uart_top",
+  "design": "ws2812_top",
   "params": {
-    "DIV": 16,
-    "RUNTIME_DIV": 0,
+    "TBIT": 62,
+    "T1H": 40,
+    "RESET_BITS": 45,
     "PRIMS": 1
   },
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0xAE99268A",
+  "crc32": "0x0A8DB22C",
   "timing_corner": "nom_slow_1p08V_125C",
-  "fmax_mhz": 89.49,
+  "fmax_mhz": 54.34,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {
-      "used": 29,
+      "used": 32,
       "available": 88
     },
     "wp_timer": {
@@ -22,11 +23,11 @@
       "available": 2
     },
     "wp_shift": {
-      "used": 2,
+      "used": 1,
       "available": 2
     },
     "IOBUF": {
-      "used": 15,
+      "used": 13,
       "available": 36
     },
     "GBUF": {
@@ -45,11 +46,8 @@
     "rst_n": {
       "i": "rst_n"
     },
-    "FAB_IN0": {
-      "i": "rx_i"
-    },
     "FAB_OUT0": {
-      "o": "tx_o"
+      "o": "dout_o"
     },
     "h_wdata[0]": {
       "i": "h_wdata[0]"
@@ -75,41 +73,14 @@
     "h_wdata[7]": {
       "i": "h_wdata[7]"
     },
+    "h_wlast": {
+      "i": "h_wlast"
+    },
     "h_wvalid": {
       "i": "h_wvalid"
     },
     "h_wready": {
       "o": "h_wready"
-    },
-    "h_rdata[0]": {
-      "o": "h_rdata[0]"
-    },
-    "h_rdata[1]": {
-      "o": "h_rdata[1]"
-    },
-    "h_rdata[2]": {
-      "o": "h_rdata[2]"
-    },
-    "h_rdata[3]": {
-      "o": "h_rdata[3]"
-    },
-    "h_rdata[4]": {
-      "o": "h_rdata[4]"
-    },
-    "h_rdata[5]": {
-      "o": "h_rdata[5]"
-    },
-    "h_rdata[6]": {
-      "o": "h_rdata[6]"
-    },
-    "h_rdata[7]": {
-      "o": "h_rdata[7]"
-    },
-    "h_rvalid": {
-      "o": "h_rvalid"
-    },
-    "h_rready": {
-      "i": "h_rready"
     },
     "h_status[0]": {
       "oe": "h_status[0]"
@@ -136,28 +107,8 @@
       "oe": "h_status[7]"
     }
   },
-  "unmapped_inputs_tied_0": [
-    "cfg_div[0]",
-    "cfg_div[1]",
-    "cfg_div[2]",
-    "cfg_div[3]",
-    "cfg_div[4]",
-    "cfg_div[5]",
-    "cfg_div[6]",
-    "cfg_div[7]",
-    "cfg_div[8]",
-    "cfg_div[9]",
-    "cfg_div[10]",
-    "cfg_div[11]",
-    "cfg_div[12]",
-    "cfg_div[13]",
-    "cfg_div[14]",
-    "cfg_div[15]",
-    "cfg_we"
-  ],
-  "unmapped_outputs_open": [
-    "tx_oe"
-  ],
+  "unmapped_inputs_tied_0": [],
+  "unmapped_outputs_open": [],
   "tools": {
     "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
     "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)",

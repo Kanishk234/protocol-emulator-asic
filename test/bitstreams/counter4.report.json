@@ -1,5 +1,6 @@
 {
   "design": "counter4",
+  "params": {},
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,

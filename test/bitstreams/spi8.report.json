@@ -1,5 +1,11 @@
 {
   "design": "spi_ctrl_top",
+  "params": {
+    "CPOL": 0,
+    "CPHA": 0,
+    "HALF": 8,
+    "PRIMS": 1
+  },
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,

@@ -1,28 +1,27 @@
 {
-  "design": "uart_top",
+  "design": "swd_top",
   "params": {
-    "DIV": 16,
-    "RUNTIME_DIV": 0,
+    "HALF": 4,
     "PRIMS": 1
   },
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,
-  "crc32": "0xAE99268A",
+  "crc32": "0xE65D12A0",
   "timing_corner": "nom_slow_1p08V_125C",
-  "fmax_mhz": 89.49,
+  "fmax_mhz": 54.35,
   "meets_50mhz": true,
   "utilisation": {
     "FABULOUS_LC": {
-      "used": 29,
+      "used": 44,
       "available": 88
     },
     "wp_timer": {
-      "used": 2,
+      "used": 1,
       "available": 2
     },
     "wp_shift": {
-      "used": 2,
+      "used": 1,
       "available": 2
     },
     "IOBUF": {
@@ -45,11 +44,13 @@
     "rst_n": {
       "i": "rst_n"
     },
-    "FAB_IN0": {
-      "i": "rx_i"
-    },
     "FAB_OUT0": {
-      "o": "tx_o"
+      "o": "swclk_o"
+    },
+    "FAB_IO0": {
+      "o": "swdio_o",
+      "oe": "swdio_oe",
+      "i": "swdio_i"
     },
     "h_wdata[0]": {
       "i": "h_wdata[0]"
@@ -136,28 +137,8 @@
       "oe": "h_status[7]"
     }
   },
-  "unmapped_inputs_tied_0": [
-    "cfg_div[0]",
-    "cfg_div[1]",
-    "cfg_div[2]",
-    "cfg_div[3]",
-    "cfg_div[4]",
-    "cfg_div[5]",
-    "cfg_div[6]",
-    "cfg_div[7]",
-    "cfg_div[8]",
-    "cfg_div[9]",
-    "cfg_div[10]",
-    "cfg_div[11]",
-    "cfg_div[12]",
-    "cfg_div[13]",
-    "cfg_div[14]",
-    "cfg_div[15]",
-    "cfg_we"
-  ],
-  "unmapped_outputs_open": [
-    "tx_oe"
-  ],
+  "unmapped_inputs_tied_0": [],
+  "unmapped_outputs_open": [],
   "tools": {
     "yosys": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)",
     "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)",

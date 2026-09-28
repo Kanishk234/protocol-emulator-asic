@@ -1,5 +1,9 @@
 {
   "design": "i2c_ctrl_top",
+  "params": {
+    "Q": 8,
+    "PRIMS": 1
+  },
   "arch": "warp_g1",
   "arch_version": "0x0003",
   "words": 722,

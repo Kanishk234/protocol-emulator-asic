@@ -13,7 +13,7 @@
   "//": "- the SRAM macro block and the four FP_PDN_V* stripe keys: R3 (D-031), unchanged, same macro location;",
   "//": "- PL_TARGET_DENSITY_PCT 51: run 4 (2 lanes, 4 pin units), 2 above the expected ~48.5 % global-placement utilisation (run 2 measured: GPL = 1.164 x Yosys + macro);",
   "//": "- PNR_SDC_FILE / SIGNOFF_SDC_FILE: the R2 latch exception (D-032);",
-  "//": "- DRT_OPT_ITERS 3: so a non-converging route ends and uploads GDS_logs before the 6 h job limit (D-034).",
+  "//": "- DRT_OPT_ITERS 64 (the default): run 5; runs 1-4 used 3 as a 6 h guard (D-034), which stopped run 4 at 874 violations (D-043).",
   "//": "- CTS_APPLY_NDR none: run 3; with clock NDRs the global router relaxes them one net at a time and never ends (run 2, D-043).",
 
   "//": "Here are some of the variables you may want to change:",
@@ -95,7 +95,7 @@
   "PNR_SDC_FILE": "dir::pnr.sdc",
   "SIGNOFF_SDC_FILE": "dir::signoff.sdc",
 
-  "DRT_OPT_ITERS": 3,
+  "DRT_OPT_ITERS": 64,
 
   "//": "Run 3 (D-043): no 2x-spacing rule on clock nets, so global routing ends after GRT_OVERFLOW_ITERS and reports overflow.",
   "CTS_APPLY_NDR": "none",

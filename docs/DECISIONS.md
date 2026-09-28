@@ -813,6 +813,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Evidence:** `test_internal/chip/` 5 tests through the pins only (identity/time/SRAM and E2, lane forwarding HOST_IN → HOST_OUT, UART TX on a full and a lean unit, a routine with LD/ST on the rotation, and `programs/uart.trw` compiled by tripc, loaded by `tools/host.load_sequence` and looped back uo0 → ui0: four bytes out and back). **5/5 on RTL and 5/5 on the Yosys gate-level netlist** (TT Icarus 13). Verilator `-Wall` clean over the whole chip. `synth/chip/run_chip.sh` reproduces area and timing.
 - **What it decides:** nothing new about the budget, but it replaces the estimate with RTL numbers. With R4 run 3, the routable point is below ~59 % at placement; the chip at spec counts is ~72 %. Run 4 (2 lanes, ~48.5 %) tells how far down the budget must go.
 
+## D-048 (2026-09-28): L3 scope for the phase 2 exit (proposed)
+- **Context:** the phase 2 exit box is "L3-UART, L3-SPI-C, L3-I2C-C pass in RTL against reference models and sigrok". `VERIFICATION.md` §6 defines those checks more widely than the shipped programs implement: L3-UART asks for 8E1 and parity errors, L3-SPI-C for modes 0–3 and 16-bit words, L3-I2C-C for arbitration loss. `programs/uart.trw` is 8N1, `spi_controller.trw` is mode 0 / 8-bit, and `i2c_controller.trw` has no arbitration handling. The model-side tests (`tools/kernels/tests`) cover the same subset as the programs.
+- **Now on the RTL** (`test_internal/chip/test_l3.py`, chip through its pins, reference model + sigrok): UART TX at 9600, 115200 and 1 Mbaud; UART RX at 115200 and 460800 with a framing error; SPI controller mode 0 at 1, 5 and 8.3 MHz; I2C controller at 100 kHz, ~400 kHz and 1 MHz with no, short and longer-than-a-period clock stretching, NACK and repeated START.
+- **Proposal:** the phase 2 box is judged on what the shipped programs implement (the list above, on RTL and in `gl_test` once the top is switched). The remaining §6 cases move to phase 3 with the program work they need: a parity-capable UART program (the op table has `PAR`), SPI CPOL/CPHA and 16-bit as program parameters (pin `idle`, `tx_edge`/`rx_edge`, `nbits`; no RTL change expected), and I2C arbitration loss in the controller program (the pin unit already reports readback mismatches only in BITSYNC; for I2C it would be a program check of SDA after each bit). Each needs its model-side test first, then the RTL L3 case.
+- **General need:** the checklist should measure the chip against the protocols it ships, and the wider §6 set against the programs that claim it.
+- **Cost:** none in hardware.
+- **Approval:** Krithik and Kanishk.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

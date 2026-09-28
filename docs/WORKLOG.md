@@ -29,12 +29,14 @@ Done:
 - `unit` workflow: new job `rtl` (VERIFICATION.md §10 puts L1 there): whole-chip Verilator lint, every L1 suite, the pin unit lean and full, the macro model fetch, and `test_chip` + `test_l3` on the chip RTL; results uploaded. First run will show whether Ubuntu 24.04's Verilator 5.020 agrees with the local 5.053.
 - BUGS #49: STEP now also makes the pin units live (D-041 B). L1-HOST 7/7, mutant killed.
 - `docs/HANDOFF.md` (local, not committed) for the next agent.
+- **L3 extended** to every rate the shipped programs support (`test_internal/chip/test_l3.py`): UART TX 9600/115200/1M, UART RX 115200/460800 with a framing error, SPI mode 0 at 1/5/8.3 MHz, I2C 100k/400k/1M with no, short and longer-than-a-period stretching. **4/4 tests (12 configurations) pass on RTL**, reference models + sigrok. `chiplib.start(clock=...)` so a test can reset between configurations without stacking clocks.
+- **D-048 (proposed):** judge the phase 2 L3 box on what the shipped programs implement; parity, SPI modes 1–3 / 16-bit and I2C arbitration loss move to phase 3 with the program work they need.
 
 Checklist boxes ticked (evidence):
 - None.
 
 Next:
-- R4 run 5 result; the area budget; L3 coverage (UART 9600/parity, SPI modes 1–3 and 16-bit, I2C 100k/1M, arbitration loss).
+- R4 run 5 result; the area budget; D-048 (L3 scope) with Kanishk.
 
 ## 2026-09-27: Krithik + Claude (phase 2: L3 on the chip RTL, R4 run 4 result)
 Done:

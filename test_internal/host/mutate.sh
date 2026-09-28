@@ -18,6 +18,7 @@ MUTANTS=(
   "trw_host.v#s/    assign hin_tok      = {o_hi\[1:0\], wd};/    assign hin_tok      = {2'd0, wd};/#D-046: HOST_IN tag ignored"
   "trw_host.v#s/    assign mem_en    = host_slot \&\& hp_v;/    assign mem_en    = hp_v;/#R1: SRAM access off the host slot"
   "trw_host.v#s/                live <= live || (wd\[NL-1:0\] != {NL{1'b0}});/                live <= (wd[NL-1:0] != {NL{1'b0}});/#D-041 B: live drops with RUN"
+  "trw_host.v#s/                live <= 1'b1;                           \/\/ D-041 B/                live <= live;                           \/\/ D-041 B/#BUGS #49: STEP does not make units live"
   "trw_host.v#s/    wire w_ln   = wr \&\& (o_ln < NL \* \`TRW_HA_LANE_STRIDE) \&\& (o_ln\[4:0\] <= \`TRW_HL_STATE);/    wire w_ln   = wr \&\& (o_ln < NL * \`TRW_HA_LANE_STRIDE);/#E2: read-only lane words writable"
   "trw_pins.v#s/else if (own_we \&\& !HOSTPAD\[own_waddr\])/else if (own_we)/#7.1: owner of a host pad writable"
 )

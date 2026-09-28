@@ -1,6 +1,6 @@
 // Host controller (ARCHITECTURE.md §9, DECISIONS D-046 with D-042 and D-044): the SPI slave (trw_spi) and
 // the register map generated into trw_defs.vh (`TRW_HA_*`, `TRW_HL_*`, `TRW_IRQ_*`). It owns RUN, STEP,
-// the pin units' `live` bit (D-041 B), the IRQ enable and the host's SRAM rotation slot; every other
+// the pin units' `live` bit (D-041 B: set by the first RUN or STEP), the IRQ enable and the host's SRAM rotation slot; every other
 // register belongs to its block, which this module writes through strobes and reads through the buses
 // below.
 //
@@ -161,6 +161,8 @@ module trw_host #(
                 run  <= wd[NL-1:0];
                 live <= live || (wd[NL-1:0] != {NL{1'b0}});
             end
+            if (w_step && ((wd[NL-1:0] & ~run) != {NL{1'b0}}))
+                live <= 1'b1;                           // D-041 B: the first RUN or STEP (BUGS #49)
             if (w_irqe)
                 irq_en <= wd[10:0];
             irq <= |(irq_st & irq_en);

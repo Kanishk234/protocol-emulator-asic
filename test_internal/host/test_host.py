@@ -131,6 +131,18 @@ async def test_control_id_step_irq(dut):
 
 
 @cocotb.test()
+async def test_step_makes_units_live(dut):
+    """D-041 B (BUGS #49): pin units become live at the first RUN *or STEP*; a STEP of no halted lane does not."""
+    h = await Host.start(dut)
+    assert int(dut.live.value) == 0
+    await h.write(HM["step"], [0])
+    assert int(dut.live.value) == 0
+    await h.write(HM["step"], [0b100])
+    assert int(dut.live.value) == 1 and int(dut.run.value) == 0
+    assert (await h.read(HM["run"]))[0] >> S.HOST_RUN_LIVE_BIT & 1
+
+
+@cocotb.test()
 async def test_write_decode(dut):
     h = await Host.start(dut)
     await h.write(HM["run"], [0b001])                   # lane 0 running

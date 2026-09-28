@@ -22,7 +22,7 @@ OR="$CACHE/openroad"
 B="$HERE/build"; rm -rf "$B"; mkdir -p "$B"
 S="$ROOT/src"
 FILES="trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v trw_host.v trw_spi.v trw_lane.v trw_alu.v
-       trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_unit.v trw_pins.v"
+       trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v trw_pins.v"
 LIB="$LIBDIR/sg13cmos5l_stdcell_typ_1p20V_25C.lib"
 YS="read_liberty -lib $LIB; read_verilog -lib $ROOT/spikes/r3_sram/overlay/src/RM_IHPSG13_1P_512x16_c2_bm_bist.v;
     read_verilog -DSYNTHESIS -I$S $(for f in $FILES; do printf '%s ' "$S/$f"; done)"

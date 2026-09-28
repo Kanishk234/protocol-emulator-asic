@@ -48,7 +48,7 @@ jobs:
           verilator --lint-only -Wall -Isrc --top-module trw_chip \
             src/trw_chip.v src/trw_sync.v src/trw_fabric.v src/trw_chan_port.v src/trw_chan_prod.v \
             src/trw_host.v src/trw_spi.v src/trw_lane.v src/trw_alu.v src/trw_slots.v src/trw_sram.v \
-            src/trw_pin_cfg.v src/trw_pin_io.v src/trw_pin_tx.v src/trw_pin_rx.v src/trw_pin_unit.v src/trw_pins.v \
+            src/trw_pin_cfg.v src/trw_pin_io.v src/trw_pin_tx.v src/trw_pin_rx.v src/trw_pin_bs.v src/trw_pin_unit.v src/trw_pins.v \
             spikes/r3_sram/overlay/src/RM_IHPSG13_1P_512x16_c2_bm_bist.v
 
       - name: L1 suites (fabric, ALU, lane, slot store, pad owners, host)

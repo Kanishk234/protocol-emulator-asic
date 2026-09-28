@@ -96,9 +96,11 @@ class Pins:
         return self.outq.pop(0) if self.outq else None
 
 
-async def start(dut, ui=0, uio=0):
-    """Clock, reset (pads held at `ui` / `uio` through reset), returns Pins."""
-    cocotb.start_soon(Clock(dut.clk, 20, unit="ns").start())
+async def start(dut, ui=0, uio=0, clock=True):
+    """Clock (once per test: pass clock=False on later calls), reset with the pads held at `ui` / `uio`,
+    returns Pins."""
+    if clock:
+        cocotb.start_soon(Clock(dut.clk, 20, unit="ns").start())
     dut.ena.value, dut.loop0.value, dut.uio_in.value = 1, 0, uio
     p = Pins(dut)
     for b in range(8):

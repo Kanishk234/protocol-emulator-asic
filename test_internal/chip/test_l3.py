@@ -3,9 +3,13 @@ program is compiled by tripc from programs/, loaded with tools/host over the SPI
 the reference models in tools/protomodels (written from the protocol specifications) and against sigrok's
 decoders on a VCD of the pads (an oracle we did not write, §9 rule 3).
 
-  L3-UART   programs/uart.trw            TX at 1 Mbaud and 115200 (model + sigrok `uart`); RX with a framing error
-  L3-SPI-C  programs/spi_controller.trw  mode 0 against the reference target (model + sigrok `spi`)
-  L3-I2C-C  programs/i2c_controller.trw  writes, NACK, repeated START, reads, clock stretching (model + sigrok `i2c`)
+  L3-UART   programs/uart.trw            TX at 1 Mbaud, 115200 and 9600 (model + sigrok `uart`); RX at 460800 and
+                                         115200 with a framing error
+  L3-SPI-C  programs/spi_controller.trw  mode 0 at 1, 5 and 8.3 MHz against the reference target (model + sigrok `spi`)
+  L3-I2C-C  programs/i2c_controller.trw  100 kHz / ~400 kHz / 1 MHz: writes, NACK, repeated START, reads, clock
+                                         stretching up to longer than an SCL period (model + sigrok `i2c`)
+The shipped programs are 8N1 UART, mode-0 8-bit SPI and an I2C controller without arbitration, so VERIFICATION.md
+§6's parity, SPI modes 1-3 / 16-bit and arbitration-loss cases need program work first.
 """
 
 import cocotb
@@ -31,118 +35,120 @@ async def until(p, cond, clocks, step=50):
 @cocotb.test()
 async def test_l3_uart_tx(dut):
     """L3-UART TX: bytes pushed into HOST_IN leave on uo0 as 8N1 frames at the programmed rate."""
-    for baud in (1_000_000, 115_200):
+    for i, (baud, msg) in enumerate(((1_000_000, MSG), (115_200, MSG), (9_600, b"T\xa5"))):
         cpb = 50e6 / baud
-        p = await start(dut)
+        p = await start(dut, clock=i == 0)
         await load(p, "uart", BAUD=baud)
         w = Wire(p, lambda uo, uout, uoe, bus: ({0: 1}, None), {"tx": lambda uo, bus: uo & 1})
-        for b in MSG:
+        for b in msg:
             await p.push(b)
-        n = round((len(MSG) * 10 + 20) * cpb)
-        await until(p, lambda: len(uart.decode(w.rec["tx"], cpb)) == len(MSG) and w.clocks > n // 2, 4 * n)
-        await ClockCycles(dut.clk, round(20 * cpb))
+        n = round((len(msg) * 10 + 20) * cpb)
+        await until(p, lambda: len(uart.decode(w.rec["tx"], cpb)) == len(msg) and w.clocks > n // 2, 4 * n)
+        await ClockCycles(dut.clk, round(2 * cpb))
         w.stop()
-        assert uart.decode(w.rec["tx"], cpb) == [(b, True) for b in MSG], baud
+        assert uart.decode(w.rec["tx"], cpb) == [(b, True) for b in msg], baud
         assert await p.read(0x0010, 1) == [0], "U0: no OVERRUN or LATE"
         write_vcd("uart_tx.vcd", w.rec)
         out = sigrok("uart_tx.vcd", f"uart:rx=tx:baudrate={baud}:format=hex", "uart=rx-data")
         if out is not None:
-            assert bytes(hex_bytes(out, r"uart-\d+: ")) == MSG, (baud, out[:200])
+            assert bytes(hex_bytes(out, r"uart-\d+: ")) == msg, (baud, out[:200])
 
 
 @cocotb.test()
 async def test_l3_uart_rx_framing(dut):
-    """L3-UART RX: a reference waveform on ui0 at 460800 baud, byte 3 with a broken stop bit: the good bytes
-    arrive as DATA, the broken frame as one ERR token carrying the raw frame, and nothing overruns. (The
-    rate is one the host link can drain: at SCK = clk/8 a HOST_OUT read takes ~560 clocks; faster streams
-    need a lane that buffers, or a faster host clock.)"""
-    baud = 460_800
-    cpb = 50e6 / baud
-    wave = uart.encode(MSG, cpb, bad_stop={3})
-    p = await start(dut, ui=1)                          # idle-high line through reset
-    await load(p, "uart", BAUD=baud)
-    it = iter(wave)
-    w = Wire(p, lambda uo, uout, uoe, bus: ({0: next(it, 1)}, None), {"rx": lambda uo, bus: 0})
-    got = []
-    for _ in range(400):
-        tok = await p.pop()
-        if tok:
-            got.append(tok)
-        if len(got) == len(MSG):
-            break
-    w.stop()
-    assert [d for t, d in got if t == DATA] == [b for i, b in enumerate(MSG) if i != 3], got
-    errs = [d for t, d in got if t == ERR]
-    assert len(errs) == 1 and errs[0] >> 1 & 0xFF == MSG[3] and not errs[0] >> 9 & 1, got
-    assert await p.read(0x0011, 1) == [0], "U1: no OVERRUN"
+    """L3-UART RX: a reference waveform on ui0, byte 3 with a broken stop bit: the good bytes arrive as DATA,
+    the broken frame as one ERR token carrying the raw frame, and nothing overruns. At 460800 and 115200 baud:
+    rates the host link can drain (at SCK = clk/8 a HOST_OUT read takes ~560 clocks; CLAIMS.md, Known limits)."""
+    for i, baud in enumerate((460_800, 115_200)):
+        cpb = 50e6 / baud
+        msg = MSG if baud > 200_000 else MSG[:5]
+        wave = uart.encode(msg, cpb, bad_stop={3})
+        p = await start(dut, ui=1, clock=i == 0)            # idle-high line through reset
+        await load(p, "uart", BAUD=baud)
+        it = iter(wave)
+        w = Wire(p, lambda uo, uout, uoe, bus, it=it: ({0: next(it, 1)}, None), {"rx": lambda uo, bus: 0})
+        got = []
+        for _ in range(2000):
+            tok = await p.pop()
+            if tok:
+                got.append(tok)
+            if len(got) == len(msg):
+                break
+        w.stop()
+        assert [d for t, d in got if t == DATA] == [b for k, b in enumerate(msg) if k != 3], (baud, got)
+        errs = [d for t, d in got if t == ERR]
+        assert len(errs) == 1 and errs[0] >> 1 & 0xFF == msg[3] and not errs[0] >> 9 & 1, (baud, got)
+        assert await p.read(0x0011, 1) == [0], "U1: no OVERRUN"
 
 
 @cocotb.test()
 async def test_l3_spi_controller(dut):
-    """L3-SPI-C mode 0 at 5 MHz SCK: CS low, six bytes, CS high; the reference target receives them and
-    answers each with the previous one (the first answer 0xA5), which come back on HOST_OUT."""
+    """L3-SPI-C mode 0 at 5, 1 and 8.3 MHz SCK: CS low, six bytes, CS high; the reference target receives
+    them and answers each with the previous one (the first answer 0xA5), which come back on HOST_OUT."""
     data = [0x01, 0x80, 0xFF, 0x3C, 0x00, 0x5A]
-    p = await start(dut)
-    await load(p, "spi_controller", PERIOD=10)
-    tgt = SPITarget(first=0xA5)
-    w = Wire(p, lambda uo, uout, uoe, bus: ({0: tgt.step(uo & 1, uo >> 1 & 1, uo >> 2 & 1)}, None),
-             {"sck": lambda uo, bus: uo & 1, "mosi": lambda uo, bus: uo >> 1 & 1,
-              "cs": lambda uo, bus: uo >> 2 & 1, "miso": lambda uo, bus: tgt.miso})
-    await p.push(0, EVENT)                               # CS low
-    for b in data:
-        await p.push(b)                                  # drains HOST_OUT while it waits
-    for _ in range(400):
-        if len(p.outq) == len(data):
-            break
-        await p.poll()
-    back = [d for _, d in p.outq]
-    await p.push(1, EVENT)                               # CS high
-    await ClockCycles(dut.clk, 200)
-    w.stop()
-    assert tgt.received == data
-    assert back == [0xA5] + data[:-1]
-    write_vcd("spi.vcd", w.rec)
-    for cls, want in (("mosi-data", data), ("miso-data", [0xA5] + data[:-1])):
-        out = sigrok("spi.vcd", "spi:clk=sck:mosi=mosi:miso=miso:cs=cs", f"spi={cls}")
-        if out is not None:
-            assert hex_bytes(out, r"spi-\d+: ") == want, (cls, out[:300])
+    for i, period in enumerate((10, 50, 6)):
+        p = await start(dut, clock=i == 0)
+        await load(p, "spi_controller", PERIOD=period)
+        tgt = SPITarget(first=0xA5)
+        w = Wire(p, lambda uo, uout, uoe, bus, tgt=tgt: ({0: tgt.step(uo & 1, uo >> 1 & 1, uo >> 2 & 1)}, None),
+                 {"sck": lambda uo, bus: uo & 1, "mosi": lambda uo, bus: uo >> 1 & 1,
+                  "cs": lambda uo, bus: uo >> 2 & 1, "miso": lambda uo, bus, tgt=tgt: tgt.miso})
+        await p.push(0, EVENT)                               # CS low
+        for b in data:
+            await p.push(b)                                  # drains HOST_OUT while it waits
+        for _ in range(400):
+            if len(p.outq) == len(data):
+                break
+            await p.poll()
+        back = [d for _, d in p.outq]
+        await p.push(1, EVENT)                               # CS high
+        await ClockCycles(dut.clk, 200)
+        w.stop()
+        assert tgt.received == data, period
+        assert back == [0xA5] + data[:-1], period
+        write_vcd("spi.vcd", w.rec)
+        for cls, want in (("mosi-data", data), ("miso-data", [0xA5] + data[:-1])):
+            out = sigrok("spi.vcd", "spi:clk=sck:mosi=mosi:miso=miso:cs=cs", f"spi={cls}")
+            if out is not None:
+                assert hex_bytes(out, r"spi-\d+: ") == want, (period, cls, out[:300])
 
 
 @cocotb.test()
 async def test_l3_i2c_controller(dut):
-    """L3-I2C-C at ~400 kHz with 40 clocks of clock stretching: START W(A0) W(01) W(02) STOP | START W(A2)
-    STOP (another device: NACK) | START W(A0) W(05) rSTART W(A1) R R R(NACK) STOP, against the reference
-    target at 0x50, which serves 0x11 0x22 0x33."""
-    p = await start(dut, uio=0xFF)
-    await load(p, "i2c_controller", PERIOD=124)
-    tgt = I2CTarget(0x50, read_data=[0x11, 0x22, 0x33], stretch=40)
+    """L3-I2C-C at ~400 kHz (40 clocks of stretching), 100 kHz (none) and 1 MHz (stretching longer than a
+    whole SCL period): START W(A0) W(01) W(02) STOP | START W(A2) STOP (another device: NACK) |
+    START W(A0) W(05) rSTART W(A1) R R R(NACK) STOP, against the reference target at 0x50 (0x11 0x22 0x33)."""
+    for i, (period, stretch) in enumerate(((124, 40), (500, 0), (50, 2 * 50 + 7))):
+        p = await start(dut, uio=0xFF, clock=i == 0)
+        await load(p, "i2c_controller", PERIOD=period)
+        tgt = I2CTarget(0x50, read_data=[0x11, 0x22, 0x33], stretch=stretch)
 
-    def env(uo, uout, uoe, bus):
-        scl_rel, sda_rel = tgt.step(bus >> 1 & 1, bus & 1)
-        return {}, {1: scl_rel, 0: sda_rel}
-    w = Wire(p, env, {"sda": lambda uo, bus: bus & 1, "scl": lambda uo, bus: bus >> 1 & 1})
-    S, P = (0, EVENT), (0x8000, EVENT)
-    W = lambda b: (b, DATA)
-    R = lambda nack: (nack, CTRL)
-    seq = [S, W(0xA0), W(0x01), W(0x02), P, S, W(0xA2), P,
-           S, W(0xA0), W(0x05), S, W(0xA1), R(0), R(0), R(1), P]
-    for data, tag in seq:
-        await p.push(data, tag)                          # drains the ACK bits and bytes while it waits
-    for _ in range(300):
-        if len(p.outq) >= 10 and tgt.log and tgt.log[-1] == ("STOP",):
-            break
-        await p.poll()
-    back = [d for _, d in p.outq]
-    await ClockCycles(dut.clk, 500)
-    w.stop()
-    assert back == [0, 0, 0, 1, 0, 0, 0, 0x11, 0x22, 0x33], back
-    assert tgt.received == [0x01, 0x02, 0x05]
-    assert [e for e in tgt.log if e[0] != "ADDR"] == [("START",), ("STOP",)] * 2 + [("START",), ("START",), ("STOP",)]
-    assert [e[1:] for e in tgt.log if e[0] == "ADDR"] == [(0xA0, True), (0xA2, False), (0xA0, True), (0xA1, True)]
-    write_vcd("i2c.vcd", w.rec)
-    out = sigrok("i2c.vcd", "i2c:scl=scl:sda=sda", "i2c")
-    if out is not None:
-        lines = [ln.split(": ", 1)[1] for ln in out.splitlines() if ": " in ln]
-        assert hex_bytes(out, "Data write: ") == [0x01, 0x02, 0x05]
-        assert hex_bytes(out, "Data read: ") == [0x11, 0x22, 0x33]
-        assert lines.count("Start") == 3 and lines.count("Start repeat") == 1 and lines.count("Stop") == 3
+        def env(uo, uout, uoe, bus, tgt=tgt):
+            scl_rel, sda_rel = tgt.step(bus >> 1 & 1, bus & 1)
+            return {}, {1: scl_rel, 0: sda_rel}
+        w = Wire(p, env, {"sda": lambda uo, bus: bus & 1, "scl": lambda uo, bus: bus >> 1 & 1})
+        S, P = (0, EVENT), (0x8000, EVENT)
+        W = lambda b: (b, DATA)
+        R = lambda nack: (nack, CTRL)
+        seq = [S, W(0xA0), W(0x01), W(0x02), P, S, W(0xA2), P,
+               S, W(0xA0), W(0x05), S, W(0xA1), R(0), R(0), R(1), P]
+        for data, tag in seq:
+            await p.push(data, tag)                          # drains the ACK bits and bytes while it waits
+        for _ in range(600):
+            if len(p.outq) >= 10 and tgt.log and tgt.log[-1] == ("STOP",):
+                break
+            await p.poll()
+        back = [d for _, d in p.outq]
+        await ClockCycles(dut.clk, 4 * period)
+        w.stop()
+        assert back == [0, 0, 0, 1, 0, 0, 0, 0x11, 0x22, 0x33], (period, back)
+        assert tgt.received == [0x01, 0x02, 0x05], period
+        assert [e for e in tgt.log if e[0] != "ADDR"] == [("START",), ("STOP",)] * 2 + [("START",), ("START",), ("STOP",)]
+        assert [e[1:] for e in tgt.log if e[0] == "ADDR"] == [(0xA0, True), (0xA2, False), (0xA0, True), (0xA1, True)]
+        write_vcd("i2c.vcd", w.rec)
+        out = sigrok("i2c.vcd", "i2c:scl=scl:sda=sda", "i2c")
+        if out is not None:
+            lines = [ln.split(": ", 1)[1] for ln in out.splitlines() if ": " in ln]
+            assert hex_bytes(out, "Data write: ") == [0x01, 0x02, 0x05], period
+            assert hex_bytes(out, "Data read: ") == [0x11, 0x22, 0x33], period
+            assert lines.count("Start") == 3 and lines.count("Start repeat") == 1 and lines.count("Stop") == 3

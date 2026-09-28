@@ -102,8 +102,25 @@ jobs:
           .venv/bin/python -m pip install --upgrade pip
           .venv/bin/python -m pip install -r requirements-dev.txt
 
+      # D-028: the compile flow's nextpnr comes from a newer suite (hard-primitive timing arcs)
+      - name: Cache nextpnr (OSS CAD Suite 2026-09-27)
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+
+      - name: Fetch nextpnr
+        run: scripts/fetch_nextpnr.sh
+
       - name: Compile the example designs (must match test/bitstreams)
         run: scripts/build_test_bitstreams.sh --check
+
+      - name: Compile every design-set protocol onto the chip fabric (UART, SPI, I2C controller must fit)
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          cd tools
+          python -m compile.protocols -o ../build/protocols --require uart spi_ctrl i2c_ctrl
 
       - name: Pin-level suite on the fabric RTL with real bitstreams
         run: |
@@ -113,6 +130,7 @@ jobs:
           make -C test WARP_FABRIC=rtl
           ! grep failure test/results.xml
           grep -q 'test_two_bitstreams' test/results.xml
+          for t in test_prims test_uart test_spi_ctrl test_i2c_ctrl; do grep -q "$t" test/results.xml; done
 
       - name: Upload results
         if: success() || failure()
@@ -123,3 +141,5 @@ jobs:
             test/results.xml
             build/compile/*/report.json
             build/compile/*/*.log
+            build/protocols/results.json
+            build/protocols/*/report.json

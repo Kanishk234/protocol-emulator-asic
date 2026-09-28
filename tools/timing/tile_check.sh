@@ -12,7 +12,8 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TILES="$ROOT/build/tile_cmos5l/fabulous-tiles"
-RUN="${1:-$(ls -td "$TILES"/tiles/tiny/PRIM2T2S/runs/*/ | head -1)}"
+# default: the newest run that completed (has a final netlist)
+RUN="${1:-$(for r in $(ls -td "$TILES"/tiles/tiny/PRIM2T2S/runs/*/); do [ -f "$r/final/nl/PRIM2T2S.nl.v" ] && { echo "$r"; break; }; done)}"
 PDK_ROOT="${PDK_ROOT:-$HOME/.cache/warp/pdk-full}"
 LIB="$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib"
 W="$ROOT/build/prim_sta"

@@ -34,9 +34,17 @@ MUTANTS=(
   "trw_pin_bs.v#s/    wire \[24:0\] tb0  = f_start ? per : tb;/    wire [24:0] tb0  = tb;/#B2: P21 no hard sync of the bit clock"
   "trw_pin_bs.v#s/    wire        done = !f_start \&\& smp_done;/    wire        done = smp_done;/#B2: P21 hard sync does not re-arm the sample"
   "trw_pin_bs.v#s/    wire        goes_idle = smp \&\& rec \&\& (icnt1 >= idle_bits)/    wire        goes_idle = 1'b0 \&\& smp \&\& rec \&\& (icnt1 >= idle_bits)/#B2: P20 idle never ends a frame"
-  "trw_pin_bs.v#s/    wire \[15:0\] w1     = order ? {w\[14:0\], bit_in} : (w | ({15'd0, bit_in} << wn));/    wire [15:0] w1     = {w[14:0], bit_in};/#B2: RX word ORDER ignored"
+  "trw_pin_bs.v#s/    wire \[15:0\] w1       = order ? {w\[14:0\], bit_in} : (w | ({15'd0, bit_in} << wn));/    wire [15:0] w1       = {w[14:0], bit_in};/#B2: RX word ORDER ignored"
   "trw_pin_bs.v#s/    wire \[24:0\] d    = !done ? ((e < sj) ? e : sj)/    wire [24:0] d    = !done ? sj/#B2: P22 resync moves by SJW, not by the phase error"
-  "trw_pin_bs.v#s/    wire        w_done = take_bit \&\& (wn1 == wlen) \&\& !goes_idle;/    wire        w_done = take_bit \&\& (wn1 == wlen);/#B2: P-G29 the idle-making sample completes a word"
+  "trw_pin_bs.v#s/    wire        fbit     = smp \&\& in_frame \&\& !goes_idle;/    wire        fbit     = smp \&\& in_frame;/#B2: P-G29 the idle-making sample completes a word"
+  "trw_pin_bs.v#s/    wire        dbit     = fbit \&\& !s_due \&\& open_fr;/    wire        dbit     = fbit \&\& !s_err \&\& open_fr;/#B2: P23 stuff bits not removed"
+  "trw_pin_bs.v#s/    wire        s_err    = fbit \&\& s_due \&\& (bit_in == rl);/    wire        s_err    = 1'b0;/#B2: P23 stuff errors not detected"
+  "trw_pin_bs.v#s/    wire \[15:0\] crc1     = (({crc\[14:0\], 1'b0}) ^ (cfb ? crc_poly : 16'd0)) \& cmask;/    wire [15:0] crc1     = ({crc[14:0], 1'b0} ^ {15'd0, cfb}) \& cmask;/#B2: P24 CRC polynomial ignored"
+  "trw_pin_bs.v#s/    wire        v_tok    = at_n \&\& words_on;/    wire        v_tok    = 1'b0;/#B2: P24 no verdict at FRAME's n"
+  "trw_pin_bs.v#s/                        post     <= 1'b1;/                        post     <= 1'b0;/#B2: P24 no stuff check right after bit n"
+  "trw_pin_bs.v#s/    wire        lvl_ok   = !stuff_lvl\[1\] || (rl == stuff_lvl\[0\]);/    wire        lvl_ok   = 1'b1;/#B2: P23 STUFF_LVL ignored"
+  "trw_pin_bs.v#s/    wire        c_in     = dbit \&\& (dcnt >= {6'd0, crc_skip})/    wire        c_in     = dbit/#B2: P24 CRC_SKIP ignored"
+  "trw_pin_bs.v#s/    assign late_set = f_now \&\& (!in_frame || !words_on || (dcnt >= arg\[10:0\]));/    assign late_set = 1'b0;/#B2: P24 FRAME never LATE"
 )
 killed=0
 survived=0

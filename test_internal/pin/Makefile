@@ -16,7 +16,7 @@ else
 COMPILE_ARGS += -Ptb_pin.FULL=$(FULL) -Ptb_pin.FRAC=$(FRAC)
 endif
 TOPLEVEL = tb_pin
-COCOTB_TEST_MODULES ?= test_pin_tx,test_pin_rx,test_pin_full
+COCOTB_TEST_MODULES ?= test_pin_tx,test_pin_rx,test_pin_full,test_pin_bs,test_pin_bs_frame
 export FULL
 COCOTB_RESULTS_FILE = results_full$(FULL)_frac$(FRAC).xml
 

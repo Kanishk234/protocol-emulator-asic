@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        job: [f1_isolation, f2_loader, f4_prims]
+        job: [f1_isolation, f2_loader, f3_fifo, f4_prims]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6

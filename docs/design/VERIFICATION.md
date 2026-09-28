@@ -13,6 +13,7 @@
 |---|---|---|---|---|---|
 | V0 | Static | Lint (Verilator `-Wall`, Icarus `-g2005`), source lists in sync, Yosys synth sanity, TT docs check | Verilator, Icarus, Yosys, tt_tool | `lint`, `scripts/check_all.sh`, `gds` docs step | running |
 | V1 | Models and primitives | Reference models self-consistent (round trips, hypothesis); later hard primitives and shell blocks at corner cases | pytest, hypothesis; cocotb, formal | `unit`, `formal` | models running (25 tests); primitives phase 3 |
+| V1S | Shell transactions | SPI responses, configuration words, host-channel bytes and IRQ against an independent transaction model; command × state, error and abort coverage | pyuvm, cocotb, Icarus | `test_internal/uvm`, `unit` | local seed 1: 2,288 transactions, 79/79 bins, 0 mismatches (2026-09-28); CI pending |
 | V1P | Protocol user designs (RTL) | Each design-set protocol against its reference model + sigrok, several configurations | cocotb, Icarus, sigrok-cli | `unit` (`protocols/*/test`) | running: UART 3, SPI 6, I2C ctrl 3, I2C target 3 configs |
 | V2 | Configuration mapping | A bitstream's bits land in the intended configuration latches; emulation mode (latches pre-initialized) vs real load give the same behaviour | cocotb, FABulous sim | `fabric` | FABulous demo two-bitstream check running; own fabric phase 2 |
 | V3 | Source vs. fabric | A protocol's source RTL and the configured fabric behave the same at the pins, cycle by cycle (the FABulous demo method), then bounded equivalence for one small design | cocotb, SymbiYosys/EQY | `fabric`, `formal` | phase 2 |
@@ -26,7 +27,7 @@
 |---|---|---|---|---|
 | F1 | Output isolation: if STATE ≠ RUNNING then all fabric output pins and all `uio_oe` bits are 0 (ARCHITECTURE §4) | shell with the fabric as a free (unconstrained) black box | unbounded (k-induction) target; ≥ 64-cycle BMC minimum | phase 2 |
 | F2 | Aborted or corrupt loads never reach RUNNING: after a LOAD_BEGIN, RUNNING requires a LOAD_END whose CRC and length match | shell (host interface + loader) | ≥ 64-cycle BMC over arbitrary host byte streams; k-induction target | phase 2 |
-| F3 | Host channel FIFOs: no loss or duplication; overflow sets ch_overflow and drops only the new byte | shell FIFO | unbounded (induction) | phase 2 |
+| F3 | Host channel FIFO: no loss, duplication or reordering; a push while full drops only the new byte; clear empties it | `wp_fifo` at depths 2 and 4 | unbounded (`abc pdr`) | PASS locally (2026-09-28, `formal/f3_fifo.sby`); the shell's `ch_overflow` flag is covered separately by `test_host_channel_overflow` |
 | F4 | Primitives: cycle-exact behaviour vs. a one-line spec model (timer, shift register) | each primitive | unbounded (induction) | phase 3 |
 
 "Formally verified" is only ever claimed with the property ID and its bound (CLAUDE.md).

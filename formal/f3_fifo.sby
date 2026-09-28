@@ -1,0 +1,24 @@
+# F3 (docs/design/VERIFICATION.md): host-channel FIFO, no loss / duplication / reordering, against
+# a shadow queue. Unbounded (abc pdr: IC3 finds the invariants; entries behind the head are not
+# observable, so plain k-induction cannot close). Tasks: the shell's depth (AW = 1) and a deeper one.
+# Run: sby -f formal/f3_fifo.sby
+[tasks]
+d2
+d4
+
+[options]
+mode prove
+depth 12
+
+[engines]
+abc pdr
+
+[script]
+read -formal wp_fifo.v f3_fifo.sv
+d2: chparam -set AW 1 f3_fifo
+d4: chparam -set AW 2 f3_fifo
+prep -top f3_fifo
+
+[files]
+../src/wp_fifo.v
+f3_fifo.sv

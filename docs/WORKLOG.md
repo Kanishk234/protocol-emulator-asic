@@ -21,6 +21,23 @@ Next:
 
 ---
 
+## 2026-09-28 (later): Krithik + Claude (phase 2: R4 run 6 result; count-generic tests)
+Done:
+- **R4 run 6** (gds 36384571157, the real `trw_chip` at the protocol floor): GPL 56.1 %, **global-routing overflow 5,350** (Metal3 87.3 %), detailed routing 16 violations after 64 iterations in 4 h 53 min, then cancelled by GitHub's 6 h limit in the antenna re-route; no artifacts. Read from the job log. `R4_FLOORPLAN.md` §12, AREA, D-043. The floor as built does not harden inside the TT `gds` job (a local hardening would not count: every entry uses the same workflow).
+- **Count-generic tests** (BUGS #52): `tb_chan.v`, `tb_host.v`/`test_host.py`, `test_gen`, `tools/host` and `tripc` tests take the lane/unit counts from the spec. Pass at 3/6 (main: pytest 292, chan 7/7, host 7/7 under Icarus and Verilator) and at 2/4 (branch copy: pytest 285 + the 7 `test_pinregs` cases, all `rtl` suites, pin 52/52 ×2, chip 10/10).
+- Area by block at the floor (Yosys, `synth/chip/run_chip.sh`): pin units ~201K, lanes 150K, fabric + producers 35K, host 22K.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- Run 6: the chip must come down ~40–60K µm² (to run 5's ~340K) or change the floor. Needs the team (D-049/D-043); no D-055 written yet.
+- 7 `test_pinregs` cases still hard-code U1 full (in `tools/tripsim/`, not read in this RTL session).
+
+Next:
+- The team's choice on run 6 (area pass on the pin units and lanes vs a floor change), then run 7.
+- B3 (P26–P29).
+
 ## 2026-09-28: Krithik + Claude (phase 2: milestone B2c; engine retimed; R4 run 6 prepared)
 Done:
 - **Milestone B2c** in `trw_pin_bs.v`: the TX queue (DATA, SYNC, LINE [2]/[6]/[3], WAIT [1]), TX stuffing, the TX CRC with CRC_XOR, our frame start and the join, the own-edge rules; pin A from the engine. Tests `test_pin_bs_tx.py` (5), including three CAN frames decoded and ACKed by the reference `CANNode` on a wired-AND bus. Pin 52/52 on both builds and under Verilator; B2 mutants 30/30 killed; chip tests 10/10. Engine 34.8K, full unit logic 73.8K. D-054 (readings P-G31 to P-G35).

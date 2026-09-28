@@ -2,7 +2,7 @@
 
 **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile (1289.28 × 710.64 µm die, ~902K µm² core, Metal1–Metal4)? R2 routed one lane only at ~42 % placement density; the plan of record is ~74–85 % of the core. DECISIONS D-043.
 
-**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7. **Run 4 (2 lanes, density 51, 2026-09-27): global routing with 0 overflow (Metal3 74.2 %); detailed routing reached 874 violations in its 4 allowed iterations, 1,428 after the antenna re-routes; job 2 h 55 min.** §9. **Run 5 (the same with `DRT_OPT_ITERS` 64, 2026-09-28): routes clean. 0 DRC, LVS match, 0 antenna, typ timing met, gl_test and precheck pass; `gds` job 2 h 58 min, precheck 1 h 56 min.** §10. **Run 6 (the real chip at the protocol floor): prepared, §11.**
+**Status (2026-09-26): run 1 failed at detailed placement after post-CTS hold repair (DPL-0036), at ~70 % global-placement utilisation (~77 % after the flow's growth). Routing was never reached.** §3–4. **Run 2 (4 pin units, density 62, 2026-09-26/27) placed at 58.9 % and passed CTS and hold repair, then spent 5 h 51 min in global routing without finishing and hit GitHub's 6 h limit; no overflow numbers, no artifacts.** §5–6. **Run 3 (same design, no clock NDRs, 2026-09-27) ran the whole flow in 5 h 25 min and does not route: global-routing overflow 4,883 (4,651 on Metal3, the only horizontal routing layer, at 92.8 % usage), 12,872 detailed-routing violations at the end. About three quarters of the violations are in the lanes' area.** §7. **Run 4 (2 lanes, density 51, 2026-09-27): global routing with 0 overflow (Metal3 74.2 %); detailed routing reached 874 violations in its 4 allowed iterations, 1,428 after the antenna re-routes; job 2 h 55 min.** §9. **Run 5 (the same with `DRT_OPT_ITERS` 64, 2026-09-28): routes clean. 0 DRC, LVS match, 0 antenna, typ timing met, gl_test and precheck pass; `gds` job 2 h 58 min, precheck 1 h 56 min.** §10. **Run 6 (the real chip at the protocol floor, 2026-09-28): placed at 56.1 %, global-routing overflow 5,350 (Metal3 87.3 %); detailed routing reached 16 violations after its 64 iterations (4 h 53 min), then GitHub's 6 h limit stopped the antenna re-route. No artifacts.** §11–12.
 
 ---
 
@@ -245,7 +245,7 @@ One change from run 3 (D-034 rule): **2 lanes instead of 3**, and the density th
 4. **A full-size hardening takes about 5 h end to end:** ~3 h `gds`, then precheck ~2 h (in parallel with `gl_test`, ~3 min). The precheck's live log stops updating during the DRC, which looks like a hang; it is not.
 5. **For the budget:** the protocol floor (D-049: 2 lanes, 4 units with U0 full, 12 slots) is ~395K µm² ≈ 56 % at placement by the RTL numbers, more with the BITSYNC engine's growth (D-052, ~58 %). That is inside the untested 48–59 % window. The next measurement that settles the budget is a run at the floor's size, ideally with the real `trw_chip` at those counts.
 
-## 11. Run 6 (prepared 2026-09-28, not pushed yet): the real chip at the protocol floor
+## 11. Run 6 (pushed 2026-09-28 06:03 UTC, 7a0548d): the real chip at the protocol floor
 
 Asked for by Krithik (D-043's next measurement). One change of design, and the density that follows. It replaces run 5's stand-in with the real chip at the smallest size that still supports every protocol (D-049).
 
@@ -254,3 +254,30 @@ Asked for by Krithik (D-043's next measurement). One change of design, and the d
 - **Pre-layout timing:** +7.35 ns typ, +0.42 ns slow (the worst path is inside the BITSYNC engine's timer; before the retiming, BUGS #51, slow was about −10 ns).
 - **Local checks:** Verilator `-Wall` clean; `test/` 4/4 on the RTL; `test_internal/chip` 10/10 at the floor's counts. The branch's `unit` and `rtl` workflows will show known failures: 11 pytest cases and the L1-CHAN / L1-HOST harnesses hard-code the spec's 3 lanes, 6 units and U1 full (the numbering, 13 ports). Those are test assumptions, not RTL faults.
 - **What to look for:** global-routing overflow (run 3 at 58.9 %, 3 lanes: 4,883; run 4/5 at 47.6 %: 0), then whether detailed routing reaches 0. If it routes clean, the floor fits on 6x4 with margin to spare, or none, which is what the budget needs. If it does not route, the job may run to the 6 h limit with 64 iterations and leave no artifacts. The fallback is then a rerun with `DRT_OPT_ITERS` 3, to read the overflow.
+
+## 12. Results: run 6 (2026-09-28) — congested; stopped by the 6 h limit in detailed routing
+
+`gds` on `spike/r4-floorplan` (7a0548d), run [36384571157](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36384571157). The `gds` job ran 06:03 → 12:03 UTC and was **cancelled by GitHub's 6 h limit** in the first antenna re-route of detailed routing; precheck, `gl_test` and `viewer` were skipped, and no artifacts were uploaded. Everything below is from the job log (`gh api …/actions/jobs/108807151528/logs`, local copy `build/ci/r4/run6/gds_job.log`, not committed).
+
+| | Run 5 (stand-in, 2 lanes, 4 lean units) | **Run 6 (real `trw_chip` at the floor)** |
+|---|---|---|
+| Yosys (flat) | 337.4K µm² | 398.7K µm² |
+| Global placement | 47.6 % | **56.1 %** (predicted 56.4 %) |
+| Post-GPL repair | 917 fanout violations, 2,873 buffers | 1,145 fanout violations, 3,453 buffers |
+| Hold repair | 1,662 endpoints, 2,860 buffers | 1,891 endpoints, 290 buffers |
+| After global routing (cells + macro) | 493.8K µm² = 54.7 % | **567.7K µm² = 62.9 %** (6,670 repair buffers, 77.6K µm²) |
+| Global-routing usage M2 / M3 / M4 | 56.9 / 74.2 / 15.4 % | 76.0 / **87.3** / 35.3 % |
+| Global-routing overflow | 0 | **5,350** (Metal3 5,100, Metal2 159, Metal4 91) |
+| Global routing time | 24 s | 3 min 42 s |
+| Detailed routing, first pass | 0 at iteration 5; 1 h 58 min in all | 37,402 → 21,390 → 19,844 → 4,882 → … → 93 (iteration 38) → **16 after iteration 64**; **4 h 53 min** (iteration 0 alone 55 min) |
+| Antenna re-route 1 | 0 | 3,414 → … → 60 when the job was cancelled |
+| Signoff (STA, DRC, LVS) | done | not reached |
+
+**What it means:**
+1. **The real chip at the protocol floor (398.7K µm², 56.1 % at placement) is congested on the 6x4 tile:** 5,350 global-routing overflows, nearly all on Metal3 (the only horizontal layer), like run 3 (58.9 %, 4,883). The router nearly got there anyway (16 violations after the first pass), but it took almost 5 h, and the flow still needed the antenna re-routes and ~45 min of signoff. The same run would need about 7 h; the `gds` job has 6 h.
+2. **A local hardening is not an answer:** the competition hardens every entry with the same Tiny Tapeout `gds` workflow, so the design has to pass inside that job. The target is a route that finishes with margin, as run 5 did (3 h job).
+3. **So the protocol floor as built today is above the ceiling for this flow.** The routable point we know is run 5's 47.6 % (337.4K µm²). Somewhere between 47.6 % and 56.1 % the route stops fitting in the job. The chip has to come down by roughly 40–60K µm² (to ~340–360K), or its routing demand has to drop in some other way.
+4. **Where the area is** (Yosys, hierarchical, 412.5K µm² before flattening): pin units ~201K (U0 full 73.8K of which the BITSYNC engine 34.8K; three lean units 91.4K, their TX 18.7K each; configuration latches 26.6K; pad owners 9.7K), lanes 150K (two × lane 44.5K + ALU 5.9K + slot store 24.5K), fabric 27.6K + producers 7.7K, host 22.2K (SPI 9.2K).
+5. The 2,148 tie cells are the flops' unused asynchronous reset pins tied high (sync reset; run 5 had 1,852). They are not a problem to fix.
+
+**Next (needs a decision, D-049/D-043):** the choices and the recommendation are in `docs/HANDOFF.md` §3 and the session's WORKLOG entry. No run 7 is prepared yet.

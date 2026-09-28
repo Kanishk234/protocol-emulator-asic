@@ -21,6 +21,32 @@ Next:
 
 ---
 
+## 2026-09-28: Codex (phase 2: complete pin-reading review through P-G47)
+Done:
+- Added focused P-G33–P-G47 tests to `tools/tripsim/tests/test_semantics.py` and revert-mutation checks for each behavior.
+- Confirmed P-G34/P-G35, P-G37/P-G39, and P-G42–P-G47. Recorded model/spec-reading differences for P-G33, P-G36, P-G38, P-G40 and P-G41 as D-061–D-065; no behavior changed.
+- Added a `test_pinregs.py` check proving default lane and unit counts follow generated definitions; reverting either default to a fixed 3 or 6 fails.
+
+Evidence:
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **91 passed**.
+- Full tripsim suite: **133 passed, 2 failed**. The only failures are `test_uart_tx_shift_decoded_by_sigrok` at both baud rates; `sigrok-cli` returned no UART annotations for the generated VCD. Its startup also reports `libusb_init() returned LIBUSB_ERROR_OTHER`; root cause is not established, so this is recorded as an unresolved environment/check issue rather than a model bug.
+- Each focused test's revert mutation failed, including TX queue terminal stuffing, JAM acceptance, foreign-frame stuff errors, event queue depth, readback mode, JAM disarm, TX run count, listen-only clearing, abort-event fields, and the SE0 condition.
+- `git diff --check`: clean.
+- Pushed workflows for `0b3b8e9`: [unit](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36486427059), [lint](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36486427054), [test](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36486427153), and [docs](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36486427097) all succeeded.
+
+Checklist boxes ticked:
+- None. L2 remains unstarted.
+
+Problems / decisions:
+- D-057–D-065 contain proposed clarifications/contests; team decisions are needed before changing those behaviors. No new BUGS entry was warranted because these are unresolved reading differences, not established implementation bugs.
+- The seven `test_pinregs.py` cases now select feature-capable and lean units from generated `PIN_UNIT_FEATURES`; the added default-count test and fixed-count revert mutations confirm model construction follows generated lane/unit counts. The team budget/count decision remains pending, so the frozen spec counts remain in effect.
+- No checklist boxes were ticked; the full tripsim suite is not green with the two sigrok annotation failures.
+
+Next:
+- Apply the team’s decisions to D-057–D-065, then complete count/budget review and its remaining tests. Start L2 only after the model prerequisites and evidence are ready.
+
+---
+
 ## 2026-09-28: Codex (phase 2: D-044/D-045 model confirmation)
 Done:
 - Added focused D-044 coverage for a port reconfiguration cancelling a same-clock take, and D-045 coverage for no fetch during EXEC/waiting plus RPC advance at fetch.
@@ -30,6 +56,7 @@ Done:
 - Added a D-052 P-G28 event-generator check and confirmed D-053 P-G27/P-G30 (stuff-error bit count and FRAME verdict). P-G28 is proposed in D-060; P-G27/P-G30 have focused mutation evidence.
 - Added D-054 P-G31 focused coverage: WAIT [1] clears at the sample point and permits TX DATA acceptance that clock; a revert mutation fails.
 - Added D-054 P-G32 coverage for opening our frame on the next bit boundary and loading EVENT `0x9001` on that clock; a boundary mutation fails.
+- Added D-054 P-G33–P-G35 checks. Empty-queue terminal stuffing disagrees with P-G33 and is proposed as D-061; frame-start stuffing reset and released-line own-edge/idle behavior match P-G34/P-G35.
 
 Evidence:
 - `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **75 passed**.
@@ -38,6 +65,7 @@ Evidence:
 - Revert mutations for BITSYNC event bypass, stuff-error bit count, and FRAME verdict threshold each failed the focused check.
 - Reverting P-G31's wait clear also fails its focused check.
 - Delaying the P-G32 frame-open condition by one clock fails its focused check.
+- Mutations changing the frame-start stuffing reset or treating a released line as driven for own-edge or idle checks fail their focused tests.
 - Revert mutation removing D-044's take cancellation failed (`port.takes` became 1); removing the D-045 fetch guard failed during EXEC; removing the RPC increment failed the RPC assertion.
 - `git diff --check`: clean.
 - Pushed workflow run [36484905620](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36484905620): unit, lint, test, docs and all RTL/Verilator jobs completed successfully.
@@ -46,7 +74,7 @@ Checklist boxes ticked:
 - None. L2 remains unstarted; D-051–D-055 and the count/budget decision are still pending.
 
 Problems / decisions:
-- No disagreement with D-044/D-045 readings found. D-057's P-G24/P-G25/P-G28, D-058's P-G26, D-059's P-G29 and D-060's P-G28 proposals remain unresolved; none of their semantics changed. D-053 P-G27/P-G30 are confirmed.
+- No disagreement with D-044/D-045 readings found. D-057's P-G24/P-G25/P-G28, D-058's P-G26, D-059's P-G29, D-060's P-G28, and D-061's P-G33 proposals remain unresolved; none of their semantics changed. D-053 P-G27/P-G30 and D-054 P-G31/P-G32/P-G34/P-G35 are confirmed.
 - The Phase 2 RTL checklist L1 edit is an existing, separate workspace change and is not part of this model session's code changes.
 
 Next:

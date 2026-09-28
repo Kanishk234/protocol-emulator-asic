@@ -886,6 +886,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Context:** B2c of pin-unit milestone B in `src/trw_pin_bs.v` (§14 P21, P22, P25). Details, tests and numbers in `PIN_UNIT_RTL.md` §9. B2 is now complete; B3 (P26–P29) is next.
 - **Readings for the model side:** P-G31 (WAIT [1] release clock), P-G32 (where our frame opens, and EVENT `0x9001`'s clock), P-G33 (a due stuff bit goes out with nothing after it), P-G34 (the TX run restarts at our frame start), P-G35 (a released line is not "driven" for the own-edge and idle rules).
 - **Model confirmation (2026-09-28):** P-G31's wait releases at the sample point, and a queued TX DATA token is accepted in that same model clock. P-G32 opens our frame at the next bit boundary after bus idle and loads EVENT `0x9001` in that clock. Focused tests and mutations pin both readings in `tools/tripsim/tests/test_semantics.py`.
+- **Model confirmation (2026-09-28):** P-G34 resets the stuffing run at frame start. P-G35 treats `tx_line = None` as released for both own-edge detection and idle frame close. Both readings have focused mutation checks in `tools/tripsim/tests/test_semantics.py`.
 - **Timing:** the chip's slow corner had fallen to −9.8 ns: the pin can come straight from a uo pad (P7) into the engine's bit-clock arithmetic. The engine now computes its sums from registered state and lets the pin only select (BUGS #51). No behaviour change. The chip is +7.65 ns typ and +0.87 ns slow pre-layout.
 - **Size:** engine 34.8K µm², full unit logic 73.8K, chip 616.7K at spec counts. D-052's trend holds: BITSYNC is about twice the estimate.
 - **Cost:** as above; no spec change.
@@ -893,6 +894,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 ## D-055 (2026-09-28): milestone B3 (BITSYNC readback, JAM, listen-only, flags, NRZI, SE0, OE auto) in the RTL; twelve readings
 - **Context:** B3, the last stage of pin-unit milestone B, in `src/trw_pin_bs.v` and `src/trw_pin_unit.v` (§14 P24, P26–P29). Details, tests and numbers in `PIN_UNIT_RTL.md` §9. Milestone B is complete: U0 (and U1 at spec counts) has PULSE, the carrier and all of BITSYNC. Written from the spec text and the CAN, HDLC and USB programs; `tools/tripsim` not read.
 - **Readings for the model side:** P-G36 (a response JAM in our own frame is judged when taken), P-G37 (ERR `0x2nnn`'s nnn), P-G38 (JAM [0] without [4]), P-G39 (no readback of JAM bits), P-G40 (a stuff error stops only our own frame's TX), P-G41 (the status EVENT register), P-G42 (each bit carries its readback mode; mode 2 reports every bit), P-G43 (JAM start clocks; firing disarms), P-G44 (flag mode counts committed bits), P-G45 (what listen-only clears), P-G46 (what "our own frame" spans; the readback EVENT fields), P-G47 (the SE0 end of frame). Each is pinned by a test in `test_internal/pin/test_pin_bs_b3.py` or a mutant.
+- **Model review (2026-09-28):** P-G37's flag-abort ERR includes the current line-bit count; P-G39's JAM output clears readback for its driven bits. Both have focused model tests and revert mutations in `tools/tripsim/tests/test_semantics.py`.
+- **Model confirmation (2026-09-28):** P-G42 captures the readback mode per transmitted bit; P-G43 counts JAM delay at sample points and disarms after firing; P-G44 counts started bits; P-G45 listen-only clears the TX queue and both JAM states. Focused tests and revert mutations cover these readings.
+- **Model confirmation (2026-09-28):** P-G46 readback abort EVENT data includes the sampled line level and the current line-bit index; P-G47 emits the SE0 frame verdict only when both sampled lines are low, before adding that ending sample to frame data. Focused mutation tests cover both.
+- **Model disagreement:** P-G41's pending status-event capacity is proposed in D-065; no model behavior changed pending agreement.
+- **Model disagreements:** P-G36, P-G38 and P-G40 are proposed in D-062–D-064; no model changes were made pending team agreement.
 - **Two choices worth the team's eye:** (1) arming a JAM does not replace a pending response, because the CAN program sends a CRC-error flag and re-arms in the same routine; "a new JAM replaces one in progress" is read as a new response. (2) Status EVENTs get a one-entry wait register (P-G41) rather than being dropped on a clash, because an arbitration loss on the bit that completes a word is common in CAN and the program needs both tokens.
 - **Timing:** the flag hold-back first sat on the frame-start path (slow −1.58 ns pre-layout); it now shifts outside the frame's priority chain. Chip +7.09 ns typ / +0.02 ns slow at spec counts, +8.49 / +2.21 at the protocol floor.
 - **Size:** engine 43.2K µm² (+8.4K), full unit logic ~81.9K; chip 632.2K at spec counts, **407.6K at the protocol floor** (B2c: 398.7K), ~57.6 % expected at global placement. R4 run 6 showed the floor at 398.7K does not harden inside the 6 h job (D-043), so this is the number the area pass starts from.
@@ -930,6 +936,29 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Finding:** `PinUnit.compute_rx()` delegates to `BitSync.step()` and returns before evaluating `ev_edge`; a pin-A rising edge therefore does not load an EVENT in BITSYNC. D-052 reads the event generator as active in BITSYNC, with priority on a coincident RX load.
 - **Proposal:** decide whether P8 events remain enabled in BITSYNC, and if so explicitly state their priority against bit-synchronous RX outputs on the same clock. No behavior changed pending agreement.
 - **Cost:** no added storage if event tokens use the existing load path; enabling this behavior changes model scheduling and same-clock producer-load priority.
+
+## D-061 (2026-09-28, proposed): terminal BITSYNC stuff bit (P-G33)
+- **Context:** model-side test of the D-054 reading, using `BitSync._tx_bit_start()` and P23/P25 only.
+- **Finding:** when the stuffing run reaches its threshold but the TX queue is empty, the model does not send a terminal stuff bit; it releases the line. D-054 reads that the due stuff bit is sent with nothing following it. P25's “with no bits queued the line is released” supports the current model reading.
+- **Proposal:** confirm that a terminal stuff bit requires a following queued bit, or approve sending the final due stuff bit before release. No behavior changed pending agreement.
+- **Cost:** no added state; the choice affects the terminal TX bit sequence.
+
+## D-062 (2026-09-28, proposed): response JAM taken during our own frame (P-G36)
+- **Finding:** the model stores a response JAM taken during an own frame, then checks `own && in_frame` only when a later bit starts. If the frame ends first, that response can drive the bus. D-055 reads that own-frame eligibility is judged when the command is taken.
+- **Proposal:** discard the response JAM at acceptance while an own frame is active, or approve the model's deferred check. No behavior changed pending agreement.
+
+## D-063 (2026-09-28, proposed): JAM [0] without [4] (P-G38)
+- **Finding:** with [0] set and [4] clear, the model starts an unarmed response JAM. ARCHITECTURE.md P28 says [0] without [4] is ignored.
+- **Proposal:** fix the model to ignore the command as P28 specifies, or change P28 if the RTL reading is intended. No behavior changed pending agreement.
+
+## D-064 (2026-09-28, proposed): receive stuff error while another frame is queued for TX (P-G40)
+- **Finding:** any receive stuff error calls `_abort()` and clears queued TX, even when `own` is false. D-055 reads that a stuff error stops only the TX of our own frame.
+- **Proposal:** abort TX only when the offending frame is ours, or approve the model's unconditional abort. No behavior changed pending agreement.
+
+## D-065 (2026-09-28, proposed): BITSYNC status-event wait capacity (P-G41)
+- **Finding:** the model buffers two pending BITSYNC output tokens in `BitSync.out` before the producer register, then raises OVERRUN on a third. D-055 describes a one-entry wait register for status EVENTs.
+- **Proposal:** match one waiting token in the model, or confirm the model's two-token queue as the intended capacity. No behavior changed pending agreement.
+- **Cost:** a smaller model queue changes only overflow timing; increasing RTL buffering would add state and event ordering logic.
 - **Proposal:** confirm the three RTL readings and amend P17, P30 and P8 with their minimum-duration, carrier-disable and event-priority rules. Until accepted, keep the behavior question visible and do not change the model to match an unconfirmed reading.
 - **Evidence:** source review only; no new focused tests or mutation checks for these readings yet. Those are prerequisites before D-057 can be accepted.
 - **Decision:** Krithik + Kanishk.

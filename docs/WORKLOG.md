@@ -4,6 +4,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-28 (session 9: close phase 4 CI; phase 5 reproduction and shell verification)
+**Done:**
+- CI from the Phase 4 push completed green: `gds`/precheck/`gl_test` 36451108163; `fabric` 36451328356 (including co-simulation); `unit` 36451328364, `lint` 36451328384, `test` 36451328368, `docs` 36451328775. No committed hardware files changed since `hw-freeze` (`git diff --name-only hw-freeze..14e7063 -- src arch macro info.yaml` empty). Phase 4 checklist and summary finalized; Phase 4 complete.
+- F3 FIFO formal proof passes locally at depths 2 and 4 (`scripts/formal.sh f3_fifo.sby`, `abc pdr`). Independent shell transaction model plus pyuvm environment passes seed 1 locally: 2,288 transactions, 2,851 response bytes, 228 configuration words, 137 design-side bytes, no mismatches, 79/79 coverage bins. Pinned pyuvm and added the checks to `unit` CI and `scripts/check_all.sh`. The mutation report now records 11/11 killed locally.
+- Filled Phase 4 CI IDs into `docs/CLAIMS.md` and `docs/EVIDENCE.md`; completed the user guide, prior-art comparison, README and Tiny Tapeout datasheet draft. `docs/summaries/PHASE5.md` is in progress.
+- Clean source export of 14e7063 plus the proposed README and Phase 5 sources in `/tmp/warp-repro.vVyH1n`, fresh Python 3.12 venv: `scripts/check_all.sh` passed (377 pytest, all default protocol RTL tests, 30 idle-fabric chip tests, 2 primitive tests, pyuvm 2,288 transactions/79 bins); all 11 committed bitstreams rebuilt identically; UART compiled; UART co-simulation passed; fabric RTL chip suite passed 30/30 including the showcase. Found two README gaps (non-executable fetch script; Python 3.12 required) and BUGS #20 (stale idle-fabric simulator reused for the real fabric); fixed instructions and separated simulator build paths. This is a clean source export and venv on the same development machine, not a separate clean machine/container.
+**Boxes ticked:** Phase 4 exit checklist (CI IDs above); Phase 5 claims audit and user-guide/datasheet items (`docs/design/phases/PHASE5_EVIDENCE_DOCS.md`).
+**Next:** repeat reproduction in a clean container; finish the evidence report's local-measurement run-ID audit; get CI on the uncommitted Phase 5 changes before closing Phase 5.
+
+---
+
 ## 2026-09-27 (session 8: G0 chip green in CI; G1 primitives usable; UART, SPI, I2C controller fit G1)
 **Done:**
 - **G0 chip in CI, all green** (e5b1f98): `gds` + precheck + `gl_test` 17/17 in 36353540402 (45.8 min; setup +10.63 ns, hold +0.121 ns, DRC/LVS/antenna 0, IR drop 0.77 mV); lint, unit, test, docs, formal, fabric green. D-025 evidence and the hardening table updated.
@@ -52,7 +63,9 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   - H3 SWD: fits (44/88; G0 61) as a bit engine with packets in `tools/board/swd.py`; chip test `test_swd` passes.
   - H4 CAN 2.0A: RTL correct (3/3 vs reference nodes), **does not fit** (207/88; G0 241).
 - Showcase replaced (D-036): six protocols switched at run time on one chip (`test_showcase_protocol_switching` passes). Robustness: `test_corrupt_load_over_running_design`, `test_uart_input_phase` pass; mutation campaign `scripts/mutation.py` 8/8 killed (`docs/reports/mutation.md`); co-simulation `test_internal/cosim` (UART source RTL vs its bitstream on the fabric: identical TX waveforms, equal RX) passes. Local: chip suite 27/27, pytest 377, lint 8 protocols × 2 forms clean, bitstreams reproducible. `docs/summaries/PHASE4.md` drafted.
-**Next:** push; CI evidence (gds/gl_test with the new tests, fabric with co-sim) closes phase 4; then phase 5 (evidence, CLAIMS, user guide).
+- Pushed (76860b1, 14e7063); CI: unit, lint, docs, test green; gds (76860b1) and fabric running.
+**Phase 5 started in parallel** (the user asked; phase 4's only open exit items are its CI runs): `docs/CLAIMS.md` audited (C1–C10), `docs/USER_GUIDE.md`, `docs/EVIDENCE.md` (draft), `docs/reports/prior_art_comparison.md`, README rewritten, `docs/info.md` + `info.yaml` pinout comment for G1; clean-checkout reproduction running.
+**Next:** CI results → close phase 4 and fill the pending run IDs; clean reproduction; PHASE5 summary.
 **Next (superseded):** after the G1 hardening result, push the protocol chip tests + timing work (touches `test/` and `macro/`, so one more hardening, which also gives gl_test evidence for the 21 tests); then phase 2 exit: timing cross-check, per-tile equivalence plan, PHASE2 summary.
 
 ---

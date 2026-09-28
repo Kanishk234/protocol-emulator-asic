@@ -11,7 +11,7 @@
 - [x] Compare held-out resource use on the final architecture vs. G0 (from a G0 build) to show whether specialization generalized. (`heldout_results.md` summary: G1 saves 17–50 LCs per protocol; 1-Wire fits only on G1)
 
 ### Software side (D-032: required by the organizers)
-- [ ] Loader for the Tiny Tapeout demo board: a MicroPython module for its RP2040 that speaks the host protocol (ARCHITECTURE §2–3) through the board's pins, sharing its transaction encoding with `tools/host/protocol.py` (tested in simulation against the chip's RTL/gate-level netlist through the same transactions; on hardware only when a board exists). (`tools/board/warp.py` + README; pytest 270 (equal to the reference, byte for byte); `test_board_loader` passes on the fabric RTL locally 2026-09-28; tick with CI `gl_test`)
+- [x] Loader for the Tiny Tapeout demo board: a MicroPython module for its RP2040 that speaks the host protocol (ARCHITECTURE §2–3) through the board's pins, sharing its transaction encoding with `tools/host/protocol.py` (tested in simulation against the chip's RTL/gate-level netlist through the same transactions; on hardware only when a board exists). (`tools/board/warp.py` + README; pytest 270 (equal to the reference, byte for byte); `test_board_loader` passes in CI `gl_test` 36451108163)
 - [x] One command per step, from source to running protocol: compile (`tools/compile`), load, run, read status; documented end-to-end examples for UART, SPI and I2C (source, pin map, bitstream, host session). (`docs/EXAMPLES.md`; board helpers `tools/board/examples.py`; the board code tested against the chip model: `test_board_loader`, `test_board_examples_spi`, `test_board_examples_i2c`, local 2026-09-28; the guide's compile commands run as written)
 
 ### Showcase
@@ -24,14 +24,14 @@
 ### Robustness and verification depth
 - [x] Reconfiguration tests: stop, partial transfer, bad checksum, wrong architecture version, reload, restart; outputs stay parked until a valid start. (test.py: wrong arch, bad CRC, length, sync, empty load, aborted transaction, reload, restart after STOP, parking under inputs (CI `test`/`gl_test`); new `test_corrupt_load_over_running_design`: a corrupt load over a running real design leaves the fabric half-written, the chip in ERROR with every pin parked and RUN refused, then a valid load runs; local 2026-09-28)
 - [x] Input phase tests: external protocol edges at varied phases relative to the system clock. (`test_uart_input_phase`: 12 UART bytes with every edge at a random 1–19 ns phase, all received, no flags; RTL simulation does not model metastability)
-- [x] Fault injection (mutation) campaign: wrong configuration-bit position, timer off-by-one, lost FIFO item, inverted output-enable. Each must be caught; investigate any that survive. (`scripts/mutation.py`, `docs/reports/mutation.md`: 8 mutants incl. the four named plus shift register wrong end, CRC check off, architecture check off, parking gate removed; all 8 killed by their intended check, local 2026-09-28)
+- [x] Fault injection (mutation) campaign: wrong configuration-bit position, timer off-by-one, lost FIFO item, inverted output-enable. Each must be caught; investigate any that survive. (`scripts/mutation.py`, `docs/reports/mutation.md`: the original 8 and 3 shell status/error mutants all killed by their intended checks, local 2026-09-28)
 - [x] Bounded equivalence or co-simulation between a protocol's source RTL and its configured-fabric simulation for at least one small design. (`test_internal/cosim`: the UART source RTL next to the chip with uart16 loaded through the host pins, one simulation: TX waveforms identical sample for sample for 4 bytes, RX bytes and flags equal for 6 frames; local 2026-09-28, CI `fabric` step added)
 
 ## Phase exit checklist
 - [x] `docs/reports/heldout_results.md` covers every held-out protocol
-- [ ] Showcase passes its tests from a real bitstream through the host interface (run ID: …)
-- [ ] Reconfiguration test suite green (run ID: …)
-- [x] Fault-injection results recorded; no unexplained surviving faults (`docs/reports/mutation.md`: 8 of 8 killed)
-- [ ] No hardware changes since `hw-freeze` except logged bug fixes
-- [ ] All CI workflows green on `efpga`
-- [ ] `docs/summaries/PHASE4.md` written
+- [x] Showcase passes its tests from a real bitstream through the host interface (CI `gl_test` 36451108163; `fabric` 36451328356)
+- [x] Reconfiguration test suite green (CI `gl_test` 36451108163; `fabric` 36451328356)
+- [x] Fault-injection results recorded; no unexplained surviving faults (`docs/reports/mutation.md`: 11 of 11 killed locally)
+- [x] No hardware changes since `hw-freeze` except logged bug fixes (`git diff --name-only hw-freeze..14e7063 -- src arch macro info.yaml` is empty, 2026-09-28)
+- [x] All CI workflows green on `efpga` (gds/precheck/gl_test 36451108163; fabric 36451328356; unit 36451328364; lint 36451328384; test 36451328368; docs 36451328775; formal last ran on frozen hardware, 36383587298)
+- [x] `docs/summaries/PHASE4.md` written (final 2026-09-28)

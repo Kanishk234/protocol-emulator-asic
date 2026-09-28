@@ -30,7 +30,7 @@ project:
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
-# ARCHITECTURE.md section 1. The current 16-LUT fabric connects FAB_IN0..3 and FAB_OUT0..3 only.
+# ARCHITECTURE.md section 1: host SPI on ui[0..2]/uo[0..1]; the fabric (G1) uses FAB_IN0..4, FAB_OUT0..5 and FAB_IO0..7.
 pinout:
   # Inputs
   ui[0]: "HOST_CS_N"

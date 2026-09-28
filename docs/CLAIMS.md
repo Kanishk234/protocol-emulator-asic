@@ -1,14 +1,27 @@
 # Claims
 
-Every public claim about the chip, with its evidence. If there is no evidence, it is not a claim.
+Every public claim about the chip, with its evidence. If there is no evidence, it is not a claim. Audited 2026-09-28 (phase 5). "Local" means measured on the development machine and reproducible with the named script, but not run in CI.
 
 | # | Claim | Evidence (run ID / report / proof log) | Status |
 |---|---|---|---|
-| C1 | A 16-LUT FABulous fabric (stock `LUT4x8_ha` tiles, CMOS5L patch D-010/D-017) hardened as a macro inside a Tiny Tapeout 6x4 IHP CMOS5L project passes TT's template `gds` flow, precheck (9/9) and `gl_test`, with DRC, LVS and antenna at 0 | CI run 36327510268 (dea2150); `docs/reports/fabric_tiny.md` | holds (phase 1 spike; not the final chip) |
-| C2 | On CMOS5L, a FABulous LUT4 costs ~5,090 µm² including its configuration latches, switch matrix and routing (tile `LUT4x8_ha`, 40,719 µm² per 8 LUT4, routed within Metal2–Metal4, KLayout DRC 0) | local tile runs 2026-09-25/26, `docs/reports/tile_cmos5l.md` (no CI run: tiles are hardened locally) | measurement, local only |
-| C3 | The four design-set protocol user designs pass RTL tests against reference models and sigrok decoders in several configurations | CI `unit` 36211778569 and later; `protocols/*/README.md` | holds (RTL simulation only, not on the fabric yet) |
+| C1 | A 16-LUT FABulous fabric (stock `LUT4x8_ha` tiles, CMOS5L patch D-010/D-017) hardened as a macro inside a Tiny Tapeout 6x4 IHP CMOS5L project passes TT's template `gds` flow, precheck (9/9) and `gl_test`, with DRC, LVS and antenna at 0 | CI 36327510268 (dea2150); `docs/reports/fabric_tiny.md` | holds (phase 1 spike; not the final chip) |
+| C2 | On CMOS5L, a FABulous LUT4 costs ~5,090 µm² including its configuration latches, switch matrix and routing (tile `LUT4x8_ha`, 40,719 µm² per 8 LUT4, routed within Metal2–Metal4, KLayout DRC 0) | `docs/reports/tile_cmos5l.md` | local measurement (tiles are hardened locally) |
+| C3 | **The final chip** (shell + G1 fabric: 88 LUT4 + 2 hard timers + 2 hard shift registers, frozen as `hw-freeze` → 3047dea) passes TT's `gds` flow and precheck with routing DRC, LVS, antenna and Magic DRC at 0, and meets setup and hold at the 50 MHz clock (slow/fast corners: setup WS +12.48 ns, hold WS +0.112 ns) | CI 36383587262 (3047dea); `docs/design/PHYSICAL_DESIGN_AND_CI.md` hardening table | holds |
+| C4 | **Reprogrammable after fabrication, shown on the hardened netlist:** real bitstreams compiled from Verilog are loaded through the chip's host SPI interface (checked load: architecture version, length, CRC-32) into the gate-level chip and run correctly: a counter, combinational logic, the host byte channel, both hard primitives, and the design-set UART, SPI controller and I2C controller against independent reference devices | CI `gl_test` 36383587262 (21/21); `test/test_bitstream.py` | holds (simulation; the fabric is modelled from its RTL, D-023) |
+| C5 | Three of the four held-out protocols, written only after the hardware was frozen, run on the frozen chip: WS2812 (32 of 88 logic cells), 1-Wire (77), SWD (44, bit engine with packets in host software); CAN 2.0A does not fit (207) | `docs/reports/heldout_results.md`; RTL tests in CI `unit` 36451328364; chip tests in `gl_test` 36451108163 and `fabric` 36451328356 | holds in simulation |
+| C6 | At equal area (same macro, one tile slot swapped), the hard-primitive fabric G1 places 3 of the 4 design-set protocols where the plain-LUT fabric G0 places 1 | `docs/reports/architecture_comparison.md`; G1 fits checked in CI `fabric` (`compile.protocols --require`, 36376994866 and later) | G1 side in CI; G0 side local |
+| C7 | Formal properties with bounds: F1 no fabric output or output enable reaches a pin unless the chip is RUNNING (unbounded, k-induction, fabric outputs unconstrained); F2 aborted or corrupt loads never reach RUN (bounded, BMC depth 84); F3 the host-channel FIFO never loses, duplicates or reorders a byte (unbounded, abc pdr, depths 2 and 4); F4 each hard primitive equals its specification model for every configuration (unbounded, k-induction) | F1/F2/F4: CI `formal` 36383587298 and `docs/reports/formal.md`; F3: local `scripts/formal.sh f3_fifo.sby` (2026-09-28), CI pending | F1/F2/F4 hold in CI within stated bounds; F3 holds locally, CI pending |
+| C8 | The UART compiled to a bitstream behaves like its source RTL: identical TX waveforms, sample for sample, and equal received bytes and flags, in one simulation of the chip (fabric RTL model) next to the source | `test_internal/cosim`; CI `fabric` 36451328356 | holds in simulation |
+| C9 | A mutation campaign plants 11 realistic bugs in the primitives, loader, FIFO, output parking, configuration bits, and status handling; each is caught by its intended check | `scripts/mutation.py`, `docs/reports/mutation.md`, local `build/mutation/results.json` | local |
+| C10 | The software side exists and is tested against the chip model: a compile flow (Verilog + pin map → checked bitstream + report), a demo-board loader and protocol helpers that are the same code the board would run, and end-to-end examples | `docs/EXAMPLES.md`, `tools/board/`, `test_board_*`; CI `gl_test` 36451108163 and `fabric` 36451328356 | simulation only; **not run on a board** |
 
-Not claimed: "first FPGA on Tiny Tapeout IHP" or similar (Tiny FABulous exists on SKY130 and FABulous has IHP tapeouts; `docs/notes/prior_art.md`); any user-design rate or fabric timing (not measured yet).
+## Not claimed
+- Any protocol rate or fabric clock rate on silicon. The Fmax numbers in reports are nextpnr estimates from a timing model (`tools/timing/README.md`), not measurements.
+- Anything on real hardware: no board, no silicon yet.
+- "First" or "novel" in general: Tiny FABulous (SKY130) and FABulous IHP tapeouts exist; PRISM is a Verilog-programmed protocol engine on IHP (`docs/notes/prior_art.md`). What WARP does differently is argued in the evidence report only as far as the data above supports.
+- Superiority over a CPU/PIO-style design: no equal-area measurement against one exists.
+- Support for the I2C target (does not fit, D-035), CAN (does not fit), USB or Ethernet.
+- Generality beyond the held-out results (C5).
 
 ## Never claim
 - USB or Ethernet support, real-hardware testing, or "formally verified" without the property and bound.

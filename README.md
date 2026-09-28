@@ -1,42 +1,52 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/unit/badge.svg) ![](../../workflows/fabric/badge.svg) ![](../../workflows/formal/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# WARP: a reprogrammable protocol emulator on Tiny Tapeout
 
-- [Read the documentation for project](docs/info.md)
+WARP is our entry to the Jane Street Protocol Emulator ASIC competition (Tiny Tapeout, IHP 130 nm CMOS5L, 6x4 tiles). Instead of a small CPU running protocol code, the chip holds a small **FPGA fabric specialized for protocols**: 88 LUT4 logic cells plus two kinds of generic hard blocks (a loadable timer and a shift register with a bit count), behind a management shell with a checked SPI loader. You write a protocol in Verilog, compile it into a bitstream on your computer, and load it into the chip; changing protocols changes the bitstream, not the silicon. The architecture was chosen from measurements of real protocol designs and tested on a held-out set sealed before profiling: the frozen chip runs UART, SPI and I2C, plus three of four protocols it was never tuned for (WS2812, 1-Wire, SWD; CAN does not fit). Everything is verified in simulation and formal proofs; nothing has run on silicon yet.
 
-## What is Tiny Tapeout?
+## Where to look
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+| | |
+|---|---|
+| What is claimed, and the evidence for each claim | [docs/CLAIMS.md](docs/CLAIMS.md) |
+| How to use it: write, compile, load, run | [docs/USER_GUIDE.md](docs/USER_GUIDE.md), [docs/EXAMPLES.md](docs/EXAMPLES.md) |
+| How the architecture was chosen (equal-area comparison) | [docs/reports/architecture_comparison.md](docs/reports/architecture_comparison.md), [docs/reports/g1_limits.md](docs/reports/g1_limits.md), [docs/reports/profiling.md](docs/reports/profiling.md) |
+| Protocols it was never designed for | [docs/reports/heldout_results.md](docs/reports/heldout_results.md) |
+| Verification: formal proofs, mutation campaign | [docs/reports/formal.md](docs/reports/formal.md), [docs/reports/mutation.md](docs/reports/mutation.md) |
+| The hardware contract | [docs/design/ARCHITECTURE.md](docs/design/ARCHITECTURE.md) |
+| Decisions, bugs, phase summaries | [docs/DECISIONS.md](docs/DECISIONS.md), [docs/BUGS.md](docs/BUGS.md), [docs/summaries/](docs/summaries/) |
+| Tiny Tapeout datasheet page | [docs/info.md](docs/info.md) |
 
-To learn more and get started, visit https://tinytapeout.com.
+## Quick start (simulation)
 
-## Set up your Verilog project
+Linux or WSL with Python ≥ 3.12 and the tools in [docs/VERSIONS.md](docs/VERSIONS.md) (OSS CAD Suite 2026-06-29, Icarus, Verilator, and sigrok-cli).
 
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
+```sh
+scripts/setup_venv.sh && source .venv/bin/activate
+bash scripts/fetch_nextpnr.sh             # the compile flow's nextpnr (D-028)
+scripts/check_all.sh                      # lint, unit tests, shell checks, idle-fabric chip tests
+scripts/build_test_bitstreams.sh --check  # rebuild and compare the committed bitstreams
 
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
+# compile a protocol into a bitstream
+cd tools && python -m compile.compile --pins ../protocols/uart/pins.yaml -o ../build/uart ../protocols/uart/*.v
 
-## Enable GitHub actions to build the results page
+# load real bitstreams into the whole chip (fabric RTL model) and run them
+cd .. && make -C test WARP_FABRIC=rtl
+make -C test_internal/cosim               # source RTL vs the loaded UART bitstream
+```
 
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
+## Repository
 
-## Resources
+| Path | Contents |
+|---|---|
+| `src/` | the chip: shell (`wp_*`), top level `tt_um_warp`, fabric black box |
+| `arch/` | fabric definitions (`warp_g1` is the chip), hard primitives (`arch/prims`) |
+| `macro/` | the hardened fabric macros and their tool files |
+| `protocols/` | user designs: UART, SPI, I2C controller, I2C target, WS2812, 1-Wire, SWD, CAN |
+| `tools/compile/` | the compile flow; `tools/board/` the demo-board loader and examples; `tools/host/` the host protocol; `tools/refmodels/` independent reference models |
+| `test/` | chip-level tests (top-level pins only, also run on the gate-level netlist) |
+| `formal/`, `test_internal/` | formal proofs; white-box tests and the co-simulation |
 
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
+## Tiny Tapeout
 
-## What next?
-
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+Tiny Tapeout is an educational project that makes it easier and cheaper to get digital and analog designs manufactured on a real chip: https://tinytapeout.com. This repository started from the [ttihp-verilog-template](https://github.com/TinyTapeout/ttihp-verilog-template); the template's workflows build the GDS, run the precheck and the gate-level test on every change.

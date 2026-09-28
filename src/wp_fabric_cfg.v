@@ -62,10 +62,13 @@ module wp_fabric_cfg #(
     genvar r, c;
     generate
         for (r = 0; r < ROWS; r = r + 1) begin : g_row
+            // the row number sized to the parameter's width (a bare genvar expression is 32 bits)
+            localparam integer         ROW_I = r + 1;
+            localparam [ROW_SEL_W-1:0] ROW   = ROW_I[ROW_SEL_W-1:0];
             Frame_Data_Reg #(
                 .FrameBitsPerRow(FRAME_BITS),
                 .RowSelectWidth (ROW_SEL_W),
-                .Row            (r + 1)
+                .Row            (ROW)
             ) u_row (
                 .CLK         (clk),
                 .FrameData_I (word),

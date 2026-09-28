@@ -46,6 +46,20 @@ module tt_um_warp (
 );
     localparam integer ROWS = 5, COLS = 6;
 
+    // ---- reset (BUGS #18): the rst_n pin is asynchronous to clk. Two flops make its assertion
+    // and its release land on clock edges; every block is reset from rst_s_n (low from 2 clocks
+    // after rst_n falls until 2 clocks after it rises). The configuration path (FABulous's
+    // ConfigFSM, asynchronous reset) gets its own copy one flop later, rst_cfg_n, so no net is
+    // used both as a synchronous and as an asynchronous reset. The synchronizer has no reset of
+    // its own: it is the reset source.
+    reg  [1:0] rst_sync;
+    reg        rst_cfg_n;
+    always @(posedge clk) begin
+        rst_sync  <= {rst_sync[0], rst_n};
+        rst_cfg_n <= rst_sync[1];
+    end
+    wire rst_s_n = rst_sync[1];
+
     // ---- IO cells of the fabric (numbering above)
     wire [35:0] cell_pad;             // into the fabric
     wire [35:0] cell_val, cell_en;    // out of the fabric
@@ -69,7 +83,7 @@ module tt_um_warp (
 
     wp_shell #(.ARCH_VERSION(16'h0003)) u_shell (
         .clk         (clk),
-        .rst_n       (rst_n),
+        .rst_n       (rst_s_n),
         .host_cs_n   (ui_in[0]),
         .host_sck    (ui_in[1]),
         .host_mosi   (ui_in[2]),
@@ -96,7 +110,7 @@ module tt_um_warp (
     wire [20*COLS-1:0] frame_strobe;
     wp_fabric_cfg #(.ROWS(ROWS), .COLS(COLS), .FRAME_BITS(32), .MAX_FRAMES(20)) u_cfg (
         .clk          (clk),
-        .rst_n        (rst_n),
+        .rst_n        (rst_cfg_n),
         .word         (cfg_word),
         .word_strobe  (cfg_strobe),
         .restart      (cfg_restart),
@@ -108,13 +122,13 @@ module tt_um_warp (
     wire [4:0] fab_in;
     wire [7:0] io_in;
     wp_sync #(.WIDTH(13)) u_in_sync (
-        .clk(clk), .rst_n(rst_n), .d({ui_in[7:3], uio_in}), .q({fab_in, io_in})
+        .clk(clk), .rst_n(rst_s_n), .d({ui_in[7:3], uio_in}), .q({fab_in, io_in})
     );
 
     reg user_rst_n;
     always @(posedge clk) begin
-        if (!rst_n) user_rst_n <= 1'b0;
-        else        user_rst_n <= !user_reset;
+        if (!rst_s_n) user_rst_n <= 1'b0;
+        else          user_rst_n <= !user_reset;
     end
 
     // ---- pads into the fabric
@@ -195,7 +209,7 @@ module tt_um_warp (
     reg [5:0] out_q;
     reg [7:0] io_out_q, io_oe_q;
     always @(posedge clk) begin
-        if (!rst_n) begin
+        if (!rst_s_n) begin
             out_q    <= 6'd0;
             io_out_q <= 8'd0;
             io_oe_q  <= 8'd0;

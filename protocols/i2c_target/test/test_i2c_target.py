@@ -70,7 +70,10 @@ async def host(dut, cmds):
     for byte in cmds:
         dut.h_wdata.value = byte
         dut.h_wvalid.value = 1
-        await RisingEdge(dut.clk)          # command taken here (h_wready is always 1)
+        while True:
+            await RisingEdge(dut.clk)      # command taken at the first edge with h_wready
+            if int(dut.h_wready.value):
+                break
         dut.h_wvalid.value = 0
         await ReadOnly()                   # a read's reply is valid right after that edge
         if int(dut.h_rvalid.value):

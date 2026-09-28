@@ -99,7 +99,7 @@ module spi_ctrl_top #(
             end
             assign rbyte  = {q[6:0], sample_e ? miso_s[1] : samp};
             assign mosi_o = CPHA_B ? mosi_q : (cs_n_o ? 1'b1 : sout);
-            wire _unused = &{done_unused, 1'b0};
+            wire _unused = &{done_unused, q[7], 1'b0};
         end else begin : g_logic
             reg [CW-1:0] cnt;
             reg [7:0]    tx, rx;

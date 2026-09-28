@@ -2,6 +2,7 @@
 top: i2c_target_top
 params:
   NREGS: 4
+  PRIMS: 1                     # hard shift register (G1; D-026)
 pins:
   clk: clk
   rst_n: rst_n

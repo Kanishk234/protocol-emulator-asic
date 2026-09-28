@@ -143,7 +143,15 @@ module trw_host #(
     reg  [10:0] irq_en;
     wire        any_drop = |dropped;
     wire [10:0] irq_st;
-    assign irq_st[5:0] = (overrun | late) & {NU{1'b1}};
+    generate                                   // [5:0]: unit u's OVERRUN or LATE (0 for units the chip lacks)
+        for (g = 0; g < 6; g = g + 1) begin : g_irq
+            if (g < NU) begin : g_u
+                assign irq_st[g] = overrun[g] | late[g];
+            end else begin : g_n
+                assign irq_st[g] = 1'b0;
+            end
+        end
+    endgenerate
     assign irq_st[7:6] = 2'd0;
     assign irq_st[8]   = hout_avail;
     assign irq_st[9]   = hin_free;
@@ -247,13 +255,24 @@ module trw_host #(
         endcase
     end
 
+    reg     uf_late, uf_ovr;                   // unit_flags word r_uf (any unit count)
+    integer ku;
+    always @* begin
+        uf_late = 1'b0;
+        uf_ovr  = 1'b0;
+        for (ku = 0; ku < NU; ku = ku + 1)
+            if (r_uf[2:0] == ku[2:0]) begin
+                uf_late = late[ku];
+                uf_ovr  = overrun[ku];
+            end
+    end
     always @* begin
         rd_data = 16'd0;
         if (ra == `TRW_HA_RUN)                      rd_data = {live, {(15-NL){1'b0}}, run};
         else if (ra == `TRW_HA_TIME)                rd_data = time_now;
         else if (ra == `TRW_HA_IRQ_EN)              rd_data = {5'd0, irq_en};
         else if (ra == `TRW_HA_IRQ_STATUS)          rd_data = {5'd0, irq_st};
-        else if (r_uf < NU)                         rd_data = {14'd0, late[r_uf[2:0]], overrun[r_uf[2:0]]};
+        else if (r_uf < NU)                         rd_data = {14'd0, uf_late, uf_ovr};
         else if (ra == `TRW_HA_VERSION)             rd_data = `TRW_SPEC_VERSION;
         else if (ra == `TRW_HA_ID)                  rd_data = `TRW_HOST_ID;
         else if (r_pt < NC)                         rd_data = {6'd0, port_state[10*r_pt[3:0] +: 10]};

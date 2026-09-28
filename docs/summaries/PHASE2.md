@@ -1,6 +1,6 @@
 # Phase 2 summary: baseline fabric and shell
 
-**Status:** in progress (2026-09-28). Six of the eight exit items pass; left: all CI workflows green on `efpga` after the last push, and this summary's final version. Two task items stay open (timing-model cross-check; protocol pin-level tests waiting for their CI `gl_test` run).
+**Status:** in progress (2026-09-28). Six of the eight exit items pass; left: all CI workflows green on `efpga` after the last push, and this summary's final version. One task item waits for CI (protocol pin-level tests in `gl_test`).
 
 ## Goal
 Build the real chip around a real fabric: the shell (SPI host interface, checked configuration loading, run control, host byte channels), a full-size fabric with and without the planned primitives (G0, G1), a compile flow from user Verilog to our bitstream, and tests that load real bitstreams into the hardened chip. Then answer the phase's decision question: is shell + G1 a valid fallback submission?
@@ -17,11 +17,11 @@ Build the real chip around a real fabric: the shell (SPI host interface, checked
 ## What we found
 - **The primitives are the difference between a toy and a protocol chip.** In the same area, G0 runs one of the four design-set protocols (SPI) and G1 runs three: UART 29, SPI 47, I2C controller 70 of 88 logic cells (`docs/reports/g1_results.md`). The I2C target (123–169 cells) fits neither; its size is the design itself, not the tools.
 - **Logic-cell count is not capacity.** Each 8-cell tile has one clock enable and one reset; designs failed placement with cells to spare until the compile flow turned rarely shared enables into logic (BUGS #15), which also shrank every design.
-- **Timing needed its own fix.** nextpnr silently left every path through the primitives untimed (BUGS #17); with arcs from STA of the primitives (D-028) the estimates dropped (e.g. I2C controller 69 → 58 MHz) but all stay above the 50 MHz clock. These are model estimates, not claims.
+- **Timing needed its own fix.** nextpnr silently left every path through the primitives untimed (BUGS #17); with arcs from STA of the primitives, checked against STA of the hardened tile (D-028), the estimates dropped (UART 122 → 91, SPI 89 → 78, I2C controller 69 → 53 MHz) but all stay above the 50 MHz clock, the I2C controller only just. These are model estimates, not claims.
 - **Simulation of an FPGA fabric has traps silicon does not:** unused routing forms loops that stay X or never settle in a zero-delay simulator, so chip tests run the gate-level shell with the fabric's RTL and settle the routing explicitly (D-023).
 
 ## What's left
-- Phase 2: the last CI run on `efpga`, the timing-model cross-check (STA of the hardened primitive tile or a configured design), and the protocol chip tests in CI `gl_test`.
+- Phase 2: the last CI run on `efpga`, and the protocol chip tests in CI `gl_test`.
 - Phase 3: specialize and compare variants at equal area (D-004), including whatever lets the I2C target fit (a register-file tile, a larger fabric), and freeze the hardware.
 
 ## One-line takeaway

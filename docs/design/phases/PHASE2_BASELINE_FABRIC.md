@@ -20,7 +20,7 @@
 
 ### Integration and physical
 - [x] Full 6x4 hardening of shell + G0 passes precheck; record area breakdown, routing overflow, and timing at the chosen clock. (CI 36353540402 on e5b1f98: `gds` 45.8 min, precheck pass, `gl_test` 17/17; fabric macro 1016.64 × 669.06 µm, shell 3,901 cells / 59,951 µm²; local pre-flight global-routing overflow 23 after D-025, CI detailed routing 0 DRC; setup WS +10.63 ns at 50 MHz, hold +0.121 ns; PHYSICAL_DESIGN_AND_CI hardening table)
-- [ ] Timing model for place and route derived from the implemented device (or a documented conservative model). (2026-09-27: routing delays from STA of the hardened tiles; tile-library cells at nextpnr's fixed values; hard primitives from OpenSTA with a ×1.5 margin, `tools/timing/README.md`, D-028, fixing BUGS #17. Left before ticking: a cross-check of the model against STA of the hardened primitive tile or of one configured design)
+- [x] Timing model for place and route derived from the implemented device (or a documented conservative model). (Documented conservative model, `tools/timing/README.md`, D-028: routing delays from STA of the hardened tiles; tile-library cells at nextpnr's fixed values; hard primitives from OpenSTA with margins set by `tools/timing/tile_check.sh` against STA of the hardened primitive tile, which the model bounds at the tile boundary (6.79 vs 15.17 ns out, 8.06 vs 12.06 ns in); fixes BUGS #17. Not done: STA of a configured design end to end)
 - [x] `gl_test` loads at least two different real bitstreams into the gate-level netlist and checks behavior. (CI 36342012141 on acc3af3 with the 16-LUT macro; G0: 36353540402 17/17; **G1 (the chip): 36367067731, 19/19** incl. counter4, logic4, two_bitstreams, host_channel, prims, uart)
 
 ### Protocols on G0

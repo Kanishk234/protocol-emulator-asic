@@ -35,3 +35,14 @@ jobs:
           STUB="src/$(cat arch/CURRENT).v"
           verilator --lint-only -Wall -Isrc --top-module "$TOP" src/lint.vlt $SOURCES $STUB
           iverilog -g2005 -Isrc -s "$TOP" -o /dev/null $SOURCES $STUB
+
+      - name: Verilator lint of the protocol user designs (plain logic and hard primitives)
+        # the designs users compile to bitstreams, with the primitives' simulation wrappers
+        run: |
+          P="tools/compile/prims/warp_prims_sim.v arch/prims/wp_timer.v arch/prims/wp_shift.v"
+          for spec in uart:uart_top spi_ctrl:spi_ctrl_top i2c_ctrl:i2c_ctrl_top i2c_target:i2c_target_top; do
+            d=${spec%%:*}; top=${spec##*:}
+            for p in 0 1; do
+              verilator --lint-only -Wall -Wno-DECLFILENAME --top-module $top $P protocols/$d/*.v -GPRIMS=$p
+            done
+          done

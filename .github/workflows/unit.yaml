@@ -1,5 +1,6 @@
 name: unit
-# TRIPWIRE's own workflow (VERIFICATION.md §10): model, kernel and generator tests (pytest).
+# TRIPWIRE's own workflow (VERIFICATION.md §10): model, kernel and generator tests (pytest), and the RTL
+# suites (job `rtl`: L1, chip-level and L3 on the chip RTL).
 on: [push, workflow_dispatch]
 
 jobs:
@@ -22,3 +23,56 @@ jobs:
 
       - name: pytest (tripsim, kernels, generator; slow tests run in nightly)
         run: python -m pytest -q -n auto -m "not slow"
+
+  # L1 white-box suites and the chip-level tests (test_internal/, VERIFICATION.md §6 and §10) under Icarus,
+  # with the whole-chip Verilator lint. Mutation checks (test_internal/*/mutate.sh) are local / nightly.
+  rtl:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install Icarus, Verilator, sigrok-cli
+        run: sudo apt-get update && sudo apt-get install -y iverilog verilator sigrok-cli
+
+      - name: Install Python packages
+        run: pip install -r requirements-dev.txt
+
+      - name: Verilator lint of the whole chip (trw_chip, macro blackboxed)
+        run: |
+          verilator --lint-only -Wall -Isrc --top-module trw_chip \
+            src/trw_chip.v src/trw_sync.v src/trw_fabric.v src/trw_chan_port.v src/trw_chan_prod.v \
+            src/trw_host.v src/trw_spi.v src/trw_lane.v src/trw_alu.v src/trw_slots.v src/trw_sram.v \
+            src/trw_pin_cfg.v src/trw_pin_io.v src/trw_pin_tx.v src/trw_pin_rx.v src/trw_pin_unit.v src/trw_pins.v \
+            spikes/r3_sram/overlay/src/RM_IHPSG13_1P_512x16_c2_bm_bist.v
+
+      - name: L1 suites (fabric, ALU, lane, slot store, pad owners, host)
+        run: |
+          for d in chan alu lane slots pins host; do
+            make -C test_internal/$d
+          done
+
+      - name: L1 pin unit (lean and full builds)
+        run: |
+          make -C test_internal/pin FULL=0
+          make -C test_internal/pin FULL=1
+
+      - name: SRAM macro model (IHP-Open-PDK, pinned revision)
+        run: spikes/r3_sram/fetch_macro.sh
+
+      - name: Chip-level tests and L3 on the chip RTL
+        run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: rtl-results
+          path: |
+            test_internal/**/results*.xml
+            test_internal/chip/*.vcd

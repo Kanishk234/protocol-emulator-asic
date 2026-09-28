@@ -1,0 +1,12 @@
+# can (held-out H4, CAN 2.0A) on the current architecture; h_* ports map by name.
+# TX on a bidirectional pin (released = recessive through the transceiver's pull-up): a uo_out
+# pin parks at 0 = dominant while the chip is stopped (BUGS #19).
+top: can_top
+params:
+  BIT: 100                     # 500 kbit/s at 50 MHz
+  PRIMS: 1                     # two hard timers + a hard shift register (D-026)
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  tx_oe: FAB_IO0.oe

@@ -1,0 +1,10 @@
+# onewire (held-out H2) on the current architecture (arch/CURRENT); h_* ports map by name.
+top: onewire_top
+params:
+  US: 50                       # clocks per microsecond (50 MHz)
+  PRIMS: 1                     # hard timer (1 us tick) + hard shift register (D-026)
+pins:
+  clk: clk
+  rst_n: rst_n
+  dq_i: FAB_IO0.i
+  dq_oe: FAB_IO0.oe

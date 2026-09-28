@@ -1,0 +1,11 @@
+# ws2812 (held-out H1) on the current architecture (arch/CURRENT); h_* ports map by name.
+top: ws2812_top
+params:
+  TBIT: 62                     # 1.24 us at 50 MHz
+  T1H: 40                      # 0.80 us (a 0: 0.40 us)
+  RESET_BITS: 45               # 56 us low latches the LEDs
+  PRIMS: 1                     # two hard timers + a hard shift register (D-026)
+pins:
+  clk: clk
+  rst_n: rst_n
+  dout_o: FAB_OUT0

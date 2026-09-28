@@ -1,0 +1,12 @@
+# swd (held-out H3, SWD host bit engine) on the current architecture; h_* ports map by name.
+top: swd_top
+params:
+  HALF: 5                      # SWCLK = clk / 10 (5 MHz at 50 MHz)
+  PRIMS: 1                     # hard timer (half period) + hard shift register (D-026)
+pins:
+  clk: clk
+  rst_n: rst_n
+  swclk_o: FAB_OUT0
+  swdio_o: FAB_IO0.o
+  swdio_oe: FAB_IO0.oe
+  swdio_i: FAB_IO0.i

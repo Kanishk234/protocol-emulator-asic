@@ -45,7 +45,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - User tagged `hw-freeze` → 3047dea. CI on a578359 all green: **phase 3 complete**; `docs/summaries/PHASE3.md` final.
 **Phase 4 started:**
 - Demo-board loader `tools/board/warp.py` (MicroPython + CPython): checked load, run control, host channel, FAB_IN pins, ttboard glue; `tools/board/tests` 270 pass (equal to the reference host); `test_board_loader` (the module's own code drives the chip model through cocotb bridge/resume) passes on the fabric RTL. Not tested on hardware.
-**Next:** end-to-end examples (UART, SPI, I2C: source → bitstream → load → run); then unseal the held-out set.
+- **End-to-end examples** (D-032): `compile --set NAME=VALUE`, report records params; `tools/board/examples.py` (UART send/recv, SPI transfer, I2C write/read/probe); `docs/EXAMPLES.md` (pins, commands at 10 MHz, wiring, what is tested); the board code tested against the chip model for all three (`test_board_loader`, `test_board_examples_spi`, `test_board_examples_i2c`). BUGS #19: parked `uo_out` pins assert active-low outputs (SPI CS_N) while stopped; documented, fix at the pin map (bidirectional pin + pull-up). Loader refuses to load while RUNNING with a clear message.
+- **Held-out set unsealed and evaluated** (`docs/reports/heldout_results.md`): models first from each spec (`tools/refmodels/{ws2812,onewire,swd,can}.py`, each tested on its own), then designs in both forms:
+  - H1 WS2812: fits (32/88 LCs, 54.3 MHz after tying the period timer's enable high; G0 82); chip test `test_ws2812` passes. Needs a host streaming a byte per ~10 µs (no pixel buffer).
+  - H2 1-Wire: fits (77/88, 54.5 MHz; G0 126 = no fit) after a restructure with the second timer (116 → 77); chip test `test_onewire` (READ ROM, CRC) passes.
+  - H3 SWD: fits (44/88; G0 61) as a bit engine with packets in `tools/board/swd.py`; chip test `test_swd` passes.
+  - H4 CAN 2.0A: RTL correct (3/3 vs reference nodes), **does not fit** (207/88; G0 241).
+- Showcase replaced (D-036): six protocols switched at run time on one chip (`test_showcase_protocol_switching` passes). Robustness: `test_corrupt_load_over_running_design`, `test_uart_input_phase` pass; mutation campaign `scripts/mutation.py` 8/8 killed (`docs/reports/mutation.md`); co-simulation `test_internal/cosim` (UART source RTL vs its bitstream on the fabric: identical TX waveforms, equal RX) passes. Local: chip suite 27/27, pytest 377, lint 8 protocols × 2 forms clean, bitstreams reproducible. `docs/summaries/PHASE4.md` drafted.
+**Next:** push; CI evidence (gds/gl_test with the new tests, fabric with co-sim) closes phase 4; then phase 5 (evidence, CLAIMS, user guide).
 **Next (superseded):** after the G1 hardening result, push the protocol chip tests + timing work (touches `test/` and `macro/`, so one more hardening, which also gives gl_test evidence for the 21 tests); then phase 2 exit: timing cross-check, per-tile equivalence plan, PHASE2 summary.
 
 ---

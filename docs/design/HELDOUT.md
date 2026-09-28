@@ -1,4 +1,4 @@
-# Held-out protocol set (sealed)
+# Held-out protocol set (unsealed 2026-09-28, after `hw-freeze` → 3047dea)
 
 **Sealed:** 2026-09-25, phase 1, before any profiling. The commit that adds this file is the seal; its hash goes in the phase 1 checklist.
 **Rule (D-003, CLAUDE.md):** until the `hw-freeze` tag at the end of phase 3, nobody writes RTL or reference models for these protocols, profiles them, or tunes the architecture (fabric, hard blocks, I/O cells, routing) with them in mind. If one is touched early, log it in DECISIONS and move it to the design set. In phase 4 each one is written, compiled onto the frozen chip and reported in `docs/reports/heldout_results.md`, failures included.

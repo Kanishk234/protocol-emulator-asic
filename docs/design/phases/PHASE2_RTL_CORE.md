@@ -113,7 +113,7 @@ Not in this phase: the helper units CRC, MATCH, MEM and CAPTURE (deferred by D-0
 ## 4. Phase exit checklist (all must pass)
 - [ ] Area estimate done (`docs/reports/AREA_ESTIMATE.md`) and its budget decisions recorded in DECISIONS. *(Estimate done; tier 1 decided (D-038–D-040); open until the design fits a routable budget.)*
 - [ ] All modules in the table exist and lint clean (`verilator --lint-only -Wall`); latches only where allowed, waived.
-- [ ] **L1** unit tests all green (ALU, EVAL, PIPE, CHAN, OVR, PIN-TX, PIN-RX including BITSYNC, ROT, HOST).
+- [x] **L1** unit tests all green (ALU, EVAL, PIPE, CHAN, OVR, PIN-TX, PIN-RX including BITSYNC, ROT, HOST). *(Evidence: `unit` CI run 36456739733 on `main` at c2a1c04; RTL suites pass under Icarus and Verilator.)*
 - [ ] **L2** lockstep ≥ 10⁶ clocks with zero divergences; L2-INJECT catches both injected bugs.
 - [ ] **L3-UART, L3-SPI-C, L3-I2C-C** pass in RTL against reference models and **sigrok**.
 - [ ] The same L3 tests pass in **`gl_test`** on the hardened netlist.

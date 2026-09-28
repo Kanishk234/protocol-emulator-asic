@@ -1,0 +1,52 @@
+pin,bel,direction,chip_pin
+clk,X1Y4/A,clock,clk
+rst_n,X1Y4/B,in,shell user reset (low while not RUNNING and on USER_RESET)
+FAB_IN0,X5Y1/A,in,ui[3]
+FAB_IN1,X5Y1/B,in,ui[4]
+FAB_IN2,X5Y1/C,in,ui[5]
+FAB_IN3,X5Y1/D,in,ui[6]
+FAB_IN4,X5Y2/A,in,ui[7]
+FAB_OUT0,X5Y2/B,out,uo[2]
+FAB_OUT1,X5Y2/C,out,uo[3]
+FAB_OUT2,X5Y2/D,out,uo[4]
+FAB_OUT3,X5Y3/A,out,uo[5]
+FAB_OUT4,X5Y3/B,out,uo[6]
+FAB_OUT5,X5Y3/C,out,uo[7]
+FAB_IO0,X0Y1/A,inout,uio[0]
+FAB_IO1,X0Y1/B,inout,uio[1]
+FAB_IO2,X0Y1/C,inout,uio[2]
+FAB_IO3,X0Y1/D,inout,uio[3]
+FAB_IO4,X0Y2/A,inout,uio[4]
+FAB_IO5,X0Y2/B,inout,uio[5]
+FAB_IO6,X0Y2/C,inout,uio[6]
+FAB_IO7,X0Y2/D,inout,uio[7]
+h_wdata[0],X0Y3/A,in,host channel: host -> design data
+h_wdata[1],X0Y3/B,in,host channel: host -> design data
+h_wdata[2],X0Y3/C,in,host channel: host -> design data
+h_wdata[3],X0Y3/D,in,host channel: host -> design data
+h_wdata[4],X1Y0/A,in,host channel: host -> design data
+h_wdata[5],X2Y0/A,in,host channel: host -> design data
+h_wdata[6],X3Y0/A,in,host channel: host -> design data
+h_wdata[7],X4Y0/A,in,host channel: host -> design data
+h_wlast,X2Y4/A,in,host channel: last byte of a write
+h_wvalid,X2Y4/B,in,host channel: byte available
+h_rready,X3Y4/A,in,host channel: shell can take a design -> host byte
+h_rdata[0],X0Y3/A,out,host channel: design -> host data
+h_rdata[1],X0Y3/B,out,host channel: design -> host data
+h_rdata[2],X0Y3/C,out,host channel: design -> host data
+h_rdata[3],X0Y3/D,out,host channel: design -> host data
+h_rdata[4],X1Y0/A,out,host channel: design -> host data
+h_rdata[5],X2Y0/A,out,host channel: design -> host data
+h_rdata[6],X3Y0/A,out,host channel: design -> host data
+h_rdata[7],X4Y0/A,out,host channel: design -> host data
+h_rvalid,X2Y4/A,out,host channel: design -> host byte valid
+h_wready,X2Y4/B,out,host channel: design takes the host byte
+h_attention,X3Y4/A,out,STATUS bit 1 / HOST_IRQ
+h_status[0],X0Y3/A,out_en,USER_STATUS byte (carried on the cell's enable wire)
+h_status[1],X0Y3/B,out_en,USER_STATUS byte (carried on the cell's enable wire)
+h_status[2],X0Y3/C,out_en,USER_STATUS byte (carried on the cell's enable wire)
+h_status[3],X0Y3/D,out_en,USER_STATUS byte (carried on the cell's enable wire)
+h_status[4],X1Y0/A,out_en,USER_STATUS byte (carried on the cell's enable wire)
+h_status[5],X2Y0/A,out_en,USER_STATUS byte (carried on the cell's enable wire)
+h_status[6],X3Y0/A,out_en,USER_STATUS byte (carried on the cell's enable wire)
+h_status[7],X4Y0/A,out_en,USER_STATUS byte (carried on the cell's enable wire)

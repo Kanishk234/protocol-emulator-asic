@@ -1,0 +1,14 @@
+# Architecture identity (ARCHITECTURE.md §3): the compile flow stamps arch_version into every
+# bitstream file, the host checks it against READ_ID, and the shell's LOAD_BEGIN check rejects a
+# mismatch. Must equal ARCH_VERSION in src/tt_um_warp.v when this is arch/CURRENT.
+name: warp_g1
+arch_version: 0x0003
+macro: macro/warp_g1            # hardened fabric + tool files (fabulous/)
+fabric_rtl: macro/warp_g1/warp_g1.v
+luts: 88                        # 11 LUT4x8 tiles
+primitives:                     # hard blocks (D-026), in tile X2Y2 (PRIM2T2S)
+  wp_timer: 2
+  wp_shift: 2
+include_border_rows: true
+config_rows: 5
+config_cols: 6

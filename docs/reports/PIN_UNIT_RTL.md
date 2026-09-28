@@ -2,7 +2,7 @@
 
 **Question:** how big is a real `trw_pin_unit`, and was the pre-RTL estimate (`AREA_ESTIMATE.md`) right? The estimate's biggest guess was the pin units' control logic ("glue", 45 % ± 15 % of the datapath), and the chip is at ~87 % of the 6x4 core against a routable ~50–60 %.
 
-**Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier) and B2a (the BITSYNC receive core) done; B2b, B2c and B3 next (§9).**
+**Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier), B2a (the BITSYNC receive core) and B2b (RX stuffing, CRC, FRAME) done; B2c and B3 next (§9).**
 
 **Answer so far:** the lean unit came in **~6 % under the estimate**: 38.7K µm² before layout (unit 29.4K + configuration 5.1K + producer 1.5K + the estimate's 2.7K for the consumer port) against 41.2K. The glue share was ~38 %, inside the guessed range. So the estimate holds, and **the chip is still ~85 % of the core** with real lean units. There is no hidden slack: getting to 50–60 % still needs real cuts. The per-feature prices below say where the lean unit's area goes.
 
@@ -210,8 +210,8 @@ The critical path is the same at both widths: burst timer → cursor → `eq`.
 |---|---|---|---|
 | B1 | P17, P30 | PULSE (per-bit symbols in whole ticks, back-to-back join, cursor = end time); the carrier (50 % toggle while pin A is not IDLE, restart at each change to the active level, fractional period) | **done** |
 | B2a | P20–P22 | BITSYNC engine `trw_pin_bs.v`: bit clock, bus idle, frame start with hard sync, resync (SJW), RX word framing | **done** |
-| B2b | P23, P24 | stuffing (RX removal, stuff errors), the RX CRC, `FRAME n` and the frame verdict | next |
-| B2c | P25 | the TX queue with `LINE`/`SYNC`, the TX CRC, `WAIT` [1]; driving pin A from the engine | after B2b |
+| B2b | P23, P24 | stuffing (RX removal, stuff errors), the RX CRC, `FRAME n` and the frame verdict | **done** |
+| B2c | P25 | the TX queue with `LINE`/`SYNC`, the TX CRC, `WAIT` [1]; driving pin A from the engine | next |
 | B3 | P26–P29 | readback modes and arbitration, errors, flag delimiters, `JAM` and listen-only, NRZI, SE0, pin N, OE auto | after B2 |
 
 **B1 as built** (`src/trw_pin_tx.v`, parameter `FULL`): PULSE runs as a burst of whole ticks, each bit two phases counted as `pt` ticks and `ps` clocks of the tick (no multiplier); P3's "take when all pending actions are at edges ≤ n+1" extends to the burst's end, so the next DATA token's first bit lands on the end edge. PULSE bits set the echo flag (P40). The carrier is a 16.9-clock half-period timer in the TX half; `lvl` shows IDLE in the off halves (so pin N follows, and C_OE still gates the pad, D-035 H). On a lean unit the PULSE code acts as LEVEL and the carrier fields read 0 (D-040).
@@ -225,6 +225,17 @@ The critical path is the same at both widths: burst timer → cursor → `eq`.
 **B2a verification:** `test_internal/pin/test_pin_bs.py` (3 tests, both builds): frames at PERIOD = 20.5 clocks starting at arbitrary phases, every byte a DATA word, a trailing partial word dropped at idle; a sender 2 % fast then 2 % slow over 48-bit frames: received intact with SJW = 0.15 PERIOD and misread with SJW = 0 (the resync is what saves it); one edge 1 clock late with SJW = 0.3 PERIOD (a resync by the whole SJW would sample the next bit). On the lean build nothing is received. Pin suite 41/41 on both builds; 7 B2 mutants, all killed; chip lint and chip tests unchanged.
 
 **B2a cost, and what it means:** the first version (separate boundary and sample timers) was 20.2K µm²; with one timer and one signed correction the engine is **16.1K**, and the full unit's logic **54.0K** (B1 37.9K). The estimate had ~16.7K for all of BITSYNC; at B2a's rate the finished engine will be nearer 30K. For the protocol floor (D-049, U0 full) that is roughly +13K, about +2 % of the core. Levers, if the budget needs them: only U0 needs the engine (D-049 lets U1 be lean); timer arithmetic in whole clocks for SJW; the CRC width capped by what the programs use (CRC-16, CRC-15, CRC-5).
+
+**B2b as built:** in `trw_pin_bs.v`: a run counter over line bits (stuff bits included); a due stuff bit is removed, an equal bit is a stuff error (ERR `0x1nnn`) that stops the frame's words; the RX CRC (MSB-first LFSR, CRC_WIDTH bits, from CRC_INIT, after CRC_SKIP destuffed bits); words of RX_NBITS (or `SETN` rx) in ORDER; `FRAME n` (now or for the next frame, LATE when it cannot apply) with the verdict at destuffed bit n, EVENT `word[11:0]` if the register equals CRC_RES, else ERR `0x0www`; after n, one more stuff bit is still removed and checked (and a violation reported). The RX commands `FRAME` and `SETN` rx are taken at once; TX tokens still wait for B2c.
+
+**B2b verification:** `test_internal/pin/test_pin_bs_frame.py` (6 tests, both builds). The line is CAN from `tools/protomodels/can.py` (Bosch CAN 2.0, CRC-15, 5-bit stuffing) and, for ones-only stuffing, `tools/protomodels/hdlc.py`: standard and extended frames give the destuffed words and an EVENT verdict; a flipped CRC bit gives ERR; a violated stuff bit gives ERR `0x1nnn` and stops the frame; the next frame is received; FRAME with no frame sets LATE; `SETN` rx to 4-bit words; a stuff bit right after bit n is removed, and its violation reported; STUFF_LVL = 1; CRC_SKIP = 3. Pin suites 47/47 on both builds; mutants 17/17 lean, 36/36 full (the first round found an equivalent mutant, and a real gap: the stuff check after bit n detected an error but did not report it; fixed). Chip lint and chip tests unchanged.
+
+**B2b cost:** the engine is **25.1K µm²** (+9.0K), the full unit's logic **62.3K**. The variable-width CRC (mask and top-bit select) and the 11-bit line/destuffed counters are most of it; a narrower CRC path (widths the programs use: 5, 15, 16) is a lever if needed.
+
+**B2b readings (D-053):**
+- **P-G27** ERR `0x1nnn` (stuff error): nnn = the index of the offending line bit in the frame (line bits, stuff bits included, from the first bit = 0).
+- **P-G30** at FRAME's bit n the verdict token carries the current word, whether bit n completed it or not; no separate DATA word is emitted for that word.
+- The verdict EVENT is `word[11:0]` with data[15:12] = 0 until B3 adds data[14] (our own frame).
 
 **B2a readings (D-052):**
 - **P-G27** (open, for B2b): ERR `0x1nnn` "nnn = line bit" (P23) is read as the frame's line-bit count at the stuff error.

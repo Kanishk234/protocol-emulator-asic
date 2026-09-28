@@ -21,6 +21,18 @@ Next:
 
 ---
 
+## 2026-09-28: Krithik + Claude (phase 2: milestone B2b; R4 run 5 routes clean)
+Done:
+- **R4 run 5 routes clean** (36363295528): 0 DRC, LVS match, 0 antenna, typ timing met, slow −6.0 ns (slot latch → flop), `gl_test` pass, `gds` job 2 h 58 min (detailed routing 1 h 58 min). The routable ceiling is between 47.6 % and 58.9 %. `R4_FLOORPLAN.md` §10, AREA row, D-043 result and the next proposal (a run at the protocol floor's size).
+- **Milestone B2b** in `trw_pin_bs.v`: RX stuffing and stuff errors, the RX CRC, `FRAME n` and its verdict, `SETN` rx; the engine takes RX commands. Tests `test_pin_bs_frame.py` (6) against the CAN and HDLC reference models. Pin 47/47 both builds; mutants 17/17 lean, 36/36 full (one first-round gap fixed: a stuff error after bit n was detected but not reported). Engine 25.1K, full unit logic 62.3K. D-053.
+
+Checklist boxes ticked (evidence):
+- None (run 5 is the stand-in, not the real chip; precheck was still running).
+
+Next:
+- B2c: the TX queue, `LINE`/`SYNC`, the TX CRC.
+- Team: the budget, with run 5 and the floor (D-049); a run at the floor's size is proposed (D-043).
+
 ## 2026-09-28: Krithik + Claude (phase 2: milestone B2a, the BITSYNC receive core)
 RTL session, from `ARCHITECTURE.md` §14 P20–P22 and D-023–D-027; `tools/tripsim` not read.
 

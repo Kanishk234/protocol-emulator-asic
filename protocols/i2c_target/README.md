@@ -2,7 +2,7 @@
 
 User design for the WARP fabric (soft logic; see `../README.md`): an I2C device with a small register map that a bus controller and the host both access.
 
-- **File:** `i2c_target_top.v` (user-design top, provisional interface D-014). `PRIMS = 1` puts the bus byte and its bit count in a WARP hard shift register (ARCHITECTURE §8, G1); `PRIMS = 0` is plain logic; same behaviour and tests. Does not fit G0 or G1 yet (`docs/reports/g1_results.md`).
+- **File:** `i2c_target_top.v` (user-design top, provisional interface D-014). `PRIMS = 1` puts the bus byte and its bit count in a WARP hard shift register (ARCHITECTURE §8, G1); `PRIMS = 0` is plain logic; same behaviour and tests. **Does not fit the chip's fabric** (G1: 169 of 88 logic cells; 110–123 even with a register-file tile, D-034), so the I2C target is not supported on the chip (D-035); it stays a tested RTL design. I2C on the chip: `protocols/i2c_ctrl`.
 - **Address:** `ADDR` parameter (7-bit, default `0x42`), fixed in the bitstream.
 - **Register map:** `NREGS` 8-bit registers (power of two, ≤ 16; default 4).
   - Bus write `[ADDR+W][pointer][data…]`: pointer taken modulo `NREGS`, data auto-increments with wrap-around; every byte ACKed.

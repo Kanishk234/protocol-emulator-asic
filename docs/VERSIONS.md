@@ -24,3 +24,4 @@ Every tool used by any flow must be listed. Local PATH order: DECISIONS D-007.
 | fabulous-fasm | 0.2.0 | FABulous-FPGA 2.2.0 dependency; CI `unit` installs it by pin | FASM parsing in `tools/compile/bitgen.py` |
 | fabulous-bit-gen | 0.3.1 | FABulous-FPGA 2.2.0 dependency | Not used to make bitstreams (BUGS #13); the reference `tools/compile` tests compare against |
 | pytest | 8.4.2 | `test/requirements.txt` | |
+| pyuvm | 5.0.0 | `requirements-dev.txt`; CI `unit` | Shell transaction environment in `test_internal/uvm` |

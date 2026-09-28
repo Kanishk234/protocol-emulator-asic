@@ -39,7 +39,10 @@ jobs:
           python-version: '3.11'
 
       - name: Install Python packages
-        run: pip install -r test/requirements.txt
+        run: pip install -r test/requirements.txt pyuvm==5.0.0
+
+      - name: Shell random transactions against the reference model
+        run: make -C test_internal/uvm RANDOM_SEED=1
 
       - name: UART RTL tests (plain logic and hard primitives)
         run: |

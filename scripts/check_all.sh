@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# WARP local check: lint + all simulation tests, in one command.
+# WARP local check: lint, Python and protocol tests, shell checks, and idle-fabric chip tests.
 # Usage: scripts/check_all.sh
 # Needs: .venv (scripts/setup_venv.sh), Icarus, and the OSS CAD Suite (Verilator, Yosys).
 set -euo pipefail
@@ -19,7 +19,7 @@ source .venv/bin/activate
 if ! command -v yosys >/dev/null && [ -d "$HOME/oss-cad-suite/bin" ]; then
   export PATH="$PATH:$HOME/oss-cad-suite/bin"
 fi
-for tool in iverilog verilator yosys; do
+for tool in iverilog verilator yosys sigrok-cli; do
   command -v "$tool" >/dev/null || { echo "error: $tool not found" >&2; exit 1; }
 done
 
@@ -82,6 +82,11 @@ fi
 if [ -f test_internal/Makefile ]; then
   step "test_internal/: white-box tests"
   make -C test_internal
+fi
+
+if [ -f test_internal/uvm/Makefile ]; then
+  step "test_internal/uvm: shell random transactions and coverage"
+  make -C test_internal/uvm RANDOM_SEED=1
 fi
 
 echo; echo "check_all: PASS"

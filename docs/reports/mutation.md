@@ -12,6 +12,9 @@ Each mutant plants one realistic bug in a throwaway copy of the repository (`scr
 | `inverted_output_enable` | bidirectional pins' output enable inverted | chip suite with a real bitstream (counter4 checks FAB_IO0's enable) | **killed** |
 | `parking_gate_removed` | fabric outputs reach the pins while not RUNNING | F1 formal proof (output isolation) | **killed** |
 | `config_bit_position` | wrong configuration-bit position: a LUT's INIT shifted by one bit in logic4's bitstream (`X4Y2.G.INIT[15:0] = 0000111100001111 -> 0001111000011110`) | chip suite with the real bitstream (logic4 truth table) | **killed** |
+| `bad_cmd_overwrites_error` | a bad command overwrites a pending load error code (D-021: only when ERROR_CODE is 0) | pyuvm shell environment vs the shell reference model | **killed** |
+| `overflow_never_clears` | ch_overflow is not cleared by READ_STATUS | pyuvm shell environment vs the shell reference model | **killed** |
+| `tx_ready_when_stopped` | STATUS.tx_ready reported while not RUNNING (a CH_WRITE would be refused) | pyuvm shell environment vs the shell reference model | **killed** |
 
 ## Notes
 - Mutants are planted in a copy (`build/mutation/<name>/`); the working tree is never changed. Logs: `build/mutation/<name>.log` (not committed).

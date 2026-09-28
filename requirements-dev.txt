@@ -4,5 +4,6 @@
 hypothesis==6.168.1
 pyyaml==6.0.3
 pytest-xdist==3.8.0
+pyuvm==5.0.0
 # Fabric generation, mapping, place and route, bitstream (D-001; versions in docs/VERSIONS.md)
 FABulous-FPGA==2.2.0

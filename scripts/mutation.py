@@ -58,6 +58,20 @@ MUTANTS = {
         "BITSTREAM",
         "COCOTB_TEST_FILTER=test_logic4 make -C test WARP_FABRIC=rtl",
         "chip suite with the real bitstream (logic4 truth table)"),
+    "bad_cmd_overwrites_error": (
+        "a bad command overwrites a pending load error code (D-021: only when ERROR_CODE is 0)",
+        [("src/wp_shell.v", "                        if (err == E_NONE)\n                            err <= E_BAD_COMMAND;",
+          "                        if (1'b1)\n                            err <= E_BAD_COMMAND;")],
+        "make -C test_internal/uvm RANDOM_SEED=1", "pyuvm shell environment vs the shell reference model"),
+    "overflow_never_clears": (
+        "ch_overflow is not cleared by READ_STATUS",
+        [("src/wp_shell.v", "                                err <= E_NONE;\n                                ovf <= 1'b0;",
+          "                                err <= E_NONE;")],
+        "make -C test_internal/uvm RANDOM_SEED=1", "pyuvm shell environment vs the shell reference model"),
+    "tx_ready_when_stopped": (
+        "STATUS.tx_ready reported while not RUNNING (a CH_WRITE would be refused)",
+        [("src/wp_shell.v", "{state, !rx_empty, running && !tx_full,", "{state, !rx_empty, !tx_full,")],
+        "make -C test_internal/uvm RANDOM_SEED=1", "pyuvm shell environment vs the shell reference model"),
 }
 
 
@@ -66,7 +80,7 @@ def copy_repo(dst):
         shutil.rmtree(dst)
     ignore = shutil.ignore_patterns("build", ".venv", "sim_build", "__pycache__", "results.xml",
                                     "*.vcd", "*.fst", "runs", ".git", "f1_isolation", "f2_loader*",
-                                    "f4_prims*")
+                                    "f3_fifo*", "f4_prims*")
     shutil.copytree(ROOT, dst, ignore=ignore, symlinks=True)
 
 
@@ -94,7 +108,8 @@ def main(argv):
     names = argv or list(MUTANTS)
     env = dict(os.environ)
     env.setdefault("WARP_TILES", subprocess.check_output([str(ROOT / "scripts/fetch_tiles.sh")], text=True).strip())
-    results = {}
+    old = WORK / "results.json"                  # keep earlier mutants' results when running a subset
+    results = json.loads(old.read_text()) if argv and old.exists() else {}
     for name in names:
         desc, edits, cmd, catcher = MUTANTS[name]
         repo = WORK / name
@@ -125,7 +140,11 @@ def main(argv):
     for n, r in results.items():
         d = r["description"] + (f" ({r['detail']})" if r["detail"] else "")
         lines.append(f"| `{n}` | {d} | {r['check']} | {'**killed**' if r['killed'] else '**survived**'} |")
-    (ROOT / "docs/reports/mutation.md").write_text("\n".join(lines) + "\n")
+    report = ROOT / "docs/reports/mutation.md"
+    notes = report.read_text().split("\n## Notes", 1) if report.exists() else []
+    if len(notes) == 2:                          # the hand-written notes section is kept
+        lines += ["", "## Notes" + notes[1].rstrip("\n")]
+    report.write_text("\n".join(lines) + "\n")
     return 0 if all(r["killed"] for r in results.values()) else 1
 
 

@@ -2,9 +2,9 @@
 // an RX half that loads the unit's fabric producer register. The port and the producer belong to the
 // fabric (§4); the configuration block is trw_pin_cfg.v.
 //
-// FULL = 1 is U0-U1, FULL = 0 is U2-U5 (D-040). Milestone A implements the lean feature set for both;
-// PULSE, carrier and BITSYNC (FULL only) come in milestone B, so for now FULL only changes which
-// configuration bits exist (trw_pin_cfg.v).
+// FULL = 1 is U0-U1, FULL = 0 is U2-U5 (D-040). Both have the lean feature set (milestone A). FULL adds
+// PULSE and the carrier in the TX half (milestone B1) and the BITSYNC engine trw_pin_bs.v (milestone B2 done,
+// B3 in progress), which owns takes, pin A and loads while TXMODE and RXMODE are both `bitsync`.
 //
 // Timing contract:
 //   - `cfg` is static while running (written while halted, §14 H1). `restart` (clock after a write to
@@ -17,6 +17,7 @@
 //     clock wins).
 `default_nettype none
 `include "trw_defs.vh"
+`include "trw_assert.vh"
 
 module trw_pin_unit #(
     parameter FULL = 0,
@@ -79,6 +80,28 @@ module trw_pin_unit #(
     wire [3:0]  nbits      = cfg[`TRW_PC_NBITS_MSB:`TRW_PC_NBITS_LSB];
     wire [4:0]  rx_nbits   = cfg[`TRW_PC_RX_NBITS_MSB:`TRW_PC_RX_NBITS_LSB];
     wire [4:0]  rx_nbits2  = cfg[`TRW_PC_RX_NBITS2_MSB:`TRW_PC_RX_NBITS2_LSB];
+    // PULSE and carrier (FULL units; on a lean unit these bits are not stored and read 0, D-040)
+    wire [11:0] sym0_t1    = cfg[`TRW_PC_SYM0_T1_MSB:`TRW_PC_SYM0_T1_LSB];
+    wire        sym0_first = cfg[`TRW_PC_SYM0_FIRST_LSB];
+    wire [11:0] sym0_t2    = cfg[`TRW_PC_SYM0_T2_MSB:`TRW_PC_SYM0_T2_LSB];
+    wire [11:0] sym1_t1    = cfg[`TRW_PC_SYM1_T1_MSB:`TRW_PC_SYM1_T1_LSB];
+    wire        sym1_first = cfg[`TRW_PC_SYM1_FIRST_LSB];
+    wire [11:0] sym1_t2    = cfg[`TRW_PC_SYM1_T2_MSB:`TRW_PC_SYM1_T2_LSB];
+    wire [23:0] carrier    = cfg[`TRW_PC_CARRIER_MSB:`TRW_PC_CARRIER_LSB];
+    // BITSYNC (FULL)
+    wire [23:0] sjw        = cfg[`TRW_PC_SJW_MSB:`TRW_PC_SJW_LSB];
+    wire [4:0]  idle_bits  = cfg[`TRW_PC_IDLE_BITS_MSB:`TRW_PC_IDLE_BITS_LSB];
+    wire        resync     = cfg[`TRW_PC_RESYNC_LSB];
+    wire [3:0]  stuff_n    = cfg[`TRW_PC_STUFF_N_MSB:`TRW_PC_STUFF_N_LSB];
+    wire [1:0]  stuff_lvl  = cfg[`TRW_PC_STUFF_LVL_MSB:`TRW_PC_STUFF_LVL_LSB];
+    wire [4:0]  crc_width  = cfg[`TRW_PC_CRC_WIDTH_MSB:`TRW_PC_CRC_WIDTH_LSB];
+    wire [4:0]  crc_skip   = cfg[`TRW_PC_CRC_SKIP_MSB:`TRW_PC_CRC_SKIP_LSB];
+    wire [15:0] crc_poly   = cfg[`TRW_PC_CRC_POLY_MSB:`TRW_PC_CRC_POLY_LSB];
+    wire [15:0] crc_init   = cfg[`TRW_PC_CRC_INIT_MSB:`TRW_PC_CRC_INIT_LSB];
+    wire [15:0] crc_res    = cfg[`TRW_PC_CRC_RES_MSB:`TRW_PC_CRC_RES_LSB];
+    wire [15:0] crc_xor    = cfg[`TRW_PC_CRC_XOR_MSB:`TRW_PC_CRC_XOR_LSB];
+    wire        bs_on      = (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
+                                         && (rxmode == `TRW_PCE_RXMODE_BITSYNC);
     // PIN_N only matters to the pad owner mux (trw_pins.v), which reads it from the same block.
 
     // ------------------------------------------------------------------ pins in
@@ -93,20 +116,29 @@ module trw_pin_unit #(
     wire b_fall = !b_in && b_prev;
 
     // ------------------------------------------------------------------ TX half
-    wire lvl, oe, echo, rxset, smp, late_set;
+    wire lvl_t, oe, echo_t, rxset, smp, late_t, take_t;
     wire [4:0] rxset_n;
-    trw_pin_tx #(.FRAC (FRAC)) u_tx (
+    trw_pin_tx #(.FULL (FULL), .FRAC (FRAC)) u_tx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
         .txmode (txmode), .order (order), .idle (idle), .tx_lentok (tx_lentok), .tx_preload (tx_preload),
         .stretch (stretch), .tx_edge (tx_edge), .period (period), .presc (presc), .nbits (nbits),
+        .sym0_t1 (sym0_t1), .sym0_first (sym0_first), .sym0_t2 (sym0_t2),
+        .sym1_t1 (sym1_t1), .sym1_first (sym1_first), .sym1_t2 (sym1_t2), .carrier (carrier),
         .a_in (a_in), .b_rise (b_rise), .b_fall (b_fall), .sel (sel), .sel_fall (sel_fall),
-        .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
-        .lvl (lvl), .oe (oe), .echo (echo),
-        .rxset (rxset), .rxset_n (rxset_n), .smp (smp), .late_set (late_set)
+        .tx_avail (tx_avail && !bs_on), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (take_t),
+        .lvl (lvl_t), .oe (oe), .echo (echo_t),
+        .rxset (rxset), .rxset_n (rxset_n), .smp (smp), .late_set (late_t)
     );
 
+    // In BITSYNC the engine drives pin A (B2c); the RX half's echo flag belongs to the other modes
+    wire lvl_b;
+    wire lvl  = bs_on ? lvl_b : lvl_t;
+    wire echo = bs_on ? 1'b0 : echo_t;
+
     // ------------------------------------------------------------------ RX half
-    wire ovr_set;
+    wire ovr_set, load_h, ovr_h;
+    wire [1:0]  tag_h;
+    wire [15:0] data_h;
     trw_pin_rx #(.FRAC (FRAC)) u_rx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
         .rxmode (rxmode), .order (order), .idle (idle), .autorearm (autorearm), .rx_echo (rx_echo),
@@ -116,8 +148,47 @@ module trw_pin_unit #(
         .a_in (a_in), .a_prev (a_prev), .b_in (b_in), .b_prev (b_prev), .c_in (c_in), .c_prev (c_prev),
         .sel (sel),
         .echo (echo), .rxset (rxset), .rxset_n (rxset_n), .smp (smp),
-        .rx_free (rx_free), .rx_load (rx_load), .rx_tag (rx_tag), .rx_data (rx_data), .ovr_set (ovr_set)
+        .rx_free (rx_free), .rx_load (load_h), .rx_tag (tag_h), .rx_data (data_h), .ovr_set (ovr_h)
     );
+
+    // ------------------------------------------------------------------ BITSYNC engine (FULL)
+    // P-G28: the RX half's event generator keeps working in BITSYNC and wins a clock it loads in (EVENT
+    // first, P19); the engine's token then counts as lost (OVERRUN).
+    wire        load_b, ovr_b, bs_idle, bs_frame, bs_bnd, bs_smp, take_b, late_b;
+    wire [1:0]  tag_b;
+    wire [15:0] data_b;
+    generate
+        if (FULL != 0) begin : g_bs
+            trw_pin_bs u_bs (
+                .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .active (bs_on),
+                .idle (idle), .order (order), .tx_lentok (tx_lentok), .period (period),
+                .sampleofs (sampleofs), .sjw (sjw),
+                .idle_bits (idle_bits), .resync_both (resync), .nbits (nbits), .rx_nbits (rx_nbits),
+                .stuff_n (stuff_n), .stuff_lvl (stuff_lvl), .crc_width (crc_width), .crc_skip (crc_skip),
+                .crc_poly (crc_poly), .crc_init (crc_init), .crc_res (crc_res), .crc_xor (crc_xor),
+                .a_in (a_in), .a_prev (a_prev),
+                .tx_avail (tx_avail && bs_on), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (take_b),
+                .late_set (late_b),
+                .rx_free (rx_free && !load_h), .rx_load (load_b), .rx_tag (tag_b), .rx_data (data_b),
+                .ovr_set (ovr_b), .tx_lvl (lvl_b),
+                .bus_idle (bs_idle), .in_frame (bs_frame), .bnd (bs_bnd), .smp (bs_smp)
+            );
+        end else begin : g_nobs
+            assign load_b = 1'b0;  assign ovr_b = 1'b0;  assign tag_b = 2'd0;  assign data_b = 16'd0;
+            assign bs_idle = 1'b0;  assign bs_frame = 1'b0;  assign bs_bnd = 1'b0;  assign bs_smp = 1'b0;
+            assign take_b = 1'b0;  assign late_b = 1'b0;  assign lvl_b = 1'b0;
+            wire _unused_bs = &{1'b0, sjw, idle_bits, resync, stuff_n, stuff_lvl, crc_width, crc_skip,
+                                crc_poly, crc_init, crc_res, crc_xor};
+        end
+    endgenerate
+    assign rx_load = load_h || load_b;
+    assign rx_tag  = load_h ? tag_h : tag_b;
+    assign rx_data = load_h ? data_h : data_b;
+    assign ovr_set = ovr_h || ovr_b;
+
+    // In BITSYNC the engine takes every token (RX commands at once, TX tokens into its queue)
+    assign tx_take  = bs_on ? take_b : take_t;
+    wire   late_set = late_t || late_b;
 
     // ------------------------------------------------------------------ pins out (§7.1, P15, P29)
     // C_OE gates the output enable one clock after the synchronised change of pin C (sel_q).
@@ -128,6 +199,13 @@ module trw_pin_unit #(
     assign a_oe  = od ? (en && !lvl) : en;
     assign n_out = !lvl;
     assign n_oe  = en;
+
+`ifdef TRW_ASSERT_ON
+    wire od_drives_high = od && a_oe && a_out;
+    wire load_not_free  = rx_load && !rx_free;
+    `TRW_ASSERT(!od_drives_high, "an open-drain pin A drives high")
+    `TRW_ASSERT(!load_not_free, "the RX half loads a producer that is not free (4.5)")
+`endif
 
     // ------------------------------------------------------------------ sticky flags
     always @(posedge clk) begin
@@ -144,5 +222,5 @@ module trw_pin_unit #(
     /* verilator lint_off UNUSEDPARAM */
     localparam HAS_OPT = FULL;
     /* verilator lint_on UNUSEDPARAM */
-    wire _unused = &{1'b0, cfg};
+    wire _unused = &{1'b0, cfg, bs_idle, bs_frame, bs_bnd, bs_smp};
 endmodule

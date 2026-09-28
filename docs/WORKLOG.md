@@ -21,6 +21,243 @@ Next:
 
 ---
 
+## 2026-09-28: Krithik + Claude (phase 2: milestone B2c; engine retimed; R4 run 6 prepared)
+Done:
+- **Milestone B2c** in `trw_pin_bs.v`: the TX queue (DATA, SYNC, LINE [2]/[6]/[3], WAIT [1]), TX stuffing, the TX CRC with CRC_XOR, our frame start and the join, the own-edge rules; pin A from the engine. Tests `test_pin_bs_tx.py` (5), including three CAN frames decoded and ACKed by the reference `CANNode` on a wired-AND bus. Pin 52/52 on both builds and under Verilator; B2 mutants 30/30 killed; chip tests 10/10. Engine 34.8K, full unit logic 73.8K. D-054 (readings P-G31 to P-G35).
+- **Timing:** chip STA showed slow −9.80 ns through the engine (pin → bit-clock sums). Retimed with no behaviour change: +7.65 typ / +0.87 slow at spec counts (BUGS #51).
+- **Host** at unit counts other than 6: width fixes (BUGS #50).
+- **R4 run 6 prepared** on `spike/r4-floorplan` (worktree `~/tw-r4`, not committed): the real `trw_chip` at the protocol floor, 398.7K µm², ~56.4 % expected, density 59. Lint clean, `test/` 4/4, chip tests 10/10 at the floor's counts. `R4_FLOORPLAN.md` §11, D-043.
+- R4 run 5's precheck **passed** (1 h 56 min, the KLayout DRC of the full GDS): run 5 is green end to end, 4 h 54 min in all.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Push R4 run 6 (branch) when the user decides; read GRT overflow and DRC.
+- B3: readback and arbitration, errors, flags, JAM, listen-only, NRZI, SE0, OE auto (P26–P29).
+
+## 2026-09-28: Krithik + Claude (phase 2: milestone B2b; R4 run 5 routes clean)
+Done:
+- **R4 run 5 routes clean** (36363295528): 0 DRC, LVS match, 0 antenna, typ timing met, slow −6.0 ns (slot latch → flop), `gl_test` pass, `gds` job 2 h 58 min (detailed routing 1 h 58 min). The routable ceiling is between 47.6 % and 58.9 %. `R4_FLOORPLAN.md` §10, AREA row, D-043 result and the next proposal (a run at the protocol floor's size).
+- **Milestone B2b** in `trw_pin_bs.v`: RX stuffing and stuff errors, the RX CRC, `FRAME n` and its verdict, `SETN` rx; the engine takes RX commands. Tests `test_pin_bs_frame.py` (6) against the CAN and HDLC reference models. Pin 47/47 both builds; mutants 17/17 lean, 36/36 full (one first-round gap fixed: a stuff error after bit n was detected but not reported). Engine 25.1K, full unit logic 62.3K. D-053.
+
+Checklist boxes ticked (evidence):
+- None (run 5 is the stand-in, not the real chip; precheck was still running).
+
+Next:
+- B2c: the TX queue, `LINE`/`SYNC`, the TX CRC.
+- Team: the budget, with run 5 and the floor (D-049); a run at the floor's size is proposed (D-043).
+
+## 2026-09-28: Krithik + Claude (phase 2: milestone B2a, the BITSYNC receive core)
+RTL session, from `ARCHITECTURE.md` §14 P20–P22 and D-023–D-027; `tools/tripsim` not read.
+
+Done:
+- `src/trw_pin_bs.v` (new): bit clock, bus idle, frame start with hard sync, resync limited to SJW, RX words. `trw_pin_unit.v` instantiates it in full units and muxes loads (event generator first) and, until B2c, holds pin A recessive and takes nothing in BITSYNC. Added to every source list (pin/chip Makefiles, synthesis scripts, CI lint).
+- `test_internal/pin/test_pin_bs.py` (3 tests, both builds): phases, idle drop, ±2 % drift with and without SJW, a 1-clock-late edge. Pin 41/41 both builds; 7 B2 mutants killed; chip lint and tests unchanged.
+- Area: a first version was 20.2K; one timer and one signed correction brought it to 16.1K. Full unit logic 54.0K. BITSYNC is heading for ~30K vs ~16.7K estimated (D-052); this raises the D-049 floor by ~2 % of the core.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- B2b: stuffing, the RX CRC, `FRAME` and the verdict (P23, P24).
+
+## 2026-09-28: Krithik + Claude (phase 2: pin-unit milestone B1, PULSE and carrier)
+RTL session, from `ARCHITECTURE.md` §7 and §14 P17, P30; `tools/tripsim` not read.
+
+Done:
+- Milestone B planned in three stages (`PIN_UNIT_RTL.md` §9): B1 PULSE + carrier, B2 BITSYNC core (P20–P25), B3 BITSYNC readback/JAM/flags/NRZI/SE0 (P26–P29). Krithik agreed that verification-infrastructure items (pyuvm, L9) can wait while the RTL phase needs RTL.
+- **B1 done:** `trw_pin_tx.v` (`FULL`): PULSE bursts in whole ticks with back-to-back joining; the carrier with a fractional half-period timer. `trw_pin_unit.v` passes the fields. Lint clean both builds; chip lint and chip tests unchanged.
+- `test_internal/pin/test_pin_full.py` (4 tests, both builds); pin suite 38/38 lean and full; `mutate.sh` handles `FULL` and the B1 mutants: 17/17 lean, 21/21 full.
+- Area: full unit logic 37.9K µm² (+7.7K).
+- D-051: three readings (P-G24–P-G26) for the model side.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- B2: the BITSYNC core (P20–P25).
+
+## 2026-09-28: Krithik + Claude (phase 2: protocol floor, L1-ROT, L0-ASRT, L-XSIM, L8-EQY)
+Done:
+- **D-049 (proposed), the protocol floor**, from Krithik's constraint that every protocol must stay supported (not at the same time). From the 20 compiled programs: ≥ 2 lanes, ≥ 4 units with U0 full (U1 may be lean), 12 slots, the 512-word SRAM. That is ≈ 395K µm² ≈ 56 % at placement, inside the window R4 has not measured (run 4 47.6 % routed globally, run 3 58.9 % did not).
+- **L1-ROT** (`test_internal/chip/test_rot.py`): all three lanes store/load through the SRAM while the host reads; every clock only the slot's owner drives the SRAM; every store lands. `test_internal/chip/mutate.sh`: 2/2 mutants killed. Added to the CI `rtl` job. L1-OVR already existed (`test_pin_rx.py::test_overrun_keeps_the_old_token`).
+- **L0-ASRT**: `src/trw_assert.vh` (`TRW_ASSERT`, `TRW_ASSERT_ON`); invariants in `trw_pin_unit` (open drain never drives high; RX never loads a full producer), `trw_pins` (a driven pad has an owner), `trw_lane` (never takes an unavailable input; never loads a full output), `trw_chan_port` (a disabled port shows no token), `trw_chan_prod` (no load while full). `SIM_ASSERT` is on in every `test_internal` Makefile; all suites pass with it; two planted bugs trip their assertions. Under `FORMAL`: `formal/l0_asrt.sby` proves the pads and producer invariants unbounded (k-induction); a planted bug fails the proof. Plain and `SIM_ASSERT` builds lint clean.
+- **L-XSIM**: every suite passes under Verilator 5.053 (venv cocotb 2.0.1) as under Icarus: 101 L1 + 10 chip/L3/ROT. The pin Makefile passes parameters per simulator; the chip Makefile uses `--timing -Wno-fatal` for the macro model under Verilator. New CI job `rtl-verilator` (OSS CAD Suite pinned and cached like the `efpga` branch).
+- **L8-EQY feasibility (D-050)**: the PDK's Verilog cell models are not readable by Yosys; liberty-derived models + a SAT miter prove the ALU's netlist equivalent (and reject a wrong RTL). `formal/equiv.sh`.
+
+Checklist boxes ticked (evidence):
+- None (L1 still needs BITSYNC cases, which wait for milestone B / the budget).
+
+Problems / decisions:
+- **Not added: a `formal` workflow.** The `efpga` branch (a separate eFPGA design) already has `.github/workflows/formal.yaml` and `formal/*.sby`; a second one on `main` would collide if it is ever merged. Krithik and the teammate decide the naming.
+
+Next:
+- R4 run 5; the budget with D-049 as its floor; the pyuvm skeleton; the L9 Hardcaml spike.
+
+## 2026-09-27: Krithik + Claude (phase 2: CI for the RTL suites, first claim, BUGS #49)
+Done:
+- R4 run 5 launched on the branch (`gds` 36363295528, `DRT_OPT_ITERS` 64, e20d390).
+- Gate-level run of the chip after the BUGS #48 fix: `test_chip` 5 + `test_l3` 4, **9/9 pass** (TT Icarus 13).
+- `docs/CLAIMS.md`: claim 1 (the three L3 programs on the chip RTL, simulated only) and a "Known limits" section (host link throughput: continuous UART RX above ~460 kbaud overruns at SCK = clk/8).
+- `unit` workflow: new job `rtl` (VERIFICATION.md §10 puts L1 there): whole-chip Verilator lint, every L1 suite, the pin unit lean and full, the macro model fetch, and `test_chip` + `test_l3` on the chip RTL; results uploaded. First run will show whether Ubuntu 24.04's Verilator 5.020 agrees with the local 5.053.
+- BUGS #49: STEP now also makes the pin units live (D-041 B). L1-HOST 7/7, mutant killed.
+- `docs/HANDOFF.md` (local, not committed) for the next agent.
+- **L3 extended** to every rate the shipped programs support (`test_internal/chip/test_l3.py`): UART TX 9600/115200/1M, UART RX 115200/460800 with a framing error, SPI mode 0 at 1/5/8.3 MHz, I2C 100k/400k/1M with no, short and longer-than-a-period stretching. **4/4 tests (12 configurations) pass on RTL**, reference models + sigrok. `chiplib.start(clock=...)` so a test can reset between configurations without stacking clocks.
+- **D-048 (proposed):** judge the phase 2 L3 box on what the shipped programs implement; parity, SPI modes 1–3 / 16-bit and I2C arbitration loss move to phase 3 with the program work they need.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- R4 run 5 result; the area budget; D-048 (L3 scope) with Kanishk.
+
+## 2026-09-27: Krithik + Claude (phase 2: L3 on the chip RTL, R4 run 4 result)
+Done:
+- **R4 run 4** (36349736069, 2 lanes, density 51) read from `GDS_logs` (`build/ci/r4/run4/`): GPL 47.6 %, **0 global-routing overflow** (Metal3 74.2 %); detailed routing 874 violations after the 4 iterations `DRT_OPT_ITERS` 3 allows (still falling), 1,428 after the antenna re-routes; typ met, slow −5.98 ns; job 2 h 55 min. `R4_FLOORPLAN.md` §9, AREA.md row, D-043 result and run 5 proposal.
+- **L3 on the chip RTL** (`test_internal/chip/test_l3.py`, pins only, programs compiled by tripc and loaded with `tools/host`): UART TX at 1 Mbaud and 115200 (reference line model + sigrok `uart`), UART RX at 460800 with a framing error, SPI controller mode 0 at 5 MHz against the reference target (+ sigrok `spi`, both directions), I2C controller at ~400 kHz with 40-clock stretching: writes, a NACKed address, repeated START, reads (+ sigrok `i2c`). **4/4 pass.** Shared helpers in `test_internal/chip/chiplib.py` (host polling that drains HOST_OUT, a pad environment stepping the reference models, a VCD writer, sigrok).
+- **BUGS #48** found by L3 and fixed in `trw_host.v`: a status+data burst could take a token the status had not shown. New L1-HOST test and mutant; L1-HOST 6/6.
+
+Checklist boxes ticked (evidence):
+- None. L3 passes on the RTL for the cases above, but VERIFICATION.md §6 asks for more (UART 9600 and 8E1/parity, SPI modes 1–3 and 16-bit, I2C 100k/1M and arbitration loss), and the tests belong in `test/` once the top is switched.
+
+Problems / decisions:
+- UART RX faster than ~460 kbaud overruns: the host at SCK = clk/8 needs ~560 clocks per HOST_OUT read. A protocol limit of the host link, not of the chip; worth a CLAIMS note.
+- Run 5 (proposed): `DRT_OPT_ITERS` back to 64.
+
+Next:
+- Team: run 5; then the area budget (the RTL chip at 2 lanes / 6 units is ~62 % at placement; run 4 routed globally at 47.6 %).
+- L3: the remaining §6 cases.
+
+## 2026-09-27: Krithik + Claude (phase 2: the whole chip, trw_chip)
+RTL session; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- **`src/trw_chip.v`**: every block wired (D-047), lane/unit counts generated from the spec (`TRW_LANES` etc.). `src/trw_sram.v` from R3. `trw_pin_cfg.v`: `FULL` test made width-clean for Verilator. Whole chip Verilator `-Wall` clean.
+- **Chip tests** (`test_internal/chip/`, pins only, `tools/host` frames at SCK = clk/8): identity/time/SRAM/E2, lane forwarding, UART TX on U0 (full) and U3 (lean), a routine with LD/ST, and `uart.trw` loaded with `tools/host.load_sequence` and looped back. **5/5 RTL, 5/5 gate level** (Yosys netlist, TT Icarus 13).
+- `synth/chip/run_chip.sh`: **517.4K µm² + macro (~62 % of the core, ~72 % at placement)**; +10.36 typ / +4.94 slow pre-layout, worst slow path from the SRAM output into EVAL.
+- All L1 suites and `pytest` re-run: pass.
+
+Checklist boxes ticked (evidence):
+- None. "All modules exist and lint clean" waits for `tt_um_tripwire.v` to become the wrapper (the switch, D-047).
+
+Problems / decisions:
+- The chip at spec counts does not fit (~72 % at placement vs. a routable ceiling below ~59 %). `info.yaml` stays on the placeholder until the budget is set.
+
+Next:
+- Run 4 result → the area budget (lanes, full units, slots) → the switch: wrapper, `info.yaml`/`test/`, `config.json` (SRAM block, latch SDC, density) with their entries → the first real hardening on `main`.
+
+## 2026-09-27: Krithik + Claude (phase 2: tools/host)
+Done:
+- **`tools/host`** (phase 2 task 2.3 item 7): §9 frames (`frame_write`, `frame_read`), the D-046 map from `tripwire_spec.py`, `load_sequence(image)` (every §14 H1 write: halt, all 6 unit blocks, all owners, all 13 ports, each used lane's 12 slots + K + r0–r3/STATE, SRAM, RUN), a `Host(xfer)` client (run/halt/step, lane debug block, unit flags, HOST_IN push with the busy check, HOST_OUT pop) and a `RegisterModel` to check sequences offline.
+- `tripc` now emits `pin_regs` for every unit (defaults for unused ones), so a load writes every block (task 2.3 item 8 with the ports and owners in `load_sequence`).
+- Tests (`tools/host/tests`): frames, encodings, the load sequence of all 20 programs checked register by register, the client against a fake chip. `pytest -m "not slow"`: 292 passed.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Run 4 result, then the real top: the pin-level tests in `test/` will drive it through `tools/host` frames.
+
+## 2026-09-27: Krithik + Claude (phase 2: host map in the spec, host RTL)
+RTL session; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- Krithik approved D-042, D-044, D-046. `spec/tripwire.yaml` v1.2 gets `host_map`; `gen.py` generates the Verilog constants (`TRW_HA_*`, `TRW_HL_*`, `TRW_IRQ_*`, ID, version), the Python tables (`HOST_MAP`, …) and the §9 table, with validation (no overlapping blocks, consistent with `pin_config` and the fabric). 1 new generator test; `pytest -m "not slow"`: 269 passed.
+- `src/trw_spi.v` (SPI engine from the R4 stub) and `src/trw_host.v` (the map: control, IRQ, write strobes, read multiplexer, SRAM host slot). Verilator `-Wall` clean. 24.8K µm².
+- BUGS #47: a prefetch of the next read word took the HOST_OUT token; now taken only when the word is shifted out.
+- L1-HOST (`test_internal/host/`): 5 tests through the pads (2-FF, SCK = clk/8), 12/12 mutants killed. All L1 suites re-run after the defs change: chan 7, alu 4, lane 6, slots 2, pins 1, host 5, pin 34 + 34, all pass.
+
+Checklist boxes ticked (evidence):
+- None yet: every module of the §2.1 table now exists except the real top; the box needs them wired and linted as one design.
+
+Problems / decisions:
+- The R4 branch's host stub still has BUGS #47 (it does not affect run 4, which measures routing).
+
+Next:
+- Run 4 result; then the real top (`tt_um_tripwire.v`) with the lane count it gives, `info.yaml`/`test/Makefile`, the SRAM macro and latch SDC in `config.json` (DECISIONS entries), and `tools/host`.
+
+## 2026-09-27: Krithik + Claude (phase 2: slots, pads, host map proposal)
+RTL session; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- `src/trw_slots.v` from the spike: write-only (the debug read port is gone, D-039), slot word 3 stores its 5 bits. 24.5K µm² (700 latch bits, 52 clock gates), as before. L1 (`test_internal/slots/`): 2 tests on the latch array and the flop build (`FLOPS=1`), both pass.
+- `src/trw_sync.v` (2-FF, P1) and `src/trw_pins.v` (owner registers and the pad multiplexer, §7.1; host pads ignore owner writes). L1 (`test_internal/pins/`): 1,500 random clocks against the ownership rule, pass. Verilator `-Wall` clean on all three.
+- D-046 (proposed): the full host register map (control/status, lane debug block, HOST_IN/HOST_OUT status, IRQ), so `trw_host.v` can be written.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- The host RTL waits for D-046, D-044 and D-042 (all proposed).
+
+Next:
+- Krithik/Kanishk: D-042, D-044, D-046. Then `trw_host.v` and `tools/host`.
+- Run 4 result; then the top that wires everything (lane count from run 4).
+
+## 2026-09-27: Krithik + Claude (phase 2: lane and ALU RTL)
+RTL session, from `ISA.md` §2–§5 and `ARCHITECTURE.md` §5, §6, §14; `tools/tripsim` not read. R4 run 4 still running.
+
+Done:
+- `src/trw_alu.v` (from the R1 spike, unchanged) and **`src/trw_lane.v`**: the R1 lane checked against D-035 and §14 L12, plus the routine controller (RPC, RIR, CALL entry read, BR, DJNZ, LD/ST, OUT, SYS), STEP (H2), host writes to r0–r3/STATE (E2), `out_load` for the fabric (F4). Verilator `-Wall` and Icarus clean.
+- Two latent spike bugs fixed on the way: BUGS #45 (BSEL 3), #46 (GETT time).
+- L1-ALU (`test_internal/alu/`): 4 tests, 8/8 mutants killed. L1 lane (`test_internal/lane/`): 6 tests covering L1-EVAL (400 random cases against ISA §4.2–4.3) and L1-PIPE, the routine controller, urgent vs routine, halt/STEP/host writes; 15/15 mutants killed.
+- Yosys: 51.5K µm² per lane with the ALU (+9.6K vs the spike). AREA.md.
+
+Checklist boxes ticked (evidence):
+- None (L1 still lacks OVR, ROT and HOST; the lane is not in the top yet).
+
+Problems / decisions:
+- D-045: three readings for the model side (fetched word competes in clock k+1; no fetch while a step is in EXEC or waiting; STEP/host writes ignored while running).
+- The fetched-word path (macro clock-to-output into EVAL) is not timed yet.
+
+Next:
+- Run 4 result.
+- `trw_slots.v` to `src/`, then a top that wires lanes, fabric, pin units and SRAM (and the host), so pre-layout STA and a real `gds` run can start.
+
+## 2026-09-27: Krithik + Claude (phase 2: channel fabric RTL)
+RTL session, from `ARCHITECTURE.md` §4 and §14 F1–F7; `tools/tripsim` not read. R4 run 4 (2 lanes) running on the branch meanwhile (`gds` 36349736069).
+
+Done:
+- `src/trw_chan_port.v` (consumer port: legal-source mux, en/tap/sel/accept registers, last_seq, DROPPED; F1, F2, F4, F5, F7) and `src/trw_chan_prod.v` (producer register; F3, F6).
+- `src/trw_fabric.v` **generated** by `tools/gen/gen.py` from the spec's legal sources (13 ports, 13 release terms); `gen.py` also exports `FABRIC_PRODUCERS` / `FABRIC_CONSUMERS` in `tools/tripwire_spec.py`. 2 new generator tests (38 in `tools/gen/tests`).
+- L1-CHAN in `test_internal/chan/`: fabric plus a producer register on all 13 producers, checked against a model of F1–F7 every clock. 7 tests: 0–4 blocking × 0–2 tap subscribers (delivery exactly once and in order, DROPPED exact), registered release, DROPPED saturation and clear, accept filter, re-pointing, sel past the list, 6,000 random clocks. **7/7 pass; `mutate.sh` 10/10 killed.**
+- Yosys: fabric 44.4K µm² (AREA.md).
+- Not in `info.yaml` / `test/Makefile` yet: the modules join when the top wires them.
+
+Checklist boxes ticked (evidence):
+- None (L1 is not complete until ALU, EVAL, PIPE, OVR, ROT and HOST exist).
+
+Problems / decisions:
+- D-044 (proposed): port registers at `0x2000 + c`, DROPPED at `0x2040 + c` (write clears), and three readings of F5 / sel / write-vs-take for the model side.
+- `pytest -m "not slow"`: 268 passed; `lint`: Verilator `-Wall` and Icarus clean on the three files.
+
+Next:
+- Krithik/Kanishk: D-044 (and still D-041 A/B, D-042).
+- Run 4 result when it finishes.
+- RTL: the host (`trw_host.v`, §9) or moving the R1 lane into `src/` (with an `out_load` output for F4 tap drops on lane producers).
+
+## 2026-09-27: Krithik + Claude (phase 2: R4 run 3 result)
+Done:
+- R4 run 3 (36327551624, 462bf06, `CTS_APPLY_NDR` = `none`) ran the full flow in 5 h 25 min; `GDS_logs` read locally (`build/ci/r4/run3/`, not committed).
+- **Global routing ended (4 min): overflow 4,883, 4,651 on Metal3 (92.8 % usage). Detailed routing: 6,004 violations after the first pass, 12,872 at the end. The full chip does not route at 58.9 % / 65.9 %.** ~74 % of the violations are in the lanes' area (approximate, by net names).
+- `R4_FLOORPLAN.md` §7, AREA.md row, D-043 result and run 4 proposal.
+- Run 4 approved and set up: `localparam NL = 2` in the R4 top, `gen_fabric.py` reads it; density 51. Yosys 337.4K µm² (−80.3K); `check_local.sh` PASS (lint, 5/5 RTL, 5/5 gate level). `R4_FLOORPLAN.md` §8.
+- Checked: all 20 programs use at most 2 lanes (CAN, LIN, IR NEC use 2), so every protocol still runs with 2 lanes, only fewer at once.
+- Fixed: the run 3 docs cited D-041 for the area budget; it is `AREA_ESTIMATE.md` / D-038–D-040.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- GitHub's live log stops at ~38.6K lines (in CTS), so a running R4 job cannot be followed; wait for the end.
+- LibreLane failed parsing netgen's JSON after the LVS mismatch, so precheck did not run (tool issue, only when LVS already fails).
+- Proposed run 4: 2 lanes instead of 3 (D-043). The routable ceiling bears on the area budget (`AREA_ESTIMATE.md`, D-038–D-040).
+
+Next:
+- Krithik: commit, then push `spike/r4-floorplan` for run 4; collect `GDS_logs` into `build/ci/r4/run4/`.
+- Team: revisit the area budget (`AREA_ESTIMATE.md`) with run 3 and run 4.
+
 ## 2026-09-27: Krithik + Claude (phase 2: R4 run 2 result)
 Done:
 - R4 run 2 (36279959944, ed3b949) read from the job log with `gh api` (cancelled at the 6 h limit, so no `GDS_logs`).

@@ -1,5 +1,9 @@
-// R1 risk spike (throwaway): the shared operation table, ISA.md §3.
-// Pure combinational. Operand selection (A, B, F, r[F[5:4]], CMPM M/V) is done by the caller.
+// The shared operation table (ISA.md §3): one ALU per lane, used by the reflex slots and the routine steps.
+// From the R1 spike (spikes/r1_lane/trw_alu.v, D-030), unchanged in function.
+//
+// Timing contract: purely combinational. The caller selects the operands (A, B, F, r[F[5:4]] for SHOR, and
+// CMPM's M and V from K or r) and applies the results: d to the destination, R to f[DF] (reflex, DFE) or RZ
+// (routine). MKCTL's CTRL tag and CALL's routine start are the lane's; here CALL gives d = 0, R = 0.
 `default_nettype none
 `include "trw_defs.vh"
 
@@ -22,7 +26,6 @@ module trw_alu (
     wire [15:0] emask = 16'hFFFF >> (4'd15 - f[7:4]);   // mask(F[7:4] + 1)
 
     always @* begin
-        d = a;
         case (op)
             `TRW_OP_MOV:   d = a;
             `TRW_OP_ADD:   d = a + b;

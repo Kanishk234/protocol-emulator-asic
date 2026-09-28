@@ -26,7 +26,7 @@ for v in "${V[@]}"; do
   rm -rf "$WORK/src"; cp -r "$ROOT/src" "$WORK/src"
   sed -i "$expr" "$WORK/src/$file"
   S="$WORK/src"
-  yosys -q -p "read_liberty -lib $TYP; read_verilog -DSYNTHESIS -I$S $S/trw_pin_io.v $S/trw_pin_tx.v $S/trw_pin_rx.v $S/trw_pin_unit.v; \
+  yosys -q -p "read_liberty -lib $TYP; read_verilog -DSYNTHESIS -I$S $S/trw_pin_io.v $S/trw_pin_tx.v $S/trw_pin_rx.v $S/trw_pin_bs.v $S/trw_pin_unit.v; \
     synth -top trw_pin_unit -flatten; dfflibmap -liberty $TYP; abc -liberty $TYP; opt_clean; tee -o $WORK/stat.txt stat -liberty $TYP" >/dev/null 2>&1 \
     || { echo "$what: synthesis failed"; continue; }
   a=$(awk '/Chip area for module/ {a=$NF} END {printf "%.0f", a}' "$WORK/stat.txt")

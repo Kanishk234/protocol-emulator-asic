@@ -1,0 +1,24 @@
+# L0-ASRT under FORMAL (VERIFICATION.md): the TRW_ASSERT invariants of the pad owners and a producer register,
+# proved unbounded by k-induction with SymbiYosys. Run in formal/: sby -f l0_asrt.sby <task> (outputs: formal/l0_asrt_<task>/)
+[tasks]
+pins
+prod
+
+[options]
+mode prove
+depth 4
+
+[engines]
+smtbmc z3
+
+[script]
+pins: read -formal -DFORMAL -I. trw_defs.vh trw_assert.vh trw_pins.v
+pins: prep -top trw_pins
+prod: read -formal -DFORMAL -I. trw_assert.vh trw_chan_prod.v
+prod: prep -top trw_chan_prod
+
+[files]
+../src/trw_defs.vh
+../src/trw_assert.vh
+../src/trw_pins.v
+../src/trw_chan_prod.v

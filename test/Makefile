@@ -1,15 +1,17 @@
 # Makefile
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
 # R4 branch (spike/r4-floorplan): the template Makefile plus the SRAM macro's simulation model (as R3).
+# Run 6: the real chip (trw_chip) at the protocol floor; sources as in info.yaml.
 
 # defaults
 SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR ?= $(PWD)/../src
-PROJECT_SOURCES = tt_um_tripwire.v r4_host.v r4_seq.v r4_port.v r4_fabric.v \
-                  trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_unit.v \
-                  trw_lane.v trw_alu.v trw_slots.v trw_sram.v
+PROJECT_SOURCES = tt_um_tripwire.v trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v \
+                  trw_host.v trw_spi.v trw_lane.v trw_alu.v trw_slots.v trw_sram.v \
+                  trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v \
+                  trw_pins.v
 
 # The macro's behavioural model, in RTL and gate-level runs alike (the blackbox in src/ is for synthesis).
 MACRO_DIR ?= $(PWD)/../macro/RM_IHPSG13_1P_512x16_c2_bm_bist

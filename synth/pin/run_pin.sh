@@ -25,7 +25,7 @@ export LD_LIBRARY_PATH="$OR/x/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LI
 export TCL_LIBRARY="$OR/x/usr/share/tcltk/tcl8.6"
 STA() { "$OR/x/usr/bin/sta" -no_init -no_splash -exit "$@" </dev/null 2>&1 | grep -v "tclreadline" || true; }
 
-UNIT="$ROOT/src/trw_pin_io.v $ROOT/src/trw_pin_tx.v $ROOT/src/trw_pin_rx.v $ROOT/src/trw_pin_unit.v"
+UNIT="$ROOT/src/trw_pin_io.v $ROOT/src/trw_pin_tx.v $ROOT/src/trw_pin_rx.v $ROOT/src/trw_pin_bs.v $ROOT/src/trw_pin_unit.v"
 CFG="$ROOT/src/trw_pin_cfg.v"
 ALL="$CFG $UNIT $HERE/trw_pin_meas.v"
 mkdir -p "$B"

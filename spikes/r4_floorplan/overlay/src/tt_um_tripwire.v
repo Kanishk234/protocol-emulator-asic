@@ -2,8 +2,9 @@
 // representative TRIPWIRE on 6x4, to learn at what utilisation the full chip routes.
 //
 // On the chip:
-//   - 3 lanes: the R1 lane with its latch slot array and K (spikes/r1_lane), no slot read-back (D-039),
-//     each with a routine sequencer stub (r4_seq) on the SRAM rotation;
+//   - NL lanes (runs 1-3: 3; run 4: 2 of the 3): the R1 lane with its latch slot array and K
+//     (spikes/r1_lane), no slot read-back (D-039), each with a routine sequencer stub (r4_seq) on the
+//     SRAM rotation;
 //   - NU lean pin units (src/trw_pin_unit.v, FULL = 0; run 2: 4 of the 6) with their configuration latch blocks
 //     (src/trw_pin_cfg.v) and producer registers; output owners per pad (reset: none);
 //   - the fabric: 13 producers, 13 consumer ports with the spec's legal-source multiplexers
@@ -50,6 +51,10 @@ module tt_um_tripwire (
     // Pin units built (run 1: 6; run 2: 4, D-043). Units NU-5 keep their numbers but are absent: their
     // producers are constant, gen_fabric.py reads NU here and leaves out their U<u>.tx ports.
     localparam NU = 4;
+    // Lanes built (runs 1-3: 3; run 4: 2, D-043). Lanes NL-2 keep their numbers but are absent: their
+    // producers are constant, host writes to their slots are ignored, their rotation slot stays idle,
+    // and gen_fabric.py reads NL here and leaves out their L<k>.I0/I1 ports.
+    localparam NL = 2;
 
     // ---------------------------------------------------------------- pads in, time, host
     reg [7:0] ui_s1, ui_s2, uio_s1, uio_s2;
@@ -173,7 +178,18 @@ module tt_um_tripwire (
     wire [224:0] lane_dbg;
     genvar k;
     generate
-        for (k = 0; k < 3; k = k + 1) begin : g_lane
+        for (k = NL; k < 3; k = k + 1) begin : g_lane_absent
+            assign p_valid[6+2*k +: 2] = 2'd0;
+            assign p_seq[6+2*k +: 2]   = 2'd0;
+            assign p_load[6+2*k +: 2]  = 2'd0;
+            assign p_tok[18*(6+2*k) +: 36] = 36'd0;
+            assign take[2*k +: 2] = 2'd0;
+            assign q_en[k] = 1'b0;
+            assign q_addr[9*k +: 9] = 9'd0;
+            assign lane_dbg[75*k +: 75] = 75'd0;
+            wire _unused_k = &{1'b0, run[k], avail[2*k +: 2], head[36*k +: 36], all_taken[6+2*k +: 2]};
+        end
+        for (k = 0; k < NL; k = k + 1) begin : g_lane
             wire [12*SB-1:0] slots;
             wire [63:0]      kk;
             wire [15:0]      slot_rd;

@@ -21,19 +21,24 @@ project:
   # The SRAM macro is not a source file: src/config.json brings it in through MACROS (as R3).
   source_files:
     - "tt_um_tripwire.v"
-    - "r4_host.v"
-    - "r4_seq.v"
-    - "r4_port.v"
-    - "r4_fabric.v"
-    - "trw_pin_cfg.v"
-    - "trw_pin_io.v"
-    - "trw_pin_tx.v"
-    - "trw_pin_rx.v"
-    - "trw_pin_unit.v"
+    - "trw_chip.v"
+    - "trw_sync.v"
+    - "trw_fabric.v"
+    - "trw_chan_port.v"
+    - "trw_chan_prod.v"
+    - "trw_host.v"
+    - "trw_spi.v"
     - "trw_lane.v"
     - "trw_alu.v"
     - "trw_slots.v"
     - "trw_sram.v"
+    - "trw_pin_cfg.v"
+    - "trw_pin_io.v"
+    - "trw_pin_tx.v"
+    - "trw_pin_rx.v"
+    - "trw_pin_bs.v"
+    - "trw_pin_unit.v"
+    - "trw_pins.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).

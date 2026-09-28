@@ -1,4 +1,4 @@
-// R3 risk spike: the routine/data store behind the interface PHYSICAL_DESIGN_AND_CI.md §3 fixes
+// SRAM (the IHP 512x16 macro, D-031; from the R3 spike): the routine/data store behind the interface PHYSICAL_DESIGN_AND_CI.md §3 fixes
 // for both the macro and its fallback: one access per clock, rdata one clock after a read.
 //
 //   en && !we  read addr; rdata holds SRAM[addr] from the next clock until the next read

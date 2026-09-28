@@ -460,8 +460,9 @@ class Compiler:
             "pins": {f"U{u}": cfg for u, cfg in sorted(self.pins.items())},
             "own": [[pad, u] for pad, u in self.owns],
             "connect": [list(c) for c in self.connects],
-            "pin_regs": {f"U{u}": [f"{w:04x}" for w in self._regs(u, cfg)]
-                         for u, cfg in sorted(self.pins.items())},
+            # every unit's block, unused ones with the default (§14 H1: the latches have no reset)
+            "pin_regs": {f"U{u}": [f"{w:04x}" for w in self._regs(u, self.pins.get(u, {}))]
+                         for u in range(len(S.PIN_UNIT_FEATURES))},
             "lanes": {f"L{i}": {"slots": [f"0x{w:014x}" for w in l.words], "k": l.k, "regs": l.regs,
                                 "states": l.states} for i, l in sorted(self.lanes.items())},
             "sram": sram,

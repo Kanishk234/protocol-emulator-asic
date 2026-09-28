@@ -700,12 +700,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Proposal B (P-G16, needs approval): pin units are live only after the first RUN or STEP.** Until some lane has been RUN or STEPped since reset, no pin unit takes a TX token or loads its producer. Half-written configuration latches can otherwise push X tokens into the fabric at gate level. Cost: one flop. A host-only setup (tokens from HOST_IN straight to a unit, no lane) must RUN an empty lane first; tripc and `tools/host` will do it. The alternative, a host "pins live" bit, costs an address and one more step to forget.
 - **Approval:** the gap answers follow the D-033 precedent (model session, from the model and the RTL's report). Proposals A and B change behaviour and wait for Krithik and Kanishk.
 
-## D-042 (2026-09-26): clearing the sticky pin-unit flags (proposed)
+## D-042 (2026-09-26): clearing the sticky pin-unit flags (approved 2026-09-27)
 - **Context:** §9 lists sticky flags (OVERRUN, LATE) in the control space, but not how the host clears them (P-G19). The RTL used write-1-to-clear strobes.
 - **Proposal:** one status word per unit at `0x0010 + u`: [0] OVERRUN, [1] LATE. A read returns the flags; writing 1 to a bit clears it; writing 0 leaves it. The words are part of the readable state (D-039 keeps them readable).
 - **General need:** any protocol's firmware and host tooling needs to see and reset overrun and lateness without reconfiguring the unit.
 - **Cost:** 2 flops per unit already exist; the decode is a few gates.
-- **Status:** proposed; waits for Krithik and Kanishk. Then §9 and the spec get the address.
+- **Status:** approved by Krithik 2026-09-27, with D-044 and D-046. In the spec as `host_map.unit_flags` (v1.2); `trw_host.v` implements it.
 
 ## D-043 (2026-09-26): R4 spike: a full-size floorplan at 6x4, to learn the routable utilisation
 - **Question:** at what utilisation does a full-size TRIPWIRE route on the 6x4 tile? R2 (one lane, 4x2) routed only at ~42 % placement density. The area estimate puts the plan of record at ~74–85 % of the core, so this limit decides every further cut.
@@ -735,6 +735,155 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - Supported protocols are unaffected: no program needs more than 4 units (SPI controller, JTAG, I2S). A 4-unit chip loses running a 4-unit protocol alongside another (e.g. SPI controller + UART).
   - **Result (run 36279959944, ed3b949): cancelled at the 6 h limit in global routing.** GPL 58.9 % (predicted ~60 %); CTS and hold repair (3,067 buffers) passed, and detailed placement passed. Global routing still had overflow after its 50 iterations and then, for 5 h 51 min, disabled the clock NDR one net at a time (GRT-0273) and re-ran 50 iterations each time; overflow figures are printed only at the end, so none were printed. No artifacts. `R4_FLOORPLAN.md` §6.
 - **Run 3 (approved by Krithik 2026-09-27): `CTS_APPLY_NDR` = `none`, same design.** A flow setting, branch-only (outside the CLAUDE.md `config.json` list, like `DRT_OPT_ITERS`). Without clock NDRs the router's relaxation loop has nothing to relax, so global routing ends after one set of 50 iterations with overflow allowed, and the run reports overflow per layer and detailed-routing violations. This is what R4 is for. Cost: clock nets route at default spacing (more coupling on the clock tree); acceptable for a measurement spike, and to be revisited for the real chip.
+  - **Result (run 36327551624, 462bf06): routed through, not clean.** Global routing ended in 4 min 22 s: overflow **4,883**, of which **4,651 on Metal3** (the only horizontal routing layer, 92.8 % usage; Metal4 44 %). 65.9 % of the core after global routing. Detailed routing: 6,004 violations after the first pass (3 h 15 min), 12,872 after two antenna re-routes; LVS failed (786 nets merged by shorts); post-route slow-corner setup −10.89 ns, from the routes. About 74 % of the violations sit in the lanes' area. `gds` job 5 h 25 min. `R4_FLOORPLAN.md` §7.
+  - **What it decides:** the full chip does not route at ~59 % placement / ~66 % final, so the routable ceiling for this design is below that, well under the plan of record (~74–85 %). Horizontal routing (Metal3) is the limit and the lanes carry most of it. The area budget (`AREA_ESTIMATE.md`, tier 1 in D-038–D-040) needs to be revisited against this.
+- **Run 4 (approved by Krithik 2026-09-27; one change): 2 lanes instead of 3.**
+  - A `localparam NL` in the R4 top, as `NU`: lane 2 keeps its number but is absent. Its producers are constant, host writes to its slots are ignored, its SRAM rotation slot stays idle, and `gen_fabric.py` reads NL and leaves out the `L2.I0`/`L2.I1` ports.
+  - Yosys (flat): **337.4K µm²** (−80.3K vs run 2); 1,829 flops, 1,876 latches, 140 clock gates. Pre-layout slack +10.27 typ / +5.05 slow. `check_local.sh`: lint clean, 5/5 RTL, 5/5 gate level (the tests use lane 0 only).
+  - `PL_TARGET_DENSITY_PCT` **51**: run 2 measured GPL = 1.164 × Yosys + macro (58.9 %), so ~392K + 45K ≈ 48.5 %, plus 2.
+  - **Protocols:** All 20 programs in `programs/` use at most 2 lanes: CAN, LIN and IR NEC use 2, the other 17 use 1 (and every program fits in 4 pin units). So every protocol still runs on a 2-lane chip; what is lost is running them together: at most two 1-lane protocols at once, and a 2-lane program (CAN, LIN, IR NEC) alone, where 3 lanes allowed a 2-lane program plus a 1-lane one, or three 1-lane protocols.
+  - If run 4 routes and the chip keeps 2 lanes, that is a spec change (`ARCHITECTURE.md` has 3 lanes) and needs its own entry.
+  - **Result (run 36349736069, 3fc5b1a): global routing clean, detailed routing stopped early.** GPL 47.6 %; 54.7 % after global routing; **0 global overflow** (Metal3 74.2 %, 22 s). Detailed routing: 874 violations after the 4 iterations `DRT_OPT_ITERS` 3 allows (still falling fast), 1,428 after the antenna re-routes; typ timing met, slow −5.98 ns from the routes; job 2 h 55 min. `R4_FLOORPLAN.md` §9.
+- **Run 5 (approved by Krithik 2026-09-27):** same design, `DRT_OPT_ITERS` back to the default (64), to see whether 47.6 % routes clean. The guard was for a non-converging route; with 0 global overflow the extra iterations are short. Decision: team.
+  - **Result (run 36363295528, e20d390): routes clean.** 0 DRC (iteration 5), LVS match, 0 antenna, Magic at the macro's baseline; typ timing met, slow −6.0 ns (slot latch → flop); `gl_test` and precheck passed; `gds` job 2 h 58 min (detailed routing 1 h 58 min), precheck 1 h 56 min. The routable ceiling is between 47.6 % (clean) and 58.9 % (run 3). `R4_FLOORPLAN.md` §10.
+  - **Next measurement (proposed):** a run at the protocol floor's size (D-049, ~56–58 % at placement), best with the real `trw_chip` at 2 lanes / 4 units (U0 full) on the branch, to settle the budget.
+  - **Run 6 (prepared 2026-09-28, asked for by Krithik; not pushed yet):** the real `trw_chip` from main (with B2c and the retimed engine) at the protocol floor: the branch's spec at 2 lanes, 4 units, only U0 full, regenerated. `tt_um_tripwire` wraps `trw_chip` (the SRAM path becomes `u_chip.u_sram.sram`), `info.yaml`/`test/Makefile` list the chip's sources, and `test/test.py` has 4 pin-level tests from `test_chip.py`. Yosys 398.7K µm², so ~56.4 % expected at placement; `PL_TARGET_DENSITY_PCT` 59; `DRT_OPT_ITERS` 64 as in run 5. Pre-layout +7.35 ns typ, +0.42 ns slow. Checked locally: lint clean, `test/` 4/4, the chip tests 10/10 at those counts. `R4_FLOORPLAN.md` §11.
+
+## D-044 (2026-09-27): fabric port registers in the host map, DROPPED readback and clear (approved 2026-09-27)
+- **Context:** writing the fabric RTL (`trw_chan_port.v`, `trw_chan_prod.v`, and `trw_fabric.v` generated by `tools/gen/gen.py`) from §4 and §14 F1–F7. §9 gives the range `0x2000–0x20FF` for "fabric consumer port registers (sel, en, mode)" but no layout, and lists DROPPED among the sticky flags without an address or a way to clear it. The modules take the port fields as separate inputs, so they do not depend on the answer; the host (`trw_host.v`) and tripc (phase 2 task 2.3 item 8) do.
+- **Numbering (in the spec now, not a proposal):** `gen.py` exports `FABRIC_PRODUCERS` and `FABRIC_CONSUMERS` in `tools/tripwire_spec.py`, from the spec's lane and unit counts: producers U0.rx–U5.rx, L0.O0, L0.O1, …, L2.O1, HOST_IN (0–12); consumers L0.I0, L0.I1, …, L2.I1, U0.tx–U5.tx, HOST_OUT (0–12). `trw_fabric.v` and the tests use them.
+- **Proposal:**
+  - Port c at **`0x2000 + c`**, read and write: `[0] en`, `[1] tap` (0 = blocking), `[5:2] sel`, `[9:6] accept` (tag mask, bit = tag code). Readable: the fields are flops (not latches, unlike D-039's blocks), and the read mux is ~10 bits × 13.
+  - DROPPED of port c at **`0x2040 + c`**, read `[7:0]`; **any write clears it**. A drop in the same clock wins over the clear.
+  - A write to a port register acts as §14 F5 at that edge (below).
+- **Readings the RTL takes where §14 leaves a choice (clarifications for the model side to confirm):**
+  - F5: `last_seq :=` the newly selected source's `seq` as it is at the start of the write clock. A token that source loads at the same edge is therefore delivered (it is newer than the write).
+  - A `sel` beyond the port's legal-source list selects nothing: never available, never holds a producer (tripc never writes one).
+  - A configuration write wins over a take in the same clock (writes happen while the lanes are halted anyway).
+- **General need:** every program's `connect` lines become these writes; any protocol's host tooling needs DROPPED to see tap losses and reset the count between runs.
+- **Cost:** nothing beyond the port registers themselves (10 flops per port, in `trw_chan_port`); a 13-way readback mux and a clear strobe per port.
+- **Evidence:** L1-CHAN (`test_internal/chan/`): 7 tests, including every combination of 0–4 blocking and 0–2 tap subscribers and 6,000 random clocks against a model of F1–F7, all passing; `mutate.sh` 10 of 10 mutants killed. Yosys: fabric 44.4K µm², producer register 1.5K.
+- **Approval:** layout and clear approved by Krithik 2026-09-27 (spec v1.2 `host_map.ports` / `dropped`). The three readings still go to the model side for confirmation.
+
+## D-045 (2026-09-27): the lane in `src/`, with the routine controller; three readings for the model side
+- **Context:** phase 2 task 2.1 `trw_lane.v`: the R1 spike lane (D-030) plus what it lacked: the routine controller (RPC, RIR, CALL entry read, BR, DJNZ, LD/ST, OUT, SYS), STEP (§14 H2), host writes to r0–r3 and STATE (D-035 E2), and a producer-load output for tap drop counting (F4). Checked against §14 L1–L12, R1–R6, H1–H2 and D-035; written without reading `tools/tripsim`. `trw_alu.v` moves to `src/` unchanged.
+- **Found in the spike (fixed in `src/`):** BUGS #45 (`BSEL = 3` gave 0, not imm, L12) and #46 (`GETT` read the time at EXEC, not at the step's EVAL, R3). The R4 branch still uses the spike lane; neither changes area.
+- **Readings where §14 leaves a choice (for the model side to confirm; each is pinned by a test and a mutant):**
+  - **R1 "usable from clock k+1":** a word read on slot k (a fetched step, or an `LD` result) competes at EVAL in clock k+1, straight from the macro's registered output; if it loses, it is held in RIR. So a routine's first step after its fetch on slot k executes in k+2 at the earliest. (The R4 stub registered it first: one clock later.)
+  - **R2 "no routine step is waiting to execute":** no fetch while a step is in EXEC (it may branch) or while a step (or an `LD` result) is waiting. `RPC` advances at the fetch, so branch offsets count from the next word.
+  - **STEP on a running lane** is ignored; a host register write while running is ignored (§9: writable while halted).
+- **Interfaces:** the lane drives the SRAM in its rotation clock (`my_slot`, `mem_*`), takes `step`, `host_we/sel/wdata`, and gives the §9 readback fields (`dbg_*`: r0–r3, STATE, flags, PEND, RPC, RIR, RZ) and `out_load`.
+- **Cost:** 51.5K µm² per lane with the ALU (Yosys, cmos5l typ), +9.6K over the spike lane (41.9K) and +6.7K over the spike plus R4's sequencer stub. 242 flops. The fetched-word path adds the macro's clock-to-output (4.3 ns typ, R3) in front of EVAL; it is not measured yet (pre-layout STA once a top wires the lane to the macro).
+- **Evidence:** `test_internal/alu/` 4 tests, 8/8 mutants; `test_internal/lane/` 6 tests (400 random EVAL cases against ISA §4.2–4.3, the pipeline timing of L3–L5 and the pending rule, output reservation with the 3-clock reload, a routine using every word kind and every reserved code, urgent vs routine, halt/STEP/host writes), 15/15 mutants.
+- **Approval:** the readings go to the model side; nothing here changes the spec.
+
+## D-046 (2026-09-27): the host register map in full (approved 2026-09-27)
+- **Context:** `trw_host.v` (phase 2 task 2.1) is the last module without RTL. §9 gives the address ranges and the transaction format, but no layout for the control/status words, the lane debug block beyond r0–r3/STATE, or the HOST_IN/HOST_OUT status. Together with D-042 (unit flags) and D-044 (fabric ports) this entry fixes every address, so the host RTL, `tools/host` (task 2.3 item 7) and `tripc.load` share one map. Where the R4 host stub (`spikes/r4_floorplan`) already chose, the proposal keeps its choice, so the R4 tests stay valid.
+- **Proposal** (R = read, W = write; unlisted addresses read 0 and ignore writes):
+
+| Address | Access | Contents |
+|---|---|---|
+| 0x0000 | RW | `[2:0]` RUN per lane (1 = run). Reads also `[15]` = pin units live (§14 P-G16, D-041 B) |
+| 0x0001 | W | STEP: `[2:0]` lanes to step; ignored for a running lane (§14 H2, D-045) |
+| 0x0002 | R | time (the 16-bit global counter) |
+| 0x0003 | RW | IRQ enable, same bit layout as 0x0004 |
+| 0x0004 | R | IRQ status (live, not latched): `[5:0]` unit u has OVERRUN or LATE, `[8]` HOST_OUT has a token, `[9]` HOST_IN is free, `[10]` any DROPPED ≠ 0. IRQ pad = OR of (status & enable) |
+| 0x0010 + u | R, W1C | unit u flags (D-042): `[0]` OVERRUN, `[1]` LATE; writing 1 clears |
+| 0x00FF | R | ID: `0x7157` ("TW" 1.x); 0x00FE: spec version (major, minor) |
+| 0x1000–0x13FF | W | slots and K (§9, unchanged): `lane[9:8] slot[7:4] word[1:0]`, slot 12 = K |
+| 0x2000 + c | RW | fabric port c (D-044) |
+| 0x2040 + c | R, W clears | DROPPED of port c (D-044) |
+| 0x3000–0x30BF | W | pin-unit blocks (§7.2, unchanged) |
+| 0x30C0 + i | RW | owner of pad 8 + i (§7.1, unchanged) |
+| 0x5000 + 32·k + j | | lane k: j = 0–3 r0–r3 and 4 STATE (R; W while halted, E2); 5 `{PEND[6:4], FLAGS[3:0]}`; 6 RPC; 7 `{RIR valid [15], RZ [14]}`; 8 RIR; 9 `{O1 valid, O1 seq, O0 valid, O0 seq, I1 avail, I0 avail}` in `[5:0]`; 10/11 I0 head `{tag}` / data; 12/13 I1 head; 14/15 O0 token `{tag}` / data; 16/17 O1 token. All R except 0–4 |
+| 0x6000–0x6003 | W | HOST_IN push with tag = `addr[1:0]`. Refused (nothing loaded) while HOST_IN is not free: the host checks 0x6004 `[14]` first |
+| 0x6004 | R | HOST_OUT/HOST_IN status: `[15]` HOST_OUT has a token, `[14]` HOST_IN free, `[1:0]` HOST_OUT tag |
+| 0x6005 | R | HOST_OUT data; the read takes the token (it is consumer port 12, blocking or tap as configured) |
+| 0x8000–0x81FF | RW | SRAM, through the host's rotation slot (§14 R1) |
+
+- **Changes from §9 as written:** HOST_IN/HOST_OUT move from 0x6000/0x6001 to 0x6000–0x6005 (the tag needs two address bits; the R4 stub already does this). Everything else fills in what §9 left open.
+- **General need:** one map for the RTL, the host library and tripc; every debug field §9 lists becomes readable; the host can run any protocol's traffic through HOST_IN/HOST_OUT with flow control and an IRQ instead of polling.
+- **Cost:** the read multiplexer (~50 readable words) and a few decode terms; no new state beyond the IRQ enable (11 flops).
+- **Approval:** approved by Krithik 2026-09-27, with D-042 and D-044.
+- **Outcome:** `spec/tripwire.yaml` v1.2 has `host_map`; `gen.py` generates `TRW_HA_*`/`TRW_HL_*`/`TRW_IRQ_*` in `trw_defs.vh`, `HOST_MAP` and friends in `tripwire_spec.py`, and the §9 table. `src/trw_spi.v` (the SPI engine, from the R4 stub) and `src/trw_host.v` implement it; BUGS #47 was found on the way. L1-HOST (`test_internal/host/`): 5 tests through the pads at SCK = clk/8, 12/12 mutants killed. 24.8K µm² (the estimate had 23.3K).
+
+## D-047 (2026-09-27): the whole chip as `trw_chip`, counts from the spec; `info.yaml` waits for the budget
+- **Context:** every phase 2 module now exists. Krithik asked for the top with the lane count as a parameter while R4 run 4 decides it.
+- **Decision:** the chip is **`src/trw_chip.v`** (module `trw_chip`, Tiny Tapeout's pins): lanes + slot stores, the generated fabric with the pin units' and HOST_IN producer registers, the pin units (U0–U1 full, D-040), the pad owners, the host, the SRAM on the rotation, the input synchronisers and the time counter. The lane and unit counts are generated from the spec (`TRW_LANES`, `TRW_UNITS`, `TRW_NPROD`, `TRW_NCONS` in `trw_defs.vh`), so 2 lanes is a spec change (`fabric.lanes`, and the `host_map` counts that the generator checks) that regenerates the fabric, the host map and the chip together. `trw_sram.v` moves to `src/` from R3.
+- **`tt_um_tripwire.v`, `info.yaml`, `test/` and `config.json` are not switched yet.** At the spec's counts the chip does not fit (below), so a real hardening on `main` would fail and every later push would restart it. The switch is one step once the budget is settled (phase 2 task 2.4): `tt_um_tripwire` becomes a wrapper of `trw_chip`, `info.yaml`/`test/Makefile` list the sources, `test/` gets pin-level tests through `tools/host`, and `config.json` gets the SRAM block, the latch SDC and the density, each with its entry.
+- **Size (Yosys, cmos5l typ, flat):** **517.4K µm²** of standard cells + the 45.3K macro, i.e. ~62 % of the core before layout and ~72 % at global placement (R4's measured 1.164×). R4 run 1 failed placement at 70 % and run 3 did not route at 58.9 %. Per block (hierarchical): lane 50.5K with the ALU, slot store 24.5K, lean unit ~36K and full unit ~42K with configuration, fabric ports and release 42K, host 25.1K, pad owners 12.2K.
+- **Timing (pre-layout OpenSTA, 20 ns):** +10.36 ns typ, **+4.94 ns slow**. At the slow corner the worst path is the D-045 one: the SRAM's output (a fetched routine word) into EVAL. Layout wires will eat into it; it is the path to watch.
+- **Evidence:** `test_internal/chip/` 5 tests through the pins only (identity/time/SRAM and E2, lane forwarding HOST_IN → HOST_OUT, UART TX on a full and a lean unit, a routine with LD/ST on the rotation, and `programs/uart.trw` compiled by tripc, loaded by `tools/host.load_sequence` and looped back uo0 → ui0: four bytes out and back). **5/5 on RTL and 5/5 on the Yosys gate-level netlist** (TT Icarus 13). Verilator `-Wall` clean over the whole chip. `synth/chip/run_chip.sh` reproduces area and timing.
+- **What it decides:** nothing new about the budget, but it replaces the estimate with RTL numbers. With R4 run 3, the routable point is below ~59 % at placement; the chip at spec counts is ~72 %. Run 4 (2 lanes, ~48.5 %) tells how far down the budget must go.
+
+## D-048 (2026-09-28): L3 scope for the phase 2 exit (proposed)
+- **Context:** the phase 2 exit box is "L3-UART, L3-SPI-C, L3-I2C-C pass in RTL against reference models and sigrok". `VERIFICATION.md` §6 defines those checks more widely than the shipped programs implement: L3-UART asks for 8E1 and parity errors, L3-SPI-C for modes 0–3 and 16-bit words, L3-I2C-C for arbitration loss. `programs/uart.trw` is 8N1, `spi_controller.trw` is mode 0 / 8-bit, and `i2c_controller.trw` has no arbitration handling. The model-side tests (`tools/kernels/tests`) cover the same subset as the programs.
+- **Now on the RTL** (`test_internal/chip/test_l3.py`, chip through its pins, reference model + sigrok): UART TX at 9600, 115200 and 1 Mbaud; UART RX at 115200 and 460800 with a framing error; SPI controller mode 0 at 1, 5 and 8.3 MHz; I2C controller at 100 kHz, ~400 kHz and 1 MHz with no, short and longer-than-a-period clock stretching, NACK and repeated START.
+- **Proposal:** the phase 2 box is judged on what the shipped programs implement (the list above, on RTL and in `gl_test` once the top is switched). The remaining §6 cases move to phase 3 with the program work they need: a parity-capable UART program (the op table has `PAR`), SPI CPOL/CPHA and 16-bit as program parameters (pin `idle`, `tx_edge`/`rx_edge`, `nbits`; no RTL change expected), and I2C arbitration loss in the controller program (the pin unit already reports readback mismatches only in BITSYNC; for I2C it would be a program check of SDA after each bit). Each needs its model-side test first, then the RTL L3 case.
+- **General need:** the checklist should measure the chip against the protocols it ships, and the wider §6 set against the programs that claim it.
+- **Cost:** none in hardware.
+- **Approval:** Krithik and Kanishk.
+
+## D-049 (2026-09-28): the protocol floor for the area budget (proposed)
+- **Context:** Krithik (2026-09-28): whatever the chip gives up, every protocol must still be supported, not necessarily at the same time. The budget decision (after R4 run 5) needs that as a hard floor. Measured from the 20 compiled programs (`tripc`, default parameters), one program at a time:
+
+| Resource | Most any one program needs | Programs at that limit |
+|---|---|---|
+| Lanes | 2 | CAN, IR NEC, LIN |
+| Pin units | 4 | I2S, JTAG, SPI controller |
+| Full units (PULSE / carrier / BITSYNC, D-040) | 1, always U0 | CAN, HDLC, USB-LS (BITSYNC); DShot, 1-Wire, WS2812 (PULSE); IR NEC (carrier + PULSE) |
+| Slots per lane | 12 | CAN, I2C target, PS/2, SMBus, SWD |
+| SRAM words | 354 of 512 | CAN |
+
+- **Proposal (a constraint on the budget, not a design change):** the chip keeps at least **2 lanes, 4 pin units of which U0 is full, 12 slots per lane, and the 512-word SRAM**. Below any of these, named protocols are lost: 1 lane loses CAN, IR NEC and LIN; 3 units lose I2S, JTAG and the SPI controller; no full unit loses 7 protocols; 8 slots lose 5. U1 can be lean (no program needs two full units). Running protocols at the same time is what the extra lanes and units buy; it is not required.
+- **Size of that floor** (RTL numbers from D-047, Yosys cmos5l typ): 2 × (lane 50.5K + slots 24.5K) = 150K; U0 full with milestone B ≈ 67K (lean 36.6K − lean config 5.1K + full config 11.4K + the PULSE/carrier/BITSYNC projection 24.4K, `PIN_UNIT_RTL.md`); 3 lean units 110K; fabric with 9 ports ≈ 34K; host ≈ 22K; pad owners ≈ 8K; synchronisers, time, glue ≈ 4K. **≈ 395K µm², ≈ 56 % at global placement** (× 1.164 + the 45.3K macro).
+- **Where that sits:** R4 run 4 (337K, 47.6 %) routed with 0 global overflow; run 3 (417.7K, 58.9 %) did not. The floor is inside the untested window, nearer the failing side. So after run 5, the budget needs either a measurement at ~56 % (an R4 run 6 at the floor's size, best with the real `trw_chip` at 2 lanes / 4 units on the branch), or area saved elsewhere without losing a protocol:
+  - the 4-bit timer fraction (measured, −1.9K per lean unit, not adopted yet);
+  - trimming fabric legal sources to what the 20 programs use at the new counts;
+  - lane logic (the routine controller added 9.6K per lane; RIR and the entry path can be looked at);
+  - the host read multiplexer;
+  - and, outside the design, Jane Street's answer on a larger tile (the 8x4 inquiry, not sent).
+- **General need:** the chip's claim is "any of these protocols"; the budget must not quietly drop one.
+- **Cost:** none by itself; it bounds the budget options.
+- **Approval:** Krithik and Kanishk (with the budget decision).
+
+## D-050 (2026-09-28): L8-EQY feasibility: liberty cell models and a SAT miter work; the PDK's Verilog models do not
+- **Context:** phase 2 task 2.5 item 16 and VERIFICATION.md L8-EQY: try equivalence checking of one module against its cmos5l netlist and log whether the cell models work, or choose the fallback.
+- **Tried on `trw_alu`** (Yosys onto cmos5l typ, the R1/R4 recipe; 575 cells of 24 types):
+  - `eqy` with the PDK's Verilog cell models (`sg13cmos5l_stdcell.v` + `_udp.v`): **does not work**. Yosys cannot parse them (syntax error at the UDP/`specify` sections).
+  - `eqy` with cell models built by Yosys from the liberty `function`s (`read_liberty -ignore_miss_func`; every cell the netlist uses has a function): the flag output `r` is proved equivalent, but `d` reports "not equivalent". This comes from `eqy`'s partitioning, which matches internal nets by name, and names do not survive `abc`. Matching only the ports leaves `eqy` nothing to partition.
+  - **A whole-module miter with the liberty models, proved by Yosys `sat`: equivalent over all inputs.** A deliberately wrong RTL (LTU as `<=`) is reported not equivalent. So the netlist is right and the method discriminates.
+- **Decision:** L8-EQY uses liberty-derived cell models and a miter (`formal/equiv.sh <module> <files>`, exit 0 = proved), not the PDK's Verilog models. The "fallback to the generic netlist" in VERIFICATION.md is not needed for combinational logic.
+- **Not covered yet:** sequential modules. They need a miter with matched state, i.e. induction via `sby` on the miter, or `eqy` with explicit `[match]` rules for the flops. The whole chip needs the same, plus the latches (`dlhq`) and clock gates (`lgcp`), whose liberty models must be checked. A candidate for the `formal` workflow once its name is settled with the `efpga` branch, which has its own `formal.yaml`.
+- **Cost:** none in hardware.
+
+## D-051 (2026-09-28): milestone B1 (PULSE, carrier) in the RTL; three readings for the model side
+- **Context:** pin-unit milestone B starts (D-049 keeps U0 full in any budget). B1 adds PULSE (§14 P17) and the carrier (P30) to `trw_pin_tx.v` under `FULL`; details in `PIN_UNIT_RTL.md` §9. B2/B3 (BITSYNC, P20–P29) follow.
+- **Readings (each pinned by a test in `test_internal/pin/test_pin_full.py`):**
+  - **P-G24:** a PULSE phase of 0 ticks lasts one clock.
+  - **P-G25:** a CARRIER below 2 clocks means the carrier is off.
+  - **P-G26:** the k-th carrier toggle after a change to the active level is on edge `t + floor(k · CARRIER / 2)`, CARRIER in 1/256 clocks, accumulated exactly (50 % duty to within a clock).
+- **Model side:** confirm or contest each (a §14 sentence and a `test_semantics.py` test), as for D-041. tripc could also reject a 0-tick phase and a CARRIER below 2 clocks.
+- **Cost:** +7.7K µm² per full unit (logic 30.2K → 37.9K).
+
+## D-052 (2026-09-28): milestone B2a (BITSYNC receive core) in the RTL; readings; the engine's size
+- **Context:** B2a of pin-unit milestone B: `src/trw_pin_bs.v` (bit clock, idle, frame start and hard sync, resync, RX words; §14 P20–P22), active in full units when TXMODE and RXMODE are `bitsync`. Details in `PIN_UNIT_RTL.md` §9.
+- **Readings for the model side:** P-G28 (the event generator keeps working in BITSYNC and wins a load clock), P-G29 (the idle-making sample is not a frame bit). P-G27 (what ERR `0x1nnn` carries) is open and gets its reading with B2b.
+- **Size:** engine 16.1K µm² after one optimisation (20.2K with two timers); full unit logic 54.0K. The whole BITSYNC engine is heading for ~30K against the estimate's ~16.7K, which raises the D-049 floor by ~13K (~2 % of the core). Levers are listed in `PIN_UNIT_RTL.md` §9; none is taken yet.
+- **Cost:** as above; no spec change.
+
+## D-053 (2026-09-28): milestone B2b (BITSYNC RX stuffing, CRC, FRAME) in the RTL; two readings
+- **Context:** B2b of pin-unit milestone B in `src/trw_pin_bs.v` (§14 P23, P24; RX commands of P25). Details and tests in `PIN_UNIT_RTL.md` §9 (the CAN and HDLC reference models drive the tests).
+- **Readings for the model side:** P-G27 (ERR `0x1nnn` carries the index of the offending line bit in the frame) and P-G30 (at FRAME's n the verdict carries the current word, and no DATA word is emitted for it).
+- **Size:** engine 25.1K µm², full unit logic 62.3K (D-052's trend holds: BITSYNC will be well above the estimate's ~16.7K).
+- **Cost:** as above; no spec change.
+
+## D-054 (2026-09-28): milestone B2c (BITSYNC TX queue) in the RTL, the engine retimed; five readings
+- **Context:** B2c of pin-unit milestone B in `src/trw_pin_bs.v` (§14 P21, P22, P25). Details, tests and numbers in `PIN_UNIT_RTL.md` §9. B2 is now complete; B3 (P26–P29) is next.
+- **Readings for the model side:** P-G31 (WAIT [1] release clock), P-G32 (where our frame opens, and EVENT `0x9001`'s clock), P-G33 (a due stuff bit goes out with nothing after it), P-G34 (the TX run restarts at our frame start), P-G35 (a released line is not "driven" for the own-edge and idle rules).
+- **Timing:** the chip's slow corner had fallen to −9.8 ns: the pin can come straight from a uo pad (P7) into the engine's bit-clock arithmetic. The engine now computes its sums from registered state and lets the pin only select (BUGS #51). No behaviour change. The chip is +7.65 ns typ and +0.87 ns slow pre-layout.
+- **Size:** engine 34.8K µm², full unit logic 73.8K, chip 616.7K at spec counts. D-052's trend holds: BITSYNC is about twice the estimate.
+- **Cost:** as above; no spec change.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

@@ -11,16 +11,17 @@
 
   "//": "TRIPWIRE R4 (branch spike/r4-floorplan, never merged; DECISIONS D-043). Changes to the template:",
   "//": "- the SRAM macro block and the four FP_PDN_V* stripe keys: R3 (D-031), unchanged, same macro location;",
-  "//": "- PL_TARGET_DENSITY_PCT 51: run 4 (2 lanes, 4 pin units), 2 above the expected ~48.5 % global-placement utilisation (run 2 measured: GPL = 1.164 x Yosys + macro);",
+  "//": "- PL_TARGET_DENSITY_PCT 59: run 6, the real trw_chip at the protocol floor (D-049: 2 lanes, 4 pin units, U0 full), Yosys 398.7K um2, ~2.5 above the expected ~56.4 % global-placement utilisation (GPL = 1.164 x Yosys + macro, over the 902.4K core; run 4: 51 for ~48.5 %);",
   "//": "- PNR_SDC_FILE / SIGNOFF_SDC_FILE: the R2 latch exception (D-032);",
-  "//": "- DRT_OPT_ITERS 64 (the default): run 5; runs 1-4 used 3 as a 6 h guard (D-034), which stopped run 4 at 874 violations (D-043).",
+  "//": "- DRT_OPT_ITERS 64 (the default): runs 5-6; runs 1-4 used 3 as a 6 h guard (D-034), which stopped run 4 at 874 violations (D-043).",
+  "//": "- the SRAM instance path: u_chip.u_sram.sram from run 6 (tt_um_tripwire wraps trw_chip; checked with a local Yosys flatten).",
   "//": "- CTS_APPLY_NDR none: run 3; with clock NDRs the global router relaxes them one net at a time and never ends (run 2, D-043).",
 
   "//": "Here are some of the variables you may want to change:",
 
   "//": "PL_TARGET_DENSITY_PCT - You can increase this if Global Placement fails with error GPL-0302.",
   "//": "Users have reported that values up to 80 worked well for them.",
-  "PL_TARGET_DENSITY_PCT": 51,
+  "PL_TARGET_DENSITY_PCT": 59,
 
   "//": "CLOCK_PERIOD - Increase this in case you are getting setup time violations.",
   "//": "The value is in nanoseconds, so 20ns == 50MHz.",
@@ -40,7 +41,7 @@
 
   "//": "================= SRAM macro integration (R3, D-031) =================",
   "//": "MACROS: key = macro name. instances: key = the FLATTENED instance path Yosys produces",
-  "//": "(tt_um_tripwire -> u_sram (trw_sram) -> sram; checked with a local flatten). location/orientation",
+  "//": "(tt_um_tripwire -> u_chip (trw_chip) -> u_sram (trw_sram) -> sram; checked with a local flatten). location/orientation",
   "//": "as in Loom's 2x2 smoke test: lower-left (12, 40), FS (mirrored about X) so the signal pins face",
   "//": "the logic above it and the Metal4 power columns stay vertical. Macro 236.80 x 191.34 um.",
   "//": "Files are vendored in macro/ at IHP-Open-PDK 2bbec755 (macro/.../README.md). nl = the port-only",
@@ -48,7 +49,7 @@
   "MACROS": {
     "RM_IHPSG13_1P_512x16_c2_bm_bist": {
       "instances": {
-        "u_sram.sram": {
+        "u_chip.u_sram.sram": {
           "location": [12, 40],
           "orientation": "FS"
         }
@@ -82,8 +83,8 @@
   "//": "PDN_MACRO_CONNECTIONS: <instance> <power net> <ground net> <macro power pin> <macro ground pin>.",
   "//": "Periphery (VDD!) and array (VDDARRAY!) supplies both go to VPWR; Tiny Tapeout has one rail.",
   "PDN_MACRO_CONNECTIONS": [
-    "u_sram.sram VPWR VGND VDD! VSS!",
-    "u_sram.sram VPWR VGND VDDARRAY! VSS!"
+    "u_chip.u_sram.sram VPWR VGND VDD! VSS!",
+    "u_chip.u_sram.sram VPWR VGND VDDARRAY! VSS!"
   ],
 
   "//": "PDN_CFG: LibreLane's default PDN script with the macro grid replaced (Loom's src/pdn_cfg.tcl,",

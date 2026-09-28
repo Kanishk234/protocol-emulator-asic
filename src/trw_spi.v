@@ -1,14 +1,20 @@
-// R4 spike (branch spike/r4-floorplan only): host SPI slave stub, the §9 transaction format.
+// Host SPI slave: the ARCHITECTURE.md §9 transaction format, as a word bus for trw_host. From the R4 stub
+// (spikes/r4_floorplan r4_host.v, which passed its RTL and gate-level tests, BUGS #44 fixed).
 //   SPI mode 0; CS_n, SCK, MOSI arrive through the chip's 2-FF synchronisers (SCK <= clk/8).
 //   CMD[7:0] (bit 7 = write), ADDR[15:0], then 16-bit words, MSB first, auto-increment.
-//   Write: each word -> one `wr` pulse with (wr_addr, wr_data).
-//   Read: one dummy byte, then words. `rd_req` asks for rd_addr right after the address (and after
-//   each word is loaded); the chip answers on `rd_data` within 60 clocks. At the last rise of the
-//   dummy byte / of a word, rd_data is loaded into the output shift register and `rd_ack` pulses (side
-//   effects such as a HOST_OUT pop happen there). MISO changes after SCK falls.
+//
+// Timing contract:
+//   - Write: each received word gives one `wr` pulse (one clock) with `wr_addr`, `wr_data`.
+//   - Read: after the address, `rd_req` pulses with `rd_addr`; the chip must present `rd_data` for that
+//     address within 60 clocks (a dummy byte at SCK <= clk/8 is 64 clocks). At the last SCK rise of the
+//     dummy byte, and of each word, `rd_data` is loaded into the output shift register and `rd_ack`
+//     pulses; then `rd_req` asks for the next address. So the word after the last one read is always
+//     fetched too: read side effects must wait for `rd_done`, which pulses when a data word has been
+//     shifted out completely (its last SCK rise). MISO changes after SCK falls.
+//   - CS_n high ends the transaction at any point; MISO idles at 0.
 `default_nettype none
 
-module r4_host (
+module trw_spi (
     input  wire        clk,
     input  wire        rst_n,
     input  wire        csn,
@@ -21,7 +27,8 @@ module r4_host (
     output reg         rd_req,
     output reg  [15:0] rd_addr,
     input  wire [15:0] rd_data,
-    output reg         rd_ack
+    output reg         rd_ack,
+    output reg         rd_done
 );
     localparam P_CMD = 3'd0, P_AH = 3'd1, P_AL = 3'd2, P_DUMMY = 3'd3, P_DATA = 3'd4;
     reg        sck_q;
@@ -41,16 +48,17 @@ module r4_host (
             sck_q <= 1'b0;  ph <= P_CMD;  cnt <= 4'd0;  is_wr <= 1'b0;
             sin <= 16'd0;  sout <= 16'd0;  addr <= 16'd0;  miso <= 1'b0;
             wr <= 1'b0;  wr_addr <= 16'd0;  wr_data <= 16'd0;
-            rd_req <= 1'b0;  rd_addr <= 16'd0;  rd_ack <= 1'b0;
+            rd_req <= 1'b0;  rd_addr <= 16'd0;  rd_ack <= 1'b0;  rd_done <= 1'b0;
         end else begin
             sck_q  <= sck;
             wr     <= 1'b0;
             rd_req <= 1'b0;
             rd_ack <= 1'b0;
+            rd_done <= 1'b0;
             if (csn) begin
                 ph   <= P_CMD;
                 cnt  <= 4'd0;
-                miso <= 1'b0;             // idle between transactions (and no stale prefetch)
+                miso <= 1'b0;
                 sout <= 16'd0;
             end else if (rise) begin
                 sin <= nxt;
@@ -79,7 +87,7 @@ module r4_host (
                                      wr <= 1'b1;  wr_addr <= addr;  wr_data <= nxt;
                                      addr <= addr + 16'd1;
                                  end else begin
-                                     sout <= rd_data;  rd_ack <= 1'b1;
+                                     sout <= rd_data;  rd_ack <= 1'b1;  rd_done <= 1'b1;
                                  end
                              end
                 endcase
@@ -87,8 +95,7 @@ module r4_host (
                 miso <= sout[15];
                 sout <= {sout[14:0], 1'b0};
             end
-            // the next read word is asked for right after one is loaded
-            if (rd_ack) begin
+            if (rd_ack) begin                   // the next read word is asked for right after one is loaded
                 rd_req  <= 1'b1;
                 rd_addr <= rd_addr + 16'd1;
             end

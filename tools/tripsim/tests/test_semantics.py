@@ -385,33 +385,32 @@ def test_p15_c_oe_gates_the_carrier():
     assert any(oe)
 
 
-def test_p30_fractional_carrier_phase_accumulates_without_drift():
+def test_p30_fractional_carrier_toggles_at_floor_half_period_boundaries():
     chip = Chip(lanes=1, pin_units=1)
     chip.pin_config(0, txmode="level", idle=0, carrier=5.5)
     unit = chip.pins[0]
     unit.level = 1
-    # Carrier phase is measured from the edge that made the level active. At
-    # 5.5 clocks, the model's 50% threshold gives this exact sampled sequence.
+    # floor(k * 5.5 / 2) gives toggle edges 2, 5, 8, 11.
     levels = []
     for elapsed in range(12):
         unit._car_n = elapsed
         levels.append(unit.pad_drive()[0])
-    assert levels == [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
+    assert levels == [1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1]
 
 
-def test_p17_zero_tick_pulse_phase_is_unobservable_in_current_model():
+def test_p17_zero_tick_pulse_phase_is_clamped_to_one_clock():
     chip = Chip(lanes=1, pin_units=1)
     unit = chip.pins[0]
     unit.configure(validate=False, txmode="pulse", idle=0, nbits=1,
                     sym0_first=0, sym0_t1=0, sym0_t2=0)
     unit._accept(0, TAG_DATA, 0)                            # one DATA bit, earliest edge 1
-    assert unit.actions == [(1, "sbit", 0), (1, "sbit", 1), (1, "send", 0)]
+    assert unit.actions == [(1, "sbit", 0), (2, "sbit", 1), (3, "send", 0)]
     unit.compute_tx(1)
     unit.commit()
-    assert unit.level == 0                                  # same-edge order hides both phases
+    assert unit.level == 0                                  # first phase begins at its earliest edge
 
 
-def test_p30_sub_two_clock_carrier_is_applied_in_current_model():
+def test_p30_carrier_below_two_clocks_is_off():
     chip = Chip(lanes=1, pin_units=1)
     chip.pin_config(0, txmode="level", idle=0, carrier=1.5)
     unit = chip.pins[0]
@@ -420,7 +419,7 @@ def test_p30_sub_two_clock_carrier_is_applied_in_current_model():
     for elapsed in range(6):
         unit._car_n = elapsed
         levels.append(unit.pad_drive()[0])
-    assert levels == [1, 0, 1, 1, 0, 1]
+    assert levels == [1] * 6
 
 
 @pytest.mark.parametrize("partial, emitted", [([0], [(0, 0b10)]), ([], [])])
@@ -458,7 +457,7 @@ def test_bitsync_setn_rx_out_of_range_means_16():
     assert chip.pins[0].bs.rx_len == 16
 
 
-def test_p20_idle_making_sample_is_counted_as_frame_data_in_current_model():
+def test_p20_idle_making_sample_closes_frame_before_word_framing():
     chip = bitsync_unit(idle_bits=2, rx_nbits=8)
     bs = chip.pins[0].bs
     bs.in_frame = bs.rx_on = True
@@ -466,16 +465,19 @@ def test_p20_idle_making_sample_is_counted_as_frame_data_in_current_model():
     bs.frame_bits = 0
     bs.bits = []
     bs._sample_bit(1)                                       # reaches IDLE_BITS and ends frame
-    assert bs.frame_bits == 1 and bs.bits == [1]
-    assert not bs.in_frame                                  # D-052 P-G29 says it is excluded
+    assert bs.frame_bits == 0 and bs.bits == []
+    assert bs.bitno == 1
+    assert not bs.in_frame                                  # D-052 P-G29
 
 
-def test_p8_event_generator_is_bypassed_in_bitsync_by_current_model():
+def test_p8_event_generator_runs_in_bitsync_and_wins_same_clock_load():
     chip = bitsync_unit(ev_edge="rise")
     unit = chip.pins[0]
     unit._prev_a = 0
+    unit.bs.out.append((S.TAGS["DATA"], 0x55))              # older BITSYNC result waits behind P8
     unit.compute_rx(chip.cycle, 1, 1)                        # pin A rises
-    assert unit.rx_prod._load is None                        # D-052 P-G28 says event still loads
+    assert unit.rx_prod._load == (S.TAGS["EVENT"], 0x8000)
+    assert list(unit.bs.out) == [(S.TAGS["DATA"], 0x55)]
 
 
 def test_p23_stuff_error_reports_one_based_line_bit_count():
@@ -524,13 +526,13 @@ def test_p25_own_frame_opens_at_next_bit_boundary_with_started_event():
     assert chip.pins[0].rx_prod._load == (S.TAGS["EVENT"], 0x9001)  # D-054 P-G32
 
 
-def test_p23_due_stuff_bit_is_suppressed_when_tx_queue_is_empty():
+def test_p23_due_stuff_bit_waits_for_following_data():
     chip = bitsync_unit(stuff_n=2)
     bs = chip.pins[0].bs
     bs.tx_stuff, bs.tx_run_lvl, bs.tx_run_n = True, 0, 2
     bs._tx_bit_start(0)
     assert bs.tx_bit is None and bs.u._tx_apply[-1] == (0, "level", bs.rec)
-    # D-054 P-G33 reads that a due stuff bit is sent even when no later DATA bit follows.
+    # D-061: without following queued data or CRC, P25 releases the line.
 
 
 def test_p25_tx_stuffing_run_restarts_at_frame_start():
@@ -555,7 +557,7 @@ def test_p25_released_line_is_not_own_edge_and_allows_idle_close():
     assert not bs2.in_frame                                  # idle can end the observed frame
 
 
-def test_p28_response_jam_taken_in_own_frame_is_deferred_in_current_model():
+def test_p28_response_jam_taken_in_own_frame_is_discarded():
     chip = bitsync_unit()
     unit = chip.pins[0]
     bs = unit.bs
@@ -565,11 +567,10 @@ def test_p28_response_jam_taken_in_own_frame_is_deferred_in_current_model():
     p.valid, p.seq, p.tag, p.data = 1, 1, S.TAGS["CTRL"], jam_word
     cmds = {n: S.PIN_CMD[n] for n in ("FRAME", "JAM", "SETN")}
     bs.accept(0, unit.tx_port, cmds)
-    assert bs.jam == [1, 1, 1, False]                       # P-G36 says judge at take
+    assert bs.jam is None                                   # P-G36 judges eligibility at take
     bs.in_frame = bs.own = False                            # frame ends before its next bit
-    bs.jam[2] = 0
     bs._tx_bit_start(1)
-    assert bs.tx_bit == 1                                   # the deferred response now fires
+    assert bs.tx_bit is None                                # the refused response cannot fire later
 
 
 def test_p28_flag_abort_error_carries_current_line_bit_count():
@@ -581,7 +582,7 @@ def test_p28_flag_abort_error_carries_current_line_bit_count():
     assert list(bs.out) == [(S.TAGS["ERR"], 0x2009)]        # D-055 P-G37
 
 
-def test_p28_jam_bit_zero_without_armed_bit_starts_response_in_current_model():
+def test_p28_jam_bit_zero_without_armed_bit_is_ignored():
     chip = bitsync_unit()
     unit = chip.pins[0]
     bs = unit.bs
@@ -590,7 +591,7 @@ def test_p28_jam_bit_zero_without_armed_bit_starts_response_in_current_model():
     p.data = S.PIN_CMD["JAM"] << 12 | 1                    # [0] set, [4] clear
     cmds = {n: S.PIN_CMD[n] for n in ("FRAME", "JAM", "SETN")}
     bs.accept(0, unit.tx_port, cmds)
-    assert bs.jam == [0, 1, 1, False]                       # P28 says [0] alone is ignored
+    assert bs.jam is None
 
 
 def test_p28_jam_bits_do_not_enable_readback():
@@ -601,23 +602,23 @@ def test_p28_jam_bits_do_not_enable_readback():
     assert bs.tx_bit == 1 and bs.tx_rb == 0                 # D-055 P-G39
 
 
-def test_p23_foreign_frame_stuff_error_aborts_queued_tx_in_current_model():
+def test_p23_foreign_frame_stuff_error_preserves_queued_tx():
     bs = bitsync_unit(stuff_n=1, stuff_lvl=0).pins[0].bs
     bs.in_frame, bs.rx_on, bs.rx_stuff, bs.own = True, True, True, False
     bs.run_lvl, bs.run_n = 0, 1
     bs.q.append(("b", 1, True))
     bs._sample_bit(0)
-    assert not bs.q and not bs.own                        # D-055 P-G40 says preserve other TX
+    assert list(bs.q) == [("b", 1, True)] and not bs.own
 
 
-def test_p26_status_event_wait_queue_holds_two_pending_events():
+def test_p26_status_event_wait_register_holds_one_pending_event():
     bs = bitsync_unit().pins[0].bs
     bs._emit(S.TAGS["EVENT"], 0xA001)
     bs._emit(S.TAGS["EVENT"], 0xA002)
-    assert list(bs.out) == [(S.TAGS["EVENT"], 0xA001), (S.TAGS["EVENT"], 0xA002)]
+    assert list(bs.out) == [(S.TAGS["EVENT"], 0xA001)]
     bs._emit(S.TAGS["EVENT"], 0xA003)
-    assert list(bs.out) == [(S.TAGS["EVENT"], 0xA001), (S.TAGS["EVENT"], 0xA002)]
-    assert bs.u.flags["OVERRUN"]                           # D-055 P-G41's one-entry wait
+    assert list(bs.out) == [(S.TAGS["EVENT"], 0xA001)]
+    assert bs.u.flags["OVERRUN"]
 
 
 def test_p26_each_tx_bit_carries_the_readback_mode_at_bit_start():

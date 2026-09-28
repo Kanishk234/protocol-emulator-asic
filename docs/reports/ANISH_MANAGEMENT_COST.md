@@ -50,6 +50,10 @@ compile logs. No SDF, frequency or physical glitch-safety claim follows.
 
 ## Reproduction and next gates
 
+Follow-up: the [loader-inclusive experiment](ANISH_LOADER_COST.md) maps and
+tests the loader and row registers too. Its larger cost boundary and
+retained serial logic must not be confused with the wrapper-only figures.
+
 With the project venv and supported tool PATH active:
 
 ```bash

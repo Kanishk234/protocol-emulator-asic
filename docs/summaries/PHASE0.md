@@ -29,6 +29,16 @@ An optional [byte-at-a-time CRC](../reports/ANISH_BYTE_CRC.md) reduces the
 matched isolated validator/guard area by 5.88%, with the same rejection
 suite passing in RTL and gate-level simulation. This is a block-level
 tradeoff, not a demonstrated full-chip area or timing improvement.
+The [loader-inclusive measurement](../reports/ANISH_LOADER_COST.md) now maps
+the actual loader and its 448 staging bits as well. Both CRC variants pass
+mapped control-path tests with counter/LFSR payloads. The 14-row reference
+loader dominates this bounded cost; fabric configuration storage, host and
+physical implementation remain outside it.
+The [word-only loader candidate](../reports/ANISH_WORD_ONLY_LOADER.md) removes
+unused serial configuration frontends and now also passes all nine selected
+reload/rejection/recovery scenarios on the live reference fabric with byte
+CRC. This extends the earlier bounded mapped cost evidence; full-fabric
+gate-level checks, arbitrary-image isolation and physical fit remain open.
 See the [candidate results](../reports/ANISH_RELOAD_EXPERIMENTS.md), the
 [evidence report](../reports/ANISH_REFERENCE.md) and
 [repair plan](../reports/ANISH_RELOAD_PLAN.md).

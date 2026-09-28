@@ -91,8 +91,11 @@ bash scripts/fabric_validator.sh build/fabric-reference-warp-reference.OBUfXfus
 bash scripts/fabric_validated.sh build/fabric-reference-warp-reference.OBUfXfus
 bash scripts/fabric_validator.sh build/fabric-reference-warp-reference.OBUfXfus byte
 bash scripts/fabric_validated.sh build/fabric-reference-warp-reference.OBUfXfus byte
+bash scripts/fabric_validated.sh build/fabric-reference-warp-reference.OBUfXfus byte word-only
 bash scripts/fabric_handshake.sh build/fabric-reference-warp-reference.OBUfXfus
 bash scripts/fabric_management_cost.sh build/fabric-reference-warp-reference.OBUfXfus
+bash scripts/fabric_loader_cost.sh build/fabric-reference-warp-reference.OBUfXfus
+bash scripts/fabric_loader_cost.sh build/fabric-reference-warp-reference.OBUfXfus word-only
 ```
 
 `hold` adds a fixed external control through a hash-checked copy of the
@@ -135,3 +138,17 @@ The management cost runner preserves the fabric as a synthesis black box,
 maps both CRC modes including pacing/parking muxes, then checks each mapped
 wrapper with the RTL loader fixture. See `ANISH_MANAGEMENT_COST.md` in
 `docs/reports/` for the explicit area boundary and mixed GL/RTL limitations.
+
+The loader cost runner includes the actual loader and 448 row-register bits
+in mapping, with an opaque boundary beyond them. Both CRC modes run mapped
+control-path checks using counter and LFSR image payloads. Hierarchical area
+is counted once; see `docs/reports/ANISH_LOADER_COST.md` for the retained
+serial-interface cost and other exclusions.
+
+Optional `word-only` mode removes serial configuration frontends from that
+bounded experiment while retaining the pinned FSM and all row registers.
+Default `all-ports` mode is unchanged. Candidate cost and capability limits
+are documented in `docs/reports/ANISH_WORD_ONLY_LOADER.md`.
+The validated-fabric runner also accepts `word-only` as its third argument
+to test this frontend with the actual held reference fabric. The report
+records the nine-scenario byte-CRC integration run and its RTL-only scope.

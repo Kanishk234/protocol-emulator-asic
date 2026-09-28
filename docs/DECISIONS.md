@@ -4,6 +4,41 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 
 ---
 
+## ANISH-D8: Compare a management-owned word-only configuration path
+- **Date:** 2026-09-28 · **Status:** measured reference candidate
+- **Decision:** optional fixture mode bypasses UART/bitbang frontends and
+  arbitration, connecting the word port to the unchanged pinned ConfigFSM.
+  Preserve the default all-frontend path and all 448 row-register bits.
+- **Reason:** the management wrapper already disables serial configuration;
+  retaining those frontends behind hierarchy inflated this bounded cost.
+- **Evidence/cost:** `ANISH_WORD_ONLY_LOADER.md`, `warp-loader-cost.t41jdJxH`:
+  byte-CRC total 47,208.5334 µm² / 1,921 cells, 31.12% below the retained
+  all-frontend reference. Four mapped control-path runs pass, using both
+  CRC modes and both image payloads. No physical or full-chip saving claim.
+- **Tradeoff/gate:** serial bypass and serial status functionality are
+  omitted. Byte-CRC live-fabric follow-up `warp-validated.FtTE9K1D` passes
+  all nine reload/rejection/recovery scenarios with the cached baseline's
+  load timing and diagnostic counts. The optional hash-checked transform
+  changes only the frontend instance in a generated-source copy.
+  Full-fabric GL, broader isolation, physical implementation and the final
+  host/recovery contract remain open; no production interface is changed.
+
+## ANISH-D7: Bound loader-inclusive mapping at the row-register interface
+- **Date:** 2026-09-28 · **Status:** reference measurement, not chip adoption
+- **Decision:** map management plus actual pinned configuration loader and
+  14 row registers; keep a single opaque fabric-side boundary. Retain loader
+  hierarchy for mapped diagnostics and explicitly include retained serial
+  frontends in this measurement rather than assuming them free.
+- **Reason:** the prior wrapper cost excluded loader/storage staging.
+  Observable variable frame data prevents accidental removal of that bank.
+- **Evidence/cost:** `ANISH_LOADER_COST.md`, `warp-loader-cost.AXvDP6i0`:
+  byte mode 68,536.6542 µm², word mode 69,542.6256 µm². Both modes pass
+  mapped control-path tests with both images. Loader cost dominates this
+  large-reference boundary; compare a word-only path before further CRC work.
+- **Limits:** excludes fabric configuration storage, column frame selects,
+  host/CDC and physical overhead. Hierarchy/14-row dimensions are experiment
+  choices, not a frozen tapeout ABI or a minimum-area implementation.
+
 ## ANISH-D6: Compare byte CRC within the existing four-clock word budget
 - **Date:** 2026-09-27 · **Status:** measured candidate, not production adoption
 - **Decision:** retain word-wide CRC as default and add `SERIAL_CRC=1` to

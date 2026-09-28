@@ -76,6 +76,38 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
   strict checks both before and after mapping. `warp-validator.x2xpdWlS`
   reports zero check problems and passes all 41 functional GL cases.
 
+## ANISH-FAB-6: Mapped-loader test references optimized private mux wires
+- **Date:** 2026-09-28 · **Status:** test adaptation complete.
+- **Symptom:** `warp-loader-cost.BdPJ8rhn` maps successfully but GL cannot
+  bind `LocalWriteData` / `LocalWriteStrobe`, absorbed during optimization.
+- **Fix/coverage:** mapped-loader mode observes input ports and retains
+  downstream comparisons of every frame address and all 14 row words.
+  `warp-loader-cost.AXvDP6i0` passes both CRC modes and both image payloads.
+  No RTL failure or physical-timing repair is implied.
+
+## ANISH-FAB-7: Loader area counted twice in a hierarchical report
+- **Date:** 2026-09-28 · **Status:** reporter fixed and regression covered.
+- **Symptom:** initial `warp-loader-cost.2wpvyEF9` summary overstated total
+  area by adding the loader to a parent area that already included it.
+- **Fix:** compute each module's direct standard-cell area from its local
+  histogram and Liberty values, sum once, then check the inclusive Yosys
+  top area independently. Verify exactly one child at each boundary.
+- **Coverage:** three reporter tests cover one-time counting, inconsistent
+  hierarchical totals and pruned row data. Final end-to-end run
+  `warp-loader-cost.AXvDP6i0` confirms corrected totals and functional GL.
+  The original erroneous summary is retained with a do-not-use filename.
+
+## ANISH-FAB-8: Flat tile mapping blocked by programmable feedback
+- **Date:** 2026-09-28 · **Status:** physical-flow integration open.
+- Initial probe omitted MUX8LUT_frame_config_mux.v; hierarchy checking caught
+  it before mapping. The corrected source list exposes structural feedback:
+  184 stock and 189 held-tile check warnings in `warp-tile-preflight.hbGIhisV`.
+- These are programmable graph loops, not a count of runtime oscillations.
+  Strict cost mapping stops; no tile area or physical result is reported.
+- The new preflight retains both variants and fails the gate visibly.
+  Next investigate the pinned tile hardening method and configuration-aware
+  checks. See `ANISH_PHYSICAL_PREFLIGHT.md`; no blanket waiver was added.
+
 ## 1: Template gate-level source list omits the flip-flop UDPs
 - **Date:** 2026-09-25
 - **Symptom:** `gl_test` fails at elaboration with `Unknown module type: ihp_dff_r` as soon as the design has flip-flops. (Seen on the TRIPWIRE branch, gds run 35821375890; carried over preemptively since WARP uses the same template.)

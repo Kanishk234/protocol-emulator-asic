@@ -4,6 +4,126 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-28 (user: prioritize competitiveness, stop near 50%, push)
+- User authorized pushing this checkpoint and requested a 50% usage stop;
+  interpreted explicitly as five-hour usage. Readings were 30%, 37%, 47%
+  during work (weekly 52–54%). Initial usage call stalled; retry succeeded.
+- Reviewed fetched R4 physical-flow documentation without reading held-out
+  implementations. Clean routing at one size is encouraging, but slow
+  timing and larger-size fit remain unresolved. No main merge was made.
+- Added a repeatable whole-reference-tile preflight. Actual measurement
+  `warp-tile-preflight.hbGIhisV` reports 184 stock / 189 held structural
+  loop warnings and deliberately blocks the physical-flow gate. No tile
+  mapped-area estimate was manufactured from this failed gate. FAB-8 and
+  `ANISH_PHYSICAL_PREFLIGHT.md` record the failures and next experiment.
+- Preserve the validated loader/area work from prior sessions, review and
+  commit source and documentation separately, then ordinary-push only
+  anish_branch under anishvivek16. No phase boxes are ticked.
+- Final usage check before publishing: 53% five-hour / 55% weekly; the
+  finishing checks/docs crossed the requested threshold, so no further
+  technical work was started. Twenty-three Python tests and runner syntax
+  checks pass. Source checkpoint committed as `4cd016c`; documentation
+  accompanies it. Remote was synchronized before the ordinary push.
+- Next: inspect the pinned tile hardening method's treatment of programmable
+  feedback, prove dynamic configuration in a small mapped fabric, then
+  measure CMOS5L routing/timing and useful protocol capacity. These take
+  priority over more isolated loader savings.
+
+## 2026-09-28 17:10 UTC (heartbeat: word-only loader in live fabric)
+**Done:**
+- Usage 3% five-hour / 48% weekly at start, 20%/50% after validation.
+  No competing jobs found. Reused cached images/tools and compiled one
+  executable for the nine-case suite. No reset credits consumed.
+- Extended the hash-checked reference-copy patch and validated-fabric
+  runner with optional word-only loading. The actual row bank, selectors,
+  configuration storage and user fabric remain intact. Default transforms
+  match cached baseline outputs; only eFPGA_top.v differs in the candidate.
+  A changed ConfigFSM is rejected before output creation.
+- `warp-validated.FtTE9K1D`: byte CRC plus word-only loader passes all nine
+  full-fabric RTL cases, including 67,987 A/B/A functional checks, 2,479
+  B/A/B checks, two interrupted uploads, corruption, duplicate frames,
+  padding, loader reset and the expected wrong-function failure.
+- Selected load timestamps, check cycles, word/frame/parked counts and all
+  exit codes match cached all-frontend `warp-validated.VxA9xvJv` in all nine
+  cases (`baseline-comparison.json`). Patch checks, syntax and whitespace
+  checks pass. Report, D8 and phase-0 summary updated. All jobs completed.
+
+**Boxes ticked:** none. Full-fabric tests are RTL only and cover the two demo
+  circuits with byte CRC. Prior bounded area/GL evidence does not establish
+  full-chip area, physical timing or arbitrary-image isolation. Pending
+  work preserved locally; no commit, push or history rewrite this run.
+  Git identity remains anishvivek16 with the verified noreply address.
+
+**Next:** review transferable physical-flow documentation on fetched main
+  (`e9da6b8`) without touching held-out protocol implementations, then choose
+  a tiny-fabric CMOS5L integration experiment. Broader isolation and the
+  final host/recovery contract remain gates before production adoption.
+
+## 2026-09-28 (user resume: word-only loader comparison)
+**Done:**
+- Usage 71% five-hour / 45% weekly at start, 76%/46% after checks. No active
+  jobs were found. Reused cached images, library and simulator; no reset
+  credits consumed. Preserved prior pending work.
+- Added optional `word-only` mode to the bounded fixture/runner: management
+  feeds the unchanged pinned ConfigFSM directly, omitting UART/bitbang
+  receivers and arbitration. All 448 row-register bits remain observable.
+  Default all-frontend mode and production RTL are unchanged (ANISH-D8).
+- `warp-loader-cost.t41jdJxH`: four mapped runs pass, both CRC variants and
+  both images; each checks 12,129 steps, 15 cancellations, 3,006 words and
+  200 exact frame payloads. Word-CRC candidate: 2,018 cells / 48,188.7630 µm²;
+  byte: 1,921 cells / 47,208.5334 µm². Byte total is 31.12% below cached
+  all-frontend baseline `warp-loader-cost.AXvDP6i0` at the same boundary.
+- Default RTL regression `warp-handshake.MtxHcGZ2` passes both CRC modes.
+  Synthesis/boundary/area checks, runner syntax and whitespace checks pass.
+  Results and tradeoffs are in `ANISH_WORD_ONLY_LOADER.md`.
+
+**Boxes ticked:** none. This removes serial configuration capability from
+  the experiment, not programmable protocol resources. Actual fabric,
+  configuration latches, host and physical implementation remain excluded.
+  Current work is local/uncommitted; no push or history rewrite this run.
+
+**Next:** integrate the word-only path with the patched live reference
+  fabric and repeat reload/rejection/recovery tests before considering it
+  for the production host contract. Then return to physical/phase-0 gates;
+  check usage before another substantial milestone.
+
+## 2026-09-28 05:05 UTC (`anish_branch`: loader-inclusive mapped control path)
+**Done:**
+- Resumed after an interrupted read/fetch-only turn; working tree was clean
+  and no simulation/synthesis jobs remained. Prior push is confirmed at
+  `10204fa` on `origin/anish_branch`. Usage at resume 27% five-hour / 38%
+  weekly, 58%/43% after validation; no reset credits consumed.
+- Added an optional fixture boundary that retains all 448 row-register
+  bits, plus a cached runner that maps management AND the actual pinned
+  loader/row registers. Loader hierarchy is intentionally retained; opaque
+  fabric outputs prevent constant-fixture area pruning. Production unchanged.
+- `warp-loader-cost.AXvDP6i0`: word and byte CRC each pass mapped tests with
+  counter and LFSR image payloads (four runs, 12,129 steps each, 15 busy
+  cancellations, 3,006 words, 200 exact frame payloads). All actual control-
+  path logic is mapped; only the fabric-side output stand-in is behavioral.
+- Correct totals: word 3,591 cells / 69,542.6256 µm²; byte 3,492 cells /
+  68,536.6542 µm². The loader/row bank is about 79.8% of the byte total.
+  Serial frontends remain included; this 14-row reference cost excludes
+  column frame selection, fabric/config storage, future host and physical
+  overhead. See `ANISH_LOADER_COST.md` / ANISH-D7.
+- Fixed two measurement/test issues: optimized private mux-wire references
+  (FAB-6) and double-counted hierarchical area (FAB-7). Failed/intermediate
+  runs retained separately. New reporter computes direct Liberty cell sums
+  and checks inclusive hierarchy totals independently.
+- Twenty-three Python tests pass, including three accounting regressions.
+  Default RTL handshake recheck `warp-handshake.TJ9LnOFl` passes both CRC
+  modes; runner syntax and whitespace checks pass. All jobs finished.
+
+**Boxes ticked:** none. Full-fabric GL, arbitrary-image isolation and physical
+  timing are not demonstrated. Changes remain uncommitted and no push was
+  made during this heartbeat, per its instruction; Git identity preserved.
+
+**Next:** measure a deliberate word-only reference loader and row-bank
+  sizing tradeoff before further CRC tuning. Review transferable physical-
+  flow documentation from fetched `origin/main` (`e9da6b8`) without merging
+  unrelated architecture work or profiling held-out protocols. Broader
+  isolation/physical gates remain open; check usage before substantial work.
+
 ## 2026-09-27 (user-authorized commit and push preparation)
 - User explicitly requested pushing this branch. Fetched `origin/anish_branch`:
   local history is ahead with no divergent remote commits. No force push or

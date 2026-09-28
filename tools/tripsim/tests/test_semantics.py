@@ -55,6 +55,25 @@ def test_d044_out_of_range_sel_disables_source_selection():
     assert (chip.host_read(addr) >> 2) & 15 == 15
 
 
+def test_d044_port_configuration_write_wins_over_same_clock_take():
+    chip = Chip(lanes=1, pin_units=1)
+    addr = S.HOST_MAP["ports"][0]
+    port = chip.fabric.ports["L0.I0"]
+    old_src = chip.fabric.producers["HOST_IN"]
+    new_src = chip.fabric.producers["U0.rx"]
+    new_src.valid, new_src.seq, new_src.tag, new_src.data = 1, 1, 0, 0x5A
+    old_sel = S.LEGAL_SOURCES[port.name].index("HOST_IN")
+    chip.host_write(addr, 1 | (old_sel << 2) | (0xF << 6))
+    old_src.valid, old_src.seq, old_src.tag, old_src.data = 1, 1, 0, 0xA5
+    assert port.avail()
+    port.take()                                               # same-clock lane take
+    new_sel = S.LEGAL_SOURCES[port.name].index("U0.rx")
+    assert chip.host_write(addr, 1 | (new_sel << 2) | (0xF << 6))  # host config wins
+    chip.fabric.commit()
+    assert port.src is new_src and port.last_seq == new_src.seq
+    assert port.takes == 0 and not port._take and not port.avail()
+
+
 def test_d046_host_map_tagged_host_in_and_lane_debug_reads():
     chip = Chip(lanes=1, pin_units=1)
     hin = S.HOST_MAP["host_in"][0]
@@ -165,6 +184,29 @@ def test_d045_step_and_host_lane_writes_are_ignored_while_running():
     assert lane.regs[0] == before
     assert chip.host_write(S.HOST_MAP["step"][0], 1)
     assert not lane.stepping
+
+
+def test_d045_fetch_waits_for_exec_and_rir_to_clear_and_advances_rpc_at_fetch():
+    chip = Chip(lanes=1, pin_units=1)
+    lane = chip.lanes[0]
+    lane.rb = 1
+    chip.load_sram(link_routines([Routine().ldi("r0", 7)]))
+
+    lane.rstep_inflight = True                              # routine instruction is in EXEC
+    lane.mem_access(chip.sram)
+    assert chip.sram.reads == 0 and lane.rpc == 0
+
+    lane.rstep_inflight = False
+    lane.rir = ("instr", chip.sram.mem[0])                  # decoded step waits for EVAL
+    lane.mem_access(chip.sram)
+    assert chip.sram.reads == 0 and lane.rpc == 0
+
+    lane.rir = None
+    lane.mem_access(chip.sram)                               # a fetch itself advances RPC
+    fetched = lane._m["rir"]
+    lane.commit()
+    assert chip.sram.reads == 1 and lane.rpc == 1
+    assert lane.rir == fetched == ("instr", chip.sram.mem[0])
 
 
 # ------------------------------------------------------------------ lanes
@@ -340,6 +382,20 @@ def test_p15_c_oe_gates_the_carrier():
         chip.step()
         oe.append(chip.outputs()[2] & 1)
     assert any(oe)
+
+
+def test_p30_fractional_carrier_phase_accumulates_without_drift():
+    chip = Chip(lanes=1, pin_units=1)
+    chip.pin_config(0, txmode="level", idle=0, carrier=5.5)
+    unit = chip.pins[0]
+    unit.level = 1
+    # Carrier phase is measured from the edge that made the level active. At
+    # 5.5 clocks, the model's 50% threshold gives this exact sampled sequence.
+    levels = []
+    for elapsed in range(12):
+        unit._car_n = elapsed
+        levels.append(unit.pad_drive()[0])
+    assert levels == [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1]
 
 
 @pytest.mark.parametrize("partial, emitted", [([0], [(0, 0b10)]), ([], [])])

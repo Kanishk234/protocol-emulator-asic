@@ -7,6 +7,7 @@ ROOT="$(cd "$HERE/../.." && pwd)"
 WORK="$(mktemp -d)"
 # file # sed expression # what it breaks
 MUTANTS=(
+  "trw_host.v#s/            out_pend <= (ra == \`TRW_HA_HOST_OUT) \&\& hout_avail \&\& (!st_seen || st_av);/            out_pend <= (ra == \`TRW_HA_HOST_OUT) \&\& hout_avail;/#BUGS #48: a token arriving after the status is taken"
   "trw_host.v#s/    assign hout_take = rd_done \&\& out_pend;/    assign hout_take = rd_ack \&\& (ra == \`TRW_HA_HOST_OUT) \&\& hout_avail;/#BUGS #47: a prefetch takes HOST_OUT"
   "trw_host.v#s/            step <= w_step ? (wd\[NL-1:0\] \& ~run) : {NL{1'b0}};/            step <= w_step ? wd[NL-1:0] : {NL{1'b0}};/#H2: STEP reaches a running lane"
   "trw_host.v#s/assign slot_we\[g\]  = w_sl \&\& (o_sl\[9:8\] == g) \&\& !run\[g\];/assign slot_we[g]  = w_sl \&\& (o_sl[9:8] == g);/#9: slot writes to a running lane"

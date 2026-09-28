@@ -226,6 +226,24 @@ async def test_host_in_and_out(dut):
 
 
 @cocotb.test()
+async def test_status_then_data_burst(dut):
+    """BUGS #48: a burst read of host_status then host_out takes the token only if the status showed it.
+    A token that arrives between the two loads stays for the next read."""
+    h = await Host.start(dut)
+    dut.hout_avail.value, dut.hout_head.value = 0, 1 << 16 | 0x0BAD
+
+    async def arrive():                                  # after the status word's load, before the data's
+        await ClockCycles(dut.clk, 8 * H * 2 * 5)
+        dut.hout_avail.value = 1
+    cocotb.start_soon(arrive())
+    st, _ = await h.read(HM["host_status"], 2)
+    assert not st >> 15, "the status must have been loaded before the token arrived"
+    assert not h.events("hout_take"), "a token the host did not see must not be taken"
+    st, d = await h.read(HM["host_status"], 2)
+    assert st >> 15 and d == 0x0BAD and len(h.events("hout_take")) == 1
+
+
+@cocotb.test()
 async def test_sram_through_the_host_slot(dut):
     h = await Host.start(dut)
     off_slot = []

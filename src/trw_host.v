@@ -11,7 +11,8 @@
 //     the same rule inside trw_lane (E2). STEP reaches only halted lanes.
 //   - Reads: the read multiplexer is combinational from `rd_addr` (held by trw_spi) and the blocks'
 //     state; trw_spi samples it at `rd_ack`. A read of `host_out` takes the HOST_OUT token only when that
-//     word has been shifted out completely (`rd_done`), not when it is prefetched (BUGS #47).
+//     word has been shifted out completely (`rd_done`), not when it is prefetched (BUGS #47); after a
+//     host_status word in the same burst, only if that status showed a token (BUGS #48).
 //   - SRAM: a host access waits for the host rotation slot (`host_slot`, time mod 4 = 3, §14 R1); read
 //     data is captured the clock after (the macro's registered output), well inside trw_spi's 60 clocks.
 //   - `irq` is registered: OR of (status & enable), status live (D-046).
@@ -201,13 +202,20 @@ module trw_host #(
     wire [15:0] r_ow = ra - `TRW_HA_OWNERS;
     wire [15:0] r_ln = ra - `TRW_HA_LANES;
     assign own_raddr = r_ow[3:0];
-    // the word being shifted out was loaded from host_out while a token was there: take it when done
-    reg out_pend;
+    // The word being shifted out was loaded from host_out while a token was there: take it when done.
+    // Read right after host_status in the same burst, it is taken only if that status showed the token
+    // (a token arriving between the two loads would otherwise be taken but ignored, BUGS #48).
+    reg out_pend, st_seen, st_av;
     always @(posedge clk) begin
-        if (!rst_n || csn)
+        if (!rst_n || csn) begin
             out_pend <= 1'b0;
-        else if (rd_ack)
-            out_pend <= (ra == `TRW_HA_HOST_OUT) && hout_avail;
+            st_seen  <= 1'b0;
+            st_av    <= 1'b0;
+        end else if (rd_ack) begin
+            out_pend <= (ra == `TRW_HA_HOST_OUT) && hout_avail && (!st_seen || st_av);
+            st_seen  <= (ra == `TRW_HA_HOST_STATUS);
+            st_av    <= hout_avail;
+        end
     end
     assign hout_take = rd_done && out_pend;
 

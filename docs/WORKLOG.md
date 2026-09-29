@@ -11,6 +11,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 **Boxes ticked:** none; this scratch tile did not pass placement, and no phase gate was advanced.
 **Next:** inspect the generated tile/configuration and placement reports, then test bounded config-cell/pin mapping changes in the ignored build copy. Require the tile to complete place-and-route with meaningful margin before attempting 5 × 3 fabric generation. Keep G1 unchanged.
 
+## 2026-09-28 (session 14: inspect tile fit and event-tile integration limits)
+**Done:**
+- Read the current run's placement report rather than inferring from the headline utilization: 35,943.264 µm² movable cell area + 1,160.105 µm² pin-density adjustment over 34,836.480 µm² core. Eliminating pin-density overhead alone would still leave cell area 3.18% over capacity; with current overhead the footprint needs at least 6.11% recovery to pass 100% utilization, before routing margin.
+- Checked FABulous 2.2's documented custom-tile generator limit: 32 internal inputs and 8 internal outputs. The proposed event tile's 29 inputs fit, but its 32 outputs do not fit that stock generation path. A bespoke matrix and matching compiler/bitstream support would be needed; no such integration was built.
+- Updated `docs/reports/architecture_research.md` with the exact physical evidence and event-tile tool constraint. No active hardware changed.
+**Boxes ticked:** none; the tile still fails global placement, and the event-tile path is not compiler-ready.
+**Next:** prioritize reducing LUT-tile cell footprint (especially switch/configuration logic) while keeping routing checks and bitstream semantics; do not expect pin-order changes alone to make the fifth-column target fit. Reassess the event-lane option only after a generated tile can be compiled and configured by the real flow.
+
 ---
 
 ## 2026-09-28 (session 12: test a fabric-coupled event-lane direction)

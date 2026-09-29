@@ -19,6 +19,50 @@ Next:
 - ...
 ```
 
+## 2026-09-29: Codex (phase 2: R4 timing report cross-check)
+Done:
+- Cross-checked the model session's active-configuration audit against the run 7 post-route STA report and the routed netlist. The slow-corner worst path starts at U0 configuration `idle` (a latch output) and ends at `u_chip.dropped[26]`; it passes through the effective A input and RX/fabric logic. This confirms the path is functional under the current contract and must not be excepted.
+- Confirmed that the report belongs to run 7's design commit `9138ee6`, which is an ancestor of `spike/r4-floorplan` HEAD `a594862`. No RTL or config change was made. The R4 source still carries proposed D-056 hold uncertainty 0.10 ns and target placement density 59%.
+
+Evidence:
+- `build/ci/r4/run7/GDS_logs.zip`, especially `runs/wokwi/55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt`, `runs/wokwi/final/metrics.json` and `runs/wokwi/final/nl/tt_um_tripwire.nl.v`.
+- Slow-corner post-route result: WNS -13.336 ns, 1,296 setup violations; typical WNS -0.934 ns, 27 violations; fast corner has none. Antenna/LVS passed, but detailed routing overflow and failed timing remain; precheck did not run.
+- R4 worktree status: clean at `a594862`; shared main still contains the model session's three uncommitted files and was left untouched.
+
+Checklist boxes ticked:
+- None. No Phase 2 exit condition was newly satisfied.
+
+Problems / decisions:
+- D-066's audit rules out a false-path exception for the U0 `idle`-to-state path under the current H1/H1a/H2 contract. The active-config path is the dominant setup failure and has a deep RX-to-fabric cone; next physical experiment must preserve this timing check and protocol behavior.
+- The R4 artifact has 1,503 global-routing overflow (1,438 Metal3), so timing and congestion both need attention. One hardware change per hardening still applies.
+
+Next:
+- Use the team-approved R4 budget/hold decisions to select one hardware or permitted floorplan knob for the next hardening. First candidate needs local RTL regression and synthesis evidence; then launch a new hardening and compare overflow and post-route timing.
+
+---
+
+## 2026-09-29: Codex (phase 2: active pin-config timing audit)
+Done:
+- Audited D-038/D-041 and ARCHITECTURE §7.2 / §14 H1, H1a and H2 against the host-map model. A host may write pin configuration after activation once all lanes are halted; `live` remains set and pin units keep clocking. Recorded the timing-contract conflict and choices for team decision as proposed D-066.
+- Added `test_pin_config_can_change_after_activation_when_lanes_are_halted`: it rewrites the full configuration through generated `HOST_MAP` and proves the new pin selection is sampled on the next live unit clock.
+- Left frozen spec counts and all RTL/SDC untouched. `test_pinregs.py` already derives feature checks from generated `PIN_UNIT_FEATURES`; no budget/count change was made.
+
+Evidence:
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **92 passed**.
+- Mutation that rejected pin-config writes whenever `live` was set failed the new test at the first config write. Mutation that stopped pin-unit compute/commit when all lanes were halted failed it at the next pin-unit sample. Both mutations were reverted.
+- `git diff --check`: clean.
+
+Checklist boxes ticked:
+- None. L2 remains unstarted.
+
+Problems / decisions:
+- D-038's false-path rationale assumes configuration latches stay static while active. The current H1/H2 + D-041 contract permits active pin units to see new config after lane HALT, so latch-to-state setup paths cannot be excluded under that contract. D-066 asks the team whether to time these paths or change the reconfiguration contract.
+- `PHASE2_RTL_CORE.md` in this checkout has sections 1–5 and no §7.4; `docs/HANDOFF.md` is absent. Continued from the newest WORKLOG and the governing architecture/decision text.
+- D-049/D-056 lane/unit budget decision remains with the RTL session. Counts remain frozen at the spec's 3 lanes / 6 units; L2 and any count-bound change wait for that decision and green model/CI evidence.
+
+Next:
+- Get the D-066 contract/timing decision and the RTL session's D-049/D-056 counts. Then rerun generated-count model checks and complete remaining pre-L2 evidence before starting lockstep.
+
 ---
 
 ## 2026-09-28: Codex (phase 2: R4 run 7 review)

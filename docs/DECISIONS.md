@@ -980,6 +980,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** a smaller model queue changes only overflow timing; increasing RTL buffering would add state and event ordering logic.
 - **Approval:** Krithik and Kanishk approved all recommendations on 2026-09-28. The model changes and focused mutation evidence are recorded in the phase 2 worklog.
 
+## D-066 (2026-09-29, proposed): pin configuration writes after activation and latch timing
+- **Context:** GDS run 7's worst setup paths start at pin-unit configuration latch outputs. D-038 described those outputs as static while running and called the latch-to-state paths false-path candidates.
+- **Contract reading:** ARCHITECTURE §7.2 / §14 H1 permits pin-configuration writes whenever all lanes are halted. H2 says pin units and the fabric keep running when lanes halt. H1a / D-041 B makes `live` sticky after the first RUN or STEP; D-041 A restarts the affected unit on each configuration-word write. The contract does not prohibit a configuration write after activation.
+- **Model evidence:** `test_pin_config_can_change_after_activation_when_lanes_are_halted` activates the chip, halts its lane, rewrites the pin-A selection through generated `HOST_MAP`, and observes the new input on the next live pin-unit clock.
+- **Timing implication:** with this legal sequence, configuration latch outputs are not guaranteed static while pin-unit state is active. A blanket setup false path from those latches to pin-unit state is therefore not justified by the current contract.
+- **Decision needed:** either retain live reconfiguration and time these latch-to-state paths, or change the host/pin-unit contract so configuration writes require quiesced pin units (with corresponding model, RTL and verification changes). No RTL, SDC, or frozen-spec change is made here.
+- **Status:** pending team decision. The model follows the currently documented allowance for writes while lanes are halted.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

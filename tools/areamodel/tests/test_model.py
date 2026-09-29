@@ -1,4 +1,6 @@
-from areamodel.model import Grid, LUT_TILE, prim_tile_um2, scenarios
+from areamodel.model import (
+    Grid, LUT_TILE, LUT_TILE_STD_CELL_UM2, PRIM_TILE_STD_CELL_UM2, prim_tile_um2, scenarios,
+)
 
 
 def test_measured_tile_gives_5090_um2_per_lut():
@@ -16,8 +18,10 @@ def test_primitive_tiles_trade_luts_for_primitives():
     assert (g.lut4, g.timers, g.shifts) == (80, 4, 4)
 
 
-def test_primitive_tile_is_close_to_a_lut_tile():
-    assert 0.9 < prim_tile_um2() / (LUT_TILE[0] * LUT_TILE[1]) < 1.2
+def test_primitive_tile_uses_measured_standard_cell_area():
+    assert prim_tile_um2() == PRIM_TILE_STD_CELL_UM2 == 35_094.0
+    assert LUT_TILE_STD_CELL_UM2 == 36_047.0
+    assert round(100 * prim_tile_um2() / LUT_TILE_STD_CELL_UM2) == 97
 
 
 def test_largest_fitting_generic_grid_is_96_lut4():

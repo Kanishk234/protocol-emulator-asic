@@ -3,6 +3,8 @@
 **Date:** 2026-09-25 · **Status:** estimate from measured tile/die numbers and synthesis; not a claim. Decision recorded as DECISIONS D-016.
 **Inputs:** tile hardening `tile_cmos5l.md` (LUT4x8_ha on CMOS5L, Metal2–Metal4, DRC clean: 40,719 µm² per 8 LUT4s); die 1289.28 × 710.64 µm (gds run 36170807513); profiling `profiling.md`; primitive sketches `spikes/primitive_area/` synthesized on `sg13cmos5l_stdcell_typ` + configuration latches. **Model:** `tools/areamodel/model.py` (`python -m areamodel.model` from `tools/`; 5 pytest).
 
+**Update:** the 1.07× primitive-tile area below was a phase 1 estimate. D-026's phase 3 hardened tile measures 35,094 µm² standard-cell area versus 36,047 µm² for the LUT tile (0.97×), with the same footprint. `tools/areamodel/model.py` now uses this measured comparison; the older primitive component estimates below are retained as historical capacity analysis, not the current area input.
+
 ## Supply: what fits on the die
 | Grid (LUT-size tiles) | Fits next to a shell column? | LUT4 (0 / 1 / 2 primitive tiles) |
 |---|---|---|

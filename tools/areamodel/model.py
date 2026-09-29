@@ -5,9 +5,9 @@ which grids of FABulous tiles fit the die next to the shell, and how many LUT4s 
 instances each gives. It is deliberately simple (tile counting); place-and-route of the full
 fabric replaces it when available.
 
-Primitive tile assumption (not measured yet): a tile that holds primitives instead of 8 LUT4s
-has the same switch matrix, so the same size as a LUT tile plus the difference in cell area.
-It holds 2 timers + 2 shift registers (port budget comparable to 8 LUT4s). Phase 3 measures it.
+The primitive tile is measured: D-026 reports 35,094 µm² standard-cell area versus 36,047 µm²
+for a LUT tile, in the same 219.84 × 185.22 µm footprint. Grid capacity is still modeled by
+tile count; the measured cell-area ratio is reported separately.
 """
 
 from dataclasses import dataclass
@@ -20,29 +20,23 @@ LUT_TILE = (219.84, 185.22)             # µm, LUT4x8_ha routed on CMOS5L, Metal
 LUTS_PER_TILE = 8
 EDGE_NS_H = 56.70                       # µm, N/S terminator tile height (IHP tile library sizes)
 EDGE_EW_W = 68.64                       # µm, E/W IO tile width
-LATCH_UM2 = 30.8448                     # µm², sg13cmos5l_dlhq_1 (configuration bit)
-
-# primitive sketches (spikes/primitive_area, Yosys on sg13cmos5l typ, + config latches)
-TIMER_CELLS, TIMER_CFG_BITS = 2226.27, 17
-SHIFT_CELLS, SHIFT_CFG_BITS = 1384.05, 5
-LUT_BEL_UM2 = 5_900.0 / 8               # µm² per LUT4 BEL without routing: 16 LUT bits + LUT mux + FF
-                                        # (estimate from the LUT4AB synthesis, capacity_early.md)
+# Measured tile standard-cell area (D-026, CMOS5L, same physical footprint).
+LUT_TILE_STD_CELL_UM2 = 36_047.0
+PRIM_TILE_STD_CELL_UM2 = 35_094.0
 
 SHELL_W_MIN = 200.0                     # µm, width left for the shell column (estimate; the shell
                                         # is ~30-50K µm² of cells at normal density)
 
 
-def timer_um2() -> float:
-    return TIMER_CELLS + TIMER_CFG_BITS * LATCH_UM2
-
-
-def shift_um2() -> float:
-    return SHIFT_CELLS + SHIFT_CFG_BITS * LATCH_UM2
-
-
 def prim_tile_um2(timers: int = 2, shifts: int = 2) -> float:
-    lut_tile = LUT_TILE[0] * LUT_TILE[1]
-    return lut_tile - LUTS_PER_TILE * LUT_BEL_UM2 + timers * timer_um2() + shifts * shift_um2()
+    """Measured standard-cell area for the 2-timer/2-shift primitive tile (D-026).
+
+    The parameters remain for compatibility with the original model API; D-026's physical
+    result only measures the 2+2 tile, so alternate primitive counts are not extrapolated.
+    """
+    if (timers, shifts) != (2, 2):
+        raise ValueError("measured area is available only for the 2-timer/2-shift tile")
+    return PRIM_TILE_STD_CELL_UM2
 
 
 @dataclass
@@ -94,9 +88,11 @@ def scenarios() -> List[Dict]:
 
 def main() -> None:
     lt = LUT_TILE[0] * LUT_TILE[1]
-    print(f"LUT tile {lt:,.0f} µm² ({lt / LUTS_PER_TILE:,.0f} per LUT4); "
-          f"timer {timer_um2():,.0f} µm²; shift {shift_um2():,.0f} µm²; "
-          f"primitive tile (2 timers + 2 shifts) {prim_tile_um2():,.0f} µm² ({prim_tile_um2() / lt:.2f}x a LUT tile)")
+    print(f"Tile footprint {lt:,.0f} µm² ({lt / LUTS_PER_TILE:,.0f} per LUT4); "
+          f"LUT tile standard cells {LUT_TILE_STD_CELL_UM2:,.0f} µm²; "
+          f"primitive tile standard cells {prim_tile_um2():,.0f} µm² "
+          f"({prim_tile_um2() / LUT_TILE_STD_CELL_UM2:.2f}x a LUT tile); "
+          "both tiles use the same physical footprint")
     print("| grid | primitive tiles | fits | fabric W x H (µm) | shell column (µm) | LUT4 | timers | shift regs |")
     print("|---|---|---|---|---|---|---|---|")
     for s in scenarios():

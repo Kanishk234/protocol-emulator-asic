@@ -19,6 +19,70 @@ Next:
 - ...
 ```
 
+## 2026-09-29: Codex (phase 2: brainstorm protocol-preserving R4 options)
+Done:
+- Kept the 20 ns / 50 MHz target fixed. Reviewed the density-56 R4 result and the timed U0 `carrier[10]` → pad/RX/fabric → `dropped[26]` path; no RTL or flow settings were changed.
+- Identified an untested RTL experiment: maintain a redundant one-bit `carrier_active` configuration latch in `trw_pin_cfg.v`, updated atomically when either word holding `carrier[23:9]` is written, then consume it in TX instead of recomputing the 15-bit reduction. This should preserve carrier behavior and protocol capability if the write/update timing is equivalent, but adds latch/decode cost and may leave most of the path delay untouched.
+- Listed follow-on physical experiments: partition the general pad feedback/fanout path only where reports identify the delay, and separately measure an allowed CTS/route-setting change. The router's suggested layer adjustment is diagnostic and must not be treated as proof of a physical fix.
+
+Evidence:
+- `docs/reports/R4_FLOORPLAN.md` and GDS artifact for run 36605194167: 1,090 global-route overflow (1,050 on M3), typical WNS −0.683 ns, slow WNS −13.037 ns; clock target remains 20 ns.
+- `docs/DECISIONS.md` D-066 requires live reconfiguration paths to remain timed; D-067 authorizes the density-56 branch-only result, not further settings or a main switch.
+- `git diff --check`: clean before this entry; no hardware or config changes made.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- `carrier_active` is only a hypothesis. It requires cycle-accurate tests for writes to both carrier word halves before and after activation, full pin tests, L2, and then routed timing/overflow measurement before retention.
+- No model-session work is currently needed. Existing model semantics already cover the legal live-reconfiguration behavior; revisit only if the RTL experiment exposes a semantic ambiguity.
+
+Next:
+- If authorized for an RTL experiment, prototype the derived carrier predicate in the isolated R4 worktree, prove update equivalence with focused tests, run pin suites and L2, then measure synthesis and route impact. Keep the main checkout, 20 ns target, protocol resources, and active GDS inputs unchanged until that evidence is reviewed.
+
+## 2026-09-29: Codex (phase 2: evaluate R4 timing-cone rewrites)
+Done:
+- Followed the R4 slow-corner path from U0 `carrier[10]` through the pin output/readback and RX event path to `dropped[26]` (L1.I1). The path is consistent with the legal TX-to-pad-to-RX event and tap-drop behavior; it cannot be cut by a false path under D-066.
+- Tested two single-file Boolean rewrites in the isolated R4 worktree: direct EV_EDGE-bit decoding in `trw_pin_rx.v`, and a mux form for the carrier-qualified output in `trw_pin_tx.v`. Neither was retained: generic Yosys cell counts rose from 682 to 695 for RX and 1,960 to 1,983 for FULL TX.
+- Restored both RTL files to candidate `0f506785e97d6c225b138181431e56fde7854aa2`; no candidate RTL change remains.
+
+Evidence:
+- With the temporary EV_EDGE rewrite, `source .venv/bin/activate && make -C /tmp/r4-bitsync-work/test_internal/pin SRC_DIR=/tmp/r4-bitsync-work/src SIM=icarus FULL=1`: **59 passed**, including event timestamps, qualified START/STOP, carrier, UART/SPI/I2C-related pin modes, and BITSYNC.
+- Generic Yosys `synth -top trw_pin_rx -flatten; stat`: baseline 682 cells, EV_EDGE rewrite 695. `synth -top trw_pin_tx -flatten` with FULL=1: baseline 1,960 cells, carrier mux rewrite 1,983. These are logic-count checks, not routed timing results.
+- The R4 worktree was confirmed at candidate SHA `0f506785e97d6c225b138181431e56fde7854aa2` with the source files restored.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- These source rewrites did not establish a physical improvement and were discarded. No RTL, model, or config change remains.
+- Raising `CLOCK_PERIOD` enough to cover the slow-corner deficit would require roughly 34 ns before margin (first-order estimate from the −13.037 ns WNS at 20 ns). That would lower the 50 MHz core target and reduce documented maximum SPI rates; it is not applied and would need a team performance decision.
+- The model session has no prerequisite work for these physical experiments. Keep it on standby unless an RTL change raises a semantic question.
+
+Next:
+- Continue with a structural optimization of the general pad/readback path, using the timed carrier-to-RX-to-fabric cone as the target. Measure placed/routed timing and overflow before retaining a change; avoid changing clock target or protocol performance without a separate decision.
+
+## 2026-09-29: Codex (phase 2: trace R4 post-route critical path)
+Done:
+- Traced the density-56 timing report and RTL on candidate `0f506785e97d6c225b138181431e56fde7854aa2`: startpoint is U0 carrier config bit 10 (packed word 13, bit 10); endpoint is `dropped[26]`, bit 2 of the L1.I1 consumer's saturating drop counter.
+- The path is a timed configuration-to-pad/RX/fabric path under D-066. The report includes a high-load buffered net; a false path or change to live-reconfiguration semantics is not justified.
+- Tried an isolated parallel decode for the pad-owner output mux in the R4 worktree. Its 1,500-cycle randomized mux test passed, but generic Yosys synthesis grew from 1,621 to 1,643 cells. Reverted the experiment because it did not demonstrate a physical timing gain and increased logic.
+
+Evidence:
+- Run artifact: `/tmp/gds-36605194167-artifacts/GDS_logs/runs/wokwi/55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt` and `runs/wokwi/06-yosys-synthesis/tt_um_tripwire.nl.v`.
+- `source .venv/bin/activate && make -C /tmp/r4-bitsync-work/test_internal/pins SRC_DIR=/tmp/r4-bitsync-work/src SIM=icarus`: randomized pad-owner/mux test passed (1,500 cycles) on the temporary rewrite.
+- Generic Yosys `synth -top trw_pins -flatten; stat`: baseline 1,621 cells, parallel-decode experiment 1,643 cells. This is a logic-count comparison, not a routed timing measurement.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Problems / decisions:
+- The tested mux rewrite is discarded; the R4 RTL worktree is restored to its original candidate revision. No RTL or configuration change remains.
+- No model-side work is needed for the current physical timing issue. L2 already covers this candidate; rerun it after any retained RTL change.
+
+Next:
+- Continue path-level RTL/netlist analysis to find a transformation that reduces the observed high-fanout/delay without changing pin timing or protocol behavior. Evaluate one retained hardware change at a time, then rerun functional checks before another hardening.
+
 ## 2026-09-29: Codex (phase 2: review R4 density-56 hardening)
 Done:
 - Re-read the Phase 2 exit checklist after L2 was completed and checked the result of R4 GDS run 36605194167 at candidate `0f506785e97d6c225b138181431e56fde7854aa2` (density target 56%).

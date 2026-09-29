@@ -13,6 +13,7 @@ Test whether two independently paced, protocol-neutral event lanes can share a s
 - The RAM variant accepts writes only while both lanes are idle (`prog_ready`). The static variant treats the image as outputs of 192 or 384 configuration latches and has no runtime write port.
 - Each lane has independent output value, output-enable mask, 8-bit pin sample register, 16-bit delay counter, and 8-bit shift state.
 - Both lanes observe the same 8 sampled input pins in this first integration-agnostic model. Their output requests remain separate; pad arbitration and eFPGA wiring are outside this spike.
+- Each lane has a byte-wide `tx_valid/data/ready` channel from user logic and an `rx_valid/data/ready` channel back to it. This is a direct backpressured interface with no queue storage in the event engine; channel wiring and any buffering live outside this spike.
 
 ## Instruction encoding
 
@@ -31,8 +32,9 @@ All instructions are 24 bits: `opcode[23:20]`, `arg0[19:12]`, `arg1[11:4]`, `tar
 | 8 | HALT | Clear `busy`, pulse `irq`, and retain output value and enables until a later RELEASE or reset. |
 | 9 | SHIFT_OUT | Serialize `arg1` on the pin selected by `arg0[2:0]`; `arg0[3]` selects MSB-first; `target[2:0]` is bit count (0 means 8). Each bit takes one lane clock. |
 | 10 | SHIFT_IN | Sample the pin selected by `arg0[2:0]` for the count in `target[2:0]` (0 means 8); `arg0[3]` selects shift order. Publish the final shift-register value in `sample`. |
+| 11 | TX_SHIFT | Wait for `tx_valid`, accept `tx_data` when `tx_ready` is asserted, and serialize the byte on the selected pin using the same count/order fields as SHIFT_OUT. |
 
-For `SHIFT_IN`, MSB-first shifts the sampled bit into the low end; LSB-first shifts it into the high end. The sample is the full 8-bit shift-register value, including zero fill; partial transfers are not normalized into a byte. For an image with `AW=3`, instruction address bit 3 must be zero for JUMP/BRANCH_SAMPLE; an invalid target falls through to the next word. With `AW=4`, all four target bits select an instruction address.
+For `SHIFT_IN`, MSB-first shifts the sampled bit into the low end; LSB-first shifts it into the high end. The sample is the full 8-bit shift-register value, including zero fill; partial transfers are not normalized into a byte. `SHIFT_IN` holds `rx_valid/data` until user logic accepts the result with `rx_ready`; then the lane advances. `TX_SHIFT` advertises `tx_ready` while it waits at the instruction and accepts a byte only when `tx_valid` is also high. For an image with `AW=3`, instruction address bit 3 must be zero for JUMP/BRANCH_SAMPLE; an invalid target falls through to the next word. With `AW=4`, all four target bits select an instruction address.
 
 Reset is synchronous active-low for control and lane state. It clears lane outputs and status but does not initialize the shared program image. `start` is accepted only for an idle lane and loads its start PC; it does not execute an instruction on that same edge. A running lane executes at most one instruction per clock. Pin waits stall until their predicate completes; delay and shift instructions occupy their stated number of subsequent lane clocks. A branch or jump changes PC on its execution edge. A halted lane produces a one-cycle `irq` pulse.
 

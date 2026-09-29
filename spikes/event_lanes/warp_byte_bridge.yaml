@@ -1,0 +1,24 @@
+top: warp_byte_bridge
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_valid: FAB_IN0
+  rx_data[0]: FAB_IN1
+  rx_data[1]: FAB_IN2
+  rx_data[2]: FAB_IN3
+  rx_data[3]: FAB_IN4
+  rx_data[4]: FAB_IO0.i
+  rx_data[5]: FAB_IO1.i
+  rx_data[6]: FAB_IO2.i
+  rx_data[7]: FAB_IO3.i
+  tx_ready: FAB_IO4.i
+  rx_ready: FAB_OUT0
+  tx_valid: FAB_OUT1
+  tx_data[0]: FAB_OUT2
+  tx_data[1]: FAB_OUT3
+  tx_data[2]: FAB_OUT4
+  tx_data[3]: FAB_OUT5
+  tx_data[4]: FAB_IO0.o
+  tx_data[5]: FAB_IO1.o
+  tx_data[6]: FAB_IO2.o
+  tx_data[7]: FAB_IO3.o

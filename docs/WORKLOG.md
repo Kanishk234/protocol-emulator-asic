@@ -4,6 +4,18 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-28 (session 12: test a fabric-coupled event-lane direction)
+**Done:**
+- Deepened the closest prior-art check. PRISM's published IHP design already describes two independent 16-state shards, loaded from Verilog state tables, with shifters, counters, FIFOs, CRC, edge capture/sampling, debug and optional trace. Updated `docs/notes/prior_art.md` and the research ranking: lane count, shared code, CRC and capture are not WARP differentiators by themselves.
+- Extended `spikes/event_lanes/` with per-lane ready/valid byte channels and `TX_SHIFT`. Added `warp_byte_bridge.v`, a one-byte elastic buffer with a configurable XOR transform, and a concurrent receive-transform-transmit test. All three lane/bridge testbenches pass; Verilator lint is clean.
+- Compiled the user bridge through WARP's existing G1 flow: 17/88 LUT4s, 18/36 IOBUFs, 722 words, nextpnr estimated Fmax 212.77 MHz at `nom_slow_1p08V_125C`. This validates the user-logic block independently, not an integrated eFPGA/event-macro data path.
+- Re-ran the area screens with channel state included: 8-word writable image 33,451 µm²; 8-word static image plus estimated configuration latches 26,157 µm²; 16-word writable image 51,272 µm²; 16-word static image plus latches 37,387 µm². These remain SG13G2 screening estimates, not CMOS5L routed results.
+- Updated `docs/reports/architecture_screen.md`, `docs/reports/architecture_research.md`, and the successor exploration to emphasize the required proof: user Verilog must process bytes between independent pin-timing lanes through the actual fabric.
+**Boxes ticked:** none; the ready/valid bridge compiles as a separate G1 user design, while the event-lane/fabric composition and physical tile remain unimplemented.
+**Next:** make the static instruction image part of a generated FABulous configuration map, route the ready/valid interface through the real fabric, then load both together and run the transform test end-to-end. Keep the physical tile-remapping experiment as the higher-confidence path to more general eFPGA capacity; select neither candidate without equal-area physical evidence.
+
+---
+
 ## 2026-09-28 (session 11: prototype shared-image event lanes)
 **Done:**
 - Kept G1 frozen and prototyped the first successor block under `spikes/event_lanes/`: two independent protocol-neutral event lanes with per-lane timing/state and a shared instruction image.

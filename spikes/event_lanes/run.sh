@@ -17,12 +17,20 @@ iverilog -g2012 -s tb_event_lanes_static -o "$OUT/event_lanes_static_tb.vvp" \
   "$ROOT/spikes/event_lanes/warp_event_lanes_static.v" \
   "$ROOT/spikes/event_lanes/tb_event_lanes_static.v"
 vvp "$OUT/event_lanes_static_tb.vvp"
+iverilog -g2012 -s tb_event_transform -o "$OUT/event_transform_tb.vvp" \
+  "$ROOT/spikes/event_lanes/warp_event_lane.v" \
+  "$ROOT/spikes/event_lanes/warp_event_lanes_static.v" \
+  "$ROOT/spikes/event_lanes/warp_byte_bridge.v" \
+  "$ROOT/spikes/event_lanes/tb_event_transform.v"
+vvp "$OUT/event_transform_tb.vvp"
 verilator --lint-only --Wall --top-module warp_event_lanes \
   "$ROOT/spikes/event_lanes/warp_event_lane.v" \
   "$ROOT/spikes/event_lanes/warp_event_lanes.v"
 verilator --lint-only --Wall --top-module warp_event_lanes_static \
   "$ROOT/spikes/event_lanes/warp_event_lane.v" \
   "$ROOT/spikes/event_lanes/warp_event_lanes_static.v"
+verilator --lint-only --Wall --top-module warp_byte_bridge \
+  "$ROOT/spikes/event_lanes/warp_byte_bridge.v"
 
 for aw in 3 4; do
   for mode in ram static; do
@@ -45,3 +53,7 @@ for aw in 3 4; do
     fi
   done
 done
+
+PYTHONPATH="$ROOT/tools" "$ROOT/.venv/bin/python" -m compile.compile \
+  --pins "$ROOT/spikes/event_lanes/warp_byte_bridge.yaml" \
+  -o "$OUT/byte_bridge" "$ROOT/spikes/event_lanes/warp_byte_bridge.v"

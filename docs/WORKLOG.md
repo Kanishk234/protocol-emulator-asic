@@ -2,14 +2,23 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 18: audit candidate tile/model consistency)
+**Done:**
+- While preparing RTL bitstream-load simulation, found the reduced candidate artifacts do not share one tile definition: the current clock-protected tile RTL has 530 configuration bits, its separate software-generation tile copy has 527, and the generated scratch macro RTL still has 566.
+- Replaced the ignored software-generation tile artifacts from the exact hardened tile, regenerated the FABulous model and feature map, and copied the matching tile RTL into the scratch macro. The candidate RTL declares 530 bits and its config map spans 0–529.
+- Recompiled UART, SPI-controller and I2C-controller on the consistent protected 5 × 3 model. All route and bitgen; each 842-word bitstream independently matches FASM-to-word regeneration and the five-row frame check. The 4 × 3 and aggressive 5 × 3 routeability claims remain unverified. Candidate timing PIPs still have placeholder delays; ignore Fmax.
+- Started a direct RTL load-and-transmit simulation against the regenerated macro. The harness loaded the UART stream but did not observe host-ready, so functional operation is not demonstrated. The full shell also needs seven frame columns and a new pin integration; the frozen shell supports six.
+- No active architecture, macro, or shell files changed; G1 and held-out set remain untouched.
+**Boxes ticked:** consistent protected candidate model and software route/bitgen checks only; no dynamic-functional or physical integration gate advanced.
+**Next:** debug the direct configuration simulation, then build a scratch shell with the seven-column decoder and candidate pin map. Generate candidate-specific realistic PIP delays before making timing claims or attempting full-fabric hardening.
+
 ## 2026-09-28 (session 17: validate clock-protected switch pruning)
 **Done:**
 - Corrected the session 15 routing claim: its identical-FASM check used a stale nominal-corner PIPs file, so it did not prove routing through the pruned graph.
-- Regenerated candidate full-fabric routing models from the candidate FABulous configuration. UART, SPI-controller and I2C-controller all place/route and generate valid bitstreams on the 4 × 3 313-choice-pruned screen and the 5 × 3 screen when six global clock/reset/enable PIPs are preserved (307 removals per LUT tile). Independent word and frame checks pass (722 words for 4 × 3, 842 for 5 × 3). The aggressive 5 × 3 candidate fails SPI routing at the global-clock connection.
+- Initially reported regenerated candidate full-fabric models, protocol routes and frame checks. Session 18 found stale tile copies, then rebuilt and revalidated the protected 5 × 3 model from the exact hardened tile; see session 18 for current evidence.
 - Re-hardened the clock-protected tile at 190.40 × 199.08 µm. It synthesizes to 29,820.5 µm² / 1,580 cells, places at 88.8% utilization, completes the pinned tile flow, and has a clear KLayout DRC result. The aggressive candidate was 29,824.2 µm² / 1,595 cells at the same utilization.
-- Candidate nextpnr timing uses placeholder PIP delays and its Fmax is invalid. No dynamic fabric simulation or full-shell integration has been performed; G1 and held-out set remain untouched.
-**Boxes ticked:** none; this is a stronger scratch candidate, not a validated successor architecture.
-**Next:** promote the 307-choice clock-protected route screen into a reproducible script/manifest workflow, then obtain realistic timing PIPs and dynamic bitstream-load evidence before any whole-fabric physical stitch attempt.
+**Boxes ticked:** tile-only PPA/DRC screen; no architecture-level gate advanced.
+**Next:** see session 18 for corrected current status.
 
 ## 2026-09-28 (session 16: make pruning screen reproducible)
 **Done:**

@@ -2,6 +2,15 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 23: characterize candidate LUT switch delays)
+**Done:**
+- The first probe accidentally paired an older 375-bit aggressive tile snapshot with the clock-protected candidate and was discarded. Re-ran against the 378-bit clock-protected `RUN_2026-09-28_20-53-31` final RTL, netlist and SPEF; the switch-matrix RTL SHA256 matches both the current tile source and candidate macro copy. A temporary `/tmp` adapter was needed for this installed FABulous/Yosys combination; no active timing or design files were changed.
+- Measured 862 of 864 internal LUT-tile PIPs. Two arcs into `J2END_GH_BEG3` failed because `N2END[1]` is absent from the physical timing graph. Delays ranged 0.001–6.089 ns (median 0.766 ns; p95 2.597 ns). Raw rows are in ignored `build/arch_explore/route_prune/timing/lut4x8_clock_protected_slow_delays.csv`.
+- The model returned all 202 external LUT-tile PIPs, but 198 are FABulous's fixed 0.001 ns stitched-wire assumption; only four global-buffer twists use extracted tile delays (0.085–0.091 ns). This does not characterize physical inter-tile wires.
+- This only characterizes candidate LUT-tile internal switches. It does not time external routing, the other tile classes, or all BEL arcs; no candidate PIPs file was replaced and no Fmax claim is valid yet.
+**Boxes ticked:** partial physical characterization of candidate LUT-tile internal PIPs; timing-model integration remains incomplete.
+**Next:** resolve the two missing graph arcs; replace the stitched-wire assumption with measured inter-tile delays; characterize remaining tile classes and validate BEL timing; then regenerate candidate timing files and rerun design-set routes. Keep G1 frozen and candidate Fmax disabled until full coverage is validated.
+
 ## 2026-09-28 (session 22: exercise candidate design-set workloads)
 **Done:**
 - Compiled the design-set `hostecho` example on the consistent clock-protected 5 × 3 candidate (23/112 LCs; 842-word WBIT). Its Fmax field is based on placeholder PIP delays and is not a timing result.

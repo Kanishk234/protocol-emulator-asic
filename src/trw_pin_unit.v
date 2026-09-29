@@ -3,8 +3,8 @@
 // fabric (§4); the configuration block is trw_pin_cfg.v.
 //
 // FULL = 1 is U0-U1, FULL = 0 is U2-U5 (D-040). Both have the lean feature set (milestone A). FULL adds
-// PULSE and the carrier in the TX half (milestone B1) and the BITSYNC engine trw_pin_bs.v (milestone B2 done,
-// B3 in progress), which owns takes, pin A and loads while TXMODE and RXMODE are both `bitsync`.
+// PULSE and the carrier in the TX half (milestone B1) and the BITSYNC engine trw_pin_bs.v (milestones B2, B3),
+// which owns takes, pin A (pin N's SE0, OE with OE_AUTO) and loads while TXMODE and RXMODE are both `bitsync`.
 //
 // Timing contract:
 //   - `cfg` is static while running (written while halted, §14 H1). `restart` (clock after a write to
@@ -100,6 +100,9 @@ module trw_pin_unit #(
     wire [15:0] crc_init   = cfg[`TRW_PC_CRC_INIT_MSB:`TRW_PC_CRC_INIT_LSB];
     wire [15:0] crc_res    = cfg[`TRW_PC_CRC_RES_MSB:`TRW_PC_CRC_RES_LSB];
     wire [15:0] crc_xor    = cfg[`TRW_PC_CRC_XOR_MSB:`TRW_PC_CRC_XOR_LSB];
+    wire        nrzi       = cfg[`TRW_PC_NRZI_LSB];
+    wire        oe_auto    = cfg[`TRW_PC_OE_AUTO_LSB];
+    wire [1:0]  delim      = cfg[`TRW_PC_DELIM_MSB:`TRW_PC_DELIM_LSB];
     wire        bs_on      = (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
                                          && (rxmode == `TRW_PCE_RXMODE_BITSYNC);
     // PIN_N only matters to the pad owner mux (trw_pins.v), which reads it from the same block.
@@ -130,8 +133,8 @@ module trw_pin_unit #(
         .rxset (rxset), .rxset_n (rxset_n), .smp (smp), .late_set (late_t)
     );
 
-    // In BITSYNC the engine drives pin A (B2c); the RX half's echo flag belongs to the other modes
-    wire lvl_b;
+    // In BITSYNC the engine drives pin A; the RX half's echo flag belongs to the other modes
+    wire lvl_b, se0_b, drv_b;
     wire lvl  = bs_on ? lvl_b : lvl_t;
     wire echo = bs_on ? 1'b0 : echo_t;
 
@@ -161,24 +164,26 @@ module trw_pin_unit #(
         if (FULL != 0) begin : g_bs
             trw_pin_bs u_bs (
                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .active (bs_on),
-                .idle (idle), .order (order), .tx_lentok (tx_lentok), .period (period),
+                .idle (idle), .order (order), .tx_lentok (tx_lentok), .nrzi (nrzi), .oe_auto (oe_auto),
+                .delim (delim), .period (period),
                 .sampleofs (sampleofs), .sjw (sjw),
                 .idle_bits (idle_bits), .resync_both (resync), .nbits (nbits), .rx_nbits (rx_nbits),
                 .stuff_n (stuff_n), .stuff_lvl (stuff_lvl), .crc_width (crc_width), .crc_skip (crc_skip),
                 .crc_poly (crc_poly), .crc_init (crc_init), .crc_res (crc_res), .crc_xor (crc_xor),
-                .a_in (a_in), .a_prev (a_prev),
+                .a_in (a_in), .a_prev (a_prev), .b_in (b_in),
                 .tx_avail (tx_avail && bs_on), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (take_b),
                 .late_set (late_b),
                 .rx_free (rx_free && !load_h), .rx_load (load_b), .rx_tag (tag_b), .rx_data (data_b),
-                .ovr_set (ovr_b), .tx_lvl (lvl_b),
+                .ovr_set (ovr_b), .tx_lvl (lvl_b), .tx_se0 (se0_b), .tx_drv (drv_b),
                 .bus_idle (bs_idle), .in_frame (bs_frame), .bnd (bs_bnd), .smp (bs_smp)
             );
         end else begin : g_nobs
             assign load_b = 1'b0;  assign ovr_b = 1'b0;  assign tag_b = 2'd0;  assign data_b = 16'd0;
             assign bs_idle = 1'b0;  assign bs_frame = 1'b0;  assign bs_bnd = 1'b0;  assign bs_smp = 1'b0;
             assign take_b = 1'b0;  assign late_b = 1'b0;  assign lvl_b = 1'b0;
+            assign se0_b = 1'b0;  assign drv_b = 1'b0;
             wire _unused_bs = &{1'b0, sjw, idle_bits, resync, stuff_n, stuff_lvl, crc_width, crc_skip,
-                                crc_poly, crc_init, crc_res, crc_xor};
+                                crc_poly, crc_init, crc_res, crc_xor, nrzi, oe_auto, delim};
         end
     endgenerate
     assign rx_load = load_h || load_b;
@@ -193,11 +198,13 @@ module trw_pin_unit #(
     // ------------------------------------------------------------------ pins out (§7.1, P15, P29)
     // C_OE gates the output enable one clock after the synchronised change of pin C (sel_q).
     // OD: 1 releases (OE = 0), 0 drives low. Pin N is the push-pull complement of pin A with pin A's
-    // output enable before OD (P-G2).
-    wire en = oe && (!c_oe || sel_q);
+    // output enable before OD (P-G2); during SE0 both are low (P29). OE_AUTO: in BITSYNC the pads are
+    // driven only while the engine sends a bit (P29).
+    wire se0 = bs_on && se0_b;
+    wire en  = ((bs_on && oe_auto) ? drv_b : oe) && (!c_oe || sel_q);
     assign a_out = od ? 1'b0 : lvl;
     assign a_oe  = od ? (en && !lvl) : en;
-    assign n_out = !lvl;
+    assign n_out = !lvl && !se0;
     assign n_oe  = en;
 
 `ifdef TRW_ASSERT_ON

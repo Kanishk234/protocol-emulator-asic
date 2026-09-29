@@ -48,14 +48,15 @@ def chunks(bits, k=12):
             for i in range(0, len(bits), k)]
 
 
-def expected_rx(fields, crc_good=True, w=8):
-    """RX tokens for one frame of destuffed bits `fields` with FRAME n = len(fields) (P24, P-G30)."""
+def expected_rx(fields, crc_good=True, w=8, own=True):
+    """RX tokens for one frame of destuffed bits `fields` with FRAME n = len(fields) (P24, P-G30); a good
+    verdict carries data[14] = our own frame."""
     n, toks, i = len(fields), [], 0
     while (i + 1) * w < n:
         toks.append((DATA, int("".join(map(str, fields[w * i:w * i + w])), 2)))
         i += 1
     word = int("".join(map(str, fields[w * i:n])), 2) & 0xFFF
-    return toks + [(EVENT, word) if crc_good else (ERR, word)]
+    return toks + [(EVENT, own << 14 | word) if crc_good else (ERR, word)]
 
 
 def crc_msb(bits, poly, init, width):
@@ -143,8 +144,9 @@ async def test_ones_stuffing_crc_xor_and_stuff_before_line(dut):
     """HDLC-style TX: ORDER = LSB first, NBITS 8, ones-only stuffing (STUFF_LVL 1), a CRC-16 (0x1021, init 0xFFFF)
     appended XOR CRC_XOR 0xFFFF. The payload is chosen so that the CRC ends in five 1s: the stuff 0 goes out
     before the `LINE` that turns stuffing off, then the flag 0x7E unstuffed. The line is compared with
-    protomodels.hdlc's stuffing of data + CRC; our RX (ones-only destuffing) reports the four words, then a stuff
-    error at the flag's sixth 1 (ERR 0x1nnn)."""
+    protomodels.hdlc's stuffing of data + CRC. With DELIM = flag (P27) our RX reports the four words, and the flag
+    closes the frame with a good CRC (residue 0x1D0F): EVENT with data[14] = our own frame. (B2c's version had no
+    DELIM and expected a stuff error at the flag; since B3 that error would stop our own TX, P26.)"""
     if not FULL:
         return
 
@@ -159,7 +161,8 @@ async def test_ones_stuffing_crc_xor_and_stuff_before_line(dut):
     line = hdlc.stuff(b)
     tb = PinTb(dut)
     await tb.start(cfg(order=0, tx_lentok=0, stuff_lvl=enum("stuff_lvl", 1), crc_width=16, crc_poly=0x1021,
-                       crc_init=0xFFFF, crc_xor=0xFFFF, idle_bits=11), pads=0xFFFFFF)
+                       crc_init=0xFFFF, crc_xor=0xFFFF, crc_res=0x1D0F, idle_bits=11,
+                       delim=enum("delim", "flag")), pads=0xFFFFFF)
     toks = [ctrl("SYNC"), line_op(stuff=True, crc_reset=True), (DATA, data[0]), (DATA, data[1]),
             line_op(stuff=True, crc_append=True), line_op(), (DATA, 0x7E)]
     tb.send(*toks, at=tb.n + 5)
@@ -170,7 +173,7 @@ async def test_ones_stuffing_crc_xor_and_stuff_before_line(dut):
     sent = bits_at(tb, s[0], len(line) + 8 + 2)
     assert sent == line + hdlc.FLAG + [1, 1], (sent, line + hdlc.FLAG)
     words = [sum(b[8 * k + i] << i for i in range(8)) for k in range(4)]
-    assert got(tb) == [START] + [(DATA, w) for w in words] + [(ERR, 0x1000 | (len(line) + 6))], got(tb)
+    assert got(tb) == [START] + [(DATA, w) for w in words] + [(EVENT, 0x4000)], got(tb)
 
 
 @cocotb.test()
@@ -192,7 +195,7 @@ async def test_no_idle_while_driving_ignored_ops_and_wait(dut):
     tb.send(*toks, at=tb.n + 5)
     await tb.until_taken(len(toks))
     await tb.settle(PERIOD * 14)
-    assert got(tb) == [START, (DATA, 0x0F), (DATA, 0xFF), (DATA, 0xF0), (EVENT, 0x05A)], got(tb)
+    assert got(tb) == [START, (DATA, 0x0F), (DATA, 0xFF), (DATA, 0xF0), (EVENT, 0x405A)], got(tb)
     s = starts(tb)[0]
     bits = [int(c) for c in "00001111111111111111000001011010"]
     assert bits_at(tb, s, 33) == bits + [1]

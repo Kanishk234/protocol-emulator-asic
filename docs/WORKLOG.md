@@ -19,6 +19,47 @@ Next:
 - ...
 ```
 
+## 2026-09-29: Codex (phase 2: start R4 L2 RTL lockstep)
+Done:
+- Added a test-side Verilator/cocotb adapter for R4 that maps candidate debug taps by logical producer/consumer names and derives candidate host offsets from the R4 headers/generated fabric.
+- Built a legal deterministic RX workload and a directed TX cursor workload. Both initialize lane slots, routine constants, pin configurations, and fabric ports before RUN.
+- Verified the candidate revision `0f506785e97d6c225b138181431e56fde7854aa2`: 2 lanes, 4 pin units, U0 full. This is the candidate test shape, not a final count approval.
+
+Evidence:
+- Candidate revision verified from the worktree: `0f506785e97d6c225b138181431e56fde7854aa2`; shape is 2 lanes, 4 pin units, U0 full. This is only the candidate under test, not a final-count decision.
+- `source .venv/bin/activate && L2_CYCLES=128 make -C test_internal/l2 SIM=verilator RTL_DIR=/tmp/r4-bitsync-work/src RTL_REV=0f506785e97d6c225b138181431e56fde7854aa2`: 128 compared clocks, zero divergences; the test also checks that the first two candidate reflex slots match the intended program before RUN.
+- `source .venv/bin/activate && L2_CYCLES=1000000 make -C test_internal/l2 SIM=verilator RTL_DIR=/tmp/r4-bitsync-work/src RTL_REV=0f506785e97d6c225b138181431e56fde7854aa2`: **1,000,000 compared clocks, zero divergences** (628.57 s).
+- `source .venv/bin/activate && python test_internal/l2/run_injections.py`: clean RX baseline passed (1,024 clocks); isolated priority-flip RTL mutation detected at compared clock 99; clean cursor baseline passed (1,037 comparisons); isolated cursor off-by-one RTL mutation detected at directed clock 326 (`unit_flags[0]`, expected 2 / mutated RTL 0). Each mutation ran from a temporary candidate copy; baseline R4 RTL was unchanged.
+- GDS run [36605194167](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36605194167) on `spike/r4-floorplan`, candidate `0f506785e97d6c225b138181431e56fde7854aa2`, has completed with failure: `Build GDS` failed; `precheck`, `gl_test`, and `viewer` were skipped. This is separate from the L2 evidence.
+
+Checklist boxes ticked (evidence):
+- **L2**: the million-clock RX comparison and both required RTL injections passed, with clean unmodified RX/cursor baselines; evidence is listed above.
+
+Problems / decisions:
+- An initial smoke failure came from incorrect input-head/availability bit offsets in the new test adapter; the corrected map passed smoke and the full run.
+- During bring-up, an RX rerun once reported an `r0`/`r1` difference at clock 99 even though its producer/port snapshots matched. The final testbench now verifies the exact loaded reflex words before RUN; subsequent 128-clock, 1,024-clock, mutation-baseline, and million-clock clean runs passed. The transient was not attributed to a candidate RTL change.
+- An earlier three-command cursor experiment diverged at directed clock 1227 (`pads[0]`, model 0 / RTL 1); it was not used as evidence. The final cursor baseline uses one delayed LEVEL command, and the mutation runner requires a clean unmodified baseline before crediting a mutation.
+- No RTL, `config.json`, `info.yaml`, macro, frozen semantics, or spec counts were changed. Candidate floor counts remain pending final budget and hardware decisions.
+
+Next:
+- Continue Phase 2 with the remaining unchecked hardware and L3 gates; keep the candidate-count decision separate from this L2 evidence.
+
+## 2026-09-29: Codex (phase 2: record D-049/D-066 team approvals)
+Done:
+- Recorded the requester's and Kanishk's approval of D-049's protocol floor as a minimum budget constraint, not a frozen-spec count change.
+- Recorded both approvals for D-066: preserve pin reconfiguration while lanes are halted and keep latch-to-state paths timed.
+- Clarified D-067: the branch-only density/hold experiment does not authorize final counts or a main-branch switch. Existing spec counts remain 3 lanes / 6 units pending GDS review and a separate count decision.
+
+Checklist boxes ticked (evidence):
+- None. These approvals do not satisfy a Phase 2 verification or physical signoff item.
+
+Problems / decisions:
+- D-056's 0.10 ns hold uncertainty remains branch-only until all-corner hold signoff and `gl_test` pass.
+- The final budget/count selection remains open until the active GDS evidence is reviewed; the approved D-049 floor constrains that decision but does not make it.
+
+Next:
+- Continue L2 against the explicit current RTL candidate counts once the RTL session provides its test-side signal adapter and common stimulus interface.
+
 ## 2026-09-29: Codex (phase 2: model-side L2 oracle preparation)
 Done:
 - Inspected the model and verification tree for L2-RAND/L2-INJECT. No lockstep runner, per-cycle scoreboard, or RTL fault-injection harness exists in the checkout.

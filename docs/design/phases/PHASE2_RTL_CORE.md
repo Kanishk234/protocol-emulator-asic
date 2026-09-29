@@ -114,7 +114,7 @@ Not in this phase: the helper units CRC, MATCH, MEM and CAPTURE (deferred by D-0
 - [ ] Area estimate done (`docs/reports/AREA_ESTIMATE.md`) and its budget decisions recorded in DECISIONS. *(Estimate done; tier 1 decided (D-038–D-040); open until the design fits a routable budget.)*
 - [ ] All modules in the table exist and lint clean (`verilator --lint-only -Wall`); latches only where allowed, waived.
 - [x] **L1** unit tests all green (ALU, EVAL, PIPE, CHAN, OVR, PIN-TX, PIN-RX including BITSYNC, ROT, HOST). *(Evidence: `unit` CI run 36456739733 on `main` at c2a1c04; RTL suites pass under Icarus and Verilator.)*
-- [ ] **L2** lockstep ≥ 10⁶ clocks with zero divergences; L2-INJECT catches both injected bugs.
+- [x] **L2** lockstep ≥ 10⁶ clocks with zero divergences; L2-INJECT catches both injected bugs. *(Evidence: candidate `0f506785e97d6c225b138181431e56fde7854aa2` (2 lanes, 4 pin units, U0 full); 1,000,000 RX clocks compared with zero divergences in 628.57 s; clean RX and cursor baselines; isolated RTL priority-flip and cursor off-by-one mutations detected at clocks 99 and 326. Commands and results are in `docs/WORKLOG.md`, 2026-09-29 L2 entry. Counts are the candidate under test, not approval of final hardware counts.)*
 - [ ] **L3-UART, L3-SPI-C, L3-I2C-C** pass in RTL against reference models and **sigrok**.
 - [ ] The same L3 tests pass in **`gl_test`** on the hardened netlist.
 - [ ] Full 6x4 `gds` run: DRC/LVS/antenna clean, precheck green, timing met at the typical corner, routing < 4 h.

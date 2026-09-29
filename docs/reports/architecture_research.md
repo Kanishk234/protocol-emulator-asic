@@ -87,6 +87,26 @@ To satisfy that prerequisite, I reran `PRIM2T2S` hardening in `build/tile_cmos5l
 
 All outputs are scratch build artifacts; the tracked architecture and G1 macro were not changed. The next useful physical experiment must reduce primitive control fanout/repair demand or revise the primitive resource mix and then produce physical views for every tile class before the full fabric flow can answer the area/congestion question.
 
+## Cached terminal-count timer experiment (2026-09-29)
+
+To reduce the timer's wide zero-count compare, I tested an ignored RTL variant that stores `count_zero` in a flip-flop and updates it on reset/load/reload/decrement. An Icarus comparison of visible count, armed state, and `tc` matched the original timer over 128,000 randomized cycles. This is functional evidence only, not a formal proof.
+
+The repair-enabled scratch flow synthesized the candidate primitive tile to 34,945.1 µm² versus 33,961.2 µm² for the baseline timer in the same flow (+2.9%). Fanout violations rose from 106 to 112, and detailed placement failed. After restoring the tracked baseline tile-flow configuration in the scratch library, run `RUN_2026-09-29_12-24-40` synthesized to 34,945.1 µm², reported global-placement routing overflow 3.7273, and completed global routing with congestion. Detailed routing retained 468 violations after seven optimization passes; the run was stopped during pass eight because it had not converged to a clean route. No routed timing, DRC-clean GDS, or usable physical views resulted.
+
+**Decision:** reject this cached-zero implementation. It preserves the timer's cycle behavior but adds area and worsens or fails physical routing in both tested flow configurations. Do not promote it or use its timing as evidence. The scratch candidate source is `/tmp/wp_timer_regzero.v`; EDA artifacts remain under ignored `build/arch_explore/` and `build/tile_cmos5l/`.
+
+## Site-aligned 5 × 3 physical stitch (2026-09-29)
+
+The earlier 190.40 × 199.08 µm experiment was not aligned to the IHP CMOS5L core site (0.48 × 3.78 µm). Although its individual tile runs appeared clean, translating those rows and sites across tile boundaries caused severe stitched-layout DRC errors. I corrected the scratch tile-size map to 190.08 × 196.56 µm for LUT and PRIM, 190.08 × 56.70 µm for north/south edge tiles, and 68.64 × 196.56 µm for east/west edge tiles. The corners remain 68.64 × 56.70 µm. These values are exact site/row multiples.
+
+With that map, the LUT4x8_ha tile and the PRIM2T2S, N_IO, S_IO2, W_IO4 and E_IO4 tiles each hardened with zero detailed-route violations and a clear KLayout DRC. The full 5 × 3 scratch candidate then stitched at 1087.68 × 703.08 µm. Its global-route report showed zero overflow, zero vias and zero routed wirelength; the tile-to-tile nets are represented as direct abutting pin connections. The stitched GDS passed the CMOS5L KLayout DRC with zero errors. This is the first clean full-fabric physical stitch for this candidate and resolves the earlier tile-boundary DRC failure.
+
+This result is still only physical feasibility. The normal FABulous flow failed after physical checks while generating its physical timing model: it requested `N2END[1]`, which was absent from the timing graph (`ValueError: Source node(s) not in graph`). Rerunning with `FABULOUS_TIMING_MODEL: null` saved the GDS, DEF, netlist and bitstream specification, but intentionally produced no timing model. No timing or complete toolchain claim follows. The macro is also 1087.68 × 703.08 µm; the fixed shell, 7-column frame decoder, power integration and full-chip placement have not been tested with it. Candidate outputs are ignored under `build/arch_explore/fabric_5x3_clock_primpip_macro_site_row_aligned_no_timing/`, run `RUN_2026-09-29_15-49-13`.
+
+The structural timing-model option is not a working fallback. A second full stitch with `FABULOUS_TIMING_MODEL: STRUCTURAL` passed layout checks but failed in NetworkX shortest-path analysis: no path existed between the pins of the `W_IO4` `S_GBUF_FEED_BEG0` mux. The `null` timing setting remains the only run mode that finishes and saves physical views, and it cannot produce a usable PIP delay model.
+
+**Next experiment:** inspect the generated timing graph for the orphaned LUT input and edge-tile mux, determine which architecture inputs are being optimized away, and preserve or remove switch choices consistently so the bitstream, router and timing model agree. Then generate a complete timing model and test shell placement plus configuration-loader integration in a scratch full-chip build. Do not replace G1 or open held-out protocols until these gates pass.
+
 ## Evidence boundaries
 
 1. The contest brief is dynamic; treat 6 × 4 as the target until its official page says otherwise.

@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-29 (session 27: site-aligned 5 × 3 fabric stitch)
+**Done:**
+- Corrected the scratch tile pitch to the IHP CMOS5L site/row grid: LUT and PRIM tiles 190.08 × 196.56 µm, north/south tiles 190.08 × 56.70 µm, east/west tiles 68.64 × 196.56 µm, corners unchanged. These dimensions replace the earlier off-grid experiment values; no tracked architecture or tile source was changed.
+- Re-hardened the aligned LUT, PRIM and four edge tile classes in the scratch library. All six tile types reached 0 detailed-routing violations, 0 antenna violations and a clear KLayout DRC. Evidence: LUT `RUN_2026-09-29_14-22-57`; `PRIM2T2S_site_row_aligned.log` (`RUN_2026-09-29_15-19-55`), `N_IO_aligned.log` (`RUN_2026-09-29_15-34-46`), `S_IO2_aligned.log` (`RUN_2026-09-29_15-35-49`), `W_IO4_aligned.log` (`RUN_2026-09-29_15-37-06`), and `E_IO4_aligned.log` (`RUN_2026-09-29_15-39-04`), all under ignored `build/arch_explore/tiles_5x3/` and `build/tile_cmos5l/`.
+- Stitched the scratch 5 × 3 fabric using those hardened views. The aligned die is 1087.68 × 703.08 µm. LibreLane global routing reported 0 overflow, 0 global-route wirelength/vias (the tile connections are direct abutments), and the full stitched GDS passed CMOS5L KLayout DRC with 0 errors. Run `RUN_2026-09-29_15-49-13` is in `build/arch_explore/fabric_5x3_clock_primpip_macro_site_row_aligned_no_timing/`; use the run directory name in that path as the authoritative ID.
+- The normal FABulous physical timing-model generation separately fails after physical checks with `ValueError: Source node(s) not in graph: ['N2END[1]']`. Setting `FABULOUS_TIMING_MODEL: null` in the scratch config allowed LibreLane to finish and save the GDS, DEF, netlist and bitstream specification, but deliberately produced no timing model. The physical macro result therefore does not establish a usable compile flow or any timing claim.
+- A follow-up with `FABULOUS_TIMING_MODEL: STRUCTURAL` also passed physical checks but failed while building the timing model: NetworkX reported no path between pins of `W_IO4`'s `S_GBUF_FEED_BEG0` mux. Structural mode is not a working fallback for this candidate either.
+- Earlier software evidence still applies to this unchanged switch graph: the candidate compiled UART/SPI/I2C and prims2 bitstreams, and the UART bitstream passed configured-fabric simulation at DIV=16. It is not a new test of the exported macro.
+**Boxes ticked:** no phase-exit boxes. This is a clean tile-hardening and stitched-GDS physical feasibility result for the scratch candidate, not full-chip/shell fit or end-to-end hardware validation.
+**Next:** fix the candidate's timing-graph reachability at both the pruned LUT input (`N2END[1]`) and W_IO4 mux, regenerate a timing model and rerun compile/simulation. Then test the macro with the fixed shell in a scratch full-chip run. Its larger 1087.68 × 703.08 µm footprint and seven fabric columns require shell/configuration integration before this can be a successor. Keep G1 frozen and held-out protocols sealed.
+
 ## 2026-09-29 (session 25: test 5 × 3 physical stitch prerequisite)
 **Done:**
 - Attempted the full clock-protected 5 × 3 candidate fabric stitch using the pinned CMOS5L FABulous/LibreLane 3.0 flow. FABulous generated the fabric and bitstream specification, but the stitch stopped before floorplanning because `PRIM2T2S.lef` was missing from the scratch tile library.
@@ -9,6 +20,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - The proposed 5 × 3 architecture therefore has no complete set of physical tile views and cannot yet be stitched. No tracked architecture or RTL was changed; G1 and held-out data remain untouched. Scratch outputs are under ignored `build/`.
 **Boxes ticked:** the 5 × 3 flow prerequisite was tested and failed with a concrete physical placement error; no physical-fit claim or checklist box added.
 **Next:** either reduce the primitive tile's repair/buffering demand or change its footprint/resource mix, then harden every tile class and rerun the full-fabric stitch. Keep the 5 × 3 candidate unpromoted until then.
+
+## 2026-09-29 (session 26: reject cached terminal-count timer)
+**Done:**
+- Tested an ignored scratch rewrite of `wp_timer` that registers the zero-count predicate and updates it on reset, load, reload, and decrement. Icarus compared the original and candidate count, armed state, and `tc` across 128,000 randomized cycles and passed.
+- Under the D-031 repair-enabled scratch flow, candidate synthesis rose from 33,961.2 to 34,945.1 µm² (+2.9%); fanout violations increased from 106 to 112, and detailed placement still failed (`DPL-0036`).
+- Found the scratch tile config still contained the D-031 repair insertion. Restored a scratch copy from tracked `arch/tiles/PRIM2T2S/config.yaml` and reran the cached-zero candidate under the normal tile flow (`RUN_2026-09-29_12-24-40`). Synthesis was 34,945.1 µm²; global placement reported routing overflow 3.7273, global routing finished congested, and detailed routing still had 468 violations after seven optimization passes. Stopped during pass 8 because the candidate was not converging to a clean route.
+- Rejected the cached-zero candidate: it preserves cycle behavior but increases area and does not harden cleanly. No tracked RTL/configuration or G1 artifacts changed; all candidate sources and EDA outputs remain in ignored `build/` and `/tmp`.
+**Boxes ticked:** functional equivalence for the scratch timer candidate passed; physical evaluation failed and does not qualify as a successor.
+**Next:** stop tuning this register-based zero flag. Any further timer redesign must first target the high-fanout control implementation without increasing the tile's area, then pass the baseline tile flow and full tile route before integration into a fabric candidate.
 
 ## 2026-09-29 (session 24: remove the orphan lane in a scratch candidate)
 **Done:**

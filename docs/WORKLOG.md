@@ -2,13 +2,17 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
-## 2026-09-28 (session 24: investigate candidate timing-graph gaps)
+## 2026-09-29 (session 24: remove the orphan lane in a scratch candidate)
 **Done:**
 - Confirmed `clock_protected.csv` is a PIP removal list, not a retained-PIP list. The two `J2END_GH_BEG3` inputs, `N2END1` and `E1END3`, remain legal candidate arcs; my initial interpretation was backwards and is discarded.
-- The candidate switch-matrix RTL contains a two-input mux for these arcs, but the hardened netlist's top-level `N2END[1]` port has no standard-cell fanout. The cause of that discrepancy remains under investigation; neither timing row is covered yet.
+- Traced the missing fanout: the candidate removes both outgoing PIPs from `J2END_GH_END3` to `LG_I3` and `LH_I3`. With no surviving sink in the hardened tile, synthesis removes the `J2END_GH_BEG3` mux and its `N2END[1]`/`E1END[3]` inputs. The two failed rows are retained source arcs on an orphaned path, not a signal that the placement flow dropped a live workload path.
+- Confirmed none of the preserved UART, SPI-controller, or I2C-controller routes selects these edges. Removing only the two source arcs fails FABulous's unconnected-output check because the four-lane `J2END_GH` jump is still declared. A separate ignored scratch variant narrows that jump to three lanes in a LUT-only Base definition, regenerates the tile at 529 bits (from 530), and regenerates the 5 × 3 CAD/bitstream model.
+- Reran nextpnr on the new model for UART, SPI-controller, and I2C-controller. All three routed normally; each FASM compiled to 842 words. The routes changed, as expected from a changed routing graph. Simulated the UART bitstream through `wp_fabric_cfg` and the generated fabric RTL: TX emitted `0x96` LSB-first with correct start and stop bits.
+- Started the matching CMOS5L tile flow. Yosys synthesis passed with 1,619 cells and 29,836.6 µm² estimated area, close to the 530-bit reference's 1,580 cells and 29,820.5 µm². Physical optimization did not complete: FABulous's OpenROAD Python hook failed to import `librelane` in the Nix OpenROAD Python environment. This is a runner environment failure, not evidence that the tile does or does not fit; no physical signoff is claimed.
+- No architecture, RTL, or timing files were changed. Scratch artifacts remain under ignored `build/`; the tracked pruning manifest and shared tile definitions remain unchanged.
 - No architecture, RTL, or timing files were changed. The previous measured delay distribution remains partial LUT-tile characterization; no candidate Fmax claim is valid.
-**Boxes ticked:** identified the two legal arcs that remain unmeasured; no root cause established.
-**Next:** trace why synthesis/physical implementation drops `N2END[1]` despite the candidate RTL mux, and verify whether the `E1END3` arc shares the same issue. Then characterize physical inter-tile wires, remaining tile classes, and BEL arcs before regenerating candidate timing files or enabling Fmax.
+**Boxes ticked:** root cause found for the two absent timing arcs; three rerouted workloads and bitstream generation passed; UART configured-fabric RTL check passed. No new timing coverage or physical signoff claimed.
+**Next:** repair the OpenROAD Python environment so the scratch 529-bit tile can finish the same CMOS5L hardening flow, then establish whether the reduced switch matrix is physically beneficial. Afterward characterize inter-tile wires, remaining tile classes, and BEL arcs before regenerating candidate timing files or enabling Fmax.
 
 ## 2026-09-28 (session 23: characterize candidate LUT switch delays)
 **Done:**

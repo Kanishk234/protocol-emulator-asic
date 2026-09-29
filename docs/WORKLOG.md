@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 24: investigate candidate timing-graph gaps)
+**Done:**
+- Confirmed `clock_protected.csv` is a PIP removal list, not a retained-PIP list. The two `J2END_GH_BEG3` inputs, `N2END1` and `E1END3`, remain legal candidate arcs; my initial interpretation was backwards and is discarded.
+- The candidate switch-matrix RTL contains a two-input mux for these arcs, but the hardened netlist's top-level `N2END[1]` port has no standard-cell fanout. The cause of that discrepancy remains under investigation; neither timing row is covered yet.
+- No architecture, RTL, or timing files were changed. The previous measured delay distribution remains partial LUT-tile characterization; no candidate Fmax claim is valid.
+**Boxes ticked:** identified the two legal arcs that remain unmeasured; no root cause established.
+**Next:** trace why synthesis/physical implementation drops `N2END[1]` despite the candidate RTL mux, and verify whether the `E1END3` arc shares the same issue. Then characterize physical inter-tile wires, remaining tile classes, and BEL arcs before regenerating candidate timing files or enabling Fmax.
+
 ## 2026-09-28 (session 23: characterize candidate LUT switch delays)
 **Done:**
 - The first probe accidentally paired an older 375-bit aggressive tile snapshot with the clock-protected candidate and was discarded. Re-ran against the 378-bit clock-protected `RUN_2026-09-28_20-53-31` final RTL, netlist and SPEF; the switch-matrix RTL SHA256 matches both the current tile source and candidate macro copy. A temporary `/tmp` adapter was needed for this installed FABulous/Yosys combination; no active timing or design files were changed.

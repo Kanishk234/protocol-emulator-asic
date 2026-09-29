@@ -2,6 +2,33 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 22: exercise candidate design-set workloads)
+**Done:**
+- Compiled the design-set `hostecho` example on the consistent clock-protected 5 × 3 candidate (23/112 LCs; 842-word WBIT). Its Fmax field is based on placeholder PIP delays and is not a timing result.
+- Through the scratch seven-column shell and host SPI protocol, all candidate workload checks passed: UART 8N1 TX of 0x96; SPI controller mode 0 against the reference target (three bytes); I2C controller against the open-drain reference target (write/read/NACK); and hostecho CH_WRITE/CH_READ, USER_STATUS, attention/IRQ, and USER_RESET.
+- I2C first exposed a scratch wrapper bug: its per-pin inout outputs were not reduced into the shell's `io_en` vector. Connecting those vectors cleared the unknown outputs and the complete I2C test passed.
+- All testbenches, generated shell, WBITs, and results remain under ignored `build/`. No active architecture/shell RTL or held-out design was touched.
+**Boxes ticked:** three required design-set protocol smoke/regression paths plus generic host-channel behavior on candidate RTL shell. Not physical signoff.
+**Next:** characterize candidate route delays from physical tile/fabric data; measure full 5 × 3 fabric and shell congestion/area; test additional SPI modes and I2C target capacity if feasible; preserve G1 as fallback until those gates pass.
+
+## 2026-09-28 (session 21: validate candidate shell integration)
+**Done:**
+- Generated an ignored scratch seven-column shell wrapper from the candidate pin map, using the repository's `wp_shell`, synchronizers and frame loader plus the regenerated 5 × 3 macro RTL. The active `src/tt_um_warp.v` remains untouched.
+- The first wrapper left the candidate macro's `FrameData`/`FrameStrobe` ports unconnected; this caused unconfigured X outputs. Connected both buses and loaded the candidate UART WBIT over the actual host SPI interface.
+- Host SPI load reached LOADED, RUN succeeded, CH_WRITE accepted 0x96, and FAB_OUT0 emitted one valid 8N1 0x96 frame. Start/data/stop checks passed. The unused `h_attention` output was tied low for this UART-only run.
+- Scratch wrapper, test, and simulator outputs stay under ignored `build/`; G1, active shell, and held-out set remain unchanged.
+**Boxes ticked:** candidate UART test through scratch shell SPI/configuration/run path. This is RTL simulation only, not physical integration.
+**Next:** automate candidate wrapper generation and add candidate passthrough/host-channel coverage; check the I/O map for all shell roles; calibrate PIP delays before timing claims; then evaluate full macro/shell physical feasibility and congestion.
+
+## 2026-09-28 (session 20: confirm candidate UART simulation)
+**Done:**
+- Traced the earlier 0x96 payload mismatch to the scratch testbench: it subscribed to `negedge tx` after the valid/ready handshake, so it could miss the start edge and sample later bits at the wrong phase. The primitive shift register had loaded 0x96 and was emitting the correct LSB-first sequence.
+- Re-armed the edge observer before asserting `h_wvalid` and added explicit assertions for start, all eight data bits, and stop. The candidate UART bitstream passed after configuration through `wp_fabric_cfg` into the regenerated 5 × 3 macro RTL.
+- Together with session 19's passthrough test, confirms a dynamic fabric I/O/LUT path and one primitive-based protocol workload on the candidate. This remains direct macro-level RTL simulation, not shell/top-level integration or physical signoff.
+- All harnesses and outputs remain ignored scratch artifacts under `build/`; G1 and the held-out set remain untouched.
+**Boxes ticked:** UART direct macro RTL load-and-transmit simulation.
+**Next:** see session 21 for scratch shell integration evidence; check the full candidate I/O map and physical feasibility before advancing.
+
 ## 2026-09-28 (session 19: validate candidate fabric logic path)
 **Done:**
 - Compiled a scratch combinational passthrough (`FAB_IN0` → `FAB_OUT0`) on the consistent clock-protected 5 × 3 candidate; routing and bitgen succeeded (842 words).

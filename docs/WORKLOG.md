@@ -41,6 +41,29 @@ Next:
 
 ---
 
+## 2026-09-29: Codex (phase 2: next R4 floorplan experiment)
+Done:
+- Compared the archived run 6 job log, the earlier D-056 run 7 summary, and the newer `build/ci/r4/run7/GDS_logs.zip` artifact. The newer artifact is from commit `9138ee6`, with area/BITSYNC RTL changes in addition to the 0.10 ns hold setting; it is distinct from the earlier run 7 timeout summarized under D-056.
+- Confirmed the newer artifact used `PL_TARGET_DENSITY_PCT=59`, produced about 54.5% standard-cell / 56.8% total instance utilization after placement, and still reported 1,503 global-route overflow (1,438 on Metal3). Its slow setup WNS is -13.336 ns and typical is -0.934 ns.
+- Identified a bounded, protocol-preserving next experiment: keep the same R4 RTL/counts and hold SDC, and lower only `PL_TARGET_DENSITY_PCT` from 59 to 56. This stays above the measured standard-cell utilization while testing whether less local placement pressure reduces Metal3 overflow. The expected tradeoff is that wire lengths and setup timing may move either way; both must be measured.
+
+Evidence:
+- `build/ci/r4/run6/gds_job.log` and `build/ci/r4/run7/GDS_logs.zip`.
+- Run 7 artifact: `runs/wokwi/final/metrics.json`, `runs/wokwi/39-openroad-globalrouting/or_metrics_out.json`, `runs/wokwi/55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt`, and `runs/wokwi/55-openroad-stapostpnr/nom_typ_1p20V_25C/max.rpt`.
+- `docs/design/PHYSICAL_DESIGN_AND_CI.md` §5 permits `PL_TARGET_DENSITY_PCT` as a floorplan knob and requires judging changes by global-routing overflow.
+
+Checklist boxes ticked:
+- None. No Phase 2 exit condition was newly satisfied.
+
+Problems / decisions:
+- The D-056 0.10 ns hold setting is still proposed, and the D-049 budget remains a team decision. A run at 56% would be a branch-only measurement, not evidence to switch the setting or floorplan to `main`.
+- No config or RTL was changed and no hardening was launched. The live pin-configuration path remains timed per D-066.
+
+Next:
+- Ask the team to approve the budget/hold assumptions and the single-variable 59% → 56% R4 density experiment. If approved, make that config change with its decision record, run local source checks, and let the user push to start hardening.
+
+---
+
 ## 2026-09-29: Codex (phase 2: active pin-config timing audit)
 Done:
 - Audited D-038/D-041 and ARCHITECTURE §7.2 / §14 H1, H1a and H2 against the host-map model. A host may write pin configuration after activation once all lanes are halted; `live` remains set and pin units keep clocking. Recorded the timing-contract conflict and choices for team decision as proposed D-066.

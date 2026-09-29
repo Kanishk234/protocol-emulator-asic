@@ -19,6 +19,29 @@ Next:
 - ...
 ```
 
+## 2026-09-29: Codex (phase 2: review R4 density-56 hardening)
+Done:
+- Re-read the Phase 2 exit checklist after L2 was completed and checked the result of R4 GDS run 36605194167 at candidate `0f506785e97d6c225b138181431e56fde7854aa2` (density target 56%).
+- Confirmed the candidate branch's `test`, `unit`, `lint`, and `docs` workflows completed green: runs 36605194188, 36605194238, 36605194253, and 36605194365. These are on `spike/r4-floorplan`; the Phase 2 gate still requires green workflows on `main`.
+
+Evidence:
+- [GDS workflow 36605194167](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36605194167): `Build GDS` failed; dependent `precheck`, `gl_test`, and `viewer` jobs were skipped.
+- Retrieved the exact run artifact at `/tmp/gds-36605194167-artifacts/GDS_logs/`; this is distinct from the older local `build/ci/r4/run7/GDS_logs.zip` (run 36526332067, commit `9138ee6`, density 59%).
+- Global routing completed, but reports total overflow **1,090** (Metal2 11, Metal3 1,050, Metal4 29); Metal3 use is 82.59%. OpenROAD warns to reduce layer adjustment from 30% to 16% and says routing finished with congestion. Detailed-route DRC metric is 0, but that does not erase the global-route congestion result.
+- Post-route setup WNS is **−0.683 ns typical** and **−13.037 ns slow** (1,277 slow-corner violations); fast corner has no setup violations. Hold passes all corners. Max-slew and max-cap checker warnings are also reported. The worst path starts at U0 pin configuration word 13 bit 10 (`carrier[10]`) and ends at `u_chip.dropped[26]`; keep it timed under D-066's approved live-reconfiguration contract.
+- Magic reports **57,924** markers, matching the SRAM macro baseline recorded in `docs/reports/R4_FLOORPLAN.md`; KLayout DRC is disabled/skipped, so this run provides no merged-GDS KLayout DRC or precheck evidence. The illegal-overlap checker reports 10. LVS passes and antenna repair/check passes. The flow took about 3 h 26 min, within the 4 h target.
+- Candidate `test`, `unit`, `lint`, and `docs` workflows were green (runs 36605194188, 36605194238, 36605194253, 36605194365), but on `spike/r4-floorplan`, not `main`.
+
+Checklist boxes ticked (evidence):
+- None in this session. L2 remains the only newly completed Phase 2 checklist item.
+
+Problems / decisions:
+- Density 56 improved over the preceding density-59 run documented in `docs/reports/R4_FLOORPLAN.md`, but still misses congestion and setup requirements. The Magic count appears to be the SRAM macro baseline, but independent KLayout DRC and precheck remain unproven; do not mark physical signoff clean.
+- The protocol-floor counts remain a budget constraint, not final approved hardware counts; D-056 remains branch-only pending its evidence plan.
+
+Next:
+- Before another full hardening, diagnose the U0 `carrier[10]` to dropped-counter timing cone while preserving D-066 semantics, then choose one measured change. Separately evaluate the router's 16% layer-adjustment suggestion as a flow-only experiment; it is not evidence that the design itself has met congestion or signoff requirements. Require merged-GDS KLayout DRC/precheck evidence on the next run.
+
 ## 2026-09-29: Codex (phase 2: start R4 L2 RTL lockstep)
 Done:
 - Added a test-side Verilator/cocotb adapter for R4 that maps candidate debug taps by logical producer/consumer names and derives candidate host offsets from the R4 headers/generated fabric.

@@ -6,7 +6,7 @@ SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_warp.v
+PROJECT_SOURCES = tt_um_warp.v wp_small_fabric.v wp_small_validated_reload.v wp_small_image_validator.v wp_reload_guard.v fabric_gen/Config_access.v fabric_gen/ConfigFSM.v fabric_gen/eFPGA_top.v fabric_gen/eFPGA.v fabric_gen/Frame_Data_Reg.v fabric_gen/Frame_Select.v fabric_gen/IO_1_bidirectional_frame_config_pass.v fabric_gen/LUT4AB_ConfigMem.v fabric_gen/LUT4AB_switch_matrix.v fabric_gen/LUT4AB.v fabric_gen/LUT4c_frame_config_dffesr.v fabric_gen/models_pack.v fabric_gen/MUX8LUT_frame_config_mux.v fabric_gen/N_term_single_switch_matrix.v fabric_gen/N_term_single.v fabric_gen/S_term_single_switch_matrix.v fabric_gen/S_term_single.v fabric_gen/W_IO_ConfigMem.v fabric_gen/W_IO_switch_matrix.v fabric_gen/W_IO.v
 
 ifneq ($(GATES),yes)
 

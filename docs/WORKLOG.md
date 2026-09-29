@@ -4,6 +4,22 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-29 (user-authorized TT integration)
+- Replaced the adder with the 16-LUT fabric, hold/validator/guard and byte
+  host. Updated generated-source provenance, source lists, actual pinout,
+  architecture prototype contract and datasheet. ANISH-D11 records scope.
+- TT-port cocotb test passes initial load, 256 counter checks, partial/CRC
+  rejection, recovery and deselection; 4,692 simulated clocks, Icarus 13.
+  Local hierarchy/proc connectivity check passes. Strict generated lint
+  still fails; no physical warnings/checks were disabled to force success.
+- Report `ANISH_TT_INTEGRATION.md` records evidence and local tool pitfalls.
+  No phase exit boxes ticked; no GDS/timing/full-chip gate-level pass claimed.
+- Usage 20% at start, 31/38/44% during work; reserve remaining headroom
+  for saving and the user-authorized push that triggers chip CI.
+- Next inspect the GDS run, fix generated lint and physical blockers, then
+  expand reload/circuit coverage. Scheduled automation remains off.
+
+
 ## 2026-09-29 (resumed: small mapped user-circuit execution)
 - User resumed work; hourly automation remains deleted. Usage checked at
   0%, 8% and 12% five-hour, below the retained 50% ceiling. No credit action.

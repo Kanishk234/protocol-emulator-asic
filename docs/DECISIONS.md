@@ -4,6 +4,25 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 
 ---
 
+## ANISH-D11: Exercise the actual TT top through CI
+- **Date:** 2026-09-29; **Status:** user-authorized integration prototype.
+- Replace the adder on anish_branch with the two-row/two-column reference
+  fabric, checked LUT/carry hold, byte-CRC validator and management shell.
+  This explicitly advances an experimental chip-flow branch while phase-0
+  exit gates remain open; it does not declare later phases complete.
+- Pin interface is synchronous parallel bytes, not SPI: ui[7:0] data,
+  uio[4:7] valid/begin/commit/abort; low four uio pins belong to the fabric.
+  A transfer is accepted on every clk edge with valid and ready both high.
+- Begin/abort/reset/deselect park pads. Four big-endian CRC bytes precede
+  the 504-byte image. FSB1 is distinct from the large FRB1 reference.
+  Commit requires a complete validated image and no partial bus word.
+- Retain the generic feedback diagnostics and existing physical checks;
+  do not disable STA, latch/loop checks or linter to manufacture a green run.
+- Check in a documented Python regression vector for isolated CI runs;
+  this is an explicit test-fixture exception to the no-build-bitstreams rule.
+- No new physical settings, timing exceptions or protocol capability claims.
+  Total-area comparison and supported asynchronous host interface remain open.
+
 ## ANISH-D10: Compile a small reference-derived grid before chip integration
 - **Date:** 2026-09-29 · **Status:** compilation experiment
 - Two LUT4AB tiles, two W_IO tiles and north/south terminators provide a

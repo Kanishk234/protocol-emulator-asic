@@ -18,40 +18,64 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
     - "tt_um_warp.v"
+    - "wp_small_fabric.v"
+    - "wp_small_validated_reload.v"
+    - "wp_small_image_validator.v"
+    - "wp_reload_guard.v"
+    - "fabric_gen/Config_access.v"
+    - "fabric_gen/ConfigFSM.v"
+    - "fabric_gen/eFPGA_top.v"
+    - "fabric_gen/eFPGA.v"
+    - "fabric_gen/Frame_Data_Reg.v"
+    - "fabric_gen/Frame_Select.v"
+    - "fabric_gen/IO_1_bidirectional_frame_config_pass.v"
+    - "fabric_gen/LUT4AB_ConfigMem.v"
+    - "fabric_gen/LUT4AB_switch_matrix.v"
+    - "fabric_gen/LUT4AB.v"
+    - "fabric_gen/LUT4c_frame_config_dffesr.v"
+    - "fabric_gen/models_pack.v"
+    - "fabric_gen/MUX8LUT_frame_config_mux.v"
+    - "fabric_gen/N_term_single_switch_matrix.v"
+    - "fabric_gen/N_term_single.v"
+    - "fabric_gen/S_term_single_switch_matrix.v"
+    - "fabric_gen/S_term_single.v"
+    - "fabric_gen/W_IO_ConfigMem.v"
+    - "fabric_gen/W_IO_switch_matrix.v"
+    - "fabric_gen/W_IO.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
-# Provisional (DECISIONS D-006) until ARCHITECTURE.md section 1 is written.
+# Experimental FSB1 integration pinout (ANISH-D11).
 pinout:
   # Inputs
-  ui[0]: "HOST_CS_N"
-  ui[1]: "HOST_SCK"
-  ui[2]: "HOST_MOSI"
-  ui[3]: "FAB_IN0"
-  ui[4]: "FAB_IN1"
-  ui[5]: "FAB_IN2"
-  ui[6]: "FAB_IN3"
-  ui[7]: "FAB_IN4"
+  ui[0]: "HOST_DATA0"
+  ui[1]: "HOST_DATA1"
+  ui[2]: "HOST_DATA2"
+  ui[3]: "HOST_DATA3"
+  ui[4]: "HOST_DATA4"
+  ui[5]: "HOST_DATA5"
+  ui[6]: "HOST_DATA6"
+  ui[7]: "HOST_DATA7"
 
   # Outputs
-  uo[0]: "HOST_MISO"
-  uo[1]: "HOST_IRQ"
-  uo[2]: "FAB_OUT0"
-  uo[3]: "FAB_OUT1"
-  uo[4]: "FAB_OUT2"
-  uo[5]: "FAB_OUT3"
-  uo[6]: "FAB_OUT4"
-  uo[7]: "FAB_OUT5"
+  uo[0]: "HOST_READY"
+  uo[1]: "RUNNING"
+  uo[2]: "IMAGE_ERROR"
+  uo[3]: "IMAGE_COMPLETE"
+  uo[4]: ""
+  uo[5]: ""
+  uo[6]: ""
+  uo[7]: ""
 
   # Bidirectional pins
   uio[0]: "FAB_IO0"
   uio[1]: "FAB_IO1"
   uio[2]: "FAB_IO2"
   uio[3]: "FAB_IO3"
-  uio[4]: "FAB_IO4"
-  uio[5]: "FAB_IO5"
-  uio[6]: "FAB_IO6"
-  uio[7]: "FAB_IO7"
+  uio[4]: "HOST_VALID"
+  uio[5]: "HOST_BEGIN"
+  uio[6]: "HOST_COMMIT"
+  uio[7]: "HOST_ABORT"
 
 # Do not change!
 yaml_version: 6

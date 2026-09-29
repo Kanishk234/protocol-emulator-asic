@@ -1,34 +1,28 @@
-<!---
-
-This file is used to generate your project datasheet. Please fill in the information below and delete any unused
-sections.
-
-You can also include images in this folder and reference them in the markdown. Each image must be less than
-512 kb in size, and the combined size of all images must be less than 1 MB.
--->
-
 ## How it works
 
-WARP is a reprogrammable protocol emulator. It is a small embedded FPGA (eFPGA) fabric, specialized for serial
-protocols, behind a fixed management shell. A protocol (UART, SPI, I2C, ...) is written as ordinary synthesizable
-Verilog, compiled on a host computer into a bitstream, and loaded into the chip over the host interface. Changing the
-protocol changes the bitstream, not the silicon.
+WARP's current anish_branch build is an experimental 16-LUT embedded FPGA,
+with a checksum-checked loader and output parking. It replaces the template
+adder so the actual fabric can be exercised by the Tiny Tapeout chip flow.
+It is not yet a validated UART/SPI/I2C emulator or a tapeout-ready design.
 
-The shell owns the host interface (an SPI-like port on `ui[0..2]`/`uo[0]`), loads and checks the bitstream, and
-starts and stops the fabric. While the fabric is stopped or unconfigured, all fabric outputs are parked and every
-bidirectional pin is an input. The remaining pins belong to the loaded protocol.
-
-**Status:** design in progress. The current silicon is a placeholder (`uo_out = ui_in + uio_in`); the pinout above
-is provisional until the architecture spec is written.
+The host uses synchronous parallel bytes: ui[7:0] data; uio[4] valid;
+uio[5] begin; uio[6] commit; uio[7] abort. uo[0] is byte-ready, uo[1]
+running, uo[2] error and uo[3] image-complete. All host signals must meet
+clk setup/hold; this is not an asynchronous SPI interface.
 
 ## How to test
 
-Placeholder design: drive `ui_in` and `uio_in`; `uo_out` shows their 8-bit sum.
+Assert begin for a clock, then send the image CRC32 as four big-endian bytes
+followed by the 504-byte FSB1 image. Each rising clk edge with valid and ready
+accepts one byte. After completion without error, assert commit until running.
+Fabric pads are uio[3:0]; before release their output enables are zero.
+The counter image uses pad0 reset, pad1 enable and pads2/3 counter outputs.
 
-The final design will be tested by loading a protocol bitstream over the host interface with the host software in
-`tools/host/`, starting the fabric, and exercising the protocol pins with a peer device or logic analyzer.
+The shared RTL/gate-level test loads the real image through TT pins, checks
+counter behavior, rejects incomplete and wrong-checksum loads, and recovers.
+A passing RTL simulation does not establish physical timing or silicon operation.
 
 ## External hardware
 
-None for the placeholder. For protocols: the peer device under test (e.g. a UART adapter, SPI or I2C device) and a
-host that can drive the SPI-like host interface.
+A synchronous host able to drive the byte/control signals and observe ready,
+plus a clock source. No manufactured-hardware result is claimed.

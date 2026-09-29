@@ -1,5 +1,11 @@
 # Phase 0 — in progress
 
+The latest TT integration now replaces the adder with the experimental small
+fabric and byte loader. Its public-pin RTL test passes load/run/rejection/
+recovery. Generated-fabric lint and physical timing remain open; see
+[integration checkpoint](../reports/ANISH_TT_INTEGRATION.md). This is not
+a tapeout-ready design or evidence that the GDS flow has passed.
+
 Latest small-grid result: a real compiled counter loads through the word
 port and passes 1,074 independent pin checks in RTL and with both LUT tiles
 mapped to CMOS5L cells. See [cold-load evidence](../reports/ANISH_SMALL_COLD.md).

@@ -41,3 +41,13 @@ Reset is synchronous active-low for control and lane state. It clears lane outpu
 ## What this experiment can establish
 
 The spike can check instruction semantics, lane independence, shared-image programming safety, synthesis structure and rough mapped area. It cannot establish routed area, timing, fabric integration, external pin ownership, bitstream compatibility, or a competition-level advantage. Run `spikes/event_lanes/run.sh` for both testbenches, warning-clean lint and 8-/16-word RAM/static synthesis screens. The static image's mapped latch area is added separately using the SG13G2 `sg13g2_dlhq_1` cell area. The next gate is a compiler-ready configuration mapping and a concurrent lane-plus-fabric workload. Do not test or tune against the previously opened held-out protocols here.
+
+## Proposed FABulous tile boundary (not generated yet)
+
+The first tile-level test should keep the port count inside G1's existing 32-input / 32-output switch-matrix interface:
+
+- Inputs: eight sampled fabric pins; for each lane, `tx_data[7:0]`, `tx_valid`, and `rx_ready`; one shared synchronous reset. This is 29 routed inputs plus the tile global clock.
+- Outputs: each lane's three output values and three output enables (12 total); each lane's `rx_data[7:0]`, `rx_valid`, and `tx_ready` (20 total). This fills all 32 routed outputs.
+- Configuration: the shared 8 × 24-bit instruction image plus two 3-bit start PCs (198 bits).
+
+Both lanes can sample any of the eight fabric inputs, while their output banks are separate three-pin groups. The streams remain independent per lane, so user logic can transform lane 0's received byte and transmit it on lane 1 without a shared-channel arbiter. This boundary is exactly at the switch matrix's 32 routed outputs and leaves no extra output slot for debug; an RTL-to-GDS tile run must test whether the output mapping is routable. The pin restriction is also a real tradeoff: each lane can directly drive only three lines, though fabric logic can still use other I/O cells.

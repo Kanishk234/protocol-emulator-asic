@@ -2,6 +2,15 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 13: test fifth-column tile dimensions)
+**Done:**
+- Checked the current phase 3 gate and retained G1 as the frozen baseline; successor work remains exploration and no active `arch/`, `macro/`, or shell hardware was modified.
+- Retried the current LUT4 tile hardening in an ignored build copy at the proposed fifth-column dimensions, 190.40 × 199.08 µm. The pinned CMOS5L flow generated the tile and reached OpenROAD global placement, then stopped with `GPL-0301`: reported utilization was 106.507%, above 100%. This rejects the unchanged tile at that geometry before detailed routing; no DRC, timing, or GDS result exists.
+- Recorded the negative feasibility result and reproduction details in `docs/reports/architecture_research.md`. The result makes physical configuration-cell/pin remapping the next high-value experiment; it does not establish that remapping will recover enough area.
+- Attempted to query recent `efpga` CI with `gh run list`; the environment could not connect to `api.github.com`, so current remote CI status could not be refreshed. The last recorded pushed-baseline CI remains the all-green set in session 12.
+**Boxes ticked:** none; this scratch tile did not pass placement, and no phase gate was advanced.
+**Next:** inspect the generated tile/configuration and placement reports, then test bounded config-cell/pin mapping changes in the ignored build copy. Require the tile to complete place-and-route with meaningful margin before attempting 5 × 3 fabric generation. Keep G1 unchanged.
+
 ---
 
 ## 2026-09-28 (session 12: test a fabric-coupled event-lane direction)

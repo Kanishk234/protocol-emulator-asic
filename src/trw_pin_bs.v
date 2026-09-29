@@ -130,9 +130,12 @@ module trw_pin_bs (
     wire        done = !hsync && smp_done;
     // P22: e = time since the bit start; before the sample move later by min(e, SJW), after it end earlier
     wire [24:0] e    = per - tb;
-    wire [24:0] d    = !smp_done ? ((e < sj) ? e : sj) : ((tb < sj) ? tb : sj);
-    wire        rs_do = rs_edge && (d != 25'd0);
-    wire [24:0] tb_r = !smp_done ? tb + d : tb - d;             // the boundary after a resync
+    wire        rs_do = rs_edge && (sj != 25'd0) && (smp_done ? (tb != 25'd0) : (e != 25'd0));
+    // Fold the min-and-add/subtract into the boundary value directly. Before the sample,
+    // tb + min(per - tb, sjw) is either per or tb + sjw. After it,
+    // tb - min(tb, sjw) is either zero or tb - sjw. This removes one 25-bit
+    // arithmetic stage from the resync path without changing its saturation behavior.
+    wire [24:0] tb_r = !smp_done ? ((e < sj) ? per : tb + sj) : ((tb < sj) ? 25'd0 : tb - sj);
     wire [24:0] sp   = sof - per;                               // sample time - boundary time
     wire [24:0] x_n  = sp + tb;                                 // the sample time, from this clock's start
     wire [24:0] x_r  = sp + tb_r;                               // the same after a resync

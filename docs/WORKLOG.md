@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-29 (session 28: 5 × 3 shell and PDN fit probe)
+**Done:**
+- Corrected the scratch timing-model path: the earlier structural run did fail on a reversed mux delay lookup. A scratch copy of the pinned FABulous package now infers mux direction from mapped pins; this lets the structural model finish. The resulting timing remains structural only and is not evidence for Fmax.
+- The candidate architecture compiled the required UART, SPI controller and I2C controller design set, plus `prims2`, using the structural model. A DIV=16 UART bitstream loaded all 842 words in a configured-fabric simulation and emitted `0x96` with correct UART framing. Evidence is under ignored `build/arch_explore/compile_design_set_structural/` and `build/arch_explore/compiled_structural/sim_uart/sim.log`; this does not yet validate the full shell or hardened macro.
+- Extracted the hardened 5 × 3 macro LEF and ran the fixed shell through LibreLane floorplanning. The 1087.68 × 703.08 µm macro fits at the scratch placement (x=121.44, y=3.78) inside the 1289.28 × 710.64 µm die. Floorplan run: `build/arch_explore/chip_5x3_fit/runs/candidate_5x3_floorplan/`.
+- The full-chip candidate then failed during PDN generation. Its macro has irregular Metal4 supply-column centers (VPWR: 12.00, 121.92, 231.84, 312.00, 421.92, 502.08, 612.00, 692.16, 802.08, 882.24, 992.16, 1072.32 µm; VGND is offset by 4.10 µm), while the current shell PDN uses a uniform 109.92 µm pitch. The checker found no stripes through some candidate macro pins. Evidence: `candidate_5x3_globalroute` in `build/arch_explore/chip_5x3_fit/globalroute.log` and its `21-openroad-generatepdn` log.
+- Tried a scratch explicit-stripe PDN configuration using measured pin centers. The first setup used a pitch wider than the die and generated no stripes; after correcting that, the follow-up still generated no macro-crossing stripes. This is an unresolved scratch-script/configuration issue, not evidence that a custom PDN is impossible. Runs and inputs are under ignored `build/arch_explore/chip_5x3_fit/pdn_variant/`.
+
+**Boxes ticked:** no phase-exit boxes. No tracked hardware, architecture, shell, or generated RTL changed. The candidate has design-set compile and fabric-simulation evidence, plus die-boundary fit evidence; it does not yet pass full-shell PDN or routing.
+
+**Next:** debug the explicit stripe generation against the pinned OpenROAD `add_pdn_stripe` behavior and inspect the candidate macro supply pin geometry in OpenDB. If the candidate’s per-tile rail pitch cannot be served by the fixed shell PDN without excessive/invalid Metal4 stripes, reshape the candidate tile/PDN interface so it preserves the shell’s power-grid pitch, then repeat full-shell global routing. Keep G1 frozen and held-out protocols sealed.
+
 ## 2026-09-29 (session 27: site-aligned 5 × 3 fabric stitch)
 **Done:**
 - Corrected the scratch tile pitch to the IHP CMOS5L site/row grid: LUT and PRIM tiles 190.08 × 196.56 µm, north/south tiles 190.08 × 56.70 µm, east/west tiles 68.64 × 196.56 µm, corners unchanged. These dimensions replace the earlier off-grid experiment values; no tracked architecture or tile source was changed.

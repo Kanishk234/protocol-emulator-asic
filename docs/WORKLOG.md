@@ -41,6 +41,53 @@ Next:
 
 ---
 
+## 2026-09-29: Codex (phase 2: approve and prepare R4 density experiment)
+Done:
+- Recorded the requester's approval of the D-049 per-protocol resource floor, D-056's 0.10 ns hold setting for the branch experiment only, D-066's decision to retain live pin reconfiguration and time the latch paths, and D-067's 56% density experiment.
+- Updated `R4_FLOORPLAN.md` to distinguish the earlier D-056 timeout (36455532221) from the newer area-pass hardening artifact (36526332067), and added its timing/routing/signoff results.
+- Prepared the R4 config at density 56; no RTL or SDC changes. The upcoming branch push will start the GDS run.
+
+Evidence:
+- `build/ci/r4/run7/GDS_logs.zip`; updated D-049/D-056/D-066/D-067 and `docs/reports/R4_FLOORPLAN.md`.
+- R4 `src/config.json` is valid JSON using the project venv; `git diff --check` passes in both worktrees.
+- No Phase 2 checklist boxes ticked. Latest main unit workflow 36602221087 was still in progress at last check; latest GDS result 36526332067 failed setup.
+
+Checklist boxes ticked:
+- None. No Phase 2 exit condition was newly satisfied.
+
+Problems / decisions:
+- 0.10 ns remains branch-only until all-corner hold signoff and `gl_test` pass. Kanishk's agreement on the final budget lock and main-branch switch is still to be recorded.
+- The density experiment tests routing and timing only; it does not prove the floor routeable and does not authorize a main-branch switch.
+
+Next:
+- User can now commit/push the main decision/report updates, then push the R4 config commit to start the branch-only GDS run. Review the workflow result before considering any main switch.
+
+---
+
+## 2026-09-29: Codex (phase 2: prepare R4 density candidate)
+Done:
+- Prepared the proposed R4 run 8 setting on the clean `/tmp/r4-bitsync-work` spike worktree: `PL_TARGET_DENSITY_PCT` 59 → 56, with RTL, counts, SDC and other flow settings unchanged.
+- Added proposed D-067 on `main`, including the evidence, expected timing/routing tradeoff, and the requirement for team approval of D-049/D-056 before hardening.
+- Confirmed the pushed main commit's docs workflow is green, unit is still running, and no R4 GDS workflow is active.
+
+Evidence:
+- `python -m json.tool /tmp/r4-bitsync-work/src/config.json`: valid JSON (project venv).
+- `git diff --check` on both worktrees: clean.
+- Branch-only config diff is two lines; main D-067 is in `docs/DECISIONS.md`.
+- Workflow runs: main docs 36602220855 green; main unit 36602221087 in progress; latest R4 GDS 36526332067 completed with failure.
+
+Checklist boxes ticked:
+- None. No Phase 2 exit condition was newly satisfied.
+
+Problems / decisions:
+- D-067, D-049 and D-056 remain proposed. Do not push the R4 config or start hardening until the team approves the density test and budget/hold assumptions.
+- The active pin-configuration path remains timed per D-066.
+
+Next:
+- Get the team's go/no-go on the prepared single-variable density experiment. If approved, the user can commit/push the main decision record and the R4 config change separately; then inspect the new GDS run.
+
+---
+
 ## 2026-09-29: Codex (phase 2: next R4 floorplan experiment)
 Done:
 - Compared the archived run 6 job log, the earlier D-056 run 7 summary, and the newer `build/ci/r4/run7/GDS_logs.zip` artifact. The newer artifact is from commit `9138ee6`, with area/BITSYNC RTL changes in addition to the 0.10 ns hold setting; it is distinct from the earlier run 7 timeout summarized under D-056.

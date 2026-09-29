@@ -336,3 +336,22 @@ Measured and not worth it: an indexed source select in the fabric ports (+0.35�
 Run 7 reduced the hold-violation endpoint count and global congestion, but detailed routing did not converge within the job. It inserted more hold buffers than run 6 (637 versus 290). The final reported detailed-routing counts oscillated between 143 and 151; 143 was the last count before cancellation. Since the flow never reached signoff, run 7 provides no all-corner hold result. Since `gl_test` did not run, it also provides no hardened-netlist functional result. The evidence plan in D-056 is therefore **not satisfied**; the 0.10 ns hold setting is not validated for the main branch by this run.
 
 **Next:** preserve this result as a failed physical experiment. Do not treat the uncertainty change as an accepted signoff setting or the protocol floor as routable. Compare run 7's remaining global-routing overflow and detailed-route hot spots against the run 6 logs, then choose one budget or physical-design change with Krithik and Kanishk before another full hardening. A rerun of the same setup is not supported by these results.
+
+## 16. Later hardening on the area-pass RTL (run 36526332067)
+
+The later `gds` run on commit `9138ee6` used the area-pass R4 floor design, the 0.10 ns hold uncertainty, and density target 59. This is a separate workflow run from the timed-out D-056 run above. Artifact: `build/ci/r4/run7/GDS_logs.zip`.
+
+| Result | Measurement |
+|---|---:|
+| Placement target | 59 % |
+| Post-placement utilization | 54.5 % standard cells / 56.8 % including macro |
+| Global-route overflow | 1,503 total / 1,438 Metal3 |
+| Detailed-route DRC | 0 |
+| Post-route setup WNS | −0.934 ns typical / −13.336 ns slow |
+| Hold WNS | positive at all reported corners |
+| Antenna / LVS | pass / pass |
+| KLayout precheck / `gl_test` | skipped after `gds` failed |
+
+The flow failed its post-route setup check. The worst path starts at U0's `idle` configuration latch and ends at `u_chip.dropped[26]`, through the effective A input and RX/fabric logic. Per D-066, this remains a real timed path. The Magic DRC count is not the signoff result: this config disables in-flow KLayout DRC, and Magic reports expected SRAM macro markers; the separate Tiny Tapeout precheck did not run, so merged-GDS KLayout signoff remains unknown.
+
+**Next experiment (D-067):** preserve this RTL, counts, SDC and all other flow settings; lower only `PL_TARGET_DENSITY_PCT` from 59 to 56. This is approved by the requester as a branch-only experiment. It tests congestion and timing together and does not establish that the D-049 floor routes or that D-056 is ready for `main`.

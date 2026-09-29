@@ -827,7 +827,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** none in hardware.
 - **Approval:** Krithik and Kanishk.
 
-## D-049 (2026-09-28): the protocol floor for the area budget (proposed)
+## D-049 (2026-09-28; approved 2026-09-29): the protocol floor for the area budget
 - **Context:** Krithik (2026-09-28): whatever the chip gives up, every protocol must still be supported, not necessarily at the same time. The budget decision (after R4 run 5) needs that as a hard floor. Measured from the 20 compiled programs (`tripc`, default parameters), one program at a time:
 
 | Resource | Most any one program needs | Programs at that limit |
@@ -838,9 +838,9 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 | Slots per lane | 12 | CAN, I2C target, PS/2, SMBus, SWD |
 | SRAM words | 354 of 512 | CAN |
 
-- **Proposal (a constraint on the budget, not a design change):** the chip keeps at least **2 lanes, 4 pin units of which U0 is full, 12 slots per lane, and the 512-word SRAM**. Below any of these, named protocols are lost: 1 lane loses CAN, IR NEC and LIN; 3 units lose I2S, JTAG and the SPI controller; no full unit loses 7 protocols; 8 slots lose 5. U1 can be lean (no program needs two full units). Running protocols at the same time is what the extra lanes and units buy; it is not required.
+- **Decision (a constraint on the budget, not a spec-count change):** the budget floor is **2 lanes, 4 pin units of which U0 is full, 12 slots per lane, and the 512-word SRAM**. Below any of these, named protocols are lost: 1 lane loses CAN, IR NEC and LIN; 3 units lose I2S, JTAG and the SPI controller; no full unit loses 7 protocols; 8 slots lose 5. U1 can be lean (no program needs two full units). Running protocols at the same time is what the extra lanes and units buy; it is not required. The frozen spec counts remain 3 lanes / 6 units unless separately changed.
 - **Size of that floor** (RTL numbers from D-047, Yosys cmos5l typ): 2 × (lane 50.5K + slots 24.5K) = 150K; U0 full with milestone B ≈ 67K (lean 36.6K − lean config 5.1K + full config 11.4K + the PULSE/carrier/BITSYNC projection 24.4K, `PIN_UNIT_RTL.md`); 3 lean units 110K; fabric with 9 ports ≈ 34K; host ≈ 22K; pad owners ≈ 8K; synchronisers, time, glue ≈ 4K. **≈ 395K µm², ≈ 56 % at global placement** (× 1.164 + the 45.3K macro).
-- **Where that sits:** R4 run 4 (337K, 47.6 %) routed with 0 global overflow; run 3 (417.7K, 58.9 %) did not. The floor is inside the untested window, nearer the failing side. So after run 5, the budget needs either a measurement at ~56 % (an R4 run 6 at the floor's size, best with the real `trw_chip` at 2 lanes / 4 units on the branch), or area saved elsewhere without losing a protocol:
+- **Where that sits:** R4 run 4 (337K, 47.6 %) routed with 0 global overflow; run 3 (417.7K, 58.9 %) did not. The real floor design is now measured: the newer run 7 artifact used 59% target density, reached 56.8% total instance utilization, and still had 1,503 global-route overflow and failing post-route setup. A single-variable lower-density experiment is recorded in D-067; the floor is not yet shown to route cleanly.
   - the 4-bit timer fraction (measured, −1.9K per lean unit, not adopted yet);
   - trimming fabric legal sources to what the 20 programs use at the new counts;
   - lane logic (the routine controller added 9.6K per lane; RIR and the entry path can be looked at);
@@ -848,7 +848,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
   - and, outside the design, Jane Street's answer on a larger tile (the 8x4 inquiry, not sent).
 - **General need:** the chip's claim is "any of these protocols"; the budget must not quietly drop one.
 - **Cost:** none by itself; it bounds the budget options.
-- **Approval:** Krithik and Kanishk (with the budget decision).
+- **Approval:** the requester approved using this as the minimum per-protocol budget floor on 2026-09-29. It constrains the R4 experiment, but does not change the frozen 3-lane / 6-unit spec counts or prove physical routability. Kanishk's agreement still needs recording before the final budget lock or main-branch switch.
 
 ## D-050 (2026-09-28): L8-EQY feasibility: liberty cell models and a SAT miter work; the PDK's Verilog models do not
 - **Context:** phase 2 task 2.5 item 16 and VERIFICATION.md L8-EQY: try equivalence checking of one module against its cmos5l netlist and log whether the cell models work, or choose the fallback.
@@ -904,14 +904,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Size:** engine 43.2K µm² (+8.4K), full unit logic ~81.9K; chip 632.2K at spec counts, **407.6K at the protocol floor** (B2c: 398.7K), ~57.6 % expected at global placement. R4 run 6 showed the floor at 398.7K does not harden inside the 6 h job (D-043), so this is the number the area pass starts from.
 - **Cost:** as above; no spec change.
 
-## D-056 (2026-09-28, proposed): hold clock uncertainty 0.10 ns (setup stays 0.25 ns)
+## D-056 (2026-09-28; approved for branch experiment 2026-09-29): hold clock uncertainty 0.10 ns (setup stays 0.25 ns)
 - **Context:** R4 run 6 (the real chip at the protocol floor) did not finish inside the 6 h `gds` job. The layout flow grew the design from 466.2K to 567.7K µm² before routing; 52.3K of that was hold repair at 1,891 endpoints (`R4_FLOORPLAN.md` §13). The constraints come from LibreLane's `base.sdc`, whose `set_clock_uncertainty 0.25` applies to hold as well as setup.
 - **Finding:** timing run 5's post-CTS netlist at the fast corner: 1,546 hold violations at 0.25 ns (median −0.05 ns, spread over every block), 29 at 0.10 ns, 28 at 0.05 ns (the SRAM macro's input hold and a few others: real, and still repaired).
 - **Proposal:** `set_clock_uncertainty -hold 0.10 [all_clocks]` after `base.sdc`, in both the place-and-route and the sign-off constraints. Reasoning: after CTS the flow times with the propagated clock tree, so skew is modelled; clock jitter does not affect hold (same edge); 0.10 ns on top of the fast corner (−40 °C, 1.32 V) remains conservative. Setup keeps 0.25 ns.
 - **Why it is fair to the competition's intent:** it is a design constraint in our own SDC file inside the same Tiny Tapeout `gds` workflow every entry uses; no flow code or template job changes.
-- **Evidence plan:** R4 run 7 on `spike/r4-floorplan` (run 6's design, this change only). Accept for `main` (at the switch, with the latch SDC of D-032) only if run 7 shows hold met at sign-off at all corners and `gl_test` passes.
+- **Evidence plan:** keep 0.10 ns for the approved branch-only density experiment in D-067. Accept for `main` (at the switch, with the latch SDC of D-032) only after a complete hardening shows hold met at sign-off at all corners and `gl_test` passes. The existing runs do not meet this plan.
 - **Cost:** none in area; it removes most of ~50K µm² of delay cells. Risk: a real hold failure in silicon if the modelled skew is off by more than the margin; mitigated by the fast corner, the 0.1 ns repair margin, and the sign-off check at 0.10 ns.
-- **Decision:** Krithik + Kanishk (a sign-off assumption, CLAUDE.md: `src/` constraint changes each with an entry).
+- **Approval scope:** the requester approved 0.10 ns for the next R4 measurement only. This is not approval to use the setting on `main`; main adoption remains conditional on the evidence plan above and Kanishk's sign-off.
 - **Run 7 result (36455532221):** at 0.10 ns, post-CTS hold violations fell to 540 endpoints (637 inserted buffers), and global-routing overflow fell from 5,350 to 4,198 (3,909 on Metal3). The six-hour `gds` job timed out in detailed routing with 143 violations; signoff and `gl_test` did not run and no artifact was uploaded. The evidence plan above was not met, so this run does **not** validate the proposed hold setting for use on `main`. Revisit D-056 together with the D-049 budget decision before any switch.
 
 ## D-057 (2026-09-28, approved): reconcile pin-unit model readings P-G24, P-G25 and P-G28
@@ -980,13 +980,22 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** a smaller model queue changes only overflow timing; increasing RTL buffering would add state and event ordering logic.
 - **Approval:** Krithik and Kanishk approved all recommendations on 2026-09-28. The model changes and focused mutation evidence are recorded in the phase 2 worklog.
 
-## D-066 (2026-09-29, proposed): pin configuration writes after activation and latch timing
+## D-066 (2026-09-29; approved 2026-09-29): retain live pin reconfiguration and time its paths
 - **Context:** GDS run 7's worst setup paths start at pin-unit configuration latch outputs. D-038 described those outputs as static while running and called the latch-to-state paths false-path candidates.
 - **Contract reading:** ARCHITECTURE §7.2 / §14 H1 permits pin-configuration writes whenever all lanes are halted. H2 says pin units and the fabric keep running when lanes halt. H1a / D-041 B makes `live` sticky after the first RUN or STEP; D-041 A restarts the affected unit on each configuration-word write. The contract does not prohibit a configuration write after activation.
 - **Model evidence:** `test_pin_config_can_change_after_activation_when_lanes_are_halted` activates the chip, halts its lane, rewrites the pin-A selection through generated `HOST_MAP`, and observes the new input on the next live pin-unit clock.
 - **Timing implication:** with this legal sequence, configuration latch outputs are not guaranteed static while pin-unit state is active. A blanket setup false path from those latches to pin-unit state is therefore not justified by the current contract.
-- **Decision needed:** either retain live reconfiguration and time these latch-to-state paths, or change the host/pin-unit contract so configuration writes require quiesced pin units (with corresponding model, RTL and verification changes). No RTL, SDC, or frozen-spec change is made here.
-- **Status:** pending team decision. The model follows the currently documented allowance for writes while lanes are halted.
+- **Decision:** retain the documented ability to write pin configuration while lanes are halted, including after `live` becomes sticky. Time the latch-to-state paths; do not add a false-path exception. No RTL, SDC, or frozen-spec change is made here.
+- **Approval:** the requester approved this contract/timing choice on 2026-09-29. The model and existing architecture contract agree; Kanishk's co-approval is not recorded yet.
+
+## D-067 (2026-09-29; approved for branch-only measurement): next R4 hardening lowers placement density to 56%
+- **Context:** the newer R4 GDS artifact for run 7 (run 36526332067, RTL commit `9138ee6`) used `PL_TARGET_DENSITY_PCT=59`. Post-placement utilization was 54.5% for standard cells / 56.8% including the macro. Global routing still reported 1,503 overflow, 1,438 on Metal3, and post-route setup failed (slow WNS -13.336 ns, typical -0.934 ns). The worst path starts at U0's live `idle` configuration latch and ends at `dropped[26]`; D-066 means it remains a timed path.
+- **Proposal:** on `spike/r4-floorplan`, keep the same RTL, resource counts, SDC, and other flow settings, and change only `PL_TARGET_DENSITY_PCT` from 59 to 56. This is a branch-only physical experiment; it preserves the protocol floor and its features while testing whether a lower placement target reduces local congestion and Metal3 overflow.
+- **Expected tradeoff:** lower target density may improve routability, but spreading cells may lengthen critical wires and worsen setup. The run must report both global-route overflow and post-route timing; a successful global route alone is not sufficient.
+- **Approval:** the requester approved this branch-only experiment on 2026-09-29, together with the D-049 floor and D-056 branch-only hold setting. No D-066 timing exception is included. Kanishk's agreement remains needed before the final budget lock and any main-branch switch.
+- **Evidence:** `build/ci/r4/run7/GDS_logs.zip`, especially `runs/wokwi/final/metrics.json`, `runs/wokwi/39-openroad-globalrouting/`, and `runs/wokwi/55-openroad-stapostpnr/`; the branch candidate is `spike/r4-floorplan/src/config.json`.
+- **Cost:** no RTL area or protocol-capability change; one floorplan setting changes. Risk is placement failure if the target is too low, or worse setup from longer wires.
+- **Status:** approved by the requester for one branch-only measurement; ready for user-controlled push. Results do not authorize a main-branch switch or adoption of the hold setting.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

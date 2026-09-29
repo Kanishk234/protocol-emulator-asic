@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 16: make pruning screen reproducible)
+**Done:**
+- Added `spikes/route_prune/removed_pips.csv` as the exact 313-choice manifest for the measured route-pruning candidate, plus a scratch-only script that applies it to every FABULOUS_LC tile and rejects removal of any selected FASM choice at those sites.
+- Reproduced the ignored candidate `.FABulous/pips.txt` byte-for-byte (3,443 internal PIPs removed across 11 LUT tiles). The preserved UART, SPI-controller and I2C-controller routes remain unchanged; this is manifest replay, not a general-purpose topology optimizer.
+- Updated the architecture research report with the reproducibility path and the current limits. G1 stays frozen; the held-out protocols were not used.
+**Boxes ticked:** none; the physical benefit is promising, but a full-fabric feature map, router and shell flow have not been regenerated for this architecture.
+**Next:** develop broader non-held-out route coverage and complete the tile-to-fabric configuration/compiler round trip before deciding whether to pursue this as the new 5 × 3 baseline.
+
 ## 2026-09-28 (session 15: physically measure route-option pruning)
 **Done:**
 - Kept G1 frozen and all edits inside ignored `build/` scratch copies while testing a fabric-native switch-matrix reduction.

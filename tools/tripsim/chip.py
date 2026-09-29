@@ -38,8 +38,10 @@ class Sram:
 
 
 class Chip:
-    def __init__(self, lanes=3, slots=12, pin_units=6, sram_words=512,
+    def __init__(self, lanes=None, slots=12, pin_units=None, sram_words=512,
                  fire_period=None, host_fifo_depth=16):
+        lanes = sum(name.startswith("L") and name.endswith(".I0") for name in _S.LEGAL_SOURCES) if lanes is None else lanes
+        pin_units = len(_S.PIN_UNIT_FEATURES) if pin_units is None else pin_units
         if fire_period is None:                 # R1 experiments: TRIPSIM_FIRE_PERIOD=2 for every chip
             fire_period = int(os.environ.get("TRIPSIM_FIRE_PERIOD", "1"))
         self.fabric = f = Fabric()

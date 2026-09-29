@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 15: physically measure route-option pruning)
+**Done:**
+- Kept G1 frozen and all edits inside ignored `build/` scratch copies while testing a fabric-native switch-matrix reduction.
+- Removed 313 of 1,272 local switch options per LUT tile (24.6%) based on routes present in the current UART, SPI-controller and I2C-controller design set. Recompiled all three against the candidate architecture; each FASM output was byte-identical to its G1 design-set counterpart.
+- Regenerated the LUT tile's scratch configuration-memory map after removing stale generated mapping data. At the 190.40 × 199.08 µm fifth-column target, synthesis area fell 14.4% (34,831.7 → 29,824.2 µm²; 1,825 → 1,595 cells). The pruned tile completed placement at 88.8% utilization and the tile flow through KLayout DRC; the unpruned tile failed placement at 106.507%.
+- Tried the remaining I2C-target design-set workload in both candidate and baseline architectures. It exceeds the current 88-LC logic capacity in both, so it cannot establish a routing regression or win.
+- Recorded run paths, metrics and limits in `docs/reports/architecture_research.md`. No held-out protocols were inspected, no G1 architecture or macro changed, and the reduced tile's complete bitstream/configuration integration remains unvalidated.
+**Boxes ticked:** none; this is a promising scratch experiment, not a complete architecture candidate. Known-workload route preservation does not establish general routability.
+**Next:** make the pruning procedure reproducible, expand preservation evidence with generated non-held-out designs and a compiler/configuration-map round trip, then test full-fabric routeability at equal clock/area. Do not merge pruning into G1 or declare the fifth column feasible until the real tile map, compiler, full fabric and shell hardening agree.
+
 ## 2026-09-28 (session 13: test fifth-column tile dimensions)
 **Done:**
 - Checked the current phase 3 gate and retained G1 as the frozen baseline; successor work remains exploration and no active `arch/`, `macro/`, or shell hardware was modified.

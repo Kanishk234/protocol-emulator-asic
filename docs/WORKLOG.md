@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 19: validate candidate fabric logic path)
+**Done:**
+- Compiled a scratch combinational passthrough (`FAB_IN0` → `FAB_OUT0`) on the consistent clock-protected 5 × 3 candidate; routing and bitgen succeeded (842 words).
+- Loaded that exact WBIT through `wp_fabric_cfg` into the generated candidate macro RTL. The routed output followed input values 0 → 1 → 0 after configuration. This confirms a basic candidate config/LUT/I/O path in simulation; it does not explain or clear the UART payload mismatch.
+- Scratch design and testbench remain under ignored `build/`; active G1, shell, and held-out set unchanged.
+**Boxes ticked:** first candidate dynamic logic-path proof; UART/primitive behavior and shell integration remain open.
+**Next:** inspect the UART compile mapping and candidate primitive/control pins, then isolate the wrong payload bits with targeted probes. After that build a scratch seven-column shell/config integration; no timing claims until candidate PIP delays are calibrated.
+
 ## 2026-09-28 (session 18: audit candidate tile/model consistency)
 **Done:**
 - While preparing RTL bitstream-load simulation, found the reduced candidate artifacts do not share one tile definition: the current clock-protected tile RTL has 530 configuration bits, its separate software-generation tile copy has 527, and the generated scratch macro RTL still has 566.

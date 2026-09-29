@@ -19,6 +19,27 @@ Next:
 - ...
 ```
 
+## 2026-09-29: Codex (phase 2: model-side L2 oracle preparation)
+Done:
+- Inspected the model and verification tree for L2-RAND/L2-INJECT. No lockstep runner, per-cycle scoreboard, or RTL fault-injection harness exists in the checkout.
+- Added `tools/tripsim/lockstep.py`: a model-only snapshot from generated D-046 debug-map addresses and generated producer/consumer lists, plus a recursive first-difference reporter for a future scoreboard adapter.
+- Added focused tests for snapshot coverage and field-level mismatch reporting. No model behavior, frozen semantics, spec counts, or RTL files changed.
+
+Evidence:
+- `source .venv/bin/activate && pytest -q tools/tripsim/tests/test_lockstep.py tools/tripsim/tests/test_semantics.py tools/tripsim/tests/test_pinregs.py`: **94 passed**.
+- Snapshot coverage derives actual lane/unit and fabric counts from the model/spec-generated definitions; the test does not assume the proposed budget floor is the final chip shape.
+
+Checklist boxes ticked:
+- None. This is model-side scoreboard preparation only; no RTL lockstep clocks or L2-INJECT run were performed.
+
+Problems / decisions:
+- The 1,000,000-clock Phase 2 gate requires a test-side RTL adapter/Verilator runner and a common stimulus stream; the model-side tree has none. L2-INJECT additionally needs executable RTL mutations for priority and cursor timing. These cannot be established by model-only tests.
+- D-049's requester-approved 2-lane/4-unit protocol floor is not a frozen spec-count change; Kanishk's agreement for final budget lock/main switch remains unrecorded. Keep model defaults tied to the generated frozen 3-lane/6-unit spec until the team changes it.
+- D-066's active-reconfiguration behavior is in the approved architecture contract; no semantic changes were needed here.
+
+Next:
+- Once the RTL test session provides a test-side adapter contract and the team settles counts, connect this snapshot to the cycle scoreboard, run ≥1,000,000 compared clocks, then run both L2-INJECT mutations.
+
 ## 2026-09-29: Codex (phase 2: R4 timing report cross-check)
 Done:
 - Cross-checked the model session's active-configuration audit against the run 7 post-route STA report and the routed netlist. The slow-corner worst path starts at U0 configuration `idle` (a latch output) and ends at `u_chip.dropped[26]`; it passes through the effective A input and RX/fabric logic. This confirms the path is functional under the current contract and must not be excepted.

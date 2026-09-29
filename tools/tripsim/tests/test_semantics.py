@@ -161,6 +161,29 @@ def test_d041_a_host_pin_cfg_word_write_restarts_and_clears_flags():
     assert unit.t_cfg == chip.cycle
 
 
+def test_pin_config_can_change_after_activation_when_lanes_are_halted():
+    chip = Chip(lanes=1, pin_units=1)
+    chip.pin_config(0, pin_a=PAD_UI, rxmode="shift_rx", idle=1)
+    chip.run([0])
+    chip.run_for(1)
+    chip.host_write(S.HOST_MAP["run"][0], 0)  # halt lanes; pin units stay live (§14 H2)
+    assert not chip.lanes[0].running and chip.live
+
+    words = pinregs.encode(PinConfig(pin_a=PAD_UI + 1, rxmode="shift_rx", idle=1), 0)
+    base = S.HOST_MAP["pin_cfg"][0]
+    for offset, word in enumerate(words):
+        assert chip.host_write(base + offset, word)  # writes are legal while lanes are halted
+
+    unit = chip.pins[0]
+    assert chip.live and unit.cfg.pin_a == PAD_UI + 1
+    chip.settle_inputs(ui=1 << 1)
+    chip.step()
+    assert unit._rx == "armed"  # the next live pin-unit clock samples the new pin A
+    chip.settle_inputs(ui=0)
+    chip.step()
+    assert unit._rx == "shift"  # a falling edge on new pin A starts RX
+
+
 def test_d045_lane_fetch_timing_matches_r1_and_r2_reading():
     body = Routine().ldi("r0", 7).out("O0", "r0").ret()
     chip, lane = host_lane([reflex(op="CALL", f=0, state=0, ns=1)])

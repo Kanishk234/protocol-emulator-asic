@@ -11,7 +11,7 @@
 
   "//": "TRIPWIRE R4 (branch spike/r4-floorplan, never merged; DECISIONS D-043). Changes to the template:",
   "//": "- the SRAM macro block and the four FP_PDN_V* stripe keys: R3 (D-031), unchanged, same macro location;",
-  "//": "- PL_TARGET_DENSITY_PCT 59: run 6, the real trw_chip at the protocol floor (D-049: 2 lanes, 4 pin units, U0 full), Yosys 398.7K um2, ~2.5 above the expected ~56.4 % global-placement utilisation (GPL = 1.164 x Yosys + macro, over the 902.4K core; run 4: 51 for ~48.5 %);",
+  "//": "- PL_TARGET_DENSITY_PCT 56: proposed run 8, same R4 protocol-floor design as the newer run 7 artifact; target is lowered from 59 to test local placement pressure without changing protocol resources (D-067 proposed);",
   "//": "- PNR_SDC_FILE / SIGNOFF_SDC_FILE: the R2 latch exception (D-032);",
   "//": "- DRT_OPT_ITERS 64 (the default): runs 5-6; runs 1-4 used 3 as a 6 h guard (D-034), which stopped run 4 at 874 violations (D-043).",
   "//": "- the SRAM instance path: u_chip.u_sram.sram from run 6 (tt_um_tripwire wraps trw_chip; checked with a local Yosys flatten).",
@@ -22,7 +22,7 @@
 
   "//": "PL_TARGET_DENSITY_PCT - You can increase this if Global Placement fails with error GPL-0302.",
   "//": "Users have reported that values up to 80 worked well for them.",
-  "PL_TARGET_DENSITY_PCT": 59,
+  "PL_TARGET_DENSITY_PCT": 56,
 
   "//": "CLOCK_PERIOD - Increase this in case you are getting setup time violations.",
   "//": "The value is in nanoseconds, so 20ns == 50MHz.",

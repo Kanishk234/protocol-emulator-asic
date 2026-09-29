@@ -4,6 +4,31 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 
 ---
 
+## ANISH-D10: Compile a small reference-derived grid before chip integration
+- **Date:** 2026-09-29 · **Status:** compilation experiment
+- Two LUT4AB tiles, two W_IO tiles and north/south terminators provide a
+  bounded starting point for mapped user-circuit execution. No RAM/DSP is
+  instantiated. Keep production RTL and the old reference unchanged.
+- `ANISH_SMALL_COMPILE.md` records four used logic cells and a 504-byte
+  counter image; no area, physical fit or behavior claim follows yet.
+- The next gate is cold-load public-port behavior, then mapped execution
+  and safe release with the new geometry and separate architecture identity.
+
+## ANISH-D9: Measure full reference tiles without hiding feedback evidence
+- **Date:** 2026-09-28 · **Status:** isolated mapping/storage experiment
+- **Decision:** retain the strict preflight, but add a separate measurement
+  that records checks before flattening, in generic logic, after cell
+  mapping, and after expanding Liberty cell functions. Reject non-loop
+  warnings, retain loop diagnostics and do not call mapping a physical pass.
+- **Evidence:** `ANISH_TILE_MAPPING.md`, `warp-tile-mapping.sOBN3KHk`:
+  held tile 36,173.3904 µm², all 616 configuration latches retained;
+  5,202 mapped full-bank storage checks and a negative control pass.
+- **Reason:** hierarchy and cell black boxes hide feedback from some check
+  stages. Upstream tile layout disables STA; that is not timing signoff.
+- **Limits:** no user-circuit execution in this storage test, no physical
+  or full-chip area claim, no production check/RTL/host-contract changes.
+  Next prove a small mapped fabric running a compiled design via real ports.
+
 ## ANISH-D8: Compare a management-owned word-only configuration path
 - **Date:** 2026-09-28 · **Status:** measured reference candidate
 - **Decision:** optional fixture mode bypasses UART/bitbang frontends and

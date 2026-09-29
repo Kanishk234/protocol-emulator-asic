@@ -1,5 +1,11 @@
 # Persistent reference reconfiguration experiment
 
+Small-grid follow-up: `scripts/fabric_small_cold.sh` reuses the cached
+small counter compilation, audits its framing and checks public pin behavior.
+An optional second argument selects cached mapped LUT tiles after matching
+their source dependencies. See `docs/reports/ANISH_SMALL_COLD.md` for scope,
+run IDs and reproduction; this is not a full-chip gate-level test.
+
 Current result: each image works from startup, but counter-to-LFSR reload
 stalls during configuration. A frame snapshot and read-only live probe
 demonstrate intermediate LUT feedback at column 1/frame 12.
@@ -152,3 +158,9 @@ are documented in `docs/reports/ANISH_WORD_ONLY_LOADER.md`.
 The validated-fabric runner also accepts `word-only` as its third argument
 to test this frontend with the actual held reference fabric. The report
 records the nine-scenario byte-CRC integration run and its RTL-only scope.
+
+`bash scripts/fabric_tile_mapping.sh build/fabric-reference-warp-reference.OBUfXfus`
+maps complete stock/held reference tiles, records feedback visibility at
+four synthesis stages and checks held-tile dynamic storage on mapped cells.
+It preserves the strict `fabric_tile_preflight.sh` gate. See
+`docs/reports/ANISH_TILE_MAPPING.md`; this is not a chip build or timing pass.

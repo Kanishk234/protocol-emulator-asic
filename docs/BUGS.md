@@ -4,6 +4,17 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 
 ---
 
+## ANISH-FAB-10: Small-grid test assumed wrong external enable polarity
+- **Date:** 2026-09-29; **Status:** test corrected.
+- First cold-load test expected external T=0011 and failed at check zero
+  with T=1100. The compiled user's io_oeb is active-low, while the generated
+  I/O primitive explicitly inverts T on its external T_top port.
+- Pin order was verified against both wrappers and was already correct.
+  Changed only the oracle's expected external enable to 1100; no RTL repair.
+- Covered by all 1,074 checks in both RTL and mixed-level runs listed in
+  `reports/ANISH_SMALL_COLD.md`. Wrong-result control still fails at zero.
+
+
 ## ANISH-FAB-1: Reference synthesis tool mismatch and paths containing spaces
 - **Date:** 2026-09-25
 - **Symptom:** FABulous 2.2 with OSS CAD Suite 2026-09-25 fails on missing
@@ -97,6 +108,17 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
   `warp-loader-cost.AXvDP6i0` confirms corrected totals and functional GL.
   The original erroneous summary is retained with a do-not-use filename.
 
+## ANISH-FAB-9: Custom demo wrapper produced an empty compilation
+- **Date:** 2026-09-29 · **Status:** compilation acceptance repaired.
+- `warp-small-compile.kAys0TJS` left the new counter's I/O unconnected.
+  FABulous warned that custom designs need manual wrapper connections;
+  checking only the binary's existence incorrectly accepted the result.
+- Runner now connects each bus explicitly before compiling and rejects
+  empty features, absent logic, zero routed arcs and wrong image length.
+- Corrected `warp-small-compile.khvqjtBG`: four logic cells, 70 features,
+  504 bytes. Behavioral execution remains a separate open gate; see
+  `ANISH_SMALL_COMPILE.md`. The original false PASS is retained as invalid.
+
 ## ANISH-FAB-8: Flat tile mapping blocked by programmable feedback
 - **Date:** 2026-09-28 · **Status:** physical-flow integration open.
 - Initial probe omitted MUX8LUT_frame_config_mux.v; hierarchy checking caught
@@ -107,6 +129,10 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - The new preflight retains both variants and fails the gate visibly.
   Next investigate the pinned tile hardening method and configuration-aware
   checks. See `ANISH_PHYSICAL_PREFLIGHT.md`; no blanket waiver was added.
+- Follow-up `ANISH_TILE_MAPPING.md`: the tile maps with storage preserved,
+  but zero hierarchy/mapped check counts hide the programmable feedback.
+  Expanding Liberty functions exposes loops again. The new measurement
+  records every stage; physical/timing/release gates remain open.
 
 ## 1: Template gate-level source list omits the flip-flop UDPs
 - **Date:** 2026-09-25

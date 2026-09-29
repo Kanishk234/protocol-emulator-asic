@@ -60,6 +60,10 @@ CMOS5L physical deck has not been established for this new experiment.
 
 ## Next experiment and acceptance
 
+Follow-up: [tile mapping and checker visibility](ANISH_TILE_MAPPING.md)
+establishes the stage-dependent check behavior and preserves all 616
+configuration latches in a mapped tile. It does not close the physical gate.
+
 1. Inspect the pinned FABulous tile hardening method for explicit mux
    boundaries and configuration-dependent feedback handling. Separate
    legitimate programmable arcs from undriven/multiple-driver errors;

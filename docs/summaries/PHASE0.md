@@ -1,5 +1,11 @@
 # Phase 0 — in progress
 
+Latest small-grid result: a real compiled counter loads through the word
+port and passes 1,074 independent pin checks in RTL and with both LUT tiles
+mapped to CMOS5L cells. See [cold-load evidence](../reports/ANISH_SMALL_COLD.md).
+Loader and I/O are still RTL in that mixed-level test; safe small-grid reload
+and chip physical fit remain unproven.
+
 The goal is to prove both the ASIC build flow and the FPGA programming flow
 work before committing to a custom fabric.
 
@@ -39,6 +45,12 @@ unused serial configuration frontends and now also passes all nine selected
 reload/rejection/recovery scenarios on the live reference fabric with byte
 CRC. This extends the earlier bounded mapped cost evidence; full-fabric
 gate-level checks, arbitrary-image isolation and physical fit remain open.
+The [complete reference tile mapping](../reports/ANISH_TILE_MAPPING.md)
+retains all 616 configuration latches and passes 5,202 mapped storage checks.
+It also demonstrates that clean hierarchy or mapped-cell check counts can
+hide programmable feedback: expanding cell functions exposes loops again.
+Physical/timing validation and a small mapped fabric running user logic
+remain necessary before replacing the placeholder chip top.
 See the [candidate results](../reports/ANISH_RELOAD_EXPERIMENTS.md), the
 [evidence report](../reports/ANISH_REFERENCE.md) and
 [repair plan](../reports/ANISH_RELOAD_PLAN.md).

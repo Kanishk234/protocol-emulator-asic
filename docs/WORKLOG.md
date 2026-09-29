@@ -4,6 +4,90 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-29 (resumed: small mapped user-circuit execution)
+- User resumed work; hourly automation remains deleted. Usage checked at
+  0%, 8% and 12% five-hour, below the retained 50% ceiling. No credit action.
+- Reused cached small grid and tile netlist; no competing CAD jobs found.
+  Added public-port cold-load runner and an independent arithmetic oracle.
+- Icarus 13 runs `warp-small-cold.ResnzZRo` (RTL) and `.8oi2sd91`
+  (both LUT tiles mapped) each pass 1,074 checks and reject the deliberate
+  wrong-result control at check zero. Header, 40 addresses and footer audited.
+- Initial test expected the wrong external enable polarity; FAB-10 records
+  the correction. Pin numbering was correct; no generated RTL was changed.
+- Report: `docs/reports/ANISH_SMALL_COLD.md`. No phase boxes ticked:
+  this is cold-load mixed-level behavior, not chip gate-level/timing signoff.
+- Validation: 23 existing Python regressions, all three experiment runner
+  syntax checks, and whitespace checks pass. First pytest invocation used
+  an incorrect audit-test path and ran no tests; corrected invocation passed.
+- Next adapt small-grid hold/validator geometry, require distinct-image
+  reload and recovery, then map the remaining loader/I/O before physical work.
+
+
+## 2026-09-29 01:13 UTC (heartbeat: small counter compilation)
+- Usage 20% five-hour / 3% weekly at start, 40% during diagnosis, 52% after
+  the corrected run. Stopped technical work then; only checkpoint recording
+  followed. No reset credits were invoked by this run. No active jobs found.
+- Generated a two-column/two-row reference-derived fabric with 16 LUT4
+  sites and four I/O pins. The first run falsely accepted an empty image
+  because custom wrapper ports were unconnected; FAB-9 records the cause.
+- Corrected runner explicitly connects I/O and rejects empty compilation.
+  `warp-small-compile.khvqjtBG` compiles a two-bit reset/enable counter to
+  four logic cells, 70 FASM features and 504 bytes. Inputs/logs/hash retained;
+  source and result are documented in ANISH-D10 / ANISH_SMALL_COMPILE.md.
+- No phase boxes ticked. No live-loading, mapped-execution or physical
+  result is claimed. Existing local work preserved; no commit or push.
+- Next reuse this cached project for a cold-load pin-level RTL oracle,
+  then adapt geometry/hold/loader validation and execute it on mapped logic.
+
+## 2026-09-28 23:11 UTC (heartbeat: small-fabric integration audit)
+- Started at 40% five-hour / 66% weekly. Chose a bounded source/interface
+  audit to preserve headroom under the 50% ceiling; no synthesis/P&R jobs
+  launched and no active jobs found. Preserved previous local changes.
+- Verified the reference's 14-row/10-column/84-LUT-tile geometry, both
+  12,024-byte image lengths and exact mapped tile port preservation.
+  Evidence: `build/small-fabric-integration-audit-20260928.json`.
+- Recorded concrete generator, hold patch, validator, decoder, loader and
+  testbench dependencies in `ANISH_SMALL_FABRIC_INTEGRATION.md`. The new
+  fabric requires its own geometry and architecture identity; cropping the
+  old image or weakening validation is not an integration path.
+- No phase boxes ticked, no RTL/physical result added, no commit/push or
+  credit use. Next generate the smallest practical connected fabric that
+  compiles a small counter, then adapt and test its real loading path.
+
+## 2026-09-28 22:11 UTC (heartbeat: full tile mapping and storage)
+**Done:**
+- Capacity reset: 0% five-hour / 60% weekly at start, 36%/65% after
+  validation. Clean starting tree at c56ce58; no competing jobs or reset
+  credits used. Reused cached reference/PDK/simulator inputs.
+- Inspected pinned upstream tile/plugin/LibreLane sources. The tile flow
+  disables STA; its synthesis metric uses a pre-flatten report. The new
+  local experiment demonstrates why a clean stage count is not a feedback
+  proof. Source snapshots and hashes retained in ignored build evidence.
+- `warp-tile-mapping.sOBN3KHk`: stock/held complete reference tiles map to
+  35,904.2166 / 36,173.3904 µm² of cells. Each retains all 616 dynamic
+  configuration latches and distinct variable configuration nets.
+- Check counts for hierarchy/generic/mapped/expanded-cell stages are
+  0/184/0/143 stock and 0/189/0/173 held. Every warning is a logic loop;
+  non-loop warnings fail the new measurement. Original strict preflight
+  remains unchanged. No production check or timing exception was added.
+- Held mapped tile storage passes 2,620 frame vectors / 5,202 full-bank
+  comparisons using an independent CSV decoder. Tests cover open-gate
+  transparency, closed-gate retention, both bit polarities and padding.
+  Wrong-expected control fails at vector 19 as intended. Seven mapping
+  audit regressions, script syntax, Python compile and whitespace checks pass.
+- Added ANISH-D9 and `ANISH_TILE_MAPPING.md`; updated FAB-8 and phase-0
+  summary. All jobs completed; changes remain local, no push or history edit.
+
+**Boxes ticked:** none. This is cell mapping and an internal read-only
+  storage witness with hold asserted. No compiled user circuit is exercised
+  on the mapped tile, and no full-chip area, physical fit or timing is proven.
+  The production Tiny Tapeout top still contains the placeholder.
+
+**Next:** build a small stitched fabric with actual loader/edge connections,
+  load a compiled design into mapped logic, and test public behavior across
+  hold release. Establish configuration-aware timing and the complete
+  CMOS5L physical environment before treating tile layout as chip signoff.
+
 ## 2026-09-28 (user: prioritize competitiveness, stop near 50%, push)
 - User authorized pushing this checkpoint and requested a 50% usage stop;
   interpreted explicitly as five-hour usage. Readings were 30%, 37%, 47%

@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-29 (session 25: test 5 × 3 physical stitch prerequisite)
+**Done:**
+- Attempted the full clock-protected 5 × 3 candidate fabric stitch using the pinned CMOS5L FABulous/LibreLane 3.0 flow. FABulous generated the fabric and bitstream specification, but the stitch stopped before floorplanning because `PRIM2T2S.lef` was missing from the scratch tile library.
+- Re-ran CMOS5L hardening for `PRIM2T2S` in that library (`RUN_2026-09-29_12-08-16`). Synthesis completed at 33,961.2 µm²; the configured post-global-placement repair step inserted buffering, then detailed placement failed (`DPL-0036`, 1,259 instances). No LEF/GDS was produced. This independently reproduces the known D-031 limitation: the primitive tile has insufficient placement margin for repair in its current footprint.
+- The proposed 5 × 3 architecture therefore has no complete set of physical tile views and cannot yet be stitched. No tracked architecture or RTL was changed; G1 and held-out data remain untouched. Scratch outputs are under ignored `build/`.
+**Boxes ticked:** the 5 × 3 flow prerequisite was tested and failed with a concrete physical placement error; no physical-fit claim or checklist box added.
+**Next:** either reduce the primitive tile's repair/buffering demand or change its footprint/resource mix, then harden every tile class and rerun the full-fabric stitch. Keep the 5 × 3 candidate unpromoted until then.
+
 ## 2026-09-29 (session 24: remove the orphan lane in a scratch candidate)
 **Done:**
 - Confirmed `clock_protected.csv` is a PIP removal list, not a retained-PIP list. The two `J2END_GH_BEG3` inputs, `N2END1` and `E1END3`, remain legal candidate arcs; my initial interpretation was backwards and is discarded.

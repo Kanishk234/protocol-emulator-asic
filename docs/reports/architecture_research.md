@@ -79,6 +79,14 @@ This run also changes how to rank the event-lane spike. The proposed tile bounda
 
 The highest-confidence direction is **make the spatial fabric denser and better connected**. Keep the shared-image event-lane spike as a control. Advance a hybrid only after adding a backpressured stream interface and proving a user-defined fabric transform between independently timed pins. This is a hypothesis to evaluate against G1 and against published PRISM/PIO/CPU architectures, not a selected replacement.
 
+## 5 × 3 physical stitch attempt (2026-09-29)
+
+I launched the clock-protected 5 × 3 candidate through the pinned CMOS5L FABulous/LibreLane 3.0 fabric flow in an ignored build directory. FABulous successfully read the architecture and generated the bitstream specification, but the stitch stopped before floorplanning because the scratch tile library did not contain the hardened `PRIM2T2S.lef`. The LUT tile's physical views existed; the remaining tile types had no exported physical views in this candidate library.
+
+To satisfy that prerequisite, I reran `PRIM2T2S` hardening in `build/tile_cmos5l/fabulous-tiles`; run `RUN_2026-09-29_12-08-16` synthesized 33,961.2 µm² of standard cells and reached the configured post-global-placement repair step. Repair inserted buffers, but detailed placement failed with `DPL-0036` on 1,259 instances. No LEF or GDS was produced, so the fabric stitch remains blocked. This repeats the physical constraint already recorded in D-031: repairing high-fanout primitive control nets does not fit the current tile footprint. It does not establish whether a redesigned primitive tile or a 5 × 3 fabric can fit.
+
+All outputs are scratch build artifacts; the tracked architecture and G1 macro were not changed. The next useful physical experiment must reduce primitive control fanout/repair demand or revise the primitive resource mix and then produce physical views for every tile class before the full fabric flow can answer the area/congestion question.
+
 ## Evidence boundaries
 
 1. The contest brief is dynamic; treat 6 × 4 as the target until its official page says otherwise.

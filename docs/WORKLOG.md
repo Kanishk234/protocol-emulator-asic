@@ -41,6 +41,28 @@ Next:
 
 ---
 
+## 2026-09-29: Codex (phase 2: verify R4 density experiment launch)
+Done:
+- Verified the user's pushes: `main` is at `ca61a1d` (`docs: approve R4 floor experiment`) and `spike/r4-floorplan` is at `0f50678` (`physical: test R4 placement density at 56`). Both local worktrees matched their origin branches before this worklog entry.
+- Confirmed the main commit contains only `docs/DECISIONS.md`, `docs/WORKLOG.md`, and `docs/reports/R4_FLOORPLAN.md`; the R4 commit contains only `src/config.json`.
+- Confirmed the intended R4 `gds` run started and its `Build GDS` step is running. R4 `docs` and `lint` have passed; R4 `unit` and `test` are still running. Main `docs`, `lint`, and `test` passed; main `unit` is still running.
+
+Evidence:
+- R4: GDS 36605194167, unit 36605194238, test 36605194188, lint 36605194253, docs 36605194365.
+- Main: unit 36605092488; test 36605092410; lint 36605092385; docs 36605092402.
+- `git status` confirmed both branches are clean after the pushes; `git diff --check` passed before this log update.
+
+Checklist boxes ticked:
+- None. The hardening is still running; no signoff or phase exit evidence yet.
+
+Problems / decisions:
+- R4 GDS has only just entered `Build GDS`; no placement, routing, timing, or signoff result is available yet.
+
+Next:
+- Monitor R4 GDS 36605194167 through global routing, detailed routing and signoff; report the measured overflow and timing before considering another change.
+
+---
+
 ## 2026-09-29: Codex (phase 2: approve and prepare R4 density experiment)
 Done:
 - Recorded the requester's approval of the D-049 per-protocol resource floor, D-056's 0.10 ns hold setting for the branch experiment only, D-066's decision to retain live pin reconfiguration and time the latch paths, and D-067's 56% density experiment.

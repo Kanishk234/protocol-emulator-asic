@@ -4,6 +4,37 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-09-29 (post-route functional validation and path witness)
+- Started at 17% five-hour / 26% weekly. Reused downloaded CI artifacts;
+  no new synthesis, hardening, tool installation or reset credits.
+- Extended the local TT test runner to accept a physical netlist, hash
+  its inputs, separate RTL/GL outputs and reject stale/missing test results.
+- Actual final netlist from CI 36603402850 passes public-port load/run,
+  invalid-image rejection, recovery and deselection: 256 counter checks,
+  4,692 clocks. No SDF or 50 MHz claim; CI GDS remains failed.
+- Traced the worst typical-corner path through _4259_ and _4269_. Counter
+  image frame bits block that specific path. This is not a blanket timing
+  exemption or an arbitrary-image safety result. Report:
+  `docs/reports/ANISH_POSTROUTE_DIAGNOSIS.md`.
+- No phase boxes closed or production timing constraints changed. Next
+  generate audited configuration-aware STA and separate load-mode checks.
+
+
+## 2026-09-29 (resumed: physical failure artifact inspection)
+- Usage reset verified at 2% used / 24% weekly; no reset-credit action.
+- Downloaded GDS_logs from run 36603402850 into ignored
+  `build/ci-36603402850`; reuse this cache for subsequent diagnosis.
+- Typical-corner post-route checks report a path from uio_in[3] to
+  uio_out[2] with -93.720856 ns slack. The report spans the programmable
+  fabric; do not infer a specific RTL repair or apply false paths from this
+  endpoint summary alone. Configuration-aware path analysis remains needed.
+- No RTL changed or new signoff claimed. Suggested user-owned task is a
+  second small reset/enable user circuit for distinct-image reload testing;
+  agent focus remains timing and integration, avoiding overlapping edits.
+- Next trace mapped path cells and distinguish feasible configured paths
+  from unrestricted fabric paths before changing architecture/constraints.
+
+
 ## 2026-09-29 (user-authorized TT integration)
 - Replaced the adder with the 16-LUT fabric, hold/validator/guard and byte
   host. Updated generated-source provenance, source lists, actual pinout,

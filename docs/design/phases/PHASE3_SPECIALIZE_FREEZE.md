@@ -1,5 +1,7 @@
 # Phase 3: Specialize, compare, hardware freeze
 
+**Reopened for successor architecture exploration by D-037 (2026-09-28).** The completed G1 checklist below records the first architecture decision and remains the baseline evidence. G1 and the `hw-freeze` tag remain intact while separate successor candidates are explored under `docs/design/ARCHITECTURE_EXPLORATION.md`.
+
 **Dates:** Nov 16 – Dec 6, 2026
 **Goal:** turn the generic fabric into a protocol-specialized one, one measured change at a time, and freeze the hardware on the best variant the data supports.
 

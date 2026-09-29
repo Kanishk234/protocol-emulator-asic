@@ -2,6 +2,15 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-09-28 (session 17: validate clock-protected switch pruning)
+**Done:**
+- Corrected the session 15 routing claim: its identical-FASM check used a stale nominal-corner PIPs file, so it did not prove routing through the pruned graph.
+- Regenerated candidate full-fabric routing models from the candidate FABulous configuration. UART, SPI-controller and I2C-controller all place/route and generate valid bitstreams on the 4 × 3 313-choice-pruned screen and the 5 × 3 screen when six global clock/reset/enable PIPs are preserved (307 removals per LUT tile). Independent word and frame checks pass (722 words for 4 × 3, 842 for 5 × 3). The aggressive 5 × 3 candidate fails SPI routing at the global-clock connection.
+- Re-hardened the clock-protected tile at 190.40 × 199.08 µm. It synthesizes to 29,820.5 µm² / 1,580 cells, places at 88.8% utilization, completes the pinned tile flow, and has a clear KLayout DRC result. The aggressive candidate was 29,824.2 µm² / 1,595 cells at the same utilization.
+- Candidate nextpnr timing uses placeholder PIP delays and its Fmax is invalid. No dynamic fabric simulation or full-shell integration has been performed; G1 and held-out set remain untouched.
+**Boxes ticked:** none; this is a stronger scratch candidate, not a validated successor architecture.
+**Next:** promote the 307-choice clock-protected route screen into a reproducible script/manifest workflow, then obtain realistic timing PIPs and dynamic bitstream-load evidence before any whole-fabric physical stitch attempt.
+
 ## 2026-09-28 (session 16: make pruning screen reproducible)
 **Done:**
 - Added `spikes/route_prune/removed_pips.csv` as the exact 313-choice manifest for the measured route-pruning candidate, plus a scratch-only script that applies it to every FABULOUS_LC tile and rejects removal of any selected FASM choice at those sites.
@@ -13,7 +22,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 ## 2026-09-28 (session 15: physically measure route-option pruning)
 **Done:**
 - Kept G1 frozen and all edits inside ignored `build/` scratch copies while testing a fabric-native switch-matrix reduction.
-- Removed 313 of 1,272 local switch options per LUT tile (24.6%) based on routes present in the current UART, SPI-controller and I2C-controller design set. Recompiled all three against the candidate architecture; each FASM output was byte-identical to its G1 design-set counterpart.
+- Removed 313 of 1,272 local switch options per LUT tile (24.6%) based on routes present in the current UART, SPI-controller and I2C-controller design set. The initial compiler run appeared to produce byte-identical FASM, but it used stale nominal-corner PIPs and was invalid as route-preservation evidence; see session 17 correction.
 - Regenerated the LUT tile's scratch configuration-memory map after removing stale generated mapping data. At the 190.40 × 199.08 µm fifth-column target, synthesis area fell 14.4% (34,831.7 → 29,824.2 µm²; 1,825 → 1,595 cells). The pruned tile completed placement at 88.8% utilization and the tile flow through KLayout DRC; the unpruned tile failed placement at 106.507%.
 - Tried the remaining I2C-target design-set workload in both candidate and baseline architectures. It exceeds the current 88-LC logic capacity in both, so it cannot establish a routing regression or win.
 - Recorded run paths, metrics and limits in `docs/reports/architecture_research.md`. No held-out protocols were inspected, no G1 architecture or macro changed, and the reduced tile's complete bitstream/configuration integration remains unvalidated.

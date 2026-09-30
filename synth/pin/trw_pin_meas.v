@@ -61,15 +61,17 @@ module trw_pin_meas #(
     input  wire        clr_overrun
 );
     wire [`TRW_PC_BITS-1:0] cfg;
-    wire restart, free, load;
+    wire restart, free, load, carrier_active;
     wire [1:0]  tag;
     wire [15:0] data;
 
     trw_pin_cfg #(.FULL (FULL)) u_cfg (
-        .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg), .restart (restart)
+        .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg),
+        .carrier_active (carrier_active), .restart (restart)
     );
     trw_pin_unit #(.FULL (FULL), .FRAC (FRAC)) u_unit (
-        .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
+        .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg),
+        .carrier_active (carrier_active), .pads (pads),
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .rx_free (free), .rx_load (load), .rx_tag (tag), .rx_data (data),
         .a_out (a_out), .a_oe (a_oe), .n_out (n_out), .n_oe (n_oe),

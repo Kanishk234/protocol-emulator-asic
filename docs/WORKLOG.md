@@ -19,6 +19,24 @@ Next:
 - ...
 ```
 
+## 2026-09-30: Codex (phase 2: check OpenROAD thread experiment result)
+Done:
+- Checked workflow run 36759109179. Candidate validation passed, but the full LibreLane hardening step failed after about 3 h 47 min; the always-run log/artifact upload step succeeded.
+- Tried retrieving the job log and artifact for diagnosis. GitHub's API/log endpoints began returning connection errors from this environment before the detailed failure could be inspected.
+- No hardware inputs changed. No Phase 2 checklist box was ticked.
+
+Evidence:
+- Run 36759109179: https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36759109179 (hardening step failed; artifact upload succeeded).
+
+Checklist boxes ticked (evidence):
+- None. GDS signoff has not passed.
+
+Problems / decisions:
+- The failure cause is not yet established from the detailed hardening log. Do not infer a routing or timing cause from the job-level failure alone.
+
+Next:
+- Retrieve and inspect the uploaded artifact and hardening log when GitHub's API is reachable; identify the failing physical-design stage before choosing another experiment.
+
 ## 2026-09-30: Codex (phase 2: dispatch explicit OpenROAD thread experiment)
 Done:
 - Set the GitHub CLI default repository to `Kanishk234/protocol-emulator-asic` after the initial dispatch failed because no default repo was selected.

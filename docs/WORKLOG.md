@@ -19,6 +19,50 @@ Next:
 - ...
 ```
 
+## 2026-09-29: Codex (phase 2: prototype carrier predicate cache)
+Done:
+- Prototyped a cached one-bit carrier-active predicate in the isolated R4 worktree at baseline `0f506785e97d6c225b138181431e56fde7854aa2`. The derived latch updates in the same gated high phase as the carrier config words; TX uses it instead of recomputing `carrier[23:9] != 0`.
+- Added a focused pin test for independent writes to both carrier words, including writes after activation. Updated the pin measurement harness and corrected the configuration timing comments to match D-066.
+- Kept this as an experiment only. No main RTL, config, counts, info.yaml, macro, GDS workflow input, or model file changed; no hardening run was started.
+
+Evidence:
+- Verilator `-Wall` lint passed for the pin unit and `trw_pin_cfg` in FULL=0/1 and latch/flop configurations.
+- Full candidate top-level Verilator `-Wall` lint passed across all 22 RTL modules.
+- `source /home/younix/protocol-emulator-asic/.venv/bin/activate && make -C /tmp/r4-bitsync-work/test_internal/pin SRC_DIR=/tmp/r4-bitsync-work/src SIM=icarus FULL=1`: **60 passed**. FULL=0: **60 passed**. The added `test_carrier_active_tracks_both_config_words` passed.
+- L2 smoke: 128 compared clocks, zero divergences. L2 full run: **1,000,000 compared clocks, zero divergences** (`RTL_REV=0f506785e97d6c225b138181431e56fde7854aa2-carrier-cache`).
+- L2-INJECT against the modified candidate: clean RX and cursor baselines passed; priority-flip detected at clock 99; cursor off-by-one detected at clock 326.
+- `synth/pin/run_pin.sh 20` mapped comparison against an archived baseline: full-unit measurement area rose 90,985 → 91,244 µm² (+259 µm²); local worst slow-corner path improved 16.273 → 14.937 ns (−1.336 ns). This is a pin-block estimate, not a full-chip routed result.
+
+Checklist boxes ticked (evidence):
+- None. The physical Phase 2 gate still needs a full hardening with timing, congestion, DRC/precheck, gate-level tests, and viewer evidence.
+
+Problems / decisions:
+- The cache appears worth a physical measurement: local timing improves with a small area increase and protocol tests remain green. The full-chip slow path may still be limited by the downstream pad/RX/fabric chain; only routing can confirm the gain.
+- Candidate modifications are in `/tmp/r4-bitsync-work` and are not committed or pushed. The main checkout remains unchanged except this work-log entry.
+- User selected this as the next hardening candidate. A live GitHub workflow check was attempted, but `gh` could not connect to `api.github.com`; verify no GDS hardening is active before pushing, since a push that changes RTL cancels it.
+
+Next:
+- After confirming no hardening is active, commit the R4 RTL, test, and measurement-harness groups and push `spike/r4-floorplan` for one hardening run. Keep the clock at 20 ns, density at 56%, and all protocol resources unchanged; judge the result by global-route overflow and timing as well as the remaining signoff gates.
+
+## 2026-09-29: Codex (phase 2: assess additional physical levers)
+Done:
+- Re-read the failed R4 slow-corner path and global-route report before the next hardening. The carrier reduction is only the first part of the path; the path then crosses multiple logic stages and a high-fanout repair-buffer tree before L1.I1's tap-drop counter.
+- Identified two behavior-preserving RTL candidates for later measurement: replace the procedural selected-source loop in `trw_chan_port` with a balanced, explicit source mux, and optimize the saturating drop-counter next-state logic while preserving its same-cycle count and host-visible value.
+- Identified two separate physical-flow experiments: test the router's suggested 16% layer adjustment as a diagnostic, and test a macro placement change only if a congestion map shows the SRAM blockage overlaps the hot region. Neither is approved by D-067, so each needs its own decision and single-variable run.
+
+Evidence:
+- Run 36605194167 slow `max.rpt`: carrier config bit 10 reaches the L1.I1 drop-counter D pin at 34.181 ns (slow WNS −13.037 ns). The path crosses an OpenROAD fanout buffer tree and additional fabric logic after the carrier decode.
+- Run 36605194167 global-route log: total overflow 1,090, including 1,050 on Metal3; router suggests layer adjustment 30% → 16%. The floorplan uses one 236.8 × 191.34 µm SRAM macro at (12, 40) with 882 reported blockages.
+- No additional RTL, config, flow, or count changes made in this brainstorm; no Phase 2 box ticked.
+
+Problems / decisions:
+- The carrier cache is worth a full-chip measurement. The prior slow-corner WNS was −13.037 ns; the 1.336 ns pin-block estimate uses a different, local timing model, so it cannot establish how much full-chip margin the cache recovers.
+- Layer adjustment changes routing capacity estimates and guides; it does not itself prove clean physical routing. Macro movement and all non-approved config changes need separate review.
+- No model-side work is needed; the proposed ideas preserve cycle semantics and need RTL/L2 checks if tested.
+
+Next:
+- Keep the carrier cache as the first single-change hardening candidate. If timing still fails, inspect the new full-chip critical path before selecting the fabric mux or counter as a follow-up change. Consider the routing-setting or macro-placement experiments separately if Metal3 overflow remains.
+
 ## 2026-09-29: Codex (phase 2: brainstorm protocol-preserving R4 options)
 Done:
 - Kept the 20 ns / 50 MHz target fixed. Reviewed the density-56 R4 result and the timed U0 `carrier[10]` → pad/RX/fabric → `dropped[26]` path; no RTL or flow settings were changed.
@@ -34,11 +78,11 @@ Checklist boxes ticked (evidence):
 - None.
 
 Problems / decisions:
-- `carrier_active` is only a hypothesis. It requires cycle-accurate tests for writes to both carrier word halves before and after activation, full pin tests, L2, and then routed timing/overflow measurement before retention.
-- No model-session work is currently needed. Existing model semantics already cover the legal live-reconfiguration behavior; revisit only if the RTL experiment exposes a semantic ambiguity.
+- `carrier_active` was only a hypothesis at that point. It required cycle-accurate tests for writes to both carrier word halves before and after activation, full pin tests, L2, and routed timing/overflow measurement.
+- No model-session work was needed. Existing model semantics already cover the legal live-reconfiguration behavior; revisit only if the RTL experiment exposes a semantic ambiguity.
 
 Next:
-- If authorized for an RTL experiment, prototype the derived carrier predicate in the isolated R4 worktree, prove update equivalence with focused tests, run pin suites and L2, then measure synthesis and route impact. Keep the main checkout, 20 ns target, protocol resources, and active GDS inputs unchanged until that evidence is reviewed.
+- Prototype the derived carrier predicate in the isolated R4 worktree and measure it as one hardware change. Keep main, the 20 ns target, protocol resources, and GDS inputs unchanged until that evidence is reviewed.
 
 ## 2026-09-29: Codex (phase 2: evaluate R4 timing-cone rewrites)
 Done:

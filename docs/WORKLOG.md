@@ -19,6 +19,73 @@ Next:
 - ...
 ```
 
+## 2026-09-30: Codex (phase 2: research next 20 ns / 6x4 experiments)
+Done:
+- Reviewed R4 route-pass costs, physical inputs, RTL critical cones, and upstream Tiny Tapeout / LibreLane / OpenROAD documentation and source. Candidate remains `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc`, 2 lanes / 4 pin units / U0 full, 20 ns, 56% placement target; this is the measured candidate, not approval of final hardware counts.
+- Found a concrete upstream thread-selection bug (#54): LibreLane 3.1.0.dev3 generates `openroad -threads None` because its fallback tests `str(None)` rather than the optional value. The archived route command confirms the argument; process statistics for the preceding run average about 100% CPU. OpenROAD source keeps its existing thread count for invalid input and initializes it to one. An explicit valid thread count is the first proposed experiment; its speedup and effect on physical results are unmeasured.
+- Audited the SRAM signal LEF rectangles against the archived DEF's Metal2 X tracks: all 47 logged off-grid warnings are reproduced among 108 signal pins. Sweeping X phase over one 0.48 um pitch on a 0.005 um grid only reduces misses to 45. The best geometric shift is +0.45 um, which has not been checked against the tightly constrained PDN. A simple X nudge is not a strong fix; consider a Y-position change only if physical hotspots implicate the macro.
+- Ranked follow-on experiments: increase early antenna-repair margin to reduce post-route repair passes; local cell-spacing or macro-Y changes guided by hotspots; cached configuration predicates using the existing word gate; balanced TX/RX arithmetic preserving every clock; synthesis strategy A/B; and a separate 30% to 18% global-routing capacity-adjustment diagnostic. Each is a hypothesis to test separately, not a demonstrated fix.
+
+Evidence:
+- R4 run 36656975727 raw log `/tmp/gh-cli-cache/run-log-36656975727-1790732994.zip`; archived prior run `/tmp/gds-36605194167-artifacts/GDS_logs/runs/wokwi/44-openroad-detailedrouting/COMMANDS`, process statistics, DEF and routing log.
+- LibreLane pinned source: <https://raw.githubusercontent.com/librelane/librelane/3.1.0.dev3/librelane/steps/openroad.py> (`OPENROAD_THREADS`, `get_command`, antenna margins and route snapshots).
+- OpenROAD thread fallback/default: <https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/src/OpenRoad.cc> and <https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/include/ord/OpenRoad.hh>.
+- Placement and routing references: <https://openroad.readthedocs.io/en/latest/main/src/gpl/README.html>, <https://openroad.readthedocs.io/en/latest/main/src/grt/README.html>, <https://openroad.readthedocs.io/en/latest/main/src/drt/README.html>.
+
+Checklist boxes ticked (evidence):
+- None. No RTL, config, macro, info or workflow input changed; no hardening was started.
+
+Problems / decisions:
+- Threading addresses tool runtime and does not establish clean DRC, post-route timing, or cause of the stubborn-tile search. Keep all signoff checks and the 20 ns constraints active.
+- `AGENTS.md` and `PHYSICAL_DESIGN_AND_CI.md` restrict project config edits to the clock, placement density and macro block. Persisting thread, antenna, padding or mapping settings requires an explicit exception to that rule; a local supported override / separate diagnostic workflow can evaluate them without editing template jobs.
+
+Next:
+- First reproduce valid thread selection and benchmark a route-stage replay with the pinned toolchain and preserved database, retaining DRC, antenna and timing reports. If runtime remains excessive, test early antenna repair next, then pick geometry or RTL work from retained hotspot/critical-path evidence. Any RTL candidate needs pin suites, million-clock L2 and both RTL injections before a single-change hardening.
+
+## 2026-09-30: Codex (phase 2: test one-hot C-pin select prototype)
+Done:
+- In disposable `/tmp/r4-padsel-opt`, changed only the C-pin pad lookup from a dynamic vector index to a 24-bit one-hot decode and masked reduction. The active R4 worktree stayed clean at `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc`.
+- Rebuilt the full-chip mapped netlist and ran matched pre-layout STA with configuration-latch paths timed under D-066. Against the carrier-cache candidate, worst typical slack regressed from +8.858 ns to +8.316 ns and worst slow-corner slack regressed from +2.717 ns to +2.045 ns. Mapped area fell only 45.25 µm² (390,666.74 to 390,621.50 µm²).
+- Rejected the prototype: the small area reduction does not compensate for the timing regression, and it was not promoted to protocol simulation or the hardening candidate. No RTL, config, info, macro, workflow input, or Phase 2 checklist box changed.
+
+Evidence:
+- Prototype STA: `/tmp/r4-padsel-opt/synth/chip/build/sta_typ_1p20V_25C_d066.txt`, `/tmp/r4-padsel-opt/synth/chip/build/sta_slow_1p08V_125C_d066.txt`.
+- Baseline matched STA: `/tmp/r4-candidate-cache/synth/chip/build/sta_typ_1p20V_25C_d066.txt`, `/tmp/r4-candidate-cache/synth/chip/build/sta_slow_1p08V_125C_d066.txt`.
+- Mapped area: `/tmp/r4-padsel-opt/synth/chip/build/stat_flat.txt` and `/tmp/r4-candidate-cache/synth/chip/build/stat_flat.txt`.
+
+Checklist boxes ticked (evidence):
+- None. Physical Phase 2 signoff remains open.
+
+Problems / decisions:
+- The one-hot C-pin lookup is not a useful timing or area improvement. As a synthesis-only prototype, it has no behavioral test evidence.
+
+Next:
+- Keep the active R4 candidate unchanged. Before spending another multi-hour hardening, find a change with measurable benefit to detailed-route runtime/congestion or obtain route-stage diagnostics from a run that preserves the relevant database and hotspot reports. Any RTL candidate must preserve protocol behavior and D-066 timing, then pass pin tests, million-clock L2, and both RTL injections before hardening.
+
+## 2026-09-30: Codex (phase 2: assess global-route adjustment experiment)
+Done:
+- Checked the run-366051 artifact and R4 config: the hardening used `GRT_ADJUSTMENT=0.30`; run 36656975727's router suggested 18% after 143 global-route overflows.
+- OpenROAD defines this adjustment as a reduction in the routing capacity assumed by global routing. Lowering 0.30 to 0.18 gives GRT a less conservative capacity estimate; it can reduce reported overflow while producing less-spread route guides, so it does not establish better detailed routability or physical capacity.
+- LibreLane exposes `GRT_ADJUSTMENT`, but the repository policy restricts `src/config.json` edits to the clock period, placement density, and SRAM macro block. The checked-in GDS workflow calls the Tiny Tapeout action without a route-setting override. No LibreLane, Nix, Docker, or Podman runner is installed here, and the available OpenROAD binary lacks runtime libraries needed to run a representative route.
+- No RTL, config, flow, info, macro, or workflow input changed. No GDS run was launched and no checklist box was ticked.
+
+Evidence:
+- Run artifact: `/tmp/gds-36605194167-artifacts/GDS_logs/runs/wokwi/39-openroad-globalrouting/_env.tcl` (`GRT_ADJUSTMENT=0.3`) and `openroad-globalrouting.log`.
+- Current route suggestion: GitHub Actions run 36656975727, raw job log `/tmp/gh-cli-cache/run-log-36656975727-1790732994.zip`.
+- OpenROAD global-routing adjustment semantics: <https://openroad.readthedocs.io/en/latest/main/src/grt/README.html>.
+- LibreLane configuration variable reference: <https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html>.
+- Workflow inputs: `.github/workflows/gds.yaml`; project config and workflow restrictions: `AGENTS.md` instructions supplied for this repository.
+
+Checklist boxes ticked (evidence):
+- None. Physical Phase 2 signoff remains open.
+
+Problems / decisions:
+- The 18% suggestion is a capacity-model diagnostic, not an established GDS fix. Testing it requires a supported local/temporary flow override or a separately approved project configuration change; neither is available in the current environment.
+- The current failed run did not retain an OpenROAD database, so its stubborn detailed-route tiles still cannot be localized.
+
+Next:
+- Keep R4 RTL, 56% density, 20 ns clock, and counts fixed. Do not spend another hardening on the 18% setting without a valid local experiment and team approval. Continue with an STA-grounded RTL experiment that preserves all protocols, or obtain a complete flow environment and test the route knob only as a separate measurement. Any successful hardening must finish detailed routing in under 4 h and complete the DRC/LVS/antenna, typical timing, precheck, and gate-level checks.
+
 ## 2026-09-30: Codex (phase 2: trace R4 full-chip timing path)
 Done:
 - Rebuilt pre-layout chip netlists from exact pre-cache `0f506785e97d6c225b138181431e56fde7854aa2` and carrier-cache `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc` source snapshots. Ran the same STA with every configuration-latch path timed under D-066.

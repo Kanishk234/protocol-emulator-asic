@@ -997,6 +997,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** no RTL area or protocol-capability change; one floorplan setting changes. Risk is placement failure if the target is too low, or worse setup from longer wires.
 - **Status:** approved by the requester for one branch-only measurement; ready for user-controlled push. Results do not authorize a main-branch switch or adoption of the hold setting.
 
+## D-068 (2026-09-30; proposed): test 58% placement density on the carrier-cache candidate
+- **Context:** run 36656975727 on the carrier-cache candidate `cfc41e1` at density 56 reduced global-route overflow to 143 (142 on Metal3), but detailed routing took about 5 h 9 min across three passes and the GDS job hit the six-hour limit. The pre-cache candidate at the same density, run 36605194167, had 1,090 global-route overflow and completed detailed routing in 2 h 21 min; its Magic DRC step took 47 min. The current candidate also had about 4.4% fewer detailed-route guides and 4.3% less detailed wirelength, yet needed many more router iterations, including expensive stubborn-tile iterations. This points to a difficult local route search rather than simply more total routing demand. The RTL cache change is associated with the run-to-run difference, but the missing current-run ODB/artifact means causality is not established.
+- **Initial proposal:** test 56% → 58% on `spike/r4-floorplan`, keeping the carrier-cache RTL, 2-lane/4-unit protocol-floor shape, U0 full, SDC, macro and all other settings fixed.
+- **Reassessment:** higher density packs cells more tightly and can worsen local routing congestion. The current evidence does not show that tighter placement will fix the detailed-route iteration cost; lower overflow, fewer guides and less wirelength coincided with a much longer route, so aggregate congestion metrics alone do not explain it. Hold the target at 56% while diagnosing the route-pass regression. Reconsider a density experiment only with a specific congestion-map or placement/timing hypothesis and team approval.
+- **Measurement requirements if later approved:** global-route overflow, detailed-route runtime, all-corner setup/hold, antenna/LVS/DRC, precheck, gate-level tests and viewer. The target is detailed routing below 4 h and the complete GDS job below 4 h.
+- **Cost:** no protocol feature, lane/unit count, clock target or ISA change.
+- **Status:** paused; no density change is approved. Do not change `src/config.json` or start this run. Any new physical experiment needs its own evidence-based proposal and the required approvals.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

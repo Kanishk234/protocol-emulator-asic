@@ -19,6 +19,62 @@ Next:
 - ...
 ```
 
+## 2026-09-30: Codex (phase 2: trace R4 full-chip timing path)
+Done:
+- Rebuilt pre-layout chip netlists from exact pre-cache `0f506785e97d6c225b138181431e56fde7854aa2` and carrier-cache `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc` source snapshots. Ran the same STA with every configuration-latch path timed under D-066.
+- The cache candidate improves matched pre-layout worst slow-corner arrival/slack from 17.648 ns / +1.719 ns to 16.792 ns / +2.717 ns. Typical arrival/slack improves from 11.385 ns / +8.164 ns to 10.756 ns / +8.858 ns. Mapped area changes from 391,017.2 to 390,666.7 µm². These ideal-clock estimates exclude routed wire parasitics and are not signoff timing.
+- Traced the candidate's worst path: U0 cached carrier-active latch → U0 output logic → `uo_out[7]` → U2 pin selection (`u_io.sel`) → U2 RX state `rt[23]`. This follows the intentional feedback in `trw_chip.v`: driven `uo_out` pads are included in `pads`, which every pin unit samples.
+- In a disposable `/tmp/r4-rt-opt` source copy, rewrote the RX timer update as one add of a selected precomputed step. The targeted U2 `rt[23]` path improved from 16.792 ns to 14.692 ns, but the overall worst slow path moved to U0 TX `eq[12]` and slack fell to +1.779 ns; mapped area rose by about 914 µm² from the cache candidate. Do not carry this variant into the hardening candidate based on this result.
+- The prototype passed the R4 candidate pin suite under Verilator (60/60, FULL=1) and a 128-clock L2 smoke comparison (zero divergences). This is exploratory evidence only, not million-clock or injection signoff.
+- Kept density at 56%, clock at 20 ns, and the R4 RTL/config inputs unchanged. No Phase 2 checklist box was ticked.
+
+Evidence:
+- Full-chip STA: `/tmp/r4-cache-baseline/synth/chip/build/sta_slow_1p08V_125C.txt`, `/tmp/r4-cache-baseline/synth/chip/build/sta_typ_1p20V_25C.txt`, `/tmp/r4-candidate-cache/synth/chip/build/sta_slow_1p08V_125C_d066.txt`, `/tmp/r4-candidate-cache/synth/chip/build/sta_typ_1p20V_25C_d066.txt`.
+- Disposable RX-timer prototype reports: `/tmp/r4-rt-opt/synth/chip/build/sta_slow_d066.txt`, `/tmp/r4-rt-opt/synth/chip/build/sta_slow_rt_target.txt`, and `/tmp/r4-rt-opt/synth/chip/build/stat_flat.txt`.
+- Source trace: `src/trw_chip.v`, `src/trw_pins.v`, `src/trw_pin_io.v`, `src/trw_pin_tx.v`; R4 candidate sources at `/tmp/r4-bitsync-work/src`. The rejected arithmetic variant is isolated at `/tmp/r4-rt-opt/src/trw_pin_rx.v`.
+
+Checklist boxes ticked (evidence):
+- None. Physical Phase 2 signoff remains open.
+
+Problems / decisions:
+- The cache improves the matched pre-layout timing estimate, but there is no post-route timing report or current OpenROAD database for run 36656975727. The report proves the logical feedback route, not the cause of the detailed-route runtime increase.
+- Breaking or registering the pad feedback path could change pin timing semantics. Any next RTL trial should preserve combinational pad behavior and use a disposable source copy first.
+- The first equivalent RX timer rewrite improves its target path but shifts the chip bottleneck and loses overall slack; it is not a viable next hardening change.
+
+Next:
+- Keep the active candidate and density 56% unchanged. Reject the RX timer rewrite for now. Inspect the newly exposed U0 TXMODE → `eq[12]` cone and look for a local simplification that does not increase area or worsen other critical paths. Any candidate must pass the full pin suite, million-clock L2, RTL injection checks, and matched chip synthesis/STA before proposing one new hardening change. Preserve the next run's OpenROAD database and detailed-route hotspot reports.
+
+## 2026-09-30: Codex (phase 2: diagnose R4 detailed-route runtime)
+Done:
+- Compared detailed-routing logs for carrier-cache run 36656975727 (`cfc41e1`, density 56) and the prior pre-cache run 36605194167 (`0f50678`, density 56).
+- Current run: first route pass took 3 h 11 min over 33 iterations; after 41 net / 44 pin antenna violations and 56 diode insertions, a second pass took 1 h 40 min over 28 iterations. A final pass took 3 min 46 sec. The log includes stubborn-tile iterations taking 22 min 29 sec, 32 min 3 sec, and 16 min 44 sec. Detailed routing ended with zero violations.
+- Prior run: first route pass took 1 h 47 min over 8 iterations; antenna repair (48 violations, 64 diodes) took 11 min 30 sec over 6 iterations; the last pass took 4 min 36 sec. It had higher global-route overflow (1,090 versus 143).
+- Route totals also ran against the intuitive congestion explanation: the cache run used about 292,056 guides and ended at 1,934,977 µm of detailed wire; the prior run used about 305,652 guides and ended at 2,021,692 µm. The cache run therefore had roughly 4.4% fewer guides and 4.3% less wire, but many more slow tile iterations.
+- The mapped synthesis netlist grew modestly: the final ABC standard-cell list is 22,180 cells versus 22,033 in the prior run (+147, about 0.7%); Yosys's reported chip area is 408,331 versus 407,717 µm² (+614 µm², about 0.15%). A small area delta does not rule out a difficult local routing topology.
+- The saved R4 pin-unit A/B reports isolate the cache's local effect with configuration paths timed (D-066): standalone full-unit worst arrival improved 16.273 → 14.937 ns (−1.336 ns), with the worst path moving from TXMODE word 0 bit 1 → `u_tx.eq[12]` to PERIOD word 4 bit 1 → `g_bs.u_bs.st_d[0]`. The wrapper area rose 90,985 → 91,244 µm² (+259 µm², about 0.28%) and gained one latch and one integrated clock gate. These are pre-layout pin-unit estimates, not full-chip routed timing.
+- The mapped cache predicate is local in the pin-unit netlist: its state output drives three logic loads and its update uses one added integrated clock gate. That gives no obvious high-fanout explanation for the whole-chip runtime increase; a small topology/placement shift or run-to-run routing variation remains possible.
+- The R4 RTL diff between the two candidates is the carrier-active cache in `trw_chip.v`, `trw_pin_cfg.v`, `trw_pin_tx.v`, and `trw_pin_unit.v`; both used density 56% and a 20 ns clock. This correlation identifies what changed, but without the current ODB/artifact it does not prove the cache caused the longer route search.
+- Revised D-068: hold density at 56%; the evidence does not support raising it to 58% to fix the iteration pattern. No RTL, config, macro, info, workflow, or protocol semantics changed.
+
+Evidence:
+- GitHub Actions run 36656975727, raw log `/tmp/gh-cli-cache/run-log-36656975727-1790732994.zip`, `3_gds.txt`.
+- Prior artifact `/tmp/gds-36605194167-artifacts/GDS_logs/runs/wokwi/44-openroad-detailedrouting/openroad-detailedrouting.log` and `runtime.txt`.
+- Prior synthesis log `/tmp/gds-36605194167-artifacts/GDS_logs/runs/wokwi/06-yosys-synthesis/yosys-synthesis.log`; current synthesized-cell and area counts are in the raw run log.
+- Pin-unit A/B summaries: `/tmp/r4-cache-baseline/synth/pin/build/summary.txt` and `/tmp/r4-bitsync-work/synth/pin/build/summary.txt`; the respective detailed slow-corner timed paths are in `sta_meas1_slow_1p08V_125C_cfg0.txt`.
+- `git diff 0f506785e97d6c225b138181431e56fde7854aa2..cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc -- src` identifies the only RTL changes between the two physical candidates.
+- `git diff --check` clean.
+
+Checklist boxes ticked (evidence):
+- None. Phase 2 physical signoff remains open.
+
+Problems / decisions:
+- The current hardening did finish detailed routing, but needed about 5 h 9 min for repeated stubborn-tile iterations and antenna repair; the 6 h job limit then stopped Magic DRC during setup. Higher density could worsen local congestion and is not supported as the next lever by this evidence.
+- Detailed-route iteration behavior is strongly associated with the cache candidate, but run-to-run causality is unproven because the current ODB and physical artifact were not retained.
+- The cache has measured local timing benefit, so reverting it solely to recover route runtime would trade away a quantified 1.336 ns pin-block gain without proving the full-chip routing regression is caused by the cache.
+
+Next:
+- Keep the cache, density 56%, clock 20 ns, and protocol-floor resources fixed while selecting the next experiment. The next hardening decision needs current full-chip timing evidence and a way to inspect the detailed-route hotspot; the pin-unit A/B does not establish chip-level setup margin. Do not treat the density-58 proposal as approved.
+
 ## 2026-09-29: Codex (phase 2: prototype carrier predicate cache)
 Done:
 - Prototyped a cached one-bit carrier-active predicate in the isolated R4 worktree at baseline `0f506785e97d6c225b138181431e56fde7854aa2`. The derived latch updates in the same gated high phase as the carrier config words; TX uses it instead of recomputing `carrier[23:9] != 0`.
@@ -48,21 +104,23 @@ Next:
 Done:
 - Retrieved the raw GitHub Actions job log for candidate `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc` (2 lanes, 4 pin units, U0 full). The GDS job was cancelled at 6 h 1 min; `precheck`, `gl_test`, and `viewer` were skipped.
 - The flow completed global routing with 143 overflow total (142 on Metal3, 1 on Metal4), compared with 1,090 on the previous density-56 run. It still reported congestion and suggested changing layer adjustment from 30% to 18%.
-- Detailed-route DRC checker reported clear and the flow reached the Magic DRC wrapper. Its last output shows GDS hierarchy import reaching 340,000 `uses`, followed by loading the full DRC style. The job was cancelled before the log shows `drc check` running or any Magic DRC count; no run artifacts were uploaded.
+- Detailed-route DRC checker reported clear and the flow reached post-PnR STA, which finished all three corners, then Magic DRC setup. Its last output shows GDS hierarchy import reaching 340,000 `uses`, followed by loading the full DRC style. The job was cancelled before the log shows `drc check` running or any Magic DRC count; no run artifacts were uploaded.
+- The detailed-routing step ran from 02:00:34 to 07:09:04 UTC (about 5 h 9 min), across three route passes. The first found 41 net / 44 pin antenna violations and inserted 56 diodes; the second found 2 / 2 and inserted 2 more; the last pass ended with zero detailed-route violations and zero antenna violations.
 
 Evidence:
 - GitHub Actions run 36656975727, raw job log for job 109703304444. The GDS job started at 2026-09-30 01:49:57 UTC and was cancelled at 07:51:01 UTC; the `Build GDS` action reports the operation was cancelled at 07:50:56 UTC.
-- Pre-route timing repair reported no setup violations, but no post-route timing sign-off report was produced. The run cannot establish final setup/hold, Magic/KLayout DRC, LVS, antenna, precheck, gate-level, or viewer status.
+- The archived prior candidate artifact for run 36605194167 (`/tmp/gds-36605194167-artifacts/GDS_logs`) reports detailed routing in 2 h 21 min and Magic DRC in 47 min, with about 345,000 GDS hierarchy `uses`. Its RTL was the pre-cache SHA `0f50678` at density 56; this run used the same density with the carrier-cache RTL. The current run's STA corners completed, but numeric timing metrics were not retained in its raw log or an artifact.
+- The run cannot establish final setup/hold, Magic/KLayout DRC, LVS, antenna sign-off, precheck, gate-level, or viewer status.
 
 Checklist boxes ticked (evidence):
 - None. The physical Phase 2 gate remains open.
 
 Problems / decisions:
-- Routing congestion improved substantially, but global routing still had overflow. The job exhausted the six-hour per-job limit during Magic DRC setup after spending most of the run in detailed routing and subsequent physical checks. The log does not prove whether the remaining time was spent importing/expanding the layout, loading the rule style, or entering the DRC scan.
+- Routing congestion improved substantially, but global routing still had overflow. The carrier-cache candidate's detailed routing took about 2 h 48 min longer than the pre-cache run at the same density, despite a lower global-route overflow. The run had two antenna-triggered detailed-route reruns. The Magic import count is similar to the prior completed run, so it is not currently the leading runtime hypothesis; the six-hour limit stopped the job during Magic DRC setup.
 - No RTL, configuration, flow setting, or protocol support was changed while diagnosing the log.
 
 Next:
-- Diagnose the detailed-route/Magic-DRC runtime bottleneck and determine a permitted single-variable way to complete sign-off within the job limit before starting another hardening.
+- D-068 proposes a single-variable density 56% → 58% measurement on the same carrier-cache candidate to test whether tighter placement reduces the detailed-route runtime. It is not approved yet; do not edit `src/config.json` or start another hardening until the requester and Kanishk approve. Preserve the 20 ns target and all protocol resources.
 
 ## 2026-09-29: Codex (phase 2: assess additional physical levers)
 Done:

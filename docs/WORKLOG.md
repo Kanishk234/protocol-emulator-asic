@@ -19,6 +19,24 @@ Next:
 - ...
 ```
 
+## 2026-09-30: Codex (phase 2: dispatch explicit OpenROAD thread experiment)
+Done:
+- Set the GitHub CLI default repository to `Kanishk234/protocol-emulator-asic` after the initial dispatch failed because no default repo was selected.
+- Dispatched `gds-thread-experiment.yaml` from `main` for `spike/r4-floorplan` with 4 OpenROAD threads. Candidate checkout and validation completed; full LibreLane hardening is running.
+- No RTL, config, info, macro or candidate hardware inputs changed. No Phase 2 checklist box was ticked.
+
+Evidence:
+- GitHub Actions run 36759109179: https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36759109179 (hardening step in progress at last check).
+
+Checklist boxes ticked (evidence):
+- None. The experiment has not completed; GDS signoff remains unproven.
+
+Problems / decisions:
+- The experiment evaluates explicit thread count and runtime/physical results only. It does not run the standard workflow's precheck, gate-level test or viewer jobs.
+
+Next:
+- Monitor run 36759109179; inspect uploaded routing and signoff artifacts after completion before deciding on another flow experiment.
+
 ## 2026-09-30: Codex (phase 2: prepare explicit OpenROAD thread experiment)
 Done:
 - Confirmed R4 run 36656975727 is completed/cancelled after the 6 h limit; no GDS workflow is currently running on `spike/r4-floorplan`.

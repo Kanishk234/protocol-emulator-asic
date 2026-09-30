@@ -14,8 +14,8 @@
 //     are transparent during the high phase of clock n+1, while the registered data is stable, and
 //     `cfg` shows the new value from the middle of clock n+1 (the pattern of trw_slots.v, R2).
 //   - `restart` is 1 in clock n+1 for any write to the block (the unit restarts at edge n+1).
-//   - Written only while the lanes are halted (§14 H1), so `cfg` is static while running: paths from
-//     it are false paths in the latch SDC exception (D-032).
+//   - Writes are legal while lanes are halted, including after activation. Pin units remain live, so
+//     configuration-to-state paths stay timed (D-066); the latch SDC exception does not cut them.
 //   - The latches have no reset: until the host writes a word, its bits are undefined (§14 H1).
 // TRW_PIN_CFG_FLOPS: a flop version with the same interface and timing (FPGA build, fallback).
 `default_nettype none
@@ -30,11 +30,66 @@ module trw_pin_cfg #(
     input  wire [4:0]              waddr,
     input  wire [15:0]             wdata,
     output wire [`TRW_PC_BITS-1:0] cfg,
+    output wire                    carrier_active,
     output reg                     restart
 );
     localparam NW = `TRW_PC_WORDS;
     localparam [`TRW_PC_BITS-1:0] OPT = `TRW_PC_MASK_PULSE | `TRW_PC_MASK_CARRIER | `TRW_PC_MASK_BITSYNC;
     localparam [`TRW_PC_BITS-1:0] STORE = `TRW_PC_MASK_CORE | ((FULL != 0) ? OPT : {`TRW_PC_BITS{1'b0}});
+    localparam integer CARRIER_WORD0 = `TRW_PC_CARRIER_LSB / 16;
+    localparam integer CARRIER_WORD1 = `TRW_PC_CARRIER_MSB / 16;
+
+    // Cache P-G25's carrier-enabled predicate beside the configuration latches. The high nine
+    // carrier fraction bits are ignored when deciding whether the period reaches two clocks.
+    // Carrier bits [15:9] are in word 13 bits [15:9]; bits [23:16] are in word 14 bits [7:0].
+    generate
+        if (FULL != 0) begin : g_carrier_active
+            wire carrier_write = (we && ((waddr == CARRIER_WORD0[4:0]) || (waddr == CARRIER_WORD1[4:0])));
+`ifndef TRW_PIN_CFG_FLOPS
+            wire carrier_active_next = (waddr == CARRIER_WORD0[4:0])
+                                     ? ((|wdata_q[15:9]) | (|cfg[`TRW_PC_CARRIER_MSB:`TRW_PC_CARRIER_LSB+16]))
+                                     : ((|cfg[`TRW_PC_CARRIER_LSB+15:`TRW_PC_CARRIER_LSB+9]) | (|wdata_q[7:0]));
+`endif
+`ifdef TRW_PIN_CFG_FLOPS
+            reg active_q;
+            always @(posedge clk) begin
+                if (!rst_n)
+                    active_q <= 1'b0;
+                else if (carrier_write)
+                    active_q <= (waddr == CARRIER_WORD0[4:0])
+                              ? ((|wdata[15:9]) | (|cfg[`TRW_PC_CARRIER_MSB:`TRW_PC_CARRIER_LSB+16]))
+                              : ((|cfg[`TRW_PC_CARRIER_LSB+15:`TRW_PC_CARRIER_LSB+9]) | (|wdata[7:0]));
+            end
+            assign carrier_active = active_q;
+`else
+            wire active_gclk;
+`ifdef SYNTHESIS
+            sg13cmos5l_lgcp_1 u_icg_active (
+                .GCLK (active_gclk), .CLK (clk), .GATE (carrier_write)
+            );
+`else
+            reg active_en_l;
+            /* verilator lint_off LATCH */
+            always @* begin
+                if (!clk)
+                    active_en_l = carrier_write;
+            end
+            /* verilator lint_on LATCH */
+            assign active_gclk = clk & active_en_l;
+`endif
+            reg active_q;
+            /* verilator lint_off LATCH */
+            always @* begin
+                if (active_gclk)
+                    active_q = carrier_active_next;
+            end
+            /* verilator lint_on LATCH */
+            assign carrier_active = active_q;
+`endif
+        end else begin : g_no_carrier_active
+            assign carrier_active = 1'b0;
+        end
+    endgenerate
 
     always @(posedge clk) begin
         if (!rst_n)

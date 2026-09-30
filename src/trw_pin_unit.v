@@ -7,8 +7,9 @@
 // which owns takes, pin A (pin N's SE0, OE with OE_AUTO) and loads while TXMODE and RXMODE are both `bitsync`.
 //
 // Timing contract:
-//   - `cfg` is static while running (written while halted, §14 H1). `restart` (clock after a write to
-//     the block) restarts every register of the unit, including the sticky flags (P-G15).
+//   - Writes require halted lanes (§14 H1), but pin units remain live after activation; a config write
+//     restarts every register of the unit, including sticky flags (P-G15), and config paths stay timed
+//     (D-066).
 //   - `pads`: see trw_pin_io.v. Outputs `a_*` and `n_*` are registered (the level/OE registers of the
 //     TX half) and gated combinationally by OD, C_OE (P15) and the registered "selected".
 //   - `live` = 0 holds the unit off the fabric: it takes and loads nothing (P-G16).
@@ -29,6 +30,7 @@ module trw_pin_unit #(
     input  wire                    restart,
     input  wire                    live,
     input  wire [`TRW_PC_BITS-1:0] cfg,
+    input  wire                    carrier_active,
     input  wire [23:0]             pads,
     // consumer port head (TX half)
     input  wire                    tx_avail,
@@ -127,6 +129,7 @@ module trw_pin_unit #(
         .stretch (stretch), .tx_edge (tx_edge), .period (period), .presc (presc), .nbits (nbits),
         .sym0_t1 (sym0_t1), .sym0_first (sym0_first), .sym0_t2 (sym0_t2),
         .sym1_t1 (sym1_t1), .sym1_first (sym1_first), .sym1_t2 (sym1_t2), .carrier (carrier),
+        .carrier_active (carrier_active),
         .a_in (a_in), .b_rise (b_rise), .b_fall (b_fall), .sel (sel), .sel_fall (sel_fall),
         .tx_avail (tx_avail && !bs_on), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (take_t),
         .lvl (lvl_t), .oe (oe), .echo (echo_t),

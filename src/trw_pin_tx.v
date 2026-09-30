@@ -57,6 +57,7 @@ module trw_pin_tx #(
     input  wire        sym1_first,
     input  wire [11:0] sym1_t2,
     input  wire [23:0] carrier,     // carrier period, 16.8 clocks (FULL; 0 = off)
+    input  wire        carrier_active, // cached P-G25 predicate from the configuration latch
     // pins
     input  wire        a_in,
     input  wire        b_rise,
@@ -146,7 +147,7 @@ module trw_pin_tx #(
     reg  [24:0] ct;          // carrier: 16.9 clocks from this clock to the next toggle
     reg         cph;         // carrier: in an off (IDLE) half
 
-    wire car_on = (FULL != 0) && (carrier[23:9] != 15'd0);           // P-G25: below 2 clocks = off
+    wire car_on = (FULL != 0) && carrier_active;                     // P-G25: below 2 clocks = off
     assign lvl = (lvx && !(car_on && cph)) ^ idle;
 
     // ------------------------------------------------------------------ the running shift / burst

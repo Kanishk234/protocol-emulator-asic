@@ -44,6 +44,26 @@ Problems / decisions:
 Next:
 - After confirming no hardening is active, commit the R4 RTL, test, and measurement-harness groups and push `spike/r4-floorplan` for one hardening run. Keep the clock at 20 ns, density at 56%, and all protocol resources unchanged; judge the result by global-route overflow and timing as well as the remaining signoff gates.
 
+## 2026-09-30: Codex (phase 2: inspect carrier-cache hardening timeout)
+Done:
+- Retrieved the raw GitHub Actions job log for candidate `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc` (2 lanes, 4 pin units, U0 full). The GDS job was cancelled at 6 h 1 min; `precheck`, `gl_test`, and `viewer` were skipped.
+- The flow completed global routing with 143 overflow total (142 on Metal3, 1 on Metal4), compared with 1,090 on the previous density-56 run. It still reported congestion and suggested changing layer adjustment from 30% to 18%.
+- Detailed-route DRC checker reported clear and the flow reached the Magic DRC wrapper. Its last output shows GDS hierarchy import reaching 340,000 `uses`, followed by loading the full DRC style. The job was cancelled before the log shows `drc check` running or any Magic DRC count; no run artifacts were uploaded.
+
+Evidence:
+- GitHub Actions run 36656975727, raw job log for job 109703304444. The GDS job started at 2026-09-30 01:49:57 UTC and was cancelled at 07:51:01 UTC; the `Build GDS` action reports the operation was cancelled at 07:50:56 UTC.
+- Pre-route timing repair reported no setup violations, but no post-route timing sign-off report was produced. The run cannot establish final setup/hold, Magic/KLayout DRC, LVS, antenna, precheck, gate-level, or viewer status.
+
+Checklist boxes ticked (evidence):
+- None. The physical Phase 2 gate remains open.
+
+Problems / decisions:
+- Routing congestion improved substantially, but global routing still had overflow. The job exhausted the six-hour per-job limit during Magic DRC setup after spending most of the run in detailed routing and subsequent physical checks. The log does not prove whether the remaining time was spent importing/expanding the layout, loading the rule style, or entering the DRC scan.
+- No RTL, configuration, flow setting, or protocol support was changed while diagnosing the log.
+
+Next:
+- Diagnose the detailed-route/Magic-DRC runtime bottleneck and determine a permitted single-variable way to complete sign-off within the job limit before starting another hardening.
+
 ## 2026-09-29: Codex (phase 2: assess additional physical levers)
 Done:
 - Re-read the failed R4 slow-corner path and global-route report before the next hardening. The carrier reduction is only the first part of the path; the path then crosses multiple logic stages and a high-fanout repair-buffer tree before L1.I1's tap-drop counter.

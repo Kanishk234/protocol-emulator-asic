@@ -1,0 +1,152 @@
+name: gds-thread-experiment
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_ref:
+        description: R4 branch containing the hardware candidate to test
+        required: true
+        type: choice
+        default: spike/r4-floorplan
+        options:
+          - spike/r4-floorplan
+      openroad_threads:
+        description: OpenROAD worker count for this one-variable R4 hardening experiment
+        required: true
+        type: choice
+        default: "4"
+        options:
+          - "2"
+          - "4"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gds-thread-experiment-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  harden:
+    name: R4 hardening with ${{ inputs.openroad_threads }} OpenROAD threads
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.candidate_ref }}
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check out Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: ihp-sg13cmos5l
+          path: tt
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tt/requirements.txt
+
+      - name: Install Tiny Tapeout prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+
+      - name: Install flow dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: Install IHP PDK
+        run: ./.tt-gds-action/install_sg13cmos5l.sh
+
+      - name: Install pinned LibreLane
+        run: pip install librelane==3.1.0.dev3
+
+      - name: Verify the R4 candidate and prepare its generated config
+        env:
+          CANDIDATE_REF: ${{ inputs.candidate_ref }}
+          OPENROAD_THREADS: ${{ inputs.openroad_threads }}
+        run: |
+          set -euo pipefail
+          expected_base=cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc
+          test "$CANDIDATE_REF" = "spike/r4-floorplan"
+          git cat-file -e "$expected_base^{commit}"
+          git diff --quiet "$expected_base" HEAD -- src info.yaml macro spec
+          python3 - <<'PY'
+          import json
+          import os
+          import pathlib
+          import subprocess
+
+          cfg = json.loads(pathlib.Path("src/config.json").read_text())
+          assert float(cfg["CLOCK_PERIOD"]) == 20.0, cfg["CLOCK_PERIOD"]
+          assert int(cfg["PL_TARGET_DENSITY_PCT"]) == 56, cfg["PL_TARGET_DENSITY_PCT"]
+
+          defs = pathlib.Path("src/trw_defs.vh").read_text().splitlines()
+          expected = {
+              "TRW_LANES": "2",
+              "TRW_UNITS": "4",
+              "TRW_PC_UNITS_PULSE": "4'b0001",
+              "TRW_PC_UNITS_CARRIER": "4'b0001",
+              "TRW_PC_UNITS_BITSYNC": "4'b0001",
+          }
+          for name, value in expected.items():
+              assert f"`define {name} {value}" in defs, name
+
+          threads = int(os.environ["OPENROAD_THREADS"])
+          visible_cpus = len(os.sched_getaffinity(0))
+          assert threads <= visible_cpus, (threads, visible_cpus)
+          print(f"Candidate HEAD: {subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}")
+          print("Hardware source matches cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc")
+          print("Counts: 2 lanes, 4 pin units; U0 full; clock 20 ns; density target 56%")
+          print(f"Thread experiment: {threads} OpenROAD threads; runner CPUs visible: {visible_cpus}")
+          PY
+          python tt/tt_tool.py --create-user-config --ihp
+
+      - name: Run full LibreLane hardening with explicit thread count
+        timeout-minutes: 330
+        env:
+          OPENROAD_THREADS: ${{ inputs.openroad_threads }}
+        run: |
+          set -euo pipefail
+          rm -rf runs/wokwi
+          mkdir -p runs/wokwi
+          python -m librelane \
+            --pdk-root "$PDK_ROOT" \
+            --docker-no-tty \
+            --dockerized \
+            --pdk-root "$PDK_ROOT" \
+            --pdk ihp-sg13cmos5l \
+            --manual-pdk \
+            --run-tag wokwi \
+            --force-run-dir runs/wokwi \
+            --hide-progress-bar \
+            --override-config "OPENROAD_THREADS=$OPENROAD_THREADS" \
+            src/config_merged.json
+
+      - name: Upload route and signoff logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-thread-${{ inputs.openroad_threads }}-${{ github.run_id }}
+          path: |
+            runs/wokwi/**
+            src/config_merged.json
+            src/user_config.json
+          if-no-files-found: warn

@@ -41,6 +41,7 @@ module tb_pin #(
     output wire        overrun,
     input  wire        clr_late,
     input  wire        clr_overrun,
+    output wire        carrier_active,
     output wire [23:0] line
 );
     initial begin
@@ -51,7 +52,8 @@ module tb_pin #(
     wire [`TRW_PC_BITS-1:0] cfg;
     wire restart;
     trw_pin_cfg #(.FULL (FULL)) u_cfg (
-        .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg), .restart (restart)
+        .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg),
+        .carrier_active (carrier_active), .restart (restart)
     );
 
     wire [4:0] pin_a = cfg[`TRW_PC_PIN_A_MSB:`TRW_PC_PIN_A_LSB];
@@ -92,7 +94,8 @@ module tb_pin #(
     end
 
     trw_pin_unit #(.FULL (FULL), .FRAC (FRAC)) u_unit (
-        .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
+        .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg),
+        .carrier_active (carrier_active), .pads (pads),
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .rx_free (free), .rx_load (rload), .rx_tag (rtag), .rx_data (rdata),
         .a_out (a_out), .a_oe (a_oe), .n_out (n_out), .n_oe (n_oe),

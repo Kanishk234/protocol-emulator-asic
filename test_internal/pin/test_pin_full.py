@@ -10,12 +10,42 @@ t + floor(k * CARRIER / 2), CARRIER in 1/256 clocks).
 import os
 
 import cocotb
+from cocotb.triggers import FallingEdge
 
 from pinlib import DATA, PAD, PinTb, ctrl, encode, enum, level, q8
 
 UO0 = PAD["uo0"]
 LVL, PULSE = enum("txmode", "level"), enum("txmode", "pulse")
 FULL = int(os.environ.get("FULL", "0"))
+
+
+@cocotb.test()
+async def test_carrier_active_tracks_both_config_words(dut):
+    """The cached P-G25 predicate follows both carrier words, including writes after activation."""
+    if not FULL:
+        return
+    tb = PinTb(dut)
+    await tb.start(encode(txmode=LVL, idle=0, pin_a=UO0, carrier=q8(10)))
+    assert int(dut.carrier_active.value) == 1
+
+    async def write_word(addr, value):
+        await FallingEdge(dut.clk)
+        dut.we.value, dut.waddr.value, dut.wdata.value = 1, addr, value
+        await FallingEdge(dut.clk)
+        dut.we.value = 0
+        for _ in range(2):
+            await FallingEdge(dut.clk)
+
+    # Word 14 contributes carrier[23:16]. Clearing it leaves active bits in word 13.
+    await write_word(14, 0)
+    assert int(dut.carrier_active.value) == 1
+    # Clearing word 13 now disables the carrier. A write to word 14 alone can enable it again.
+    await write_word(13, 0)
+    assert int(dut.carrier_active.value) == 0
+    await write_word(14, 1)
+    assert int(dut.carrier_active.value) == 1
+    await write_word(14, 0)
+    assert int(dut.carrier_active.value) == 0
 
 
 def waveform(actions, idle, since, until):

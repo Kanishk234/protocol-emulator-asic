@@ -19,6 +19,29 @@ Next:
 - ...
 ```
 
+## 2026-09-30: Codex (phase 2: prepare explicit OpenROAD thread experiment)
+Done:
+- Confirmed R4 run 36656975727 is completed/cancelled after the 6 h limit; no GDS workflow is currently running on `spike/r4-floorplan`.
+- Added `.github/workflows/gds-thread-experiment.yaml` on the default branch so GitHub can manually dispatch it. It checks out `spike/r4-floorplan`, rejects hardware changes from candidate `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc`, and verifies 2 lanes, 4 pin units, U0 full, 20 ns and 56% density.
+- The workflow tests 4 threads by default (2 is available for a later separate run) using LibreLane 3.1.0.dev3's per-run `--override-config`. It leaves `src/config.json` and the standard `gds.yaml` workflow untouched; its hardening step is capped at 330 minutes and an always-run upload preserves available logs before the 6 h job limit.
+- This targets the invalid `openroad -threads None` invocation seen in run 36656975727. The thread-count speedup and routing effect remain unmeasured.
+
+Evidence:
+- Current R4 workflow run 36656975727: `https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36656975727` (cancelled).
+- Prior route database and logs: `/tmp/gds-36605194167-artifacts/GDS_logs/runs/wokwi/44-openroad-detailedrouting/`.
+- LibreLane CLI override source: `https://raw.githubusercontent.com/librelane/librelane/3.1.0.dev3/librelane/flows/cli.py`.
+- YAML syntax parsed successfully with the project virtualenv; `git diff --check` is clean.
+
+Checklist boxes ticked (evidence):
+- None. The manual experiment has not run and does not itself run the standard workflow's precheck, gate-level test or viewer jobs.
+
+Problems / decisions:
+- Local route replay is unavailable: no OpenROAD binary is on `PATH`; the cached binary lacks Tcl, OR-Tools and Qt libraries, and the pinned PDK is not installed.
+- This full hardening experiment still has placement/routing variation. Compare overflow, detailed-route time, antenna repair, all-corner timing, and GDS signoff; a faster route by itself is not a pass.
+
+Next:
+- Commit and push this docs/workflow change on `main`, then dispatch `gds-thread-experiment` from `main` with candidate ref `spike/r4-floorplan` and 4 threads. Review its artifact before deciding whether to try 2 threads or request a supported persistent flow-setting exception.
+
 ## 2026-09-30: Codex (phase 2: research next 20 ns / 6x4 experiments)
 Done:
 - Reviewed R4 route-pass costs, physical inputs, RTL critical cones, and upstream Tiny Tapeout / LibreLane / OpenROAD documentation and source. Candidate remains `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc`, 2 lanes / 4 pin units / U0 full, 20 ns, 56% placement target; this is the measured candidate, not approval of final hardware counts.

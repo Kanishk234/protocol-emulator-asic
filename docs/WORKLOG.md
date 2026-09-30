@@ -19,6 +19,28 @@ Next:
 - ...
 ```
 
+## 2026-09-30: Codex (phase 2: review four-thread hardening artifact)
+Done:
+- Reviewed the 2 GB artifact for run 36759109179. The candidate check passed for 2 lanes, 4 pin units, U0 full, 20 ns, and 56% density; the generated OpenROAD environment confirms `OPENROAD_THREADS=4`.
+- The run generated final GDS and completed in about 3 h 48 min. Detailed routing took 2 h 44 min; final detailed-route DRC was 0, and antenna and LVS checks passed.
+- Global routing still reported 143 overflow (142 on Metal3, 1 on Metal4). Signoff failed: slow-corner setup WNS -15.684 ns with 1,271 setup violations; typical WNS -2.213 ns with 81; max-slew/max-cap checks reported violations. Magic reported 57,924 markers in SRAM-exception rule classes, KLayout DRC was skipped, and 10 illegal overlaps were reported.
+- The worst setup path is from U0's `carrier_active` latch to top-level `dropped[6]`, confirming this live reconfiguration path remains critical under D-066. Post-route summary also records two fast-corner hold paths at -4.6 ps, although the configured hold checker did not report a failure.
+- No RTL, config, info, macro, or hardware candidate changed; no Phase 2 checklist box was ticked.
+
+Evidence:
+- Run 36759109179: https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36759109179.
+- Artifact: `build/ci/r4/thread4/runs/wokwi/`; key reports are `39-openroad-globalrouting/openroad-globalrouting.log`, `44-openroad-detailedrouting/openroad-detailedrouting.log`, `55-openroad-stapostpnr/summary.rpt`, `62-magic-drc/reports/drc.magic.rpt`, and `warning.log`.
+
+Checklist boxes ticked (evidence):
+- None. Timing, congestion and complete DRC signoff remain unresolved.
+
+Problems / decisions:
+- The custom experiment stops after hardening and does not run the standard workflow's precheck, gate-level test or viewer jobs.
+- The Magic DRC report names only SRAM-exception rules, but KLayout DRC was skipped and illegal-overlap checks reported 10; do not claim clean merged-GDS DRC.
+
+Next:
+- Keep 20 ns and protocol behavior fixed. Use the critical `carrier_active`-to-`dropped` path and the slew/cap reports to guide one RTL optimization, then validate it with simulation, L2 lockstep and pre-route STA before another hardening.
+
 ## 2026-09-30: Codex (phase 2: check OpenROAD thread experiment result)
 Done:
 - Checked workflow run 36759109179. Candidate validation passed, but the full LibreLane hardening step failed after about 3 h 47 min; the always-run log/artifact upload step succeeded.

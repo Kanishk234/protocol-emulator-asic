@@ -19,6 +19,26 @@ Next:
 - ...
 ```
 
+## 2026-10-01: Codex (phase 2: prepare GRT congestion diagnostic)
+Done:
+- Added `.github/workflows/gds-congestion-diagnostic.yaml`, a manual run pinned to candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. It verifies 2 lanes, 4 pin units, U0 full, 20 ns and 56% density; LibreLane stops at `OpenROAD.GlobalRouting` and uploads that stage's report and artifacts.
+- Added `scripts/ci/openroad_congestion_wrapper.sh`. It leaves the original OpenROAD arguments and router settings intact, adding only `-congestion_report_file` when LibreLane invokes `grt.tcl`.
+- The workflow copies the helper into the candidate workspace before launching the containerized flow, so the OpenROAD process can execute it from the mounted project directory.
+- Updated the experiment report with the workflow and its limit: it recomputes stages before GRT, so placement may differ from run 36799356107; detailed routing and signoff are not part of this diagnostic.
+
+Checklist boxes ticked (evidence):
+- None. The diagnostic workflow has not been dispatched; no new physical result exists.
+
+Problems / decisions:
+- No RTL, `src/config.json`, `info.yaml`, macro, clock, density, resource count, or GRT setting was changed. The workflow only adds an output report and stops before detailed routing.
+
+Evidence:
+- `.github/workflows/gds-congestion-diagnostic.yaml` and `scripts/ci/openroad_congestion_wrapper.sh`.
+- `bash -n scripts/ci/openroad_congestion_wrapper.sh`; wrapper smoke check with a stub OpenROAD executable; PyYAML workflow parse; `git diff --check`.
+
+Next:
+- Push the manual workflow and dispatch it from `main`; inspect the congestion bins before proposing a separate routing-setting or RTL experiment.
+
 ## 2026-10-01: Codex (phase 2: trace R4 timing and congestion)
 Done:
 - Traced the run 36799356107 slow-corner path from U0's `idle` configuration latch bit 7 to `dropped[16]`, bit 0 of C2 / L1.I0. Candidate fabric source 0 for C2 is U0.rx.

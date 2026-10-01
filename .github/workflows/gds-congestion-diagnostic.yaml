@@ -2,6 +2,15 @@ name: gds-congestion-diagnostic
 
 on:
   workflow_dispatch:
+    inputs:
+      grt_adjustment:
+        description: Temporary GRT_ADJUSTMENT overlay for this diagnostic run
+        required: true
+        default: "0.30"
+        type: choice
+        options:
+          - "0.30"
+          - "0.12"
 
 permissions:
   contents: read
@@ -19,6 +28,7 @@ jobs:
       PDK_ROOT: /home/runner/pdk
       CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
       TRIPWIRE_GRT_REPORT: ${{ github.workspace }}/candidate/runs/congestion-diag/39-openroad-globalrouting/congestion.rpt
+      TRIPWIRE_GRT_ADJUSTMENT: ${{ inputs.grt_adjustment }}
       LIBRELANE_IMAGE_OVERRIDE: tripwire-librelane-grt:${{ github.run_id }}
 
     steps:
@@ -101,6 +111,31 @@ jobs:
           print("Candidate shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
           PY
           python tt/tt_tool.py --create-user-config --ihp
+
+      - name: Apply temporary GRT adjustment overlay
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          choices = {"0.30": 0.30, "0.12": 0.12}
+          selected = os.environ["TRIPWIRE_GRT_ADJUSTMENT"]
+          if selected not in choices:
+              raise SystemExit(f"Unsupported GRT_ADJUSTMENT: {selected}")
+
+          config_path = Path("src/config_merged.json")
+          config = json.loads(config_path.read_text())
+          if float(config["GRT_ADJUSTMENT"]) != 0.30:
+              raise SystemExit(
+                  f"Expected pinned candidate default 0.30, found {config['GRT_ADJUSTMENT']}"
+              )
+          config["GRT_ADJUSTMENT"] = choices[selected]
+          config_path.write_text(json.dumps(config, indent=2) + "\n")
+          print(f"Temporary flow-only GRT_ADJUSTMENT={selected}")
+          PY
 
       - name: Build diagnostic LibreLane image
         run: |

@@ -5,6 +5,63 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-01: Codex (phase 2: screen pad mux timing)
+Done:
+- Refreshed hardening run [36913096552](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36913096552): it remains in full LibreLane hardening step 11, pinned to candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`, 2 lanes / 4 units / U0 full, 20 ns, 56% density, `GRT_ADJUSTMENT=0.12`. At 21:56 UTC it had been in that step about 2 h 40 min; precheck and gate-level jobs are waiting on hardening. GitHub says logs will be available when the step completes.
+- Screened a separate `trw_pins.v` rewrite in `/tmp/r4-padmux-opt` against the exact R4 source at `3393eea`. Parallel owner/A/N match vectors and masked ORs preserve one-owner pad selection and A-before-N priority; no active candidate RTL, config, info, macro, clock target, false path, or `DROPPED` behavior changed.
+- Matched local full-chip Yosys-mapped / OpenSTA slow-corner STA on the same logical idle-latch → C2 DROPPED[0] path: arrival 13.5434 → 12.2152 ns (1.3282 ns faster), slack +5.8762 → +7.1606 ns, mapped area 392,541.24 → 391,881.75 µm² (−0.168%). This excludes placement and routed parasitics; no routed improvement is established.
+- The Verilator pad-owner scoreboard passed 1,500 randomized cycles. Candidate L2 passed a 128-clock smoke and 1,000,000 clocks with zero divergences (1,019.81 s). Separate clean L2 baselines passed; the priority-flip and cursor off-by-one RTL mutations were detected at clocks 99 and 326.
+- The R4 chip-level suite passed 5/5, including UART TX on full and lean units at the 20 ns target and the UART program loopback. Local artifacts, RTL trial and reports are in `/tmp/r4-padmux-opt/`.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md` with this timing experiment and current hardening status. `git diff --check` passed.
+
+Checklist boxes ticked (evidence):
+- None. The pad-mux STA is pre-route; run 36913096552 has not completed, so no Phase 2 exit box is newly satisfied.
+
+Problems / decisions:
+- The pad-mux prototype is a promising isolated timing/area experiment, not proof that the 6x4 layout meets slow-corner timing. Keep it out of the active run and do not call the GDS workflow green yet.
+- The active run was still in hardening; no logs or downstream precheck / gate-level results were available at the latest query. No L3 scope decision or final hardware-count decision was made.
+
+Next:
+- Review run 36913096552 when it completes. Compare all-corner timing, congestion, DRC/LVS/antenna, detailed-route duration, precheck, gate-level tests and rendered design. If timing remains failing, decide which single isolated RTL timing change warrants a separate hardening at the same 20 ns target.
+
+## 2026-10-01: Codex (phase 2: isolate RX timing optimization)
+Done:
+- Added timing optimization as a separate workstream beside the active hardening and L3 validation in `docs/reports/PHASE2_GDS_EXPERIMENTS.md`.
+- Rechecked the archived physical slow-corner worst path for R4 candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full; 20 ns): U0's live `idle` config latch bit 7 to `dropped[16]`, 31.723 ns arrival, 21.025 ns required, −10.698 ns slack.
+- In an isolated copy under `/tmp/r4-timing-opt`, split the SHIFT_RX sample-zero check into START/`sofs` and `S_SAMP`/`rt` terms. It remains combinational, samples on the same clock, keeps configuration latch-to-state paths timed, and does not alter `DROPPED` accounting. The active hardening tree and its inputs were not changed.
+- Matched local full-chip mapped-gate slow-corner STA on baseline and prototype: same idle-latch → DROPPED endpoint, arrival 13.5434 → 11.9531 ns (1.5903 ns faster), slack +5.8762 → +7.4761 ns. Mapped area increased 392,541.24 → 394,026.03 µm² (+0.378%). This is pre-layout evidence only; the routed baseline remains −10.698 ns and the prototype has no routed result.
+- Added an RX unit regression that writes the real configuration latches after activation and checks that the next frame uses the new pin and sample offset on the specified clock. Candidate full-unit Verilator RX tests passed 16/16 on baseline and optimized RTL; lean-unit Icarus RX tests passed 16/16 on both. Top-level UART RX framing passed.
+- L2 passed a 128-clock smoke, a 1,024-clock isolated rerun, and 1,000,000 clocks with zero divergences. The priority-flip RTL mutation was detected at clock 99; the cursor off-by-one RTL mutation was detected at clock 326; both corresponding clean baselines passed.
+- The latest successful query reported active full hardening [36913096552](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36913096552) as `in_progress` (last updated 2026-10-01 19:16:50 UTC); a later refresh could not connect to GitHub. It remains on the pinned candidate and flow override. No GDS inputs, Phase 2 boxes, or RTL candidate were changed.
+
+Evidence:
+- Physical worst path: `/tmp/r4-gds-36799356107/GDS_logs/runs/wokwi/55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt`.
+- Prototype diff and matched STA: `/tmp/r4-timing-opt/rx-sample-factor.patch`, `/tmp/r4-timing-opt/sta_chip_baseline.log`, `/tmp/r4-timing-opt/sta_chip_opt.log`; full-unit candidate RX suite XML: `/tmp/r4-timing-opt/pin_candidate_live.xml`, `/tmp/r4-timing-opt/pin_opt_live.xml`; lean-unit candidate RX suite XML: `/tmp/r4-timing-opt/pin_lean_base_icarus.xml`, `/tmp/r4-timing-opt/pin_lean_opt_icarus.xml`; UART RX XML: `/tmp/r4-timing-opt/l3_rx.xml`.
+- L2 smoke XML: `/tmp/r4-timing-opt/l2_short128.xml`, `/tmp/r4-timing-opt/l2_short1024.xml`; the exact one-million-clock command was `L2_CYCLES=1000000 make -C test_internal/l2 SIM=verilator RTL_DIR=/tmp/r4-timing-opt/src RTL_REV=timing-opt` (1,000,000 compared clocks, zero divergences, 961.90 s).
+- L2-INJECT: `RTL_DIR=/tmp/r4-timing-opt/src RTL_REV=timing-opt SIM_BUILD=/tmp/r4-timing-opt/l2_injection_build python -u test_internal/l2/run_injections.py`; isolated cursor mutant check used `run_mutation` with a separate `SIM_BUILD`. One initial attempt on the shared simulator build reported a lane-debug mismatch at clock 99; fresh isolated baseline and optimized builds passed at 128/1,024 clocks, and the isolated clean baselines plus both mutations then passed/detected. The shared-build discrepancy did not recur; its cause is undetermined.
+- `git diff --check` passed. The main checkout has documentation updates and the new `test_internal/pin/test_pin_rx.py` regression; `/tmp/r4-timing-opt/src` is an isolated RTL copy.
+
+Checklist boxes ticked (evidence):
+- None. Local mapped STA is not routed timing, and no Phase 2 exit box is newly satisfied by this isolated experiment.
+
+Problems / decisions:
+- No false path was added. D-066 live configuration behavior and same-cycle `DROPPED` accounting remain in the timed design. The 20 ns target and supported protocol/resources are unchanged.
+- The mapped area rises 0.378%, and local STA does not include placement, routing, or parasitics. Do not promote this prototype into the active hardening run. Wait for run 36913096552 and resolve the separate L3 sigrok/VCD annotation issue; only then consider a one-change hardening with this RTL.
+
+Next:
+- Review run 36913096552's routed timing, congestion, DRC/LVS/antenna, precheck, gate-level, and viewer outputs. Keep L3 decoder diagnosis and timing RTL promotion as separate workstreams.
+
+## 2026-10-01: Codex (phase 2: exit plan)
+Done:
+- Reviewed the current Phase 2 exit checklist and latest worklog. Open checklist boxes are area/budget, L3 RTL, L3 on the hardened netlist, and bug-log audit.
+- Refreshed full hardening run 36913096552: still in progress at `Run full LibreLane hardening with GRT adjustment override`; the GitHub CLI reports logs will be available when the job completes.
+- Ran `source /home/younix/protocol-emulator-asic/.venv/bin/activate && make -C /tmp/r4-bitsync-work/test_internal/chip SIM=verilator SIM_BUILD=/home/younix/protocol-emulator-asic/test_internal/chip/sim_build/vl_l3_spi COCOTB_TEST_MODULES=test_l3 COCOTB_RESULTS_FILE=results_l3_r4.xml` against matching R4 candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`: UART RX passed; UART TX, SPI-C and I2C-C passed their reference-model checks but failed when sigrok produced no annotations. XML: `/tmp/r4-bitsync-work/test_internal/chip/results_l3_r4.xml`. `sigrok-cli -L` likewise listed no decoders beyond a libusb warning; the same empty UART decode reproduces on a tripsim-generated waveform, pointing to a shared sigrok/VCD setup issue rather than isolating an RTL failure.
+- `test/` remains the counter placeholder, so these `trw_chip` tests alone do not provide the required top-level pin-test evidence.
+- An initial cross-branch run paired R4 RTL with `main`'s 3-lane/6-unit tools and was discarded as invalid. No checklist boxes were ticked; no project decisions or hardware inputs changed.
+
+Next:
+- Resolve the sigrok decoder/VCD setup and rerun L3 against the matching candidate; review run 36913096552's full hardening, precheck, gate-level, and GDS preview when it finishes.
+
 Template:
 
 ```

@@ -19,19 +19,18 @@ Next:
 - ...
 ```
 
-## 2026-10-01: Codex (phase 2: prepare GRT congestion diagnostic)
+## 2026-10-01: Codex (phase 2: GRT congestion map and controlled follow-up)
 Done:
-- Added `.github/workflows/gds-congestion-diagnostic.yaml`, a manual run pinned to candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. It verifies 2 lanes, 4 pin units, U0 full, 20 ns and 56% density; LibreLane stops at `OpenROAD.GlobalRouting` and uploads that stage's report and artifacts.
-- Added `scripts/ci/openroad_congestion_wrapper.sh`. It leaves the original OpenROAD arguments and router settings intact, adding only `-congestion_report_file` when LibreLane invokes `grt.tcl`.
-- The workflow builds a temporary diagnostic image from the pinned LibreLane image, adding only the wrapper and its report-path environment. This is needed because LibreLane's Dockerized flow does not inherit the host's OpenROAD override environment.
-- Updated the experiment report with the workflow and its limit: it recomputes stages before GRT, so placement may differ from run 36799356107; detailed routing and signoff are not part of this diagnostic.
-- Diagnostic runs 36893706804 and 36896957051 reached GRT and reproduced the prior aggregate congestion exactly: 821 total overflow (M2 10, M3 779, M4 32), M3 usage 78.19%; GRT runtime 1:58. Neither produced a bin report: the command remained stock `openroad`, and `global_route` lacked the report option. The attempted `--docker-mount` environment forwarding was invalid because LibreLane treats each value as a volume mount. The workflow now builds an image with the wrapper and environment baked in; it still needs a rerun to confirm the hook works.
+- Added `.github/workflows/gds-congestion-diagnostic.yaml`, pinned to candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full, 20 ns, 56% density). It stops at `OpenROAD.GlobalRouting` and uploads the stage report and artifacts.
+- Added `scripts/ci/openroad_congestion_wrapper.sh` and `scripts/ci/Dockerfile.openroad-congestion`. The wrapper preserves router arguments and injects only the congestion-report output; the custom image makes LibreLane's OpenROAD override available inside the Dockerized flow.
+- Runs 36893706804 and 36896957051 reproduced baseline overflow 821 (M2 10, M3 779, M4 32; M3 usage 78.19%) but did not produce bin reports. The hook worked in run 36899340155: 769 overfull bins, 820 horizontal and 1 vertical overflow, summing to the same 821. The bins span x=244.8–792.0 µm and y=0–698.4 µm; the largest 100 µm x band is 600–700 µm with 444 overflow. Overflow spans the design height rather than being confined to one small blockage. This is GRT-only evidence, not proof of detailed-route capacity.
+- Added a diagnostic input for `GRT_ADJUSTMENT=0.30` (baseline) or `0.12` as a temporary overlay to generated `src/config_merged.json`; it does not edit the candidate's tracked `src/config.json`. The next run tests the router's suggested reduction in estimated capacity adjustment with RTL, counts, density, clock, macros, and other settings held fixed.
 
 Checklist boxes ticked (evidence):
-- None. Run 36893706804 is diagnostics-only GRT evidence; it is not a hardening/signoff run and produced no bin-level congestion report.
+- None. Run 36899340155 and the planned follow-up are diagnostics-only GRT evidence, not full hardening/signoff runs. A lower congestion estimate alone will not establish that detailed routing fits.
 
 Problems / decisions:
-- No RTL, `src/config.json`, `info.yaml`, macro, clock, density, resource count, or GRT setting was changed. The workflow only adds an output report and stops before detailed routing.
+- No RTL, candidate `src/config.json`, `info.yaml`, macro, clock, density, or resource count was changed. The adjustment experiment modifies only the generated, temporary merged config in the diagnostic checkout and stops before detailed routing.
 - First dispatch, run 36892786936, stopped before synthesis/GRT because LibreLane requires the `--force-run-dir` path to exist first. No congestion data was generated; the workflow now creates that directory before launch.
 
 Evidence:
@@ -39,9 +38,10 @@ Evidence:
 - `bash -n scripts/ci/openroad_congestion_wrapper.sh`; wrapper smoke check with a stub OpenROAD executable; PyYAML workflow parse; `git diff --check`.
 - Failed setup attempt: [workflow run 36892786936](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36892786936), error: `Directory 'runs/congestion-diag' does not exist`.
 - Missing report evidence: the `COMMANDS` and `openroad-globalrouting.log` files in the downloaded artifacts for [run 36893706804](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36893706804) and [run 36896957051](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36896957051) show the stock executable and no `-congestion_report_file` option.
+- Successful report evidence: [run 36899340155](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36899340155); `/tmp/gds-congestion-36899340155/gds-congestion-36899340155/runs/congestion-diag/39-openroad-globalrouting/congestion.rpt` (769 bins) and adjacent `openroad-globalrouting.log` (per-layer overflow summary).
 
 Next:
-- Push the custom-image fix and rerun; confirm `COMMANDS` uses the wrapper and the congestion report is nonempty before analyzing bins.
+- Push the temporary adjustment input and documentation; run the diagnostic with `grt_adjustment=0.12`, then compare its bin and per-layer totals against run 36899340155 (0.30 baseline). If the estimate improves, run full detailed routing and signoff on the same hardware candidate before calling it a fit improvement.
 
 ## 2026-10-01: Codex (phase 2: trace R4 timing and congestion)
 Done:

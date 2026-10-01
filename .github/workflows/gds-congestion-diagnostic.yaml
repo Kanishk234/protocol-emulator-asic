@@ -112,32 +112,6 @@ jobs:
           PY
           python tt/tt_tool.py --create-user-config --ihp
 
-      - name: Apply temporary GRT adjustment overlay
-        working-directory: candidate
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          choices = {"0.30": 0.30, "0.12": 0.12}
-          selected = os.environ["TRIPWIRE_GRT_ADJUSTMENT"]
-          if selected not in choices:
-              raise SystemExit(f"Unsupported GRT_ADJUSTMENT: {selected}")
-
-          config_path = Path("src/config_merged.json")
-          config = json.loads(config_path.read_text())
-          baseline = float(config.get("GRT_ADJUSTMENT", 0.30))
-          if baseline != 0.30:
-              raise SystemExit(
-                  f"Expected pinned candidate default 0.30, found {baseline}"
-              )
-          config["GRT_ADJUSTMENT"] = choices[selected]
-          config_path.write_text(json.dumps(config, indent=2) + "\n")
-          print(f"Temporary flow-only GRT_ADJUSTMENT={selected}")
-          PY
-
       - name: Build diagnostic LibreLane image
         run: |
           set -euo pipefail
@@ -162,9 +136,35 @@ jobs:
             --force-run-dir runs/congestion-diag \
             --hide-progress-bar \
             --to OpenROAD.GlobalRouting \
+            --override-config "GRT_ADJUSTMENT=$TRIPWIRE_GRT_ADJUSTMENT" \
             src/config_merged.json
-          test -s "$TRIPWIRE_GRT_REPORT"
-          ls -lh "$TRIPWIRE_GRT_REPORT"
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          report = Path(os.environ["TRIPWIRE_GRT_REPORT"])
+          if report.is_file() and report.stat().st_size:
+              print(f"Saved bin-level congestion report: {report.stat().st_size} bytes")
+          else:
+              log = Path("runs/congestion-diag/39-openroad-globalrouting/openroad-globalrouting.log")
+              text = log.read_text()
+              totals = re.findall(
+                  r"^\s*Total\s+\d+\s+\d+\s+[\d.]+%\s+\d+\s*/\s*\d+\s*/\s*(\d+)\s*$",
+                  text,
+                  re.MULTILINE,
+              )
+              if not totals or int(totals[-1]) != 0:
+                  raise SystemExit(
+                      "OpenROAD produced no bin report and its final GRT total overflow is not zero"
+                  )
+              report.parent.mkdir(parents=True, exist_ok=True)
+              report.write_text(
+                  "No per-bin congestion entries: final GRT total overflow is zero; "
+                  f"GRT_ADJUSTMENT={os.environ['TRIPWIRE_GRT_ADJUSTMENT']}.\n"
+              )
+              print("No overflowing bins; wrote a zero-overflow summary beside the GRT artifacts")
+          PY
 
       - name: Upload GRT diagnostic artifacts
         if: always()

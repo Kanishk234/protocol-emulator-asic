@@ -19,6 +19,28 @@ Next:
 - ...
 ```
 
+## 2026-10-01: Codex (phase 2: trace R4 timing and congestion)
+Done:
+- Traced the run 36799356107 slow-corner path from U0's `idle` configuration latch bit 7 to `dropped[16]`, bit 0 of C2 / L1.I0. Candidate fabric source 0 for C2 is U0.rx.
+- The mapped path crosses U0 pin/drive and BITSYNC logic, RX token loading, and the C2 drop condition; it contains 32 combinational cells and 12 fanout buffers. Arrival is 31.723 ns, required time 21.025 ns, slack −10.698 ns. The counter is the endpoint; the long delay is primarily upstream logic depth and buffering.
+- Checked the retained GRT ODB, DEF, guides, log and metrics. The artifact has no per-bin congestion report or heatmap, so the 779 M3 overflow cannot be localized from its saved summary. The route-guide boxes do not encode overflow. Local OpenROAD is unavailable to inspect the ODB directly.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md` with the path trace and a diagnostic-only next step: rerun GRT on the same candidate/settings and save its congestion report before changing routing settings.
+
+Checklist boxes ticked (evidence):
+- None. This session did not run a new verification or signoff check.
+
+Problems / decisions:
+- D-066 requires the live configuration-to-state path to remain timed. Do not false-path or add a cycle to DROPPED accounting; that changes frozen behavior. The current GRT archive does not support a claim about spatial M3 hotspots.
+- No RTL, `src/config.json`, `info.yaml`, macro, or hardening input was changed.
+
+Evidence:
+- Timing path: `/tmp/r4-gds-36799356107/GDS_logs/runs/wokwi/55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt`.
+- GRT summary and retained files: `/tmp/r4-gds-36799356107/GDS_logs/runs/wokwi/39-openroad-globalrouting/`.
+- Exact candidate fabric mapping: `/tmp/r4-bitsync-work/src/trw_fabric.v` at `3393eea9a58c5cad9077cc360a8515d0e5ec8284`.
+
+Next:
+- Produce bin-level congestion data on the exact candidate without changing its hardware or flow settings; then propose one isolated routing-setting experiment if the map supports it. Continue timing work as a separate experiment, with D-066 paths timed and all required protocol behavior intact.
+
 ## 2026-10-01: Codex (phase 2: review full 6x4 hardening)
 Done:
 - Reviewed standard GDS workflow run [36799356107](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356107) for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (`spike/r4-floorplan`; 2 lanes, 4 pin units, U0 full; 20 ns; density 56%; hold uncertainty 0.10 ns, setup 0.25 ns). The counts remain the candidate under test, not approval of final hardware counts.

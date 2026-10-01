@@ -27,6 +27,7 @@ Done:
 - Added a diagnostic input for `GRT_ADJUSTMENT=0.30` (baseline) or `0.12`, passed through LibreLane's `--override-config`; it does not edit either candidate config file. The first 12% dispatch, run 36904343041, stopped before LibreLane because the generated merge omits the default-valued key. Run 36906496173 then completed GRT at 12% with zero overflow but the workflow failed its nonempty-report assertion: OpenROAD emitted no bin report when no bins overflowed. The validator now accepts a missing report only when the GRT log's final aggregate overflow is zero, and writes a short zero-overflow summary into the artifact.
 - At 12%, run 36906496173 reports 0 overflow on M2/M3/M4, 40.28% overall usage, and 2,458,468 µm global-route wirelength. Baseline 30% run 36899340155 reports 821 overflow, 58.24% usage, and 2,863,598 µm. This is a favorable GRT estimate, not a detailed-route result: the lower adjustment gives the router more assumed capacity, not more physical tracks.
 - Added `.github/workflows/gds-grt-adjustment-experiment.yaml` for full LibreLane hardening on the same pinned R4 candidate with only the `GRT_ADJUSTMENT=0.12` CLI override. On successful hardening it packages the Tiny Tapeout submission, runs precheck and gate-level test jobs, and uploads a GDS preview artifact; it does not publish a viewer or change any candidate hardware input.
+- Dispatched full experiment [36913096552](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36913096552). Candidate validation and all setup steps passed; the full LibreLane hardening step is running. The run pins `3393eea9a58c5cad9077cc360a8515d0e5ec8284` and keeps the 20 ns clock, 2-lane/4-unit shape, U0 full and 56% density.
 
 Checklist boxes ticked (evidence):
 - None. Runs 36899340155 and 36906496173 are GRT-only evidence, not full hardening/signoff runs. A lower congestion estimate alone will not establish that detailed routing fits.
@@ -38,6 +39,7 @@ Problems / decisions:
 Evidence:
 - `.github/workflows/gds-congestion-diagnostic.yaml` and `scripts/ci/openroad_congestion_wrapper.sh`.
 - `.github/workflows/gds-grt-adjustment-experiment.yaml` for full hardening plus dependent precheck and gate-level test jobs.
+- Full hardening progress: [run 36913096552](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36913096552); setup passed and LibreLane hardening is active.
 - `bash -n scripts/ci/openroad_congestion_wrapper.sh`; wrapper smoke check with a stub OpenROAD executable; PyYAML and embedded-Python workflow checks; zero-overflow report postcondition smoke-tested against run 36906496173; `git diff --check`.
 - Failed setup attempt: [workflow run 36892786936](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36892786936), error: `Directory 'runs/congestion-diag' does not exist`.
 - Missing report evidence: the `COMMANDS` and `openroad-globalrouting.log` files in the downloaded artifacts for [run 36893706804](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36893706804) and [run 36896957051](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36896957051) show the stock executable and no `-congestion_report_file` option.
@@ -46,7 +48,7 @@ Evidence:
 - 12% GRT evidence: [run 36906496173](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36906496173), adjacent `openroad-globalrouting.log` shows `Global adjustment: 12%`, zero total overflow, and 2,458,468 µm wirelength. Its overall job failed only because zero overflowing bins produce no congestion report file; the postcondition now handles that case.
 
 Next:
-- Push the zero-overflow report handling and full-hardening workflow, then dispatch it. Detailed routing, precheck, gate-level tests and signoff must pass before calling this a physical fit improvement.
+- Review run 36913096552 after full hardening completes: GRT, detailed-route runtime/DRC, all-corner timing/hold, LVS, antenna, precheck, gate-level tests and the GDS preview. Until those results pass, treat 12% as a promising estimate only.
 
 ## 2026-10-01: Codex (phase 2: trace R4 timing and congestion)
 Done:

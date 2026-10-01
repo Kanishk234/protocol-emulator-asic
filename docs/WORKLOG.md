@@ -31,13 +31,15 @@ Checklist boxes ticked (evidence):
 
 Problems / decisions:
 - No RTL, `src/config.json`, `info.yaml`, macro, clock, density, resource count, or GRT setting was changed. The workflow only adds an output report and stops before detailed routing.
+- First dispatch, run 36892786936, stopped before synthesis/GRT because LibreLane requires the `--force-run-dir` path to exist first. No congestion data was generated; the workflow now creates that directory before launch.
 
 Evidence:
 - `.github/workflows/gds-congestion-diagnostic.yaml` and `scripts/ci/openroad_congestion_wrapper.sh`.
 - `bash -n scripts/ci/openroad_congestion_wrapper.sh`; wrapper smoke check with a stub OpenROAD executable; PyYAML workflow parse; `git diff --check`.
+- Failed setup attempt: [workflow run 36892786936](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36892786936), error: `Directory 'runs/congestion-diag' does not exist`.
 
 Next:
-- Push the manual workflow and dispatch it from `main`; inspect the congestion bins before proposing a separate routing-setting or RTL experiment.
+- Push the fix and dispatch a second run; inspect the congestion bins before proposing a separate routing-setting or RTL experiment.
 
 ## 2026-10-01: Codex (phase 2: trace R4 timing and congestion)
 Done:

@@ -1,0 +1,8 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+
+ARG TRIPWIRE_GRT_REPORT
+
+COPY --chmod=755 openroad_congestion_wrapper.sh /usr/local/bin/tripwire-openroad-congestion
+
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-openroad-congestion
+ENV TRIPWIRE_GRT_REPORT=${TRIPWIRE_GRT_REPORT}

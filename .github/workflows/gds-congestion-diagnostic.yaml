@@ -19,7 +19,7 @@ jobs:
       PDK_ROOT: /home/runner/pdk
       CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
       TRIPWIRE_GRT_REPORT: ${{ github.workspace }}/candidate/runs/congestion-diag/39-openroad-globalrouting/congestion.rpt
-      _LLN_OVERRIDE_OPENROAD: ${{ github.workspace }}/candidate/.openroad_congestion_wrapper.sh
+      LIBRELANE_IMAGE_OVERRIDE: tripwire-librelane-grt:${{ github.run_id }}
 
     steps:
       - name: Check out workflow helpers
@@ -101,9 +101,15 @@ jobs:
           print("Candidate shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
           PY
           python tt/tt_tool.py --create-user-config --ihp
-          cp "$GITHUB_WORKSPACE/workflow-src/scripts/ci/openroad_congestion_wrapper.sh" \
-            "$GITHUB_WORKSPACE/candidate/.openroad_congestion_wrapper.sh"
-          chmod +x "$_LLN_OVERRIDE_OPENROAD"
+
+      - name: Build diagnostic LibreLane image
+        run: |
+          set -euo pipefail
+          docker build \
+            --build-arg "TRIPWIRE_GRT_REPORT=$TRIPWIRE_GRT_REPORT" \
+            --tag "$LIBRELANE_IMAGE_OVERRIDE" \
+            --file workflow-src/scripts/ci/Dockerfile.openroad-congestion \
+            workflow-src/scripts/ci
 
       - name: Run only through GlobalRouting and save its congestion report
         working-directory: candidate
@@ -111,8 +117,6 @@ jobs:
           set -euo pipefail
           mkdir -p runs/congestion-diag
           python -m librelane \
-            --docker-mount="--env=_LLN_OVERRIDE_OPENROAD=$_LLN_OVERRIDE_OPENROAD" \
-            --docker-mount="--env=TRIPWIRE_GRT_REPORT=$TRIPWIRE_GRT_REPORT" \
             --pdk-root "$PDK_ROOT" \
             --docker-no-tty \
             --dockerized \

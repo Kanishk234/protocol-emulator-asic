@@ -43,6 +43,32 @@ async def test_shift_rx_sample_points(dut):
 
 
 @cocotb.test()
+async def test_shift_rx_live_configuration_restarts_on_new_pin_and_offset(dut):
+    """D-066 / H1a / P5: a config write after activation restarts the pin unit, and the next frame uses
+    the newly selected pin and sample offset on the specified sample clock."""
+    tb = PinTb(dut)
+    new_sofs = round(0.75 * PER)
+    await tb.start(encode(rxmode=SRX, idle=1, pin_a=UI0, period=PER, sampleofs=SOFS, rx_nbits=10,
+                          autorearm=1), live=True)
+    await tb.write(encode(rxmode=SRX, idle=1, pin_a=UI1, period=PER, sampleofs=new_sofs, rx_nbits=10,
+                          autorearm=1))
+    assert int(dut.live.value) == 1  # config restart is legal after activation; the unit stays live
+
+    bits = uart_bits(0xA6)
+    t0 = tb.n + 40
+    smp = [t0 + ((new_sofs + i * PER) >> 8) for i in range(10)]
+    # The old pin falls first. Only the newly configured pin A carries the intended frame.
+    tb.drive(t0 - 10, UI0, 0)
+    tb.drive(t0 - 2, UI1, 0)
+    for c in range(t0 - 1, smp[-1] - 1):
+        nxt = next(i for i, s in enumerate(smp) if s - 2 >= c)
+        tb.drive(c, UI1, bits[nxt] if smp[nxt] - 2 == c else 1 - bits[nxt])
+    tb.drive(smp[-1] - 1, UI1, 1)
+    await tb.until(smp[-1] + 10)
+    assert tb.loads == [(smp[-1], DATA, frame(0xA6))]
+
+
+@cocotb.test()
 @cocotb.parametrize(rearm=[1, 0])
 async def test_shift_rx_back_to_back_and_autorearm(dut, rearm):
     """AUTOREARM: back-to-back frames (the next start bit right after the stop bit) all arrive; without

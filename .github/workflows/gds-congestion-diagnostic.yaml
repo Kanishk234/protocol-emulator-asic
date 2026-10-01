@@ -128,9 +128,10 @@ jobs:
 
           config_path = Path("src/config_merged.json")
           config = json.loads(config_path.read_text())
-          if float(config["GRT_ADJUSTMENT"]) != 0.30:
+          baseline = float(config.get("GRT_ADJUSTMENT", 0.30))
+          if baseline != 0.30:
               raise SystemExit(
-                  f"Expected pinned candidate default 0.30, found {config['GRT_ADJUSTMENT']}"
+                  f"Expected pinned candidate default 0.30, found {baseline}"
               )
           config["GRT_ADJUSTMENT"] = choices[selected]
           config_path.write_text(json.dumps(config, indent=2) + "\n")

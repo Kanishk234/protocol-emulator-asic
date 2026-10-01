@@ -19,6 +19,57 @@ Next:
 - ...
 ```
 
+## 2026-09-30: Codex (phase 2: register carrier enable on the pin clock)
+Done:
+- Added one flop in `trw_pin_tx.v` to capture the cached carrier-enabled predicate at each pin-unit clock and use that sampled value for the pad output. The carrier configuration latch-to-flop path remains timed under D-066; the registered carrier state no longer feeds the output-to-RX loop combinationally.
+- Kept this as one RTL change on top of R4 `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc`; lane/unit counts, 20 ns clock, and 56% density are unchanged.
+- The full and lean pin suites each pass 60/60. L2 smoke passes 128 clocks; the full lockstep passes 1,000,000 clocks with zero divergences against main's `b6f8fa9` model. Both required RTL injections are detected.
+- Matched 20 ns pre-layout STA with every latch-to-state path timed improves worst slack from +8.858 to +9.154 ns typical and +2.717 to +3.344 ns slow. Yosys mapped area rises from 390,666.74 to 391,112.44 µm² (+445.70 µm²).
+- Copied only `src/trw_pin_tx.v` into `/tmp/r4-bitsync-work` for review. No hardening was started; routed timing, congestion and signoff remain unproven.
+- Updated the main-side `gds-thread-experiment.yaml` guard to permit either the exact baseline or a candidate differing from `cfc41e1` only in `src/trw_pin_tx.v`, so this one-file candidate can be tested with an explicit OpenROAD thread count.
+
+Evidence:
+- Pin suites: `/tmp/r4-carrierout-ff/test_internal/pin/results_full1_frac8.xml` and `results_full0_frac8.xml` (60/60 each).
+- L2: `L2_CYCLES=128` smoke and `L2_CYCLES=1000000` full run from `test_internal/l2` with `RTL_DIR=/tmp/r4-carrierout-ff/src`; full run reported zero divergences in 523.39 s.
+- L2-INJECT: `RTL_DIR=/tmp/r4-carrierout-ff/src RTL_REV=cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc-carrierout-ff python test_internal/l2/run_injections.py`; priority-flip detected at clock 99, cursor off-by-one at clock 326, and both clean baselines passed.
+- STA and area: `/tmp/r4-carrierout-ff/synth/chip/build/sta_typ_d066.txt`, `sta_slow_d066.txt`, and `stat_flat.txt`; baseline: `/tmp/r4-candidate-cache/synth/chip/build/sta_typ_1p20V_25C_d066.txt`, `sta_slow_1p08V_125C_d066.txt`, and `stat_flat.txt`.
+
+Checklist boxes ticked (evidence):
+- None. Full routed timing and GDS signoff are still required.
+
+Problems / decisions:
+- This is pre-layout evidence only. The new register changes sub-cycle response to a pin-configuration latch update; the architecture and model observe the new setting on the next pin-unit clock, and clock-level pin/L2 checks pass. Review the diff before hardening.
+- A fresh GitHub Actions status query could not connect to `api.github.com`; the last available status showed no active hardening. Recheck before pushing, because a hardware push can cancel a running hardening.
+- The main checkout has uncommitted `docs/WORKLOG.md` and `.github/workflows/gds-thread-experiment.yaml` changes. The R4 worktree has only `src/trw_pin_tx.v` modified.
+
+Next:
+- Review and commit the workflow guard on `main`, then commit and push the single RTL change on `spike/r4-floorplan`. Confirm no hardening is active before the hardware push; run one 4-thread GDS experiment at unchanged 2-lane/4-unit, 20 ns, 56% settings. Judge it by post-route timing, overflow, complete DRC/LVS/antenna, precheck, gate-level tests, and viewer.
+
+## 2026-09-30: Codex (phase 2: screen critical-path RTL ideas)
+Done:
+- Kept the source baseline at R4 candidate `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc` (2 lanes, 4 pin units, U0 full, 20 ns, 56% density) and made one-at-a-time prototypes in `/tmp` only.
+- Screened five behavior-preserving RTL forms with the chip Yosys/cmos5l and OpenSTA flow, keeping D-066 latch-to-state paths timed. Baseline was 390,666.74 µm² and +2.717 ns slow-corner pre-layout slack. Every trial increased mapped area and reduced slow slack:
+  - fabric one-hot source selection: 391,177.19 µm², +1.004 ns;
+  - fabric indexed selection: 392,077.93 µm², +2.176 ns;
+  - factored RX event-edge decode: 391,948.73 µm², +1.660 ns;
+  - parallel saturating-counter toggles: 392,327.94 µm², +2.690 ns;
+  - factored carrier output level: 391,046.18 µm², +1.759 ns.
+- Rejected all five. None was copied into the R4 worktree or main, and no hardening candidate or protocol resource changed.
+
+Evidence:
+- Four-thread post-route critical path: `build/ci/r4/thread4/runs/wokwi/55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt` (U0 carrier-active latch to `dropped[6]`).
+- Matched baseline and prototype chip reports: `/tmp/r4-candidate-cache/synth/chip/build/sta_slow_1p08V_125C_d066.txt`; `/tmp/r4-fabriccase-opt/synth/chip/build/sta_slow_d066.txt`; `/tmp/r4-fabricidx-opt/synth/chip/build/sta_slow_d066.txt`; `/tmp/r4-event-factor/synth/chip/build/sta_slow_d066.txt`; `/tmp/r4-satcounter-opt/synth/chip/build/sta_slow_d066.txt`; `/tmp/r4-carrierlvl-opt/synth/chip/build/sta_slow_d066.txt`. Mapped areas are in each directory's `stat_flat.txt`.
+
+Checklist boxes ticked (evidence):
+- None. The estimates are pre-layout and do not establish routed timing or behavior; physical Phase 2 signoff remains open.
+
+Problems / decisions:
+- All five local RTL hypotheses lost on the measured pre-layout timing/area tradeoff. The post-route path still includes the legal output-to-input pin feedback and live reconfiguration required by D-066.
+- A one-clock delayed `DROPPED` update could remove counter accounting from this same-cycle path without changing protocol data traffic, but it changes the frozen F4/D-044 visibility timing. Do not implement it before a DECISIONS proposal and requester/Kanishk approval.
+
+Next:
+- Keep R4 at `cfc41e1` and 20 ns. Propose the `DROPPED` visibility timing change for team review, or obtain a route-aware optimization that preserves F4 exactly; do not harden any of these prototypes.
+
 ## 2026-09-30: Codex (phase 2: review four-thread hardening artifact)
 Done:
 - Reviewed the 2 GB artifact for run 36759109179. The candidate check passed for 2 lanes, 4 pin units, U0 full, 20 ns, and 56% density; the generated OpenROAD environment confirms `OPENROAD_THREADS=4`.
@@ -37,6 +88,7 @@ Checklist boxes ticked (evidence):
 Problems / decisions:
 - The custom experiment stops after hardening and does not run the standard workflow's precheck, gate-level test or viewer jobs.
 - The Magic DRC report names only SRAM-exception rules, but KLayout DRC was skipped and illegal-overlap checks reported 10; do not claim clean merged-GDS DRC.
+- The 56%-density artifact's source baseline (`cfc41e1`) differs from the 59%-density run 7 source (`9138ee6`) in `trw_chip.v`, `trw_pin_cfg.v`, `trw_pin_tx.v`, and `trw_pin_unit.v`. Treat the density comparison as confounded; do not attribute the overflow change to density alone.
 
 Next:
 - Keep 20 ns and protocol behavior fixed. Use the critical `carrier_active`-to-`dropped` path and the slew/cap reports to guide one RTL optimization, then validate it with simulation, L2 lockstep and pre-route STA before another hardening.

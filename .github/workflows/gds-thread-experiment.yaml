@@ -11,7 +11,7 @@ on:
         options:
           - spike/r4-floorplan
       openroad_threads:
-        description: OpenROAD worker count for this one-variable R4 hardening experiment
+        description: OpenROAD worker count for the controlled R4 hardening experiment
         required: true
         type: choice
         default: "4"
@@ -87,8 +87,13 @@ jobs:
           expected_base=cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc
           test "$CANDIDATE_REF" = "spike/r4-floorplan"
           git cat-file -e "$expected_base^{commit}"
-          git diff --quiet "$expected_base" HEAD -- src info.yaml macro spec
-          python3 - <<'PY'
+          git merge-base --is-ancestor "$expected_base" HEAD
+          candidate_changes=$(git diff --name-only "$expected_base" HEAD)
+          if [ -n "$candidate_changes" ]; then
+            test "$candidate_changes" = "src/trw_pin_tx.v"
+          fi
+          git diff --check "$expected_base" HEAD
+          CANDIDATE_CHANGES="$candidate_changes" python3 - <<'PY'
           import json
           import os
           import pathlib
@@ -113,7 +118,7 @@ jobs:
           visible_cpus = len(os.sched_getaffinity(0))
           assert threads <= visible_cpus, (threads, visible_cpus)
           print(f"Candidate HEAD: {subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()}")
-          print("Hardware source matches cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc")
+          print(f"Hardware source diff vs cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc: {os.environ['CANDIDATE_CHANGES'] or 'none'}")
           print("Counts: 2 lanes, 4 pin units; U0 full; clock 20 ns; density target 56%")
           print(f"Thread experiment: {threads} OpenROAD threads; runner CPUs visible: {visible_cpus}")
           PY

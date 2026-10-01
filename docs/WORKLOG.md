@@ -23,11 +23,12 @@ Next:
 Done:
 - Added `.github/workflows/gds-congestion-diagnostic.yaml`, a manual run pinned to candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. It verifies 2 lanes, 4 pin units, U0 full, 20 ns and 56% density; LibreLane stops at `OpenROAD.GlobalRouting` and uploads that stage's report and artifacts.
 - Added `scripts/ci/openroad_congestion_wrapper.sh`. It leaves the original OpenROAD arguments and router settings intact, adding only `-congestion_report_file` when LibreLane invokes `grt.tcl`.
-- The workflow copies the helper into the candidate workspace before launching the containerized flow, so the OpenROAD process can execute it from the mounted project directory.
+- The workflow copies the helper into the candidate workspace before launching the containerized flow. Run 36893706804 showed that the host environment override was not forwarded into that container; the workflow is now updated to pass both required environment variables through Docker arguments.
 - Updated the experiment report with the workflow and its limit: it recomputes stages before GRT, so placement may differ from run 36799356107; detailed routing and signoff are not part of this diagnostic.
+- Diagnostic run 36893706804 reached GRT and reproduced the prior aggregate congestion exactly: 821 total overflow (M2 10, M3 779, M4 32), M3 usage 78.19%; GRT runtime 1:58. It produced no bin report because the container used plain `openroad` and ran `global_route` without the report option. The workflow update passes the wrapper/report environment into the LibreLane container using its Docker argument passthrough; it still needs a rerun to confirm the hook works.
 
 Checklist boxes ticked (evidence):
-- None. The diagnostic workflow has not been dispatched; no new physical result exists.
+- None. Run 36893706804 is diagnostics-only GRT evidence; it is not a hardening/signoff run and produced no bin-level congestion report.
 
 Problems / decisions:
 - No RTL, `src/config.json`, `info.yaml`, macro, clock, density, resource count, or GRT setting was changed. The workflow only adds an output report and stops before detailed routing.
@@ -37,9 +38,10 @@ Evidence:
 - `.github/workflows/gds-congestion-diagnostic.yaml` and `scripts/ci/openroad_congestion_wrapper.sh`.
 - `bash -n scripts/ci/openroad_congestion_wrapper.sh`; wrapper smoke check with a stub OpenROAD executable; PyYAML workflow parse; `git diff --check`.
 - Failed setup attempt: [workflow run 36892786936](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36892786936), error: `Directory 'runs/congestion-diag' does not exist`.
+- Missing report evidence: `/tmp/gds-congestion-36893706804-retry/gds-congestion-36893706804/runs/congestion-diag/39-openroad-globalrouting/COMMANDS` and `openroad-globalrouting.log` show the stock executable and no `-congestion_report_file` option.
 
 Next:
-- Push the fix and dispatch a second run; inspect the congestion bins before proposing a separate routing-setting or RTL experiment.
+- Push the container environment-forwarding fix and rerun; confirm `COMMANDS` uses the wrapper and the congestion report is nonempty before analyzing bins.
 
 ## 2026-10-01: Codex (phase 2: trace R4 timing and congestion)
 Done:

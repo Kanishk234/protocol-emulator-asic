@@ -148,7 +148,17 @@ module trw_pin_tx #(
     reg         cph;         // carrier: in an off (IDLE) half
 
     wire car_on = (FULL != 0) && carrier_active;                     // P-G25: below 2 clocks = off
-    assign lvl = (lvx && !(car_on && cph)) ^ idle;
+    // Capture the live configuration predicate at the pin-unit clock. The latch-to-flop
+    // path remains timed (D-066), while pad feedback sees the selected setting as state.
+    reg carrier_active_q;
+    always @(posedge clk) begin
+        if (!rst_n)
+            carrier_active_q <= 1'b0;
+        else
+            carrier_active_q <= carrier_active;
+    end
+    wire car_out_on = (FULL != 0) && carrier_active_q;
+    assign lvl = (lvx && !(car_out_on && cph)) ^ idle;
 
     // ------------------------------------------------------------------ the running shift / burst
     wire [15:0] bt_i    = bt[BW-1:FRAC+1];

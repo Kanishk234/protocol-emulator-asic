@@ -111,6 +111,8 @@ jobs:
           set -euo pipefail
           mkdir -p runs/congestion-diag
           python -m librelane \
+            --docker-mount="--env=_LLN_OVERRIDE_OPENROAD=$_LLN_OVERRIDE_OPENROAD" \
+            --docker-mount="--env=TRIPWIRE_GRT_REPORT=$TRIPWIRE_GRT_REPORT" \
             --pdk-root "$PDK_ROOT" \
             --docker-no-tty \
             --dockerized \

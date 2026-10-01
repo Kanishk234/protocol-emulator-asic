@@ -5,7 +5,8 @@ Plain-language accounts of what happened in each phase, written for someone who 
 | Phase | Summary | Status |
 |---|---|---|
 | 0: setup | [PHASE0.md](PHASE0.md) | Complete |
-| 1: spec, model and risks | [PHASE1.md](PHASE1.md) | In progress |
+| 1: spec, model and risks | [PHASE1.md](PHASE1.md) | Complete |
+| 2: RTL core | [PHASE2.md](PHASE2.md) | In progress |
 
 **How these relate to the other docs:**
 - `docs/design/phases/` holds the **plans**: tasks and exit checklists, written before each phase starts.

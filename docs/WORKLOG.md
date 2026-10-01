@@ -19,6 +19,36 @@ Next:
 - ...
 ```
 
+## 2026-10-01: Codex (phase 2: review full 6x4 hardening)
+Done:
+- Reviewed standard GDS workflow run [36799356107](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356107) for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (`spike/r4-floorplan`; 2 lanes, 4 pin units, U0 full; 20 ns; density 56%; hold uncertainty 0.10 ns, setup 0.25 ns). The counts remain the candidate under test, not approval of final hardware counts.
+- All four workflow jobs passed: GDS (4 h 23 min), precheck (9/9 checks, 2 h 22 min), gate-level test (4 existing tests), and viewer. The rendered image shows the actual routed design.
+- Candidate `test`, `lint`, `docs`, and `unit` runs all passed on the exact R4 commit (36799356152, 36799356097, 36799356063, 36799356039). Main's corresponding workflows also passed on `ad401efdd0421c11931e9c6f533ed43cc5fcd788` (36799339276, 36799339202, 36799339220, 36799339309).
+- Detailed routing finished in 3 h 15 min 40 s with final route DRC 0. LVS and antenna checks are clean; KLayout SG13CMOS5L DRC and all other precheck checks passed. The 57,924 Magic DRC markers are the documented SRAM exception baseline; its 10 overlap markers are the expected POWER-stripe/SRAM-OBS crossings noted in the run's config and checked by Loom.
+- Typical setup has 0 violating paths; all-corner hold has 0 violating paths. Slow setup remains poor: WNS −10.698 ns, TNS −4,463.296 ns, 1,132 violations. Max-slew violations are 44 typical / 211 slow, and max-cap violations are 18 in each corner.
+- Global routing still reports 821 overflow (779 M3, 10 M2, 32 M4) at 78.19% M3 usage. Thus detailed routing converged within the Phase 2 <4 h routing target, but the high global congestion remains a design risk. The worst slow setup path is U0's `idle` configuration latch bit 7 to `dropped[16]`; keep it timed under D-066.
+- Added the run to `docs/reports/AREA.md` and updated the experiment record and Phase 2 checklist with the passed evidence. The 2-lane/4-unit measurement is not a final-count decision.
+
+Evidence:
+- GDS, timing, route and checker reports: downloaded run artifact at `/tmp/r4-gds-36799356107/GDS_logs/runs/wokwi/`; primary files are `final/metrics.json`, `39-openroad-globalrouting/openroad-globalrouting.log`, `44-openroad-detailedrouting/openroad-detailedrouting.log`, `55-openroad-stapostpnr/summary.rpt`, and `55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt`.
+- Precheck: `/tmp/r4-gds-36799356107/precheck_reports/results.md` (all 9 checks pass).
+- Gate-level suite: `/tmp/r4-gds-36799356107/gatelevel_test_results/results.xml` (4/4 tests pass; this is not the full L3 UART/SPI/I2C suite).
+- Viewer: `/tmp/r4-gds-36799356107/gds_render/gds_render.png` and viewer job in run 36799356107.
+
+Checklist boxes ticked (evidence):
+- [x] All RTL modules exist and lint clean with latches only where allowed: candidate lint run 36799356097; full synthesis checks in GDS run 36799356107.
+- [x] Full 6x4 GDS criteria as written (precheck, DRC/LVS/antenna, typical timing, detailed routing <4 h): run 36799356107. Slow-corner setup and global-route congestion are recorded above and in `docs/reports/AREA.md`.
+- [x] Viewer output shows the full routed design: viewer job and rendered image from run 36799356107.
+- [x] First full-design AREA row: `docs/reports/AREA.md`, run 36799356107.
+
+Problems / decisions:
+- Phase 2 is not complete. The area/count decision remains open; box 6's required L3 protocol tests on the hardened netlist are not covered by the four existing gate-level tests; slow-corner timing and global-route overflow need engineering review. The candidate counts are not approved for final hardware.
+- The candidate's all-corner STA report is retained as required evidence. Do not false-path or otherwise waive U0 `idle` → `dropped[16]`; D-066 requires live reconfiguration paths to remain timed.
+- The main-side test/docs/lint/unit runs were green before these uncommitted documentation updates. The docs workflow runs after push; no hardware inputs were changed by this session.
+
+Next:
+- Trace the `idle` → `dropped` logic and inspect the M3 congestion map; propose one behavior-preserving RTL or placement-flow experiment without lowering the 20 ns clock or removing protocol support. Keep D-066 paths timed and ask for any decision that changes the frozen contract. Then add the full L3 suite to the gate-level path and obtain the remaining budget/count sign-off.
+
 ## 2026-09-30: Codex (phase 2: register carrier enable on the pin clock)
 Done:
 - Added one flop in `trw_pin_tx.v` to capture the cached carrier-enabled predicate at each pin-unit clock and use that sampled value for the pad output. The carrier configuration latch-to-flop path remains timed under D-066; the registered carrier state no longer feeds the output-to-RX loop combinationally.

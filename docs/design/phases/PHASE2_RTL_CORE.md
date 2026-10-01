@@ -112,15 +112,15 @@ Not in this phase: the helper units CRC, MATCH, MEM and CAPTURE (deferred by D-0
 
 ## 4. Phase exit checklist (all must pass)
 - [ ] Area estimate done (`docs/reports/AREA_ESTIMATE.md`) and its budget decisions recorded in DECISIONS. *(Estimate done; tier 1 decided (D-038–D-040); open until the design fits a routable budget.)*
-- [ ] All modules in the table exist and lint clean (`verilator --lint-only -Wall`); latches only where allowed, waived.
+- [x] All modules in the table exist and lint clean (`verilator --lint-only -Wall`); latches only where allowed, waived. *(Evidence: candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`, lint CI run 36799356097; standard GDS run 36799356107 reports no inferred latches and synthesis checks pass.)*
 - [x] **L1** unit tests all green (ALU, EVAL, PIPE, CHAN, OVR, PIN-TX, PIN-RX including BITSYNC, ROT, HOST). *(Evidence: `unit` CI run 36456739733 on `main` at c2a1c04; RTL suites pass under Icarus and Verilator.)*
 - [x] **L2** lockstep ≥ 10⁶ clocks with zero divergences; L2-INJECT catches both injected bugs. *(Evidence: candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full); 1,000,000 clocks compared with zero divergences in 555.36 s using the main-branch `tripsim` model; clean RX and cursor baselines passed; isolated RTL priority-flip and cursor off-by-one mutations detected at clocks 99 and 326. Commands and results are in `docs/WORKLOG.md`, 2026-09-30 L2 rerun. Counts are the candidate under test, not approval of final hardware counts.)*
 - [ ] **L3-UART, L3-SPI-C, L3-I2C-C** pass in RTL against reference models and **sigrok**.
 - [ ] The same L3 tests pass in **`gl_test`** on the hardened netlist.
-- [ ] Full 6x4 `gds` run: DRC/LVS/antenna clean, precheck green, timing met at the typical corner, routing < 4 h.
-- [ ] `viewer` deployed; Pages shows the real design.
-- [ ] `test`, `docs`, `lint`, `unit` workflows green on `main`.
-- [ ] `docs/reports/AREA.md` has the first full-design row.
+- [x] Full 6x4 `gds` run: DRC/LVS/antenna clean, precheck green, timing met at the typical corner, routing < 4 h. *(Evidence: GDS run 36799356107; detailed-route DRC 0, LVS errors/differences 0, antenna violations 0; precheck 9/9; typical setup 0 violations; detailed routing 3 h 15 min 40 s. Slow setup remains −10.698 ns / 1,132 paths, and global routing reported 821 overflow; both are recorded in `docs/reports/AREA.md`.)*
+- [x] `viewer` deployed; Pages shows the real design. *(Evidence: viewer job in run 36799356107 passed and its rendered GDS image shows the full routed design.)*
+- [x] `test`, `docs`, `lint`, `unit` workflows green on `main`. *(Evidence: all four passed on `main` at `ad401efdd0421c11931e9c6f533ed43cc5fcd788`: test 36799339276, docs 36799339220, lint 36799339202, unit 36799339309. Re-run after the eventual hardware switch and keep them green.)*
+- [x] `docs/reports/AREA.md` has the first full-design row. *(Evidence: run 36799356107, recorded as R4 run 8.)*
 - [ ] Every bug found so far is in `BUGS.md`.
 
 ## 5. Risks in this phase

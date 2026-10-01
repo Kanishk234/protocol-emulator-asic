@@ -25,25 +25,32 @@ Done:
 - Kept this as one RTL change on top of R4 `cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc`; lane/unit counts, 20 ns clock, and 56% density are unchanged.
 - The full and lean pin suites each pass 60/60. L2 smoke passes 128 clocks; the full lockstep passes 1,000,000 clocks with zero divergences against main's `b6f8fa9` model. Both required RTL injections are detected.
 - Matched 20 ns pre-layout STA with every latch-to-state path timed improves worst slack from +8.858 to +9.154 ns typical and +2.717 to +3.344 ns slow. Yosys mapped area rises from 390,666.74 to 391,112.44 µm² (+445.70 µm²).
-- Copied only `src/trw_pin_tx.v` into `/tmp/r4-bitsync-work` for review. No hardening was started; routed timing, congestion and signoff remain unproven.
+- Copied only `src/trw_pin_tx.v` into `/tmp/r4-bitsync-work` for review before pushing. Routed timing, congestion and signoff remain unproven until GDS run 36799356107 finishes.
 - Updated the main-side `gds-thread-experiment.yaml` guard to permit either the exact baseline or a candidate differing from `cfc41e1` only in `src/trw_pin_tx.v`, so this one-file candidate can be tested with an explicit OpenROAD thread count.
+- R4 commit `3393eea9a58c5cad9077cc360a8515d0e5ec8284` passed `test`, `lint`, `docs`, and `unit`. Its standard GDS workflow is still running in `Build GDS`; precheck, gate-level test, and viewer are downstream.
+- Main commit `ad401efdd0421c11931e9c6f533ed43cc5fcd788` passed `test`, `lint`, `docs`, and `unit`.
+- Re-ran L2 on the exact pushed RTL revision `3393eea9a58c5cad9077cc360a8515d0e5ec8284`: smoke passed 128 clocks; full comparison passed 1,000,000 clocks with zero divergences in 555.36 s. Both clean injection baselines passed; priority-flip was detected at clock 99 and cursor off-by-one at clock 326.
+- Added `docs/reports/PHASE2_GDS_EXPERIMENTS.md` to summarize the measured fit/timing experiments, constraints, current status, and follow-up candidates.
 
 Evidence:
 - Pin suites: `/tmp/r4-carrierout-ff/test_internal/pin/results_full1_frac8.xml` and `results_full0_frac8.xml` (60/60 each).
 - L2: `L2_CYCLES=128` smoke and `L2_CYCLES=1000000` full run from `test_internal/l2` with `RTL_DIR=/tmp/r4-carrierout-ff/src`; full run reported zero divergences in 523.39 s.
 - L2-INJECT: `RTL_DIR=/tmp/r4-carrierout-ff/src RTL_REV=cfc41e1d67a1f9c8cbca4168f6979f4c17a999cc-carrierout-ff python test_internal/l2/run_injections.py`; priority-flip detected at clock 99, cursor off-by-one at clock 326, and both clean baselines passed.
+- Exact-revision L2 rerun: `L2_CYCLES=128 make -C test_internal/l2 SIM=verilator RTL_DIR=/tmp/r4-bitsync-work/src RTL_REV=3393eea9a58c5cad9077cc360a8515d0e5ec8284`; `L2_CYCLES=1000000 make -C test_internal/l2 SIM=verilator RTL_DIR=/tmp/r4-bitsync-work/src RTL_REV=3393eea9a58c5cad9077cc360a8515d0e5ec8284` (PASS, 1,000,000 clocks, zero divergences, 555.36 s); `RTL_DIR=/tmp/r4-bitsync-work/src RTL_REV=3393eea9a58c5cad9077cc360a8515d0e5ec8284 python test_internal/l2/run_injections.py` (clean baselines passed; both RTL mutations detected).
 - STA and area: `/tmp/r4-carrierout-ff/synth/chip/build/sta_typ_d066.txt`, `sta_slow_d066.txt`, and `stat_flat.txt`; baseline: `/tmp/r4-candidate-cache/synth/chip/build/sta_typ_1p20V_25C_d066.txt`, `sta_slow_1p08V_125C_d066.txt`, and `stat_flat.txt`.
+- GitHub Actions: R4 test [36799356152](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356152), lint [36799356097](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356097), docs [36799356063](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356063), and unit [36799356039](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356039) passed; GDS [36799356107](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356107) remains in progress at `Build GDS`. Main test [36799339276](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799339276), lint [36799339202](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799339202), docs [36799339220](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799339220), and unit [36799339309](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799339309) passed.
 
 Checklist boxes ticked (evidence):
-- None. Full routed timing and GDS signoff are still required.
+- [x] Phase 2 L2 lockstep and L2-INJECT: exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`, 1,000,000 clocks with zero divergences; both clean baselines passed and both RTL mutations detected. Detailed evidence is in `docs/design/phases/PHASE2_RTL_CORE.md` and the commands above.
+- Other Phase 2 boxes remain open. Full routed timing and GDS signoff are still required.
 
 Problems / decisions:
 - This is pre-layout evidence only. The new register changes sub-cycle response to a pin-configuration latch update; the architecture and model observe the new setting on the next pin-unit clock, and clock-level pin/L2 checks pass. Review the diff before hardening.
-- A fresh GitHub Actions status query could not connect to `api.github.com`; the last available status showed no active hardening. Recheck before pushing, because a hardware push can cancel a running hardening.
-- The main checkout has uncommitted `docs/WORKLOG.md` and `.github/workflows/gds-thread-experiment.yaml` changes. The R4 worktree has only `src/trw_pin_tx.v` modified.
+- The first GitHub Actions query could not connect to `api.github.com`; a subsequent query succeeded and confirmed the runs above.
+- The main checkout has uncommitted `docs/WORKLOG.md`, `docs/design/phases/PHASE2_RTL_CORE.md`, and new `docs/reports/PHASE2_GDS_EXPERIMENTS.md` updates. Both pushed branches were clean and in sync at the time of the check.
 
 Next:
-- Review and commit the workflow guard on `main`, then commit and push the single RTL change on `spike/r4-floorplan`. Confirm no hardening is active before the hardware push; run one 4-thread GDS experiment at unchanged 2-lane/4-unit, 20 ns, 56% settings. Judge it by post-route timing, overflow, complete DRC/LVS/antenna, precheck, gate-level tests, and viewer.
+- Wait for R4 unit and GDS runs to finish. If GDS passes, verify the downstream precheck, gate-level test, and viewer jobs. If GDS fails, inspect its artifact and address the measured failure; do not tick any other Phase 2 boxes before their evidence passes.
 
 ## 2026-09-30: Codex (phase 2: screen critical-path RTL ideas)
 Done:

@@ -5,6 +5,87 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-01: Codex (phase 2: analyze 12% GRT hardening)
+Done:
+- Downloaded artifact `GDS_logs-36913096552` for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full; 20 ns; density 56%). Run 36913096552 failed after 5 h 31 min in the full hardening job; precheck and `gl_test` were skipped.
+- The 12% global route had zero overflow, 631,958 total capacity, 254,567 demand, 40.28% usage and 2,458,468 µm wirelength. Compared with the 30% run's 821 overflow and 2,863,598 µm, this improves the global-route estimate but not the full route.
+- Detailed routing was still in optimization when the LibreLane step hit its configured 330-minute limit. Its partial log reports 35,152 initial violations, 26,196 after optimization iteration 1, then 25,030 after iteration 2; no detailed route completion or final DRC was produced. Do not interpret those intermediate counts as a final DRC report.
+- At the post-CTS checkpoint, preliminary metrics show slow setup WNS −5.044 ns / TNS −555.063 ns / 184 violating paths; fast and slow hold WNS −0.327 ns / −0.554 ns with 28 violating paths each. No final routed timing, LVS, precheck, gate-level, or viewer evidence exists for this run.
+- Added 16% as an option to the existing GRT-only diagnostic workflow. It will compare capacity/overflow and route guides before another multi-hour full hardening; no RTL, config, macro, info, or active hardening input changed.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md`; `git diff --check` passed. No Phase 2 checklist boxes were ticked.
+
+Checklist boxes ticked (evidence):
+- None. GRT improvement alone is not a completed route or signoff result.
+
+Next:
+- Run `gds-congestion-diagnostic` at 16%, then compare it against the saved 12% and 30% reports. Promote it to full hardening only if the routeability indicators support it. Keep timing optimization as a separate one-change hardening track and preserve 20 ns / D-066 behavior.
+
+## 2026-10-01: Codex (phase 2: screen one-hot pin input selector)
+Done:
+- Screened an isolated one-file rewrite of `trw_pin_io.v` against the exact R4 candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full). It replaces the variable A/S pad select with equality decodes and a masked OR. The scratch tree is `/tmp/r4-pinin-opt/src`; the active GDS candidate and its inputs were not changed.
+- Matched slow-corner mapped Yosys/OpenSTA: area changed 393,004.18 → 392,124.61 µm² (−0.224%). Worst path from U0 `idle` improved by 1.335 ns of slack; the same latch-to-`dropped[26]` endpoint improved by 0.902 ns. This is pre-placement, no-parasitic timing only.
+- Yosys SAT proved combinational `a_in`, `b_in`, `c_in`, and `sel` equivalence for all two-state inputs. The R4 pin suites passed 60/60 for FULL=0/1 on Icarus on both baseline and scratch RTL; the scratch variant also passed 60/60 for each mode on Verilator. Whole-chip Verilator lint passed.
+- Scratch L2 passed the 128-clock smoke and 1,000,000-clock comparison with zero divergences. Both L2 RTL injections were detected: priority flip at clock 99; cursor off-by-one at clock 326.
+- Ran L3 using the matching R4 checkout/spec/tools. Baseline and scratch outputs match: UART RX passes; the TX, SPI-C and I2C-C reference-model checks pass, but local sigrok checks receive empty annotations, so those tests report failures. The VCD-to-UART toolchain smoke also returns no decoded bytes (`scripts/sigrok_smoke.py /tmp/tripwire-sigrok-smoke` expected `TRIPWIRE`, got empty output); `sigrok-cli -L` returns no supported-module listing, including with `SIGROKDECODE_DIR=/usr/share/libsigrokdecode/decoders`. This confirms a local sigrok installation/setup problem rather than a candidate RTL or L3 VCD-specific regression. A first cross-check using `main`'s newer generated host map was discarded as an invalid mixed-revision run.
+- Refreshed hardening run 36913096552; at 2026-10-02 00:26 UTC it remained in full hardening step 11, about 5 h 10 min after start. GitHub still withholds logs until that step completes; its 6-hour job limit is approaching.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md`. `git diff --check` passed. No phase checklist boxes were ticked; no candidate RTL or flow input was changed.
+
+Checklist boxes ticked (evidence):
+- None. The mapped screen and simulations do not establish routed timing or GDS signoff.
+
+Next:
+- Review run 36913096552 immediately when it completes or times out. If its slow-corner path remains relevant, decide whether to route this one-file selector as a separate hardening. Rerun the L3 sigrok checks with a working sigrok-cli/libsigrok installation; the local toolchain currently fails its standalone UART smoke test.
+
+## 2026-10-01: Codex (phase 2: trace the slow timing cone)
+Done:
+- Audited the final slow-corner path list and mapped endpoint cells back to the archived synthesized netlist for run 36799356107. Of 1,000 reported worst paths, 991 launch from U0's stored `idle` configuration latch. The first 120 unique endpoints span 54 U0 BITSYNC state bits, 20 U0 RX producer state bits, 40 top-level state bits (including C2 DROPPED), five fabric `last_seq` bits and U0 `overrun`.
+- This broad, shared cone indicates the counter endpoint is only one of many affected sinks. A counter-only rewrite is unlikely to close the path; focus screening on the latch-driven pad/RX/fabric cone and physical fanout/load repair.
+- The saved GRT checkpoint is available, but the local replay remains unavailable: no LibreLane or Docker, and cached OpenROAD has missing shared libraries. The active GDS run 36913096552 was refreshed successfully at 18:06 Chicago and remained in hardening step 11.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md`; `git diff --check` passed. No hardware or active flow inputs changed.
+
+Checklist boxes ticked (evidence):
+- None; this is report analysis, not a new routed result.
+
+Next:
+- Use a compatible flow environment to test timing repair at the saved GRT checkpoint. When the active run finishes, repeat endpoint/fanout analysis on its 12% GRT route before selecting the next RTL experiment.
+
+## 2026-10-01: Codex (phase 2: prepare route-aware timing replay)
+Done:
+- Confirmed the prior baseline GRT checkpoint is present at `/tmp/r4-gds-36799356107/GDS_logs/runs/wokwi/39-openroad-globalrouting/`: it includes the ODB, DEF, guides, config, and LibreLane state. The checkpoint is candidate `3393eea` with 30% GRT adjustment; use it only as a flow-repair screen, not as a substitute for the active 12% run.
+- Checked the local replay environment. The project venv has no LibreLane module and Docker is unavailable. The cached OpenROAD binary cannot start because its cached package dependencies (`libtcl8.6`, `libortools`, and Qt libraries) are missing. No local route-aware repair run could be launched.
+- GitHub CLI recovered on retry. At 18:06 Chicago, run 36913096552 remained in full hardening step 11; later steps are pending.
+- No candidate RTL/config/flow inputs were changed. Existing documentation changes remain uncommitted.
+
+Checklist boxes ticked (evidence):
+- None. The saved checkpoint has not been replayed and the active workflow result is unavailable.
+
+Next:
+- Run the saved-state ECO replay in a compatible LibreLane 3.1.0.dev3/IHP/OpenROAD environment, or wait for the active run's artifacts and use its 12% GRT checkpoint. Report fresh slow-corner setup and fast-corner hold at the checkpoint before routing any RTL variant.
+
+## 2026-10-01: Codex (phase 2: timing experiment research)
+Done:
+- Traced the archived slow latch-to-DROPPED path and consulted primary OpenROAD, Yosys and LibreLane documentation. The path has slow heavily loaded cell arcs as well as logic depth; a 2.399 ns cell arc and >3 ns transition motivate targeted sizing/load repair.
+- Checked the baseline resolved configuration: AREA 0 synthesis, timing-driven placement disabled, and both post-GRT design repair and timing repair disabled. Post-CTS repair loaded all corners but reported no setup violations; intermediate STA/GRT loaded typical only. The repair/signoff discrepancy needs fresh checkpoint reports, not conclusions from metrics inherited in state JSON.
+- Added a ranked screening plan and source links to `docs/reports/PHASE2_GDS_EXPERIMENTS.md`: route-aware repair, timing-driven placement, delay synthesis/slow mapping, existing RTL trials, configuration predecode, narrow load/drop decode and targeted locality/cloning. No hardware or running-flow inputs changed; no new experiments were launched.
+
+Checklist boxes ticked (evidence):
+- None; the new ideas are proposals without timing results.
+
+Next:
+- Diagnose the repair/signoff discrepancy and screen route-aware repair using saved checkpoints before selecting the next complete hardening. Preserve 20 ns, D-066 and same-cycle DROPPED accounting.
+
+## 2026-10-01: Codex (phase 2: timing and signoff action plan)
+Done:
+- Checked `gds-grt-adjustment-experiment` run 36913096552 at 22:54 UTC (17:54 Chicago): still in progress, about 3 h 38 min after the hardening job started. Setup and candidate validation passed; full LibreLane hardening step 11 remains active. GitHub does not expose this job's logs until completion; precheck and gate-level jobs have not started.
+- Reviewed the timing experiment report. The current flow trial uses exact candidate `3393eea`, 2 lanes / 4 units / U0 full, 20 ns, density 56%, with only the 12% GRT adjustment override. The earlier GRT-only zero-overflow result does not establish detailed-route or timing success.
+- Set the follow-up order: inspect this run's routed all-corner paths and physical checks; if timing still fails, prioritize a separate single-change pad-mux hardening if the path diagnosis still supports it, then evaluate the RX compare-factor trial separately. Both prototypes already passed million-clock L2 and RTL injection checks, but neither has routed timing evidence.
+
+Checklist boxes ticked (evidence):
+- None; the active experiment has not completed.
+
+Next:
+- Download the completed run's artifacts and compare congestion, routed timing, slew/cap, DRC/LVS/antenna, runtime, precheck, and gate-level results. Complete the matching-candidate L3 reference/sigrok suite and run it against the hardened netlist. Keep the 20 ns clock, protocol support, timed D-066 live configuration, and same-cycle DROPPED accounting throughout.
+
 ## 2026-10-01: Codex (phase 2: screen pad mux timing)
 Done:
 - Refreshed hardening run [36913096552](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36913096552): it remains in full LibreLane hardening step 11, pinned to candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`, 2 lanes / 4 units / U0 full, 20 ns, 56% density, `GRT_ADJUSTMENT=0.12`. At 21:56 UTC it had been in that step about 2 h 40 min; precheck and gate-level jobs are waiting on hardening. GitHub says logs will be available when the step completes.

@@ -1,11 +1,13 @@
 # WS2812 / WS2812B / SK6812 LED strip driver. 2 slots, 1 pin unit (PULSE mode).
-#   DIN = uo0. Host: DATA bytes = colour bytes in the strip's order (G, R, B per LED);
-#   EVENT = latch (the strip shows the colours after a >= 50 us low).
+#   DIN = uo0. Host: send each LED's 24 GRB bits as two MSB-first, 12-bit DATA tokens with length-in-token
+#   enabled (top nibble 0xB); EVENT = latch (the strip shows the colours after a >= 50 us low).
 program ws2812
 const LATCH = 0x4000 | 3000             # GAP 3000 clocks = 60 us of idle low
 
-# a 0 bit: 20 clocks high, 43 low (0.40 / 0.86 us); a 1 bit: 40 high, 23 low (0.80 / 0.46 us)
-pin U0: pin_a=uo0 txmode=pulse nbits=8 order=msb idle=0 sym0_first=1 sym0_t1=20 sym0_t2=43 sym1_first=1 sym1_t1=40 sym1_t2=23
+# The RTL pad trace adds one clock to the second phase, so configure 49/29 for 50/30 output clocks:
+# a 0 bit: 25 high, 50 low (0.50 / 1.00 us); a 1 bit: 47 high, 30 low (0.94 / 0.60 us).
+# These legal upper-tolerance periods leave enough time for host-SPI to refill 12-bit tokens.
+pin U0: pin_a=uo0 txmode=pulse tx_lentok=true nbits=8 order=msb idle=0 sym0_first=1 sym0_t1=25 sym0_t2=49 sym1_first=1 sym1_t1=47 sym1_t2=29
 own uo0 U0
 connect L0.I0 <- HOST_IN
 connect U0.tx <- L0.O0

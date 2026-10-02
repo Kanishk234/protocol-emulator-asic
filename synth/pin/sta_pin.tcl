@@ -1,7 +1,7 @@
 # Static timing of the synthesized pin-unit wrapper (trw_pin_meas) with OpenSTA, pre-layout: ideal clock,
 # no wire parasitics (as spikes/r1_lane/sta.tcl).
-# Env: PIN_LIB (liberty), PIN_NET (netlist), PIN_PERIOD (ns), PIN_CFG_STATIC (1: the configuration
-# latches are false-path startpoints, since the host writes them only while halted, §14 H1, D-038).
+# Env: PIN_LIB (liberty), PIN_NET (netlist), PIN_PERIOD (ns). Pin configuration latch outputs always remain
+# timed startpoints under D-066 because writes may occur after units become live.
 # Latch D pins borrow time by design (0 slack, as in R2), so the reported paths end at flop D pins.
 read_liberty $::env(PIN_LIB)
 read_verilog $::env(PIN_NET)
@@ -21,10 +21,7 @@ foreach c [get_cells *] {
     if {[string match "sg13cmos5l_df*" $lc]} { lappend flop_d [get_pins -of_objects $c -filter "direction == input && name == D"] }
 }
 puts "latch cells: [llength $latches]; flop D pins: [llength $flop_d]"
-if {$::env(PIN_CFG_STATIC) == 1 && [llength $latches] > 0} {
-    set_false_path -from $latches
-    puts "configuration latches set as false-path startpoints"
-}
+puts "latch outputs remain timed startpoints (including pin configuration, D-066)"
 
 puts "\n==== worst path to a flop"
 report_checks -path_delay max -to $flop_d -digits 3 -fields {fanout nets}

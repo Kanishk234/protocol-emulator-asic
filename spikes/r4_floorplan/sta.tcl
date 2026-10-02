@@ -1,7 +1,7 @@
 # R4: pre-layout static timing of the Yosys netlist (ideal clock, no wires), as spikes/r1_lane/sta.tcl.
-# Env: R4_LIB, R4_MACRO_LIB, R4_NET, R4_PERIOD. Configuration latches (slots, K, pin configuration) are
-# written only while halted (§14 H1), so they are false-path startpoints; latch D pins borrow time by
-# design (R2), so the reported paths end at flop D pins and outputs.
+# Env: R4_LIB, R4_MACRO_LIB, R4_NET, R4_PERIOD. Keep latch outputs as timed startpoints: D-066 allows pin
+# configuration writes after units are live, and the updated value reaches unit state next clock. Latch D
+# pins borrow time by design (R2), so the reported paths end at flop D pins and outputs.
 read_liberty $::env(R4_LIB)
 read_liberty $::env(R4_MACRO_LIB)
 read_verilog $::env(R4_NET)
@@ -19,7 +19,7 @@ foreach c [get_cells *] {
     if {[string match "sg13cmos5l_df*" $lc]} { lappend flop_d [get_pins -of_objects $c -filter "direction == input && name == D"] }
 }
 puts "latch cells: [llength $latches]; flop D pins: [llength $flop_d]"
-set_false_path -from $latches
+puts "latch outputs remain timed startpoints (including pin configuration, D-066)"
 puts "\n==== worst path to a flop"
 report_checks -path_delay max -to $flop_d -digits 3 -fields {nets}
 puts "\n==== ten worst flop endpoints"

@@ -69,23 +69,21 @@ for f in 0 1; do
 done
 
 echo "=== STA at $PERIOD ns"
-printf "\n%-6s %-16s %-4s %10s %10s  %s\n" net corner cfg arrival slack "worst path to a flop (first net -> last net)" >> "$SUMMARY"
+printf "\n%-6s %-16s %10s %10s  %s\n" net corner arrival slack "worst path to a flop (first net -> last net)" >> "$SUMMARY"
 for f in 0 1; do
   for corner in typ_1p20V_25C slow_1p08V_125C; do
-    for cs in 0 1; do
-      out="$B/sta_meas${f}_${corner}_cfg$cs.txt"
-      PIN_LIB="$LIBDIR/sg13cmos5l_stdcell_$corner.lib" PIN_NET="$B/net_meas$f.v" PIN_PERIOD="$PERIOD" \
-        PIN_CFG_STATIC=$cs STA sta_pin.tcl > "$out"
-      grep -q "==== summary" "$out" || { echo "STA failed, see $out" >&2; tail -5 "$out" >&2; exit 1; }
-      arr=$(awk '/==== worst path to a flop/{f=1} f && /data arrival time/{print $1; exit}' "$out")
-      slk=$(awk '/==== worst path to a flop/{f=1} f && /slack/{print $1; exit}' "$out")
-      sp=$(awk '/==== worst path to a flop/{f=1} f && /\(net\)/{print $1; exit}' "$out")
-      ep=$(awk '/==== worst path to a flop/{f=1} /==== ten worst/{f=0} f && /\(net\)/{e=$1} END{print e}' "$out")
-      printf "%-6s %-16s %-4s %10s %10s  %s -> %s\n" "meas$f" "$corner" "$cs" "$arr" "$slk" "$sp" "$ep" >> "$SUMMARY"
-    done
+    out="$B/sta_meas${f}_${corner}_timed.txt"
+    PIN_LIB="$LIBDIR/sg13cmos5l_stdcell_$corner.lib" PIN_NET="$B/net_meas$f.v" PIN_PERIOD="$PERIOD" \
+      STA sta_pin.tcl > "$out"
+    grep -q "==== summary" "$out" || { echo "STA failed, see $out" >&2; tail -5 "$out" >&2; exit 1; }
+    arr=$(awk '/==== worst path to a flop/{f=1} f && /data arrival time/{print $1; exit}' "$out")
+    slk=$(awk '/==== worst path to a flop/{f=1} f && /slack/{print $1; exit}' "$out")
+    sp=$(awk '/==== worst path to a flop/{f=1} f && /\(net\)/{print $1; exit}' "$out")
+    ep=$(awk '/==== worst path to a flop/{f=1} /==== ten worst/{f=0} f && /\(net\)/{e=$1} END{print e}' "$out")
+    printf "%-6s %-16s %10s %10s  %s -> %s\n" "meas$f" "$corner" "$arr" "$slk" "$sp" "$ep" >> "$SUMMARY"
   done
 done
-echo "(cfg 1 = configuration latches are false-path startpoints; reg-to-reg paths; setup uncertainty 0.25 ns)" >> "$SUMMARY"
+echo "(pin configuration latch outputs timed per D-066; setup uncertainty 0.25 ns)" >> "$SUMMARY"
 echo; cat "$SUMMARY"
 echo; for f in 0 1; do echo "--- hierarchy, FULL=$f"; grep -E "^=== |Chip area" "$B/stat_hier_unit$f.txt"; done
 echo "run_pin: done (reports in synth/pin/$B/)"

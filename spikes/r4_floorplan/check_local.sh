@@ -54,7 +54,7 @@ yosys -q -l "$B/yosys.log" -p "$YS; synth -top tt_um_tripwire -flatten; dfflibma
   write_verilog -noattr -noexpr $B/test/gate_level_netlist.v" >/dev/null
 grep -E "Chip area for (module|top)" "$B/stat_hier.txt" | sed 's/^ *//'
 grep -E " cells$|sg13cmos5l_(dfrbpq|dlhq|lgcp)|RM_IHP|Chip area" "$B/stat_flat.txt" | sed 's/^ */  flat: /'
-echo "=== pre-layout STA (OpenSTA, 20 ns, config latches static)"
+echo "=== pre-layout STA (OpenSTA, 20 ns, configuration latch outputs timed; D-066)"
 OR="$CACHE/openroad"
 if [ -x "$OR/x/usr/bin/sta" ]; then
   sed 's/^\( *\)wire signed /\1wire /' "$B/test/gate_level_netlist.v" > "$B/net_sta.v"

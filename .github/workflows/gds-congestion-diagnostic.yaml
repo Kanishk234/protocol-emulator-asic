@@ -10,6 +10,7 @@ on:
         type: choice
         options:
           - "0.30"
+          - "0.16"
           - "0.12"
 
 permissions:

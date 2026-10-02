@@ -5,6 +5,49 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-02: Codex (phase 2: 16% detailed route and servo PWM RTL)
+Done:
+- Reviewed DRT-only continuation [36951141285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36951141285) for candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 units, U0 full; 20 ns; density 56%). It completed successfully in 3 h 48 min total; detailed routing took 3 h 45 min and ended with 0 router violations, 0 final route DRC markers, and 1,887,085 µm detailed wirelength. The workflow skipped post-route parasitic extraction/STA, GDS stream-out, full DRC/LVS/antenna, precheck, gate-level tests, and viewer; it is not full GDS signoff. Artifact: `/tmp/drt-continuation-36951141285/`.
+- Added `test_l3_servo_pwm` in `test_internal/chip/test_l3.py`. On the exact candidate, it passed under Verilator (34.66 s) and Icarus 12 (292.51 s): UO0 emitted a 1.5 ms pulse, then a 1.0 ms pulse after an early host update; both periods were exactly 1,000,000 clocks (20 ms). Local command, after temporarily copying the current L3 test/helper into the candidate checkout and restoring them: `TRIPWIRE_SKIP_SIGROK=1 make -C /tmp/r4-bitsync-work/test_internal/chip SIM=verilator RTL_DIR=/tmp/r4-bitsync-work/src COCOTB_TEST_MODULES=test_l3 COCOTB_TEST_FILTER=test_l3_servo_pwm SIM_BUILD=sim_build/servo_l3_verilator COCOTB_RESULTS_FILE=results_servo_l3_verilator.xml`; repeat with `SIM=icarus`, `SIM_BUILD=sim_build/servo_l3_icarus`, and `COCOTB_RESULTS_FILE=results_servo_l3_icarus.xml`. Local sigrok was skipped; the test writes a sparse PWM VCD for CI decoding.
+- Checked host-update timing against tripsim. With an 865-clock delay approximating the candidate SPI host write, a width update sent after a pulse falls misses the already staged frame; both model and RTL apply it on the following frame. No protocol bug was inferred. The test sends early enough in the frame to check the documented next-frame update.
+- Updated `docs/reports/PHASE2_PROTOCOL_COVERAGE.md`, `docs/reports/PHASE2_GDS_EXPERIMENTS.md`, and `docs/summaries/PHASE2.md`. Changed `.github/workflows/gds-grt-adjustment-experiment.yaml` to accept a manual 12% or 16% flow-only setting, defaulting to 16%; YAML parsing and input/env consistency checks passed. The workflow was not dispatched.
+- `git diff --check` passed. No Phase 2 checklist box was ticked. No RTL, `src/config.json`, `info.yaml`, macro, or hardening input changed. The candidate temp checkout was restored; its pre-existing top-level test changes were left untouched.
+
+Checklist boxes ticked (evidence):
+- None. The DRT-only result is not full signoff, and local protocol tests are not hardened-netlist evidence.
+
+Next:
+- After the workflow edit reaches `main`, run a full 16% hardening with the 20 ns clock and pinned R4 candidate. Review actual routed all-corner setup/hold, DRC/LVS/antenna, precheck, gate-level results, and viewer output before any checklist update.
+- Run the expanded protocol suite with sigrok in CI and on the resulting hardened netlist; continue covering remaining model-verified programs.
+
+## 2026-10-01: Codex (phase 2: extend RTL protocol coverage)
+Done:
+- Added complete-program MIDI TX, SPI-target, I2C-target, DMX, WS2812 and DShot checks in `test_internal/chip/test_l3.py`. The ten cases cover required UART/SPI/I2C controller tests plus MIDI, SPI/I2C targets, DMX, WS2812, and DShot at 150/300/600/1200 kbit/s.
+- On exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`, all ten L3 cases passed across both simulators. Verilator: seven-test module passed 7/7, with focused DMX/WS2812/DShot tests passing. Icarus: six UART/SPI/I2C module tests passed 6/6, with focused MIDI/DMX/WS2812/DShot tests passing. Local command prefix: `TRIPWIRE_SKIP_SIGROK=1 make -C /tmp/r4-bitsync-work/test_internal/chip`; simulator-specific settings used `SIM_BUILD=sim_build/<case>_icarus COCOTB_RESULTS_FILE=results_<case>_icarus.xml COCOTB_TEST_FILTER=test_l3_<case>_tx` for focused cases. The model pulse suite also passed 6/6 with the command below. Local sigrok decoding was skipped; CI evidence covers only the original four L3 cases, and the expanded tests have not run on a hardened netlist.
+- Model PULSE command: `TRIPWIRE_SKIP_SIGROK=1 PYTHONPATH=tools:tools/kernels pytest -q tools/kernels/tests/test_pulse_protocols.py::test_ws2812_two_frames tools/kernels/tests/test_pulse_protocols.py::test_dshot_frames_and_checksum tools/kernels/tests/test_pulse_protocols.py::test_dshot_checksum_is_computed_by_the_lane` — 6 passed.
+- WS2812's first RTL test exposed a host-throughput gap hidden by the model test's instantaneous input preload. Updated `programs/ws2812.trw` to send two 12-bit length-in-token chunks per LED and use legal upper-tolerance pulse timings; the chip pad trace now passes the timing decoder with actual host SPI traffic. The model test was changed to the same format and BUGS.md #55 records the finding. I2C-target tests use bus-free intervals between 1 MHz writes because sustained writes exceed documented HOST_OUT polling throughput; no RTL defect was inferred.
+- Updated `docs/reports/PHASE2_PROTOCOL_COVERAGE.md`, `docs/reports/PROTOCOL_SUPPORT.md`, and the in-progress Phase 2 summary with the evidence and remaining sigrok/netlist gaps. Active DRT continuation 36951141285 was still in detailed routing at the last check; GitHub reported it in progress, but live logs returned an API connection error.
+- No RTL, config, info, or macro files changed; firmware, tests and docs changed. No Phase 2 checklist box was ticked. `git diff --check` passed.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Run the expanded L3 tests with sigrok in CI, then on the matching hardened netlist when available. Continue with the remaining model-verified programs from `docs/reports/PROTOCOL_SUPPORT.md` while preserving active hardening inputs.
+
+## 2026-10-01: Codex (phase 2: audit expanded protocol capability goal)
+Done:
+- Checked active GitHub workflows: DRT-only continuation [36951141285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36951141285) is the only queued or running workflow; it continues detailed routing from the saved 16% GRT checkpoint.
+- Compared `docs/reports/PROTOCOL_SUPPORT.md`, D-049's resource floor, the Phase 2/3 plans, and current chip tests. The current R4 RTL and hardened-netlist L3 evidence covers UART 8N1, SPI controller mode 0, and I2C controller only. D-049's one-program-at-a-time resource measurement does not establish RTL/GDS behavior for every program.
+- Added `docs/reports/PHASE2_PROTOCOL_COVERAGE.md` to map roadmap status to current R4 RTL/netlist evidence and list the safe test-side work that can proceed during DRT. No RTL, config, info, macro, or active workflow input changed; no checklist box was ticked.
+- `git diff --check` passed.
+
+Checklist boxes ticked (evidence):
+- None.
+
+Next:
+- Keep the DRT continuation running without modifying its checkpoint inputs. Start extending `test_internal/chip/test_l3.py` with complete-program RTL tests for the existing model-verified programs, then run the matching suite on the hardened netlist. Keep the 20 ns target and do not count model-only tests as RTL evidence.
+
 ## 2026-10-02: Codex (phase 2: RTL and gate-level L3 passed)
 Done:
 - Retrieved and reviewed candidate unit workflow [36799356039](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356039) for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. The chip RTL L3 suite passed 4/4 under both Icarus and Verilator, with `sigrok-cli` installed; tests cover UART TX, UART RX framing, SPI controller and I2C controller against reference models and sigrok. Artifacts `rtl-results` and `rtl-verilator-results` contain `chip/results.xml` and `chip/results_vl.xml`.

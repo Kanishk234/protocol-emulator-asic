@@ -31,7 +31,7 @@ Per CLAUDE.md, nothing here claims USB or Ethernet *support*. Those rows are fea
 | PCM / TDM | Expected (firmware) | As I2S with other WS patterns and word lengths |
 | IR remote, NEC (TX and RX) | **Verified (model)** | `programs/ir_nec.trw`, 2 lanes: TX with a 38 kHz carrier (D-024) and exact 108 ms frames, sigrok `ir_nec` (carrier detection); RX from edge timestamps in PRESC ticks (frames and repeat codes) |
 | Slow Manchester (DALI, etc.) | Expected (firmware) | Encode/decode in routines or from edge timestamps; fine at kbit/s rates |
-| WS2812 / WS2812B / SK6812 | **Verified (model)** | `programs/ws2812.trw`, 2 slots; every datasheet tolerance checked by a reference decoder; sigrok `rgb_led_ws281x` |
+| WS2812 / WS2812B / SK6812 | **Verified (model)** | `programs/ws2812.trw`, 2 slots; host sends each LED's 24 GRB bits in two 12-bit length-in-token words so the 6.25 MHz host SPI link can sustain the waveform; pulse timings are within datasheet tolerance and checked by a reference decoder; sigrok `rgb_led_ws281x` |
 | DShot150 / 300 / 600 / 1200 | **Verified (model)** | `programs/dshot.trw`: the lane computes the checksum in a routine; frames, checksums and bit timing checked by a reference decoder (sigrok has no DShot decoder) |
 | Servo / ESC PWM | **Verified (model)** | `programs/servo.trw`, 2 slots + 1 routine: 500–4000 µs pulses, exactly 20 ms period, width updates between frames; sigrok `pwm` |
 | Quad / dual SPI, 8080 parallel | Needs primitive: **parallel shift** (optional) | Works today at low speed with one unit per line; a unit that shifts N pins at once would make it efficient |

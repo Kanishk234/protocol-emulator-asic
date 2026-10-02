@@ -2,6 +2,17 @@ name: l3-hardened-gl
 
 on:
   workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Exact R4 RTL candidate commit used for hardening
+        required: true
+        type: string
+        default: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      gds_run_id:
+        description: GDS workflow run ID that produced the candidate netlist artifact
+        required: true
+        type: string
+        default: "36799356107"
 
 permissions:
   actions: read
@@ -19,8 +30,8 @@ jobs:
     env:
       PDK_ROOT: /home/runner/pdk
       PDK_REV: 2bbec755dc67ca3db0261c3d6163e15735d66710
-      CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
-      GDS_RUN_ID: "36799356107"
+      CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      GDS_RUN_ID: ${{ inputs.gds_run_id }}
 
     steps:
       - name: Check out workflow helpers
@@ -32,19 +43,19 @@ jobs:
       - name: Check out the matching R4 candidate
         uses: actions/checkout@v6
         with:
-          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          ref: ${{ inputs.candidate_sha }}
           path: candidate
           fetch-depth: 0
           submodules: recursive
 
-      - name: Download the successful hardened-netlist artifact
+      - name: Download the candidate hardened-netlist artifact
         uses: actions/download-artifact@v7
         with:
           name: GDS_logs
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          run-id: 36799356107
+          run-id: ${{ inputs.gds_run_id }}
 
       - name: Check out the pinned IHP installer
         uses: actions/checkout@v6
@@ -81,13 +92,14 @@ jobs:
           test -s "$GITHUB_WORKSPACE/artifacts/runs/wokwi/final/nl/tt_um_tripwire.nl.v"
           python3 - <<'PY'
           from pathlib import Path
+          import os
 
           netlist = Path("../artifacts/runs/wokwi/final/nl/tt_um_tripwire.nl.v")
           text = netlist.read_text(errors="replace")
           assert text.startswith("module tt_um_tripwire"), netlist
           assert "RM_IHPSG13_1P_512x16_c2_bm_bist" in text
-          print("Candidate: 3393eea9a58c5cad9077cc360a8515d0e5ec8284")
-          print("Hardened netlist: GDS run 36799356107; full physical netlist present")
+          print(f"Candidate: {os.environ['CANDIDATE_SHA']}")
+          print(f"Hardened netlist: GDS run {os.environ['GDS_RUN_ID']}; full physical netlist present")
           PY
 
       - name: Install pinned Tiny Tapeout Icarus 13
@@ -99,8 +111,7 @@ jobs:
           dpkg-deb -x "$RUNNER_TEMP/iverilog13.deb" "$RUNNER_TEMP/iverilog-13"
           "$RUNNER_TEMP/iverilog-13/usr/bin/iverilog" -B "$RUNNER_TEMP/iverilog-13/usr/lib/ivl" -V
 
-      - name: Run the unchanged L3 suite on the hardened netlist
-        working-directory: candidate
+      - name: Run the expanded L3 suite on the hardened netlist
         timeout-minutes: 300
         run: |
           set -euo pipefail
@@ -112,7 +123,8 @@ jobs:
           NETLIST="$GITHUB_WORKSPACE/artifacts/runs/wokwi/final/nl/tt_um_tripwire.nl.v"
           TB="$GITHUB_WORKSPACE/workflow-src/test_internal/chip/tb_chip_gl.v"
           VERILOG_SOURCES="$CELL_DIR/sg13cmos5l_stdcell.v $CELL_DIR/sg13cmos5l_udp.v $MACRO_DIR/RM_IHPSG13_1P_core_behavioral_bm_bist.v $MACRO_DIR/RM_IHPSG13_1P_512x16_c2_bm_bist.v $NETLIST $TB"
-          make -C test_internal/chip \
+          export TRIPWIRE_SPEC_FILE="$GITHUB_WORKSPACE/candidate/tools/tripwire_spec.py"
+          make -C "$GITHUB_WORKSPACE/workflow-src/test_internal/chip" \
             SIM=icarus GATES=yes SIM_BUILD=sim_build/l3-gl \
             TOPLEVEL=tb_chip TOPLEVEL_LANG=verilog \
             COCOTB_TEST_MODULES=test_l3 COCOTB_RESULTS_FILE=results_l3_gl.xml \
@@ -123,5 +135,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: l3-hardened-gl-${{ github.run_id }}
-          path: candidate/test_internal/chip/results_l3_gl.xml
+          path: workflow-src/test_internal/chip/results_l3_gl.xml
           if-no-files-found: warn

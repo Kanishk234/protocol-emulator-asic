@@ -1,5 +1,6 @@
 """L3-PULSE on the model: WS2812 and DShot programs against reference decoders (and sigrok for WS281x)."""
 
+import os
 import re
 import shutil
 import subprocess
@@ -33,17 +34,23 @@ FRAME2 = [0xA5, 0x5A, 0x0F]
 def test_ws2812_two_frames(tmp_path):
     chip = Chip(lanes=1)
     load_program(chip, "ws2812")
-    for b in FRAME1:
-        chip.host_push(b, TAG_DATA)
+
+    def tokens(frame):
+        bits = "".join(f"{byte:08b}" for byte in frame)
+        assert len(bits) % 12 == 0
+        return [0xB000 | int(bits[i:i + 12], 2) for i in range(0, len(bits), 12)]
+
+    for token in tokens(FRAME1):
+        chip.host_push(token, TAG_DATA)
     chip.host_push(0, TAG_EVENT)
-    for b in FRAME2:
-        chip.host_push(b, TAG_DATA)
+    for token in tokens(FRAME2):
+        chip.host_push(token, TAG_DATA)
     chip.host_push(0, TAG_EVENT)
-    levels = run(chip, (len(FRAME1) + len(FRAME2)) * 8 * 63 + 2 * 3100 + 200, vcd=tmp_path / "ws.vcd")
+    levels = run(chip, (len(FRAME1) + len(FRAME2)) * 8 * 77 + 2 * 3100 + 200, vcd=tmp_path / "ws.vcd")
     frames, errs = pulse.ws2812_decode(levels)
     assert errs == []                                   # every datasheet tolerance met
     assert frames == [FRAME1, FRAME2]
-    if shutil.which("sigrok-cli"):
+    if shutil.which("sigrok-cli") and os.environ.get("TRIPWIRE_SKIP_SIGROK") != "1":
         out = subprocess.run(["sigrok-cli", "-i", str(tmp_path / "ws.vcd"), "-I", "vcd",
                               "-P", "rgb_led_ws281x:din=din", "-A", "rgb_led_ws281x=rgb"],
                              capture_output=True, text=True, check=True).stdout

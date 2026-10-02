@@ -7,6 +7,7 @@
   records named pad levels; `write_vcd` / `sigrok` turn the record into an independent decode.
 """
 
+import os
 import pathlib
 import re
 import shutil
@@ -182,8 +183,8 @@ def write_vcd(path, rec):
 
 
 def sigrok(vcd, decoder, annotation=None):
-    """sigrok-cli's decode of a VCD (stdout); None if sigrok-cli is not installed."""
-    if shutil.which("sigrok-cli") is None:
+    """sigrok-cli's decode of a VCD (stdout); None when unavailable or explicitly skipped locally."""
+    if os.environ.get("TRIPWIRE_SKIP_SIGROK") == "1" or shutil.which("sigrok-cli") is None:
         return None
     cmd = ["sigrok-cli", "-i", str(vcd), "-I", "vcd", "-P", decoder]
     if annotation:

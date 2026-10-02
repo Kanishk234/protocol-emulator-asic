@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-02: Codex (phase 2: repair expanded L3 CI checks)
+Done:
+- Pushed four author-attributed commits to `main`: `7957114` (L3 tests), `d69f3cf` (WS2812 firmware), `ccd7994` (protocol and physical-design evidence), and `9941a81` (manual 16% GRT workflow). No RTL, config, info, macro, or hardening input changed.
+- On CI run [37032034520](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37032034520), test, model/unit, lint, and docs jobs passed. The Verilator RTL artifact `/tmp/unit-37032034520-verilator/chip/results_vl.xml` identified two assertion issues: PWM sigrok only reported the first measured cycle because the VCD ended at the final rising edge; the I2C-target waveform correctly had five START/STOP transactions (four writes including the wrong-address NACK, plus one read), while the test expected three. The Icarus RTL job is still running on the earlier commit; the full unit workflow is not green.
+- Updated `test_internal/chip/test_l3.py` to add a terminal falling edge to the sparse PWM VCD and expect five I2C-target START/STOP events. Focused Verilator tests for servo PWM and I2C target passed locally with `TRIPWIRE_SKIP_SIGROK=1`. Local sigrok decoding is unavailable in this environment; the CI sigrok-enabled run must confirm these fixes.
+- `git diff --check` passed. No Phase 2 checklist box was ticked.
+
+Checklist boxes ticked (evidence):
+- None; the expanded RTL suite has a known failure and the full 16% hardening has not run.
+
+Next:
+- Let run 37032034520 finish and inspect the Icarus artifact. Commit and push the two test fixes, require a green unit workflow on that revision, then dispatch the full hardening workflow with GRT adjustment 16% and the pinned R4 candidate. Review final routed setup/hold and all signoff jobs.
+
 ## 2026-10-02: Codex (phase 2: 16% detailed route and servo PWM RTL)
 Done:
 - Reviewed DRT-only continuation [36951141285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36951141285) for candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 units, U0 full; 20 ns; density 56%). It completed successfully in 3 h 48 min total; detailed routing took 3 h 45 min and ended with 0 router violations, 0 final route DRC markers, and 1,887,085 µm detailed wirelength. The workflow skipped post-route parasitic extraction/STA, GDS stream-out, full DRC/LVS/antenna, precheck, gate-level tests, and viewer; it is not full GDS signoff. Artifact: `/tmp/drt-continuation-36951141285/`.

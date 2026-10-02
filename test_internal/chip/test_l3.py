@@ -9,24 +9,70 @@ by tripc, loaded with tools/host over SPI, and checked against protocol referenc
   I2C-T programs/i2c_target.trw      writes, address NACK and readback at 400 kHz and 1 MHz
   DMX  programs/dmx.trw              two 8N2 packets with BREAK and MAB timing
   PULSE programs/ws2812.trw, dshot.trw WS2812 data frames and DShot at 150/300/600/1200 kbit/s
+  PWM  programs/servo.trw            20 ms servo frames with a live width update
+  I2S  programs/i2s.trw              full-duplex 16-bit stereo at 48/96/192 kHz
 
 The tests provide implementation-level evidence for these exercised cases only. Other roadmap programs need
 matching RTL and hardened-netlist checks before they have implementation-level evidence.
 """
 
+import importlib.util
+import os
 import re
+from pathlib import Path
 
 import cocotb
 from cocotb.triggers import ClockCycles, ReadOnly, ValueChange
 from cocotb.utils import get_sim_time
 
-from chiplib import HM, TAGS, Wire, hex_bytes, load, sigrok, start, write_vcd
+from chiplib import HM, TAGS, Wire, hex_bytes, load as _load, sigrok, start, write_vcd
 from protomodels import dmx, pulse, uart
 from protomodels.i2c import I2CController, I2CTarget
+from protomodels.i2s import I2SADC, I2SReceiver
 from protomodels.spi import SPIController, SPITarget
 
 DATA, CTRL, EVENT, ERR = (TAGS[t] for t in ("DATA", "CTRL", "EVENT", "ERR"))
 MSG = b"TRIPWIRE\x00\xff\x55"
+
+
+def _candidate_port_map():
+    """Load a shape-specific generated fabric map for reduced RTL candidates when requested."""
+    spec_path = os.environ.get("TRIPWIRE_SPEC_FILE")
+    if not spec_path:
+        return None
+    spec_path = Path(spec_path)
+    if not spec_path.is_file():
+        raise FileNotFoundError(f"TRIPWIRE_SPEC_FILE does not exist: {spec_path}")
+    spec = importlib.util.spec_from_file_location("candidate_tripwire_spec", spec_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load candidate fabric map from {spec_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_CANDIDATE_SPEC = _candidate_port_map()
+
+
+def _candidate_port_words(image):
+    spec = _CANDIDATE_SPEC
+    ports = {consumer: 0 for consumer in spec.FABRIC_CONSUMERS}
+    for consumer, producer, mode, accept in image["connect"]:
+        source = spec.LEGAL_SOURCES[consumer].index(producer)
+        ports[consumer] = int(mode == "tap") << 1 | source << 2 | (accept & 0xF) << 6 | 1
+    return [ports[consumer] for consumer in spec.FABRIC_CONSUMERS]
+
+
+async def load(p, program, run=True, **params):
+    """Load programs with a reduced candidate's generated logical fabric numbering when requested."""
+    if _CANDIDATE_SPEC is None:
+        return await _load(p, program, run=run, **params)
+    image = await _load(p, program, run=False, **params)
+    await p.write(HM["ports"], _candidate_port_words(image))
+    if run:
+        lanes = sum(1 << int(name[1:]) for name in image["lanes"])
+        await p.write(HM["run"], [lanes])
+    return image
 
 
 async def until(p, cond, clocks, step=50):
@@ -252,6 +298,62 @@ async def test_l3_servo_pwm(dut):
         duty = [float(value) for value in re.findall(r"([\d.]+)%", out)]
         runs = [value for i, value in enumerate(duty) if i == 0 or value != duty[i - 1]]
         assert runs == [7.5, 5.0], out
+
+
+@cocotb.test()
+async def test_l3_i2s(dut):
+    """L3-I2S: full-duplex 16-bit stereo against reference models at 48/96/192 kHz."""
+    samples = [(0x1234, 0xABCD), (0x8000, 0x7FFF), (0x0001, 0xFFFE),
+               (0x5A5A, 0xA5A5), (0x0000, 0xFFFF)]
+    expect_tx = [(ch, word) for pair in samples for ch, word in zip(("L", "R"), pair)]
+    expect_rx = [0] + [word for pair in samples for word in pair][1:]
+    for i, fs in enumerate((48_000, 96_000, 192_000)):
+        p = await start(dut, clock=i == 0)
+        await load(p, "i2s", FS=fs)
+
+        rx, adc = I2SReceiver(), I2SADC(samples)
+
+        def env(uo, uout, uoe, bus):
+            sck, sd, ws = uo & 1, uo >> 1 & 1, uo >> 2 & 1
+            rx.step(sck, ws, sd)
+            return {0: adc.step(sck, ws)}, None
+
+        wire = Wire(p, env, {
+            "sck": lambda uo, bus: uo & 1,
+            "sd": lambda uo, bus: uo >> 1 & 1,
+            "ws": lambda uo, bus: uo >> 2 & 1,
+        })
+        for sample_index, (left, right) in enumerate(samples):
+            try:
+                await p.push(left, tries=100)
+                await p.push(right, tries=100)
+            except AssertionError as exc:
+                wire.stop()
+                raise AssertionError(
+                    f"fs={fs} sample={sample_index} input push: TX={rx.words}, HOST_OUT={p.outq}, "
+                    f"wire clocks={wire.clocks}, recent SCK={wire.rec['sck'][-24:]}, "
+                    f"WS={wire.rec['ws'][-24:]}, SD={wire.rec['sd'][-24:]}"
+                ) from exc
+        got = await _drain_host_until(p, lambda: len(rx.words) >= len(expect_tx) - 1,
+                                      len(expect_rx) - 1, max_polls=400)
+        wire.stop()
+
+        decoded_tx = [(ch, word) for ch, word, nbits in rx.words]
+        assert decoded_tx == expect_tx[:len(decoded_tx)], (fs, decoded_tx)
+        assert len(decoded_tx) >= len(expect_tx) - 1, (fs, decoded_tx)
+        assert all(nbits == 16 for _, _, nbits in rx.words), (fs, rx.words)
+        decoded_rx = [data for tag, data in got if tag == EVENT]
+        assert decoded_rx == expect_rx[:len(decoded_rx)] and len(decoded_rx) >= len(expect_rx) - 1, (fs, got)
+
+        name = f"i2s_{fs}.vcd"
+        write_vcd(name, wire.rec)
+        out = sigrok(name, "i2s:sck=sck:ws=ws:sd=sd", "i2s")
+        if out is not None:
+            decoded = [(channel[0], int(word, 16))
+                       for channel, word in re.findall(r"(Left|Right) channel: ([0-9a-f]{8})", out)]
+            assert len(decoded) >= len(expect_tx) - 1 and decoded == expect_tx[:len(decoded)], (fs, out)
+            warns = re.findall(r"Received (\d+)-bit word, expected (\d+)-bit word", out)
+            assert warns in ([], [("16", "15")]), (fs, out)
 
 
 @cocotb.test()

@@ -5,6 +5,28 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-02: Codex (phase 2: correct reduced-candidate L3 map and add I2S)
+Done:
+- Confirmed the active R4 source checkout is exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`: 2 lanes, 4 pin units, U0 full, 20 ns, 56% placement target. Its temporary worktree's unrelated `test/` changes were left untouched.
+- The first I2S RTL check showed no BCLK because `test_internal/chip/chiplib.py`'s ordinary loader encodes the frozen 3-lane/6-unit fabric selectors, while the R4 candidate uses its generated 2-lane/4-unit selectors. Added an optional `TRIPWIRE_SPEC_FILE` adapter in `test_internal/chip/test_l3.py` to encode candidate consumer/producer connections by the candidate's logical map, then start the loaded program. The standard main-shaped loader remains the default.
+- Logged the reduced-candidate loader mismatch as BUGS.md #56; the optional generated-map adapter is the check/fix for it.
+- Ran the complete 12-case L3 suite against the exact candidate with the adapter. Verilator: 12/12 passed in 185.24 s; Icarus 12: 12/12 passed in 1,171.39 s. Cases cover UART TX/RX, MIDI, SPI controller/target, I2C controller/target, DMX, WS2812, DShot, servo PWM, and I2S. I2S checks full-duplex 16-bit stereo at 48/96/192 kHz against `I2SADC` and `I2SReceiver`. Focused I2S also passed on main's 3-lane/6-unit RTL under Verilator (1/1, 10.32 s).
+- Local tests set `TRIPWIRE_SKIP_SIGROK=1` because the WSL sigrok setup cannot decode locally; the expanded sigrok legs still need CI confirmation. No matching hardened-netlist L3 evidence exists for the new cases.
+- Final focused candidate I2S rerun after the adapter's path validation change passed under Verilator: 1/1, 11.10 s, with the generated 2-lane/4-unit map.
+- Full 16% hardening run [37037880327](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37037880327) remains in LibreLane step 11. At the latest query (2026-10-02 18:36 UTC), setup and candidate validation had passed, but the hardening step was still active and GitHub withheld its logs. Its only flow override is `GRT_ADJUSTMENT=0.16`; the pinned candidate/config inputs are unchanged.
+- Updated `docs/reports/PHASE2_PROTOCOL_COVERAGE.md` and `docs/summaries/PHASE2.md`. `git diff --check` passes, and `git log origin/main..main -- src info.yaml macro` is empty. No Phase 2 checklist box was ticked.
+
+Commands and results:
+- `source .venv/bin/activate && TRIPWIRE_SKIP_SIGROK=1 TRIPWIRE_SPEC_FILE=/tmp/r4-bitsync-work/tools/tripwire_spec.py make -C test_internal/chip SIM=verilator COCOTB_TEST_MODULES=test_l3 SRC_DIR=/tmp/r4-bitsync-work/src SIM_BUILD=sim_build/vl_l3_candidate_correctmap COCOTB_RESULTS_FILE=results_l3_candidate_correctmap.xml` — 12 passed.
+- Same command with `SIM=icarus`, `SIM_BUILD=sim_build/icarus_i2s_r4`, and `COCOTB_RESULTS_FILE=results_l3_candidate_correctmap_icarus.xml` — 12 passed.
+- `source .venv/bin/activate && TRIPWIRE_SKIP_SIGROK=1 COCOTB_TEST_FILTER=test_l3_i2s make -C test_internal/chip SIM=verilator COCOTB_TEST_MODULES=test_l3 SRC_DIR=/home/younix/protocol-emulator-asic/src SIM_BUILD=sim_build/vl_i2s_main COCOTB_RESULTS_FILE=results_i2s_main.xml` — main-shape I2S passed.
+
+Checklist boxes ticked (evidence):
+- None. These are RTL protocol checks; the active full hardening, matching hardened-netlist checks, and team decisions remain open.
+
+Next:
+- Commit/push the test and documentation update after confirming the existing hardware-input diff check is still empty. Let CI run the expanded sigrok tests. Monitor hardening 37037880327; when it completes, download its artifacts and review routed WNS/TNS per corner, congestion, DRC/LVS/antenna, precheck, gate-level result, and viewer. Keep the 20 ns clock and protocol support unchanged.
+
 ## 2026-10-02: Codex (phase 2: repair expanded L3 CI checks)
 Done:
 - Pushed four author-attributed commits to `main`: `7957114` (L3 tests), `d69f3cf` (WS2812 firmware), `ccd7994` (protocol and physical-design evidence), and `9941a81` (manual 16% GRT workflow). No RTL, config, info, macro, or hardening input changed.

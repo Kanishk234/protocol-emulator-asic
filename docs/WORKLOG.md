@@ -13,19 +13,22 @@ Done:
 - Ran the complete 12-case L3 suite against the exact candidate with the adapter. Verilator: 12/12 passed in 185.24 s; Icarus 12: 12/12 passed in 1,171.39 s. Cases cover UART TX/RX, MIDI, SPI controller/target, I2C controller/target, DMX, WS2812, DShot, servo PWM, and I2S. I2S checks full-duplex 16-bit stereo at 48/96/192 kHz against `I2SADC` and `I2SReceiver`. Focused I2S also passed on main's 3-lane/6-unit RTL under Verilator (1/1, 10.32 s).
 - Local tests set `TRIPWIRE_SKIP_SIGROK=1` because the WSL sigrok setup cannot decode locally; the expanded sigrok legs still need CI confirmation. No matching hardened-netlist L3 evidence exists for the new cases.
 - Final focused candidate I2S rerun after the adapter's path validation change passed under Verilator: 1/1, 11.10 s, with the generated 2-lane/4-unit map.
-- Full 16% hardening run [37037880327](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37037880327) remains in LibreLane step 11. At the latest query (2026-10-02 18:36 UTC), setup and candidate validation had passed, but the hardening step was still active and GitHub withheld its logs. Its only flow override is `GRT_ADJUSTMENT=0.16`; the pinned candidate/config inputs are unchanged.
+- Updated `.github/workflows/l3-hardened-gl.yaml`: it now takes the exact candidate SHA and GDS artifact run ID, runs the current expanded L3 test module from `main` against that netlist, and supplies the candidate's generated compact fabric map. YAML parsing and `bash -n` on all five embedded shell blocks passed. The updated workflow has not been dispatched yet.
+- Full 16% hardening run [37037880327](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37037880327) remains in LibreLane step 11. At the latest query (2026-10-02 18:47 UTC), setup and candidate validation had passed, but the hardening step was still active and GitHub withheld its logs. Its only flow override is `GRT_ADJUSTMENT=0.16`; the pinned candidate/config inputs are unchanged.
+- Pushed test and evidence commits `97f11ad` and `39b8161` as Krithik4. On `main` SHA `39b8161`, test, docs, lint, model/unit, and Verilator RTL jobs passed; the Icarus RTL chip job is still running (unit run `37048872125`).
 - Updated `docs/reports/PHASE2_PROTOCOL_COVERAGE.md` and `docs/summaries/PHASE2.md`. `git diff --check` passes, and `git log origin/main..main -- src info.yaml macro` is empty. No Phase 2 checklist box was ticked.
 
 Commands and results:
 - `source .venv/bin/activate && TRIPWIRE_SKIP_SIGROK=1 TRIPWIRE_SPEC_FILE=/tmp/r4-bitsync-work/tools/tripwire_spec.py make -C test_internal/chip SIM=verilator COCOTB_TEST_MODULES=test_l3 SRC_DIR=/tmp/r4-bitsync-work/src SIM_BUILD=sim_build/vl_l3_candidate_correctmap COCOTB_RESULTS_FILE=results_l3_candidate_correctmap.xml` — 12 passed.
 - Same command with `SIM=icarus`, `SIM_BUILD=sim_build/icarus_i2s_r4`, and `COCOTB_RESULTS_FILE=results_l3_candidate_correctmap_icarus.xml` — 12 passed.
 - `source .venv/bin/activate && TRIPWIRE_SKIP_SIGROK=1 COCOTB_TEST_FILTER=test_l3_i2s make -C test_internal/chip SIM=verilator COCOTB_TEST_MODULES=test_l3 SRC_DIR=/home/younix/protocol-emulator-asic/src SIM_BUILD=sim_build/vl_i2s_main COCOTB_RESULTS_FILE=results_i2s_main.xml` — main-shape I2S passed.
+- Workflow validation: `.github/workflows/l3-hardened-gl.yaml` parsed with PyYAML and all five embedded shell blocks passed `bash -n`; `git diff --check` is clean.
 
 Checklist boxes ticked (evidence):
 - None. These are RTL protocol checks; the active full hardening, matching hardened-netlist checks, and team decisions remain open.
 
 Next:
-- Commit/push the test and documentation update after confirming the existing hardware-input diff check is still empty. Let CI run the expanded sigrok tests. Monitor hardening 37037880327; when it completes, download its artifacts and review routed WNS/TNS per corner, congestion, DRC/LVS/antenna, precheck, gate-level result, and viewer. Keep the 20 ns clock and protocol support unchanged.
+- Let unit run `37048872125` finish and inspect expanded L3 sigrok results. Run the updated hardened-netlist L3 workflow against candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` and the current GDS artifact when available. Monitor hardening `37037880327`; when it completes, inspect routed WNS/TNS per corner, congestion, DRC/LVS/antenna, precheck, gate-level result, and viewer. Keep 20 ns and protocol behavior unchanged.
 
 ## 2026-10-02: Codex (phase 2: repair expanded L3 CI checks)
 Done:

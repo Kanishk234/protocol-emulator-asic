@@ -240,7 +240,12 @@ async def test_l3_servo_pwm(dut):
     periods = [second[0] - first_rise, next_rise - second[0]]
     assert periods == [1_000_000] * 2, periods
 
-    transitions = [(first_rise, 1), (first_fall, 0), (second[0], 1), (second[1], 0), (next_rise, 1)]
+    # Keep one falling edge after the last measured rising edge. The PWM decoder
+    # needs a sample after that edge to finish reporting the preceding period.
+    transitions = [
+        (first_rise, 1), (first_fall, 0), (second[0], 1), (second[1], 0),
+        (next_rise, 1), (next_rise + 1000 * 50, 0),
+    ]
     _write_edge_vcd("servo_pwm.vcd", transitions)
     out = sigrok("servo_pwm.vcd", "pwm:data=pwm", "pwm=duty-cycle")
     if out is not None:
@@ -430,4 +435,5 @@ async def test_l3_i2c_target(dut):
             lines = [line.split(": ", 1)[1] for line in out.splitlines() if ": " in line]
             assert hex_bytes(out, "Data write: ") == written, (cpb, out[:300])
             assert hex_bytes(out, "Data read: ") == read_data, (cpb, out[:300])
-            assert lines.count("Start") == 3 and lines.count("Stop") == 3, (cpb, lines)
+            # Four writes (including the deliberately wrong address) and one read.
+            assert lines.count("Start") == 5 and lines.count("Stop") == 5, (cpb, lines)

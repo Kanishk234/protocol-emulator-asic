@@ -2034,3 +2034,16 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Phase 0, task 1: create the GitHub repo from the local template clone, rename the top module to `tt_um_tripwire`, commit the docs.
+
+## 2026-10-01: Codex (phase 2: evaluate 16% GRT diagnostic)
+Done:
+- Reviewed GRT diagnostic run [36949467252](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36949467252) for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full; 20 ns; 56% density). It passed candidate validation and global routing in about 8 minutes, with zero overflow on every layer; the diagnostic stops before detailed routing.
+- Compared its saved GRT data with 12% run 36906496173 / hardening 36913096552 and 30% run 36899340155. At 16%: capacity 601,423, demand 255,230, usage 42.44%, wirelength 2,465,539 um, and 262,708 guide rectangles. Relative to 12%, capacity is 4.8% lower, while demand, wirelength, and guide rectangles each increase about 0.3%. Both 12% and 16% have zero GRT overflow. The 12% detailed-route attempt timed out after 330 minutes with 25,030 intermediate violations remaining after two optimization iterations; no final DRC was produced.
+- Conclusion: 16% has no demonstrated aggregate routeability advantage over 12%, and GRT-only success does not establish DRT completion, timing, or signoff. Do not claim a passing hardening or blindly repeat a full run. Assess whether the saved 16% GRT checkpoint can be continued through DRT in the pinned LibreLane/PDK environment; compare routed evidence before choosing another full run.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md` and this worklog. No RTL, `src/config.json`, `info.yaml`, macro, or active hardening input changed. `git diff --check` passed.
+
+Checklist boxes ticked (evidence):
+- None. Run 36949467252 is a GRT-only diagnostic, not a completed hardening.
+
+Next:
+- Check whether a DRT-only continuation can use the saved 16% ODB/DEF/guides and pinned flow image. Keep 20 ns, all protocol behavior, and D-066 timed live reconfiguration intact; route any selected timing RTL change as a separate controlled candidate.

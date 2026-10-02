@@ -825,6 +825,7 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Proposal:** the phase 2 box is judged on what the shipped programs implement (the list above, on RTL and in `gl_test` once the top is switched). The remaining §6 cases move to phase 3 with the program work they need: a parity-capable UART program (the op table has `PAR`), SPI CPOL/CPHA and 16-bit as program parameters (pin `idle`, `tx_edge`/`rx_edge`, `nbits`; no RTL change expected), and I2C arbitration loss in the controller program (the pin unit already reports readback mismatches only in BITSYNC; for I2C it would be a program check of SDA after each bit). Each needs its model-side test first, then the RTL L3 case.
 - **General need:** the checklist should measure the chip against the protocols it ships, and the wider §6 set against the programs that claim it.
 - **Cost:** none in hardware.
+- **Evidence for scope review (2026-10-02):** the listed shipped-program scope passed on exact R4 candidate `3393eea` in RTL under Icarus and Verilator (unit run 36799356039) and on its hardened netlist with Icarus 13 (run 36952644578); each run passed all four `test_l3.py` cases, with reference-model and sigrok checks. The proposal remains pending team approval; the wider §6 cases listed above are not covered by these programs/tests.
 - **Approval:** Krithik and Kanishk.
 
 ## D-049 (2026-09-28; approved 2026-09-29): the protocol floor for the area budget

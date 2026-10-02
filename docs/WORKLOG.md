@@ -12,6 +12,7 @@ Done:
 - Verified `docs/BUGS.md` contains a contiguous ledger from #1 through #54, including the latest open flow issue, and ticked checklist box 11.
 - Ticked Phase 2 checklist boxes 5 and 6 with exact-candidate RTL and hardened-netlist evidence. Updated the checklist, `docs/reports/PHASE2_GDS_EXPERIMENTS.md`, and the plain-language Phase 2 summary. The area/budget decision, routed timing/congestion and full sign-off remain open.
 - Audited D-056 against full GDS run 36799356107: 0.10 ns hold uncertainty had positive final hold slack at typ/slow/fast (+0.156 / +0.314 / +0.058 ns), and `gl_test` passed. The technical evidence condition is met; Kanishk's sign-off remains required before main adoption. Recorded the result in `docs/DECISIONS.md`; this does not resolve the run's −10.698 ns slow setup slack or 821 global-route overflow.
+- Added the exact-candidate RTL and hardened-netlist L3 results to proposed D-048 for team review; approval remains pending. This keeps the Phase 2 tested scope tied to the shipped UART/SPI/I2C programs and leaves the wider protocol cases for phase 3 program work.
 - Main CI is green at `3e82ae301c7afcb79d2f507e988754c4bfc85b99`: test 36952853704, lint 36952853714, docs 36952853881, unit 36952853654.
 - DRT-only continuation [36951141285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36951141285) remains in its detailed-routing step; no result is available yet. It continues from the 16% GRT checkpoint and is not a full sign-off workflow.
 

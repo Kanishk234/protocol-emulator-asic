@@ -2049,3 +2049,17 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Monitor run 36951141285 for detailed-route completion, runtime, and route DRC; if it completes, continue downstream checks before claiming GDS signoff. If it times out, pivot from GRT-adjustment-only experiments to a separately controlled timing RTL or route-aware repair experiment. Keep 20 ns, all protocol behavior, and D-066 timed live reconfiguration intact.
+
+## 2026-10-01: Codex (phase 2: run L3 on hardened netlist)
+Done:
+- Added `test_internal/chip/tb_chip_gl.v`, a pin-only harness that instantiates `tt_um_tripwire` from the hardened netlist while keeping the cocotb-visible pins expected by the existing `test_l3.py`.
+- Added manual workflow `.github/workflows/l3-hardened-gl.yaml`. It downloads the final netlist from successful GDS run 36799356107 for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`, installs the pinned IHP SRAM/standard-cell models and Tiny Tapeout Icarus 13, and runs the unchanged UART/SPI/I2C L3 test module.
+- Local Icarus 12 elaborated the hardened netlist and test harness successfully (34,161,403-byte simulation image); this is compile evidence only, not a valid simulation because Icarus 12 triggers BUGS #1. The GitHub workflow uses Icarus 13.
+- Dispatched gate-level L3 run [36952644578](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36952644578). Its artifact download completed and the pinned PDK/SRAM setup is active; L3 simulation has not started yet. The separate DRT continuation [36951141285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36951141285) remains in its detailed-routing step.
+- On commit `f47a5c8`, `test` 36951822413, `lint` 36951822419, `docs` 36951822379, and `unit` 36951822390 all passed. On the newer test/workflow commit `32bf4f0`, test/lint/docs passed; unit is still running. No hardware input changed. `git diff --check` passed.
+
+Checklist boxes ticked (evidence):
+- None from these runs yet. Box 6 remains open until the exact hardened-netlist L3 run passes; the DRT continuation is not full GDS signoff.
+
+Next:
+- Monitor runs 36952644578 and 36951141285. If the gate-level L3 suite passes, record the evidence and tick only box 6. For the DRT continuation, inspect final route DRC/runtime and continue downstream signoff before treating it as a passing hardening. Preserve the 20 ns target, all protocols, and D-066 behavior.

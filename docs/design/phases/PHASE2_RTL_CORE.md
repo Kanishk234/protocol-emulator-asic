@@ -121,7 +121,7 @@ Not in this phase: the helper units CRC, MATCH, MEM and CAPTURE (deferred by D-0
 - [x] `viewer` deployed; Pages shows the real design. *(Evidence: viewer job in run 36799356107 passed and its rendered GDS image shows the full routed design.)*
 - [x] `test`, `docs`, `lint`, `unit` workflows green on `main`. *(Latest evidence: all four passed on `main` at `3e82ae301c7afcb79d2f507e988754c4bfc85b99`: test 36952853704, docs 36952853881, lint 36952853714, unit 36952853654. Re-run after the eventual hardware switch and keep them green.)*
 - [x] `docs/reports/AREA.md` has the first full-design row. *(Evidence: run 36799356107, recorded as R4 run 8.)*
-- [x] Every bug found so far is in `BUGS.md`. *(Evidence: `docs/BUGS.md` has a continuous ledger through #54; the latest entry records the open LibreLane thread-selection issue and its proposed follow-up.)*
+- [x] Every bug found so far is in `BUGS.md`. *(Evidence: `docs/BUGS.md` has a continuous ledger through #57, including the D-066 timing-analysis exception fixed in the whole-chip pre-layout STA helpers.)*
 
 ## 5. Risks in this phase
 | Risk | Response |

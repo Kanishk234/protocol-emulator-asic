@@ -5,6 +5,25 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-02: Codex (phase 2: keep D-066 paths timed in pre-layout STA)
+Done:
+- While hardening 37037880327 runs, audited the standalone STA scripts and found `set_false_path -from $latches` hiding legal live pin-configuration-to-unit-state paths under D-066. Removed the exception from the whole-chip, R4 spike, and pin-unit helpers; `synth/pin` now runs only with configuration latch outputs timed. Logged the issue as BUGS.md #57.
+- Ran the corrected `synth/chip/run_chip.sh 20` in `/tmp/r4-sta-d066`, an isolated copy of exact candidate source `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. Latch outputs stayed timed. Worst latch-startpoint flop slack was +9.154 ns typ / +3.344 ns slow; the slow path starts at U0 config word 0 bit 1 and ends at U0 TX `eq[14]`. This is pre-layout, without placement or routed parasitics.
+- Compared the old STA Tcl on the same mapped netlist: its blanket false path hid the configuration path and reported the SRAM path at +10.442 ns typ / +4.828 ns slow. Historical `run_chip.sh` timing values using that helper do not include the D-066 path.
+- Expanded hardened-netlist L3 run [37051434072](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37051434072) passed 12/12 under Icarus 13 on GDS netlist 36799356107 for the same candidate SHA. Main `test`, `docs`, `lint`, and `unit` passed on `56a71ea` (runs 37053242291, 37053242296, 37053242412, and 37053242391).
+- Full 16% hardening [37037880327](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37037880327) remained in LibreLane step 11 at the latest query (20:01 UTC); its hardware inputs are unchanged. No RTL, `src/config.json`, `info.yaml`, or macro files changed. No Phase 2 box was newly ticked.
+
+Commands and results:
+- `bash synth/chip/run_chip.sh 20` in `/tmp/r4-sta-d066` with exact candidate `src/` and corrected `sta_chip.tcl` — PASS; typ +9.154 ns, slow +3.344 ns, latch outputs included as timing startpoints.
+- Old Tcl comparison against the same `net_sta.v` and IHP libraries — reported SRAM path typ +10.442 ns / slow +4.828 ns; confirms the old exception concealed the D-066 path.
+- `git diff --check` and `bash -n synth/chip/run_chip.sh synth/pin/run_pin.sh spikes/r4_floorplan/check_local.sh` — clean.
+
+Checklist boxes ticked (evidence):
+- None newly ticked. Existing box 11 evidence now includes BUGS.md #57; routed timing/signoff remain unproven by this pre-layout STA run.
+
+Next:
+- Finish and inspect hardening 37037880327. If it produces a viable route, rerun the expanded L3 suite against that exact hardened netlist. Use routed all-corner timing—not this pre-layout estimate—to select the next timing experiment.
+
 ## 2026-10-02: Codex (phase 2: correct reduced-candidate L3 map and add I2S)
 Done:
 - Confirmed the active R4 source checkout is exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`: 2 lanes, 4 pin units, U0 full, 20 ns, 56% placement target. Its temporary worktree's unrelated `test/` changes were left untouched.

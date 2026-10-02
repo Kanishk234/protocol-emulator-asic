@@ -68,9 +68,9 @@ Yosys onto the cmos5l cells, typical corner, the R1 recipe (`synth -flatten; dff
 - Flops are ~36 % of the unit's area (216 × 49 µm²).
 - The lean block stores 114 latch bits in the wrapper (119 in the block alone: the 5 PIN_N bits go to the pad mux, which is not in the wrapper).
 
-**Timing at 20 ns** (OpenSTA, ideal clock, no wires, 0.25 ns uncertainty; paths ending at flops, since latch D pins borrow time by design as in R2):
+**Timing at 20 ns** (OpenSTA, ideal clock, no wires, 0.25 ns uncertainty; paths ending at flops, since latch D pins borrow time by design as in R2). Only the timed-configuration column follows D-066; the static-configuration result is a historical comparison, and the current script now runs timed paths only.
 
-| Corner | Config latches static (false path) | Config latches timed |
+| Corner | Config static comparison (not D-066 signoff) | Config latches timed (D-066 contract) |
 |---|---|---|
 | typ | +10.83 ns (arrival 8.76) | +9.87 ns |
 | slow | **+5.84 ns** (arrival 13.60) | +4.39 ns |

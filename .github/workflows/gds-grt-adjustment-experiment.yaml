@@ -2,6 +2,15 @@ name: gds-grt-adjustment-experiment
 
 on:
   workflow_dispatch:
+    inputs:
+      grt_adjustment:
+        description: Global-route capacity adjustment for the pinned R4 candidate
+        required: true
+        default: "0.16"
+        type: choice
+        options:
+          - "0.12"
+          - "0.16"
 
 permissions:
   contents: read
@@ -12,13 +21,13 @@ concurrency:
 
 jobs:
   harden:
-    name: Full R4 hardening at GRT_ADJUSTMENT=0.12
+    name: Full R4 hardening at GRT_ADJUSTMENT=${{ inputs.grt_adjustment }}
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
       PDK_ROOT: /home/runner/pdk
       CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
-      GRT_ADJUSTMENT: "0.12"
+      GRT_ADJUSTMENT: ${{ inputs.grt_adjustment }}
 
     steps:
       - name: Check out the measured R4 candidate
@@ -73,6 +82,9 @@ jobs:
           import os
           from pathlib import Path
 
+          grt_adjustment = os.environ["GRT_ADJUSTMENT"]
+          assert grt_adjustment in {"0.12", "0.16"}, grt_adjustment
+
           cfg = json.loads(Path("src/config.json").read_text())
           assert float(cfg["CLOCK_PERIOD"]) == 20.0
           assert int(cfg["PL_TARGET_DENSITY_PCT"]) == 56
@@ -89,7 +101,7 @@ jobs:
               assert f"`define {name} {value}" in defs, name
           print(f"Pinned candidate: {os.environ['CANDIDATE_SHA']}")
           print("Candidate shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
-          print("Flow-only override: GRT_ADJUSTMENT=0.12; all hardware inputs unchanged")
+          print(f"Flow-only override: GRT_ADJUSTMENT={grt_adjustment}; all hardware inputs unchanged")
           PY
           python tt/tt_tool.py --create-user-config --ihp
 

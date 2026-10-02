@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-02: Codex (phase 2: RTL and gate-level L3 passed)
+Done:
+- Retrieved and reviewed candidate unit workflow [36799356039](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36799356039) for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. The chip RTL L3 suite passed 4/4 under both Icarus and Verilator, with `sigrok-cli` installed; tests cover UART TX, UART RX framing, SPI controller and I2C controller against reference models and sigrok. Artifacts `rtl-results` and `rtl-verilator-results` contain `chip/results.xml` and `chip/results_vl.xml`.
+- Reviewed hardened-netlist L3 workflow [36952644578](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36952644578) and downloaded its `results_l3_gl.xml`: all 4/4 tests passed on the final netlist from GDS run 36799356107, for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. Tests cover UART TX, UART RX framing, SPI controller and I2C controller; the workflow used pinned Icarus 13, IHP models and installed `sigrok-cli`.
+- Verified `docs/BUGS.md` contains a contiguous ledger from #1 through #54, including the latest open flow issue, and ticked checklist box 11.
+- Ticked Phase 2 checklist boxes 5 and 6 with exact-candidate RTL and hardened-netlist evidence. Updated the checklist, `docs/reports/PHASE2_GDS_EXPERIMENTS.md`, and the plain-language Phase 2 summary. The area/budget decision, routed timing/congestion and full sign-off remain open.
+- Main CI is green at `3e82ae301c7afcb79d2f507e988754c4bfc85b99`: test 36952853704, lint 36952853714, docs 36952853881, unit 36952853654.
+- DRT-only continuation [36951141285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36951141285) remains in its detailed-routing step; no result is available yet. It continues from the 16% GRT checkpoint and is not a full sign-off workflow.
+
+Checklist boxes ticked (evidence):
+- [x] Box 5: RTL L3 suite, 4/4 tests under Icarus and Verilator in candidate unit workflow 36799356039; artifacts include `chip/results.xml` and `chip/results_vl.xml`.
+- [x] Box 6: same L3 suite on the hardened netlist, 4/4 tests passed in workflow 36952644578; the exact test results are in its `l3-hardened-gl-36952644578` artifact.
+- [x] Box 11: all currently logged bugs are represented in `docs/BUGS.md`, with consecutive entries #1–#54.
+
+Next:
+- Wait for DRT continuation 36951141285 to finish and inspect its detailed-route runtime and route DRC. If it completes, use the resulting checkpoint for routed timing and downstream physical sign-off; if it times out, stop repeating GRT-adjustment-only runs and choose the next isolated route-aware or timing experiment. Keep the 20 ns clock, protocol behavior, and D-066 live configuration contract.
+
 ## 2026-10-01: Codex (phase 2: analyze 12% GRT hardening)
 Done:
 - Downloaded artifact `GDS_logs-36913096552` for exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full; 20 ns; density 56%). Run 36913096552 failed after 5 h 31 min in the full hardening job; precheck and `gl_test` were skipped.

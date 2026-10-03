@@ -5,6 +5,22 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-03: Codex (phase 2: close L3 assertion gaps and diagnose DRT timeout)
+Done:
+- Reviewed completed post-antenna continuation [37102837764](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37102837764): checkpoint validation passed, but DRT hit its 330-minute limit. It started with 32,500 route markers, completed 35 optimization rounds and reached 277 markers; round 36 was partial. No final route state or signoff was produced. The flow used `OPENROAD_THREADS=null`.
+- Reviewed expanded gate-level L3 run [37101678657](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37101678657) and unit runs [37102835070](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37102835070) and [37103768779](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37103768779): each exposed the same two sigrok assertion mismatches in 1-Wire and LIN. The newest run's Python/model job passed; both RTL simulator jobs failed only on these annotations after the protocol reference checks had passed. Corrected the assertions in `test_internal/chip/test_l3.py` to match sigrok's available annotations. The CI sigrok-enabled rerun is still required.
+- Downloaded the latest unit artifacts to `/tmp/unit-37103768779-icarus/` and `/tmp/unit-37103768779-verilator/`; JUnit confirms the 1-Wire decoder emitted reset/presence and `Read ROM` but no slave ROM byte annotation, while LIN emitted frame ID `0x10`, valid parity, data and checksum (the test incorrectly expected protected ID `0x50`). The same run's `test`, `lint`, and `docs` workflows passed (37103768797, 37103768813, 37103768803). GitHub reports no queued or in-progress runs.
+- Added an explicit 2/4-thread input to `.github/workflows/gds-postantenna-drt-continuation.yaml`, defaulting to 4, and pass it as `OPENROAD_THREADS` to LibreLane. The rerun will use the same source checkpoint and candidate, changing only the thread count.
+- Removed the now-unused LIN `pid_of` import. Focused 1-Wire READ ROM and LIN commander tests passed on both Verilator and Icarus with `TRIPWIRE_SKIP_SIGROK=1` (4 simulator/test runs). `python -m py_compile test_internal/chip/test_l3.py`, workflow YAML parsing and the `OPENROAD_THREADS` wiring assertion passed; `git diff --check` passed.
+
+Checklist status:
+- Box 9 is unchecked again: latest unit run 37103768779 passed the model job but failed both RTL simulator jobs on the 1-Wire/LIN sigrok assertions. No boxes were ticked in this session; the million-clock L2 result remains valid.
+
+Next:
+- After these test/workflow/documentation changes are committed and pushed by the user, rerun `unit` and the expanded hardened-netlist L3 workflow with sigrok enabled.
+- Replay the validated post-antenna checkpoint with four OpenROAD threads. A clean DRT result would still need a full hardening for routed timing, DRC/LVS/antenna, precheck, gate-level tests and viewer output.
+- Keep timing optimization focused on the slow-corner `idle` configuration latch to `dropped[16]` path from the last fully routed candidate; preserve 20 ns, D-066 timing, and same-cycle DROPPED accounting.
+
 ## 2026-10-03: Codex (phase 2: push expanded L3 checks and prepare post-antenna DRT)
 Done:
 - Committed and pushed the IR NEC state initialization, expanded 22-case L3 suite, and updated evidence as `68adf20`, `2c03bd3`, and `a9b9f26`, authored by Krithik4. No hardware input changed; the hardware-only ahead-of-main check was empty.

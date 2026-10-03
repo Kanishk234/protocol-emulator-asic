@@ -28,9 +28,18 @@ lane L0:
 
 lane L1:
     r3 = 0                              # SRAM base for the decoder's variables
-    states IDLE GO
+    states BOOT IDLE GO
+    slot: when BOOT, rb == 0 do CALL clear_decoder then IDLE
     slot: when IDLE, rb == 0, I0 is EVENT       do MOV r0 <- I0, deq                then GO
     slot: when GO                               do CALL edge                        then IDLE
+
+routine clear_decoder:
+    ldi r1, 0
+    st r1, r3, 240                      # last edge timestamp
+    st r1, r3, 241                      # accumulated data bits
+    st r1, r3, 242                      # frame bit count
+    st r1, r3, 243                      # leader-mark seen flag
+    ret
 
 routine send:
     load16 r3, 0xFF

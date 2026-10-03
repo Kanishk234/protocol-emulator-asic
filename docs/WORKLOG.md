@@ -8,16 +8,16 @@ Newest entry at the top. One entry per work session.
 ## 2026-10-03: Codex (phase 2: push expanded L3 checks and prepare post-antenna DRT)
 Done:
 - Committed and pushed the IR NEC state initialization, expanded 22-case L3 suite, and updated evidence as `68adf20`, `2c03bd3`, and `a9b9f26`, authored by Krithik4. No hardware input changed; the hardware-only ahead-of-main check was empty.
-- Main `test`, `unit`, `lint`, and `docs` runs are active on `a9b9f26`: 37101626363, 37101626314, 37101626351, and 37101626299.
+- Main `test`, `unit`, `lint`, and `docs` runs on `a9b9f26` are 37101626363, 37101626314, 37101626351, and 37101626299. After the workflow/documentation push, the corresponding new runs on `9d42f3f` are 37102473180, 37102473194, 37102473168, and 37102473188.
 - Dispatched expanded hardened-netlist L3 run [37101678657](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37101678657) against the earlier netlist from GDS run 36799356107, which matches candidate RTL `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. This run can establish protocol function, not timing or route signoff.
-- Added `.github/workflows/gds-postantenna-drt-continuation.yaml` to resume detailed routing from run 37037880327's post-antenna stage 43. Local artifact validation confirmed that stage 43's ODB/DEF/SDC/netlist references match the original DRT input, with 33,755 instances and `GRT_ADJUSTMENT=0.16`. Workflow YAML parsed, `bash -n` passed for all five shell blocks, and `git diff --check` is clean. The workflow has not yet been dispatched.
+- Added and pushed `.github/workflows/gds-postantenna-drt-continuation.yaml` to resume detailed routing from run 37037880327's post-antenna stage 43. Local artifact validation confirmed that stage 43's ODB/DEF/SDC/netlist references match the original DRT input, with 33,755 instances and `GRT_ADJUSTMENT=0.16`. The first continuation attempt, [37102555758](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37102555758), stopped at artifact download because the manual run artifact is named `GDS_logs-37037880327`, not `GDS_logs`; confirmed the artifact exists. Updated the workflow to use the run-specific artifact name; YAML and shell validation will be repeated before retrying.
 
 Checklist boxes ticked:
 - None. These tests and route diagnostics do not complete the Phase 2 timing, signoff, or budget gates.
 
 Next:
-- Wait for the four main CI runs and expanded gate-level run 37101678657; resolve any failures before proceeding.
-- Push and dispatch the post-antenna DRT continuation, then assess route completion and DRC. It does not replace a full GDS signoff run.
+- Review the main CI runs on `a9b9f26` and `9d42f3f`, plus expanded gate-level run 37101678657; resolve any failures before proceeding.
+- Commit and push the corrected artifact name, redispatch the post-antenna DRT continuation, then assess route completion and DRC. It does not replace a full GDS signoff run.
 - Continue route-aware timing work with all configuration paths timed, the 20 ns target intact, and no added DROPPED latency.
 
 ## 2026-10-02: Codex (phase 2: status review and next actions)

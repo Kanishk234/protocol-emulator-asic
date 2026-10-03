@@ -11,6 +11,7 @@ by tripc, loaded with tools/host over SPI, and checked against protocol referenc
   PULSE programs/ws2812.trw, dshot.trw WS2812 data frames and DShot at 150/300/600/1200 kbit/s
   PWM  programs/servo.trw            20 ms servo frames with a live width update
   I2S  programs/i2s.trw              full-duplex 16-bit stereo at 48/96/192 kHz
+  Other shipped programs: PS/2, 1-Wire, JTAG, SWD, SMBus, HDLC, LIN, CAN, IR NEC repeat RX
 
 The tests provide implementation-level evidence for these exercised cases only. Other roadmap programs need
 matching RTL and hardened-netlist checks before they have implementation-level evidence.
@@ -22,14 +23,21 @@ import re
 from pathlib import Path
 
 import cocotb
-from cocotb.triggers import ClockCycles, ReadOnly, ValueChange
+from cocotb.triggers import ClockCycles, FallingEdge, ReadOnly, RisingEdge, ValueChange
 from cocotb.utils import get_sim_time
 
 from chiplib import HM, TAGS, Wire, hex_bytes, load as _load, sigrok, start, write_vcd
-from protomodels import dmx, pulse, uart
+from protomodels import dmx, hdlc, nec, pulse, uart
 from protomodels.i2c import I2CController, I2CTarget
 from protomodels.i2s import I2SADC, I2SReceiver
+from protomodels.can import CANNode
+from protomodels.jtag import IDCODE, JTAGTarget
+from protomodels.lin import LINResponder, checksum as lin_checksum, pid_of
+from protomodels.onewire import OneWireDevice, crc8
+from protomodels.ps2 import PS2Device
+from protomodels.smbus import SMBusDevice, crc8 as smbus_crc8
 from protomodels.spi import SPIController, SPITarget
+from protomodels.swd import DPIDR, OK as SWD_OK, WAIT as SWD_WAIT, SWDTarget, parity as swd_parity
 
 DATA, CTRL, EVENT, ERR = (TAGS[t] for t in ("DATA", "CTRL", "EVENT", "ERR"))
 MSG = b"TRIPWIRE\x00\xff\x55"
@@ -539,3 +547,452 @@ async def test_l3_i2c_target(dut):
             assert hex_bytes(out, "Data read: ") == read_data, (cpb, out[:300])
             # Four writes (including the deliberately wrong address) and one read.
             assert lines.count("Start") == 5 and lines.count("Stop") == 5, (cpb, lines)
+
+
+@cocotb.test()
+async def test_l3_ps2_device_to_host(dut):
+    """L3-PS/2 RX: read device frames, reject one bad-parity frame, and decode the bus with sigrok."""
+    sent = [0x1C, 0xF0, 0x1C, 0x5A, 0x00, 0xFF]
+    bad_parity = {3}
+    p = await start(dut, uio=0xFF, clock=True)
+    await load(p, "ps2_host")
+    device = PS2Device(half=1500, send=sent, bad_parity=bad_parity)
+    mark = {"n": 0, "t": 0}
+
+    def sigrok_clk(uo, bus):
+        # sigrok 0.5's PS/2 decoder needs a twelfth falling edge to finish an 11-bit frame.
+        # Add a short recorder-only clock pulse after each frame; the device and RTL see the real bus.
+        if device.frames_sent > mark["n"]:
+            mark["n"], mark["t"] = device.frames_sent, 20
+        if mark["t"]:
+            mark["t"] -= 1
+            return 0 if mark["t"] < 10 else (bus >> 1) & 1
+        return (bus >> 1) & 1
+
+    def env(uo, uout, uoe, bus):
+        clk_release, data_release = device.step((bus >> 1) & 1, bus & 1)
+        return {}, {1: clk_release, 0: data_release}
+
+    wire = Wire(p, env, {"clk": sigrok_clk, "data": lambda uo, bus: bus & 1})
+    got = []
+    for _ in range(1000):
+        token = await p.pop()
+        if token is not None:
+            got.append(token)
+        if len(got) >= len(sent) and device.frames_sent == len(sent):
+            break
+    wire.stop()
+
+    assert device.frames_sent == len(sent), (device.frames_sent, got, p.outq, device.received)
+    assert [data for tag, data in got if tag == DATA] == [0x1C, 0xF0, 0x1C, 0x00, 0xFF], got
+    errors = [data for tag, data in got if tag == ERR]
+    assert len(errors) == 1 and (errors[0] >> 1) & 0xFF == 0x5A, got
+    write_vcd("ps2_rx.vcd", wire.rec)
+    out = sigrok("ps2_rx.vcd", "ps2:clk=clk:data=data", "ps2")
+    if out is not None:
+        decoded = [int(value, 16) for value in re.findall(r"Data: ([0-9A-Fa-f]{2})\b", out)]
+        assert decoded == sent, out
+        assert out.count("Parity error") == 1, out
+
+
+@cocotb.test()
+async def test_l3_ps2_host_to_device(dut):
+    """L3-PS/2 TX: request-to-send, odd parity, stop, device ACK, and multiple host bytes."""
+    sent = [0xED, 0x02, 0xFF, 0x00]
+    p = await start(dut, uio=0xFF, clock=True)
+    await load(p, "ps2_host")
+    device = PS2Device(half=1500)
+
+    def env(uo, uout, uoe, bus):
+        clk_release, data_release = device.step((bus >> 1) & 1, bus & 1)
+        return {}, {1: clk_release, 0: data_release}
+
+    wire = Wire(p, env, {"clk": lambda uo, bus: (bus >> 1) & 1,
+                         "data": lambda uo, bus: bus & 1})
+    for byte in sent:
+        await p.push(byte)
+    await until(p, lambda: len(device.received) == len(sent), 500_000)
+    await ClockCycles(dut.clk, 100)
+    wire.stop()
+
+    assert device.received == [(byte, True, True) for byte in sent], device.received
+    assert all(tag != ERR for tag, _ in p.outq), p.outq
+
+
+@cocotb.test()
+async def test_l3_onewire_read_rom(dut):
+    """L3-1-Wire: reset/presence, READ ROM, 64 LSB-first data bits, and the ROM CRC-8."""
+    reset, read = (0, CTRL), (1, CTRL)
+    rom7 = [0x28, 0xFF, 0x4C, 0x59, 0x91, 0x16, 0x04]
+    expected_rom = rom7 + [crc8(rom7)]
+    p = await start(dut, uio=0xFF, clock=True)
+    await load(p, "onewire")
+    device = OneWireDevice(rom7=rom7)
+
+    def env(uo, uout, uoe, bus):
+        release = device.step(bus & 1)
+        return {}, {0: release}
+
+    wire = Wire(p, env, {"dq": lambda uo, bus: bus & 1})
+    await p.push(*reset)
+    await p.push(0x33, DATA)                              # READ ROM command
+    for _ in range(8):
+        await p.push(*read)                               # one host command reads one byte
+
+    got = []
+    for _ in range(1000):
+        token = await p.pop()
+        if token is not None:
+            got.append(token)
+        if len(got) == 9:
+            break
+    wire.stop()
+
+    assert device.resets == 1 and device.received == [0x33], (device.resets, device.received)
+    assert got == [(DATA, 0), *[(DATA, byte) for byte in expected_rom]], got
+    assert crc8([data for _, data in got[1:8]]) == got[8][1]
+    write_vcd("onewire_l3.vcd", wire.rec)
+    out = sigrok("onewire_l3.vcd", "onewire_link:owr=dq,onewire_network", "onewire_network")
+    if out is not None:
+        assert "Read ROM" in out, out
+        match = re.search(r"ROM: 0x([0-9a-fA-F]{16})", out)
+        assert match and int(match.group(1), 16) == int.from_bytes(bytes(expected_rom), "little"), out
+
+
+@cocotb.test()
+async def test_l3_jtag_idcode(dut):
+    """L3-JTAG: walk the TAP to Shift-DR and read the target's 32-bit IDCODE over the chip pads."""
+    p = await start(dut, ui=1, clock=True)
+    await load(p, "jtag", PERIOD=20)
+    target = JTAGTarget()
+
+    def env(uo, uout, uoe, bus):
+        tdo = target.step(uo & 1, uo >> 1 & 1, uo >> 2 & 1)
+        return {0: tdo}, None
+
+    wire = Wire(p, env, {
+        "tck": lambda uo, bus: uo & 1,
+        "tms": lambda uo, bus: uo >> 1 & 1,
+        "tdi": lambda uo, bus: uo >> 2 & 1,
+        "tdo": lambda uo, bus: target.tdo,
+    })
+    sequences = [([1, 1, 1, 1, 1, 0], [0] * 6),
+                 ([1, 0, 0] + [0] * 31 + [1, 1, 0], [0] * 37)]
+    chunk_lengths = []
+    for tms, tdi in sequences:
+        for offset in range(0, len(tms), 12):
+            m, d = tms[offset:offset + 12], tdi[offset:offset + 12]
+            count = len(m)
+            chunk_lengths.append(count)
+            await p.push((count - 1) << 12 | sum(bit << i for i, bit in enumerate(m)), EVENT)
+            await p.push((count - 1) << 12 | sum(bit << i for i, bit in enumerate(d)), DATA)
+
+    captured = []
+    for count in chunk_lengths:
+        token = await p.pop()
+        assert token is not None and token[0] == EVENT, (count, token, p.outq)
+        captured.extend((token[1] >> i) & 1 for i in range(count))
+    wire.stop()
+
+    assert target.state == "RTI" and target.ir == IDCODE, (target.state, target.ir)
+    assert sum(bit << i for i, bit in enumerate(captured[9:41])) == target.idcode, captured
+    write_vcd("jtag_idcode.vcd", wire.rec)
+    out = sigrok("jtag_idcode.vcd", "jtag:tdi=tdi:tdo=tdo:tck=tck:tms=tms", "jtag=bitstring-tdo")
+    if out is not None:
+        decoded = [int(bits, 2) for bits in re.findall(r"TDO: ([01]{32})\b", out)]
+        assert target.idcode in decoded, out
+
+
+@cocotb.test()
+async def test_l3_smbus_word_pec(dut):
+    """L3-SMBus: write and read a word with PEC checked independently by a reference device."""
+    addr, period = 0x2C, 124
+    aw, ar = addr << 1, (addr << 1) | 1
+    start_event, stop_event = (0, EVENT), (0x8000, EVENT)
+    write = lambda byte: (byte, DATA)
+    read = lambda nack: (nack, CTRL)
+    expected_pec_read = smbus_crc8([aw, 0x05, ar, 0xEF, 0xBE])
+    expected_pec_write = smbus_crc8([aw, 0x10, 0x34, 0x12])
+    expected_pec_readback = smbus_crc8([aw, 0x10, ar, 0x34, 0x12])
+    device = SMBusDevice(addr, regs={0x05: 0xBEEF})
+    p = await start(dut, uio=0xFF, clock=True)
+    await load(p, "smbus", PERIOD=period)
+
+    def env(uo, uout, uoe, bus):
+        scl_release, sda_release = device.step((bus >> 1) & 1, bus & 1)
+        return {}, {0: sda_release, 1: scl_release}
+
+    wire = Wire(p, env, {"sda": lambda uo, bus: bus & 1,
+                         "scl": lambda uo, bus: (bus >> 1) & 1})
+    sequence = [
+        start_event, write(aw), write(0x10), write(0x34), write(0x12), (0x8000, DATA), stop_event,
+        start_event, write(aw), write(0x05), start_event, write(ar), read(0), read(0), read(1), stop_event,
+        start_event, write(aw), write(0x10), start_event, write(ar), read(0), read(0), read(1), stop_event,
+    ]
+    for data, tag in sequence:
+        await p.push(data, tag)
+
+    expected = ([(DATA, 0)] * 5 + [(EVENT, 0)]
+                + [(DATA, 0)] * 3 + [(DATA, 0xEF), (DATA, 0xBE), (DATA, expected_pec_read), (EVENT, 0)]
+                + [(DATA, 0)] * 3 + [(DATA, 0x34), (DATA, 0x12), (DATA, expected_pec_readback), (EVENT, 0)])
+    got = []
+    for _ in range(1000):
+        token = await p.pop()
+        if token is not None:
+            got.append(token)
+        if len(got) == len(expected):
+            break
+    wire.stop()
+
+    if got != expected:
+        mismatch = [(i, actual, wanted) for i, (actual, wanted) in enumerate(zip(got, expected))
+                    if actual != wanted]
+        raise AssertionError(f"SMBus HOST_OUT mismatch at {mismatch[:4]}; lengths {len(got)}/{len(expected)}; "
+                             f"got={got}; expected={expected}; device writes={device.writes}; "
+                             f"device log={device.log[-24:]}")
+    assert device.writes == [(0x10, [0x34, 0x12], True)], device.writes
+    assert device.regs[0x10] == 0x1234
+    write_vcd("smbus_pec.vcd", wire.rec)
+    out = sigrok("smbus_pec.vcd", "i2c:scl=scl:sda=sda", "i2c")
+    if out is not None:
+        assert hex_bytes(out, "Data write: ") == [0x10, 0x34, 0x12, expected_pec_write, 0x05, 0x10], out
+        assert hex_bytes(out, "Data read: ") == [0xEF, 0xBE, expected_pec_read,
+                                                  0x34, 0x12, expected_pec_readback], out
+
+
+@cocotb.test()
+async def test_l3_swd_dpidr_read_with_wait_retry(dut):
+    """L3-SWD: receive WAIT, retry a DP IDCODE read, and check turnaround has no bus contention."""
+    period = 6                                    # 8.3 MHz SWCLK, the program's supported ceiling
+    p = await start(dut, uio=0xFF, clock=True)
+    await load(p, "swd", PERIOD=period)
+    target = SWDTarget(wait_on={0})
+    rec = {"swclk": [], "swdio": []}
+    contentions = {"n": 0}
+
+    async def bus_task():
+        while True:
+            await RisingEdge(dut.clk)
+            await ReadOnly()
+            swclk = int(dut.uo_out.value) & 1
+            uio_out, uio_oe = int(dut.uio_out.value), int(dut.uio_oe.value)
+            host_oe = uio_oe & 1
+            if host_oe and target.oe:
+                contentions["n"] += 1
+            dio = (uio_out & 1) if host_oe else (target.value if target.oe else 1)
+            rec["swclk"].append(swclk)
+            rec["swdio"].append(dio)
+            target.step(swclk, dio)
+            await FallingEdge(dut.clk)
+            dut.uio_in.value = 0xFE | dio
+
+    task = cocotb.start_soon(bus_task())
+    request = 1 | (1 << 2) | (1 << 5) | (1 << 7)       # start, RnW, request parity, park
+    token = 0x7000 | request
+    await p.push(token, DATA)                            # first request gets WAIT
+    await p.push(token, DATA)                            # identical retry gets OK + DPIDR
+    got = []
+    for _ in range(200):
+        response = await p.pop()
+        if response is not None:
+            got.append(response)
+        if len(got) == 5:
+            break
+    await ClockCycles(dut.clk, 4 * period)
+    task.cancel()
+
+    expected = [(DATA, SWD_WAIT), (DATA, SWD_OK), (DATA, DPIDR & 0xFFFF),
+                (DATA, DPIDR >> 16)]
+    assert got[:4] == expected and len(got) == 5, got
+    # RX2 returns parity in bit 0 and the following turnaround sample in bit 1.
+    assert got[4][0] == DATA and got[4][1] & 1 == swd_parity(DPIDR), got
+    assert contentions["n"] == 0, contentions
+    assert target.protocol_errors == 0 and [entry[4] for entry in target.log] == [SWD_WAIT, SWD_OK], target.log
+    write_vcd("swd_dpidr.vcd", rec)
+    out = sigrok("swd_dpidr.vcd", "swd:swclk=swclk:swdio=swdio", "swd")
+    if out is not None:
+        assert "WAIT" in out and "IDCODE" in out and "OK" in out, out
+        values = [int(value, 16) for value in re.findall(r"0x([0-9a-f]{8})", out)]
+        assert DPIDR in values, out
+
+
+@cocotb.test()
+async def test_l3_hdlc_tx_loopback(dut):
+    """L3-HDLC: firmware TX flags, stuffing and FCS decode correctly and loop back as valid RX frames."""
+    period = 500                                  # leave the SPI host enough bandwidth to queue frame bytes
+    frames = [[0x03, 0x3F, 0x7E, 0xFF, 0x7D]]
+    p = await start(dut, ui=1, clock=True)
+    await load(p, "hdlc", BAUD=100_000)
+    await ClockCycles(dut.clk, period * 12)              # settle to the firmware's idle-high line
+    delay = [1, 1, 1]
+
+    def env(uo, uout, uoe, bus):
+        delayed_tx = delay.pop(0)
+        delay.append(uo & 1)
+        return {0: delayed_tx}, None
+
+    wire = Wire(p, env, {"tx": lambda uo, bus: uo & 1})
+    for frame in frames:
+        for byte in frame:
+            await p.push(byte)
+        await p.push(0, EVENT)
+
+    got = []
+
+    async def drain_frames():
+        while sum(tag in (EVENT, ERR) for tag, _ in got) < len(frames):
+            token = await p.pop()
+            if token is not None:
+                got.append(token)
+
+    drain_task = cocotb.start_soon(drain_frames())
+    await ClockCycles(dut.clk, period * 200)
+    drain_task.cancel()
+    wire.stop()
+
+    line = wire.rec["tx"]
+    first_zero = line.index(0)
+    sampled_bits = [line[k] for k in range(first_zero % period + period // 2, len(line), period)]
+    write_vcd("hdlc_l3.vcd", wire.rec)
+    decoded = hdlc.decode(sampled_bits)
+    assert decoded == [(frame, True) for frame in frames], (decoded, got, first_zero, len(line))
+
+    received, current = [], []
+    for tag, data in got:
+        if tag == DATA:
+            current.append(data)
+        else:
+            assert tag == EVENT, (tag, data, got)
+            received.append(current[:-2])
+            current = []
+    assert received == frames and current == [], (received, current, got)
+
+
+@cocotb.test()
+async def test_l3_lin_commander_publish_response(dut):
+    """L3-LIN: send a protected-ID header and receive a responder's enhanced-checksum payload."""
+    baud, fid, data = 100_000, 0x10, [0x11, 0x22, 0x33, 0x44]
+    period = round(50_000_000 / baud)
+    node = LINResponder(period, publish={fid: data})
+    p = await start(dut, ui=1, clock=True)
+    await load(p, "lin", BAUD=baud)
+    line = {"level": 1}
+
+    def env(uo, uout, uoe, bus):
+        level = (uo & 1) & node.drive
+        line["level"] = level
+        node.step(level)
+        return {0: level}, None
+
+    wire = Wire(p, env, {"lin": lambda uo, bus: line["level"]})
+    await p.push((len(data) << 8) | fid, EVENT)
+    got = []
+
+    async def drain_response():
+        while not any(tag == EVENT for tag, _ in got):
+            token = await p.pop()
+            if token is not None:
+                got.append(token)
+
+    drain_task = cocotb.start_soon(drain_response())
+    await ClockCycles(dut.clk, round(220 * period))
+    drain_task.cancel()
+    wire.stop()
+
+    expected = [(DATA, b) for b in data] + [(EVENT, 0)]
+    assert node.headers == [(fid, True)], node.headers
+    assert got == expected, got
+    write_vcd("lin_l3.vcd", wire.rec)
+    out = sigrok("lin_l3.vcd", f"uart:rx=lin:baudrate={baud},lin", "lin")
+    if out is not None:
+        ids = [int(value, 16) for value in re.findall(r"ID: ([0-9A-F]{2}) Parity: \d \(ok\)", out)]
+        checksums = [int(value, 16) for value in re.findall(r"Checksum: 0x([0-9A-F]{2})", out)]
+        assert ids == [pid_of(fid)] and checksums == [lin_checksum(fid, data)], out
+
+
+@cocotb.test()
+async def test_l3_can_standard_frame_and_ack(dut):
+    """L3-CAN: transmit a standard data frame, receive ACK, and self-monitor the CRC-valid bus frame."""
+    period, can_id, data = 400, 0x123, [0xDE, 0xAD]
+    node = CANNode(period)
+    p = await start(dut, ui=1, clock=True)
+    await load(p, "can", PERIOD=period)
+    history = [1] * 5
+    line = {"level": 1}
+
+    def env(uo, uout, uoe, bus):
+        level = (uo & 1) & node.drive
+        history.append(level)
+        rx = history.pop(0)
+        line["level"] = level
+        node.step(level)
+        return {0: rx}, None
+
+    wire = Wire(p, env, {"can": lambda uo, bus: line["level"]})
+    await p.push(0, CTRL)                             # error-active, transmit enabled
+    await p.push(len(data), EVENT)
+    await p.push(can_id, DATA)
+    for byte in data:
+        await p.push(byte, DATA)
+    await p.push(0, EVENT)
+    await ClockCycles(dut.clk, 170 * period)
+
+    got = []
+    for _ in range(60):
+        token = await p.pop()
+        if token is not None:
+            got.append(token)
+        tx_done = any(tag == EVENT and value & 0xE000 == 0xA000 for tag, value in got)
+        if tx_done:
+            break
+    wire.stop()
+
+    expected_frame = {"id": can_id, "data": data, "ext": False, "rtr": False,
+                      "dlc": len(data), "crc_ok": True}
+    assert node.received == [expected_frame], node.received
+    assert node.errors == [], node.errors
+    assert any(tag == EVENT and value == 0x9001 for tag, value in got), got
+    assert tx_done, got
+    write_vcd("can_l3.vcd", wire.rec)
+    out = sigrok("can_l3.vcd", f"can:can_rx=can:nominal_bitrate={50_000_000 // period}:sample_point=75", "can")
+    if out is not None:
+        ids = [int(value, 16) for value in re.findall(r"Identifier: \d+ \(0x([0-9a-f]+)\)", out)]
+        assert ids == [can_id] and "ACK slot: ACK" in out and "error" not in out.lower(), out
+
+
+@cocotb.test()
+async def test_l3_ir_nec_repeat_rx(dut):
+    """L3-IR NEC: detect a valid active-low 9 ms leader and 2.25 ms repeat space on ui0."""
+    mark = round(nec.MARK)
+    segments = [(0, 16 * mark), (1, 4 * mark), (0, mark), (1, 4 * mark)]
+    total_clocks = sum(clocks for _, clocks in segments)
+
+    p = await start(dut, ui=1, clock=True)
+    await load(p, "ir_nec")
+    await ClockCycles(dut.clk, 4 * mark)               # stable idle before the test waveform
+    startup = await p.pop()
+    assert startup is None, f"IR receiver emitted a token during idle: {startup}"
+
+    state = {"index": 0, "remaining": segments[0][1]}
+
+    def env(uo, uout, uoe, bus):
+        index = state["index"]
+        level = segments[index][0] if index < len(segments) else 1
+        if index < len(segments):
+            state["remaining"] -= 1
+            if state["remaining"] == 0:
+                state["index"] += 1
+                if state["index"] < len(segments):
+                    state["remaining"] = segments[state["index"]][1]
+        return {0: level}, None
+
+    wire = Wire(p, env, {"ir_rx": lambda uo, bus: bus & 1})
+    await ClockCycles(dut.clk, total_clocks + 100)
+    wire.stop()
+
+    got = []
+    for _ in range(4):
+        token = await p.pop()
+        if token is not None:
+            got.append(token)
+    assert got == [(EVENT, 0)], got

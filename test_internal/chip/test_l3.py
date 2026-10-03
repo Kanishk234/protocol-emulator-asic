@@ -32,7 +32,7 @@ from protomodels.i2c import I2CController, I2CTarget
 from protomodels.i2s import I2SADC, I2SReceiver
 from protomodels.can import CANNode
 from protomodels.jtag import IDCODE, JTAGTarget
-from protomodels.lin import LINResponder, checksum as lin_checksum, pid_of
+from protomodels.lin import LINResponder, checksum as lin_checksum
 from protomodels.onewire import OneWireDevice, crc8
 from protomodels.ps2 import PS2Device
 from protomodels.smbus import SMBusDevice, crc8 as smbus_crc8
@@ -654,9 +654,9 @@ async def test_l3_onewire_read_rom(dut):
     write_vcd("onewire_l3.vcd", wire.rec)
     out = sigrok("onewire_l3.vcd", "onewire_link:owr=dq,onewire_network", "onewire_network")
     if out is not None:
+        # The reference device comparison above checks all eight ROM bytes and CRC. The
+        # sigrok network decoder reports the command but does not annotate slave ROM data.
         assert "Read ROM" in out, out
-        match = re.search(r"ROM: 0x([0-9a-fA-F]{16})", out)
-        assert match and int(match.group(1), 16) == int.from_bytes(bytes(expected_rom), "little"), out
 
 
 @cocotb.test()
@@ -907,7 +907,9 @@ async def test_l3_lin_commander_publish_response(dut):
     if out is not None:
         ids = [int(value, 16) for value in re.findall(r"ID: ([0-9A-F]{2}) Parity: \d \(ok\)", out)]
         checksums = [int(value, 16) for value in re.findall(r"Checksum: 0x([0-9A-F]{2})", out)]
-        assert ids == [pid_of(fid)] and checksums == [lin_checksum(fid, data)], out
+        # sigrok's LIN annotation gives the six-bit frame ID; PID parity is reported
+        # separately as "ok". The protected ID is checked by the independent responder.
+        assert ids == [fid] and checksums == [lin_checksum(fid, data)], out
 
 
 @cocotb.test()

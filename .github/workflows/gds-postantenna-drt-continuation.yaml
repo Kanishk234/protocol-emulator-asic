@@ -81,7 +81,7 @@ jobs:
       - name: Download the full GDS checkpoint artifact
         uses: actions/download-artifact@v7
         with:
-          name: GDS_logs
+          name: GDS_logs-${{ inputs.source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}

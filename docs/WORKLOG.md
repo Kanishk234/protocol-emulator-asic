@@ -7,16 +7,18 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-10-03: Codex (phase 2: whole-chip timing screen while DRT runs)
 Done:
-- Rechecked main workflows: latest `test` 37144501893, `lint` 37144501903, and `docs` 37144501853 passed; `unit` 37144501861 is running. Hardened-netlist L3 37144286224 is running.
-- Confirmed post-antenna route replay 37144286178 validated the existing checkpoint and is in detailed routing with `OPENROAD_THREADS=4`. No active GDS inputs or source files changed.
+- The expanded 22-case hardened-netlist L3 workflow 37144286224 passed on the matching R4 netlist.
+- Main `test`, `docs`, `lint`, and `unit` all passed on commit `62fa04d`: runs 37145661322, 37145660996, 37145661033, and 37145661022. Ticked Phase 2 box 9 with this evidence; rerun after the hardware switch.
+- Post-antenna route replay 37144286178 validated the existing checkpoint and remains in detailed routing with `OPENROAD_THREADS=4`; it has run about 4 h 18 min so far. It is route-only, not full GDS signoff. No active GDS inputs or source files changed.
 - Ran matched D-066-timed `bash synth/chip/run_chip.sh 20` screens against exact source `3393eea9a58c5cad9077cc360a8515d0e5ec8284` in isolated `/tmp` copies. Baseline area/slack: 391,112.442 µm², +9.154 ns typ / +3.344 ns slow. SHIFT_RX factoring: 392,762.563 µm², +7.866/+1.360 ns. Pad-output mux: 391,278.384 µm², +8.279/+2.001 ns. Pad-input selector: 389,852.757 µm², +8.599/+2.501 ns. RX + pad-output combined: 392,878.647 µm², +8.529/+2.376 ns.
 - Although earlier checks improved selected latch-to-DROPPED paths, all four screens worsened the whole-chip worst slow slack. They use ideal clocks and no wire parasitics; none qualifies as a routed timing improvement. Did not run additional unit/L2 checks on the combined form after its whole-chip screen regressed. Details are in `docs/reports/PHASE2_GDS_EXPERIMENTS.md` and the isolated output directories listed there.
 
 Checklist:
-- None ticked. The main `unit`, hardened-netlist L3, and post-antenna DRT runs remain in progress; the route replay is not full GDS signoff.
+- Box 9 ticked: all four main workflows passed on `62fa04d` (run IDs above).
+- No other boxes ticked. The route replay remains active and is not full GDS signoff.
 
 Next:
-- Review the active unit, hardened-netlist L3, and four-thread route replay when they finish.
+- Review the completed route replay when it finishes; compare remaining markers and runtime with the prior timed-out attempt.
 - For timing, use the route result and the archived high-fanout configuration cone to guide an isolated resizer/placement or narrower logic/load experiment. Preserve 20 ns, D-066 timed paths, protocol behavior, and same-cycle DROPPED accounting.
 
 ## 2026-10-03: Codex (phase 2: close L3 assertion gaps and diagnose DRT timeout)

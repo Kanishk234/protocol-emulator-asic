@@ -5,6 +5,21 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-03: Codex (phase 2: push expanded L3 checks and prepare post-antenna DRT)
+Done:
+- Committed and pushed the IR NEC state initialization, expanded 22-case L3 suite, and updated evidence as `68adf20`, `2c03bd3`, and `a9b9f26`, authored by Krithik4. No hardware input changed; the hardware-only ahead-of-main check was empty.
+- Main `test`, `unit`, `lint`, and `docs` runs are active on `a9b9f26`: 37101626363, 37101626314, 37101626351, and 37101626299.
+- Dispatched expanded hardened-netlist L3 run [37101678657](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37101678657) against the earlier netlist from GDS run 36799356107, which matches candidate RTL `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. This run can establish protocol function, not timing or route signoff.
+- Added `.github/workflows/gds-postantenna-drt-continuation.yaml` to resume detailed routing from run 37037880327's post-antenna stage 43. Local artifact validation confirmed that stage 43's ODB/DEF/SDC/netlist references match the original DRT input, with 33,755 instances and `GRT_ADJUSTMENT=0.16`. Workflow YAML parsed, `bash -n` passed for all five shell blocks, and `git diff --check` is clean. The workflow has not yet been dispatched.
+
+Checklist boxes ticked:
+- None. These tests and route diagnostics do not complete the Phase 2 timing, signoff, or budget gates.
+
+Next:
+- Wait for the four main CI runs and expanded gate-level run 37101678657; resolve any failures before proceeding.
+- Push and dispatch the post-antenna DRT continuation, then assess route completion and DRC. It does not replace a full GDS signoff run.
+- Continue route-aware timing work with all configuration paths timed, the 20 ns target intact, and no added DROPPED latency.
+
 ## 2026-10-02: Codex (phase 2: status review and next actions)
 Done:
 - Rechecked `main` at `3720983` against `origin/main`. The pending changes are the IR NEC firmware initialization, expanded L3 tests, and their evidence/docs; `git diff --check` is clean.

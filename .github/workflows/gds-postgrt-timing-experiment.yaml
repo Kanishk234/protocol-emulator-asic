@@ -145,12 +145,17 @@ jobs:
             --with-initial-state runs/wokwi/39-openroad-globalrouting/state_out.json \
             --from OpenROAD.ResizerTimingPostGRT \
             --to OpenROAD.ResizerTimingPostGRT \
+            --override-config GRT_ADJUSTMENT=0.16 \
             --override-config RUN_POST_GRT_RESIZER_TIMING=true \
             src/config_merged.json
           python3 - <<'PY'
+          import json
           from pathlib import Path
 
           root = Path("runs/postgrt-timing")
+          resolved = json.loads((root / "resolved.json").read_text())
+          assert float(resolved["GRT_ADJUSTMENT"]) == 0.16, resolved["GRT_ADJUSTMENT"]
+          assert resolved["RUN_POST_GRT_RESIZER_TIMING"] is True
           log = root / "flow.log"
           if not log.is_file():
               matches = list(root.rglob("flow.log"))
@@ -164,7 +169,10 @@ jobs:
               if "resizertimingpostgrt" in str(path).lower()
           ]
           assert states, "post-GRT resizer state_out.json was not produced"
+          step_cfg = json.loads(states[-1].with_name("config.json").read_text())
+          assert float(step_cfg["GRT_ADJUSTMENT"]) == 0.16
           print(f"Post-GRT resizer checkpoint: {states[-1]}")
+          print("Resolved flow: GRT_ADJUSTMENT=0.16; post-GRT timing resizer enabled")
           PY
 
       - name: Upload timing-resizer artifacts

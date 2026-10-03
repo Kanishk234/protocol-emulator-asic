@@ -5,6 +5,40 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-02: Codex (phase 2: status review and next actions)
+Done:
+- Rechecked `main` at `3720983` against `origin/main`. The pending changes are the IR NEC firmware initialization, expanded L3 tests, and their evidence/docs; `git diff --check` is clean.
+- Confirmed main test, unit, lint and docs runs 37066391043, 37066391060, 37066391039 and 37066391070 passed, with no GitHub workflows currently in progress.
+- Confirmed full GDS run 37037880327 failed at its 330-minute detailed-route timeout. The earlier hardened netlist run 36799356107 used the same candidate RTL SHA, so the updated L3 suite can provide gate-level functional evidence against it; it does not establish timing or routing signoff.
+- No Phase 2 checklist box changed. No commit or push was made; repository instructions reserve those actions to the user.
+
+Next:
+- Commit and push the pending firmware, test and documentation groups; inspect the resulting `test`, `unit`, `lint` and `docs` runs.
+- Run the expanded L3 suite on matching candidate netlist 36799356107, then continue route experiments from the post-antenna checkpoint in 37037880327 and separately optimize routed all-corner timing without relaxing 20 ns or D-066 behavior.
+- Only promote a candidate after L2, both RTL injections, the full protocol suite, and full GDS signoff pass; then repeat the official hardening and close the remaining area/count and Phase 2 evidence items.
+
+## 2026-10-02: Codex (phase 2: analyze 16% hardening timeout and complete IR NEC RTL check)
+Done:
+- Retrieved and reviewed the artifact for full hardening [37037880327](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37037880327), exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full; 20 ns; 56% density; `GRT_ADJUSTMENT=0.16`). The LibreLane hardening job timed out at 330 minutes during DRT. GRT had zero overflow (capacity 601,423; demand 255,230; usage 42.44%). After 13 DRT rounds, 1,246 violations remained; the next round was cut off. Last counts: 345 M2 / 53 M3 / 2 M4 spacing, 697 M2 / 106 M3 / 43 M4 shorts. Antenna repair reduced 113 markers to zero, adding 141 diodes plus jumpers.
+- Distinguished the run's intermediate STA from final timing: post-antenna, pre-DRT typical setup slack was +7.81655 ns and hold slack +0.171227 ns, with zero typical violations; no routed parasitics or slow/fast signoff exists. `precheck` and `gl_test` were skipped, and the run produced no GDS/viewer result.
+- Compared the DRT input against continuation [36951141285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36951141285): the failed full run entered DRT with 33,755 instances / 514,867 µm² after antenna repair, while the earlier continuation used the pre-antenna GRT checkpoint at 33,602 instances / 514,034 µm². This explains why the earlier zero-violation DRT result is not an apples-to-apples comparison; it does not prove antenna repair caused the timeout. The next route experiment should resume from the post-antenna state.
+- Added PS/2, 1-Wire, SWD, JTAG, SMBus, HDLC, LIN, CAN and IR NEC repeat L3 tests to the existing twelve-case suite. Nine non-IR tests pass under both simulators; the IR test passes on the exact candidate under Verilator and Icarus. The IR test caught uninitialized decoder SRAM state in `programs/ir_nec.trw`; added a BOOT routine that initializes words 240–243 before input processing and logged BUGS #58. The existing tripsim IR frame/repeat test passes after the firmware change.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md`, `docs/reports/PHASE2_PROTOCOL_COVERAGE.md`, `docs/summaries/PHASE2.md`, and BUGS #58 with the run result and evidence. No RTL, config, info, macro, or checklist count changed. No Phase 2 box was ticked.
+- Current main `test`, `lint`, `docs`, and `unit` workflows are green (runs 37066391043, 37066391039, 37066391070, 37066391060); a live-run query returned no workflows in progress.
+
+Commands and results:
+- `source .venv/bin/activate && TRIPWIRE_SKIP_SIGROK=1 TRIPWIRE_SPEC_FILE=/tmp/r4-bitsync-work/tools/tripwire_spec.py make -C test_internal/chip SIM=verilator SRC_DIR=/tmp/r4-bitsync-work/src SIM_BUILD=sim_build/r4_l3_ir_verilator COCOTB_TEST_MODULES=test_l3 COCOTB_TEST_FILTER=test_l3_ir_nec_repeat_rx COCOTB_RESULTS_FILE=results_l3_ir_fixed_verilator.xml` — PASS, 1/1, 86.20 s.
+- Same command with `SIM=icarus`, `SIM_BUILD=sim_build/r4_l3_ir_icarus`, and `COCOTB_RESULTS_FILE=results_l3_ir_fixed_icarus.xml` — PASS, 1/1, 465.34 s.
+- `source .venv/bin/activate && PYTHONPATH=tools:tools/kernels pytest -q tools/kernels/tests/test_simple_protocols.py::test_ir_nec_rx_frames_and_repeat` — PASS, 1 test in 210.48 s.
+- `source .venv/bin/activate && python -m py_compile test_internal/chip/test_l3.py`; `git diff --check` — clean.
+- Artifact downloaded to `/tmp/gds-37037880327/`; detailed report is in `docs/reports/PHASE2_GDS_EXPERIMENTS.md`.
+
+Checklist boxes ticked:
+- None. The 16% hardening did not finish DRT or final signoff; the added protocol tests do not yet have hardened-netlist evidence.
+
+Next:
+- Compare/resume detailed routing from run 37037880327's post-antenna checkpoint before scheduling another full hardening. Then run sigrok-enabled CI and the expanded suite on a successfully hardened netlist. Preserve 20 ns, all protocol support and D-066 timed configuration paths.
+
 ## 2026-10-02: Codex (phase 2: keep D-066 paths timed in pre-layout STA)
 Done:
 - While hardening 37037880327 runs, audited the standalone STA scripts and found `set_false_path -from $latches` hiding legal live pin-configuration-to-unit-state paths under D-066. Removed the exception from the whole-chip, R4 spike, and pin-unit helpers; `synth/pin` now runs only with configuration latch outputs timed. Logged the issue as BUGS.md #57.

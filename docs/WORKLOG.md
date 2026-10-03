@@ -8,17 +8,19 @@ Newest entry at the top. One entry per work session.
 ## 2026-10-03: Codex (phase 2: push expanded L3 checks and prepare post-antenna DRT)
 Done:
 - Committed and pushed the IR NEC state initialization, expanded 22-case L3 suite, and updated evidence as `68adf20`, `2c03bd3`, and `a9b9f26`, authored by Krithik4. No hardware input changed; the hardware-only ahead-of-main check was empty.
-- Main `test`, `unit`, `lint`, and `docs` runs on `a9b9f26` are 37101626363, 37101626314, 37101626351, and 37101626299. After the workflow/documentation push, the corresponding new runs on `9d42f3f` are 37102473180, 37102473194, 37102473168, and 37102473188.
+- Main `test`, `unit`, `lint`, and `docs` runs on `a9b9f26` are 37101626363, 37101626314, 37101626351, and 37101626299. Later runs on `9d42f3f` are 37102473180, 37102473194, 37102473168, and 37102473188; runs on `2a3845b` are 37102835114, 37102835070, 37102835113, and 37102835372.
 - Dispatched expanded hardened-netlist L3 run [37101678657](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37101678657) against the earlier netlist from GDS run 36799356107, which matches candidate RTL `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. This run can establish protocol function, not timing or route signoff.
-- Added and pushed `.github/workflows/gds-postantenna-drt-continuation.yaml` to resume detailed routing from run 37037880327's post-antenna stage 43. Local artifact validation confirmed that stage 43's ODB/DEF/SDC/netlist references match the original DRT input, with 33,755 instances and `GRT_ADJUSTMENT=0.16`. The first continuation attempt, [37102555758](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37102555758), stopped at artifact download because the manual run artifact is named `GDS_logs-37037880327`, not `GDS_logs`; confirmed the artifact exists. Updated the workflow to use the run-specific artifact name; YAML and shell validation will be repeated before retrying.
+- Added and pushed `.github/workflows/gds-postantenna-drt-continuation.yaml` (`d9bfcef`) to resume detailed routing from run 37037880327's post-antenna stage 43. Local artifact validation confirmed that stage 43's ODB/DEF/SDC/netlist references match the original DRT input, with 33,755 instances and `GRT_ADJUSTMENT=0.16`. The first attempt, [37102555758](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37102555758), stopped at artifact download because the manual run artifact is named `GDS_logs-37037880327`; fixed the workflow name in `8cb6016` and recorded the failure in `2a3845b`. Retry [37102837764](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37102837764) downloaded the artifact, passed checkpoint validation, and entered detailed routing.
+- Screened a generic one-hot source-valid/sequence/load selector in `trw_chan_port` on isolated archives of exact candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`. With the current D-066-timed STA helper, baseline area/slack were 391,112.442 µm² and +9.154/+3.344 ns typ/slow; the variant was 391,175.984 µm² and +8.494/+2.251 ns. Rejected before simulation or routing. The test RTL is confined to `/tmp/r4-fabricmux-opt-20261003/`; active sources were unchanged.
+- Reproduction command in each temporary tree: `source .venv/bin/activate && bash synth/chip/run_chip.sh 20`.
 
 Checklist boxes ticked:
 - None. These tests and route diagnostics do not complete the Phase 2 timing, signoff, or budget gates.
 
 Next:
-- Review the main CI runs on `a9b9f26` and `9d42f3f`, plus expanded gate-level run 37101678657; resolve any failures before proceeding.
-- Commit and push the corrected artifact name, redispatch the post-antenna DRT continuation, then assess route completion and DRC. It does not replace a full GDS signoff run.
-- Continue route-aware timing work with all configuration paths timed, the 20 ns target intact, and no added DROPPED latency.
+- Review the main CI runs on `a9b9f26`, `9d42f3f`, and `2a3845b`, plus expanded gate-level run 37101678657; resolve any failures before proceeding.
+- Monitor continuation 37102837764 and expanded gate-level L3 run 37101678657. The route-only result does not replace a full GDS signoff run.
+- Continue route-aware timing work with all configuration paths timed, the 20 ns target intact, and no added DROPPED latency. The one-hot source-select trial regressed and should not be promoted.
 
 ## 2026-10-02: Codex (phase 2: status review and next actions)
 Done:

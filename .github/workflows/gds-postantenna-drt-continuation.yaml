@@ -1,0 +1,166 @@
+name: gds-postantenna-drt-continuation
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Full GDS run whose post-antenna DRT checkpoint will be continued
+        required: true
+        default: "37037880327"
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: gds-postantenna-drt-${{ inputs.source_run_id }}
+  cancel-in-progress: false
+
+jobs:
+  detailed-route:
+    name: R4 post-antenna detailed-route continuation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      GRT_ADJUSTMENT: "0.16"
+
+    steps:
+      - name: Check out the exact R4 candidate at the artifact's original path
+        uses: actions/checkout@v6
+        with:
+          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check out workflow helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Check out Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: ihp-sg13cmos5l
+          path: tt
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tt/requirements.txt
+
+      - name: Install Tiny Tapeout prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+
+      - name: Install flow dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: Install IHP PDK
+        run: ./.tt-gds-action/install_sg13cmos5l.sh
+
+      - name: Install pinned LibreLane
+        run: pip install librelane==3.1.0.dev3
+
+      - name: Download the full GDS checkpoint artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: GDS_logs
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Validate the post-antenna checkpoint
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path.cwd().resolve()
+          expected_root = Path("/home/runner/work/protocol-emulator-asic/protocol-emulator-asic")
+          assert root == expected_root, (root, expected_root)
+
+          cfg = json.loads(Path("src/config_merged.json").read_text())
+          assert float(cfg["CLOCK_PERIOD"]) == 20.0
+          assert int(cfg["PL_TARGET_DENSITY_PCT"]) == 56
+
+          defs = Path("src/trw_defs.vh").read_text().splitlines()
+          expected_defs = {
+              "TRW_LANES": "2",
+              "TRW_UNITS": "4",
+              "TRW_PC_UNITS_PULSE": "4'b0001",
+              "TRW_PC_UNITS_CARRIER": "4'b0001",
+              "TRW_PC_UNITS_BITSYNC": "4'b0001",
+          }
+          for name, value in expected_defs.items():
+              assert f"`define {name} {value}" in defs, name
+
+          checkpoint = Path("runs/wokwi/43-openroad-stamidpnr-3/state_out.json")
+          recorded_drt_input = Path("runs/wokwi/44-openroad-detailedrouting/state_in.json")
+          drt_config = Path("runs/wokwi/44-openroad-detailedrouting/config.json")
+          state = json.loads(checkpoint.read_text())
+          drt_state = json.loads(recorded_drt_input.read_text())
+          for key in ("odb", "def", "sdc", "pnl"):
+              source = Path(state[key])
+              assert source.is_file(), f"missing checkpoint {key}: {source}"
+              assert Path(drt_state[key]).resolve() == source.resolve(), key
+
+          config = json.loads(drt_config.read_text())
+          assert float(config["GRT_ADJUSTMENT"]) == 0.16
+          assert int(state["metrics"]["design__instance__count"]) == 33755
+          print("Candidate: 3393eea9a58c5cad9077cc360a8515d0e5ec8284")
+          print("Shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
+          print("Checkpoint: post-antenna STA output, verified against original DRT input")
+          print("DRT input: 33,755 instances; GRT_ADJUSTMENT=0.16")
+          PY
+
+      - name: Continue from post-antenna state through detailed routing
+        timeout-minutes: 330
+        run: |
+          set -euo pipefail
+          mkdir -p runs/postantenna-drt
+          python -m librelane \
+            --pdk-root "$PDK_ROOT" \
+            --docker-no-tty \
+            --dockerized \
+            --pdk ihp-sg13cmos5l \
+            --manual-pdk \
+            --run-tag postantenna-drt \
+            --force-run-dir runs/postantenna-drt \
+            --hide-progress-bar \
+            --with-initial-state runs/wokwi/43-openroad-stamidpnr-3/state_out.json \
+            --from OpenROAD.DetailedRouting \
+            --to OpenROAD.DetailedRouting \
+            --override-config "GRT_ADJUSTMENT=$GRT_ADJUSTMENT" \
+            src/config_merged.json
+
+      - name: Upload post-antenna detailed-route artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-postantenna-drt-${{ github.run_id }}
+          path: |
+            runs/postantenna-drt/**
+            runs/wokwi/43-openroad-stamidpnr-3/state_out.json
+            runs/wokwi/44-openroad-detailedrouting/state_in.json
+            src/config_merged.json
+          if-no-files-found: warn

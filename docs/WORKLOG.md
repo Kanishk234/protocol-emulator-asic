@@ -5,6 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-03: Codex (phase 2: timing-repair experiment prep while DRT runs)
+Done:
+- Rechecked the locally saved full-run artifact for candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 units; 20 ns; 56% density). Its stage 39 global-route report ends with zero overflow on every layer (`/tmp/gds-37037880327/runs/wokwi/39-openroad-globalrouting/openroad-globalrouting.log`).
+- Confirmed the same run had `RUN_POST_GRT_DESIGN_REPAIR=false` and `RUN_POST_GRT_RESIZER_TIMING=false`; flow log records both steps skipped. The currently running replay [37144286178](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37144286178) starts at post-antenna stage 43 and runs detailed routing only, so it cannot measure a post-GRT timing-repair change.
+- Added `.github/workflows/gds-postgrt-timing-experiment.yaml` to run only the post-GRT resizer from the saved stage 39 checkpoint, overriding only `RUN_POST_GRT_RESIZER_TIMING=true`. Its YAML and both embedded Python blocks parse cleanly; the pinned LibreLane option is documented as experimental, so the first run is a bounded 90-minute screen.
+- Next controlled flow test: keep candidate, 20 ns clock, density and GRT adjustment fixed, and capture fresh timing, area and congestion metrics. A promising result still needs a separate routed replay and signoff; validate all-corner coverage in the pinned flow artifact.
+- GitHub API was unreachable during this check, so the latest remote status could not be refreshed. Last available status has route replay 37144286178 active. No RTL, `src/config.json`, `info.yaml`, macro, or hardening input changed.
+
+Checklist:
+- No boxes ticked; this is saved-artifact analysis and experiment preparation, not routed signoff evidence.
+
+Next:
+- Read the final status and artifact for route replay 37144286178 when GitHub is reachable. Then validate and run the isolated stage 39 post-GRT resizer experiment; keep the 20 ns target, D-066 timed configuration paths, and same-cycle DROPPED accounting.
+
 ## 2026-10-03: Codex (phase 2: whole-chip timing screen while DRT runs)
 Done:
 - The expanded 22-case hardened-netlist L3 workflow 37144286224 passed on the matching R4 netlist.

@@ -8,14 +8,14 @@ Newest entry at the top. One entry per work session.
 ## 2026-10-04: Codex (timing-directory fix and routing hotspot analysis)
 Done:
 - Fetched main and checked Actions headBranch: 319d7d3/lint 37178674680 belongs to `anish_branch`, not main. Corrected the previous entry. Main is still 4652fc1 with green test/lint/docs/unit (37176353137/163/176/184). No integration conflict or newer main hardware change exists.
-- Fixed required run-directory creation before LibreLane invocation and made regression CLI checks require it. Three cases pass; diff checks pass. This fixes the pre-STA failure in 37176270000; no timing improvement is claimed.
+- Fixed required run-directory creation before LibreLane invocation and made regression CLI checks require it. Three cases pass; diff checks pass. Published CI fix 5109d19 and evidence f829ee5 separately; launched timing retry 37182661906 on f829ee5 (queued at dispatch). This fixes the pre-STA failure in 37176270000; no timing improvement is claimed.
 - Parsed routing run 37165048635's snapshots 5–50. Last snapshot has 215 markers (157 shorts, 58 spacing); 203/215 lie in x=500–700 µm, y=300–350 µm, using 50 µm bins. U0 RX producer token bit 16 appears in 20 marker records. Counts are marker records, not independent defects or unique nets. Added snapshot progression/hotspot evidence to the GDS report.
 
 Checklist:
 - No boxes ticked; candidate hardware and constraints unchanged.
 
 Next:
-- Publish CI fix and documentation separately, rerun timing against source 37037880327, and inspect fresh corner metrics. Map the routing hotspot to macro/cell placement before proposing one physical experiment.
+- Inspect timing retry 37182661906 fresh corner metrics against source 37037880327. Map the routing hotspot to macro/cell placement before proposing one physical experiment.
 
 ## 2026-10-04: Codex (completed diagnostic status)
 Done:

@@ -8,13 +8,15 @@ Newest entry at the top. One entry per work session.
 ## 2026-10-03: Codex (authorized publication of timing diagnostic)
 Done:
 - User explicitly authorized the commit/push/launch commands, overriding the default Codex git restriction for this action. Rechecked tests (3/3), YAML parsing and `git diff --check`.
-- `git log origin/main..main -- src info.yaml macro` was empty before publication: no hardware changes queued that would cancel routing. Committed CI/helper changes separately as 13dce25 (`ci: compare fresh post-GRT timing by corner`). Documentation is a separate commit.
+- `git log origin/main..main -- src info.yaml macro` was empty before publication: no hardware changes queued that would cancel routing. Committed CI/helper changes separately as 13dce25 (`ci: compare fresh post-GRT timing by corner`). Documentation committed separately as 4a035d6 (`docs: reconcile protocol and timing evidence`). Both commits pushed successfully to main.
+
+- Dispatched corrected timing diagnostic 37176270000 on 4a035d6 with source run 37037880327; confirmed in progress. Existing routing replay 37165048635 remains in progress. Working tree was clean after publication.
 
 Checklist:
 - No boxes ticked; actual diagnostic corner measurements remain pending.
 
 Next:
-- Push these CI/documentation groups and launch the corrected timing diagnostic against source run 37037880327; inspect fresh corner metrics when it finishes. Preserve active routing and candidate inputs.
+- Inspect run 37176270000 fresh corner metrics when it finishes and routing replay 37165048635 snapshots. Preserve candidate inputs.
 
 ## 2026-10-03: Codex (route-free matched timing diagnostic and WNS hypotheses)
 Done:

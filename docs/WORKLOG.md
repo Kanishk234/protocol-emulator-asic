@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (region trial timing and antenna repair preparation)
+Done:
+- Inspected seven slow violations: six paths originate at latch _49036_ to _48142_–_48147_; one _49012_→_47080_. Worst −0.044798 ns. No architectural latency or constraint change proposed.
+- Added separate hotspot-repair workflow/helper: restore region checkpoint, slow signoff-aware margin-zero timing repair, antenna repair, then matched fresh three-corner checks. Stop before DRT and report actual timing/antenna gates.
+- Extended region wrapper to rsz_timing_postgrt.tcl and antenna_repair.tcl; validate repair reroutes retain the trial reservation. Fifteen helper/wrapper checks passed with a Tcl interpreter unpacked under /tmp (no system installation); shell/YAML/embedded-Python/diff checks passed. No phase boxes ticked.
+
+Next:
+- Publish and dispatch repair screen, inspect cell/electrical changes and post-antenna timing/antenna gates before considering DRT.
+
+## 2026-10-04: Codex (local resource screen completed)
+Done:
+- Screen 37219355996 succeeded as a diagnostic. Both fresh GRT variants have zero overflow and 33,775 instances. Baseline/region wirelength 2,530,396/2,518,898 µm. Region slow setup WS −0.0447979 ns, TNS −0.180505 ns, 7 violations; baseline setup passes. Hold remains positive in all corners.
+- Fresh rerouting reintroduces antenna violations in both variants: baseline 86 nets/95 pins, region 84 nets/97 pins. Slow slew 13/14; fanout 181, cap 0. Neither rerouted checkpoint is ready for a clean DRT/signoff continuation. No phase boxes ticked.
+
+Next:
+- Examine the seven new slow paths and ensure any local-resource trial survives signoff-aware timing repair plus fresh antenna repair. Preserve the region override during rerouting; do not directly route either antenna-dirty screen output or mistake diagnostic success for closure.
+
 ## 2026-10-04: Codex (bounded local Metal2 resource screen)
 Done:
 - Inspected pinned PDK cell LEF: implicated buf/a21oi/a221oi pins/obstructions use Metal1. SRAM footprint is outside the persistent x=500–700 hotspot. Power-grid via entries also occupy Metal2; exact interference remains unproven without routed geometry.

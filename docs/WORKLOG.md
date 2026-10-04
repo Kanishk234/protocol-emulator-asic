@@ -5,6 +5,24 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (repaired post-antenna and routing hotspot audit)
+Done:
+- Downloaded completed continuation 37187027878: post-antenna signoff-view estimated setup WS 0 in all corners, hold +0.0897432/+0.366301/+0.190121 ns (fast/slow/typ), zero setup/hold violations. Remaining SRAM A_MEN slow slew excess 0.100671 ns; fanout 181, cap 0.
+- Confirmed timeout during iteration 51; completed iteration 50 has 108 intermediate markers (80 shorts/28 spacing; M2 103/M3 3/M4 2). No final route state exists. 95/108 records occupy the earlier x=500–700/y=300–350 µm band; current leaders are lane-0 output-token bit 3, net1580, net1468 and _18767_. Mapped drivers/loads to saved placement.
+- Added reusable `scripts/ci/routing_audit.py` and `docs/reports/PHASE2_REPAIRED_ROUTE_AUDIT.md`. Analyzer matches both actual 108/215 snapshots and log breakdowns; diff check passes. Repaired L3 artifact confirms 22 cases, zero failures/errors/skips. No phase boxes ticked or candidate hardware changed.
+
+Next:
+- Inspect pin shapes, routing obstructions and guides in the persistent Metal2 band before selecting a local spacing/resource experiment. Extraction remains gated on a completed clean route; avoid another identical replay.
+
+## 2026-10-04: Codex (completed repaired-netlist and routing results)
+Done:
+- Repaired-netlist L3 run 37187473289 completed successfully; its protocol-suite step passed. This is functional evidence, not extracted timing signoff.
+- Repaired routing continuation 37187027878 timed out at the combined step's 330-minute limit. Job 111391024983 reached 50 completed optimization iterations with 108 violations remaining, and timed out during iteration 51. Compared with the older replay's 215-marker snapshot, the remaining count is lower, but routing still has no demonstrated clean completion.
+- Recent main test/lint/unit/docs runs and nightly 37204675992 passed. No phase boxes ticked or candidate hardware changed.
+
+Next:
+- Inspect saved post-antenna timing and remaining routing-marker geometry before choosing another controlled experiment. Keep extracted-timing continuation pending until a completed clean route exists.
+
 ## 2026-10-04: Codex (independent repaired-netlist, electrical and extraction work)
 Done:
 - Added separate `l3-repaired-gl` workflow: exact R4 candidate, audited repaired netlist, SHA256, config validation, pinned Icarus 13/IHP models and full 22-case L3. Does not depend on active routing output.

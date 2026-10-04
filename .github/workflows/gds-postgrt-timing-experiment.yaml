@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   postgrt-timing:
-    name: R4 post-GRT timing-resizer screen
+    name: R4 slow-corner post-GRT repair screen
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
@@ -125,10 +125,10 @@ jobs:
           print(f"Candidate: {Path.cwd()} @ {os.environ['CANDIDATE_SHA']}")
           print("Shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
           print("Checkpoint: stage 39 GlobalRouting; GRT_ADJUSTMENT=0.16")
-          print("Experiment changes only RUN_POST_GRT_RESIZER_TIMING: false -> true")
+          print("Screen: slow-corner setup repair followed by mid-PnR STA at fast, slow, and typical corners")
           PY
 
-      - name: Run only the post-GRT timing resizer
+      - name: Run slow-corner post-GRT repair and mid-PnR STA
         timeout-minutes: 90
         run: |
           set -euo pipefail
@@ -144,8 +144,10 @@ jobs:
             --hide-progress-bar \
             --with-initial-state runs/wokwi/39-openroad-globalrouting/state_out.json \
             --from OpenROAD.ResizerTimingPostGRT \
-            --to OpenROAD.ResizerTimingPostGRT \
+            --to OpenROAD.STAMidPNR \
             --override-config GRT_ADJUSTMENT=0.16 \
+            --override-config 'RSZ_CORNERS=["nom_slow_1p08V_125C"]' \
+            --override-config 'PNR_CORNERS=["nom_fast_1p32V_m40C","nom_slow_1p08V_125C","nom_typ_1p20V_25C"]' \
             --override-config RUN_POST_GRT_RESIZER_TIMING=true \
             src/config_merged.json
           python3 - <<'PY'
@@ -155,6 +157,13 @@ jobs:
           root = Path("runs/postgrt-timing")
           resolved = json.loads((root / "resolved.json").read_text())
           assert float(resolved["GRT_ADJUSTMENT"]) == 0.16, resolved["GRT_ADJUSTMENT"]
+          assert resolved["RSZ_CORNERS"] == ["nom_slow_1p08V_125C"], resolved["RSZ_CORNERS"]
+          expected_sta_corners = [
+              "nom_fast_1p32V_m40C",
+              "nom_slow_1p08V_125C",
+              "nom_typ_1p20V_25C",
+          ]
+          assert resolved["PNR_CORNERS"] == expected_sta_corners, resolved["PNR_CORNERS"]
           assert resolved["RUN_POST_GRT_RESIZER_TIMING"] is True
           log = root / "flow.log"
           if not log.is_file():
@@ -171,8 +180,20 @@ jobs:
           assert states, "post-GRT resizer state_out.json was not produced"
           step_cfg = json.loads(states[-1].with_name("config.json").read_text())
           assert float(step_cfg["GRT_ADJUSTMENT"]) == 0.16
+          assert step_cfg["RSZ_CORNERS"] == ["nom_slow_1p08V_125C"]
+          sta_metrics = {}
+          for metrics_path in root.rglob("or_metrics_out.json"):
+              if "stamidpnr" not in str(metrics_path).lower():
+                  continue
+              metrics = json.loads(metrics_path.read_text())
+              sta_metrics.update(metrics)
+          for corner in expected_sta_corners:
+              for kind in ("setup", "hold"):
+                  key = f"timing__{kind}__ws__corner:{corner}"
+                  assert key in sta_metrics, f"missing fresh all-corner STA metric {key}"
+                  print(f"Post-repair {corner} {kind} worst slack: {sta_metrics[key]} ns")
           print(f"Post-GRT resizer checkpoint: {states[-1]}")
-          print("Resolved flow: GRT_ADJUSTMENT=0.16; post-GRT timing resizer enabled")
+          print("Resolved flow: GRT_ADJUSTMENT=0.16; slow-corner resizer; fresh post-repair mid-PnR STA at fast, slow, and typical corners")
           PY
 
       - name: Upload timing-resizer artifacts

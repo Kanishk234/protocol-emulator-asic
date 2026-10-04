@@ -169,6 +169,7 @@ jobs:
             --to OpenROAD.DetailedRouting \
             --override-config "OPENROAD_THREADS=$OPENROAD_THREADS" \
             --override-config "GRT_ADJUSTMENT=$GRT_ADJUSTMENT" \
+            --override-config DRT_SAVE_DRC_REPORT_ITERS=5 \
             src/config_merged.json
 
       - name: Upload post-antenna detailed-route artifacts

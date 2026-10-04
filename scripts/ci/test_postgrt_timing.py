@@ -29,7 +29,7 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair):
         root = Path(command[command.index("--force-run-dir") + 1])
         assert checkpoint == str(before if root.name.startswith("before-") or root.name == "repair" else repaired)
         calls.append((root.name, checkpoint))
-        root.mkdir()
+        assert root.is_dir(), "LibreLane requires --force-run-dir to exist"
         (root / "resolved.json").write_text(json.dumps(cfg))
         stage = root / ("01-openroad-resizertimingpostgrt" if root.name == "repair" else "01-openroad-stamidpnr")
         stage.mkdir()

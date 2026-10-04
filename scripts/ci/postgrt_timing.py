@@ -46,6 +46,8 @@ def screen(config_path, before, output, pdk_root, repaired=None):
         path = config_path.with_name(f"config_timing_{tag}.json")
         path.write_text(json.dumps(config, indent=2) + "\n")
         root = output / tag
+        # LibreLane's CLI validates --force-run-dir before starting the flow.
+        root.mkdir()
         subprocess.run([
             sys.executable, "-m", "librelane", "--pdk-root", pdk_root,
             "--docker-no-tty", "--dockerized", "--pdk", "ihp-sg13cmos5l",

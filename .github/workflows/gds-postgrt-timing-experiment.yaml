@@ -128,97 +128,11 @@ jobs:
           print("Screen: slow-corner setup repair followed by mid-PnR STA at fast, slow, and typical corners")
           PY
 
-      - name: Configure disposable timing-screen corners
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          path = Path("src/config_merged.json")
-          config = json.loads(path.read_text())
-          config["GRT_ADJUSTMENT"] = 0.16
-          config["RSZ_CORNERS"] = ["nom_slow_1p08V_125C"]
-          config["PNR_CORNERS"] = [
-              "nom_fast_1p32V_m40C",
-              "nom_slow_1p08V_125C",
-              "nom_typ_1p20V_25C",
-          ]
-          config["RUN_POST_GRT_RESIZER_TIMING"] = True
-          path.write_text(json.dumps(config, indent=2) + "\n")
-
-          assert config["RSZ_CORNERS"] == ["nom_slow_1p08V_125C"]
-          assert config["PNR_CORNERS"] == [
-              "nom_fast_1p32V_m40C",
-              "nom_slow_1p08V_125C",
-              "nom_typ_1p20V_25C",
-          ]
-          print("Configured the disposable merged config with native JSON corner lists")
-          PY
-
-      - name: Run slow-corner post-GRT repair and mid-PnR STA
+      - name: Compare fresh before/after STA at each corner
         timeout-minutes: 90
         run: |
           set -euo pipefail
-          mkdir -p runs/postgrt-timing
-          python -m librelane \
-            --pdk-root "$PDK_ROOT" \
-            --docker-no-tty \
-            --dockerized \
-            --pdk ihp-sg13cmos5l \
-            --manual-pdk \
-            --run-tag postgrt-timing \
-            --force-run-dir runs/postgrt-timing \
-            --hide-progress-bar \
-            --with-initial-state runs/wokwi/39-openroad-globalrouting/state_out.json \
-            --from OpenROAD.ResizerTimingPostGRT \
-            --to OpenROAD.STAMidPNR \
-            src/config_merged.json
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          root = Path("runs/postgrt-timing")
-          resolved = json.loads((root / "resolved.json").read_text())
-          assert float(resolved["GRT_ADJUSTMENT"]) == 0.16, resolved["GRT_ADJUSTMENT"]
-          assert resolved["RSZ_CORNERS"] == ["nom_slow_1p08V_125C"], resolved["RSZ_CORNERS"]
-          expected_sta_corners = [
-              "nom_fast_1p32V_m40C",
-              "nom_slow_1p08V_125C",
-              "nom_typ_1p20V_25C",
-          ]
-          assert resolved["PNR_CORNERS"] == expected_sta_corners, resolved["PNR_CORNERS"]
-          assert resolved["RUN_POST_GRT_RESIZER_TIMING"] is True
-          log = root / "flow.log"
-          if not log.is_file():
-              matches = list(root.rglob("flow.log"))
-              assert matches, "LibreLane flow.log was not produced"
-              log = matches[0]
-          text = log.read_text(errors="replace")
-          assert "OpenROAD.ResizerTimingPostGRT" in text, "post-GRT resizer did not run"
-          assert "Gating variable for step 'OpenROAD.ResizerTimingPostGRT' set to 'False'" not in text
-          states = [
-              path for path in root.rglob("state_out.json")
-              if "resizertimingpostgrt" in str(path).lower()
-          ]
-          assert states, "post-GRT resizer state_out.json was not produced"
-          step_cfg = json.loads(states[-1].with_name("config.json").read_text())
-          assert float(step_cfg["GRT_ADJUSTMENT"]) == 0.16
-          assert step_cfg["RSZ_CORNERS"] == ["nom_slow_1p08V_125C"]
-          sta_metrics = {}
-          for metrics_path in root.rglob("or_metrics_out.json"):
-              if "stamidpnr" not in str(metrics_path).lower():
-                  continue
-              metrics = json.loads(metrics_path.read_text())
-              sta_metrics.update(metrics)
-          for corner in expected_sta_corners:
-              for kind in ("setup", "hold"):
-                  key = f"timing__{kind}__ws__corner:{corner}"
-                  assert key in sta_metrics, f"missing fresh all-corner STA metric {key}"
-                  print(f"Post-repair {corner} {kind} worst slack: {sta_metrics[key]} ns")
-          print(f"Post-GRT resizer checkpoint: {states[-1]}")
-          print("Resolved flow: GRT_ADJUSTMENT=0.16; slow-corner resizer; fresh post-repair mid-PnR STA at fast, slow, and typical corners")
-          PY
+          python workflow-src/scripts/ci/postgrt_timing.py --pdk-root "$PDK_ROOT"
 
       - name: Upload timing-resizer artifacts
         if: always()
@@ -230,4 +144,5 @@ jobs:
             runs/wokwi/39-openroad-globalrouting/state_out.json
             runs/wokwi/39-openroad-globalrouting/config.json
             src/config_merged.json
+            src/config_timing_*.json
           if-no-files-found: warn

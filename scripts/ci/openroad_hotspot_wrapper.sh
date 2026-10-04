@@ -4,7 +4,7 @@ real_openroad="$(command -v openroad)"
 args=("$@")
 script_index=$((${#args[@]} - 1))
 script_path="${args[$script_index]}"
-if [[ "$(basename -- "$script_path")" == "grt.tcl" ]]; then
+if [[ "$(basename -- "$script_path")" =~ ^(grt|rsz_timing_postgrt|antenna_repair)\.tcl$ ]]; then
     patched_tcl="$(mktemp "${RUNNER_TEMP:-/tmp}/tripwire-hotspot.XXXXXX.tcl")"
     cat > "$patched_tcl" <<'TCL'
 if {![llength [info commands ::set_global_routing_region_adjustment]]} {

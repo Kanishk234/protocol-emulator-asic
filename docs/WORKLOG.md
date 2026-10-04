@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-03: Codex (phase 2: diagnose DRT timeout and prepare corner-aware timing screen)
+Done:
+- Inspected corrected post-GRT resizer run [37162483954](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37162483954) for candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 units; 20 ns; 56% density). It honored `GRT_ADJUSTMENT=0.16`; pre- and post-resizer GRT had zero overflow. Wirelength changed 2,465,539 → 2,474,553. The resizer used the typical default corner, reported no setup/hold violations, made no cell changes, and did not refresh the saved slow-corner WNS (−5.0436 ns).
+- Confirmed the pinned LibreLane 3.1.0.dev3 release supports `RSZ_CORNERS` for resizer steps and per-corner mid-PnR STA with step-level aggregation. Updated the isolated timing-experiment workflow to target slow-corner repair, then run fresh post-repair mid-PnR STA across fast, slow, and typical corners using global-route estimated parasitics; the workflow asserts all resolved corner settings and requires fresh setup/hold slack metrics for all three corners. The candidate RTL and active GDS inputs remain unchanged. This experiment has not run yet.
+- Downloaded the completed DRT replay [37144286178](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37144286178). It hit the workflow's 330-minute step timeout after 46 completed iterations numbered 0–45, with 227 markers remaining (61 spacing violations and 166 shorts). The prior unset-thread replay [37102837764](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37102837764) reached 277 markers after 35 rounds. This four-thread replay made more progress, but no detailed-route output state was saved. Artifact log and config are under `/tmp/gds-postantenna-37144286178/gds-postantenna-drt-37144286178/runs/postantenna-drt/`.
+- Prepared the isolated post-antenna continuation workflow to set `DRT_SAVE_DRC_REPORT_ITERS=5`, so a same-checkpoint replay can reveal where the remaining route markers are concentrated. It changes diagnostic artifact generation only; candidate RTL and active hardening inputs remain untouched.
+- Main `test`, `docs`, `lint`, and `unit` all passed on `467012a`: runs 37162474601, 37162474600, 37162474609, and [37162474623](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37162474623). The latest `unit` completed successfully, including the chip-level Icarus job.
+- Updated `docs/reports/PHASE2_GDS_EXPERIMENTS.md` with the DRT timeout result, corrected screen, and next experiments. No checklist boxes changed.
+
+Checklist:
+- No boxes ticked. The current route replay is not full hardening signoff, and no slow-corner resizer result exists yet.
+
+Next:
+- Run the same-checkpoint DRT replay with reports every five iterations; use the remaining marker coordinates and nets to select one controlled route experiment.
+- Run the updated isolated resizer workflow with its slow-corner override and fresh all-corner STA; compare setup/hold slack, cell area, and global-route overflow.
+- Commit and push the prepared workflow and evidence updates, then dispatch the marker-report DRT replay and the slow-corner post-GRT timing screen. Continue preserving 20 ns, D-066 timed configuration paths, protocol support, and same-cycle DROPPED accounting.
+
 ## 2026-10-03: Codex (phase 2: timing-repair experiment prep while DRT runs)
 Done:
 - Rechecked the locally saved full-run artifact for candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 units; 20 ns; 56% density). Its stage 39 global-route report ends with zero overflow on every layer (`/tmp/gds-37037880327/runs/wokwi/39-openroad-globalrouting/openroad-globalrouting.log`).

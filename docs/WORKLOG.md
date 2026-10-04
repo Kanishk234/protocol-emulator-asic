@@ -12,7 +12,7 @@ Done:
 - Extended region wrapper to rsz_timing_postgrt.tcl and antenna_repair.tcl; validate repair reroutes retain the trial reservation. Fifteen helper/wrapper checks passed with a Tcl interpreter unpacked under /tmp (no system installation); shell/YAML/embedded-Python/diff checks passed. No phase boxes ticked.
 
 Next:
-- Publish and dispatch repair screen, inspect cell/electrical changes and post-antenna timing/antenna gates before considering DRT.
+- Published CI 2158652 and docs aab3aad separately; repair screen [37220414494](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37220414494) dispatched (queued). Inspect cell/electrical changes and post-antenna timing/antenna gates before considering DRT.
 
 ## 2026-10-04: Codex (local resource screen completed)
 Done:

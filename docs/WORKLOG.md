@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (antenna reservation hook correction)
+Done:
+- Downloaded failed repair 37220414494. Antenna checks actually reached zero nets/pins after 88 new diodes and 65 jumpers; no post-antenna corner reports were produced because the guard stopped first.
+- Pinned antenna_repair.tcl calls repair_antennas directly, whose internal reroutes bypass Tcl global_route. Corrected wrapper to reserve the region before repair_antennas too; added actual-entry Tcl regression (bug #64). Fifteen helper/wrapper checks pass with local Tcl; shell and diff checks pass.
+- Timing resizer inserted 8 buffers, upsized 4 cells and swapped 9 pins, reaching zero internal violations. After legalization (14,932 mirrored instances) and fresh rerouting, slow WS −0.114909 ns / TNS −1.61488 ns / 22 violations. This establishes that internal resizer success does not survive downstream geometry; mirroring alone is not proven causal. No DRT/phase box/physical closure claimed.
+
+Next:
+- Publish the hook fix and dispatch corrected bounded repair to obtain valid post-antenna corner results. Do not add a second flow change or route a state with negative timing.
+
+## 2026-10-04: Codex (live workflow status and region repair failure)
+Done:
+- Region repair 37220414494 failed its antenna rerouting reservation guard after setup/download/build and timing repair completed. Fresh post-timing-repair slow setup WS −0.114909 ns (source −0.0447979); hold remains positive. This is not a passing repaired state; no DRT was launched.
+- Status check found three main unit workflows still running: 37220444968, 37220404486, 37219349491. Recent lint/test/docs passed.
+
+Next:
+- Inspect antenna-step logs/artifact to determine whether the reservation guard caught an actual missing override or a no-reroute case; address that orchestration issue before another repair screen. Independently review the worsened slow timing result.
+
 ## 2026-10-04: Codex (region trial timing and antenna repair preparation)
 Done:
 - Inspected seven slow violations: six paths originate at latch _49036_ to _48142_–_48147_; one _49012_→_47080_. Worst −0.044798 ns. No architectural latency or constraint change proposed.

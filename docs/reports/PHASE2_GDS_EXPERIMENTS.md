@@ -168,3 +168,20 @@ Mapped snapshot-50 net names onto the **exact post-antenna input DEF**, `42-open
 - The SRAM placement origin is (12, 40) µm with FS orientation. Its origin alone does not establish its extent or exclude macro obstruction effects. Instance-origin counts in x=500–700 are 424 at y=250–300, 393 at y=300–350, and 460 at y=350–400. The marker band is not simply the band with the most instances; widths and obstructions remain unmeasured.
 
 Timing retry 37182661906 failed at config load: forcing metadata version 2 rejected legacy string `DIE_AREA`. The helper now preserves the source version (default 1), with the one-step flow unchanged; bug #62 records the correction. No new WNS measurement was produced.
+
+
+## Fresh matched corner screen 37182963688 (2026-10-04)
+
+[Run 37182963688](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37182963688) completed successfully. Its artifact has `comparison.json` and six independent single-corner STA reports from stage 39 before and after the slow-corner resizer-only flow. This is **pre-antenna global-route-estimated timing**, not post-antenna DRT or extracted final-route signoff.
+
+| Corner | Setup worst slack before → after (ns) | Hold worst slack before → after (ns) | Slew violations before → after |
+|---|---|---|---|
+| Fast | +11.8676 → +12.0141 | +0.0473634 → +0.0490773 | 0 → 0 |
+| Slow | +0.846560 → +1.201990 | +0.296200 → +0.278556 | 13 → 15 |
+| Typical | +7.806480 → +8.038230 | +0.138603 → +0.132473 | 0 → 1 |
+
+Setup/hold WNS and TNS are zero, and setup/hold violation counts are zero at all three corners. Each report has 164 fanout violations and zero cap violations. Earlier mixed-corner process counters labelled fast had 15 slew violations; single-corner reporting now isolates those as slow-corner counts, so use the new independent reports for electrical comparisons.
+
+The resizer explicitly reports no setup/hold violations and zero inserted setup/hold buffers. It mirrors 14,866 instances during detailed placement, with zero placement displacement, and reruns GRT with zero overflow. Its fresh area/instance metrics are 514,034 µm² / 33,602 (pre-antenna). The +0.355430 ns slow slack gain should not be attributed to setup repair or resizing without inspecting cell/netlist differences; orientation/global-route changes can alter estimated delay. Worst slow path starts at latch `_49012_` and ends at flop `_47080_` both before and after.
+
+This screen resolves the missing-corner reporting problem and shows the stage-39 timing view is already nonnegative. Do not compare its positive slack directly with the earlier −10.698019 ns final-route WNS as a measured improvement: those are different runs, GRT settings, flow stages and parasitic views. Next, obtain matched per-corner reports at the source run's post-antenna checkpoint and identify the endpoint/constraint/parasitic differences from earlier final signoff. The slow slew regression and persistent clock fanout violations remain open. Existing post-antenna routing snapshots still contain 215 markers.

@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (successful matched corner timing screen)
+Done:
+- Downloaded successful timing run 37182963688 and inspected comparison JSON plus six fresh single-corner reports. Stage-39 slow setup WS +0.846560 → +1.201990 ns; fast +11.8676 → +12.0141; typ +7.80648 → +8.03823. Setup/hold WNS/TNS and violation counts are zero at all three corners; this is estimated pre-antenna GRT timing, not final signoff.
+- Resizer reports no setup/hold violations and zero inserted buffers; it mirrors 14,866 instances and reroutes with zero overflow. Fresh repair area/instances 514,034 µm² / 33,602. Slow slew violations increase 13→15, typ 0→1, fast stays 0. All corners retain 164 fanout violations and zero cap violations. Do not attribute the slack gain to sizing or compare directly with older final-route WNS.
+- Recorded measured results in the GDS report and updated bugs #60–62 with passing pinned-tool evidence. Routing geometry analysis remains independent: marker band/net spans support targeted hypotheses but do not establish causality.
+
+Checklist:
+- No boxes ticked; final routed timing, electrical limits and physical closure remain open.
+
+Next:
+- Prepare matched post-antenna all-corner STA and compare timing constraints/path endpoints/parasitic views with earlier final signoff. Continue locality/pin-access/obstruction analysis while workflows run; no hardware change until a controlled experiment has a measured hypothesis.
+
 ## 2026-10-04: Codex (legacy timing config fix and exact placement mapping)
 Done:
 - Timing retry 37182661906 completed with failure before STA: metadata version 2 rejected the legacy string DIE_AREA. Preserved source metadata version (default 1), recorded bug #62, and added the real legacy DIE_AREA shape to regression checks. Three tests and diff checks pass; no new WNS result.

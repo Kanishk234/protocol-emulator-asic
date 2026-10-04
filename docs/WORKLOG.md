@@ -16,7 +16,7 @@ Checklist:
 - No boxes ticked; prepared workflows/tests are not completed physical/functional evidence.
 
 Next:
-- Publish CI/helpers separately from docs, dispatch independent repaired-netlist L3, and inspect its own results when available. Keep extraction ready for a completed route; electrical fixes are hypotheses until screened.
+- Published CI/helpers c2c7fae and electrical audit 793aa8f separately. Dispatched independent repaired-netlist L3 37187473289 against repair 37185455158 (queued at dispatch). Inspect its own results when available. Extraction is published but deliberately not dispatched until a completed clean route exists; electrical fixes remain hypotheses.
 
 ## 2026-10-04: Codex (active workflows and independent work)
 Done:

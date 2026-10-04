@@ -26,13 +26,15 @@ def fresh_metrics(root, step, corner):
     return metrics
 
 
-def screen(config_path, before, output, pdk_root, repaired=None):
+def screen(config_path, before, output, pdk_root, repaired=None, sdc=None):
     base = json.loads(config_path.read_text())
     if float(base["CLOCK_PERIOD"]) != 20:
         raise ValueError("Screen requires the 20 ns candidate")
     # Source-run CLI overrides may not be present in config_merged.json.
     # The workflow validates 0.16 in the actual GlobalRouting step config.
     base["GRT_ADJUSTMENT"] = 0.16
+    if sdc is not None:
+        base["PNR_SDC_FILE"] = str(sdc.resolve())
     output.mkdir(parents=True, exist_ok=False)
 
     def run(tag, checkpoint, step, corner):
@@ -65,7 +67,7 @@ def screen(config_path, before, output, pdk_root, repaired=None):
             raise ValueError(f"Unexpected detailed routing in {root}")
         return root
 
-    results = {"before_state": str(before), "corners": {}}
+    results = {"before_state": str(before), "sdc": base.get("PNR_SDC_FILE"), "corners": {}}
     for corner in CORNERS:
         root = run(f"before-{corner}", before, "OpenROAD.STAMidPNR", corner)
         results["corners"][corner] = {"before": fresh_metrics(root, "openroad-stamidpnr", corner)}
@@ -102,5 +104,6 @@ if __name__ == "__main__":
     parser.add_argument("--repaired", type=Path, help="Reuse a saved resizer state instead of repeating repair")
     parser.add_argument("--output", type=Path, default=Path("runs/postgrt-timing"))
     parser.add_argument("--pdk-root", required=True)
+    parser.add_argument("--sdc", type=Path, help="Use the same explicit constraint file for both checkpoints")
     args = parser.parse_args()
-    screen(args.config, args.before, args.output, args.pdk_root, args.repaired)
+    screen(args.config, args.before, args.output, args.pdk_root, args.repaired, args.sdc)

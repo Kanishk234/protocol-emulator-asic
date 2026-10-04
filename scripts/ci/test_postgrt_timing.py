@@ -12,7 +12,8 @@ spec.loader.exec_module(timing)
 
 
 @pytest.mark.parametrize("reuse_repair", [True, False])
-def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair):
+@pytest.mark.parametrize("explicit_sdc", [False, True])
+def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, explicit_sdc):
     config = tmp_path / "config.json"
     config.write_text(json.dumps({"CLOCK_PERIOD": 20, "GRT_ADJUSTMENT": 0.3,
                                   "DIE_AREA": "0 0 1289.28 710.64"}))
@@ -25,6 +26,8 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair):
         cfg = json.loads(Path(command[-1]).read_text())
         assert cfg["meta"]["version"] == 1
         assert cfg["DIE_AREA"] == "0 0 1289.28 710.64"
+        if explicit_sdc:
+            assert cfg["PNR_SDC_FILE"] == str((tmp_path / "signoff.sdc").resolve())
         step = cfg["meta"]["flow"]
         assert step in (["OpenROAD.STAMidPNR"], ["OpenROAD.ResizerTimingPostGRT"])
         assert len(cfg["PNR_CORNERS"]) == 1
@@ -48,7 +51,8 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair):
         (stage / "or_metrics_out.json").write_text(json.dumps(metrics))
 
     with patch.object(timing.subprocess, "run", side_effect=fake_run):
-        timing.screen(config, before, tmp_path / "result", "/pdk", repaired if reuse_repair else None)
+        timing.screen(config, before, tmp_path / "result", "/pdk", repaired if reuse_repair else None,
+                      tmp_path / "signoff.sdc" if explicit_sdc else None)
     assert len(calls) == (6 if reuse_repair else 7)
     result = json.loads((tmp_path / "result/comparison.json").read_text())
     assert set(result["corners"]) == set(timing.CORNERS)

@@ -5,6 +5,27 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (audited repaired-state routing continuation)
+Done:
+- Downloaded repair 37185455158 and audited fresh comparison/repair metrics: zero setup/hold violations in all corners; 8 inserted buffers, 14 upsized cells, 5 pin swaps; area +120 µm² (~0.023%), instances +8. Slew remains slow 3/typ 1; fanout 164; cap 0. Estimated timing passes, electrical and final routed closure remain open.
+- Added separate `gds-repaired-drt-continuation.yaml` and helper: validate successful repaired artifact and pinned inputs, antenna check/repair/check, fresh matched signoff-view corners, then DRT only if setup/hold remain nonnegative. Four threads, five-iteration marker reports, combined 330-minute continuation budget. Candidate/template/config untouched.
+- Seven helper regressions pass, including negative post-antenna timing blocking DRT and the final route consuming the correct saved state. YAML/embedded Python and diff checks pass. No new functional equivalence/netlist protocol evidence is claimed.
+
+Checklist:
+- No boxes ticked; physical signoff and functional final-netlist evidence remain required.
+
+Next:
+- Publish CI/helper and docs separately, launch the controlled continuation against source 37037880327 / repair 37185455158, and inspect antenna/timing gating and routing progress. Do not repeat the old unchanged checkpoint replay.
+
+## 2026-10-04: Codex (repair result and remaining priorities)
+Done:
+- Signoff-aware margin-zero repair 37185455158 completed successfully. Job 111386312253 reports 8 inserted buffers, 14 upsized instances, and zero GRT overflow. Fresh single-corner setup WS: fast 0→0, slow −2.32321→0, typical 0→0 ns. Hold WS after: fast +0.0672144, slow +0.328604, typical +0.161372 ns. These are estimated pre-antenna results, not final routed timing closure.
+- Reviewed the Phase 2 exit checklist and prepared a prioritized chat to-do list: inspect repair electrical/area/path metrics, carry the repaired saved state through antenna/DRT with correct timing view, extract/sign off all corners, preserve functional behavior, finalize count/budget and main integration, then rerun complete physical/protocol/main gates. No checklist boxes ticked.
+- Initial log/artifact retrieval escalation timed out in automatic review; one read-only job-log retry succeeded. No action remains blocked by approval review.
+
+Next:
+- Inspect the complete repaired artifact before selecting the next controlled continuation. No hardware/config adoption based solely on zero estimated WNS.
+
 ## 2026-10-04: Codex (post-antenna evidence and signoff-aware repair screen)
 Done:
 - Inspected both completed artifacts: PnR 37183579900 / signoff 37183581129. Post-antenna slow setup WS +0.853715 ns vs −2.249214 ns; signoff slow TNS −83.5406 ns / 111 violations. Fast/typ signoff setup WS 0, all hold slack positive. Fanout 180, slow slew 1, cap violations 0 after antenna repair.

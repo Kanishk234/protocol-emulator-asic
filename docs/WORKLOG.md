@@ -15,7 +15,7 @@ Checklist:
 - No boxes ticked; physical signoff and functional final-netlist evidence remain required.
 
 Next:
-- Publish CI/helper and docs separately, launch the controlled continuation against source 37037880327 / repair 37185455158, and inspect antenna/timing gating and routing progress. Do not repeat the old unchanged checkpoint replay.
+- Published CI/helper e2e98aa and audit e2334c8 separately. First dispatch encountered workflow-registration 404; registration check and retry succeeded. Controlled continuation 37187027878 launched against source 37037880327 / repair 37185455158 (queued at dispatch). Inspect antenna/timing gating and routing progress; do not repeat the old unchanged checkpoint replay.
 
 ## 2026-10-04: Codex (repair result and remaining priorities)
 Done:

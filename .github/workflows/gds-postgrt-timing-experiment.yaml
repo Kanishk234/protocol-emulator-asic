@@ -24,6 +24,11 @@ on:
         options:
           - pnr
           - signoff
+      setup_margin:
+        description: Setup-repair margin in ns (0 avoids demanding margin on zero-slack latch checks)
+        required: true
+        default: "0.025"
+        type: string
 
 permissions:
   actions: read
@@ -44,6 +49,7 @@ jobs:
       SOURCE_RUN_ID: ${{ inputs.source_run_id }}
       TIMING_COMPARISON: ${{ inputs.comparison }}
       TIMING_CONSTRAINTS: ${{ inputs.constraints }}
+      SETUP_REPAIR_MARGIN: ${{ inputs.setup_margin }}
 
     steps:
       - name: Check out the exact R4 candidate at the artifact's original path
@@ -164,7 +170,7 @@ jobs:
           if [[ "$TIMING_CONSTRAINTS" == "signoff" ]]; then
             args+=(--sdc src/signoff.sdc)
           fi
-          python workflow-src/scripts/ci/postgrt_timing.py --pdk-root "$PDK_ROOT" "${args[@]}"
+          python workflow-src/scripts/ci/postgrt_timing.py --pdk-root "$PDK_ROOT" --setup-margin "$SETUP_REPAIR_MARGIN" "${args[@]}"
 
       - name: Upload timing-resizer artifacts
         if: always()

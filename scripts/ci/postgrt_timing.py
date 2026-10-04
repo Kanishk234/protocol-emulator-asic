@@ -26,7 +26,7 @@ def fresh_metrics(root, step, corner):
     return metrics
 
 
-def screen(config_path, before, output, pdk_root, repaired=None, sdc=None):
+def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None):
     base = json.loads(config_path.read_text())
     if float(base["CLOCK_PERIOD"]) != 20:
         raise ValueError("Screen requires the 20 ns candidate")
@@ -35,6 +35,10 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None):
     base["GRT_ADJUSTMENT"] = 0.16
     if sdc is not None:
         base["PNR_SDC_FILE"] = str(sdc.resolve())
+    if setup_margin is not None:
+        if setup_margin < 0:
+            raise ValueError("Setup repair margin must be nonnegative")
+        base["GRT_RESIZER_SETUP_SLACK_MARGIN"] = setup_margin
     output.mkdir(parents=True, exist_ok=False)
 
     def run(tag, checkpoint, step, corner):
@@ -105,5 +109,6 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, default=Path("runs/postgrt-timing"))
     parser.add_argument("--pdk-root", required=True)
     parser.add_argument("--sdc", type=Path, help="Use the same explicit constraint file for both checkpoints")
+    parser.add_argument("--setup-margin", type=float, help="Isolated setup-repair margin in ns")
     args = parser.parse_args()
-    screen(args.config, args.before, args.output, args.pdk_root, args.repaired, args.sdc)
+    screen(args.config, args.before, args.output, args.pdk_root, args.repaired, args.sdc, args.setup_margin)

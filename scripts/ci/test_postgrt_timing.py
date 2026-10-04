@@ -28,6 +28,7 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, expli
         assert cfg["DIE_AREA"] == "0 0 1289.28 710.64"
         if explicit_sdc:
             assert cfg["PNR_SDC_FILE"] == str((tmp_path / "signoff.sdc").resolve())
+            assert cfg["GRT_RESIZER_SETUP_SLACK_MARGIN"] == 0
         step = cfg["meta"]["flow"]
         assert step in (["OpenROAD.STAMidPNR"], ["OpenROAD.ResizerTimingPostGRT"])
         assert len(cfg["PNR_CORNERS"]) == 1
@@ -52,7 +53,7 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, expli
 
     with patch.object(timing.subprocess, "run", side_effect=fake_run):
         timing.screen(config, before, tmp_path / "result", "/pdk", repaired if reuse_repair else None,
-                      tmp_path / "signoff.sdc" if explicit_sdc else None)
+                      tmp_path / "signoff.sdc" if explicit_sdc else None, 0 if explicit_sdc else None)
     assert len(calls) == (6 if reuse_repair else 7)
     result = json.loads((tmp_path / "result/comparison.json").read_text())
     assert set(result["corners"]) == set(timing.CORNERS)

@@ -4,6 +4,30 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ---
 
+## 2026-10-04 (saved checkpoint publication)
+- User requested resumption or publication of pending edits. Usage is 73%
+  used, above the retained 50% ceiling; limited this session to validating
+  and saving existing work, with no new CAD run or reset-credit action.
+- Re-ran the saved decoder: 860 mapped pins; unresolved aliases still prevent
+  configured Tcl emission. Publishing the diagnostic and prior report on
+  anish_branch as anishvivek16; efpga_Anish is left unchanged.
+- Next remains alias resolution and complete mapping audit. No RTL changes,
+  new timing pass or phase exit claimed.
+
+
+## 2026-09-29 (local STA baseline replay)
+- Confirmed 32% used (68% remaining), then 43% used. Kept work local while
+  the remote branch rename remains unresolved; no pushes this session.
+- Added bounded `scripts/prepare_configured_sta.py` for cached CI artifacts.
+  Local OpenSTA 2.7.0 with final netlist/SDC/SPEF and typical Liberty reproduces
+  -93.72 ns worst slack; TNS -1876.43 ns. No new hardening run required.
+- Audited 860 directly named configuration latch outputs; 352 optimized
+  aliases remain unresolved. Script refuses configured Tcl while unresolved
+  aliases exist. No production constraints or RTL changed; no phase boxes.
+- Next resolve aliases through synthesis/source correspondence and check
+  complete configuration coverage before configuration-specific STA.
+
+
 ## 2026-09-29 (post-route functional validation and path witness)
 - Started at 17% five-hour / 26% weekly. Reused downloaded CI artifacts;
   no new synthesis, hardening, tool installation or reset credits.

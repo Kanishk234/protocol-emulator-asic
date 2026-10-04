@@ -56,6 +56,21 @@ Do not add a blanket false-path exception between these pins.
 
 ## Next gate
 
+Follow-up local replay: `scripts/prepare_configured_sta.py` emits baseline
+OpenSTA Tcl using the saved final netlist, SDC and nominal SPEF with the
+cached typical CMOS5L Liberty. Cached OpenSTA 2.7.0 reproduces worst slack
+**-93.72 ns** and reports TNS **-1876.43 ns**. Evidence is under
+`build/configured-sta/` (`baseline.log`, `baseline.tcl`, `audit.json`).
+This matches the worst-slack baseline before introducing case analysis.
+
+The bounded decoder resolves 860 latch outputs to original frame/bit names.
+Another 352 latch outputs use optimized aliases (for example LUT mux A15),
+so the script deliberately does not emit counter.tcl. These counts describe
+the physical netlist's latch instances, not a proof of complete configuration
+storage correspondence. Resolve aliases and audit optimized-away/merged
+storage before accepting a complete image-to-netlist map. No configured
+timing pass is claimed from this partial mapping.
+
 Build reproducible configuration-aware STA for the loaded image while
 retaining separate management/load-mode analysis. Audit every case-analysis
 assignment against the frame decoder and verify the resulting configuration

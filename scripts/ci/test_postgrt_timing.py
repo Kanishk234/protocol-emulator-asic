@@ -33,7 +33,11 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair):
         assert checkpoint == str(before if root.name.startswith("before-") or root.name == "repair" else repaired)
         calls.append((root.name, checkpoint))
         assert root.is_dir(), "LibreLane requires --force-run-dir to exist"
-        (root / "resolved.json").write_text(json.dumps(cfg))
+        resolved = dict(cfg)
+        if step == ["OpenROAD.STAMidPNR"]:
+            # Pinned one-step STA discards config variables unused by the step.
+            resolved.pop("GRT_ADJUSTMENT")
+        (root / "resolved.json").write_text(json.dumps(resolved))
         stage = root / ("01-openroad-resizertimingpostgrt" if root.name == "repair" else "01-openroad-stamidpnr")
         stage.mkdir()
         if root.name == "repair":

@@ -58,7 +58,8 @@ def screen(config_path, before, output, pdk_root, repaired=None):
         resolved = json.loads((root / "resolved.json").read_text())
         if resolved["PNR_CORNERS"] != [corner] or resolved["OPENROAD_THREADS"] != 4:
             raise ValueError(f"Resolved corner/thread mismatch in {root}")
-        if float(resolved["GRT_ADJUSTMENT"]) != 0.16:
+        # STA-only configs omit routing variables; the repair flow uses them.
+        if step == "OpenROAD.ResizerTimingPostGRT" and float(resolved["GRT_ADJUSTMENT"]) != 0.16:
             raise ValueError(f"Resolved GRT adjustment mismatch in {root}")
         if list(root.glob("*-openroad-detailedrouting")):
             raise ValueError(f"Unexpected detailed routing in {root}")

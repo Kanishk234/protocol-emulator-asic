@@ -5,6 +5,74 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-03: Codex (authorized publication of timing diagnostic)
+Done:
+- User explicitly authorized the commit/push/launch commands, overriding the default Codex git restriction for this action. Rechecked tests (3/3), YAML parsing and `git diff --check`.
+- `git log origin/main..main -- src info.yaml macro` was empty before publication: no hardware changes queued that would cancel routing. Committed CI/helper changes separately as 13dce25 (`ci: compare fresh post-GRT timing by corner`). Documentation is a separate commit.
+
+Checklist:
+- No boxes ticked; actual diagnostic corner measurements remain pending.
+
+Next:
+- Push these CI/documentation groups and launch the corrected timing diagnostic against source run 37037880327; inspect fresh corner metrics when it finishes. Preserve active routing and candidate inputs.
+
+## 2026-10-03: Codex (route-free matched timing diagnostic and WNS hypotheses)
+Done:
+- Replaced the diagnostic workflow's ambiguous `--from`/`--to` range with `scripts/ci/postgrt_timing.py`: explicit resizer-only flow and six before/after single-corner STA flows, four threads, fresh WS/WNS/TNS checks, resolved-config validation and comparison JSON. Optional `--repaired` reuses an archived resizer checkpoint. No DRT step exists in these flows. Recorded bug #60.
+- Added regression coverage for fresh repair, saved-repair reuse, and rejection of inherited metrics: `source .venv/bin/activate; pytest -q scripts/ci/test_postgrt_timing.py` passes 3/3. Workflow YAML parsing and `git diff --check` pass. Actual pinned LibreLane/OpenROAD/PDK execution is pending; no local container toolchain is available.
+- Inspected fast electrical reports: all 164 fanout violators are clock-tree leaf outputs, not the presumed data cone. Added ranked WNS hypotheses and acceptance criteria to the GDS experiments report: locate stage/corner losses, audit repair's timing view, selective load splitting/sizing, equivalent selection-depth reduction, locality/mapping, and independent CTS analysis. These are unmeasured hypotheses.
+
+Checklist:
+- No boxes ticked. No candidate RTL/config/template-job changes, workflow dispatch, commits, or pushes.
+
+Next:
+- User commits/pushes the CI/helper and documentation groups, then runs the corrected diagnostic. Before a push while routing is active, check `git log origin/main..main -- src info.yaml macro`. Inspect fresh slow/typical metrics and completed DRT snapshots before choosing one controlled physical change.
+
+## 2026-10-03: Codex (timing diagnostic follow-up)
+Done:
+- Inspected timing run 37166808611's STA command, environment, and reports. The command invokes pinned LibreLane `sta/corner.tcl` once with three corners loaded; its reports contain only fast. Upstream tag `3.1.0.dev3` explicitly documents this script as one-corner-per-process and selects the first corner before reporting. This explains the missing slow/typical measurements; loading libraries is insufficient.
+- Identified useful independent work while routing runs: repair diagnostic endpoint/per-corner reporting, reuse the saved before/after resizer checkpoints for matched STA, and analyze electrical violators. No workflow or hardware changes made; no boxes ticked.
+
+Next:
+- Prepare a separate timing-only diagnostic that stops before DRT and explicitly reports each corner on matched checkpoints. Compare critical paths/electrical limits before selecting a physical change; wait for routing snapshots to select a congestion hypothesis.
+
+## 2026-10-03: Codex (protocol evidence reconciliation and diagnostic comparison)
+Done:
+- Reconciled protocol coverage, claims, bug #59, and GDS experiment status with the passing expanded hardened-netlist run 37144286224. Downloaded its JUnit artifact and verified 22 testcases with no failures/errors/skips. Main unit 37145661022 and latest 37167980192 passed; functional simulation remains distinct from slow-corner timing closure.
+- Inspected completed timing screen 37166808611 (failure, ended 2026-10-04 02:33:51 UTC). Its artifact preserves slow-library resizer execution with no setup/hold violations and zero GRT overflow, but fresh mid-PnR metrics only cover fast (setup WS +12.0141 ns, hold WS +0.0490773 ns). Slow/typical metrics are missing and the flow continued into unfinished DetailedRouting. Exact terminal cause is not established from the artifact; do not claim timing improvement.
+- Added provenance, fresh timing/electrical, repair cost, five-iteration routing marker, completion, and promotion comparison criteria to `docs/reports/PHASE2_GDS_EXPERIMENTS.md`. Separate post-antenna replay 37165048635 remains running at the latest check; checkpoint validation passed.
+
+Checklist:
+- Validation: `git diff --check` passed; venv XML inspection confirmed 22 cases and no failures/errors/skips. No boxes ticked; documentation/evidence changes only. No candidate, RTL, config, workflow, or repository history changes.
+
+Next:
+- Inspect completed routing snapshots when available. Correct repeated-STA endpoint selection and explicit per-corner reporting in a separate diagnostic change before another timing screen. Keep the 20 ns target, live configuration timing, same-cycle feedback/DROPPED semantics, and protocols intact.
+
+## 2026-10-03: Codex (current workflow status and immediate next steps)
+Done:
+- Refreshed GitHub Actions at 2026-10-04 02:15 UTC (2026-10-03 21:15 America/Chicago). Exactly two runs are in progress and none queued: post-antenna DRT 37165048635 (checkpoint validation passed, detailed routing active) and post-GRT timing screen 37166808611 (checkpoint/native corner configuration passed, slow-corner repair and mid-PnR STA step active). `gh run view --log` reports logs unavailable until completion; no live iteration count or fresh timing result can be inferred.
+- Latest main `11243a7` test, lint, docs, and unit all passed: 37167980180, 37167980171, 37167980170, and 37167980192. Unit completed at 02:06 UTC.
+- Confirmed the user removed the untracked handoff file. The only tracked local modification is this worklog.
+
+Checklist:
+- No boxes ticked; no implementation changes or workflow dispatches.
+
+Next:
+- While diagnostics run, reconcile stale protocol evidence and prepare comparison criteria for fresh corner STA and DRT markers. Inspect their completed artifacts before selecting another physical experiment; preserve candidate inputs and semantics.
+
+## 2026-10-03: Codex (repository orientation and handoff review)
+Done:
+- Read `AGENTS.md` and the untracked `PHASE2_GDS_TIMING_HANDOFF.md`; reviewed the required project docs, recent worklog/decisions, Phase 2 evidence, core RTL/model/compiler/host code, verification harnesses, and physical/CI workflows, with a repository-wide file and test inventory.
+- Confirmed `main` is at `11243a7`: its TT top remains the Phase 0 counter (D-047), while full-chip tests use `trw_chip` and physical experiments pin R4 candidate `3393eea`. Keep the candidate's 20 ns clock, D-066 timed live configuration, protocol behavior, and same-cycle feedback/drop accounting intact.
+- Noted stale evidence wording: the handoff and protocol coverage audit leave expanded hardened-netlist L3 pending, while the worklog and Phase 2 summary record 22 passing cases in run 37144286224. D-056 concerns hold uncertainty; D-049 defines the resource floor, with final counts still undecided. No evidence documents were reconciled in this orientation session.
+- No tests, remote status refresh, workflow dispatch, implementation changes, commits, or pushes performed. Run states in the handoff remain historical observations.
+
+Checklist:
+- No boxes ticked; Phase 2 remains open.
+
+Next:
+- When physical work resumes, refresh runs 37165048635 and 37166808611 and inspect completed artifacts for persistent DRT markers and fresh all-corner STA before selecting a follow-up experiment. Reconcile evidence wording against the corresponding artifacts.
+
 ## 2026-10-03: Codex (phase 2: repair timing-screen corner configuration)
 Done:
 - Pushed the post-antenna DRT and post-GRT timing workflows with their evidence updates as `90de9b7` and `22bb1aa`, authored by Krithik4. `test`, `docs`, `lint`, and `unit` all passed on the pushed commit (runs 37165038069, 37165038087, 37165038076, and 37165038086).

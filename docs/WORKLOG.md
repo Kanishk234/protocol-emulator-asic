@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (bounded local Metal2 resource screen)
+Done:
+- Inspected pinned PDK cell LEF: implicated buf/a21oi/a221oi pins/obstructions use Metal1. SRAM footprint is outside the persistent x=500–700 hotspot. Power-grid via entries also occupy Metal2; exact interference remains unproven without routed geometry.
+- Added owned hotspot-screen workflow, helper and pinned OpenROAD wrapper. Compare identical post-antenna source with global adjustment 0.16 against a local Metal2 0.30 reservation in {500 280 700 380}; run only GRT, antenna checks and six matched corner reports. No cell/placement/RTL changes, antenna repair or DRT.
+- Eleven helper regressions pass; workflow YAML/embedded Python, shell syntax and diff checks pass. No phase boxes ticked.
+
+Next:
+- Publish and dispatch the bounded screen; compare fresh overflow, antenna, all-corner timing and guide allocation before selecting any detailed-route continuation.
+
 ## 2026-10-04: Codex (repaired post-antenna and routing hotspot audit)
 Done:
 - Downloaded completed continuation 37187027878: post-antenna signoff-view estimated setup WS 0 in all corners, hold +0.0897432/+0.366301/+0.190121 ns (fast/slow/typ), zero setup/hold violations. Remaining SRAM A_MEN slow slew excess 0.100671 ns; fanout 181, cap 0.

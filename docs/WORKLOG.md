@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (matched post-antenna and constraint-view diagnostics)
+Done:
+- Added workflow `comparison=postantenna` to report stage 39 vs exact stage-43 DRT input with no repair/routing. Validates ODB/DEF/SDC/powered-netlist references against original stage 44. Added `constraints=pnr|signoff` and helper shared SDC override so both checkpoints use the same timing view.
+- Compared saved SDC files: source runs 36799356107 and 37037880327 have identical PnR constraints. Signoff removes only the setup-to-latch-data exception; both retain setup uncertainty 0.25 ns / hold 0.10 ns. Earlier worst path ends at a flop, so this exception alone does not explain its failure. Live latch-starting paths stay timed.
+- Validation: five helper regression tests pass; workflow YAML/embedded Python parse; diff checks pass; no outgoing src/info/macro commits. These are estimated GRT timing screens, not final signoff.
+
+Checklist:
+- No boxes ticked; hardware inputs unchanged.
+
+Next:
+- Publish CI/helper and evidence separately, launch post-antenna PnR and signoff-view comparisons, and inspect actual fresh reports before choosing a physical change.
+
 ## 2026-10-04: Codex (successful matched corner timing screen)
 Done:
 - Downloaded successful timing run 37182963688 and inspected comparison JSON plus six fresh single-corner reports. Stage-39 slow setup WS +0.846560 → +1.201990 ns; fast +11.8676 → +12.0141; typ +7.80648 → +8.03823. Setup/hold WNS/TNS and violation counts are zero at all three corners; this is estimated pre-antenna GRT timing, not final signoff.

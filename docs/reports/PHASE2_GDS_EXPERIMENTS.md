@@ -156,3 +156,15 @@ Pinned source references: [one-step flow selection](https://github.com/librelane
 At snapshot 50, M2 has 184 records, M3 20, M4 11. Midpoint binning at 50 µm gives 80 records in x=600–650/y=300–350, 64 in x=650–700/y=300–350, 42 in x=500–550/y=300–350, and 17 in x=550–600/y=300–350: 203/215 in one horizontal band. `u_chip.g_unit[0].u_prod.tok[16]` appears in 20 marker records; `net1677` in 13 and `_17270_` in 12. These counts can include duplicate/overlapping violations, and do not by themselves identify the owning cell or cause. Map named nets and bounding boxes onto the saved placement/macro geometry before screening local placement spreading, routing resources, or load splitting. Avoid another identical replay based solely on the small 227→215 endpoint improvement.
 
 Timing replay 37176270000 produced no STA reports: CLI validation rejected a missing per-run directory. The local directory-creation fix and regression check are tracked as bug #61; the corner/one-step strategy has not yet been exercised by the pinned tools.
+
+
+### Placement mapping of the residual band
+
+Mapped snapshot-50 net names onto the **exact post-antenna input DEF**, `42-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.def` from source run 37037880327, referenced by stage 43 state. Coordinates below are component placement origins, not pin positions or final-route geometry.
+
+- `U0.u_prod.tok[16]`: driver `_47024_` (`dfrbpq_1`) at (872.64, 332.64) µm; one nearby load at (870.72, 332.64), and five remote loads at (518.88, 328.86), (609.12, 309.96), (666.24, 317.52), (637.92, 306.18), (617.28, 306.18). Six loads total; longest x span 353.76 µm. This crosses the marker band and supports a selective remote-branch buffer/load-split hypothesis. It does not prove that this net is the timing bottleneck.
+- `net1677`: `fanout1677` (`buf_1`) at (647.04, 370.44), eight loads mostly in the marker band around x=637–682/y=306–333, plus one at y=366.66. Consider driver placement or branch splitting only after inspecting actual pin/wire delay and legal routing resources.
+- `_17270_`: two connected cells at (538.08, 340.20) and (540.96, 340.20), despite twelve marker records. This shows marker multiplicity is not a proxy for long-wire fanout; local obstruction/pin-access geometry also needs inspection.
+- The SRAM placement origin is (12, 40) µm with FS orientation. Its origin alone does not establish its extent or exclude macro obstruction effects. Instance-origin counts in x=500–700 are 424 at y=250–300, 393 at y=300–350, and 460 at y=350–400. The marker band is not simply the band with the most instances; widths and obstructions remain unmeasured.
+
+Timing retry 37182661906 failed at config load: forcing metadata version 2 rejected legacy string `DIE_AREA`. The helper now preserves the source version (default 1), with the one-step flow unchanged; bug #62 records the correction. No new WNS measurement was produced.

@@ -69,4 +69,6 @@ Every bug found by any layer, newest at the bottom. Nothing is fixed silently.
 
 | 61 | 2026-10-04 | Timing diagnostic helper | Run 37176270000 fails before STA with `Invalid value for --force-run-dir: Directory does not exist` | Helper created only the parent output directory; pinned LibreLane validates each run directory before starting | Job 111359406575 log | Create each run directory before subprocess invocation; mocked CLI now asserts it exists; all three regression cases pass | fixed locally; CI rerun pending |
 
+| 62 | 2026-10-04 | Timing diagnostic config metadata | Run 37182661906 stops before STA: refusing to convert DIE_AREA string to list | Helper forced metadata version 2 onto legacy config_merged.json, whose absent metadata defaults to version 1 | Job 111378185706 log and pinned LibreLane config loader | Preserve the source metadata version (default 1) when selecting one-step flow; regression fixture includes the real legacy DIE_AREA shape and asserts preservation; three tests pass | fixed locally; pinned-flow retry pending |
+
 Note on #1: gate-level simulation also needs Tiny Tapeout's Icarus 13 build, which is what CI installs. Stock Icarus 12 leaves the cell models' `delayed_*` timing-check nets undriven, so every flop reads X. Use the TT build for any local gate-level run.

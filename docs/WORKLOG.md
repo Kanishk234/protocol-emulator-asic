@@ -5,6 +5,17 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (legacy timing config fix and exact placement mapping)
+Done:
+- Timing retry 37182661906 completed with failure before STA: metadata version 2 rejected the legacy string DIE_AREA. Preserved source metadata version (default 1), recorded bug #62, and added the real legacy DIE_AREA shape to regression checks. Three tests and diff checks pass; no new WNS result.
+- Mapped residual hotspot nets to exact post-antenna DEF from source run 37037880327. U0 producer token bit 16 driver at x=872.64 µm serves remote consumers x=518.88–666.24 µm, crossing the marker band; net1677's buffer is above that band; _17270_ has two nearby cells despite twelve marker records. Added coordinates and targeted load/locality hypotheses to the GDS report. Origin counts do not establish density or macro obstructions.
+
+Checklist:
+- No boxes ticked; no candidate hardware or timing-constraint changes.
+
+Next:
+- Publish metadata-version correction separately from evidence and rerun the saved-checkpoint timing diagnostic. Obtain actual fresh slow-corner timing before changing critical nets or placement.
+
 ## 2026-10-04: Codex (timing-directory fix and routing hotspot analysis)
 Done:
 - Fetched main and checked Actions headBranch: 319d7d3/lint 37178674680 belongs to `anish_branch`, not main. Corrected the previous entry. Main is still 4652fc1 with green test/lint/docs/unit (37176353137/163/176/184). No integration conflict or newer main hardware change exists.

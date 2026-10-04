@@ -8,16 +8,19 @@ Newest entry at the top. One entry per work session.
 ## 2026-10-03: Codex (phase 2: repair timing-screen corner configuration)
 Done:
 - Pushed the post-antenna DRT and post-GRT timing workflows with their evidence updates as `90de9b7` and `22bb1aa`, authored by Krithik4. `test`, `docs`, `lint`, and `unit` all passed on the pushed commit (runs 37165038069, 37165038087, 37165038076, and 37165038086).
+- Fixed the timing workflow's corner-list serialization and pushed `7ead414` and `f968a68`, authored by Krithik4. On `f968a68`, `test`, `docs`, and `lint` passed (37166801957, 37166801984, 37166801969); `unit` 37166801989 is still running.
 - Started the four-thread post-antenna DRT replay [37165048635](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37165048635) from run 37037880327's stage 43 checkpoint. It remains in detailed routing; no final route result is available yet.
 - Timing screen [37165052112](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37165052112) failed before producing STA. LibreLane parsed the CLI corner-list overrides as lists containing bracketed strings, so OpenROAD could not find `sg13cmos5l_buf_4`. The uploaded artifact confirms this in the resizer step config and `_env.tcl`; this is an experiment configuration failure, not a design timing result.
-- Updated the isolated timing workflow to write correctly typed corner lists and settings into its disposable `src/config_merged.json` before replay. This does not touch the candidate's source config, RTL, macro, or active DRT inputs. Workflow YAML and embedded Python parse cleanly; `git diff --check` passes. The corrected screen still needs a fresh run.
+- The corrected timing screen [37166808611](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37166808611) passed checkpoint validation and native JSON corner configuration; `OpenROAD.ResizerTimingPostGRT` and mid-PnR STA are currently running. It uses the same saved checkpoint and no candidate source inputs changed.
+- Traced the archived slow-corner path in `/tmp/r4-gds-36799356107/GDS_logs/runs/wokwi/55-openroad-stapostpnr/nom_slow_1p08V_125C/max.rpt`. U0's `idle` latch feeds TX/BITSYNC output logic, returns through driven-pad selection into `a_in`, then passes through RX/fabric logic to C2 `dropped[16]` D. Arrival is 31.722853 ns, required time 21.024834 ns, slack −10.698019 ns. One arc is 2.399 ns with 3.146 ns output slew; this supports focusing on the feedback/control and fanout path rather than only the DROPPED incrementer.
+- Ran isolated D-066-timed Yosys/OpenSTA screens on exact RTL `3393eea9a58c5cad9077cc360a8515d0e5ec8284` under `/tmp/r4-abc-delay-screen-20261003/`. Baseline reproduced area 391,112.442 µm² and worst-flop slack +9.154 ns typical / +3.344 ns slow. Direct ABC `-D` targets of 15,000, 8,000 and 3,000 ps all produced the same mapped-netlist SHA (`93f4af5c…`) and unchanged area/slack. This local option did not change mapping; it does not test LibreLane's separate `SYNTH_STRATEGY=DELAY` setting.
 
 Checklist:
-- No boxes ticked. The timing screen failed before STA; the DRT replay has not completed.
+- No boxes ticked. The corrected timing screen and DRT replay have not completed.
 
 Next:
-- Commit and push the corrected experiment workflow and evidence updates, then rerun the timing screen. Verify the resolved config has flat corner-name lists before evaluating fresh STA output.
-- Monitor DRT replay 37165048635 for marker progress and final route state. Keep the 20 ns target, D-066 paths, protocol behavior, and same-cycle DROPPED accounting unchanged.
+- Inspect the fresh STA/resizer output from 37166808611 and marker/final-route output from 37165048635 when they finish; use them to select one justified follow-up experiment.
+- Continue timing screens only on isolated copies; keep the active candidate at 20 ns with all protocol behavior, D-066 paths, and same-cycle DROPPED accounting intact.
 
 ## 2026-10-03: Codex (phase 2: diagnose DRT timeout and prepare corner-aware timing screen)
 Done:

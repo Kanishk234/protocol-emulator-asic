@@ -1,0 +1,146 @@
+name: l3-repaired-gl
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Exact R4 RTL candidate commit used for hardening
+        required: true
+        type: string
+        default: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      repair_run_id:
+        description: Successful signoff-aware repair run containing the saved netlist
+        required: true
+        type: string
+        default: "37185455158"
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: l3-repaired-gl-r4
+  cancel-in-progress: false
+
+jobs:
+  l3:
+    name: L3 on the R4 repaired netlist
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+      PDK_REV: 2bbec755dc67ca3db0261c3d6163e15735d66710
+      CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      REPAIR_RUN_ID: ${{ inputs.repair_run_id }}
+
+    steps:
+      - name: Check out workflow helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Check out the matching R4 candidate
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          path: candidate
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Download the candidate repaired-netlist artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-postgrt-timing-${{ inputs.repair_run_id }}
+          path: artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.repair_run_id }}
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: candidate/.tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: candidate/requirements-dev.txt
+
+      - name: Install simulator and decoder dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sigrok-cli
+          pip install -r candidate/requirements-dev.txt
+
+      - name: Install the pinned IHP PDK and SRAM model
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          ./.tt-gds-action/install_sg13cmos5l.sh
+          spikes/r3_sram/fetch_macro.sh
+
+      - name: Validate artifact and repaired netlist
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test -s "$GITHUB_WORKSPACE/artifacts/runs/postgrt-timing/repair/1-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v"
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+
+          netlist = Path("../artifacts/runs/postgrt-timing/repair/1-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v")
+          text = netlist.read_text(errors="replace")
+          assert "module tt_um_tripwire" in text, netlist
+          assert "RM_IHPSG13_1P_512x16_c2_bm_bist" in text
+          import hashlib, json
+          step = netlist.parent
+          cfg = json.loads((step / "config.json").read_text())
+          assert cfg["RSZ_CORNERS"] == ["nom_slow_1p08V_125C"]
+          assert float(cfg["GRT_RESIZER_SETUP_SLACK_MARGIN"]) == 0
+          assert cfg["PNR_SDC_FILE"].endswith("/src/signoff.sdc")
+          print(f"Netlist SHA256: {hashlib.sha256(netlist.read_bytes()).hexdigest()}")
+          print(f"Candidate: {os.environ['CANDIDATE_SHA']}")
+          print(f"Repaired netlist: GDS run {os.environ['REPAIR_RUN_ID']}; saved repaired netlist; functional simulation only")
+          PY
+
+      - name: Install pinned Tiny Tapeout Icarus 13
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/iverilog-13"
+          curl -sfL -o "$RUNNER_TEMP/iverilog13.deb" \
+            https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb
+          dpkg-deb -x "$RUNNER_TEMP/iverilog13.deb" "$RUNNER_TEMP/iverilog-13"
+          "$RUNNER_TEMP/iverilog-13/usr/bin/iverilog" -B "$RUNNER_TEMP/iverilog-13/usr/lib/ivl" -V
+
+      - name: Run the expanded L3 suite on the repaired netlist
+        timeout-minutes: 300
+        run: |
+          set -euo pipefail
+          export PATH="$RUNNER_TEMP/iverilog-13/usr/bin:$PATH"
+          export IVERILOG_VPI_MODULE_PATH="$RUNNER_TEMP/iverilog-13/usr/lib/ivl"
+          export COMPILE_ARGS="-B $RUNNER_TEMP/iverilog-13/usr/lib/ivl"
+          CELL_DIR="$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog"
+          MACRO_DIR="$HOME/.cache/tripwire/macro-$PDK_REV/RM_IHPSG13_1P_512x16_c2_bm_bist"
+          NETLIST="$GITHUB_WORKSPACE/artifacts/runs/postgrt-timing/repair/1-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v"
+          TB="$GITHUB_WORKSPACE/workflow-src/test_internal/chip/tb_chip_gl.v"
+          VERILOG_SOURCES="$CELL_DIR/sg13cmos5l_stdcell.v $CELL_DIR/sg13cmos5l_udp.v $MACRO_DIR/RM_IHPSG13_1P_core_behavioral_bm_bist.v $MACRO_DIR/RM_IHPSG13_1P_512x16_c2_bm_bist.v $NETLIST $TB"
+          export TRIPWIRE_SPEC_FILE="$GITHUB_WORKSPACE/candidate/tools/tripwire_spec.py"
+          make -C "$GITHUB_WORKSPACE/workflow-src/test_internal/chip" \
+            SIM=icarus GATES=yes SIM_BUILD=sim_build/l3-gl \
+            TOPLEVEL=tb_chip TOPLEVEL_LANG=verilog \
+            COCOTB_TEST_MODULES=test_l3 COCOTB_RESULTS_FILE=results_l3_gl.xml \
+            VERILOG_SOURCES="$VERILOG_SOURCES"
+
+      - name: Upload L3 gate-level results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: l3-repaired-gl-${{ github.run_id }}
+          path: workflow-src/test_internal/chip/results_l3_gl.xml
+          if-no-files-found: warn

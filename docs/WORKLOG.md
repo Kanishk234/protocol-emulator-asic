@@ -12,7 +12,7 @@ Done:
 - Timing resizer inserted 8 buffers, upsized 4 cells and swapped 9 pins, reaching zero internal violations. After legalization (14,932 mirrored instances) and fresh rerouting, slow WS −0.114909 ns / TNS −1.61488 ns / 22 violations. This establishes that internal resizer success does not survive downstream geometry; mirroring alone is not proven causal. No DRT/phase box/physical closure claimed.
 
 Next:
-- Publish the hook fix and dispatch corrected bounded repair to obtain valid post-antenna corner results. Do not add a second flow change or route a state with negative timing.
+- Published hook fix e0c4e00 and docs 4d3ed63 separately; corrected bounded repair [37221292614](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37221292614) dispatched (queued). Obtain valid post-antenna corner results; do not add a second flow change or route a state with negative timing.
 
 ## 2026-10-04: Codex (live workflow status and region repair failure)
 Done:

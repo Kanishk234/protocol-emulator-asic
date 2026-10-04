@@ -5,6 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-03: Codex (phase 2: repair timing-screen corner configuration)
+Done:
+- Pushed the post-antenna DRT and post-GRT timing workflows with their evidence updates as `90de9b7` and `22bb1aa`, authored by Krithik4. `test`, `docs`, `lint`, and `unit` all passed on the pushed commit (runs 37165038069, 37165038087, 37165038076, and 37165038086).
+- Started the four-thread post-antenna DRT replay [37165048635](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37165048635) from run 37037880327's stage 43 checkpoint. It remains in detailed routing; no final route result is available yet.
+- Timing screen [37165052112](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37165052112) failed before producing STA. LibreLane parsed the CLI corner-list overrides as lists containing bracketed strings, so OpenROAD could not find `sg13cmos5l_buf_4`. The uploaded artifact confirms this in the resizer step config and `_env.tcl`; this is an experiment configuration failure, not a design timing result.
+- Updated the isolated timing workflow to write correctly typed corner lists and settings into its disposable `src/config_merged.json` before replay. This does not touch the candidate's source config, RTL, macro, or active DRT inputs. Workflow YAML and embedded Python parse cleanly; `git diff --check` passes. The corrected screen still needs a fresh run.
+
+Checklist:
+- No boxes ticked. The timing screen failed before STA; the DRT replay has not completed.
+
+Next:
+- Commit and push the corrected experiment workflow and evidence updates, then rerun the timing screen. Verify the resolved config has flat corner-name lists before evaluating fresh STA output.
+- Monitor DRT replay 37165048635 for marker progress and final route state. Keep the 20 ns target, D-066 paths, protocol behavior, and same-cycle DROPPED accounting unchanged.
+
 ## 2026-10-03: Codex (phase 2: diagnose DRT timeout and prepare corner-aware timing screen)
 Done:
 - Inspected corrected post-GRT resizer run [37162483954](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37162483954) for candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 units; 20 ns; 56% density). It honored `GRT_ADJUSTMENT=0.16`; pre- and post-resizer GRT had zero overflow. Wirelength changed 2,465,539 → 2,474,553. The resizer used the typical default corner, reported no setup/hold violations, made no cell changes, and did not refresh the saved slow-corner WNS (−5.0436 ns).

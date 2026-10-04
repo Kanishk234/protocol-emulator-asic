@@ -15,7 +15,7 @@ Checklist:
 - No boxes ticked; hardware inputs unchanged.
 
 Next:
-- Publish CI/helper and evidence separately, launch post-antenna PnR and signoff-view comparisons, and inspect actual fresh reports before choosing a physical change.
+- Published CI/helper b1787d3 and evidence 4667c00 separately. Launched stage-39/stage-43 PnR comparison 37183579900 and signoff-constraint comparison 37183581129 against source 37037880327; both queued at dispatch and serialized by source-run concurrency. Inspect fresh reports before choosing a physical change.
 
 ## 2026-10-04: Codex (successful matched corner timing screen)
 Done:

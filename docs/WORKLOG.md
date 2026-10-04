@@ -5,6 +5,30 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (timing-directory fix and routing hotspot analysis)
+Done:
+- Fetched main and checked Actions headBranch: 319d7d3/lint 37178674680 belongs to `anish_branch`, not main. Corrected the previous entry. Main is still 4652fc1 with green test/lint/docs/unit (37176353137/163/176/184). No integration conflict or newer main hardware change exists.
+- Fixed required run-directory creation before LibreLane invocation and made regression CLI checks require it. Three cases pass; diff checks pass. This fixes the pre-STA failure in 37176270000; no timing improvement is claimed.
+- Parsed routing run 37165048635's snapshots 5–50. Last snapshot has 215 markers (157 shorts, 58 spacing); 203/215 lie in x=500–700 µm, y=300–350 µm, using 50 µm bins. U0 RX producer token bit 16 appears in 20 marker records. Counts are marker records, not independent defects or unique nets. Added snapshot progression/hotspot evidence to the GDS report.
+
+Checklist:
+- No boxes ticked; candidate hardware and constraints unchanged.
+
+Next:
+- Publish CI fix and documentation separately, rerun timing against source 37037880327, and inspect fresh corner metrics. Map the routing hotspot to macro/cell placement before proposing one physical experiment.
+
+## 2026-10-04: Codex (completed diagnostic status)
+Done:
+- Timing run 37176270000 failed before STA: job log reports that `--force-run-dir runs/postgrt-timing/before-nom_fast_1p32V_m40C` must already exist. Fixed the local helper to create each run directory and tightened the mocked CLI check. Regression tests pass 3/3; `git diff --check` passes. No fresh timing measurements were produced.
+- Routing replay 37165048635 failed after the routing timeout. Latest report `tt_um_tripwire.drc-50.rpt` has 215 markers: 157 shorts and 58 spacing; layers M2 184, M3 20, M4 11. This is 12 fewer than the earlier four-thread replay's endpoint of 227, still no completed route/signoff.
+- No workflows are running or queued. Run 319d7d3 on `anish_branch` (corrected after checking headBranch) has green test/unit/docs but failed lint 37178674680: Verilator exits on 120 warnings, including UNOPTFLAT in `tt_um_warp` generated fabric files. Remote and local main remain 4652fc1; main test/lint/docs/unit are green; no remote/history changes made in this status check.
+
+Checklist:
+- No boxes ticked. Timing-directory correction is local and uncommitted.
+
+Next:
+- Publish the local helper correction; the apparent newer main changes belong to `anish_branch`. Analyze saved routing hotspots; repeated identical routing replay has not achieved completion.
+
 ## 2026-10-03: Codex (authorized publication of timing diagnostic)
 Done:
 - User explicitly authorized the commit/push/launch commands, overriding the default Codex git restriction for this action. Rechecked tests (3/3), YAML parsing and `git diff --check`.

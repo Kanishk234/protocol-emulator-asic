@@ -134,3 +134,25 @@ These are hypotheses, not measured improvements. Preserve the 20 ns clock, synch
 6. **Treat CTS/electrical effects separately.** All 164 fanout violations in the fresh fast `checks.rpt` are `clkbuf_leaf_*` outputs (largest fanout 18 against limit 8). Reported fast hold WS is only +0.0490773 ns. Inspect clock slew/skew, leaf loads and the 190 unannotated drivers (many `clkload*`) before a targeted CTS experiment; do not assume clock violations explain the data-cone WNS. Changing clock balance can worsen hold or move the worst setup path.
 
 Pinned source references: [one-step flow selection](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/__main__.py), [mid-PnR corner handling](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/steps/openroad.py), and [one-corner reporting script](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/scripts/openroad/sta/corner.tcl). Resizer capabilities described in the upstream reference above must still be checked against the installed OpenROAD version before experimenting.
+
+
+## Completed snapshot replay 37165048635 (2026-10-04)
+
+[Replay](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37165048635) hit the routing timeout; no final route/signoff exists. Uploaded `gds-postantenna-drt-37165048635` preserves five-iteration DRC snapshots. Snapshot labels are report indices, not proof of a final saved routing state.
+
+| Snapshot | Shorts | Spacing | Other | Total |
+|---|---:|---:|---:|---:|
+| 5 | 3494 | 1341 | 1 min area | 4836 |
+| 10 | 1346 | 529 | 1 cut short | 1876 |
+| 15 | 781 | 318 | 1 cut short | 1100 |
+| 20 | 684 | 275 | 0 | 959 |
+| 25 | 704 | 209 | 0 | 913 |
+| 30 | 271 | 88 | 0 | 359 |
+| 35 | 206 | 71 | 0 | 277 |
+| 40 | 189 | 58 | 0 | 247 |
+| 45 | 166 | 61 | 0 | 227 |
+| 50 | 157 | 58 | 0 | 215 |
+
+At snapshot 50, M2 has 184 records, M3 20, M4 11. Midpoint binning at 50 µm gives 80 records in x=600–650/y=300–350, 64 in x=650–700/y=300–350, 42 in x=500–550/y=300–350, and 17 in x=550–600/y=300–350: 203/215 in one horizontal band. `u_chip.g_unit[0].u_prod.tok[16]` appears in 20 marker records; `net1677` in 13 and `_17270_` in 12. These counts can include duplicate/overlapping violations, and do not by themselves identify the owning cell or cause. Map named nets and bounding boxes onto the saved placement/macro geometry before screening local placement spreading, routing resources, or load splitting. Avoid another identical replay based solely on the small 227→215 endpoint improvement.
+
+Timing replay 37176270000 produced no STA reports: CLI validation rejected a missing per-run directory. The local directory-creation fix and regression check are tracked as bug #61; the corner/one-step strategy has not yet been exercised by the pinned tools.

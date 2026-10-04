@@ -5,6 +5,27 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (independent repaired-netlist, electrical and extraction work)
+Done:
+- Added separate `l3-repaired-gl` workflow: exact R4 candidate, audited repaired netlist, SHA256, config validation, pinned Icarus 13/IHP models and full 22-case L3. Does not depend on active routing output.
+- Traced electrical violators from already completed repair 37185455158: SRAM A_MEN fails slow/typ slew; _30323_ NOR4 output → _30324_ A21OI input fails slow slew, with 446.88 µm x separation. All 164 fanout failures are clock-tree leaves. Added quantified targets/placement and controlled hypotheses in `docs/reports/PHASE2_ELECTRICAL_AUDIT.md`.
+- Prepared separate extracted-timing workflow/helper, requiring a completed clean route and following pinned cleanup/connectivity/fill/RCX/multicorner STA ordering. It refuses timeout/missing/dirty checkpoints. Not dispatched because it requires the future route artifact.
+- Nine helper regression cases pass; both new workflows' YAML/embedded Python parse; diff checks pass. No candidate RTL/config changes and no changes to active route inputs.
+
+Checklist:
+- No boxes ticked; prepared workflows/tests are not completed physical/functional evidence.
+
+Next:
+- Publish CI/helpers separately from docs, dispatch independent repaired-netlist L3, and inspect its own results when available. Keep extraction ready for a completed route; electrical fixes are hypotheses until screened.
+
+## 2026-10-04: Codex (active workflows and independent work)
+Done:
+- Four main workflows running: repaired continuation 37187027878 and unit 37187043719, 37187014115, 37185475488; none queued. Continuation passed setup, both artifact downloads and provenance validation; combined antenna/corner-check/route step is active. No finer-grained completion is established from step status.
+- Identified useful independent work: expanded L3 simulation of repaired netlist, mapping remaining electrical violators, and preparing extracted-timing/physical-signoff continuation. No changes dispatched in this status check; no boxes ticked.
+
+Next:
+- Prioritize repaired-netlist functional verification while routing continues; it has physical cell/pin changes but no fresh protocol evidence yet.
+
 ## 2026-10-04: Codex (audited repaired-state routing continuation)
 Done:
 - Downloaded repair 37185455158 and audited fresh comparison/repair metrics: zero setup/hold violations in all corners; 8 inserted buffers, 14 upsized cells, 5 pin swaps; area +120 µm² (~0.023%), instances +8. Slew remains slow 3/typ 1; fanout 164; cap 0. Estimated timing passes, electrical and final routed closure remain open.

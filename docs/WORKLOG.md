@@ -15,7 +15,7 @@ Checklist:
 - No boxes ticked; physical timing/route/electrical closure remain open.
 
 Next:
-- Publish CI/helper and evidence separately; launch signoff-aware margin-zero repair and compare fresh corners, area/buffer cost and GRT overflow. Do not promote it without routed evidence.
+- Published CI/helper 0fd6ddb and evidence a990ece separately. Launched signoff-aware margin-zero repair 37185455158 against source 37037880327 (queued at dispatch). Inspect fresh corners, area/buffer cost and GRT overflow; do not promote without routed evidence.
 
 ## 2026-10-04: Codex (current workflow status)
 Done:

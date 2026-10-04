@@ -12,7 +12,7 @@ Done:
 - Eleven helper regressions pass; workflow YAML/embedded Python, shell syntax and diff checks pass. No phase boxes ticked.
 
 Next:
-- Publish and dispatch the bounded screen; compare fresh overflow, antenna, all-corner timing and guide allocation before selecting any detailed-route continuation.
+- Published CI/helpers 74a199a and docs 561fa13 separately; dispatched bounded screen [37219355996](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37219355996), now in progress. Compare fresh overflow, antenna, all-corner timing and guide allocation before selecting any detailed-route continuation.
 
 ## 2026-10-04: Codex (repaired post-antenna and routing hotspot audit)
 Done:

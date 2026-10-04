@@ -14,7 +14,7 @@ Checklist:
 - No boxes ticked; no candidate hardware or timing-constraint changes.
 
 Next:
-- Publish metadata-version correction separately from evidence and rerun the saved-checkpoint timing diagnostic. Obtain actual fresh slow-corner timing before changing critical nets or placement.
+- Published metadata fix f6111cb and hotspot evidence 7cf3c4c. Pinned-source review identified that STA-only resolved configs omit GRT_ADJUSTMENT; limited that validation to the repair step and published 46227fd (three regression cases pass). Cancelled superseded retry 37182914944 and launched replacement 37182963688 against source 37037880327. Replacement passed setup/checkpoint validation and is executing the comparison; fix commit 46227fd has green lint/test/docs (37182963082/032/086), unit 37182963039 is still running at the check. Obtain actual fresh slow-corner timing before changing critical nets or placement.
 
 ## 2026-10-04: Codex (timing-directory fix and routing hotspot analysis)
 Done:

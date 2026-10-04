@@ -5,6 +5,28 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-04: Codex (post-antenna evidence and signoff-aware repair screen)
+Done:
+- Inspected both completed artifacts: PnR 37183579900 / signoff 37183581129. Post-antenna slow setup WS +0.853715 ns vs −2.249214 ns; signoff slow TNS −83.5406 ns / 111 violations. Fast/typ signoff setup WS 0, all hold slack positive. Fanout 180, slow slew 1, cap violations 0 after antenna repair.
+- Matched worst flop-ending path _49012_→_47080_: signoff adds ~3.103 ns departure/borrowing time with identical downstream cell arcs. This disproves the earlier assumption that the setup-to-latch exception could not affect flop-ending paths; corrected report wording and logged #63. Older final endpoint _48142_ has new estimated signoff slack −1.243498 ns vs older extracted −10.698019 ns (different physical runs).
+- Added isolated setup-margin option to the workflow/helper. Prepared signoff-aware slow repair with margin 0, preserving naturally zero-slack latch checks, hold margin, 20 ns and candidate inputs. Five regression tests pass; YAML and diff checks pass. This is a screen, not a candidate constraint change.
+
+Checklist:
+- No boxes ticked; physical timing/route/electrical closure remain open.
+
+Next:
+- Publish CI/helper and evidence separately; launch signoff-aware margin-zero repair and compare fresh corners, area/buffer cost and GRT overflow. Do not promote it without routed evidence.
+
+## 2026-10-04: Codex (current workflow status)
+Done:
+- Current running workflows are main `unit` 37183579933 and 37183385156; none queued. Post-antenna PnR comparison 37183579900 and signoff-constraint comparison 37183581129 both completed successfully. Detailed routing replay is no longer running.
+
+Checklist:
+- No boxes ticked; successful diagnostic status alone does not establish timing closure.
+
+Next:
+- Inspect both completed post-antenna comparison artifacts and corner/path differences.
+
 ## 2026-10-04: Codex (matched post-antenna and constraint-view diagnostics)
 Done:
 - Added workflow `comparison=postantenna` to report stage 39 vs exact stage-43 DRT input with no repair/routing. Validates ODB/DEF/SDC/powered-netlist references against original stage 44. Added `constraints=pnr|signoff` and helper shared SDC override so both checkpoints use the same timing view.

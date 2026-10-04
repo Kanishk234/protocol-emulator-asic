@@ -191,6 +191,25 @@ This screen resolves the missing-corner reporting problem and shows the stage-39
 
 The timing workflow now accepts `comparison=postantenna`: it compares saved stage 39 with stage 43 without invoking resizer, placement or routing. Validation requires stage-43 ODB/DEF/SDC/powered-netlist references to match original stage-44 DRT input exactly. `constraints=pnr` retains the original PnR view; `constraints=signoff` explicitly uses `src/signoff.sdc` at both checkpoints. Both modes report three corners independently and preserve source checkpoint geometry. Signoff constraints on estimated parasitics are still not final routed signoff.
 
-Saved source runs 36799356107 and 37037880327 have identical PnR SDC files. Both use setup uncertainty 0.25 ns and hold uncertainty 0.10 ns. The PnR file additionally false-paths setup **to latch data pins**; signoff removes that exception. This is different from the invalid broad latch-output exception fixed in bug #57/D-066. The earlier worst final path ends at a flop, so the latch-data exception alone does not explain its failure. Use matched constraint-view reports to quantify newly included latch endpoints separately from flop-ending paths, then compare extracted final-route net delay and cell slew.
+Saved source runs 36799356107 and 37037880327 have identical PnR SDC files. Both use setup uncertainty 0.25 ns and hold uncertainty 0.10 ns. The PnR file additionally false-paths setup **to latch data pins**; signoff removes that exception. This is different from the invalid broad latch-output exception fixed in bug #57/D-066. The earlier worst final path ends at a flop; the fresh matched reports below show that the latch-data exception can still change its latch departure timing. Use matched constraint-view reports to quantify newly included latch endpoints separately from flop-ending paths, then compare extracted final-route net delay and cell slew.
 
 Local validation: five orchestration/evidence tests pass (saved/fresh repair, explicit shared SDC, missing fresh metric rejection); workflow YAML and embedded checkpoint-validation Python parse; diff checks pass. No candidate RTL/config changes.
+
+
+## Post-antenna results and latch departure timing (2026-10-04)
+
+Both [PnR view 37183579900](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37183579900) and [signoff view 37183581129](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37183581129) passed as diagnostics. Neither invokes repair. Fresh post-antenna results:
+
+| Corner | PnR setup WS (ns) | Signoff setup WS (ns) | Hold WS, both views (ns) |
+|---|---:|---:|---:|
+| Fast | +11.8740 | 0 | +0.0752352 |
+| Slow | +0.853715 | −2.249214 | +0.339348 |
+| Typical | +7.81655 | 0 | +0.171227 |
+
+Signoff slow TNS is −83.5406 ns with 111 setup violations (stage-39 baseline −91.8611 ns / 116). Other corners have zero setup violations; hold violations are zero everywhere. Post-antenna fanout violations rise 164→180; slow slew violations fall 13→1; cap violations remain zero. Electrical limits and signoff setup remain open despite the diagnostic jobs passing.
+
+**The constraint difference affects a flop-ending path too.** Worst slow path in both post-antenna views is `_49012_` (U0 idle config latch bit 7) → `_47080_` (flop). PnR reports arrival 19.891525 ns, required 20.745241 ns, slack +0.853715 ns. Signoff reports arrival 22.994455 ns against the same requirement, slack −2.249214 ns; its launch trace explicitly includes 3.103180 ns `time given to startpoint`. Downstream cell arcs are unchanged. Thus setup-to-latch-data masking changes propagated latch departure/borrowing, not merely which final endpoints are checked. Earlier statements that a flop endpoint excluded this explanation are superseded by these matched reports.
+
+The older final-route endpoint `_48142_` also appears in both new reports: PnR +1.859428 ns, signoff −1.243498 ns. Older run 36799356107 final signoff gives −10.698019 ns for the same instance endpoints, with 4.030270 ns time given to the startpoint and 31.722853 ns arrival. Its `_25365_` O21AI arc is 2.399002 ns versus 1.304861 ns in current estimated timing. These are different physical runs/parasitic views, so they demonstrate a remaining gap rather than an isolated routing delta.
+
+**Next controlled screen:** use signoff constraints at stage 39 for slow-corner repair, with `GRT_RESIZER_SETUP_SLACK_MARGIN=0` instead of 0.025 ns. This exposes propagated latch departure timing while avoiding a demand for positive margin on naturally zero-slack latch setup/borrow checks (the D-032 stall). Preserve hold margin, 20 ns clock, hardware and candidate config. Measure all-corner fresh setup/hold, borrowing, electrical limits, buffer/area cost and GRT overflow. A timeout, excessive repair churn, or electrical/congestion regression rejects this screen; no candidate PnR SDC change is implied. Residual long/high-slew arcs still merit selective load splitting/locality after this screen.

@@ -14,7 +14,8 @@ spec.loader.exec_module(timing)
 @pytest.mark.parametrize("reuse_repair", [True, False])
 def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair):
     config = tmp_path / "config.json"
-    config.write_text(json.dumps({"CLOCK_PERIOD": 20, "GRT_ADJUSTMENT": 0.3}))
+    config.write_text(json.dumps({"CLOCK_PERIOD": 20, "GRT_ADJUSTMENT": 0.3,
+                                  "DIE_AREA": "0 0 1289.28 710.64"}))
     before = tmp_path / "before.json"
     repaired = (tmp_path / "repaired.json" if reuse_repair else
                 tmp_path / "result/repair/01-openroad-resizertimingpostgrt/state_out.json")
@@ -22,6 +23,8 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair):
 
     def fake_run(command, check):
         cfg = json.loads(Path(command[-1]).read_text())
+        assert cfg["meta"]["version"] == 1
+        assert cfg["DIE_AREA"] == "0 0 1289.28 710.64"
         step = cfg["meta"]["flow"]
         assert step in (["OpenROAD.STAMidPNR"], ["OpenROAD.ResizerTimingPostGRT"])
         assert len(cfg["PNR_CORNERS"]) == 1

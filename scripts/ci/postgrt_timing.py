@@ -38,7 +38,8 @@ def screen(config_path, before, output, pdk_root, repaired=None):
     def run(tag, checkpoint, step, corner):
         config = dict(base)
         # Single-step flows have no repeated-ID or --to ambiguity.
-        config["meta"] = {"version": 2, "flow": [step]}
+        # Preserve legacy merged-config parsing (e.g. string DIE_AREA).
+        config["meta"] = {"version": base.get("meta", {}).get("version", 1), "flow": [step]}
         config["OPENROAD_THREADS"] = 4
         config["PNR_CORNERS"] = [corner]
         config["RSZ_CORNERS"] = [CORNERS[1]]

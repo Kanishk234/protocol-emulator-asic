@@ -12,7 +12,7 @@ Done:
 - Twenty-one helper/Tcl checks pass, including negative timing, dirty antenna and missing state refusal. Workflow YAML/embedded Python and diff checks pass. No phase boxes ticked or candidate changes.
 
 Next:
-- Publish and launch route diagnostic, judge convergence/marker geometry against earlier 108-marker timeout. Preserve separate electrical follow-up and require extraction/full signoff after a completed clean route.
+- Published CI f4e54b9 and docs 40a9961 separately; route diagnostic [37363064899](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37363064899) dispatched (queued). Judge convergence/marker geometry against earlier 108-marker timeout. Preserve separate electrical follow-up and require extraction/full signoff after a completed clean route.
 
 ## 2026-10-05: Codex (no-mirroring repair result)
 Done:

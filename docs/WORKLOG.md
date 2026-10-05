@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (branch follow-up gates passed; routing continuation)
+Done:
+- Downloaded and audited successful follow-up 37386510229: final fresh setup WS/WNS 0 ns and setup/hold count 0 at all corners; hold WS fast/slow/typ +0.0649927/+0.333241/+0.158755 ns; antenna nets/pins 0. Electrical still open: slew 0/4/1, fanout203, cap0. These are estimated gates, not extracted timing.
+- Added explicit branch-followup artifact/root selection to owned DRT workflow/helper with successful provenance and branch flags required. Kept all existing DRT timing/antenna/config gates. Updated routed L3 validator to read the correct follow-up repair config when present. No hardware source changes.
+- Helper suite 35 passed including both checkpoint roots; workflow YAML/embedded Python/diff checks pass. No phase boxes ticked.
+
+Next:
+- Publish CI/docs separately and dispatch controlled DRT using repair 37386510229. Inspect terminal router DRC/antenna, then fresh extraction and protocol verification. Actual extracted WNS remains −6.178462 ns until measured on this new physical result.
+
 ## 2026-10-05: Codex (bounded branch follow-up prepared)
 Done:
 - Traced matched _49012_→_47080_ reports: fresh post-resizer setup slack −0.309102 ns precedes antenna repair; post-antenna −0.280528 ns. This supersedes attributing the deficit solely to antenna repair. Both paths traverse the inserted BUF4; no extracted benefit established.
@@ -12,7 +21,7 @@ Done:
 - All 34 helper/Tcl checks pass; YAML/embedded Python/diff checks pass. Follow-up guards reject mismatched source, missing branch/no-mirror provenance, dirty antenna and reinsertion. No phase boxes ticked.
 
 Next:
-- Publish and dispatch the bounded follow-up using ongoing user permission. Judge fresh final gates; if setup remains negative, reject checkpoint and investigate a separate RTL logic optimization instead of repeating the same repair.
+- Published CI 6cd9287 and separate docs 8afdbd0 using ongoing user permission; follow-up 37386510229 is in progress. Judge fresh final gates; if setup remains negative, reject checkpoint and investigate a separate RTL logic optimization instead of repeating the same repair.
 
 ## 2026-10-05: Codex (corrected repair completed and routed protocols passed)
 Done:

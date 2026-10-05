@@ -96,4 +96,20 @@ Separate `gds-hotspot-drt.yaml` restores the exact passing no-mirroring state an
 
 Owned `gds-hotspot-extracted-timing.yaml` restores this route artifact and original source dependencies, validates successful workflow provenance and completed zero-DRC state, then invokes the existing cleanup/connectivity/fill/RCX/STA guard with `--route-root runs/hotspot-drt`. Fresh reports must exist for all three corners. Negative timing remains diagnostic evidence rather than being hidden; full downstream DRC/LVS/precheck and functional final-netlist evidence remain necessary. Twenty-two helper/Tcl checks pass including valid clean-state acceptance and missing-file refusal.
 
+### Extracted timing 37375411729
+
+[Extraction completed successfully as a diagnostic](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37375411729). Routing DRC, critical disconnected-pin and wirelength checks passed; one disconnected pin was classified noncritical by the flow. Timing does not pass:
+
+| Corner | Setup WS (ns) / violations | Hold WS (ns) / violations | Slew violations |
+|---|---|---|---:|
+| Fast | 0 / 0 | −0.020809 / 4 | 1 |
+| Slow | −6.178462 / 902 | +0.198143 / 0 | 179 |
+| Typical | 0 / 0 | +0.057654 / 0 | 28 |
+
+Worst slow path is U0 mode configuration word0 bit0 latch `_49139_`→`dropped[26]` flop `_48163_`. Arrival 27.414698 ns exceeds required 21.236235 ns. Departure/borrowing time given to startpoint is 4.038346 ns. Large arcs: `_25365_/Y` O21AI_1 1.905905 ns, `_25366_/Y` O21AI_1 1.379506 ns, `_25128_/Y` NOR4_1 1.372737 ns. These measured load/slew-sensitive cell arcs identify targets for a separately controlled structural/sizing/load-distribution change; constraints and same-cycle feedback must remain intact.
+
+Worst fast hold is U0 configuration word13 bit12 latch `_48986_`→TX `ct[12]` flop `_46495_`, arrival 0.894947 ns vs required 0.915756 ns. Any setup repair must also check all four fast hold failures. The older completed extracted result was −10.698019 ns from another physical run; this is not a matched single-change comparison to that old result. Zero pre-route WNS was insufficient to establish routed closure.
+
+Final routed-netlist L3 37375683211 stopped before simulation because its validator read PL_OPTIMIZE_MIRRORING from a DRT config that omits placement-only variables. Bug #65 fixes this by validating policy against the saved repair config. The corrected validator executed successfully on the actual downloaded artifact and matching SHA256; protocol simulation evidence remains pending.
+
 On the worst reported slow path, 50 cell-output arcs (including latch Q and buffers) contribute 16.019526 ns of incremental delay, while summed input/net increments contribute 0.084843 ns in this estimated-parasitic report. Largest output arcs include `_30525_/Y` A221OI 0.570740 ns, `_38458_/Y` O21AI 0.526990 ns, `_38425_/Y` NOR3 0.492175 ns and `_38194_/Y` A221OI 0.486931 ns. Cell arcs include dependence on load and input slew; these sums do not prove physical wire delay is negligible, especially before extraction. They identify common-cone cell sizing, load distribution and combinational depth as alternatives to inspect if the no-mirroring trial fails. No RTL or cell edits are made from this audit alone.

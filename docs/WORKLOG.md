@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (extracted timing diagnosis and routed L3 validator fix)
+Done:
+- Monitored extraction 37375411729 through completion: actual routed slow setup WS/WNS −6.178462 ns / 902 violations; fast hold −0.020809 ns / 4 violations. Fast/typ setup pass; slow/typ hold +0.198143/+0.057654 ns. Slew fast/slow/typ 1/179/28. No timing closure claimed.
+- Worst slow path U0 mode config latch _49139_→dropped[26] flop _48163_, arrival 27.414698 vs required 21.236235 ns. Large arcs: _25365_ O21AI 1.905905 ns, _25366_ O21AI 1.379506, _25128_ NOR4 1.372737. Worst fast hold U0 word13 bit12 latch _48986_→TX ct[12] flop _46495_, arrival 0.894947 vs required 0.915756 ns. Preserve configuration timing/feedback contract.
+- Final L3 run 37375683211 failed validation, not simulation: DRT config omits PL_OPTIMIZE_MIRRORING. Corrected validator reads saved repair config; executed successfully on actual artifact (SHA256 matches). Logged bug #65. No phase boxes ticked.
+
+Next:
+- Publish and launch corrected final-netlist L3. Use extracted critical-cone cell/load evidence for a new single-change timing repair; close fast hold too. Do not equate zero estimated WNS with extracted closure.
+
 ## 2026-10-05: Codex (continuous verification and final routed netlist)
 Done:
 - Extraction 37375411729 has started; no timing result inferred from active status. Continued independent work while source timing is being extracted.
@@ -12,7 +21,7 @@ Done:
 - No phase boxes ticked or hardware inputs changed.
 
 Next:
-- Publish and launch final-netlist verification; keep auditing extraction and outstanding CI without stopping at dispatch acknowledgments.
+- Published CI 77a14d3 and docs b74cc66; launched final-netlist verification 37375683211, now running alongside extraction 37375411729. Final route audit additionally records 33,902 instances, 515,776 µm² instance area and empty terminal router DRC report. Final routed netlist SHA256 efeb0feaeff6451961c295d5aafc0c5ace4803a62cb96eaac207a65e0414b50a. Keep auditing new results; no extracted WNS claim yet.
 
 ## 2026-10-05: Codex (final route audit and extracted timing preparation)
 Done:

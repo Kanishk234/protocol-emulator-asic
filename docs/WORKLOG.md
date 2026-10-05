@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (controlled repair mirroring screen)
+Done:
+- Audited corrected 37221292614: clean antenna checks, slow setup WS −0.124212 ns / TNS −1.33337 ns / 15 violations; fourteen from _49036_, one _49139_→_47080_. Fast/typ setup and all hold pass estimated checks. Slew fast/slow/typ 0/1/1, fanout 193, cap 0. Bug #64 CI fix confirmed.
+- Prepared one-variable repair comparison: PL_OPTIMIZE_MIRRORING=false in a disposable config; same source region state, constraints, repair margin 0, legalization, routing and antenna hooks. Validate resolved flag. This tests whether mirroring contributes to the downstream regression, not an established root cause.
+- Sixteen helper/Tcl checks pass; YAML/embedded Python/diff checks pass. No phase boxes ticked, no DRT or candidate hardware changes.
+
+Next:
+- Publish and dispatch no-mirroring bounded repair; compare with corrected baseline 37221292614 before any DRT.
+
+## 2026-10-05: Codex (latest WNS status)
+Done:
+- Corrected bounded repair 37221292614 completed successfully as a diagnostic. Fresh post-antenna estimated setup WS/WNS: slow −0.124212 ns, fast/typ 0 ns; hold WS fast +0.0853453, slow +0.349589, typ +0.181270 ns. This does not pass slow setup or establish final routed closure.
+- Last completed extracted routed slow WNS remains −10.698019 ns from GDS 36799356107. Different routing stages/runs prevent claiming a measured −10.698→−0.124 ns routed improvement. No phase boxes ticked.
+
+Next:
+- Inspect corrected repair artifacts, electrical/antenna gates and residual slow paths before selecting another experiment. No DRT dispatched from this negative-timing state.
+
 ## 2026-10-04: Codex (antenna reservation hook correction)
 Done:
 - Downloaded failed repair 37220414494. Antenna checks actually reached zero nets/pins after 88 new diodes and 65 jumpers; no post-antenna corner reports were produced because the guard stopped first.

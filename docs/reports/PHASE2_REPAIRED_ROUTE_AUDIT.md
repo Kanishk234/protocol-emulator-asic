@@ -112,4 +112,31 @@ Worst fast hold is U0 configuration word13 bit12 latch `_48986_`→TX `ct[12]` f
 
 Final routed-netlist L3 37375683211 stopped before simulation because its validator read PL_OPTIMIZE_MIRRORING from a DRT config that omits placement-only variables. Bug #65 fixes this by validating policy against the saved repair config. The corrected validator executed successfully on the actual downloaded artifact and matching SHA256; protocol simulation evidence remains pending.
 
+Corrected verification 37376481257 is active. The critical `_25365_` driver is at (201.12,570.78) µm; `_25366_` and `rebuffer5871` are near (925.92,563.22–567.00), a 724.80 µm x span. Nominal extracted SPEF gives `_19783_` total capacitance 0.156899 pF and 29 resistor segments totaling 1122.8124 Ω; the sum is not source-to-sink equivalent resistance. Following `_19784_` has 0.0560947 pF and eight segments totaling 329.6446 Ω. This is a measured long, capacitive branch between the worst two output arcs and provides a specific distribution/sizing target for a new controlled repair. Placement origin spans and resistor sums alone do not predict the improvement or select a legal buffer location.
+
 On the worst reported slow path, 50 cell-output arcs (including latch Q and buffers) contribute 16.019526 ns of incremental delay, while summed input/net increments contribute 0.084843 ns in this estimated-parasitic report. Largest output arcs include `_30525_/Y` A221OI 0.570740 ns, `_38458_/Y` O21AI 0.526990 ns, `_38425_/Y` NOR3 0.492175 ns and `_38194_/Y` A221OI 0.486931 ns. Cell arcs include dependence on load and input slew; these sums do not prove physical wire delay is negligible, especially before extraction. They identify common-cone cell sizing, load distribution and combinational depth as alternatives to inspect if the no-mirroring trial fails. No RTL or cell edits are made from this audit alone.
+
+
+### Controlled critical-branch trial prepared (2026-10-05)
+
+The pinned LEF contains O21AI_1 only, so O21AI_2/_4 upsizing is unavailable. A separate `gds-critical-branch-repair` workflow prepares a BUF4 insertion at the initial midpoint (563.52, 570.78) µm between `_25365_/Y` and both remote loads `_25366_/B1` and `rebuffer5871/A`. The saved region-screen checkpoint inherits exactly this three-pin connectivity from repair 37185455158; local netlist inspection confirmed it. A Tcl guard rejects changed connectivity, a changed driver master, missing power nets or repeated insertion before mutation. Power connections are copied from the driver. The wrapper applies the change immediately after reading the pre-route ODB, legalizes before the first GRT pass, and preserves the established region reservation and disabled mirroring. It never edits the final routed ODB.
+
+The trial uses the same pinned R4 hardware, 20 ns clock, density and signoff constraints. Its added buffer is a physical implementation change only. Existing resizer/antenna and independent per-corner reporting remain in place; estimated gates only permit DRT, never establish timing closure. The DRT provenance validator explicitly permits the new workflow only when its artifact records the critical-branch flag. Final extraction and functional verification must still follow successful DRT; close all four actual fast hold failures and electrical violations before promotion. No improvement is claimed until those measurements exist.
+
+Local validation: 24 helper/Tcl tests passed, including both audited load rewiring and rejection of an unexpected load before creating cells. Shell syntax, workflow YAML/embedded Python and diff checks passed. These checks do not execute real OpenDB or establish legal placement/routability. No local Docker/OpenROAD executable is available. The trial is not published or dispatched: the latest supplied AGENTS.md Git rule reserves commit/push for the user.
+
+
+### Fast hold endpoints and repair-hook validation (2026-10-05)
+
+Audited all four negative paths in extraction 37375411729's fast `min.rpt`, then mapped launch/output signals in the exact final routed netlist:
+
+| Configuration launch | Captured state | Arrival / required (ns) | Hold slack (ns) |
+|---|---|---|---|
+| U0 word13 bit12, `_48986_` | U0 TX `ct[12]`, `_46495_` | 0.894947 / 0.915756 | −0.020809 |
+| U0 word13 bit14, `_48990_` | U0 TX `ct[14]`, `_46497_` | 0.904757 / 0.913878 | −0.009121 |
+| U0 word13 bit3, `_48968_` | U0 TX `ct[3]`, `_46511_` | 0.895907 / 0.903980 | −0.008073 |
+| U3 word4 bit1, `_48664_` | U3 RX `rt[1]`, `_47897_` | 0.941699 / 0.942055 | −0.000356 |
+
+These short data paths need a separate hold-repair assessment after the controlled setup trial. Do not modify shared clocks or exempt configuration paths. A targeted data-path delay can be investigated against both minimum and maximum extracted timing, but no hold insertion has been made and no result is predicted from the slack alone.
+
+Added executable wrapper tests proving branch insertion follows the one checkpoint load, precedes legalization and first global route, and rejects missing/duplicate checkpoint-load commands before executing the repair. The complete helper suite now passes 27 cases. Unit workflow 37376426740 completed successfully; final routed L3 37376481257 was still running at this check. Trial publication remains pending under AGENTS.md.

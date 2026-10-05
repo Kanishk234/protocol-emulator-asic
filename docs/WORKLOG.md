@@ -5,6 +5,24 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (repair-hook validation and complete hold audit)
+Done:
+- Added real wrapper execution tests for insertion ordering and rejection of missing/duplicate ODB reads. All 27 helper/Tcl tests passed; diff checks passed.
+- Audited all four fast extracted hold failures and mapped actual routed netlist signals: U0 word13 bits12/14/3 to TX ct[12/14/3] (−20.809/−9.121/−8.073 ps), U3 word4 bit1 to RX rt[1] (−0.356 ps). Recorded arrivals, required times and identities in the route audit. No hold or clock change made.
+- Unit 37376426740 passed; final routed L3 37376481257 remained active. Prepared branch CI remains local/unpublished. No phase boxes ticked.
+
+Next:
+- Publish the prepared groups using the user-run script as required by AGENTS.md, then measure the controlled setup branch experiment before choosing a separate hold repair. Actual extracted setup WNS remains −6.178462 ns.
+
+## 2026-10-05: Codex (measured critical-branch repair prepared)
+Done:
+- Prepared separate critical-branch repair workflow and guarded pre-route BUF4 split of _19783_; pinned library has no stronger O21AI variant. Confirmed source checkpoint netlist has exactly driver _25365_/Y and loads _25366_/B1, rebuffer5871/A. Preserve 20 ns clock, no-mirroring baseline, region reservation and configuration contract.
+- Guarded changed connectivity/master/power/duplicate insertion; legalize before GRT. Extended DRT provenance acceptance only for explicitly flagged branch artifacts. Local helper/Tcl suite 24 passed; shell/YAML/embedded Python/diff checks passed. Real OpenDB/placement/timing remain untested. No phase boxes ticked.
+- Latest lint 37376426718, test 37376426587 and docs 37376426735 passed. Final routed L3 37376481257 and unit jobs remain active.
+
+Next:
+- User publishes the prepared CI and docs groups under the newly supplied AGENTS.md prohibition on agent commit/push, then dispatch critical-branch repair. Audit actual execution, estimated multicorner/antenna/electrical changes; proceed through DRT, extraction and functional checks only with evidence. Actual baseline remains setup −6.178462 ns and fast hold −0.020809 ns; no timing improvement claimed.
+
 ## 2026-10-05: Codex (extracted timing diagnosis and routed L3 validator fix)
 Done:
 - Monitored extraction 37375411729 through completion: actual routed slow setup WS/WNS −6.178462 ns / 902 violations; fast hold −0.020809 ns / 4 violations. Fast/typ setup pass; slow/typ hold +0.198143/+0.057654 ns. Slew fast/slow/typ 1/179/28. No timing closure claimed.
@@ -12,7 +30,7 @@ Done:
 - Final L3 run 37375683211 failed validation, not simulation: DRT config omits PL_OPTIMIZE_MIRRORING. Corrected validator reads saved repair config; executed successfully on actual artifact (SHA256 matches). Logged bug #65. No phase boxes ticked.
 
 Next:
-- Publish and launch corrected final-netlist L3. Use extracted critical-cone cell/load evidence for a new single-change timing repair; close fast hold too. Do not equate zero estimated WNS with extracted closure.
+- Published validator fix e7d4f61 and extracted audit dbad41b; corrected final-netlist L3 37376481257 launched and running. Critical _25365_→_25366_/buffer branch spans 724.80 µm in x; nominal SPEF _19783_ cap 0.156899 pF and 29 resistance segments sum 1122.8124 Ω (not point-to-point resistance). Following _19784_ cap 0.0560947 pF. These measured loads support a controlled branch distribution/sizing investigation, not changing live-config timing or relaxing clock. Close fast hold too; do not equate zero estimated WNS with extracted closure.
 
 ## 2026-10-05: Codex (continuous verification and final routed netlist)
 Done:

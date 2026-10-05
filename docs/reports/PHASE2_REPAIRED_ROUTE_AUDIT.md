@@ -140,3 +140,17 @@ Audited all four negative paths in extraction 37375411729's fast `min.rpt`, then
 These short data paths need a separate hold-repair assessment after the controlled setup trial. Do not modify shared clocks or exempt configuration paths. A targeted data-path delay can be investigated against both minimum and maximum extracted timing, but no hold insertion has been made and no result is predicted from the slack alone.
 
 Added executable wrapper tests proving branch insertion follows the one checkpoint load, precedes legalization and first global route, and rejects missing/duplicate checkpoint-load commands before executing the repair. The complete helper suite now passes 27 cases. Unit workflow 37376426740 completed successfully; final routed L3 37376481257 was still running at this check. Trial publication remains pending under AGENTS.md.
+
+
+### Critical branch screen result 37381107529
+
+Corrected container wrapper executed insertion and legalization; workflow completed. The fresh post-antenna gate is **false**: slow estimated WNS −0.280528 ns, six setup violations, while fast/typ setup pass. Hold WS fast/slow/typ is +0.0503921/+0.281459/+0.132105 ns, with zero violations, and antenna repair terminates at zero violations. Failed setup endpoints are `_49012_`→`_47080_/79/78` (−0.280528/−0.191168/−0.056440 ns) and `_49036_`→`_48163_/66/64` (−0.030042/−0.010495/−0.003588 ns). The checkpoint is not advanced to DRT. These estimated results cannot be compared as routed improvement against −6.178462 ns.
+
+Separately, previous final routed netlist verification 37376481257 passed all 22 JUnit cases with zero failures/errors/skips. It is functional verification of that earlier routed netlist, without SDF, not validation of this branch modification or timing closure. Latest main lint/test/docs/unit on 90e20a2 pass.
+
+
+### One bounded post-antenna repair follow-up
+
+Matched branch-trial reports show `_49012_`→`_47080_` is already −0.309102 ns immediately after the resizer's placement/routing output; antenna repair changes it to −0.280528 ns. Thus antenna repair is not the sole source of the new deficit. The resizer log's no-violation statement does not describe the final fresh STA outcome. No causal sizing/locality improvement is assumed.
+
+A separate `gds-critical-branch-followup` runs one ordinary signoff-aware, zero-margin repair from the saved clean post-antenna branch ODB using the existing region image, which does not reinsert the branch. It preserves the source artifact in place and writes runs/branch-followup. Original R4 hardware, 20 ns/density56, four threads, region resource reservation and no-mirroring policy remain. Source gates are allowed to have negative timing because this is a repair diagnostic, while source antenna must be clean and branch provenance must match. Fresh per-corner timing/antenna gates still block advancement; this workflow does not run DRT. Local suite 34 passed, including source/provenance/antenna/reinsertion rejection. If final gates remain negative, do not repeat identical follow-ups.

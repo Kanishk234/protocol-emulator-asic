@@ -5,6 +5,24 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (bounded branch follow-up prepared)
+Done:
+- Traced matched _49012_→_47080_ reports: fresh post-resizer setup slack −0.309102 ns precedes antenna repair; post-antenna −0.280528 ns. This supersedes attributing the deficit solely to antenna repair. Both paths traverse the inserted BUF4; no extracted benefit established.
+- Added separate critical-branch-followup workflow to repair the measured post-antenna branch checkpoint once with no reinsertion, mirroring disabled, identical 20 ns/signoff/zero-margin constraints and fresh corner/antenna gates. Output stays in runs/branch-followup, retaining original input state. Workflow validates completed branch provenance. No DRT launch included.
+- All 34 helper/Tcl checks pass; YAML/embedded Python/diff checks pass. Follow-up guards reject mismatched source, missing branch/no-mirror provenance, dirty antenna and reinsertion. No phase boxes ticked.
+
+Next:
+- Publish and dispatch the bounded follow-up using ongoing user permission. Judge fresh final gates; if setup remains negative, reject checkpoint and investigate a separate RTL logic optimization instead of repeating the same repair.
+
+## 2026-10-05: Codex (corrected repair completed and routed protocols passed)
+Done:
+- Corrected branch repair 37381107529 completed successfully (job 112003036121). Log confirms real branch insertion, no estimated repair setup/hold violations and terminal antenna repair 0 violations. Downloaded gate artifact: post-antenna estimated slow WNS −0.280528 ns / 6 setup violations; fast/typ setup pass, all hold pass (+0.0503921/+0.281459/+0.132105 ns). Gate false, so no DRT dispatched. No extracted improvement claimed.
+- Final routed protocol run 37376481257 passed; downloaded JUnit results_l3_gl.xml has 22 cases, 0 failures/errors/skips. This verifies the previous routed netlist, not the new branch trial, and includes no SDF timing claim.
+- Latest main lint 37381099916, test 37381100012, docs 37381100021 and unit 37381099885 all passed. No phase boxes ticked; actual extracted setup WNS remains −6.178462 ns.
+
+Next:
+- Reject this branch checkpoint for DRT at current gates. Diagnose post-antenna regression (_49012_→_47080_/79/78, _49036_→_48163_/66/64), then choose a separate controlled repair; preserve required constraints.
+
 ## 2026-10-05: Codex (critical branch container dependency fix)
 Done:
 - Diagnosed failed repair 37380322860 from job 112000338612: pinned container has no awk; wrapper aborted before OpenROAD repair. No new timing result. Logged bug #66.
@@ -12,7 +30,7 @@ Done:
 - Latest lint 37380313880, docs 37380313792 and test 37380313782 passed. Unit 37380313735 and final routed L3 37376481257 still active at initial check. No phase boxes ticked.
 
 Next:
-- Publish the scoped fix using ongoing explicit user authorization and launch a fresh repair on the corrected helper revision; inspect real OpenDB execution and per-corner gates before DRT/extraction. WNS remains −6.178462 ns.
+- Published CI 3fd67f0 and docs 90e20a2 using explicit user authorization; fresh corrected repair 37381107529 is in progress. Inspect real OpenDB execution and per-corner gates before DRT/extraction. WNS remains −6.178462 ns.
 
 ## 2026-10-05: Codex (authorized branch trial published and dispatched)
 Done:

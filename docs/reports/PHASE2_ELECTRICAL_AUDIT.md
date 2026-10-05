@@ -27,6 +27,19 @@ All 164 fanout rows are `clkbuf_leaf_*_clk_regs/X`. Largest is `clkbuf_leaf_48_c
 
 ## Independent work completed / pending
 
+### No-mirroring checkpoint 37360552753
+
+This newer state has estimated setup/hold passing all corners and clean antenna, but 19 slow slew records remain. Saved post-antenna DEF/netlist groups them into four driven nets plus SRAM A_MEN. Coordinates below are component origins; spans are placement bounds, not routed wire lengths.
+
+| Net / driver | Connections including driver | Driver origin (µm) | x/y span (µm) |
+|---|---:|---|---|
+| `_12745_` / `_39031_` NOR3_1 | 9 | (294.24,298.62) | 608.64 / 147.42 |
+| `_04725_` / `_30323_` NOR4_1 | 3 | (800.64,207.90) | 448.32 / 18.90 |
+| `_04693_` / `_30187_` NAND4_1 | 4 | (297.60,287.28) | 669.12 / 124.74 |
+| `_08831_` / `_34785_` O21AI_1 | 2 | (685.92,64.26) | 258.72 / 0 |
+
+Long branches and weak one-drive cells support testing targeted slew repair/load splitting or sizing, separately from the active route. They do not prove the best repair or its timing/routability cost. Do not modify the active checkpoint. Separate `l3-hotspot-gl.yaml` prepares the expanded 22-case functional suite for this new repaired netlist, validates source workflow/gates/no-mirroring/slow margin-zero config and records SHA256. Its results are independent of final routing and do not provide SDF timing evidence.
+
 - Separate `l3-repaired-gl` workflow runs all 22 reference-model/available-sigrok protocol cases on the saved repaired netlist using Icarus 13 and pinned cells/macros. It records the netlist SHA256 and validates slow signoff-aware margin-zero repair config. Simulation is functional evidence, not timing simulation or final-netlist evidence.
 - Separate extraction diagnostic is prepared to accept only a successful completed repaired route with final state/ODB/DEF/netlists and zero route DRC. It follows the pinned flow's cleanup/connectivity/fill/extraction/multicorner STA ordering and requires fresh reports from each corner. A timeout is rejected. It is not dispatched before the required route exists and does not replace full DRC/LVS/precheck/viewer/submission validation.
 - Nine local orchestration/guard regression cases pass; workflow YAML and embedded Python parse. Actual L3 and future extracted diagnostics require their own CI evidence.

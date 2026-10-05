@@ -5,6 +5,40 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (independent electrical and repaired-netlist work)
+Done:
+- Mapped no-mirroring slew-driver placement spans: _39031_ NOR3 608.64×147.42 µm, _30323_ NOR4 448.32×18.90, _30187_ NAND4 669.12×124.74, _34785_ O21AI 258.72×0. Connection counts 9/3/4/2 include drivers; origin bounds are not routed lengths. Added quantified targets to electrical audit.
+- Prepared separate l3-hotspot-gl workflow for exact new 37360552753 repaired netlist: expanded 22 cases, pinned Icarus/PDK, source/gate/config validation and SHA256. Independent of routing; functional evidence only. YAML/embedded Python/diff checks pass.
+- No active routing inputs or candidate RTL/config changed; no phase boxes ticked. Earlier annotation-read approval review timed out; unaffected local work proceeded without another retry or new permission request.
+
+Next:
+- Publish/dispatch the independent netlist suite; inspect results alongside routing. Use electrical targets for a later single-change repair trial without altering the active checkpoint.
+
+## 2026-10-05: Codex (workflow email update check)
+Done:
+- Routing 37363064899 remains active in DRT; no final result. Unit retry 37363104833 is queued. Lint retry 37363104841 again ended cancelled with no executed steps, indicating runner provisioning rather than a lint result. Latest test/docs remain passed.
+- Did not launch another immediate lint retry after repeated provisioning failure. No candidate changes or boxes ticked.
+
+Next:
+- Inspect routing and queued unit retry outcomes; retry lint when runner allocation recovers.
+
+## 2026-10-05: Codex (unit completion and runner retry)
+Done:
+- Unit 37363104833 finished: Python/model and RTL/Icarus jobs passed, including chip/L3 tests. Verilator job executed no steps; annotation confirms hosted runner was not acquired. Requested failed-job-only retry.
+- Routing 37363064899 remains in detailed routing. Retried lint 37363104841 is queued; latest test/docs remain green. No final routing or WNS evidence available, no boxes ticked.
+
+Next:
+- Inspect routing completion and runner retries; keep extracted timing/electrical closure open.
+
+## 2026-10-05: Codex (routing and CI status check)
+Done:
+- Routing diagnostic 37363064899 remains in its detailed-route step; setup, checkpoint downloads, provenance validation and pinned image build passed. No final route result available.
+- Latest test 37363105105 and docs 37363180371 passed; unit 37363104833 remains active. Earlier failed CI jobs show cancelled status with no executed steps. Lint 37363104841 annotation: hosted runner was not acquired after multiple attempts, not a code-check failure.
+- Requested retry of runner-allocation-failed lint 37363104841. No candidate or routing inputs changed; no phase boxes ticked.
+
+Next:
+- Inspect routing result when it finishes and the retried lint outcome; preserve electrical and extracted-timing checks as open.
+
 ## 2026-10-05: Codex (guarded no-mirroring routing continuation)
 Done:
 - Mapped 19 slow slew records into shared driver groups: _39031_ NOR3 plus eight loads (9), _30323_ NOR4 plus load/diode (3), _30187_ NAND4 plus buffers/diode (4), _34785_ O21AI plus load (2), SRAM A_MEN (1). Electrical closure remains open; no library limits relaxed.

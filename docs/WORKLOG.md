@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (continuous verification and final routed netlist)
+Done:
+- Extraction 37375411729 has started; no timing result inferred from active status. Continued independent work while source timing is being extracted.
+- Prepared separate l3-hotspot-routed-gl workflow for the final routed netlist from 37363064899, with successful source workflow, zero route DRC, state netlist path, config/gate and SHA256 validation; pinned simulator/models and full expanded suite. This covers routing-stage changes beyond the earlier repaired-netlist suite. YAML/embedded Python/diff checks pass.
+- No phase boxes ticked or hardware inputs changed.
+
+Next:
+- Publish and launch final-netlist verification; keep auditing extraction and outstanding CI without stopping at dispatch acknowledgments.
+
 ## 2026-10-05: Codex (final route audit and extracted timing preparation)
 Done:
 - Downloaded final 37363064899 artifact: one completed DRT state, route__drc_errors=0, route antenna count=0, saved ODB/DEF/nl/pnl all present. Terminal wirelength 1,912,141 µm. This is route evidence, not full DRC/LVS or extracted STA.

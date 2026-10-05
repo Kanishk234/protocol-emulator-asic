@@ -12,7 +12,7 @@ Done:
 - Sixteen helper/Tcl checks pass; YAML/embedded Python/diff checks pass. No phase boxes ticked, no DRT or candidate hardware changes.
 
 Next:
-- Publish and dispatch no-mirroring bounded repair; compare with corrected baseline 37221292614 before any DRT.
+- Published CI 7ffeb94 and docs 44caf4f separately; dispatched no-mirroring bounded repair [37360552753](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37360552753) (queued). Compare with corrected baseline 37221292614 before any DRT.
 
 ## 2026-10-05: Codex (latest WNS status)
 Done:

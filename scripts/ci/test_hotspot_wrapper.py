@@ -60,9 +60,14 @@ source [lindex $argv end]
     wrapper = tmp_path / "wrapper.sh"
     wrapper.write_text(Path(__file__).with_name("openroad_hotspot_wrapper.sh").read_text()
                        .replace("/usr/local/share/tripwire/critical_branch.tcl", str(branch)))
-    env = dict(os.environ, PATH=str(tmp_path) + os.pathsep + os.environ["PATH"],
+    # Model the minimal pinned image: awk is absent. Expose only utilities
+    # already used by the wrapper plus the test's Tcl interpreter.
+    for command in ("bash", "tclsh", "basename", "mktemp", "cat"):
+        (tmp_path / command).symlink_to(shutil.which(command))
+    env = dict(os.environ, PATH=str(tmp_path),
                RUNNER_TEMP=str(tmp_path), TRIPWIRE_BRANCH_REPAIR="1", SCRIPTS_DIR=str(tmp_path / "scripts"))
-    result = subprocess.run(["bash", str(wrapper), str(original)], env=env,
+    assert shutil.which("awk", path=env["PATH"]) is None
+    result = subprocess.run([shutil.which("bash"), str(wrapper), str(original)], env=env,
                             capture_output=True, text=True)
     if reads != 1:
         assert result.returncode != 0

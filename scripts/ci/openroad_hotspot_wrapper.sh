@@ -28,14 +28,25 @@ if {[llength [info commands ::repair_antennas]]} {
 }
 TCL
     if [[ "$(basename -- "$script_path")" == "rsz_timing_postgrt.tcl" && "${TRIPWIRE_BRANCH_REPAIR:-0}" == "1" ]]; then
-        test "$(awk '/^read_current_odb$/ {n++} END {print n+0}' "$script_path")" = "1"
-        awk '/^read_current_odb$/ {
-            print;
-            print "source /usr/local/share/tripwire/critical_branch.tcl";
-            print "tripwire_split_critical_branch";
-            print "source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl";
-            next
-        } {print}' "$script_path" >> "$patched_tcl"
+        read_count=0
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            if [[ "$line" == "read_current_odb" ]]; then
+                ((read_count+=1))
+            fi
+        done < "$script_path"
+        if [[ "$read_count" != "1" ]]; then
+            printf 'Expected one checkpoint read, found %s\n' "$read_count" >&2
+            exit 1
+        fi
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            printf '%s\n' "$line"
+            if [[ "$line" == "read_current_odb" ]]; then
+                printf '%s\n' \
+                    'source /usr/local/share/tripwire/critical_branch.tcl' \
+                    'tripwire_split_critical_branch' \
+                    'source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl'
+            fi
+        done < "$script_path" >> "$patched_tcl"
     else
         printf 'source [list {%s}]\n' "$script_path" >> "$patched_tcl"
     fi

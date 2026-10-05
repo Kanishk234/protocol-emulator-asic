@@ -105,12 +105,18 @@ jobs:
           run = json.loads(Path("/tmp/l3-source-run.json").read_text())
           assert run["conclusion"] == "success"
           assert run["path"] == ".github/workflows/gds-hotspot-drt.yaml"
-          gates = json.loads(Path("../artifacts/runs/hotspot-repair/gates.json").read_text())
+          repair_root = Path("../artifacts/runs/branch-followup")
+          if repair_root.exists():
+              gates = json.loads((repair_root / "gates.json").read_text())
+              assert gates["postantenna_followup"] is True and gates["critical_branch"] is True
+          else:
+              repair_root = Path("../artifacts/runs/hotspot-repair")
+              gates = json.loads((repair_root / "gates.json").read_text())
           assert gates["disable_mirroring"] is True
           assert gates["estimated_timing_and_antenna_pass"] is True
           step = netlist.parent
           cfg = json.loads((step / "config.json").read_text())
-          repair_cfg = json.loads(Path("../artifacts/runs/hotspot-repair/timing/repair/1-openroad-resizertimingpostgrt/config.json").read_text())
+          repair_cfg = json.loads((repair_root / "timing/repair/1-openroad-resizertimingpostgrt/config.json").read_text())
           assert repair_cfg["PL_OPTIMIZE_MIRRORING"] is False
           assert float(cfg["CLOCK_PERIOD"]) == 20
           assert float(cfg["GRT_ADJUSTMENT"]) == 0.16

@@ -25,6 +25,12 @@ on:
         default: "37360552753"
         type: string
 
+      postantenna_followup:
+        description: Use the guarded branch-followup artifact instead of the original repair
+        required: true
+        default: false
+        type: boolean
+
 permissions:
   actions: read
   contents: read
@@ -125,7 +131,7 @@ jobs:
       - name: Download passing no-mirroring repair
         uses: actions/download-artifact@v7
         with:
-          name: gds-hotspot-repair-${{ inputs.repair_run_id }}
+          name: ${{ inputs.postantenna_followup && 'gds-branch-followup' || 'gds-hotspot-repair' }}-${{ inputs.repair_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
@@ -137,6 +143,7 @@ jobs:
           ROUTE_RUN_ID: ${{ inputs.route_run_id }}
           SCREEN_RUN_ID: ${{ inputs.screen_run_id }}
           REPAIR_RUN_ID: ${{ inputs.repair_run_id }}
+          FOLLOWUP: ${{ inputs.postantenna_followup }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
@@ -145,6 +152,7 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$REPAIR_RUN_ID" > /tmp/repair-run.json
           python - <<'PYCODE'
           import json
+          import os
           from pathlib import Path
           run = json.loads(Path("/tmp/source-run.json").read_text())
           assert run["status"] == "completed"
@@ -158,9 +166,14 @@ jobs:
           assert screen["path"] == ".github/workflows/gds-hotspot-screen.yaml"
           repair = json.loads(Path("/tmp/repair-run.json").read_text())
           assert repair["conclusion"] == "success"
-          assert repair["path"] in {".github/workflows/gds-hotspot-repair.yaml", ".github/workflows/gds-critical-branch-repair.yaml"}
-          if repair["path"] == ".github/workflows/gds-critical-branch-repair.yaml":
-              assert json.loads(Path("runs/hotspot-repair/gates.json").read_text())["critical_branch"] is True
+          if os.environ["FOLLOWUP"] == "true":
+              assert repair["path"] == ".github/workflows/gds-critical-branch-followup.yaml"
+              gates = json.loads(Path("runs/branch-followup/gates.json").read_text())
+              assert gates["postantenna_followup"] is True and gates["critical_branch"] is True
+          else:
+              assert repair["path"] in {".github/workflows/gds-hotspot-repair.yaml", ".github/workflows/gds-critical-branch-repair.yaml"}
+              if repair["path"] == ".github/workflows/gds-critical-branch-repair.yaml":
+                  assert json.loads(Path("runs/hotspot-repair/gates.json").read_text())["critical_branch"] is True
           # A failed DRT job is acceptable only for its completed, independently timed antenna state.
           PYCODE
 
@@ -169,7 +182,14 @@ jobs:
 
       - name: Route the validated no-mirroring checkpoint
         timeout-minutes: 330
-        run: python workflow-src/scripts/ci/hotspot_drt.py
+        env:
+          FOLLOWUP: ${{ inputs.postantenna_followup }}
+        run: |
+          args=()
+          if [[ "$FOLLOWUP" == "true" ]]; then
+            args+=(--repair-root runs/branch-followup)
+          fi
+          python workflow-src/scripts/ci/hotspot_drt.py "${args[@]}"
 
       - name: Upload routing evidence
         if: always()
@@ -179,6 +199,7 @@ jobs:
           path: |
             runs/hotspot-drt/**
             runs/hotspot-repair/**
+            runs/branch-followup/**
             src/config_hotspot_*.json
             src/config_merged.json
             src/config_timing_*.json

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Route the audited no-mirroring checkpoint; this is not full signoff."""
 import json
+import argparse
 import os
 from pathlib import Path
 import subprocess
@@ -40,8 +41,8 @@ def validate(root):
     return state
 
 
-def main():
-    state = validate(Path("runs/hotspot-repair"))
+def main(repair_root=Path("runs/hotspot-repair")):
+    state = validate(repair_root)
     config = json.loads(Path("src/config_merged.json").read_text())
     if float(config["CLOCK_PERIOD"]) != 20 or float(config["PL_TARGET_DENSITY_PCT"]) != 56:
         raise ValueError("Wrong candidate")
@@ -60,4 +61,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--repair-root", choices=("runs/hotspot-repair", "runs/branch-followup"),
+                        default="runs/hotspot-repair")
+    main(Path(parser.parse_args().repair_root))

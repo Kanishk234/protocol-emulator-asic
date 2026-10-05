@@ -7,9 +7,9 @@ from hotspot_drt import validate
 from postgrt_timing import CORNERS
 
 
-def prepare(monkeypatch, tmp_path):
+def prepare(monkeypatch, tmp_path, root_name="hotspot-repair"):
     monkeypatch.chdir(tmp_path)
-    root = Path("runs/hotspot-repair")
+    root = Path("runs") / root_name
     state = root / "antenna/3-openroad-checkantennas-1/state_out.json"
     def write(p, data):
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -30,8 +30,9 @@ def prepare(monkeypatch, tmp_path):
     return root, state, write
 
 
-def test_valid_saved_state(monkeypatch, tmp_path):
-    root, state, _ = prepare(monkeypatch, tmp_path)
+@pytest.mark.parametrize("root_name", ["hotspot-repair", "branch-followup"])
+def test_valid_saved_state(monkeypatch, tmp_path, root_name):
+    root, state, _ = prepare(monkeypatch, tmp_path, root_name)
     assert validate(root) == state
 
 

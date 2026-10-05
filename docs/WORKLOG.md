@@ -5,6 +5,24 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (critical branch container dependency fix)
+Done:
+- Diagnosed failed repair 37380322860 from job 112000338612: pinned container has no awk; wrapper aborted before OpenROAD repair. No new timing result. Logged bug #66.
+- Replaced awk with Bash built-in loops and explicit one-read guard. Restricted-PATH wrapper regression excludes awk and confirms insertion ordering and malformed-script rejection; complete helper suite 27 passed, shell/diff checks passed.
+- Latest lint 37380313880, docs 37380313792 and test 37380313782 passed. Unit 37380313735 and final routed L3 37376481257 still active at initial check. No phase boxes ticked.
+
+Next:
+- Publish the scoped fix using ongoing explicit user authorization and launch a fresh repair on the corrected helper revision; inspect real OpenDB execution and per-corner gates before DRT/extraction. WNS remains −6.178462 ns.
+
+## 2026-10-05: Codex (authorized branch trial published and dispatched)
+Done:
+- User explicitly authorized running the prepared publication script, overriding AGENTS.md Git restriction for this action. Initial opaque-script approval review timed out without execution; explicit commands succeeded. Published CI 092cd76 and separate docs 0988430. Hardware-change log for origin/main..main over src/info.yaml/macro was empty before push.
+- Reconfirmed all 27 local helper/Tcl checks passed. Dispatched critical-branch repair 37380322860 on 0988430 with exact source/screen IDs and disabled mirroring; runner acquired and dependency setup active (job 112000338612). Final routed L3 37376481257 still active; unit 37376426740 passed.
+- No new timing result or phase boxes ticked. Actual extracted setup WNS remains −6.178462 ns and fast hold −0.020809 ns.
+
+Next:
+- Inspect actual branch insertion, legalization, estimated multicorner/electrical and antenna results. If guarded gates pass, continue DRT and extraction before claiming improvement; audit final L3 result independently.
+
 ## 2026-10-05: Codex (repair-hook validation and complete hold audit)
 Done:
 - Added real wrapper execution tests for insertion ordering and rejection of missing/duplicate ODB reads. All 27 helper/Tcl tests passed; diff checks passed.

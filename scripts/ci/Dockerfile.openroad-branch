@@ -1,0 +1,5 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY --chmod=755 openroad_hotspot_wrapper.sh /usr/local/bin/tripwire-openroad-hotspot
+COPY critical_branch.tcl /usr/local/share/tripwire/critical_branch.tcl
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-openroad-hotspot
+ENV TRIPWIRE_BRANCH_REPAIR=1

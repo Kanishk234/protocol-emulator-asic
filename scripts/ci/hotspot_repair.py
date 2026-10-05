@@ -20,7 +20,9 @@ def repair_config(disable_mirroring):
     return path
 
 
-def main(disable_mirroring=False):
+def main(disable_mirroring=False, critical_branch=False):
+    if critical_branch and not disable_mirroring:
+        raise ValueError("Branch comparison requires the established no-mirroring baseline")
     root = Path("runs/hotspot-repair")
     source = Path("runs/hotspot-screen/region/2-openroad-checkantennas/state_out.json")
     provenance = json.loads(Path("runs/hotspot-screen/screen.json").read_text())
@@ -47,6 +49,8 @@ def main(disable_mirroring=False):
         raise ValueError("Repair did not disable mirroring")
     if "TRIPWIRE hotspot screen:" not in (repair / "openroad-resizertimingpostgrt.log").read_text():
         raise ValueError("Timing repair failed to preserve region reservation")
+    if critical_branch and "TRIPWIRE critical branch:" not in (repair / "openroad-resizertimingpostgrt.log").read_text():
+        raise ValueError("Missing critical-branch execution evidence")
     config = json.loads(config_path.read_text())
     config.update(GRT_ADJUSTMENT=0.16, OPENROAD_THREADS=4,
                   PNR_SDC_FILE=str(Path("src/signoff.sdc").resolve()))
@@ -73,10 +77,12 @@ def main(disable_mirroring=False):
     ready &= metrics["antenna__violating__nets"] == 0 and metrics["antenna__violating__pins"] == 0
     (root / "gates.json").write_text(json.dumps({"state": str(final), "antenna": metrics,
         "estimated_timing_and_antenna_pass": ready, "drt_launched": False,
-        "disable_mirroring": disable_mirroring}, indent=2) + "\n")
+        "disable_mirroring": disable_mirroring, "critical_branch": critical_branch}, indent=2) + "\n")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--disable-mirroring", action="store_true")
-    main(parser.parse_args().disable_mirroring)
+    parser.add_argument("--critical-branch", action="store_true")
+    args = parser.parse_args()
+    main(args.disable_mirroring, args.critical_branch)

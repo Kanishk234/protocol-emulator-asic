@@ -27,7 +27,18 @@ if {[llength [info commands ::repair_antennas]]} {
     }
 }
 TCL
-    printf 'source [list {%s}]\n' "$script_path" >> "$patched_tcl"
+    if [[ "$(basename -- "$script_path")" == "rsz_timing_postgrt.tcl" && "${TRIPWIRE_BRANCH_REPAIR:-0}" == "1" ]]; then
+        test "$(awk '/^read_current_odb$/ {n++} END {print n+0}' "$script_path")" = "1"
+        awk '/^read_current_odb$/ {
+            print;
+            print "source /usr/local/share/tripwire/critical_branch.tcl";
+            print "tripwire_split_critical_branch";
+            print "source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl";
+            next
+        } {print}' "$script_path" >> "$patched_tcl"
+    else
+        printf 'source [list {%s}]\n' "$script_path" >> "$patched_tcl"
+    fi
     args[$script_index]="$patched_tcl"
 fi
 exec "$real_openroad" "${args[@]}"

@@ -1,4 +1,4 @@
-name: gds-hotspot-drt
+name: gds-critical-branch-repair
 
 on:
   workflow_dispatch:
@@ -19,25 +19,25 @@ on:
         default: "37219355996"
         type: string
 
-      repair_run_id:
-        description: Successful no-mirroring repair checkpoint
+      disable_mirroring:
+        description: Disable only repair-stage placement mirroring for a controlled comparison
         required: true
-        default: "37360552753"
-        type: string
+        default: true
+        type: boolean
 
 permissions:
   actions: read
   contents: read
 
 concurrency:
-  group: gds-hotspot-drt-${{ inputs.route_run_id }}
+  group: gds-critical-branch-repair-${{ inputs.route_run_id }}
   cancel-in-progress: false
 
 jobs:
   detailed-route:
-    name: R4 no-mirroring post-antenna detailed routing
+    name: R4 critical branch timing and antenna repair screen
     runs-on: ubuntu-24.04
-    timeout-minutes: 360
+    timeout-minutes: 90
     env:
       PDK_ROOT: /home/runner/pdk
       CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
@@ -122,27 +122,16 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ inputs.screen_run_id }}
 
-      - name: Download passing no-mirroring repair
-        uses: actions/download-artifact@v7
-        with:
-          name: gds-hotspot-repair-${{ inputs.repair_run_id }}
-          path: .
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          run-id: ${{ inputs.repair_run_id }}
-
       - name: Validate checkpoint provenance
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ROUTE_RUN_ID: ${{ inputs.route_run_id }}
           SCREEN_RUN_ID: ${{ inputs.screen_run_id }}
-          REPAIR_RUN_ID: ${{ inputs.repair_run_id }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ROUTE_RUN_ID" > /tmp/source-run.json
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SCREEN_RUN_ID" > /tmp/screen-run.json
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$REPAIR_RUN_ID" > /tmp/repair-run.json
           python - <<'PYCODE'
           import json
           from pathlib import Path
@@ -156,30 +145,30 @@ jobs:
           screen = json.loads(Path("/tmp/screen-run.json").read_text())
           assert screen["conclusion"] == "success"
           assert screen["path"] == ".github/workflows/gds-hotspot-screen.yaml"
-          repair = json.loads(Path("/tmp/repair-run.json").read_text())
-          assert repair["conclusion"] == "success"
-          assert repair["path"] in {".github/workflows/gds-hotspot-repair.yaml", ".github/workflows/gds-critical-branch-repair.yaml"}
-          if repair["path"] == ".github/workflows/gds-critical-branch-repair.yaml":
-              assert json.loads(Path("runs/hotspot-repair/gates.json").read_text())["critical_branch"] is True
           # A failed DRT job is acceptable only for its completed, independently timed antenna state.
           PYCODE
 
       - name: Build pinned region-screen image
-        run: docker build --tag tripwire-hotspot:local --file workflow-src/scripts/ci/Dockerfile.openroad-hotspot workflow-src/scripts/ci
+        run: docker build --tag tripwire-hotspot:local --file workflow-src/scripts/ci/Dockerfile.openroad-branch workflow-src/scripts/ci
 
-      - name: Route the validated no-mirroring checkpoint
-        timeout-minutes: 330
-        run: python workflow-src/scripts/ci/hotspot_drt.py
+      - name: Repair timing and antenna then measure corners
+        timeout-minutes: 65
+        env:
+          DISABLE_MIRRORING: ${{ inputs.disable_mirroring }}
+        run: |
+          args=(--critical-branch)
+          if [[ "$DISABLE_MIRRORING" == "true" ]]; then
+            args+=(--disable-mirroring)
+          fi
+          python workflow-src/scripts/ci/hotspot_repair.py "${args[@]}"
 
-      - name: Upload routing evidence
+      - name: Upload bounded screen evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: gds-hotspot-drt-${{ github.run_id }}
+          name: gds-hotspot-repair-${{ github.run_id }}
           path: |
-            runs/hotspot-drt/**
             runs/hotspot-repair/**
             src/config_hotspot_*.json
-            src/config_merged.json
             src/config_timing_*.json
           if-no-files-found: warn

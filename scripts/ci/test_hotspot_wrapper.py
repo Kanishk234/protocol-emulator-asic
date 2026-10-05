@@ -6,7 +6,7 @@ import subprocess
 import pytest
 
 
-@pytest.mark.parametrize("name", ["grt.tcl", "rsz_timing_postgrt.tcl", "antenna_repair.tcl", "sta.tcl"])
+@pytest.mark.parametrize("name", ["grt.tcl", "rsz_timing_postgrt.tcl", "antenna_repair.tcl", "drt.tcl", "sta.tcl"])
 def test_reservation_survives_each_rerouting_entry(tmp_path, name):
     if shutil.which("tclsh") is None:
         pytest.skip("Tcl interpreter unavailable")

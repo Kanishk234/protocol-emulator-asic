@@ -1,0 +1,183 @@
+name: gds-hotspot-drt
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Full GDS run containing the original stage-39 checkpoint
+        required: true
+        default: "37037880327"
+        type: string
+      route_run_id:
+        description: Routing run containing the audited repaired post-antenna checkpoint
+        required: true
+        default: "37187027878"
+        type: string
+      screen_run_id:
+        description: Completed matched local-resource screen
+        required: true
+        default: "37219355996"
+        type: string
+
+      repair_run_id:
+        description: Successful no-mirroring repair checkpoint
+        required: true
+        default: "37360552753"
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: gds-hotspot-drt-${{ inputs.route_run_id }}
+  cancel-in-progress: false
+
+jobs:
+  detailed-route:
+    name: R4 no-mirroring post-antenna detailed routing
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      OPENROAD_THREADS: "4"
+      GRT_ADJUSTMENT: "0.16"
+
+    steps:
+      - name: Check out the exact R4 candidate at the artifact's original path
+        uses: actions/checkout@v6
+        with:
+          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check out workflow helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Check out Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: ihp-sg13cmos5l
+          path: tt
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tt/requirements.txt
+
+      - name: Install Tiny Tapeout prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+
+      - name: Install flow dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: Install IHP PDK
+        run: ./.tt-gds-action/install_sg13cmos5l.sh
+
+      - name: Install pinned LibreLane
+        run: pip install librelane==3.1.0.dev3
+
+      - name: Download the full GDS checkpoint artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: GDS_logs-${{ inputs.source_run_id }}
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Download the repaired post-antenna checkpoint
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-repaired-drt-${{ inputs.route_run_id }}
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.route_run_id }}
+
+      - name: Download matched region screen
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-hotspot-screen-${{ inputs.screen_run_id }}
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.screen_run_id }}
+
+      - name: Download passing no-mirroring repair
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-hotspot-repair-${{ inputs.repair_run_id }}
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.repair_run_id }}
+
+      - name: Validate checkpoint provenance
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ROUTE_RUN_ID: ${{ inputs.route_run_id }}
+          SCREEN_RUN_ID: ${{ inputs.screen_run_id }}
+          REPAIR_RUN_ID: ${{ inputs.repair_run_id }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ROUTE_RUN_ID" > /tmp/source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SCREEN_RUN_ID" > /tmp/screen-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$REPAIR_RUN_ID" > /tmp/repair-run.json
+          python - <<'PYCODE'
+          import json
+          from pathlib import Path
+          run = json.loads(Path("/tmp/source-run.json").read_text())
+          assert run["status"] == "completed"
+          assert run["path"] == ".github/workflows/gds-repaired-drt-continuation.yaml"
+          assert Path.cwd().resolve() == Path("/home/runner/work/protocol-emulator-asic/protocol-emulator-asic")
+          defs = Path("src/trw_defs.vh").read_text().splitlines()
+          for key, value in {"TRW_LANES":"2", "TRW_UNITS":"4", "TRW_PC_UNITS_BITSYNC":"4'b0001"}.items():
+              assert f"`define {key} {value}" in defs
+          screen = json.loads(Path("/tmp/screen-run.json").read_text())
+          assert screen["conclusion"] == "success"
+          assert screen["path"] == ".github/workflows/gds-hotspot-screen.yaml"
+          repair = json.loads(Path("/tmp/repair-run.json").read_text())
+          assert repair["conclusion"] == "success"
+          assert repair["path"] == ".github/workflows/gds-hotspot-repair.yaml"
+          # A failed DRT job is acceptable only for its completed, independently timed antenna state.
+          PYCODE
+
+      - name: Build pinned region-screen image
+        run: docker build --tag tripwire-hotspot:local --file workflow-src/scripts/ci/Dockerfile.openroad-hotspot workflow-src/scripts/ci
+
+      - name: Route the validated no-mirroring checkpoint
+        timeout-minutes: 330
+        run: python workflow-src/scripts/ci/hotspot_drt.py
+
+      - name: Upload routing evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-hotspot-drt-${{ github.run_id }}
+          path: |
+            runs/hotspot-drt/**
+            runs/hotspot-repair/**
+            src/config_hotspot_*.json
+            src/config_merged.json
+            src/config_timing_*.json
+          if-no-files-found: warn

@@ -12,7 +12,7 @@ Done:
 - No active routing inputs or candidate RTL/config changed; no phase boxes ticked. Earlier annotation-read approval review timed out; unaffected local work proceeded without another retry or new permission request.
 
 Next:
-- Publish/dispatch the independent netlist suite; inspect results alongside routing. Use electrical targets for a later single-change repair trial without altering the active checkpoint.
+- Published CI 731c1c9 and docs 1f5228a separately; independent netlist suite [37370664368](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37370664368) dispatched (queued). Inspect results alongside routing. Use electrical targets for a later single-change repair trial without altering the active checkpoint.
 
 ## 2026-10-05: Codex (workflow email update check)
 Done:

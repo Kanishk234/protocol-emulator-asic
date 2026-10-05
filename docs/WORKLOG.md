@@ -5,6 +5,33 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (guarded no-mirroring routing continuation)
+Done:
+- Mapped 19 slow slew records into shared driver groups: _39031_ NOR3 plus eight loads (9), _30323_ NOR4 plus load/diode (3), _30187_ NAND4 plus buffers/diode (4), _34785_ O21AI plus load (2), SRAM A_MEN (1). Electrical closure remains open; no library limits relaxed.
+- Added owned hotspot-drt workflow/helper to restore exact passing 37360552753 checkpoint and dependencies. Independently validate no-mirroring, signoff constraints, margin 0, three-corner setup/hold counts, antenna 0 and state files before one-step DRT. Four threads, five-iteration marker reports, 330-minute route limit; preserve region hook during DRT antenna reroutes.
+- Twenty-one helper/Tcl checks pass, including negative timing, dirty antenna and missing state refusal. Workflow YAML/embedded Python and diff checks pass. No phase boxes ticked or candidate changes.
+
+Next:
+- Publish and launch route diagnostic, judge convergence/marker geometry against earlier 108-marker timeout. Preserve separate electrical follow-up and require extraction/full signoff after a completed clean route.
+
+## 2026-10-05: Codex (no-mirroring repair result)
+Done:
+- Audited successful run 37360552753 artifacts: no-mirroring repair has setup WS/WNS 0 and zero setup/hold violations in all corners after antenna repair. Hold WS fast/slow/typ +0.0499802/+0.302909/+0.141023 ns. Antenna nets/pins 0/0; gates.json confirms estimated timing/antenna pass and no DRT launched.
+- Compared with mirroring baseline 37221292614 slow WS −0.124212 ns / 15 setup violations. Trial preserves timing through downstream geometry, but has slow/typ slew 19/1 (fast 0), fanout 189, cap 0. These electrical issues and extracted routed timing remain open.
+- Repair inserted 8 buffers and upsized 4 cells; antenna repair added 76 diodes and 63 jumpers. No candidate hardware changes or phase boxes ticked.
+
+Next:
+- Map the 19 remaining slow slew violators and prepare a guarded DRT trial from the exact no-mirroring post-antenna state. A successful estimated timing screen is not final signoff; extracted all-corner timing and electrical closure remain necessary.
+
+## 2026-10-05: Codex (baseline timing-cone audit during mirroring trial)
+Done:
+- No-mirroring run 37360552753 passed setup, artifact validation and image build; active in timing/antenna/corner-check step. No result inferred from active status.
+- Mapped corrected baseline worst path: U0 config word 4 bit 0 (_49036_) to dropped[21] (_48147_); remaining separate failing cone is U0 config word 0 bit 0 (_49139_) to BITSYNC tb[24] (_47080_). Preserved timed live configuration and same-cycle feedback.
+- Quantified worst estimated path: 50 output arcs sum 16.019526 ns, input/net increments 0.084843 ns. Largest arcs and interpretation limits recorded in PHASE2_REPAIRED_ROUTE_AUDIT.md. These are estimated parasitics; no routed improvement or root cause claimed. No phase boxes ticked or hardware changes.
+
+Next:
+- Inspect the no-mirroring result when available. If slow timing remains negative, use the common-cone delay/load evidence to choose a single controlled repair; do not dispatch DRT from a failing state.
+
 ## 2026-10-05: Codex (controlled repair mirroring screen)
 Done:
 - Audited corrected 37221292614: clean antenna checks, slow setup WS −0.124212 ns / TNS −1.33337 ns / 15 violations; fourteen from _49036_, one _49139_→_47080_. Fast/typ setup and all hold pass estimated checks. Slew fast/slow/typ 0/1/1, fanout 193, cap 0. Bug #64 CI fix confirmed.

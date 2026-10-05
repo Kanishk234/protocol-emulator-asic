@@ -20,10 +20,23 @@ def repair_config(disable_mirroring):
     return path
 
 
-def main(disable_mirroring=False, critical_branch=False):
+def followup_source(previous):
+    gates = json.loads((previous / "gates.json").read_text())
+    source = previous / "antenna/3-openroad-checkantennas-1/state_out.json"
+    if Path(gates["state"]).resolve() != source.resolve() or not gates["critical_branch"] or not gates["disable_mirroring"]:
+        raise ValueError("Unexpected branch follow-up source")
+    antenna = json.loads(source.with_name("or_metrics_out.json").read_text())
+    if antenna["antenna__violating__nets"] or antenna["antenna__violating__pins"]:
+        raise ValueError("Follow-up requires clean source antenna")
+    return source
+
+
+def main(disable_mirroring=False, critical_branch=False, postantenna=False):
     if critical_branch and not disable_mirroring:
         raise ValueError("Branch comparison requires the established no-mirroring baseline")
-    root = Path("runs/hotspot-repair")
+    if postantenna and (critical_branch or not disable_mirroring):
+        raise ValueError("Follow-up must retain no-mirroring and must not reinsert the branch")
+    root = Path("runs/branch-followup" if postantenna else "runs/hotspot-repair")
     source = Path("runs/hotspot-screen/region/2-openroad-checkantennas/state_out.json")
     provenance = json.loads(Path("runs/hotspot-screen/screen.json").read_text())
     if Path(provenance["region"]["state"]).resolve() != source.resolve():
@@ -34,6 +47,8 @@ def main(disable_mirroring=False, critical_branch=False):
     log = Path("runs/hotspot-screen/region/1-openroad-globalrouting/openroad-globalrouting.log")
     if "TRIPWIRE hotspot screen:" not in log.read_text():
         raise ValueError("Missing region execution evidence")
+    if postantenna:
+        source = followup_source(Path("runs/hotspot-repair"))
     state = json.loads(source.read_text())
     for key in ("odb", "def", "nl", "pnl", "sdc"):
         if not Path(state[key]).is_file():
@@ -77,12 +92,14 @@ def main(disable_mirroring=False, critical_branch=False):
     ready &= metrics["antenna__violating__nets"] == 0 and metrics["antenna__violating__pins"] == 0
     (root / "gates.json").write_text(json.dumps({"state": str(final), "antenna": metrics,
         "estimated_timing_and_antenna_pass": ready, "drt_launched": False,
-        "disable_mirroring": disable_mirroring, "critical_branch": critical_branch}, indent=2) + "\n")
+        "disable_mirroring": disable_mirroring, "critical_branch": critical_branch or postantenna,
+        "postantenna_followup": postantenna}, indent=2) + "\n")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--disable-mirroring", action="store_true")
     parser.add_argument("--critical-branch", action="store_true")
+    parser.add_argument("--postantenna", action="store_true")
     args = parser.parse_args()
-    main(args.disable_mirroring, args.critical_branch)
+    main(args.disable_mirroring, args.critical_branch, args.postantenna)

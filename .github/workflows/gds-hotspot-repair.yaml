@@ -19,6 +19,12 @@ on:
         default: "37219355996"
         type: string
 
+      disable_mirroring:
+        description: Disable only repair-stage placement mirroring for a controlled comparison
+        required: true
+        default: false
+        type: boolean
+
 permissions:
   actions: read
   contents: read
@@ -147,7 +153,14 @@ jobs:
 
       - name: Repair timing and antenna then measure corners
         timeout-minutes: 65
-        run: python workflow-src/scripts/ci/hotspot_repair.py
+        env:
+          DISABLE_MIRRORING: ${{ inputs.disable_mirroring }}
+        run: |
+          args=()
+          if [[ "$DISABLE_MIRRORING" == "true" ]]; then
+            args+=(--disable-mirroring)
+          fi
+          python workflow-src/scripts/ci/hotspot_repair.py "${args[@]}"
 
       - name: Upload bounded screen evidence
         if: always()

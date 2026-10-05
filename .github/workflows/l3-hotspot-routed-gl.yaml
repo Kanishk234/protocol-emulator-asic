@@ -110,7 +110,8 @@ jobs:
           assert gates["estimated_timing_and_antenna_pass"] is True
           step = netlist.parent
           cfg = json.loads((step / "config.json").read_text())
-          assert cfg["PL_OPTIMIZE_MIRRORING"] is False
+          repair_cfg = json.loads(Path("../artifacts/runs/hotspot-repair/timing/repair/1-openroad-resizertimingpostgrt/config.json").read_text())
+          assert repair_cfg["PL_OPTIMIZE_MIRRORING"] is False
           assert float(cfg["CLOCK_PERIOD"]) == 20
           assert float(cfg["GRT_ADJUSTMENT"]) == 0.16
           state = json.loads((step / "state_out.json").read_text())

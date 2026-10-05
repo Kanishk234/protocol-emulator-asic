@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Prepared extraction/STA diagnostic; requires an actual completed clean route."""
+import argparse
 import json
 import os
 import subprocess
@@ -25,8 +26,8 @@ def route_checkpoint(root):
     return states[0]
 
 
-def main():
-    checkpoint = route_checkpoint(Path("runs/repaired-route/drt"))
+def main(route_root=Path("runs/repaired-route/drt")):
+    checkpoint = route_checkpoint(route_root)
     config = json.loads(Path("src/config_merged.json").read_text())
     if float(config["CLOCK_PERIOD"]) != 20:
         raise ValueError("Expected the unchanged 20 ns candidate")
@@ -63,4 +64,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--route-root", type=Path, default=Path("runs/repaired-route/drt"))
+    main(parser.parse_args().route_root)

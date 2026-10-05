@@ -12,7 +12,7 @@ Done:
 - Requested failed-job retries of latest unit 37370695839, docs 37370695882 and independent L3 37370664368. No candidate changes or phase boxes ticked.
 
 Next:
-- Publish and launch extraction; inspect actual routed WNS/hold/electrical results and prerequisite check outcomes. Continue full physical signoff only after the measured result supports it.
+- Published CI 0c9726b and docs 30ff3f5 separately; extraction [37375411729](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37375411729) dispatched (queued). Inspect actual routed WNS/hold/electrical results and prerequisite check outcomes. Continue full physical signoff only after the measured result supports it.
 
 ## 2026-10-05: Codex (routing log zero violations confirmed)
 Done:

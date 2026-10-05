@@ -5,6 +5,41 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (final route audit and extracted timing preparation)
+Done:
+- Downloaded final 37363064899 artifact: one completed DRT state, route__drc_errors=0, route antenna count=0, saved ODB/DEF/nl/pnl all present. Terminal wirelength 1,912,141 µm. This is route evidence, not full DRC/LVS or extracted STA.
+- Added separate hotspot-extracted-timing workflow and explicit route-root selection in existing guarded helper. Restore original source plus hotspot route artifact; check success/provenance, final DRC/files, then cleanup, antenna, connectivity, wirelength, fill, extraction and multicorner signoff-view STA. Twenty-two helper/Tcl checks pass; YAML/embedded Python/diff checks pass.
+- Requested failed-job retries of latest unit 37370695839, docs 37370695882 and independent L3 37370664368. No candidate changes or phase boxes ticked.
+
+Next:
+- Publish and launch extraction; inspect actual routed WNS/hold/electrical results and prerequisite check outcomes. Continue full physical signoff only after the measured result supports it.
+
+## 2026-10-05: Codex (routing log zero violations confirmed)
+Done:
+- Downloaded completed DRT log 37363064899. First routing pass reached zero violations at 20:40:04; subsequent antenna repair/reroute reached zero again at 20:57:47, then flow completed. This confirms terminal router-reported zero violations, not full signoff DRC/LVS or extracted timing.
+- Latest unit RTL job passed including chip/L3 tests; other jobs were cancelled with no steps. Latest lint/test passed; protocol retry did not execute tests. No main workflows in progress at check time.
+
+Next:
+- Audit final saved route state/antenna metrics and run extraction if checkpoint validation passes. Final routed WNS remains unmeasured for this trial.
+
+## 2026-10-05: Codex (routing workflow completed)
+Done:
+- Routing 37363064899 completed successfully, 19:29:14–20:58:46 UTC (~1 h 30 min including setup). Route step and artifact upload passed. Final DRC/state and extracted timing are not yet audited; no clean-route or timing-closure claim from job conclusion alone.
+- L3 retry 37370664368 cancelled with no executed steps; protocol checks have not run. Latest lint/test passed; latest unit remains active, latest docs job was cancelled earlier.
+- Started retrieving final routing log to verify route output; no boxes ticked.
+
+Next:
+- Audit final route DRC/state, then prepare extraction if clean. Resolve independent protocol runner allocation; electrical and final signoff remain open.
+
+## 2026-10-05: Codex (independent verification runner allocation)
+Done:
+- L3-hotspot-gl 37370664368 failed before executing steps: annotation confirms no hosted runner acquired. Requested one failed-job retry; no protocol failure or pass is established.
+- Routing 37363064899 remains active. Latest lint/test passed; two recent unit workflows are running. Latest docs job ended cancelled with no steps, while preceding docs run passed.
+- No hardware changes, phase boxes or new timing evidence.
+
+Next:
+- Inspect routing and independent L3 retry results when available; distinguish provisioning failures from executed check failures.
+
 ## 2026-10-05: Codex (independent electrical and repaired-netlist work)
 Done:
 - Mapped no-mirroring slew-driver placement spans: _39031_ NOR3 608.64×147.42 µm, _30323_ NOR4 448.32×18.90, _30187_ NAND4 669.12×124.74, _34785_ O21AI 258.72×0. Connection counts 9/3/4/2 include drivers; origin bounds are not routed lengths. Added quantified targets to electrical audit.

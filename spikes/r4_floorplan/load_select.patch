@@ -1,0 +1,32 @@
+--- a/src/trw_chan_port.v
++++ b/src/trw_chan_port.v
+@@ -53,20 +53,26 @@
+     output reg  [7:0]      dropped
+ );
+     // selected source; a sel beyond the list selects nothing
+-    reg        s_valid, s_seq, s_load, w_seq;
++    reg        s_valid, s_seq, w_seq;
++    wire [N-1:0] load_terms;
++    genvar source;
++    generate
++        for (source = 0; source < N; source = source + 1) begin : g_load_select
++            assign load_terms[source] = ({28'd0, sel} == source) && src_load[source];
++        end
++    endgenerate
++    wire s_load = |load_terms;
+     reg [17:0] s_tok;
+     integer n;
+     always @* begin
+         s_valid = 1'b0;
+         s_seq   = 1'b0;
+-        s_load  = 1'b0;
+         s_tok   = 18'd0;
+         w_seq   = 1'b0;
+         for (n = 0; n < N; n = n + 1) begin
+             if ({28'd0, sel} == n) begin
+                 s_valid = src_valid[n];
+                 s_seq   = src_seq[n];
+-                s_load  = src_load[n];
+                 s_tok   = src_tok[18*n +: 18];
+             end
+             if ({28'd0, cfg_sel} == n)

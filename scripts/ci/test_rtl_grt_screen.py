@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from rtl_grt_screen import checkpoint
+from rtl_grt_screen import checkpoint, timing_placement
 
 
 @pytest.mark.parametrize("failure", [None, "missing_odb", "drt", "second_grt"])
@@ -27,3 +27,11 @@ def test_screen_requires_unique_complete_preroute_state(tmp_path, failure):
             checkpoint(tmp_path)
     else:
         assert checkpoint(tmp_path) == source
+
+
+def test_placement_override_is_isolated_and_unknown_variants_refused():
+    assert timing_placement("timing-placement") is True
+    for variant in ("baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input"):
+        assert timing_placement(variant) is False
+    with pytest.raises(ValueError):
+        timing_placement("unknown")

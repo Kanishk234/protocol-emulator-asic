@@ -1,0 +1,44 @@
+--- a/src/trw_pin_io.v
++++ b/src/trw_pin_io.v
+@@ -31,20 +31,28 @@
+     output reg         sel_q,
+     output wire        sel_fall
+ );
+-    wire       s_on  = (pin_s < 5'd24);
+-    wire [4:0] a_idx = s_on ? pin_s : pin_a;
+-    wire       a_on  = (a_idx < 5'd24);
+-    wire       b_on  = (pin_b < 5'd24);
+-    wire       c_on  = (pin_c < 5'd24);
++    // Parallel decode keeps pin-index selection out of the pad data path.
++    // Pin S retains priority; invalid pin indices keep their original defaults.
++    wire s_on = (pin_s < 5'd24);
++    wire a_on = s_on || (pin_a < 5'd24);
++    wire b_on = (pin_b < 5'd24);
++    wire c_on = (pin_c < 5'd24);
++    wire [23:0] a_match, b_match, c_match;
++    genvar pad;
++    generate
++        for (pad = 0; pad < 24; pad = pad + 1) begin : g_decode
++            assign a_match[pad] = (pin_s == pad) || (!s_on && (pin_a == pad));
++            assign b_match[pad] = (pin_b == pad);
++            assign c_match[pad] = (pin_c == pad);
++        end
++    endgenerate
++    wire decoded_a_pad = |(a_match & pads);
++    wire decoded_b_pad = |(b_match & pads);
++    wire decoded_c_pad = |(c_match & pads);
+ 
+-    // Index the pad vector only with in-range values (the `*_on` checks pick the default otherwise).
+-    wire       a_pad = pads[a_on ? a_idx : 5'd0];
+-    wire       b_pad = pads[b_on ? pin_b : 5'd0];
+-    wire       c_pad = pads[c_on ? pin_c : 5'd0];
+-
+-    assign a_in = a_on ? a_pad : idle;
+-    assign b_in = b_on && b_pad;
+-    assign c_in = c_on ? c_pad : c_active;
++    assign a_in = a_on ? decoded_a_pad : idle;
++    assign b_in = b_on && decoded_b_pad;
++    assign c_in = c_on ? decoded_c_pad : c_active;
+     assign sel  = (c_in == c_active);
+     assign sel_fall = sel_q && !sel;
+ 

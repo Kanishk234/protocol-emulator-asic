@@ -1,0 +1,176 @@
+--- a/src/trw_pin_io.v
++++ b/src/trw_pin_io.v
+@@ -12,13 +12,15 @@
+ //     restart ever creates an edge. `sel_fall` = 1 in the clock pin C becomes inactive (P15).
+ `default_nettype none
+ 
+-module trw_pin_io (
++module trw_pin_io #(parameter INPUT_PREDECODE = 0) (
+     input  wire        clk,
+     input  wire [23:0] pads,
+     input  wire [4:0]  pin_a,
+     input  wire [4:0]  pin_s,
+     input  wire [4:0]  pin_b,
+     input  wire [4:0]  pin_c,
++    input  wire [23:0] pin_a_mask,
++    input  wire [23:0] pin_s_mask,
+     input  wire        idle,
+     input  wire        c_active,
+     output wire        a_in,
+@@ -42,7 +44,11 @@
+     wire       b_pad = pads[b_on ? pin_b : 5'd0];
+     wire       c_pad = pads[c_on ? pin_c : 5'd0];
+ 
+-    assign a_in = a_on ? a_pad : idle;
++    wire mask_s_on = |pin_s_mask;
++    wire mask_a_on = mask_s_on || (|pin_a_mask);
++    wire mask_a_pad = (|(pin_s_mask & pads)) || (!mask_s_on && (|(pin_a_mask & pads)));
++    assign a_in = (INPUT_PREDECODE != 0) ? (mask_a_on ? mask_a_pad : idle)
++                                       : (a_on ? a_pad : idle);
+     assign b_in = b_on && b_pad;
+     assign c_in = c_on ? c_pad : c_active;
+     assign sel  = (c_in == c_active);
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -22,6 +22,7 @@
+ `include "trw_defs.vh"
+ 
+ module trw_pin_cfg #(
++    parameter INPUT_PREDECODE = 0,
+     parameter FULL = 1
+ ) (
+     input  wire                    clk,
+@@ -30,6 +31,8 @@
+     input  wire [4:0]              waddr,
+     input  wire [15:0]             wdata,
+     output wire [`TRW_PC_BITS-1:0] cfg,
++    output wire [23:0]             pin_a_mask,
++    output wire [23:0]             pin_s_mask,
+     output wire                    carrier_active,
+     output reg                     restart
+ );
+@@ -106,6 +109,9 @@
+             wdata_q <= wdata;
+     end
+ 
++`ifndef TRW_PIN_CFG_FLOPS
++    wire [NW-1:0] word_gclk;
++`endif
+     genvar w, b;
+     generate
+         for (w = 0; w < NW; w = w + 1) begin : g_word
+@@ -124,6 +130,7 @@
+                 end
+ `else
+                 wire gclk;
++                assign word_gclk[w] = gclk;
+                 /* verilator lint_off LATCH */
+ `ifdef SYNTHESIS
+                 // Synthesis (Yosys, LibreLane): the library's integrated clock gate.
+@@ -154,11 +161,49 @@
+                 /* verilator lint_on LATCH */
+ `endif
+             end else begin : g_empty
++`ifndef TRW_PIN_CFG_FLOPS
++                assign word_gclk[w] = 1'b0;
++`endif
+                 assign cfg[16*w +: 16] = 16'h0000;
+             end
+         end
+     endgenerate
+ 
++    // General cached selection masks; reuse each field's existing word clock.
++    // Raw encoded configuration remains unchanged. No new sample or feedback stage.
++    generate
++        if (INPUT_PREDECODE != 0) begin : g_input_masks
++            reg [23:0] a_mask, s_mask;
++`ifdef TRW_PIN_CFG_FLOPS
++            always @(posedge clk) begin
++                if (!rst_n) begin
++                    a_mask <= 24'd1;
++                    s_mask <= 24'd1;
++                end else begin
++                    if (we && (waddr == (`TRW_PC_PIN_A_LSB / 16)))
++                        a_mask <= 24'd1 << wdata[`TRW_PC_PIN_A_LSB % 16 +: 5];
++                    if (we && (waddr == (`TRW_PC_PIN_S_LSB / 16)))
++                        s_mask <= 24'd1 << wdata[`TRW_PC_PIN_S_LSB % 16 +: 5];
++                end
++            end
++`else
++            /* verilator lint_off LATCH */
++            always @* begin
++                if (word_gclk[`TRW_PC_PIN_A_LSB / 16])
++                    a_mask = 24'd1 << wdata_q[`TRW_PC_PIN_A_LSB % 16 +: 5];
++                if (word_gclk[`TRW_PC_PIN_S_LSB / 16])
++                    s_mask = 24'd1 << wdata_q[`TRW_PC_PIN_S_LSB % 16 +: 5];
++            end
++            /* verilator lint_on LATCH */
++`endif
++            assign pin_a_mask = a_mask;
++            assign pin_s_mask = s_mask;
++        end else begin : g_no_input_masks
++            assign pin_a_mask = 24'd0;
++            assign pin_s_mask = 24'd0;
++        end
++    endgenerate
++
+ `ifdef TRW_PIN_CFG_FLOPS
+     wire _unused = &{1'b0, wdata_q};
+ `endif
+--- a/src/trw_chip.v
++++ b/src/trw_chip.v
+@@ -175,17 +175,18 @@
+         for (u = 0; u < NU; u = u + 1) begin : g_unit
+             localparam FULL = (`TRW_PC_UNITS_PULSE >> u) & 1;               // D-040: U0-U1 full
+             wire [`TRW_PC_BITS-1:0] cfg;
++            wire [23:0] pin_a_mask, pin_s_mask;
+             wire        carrier_active;
+             wire        restart, rx_load, rx_free;
+             wire [1:0]  rx_tag;
+             wire [15:0] rx_data;
+-            trw_pin_cfg #(.FULL (FULL)) u_cfg (
++            trw_pin_cfg #(.FULL (FULL), .INPUT_PREDECODE (1)) u_cfg (
+                 .clk (clk), .rst_n (rst_n), .we (pcfg_we[u]), .waddr (pcfg_waddr), .wdata (hwd),
+-                .cfg (cfg), .carrier_active (carrier_active), .restart (restart)
+-            );
+-            trw_pin_unit #(.FULL (FULL)) u_unit (
++                .cfg (cfg), .carrier_active (carrier_active), .pin_a_mask (pin_a_mask), .pin_s_mask (pin_s_mask), .restart (restart)
++            );
++            trw_pin_unit #(.FULL (FULL), .INPUT_PREDECODE (1)) u_unit (
+                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg),
+-                .carrier_active (carrier_active), .pads (pads),
++                .carrier_active (carrier_active), .pin_a_mask (pin_a_mask), .pin_s_mask (pin_s_mask), .pads (pads),
+                 .tx_avail (avail[C_U+u]), .tx_tag (head[18*(C_U+u)+16 +: 2]), .tx_data (head[18*(C_U+u) +: 16]),
+                 .tx_take (take[C_U+u]),
+                 .rx_free (rx_free), .rx_load (rx_load), .rx_tag (rx_tag), .rx_data (rx_data),
+--- a/src/trw_pin_unit.v
++++ b/src/trw_pin_unit.v
+@@ -21,6 +21,7 @@
+ `include "trw_assert.vh"
+ 
+ module trw_pin_unit #(
++    parameter INPUT_PREDECODE = 0,
+     parameter FULL = 0,
+     parameter FRAC = 8           // time fraction bits; 8 is the spec (16.8). FRAC < 8 is a measurement
+                                  // variant only: it uses the top FRAC bits of the fraction fields
+@@ -31,6 +32,8 @@
+     input  wire                    live,
+     input  wire [`TRW_PC_BITS-1:0] cfg,
+     input  wire                    carrier_active,
++    input  wire [23:0]             pin_a_mask,
++    input  wire [23:0]             pin_s_mask,
+     input  wire [23:0]             pads,
+     // consumer port head (TX half)
+     input  wire                    tx_avail,
+@@ -111,9 +114,9 @@
+ 
+     // ------------------------------------------------------------------ pins in
+     wire a_in, a_prev, b_in, b_prev, c_in, c_prev, sel, sel_q, sel_fall;
+-    trw_pin_io u_io (
++    trw_pin_io #(.INPUT_PREDECODE (INPUT_PREDECODE)) u_io (
+         .clk (clk), .pads (pads), .pin_a (pin_a), .pin_s (pin_s), .pin_b (pin_b), .pin_c (pin_c),
+-        .idle (idle), .c_active (c_active),
++        .idle (idle), .c_active (c_active), .pin_a_mask (pin_a_mask), .pin_s_mask (pin_s_mask),
+         .a_in (a_in), .a_prev (a_prev), .b_in (b_in), .b_prev (b_prev), .c_in (c_in), .c_prev (c_prev),
+         .sel (sel), .sel_q (sel_q), .sel_fall (sel_fall)
+     );

@@ -9,6 +9,12 @@ import sys
 from postgrt_timing import screen, CORNERS
 
 
+def timing_placement(variant):
+    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement"}:
+        raise ValueError("Unknown timing screen variant")
+    return variant == "timing-placement"
+
+
 def checkpoint(root):
     if list(root.glob("*-openroad-detailedrouting")):
         raise ValueError("Unexpected detailed routing in the RTL screen")
@@ -27,6 +33,7 @@ def main():
     if float(config["CLOCK_PERIOD"]) != 20 or float(config["PL_TARGET_DENSITY_PCT"]) != 56:
         raise ValueError("Unexpected candidate clock/density")
     config.update(GRT_ADJUSTMENT=0.16, OPENROAD_THREADS=4, PL_OPTIMIZE_MIRRORING=False,
+                  PL_TIMING_DRIVEN=timing_placement(os.environ["VARIANT"]),
                   PL_RESIZER_SETUP_SLACK_MARGIN=0, GRT_RESIZER_SETUP_SLACK_MARGIN=0,
                   PNR_SDC_FILE=str(Path("src/signoff.sdc").resolve()),
                   PNR_CORNERS=[CORNERS[1], CORNERS[0], CORNERS[2]], RSZ_CORNERS=[CORNERS[1]])

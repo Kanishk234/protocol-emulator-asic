@@ -1,0 +1,140 @@
+name: gds-input-decode-screen
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gds-input-decode-screen-3393eea
+  cancel-in-progress: false
+
+jobs:
+  harden:
+    name: Matched R4 GRT screen (${{ matrix.variant }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [baseline, input-decode]
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      GRT_ADJUSTMENT: "0.16"
+      VARIANT: ${{ matrix.variant }}
+
+    steps:
+      - name: Check out the measured R4 candidate
+        uses: actions/checkout@v6
+        with:
+          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check out experiment helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Apply only the input-decode change
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          if [[ "$VARIANT" == "input-decode" ]]; then
+            git apply --check workflow-src/spikes/r4_floorplan/input_decode.patch
+            git apply workflow-src/spikes/r4_floorplan/input_decode.patch
+            python -c "import subprocess; assert subprocess.check_output(['git', 'diff', '--name-only'], text=True).splitlines() == ['src/trw_pin_io.v']"
+          else
+            test -z "$(git diff --name-only)"
+          fi
+          sha256sum src/trw_pin_io.v workflow-src/spikes/r4_floorplan/input_decode.patch
+
+      - name: Check out Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: ihp-sg13cmos5l
+          path: tt
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tt/requirements.txt
+
+      - name: Install Tiny Tapeout prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+
+      - name: Install flow dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: Install IHP PDK
+        run: ./.tt-gds-action/install_sg13cmos5l.sh
+
+      - name: Install pinned LibreLane
+        run: pip install librelane==3.1.0.dev3
+
+      - name: Validate candidate and prepare generated config
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          grt_adjustment = os.environ["GRT_ADJUSTMENT"]
+          assert grt_adjustment in {"0.12", "0.16"}, grt_adjustment
+
+          cfg = json.loads(Path("src/config.json").read_text())
+          assert float(cfg["CLOCK_PERIOD"]) == 20.0
+          assert int(cfg["PL_TARGET_DENSITY_PCT"]) == 56
+
+          defs = Path("src/trw_defs.vh").read_text().splitlines()
+          expected = {
+              "TRW_LANES": "2",
+              "TRW_UNITS": "4",
+              "TRW_PC_UNITS_PULSE": "4'b0001",
+              "TRW_PC_UNITS_CARRIER": "4'b0001",
+              "TRW_PC_UNITS_BITSYNC": "4'b0001",
+          }
+          for name, value in expected.items():
+              assert f"`define {name} {value}" in defs, name
+          print(f"Pinned candidate: {os.environ['CANDIDATE_SHA']}")
+          print("Candidate shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
+          print(f"Matched RTL variant: {os.environ['VARIANT']}; clock/density/resource shape unchanged")
+          PY
+          python tt/tt_tool.py --create-user-config --ihp
+
+      - name: Build pinned region-reservation image
+        run: docker build --tag tripwire-hotspot:local --file workflow-src/scripts/ci/Dockerfile.openroad-hotspot workflow-src/scripts/ci
+
+      - name: Screen through global routing and measure fresh timing
+        timeout-minutes: 80
+        run: python workflow-src/scripts/ci/rtl_grt_screen.py
+
+      - name: Upload matched screen evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-input-decode-${{ matrix.variant }}-${{ github.run_id }}
+          path: |
+            runs/rtl-grt-screen/**
+            src/**
+            info.yaml
+            workflow-src/spikes/r4_floorplan/input_decode.patch
+          if-no-files-found: warn

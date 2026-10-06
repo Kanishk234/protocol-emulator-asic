@@ -244,3 +244,15 @@ First choice is an isolated RX compare or pad mux hardening, one at a time; thei
 Persisted patch changes only trw_pin_rx.v on exact 3393eea, checked by byte comparison against a fresh archived source tree. Local current RX tests pass 16/16 for both FULL0/FULL1 including live configuration restart; fresh million-clock L2 is running. Helpers 39 tests pass. No main RTL/spec/count/clock change.
 
 Separate baseline/rx-factor matrix regenerates synthesis and placement rather than reusing incompatible old ODBs. Both variants use identical signoff PnR constraints, slow-first PnR libraries, zero setup margins, GRT.16, no mirroring and the same region-reservation image; 20 ns/density56 stay fixed. The pinned Classic flow stops at GlobalRouting before DRT; strict checkpoint checks and independent single-corner resizer comparisons follow. Artifacts retain actual modified sources and patch, per-variant names and fresh reports. These are estimated screening results only; no gains from historical mapping are assumed, and no phase gate is closed.
+
+
+RX screen 37399927459 is running on helpers 652167d (CI ec076b7). Fresh Yosys module equivalence used exact baseline/variant trw_pin_rx.v, proc/memory lowering, equiv_make, equiv_simple and equiv_status -assert: all 275 equivalence points proven for default FRAC8. This checks equivalent module logic with matched state, not extracted timing, analog behavior or hardware. Raw proof log is /tmp/rx-compare-trial-20261005/equivalence.log, not committed. Fresh million-clock L2 remains active.
+
+Fresh isolated candidate chip suite passed 5/5 (host path, UART TX full/lean, routine rotation and UART program loopback included). This uses archived candidate test/tools/spec, so port selector encoding matches the reduced candidate. Fresh lockstep has reached 400,000/1,000,000 clocks with zero reported divergence; do not claim completion yet.
+
+
+### Independent parallel pad-mux trial
+
+The new persisted parallel_pad_mux.patch changes only trw_pins.v on an independent exact-3393eea source tree, with the original RX logic retained. It implements per-pad owner/A/N matches and masked OR reductions, preserving invalid-owner output suppression and A-before-N priority. Yosys module equivalence proves all 83 points for NU4 and NU6 separately. A fresh 1,500-clock owner/output scoreboard passes, and the matching archived candidate chip suite passes 5/5 including UART program loopback. Fresh million-clock L2 is active; no completion claim yet. Raw local evidence is under /tmp/pad-mux-trial-20261005, not committed.
+
+Separate gds-pad-mux-screen matrix compares baseline/pad-mux with the same helper and identical flow settings as the RX matrix. No changes to main src, resource counts, live configuration behavior, feedback, same-cycle DROPPED or 20 ns clock. Historical 1.3282 ns mapped improvement is still not a routed promise. All 39 helper checks and workflow parsing/diff checks pass. No full hardening or phase advancement is implied by this screen.

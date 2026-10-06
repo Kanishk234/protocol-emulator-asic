@@ -5,15 +5,25 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (independent parallel pad-selection trial)
+Done:
+- Prepared a second isolated exact-3393eea tree; only trw_pins.v changes, verified by byte comparison. Persisted parallel_pad_mux.patch preserves owner read/write/reset, invalid-owner behavior and A-before-N selection. RX change is absent from this variant.
+- Yosys equiv_make/equiv_simple/equiv_status -assert proved all 83 pad-module equivalence points for both NU4 (candidate) and NU6 (default). Randomized 1,500-clock owner/output scoreboard passed; archived candidate chip suite passed 5/5, including UART loopback. Fresh million-clock pad L2 started, not yet complete.
+- Prepared independent gds-pad-mux-screen baseline/pad-mux matrix using the same shared helper and flow settings as RX; no main hardware/spec/config edits. All 39 helper/Tcl checks pass; YAML/embedded Python/diff checks pass.
+- Existing RX screen and routed protocol verification still active at check; fresh RX L2 reached 700,000 clocks with zero reported divergence. No phase boxes ticked or new timing gain claimed.
+
+Next:
+- Publish and launch the independent pad screen under ongoing user authorization; compare both RTL ideas separately before combining or routing. Finish lockstep runs and inspect fresh slow setup/fast hold, area, overflow and electrical evidence.
+
 ## 2026-10-05: Codex (isolated RX comparison trial and matched physical screen)
 Done:
 - Rebuilt exact candidate 3393eea in isolated baseline/variant trees; applied persisted rx_sample_factor.patch with zero fuzz. Byte comparison confirms trw_pin_rx.v is the only changed hardware file. Main src/config/spec remain unchanged. Separate START/S_SAMP zero comparisons preserve the existing sample event and timer arithmetic.
-- Fresh RX suite with current live-reconfiguration case passed 16/16 for FULL0 and FULL1 under Icarus. Fresh million-clock L2 on exact variant is active; earlier same prototype had million-clock/injection evidence, but new result is not yet claimed.
+- Fresh RX suite with current live-reconfiguration case passed 16/16 for FULL0 and FULL1 under Icarus. Yosys equiv_make/equiv_simple/equiv_status -assert proved all 275 default-FRAC8 equivalence points between the exact baseline and RX variant (matched-state module equivalence; not physical timing). Fresh million-clock L2 on exact variant passed 400,000 clocks so far and remains active; new million-clock result is not yet claimed. Archived candidate chip suite passed 5/5 including UART loopback. An initial current-main chip harness attempt used the main selector map and was unsuitable for this reduced candidate; only the matching candidate suite is acceptance evidence.
 - Prepared gds-rx-compare-screen matrix for baseline/rx-factor with identical 20 ns, density56, GRT.16/region reservation/no-mirroring, slow repair and signoff constraints. It stops at unique GlobalRouting, rejects unexpected DRT/missing checkpoint views, then runs fresh independent before/repair/after corner reports. No full hardening/physical signoff claimed by this screen.
 - All 39 helper/Tcl checks passed; workflow YAML/embedded Python and diff checks passed. No phase boxes ticked.
 
 Next:
-- Publish and dispatch matched screen under ongoing user authorization; inspect timing/area/overflow/electrical evidence, finish L2, then route only a justified surviving trial. Actual extracted branch WNS remains −5.630099 ns.
+- Published CI ec076b7 and separate docs 652167d; matched screen 37399927459 running. Inspect timing/area/overflow/electrical evidence, finish L2, then route only a justified surviving trial. Actual extracted branch WNS remains −5.630099 ns; routed protocol 37398304113 still active.
 
 ## 2026-10-05: Codex (high-leverage WNS brainstorming)
 Done:

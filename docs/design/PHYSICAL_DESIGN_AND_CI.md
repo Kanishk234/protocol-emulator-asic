@@ -137,3 +137,12 @@ pins. The routing checker fails; later incompatible Magic was stopped.
 Local CRC padding bounded screen finishes13m22s at3477markers versus3482
 baseline. Neither is selected; no compact whole-chip route is currently
 running. Full pass durations vary substantially and are not an ETA to zero.
+
+October6 hosted update: G1 workflow37511778153 passes gds/precheck/gl_test/viewer.
+Compact route37516794406 started19:09:17UTC; at19:55:17UTC it remains in the
+routing step,46minutes after job start (including setup). The step is bounded
+to300minutes, job330. This is the unchanged saved-checkpoint route with up
+to64 repair iterations, not a completed zero-marker result. Prior compact
+131m58s/174m51s attempts explain the possible scale, not an ETA or convergence
+guarantee. See hosted experiment report for current status; older "not running"
+statements above describe the earlier local runs.

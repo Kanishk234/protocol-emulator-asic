@@ -243,6 +243,7 @@ def report_shadow(dut, label):
                   timer.load.value, timer.half.value, timer.en.value, timer.ConfigBits.value)
     # Read-only local truth-table checks. Enumerating every binary completion
     # avoids interpreting RTL if/case optimism as evidence of a correct gate.
+    proof_targets = []
     for instance in ("Tile_X1Y2_LUT4x8_ha", "Tile_X2Y1_LUT4x8_ha_C2",
                      "Tile_X2Y3_LUT4x8_ha_C2"):
         native = dut.user_project.u_fabric[instance]
@@ -271,6 +272,21 @@ def report_shadow(dut, label):
                 bit = module["netnames"][name + ".O"]["bits"][0]
                 trace_unknown_cone(dut, "CONSTANT LUT " + instance + " L" + letter,
                                    module, native, bit)
+                if values in ("0" * 16, "1" * 16):
+                    configuration = {}
+                    for signal in native:
+                        if re.search(r"ConfigMem\.Inst_frame\d+_bit\d+\.Q$", signal._name):
+                            if not signal.value.is_resolvable:
+                                raise RuntimeError("Unknown captured configuration for local proof")
+                            configuration[signal._name] = int(signal.value)
+                    if not configuration:
+                        raise RuntimeError("No captured configuration for local proof")
+                    proof_targets.append(dict(instance=instance, module=macro["cells"][instance]["type"],
+                                              output=name + ".O", expected=int(values[0]),
+                                              configuration=configuration))
+    if proof_targets:
+        Path(os.environ["WARP_COMPACT_SNAPSHOT"]).write_text(json.dumps(dict(
+            observation=label, targets=proof_targets, simulation_signals_forced=False)) + "\n")
 
 
 def lut_completion_values(index, values):

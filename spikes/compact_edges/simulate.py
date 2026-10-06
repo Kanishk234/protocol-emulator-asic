@@ -144,6 +144,7 @@ tt_um_warp user_project(.clk(clk), .rst_n(rst_n), .ena(ena),
                  build_args=build_args, log_file=sim / "build.log")
     runner.test(test_module="test_shell", hdl_toplevel="tb", test_dir=Path(__file__).parent,
                 extra_env={"WARP_COMPACT_WORDS": str(words),
+                           "WARP_COMPACT_SNAPSHOT": str((sim / "native_lut_snapshot.json").resolve()),
                            "WARP_COMPACT_RESET_PROBE": "1" if reset_probe else "0",
                            "WARP_COMPACT_SHARED_CRC": "1" if any(
                                path.name == "wp_crc32_shared_word.v" for path in sources) else "0"},

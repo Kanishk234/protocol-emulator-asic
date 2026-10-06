@@ -38,4 +38,6 @@ with gzip.open(out / "actual_fabric_cone.json.gz", "wb") as archive:
 env.update(WARP_COMPACT_FABRIC_CONE_JSON=str(full), WARP_COMPACT_FABRIC_TOP=top,
            WARP_COMPACT_SHADOW_RTL="1")
 result = subprocess.run([sys.executable, str(ROOT / "spikes/cloud/native_fabric.py")], env=env)
+from cloud_lut_formal import run_proofs
+run_proofs(ROOT, work, library)
 raise SystemExit(result.returncode)

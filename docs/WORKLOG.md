@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-06 (session55: first timer corruption investigation)
+**Done:** Inspected37522773342: actual native failure persists; TB timer is unknown before RUN, resets to configured15/armed1 after RUN, then all sixteen counter bits become unknown while armed stays1 by UART failure. Counter-D cone mostly reaches counter feedback, so sampling only at UART failure cannot identify the original corruption. Added bounded read-only first-known-to-X watcher: captures stable falling-edge counter/D/reset inputs and rising-edge settled state, then traces runtime at the first corrupt edge. Verified all sixteen mapped flop D/RESET_B/CLK bindings, Python syntax and whitespace; hosted verification pending. Standard lint37522773332/test37522773372/docs37522773357/unit37522773331 all pass. Routing37516794406 remains active and its inputs are unchanged; no fresh final route count. No local heavy computation or hardware/model/config/state force changes.
+**Boxes ticked:** none. Native/physical/configured-fabric timing and phase5 gates remain open.
+**Next:** inspect first corrupt timer edge and upstream data/control cone; select a correction from observed evidence, keep G1 and active route unchanged.
+
 ## 2026-10-06 (session54: persistent native unknown and cross-tile diagnosis)
 **Done:** Inspected new failed workflow37519661148 at7a7148b. RTL control passes; native UART X persists at4423540ns both at sampled clock edge and after delta-cycle settling. Exact selected UART path reaches Tile_X6Y2 E2END[7]; this is a neighboring route, not an established unconnected net. Added read-only traversal across exact macro/tile connectivity, excluding known unselected mux branches and stopping at clocked state. Whole-fabric JSON comes from actual mapped netlists and pinned Liberty with no remapping; compressed connectivity retained as cloud evidence. Synthetic mux/vector boundary/state-stop checks and Python/YAML/whitespace checks pass. Hosted verification pending. No local heavy EDA, model/config/state forcing, frozen hardware or active route changes.
 

@@ -5,6 +5,78 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (audit resync and prepare modified-RTL routing)
+Done:
+- Downloaded exact candidate/baseline37504886226. Fresh setup/hold counts0 all corners; fast hold+0.0379569ns; slow slew8→1; fanout162→160; cap0→2/1/2fast/slow/typical. Repaired area508444→509241µm²; demand233872→243504(+4.12%),overflow0. Exact27RTL/config/info fingerprints match frozen3393eea plus bs_resync.patch. Full audit in PHASE2_RESYNC_ROUTE_AUDIT.md.
+- Prepared existing route workflow for bs-resync with expected fingerprints computed from trusted checkout+patch before artifact download, main-only exact run provenance, existing all-corner/antenna guards and saved source identity rechecked during extraction/GL. Added macro artifact payload to support downstream checks; pre-launch bug71 covered.77helper checks, workflow parsing and diff checks pass.
+- Resync qualifies for diagnostic routing, not electrical signoff; no combined SRAM-buffer/CTS change, no extracted resync WNS and no new dispatch yet. Main hardware/config/spec remain unchanged.
+Next:
+- Publish validated route support under scoped git authorization, then route source37504886226/variantbs-resync and audit automatic extraction/GL. Fresh million-clock comparison is required before any eventual RTL adoption. Best prior extracted setup remains−1.385050ns; no phase boxes ticked.
+- Continuation: repeated all77helper tests successfully and confirmed no main workflows running/queued. Started fresh resync million-clock RTL/model comparison locally (Verilator, session88060); result pending. Requested scoped approval for CI/docs commits, push and resync route because AGENTS.md reserves publication for the user. No publication or launch performed.
+- User explicitly approved publication and launch. CI support committed as f0ab242; fresh local comparison reached200000/1000000 clocks without a reported mismatch so far (not a final pass). Preparing separate docs commit and approved push/dispatch; main hardware inputs remain unchanged.
+
+## 2026-10-06: Codex (restrict workflow monitoring to main)
+Done:
+- User directed main-only workflow monitoring. Branch-filtered inventory shows all recent main runs completed; none running/queued in the checked set. Resync37504886226 passed; margin37504890339 timed out; both routed GL runs and latest unit/lint/test/docs passed.
+- Correction to prior unfiltered inventory: newly reported official GDS/compact runs were outside main and must not be treated as main advances or main evidence. Main's latest checked revision remains44700f3.
+Next:
+- Monitor/analyze main runs only until user changes scope. All originally awaited main workflows are finished, so their artifacts can now inform the2/4 official candidate decision. No new dispatch or phase tick.
+
+## 2026-10-06: Codex (workflow check after remote advances)
+Done:
+- Earlier runs finished: CTS routed GL37502135732 success; margin37504890339 failure after80min step timeout. Completed margin log shows repair iterations813–821 with reported WNS0,2065targets and+0.0% area change; no useful final fresh timing result. Do not repeat global2ns margin blindly.
+- GitHub now has newer revisions than local44700f3: official gds37515299060(a284f4c) in Build GDS; compact experiments37516794406(1784a49) route active, demos success, native_fabric failure; unit37516794383 active. Latest lint/test/docs passed. Prior compact37516278474(c26f520) failed native and route jobs. No checkout/history changes or new dispatches made.
+- Current compact completed failure log is unavailable until its workflow finishes. Prior native failure log reports a Yosys tile-cone conversion subprocess failure; do not assume latest root cause matches without logs.
+Next:
+- Await current official/compact results and inspect exact new remote candidate before making hardware claims. Local checkout remains44700f3 with local documentation changes preserved. No phase boxes ticked; best earlier extracted setup remains−1.385050ns.
+
+## 2026-10-06: Codex (investigate long margin screen)
+Done:
+- At18:40UTC, margin37504890339 has run~63min; baseline completed in22min33sec. Candidate's screen step started17:39:11UTC, with80min timeout (deadline~18:59:11UTC), job cap100min. GitHub refuses unfinished-job log retrieval; exact internal stage not independently confirmed.
+- Identified likely explanation: global2ns repair margin can repeatedly target intrinsically zero-slack borrowing latch endpoints, the known D-032 limitation. This is a hypothesis pending completed logs, not evidence of useful continuing optimization. Selecting global margin should have accounted for that history.
+Next:
+- Respect user's wait instruction: allow bounded current run to finish, do not extend or relaunch. Inspect failure/success artifact and iteration progress to confirm whether margin is viable. Prefer genuine critical-cone shortening over trying to force positive margin on borrowing endpoints. No phase boxes ticked.
+
+## 2026-10-06: Codex (resync screen completed; two workflows remain)
+Done:
+- Resync37504886226 completed successfully. Log reports fresh estimated setup WS0 all corners and hold fast+0.0379569ns, slow+0.227755ns, typical+0.100974ns after repair. Baseline setup0/hold+0.0360107,+0.238266,+0.103103ns. Estimated passes do not establish extracted improvement; full artifact audit pending.
+- Both main unit runs passed; lint/test/docs green. Only margin37504890339(candidate active/baseline success) and CTS routed GL37502135732(simulation) remain running.
+Next:
+- Follow user's instruction to await all existing runs before selecting official candidate; launch no additional experiments. Audit full artifacts after completion. Best extracted setup remains−1.385050ns; no phase boxes ticked.
+
+## 2026-10-06: Codex (official GDS readiness assessment)
+Done:
+- Verified main TT entry point is still phase0counter and info.yaml lists only it; real protocol experiments harden frozen R4. Dispatching unchanged main cannot measure current protocol timing improvements.
+- Recorded official candidate requirements and diagnostic-to-official portability gaps in PHASE2_OFFICIAL_GDS_READINESS.md. SRAM ODB repair and placement/all-corner/reservation recipe do not automatically transfer to clean official synthesis. Current resync/margin screens still active.
+Next:
+- Prepare complete reproducible2/4 candidate, choose measured winning change after screen results, document any config-policy exception, then run official gds on exact candidate. No official dispatch, hardware adoption or checklist tick in this audit.
+
+## 2026-10-06: Codex (active workflow inventory)
+Done:
+- Verified five workflows active: resync37504886226(both paired jobs), margin37504890339(candidate active/baseline passed), CTS routed GL37502135732, unit37504873739 on6847566 and unit37505008445 on44700f3. Unit model/Verilator jobs passed; each remaining Icarus job is in chip/L3/rotation tests. No queued workflows in this checked set.
+Next:
+- Audit completed timing candidates; unit duplication comes from successive code/docs pushes, not extra hardware variants. Official gds is not running. No phase boxes ticked.
+
+## 2026-10-06: Codex (synthesize timing and protocol lessons)
+Done:
+- Audited claims, protocol scenarios, resource-floor decision and physical comparisons. Recorded latest22-case routed-GL evidence, exact failing extracted timing and bounded resync prototype evidence in CLAIMS with explicit limits.
+- Main lessons: retain general protocol primitives and2/4 resource floor; optimize the common PERIOD→bit-clock→fabric-accounting cone; prefer extracted timing over estimated passes, electrical counts or cell count. Counter/prototype functional checks preserve behavior but do not establish physical speed.
+Next:
+- Audit resync/margin physical screens, reproduce winning changes on a complete2/4 candidate, and require official GDS all-corner timing plus physical and protocol checks. No phase boxes ticked; no new routed WNS claimed.
+
+## 2026-10-06: Codex (SRAM routed GL completed)
+Done:
+- SRAM routed GL37499559483 completed successfully; downloaded JUnit verifies22cases,zero failures/errors/skips. Functional gate-level evidence without SDF; setup closure remains unproven.
+- CTS GL37502135732 has started expanded simulation. Resync37504886226 and margin37504890339 each have baseline/candidate active in GRT/fresh timing stage. Latest main lint/test/docs passed; unit still active. No checked failures.
+Next:
+- Audit completed resync/margin screens when fresh reports appear. Best extracted slow setup remains−1.385050ns. No phase boxes ticked.
+
+## 2026-10-06: Codex (estimate routed L3 runtime)
+Done:
+- At17:51UTC, SRAM GL37499559483 has run about56minutes and is still in expanded L3 simulation. Previous matching22-case GL37417248117 took56min41sec total. CTS GL37502135732 is pending behind it.
+Next:
+- Expect roughly an hour per run, with variation by netlist and runner; pending CTS starts after SRAM finishes. Simulation step timeout300minutes is a ceiling, not expected runtime. No new timing evidence or phase boxes ticked.
+
 ## 2026-10-06: Codex (publish and launch approved timing prototypes)
 Done:
 - User explicitly approved separate prototype/CI/docs commits, push to the exact Kanishk234 repository and both screen launches. Published66bc13d(prototypes),fa16d52(CI) and6847566(evidence/docs). No hardware inputs pending in origin/main..main; no main RTL/config/spec changed.

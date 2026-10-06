@@ -142,7 +142,7 @@ def sensitive_ports(kind, values):
     elif kind == "nand2b":
         function = lambda v: (not v["A_N"]) and v["B"]
     elif kind == "nor2b":
-        function = lambda v: (not v["A_N"]) or v["B"]
+        function = lambda v: v["A"] or (not v["B_N"])
     else:
         return set(values)
     # Output inversion does not change sensitivity. Treat other unknown pins

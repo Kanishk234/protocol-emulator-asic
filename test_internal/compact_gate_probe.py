@@ -99,12 +99,29 @@ def report_runtime(dut, label):
     cone_file = os.environ.get("WARP_COMPACT_CONE_JSON")
     if cone_file:
         report_unknown_cone(dut, label, Path(cone_file))
+    io_cone = os.environ.get("WARP_COMPACT_IO_CONE_JSON")
+    if io_cone:
+        module = json.loads(Path(io_cone).read_text())["modules"]["E_IO4_wide"]
+        tile = top.u_fabric.Tile_X6Y2_E_IO4_wide
+        trace_unknown_cone(dut, label + " UART_TX", module, tile,
+                           module["ports"]["B_IN_top"]["bits"][0])
 
 
 def report_unknown_cone(dut, label, path):
     """Trace one configured flop's unknown D cone using mapped-cell connectivity."""
     module = json.loads(path.read_text())["modules"]["LUT4x8_ha"]
     tile = dut.user_project.u_fabric.Tile_X1Y1_LUT4x8_ha
+    target = module["netnames"]["Inst_LB_FABULOUS_LC.LUT_flop"]["bits"][0]
+    flop = next(cell for cell in module["cells"].values()
+                if any(target in cell["connections"][port]
+                       for port, direction in cell["port_directions"].items()
+                       if direction == "output"))
+    trace_unknown_cone(dut, label + " LB_D", module, tile,
+                       flop["connections"]["D"][0])
+
+
+def trace_unknown_cone(dut, label, module, tile, start):
+    """Read-only tile cone; known mux selects exclude inactive data branches."""
     aliases, drivers = {}, {}
     for name, net in module["netnames"].items():
         for index, bit in enumerate(net["bits"]):
@@ -125,9 +142,6 @@ def report_unknown_cone(dut, label, path):
                 continue
         return "?"
 
-    target = module["netnames"]["Inst_LB_FABULOUS_LC.LUT_flop"]["bits"][0]
-    _, flop = drivers[target]
-    start = flop["connections"]["D"][0]
     visited = set()
 
     def trace(bit, depth):
@@ -137,16 +151,29 @@ def report_unknown_cone(dut, label, path):
         entry = drivers.get(bit)
         names = [f"{name}[{index}]" for name, index in aliases.get(bit, [])][:2]
         if entry is None:
-            dut._log.info("CONE %s depth=%d %s=%s primary/undriven", label, depth, names, value(bit))
+            dut._log.info("CONE %s %s depth=%d %s=%s tile input/constant or no local driver",
+                          label, tile._name, depth, names, value(bit))
             return
         name, cell = entry
         inputs = [(port, b) for port, direction in cell["port_directions"].items()
                   if direction == "input" for b in cell["connections"][port]]
-        dut._log.info("CONE %s depth=%d %s=%s via %s %s inputs=%s", label, depth,
-                      names, value(bit), name, cell["type"], [(port, value(b)) for port, b in inputs])
+        active = inputs
+        connections = cell["connections"]
+        if cell["type"].startswith("sg13cmos5l_mux2_"):
+            select = value(connections["S"][0])
+            if select in ("0", "1"):
+                active = [("A" + select, connections["A" + select][0])]
+        elif cell["type"].startswith("sg13cmos5l_mux4_"):
+            s0, s1 = (value(connections[port][0]) for port in ("S0", "S1"))
+            if s0 in ("0", "1") and s1 in ("0", "1"):
+                port = "A" + str(int(s0) + 2 * int(s1))
+                active = [(port, connections[port][0])]
+        dut._log.info("CONE %s %s depth=%d %s=%s via %s %s inputs=%s traced=%s", label,
+                      tile._name, depth, names, value(bit), name, cell["type"],
+                      [(port, value(b)) for port, b in inputs], [port for port, _ in active])
         # State is a boundary: never trace a DFF's feedback into another cycle.
         if "CLK" not in cell["connections"] and "GATE" not in cell["connections"]:
-            for _, child in inputs:
+            for _, child in active:
                 trace(child, depth + 1)
 
     trace(start, 0)

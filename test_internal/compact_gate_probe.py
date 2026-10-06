@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 from functools import lru_cache
+from itertools import product
 from cocotb.handle import HierarchyObject
 
 
@@ -126,6 +127,40 @@ def read_cone_json(path):
     return json.loads(Path(path).read_text())
 
 
+def sensitive_ports(kind, values):
+    """Conservative Boolean sensitivity for gates with known controlling inputs."""
+    if kind in ("a21o", "a21oi"):
+        function = lambda v: (v["A1"] and v["A2"]) or v["B1"]
+    elif kind in ("o21a", "o21ai"):
+        function = lambda v: (v["A1"] or v["A2"]) and v["B1"]
+    elif kind in ("a22o", "a22oi"):
+        function = lambda v: (v["A1"] and v["A2"]) or (v["B1"] and v["B2"])
+    elif kind in ("o22a", "o22ai"):
+        function = lambda v: (v["A1"] or v["A2"]) and (v["B1"] or v["B2"])
+    elif re.fullmatch(r"(?:and|nand|or|nor)[234]", kind):
+        function = (lambda v: all(v.values())) if "and" in kind else (lambda v: any(v.values()))
+    elif kind == "nand2b":
+        function = lambda v: (not v["A_N"]) and v["B"]
+    elif kind == "nor2b":
+        function = lambda v: (not v["A_N"]) or v["B"]
+    else:
+        return set(values)
+    # Output inversion does not change sensitivity. Treat other unknown pins
+    # independently: this can overtrace correlated inputs, never remove one
+    # merely because the current unknown has a convenient assumed value.
+    known = {port: int(v) for port, v in values.items() if v in ("0", "1")}
+    unknown = [port for port in values if port not in known]
+    active = set(known)
+    for port in unknown:
+        others = [name for name in unknown if name != port]
+        for assignment in product((0, 1), repeat=len(others)):
+            pins = dict(known, **dict(zip(others, assignment)))
+            if bool(function(dict(pins, **{port: 0}))) != bool(function(dict(pins, **{port: 1}))):
+                active.add(port)
+                break
+    return active
+
+
 def trace_unknown_cone(dut, label, module, tile, start):
     """Follow selected data across actual macro wiring, stopping at state."""
     fabric_file = os.environ.get("WARP_COMPACT_FABRIC_CONE_JSON")
@@ -214,6 +249,10 @@ def trace_unknown_cone(dut, label, module, tile, start):
             if s0 in ("0", "1") and s1 in ("0", "1"):
                 port = "A" + str(int(s0) + 2 * int(s1))
                 active = [(port, connections[port][0])]
+        elif cell["type"].startswith("sg13cmos5l_"):
+            kind = cell["type"][len("sg13cmos5l_"):].rsplit("_", 1)[0]
+            sensitive = sensitive_ports(kind, {port: value(b, mod, handle) for port, b in inputs})
+            active = [(port, b) for port, b in inputs if port in sensitive]
         dut._log.info("CONE %s %s depth=%d %s=%s via %s %s inputs=%s traced=%s", label,
                       handle._name, depth, names, val, name, cell["type"],
                       [(port, value(b, mod, handle)) for port, b in inputs],

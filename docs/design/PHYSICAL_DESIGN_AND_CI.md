@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**Latest compact experiment (2026-10-06):** cloud37516794406 reaches final
+native routing DRC0/antenna0/critical disconnected0. Router elapsed2h47m15s;
+whole route/geometry job3h16m05s. Full geometry fails KLayout248 (1 Metal1
+width,247 Metal1 spacing), Magic1828 and LVS67. Extracted shell setup/hold
+slack+12.251343397653367/+0.12463458395889776ns at20ns, with9 slow-corner
+slew violations; macro black-boxed. No compact physical, complete timing or
+native-function pass. See compact_route_root_causes.md.
+
 **Macro placement rules learned the hard way (D-019, BUGS #9–#11):** (1) on the power-grid phase, x = 11.52 + 109.92 k; (2) the macro's pin-heavy faces (west, south for this fabric) toward open core; (3) beside the macro, no channel or one wide enough for a full grid stripe pair; (4) no `"//"` keys inside `MACROS`. Check all four locally with TT's merged config before pushing (the local flow reaches detailed routing in ~2 min).
 
 ## Hardening flow (how the fabric is integrated: flat or macro)

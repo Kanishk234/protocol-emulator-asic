@@ -2,6 +2,24 @@
 
 Format for each entry: number, date, symptom, root cause, the check that caught it, the check that now covers it, fix commit.
 
+## 38: Functional Liberty import rejects an unused clock-gate cell
+- **Date:**2026-10-06.
+- **Symptom/check:**37536118708 native UART fails; separate optional SAT stops before solving because sg13cmos5l_lgcp_1 has an internal output without a function.
+- **Root cause:** full functional import attempts to model unused Liberty entries whose state-table semantics the importer does not support.
+- **Fix/coverage:** ignore incomplete entries at import, then hierarchy-check every instantiated cell so a used missing model still fails.37545251399 verifies import succeeds; no native/model/hardware change or proof success implied.
+
+## 39: Native configuration capture misses renamed latch outputs
+- **Date:**2026-10-06.
+- **Symptom/check:**37545251399 SAT setup cannot bind aliases removed by cleanup.37545630704 retains aliases and finds counterexamples, but some configuration selectors remain free.
+- **Root cause:** capture selected only ConfigMem.*.Q names. Exact netlist audit finds529 configuration latches, with24 outputs without those aliases;530 logical configuration bits include one merged latch. The earlier8707 matching-bit audit is a named-storage subset. Missing constraints invalidate interpreting these counterexamples as a mapped-LUT fault.
+- **Fix/coverage:** preserve proof aliases and capture Q directly on every actual sg13cmos5l_dlhq_1 instance. Static529/505/24 cell/alias audit passes. Hosted37546145073 pending. No signals are forced in simulation; only the isolated proof constrains observed configuration values.
+
+## 40: Cloud evidence omits final physical database and marker coordinates
+- **Date:**2026-10-06.
+- **Symptom/check:**37516794406 reaches0 native markers, but artifact's latest drt_iter snapshot is iteration52 with3markers. KLayout counts survive while its lyrdb and final zero-route ODB are absent.
+- **Root cause:** bounded collector retains intermediate drt_iter ODB and small log/rpt/json/xml files, excluding final physical views and lyrdb.
+- **Coverage/workaround:** separate geometry replay37545941476 retains full ignored run directory including physical views and marker databases. Its source remains intermediate3-marker ODB; cannot reconstruct or claim the final0 database from it. Update long-route evidence retention before another route is needed; original collector is not yet corrected.
+
 ## 37: Optional native LUT alias raises KeyError through indexed lookup
 - **Date:**2026-10-06.
 - **Symptom/check:** focused diagnostic37534707478 stops before RUN while looking for LUT_out, an alias removed by synthesis; it does not reach the later UART check.

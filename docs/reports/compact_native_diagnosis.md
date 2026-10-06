@@ -101,6 +101,16 @@ The method follows the official Yosys
 and [SAT](https://yosyshq.readthedocs.io/projects/yosys/en/v0.49/cmd/sat.html)
 command contracts; those references are methodology, not WARP proof evidence.
 
+37536118708 does not reach SAT because an unused incomplete Liberty cell is
+rejected (BUG38). Functional import now skips such entries while hierarchy-check
+requires every instantiated cell.37545251399 passes import but loses captured
+aliases during cleanup.37545630704 preserves them and reaches feasible SAT
+counterexamples; however529 actual configuration latches have only505 named
+ConfigMem.Q aliases. The24 missing outputs leave selectors free, so these
+counterexamples do not establish a hardware fault (BUG39). The earlier8707
+matching-bit audit covers the named-storage subset. The next37546145073
+captures every actual latch Q and retains those proof wires; result pending.
+
 Acceptance still requires actual native loaded behavior, zero final routing
 and physical violations, and timing through the configured fabric. The frozen
 G1 physical success does not supply those compact or native proofs.

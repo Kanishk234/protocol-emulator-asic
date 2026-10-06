@@ -4,6 +4,7 @@ Every public claim about the chip, with its evidence. If there is no evidence, i
 
 | # | Claim | Evidence (run ID / report / proof log) | Status |
 |---|---|---|---|
+| C-compact-route | The tighter compact experimental shell/macro reaches native routing DRC0, antenna nets/pins0 and critical disconnected pins0 | Cloud37516794406, iteration53; compact_route_root_causes.md | holds for this experiment only; later KLayout248/LVS67,9 slew violations and native UART failure prevent acceptance |
 | C1 | A 16-LUT FABulous fabric (stock `LUT4x8_ha` tiles, CMOS5L patch D-010/D-017) hardened as a macro inside a Tiny Tapeout 6x4 IHP CMOS5L project passes TT's template `gds` flow, precheck (9/9) and `gl_test`, with DRC, LVS and antenna at 0 | CI 36327510268 (dea2150); `docs/reports/fabric_tiny.md` | holds (phase 1 spike; not the final chip) |
 | C2 | On CMOS5L, a FABulous LUT4 costs ~5,090 µm² including its configuration latches, switch matrix and routing (tile `LUT4x8_ha`, 40,719 µm² per 8 LUT4, routed within Metal2–Metal4, KLayout DRC 0) | `docs/reports/tile_cmos5l.md` | local measurement (tiles are hardened locally) |
 | C3 | **The final chip** (shell + G1 fabric: 88 LUT4 + 2 hard timers + 2 hard shift registers, frozen as `hw-freeze` → 3047dea) passes TT's `gds` flow and precheck with routing DRC, LVS, antenna and Magic DRC at 0, and meets setup and hold at the 50 MHz clock (slow/fast corners: setup WS +12.48 ns, hold WS +0.112 ns) | CI 36383587262 (3047dea); `docs/design/PHYSICAL_DESIGN_AND_CI.md` hardening table | holds |

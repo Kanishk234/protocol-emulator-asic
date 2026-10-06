@@ -3,10 +3,34 @@
 The compact successor has not passed full-chip physical checks. The frozen
 G1 submission fallback has passed its recorded hardening/CI; “routing never
 passed” describes the compact exploration, not every WARP implementation.
-The best completed compact result is D-040: zero global-routing overflow,
-144 final detailed-routing markers, and zero final antenna violations.
+The earlier best completed compact result was D-040: zero global-routing
+overflow,144 final detailed-routing markers and zero antenna violations.
+Cloud37516794406 now completes detailed routing with0markers; full geometry
+still fails, as recorded below.
 The remaining problem is local geometry, not proof of exhausted global
 routing capacity. This audit distinguishes measurements from hypotheses.
+
+## Completed hosted result
+
+[37516794406](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37516794406)
+reaches0 routing markers at iteration53 after2h47m15s router elapsed, with
+antenna nets/pins0 and critical disconnected pins0 (7 noncritical). Full job
+elapsed3h16m05s. Later KLayout reports248 errors: M1.a1 and M1.b247.
+Magic reports1828; LVS reports67, including power-net mismatches. Extracted
+shell setup/hold slack+12.251343397653367/+0.12463458395889776ns at20ns,
+but9 slow-corner slew violations remain and the fabric macro is black-boxed.
+This is native routing closure, not compact physical/function/timing acceptance.
+
+The saved artifact contains iteration52 ODB with3markers, not the final0 ODB.
+Its SHA256 is33dceb8d52df9d5ea8cc3741b71b9b3e1e79ae4fb95b1eb559b3ca3eb40390bc.
+[Read-only inventory37545539269](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37545539269)
+records rows, cell orientations, Metal1 pins and power rectangles. The width
+marker at x31.005–31.055/y704.655–704.815µm contains no pre-fill cell;
+the subsequent flow inserts6762 filler cells. Filler/power geometry is a
+specific hypothesis, not a proven root cause. Geometry-only replay37545941476
+uses the unchanged saved database, retains full marker coordinates/views,
+and performs no routing. Its input's3markers prevent treating it as final
+route certification. No new route or hardware change is launched here.
 
 ## Evidence chain
 

@@ -4,6 +4,7 @@ import re
 import json
 import os
 from pathlib import Path
+from functools import lru_cache
 from cocotb.handle import HierarchyObject
 
 
@@ -120,39 +121,84 @@ def report_unknown_cone(dut, label, path):
                        flop["connections"]["D"][0])
 
 
+@lru_cache(maxsize=4)
+def read_cone_json(path):
+    return json.loads(Path(path).read_text())
+
+
 def trace_unknown_cone(dut, label, module, tile, start):
-    """Read-only tile cone; known mux selects exclude inactive data branches."""
-    aliases, drivers = {}, {}
-    for name, net in module["netnames"].items():
-        for index, bit in enumerate(net["bits"]):
-            aliases.setdefault(bit, []).append((name, index))
-    for name, cell in module["cells"].items():
+    """Follow selected data across actual macro wiring, stopping at state."""
+    fabric_file = os.environ.get("WARP_COMPACT_FABRIC_CONE_JSON")
+    fabric = read_cone_json(fabric_file)["modules"] if fabric_file else {}
+    macro = fabric.get(os.environ.get("WARP_COMPACT_FABRIC_TOP"), {})
+    macro_drivers = {}
+    for instance, cell in macro.get("cells", {}).items():
         for port, direction in cell["port_directions"].items():
             if direction == "output":
-                for bit in cell["connections"][port]:
-                    drivers[bit] = (name, cell)
+                for index, bit in enumerate(cell["connections"][port]):
+                    macro_drivers.setdefault(bit, []).append((instance, cell["type"], port, index))
+    indexes = {}
 
-    def value(bit):
+    def index_for(mod):
+        key = id(mod)
+        if key not in indexes:
+            aliases, drivers, inputs = {}, {}, {}
+            for name, net in mod["netnames"].items():
+                for index, bit in enumerate(net["bits"]):
+                    aliases.setdefault(bit, []).append((name, index))
+            for name, cell in mod["cells"].items():
+                for port, direction in cell["port_directions"].items():
+                    if direction == "output":
+                        for bit in cell["connections"][port]:
+                            drivers[bit] = (name, cell)
+            for name, port in mod["ports"].items():
+                if port["direction"] == "input":
+                    for index, bit in enumerate(port["bits"]):
+                        inputs.setdefault(bit, []).append((name, index))
+            indexes[key] = aliases, drivers, inputs
+        return indexes[key]
+
+    def value(bit, mod, handle):
         if isinstance(bit, str):
             return bit
-        for name, index in aliases.get(bit, []):
+        for name, index in index_for(mod)[0].get(bit, []):
             try:
-                return str(tile[name].value)[-1 - index].lower()
+                return str(handle[name].value)[-1 - index].lower()
             except (AttributeError, KeyError, IndexError):
                 continue
         return "?"
 
     visited = set()
 
-    def trace(bit, depth):
-        if value(bit) in ("0", "1") or bit in visited or len(visited) >= 80:
+    def trace(bit, depth, mod, handle):
+        val = value(bit, mod, handle)
+        key = (handle._name, bit)
+        if val in ("0", "1") or key in visited or len(visited) >= 160:
             return
-        visited.add(bit)
+        visited.add(key)
+        aliases, drivers, ports = index_for(mod)
         entry = drivers.get(bit)
         names = [f"{name}[{index}]" for name, index in aliases.get(bit, [])][:2]
         if entry is None:
-            dut._log.info("CONE %s %s depth=%d %s=%s tile input/constant or no local driver",
-                          label, tile._name, depth, names, value(bit))
+            instance = macro.get("cells", {}).get(handle._name)
+            for port, index in ports.get(bit, []):
+                if instance is None:
+                    break
+                wire = instance["connections"][port][index]
+                sources = macro_drivers.get(wire, [])
+                if len(sources) != 1:
+                    continue
+                source, kind, source_port, source_index = sources[0]
+                if kind not in fabric:
+                    continue
+                dut._log.info("CROSS %s %s.%s[%d] <- %s.%s[%d]", label,
+                              handle._name, port, index, source, source_port, source_index)
+                source_mod = fabric[kind]
+                source_bit = source_mod["ports"][source_port]["bits"][source_index]
+                trace(source_bit, depth + 1, source_mod, dut.user_project.u_fabric[source])
+                return
+            dut._log.info("CONE %s %s depth=%d %s=%s tile input/constant or no unique traced driver",
+                          label, handle._name, depth, names, val)
             return
         name, cell = entry
         inputs = [(port, b) for port, direction in cell["port_directions"].items()
@@ -160,21 +206,21 @@ def trace_unknown_cone(dut, label, module, tile, start):
         active = inputs
         connections = cell["connections"]
         if cell["type"].startswith("sg13cmos5l_mux2_"):
-            select = value(connections["S"][0])
+            select = value(connections["S"][0], mod, handle)
             if select in ("0", "1"):
                 active = [("A" + select, connections["A" + select][0])]
         elif cell["type"].startswith("sg13cmos5l_mux4_"):
-            s0, s1 = (value(connections[port][0]) for port in ("S0", "S1"))
+            s0, s1 = (value(connections[port][0], mod, handle) for port in ("S0", "S1"))
             if s0 in ("0", "1") and s1 in ("0", "1"):
                 port = "A" + str(int(s0) + 2 * int(s1))
                 active = [(port, connections[port][0])]
         dut._log.info("CONE %s %s depth=%d %s=%s via %s %s inputs=%s traced=%s", label,
-                      tile._name, depth, names, value(bit), name, cell["type"],
-                      [(port, value(b)) for port, b in inputs], [port for port, _ in active])
-        # State is a boundary: never trace a DFF's feedback into another cycle.
-        if "CLK" not in cell["connections"] and "GATE" not in cell["connections"]:
+                      handle._name, depth, names, val, name, cell["type"],
+                      [(port, value(b, mod, handle)) for port, b in inputs],
+                      [port for port, _ in active])
+        if "CLK" not in connections and "GATE" not in connections:
             for _, child in active:
-                trace(child, depth + 1)
+                trace(child, depth + 1, mod, handle)
 
-    trace(start, 0)
-    dut._log.info("CONE %s: visited %d unknown nodes (limit 80)", label, len(visited))
+    trace(start, 0, module, tile)
+    dut._log.info("CONE %s: visited %d unknown nodes (limit 160)", label, len(visited))

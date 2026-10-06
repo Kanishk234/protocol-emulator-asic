@@ -79,6 +79,28 @@ binary outputs. Both match. This excludes a simple missing selector rule in
 those tables; it does not prove the full mapped logic handles reconvergence
 correctly. PDK models remain unchanged.
 
+## Bounded mapped-logic proof
+
+At17cc085 a cloud-only diagnostic checks the three all0/all1 cases above using
+the actual mapped tile netlist and pinned functional Liberty. It captures real
+native configuration-Q values at the observation instant. Sequential cells are
+cut to arbitrary symbolic outputs; only configuration Q is constrained. Tile
+inputs and user state remain free. The first SAT query must find a feasible
+assignment, then a second query checks the constant-output property for every
+assignment. Each target has a60-second process cap; unsupported cells are not
+ignored. Script-generation and result-parser checks pass; actual hosted proof
+execution is pending.
+
+This is a binary combinational property under one captured configuration. It
+does not prove sequential initialization, native four-state behavior, complete
+fabric equivalence, SDF behavior or timing. Native simulation failures remain
+failures regardless of proof results. The workflow retains constraints,
+prepared connectivity, scripts and logs as artifacts, not committed raw output.
+The method follows the official Yosys
+[cutpoint](https://yosyshq.readthedocs.io/projects/yosys/en/v0.53/cmd/cutpoint.html)
+and [SAT](https://yosyshq.readthedocs.io/projects/yosys/en/v0.49/cmd/sat.html)
+command contracts; those references are methodology, not WARP proof evidence.
+
 Acceptance still requires actual native loaded behavior, zero final routing
 and physical violations, and timing through the configured fabric. The frozen
 G1 physical success does not supply those compact or native proofs.

@@ -5,6 +5,22 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (parallel electrical/path/budget audit)
+Done:
+- Completed requested parallel audit; PHASE2_PLACEMENT_PARALLEL_AUDIT.md records reproducible artifact/netlist/DEF/STA evidence and next controlled experiments.
+- All 162 fanout violations are clk_regs clock leaves (limit8, loads10–17). Eight slew pins belong to two NOR4_1 nets: lane0 slot-write decode driving five remote loads (443–461 µm), and SRAM-enable arbitration feeding one load (516 µm). Capacitance violations zero.
+- Mapped old logical failing U0modecfg→dropped26 and new top carrier-config latch path; retained D-066 timing and did not infer closure from bounded pre-route reports.
+- Budget audit: total instance utilization56.3425%, standard-cell51.3216%; gross gap to60% is33,006.2 µm², not guaranteed usable capacity. Reduced resource counts remain unadopted; no phase boxes ticked.
+Next:
+- Current placement route 37412965189 was active in its antenna/timing/DRT step at query. Let automatic extracted timing and L3 measure the exact route. If electrical issues survive, test one data-net buffer split or separate CTS-clustering experiment; no constraint relaxation or premature hardware change.
+
+## 2026-10-05: Codex (current WNS/progress snapshot)
+Done:
+- Latest run query: placement route 37412965189 is active; no newer extracted timing run/result exists. Main test/lint/docs are green; unit runs remain active. Latest actual extracted slow setup is −5.630099 ns (37398296289); placement all-corner global-route estimated setup is 0, hold positive (37408506116). Keep these evidence levels separate.
+- Correction to earlier commentary claiming all six screens had zero overflow: report correctly records input-decode final logged overflow 5 and cached-input 37; placement, RX, pad and load-select have zero. This reinforces deferring cached/stateless input changes.
+Next:
+- Diagnose eight slow slew and 162 fanout violations from existing reports, compare critical latch paths against old routed failure, and audit resource budgets while routing runs. Automatic extraction and L3 are published for successful route completion. No phase boxes ticked.
+
 ## 2026-10-05: Codex (automatic placement-route downstream evidence)
 Done:
 - Routing continuation 37412965189 is active; first check showed setup complete and source-artifact download in progress.

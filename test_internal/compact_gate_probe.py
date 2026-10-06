@@ -124,13 +124,16 @@ def report_runtime(dut, label):
         module = read_cone_json(full_cone)["modules"]["PRIM2T2S_C2"]
         tile = top.u_fabric.Tile_X2Y2_PRIM2T2S_C2
         prefix = "Inst_TB_wp_timer."
-        for name in ("rst", "load", "half", "en", "tc", "count", "armed", "reload", "oneshot"):
-            if prefix + name not in module["netnames"]:
-                continue
-            dut._log.info("UART TIMER %s %s=%s", label, name, tile[prefix + name].value)
-            if name in ("rst", "load", "half", "en"):
-                trace_unknown_cone(dut, label + " UART_TIMER_" + name, module,
-                                   tile, module["netnames"][prefix + name]["bits"][0])
+        count = "".join(str(tile[prefix + f"count[{i}]"].value) for i in range(15, -1, -1))
+        dut._log.info("UART TIMER %s count=%s armed=%s", label, count, tile[prefix + "armed"].value)
+        # Physical synthesis removed primitive port aliases. Trace preserved
+        # state's actual D inputs instead of inventing reset/control bindings.
+        for name in ("count[0]", "armed"):
+            state = module["netnames"][prefix + name]["bits"][0]
+            flop = next(cell for cell in module["cells"].values()
+                        if state in cell["connections"].get("Q", []))
+            trace_unknown_cone(dut, label + " UART_TIMER_" + name + "_D", module,
+                               tile, flop["connections"]["D"][0])
 
 
 def report_unknown_cone(dut, label, path):

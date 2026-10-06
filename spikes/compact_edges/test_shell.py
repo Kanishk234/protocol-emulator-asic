@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 import cocotb
-from cocotb.triggers import ClockCycles, Timer
+from cocotb.triggers import ClockCycles, ReadOnly, Timer
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "test"))
@@ -61,7 +61,16 @@ async def load_uart_through_shell(dut):
     async def record():
         for _ in range(4000):
             await ClockCycles(dut.clk, 1)
-            samples.append(bit(dut.uo_out, 2))
+            try:
+                samples.append(bit(dut.uo_out, 2))
+            except ValueError:
+                if os.environ.get("WARP_COMPACT_DIAG") == "1":
+                    report_runtime(dut, "first UART X at clock edge")
+                    # Observe the same failing edge after all delta cycles,
+                    # preserving the original failure and sampling contract.
+                    await ReadOnly()
+                    report_runtime(dut, "first UART X after settling")
+                raise
 
     capture = cocotb.start_soon(record())
     sent = [0x55, 0x00, 0xC3]

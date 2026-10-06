@@ -12,7 +12,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Date:**2026-10-06.
 - **Symptom/check:**37545251399 SAT setup cannot bind aliases removed by cleanup.37545630704 retains aliases and finds counterexamples, but some configuration selectors remain free.
 - **Root cause:** capture selected only ConfigMem.*.Q names. Exact netlist audit finds529 configuration latches, with24 outputs without those aliases;530 logical configuration bits include one merged latch. The earlier8707 matching-bit audit is a named-storage subset. Missing constraints invalidate interpreting these counterexamples as a mapped-LUT fault.
-- **Fix/coverage:** preserve proof aliases and capture Q directly on every actual sg13cmos5l_dlhq_1 instance. Static529/505/24 cell/alias audit passes. Hosted37546145073 pending. No signals are forced in simulation; only the isolated proof constrains observed configuration values.
+- **Fix/coverage:** preserve proof aliases and capture Q directly on every actual sg13cmos5l_dlhq_1 instance. Static529/505/24 cell/alias audit passes. Hosted37546145073 proves all three local constant properties with feasible constraints. No signals are forced in simulation; only the isolated proof constrains observed configuration values. BUG33/native UART remains open.
 
 ## 40: Cloud evidence omits final physical database and marker coordinates
 - **Date:**2026-10-06.

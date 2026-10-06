@@ -111,6 +111,20 @@ counterexamples do not establish a hardware fault (BUG39). The earlier8707
 matching-bit audit covers the named-storage subset. The next37546145073
 captures every actual latch Q and retains those proof wires; result pending.
 
+## Verified local property
+
+[37546145073](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37546145073)
+captures all529 actual latch Q values per target and proves all three constant
+outputs listed above. Both feasibility and proof queries succeed with arbitrary
+binary tile inputs and user state. The ordinary actual native UART still fails.
+This establishes false unknowns in these three combinational cones under that
+configuration, not an explanation of every UART unknown or sequential boot.
+
+D-047 screens a standalone five-mux4 LUT implementation with actual pinned
+cell models, full binary equivalence against FABulous LUTK, and independent
+partial-input truth-table tests. No chip/generator/model correction has been
+installed. Area, routing, timing and real loaded integration remain open.
+
 Acceptance still requires actual native loaded behavior, zero final routing
 and physical violations, and timing through the configured fabric. The frozen
 G1 physical success does not supply those compact or native proofs.

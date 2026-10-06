@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-047: Screen a structurally preserved LUT mux tree (scratch only)
+- **Date:**2026-10-06. **Status:** accepted isolated diagnostic experiment; no hardware promotion or resource/spec change.
+- **Evidence:**37546145073 proves three native unregistered LUT constants under all529 observed configuration-latch Q values, arbitrary binary tile inputs and arbitrary user state. Actual native four-state UART still fails and those outputs areX. This establishes false unknowns in those three cones, not the complete UART root cause.
+- **Decision:** screen a standalone LUT4 implementation using five actual CMOS5L mux4 cells, maintaining the full16-bit runtime truth table and4-bit input contract. Prove binary equivalence against pinned FABulous LUTK for every configuration/input and test partial unknown inputs against independent truth-table completions with actual pinned PDK models. Candidate is confined to spikes/lut_mapping, not arch/src/macro or generated upstream code.
+- **Cost/limits:** five mux4 instances per LUT; physical area/routing/timing comparison against actual existing mapping is pending. No new configuration storage or protocol-specific behavior. If later integrated, every workload pays any area/delay cost, including users not affected by simulation unknowns. No equal-area improvement or configured-fabric timing claim. LUT-cell/compiler/bitstream/native loaded integration and physical hardening remain required before promotion.
+
 ---
 
 ## D-001: Build on FABulous

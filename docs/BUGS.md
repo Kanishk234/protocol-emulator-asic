@@ -165,3 +165,81 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Caught by:** the Phase 5 clean-source README reproduction, in the documented command order.
 - **Now covered by:** `test/Makefile` uses `sim_build/$(WARP_FABRIC)` for RTL simulations, so a change between `stub` and `rtl` requires a new compile. The clean-source reproduction reruns the two commands in order.
 - **Fix:** separate simulator build directories by fabric model. No chip RTL change.
+
+## 21: LibreLane DRC XML merges violations from different metal layers
+- **Date:** 2026-09-30
+- **Symptom:** session 34's generated XML reported all 3,384 shorts as `Metal3.Short`, unlike the native router report: 471 Metal2, 1,278 Metal3 and 1,635 Metal4 shorts.
+- **Root cause:** pinned LibreLane `common/drc.py::DRC.from_tritonroute` indexes its violation dictionary by violation type alone, retaining the first layer while appending coordinates from subsequent layers. Total counts and coordinates remain useful; the XML category is not reliable for layer attribution.
+- **Caught by:** comparison of `cfgmacro_x121_m4obs/39-openroad-detailedrouting/tt_um_warp.drc`, the router log and generated XML.
+- **Now covered by:** session 34's corrected layer counts and the compact-edge experiment README explicitly require native router reports for layer attribution. Upstream code is unchanged.
+- **Fix:** use the native `.drc` report/router log when reporting layer counts; an upstream converter fix remains open.
+
+## 22: Concurrent FABulous tile parsing corrupts shared primitive JSON
+- **Date:** 2026-09-30
+- **Symptom:** concurrent north/south scratch tile hardening failed with `JSONDecodeError: Invalid control character` while reading `primitives/IOBUF/fabulous/IOBUF.json`; serial reruns passed.
+- **Root cause:** FABulous's `fabric_definition/yosys_obj.py` writes parsed BEL metadata beside the shared primitive. Two tile drivers in the same library can overwrite/read that file concurrently.
+- **Caught by:** the compact-edge north/south hardening experiment.
+- **Now covered by:** `spikes/compact_edges/run.sh` runs tile drivers sequentially; all 14 changed tiles completed with clear routing and KLayout DRC. Per-tile run IDs are in the experiment README.
+- **Fix:** serialize tile parsing in a shared library. Upstream code is unchanged.
+
+## 23: Scratch simulation driver exits successfully after a cocotb failure
+- **Date:** 2026-09-30
+- **Symptom:** the new hardened-fabric/post-CTS-shell test returned process status 0, but its results XML contained a failed test (`X` in a status read after RUN).
+- **Root cause:** `runner.test()` wrote the result XML without raising for that failed test; the scratch driver checked neither test count nor failure/error elements.
+- **Caught by:** inspecting `simulation_chip_mask_narrow_rows_mapped_fabric_mapped_shell/results.xml` and `test.log`. Earlier reported passes were checked against their XML and remain valid.
+- **Now covered by:** `spikes/compact_edges/simulate.py` explicitly rejects missing testcases and failure/error elements after the simulator finishes.
+- **Fix:** validate XML and raise on failure. The hardened-fabric unknown-value issue is separate and remains under investigation; no gate-level pass is claimed for that run.
+
+## 24: I2C decoder failure hid sigrok's environment error
+- **Date:** 2026-10-05
+- **Symptom:** the I2C controller's independent bus checks passed but the sigrok byte comparison returned an empty list.
+- **Root cause:** sandboxed libusb initialization returned `LIBUSB_ERROR_OTHER`; sigrok exited 0 with empty stdout and the harness discarded stderr. This was an execution-environment failure, not an observed RTL fault.
+- **Caught by:** `scripts/check_all.sh`, then a diagnostic rerun of `protocols/i2c_ctrl/test`.
+- **Now covered by:** `sigrok_decode` rejects an empty decoded byte list and includes stdout/stderr in the assertion. The full check rerun outside the sandbox passes (`build/check_all_20261005.log`).
+- **Fix:** retain decoder diagnostics in the test and run libusb-dependent checks with the required execution permission. No RTL change.
+
+## 25: Scratch shared-word CRC read a changing byte-assembly wire
+- **Date:** 2026-10-05
+- **Symptom:** the scratch CRC passed stable-input unit comparisons but the real 842-word SPI load failed with CRC error `0x12`.
+- **Root cause:** the first integration read `{pay, rx_byte}` directly. The shell shifts `pay` on the same edge as word completion, so that concatenation changes immediately after the original CRC would have captured it. Host word spacing alone does not make this wire stable.
+- **Caught by:** `simulation_chip_shared_crc/results.xml` real SPI load, before any physical selection.
+- **Now covered by:** the full SPI/UART/STOP scratch test and `test_internal/shared_crc_probe.py`, which checks that the actual registered input remains stable throughout CRC processing. The stable-word unit test still compares every cycle to the original CRC and final values to zlib.
+- **Fix:** the optional scratch shell connects CRC to the existing `cfg_word` register, updated at the word-complete edge; bit consumption begins on the following edge. The corrected real load/UART test passes (`build/arch_explore/compact_edges/shared_crc_shell_20261005.log`). Frozen G1 is unchanged; the physical experiment is still unselected.
+
+## 26: Independent input monitor misses events on a synthesized gate shell
+- **Date:** 2026-10-05
+- **Symptom:** Existing SPI-loaded UART+monitor passes RTL fabric/shell testing, but a newly synthesized gate shell with RTL fabric transmits correctly and returns zero event count after20 input pulses.
+- **Root cause:** under investigation. Read-only tracing shows synchronized fab_in transitions known, event_previous FF updates, resets/enables known, but the counter enable is zero at sampled clock edges. Mixed gate/RTL input-to-enable scheduling/timing is a hypothesis, not proven silicon behavior. No user state or configuration forced.
+- **Caught by:** `build/g1_monitor_gate_20261005/results.xml`, Icarus13/project-venv cocotb; synthesized shell is not the hardened netlist. White-box traces in `probe3.log`/`probe4.log` and `test_internal/uart_monitor_gate_probe.py`.
+- **Fix for the observed test:** sample the shell input into one additional fabric FF before forming the edge enable; adds one cycle of observation latency and one LC (36→37). Both actual loaded regressions PASS: `uart_monitor_sampled_20261005/rtl_results.xml` (23.23s) and `g1_monitor_gate_20261005/sampled_results.xml` (33.82s), under `build/`. This resolves the observed mixed-model mismatch; physical timing/root-cause proof remains open. No frozen hardware change.
+- **Coverage:** `test/test_uart_monitor.py`, overlapping TX/events, RX/events, counter wrap, framing status and host reset; prospective same test on gate shell. Fix commit: pending.
+
+## 27: Failed compiler rebuild could leave a stale success report
+- **Date:** 2026-10-05
+- **Symptom:** rebuilding into an existing output directory could fail place/route while retaining `report.json` from an earlier successful design.
+- **Root cause:** success reports were written only after completion, with no invalidation when a new build began.
+- **Caught by:** a deliberate stale-success report followed by the over-capacity binary-I2C build (95/88 LCs), `build/compiler_fit_diagnostic_20261005/verification.txt`.
+- **Fix:** invalidate prior success/failure reports at build start; place/route failures write a separate `failure.json` with utilization and actionable capacity diagnostics.
+- **Coverage:** compiler diagnostic regression in `tools/compile/tests/test_diagnostics.py`; actual vendor-tool check above. No hardware change.
+
+## 28: Failed compiler rebuild retained an old loadable image
+- **Date:** 2026-10-05
+- **Symptom:** invalidating reports alone still left the earlier `.wbit` at the path users would load after a failed rebuild.
+- **Root cause:** images were overwritten only on success, without invalidation when rebuilding the same target.
+- **Fix:** remove the exact target image after reading the pin-map top/name and before synthesis; preserve differently named images. A subsequent success generates the image normally.
+- **Caught/covered by:** extended compiler diagnostic tests and actual95/88-LC binary-I2C failure (`build/compiler_stale_image_20261005/verification.txt`). Fresh successful fault-demo rebuild remains byte-identical to the already loaded/tested image. No chip change.
+
+## 29: Default primitive timing audit could select a newer experimental tile
+- **Date:** 2026-10-05
+- **Symptom:** default tile timing check selected the latest completed PRIM2T2S run even when its netlist differed from the committed G1 tile; historical run paths were absent.
+- **Root cause:** selection used recency and file existence, without binding the routed artifacts to the chip being assessed.
+- **Caught by:** fresh audit/source check; committed netlist SHA25613fec76424949b0d25789ca8d0721b74d4acdba5ff93eaeb99dfb4d412f6a170 differs from latest run2c49c0e6dba54229e6d9e267df28dc373a5191258fb08b716bb7ee7ff6973dc0. No completed local run is byte-identical to the committed tile; semantic equivalence of other runs is not established.
+- **Fix:** default selects only matching netlists and requires matching SPEF; an explicitly supplied variant is rejected unless `WARP_TIMING_ALLOW_VARIANT=1`, which labels the comparison experimental. A byte mismatch is conservative rejection, not proof of functional difference.
+- **Coverage:** `build/primitive_path_audit_20261005/default_missing_artifact_check.log` rejects unavailable matching evidence; explicit missing-artifact and variant checks; shell syntax passes. Historical timing numbers remain historical; no refreshed G1 timing pass claimed.
+
+## 30: Bare OpenDB cell swap crashes the pinned STA callback
+- **Date:** 2026-10-06
+- **Symptom:** isolated pin-hotspot resize crashes with signal11 before placement; no output database is written.
+- **Root cause:** geometry-only helper reads an ODB without Liberty, then calls `dbInst.swapMaster`. The pinned callback `dbStaCbk::inDbInstSwapMasterBefore` reaches `sta::ConcreteCell::portCount` without loaded Liberty cell objects. This is a scratch-tool setup issue, not an observed chip fault.
+- **Caught by:** `build/route_root_audit_20261006/chip_nor3_pin_screen/placement.log` stack trace and exit139.
+- **Fix/coverage:** require `WARP_SIZE_LIB` and `read_liberty` before `read_db`/swap. Actual rerun `placement_with_liberty.log` reaches detailed placement, which separately reports a local legalization failure; no routing or legalization pass claimed from resolving the crash. Frozen/upstream files untouched.

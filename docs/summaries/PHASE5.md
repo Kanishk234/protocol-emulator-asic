@@ -1,6 +1,14 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (2026-09-28). The evidence, tests and reproduction fixes are in the working tree; CI has not run on them yet. The README flow and all local checks passed from a source export and fresh venv on the development machine; the phase checklist still asks for a clean machine or container.
+**Status:** in progress (updated 2026-10-06). Evidence and software improvements are grouped into authorized commits; hosted validation is being launched. The README flow and all local checks passed from a source export and fresh venv on the development machine; the phase checklist still asks for a clean machine or container. Separate checkpoint experiments do not close that requirement.
+
+The compact successor's best completed route retains144markers; a warm restart
+saves15 at iteration8 without final repair/checks. Ground-up geometry identifies
+crowded west-channel pin escapes and clock/control crossings. A separate hosted
+workflow now tests routing, native mapped fabric and four G1 software demos,
+avoiding heavy local computation. The native-fabric and configured-fabric timing
+gates remain open; G1 stays frozen. See the
+[closure plan and competitor research](../reports/compact_acceptance_and_competitors.md).
 
 ## Goal
 Make WARP's design choice, results, limits and use understandable to a judge, and make the simulation results reproducible from a clean source tree.
@@ -15,6 +23,39 @@ Make WARP's design choice, results, limits and use understandable to a judge, an
 - The pinned FABulous release requires Python 3.12 or newer; the README and agent guidance now say so.
 - All Phase 4 tests reached green CI, but the new F3 and pyuvm checks still need CI evidence after the current changes are committed and pushed.
 - The evidence report still needs a final pass over local-only measurements and their reproducible source references before its checklist item can be ticked.
+
+## October 5 milestone
+
+The unchanged fallback can now run UART and an independent event monitor
+together, and a second bitstream adds externally timed corruption of selected
+TX bits. The latter uses38/88 logic cells. Real SPI-loaded RTL and synthesized
+shell tests pass normal RX/errors, injected corruption, recovery, monitoring,
+reset and STOP parking. These remain local RTL-fabric tests without new CI,
+SDF or silicon evidence; exact reports are `docs/reports/g1_uart_monitor.md`
+and `docs/reports/g1_uart_fault_monitor.md`.
+
+Compiler seed, control-mapping and FSM screens retain default settings;
+no overall improvement is established. Strict port checking and structured
+failure diagnostics make mistakes easier to find, including invalidating
+stale success reports. Compiler/board unit checks pass315tests in local run
+`compiler_host_unit_final_20261005`. Scratch compact hardware remains a separate
+unpromoted experiment; its routing failures do not block these G1 improvements.
+
+Compiler reports now bind listed sources/models to the emitted image with
+fingerprints, and an audit checks those files plus image CRC/architecture/length.
+Actual tools reject an owned source changed during compilation. This improves
+evidence traceability without claiming hermetic reproduction or chip timing.
+The historical G1 CI archive was searched for missing original tile parasitics;
+it contains chip-level extraction only, so that reproduction gap remains open.
+Details: `docs/reports/compiler_provenance.md` and `docs/reports/reproduction.md`.
+
+G1 also runs UART alongside a two-entry soft timestamp queue. Its83-cell
+version records one-clock ticks with64-clock wrap; an85-cell option gives
+four-clock ticks with256-clock wrap. Real loaded RTL and synthesized-shell
+tests cover concurrent TX/capture, quantization/wrap, overflow/order,
+backpressure, RX, reset and STOP. These local results preserve the same
+RTL-fabric/no-SDF limits and do not replace the open clean-machine/CI gates.
+Evidence: `docs/reports/g1_uart_capture.md`.
 
 ## What's left
 - Repeat in a clean machine or container to satisfy the checklist literally.

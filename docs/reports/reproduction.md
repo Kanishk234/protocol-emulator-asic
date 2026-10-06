@@ -27,3 +27,38 @@
 
 - Repeat the source export in a clean machine or container to satisfy the phase checklist literally.
 - Confirm the same results in CI on the committed Phase 5 changes.
+
+## October 5 routed primitive timing artifact gap
+
+A fresh path-audit attempt finds the historic PRIM2T2S run netlist/SPEF path
+no longer present (`build/primitive_path_audit_20261005/audit.log`). The
+committed G1 primitive-tile netlist exists, but matching extracted SPEF is
+not available locally. This does not invalidate the recorded historical
+comparison; it prevents reproducing it from the current local artifacts.
+No fresh routed timing pass is claimed. Restore matching archived artifacts
+or rebuild the same tile with pinned tools before repeating the check.
+`tools/timing/tile_check.sh` now checks for both artifacts explicitly and
+fails with recovery instructions. Netlist-only timing is not substituted for
+routed parasitics. This is another open item in the phase5 reproduction audit.
+
+Follow-up: newer experimental PRIM2T2S netlists/SPEFs do exist, but none of
+the completed local run netlists is byte-identical to committed G1. The default
+audit previously chose the newest experiment. It now selects only matching
+netlists (BUGS#29); explicit variants require
+`WARP_TIMING_ALLOW_VARIANT=1` and are labeled experimental. Byte differences
+are not proof of semantic differences, but no equivalence has been established
+for substituting those artifacts. The missing evidence is the matching G1
+archive, not every PRIM2T2S parasitic file. Default rejection is recorded in
+`build/primitive_path_audit_20261005/default_missing_artifact_check.log`.
+
+## Historical CI archive search, October 5
+
+Queried historical G1 run36342012141 and downloaded unexpired `GDS_logs`
+artifact10939348491 to an ignored local archive. Its909members include only
+chip-level `tt_um_warp.nom.spef` (stage/final copies), with no PRIM2T2S netlist
+or extracted tile parasitics. This archive cannot refresh the missing original
+primitive-tile comparison. Inventory evidence:
+`build/g1_timing_archive_audit_20261005.txt`; archive
+`build/g1_gds_logs_36342012141.zip`. No remote/history change or substituted
+experimental timing evidence. Further restoration must use the original
+local tile archive or a separately identified matching source/artifact set.

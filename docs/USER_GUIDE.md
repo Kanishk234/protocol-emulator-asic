@@ -98,7 +98,37 @@ Needs the OSS CAD Suite (`docs/VERSIONS.md`) and `bash scripts/fetch_nextpnr.sh`
 - `report.json`: logic cells, hard blocks and IO cells used, the parameters, pins, unmapped ports, the tool versions, and an Fmax **estimate** at the slow corner (a model, `tools/timing/README.md`; keep it above your clock);
 - logs of every step.
 
-Errors you may see: a pin-map error (unknown port or pin, a pin used twice), "no legal placement" (the design does not fit: see `report.json` and §7), a missing tool.
+Add `--strict-ports` to reject unmapped inputs and outputs before synthesis.
+Without it, omitted inputs are tied to zero and omitted outputs are left open;
+both are listed in the report. This option helps catch a forgotten signal in
+the pin map. Intentional omissions can use the default behavior.
+
+Errors you may see: a pin-map error (unknown port or pin, a pin used twice),
+"no legal placement" (the design does not fit: inspect `synth.log` and
+`pnr.log`, then §7), or a missing tool. `report.json` is written only after a
+successful build. A placement/routing failure writes `failure.json` with
+available resource counts and the error; over-capacity resources are also
+printed. A rebuild clears previous success/failure reports so they cannot be
+mistaken for its result. The target `.wbit` is also invalidated before rebuilding,
+so a failed build cannot leave an old image at the advertised output path;
+other images in that directory are preserved. The printed model Fmax is not
+whole-chip timing signoff.
+
+Successful reports now also record the placement seed, control-mapping threshold
+and SHA-256 fingerprints of listed sources, pin map, architecture/generated
+fabric files, compiler files and the emitted image. Check them with:
+
+```sh
+python -m compile.audit ../build/mydesign/report.json
+```
+
+The audit rejects missing/changed listed inputs, a swapped or corrupt image,
+and disagreement between the image and report's architecture/length/CRC.
+Reports retain the original absolute paths, so keep those inputs available.
+This is a consistency check, not authentication or timing/behavior signoff;
+recursive Verilog includes and vendor binaries/libraries are outside its scope.
+If a listed input changes during compilation, the compiler rejects the build
+before emitting an image. Legacy reports need a rebuild to obtain fingerprints.
 
 `python -m compile.protocols` compiles every design in `protocols/` and prints the fit table.
 

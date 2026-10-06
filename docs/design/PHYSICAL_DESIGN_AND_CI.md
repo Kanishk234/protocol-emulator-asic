@@ -83,3 +83,57 @@ Local equivalents: `scripts/check_all.sh` (lint + all simulation tests), `script
 | 2026-09-28 | 3047dea | G1 + reset synchronizer (BUGS #18) | 36.8 min | 4.4 min, pass | 6.8 min, **pass 21/21** | 36383587262 | Shell 3,723 std cells / 60,567 µm², utilisation 82 %; setup WS +12.48 ns (slow), hold WS +0.112 ns (fast); routing DRC 0 (local pre-flight had 36 on `clk`), LVS 0, antenna 0, Magic DRC 0; IR drop 0.90 mV |
 
 Budget: GitHub stops a job at 6 h. The empty 6x4 tile already costs about 35 min, most of it fixed-cost steps over the empty area, so a filled fabric will take longer; re-measure after the first fabric hardening.
+
+### Scratch 5 × 3 edge hardening (2026-09-30)
+
+Local tighter-edge `N_IO` run `RUN_2026-09-30_15-14-35` completed at
+17:04:01, about 109.4 minutes elapsed, with zero routing/KLayout DRC. The
+45.36 µm `S_IO2` run `RUN_2026-09-30_17-04-02` completed around 17:05 with
+the same checks clear. These are individual tile runs under concurrent local
+load, not CI or complete-chip durations. Narrow north-edge routing can dominate
+the batch; do not budget the entire rebuild from the faster south tile.
+Evidence is under `build/arch_explore/compact_edges_tighter/` (ignored logs).
+The superseded `compact_mask_m1_drt` was stopped. The improved
+`compact_narrow_rows_drt` reached 1,059 native violations at iteration 8 before
+a daemon restart. Its recovery and the unfinished tighter tile batch were
+stopped at the user's request; no complete chip hardening duration or final
+routing pass is available. See WORKLOG session 37 for restart inputs.
+
+### Hosted experiment migration (2026-10-06)
+
+Separate `.github/workflows/experiments.yaml` uses standard GitHub-hosted
+Ubuntu24.04 runners for compact routing, native mapped-fabric diagnosis and G1
+software demonstrations. Template jobs, frozen hardware and `main` are unchanged.
+No self-hosted or paid/larger runner is configured. Artifacts expire after one
+day. Routing step is bounded to300minutes (job330), native job35, demos40.
+
+D-044 warm restart reaches a complete15-marker iteration8 checkpoint; it ends
+locally before final native repair/checkers. Hosted work resumes that separately
+hashed experimental asset, not a clean-source rebuild. LibreLane3.1.0.dev3 Docker
+and four threads differ from local3.0.0 Nix packaging; OpenROAD source and PDK
+revisions remain pinned. No convergence ETA or physical pass follows from15.
+Macro-black-box shell STA does not close configured-fabric timing. See
+`spikes/cloud/README.md` and `docs/reports/compact_acceptance_and_competitors.md`.
+
+### Compact diagnostic run timing (2026-10-05)
+
+Local `compact_narrow_rows_drt_20261005` completed initial16-iteration
+DRT in42m36s, then three antenna repair/reroute passes in32m20s,31m40s
+and25m22s:131m58s total DRT wall time, excluding surrounding flow steps.
+Source: `build/arch_explore/compact_edges/chip_mask_narrow_rows/runs/compact_narrow_rows_drt_20261005/01-openroad-detailedrouting/openroad-detailedrouting.log`,
+each pass's final DRT-0267 summary. Final routing reports716DRC markers
+and the checker fails; this is not successful hardening. Later Magic DEF
+via-reading errors are additional flow errors, not the cause of the716
+TritonRoute violations. Later completed sharedCRC and tighter branch-buffer
+routes retain404and144markers respectively; neither passes. The separate
+preplaced-diode restart is active. Clock-minimum-Metal3 bounded DRT finishes
+in13m08s with3784markers after two optimization iterations (baseline3482),
+so that screen is set aside. Local CRC padding is a new bounded diagnostic,
+not a completed hardening. Exact runs: `docs/reports/compact_route_diagnosis.md`.
+
+October6: preplaced-diode restart completes three DRT passes in66m00s,
+43m58s and64m53s,174m51s total, ending258routing markers/0antenna nets or
+pins. The routing checker fails; later incompatible Magic was stopped.
+Local CRC padding bounded screen finishes13m22s at3477markers versus3482
+baseline. Neither is selected; no compact whole-chip route is currently
+running. Full pass durations vary substantially and are not an ETA to zero.

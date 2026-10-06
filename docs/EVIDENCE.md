@@ -77,12 +77,14 @@ The organizers asked for the flow from a protocol description to a bitstream, ho
 | Mutation | 11 planted bugs, all caught | `docs/reports/mutation.md` (local), `scripts/mutation.py` |
 | Timing model | primitive timing arcs checked against STA of the hardened primitive tile | `tools/timing/README.md`, D-028 |
 
-Bugs found and fixed along the way, with the check that now covers each: `docs/BUGS.md` (20 entries).
+Bugs and investigations, with the checks and limits recorded for each: `docs/BUGS.md`.
 
 ## 9. Known limits
 
 - **No hardware results**: no silicon, no board; rates are model estimates (Fmax 53–91 MHz for the supported designs, `tools/timing/README.md`), not measurements.
-- **Capacity**: 88 cells; the I2C target and CAN do not fit; one design at a time.
+- **Capacity**: 88 cells; the I2C target and CAN do not fit. One bitstream runs at a time, but it can contain concurrent functions: a local UART-plus-event-monitor demonstration fits at 37/88 cells and passes loaded RTL and synthesized gate-shell tests (`docs/reports/g1_uart_monitor.md`, C11); it has no new hardened-netlist/CI result.
+- **Fault-control showcase**: the UART/monitor plus externally timed TX line inversion fits at38/88 cells and passes two-case loaded RTL and synthesized-shell suites (`docs/reports/g1_uart_fault_monitor.md`, C12). This controls selected corruption and preserves monitoring; it is not an autonomous fault scheduler or a silicon result.
+- **Soft capture**: UART plus a two-entry six-bit timestamp queue fits at83/88cells and passes loaded ordering/overflow/wrap/backpressure/TX/RX/reset tests (`docs/reports/g1_uart_capture.md`, C13). Default timestamps wrap at64clocks; an85-cell option trades four-clock resolution for256-clock wrap, with loaded quantization/wrap checks. The eight-bit stored timestamp version exceeds capacity at91cells. No new hardware or native gate timing evidence.
 - **Host link**: one byte per SPI transaction; a protocol needing a byte every few µs (WS2812) needs a fast host.
 - **Parked outputs are 0**: active-low signals on `uo_out` pins are asserted while stopped (BUGS #19); use a bidirectional pin with a pull-up.
 - **Gate-level fabric**: chip tests simulate the fabric from its RTL, not its hardened netlist (D-023); per-tile netlist-vs-RTL equivalence is not done.

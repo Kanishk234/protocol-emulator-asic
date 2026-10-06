@@ -256,22 +256,23 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Symptom/check:** compact37512885358 attempt2 route job downloads/verifies inputs and Docker image, then exits with the input device is not a TTY before OpenROAD starts.
 - **Root cause:** cloud driver placed docker-no-tty after dockerized; LibreLane's eager container callback launches before later options are applied.
 - **Fix:** place docker-no-tty first. No source/PDK/physical checker changes.
-- **Coverage:** static check passes; next hosted launch verifies actual routing startup. [Pinned CLI contract](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/__main__.py).
+- **Coverage:**37516278474 passes container launch and reaches directory validation;37516794406 passes that validation and remains in the routing step. No final routing pass implied. [Pinned CLI contract](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/__main__.py).
 
 ## 33: Tighter native fabric retains unknown user state after real load
 - **Date:**2026-10-06.
 - **Symptom/check:**37512885358 attempt2 native job: tighter RTL control passes; actual mapped fabric fails UART recording with X at output. All8707 configuration bits are known and image-matching;26944 CRC processing cycles have stable input. Selected user registers already unknown before RUN despite shell user_reset=1/user_rst_n=0.
 - **Root cause:** unresolved. Known configuration is insufficient to distinguish mapped logic/reset behavior from zero-delay combinational/model pessimism. No hardware/model fix claimed.
 - **Next coverage:** derive a read-only cone JSON from the exact mapped tile and trace LB register D logic at pre/post RUN; separately probe the real USER_RESET command while retaining ordinary native failure. No configuration or user-state force. Existing D-023 routing harness remains explicitly limited; native/SDF acceptance is open.
+- **Follow-up:**37516794406 cone extraction/RTL control pass; native baseline18.81s and real USER_RESET probe19.12s both fail with UART X. Known configuration does not identify the root cause. Next diagnostic follows selected mux branches and actual UART output at Tile_X6Y2, with tile boundaries labeled explicitly.
 
 ## 34: Hosted LibreLane requires existing forced run directory
 - **Date:**2026-10-06.
 - **Symptom/check:**37516278474 route passes Docker launch, then CLI rejects nonexistent forced native_route directory before OpenROAD.
 - **Root cause:**3.1.0.dev3 validates force-run-dir with exists=True; our fresh cloud root omitted its run directories.
-- **Fix/coverage:** create both empty native/geometry run directories under the already freshness-checked output root before invoking CLI. Static checks pass; hosted execution verification pending.
+- **Fix/coverage:** create both empty native/geometry run directories under the already freshness-checked output root before invoking CLI.37516794406 passes validation and continues in the routing step; physical checker results pending.
 
 ## 35: Distribution Yosys cannot parse PDK model specify syntax
 - **Date:**2026-10-06.
 - **Symptom/check:**37516278474 native RTL control passes; new read-only cone extraction fails parsing PDK Verilog line43's specify syntax before native tests.
 - **Root cause:** distribution Yosys parser does not support this PDK model timing syntax, even when read as black-box library.
-- **Fix/coverage:** read signal port directions from the pinned standard-cell Liberty with read_liberty -lib, then read actual tile netlist without mapping/optimization. Native simulation still uses unchanged official Verilog/UDP models. Static checks pass; hosted cone/test verification pending. This setup failure neither supersedes prior native X failure nor qualifies hardware.
+- **Fix/coverage:** read signal port directions from the pinned standard-cell Liberty with read_liberty -lib, then read actual tile netlist without mapping/optimization.37516794406 successfully emits actual_tile_cone.json and reaches both native tests. Simulation uses unchanged official Verilog/UDP models. BUG33 remains open; fixing extraction does not qualify hardware.

@@ -81,3 +81,25 @@ no-TTY is placed after eager dockerized option (BUG32). Corrected ordering,
 visible bounded progress and read-only native cone/reset diagnostics are added;
 new cloud verification pending. Existing G1 fabric37511778167 passes; G1
 physical37511778153 remains running at this entry. No compact pass claimed.
+
+## Corrected setup and unresolved native behavior
+
+[Run37516794406](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37516794406)
+at1784a49 passes directory validation, with routing still active when checked.
+No new final routing count is available. Actual Liberty-based cone extraction
+passes; tighter RTL control passes; native UART fails18.81s and the separately
+labeled real USER_RESET probe fails19.12s. All8707 configuration bits remain
+known and image-matching. Artifact `compact-native-37516794406` retains logs,
+actual tile connectivity and strict nonzero native result.
+
+The initial tile cone includes inactive mux branches and stops at tile inputs.
+Neither is evidence of a whole-chip undriven net. Follow-up diagnostics trace
+known selected mux data and actual UART output at Tile_X6Y2_E_IO4_wide.B_IN_top.
+The independent `compact native diagnostic` workflow performs this investigation
+without starting another route. It retains ordinary native failure even if a
+reset probe succeeds; no state/configuration force or PDK model change.
+
+All four G1 demo tests pass again in37516794406. At1784a49, lint37516794249,
+docs37516794365, test37516794224 and unit37516794383 pass. Original G1
+gds/precheck/viewer37511778153 pass; gl_test remains active at this check.
+These results do not close compact/native/configured-fabric timing gates.

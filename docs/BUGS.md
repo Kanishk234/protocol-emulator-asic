@@ -249,4 +249,4 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Symptom/check:** hosted compact experiments37511778394; monitor compiles/audits and passes loaded RTL in22.72s, then fault synthesis reports missing uart_monitor_top.
 - **Root cause:** new cloud driver supplied fault top and UART sources but omitted the intermediate monitor module present in the documented local compile command.
 - **Fix:** include protocols/uart_monitor/uart_monitor_top.v only for the fault case. No hardware/compiler change.
-- **Coverage:** rerun the fresh hosted compile/audit/loaded suite; fix verification pending, do not call the first run a four-demo pass.
+- **Coverage:** hosted37512249763 at f671c1b passes all four fresh compile/audit/loaded RTL cases; independently checked four XMLs, exactly one case each, no failure/error/skip. See `docs/reports/hosted_experiments_20261006.md`. The first run remains failed; no native/SDF result is implied.

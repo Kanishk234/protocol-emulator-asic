@@ -93,6 +93,23 @@ careful locality. They do not require switching WARP to a processor. The
 competition value remains programmable parallel user logic backed by measured
 coverage; a claim that WARP outperforms these designs requires equal-area data.
 
+## Research on persistent pin conflicts
+
+[Kahng et al., pin-access-driven placement refinement](https://vlsicad.ucsd.edu/Publications/Journals/j135.pdf)
+shows that equal cell/pin density can still yield different accessibility when
+pin shapes align differently with routing tracks, and motivates bounded local
+placement with actual access information. Its advanced-node commercial-tool
+results are not WARP measurements. Our inference: if residual clusters persist,
+screen legal cell mirroring or a small site shift before broadly adding padding.
+Preserve rail/row legality, connectivity and needed clock/hold structures; judge
+native routed geometry and fresh timing. This changes a concrete pin/track
+relationship that density-only placement may miss.
+
+[TritonRoute's authors](https://vlsicad.ucsd.edu/Publications/Journals/j133.pdf)
+describe separate pin access, routing and search/repair stages. That supports
+inspecting exact access candidates and neighbor interactions rather than
+assuming a zero-overflow global route guarantees legal detailed routing.
+
 ## Work independent of compact routing
 
 The monitor, fault monitor, two-entry capture and timestamp-prescaling option

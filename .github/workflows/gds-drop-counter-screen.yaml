@@ -8,7 +8,7 @@ on:
         required: true
         default: drop-counter
         type: choice
-        options: [drop-counter, drop-qual, bs-resync, bs-csa, setup-margin]
+        options: [drop-counter, drop-qual, bs-resync, bs-csa, bs-event-late, bs-load-flat, setup-margin]
 
 permissions:
   contents: read

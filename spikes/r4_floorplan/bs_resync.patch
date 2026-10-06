@@ -1,0 +1,23 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -130,7 +130,7 @@
+     wire        done = !hsync && smp_done;
+     // P22: e = time since the bit start; before the sample move later by min(e, SJW), after it end earlier
+     wire [24:0] e    = per - tb;
+-    wire        rs_do = rs_edge && (sj != 25'd0) && (smp_done ? (tb != 25'd0) : (e != 25'd0));
++    wire        rs_do = rs_edge && (sj != 25'd0) && (smp_done ? (tb != 25'd0) : (per != tb));
+     // Fold the min-and-add/subtract into the boundary value directly. Before the sample,
+     // tb + min(per - tb, sjw) is either per or tb + sjw. After it,
+     // tb - min(tb, sjw) is either zero or tb - sjw. This removes one 25-bit
+@@ -138,7 +138,10 @@
+     wire [24:0] tb_r = !smp_done ? ((e < sj) ? per : tb + sj) : ((tb < sj) ? 25'd0 : tb - sj);
+     wire [24:0] sp   = sof - per;                               // sample time - boundary time
+     wire [24:0] x_n  = sp + tb;                                 // the sample time, from this clock's start
+-    wire [24:0] x_r  = sp + tb_r;                               // the same after a resync
++    // Cancel the saturated correction before doing sample-time arithmetic.
++    // These identities hold modulo 2^25, including timer wrap and live writes.
++    wire [24:0] x_r = !smp_done ? ((e < sj) ? sof : x_n + sj) :
++                                ((tb < sj) ? sp : x_n - sj);
+     wire        s_n  = x_n[24] || (x_n < 25'd256);              // at or before the end of this clock
+     wire        s_r  = x_r[24] || (x_r < 25'd256);
+     wire        s_h  = sof < 25'd256;

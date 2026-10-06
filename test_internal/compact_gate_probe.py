@@ -6,6 +6,10 @@ import os
 from pathlib import Path
 from functools import lru_cache
 from itertools import product
+import cocotb
+from cocotb.triggers import FallingEdge, RisingEdge, ReadOnly
+
+_timer_watch_started = False
 from cocotb.handle import HierarchyObject
 
 
@@ -123,6 +127,10 @@ def report_runtime(dut, label):
                                tile, flop["connections"][port][0])
         module = read_cone_json(full_cone)["modules"]["PRIM2T2S_C2"]
         tile = top.u_fabric.Tile_X2Y2_PRIM2T2S_C2
+        global _timer_watch_started
+        if not _timer_watch_started:
+            _timer_watch_started = True
+            cocotb.start_soon(watch_timer_first_unknown(dut, module, tile))
         prefix = "Inst_TB_wp_timer."
         count = "".join(str(tile[prefix + f"count[{i}]"].value) for i in range(15, -1, -1))
         dut._log.info("UART TIMER %s count=%s armed=%s", label, count, tile[prefix + "armed"].value)
@@ -134,6 +142,49 @@ def report_runtime(dut, label):
                         if state in cell["connections"].get("Q", []))
             trace_unknown_cone(dut, label + " UART_TIMER_" + name + "_D", module,
                                tile, flop["connections"]["D"][0])
+
+
+async def watch_timer_first_unknown(dut, module, tile):
+    """Retain stable pre-edge timer inputs, then report its first known→X edge."""
+    prefix = "Inst_TB_wp_timer."
+    aliases = {}
+    for name, net in module["netnames"].items():
+        for index, bit in enumerate(net["bits"]):
+            aliases.setdefault(bit, []).append((name, index))
+    flops = []
+    for i in range(16):
+        bit = module["netnames"][prefix + f"count[{i}]"]["bits"][0]
+        flops.append(next(cell for cell in module["cells"].values()
+                          if bit in cell["connections"].get("Q", [])))
+
+    def value(bit):
+        if isinstance(bit, str):
+            return bit
+        for name, index in aliases.get(bit, []):
+            try:
+                return str(tile[name].value)[-1-index].lower()
+            except (AttributeError, KeyError, IndexError):
+                continue
+        return "?"
+
+    def counter():
+        return "".join(str(tile[prefix + f"count[{i}]"].value).lower()
+                       for i in range(15, -1, -1))
+
+    for _ in range(12000):
+        await FallingEdge(dut.clk)
+        await ReadOnly()
+        before = counter()
+        data = "".join(value(flop["connections"]["D"][0]) for flop in reversed(flops))
+        resets = "".join(value(flop["connections"]["RESET_B"][0]) for flop in reversed(flops))
+        await RisingEdge(dut.clk)
+        await ReadOnly()
+        after = counter()
+        if all(c in "01" for c in before) and any(c not in "01" for c in after):
+            dut._log.info("FIRST TIMER X: stable pre-edge count=%s D=%s RESET_B=%s; post-edge count=%s",
+                          before, data, resets, after)
+            report_runtime(dut, "first timer known-to-X edge")
+            return
 
 
 def report_unknown_cone(dut, label, path):

@@ -274,11 +274,15 @@ def report_shadow(dut, label):
                                    module, native, bit)
                 if values in ("0" * 16, "1" * 16):
                     configuration = {}
-                    for signal in native:
-                        if re.search(r"ConfigMem\.Inst_frame\d+_bit\d+\.Q$", signal._name):
+                    # Some configuration latches lose ConfigMem aliases when
+                    # their outputs become direct LUT selector nets. Capture
+                    # actual latch-cell outputs, not a name-based subset.
+                    for cell_name, mapped_cell in module["cells"].items():
+                        if mapped_cell["type"] == "sg13cmos5l_dlhq_1":
+                            signal = native[cell_name].Q
                             if not signal.value.is_resolvable:
                                 raise RuntimeError("Unknown captured configuration for local proof")
-                            configuration[signal._name] = int(signal.value)
+                            configuration[cell_name + ".Q"] = int(signal.value)
                     if not configuration:
                         raise RuntimeError("No captured configuration for local proof")
                     proof_targets.append(dict(instance=instance, module=macro["cells"][instance]["type"],

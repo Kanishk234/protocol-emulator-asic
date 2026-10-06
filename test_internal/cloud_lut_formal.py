@@ -35,7 +35,7 @@ def run_proofs(root, work, library):
             f"read_liberty -ignore_miss_func {library}", f"read_verilog {netlist}",
             f"hierarchy -check -top {module}", "flatten", "proc",
             f"select -module {module}",
-            "setattr -set keep 1 w:*ConfigMem*",
+            "setattr -set keep 1 w:*ConfigMem* w:*.Q",
             "cutpoint t:$*ff* t:$*latch* t:$_DFF* t:$_DLATCH*",
             "opt_clean", f"write_json {out / f'target_{index}.json'}",
             # First establish feasibility, so an inconsistent constraint set

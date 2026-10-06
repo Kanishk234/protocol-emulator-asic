@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (publish and launch approved timing prototypes)
+Done:
+- User explicitly approved separate prototype/CI/docs commits, push to the exact Kanishk234 repository and both screen launches. Published66bc13d(prototypes),fa16d52(CI) and6847566(evidence/docs). No hardware inputs pending in origin/main..main; no main RTL/config/spec changed.
+- Launched resync screen37504886226 and independent2ns margin screen37504890339, both gds-rtl-timing-screen on main. Each has its own unchanged baseline and isolated candidate. Main test/lint/unit/docs checks queued on6847566.
+- SRAM routed GL37499559483 remains active; CTS routed GL37502135732 pending. Best actual extracted setup remains SRAM−1.385050ns; CTS−1.996169ns is worse. No phase boxes ticked.
+Next:
+- Audit fresh resync/margin timing, electrical counts, area and routing overflow. Advance only measured qualifying candidates with matching modified-RTL provenance; then demonstrate complete2/4 official-GDS timing before the3/6 attempt.
+
 ## 2026-10-06: Codex (implement structural timing prototypes at 2/4)
 Done:
 - Recorded user-directed2/4 official closure first, then3/6 if area permits (D-070). Prepared isolated drop_qual.patch, bs_resync.patch and bs_csa.patch against3393eea; no main RTL/spec/config changed. D-071 records general need, behavior preservation and costs.

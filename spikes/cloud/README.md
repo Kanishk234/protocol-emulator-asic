@@ -19,6 +19,10 @@ Storage has its own limits and is not claimed to be unlimited.
 The native job uses the existing D-023 routing-settling harness, not forced
 configuration or user storage. These tests contain no SDF. Shell STA black-boxes
 the fabric macro, so success does not close configured-fabric timing.
+The actual mapped tile is parsed read-only to trace unknown register-input
+cones. On baseline failure, a separate real-host USER_RESET probe runs for
+diagnosis; its result never overrides the ordinary test's failure. Routing
+milestones are printed to Actions logs while full logs remain in artifacts.
 
 The 5.41 MiB checkpoint is a separately published experimental prerelease asset,
 not a binary committed to Git. `checkpoint.json` pins its whole-archive SHA256;

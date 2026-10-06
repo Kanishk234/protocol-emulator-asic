@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Project simulation venv
         run: |
-          sudo apt-get update && sudo apt-get install -y iverilog python3-venv
+          sudo apt-get update && sudo apt-get install -y iverilog yosys python3-venv
           python3 -m venv .venv
           source .venv/bin/activate
           python -m pip install -r test/requirements.txt pyyaml==6.0.3

@@ -26,6 +26,7 @@ Unmapped user inputs are tied to 0; unmapped outputs are left open (both reporte
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import re
@@ -356,12 +357,31 @@ def parse_pnr_log(log: Path):
     return util, (fmax[-1] if fmax else None)
 
 
-def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None):
+def fingerprint_inputs(paths):
+    """Snapshot explicitly listed inputs; includes are not discovered recursively."""
+    rows = []
+    for path in sorted({Path(p).resolve() for p in paths}):
+        try:
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        except OSError as exc:
+            raise CompileError(f"Cannot fingerprint compile input {path}: {exc}") from exc
+        rows.append({"path": str(path), "sha256": digest})
+    return rows
+
+
+def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None, strict_ports=False):
     arch_dir, out = Path(arch_dir).resolve(), Path(out).resolve()
     out.mkdir(parents=True, exist_ok=True)
+    # A previous successful report must not describe a failed rebuild.
+    for stale in ("report.json", "failure.json"):
+        (out / stale).unlink(missing_ok=True)
     meta, arch_pins = load_arch(arch_dir)
     spec = yaml.safe_load(Path(pins_file).read_text())
     top = spec["top"]
+    name = Path(pins_file).stem if Path(pins_file).stem != "pins" else top
+    # A failed rebuild must not leave the previous loadable image at the
+    # advertised output path. Other images in the directory are untouched.
+    (out / f"{name}.wbit").unlink(missing_ok=True)
     fab = (ROOT / meta["macro"] / "fabulous").resolve()
     if meta.get("primitives") and not (fab / ".FABulous" / "placement_estimate.txt").exists():
         raise CompileError(f"{fab}/.FABulous/placement_estimate.txt missing: without it paths through "
@@ -372,9 +392,21 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None):
 
     params = dict(spec.get("params") or {}, **(set_params or {}))   # parameters of the user top
     sources = prim_sources(meta) + list(sources)
+    input_paths = [*sources, pins_file, arch_dir / "arch.yaml", arch_dir / "pins.csv",
+                   fab / "bitStreamSpec.bin", *sorted((fab / ".FABulous").glob("*.txt")),
+                   Path(__file__), ROOT / "tools/compile/bitgen.py", ROOT / "tools/compile/bitfile.py"]
+    input_snapshot = fingerprint_inputs(input_paths)
     ports = user_ports(sources, top, out, params)
     use = resolve(spec["pins"], ports, arch_pins)
     wtext, unmapped_in, unmapped_out, cells = wrapper(top, ports, use, arch_pins)
+    if strict_ports and (unmapped_in or unmapped_out):
+        details = []
+        if unmapped_in:
+            details.append("inputs tied to zero: " + ", ".join(unmapped_in))
+        if unmapped_out:
+            details.append("outputs left open: " + ", ".join(unmapped_out))
+        raise CompileError("--strict-ports: " + "; ".join(details) +
+                           ". Add these ports to the pin map or omit --strict-ports for intentional omissions.")
     (out / "warp_top.v").write_text(wtext)
 
     pcf = "\n".join(f"set_io pad_{cell_id(bel)} {bel}" for bel in cells) + "\n"
@@ -385,17 +417,34 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None):
     run([tool("yosys"), "-s", str(out / "synth.ys")], out / "synth.log", out)
 
     env = dict(os.environ, FAB_ROOT=str(fab))
-    run([tool("nextpnr-generic"), "--uarch", "fabulous", "--json", str(out / "design.json"),
-         "--write", str(out / "design_pnr.json"), "-o", f"fasm={out / 'design.fasm'}",
-         "-o", f"pcf={out / 'pins.pcf'}", "-o", f"corner={SLOW_CORNER}",
-         "--seed", str(seed), "--log", str(out / "pnr.log"), "--timing-allow-fail"],
-        out / "pnr_stdout.log", out, env)
+    nextpnr = tool("nextpnr-generic")
+    try:
+        run([nextpnr, "--uarch", "fabulous", "--json", str(out / "design.json"),
+             "--write", str(out / "design_pnr.json"), "-o", f"fasm={out / 'design.fasm'}",
+             "-o", f"pcf={out / 'pins.pcf'}", "-o", f"corner={SLOW_CORNER}",
+             "--seed", str(seed), "--log", str(out / "pnr.log"), "--timing-allow-fail"],
+            out / "pnr_stdout.log", out, env)
+    except CompileError as exc:
+        util, _ = parse_pnr_log(out / "pnr_stdout.log")
+        failure = {"design": top, "arch": meta["name"], "stage": "place_route",
+                   "seed": seed, "utilisation": util, "error": str(exc),
+                   "tools": tool_versions()}
+        diagnostic = out / "failure.json"
+        diagnostic.write_text(json.dumps(failure, indent=2) + "\n")
+        over = [f"{name}: {row['used']}/{row['available']}"
+                for name, row in util.items() if row["used"] > row["available"]]
+        advice = ("Resource capacity exceeded (" + ", ".join(over) +
+                  "). Reduce logic/widths or reuse available primitives.") if over else (
+                  "Check shared reset/enable groups and routing constraints; "
+                  "resource totals alone do not guarantee placement.")
+        raise CompileError(f"{exc}\n{advice}\nDiagnostic: {diagnostic}") from exc
 
     # WARP bitgen (BUGS #13); every row, the edge rows included, is written
     words = gen_words(out / "design.fasm", fab / "bitStreamSpec.bin")
     check_frames(words, int(meta["config_rows"]))
+    if fingerprint_inputs(input_paths) != input_snapshot:
+        raise CompileError("Compile inputs changed during the build; no image emitted. Rebuild from stable inputs.")
     bf = BitFile(int(meta["arch_version"]), words)
-    name = Path(pins_file).stem if Path(pins_file).stem != "pins" else top
     bf.save(out / f"{name}.wbit")
 
     util, fmax = parse_pnr_log(out / "pnr.log")
@@ -414,6 +463,10 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None):
         "unmapped_inputs_tied_0": unmapped_in,
         "unmapped_outputs_open": unmapped_out,
         "tools": tool_versions(),
+        "build_options": {"seed": seed, "min_ctrl": MIN_CTRL, "strict_ports": strict_ports},
+        "provenance": {"scope": "explicit sources, pin map, architecture, generated fabric models and compiler files; excludes recursive includes and vendor binaries/libraries",
+                       "inputs": input_snapshot, "bitfile": str(out / f"{name}.wbit"),
+                       "bitfile_sha256": hashlib.sha256((out / f"{name}.wbit").read_bytes()).hexdigest()},
     }
     (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     return out / f"{name}.wbit", report
@@ -438,6 +491,8 @@ def main(argv=None):
     ap.add_argument("--arch", default=str(current_arch()))
     ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--strict-ports", action="store_true",
+                    help="reject unmapped inputs/outputs before synthesis instead of tying/opening them")
     ap.add_argument("--set", nargs="*", default=[], metavar="NAME=VALUE",
                     help="override a parameter of the user top (e.g. DIV=87 for 115200 baud at 10 MHz)")
     a = ap.parse_args(argv)
@@ -448,12 +503,13 @@ def main(argv=None):
             if not sep or not name:
                 raise CompileError(f"--set {kv!r}: expected NAME=VALUE")
             overrides[name] = int(value, 0) if re.fullmatch(r"-?(0[xXbBoO])?[0-9a-fA-F_]+", value) else value
-        path, rep = compile_design(a.sources, a.pins, a.arch, a.out, a.seed, set_params=overrides)
+        path, rep = compile_design(a.sources, a.pins, a.arch, a.out, a.seed,
+                                   set_params=overrides, strict_ports=a.strict_ports)
     except CompileError as e:
         print(f"compile: error: {e}", file=sys.stderr)
         return 1
     print(f"{path}: {rep['words']} words, CRC {rep['crc32']}, arch {rep['arch_version']}, "
-          f"Fmax {rep['fmax_mhz']} MHz ({rep['timing_corner']})")
+          f"model Fmax {rep['fmax_mhz']} MHz ({rep['timing_corner']}; not chip signoff)")
     for k, v in rep["utilisation"].items():
         print(f"  {k}: {v['used']}/{v['available']}")
     for w, lst in (("inputs tied to 0", rep["unmapped_inputs_tied_0"]),

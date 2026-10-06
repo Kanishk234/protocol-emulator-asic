@@ -28,3 +28,26 @@ Run [37408506116](https://github.com/Kanishk234/protocol-emulator-asic/actions/r
 Downloaded placement artifact audit: total instance area 508,444 um² (standard cells 463,135, macro 45,309.3), 33,169 instances. Electrical violations remain: slow slew 8; fast/typ slew 0; fanout 162 in each corner; capacitance 0 in each. Do not treat timing passes as electrical/signoff closure. Worst slow report begins with latch _48984_ to latch _49160_, zero slack; zero is not positive margin. Raw artifact lives under /tmp/placement-multicorner-37408506116.
 
 Prepared guarded gds-placement-route continuation of this exact frozen-hardware artifact, no resynthesis or new RTL. Validates source workflow/SHA, actual timing-placement config, constraints, all-corner repair, saved files and fresh source timing counts. Runs antenna check/repair/check, then six fresh single-corner before/after STA processes; aborts before DRT on dirty antenna or negative timing/nonzero timing violation counts. This is a routing diagnostic, not full signoff; electrical issues remain recorded. Thirty-two helper tests pass, including refusal of negative/missing timing or nonzero violation counts for each setup/hold corner.
+
+## Latest actual extracted timing
+
+Placement route [37412965189](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37412965189) completed successfully. Automatic extraction [37417248079](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37417248079) reports slow setup WS −1.731802306 ns, fast/typ setup0. Hold fast −0.035371207 ns, slow +0.115164992 ns, typ +0.012006063 ns. Actual slow setup deficit is 3.898297 ns smaller than the previous −5.630099 ns (69.2% reduction), comparing whole flows. Setup and fast hold still fail; zero global-route estimates did not survive extraction. Expanded routed L3 37417248117 completed: downloaded JUnit records22/22,0failures/errors/skips. This is functional verification without SDF.
+
+## Extracted path audit and independent follow-ups (2026-10-06)
+
+Downloaded extraction artifact37417248079 confirms119 slow setup violations and4 fast hold violations. Slow setup max report has119 failing path pairs:115 start at `_49057_` (U0 PERIOD config word4 bit10),3 at `_49139_` (U0mode word0 bit0),1 at `_46978_`. Worst path `_49057_`→`_48168_` (dropped[31]) is−1.731802ns; next dropped[30]−1.716378 and dropped[25]−1.707015. These are path-pair counts, not119 independent root causes. Live configuration remains timed.
+
+Fast hold failures:
+
+| Source | Destination | Slack(ns) |
+|---|---|---:|
+| lane0slots[634] latch `_50495_` | lane0ex_kt `_46718_` | −0.035371 |
+| lane0slots[633] latch `_50494_` | lane0ex_ot[1] `_46708_` | −0.029308 |
+| lane0slots[579] latch `_50270_` | lane0ex_ot[0] `_46707_` | −0.028054 |
+| U0config word0 bit8 `_49101_` | U0RX sst[0] `_48522_` | −0.002471 |
+
+Extracted electrical counts fast/slow/typ: slew3/101/13, fanout187/187/187, capacitance2/1/1. Post-route fanout now includes data drivers as well as162 clock leaves; do not apply the pre-route 'all violations are clocks' finding to this extracted report. Prepared data slew targets remain worst: `_30323_/Y` SRAM-enable4.354481ns and `_33713_/Y` lane-control3.998465ns versus2.5074ns limit. This supports separately measuring their buffers.
+
+Dispatched existing isolated comparisons: CTS37486833508, lane buffer37487199839, SRAM buffer37487199871. Each has an independent baseline; no simultaneous combined hardware change.
+
+Additional measurement prototype: drop_counter.patch changes only trw_chan_port's existing8-bit saturating DROPPED update to parallel per-bit toggle logic precomputed from registered state. It preserves reset, saturation, config-write/drop exclusion and clear/drop priority; no state/latency/spec addition. Late drop gating remains per-bit, targeting the actual failing endpoint cone. Yosys proves98 equivalence points atN=1/5/6/7/9/16 using equiv_simple plus successful induction;7/7fabric and5/5chip tests pass. Fresh2048-clock L2 comparison passes underVerilator and Icarus. Matched baseline/drop-counter screen uses timing-driven placement and all-corner repair. This is unmeasured until its physical results exist; no guarantee of WNS improvement or formal whole-chip claim. Raw local evidence under/tmp/drop-counter-trial-20261006.

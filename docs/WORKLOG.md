@@ -5,6 +5,49 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (continue actual-path-directed timing repairs)
+Done:
+- Audited downloaded37417248079 extracted artifact:119slow setup violations,4fast hold;115reported failing path pairs start atU0PERIOD word4bit10, worst endsdropped[31]. Fast hold paths are three lane-slot→execution-control and oneU0mode→RXsst[0]. Counts/electrical/path details recorded in PHASE2_INDEPENDENT_TIMING_SCREENS.md.
+- Confirmed two prepared slew targets survive as worst slow slew violations; dispatched CTS37486833508, lane37487199839, SRAM37487199871 as independent paired screens. No main RTL/config/spec changed.
+- Prepared drop_counter.patch targeting late control in saturating8-bit DROPPED update. Proved98module equivalence points each atN1/5/6/7/9/16 with induction;7fabric tests and5chip tests pass. Fresh2048-clock L2 passes underVerilator and Icarus. Shared helper14tests and workflow parse/diff checks pass. Prototype only, no measured timing gain yet.
+Next:
+- Publish/dispatch matched drop-counter screen; collect independent CTS/buffer metrics and route only selected candidate. Actual setup remains−1.731802ns and hold−0.035371ns; no phase boxes ticked. Fullsignoff and resource adoption still open.
+
+## 2026-10-06: Codex (new-day completed workflow check)
+Done:
+- No workflows running or queued. Latest nightly37476592630, main test/lint/unit/docs, placement route37412965189 and extraction37417248079 all successful.
+- Routed GL37417248117 completed successfully; downloaded JUnit records 22 cases, 0 failures, 0 errors and 0 skipped. Functional netlist evidence only, not timing signoff.
+Next:
+- Actual setup remains−1.731802ns and fast hold−0.035371ns. Audit extracted critical/electrical paths and choose prepared isolated repair comparisons. No phase boxes ticked.
+
+## 2026-10-06: Codex (workflow inventory explanation)
+Done:
+- Verified sole active run is l3-placement-routed-gl37417248117, expanded netlist simulation; none queued. Enumerated registered GDS workflows and distinguished completed screens, prepared manual experiments, route/extraction pipeline and historical diagnostics. GitHub workflow-list active means enabled, not running.
+Next:
+- Audit L3 result and extracted critical paths, then choose prepared experiments. Latest actual slow setup−1.731802ns and fast hold−0.035371ns remain failing. No phase boxes ticked.
+
+## 2026-10-06: Codex (placement route extracted timing result)
+Done:
+- Placement route37412965189 succeeded. Automatic extraction37417248079 succeeded and printed fresh all-corner timing: slow setup−1.731802306ns, fast/typ setup0; fast hold−0.035371207ns, slow+0.115164992ns, typ+0.012006063ns. Timing still fails; diagnostic workflow success is not signoff.
+- Slow setup improves3.898297ns versus previous actual−5.630099ns, about69.2% less deficit. This compares complete flows, not an isolated cell change.
+- Automatic gate-level L3 run37417248117 is active in expanded simulation; latest main unit/test/lint/docs all successful. Timing/path/electrical artifact details still need audit.
+Next:
+- Audit extracted critical paths/counts/electrical reports to select prepared experiments; fast hold repair must also survive extraction. Inspect L3 JUnit on completion. No phase boxes ticked.
+
+## 2026-10-06: Codex (workflow progress at 05:07 UTC)
+Done:
+- Two active workflows, none queued: route37412965189 (~50min since job start) in combined antenna/timing/DRT step; unit37413767879 (~40min) in Icarus chip/L3 tests, with Verilator and module-unit jobs successful.
+- Other three previously active unit workflows completed successfully; latest test/lint/docs successful. No new extracted timing run/result available.
+Next:
+- Monitor route and automatic downstream extraction/L3; actual WNS remains −5.630099ns until new extraction. No phase boxes ticked.
+
+## 2026-10-05: Codex (workflow progress at 04:33 UTC)
+Done:
+- Active placement route37412965189 started04:17UTC (~16min elapsed); setup/source download/provenance/image stages complete. Combined antenna/fresh-STA/DRT step active. Live job-log API returns404 while job is active, so exact router iteration is unavailable; do not claim DRT has started.
+- Four active unit workflows:37413767879 and37413470130 in Icarus chip/L3 and Verilator suites;37413151906 and37412962050 have Verilator/unit successful, Icarus chip/L3 still active. All four unit jobs passed. No queued workflows.
+Next:
+- Monitor route completion/gate, then automatic extraction and routed L3. No new WNS evidence or phase boxes ticked.
+
 ## 2026-10-05: Codex (three independent follow-ups and phase exit audit)
 Done:
 - Prepared manual gds-cts-cluster-screen (timing-placement baseline vs sink-cluster8), gds-lane-slew-screen (oneBUF4 on slot-write decode), and gds-sram-slew-screen (oneBUF4 on SRAM-enable branch). Buffer trials reuse exact37408506116 checkpoint and move only audited loads; no combined changes or main hardware edits.

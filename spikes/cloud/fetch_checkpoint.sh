@@ -17,6 +17,20 @@ for warp_attempt in {1..18}; do
     fi
     sleep 10
 done
+if [ ! -s build/cloud_download/compact-checkpoint.tar.gz ]; then
+    mkdir -p build/cloud_setup
+    python - <<'PY'
+import json
+from pathlib import Path
+Path('build/cloud_setup/checkpoint_status.json').write_text(json.dumps({
+    'status': 'blocked_before_eda',
+    'reason': 'Required experimental release asset is not available',
+    'design_tested': False,
+})+'\n')
+PY
+    echo '::error::Checkpoint asset unavailable: EDA did not start; this is an input/setup failure, not a routing or functional result.' >&2
+    exit 2
+fi
 python spikes/cloud/checkpoint.py materialize \
     --archive build/cloud_download/compact-checkpoint.tar.gz \
     --sha256 "$warp_asset_sha" --out build/cloud_input

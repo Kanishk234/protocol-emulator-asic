@@ -9,7 +9,7 @@ import shutil
 ROOT = Path(__file__).resolve().parents[2]
 out = ROOT / 'build/cloud_results'
 out.mkdir(exist_ok=False, parents=True)
-search = [ROOT / 'build/cloud_run', ROOT / 'build/cloud_native']
+search = [ROOT / 'build/cloud_run', ROOT / 'build/cloud_native', ROOT / 'build/cloud_setup']
 native_work = ROOT / 'build/cloud_input/materialized.json'
 if native_work.is_file():
     details = json.loads(native_work.read_text())

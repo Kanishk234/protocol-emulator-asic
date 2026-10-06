@@ -236,6 +236,46 @@ def report_shadow(dut, label):
                                   label, instance, name, actual, expected, mismatches)
     dut._log.info("TILE SAME INPUT %s: %d output ports with differing RTL-known bits (first24 logged)",
                   label, differences)
+    local = dut.native_inputs_Tile_X2Y2_PRIM2T2S_C2
+    timer = local.Inst_TB_wp_timer
+    dut._log.info("LOCAL TIMER %s count=%s armed=%s rst=%s load=%s half=%s en=%s cfg=%s",
+                  label, timer.count.value, timer.armed.value, timer.rst.value,
+                  timer.load.value, timer.half.value, timer.en.value, timer.ConfigBits.value)
+    # Read-only local truth-table checks. Enumerating every binary completion
+    # avoids interpreting RTL if/case optimism as evidence of a correct gate.
+    for instance in ("Tile_X1Y2_LUT4x8_ha", "Tile_X2Y1_LUT4x8_ha_C2",
+                     "Tile_X2Y3_LUT4x8_ha_C2"):
+        native = dut.user_project.u_fabric[instance]
+        local = dut["native_inputs_" + instance]
+        for letter in "ABCDEFGH":
+            name = "Inst_L" + letter + "_FABULOUS_LC"
+            cell = local[name]
+            index, values = str(cell.LUT_index.value).lower(), str(cell.LUT_values.value).lower()
+            possibilities = lut_completion_values(index, values)
+            actual = {}
+            for signal in ("LUT_flop", "O", "LUT_out", "c_out_mux", "c_reset_value"):
+                try:
+                    actual[signal] = str(native[name + "." + signal].value).lower()
+                except AttributeError:
+                    pass  # Synthesis may remove this alias; do not invent it.
+            dut._log.info("LOCAL LUT %s %s L%s I=%s index=%s INIT=%s SR=%s EN=%s "
+                          "cfg=%s Q=%s comb=%s O=%s binary_outputs=%s mapped=%s",
+                          label, instance, letter, cell.I.value, index, values,
+                          cell.SR.value, cell.EN.value, cell.ConfigBits.value,
+                          cell.LUT_flop.value, cell.LUT_out.value, cell.O.value,
+                          sorted(possibilities), actual)
+
+
+def lut_completion_values(index, values):
+    """Conservative output set for a LUT with partially unknown index/INIT."""
+    if len(values) != 1 << len(index) or any(c not in "01xz" for c in index + values):
+        raise ValueError("Invalid LUT index/truth-table widths or digits")
+    outputs = set()
+    choices = [(c,) if c in "01" else ("0", "1") for c in index]
+    for bits in product(*choices):
+        value = values[-1 - int("".join(bits), 2)]
+        outputs.update((value,) if value in "01" else ("0", "1"))
+    return outputs
 
 
 def report_unknown_cone(dut, label, path):

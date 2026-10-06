@@ -1,0 +1,42 @@
+name: compact physical forensics
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/physical_forensics.tcl'
+      - '.github/workflows/physical_forensics.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-physical-forensics-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch authenticated completed snapshot evidence
+        run: |
+          mkdir -p build/physical_source build/physical_forensics
+          gh run download 37516794406 -R "$GITHUB_REPOSITORY" -n compact-route-37516794406 -D build/physical_source
+          echo '33dceb8d52df9d5ea8cc3741b71b9b3e1e79ae4fb95b1eb559b3ca3eb40390bc  build/physical_source/last_complete_drt.odb' | sha256sum -c -
+      - name: Read database rows, cell pins and Metal1 power geometry
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e WARP_FORENSIC_ODB="$GITHUB_WORKSPACE/build/physical_source/last_complete_drt.odb" \
+            -e WARP_FORENSIC_OUT="$GITHUB_WORKSPACE/build/physical_forensics" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            openroad -exit test_internal/physical_forensics.tcl \
+            > build/physical_forensics/read_db.log 2>&1
+      - name: Retain read-only evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: compact-physical-forensics-${{ github.run_id }}
+          path: build/physical_forensics/
+          retention-days: 3

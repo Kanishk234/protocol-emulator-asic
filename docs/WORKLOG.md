@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (three independent follow-ups and phase exit audit)
+Done:
+- Prepared manual gds-cts-cluster-screen (timing-placement baseline vs sink-cluster8), gds-lane-slew-screen (oneBUF4 on slot-write decode), and gds-sram-slew-screen (oneBUF4 on SRAM-enable branch). Buffer trials reuse exact37408506116 checkpoint and move only audited loads; no combined changes or main hardware edits.
+- Added fail-closed source/connectivity/supply/duplicate guards and reused established after-read→split→DPL→repair hook. Baselines follow identical DPL/repair sequence without connectivity mutation. Twenty-three helper/Tcl checks passed; three workflows/embedded Python parsed; diff checks passed. No physical success claimed from mocked tests.
+- PHASE2_EXIT_EVIDENCE_AUDIT.md records all exit items, historical evidence and required final-candidate evidence. Area/budget is first unchecked item; reduced counts adoption, actual all-corner timing and full selected-candidate signoff remain unresolved. No boxes ticked.
+Next:
+- Publish prepared manual workflows, but select dispatches after current routed/extracted evidence identifies surviving issues. Route37412965189 remains active in antenna/timing/DRT step. Automatic extraction/L3 already published; preserve20ns, constraints and D-066.
+
 ## 2026-10-05: Codex (parallel electrical/path/budget audit)
 Done:
 - Completed requested parallel audit; PHASE2_PLACEMENT_PARALLEL_AUDIT.md records reproducible artifact/netlist/DEF/STA evidence and next controlled experiments.

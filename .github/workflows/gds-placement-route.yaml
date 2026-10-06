@@ -2,6 +2,18 @@ name: gds-placement-route
 
 on:
   workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful measured source screen
+        required: true
+        default: "37408506116"
+        type: string
+      source_variant:
+        description: One isolated measured physical variant
+        required: true
+        default: placement
+        type: choice
+        options: [placement, lane, sram]
 
 permissions:
   contents: read
@@ -21,6 +33,8 @@ jobs:
       CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
       GRT_ADJUSTMENT: "0.16"
       VARIANT: timing-placement
+      SOURCE_VARIANT: ${{ inputs.source_variant }}
+      SOURCE_RUN_ID: ${{ inputs.source_run_id }}
 
     steps:
       - name: Check out the measured R4 candidate
@@ -82,27 +96,33 @@ jobs:
       - name: Download the audited all-corner placement screen
         uses: actions/download-artifact@v7
         with:
-          name: gds-placement-multicorner-timing-placement-37408506116
+          name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          run-id: 37408506116
+          run-id: ${{ inputs.source_run_id }}
 
       - name: Validate artifact provenance and unchanged hardware
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs/37408506116" > /tmp/placement-source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" > /tmp/placement-source-run.json
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           test -z "$(git diff --name-only -- src info.yaml macro)"
           python - <<'PYCODE'
-          import json
+          import json, os
           from pathlib import Path
           run = json.loads(Path('/tmp/placement-source-run.json').read_text())
           assert run['conclusion'] == 'success'
-          assert run['path'] == '.github/workflows/gds-placement-multicorner-screen.yaml'
-          assert run['head_sha'] == 'f4bc126' or run['head_sha'].startswith('f4bc126')
+          variant = os.environ['SOURCE_VARIANT']
+          expected = {'placement': 'gds-placement-multicorner-screen',
+                      'lane': 'gds-lane-slew-screen', 'sram': 'gds-sram-slew-screen'}
+          assert run['path'] == f'.github/workflows/{expected[variant]}.yaml'
+          assert run['id'] == int(os.environ['SOURCE_RUN_ID'])
+          assert run['head_branch'] == 'main'
+          if variant == 'placement':
+              assert run['head_sha'].startswith('f4bc126')
           assert Path.cwd() == Path('/home/runner/work/protocol-emulator-asic/protocol-emulator-asic')
           PYCODE
 
@@ -121,6 +141,7 @@ jobs:
           path: |
             runs/rtl-grt-screen/**
             runs/placement-route/**
+            runs/slew-screen/**
             src/**
             info.yaml
           if-no-files-found: warn

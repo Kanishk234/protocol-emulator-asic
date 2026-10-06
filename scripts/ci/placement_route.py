@@ -17,11 +17,15 @@ def timing_pass(data):
 
 def main():
     root = Path('runs/rtl-grt-screen')
-    comparison = json.loads((root / 'timing/comparison.json').read_text())
+    variant = os.environ.get('SOURCE_VARIANT', 'placement')
+    if variant not in {'placement', 'lane', 'sram'}:
+        raise ValueError('Unknown route source variant')
+    timing_root = root / 'timing' if variant == 'placement' else Path('runs/slew-screen')
+    comparison = json.loads((timing_root / 'comparison.json').read_text())
     if not timing_pass(comparison):
         raise ValueError('Failing source timing')
     state = Path(comparison['after_state'])
-    states = list((root / 'timing/repair').glob('*-openroad-resizertimingpostgrt/state_out.json'))
+    states = list((timing_root / 'repair').glob('*-openroad-resizertimingpostgrt/state_out.json'))
     if len(states) != 1 or state.resolve() != states[0].resolve():
         raise ValueError('Timing covers the wrong saved state')
     cfg = json.loads(state.with_name('config.json').read_text())
@@ -41,6 +45,10 @@ def main():
     for key in ('odb', 'def', 'nl', 'pnl', 'sdc'):
         if not Path(json.loads(state.read_text())[key]).is_file():
             raise ValueError(f'Missing checkpoint {key}')
+    if variant != 'placement':
+        netlist = Path(json.loads(state.read_text())['nl']).read_text()
+        if f'tripwire_slew_{variant}_buf' not in netlist:
+            raise ValueError('Missing selected physical buffer')
     config_path = Path('src/config_rx_screen.json')
     base = json.loads(config_path.read_text())
     out = Path('runs/placement-route')

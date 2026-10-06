@@ -11,7 +11,10 @@ Done:
 - Confirmed two prepared slew targets survive as worst slow slew violations; dispatched CTS37486833508, lane37487199839, SRAM37487199871 as independent paired screens. No main RTL/config/spec changed.
 - Prepared drop_counter.patch targeting late control in saturating8-bit DROPPED update. Proved98module equivalence points each atN1/5/6/7/9/16 with induction;7fabric tests and5chip tests pass. Fresh2048-clock L2 passes underVerilator and Icarus. Shared helper14tests and workflow parse/diff checks pass. Prototype only, no measured timing gain yet.
 Next:
-- Publish/dispatch matched drop-counter screen; collect independent CTS/buffer metrics and route only selected candidate. Actual setup remains−1.731802ns and hold−0.035371ns; no phase boxes ticked. Fullsignoff and resource adoption still open.
+- Published CI b58fca0 and docs765b443; dispatched drop-counter37489333139, currently running. Million-clock L2 is running locally (session63351), reached500,000clocks without divergence. Earlier diagnostic parser session95080 was interrupted after a slow report regex; completed audit used bounded per-path parsing instead.
+- Buffer screens37487199839/37487199871 completed successfully; fresh estimated setup0 and fast hold+0.0442855/+0.051976ns versus baseline+0.0364431ns. Downloaded variants and matched baseline: slow slew3baseline/3lane/1SRAM, alloverflow0, fanout162/cap0. Lane has no additional slew-count improvement; SRAM is stronger. Extra unchanged repair alone reduces8→3. Downloads completed; CTS37486833508 still running.
+- Selected SRAM-buffer for separate guarded routing from37487199871; extended existing placement-route dispatch to bounded placement/lane/SRAM artifacts, preserving default original source. Twenty-eight gate/GL/extraction checks and workflow parsing pass. Updated in-progress PHASE2 summary with actual−1.732ns result and remaining gates.
+- Dispatch SRAM-buffer route; collect CTS/counter metrics and complete the million-clock comparison. Actual setup remains−1.731802ns and hold−0.035371ns; no phase boxes ticked. Fullsignoff and resource adoption still open.
 
 ## 2026-10-06: Codex (new-day completed workflow check)
 Done:

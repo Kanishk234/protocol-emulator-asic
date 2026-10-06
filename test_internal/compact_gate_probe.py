@@ -171,12 +171,20 @@ async def watch_timer_first_unknown(dut, module, tile):
         return "".join(str(tile[prefix + f"count[{i}]"].value).lower()
                        for i in range(15, -1, -1))
 
+    preedge_reported = False
     for _ in range(12000):
         await FallingEdge(dut.clk)
         await ReadOnly()
         before = counter()
         data = "".join(value(flop["connections"]["D"][0]) for flop in reversed(flops))
         resets = "".join(value(flop["connections"]["RESET_B"][0]) for flop in reversed(flops))
+        if (not preedge_reported and all(c in "01" for c in before)
+                and any(c not in "01" for c in data) and resets == "1" * 16):
+            preedge_reported = True
+            dut._log.info("FIRST TIMER UNKNOWN INPUT: count=%s D=%s RESET_B=%s", before, data, resets)
+            words = [int(word, 16) for word in Path(os.environ["WARP_COMPACT_WORDS"]).read_text().split()]
+            report_loaded_config(dut, words)
+            report_runtime(dut, "timer unknown input before corrupt edge")
         await RisingEdge(dut.clk)
         await ReadOnly()
         after = counter()
@@ -215,6 +223,8 @@ def sensitive_ports(kind, values):
         function = lambda v: (v["A1"] and v["A2"]) or (v["B1"] and v["B2"])
     elif kind in ("o22a", "o22ai"):
         function = lambda v: (v["A1"] or v["A2"]) and (v["B1"] or v["B2"])
+    elif kind in ("a221o", "a221oi"):
+        function = lambda v: (v["A1"] and v["A2"]) or (v["B1"] and v["B2"]) or v["C1"]
     elif re.fullmatch(r"(?:and|nand|or|nor)[234]", kind):
         function = (lambda v: all(v.values())) if "and" in kind else (lambda v: any(v.values()))
     elif kind == "nand2b":

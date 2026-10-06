@@ -1027,6 +1027,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost/prioritization: isolated typical-library mapping gives resync area41,905.95µm² versus40,667.32baseline and slow PERIOD→RX-load delay10.669ns versus13.809ns, ideal wires/clocks. CSA delay14.636ns and fabric late-load delay1.325ns versus1.255ns baseline are worse; these remain lower-priority prototypes. No extracted improvement is claimed. Global routing overflow and actual routed timing decide adoption.
 - Separate optimization experiment:2ns positive post-GRT setup-repair margin versus0, all three repair corners, unchanged20ns signoff constraints. This is a headroom target, not a false path or clock relaxation. Generated diagnostic configs only; no main config or template jobs changed. Adoption of extra flow knobs requires a separate explicit decision under the config rules.
 
+## D-072 (2026-10-06): isolated general event-path optimization experiments
+- General need: late timer/sample events feed token generation and fabric accounting through a long combinational cone. Preserve event clocks, tag/data priorities, live writes and all protocols; no new protocol block, state, ISA or resource change.
+- Experiment bs-event-late precomputes state/config completion qualification before the sample event; bs-load-flat flattens frame/status producer-load arbitration. Each remains isolated against frozen2/4 R4. Local module equivalence892points,21bit-clock tests,5chip tests and2048L2 clocks pass for each.
+- Local mapped costs: baseline40667.3184µm²/13.808641ns PERIOD→RX-load; event-late40591.0764/11.697581; load-flat40740.4998/12.391160. Ideal-wire probes only. Separate matched full-design GRT screens are prepared; eventual routed extraction decides adoption.
+- Direct sample predicate proves818points and passes the same tests but maps41529.5370µm²/13.980507ns; retain reference patch without launching a physical screen. No architecture/main RTL adoption or official timing pass.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

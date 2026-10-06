@@ -5,6 +5,40 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (publish approved event screens and read resync extraction)
+Done:
+- User approved separate prototype/tools,CI,docs commits, push and both event screens. Prototype/tools committed3bf11bb; publication in progress. Approval-review timeout on first compound command was resolved by a scoped retry; no rejection of task authorization.
+- Main resync route37521491667 and extraction37529099235 completed. Extracted slow setup WS−0.325227853853ns; fast hold−0.008052669870ns, slow hold+0.145561455898ns,typical+0.043376747866ns. Setup fast/typical0. This is a closer diagnostic setup result than prior−1.385050ns, but both setup and fast hold still fail; no official pass.
+- Matching routed GL37529099455 is active. Previous main lint/test/docs/unit all passed. Local resync million-clock comparison completed successfully.
+Next:
+- Finish approved publication,launch bs-event-late and bs-load-flat independently and record run IDs. Download/audit resync extracted path families and hold endpoints before selecting a combination or repair. No phase ticks.
+
+## 2026-10-06: Codex (prepare isolated event timing screens)
+Done:
+- Resync background terminal completed: results_million.xml contains1passing testcase, log reports1000000clocks/zero divergences,1103.64s. Session88060 no longer needs to run. Resync route37521491667 remains active in antenna/fresh timing checks; main lint/test/docs passed, unit active.
+- Prepared existing RTL screen choices bs-event-late and bs-load-flat with independent concurrency, paired unchanged baseline, exact frozen2/4 source guards, timing-driven placement/all-corner repair and0ns margin. Direct-predicate regression stays local; no dispatch yet.
+- All83helper checks pass, workflow inputs parse/validate, diff check passes. Added D-072 with general need and measured costs. Publication/launch needs scoped approval under AGENTS git rule; reviewed changes are in PHASE2_EVENT_TIMING_PROTOTYPES.md.
+Next:
+- Publish separate prototype/tools/CI/docs groups and launch the two approved isolated screens after scoped authorization. Audit completed physical evidence; no combined candidate or phase tick.
+
+## 2026-10-06: Codex (prove and measure three event-path prototypes)
+Done:
+- Answered background-terminal question: session88060 is local Verilator resync RTL/model million-clock lockstep, latest900000clocks without reported divergence; final result pending.
+- Implemented three isolated frozen2/4 patches outside main RTL. Module proofs pass892points for load-flat/event-late and818for sample-predicate. Each passes21bit-clock tests,5chip tests and2048L2 clocks.
+- Identical-library slow PERIOD→RX-load probes: baseline13.808641ns/40667.3184µm²; load-flat12.391160/40740.4998; event-late11.697581/40591.0764; predicate13.980507/41529.5370. Prioritize first two; reject predicate physical spending on this evidence. These are local ideal-wire queries, not extracted WNS.
+- Fixed verification fixture resource mismatch (BUGS72): regenerate Python tables from frozen specification without rewriting RTL. Regression plus existing helper suite81passed. Added named local verification support and detailed PHASE2_EVENT_TIMING_PROTOTYPES.md. No publication/new physical dispatch or checklist tick.
+- Approved resync route37521491667 remains active in antenna/fresh-timing pre-route checks at latest inspection.
+Next:
+- Audit resync route/extraction/GL and finish local million-clock run. Prepare measured isolated physical candidates for event-late/load-flat; seek scoped publication approval only after concrete review. Preserve complete2/4 protocol floor,20ns and live configuration.
+
+## 2026-10-06: Codex (rank further timing ideas during resync routing)
+Done:
+- Audited worst extracted slow path37499559422:41cell arcs total17.333846ns versus0.104522ns reported interconnect, excluding clocks/preceding3.502306ns launch time. Logic depth and loaded slow cells are concrete targets; this is one path only.
+- Recorded six ranked hypotheses and proof/physical-validation requirements in PHASE2_TIMING_NEXT_IDEAS.md: direct sample predicates, late sample gating, flattened producer-load arbitration, prepared drop-counter prefixes, targeted cell/fanout repair and critical configuration-launch decode. No implementation, architecture adoption or new dispatch in this brainstorming pass.
+- Fresh local million-clock resync comparison reached400000clocks without a reported mismatch; not a completed pass. Current isolated routing remains37521491667. No phase checklist boxes ticked.
+Next:
+- Prepare narrow equivalence/mapping experiments for top candidates while current route runs; evaluate combinations only after isolated physical evidence. Keep20ns,2/4,all protocol behavior and live writes intact. New report/status notes remain local.
+
 ## 2026-10-06: Codex (audit resync and prepare modified-RTL routing)
 Done:
 - Downloaded exact candidate/baseline37504886226. Fresh setup/hold counts0 all corners; fast hold+0.0379569ns; slow slew8→1; fanout162→160; cap0→2/1/2fast/slow/typical. Repaired area508444→509241µm²; demand233872→243504(+4.12%),overflow0. Exact27RTL/config/info fingerprints match frozen3393eea plus bs_resync.patch. Full audit in PHASE2_RESYNC_ROUTE_AUDIT.md.
@@ -14,6 +48,8 @@ Next:
 - Publish validated route support under scoped git authorization, then route source37504886226/variantbs-resync and audit automatic extraction/GL. Fresh million-clock comparison is required before any eventual RTL adoption. Best prior extracted setup remains−1.385050ns; no phase boxes ticked.
 - Continuation: repeated all77helper tests successfully and confirmed no main workflows running/queued. Started fresh resync million-clock RTL/model comparison locally (Verilator, session88060); result pending. Requested scoped approval for CI/docs commits, push and resync route because AGENTS.md reserves publication for the user. No publication or launch performed.
 - User explicitly approved publication and launch. CI support committed as f0ab242; fresh local comparison reached200000/1000000 clocks without a reported mismatch so far (not a final pass). Preparing separate docs commit and approved push/dispatch; main hardware inputs remain unchanged.
+- Published CI f0ab242 and docs8496fb8 to approved main remote. Dispatched resync route [37521491667](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37521491667), source37504886226/bs-resync; queued at first verification. Main unit37521483283,test37521483360,lint37521483275,docs37521483295 are active. Local resync lockstep reached300000/1000000 clocks, result pending. Hardware pending-commit log was empty before push; no official GDS launched or phase boxes ticked.
+- Rechecked user's remote-push concern: git ls-remote and GitHub commits/main API both confirm remote main8496fb8314bf3030222915fd416d7d310c0c1d0d, matching local HEAD. Resync route37521491667 is now in progress on that exact revision. Only subsequent WORKLOG status notes remain uncommitted locally.
 
 ## 2026-10-06: Codex (restrict workflow monitoring to main)
 Done:

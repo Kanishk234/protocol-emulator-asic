@@ -1,0 +1,27 @@
+# Further timing candidates (2026-10-06)
+
+These are hypotheses, not measured improvements or adopted architecture changes. Preserve the complete 2-lane/4-unit resource floor, 20 ns clock, protocol behavior, event clocks, live configuration and all timed paths. Current resync routing must remain an isolated experiment.
+
+## Evidence directing the search
+
+The slow-corner worst setup path in extracted run37499559422 starts at U0 PERIOD word4 bit10 and ends at drop-accounting state. Its data path from the launching latch D to endpoint D contains41cell output arcs, summing17.333846ns, and41reported interconnect arcs, summing0.104522ns. This decomposition excludes clocks and the preceding3.502306ns of time given to the launching latch. Small reported wire delay does not imply loading is irrelevant: several gate slews exceed0.7ns, and capacitance affects cell delay. It does indicate that logic depth and selected weak gates deserve priority over broad placement sweeps. This is one worst path, not a whole-design statistical conclusion.
+
+## Ranked candidates
+
+1. **Compute sample decisions directly.** Instead of always materializing a full25-bit sample-time result and then reducing it to a Boolean, compute the sign bit and upper-bit-zero predicate needed by `x[24] || x <256`. Explore chunked carry/borrow lookahead for `sof-per+tb`, with the saturated resync branches already simplified. No new state. This differs from the tested generic carry-save rewrite, which worsened local mapping: optimize the required predicate and actual library mapping. Prove equivalence for wrap, arbitrary live writes and every branch before mapping. Risk: wide prefix wiring and synthesis undoing the structure.
+
+2. **Move late sample gating to the end of token decisions.** Precompute word-completion, frame-count, stuffing, delimiter and CRC-result conditions from current state and configuration; select with the sample event late. For example `at_n=cm&&fr_v&&(dcnt+1==fr_n)` currently feeds later priority logic. Derive the combined decision directly rather than propagate nested enables through multiple layers. Keep flag hold-back, own-frame suppression and error priority exact. General benefit: shorten the event-to-producer path without changing event latency. Cost: duplicated qualification logic and possible area/routing increase.
+
+3. **Flatten producer-load arbitration separately from payload priority.** Existing equations `ld_fr`, `ld_sth`, `ld_stn` allow `rx_load=rx_free&&(fr_want||st_v||st_new)`. Payload/tag still retain frame-first/status ordering; pending status and overflow retain their original rules. This offers a narrow, cheap equivalence experiment, although synthesis may already discover the identity. Extend only if mapped evidence shows avoidable reconvergence through producer/channel arbitration. Do not claim a gain from source readability alone.
+
+4. **Prepare drop-counter carry conditions before the late event.** Use current registered count to compute increment toggles/prefixes independently; let the drop event qualify those prepared next-bit decisions at the final layer. Explicitly preserve saturation, reset, clear and configuration-write priority. Compare with the existing drop-counter patch first; this is worthwhile only if it creates a distinct mapped structure. Cost: prefix fanout and potentially more gates. Avoid delayed accounting or changing the host-visible count.
+
+5. **Repair selected slow arcs rather than globally changing CTS.** On an exact saved physical candidate, identify the highest-delay gates in the measured cone, trial bounded drive-strength changes or local fanout buffering, and recheck all-corner setup/hold, capacitance, overflow and detailed routing. The measured path includes several0.6–0.9ns cell arcs. Loading isolation could complement arithmetic shortening, but broad clustering already worsened extracted timing. Any useful ODB repair needs a deterministic clean-build recipe before official adoption; a checkpoint-only win is insufficient.
+
+6. **Reduce configuration-launch delay if the downstream cone remains dominant.** Examine host-write data/decode into the specific critical PERIOD latch and its loading. The worst path includes3.502306ns of borrowed launch time before the latch D. Faster decode or bounded configuration-output fanout isolation may reclaim part of the total path budget without freezing live settings. This must include the complete host-write-to-consumer timing path. Derived cached settings or shadow registers require proof of same-cycle live-write semantics; any change to that contract needs a separately approved architecture decision.
+
+## Experiment order
+
+Prepare local equivalence and identical-library mapping for candidates1–3 first, outside main RTL. Use the existing candidate baseline or an explicitly named resync baseline; do not confuse isolated wins with combined wins. Keep candidates4–6 conditional on mapped/path evidence and the running resync extraction. Reject local regressions before spending routing time. A successful local probe only prioritizes a full-design physical screen; it does not establish WNS improvement. After independently measured wins, deliberately test combinations from clean synthesis and finally run the complete official GDS flow.
+
+Retain UART, SPI, I2C and all implemented general primitives. Adding a pipeline clock, freezing configuration, relaxing the clock/constraints, reducing the resource floor or deleting modes does not satisfy the current goal.

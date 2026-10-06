@@ -103,3 +103,13 @@ All four G1 demo tests pass again in37516794406. At1784a49, lint37516794249,
 docs37516794365, test37516794224 and unit37516794383 pass. Original G1
 gds/precheck/viewer37511778153 pass; gl_test remains active at this check.
 These results do not close compact/native/configured-fabric timing gates.
+
+[Independent probe37519060510](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37519060510)
+at21a2466 reaches actual tests: RTL passes; native24.76s and reset probe fail.
+UART output is unknown before RUN via selected E2END[7], known at after-RUN
+and after-USER_RESET snapshots, and subsequently unknown at4423540ns in the
+baseline recording. The after-RUN snapshot is4419480ns,4060ns earlier.
+This establishes an observation window, not the cause. Next probe records
+runtime/cones at first UART X and after the same edge's delta cycles, retaining
+the original test failure. Heavy computation remains hosted; active routing
+inputs and frozen G1 remain unchanged.

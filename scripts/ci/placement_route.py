@@ -29,9 +29,9 @@ def hold_followup(config_path, state, output, pdk_root):
 def main():
     root = Path('runs/rtl-grt-screen')
     variant = os.environ.get('SOURCE_VARIANT', 'placement')
-    if variant not in {'placement', 'lane', 'sram', 'cts', 'bs-resync'}:
+    if variant not in {'placement', 'lane', 'sram', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat'}:
         raise ValueError('Unknown route source variant')
-    timing_root = root / 'timing' if variant in {'placement', 'cts', 'bs-resync'} else Path('runs/slew-screen')
+    timing_root = root / 'timing' if variant in {'placement', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat'} else Path('runs/slew-screen')
     comparison = json.loads((timing_root / 'comparison.json').read_text())
     if variant != 'cts' and not timing_pass(comparison):
         raise ValueError('Failing source timing')

@@ -46,7 +46,8 @@ def test_source_identity_refuses_mismatch_and_untrusted_paths(tmp_path, failure)
 
 
 @pytest.mark.parametrize('failure', [None, 'branch', 'workflow', 'run-id', 'failure', 'unknown'])
-def test_only_successful_main_source_workflow_is_accepted(failure):
+@pytest.mark.parametrize('variant', ['bs-resync', 'bs-event-late', 'bs-load-flat'])
+def test_only_successful_main_source_workflow_is_accepted(failure, variant):
     run = {'id': 37504886226, 'head_branch': 'main', 'conclusion': 'success',
            'path': '.github/workflows/gds-drop-counter-screen.yaml'}
     if failure == 'branch':
@@ -59,9 +60,9 @@ def test_only_successful_main_source_workflow_is_accepted(failure):
         run['conclusion'] = 'failure'
     if failure:
         with pytest.raises(ValueError):
-            validate_run(run, 'unknown' if failure == 'unknown' else 'bs-resync', 37504886226)
+            validate_run(run, 'unknown' if failure == 'unknown' else variant, 37504886226)
     else:
-        validate_run(run, 'bs-resync', 37504886226)
+        validate_run(run, variant, 37504886226)
 
 
 def test_downstream_rechecks_modified_source_and_legacy_artifacts_still_work(tmp_path):
@@ -85,3 +86,18 @@ def test_route_artifact_contains_macro_files_needed_by_downstream_identity():
     assert len(upload) == 1
     paths = upload[0]['with']['path'].splitlines()
     assert 'macro/**' in paths and 'src/**' in paths and 'runs/placement-route/**' in paths
+
+
+@pytest.mark.parametrize('variant', ['bs-resync', 'bs-event-late', 'bs-load-flat'])
+def test_route_prepares_exact_named_patch_before_fingerprinting(tmp_path, monkeypatch, variant):
+    import route_source
+    data = identity(tmp_path)
+    applied = []
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(route_source, 'apply_trial', lambda name, helpers: applied.append(name))
+    monkeypatch.setattr(route_source.subprocess, 'check_output',
+                        lambda *args, **kwargs: '\0'.join(data['files']).encode())
+    prepared = route_source.prepare(variant, 123, Path('helpers'))
+    assert applied == [variant]
+    assert prepared['variant'] == variant and prepared['source_run_id'] == 123
+    assert prepared['files'] == data['files']

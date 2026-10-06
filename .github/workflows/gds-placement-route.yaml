@@ -13,7 +13,7 @@ on:
         required: true
         default: placement
         type: choice
-        options: [placement, lane, sram, cts, bs-resync]
+        options: [placement, lane, sram, cts, bs-resync, bs-event-late, bs-load-flat]
 
 permissions:
   contents: read
@@ -102,7 +102,7 @@ jobs:
       - name: Download the audited all-corner placement screen
         uses: actions/download-artifact@v7
         with:
-          name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || inputs.source_variant == 'cts' && 'gds-cts-cluster-cts-cluster8' || inputs.source_variant == 'bs-resync' && 'gds-drop-counter-bs-resync' || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
+          name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || inputs.source_variant == 'cts' && 'gds-cts-cluster-cts-cluster8' || startsWith(inputs.source_variant, 'bs-') && format('gds-drop-counter-{0}', inputs.source_variant) || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}

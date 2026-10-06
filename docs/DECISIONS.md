@@ -1014,6 +1014,19 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Evidence: exhaustive 1,024-index-pair bench in four full/lean latch/flop combinations, five chip tests, 2,048-clock L2 comparison and whole-chip Yosys structural checks pass. Stored state is not claimed formally verified.
 - Status: approved isolated measurement only. Adoption requires resource-budget review, physical timing/area/overflow evidence and routed verification. No phase gate is satisfied by this prototype.
 
+## D-070 (2026-10-06; approved experiment sequence): close official timing at 2 lanes / 4 units first
+- User instruction: implement timing ideas with the2/4 configuration, pass official GDS timing there, then attempt3/6 if area permits.
+- Scope: complete2/4 protocol-floor candidate, U0 full,12slots/lane,512-word SRAM, unchanged20ns target and D-066 live reconfiguration. Diagnostic workflows are intermediate evidence; final acceptance requires actual extracted setup/hold margin and passing official GDS/precheck/GL on the selected complete candidate.
+- The frozen main spec remains3/6 during isolated trials. This instruction sets the immediate closure target and sequencing; no final submission count decision or checklist tick is implied. Resource promotion must be regenerated from the selected spec and documented with matching evidence.
+- General need/cost: fit and time the general engine that retains the protocol floor before spending hardening time on additional instances. The2/4 floor gives up concurrent resources compared with3/6, not protocol-specific blocks.
+
+## D-071 (2026-10-06; approved isolated trials): shorten late token-event cones without added latency
+- General need: live timer configuration can feed an event producer, fabric drop qualification and drop-accounting state in one cycle. SRAM extracted37499559422 still has112reported failing setup path pairs,108fromU0PERIOD word4bit10 and4fromU0mode. Improve the combinational cone while preserving all documented timing and update priorities.
+- Isolated patches: `bs_resync.patch` replaces resync-enable subtraction-zero testing with equality and cancels saturated correction in the sample-time expression; `bs_csa.patch` compresses three sample-time operands before carry propagation; `drop_qual.patch` qualifies each fabric source in parallel before reducing the drop event. No new state, cycle, ISA encoding or protocol block. Raw proof/test outputs stay in/tmp.
+- Verification: complete bit-clock-module equivalence proves893points for resync and868for CSA using equiv_simple/induction (seq2 cap; induction closes at step1). Fabric qualification proves97points each atN1/5/6/7/9/16. Existing21bit-clock tests pass for each arithmetic patch;7fabric tests pass;5chip tests and2048-clock L2 pass for each of the three.
+- Cost/prioritization: isolated typical-library mapping gives resync area41,905.95µm² versus40,667.32baseline and slow PERIOD→RX-load delay10.669ns versus13.809ns, ideal wires/clocks. CSA delay14.636ns and fabric late-load delay1.325ns versus1.255ns baseline are worse; these remain lower-priority prototypes. No extracted improvement is claimed. Global routing overflow and actual routed timing decide adoption.
+- Separate optimization experiment:2ns positive post-GRT setup-repair margin versus0, all three repair corners, unchanged20ns signoff constraints. This is a headroom target, not a false path or clock relaxation. Generated diagnostic configs only; no main config or template jobs changed. Adoption of extra flow knobs requires a separate explicit decision under the config rules.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

@@ -63,3 +63,27 @@ Pinned local slow Liberty also contains NOR4_2 with identical `!(A+B+C+D)` funct
 The extracted final instance area892,500µm² includes383,267µm² of fill cells. Standard cells463,924 plus SRAM45,309.3 total509,233.3µm², about56.43% of902,417µm² core. Do not mistake filler-inclusive area for logic utilization or guaranteed ECO capacity.
 
 Selected SRAM-buffer screen37487199871 for separate guarded routing; generalized existing gds-placement-route's dispatch inputs to accept audited placement/lane/SRAM source artifacts. The continuation validates source workflow/ID/main branch, exact source state, actual timing-driven placement, all-corner repair and the selected buffer's presence before antenna/timing guards. No combination with CTS or counter variants. Existing automatic extraction/L3 remain tied to that successful route. Twenty-eight gate/extraction/GL helper checks and workflow parse checks passed.
+
+CTS comparison37486833508 completed: cluster8 estimated setup0 but fast hold−0.00424344ns, slow+0.195752 andtyp+0.0863023ns. Baseline fast hold+0.0360107ns. Do not advance cluster8 to routing with this failing hold result. Electrical/fanout artifact audit remains pending. Counter prototype million-clock L2 now passes:1,000,000clocks,zero divergences,JUnit1case0failures/errors,956.26s underVerilator. SRAM route and counter screen remain active; actual WNS is unchanged.
+
+Downloaded CTS37486833508 artifact changes the hold-only assessment: cluster8 reduces estimated fanout violations162→4, slow slew8→0 (all-corner slew/cap0), final GRT overflow0. Area514,551µm² and33,464instances;31hold buffers in last repair. Fresh setup/hold counts all0 except one fast hold violation `_46919_`→SRAM macro,−0.00424344ns. This merits a bounded hold-repair follow-up with unchanged constraints, not rejection or direct routing. Estimated electrical improvements are not extracted signoff. SRAM route still active; counter baseline finished, variant pending at query.
+
+
+### Completed counter screen and bounded CTS follow-up (2026-10-06)
+
+Counter run [37489333139](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37489333139) passes fresh estimated setup and hold at all three corners. Setup WS is 0; hold WS is +0.0234049 ns fast, +0.203146 ns slow and +0.0996158 ns typical, with zero violation counts. Candidate slow slew count is 9 versus matched baseline 8; fanout is 158 at each corner versus 162; capacitance violations are zero. Repaired candidate area is 508,489 µm² with 33,077 instances. These mixed electrical results and passing estimated timing do not establish an extracted setup improvement.
+
+Local CI commit `54388c8` extends the existing placement-route workflow to a validated CTS-cluster8 source. It performs exactly one additional all-corner repair with unchanged signoff constraints, then requires fresh setup/hold checks before antenna repair and detailed routing. Thirty-nine helper tests pass. Publication and dispatch remain pending: automatic approval review rejected the exact push to `main`; explicit authorization was requested. SRAM route37490897034 remains active. Actual extracted setup WNS remains −1.731802 ns.
+
+
+The user subsequently explicitly approved the push. Commit `54388c8` is published, and CTS follow-up [37496347122](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37496347122) was dispatched with source37486833508/variantcts. SRAM route37490897034 remains in progress; no new extracted WNS is available.
+
+
+### SRAM-buffer extracted result (2026-10-06)
+
+Extracted diagnostic [37499559422](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37499559422), following successful SRAM-buffer route37490897034, reports slow setup WS **−1.385050335848 ns**, compared with −1.731802306133 ns on the previous routed placement trial (0.346751970285 ns improvement). Fast and typical setup WS are0. Hold WS is positive at every corner: fast+0.050187910803 ns, slow+0.247750382777 ns, typical+0.123471236730 ns. These are fresh extracted measurements; setup still fails and diagnostic workflow success is not signoff. Routed GL and CTS follow-up remain pending at this check.
+
+
+### Clock clustering does not survive extraction (2026-10-06)
+
+CTS follow-up route37496347122 completed, but extracted37502135749 reports slow setup−1.996168620234ns and fast hold−0.004409972512ns; slow/typical hold remain+0.196984101273/+0.072321928270ns. This regresses against the SRAM-buffer trial and fails signoff despite its repaired pre-route gates. Do not promote cluster8 from diagnostic success. New independent structural prototypes and local delay priorities are recorded in PHASE2_TIMING_PROTOTYPES.md.

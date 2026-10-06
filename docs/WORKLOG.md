@@ -5,16 +5,82 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (implement structural timing prototypes at 2/4)
+Done:
+- Recorded user-directed2/4 official closure first, then3/6 if area permits (D-070). Prepared isolated drop_qual.patch, bs_resync.patch and bs_csa.patch against3393eea; no main RTL/spec/config changed. D-071 records general need, behavior preservation and costs.
+- Module equivalence passes: fabric97points atN1/5/6/7/9/16, resync893points andCSA868points; equiv_simple plus induction closes at step1 withseq2 cap. Affected unit tests7/7fabric and21/21bit-clock each; all three pass5/5chip tests and2048-clock L2 withzero divergences. Corrected local fixture/include bugs68/69; reruns pass. Reusable verifier proof passes including a path with spaces.
+- Local mapped slow PERIOD→RX-load delay: baseline13.808641ns, resync10.669182ns, CSA14.636085ns. Resync module area+1238.6304µm² (~3.05%); parallel fabric delay1.324727ns versus1.254606baseline and more area. Prioritize resync and independent2ns repair-margin screen; other variants remain lower priority. Ideal-wire module probes are not routed WNS.
+- Parameterized existing RTL-screen workflow with named isolated trials and exact source/patch guards;58helper tests, patch/proof/JUnit/workflow checks and git diff --check pass. Publication and dispatch have not occurred. CI code/patches and documentation are reviewable locally.
+- CTS extraction37502135749 completed but regresses: slow setup−1.996169ns/fast hold−0.004410ns. SRAM remains best measured at−1.385050ns with positive hold all corners. No phase boxes ticked.
+Next:
+- Publish validated prototype/CI changes with scoped git authorization, then dispatch bs-resync and setup-margin separately. Measure overflow and fresh timing; route only qualifying candidates with explicit modified-RTL provenance, then build a clean reproducible2/4 official-GDS candidate. Other prototype sessions completed; no local proof/test process remains active.
+
+## 2026-10-06: Codex (high-impact timing closure plan)
+Done:
+- Recorded prioritized cone-level changes and exact official-flow acceptance in docs/reports/PHASE2_TIMING_CLOSURE_PLAN.md. Main candidates: parallel source/drop qualification, timer arithmetic shortening, counter late-enable rewrite, critical-cone locality and positive pre-route optimization margin.
+- Verified frozen spec remains3lanes/6units, while current−1.385050ns extracted result is2lanes/4units. D-049 is experiment approval, not final adoption; closure must be demonstrated on the adopted full design via official gds, not custom diagnostics.
+- Read RTL and prior extracted-path evidence without touching model code or hardware. Newest SRAM artifact download63574 and counter matched-baseline download80502 remain active; no new prototype or timing gain claimed.
+Next:
+- Complete routed path/baseline audit, prepare isolated source-selection and arithmetic changes preserving cycle behavior, then measure before combining. Require clean reproducibility and official full-flow evidence. No phase boxes ticked.
+
+## 2026-10-06: Codex (parallel analysis and new SRAM extracted result)
+Done:
+- Retrieved completed extracted diagnostic37499559422: SRAM trial slow setup WNS−1.385050335848ns (previous−1.731802306133ns, improvement0.346751970285ns). Fast/typical setup0; hold positive all corners: fast+0.050187910803ns, slow+0.247750382777ns, typical+0.123471236730ns. Setup still fails; no signoff claim or checklist tick.
+- Began counter matched-baseline path comparison while CTS routing and SRAM GL run. Candidate artifact available; matched-baseline download in progress. Raw reports remain in/tmp.
+Next:
+- Inspect remaining SRAM setup paths and complete counter comparison; prioritize the next isolated trial based on extracted critical cones. Audit CTS and SRAM routed GL completion.
+
+## 2026-10-06: Codex (workflow status check after SRAM routing)
+Done:
+- SRAM route37490897034 completed successfully. Its automatic extracted-timing37499559422 is extracting/reporting all-corner timing; routed GL37499559483 is running expanded L3 simulation.
+- CTS follow-up37496347122 remains in antenna/fresh-timing/DRT step. Main54388c8 lint/test/docs passed; unit37496335870 RTL chip tests remain active, other two jobs passed. No failures observed in checked runs.
+Next:
+- Analyze SRAM extracted timing when available and verify routed GL. Inspect CTS fresh repair/route outcome. No new WNS yet (latest−1.731802ns); no phase boxes ticked.
+
+## 2026-10-06: Codex (publish approved CTS follow-up)
+Done:
+- User explicitly approved the push. Published CI commit54388c8 to main at the authorized repository; no hardware files were pending in origin/main..main.
+- Dispatched [37496347122](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37496347122), gds-placement-route with source_run_id37486833508/source_variantcts. Queued at dispatch; performs one bounded all-corner hold repair and gates before routing. SRAM route37490897034 remains in progress.
+- Main lint/test/unit/docs checks started for54388c8. No new extracted timing result; WNS remains−1.731802ns. No checklist boxes ticked.
+Next:
+- Audit the CTS fresh repair gates and SRAM route completion, then extracted timing and routed GL results. Keep the 20ns constraints unchanged.
+
+## 2026-10-06: Codex (bounded CTS follow-up and completed counter audit)
+Done:
+- Counter screen [37489333139](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37489333139) completed. Downloaded candidate artifact: fresh estimated setup WS0/count0 all corners; hold fast+0.0234049ns, slow+0.203146ns, typical+0.0996158ns/count0. Slow slew9, fanout158 each, cap0; repaired area508,489µm²,33,077instances. Baseline slow slew8/fanout162; electrical results are mixed, and no routed improvement is established.
+- Extended existing placement-route workflow with CTS source provenance and actual cluster-size8 validation. Exactly one additional all-corner repair precedes fresh setup/hold gates, antenna checks, and DRT. Source-variant concurrency permits an independent CTS experiment while SRAM routing continues. No RTL or timing constraints changed.
+- 39 timing/route/GL/extraction helper tests pass; workflow YAML parses and git diff --check passes. Local CI commit54388c8 created. Automatic approval review rejected its push to main because exact push authorization was not recognized and AGENTS reserves pushes for the user. Requested explicit approval; no push or CTS dispatch occurred.
+- SRAM route37490897034 remains in its antenna/fresh-timing/DRT step. Actual extracted WNS remains−1.731802ns; no checklist boxes ticked.
+Next:
+- After exact push authorization, publish54388c8 and dispatch placement-route with source_run_id37486833508/source_variantcts. If the single follow-up repair still fails, refuse routing and inspect its fresh evidence. Analyze SRAM extraction when available. Counter needs route evidence before any timing claim.
+
+## 2026-10-06: Codex (analyze completed clock-clustering artifact)
+Done:
+- Downloaded CTS37486833508 artifact: fresh all-corner setup counts0; fanout4 each (baseline162), slew0 each (baseline slow8), cap0, final GRT overflow0. Area514,551µm²,33,464instances;31hold buffers in last repair. Estimated fanout improvement is substantial despite failed hold gate.
+- Only estimated hold failure is fast−0.00424344ns, `_46919_`→SRAM macro. Cluster8 is promising for a bounded hold-repair follow-up, but cannot route as-is. Revised assessment from hold-only headline; no extracted gain claimed.
+- SRAM route37490897034 still active. Counter screen37489333139 baseline completed, variant active; timing benefit not yet known. Million-clock functional verification already passed.
+Next:
+- Prepare one bounded all-corner hold follow-up for CTS with unchanged constraints; repeat fresh per-corner gates before any route. Audit SRAM extraction/counter variant once complete. No phase boxes ticked; actual WNS remains−1.731802ns.
+
+## 2026-10-06: Codex (parallel experiment progress)
+Done:
+- CTS37486833508 completed diagnostic execution. Cluster8 estimated setup0, fast hold−0.00424344ns; matched baseline fast hold+0.0360107ns. This variant regresses hold and does not qualify for routing without repair; workflow success is not timing gate success.
+- Counter prototype fresh million-clock L2 completed:1,000,000clocks,zero divergences,JUnit1case0failures/errors,956.26s underVerilator. No full-chip formal claim.
+- SRAM-buffer route37490897034 active in antenna/timing/DRT step. Counter screen37489333139 both jobs active in GRT/fresh timing step. No new extracted WNS result.
+Next:
+- Inspect CTS electrical/fanout artifact before deciding whether any hold-repaired follow-up is worthwhile; do not promote failing hold variant. Audit counter results and SRAM extracted timing on completion. Actual WNS remains−1.731802ns; no phase boxes ticked.
+
 ## 2026-10-06: Codex (continue actual-path-directed timing repairs)
 Done:
 - Audited downloaded37417248079 extracted artifact:119slow setup violations,4fast hold;115reported failing path pairs start atU0PERIOD word4bit10, worst endsdropped[31]. Fast hold paths are three lane-slot→execution-control and oneU0mode→RXsst[0]. Counts/electrical/path details recorded in PHASE2_INDEPENDENT_TIMING_SCREENS.md.
 - Confirmed two prepared slew targets survive as worst slow slew violations; dispatched CTS37486833508, lane37487199839, SRAM37487199871 as independent paired screens. No main RTL/config/spec changed.
 - Prepared drop_counter.patch targeting late control in saturating8-bit DROPPED update. Proved98module equivalence points each atN1/5/6/7/9/16 with induction;7fabric tests and5chip tests pass. Fresh2048-clock L2 passes underVerilator and Icarus. Shared helper14tests and workflow parse/diff checks pass. Prototype only, no measured timing gain yet.
 Next:
-- Published CI b58fca0 and docs765b443; dispatched drop-counter37489333139, currently running. Million-clock L2 is running locally (session63351), reached500,000clocks without divergence. Earlier diagnostic parser session95080 was interrupted after a slow report regex; completed audit used bounded per-path parsing instead.
+- Published CI b58fca0 and docs765b443; dispatched drop-counter37489333139, currently running. Million-clock L2 is running locally (session63351), reached700,000clocks without divergence. Earlier diagnostic parser session95080 was interrupted after a slow report regex; completed audit used bounded per-path parsing instead.
 - Buffer screens37487199839/37487199871 completed successfully; fresh estimated setup0 and fast hold+0.0442855/+0.051976ns versus baseline+0.0364431ns. Downloaded variants and matched baseline: slow slew3baseline/3lane/1SRAM, alloverflow0, fanout162/cap0. Lane has no additional slew-count improvement; SRAM is stronger. Extra unchanged repair alone reduces8→3. Downloads completed; CTS37486833508 still running.
 - Selected SRAM-buffer for separate guarded routing from37487199871; extended existing placement-route dispatch to bounded placement/lane/SRAM artifacts, preserving default original source. Twenty-eight gate/GL/extraction checks and workflow parsing pass. Updated in-progress PHASE2 summary with actual−1.732ns result and remaining gates.
-- Dispatch SRAM-buffer route; collect CTS/counter metrics and complete the million-clock comparison. Actual setup remains−1.731802ns and hold−0.035371ns; no phase boxes ticked. Fullsignoff and resource adoption still open.
+- Published guarded routing CI fea46ed and milestone docs30d1aa9. SRAM-buffer route37490897034 dispatched and running with source37487199871/source_variant=sram; automatic extraction/L3 enabled after success.
+- Collect CTS/counter metrics and complete million-clock comparison; no new extracted WNS yet. Actual setup remains−1.731802ns and hold−0.035371ns; no phase boxes ticked. Fullsignoff and resource adoption still open.
 
 ## 2026-10-06: Codex (new-day completed workflow check)
 Done:

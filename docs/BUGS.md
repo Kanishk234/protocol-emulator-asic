@@ -81,4 +81,8 @@ Every bug found by any layer, newest at the bottom. Nothing is fixed silently.
 
 | 67 | 2026-10-05 | Cached-input measurement prototype | Yosys rejects hierarchical generated clock reference despite Icarus simulation passing | Generated-block clock reference is not portable through Yosys elaboration under default_nettype none | Whole-chip Yosys hierarchy/proc/check | Export each existing gated clock onto a module-local word_gclk vector; mask storage uses that vector. Whole-chip Yosys checks, exhaustive four-mode bench, five chip tests and L2 pass after correction | fixed in isolated prototype |
 
+| 68 | 2026-10-06 | Local timing-prototype verifier fixtures | New L2 harness cannot import tripsim.lockstep | Frozen hardware archive also supplied old model tools, while tests came from current HEAD | First isolated L2 executions failed before simulation | Archive frozen src/spec/programs but current independent model tools and test fixtures; all three fresh2048-clock L2 comparisons pass | fixed locally |
+
+| 69 | 2026-10-06 | Local timing-prototype proof runner | Yosys cannot open trw_assert.vh | Quotes embedded in the concatenated -I option are treated literally | First reusable verifier proof attempt | Run Yosys from the isolated trial directory with -Isrc and relative source paths; fresh resync proof passes even with spaces in the output directory, fresh fabric proofs pass all six counts | fixed locally |
+
 Note on #1: gate-level simulation also needs Tiny Tapeout's Icarus 13 build, which is what CI installs. Stock Icarus 12 leaves the cell models' `delayed_*` timing-check nets undriven, so every flop reads X. Use the TT build for any local gate-level run.

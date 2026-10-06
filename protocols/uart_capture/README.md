@@ -45,3 +45,10 @@ and leaves three spare. Queue depth and event sampling latency are unchanged.
 Intervals not divisible by four quantize to either adjacent tick difference,
 depending on counter phase. Range is still finite and there is no wrap flag.
 See the report for loaded verification and its gate/silicon limits.
+
+`test/` isolates queue boundaries through the user-design top ports: a full
+queue pops its old head while accepting a simultaneous event, preserves order
+and stays full without setting overflow; an empty ready queue retains a new
+event until the next cycle. The hosted `capture queue boundaries` workflow
+checks both timestamp settings. This is source-RTL coverage, supplementary to
+the compiled SPI-loaded tests; initial hosted verification is pending.

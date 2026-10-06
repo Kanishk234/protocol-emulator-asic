@@ -5,11 +5,27 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (audit SRAM hold failure and prepare one-pass recovery)
+Done:
+- Audited failed artifact11450688351 from37546502664. Exactly1fast hold violation: lane0acc_addr[1]→SRAM A_ADDR[1],arrival0.946049ns/required0.979280ns,WS−0.0332313ns. Setup counts0allcorners; slow/typical hold positive.
+- Prepared opt-in/defaultfalse post-antenna hold recovery: reject setup failures,one all-corner timing repair,independent antenna check,fresh three-corner timing,then existing DRT gate. No retries or relaxed constraints; downstream upload preserves follow-up evidence.108helper tests/workflow validation/diffcheck pass. Report PHASE2_LOAD_FLAT_HOLD_RECOVERY.md.
+- Event-late37546499438 still active; its named step encompasses checks and DRT, so internal stage is not independently confirmed. Unit remaining RTL job in chip/L3/rotation tests; other two unit jobs passed. No new dispatch/publication or phase tick.
+Next:
+- Publish scoped CI/docs and launch source37533972946/bs-load-flat with repair_postantenna_hold=true after explicit publication authorization. Continue event-late/extraction/GL monitoring and evaluate actual routed timing.
+
+## 2026-10-06: Codex (load-flat route stopped at timing guard)
+Done:
+- Event-late37546499438 remains active in antenna/fresh timing checks; main unit37546482082 active. Latest lint37546482114,test37546482166,docs37546482128 passed.
+- Load-flat37546502664 failed before detailed routing: after antenna repair fast hold WS fell+0.0236243→−0.0332313ns; slow hold+0.154009,typical+0.052975,setup0allcorners. Existing guard correctly refused DRT. Extraction37547207387 and GL37547207361 were skipped because their source route failed. This is a physical timing regression, not a source-provenance failure.
+Next:
+- Audit exact violating hold endpoints and saved antenna checkpoint before preparing any bounded hold-repair follow-up; do not bypass the guard or rerun unchanged. Await event-late result. No new dispatch or phase tick; best extracted setup remains−0.325228ns with negative fast hold.
+
 ## 2026-10-06: Codex (audit completed event screens and prepare guarded routes)
 Done:
 - Downloaded both candidates and their exact paired baselines using direct artifact API after standard download stalled. Both candidates match27expected source/config/info files. All-corner estimated setup/hold counts0; zero repaired GRT overflow. Event-late holdfast+0.0313302ns,slow slew8,fanout166,cap0all; load-flat holdfast+0.0236243,slow slew6/typical1,fanout160,capfast/typical1.
 - Repaired baseline/event/load area508444/510233/509017µm² and demand233872/239415/239238. Physical tradeoffs do not establish an extracted timing win. Both qualify for isolated bounded routing. Full comparison in PHASE2_EVENT_SCREEN_AUDIT.md.
 - Prepared routing options and exact patch/source guards for both, with named-patch regression.98helper tests,workflow-choice and diff checks pass. No publication/route dispatch or main hardware change.
+- User approved publication. Committed CI666b5e9 and docs1411f26, then explicitly pushed origin main. Local HEAD,origin/main and git ls-remote main all equal1411f26d20a4b47d089b9f8492ff0b5532aad848. Launched event-late route37546499438(active) and load-flat37546502664(queued), both on that exact remote revision. Subsequent status note remains uncommitted; no commits await pushing.
 Next:
 - Obtain scoped approval to publish CI/docs and launch two isolated routes, then audit automatic extraction/GL. Resync remains best reviewed setup−0.325228ns but fast hold−0.008053ns; official timing still fails. No phase ticks.
 

@@ -1,0 +1,11 @@
+# Load-flat post-antenna hold audit and bounded follow-up (2026-10-06)
+
+Failed main route37546502664, source screen37533972946/bs-load-flat, stopped before detailed routing. Its saved post-antenna fast-corner STA reports exactly1hold violation at−0.0332313ns. Worst path launches at lane0 `acc_addr[1]` (`_46422_/Q`), passes two address-selection gates and `place7588`, and captures at SRAM `A_ADDR[1]`. Arrival0.946049ns versus required0.979280ns includes the unchanged0.1ns hold uncertainty. This is the lane/SRAM interface, not a failed equivalence result for producer-load logic.
+
+Setup WS and violation counts remain0at every corner. Hold slow+0.154009ns and typical+0.052975ns have0violations. The fast result regressed from+0.0236243ns in the saved pre-antenna screen. Keep the route refusal; never bypass signoff constraints or the hold gate.
+
+Prepared existing route dispatch input `repair_postantenna_hold` (boolean, defaultfalse). If explicitly selected and post-antenna timing fails exclusively hold, perform exactly one existing all-corner post-GRT timing repair with unchanged configuration/constraints. Require its fresh setup/hold checks to pass; independently check antennas without another antenna-repair loop; then run fresh three-corner timing on that checked state. Every gate must pass before DRT. Reject setup failures, dirty antennas and residual timing failure; no retries. Record final gate state and preserve follow-up comparisons in downstream extraction artifacts.
+
+This is a physical-flow experiment, not new RTL or architecture.108helper checks pass, including single-pass recovery ordering, repair/antenna/timing failures and setup rejection at every corner. Dispatch remains unpublished/unlaunched pending scoped authorization. Proposed source37533972946,variantbs-load-flat,repair_postantenna_hold=true. It reconstructs the trusted source checkpoint and antenna steps, then adds the bounded recovery; no unrelated hardware change is combined.
+
+Raw evidence: `/tmp/load-route-hold-audit/runs/placement-route/postantenna-sta/comparison.json` and fast `min.rpt`, downloaded artifact11450688351. A successful diagnostic recovery is not official timing closure. Event-late37546499438 remains active at the latest check; no new extracted WNS is available.

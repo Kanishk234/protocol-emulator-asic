@@ -35,6 +35,7 @@ with (out / "fabric_cone_parse.log").open("w") as log:
 # Retain exact connectivity even if uncompressed JSON exceeds collector limit.
 with gzip.open(out / "actual_fabric_cone.json.gz", "wb") as archive:
     archive.write(full.read_bytes())
-env.update(WARP_COMPACT_FABRIC_CONE_JSON=str(full), WARP_COMPACT_FABRIC_TOP=top)
+env.update(WARP_COMPACT_FABRIC_CONE_JSON=str(full), WARP_COMPACT_FABRIC_TOP=top,
+           WARP_COMPACT_SHADOW_RTL="1")
 result = subprocess.run([sys.executable, str(ROOT / "spikes/cloud/native_fabric.py")], env=env)
 raise SystemExit(result.returncode)

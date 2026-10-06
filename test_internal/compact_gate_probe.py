@@ -74,6 +74,8 @@ def report_loaded_config(dut, words):
 def report_runtime(dut, label):
     """Localize unknowns at shell, clock/reset and logic-cell boundaries."""
     top = dut.user_project
+    if os.environ.get("WARP_COMPACT_SHADOW_RTL") == "1":
+        report_shadow(dut, label)
     for name in ("running", "user_reset", "user_rst_n", "cell_val", "cell_en", "out_q"):
         try:
             signal = getattr(top, name)
@@ -193,6 +195,24 @@ async def watch_timer_first_unknown(dut, module, tile):
                           before, data, resets, after)
             report_runtime(dut, "first timer known-to-X edge")
             return
+
+
+def report_shadow(dut, label):
+    """Compare separate RTL state/routes at the same real loaded clock sample."""
+    fabric = dut.rtl_shadow
+    timer_tile = fabric.Tile_X2Y2_PRIM2T2S_C2
+    timer = timer_tile.Inst_TB_wp_timer
+    dut._log.info("SHADOW %s timer count=%s armed=%s rst=%s load=%s half=%s en=%s tc=%s",
+                  label, timer.count.value, timer.armed.value, timer_tile.TB_rst.value,
+                  timer_tile.TB_load.value, timer_tile.TB_half.value, timer_tile.TB_en.value,
+                  timer_tile.TB_tc.value)
+    for instance, ports in (("Tile_X2Y2_PRIM2T2S_C2", ("N1END", "S1BEG", "E1BEG")),
+                            ("Tile_X2Y3_LUT4x8_ha_C2", ("N1BEG", "S1BEG", "N2MID"))):
+        native = dut.user_project.u_fabric[instance]
+        companion = fabric[instance]
+        for port in ports:
+            dut._log.info("SHADOW %s %s.%s mapped=%s rtl=%s", label, instance, port,
+                          native[port].value, companion[port].value)
 
 
 def report_unknown_cone(dut, label, path):

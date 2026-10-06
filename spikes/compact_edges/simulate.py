@@ -4,6 +4,7 @@
 import argparse
 import csv
 import os
+import sys
 from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
@@ -42,6 +43,9 @@ def simulate(work: Path, words: Path, shell_netlist: Path | None = None,
         sim_name += "_internal_settle"
     if reset_probe:
         sim_name += "_reset_probe"
+    shadow = mapped_fabric and os.environ.get("WARP_COMPACT_SHADOW_RTL") == "1"
+    if shadow:
+        sim_name += "_shadow"
     sim = work / (sim_name + ("_mapped_shell" if shell_netlist else ""))
     sim.mkdir(exist_ok=True)
     routing_nets = [m[1] for m in re.finditer(
@@ -61,6 +65,12 @@ def simulate(work: Path, words: Path, shell_netlist: Path | None = None,
     hierarchy = "user_project.u_fabric."
     refs = [hierarchy + net + (" " if net.startswith("\\") else "")
             for net in routing_nets]
+    shadow_sources, shadow_instance = [], ""
+    if shadow:
+        sys.path.insert(0, str(ROOT / "test_internal"))
+        from native_shadow import prepare_shadow
+        shadow_sources, shadow_instance, shadow_refs = prepare_shadow(ROOT, library, fabric_rtl, tiles, sim)
+        refs.extend(shadow_refs)
     if settle_internal:
         # Diagnostic only: include preserved intra-tile switch outputs in the
         # same D-023 pulse. Derive the allowlist from generated output ports;
@@ -98,11 +108,10 @@ wire [7:0] uo_out, uio_out, uio_oe;
 reg hold_x=0, settle_routing=0;
 tt_um_warp user_project(.clk(clk), .rst_n(rst_n), .ena(ena),
   .ui_in(ui_in), .uo_out(uo_out), .uio_in(uio_in), .uio_out(uio_out), .uio_oe(uio_oe));
-always @(posedge hold_x) begin
-''' + forces + "\nend\nalways @(negedge hold_x) begin\n" + releases +
+''' + shadow_instance + "always @(posedge hold_x) begin\n" + forces + "\nend\nalways @(negedge hold_x) begin\n" + releases +
         "\nend\nalways @(posedge settle_routing) begin\n" + zeros +
         "\n#1;\n" + releases + "\nend\nendmodule\n")
-    sources = [shell_netlist.resolve() if shell_netlist else top, fabric, tb]
+    sources = [shell_netlist.resolve() if shell_netlist else top, fabric, tb] + shadow_sources
     if not mapped_fabric:
         sources.append(library / "models_pack.v")
     build_args = ["-g2012"]

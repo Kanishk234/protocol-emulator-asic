@@ -213,6 +213,29 @@ def report_shadow(dut, label):
         for port in ports:
             dut._log.info("SHADOW %s %s.%s mapped=%s rtl=%s", label, instance, port,
                           native[port].value, companion[port].value)
+    modules = read_cone_json(os.environ["WARP_COMPACT_FABRIC_CONE_JSON"])["modules"]
+    macro = modules[os.environ["WARP_COMPACT_FABRIC_TOP"]]
+    differences = 0
+    for instance, cell in macro["cells"].items():
+        if not instance.startswith("Tile_X") or cell["type"] not in modules:
+            continue
+        native = dut.user_project.u_fabric[instance]
+        companion = dut["native_inputs_" + instance]
+        for name, port in modules[cell["type"]]["ports"].items():
+            if port["direction"] != "output" or name.startswith(("Frame", "GCLK", "GSR", "GEN")):
+                continue
+            actual, expected = str(native[name].value).lower(), str(companion[name].value).lower()
+            if len(actual) != len(expected):
+                raise RuntimeError("Matched-input companion output width differs")
+            mismatches = [(len(actual)-1-index, a, b) for index, (a, b) in enumerate(zip(actual, expected))
+                          if b in "01" and a != b]
+            if mismatches:
+                differences += 1
+                if differences <= 24:
+                    dut._log.info("TILE SAME INPUT %s %s.%s mapped=%s rtl=%s differences=%s",
+                                  label, instance, name, actual, expected, mismatches)
+    dut._log.info("TILE SAME INPUT %s: %d output ports with differing RTL-known bits (first24 logged)",
+                  label, differences)
 
 
 def report_unknown_cone(dut, label, path):

@@ -28,6 +28,17 @@ def prepare_shadow(root, library, fabric_rtl, tiles, sim):
     connections = [f".{name}(user_project.u_fabric.{name})" if port["direction"] == "input"
                    else f".{name}()" for name, port in macro["ports"].items()]
     instance = names[top] + " rtl_shadow(" + ",\n".join(connections) + ");\n"
+    # Tile-local companions receive the *mapped tile's* actual inputs. Unlike
+    # the whole RTL fabric above, they cannot hide a bad incoming route.
+    design = json.loads(Path(os.environ["WARP_COMPACT_FABRIC_CONE_JSON"]).read_text())["modules"]
+    for cell_name, cell in macro["cells"].items():
+        if not cell_name.startswith("Tile_X") or cell["type"] not in names:
+            continue
+        ports = design[cell["type"]]["ports"]
+        connections = [f".{name}(user_project.u_fabric.{cell_name}.{name})"
+                       if port["direction"] == "input" else f".{name}()"
+                       for name, port in ports.items()]
+        instance += names[cell["type"]] + " native_inputs_" + cell_name + "(" + ",\n".join(connections) + ");\n"
     # Same D-023 routing pulse as the ordinary RTL control. No storage,
     # configuration or user state is forced in either fabric.
     refs = ["rtl_shadow." + match[1] for match in re.finditer(

@@ -69,6 +69,55 @@ def report_loaded_config(dut, words):
         raise AssertionError(f"{total_unknown} mapped configuration bits remain unknown")
     if total_mismatch:
         raise AssertionError(f"{total_mismatch} mapped configuration bits disagree with loaded image")
+    full = os.environ.get("WARP_COMPACT_FABRIC_CONE_JSON")
+    if full:
+        modules = read_cone_json(full)["modules"]
+        macro = modules[os.environ["WARP_COMPACT_FABRIC_TOP"]]
+        checked = unknown = mismatch = 0
+        for instance, cell in macro["cells"].items():
+            if not instance.startswith("Tile_X"):
+                continue
+            x, y = map(int, re.match(r"Tile_X(\d+)Y(\d+)_", instance).groups())
+            tile = fabric[instance]
+            for name, (frame, bit) in native_config_bindings(modules[cell["type"]]).items():
+                signal = tile[name].Q
+                checked += 1
+                if not signal.value.is_resolvable:
+                    unknown += 1
+                elif int(signal.value) != ((expected[x, y, frame] >> bit) & 1):
+                    mismatch += 1
+                    dut._log.error("CONFIG CELL MISMATCH %s.%s frame=%d bit=%d", instance, name, frame, bit)
+        dut._log.info("CONFIG CELL TOTAL: %d actual latches, %d unknown, %d image mismatches",
+                      checked, unknown, mismatch)
+        if not checked or unknown or mismatch:
+            raise AssertionError("Complete native configuration-cell audit did not pass")
+
+
+def native_config_bindings(module):
+    """Bind actual configuration latch D/GATE to unmodified frame input ports."""
+    ports = module["ports"]
+    drivers = {bit: cell for cell in module["cells"].values()
+               for port, direction in cell["port_directions"].items() if direction == "output"
+               for bit in cell["connections"][port]}
+
+    def source(bit, port):
+        visited = set()
+        bits = ports[port]["bits"]
+        if ports[port].get("offset", 0) or ports[port].get("upto", 0):
+            raise ValueError("Unsupported frame-port indexing")
+        while bit not in bits:
+            if bit in visited or bit not in drivers:
+                raise ValueError("Unresolved configuration input binding")
+            visited.add(bit)
+            cell = drivers[bit]
+            if not cell["type"].startswith(("sg13cmos5l_buf_", "sg13cmos5l_dlygate")):
+                raise ValueError("Unexpected configuration input driver: " + cell["type"])
+            bit = cell["connections"]["A"][0]
+        return bits.index(bit)
+
+    return {name: (source(cell["connections"]["GATE"][0], "FrameStrobe"),
+                   source(cell["connections"]["D"][0], "FrameData"))
+            for name, cell in module["cells"].items() if cell["type"] == "sg13cmos5l_dlhq_1"}
 
 
 def report_runtime(dut, label):

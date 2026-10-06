@@ -1,0 +1,8 @@
+{
+  "release_tag": "compact-checkpoint-20261006-iter8",
+  "sha256": "6e2bac339e810a09dc9084393cadc3da5cdfb596077c05410c3b30b5e15ecb4d",
+  "source_commit": "650163a",
+  "source_iteration": 8,
+  "source_markers": 15,
+  "scope": "Experimental checkpoint; not a chip release or clean-source rebuild"
+}

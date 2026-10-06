@@ -1,0 +1,9 @@
+top: uart_monitor_top
+params:
+  DIV: 16
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  event_i: FAB_IN1
+  tx_o: FAB_OUT0

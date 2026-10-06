@@ -1,0 +1,12 @@
+top: uart_capture_top
+params:
+  DIV: 16
+  STAMP_BITS: 6
+  STAMP_SHIFT: 2
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  event_i: FAB_IN1
+  capture_select_i: FAB_IN2
+  tx_o: FAB_OUT0

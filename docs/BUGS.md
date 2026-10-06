@@ -264,6 +264,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Root cause:** unresolved. Known configuration is insufficient to distinguish mapped logic/reset behavior from zero-delay combinational/model pessimism. No hardware/model fix claimed.
 - **Next coverage:** derive a read-only cone JSON from the exact mapped tile and trace LB register D logic at pre/post RUN; separately probe the real USER_RESET command while retaining ordinary native failure. No configuration or user-state force. Existing D-023 routing harness remains explicitly limited; native/SDF acceptance is open.
 - **Follow-up:**37516794406 cone extraction/RTL control pass; native baseline18.81s and real USER_RESET probe19.12s both fail with UART X. Known configuration does not identify the root cause. Next diagnostic follows selected mux branches and actual UART output at Tile_X6Y2, with tile boundaries labeled explicitly.
+- **Failure-time evidence:**37519661148 shows UART X at4423540ns persists after same-edge delta-cycle settling. Actual selected output cone reaches Tile_X6Y2.E2END[7]. Next read-only probe follows exact macro connections across tiles and stops at clocked state; no hardware fix established.
 
 ## 34: Hosted LibreLane requires existing forced run directory
 - **Date:**2026-10-06.

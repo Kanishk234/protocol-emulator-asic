@@ -113,3 +113,24 @@ This establishes an observation window, not the cause. Next probe records
 runtime/cones at first UART X and after the same edge's delta cycles, retaining
 the original test failure. Heavy computation remains hosted; active routing
 inputs and frozen G1 remain unchanged.
+
+## Failure-time evidence and baseline physical completion
+
+[Probe37519661148](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37519661148)
+at7a7148b completes RTL control and both failing native paths. UART X at4423540ns
+persists after delta cycles; this observed failure is not resolved by sampling
+after settling. Selected output cone reaches Tile_X6Y2.E2END[7]. Follow-up
+traces exact macro connectivity across tiles, stops at clocked state and keeps
+compressed actual connectivity in the artifact. No remapping or model changes.
+
+[G1 physical37511778153](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37511778153)
+now completes success including gds, precheck, gl_test and viewer. D-023's
+mapped-shell/RTL-fabric limit still applies. At7a7148b, all regular checks pass:
+lint37519661090/docs37519661032/test37519661002/unit37519661006.
+Compact37516794406 routing remains active at this check. No compact native,
+final geometry, configured-fabric timing or promotion pass is claimed.
+
+Research follow-up: [FABulous synthesis guidance](https://github.com/FPGA-Research/FABulous/blob/main/docs/source/user_guide/using_doc/synthesis/yosys.md)
+and [Yosys FABulous pass](https://yosyshq.readthedocs.io/projects/yosys/en/v0.69/cmd/index_techlibs_fabulous.html)
+describe technology-specific mapping. They do not establish our X failure's
+cause or justify changing pinned models. Trace actual active sources first.

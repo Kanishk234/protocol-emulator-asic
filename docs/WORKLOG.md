@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-06 (session54: persistent native unknown and cross-tile diagnosis)
+**Done:** Inspected new failed workflow37519661148 at7a7148b. RTL control passes; native UART X persists at4423540ns both at sampled clock edge and after delta-cycle settling. Exact selected UART path reaches Tile_X6Y2 E2END[7]; this is a neighboring route, not an established unconnected net. Added read-only traversal across exact macro/tile connectivity, excluding known unselected mux branches and stopping at clocked state. Whole-fabric JSON comes from actual mapped netlists and pinned Liberty with no remapping; compressed connectivity retained as cloud evidence. Synthetic mux/vector boundary/state-stop checks and Python/YAML/whitespace checks pass. Hosted verification pending. No local heavy EDA, model/config/state forcing, frozen hardware or active route changes.
+
+G1 physical37511778153 completes success, including gds/precheck/viewer/gl_test. This remains the template's mapped-shell/RTL-fabric scope (D-023), not compact native/SDF proof. At7a7148b, lint37519661090/docs37519661032/test37519661002/unit37519661006 all pass. Compact route37516794406 remains active; no final count or timing result available.
+**Boxes ticked:** none. Compact native/routing/timing acceptance and phase5 remain open.
+**Next:** inspect cross-tile first-failure cone, identify the earliest active unknown source before selecting a hardware/model correction; continue independent fallback-compatible improvements and preserve current routing inputs.
+
 ## 2026-10-06 (session53: approved checkpoint publication and cloud diagnosis)
 **Done:** User explicitly approves public experimental checkpoint upload after contents/purpose explained. Initial network error, then short target SHA rejected; full a284f4c SHA publishes exact5676972-byte asset under compact-checkpoint-20261006-iter8, same pinned SHA256. Earlier automatic approval blocker is resolved, no further publication permission needed. Restarted only failed jobs of37512885358 (attempt2); both verify/materialize checkpoint and fetch exact PDK, four G1 demos remain passed. Existing G1 fabric37511778167 passes; G1 gds37511778153 still running.
 

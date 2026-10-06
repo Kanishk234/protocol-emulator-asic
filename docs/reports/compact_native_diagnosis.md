@@ -50,6 +50,35 @@ alias is removed and indexed lookup raises KeyError (BUG37). This is a probe
 failure, not new UART evidence. Attribute lookup corrects the diagnostic;
 hosted verification of the focused snapshots remains pending.
 
+## Focused result
+
+[37535155011](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37535155011)
+verifies the optional-alias fix and reaches the actual UART failure again. At
+4423490ns the same-input RTL timer has count15, rst0, loadX, halfX and en0.
+The RTL conditional retains the count with unknown load; this cannot prove
+the corresponding hardware next state is determined.
+
+Unregistered constant LUT outputs provide smaller diagnostic targets:
+
+| Tile / cell | Local RTL truth table | Binary outputs | Native O |
+|---|---|---|---|
+| X1Y2 LD | all0 | 0 | X |
+| X2Y1 LB | all0 | 0 | X |
+| X2Y1 LD | all1 | 1 | X |
+
+These truth tables determine the combinational output regardless of LUT input
+values. The next read-only probe traces their actual mapped output cones,
+including configuration dependence, before concluding whether a mapping,
+configuration binding or simulation correlation explains the discrepancy.
+For X2Y3 LD the local index is x001 and all possible completions yield1, but
+internal mapped inputs also need accounting. No chip correction is established.
+
+A lightweight static audit of the cached exact-revision PDK ihp_mux2/ihp_mux4
+UDP tables checks all27/729 combinations over0/1/X against their possible
+binary outputs. Both match. This excludes a simple missing selector rule in
+those tables; it does not prove the full mapped logic handles reconvergence
+correctly. PDK models remain unchanged.
+
 Acceptance still requires actual native loaded behavior, zero final routing
 and physical violations, and timing through the configured fabric. The frozen
 G1 physical success does not supply those compact or native proofs.

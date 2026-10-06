@@ -6,7 +6,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Date:**2026-10-06.
 - **Symptom/check:** focused diagnostic37534707478 stops before RUN while looking for LUT_out, an alias removed by synthesis; it does not reach the later UART check.
 - **Root cause:** cocotb indexed lookup raises KeyError for missing handles, whereas optional-alias handling catches AttributeError. The pre-push netlist audit had confirmed LUT_out was removed but did not exercise the handle access behavior.
-- **Fix/coverage:** use attribute lookup, matching existing optional native probes and their AttributeError handling. Lightweight fake-handle check covers retained and removed names. Hosted rerun pending; BUG33 remains unresolved.
+- **Fix/coverage:** use attribute lookup, matching existing optional native probes and their AttributeError handling. Lightweight fake-handle check covers retained and removed names. Hosted37535155011 verifies the correction and reaches actual UART X; BUG33 remains unresolved.
 
 ## 36: Diagnostic NOR gate used NAND's inverted input name
 - **Date:**2026-10-06.
@@ -282,6 +282,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Timer evidence:**37522773342 timer count becomes configured15/armed1 after RUN, then counter goes entirely unknown while armed remains1. Added first-known-to-X edge watcher with stable pre-edge D/reset snapshots; later feedback X alone does not identify original corruption.
 - **Before corruption:**37523983755 at4423490ns timer count remains15, but D inputs are allX with reset pins1. All8707 configuration bits still match the loaded image. Trace follows upstream logic; original cause remains unresolved. Unknown mux selectors are filtered only when Boolean sensitivity proves irrelevance under known inputs.
 - **Direct comparison:**37532673220 still reaches trace cap despite selector filtering. Added separate RTL companion sharing real shell/configuration input ports and ordinary D-023 routing pulse; native outputs remain authoritative. Compare timer control/state and tile route vectors without changing actual mapped netlist, configuration or user storage. Hosted verification pending.
+- **Matched-input result:**37535155011 reaches UART X with same-input companion snapshots. At4423490ns local timer load/half are unknown while RTL retains count15. Unregistered constant LUTs (X1Y2 LD=0, X2Y1 LB=0/LD=1) have native O=X. Next probe traces those actual mapped cones; neither benign pessimism nor a hardware root cause is established. See compact_native_diagnosis.md for scope and run evidence.
 
 ## 34: Hosted LibreLane requires existing forced run directory
 - **Date:**2026-10-06.

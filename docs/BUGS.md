@@ -2,6 +2,12 @@
 
 Format for each entry: number, date, symptom, root cause, the check that caught it, the check that now covers it, fix commit.
 
+## 36: Diagnostic NOR gate used NAND's inverted input name
+- **Date:**2026-10-06.
+- **Symptom/check:** native diagnostic37521273371 passes RTL control but stops before RUN with KeyError:A_N in sensitivity filtering.
+- **Root cause:** nor2b ports are A/B_N; diagnostic incorrectly reused nand2b's A_N/B convention. Official pinned PDK models are unchanged and not at fault.
+- **Fix/coverage:** use A or !B_N for NOR input sensitivity (output inversion does not change sensitivity). Lightweight schema audit invokes filtering for every distinct gate interface in actual mapped fabric; controlling-input checks pass. Hosted rerun pending. This diagnostic error does not resolve or reproduce the later UART failure by itself.
+
 ---
 
 ## 1: Template gate-level source list omits the flip-flop UDPs

@@ -51,4 +51,6 @@ queue pops its old head while accepting a simultaneous event, preserves order
 and stays full without setting overflow; an empty ready queue retains a new
 event until the next cycle. The hosted `capture queue boundaries` workflow
 checks both timestamp settings. This is source-RTL coverage, supplementary to
-the compiled SPI-loaded tests; initial hosted verification is pending.
+the compiled SPI-loaded tests. [Run37520971978](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37520971978)
+passes both settings; independent XML audit finds one case per setting and no
+failure, error or skipped result.

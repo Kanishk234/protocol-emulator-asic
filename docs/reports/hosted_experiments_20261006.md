@@ -134,3 +134,17 @@ Research follow-up: [FABulous synthesis guidance](https://github.com/FPGA-Resear
 and [Yosys FABulous pass](https://yosyshq.readthedocs.io/projects/yosys/en/v0.69/cmd/index_techlibs_fabulous.html)
 describe technology-specific mapping. They do not establish our X failure's
 cause or justify changing pinned models. Trace actual active sources first.
+
+## Independent capture boundary improvement
+
+[Queue37520971978](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37520971978)
+at86a1af7 passes the new full simultaneous pop/event and empty ready/event
+checks at STAMP_SHIFT0/2 with six stored timestamp bits. Independently audited
+both XMLs: one case each, no failure/error/skip. This exercises user-design
+top ports in source RTL; it supplements, rather than replaces, existing real
+SPI-loaded behavior checks. No queue implementation or frozen hardware change.
+
+Cross-tile probe37520760969 reaches actual native failure and traces UART
+through columns6→5→4→3→2. Unknown branches masked by controlling gate inputs
+consume the trace cap; follow-up uses conservative Boolean sensitivity for
+supported basic/AOI/OAI gates. No native pass or root-cause fix yet.

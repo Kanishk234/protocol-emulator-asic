@@ -1,0 +1,11 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -364,7 +364,7 @@
+     wire        ld_stn   = !fr_want && !st_v && st_new && rx_free;
+     wire        st_keep  = st_v && !ld_sth;
+     wire        st_hold  = st_new && !ld_stn;
+-    assign rx_load = ld_fr || ld_sth || ld_stn;
++    assign rx_load = rx_free && (fr_want || st_v || st_new);
+     assign rx_tag  = fr_want ? fr_tag : `TRW_TAG_EVENT;
+     assign rx_data = fr_want ? fr_data : st_v ? st_d : st_nd;
+     assign ovr_set = (fr_want && !rx_free) || (st_hold && st_keep);

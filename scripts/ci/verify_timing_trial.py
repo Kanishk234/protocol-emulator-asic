@@ -6,6 +6,7 @@ Raw proof/simulation output stays in the explicitly selected new directory.
 """
 import argparse
 import io
+import importlib.util
 from pathlib import Path
 import subprocess
 import tarfile
@@ -13,6 +14,17 @@ import tarfile
 from timing_trial import CANDIDATE, PATCHES
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def regenerate_python_tables(output):
+    """Use trial resource counts without rewriting its archived RTL."""
+    import yaml
+    generator_spec = importlib.util.spec_from_file_location('trial_generator', output / 'tools/gen/gen.py')
+    generator = importlib.util.module_from_spec(generator_spec)
+    generator_spec.loader.exec_module(generator)
+    spec = yaml.safe_load((output / 'spec/tripwire.yaml').read_text())
+    generator.validate(spec)
+    (output / 'tools/tripwire_spec.py').write_text(generator.gen_python(spec))
 
 
 def verify(variant, output, simulate=False):
@@ -26,6 +38,9 @@ def verify(variant, output, simulate=False):
         data = subprocess.check_output(['git', 'archive', revision, *paths], cwd=ROOT)
         with tarfile.open(fileobj=io.BytesIO(data)) as archive:
             archive.extractall(output, filter='data')
+    # HEAD supplies current test/model fixes, but its generated tables describe
+    # main's resource counts. Regenerate only Python encodings from frozen spec.
+    regenerate_python_tables(output)
     original = (output / source).read_text()
     subprocess.run(['git', 'apply', str(ROOT / 'spikes/r4_floorplan' / patch)],
                    cwd=output, check=True)

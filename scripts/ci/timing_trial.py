@@ -10,6 +10,9 @@ PATCHES = {
     "drop-qual": ("drop_qual.patch", "src/trw_chan_port.v"),
     "bs-resync": ("bs_resync.patch", "src/trw_pin_bs.v"),
     "bs-csa": ("bs_csa.patch", "src/trw_pin_bs.v"),
+    "bs-load-flat": ("bs_load_flat.patch", "src/trw_pin_bs.v"),
+    "bs-event-late": ("bs_event_late.patch", "src/trw_pin_bs.v"),
+    "bs-sample-predicate": ("bs_sample_predicate.patch", "src/trw_pin_bs.v"),
 }
 
 

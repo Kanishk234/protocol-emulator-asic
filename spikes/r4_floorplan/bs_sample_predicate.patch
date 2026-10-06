@@ -1,0 +1,27 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -139,8 +139,22 @@
+     wire [24:0] sp   = sof - per;                               // sample time - boundary time
+     wire [24:0] x_n  = sp + tb;                                 // the sample time, from this clock's start
+     wire [24:0] x_r  = sp + tb_r;                               // the same after a resync
+-    wire        s_n  = x_n[24] || (x_n < 25'd256);              // at or before the end of this clock
+-    wire        s_r  = x_r[24] || (x_r < 25'd256);
++    // Only the upper seventeen result bits determine signed due-or-before-256.
++    // Split at the eight fractional bits; retain both possible carry bits.
++    function sample_due;
++        input [24:0] a, b, c;
++        reg [9:0] low_sum;
++        reg [16:0] high_sum;
++        begin
++            low_sum = {2'b0, a[7:0]} + {2'b0, ~b[7:0]} +
++                      {2'b0, c[7:0]} + 10'd1;
++            high_sum = a[24:8] + (~b[24:8]) + c[24:8] +
++                       {15'd0, low_sum[9:8]};
++            sample_due = high_sum[16] || (high_sum == 17'd0);
++        end
++    endfunction
++    wire        s_n = sample_due(sof, per, tb);              // at or before the end of this clock
++    wire        s_r = sample_due(sof, per, tb_r);
+     wire        s_h  = sof < 25'd256;
+     wire [24:0] tb1  = hsync ? per : rs_do ? tb_r : tb;
+ 

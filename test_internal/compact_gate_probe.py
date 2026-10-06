@@ -215,7 +215,11 @@ def read_cone_json(path):
 
 def sensitive_ports(kind, values):
     """Conservative Boolean sensitivity for gates with known controlling inputs."""
-    if kind in ("a21o", "a21oi"):
+    if kind == "mux2":
+        function = lambda v: v["A" + str(v["S"])]
+    elif kind == "mux4":
+        function = lambda v: v["A" + str(v["S0"] + 2 * v["S1"])]
+    elif kind in ("a21o", "a21oi"):
         function = lambda v: (v["A1"] and v["A2"]) or v["B1"]
     elif kind in ("o21a", "o21ai"):
         function = lambda v: (v["A1"] or v["A2"]) and v["B1"]
@@ -332,11 +336,17 @@ def trace_unknown_cone(dut, label, module, tile, start):
             select = value(connections["S"][0], mod, handle)
             if select in ("0", "1"):
                 active = [("A" + select, connections["A" + select][0])]
+            else:
+                sensitive = sensitive_ports("mux2", {port: value(b, mod, handle) for port, b in inputs})
+                active = [(port, b) for port, b in inputs if port in sensitive]
         elif cell["type"].startswith("sg13cmos5l_mux4_"):
             s0, s1 = (value(connections[port][0], mod, handle) for port in ("S0", "S1"))
             if s0 in ("0", "1") and s1 in ("0", "1"):
                 port = "A" + str(int(s0) + 2 * int(s1))
                 active = [(port, connections[port][0])]
+            else:
+                sensitive = sensitive_ports("mux4", {port: value(b, mod, handle) for port, b in inputs})
+                active = [(port, b) for port, b in inputs if port in sensitive]
         elif cell["type"].startswith("sg13cmos5l_"):
             kind = cell["type"][len("sg13cmos5l_"):].rsplit("_", 1)[0]
             sensitive = sensitive_ports(kind, {port: value(b, mod, handle) for port, b in inputs})

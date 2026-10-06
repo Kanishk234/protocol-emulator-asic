@@ -7,6 +7,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Symptom/check:** native diagnostic37521273371 passes RTL control but stops before RUN with KeyError:A_N in sensitivity filtering.
 - **Root cause:** nor2b ports are A/B_N; diagnostic incorrectly reused nand2b's A_N/B convention. Official pinned PDK models are unchanged and not at fault.
 - **Fix/coverage:** use A or !B_N for NOR input sensitivity (output inversion does not change sensitivity). Lightweight schema audit invokes filtering for every distinct gate interface in actual mapped fabric; controlling-input checks pass. Hosted rerun pending. This diagnostic error does not resolve or reproduce the later UART failure by itself.
+- **Hosted verification:**37521660597 successfully executes filtered traces through the actual later UART X; no KeyError. BUG33 remains open.
 
 ---
 
@@ -271,6 +272,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Next coverage:** derive a read-only cone JSON from the exact mapped tile and trace LB register D logic at pre/post RUN; separately probe the real USER_RESET command while retaining ordinary native failure. No configuration or user-state force. Existing D-023 routing harness remains explicitly limited; native/SDF acceptance is open.
 - **Follow-up:**37516794406 cone extraction/RTL control pass; native baseline18.81s and real USER_RESET probe19.12s both fail with UART X. Known configuration does not identify the root cause. Next diagnostic follows selected mux branches and actual UART output at Tile_X6Y2, with tile boundaries labeled explicitly.
 - **Failure-time evidence:**37519661148 shows UART X at4423540ns persists after same-edge delta-cycle settling. Actual selected output cone reaches Tile_X6Y2.E2END[7]. Next read-only probe follows exact macro connections across tiles and stops at clocked state; no hardware fix established.
+- **Isolated state source:**37521660597 filtered UART cone ends at Tile_X2Y3_LUT4x8_ha_C2.Inst_LH_FABULOUS_LC.LUT_flop after41unknown nodes, D=X/RESET_B=1 at failure. Next probe checks that register's exact data/reset paths and configuration selectors. This identifies a source state boundary, not the original cause of unknown state.
 
 ## 34: Hosted LibreLane requires existing forced run directory
 - **Date:**2026-10-06.

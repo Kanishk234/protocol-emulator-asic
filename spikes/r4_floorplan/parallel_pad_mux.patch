@@ -1,0 +1,52 @@
+--- a/src/trw_pins.v
++++ b/src/trw_pins.v
+@@ -35,8 +35,8 @@
+     input  wire [5*NU-1:0] pin_a,        // pad numbers from each unit's configuration
+     input  wire [5*NU-1:0] pin_n,
+     // pads 8..23: {uio[7:0], uo[7:0]}
+-    output reg  [15:0]   pad_out,
+-    output reg  [15:0]   pad_oe
++    output wire [15:0]   pad_out,
++    output wire [15:0]   pad_oe
+ );
+     localparam [15:0] HOSTPAD = 16'h0048;        // uo3 (MISO) and uo6 (IRQ): index 3 and 6
+ 
+@@ -51,22 +51,22 @@
+     end
+     assign own_q = own[3*own_raddr +: 3];
+ 
+-    integer i, u;
+-    always @* begin
+-        pad_out = 16'd0;
+-        pad_oe  = 16'd0;
+-        for (i = 0; i < 16; i = i + 1)
+-            for (u = 0; u < NU; u = u + 1)
+-                if ({29'd0, own[3*i +: 3]} == u) begin
+-                    if ({27'd0, pin_a[5*u +: 5]} == i + 8) begin
+-                        pad_out[i] = a_out[u];
+-                        pad_oe[i]  = a_oe[u];
+-                    end else if ({27'd0, pin_n[5*u +: 5]} == i + 8) begin
+-                        pad_out[i] = n_out[u];
+-                        pad_oe[i]  = n_oe[u];
+-                    end
+-                end
+-    end
++    genvar i, u;
++    generate
++        for (i = 0; i < 16; i = i + 1) begin : g_pad
++            wire [NU-1:0] a_match, n_match;
++            for (u = 0; u < NU; u = u + 1) begin : g_unit
++                wire owner_match = (own[3*i +: 3] == u);
++                wire a_pin_match = ({27'd0, pin_a[5*u +: 5]} == i + 8);
++                wire n_pin_match = ({27'd0, pin_n[5*u +: 5]} == i + 8);
++                assign a_match[u] = owner_match && a_pin_match;
++                // Keep the original A-before-N priority if one unit maps both to this pad.
++                assign n_match[u] = owner_match && !a_pin_match && n_pin_match;
++            end
++            assign pad_out[i] = (|(a_match & a_out)) | (|(n_match & n_out));
++            assign pad_oe[i]  = (|(a_match & a_oe))  | (|(n_match & n_oe));
++        end
++    endgenerate
+ 
+ `ifdef TRW_ASSERT_ON
+     // at most one driver per pad: an enabled pad has a valid owner (the multiplexer picks only the owner)

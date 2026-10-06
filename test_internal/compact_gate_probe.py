@@ -107,6 +107,20 @@ def report_runtime(dut, label):
         tile = top.u_fabric.Tile_X6Y2_E_IO4_wide
         trace_unknown_cone(dut, label + " UART_TX", module, tile,
                            module["ports"]["B_IN_top"]["bits"][0])
+    full_cone = os.environ.get("WARP_COMPACT_FABRIC_CONE_JSON")
+    if full_cone:
+        module = read_cone_json(full_cone)["modules"]["LUT4x8_ha_C2"]
+        tile = top.u_fabric.Tile_X2Y3_LUT4x8_ha_C2
+        prefix = "Inst_LH_FABULOUS_LC."
+        state_bit = module["netnames"][prefix + "LUT_flop"]["bits"][0]
+        flop = next(cell for cell in module["cells"].values()
+                    if state_bit in cell["connections"].get("Q", []))
+        for name in ("LUT_flop", "c_out_mux", "c_reset_value", "O"):
+            dut._log.info("UART SOURCE %s %s %s=%s", label, tile._name,
+                          name, tile[prefix + name].value)
+        for port in ("D", "RESET_B"):
+            trace_unknown_cone(dut, label + " UART_SOURCE_" + port, module,
+                               tile, flop["connections"][port][0])
 
 
 def report_unknown_cone(dut, label, path):

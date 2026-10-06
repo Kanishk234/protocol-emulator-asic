@@ -1,0 +1,7 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+ARG SPLIT_TARGET=none
+COPY --chmod=755 openroad_hotspot_wrapper.sh /usr/local/bin/tripwire-openroad-hotspot
+COPY slew_split.tcl /usr/local/share/tripwire/critical_branch.tcl
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-openroad-hotspot
+ENV TRIPWIRE_BRANCH_REPAIR=1
+ENV TRIPWIRE_SLEW_TARGET=${SPLIT_TARGET}

@@ -10,9 +10,9 @@ from postgrt_timing import screen, CORNERS
 
 
 def timing_placement(variant):
-    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement"}:
+    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement", "cts-cluster8"}:
         raise ValueError("Unknown timing screen variant")
-    return variant == "timing-placement"
+    return variant in {"timing-placement", "cts-cluster8"}
 
 
 def checkpoint(root):
@@ -37,6 +37,8 @@ def main():
                   PL_RESIZER_SETUP_SLACK_MARGIN=0, GRT_RESIZER_SETUP_SLACK_MARGIN=0,
                   PNR_SDC_FILE=str(Path("src/signoff.sdc").resolve()),
                   PNR_CORNERS=[CORNERS[1], CORNERS[0], CORNERS[2]], RSZ_CORNERS=[CORNERS[1]])
+    if os.environ["VARIANT"] == "cts-cluster8":
+        config["CTS_SINK_CLUSTERING_SIZE"] = 8
     path = Path("src/config_rx_screen.json")
     path.write_text(json.dumps(config, indent=2) + "\n")
     root = Path("runs/rtl-grt-screen")

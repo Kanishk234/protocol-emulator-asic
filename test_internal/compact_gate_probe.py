@@ -255,7 +255,7 @@ def report_shadow(dut, label):
             actual = {}
             for signal in ("LUT_flop", "O", "LUT_out", "c_out_mux", "c_reset_value"):
                 try:
-                    actual[signal] = str(native[name + "." + signal].value).lower()
+                    actual[signal] = str(getattr(native, name + "." + signal).value).lower()
                 except AttributeError:
                     pass  # Synthesis may remove this alias; do not invent it.
             dut._log.info("LOCAL LUT %s %s L%s I=%s index=%s INIT=%s SR=%s EN=%s "

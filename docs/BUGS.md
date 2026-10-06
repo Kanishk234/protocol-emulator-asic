@@ -263,3 +263,15 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Symptom/check:**37512885358 attempt2 native job: tighter RTL control passes; actual mapped fabric fails UART recording with X at output. All8707 configuration bits are known and image-matching;26944 CRC processing cycles have stable input. Selected user registers already unknown before RUN despite shell user_reset=1/user_rst_n=0.
 - **Root cause:** unresolved. Known configuration is insufficient to distinguish mapped logic/reset behavior from zero-delay combinational/model pessimism. No hardware/model fix claimed.
 - **Next coverage:** derive a read-only cone JSON from the exact mapped tile and trace LB register D logic at pre/post RUN; separately probe the real USER_RESET command while retaining ordinary native failure. No configuration or user-state force. Existing D-023 routing harness remains explicitly limited; native/SDF acceptance is open.
+
+## 34: Hosted LibreLane requires existing forced run directory
+- **Date:**2026-10-06.
+- **Symptom/check:**37516278474 route passes Docker launch, then CLI rejects nonexistent forced native_route directory before OpenROAD.
+- **Root cause:**3.1.0.dev3 validates force-run-dir with exists=True; our fresh cloud root omitted its run directories.
+- **Fix/coverage:** create both empty native/geometry run directories under the already freshness-checked output root before invoking CLI. Static checks pass; hosted execution verification pending.
+
+## 35: Distribution Yosys cannot parse PDK model specify syntax
+- **Date:**2026-10-06.
+- **Symptom/check:**37516278474 native RTL control passes; new read-only cone extraction fails parsing PDK Verilog line43's specify syntax before native tests.
+- **Root cause:** distribution Yosys parser does not support this PDK model timing syntax, even when read as black-box library.
+- **Fix/coverage:** read signal port directions from the pinned standard-cell Liberty with read_liberty -lib, then read actual tile netlist without mapping/optimization. Native simulation still uses unchanged official Verilog/UDP models. Static checks pass; hosted cone/test verification pending. This setup failure neither supersedes prior native X failure nor qualifies hardware.

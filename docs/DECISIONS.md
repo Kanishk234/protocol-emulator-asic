@@ -1007,6 +1007,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - **Cost:** no protocol feature, lane/unit count, clock target or ISA change.
 - **Status:** paused; no density change is approved. Do not change `src/config.json` or start this run. Any new physical experiment needs its own evidence-based proposal and the required approvals.
 
+## D-069 (2026-10-05; measurement prototype): cached general pin-input selection
+- General need: shorten live configuration-to-pin selection paths without changing sampling cycles, encoded configuration, or protocol behavior. The requester authorized independent experiments and their launch.
+- Experiment: retain raw configuration and also store 24-bit masks for A and S. Reuse existing word-write gated clocks; preserve S-before-A selection, invalid-index behavior and D-066 live writes. Compare separately against unchanged frozen R4 hardware; no main RTL or spec change.
+- Cost: 48 extra latch bits per unit, 192 for four units, plus write decode and clock load; no additional clock gates. A stateless parallel-decode experiment measures a storage-free alternative independently.
+- Evidence: exhaustive 1,024-index-pair bench in four full/lean latch/flop combinations, five chip tests, 2,048-clock L2 comparison and whole-chip Yosys structural checks pass. Stored state is not claimed formally verified.
+- Status: approved isolated measurement only. Adoption requires resource-budget review, physical timing/area/overflow evidence and routed verification. No phase gate is satisfied by this prototype.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

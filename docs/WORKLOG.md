@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (four additional independent timing screens)
+Done:
+- Prepared isolated load-select, stateless input-decode, cached-input and timing-driven-placement comparisons against frozen 3393eea. Each workflow has its own unchanged baseline; main hardware, 20 ns clock and density 56 remain unchanged.
+- Load-select: Yosys proved 98 equivalence points at each N=1/5/6/7/9/16. Input-decode: 13 equivalence points proved. Each RTL variant, including cached-input, passed five chip tests and a fresh 2,048-clock L2 comparison with zero divergences.
+- Cached-input exhaustive bench passed all 1,024 A/S index pairs in full/lean and latch/flop configurations. Whole-chip Yosys hierarchy/proc/check passed after fixing prototype clock visibility (BUGS #67). Added storage costs 192 latch bits on R4; measurement only, adoption pending evidence (D-069).
+- Shared helper/Tcl suite passed 40 checks; all four workflows parsed. RX million-clock L2 completed with zero divergences. Pad million-clock comparison remains separate.
+- No phase boxes ticked. Latest extracted slow setup remains −5.630099 ns; new screens have no measured timing result yet.
+Next:
+- Publish and launch all four matched screens; audit area, global-route overflow and fresh all-corner timing before selecting changes for detailed routing. Record dispatch IDs here.
+
 ## 2026-10-05: Codex (independent parallel pad-selection trial)
 Done:
 - Prepared a second isolated exact-3393eea tree; only trw_pins.v changes, verified by byte comparison. Persisted parallel_pad_mux.patch preserves owner read/write/reset, invalid-owner behavior and A-before-N selection. RX change is absent from this variant.
@@ -13,7 +23,7 @@ Done:
 - Existing RX screen and routed protocol verification still active at check; fresh RX L2 reached 700,000 clocks with zero reported divergence. No phase boxes ticked or new timing gain claimed.
 
 Next:
-- Publish and launch the independent pad screen under ongoing user authorization; compare both RTL ideas separately before combining or routing. Finish lockstep runs and inspect fresh slow setup/fast hold, area, overflow and electrical evidence.
+- Published CI 9e38669 and separate docs b355b48; independent pad screen 37400509726 is running alongside RX screen 37399927459. Compare both RTL ideas separately before combining or routing. Fresh RX L2 reached 800,000 clocks without divergence; pad million-clock L2 is active. Inspect fresh slow setup/fast hold, area, overflow and electrical evidence.
 
 ## 2026-10-05: Codex (isolated RX comparison trial and matched physical screen)
 Done:

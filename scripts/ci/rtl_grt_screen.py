@@ -50,7 +50,8 @@ def main():
                     "--to", "OpenROAD.GlobalRouting", str(path)], check=True)
     source = checkpoint(flow)
     screen(path, source, root / "timing", os.environ["PDK_ROOT"],
-           sdc=Path("src/signoff.sdc"), setup_margin=0)
+           sdc=Path("src/signoff.sdc"), setup_margin=0,
+           repair_corners=CORNERS if os.environ.get("ALL_CORNER_REPAIR") == "1" else None)
 
 
 if __name__ == "__main__":

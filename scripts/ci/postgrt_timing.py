@@ -26,7 +26,9 @@ def fresh_metrics(root, step, corner):
     return metrics
 
 
-def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None):
+def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None, repair_corners=None):
+    if repair_corners is not None and tuple(repair_corners) != CORNERS:
+        raise ValueError("Repair corners must be the complete pinned corner set")
     base = json.loads(config_path.read_text())
     if float(base["CLOCK_PERIOD"]) != 20:
         raise ValueError("Screen requires the 20 ns candidate")
@@ -48,7 +50,9 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup
         config["meta"] = {"version": base.get("meta", {}).get("version", 1), "flow": [step]}
         config["OPENROAD_THREADS"] = 4
         config["PNR_CORNERS"] = [corner]
-        config["RSZ_CORNERS"] = [CORNERS[1]]
+        config["RSZ_CORNERS"] = list(repair_corners or [CORNERS[1]])
+        if step == "OpenROAD.ResizerTimingPostGRT" and repair_corners:
+            config["PNR_CORNERS"] = list(repair_corners)
         config["RUN_POST_GRT_RESIZER_TIMING"] = True
         path = config_path.with_name(f"config_timing_{tag}.json")
         path.write_text(json.dumps(config, indent=2) + "\n")
@@ -62,7 +66,7 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup
             "--hide-progress-bar", "--with-initial-state", str(checkpoint), str(path),
         ], check=True)
         resolved = json.loads((root / "resolved.json").read_text())
-        if resolved["PNR_CORNERS"] != [corner] or resolved["OPENROAD_THREADS"] != 4:
+        if resolved["PNR_CORNERS"] != config["PNR_CORNERS"] or resolved["OPENROAD_THREADS"] != 4:
             raise ValueError(f"Resolved corner/thread mismatch in {root}")
         # STA-only configs omit routing variables; the repair flow uses them.
         if step == "OpenROAD.ResizerTimingPostGRT" and float(resolved["GRT_ADJUSTMENT"]) != 0.16:

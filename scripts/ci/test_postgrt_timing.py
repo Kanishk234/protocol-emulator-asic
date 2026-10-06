@@ -11,9 +11,10 @@ timing = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(timing)
 
 
+@pytest.mark.parametrize("all_corners", [False, True])
 @pytest.mark.parametrize("reuse_repair", [True, False])
 @pytest.mark.parametrize("explicit_sdc", [False, True])
-def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, explicit_sdc):
+def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, explicit_sdc, all_corners):
     config = tmp_path / "config.json"
     config.write_text(json.dumps({"CLOCK_PERIOD": 20, "GRT_ADJUSTMENT": 0.3,
                                   "DIE_AREA": "0 0 1289.28 710.64"}))
@@ -31,7 +32,11 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, expli
             assert cfg["GRT_RESIZER_SETUP_SLACK_MARGIN"] == 0
         step = cfg["meta"]["flow"]
         assert step in (["OpenROAD.STAMidPNR"], ["OpenROAD.ResizerTimingPostGRT"])
-        assert len(cfg["PNR_CORNERS"]) == 1
+        if all_corners and step == ["OpenROAD.ResizerTimingPostGRT"]:
+            assert cfg["PNR_CORNERS"] == list(timing.CORNERS)
+            assert cfg["RSZ_CORNERS"] == list(timing.CORNERS)
+        else:
+            assert len(cfg["PNR_CORNERS"]) == 1
         checkpoint = command[command.index("--with-initial-state") + 1]
         root = Path(command[command.index("--force-run-dir") + 1])
         assert checkpoint == str(before if root.name.startswith("before-") or root.name == "repair" else repaired)
@@ -53,7 +58,8 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, expli
 
     with patch.object(timing.subprocess, "run", side_effect=fake_run):
         timing.screen(config, before, tmp_path / "result", "/pdk", repaired if reuse_repair else None,
-                      tmp_path / "signoff.sdc" if explicit_sdc else None, 0 if explicit_sdc else None)
+                      tmp_path / "signoff.sdc" if explicit_sdc else None, 0 if explicit_sdc else None,
+                      timing.CORNERS if all_corners else None)
     assert len(calls) == (6 if reuse_repair else 7)
     result = json.loads((tmp_path / "result/comparison.json").read_text())
     assert set(result["corners"]) == set(timing.CORNERS)

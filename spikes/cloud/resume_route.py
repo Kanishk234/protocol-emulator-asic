@@ -16,6 +16,9 @@ work = ROOT / 'build/cloud_run'
 state = ROOT / 'build/cloud_input/route_state.json'
 config = ROOT / 'build/cloud_input/route_config.json'
 work.mkdir(exist_ok=False, parents=True)
+# LibreLane3.1's CLI validates --force-run-dir as an existing directory.
+for name in ('native_route', 'geometry_and_timing'):
+    (work/'runs'/name).mkdir(parents=True)
 # Resolve absolute snapshot paths; outputs go in the fresh cloud run directory.
 common = [sys.executable, '-m', 'librelane', '--docker-no-tty', '--dockerized',
           '--pdk', 'ihp-sg13cmos5l', '--pdk-root', os.environ['PDK_ROOT'], '--manual-pdk',

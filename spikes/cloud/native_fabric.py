@@ -22,11 +22,11 @@ env = dict(os.environ, WARP_COMPACT_DIAG='1')
 # Parse the actual mapped tile with black-box library ports, without remapping
 # or changing any logic. The probe walks unknown D-input cones read-only.
 tile = Path(details['native_work'])/'fabulous-tiles/tiles/tiny/LUT4x8_ha/macro/ihp-sg13cmos5l/nl/LUT4x8_ha.nl.v'
-library = Path(os.environ['PDK_ROOT'])/'ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog/sg13cmos5l_stdcell.v'
+library = Path(os.environ['PDK_ROOT'])/'ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib'
 cone = out/'actual_tile_cone.json'
 with (out/'cone_parse.log').open('w') as log:
     subprocess.run(['yosys', '-Q', '-T', '-p',
-        f'read_verilog -lib -DFUNCTIONAL {library}; read_verilog {tile}; hierarchy -top LUT4x8_ha; write_json {cone}'],
+        f'read_liberty -lib {library}; read_verilog {tile}; hierarchy -top LUT4x8_ha; write_json {cone}'],
         check=True, stdout=log, stderr=subprocess.STDOUT)
 env['WARP_COMPACT_CONE_JSON'] = str(cone)
 with (out / 'native_fabric.log').open('w') as log:

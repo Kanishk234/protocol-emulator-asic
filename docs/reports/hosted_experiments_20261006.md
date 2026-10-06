@@ -47,3 +47,19 @@ unit37511778471 pass. Fabric37511778167 and G1 gds37511778153 are still running
 when this report is written. These do not validate the compact successor.
 No phase checklist is closed. See
 [compact acceptance plan](compact_acceptance_and_competitors.md).
+
+## Additional failed-workflow review
+
+Read recent failures across both branches after the user's status report.
+On main (TRIPWIRE), critical-branch37380322860 fails in its custom OpenROAD
+wrapper because awk is absent from its command path. Routed-GL37375683211
+fails setup with KeyError:PL_OPTIMIZE_MIRRORING. Unit37375675116's RTL job has
+a cancellation annotation, while its pytest and Verilator jobs pass. Read the
+plain job logs and annotations; no main files or runs were modified. These are
+not WARP compact closure results and WARP uses no TRIPWIRE custom wrapper.
+
+At WARP4146abd, test37512885377, lint37512885326, docs37512885423 and
+unit37512885345 all pass. Compact experiments37512885358 is in progress at
+this review; no asset approval or new routing/native result yet. The original
+G1 fabric and gds runs remain separately in progress. Historical red badges
+remain historical; no checks were waived or hidden.

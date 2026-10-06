@@ -44,6 +44,12 @@ truth-table result; a two-value set remains uncertain. Independent companion
 state and incoming internal tile routes must still be accounted for. No output
 is replaced, and no passing companion can override a native failure.
 
+[37534707478](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37534707478)
+passes RTL control but stops before RUN because the optional native LUT_out
+alias is removed and indexed lookup raises KeyError (BUG37). This is a probe
+failure, not new UART evidence. Attribute lookup corrects the diagnostic;
+hosted verification of the focused snapshots remains pending.
+
 Acceptance still requires actual native loaded behavior, zero final routing
 and physical violations, and timing through the configured fabric. The frozen
 G1 physical success does not supply those compact or native proofs.

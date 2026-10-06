@@ -2,6 +2,12 @@
 
 Format for each entry: number, date, symptom, root cause, the check that caught it, the check that now covers it, fix commit.
 
+## 37: Optional native LUT alias raises KeyError through indexed lookup
+- **Date:**2026-10-06.
+- **Symptom/check:** focused diagnostic37534707478 stops before RUN while looking for LUT_out, an alias removed by synthesis; it does not reach the later UART check.
+- **Root cause:** cocotb indexed lookup raises KeyError for missing handles, whereas optional-alias handling catches AttributeError. The pre-push netlist audit had confirmed LUT_out was removed but did not exercise the handle access behavior.
+- **Fix/coverage:** use attribute lookup, matching existing optional native probes and their AttributeError handling. Lightweight fake-handle check covers retained and removed names. Hosted rerun pending; BUG33 remains unresolved.
+
 ## 36: Diagnostic NOR gate used NAND's inverted input name
 - **Date:**2026-10-06.
 - **Symptom/check:** native diagnostic37521273371 passes RTL control but stops before RUN with KeyError:A_N in sensitivity filtering.

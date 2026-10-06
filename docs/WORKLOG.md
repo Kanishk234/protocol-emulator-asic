@@ -9,6 +9,8 @@ Reviewed Piper/Vimjam's DVCon X-propagation paper: RTL conditional optimism and 
 **Boxes ticked:** none. Native acceptance, final compact geometry, configured-fabric timing and phase5 remain open.
 **Next:** inspect the focused cloud snapshots; identify a combinational discrepancy under known configuration or a control/reset uncertainty requiring correction. Keep frozen G1 and active routing unchanged.
 
+**Focused probe correction:**37534707478 passes RTL control but stops before RUN in the new optional-alias probe, not at the later UART failure. Native LUT_out aliases are removed; indexed cocotb lookup raises KeyError while the handler expects AttributeError (BUG37). Switched to existing attribute-lookup convention and checked retained/removed behavior with a fake handle. The snapshot attempt supplies no new native UART result. Corrected hosted rerun pending.
+
 ## 2026-10-06 (session56: loaded RTL companion for native diagnosis)
 **Done:**37532673220 still fails actual native UART; unknown-select filtering removes a false selector branch but timer input trace still reaches160-node cap in neighboring routing loops. Configuration audit remains8707known/matching bits immediately before timer corruption. Regular lint37532673267/docs37532673461/test37532673177/unit37532673160 pass. Route37516794406 remains active with unchanged inputs.
 

@@ -5,6 +5,48 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (isolated RX comparison trial and matched physical screen)
+Done:
+- Rebuilt exact candidate 3393eea in isolated baseline/variant trees; applied persisted rx_sample_factor.patch with zero fuzz. Byte comparison confirms trw_pin_rx.v is the only changed hardware file. Main src/config/spec remain unchanged. Separate START/S_SAMP zero comparisons preserve the existing sample event and timer arithmetic.
+- Fresh RX suite with current live-reconfiguration case passed 16/16 for FULL0 and FULL1 under Icarus. Fresh million-clock L2 on exact variant is active; earlier same prototype had million-clock/injection evidence, but new result is not yet claimed.
+- Prepared gds-rx-compare-screen matrix for baseline/rx-factor with identical 20 ns, density56, GRT.16/region reservation/no-mirroring, slow repair and signoff constraints. It stops at unique GlobalRouting, rejects unexpected DRT/missing checkpoint views, then runs fresh independent before/repair/after corner reports. No full hardening/physical signoff claimed by this screen.
+- All 39 helper/Tcl checks passed; workflow YAML/embedded Python and diff checks passed. No phase boxes ticked.
+
+Next:
+- Publish and dispatch matched screen under ongoing user authorization; inspect timing/area/overflow/electrical evidence, finish L2, then route only a justified surviving trial. Actual extracted branch WNS remains −5.630099 ns.
+
+## 2026-10-05: Codex (high-leverage WNS brainstorming)
+Done:
+- Reviewed archived mapped/routed cone, exact R4 RTL, prior isolated RX compare/pad mux prototypes, and fabric drop contract without reading model implementation. Ranked logic-depth reductions before further generic buffering: RX compare factoring, parallel pad owner mux, narrow late-control/counter optimization, critical-cone locality, and optional stored predecodes requiring contract/cost review.
+- Recorded evidence, limits and acceptance criteria in PHASE2_GDS_EXPERIMENTS.md. Earlier local gains 1.5903/1.3282 ns are not additive or routed predictions. No candidate changes or phase boxes ticked.
+
+Next:
+- Audit new extracted paths and pick one isolated RTL trial; preserve 20 ns, live config, feedback, same-cycle DROPPED and fast hold checks. Await independent routed L3 result.
+
+## 2026-10-05: Codex (new extracted timing measured)
+Done:
+- Extraction 37398296289 completed successfully as a diagnostic. Completed job 112059433306 prints actual slow setup WS −5.630099213 ns, fast/typ setup WS0; fast hold −0.024958369 ns, slow/typ hold +0.153200346/+0.030348946 ns. Timing still fails. Previous routed slow WNS was −6.178462361 ns; new route improves worst setup by ~0.548363 ns across the full branch/follow-up physical experiment, not an isolated single-change attribution.
+- Final routed protocol 37398304113 remains active in its expanded simulation step after artifact/netlist validation and simulator setup passed. No new protocol pass or phase boxes claimed.
+
+Next:
+- Audit detailed extracted critical paths/electrical reports and hold failures, retain the 20 ns/spec contract, choose a different controlled optimization if needed; inspect final protocol result.
+
+## 2026-10-05: Codex (branch routing completed; extraction and protocols dispatched)
+Done:
+- Routing 37390375337 completed successfully (job 112033753464), 23:46:20–00:50:35 UTC (~64 minutes). Downloaded completed log: final router violations 0 at 00:49:41; antenna net/pin violations 0 at 00:49:47. Terminal wirelength 1,918,723 µm. These are router results, not full physical signoff.
+- Dispatched guarded hotspot extraction and final routed L3 workflows for new route 37390375337 on published helpers; each validates the saved final checkpoint/artifact. No new WNS or functional pass claimed yet. Latest main test/lint/unit/docs remain green. No phase boxes ticked.
+
+Next:
+- Inspect extracted multicorner setup/hold/electrical results and final routed protocol JUnit independently. Actual prior extracted WNS remains −6.178462 ns until the new measurement completes.
+
+## 2026-10-05: Codex (branch DRT status check)
+Done:
+- Checked DRT 37390375337: job 112033753464 acquired runner at 23:46:20 UTC; setup, artifact downloads, provenance validation and image build passed. Detailed-routing step active; final artifact upload pending. No terminal DRC/antenna or extracted timing result available.
+- Latest main test 37390367648, lint 37390366937, unit 37390366738 and docs 37390366560 all passed. No phase boxes ticked.
+
+Next:
+- Audit final routing state after completion, then run fresh extracted timing and routed protocol verification. Actual extracted WNS remains −6.178462 ns until a new completed result is measured.
+
 ## 2026-10-05: Codex (branch follow-up gates passed; routing continuation)
 Done:
 - Downloaded and audited successful follow-up 37386510229: final fresh setup WS/WNS 0 ns and setup/hold count 0 at all corners; hold WS fast/slow/typ +0.0649927/+0.333241/+0.158755 ns; antenna nets/pins 0. Electrical still open: slew 0/4/1, fanout203, cap0. These are estimated gates, not extracted timing.
@@ -12,7 +54,7 @@ Done:
 - Helper suite 35 passed including both checkpoint roots; workflow YAML/embedded Python/diff checks pass. No phase boxes ticked.
 
 Next:
-- Publish CI/docs separately and dispatch controlled DRT using repair 37386510229. Inspect terminal router DRC/antenna, then fresh extraction and protocol verification. Actual extracted WNS remains −6.178462 ns until measured on this new physical result.
+- Published CI 2c420f7 and separate docs 28fb3ea; controlled DRT 37390375337 dispatched with repair 37386510229 and explicit follow-up selection, queued at check. Inspect terminal router DRC/antenna, then fresh extraction and protocol verification. Actual extracted WNS remains −6.178462 ns until measured on this new physical result.
 
 ## 2026-10-05: Codex (bounded branch follow-up prepared)
 Done:

@@ -161,3 +161,13 @@ A separate `gds-critical-branch-followup` runs one ordinary signoff-aware, zero-
 The one bounded repair completed successfully; logs report seven repaired endpoints and four inserted buffers. Fresh final post-antenna setup WS/WNS is 0 ns with zero setup and hold violation counts at fast/slow/typical. Hold WS is +0.0649927/+0.333241/+0.158755 ns, antenna violating nets/pins 0. Slew remains 0/4/1 and fanout 203 per corner (cap0), so electrical signoff is still open. This qualifies for guarded DRT only; it does not establish routed timing closure or close the previous extracted fast hold failures.
 
 Owned DRT workflow now selects the follow-up artifact and root explicitly, checks successful follow-up provenance/flags, and uses unchanged required timing/antenna gates. Its artifact retains follow-up reports for extraction and protocol validation. The routed L3 validator can locate that repair config without relying on missing DRT placement settings. Local helper suite 35 passed, both checkpoint roots covered; YAML/embedded Python/diff checks pass.
+
+
+### Branch follow-up detailed routing 37390375337
+
+Run completed successfully in ~64 minutes including setup (job 112033753464, 23:46:20–00:50:35 UTC). Completed log reaches router DRC 0 after each antenna reroute, terminal 00:49:41; final antenna net/pin violations 0 at 00:49:47. Final wirelength is 1,918,723 µm. Router convergence is established; full DRC/LVS/precheck and extracted setup/hold/electrical closure are not established by these results. Guarded extraction and final routed protocol workflows dispatched for this exact route.
+
+
+### Branch/follow-up extracted result 37398296289
+
+Completed extraction diagnostic prints slow setup WS −5.630099213 ns; fast/typ setup0. Fast hold WS −0.024958369 ns, slow/typ hold +0.153200346/+0.030348946 ns. Thus actual routed timing remains failing despite estimated gates passing. Compared with the prior −6.178462361 ns routed result, worst slow setup improves ~0.548363 ns over the complete branch insertion/follow-up repair/reroute experiment; no isolated causal gain is claimed. Detailed violation counts and critical/electrical paths remain to be audited from the artifact. Final routed protocol run 37398304113 remains active, with checkpoint/netlist validation passed.

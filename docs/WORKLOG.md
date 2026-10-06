@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (timing screens compared; all-corner repair follow-up)
+Done:
+- Audited logs for all six paired screens; report PHASE2_INDEPENDENT_TIMING_SCREENS.md records fresh before/after slow setup, fast hold and final logged GRT overflow. Baselines reproduce exactly. Timing placement is strongest no-storage follow-up, with setup WS 0 and fast hold −0.0045709 ns.
+- Prepared independent placement-multicorner screen to address fast hold; all three repair corners load together, while every before/after STA invocation remains single-corner. Existing helper defaults remain slow-only. Fourteen helper tests, workflow YAML and diff checks pass.
+- Only modified file at user query was WORKLOG.md from completion audit. Previously tracked pad/RX background simulation terminals returned exit 0; no cancellation needed. No main hardware/config/spec edits or phase boxes ticked.
+Next:
+- Publish and dispatch the matched all-corner repair screen, then audit hold/setup, area and electrical checks before detailed routing. Extracted timing remains failing at −5.630099 ns.
+
+## 2026-10-05: Codex (workflow completion audit)
+Done:
+- Queried 45 recent runs and separately all in-progress/queued/waiting runs. No workflows remain active, queued or waiting.
+- All six independent screens completed successfully: RX 37399927459, pad-mux 37400509726, load-select 37403723129, input-decode 37403722954, cached-input 37403723111 and timing-placement 37403722938.
+- Latest main test/unit/lint/docs and routed L3 37398304113 are successful. Older branch repair failure 37380322860 is the already-recorded BUGS #66, followed by a successful corrected run.
+- No phase boxes ticked; diagnostic success is not timing closure.
+Next:
+- Extract and compare all six paired timing/area/overflow results, then choose the next routed experiment from evidence.
+
 ## 2026-10-05: Codex (four additional independent timing screens)
 Done:
 - Prepared isolated load-select, stateless input-decode, cached-input and timing-driven-placement comparisons against frozen 3393eea. Each workflow has its own unchanged baseline; main hardware, 20 ns clock and density 56 remain unchanged.
@@ -13,7 +30,8 @@ Done:
 - Shared helper/Tcl suite passed 40 checks; all four workflows parsed. RX million-clock L2 completed with zero divergences. Pad million-clock comparison remains separate.
 - No phase boxes ticked. Latest extracted slow setup remains −5.630099 ns; new screens have no measured timing result yet.
 Next:
-- Publish and launch all four matched screens; audit area, global-route overflow and fresh all-corner timing before selecting changes for detailed routing. Record dispatch IDs here.
+- Published scoped CI 67e3f8c and docs b7dd8f7 with explicit user approval for this remote. Dispatched load-select 37403723129 (in progress), input-decode 37403722954 (queued), cached-input 37403723111 (queued), timing-placement 37403722938 (queued). Each has an independent baseline. RX 37399927459 and pad 37400509726 are now completed successfully; their timing metrics still need audit. Routed GL 37398304113 also completed successfully; inspect its artifact before recording case counts.
+- Audit area, global-route overflow and fresh all-corner timing before selecting changes for detailed routing. No timing closure claim follows from workflow success.
 
 ## 2026-10-05: Codex (independent parallel pad-selection trial)
 Done:

@@ -13,14 +13,14 @@ on:
         required: true
         default: placement
         type: choice
-        options: [placement, lane, sram]
+        options: [placement, lane, sram, cts]
 
 permissions:
   contents: read
   actions: read
 
 concurrency:
-  group: gds-placement-route-3393eea
+  group: gds-placement-route-3393eea-${{ inputs.source_variant }}
   cancel-in-progress: false
 
 jobs:
@@ -96,7 +96,7 @@ jobs:
       - name: Download the audited all-corner placement screen
         uses: actions/download-artifact@v7
         with:
-          name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
+          name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || inputs.source_variant == 'cts' && 'gds-cts-cluster-cts-cluster8' || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
@@ -117,7 +117,8 @@ jobs:
           assert run['conclusion'] == 'success'
           variant = os.environ['SOURCE_VARIANT']
           expected = {'placement': 'gds-placement-multicorner-screen',
-                      'lane': 'gds-lane-slew-screen', 'sram': 'gds-sram-slew-screen'}
+                      'lane': 'gds-lane-slew-screen', 'sram': 'gds-sram-slew-screen',
+                      'cts': 'gds-cts-cluster-screen'}
           assert run['path'] == f'.github/workflows/{expected[variant]}.yaml'
           assert run['id'] == int(os.environ['SOURCE_RUN_ID'])
           assert run['head_branch'] == 'main'

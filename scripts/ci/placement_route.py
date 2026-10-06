@@ -15,14 +15,24 @@ def timing_pass(data):
                for c in CORNERS for k in ('setup', 'hold'))
 
 
+def hold_followup(config_path, state, output, pdk_root):
+    """One repair only, with unchanged constraints and every corner checked."""
+    screen(config_path, state, output, pdk_root,
+           sdc=Path('src/signoff.sdc'), repair_corners=CORNERS)
+    followup = json.loads((output / 'comparison.json').read_text())
+    if not timing_pass(followup):
+        raise ValueError('Clock-clustering follow-up still fails timing; routing refused')
+    return Path(followup['after_state'])
+
+
 def main():
     root = Path('runs/rtl-grt-screen')
     variant = os.environ.get('SOURCE_VARIANT', 'placement')
-    if variant not in {'placement', 'lane', 'sram'}:
+    if variant not in {'placement', 'lane', 'sram', 'cts'}:
         raise ValueError('Unknown route source variant')
-    timing_root = root / 'timing' if variant == 'placement' else Path('runs/slew-screen')
+    timing_root = root / 'timing' if variant in {'placement', 'cts'} else Path('runs/slew-screen')
     comparison = json.loads((timing_root / 'comparison.json').read_text())
-    if not timing_pass(comparison):
+    if variant != 'cts' and not timing_pass(comparison):
         raise ValueError('Failing source timing')
     state = Path(comparison['after_state'])
     states = list((timing_root / 'repair').glob('*-openroad-resizertimingpostgrt/state_out.json'))
@@ -45,15 +55,23 @@ def main():
     for key in ('odb', 'def', 'nl', 'pnl', 'sdc'):
         if not Path(json.loads(state.read_text())[key]).is_file():
             raise ValueError(f'Missing checkpoint {key}')
-    if variant != 'placement':
+    if variant in {'lane', 'sram'}:
         netlist = Path(json.loads(state.read_text())['nl']).read_text()
         if f'tripwire_slew_{variant}_buf' not in netlist:
             raise ValueError('Missing selected physical buffer')
+    if variant == 'cts':
+        cts = list((root / 'flow').glob('*-openroad-cts/config.json'))
+        if (len(cts) != 1 or json.loads(cts[0].read_text()).get('CTS_SINK_CLUSTERING_SIZE') != 8
+                or base.get('CTS_SINK_CLUSTERING_SIZE') != 8):
+            raise ValueError('Wrong clock-clustering source')
     config_path = Path('src/config_rx_screen.json')
     base = json.loads(config_path.read_text())
     out = Path('runs/placement-route')
     out.mkdir(exist_ok=False)
     os.environ['LIBRELANE_IMAGE_OVERRIDE'] = 'tripwire-hotspot:local'
+
+    if variant == 'cts':
+        state = hold_followup(config_path, state, out / 'hold-followup', os.environ['PDK_ROOT'])
 
     def run(tag, steps, source):
         config = dict(base)

@@ -28,3 +28,26 @@ def test_every_corner_and_violation_count_required(corner, kind, failure):
             timing_pass(data)
         return
     assert not timing_pass(data)
+
+
+@pytest.mark.parametrize("passes", [True, False])
+def test_bounded_followup_checks_fresh_result_without_retry(tmp_path, monkeypatch, passes):
+    import json
+    from pathlib import Path
+    import placement_route
+    calls = []
+    data = fixture()
+    data['after_state'] = str(tmp_path / 'repaired-state.json')
+    if not passes:
+        corner = CORNERS[0]
+        data['corners'][corner]['after'][f'timing__hold__ws__corner:{corner}'] = -0.001
+    def fake_screen(config, state, output, pdk_root, **kwargs):
+        calls.append(kwargs)
+        (output / 'comparison.json').write_text(json.dumps(data))
+    monkeypatch.setattr(placement_route, 'screen', fake_screen)
+    if passes:
+        assert placement_route.hold_followup('config', 'state', tmp_path, 'pdk') == Path(data['after_state'])
+    else:
+        with pytest.raises(ValueError, match='routing refused'):
+            placement_route.hold_followup('config', 'state', tmp_path, 'pdk')
+    assert calls == [{'sdc': Path('src/signoff.sdc'), 'repair_corners': CORNERS}]

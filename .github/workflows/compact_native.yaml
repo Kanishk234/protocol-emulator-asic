@@ -55,5 +55,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: compact-native-probe-${{ github.run_id }}
-          path: build/cloud_results/
+          path: |
+            build/cloud_results/
+            build/cloud_setup/actual_fabric_cone.json.gz
           retention-days: 1

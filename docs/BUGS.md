@@ -243,3 +243,10 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Root cause:** geometry-only helper reads an ODB without Liberty, then calls `dbInst.swapMaster`. The pinned callback `dbStaCbk::inDbInstSwapMasterBefore` reaches `sta::ConcreteCell::portCount` without loaded Liberty cell objects. This is a scratch-tool setup issue, not an observed chip fault.
 - **Caught by:** `build/route_root_audit_20261006/chip_nor3_pin_screen/placement.log` stack trace and exit139.
 - **Fix/coverage:** require `WARP_SIZE_LIB` and `read_liberty` before `read_db`/swap. Actual rerun `placement_with_liberty.log` reaches detailed placement, which separately reports a local legalization failure; no routing or legalization pass claimed from resolving the crash. Frozen/upstream files untouched.
+
+## 31: Hosted fault-monitor compile omitted its monitor dependency
+- **Date:**2026-10-06.
+- **Symptom/check:** hosted compact experiments37511778394; monitor compiles/audits and passes loaded RTL in22.72s, then fault synthesis reports missing uart_monitor_top.
+- **Root cause:** new cloud driver supplied fault top and UART sources but omitted the intermediate monitor module present in the documented local compile command.
+- **Fix:** include protocols/uart_monitor/uart_monitor_top.v only for the fault case. No hardware/compiler change.
+- **Coverage:** rerun the fresh hosted compile/audit/loaded suite; fix verification pending, do not call the first run a four-demo pass.

@@ -121,6 +121,16 @@ def report_runtime(dut, label):
         for port in ("D", "RESET_B"):
             trace_unknown_cone(dut, label + " UART_SOURCE_" + port, module,
                                tile, flop["connections"][port][0])
+        module = read_cone_json(full_cone)["modules"]["PRIM2T2S_C2"]
+        tile = top.u_fabric.Tile_X2Y2_PRIM2T2S_C2
+        prefix = "Inst_TB_wp_timer."
+        for name in ("rst", "load", "half", "en", "tc", "count", "armed", "reload", "oneshot"):
+            if prefix + name not in module["netnames"]:
+                continue
+            dut._log.info("UART TIMER %s %s=%s", label, name, tile[prefix + name].value)
+            if name in ("rst", "load", "half", "en"):
+                trace_unknown_cone(dut, label + " UART_TIMER_" + name, module,
+                                   tile, module["netnames"][prefix + name]["bits"][0])
 
 
 def report_unknown_cone(dut, label, path):

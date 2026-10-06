@@ -1,0 +1,67 @@
+name: LUT mapping experiment
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/lut_mapping/**'
+      - 'test_internal/lut_mux_tree/**'
+      - '.github/workflows/lut_mapping.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-lut-mapping-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Project tools and venv
+        run: |
+          sudo apt-get update && sudo apt-get install -y iverilog yosys python3-venv
+          python3 -m venv .venv
+      - name: Fetch pinned reference and cell models
+        run: |
+          bash spikes/cloud/fetch_checkpoint.sh
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Prove binary equivalence and test partial inputs
+        run: |
+          source .venv/bin/activate
+          mkdir -p build/lut_mapping
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          root = Path.cwd()
+          work = Path(json.loads(Path('build/cloud_input/materialized.json').read_text())['native_work'])
+          gold = work / 'fabulous-tiles/primitives/FABULOUS_LC/fabulous/FABULOUS_LC.v'
+          pdk = Path(os.environ['PDK_ROOT']) / 'ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell'
+          lib = pdk / 'lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib'
+          candidate = root / 'spikes/lut_mapping/wp_lut4_mux_tree.v'
+          script = f'''read_liberty -ignore_miss_func {lib}
+          read_verilog {gold} {candidate} test_internal/lut_mux_tree/wp_lut_miter.v
+          hierarchy -check -top wp_lut_miter
+          prep -top wp_lut_miter -flatten
+          sat -verify -prove mismatch 0 -show-ports
+          '''
+          Path('build/lut_mapping/equivalence.ys').write_text(script)
+          with Path('build/lut_mapping/equivalence.log').open('w') as log:
+              subprocess.run(['yosys', '-Q', '-T', '-s', 'build/lut_mapping/equivalence.ys'], stdout=log, stderr=subprocess.STDOUT, check=True, timeout=60)
+          subprocess.run(['iverilog', '-g2012', '-DFUNCTIONAL', '-s', 'tb', '-o', 'build/lut_mapping/test.vvp',
+                          str(pdk/'verilog/sg13cmos5l_stdcell.v'), str(pdk/'verilog/sg13cmos5l_udp.v'),
+                          str(candidate), 'test_internal/lut_mux_tree/tb.v'], check=True, timeout=60)
+          with Path('build/lut_mapping/partial_inputs.log').open('w') as log:
+              subprocess.run(['vvp', 'build/lut_mapping/test.vvp'], stdout=log, stderr=subprocess.STDOUT, check=True, timeout=60)
+          print(Path('build/lut_mapping/partial_inputs.log').read_text())
+          PY
+      - name: Retain comparison evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lut-mapping-${{ github.run_id }}
+          path: build/lut_mapping/
+          retention-days: 3

@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (automatic placement-route downstream evidence)
+Done:
+- Routing continuation 37412965189 is active; first check showed setup complete and source-artifact download in progress.
+- Prepared gds-placement-extracted-timing and l3-placement-routed-gl with automatic workflow_run triggers after successful main-branch gds-placement-route completion, plus manual dispatch fallback. Both select the triggering route ID and download that exact artifact.
+- Extraction requires a completed zero-router-DRC checkpoint and records fresh three-corner extracted reports; negative timing remains diagnostic evidence. Functional GL validates saved route/netlist/constraints/source policy and uses pinned Tiny Tapeout Icarus 13, SRAM models and existing expanded L3 tests; no SDF timing claim.
+- Twenty-eight saved-route/extraction/gate checks pass; both workflows and embedded Python parse; diff check passes. No hardware/spec/config input changes or phase boxes ticked.
+Next:
+- Publish these downstream workflows before route completion; monitor antenna/timing guard and DRT. If routing succeeds, automatic extraction and L3 start; audit artifact reports/JUnit before claims. If routing fails, fix the actual cause without launching downstream jobs on an incomplete checkpoint.
+
 ## 2026-10-05: Codex (all-corner placement audit and guarded routing)
 Done:
 - All-corner repair 37408506116 completed successfully; no active workflows at progress query. Placement setup/hold violation counts zero in all corners, hold +36.01/+238.27/+103.10 ps fast/slow/typ. Baseline slow setup remains −0.274897 ns.

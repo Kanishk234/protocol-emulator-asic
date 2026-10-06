@@ -32,8 +32,8 @@ def run_proofs(root, work, library):
         # Keep public aliases; do not optimize against the captured configuration.
         # No ignore_unknown_cells: unsupported logic must fail rather than vanish.
         script = "\n".join([
-            f"read_liberty {library}", f"read_verilog {netlist}",
-            f"hierarchy -top {module}", "flatten", "proc",
+            f"read_liberty -ignore_miss_func {library}", f"read_verilog {netlist}",
+            f"hierarchy -check -top {module}", "flatten", "proc",
             f"select -module {module}",
             "cutpoint t:$*ff* t:$*latch* t:$_DFF* t:$_DLATCH*",
             "opt_clean", f"write_json {out / f'target_{index}.json'}",

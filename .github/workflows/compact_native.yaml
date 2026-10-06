@@ -6,6 +6,7 @@ on:
     paths:
       - 'test_internal/compact_gate_probe.py'
       - 'test_internal/cloud_native_probe.py'
+      - 'test_internal/cloud_lut_formal.py'
       - 'test_internal/native_shadow.py'
       - 'spikes/compact_edges/simulate.py'
       - 'spikes/compact_edges/test_shell.py'
@@ -60,4 +61,5 @@ jobs:
           path: |
             build/cloud_results/
             build/cloud_setup/actual_fabric_cone.json.gz
+            build/cloud_setup/local_lut_formal/
           retention-days: 1

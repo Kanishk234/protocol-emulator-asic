@@ -5,11 +5,27 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (audit completed event screens and prepare guarded routes)
+Done:
+- Downloaded both candidates and their exact paired baselines using direct artifact API after standard download stalled. Both candidates match27expected source/config/info files. All-corner estimated setup/hold counts0; zero repaired GRT overflow. Event-late holdfast+0.0313302ns,slow slew8,fanout166,cap0all; load-flat holdfast+0.0236243,slow slew6/typical1,fanout160,capfast/typical1.
+- Repaired baseline/event/load area508444/510233/509017µm² and demand233872/239415/239238. Physical tradeoffs do not establish an extracted timing win. Both qualify for isolated bounded routing. Full comparison in PHASE2_EVENT_SCREEN_AUDIT.md.
+- Prepared routing options and exact patch/source guards for both, with named-patch regression.98helper tests,workflow-choice and diff checks pass. No publication/route dispatch or main hardware change.
+Next:
+- Obtain scoped approval to publish CI/docs and launch two isolated routes, then audit automatic extraction/GL. Resync remains best reviewed setup−0.325228ns but fast hold−0.008053ns; official timing still fails. No phase ticks.
+
+## 2026-10-06: Codex (all main workflows completed)
+Done:
+- Explicit main queries for in_progress and queued both return empty. Event-late37533969613 and load-flat37533972946 completed successfully, including both paired baseline/candidate jobs. Resync routed GL37529099455 completed successfully. Latest main lint37533961193,test37533961246,docs37533961215,unit37533961312 all green.
+- Diagnostic workflow success does not imply timing closure. Best currently reviewed extracted setup remains resync−0.325227853853ns with fast hold−0.008052669870ns. New screen artifacts await metric/path audit; no new extracted claim or phase tick.
+Next:
+- Audit the completed event/load artifacts and resync GL evidence, rank physical candidates, then prepare separately guarded routing for a qualifying candidate. No dispatch/publication in this check.
+
 ## 2026-10-06: Codex (publish approved event screens and read resync extraction)
 Done:
 - User approved separate prototype/tools,CI,docs commits, push and both event screens. Prototype/tools committed3bf11bb; publication in progress. Approval-review timeout on first compound command was resolved by a scoped retry; no rejection of task authorization.
 - Main resync route37521491667 and extraction37529099235 completed. Extracted slow setup WS−0.325227853853ns; fast hold−0.008052669870ns, slow hold+0.145561455898ns,typical+0.043376747866ns. Setup fast/typical0. This is a closer diagnostic setup result than prior−1.385050ns, but both setup and fast hold still fail; no official pass.
 - Matching routed GL37529099455 is active. Previous main lint/test/docs/unit all passed. Local resync million-clock comparison completed successfully.
+- Published prototype/tools3bf11bb,CI3233de5,docs2b93d42 to main. Launched event-late37533969613 and load-flat37533972946 on exact2b93d42; both queued at verification, event-late matrix names confirmed. New main docs37533961215,lint37533961193,test37533961246,unit37533961312 active. No main hardware-input commits were pending before push. Subsequent status note remains local.
 Next:
 - Finish approved publication,launch bs-event-late and bs-load-flat independently and record run IDs. Download/audit resync extracted path families and hold endpoints before selecting a combination or repair. No phase ticks.
 

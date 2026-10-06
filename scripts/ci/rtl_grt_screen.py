@@ -10,9 +10,14 @@ from postgrt_timing import screen, CORNERS
 
 
 def timing_placement(variant):
-    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement", "cts-cluster8", "drop-counter"}:
+    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement", "cts-cluster8", "drop-counter", "drop-qual", "bs-resync", "bs-csa", "setup-margin"}:
         raise ValueError("Unknown timing screen variant")
-    return variant in {"timing-placement", "cts-cluster8", "drop-counter"}
+    return variant in {"timing-placement", "cts-cluster8", "drop-counter", "drop-qual", "bs-resync", "bs-csa", "setup-margin"}
+
+
+def repair_margin(variant):
+    timing_placement(variant)  # reject an unknown experiment before any flow runs
+    return 2.0 if variant == "setup-margin" else 0.0
 
 
 def checkpoint(root):
@@ -52,7 +57,7 @@ def main():
                     "--to", "OpenROAD.GlobalRouting", str(path)], check=True)
     source = checkpoint(flow)
     screen(path, source, root / "timing", os.environ["PDK_ROOT"],
-           sdc=Path("src/signoff.sdc"), setup_margin=0,
+           sdc=Path("src/signoff.sdc"), setup_margin=repair_margin(os.environ["VARIANT"]),
            repair_corners=CORNERS if os.environ.get("ALL_CORNER_REPAIR") == "1" else None)
 
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from rtl_grt_screen import checkpoint, timing_placement
+from rtl_grt_screen import checkpoint, timing_placement, repair_margin
 
 
 @pytest.mark.parametrize("failure", [None, "missing_odb", "drt", "second_grt"])
@@ -37,3 +37,12 @@ def test_placement_override_is_isolated_and_unknown_variants_refused():
         assert timing_placement(variant) is False
     with pytest.raises(ValueError):
         timing_placement("unknown")
+
+
+@pytest.mark.parametrize("variant", ["drop-qual", "bs-resync", "bs-csa", "setup-margin"])
+def test_new_trials_keep_timing_placement_and_only_margin_trial_adds_headroom(variant):
+    assert timing_placement(variant)
+    assert repair_margin(variant) == (2.0 if variant == "setup-margin" else 0.0)
+    assert repair_margin("timing-placement") == 0
+    with pytest.raises(ValueError):
+        repair_margin("unknown")

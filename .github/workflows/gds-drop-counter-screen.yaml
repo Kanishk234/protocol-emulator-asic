@@ -1,13 +1,20 @@
-name: gds-drop-counter-screen
+name: gds-rtl-timing-screen
 
 on:
   workflow_dispatch:
+    inputs:
+      experiment:
+        description: One isolated RTL or optimization-margin experiment
+        required: true
+        default: drop-counter
+        type: choice
+        options: [drop-counter, drop-qual, bs-resync, bs-csa, setup-margin]
 
 permissions:
   contents: read
 
 concurrency:
-  group: gds-drop-counter-screen-3393eea
+  group: gds-drop-counter-screen-3393eea-${{ inputs.experiment }}
   cancel-in-progress: false
 
 jobs:
@@ -18,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [timing-placement, drop-counter]
+        variant: [timing-placement, '${{ inputs.experiment }}']
     env:
       PDK_ROOT: /home/runner/pdk
       CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
@@ -40,17 +47,12 @@ jobs:
           ref: ${{ github.sha }}
           path: workflow-src
 
-      - name: Apply only the independent drop-counter trial
+      - name: Apply exactly one independent timing trial
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
-          if [[ "$VARIANT" == "drop-counter" ]]; then
-            git apply workflow-src/spikes/r4_floorplan/drop_counter.patch
-            test "$(git diff --name-only)" = "src/trw_chan_port.v"
-          else
-            test -z "$(git diff --name-only)"
-          fi
-          sha256sum src/config.json src/trw_chan_port.v
+          python workflow-src/scripts/ci/timing_trial.py
+          sha256sum src/config.json src/trw_chan_port.v src/trw_pin_bs.v
 
       - name: Check out Tiny Tapeout tools
         uses: actions/checkout@v6
@@ -136,5 +138,5 @@ jobs:
             runs/rtl-grt-screen/**
             src/**
             info.yaml
-            workflow-src/spikes/r4_floorplan/drop_counter.patch
+            workflow-src/spikes/r4_floorplan/*.patch
           if-no-files-found: warn

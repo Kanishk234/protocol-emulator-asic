@@ -63,3 +63,21 @@ unit37512885345 all pass. Compact experiments37512885358 is in progress at
 this review; no asset approval or new routing/native result yet. The original
 G1 fabric and gds runs remain separately in progress. Historical red badges
 remain historical; no checks were waived or hidden.
+
+## Checkpoint publication and actual execution
+
+User explicitly approves public checkpoint publication after explanation.
+[Experimental asset](https://github.com/Kanishk234/protocol-emulator-asic/releases/tag/compact-checkpoint-20261006-iter8)
+is published,5676972bytes, unchanged SHA2566e2bac339e810a09dc9084393cadc3da5cdfb596077c05410c3b30b5e15ecb4d.
+Attempt2 of37512885358 restarts only failed jobs, verifies materialization and
+fetches pinned PDK. Publication/approval blocker is resolved.
+
+Native RTL control passes; actual tighter mapped fabric fails15.39s with X
+at UART output. All8707 configuration bits match and26944 CRC processing
+cycles have stable input. This reproduces a real native test failure, not
+loader corruption or proof of a hardware fault (BUG33). No SDF/config/user-state
+force. Route reaches Docker image launch but fails before OpenROAD because
+no-TTY is placed after eager dockerized option (BUG32). Corrected ordering,
+visible bounded progress and read-only native cone/reset diagnostics are added;
+new cloud verification pending. Existing G1 fabric37511778167 passes; G1
+physical37511778153 remains running at this entry. No compact pass claimed.

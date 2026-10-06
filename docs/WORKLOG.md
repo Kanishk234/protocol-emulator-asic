@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-06 (session53: approved checkpoint publication and cloud diagnosis)
+**Done:** User explicitly approves public experimental checkpoint upload after contents/purpose explained. Initial network error, then short target SHA rejected; full a284f4c SHA publishes exact5676972-byte asset under compact-checkpoint-20261006-iter8, same pinned SHA256. Earlier automatic approval blocker is resolved, no further publication permission needed. Restarted only failed jobs of37512885358 (attempt2); both verify/materialize checkpoint and fetch exact PDK, four G1 demos remain passed. Existing G1 fabric37511778167 passes; G1 gds37511778153 still running.
+
+Actual tighter RTL-control UART passes. Mapped-fabric test fails15.39s with UART X:8707bits known/matching and26944 stable CRC cycles, selected user flops unknown before RUN. BUG33 records unresolved native/reset/zero-delay distinction. Route fails before OpenROAD with non-TTY Docker input: eager flag ordering error in our driver (BUG32), verified against pinned LibreLane CLI source. Fixed order and added bounded live route progress. Added read-only actual-tile cone parsing with Yosys and a separately labeled real-host USER_RESET probe; ordinary native failure remains required and cannot be overridden. No PDK/upstream/hardware/config/user-state changes or local heavy computation. Python/YAML/whitespace static checks pass; hosted verification pending.
+**Boxes ticked:** none. Native function, final routing/physical checks, configured-fabric timing and phase5 acceptance remain open.
+**Next:** push scoped harness/docs fixes, inspect new hosted launch and cone evidence; use surviving routing/native evidence for one next isolated correction. Retain frozen G1.
+
 ## 2026-10-06 (session52: routing root causes, hosted migration and authorized commits)
 **Done:** Read current plans, evidence and failed runs before changing experiments. Ground-up exact ODB/marker audit identifies west-channel pin escape/local density conflicts;144 final markers cluster near tiny NOR/CRC/clock pins. Local row-bin occupancy reaches97.86%;0global overflow is insufficient. D-044 warm restart saves15markers at completed iteration8, without final repair/checkers; local process no longer visible after steering. Packaged that exact checkpoint and122 hashed inputs into5.41MiB experimental asset (SHA256 `6e2bac339e810a09dc9084393cadc3da5cdfb596077c05410c3b30b5e15ecb4d`). D-045 larger-NOR backup preserves connectivity/legal placement,0GRT overflow, and actual mapped-shell/RTL-fabric SPI UART passes58.69s; not full routed or selected. Fixed bare-DB sizing setup by loading Liberty (BUG30).
 

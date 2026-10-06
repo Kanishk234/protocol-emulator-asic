@@ -250,3 +250,16 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Root cause:** new cloud driver supplied fault top and UART sources but omitted the intermediate monitor module present in the documented local compile command.
 - **Fix:** include protocols/uart_monitor/uart_monitor_top.v only for the fault case. No hardware/compiler change.
 - **Coverage:** hosted37512249763 at f671c1b passes all four fresh compile/audit/loaded RTL cases; independently checked four XMLs, exactly one case each, no failure/error/skip. See `docs/reports/hosted_experiments_20261006.md`. The first run remains failed; no native/SDF result is implied.
+
+## 32: Docker no-TTY flag followed eager container launch
+- **Date:**2026-10-06.
+- **Symptom/check:** compact37512885358 attempt2 route job downloads/verifies inputs and Docker image, then exits with the input device is not a TTY before OpenROAD starts.
+- **Root cause:** cloud driver placed docker-no-tty after dockerized; LibreLane's eager container callback launches before later options are applied.
+- **Fix:** place docker-no-tty first. No source/PDK/physical checker changes.
+- **Coverage:** static check passes; next hosted launch verifies actual routing startup. [Pinned CLI contract](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/__main__.py).
+
+## 33: Tighter native fabric retains unknown user state after real load
+- **Date:**2026-10-06.
+- **Symptom/check:**37512885358 attempt2 native job: tighter RTL control passes; actual mapped fabric fails UART recording with X at output. All8707 configuration bits are known and image-matching;26944 CRC processing cycles have stable input. Selected user registers already unknown before RUN despite shell user_reset=1/user_rst_n=0.
+- **Root cause:** unresolved. Known configuration is insufficient to distinguish mapped logic/reset behavior from zero-delay combinational/model pessimism. No hardware/model fix claimed.
+- **Next coverage:** derive a read-only cone JSON from the exact mapped tile and trace LB register D logic at pre/post RUN; separately probe the real USER_RESET command while retaining ordinary native failure. No configuration or user-state force. Existing D-023 routing harness remains explicitly limited; native/SDF acceptance is open.

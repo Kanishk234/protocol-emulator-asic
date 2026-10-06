@@ -1,0 +1,44 @@
+name: compact geometry replay
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_geometry_probe.py'
+      - '.github/workflows/geometry_probe.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-geometry-probe-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Project venv
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+      - name: Materialize unchanged design and saved iteration52
+        run: |
+          bash spikes/cloud/fetch_checkpoint.sh
+          gh run download 37516794406 -R "$GITHUB_REPOSITORY" -n compact-route-37516794406 -D build/physical_source
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Replay geometry without detailed routing
+        timeout-minutes: 30
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_geometry_probe.py
+      - name: Retain marker coordinates and exact physical views
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: compact-geometry-replay-${{ github.run_id }}
+          path: build/geometry_probe/
+          retention-days: 3

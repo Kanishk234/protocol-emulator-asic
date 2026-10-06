@@ -6,6 +6,8 @@ on:
     paths:
       - 'test_internal/compact_gate_probe.py'
       - 'test_internal/cloud_native_probe.py'
+      - 'test_internal/native_shadow.py'
+      - 'spikes/compact_edges/simulate.py'
       - 'spikes/compact_edges/test_shell.py'
       - '.github/workflows/compact_native.yaml'
   workflow_dispatch:

@@ -10,9 +10,9 @@ from postgrt_timing import screen, CORNERS
 
 
 def timing_placement(variant):
-    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement", "cts-cluster8"}:
+    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement", "cts-cluster8", "drop-counter"}:
         raise ValueError("Unknown timing screen variant")
-    return variant in {"timing-placement", "cts-cluster8"}
+    return variant in {"timing-placement", "cts-cluster8", "drop-counter"}
 
 
 def checkpoint(root):

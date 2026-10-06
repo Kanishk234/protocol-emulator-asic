@@ -1,0 +1,37 @@
+--- a/src/trw_chan_port.v
++++ b/src/trw_chan_port.v
+@@ -102,13 +102,26 @@
+         end
+     end
+ 
+-    always @(posedge clk) begin
+-        if (!rst_n)
+-            dropped <= 8'd0;
+-        else if (drop && !cfg_we)
+-            dropped <= (dropped == 8'hff) ? 8'hff : dropped + 8'd1;
+-        else if (clr_dropped)
+-            dropped <= 8'd0;
+-    end
++    // Precompute the increment toggle from registered state. The late drop
++    // control selects each bit in parallel, preserving saturation and priority.
++    wire drop_inc = drop && !cfg_we;
++    wire drop_room = !(&dropped);
++    wire [7:0] drop_toggle;
++    genvar db;
++    generate for (db = 0; db < 8; db = db + 1) begin: g_drop_bit
++        if (db == 0) begin: g_low
++            assign drop_toggle[db] = drop_room;
++        end else begin: g_high
++            assign drop_toggle[db] = drop_room && (&dropped[db-1:0]);
++        end
++        always @(posedge clk) begin
++            if (!rst_n)
++                dropped[db] <= 1'b0;
++            else if (drop_inc)
++                dropped[db] <= dropped[db] ^ drop_toggle[db];
++            else if (clr_dropped)
++                dropped[db] <= 1'b0;
++        end
++    end endgenerate
+     `TRW_ASSERT(!(avail && !en), "a disabled port shows a token (F1)")
+ endmodule

@@ -32,6 +32,7 @@ def test_screen_requires_unique_complete_preroute_state(tmp_path, failure):
 def test_placement_override_is_isolated_and_unknown_variants_refused():
     assert timing_placement("timing-placement") is True
     assert timing_placement("cts-cluster8") is True
+    assert timing_placement("drop-counter") is True
     for variant in ("baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input"):
         assert timing_placement(variant) is False
     with pytest.raises(ValueError):

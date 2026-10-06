@@ -1,0 +1,16 @@
+--- a/src/trw_pin_rx.v
++++ b/src/trw_pin_rx.v
+@@ -100,7 +100,12 @@
+     wire       srx_on  = m_srx && sel;
+     wire       start   = srx_on && (sst == S_START) && (a_in != idle);
+     wire [RW-1:0] rt_cur = start ? sofs : rt;
+-    wire       srx_smp = srx_on && (start || (sst == S_SAMP)) && (rt_cur[RW-1:FRAC] == 16'd0);
++    // Keep the live IDLE -> START path out of the wide offset/timer mux. START and S_SAMP
++    // are mutually exclusive states, so compare each candidate directly before selecting
++    // the sample event. This is combinational only: the sample still occurs on the same clock.
++    wire       srx_start_smp = start && (sofs[RW-1:FRAC] == 16'd0);
++    wire       srx_timer_smp = srx_on && (sst == S_SAMP) && (rt[RW-1:FRAC] == 16'd0);
++    wire       srx_smp = srx_start_smp || srx_timer_smp;
+     wire [RW:0] rt_add = {1'b0, rt_cur} + (srx_smp ? {1'b0, per} : {(RW+1){1'b0}});
+ 
+     // ------------------------------------------------------------------ LINKED_RX, SAMPLE

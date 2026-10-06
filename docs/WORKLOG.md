@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-05: Codex (all-corner placement audit and guarded routing)
+Done:
+- All-corner repair 37408506116 completed successfully; no active workflows at progress query. Placement setup/hold violation counts zero in all corners, hold +36.01/+238.27/+103.10 ps fast/slow/typ. Baseline slow setup remains −0.274897 ns.
+- Audited downloaded area/electrical/path evidence and updated PHASE2_INDEPENDENT_TIMING_SCREENS.md: 508,444 um² instance area, 8 slow slew and 162 fanout violations remain. Zero setup slack is not positive margin or extracted timing closure.
+- Prepared guarded artifact continuation through antenna checks/repair, fresh per-corner STA and DRT only on passing timing/antenna. Thirty-two helper tests and workflow/embedded-Python/diff checks pass. Actual saved placement config verified, not inferred from repair config where placement keys are omitted.
+- No main hardware, constraints or spec change; no phase boxes ticked.
+Next:
+- Publish and dispatch gds-placement-route, audit post-antenna gate and detailed-route result; then run extraction and gate-level verification on that exact route. Existing extracted setup remains −5.630099 ns until a new routed measurement exists.
+
 ## 2026-10-05: Codex (timing screens compared; all-corner repair follow-up)
 Done:
 - Audited logs for all six paired screens; report PHASE2_INDEPENDENT_TIMING_SCREENS.md records fresh before/after slow setup, fast hold and final logged GRT overflow. Baselines reproduce exactly. Timing placement is strongest no-storage follow-up, with setup WS 0 and fast hold −0.0045709 ns.

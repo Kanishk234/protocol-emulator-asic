@@ -264,6 +264,13 @@ def report_shadow(dut, label):
                           cell.SR.value, cell.EN.value, cell.ConfigBits.value,
                           cell.LUT_flop.value, cell.LUT_out.value, cell.O.value,
                           sorted(possibilities), actual)
+            if (label == "timer unknown input before corrupt edge"
+                    and cell.c_out_mux.value.is_resolvable and not int(cell.c_out_mux.value)
+                    and len(possibilities) == 1 and actual.get("O") in ("x", "z")):
+                module = modules[macro["cells"][instance]["type"]]
+                bit = module["netnames"][name + ".O"]["bits"][0]
+                trace_unknown_cone(dut, "CONSTANT LUT " + instance + " L" + letter,
+                                   module, native, bit)
 
 
 def lut_completion_values(index, values):

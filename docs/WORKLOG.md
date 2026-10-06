@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-06 (session57: matched-input LUT diagnosis)
+**Done:** inspected hosted37534251857. Setup, RTL control and companion loading execute; actual native UART/reset probes still fail. At4423490ns,49 tile output ports differ on RTL-known bits even with actual native tile input ports shared. Independent internal state can differ, so this is not local equivalence or proof of harmless simulation pessimism. Added read-only snapshots of the same-input TB timer controls/state/config and24 LUT cells in the timer/UART upstream tiles. Enumerate every binary completion of each partially unknown LUT index to report possible combinational outputs, alongside RTL/native state and retained native output aliases. No mapped model, hardware, configuration or user state changed. Lightweight truth-table/index/unknown checks, Python syntax and whitespace pass; hosted37534707478 active at7f5442a. Route37516794406 remains active with unchanged inputs and no final violation/timing result.
+
+Reviewed Piper/Vimjam's DVCon X-propagation paper: RTL conditional optimism and netlist reconvergence pessimism both matter. Passing RTL alone cannot choose between them. Recorded the distinction and next acceptance evidence in the diagnostic report. No heavy local EDA or new routing run.
+**Boxes ticked:** none. Native acceptance, final compact geometry, configured-fabric timing and phase5 remain open.
+**Next:** inspect the focused cloud snapshots; identify a combinational discrepancy under known configuration or a control/reset uncertainty requiring correction. Keep frozen G1 and active routing unchanged.
+
 ## 2026-10-06 (session56: loaded RTL companion for native diagnosis)
 **Done:**37532673220 still fails actual native UART; unknown-select filtering removes a false selector branch but timer input trace still reaches160-node cap in neighboring routing loops. Configuration audit remains8707known/matching bits immediately before timer corruption. Regular lint37532673267/docs37532673461/test37532673177/unit37532673160 pass. Route37516794406 remains active with unchanged inputs.
 

@@ -12,8 +12,39 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TILES="$ROOT/build/tile_cmos5l/fabulous-tiles"
-# default: the newest run that completed (has a final netlist)
-RUN="${1:-$(for r in $(ls -td "$TILES"/tiles/tiny/PRIM2T2S/runs/*/); do [ -f "$r/final/nl/PRIM2T2S.nl.v" ] && { echo "$r"; break; }; done)}"
+# Default must match the committed tile, not a newer rejected experiment.
+warp_fabric="$(cat "$ROOT/arch/CURRENT")"
+warp_committed_tile="$ROOT/macro/$warp_fabric/tiles/PRIM2T2S.nl.v"
+RUN="${1:-}"
+if [ -z "$RUN" ]; then
+  for warp_run in "$TILES"/tiles/tiny/PRIM2T2S/runs/*/; do
+    if [ -r "$warp_run/final/nl/PRIM2T2S.nl.v" ] &&
+       cmp -s "$warp_committed_tile" "$warp_run/final/nl/PRIM2T2S.nl.v" &&
+       { [ -z "$RUN" ] || [ "$warp_run/final/nl/PRIM2T2S.nl.v" -nt "$RUN/final/nl/PRIM2T2S.nl.v" ]; }; then
+      RUN="$warp_run"
+    fi
+  done
+  if [ -z "$RUN" ]; then
+    echo "tile_check: no completed run matches $warp_committed_tile" >&2
+    echo "Restore its matching archived netlist/SPEF; newer experimental runs are not evidence for the committed tile." >&2
+    exit 1
+  fi
+fi
+for warp_required in "$RUN/final/nl/PRIM2T2S.nl.v" "$RUN/final/spef/nom/PRIM2T2S.nom.spef"; do
+  if [ ! -r "$warp_required" ]; then
+    echo "tile_check: missing hardened-tile artifact: $warp_required" >&2
+    echo "Restore the matching PRIM2T2S netlist and SPEF, or rebuild the tile; pass its completed run directory as the first argument." >&2
+    echo "A netlist-only check cannot reproduce the routed timing comparison (tools/timing/README.md)." >&2
+    exit 1
+  fi
+done
+if ! cmp -s "$warp_committed_tile" "$RUN/final/nl/PRIM2T2S.nl.v"; then
+  if [ "${WARP_TIMING_ALLOW_VARIANT:-0}" != 1 ]; then
+    echo "tile_check: supplied netlist differs from the committed tile; set WARP_TIMING_ALLOW_VARIANT=1 only for a labeled experimental comparison." >&2
+    exit 1
+  fi
+  echo "tile_check: EXPERIMENTAL VARIANT; this does not refresh committed-tile timing evidence." >&2
+fi
 PDK_ROOT="${PDK_ROOT:-$HOME/.cache/warp/pdk-full}"
 LIB="$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib"
 W="$ROOT/build/prim_sta"

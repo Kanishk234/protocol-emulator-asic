@@ -22,8 +22,27 @@ def hold_followup(config_path, state, output, pdk_root):
            sdc=Path('src/signoff.sdc'), repair_corners=CORNERS)
     followup = json.loads((output / 'comparison.json').read_text())
     if not timing_pass(followup):
-        raise ValueError('Clock-clustering follow-up still fails timing; routing refused')
+        raise ValueError('Bounded timing follow-up still fails timing; routing refused')
     return Path(followup['after_state'])
+
+
+def postantenna_followup(config_path, state, output, pdk_root, check_antennas):
+    """One repair, then independent antenna and timing gates; never retry."""
+    repaired = hold_followup(config_path, state, output / 'repair', pdk_root)
+    checked = check_antennas(repaired)
+    screen(config_path, repaired, output / 'checked-sta', pdk_root,
+           repaired=checked, sdc=Path('src/signoff.sdc'))
+    data = json.loads((output / 'checked-sta/comparison.json').read_text())
+    if not timing_pass(data):
+        raise ValueError('Post-repair checkpoint fails timing; routing refused')
+    return checked
+
+
+def hold_only_failure(data):
+    return (not timing_pass(data) and all(
+        data['corners'][c]['after'][f'timing__setup__ws__corner:{c}'] >= 0
+        and data['corners'][c]['after'][f'timing__setup_vio__count__corner:{c}'] == 0
+        for c in CORNERS))
 
 
 def main():
@@ -106,6 +125,25 @@ def main():
            repaired=final, sdc=Path('src/signoff.sdc'))
     data = json.loads((out / 'postantenna-sta/comparison.json').read_text())
     ready = timing_pass(data)
+    if not ready and os.environ.get('REPAIR_POSTANTENNA_HOLD', '0') == '1':
+        if not hold_only_failure(data):
+            raise ValueError('Post-antenna setup failure; hold recovery refused')
+        def check_repaired_antennas(repaired):
+            checked_root = run('antenna-recheck', ['OpenROAD.CheckAntennas'], repaired)
+            checked_states = list(checked_root.glob('*-openroad-checkantennas/state_out.json'))
+            if len(checked_states) != 1:
+                raise ValueError('Missing post-repair antenna check')
+            checked = checked_states[0]
+            checked_metrics = json.loads(checked.with_name('or_metrics_out.json').read_text())
+            if checked_metrics['antenna__violating__nets'] or checked_metrics['antenna__violating__pins']:
+                raise ValueError('Post-repair antennas fail; routing refused')
+            return checked
+        recovery = out / 'postantenna-hold-followup'
+        recovery.mkdir()
+        final = postantenna_followup(config_path, final, recovery, os.environ['PDK_ROOT'],
+                                     check_repaired_antennas)
+        data = json.loads((recovery / 'checked-sta/comparison.json').read_text())
+        ready = timing_pass(data)
     (out / 'gates.json').write_text(json.dumps({'timing_and_antenna_pass': ready,
                                              'state': str(final)}, indent=2) + '\n')
     if not ready:

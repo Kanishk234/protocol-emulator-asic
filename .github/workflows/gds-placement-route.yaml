@@ -14,6 +14,11 @@ on:
         default: placement
         type: choice
         options: [placement, lane, sram, cts, bs-resync, bs-event-late, bs-load-flat]
+      repair_postantenna_hold:
+        description: One bounded repair if antenna changes create hold-only violations
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -35,6 +40,7 @@ jobs:
       VARIANT: timing-placement
       SOURCE_VARIANT: ${{ inputs.source_variant }}
       SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      REPAIR_POSTANTENNA_HOLD: ${{ inputs.repair_postantenna_hold && '1' || '0' }}
 
     steps:
       - name: Check out the measured R4 candidate

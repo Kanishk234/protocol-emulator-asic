@@ -141,6 +141,7 @@ jobs:
             runs/placement-route/drt/**
             runs/placement-route/gates.json
             runs/placement-route/postantenna-sta/comparison.json
+            runs/placement-route/postantenna-hold-followup/**/comparison.json
             src/config_merged.json
             src/config_extracted_timing.json
             src/config_timing_*.json

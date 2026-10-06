@@ -51,3 +51,50 @@ def test_bounded_followup_checks_fresh_result_without_retry(tmp_path, monkeypatc
         with pytest.raises(ValueError, match='routing refused'):
             placement_route.hold_followup('config', 'state', tmp_path, 'pdk')
     assert calls == [{'sdc': Path('src/signoff.sdc'), 'repair_corners': CORNERS}]
+
+
+@pytest.mark.parametrize('failure', [None, 'repair', 'antenna', 'fresh-timing'])
+def test_postantenna_recovery_is_single_pass_and_rechecks_both_gates(tmp_path, monkeypatch, failure):
+    import json
+    from pathlib import Path
+    import placement_route
+    calls = []
+    def repair(*args):
+        calls.append('repair')
+        if failure == 'repair':
+            raise ValueError('repair fails')
+        return Path('repaired-state')
+    def antenna(state):
+        assert state == Path('repaired-state')
+        calls.append('antenna')
+        if failure == 'antenna':
+            raise ValueError('dirty antenna')
+        return Path('antenna-checked-state')
+    def fresh(config, before, output, pdk, **kwargs):
+        assert before == Path('repaired-state')
+        assert kwargs == {'repaired': Path('antenna-checked-state'), 'sdc': Path('src/signoff.sdc')}
+        calls.append('fresh-timing')
+        output.mkdir()
+        data = fixture()
+        if failure == 'fresh-timing':
+            data['corners'][CORNERS[0]]['after'][f'timing__hold__ws__corner:{CORNERS[0]}'] = -0.001
+        (output / 'comparison.json').write_text(json.dumps(data))
+    monkeypatch.setattr(placement_route, 'hold_followup', repair)
+    monkeypatch.setattr(placement_route, 'screen', fresh)
+    if failure:
+        with pytest.raises(ValueError):
+            placement_route.postantenna_followup('config', 'state', tmp_path, 'pdk', antenna)
+    else:
+        assert placement_route.postantenna_followup('config', 'state', tmp_path, 'pdk', antenna) == Path('antenna-checked-state')
+    assert calls.count('repair') == 1
+    assert calls == ['repair', 'antenna', 'fresh-timing'][:{'repair': 1, 'antenna': 2}.get(failure, 3)]
+
+
+@pytest.mark.parametrize('kind', ['hold', 'setup'])
+@pytest.mark.parametrize('corner', CORNERS)
+def test_postantenna_recovery_only_accepts_hold_only_failures(kind, corner):
+    from placement_route import hold_only_failure
+    data = fixture()
+    assert not hold_only_failure(data)
+    data['corners'][corner]['after'][f'timing__{kind}__ws__corner:{corner}'] = -0.001
+    assert hold_only_failure(data) == (kind == 'hold')

@@ -100,10 +100,12 @@ jobs:
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ROUTE_RUN_ID" > /tmp/route-run.json
           python3 - <<'PY'
-          import json
+          import json, os
           from pathlib import Path
           run = json.loads(Path("/tmp/route-run.json").read_text())
           assert run["conclusion"] == "success"
+          assert run["head_branch"] == "main"
+          assert run["id"] == int(os.environ["ROUTE_RUN_ID"])
           assert run["path"] == ".github/workflows/gds-placement-route.yaml"
           assert Path.cwd().resolve() == Path("/home/runner/work/protocol-emulator-asic/protocol-emulator-asic")
           expected = {"TRW_LANES": "2", "TRW_UNITS": "4", "TRW_PC_UNITS_BITSYNC": "4'b0001"}
@@ -114,6 +116,12 @@ jobs:
           assert len(states) == 1, "Completed DRT checkpoint required"
           state = json.loads(states[0].read_text())
           assert state["metrics"]["route__drc_errors"] == 0
+          import sys
+          sys.path.insert(0, str(Path('workflow-src/scripts/ci').resolve()))
+          from route_source import validate_saved
+          identity = validate_saved(Path.cwd())
+          if identity:
+              print(f"Source variant: {identity['variant']}; screen run: {identity['source_run_id']}")
           print("Successful routing artifact and final zero-DRC checkpoint validated")
           PY
 

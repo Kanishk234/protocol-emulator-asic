@@ -13,7 +13,7 @@ on:
         required: true
         default: placement
         type: choice
-        options: [placement, lane, sram, cts]
+        options: [placement, lane, sram, cts, bs-resync]
 
 permissions:
   contents: read
@@ -93,39 +93,33 @@ jobs:
       - name: Install pinned LibreLane
         run: pip install librelane==3.1.0.dev3
 
+      - name: Prepare trusted source fingerprints before artifact download
+        run: |
+          python workflow-src/scripts/ci/route_source.py prepare \
+            --variant "$SOURCE_VARIANT" --run-id "$SOURCE_RUN_ID" \
+            --identity /tmp/placement-source-identity.json
+
       - name: Download the audited all-corner placement screen
         uses: actions/download-artifact@v7
         with:
-          name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || inputs.source_variant == 'cts' && 'gds-cts-cluster-cts-cluster8' || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
+          name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || inputs.source_variant == 'cts' && 'gds-cts-cluster-cts-cluster8' || inputs.source_variant == 'bs-resync' && 'gds-drop-counter-bs-resync' || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           run-id: ${{ inputs.source_run_id }}
 
-      - name: Validate artifact provenance and unchanged hardware
+      - name: Validate exact source artifact provenance and fingerprints
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" > /tmp/placement-source-run.json
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
-          test -z "$(git diff --name-only -- src info.yaml macro)"
-          python - <<'PYCODE'
-          import json, os
-          from pathlib import Path
-          run = json.loads(Path('/tmp/placement-source-run.json').read_text())
-          assert run['conclusion'] == 'success'
-          variant = os.environ['SOURCE_VARIANT']
-          expected = {'placement': 'gds-placement-multicorner-screen',
-                      'lane': 'gds-lane-slew-screen', 'sram': 'gds-sram-slew-screen',
-                      'cts': 'gds-cts-cluster-screen'}
-          assert run['path'] == f'.github/workflows/{expected[variant]}.yaml'
-          assert run['id'] == int(os.environ['SOURCE_RUN_ID'])
-          assert run['head_branch'] == 'main'
-          if variant == 'placement':
-              assert run['head_sha'].startswith('f4bc126')
-          assert Path.cwd() == Path('/home/runner/work/protocol-emulator-asic/protocol-emulator-asic')
-          PYCODE
+          test "$PWD" = /home/runner/work/protocol-emulator-asic/protocol-emulator-asic
+          python workflow-src/scripts/ci/route_source.py validate \
+            --variant "$SOURCE_VARIANT" --run-id "$SOURCE_RUN_ID" \
+            --identity /tmp/placement-source-identity.json \
+            --run-json /tmp/placement-source-run.json
 
       - name: Build pinned region-reservation image
         run: docker build --tag tripwire-hotspot:local --file workflow-src/scripts/ci/Dockerfile.openroad-hotspot workflow-src/scripts/ci
@@ -144,5 +138,6 @@ jobs:
             runs/placement-route/**
             runs/slew-screen/**
             src/**
+            macro/**
             info.yaml
           if-no-files-found: warn

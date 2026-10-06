@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 from postgrt_timing import CORNERS, screen
+from route_source import validate_identity
 
 
 def timing_pass(data):
@@ -28,9 +29,9 @@ def hold_followup(config_path, state, output, pdk_root):
 def main():
     root = Path('runs/rtl-grt-screen')
     variant = os.environ.get('SOURCE_VARIANT', 'placement')
-    if variant not in {'placement', 'lane', 'sram', 'cts'}:
+    if variant not in {'placement', 'lane', 'sram', 'cts', 'bs-resync'}:
         raise ValueError('Unknown route source variant')
-    timing_root = root / 'timing' if variant in {'placement', 'cts'} else Path('runs/slew-screen')
+    timing_root = root / 'timing' if variant in {'placement', 'cts', 'bs-resync'} else Path('runs/slew-screen')
     comparison = json.loads((timing_root / 'comparison.json').read_text())
     if variant != 'cts' and not timing_pass(comparison):
         raise ValueError('Failing source timing')
@@ -68,6 +69,9 @@ def main():
     base = json.loads(config_path.read_text())
     out = Path('runs/placement-route')
     out.mkdir(exist_ok=False)
+    identity = validate_identity(json.loads(Path('/tmp/placement-source-identity.json').read_text()),
+                                 Path.cwd(), variant)
+    (out / 'source_identity.json').write_text(json.dumps(identity, indent=2) + '\n')
     os.environ['LIBRELANE_IMAGE_OVERRIDE'] = 'tripwire-hotspot:local'
 
     if variant == 'cts':

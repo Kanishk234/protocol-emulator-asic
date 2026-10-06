@@ -2,9 +2,11 @@
 import hashlib
 import json
 from pathlib import Path
+from route_source import validate_saved
 
 
 def validate(root):
+    validate_saved(root)
     route = root / 'runs/placement-route'
     gates = json.loads((route / 'gates.json').read_text())
     if gates['timing_and_antenna_pass'] is not True:

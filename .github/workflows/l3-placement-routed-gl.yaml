@@ -108,11 +108,17 @@ jobs:
           import hashlib, json
           run = json.loads(Path("/tmp/l3-source-run.json").read_text())
           assert run["conclusion"] == "success"
+          assert run["head_branch"] == "main"
+          assert run["id"] == int(os.environ["ROUTE_RUN_ID"])
           assert run["path"] == ".github/workflows/gds-placement-route.yaml"
           import sys
           sys.path.insert(0, str(Path('../workflow-src/scripts/ci').resolve()))
           from placement_gl import validate
           validate(Path('../artifacts'))
+          identity_path = Path('../artifacts/runs/placement-route/source_identity.json')
+          if identity_path.exists():
+              identity = json.loads(identity_path.read_text())
+              print(f"Source variant: {identity['variant']}; screen run: {identity['source_run_id']}")
           print(f"Netlist SHA256: {hashlib.sha256(netlist.read_bytes()).hexdigest()}")
           print(f"Candidate: {os.environ['CANDIDATE_SHA']}")
           print(f"Repaired netlist: GDS run {os.environ['ROUTE_RUN_ID']}; saved repaired netlist; functional simulation only")

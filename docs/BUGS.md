@@ -275,6 +275,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Isolated state source:**37521660597 filtered UART cone ends at Tile_X2Y3_LUT4x8_ha_C2.Inst_LH_FABULOUS_LC.LUT_flop after41unknown nodes, D=X/RESET_B=1 at failure. Next probe checks that register's exact data/reset paths and configuration selectors. This identifies a source state boundary, not the original cause of unknown state.
 - **Timer evidence:**37522773342 timer count becomes configured15/armed1 after RUN, then counter goes entirely unknown while armed remains1. Added first-known-to-X edge watcher with stable pre-edge D/reset snapshots; later feedback X alone does not identify original corruption.
 - **Before corruption:**37523983755 at4423490ns timer count remains15, but D inputs are allX with reset pins1. All8707 configuration bits still match the loaded image. Trace follows upstream logic; original cause remains unresolved. Unknown mux selectors are filtered only when Boolean sensitivity proves irrelevance under known inputs.
+- **Direct comparison:**37532673220 still reaches trace cap despite selector filtering. Added separate RTL companion sharing real shell/configuration input ports and ordinary D-023 routing pulse; native outputs remain authoritative. Compare timer control/state and tile route vectors without changing actual mapped netlist, configuration or user storage. Hosted verification pending.
 
 ## 34: Hosted LibreLane requires existing forced run directory
 - **Date:**2026-10-06.

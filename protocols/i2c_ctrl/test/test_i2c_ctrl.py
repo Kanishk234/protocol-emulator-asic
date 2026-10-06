@@ -109,15 +109,17 @@ def sigrok_decode(b):
                     f.write(f"#{t * CLK_NS}\n{c}!\n{s}#\n")
                     prev = (c, s)
             f.write(f"#{len(b.scl) * CLK_NS}\n")
-        out = subprocess.run(
+        decoded = subprocess.run(
             ["sigrok-cli", "-i", path, "-I", f"vcd:samplerate={int(1e9 / CLK_NS)}",
              "-P", "i2c:scl=scl:sda=sda", "-A", "i2c=address-read:address-write:data-read:data-write"],
-            capture_output=True, text=True, check=True).stdout
+            capture_output=True, text=True, check=True)
+        out = decoded.stdout
     res = []
     for line in out.splitlines():
         m = re.search(r"(Address read|Address write|Data read|Data write): ([0-9A-Fa-f]+)", line)
         if m:
             res.append((m.group(1), int(m.group(2), 16)))
+    assert res, f"sigrok produced no I2C bytes: stdout={out!r}, stderr={decoded.stderr!r}"
     return res
 
 

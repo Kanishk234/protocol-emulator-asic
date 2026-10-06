@@ -18,9 +18,12 @@ cases = [
 ]
 for name, directory, source, pins, module, variable, shift in cases:
     build = out/name
+    dependencies = sorted((ROOT/'protocols/uart').glob('*.v'))
+    if name == 'fault':
+        dependencies.append(ROOT/'protocols/uart_monitor/uart_monitor_top.v')
     cmd = [sys.executable, '-m', 'compile.compile',
            str(ROOT/f'protocols/{directory}/{source}'),
-           *map(str, sorted((ROOT/'protocols/uart').glob('*.v'))),
+           *map(str, dependencies),
            '--pins', str(ROOT/f'protocols/{directory}/{pins}.yaml'),
            '--arch', str(ROOT/'arch/warp_g1'), '--strict-ports', '-o', str(build)]
     with (out/f'{name}_compile.log').open('w') as log:

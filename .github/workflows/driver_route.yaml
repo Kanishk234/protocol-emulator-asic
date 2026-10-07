@@ -1,0 +1,44 @@
+name: compact stronger driver routed trial
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/driver_route_repair.tcl'
+      - 'test_internal/cloud_driver_route.py'
+      - '.github/workflows/driver_route.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-driver-route-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  route:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 220
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned tools and legal one-driver placement
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_checkpoint.sh
+          bash spikes/cloud/fetch_pdk.sh
+          gh run download 37689324316 -R "$GITHUB_REPOSITORY" -n compact-driver-placement-37689324316 -D build/driver_source
+      - name: Bounded route, native checks, fresh extraction and geometry
+        timeout-minutes: 200
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_driver_route.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-driver-route-${{ github.run_id }}
+          path: |
+            build/driver_route/
+            build/clean_layout/
+          retention-days: 3

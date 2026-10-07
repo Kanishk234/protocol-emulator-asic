@@ -1,0 +1,39 @@
+name: compact driver placement preflight
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/driver_placement_probe.tcl'
+      - 'test_internal/cloud_driver_placement.py'
+      - '.github/workflows/driver_placement.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-driver-placement-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  placement:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Authenticated source and pinned PDK
+        run: |
+          python3 -m venv .venv
+          gh run download 37674839060 -R "$GITHUB_REPOSITORY" -n compact-clean-layout-37674839060 -D build/driver_source
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Check three-cell legal placement only
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_driver_placement.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-driver-placement-${{ github.run_id }}
+          path: build/driver_placement/
+          retention-days: 3

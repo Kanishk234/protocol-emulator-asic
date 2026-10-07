@@ -39,3 +39,12 @@ def test_combination_requires_both_exact_modules(monkeypatch, changed):
     monkeypatch.setattr(timing_trial.subprocess, "run", lambda *a, **k: None)
     with pytest.raises(ValueError, match="unexpected files"):
         timing_trial.apply_trial("bs-event-drop-qual")
+
+
+@pytest.mark.parametrize("changed", ["src/trw_pin_bs.v", "src/trw_pin_io.v", "src/trw_pin_bs.v\nsrc/trw_pin_io.v\nsrc/trw_pin_rx.v"])
+def test_banked_trial_refuses_missing_io_or_rx_change(monkeypatch, changed):
+    replies = [timing_trial.CANDIDATE, "", changed]
+    monkeypatch.setattr(timing_trial.subprocess, "check_output", lambda *a, **k: replies.pop(0))
+    monkeypatch.setattr(timing_trial.subprocess, "run", lambda *a, **k: None)
+    with pytest.raises(ValueError, match="unexpected files"):
+        timing_trial.apply_trial("bs-event-pin-banked")

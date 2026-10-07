@@ -6,6 +6,7 @@ import subprocess
 
 CANDIDATE = "3393eea9a58c5cad9077cc360a8515d0e5ec8284"
 PATCHES = {
+    "bs-event-pin-banked": ("bs_event_pin_banked.patch", ("src/trw_pin_bs.v", "src/trw_pin_io.v")),
     "bs-event-rx-shared": ("bs_event_rx_shared.patch", ("src/trw_pin_bs.v", "src/trw_pin_rx.v")),
     "bs-event-rx-timer": ("bs_event_rx_timer.patch", ("src/trw_pin_bs.v", "src/trw_pin_rx.v")),
     "bs-event-drop-qual": ("bs_event_drop_qual.patch", ("src/trw_chan_port.v", "src/trw_pin_bs.v")),

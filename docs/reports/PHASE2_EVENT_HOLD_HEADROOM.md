@@ -65,3 +65,15 @@ Extraction37581139249and expanded routedGL37581139271are active. These are diagn
 Published reporting-only `scripts/ci/execution_margin.tcl` retains unrestricted setup/hold and separate flop/latch/output reports. Optional `tripwire_report_residual_cones` selects96RXtimer D pins,72dropped-counter D pins and9SRAMaddress pins by preserved net names;reset/control pins are excluded from targeted flop groups. It fails if a required group is absent. It changes no constraints or hardware.
 
 Executed against original event extraction37551577987 with saved emittedSDC/SPEF at allthreecorners using localOpenSTA2.6.0. Allgroups present and allsixgroup reports produced percorner. Slow targetedsetup margins:RX2.762297ns,dropped2.012822ns,SRAMaddress11.371373ns. These describe the original weaker-hold candidate,not125psrouting orRXprototype. Localengine's missing latch paths remain a limitation; pinnedCI replay required before using endpoint results to judge adoption or signoff. Rawlogs:/tmp/event-final-audit/residual-cones-*.log.
+
+## 125 ps extracted timing (37581139249)
+
+Completed diagnostic reports setupfast/typical0,slow-0.179788633514ns;holdfast+0.037289505872ns,slow+0.369336571780ns,typical+0.165097162836ns. Thus125psimproves slowsetup versus150ps(-0.389409ns)andpasseshold,but stillfailssetup. Fastholdloses61.9008ps frompostantenna+0.0991903ns. Do notpromoteasclosedorofficial-ready. RoutedGL37581139271stillactive. Inspectactualslowpaths beforeselecting another repair/RTL change.
+
+## 125 ps setup-path audit and targeted follow-up
+
+Artifact11464064023,extraction37581139249:the slowmax report contains exactlytwo failing entries among1000paths. Both launchU0PIN_Aselection(configword1bit1) and endU3RXtimer:rt23(_47775_) -0.179789ns,rt22(_47774_) -0.052855ns. No finalholdcell appears in either reported data path;the150psdropped-counter failures are absent here.
+
+The common cone has slowarcs_o21ai_1(_25443_)1.166990ns andxor2_1(_25445_)1.305548ns feedingunit3sel,thenNOR2_1(_27853_)0.820204ns andNOR4_1(_27962_)0.785984ns. Pinnedlibrary hasNOR2_2/NOR4_2 alternatives but no strongerXOR2/O21AI variant. Selective fanout/drive changes are a small-area fallback;anupsizedNORincreasesupstreamcapacitance,soactualall-cornermeasurement isrequired.
+
+SharedRXscreen37579966660alreadytargets these timerpaths. Preparedrouting allows that exactvariant onlywith125pstarget;existingevent-latechoices/defaultandallgates unchanged.171helpertests pass,including25source/targetauthorization cases. Routeonlyafter source screen passes,thenextractandrunfullprotocolGL;no continuation launched yet.

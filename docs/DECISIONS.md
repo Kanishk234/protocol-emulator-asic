@@ -1058,6 +1058,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost/benefit from identical module mapping:11701.7082um² versus12559.7682 for first prototype,6.83% smaller but20.58% above original baseline. Slow ideal-wire input-to-timer1.812930ns; other input-to-flop endpoint6.063411ns slightly worse than first prototype5.907698ns. Full-chip effects unmeasured.
 - Independent equivalence FRAC4/8 and41pin tests pass. Require matching frozen chip/model verification and paired physical measurements before adoption; all timing/physical gates remain unchanged.
 
+## D-078 (2026-10-07): bound shared-RX routing to the measured 125 ps repair
+- General need: original event125ps extraction37581139249 has only two setup violations,unit3RXtimerbits23/22 (-0.179789/-0.052855ns). No dropped-counter setup violations remain. Shared-RX prototype preserves all behavior and targets that arithmetic cone at lower area than first RX variant.
+- Permit125ps headroom only for bs-event-rx-shared in addition to existing event-late target choices. Every other new source/target pair is refused. Preserve one repair,20ns,setup0,all-corner fresh pass,fast hold>=50ps before routing,andantenna/DRC/extraction checks. Launch only after trusted successful-main screen37579966660 passes source timing.
+- Cost: extra repair buffers/sizing and potential setup/overflow regression; shared RX still costs module area. No clean official timing claimed; actual extracted results and complete GL decide.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

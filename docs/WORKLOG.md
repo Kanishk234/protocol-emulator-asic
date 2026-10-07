@@ -5,11 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (125 ps residual setup localized to RX)
+- Auditedartifact11464064023:exactlytwo slowsetupfailures,U0PIN_A1→U3RXrt23/22 (-0.179789/-0.052855ns). No finalholdcellinreportedpaths;dropped-counter failuresabsent. CommonSELarcsO21AI1.167ns/XOR1.306ns;NOR2/NOR4alsoweak. PinnedlibraryhasstrongerNOR2/4butnotXOR/O21AI;targetedfanoutrepair remainsfallback.
+- PreparedexactsharedRX+125pscontinuationguard;refuseotherunreviewedsource/targetpairs.171helpertests pass. Existingall-corner/fast50ps/antenna/DRCgates preserved;no mainRTL/configchange/phase tick.
+- SharedRXscreen37579966660and125psGL37581139271remainrunning;latestlint/test/docs green,unitactive. No routingdispatchuntilsharedRXsourceactuallypasses.
+- Next:publishCI/evidence,inspectsharedscreenandlaunchguardedcontinuationonlywithpassingprovenance;waitforactualGLbeforefunctionalclaim. Officialtimingunproven.
+
 ## 2026-10-07: Codex (125 ps route complete and parallel endpoint audit)
 - Main125psroute37574267994passes withrouteDRC0;180extra holdbuffers,repairpassarea+2.7%,postantennafast hold+0.0991903ns/setup0allcorners. Extraction37581139249andGL37581139271active. SharedRXscreen37579966660measuringbothbranches;latestunitactive,lint/test/docs green.
 - Extendedreporting-onlyexecution_margin.tcl withpreserved-net endpoint selection:96RXtimer,72dropped-counter,9SRAMaddress;D-onlyflopgroups excludereset. Replayedoriginal37551577987extraction allthreecorners;endpointcountsandsixreports/cornerpass. Olderlocalenginecannotreportfull latch timing;withheldsignoff/125psclaims.
 - Publishinghelperandmeasuredreportseparately;no mainRTL/config change,phasetick orconstraintchange. OlderSRAMinsertionprototype remainsunlaunched/untracked becauseitscheckpointdoesnotmatchRX/newcandidate.
-- Next:inspectextracted125ps setup/hold and22-caseGL;assesssharedRXoverflow/area;runresidualreportwithpinnedenginebeforepromotinganycandidate toofficialGDS.
+- Publishedhelpercdd7e2banddocs55c54db;HEAD/origin/main/GitHubrefmatch55c54db102dbcf5277b464c680f5db65bfb04faf. Extraction37581139249nowcomplete:slowsetup-0.179788633514ns,fasthold+0.037289505872ns;fast/typsetup0. Notclosed. GLandsharedRXscreenremainactive.
+- Next:inspectactual125ps failing setuppathsand22-caseGL;assesssharedRXoverflow/area;runresidualreportwithpinnedenginebeforeofficialpromotion.
 
 ## 2026-10-07: Codex (shared RX physical screen preparation)
 - Main125psroute37574267994 remains active;latestlint/test/docs passed,unitactive. Correction:its single named step includes repair/antenna andDRT,so active step alonecannotidentifyexactsubstage.

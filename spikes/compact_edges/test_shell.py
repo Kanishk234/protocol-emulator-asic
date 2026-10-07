@@ -1,6 +1,7 @@
 """Real SPI loading and UART pins on the compact 5 x 3 shell candidate."""
 
 import os
+import random
 from pathlib import Path
 import sys
 
@@ -56,10 +57,18 @@ async def load_uart_through_shell(dut):
         if os.environ.get("WARP_COMPACT_DIAG") == "1":
             report_runtime(dut, "after USER_RESET")
 
+    stress = os.environ.get("WARP_COMPACT_UART_STRESS") == "edge_patterns"
+    sent = [0x55, 0x00, 0xC3]
+    receive_patterns = [0x69]
+    if stress:
+        rng = random.Random(20261007)
+        edges = [0x00, 0xFF, 0x55, 0xAA] + [1 << i for i in range(8)] + [0xFF ^ (1 << i) for i in range(8)]
+        sent = edges + [rng.randrange(256) for _ in range(8)]
+        receive_patterns = list(reversed(edges)) + [rng.randrange(256) for _ in range(8)]
     samples = []
 
     async def record():
-        for _ in range(4000):
+        for _ in range(max(4000, 1400 * len(sent))):
             await ClockCycles(dut.clk, 1)
             try:
                 samples.append(bit(dut.uo_out, 2))
@@ -73,7 +82,6 @@ async def load_uart_through_shell(dut):
                 raise
 
     capture = cocotb.start_soon(record())
-    sent = [0x55, 0x00, 0xC3]
     for byte in sent:
         await host.xfer(tx_ch_write(byte))
     await capture
@@ -89,17 +97,19 @@ async def load_uart_through_shell(dut):
             offset += 1
     assert decoded == sent, (decoded, sent)
 
-    received = 0x69
-    host.set_fab_in(0)
-    await ClockCycles(dut.clk, 16)
-    for i in range(8):
-        host.set_fab_in((received >> i) & 1)
+    for received in receive_patterns:
+        host.set_fab_in(0)
         await ClockCycles(dut.clk, 16)
-    host.set_fab_in(1)
-    await ClockCycles(dut.clk, 32)
-    assert (await host.status()).rx_valid
-    assert parse_byte(await host.xfer(tx_ch_read())) == received
+        for i in range(8):
+            host.set_fab_in((received >> i) & 1)
+            await ClockCycles(dut.clk, 16)
+        host.set_fab_in(1)
+        await ClockCycles(dut.clk, 32)
+        assert (await host.status()).rx_valid
+        assert parse_byte(await host.xfer(tx_ch_read())) == received
+        assert not (await host.status()).rx_valid, "extra UART RX byte queued"
     await host.xfer(tx_simple(Op.STOP))
     await expect(host, State.LOADED)
     assert parked(dut)
-    dut._log.info("Loaded %d real words through SPI; UART TX/RX and STOP parking pass", len(words))
+    dut._log.info("Loaded %d real words through SPI; %d UART TX/%d RX bytes and STOP parking pass",
+                  len(words), len(sent), len(receive_patterns))

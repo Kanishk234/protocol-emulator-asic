@@ -87,7 +87,7 @@ results = {}
 for name, extra in (("rtl_control", []), ("native_candidate", ["--mapped-fabric"]),
                     ("native_user_reset", ["--mapped-fabric", "--reset-probe"])):
     with (out / f"{name}.log").open("w") as log:
-        result = subprocess.run(base + extra, stdout=log, stderr=subprocess.STDOUT, timeout=300)
+        result = subprocess.run(base + extra, stdout=log, stderr=subprocess.STDOUT, timeout=600)
     results[name] = result.returncode
     suffix = "" if name == "rtl_control" else "_mapped_fabric"
     if name == "native_user_reset":

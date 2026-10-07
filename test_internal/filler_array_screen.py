@@ -17,6 +17,12 @@ cases = {
     "warp_fill2_rows_mirrored": ("sg13cmos5l_fill_2", 0.96, 2, True),
     "warp_fill1_rows_ground": ("sg13cmos5l_fill_1", 0.48, 2, True),
     "warp_fill2_rows_ground": ("sg13cmos5l_fill_2", 0.96, 2, True),
+    "warp_fill4_horizontal": ("sg13cmos5l_fill_4", 1.92, 1, False),
+    "warp_fill8_horizontal": ("sg13cmos5l_fill_8", 3.84, 1, False),
+    "warp_fill4_rows_mirrored": ("sg13cmos5l_fill_4", 1.92, 2, True),
+    "warp_fill8_rows_mirrored": ("sg13cmos5l_fill_8", 3.84, 2, True),
+    "warp_fill4_rows_ground": ("sg13cmos5l_fill_4", 1.92, 2, True),
+    "warp_fill8_rows_ground": ("sg13cmos5l_fill_8", 3.84, 2, True),
 }
 for name, (master, width, rows, mirrored) in cases.items():
     source = layout.cell(master)

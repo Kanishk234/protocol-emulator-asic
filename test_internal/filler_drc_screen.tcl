@@ -6,7 +6,14 @@ gds read $::env(WARP_FILLER_GDS)
 gds read "$::env(WARP_FILLER_OUT)/filler_arrays.gds"
 drc euclidean on
 drc style drc(full)
-foreach cell {sg13cmos5l_fill_1 sg13cmos5l_fill_2 sg13cmos5l_decap_4 sg13cmos5l_decap_8 sg13cmos5l_inv_1 warp_fill1_horizontal warp_fill2_horizontal warp_fill1_rows_same warp_fill2_rows_same warp_fill1_rows_mirrored warp_fill2_rows_mirrored warp_fill1_rows_ground warp_fill2_rows_ground} {
+set cells {sg13cmos5l_fill_1 sg13cmos5l_fill_2 sg13cmos5l_fill_4 sg13cmos5l_fill_8 sg13cmos5l_decap_4 sg13cmos5l_decap_8 sg13cmos5l_inv_1}
+foreach width {1 2 4 8} {
+    foreach fixture {horizontal rows_mirrored rows_ground} {
+        lappend cells warp_fill${width}_${fixture}
+    }
+}
+lappend cells warp_fill1_rows_same warp_fill2_rows_same
+foreach cell $cells {
     puts "WARP_CELL $cell"
     load $cell
     select top cell

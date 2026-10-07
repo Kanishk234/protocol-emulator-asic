@@ -1,5 +1,23 @@
 # Compact acceptance plan and competitor research — 2026-10-06
 
+## Current checkpoint (October6, after the initial assessment)
+
+Compact37516794406 reaches0 final native routing markers,0 antenna violations
+and0 critical disconnected pins. Full geometry fails KLayout248/Magic1828/LVS67;
+9 shell slow-corner slew violations remain and configured-fabric timing is
+unproved. All248 KLayout markers associate with inserted decap fillers. The
+plain-filler-only DRC/LVS replay37552604692 is pending on an earlier3-marker
+snapshot; it cannot certify the missing final0 database.
+
+Regenerated native LUT tiles pass actual SPI-loaded UART in37552796495 and
+37553037381. Matched original-LUT resynthesis37553190074 also passes, so the
+new five-mux primitive alone is not a demonstrated cause. Expanded37553717299
+passes actual USER_RESET as well. Old physical views do not qualify either
+regenerated mapping. See [native diagnosis](compact_native_diagnosis.md) and
+[routing report](compact_route_root_causes.md) for scope and evidence.
+Frozen G1 remains the submission fallback; next steps are physical replay,
+matched reset control, synthesis isolation and matched tile hardening/timing.
+
 ## Assessment before changing the design
 
 WARP is not wholly broken: frozen G1 has a recorded clean physical CI run

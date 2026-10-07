@@ -30,6 +30,16 @@ is not a failed candidate; manual control37553190074 succeeds.
 isolate mapping differences and obtain matching hardened views before any
 promotion. Keep checking all workflow results without user reminders.
 
+**Verified follow-up:**37553717299 passes all three expanded tests. Downloaded
+and strictly parsed rtl_control/native_candidate/native_user_reset XMLs, each
+one case and no failure/error/skip. Five retained native netlists match manifest
+hashes; static inventory preserves529 configuration latches/eight user flops
+per LUT tile type, original source hashes unchanged. This is not equivalence,
+full loaded-bit audit, matching geometry or SDF timing. Original-LUT reset
+control37553979644 active; physical replay37552604692 still active. Ordinary
+lint37553717429/docs37553717453/test37553717308 pass, unit37553717264 pending.
+Pushed scoped fixes through4b55b28; final evidence note follows as docs only.
+
 ## 2026-10-06 (session58: routing closes; physical checks become the blocker)
 **Done:** proactively inspected outstanding cloud jobs.37516794406 completes: native route exit0, iteration53 reaches0markers after2h47m15s router elapsed; antenna nets/pins0, critical disconnected pins0 (7 noncritical). Whole route/geometry job19:09:17–22:25:22UTC takes3h16m05s and fails later geometry: KLayout248 (M1.a1/M1.b247), Magic1828, LVS67 (63 net differences,1 unmatched net,3 unmatched pins). LVS shows power-net mismatches; cause unproven. Extracted shell setup+12.251343397653367ns/hold+0.12463458395889776ns at20ns, but9 slow-corner slew violations and macro black-boxed: no complete timing pass. Frozen G1 unchanged; compact not promoted.
 

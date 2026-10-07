@@ -174,3 +174,21 @@ uses Yosys's default abc -liberty script. This is one candidate difference, not
 an isolated cause. LibreLane documents that its strategies select different ABC
 scripts and that the best strategy must be measured:
 [official synthesis configuration](https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html).
+
+
+**Extended verified candidate:**
+[37553717299](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37553717299)
+passes RTL control, mapped UART and mapped UART after the real USER_RESET
+command. Downloaded three explicit acceptance XMLs: each has exactly one case
+and no failure/error/skip. All five generated netlists match their recorded
+hashes; original inputs match their original hashes. Static cell inventory
+preserves 529 actual configuration latches and eight user flops in each of the
+five LUT tile types. This count audit is not equivalence or complete bit-value
+coverage. Matched original-LUT reset control37553979644 remains pending.
+
+The exact pinned LibreLane3.1.0.dev3 script is available in
+[construct_abc_script.py](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/scripts/pyosys/construct_abc_script.py).
+It builds a different AREA2 optimization/mapping sequence from the default
+ABC command. Historical tile hardening used the local3.0.0 packaging, so this
+source identifies another comparison variable; it does not reproduce the old
+flow or establish which transformation caused the observed false unknowns.

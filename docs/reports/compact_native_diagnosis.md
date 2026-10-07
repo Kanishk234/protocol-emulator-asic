@@ -125,6 +125,21 @@ cell models, full binary equivalence against FABulous LUTK, and independent
 partial-input truth-table tests. No chip/generator/model correction has been
 installed. Area, routing, timing and real loaded integration remain open.
 
+[37546784325](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37546784325)
+passes binary equivalence against pinned LUTK for every16-bit truth table and
+4-bit input, plus2916 partial-input simulations with actual pinned PDK models.
+The follow-up37552796495 regenerates scratch native LUT tile netlists and tests
+SPI-loaded UART against the unchanged RTL control. Copied macro physical views
+do not qualify those new netlists; whole loaded/physical/timing acceptance is
+still pending. Upstream change lives in patches/fabulous_lut_mux_tree.patch and
+is applied only to a separate staged source.
+
+[37546984612](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37546984612)
+checks all9164 actual configuration latches by their real frame-data/strobe
+wiring. All are known and image-matching before RUN and immediately before
+timer corruption. Native UART still fails. This closes the previous name-subset
+coverage gap without claiming a functional correction.
+
 Acceptance still requires actual native loaded behavior, zero final routing
 and physical violations, and timing through the configured fabric. The frozen
 G1 physical success does not supply those compact or native proofs.

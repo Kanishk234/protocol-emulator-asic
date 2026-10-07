@@ -32,6 +32,15 @@ uses the unchanged saved database, retains full marker coordinates/views,
 and performs no routing. Its input's3markers prevent treating it as final
 route certification. No new route or hardware change is launched here.
 
+37545941476 finishes replay with248 KLayout errors again and retains exact
+coordinates and filled physical views. Joining marker edges to its post-fill
+DEF and pinned LEF cell dimensions associates all248 with decap fillers:
+241 decap8-only,3 decap4-only,2 decap4/8 boundaries,1 decap8/fill2 boundary
+and1 decap4/fill2 boundary. Width marker is inside FILLER_185_58/decap8.
+D-048 changes only FILL_CELLS to plain fill1/fill2 for the same saved database
+and adds LVS checks.37552604692 is pending. Decap reduction's power implications
+and final native0-route/physical/timing qualification remain open.
+
 ## Evidence chain
 
 The preserved source is

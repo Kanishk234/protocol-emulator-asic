@@ -1,0 +1,50 @@
+name: compact pin containment screen
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/pin_containment_probe.tcl'
+      - '.github/workflows/pin_containment.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-pin-containment-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Authenticate retained source
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          gh run download 37668791436 -R "$GITHUB_REPOSITORY" -n compact-late-route-37668791436 -D build/pin_source
+          mkdir -p build/pin_containment
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          source=Path('build/pin_source/source_iter52.odb')
+          assert hashlib.sha256(source.read_bytes()).hexdigest()=='33dceb8d52df9d5ea8cc3741b71b9b3e1e79ae4fb95b1eb559b3ca3eb40390bc'
+          PY
+      - name: Native pin analysis with full enclosure containment
+        timeout-minutes: 10
+        run: |
+          source .venv/bin/activate
+          set -o pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e WARP_PIN_SOURCE="$GITHUB_WORKSPACE/build/pin_source/source_iter52.odb" \
+            -e WARP_PIN_OUT="$GITHUB_WORKSPACE/build/pin_containment" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            bash -c 'openroad -version | tee build/pin_containment/tool_version.txt; grep -q dcf36133 build/pin_containment/tool_version.txt && openroad -exit test_internal/pin_containment_probe.tcl' \
+            2>&1 | tee build/pin_containment/analysis.log
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-pin-containment-${{ github.run_id }}
+          path: build/pin_containment/
+          retention-days: 3

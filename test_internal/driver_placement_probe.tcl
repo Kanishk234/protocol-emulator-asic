@@ -4,7 +4,9 @@ read_liberty $::env(WARP_SCREEN_IO_LIB)
 read_db $::env(WARP_SCREEN_ODB)
 set block [ord::get_db_block]
 set out $::env(WARP_SCREEN_OUT)
-if {[check_placement -verbose] != 0} {error "Source placement is not legal"}
+# Pinned check_placement_cmd is void; illegal placement raises DPL-0033.
+# Comparing its empty successful return with numeric zero falsely fails.
+check_placement -verbose -report_file_name "$out/baseline_placement.json"
 proc normalized {name} {return [string map {\\ ""} $name]}
 proc find_unique {block name} {
     set found {}
@@ -64,7 +66,7 @@ foreach inst [$block getInsts] {
     if {[lindex $before 2] ne [$inst getOrient]} {error "Orientation changed $name"}
     if {$inst ne $driver && [lindex $before 0] ne [[$inst getMaster] getName]} {error "Unexpected master change $name"}
 }
-if {[check_placement -verbose] != 0} {error "Three-cell ECO placement is not legal"}
+check_placement -verbose -report_file_name "$out/candidate_placement.json"
 write_db "$out/placement_only.odb"
 write_def "$out/placement_only.def"
 set channel [open "$out/placement_result.json" w]

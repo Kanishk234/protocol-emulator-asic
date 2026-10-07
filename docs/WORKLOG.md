@@ -40,6 +40,17 @@ options reviewed against official docs/pinned API; tool10min/job15, no reroute.
 Analysis result must be read for inaccessible pins before any long constrained
 route. Existing native job untouched. Tcl/YAML/shell/whitespace checks pass.
 
+**Native closure verified:**37669731197 succeeds26m53s. Downloaded reports
+verify source3/bootstrap17 then7→3→3→0; fourth repair uses native stubborn
+mode. Fresh DRC0, stock antenna nets/pins0 and critical disconnected0;
+exact masters/placement/topology unchanged. Retained post-check ODB hash
+9cac79d86dd15707efdd385c32d3990347cb4695874bc802d0bfe20a5e90e9ba verified.
+Prepared D-055 fresh extraction/shell STA, measured filler policy and full
+Magic/KLayout/GDS-based shell LVS on that exact route. Older-source Magic0
+cannot be asserted as same-layout pass, so no skipped check or promotion.
+Helper gains explicit fresh-source hash/provenance metadata; original source
+mode stays default. Python AST/YAML/shell/whitespace checks pass locally.
+
 ## 2026-10-07 (session64: parallel diagnosis and independent board fix)
 **Done:** user explicitly authorized agents; assigned two bounded independent
 agents for primary-source routing research and fallback-compatible software

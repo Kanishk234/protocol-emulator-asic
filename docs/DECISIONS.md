@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-055: Validate measured filler policy on the recovered zero route
+- **Date:**2026-10-07. **Status:** accepted combined scratch physical verification under D-037; no promotion.
+- **Evidence:**37669731197 reaches fresh native0/antenna0/critical disconnected0, unchanged topology and retained checked ODB9cac79d86dd15707efdd385c32d3990347cb4695874bc802d0bfe20a5e90e9ba. Fourth late-cost pass enters stubborn flow. Separate older-source widened-filler37669173193 gives full Magic0; these results cannot be combined into a same-layout acceptance claim without fresh checks.
+- **Decision:** authenticate the actual checked0 database, perform new wire extraction/shell STA and plain-filler streamout, then apply the measured pSD overlay to fresh GDS with source hash/count/non-pSD equality checks. Run full Magic and stock KLayout/GDS-based shell LVS on that same output. Preserve stock macro abstraction and original clock target. Bound95min stage/110min standard cloud job; retain all evidence.
+- **Cost/limits:** combines separately measured decap removal and implant correction as one filler policy. Decoupling, leakage/capacitance and power/noise costs remain uncharacterized; implant changes do not increase the nominal footprint. Shell STA keeps macro black-boxed and does not prove configured-fabric timing/native function. No frozen config, cell netlist, primitive/compiler or PDK edits. No check waiver; macro timing/function and clean-source reproduction remain required even if geometry passes.
+
 ## D-054: Screen fully contained Metal1 pin access before routing
 - **Date:**2026-10-07. **Status:** accepted bounded diagnostic under D-037; frozen hardware untouched.
 - **Evidence:** exact retained37668791436 route/LEF audit reproduces two short clusters: NAND signal escape crosses its VSS spur and NOR B escape crosses C. Late-cost37669731197 remains active independently.

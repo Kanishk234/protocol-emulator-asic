@@ -24,6 +24,14 @@ is unsupported and stock KLayout does not implement that pSD rule. No waiver.
 Native regenerated mappings pass broader28 TX/28 RX plus reset checks in
 37659112021/37659171115, but copied physical views remain unqualified.
 
+**Recovered clean native route (October7):**37669731197 succeeds26m53s using
+incremental bootstrap and late-cost continuation. Fourth repair enters
+stubborn flow and reaches0; fresh full-chip native/antenna/critical disconnected
+checks all0. Checked final ODB retained/authenticated; topology unchanged.
+Independent widened-filler37669173193 clears full Magic on older3-marker
+source. Combined fresh route+filler+LVS+shell extraction under D-055 is pending;
+these separate passes do not yet certify a single complete layout or timing.
+
 **Macro placement rules learned the hard way (D-019, BUGS #9–#11):** (1) on the power-grid phase, x = 11.52 + 109.92 k; (2) the macro's pin-heavy faces (west, south for this fabric) toward open core; (3) beside the macro, no channel or one wide enough for a full grid stripe pair; (4) no `"//"` keys inside `MACROS`. Check all four locally with TT's merged config before pushing (the local flow reaches detailed routing in ~2 min).
 
 ## Hardening flow (how the fabric is integrated: flat or macro)

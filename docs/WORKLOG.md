@@ -5,13 +5,21 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (area-conscious timing follow-up)
+- Prepared bounded 125 ps event hold target between the tested 100/150 ps settings. Five CI/workflow files updated; 135 helper tests and workflow default/choice validation pass. Retained every setup/hold/physical gate; no main hardware/config edits or phase ticks.
+- Main paired RX screen37572964628 still measuring GRT/fresh timing on both branches. Unit37572948480: Python and Verilator jobs pass, Icarus chip/L3 step remains active; lint/test/docs pass.
+- Prioritized selective delay-cell sizing, measured weak-gate drive fixes and state-derived counter carry over replicated arithmetic/storage. RX prototype costs29.4% module area; full-chip overflow must justify adoption.
+- User subsequently explicitly authorized commits/pushes. Committed the verified CI group as57039a5; publishing docs separately and dispatching125ps from the original trusted event source. No main hardware inputs change.
+- Next: publish CI/docs groups, launch125ps original-event trial, inspect RX screen area/overflow/all-corner timing, and promote only after extracted timing/physical/GL evidence. Official timing remains unproven.
+
 ## 2026-10-06: Codex (RX timer late-selection prototype)
 - Routed150ps eventGL37566926287 completed22/22PASS,0FAIL/SKIP. Extracted slow setup still−0.389409ns despitepositivefast hold+0.067034ns; no timingclosure.
 - Pairedscreen37569441149completed:dropqualification setup0allcorners butfast hold−0.0184668ns versusbaseline+0.0313302ns. Refuse directrouting/promotion ofthatfailingcandidate.
 - NewRXtimer arithmetic moveslateSTARTselectionafterprecomputedvalues; preservesall sample clocks/livewrites. ModuleequivalenceFRAC4/8passes (FRAC8:226points,inductionstep1underseq2cap);20RX/fulltests,5chiptests and2048L2clocks pass locally. Mappedslowain→rt6.620677→1.943963ns,area9704.3184→12559.7682um² (+29.4%);onlymoduleprobe,fullroutingcostunknown.
 - FoundBUG73:frozen standalonepin carrier_active unconnected. Opt-inharnessconnectioncommit64fa661;mainolderinterfaceandfrozentrial20/20eachpass. Reusableverifier archivesHEADtests,sofirstreuse stillhadoldfixture;freshcommittedfixtureverification passedbothmoduleproofs,41pintests,5chiptestsand2048-clockL2.
 - Prepared pairedRX/eventscreen+routeprovenance,requiredRXhash,157helperchecks passingandworkflowparsepassed. NewreportPHASE2_RX_TIMER_LATE.md,D-075/BUG73/CLAIMS evidence recorded. No mainRTL/config/spec/templatejobs edited; no phase ticks.
-- Next: completefreshreusableverification,publishseparatetest/prototype/CI/docgroupsunderstandingapproval,andlaunch matchedRXscreenagainstevent-late.
+- Fresh reusable verification completed both named module proofs,41pin tests,5chip tests and2048L2 clocks. Published test64fa661,prototype84501b4,CI42fddb2,docs15e1d13 toremote main;HEAD/origin/main/GitHubref allmatch15e1d1344dee7da5d52671ab15288c2df9098468. Launched matchedRXscreen37572964628,event-latebaseline,queued atcheck. Newlint/test/docs/unitrunning. No mainhardwarechanges.
+- Next: inspectnewscreenallcornertimingandglobaloverflow;routeonlypassingcandidate. Keeppriorfailedcountercombinationand150pssetupregressiondistinctfromfunctional22/22GLpass.
 
 ## 2026-10-06: Codex (standing publication authorization)
 - User grants standing approval for commands, commits, pushes and workflow launches in this timing task; no repeat scoped approval needed for routine authorized work. Repository rules and evidence requirements remain otherwise intact.

@@ -1048,6 +1048,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost: isolated RX mapped area grows9704.3184→12559.7682um² (about29.4%); replicated area/wiring may cause full-chip overflow. Isolated slow a_in→rt delay falls6.620677→1.943963ns; longest a_in→any-register becomes5.907698ns at framing. These are no-wire module probes, not full-design WNS.
 - Prove FRAC4/8, run RX/full and complete chip/model tests, then compare complete event-late versus event-late+RXtimer through matched physical screens. Do not adopt on probe delay alone; retain20ns,2/4 resources and all setup/hold/physical gates.
 
+## D-076 (2026-10-06): bounded 125 ps hold target
+- General need: the 100 ps event repair misses the fresh 50 ps fast-hold gate by 1.2974 ps; 150 ps passes extracted hold but regresses slow setup to -0.389409 ns. Test an intermediate target on the original trusted event checkpoint, without assuming linear results.
+- Add optional 0.125 ns to the isolated event-late route helper/workflow. Preserve source default, one repair, zero setup target, all-corner checks, fresh fast hold >=0.05 ns and downstream physical/extracted gates. No architecture, main hardware/config or template job changes.
+- Cost: additional delay cells and wiring; compare actual buffer count, area, overflow and extracted setup/hold against 100/150 ps. No gain claimed before measurement. Helper regression: 135 tests passed.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

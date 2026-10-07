@@ -47,3 +47,9 @@ Actual extracted slow max report contains11violating entries:9dropped-counter en
 Preparing isolated event-late+drop-qual from frozenhardware. Parallel per-source drop qualification is alreadymodule-equivalent; combining it with event-late targets most failing counters while retainingliveconfig/same-cyclebehavior. It doesnotdirectlyaddress RXtimer failures andhasno measuredtiminggain. Combinedfunctionalverification mustfinish before anyphysicalscreen orpromotion.
 
 Isolatedevent-late+drop-qual prototype completed:drop-qualification equivalence passes atN1/5/6/7/9/16 (event-late unchanged frompreviousprovenpatch),channeltests pass,5/5chiptests pass,and2048clockL2lockstep passes. Rawproof/tests under /tmp/event-drop-qual-20261006. Combinedpatch `spikes/r4_floorplan/bs_event_drop_qual.patch` preparedlocally; notpublishedorregisteredinremotechoices andnotphysicallymeasured. This prototypetargetsreportedcountercone,notall11violations.
+
+## Bounded 125 ps follow-up prepared
+
+The route workflow now accepts 0.125 ns only for the trusted event-late source. Regression checks: 135 passed across post-GRT timing, placement routing and route provenance; workflow choices/default parsed and diff check passed. All gates remain intact. This local change is not published or launched yet. Use source run 37533969613, variant bs-event-late, pre_route_hold_target=0.125, repair_postantenna_hold=false after publication.
+
+Prioritize low-area alternatives if this misses either corner: target delay sizing on actual failing fast paths, strengthen only measured high-delay gates, or move dropped-counter control after state-derived carry. Each needs independent equivalence and matched physical evidence. Avoid broad buffering or new configuration storage. The RX arithmetic experiment is currently running but its isolated 29.4% area increase makes full-chip overflow an adoption gate.

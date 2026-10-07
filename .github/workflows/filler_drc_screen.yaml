@@ -1,0 +1,47 @@
+name: isolated filler Magic screen
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/filler_drc_screen.tcl'
+      - '.github/workflows/filler_drc_screen.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-filler-screen-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned untouched PDK
+        run: bash spikes/cloud/fetch_pdk.sh
+      - name: Isolated library cells with full Magic rules
+        timeout-minutes: 7
+        run: |
+          mkdir -p build/filler_drc_screen
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e WARP_FILLER_GDS="$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/gds/sg13cmos5l_stdcell.gds" \
+            -e WARP_FILLER_OUT="$GITHUB_WORKSPACE/build/filler_drc_screen" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            magic -dnull -noconsole \
+            -rcfile "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc" \
+            test_internal/filler_drc_screen.tcl > build/filler_drc_screen/magic.log 2>&1
+          for cell in fill_1 fill_2 decap_4 decap_8 inv_1; do
+            test -s "build/filler_drc_screen/sg13cmos5l_${cell}.rpt"
+          done
+          sha256sum "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/gds/sg13cmos5l_stdcell.gds" \
+            "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l-drc.tech" \
+            "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l-cifout.tech" \
+            > build/filler_drc_screen/input_hashes.txt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: isolated-filler-drc-${{ github.run_id }}
+          path: build/filler_drc_screen/
+          retention-days: 3

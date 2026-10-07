@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-054: Screen fully contained Metal1 pin access before routing
+- **Date:**2026-10-07. **Status:** accepted bounded diagnostic under D-037; frozen hardware untouched.
+- **Evidence:** exact retained37668791436 route/LEF audit reproduces two short clusters: NAND signal escape crosses its VSS spur and NOR B escape crosses C. Late-cost37669731197 remains active independently.
+- **Decision:** on authenticated original iteration52 ODB, run native pin_access with via-only Metal1 access and fully contained via enclosures on Metal1, using pinned tool/API. Source hash binds recent retained source copy. Do not reroute in this preflight; inspect warnings/statistics and retain generated AP database. Bound10min tool/15min job on standard free runner. A green job means analysis completed, not route closure or every target pin is qualified.
+- **Costs/limits:** no added cells/footprint/resources; tighter access may reduce choices, increase upper-metal congestion/delay or make pins inaccessible. All bitstreams pay any eventual routing cost. Preserve same clock, pin connectivity and PDK rules. Further routing requires native0, antenna/critical connectivity, full DRC/LVS and fresh extracted/configured timing. No performance claim or promotion.
+- **Primary source:** [OpenROAD pin-access arguments](https://openroad.readthedocs.io/en/latest/main/src/drt/README.html#pin-access-arguments); pinned dcf36133 TritonRoute.tcl exposes the same options. No upstream edit or acceptance exception.
+
 ## D-053: Screen late repair costs instead of restarting the early schedule
 - **Date:**2026-10-07. **Status:** accepted bounded scratch measurement under D-037; no frozen hardware change.
 - **Evidence:**37657068016 stock reload restarts track assignment/optimization0 and ends5 markers after17 iterations. Original37516794406 reaches0 only after iteration53. Pinned OpenROAD dcf36133 initialization resets schedule state; checkpoint ODB is not a serialized router-state continuation.

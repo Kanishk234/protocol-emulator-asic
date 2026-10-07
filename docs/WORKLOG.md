@@ -34,6 +34,12 @@ B-to-C pin short boxes; documents a concrete next access hypothesis if active
 late-cost repair fails. Source/clock/RTL untouched. Python/YAML/shell checks
 pass locally. Native37669731197 still active.
 
+**Next independent preflight:** D-054 prepares native pin_access with fully
+contained Metal1 via enclosures on the authenticated source. Exact standard
+options reviewed against official docs/pinned API; tool10min/job15, no reroute.
+Analysis result must be read for inaccessible pins before any long constrained
+route. Existing native job untouched. Tcl/YAML/shell/whitespace checks pass.
+
 ## 2026-10-07 (session64: parallel diagnosis and independent board fix)
 **Done:** user explicitly authorized agents; assigned two bounded independent
 agents for primary-source routing research and fallback-compatible software

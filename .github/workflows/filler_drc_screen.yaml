@@ -5,6 +5,7 @@ on:
     paths:
       - 'test_internal/filler_drc_screen.tcl'
       - 'test_internal/filler_array_screen.py'
+      - 'patches/ihp_filler_psd_trial.py'
       - '.github/workflows/filler_drc_screen.yaml'
   workflow_dispatch:
 permissions:
@@ -57,6 +58,13 @@ jobs:
           test -s "build/filler_drc_screen/$maskhints/warp_fill2_rows_same.rpt"
           for gap in 005 030 300; do
             test -s "build/filler_drc_screen/$maskhints/warp_fill2_ground_gap${gap}.rpt"
+          done
+          test -s "build/filler_drc_screen/$maskhints/warp_fill2_ground_flat.rpt"
+          for width in 1 2; do
+            test -s "build/filler_drc_screen/$maskhints/wp_sg13cmos5l_fill_${width}_psd_trial.rpt"
+            for fixture in horizontal rows_mirrored rows_ground; do
+              test -s "build/filler_drc_screen/$maskhints/warp_trial${width}_${fixture}.rpt"
+            done
           done
           done
           sha256sum "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/gds/sg13cmos5l_stdcell.gds" \

@@ -21,6 +21,14 @@ explicitly; checked channel reads distinguish valid zero from empty. Loader
 validation rejects negative chunk sizes and truncating fields. These work on
 the fallback, with31 local host tests passing and hosted unit37651173601 green.
 
+An independent divide-by-eight capture image now fits frozen G1 at86/88LCs
+and passes real SPI-loaded RTL/source-queue checks in37659595436. It doubles
+the counter period at the cost of one LC and coarser timestamps. Regenerated
+native mappings pass28 TX/28 RX plus reset coverage in37659112021/37659171115;
+their physical views remain unqualified. Tiny mirrored filler-ground fixtures
+reproduce Magic's rule across all four filler widths, so a width-only swap
+is unsupported. Compact physical/configured timing acceptance remains open.
+
 ## Goal
 Make WARP's design choice, results, limits and use understandable to a judge, and make the simulation results reproducible from a clean source tree.
 

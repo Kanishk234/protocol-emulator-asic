@@ -1,5 +1,23 @@
 # G1 UART plus bounded event timestamp capture
 
+## Verified divide-by-eight option (October7)
+
+[37659595436](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37659595436)
+freshly compiles/audits `prescaled8.yaml` with six timestamp bits and shift3.
+It fits86/88LCs,2/2timers,2/2shifts,17/36IOBELs and1/4global buffers.
+Downloaded source queue and actual SPI-loaded RTL XML each contain exactly
+one passing case, no failure/error/skip. Loaded checks cover concurrent UART,
+capture overflow/order/backpressure, wrap, fractional interval quantization,
+normal RX, USER_RESET and STOP parking through top-level ports.
+
+Counter period512 clocks versus256 for the divide-by-four image in37512249763;
+resource cost rises85→86LCs on the identical frozen chip. Eight-clock ticks
+trade interval precision for a longer range. The host decoder requires a
+known maximum gap≤504 clocks to exclude hidden wraps at every counter phase.
+Timestamp bytes alone cannot establish that bound or recover missing wraps.
+Compiler Fmax remains an estimate; no new gate/SDF, configured STA or silicon
+claim. No hardware or fixed architecture-comparison workload change.
+
 Local runs `uart_capture_20261005`, `uart_capture6_20261005` and
 `uart_capture6_final_20261005`, 2026-10-05. User bitstream only; frozen chip
 hardware and fixed architecture-comparison workload list are unchanged.

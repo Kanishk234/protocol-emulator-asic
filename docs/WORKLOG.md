@@ -87,6 +87,27 @@ STOP through existing top-port test. No new chip hardware or architecture.
 Documents mark candidate pending; artifacts exclude raw bitstreams. Static
 syntax checks only locally; cloud acceptance required before claiming usability.
 
+**Native stress verified:**37659112021 mux_tree and37659171115 original_control
+both pass RTL/native/native USER_RESET triplets. Downloaded manifests/XMLs and
+actual simulator logs verify28 TX/28 RX bytes in all three cases per run,
+no failure/error/skipped cases. This strengthens functional coverage without
+establishing mux necessity, broader protocol coverage or new physical timing.
+Extended capture37659595436 now green; artifact verification next. Bounded
+route37657068016 still native-active at latest check. Prepared read-only
+ground-boundary polygon export and5/30/300nm synthetic row-gap controls;
+no real chip row spacing changed, and new spacing/abutment failures remain
+acceptance failures to diagnose. Syntax checks pass locally.
+
+**Capture verified:** downloaded37659595436: strict source queue and loaded
+XMLs each one passing case/no failure/error/skip. Compiled/audited shift3
+image uses86/88LCs versus85/88 for shift2 in37512249763; same frozen hardware.
+Counter period512 clocks/eight-clock quantization; decoder known max gap504.
+Updated README/report/claims with scope and evidence. Latest lint37659595251/
+docs37659595258/test37659595277/unit37659595335/capture queue37659595221 green;
+fabric37659595241 and frozen-design gds37659595229 active. No phase boxes
+ticked. Next inspect native repair and synthetic gap/polygon reports, then
+choose a physically validated remedy for the reproduced filler boundary.
+
 ## 2026-10-07 (session61: short electrical screen while physical checks run)
 **Done:** proactively inspected corrected geometry37648945387, still active.
 Explained that this replay skips detailed routing; previous physical-only job

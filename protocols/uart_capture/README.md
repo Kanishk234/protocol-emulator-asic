@@ -90,12 +90,13 @@ contract; its tests verify arithmetic and validation, not new hardware rates.
 
 ## Divide-by-eight candidate
 
-`prescaled8.yaml` is an experimental six-bit timestamp image with
+`prescaled8.yaml` is a six-bit timestamp image with
 `STAMP_SHIFT=3`. It targets a512-clock counter period, with eight-clock
 quantization. The host decoder needs `--stamp-shift 3` and a known maximum
 gap of at most504 clocks; the stream cannot reveal extra full wraps.
-The `extended capture image` cloud workflow must compile and audit the image,
-check source queue boundaries and pass the existing real SPI-loaded capture
-test before this configuration is treated as usable. Fit and timing are
-pending measurements. This changes only the user bitstream, so the frozen G1
-hardware can run it if those checks pass.
+[Cloud37659595436](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37659595436)
+compiles/audits it at86/88 logic cells and passes source queue boundaries plus
+the real SPI-loaded RTL capture test. It uses one more logic cell than the
+divide-by-four image measured in37512249763, for twice the counter period
+and coarser timestamps. Hardware is unchanged. These are loaded simulation
+results and compiler timing estimates; no new gate/SDF or silicon result.

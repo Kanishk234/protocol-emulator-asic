@@ -10,6 +10,18 @@ slack+12.251343397653367/+0.12463458395889776ns at20ns, with9 slow-corner
 slew violations; macro black-boxed. No compact physical, complete timing or
 native-function pass. See compact_route_root_causes.md.
 
+**October7 follow-ups:** no-decap replay37648945387 takes18m02s, verifies
+0decaps/20714plain fillers and reports KLayout0/LVS12/Magic6350. Its source
+still3 native shorts. Fifteen-minute cleanup37652533986 reaches the same3
+shorts and is cut off during stubborn repair; the earlier successful final
+repair pass took50m43s. Follow-up37657068016 gives a retained intermediate
+80minute routing cap before acceptance-gated geometry. Standard cloud only.
+Tiny full-style Magic37657638270/37658318703 reproduces pSD.e/f at ground-
+sharing mirrored filler boundaries for fill1/2/4/8; width-only replacement
+is unsupported and stock KLayout does not implement that pSD rule. No waiver.
+Native regenerated mappings pass broader28 TX/28 RX plus reset checks in
+37659112021/37659171115, but copied physical views remain unqualified.
+
 **Macro placement rules learned the hard way (D-019, BUGS #9–#11):** (1) on the power-grid phase, x = 11.52 + 109.92 k; (2) the macro's pin-heavy faces (west, south for this fabric) toward open core; (3) beside the macro, no channel or one wide enough for a full grid stripe pair; (4) no `"//"` keys inside `MACROS`. Check all four locally with TT's merged config before pushing (the local flow reaches detailed routing in ~2 min).
 
 ## Hardening flow (how the fabric is integrated: flat or macro)

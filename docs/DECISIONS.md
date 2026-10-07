@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-052: Measure wider filler pSD geometry in scratch fixtures
+- **Date:**2026-10-07. **Status:** accepted isolated diagnostic under D-037; no chip promotion.
+- **Evidence:**37657638270/37658318703 reproduce17 pSD.e/f boxes at correctly mirrored ground boundaries for fill1/2/4/8. 37660478954 synthetic5/30nm gaps produce81 boxes;300nm gives32 contact-spacing boxes. Neither width nor gaps qualify. Exported polygons show N+ diffusion bordering both sides of the shared ground pSD stripe.
+- **Decision:** clone pinned fill1/fill2 only in synthetic fixture GDS; add a0.30um inward pSD extension through our patches/ helper, leaving original PDK files untouched. Require identical non-pSD regions and bounding boxes; record added implant area and source hash. Include geometry-identical flattened ground-pair control with per-layer XOR checks, untouched library fixtures and invalid-orientation positive control. Run full pinned Magic rules with both import controls on free standard runners.
+- **Costs/limits:** nominal footprint and logic resources unchanged; broader implant can change junction capacitance, leakage, diffusion interpretation and density. All protocols pay any eventual physical cost. No measured chip power/area/timing benefit, primitive or architecture-contract change. Fixture report success is not DRC acceptance. Chip use requires full DRC/LVS, legal placement/power connectivity, fresh native routing and extracted timing; no waiver or upstream in-place modification.
+- **Attribution:** geometry derives from IHP-Open-PDK2bbec755dc67ca3db0261c3d6163e15735d66710, Apache-2.0; upstream licenses remain in the fetched PDK. Overlay code lives in patches/ihp_filler_psd_trial.py.
+
 ## D-051: Isolate the Magic filler rule without changing hardware
 - **Date:**2026-10-07. **Status:** accepted diagnostic under D-037.
 - **Evidence:**37648945387 has6350 Magic pSD.e boxes, all overlapping plain top-level fillers; none inside macro bounds. Pinned KLayout shared pSD deck implements only pSD.c1, so its zero does not clear pSD.e/f.

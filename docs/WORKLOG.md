@@ -2,6 +2,30 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session63: inspect fresh route failure and isolate filler remedy)
+**Done:** checked newly failed37657068016 and downloaded artifact. Job32m09s,
+router29m42s, exit2 because5 native routing violations, not timeout. Both
+stubborn passes finish (~7m55s/~7m34s) without eliminating markers. Remaining
+2 Metal2 shorts join shell_0489_/_0490_ near(59,474.2);3 Metal2 spacing markers
+involve CRC r[29]/clock near(39.2–40.4,451.4–452.2). Antenna0/critical
+disconnected0; geometry correctly skipped. Collector now retains checked final
+ODB hash785a0afb8ab8e09e9c8db2c11dde54155aeba06f46979abd2599921d047be7f5,
+not merely intermediate iteration17. No physical or configured timing pass.
+Ordinary latest lint/docs/test/unit/capture queue green; fabric and frozen
+G1 gds remain active. No identical route retry queued.
+
+Verified gap37660478954 yields81 boxes at5/30nm and32 contact-spacing boxes
+at300nm; gap-only policy rejected. Prepared D-052 wider pSD scratch clones
+plus geometry-identical flattened control. Non-pSD layer XOR and unchanged
+bbox/source hash assertions; full Magic controls, original positive invalid
+fixture retained. Code in patches/, upstream unchanged. Python AST/YAML/shell
+checks local; all EDA executes on standard hosted runners. Frozen hardware
+and ongoing jobs unchanged.
+**Boxes ticked:** none.
+**Next:** inspect hosted flattened/pSD trial reports; select targeted routing
+repair using remaining marker geometry rather than repeating identical cleanup.
+Native all-check closure, whole-chip filler DRC/LVS and configured timing remain open.
+
 ## 2026-10-07 (session62: identify residual shorts and screen filler abutments)
 **Done:** proactively checked hosted outcomes after user asked to continue.
 Initial GitHub request stalled; retried with explicit network time limits.

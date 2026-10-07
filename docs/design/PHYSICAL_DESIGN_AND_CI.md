@@ -14,8 +14,10 @@ native-function pass. See compact_route_root_causes.md.
 0decaps/20714plain fillers and reports KLayout0/LVS12/Magic6350. Its source
 still3 native shorts. Fifteen-minute cleanup37652533986 reaches the same3
 shorts and is cut off during stubborn repair; the earlier successful final
-repair pass took50m43s. Follow-up37657068016 gives a retained intermediate
-80minute routing cap before acceptance-gated geometry. Standard cloud only.
+repair pass took50m43s. Follow-up37657068016 completes32m09s, fails5 native routing markers
+(2 Metal2 shell shorts and3 Metal2 CRC/clock spacing errors); antenna0 and
+critical disconnected0. Both stubborn passes completed within80minute cap.
+Geometry correctly skipped; final checked views/hashes retained. Standard cloud only.
 Tiny full-style Magic37657638270/37658318703 reproduces pSD.e/f at ground-
 sharing mirrored filler boundaries for fill1/2/4/8; width-only replacement
 is unsupported and stock KLayout does not implement that pSD rule. No waiver.

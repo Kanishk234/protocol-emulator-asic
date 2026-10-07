@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session66: access restored; same-layout physical closure)
+**Done:** user requested continued work and explanation of the review limit.
+Fresh authorized GitHub retry succeeds; no bypass used. Downloaded successful
+37674839060 evidence and previously blocked37673567925 failed report. New
+native0 source gives Magic0/KLayout0/GDS-based shell LVS0 in22m14s; final GDS
+hash7475586c234ce15f0d51b47a9882990b58a703e9c4f387083bd3f09aa4cf7a7a.
+All supplied shell setup/hold corners pass at20ns, but slow slew9 and fanout33
+remain. Old3-marker source has LVS16/power pin matching failure; exact cause
+not isolated. Latest frozen G1 gds37659595229 and HEAD33191 lint/docs/test/unit
+pass. Native resynthesis stress37659112021/37659171115 both pass, but those
+netlists still lack matching physical views. Recorded rejected containment
+pins, claim/report/phase summary and physical run duration; no phase box ticked.
+Prepared D-049 same-wire driver refresh on authenticated new extracted ODB
+02b8bd30f3fb12e4a66e2322b5f3906c236dd93eed8b8cd1eeeff95f6e796a61,
+strict physical-source and nine-pin checks, hash-recorded SPEF/SDC, standard
+cloud20min bound. Python AST/YAML/whitespace checks pass locally; no local EDA.
+**Next:** read fresh driver screen; if promising, prepare one-cell physical
+resize/legalization/routing/extraction with unchanged gates. Matching native
+tile hardening, configured timing, precheck and clean reproduction remain
+required before any compact promotion. No current failure is waived.
+
 ## 2026-10-07 (session65: continue physical closure and loaded phase stress)
 **Done:** proactively checked current runs/failures at user's request to
 continue without repeated confirmation. Native late repair37669731197 and
@@ -50,6 +71,24 @@ Magic/KLayout/GDS-based shell LVS on that exact route. Older-source Magic0
 cannot be asserted as same-layout pass, so no skipped check or promotion.
 Helper gains explicit fresh-source hash/provenance metadata; original source
 mode stays default. Python AST/YAML/shell/whitespace checks pass locally.
+
+**Latest failure audit:** pin-containment37673914480 fails DRT-0073 for
+sg13cmos5l_nand4_1 A pins u_cfg.u_fsm._097_ and
+u_cfg.g_col[0].u_col._24_; downloaded analysis log confirms no access.
+Reject global containment hypothesis; no constrained reroute or waiver.
+Older-layout GDS/LVS37673567925 also fails, but its report download was not
+executed: automatic approval review hit an account usage limit, explicitly
+a review failure rather than an unsafe-action judgment. Its exact failure
+cause remains unknown; do not infer LVS counts or bypass the review.
+Fresh same-layout verification37674839060 was active at the last successful
+GitHub audit, alongside redundant older-layout Magic37674839230. Current
+statuses cannot be refreshed while approval review is unavailable.
+All scoped changes through33191e2 were pushed before that limit; these latest
+evidence notes are local. No boxes ticked. Next: when review is available,
+inspect fresh clean-layout checks and download the failed older-layout
+report, cancel only redundant older Magic if still active, and repair the
+specific remaining failure. Native0, older-source Magic0 and48 UART phase
+cases remain separate verified results, not full combined acceptance.
 
 ## 2026-10-07 (session64: parallel diagnosis and independent board fix)
 **Done:** user explicitly authorized agents; assigned two bounded independent

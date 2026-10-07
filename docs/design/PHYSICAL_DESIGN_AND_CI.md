@@ -176,3 +176,10 @@ to64 repair iterations, not a completed zero-marker result. Prior compact
 131m58s/174m51s attempts explain the possible scale, not an ETA or convergence
 guarantee. See hosted experiment report for current status; older "not running"
 statements above describe the earlier local runs.
+
+October7 recovered-route verification37674839060 succeeds22m14s after
+native repair37669731197 (26m53s). Fresh full Magic0/KLayout0/GDS-based shell
+LVS0 on the actual recovered route and measured scratch filler policy.
+Shell setup/hold pass all supplied corners at20ns, but slew9/fanout33 remain;
+configured fabric timing/function and clean reproduction remain open. Exact
+hashes, corners and scope: docs/reports/compact_clean_layout_20261007.md.

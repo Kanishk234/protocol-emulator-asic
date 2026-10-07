@@ -85,6 +85,13 @@ RTL-fabric/no-SDF limits and do not replace the open clean-machine/CI gates.
 Evidence: `docs/reports/g1_uart_capture.md`.
 
 ## What's left
+October7: the compact scratch checkpoint now passes native routing and full
+Magic/KLayout/shell LVS on one recovered layout (37669731197/37674839060).
+Shell setup/hold pass, but electrical limits and configured-fabric function/
+timing still prevent promotion. Frozen G1 remains the fallback. New48-case
+loaded UART phase/read-delay stress passes37671919707. See
+docs/reports/compact_clean_layout_20261007.md for the exact remaining gates.
+
 - Repeat in a clean machine or container to satisfy the checklist literally.
 - Finish the numerical-source audit in `docs/EVIDENCE.md` and run CI for the new verification and documentation changes.
 - Tick the remaining Phase 5 exit items only after that evidence exists.

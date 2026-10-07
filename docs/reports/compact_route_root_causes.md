@@ -337,3 +337,28 @@ support a via-only access layer and a fully contained via-enclosure range.
 A constrained-via experiment still needs access for every pin, native0,
 antenna/connectivity, full geometry/LVS and new extraction/timing. It is a
 pending hypothesis; no setting has been promoted or tool rule waived.
+
+**Follow-up results:** native repair
+[37669731197](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37669731197)
+passes in26m53s: source3/bootstrap17, then7→3→3→0 with the fourth repair
+entering stubborn mode. Fresh native DRC0, antenna nets/pins0 and critical
+disconnected0; masters, placement and connectivity unchanged. Checked ODB
+SHA2569cac79d86dd15707efdd385c32d3990347cb4695874bc802d0bfe20a5e90e9ba.
+This closes the native escape shorts; full geometry/LVS and configured
+timing remain separate requirements.
+
+Global fully-contained Metal1 via screen
+[37673914480](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37673914480)
+fails DRT-0073 for A of u_cfg.u_fsm._097_ and
+u_cfg.g_col[0].u_col._24_, both sg13cmos5l_nand4_1. Its retained analysis.log
+reports no access point. Reject this global policy; no long constrained
+route follows and no access rule is relaxed. The successful native repair
+does not use it.
+
+Fresh same-layout physical verification
+[37674839060](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37674839060)
+was active at the last audit: new extraction/shell STA, measured filler
+policy, full Magic and stock KLayout/GDS-based shell LVS on the actual native0
+route. Older-source GDS/LVS37673567925 failed; report retrieval was blocked
+by an automatic approval-review usage limit, so its exact cause is unknown.
+No same-layout geometry/LVS or configured-fabric timing pass is claimed.

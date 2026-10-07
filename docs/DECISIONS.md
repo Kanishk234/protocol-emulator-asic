@@ -8,12 +8,16 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** authenticate the actual checked0 database, perform new wire extraction/shell STA and plain-filler streamout, then apply the measured pSD overlay to fresh GDS with source hash/count/non-pSD equality checks. Run full Magic and stock KLayout/GDS-based shell LVS on that same output. Preserve stock macro abstraction and original clock target. Bound95min stage/110min standard cloud job; retain all evidence.
 - **Cost/limits:** combines separately measured decap removal and implant correction as one filler policy. Decoupling, leakage/capacitance and power/noise costs remain uncharacterized; implant changes do not increase the nominal footprint. Shell STA keeps macro black-boxed and does not prove configured-fabric timing/native function. No frozen config, cell netlist, primitive/compiler or PDK edits. No check waiver; macro timing/function and clean-source reproduction remain required even if geometry passes.
 
+- **Verified result:**37674839060 succeeds22m14s: native0 source, fresh Magic0/KLayout0/GDS-based shell LVS0, final GDS7475586c234ce15f0d51b47a9882990b58a703e9c4f387083bd3f09aa4cf7a7a. Fresh shell setup/hold pass all supplied corners, but slow slew9/fanout33 remain. See compact_clean_layout_20261007.md. No configured timing/native-function or successor promotion follows.
+
 ## D-054: Screen fully contained Metal1 pin access before routing
 - **Date:**2026-10-07. **Status:** accepted bounded diagnostic under D-037; frozen hardware untouched.
 - **Evidence:** exact retained37668791436 route/LEF audit reproduces two short clusters: NAND signal escape crosses its VSS spur and NOR B escape crosses C. Late-cost37669731197 remains active independently.
 - **Decision:** on authenticated original iteration52 ODB, run native pin_access with via-only Metal1 access and fully contained via enclosures on Metal1, using pinned tool/API. Source hash binds recent retained source copy. Do not reroute in this preflight; inspect warnings/statistics and retain generated AP database. Bound10min tool/15min job on standard free runner. A green job means analysis completed, not route closure or every target pin is qualified.
 - **Costs/limits:** no added cells/footprint/resources; tighter access may reduce choices, increase upper-metal congestion/delay or make pins inaccessible. All bitstreams pay any eventual routing cost. Preserve same clock, pin connectivity and PDK rules. Further routing requires native0, antenna/critical connectivity, full DRC/LVS and fresh extracted/configured timing. No performance claim or promotion.
 - **Primary source:** [OpenROAD pin-access arguments](https://openroad.readthedocs.io/en/latest/main/src/drt/README.html#pin-access-arguments); pinned dcf36133 TritonRoute.tcl exposes the same options. No upstream edit or acceptance exception.
+
+- **Verified rejection:**37673914480 fails native DRT-0073: inputs A of u_cfg.u_fsm._097_ and u_cfg.g_col[0].u_col._24_ (both sg13cmos5l_nand4_1) have no access point. Downloaded analysis.log identifies both pins; no AP database or reroute completed. Reject this global containment policy rather than launch a long route with inaccessible pins. Independently,37669731197 already passes fresh native routing0 without this policy. No rule or access gate relaxed.
 
 ## D-053: Screen late repair costs instead of restarting the early schedule
 - **Date:**2026-10-07. **Status:** accepted bounded scratch measurement under D-037; no frozen hardware change.
@@ -463,6 +467,15 @@ pins and the stronger same-wire driver has0 slew violations. Both retain33
 fanout violations. Inputs/report artifacts downloaded and parsed. This is
 slow-corner shell-only old-wire estimation, not a routed resized driver,
 configured-fabric or all-corner timing pass. No master change promoted.
+
+**Fresh-source follow-up:**37674839060 now supplies recovered-route physical
+checks0 and new extracted wires, still with9 slow-corner slew violations.
+Refresh the same in-memory driver comparison using authenticated extracted
+ODB02b8bd30f3fb12e4a66e2322b5f3906c236dd93eed8b8cd1eeeff95f6e796a61
+and hash-recorded SPEF/SDC. Bounded standard cloud job20min; no saved modified
+DB, physical legalization or promotion. Retain exact nine-pin reproduction
+gate and fanout reporting; the prior old-wire result alone cannot qualify a
+resize on the newly recovered layout.
 
 ## D-050: Bounded repair and evidence recovery from the near-finished route
 - **Date:**2026-10-07. **Status:** accepted isolated cloud experiment; no hardware promotion.

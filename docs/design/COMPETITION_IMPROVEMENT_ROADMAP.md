@@ -157,3 +157,27 @@ and truncated word/architecture fields (BUG42). All31 host tests and CLI
 examples pass locally with lightweight Python only; hosted verification pending.
 These improvements apply to the fallback without chip changes. They do not
 increase queue depth, host bandwidth or validated hardware rates.
+
+## October7 verified progress and research follow-up
+
+The divide-by-eight capture image passes actual compile/load/queue checks in
+37659595436 at86/88 LCs, with512-clock counter period and8-clock resolution.
+This extends range over the verified85-LC divide-by-four image at the cost
+of one LC and coarser quantization; it does not deepen the queue or qualify
+physical timing. Native UART stress37659112021/37659171115 verifies28 TX and
+28 RX bytes in both regenerated mappings under the documented diagnostic
+harness. The board loader now also receives unsigned/chunk/length validation
+before device I/O (BUG44);317 local board/host tests pass, cloud pending.
+
+Additional primary-source ideas researched with bounded independent agents:
+
+| Source | Concrete fallback-compatible next experiment | Acceptance/limit |
+|---|---|---|
+| [FABulous outer-row discussion830](https://github.com/FPGA-Research/FABulous/discussions/830) | Compile paired images that intentionally differ at first/last-row I/O configuration and verify changed outputs after real SPI loading | Safeguard against omitted border bits; no evidence our pinned generator has the reported bug. Retain config mapping/mutation evidence. |
+| [Tiny FABulous simulation](https://github.com/mole99/tt-fabulous-sky-26a#simulate-the-fabric) | Use fast preconfigured simulation for localization, then repeat real-upload RTL and native gates | Fast emulation does not substitute for real loader acceptance or configured timing. |
+| [PRISM documentation](https://www.tinytapeout.com/chips/ttihp26b/tt_um_pettit_prism_lite) | Retain deterministic seed, host status, channel bytes and existing capture events when a test fails | Software observability only; no new hard debugger or deep memory promised. |
+| [Competitor architecture](https://github.com/derek-suwho/protocol-emulator-asic/blob/main/docs/architecture.md) | Sweep bounded clock phase/backpressure and exact transition boundaries against independent models on existing design-set protocols | Record seeds and counterexamples; do not tune new hardware or held-out protocols. |
+
+These are pending experiments, not equal-area rankings or fixes for foundry
+geometry. Physical priority remains targeted native repair, full-layout filler
+DRC/LVS and configured-fabric timing. Existing frozen G1 is retained.

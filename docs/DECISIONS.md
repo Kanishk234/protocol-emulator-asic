@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-053: Screen late repair costs instead of restarting the early schedule
+- **Date:**2026-10-07. **Status:** accepted bounded scratch measurement under D-037; no frozen hardware change.
+- **Evidence:**37657068016 stock reload restarts track assignment/optimization0 and ends5 markers after17 iterations. Original37516794406 reaches0 only after iteration53. Pinned OpenROAD dcf36133 initialization resets schedule state; checkpoint ODB is not a serialized router-state continuation.
+- **Decision:** authenticate original iteration52 hash33dceb8d52df9d5ea8cc3741b71b9b3e1e79ae4fb95b1eb559b3ca3eb40390bc; reproduce3 source markers. Bootstrap native incremental mode then test two late-cost steps (offsets-2/-3,32 maze iterations,DRC/marker/fixed-shape costs256/256/800,decay.999). These are experimental exposed algorithm APIs, not exact continuation53. Audit unchanged masters/placement/net connectivity, commit final views, require step count and fresh whole-chip native DRC0, then stock antenna/critical-connectivity checks. Pin container/tool, cap native step80min, retain source/reports/views.
+- **Cost/limits:** standard runner time; no new cells/resources, bitstream or clock-target change. Different routing can alter parasitics and rates; no geometry/LVS/native-function/configured timing acceptance inferred. Follow-up must pass full physical checks and extracted timing. Do not copy prior-art disconnected-pin/PDN check exceptions.
+- **Primary sources:** [schedule](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/drt/src/dr/FlexDR.cpp), [costs](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/drt/src/global.h), [step initialization/commit](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/drt/src/TritonRoute.cpp). Upstream files are read-only; our Tcl lives in test_internal/.
+
 ## D-052: Measure wider filler pSD geometry in scratch fixtures
 - **Date:**2026-10-07. **Status:** accepted isolated diagnostic under D-037; no chip promotion.
 - **Evidence:**37657638270/37658318703 reproduce17 pSD.e/f boxes at correctly mirrored ground boundaries for fill1/2/4/8. 37660478954 synthetic5/30nm gaps produce81 boxes;300nm gives32 contact-spacing boxes. Neither width nor gaps qualify. Exported polygons show N+ diffusion bordering both sides of the shared ground pSD stripe.

@@ -23,6 +23,16 @@ review; no identical route rerun or unverified acceptance claim.
 **Next:** read layer-delta report from full-chip trial, run verified targeted
 late-schedule repair in cloud, check board hosted result and ongoing regressions.
 
+**Parallel research/action:** verified pinned OpenROAD schedule and prepared
+D-053 native late-cost bootstrap plus two late repair steps from original
+3-marker iteration52, with exact topology/master/placement checks and a fresh
+whole-chip native DRC gate. Pinned80minute hosted cap; downstream stock antenna/
+critical disconnected gates retained; no geometry/timing claim. Tcl completeness,
+Python AST, workflow YAML and shell syntax pass locally. Two agents completed;
+no extra agent fan-out. Added source-linked border-config, failure-trace and
+clock-phase/backpressure ideas to existing improvement roadmap; pending tests,
+not accepted hardware changes or competitor rankings.
+
 ## 2026-10-07 (session63: inspect fresh route failure and isolate filler remedy)
 **Done:** checked newly failed37657068016 and downloaded artifact. Job32m09s,
 router29m42s, exit2 because5 native routing violations, not timeout. Both

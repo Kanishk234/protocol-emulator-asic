@@ -45,12 +45,16 @@ jobs:
             magic -dnull -noconsole \
             -rcfile "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc" \
             test_internal/filler_drc_screen.tcl > "build/filler_drc_screen/$maskhints/magic.log" 2>&1
-          for cell in fill_1 fill_2 decap_4 decap_8 inv_1; do
+          for cell in fill_1 fill_2 fill_4 fill_8 decap_4 decap_8 inv_1; do
             test -s "build/filler_drc_screen/$maskhints/sg13cmos5l_${cell}.rpt"
           done
-          for fixture in fill1_horizontal fill2_horizontal fill1_rows_same fill2_rows_same fill1_rows_mirrored fill2_rows_mirrored fill1_rows_ground fill2_rows_ground; do
-            test -s "build/filler_drc_screen/$maskhints/warp_${fixture}.rpt"
+          for width in 1 2 4 8; do
+          for fixture in horizontal rows_mirrored rows_ground; do
+            test -s "build/filler_drc_screen/$maskhints/warp_fill${width}_${fixture}.rpt"
           done
+          done
+          test -s "build/filler_drc_screen/$maskhints/warp_fill1_rows_same.rpt"
+          test -s "build/filler_drc_screen/$maskhints/warp_fill2_rows_same.rpt"
           done
           sha256sum "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/gds/sg13cmos5l_stdcell.gds" \
             "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l-drc.tech" \

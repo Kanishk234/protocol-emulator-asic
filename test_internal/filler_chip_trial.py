@@ -33,7 +33,8 @@ for width_id, width in ((1, 0.48), (2, 0.96)):
     manifest.append(record)
 counts = dict.fromkeys(replacements, 0)
 for cell in list(layout.each_cell()):
-    for inst in cell.each_inst():
+    # Changing a master can reorder the live instance iterator.
+    for inst in list(cell.each_inst()):
         old = inst.cell_index
         if old in replacements:
             if inst.is_regular_array():
@@ -42,10 +43,19 @@ for cell in list(layout.each_cell()):
             inst.cell_index = replacements[old]
 if sorted(counts.values()) != [464, 20250]:
     raise RuntimeError(f"Unexpected source filler inventory: {counts}")
-for layer, region in before.items():
-    if not (region ^ pya.Region(top.begin_shapes_rec(layer))).is_empty():
-        raise RuntimeError("Whole chip changed on a non-pSD layer")
 out = Path(os.environ["WARP_FILLER_OUT"])
+differences = []
+for layer, region in before.items():
+    after = pya.Region(top.begin_shapes_rec(layer)).merged()
+    delta = region ^ after
+    if not delta.is_empty():
+        differences.append({"layer": str(layout.get_info(layer)),
+                            "before_area_dbu2": region.area(), "after_area_dbu2": after.area(),
+                            "delta_area_dbu2": delta.area(), "delta_bbox": str(delta.bbox()),
+                            "sample_polygons": [str(polygon) for polygon in list(delta.each())[:4]]})
+(out / "non_psd_xor.json").write_text(json.dumps(differences, indent=2) + "\n")
+if differences:
+    raise RuntimeError("Whole chip changed on a non-pSD layer; see non_psd_xor.json")
 layout.write(str(out / "chip_trial.gds"))
 (out / "chip_trial_manifest.json").write_text(json.dumps({
     "source_run": 37648945387, "source_sha256": expected,

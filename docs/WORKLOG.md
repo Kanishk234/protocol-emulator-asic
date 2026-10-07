@@ -5,6 +5,12 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (local pin-selection study)
+- SharedRXroute37642988571 remains active. Studied four equivalent selector forms on frozen trw_pin_io; factored validity worsens both area/timing, padded/polarity versions worsen the relevant pad path and are not queued.
+- Banked comparison proves19points and maps1.5% smaller IO area. Ideal-wire slowpad→sel1.511804→1.442738ns;C_ACTIVE→sel worsens0.674786→0.796614ns. No full-design WNS gain claim.
+- Isolated event/sharedRX/banked combo passes41pin tests,5chiptestsand2048-clockL2. Prepared pin_select_banked.patch, report andD-079. No mainRTL/config/spec change orphase tick;localFIPEfile remainsuntracked.
+- Next:finishchip/L2, publish verifiedprototype/evidence separately, then choose physicalfollow-up fromactualsharedRXextraction. Preserveallsetup/hold/physicalgates.
+
 ## 2026-10-07: Codex (return focus to design timing)
 - User requests the external-project comparison stay local. Removed its report from tracked files and retained the local copy; no ignore rules added. Removed the detailed comparison entry from the published worklog.
 - No chip, configuration or workflow changes. No phase boxes ticked.

@@ -1063,6 +1063,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Permit125ps headroom only for bs-event-rx-shared in addition to existing event-late target choices. Every other new source/target pair is refused. Preserve one repair,20ns,setup0,all-corner fresh pass,fast hold>=50ps before routing,andantenna/DRC/extraction checks. Launch only after trusted successful-main screen37579966660 passes source timing.
 - Cost: extra repair buffers/sizing and potential setup/overflow regression; shared RX still costs module area. No clean official timing claimed; actual extracted results and complete GL decide.
 
+## D-079 (2026-10-07): bank comparison before live C-pin selection
+- General need: live pad feedback passes through a configurable selection cone before RX arithmetic. Compare each eight-pad bank with C_ACTIVE before final bank selection, preserving invalid-pin defaults, previous samples and live writes. No new state, protocol feature or architecture change.
+- Isolated cost: IO mapped area1453.3344→1431.5238um² (-1.5%); slow ideal-wire pad→sel1.511804→1.442738ns. C_ACTIVE→sel worsens0.674786→0.796614ns. Full-chip setup/hold/routing benefit unmeasured; do not infer closure from local probes.
+- Module equivalence19points passes. Combine with proven frozen2/4 event/sharedRX for simulation; retain all physical/corner gates and require exact matched baseline before adoption. Main hardware remains unchanged.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

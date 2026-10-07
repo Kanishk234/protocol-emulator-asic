@@ -1,0 +1,42 @@
+name: scratch filler GDS and LVS checks
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_filler_checks.py'
+      - '.github/workflows/filler_checks.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-filler-checks-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned tools and verified layout sources
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_checkpoint.sh
+          bash spikes/cloud/fetch_pdk.sh
+          gh run download 37669173193 -R "$GITHUB_REPOSITORY" -n scratch-chip-filler-37669173193 -D build/filler_trial_source
+          gh run download 37648945387 -R "$GITHUB_REPOSITORY" -n compact-geometry-replay-37648945387 -D build/filler_original_source
+      - name: Full KLayout and actual GDS-based shell LVS
+        timeout-minutes: 35
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_filler_checks.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: scratch-filler-checks-${{ github.run_id }}
+          path: build/filler_checks/
+          retention-days: 3

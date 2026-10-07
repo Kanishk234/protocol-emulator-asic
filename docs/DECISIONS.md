@@ -406,3 +406,21 @@ removal and cannot reject the hypothesis. Corrected one-field copied config
 sets DECAP_CELLS=[] and preserves original FILL_CELLS. Require actual post-fill
 inventory confirmation before DRC/LVS. Retain original clock, routing, logic,
 macro, geometry checks and power tradeoff; no frozen config change.
+
+
+**D-048 verified result:**37648945387 completes18m02s with actual0 decaps and
+20714 plain fillers. KLayout248→0, LVS75→12. Magic reports6350, all pSD.e,
+versus1828 before; no full physical pass or waiver. Same saved3-marker route
+source and original frozen hardware. Retain decoupling/power tradeoff.
+
+**D-049 verified diagnostic:**37651173629 reproduces all9 exact baseline slew
+pins and the stronger same-wire driver has0 slew violations. Both retain33
+fanout violations. Inputs/report artifacts downloaded and parsed. This is
+slow-corner shell-only old-wire estimation, not a routed resized driver,
+configured-fabric or all-corner timing pass. No master change promoted.
+
+## D-050: Bounded repair and evidence recovery from the near-finished route
+- **Date:**2026-10-07. **Status:** accepted isolated cloud experiment; no hardware promotion.
+- **Reason:** final native0 database37516794406 was not retained (BUG40). No-decap replay37648945387 on saved iteration52 has0 KLayout but12 LVS differences, two fewer layout nets and four extra signal-pin incidences on VGND. Native source still has3 markers; remaining signal shorts are a hypothesis, not a proved cause of LVS12.
+- **Decision:** warm-start the authenticated iteration52/3-marker ODB with16 iterations and15-minute routing-step limit, retaining stock antenna/disconnected checks. Only after native0 run no-decap geometry/LVS; retain final checked ODB/DEF/GDS/netlist/SPEF and exact metrics/hashes. Keep original driver; do not combine D-049 resize. One physical field change is DECAP_CELLS=[] already measured in D-048. Frozen source/config/macro/PDK stay unchanged.
+- **Cost/limits:** bounded compute, possible diode/parasitic changes; decap/power cost remains open. No new resource or protocol-specific hardware. No full native-function/configured timing acceptance. Magic result is recorded separately; partial KLayout/LVS success cannot make all-three-geometry-zero true. A timeout/nonzero native result stops geometry and preserves completed evidence.

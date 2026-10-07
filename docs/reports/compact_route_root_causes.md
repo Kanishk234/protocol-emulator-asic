@@ -211,3 +211,30 @@ extraction and setup/hold/electrical checks. The pinned LEF offers a21oi_2:
 installed or improvement claimed; input loading, routing and hold can change.
 Clock fanout needs a separate constraint/tree review. Only one physical change
 per hardening; the active filler experiment remains untouched.
+
+
+## Verified no-decap replay and bounded next step
+
+[37648945387](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37648945387)
+completes18m02s. Actual inventory0 decaps/20714 plain fillers; KLayout0,
+LVS12 and Magic6350 (every reported item pSD.e). Removal resolves the248
+KLayout markers on this input, but is not full physical acceptance. Source
+remains iteration52 with3 native markers, not the lost final0 database.
+LVS has3530devices on each side,3586 versus3588nets; layout VGND has four
+additional signal-pin incidences (inv/A,a21oi/A1,dfrbpq/Q,dlygate/A). Netgen
+fanout counts are connectivity degrees, not net identifiers. These findings
+motivate checking residual signal shorts before changing logical RTL.
+
+[37651173629](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37651173629)
+reproduces all9 original slow slew pins with the same old SPEF. In-memory
+a21oi_2 substitution produces0 slew violations, retaining33fanout violations.
+Reports include path and parasitic-annotation evidence. This validates a
+focused electrical hypothesis; old wire geometry does not qualify a real
+resized placement, fast corner, configured fabric or complete timing.
+
+D-050 bounded cloud route finish starts from authenticated3-marker source,
+limits native routing to15minutes/16iterations, and stops geometry unless
+native routing/antenna/critical-disconnected checks are zero. It then replays
+no-decap physical checks and retains final views with corrected collector.
+Driver remains unchanged; Magic disagreements still require investigation.
+No three-hour route is queued by this experiment, and frozen G1 is untouched.

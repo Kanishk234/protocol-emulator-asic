@@ -24,6 +24,28 @@ Tcl executable absent, so used venv tkinter's Tcl parser without tool execution.
 measure one useful correction before spending hours on a fresh route. Retain
 frozen G1 and proactive full-workflow checks.
 
+**Verified cloud follow-up:** caught corrected geometry37648945387 failure
+before user reminder and downloaded exact views. Actual0decaps/20714plain
+fillers; KLayout248→0, LVS75→12, Magic6350 (all pSD.e). Job18m02s. Remaining
+LVS has equal3530device counts, two fewer extracted nets and four extra signal
+pin incidences on ground. Saved source still3markers; residual shorts remain
+hypothesis. No full physical or timing pass.
+
+Short screen37651173629 succeeds and downloaded reports reproduce9baseline
+slew pins; a21oi_2 same-old-wire substitution gives0slew violations,33fanout
+violations remain. Conditional slow shell estimate only, no physical DB saved
+or resize promoted. Ordinary lint37651173562/docs37651173593/test37651173588/
+unit37651173601 green; fabric37650210874 active at check. User requests periodic
+monitoring again; checked all workflows repeatedly and explained exact failure
+versus concrete improvements.
+
+Prepared D-050 bounded route finish: original driver, authenticated iter52,
+16iterations/15minute native-stage cap, stock native acceptance before no-decap
+geometry/LVS, corrected final-view retention. Record Magic separately; cannot
+claim all geometry zero when it fails. Syntax/YAML/whitespace checks pass; cloud
+verification pending. Next is retained native0/LVS result and Magic pSD.e
+analysis, then matching new native physical views and configured timing.
+
 ## 2026-10-07 (session60: verified reset control, corrected filler experiment, host improvements)
 **Done:** proactively inspected all latest workflows. Original-LUT matched
 control37553979644 passes RTL/native UART/native USER_RESET; downloaded and

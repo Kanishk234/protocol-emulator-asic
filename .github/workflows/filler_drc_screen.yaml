@@ -55,6 +55,9 @@ jobs:
           done
           test -s "build/filler_drc_screen/$maskhints/warp_fill1_rows_same.rpt"
           test -s "build/filler_drc_screen/$maskhints/warp_fill2_rows_same.rpt"
+          for gap in 005 030 300; do
+            test -s "build/filler_drc_screen/$maskhints/warp_fill2_ground_gap${gap}.rpt"
+          done
           done
           sha256sum "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/gds/sg13cmos5l_stdcell.gds" \
             "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l-drc.tech" \

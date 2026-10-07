@@ -80,9 +80,11 @@ set bootstrap [drt::detailed_route_num_drvs]
 puts "WARP_REPAIR bootstrap=$bootstrap"
 set final $bootstrap
 if {$bootstrap > 0} {
-    # Same worker costs, successive offsets: first GUIDES, then potentially
-    # STUBBORN if ineffective. Avoid a second fresh stock0..17 schedule.
-    foreach offset {-2 -3} {
+    # Continue through a guide plateau so the native state machine can enter
+    # STUBBORN. The first pair alone improved17->7->3 and remained GUIDES.
+    # Same costs (offset changes are ignored by the FSM argument comparison),
+    # at most six steps; the outer hosted timeout also bounds stubborn work.
+    foreach offset {-2 -3 -2 -3 -2 -3} {
         puts "WARP_REPAIR late_offset=$offset starting=$final"
         drt::step_dr 7 $offset 32 256 256 800 0.999 0 false
         set final [drt::detailed_route_num_drvs]

@@ -71,6 +71,22 @@ read. Same RTL/native/reset triplet, matched original-LUT control remains
 available; netlists still function-only with unqualified physical views.
 Python/YAML and whitespace checks pass locally. Hosted simulation only.
 
+**User steering/independent fronts:** expanded native UART candidate
+37659112021 runs; explicitly dispatched matched original-control37659171115,
+queued behind candidate. Shared test edit also triggered known-failing original
+hardened diagnostic37659111975; canceled this redundant run rather than spend
+time reproducing unchanged BUG33. No gate/check weakened; its manual/automatic
+workflow remains and original native acceptance is still unresolved.
+
+Prepared separate frozen-G1 divide-by-eight capture image (six timestamp bits,
+shift3, counter period512 clocks, conservative decoder max gap504, quantization8).
+Existing verified prescaled image uses85/88 LC in37512249763; new fit unmeasured.
+New bounded cloud workflow compiles/audits, runs source queue boundary check,
+SPI-loads actual image and verifies FIFO/overflow/wrap/quantization/UART/reset/
+STOP through existing top-port test. No new chip hardware or architecture.
+Documents mark candidate pending; artifacts exclude raw bitstreams. Static
+syntax checks only locally; cloud acceptance required before claiming usability.
+
 ## 2026-10-07 (session61: short electrical screen while physical checks run)
 **Done:** proactively inspected corrected geometry37648945387, still active.
 Explained that this replay skips detailed routing; previous physical-only job

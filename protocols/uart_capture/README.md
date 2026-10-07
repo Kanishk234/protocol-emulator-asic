@@ -87,3 +87,15 @@ contradicting the supplied bound are also rejected.
 
 This host decoder works with either chip design using the same capture image
 contract; its tests verify arithmetic and validation, not new hardware rates.
+
+## Divide-by-eight candidate
+
+`prescaled8.yaml` is an experimental six-bit timestamp image with
+`STAMP_SHIFT=3`. It targets a512-clock counter period, with eight-clock
+quantization. The host decoder needs `--stamp-shift 3` and a known maximum
+gap of at most504 clocks; the stream cannot reveal extra full wraps.
+The `extended capture image` cloud workflow must compile and audit the image,
+check source queue boundaries and pass the existing real SPI-loaded capture
+test before this configuration is treated as usable. Fit and timing are
+pending measurements. This changes only the user bitstream, so the frozen G1
+hardware can run it if those checks pass.

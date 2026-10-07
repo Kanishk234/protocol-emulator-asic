@@ -10,9 +10,9 @@ from postgrt_timing import screen, CORNERS
 
 
 def timing_placement(variant):
-    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement", "cts-cluster8", "drop-counter", "drop-qual", "bs-resync", "bs-csa", "bs-event-late", "bs-load-flat", "bs-event-drop-qual", "bs-event-rx-timer", "bs-event-rx-shared", "setup-margin"}:
+    if variant not in {"baseline", "rx-factor", "pad-mux", "load-select", "input-decode", "cached-input", "timing-placement", "cts-cluster8", "drop-counter", "drop-qual", "bs-resync", "bs-csa", "bs-event-late", "bs-load-flat", "bs-event-drop-qual", "bs-event-rx-timer", "bs-event-rx-shared", "bs-event-pin-banked", "setup-margin"}:
         raise ValueError("Unknown timing screen variant")
-    return variant in {"timing-placement", "cts-cluster8", "drop-counter", "drop-qual", "bs-resync", "bs-csa", "bs-event-late", "bs-load-flat", "bs-event-drop-qual", "bs-event-rx-timer", "bs-event-rx-shared", "setup-margin"}
+    return variant in {"timing-placement", "cts-cluster8", "drop-counter", "drop-qual", "bs-resync", "bs-csa", "bs-event-late", "bs-load-flat", "bs-event-drop-qual", "bs-event-rx-timer", "bs-event-rx-shared", "bs-event-pin-banked", "setup-margin"}
 
 
 def repair_margin(variant):

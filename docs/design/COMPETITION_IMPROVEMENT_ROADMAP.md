@@ -181,3 +181,9 @@ Additional primary-source ideas researched with bounded independent agents:
 These are pending experiments, not equal-area rankings or fixes for foundry
 geometry. Physical priority remains targeted native repair, full-layout filler
 DRC/LVS and configured-fabric timing. Existing frozen G1 is retained.
+
+**Phase-stress implementation:** separate loaded UART workflow now prepared
+for48 receive bytes across3 seeds,1/19ns phase boundaries, random per-bit
+phases and varied host read delay, with strict XML and replay trace. It uses
+the unchanged G1 image and real SPI loader; cloud evidence is pending. This
+is bounded functional robustness coverage, not a new baud/timing guarantee.

@@ -2,6 +2,24 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session65: continue physical closure and loaded phase stress)
+**Done:** proactively checked current runs/failures at user's request to
+continue without repeated confirmation. Native late repair37669731197 and
+stock-aligned Magic37669173193 still active; no newer failure in initial
+audit. Prepared independent frozen-G1 UART check using actual committed image
+loaded through SPI,48 RX bytes across3 deterministic seeds, all-early/all-late
+boundary phases and per-bit random phases, delayed reads0..128clocks, empty
+channel after each read, framing/overrun flags, USER_RESET and STOP parking.
+Trace preserves bitfile hash, every seed/byte/phase/read delay, status and
+failure; XML requires exactly1 non-skipped successful case and48 verified
+trace entries. New separate bounded standard-runner workflow; no test/src/
+macro/arch edits to trigger or interfere with hardening. Python AST/YAML/shell
+checks local only; simulation acceptance pending in cloud. No new native/SDF/
+physical rate claim. No additional agents spawned.
+**Boxes ticked:** none.
+**Next:** inspect physical/native results and targeted stress trace, then
+repair the specific remaining failures without relaxing gates.
+
 ## 2026-10-07 (session64: parallel diagnosis and independent board fix)
 **Done:** user explicitly authorized agents; assigned two bounded independent
 agents for primary-source routing research and fallback-compatible software

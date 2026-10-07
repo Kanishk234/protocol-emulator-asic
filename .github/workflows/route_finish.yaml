@@ -1,0 +1,51 @@
+name: compact bounded route finish
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_route_finish.py'
+      - '.github/workflows/route_finish.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-route-finish-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  finish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Project venv and pinned inputs
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_checkpoint.sh
+          gh run download 37516794406 -R "$GITHUB_REPOSITORY" -n compact-route-37516794406 -D build/physical_source
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Bounded native cleanup from three-marker snapshot
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_route_finish.py native
+      - name: No-decap geometry and LVS after native acceptance
+        timeout-minutes: 30
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_route_finish.py geometry
+      - name: Preserve final checked database and reports
+        if: always()
+        run: |
+          source .venv/bin/activate
+          python spikes/cloud/collect.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-route-finish-${{ github.run_id }}
+          path: build/cloud_results/
+          retention-days: 3

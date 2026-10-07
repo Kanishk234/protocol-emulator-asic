@@ -1,5 +1,11 @@
 # Bugs
 
+## 44: Board loader truncates malformed fields and skips negative chunks
+- **Date:**2026-10-07.
+- **Symptom/check:** independent audit reproduces negative chunk emitting BEGIN/END without DATA, oversized architecture/word truncation and65536-word length wrapping to0 in tools/board/warp.py. Host BUG42 validation had not reached the board API.
+- **Root cause:** MicroPython board transaction builder serialized values without unsigned-width/chunk/length validation; Warp.load queried the device before checking malformed inputs.
+- **Fix/coverage:** validate chunk, architecture, every word and16-bit length in both transaction builder and before any device I/O. Meaningful boundary/no-I/O tests and valid maximum-length parity/CRC; project-venv board+host317 tests pass. Existing unit workflow covers them; hosted verification pending. No physical/bitstream/SPI format change or real-board claim.
+
 ## 43: Isolated Magic count field is empty despite completed checks
 - **Date:**2026-10-07.
 - **Symptom/check:**37653631748 produces five reports with an empty count field. Full log records five zero-error checks and empty reason lists; workflow green only means reports completed.

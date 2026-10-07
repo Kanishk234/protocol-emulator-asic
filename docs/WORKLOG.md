@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session64: parallel diagnosis and independent board fix)
+**Done:** user explicitly authorized agents; assigned two bounded independent
+agents for primary-source routing research and fallback-compatible software
+improvements, root handles fresh physical workflow. No heavy local EDA.
+Whole-chip filler37662990606 fails strict non-pSD XOR guard before Magic;
+this is not accepted DRC evidence. Retained log inspected. Added stable
+instance list before master mutation and explicit per-layer delta diagnostics;
+strict gate remains. Pushed4311509; diagnostic37663775123 active.
+
+Independent board audit reproduces malformed chunk/unsigned fields/length
+silently corrupting load transactions. Fixed BUG44 in MicroPython-compatible
+board API with pre-I/O validation and boundary/no-I/O tests. Agent's venv
+board+host317 tests pass in0.84s; reviewed source/tests/report. Existing unit
+workflow will verify hosted. Frozen hardware unchanged.
+Routing research finds database reload restarts optimization schedule rather
+than resuming prior iteration53 costs. Exact pinned late-schedule APIs under
+review; no identical route rerun or unverified acceptance claim.
+**Boxes ticked:** none.
+**Next:** read layer-delta report from full-chip trial, run verified targeted
+late-schedule repair in cloud, check board hosted result and ongoing regressions.
+
 ## 2026-10-07 (session63: inspect fresh route failure and isolate filler remedy)
 **Done:** checked newly failed37657068016 and downloaded artifact. Job32m09s,
 router29m42s, exit2 because5 native routing violations, not timeout. Both

@@ -112,6 +112,9 @@ jobs:
       - name: Build pinned region-reservation image
         run: docker build --tag tripwire-banked-hold:local --file workflow-src/scripts/ci/Dockerfile.openroad-banked-hold workflow-src/scripts/ci
 
+      - name: Smoke check the installed OpenROAD wrapper
+        run: docker run --rm --entrypoint /usr/local/bin/tripwire-openroad-banked-hold tripwire-banked-hold:local -version
+
       - name: Measure guarded address repair and fresh antenna/timing gates
         timeout-minutes: 70
         run: python workflow-src/scripts/ci/banked_sram_hold_screen.py

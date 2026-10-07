@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session61: short electrical screen while physical checks run)
+**Done:** proactively inspected corrected geometry37648945387, still active.
+Explained that this replay skips detailed routing; previous physical-only job
+27m34s, not another3h route. Latest capture queue37650210884/lint37650210869/
+docs37650210907/test37650210872 pass; fabric37650210874 and unit37650210862
+still active at initial check. No new hardware acceptance claimed.
+
+Prepared D-049 short cloud same-wire slow-corner driver screen: original
+a21oi_1 versus a21oi_2 at measured frame_idx[0] hotspot, no saved modified DB,
+placement/routing, forced configuration or frozen edits. Require exact baseline
+nine-pin reproduction; preserve driver connections and record old wire/input
+hashes plus before/after electrical/path/annotation reports. Macro black-boxed;
+results cannot sign off new layout or configured fabric. Official PDK gate
+networks match and LEF area delta5.4432um2 before any physical repairs. Python,
+YAML, Tcl completeness, PDK gate-network and whitespace checks pass locally;
+no EDA executed. Initial local syntax-check snippet was corrected; system
+Tcl executable absent, so used venv tkinter's Tcl parser without tool execution.
+**Boxes ticked:** none.
+**Next:** inspect physical outcome and short electrical-screen setup/result;
+measure one useful correction before spending hours on a fresh route. Retain
+frozen G1 and proactive full-workflow checks.
+
 ## 2026-10-07 (session60: verified reset control, corrected filler experiment, host improvements)
 **Done:** proactively inspected all latest workflows. Original-LUT matched
 control37553979644 passes RTL/native UART/native USER_RESET; downloaded and

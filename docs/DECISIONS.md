@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-049: Same-wire diagnostic of the frame-index slew hotspot
+- **Date:**2026-10-07. **Status:** accepted isolated measurement under D-037; no physical promotion.
+- **Evidence:** exact37552604692 extracted slow-corner report has9 slew violations, all on frame_idx[0], driven by u_cfg._54_/a21oi_1. Worst2.562529ns versus2.507400ns limit. Same report has33 fanout violations. Source is the saved3-marker intermediate route, macro black-boxed.
+- **Decision:** cloud-only comparison of original driver against equivalent a21oi_2, substituting only in memory and reusing identical old wire SPEF/constraints. Require baseline to reproduce all nine exact violation pins and preserve target connectivity. Retain before/after electrical/path/annotation reports and input hashes. No DB write, placement, routing, configuration force or frozen hardware/PDK edits.
+- **Cost/benefit:** generic configuration distribution helps all bitstreams if confirmed. Pinned LEF size2.4x3.78→3.84x3.78um adds5.4432um2 before repairs; larger input loading and changed pin access/hold/routing can cost every user. Actual new layout cost/timing is unmeasured. Official PDK combinational gate networks match for the two variants.
+- **Limits:** same-old-wire results are conditional electrical estimates. No configured-fabric, fast-corner, legal placement, zero-route or full timing claim. A useful result requires one separately hardened driver change and fresh extraction/all checks. Decap experiment remains independent/untouched.
+
 ## D-047: Screen a structurally preserved LUT mux tree (scratch only)
 - **Date:**2026-10-06. **Status:** accepted isolated diagnostic experiment; no hardware promotion or resource/spec change.
 - **Evidence:**37546145073 proves three native unregistered LUT constants under all529 observed configuration-latch Q values, arbitrary binary tile inputs and arbitrary user state. Actual native four-state UART still fails and those outputs areX. This establishes false unknowns in those three cones, not the complete UART root cause.

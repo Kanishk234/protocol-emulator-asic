@@ -1,5 +1,12 @@
 # Bugs
 
+## 45: Placement preflight misreads a void successful checker return
+- **Date:**2026-10-07.
+- **Symptom/check:**37688867787 fails before resizing with custom "Source placement is not legal", without native placement violations.
+- **Root cause:** script compares check_placement's empty successful return to numeric0. Pinned OpenROAD dcf36133 Opendp.i defines check_placement_cmd as void; CheckPlacement.cpp raises DPL-0033 on actual violations. Current general documentation's numeric-return description did not match this pinned API.
+- **Fix/coverage:** invoke native check directly with retained baseline/candidate placement reports; native errors still fail the job. Source and final checks both retained. Corrected cloud result pending; no placement acceptance inferred from fixing setup.
+- **Primary sources:** [pinned command](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/dpl/src/Opendp.i), [pinned failure gate](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/dpl/src/CheckPlacement.cpp).
+
 ## 44: Board loader truncates malformed fields and skips negative chunks
 - **Date:**2026-10-07.
 - **Symptom/check:** independent audit reproduces negative chunk emitting BEGIN/END without DATA, oversized architecture/word truncation and65536-word length wrapping to0 in tools/board/warp.py. Host BUG42 validation had not reached the board API.

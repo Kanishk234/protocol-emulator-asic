@@ -38,6 +38,13 @@ orientation/all other placement, one master only, strict placement gates.
 Retained trial is explicitly not valid routing/parasitics. Python AST/YAML,
 Tcl completeness/JSON-output and whitespace checks pass; no local EDA.
 
+**Immediate failure fix:** placement37688867787 fails before mutation because
+our numeric test misreads the pinned native void return (BUG45), not observed
+placement violations. Downloaded full log and exact pinned Opendp.i/
+CheckPlacement.cpp confirm void API plus DPL-0033 on actual illegal placement.
+Invoke checker directly with baseline/candidate report files; preserve native
+failure gate. Corrected cloud result pending. No master/placement promotion.
+
 ## 2026-10-07 (session65: continue physical closure and loaded phase stress)
 **Done:** proactively checked current runs/failures at user's request to
 continue without repeated confirmation. Native late repair37669731197 and

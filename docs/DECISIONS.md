@@ -8,6 +8,12 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** screen a standalone LUT4 implementation using five actual CMOS5L mux4 cells, maintaining the full16-bit runtime truth table and4-bit input contract. Prove binary equivalence against pinned FABulous LUTK for every configuration/input and test partial unknown inputs against independent truth-table completions with actual pinned PDK models. Candidate is confined to spikes/lut_mapping, not arch/src/macro or generated upstream code.
 - **Cost/limits:** five mux4 instances per LUT; physical area/routing/timing comparison against actual existing mapping is pending. No new configuration storage or protocol-specific behavior. If later integrated, every workload pays any area/delay cost, including users not affected by simulation unknowns. No equal-area improvement or configured-fabric timing claim. LUT-cell/compiler/bitstream/native loaded integration and physical hardening remain required before promotion.
 
+## D-048: Exclude decap fillers in isolated geometry replay
+- **Date:**2026-10-06. **Status:** accepted one-field scratch physical experiment; frozen config unchanged.
+- **Evidence:**37545941476 replays saved iteration52 with no routing and reproduces KLayout248 (1 M1.a,247 M1.b). Joining its exact marker coordinates to post-fill DEF and pinned LEF dimensions associates every marker with decap fillers:241 decap8-only,3 decap4-only,2 decap4/8 boundaries,1 decap8/fill2 boundary,1 decap4/fill2 boundary. Width marker lies in FILLER_185_58/decap8. This locates violations in inserted decap geometry, but does not yet establish that removing them resolves LVS67.
+- **Decision:** replay the same authenticated3-marker ODB with only FILL_CELLS changed to plain fill1/fill2; extend downstream checks through LVS. No routing, signal/macro/netlist change, DRC waiver or frozen src/config change. Preserve full output views and marker databases.
+- **Cost/limits:** fewer decap filler cells can reduce local decoupling and change power behavior; power/IR/noise implications require measurement before promotion. Plain fillers still provide their normal well/rail structures. Logic resources, bitstream and protocol behavior unchanged. The input's3 routing markers prevent claiming final routing certification or configured-fabric timing from this experiment. Clock target and constraints unchanged.
+
 ---
 
 ## D-001: Build on FABulous

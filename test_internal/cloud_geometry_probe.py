@@ -23,19 +23,29 @@ for key in list(state["metrics"]):
 state["metrics"]["route__drc_errors"] = 3
 initial = out / "initial_state.json"
 initial.write_text(json.dumps(state) + "\n")
+config_path = ROOT / "build/cloud_input/route_config.json"
+filler_only = os.environ.get("WARP_GEOMETRY_FILLER_ONLY") == "1"
+if filler_only:
+    config = json.loads(config_path.read_text())
+    config["FILL_CELLS"] = ["sg13cmos5l_fill_1", "sg13cmos5l_fill_2"]
+    config_path = out / "plain_fill_config.json"
+    config_path.write_text(json.dumps(config, indent=2) + "\n")
 command = [sys.executable, "-m", "librelane", "--docker-no-tty", "--dockerized",
            "--pdk", "ihp-sg13cmos5l", "--pdk-root", os.environ["PDK_ROOT"], "--manual-pdk",
            "--hide-progress-bar", "--run-tag", "geometry_probe", "--force-run-dir", str(run),
-           "--from", "Odb.ReportWireLength", "--to", "KLayout.DRC",
-           "--with-initial-state", str(initial), str(ROOT / "build/cloud_input/route_config.json")]
+           "--from", "Odb.ReportWireLength", "--to", "Checker.LVS" if filler_only else "KLayout.DRC",
+           "--with-initial-state", str(initial), str(config_path)]
 with (out / "flow.log").open("w") as log:
     result = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
-final = list(run.glob("*-klayout-drc/state_out.json"))
+final = list(run.glob("*-checker-lvs/state_out.json" if filler_only else "*-klayout-drc/state_out.json"))
 metrics = json.loads(final[0].read_text())["metrics"] if len(final) == 1 else {}
 errors = metrics.get("klayout__drc_error__count")
+lvs_errors = metrics.get("design__lvs_error__count")
 (out / "result.json").write_text(json.dumps({
     "source_run": 37516794406, "source_sha256": EXPECTED, "source_routing_markers": 3,
     "scope": "geometry_replay_only_not_final_route_or_timing_acceptance",
-    "flow_returncode": result.returncode, "klayout_errors": errors,
+    "flow_returncode": result.returncode, "klayout_errors": errors, "lvs_errors": lvs_errors,
+    "plain_filler_only": filler_only,
+    "physical_change": "FILL_CELLS excludes decap cells" if filler_only else "none",
 }, indent=2) + "\n")
-raise SystemExit(result.returncode or (0 if errors == 0 else 1))
+raise SystemExit(result.returncode or (0 if errors == 0 and (not filler_only or lvs_errors == 0) else 1))

@@ -1,0 +1,11 @@
+# Event-late hold-headroom experiment (2026-10-06)
+
+Leading measured candidate: event-late source37533969613,route37546499438,extraction37551577987 and routed GL37551578053. Extracted setup WS0at all corners; fast hold−0.014614976310ns,slow+0.104597222733ns,typical+0.030520697944ns. Final min report contains three violating entries: lane1ex_imm[6]−14.615ps,[7]−7.615ps,U0TXct[0]−6.856ps. GL log confirms22/22tests,0failure/skip. Its setup worst report includes a flop→latch zero-slack borrowing path; positive useful-path headroom remains to audit.
+
+Original repaired screen config uses GRT_RESIZER_HOLD_SLACK_MARGIN0.05ns and SETUP0.0ns. Pre-route fast hold+0.0313302ns became−0.014615ns after route/extraction. The proposed isolated experiment uses a100ps hold-repair target on the same verified source checkpoint before antenna/DRT, aiming to retain headroom through physical changes. No guarantee that a larger target achieves it; actual extracted results decide.
+
+Existing route workflow gains optional pre_route_hold_target choice source(default)/0.10. The new choice is restricted to bs-event-late and performs exactly one all-corner repair with setup target0.0 and hold target0.10. Require fresh setup/hold checks to pass at all corners and fast hold WS≥0.05ns before continuing. Existing post-antenna timing/antenna and route DRC gates remain. Saved headroom comparison is included in downstream extraction artifacts. Constraints,20ns clock,resources,RTL,source identity and official template jobs are unchanged.
+
+Helper validates the selected hold target against resolved repair configuration and rejects unbounded/NaN/infinite values.131combined helper tests pass, including default preservation, explicit target propagation, all-corner/headroom gating and invalid-target rejection. Both edited workflows parse,choice/default checks and git diff check pass. Tcl tests use cached OpenSTA's Tcl runtime via temporary launcher, not physical OpenDB.
+
+Proposed dispatch: source_run_id37533969613,source_variantbs-event-late,pre_route_hold_target0.10,repair_postantenna_holdfalse. CI/docs publication and launch pending scoped authorization. No physical hold improvement,combined RTL adoption or official timing pass claimed. Local resync combinations and SRAM-delay prototype remain separate unpublished work.

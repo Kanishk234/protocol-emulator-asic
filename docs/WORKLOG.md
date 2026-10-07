@@ -5,13 +5,48 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (prepare isolated event hold-headroom repair)
+Done:
+- Verified source event repair inherited50ps hold target and0setup target. Prepared optional/defaultsource100ps hold target for event-late only,one all-corner repair with resolved-target validation,fresh full pass and≥50ps fast headroom before existing antenna/DRT gates. This addresses known post-route margin loss without positive setup-margin latch stalls.
+- Added D-073 and PHASE2_EVENT_HOLD_HEADROOM.md.131helper tests,workflow parsing/default-choice validation,diff check passed. No physical execution/publication yet; local combination and SRAM prototype files remain separate.
+Next:
+- Scoped CI/docs push and launch source37533969613/bs-event-late/pre_route_hold_target0.10 after publication authorization,then measure actual extracted setup/hold and GL. Continue full2/4 official candidate readiness; no phase tick or timing-pass claim.
+
+## 2026-10-06: Codex (select event-late and audit final hold endpoints)
+Done:
+- Downloaded extracted event37551577987 artifact11452594564. Final fast min report contains3violating entries: lane1ex_imm[6]−14.615ps,[7]−7.615ps,and U0TXct[0]−6.856ps. These differ from load-flat SRAM targets. Slow max report starts flop→configuration latch,slack0,no violating entries; zero global setup WS does not establish positive headroom on useful flop paths.
+- Verified routed GL37551578053 job112568071978 log:22tests/22pass/0fail/0skip. Event-late is leading measured candidate for next repair; prioritize its own residual hold paths. All remote workflows completed at prior inventory.
+Next:
+- Quantify real setup headroom and final electrical/physical counts,prepare bounded hold repair for event-late's exact endpoints,then re-extract/retest. Reproduce full2/4 wrapper/source/SRAM/constraints and winning recipe in clean official GDS before any closure claim. No new dispatch,publication or phase tick.
+
+## 2026-10-06: Codex (prepare guarded SRAM bit0 delay while event route runs)
+Done:
+- Event-late37546499438 remains active, so combined setup candidate selection awaits extracted results. Independently prepared local sram_addr_hold.tcl for exact recovery37547755184 branch net7589/place7589→SRAM A_ADDR[0]. Guards reject changed connectivity/masters, duplicate mutation and disconnected power; only SRAM sink is rewired behind one BUF1.
+- Latest explicit main inventory: only event-late37546499438 running; queued list empty. Latest lint/test/docs/unit all passed. No new extraction/GL results; load-flat recovery remains failed and its downstream checks skipped. No dispatch or new physical timing claim.
+- Subsequent main check: no running/queued workflows. Event-late route37546499438,extraction37551577987 and GL37551578053 completed successfully. Extracted setup WS0allcorners (no positive margin established); fast hold−0.014614976310ns,slow+0.104597222733,typical+0.030520697944. Timing still fails hold; full artifact/path and GL testcase audit pending. No official pass or phase tick.
+- Five mock OpenDB/Tcl checks and115combined helper tests pass using cached OpenSTA Tcl interpreter via temporary launcher (standalone tclsh unavailable). Confirmed named driver/net in exact repaired netlist. No actual ODB mutation, measured delay gain, physical workflow integration or dispatch yet; no phase tick.
+Next:
+- Continue event-late monitoring; implement checkpoint-validated local physical insertion/STA integration before proposing publication or launch. Any BUF delay hypothesis must pass fresh all-corner timing, antennas, legal placement and routing. Current extra code/docs remain local.
+
 ## 2026-10-06: Codex (audit SRAM hold failure and prepare one-pass recovery)
 Done:
 - Audited failed artifact11450688351 from37546502664. Exactly1fast hold violation: lane0acc_addr[1]→SRAM A_ADDR[1],arrival0.946049ns/required0.979280ns,WS−0.0332313ns. Setup counts0allcorners; slow/typical hold positive.
 - Prepared opt-in/defaultfalse post-antenna hold recovery: reject setup failures,one all-corner timing repair,independent antenna check,fresh three-corner timing,then existing DRT gate. No retries or relaxed constraints; downstream upload preserves follow-up evidence.108helper tests/workflow validation/diffcheck pass. Report PHASE2_LOAD_FLAT_HOLD_RECOVERY.md.
 - Event-late37546499438 still active; its named step encompasses checks and DRT, so internal stage is not independently confirmed. Unit remaining RTL job in chip/L3/rotation tests; other two unit jobs passed. No new dispatch/publication or phase tick.
+- User approved publication/launch. Committed CIcd9d22f/docs eb90c4d and pushed origin main; HEAD,origin/main and remote main independently match eb90c4d8ff7ee48b7714271a4dbe6cb19c1174c8. Launched load-flat bounded recovery37547755184 from source37533972946 with repair_postantenna_hold=true; queued. Existing event-late remains active. No unpushed commits; subsequent status note remains local.
+- Latest main check: both event-late37546499438 and load-flat recovery37547755184 in progress in combined antenna/timing/DRT step; no independently confirmed internal stage. Unit37547743325 and prior37546482082 active. Latest docs37547743332,lint37547743341,test37547743337 passed. No new physical results or dispatch.
+- Subsequent workflow check: load-flat recovery37547755184 failed its bounded repair gate. Fast hold improved−0.0332313→−0.0216314ns but remains negative; setup0allcorners,hold slow+0.188543/typical+0.0731607ns. Extraction37549226850/GL37549226991 skipped. Latest unit37547743325 passed; prior unit37546482082 and event-late37546499438 still active. No repeat dispatched; exact residual endpoints require artifact audit.
 Next:
 - Publish scoped CI/docs and launch source37533972946/bs-load-flat with repair_postantenna_hold=true after explicit publication authorization. Continue event-late/extraction/GL monitoring and evaluate actual routed timing.
+
+## 2026-10-06: Codex (audit residual paths and verify local combinations)
+Done:
+- Downloaded/audited resync extracted37529099235:11reported violating slow setup entries all start U0TXMODEbit2, worst enddropped[14],WS−0.325228ns. Fast min report5violating entries end lane state/immediate and BSqueue; distinct from SRAM hold.
+- Audited load-flat recovery37547755184: exactly1residual fast hold violation by metrics, now lane1acc_addr[0]→SRAM A_ADDR[0],−0.0216314ns. Originalbit1 target is not the remaining worst failure. A targetedbit0 delay experiment requires exact connectivity and fresh all-corner/antenna validation; no insertion performed.
+- Created two local combined patches against frozenR4. Resync+event and resync+load each prove892points,pass21bit-clock tests,5chip tests and2048L2 clocks. Ideal-wire PERIOD probes10.119960/10.311445ns versus resync10.669182; areas41659.7958/41552.4060µm² versus41905.9494. Active→load query eventcombo6.795213vsresync7.115667ns,not whole-chip mode timing.
+- Named verifier support prepared;110helper tests and diff check pass. Report PHASE2_RESIDUAL_TIMING_AND_COMBINATIONS.md. Main RTL/spec/physical choices unchanged; no publication or new dispatch. Older unit37546482082 now passed; event-late37546499438 remains active.
+Next:
+- Await isolated event extraction before selecting combined physical screen. Prepare guarded targetbit0 hold experiment against exact repaired checkpoint if pursuing load-flat. Keep live modes timed and require official full2/4 signoff; no phase ticks.
 
 ## 2026-10-06: Codex (load-flat route stopped at timing guard)
 Done:

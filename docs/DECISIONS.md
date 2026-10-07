@@ -1033,6 +1033,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Local mapped costs: baseline40667.3184µm²/13.808641ns PERIOD→RX-load; event-late40591.0764/11.697581; load-flat40740.4998/12.391160. Ideal-wire probes only. Separate matched full-design GRT screens are prepared; eventual routed extraction decides adoption.
 - Direct sample predicate proves818points and passes the same tests but maps41529.5370µm²/13.980507ns; retain reference patch without launching a physical screen. No architecture/main RTL adoption or official timing pass.
 
+## D-073 (2026-10-06): isolated event-late hold-headroom experiment
+- General need: configuration-latch→state paths pass estimated timing but lose fast-corner hold margin after routing/extraction. Event-late37551577987 has setup0allcorners and fast hold−14.615ps; reported failing endpoints are lane immediate bits and pin TX counter,not a dedicated protocol primitive.
+- Prepare one extra all-corner repair from trusted screen37533969613 with hold target0.10ns instead of inherited0.05ns,setup target0.0ns unchanged. Require fresh all-corner pass and fast hold≥0.05ns before antennas/DRT; preserve all later gates,20ns and D-066 live paths. Default existing route behavior unchanged.
+- Cost: potentially extra delay buffers/area/wiring and setup degradation. No physical improvement claimed; global overflow,DRC,all-corner extracted timing and GL decide. Diagnostic generated configuration only; no main config/template edits or final flow-knob adoption.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

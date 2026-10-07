@@ -9,3 +9,13 @@ Existing route workflow gains optional pre_route_hold_target choice source(defau
 Helper validates the selected hold target against resolved repair configuration and rejects unbounded/NaN/infinite values.131combined helper tests pass, including default preservation, explicit target propagation, all-corner/headroom gating and invalid-target rejection. Both edited workflows parse,choice/default checks and git diff check pass. Tcl tests use cached OpenSTA's Tcl runtime via temporary launcher, not physical OpenDB.
 
 Proposed dispatch: source_run_id37533969613,source_variantbs-event-late,pre_route_hold_target0.10,repair_postantenna_holdfalse. CI/docs publication and launch pending scoped authorization. No physical hold improvement,combined RTL adoption or official timing pass claimed. Local resync combinations and SRAM-delay prototype remain separate unpublished work.
+
+## Measured 100 ps trial and proposed 150 ps follow-up
+
+Run37557256170 failed before antennas/DRT at the unchanged50ps headroom gate. Fresh fast hold improved31.3302→48.7026ps; slow229.262→376.427ps; typical102.516→178.650ps. Setup WS remained0allcorners. Extraction37558180965 andGL37558180997 skipped; there is no new extracted result.
+
+The actual repair log reports241 endpoints below its100ps target and255 inserted buffers (+0.8% area). It reached100ps internally, then legalized (maximum displacement14.9um) and rerouted. Fresh STA's worst path is slot latch `_50151_` (`lane0.slots[461]`) through `_34673_`, `_34675_`, `_34676_`, `_34677_` to `_46523_` (`lane0.acc_addr[4]`), +48.703ps. Next reported endpoints are U2RXsst[2]+55.372ps, U2TXer[1]+55.628ps and lane0ex_imm[3]+59.044ps. This is not the original extracted event failing endpoint set. Saved artifact11454893508, local audit `/tmp/event-headroom-audit`.
+
+Prepare an optional150ps repair target on the original trusted event source37533969613 (not an automatic retry of the mutated state). Keep zero setup target, one repair, fresh all-corner pass,50ps minimum fast hold, antenna/DRC guards and final extracted checks. Default remains source;100ps remains reproducible. Extra buffering may hurt setup or routing; no physical success asserted. Changes are local pending publication.
+
+All1000 entries in this trial's slow max report end at latches and have zero reported slack. This report cannot establish execution-path setup margin; a separate flop-endpoint report is needed without changing constraints or hiding latch checks.

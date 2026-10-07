@@ -5,10 +5,44 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (bounded follow-up ready for review)
+Done:
+- Audited artifact11454893508:241 endpoints below100ps target,255buffers (+0.8%area),internal100ps before legalization/rerouting became fresh48.7026ps. Worst slot461→lane0acc_addr[4]; next U2RXsst2+55.372ps,U2TXer1+55.628ps. Slow setup report1000entries all latch endpoints; execution margin not yet established.
+- Prepared optional150ps event repair from original source37533969613. Source default and100ps option preserved;50ps fast budget/all-corner/setup/antenna/DRC guards unchanged.68helper tests passed,workflow choices/default parse anddiff check passed. D-074 and event-headroom report updated. No commit/push/dispatch in this session.
+- Confirmed local sigrok failures are sandbox libusb initialization: same UART VCD decodes correct11bytes outside sandbox. Local L3 continues; its failures must be replayed with working decoder before a full-pass claim.
+Checklist boxes ticked: none.
+Next: publish scoped CI/docs groups using user-run commands perAGENTS.md,then dispatch150ps diagnostic; inspect local protocol suite and replay decoder-affected cases.
+
+## 2026-10-06: Codex (hold-headroom failure diagnosis)
+Done:
+- Main route37557256170 failed the explicit50ps pre-route fast-hold headroom gate: repair improved fast WS+0.0313302 to+0.0487026ns; setup WS0allcorners,slow hold+0.376427ns,typical+0.17865ns. This is a margin-gate failure before DRT, not an extracted timing result. Dependent extraction37558180965 andGL37558180997 skipped. Unit37557237430 still running; lint/docs/test green.
+- Started download of saved artifact11454893508 to /tmp/event-headroom-37557256170.zip for limiting-path audit. No gate relaxed or new workflow launched.
+Checklist boxes ticked: none.
+Next: inspect actual min paths and repair decisions before choosing a targeted hold change or another bounded margin trial; retain all-corner/setup/antenna guards.
+
+## 2026-10-06: Codex (parallel full-wrapper protocol validation)
+Done:
+- Started the expanded 22-case L3 protocol suite against the isolated 2/4 event-late candidate using the real tt_um_tripwire RTL wrapper, behavioral SRAM and candidate-generated resource map. Local terminal session 7673; log /tmp/tripwire-official-2x4-prep-20261006/l3-official-prep.log. Elaboration passed and UART TX is running; no completed-suite claim yet.
+- Early local L3 result: UART TX passed the Python waveform/reference and status checks but failed the additional sigrok annotation check (empty decoder stdout); UART RX framing passed. The suite is continuing. Investigate local decoder output before attributing the failure to RTL; do not claim a full pass.
+- Checked main workflows: hold-headroom routing 37557256170 and unit 37557237430 remain in progress; test/lint/docs passed. This local simulation is independent of the physical repair result.
+Checklist boxes ticked: none.
+Next: inspect the protocol JUnit result, then compare the hold-headroom extraction with the previous fast hold deficit and complete official-flow adoption review.
+
+## 2026-10-06: Codex (parallel official candidate preparation and local file audit)
+Done:
+- Explained remaining local files: combination patches/verifier registrations,guarded SRAM prototype/tests,report and recent status notes. They are separate unpublished work; no unpushed commits or hidden main RTL changes.
+- Prepared isolated `/tmp/tripwire-official-2x4-prep-20261006` with full frozen2/4wrapper/source/SRAM plus event-late,regenerated resource tables/docs,and synchronized19source files. Generated RTL matches frozen exactly; gen --check passed. Manifest records35hardware/macro fingerprints. All4top-port smoke tests pass.
+- Found old spike disables MagicDRC/illegal-overlap error gates; enabled them only in prepared candidate and recorded remaining PDN/SDC/NDR/flow adoption gaps. Updated PHASE2_OFFICIAL_GDS_READINESS.md. No main candidate adoption or physical pass claimed.
+- Repair37557256170 active at pinned-image build inspection. No new dispatch/publication or phase tick.
+- Latest progress check: repair37557256170 now active in combined repair/antenna/timing/DRT step; unit37557237430 active,lint37557237415/docs37557237426/test37557237427 passed. No new extracted results. Closest measured event setup0allcorners/fast hold−14.615ps; positive setup headroom and official complete-design validation remain unproven.
+Next:
+- Audit hold-headroom result and complete official-compatible physical recipe/full protocol validation before proposed promotion. Keep local speculative prototypes separate from published repair.
+
 ## 2026-10-06: Codex (prepare isolated event hold-headroom repair)
 Done:
 - Verified source event repair inherited50ps hold target and0setup target. Prepared optional/defaultsource100ps hold target for event-late only,one all-corner repair with resolved-target validation,fresh full pass and≥50ps fast headroom before existing antenna/DRT gates. This addresses known post-route margin loss without positive setup-margin latch stalls.
 - Added D-073 and PHASE2_EVENT_HOLD_HEADROOM.md.131helper tests,workflow parsing/default-choice validation,diff check passed. No physical execution/publication yet; local combination and SRAM prototype files remain separate.
+- User approved. Committed CIbfe2bc4/docs1f73633 and pushed origin main; local HEAD,origin/main and remote main independently match1f7363358daa3dda54e8d00da7864a8170e374f6. Launched37557256170(source37533969613,bs-event-late,hold target0.10,postantenna recoveryfalse),queued at verification. No unpushed commits; local combination/SRAM prototypes and subsequent status notes remain unpublished.
 Next:
 - Scoped CI/docs push and launch source37533969613/bs-event-late/pre_route_hold_target0.10 after publication authorization,then measure actual extracted setup/hold and GL. Continue full2/4 official candidate readiness; no phase tick or timing-pass claim.
 

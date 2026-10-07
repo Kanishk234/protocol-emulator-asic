@@ -1038,6 +1038,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Prepare one extra all-corner repair from trusted screen37533969613 with hold target0.10ns instead of inherited0.05ns,setup target0.0ns unchanged. Require fresh all-corner pass and fast hold≥0.05ns before antennas/DRT; preserve all later gates,20ns and D-066 live paths. Default existing route behavior unchanged.
 - Cost: potentially extra delay buffers/area/wiring and setup degradation. No physical improvement claimed; global overflow,DRC,all-corner extracted timing and GL decide. Diagnostic generated configuration only; no main config/template edits or final flow-knob adoption.
 
+## D-074 (2026-10-06): bounded 150 ps event hold-target proposal
+- General need:100ps internal repair slack did not survive legalization/rerouting; fresh fast hold48.7026ps missed the50ps gate in37557256170. Worst endpoint now lane0acc_addr[4], not a protocol-specific block.
+- Prepare optional150ps target from the original verified event source; retain one repair,zero setup target,all-corner timing and50ps fast budget before antennas/DRT. No gate relaxation,RTL/spec/main config change or template job edit.
+- Cost: more buffers/wires and possible setup/overflow degradation. Proposed diagnostic only; publication and physical measurement pending. Positive official timing remains unproven.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

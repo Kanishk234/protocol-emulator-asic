@@ -13,6 +13,7 @@ foreach width {1 2 4 8} {
     }
 }
 lappend cells warp_fill1_rows_same warp_fill2_rows_same
+lappend cells warp_fill2_ground_gap005 warp_fill2_ground_gap030 warp_fill2_ground_gap300
 foreach cell $cells {
     puts "WARP_CELL $cell"
     load $cell

@@ -9,6 +9,8 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Costs/limits:** nominal footprint and logic resources unchanged; broader implant can change junction capacitance, leakage, diffusion interpretation and density. All protocols pay any eventual physical cost. No measured chip power/area/timing benefit, primitive or architecture-contract change. Fixture report success is not DRC acceptance. Chip use requires full DRC/LVS, legal placement/power connectivity, fresh native routing and extracted timing; no waiver or upstream in-place modification.
 - **Attribution:** geometry derives from IHP-Open-PDK2bbec755dc67ca3db0261c3d6163e15735d66710, Apache-2.0; upstream licenses remain in the fetched PDK. Overlay code lives in patches/ihp_filler_psd_trial.py.
 
+- **Verified/follow-up:**37662382228 reproduces17 boxes in unchanged ground pair and geometry-identical flattened control, but widened-pSD fill1/fill2 give0 in isolated/horizontal/both mirrored-boundary fixtures. Both import modes agree and invalid control still fails. Added implant area0.186/0.330um2 per fill1/fill2. Prepare manual cloud-only full Magic replay of authenticated37648945387 GDS with the same overlay, exact20714-instance inventory and whole-chip non-pSD XOR checks. Source still3 native markers; no rerouting, chip promotion, LVS or timing pass inferred. Full report generation remains distinct from reported zero.
+
 ## D-051: Isolate the Magic filler rule without changing hardware
 - **Date:**2026-10-07. **Status:** accepted diagnostic under D-037.
 - **Evidence:**37648945387 has6350 Magic pSD.e boxes, all overlapping plain top-level fillers; none inside macro bounds. Pinned KLayout shared pSD deck implements only pSD.c1, so its zero does not clear pSD.e/f.

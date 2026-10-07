@@ -25,6 +25,19 @@ and ongoing jobs unchanged.
 **Next:** inspect hosted flattened/pSD trial reports; select targeted routing
 repair using remaining marker geometry rather than repeating identical cleanup.
 Native all-check closure, whole-chip filler DRC/LVS and configured timing remain open.
+**Launch:** scoped4b6dcb1/982f7da/fd7239c pushed; filler37662382228 active.
+Final-view artifact hashes verified locally. No frozen-hardware push.
+
+**Verified filler remedy on reproducer:**37662382228 completes successfully.
+Downloaded reports verify both import modes: scratch fill1/fill2 isolated,
+horizontal and both mirrored boundaries0; original ground pair17 and flattened
+identical control17; invalid orientation retains findings. Geometry assertions
+pass. Added pSD0.186/0.330um2 per cell; other layers/bboxes unchanged. Supports
+physical abutment cause rather than tested hierarchy/import explanation.
+Prepared manual whole-chip Magic diagnostic on authenticated no-decap GDS,
+replacing exactly20714 filler references in scratch output and asserting all
+non-pSD chip regions identical. Original source has3 native markers; whole
+DRC/LVS/power/timing still unqualified. No frozen edits or rerouting.
 
 ## 2026-10-07 (session62: identify residual shorts and screen filler abutments)
 **Done:** proactively checked hosted outcomes after user asked to continue.

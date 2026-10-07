@@ -5,6 +5,12 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (FIPE review and parallel-work assessment)
+- Shared-RX route37642988571 is active; latest lint/test/docs pass and unit runs. Its long step includes repair, antennas and detailed route; exact substage is not inferred from its name.
+- Read FIPE README/event queue/protocol rules/sweep source at916ed28. Public GDS37554106388: gds/precheck/viewer success, GL test failure. README synthesis24% is not comparable to our post-placement area or proof of full timing closure.
+- Added FIPE_REVIEW_AND_PARALLEL_WORK.md: transferable committed-event scheduling and rule/boundary evidence ideas; kept behavioral model independent and deferred new protocol features/monitors until phase gates. Reviewed our22-case coverage and existing critical-path/endpoint/fallback/official-portability work. No new hardware or phase tick.
+- Next: inspect shared-RX extracted result after routing; use selective fanout/drive fallback only on measured residual paths. Prepare official clean-build integration when candidate passes all timing/physical/protocol gates.
+
 ## 2026-10-07: Codex (completed shared screen and 22-case routed GL)
 - Allmainworkflowsfinished;latestlint/test/docs/unitandnightlygreen. Original125psGL37581139271passes22/22,0fail/error/skip;independentlyparsedJUnitartifact11467535087. Originalslowsetupremains-0.179789ns.
 - SharedRXscreen37579966660complete:setup0allcorners;holdfast/slow/typ+0.0166144/+0.150971/+0.069035ns. Finalinstancearea515652.60um² versusbaseline510232.98 (+1.06%);notextractedclosure.

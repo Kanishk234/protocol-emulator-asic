@@ -45,6 +45,12 @@ Magic37669173193 active alongside late-route37668791436. Both use standard
 cloud runners. Agent tasks complete; no further agent expansion. Official
 OpenAI documentation confirms subagents can increase token usage; exact
 account consumption is not available here. All authorized changes recorded.
+**Fresh targeted result:**37668791436 fails correctly: source3, bootstrap17,
+late guides7→3, fresh whole-chip3 and unchanged topology. Residual shorts are
+shell_0489_/_0490_ and shell_0331_/VGND. Both late passes remained GUIDES
+because effective; verified pinned FlexDRFlow transition then extended same
+costs to at most6 alternating-offset steps, preserving80minute cap and all
+gates. This reaches possible stubborn work without resetting the router.
 
 ## 2026-10-07 (session63: inspect fresh route failure and isolate filler remedy)
 **Done:** checked newly failed37657068016 and downloaded artifact. Job32m09s,

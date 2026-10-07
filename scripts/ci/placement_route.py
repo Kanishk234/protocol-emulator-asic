@@ -58,9 +58,9 @@ def hold_headroom(config_path, state, output, pdk_root, hold_margin=0.10):
 def main():
     root = Path('runs/rtl-grt-screen')
     variant = os.environ.get('SOURCE_VARIANT', 'placement')
-    if variant not in {'placement', 'lane', 'sram', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual'}:
+    if variant not in {'placement', 'lane', 'sram', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer'}:
         raise ValueError('Unknown route source variant')
-    timing_root = root / 'timing' if variant in {'placement', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual'} else Path('runs/slew-screen')
+    timing_root = root / 'timing' if variant in {'placement', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer'} else Path('runs/slew-screen')
     comparison = json.loads((timing_root / 'comparison.json').read_text())
     if variant != 'cts' and not timing_pass(comparison):
         raise ValueError('Failing source timing')

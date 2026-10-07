@@ -49,9 +49,10 @@ def verify(variant, output, simulate=False):
         module = Path(source).stem
         gold = output / f'gold_{module}.v'
         gold.write_text(originals[source])
-        for count in ([1, 5, 6, 7, 9, 16] if module == 'trw_chan_port' else [None]):
-            param = f'chparam -set N {count} {module}\n' if count else ''
-            tag = f'equiv-n{count}' if count else 'equiv'
+        for count in ([1, 5, 6, 7, 9, 16] if module == 'trw_chan_port' else [4, 8] if module == 'trw_pin_rx' else [None]):
+            parameter = 'FRAC' if module == 'trw_pin_rx' else 'N'
+            param = f'chparam -set {parameter} {count} {module}\n' if count else ''
+            tag = f'equiv-{parameter.lower()}{count}' if count else 'equiv'
             if len(sources) > 1:
                 tag = module + '-' + tag
             # Relative include paths avoid Yosys treating quotes in -I as literal text.
@@ -71,12 +72,18 @@ def verify(variant, output, simulate=False):
         suites = []
         if 'src/trw_chan_port.v' in sources:
             suites.append(('chan', []))
+        pin_modules = []
         if 'src/trw_pin_bs.v' in sources:
-            suites.append(('pin', ['FULL=1',
-                'COCOTB_TEST_MODULES=test_pin_bs,test_pin_bs_frame,test_pin_bs_tx,test_pin_bs_b3']))
+            pin_modules += ['test_pin_bs', 'test_pin_bs_frame', 'test_pin_bs_tx', 'test_pin_bs_b3']
+        if 'src/trw_pin_rx.v' in sources:
+            pin_modules += ['test_pin_rx', 'test_pin_full']
+        if pin_modules:
+            suites.append(('pin', ['FULL=1', 'COCOTB_TEST_MODULES=' + ','.join(pin_modules)]))
         suites += [('chip', []), ('l2', [f'RTL_DIR={output / "src"}',
                                       f'RTL_REV={CANDIDATE}-{variant}', 'L2_CYCLES=2048'])]
         for suite, args in suites:
+            if suite == 'pin' and 'carrier_active' in (output / 'src/trw_pin_unit.v').read_text():
+                args = [*args, 'CACHED_CARRIER=1']
             with (output / f'{suite}.log').open('w') as log:
                 subprocess.run(['make', '-C', str(output / 'test_internal' / suite),
                                 'SIM=icarus', *args], stdout=log,

@@ -46,6 +46,20 @@ claim all geometry zero when it fails. Syntax/YAML/whitespace checks pass; cloud
 verification pending. Next is retained native0/LVS result and Magic pSD.e
 analysis, then matching new native physical views and configured timing.
 
+**Further proactive checks:** D-050 cloud37652533986 is active in bounded
+native cleanup. Latest lint37652533997/test37652534156/docs37652533791/
+unit37652533933 and fabric37650210874 all pass. No failing routine workflow
+left in this checked group. Continue monitoring the physical experiment.
+
+Read-only6350 Magic polygon-box association:6346 fill2-only,2 fill1/fill2,
+2 fill1-only; none inside macro bounds. Exact pinned KLayout pSD symlink target
+implements only pSD.c1, confirmed by execution log. KLayout0 does not clear
+Magic pSD.e/f; no false-positive assertion or rule waiver. Prepared D-051
+bounded isolated full-style Magic filler/library screen, no local EDA or
+hardware change. YAML/Tcl completeness and whitespace checks pass. Next:
+inspect bounded route outcome and isolated-cell reports, then reproduce row
+boundaries if isolated library cells pass. All phase boxes remain open.
+
 ## 2026-10-07 (session60: verified reset control, corrected filler experiment, host improvements)
 **Done:** proactively inspected all latest workflows. Original-LUT matched
 control37553979644 passes RTL/native UART/native USER_RESET; downloaded and

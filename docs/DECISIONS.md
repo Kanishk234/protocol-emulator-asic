@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-051: Isolate the Magic filler rule without changing hardware
+- **Date:**2026-10-07. **Status:** accepted diagnostic under D-037.
+- **Evidence:**37648945387 has6350 Magic pSD.e boxes, all overlapping plain top-level fillers; none inside macro bounds. Pinned KLayout shared pSD deck implements only pSD.c1, so its zero does not clear pSD.e/f.
+- **Decision:** cloud-only read-only full-style Magic checks of pinned fill1/fill2, decap4/decap8 and inverter control; retain every report and deck/library hashes. No design, PDK or template-job edits. Bound job12minutes/tool step7minutes.
+- **Cost/limits:** free standard runner time only; no hardware cost. Isolated cells do not reproduce row abutment, complete-chip DRC/LVS, native function or timing. Workflow success only certifies completed report generation; reported DRC counts remain failures to diagnose.
+
 ## D-049: Same-wire diagnostic of the frame-index slew hotspot
 - **Date:**2026-10-07. **Status:** accepted isolated measurement under D-037; no physical promotion.
 - **Evidence:** exact37552604692 extracted slow-corner report has9 slew violations, all on frame_idx[0], driven by u_cfg._54_/a21oi_1. Worst2.562529ns versus2.507400ns limit. Same report has33 fanout violations. Source is the saved3-marker intermediate route, macro black-boxed.

@@ -238,3 +238,25 @@ native routing/antenna/critical-disconnected checks are zero. It then replays
 no-decap physical checks and retains final views with corrected collector.
 Driver remains unchanged; Magic disagreements still require investigation.
 No three-hour route is queued by this experiment, and frozen G1 is untouched.
+
+## Magic filler localization and checker coverage
+
+Read-only association of all6350 Magic polygon boxes from37648945387 with
+its post-fill DEF and exact pinned standard-cell LEF gives6346 fill2-only,
+2 fill1/fill2 and2 fill1-only boxes. None is inside the fabric macro bounding
+box. This is a placement-box association, not a polygon connectivity proof.
+
+The exact pinned CMOS5L KLayout pSD include links to the shared
+[5_10_psd.drc](https://github.com/IHP-GmbH/IHP-Open-PDK/blob/2bbec755dc67ca3db0261c3d6163e15735d66710/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/feol/5_10_psd.drc),
+which implements only pSD.c1. The retained execution log likewise runs only
+pSD.c1 in that table. KLayout0 therefore does not disprove Magic pSD.e/f.
+Magic's untouched CIF derivation identifies butted taps lacking a0.3um
+extension from diffusion. The underlying overlap requirement is documented
+in the [official extra DRC rules](https://ihp-open-pdk-docs.readthedocs.io/en/latest/verification/drc/03_extra_drc.html).
+
+D-051 adds a bounded cloud-only isolated check of untouched fill1/fill2,
+decap4/decap8 and an inverter control with the same full Magic style. A green
+workflow means reports were produced, not that those cells or this chip passed
+DRC. Isolated failure would motivate a library/deck reproducer; isolated success
+would leave assembled row boundaries and integration as hypotheses. No PDK
+edits, rule waiver or layout promotion.

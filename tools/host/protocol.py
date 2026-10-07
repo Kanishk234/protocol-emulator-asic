@@ -158,6 +158,13 @@ def checked_load_transactions(words: Sequence[int], file_arch: int, chip_arch: i
 def load_transactions(words: Sequence[int], chunk: int = 64,
                       arch_version: int = ARCH_VERSION) -> List[List[int]]:
     """The whole load: LOAD_BEGIN, LOAD_DATA in chunks of `chunk` words, LOAD_END with the CRC."""
+    if not isinstance(chunk, int) or isinstance(chunk, bool) or chunk <= 0:
+        raise ValueError("chunk must be a positive integer number of words")
+    if not isinstance(arch_version, int) or isinstance(arch_version, bool) or not 0 <= arch_version <= 0xFFFF:
+        raise ValueError("architecture version must be an unsigned 16-bit integer")
+    if any(not isinstance(word, int) or isinstance(word, bool) or not 0 <= word <= 0xFFFFFFFF
+           for word in words):
+        raise ValueError("configuration words must be unsigned 32-bit integers")
     txs = [tx_load_begin(len(words), arch_version)]
     for i in range(0, len(words), chunk):
         txs.append(tx_load_data(words[i:i + chunk]))
@@ -185,3 +192,19 @@ def parse_read_status(miso: Sequence[int]):
 def parse_byte(miso: Sequence[int]) -> int:
     """CH_READ / USER_STATUS: the byte after the opcode."""
     return miso[1]
+
+
+def parse_channel_read(miso: Sequence[int]) -> tuple[Status, int | None]:
+    """Parse exactly one CH_READ response; distinguish valid zero from empty.
+
+    STATUS.rx_valid during the opcode determines whether the payload is data.
+    Only RUNNING accepts CH_READ. Keep parse_byte for USER_STATUS and callers
+    that already checked channel validity explicitly.
+    """
+    if len(miso) != 2 or any(not isinstance(byte, int) or isinstance(byte, bool)
+                            or not 0 <= byte <= 255 for byte in miso):
+        raise ValueError("CH_READ response must contain exactly two bytes")
+    status = Status.decode(miso[0])
+    if status.state != State.RUNNING:
+        raise ValueError("CH_READ is valid only in RUNNING")
+    return status, miso[1] if status.rx_valid else None

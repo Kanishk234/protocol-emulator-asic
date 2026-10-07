@@ -33,6 +33,14 @@ no extra agent fan-out. Added source-linked border-config, failure-trace and
 clock-phase/backpressure ideas to existing improvement roadmap; pending tests,
 not accepted hardware changes or competitor rankings.
 
+**Latest cloud evidence:** board unit37663965540 green on675a03c. Pushed
+697499b/98c24b0/1731c08; late-cost native37668791436 active. Automatic approval
+review initially timed out before executing the git command; one retry succeeds.
+Whole-chip37663775123 verifies20714 replacements and empty non-pSD XOR, then
+Magic hits30min cap with no report. Baseline stock check12m19s. Align scratch
+Tcl with stock suspendall/selected-chip listall query, avoiding global catchup;
+full rules unchanged,45min step/55min job bound. No DRC acceptance yet.
+
 ## 2026-10-07 (session63: inspect fresh route failure and isolate filler remedy)
 **Done:** checked newly failed37657068016 and downloaded artifact. Job32m09s,
 router29m42s, exit2 because5 native routing violations, not timeout. Both

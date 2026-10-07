@@ -31,4 +31,4 @@ PYTHONPATH=tools pytest -q tools/board/tests/test_warp.py tools/host/tests/test_
 
 Result: **317 passed in 0.84s**. This is Python validation and transaction
 evidence, not real-board testing or a new chip simulation result. The normal
-`unit` workflow already collects these tests; hosted evidence remains pending.
+`unit` workflow already collects these tests; hosted unit37663965540 passes on675a03c, covering the board fix through the normal unit suite.

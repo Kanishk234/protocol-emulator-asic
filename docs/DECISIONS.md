@@ -18,6 +18,8 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 
 - **Verified/follow-up:**37662382228 reproduces17 boxes in unchanged ground pair and geometry-identical flattened control, but widened-pSD fill1/fill2 give0 in isolated/horizontal/both mirrored-boundary fixtures. Both import modes agree and invalid control still fails. Added implant area0.186/0.330um2 per fill1/fill2. Prepare manual cloud-only full Magic replay of authenticated37648945387 GDS with the same overlay, exact20714-instance inventory and whole-chip non-pSD XOR checks. Source still3 native markers; no rerouting, chip promotion, LVS or timing pass inferred. Full report generation remains distinct from reported zero.
 
+- **Whole-layout follow-up:**37662990606 stops at non-pSD XOR guard.37663775123, using stable instance iteration and normalized region comparison, verifies20714 replacements and empty non-pSD delta; Magic times out30min before reporting. Baseline same-chip stock Magic took12m19s. Match stock suspendall/selected-chip listall sequence instead of global catchup; bound full step45min/job55. This is a reporting/control-flow alignment, no reduced rules or acceptance. No DRC result or cause-specific speed improvement claimed until cloud completes.
+
 ## D-051: Isolate the Magic filler rule without changing hardware
 - **Date:**2026-10-07. **Status:** accepted diagnostic under D-037.
 - **Evidence:**37648945387 has6350 Magic pSD.e boxes, all overlapping plain top-level fillers; none inside macro bounds. Pinned KLayout shared pSD deck implements only pSD.c1, so its zero does not clear pSD.e/f.

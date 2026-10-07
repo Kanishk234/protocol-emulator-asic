@@ -14,6 +14,13 @@ foreach width {1 2 4 8} {
 }
 lappend cells warp_fill1_rows_same warp_fill2_rows_same
 lappend cells warp_fill2_ground_gap005 warp_fill2_ground_gap030 warp_fill2_ground_gap300
+lappend cells warp_fill2_ground_flat
+foreach width {1 2} {
+    lappend cells wp_sg13cmos5l_fill_${width}_psd_trial
+    foreach fixture {horizontal rows_mirrored rows_ground} {
+        lappend cells warp_trial${width}_${fixture}
+    }
+}
 foreach cell $cells {
     puts "WARP_CELL $cell"
     load $cell

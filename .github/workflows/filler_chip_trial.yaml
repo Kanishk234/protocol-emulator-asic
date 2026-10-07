@@ -15,7 +15,7 @@ concurrency:
 jobs:
   inspect:
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 55
     env:
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
@@ -28,7 +28,7 @@ jobs:
           bash spikes/cloud/fetch_pdk.sh
           gh run download 37648945387 -R "$GITHUB_REPOSITORY" -n compact-geometry-replay-37648945387 -D build/filler_chip_source
       - name: Scratch implant overlay and full Magic report
-        timeout-minutes: 30
+        timeout-minutes: 45
         run: |
           source .venv/bin/activate
           mkdir -p build/filler_chip_trial

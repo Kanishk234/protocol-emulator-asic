@@ -7,6 +7,12 @@ on:
       - 'patches/fabulous_lut_mux_tree.patch'
       - '.github/workflows/lut_variant.yaml'
   workflow_dispatch:
+    inputs:
+      implementation:
+        description: LUT implementation for matched synthesis control
+        type: choice
+        default: mux_tree
+        options: [mux_tree, original_control]
 permissions:
   contents: read
 concurrency:
@@ -19,6 +25,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      WARP_LUT_IMPLEMENTATION: ${{ inputs.implementation || 'mux_tree' }}
     steps:
       - uses: actions/checkout@v6
       - name: Project tools and simulation venv

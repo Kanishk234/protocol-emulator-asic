@@ -5,6 +5,72 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (standing publication authorization)
+- User grants standing approval for commands, commits, pushes and workflow launches in this timing task; no repeat scoped approval needed for routine authorized work. Repository rules and evidence requirements remain otherwise intact.
+- Committed verified prototype patches9f5037b separately from CI187d4fd. Both named-module proofs, channel/pin/chip simulations and2048-clock L2 pass for the new combination;143helper tests andworkflow parses pass. MainRTL/spec/config/template jobs unchanged.
+- Publishing reviewed reports with exact extracted setup/hold tradeoff and complete22/22localwrapperprotocol evidence. Pending push/pairedscreen dispatch; no physical gain orphase tick claimed.
+- Next: launch bs-event-drop-qual against bs-event-late,inspect existingGL37566926287,andcontinue physical closure from actual results.
+
+## 2026-10-06: Codex (paired combination screen prepared)
+- Prepared bs-event-drop-qual screen and route continuation with exact two-module mutation guards, independent source fingerprints and successful-main provenance. Optional comparison_baseline=bs-event-late isolates the new channel qualification change; existing defaults remain unchanged. No template GDS jobs or main RTL/config edited.
+- 143 CI/helper tests pass, workflow choices/defaults parse, and diff check passes. Reusable verifier proves both modules (channel N=1/5/6/7/9/16 and bitsync), channel/pin/chip suites and fresh 2048-clock L2 all pass (session74453 exit0). Report PHASE2_EVENT_DROP_QUAL.md contains review scope and proposed dispatch.
+- Routed GL37566926287 still running. No new physical margin or phase tick; publication/dispatch pending a scoped git exception under AGENTS.md.
+- Next: finish reusable L2, publish reviewed CI/prototype/docs groups and launch matched event-late comparison after authorization; inspect current routed GL.
+
+## 2026-10-06: Codex (actual setup cone and verified combination)
+- GL37566926287activeatmaincheck;route/extractionsuccessstatusesunchangedandtimingnotclosed.
+- Auditedcompletedartifact11459002750:11slowsetupentries,9droppedcounter/2U3RXrt22/23. SourcesU1/U0PIN_Aselectionword1bit1. Worst−0.389409ns/second−0.344089ns include0.662608/0.617550nshold-delaycells;otherfailureshavenofinalholdbuffer,soeffectsincludecriticalrouting/slew.
+- Builtisolatedevent-late+drop-qual,frozen2/4. ChannelmoduleequivalenceN1/5/6/7/9/16passes;channeltests,5chiptestsand2048L2zero-divergencepass. Localpatchbs_event_drop_qual.patch;rawresults/tmp/event-drop-qual-20261006. No mainRTLchange,push,dispatchorphysicalgainclaim.
+- Next: preparesource-provenancedtwo-modulephysicalscreenandreviewcounter/RXcones;inspectcurrentGL. No phase ticks.
+
+## 2026-10-06: Codex (150 ps extracted tradeoff and static audit)
+- Newroute37559740009SUCCESS,extraction37566926240SUCCESSdiagnostic: setupfast/typ0,slow−0.389409404633ns;holdfast+0.067033713810,slow+0.379780995180,typ+0.184989584442ns. Notclosed.443holdbuffers,pre-routefasthold+0.120978ns,extractioncost53.944ps. GL37566926287running; allCIgreen.
+- Startedartifact11459002750downloadtosavedzipforslowsetupcone audit. Priorityshiftedtoactualsetupregression; donotpromote150psaspassingrecipe.
+- Staticcandidateauditpassed19sourcepaths,7SRAMviews,clockmetadataandphysicalerrorgates. Recordedstatic_integration_audit.jsonandupdatedreadiness/headroomreports. No physicalgeometry/LVSclaimorphaseticks.
+- Next: identifyextractedslowcriticalpaths,chooseboundedselectivehold/setupfollow-upandinspectGLresult.
+
+## 2026-10-06: Codex (official native recipe audit)
+- Main150psroute37559740009stillactive; allCIgreen. Verified officialaction LibreLane3.1.0.dev3andIHPnativeconfigmerge fromremoteaction/project/techsource.
+- Prepared standalone native-timing-settings-proposal.json inisolatedcandidate:timing-driven/no-mirror placement,zero setup targets,0.16routing,signoffPNRconstraints,allcornersandpending150pshold. Notappliedtosrc/config orpublished; requiresreviewedconfigexception beforeadoption.
+- Documented customMetal2wrapperandextra checkpointpass are notreproduced bynormalofficialflow. Firstofficialbuildmusttestportability ratherthanassumeequivalence. No officialdispatch,phaseticksornewmarginclaims.
+- Next: inspect150psroute/extraction,thenreviewnativeconfigandfullcandidatepromotionforofficialGDS.
+
+## 2026-10-06: Codex (parallel candidate protocol gate passes)
+- Full-wrapper2/4event-late RTL replay finished22/22PASS,0FAIL/ERROR/SKIP withsigrok enabled,1545.11s. Independently verifiedJUnit andrecordedhash in /tmp/tripwire-official-2x4-prep-20261006/candidate_manifest.json. Localterminal28639 complete.
+- Generator --check passes. Prepared /tmp/tripwire-official-2x4-prep-20261006/official-hardware-review.patch againstcurrentHEADsource/spec/info/testMakefile forreview; no mainRTL/spec/config changes,promotionorpublication. Updatedreadinessreport tosupersede100psactive status withactualfailure/150psfollow-upandlocalprotocolevidence.
+- No phase ticks: officialflowportability,latchmarginpinnedengine,andcompletephysical/precheck/GLremainrequired.
+- Next: inspect150psroute/extraction; reviewofficialrecipe andcandidatepromotionwithactualphysicalresults.
+
+## 2026-10-06: Codex (execution report helper and green CI)
+- Mainlint/docs/test/unit on87fbb59 allpassed;150psroute37559740009 stillactive. Local full-wrapper replay has18passes,0failures andis running19HDLC.
+- Prepared reporting-onlyexecution_margin.tcl,ran against actualprior extracted design at all3corners. Finds4504flop/2065latch/24output endpoints; flop/output/hold values match preceding independent audit. LocalolderOpenSTA emitsno latch paths unlike pinnedCI; explicitlydocumented incomplete latch coverage andwithheld globalpositive-WNSclaims. No constraints modified,remote helper integration/publication orphaseticks.
+- Next: finish replay,check150psrouting/extraction andrun endpointhelperwithpinnedengine beforefinalmarginclaims.
+
+## 2026-10-06: Codex (independent extracted endpoint margin audit)
+- Route37559740009 andunit37559733397 remain active;lint/docs/test green. Local decoder replay28639 passed UARTTX/RX andis onMIDI.
+- Audited previous event extracted netlist/SPEF/emittedSDC with local OpenSTA2.6.0: fast/slow/typ hold−0.014615/+0.104597/+0.030521ns reproduce published metrics. Worst flop endpoint setup12.147419/1.223082/8.164472ns; slow pathlane0a_lat13→rpc2. Output marginspositive. Local global setup report differs from pinned latch0report,so results are independent execution-path diagnostics,not official closure or replacement WNS.
+- Added evidence/limitations to event hold-headroom report. No phase ticks,publication or additional remote launches.
+- Next: confirm flop endpoint margin with pinned engine,inspect150ps actualfresh/extractedholdandcontinue protocol replay.
+
+## 2026-10-06: Codex (local decoder replay started)
+- Main37559740009 route and37559733397unit still in progress;lint/docs/test passed. No new extracted timing.
+- Local first L3 suite finished22cases:5pass17fail,2073s. Inspected all17traces: each fails at empty sigrok annotation output. Previous out-of-sandbox UART/WS decoding confirms environment cause; not a full functional pass.
+- Started full unchanged RTL L3 replay outside sandbox with working decoder,session28639,log /tmp/tripwire-official-2x4-prep-20261006/l3-decoder-replay.log andseparate results_l3_decoder_replay.xml. Old simulator completed; no duplicate live suite. No phase ticks.
+- Next: inspect replay andremote fresh timing/extraction results.
+
+## 2026-10-06: Codex (progress check)
+- Main150ps route37559740009 remains in combined repair/antenna/fresh-STA/DRT step; public step label does not identify its inner stage. Unit37559733397 running;lint37559733405,docs37559733390,test37559733356 passed. No new extracted measurement.
+- Local full-wrapper L3 advanced to19/22HDLC; multiple tests fail at sigrok annotation checks with empty stdout. Previously demonstrated sandbox libusb cause on UART/WS; suite not counted as passing and decoder-dependent cases need replay with working sigrok. No phase ticks.
+- Next: finish local suite,inspect every failure and replay; audit remote repair's fresh metrics when available.
+
+## 2026-10-06: Codex (approved 150 ps publication and launch)
+Done:
+- User explicitly authorized all listed commit/push/dispatch commands. Re-ran68helper tests anddiff check successfully; committed CIf99c148 anddocs87fbb59 separately,then pushed remote main. HEAD andorigin/main match87fbb59077f6af13739a59886d30ccc52738aa6e. No src/info/macro changes in pushed commits.
+- Dispatched150ps event hold target run37559740009 from trusted source37533969613; in progress. New unit37559733397,lint37559733405,docs37559733390,test37559733356 in progress at check. Original routing failure/downstream skips unchanged; no physical pass claimed.
+- Background terminal7673 is actual Icarus RTL L3 simulation,currently case7/22servoPWM. PID1663469 consumes101%CPU after11min,so actively computing. Decoder-restricted cases need replay outside sandbox; UART/WS saved waveforms already decode correctly there. No simulator stopped or duplicate suite launched.
+Checklist boxes ticked: none.
+Next: inspect150ps fresh/route/extraction gates; finish and replay decoder-dependent local L3 cases. Remaining local speculative combination/SRAM files and official-readiness edits intentionally unpublished.
+
 ## 2026-10-06: Codex (bounded follow-up ready for review)
 Done:
 - Audited artifact11454893508:241 endpoints below100ps target,255buffers (+0.8%area),internal100ps before legalization/rerouting became fresh48.7026ps. Worst slot461→lane0acc_addr[4]; next U2RXsst2+55.372ps,U2TXer1+55.628ps. Slow setup report1000entries all latch endpoints; execution margin not yet established.

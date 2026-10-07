@@ -19,3 +19,31 @@ The actual repair log reports241 endpoints below its100ps target and255 inserted
 Prepare an optional150ps repair target on the original trusted event source37533969613 (not an automatic retry of the mutated state). Keep zero setup target, one repair, fresh all-corner pass,50ps minimum fast hold, antenna/DRC guards and final extracted checks. Default remains source;100ps remains reproducible. Extra buffering may hurt setup or routing; no physical success asserted. Changes are local pending publication.
 
 All1000 entries in this trial's slow max report end at latches and have zero reported slack. This report cannot establish execution-path setup margin; a separate flop-endpoint report is needed without changing constraints or hiding latch checks.
+
+## Independent execution endpoint audit while 150 ps trial runs
+
+Replayed source extraction37551577987 locally using its actual fill-inserted netlist,nominal extracted SPEF and emitted final SDC (20ns,propagated clocks,setup uncertainty0.25ns,hold0.10ns,IO4ns andearly/late0.95/1.05derates). Used cached PDK standard-cell and matching frozen SRAM libraries. No missing-cell/annotation errors reported; no IO pad instances in this design. Local OpenSTA2.6.0aa598a2f14 differs from the pinned CI tool,so this is independent endpoint analysis,not replacement signoff evidence.
+
+| Corner | Worst flop-endpoint setup slack (ns) | Worst output setup slack (ns) | Global hold slack (ns) |
+|---|---:|---:|---:|
+| Fast |12.147419|13.448309|−0.014615|
+| Slow |1.223082|10.259272|0.104597|
+| Typical |8.164472|12.286599|0.030521|
+
+Hold agrees with published extracted metrics to displayed precision at all3corners. Slow worst flop path is lane0a_lat[13] (`_46588_`)→lane0rpc[2] (`_46493_`). Local unrestricted setup report also returns this path,whereas pinned CI reports0at latch endpoints. Treat this difference as a tool/report-semantics limitation: retain full latch checks and do not relabel official/global WNS as positive. Flop-only reports from the exact pinned engine are still needed to confirm this margin. The evidence supports prioritizing measured hold repair;150ps repair has not yet completed. Scripts/logs under `/tmp/event-final-audit/execution-*`.
+
+Prepared local reporting-only helper `scripts/ci/execution_margin.tcl` for an already-linked/constrained/extracted STA session. It retains global reports and independently selects4504flop,2065latch and24output endpoints on this candidate. Executed with the saved extracted design at all3corners; flop/output/hold values reproduce the independent audit above. Local2.6engine emits no paths for the2065latch endpoints,while pinnedCI previously reported zero-slack latch paths. This confirms the local analysis is incomplete for latch timing and cannot support any global-closure claim. The helper has not been integrated into remote workflows or published; pinned-engine execution remains required.
+
+## 150 ps extracted result: hold closes, setup regresses
+
+Route37559740009 completed successfully; extraction37566926240 completed diagnostically. Fresh pre-route fasthold+0.120978ns became extracted+0.067033713810ns (loss53.944ps). Slow hold+0.379780995180ns,typical+0.184989584442ns. Setupfast/typicalWS0; slowWS−0.389409404633ns. Therefore this candidate is not timing-closed despite successful diagnostic job status.443hold buffers were inserted versus255in the100ps trial. RoutedGL37566926287 is active.
+
+Inspect actual slow max paths from artifact11459002750 before selecting a follow-up. A smaller bounded hold target or selective delay placement may reduce setup damage,but margins are not assumed linear and should not be chosen without the path audit. Official native proposal's150pshold setting is now unproven forsetup andmustnotbe promoted as a passing recipe.
+
+## 150 ps setup-path audit
+
+Actual extracted slow max report contains11violating entries:9dropped-counter endpoints and2U3RXtimer endpoints (`rt[23]`/`rt[22]`). Launches are U1/U0configword1bit1 (PIN_Aselection),not the earlier PERIOD/TXMODE cones. Worst U1PIN_A1→dropped[15]−0.389409ns includeshold12461 dlygate4sd3_1 adding0.662608ns; secondU0PIN_A1→dropped[31]−0.344089ns includeshold11765 adding0.617550ns. Remaining failures do not contain such finalholdbuffers in their reported data paths. Thus broad hold-repair delay androuting/slew effects both matter; removing two cells alone does not establish closure.
+
+Preparing isolated event-late+drop-qual from frozenhardware. Parallel per-source drop qualification is alreadymodule-equivalent; combining it with event-late targets most failing counters while retainingliveconfig/same-cyclebehavior. It doesnotdirectlyaddress RXtimer failures andhasno measuredtiminggain. Combinedfunctionalverification mustfinish before anyphysicalscreen orpromotion.
+
+Isolatedevent-late+drop-qual prototype completed:drop-qualification equivalence passes atN1/5/6/7/9/16 (event-late unchanged frompreviousprovenpatch),channeltests pass,5/5chiptests pass,and2048clockL2lockstep passes. Rawproof/tests under /tmp/event-drop-qual-20261006. Combinedpatch `spikes/r4_floorplan/bs_event_drop_qual.patch` preparedlocally; notpublishedorregisteredinremotechoices andnotphysicallymeasured. This prototypetargetsreportedcountercone,notall11violations.

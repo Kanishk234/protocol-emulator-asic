@@ -50,8 +50,14 @@ module tb_pin #(
 
     wire [`TRW_PC_BITS-1:0] cfg;
     wire restart;
+`ifdef TRIPWIRE_CACHED_CARRIER
+    wire carrier_active;
+`endif
     trw_pin_cfg #(.FULL (FULL)) u_cfg (
         .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg), .restart (restart)
+`ifdef TRIPWIRE_CACHED_CARRIER
+        , .carrier_active (carrier_active)
+`endif
     );
 
     wire [4:0] pin_a = cfg[`TRW_PC_PIN_A_MSB:`TRW_PC_PIN_A_LSB];
@@ -93,6 +99,9 @@ module tb_pin #(
 
     trw_pin_unit #(.FULL (FULL), .FRAC (FRAC)) u_unit (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
+`ifdef TRIPWIRE_CACHED_CARRIER
+        .carrier_active (carrier_active),
+`endif
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .rx_free (free), .rx_load (rload), .rx_tag (rtag), .rx_data (rdata),
         .a_out (a_out), .a_oe (a_oe), .n_out (n_out), .n_oe (n_oe),

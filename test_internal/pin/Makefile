@@ -4,6 +4,10 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 FULL ?= 0
 FRAC ?= 8
+CACHED_CARRIER ?= 0
+ifeq ($(CACHED_CARRIER),1)
+COMPILE_ARGS += -DTRIPWIRE_CACHED_CARRIER
+endif
 SRC_DIR ?= $(PWD)/../../src
 SIM_BUILD = sim_build/full$(FULL)_frac$(FRAC)
 

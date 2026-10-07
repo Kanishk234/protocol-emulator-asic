@@ -22,6 +22,8 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 
 - **Whole-layout follow-up:**37662990606 stops at non-pSD XOR guard.37663775123, using stable instance iteration and normalized region comparison, verifies20714 replacements and empty non-pSD delta; Magic times out30min before reporting. Baseline same-chip stock Magic took12m19s. Match stock suspendall/selected-chip listall sequence instead of global catchup; bound full step45min/job55. This is a reporting/control-flow alignment, no reduced rules or acceptance. No DRC result or cause-specific speed improvement claimed until cloud completes.
 
+- **Whole-chip verified/follow-up:**37669173193 completes whole-chip Magic report0 with20714 replacements and no non-pSD delta, authenticated GDS3ee36af59b8b5964f1796b7b2756e7dad859572d3e23266c848b05fc58ae9f9b. Prepare KLayout and GDS-based shell LVS on that exact artifact; set MAGIC_EXT_USE_GDS true only in copied scratch config so extraction checks actual changed geometry. Preserve stock macro abstraction (shell scope), original logical netlist and source native3 limit. No routing, native-function or configured-timing acceptance inferred. Pinned upstream extract_spice.tcl explicitly selects GDS versus DEF/LEF; upstream untouched.
+
 ## D-051: Isolate the Magic filler rule without changing hardware
 - **Date:**2026-10-07. **Status:** accepted diagnostic under D-037.
 - **Evidence:**37648945387 has6350 Magic pSD.e boxes, all overlapping plain top-level fillers; none inside macro bounds. Pinned KLayout shared pSD deck implements only pSD.c1, so its zero does not clear pSD.e/f.

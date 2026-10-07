@@ -29,6 +29,14 @@ their physical views remain unqualified. Tiny mirrored filler-ground fixtures
 reproduce Magic's rule across all four filler widths, so a width-only swap
 is unsupported. Compact physical/configured timing acceptance remains open.
 
+The scratch filler remedy now clears full-chip Magic in37669173193:0 errors,
+with all other layers identical. Full GDS-based KLayout/shell LVS follow-up
+is prepared; known native shorts and configured timing remain open. Their
+geometry now identifies actual pin escapes crossing ground/neighbor pins,
+not just net-name associations. Independent loaded UART phase/read-delay
+stress37671919707 verifies48 bytes over3 seeds with replay traces. No freeze
+or phase gate changed.
+
 ## Goal
 Make WARP's design choice, results, limits and use understandable to a judge, and make the simulation results reproducible from a clean source tree.
 

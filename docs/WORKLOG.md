@@ -20,6 +20,20 @@ physical rate claim. No additional agents spawned.
 **Next:** inspect physical/native results and targeted stress trace, then
 repair the specific remaining failures without relaxing gates.
 
+**Verified progress:** UART phase37671919707 succeeds; downloaded strict XML
+and trace verify48 correct bytes/3 seeds/all phase endpoint cases, actual
+read-delay range0..125clocks and no framing/overrun. Full-chip filler
+37669173193 reports Magic0 (baseline6350),20714 replacements/empty non-pSD
+XOR and exact GDS hash3ee36af59b8b5964f1796b7b2756e7dad859572d3e23266c848b05fc58ae9f9b.
+This qualifies only that scratch Magic check, not native/LVS/timing.
+Prepared bounded KLayout/GDS-based shell LVS follow-up; copied config uses
+MAGIC_EXT_USE_GDS true, because original DEF-based extraction would silently
+ignore implant overlays. Stock macro abstraction unchanged and explicit.
+Actual LEF/DEF intersection audit exactly reproduces NAND ground-spur and NOR
+B-to-C pin short boxes; documents a concrete next access hypothesis if active
+late-cost repair fails. Source/clock/RTL untouched. Python/YAML/shell checks
+pass locally. Native37669731197 still active.
+
 ## 2026-10-07 (session64: parallel diagnosis and independent board fix)
 **Done:** user explicitly authorized agents; assigned two bounded independent
 agents for primary-source routing research and fallback-compatible software

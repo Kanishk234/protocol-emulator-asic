@@ -305,3 +305,35 @@ ground-boundary pSD.e/f boxes, while horizontal/opposite-boundary/isolated
 checks give0, identically for both import modes. A width-only filler swap is
 not supported. Study the small tap geometry and upstream rule implementation
 before changing physical cells or production checks. DRC is still not waived.
+
+## Verified scratch filler fix and exact pin-escape shorts (October7)
+
+[37669173193](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37669173193)
+reports **0 full-style Magic violations** on the whole scratch GDS after
+widening ground-side pSD in fill1/fill2 (D-052). Downloaded report is exactly
+`count 0`; log says no errors. Manifest verifies20714 replacements, identical
+bounding boxes/non-pSD geometry and original source hash. Trial GDS SHA256
+3ee36af59b8b5964f1796b7b2756e7dad859572d3e23266c848b05fc58ae9f9b.
+Baseline37648945387 had6350 Magic errors. This clears that check for this
+scratch layout, not routing/LVS/timing or fabricated silicon. Source still
+has3 native shorts. KLayout and actual GDS-based shell LVS are next; DEF/LEF
+extraction would test old filler geometry and must not be mistaken for overlay
+validation. Preserve stock macro abstraction and state its electrical scope.
+
+Native [37668791436](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37668791436)
+keeps cells/placement/connectivity identical and ends3 shorts. Its retained
+DEF, netlist, fresh after.drc report and pinned CMOS5L LEF explain exact escapes:
+
+| Marker | Placed pin geometry and actual routed segment | Implication |
+|---|---|---|
+| shell_0331_/VGND, x41.01–41.28/y450.37–450.53um | NAND2b u_shell._0997_ is N at(40.32,449.82). VSS's vertical M1 rectangle is local x.69–.96/y-.22–.94. Signal horizontal M1 runs x40.56–41.76 at y450.45, width.16. Their intersection equals the marker. | Signal route crosses the NAND's ground spur on its way to the output pin; this is a concrete pin-escape collision. |
+| shell_0489_/_0490_, x59.38–59.66/y474.065–474.225um | NOR3 u_shell._1183_ is N at(57.60,472.50). C pin M1 is local x1.78–2.06/y1.515–1.85. Net to B runs horizontal M1 x59.075–59.965 at y474.145, width.16. Its intersection with C equals the marker. | B's escape crosses neighboring C pin; two boxes here are incidences of the same pin cluster, not independent logic faults. |
+
+Current late-cost37669731197 continues through guide plateau to native
+stubborn work; no identical early-schedule restart. If it fails, prioritize
+access directly through vias inside these pins rather than generic cell-count
+changes. Official [pin-access options](https://openroad.readthedocs.io/en/latest/main/src/drt/README.html#pin-access-arguments)
+support a via-only access layer and a fully contained via-enclosure range.
+A constrained-via experiment still needs access for every pin, native0,
+antenna/connectivity, full geometry/LVS and new extraction/timing. It is a
+pending hypothesis; no setting has been promoted or tool rule waived.

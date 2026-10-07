@@ -25,4 +25,4 @@ if [[ "$(basename -- "$script_path")" == "rsz_timing_postgrt.tcl" ]]; then
     done < "$script_path" > "$patched_tcl"
     args[$script_index]="$patched_tcl"
 fi
-exec tripwire-openroad-hotspot "${args[@]}"
+exec "$(dirname -- "${BASH_SOURCE[0]}")/tripwire-openroad-hotspot" "${args[@]}"

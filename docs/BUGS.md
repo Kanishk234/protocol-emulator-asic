@@ -2,6 +2,12 @@
 
 Format for each entry: number, date, symptom, root cause, the check that caught it, the check that now covers it, fix commit.
 
+## 41: Plain-filler experiment leaves the separate decap selector active
+- **Date:**2026-10-07.
+- **Symptom/check:**37552604692 reproduces248 KLayout errors and75 LVS errors; intended decap removal did not occur. Result summary has null counts because failed deferred checkers do not write final state_out.
+- **Root cause:** fill insertion combines DECAP_CELLS and FILL_CELLS. Only FILL_CELLS was changed; DECAP_CELLS remained sg13cmos5l_decap_*. Exact post-fill DEF has5667 decaps and1095 plain fillers,6762 total. This run does not test the no-decap hypothesis.
+- **Fix/coverage:** change only DECAP_CELLS to an empty list in the copied config. Stage filler insertion separately and require zero actual decap instances plus nonzero plain fillers before expensive physical checks. Read KLayout/Netgen metrics from their completed states even when deferred checkers fail. Static inventory/parser checks pass against failed-run evidence; corrected cloud verification pending. Frozen chip/PDK unchanged.
+
 ## 38: Functional Liberty import rejects an unused clock-gate cell
 - **Date:**2026-10-06.
 - **Symptom/check:**37536118708 native UART fails; separate optional SAT stops before solving because sg13cmos5l_lgcp_1 has an internal output without a function.

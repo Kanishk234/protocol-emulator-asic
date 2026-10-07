@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session60: verified reset control, corrected filler experiment, host improvements)
+**Done:** proactively inspected all latest workflows. Original-LUT matched
+control37553979644 passes RTL/native UART/native USER_RESET; downloaded and
+strictly parsed all3 XMLs, one case each/no failure/error/skip. Both regenerated
+mappings pass, so mux-tree-only attribution remains unsupported. Latest
+ordinary docs37554066409/lint37554066460/test37554066619/unit37554066461 green.
+
+Physical replay37552604692 fails after27m34s: KLayout248/LVS75, but actual
+post-fill DEF still has5667 decaps plus1095 plain fillers. DECAP_CELLS remained
+active when FILL_CELLS was edited (BUG41); no-decap hypothesis was not tested.
+Corrected one copied config field to DECAP_CELLS=[], added actual filler
+inventory gate before long checks, and corrected metric extraction from
+completed tool states when deferred checkers omit their state_out. Syntax,
+exact failed-run DEF count and248/75 parser checks pass; corrected hosted run
+pending. Frozen G1/src/arch/macro/info/PDK unchanged; no heavy local EDA.
+**Boxes ticked:** none. Compact physical/configured timing remain open.
+**Next:** inspect corrected inventory/DRC/LVS; improve fallback-compatible host
+trace tools and loading validation while cloud checks run.
+
 ## 2026-10-06 (session59: matched synthesis control and final evidence retention)
 **Done:** proactively checked cloud workflows. Native mux-tree37552796495 and
 tracked-patch37553037381 pass RTL control and actual SPI-loaded native UART.

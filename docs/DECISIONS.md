@@ -390,3 +390,12 @@ passes. Do not attribute the correction solely to the new primitive. Both use
 fresh copied inputs and identical synthesis flow apart from primitive choice;
 old physical views remain unqualified. Prefer isolating synthesis differences
 before changing architecture. Area/routing/configured timing costs stay open.
+
+
+**D-048 correction (October7):**37552604692 failed248 KLayout/75 LVS after27m34s
+job time. Actual DEF still has5667 decaps/1095 plain fillers because the
+separate DECAP_CELLS selector was active (BUG41). This did not exercise decap
+removal and cannot reject the hypothesis. Corrected one-field copied config
+sets DECAP_CELLS=[] and preserves original FILL_CELLS. Require actual post-fill
+inventory confirmation before DRC/LVS. Retain original clock, routing, logic,
+macro, geometry checks and power tradeoff; no frozen config change.

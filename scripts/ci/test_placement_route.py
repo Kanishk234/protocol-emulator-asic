@@ -129,3 +129,16 @@ def test_headroom_requires_fresh_all_corner_pass_and_fast_budget(tmp_path, monke
         assert placement_route.hold_headroom('config', 'state', tmp_path, 'pdk', hold_margin=hold_margin) == Path('measured-state')
     assert calls == [{'sdc': Path('src/signoff.sdc'), 'setup_margin': 0.0,
                       'repair_corners': CORNERS, 'hold_margin': hold_margin}]
+
+
+@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-event-rx-shared', 'bs-event-rx-timer', 'placement', 'bs-event-drop-qual'])
+@pytest.mark.parametrize('target', ['source', '0.10', '0.125', '0.15', '0.12'])
+def test_only_reviewed_source_target_pairs_allow_headroom(variant, target):
+    from placement_route import selected_hold_margin
+    if target == 'source':
+        assert selected_hold_margin(variant, target) is None
+    elif target in {'0.10', '0.125', '0.15'} and (variant == 'bs-event-late' or (variant == 'bs-event-rx-shared' and target == '0.125')):
+        assert selected_hold_margin(variant, target) == float(target)
+    else:
+        with pytest.raises(ValueError):
+            selected_hold_margin(variant, target)

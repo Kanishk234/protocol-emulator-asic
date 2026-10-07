@@ -55,6 +55,17 @@ def hold_headroom(config_path, state, output, pdk_root, hold_margin=0.10):
     return Path(data['after_state'])
 
 
+def selected_hold_margin(variant, selected):
+    """Bound optional headroom experiments to reviewed source/target pairs."""
+    if selected not in {'source', '0.10', '0.125', '0.15'}:
+        raise ValueError('Unknown pre-route hold target')
+    if selected == 'source':
+        return None
+    if variant != 'bs-event-late' and not (variant == 'bs-event-rx-shared' and selected == '0.125'):
+        raise ValueError('Hold-headroom target is not reviewed for this source')
+    return float(selected)
+
+
 def main():
     root = Path('runs/rtl-grt-screen')
     variant = os.environ.get('SOURCE_VARIANT', 'placement')
@@ -106,13 +117,10 @@ def main():
     if variant == 'cts':
         state = hold_followup(config_path, state, out / 'hold-followup', os.environ['PDK_ROOT'])
     selected_hold = os.environ.get('PRE_ROUTE_HOLD_TARGET', 'source')
-    if selected_hold not in {'source', '0.10', '0.125', '0.15'}:
-        raise ValueError('Unknown pre-route hold target')
-    if selected_hold != 'source':
-        if variant != 'bs-event-late':
-            raise ValueError('Hold-headroom experiment is scoped to event-late')
+    hold_margin = selected_hold_margin(variant, selected_hold)
+    if hold_margin is not None:
         state = hold_headroom(config_path, state, out / 'hold-headroom', os.environ['PDK_ROOT'],
-                              hold_margin=float(selected_hold))
+                              hold_margin=hold_margin)
 
     def run(tag, steps, source):
         config = dict(base)

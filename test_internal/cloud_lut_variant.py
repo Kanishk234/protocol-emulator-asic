@@ -27,8 +27,14 @@ out.mkdir(exist_ok=False)
 library = variant / "fabulous-tiles"
 gold = library / "primitives/FABULOUS_LC/fabulous/FABULOUS_LC.v"
 patched = out / "FABULOUS_LC_mux_tree.v"
-subprocess.run(["patch", "--batch", "--forward", "--output", str(patched), str(gold),
-                str(ROOT / "patches/fabulous_lut_mux_tree.patch")], check=True)
+implementation = os.environ.get("WARP_LUT_IMPLEMENTATION", "mux_tree")
+if implementation == "mux_tree":
+    subprocess.run(["patch", "--batch", "--forward", "--output", str(patched), str(gold),
+                    str(ROOT / "patches/fabulous_lut_mux_tree.patch")], check=True)
+elif implementation == "original_control":
+    shutil.copyfile(gold, patched)
+else:
+    raise ValueError("Unknown LUT implementation experiment")
 latch_map = out / "latch_map.v"
 latch_map.write_text(r'''module \$_DLATCH_P_ (input E, D, output Q);
 sg13cmos5l_dlhq_1 impl (.D(D), .GATE(E), .Q(Q));
@@ -69,6 +75,7 @@ if not records:
     raise RuntimeError("No native LUT tiles regenerated")
 (out / "manifest.json").write_text(json.dumps({
     "scope": "regenerated_native_netlist_functional_only_no_physical_or_timing_qualification",
+    "implementation": implementation,
     "configuration_tied_to_constants": False, "original_inputs_edited": False,
     "tiles": records,
 }, indent=2) + "\n")

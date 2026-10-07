@@ -130,7 +130,7 @@ passes binary equivalence against pinned LUTK for every16-bit truth table and
 4-bit input, plus2916 partial-input simulations with actual pinned PDK models.
 The follow-up37552796495 regenerates scratch native LUT tile netlists and tests
 SPI-loaded UART against the unchanged RTL control. Copied macro physical views
-do not qualify those new netlists; whole loaded/physical/timing acceptance is
+do not qualify those new netlists; physical/timing acceptance is
 still pending. Upstream change lives in patches/fabulous_lut_mux_tree.patch and
 is applied only to a separate staged source.
 
@@ -143,3 +143,34 @@ coverage gap without claiming a functional correction.
 Acceptance still requires actual native loaded behavior, zero final routing
 and physical violations, and timing through the configured fabric. The frozen
 G1 physical success does not supply those compact or native proofs.
+
+## Matched resynthesis results (October 6)
+
+[37552796495](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37552796495)
+and tracked-patch follow-up
+[37553037381](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37553037381)
+pass the unchanged RTL control and actual regenerated native UART test.
+The test loads 842 real words through SPI, checks UART TX/RX and STOP parking,
+and rejects failures/errors/skips in its acceptance XML. The existing D-023
+routing harness remains; this is zero-delay simulation, not SDF or hardware.
+
+Crucially, matched original-LUT control
+[37553190074](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37553190074)
+also passes. Its downloaded manifest confirms original_control; simulation log
+reports TESTS=1 PASS=1 FAIL=0 SKIP=0 and actual SPI loading. Both experiments
+resynthesize the same five LUT tile types with the same Yosys/latch mapping/ABC
+flow. Therefore the five-mux primitive is not established as necessary for this
+UART correction. Differences from the original hardened synthesis flow remain
+under investigation; a passing resynthesis does not prove the old netlists
+incorrect in binary hardware operation.
+
+Next checks retain all regenerated tile netlists and acceptance XML explicitly,
+and run UART after the real USER_RESET command. Any new netlist needs matching
+hardened physical views, binary equivalence/resource audits and configured-fabric
+timing before promotion. The copied old LEF/GDS/SPEF cannot qualify it.
+
+The original tile config uses SYNTH_STRATEGY=AREA 2, whereas this scratch helper
+uses Yosys's default abc -liberty script. This is one candidate difference, not
+an isolated cause. LibreLane documents that its strategies select different ABC
+scripts and that the best strategy must be measured:
+[official synthesis configuration](https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html).

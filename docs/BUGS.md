@@ -18,7 +18,7 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Date:**2026-10-06.
 - **Symptom/check:**37516794406 reaches0 native markers, but artifact's latest drt_iter snapshot is iteration52 with3markers. KLayout counts survive while its lyrdb and final zero-route ODB are absent.
 - **Root cause:** bounded collector retains intermediate drt_iter ODB and small log/rpt/json/xml files, excluding final physical views and lyrdb.
-- **Coverage/workaround:** separate geometry replay37545941476 retains full ignored run directory including physical views and marker databases. Its source remains intermediate3-marker ODB; cannot reconstruct or claim the final0 database from it. Update long-route evidence retention before another route is needed; original collector is not yet corrected.
+- **Coverage/workaround:** separate geometry replay37545941476 retains full ignored run directory including physical views and marker databases. Its source remains intermediate3-marker ODB; cannot reconstruct or claim the final0 database from it. Update long-route evidence retention before another route is needed; collector now retains the final completed state views separately, with exact metrics and hashes, plus all lyrdb files. Synthetic regression verifies final0 ODB retention even when the latest intermediate snapshot has3 markers. Hosted retention verification remains pending; it does not recover the missing historical final database.
 
 ## 37: Optional native LUT alias raises KeyError through indexed lookup
 - **Date:**2026-10-06.
@@ -314,3 +314,10 @@ Format for each entry: number, date, symptom, root cause, the check that caught 
 - **Symptom/check:**37516278474 native RTL control passes; new read-only cone extraction fails parsing PDK Verilog line43's specify syntax before native tests.
 - **Root cause:** distribution Yosys parser does not support this PDK model timing syntax, even when read as black-box library.
 - **Fix/coverage:** read signal port directions from the pinned standard-cell Liberty with read_liberty -lib, then read actual tile netlist without mapping/optimization.37516794406 successfully emits actual_tile_cone.json and reaches both native tests. Simulation uses unchanged official Verilog/UDP models. BUG33 remains open; fixing extraction does not qualify hardware.
+
+
+**BUG33 resynthesis follow-up:**37552796495/37553037381 five-mux candidates
+pass actual SPI-loaded native UART. Matched original-LUT resynthesis37553190074
+also passes, so a mux-only causal claim is unsupported. Original hardened
+netlists still fail; regenerated netlists require matching physical/timing
+validation. Next coverage adds real USER_RESET and preserves candidate netlists.

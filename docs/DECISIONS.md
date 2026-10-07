@@ -382,3 +382,11 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** separate standard Ubuntu24.04 hosted experiment jobs; no template-job edits, main changes, self-hosted runner or paid/larger runner. Publish preserved iteration8/15-marker inputs as a hashed experimental prerelease asset, not committed build output. Bound routing step300minutes and retain concise artifacts one day. Stock native failures block downstream signoff. Native mapped-fabric failures propagate independently.
 - **Scope/cost:** no hardware/resource/spec change. Hosted LibreLane3.1.0.dev3 Docker/four threads differ from local3.0.0 Nix packaging, so this is not a pure iteration-budget experiment. Source OpenROAD/PDK pins remain matched. Public standard-runner compute is free under GitHub rules; storage is separately limited. Checkpoint reproduction does not close clean-source rebuild, native/SDF functionality or configured-fabric timing gates.
 - **Evidence:** cloud Python/shell/YAML static checks and relocation of122 hash-verified files pass locally with no EDA computation. Workflow/results are recorded in WORKLOG; [acceptance/research plan](reports/compact_acceptance_and_competitors.md), spikes/cloud/README.md.
+
+
+**D-047 matched-control update (October6):** five-mux regenerated native UART
+passes37552796495/37553037381, but original-LUT resynthesis37553190074 also
+passes. Do not attribute the correction solely to the new primitive. Both use
+fresh copied inputs and identical synthesis flow apart from primitive choice;
+old physical views remain unqualified. Prefer isolating synthesis differences
+before changing architecture. Area/routing/configured timing costs stay open.

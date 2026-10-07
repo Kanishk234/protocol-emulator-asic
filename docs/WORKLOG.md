@@ -2,6 +2,34 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-06 (session59: matched synthesis control and final evidence retention)
+**Done:** proactively checked cloud workflows. Native mux-tree37552796495 and
+tracked-patch37553037381 pass RTL control and actual SPI-loaded native UART.
+Matched original-LUT resynthesis37553190074 also passes: the mux change alone
+cannot explain the correction. Downloaded control manifest and simulation log
+verify original_control,842 loaded words,UART TX/RX/STOP and one passing case.
+The original hardened native netlists still fail. Both regenerated variants
+have unqualified copied physical views; no compact physical/timing promotion.
+Official LibreLane synthesis documentation confirms different ABC strategies;
+AREA2 versus this helper's default ABC is a candidate difference, not a cause.
+
+Extended the candidate cloud check with real USER_RESET acceptance, explicit XML
+retention and all regenerated tile netlists. Fixed BUG40 collector to preserve
+views referenced by each flow's final completed state, metrics/hashes and full
+KLayout marker databases, independently of intermediate snapshots. Synthetic
+regression retains final0 ODB alongside an old3-marker snapshot. Python/YAML and
+whitespace checks pass. Collector/workflow-only edits no longer automatically
+start another hours-long compact route; manual dispatch remains available.
+No frozen src/arch/macro/info edits or heavy local EDA. Existing filler-only
+geometry/LVS37552604692 continues with unchanged inputs.
+
+**Boxes ticked:** none. At5da3b4b ordinary docs37553190167/lint37553190070/
+test37553190069/unit37553190205 all green. Cancelled pending push37553190274
+is not a failed candidate; manual control37553190074 succeeds.
+**Next:** inspect plain-filler DRC/LVS and extended native reset results;
+isolate mapping differences and obtain matching hardened views before any
+promotion. Keep checking all workflow results without user reminders.
+
 ## 2026-10-06 (session58: routing closes; physical checks become the blocker)
 **Done:** proactively inspected outstanding cloud jobs.37516794406 completes: native route exit0, iteration53 reaches0markers after2h47m15s router elapsed; antenna nets/pins0, critical disconnected pins0 (7 noncritical). Whole route/geometry job19:09:17–22:25:22UTC takes3h16m05s and fails later geometry: KLayout248 (M1.a1/M1.b247), Magic1828, LVS67 (63 net differences,1 unmatched net,3 unmatched pins). LVS shows power-net mismatches; cause unproven. Extracted shell setup+12.251343397653367ns/hold+0.12463458395889776ns at20ns, but9 slow-corner slew violations and macro black-boxed: no complete timing pass. Frozen G1 unchanged; compact not promoted.
 

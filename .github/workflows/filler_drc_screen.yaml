@@ -15,7 +15,7 @@ concurrency:
 jobs:
   inspect:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 15
     env:
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
     steps:
@@ -25,7 +25,7 @@ jobs:
           python3 -m venv .venv
           bash spikes/cloud/fetch_pdk.sh
       - name: Isolated library cells with full Magic rules
-        timeout-minutes: 7
+        timeout-minutes: 10
         run: |
           source .venv/bin/activate
           mkdir -p build/filler_drc_screen
@@ -34,18 +34,23 @@ jobs:
             -e WARP_FILLER_OUT="$GITHUB_WORKSPACE/build/filler_drc_screen" \
             ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
             klayout -b -r test_internal/filler_array_screen.py > build/filler_drc_screen/fixtures.log 2>&1
+          for maskhints in true false; do
+          mkdir -p "build/filler_drc_screen/$maskhints"
+          cp build/filler_drc_screen/filler_arrays.gds "build/filler_drc_screen/$maskhints/"
           docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
             -e WARP_FILLER_GDS="$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/gds/sg13cmos5l_stdcell.gds" \
-            -e WARP_FILLER_OUT="$GITHUB_WORKSPACE/build/filler_drc_screen" \
+            -e WARP_FILLER_OUT="$GITHUB_WORKSPACE/build/filler_drc_screen/$maskhints" \
+            -e WARP_FILLER_MASKHINTS="$maskhints" \
             ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
             magic -dnull -noconsole \
             -rcfile "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc" \
-            test_internal/filler_drc_screen.tcl > build/filler_drc_screen/magic.log 2>&1
+            test_internal/filler_drc_screen.tcl > "build/filler_drc_screen/$maskhints/magic.log" 2>&1
           for cell in fill_1 fill_2 decap_4 decap_8 inv_1; do
-            test -s "build/filler_drc_screen/sg13cmos5l_${cell}.rpt"
+            test -s "build/filler_drc_screen/$maskhints/sg13cmos5l_${cell}.rpt"
           done
-          for fixture in fill1_horizontal fill2_horizontal fill1_rows_same fill2_rows_same fill1_rows_mirrored fill2_rows_mirrored; do
-            test -s "build/filler_drc_screen/warp_${fixture}.rpt"
+          for fixture in fill1_horizontal fill2_horizontal fill1_rows_same fill2_rows_same fill1_rows_mirrored fill2_rows_mirrored fill1_rows_ground fill2_rows_ground; do
+            test -s "build/filler_drc_screen/$maskhints/warp_${fixture}.rpt"
+          done
           done
           sha256sum "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/gds/sg13cmos5l_stdcell.gds" \
             "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l-drc.tech" \

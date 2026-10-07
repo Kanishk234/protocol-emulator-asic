@@ -24,7 +24,7 @@ on:
         required: false
         default: source
         type: choice
-        options: [source, "0.10", "0.15"]
+        options: [source, "0.10", "0.125", "0.15"]
 
 permissions:
   contents: read

@@ -106,7 +106,7 @@ def main():
     if variant == 'cts':
         state = hold_followup(config_path, state, out / 'hold-followup', os.environ['PDK_ROOT'])
     selected_hold = os.environ.get('PRE_ROUTE_HOLD_TARGET', 'source')
-    if selected_hold not in {'source', '0.10', '0.15'}:
+    if selected_hold not in {'source', '0.10', '0.125', '0.15'}:
         raise ValueError('Unknown pre-route hold target')
     if selected_hold != 'source':
         if variant != 'bs-event-late':

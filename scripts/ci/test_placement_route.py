@@ -100,7 +100,7 @@ def test_postantenna_recovery_only_accepts_hold_only_failures(kind, corner):
     assert hold_only_failure(data) == (kind == 'hold')
 
 
-@pytest.mark.parametrize('hold_margin', [0.10, 0.15])
+@pytest.mark.parametrize('hold_margin', [0.10, 0.125, 0.15])
 @pytest.mark.parametrize('failure', [None, 'headroom', 'setup', 'hold-count'])
 def test_headroom_requires_fresh_all_corner_pass_and_fast_budget(tmp_path, monkeypatch, failure, hold_margin):
     import json

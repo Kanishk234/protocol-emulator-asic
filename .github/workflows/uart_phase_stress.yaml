@@ -1,0 +1,53 @@
+name: loaded UART phase stress
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/uart_phase_stress.py'
+      - '.github/workflows/uart_phase_stress.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-uart-phase-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  simulate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned project dependencies and standard simulator
+        run: |
+          sudo apt-get update && sudo apt-get install -y iverilog python3-venv python3-tk
+          bash scripts/setup_venv.sh
+      - name: Actual SPI-loaded phase and read-delay sweep
+        timeout-minutes: 20
+        run: |
+          source .venv/bin/activate
+          export PYTHONPATH="$GITHUB_WORKSPACE/tools:$GITHUB_WORKSPACE/test:$GITHUB_WORKSPACE/test_internal"
+          export WARP_PHASE_OUT="$GITHUB_WORKSPACE/build/uart_phase_stress"
+          mkdir -p "$WARP_PHASE_OUT"
+          set -o pipefail
+          make -C test WARP_FABRIC=rtl COCOTB_TEST_MODULES=uart_phase_stress \
+            SIM_BUILD="$WARP_PHASE_OUT/sim" COCOTB_RESULTS_FILE="$WARP_PHASE_OUT/results.xml" \
+            2>&1 | tee "$WARP_PHASE_OUT/simulation.log"
+          python - <<'PY'
+          import json, os, pathlib, xml.etree.ElementTree as ET
+          output=pathlib.Path(os.environ['WARP_PHASE_OUT'])
+          xml=ET.parse(output/'results.xml').getroot()
+          cases=xml.findall('.//testcase')
+          assert len(cases)==1 and cases[0].get('name')=='uart_phase_and_read_delay'
+          assert not any(xml.findall('.//'+tag) for tag in ('failure','error','skipped'))
+          trace=json.loads((output/'phase_trace.json').read_text())
+          assert trace['passed'] is True and len(trace['cases'])==48
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: loaded-uart-phase-${{ github.run_id }}
+          path: |
+            build/uart_phase_stress/phase_trace.json
+            build/uart_phase_stress/results.xml
+            build/uart_phase_stress/simulation.log
+          retention-days: 3

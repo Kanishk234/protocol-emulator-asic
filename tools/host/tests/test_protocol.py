@@ -5,7 +5,7 @@ from hypothesis import given, strategies as st
 
 from host.protocol import (ARCH_VERSION, ArchMismatch, Op, State, Status,
                            checked_load_transactions, crc32_words, load_transactions,
-                           parse_read_id, tx_ch_write, tx_load_begin, words_to_bytes)
+                           parse_channel_read, parse_read_id, tx_ch_write, tx_load_begin, words_to_bytes)
 
 
 def test_crc_is_ieee_over_big_endian_bytes():
@@ -52,3 +52,35 @@ def test_host_refuses_other_architecture():
 
 def test_ch_write_flags():
     assert tx_ch_write(0xAB, last=True) == [Op.CH_WRITE, 1, 0xAB]
+
+
+@pytest.mark.parametrize("chunk", [0, -1, True, 1.5])
+def test_load_rejects_invalid_chunk_before_building_transactions(chunk):
+    with pytest.raises(ValueError, match="chunk"):
+        load_transactions([0xFAB0FAB1], chunk=chunk)
+
+
+@pytest.mark.parametrize("word", [-1, 0x100000000, True, 2.5])
+def test_load_rejects_words_that_would_be_truncated(word):
+    with pytest.raises(ValueError, match="32-bit"):
+        load_transactions([word])
+
+
+@pytest.mark.parametrize("version", [-1, 0x10000, True, 2.5])
+def test_load_rejects_architecture_version_truncation(version):
+    with pytest.raises(ValueError, match="16-bit"):
+        load_transactions([0xFAB0FAB1], arch_version=version)
+
+
+def test_channel_read_distinguishes_zero_data_from_empty():
+    assert parse_channel_read([0x70, 0])[1] == 0
+    assert parse_channel_read([0x60, 0])[1] is None
+    assert parse_channel_read([0x60, 0xFF])[1] is None
+    with pytest.raises(ValueError, match="RUNNING"):
+        parse_channel_read([0x50, 0xAB])
+
+
+@pytest.mark.parametrize("response", [[], [0x60], [0x60, 0, 0], [0x60, 256], [True, 0]])
+def test_channel_read_rejects_malformed_response(response):
+    with pytest.raises(ValueError, match="two bytes"):
+        parse_channel_read(response)

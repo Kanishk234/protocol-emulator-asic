@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session67: route the legal ECO; independent reproduction/native audits)
+**Done:** proactively checked corrected placement37689324316; success.
+Downloaded actual placement-only ODB7b2811c291443d4208bcb1154fbe37ab6eeb7be6702c52060f135d0318509adf
+and strict one-master/three-cell/legal-placement/connectivity evidence. BUG45
+coverage updated. Prepared D-057 route of this exact placement: measured
+starting stale-wire markers, incremental bootstrap plus at most six late-cost
+passes, unchanged topology/masters/placement, fresh native0, stock antenna/
+critical connectivity, then fresh extraction/full geometry/LVS and strict
+all-corner slew/setup/hold/cap. Fanout remains explicitly open. Generalized
+physical helper with explicit ECO provenance and exact fresh-DEF filler counts;
+original defaults/gates remain. No frozen hardware/PDK edit. Local Python AST,
+Tcl completeness, YAML and whitespace checks pass; no local EDA.
+Reactivated existing bounded agents for clean-readme reproduction and read-only
+matched-native/fanout audit; no additional agents or local heavy work.
+**Boxes ticked:** none.
+**Next:** launch/monitor routed ECO, cancel only redundant baseline repeats
+autoqueued by shared diagnostic-helper edits, review agents' independent work
+and inspect any failure immediately. Native mapping/function, configured timing,
+fanout, precheck and clean reproduction remain before successor promotion.
+
 ## 2026-10-07 (session66: access restored; same-layout physical closure)
 **Done:** user requested continued work and explanation of the review limit.
 Fresh authorized GitHub retry succeeds; no bypass used. Downloaded successful

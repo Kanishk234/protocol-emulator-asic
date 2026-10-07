@@ -48,6 +48,17 @@ boundary fixtures. Turning hints off will not qualify production DRC. Added
 explicit box-count calculation from returned reasons; shell syntax/order,
 Python/Tcl checks pass locally. No frozen hardware or upstream edits.
 
+**Reproduced ground-boundary failure:**37657638270 completes1m49s; exact
+stock import flags enabled. Both fill1 and fill2 ground-sharing mirrored
+pairs give17 boxes, all pSD.e/f; opposite mirrored boundary and horizontal
+fixtures give0. Results identical with maskhints true/false. This reproduces
+the dominant complete-chip thin-box geometry without signals or fabric and
+rules out the tested maskhint toggle as a remedy. It does not certify the
+entire6350-error cause or justify waiving the rule. Next screen fill4/fill8
+at both mirrored boundaries before selecting a physical filler policy;
+all nominal pitches checked against exact pinned LEF. Native37657068016
+continues independently. Frozen hardware unchanged.
+
 ## 2026-10-07 (session61: short electrical screen while physical checks run)
 **Done:** proactively inspected corrected geometry37648945387, still active.
 Explained that this replay skips detailed routing; previous physical-only job

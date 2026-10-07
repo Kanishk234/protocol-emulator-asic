@@ -290,3 +290,12 @@ noduplicates and euclidean checking, unlike the initial reproducer. Follow-up
 matches these and screens both mirrored rail boundaries with maskhints
 true/false as an import diagnostic only. Production acceptance still requires
 stock settings; no false-positive or waiver claim.
+
+Production-matched37657638270 completes1m49s and reproduces17 pSD.e/f boxes
+on each ground-sharing mirrored fill1/fill2 pair. Horizontal and the opposite
+mirrored boundary remain0. Both maskhint values give identical results.
+Thin ground-boundary boxes match the dominant chip marker shape without
+fabric or signal routes. This supports a specific filler-ground-abutment
+cause, not proof every chip error is explained or a rule is invalid.
+Next screen the larger fill4/fill8 geometries before trying a chip-wide
+replacement; fill1-only cannot clear this isolated ground-boundary failure.

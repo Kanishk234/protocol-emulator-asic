@@ -1,5 +1,11 @@
 name: scratch chip filler implant screen
 on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/filler_chip_trial.py'
+      - 'test_internal/filler_chip_drc.tcl'
+      - '.github/workflows/filler_chip_trial.yaml'
   workflow_dispatch:
 permissions:
   contents: read

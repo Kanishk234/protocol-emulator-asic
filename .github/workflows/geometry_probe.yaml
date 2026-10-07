@@ -18,6 +18,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      WARP_GEOMETRY_FILLER_ONLY: '1'
     steps:
       - uses: actions/checkout@v6
       - name: Project venv

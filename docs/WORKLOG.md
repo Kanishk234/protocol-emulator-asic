@@ -38,6 +38,11 @@ Prepared manual whole-chip Magic diagnostic on authenticated no-decap GDS,
 replacing exactly20714 filler references in scratch output and asserting all
 non-pSD chip regions identical. Original source has3 native markers; whole
 DRC/LVS/power/timing still unqualified. No frozen edits or rerouting.
+**Cloud follow-up:** pushedd188de1/378b304/8b1a3d5/b265211; whole-chip
+filler37662990606 active. Initial branch-only workflow dispatch404 required
+a narrow efpga push trigger to register it; source artifact exists and name
+confirmed. Latest failure audit still identifies37657068016 as freshest
+failed efpga run. No acceptance gates relaxed.
 
 ## 2026-10-07 (session62: identify residual shorts and screen filler abutments)
 **Done:** proactively checked hosted outcomes after user asked to continue.

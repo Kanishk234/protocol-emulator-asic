@@ -5,10 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (125 ps route complete and parallel endpoint audit)
+- Main125psroute37574267994passes withrouteDRC0;180extra holdbuffers,repairpassarea+2.7%,postantennafast hold+0.0991903ns/setup0allcorners. Extraction37581139249andGL37581139271active. SharedRXscreen37579966660measuringbothbranches;latestunitactive,lint/test/docs green.
+- Extendedreporting-onlyexecution_margin.tcl withpreserved-net endpoint selection:96RXtimer,72dropped-counter,9SRAMaddress;D-onlyflopgroups excludereset. Replayedoriginal37551577987extraction allthreecorners;endpointcountsandsixreports/cornerpass. Olderlocalenginecannotreportfull latch timing;withheldsignoff/125psclaims.
+- Publishinghelperandmeasuredreportseparately;no mainRTL/config change,phasetick orconstraintchange. OlderSRAMinsertionprototype remainsunlaunched/untracked becauseitscheckpointdoesnotmatchRX/newcandidate.
+- Next:inspectextracted125ps setup/hold and22-caseGL;assesssharedRXoverflow/area;runresidualreportwithpinnedenginebeforepromotinganycandidate toofficialGDS.
+
 ## 2026-10-07: Codex (shared RX physical screen preparation)
 - Main125psroute37574267994 remains active;latestlint/test/docs passed,unitactive. Correction:its single named step includes repair/antenna andDRT,so active step alonecannotidentifyexactsubstage.
 - Preparedbs-event-rx-shared pair against event-late withtwo-module mutation/provenanceguards.181helpertests pass;workflowchoices parse. Freshreusableverification provesBSandRXFRAC4/8;41pintests,5chiptestsand2048L2clocks allpass. No mainRTL/config/templatejobchange orphasetick.
-- Verifiedprototypee7a3447andCIf3371dd committedseparately;publishingevidenceanddispatchingmatchedscreenafterremoterefverification. Next:inspectnewscreenand125psextractedresultwhenavailable. Retainallphysical/timinggates.
+- Publishedprototypee7a3447,CIf3371dd,docsfbf7835;HEAD/origin/main/GitHubref allmatchfbf78351e1990851897086c055b1254598a7ddfb. DispatchedsharedRXscreen37579966660,queued;newtest/docs/lint/unitactive.125psroute37574267994continues. Threeolderexperimentalhelpersremainuntracked andwerenotincluded. Next:inspectnewscreenand125psextractedresultwhenavailable. Retainallphysical/timinggates.
 
 ## 2026-10-07: Codex (main workflow progress and RX screen result)
 - All latest main lint/test/docs/unit runs on24bb0fd passed.125psroute37574267994 remains active atantenna/fresh-timing checks beforeDRT; no new extracted result.

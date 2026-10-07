@@ -53,3 +53,15 @@ Isolatedevent-late+drop-qual prototype completed:drop-qualification equivalence 
 The route workflow now accepts 0.125 ns only for the trusted event-late source. Regression checks: 135 passed across post-GRT timing, placement routing and route provenance; workflow choices/default parsed and diff check passed. All gates remain intact. This local change is not published or launched yet. Use source run 37533969613, variant bs-event-late, pre_route_hold_target=0.125, repair_postantenna_hold=false after publication.
 
 Prioritize low-area alternatives if this misses either corner: target delay sizing on actual failing fast paths, strengthen only measured high-delay gates, or move dropped-counter control after state-derived carry. Each needs independent equivalence and matched physical evidence. Avoid broad buffering or new configuration storage. The RX arithmetic experiment is currently running but its isolated 29.4% area increase makes full-chip overflow an adoption gate.
+
+## 125 ps routed result and pending extraction
+
+Route37574267994completed successfully with final routeDRC0. The extra repair inserted180holdbuffers;resizer reports2.7% sizing/repair area growth within this pass. Buffer counts do not establish lower full-design area versus the other targets. Fresh repaired fast hold0.0974116ns;postantenna0.0991903ns. Postantenna slow/typical hold0.367636/0.203499ns;setupWS0allcorners. Detailed routing consumed roughly58minutes after repair/checks.
+
+Extraction37581139249and expanded routedGL37581139271are active. These are diagnostic continuations; extracted setup/hold and protocol outcomes remain pending, and official GDS/precheck closure is unproven. The workflow's single long step includes repair,antenna andDRT,so its active name cannot identify the exact internal stage.
+
+## Residual endpoint report helper
+
+Published reporting-only `scripts/ci/execution_margin.tcl` retains unrestricted setup/hold and separate flop/latch/output reports. Optional `tripwire_report_residual_cones` selects96RXtimer D pins,72dropped-counter D pins and9SRAMaddress pins by preserved net names;reset/control pins are excluded from targeted flop groups. It fails if a required group is absent. It changes no constraints or hardware.
+
+Executed against original event extraction37551577987 with saved emittedSDC/SPEF at allthreecorners using localOpenSTA2.6.0. Allgroups present and allsixgroup reports produced percorner. Slow targetedsetup margins:RX2.762297ns,dropped2.012822ns,SRAMaddress11.371373ns. These describe the original weaker-hold candidate,not125psrouting orRXprototype. Localengine's missing latch paths remain a limitation; pinnedCI replay required before using endpoint results to judge adoption or signoff. Rawlogs:/tmp/event-final-audit/residual-cones-*.log.

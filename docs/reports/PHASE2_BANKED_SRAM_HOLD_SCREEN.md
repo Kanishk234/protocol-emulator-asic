@@ -25,3 +25,5 @@ gh workflow run gds-banked-sram-hold-screen.yaml --repo Kanishk234/protocol-emul
 ```
 
 Original125ps event-late remains the strongest measured extracted setup baseline (-0.179789ns setup, +0.037290ns fast hold). This experiment must improve measured feasibility rather than displace that baseline on an unverified claim.
+
+First run37689090398 aborts before insertion because resizer step config lacks placement-only PL_TARGET_DENSITY_PCT (BUG75). Corrected guard checks density/timing mode in base and unique actual global-placement config; repair config still checks clock/GRT/mirroring/SDC.224 helper tests and replay of actual downloaded source configs pass (runner absolute SDC path rebased only for local audit). This failure supplies no physical timing evidence.

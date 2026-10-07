@@ -5,7 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (repair-only config guard scope fixed)
+- Run37689090398 fails before insertion: KeyError PL_TARGET_DENSITY_PCT. LibreLane resizer step config intentionally omits placement-only key. Logged BUG75; validate density in base plus unique actual placement config, keep repair clock/GRT/mirroring/SDC checks.
+-224 helper tests pass; actual downloaded source configs pass corrected guard with runner SDC path rebased only in local audit. No timing result or hardware failure inferred from this tooling abort.
+- Next: publish corrective tool/test/docs groups under approved repair-only scope and relaunch exact experiment. No phase boxes ticked or DRT dispatched.
+
+## 2026-10-07: Codex (workflow and phase2 status snapshot)
+- Repair-only37689090398 is building pinned region-reservation image. Current dbd3dd9 test passes; lint/docs/unit active (RTL Icarus/Verilator suites); older docs37668163469 remains displayed active. Two stale automatic extraction/GL entries still queued, superseded by completed manual runs.
+- Phase2 checklist10/11 checked historically; routable-budget item remains open. Historical official typical-only gate does not meet current user requirement of positive full-design official WNS and nonnegative all-corner hold. Original125ps remains strongest extracted setup -0.179789ns/fast hold +0.037290ns; latest banked GRT setup0/fast hold -0.0223693ns, no banked extraction.
+- No phase ticks. Next: inspect actual repair-only gates, then guarded routing/extraction/GL if justified; reproduce clean recipe in official GDS and revalidate complete candidate before phase exit.
+
 ## 2026-10-07: Codex (approved repair-only publication)
+- Publication complete:41f23d9 tools,7499d4a workflow,dbd3dd9 reports pushed; HEAD/origin/main matchdbd3dd9a515f4d511ddf4b8de637a846b4bd1ff4. Repair-only run37689090398 is in progress on main. No DRT dispatched.
 - User approved separate tools/workflow/reports commits, push and manual launch. Rechecked217 local helper tests and diff; no unpublished src/info/macro history or main hardening active.
 - Tools committed41f23d9; new manual workflow7499d4a. Reports record exact negative banked hold and preserve original125ps baseline. FIPE and old addr0 prototypes excluded; direct routing support remains local until measured repair evidence.
 - No phase boxes ticked. Next: push approved groups and launch repair-only screen, then inspect real legalization/routing/all-corner margin and antenna gates before any DRT.

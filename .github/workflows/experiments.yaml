@@ -5,7 +5,7 @@ on:
     branches: [efpga]
     paths:
       - 'spikes/cloud/**'
-      - '.github/workflows/experiments.yaml'
+      - '!spikes/cloud/collect.py'
   workflow_dispatch:
 
 permissions:

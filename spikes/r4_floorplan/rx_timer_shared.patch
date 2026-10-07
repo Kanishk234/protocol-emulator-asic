@@ -1,0 +1,40 @@
+--- a/src/trw_pin_rx.v
++++ b/src/trw_pin_rx.v
+@@ -99,9 +99,18 @@
+     reg [RW-1:0] rt;                            // 16.FRAC clocks from this clock to the next sample
+     wire       srx_on  = m_srx && sel;
+     wire       start   = srx_on && (sst == S_START) && (a_in != idle);
+-    wire [RW-1:0] rt_cur = start ? sofs : rt;
+-    wire       srx_smp = srx_on && (start || (sst == S_SAMP)) && (rt_cur[RW-1:FRAC] == 16'd0);
+-    wire [RW:0] rt_add = {1'b0, rt_cur} + (srx_smp ? {1'b0, per} : {(RW+1){1'b0}});
++    // Prepare timer values before the late live-input START decision.
++    // Every branch retains the original modulo-RW update and sample clock.
++    wire start_sample = start && (sofs[RW-1:FRAC] == 16'd0);
++    wire timer_sample = srx_on && (sst == S_SAMP) && (rt[RW-1:FRAC] == 16'd0);
++    wire srx_smp = start_sample || timer_sample;
++    wire [RW-1:0] rt_tick = rt - (1 << FRAC);
++    wire [RW-1:0] sample_delta = per - (1 << FRAC);
++    wire [RW-1:0] rt_sample = rt + sample_delta;
++    wire [RW-1:0] sofs_tick = sofs - (1 << FRAC);
++    wire [RW-1:0] sofs_sample = sofs + sample_delta;
++    wire [RW-1:0] start_value = (sofs[RW-1:FRAC] == 16'd0) ? sofs_sample : sofs_tick;
++    wire [RW-1:0] rt_next = start ? start_value : (timer_sample ? rt_sample : rt_tick);
+ 
+     // ------------------------------------------------------------------ LINKED_RX, SAMPLE
+     wire lrx_smp = m_lrx && sel && (rx_edge ? (b_prev && !b_in) : (!b_prev && b_in));
+@@ -168,7 +177,7 @@
+             end
+ 
+             // SHIFT_RX state
+-            rt <= rt_add[RW-1:0] - (1 << FRAC);
++            rt <= rt_next;
+             if (!srx_on)
+                 sst <= S_IDLE;
+             else case (sst)
+@@ -187,5 +196,5 @@
+     assign rx_data = ev ? {es, tick} : fw_add;
+     assign ovr_set = live && ((want && !rx_free) || (ev && emit) || smp_lost);
+ 
+-    wire _unused = &{1'b0, rt_add[RW], period, sampleofs};
++    wire _unused = &{1'b0, period, sampleofs};
+ endmodule

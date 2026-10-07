@@ -299,3 +299,9 @@ fabric or signal routes. This supports a specific filler-ground-abutment
 cause, not proof every chip error is explained or a rule is invalid.
 Next screen the larger fill4/fill8 geometries before trying a chip-wide
 replacement; fill1-only cannot clear this isolated ground-boundary failure.
+
+Larger-filler37658318703 completes2m01s: fill4/fill8 reproduce the same17
+ground-boundary pSD.e/f boxes, while horizontal/opposite-boundary/isolated
+checks give0, identically for both import modes. A width-only filler swap is
+not supported. Study the small tap geometry and upstream rule implementation
+before changing physical cells or production checks. DRC is still not waived.

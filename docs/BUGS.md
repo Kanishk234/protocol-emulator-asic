@@ -5,6 +5,7 @@
 - **Symptom/check:**37653631748 produces five reports with an empty count field. Full log records five zero-error checks and empty reason lists; workflow green only means reports completed.
 - **Root cause:** Magic `drc count total` prints its result instead of returning a Tcl value suitable for interpolation.
 - **Fix/coverage:** keep count output in the retained log, label each cell there and write `has_findings` from the returned `drc listall why` list. Check that every baseline and array fixture produces a report. Tcl completeness passes; hosted extended-array verification pending. This reporting correction does not resolve complete-chip DRC.
+- **Verified:**37657638270 and37658318703 retain explicit box counts derived from the returned reason lists, including17 ground-boundary boxes. Baseline/no-finding cases report0. These counts measure reports, not chip acceptance.
 
 Format for each entry: number, date, symptom, root cause, the check that caught it, the check that now covers it, fix commit.
 

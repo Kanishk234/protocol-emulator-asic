@@ -59,6 +59,18 @@ at both mirrored boundaries before selecting a physical filler policy;
 all nominal pitches checked against exact pinned LEF. Native37657068016
 continues independently. Frozen hardware unchanged.
 
+**Larger fillers/independent validation:**37658318703 completes2m01s. Fill4
+and fill8 also give17 pSD.e/f boxes at mirrored ground boundaries,0 on the
+opposite boundary/horizontal fixtures; isolated cells0. Both import controls
+agree. Simple filler-width replacement is not supported. Next investigate
+actual tap polygons and upstream interpretation using the now-small reproducer.
+Prepared independent D-047 native UART coverage extension:28 TX and28 RX bytes
+(zero/ones, alternating, walking-one/walking-zero, seeded random), real SPI
+load, original timing and STOP checks. Also require RX FIFO empty after each
+read. Same RTL/native/reset triplet, matched original-LUT control remains
+available; netlists still function-only with unqualified physical views.
+Python/YAML and whitespace checks pass locally. Hosted simulation only.
+
 ## 2026-10-07 (session61: short electrical screen while physical checks run)
 **Done:** proactively inspected corrected geometry37648945387, still active.
 Explained that this replay skips detailed routing; previous physical-only job

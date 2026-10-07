@@ -14,7 +14,7 @@ from host.protocol import Op, parse_byte, tx_ch_read, tx_ch_write, tx_simple, tx
 async def test_loaded_uart_capture(dut):
     image = Path(os.environ["WARP_UART_CAPTURE_BITFILE"]).resolve()
     tick = 1 << int(os.environ.get("WARP_UART_CAPTURE_STAMP_SHIFT", "0"))
-    assert tick in (1, 4), "loaded test covers the unscaled and divide-by-four images"
+    assert tick in (1, 4, 8), "loaded test covers unscaled, divide-by-four and divide-by-eight images"
     bs.BITS = image.parent
     host = await reset(dut)
     host.set_fab_in(1)

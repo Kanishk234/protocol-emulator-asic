@@ -1,0 +1,41 @@
+name: compact clean-route physical checks
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_clean_layout.py'
+      - '.github/workflows/clean_layout.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-clean-layout-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned tools and checked native source
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_checkpoint.sh
+          bash spikes/cloud/fetch_pdk.sh
+          gh run download 37669731197 -R "$GITHUB_REPOSITORY" -n compact-late-route-37669731197 -D build/native_zero_source
+      - name: Fresh extraction, filler policy and all geometry checks
+        timeout-minutes: 95
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_clean_layout.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-clean-layout-${{ github.run_id }}
+          path: build/clean_layout/
+          retention-days: 3

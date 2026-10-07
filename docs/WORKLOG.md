@@ -51,6 +51,11 @@ shell_0489_/_0490_ and shell_0331_/VGND. Both late passes remained GUIDES
 because effective; verified pinned FlexDRFlow transition then extended same
 costs to at most6 alternating-offset steps, preserving80minute cap and all
 gates. This reaches possible stubborn work without resetting the router.
+**Current runs/user alert audit:**9bba1c1/cae28d7 pushed; revised late repair
+37669731197 active, alongside selected-chip Magic37669173193. Latest efpga
+and all-branch failure lists show no additional WARP failure beyond the two
+already diagnosed; main gds-placement-route37557256170 is unrelated TRIPWIRE.
+Recent standard checks pass or remain active. No final physical/timing claim.
 
 ## 2026-10-07 (session63: inspect fresh route failure and isolate filler remedy)
 **Done:** checked newly failed37657068016 and downloaded artifact. Job32m09s,

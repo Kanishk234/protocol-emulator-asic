@@ -34,3 +34,9 @@ Independent frozen-baseline equivalence at FRAC4/8 passes;FRAC8 proves226points,
 Named trial `bs-event-rx-shared` combines unchanged event-late bitsync with only the shared-delta RX transformation. CI supports the exact two-module mutation set, successful-main source provenance, separate RX/BS fingerprints and matched event-late baseline.181helper checks pass; both workflow choices parse. Fresh reusable verification proves BS and RXFRAC4/8;41pin tests,5chip tests and2048model/RTL lockstep clocks allpass. Raw evidence:/tmp/bs-event-rx-shared-verify-20261007.log.
 
 Planned dispatch: `gh workflow run gds-drop-counter-screen.yaml --repo Kanishk234/protocol-emulator-asic --ref main -f experiment=bs-event-rx-shared -f comparison_baseline=bs-event-late`. Evaluate area, global overflow and all three corners; any routing continuation must retain its existing gates. No automatic adoption from diagnostic workflow success.
+
+## Completed shared-delta screen and guarded continuation
+
+Screen37579966660completed:sharedRXsetupWS0allcorners;holdfast+0.0166144ns,slow+0.150971ns,typical+0.069035ns. Baselinehold+0.0313302/+0.229262/+0.102516ns. Finalinstancearea515652.60um²/33787instances versus510232.98/33205 (+1.06%area);firstRXvariant517408.93um². No extractedsharedRXgainclaimed.
+
+Original125ps routedGL37581139271passedall22cases,0fail/error/skip (artifact11467535087JUnit independently parsed). Originalslowsetupstill-0.179789ns;protocolpassdoesnotclosetiming. DispatchsharedRXsource37579966660with125pstargetandpostantennarepairfalse usingexistingstrictsource/fresh50pshold/allcornertiminggates.

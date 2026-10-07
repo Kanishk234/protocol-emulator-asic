@@ -5,11 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (completed shared screen and 22-case routed GL)
+- Allmainworkflowsfinished;latestlint/test/docs/unitandnightlygreen. Original125psGL37581139271passes22/22,0fail/error/skip;independentlyparsedJUnitartifact11467535087. Originalslowsetupremains-0.179789ns.
+- SharedRXscreen37579966660complete:setup0allcorners;holdfast/slow/typ+0.0166144/+0.150971/+0.069035ns. Finalinstancearea515652.60um² versusbaseline510232.98 (+1.06%);notextractedclosure.
+- DispatchedpreviouslyverifiedguardedsharedRX125pscontinuationfromsuccessfulmainsource37579966660;preserveonepass/fresh50psfast/allcornertiming/physicalgates. No mainRTL/configchangesorphaseticks.
+- Newcontinuation37642988571queuedon09db1db. Next:inspectfreshrepairheadroomandDRT;oncleancompletionextractandrunexpandedGL. Officialclosurestillunproven.
+
 ## 2026-10-07: Codex (125 ps residual setup localized to RX)
 - Auditedartifact11464064023:exactlytwo slowsetupfailures,U0PIN_A1→U3RXrt23/22 (-0.179789/-0.052855ns). No finalholdcellinreportedpaths;dropped-counter failuresabsent. CommonSELarcsO21AI1.167ns/XOR1.306ns;NOR2/NOR4alsoweak. PinnedlibraryhasstrongerNOR2/4butnotXOR/O21AI;targetedfanoutrepair remainsfallback.
 - PreparedexactsharedRX+125pscontinuationguard;refuseotherunreviewedsource/targetpairs.171helpertests pass. Existingall-corner/fast50ps/antenna/DRCgates preserved;no mainRTL/configchange/phase tick.
 - SharedRXscreen37579966660and125psGL37581139271remainrunning;latestlint/test/docs green,unitactive. No routingdispatchuntilsharedRXsourceactuallypasses.
-- Next:publishCI/evidence,inspectsharedscreenandlaunchguardedcontinuationonlywithpassingprovenance;waitforactualGLbeforefunctionalclaim. Officialtimingunproven.
+- Published CI2901811 anddocs09db1db;localHEAD/origin/main/GitHubref verified09db1db22ee2d5859adec551ac1bb71df27eafc5. SharedscreenandGLstillactive;continuationnotlaunched.
+- Next:inspectsharedscreenandlaunchguardedcontinuationonlywithpassingprovenance;waitforactualGLbeforefunctionalclaim. Officialtimingunproven.
 
 ## 2026-10-07: Codex (125 ps route complete and parallel endpoint audit)
 - Main125psroute37574267994passes withrouteDRC0;180extra holdbuffers,repairpassarea+2.7%,postantennafast hold+0.0991903ns/setup0allcorners. Extraction37581139249andGL37581139271active. SharedRXscreen37579966660measuringbothbranches;latestunitactive,lint/test/docs green.

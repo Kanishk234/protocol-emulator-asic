@@ -8,6 +8,7 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Decision:** cloud-only read-only full-style Magic checks of pinned fill1/fill2, decap4/decap8 and inverter control; retain every report and deck/library hashes. No design, PDK or template-job edits. Bound job12minutes/tool step7minutes.
 - **Cost/limits:** free standard runner time only; no hardware cost. Isolated cells do not reproduce row abutment, complete-chip DRC/LVS, native function or timing. Workflow success only certifies completed report generation; reported DRC counts remain failures to diagnose.
 - **Verified/follow-up:**37653631748 completes five zero-error isolated checks in retained Magic log. Extend same measurement with untouched-cell horizontal arrays, two same-orientation rows and alternating mirrored rows using exact nominal LEF pitches. Preserve generated fixture GDS; this is a reproducer, not new hardware. Report returned reason-list presence because count output is printed (BUG43).
+- **Control refinement:**37657067983 horizontal/mirrored pairs have no findings; intentionally same-orientation rows exercise pSD.e/f and other overlap rules. Match stock readonly/noduplicates/euclidean settings, compare maskhints true (stock) versus false only as an isolated import diagnostic, and cover both mirrored rail-boundary types. Disabling hints is not accepted production DRC or a rule waiver.
 
 ## D-049: Same-wire diagnostic of the frame-index slew hotspot
 - **Date:**2026-10-07. **Status:** accepted isolated measurement under D-037; no physical promotion.

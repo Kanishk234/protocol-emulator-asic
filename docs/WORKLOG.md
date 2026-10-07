@@ -35,6 +35,19 @@ whitespace checks pass locally. No heavy local EDA.
 retain final checked views and test whether repairing those shorts resolves
 LVS12. Macro function, filler DRC and configured timing still need closure.
 
+**Cloud launch/results:** pushed6a97584/e66e0be/0f0e67b; extended native
+37657068016 active, filler arrays37657067983 complete. Horizontal and correctly
+mirrored pair fixtures have empty findings; intentionally same-orientation
+rows produce overlap/well/tap errors, including pSD.e/f with0.56x0.03um boxes
+matching the dominant chip marker shape. This is a positive checker control,
+not proof chip rows are wrongly oriented. Exact flow-script comparison also
+finds stream-in differences: stock enables maskhints/readonly/noduplicates and
+euclidean DRC. Refining array screen with matching settings, both maskhint
+values as isolated diagnostic controls, and complementary mirrored ground
+boundary fixtures. Turning hints off will not qualify production DRC. Added
+explicit box-count calculation from returned reasons; shell syntax/order,
+Python/Tcl checks pass locally. No frozen hardware or upstream edits.
+
 ## 2026-10-07 (session61: short electrical screen while physical checks run)
 **Done:** proactively inspected corrected geometry37648945387, still active.
 Explained that this replay skips detailed routing; previous physical-only job

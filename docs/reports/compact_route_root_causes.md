@@ -280,3 +280,13 @@ because the command prints instead of returning it (BUG43); empty reason lists
 and complete retained log support the isolated result. D-051 now tests small
 horizontal filler arrays and paired same/mirrored rows with untouched library
 geometry. Individual-cell success does not clear complete-chip filler errors.
+
+Array37657067983 completes1m47s: horizontal and mirrored pairs have empty
+reason lists. Intentionally invalid same-orientation row pairs trigger
+overlap/well/tap rules, including pSD.e/f boxes0.56x0.03um matching the dominant
+chip marker shape. This demonstrates checker sensitivity, not wrong chip-row
+orientation. The pinned stock Magic flow also sets maskhints/readonly/
+noduplicates and euclidean checking, unlike the initial reproducer. Follow-up
+matches these and screens both mirrored rail boundaries with maskhints
+true/false as an import diagnostic only. Production acceptance still requires
+stock settings; no false-positive or waiver claim.

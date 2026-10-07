@@ -6,6 +6,21 @@ import pytest
 from rtl_grt_screen import checkpoint, timing_placement, repair_margin
 
 
+def test_every_workflow_experiment_is_registered_in_patch_and_runner():
+    import yaml
+    from timing_trial import PATCHES
+
+    path = Path(__file__).resolve().parents[2] / '.github/workflows/gds-drop-counter-screen.yaml'
+    workflow = yaml.load(path.read_text(), Loader=yaml.BaseLoader)
+    inputs = workflow['on']['workflow_dispatch']['inputs']
+    for variant in inputs['experiment']['options']:
+        assert variant in PATCHES or variant == 'setup-margin'
+        assert timing_placement(variant)
+        assert repair_margin(variant) == (2.0 if variant == 'setup-margin' else 0.0)
+    for variant in inputs['comparison_baseline']['options']:
+        assert timing_placement(variant)
+
+
 @pytest.mark.parametrize("failure", [None, "missing_odb", "drt", "second_grt"])
 def test_screen_requires_unique_complete_preroute_state(tmp_path, failure):
     source = tmp_path / "35-openroad-globalrouting/state_out.json"

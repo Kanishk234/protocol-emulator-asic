@@ -8,7 +8,7 @@ from route_source import CANDIDATE, REQUIRED, SOURCES, validate_identity, valida
 
 def identity(root):
     files = {}
-    for name in REQUIRED | {'macro/RM_IHPSG13_1P_512x16_c2_bm_bist/README.md'}:
+    for name in REQUIRED | {'src/trw_pin_io.v', 'macro/RM_IHPSG13_1P_512x16_c2_bm_bist/README.md'}:
         path = root / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(name)
@@ -46,7 +46,7 @@ def test_source_identity_refuses_mismatch_and_untrusted_paths(tmp_path, failure)
 
 
 @pytest.mark.parametrize('failure', [None, 'branch', 'workflow', 'run-id', 'failure', 'unknown'])
-@pytest.mark.parametrize('variant', ['bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared'])
+@pytest.mark.parametrize('variant', ['bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared', 'bs-event-pin-banked'])
 def test_only_successful_main_source_workflow_is_accepted(failure, variant):
     run = {'id': 37504886226, 'head_branch': 'main', 'conclusion': 'success',
            'path': '.github/workflows/gds-drop-counter-screen.yaml'}
@@ -88,7 +88,7 @@ def test_route_artifact_contains_macro_files_needed_by_downstream_identity():
     assert 'macro/**' in paths and 'src/**' in paths and 'runs/placement-route/**' in paths
 
 
-@pytest.mark.parametrize('variant', ['bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared'])
+@pytest.mark.parametrize('variant', ['bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared', 'bs-event-pin-banked'])
 def test_route_prepares_exact_named_patch_before_fingerprinting(tmp_path, monkeypatch, variant):
     import route_source
     data = identity(tmp_path)
@@ -102,8 +102,8 @@ def test_route_prepares_exact_named_patch_before_fingerprinting(tmp_path, monkey
     assert prepared['variant'] == variant and prepared['source_run_id'] == 123
     assert prepared['files'] == data['files']
 
-@pytest.mark.parametrize('variant', ['bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared'])
-@pytest.mark.parametrize('changed', [None, 'src/trw_pin_bs.v', 'src/trw_chan_port.v', 'src/trw_pin_rx.v'])
+@pytest.mark.parametrize('variant', ['bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared', 'bs-event-pin-banked'])
+@pytest.mark.parametrize('changed', [None, 'src/trw_pin_bs.v', 'src/trw_chan_port.v', 'src/trw_pin_rx.v', 'src/trw_pin_io.v'])
 def test_combination_binds_both_modified_modules(tmp_path, changed, variant):
     data = identity(tmp_path)
     data['variant'] = variant
@@ -113,3 +113,11 @@ def test_combination_binds_both_modified_modules(tmp_path, changed, variant):
             validate_identity(data, tmp_path, variant)
     else:
         assert validate_identity(data, tmp_path, variant) == data
+
+
+def test_banked_source_requires_io_fingerprint(tmp_path):
+    data = identity(tmp_path)
+    data['variant'] = 'bs-event-pin-banked'
+    del data['files']['src/trw_pin_io.v']
+    with pytest.raises(ValueError, match='Incomplete source identity'):
+        validate_identity(data, tmp_path, 'bs-event-pin-banked')

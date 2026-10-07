@@ -14,6 +14,7 @@ SOURCES = {
     'sram': ('gds-sram-slew-screen', 'gds-sram-slew-sram'),
     'cts': ('gds-cts-cluster-screen', 'gds-cts-cluster-cts-cluster8'),
     'bs-resync': ('gds-drop-counter-screen', 'gds-drop-counter-bs-resync'),
+    'bs-event-pin-banked': ('gds-drop-counter-screen', 'gds-drop-counter-bs-event-pin-banked'),
     'bs-event-late': ('gds-drop-counter-screen', 'gds-drop-counter-bs-event-late'),
     'bs-event-rx-shared': ('gds-drop-counter-screen', 'gds-drop-counter-bs-event-rx-shared'),
     'bs-event-rx-timer': ('gds-drop-counter-screen', 'gds-drop-counter-bs-event-rx-timer'),
@@ -42,7 +43,8 @@ def validate_identity(identity, root, variant=None):
             or type(identity['source_run_id']) is not int or identity['source_run_id'] <= 0):
         raise ValueError('Wrong source identity')
     files = identity['files']
-    if not REQUIRED.issubset(files):
+    required = REQUIRED | ({'src/trw_pin_io.v'} if identity['variant'] == 'bs-event-pin-banked' else set())
+    if not required.issubset(files):
         raise ValueError('Incomplete source identity')
     root = root.resolve()
     for name, digest in files.items():
@@ -64,7 +66,7 @@ def prepare(variant, run_id, helpers):
         raise ValueError('Unknown route source variant')
     # This runs before the artifact download: expected hashes come from trusted
     # checkout + named patch, never from the artifact's own assertions.
-    apply_trial(variant if variant in {'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared'} else 'timing-placement', helpers)
+    apply_trial(variant if variant in {'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared', 'bs-event-pin-banked'} else 'timing-placement', helpers)
     names = subprocess.check_output(
         ['git', 'ls-files', '-z', '--', 'src', 'info.yaml', 'macro']).decode().split('\0')
     identity = {'candidate': CANDIDATE, 'variant': variant, 'source_run_id': int(run_id),

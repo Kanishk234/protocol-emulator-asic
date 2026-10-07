@@ -1,0 +1,21 @@
+--- a/src/trw_pin_io.v
++++ b/src/trw_pin_io.v
+@@ -44,8 +44,16 @@
+ 
+     assign a_in = a_on ? a_pad : idle;
+     assign b_in = b_on && b_pad;
+-    assign c_in = c_on ? c_pad : c_active;
+-    assign sel  = (c_in == c_active);
++    wire [31:0] c_values = {{8{c_active}}, pads};
++    assign c_in = c_values[pin_c];
++    wire [7:0] c_bank0 = pads[7:0];
++    wire [7:0] c_bank1 = pads[15:8];
++    wire [7:0] c_bank2 = pads[23:16];
++    wire [3:0] c_bank_match = {1'b1,
++        (c_bank2[pin_c[2:0]] == c_active),
++        (c_bank1[pin_c[2:0]] == c_active),
++        (c_bank0[pin_c[2:0]] == c_active)};
++    assign sel = c_bank_match[pin_c[4:3]];
+     assign sel_fall = sel_q && !sel;
+ 
+     always @(posedge clk) begin

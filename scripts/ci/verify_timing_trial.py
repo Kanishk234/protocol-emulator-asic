@@ -41,31 +41,39 @@ def verify(variant, output, simulate=False):
     # HEAD supplies current test/model fixes, but its generated tables describe
     # main's resource counts. Regenerate only Python encodings from frozen spec.
     regenerate_python_tables(output)
-    original = (output / source).read_text()
+    sources = [source] if isinstance(source, str) else list(source)
+    originals = {name: (output / name).read_text() for name in sources}
     subprocess.run(['git', 'apply', str(ROOT / 'spikes/r4_floorplan' / patch)],
                    cwd=output, check=True)
-    module = Path(source).stem
-    gold = output / f'gold_{module}.v'
-    gold.write_text(original)
-    for count in ([1, 5, 6, 7, 9, 16] if module == 'trw_chan_port' else [None]):
-        param = f'chparam -set N {count} {module}\n' if count else ''
-        tag = f'equiv-n{count}' if count else 'equiv'
-        # Relative include paths avoid Yosys treating quotes in -I as literal text.
-        script = (f'read_verilog -DSYNTHESIS -Isrc gold_{module}.v\n'
-                  f'{param}rename {module} gold\n'
-                  f'read_verilog -DSYNTHESIS -Isrc {source}\n'
-                  f'{param}rename {module} gate\n'
-                  'proc\nmemory\nopt\nequiv_make gold gate equiv\nhierarchy -top equiv\n'
-                  'equiv_simple\nequiv_induct -seq 2\nequiv_status -assert\n')
-        script_path = output / f'{tag}.ys'
-        script_path.write_text(script)
-        with (output / f'{tag}.log').open('w') as log:
-            subprocess.run(['yosys', '-Q', '-s', str(script_path)], stdout=log,
-                           stderr=subprocess.STDOUT, check=True, timeout=180, cwd=output)
-        print(f'{variant}: {tag} passed', flush=True)
+    for source in sources:
+        module = Path(source).stem
+        gold = output / f'gold_{module}.v'
+        gold.write_text(originals[source])
+        for count in ([1, 5, 6, 7, 9, 16] if module == 'trw_chan_port' else [None]):
+            param = f'chparam -set N {count} {module}\n' if count else ''
+            tag = f'equiv-n{count}' if count else 'equiv'
+            if len(sources) > 1:
+                tag = module + '-' + tag
+            # Relative include paths avoid Yosys treating quotes in -I as literal text.
+            script = (f'read_verilog -DSYNTHESIS -Isrc gold_{module}.v\n'
+                      f'{param}rename {module} gold\n'
+                      f'read_verilog -DSYNTHESIS -Isrc {source}\n'
+                      f'{param}rename {module} gate\n'
+                      'proc\nmemory\nopt\nequiv_make gold gate equiv\nhierarchy -top equiv\n'
+                      'equiv_simple\nequiv_induct -seq 2\nequiv_status -assert\n')
+            script_path = output / f'{tag}.ys'
+            script_path.write_text(script)
+            with (output / f'{tag}.log').open('w') as log:
+                subprocess.run(['yosys', '-Q', '-s', str(script_path)], stdout=log,
+                               stderr=subprocess.STDOUT, check=True, timeout=180, cwd=output)
+            print(f'{variant}: {tag} passed', flush=True)
     if simulate:
-        suites = [('chan', [])] if module == 'trw_chan_port' else [('pin', [
-            'FULL=1', 'COCOTB_TEST_MODULES=test_pin_bs,test_pin_bs_frame,test_pin_bs_tx,test_pin_bs_b3'])]
+        suites = []
+        if 'src/trw_chan_port.v' in sources:
+            suites.append(('chan', []))
+        if 'src/trw_pin_bs.v' in sources:
+            suites.append(('pin', ['FULL=1',
+                'COCOTB_TEST_MODULES=test_pin_bs,test_pin_bs_frame,test_pin_bs_tx,test_pin_bs_b3']))
         suites += [('chip', []), ('l2', [f'RTL_DIR={output / "src"}',
                                       f'RTL_REV={CANDIDATE}-{variant}', 'L2_CYCLES=2048'])]
         for suite, args in suites:

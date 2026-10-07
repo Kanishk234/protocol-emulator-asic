@@ -8,7 +8,14 @@ on:
         required: true
         default: drop-counter
         type: choice
-        options: [drop-counter, drop-qual, bs-resync, bs-csa, bs-event-late, bs-load-flat, setup-margin]
+        options: [drop-counter, drop-qual, bs-resync, bs-csa, bs-event-late, bs-event-drop-qual, bs-load-flat, setup-margin]
+
+      comparison_baseline:
+        description: Matched baseline for the selected RTL trial
+        required: false
+        default: timing-placement
+        type: choice
+        options: [timing-placement, bs-event-late]
 
 permissions:
   contents: read
@@ -25,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [timing-placement, '${{ inputs.experiment }}']
+        variant: ["${{ inputs.comparison_baseline || 'timing-placement' }}", '${{ inputs.experiment }}']
     env:
       PDK_ROOT: /home/runner/pdk
       CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284

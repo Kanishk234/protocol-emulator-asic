@@ -15,6 +15,7 @@ SOURCES = {
     'cts': ('gds-cts-cluster-screen', 'gds-cts-cluster-cts-cluster8'),
     'bs-resync': ('gds-drop-counter-screen', 'gds-drop-counter-bs-resync'),
     'bs-event-late': ('gds-drop-counter-screen', 'gds-drop-counter-bs-event-late'),
+    'bs-event-drop-qual': ('gds-drop-counter-screen', 'gds-drop-counter-bs-event-drop-qual'),
     'bs-load-flat': ('gds-drop-counter-screen', 'gds-drop-counter-bs-load-flat'),
 }
 REQUIRED = {'src/trw_pin_bs.v', 'src/trw_chan_port.v', 'src/trw_defs.vh',
@@ -61,7 +62,7 @@ def prepare(variant, run_id, helpers):
         raise ValueError('Unknown route source variant')
     # This runs before the artifact download: expected hashes come from trusted
     # checkout + named patch, never from the artifact's own assertions.
-    apply_trial(variant if variant in {'bs-resync', 'bs-event-late', 'bs-load-flat'} else 'timing-placement', helpers)
+    apply_trial(variant if variant in {'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual'} else 'timing-placement', helpers)
     names = subprocess.check_output(
         ['git', 'ls-files', '-z', '--', 'src', 'info.yaml', 'macro']).decode().split('\0')
     identity = {'candidate': CANDIDATE, 'variant': variant, 'source_run_id': int(run_id),

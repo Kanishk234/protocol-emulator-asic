@@ -23,9 +23,19 @@ def test_trial_refuses_untrusted_source_or_unexpected_mutation(monkeypatch, fail
 @pytest.mark.parametrize("variant", ["timing-placement", "setup-margin", *timing_trial.PATCHES])
 def test_trial_only_applies_selected_patch(monkeypatch, variant):
     expected = timing_trial.PATCHES.get(variant)
-    replies = [timing_trial.CANDIDATE, "", expected[1] if expected else ""]
+    sources = expected[1] if expected else ""
+    changed = sources if isinstance(sources, str) else "\n".join(sources)
+    replies = [timing_trial.CANDIDATE, "", changed]
     mutations = []
     monkeypatch.setattr(timing_trial.subprocess, "check_output", lambda *a, **k: replies.pop(0))
     monkeypatch.setattr(timing_trial.subprocess, "run", lambda cmd, **k: mutations.append(cmd))
     timing_trial.apply_trial(variant)
     assert mutations == ([["git", "apply", str(Path("workflow-src/spikes/r4_floorplan") / expected[0])]] if expected else [])
+
+@pytest.mark.parametrize("changed", ["src/trw_pin_bs.v", "src/trw_chan_port.v", "src/trw_pin_bs.v\nsrc/trw_chan_port.v\nsrc/config.json"])
+def test_combination_requires_both_exact_modules(monkeypatch, changed):
+    replies = [timing_trial.CANDIDATE, "", changed]
+    monkeypatch.setattr(timing_trial.subprocess, "check_output", lambda *a, **k: replies.pop(0))
+    monkeypatch.setattr(timing_trial.subprocess, "run", lambda *a, **k: None)
+    with pytest.raises(ValueError, match="unexpected files"):
+        timing_trial.apply_trial("bs-event-drop-qual")

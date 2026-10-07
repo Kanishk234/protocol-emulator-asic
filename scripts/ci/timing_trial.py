@@ -6,6 +6,7 @@ import subprocess
 
 CANDIDATE = "3393eea9a58c5cad9077cc360a8515d0e5ec8284"
 PATCHES = {
+    "bs-event-drop-qual": ("bs_event_drop_qual.patch", ("src/trw_chan_port.v", "src/trw_pin_bs.v")),
     "drop-counter": ("drop_counter.patch", "src/trw_chan_port.v"),
     "drop-qual": ("drop_qual.patch", "src/trw_chan_port.v"),
     "bs-resync": ("bs_resync.patch", "src/trw_pin_bs.v"),
@@ -13,6 +14,8 @@ PATCHES = {
     "bs-load-flat": ("bs_load_flat.patch", "src/trw_pin_bs.v"),
     "bs-event-late": ("bs_event_late.patch", "src/trw_pin_bs.v"),
     "bs-sample-predicate": ("bs_sample_predicate.patch", "src/trw_pin_bs.v"),
+    "bs-resync-event": ("bs_resync_event.patch", "src/trw_pin_bs.v"),
+    "bs-resync-load": ("bs_resync_load.patch", "src/trw_pin_bs.v"),
 }
 
 
@@ -23,12 +26,13 @@ def apply_trial(variant, helpers=Path("workflow-src")):
     dirty = subprocess.check_output(["git", "diff", "--name-only", "HEAD"], text=True).strip()
     if head != CANDIDATE or dirty:
         raise ValueError("Trial requires clean exact frozen hardware")
-    expected = ""
+    expected = set()
     if variant in PATCHES:
-        patch, expected = PATCHES[variant]
+        patch, sources = PATCHES[variant]
+        expected = {sources} if isinstance(sources, str) else set(sources)
         subprocess.run(["git", "apply", str(helpers / "spikes/r4_floorplan" / patch)], check=True)
     changed = subprocess.check_output(["git", "diff", "--name-only", "HEAD"], text=True).strip()
-    if changed != expected:
+    if set(changed.splitlines()) != expected:
         raise ValueError("Trial changed unexpected files")
 
 

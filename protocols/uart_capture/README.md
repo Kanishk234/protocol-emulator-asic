@@ -54,3 +54,36 @@ checks both timestamp settings. This is source-RTL coverage, supplementary to
 the compiled SPI-loaded tests. [Run37520971978](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37520971978)
 passes both settings; independent XML audit finds one case per setting and no
 failure, error or skipped result.
+
+## Decode a saved capture
+
+After draining the previous shell stream, select capture and save only valid
+CH_READ payload bytes as a JSON array, for example `[60, 4]`. Check the capture
+overflow bit in USER_STATUS: a set bit means events were lost. Do not mix UART
+bytes or data retained before USER_RESET into this capture session.
+`host.protocol.parse_channel_read(response)` returns `(status, payload)` with
+`payload=None` for an empty channel; a valid zero timestamp remains `0`.
+Append only non-None payloads. It rejects malformed responses and CH_READ
+outside RUNNING.
+
+```sh
+source .venv/bin/activate
+PYTHONPATH=tools python -m host.capture trace.json --max-gap-clocks 20
+```
+
+This reports an eight-clock interval for the example, assuming the interval
+between observed events is known to be at most20 clocks. It does not report
+absolute time or subtract shell/fabric input latency. The byte stream alone
+cannot verify that assumption: a longer interval can have the same timestamps.
+
+For `prescaled.yaml`, add `--stamp-shift 2`. The decoder reports an interval
+range because counter phase is unknown: `[60, 0]` means13–19 clocks when the
+maximum gap assumption is20. With six bits, accepted maximum-gap bounds are
+at most63 clocks unscaled or252 clocks prescaled. Even a253-clock prescaled
+gap can look like zero ticks at some counter phases, so a bound merely below
+the256-clock wrap period is insufficient. Pass `--overflow` when overflow was
+observed; decoding then rejects the trace. Incompatible bytes and intervals
+contradicting the supplied bound are also rejected.
+
+This host decoder works with either chip design using the same capture image
+contract; its tests verify arithmetic and validation, not new hardware rates.

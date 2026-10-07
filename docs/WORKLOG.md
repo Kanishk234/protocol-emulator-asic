@@ -21,6 +21,24 @@ pending. Frozen G1/src/arch/macro/info/PDK unchanged; no heavy local EDA.
 **Next:** inspect corrected inventory/DRC/LVS; improve fallback-compatible host
 trace tools and loading validation while cloud checks run.
 
+**Independent progress:** added host capture decoder with explicit maximum-gap
+assumptions, wrap/quantization interval bounds, overflow/mixed-byte rejection,
+and documented CLI for both capture variants. Added checked CH_READ parsing
+(valid zero versus empty, malformed/out-of-state rejection). Fixed negative
+chunk and word/architecture truncation validation (BUG42). All31 lightweight
+host tests pass in0.49s; CLI examples/overflow exit and whitespace checks pass.
+No EDA or hardware/bitstream format change. Cloud regression follows push.
+
+**Electrical diagnosis:** exact replay netlist/report audit binds all9 slow
+slew pins to frame_idx[0], driven by a21oi_1 u_cfg._54_; worst2.562529ns versus
+2.507400ns limit. The report also has33 fanout violations. Retained ignored
+hash-bound summary; documented one-driver/local-buffer screen and costs, no
+hardware change or timing fix claimed. Updated phase5 summary/roadmap. Corrected
+geometry37648945387 remains active; at b8922e9 lint37648945437/docs37648945446/
+test37648945505/unit37648945403 green. Explicitly answered user: complete timing
+has not passed; router0 is distinct from failed DRC/LVS and macro-black-boxed
+shell timing. Next is corrected physical outcome and hosted host-tool tests.
+
 ## 2026-10-06 (session59: matched synthesis control and final evidence retention)
 **Done:** proactively checked cloud workflows. Native mux-tree37552796495 and
 tracked-patch37553037381 pass RTL control and actual SPI-loaded native UART.

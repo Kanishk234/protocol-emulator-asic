@@ -142,3 +142,18 @@ suite; the original83-cell option remains byte-identical. A wider stored
 timestamp still does not fit. For any further range/queue change, explicitly test
 quantization, wrap, drop policy and stream switching. Do not claim a larger
 capture range until the actual compiled image passes loaded tests.
+
+
+## October7 host-side progress
+
+The capture decoder (`tools/host/capture.py`, `python -m host.capture`) reports
+relative interval ranges, rejects reported overflow and requires an explicit
+known bound to avoid modular-time ambiguity. Prescaled timestamps retain
+phase uncertainty; no absolute timestamps or pin latency correction are
+invented. README examples cover both timestamp settings. The new checked
+CH_READ parser distinguishes a valid zero from an empty channel, and rejects
+malformed/out-of-state responses. Loader validation rejects negative chunks
+and truncated word/architecture fields (BUG42). All31 host tests and CLI
+examples pass locally with lightweight Python only; hosted verification pending.
+These improvements apply to the fallback without chip changes. They do not
+increase queue depth, host bandwidth or validated hardware rates.

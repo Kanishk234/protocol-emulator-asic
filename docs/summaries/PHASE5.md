@@ -1,14 +1,22 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-06). Evidence and software improvements are grouped into authorized commits; hosted validation is being launched. The README flow and all local checks passed from a source export and fresh venv on the development machine; the phase checklist still asks for a clean machine or container. Separate checkpoint experiments do not close that requirement.
+**Status:** in progress (updated 2026-10-07). Evidence and software improvements are grouped into authorized commits; hosted validation is being launched. The README flow and all local checks passed from a source export and fresh venv on the development machine; the phase checklist still asks for a clean machine or container. Separate checkpoint experiments do not close that requirement.
 
-The compact successor's best completed route retains144markers; a warm restart
-saves15 at iteration8 without final repair/checks. Ground-up geometry identifies
-crowded west-channel pin escapes and clock/control crossings. A separate hosted
-workflow now tests routing, native mapped fabric and four G1 software demos,
-avoiding heavy local computation. The native-fabric and configured-fabric timing
-gates remain open; G1 stays frozen. See the
-[closure plan and competitor research](../reports/compact_acceptance_and_competitors.md).
+Compact37516794406 now reaches zero native router/antenna violations, but later
+physical checks fail. All248 KLayout markers associate with inserted decaps;
+the first exclusion attempt left the separate decap selector active. Corrected
+37648945387 checks actual filler inventory before geometry/LVS. Nine slow-corner
+slew failures share one frame-index net; configured-fabric timing remains open.
+Regenerated native LUT netlists pass real SPI-loaded UART and USER_RESET in
+37553717299; matched original-LUT resynthesis37553979644 also passes, so the
+new primitive alone is not established as the fix. Copied physical views do
+not qualify either regenerated mapping. G1 stays frozen. See the
+[closure plan](../reports/compact_acceptance_and_competitors.md).
+
+Host capture decoding now handles wrap, quantization and observed overflow
+explicitly; checked channel reads distinguish valid zero from empty. Loader
+validation rejects negative chunk sizes and truncating fields. These work on
+the fallback, with31 local host tests passing and hosted verification pending.
 
 ## Goal
 Make WARP's design choice, results, limits and use understandable to a judge, and make the simulation results reproducible from a clean source tree.

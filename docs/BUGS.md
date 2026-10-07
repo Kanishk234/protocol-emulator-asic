@@ -2,6 +2,12 @@
 
 Format for each entry: number, date, symptom, root cause, the check that caught it, the check that now covers it, fix commit.
 
+## 42: Host loader accepts negative chunk size and truncating fields
+- **Date:**2026-10-07.
+- **Symptom/check:** load_transactions(words, chunk=-1) builds LOAD_BEGIN/LOAD_END but no LOAD_DATA; words outside32 bits and architecture IDs outside16 bits are truncated by byte packing.
+- **Root cause:** transaction builder relied on range/byte helpers without validating the caller's chunk, word or architecture fields.
+- **Fix/coverage:** reject non-positive/non-integer chunks, non-unsigned32-bit words and non-unsigned16-bit architecture IDs before building load transactions. Host tests include all three boundaries, valid randomized loads and CRC preservation. Local31 host tests pass; hosted verification pending. No shell/bitstream format change.
+
 ## 41: Plain-filler experiment leaves the separate decap selector active
 - **Date:**2026-10-07.
 - **Symptom/check:**37552604692 reproduces248 KLayout errors and75 LVS errors; intended decap removal did not occur. Result summary has null counts because failed deferred checkers do not write final state_out.

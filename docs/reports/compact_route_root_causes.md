@@ -182,3 +182,32 @@ The current upstream discussion of
 also warns that plateauing early does not prove later strategies cannot
 help. Our own measured26-marker trajectory is the criterion for subsequent
 diagnosis; external reports are context, not WARP verification evidence.
+
+
+## October7 follow-up: actual filler control and electrical hotspot
+
+Replay37552604692 takes27m34s and reports248 KLayout/75 LVS. Its actual DEF
+still has5667 decaps and1095 plain fillers: DECAP_CELLS remained enabled when
+FILL_CELLS changed. This did not test decap exclusion. Corrected37648945387
+changes only DECAP_CELLS=[] in copied config, audits actual inserted cells,
+and continues DRC/LVS only with zero decaps/nonzero plain fillers. No routing,
+rule waiver or frozen hardware change. The input still has3 native markers.
+
+Read-only audit of37552604692's slow-corner checks.rpt and exact netlist binds
+all9 slew-violation pins to u_cfg.frame_idx[0]: driver u_cfg._54_/Y,
+seven WARP_CFG_BRANCH_0/A inputs, and ANTENNA_29/A. Driver master is
+sg13cmos5l_a21oi_1. Worst slew2.562529ns exceeds2.507400ns limit by0.055129ns.
+The extracted wire-only SPEF capacitance is0.177875pF (PIN_CAP NONE), not the
+complete loaded capacitance. The same report lists33 max-fanout violations,
+including27 clock-tree outputs, five column-decode outputs and one FSM flop.
+Do not equate positive setup/hold with complete electrical/timing acceptance.
+Artifact summary: build/route_root_audit_20261007/electrical_hotspot.json,
+with report/netlist hashes and all nine actual endpoint bindings.
+
+This identifies a focused next electrical screen: stronger equivalent driver
+or an additional legal local buffer, followed by regenerated placement/routing,
+extraction and setup/hold/electrical checks. The pinned LEF offers a21oi_2:
+2.4x3.78 to3.84x3.78um adds5.4432um2 before downstream repairs. No swap is
+installed or improvement claimed; input loading, routing and hold can change.
+Clock fanout needs a separate constraint/tree review. Only one physical change
+per hardening; the active filler experiment remains untouched.

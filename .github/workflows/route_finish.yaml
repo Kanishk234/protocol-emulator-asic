@@ -14,7 +14,7 @@ concurrency:
 jobs:
   finish:
     runs-on: ubuntu-24.04
-    timeout-minutes: 55
+    timeout-minutes: 120
     env:
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
@@ -26,10 +26,10 @@ jobs:
           source .venv/bin/activate
           python -m pip install librelane==3.1.0.dev3
           bash spikes/cloud/fetch_checkpoint.sh
-          gh run download 37516794406 -R "$GITHUB_REPOSITORY" -n compact-route-37516794406 -D build/physical_source
+          gh run download 37652533986 -R "$GITHUB_REPOSITORY" -n compact-route-finish-37652533986 -D build/physical_source
           bash spikes/cloud/fetch_pdk.sh
       - name: Bounded native cleanup from three-marker snapshot
-        timeout-minutes: 15
+        timeout-minutes: 80
         run: |
           source .venv/bin/activate
           python test_internal/cloud_route_finish.py native

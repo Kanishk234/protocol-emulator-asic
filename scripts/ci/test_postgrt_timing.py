@@ -14,7 +14,7 @@ spec.loader.exec_module(timing)
 @pytest.mark.parametrize("all_corners", [False, True])
 @pytest.mark.parametrize("reuse_repair", [True, False])
 @pytest.mark.parametrize("explicit_sdc", [False, True])
-@pytest.mark.parametrize("hold_margin", [None, 0.10])
+@pytest.mark.parametrize("hold_margin", [None, 0.10, 0.15])
 def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, explicit_sdc, all_corners, hold_margin):
     config = tmp_path / "config.json"
     config.write_text(json.dumps({"CLOCK_PERIOD": 20, "GRT_ADJUSTMENT": 0.3,

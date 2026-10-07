@@ -42,8 +42,8 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup
             raise ValueError("Setup repair margin must be nonnegative")
         base["GRT_RESIZER_SETUP_SLACK_MARGIN"] = setup_margin
     if hold_margin is not None:
-        if hold_margin not in (0.05, 0.10):
-            raise ValueError("Hold target must be a bounded 0.05 or 0.10 ns experiment")
+        if hold_margin not in (0.05, 0.10, 0.15):
+            raise ValueError("Hold target must be a bounded 0.05, 0.10 or 0.15 ns experiment")
         base["GRT_RESIZER_HOLD_SLACK_MARGIN"] = hold_margin
     output.mkdir(parents=True, exist_ok=False)
 

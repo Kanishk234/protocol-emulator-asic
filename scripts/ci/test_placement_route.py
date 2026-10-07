@@ -100,8 +100,9 @@ def test_postantenna_recovery_only_accepts_hold_only_failures(kind, corner):
     assert hold_only_failure(data) == (kind == 'hold')
 
 
+@pytest.mark.parametrize('hold_margin', [0.10, 0.15])
 @pytest.mark.parametrize('failure', [None, 'headroom', 'setup', 'hold-count'])
-def test_headroom_requires_fresh_all_corner_pass_and_fast_budget(tmp_path, monkeypatch, failure):
+def test_headroom_requires_fresh_all_corner_pass_and_fast_budget(tmp_path, monkeypatch, failure, hold_margin):
     import json
     from pathlib import Path
     import placement_route
@@ -123,8 +124,8 @@ def test_headroom_requires_fresh_all_corner_pass_and_fast_budget(tmp_path, monke
     monkeypatch.setattr(placement_route, 'screen', fake)
     if failure:
         with pytest.raises(ValueError, match='routing refused'):
-            placement_route.hold_headroom('config', 'state', tmp_path, 'pdk')
+            placement_route.hold_headroom('config', 'state', tmp_path, 'pdk', hold_margin=hold_margin)
     else:
-        assert placement_route.hold_headroom('config', 'state', tmp_path, 'pdk') == Path('measured-state')
+        assert placement_route.hold_headroom('config', 'state', tmp_path, 'pdk', hold_margin=hold_margin) == Path('measured-state')
     assert calls == [{'sdc': Path('src/signoff.sdc'), 'setup_margin': 0.0,
-                      'repair_corners': CORNERS, 'hold_margin': 0.10}]
+                      'repair_corners': CORNERS, 'hold_margin': hold_margin}]

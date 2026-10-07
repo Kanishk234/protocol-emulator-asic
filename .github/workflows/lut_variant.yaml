@@ -4,6 +4,7 @@ on:
     branches: [efpga]
     paths:
       - 'test_internal/cloud_lut_variant.py'
+      - 'patches/fabulous_lut_mux_tree.patch'
       - '.github/workflows/lut_variant.yaml'
   workflow_dispatch:
 permissions:

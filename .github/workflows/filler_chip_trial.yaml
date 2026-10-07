@@ -1,0 +1,46 @@
+name: scratch chip filler implant screen
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-chip-filler-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned PDK and authenticated previous GDS
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          bash spikes/cloud/fetch_pdk.sh
+          gh run download 37648945387 -R "$GITHUB_REPOSITORY" -n compact-geometry-replay-37648945387 -D build/filler_chip_source
+      - name: Scratch implant overlay and full Magic report
+        timeout-minutes: 30
+        run: |
+          source .venv/bin/activate
+          mkdir -p build/filler_chip_trial
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e WARP_CHIP_GDS="$GITHUB_WORKSPACE/build/filler_chip_source/run/final/klayout_gds/tt_um_warp.klayout.gds" \
+            -e WARP_FILLER_OUT="$GITHUB_WORKSPACE/build/filler_chip_trial" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            klayout -b -r test_internal/filler_chip_trial.py > build/filler_chip_trial/overlay.log 2>&1
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e WARP_FILLER_OUT="$GITHUB_WORKSPACE/build/filler_chip_trial" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            magic -dnull -noconsole \
+            -rcfile "$PDK_ROOT/ihp-sg13cmos5l/libs.tech/magic/ihp-sg13cmos5l.magicrc" \
+            test_internal/filler_chip_drc.tcl > build/filler_chip_trial/magic.log 2>&1
+          test -s build/filler_chip_trial/chip_trial.rpt
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: scratch-chip-filler-${{ github.run_id }}
+          path: build/filler_chip_trial/
+          retention-days: 3

@@ -62,3 +62,22 @@ primitive-tile comparison. Inventory evidence:
 `build/g1_gds_logs_36342012141.zip`. No remote/history change or substituted
 experimental timing evidence. Further restoration must use the original
 local tile archive or a separately identified matching source/artifact set.
+
+## Fresh hosted README reproduction prepared, October7
+
+Separate clean_reproduction workflow starts with a pristine checkout, fresh
+project venv and no reused build or simulator output. Only pinned binary tools
+are cached. It records the README hash and exact command line references,
+checks actual tool/package versions, then executes check_all, deterministic
+bitstream rebuild comparison, the documented UART compile plus report audit,
+the complete actual-loaded RTL-fabric suite and source-versus-fabric cosim.
+XML validation rejects empty suites, failures/errors and skipped loaded/cosim
+cases; known default idle/UART-divider skips remain explicitly limited to the
+initial check_all suites. Tracked source must remain unchanged.
+
+Standard hosted job190min, verification step180min, with individual command
+bounds and retained incremental result/log/runtime/XML evidence for3days.
+This targets the open README reproduction gate; it does not replace physical
+checks, SDF/native mapping evidence or every CI parameter variant. No checklist
+box is ticked until an actual successful run is inspected. Missing historic
+G1 tile parasitics remain a separate unresolved timing reproduction gap.

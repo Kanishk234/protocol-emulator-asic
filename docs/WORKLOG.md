@@ -22,6 +22,18 @@ autoqueued by shared diagnostic-helper edits, review agents' independent work
 and inspect any failure immediately. Native mapping/function, configured timing,
 fanout, precheck and clean reproduction remain before successor promotion.
 
+**Launched/audited:**3d48519 pushes routed ECO37690243797, setup succeeds and
+route stage active. Canceled redundant old-layout37690243661/37690243635 only;
+accepted baseline artifacts and new trial/regressions retained. Fresh user
+failure report audited: no new failures; old placement37688867787 is already
+fixed by passing37689324316. Independent audit confirms33 real Liberty fanout
+violations (27 clock leaves/6 configuration drivers), not solved by driver size.
+Prepared reviewed fresh README reproduction from agent: new workflow/script
+only, standard cloud runner, strict tool/README/XML/source provenance, no
+build cache or local EDA. AST/YAML/README lookup/XML negative controls pass
+locally. Native audit recommends stage isolation with passing original-control
+mapping before paying for new tile hardening; no unsupported mux-only claim.
+
 ## 2026-10-07 (session66: access restored; same-layout physical closure)
 **Done:** user requested continued work and explanation of the review limit.
 Fresh authorized GitHub retry succeeds; no bypass used. Downloaded successful

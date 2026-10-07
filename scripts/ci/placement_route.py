@@ -45,6 +45,16 @@ def hold_only_failure(data):
         for c in CORNERS))
 
 
+def hold_headroom(config_path, state, output, pdk_root):
+    """One measured 100 ps repair target; retain the zero setup target."""
+    screen(config_path, state, output, pdk_root, sdc=Path('src/signoff.sdc'),
+           setup_margin=0.0, repair_corners=CORNERS, hold_margin=0.10)
+    data = json.loads((output / 'comparison.json').read_text())
+    if not timing_pass(data) or data['corners'][CORNERS[0]]['after'][f'timing__hold__ws__corner:{CORNERS[0]}'] < 0.05:
+        raise ValueError('Insufficient repaired hold headroom; routing refused')
+    return Path(data['after_state'])
+
+
 def main():
     root = Path('runs/rtl-grt-screen')
     variant = os.environ.get('SOURCE_VARIANT', 'placement')
@@ -95,6 +105,13 @@ def main():
 
     if variant == 'cts':
         state = hold_followup(config_path, state, out / 'hold-followup', os.environ['PDK_ROOT'])
+    selected_hold = os.environ.get('PRE_ROUTE_HOLD_TARGET', 'source')
+    if selected_hold not in {'source', '0.10'}:
+        raise ValueError('Unknown pre-route hold target')
+    if selected_hold == '0.10':
+        if variant != 'bs-event-late':
+            raise ValueError('Hold-headroom experiment is scoped to event-late')
+        state = hold_headroom(config_path, state, out / 'hold-headroom', os.environ['PDK_ROOT'])
 
     def run(tag, steps, source):
         config = dict(base)

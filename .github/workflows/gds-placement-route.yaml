@@ -19,6 +19,12 @@ on:
         required: false
         default: false
         type: boolean
+      pre_route_hold_target:
+        description: Isolated event-late hold-headroom target in ns
+        required: false
+        default: source
+        type: choice
+        options: [source, "0.10"]
 
 permissions:
   contents: read
@@ -41,6 +47,7 @@ jobs:
       SOURCE_VARIANT: ${{ inputs.source_variant }}
       SOURCE_RUN_ID: ${{ inputs.source_run_id }}
       REPAIR_POSTANTENNA_HOLD: ${{ inputs.repair_postantenna_hold && '1' || '0' }}
+      PRE_ROUTE_HOLD_TARGET: ${{ inputs.pre_route_hold_target || 'source' }}
 
     steps:
       - name: Check out the measured R4 candidate

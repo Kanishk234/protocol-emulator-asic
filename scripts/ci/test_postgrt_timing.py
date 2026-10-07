@@ -14,7 +14,8 @@ spec.loader.exec_module(timing)
 @pytest.mark.parametrize("all_corners", [False, True])
 @pytest.mark.parametrize("reuse_repair", [True, False])
 @pytest.mark.parametrize("explicit_sdc", [False, True])
-def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, explicit_sdc, all_corners):
+@pytest.mark.parametrize("hold_margin", [None, 0.10])
+def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, explicit_sdc, all_corners, hold_margin):
     config = tmp_path / "config.json"
     config.write_text(json.dumps({"CLOCK_PERIOD": 20, "GRT_ADJUSTMENT": 0.3,
                                   "DIE_AREA": "0 0 1289.28 710.64"}))
@@ -31,6 +32,8 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, expli
             assert cfg["PNR_SDC_FILE"] == str((tmp_path / "signoff.sdc").resolve())
             assert cfg["GRT_RESIZER_SETUP_SLACK_MARGIN"] == 0
         step = cfg["meta"]["flow"]
+        if hold_margin is not None:
+            assert cfg['GRT_RESIZER_HOLD_SLACK_MARGIN'] == hold_margin
         assert step in (["OpenROAD.STAMidPNR"], ["OpenROAD.ResizerTimingPostGRT"])
         if all_corners and step == ["OpenROAD.ResizerTimingPostGRT"]:
             assert cfg["PNR_CORNERS"] == list(timing.CORNERS)
@@ -59,7 +62,7 @@ def test_matched_corner_processes_and_saved_repair(tmp_path, reuse_repair, expli
     with patch.object(timing.subprocess, "run", side_effect=fake_run):
         timing.screen(config, before, tmp_path / "result", "/pdk", repaired if reuse_repair else None,
                       tmp_path / "signoff.sdc" if explicit_sdc else None, 0 if explicit_sdc else None,
-                      timing.CORNERS if all_corners else None)
+                      timing.CORNERS if all_corners else None, hold_margin)
     assert len(calls) == (6 if reuse_repair else 7)
     result = json.loads((tmp_path / "result/comparison.json").read_text())
     assert set(result["corners"]) == set(timing.CORNERS)
@@ -73,3 +76,13 @@ def test_inherited_metrics_cannot_replace_missing_fresh_corner(tmp_path):
         f"timing__setup__ws__corner:{timing.CORNERS[1]}": 5}}))
     with pytest.raises(ValueError, match="Missing fresh metric"):
         timing.fresh_metrics(tmp_path, "openroad-stamidpnr", timing.CORNERS[1])
+
+
+@pytest.mark.parametrize('margin', [-0.1, 2, float('nan'), float('inf')])
+def test_unbounded_hold_target_refused_before_flow(tmp_path, margin):
+    config = tmp_path / 'config.json'
+    config.write_text(json.dumps({'CLOCK_PERIOD': 20}))
+    with patch.object(timing.subprocess, 'run') as run:
+        with pytest.raises(ValueError, match='bounded'):
+            timing.screen(config, Path('state'), tmp_path / 'out', '/pdk', hold_margin=margin)
+        run.assert_not_called()

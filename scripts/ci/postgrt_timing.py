@@ -26,7 +26,7 @@ def fresh_metrics(root, step, corner):
     return metrics
 
 
-def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None, repair_corners=None):
+def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None, repair_corners=None, hold_margin=None):
     if repair_corners is not None and tuple(repair_corners) != CORNERS:
         raise ValueError("Repair corners must be the complete pinned corner set")
     base = json.loads(config_path.read_text())
@@ -41,6 +41,10 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup
         if setup_margin < 0:
             raise ValueError("Setup repair margin must be nonnegative")
         base["GRT_RESIZER_SETUP_SLACK_MARGIN"] = setup_margin
+    if hold_margin is not None:
+        if hold_margin not in (0.05, 0.10):
+            raise ValueError("Hold target must be a bounded 0.05 or 0.10 ns experiment")
+        base["GRT_RESIZER_HOLD_SLACK_MARGIN"] = hold_margin
     output.mkdir(parents=True, exist_ok=False)
 
     def run(tag, checkpoint, step, corner):
@@ -71,6 +75,9 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup
         # STA-only configs omit routing variables; the repair flow uses them.
         if step == "OpenROAD.ResizerTimingPostGRT" and float(resolved["GRT_ADJUSTMENT"]) != 0.16:
             raise ValueError(f"Resolved GRT adjustment mismatch in {root}")
+        if step == "OpenROAD.ResizerTimingPostGRT" and hold_margin is not None:
+            if resolved["GRT_RESIZER_HOLD_SLACK_MARGIN"] != hold_margin:
+                raise ValueError("Resolved hold target differs from the selected experiment")
         if list(root.glob("*-openroad-detailedrouting")):
             raise ValueError(f"Unexpected detailed routing in {root}")
         return root

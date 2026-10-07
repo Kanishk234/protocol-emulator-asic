@@ -98,3 +98,33 @@ def test_postantenna_recovery_only_accepts_hold_only_failures(kind, corner):
     assert not hold_only_failure(data)
     data['corners'][corner]['after'][f'timing__{kind}__ws__corner:{corner}'] = -0.001
     assert hold_only_failure(data) == (kind == 'hold')
+
+
+@pytest.mark.parametrize('failure', [None, 'headroom', 'setup', 'hold-count'])
+def test_headroom_requires_fresh_all_corner_pass_and_fast_budget(tmp_path, monkeypatch, failure):
+    import json
+    from pathlib import Path
+    import placement_route
+    data = fixture()
+    data['after_state'] = 'measured-state'
+    fast = data['corners'][CORNERS[0]]['after']
+    fast[f'timing__hold__ws__corner:{CORNERS[0]}'] = 0.08
+    if failure == 'headroom':
+        fast[f'timing__hold__ws__corner:{CORNERS[0]}'] = 0.049
+    elif failure == 'setup':
+        c = CORNERS[1]
+        data['corners'][c]['after'][f'timing__setup__ws__corner:{c}'] = -0.001
+    elif failure == 'hold-count':
+        fast[f'timing__hold_vio__count__corner:{CORNERS[0]}'] = 1
+    calls = []
+    def fake(*args, **kwargs):
+        calls.append(kwargs)
+        (tmp_path / 'comparison.json').write_text(json.dumps(data))
+    monkeypatch.setattr(placement_route, 'screen', fake)
+    if failure:
+        with pytest.raises(ValueError, match='routing refused'):
+            placement_route.hold_headroom('config', 'state', tmp_path, 'pdk')
+    else:
+        assert placement_route.hold_headroom('config', 'state', tmp_path, 'pdk') == Path('measured-state')
+    assert calls == [{'sdc': Path('src/signoff.sdc'), 'setup_margin': 0.0,
+                      'repair_corners': CORNERS, 'hold_margin': 0.10}]

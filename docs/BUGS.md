@@ -1,5 +1,11 @@
 # Bugs
 
+## 43: Isolated Magic count field is empty despite completed checks
+- **Date:**2026-10-07.
+- **Symptom/check:**37653631748 produces five reports with an empty count field. Full log records five zero-error checks and empty reason lists; workflow green only means reports completed.
+- **Root cause:** Magic `drc count total` prints its result instead of returning a Tcl value suitable for interpolation.
+- **Fix/coverage:** keep count output in the retained log, label each cell there and write `has_findings` from the returned `drc listall why` list. Check that every baseline and array fixture produces a report. Tcl completeness passes; hosted extended-array verification pending. This reporting correction does not resolve complete-chip DRC.
+
 Format for each entry: number, date, symptom, root cause, the check that caught it, the check that now covers it, fix commit.
 
 ## 42: Host loader accepts negative chunk size and truncating fields

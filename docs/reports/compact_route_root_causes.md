@@ -260,3 +260,23 @@ workflow means reports were produced, not that those cells or this chip passed
 DRC. Isolated failure would motivate a library/deck reproducer; isolated success
 would leave assembled row boundaries and integration as hypotheses. No PDK
 edits, rule waiver or layout promotion.
+
+## Bounded cleanup outcome and abutment follow-up
+
+[37652533986](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37652533986)
+stops at the15minute native-stage cap, with iteration16 stubborn repair active.
+Retained iteration15 still has3 Metal1 shorts: two boxes joining shell
+_0489_/_0490_ near x59.38/y474.065um and one joining crc.r[29]/VGND near
+x39.775/y450.370um. Those nets agree with remaining LVS mismatches; repairing
+them and rerunning LVS is still needed to establish closure. No geometry ran.
+The earlier successful iteration53 took50m43s, not the35m14s90percent progress
+point. Follow-up uses authenticated retained source,17iterations/80minute
+native cap, then unchanged acceptance-gated no-decap geometry. Same hardware
+and original driver; no claim that this iteration schedule must succeed.
+
+[37653631748](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37653631748)
+logs five zero-error isolated Magic checks. The initial count field is empty
+because the command prints instead of returning it (BUG43); empty reason lists
+and complete retained log support the isolated result. D-051 now tests small
+horizontal filler arrays and paired same/mirrored rows with untouched library
+geometry. Individual-cell success does not clear complete-chip filler errors.

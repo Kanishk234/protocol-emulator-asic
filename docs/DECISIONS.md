@@ -7,6 +7,7 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 - **Evidence:**37648945387 has6350 Magic pSD.e boxes, all overlapping plain top-level fillers; none inside macro bounds. Pinned KLayout shared pSD deck implements only pSD.c1, so its zero does not clear pSD.e/f.
 - **Decision:** cloud-only read-only full-style Magic checks of pinned fill1/fill2, decap4/decap8 and inverter control; retain every report and deck/library hashes. No design, PDK or template-job edits. Bound job12minutes/tool step7minutes.
 - **Cost/limits:** free standard runner time only; no hardware cost. Isolated cells do not reproduce row abutment, complete-chip DRC/LVS, native function or timing. Workflow success only certifies completed report generation; reported DRC counts remain failures to diagnose.
+- **Verified/follow-up:**37653631748 completes five zero-error isolated checks in retained Magic log. Extend same measurement with untouched-cell horizontal arrays, two same-orientation rows and alternating mirrored rows using exact nominal LEF pitches. Preserve generated fixture GDS; this is a reproducer, not new hardware. Report returned reason-list presence because count output is printed (BUG43).
 
 ## D-049: Same-wire diagnostic of the frame-index slew hotspot
 - **Date:**2026-10-07. **Status:** accepted isolated measurement under D-037; no physical promotion.

@@ -1,0 +1,62 @@
+name: compact late-cost native repair
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/late_route_repair.tcl'
+      - 'test_internal/cloud_late_route.py'
+      - '.github/workflows/late_route.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-late-route-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned source and tools
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_checkpoint.sh
+          gh run download 37516794406 -R "$GITHUB_REPOSITORY" -n compact-route-37516794406 -D build/physical_source
+          bash spikes/cloud/fetch_pdk.sh
+          mkdir -p build/late_route
+          python - <<'PY'
+          import hashlib, shutil
+          from pathlib import Path
+          source=Path('build/physical_source/last_complete_drt.odb')
+          assert hashlib.sha256(source.read_bytes()).hexdigest() == '33dceb8d52df9d5ea8cc3741b71b9b3e1e79ae4fb95b1eb559b3ca3eb40390bc'
+          shutil.copyfile(source,'build/late_route/source_iter52.odb')
+          PY
+      - name: Bounded native late-cost experiment
+        timeout-minutes: 80
+        run: |
+          source .venv/bin/activate
+          set -o pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e WARP_REPAIR_SOURCE="$GITHUB_WORKSPACE/build/physical_source/last_complete_drt.odb" \
+            -e WARP_REPAIR_OUT="$GITHUB_WORKSPACE/build/late_route" \
+            -e WARP_REPAIR_EXPECTED_MARKERS=3 \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            bash -c 'openroad -version | tee build/late_route/tool_version.txt; grep -q dcf36133 build/late_route/tool_version.txt && openroad -exit test_internal/late_route_repair.tcl' \
+            2>&1 | tee build/late_route/repair.log
+      - name: Stock antenna and critical connectivity acceptance
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_late_route.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-late-route-${{ github.run_id }}
+          path: build/late_route/
+          retention-days: 3

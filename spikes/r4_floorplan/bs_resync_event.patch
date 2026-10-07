@@ -1,0 +1,38 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -130,7 +130,7 @@
+     wire        done = !hsync && smp_done;
+     // P22: e = time since the bit start; before the sample move later by min(e, SJW), after it end earlier
+     wire [24:0] e    = per - tb;
+-    wire        rs_do = rs_edge && (sj != 25'd0) && (smp_done ? (tb != 25'd0) : (e != 25'd0));
++    wire        rs_do = rs_edge && (sj != 25'd0) && (smp_done ? (tb != 25'd0) : (per != tb));
+     // Fold the min-and-add/subtract into the boundary value directly. Before the sample,
+     // tb + min(per - tb, sjw) is either per or tb + sjw. After it,
+     // tb - min(tb, sjw) is either zero or tb - sjw. This removes one 25-bit
+@@ -138,7 +138,10 @@
+     wire [24:0] tb_r = !smp_done ? ((e < sj) ? per : tb + sj) : ((tb < sj) ? 25'd0 : tb - sj);
+     wire [24:0] sp   = sof - per;                               // sample time - boundary time
+     wire [24:0] x_n  = sp + tb;                                 // the sample time, from this clock's start
+-    wire [24:0] x_r  = sp + tb_r;                               // the same after a resync
++    // Cancel the saturated correction before doing sample-time arithmetic.
++    // These identities hold modulo 2^25, including timer wrap and live writes.
++    wire [24:0] x_r = !smp_done ? ((e < sj) ? sof : x_n + sj) :
++                                ((tb < sj) ? sp : x_n - sj);
+     wire        s_n  = x_n[24] || (x_n < 25'd256);              // at or before the end of this clock
+     wire        s_r  = x_r[24] || (x_r < 25'd256);
+     wire        s_h  = sof < 25'd256;
+@@ -347,7 +350,13 @@
+     // ------------------------------------------------------------------ producer
+     // frame tokens first; status EVENTs wait in `st` (P-G41). With OE_AUTO our own frames are not reported.
+     wire        rep_ok   = !(oe_auto && own);
+-    wire        fr_want  = live && rep_ok && (err_tok || ab_tok || v_tok || w_tok);
++    // Qualify the late sample event after state-only completion decisions.
++    wire        commit_ready = !s_due && !f6 && open_fr && (!dlf || hb_full);
++    wire        completion_ready = (fr_v && (dcnt1 == fr_n)) || (wn1 == wlen);
++    wire        frame_ready = (s_due && run_eq && !dlf && (words_on || post)) ||
++                              (f6 && words_on && (dcnt != 11'd0)) ||
++                              (commit_ready && words_on && completion_ready);
++    wire        fr_want = live && rep_ok && ((fbit && frame_ready) || (se0_s && words_on));
+     wire [1:0]  fr_tag   = (err_tok || ab_tok) ? `TRW_TAG_ERR : v_tok ? (crc_ok ? `TRW_TAG_EVENT : `TRW_TAG_ERR) :
+                            `TRW_TAG_DATA;
+     wire [15:0] fr_data  = err_tok ? {4'h1, 1'b0, lcnt} : ab_tok ? {4'h2, 1'b0, lcnt} :

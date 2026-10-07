@@ -1,0 +1,59 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -347,7 +347,13 @@
+     // ------------------------------------------------------------------ producer
+     // frame tokens first; status EVENTs wait in `st` (P-G41). With OE_AUTO our own frames are not reported.
+     wire        rep_ok   = !(oe_auto && own);
+-    wire        fr_want  = live && rep_ok && (err_tok || ab_tok || v_tok || w_tok);
++    // Qualify the late sample event after state-only completion decisions.
++    wire        commit_ready = !s_due && !f6 && open_fr && (!dlf || hb_full);
++    wire        completion_ready = (fr_v && (dcnt1 == fr_n)) || (wn1 == wlen);
++    wire        frame_ready = (s_due && run_eq && !dlf && (words_on || post)) ||
++                              (f6 && words_on && (dcnt != 11'd0)) ||
++                              (commit_ready && words_on && completion_ready);
++    wire        fr_want = live && rep_ok && ((fbit && frame_ready) || (se0_s && words_on));
+     wire [1:0]  fr_tag   = (err_tok || ab_tok) ? `TRW_TAG_ERR : v_tok ? (crc_ok ? `TRW_TAG_EVENT : `TRW_TAG_ERR) :
+                            `TRW_TAG_DATA;
+     wire [15:0] fr_data  = err_tok ? {4'h1, 1'b0, lcnt} : ab_tok ? {4'h2, 1'b0, lcnt} :
+--- a/src/trw_chan_port.v
++++ b/src/trw_chan_port.v
+@@ -53,20 +53,18 @@
+     output reg  [7:0]      dropped
+ );
+     // selected source; a sel beyond the list selects nothing
+-    reg        s_valid, s_seq, s_load, w_seq;
++    reg        s_valid, s_seq, w_seq;
+     reg [17:0] s_tok;
+     integer n;
+     always @* begin
+         s_valid = 1'b0;
+         s_seq   = 1'b0;
+-        s_load  = 1'b0;
+         s_tok   = 18'd0;
+         w_seq   = 1'b0;
+         for (n = 0; n < N; n = n + 1) begin
+             if ({28'd0, sel} == n) begin
+                 s_valid = src_valid[n];
+                 s_seq   = src_seq[n];
+-                s_load  = src_load[n];
+                 s_tok   = src_tok[18*n +: 18];
+             end
+             if ({28'd0, cfg_sel} == n)
+@@ -82,7 +80,16 @@
+ 
+     wire took     = avail && take;                              // F2
+     wire filtered = present && !accepted;                       // F7
+-    wire drop     = tap && avail && !take && s_load;            // F4
++    // Qualify each source in parallel: the late load avoids selected-token filtering.
++    wire [N-1:0] drop_terms;
++    genvar ds;
++    generate
++        for (ds = 0; ds < N; ds = ds + 1) begin : g_drop_qual
++            assign drop_terms[ds] = ({28'd0, sel} == ds) && src_valid[ds] &&
++                (last_seq != src_seq[ds]) && accept[src_tok[18*ds+16 +: 2]] && src_load[ds];
++        end
++    endgenerate
++    wire drop = tap && en && !take && (|drop_terms);           // F4
+ 
+     always @(posedge clk) begin
+         if (!rst_n) begin

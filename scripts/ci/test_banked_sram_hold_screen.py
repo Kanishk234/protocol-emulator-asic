@@ -80,3 +80,23 @@ def test_repair_workflow_is_bound_to_reviewed_source_and_separate_image():
     assert 'banked_sram_hold_screen.py' in runs
     assert 'Dockerfile.openroad-banked-hold' in runs
     assert 'scripts/ci/placement_route.py' not in runs
+
+
+@pytest.mark.parametrize('failure', [None, 'density', 'placement-density', 'placement-mode', 'repair-clock', 'repair-sdc', 'missing-base-density'])
+def test_density_comes_from_base_and_actual_placement_not_resizer(failure):
+    from banked_sram_hold_screen import validate_configs
+    repair = {'CLOCK_PERIOD': 20, 'GRT_ADJUSTMENT': 0.16,
+              'PL_OPTIMIZE_MIRRORING': False, 'PNR_SDC_FILE': 'src/signoff.sdc'}
+    base = {**repair, 'PL_TARGET_DENSITY_PCT': 56, 'PL_TIMING_DRIVEN': True}
+    placement = {'PL_TARGET_DENSITY_PCT': 56, 'PL_TIMING_DRIVEN': True}
+    if failure == 'density': base['PL_TARGET_DENSITY_PCT'] = 57
+    if failure == 'placement-density': placement['PL_TARGET_DENSITY_PCT'] = 57
+    if failure == 'placement-mode': placement['PL_TIMING_DRIVEN'] = False
+    if failure == 'repair-clock': repair['CLOCK_PERIOD'] = 21
+    if failure == 'repair-sdc': repair['PNR_SDC_FILE'] = 'src/pnr.sdc'
+    if failure == 'missing-base-density': del base['PL_TARGET_DENSITY_PCT']
+    if failure:
+        with pytest.raises((ValueError, KeyError)):
+            validate_configs(repair, base, placement)
+    else:
+        validate_configs(repair, base, placement)

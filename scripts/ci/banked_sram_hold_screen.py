@@ -38,6 +38,23 @@ def qualified(data, antenna):
             and antenna['antenna__violating__pins'] == 0)
 
 
+def validate_configs(repair, base, placement):
+    for config, expected in (
+        (repair, {'CLOCK_PERIOD': 20, 'GRT_ADJUSTMENT': 0.16,
+                  'PL_OPTIMIZE_MIRRORING': False}),
+        (base, {'CLOCK_PERIOD': 20, 'GRT_ADJUSTMENT': 0.16,
+                'PL_TARGET_DENSITY_PCT': 56, 'PL_OPTIMIZE_MIRRORING': False,
+                'PL_TIMING_DRIVEN': True}),
+        (placement, {'PL_TARGET_DENSITY_PCT': 56, 'PL_TIMING_DRIVEN': True}),
+    ):
+        for key, value in expected.items():
+            if config[key] != value:
+                raise ValueError(f'Unexpected source {key}')
+    for config in (repair, base):
+        if Path(config['PNR_SDC_FILE']).resolve() != Path('src/signoff.sdc').resolve():
+            raise ValueError('Source constraints changed')
+
+
 def main():
     if os.environ['SOURCE_VARIANT'] != VARIANT:
         raise ValueError('Unexpected SRAM branch source variant')
@@ -49,12 +66,11 @@ def main():
     if len(states) != 1 or source.resolve() != states[0].resolve():
         raise ValueError('Unexpected repaired source checkpoint')
     cfg = json.loads(source.with_name('config.json').read_text())
-    for key, value in {'CLOCK_PERIOD': 20, 'GRT_ADJUSTMENT': 0.16,
-                       'PL_TARGET_DENSITY_PCT': 56, 'PL_OPTIMIZE_MIRRORING': False}.items():
-        if cfg[key] != value:
-            raise ValueError(f'Unexpected source {key}')
-    if Path(cfg['PNR_SDC_FILE']).resolve() != Path('src/signoff.sdc').resolve():
-        raise ValueError('Source constraints changed')
+    placements = list(Path('runs/rtl-grt-screen/flow').glob('*-openroad-globalplacement/config.json'))
+    if len(placements) != 1:
+        raise ValueError('Missing unique actual placement config')
+    validate_configs(cfg, json.loads(Path('src/config_rx_screen.json').read_text()),
+                     json.loads(placements[0].read_text()))
     identity = validate_identity(json.loads(Path('/tmp/placement-source-identity.json').read_text()),
                                  Path.cwd(), VARIANT)
     if identity['source_run_id'] != SOURCE_RUN:

@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (shared RX physical screen preparation)
+- Main125psroute37574267994 remains active;latestlint/test/docs passed,unitactive. Correction:its single named step includes repair/antenna andDRT,so active step alonecannotidentifyexactsubstage.
+- Preparedbs-event-rx-shared pair against event-late withtwo-module mutation/provenanceguards.181helpertests pass;workflowchoices parse. Freshreusableverification provesBSandRXFRAC4/8;41pintests,5chiptestsand2048L2clocks allpass. No mainRTL/config/templatejobchange orphasetick.
+- Verifiedprototypee7a3447andCIf3371dd committedseparately;publishingevidenceanddispatchingmatchedscreenafterremoterefverification. Next:inspectnewscreenand125psextractedresultwhenavailable. Retainallphysical/timinggates.
+
 ## 2026-10-07: Codex (main workflow progress and RX screen result)
 - All latest main lint/test/docs/unit runs on24bb0fd passed.125psroute37574267994 remains active atantenna/fresh-timing checks beforeDRT; no new extracted result.
 - RXpairedscreen37572964628completed:setupWS0allcornersboth;fast holdRX+0.0229828ns versusbaseline+0.0313302ns. BothfinalGRTzerooverflow. Postrepairinstancearea510232.98→517408.93um² (+about1.41%);routingdemand239415→245441. RecordedactualresultinRXreport;no promotion/phase tick.

@@ -28,3 +28,9 @@ New isolated `rx_timer_shared.patch` computes `sample_delta=per-(1<<FRAC)` once 
 With identical Yosys/Liberty mapping, RX area is11701.7082um² versus12559.7682 for the first late-selection variant (6.83% smaller;still20.58% above9704.3184 baseline). Slow ideal-wire a_in→timer arrival1.812930ns versus1.943963ns;worst a_in→any-flop6.063411ns versus5.907698ns. Thus it improves timer area/delay but slightly worsens another endpoint;these module probes are not full-chip WNS.
 
 Independent frozen-baseline equivalence at FRAC4/8 passes;FRAC8 proves226points,induction closes atstep1underseq2cap. All41combined pin tests pass,0fail/skip. Matching frozen chip verification passes5/5;L2passes2048clocks withzero model divergence. First invocation incorrectly used current checkout generated encodings with frozen RTL; discarded that mismatched run and reran in matching frozen environment. Raw scratch evidence:/tmp/rx-timer-shared-20261007. No physical screen launched or mainRTL/config adoption.
+
+## Shared-delta paired screen prepared
+
+Named trial `bs-event-rx-shared` combines unchanged event-late bitsync with only the shared-delta RX transformation. CI supports the exact two-module mutation set, successful-main source provenance, separate RX/BS fingerprints and matched event-late baseline.181helper checks pass; both workflow choices parse. Fresh reusable verification proves BS and RXFRAC4/8;41pin tests,5chip tests and2048model/RTL lockstep clocks allpass. Raw evidence:/tmp/bs-event-rx-shared-verify-20261007.log.
+
+Planned dispatch: `gh workflow run gds-drop-counter-screen.yaml --repo Kanishk234/protocol-emulator-asic --ref main -f experiment=bs-event-rx-shared -f comparison_baseline=bs-event-late`. Evaluate area, global overflow and all three corners; any routing continuation must retain its existing gates. No automatic adoption from diagnostic workflow success.

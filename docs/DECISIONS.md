@@ -1043,6 +1043,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Prepare optional150ps target from the original verified event source; retain one repair,zero setup target,all-corner timing and50ps fast budget before antennas/DRT. No gate relaxation,RTL/spec/main config change or template job edit.
 - Cost: more buffers/wires and possible setup/overflow degradation. Proposed diagnostic only; publication and physical measurement pending. Positive official timing remains unproven.
 
+## D-075 (2026-10-06): late selection of fractional RX timer values
+- General need: live pad selection reaches a fractional timer through arithmetic and control, leaving RX timer setup failures after the stronger hold repair. Compute timer/offset arithmetic first, then select its result with the live input decision. Preserve sample timing, modulo-width arithmetic, state priorities and live writes; no protocol-specific block or contract change.
+- Cost: isolated RX mapped area grows9704.3184→12559.7682um² (about29.4%); replicated area/wiring may cause full-chip overflow. Isolated slow a_in→rt delay falls6.620677→1.943963ns; longest a_in→any-register becomes5.907698ns at framing. These are no-wire module probes, not full-design WNS.
+- Prove FRAC4/8, run RX/full and complete chip/model tests, then compare complete event-late versus event-late+RXtimer through matched physical screens. Do not adopt on probe delay alone; retain20ns,2/4 resources and all setup/hold/physical gates.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

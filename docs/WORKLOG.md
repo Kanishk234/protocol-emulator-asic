@@ -5,11 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-06: Codex (RX timer late-selection prototype)
+- Routed150ps eventGL37566926287 completed22/22PASS,0FAIL/SKIP. Extracted slow setup still−0.389409ns despitepositivefast hold+0.067034ns; no timingclosure.
+- Pairedscreen37569441149completed:dropqualification setup0allcorners butfast hold−0.0184668ns versusbaseline+0.0313302ns. Refuse directrouting/promotion ofthatfailingcandidate.
+- NewRXtimer arithmetic moveslateSTARTselectionafterprecomputedvalues; preservesall sample clocks/livewrites. ModuleequivalenceFRAC4/8passes (FRAC8:226points,inductionstep1underseq2cap);20RX/fulltests,5chiptests and2048L2clocks pass locally. Mappedslowain→rt6.620677→1.943963ns,area9704.3184→12559.7682um² (+29.4%);onlymoduleprobe,fullroutingcostunknown.
+- FoundBUG73:frozen standalonepin carrier_active unconnected. Opt-inharnessconnectioncommit64fa661;mainolderinterfaceandfrozentrial20/20eachpass. Reusableverifier archivesHEADtests,sofirstreuse stillhadoldfixture;freshcommittedfixtureverification passedbothmoduleproofs,41pintests,5chiptestsand2048-clockL2.
+- Prepared pairedRX/eventscreen+routeprovenance,requiredRXhash,157helperchecks passingandworkflowparsepassed. NewreportPHASE2_RX_TIMER_LATE.md,D-075/BUG73/CLAIMS evidence recorded. No mainRTL/config/spec/templatejobs edited; no phase ticks.
+- Next: completefreshreusableverification,publishseparatetest/prototype/CI/docgroupsunderstandingapproval,andlaunch matchedRXscreenagainstevent-late.
+
 ## 2026-10-06: Codex (standing publication authorization)
 - User grants standing approval for commands, commits, pushes and workflow launches in this timing task; no repeat scoped approval needed for routine authorized work. Repository rules and evidence requirements remain otherwise intact.
 - Committed verified prototype patches9f5037b separately from CI187d4fd. Both named-module proofs, channel/pin/chip simulations and2048-clock L2 pass for the new combination;143helper tests andworkflow parses pass. MainRTL/spec/config/template jobs unchanged.
 - Publishing reviewed reports with exact extracted setup/hold tradeoff and complete22/22localwrapperprotocol evidence. Pending push/pairedscreen dispatch; no physical gain orphase tick claimed.
-- Next: launch bs-event-drop-qual against bs-event-late,inspect existingGL37566926287,andcontinue physical closure from actual results.
+- Published prototype9f5037b,CI187d4fd anddocsacd7d5f toorigin/main. LocalHEAD,origin/main andGitHubref independently matchacd7d5fdc79bf8999607cddc5901528842ed3f46. Launched pairedscreen37569441149(bs-event-drop-qual versusbs-event-late),inprogress. Newlint/test/docs/unit active; priorroutedGL37566926287stillrunning. Remaininguntrackedfiles areexecutionreport/SRAMprototypehelpers; publicationstatus notes remain local.
+- Next: inspectmatchedscreen'sfreshallcornertimingandrouteonlywithpasses;monitorpriorGL andcontinue setup/hold closure withoutrepeatpermissionquestions.
 
 ## 2026-10-06: Codex (paired combination screen prepared)
 - Prepared bs-event-drop-qual screen and route continuation with exact two-module mutation guards, independent source fingerprints and successful-main provenance. Optional comparison_baseline=bs-event-late isolates the new channel qualification change; existing defaults remain unchanged. No template GDS jobs or main RTL/config edited.

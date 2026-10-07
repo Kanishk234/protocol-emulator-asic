@@ -16,3 +16,7 @@ gh workflow run gds-drop-counter-screen.yaml --ref main \
 ```
 
 Publish CI/helpers/tests and prototype patches separately from documentation. The local `timing_trial.py` also contains previously verified resync-event/resync-load registrations; their matching patches must accompany publication. Keep SRAM prototypes, the execution report helper and unrelated readiness updates separate. No remote dispatch or main RTL adoption occurred during preparation.
+
+## Paired screen outcome
+
+Run37569441149 completed diagnostically. Both variants retain estimated setupWS0 at allcorners. Event-late baseline fast hold+0.0313302ns; event/drop-qualification fast hold−0.0184668ns afterrepair (slow+0.158524ns,typical+0.0647883ns). Therefore the combination fails the fresh fast hold gate and must not be sent directly to routing or promoted. No extracted gain established. This result does not invalidate its functional proofs, but shifts priority to another candidate or a separately measured hold repair.

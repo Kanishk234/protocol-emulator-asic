@@ -40,6 +40,11 @@ Whole-chip37663775123 verifies20714 replacements and empty non-pSD XOR, then
 Magic hits30min cap with no report. Baseline stock check12m19s. Align scratch
 Tcl with stock suspendall/selected-chip listall query, avoiding global catchup;
 full rules unchanged,45min step/55min job bound. No DRC acceptance yet.
+**Launch/status:**944ef1f/7bf9901/36f9527 pushed; stock-aligned whole-chip
+Magic37669173193 active alongside late-route37668791436. Both use standard
+cloud runners. Agent tasks complete; no further agent expansion. Official
+OpenAI documentation confirms subagents can increase token usage; exact
+account consumption is not available here. All authorized changes recorded.
 
 ## 2026-10-07 (session63: inspect fresh route failure and isolate filler remedy)
 **Done:** checked newly failed37657068016 and downloaded artifact. Job32m09s,

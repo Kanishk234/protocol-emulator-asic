@@ -23,6 +23,21 @@ resize/legalization/routing/extraction with unchanged gates. Matching native
 tile hardening, configured timing, precheck and clean reproduction remain
 required before any compact promotion. No current failure is waived.
 
+**Launched:** scoped c070159/27b7b6a/ec9121f pushed; fresh same-wire slew
+37688389888 active, latest lint/docs/unit/test active at launch audit.
+Read-only actual DEF/LEF audit finds stronger driver adds3 sites/5.4432um2
+and overlaps adjacent hold1096 by1.44um at unchanged origin. Its left neighbor
+is also packed. Record nearby fillers and cells; a direct physical master
+swap is illegal, so future ECO must legalize neighbors and reroute, not reuse
+old wires as acceptance. No local route or original view mutated.
+
+**Fresh diagnostic verified:**37688389888 succeeds; downloaded result has
+baseline slew9/candidate0/fanout33 both. Prepared D-056 exact three-cell
+placement preflight, source hash and Liberty checked, unchanged connectivity/
+orientation/all other placement, one master only, strict placement gates.
+Retained trial is explicitly not valid routing/parasitics. Python AST/YAML,
+Tcl completeness/JSON-output and whitespace checks pass; no local EDA.
+
 ## 2026-10-07 (session65: continue physical closure and loaded phase stress)
 **Done:** proactively checked current runs/failures at user's request to
 continue without repeated confirmation. Native late repair37669731197 and

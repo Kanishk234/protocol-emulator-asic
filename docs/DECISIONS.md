@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-056: Preflight legal placement for one stronger configuration driver
+- **Date:**2026-10-07. **Status:** accepted bounded scratch placement diagnostic; no promotion.
+- **Evidence:** fresh-wire37688389888 reproduces9 slow slew violations and a21oi_2 in-memory substitution clears all9;33 fanout violations remain. Authenticated37674839060 DEF/LEF has packed driver width2.40um versus3.84um candidate, requiring3 extra sites. Two fill2 cells provide1.92um space left of the tie/NAND/driver chain.
+- **Decision:** authenticate extracted ODB02b8bd30f3fb12e4a66e2322b5f3906c236dd93eed8b8cd1eeeff95f6e796a61 and read Liberty before swap. Remove only fillers in scratch; change only u_cfg._54_ to a21oi_2 and shift driver, adjacent NAND and tie left1.44um each. Require legal original/final placement, unchanged all non-filler connectivity/orientation, exactly one master change, and no other cell movement. Bound tool3min/step5/job15 on standard cloud runner. Retain placement-only ODB/DEF explicitly marked routes/parasitics invalid.
+- **Costs/limits:** nominal driver area increases5.4432um2, three cells move, loading/power costs not measured; every protocol pays this shell cost. No additional fabric resources or architecture/clock change. Existing hold cell stays unchanged. This preflight cannot claim routed DRC/antenna/LVS/timing or configured function. New routing, filler replacement, extracted all-corner timing and physical checks are mandatory before any promotion. No PDK/source/frozen macro edits or waived checks.
+- **Alternative/source:** OpenROAD [detailed placement documentation](https://openroad.readthedocs.io/en/latest/main/src/dpl/README.html) describes re-legalization after resizing and placement checks. A bounded hand-selected site shift minimizes changed cells for this measured row; if it fails, investigate the exact legality report instead of widening global placement or accepting overlap. Pinned tool execution remains authoritative.
+
 ## D-055: Validate measured filler policy on the recovered zero route
 - **Date:**2026-10-07. **Status:** accepted combined scratch physical verification under D-037; no promotion.
 - **Evidence:**37669731197 reaches fresh native0/antenna0/critical disconnected0, unchanged topology and retained checked ODB9cac79d86dd15707efdd385c32d3990347cb4695874bc802d0bfe20a5e90e9ba. Fourth late-cost pass enters stubborn flow. Separate older-source widened-filler37669173193 gives full Magic0; these results cannot be combined into a same-layout acceptance claim without fresh checks.

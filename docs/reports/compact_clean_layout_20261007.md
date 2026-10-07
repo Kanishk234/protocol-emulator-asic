@@ -41,3 +41,26 @@ simulation failures while regenerated mappings pass loaded UART; their physical
 views must be hardened and matched before successor acceptance. Configured
 timing, official precheck, clean reproduction and required CI remain gates.
 Frozen G1 remains the fallback; its latest template gds37659595229 succeeds.
+
+## Placement constraint for the proposed driver resize
+
+Read-only inspection of this run's actual DEF and pinned standard-cell LEF
+shows u_cfg._54_ at(46.08,52.92)um, FS, width2.40um. The proposed a21oi_2
+is3.84um wide: three extra0.48um sites and5.4432um2 nominal cell area.
+The row height is3.78um. This is a cell cost, not a measured total-chip area
+or capacity improvement.
+
+The current driver is packed between u_cfg._72_ (44.16–46.08um) and
+hold1096 (48.48–52.80um). A same-origin stronger driver overlaps hold1096
+by1.44um. It cannot simply be swapped and accepted in the physical database.
+Leftward space exists as two fill2 cells at40.32–42.24um, but a tie cell
+(42.24–44.16um) and the NAND sit between that space and the driver. An ECO
+must legalize neighboring placement and reroute affected pins; deleting
+fillers alone does not free the required contiguous sites at the driver.
+Keep the authenticated clean baseline, and check placement legality plus
+fresh native/antenna/connectivity/geometry/LVS/extraction after any ECO.
+
+Fresh-wire diagnostic37688389888 succeeds: downloaded result reproduces9
+baseline slew violations and0 after in-memory a21oi_2 substitution, with33
+fanout violations unchanged. This justifies the separate D-056 placement-only
+preflight, not a physical ECO pass. Original routed layout remains untouched.

@@ -10,6 +10,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 details = json.loads((ROOT / "build/cloud_input/materialized.json").read_text())
@@ -71,6 +72,7 @@ for tile in sorted((library / "tiles/tiny").glob("LUT4x8_ha*")):
                        stdout=log, stderr=subprocess.STDOUT, check=True, timeout=120)
     records.append({"tile": tile.name, "original_sha256": previous,
                     "variant_sha256": hashlib.sha256(native.read_bytes()).hexdigest()})
+    shutil.copyfile(native, out / native.name)
 if not records:
     raise RuntimeError("No native LUT tiles regenerated")
 (out / "manifest.json").write_text(json.dumps({
@@ -82,10 +84,22 @@ if not records:
 base = [sys.executable, str(ROOT / "spikes/compact_edges/simulate.py"), "--work", str(variant),
         "--words", details["words"], "--chip-dir", "chip_shared_crc_cfgbranches"]
 results = {}
-for name, extra in (("rtl_control", []), ("native_candidate", ["--mapped-fabric"])):
+for name, extra in (("rtl_control", []), ("native_candidate", ["--mapped-fabric"]),
+                    ("native_user_reset", ["--mapped-fabric", "--reset-probe"])):
     with (out / f"{name}.log").open("w") as log:
         result = subprocess.run(base + extra, stdout=log, stderr=subprocess.STDOUT, timeout=300)
     results[name] = result.returncode
+    suffix = "" if name == "rtl_control" else "_mapped_fabric"
+    if name == "native_user_reset":
+        suffix += "_reset_probe"
+    xml = variant / ("simulation_chip_shared_crc_cfgbranches" + suffix) / "results.xml"
+    if xml.is_file():
+        shutil.copyfile(xml, out / f"{name}_results.xml")
+    if result.returncode == 0:
+        tree = ET.parse(xml).getroot()
+        if len(tree.findall(".//testcase")) != 1 or any(
+                tree.findall(".//" + tag) for tag in ("failure", "error", "skipped")):
+            raise RuntimeError(f"Missing or unsuccessful acceptance XML: {xml}")
     if result.returncode:
         break
 (out / "result.json").write_text(json.dumps(results) + "\n")

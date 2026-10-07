@@ -1,0 +1,40 @@
+name: compact slew screen
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/slew_screen.tcl'
+      - 'test_internal/cloud_slew_screen.py'
+      - '.github/workflows/slew_screen.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-slew-screen-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Project venv and pinned physical evidence
+        run: |
+          python3 -m venv .venv
+          gh run download 37552604692 -R "$GITHUB_REPOSITORY" -n compact-geometry-replay-37552604692 -D build/slew_source
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Compare one driver with unchanged extracted wires
+        timeout-minutes: 8
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_slew_screen.py
+      - name: Retain diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: compact-slew-screen-${{ github.run_id }}
+          path: build/slew_screen/
+          retention-days: 3

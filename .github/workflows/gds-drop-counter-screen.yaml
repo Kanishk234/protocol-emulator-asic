@@ -8,7 +8,7 @@ on:
         required: true
         default: drop-counter
         type: choice
-        options: [drop-counter, drop-qual, bs-resync, bs-csa, bs-event-late, bs-event-drop-qual, bs-event-rx-timer, bs-load-flat, setup-margin]
+        options: [drop-counter, drop-qual, bs-resync, bs-csa, bs-event-late, bs-event-drop-qual, bs-event-rx-timer, bs-event-rx-shared, bs-load-flat, setup-margin]
 
       comparison_baseline:
         description: Matched baseline for the selected RTL trial

@@ -39,7 +39,7 @@ def test_placement_override_is_isolated_and_unknown_variants_refused():
         timing_placement("unknown")
 
 
-@pytest.mark.parametrize("variant", ["drop-qual", "bs-resync", "bs-csa", "bs-event-late", "bs-event-drop-qual", "bs-event-rx-timer", "bs-load-flat", "setup-margin"])
+@pytest.mark.parametrize("variant", ["drop-qual", "bs-resync", "bs-csa", "bs-event-late", "bs-event-drop-qual", "bs-event-rx-timer", "bs-event-rx-shared", "bs-load-flat", "setup-margin"])
 def test_new_trials_keep_timing_placement_and_only_margin_trial_adds_headroom(variant):
     assert timing_placement(variant)
     assert repair_margin(variant) == (2.0 if variant == "setup-margin" else 0.0)

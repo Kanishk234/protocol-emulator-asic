@@ -91,8 +91,22 @@ def _be(v, n):
     return [(v >> (8 * (n - 1 - i))) & 0xFF for i in range(n)]
 
 
+def _validate_load(words, arch, chunk):
+    """Reject values that would be truncated on the wire, before device I/O."""
+    if not isinstance(chunk, int) or isinstance(chunk, bool) or chunk <= 0:
+        raise WarpError("chunk must be a positive integer number of words")
+    if not isinstance(arch, int) or isinstance(arch, bool) or not 0 <= arch <= 0xFFFF:
+        raise WarpError("architecture version must be an unsigned 16-bit integer")
+    if len(words) > 0xFFFF:
+        raise WarpError("configuration length must fit in 16 bits")
+    if any(not isinstance(word, int) or isinstance(word, bool) or not 0 <= word <= 0xFFFFFFFF
+           for word in words):
+        raise WarpError("configuration words must be unsigned 32-bit integers")
+
+
 def load_transactions(words, arch, chunk=64):
     """MOSI bytes of every transaction of a load (ARCHITECTURE.md §3)."""
+    _validate_load(words, arch, chunk)
     txs = [[LOAD_BEGIN] + _be(arch, 2) + _be(len(words), 2)]
     for i in range(0, len(words), chunk):
         tx = [LOAD_DATA]
@@ -162,6 +176,7 @@ class Warp:
     def load(self, arch, words, chunk=64):
         """Checked load: refuses a bitstream for another architecture before sending anything;
         raises WarpError unless the chip ends in LOADED."""
+        _validate_load(words, arch, chunk)
         chip = self.read_id()
         if arch != chip:
             raise WarpError("bitstream is for architecture 0x%04X, the chip is 0x%04X" % (arch, chip))

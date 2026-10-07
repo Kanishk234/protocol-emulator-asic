@@ -36,6 +36,62 @@ def test_load_transactions_match_reference(chunk):
     assert warp.load_transactions(words, 0x0003, chunk) == ref
 
 
+INVALID_LOADS = [
+    ([protocol.SYNC_WORD], 3, chunk)
+    for chunk in (-1, 0, True, False, 1.5, "64")
+] + [
+    ([protocol.SYNC_WORD], arch, 64)
+    for arch in (-1, 0x10000, True, 3.0, "3")
+] + [
+    ([protocol.SYNC_WORD, word], 3, 64)
+    for word in (-1, 0x100000000, True, 1.5, "1")
+]
+
+
+@pytest.mark.parametrize("words,arch,chunk", INVALID_LOADS)
+def test_invalid_load_rejected_before_transaction_or_device_io(words, arch, chunk):
+    with pytest.raises(warp.WarpError):
+        warp.load_transactions(words, arch, chunk)
+
+    class NoDeviceIO(warp.Warp):
+        def __init__(self):
+            self.transactions = []
+
+        def xfer(self, data):
+            self.transactions.append(data)
+            raise AssertionError("invalid input must not contact the chip")
+
+    board = NoDeviceIO()
+    with pytest.raises(warp.WarpError):
+        board.load(arch, words, chunk)
+    assert board.transactions == []
+
+
+def test_load_length_at_wire_boundary():
+    words = [protocol.SYNC_WORD] * 0xFFFF
+    txs = warp.load_transactions(words, 0xFFFF, chunk=0xFFFF)
+    assert txs == protocol.load_transactions(words, chunk=0xFFFF, arch_version=0xFFFF)
+    assert txs[0] == [warp.LOAD_BEGIN, 0xFF, 0xFF, 0xFF, 0xFF]
+    words.append(protocol.SYNC_WORD)
+    with pytest.raises(warp.WarpError, match="length"):
+        warp.load_transactions(words, 3)
+
+    class NoDeviceIO(warp.Warp):
+        def __init__(self):
+            pass
+
+        def xfer(self, data):
+            raise AssertionError("invalid length must not contact the chip")
+
+    with pytest.raises(warp.WarpError, match="length"):
+        NoDeviceIO().load(3, words)
+
+
+def test_unsigned_word_boundaries_preserve_wire_bytes():
+    words = [protocol.SYNC_WORD, 0, 0xFFFFFFFF]
+    assert warp.load_transactions(words, 0) == protocol.load_transactions(words, arch_version=0)
+
+
 @pytest.mark.parametrize("path", sorted(BITS.glob("*.wbit")), ids=lambda p: p.stem)
 def test_parse_wbit_matches_bitfile(path):
     data = path.read_bytes()

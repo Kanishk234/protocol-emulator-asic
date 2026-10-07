@@ -1,0 +1,65 @@
+name: clean README reproduction
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/clean_reproduction.py'
+      - '.github/workflows/clean_reproduction.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-clean-reproduction-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  reproduce:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 190
+    steps:
+      - uses: actions/checkout@v6
+      - name: README system prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog verilator sigrok-cli python3-venv python3-tk
+      - name: Cache pinned binary tools only
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Install pinned OSS CAD Suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+      - name: README fresh venv setup
+        run: scripts/setup_venv.sh
+      - name: Record actual tool environment
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          python --version
+          iverilog -V 2>&1 | head -1
+          verilator --version
+          yosys -V
+          sigrok-cli --version
+          python -m pip freeze
+      - name: Follow README quick start with strict retained results
+        timeout-minutes: 180
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          python test_internal/clean_reproduction.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: clean-readme-reproduction-${{ github.run_id }}
+          path: |
+            build/clean_reproduction/
+            build/uart/report.json
+            build/uart/*.log
+            build/compile/*/report.json
+          retention-days: 3

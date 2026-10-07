@@ -46,8 +46,14 @@ for cell in list(layout.each_cell()):
                 raise RuntimeError("Unexpected array: inventory requires explicit instances")
             counts[old] += 1
             inst.cell_index = replacements[old]
-if sorted(counts.values()) != [464, 20250]:
-    raise RuntimeError(f"Unexpected source filler inventory: {counts}")
+expected_counts = json.loads(os.environ.get("WARP_CHIP_FILLER_COUNTS",
+    '{"sg13cmos5l_fill_1":464,"sg13cmos5l_fill_2":20250}'))
+if set(expected_counts) != {"sg13cmos5l_fill_1", "sg13cmos5l_fill_2"} or any(
+        type(value) is not int or value <= 0 for value in expected_counts.values()):
+    raise RuntimeError("Invalid expected filler inventory")
+actual_counts = {layout.cell(index).name: count for index, count in counts.items()}
+if actual_counts != expected_counts:
+    raise RuntimeError(f"Unexpected source filler inventory: {actual_counts}; expected {expected_counts}")
 out = Path(os.environ["WARP_FILLER_OUT"])
 differences = []
 for layer, region in before.items():
@@ -66,4 +72,5 @@ layout.write(str(out / "chip_trial.gds"))
     "source_run": int(os.environ.get("WARP_CHIP_SOURCE_RUN", "37648945387")), "source_sha256": expected,
     "source_native_markers": int(os.environ.get("WARP_CHIP_NATIVE_MARKERS", "3")), "replaced_instances": sum(counts.values()),
     "other_layers_xor_empty": True, "trials": manifest,
+    "actual_filler_counts": actual_counts, "expected_filler_counts": expected_counts,
     "physical_or_timing_acceptance": False}, indent=2) + "\n")

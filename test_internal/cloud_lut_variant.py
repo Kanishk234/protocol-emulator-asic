@@ -7,7 +7,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import shutil
 import subprocess
 import sys
@@ -27,12 +26,9 @@ out = ROOT / "build/lut_variant_evidence"
 out.mkdir(exist_ok=False)
 library = variant / "fabulous-tiles"
 gold = library / "primitives/FABULOUS_LC/fabulous/FABULOUS_LC.v"
-text, count = re.subn(r"LUTK\s*#\(\s*\.K\s*\(4\)\s*\)\s*LUT4\s*\(",
-                     "wp_lut4_mux_tree LUT4 (", gold.read_text())
-if count != 1:
-    raise ValueError("Pinned primitive does not have exactly one expected LUT4 instance")
 patched = out / "FABULOUS_LC_mux_tree.v"
-patched.write_text(text)
+subprocess.run(["patch", "--batch", "--forward", "--output", str(patched), str(gold),
+                str(ROOT / "patches/fabulous_lut_mux_tree.patch")], check=True)
 latch_map = out / "latch_map.v"
 latch_map.write_text(r'''module \$_DLATCH_P_ (input E, D, output Q);
 sg13cmos5l_dlhq_1 impl (.D(D), .GATE(E), .Q(Q));

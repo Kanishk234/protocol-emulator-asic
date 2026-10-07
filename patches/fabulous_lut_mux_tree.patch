@@ -1,0 +1,11 @@
+--- a/FABULOUS_LC.v
++++ b/FABULOUS_LC.v
+@@ -113,7 +113,5 @@
+     // The look-up table
+-    LUTK #(
+-        .K (4)
+-    ) LUT4 (
++    wp_lut4_mux_tree LUT4 (
+         .I    (LUT_index),
+         .INIT (LUT_values),
+         .O    (LUT_out)

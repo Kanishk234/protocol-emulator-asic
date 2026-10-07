@@ -5,6 +5,76 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (approved repair-only publication)
+- User approved separate tools/workflow/reports commits, push and manual launch. Rechecked217 local helper tests and diff; no unpublished src/info/macro history or main hardening active.
+- Tools committed41f23d9; new manual workflow7499d4a. Reports record exact negative banked hold and preserve original125ps baseline. FIPE and old addr0 prototypes excluded; direct routing support remains local until measured repair evidence.
+- No phase boxes ticked. Next: push approved groups and launch repair-only screen, then inspect real legalization/routing/all-corner margin and antenna gates before any DRT.
+
+## 2026-10-07: Codex (bounded SRAM repair-only workflow prepared)
+- Prepared separate manual gds-banked-sram-hold-screen, exact source37669663762/variant identity, guarded address8 BUF1 insertion with legalization,125ps all-corner repair, antenna recheck and fresh50ps/all-corner timing gates. No DRT in this flow; gate failure is workflow failure with evidence upload.
+- Independent image preserves existing Metal2 reservation; wrapper validates one checkpoint read and insertion order.217 local helper tests pass; Bash syntax/diff checks pass. Real physical behavior awaits pinned CI; local OpenROAD lacks QtCharts.
+- Review in PHASE2_BANKED_SRAM_HOLD_SCREEN.md. No source/config/template job changes, phase ticks, commit/push or dispatch. Current AGENTS reserves history/remote changes to user; publication authorization for this new workflow remains needed.
+- Next: publish reviewed tool/workflow groups then dispatch repair-only measurement; no routing until measured gates and source provenance pass.
+
+## 2026-10-07: Codex (banked hold residual audited and guarded delay prepared)
+- Screen37669663762 banked setup WS0 all corners; hold fast/slow/typ -0.0223693/+0.147057/+0.0526946 ns. Baseline hold +0.0313302/+0.229262/+0.102516 ns. Diagnostic green is not timing pass.
+- Artifact11506981784 maps the single fast failure to lane1 acc_addr8→SRAM A_ADDR8. Repair area510973 µm²/33156 instances; zero GRT overflow. Do not launch direct routing: source gate correctly refuses hold failure.
+- Prepared banked_sram_addr_hold.tcl with exact net9161/BUF2 wire9161/SRAM address8 guards and one BUF1 insertion. Five mock Tcl guard tests pass, zero skips. Actual OpenDB audit blocked by missing local libQt5Charts.so.5; no actual physical repair/timing claim.
+- No phase ticks, history changes or workflow dispatch. Next: run a bounded repair-only measurement in pinned CI with source identity, legalization/routing, all corners and antennas; route only after measured pass/headroom. Original125ps remains strongest extracted baseline.
+
+## 2026-10-07: Codex (matched banked screen completes)
+- Both jobs in corrected screen37669663762 pass; latest cf78cde lint/test/unit/docs all pass. Older docs37668163469 still displays in progress.
+- Independently read final GRT log tables: baseline and banked have zero overflow on every layer. Banked demand244196/usage40.81% versus baseline239415/40.01%; no extracted closure claim. Actual corner margins/instance-area artifact audit remains next.
+- No phase ticks or routed dispatch. Retain original125ps as measured baseline until extracted comparison proves improvement.
+
+## 2026-10-07: Codex (prepare guarded banked routed follow-up)
+- Corrected matched screen37669663762 now has both event-late and banked jobs actively screening through GRT/fresh timing. Latest cf78cde test/lint/docs green; unit active.
+- Prepared local downstream registration, exact banked IO fingerprint requirement and125ps-only headroom option. Successful main source provenance, complete original RX/BS/IO identities, fresh50ps fast-hold budget and all timing/antenna/DRC gates remain enforced.
+- Added workflow-catalog test covering every actual screen input against patch mapping/runner, preventing BUG74 registration drift.196 helper tests pass; git diff --check passes. Changes remain local; no routed dispatch or phase ticks.
+- Next: inspect screen results before publishing/launching routed continuation; require extracted improvement relative to original125ps -0.179789ns baseline.
+
+## 2026-10-07: Codex (fix banked screen runner registration)
+- Screen37668189723 banked job fails before synthesis with Unknown timing screen variant: workflow/patch mapping registered, runner timing-placement allowlist missed. Logged BUG74; corrected runner and added variant policy test.174 helper tests pass.
+- Published only runner/tests fix cf78cde to remote main under screen authorization. Requested cancellation of incomplete failed comparison; dispatched corrected paired screen. No hardware changes or phase ticks.
+- Next: inspect fresh matched physical results, retain original125ps baseline until extracted improvement is demonstrated. Shared-RX22/22 functional pass does not offset setup regression.
+
+## 2026-10-07: Codex (approved banked-selector screen published and launched)
+- User explicitly authorized commit/push/dispatch. Committed only four screen helper/workflow/patch files as e5a6e3c; push to remote main confirmed. Local HEAD and origin/main match e5a6e3cd129c9d59a6e6fa40bb90bbfab392bd2a.
+- Launched matched bs-event-pin-banked versus bs-event-late screen37668189723; status in progress. Original RX retained. No main src/info/macro changes or phase ticks. FIPE report remains local/untracked.
+- Initial compound command approval timed out before execution; simpler retry succeeded. Next: inspect matched all-corner setup/hold, overflow, area and endpoint evidence before any routed follow-up.
+
+## 2026-10-07: Codex (smaller candidate screen prepared)
+- Added bs-event-pin-banked to the manual RTL screen and source patch mapping; guard rejects missing IO or added RX mutation. Actual patch application reproduces verified BS/IO/original RX byte-for-byte.159 CI helper tests pass; git diff --check passes.
+- Shared-RX routed GL37659138336 independently passes22/22 from artifact11501802812. Timing remains -1.427891 ns, so candidate is not promoted.
+- No phase ticks, commit/push or workflow dispatch. Current AGENTS git rule reserves publication for user; exact screen dispatch recorded in regression report. Next: publish helpers/workflow/patch, then matched screen against event-late; route only with justified screen evidence.
+
+## 2026-10-07: Codex (recover stronger baseline and verify smaller selector candidate)
+- Independently mapped40 shared-RX slow setup report violations:39 dropped-counter entries and one channel2 last_seq, all from U0 PERIOD word4 bit11. Worst dropped[22] -1.427891 ns; worst data path has no named hold-delay cell. Original125ps remains stronger measured baseline.
+- Prepared bs_event_pin_banked.patch against original RX/event-late; source audit confirms only BS/IO changes. Fresh cached-carrier pin harness passes60/60; chip5/5; model/RTL2048 clocks with zero divergence. Earlier pin fixture invocations reproduce known BUG73/stale build and are superseded, not hidden.
+- Added regression report and updated readiness to disqualify shared-RX promotion. Routed GL37659138336 still running. No phase ticks, hardware promotion or physical dispatch.
+- Next: screen the smaller candidate against the original event-late baseline with all setup/hold/overflow gates; require extracted evidence before official promotion.
+
+## 2026-10-07: Codex (shared-RX extracted timing result)
+- Manual extraction37659134964 completed successfully as a diagnostic, but extracted slow setup WS is -1.427891 ns; fast/typ setup WS0. Hold fast/slow/typ is +0.059525/+0.331955/+0.168051 ns. This candidate does not close timing and regresses setup versus original125ps -0.179789 ns.
+- Manual routed GL37659138336 is actively running the expanded L3 suite. Stale automatic entries remain queued. No phase ticks or hardware changes.
+- Next: inspect extracted failing paths and repair-induced area/buffers before choosing another physical experiment; retain original125ps as stronger measured setup baseline.
+
+## 2026-10-07: Codex (manual downstream checks recover stalled queue)
+- Automatic extraction37655518925 and GL37655518919 remained queued with no jobs; cancellation endpoint inconsistently reported completed. Successful source route37642988571 verified on main.
+- Manually dispatched extraction37659134964 and routed GL37659138336 on main against the same route artifact/frozen candidate. Both now in progress. No hardware/config changes or phase ticks.
+- Next: inspect actual extracted margins and expanded GL; stale automatic entries may persist in the UI and must not be mistaken for active checks.
+
+## 2026-10-07: Codex (official native configuration review)
+- Assembled isolated native configuration, ten-key review diff and portability audit in /tmp/tripwire-shared-rx-official-prep-20261007. Static assertions pass: 20 ns, fully timed PNR/signoff constraints, three corners, 125 ps hold target and physical error gates. Source configuration remains unchanged.
+- Shared-RX route37642988571 passed with final DRT violations zero. Extraction37655518925 and routed GL37655518919 are queued; extracted closure is unconfirmed.
+- No phase boxes ticked, new workflow launched or hardware change. Next: inspect downstream evidence and resolve native repair/Metal2-reservation portability before official promotion.
+
+## 2026-10-07: Codex (parallel shared-RX official integration preparation)
+- Kept structural changes on hold. Prepared isolated /tmp/tripwire-shared-rx-official-prep-20261007 withevent/sharedRXonly;bankedfallbackexcluded.19source lists/sevenSRAMviews/20nsmetadata andphysicalerrorgates checked. Generatorpasses;4top-levelsmokespass,0fail/error/skip;manifestincludesJUnitdigestandreviewpatch.
+- Audit confirms inheritedPNRSDCcontainslatchsetupfalsepath;qualifiedofficialrecipe mustusefullytimedconstraintsconsistentwithD-066. Extra checkpointrepair/customMetal2wrapperalso neednativecleanbuildhandling. Separate125psnativeproposalremainsunapplied.
+- No mainhardware/config changes,officialdispatch,newworkflows orphaseticks. Readinessreportupdatedlocally whilecurrentroute runs.
+- Next:inspectactualsharedRXroute/extraction/GL;promoteonlywithallgates passingandreviewedofficialrecipe. Currentstatic/smokeevidenceisnotphysicalsignoff.
+
 ## 2026-10-07: Codex (local pin-selection study)
 - SharedRXroute37642988571 remains active. Studied four equivalent selector forms on frozen trw_pin_io; factored validity worsens both area/timing, padded/polarity versions worsen the relevant pad path and are not queued.
 - Banked comparison proves19points and maps1.5% smaller IO area. Ideal-wire slowpad→sel1.511804→1.442738ns;C_ACTIVE→sel worsens0.674786→0.796614ns. No full-design WNS gain claim.

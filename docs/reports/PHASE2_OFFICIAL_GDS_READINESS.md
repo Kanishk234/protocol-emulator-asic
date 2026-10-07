@@ -25,3 +25,21 @@ Prepared `/tmp/tripwire-official-2x4-prep-20261006/native-timing-settings-propos
 The customMetal2regionreservation cannot be assumed in unchanged official jobs. First official run with native settings must test this portability difference using actual overflow/DRC/antenna/extractedtiming. If it fails,repair based on its paths/congestion; do not relabel custom-image diagnostic as official evidence. Any config-key adoption beyond AGENTS whitelist needs an explicit reviewed exception; no main config or template jobs changed here. Full frozen macro/PDN and physical error gates also need review before promotion.
 
 Static integration audit completed:19RTLsource files exist; all7configured SRAM views (GDS/LEF/netlist/CDL/threeLibertycorners) resolve; clock metadata agrees at50MHz/20ns; MagicDRC andillegal-overlap error gates enabled. Results inisolatedcandidate/static_integration_audit.json. This establishes file/configconsistency,notgeometry/LVS/precheck. New150psresults require resolving setup regression beforepromoting itsmarginsetting.
+
+## Shared-RX provisional integration prepared during routing
+
+Isolated directory `/tmp/tripwire-shared-rx-official-prep-20261007` uses the complete2/4 baseline with verified event-late/shared-RX sources;banked-selection fallback is excluded. Both19-source lists match,sevenSRAMviews exist,clockmetadata is20ns/50MHz,andMagicDRC/illegal-overlap gates aretrue. Generatorcheckpasses;four top-level smoke tests pass,0failure/error/skip. Manifest hashes/JUnitdigest and `official-hardware-review.patch` make the provisional candidate reviewable. These checks do not prove geometry,LVS,precheck or timing.
+
+The separate native-settings proposal now uses125ps,stillunapplied. InheritedcandidateconfigpointsPNR at`pnr.sdc`,whichcontainsasetupfalsepath tolatches;ouractualdiagnosticsuse`signoff.sdc`. The final official recipe must time those paths consistently withD-066 andall currentgates. Otherportability gaps: customMetal2regionwrapperandextra checkpointrepair are not reproduced by native settings alone. No official dispatch or mainhardware/config/templatejob change.
+
+Currentroute37642988571must completecleanly,thenitsactualextractedsetup/hold andexpandedroutedGLmustpass before promotion. This preparation removes integration work fromthatlatercriticalpath;itdoesnotdeclarethecandidateofficial-ready.
+
+## Native configuration review assembled (2026-10-07)
+
+Prepared `official-config-review.json`, `official-config-review.patch` and `official-config-portability-audit.json` in `/tmp/tripwire-shared-rx-official-prep-20261007`. These merge the provisional native proposal with the complete SRAM/configuration baseline without applying it to source configuration. Ten configuration keys differ. Static assertions pass for 20 ns, identical fully timed PNR/signoff SDC with no setup false-path command, three timing corners, 125 ps GRT hold target and enabled Magic DRC/illegal-overlap error gates. This is a review artifact, not a physically qualified recipe.
+
+Shared-RX route37642988571 completed successfully with final detailed-route violations zero; extracted timing37655518925 and routed GL37655518919 remain queued. Native repair ordering and missing custom Metal2 reservation still prevent an equivalence claim between experimental and official flows. No new experiment or official dispatch.
+
+## Candidate selection after shared-RX extraction
+
+Extraction37659134964 has slow setup -1.427891 ns and fast hold +0.059525 ns. Shared-RX provisional integration is therefore not eligible for promotion. Retain the original event-late125ps candidate (-0.179789 ns setup, +0.037290 ns fast hold) as the stronger measured baseline. The native configuration review remains useful preparation, but neither its125ps target nor the source candidate is qualified for official closure. See PHASE2_SHARED_RX_REGRESSION.md for independently mapped failure endpoints.

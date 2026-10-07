@@ -1053,6 +1053,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Add optional 0.125 ns to the isolated event-late route helper/workflow. Preserve source default, one repair, zero setup target, all-corner checks, fresh fast hold >=0.05 ns and downstream physical/extracted gates. No architecture, main hardware/config or template job changes.
 - Cost: additional delay cells and wiring; compare actual buffer count, area, overflow and extracted setup/hold against 100/150 ps. No gain claimed before measurement. Helper regression: 135 tests passed.
 
+## D-077 (2026-10-07): share the fractional RX sample delta
+- General need: moving live input selection after timer arithmetic shortens its path but duplicates arithmetic. Compute modulo-width period-minus-tick once, then reuse it for timer and offset sample values. Preserve unconditional timer updates, sample cycles and live configuration; no new state or contract change.
+- Cost/benefit from identical module mapping:11701.7082um² versus12559.7682 for first prototype,6.83% smaller but20.58% above original baseline. Slow ideal-wire input-to-timer1.812930ns; other input-to-flop endpoint6.063411ns slightly worse than first prototype5.907698ns. Full-chip effects unmeasured.
+- Independent equivalence FRAC4/8 and41pin tests pass. Require matching frozen chip/model verification and paired physical measurements before adoption; all timing/physical gates remain unchanged.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

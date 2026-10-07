@@ -5,12 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (main workflow progress and RX screen result)
+- All latest main lint/test/docs/unit runs on24bb0fd passed.125psroute37574267994 remains active atantenna/fresh-timing checks beforeDRT; no new extracted result.
+- RXpairedscreen37572964628completed:setupWS0allcornersboth;fast holdRX+0.0229828ns versusbaseline+0.0313302ns. BothfinalGRTzerooverflow. Postrepairinstancearea510232.98→517408.93um² (+about1.41%);routingdemand239415→245441. RecordedactualresultinRXreport;no promotion/phase tick.
+- RXendpointaudit:worstfastpathlane1rpc0→SRAMA_ADDR0,+22.983ps;second+37.224ps. Slowmax1000pathsalllatchendpoints,nontimer,soaggregate0cannotproveRXsetupbenefit.
+- BuiltsmallerRXshared-delta patch:area11701.7082um² (6.83%belowpreviousprototype),ideal-wiretimertiming1.812930ns,otherinputendpoint6.063411ns. FRAC4/8equivalence,41pintests,5chiptestsand2048L2clocks pass. Initialcurrent-encoding/frozenRTL invocation was discarded;matchingfrozenenvironment rerunpasses. No physicalgainclaim/mainRTLchange.
+- Next:finishsharedvariantchip/L2,inspect125psresult,andpreparepinnedendpointmeasurementbeforepromotingRX. Retainallgates;officialpositiveWNS remainsunproven.
+
 ## 2026-10-06: Codex (area-conscious timing follow-up)
 - Prepared bounded 125 ps event hold target between the tested 100/150 ps settings. Five CI/workflow files updated; 135 helper tests and workflow default/choice validation pass. Retained every setup/hold/physical gate; no main hardware/config edits or phase ticks.
 - Main paired RX screen37572964628 still measuring GRT/fresh timing on both branches. Unit37572948480: Python and Verilator jobs pass, Icarus chip/L3 step remains active; lint/test/docs pass.
 - Prioritized selective delay-cell sizing, measured weak-gate drive fixes and state-derived counter carry over replicated arithmetic/storage. RX prototype costs29.4% module area; full-chip overflow must justify adoption.
 - User subsequently explicitly authorized commits/pushes. Committed the verified CI group as57039a5; publishing docs separately and dispatching125ps from the original trusted event source. No main hardware inputs change.
-- Next: publish CI/docs groups, launch125ps original-event trial, inspect RX screen area/overflow/all-corner timing, and promote only after extracted timing/physical/GL evidence. Official timing remains unproven.
+- Published CI57039a5 anddocs24bb0fd toremote main; localHEAD/origin/main/GitHubref independently match24bb0fda821bc829c5c0c4992405f7169e7b7844. Dispatched125psroute37574267994,inprogress. RXscreen37572964628continues;newlintpassed,test/docs/unitactive. Three experimentalhelpers remainuntracked andwere notincluded.
+- Next: inspect125ps fresh/extractedsetup/hold andRXscreenarea/overflow/all-corner timing;promoteonlywithphysical/GL evidence. Officialtiming remainsunproven.
 
 ## 2026-10-06: Codex (RX timer late-selection prototype)
 - Routed150ps eventGL37566926287 completed22/22PASS,0FAIL/SKIP. Extracted slow setup still−0.389409ns despitepositivefast hold+0.067034ns; no timingclosure.

@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -27,25 +28,50 @@ config_path = ROOT / "build/cloud_input/route_config.json"
 filler_only = os.environ.get("WARP_GEOMETRY_FILLER_ONLY") == "1"
 if filler_only:
     config = json.loads(config_path.read_text())
-    config["FILL_CELLS"] = ["sg13cmos5l_fill_1", "sg13cmos5l_fill_2"]
+    config["DECAP_CELLS"] = []
     config_path = out / "plain_fill_config.json"
     config_path.write_text(json.dumps(config, indent=2) + "\n")
-command = [sys.executable, "-m", "librelane", "--docker-no-tty", "--dockerized",
+common = [sys.executable, "-m", "librelane", "--docker-no-tty", "--dockerized",
            "--pdk", "ihp-sg13cmos5l", "--pdk-root", os.environ["PDK_ROOT"], "--manual-pdk",
-           "--hide-progress-bar", "--run-tag", "geometry_probe", "--force-run-dir", str(run),
-           "--from", "Odb.ReportWireLength", "--to", "Checker.LVS" if filler_only else "KLayout.DRC",
+           "--hide-progress-bar", "--run-tag", "geometry_probe"]
+if filler_only:
+    fill_run = out / "fill_audit"
+    fill_run.mkdir()
+    fill_command = common + ["--force-run-dir", str(fill_run),
+        "--from", "Odb.ReportWireLength", "--to", "OpenROAD.FillInsertion",
+        "--with-initial-state", str(initial), str(config_path)]
+    with (out / "fill.log").open("w") as log:
+        subprocess.run(fill_command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, check=True)
+    fill_states = list(fill_run.glob("*-openroad-fillinsertion/state_out.json"))
+    if len(fill_states) != 1:
+        raise RuntimeError("Missing unique completed filler state")
+    filled = json.loads(fill_states[0].read_text())
+    components = Path(filled["def"]).read_text().split("COMPONENTS", 1)[1].split("END COMPONENTS", 1)[0]
+    decaps = re.findall(r"(?m)^\s*-\s+\S+\s+(sg13cmos5l_decap_\w+)", components)
+    plain = re.findall(r"(?m)^\s*-\s+\S+\s+(sg13cmos5l_fill_\w+)", components)
+    (out / "filler_audit.json").write_text(json.dumps({
+        "decap_instances": len(decaps), "plain_fill_instances": len(plain),
+        "state": str(fill_states[0]), "passed": not decaps and bool(plain),
+    }, indent=2) + "\n")
+    if decaps or not plain:
+        raise RuntimeError("Actual filler inventory does not implement the experiment")
+    initial = fill_states[0]
+command = common + ["--force-run-dir", str(run),
+           "--from", "Odb.CellFrequencyTables" if filler_only else "Odb.ReportWireLength",
+           "--to", "Checker.LVS" if filler_only else "KLayout.DRC",
            "--with-initial-state", str(initial), str(config_path)]
 with (out / "flow.log").open("w") as log:
     result = subprocess.run(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
-final = list(run.glob("*-checker-lvs/state_out.json" if filler_only else "*-klayout-drc/state_out.json"))
-metrics = json.loads(final[0].read_text())["metrics"] if len(final) == 1 else {}
-errors = metrics.get("klayout__drc_error__count")
-lvs_errors = metrics.get("design__lvs_error__count")
+def step_metric(pattern, key):
+    states = list(run.glob(pattern + "/state_out.json"))
+    return json.loads(states[0].read_text())["metrics"].get(key) if len(states) == 1 else None
+errors = step_metric("*-klayout-drc", "klayout__drc_error__count")
+lvs_errors = step_metric("*-netgen-lvs", "design__lvs_error__count")
 (out / "result.json").write_text(json.dumps({
     "source_run": 37516794406, "source_sha256": EXPECTED, "source_routing_markers": 3,
     "scope": "geometry_replay_only_not_final_route_or_timing_acceptance",
     "flow_returncode": result.returncode, "klayout_errors": errors, "lvs_errors": lvs_errors,
     "plain_filler_only": filler_only,
-    "physical_change": "FILL_CELLS excludes decap cells" if filler_only else "none",
+    "physical_change": "DECAP_CELLS empty; actual inserted inventory audited" if filler_only else "none",
 }, indent=2) + "\n")
 raise SystemExit(result.returncode or (0 if errors == 0 and (not filler_only or lvs_errors == 0) else 1))

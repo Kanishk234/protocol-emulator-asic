@@ -11,7 +11,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "patches"))
 from ihp_filler_psd_trial import clone_trial
 
 source = Path(os.environ["WARP_CHIP_GDS"])
-expected = "befeaf6c9ff440400108034bbc6eca90de8a96a0c8dd65239aa0cd745aa41786"
+expected = os.environ.get("WARP_CHIP_EXPECTED_SHA256",
+                          "befeaf6c9ff440400108034bbc6eca90de8a96a0c8dd65239aa0cd745aa41786")
+if "WARP_CHIP_EXPECTED_SHA256" in os.environ:
+    for required in ("WARP_CHIP_SOURCE_RUN", "WARP_CHIP_NATIVE_MARKERS"):
+        if required not in os.environ:
+            raise RuntimeError("Fresh source needs explicit provenance and native scope")
 if hashlib.sha256(source.read_bytes()).hexdigest() != expected:
     raise RuntimeError("Not authenticated no-decap GDS from37648945387")
 layout = pya.Layout()
@@ -58,7 +63,7 @@ if differences:
     raise RuntimeError("Whole chip changed on a non-pSD layer; see non_psd_xor.json")
 layout.write(str(out / "chip_trial.gds"))
 (out / "chip_trial_manifest.json").write_text(json.dumps({
-    "source_run": 37648945387, "source_sha256": expected,
-    "source_native_markers": 3, "replaced_instances": sum(counts.values()),
+    "source_run": int(os.environ.get("WARP_CHIP_SOURCE_RUN", "37648945387")), "source_sha256": expected,
+    "source_native_markers": int(os.environ.get("WARP_CHIP_NATIVE_MARKERS", "3")), "replaced_instances": sum(counts.values()),
     "other_layers_xor_empty": True, "trials": manifest,
     "physical_or_timing_acceptance": False}, indent=2) + "\n")

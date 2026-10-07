@@ -1,0 +1,131 @@
+name: gds-banked-sram-hold-screen
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gds-banked-sram-hold-37669663762
+  cancel-in-progress: false
+
+jobs:
+  harden:
+    name: Bounded SRAM address hold repair without DRT
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      GRT_ADJUSTMENT: "0.16"
+      VARIANT: timing-placement
+      SOURCE_VARIANT: bs-event-pin-banked
+      SOURCE_RUN_ID: "37669663762"
+
+    steps:
+      - name: Check out the measured R4 candidate
+        uses: actions/checkout@v6
+        with:
+          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check out experiment helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Verify unchanged hardware for placement comparison change
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test -z "$(git diff --name-only)"
+          sha256sum src/config.json src/trw_pin_io.v
+
+      - name: Check out Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: ihp-sg13cmos5l
+          path: tt
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tt/requirements.txt
+
+      - name: Install Tiny Tapeout prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+
+      - name: Install flow dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: Install IHP PDK
+        run: ./.tt-gds-action/install_sg13cmos5l.sh
+
+      - name: Install pinned LibreLane
+        run: pip install librelane==3.1.0.dev3
+
+      - name: Prepare trusted source fingerprints before artifact download
+        run: |
+          python workflow-src/scripts/ci/route_source.py prepare \
+            --variant "$SOURCE_VARIANT" --run-id "$SOURCE_RUN_ID" \
+            --identity /tmp/placement-source-identity.json
+
+      - name: Download the audited all-corner placement screen
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-drop-counter-bs-event-pin-banked-37669663762
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 37669663762
+
+      - name: Validate exact source artifact provenance and fingerprints
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" > /tmp/placement-source-run.json
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test "$PWD" = /home/runner/work/protocol-emulator-asic/protocol-emulator-asic
+          python workflow-src/scripts/ci/route_source.py validate \
+            --variant "$SOURCE_VARIANT" --run-id "$SOURCE_RUN_ID" \
+            --identity /tmp/placement-source-identity.json \
+            --run-json /tmp/placement-source-run.json
+
+      - name: Build pinned region-reservation image
+        run: docker build --tag tripwire-banked-hold:local --file workflow-src/scripts/ci/Dockerfile.openroad-banked-hold workflow-src/scripts/ci
+
+      - name: Measure guarded address repair and fresh antenna/timing gates
+        timeout-minutes: 70
+        run: python workflow-src/scripts/ci/banked_sram_hold_screen.py
+
+      - name: Upload matched screen evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-banked-sram-hold-${{ github.run_id }}
+          path: |
+            runs/rtl-grt-screen/**
+            runs/banked-sram-hold/**
+            runs/slew-screen/**
+            src/**
+            macro/**
+            info.yaml
+          if-no-files-found: warn

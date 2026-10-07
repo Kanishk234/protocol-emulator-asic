@@ -1,0 +1,56 @@
+name: extended capture image
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'protocols/uart_capture/prescaled8.yaml'
+      - 'test_internal/cloud_capture_extended.py'
+      - '.github/workflows/capture_extended.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-capture-extended-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  compile_and_load:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: System simulator and Python environment
+        run: sudo apt-get update && sudo apt-get install -y iverilog python3-venv python3-tk
+      - uses: actions/cache@v5
+        id: ocs
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-2026-06-29
+      - name: Pinned compiler suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          curl -sfL -o /tmp/ocs.tgz https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2026-06-29/oss-cad-suite-linux-x64-20260629.tgz
+          tar -xzf /tmp/ocs.tgz -C "$HOME"
+      - name: Pinned nextpnr and project venv
+        run: |
+          bash scripts/fetch_nextpnr.sh
+          bash scripts/setup_venv.sh
+      - name: Source queue and actual compiled loaded image
+        timeout-minutes: 20
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          make -C protocols/uart_capture/test STAMP_SHIFT=3 COCOTB_RESULTS_FILE=results_extended.xml
+          python test_internal/cloud_capture_extended.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: capture-extended-${{ github.run_id }}
+          path: |
+            build/cloud_capture_extended/compile.log
+            build/cloud_capture_extended/loaded.log
+            build/cloud_capture_extended/*results.xml
+            build/cloud_capture_extended/result.json
+            build/cloud_capture_extended/compiled/report.json
+            build/cloud_capture_extended/compiled/failure.json
+            protocols/uart_capture/test/results_extended.xml
+          retention-days: 3

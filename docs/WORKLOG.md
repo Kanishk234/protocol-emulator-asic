@@ -5,7 +5,13 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (repair wrapper PATH fix)
+- Run37689746190 passes config guard but fails before STA because companion wrapper is not on LibreLane runtime PATH. Logged BUG76; delegate via installed wrapper directory, preserving actual script arguments.
+-225 helper tests pass, including STA delegation and malformed/valid insertion with installation directory absent from PATH. Added container wrapper smoke before physical measurements. No physical mutation/timing result inferred from this failure.
+- Next: publish corrective tool/workflow/docs groups and relaunch under existing repair-only authorization. No phase ticks or DRT.
+
 ## 2026-10-07: Codex (repair-only config guard scope fixed)
+- Published c6e871c tools/tests and b5a19e4 docs; remote/local main match b5a19e4fc5a2918bdbad2f910d8b19846df2a327. Corrected repair-only run37689746190 is in progress.
 - Run37689090398 fails before insertion: KeyError PL_TARGET_DENSITY_PCT. LibreLane resizer step config intentionally omits placement-only key. Logged BUG75; validate density in base plus unique actual placement config, keep repair clock/GRT/mirroring/SDC checks.
 -224 helper tests pass; actual downloaded source configs pass corrected guard with runner SDC path rebased only in local audit. No timing result or hardware failure inferred from this tooling abort.
 - Next: publish corrective tool/test/docs groups under approved repair-only scope and relaunch exact experiment. No phase boxes ticked or DRT dispatched.

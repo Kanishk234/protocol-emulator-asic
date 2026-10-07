@@ -6,6 +6,7 @@ on:
       - 'test_internal/cloud_lut_variant.py'
       - 'patches/fabulous_lut_mux_tree.patch'
       - '.github/workflows/lut_variant.yaml'
+      - 'spikes/compact_edges/test_shell.py'
   workflow_dispatch:
     inputs:
       implementation:
@@ -13,6 +14,11 @@ on:
         type: choice
         default: mux_tree
         options: [mux_tree, original_control]
+      uart_stress:
+        description: Real loaded UART data coverage
+        type: choice
+        default: edge_patterns
+        options: [edge_patterns, smoke]
 permissions:
   contents: read
 concurrency:
@@ -26,6 +32,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
       WARP_LUT_IMPLEMENTATION: ${{ inputs.implementation || 'mux_tree' }}
+      WARP_COMPACT_UART_STRESS: ${{ inputs.uart_stress || 'edge_patterns' }}
     steps:
       - uses: actions/checkout@v6
       - name: Project tools and simulation venv

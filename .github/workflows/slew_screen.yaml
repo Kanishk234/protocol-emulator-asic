@@ -19,12 +19,13 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      WARP_SLEW_SOURCE_RUN: '37674839060'
     steps:
       - uses: actions/checkout@v6
       - name: Project venv and pinned physical evidence
         run: |
           python3 -m venv .venv
-          gh run download 37552604692 -R "$GITHUB_REPOSITORY" -n compact-geometry-replay-37552604692 -D build/slew_source
+          gh run download 37674839060 -R "$GITHUB_REPOSITORY" -n compact-clean-layout-37674839060 -D build/slew_source
           bash spikes/cloud/fetch_pdk.sh
       - name: Compare one driver with unchanged extracted wires
         timeout-minutes: 8

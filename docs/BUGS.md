@@ -1,5 +1,12 @@
 # Bugs
 
+## 54: Experimental view packaging violates official precheck input contract
+- **Date:**2026-10-08.
+- **Symptom/check:** official37811985173 fails six of nine checks: multiple GDS top cells and apparent LEF/template die mismatch.
+- **Root cause:** filler overlays leave unreferenced original masters in the GDS. Official checks choose a unique top, unlike earlier explicit tt_um_warp geometry checks. Native LEF emits valid short decimals; pinned official parse_fp3 left-pads fractional digits, so1289.28 becomes1289.028.
+- **Fix/coverage:** publish only actual chip plus its complete referenced hierarchy, requiring exact per-cell shapes/labels/instance transforms/arrays and database-unit equality after readback. Format only LEF geometry tokens to three decimals with exact Decimal equality, rejecting rounding. Preserve authenticated original GDS/ODB and unmodified nine official checks. Formatting/precision negative controls and AST pass; cloud acceptance pending.
+- **Primary sources:** [pinned official pin checker](https://github.com/TinyTapeout/tt-support-tools/blob/d66cf179e7bc4d296362ab7e2e3b344dc3c4f665/precheck/pin_check.py), [KLayout hierarchy selection](https://www.klayout.de/0.28/doc/code/class_SaveLayoutOptions.html).
+
 ## 53: Default instance-array serialization fails protected macro audit
 - **Date:**2026-10-08.
 - **Symptom/check:** fanout37810652597 completes baseline CTS/resizer/STA, then strict MACROS comparison rejects the resolved configuration.

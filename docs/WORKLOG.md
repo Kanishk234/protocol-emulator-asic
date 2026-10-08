@@ -62,6 +62,21 @@ Same upload approved on retry with that evidence. No permission bypass.
 retain actual failures and don't promote until native/physical/timing gates
 all pass. No phase boxes ticked.
 
+**Measured independent results:**0309544 regular lint/docs/test/unit all pass.
+Tile37811985092 SUCCESS1m55s: original and passingC2 each306 signal ports,
+exact original die/pin geometry. Fanout37811985079 SUCCESS2m45s: cluster8
+reduces32→5 violations at estimated typ, all27 clock violations cleared;
+cost39 extra cells/+1056um2 area. Five config-column nets remain. Full report
+compact_preflights_20261008.md. Native37811985147 passes537-storage audit
+then SATcounterexample; prepare identical-original self-miter to test feedback
+construction before blaming remapping. Official37811985173 fails six checks
+on orphan tops/short-decimal parsing (BUG54); prepare strict geometry-identical
+hierarchy publication/exact-value LEF formatting, no check changes.
+Two existing agents prepare faithful one-tile hardening and separate remaining
+configuration fanout experiment. No local heavy EDA, frozen edits or boxes ticked.
+**Next:** inspect official rerun and self-miter, review continuation inputs
+before bounded tile hardening/config fanout cloud trials.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

@@ -8,7 +8,7 @@ Newest entry at the top. One entry per work session.
 ## 2026-10-08: Codex (native route antenna gate failure fixed)
 - Run37858532319 fails safely before DRT: fresh setupWS0/holdfast+0.119326ns, but post-timing antenna15nets/17pins. Exact fresh artifact11584854275 confirms; source provenance/config/STA all pass. Electrical cleanup37858535440 remains active.
 - Added conditional stock antenna cleanup with congestion disallowed and audited resolved config/repair command. Preserve repaired guides; proposed full reroute rejected locally after reviewing BUG79, before publication. Fresh CheckAntennas and STA use cleaned ODB; remaining antennas, timing or50ps hold failure still refuse DRT.
--51 helper regressions pass; diff check passes. BUG82 records cause and coverage. Next publish corrective tools/docs and relaunch the previously approved native route; no hardware/template edit, relaxed gate or phase tick.
+-51 helper regressions pass; diff check passes. BUG82 records cause and coverage. Published d9af592/c2d7c8b to remote main. Relaunched native route37859526262 on c2d7c8b1094edd4551cc6078ece502a2758c7255, running at receipt; cleanup37858535440 still active. Next inspect fresh cleanup/STA gates and actual DRT/extraction. No hardware/template edit, relaxed gate or phase tick.
 
 ## 2026-10-08: Codex (native physical audit and guarded continuation ready)
 - Audited exact native37853023857 artifacts: both setupWS0; AREA1 holdfast+0.119326ns, area524688.31µm² inclSRAM, GRT39.76%/0overflow vs AREA0+0.074614ns/524994.94µm²/40.21%/0overflow.

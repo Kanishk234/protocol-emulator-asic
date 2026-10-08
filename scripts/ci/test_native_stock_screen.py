@@ -66,3 +66,14 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch):
     receipt = json.loads(Path('runs/native-stock-screen/recipe.json').read_text())
     assert receipt['checkpoint_ecos'] is False
     assert receipt['official_signoff'] is False
+
+
+
+def test_design_repair_is_explicit_and_preserves_timing_recipe(tmp_path):
+    original=dict(CLOCK_PERIOD=20,PL_TARGET_DENSITY_PCT=56)
+    baseline=runner.configure(original,'AREA 1',tmp_path/'sdc')
+    changed=runner.configure(original,'AREA 1',tmp_path/'sdc',design_repair=True)
+    assert 'RUN_POST_GRT_DESIGN_REPAIR' not in baseline
+    assert changed.pop('RUN_POST_GRT_DESIGN_REPAIR') is True
+    assert changed==baseline
+    with pytest.raises(ValueError):runner.configure(original,'AREA 1',tmp_path/'sdc',design_repair='1')

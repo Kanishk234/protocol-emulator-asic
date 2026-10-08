@@ -10,7 +10,9 @@ from postgrt_timing import CORNERS, screen
 from rtl_grt_screen import native_mapping_strategy
 
 
-def configure(original, strategy, sdc):
+def configure(original, strategy, sdc, design_repair=False):
+    if type(design_repair) is not bool:
+        raise ValueError('Design repair selection must be boolean')
     native_mapping_strategy('bs-event-late', strategy)
     if strategy is None:
         raise ValueError('Explicit native mapping strategy required')
@@ -27,6 +29,8 @@ def configure(original, strategy, sdc):
                   RUN_POST_GRT_RESIZER_TIMING=True)
     # A saved/custom step list would bypass the stock Classic ordering.
     config['meta'] = {'version': original.get('meta', {}).get('version', 1), 'flow': 'Classic'}
+    if design_repair:
+        config['RUN_POST_GRT_DESIGN_REPAIR'] = True
     return config
 
 
@@ -48,7 +52,11 @@ def main():
         raise ValueError('Unreviewed source variant')
     original = json.loads(Path('src/config_merged.json').read_text())
     sdc = Path('src/signoff.sdc')
-    config = configure(original, os.environ['NATIVE_MAPPING_STRATEGY'], sdc)
+    repair = os.environ.get('NATIVE_DESIGN_REPAIR', '0')
+    if repair not in {'0', '1'}:
+        raise ValueError('Unknown native design repair selection')
+    config = configure(original, os.environ['NATIVE_MAPPING_STRATEGY'], sdc,
+                       design_repair=repair == '1')
     path = Path('src/config_native_stock.json')
     path.write_text(json.dumps(config, indent=2) + '\n')
     root = Path('runs/native-stock-screen')
@@ -66,6 +74,7 @@ def main():
         'source_variant': 'bs-event-late', 'synthesis_strategy': config['SYNTH_STRATEGY'],
         'repair_corners': list(CORNERS), 'hold_target_ns': 0.125,
         'stock_sequence': True, 'checkpoint_ecos': False,
+        'post_grt_design_repair': repair == '1',
         'extracted': False, 'official_signoff': False,
     }, indent=2) + '\n')
 

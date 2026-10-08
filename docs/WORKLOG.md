@@ -6,6 +6,7 @@ Newest entry at the top. One entry per work session.
 - Raw logs are not committed; link to them instead.
 
 ## 2026-10-08: Codex (moved hold bottleneck audited; nine-leaf screen ready)
+- Published78ca427 tools,b2652a1 workflow,61ac267 evidence to remote main. Launched [37806209914](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37806209914) on61ac267; in_progress at confirmation. Antenna repair enabled; no DRT or setup/inverter changes.
 - Finished screen37803300460 passes setup/hold counts and antennas0/0; setupWS0, hold fast+0.033514ns/slow+0.352956ns/typ+0.159913ns. Fast hold is below50ps DRT gate; no threshold relaxed.
 - Byte-range artifact11563320092 audit identifies9 distinct printed endpoints below50ps, headed by lane0.ex_imm[3], not prior state[2]. Old one-leaf prototype remains local/unlaunched. Actual fresh NL confirms9 separate single-driver/single-sink D nets.
 - Prepared bounded9-BUF1 hold screen from exact37803300460. Preflight all branches before mutation; preserve all other logic and clock/reset; require zero-overflow routing, strict antenna repair and fresh all-corner timing with50ps margin. Added library area65.3184µm², not final routed area.

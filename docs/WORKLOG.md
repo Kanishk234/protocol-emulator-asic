@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (antenna-clean NOR2 screen succeeds)
+- Screen37736921949 on d150bb7 succeeded. Final antennas0 nets/0 pins; all-corner setup WS0 and no setup/hold violations. Hold fast+0.0932422ns, slow+0.393571ns, typical+0.212009ns. Repair adds36 diodes;34189 cells, instance area524911.48µm².
+- Successful source meets local continuation's50ps fast-hold gate. Updated prepared continuation to this exact run; prior failed runs remain rejected.240 helper tests pass. Continuation remains local/unpublished; no DRT launched.
+- No phase tick: GRT estimates do not establish extracted timing or official signoff. Next: publish/launch guarded DRT continuation, then extracted timing and routed GL; resolve official clean-build portability.
+
 ## 2026-10-08: Codex (pinpoint and fix antenna audit regression)
 - Failed screen37735461986 actually passes all-corner timing but fails47 antenna nets/52 pins. Repair itself reaches0 violations; the full audit reroute added afterward recreates them (BUG79).
 - Removed full audit reroute; antenna configuration disallows congestion, wrapper asserts policy before/after repair and records completion, runner checks evidence and retains independent antennas/netlist/STA gates.

@@ -1,0 +1,5 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY --chmod=755 openroad_hotspot_wrapper.sh /usr/local/bin/tripwire-openroad-hotspot
+COPY --chmod=755 openroad_event_nor2_wrapper.sh /usr/local/bin/tripwire-openroad-event-nor2
+COPY drop_driver_size.tcl /usr/local/share/tripwire/drop_driver_size.tcl
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-openroad-event-nor2

@@ -16,6 +16,7 @@ SOURCE_RUN = 37533969613
 VARIANT = 'bs-event-late'
 DROP_SOURCE_RUN = 37736921949
 HOLD_SOURCE_RUN = 37803300460
+DRIVER_SOURCE_RUN = 37806209914
 
 
 def validate_run(run):
@@ -60,6 +61,29 @@ def validate_drop_netlist(before, after):
         raise ValueError('Dropped-event ECO changed additional cells or connections')
 
 
+def validate_driver_netlist(before, after):
+    original, changed = logical_cells(before), logical_cells(after)
+    expected = ('sg13cmos5l_a21oi_1', (('A1', '_12085_'), ('A2', '_12163_'),
+                                     ('B1', '_12191_'), ('Y', '_12192_')))
+    if original.get('_38386_') != expected:
+        raise ValueError('Driver cell identity or connectivity changed')
+    for name in ('_27853_', '_31567_'):
+        if original.get(name, ('',))[0] != 'sg13cmos5l_nor2_2':
+            raise ValueError('Missing prior qualified NOR2 repair')
+    from drop_leaf_hold import TARGETS
+    for sink, net, *_ in TARGETS:
+        new_net = f'tripwire_drop_hold_net{sink}'
+        if original.get(f'tripwire_drop_hold_buf{sink}') != (
+                'sg13cmos5l_buf_1', (('A', net), ('X', new_net))):
+            raise ValueError('Missing qualified hold leaf')
+        master, pins = original.get(sink, ('', ()))
+        if master != 'sg13cmos5l_dfrbpq_1' or dict(pins).get('D') != new_net:
+            raise ValueError('Qualified hold leaf destination changed')
+    original['_38386_'] = ('sg13cmos5l_a21oi_2', expected[1])
+    if original != changed:
+        raise ValueError('Driver ECO changed additional cells or connections')
+
+
 def validate_physical_baseline(inherited, physical):
     old, exported = logical_cells(inherited), logical_cells(physical)
     added = exported.keys() - old.keys()
@@ -100,7 +124,7 @@ def validate_antenna_overflow(log):
         raise ValueError('Antenna repair congestion policy not enforced')
 
 
-def promote_netlists(state_path, original_netlist, drop=False, hold=False):
+def promote_netlists(state_path, original_netlist, drop=False, hold=False, driver=False):
     state = json.loads(state_path.read_text())
     odb = Path(state['odb'])
     nl = odb.with_suffix('.eco.nl.v')
@@ -108,10 +132,12 @@ def promote_netlists(state_path, original_netlist, drop=False, hold=False):
     baseline = odb.with_suffix('.baseline.nl.v')
     if not nl.is_file() or not pnl.is_file() or not baseline.is_file():
         raise ValueError('Fresh ECO netlists missing; stale STA refused')
-    if drop or hold:
+    if drop or hold or driver:
         if logical_cells(original_netlist.read_text()) != logical_cells(baseline.read_text()):
             raise ValueError('Qualified source ODB/netlist mismatch')
-        if hold:
+        if driver:
+            validate_driver_netlist(baseline.read_text(), nl.read_text())
+        elif hold:
             from drop_leaf_hold import validate_drop_leaf_hold
             validate_drop_leaf_hold(baseline.read_text(), nl.read_text())
         else:
@@ -121,9 +147,11 @@ def promote_netlists(state_path, original_netlist, drop=False, hold=False):
         validate_netlist(baseline.read_text(), nl.read_text())
     if not re.search(r'\bsg13cmos5l_nor2_2\s+_27853_\s*\(', pnl.read_text()):
         raise ValueError('Powered netlist missing ECO')
-    if (drop or hold) and not re.search(r'\bsg13cmos5l_nor2_2\s+_31567_\s*\(', pnl.read_text()):
+    if (drop or hold or driver) and not re.search(r'\bsg13cmos5l_nor2_2\s+_31567_\s*\(', pnl.read_text()):
         raise ValueError('Powered netlist missing dropped-event ECO')
-    if hold:
+    if driver and not re.search(r'\bsg13cmos5l_a21oi_2\s+_38386_\s*\(', pnl.read_text()):
+        raise ValueError('Powered netlist missing driver ECO')
+    if hold or driver:
         from drop_leaf_hold import TARGETS
         for sink, *_ in TARGETS:
             if not re.search(r'\bsg13cmos5l_buf_1\s+tripwire_drop_hold_buf' + sink + r'\s*\(', pnl.read_text()):
@@ -151,35 +179,37 @@ def promote_antenna_netlists(state_path, original_netlist):
 
 def main():
     profile = os.environ.get('ECO_PROFILE', 'original')
-    if profile not in {'original', 'drop-nor2', 'drop-hold'}:
+    if profile not in {'original', 'drop-nor2', 'drop-hold', 'drop-driver'}:
         raise ValueError('Unreviewed ECO profile')
     drop = profile == 'drop-nor2'
     hold = profile == 'drop-hold'
+    driver = profile == 'drop-driver'
     run_info = json.loads(Path('/tmp/event-nor2-route-run.json').read_text())
-    if drop or hold:
-        source_run = HOLD_SOURCE_RUN if hold else DROP_SOURCE_RUN
-        source_workflow = 'gds-drop-event-screen' if hold else 'gds-event-nor2-screen'
+    if drop or hold or driver:
+        source_run = DRIVER_SOURCE_RUN if driver else HOLD_SOURCE_RUN if hold else DROP_SOURCE_RUN
+        source_workflow = ('gds-drop-leaf-hold-screen' if driver else
+                           'gds-drop-event-screen' if hold else 'gds-event-nor2-screen')
         if (run_info['id'] != source_run or run_info['head_branch'] != 'main'
                 or run_info['conclusion'] != 'success'
                 or run_info['path'] != f'.github/workflows/{source_workflow}.yaml'):
             raise ValueError('Unqualified dropped-event source screen')
     else:
         validate_run(run_info)
-    root = Path('runs/drop-event' if hold else 'runs/event-nor2' if drop else 'runs/placement-route')
+    root = Path('runs/drop-hold' if driver else 'runs/drop-event' if hold else 'runs/event-nor2' if drop else 'runs/placement-route')
     identity = validate_identity(json.loads((root / 'source_identity.json').read_text()), Path.cwd(), VARIANT)
     expected = validate_identity(json.loads(Path('/tmp/placement-source-identity.json').read_text()), Path.cwd(), VARIANT)
     if identity != expected or identity['source_run_id'] != SOURCE_RUN:
         raise ValueError('Original hardware fingerprints changed')
     gates = json.loads((root / 'gates.json').read_text())
     source = Path(gates['state'])
-    timing = json.loads((root / ('timing/comparison.json' if drop or hold else 'postantenna-sta/comparison.json')).read_text())
-    expected_state = root / ('antenna/3-openroad-checkantennas-1/eco_state.json' if drop or hold
+    timing = json.loads((root / ('timing/comparison.json' if drop or hold or driver else 'postantenna-sta/comparison.json')).read_text())
+    expected_state = root / ('antenna/3-openroad-checkantennas-1/eco_state.json' if drop or hold or driver
                              else 'antenna/3-openroad-checkantennas-1/state_out.json')
-    if (not gates['ready_for_route_review' if drop or hold else 'timing_and_antenna_pass'] or not timing_pass(timing)
+    if (not gates['ready_for_route_review' if drop or hold or driver else 'timing_and_antenna_pass'] or not timing_pass(timing)
             or Path(timing['after_state']).resolve() != source.resolve()
             or source.resolve() != expected_state.resolve()):
         raise ValueError('Original checkpoint timing/state gate fails')
-    if drop or hold:
+    if drop or hold or driver:
         if (gates['antenna_repair_requested'] is not True
                 or gates['antenna_nets'] != 0 or gates['antenna_pins'] != 0
                 or gates['source_route'] != ROUTE_RUN):
@@ -187,6 +217,13 @@ def main():
         validate_antenna_overflow((root / 'antenna/2-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log').read_text())
         if hold and (gates['eco_profile'] != 'drop-nor2' or gates['source_screen'] != DROP_SOURCE_RUN):
             raise ValueError('Unreviewed hold source repair history')
+        if driver:
+            from event_nor2_route import validate_hold_history, qualified, validate_repair_chain
+            validate_hold_history(gates)
+            if not qualified(timing, {'antenna__violating__nets': gates['antenna_nets'],
+                                      'antenna__violating__pins': gates['antenna_pins']}):
+                raise ValueError('Driver source lacks qualified hold margin')
+            validate_repair_chain(root, json.loads(source.read_text()), held=True)
     saved = json.loads(source.read_text())
     for key in ('odb', 'def', 'nl', 'pnl', 'sdc'):
         if not Path(saved[key]).is_file():
@@ -200,10 +237,10 @@ def main():
             raise ValueError(f'Unexpected source {key}')
     if Path(base['PNR_SDC_FILE']).resolve() != Path('src/signoff.sdc').resolve():
         raise ValueError('Source constraints changed')
-    out = Path('runs/drop-hold' if hold else 'runs/drop-event' if drop else 'runs/event-nor2')
+    out = Path('runs/drop-driver' if driver else 'runs/drop-hold' if hold else 'runs/drop-event' if drop else 'runs/event-nor2')
     out.mkdir(exist_ok=False)
     (out / 'source_identity.json').write_text(json.dumps(identity, indent=2) + '\n')
-    os.environ['LIBRELANE_IMAGE_OVERRIDE'] = ('tripwire-drop-hold:local' if hold
+    os.environ['LIBRELANE_IMAGE_OVERRIDE'] = ('tripwire-drop-driver:local' if driver else 'tripwire-drop-hold:local' if hold
                                             else 'tripwire-drop-event:local' if drop else 'tripwire-event-nor2:local')
 
     def run(tag, steps, initial):
@@ -226,11 +263,11 @@ def main():
     routed = run('grt', ['OpenROAD.GlobalRouting'], source)
     state_path = routed / '1-openroad-globalrouting/state_out.json'
     log = state_path.with_name('openroad-globalrouting.log').read_text()
-    marker = 'TRIPWIRE drop-leaf hold:' if hold else 'TRIPWIRE dropped-event sizing:' if drop else 'TRIPWIRE event NOR2:'
+    marker = 'TRIPWIRE drop-driver sizing:' if driver else 'TRIPWIRE drop-leaf hold:' if hold else 'TRIPWIRE dropped-event sizing:' if drop else 'TRIPWIRE event NOR2:'
     if marker not in log or 'TRIPWIRE hotspot screen:' not in log:
         raise ValueError('Missing ECO or routing reservation evidence')
     validate_overflow(log)
-    changed = promote_netlists(state_path, Path(saved['nl']), drop=drop, hold=hold)
+    changed = promote_netlists(state_path, Path(saved['nl']), drop=drop, hold=hold, driver=driver)
     repair_antennas = os.environ.get('REPAIR_ECO_ANTENNAS', '0')
     if repair_antennas not in {'0', '1'}:
         raise ValueError('Unknown antenna repair selection')
@@ -251,7 +288,7 @@ def main():
     data = json.loads((out / 'timing/comparison.json').read_text())
     ready = (timing_pass(data) and antenna['antenna__violating__nets'] == 0
              and antenna['antenna__violating__pins'] == 0)
-    if hold:
+    if hold or driver:
         ready = ready and data['corners'][CORNERS[0]]['after'][f'timing__hold__ws__corner:{CORNERS[0]}'] >= 0.05
     gates = {'state': str(checked), 'source_route': ROUTE_RUN,
              'ready_for_route_review': ready, 'drt_launched': False,
@@ -259,9 +296,9 @@ def main():
              'timing_pass': timing_pass(data),
              'antenna_nets': antenna['antenna__violating__nets'],
              'antenna_pins': antenna['antenna__violating__pins']}
-    if drop or hold:
-        gates.update(eco_profile=profile, source_screen=HOLD_SOURCE_RUN if hold else DROP_SOURCE_RUN)
-    if hold:
+    if drop or hold or driver:
+        gates.update(eco_profile=profile, source_screen=DRIVER_SOURCE_RUN if driver else HOLD_SOURCE_RUN if hold else DROP_SOURCE_RUN)
+    if hold or driver:
         gates.update(minimum_fast_hold_ns=0.05,
                      fast_hold_margin_pass=data['corners'][CORNERS[0]]['after'][f'timing__hold__ws__corner:{CORNERS[0]}'] >= 0.05)
     (out / 'gates.json').write_text(json.dumps(gates, indent=2) + '\n')

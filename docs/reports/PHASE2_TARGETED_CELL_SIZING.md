@@ -29,6 +29,8 @@ These probes reuse original extracted wires. They include changed Liberty loadin
 
 ## Repair-only workflow prepared (2026-10-08)
 
+Published tools3591a5f/workflowf8bfd01/reports631fab1 under explicit user approval. Repair-only [37730917594](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37730917594) is running on631fab1. Physical result remains pending; preparation statements below describe the launch contract.
+
 Local `gds-event-nor2-screen.yaml` accepts only successful main route37574267994 and original source37533969613/event-late. Trusted source fingerprints are reconstructed before downloading the artifact. Independently audited artifact11464617506: pre-route state and all five checkpoint views exist, cell/master/connections match the proposed repair, and exact one-cell netlist comparison passes. The checkpoint netlist SHA256 is `83e58066e2482c3db647c04b2004b94c74b30f206e4bbce1eacbfdca7f92da07`.
 
 The pinned LibreLane3.1.0.dev3 global-routing script reads the checkpoint once. A guarded wrapper injects the master replacement and normal detailed-placement legalization, then runs the existing routing script with the existing Metal2 reservation. GlobalRouting normally exports only ODB/DEF, so the wrapper also writes fresh logical/powered netlists. The runner checks that exactly the intended logical cell master changes, explicitly adopts these fresh views, and clears inherited SPEF/SDF/Liberty views. This avoids timing or forwarding an obsolete pre-ECO netlist.

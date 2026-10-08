@@ -6,6 +6,7 @@ Newest entry at the top. One entry per work session.
 - Raw logs are not committed; link to them instead.
 
 ## 2026-10-08: Codex (approved one-cell repair publication)
+- Published3591a5f tools,f8bfd01 workflow,631fab1 evidence to remote main. Repair-only [37730917594](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37730917594) is in progress on631fab1a6ba913d912590ebdb347ce8fe6548585; noDRT.
 - User explicitly approves separate tools/workflow/report commits, remote main push and repair-only launch. Tools3591a5f and workflowf8bfd01 committed; FIPE and oldSRAMprototypes excluded.
 - Rechecked diff and unpublished src/info/macro history: clean. No mainworkflowactive beforepublication; mainhardware/config/templatejobs unchanged.215helpertests pass.
 - No phase boxes ticked. Next: push approvedgroups, launchgds-event-nor2-screen, inspect actualfreshGRT/STA/antenna gates before anyDRT/extractionfollow-up.

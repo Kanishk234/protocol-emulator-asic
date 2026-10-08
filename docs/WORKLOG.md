@@ -5,6 +5,24 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (moved hold bottleneck audited; nine-leaf screen ready)
+- Finished screen37803300460 passes setup/hold counts and antennas0/0; setupWS0, hold fast+0.033514ns/slow+0.352956ns/typ+0.159913ns. Fast hold is below50ps DRT gate; no threshold relaxed.
+- Byte-range artifact11563320092 audit identifies9 distinct printed endpoints below50ps, headed by lane0.ex_imm[3], not prior state[2]. Old one-leaf prototype remains local/unlaunched. Actual fresh NL confirms9 separate single-driver/single-sink D nets.
+- Prepared bounded9-BUF1 hold screen from exact37803300460. Preflight all branches before mutation; preserve all other logic and clock/reset; require zero-overflow routing, strict antenna repair and fresh all-corner timing with50ps margin. Added library area65.3184µm², not final routed area.
+-289 related tests and actual checkpoint netlist rehearsal pass; shell syntax/diff checks pass. No phase ticks or official promotion. Next: publish/run bounded hold screen, then use qualified evidence for DRT/extraction/GL.
+
+## 2026-10-08: Codex (parallel one-leaf hold prototype tested)
+- Prepared local guarded BUF1 insertion at lane0 state[2] D and independent exact netlist-change validator. Pinned buffer is noninverting, area7.2576µm²; actual extracted-NL rehearsal passes. Clock/reset/other logic remain unchanged by the permitted edit.
+-16 targeted guard tests and279 related helpers pass; diff check passes. No actual physical hold repair or numerical improvement claimed; existing+5.298629284ns destination slow setup headroom supports a future trial.
+- Screen37803300460 measurement step now passes; artifact upload is active at check, final conclusion/metrics pending. Local prototype/report remain unpublished; no phase ticks.
+- Next: inspect finished setup screen metrics, select a setup-qualified checkpoint for a separate one-cell hold trial, then require fresh physical extraction and all-corner evidence.
+
+## 2026-10-08: Codex (parallel hold and portability audit)
+- Running drop-event screen37803300460 passed setup/source validation and is building its image at check. Independent extraction hold audit finds1/1000 printed fast paths below50ps,37 below100ps; weakest is lane0 slot latch50100→state[2] register46479 at+0.035871ns.
+- Reviewed cached pinned official action/support-tools/LibreLane code: ordinary merged-config clean build, no arbitrary post-placement sizing hook found; native resizer controls available, custom diagnostic images/checkpoints not automatically portable.
+- Report PHASE2_PARALLEL_HOLD_AND_PORTABILITY.md records targeted leaf-delay option, distinction between50ps and100ps repair scope, native clean-flow reproduction and separate inverter follow-up. No hardware changes or phase ticks. Local exact extracted STA measures+5.298629284ns slow setup headroom at46479/D, supporting a small leaf-delay experiment without proving its physical result.
+- Next: inspect destination setup headroom and current physical screen result; preserve original baseline until extracted evidence improves.
+
 ## 2026-10-08: Codex (extracted dropped-event bottleneck isolated)
 - Published a12aeb5 tools,4bc3fd3 workflow,5b13ebe evidence to remote main.263 helper tests pass. Dispatched [37803300460](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37803300460), queued at confirmation; one31567 NOR2 change, antenna repair enabled, no DRT.
 - Downloaded extracted artifact11535321738 from37743628998.9 printed negative slow paths terminate at dropped counters;31567 NOR2 delay2.300487ns dominates the worst branch. Prior RX timer is no longer worst.

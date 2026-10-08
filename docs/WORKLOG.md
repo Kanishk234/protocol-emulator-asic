@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (qualified residual DRT continuation)
+- User requests continued work/manual launch. Published tools5ee1fcf, workflow8e5f6cd and earlier screen receipt30f9dd1. Added exact residual source37834700367: successful main provenance, full prior driver/hold/NOR chain plus exact3-cell audit, strict routing/antenna evidence and fresh all-corner STA/50ps hold gate. No repair repeated; existing DRT refused.
+-84 routing tests pass including21 new residual checks. Static artifact-selection audit initially selected the wrong download step and failed; corrected explicit step-name selection passes. No implementation change needed. Shell publication proceeded after that audit failure; recorded and corrected before dispatch.
+- Two unit37834754490/37834675410 still active at check. No hardware/config/template edit or phase tick. Next: dispatch original37533969613/bs-event-late with repaired37834700367, source hold target and no repeated repair; inspect final DRC, extraction and routed GL.
+
 ## 2026-10-08: Codex (residual screen qualifies)
 - Screen37834700367 succeeds: fresh setupWS0 all corners; hold fast+0.113342ns/slow+0.418904ns/typ+0.226324ns; antenna nets/pins0/0, ready_for_route_review true and unchanged50ps hold gate passes. This is GRT evidence, not detailed-route/extracted/official closure.
 - Two latest unit workflows37834754490/37834675410 remain running. Legacy37655518919 GL and37655518925 extraction remain queued. No residual DRT launched yet; next prepare guarded exact-source continuation preserving full three-cell/prior repair history, then extraction and protocol GL if DRT qualifies. No phase ticks.

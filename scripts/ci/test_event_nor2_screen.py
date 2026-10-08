@@ -4,7 +4,7 @@ import subprocess
 
 import pytest
 
-from event_nor2_screen import promote_netlists, validate_netlist, validate_overflow, validate_run, validate_physical_baseline
+from event_nor2_screen import promote_netlists, validate_netlist, validate_overflow, validate_run, validate_physical_baseline, validate_antenna_only_changes, promote_antenna_netlists
 
 
 ORIGINAL = 'sg13cmos5l_nor2_1 _27853_ (.A(_21095_), .B(_02509_), .Y(_02510_));'
@@ -60,6 +60,33 @@ def test_source_antenna_materialization_is_exact_and_eco_preserves_it():
         validate_netlist(physical, CHANGED + '\n' + ANTENNAS.replace('net91', 'wrong'))
 
 
+def test_antenna_repair_allows_only_diodes_on_existing_nets():
+    diode = '\nsg13cmos5l_antennanp new_diode (.A(_02510_));'
+    validate_antenna_only_changes(CHANGED, CHANGED + diode)
+    validate_antenna_only_changes(CHANGED, CHANGED)
+    for bad in (CHANGED + diode.replace('_02510_', 'unknown'),
+                CHANGED + diode.replace('antennanp', 'buf_1'),
+                CHANGED.replace('_02509_', 'wrong') + diode, '',
+                CHANGED + diode.replace('.A(', '.Y(')):
+        with pytest.raises(ValueError):
+            validate_antenna_only_changes(CHANGED, bad)
+
+
+def test_antenna_views_are_fresh_and_original_state_is_preserved(tmp_path):
+    original = tmp_path / 'original.v'
+    original.write_text(CHANGED)
+    state = tmp_path / 'state_out.json'
+    state.write_text(json.dumps(dict(odb=str(tmp_path / 'chip.odb'), nl=str(original), pnl='old')))
+    with pytest.raises(ValueError, match='Fresh'):
+        promote_antenna_netlists(state, original)
+    (tmp_path / 'chip.eco.nl.v').write_text(CHANGED + '\nsg13cmos5l_antennanp diode (.A(_02510_));')
+    (tmp_path / 'chip.eco.pnl.v').write_text(CHANGED)
+    new = json.loads(promote_antenna_netlists(state, original).read_text())
+    assert new['nl'].endswith('chip.eco.nl.v')
+    assert all(new[k] is None for k in ('spef', 'sdf', 'lib'))
+    assert json.loads(state.read_text())['nl'] == str(original)
+
+
 def test_overflow_requires_complete_fresh_zero_report():
     good = 'Final congestion report:\n' + ''.join(
         f'Metal{i} 100 50 50.00% 0 / 0 / 0\n' for i in range(1, 5))
@@ -94,3 +121,9 @@ def test_wrapper_injection_and_delegation(tmp_path):
     result = subprocess.run(['bash', str(wrapper), str(other)], capture_output=True, text=True)
     assert result.returncode == 0
     assert result.stdout == 'UNMODIFIED\n'
+    antenna = tmp_path / 'antenna_repair.tcl'
+    antenna.write_text('read_current_odb\nrepair_antennas diode\nwrite_views\n')
+    result = subprocess.run(['bash', str(wrapper), str(antenna)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert 'tripwire_size_event_nor2' not in result.stdout
+    assert 'SAVE_NL' in result.stdout and 'SAVE_PNL' in result.stdout

@@ -54,6 +54,18 @@ def validate_physical_baseline(inherited, physical):
         raise ValueError('Source ODB/netlist differs beyond audited92 antenna cells')
 
 
+def validate_antenna_only_changes(before, after):
+    original, changed = logical_cells(before), logical_cells(after)
+    if any(changed.get(n) != cell for n, cell in original.items()):
+        raise ValueError('Antenna repair changed existing logical cells or connections')
+    nets = {net for _, ports in original.values() for _, net in ports}
+    for name in changed.keys() - original.keys():
+        master, ports = changed[name]
+        if (master != 'sg13cmos5l_antennanp' or len(ports) != 1
+                or ports[0][0] != 'A' or ports[0][1] not in nets):
+            raise ValueError('Antenna repair added unreviewed logic or wiring')
+
+
 def validate_overflow(log):
     if 'Final congestion report:' not in log:
         raise ValueError('Missing fresh global routing congestion report')
@@ -77,6 +89,21 @@ def promote_netlists(state_path, original_netlist):
     validate_netlist(baseline.read_text(), nl.read_text())
     if not re.search(r'\bsg13cmos5l_nor2_2\s+_27853_\s*\(', pnl.read_text()):
         raise ValueError('Powered netlist missing ECO')
+    state.update(nl=str(nl), pnl=str(pnl), spef=None, sdf=None, lib=None)
+    promoted = state_path.with_name('eco_state.json')
+    promoted.write_text(json.dumps(state, indent=2) + '\n')
+    return promoted
+
+
+def promote_antenna_netlists(state_path, original_netlist):
+    state = json.loads(state_path.read_text())
+    odb = Path(state['odb'])
+    nl, pnl = odb.with_suffix('.eco.nl.v'), odb.with_suffix('.eco.pnl.v')
+    if not nl.is_file() or not pnl.is_file():
+        raise ValueError('Fresh antenna-repaired netlists missing')
+    validate_antenna_only_changes(original_netlist.read_text(), nl.read_text())
+    if not re.search(r'\bsg13cmos5l_nor2_2\s+_27853_\s*\(', pnl.read_text()):
+        raise ValueError('Antenna-repaired powered netlist missing ECO')
     state.update(nl=str(nl), pnl=str(pnl), spef=None, sdf=None, lib=None)
     promoted = state_path.with_name('eco_state.json')
     promoted.write_text(json.dumps(state, indent=2) + '\n')
@@ -137,15 +164,34 @@ def main():
         raise ValueError('Missing ECO or routing reservation evidence')
     validate_overflow(log)
     changed = promote_netlists(state_path, Path(saved['nl']))
-    checked = run('antenna', ['OpenROAD.CheckAntennas'], changed) / '1-openroad-checkantennas/state_out.json'
+    repair_antennas = os.environ.get('REPAIR_ECO_ANTENNAS', '0')
+    if repair_antennas not in {'0', '1'}:
+        raise ValueError('Unknown antenna repair selection')
+    steps = ['OpenROAD.CheckAntennas']
+    if repair_antennas == '1':
+        steps += ['OpenROAD.RepairAntennas', 'OpenROAD.CheckAntennas']
+    antenna_root = run('antenna', steps, changed)
+    checked = antenna_root / ('3-openroad-checkantennas-1/state_out.json' if repair_antennas == '1'
+                              else '1-openroad-checkantennas/state_out.json')
     antenna = json.loads(checked.with_name('or_metrics_out.json').read_text())
+    if repair_antennas == '1':
+        repaired_log = antenna_root / '2-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log'
+        validate_overflow(repaired_log.read_text())
+        changed_nl = Path(json.loads(changed.read_text())['nl'])
+        checked = promote_antenna_netlists(checked, changed_nl)
     screen(base_path, source, out / 'timing', os.environ['PDK_ROOT'],
            repaired=checked, sdc=Path('src/signoff.sdc'))
     data = json.loads((out / 'timing/comparison.json').read_text())
     ready = (timing_pass(data) and antenna['antenna__violating__nets'] == 0
              and antenna['antenna__violating__pins'] == 0)
-    (out / 'gates.json').write_text(json.dumps({'state': str(checked), 'source_route': ROUTE_RUN,
-        'ready_for_route_review': ready, 'drt_launched': False}, indent=2) + '\n')
+    gates = {'state': str(checked), 'source_route': ROUTE_RUN,
+             'ready_for_route_review': ready, 'drt_launched': False,
+             'antenna_repair_requested': repair_antennas == '1',
+             'timing_pass': timing_pass(data),
+             'antenna_nets': antenna['antenna__violating__nets'],
+             'antenna_pins': antenna['antenna__violating__pins']}
+    (out / 'gates.json').write_text(json.dumps(gates, indent=2) + '\n')
+    print(json.dumps(gates, indent=2), flush=True)
     if not ready:
         raise ValueError('ECO timing/antenna gate fails; DRT not launched')
     print('One-cell ECO GRT/antenna/all-corner gates pass; no DRT or official signoff')

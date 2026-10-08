@@ -3,7 +3,8 @@ set -euo pipefail
 args=("$@")
 script_index=$((${#args[@]} - 1))
 script_path="${args[$script_index]}"
-if [[ "$(basename -- "$script_path")" == "grt.tcl" ]]; then
+script_name="$(basename -- "$script_path")"
+if [[ "$script_name" == "grt.tcl" || "$script_name" == "antenna_repair.tcl" ]]; then
     read_count=0
     while IFS= read -r line || [[ -n "$line" ]]; do
         if [[ "$line" == "read_current_odb" ]]; then ((read_count+=1)); fi
@@ -13,15 +14,18 @@ if [[ "$(basename -- "$script_path")" == "grt.tcl" ]]; then
         exit 1
     fi
     patch_dir="$(mktemp -d "${RUNNER_TEMP:-/tmp}/tripwire-event-nor2.XXXXXX")"
-    patched_tcl="$patch_dir/grt.tcl"
+    patched_tcl="$patch_dir/$script_name"
     while IFS= read -r line || [[ -n "$line" ]]; do
         printf '%s\n' "$line"
         if [[ "$line" == "read_current_odb" ]]; then
+            if [[ "$script_name" == "grt.tcl" ]]; then
             printf '%s\n' \
                 'write_verilog [file rootname $::env(SAVE_ODB)].baseline.nl.v' \
                 'source /usr/local/share/tripwire/event_nor2_size.tcl' \
                 'tripwire_size_event_nor2' \
-                'source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl' \
+                'source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl'
+            fi
+            printf '%s\n' \
                 'set ::env(SAVE_NL) [file rootname $::env(SAVE_ODB)].eco.nl.v' \
                 'set ::env(SAVE_PNL) [file rootname $::env(SAVE_ODB)].eco.pnl.v'
         fi

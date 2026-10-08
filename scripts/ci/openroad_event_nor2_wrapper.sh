@@ -18,6 +18,7 @@ if [[ "$(basename -- "$script_path")" == "grt.tcl" ]]; then
         printf '%s\n' "$line"
         if [[ "$line" == "read_current_odb" ]]; then
             printf '%s\n' \
+                'write_verilog [file rootname $::env(SAVE_ODB)].baseline.nl.v' \
                 'source /usr/local/share/tripwire/event_nor2_size.tcl' \
                 'tripwire_size_event_nor2' \
                 'source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl' \

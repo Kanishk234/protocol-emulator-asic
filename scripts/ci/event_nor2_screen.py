@@ -46,6 +46,14 @@ def validate_netlist(before, after):
         raise ValueError('ECO changed additional logical cells or connections')
 
 
+def validate_physical_baseline(inherited, physical):
+    old, exported = logical_cells(inherited), logical_cells(physical)
+    added = exported.keys() - old.keys()
+    if (len(added) != 92 or any(exported[n][0] != 'sg13cmos5l_antennanp' for n in added)
+            or any(exported.get(n) != cell for n, cell in old.items())):
+        raise ValueError('Source ODB/netlist differs beyond audited92 antenna cells')
+
+
 def validate_overflow(log):
     if 'Final congestion report:' not in log:
         raise ValueError('Missing fresh global routing congestion report')
@@ -62,9 +70,11 @@ def promote_netlists(state_path, original_netlist):
     odb = Path(state['odb'])
     nl = odb.with_suffix('.eco.nl.v')
     pnl = odb.with_suffix('.eco.pnl.v')
-    if not nl.is_file() or not pnl.is_file():
+    baseline = odb.with_suffix('.baseline.nl.v')
+    if not nl.is_file() or not pnl.is_file() or not baseline.is_file():
         raise ValueError('Fresh ECO netlists missing; stale STA refused')
-    validate_netlist(original_netlist.read_text(), nl.read_text())
+    validate_physical_baseline(original_netlist.read_text(), baseline.read_text())
+    validate_netlist(baseline.read_text(), nl.read_text())
     if not re.search(r'\bsg13cmos5l_nor2_2\s+_27853_\s*\(', pnl.read_text()):
         raise ValueError('Powered netlist missing ECO')
     state.update(nl=str(nl), pnl=str(pnl), spef=None, sdf=None, lib=None)

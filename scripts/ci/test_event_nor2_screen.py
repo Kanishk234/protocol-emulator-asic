@@ -4,11 +4,12 @@ import subprocess
 
 import pytest
 
-from event_nor2_screen import promote_netlists, validate_netlist, validate_overflow, validate_run
+from event_nor2_screen import promote_netlists, validate_netlist, validate_overflow, validate_run, validate_physical_baseline
 
 
 ORIGINAL = 'sg13cmos5l_nor2_1 _27853_ (.A(_21095_), .B(_02509_), .Y(_02510_));'
 CHANGED = ORIGINAL.replace('nor2_1', 'nor2_2')
+ANTENNAS = '\n'.join(f'sg13cmos5l_antennanp antenna{i} (.A(net{i}));' for i in range(92))
 
 
 def test_exact_change_only():
@@ -38,13 +39,25 @@ def test_fresh_netlists_replace_stale_views(tmp_path):
                                     pnl='old', spef='old', sdf='old', lib='old')))
     with pytest.raises(ValueError, match='Fresh'):
         promote_netlists(state, original)
-    (tmp_path / 'chip.eco.nl.v').write_text(CHANGED)
-    (tmp_path / 'chip.eco.pnl.v').write_text(CHANGED)
+    (tmp_path / 'chip.baseline.nl.v').write_text(ORIGINAL + '\n' + ANTENNAS)
+    (tmp_path / 'chip.eco.nl.v').write_text(CHANGED + '\n' + ANTENNAS)
+    (tmp_path / 'chip.eco.pnl.v').write_text(CHANGED + '\n' + ANTENNAS)
     new = json.loads(promote_netlists(state, original).read_text())
     assert new['nl'].endswith('chip.eco.nl.v')
     assert new['pnl'].endswith('chip.eco.pnl.v')
     assert all(new[k] is None for k in ('spef', 'sdf', 'lib'))
     assert json.loads(state.read_text())['nl'] == str(original)
+
+
+def test_source_antenna_materialization_is_exact_and_eco_preserves_it():
+    physical = ORIGINAL + '\n' + ANTENNAS
+    validate_physical_baseline(ORIGINAL, physical)
+    for bad in (ORIGINAL, physical.replace('antennanp', 'buf_1', 1),
+                physical.replace('_21095_', 'wrong'), physical.replace('antenna91', 'antenna90')):
+        with pytest.raises(ValueError):
+            validate_physical_baseline(ORIGINAL, bad)
+    with pytest.raises(ValueError):
+        validate_netlist(physical, CHANGED + '\n' + ANTENNAS.replace('net91', 'wrong'))
 
 
 def test_overflow_requires_complete_fresh_zero_report():
@@ -69,6 +82,7 @@ def test_wrapper_injection_and_delegation(tmp_path):
     assert result.returncode == 0, result.stderr
     text = result.stdout
     assert text.index('read_current_odb') < text.index('tripwire_size_event_nor2')
+    assert text.index('.baseline.nl.v') < text.index('tripwire_size_event_nor2')
     assert text.index('tripwire_size_event_nor2') < text.index('common/dpl.tcl') < text.index('write_views')
     assert 'SAVE_NL' in text and 'SAVE_PNL' in text
     grt.write_text('read_current_odb\nread_current_odb\n')

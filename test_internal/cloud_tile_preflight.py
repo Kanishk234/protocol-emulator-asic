@@ -16,10 +16,50 @@ TOP = "LUT4x8_ha_C2"
 PASSING_SHA = "03c21b8e400e1774390e67b0939422959d37e26849adca18fa082f492cf5cdaf"
 ORIGINAL_SHA = "2c9faa6dc332004212c2719a8ca740b902d8c720f5f7da664007d3df7eedf6d9"
 IO_SHA = "4517d4d40cfbadd7dfadc3d7415cd9ade794f3bbaefb21a5ce7bec9db4eefb32"
+PIN_OBSERVER = r"""
+read_db $::env(WARP_TILE_PIN_INPUT)
+set block [ord::get_db_block]
+set die [$block getDieArea]
+puts "WARP_DIE\t[$die xMin]\t[$die yMin]\t[$die xMax]\t[$die yMax]"
+foreach term [$block getBTerms] {
+    if {[$term getSigType] in {POWER GROUND}} {continue}
+    set boxes {}
+    foreach pin [$term getBPins] {
+        foreach box [$pin getBoxes] {
+            lappend boxes "[[$box getTechLayer] getName],[$box xMin],[$box yMin],[$box xMax],[$box yMax]"
+        }
+    }
+    if {![llength $boxes]} {error "Signal port has no geometry: [$term getName]"}
+    puts "WARP_PIN\t[$term getName]\t[$term getIoType]\t[join [lsort $boxes] ;]"
+}
+"""
 
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def parse_pin_inventory(text):
+    dies, inventory = [], {}
+    for line in text.splitlines():
+        columns = line.split("\t")
+        if columns[0] == "WARP_DIE":
+            if len(columns) != 5:
+                raise ValueError("Malformed native die census")
+            dies.append(list(map(int, columns[1:])))
+        elif columns[0] == "WARP_PIN":
+            if len(columns) != 4 or columns[1] in inventory:
+                raise ValueError("Malformed/duplicate native signal-pin census")
+            boxes = []
+            for encoded in columns[3].split(";"):
+                layer, *rectangle = encoded.split(",")
+                if len(rectangle) != 4 or not layer:
+                    raise ValueError("Malformed signal-pin rectangle")
+                boxes.append([layer, *map(int, rectangle)])
+            inventory[columns[1]] = {"direction": columns[2], "boxes": sorted(boxes)}
+    if len(dies) != 1 or not inventory:
+        raise ValueError("Missing unique die/signal-pin inventory")
+    return {"die": dies[0], "pins": inventory}
 
 
 def unpack(archive):
@@ -52,7 +92,6 @@ def unpack(archive):
 
 def inner():
     # These imports execute only in the pinned EDA container on GitHub.
-    import odb
     from librelane.common import Path as LLPath
     from librelane.flows import SequentialFlow
     from librelane.state import State, DesignFormat
@@ -68,21 +107,17 @@ def inner():
         Steps = [OpenROAD.Floorplan, Odb.SetPowerConnections, WarpTileIO]
 
     def pins(path):
-        db = odb.dbDatabase.create()
-        odb.read_db(db, str(path))
-        block = db.getChip().getBlock()
-        inventory = {}
-        for term in block.getBTerms():
-            if term.getSigType() in ("POWER", "GROUND"):
-                continue
-            boxes = sorted((box.getTechLayer().getName(), box.xMin(), box.yMin(),
-                            box.xMax(), box.yMax())
-                           for pin in term.getBPins() for box in pin.getBoxes())
-            if not boxes:
-                raise ValueError("Signal port has no pin geometry: " + term.getName())
-            inventory[term.getName()] = {"direction": term.getIoType(), "boxes": boxes}
-        die = block.getDieArea()
-        return {"die": [die.xMin(), die.yMin(), die.xMax(), die.yMax()], "pins": inventory}
+        # OpenDB bindings live in OpenROAD's embedded interpreter, rather than
+        # the container's ordinary Python. A native read-only Tcl observer
+        # keeps that API boundary explicit and retains every signal rectangle.
+        observer = OUT / "observe_pins.tcl"
+        observer.write_text(PIN_OBSERVER)
+        log = OUT / (path.parent.name + "_pins.log")
+        with log.open("w") as stream:
+            subprocess.run(["openroad", "-exit", str(observer)],
+                           env=dict(os.environ, WARP_TILE_PIN_INPUT=str(path)),
+                           stdout=stream, stderr=subprocess.STDOUT, check=True, timeout=60)
+        return parse_pin_inventory(log.read_text())
 
     result = {"scope": "C2 floorplan and signal-pin geometry only; no routing/PDN/timing/native acceptance",
               "passed": False, "synthesis_executed": False, "stages": {}}

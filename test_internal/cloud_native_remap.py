@@ -137,7 +137,12 @@ def main():
             "blackbox sg13cmos5l_dlhq_1 sg13cmos5l_dfrbpq_1",
             f"read_verilog {source}", f"hierarchy -check -top {C2}",
             f"setattr -set keep 1 {C2}/t:sg13cmos5l_dlhq_1 {C2}/t:sg13cmos5l_dfrbpq_1",
-            "flatten -wb", "techmap", "opt", f"abc -liberty {liberty}", "clean",
+            "flatten -wb", "techmap", "opt", f"abc -liberty {liberty}",
+            # Flatten discarded the combinational cell declarations. ABC adds
+            # mapped instances but does not reload their port directions. Restore
+            # declarations before clean/check; retain the original state boxes.
+            # -lib skips function parsing (including PDK internal clockgate pins).
+            f"read_liberty -lib -nooverwrite {liberty}", "clean",
             "check -assert", f"write_verilog -noattr -noexpr {candidate}", f"write_json {candidate_json}",
         ]))
         new = json.loads(candidate_json.read_text())["modules"][C2]

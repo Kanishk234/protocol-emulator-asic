@@ -172,6 +172,29 @@ def run(archive, expected):
     replace = lambda text: text.replace("@BUNDLE@", str(bundle)).replace("@PDK@", os.environ["PDK_ROOT"])
     source_state = transform(json.loads((bundle / "state.json").read_text()), replace)
     source_config = transform(json.loads((bundle / "config.json").read_text()), replace)
+    # LibreLane 3.0 resolved this unused selector to null. In pinned 3.1.0.dev3
+    # PAD_LIBS defaults to {}, and OpenROAD.prepare_env iterates it without a
+    # null guard. All original stdcell AND IO timing files are already in LIB;
+    # preserve them exactly instead of letting a new PDK resolution replace it.
+    protected = {key: value for key, value in source_config.items()
+        if "LIB" in key or "CLOCK" in key or "SDC" in key or key == "MACROS"}
+    compatibility = []
+    if source_config.get("PAD_LIBS") is None:
+        source_config["PAD_LIBS"] = {}
+        compatibility.append({"key": "PAD_LIBS", "before": None, "after": {},
+            "reason": "Match pinned3.1 default empty corner-selector; original LIB unchanged"})
+    protected_after = {key: value for key, value in source_config.items()
+        if "LIB" in key or "CLOCK" in key or "SDC" in key or key == "MACROS"}
+    if any(protected_after[key] != value for key, value in protected.items()
+            if key != "PAD_LIBS"):
+        raise RuntimeError("Compatibility normalization changed real timing inputs")
+    timing_inputs = []
+    for corner, paths in source_config["LIB"].items():
+        for path in paths:
+            timing_inputs.append({"corner": corner, "path": path, "sha256": sha(Path(path))})
+    (OUT / "compatibility.json").write_text(json.dumps({"normalizations": compatibility,
+        "original_liberty_files": timing_inputs, "protected_input_keys": sorted(protected),
+        "other_library_macro_clock_sdc_values_unchanged": True}, indent=2) + "\n")
     if source_config["CLOCK_PERIOD"] != 20 or source_config["CLOCK_PORT"] != "clk":
         raise RuntimeError("Clock contract differs")
     if source_config["CTS_SINK_CLUSTERING_SIZE"] is not None:
@@ -198,6 +221,9 @@ def run(archive, expected):
     source_macro = observe("source", source_state["odb"])
     for label, size in (("baseline", None), ("cluster8", 8)):
         config = dict(source_config, CTS_SINK_CLUSTERING_SIZE=size)
+        if {key for key in source_config if source_config[key] != config[key]} != (
+                {"CTS_SINK_CLUSTERING_SIZE"} if size is not None else set()):
+            raise RuntimeError("Unexpected experiment config difference")
         config_path = OUT / f"{label}.json"
         config_path.write_text(json.dumps(config, indent=2) + "\n")
         run_dir = OUT / label
@@ -213,6 +239,20 @@ def run(archive, expected):
             except subprocess.TimeoutExpired:
                 code = "timeout"
         final_states = sorted(run_dir.glob("*-openroad-stamidpnr/state_out.json"))
+        if code == 0:
+            resolved_configs = list(run_dir.glob("*-openroad-cts/config.json"))
+            if len(resolved_configs) != 1:
+                raise RuntimeError("Missing unique resolved CTS configuration")
+            resolved = json.loads(resolved_configs[0].read_text())
+            # LIB is the documented deprecated name of 3.1 CELL_LIBS. Check
+            # the actual step configuration, not only our input JSON.
+            if resolved.get("CELL_LIBS") != source_config["LIB"]:
+                raise RuntimeError("Resolved CTS changed original Liberty corner maps")
+            for key in ("MACROS", "CLOCK_PORT", "CLOCK_PERIOD",
+                    "CLOCK_UNCERTAINTY_CONSTRAINT", "CLOCK_TRANSITION_CONSTRAINT",
+                    "FALLBACK_SDC", "PNR_SDC_FILE", "MAX_FANOUT_CONSTRAINT"):
+                if resolved.get(key) != source_config.get(key):
+                    raise RuntimeError(f"Resolved CTS changed protected input {key}")
         reports = list(run_dir.rglob("checks.rpt"))
         result = {"returncode": code, "cluster_size": size,
             "reports": [{"path": str(path.relative_to(OUT)), "fanout": parse_fanout(path)}

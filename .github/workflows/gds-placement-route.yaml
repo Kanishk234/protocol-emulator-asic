@@ -13,7 +13,12 @@ on:
         required: true
         default: placement
         type: choice
-        options: [placement, lane, sram, cts, bs-resync, bs-event-late, bs-event-drop-qual, bs-event-rx-timer, bs-event-rx-shared, bs-load-flat]
+        options: [placement, lane, sram, cts, bs-resync, bs-event-late, bs-event-drop-qual, bs-event-rx-timer, bs-event-rx-shared, bs-event-pin-banked, bs-load-flat]
+      repaired_source_run_id:
+        description: Audited banked SRAM repair-only run (37690561695), otherwise empty
+        required: false
+        default: ""
+        type: string
       repair_postantenna_hold:
         description: One bounded repair if antenna changes create hold-only violations
         required: false
@@ -46,6 +51,7 @@ jobs:
       VARIANT: timing-placement
       SOURCE_VARIANT: ${{ inputs.source_variant }}
       SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      REPAIRED_SOURCE_RUN_ID: ${{ inputs.repaired_source_run_id || '' }}
       REPAIR_POSTANTENNA_HOLD: ${{ inputs.repair_postantenna_hold && '1' || '0' }}
       PRE_ROUTE_HOLD_TARGET: ${{ inputs.pre_route_hold_target || 'source' }}
 
@@ -113,6 +119,7 @@ jobs:
             --identity /tmp/placement-source-identity.json
 
       - name: Download the audited all-corner placement screen
+        if: inputs.repaired_source_run_id == ''
         uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.source_variant == 'placement' && 'gds-placement-multicorner-timing-placement' || inputs.source_variant == 'cts' && 'gds-cts-cluster-cts-cluster8' || startsWith(inputs.source_variant, 'bs-') && format('gds-drop-counter-{0}', inputs.source_variant) || format('gds-{0}-slew-{0}', inputs.source_variant) }}-${{ inputs.source_run_id }}
@@ -120,6 +127,16 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           run-id: ${{ inputs.source_run_id }}
+
+      - name: Download the audited repaired banked checkpoint
+        if: inputs.repaired_source_run_id != ''
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-banked-sram-hold-${{ inputs.repaired_source_run_id }}
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.repaired_source_run_id }}
 
       - name: Validate exact source artifact provenance and fingerprints
         env:
@@ -133,6 +150,9 @@ jobs:
             --variant "$SOURCE_VARIANT" --run-id "$SOURCE_RUN_ID" \
             --identity /tmp/placement-source-identity.json \
             --run-json /tmp/placement-source-run.json
+          if [[ -n "$REPAIRED_SOURCE_RUN_ID" ]]; then
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/$REPAIRED_SOURCE_RUN_ID" > /tmp/placement-repaired-run.json
+          fi
 
       - name: Build pinned region-reservation image
         run: docker build --tag tripwire-hotspot:local --file workflow-src/scripts/ci/Dockerfile.openroad-hotspot workflow-src/scripts/ci

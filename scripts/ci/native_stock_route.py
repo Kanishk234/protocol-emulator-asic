@@ -101,6 +101,26 @@ def main():
     if len(metrics) != 1:
         raise ValueError('Fresh antenna evidence missing')
     antenna = json.loads(metrics[0].read_text())
+    if antenna.get('antenna__violating__nets', 0) or antenna.get('antenna__violating__pins', 0):
+        # Stock timing repair runs after stock antenna repair and can introduce
+        # new violations. Preserve repaired guides (BUG79): do not run another
+        # full GRT after cleanup. Require congestion-disallowed stock repair.
+        print('Post-timing antenna violations:', antenna, flush=True)
+        cleanup = out / 'antenna-cleanup'
+        cleanup_config = dict(config, GRT_ALLOW_CONGESTION=False)
+        run_step(cleanup_config, source, cleanup, ['OpenROAD.RepairAntennas', 'OpenROAD.CheckAntennas'])
+        resolved = json.loads((cleanup / 'resolved.json').read_text())
+        repair_logs = list(cleanup.glob('*-openroad-repairantennas/*-openroad-diodeinsertion/openroad-diodeinsertion.log'))
+        states = list(cleanup.glob('*-openroad-checkantennas/state_out.json'))
+        fresh_metrics = list(cleanup.glob('*-openroad-checkantennas/or_metrics_out.json'))
+        if len(repair_logs) != 1 or len(states) != 1 or len(fresh_metrics) != 1:
+            raise ValueError('Fresh post-cleanup routing/antenna checkpoint missing')
+        log = repair_logs[0].read_text()
+        if (resolved.get('GRT_ALLOW_CONGESTION') is not False
+                or 'repair_antennas' not in log or '-allow_congestion' in log):
+            raise ValueError('Antenna repair congestion policy not enforced')
+        source = states[0]
+        antenna = json.loads(fresh_metrics[0].read_text())
     screen(config_path, source, out / 'timing', os.environ['PDK_ROOT'],
            repaired=source, sdc=Path('src/signoff.sdc'))
     timing = json.loads((out / 'timing/comparison.json').read_text())
@@ -109,7 +129,7 @@ def main():
         'strategy': 'AREA 1', 'state': str(source), 'qualified': ready,
         'minimum_fast_hold_ns': 0.05, 'official_signoff': False}, indent=2) + '\n')
     if not ready:
-        raise ValueError('Fresh timing/50ps hold/antenna gate fails; routing refused')
+        raise ValueError(f'Fresh timing/50ps hold/antenna gate fails; routing refused: {antenna}')
     run_step(config, source, out / 'drt', ['OpenROAD.DetailedRouting'])
     # Extraction reads config_merged.json; preserve the exact native recipe.
     Path('src/config_merged.json').write_text(json.dumps(config, indent=2) + '\n')

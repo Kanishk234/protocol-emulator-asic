@@ -51,7 +51,9 @@ def test_antenna_and_positive_margin_required():
 
 
 @pytest.mark.parametrize('setup_ok',[True,False])
-def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_ok):
+@pytest.mark.parametrize('cleanup_needed',[True,False])
+@pytest.mark.parametrize('bad_cleanup',[None,'policy','log','antenna'])
+def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_ok,cleanup_needed,bad_cleanup):
     import json, sys, types
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('PDK_ROOT','/pdk')
@@ -77,17 +79,27 @@ def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_
     monkeypatch.setattr(runner,'checkpoint',lambda root:source_path)
     monkeypatch.setattr(runner,'validate_overflow',lambda log:None)
     calls=[]
+    current=[source_path]
     def step(cfg,saved,out,steps):
         import os
         assert 'LIBRELANE_IMAGE_OVERRIDE' not in os.environ
-        assert saved==source_path
+        assert saved==current[0]
         assert 'OpenROAD.ResizerTimingPostGRT' not in steps
         calls.append(steps[0]);out.mkdir(parents=True)
+        if steps[0]=='OpenROAD.RepairAntennas':
+            assert steps==['OpenROAD.RepairAntennas','OpenROAD.CheckAntennas']
+            assert cfg['GRT_ALLOW_CONGESTION'] is False
+            (out/'resolved.json').write_text(json.dumps({'GRT_ALLOW_CONGESTION':bad_cleanup=='policy'}))
+            stage=out/'2-openroad-checkantennas';stage.mkdir()
+            current[0]=stage/'state_out.json';current[0].write_text('{}')
+            (stage/'or_metrics_out.json').write_text(json.dumps({'antenna__violating__nets':1 if bad_cleanup=='antenna' else 0,'antenna__violating__pins':0}))
+            repair=out/'1-openroad-repairantennas/1-openroad-diodeinsertion';repair.mkdir(parents=True)
+            (repair/'openroad-diodeinsertion.log').write_text('+ repair_antennas antennanp -iterations 3'+(' -allow_congestion' if bad_cleanup=='log' else ''))
         if steps==['OpenROAD.CheckAntennas']:
             stage=out/'1-openroad-checkantennas';stage.mkdir()
-            (stage/'or_metrics_out.json').write_text(json.dumps({'antenna__violating__nets':0,'antenna__violating__pins':0}))
+            (stage/'or_metrics_out.json').write_text(json.dumps({'antenna__violating__nets':15 if cleanup_needed else 0,'antenna__violating__pins':17 if cleanup_needed else 0}))
     def sta(path,saved,out,pdk,**kwargs):
-        assert kwargs['repaired']==saved==source_path
+        assert kwargs['repaired']==saved==current[0]
         out.mkdir();t=timing()
         if not setup_ok:
             c=runner.CORNERS[1];t['corners'][c]['after'][f'timing__setup__ws__corner:{c}']=-.01
@@ -97,9 +109,13 @@ def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_
     fake=types.ModuleType('extracted_timing')
     fake.main=lambda root:calls.append('extract')
     monkeypatch.setitem(sys.modules,'extracted_timing',fake)
-    if setup_ok:
+    prefix=['OpenROAD.CheckAntennas']+(['OpenROAD.RepairAntennas'] if cleanup_needed else [])+['STA']
+    if cleanup_needed and bad_cleanup in ('policy','log'):
+        with pytest.raises(ValueError,match='congestion policy'):runner.main()
+        assert calls==['OpenROAD.CheckAntennas','OpenROAD.RepairAntennas']
+    elif setup_ok and not (cleanup_needed and bad_cleanup=='antenna'):
         runner.main()
-        assert calls==['OpenROAD.CheckAntennas','STA','OpenROAD.DetailedRouting','extract']
+        assert calls==prefix+['OpenROAD.DetailedRouting','extract']
     else:
         with pytest.raises(ValueError,match='routing refused'):runner.main()
-        assert calls==['OpenROAD.CheckAntennas','STA']
+        assert calls==prefix

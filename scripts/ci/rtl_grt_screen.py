@@ -20,6 +20,14 @@ def repair_margin(variant):
     return 2.0 if variant == "setup-margin" else 0.0
 
 
+def native_mapping_strategy(variant, selected):
+    if selected is None:
+        return None
+    if variant != 'bs-event-late' or selected not in {'AREA 0', 'AREA 1'}:
+        raise ValueError('Unreviewed native mapping source or strategy')
+    return selected
+
+
 def checkpoint(root):
     if list(root.glob("*-openroad-detailedrouting")):
         raise ValueError("Unexpected detailed routing in the RTL screen")
@@ -35,6 +43,7 @@ def checkpoint(root):
 
 def main():
     config = json.loads(Path("src/config_merged.json").read_text())
+    native = native_mapping_strategy(os.environ['VARIANT'], os.environ.get('NATIVE_MAPPING_STRATEGY'))
     if float(config["CLOCK_PERIOD"]) != 20 or float(config["PL_TARGET_DENSITY_PCT"]) != 56:
         raise ValueError("Unexpected candidate clock/density")
     config.update(GRT_ADJUSTMENT=0.16, OPENROAD_THREADS=4, PL_OPTIMIZE_MIRRORING=False,
@@ -44,12 +53,22 @@ def main():
                   PNR_CORNERS=[CORNERS[1], CORNERS[0], CORNERS[2]], RSZ_CORNERS=[CORNERS[1]])
     if os.environ["VARIANT"] == "cts-cluster8":
         config["CTS_SINK_CLUSTERING_SIZE"] = 8
+    if native:
+        config['SYNTH_STRATEGY'] = native
     path = Path("src/config_rx_screen.json")
     path.write_text(json.dumps(config, indent=2) + "\n")
     root = Path("runs/rtl-grt-screen")
     flow = root / "flow"
     flow.mkdir(parents=True, exist_ok=False)
-    os.environ["LIBRELANE_IMAGE_OVERRIDE"] = "tripwire-hotspot:local"
+    if native:
+        os.environ.pop('LIBRELANE_IMAGE_OVERRIDE', None)
+        (root / 'native_mapping.json').write_text(json.dumps({
+            'source_variant': os.environ['VARIANT'], 'synthesis_strategy': native,
+            'custom_image': False, 'regional_reservation': False,
+            'drt_launched': False, 'official_signoff': False,
+        }, indent=2) + '\n')
+    else:
+        os.environ["LIBRELANE_IMAGE_OVERRIDE"] = "tripwire-hotspot:local"
     subprocess.run([sys.executable, "-m", "librelane", "--pdk-root", os.environ["PDK_ROOT"],
                     "--docker-no-tty", "--dockerized", "--pdk", "ihp-sg13cmos5l", "--manual-pdk",
                     "--run-tag", "rtl-screen", "--force-run-dir", str(flow), "--hide-progress-bar",

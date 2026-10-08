@@ -1068,6 +1068,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Isolated cost: IO mapped area1453.3344→1431.5238um² (-1.5%); slow ideal-wire pad→sel1.511804→1.442738ns. C_ACTIVE→sel worsens0.674786→0.796614ns. Full-chip setup/hold/routing benefit unmeasured; do not infer closure from local probes.
 - Module equivalence19points passes. Combine with proven frozen2/4 event/sharedRX for simulation; retain all physical/corner gates and require exact matched baseline before adoption. Main hardware remains unchanged.
 
+## D-080 (2026-10-08): matched native mapping screen for clean-build portability
+- General need: checkpoint-specific cell sizing is not automatically reproduced by the official clean flow. Measure synthesis strategy using stock pinned LibreLane, without custom regional routing reservations or any RTL/state/protocol change.
+- Isolated event-late BITSYNC mapping: AREA0 area40393.6092µm²/slow PERIOD→rx_load13.142539ns; AREA1 area40144.3938µm²/delay12.479320ns (0.62% less module area and0.663219ns shorter targeted ideal-wire delay). DELAY1/2 are faster but cost more area; native sizing alone at20ns is unchanged. These are local module results, not physical full-chip evidence.
+- Prepare matched full2/4 source/20ns/56%-density AREA0 versus AREA1 GRT screens, changing only generated SYNTH_STRATEGY between matrix jobs. Both use fully timed constraints and identical native all-corner repair. Stock image; no checkpoint cell ECO or custom reservation. Stop before DRT; retain measured area/overflow/all-corner data and do not infer official closure from a green diagnostic.
+- Cost: mapping may alter fanout, routeability, hold and full-design area despite the local module result. Adoption outside the main-config whitelist requires a separate reviewed exception and actual clean official GDS/precheck/GL evidence. No main src/config.json or template job edit here.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

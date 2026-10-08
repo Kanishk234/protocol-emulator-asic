@@ -5,6 +5,12 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (driver screen launched; clean-build mapping explored)
+- Published99c69d7 driver guards,9ef5d1c effective-constraint evidence,663b341 workflow andccddb80 research to remote main. Launched37818177484 with antenna repair; provenance passes and pinned image builds at check. RoutedGL37815131566 remains active.
+- Prepared local exact-driver-screen DRT continuation;83 continuation tests pass. It rejects unsuccessful/incomplete source and audits every prior repair plus fresh STA; no DRT launched from pending screen.
+- Pinned-wheel ABC script mapping on event-late BITSYNC: DELAY0 area43678.6182µm²/slow PERIOD→rx_load12.122954ns, DELAY1 area44772.5502µm²/delay10.994252ns. About2.5% module area for1.129ns ideal-wire improvement. Native sizing adds no change at20ns. Source/state/clock unchanged; full-chip/container/physical effect unproven.
+- No phase ticks or main hardware/config changes. Next: finish mapping controls and driver measurement, then DRT/extraction/GL only if qualified; select separate clean-build mapping trial from measured evidence.
+
 ## 2026-10-08: Codex (closure research and audited upstream-driver trial)
 - Reviewed current extracted8-path cone, architecture/D-066, rejected RTL experiments, official portability and primary OpenROAD/LibreLane/Yosys/TinyTapeout sources. Report PHASE2_CLOSURE_RESEARCH.md records ranked actions and limits.
 -24 current-checkpoint fixed-wire STA measurements reproduce six CI baseline values within1e-6ns.38386 A21OI1→2 removes printed slow setup failures; formerly failing endpoints+0.085912..+0.498670ns, unchanged fast hold+0.109290ns. Single-driver added library area5.4432µm². Inverter-only alternatives remain negative; larger inverter8 is worse than4. No physical improvement claimed.

@@ -5,7 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (NOR2 timing passes GRT; antenna cleanup prepared)
+- Correctedscreen37732392933 physicallyresizes/legalizes/reroutes andpassesstrictnetlistguard/zerooverflow. Independentartifact11530157875: setupWS0/allcornercounts0; holdfast/slow/typ +0.0932422/+0.393552/+0.211997ns. Finalgatefails42antennanets/45pins; noDRT/extractedclosureclaim.
+- Prepared explicitrepair_antennas option(defaultfalse), oneboundedstandardrepair plusfreshchecks, no timingresizer/DRT. FreshrepairedNL/PNL promoted; onlyaddedantennanpdiodes onexistingnets allowed,originallogicunchanged.237helperspass; report PHASE2_NOR2_ANTENNA_FOLLOWUP.md.
+- Paralleloriginaleventofficialprep in `/tmp/tripwire-event-nor2-official-prep-20261008`: generator/static19sources pass,125psnativeproposalunapplied. LocalNOR2routeworkflowintegrationtested butexcludedfromscreenpublication pendingqualification.
+- Publishingnecessaryantennafollow-up withinapprovedrepair-onlyscope. No mainhardware/config/templatechange orphase tick. Next: cleanantenna/timingcheckpoint,thenDRT/extraction/GL andcleanofficialreproduction.
+
 ## 2026-10-08: Codex (NOR2 source antenna-view guard corrected)
+- Published3aab4c3 tools and99fb65f docs toremote main; correctedscreen [37732392933](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37732392933) is inprogress on99fb65f778cd159fed38f7240c583dde4118eb93. NoDRT.
 - Screen37730917594 fails guard after successfulNOR2swap/legalization/zerooverflowGRT, beforeSTA. Artifact11529811539 independently shows92existingantennanp cells materialized innewNL,0removedcells andexactly1intendedmasterchange. No timingverdict inferred; BUG77logged.
 - Fix exports actualsourceODB baselineNL beforemutation; validates inheriteddifference exactly92antennacells/unchangedlogic, thenstrictone-master-onlyECO comparison.234helpers pass; realartifactregression and Bash/diffchecks pass. Localcontinuation updated butexcludedfrompublication.
 - Proceeding with necessarycorrective tools/docs publication andscreenrelaunch withinapprovedrepair-only scope. NoDRT/mainhardware/configchange orphase tick. Next: actualcorrectedGRT/antenna/allcornerSTA results.

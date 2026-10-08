@@ -176,6 +176,8 @@ def main():
     antenna = json.loads(checked.with_name('or_metrics_out.json').read_text())
     if repair_antennas == '1':
         repaired_log = antenna_root / '2-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log'
+        if 'TRIPWIRE antenna overflow audit: fresh full global routing' not in repaired_log.read_text():
+            raise ValueError('Missing post-repair routing audit')
         validate_overflow(repaired_log.read_text())
         changed_nl = Path(json.loads(changed.read_text())['nl'])
         checked = promote_antenna_netlists(checked, changed_nl)

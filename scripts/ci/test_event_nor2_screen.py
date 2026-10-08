@@ -122,8 +122,15 @@ def test_wrapper_injection_and_delegation(tmp_path):
     assert result.returncode == 0
     assert result.stdout == 'UNMODIFIED\n'
     antenna = tmp_path / 'antenna_repair.tcl'
-    antenna.write_text('read_current_odb\nrepair_antennas diode\nwrite_views\n')
+    antenna.write_text('read_current_odb\nrepair_antennas diode\nestimate_parasitics -global_routing\nwrite_views\n')
     result = subprocess.run(['bash', str(wrapper), str(antenna)], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert 'tripwire_size_event_nor2' not in result.stdout
     assert 'SAVE_NL' in result.stdout and 'SAVE_PNL' in result.stdout
+    assert result.stdout.index('repair_antennas diode') < result.stdout.index('global_route -congestion_iterations')
+    assert result.stdout.index('global_route -congestion_iterations') < result.stdout.index('estimate_parasitics')
+    assert 'TRIPWIRE antenna overflow audit' in result.stdout
+    antenna.write_text('read_current_odb\nrepair_antennas diode\nwrite_views\n')
+    result = subprocess.run(['bash', str(wrapper), str(antenna)], capture_output=True, text=True)
+    assert result.returncode != 0
+    assert 'audit insertion point' in result.stderr

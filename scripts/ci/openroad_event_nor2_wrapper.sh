@@ -6,16 +6,27 @@ script_path="${args[$script_index]}"
 script_name="$(basename -- "$script_path")"
 if [[ "$script_name" == "grt.tcl" || "$script_name" == "antenna_repair.tcl" ]]; then
     read_count=0
+    estimate_count=0
     while IFS= read -r line || [[ -n "$line" ]]; do
         if [[ "$line" == "read_current_odb" ]]; then ((read_count+=1)); fi
+        if [[ "$line" == 'estimate_parasitics -global_routing' ]]; then ((estimate_count+=1)); fi
     done < "$script_path"
     if [[ "$read_count" != "1" ]]; then
         printf 'Expected one checkpoint read, found %s\n' "$read_count" >&2
         exit 1
     fi
+    if [[ "$script_name" == "antenna_repair.tcl" && "$estimate_count" != "1" ]]; then
+        printf 'Expected one antenna routing audit insertion point, found %s\n' "$estimate_count" >&2
+        exit 1
+    fi
     patch_dir="$(mktemp -d "${RUNNER_TEMP:-/tmp}/tripwire-event-nor2.XXXXXX")"
     patched_tcl="$patch_dir/$script_name"
     while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ "$script_name" == "antenna_repair.tcl" && "$line" == 'estimate_parasitics -global_routing' ]]; then
+            printf '%s\n' \
+                'puts "TRIPWIRE antenna overflow audit: fresh full global routing"' \
+                'global_route -congestion_iterations $::env(GRT_OVERFLOW_ITERS) -verbose'
+        fi
         printf '%s\n' "$line"
         if [[ "$line" == "read_current_odb" ]]; then
             if [[ "$script_name" == "grt.tcl" ]]; then

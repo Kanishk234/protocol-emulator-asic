@@ -132,7 +132,7 @@ jobs:
         if: inputs.repaired_source_run_id != ''
         uses: actions/download-artifact@v7
         with:
-          name: ${{ inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37806209914' && 'gds-drop-leaf-hold' || inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}
+          name: ${{ inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37818177484' && 'gds-drop-driver' || inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37806209914' && 'gds-drop-leaf-hold' || inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
@@ -172,6 +172,7 @@ jobs:
             runs/event-nor2/**
             runs/drop-event/**
             runs/drop-hold/**
+            runs/drop-driver/**
             runs/slew-screen/**
             src/**
             macro/**

@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (native physical audit and guarded continuation ready)
+- Audited exact native37853023857 artifacts: both setupWS0; AREA1 holdfast+0.119326ns, area524688.31µm² inclSRAM, GRT39.76%/0overflow vs AREA0+0.074614ns/524994.94µm²/40.21%/0overflow.
+- Found unresolved fresh electrical failures: AREA1 slow slew21 vs AREA0 3; both cap1 each corner. AREA1 SRAM A_REN0.996394ns vs0.595200ns, A_DOUT[0]0.070544pF vs0.064pF, loaded28820 cone about2.556ns vs2.5074ns. No official closure/adoption claim.
+- Prepared exact-source AREA1 route→extraction continuation with trusted pre-download hardware/full-config equality, fresh antenna/STA/50ps hold gates and no repeated repair. Prepared independent AREA1 stock post-GRT design-repair screen targeting electrical failures.37 regressions and both workflow/static/diff checks pass. Phase summary updated, no phase ticks. New files remain local; publication approval needed under supplied git rule before remote dispatch. Next route/extract measured clean build and compare electrical cleanup; protocol GL follows actual final netlist. FIPE stays local.
+
+## 2026-10-08: Codex (measured extracted timing reserve)
+- Ran21 local all-corner fixed-parasitic STA processes on actual residual extraction37844735445; all six20ns baseline metrics match CI within1e-6ns. Fully timed constraints, no cell/port/uncertainty/derate changes; only clock period varied.
+- All corners remain nonnegative setup at19.90/19.85ns, positive hold unchanged minimum+0.062788613ns. Slow fails19.75ns with−0.099644743ns. Former worst endpoint47775 is+0.150356174ns at20ns; globalWS0 reflects time-borrowing latch reports. Measured150ps period reserve, not official closure or per-path universal margin.
+- Report PHASE2_EXTRACTED_TIMING_MARGIN.md records evidence/limits. Native stock37853023857 and unit37853058366 remain running; no new physical launch, phase tick or hardware/config edit. Next native clean-build result and matched DRT/extraction if qualified. Raw evidence in/tmp, FIPE local.
+
 ## 2026-10-08: Codex (extracted closure and stock reproduction preparation)
 - Residual DRT37837038264 succeeds; extraction37844735445 setupWS0 all corners, hold fast+0.062788609ns/slow+0.315522950ns/typ+0.157048712ns. GL37844735520 passes22/22, no skips. No official closure or phase tick.
 - Found pinned Classic post-GRT timing repair defaults disabled despite appearing in its step list. Prepared separate clean-build stock-sequence AREA0/AREA1 workflow and helper, explicitly enabling repair/all-corner resizer/125ps hold target with fully timed constraints. No checkpoint ECO, repeated repair or main hardware/template edits.

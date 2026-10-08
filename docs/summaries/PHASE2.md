@@ -18,7 +18,9 @@ The banked candidate later routed cleanly and passed22/22 protocol tests, but ex
 
 Small cell-sizing trials then targeted the live configuration→pin-unit decision→dropped-counter path. The hold-repaired route37807978035 is clean, and extracted fast hold improves to+0.109290ns, but slow setup is−0.603908ns. We independently reproduced that result and found8 printed failing paths sharing one upstream driver. Sizing that driver clears those failures on unchanged extracted wires, with small cell-area cost; it still needs fresh physical proof.
 
-The separate driver screen37818177484 now succeeds: all-corner setup has no violations, fast hold+0.071714ns and antennas0/0. Guarded detailed routing37819598187 is running; extraction and protocol tests follow. A separate stock-flow full-design AREA0/AREA1 mapping comparison37819169130 tests whether improved timing can be reproduced from clean synthesis without the experimental routing wrapper. Source behavior and20ns timing contract remain unchanged. Research and independent guard checks are recorded in PHASE2_CLOSURE_RESEARCH.md.
+Driver extraction37825505569 improved slow setup to−0.147084ns and passed22/22 routed protocol tests. A further three-cell repair then routed successfully37837038264; extraction37844735445 has setupWS0 at every corner and minimum hold+0.062789ns. Routed regression37844735520 passes22/22, no skips. Local all-corner extracted sweeps match CI and tolerate19.85ns against the20ns requirement, demonstrating150ps tested period reserve. Global zero setup remains dominated by latch time-borrowing reports; no strictly positive global setup claim is made.
+
+Clean-build stock screens37853023857 AREA0/AREA1 both report setupWS0 and positive hold; AREA1 fast hold+0.119326ns, final GRT zero overflow and cell area524688.31µm² including SRAM. Electrical checks still fail: AREA1 has21 slow slew violations and one cap violation per corner. Prepared exact AREA1 route/extraction continuation and independent stock design-repair cleanup screen. Clean-build extracted results and official electrical closure remain unproven.
 
 ## What we found
 
@@ -28,13 +30,13 @@ Functional evidence is strong. Physical timing and area must still be judged tog
 
 ## What's left
 
-- Finish driver-repaired routing, extraction and protocol verification; inspect the stock-flow mapping comparison and compare measured results with the original−0.179789ns baseline.
-- Achieve positive setup WNS and nonnegative all-corner hold, without losing protocol or live-configuration behavior.
+- Qualify the clean-build native candidate through fresh antennas, detailed routing, extraction and routed protocol verification; resolve slew/capacitance failures.
+- Preserve measured setup/hold reserve without losing protocol or live-configuration behavior; distinguish latch-reported zero WS from actual endpoint margins.
 - Reproduce the selected full design in official GDS; pass DRC/LVS/antenna/precheck and matching gate-level tests.
 - Complete the routable-budget decision, revalidate the adopted hardware and keep required CI green on final main. Phase2 stays open until all exit requirements pass.
 
 ## One-line takeaway
 
-The full chip works in simulation; setup remains unclosed, while targeted driver repair and clean-build mapping are being measured without weakening the timing contract.
+The checkpoint candidate passes extracted setup/hold and routed protocols; clean-build extraction, electrical cleanup and official GDS are the remaining physical gates.
 
 Detailed evidence: [closure research](../reports/PHASE2_CLOSURE_RESEARCH.md), [baseline recovery](../reports/PHASE2_SHARED_RX_REGRESSION.md), [repair-only screen](../reports/PHASE2_BANKED_SRAM_HOLD_SCREEN.md), [routed follow-up review](../reports/PHASE2_BANKED_SRAM_HOLD_ROUTE.md).

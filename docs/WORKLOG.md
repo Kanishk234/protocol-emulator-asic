@@ -7,7 +7,7 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-10-08: Codex (approved residual-screen publication)
 - User explicitly approves the scoped commit/push/dispatch commands, overriding the latest git restriction for these groups. Reviewed diff checks and outgoing hardware history (none); no main source/config/macro edit. FIPE, comparison helper and unused hold prototypes excluded.
-- Publishing tested tools, separate workflow and evidence groups, then launching residual setup screen from qualified driver37818177484. Actual routed/extracted improvements remain unproven; no phase tick. Launch receipt follows once confirmed.
+- Published tools e85bcb2, workflow9811a40 and evidence df46fa3 to remote main; verified remote SHA df46fa3a58547ed6ab849d0372d4bb1789d1e02c. Launched residual setup screen37834700367 on that exact SHA, in_progress at receipt, from qualified driver37818177484. Actual routed/extracted improvements remain unproven; no phase tick. Next: verify screen source/antenna/hold gates, then guarded DRT/extraction only if qualified.
 
 ## 2026-10-08: Codex (residual two-branch prototype ready)
 -24 new all-corner fixed-wire probes: exact place6860 BUF2 +44061 A21OI2 +27962 NOR4_2 gives setupWS0 all corners;9 previous failing endpoints slow+0.098701492..+0.731180489ns. Worst hold unchanged fast+0.067579724ns. Cost18.144µm² library area; no state/connectivity changes; physical improvement unproven.

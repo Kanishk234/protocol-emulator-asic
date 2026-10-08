@@ -29,3 +29,10 @@ Prepared local DRT continuation for this exact successful source. It validates e
 Next: publish the prepared continuation, run DRT from37806209914, then inspect final DRC, extracted all-corner timing and routed protocol GL. User explicitly approved publishing and launching the prepared continuation after reviewing the successful screen; record its run receipt separately. No Phase2 boxes ticked.
 
 Approved continuation published on89d7537 and launched [37807978035](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37807978035); queued at receipt. Exact original source37533969613/bs-event-late and repaired source37806209914; no repeated repair. Await actual DRT, extracted timing and routed GL results.
+
+
+## Extracted outcome: hold improves, setup regresses
+
+DRT37807978035 completed successfully in55 minutes with zero final routing violations and antenna nets/pins0/0. Extraction [37815131590](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37815131590) completed as a diagnostic; it retains negative timing rather than gating success on closure. Extracted setup WS: fast0, slow−0.6039080517705893ns, typical0. Hold: fast+0.10929035763504281ns, slow+0.38645998606225973ns, typical+0.21145952254413386ns. This improves hold but regresses slow setup relative to prior NOR2−0.422085ns and original baseline−0.179789ns; do not promote.
+
+Selected slow max.rpt from artifact11565909997 contains8 printed violating paths, all starting at configuration latch48905 and ending at48112–48119. Worst endpoint48115 remains on the separate dropped-counter branch with38386/38387, rather than the previously sized31567 branch. Full detailed routing changed parasitics and the worst path; these data do not isolate which individual physical edit caused the regression. Next: probe the current extracted checkpoint for the separate inverter/upstream-driver branch and require fresh physical evidence for any selected change. Routed protocol run37815131566 is still active at this snapshot. No official closure or Phase2 tick.

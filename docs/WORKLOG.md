@@ -5,6 +5,28 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (closure research and audited upstream-driver trial)
+- Reviewed current extracted8-path cone, architecture/D-066, rejected RTL experiments, official portability and primary OpenROAD/LibreLane/Yosys/TinyTapeout sources. Report PHASE2_CLOSURE_RESEARCH.md records ranked actions and limits.
+-24 current-checkpoint fixed-wire STA measurements reproduce six CI baseline values within1e-6ns.38386 A21OI1→2 removes printed slow setup failures; formerly failing endpoints+0.085912..+0.498670ns, unchanged fast hold+0.109290ns. Single-driver added library area5.4432µm². Inverter-only alternatives remain negative; larger inverter8 is worse than4. No physical improvement claimed.
+- Prepared guarded driver screen from37806209914: exact single-master/pin audit, all prior repairs preserved, fresh zero-overflow GRT/strict antennas/all-corner STA and50ps hold gate. Actual source-NL rehearsal passes;336 related tests pass/8 wrapper skips, four extraction checks pass.
+- BUG81: inherited artifact SDC masks latch setup paths; baseline assertion rejected invalid positive replay. Fully timed replay matches actual diagnostic. Future extraction exports and uses exact effective signoff SDC with SHA256 identity.
+- No phase ticks or official source/config edits. Next: publish/run one-driver physical screen, inspect routedGL, then conditional DRT/extraction from qualifying evidence. Keep original−0.179789ns extracted baseline until beaten physically.
+
+## 2026-10-08: Codex (extracted hold improves; setup remains failing)
+- Extraction37815131590 succeeds as diagnostic, not timing closure. Slow setup−0.6039080517705893ns; fast/typ setup0. Hold fast+0.10929035763504281ns/slow+0.38645998606225973ns/typ+0.21145952254413386ns. Reject promotion; original−0.179789ns remains best extracted baseline.
+- Downloaded selected slow reports by byte ranges from artifact11565909997.8 printed negative paths start at config latch48905 and end at48112–48119; worst48115 uses the separate38386/38387 branch. No unsupported claim attributing regression to one edit.
+- RoutedGL37815131566 remains in expanded L3 simulation. No phase ticks. Next: current-checkpoint fixed-wire branch probes and routed protocol result, then separately controlled physical repair only if supported.
+
+## 2026-10-08: Codex (hold-qualified routing completes cleanly)
+- Routing37807978035 succeeded in55 minutes. Completed OpenROAD log confirms final detailed-route violations0 and antenna nets/pins0/0; this is not full signoff.
+- Automatically launched extraction37815131590 and routedGL37815131566 at17:15 UTC; both in_progress at17:15:47, dependency installation/artifact download respectively. Current extracted setup/hold and routed protocol results remain pending.
+- Latest test/lint/docs/unit all green. No phase checklist ticks. Next: inspect fresh extracted all-corner results and routed22-case protocol suite; preserve stronger prior baseline until actual evidence supports promotion.
+
+## 2026-10-08: Codex (workflow ETA snapshot at16:22 UTC)
+- Checked main: routing37807978035 building pinned image; five unit runs37808033530/37807950696/37806394870/37806176506/37803254216 active in chip-level RTL. Latest lint/test/docs green; bounded hold screen37806209914 succeeded.
+- Older37655518919 routedGL and37655518925 extracted timing still queued; no reliable queue ETA. Current routing ETA roughly55–90 minutes remaining, based on prior58-minute route and runner variation; unit ETA roughly20–35 minutes for newest runs,10–25 for14–16-minute runs,5–20 for oldest38-minute run. Estimates, not measured deadlines.
+- No phase ticks or new launch. Next: inspect routing qualification/final DRC and downstream extracted timing/GL; investigate oldest unit if it continues beyond comparable runtimes.
+
 ## 2026-10-08: Codex (approved hold-qualified detailed routing launched)
 - User explicitly approved publishing and launch. Committed tools/tests450d29a, workflowfa6101a and evidence89d7537; pushed and verified remote main equals89d7537856b8e3b1de0742ea4884aa3fd9fcce1f. FIPE and unused local prototypes remain untracked.
 - Launched [37807978035](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37807978035), queued at receipt: original source37533969613/bs-event-late, repaired source37806209914, pre-route hold target source, no repeated post-antenna hold repair. Source screen succeeded with fast hold+0.109256ns, all-corner setup WS0 and zero timing/antenna violations.

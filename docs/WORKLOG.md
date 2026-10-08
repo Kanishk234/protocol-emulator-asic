@@ -5,6 +5,12 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (nine-leaf hold screen qualifies; DRT continuation prepared)
+- Screen37806209914 succeeded in9.5 minutes. Matched artifact11563058526: all-corner setup WS0, zero setup/hold violations, hold fast+0.109256ns/slow+0.371234ns/typ+0.202929ns; antennas0/0. Fast hold exceeds unchanged50ps gate.
+- Prepared local exact-source continuation with complete netlist-transition audit, trusted fingerprints, strict routing/antenna evidence and fresh STA before DRT. Workflow preserves inherited setup/hold evidence and uses ordinary routing image without repeated repairs.
+-311 related helper tests pass;8 system-tclsh wrapper tests skip. Cached STA Tcl guards execute; physical operations in tests are mocked. Diff check passes. Evidence in PHASE2_DROP_LEAF_HOLD.md.
+- No phase ticks or official closure claim. Changes remain local: latest supplied AGENTS.md reserves commits/pushes for user. Next: publish continuation, DRT, extracted all-corner timing and routed GL; then resolve clean official-flow reproduction.
+
 ## 2026-10-08: Codex (moved hold bottleneck audited; nine-leaf screen ready)
 - Published78ca427 tools,b2652a1 workflow,61ac267 evidence to remote main. Launched [37806209914](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37806209914) on61ac267; in_progress at confirmation. Antenna repair enabled; no DRT or setup/inverter changes.
 - Finished screen37803300460 passes setup/hold counts and antennas0/0; setupWS0, hold fast+0.033514ns/slow+0.352956ns/typ+0.159913ns. Fast hold is below50ps DRT gate; no threshold relaxed.

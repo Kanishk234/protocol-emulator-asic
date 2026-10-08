@@ -1,0 +1,68 @@
+name: compact official Tiny Tapeout precheck
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_compact_precheck.py'
+      - '.github/workflows/compact_precheck.yaml'
+  workflow_dispatch:
+    inputs:
+      source_release:
+        description: Release containing compact-precheck-source.tar.gz
+        required: true
+        type: string
+      source_sha256:
+        description: Authenticated source archive SHA256
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: warp-compact-precheck-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  precheck:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK: ihp-sg13cmos5l
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      WARP_SOURCE_RELEASE: ${{ inputs.source_release || 'compact-checkpoint-20261006-iter8' }}
+      WARP_SOURCE_SHA256: ${{ inputs.source_sha256 || '04ed04ee60dc4f586309fed368b86b9577cdc9821ffdc0519cafd790eb83b2e6' }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+          path: build/compact_precheck_tools
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Official Python dependencies in project venv and pinned PDK
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install -r build/compact_precheck_tools/precheck/requirements.txt
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download "$WARP_SOURCE_RELEASE" -R "$GITHUB_REPOSITORY" --pattern compact-precheck-source.tar.gz --dir build
+      - name: Official pinned Nix environment
+        uses: rikhuijzer/cache-install@c46c673b14b0780c6749d7a45f26ebc07c8c7388
+        with:
+          key: warp-precheck-nix-d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+          nix_file: build/compact_precheck_tools/precheck/default.nix
+      - name: Build official precheck Nix packages
+        working-directory: build/compact_precheck_tools/precheck
+        run: nix-build
+      - name: Native top LEF export and all official IHP precheck checks
+        timeout-minutes: 45
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_compact_precheck.py run --archive build/compact-precheck-source.tar.gz --sha256 "$WARP_SOURCE_SHA256"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-official-precheck-${{ github.run_id }}
+          path: build/compact_precheck/
+          retention-days: 3

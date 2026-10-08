@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (extracted closure and stock reproduction preparation)
+- Residual DRT37837038264 succeeds; extraction37844735445 setupWS0 all corners, hold fast+0.062788609ns/slow+0.315522950ns/typ+0.157048712ns. GL37844735520 passes22/22, no skips. No official closure or phase tick.
+- Found pinned Classic post-GRT timing repair defaults disabled despite appearing in its step list. Prepared separate clean-build stock-sequence AREA0/AREA1 workflow and helper, explicitly enabling repair/all-corner resizer/125ps hold target with fully timed constraints. No checkpoint ECO, repeated repair or main hardware/template edits.
+-16 native helper regressions pass (configuration guards, actual orchestration and no repeated repair), diff check passes. Changes remain local; no workflow launched or publication claimed. Next publish this scoped group and run native stock screens, inspect gates before DRT/extraction. FIPE remains local.
+
 ## 2026-10-08: Codex (qualified residual DRT continuation)
 - User requests continued work/manual launch. Published tools5ee1fcf, workflow8e5f6cd and earlier screen receipt30f9dd1. Added exact residual source37834700367: successful main provenance, full prior driver/hold/NOR chain plus exact3-cell audit, strict routing/antenna evidence and fresh all-corner STA/50ps hold gate. No repair repeated; existing DRT refused.
 -84 routing tests pass including21 new residual checks. Static artifact-selection audit initially selected the wrong download step and failed; corrected explicit step-name selection passes. No implementation change needed. Shell publication proceeded after that audit failure; recorded and corrected before dispatch.

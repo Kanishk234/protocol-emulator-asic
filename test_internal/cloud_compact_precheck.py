@@ -8,6 +8,8 @@ import argparse
 import hashlib
 import json
 import os
+import re
+from decimal import Decimal
 from pathlib import Path
 import shlex
 import shutil
@@ -38,6 +40,60 @@ if {[[ord::get_db_block] getName] != "tt_um_warp"} {error "Unexpected top block"
 write_abstract_lef $::env(WARP_PRECHECK_LEF)
 write_verilog -include_pwr_gnd $::env(WARP_PRECHECK_VERILOG)
 """
+
+
+PUBLISH_GDS = r"""
+import json, os
+from pathlib import Path
+import pya
+layout = pya.Layout()
+layout.read(os.environ["WARP_PRECHECK_SOURCE_GDS"])
+top = layout.cell("tt_um_warp")
+if top is None: raise RuntimeError("Missing authenticated chip top")
+# Serialize only the actual chip and its complete referenced hierarchy.
+# No referenced cell, label, polygon or instance may change.
+def signature(cell, database):
+    shapes = {str(database.get_info(layer)): sorted(shape.to_s() for shape in cell.shapes(layer).each())
+              for layer in database.layer_indexes() if not cell.shapes(layer).is_empty()}
+    instances = sorted((database.cell(inst.cell_index).name, inst.cplx_trans.to_s(),
+                        str(inst.a), str(inst.b), inst.na, inst.nb) for inst in cell.each_inst())
+    return {"shapes": shapes, "instances": instances}
+reachable = {top.cell_index(), *top.called_cells()}
+before = {layout.cell(index).name: signature(layout.cell(index), layout) for index in reachable}
+options = pya.SaveLayoutOptions()
+options.select_cell(top.cell_index())
+layout.write(os.environ["WARP_PRECHECK_PUBLISHED_GDS"], options)
+after_layout = pya.Layout()
+after_layout.read(os.environ["WARP_PRECHECK_PUBLISHED_GDS"])
+after_top = after_layout.top_cells()
+if len(after_top) != 1 or after_top[0].name != "tt_um_warp":
+    raise RuntimeError("Published GDS does not have exactly the chip top")
+after = {cell.name: signature(cell, after_layout) for cell in after_layout.each_cell()}
+# Pruning can renumber cell indices. Names/transforms/arrays and all shapes
+# including labels must remain exactly identical at the same database units.
+if layout.dbu != after_layout.dbu or before != after: raise RuntimeError("Referenced hierarchy or shapes changed")
+Path(os.environ["WARP_PRECHECK_PUBLICATION_REPORT"]).write_text(json.dumps({
+    "source_top_cells": sorted(cell.name for cell in layout.top_cells()),
+    "published_top_cells": ["tt_um_warp"], "reachable_cells": len(before),
+    "referenced_shapes_labels_instances_identical": True}, indent=2) + "\n")
+"""
+
+
+def fixed_point_lef(text):
+    """Format geometric tokens to official fp3 syntax with exact value checks."""
+    lines = []
+    for line in text.splitlines(keepends=True):
+        if re.match(r"^\s*(SIZE|ORIGIN|RECT|FOREIGN)\s", line):
+            def number(match):
+                value = Decimal(match.group())
+                formatted = format(value, ".3f")
+                if Decimal(formatted) != value:
+                    raise RuntimeError("LEF geometry is not representable at official nanometer precision")
+                return formatted
+            # Foreign names are identifiers, never coordinate tokens.
+            line = re.sub(r"(?<![\w.])[-+]?\d+(?:\.\d+)?(?![\w.])", number, line)
+        lines.append(line)
+    return "".join(lines)
 
 
 def sha(path):
@@ -111,15 +167,31 @@ def run(archive, expected):
     for name in ("tt_um_warp.lef", "tt_um_warp.v"):
         if not (source / name).is_file() or (source / name).stat().st_size == 0:
             raise RuntimeError(f"Missing native export {name}")
+    published = OUT / "published"
+    published.mkdir()
+    shutil.copyfile(source / "info.yaml", published / "info.yaml")
+    shutil.copyfile(source / "tt_um_warp.v", published / "tt_um_warp.v")
+    (published / "tt_um_warp.lef").write_text(fixed_point_lef((source / "tt_um_warp.lef").read_text()))
+    publish_script = OUT / "publish_gds.py"
+    publish_script.write_text(PUBLISH_GDS)
+    publication = {"SOURCE_GDS": source / "tt_um_warp.gds",
+        "PUBLISHED_GDS": published / "tt_um_warp.gds",
+        "PUBLICATION_REPORT": OUT / "publication.json"}
+    command = ["docker", "run", "--rm", "-v", f"{ROOT}:{ROOT}", "-w", str(ROOT)]
+    for key, path in publication.items(): command += ["-e", f"WARP_PRECHECK_{key}={path}"]
+    command += [IMAGE, "klayout", "-b", "-r", str(publish_script)]
+    with (OUT / "publication.log").open("w") as log:
+        subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, timeout=180, check=True)
     precheck = TOOLS / "precheck"
     (precheck / "reports").mkdir(exist_ok=True)
     invocation = shlex.join([sys.executable, "precheck.py", "--gds",
-        str(source / "tt_um_warp.gds"), "--tech", "ihp-sg13cmos5l"])
+        str(published / "tt_um_warp.gds"), "--tech", "ihp-sg13cmos5l"])
     command = ["nix-shell", "--run", invocation]
     (OUT / "invocation.json").write_text(json.dumps({"command": command,
         "cwd": str(precheck), "PDK": os.environ["PDK"],
         "PDK_ROOT": os.environ["PDK_ROOT"], "support_commit": SUPPORT,
-        "action_contract_commit": ACTION, "fresh_export_sha256": {
+        "action_contract_commit": ACTION, "published_views_sha256": {
+            name: sha(published / name) for name in ("tt_um_warp.gds", "tt_um_warp.lef", "tt_um_warp.v")}, "fresh_export_sha256": {
             name: sha(source / name) for name in ("tt_um_warp.lef", "tt_um_warp.v")}}, indent=2) + "\n")
     code = None
     try:

@@ -108,11 +108,33 @@ def state_cut(module, name):
     return {"modules": {name: cut}, "creator": "WARP original/candidate binary combinational state-cut diagnostic"}
 
 
+def state_cut_proof_script(liberty, gold_json, gate_json, witness):
+    """Use exactly the same binary miter construction for control and candidate.
+
+    The identical-original control tests this construction before attributing a
+    counterexample to remapping. Outputs/comparisons and the WaveJSON witness
+    retain evidence without changing the SAT constraints or circuit equations.
+    These miter/SAT options are supported by the runner's pinned Yosys 0.33.
+    """
+    return "\n".join([
+        f"read_liberty -ignore_miss_func {liberty}", f"read_json {gold_json}",
+        "hierarchy -top gold_cut", "flatten -wb", "techmap", "opt", "design -stash gold",
+        f"read_liberty -ignore_miss_func {liberty}", f"read_json {gate_json}",
+        "hierarchy -top gate_cut", "flatten -wb", "techmap", "opt", "design -stash gate",
+        "design -copy-from gold -as gold_cut gold_cut", "design -copy-from gate -as gate_cut gate_cut",
+        "miter -equiv -flatten -make_outputs -make_outcmp gold_cut gate_cut equiv",
+        "hierarchy -top equiv", "opt_clean",
+        f"sat -verify -prove trigger 0 -show-inputs -show-outputs -dump_json {witness} -timeout 180 equiv",
+    ])
+
+
 def main():
     OUT.mkdir(exist_ok=False)
     result = {"scope": "one original-synthesis C2 combinational remap; binary state-cut proof only",
               "configuration_forced": False, "stock_models_changed": False,
-              "physical_or_timing_qualified": False, "stages": {}, "passed": False}
+              "physical_or_timing_qualified": False, "stages": {}, "passed": False,
+              "original_self_miter": {"status": "not_run", "passed": False},
+              "binary_state_cut_equivalence_passed": False}
     def save():
         (OUT / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     def yosys(name, script, seconds=180):
@@ -177,19 +199,35 @@ def main():
         result["candidate_c2_sha256"] = sha(candidate)
         if result["candidate_c2_sha256"] == result["original_c2_sha256"]:
             raise ValueError("remap did not produce a distinct candidate")
-        for name, module in (("gold_cut", old), ("gate_cut", new)):
-            (OUT / (name + ".json")).write_text(json.dumps(state_cut(module, name)) + "\n")
+        for filename, name, module in (("gold_cut", "gold_cut", old),
+                ("original_self_gate_cut", "gate_cut", old), ("gate_cut", "gate_cut", new)):
+            (OUT / (filename + ".json")).write_text(json.dumps(state_cut(module, name)) + "\n")
+        def prove(name, gate_json, record):
+            witness = OUT / (name + "_witness.json")
+            record.update(status="running", passed=False, gold_sha256=sha(OUT / "gold_cut.json"),
+                          gate_sha256=sha(gate_json), log=name + ".log", script=name + ".ys",
+                          witness=name + "_witness.json")
+            save()
+            try:
+                yosys(name, state_cut_proof_script(liberty, OUT / "gold_cut.json", gate_json, witness),
+                      seconds=240)
+            except Exception:
+                log = (OUT / (name + ".log")).read_text()
+                record["status"] = ("counterexample" if "SAT proof finished - model found: FAIL!" in log
+                                    else "failed")
+                raise
+            else:
+                record.update(status="passed", passed=True)
+            finally:
+                record["witness_retained"] = witness.is_file()
+                save()
+        # A failing identical-original miter invalidates this proof construction;
+        # retain its failure and stop, rather than advancing the candidate.
+        prove("original_self_miter", OUT / "original_self_gate_cut.json", result["original_self_miter"])
         # Compare all external outputs plus next-state/control pins for arbitrary
         # binary inputs/configuration/user-state Q. This is not a sequential proof.
-        yosys("binary_state_cut_proof", "\n".join([
-            f"read_liberty -ignore_miss_func {liberty}", f"read_json {OUT / 'gold_cut.json'}",
-            "hierarchy -top gold_cut", "flatten -wb", "techmap", "opt", "design -stash gold",
-            f"read_liberty -ignore_miss_func {liberty}", f"read_json {OUT / 'gate_cut.json'}",
-            "hierarchy -top gate_cut", "flatten -wb", "techmap", "opt", "design -stash gate",
-            "design -copy-from gold -as gold_cut gold_cut", "design -copy-from gate -as gate_cut gate_cut",
-            "miter -equiv -flatten gold_cut gate_cut equiv", "hierarchy -top equiv", "opt_clean",
-            "sat -verify -prove trigger 0 -timeout 180 equiv",
-        ]), seconds=240)
+        result["binary_state_cut_proof"] = {}
+        prove("binary_state_cut_proof", OUT / "gate_cut.json", result["binary_state_cut_proof"])
         result["binary_state_cut_equivalence_passed"] = True
         save()
         for stage, replacement in (("passing_control", None), ("original_synthesis_negative", source),

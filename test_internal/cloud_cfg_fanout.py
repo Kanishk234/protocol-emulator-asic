@@ -166,9 +166,17 @@ def verify_connections(before, after):
     for key in set(newpins) - set(oldpins):
         if key[0] != "PIN" or key[1].rsplit("/", 1)[0] not in added:
             raise ValueError("Additional original terminal")
+    displacement = []
+    for name in old:
+        oldxy, newxy = list(map(int, old[name][1].split())), list(map(int, new[name][1].split()))
+        if len(oldxy) != 2 or len(newxy) != 2: raise ValueError("Invalid instance origin")
+        displacement.append((abs(newxy[0] - oldxy[0]), abs(newxy[1] - oldxy[1])))
     return {"original_instances": len(old), "original_terminals": len(oldpins),
             "added_identity_buffers": len(added), "contracted_connectivity_exact": True,
-            "fixed_macro_exact": True}
+            "fixed_macro_exact": True,
+            "original_cells_moved": sum(dx != 0 or dy != 0 for dx, dy in displacement),
+            "original_cell_max_manhattan_displacement_database_units": max(dx + dy for dx, dy in displacement),
+            "original_cell_max_axis_displacement_database_units": max(max(dx, dy) for dx, dy in displacement)}
 
 
 def run():

@@ -92,6 +92,11 @@ def fixed_point_lef(text):
                 return formatted
             # Foreign names are identifiers, never coordinate tokens.
             line = re.sub(r"(?<![\w.])[-+]?\d+(?:\.\d+)?(?![\w.])", number, line)
+            # The official RECT parser expects single separators; native LEF
+            # uses a double separator after RECT. Preserve numeric values.
+            indent = line[:len(line) - len(line.lstrip())]
+            ending = "\n" if line.endswith("\n") else ""
+            line = indent + " ".join(line.strip().split()) + ending
         lines.append(line)
     return "".join(lines)
 

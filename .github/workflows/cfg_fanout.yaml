@@ -1,0 +1,43 @@
+name: compact configuration fanout diagnostic
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_cfg_fanout.py'
+      - '.github/workflows/cfg_fanout.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-cfg-fanout-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch authenticated pre-CTS provenance and passing cluster-eight result
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+          gh run download 37811985079 -R "$GITHUB_REPOSITORY" --name compact-fanout-preflight-37811985079 --dir build/cfg_fanout_input
+      - name: Buffer five exact nets, audit identity topology, and estimate three-corner STA
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_cfg_fanout.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-cfg-fanout-${{ github.run_id }}
+          path: build/cfg_fanout/
+          retention-days: 3

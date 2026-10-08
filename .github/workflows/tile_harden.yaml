@@ -1,0 +1,50 @@
+name: matched native C2 tile hardening
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_tile_harden.py'
+      - '.github/workflows/tile_harden.yaml'
+  workflow_dispatch:
+    inputs:
+      source_release:
+        description: Release containing tile-harden-c2.tar.gz
+        required: true
+        type: string
+      source_sha256:
+        description: Full authenticated hardening archive SHA256
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: warp-matched-c2-harden-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  harden:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      WARP_SOURCE_RELEASE: ${{ inputs.source_release || 'compact-checkpoint-20261006-iter8' }}
+      WARP_SOURCE_SHA256: ${{ inputs.source_sha256 || '356c909c1415d2d56f7925e304b3d862055ed471af585cc206af92257c2bb2d8' }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Project venv and authenticated tile source
+        timeout-minutes: 10
+        run: |
+          python3 -m venv .venv
+          bash spikes/cloud/fetch_pdk.sh
+          timeout 120s gh release download "$WARP_SOURCE_RELEASE" -R "$GITHUB_REPOSITORY" --pattern tile-harden-c2.tar.gz --dir build
+      - name: Exact mapped C2 route and strict physical checks
+        timeout-minutes: 112
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_tile_harden.py run --archive build/tile-harden-c2.tar.gz --sha256 "$WARP_SOURCE_SHA256"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: matched-c2-harden-${{ github.run_id }}
+          path: build/tile_harden/
+          retention-days: 3

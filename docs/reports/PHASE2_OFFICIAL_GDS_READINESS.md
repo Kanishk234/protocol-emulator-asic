@@ -1,5 +1,17 @@
 # Official GDS readiness (2026-10-06)
 
+## Banked candidate preparation (2026-10-07)
+
+Update after extraction: banked route37709856777 completes with zero route DRC errors, but extracted37714872507 has slow setup -2.475764ns and fast hold +0.094940ns. Independently verified routedGL37714872772 passes22/22. Reject banked promotion and retain original event-late125ps (-0.179789ns setup, +0.037290ns fast hold). See PHASE2_BANKED_EXTRACTED_REGRESSION.md. The isolated integration artifacts below remain review material, not a selected official candidate.
+
+Prepared `/tmp/tripwire-banked-official-prep-20261008` with original RX, event-late BS and banked pin selection. Generation checks and four top-level smoke tests pass. The two 19-source lists agree, all seven SRAM views resolve, and clock metadata remains 20 ns/50 MHz. `official-hardware-review.patch` and its JSON inventory describe 17 changed integration files relative to main; they are local review artifacts, not an applied promotion.
+
+The 22-case full-wrapper RTL protocol replay passed with sigrok enabled: 22 tests, zero failures/errors/skips, 770.10 seconds. Independently parsed `results_official_banked_l3.xml`; SHA256 `2ba39b9621512dc5ea00fcb142eb207f76c93ed89d3071663805dc3b32120f01` is recorded in the candidate manifest. Its first invocation stopped before simulation because the supplied spec-file path did not exist; the corrected invocation uses `tools/tripwire_spec.py`.
+
+Prepared banked-specific `official-config-review.json`, `official-config-review.patch` and `official-config-portability-audit.json` in the same directory. Static assertions pass for fully timed PNR/signoff constraints, all three corners, 125 ps proposed hold target and enabled physical error gates. Ten configuration keys differ from the inherited baseline; the proposal is unapplied and requires separate policy review.
+
+Detailed-route continuation [37709856777](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37709856777) is active on the independently audited repaired checkpoint. Post-antenna fast hold was +0.0700513 ns with nonnegative setup/hold across all corners. Extracted timing and routed protocol validation remain required. The checkpoint-specific SRAM buffer and custom routing reservation still need a clean-build portability solution before an official-flow equivalence claim. Main hardware/configuration and template jobs remain unchanged.
+
 An official run is the next integration milestone, but dispatching unchanged main does not measure the real chip: main src/tt_um_tripwire.v still implements the phase0 counter and info.yaml lists only that source. Protocol RTL exists separately and current timing experiments harden frozen R4 candidate3393eea, not main's placeholder TT entry point.
 
 Prepare an isolated complete2/4 official candidate using the real TT wrapper, generated2/4 definitions/fabric, all source files synchronized in info.yaml/test Makefile, matching protocol tests, SRAM views/config/PDN and unchanged20ns live-configuration constraints. Do not replace the frozen main specification or template jobs silently. User-directed sequencing is D-070.

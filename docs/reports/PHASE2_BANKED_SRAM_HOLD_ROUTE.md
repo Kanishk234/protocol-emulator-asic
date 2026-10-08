@@ -1,5 +1,7 @@
 # Banked selector repaired checkpoint: routed follow-up review
 
+Continuation37709856777 has now completed with zero route DRC errors. Extracted37714872507 regresses to slow setup -2.475764ns with fast hold +0.094940ns; routedGL37714872772 passes22/22. Banked selection is rejected for promotion; retain original event-late125ps baseline. See PHASE2_BANKED_EXTRACTED_REGRESSION.md. The preparation text below records the reviewed launch gates, not current eligibility.
+
 Repair-only run37690561695 passed on main3c494c0. Independently audited artifact11513594590:36 source hashes match frozen3393eea plus the tested event-late/banked IO patch, exact checkpoint files exist, and saved timing/antenna readiness passes. The SRAM seed buffer remains in the repaired netlist. No detailed routing has run for this candidate.
 
 | Measurement | Post-antenna result |

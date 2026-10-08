@@ -5,7 +5,43 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (approved one-cell repair publication)
+- User explicitly approves separate tools/workflow/report commits, remote main push and repair-only launch. Tools3591a5f and workflowf8bfd01 committed; FIPE and oldSRAMprototypes excluded.
+- Rechecked diff and unpublished src/info/macro history: clean. No mainworkflowactive beforepublication; mainhardware/config/templatejobs unchanged.215helpertests pass.
+- No phase boxes ticked. Next: push approvedgroups, launchgds-event-nor2-screen, inspect actualfreshGRT/STA/antenna gates before anyDRT/extractionfollow-up.
+
+## 2026-10-08: Codex (Phase2 guarded one-cell physical screen prepared)
+- Prepared event_nor2_size.tcl, wrapper/image, event_nor2_screen.py and separate manualgds-event-nor2-screen. Exactoriginalroute37574267994/source37533969613/event-late; oneNOR2resize, legalization, freshGRT/netlists, allcornerSTA/antenna gates. No broadresizer/DRT.
+- Independently audited459MBoriginalartifact11464617506: exact pre-routecheckpointviews andtargetconnections present; intended one-cell netlistcomparison passes. PinnedLibreLane3.1.0.dev3 source reviewed from downloadedwheel withoutinstallation.
+-215helpertests pass; Bashsyntax/diffchecks pass. Freshnetlistpromotion clears staleSPEF/SDF/lib; source/master/pins/connectivity/power, unintendedchanges andcompletezerolayeroverflow guarded. No phase tick, mainhardware/config/templatechanges, publication ordispatch.
+- Next: publish reviewed tools/workflow/report groups under explicitgitexception oruser-runcommands; launchrepair-only screen. Then measuredDRT/extraction/GL ifqualified, andcleanofficialreproduction beforeclosingroutablebudgetgate.
+
+## 2026-10-07: Codex (targeted sizing reproduces baseline and clears local residuals)
+- Original125ps exact netlist/SPEF plus fully timedconstraints reproduces allcornerCIsetup/hold within1e-6ns. Twelve verified OpenSTAcorner invocations pass withoutSTAerrors; comparison in `/tmp/event-125ps-local-eco/comparison.json`.
+- SingleNOR2 `_27853_` strength1→2 moves slowRXtimer23/22 -0.179789/-0.052855 to +0.103142/+0.230076ns; fast holdunchanged +0.0372895ns. Libraryarea +3.6288µm². NOR4alone +0.044478/+0.171411; both +0.327406/+0.454339. GlobalsetupWS0, notpositiveofficialWNS.
+- Report PHASE2_TARGETED_CELL_SIZING.md records exact connections, guards and limitations. Fixedwireprobes do not prove legalization/newrouting/signoff. No mainhardware/config/remotechange, physicaldispatch or phase tick.
+- Next: prepare boundedphysicalNOR2follow-up on exactoriginalcheckpoint; freshallcorners/antennas/extraction/protocolvalidation beforepromotion. No mainworkflowcurrentlyactive.
+
+## 2026-10-07: Codex (banked extraction audited; original baseline retained)
+- Route37709856777 succeeds, final routeDRC0. Artifact11522683978/extracted37714872507: slow setup -2.4757636642ns, fast hold +0.0949399475ns; fast/typ setup0, slow/typ holdpositive. Reject banked promotion versus original125ps -0.179789ns.
+- Audited41 printed slow violations: all U0 PERIOD word4bit1;40droppedcounter,1fabricchannel1last_seq. Worst data path has no named hold-delaycell. Report PHASE2_BANKED_EXTRACTED_REGRESSION.md.
+- Independently parsed routedGLartifact11525366657:22/22,0failure/error/skip. Local official-wrapper RTL also22/22 withsigrok,770.10s; manifest updated withJUnitSHA. Latest lint/test/docs/unit allgreen; no main workflowactive, only two obsolete superseded queued entries.
+- Started isolated single-cell sizing probes on strongestoriginal125ps extractednetlist/SPEF. LocalfullytimedSTA reproduces its reported worststart/end and roundedslowWS-0.18ns; saved routingSDC exceptionremoved for signoff replay. No mainRTL/config/historychanges or phase ticks. Next: inspect exactdelta/allcornerhold and qualify physicalrepair beforelaunch.
+
+## 2026-10-07: Codex (banked configuration review continued)
+- Wrapper replay has passed6/22 cases, including UART TX/RX; servo PWM is active. Complete JUnit remains pending.
+- Prepared banked-specific native config review/patch/audit in isolated candidate. Static fully timed constraints, three corners,125ps target and physical error gates pass; ten proposed keys differ, none applied.
+- Route37709856777 and latest unit37709844787 remain active; lint/test/docs pass. GitHub live-job logs API returns404, so no internal DRT iteration inferred from its combined step name.
+- No phase ticks or main hardware/config/remote changes. Next: complete wrapper replay, collect routed/extracted/GL evidence, then resolve clean-build SRAM repair and routing reservation portability.
+
+## 2026-10-07: Codex (parallel banked official integration preparation)
+- Prepared isolated original-RX/event-late/banked candidate in `/tmp/tripwire-banked-official-prep-20261008`. Generation and four top-level smoke tests pass; 19-source lists match, seven SRAM views resolve, clock remains20ns. Local hardware review patch/inventory covers17 changed integration files; no promotion.
+- Corrected local L3 invocation from nonexistent tripsim/spec.py to generated tools/tripwire_spec.py. The first invocation stopped before simulation; corrected22-case full-wrapper RTL/sigrok replay is running, results pending.
+- Route37709856777 remains active after successful identity/image checks. Latest main lint/test/docs pass; unit is in chip-level/L3 RTL checks. No phase boxes ticked or main hardware/config/template jobs changed.
+- Next: collect wrapper JUnit; inspect completed route, actual extracted timing and routedGL; resolve checkpoint-specific repair/native-flow portability before official dispatch.
+
 ## 2026-10-07: Codex (approved repaired banked routing publication)
+- Publication complete:7af0b1d tools,a2e7e4b workflow,dbdfb7f reports pushed; HEAD/origin/main matchdbdfb7f7a7530d5dd0e8e00996a30ce063591460. Routed continuation37709856777 is in progress on main.
 - User approves separate tools/workflow/report commits, push and detailed-route launch. Rechecked245 helper tests and diff; no src/info/macro history changes or main hardening active.
 - Tools committed7af0b1d; workflowa2e7e4b. Exact repaired source37690561695 has independently checked all-corner/50ps/antenna/identity gates; no repeat SRAM insertion or repair. FIPE and unrelated addr0 prototypes excluded.
 - No phase boxes ticked. Next: push approved groups, launch exact continuation and inspect route/extraction/GL before any official promotion.

@@ -5,7 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (NOR2 antenna overflow-report correction)
+- Checked main: two unit runs active; older extracted-timing and routed-GL runs queued. Latest NOR2 screen37733684248 failed after diode repair because incremental routing omitted the full congestion table; fresh post-repair STA did not run.
+- Fixed BUG78 locally: explicitly reroute after diode repair before parasitic estimation/export, then require the full zero-overflow report, independent antennas and all-corner STA. Wrapper rejects missing/duplicate insertion points. Physical rerouting may expose new antenna failures; no gate relaxed.
+- Evidence:239 related helper tests passed; bash syntax and git diff checks passed. No checklist boxes ticked. No DRT or official workflow launched.
+- Latest user-provided AGENTS.md reserves Git history/remote changes for the user. Next: user publishes the exact screen/tools/docs groups and dispatches repair_antennas=true; evaluate that physical result before any DRT promotion. Local DRT preparation, FIPE and old SRAM prototypes stay excluded.
+
+## 2026-10-08: Codex (parallel NOR2 route orchestration reviewed)
+- Antennafollow-up37733684248 is measuring; nofailstepatcheck. Main/originmatchcdeedba; localchanges are deliberatecontinuation/tools/workflowtests pluslaunchreceipt, notfailedpush. FIPE/oldSRAMprototypesremainexcluded.
+-239relatedtests pass, including end-to-end repairedview/ordinaryimage/DRT-only selection andfreshSTAnegative refusal. Report PHASE2_NOR2_ROUTE_READINESS.md makeslocalcontinuation reviewable; nopublication/DRTlaunchyet.
+- ActualGRTinstancearea baseline524712→NOR2524716µm², count34153unchanged; utilization0.581452→0.581456. Areaestimatehistorical remains distinct fromfinalcandidatequalification.
+- No phase tick ormainhardware/configchange. Next: auditactualantenna-clean screenresult; thenpublishreviewedcontinuation ifqualified, measureDRT/extraction/GL, resolvecleanofficialportability andfullsignoff.
+
 ## 2026-10-08: Codex (NOR2 timing passes GRT; antenna cleanup prepared)
+- Published3a9ea54 tools,c4e039e workflow,cdeedba evidence toremote main; antenna-enabledscreen [37733684248](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37733684248) is inprogress oncdeedbaf15e116d8538bc4b6b0a0e232aca8f009. NoDRT. Localcontinuationnowtargetsitsfreshantenna-repairedviews andchecks bothroutingpasses; publicationstillawaitsqualification.
 - Correctedscreen37732392933 physicallyresizes/legalizes/reroutes andpassesstrictnetlistguard/zerooverflow. Independentartifact11530157875: setupWS0/allcornercounts0; holdfast/slow/typ +0.0932422/+0.393552/+0.211997ns. Finalgatefails42antennanets/45pins; noDRT/extractedclosureclaim.
 - Prepared explicitrepair_antennas option(defaultfalse), oneboundedstandardrepair plusfreshchecks, no timingresizer/DRT. FreshrepairedNL/PNL promoted; onlyaddedantennanpdiodes onexistingnets allowed,originallogicunchanged.237helperspass; report PHASE2_NOR2_ANTENNA_FOLLOWUP.md.
 - Paralleloriginaleventofficialprep in `/tmp/tripwire-event-nor2-official-prep-20261008`: generator/static19sources pass,125psnativeproposalunapplied. LocalNOR2routeworkflowintegrationtested butexcludedfromscreenpublication pendingqualification.

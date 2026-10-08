@@ -1,5 +1,13 @@
 # NOR2 physical screen: antenna-only follow-up
 
+## Follow-up reporting correction
+
+Run [37733684248](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37733684248) completed diode repair but stopped before fresh STA: incremental antenna rerouting did not print the full congestion table required by the guard (BUG78). This run establishes no post-repair timing verdict.
+
+The local correction performs an explicit full global-routing pass after diode repair and before parasitic estimation and view export. It disallows congestion on that pass, requires the fresh complete zero-overflow table, and then runs independent antenna checks and all-corner STA on the resulting route. This reroute may reintroduce antenna violations; those remain a failing gate. No repeated sizing, timing repair, or DRT is added. The wrapper requires exactly one insertion point. All 239 related helper tests pass, along with shell syntax and diff checks; these are orchestration tests, not physical closure evidence.
+
+Publication and physical rerun are pending under the latest AGENTS.md user-run Git rule. Publish only the screen correction and its documentation; exclude the local DRT continuation, FIPE document and old SRAM prototypes.
+
 Corrected screen [37732392933](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37732392933) passes source identity, guarded NOR2 replacement, legalization, strict fresh-netlist comparison and zero-overflow GRT. Independently read artifact11530157875. Its final gate fails because of42 antenna nets/45 pins, not timing:
 
 | Corner | Setup WS(ns) | Hold WS(ns) | Setup/hold violation counts |

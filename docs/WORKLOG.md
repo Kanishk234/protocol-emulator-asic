@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (residual screen qualifies)
+- Screen37834700367 succeeds: fresh setupWS0 all corners; hold fast+0.113342ns/slow+0.418904ns/typ+0.226324ns; antenna nets/pins0/0, ready_for_route_review true and unchanged50ps hold gate passes. This is GRT evidence, not detailed-route/extracted/official closure.
+- Two latest unit workflows37834754490/37834675410 remain running. Legacy37655518919 GL and37655518925 extraction remain queued. No residual DRT launched yet; next prepare guarded exact-source continuation preserving full three-cell/prior repair history, then extraction and protocol GL if DRT qualifies. No phase ticks.
+
 ## 2026-10-08: Codex (approved residual-screen publication)
 - User explicitly approves the scoped commit/push/dispatch commands, overriding the latest git restriction for these groups. Reviewed diff checks and outgoing hardware history (none); no main source/config/macro edit. FIPE, comparison helper and unused hold prototypes excluded.
 - Published tools e85bcb2, workflow9811a40 and evidence df46fa3 to remote main; verified remote SHA df46fa3a58547ed6ab849d0372d4bb1789d1e02c. Launched residual setup screen37834700367 on that exact SHA, in_progress at receipt, from qualified driver37818177484. Actual routed/extracted improvements remain unproven; no phase tick. Next: verify screen source/antenna/hold gates, then guarded DRT/extraction only if qualified.

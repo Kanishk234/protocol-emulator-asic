@@ -15,7 +15,7 @@ on:
         type: choice
         options: [placement, lane, sram, cts, bs-resync, bs-event-late, bs-event-drop-qual, bs-event-rx-timer, bs-event-rx-shared, bs-event-pin-banked, bs-load-flat]
       repaired_source_run_id:
-        description: Audited banked SRAM, event NOR2 or nine-leaf hold screen, otherwise empty
+        description: Audited SRAM, NOR2, hold, driver or residual setup screen, otherwise empty
         required: false
         default: ""
         type: string
@@ -132,7 +132,7 @@ jobs:
         if: inputs.repaired_source_run_id != ''
         uses: actions/download-artifact@v7
         with:
-          name: ${{ inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37818177484' && 'gds-drop-driver' || inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37806209914' && 'gds-drop-leaf-hold' || inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}
+          name: ${{ inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37834700367' && 'gds-residual-setup' || inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37818177484' && 'gds-drop-driver' || inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37806209914' && 'gds-drop-leaf-hold' || inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
@@ -173,6 +173,7 @@ jobs:
             runs/drop-event/**
             runs/drop-hold/**
             runs/drop-driver/**
+            runs/residual-setup/**
             runs/slew-screen/**
             src/**
             macro/**

@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**Latest verified compact trial (October8):** stronger-driver37708459393
+passes in30m05s (00:34:18–01:04:23UTC): fresh native0/antenna0/critical
+disconnected0, full Magic0/KLayout0/GDS-based shell LVS0, with fresh extracted
+shell slew/setup/hold/capacitance violations0 at all three supplied corners.
+Fanout33 remains; native/configured-fabric timing and official precheck remain
+open. See compact_driver_native_20261008.md for exact hashes/slacks/scope.
+The chronological baseline results below retain their original limits.
+
 **Latest compact experiment (2026-10-06):** cloud37516794406 reaches final
 native routing DRC0/antenna0/critical disconnected0. Router elapsed2h47m15s;
 whole route/geometry job3h16m05s. Full geometry fails KLayout248 (1 Metal1

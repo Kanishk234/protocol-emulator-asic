@@ -2,6 +2,30 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-08 (session69: driver closure; isolate native mapping and preflight fanout)
+**Done:** proactively audited latest workflows. HEAD03851ee lint37709970909/
+docs37709970944/test37709970924/unit37709970902 all pass. Downloaded driver
+37708459393 SUCCESS actual reports: fresh native/antenna/critical disconnect0,
+Magic0/KLayout0/shell LVS0; fresh all-corner slew/setup/hold/cap0, fanout33
+remains. Duration30m05s. Exact ODB/GDS/extraction hashes and slacks in new
+compact_driver_native_20261008.md; updated claims/evidence/physical docs/summary.
+BUG46 verified fixed. Downloaded native37709917442 failed six-case artifact:
+control two cases pass,9164 actual config latches known/matching (BUG47 fixed).
+Only original synthesisC2 or finalC2 substitution fails UART X despite same
+configuration pass. Functional problem predates routing; no false setup-only
+failure conclusion. Two existing agents prepare bounded original-state-preserving
+combinational remap and exact original pre-CTS fanout preflight, respectively.
+Root prepares exact mapped C2 floorplan/signal-pin preflight from recovered
+authenticated geometry/pin assets and untouched pinned Apache I/O adapter.
+No frozen hardware/PDK changes, local EDA or extra agents. D-059/060/061
+record bounds, costs and acceptance limits. Local AST/YAML/config-only API/
+archive/SHA/whitespace checks pass; agent storage mutation checks pass.
+**Boxes ticked:** none.
+**Next:** publish small attributed diagnostic inputs to existing experimental
+release, launch/review three independent bounded cloud trials, inspect failures
+and continue from actual evidence. Native function/physical matching, fanout,
+configured timing, official precheck and successor reproduction remain open.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

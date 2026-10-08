@@ -1,19 +1,20 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-07). Clean README reproduction now
+**Status:** in progress (updated 2026-10-08). Clean README reproduction now
 passes on a fresh hosted runner37690896748: rebuilt bitstreams, loaded30/30
 and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
 remain open. This is a separate reproducibility result from checkpoint experiments.
 
-The compact scratch layout now passes same-layout native routing, full
-Magic/KLayout and shell LVS (37669731197/37674839060). Shell setup/hold pass,
-but slew9/fanout33 and native/configured-fabric qualification remain open.
-The stronger driver's legal placement passes37689324316; its first route
-37690243797 fails on stale moved-pin wires, and corrected37708459393 is
-active. Separate C2 synthesis/final loaded diagnostics target the native
-failure before new tile hardening. Frozen G1 remains the fallback. See
-[current physical evidence](../reports/compact_clean_layout_20261007.md) and
+The compact stronger-driver trial37708459393 passes same-layout native
+routing, antenna, full Magic/KLayout and shell LVS. Fresh shell setup/hold,
+slew and capacitance pass at all supplied corners; fanout33 remains.
+Native37709917442 passes the control after BUG47's configuration-audit fix,
+then fails when original C2 is substituted at either synthesis or final
+physical output. The failure already exists before physical routing.
+State-preserving mapping isolation, matched-tile preflight and clock-tree
+fanout preflight proceed independently. Frozen G1 remains the fallback. See
+[current physical/native evidence](../reports/compact_driver_native_20261008.md) and
 [fanout/native plan](../reports/compact_fanout_native_next_20261007.md).
 
 Compact37516794406 now reaches zero native router/antenna violations, but later

@@ -5,6 +5,7 @@
 - **Symptom/check:** native stage37708777882 fails all six cases before UART; control14 unknown named signals, original synthesis/finalC2 substitutions12. The stronger audit therefore cannot yet locate a functional divergence.
 - **Root cause:** report_loaded_config inventories names ending ConfigMem.Inst_frameN_bitM.Q as storage. Passing C2 mapped NL SHA25603c21b8e400e1774390e67b0939422959d37e26849adca18fa082f492cf5cdaf retains Inst_frame4_bit2.Q only as a declaration (line2237) and assignment to1'hx (line14229), without a live cell load/driver. Names are not an actual storage-cell inventory.
 - **Fix/coverage:** matched connectivity JSON for each stage, generated without optimization from its exact mapped netlists, plus source hash and exact alias-reference census. Only JSON literal-x aliases with exactly wire+assign references may be classified separately. Every actual configuration latch must bind scalar D/GATE to FrameData/FrameStrobe and have known Q matching the loaded image. Unknown/mismatching real storage remains a failure; no signal force or model change. Lightweight loaded-alias/unproven-alias/bad-binding controls and mocked actual-Q unknown/wrong/correct controls pass; all five passing NLs identify only the unused frame4_bit2 alias. Corrected six-case cloud result pending.
+- **Verified:**37709917442 control passes both cases with9164 actual latches known/matching. Four original synthesis/finalC2 cases fail later on real UART X, with the configuration audit passing; no remaining phantom-alias failure.
 
 ## 46: Moved ECO pins retain stale routed signal-net connections
 - **Date:**2026-10-07.
@@ -12,6 +13,7 @@
 - **Root cause:** legal cell moves invalidate existing pin escapes. Reusing those partially stale complete-net wires as an incremental input leaves a pin unvisited; the native connectivity gate correctly rejects it. The failed net connects the moved driver's input, so it belongs to the intended affected signal set.
 - **Fix/coverage:** remove complete ordinary signal wires only for nets touching the exact three moved cells before routing; preserve all power rails, other routing and logical/port connectivity. Require exact moved-cell inventory, unchanged topology after ripup and after routing, fresh native0 and stock antenna/critical-connectivity checks. Retain ripped-net names and failure evidence. Corrected cloud result pending; no check waiver.
 - **Primary API:** pinned OpenDB dbWire::destroy removes wire geometry rather than logical dbNet/ITerms; [pinned header](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/include/odb/db.h). Runtime checks required Tcl binding before mutation.
+- **Verified:** corrected37708459393 passes. Eight affected signal nets ripped, bootstrap59 markers then first late pass0; fresh full-chip native0, stock antenna/critical connectivity0 and downstream Magic/KLayout/shell LVS0. Fresh all-corner slew/setup/hold/cap0; fanout33 remains separate.
 
 ## 45: Placement preflight misreads a void successful checker return
 - **Date:**2026-10-07.

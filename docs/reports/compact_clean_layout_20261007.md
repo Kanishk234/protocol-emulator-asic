@@ -1,5 +1,11 @@
 # Recovered compact layout: physical checks pass, electrical/function gates remain
 
+**October8 follow-up:** routed stronger-driver37708459393 passes native0,
+antenna0, Magic0, KLayout0 and shell LVS0; fresh extracted slew/setup/hold/
+capacitance violations are0 at all three supplied shell corners. Fanout33
+and native/configured-fabric timing remain open. See
+`compact_driver_native_20261008.md`; the numbers below describe the baseline.
+
 [Run37674839060](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37674839060)
 completed successfully in22m14s (19:29:12–19:51:26UTC). Downloaded result,
 Magic report, extraction/Netgen reports and fresh STA metrics were inspected.

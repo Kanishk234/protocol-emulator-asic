@@ -109,12 +109,16 @@ The compact successor remains an experiment. Native repair37669731197 and
 same-layout physical follow-up37674839060 provide routing/Magic/KLayout/shell
 LVS0, with shell setup/hold passing but slew9/fanout33 still open. Stronger
 driver placement37689324316 is legal, but its first route37690243797 failed
-connectivity on stale moved-pin wires; corrected37708459393 is active.
+connectivity on stale moved-pin wires. Corrected37708459393 now passes native0,
+antenna0, Magic0/KLayout0/shell LVS0 and fresh all-corner slew/setup/hold/cap0.
+Fanout33 remains. Actual report/hashes: compact_driver_native_20261008.md.
 Native C2 stage37708777882 failed all six cases before UART: the diagnostic
 found14 unknown named configuration signals in the control and12 in each
-C2 substitution. The formerly passing control therefore did not pass this
-stronger audit. Actual latch bindings versus retained net aliases are under
-investigation; this run cannot identify synthesis/physical divergence yet.
+C2 substitution. BUG47 proves these were unused constant-X aliases, not live
+latches. Corrected37709917442 passes both control cases with9164 real latches
+known/matching; original synthesis/finalC2 substitutions fail real UART X
+despite the same complete configuration pass. The functional issue is present
+at original synthesis, with exact cause still under investigation.
 Latest d826baf docs37708777806/lint37708777982/test37708777749/unit37708777707
 all pass. No compact promotion, matched native/configured
 timing or equal-area superiority claim follows from these scratch results.

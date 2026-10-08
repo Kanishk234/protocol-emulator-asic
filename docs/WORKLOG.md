@@ -20,6 +20,19 @@ Original tile flow omitted STA; its20ns field is not timing evidence.
 all six cases, and inspect routed-driver results when available. Real fanout
 violations and configured timing remain open. Heavy work stays in cloud.
 
+**Root cause established:** BUG47 passing C2 frame4_bit2.Q is an unused
+alias assigned1'hx, not a live storage-cell output. Prepared matched per-stage
+JSON/actual-latch audit correction, preserving failure on all unknown or
+mismatching real configuration. No hardware or PDK change. Research/report
+and current evidence committed as ae7fecb; latest routing remains active.
+
+**Correction reviewed/checked:** exact-source/hash-bound unoptimized JSON
+per stage now supports actual-latch census. Only proven unloaded constant-x
+aliases are excluded from named-wire inventory; all real storage remains
+strict. Negative loaded/unproven-alias/bad-binding controls pass; independent
+mock unknown/wrong/correct Q checks fail/fail/pass. Python AST/whitespace
+pass; no local EDA. Preparing scoped test/docs push to replay all six cases.
+
 ## 2026-10-07 (session67: route the legal ECO; independent reproduction/native audits)
 **Done:** proactively checked corrected placement37689324316; success.
 Downloaded actual placement-only ODB7b2811c291443d4208bcb1154fbe37ab6eeb7be6702c52060f135d0318509adf

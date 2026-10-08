@@ -1,5 +1,11 @@
 # Bugs
 
+## 47: Named configuration audit counts an optimized-away alias as storage
+- **Date:**2026-10-07.
+- **Symptom/check:** native stage37708777882 fails all six cases before UART; control14 unknown named signals, original synthesis/finalC2 substitutions12. The stronger audit therefore cannot yet locate a functional divergence.
+- **Root cause:** report_loaded_config inventories names ending ConfigMem.Inst_frameN_bitM.Q as storage. Passing C2 mapped NL SHA25603c21b8e400e1774390e67b0939422959d37e26849adca18fa082f492cf5cdaf retains Inst_frame4_bit2.Q only as a declaration (line2237) and assignment to1'hx (line14229), without a live cell load/driver. Names are not an actual storage-cell inventory.
+- **Fix/coverage:** matched connectivity JSON for each stage, generated without optimization from its exact mapped netlists, plus source hash and exact alias-reference census. Only JSON literal-x aliases with exactly wire+assign references may be classified separately. Every actual configuration latch must bind scalar D/GATE to FrameData/FrameStrobe and have known Q matching the loaded image. Unknown/mismatching real storage remains a failure; no signal force or model change. Lightweight loaded-alias/unproven-alias/bad-binding controls and mocked actual-Q unknown/wrong/correct controls pass; all five passing NLs identify only the unused frame4_bit2 alias. Corrected six-case cloud result pending.
+
 ## 46: Moved ECO pins retain stale routed signal-net connections
 - **Date:**2026-10-07.
 - **Symptom/check:**37690243797 legal driver ECO starts22 native markers, bootstrap27, then first late pass fails DRT-0206 checkConnectivity on u_cfg._17_ (driver u_cfg._53_/Y). No routed or timing acceptance.

@@ -67,11 +67,16 @@ def selected_hold_margin(variant, selected):
 
 
 def main():
+    if os.environ.get('REPAIRED_SOURCE_RUN_ID'):
+        from banked_sram_hold_route import main as route_repaired
+        return route_repaired()
     root = Path('runs/rtl-grt-screen')
     variant = os.environ.get('SOURCE_VARIANT', 'placement')
-    if variant not in {'placement', 'lane', 'sram', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared'}:
+    if variant == 'bs-event-pin-banked':
+        raise ValueError('Banked continuation requires the reviewed repaired source')
+    if variant not in {'placement', 'lane', 'sram', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared', 'bs-event-pin-banked'}:
         raise ValueError('Unknown route source variant')
-    timing_root = root / 'timing' if variant in {'placement', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared'} else Path('runs/slew-screen')
+    timing_root = root / 'timing' if variant in {'placement', 'cts', 'bs-resync', 'bs-event-late', 'bs-load-flat', 'bs-event-drop-qual', 'bs-event-rx-timer', 'bs-event-rx-shared', 'bs-event-pin-banked'} else Path('runs/slew-screen')
     comparison = json.loads((timing_root / 'comparison.json').read_text())
     if variant != 'cts' and not timing_pass(comparison):
         raise ValueError('Failing source timing')

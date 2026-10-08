@@ -131,7 +131,7 @@ def test_headroom_requires_fresh_all_corner_pass_and_fast_budget(tmp_path, monke
                       'repair_corners': CORNERS, 'hold_margin': hold_margin}]
 
 
-@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-event-rx-shared', 'bs-event-rx-timer', 'placement', 'bs-event-drop-qual'])
+@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-event-rx-shared', 'bs-event-pin-banked', 'bs-event-rx-timer', 'placement', 'bs-event-drop-qual'])
 @pytest.mark.parametrize('target', ['source', '0.10', '0.125', '0.15', '0.12'])
 def test_only_reviewed_source_target_pairs_allow_headroom(variant, target):
     from placement_route import selected_hold_margin

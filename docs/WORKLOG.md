@@ -2,6 +2,24 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-07 (session68: current status and stronger native audit)
+**Done:** checked live GitHub status in response to the user. Corrected
+driver37708459393 remains in bounded route/extraction/checks; setup passed.
+Latest d826baf docs37708777806/lint37708777982/test37708777749/unit37708777707
+all pass. Downloaded native37708777882 diagnostic evidence: all six cases
+fail before UART, on unknown named configuration signals (control14,
+synthesis/finalC2 substitutions12). No stage divergence conclusion is valid
+until the control passes the stronger audit. Assigned a bounded independent
+audit of actual configuration latches versus retained net aliases; no force,
+constant ties, or gate waiver. Reviewed portable one-tile hardening research:
+direct pinned-container API flow can start from the passing mapped netlist,
+but authenticated pin/config/header inputs and geometry preflight are needed.
+Original tile flow omitted STA; its20ns field is not timing evidence.
+**Boxes ticked:** none.
+**Next:** repair the audit only with proven actual latch bindings, replay
+all six cases, and inspect routed-driver results when available. Real fanout
+violations and configured timing remain open. Heavy work stays in cloud.
+
 ## 2026-10-07 (session67: route the legal ECO; independent reproduction/native audits)
 **Done:** proactively checked corrected placement37689324316; success.
 Downloaded actual placement-only ODB7b2811c291443d4208bcb1154fbe37ab6eeb7be6702c52060f135d0318509adf
@@ -56,6 +74,14 @@ all outcomes retained, every failure remains nonzero. AST/YAML/bash syntax,
 safe extraction/SHA and XML failure controls pass locally, no local EDA.
 Corrected driver37708459393 and latest regressions active; no cancellation
 or push touching frozen hardware. Two agents finished their bounded tasks.
+
+**Launch and status response:** D-058 native37708777882 setup succeeds and
+six-case stage active, corrected route37708459393 active. User asked status;
+reported verified same-layout closure and fresh README gate, plus open fanout/
+native/configured timing. Continued independent evidence audit: corrected stale
+"no CI" monitor language using37512249763, added clean reproduction/phase
+stress/successor scopes to EVIDENCE and new traceable reproduction claim.
+Numerical-source audit remains incomplete; no extra phase box ticked.
 
 ## 2026-10-07 (session66: access restored; same-layout physical closure)
 **Done:** user requested continued work and explanation of the review limit.

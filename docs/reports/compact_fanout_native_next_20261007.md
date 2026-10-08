@@ -8,6 +8,44 @@ netlists still fail loaded native simulation (BUG33). Regenerated
 tests, but do not yet have matching physical views. No check is waived and
 no successor is promoted by this report.
 
+Latest stage diagnostic37708777882 fails all six cases before UART because
+the stronger named-configuration audit finds14 unknown signals in the control
+and12 in the two C2 substitutions. Actual latch bindings versus retained
+aliases must be resolved before interpreting this as synthesis/physical
+divergence. Latest corrected driver route37708459393 remains active at the
+session68 status check; no fresh routed electrical result is available yet.
+
+## Portable matched-tile hardening preparation
+
+A bounded physical experiment should start from the exact passing C2 mapped
+netlist in the table below, bypass synthesis, and preserve the original pin
+geometry. Use a mounted Python API driver directly inside the pinned LibreLane
+container. The standard dockerized wrapper does not support external plugins;
+see the official [plugin documentation](https://librelane.readthedocs.io/en/stable/usage/writing_plugins.html)
+and [custom sequential flows](https://librelane.readthedocs.io/en/stable/usage/writing_custom_flows.html).
+
+Reuse the attributed, unmodified FABulous I/O-placement script and output-port
+buffering adapter from plugin revision
+`dcc038217472822330b33f61fadbc06e0c3cc96d`. Importing the whole old FABulousTile
+flow would regenerate RTL and omit STA. The checkpoint alone lacks all the
+pin/config/header inputs needed for faithful reproduction. Authenticate the
+original `pins.yaml`, tile/common and resolved configs, JSON header, SDC and
+final LEF/DEF before dispatch. Initial state must reference the candidate
+netlist and its compatible header, never a leftover original netlist view.
+
+Preserve C2 die190.08x196.56um, signal layers Metal2 through Metal4,
+horizontal I/O Metal3/vertical I/O Metal2, original PDN/20 edge obstructions
+and GRT adjustment0.3. First run only import/floorplan/I/O placement and
+compare actual port names/directions/pin rectangles/power geometry. Launch
+long routing only after that preflight and a valid native control pass.
+
+The original tile uses CLOCK_PORT=null and removes every STA stage. Its
+20ns configuration field therefore provides no setup/hold evidence.
+Retain final mapped netlist and generated physical/parasitic/timing views,
+configs, provenance and checker reports; retest the actual final netlist.
+Configured timing still needs identified clocks, matched tiles and
+configuration-specific path constraints in the composed fabric.
+
 ## Fanout is a pinned library limit
 
 The authenticated slow-corner Liberty used by driver screen37688389888 is:

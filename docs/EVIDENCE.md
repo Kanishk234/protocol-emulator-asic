@@ -82,10 +82,41 @@ Bugs and investigations, with the checks and limits recorded for each: `docs/BUG
 ## 9. Known limits
 
 - **No hardware results**: no silicon, no board; rates are model estimates (Fmax 53–91 MHz for the supported designs, `tools/timing/README.md`), not measurements.
-- **Capacity**: 88 cells; the I2C target and CAN do not fit. One bitstream runs at a time, but it can contain concurrent functions: a local UART-plus-event-monitor demonstration fits at 37/88 cells and passes loaded RTL and synthesized gate-shell tests (`docs/reports/g1_uart_monitor.md`, C11); it has no new hardened-netlist/CI result.
+- **Capacity**: 88 cells; the I2C target and CAN do not fit. One bitstream runs at a time, but it can contain concurrent functions: UART-plus-event-monitor fits at 37/88 cells and passes local loaded RTL/synthesized gate-shell tests (`docs/reports/g1_uart_monitor.md`, C11) and fresh hosted compile/loaded RTL in37512249763. There is no new hardened macro/SDF result from that hosted demonstration.
 - **Fault-control showcase**: the UART/monitor plus externally timed TX line inversion fits at38/88 cells and passes two-case loaded RTL and synthesized-shell suites (`docs/reports/g1_uart_fault_monitor.md`, C12). This controls selected corruption and preserves monitoring; it is not an autonomous fault scheduler or a silicon result.
 - **Soft capture**: UART plus a two-entry six-bit timestamp queue fits at83/88cells and passes loaded ordering/overflow/wrap/backpressure/TX/RX/reset tests (`docs/reports/g1_uart_capture.md`, C13). Default timestamps wrap at64clocks; an85-cell option trades four-clock resolution for256-clock wrap, with loaded quantization/wrap checks. The eight-bit stored timestamp version exceeds capacity at91cells. No new hardware or native gate timing evidence.
 - **Host link**: one byte per SPI transaction; a protocol needing a byte every few µs (WS2812) needs a fast host.
 - **Parked outputs are 0**: active-low signals on `uo_out` pins are asserted while stopped (BUGS #19); use a bidirectional pin with a pull-up.
 - **Gate-level fabric**: chip tests simulate the fabric from its RTL, not its hardened netlist (D-023); per-tile netlist-vs-RTL equivalence is not done.
 - **Prior art**: FPGA fabrics on Tiny Tapeout exist (Tiny FABulous, SKY130), as does a Verilog-programmed protocol engine on IHP (PRISM); what WARP adds is the measured, held-out-tested choice of architecture (`docs/notes/prior_art.md`).
+
+## 10. October7 verification and experimental successor
+
+Fresh README reproduction37690896748, commit962da93, executes documented
+setup/check/rebuild/compile commands with pinned tool/package checks and no
+prior build output. Downloaded strict XML verifies30 loaded-fabric cases and
+1 UART source-versus-fabric cosim case, no failures or skips in either suite.
+Default idle/parameter-specific skips are separately recorded. This closes
+the clean-machine README item, not missing historic routed-tile timing evidence.
+Details: `docs/reports/reproduction.md`, C-readme-reproduction.
+
+Independent loaded G1 UART phase/read-delay stress37671919707 passes48 bytes
+over3 seeds, including early/late bit-edge phases and delayed reads, with no
+framing/overrun/stale-byte failures. This improves robustness evidence for the
+fallback without a hardware change or a new physical rate claim (C-uart-phase).
+
+The compact successor remains an experiment. Native repair37669731197 and
+same-layout physical follow-up37674839060 provide routing/Magic/KLayout/shell
+LVS0, with shell setup/hold passing but slew9/fanout33 still open. Stronger
+driver placement37689324316 is legal, but its first route37690243797 failed
+connectivity on stale moved-pin wires; corrected37708459393 is active.
+Native C2 stage37708777882 failed all six cases before UART: the diagnostic
+found14 unknown named configuration signals in the control and12 in each
+C2 substitution. The formerly passing control therefore did not pass this
+stronger audit. Actual latch bindings versus retained net aliases are under
+investigation; this run cannot identify synthesis/physical divergence yet.
+Latest d826baf docs37708777806/lint37708777982/test37708777749/unit37708777707
+all pass. No compact promotion, matched native/configured
+timing or equal-area superiority claim follows from these scratch results.
+Exact hashes/limits: `docs/reports/compact_clean_layout_20261007.md` and
+`docs/reports/compact_fanout_native_next_20261007.md`.

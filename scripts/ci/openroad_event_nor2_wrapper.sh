@@ -24,11 +24,14 @@ if [[ "$script_name" == "grt.tcl" || "$script_name" == "antenna_repair.tcl" ]]; 
     while IFS= read -r line || [[ -n "$line" ]]; do
         if [[ "$script_name" == "antenna_repair.tcl" && "$line" == 'estimate_parasitics -global_routing' ]]; then
             printf '%s\n' \
-                'puts "TRIPWIRE antenna overflow audit: fresh full global routing"' \
-                'global_route -congestion_iterations $::env(GRT_OVERFLOW_ITERS) -verbose'
+                'if {$::env(GRT_ALLOW_CONGESTION)} {error "Antenna repair must disallow congestion"}' \
+                'puts "TRIPWIRE antenna overflow audit: incremental repair completed with congestion disallowed"'
         fi
         printf '%s\n' "$line"
         if [[ "$line" == "read_current_odb" ]]; then
+            if [[ "$script_name" == "antenna_repair.tcl" ]]; then
+                printf '%s\n' 'if {$::env(GRT_ALLOW_CONGESTION)} {error "Antenna repair must disallow congestion"}'
+            fi
             if [[ "$script_name" == "grt.tcl" ]]; then
             printf '%s\n' \
                 'write_verilog [file rootname $::env(SAVE_ODB)].baseline.nl.v' \

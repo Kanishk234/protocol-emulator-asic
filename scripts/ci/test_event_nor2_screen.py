@@ -5,6 +5,7 @@ import subprocess
 import pytest
 
 from event_nor2_screen import promote_netlists, validate_netlist, validate_overflow, validate_run, validate_physical_baseline, validate_antenna_only_changes, promote_antenna_netlists
+from event_nor2_screen import validate_antenna_overflow
 
 
 ORIGINAL = 'sg13cmos5l_nor2_1 _27853_ (.A(_21095_), .B(_02509_), .Y(_02510_));'
@@ -96,6 +97,15 @@ def test_overflow_requires_complete_fresh_zero_report():
             validate_overflow(bad)
 
 
+def test_antenna_overflow_requires_successful_strict_incremental_repair():
+    marker = 'TRIPWIRE antenna overflow audit: incremental repair completed with congestion disallowed\n'
+    good = '+ repair_antennas diode -iterations 3\n' + marker
+    validate_antenna_overflow(good)
+    for bad in ('', marker, good + marker, good.replace('-iterations', '-allow_congestion -iterations')):
+        with pytest.raises(ValueError):
+            validate_antenna_overflow(bad)
+
+
 def test_wrapper_injection_and_delegation(tmp_path):
     root = Path(__file__).parent
     wrapper = tmp_path / 'wrapper'
@@ -127,8 +137,10 @@ def test_wrapper_injection_and_delegation(tmp_path):
     assert result.returncode == 0, result.stderr
     assert 'tripwire_size_event_nor2' not in result.stdout
     assert 'SAVE_NL' in result.stdout and 'SAVE_PNL' in result.stdout
-    assert result.stdout.index('repair_antennas diode') < result.stdout.index('global_route -congestion_iterations')
-    assert result.stdout.index('global_route -congestion_iterations') < result.stdout.index('estimate_parasitics')
+    assert result.stdout.index('repair_antennas diode') < result.stdout.index('incremental repair completed')
+    assert result.stdout.index('incremental repair completed') < result.stdout.index('estimate_parasitics')
+    assert 'global_route -congestion_iterations' not in result.stdout
+    assert result.stdout.count('Antenna repair must disallow congestion') == 2
     assert 'TRIPWIRE antenna overflow audit' in result.stdout
     antenna.write_text('read_current_odb\nrepair_antennas diode\nwrite_views\n')
     result = subprocess.run(['bash', str(wrapper), str(antenna)], capture_output=True, text=True)

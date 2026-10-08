@@ -77,6 +77,15 @@ def validate_overflow(log):
         raise ValueError('ECO global routing overflow')
 
 
+def validate_antenna_overflow(log):
+    marker = 'TRIPWIRE antenna overflow audit: incremental repair completed with congestion disallowed'
+    if log.count(marker) != 1:
+        raise ValueError('Missing or ambiguous post-repair routing audit')
+    prefix = log.split(marker, 1)[0]
+    if 'repair_antennas' not in prefix or '-allow_congestion' in prefix:
+        raise ValueError('Antenna repair congestion policy not enforced')
+
+
 def promote_netlists(state_path, original_netlist):
     state = json.loads(state_path.read_text())
     odb = Path(state['odb'])
@@ -147,6 +156,8 @@ def main():
         cfg.update(PNR_CORNERS=list(CORNERS), RSZ_CORNERS=list(CORNERS), OPENROAD_THREADS=4,
                    PNR_SDC_FILE=str(Path('src/signoff.sdc').resolve()),
                    meta={'version': base.get('meta', {}).get('version', 1), 'flow': steps})
+        if tag == 'antenna':
+            cfg['GRT_ALLOW_CONGESTION'] = False
         path = Path(f'src/config_event_nor2_{tag}.json')
         path.write_text(json.dumps(cfg, indent=2) + '\n')
         dest = out / tag
@@ -176,9 +187,7 @@ def main():
     antenna = json.loads(checked.with_name('or_metrics_out.json').read_text())
     if repair_antennas == '1':
         repaired_log = antenna_root / '2-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log'
-        if 'TRIPWIRE antenna overflow audit: fresh full global routing' not in repaired_log.read_text():
-            raise ValueError('Missing post-repair routing audit')
-        validate_overflow(repaired_log.read_text())
+        validate_antenna_overflow(repaired_log.read_text())
         changed_nl = Path(json.loads(changed.read_text())['nl'])
         checked = promote_antenna_netlists(checked, changed_nl)
     screen(base_path, source, out / 'timing', os.environ['PDK_ROOT'],

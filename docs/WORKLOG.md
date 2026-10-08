@@ -26,6 +26,15 @@ release, launch/review three independent bounded cloud trials, inspect failures
 and continue from actual evidence. Native function/physical matching, fanout,
 configured timing, official precheck and successor reproduction remain open.
 
+**Launched and immediate failure audit:** scoped b93545f/42a49ae/f686dc9
+pushed; native remap37809673029, tile37809673093 and fanout37809673156 start.
+All fail before their intended design comparison: BUG48 missing mapped cell
+declarations after ABC, BUG49 ordinary-Python odb import, BUG50 legacy null
+PAD_LIBS. Downloaded artifacts and verified exact causes; prepared narrow
+declaration/native-observer/empty-selector fixes, with all original gates
+preserved. Native/tile negative controls, AST/Tcl/YAML/whitespace pass; no
+local EDA. No design-success claim follows from these setup corrections.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

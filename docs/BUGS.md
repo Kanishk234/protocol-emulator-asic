@@ -1,5 +1,25 @@
 # Bugs
 
+## 50: Legacy null pad-library selector breaks pinned physical preflight
+- **Date:**2026-10-08.
+- **Symptom/check:** fanout37809673156 passes source placement/load observation but stops before CTS on OpenROAD.prepare_env/filter_views TypeError: NoneType not iterable.
+- **Root cause:** original LibreLane3.0 resolved config has PAD_LIBS=null; pinned3.1 default is an empty dictionary, and prepare_env iterates it. Original LIB already includes standard-cell and I/O Liberty files at all three corners.
+- **Fix/coverage:** normalize only the legacy empty selector to{}, retain/hash all six actual timing files and check resolved libraries/macros/clock/SDC/fanout constraints remain unchanged. Baseline/cluster8 still differ only by clustering size. No library or gate removed. Corrected cloud result pending.
+
+## 49: Tile preflight imports OpenDB outside its embedded interpreter
+- **Date:**2026-10-08.
+- **Symptom/check:** tile37809673093 fails before floorplanning with ModuleNotFoundError: odb in ordinary container Python.
+- **Root cause:** the pinned image exposes OpenDB through OpenROAD's embedded interpreter, not ordinary python3. Direct LibreLane flow APIs remain available in ordinary Python.
+- **Fix/coverage:** run a read-only native OpenROAD Tcl observer for die, signal-port directions and every pin rectangle; parse its retained output with strict unique/nonempty/shape checks. Missing/duplicate/malformed census controls and Tcl completeness pass. Physical pin equality gates unchanged; no local EDA. Corrected cloud result pending.
+- **Primary source:** [OpenDB interpreter documentation](https://openroad.readthedocs.io/en/latest/main/src/odb/README.html#python).
+
+## 48: ABC remap recreates cells after flatten deletes port declarations
+- **Date:**2026-10-08.
+- **Symptom/check:** native remap37809673029 fails check-assert with74 undriven output/user-D/clock warnings, before proof or simulation.
+- **Root cause:** flatten deletes21 combinational module definitions; ABC creates new mapped instances without restoring their port direction declarations. Both original storage black boxes remain.
+- **Fix/coverage:** read_liberty -lib -nooverwrite immediately after ABC restores only missing black-box declarations and preserves existing storage definitions. This skips functional reimport of the unused clock-gate cell (BUG38). Actual mapped/deleted-type census, syntax/order controls pass; storage/check/proof/native gates unchanged. Corrected cloud result pending.
+- **Primary source:** [pinned Yosys0.33 Liberty frontend](https://github.com/YosysHQ/yosys/blob/yosys-0.33/frontends/liberty/liberty.cc).
+
 ## 47: Named configuration audit counts an optimized-away alias as storage
 - **Date:**2026-10-07.
 - **Symptom/check:** native stage37708777882 fails all six cases before UART; control14 unknown named signals, original synthesis/finalC2 substitutions12. The stronger audit therefore cannot yet locate a functional divergence.

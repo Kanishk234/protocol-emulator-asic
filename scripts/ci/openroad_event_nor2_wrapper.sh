@@ -35,7 +35,10 @@ if [[ "$script_name" == "grt.tcl" || "$script_name" == "antenna_repair.tcl" ]]; 
             if [[ "$script_name" == "grt.tcl" ]]; then
             printf '%s\n' \
                 'write_verilog [file rootname $::env(SAVE_ODB)].baseline.nl.v' \
-                'if {[file exists /usr/local/share/tripwire/drop_event_size.tcl]} {' \
+                'if {[file exists /usr/local/share/tripwire/drop_leaf_hold.tcl]} {' \
+                'source /usr/local/share/tripwire/drop_leaf_hold.tcl' \
+                'tripwire_delay_drop_leaves' \
+                '} elseif {[file exists /usr/local/share/tripwire/drop_event_size.tcl]} {' \
                 'source /usr/local/share/tripwire/drop_event_size.tcl' \
                 'tripwire_size_drop_cell nor2' \
                 '} else {' \

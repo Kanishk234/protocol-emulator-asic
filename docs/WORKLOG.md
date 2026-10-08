@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (extracted dropped-event bottleneck isolated)
+- Downloaded extracted artifact11535321738 from37743628998.9 printed negative slow paths terminate at dropped counters;31567 NOR2 delay2.300487ns dominates the worst branch. Prior RX timer is no longer worst.
+- Local independent STA reproduces all-corner CI baseline within1e-6ns.31567 strength1→2 gives slow WNS-0.004851231ns; plus38387 inverter strength1→2 yields0 reported WNS/no printed setup failures and preserves fast hold+0.035871472ns. Combined cell-area increment5.4432µm²; fixed-wire evidence only.
+- Discarded nonexistent upstream o21ai_2/xor2_2 black-box probes (BUG80). Prepared guarded single-cell physical screen from qualified37736921949; inverter remains a separate experiment. No RTL/config/official source changes or phase ticks.
+- Next: measure the single NOR2 physical screen, then select separate inverter follow-up or DRT only from qualified measured evidence. Official portability remains unresolved.
+
+## 2026-10-08: Codex (NOR2 extracted result regresses setup)
+- DRT37737970080 succeeded in58 minutes, final DRT violations0 and final antenna nets/pins0. RoutedGL37743629089 passes22/22. Extraction diagnostic37743628998 succeeds as a reporting workflow but slow setup fails at-0.4220854896178046ns.
+- Extracted hold: fast+0.03587147347360706ns, slow+0.3196811794654476ns, typical+0.13442103366429453ns; fast/typ setup WS0. Previous original event-late extracted slow setup-0.17978863351414795ns remains the stronger baseline.
+- No active main workflows at check; older37655518919 routedGL and37655518925 extraction remain queued. Latest lint/test/unit/docs/nightly green.
+- No checklist ticks or official promotion. Next: inspect extracted slow paths to distinguish remaining event feedback from route-induced/new critical paths before selecting another narrowly targeted repair; preserve the original baseline and all protocol behavior.
+
 ## 2026-10-08: Codex (NOR2 detailed-routing continuation launched)
 - Published continuation448f423, workflow24343bf and readiness564f7c6 to remote main.240 related helper tests pass; diff checks pass. No source, macro, info or official configuration changed.
 - Launched [37737970080](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37737970080) on564f7c6: source37533969613, bs-event-late, repaired checkpoint37736921949, no repeated hold repair or sizing. GitHub confirms in_progress. Fresh all-corner STA/50ps fast hold and saved antenna/provenance gates precede DRT.

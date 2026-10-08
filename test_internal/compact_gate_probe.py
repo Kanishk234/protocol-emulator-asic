@@ -3,6 +3,7 @@
 import re
 import json
 import os
+import hashlib
 from pathlib import Path
 from functools import lru_cache
 from itertools import product
@@ -33,10 +34,43 @@ def report_loaded_config(dut, words):
         frame = select.bit_length() - 1
         for y in range(rows):
             expected[column, y, frame] = words[offset + rows - y]
+    full = os.environ.get("WARP_COMPACT_FABRIC_CONE_JSON")
+    config_views = {}
+    if full:
+        graph = read_cone_json(full)
+        modules = graph["modules"]
+        macro = modules[os.environ["WARP_COMPACT_FABRIC_TOP"]]
+        provenance = graph.get("warp_native_input_provenance", {})
+        for cell in macro["cells"].values():
+            kind = cell["type"]
+            if kind in config_views:
+                continue
+            module = modules[kind]
+            proof = provenance.get(kind)
+            unloaded = set()
+            if proof:
+                raw = Path(proof["path"]).read_bytes()
+                text = raw.decode()
+                if hashlib.sha256(raw).hexdigest() != proof["sha256"]:
+                    raise ValueError("Configuration census input hash changed: " + kind)
+                unloaded = constant_x_config_aliases_without_loads(text)
+                if sorted(unloaded) != proof["unloaded_constant_x_config_aliases"]:
+                    raise ValueError("Configuration alias census changed: " + kind)
+            active, inactive = native_named_config_aliases(module, unloaded)
+            config_views[kind] = (active, inactive, native_config_bindings(module))
+    ignored_total = 0
     for tile in tiles:
         name = tile._name
         bits = [signal for signal in tile
                 if re.search(r"ConfigMem\.Inst_frame\d+_bit\d+\.Q$", signal._name)]
+        if full:
+            active, inactive, _ = config_views[macro["cells"][name]["type"]]
+            if {signal._name for signal in bits} - active - inactive:
+                raise ValueError("Exposed configuration aliases missing from matched native graph")
+            ignored_total += len(inactive)
+            dut._log.info("CONFIG CENSUS %s: %d live named aliases, %d unloaded constant-x aliases, %d actual latches",
+                          name, len(active), len(inactive), len(config_views[macro["cells"][name]["type"]][2]))
+            bits = [signal for signal in bits if signal._name in active]
         unknown = [signal._name for signal in bits
                    if any(c in str(signal.value).lower() for c in "xz")]
         dut._log.info("CONFIG %s: %d bits, %d unknown; first unknowns %s",
@@ -63,23 +97,20 @@ def report_loaded_config(dut, words):
             dut._log.info("PORT %s.%s = %s", name, port, signal.value)
     dut._log.info("CONFIG TOTAL: %d bits, %d unknown, %d image mismatches",
                   total_bits, total_unknown, total_mismatch)
-    if not total_bits:
+    if not total_bits and not full:
         raise RuntimeError("Mapped configuration audit found no storage bits")
     if total_unknown:
         raise AssertionError(f"{total_unknown} mapped configuration bits remain unknown")
     if total_mismatch:
         raise AssertionError(f"{total_mismatch} mapped configuration bits disagree with loaded image")
-    full = os.environ.get("WARP_COMPACT_FABRIC_CONE_JSON")
     if full:
-        modules = read_cone_json(full)["modules"]
-        macro = modules[os.environ["WARP_COMPACT_FABRIC_TOP"]]
         checked = unknown = mismatch = 0
         for instance, cell in macro["cells"].items():
             if not instance.startswith("Tile_X"):
                 continue
             x, y = map(int, re.match(r"Tile_X(\d+)Y(\d+)_", instance).groups())
             tile = fabric[instance]
-            for name, (frame, bit) in native_config_bindings(modules[cell["type"]]).items():
+            for name, (frame, bit) in config_views[cell["type"]][2].items():
                 signal = tile[name].Q
                 checked += 1
                 if not signal.value.is_resolvable:
@@ -89,8 +120,47 @@ def report_loaded_config(dut, words):
                     dut._log.error("CONFIG CELL MISMATCH %s.%s frame=%d bit=%d", instance, name, frame, bit)
         dut._log.info("CONFIG CELL TOTAL: %d actual latches, %d unknown, %d image mismatches",
                       checked, unknown, mismatch)
+        dut._log.info("CONFIG ALIAS TOTAL: %d removed constant-x aliases proven to have no cell loads",
+                      ignored_total)
         if not checked or unknown or mismatch:
             raise AssertionError("Complete native configuration-cell audit did not pass")
+
+
+def constant_x_config_aliases_without_loads(text):
+    """Prove a discarded alias has only its declaration and constant-X assignment.
+
+    JSON merges all literal X values, so raw escaped-name token references are
+    necessary to distinguish an unloaded alias from unrelated X-valued inputs.
+    Additional references conservatively prevent exclusion.
+    """
+    tokens = re.findall(r"\\[^\s]+", text)
+    aliases = set()
+    for alias in re.findall(r"(?m)^\s*assign\s+(\\\S+)\s+=\s+1'[hb]x\s*;", text):
+        if (re.search(r"ConfigMem\.Inst_frame\d+_bit\d+\.Q$", alias)
+                and tokens.count(alias) == 2
+                and re.search(r"(?m)^\s*wire\s+" + re.escape(alias) + r"\s+;", text)):
+            aliases.add(alias[1:])
+    return aliases
+
+
+def native_named_config_aliases(module, proven_unloaded=()):
+    """Classify names using actual latch-Q connectivity, not a '.Q' suffix."""
+    q_bits = {bit for cell in module["cells"].values() if cell["type"] == "sg13cmos5l_dlhq_1"
+              for bit in cell["connections"]["Q"]}
+    active, inactive = set(), set()
+    for name, net in module["netnames"].items():
+        if not re.search(r"ConfigMem\.Inst_frame\d+_bit\d+\.Q$", name):
+            continue
+        if len(net["bits"]) != 1:
+            raise ValueError("Configuration alias is not scalar")
+        bit = net["bits"][0]
+        if bit in q_bits:
+            active.add(name)
+        elif bit == "x" and name in proven_unloaded:
+            inactive.add(name)
+        else:
+            raise ValueError("Configuration alias has no verified latch/unloaded binding: " + name)
+    return active, inactive
 
 
 def native_config_bindings(module):
@@ -99,6 +169,10 @@ def native_config_bindings(module):
     drivers = {bit: cell for cell in module["cells"].values()
                for port, direction in cell["port_directions"].items() if direction == "output"
                for bit in cell["connections"][port]}
+    for cell in module["cells"].values():
+        if cell["type"] == "sg13cmos5l_dlhq_1" and any(
+                len(cell["connections"][port]) != 1 for port in ("D", "GATE", "Q")):
+            raise ValueError("Configuration latch ports must be scalar")
 
     def source(bit, port):
         visited = set()

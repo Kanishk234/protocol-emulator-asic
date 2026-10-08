@@ -149,6 +149,38 @@ def main():
             entry = {"tile_sha256": final, "changed_tiles": changed, "cases": {}}
             result["stages"][stage] = entry
             save()
+            stage_out = OUT / stage
+            stage_out.mkdir()
+            cone = stage_out / "matched_native_cone.json"
+            top = next((work / "macro/nl").glob("*.nl.v")).stem.removesuffix(".nl")
+            macro_netlist = work / "macro/nl" / (top + ".nl.v")
+            liberty = Path(os.environ["PDK_ROOT"]) / (
+                "ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib")
+            with (stage_out / "matched_native_cone.log").open("w") as log:
+                try:
+                    parsed = subprocess.run(["yosys", "-Q", "-T", "-p",
+                        f"read_liberty -lib {liberty}; read_verilog {' '.join(map(str, tiles.values()))} {macro_netlist}; "
+                        f"hierarchy -check -top {top}; write_json {cone}"],
+                        stdout=log, stderr=subprocess.STDOUT, timeout=120)
+                    cone_failed = bool(parsed.returncode)
+                except subprocess.TimeoutExpired:
+                    cone_failed = True
+            if cone_failed:
+                entry["cone_error"] = "matched native parsing failed"
+                entry["cases"] = {name: {"passed": False, "setup_error": entry["cone_error"]}
+                                  for name in ("native_loaded", "native_user_reset")}
+                save()
+                continue
+            from compact_gate_probe import constant_x_config_aliases_without_loads
+            graph = json.loads(cone.read_text())
+            graph["warp_native_input_provenance"] = {
+                name.removesuffix(".nl.v"): {"path": str(path), "sha256": sha(path),
+                    "unloaded_constant_x_config_aliases": sorted(
+                        constant_x_config_aliases_without_loads(path.read_text()))}
+                for name, path in tiles.items()}
+            cone.write_text(json.dumps(graph) + "\n")
+            entry["matched_cone_sha256"] = sha(cone)
+            stage_env = dict(env, WARP_COMPACT_FABRIC_CONE_JSON=str(cone), WARP_COMPACT_FABRIC_TOP=top)
             for case, extra in (("native_loaded", []), ("native_user_reset", ["--reset-probe"])):
                 destination = OUT / stage / case
                 destination.mkdir(parents=True)
@@ -163,7 +195,7 @@ def main():
                 try:
                     with (destination / "runner.log").open("w") as log:
                         proc = subprocess.Popen(args, stdout=log, stderr=subprocess.STDOUT,
-                                                env=env, start_new_session=True)
+                                                env=stage_env, start_new_session=True)
                         try:
                             record["exit_code"] = proc.wait(timeout=300)
                         except subprocess.TimeoutExpired:

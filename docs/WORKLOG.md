@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (NOR2 source antenna-view guard corrected)
+- Screen37730917594 fails guard after successfulNOR2swap/legalization/zerooverflowGRT, beforeSTA. Artifact11529811539 independently shows92existingantennanp cells materialized innewNL,0removedcells andexactly1intendedmasterchange. No timingverdict inferred; BUG77logged.
+- Fix exports actualsourceODB baselineNL beforemutation; validates inheriteddifference exactly92antennacells/unchangedlogic, thenstrictone-master-onlyECO comparison.234helpers pass; realartifactregression and Bash/diffchecks pass. Localcontinuation updated butexcludedfrompublication.
+- Proceeding with necessarycorrective tools/docs publication andscreenrelaunch withinapprovedrepair-only scope. NoDRT/mainhardware/configchange orphase tick. Next: actualcorrectedGRT/antenna/allcornerSTA results.
+
+## 2026-10-08: Codex (NOR2 measurement active; continuation prepared locally)
+- Screen37730917594 passes setup/artifactdownload/imagebuild/wrappersmoke and is measuring guardedresize/GRT/antennas/STA. No physicalpass inferred yet. Latestmainlintgreen; test/docs/unit stillrunning atcheck.
+- Prepared local event_nor2_route.py and18gate/provenance tests. Full34NOR2helpertests pass. Continuation requires exactsuccessfulscreen, identity/one-cellnetlist/zerooverflow/antenna gates, freshallcornerSTA and50psfastbudget; ordinaryimage preventsrepeatresize. It preserves originalsourceevidence and refuses existingDRToutput.
+- No routeworkflowintegration, publication, dispatch, mainhardware/configchanges orphase ticks. Newcontinuationfiles deliberatelyremainlocal pending measuredscreenresult. Next: inspectactualscreenartifact; ifqualified, integrate/publishreviewedcontinuation androute/extract/GL, thencleanofficialreproduction.
+
 ## 2026-10-08: Codex (approved one-cell repair publication)
 - Published3591a5f tools,f8bfd01 workflow,631fab1 evidence to remote main. Repair-only [37730917594](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37730917594) is in progress on631fab1a6ba913d912590ebdb347ce8fe6548585; noDRT.
 - User explicitly approves separate tools/workflow/report commits, remote main push and repair-only launch. Tools3591a5f and workflowf8bfd01 committed; FIPE and oldSRAMprototypes excluded.

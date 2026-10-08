@@ -29,7 +29,11 @@ These probes reuse original extracted wires. They include changed Liberty loadin
 
 ## Repair-only workflow prepared (2026-10-08)
 
+First run37730917594 fails before STA, despite successful replacement/legalization/zero-overflow GRT: inherited source NL omits92 existing antenna cells from its ODB. Artifact11529811539 independently has92added `sg13cmos5l_antennanp` cells, no removed cells, and only the intended NOR2 master change. BUG77 records the guard correction: export actual pre-ECO ODB netlist, validate exactly the known92 antenna cells relative to inherited NL, then compare fresh physical before/after strictly.234 helper tests pass; corrected physical measurement remains required. No timing verdict follows from this run.
+
 Published tools3591a5f/workflowf8bfd01/reports631fab1 under explicit user approval. Repair-only [37730917594](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37730917594) is running on631fab1. Physical result remains pending; preparation statements below describe the launch contract.
+
+Latest check: setup, artifact download, image build and wrapper smoke pass; actual physical measurements are active. Prepared local `event_nor2_route.py` with18 provenance/gate tests (34 NOR2 helper tests total pass). It requires exact successful screen37730917594, zero overflow/antennas, matching one-cell netlist/source identity and fresh nonnegative all-corner timing with50ps fast-hold margin before DRT. It uses the ordinary image without repeating the ECO and preserves the existing source evidence. This continuation is not integrated into the route workflow, published or launched; measured screen results remain prerequisite.
 
 Local `gds-event-nor2-screen.yaml` accepts only successful main route37574267994 and original source37533969613/event-late. Trusted source fingerprints are reconstructed before downloading the artifact. Independently audited artifact11464617506: pre-route state and all five checkpoint views exist, cell/master/connections match the proposed repair, and exact one-cell netlist comparison passes. The checkpoint netlist SHA256 is `83e58066e2482c3db647c04b2004b94c74b30f206e4bbce1eacbfdca7f92da07`.
 

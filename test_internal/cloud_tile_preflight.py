@@ -110,6 +110,7 @@ def inner():
         # OpenDB bindings live in OpenROAD's embedded interpreter, rather than
         # the container's ordinary Python. A native read-only Tcl observer
         # keeps that API boundary explicit and retains every signal rectangle.
+        path = Path(str(path))
         observer = OUT / "observe_pins.tcl"
         observer.write_text(PIN_OBSERVER)
         log = OUT / (path.parent.name + "_pins.log")
@@ -147,7 +148,13 @@ def inner():
                 subprocess.run(["yosys", "-Q", "-T", "-p",
                     f"read_liberty -lib {liberty}; read_verilog {nl}; hierarchy -check -top {TOP}; write_json {header}"],
                     stdout=log, stderr=subprocess.STDOUT, check=True, timeout=120)
-            ports = json.loads(header.read_text())["modules"][TOP]["ports"]
+            header_graph = json.loads(header.read_text())
+            # A JSON header contains the design module, not the imported
+            # Liberty modules (which the power adapter would mistake for
+            # hierarchical macros). This preserves all actual top metadata.
+            header_graph["modules"] = {TOP: header_graph["modules"][TOP]}
+            header.write_text(json.dumps(header_graph) + "\n")
+            ports = header_graph["modules"][TOP]["ports"]
             headers.append({port: (v["direction"], len(v["bits"])) for port, v in ports.items()})
             if len(headers) == 2 and headers[0] != headers[1]:
                 raise ValueError("Candidate top-level ports differ from original")

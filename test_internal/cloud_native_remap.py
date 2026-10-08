@@ -28,6 +28,30 @@ def state_inventory(module):
     return {name: cell for name, cell in module["cells"].items() if cell["type"] in STATE_TYPES}
 
 
+def storage_pin_aliases(module):
+    """Keep one original wire name per live storage-pin bit for exact auditing.
+
+    Constant folding may eliminate a tie-cell net without changing its value.
+    Retaining its name preserves the original connection evidence; it neither
+    changes logic nor supplies a value to any configuration or user-state pin.
+    """
+    aliases = {}
+    for name, net in module["netnames"].items():
+        for bit in net["bits"]:
+            if isinstance(bit, int): aliases.setdefault(bit, []).append(name)
+    names = set()
+    for cell in state_inventory(module).values():
+        for bits in cell["connections"].values():
+            for bit in bits:
+                if isinstance(bit, int):
+                    if bit not in aliases: raise ValueError("storage pin has no original named net")
+                    name = min(aliases[bit], key=lambda item: (len(item), item))
+                    if any(token in name for token in ("*", "?", "[", "]", " ")):
+                        raise ValueError("unsupported literal storage-wire selection: " + name)
+                    names.add(name)
+    return sorted(names)
+
+
 def verify_storage(original, candidate):
     """Require exact instance/type/ports, resolving connectivity by retained names."""
     old, new = state_inventory(original), state_inventory(candidate)
@@ -130,6 +154,8 @@ def main():
         candidate = OUT / (C2 + ".remapped.nl.v")
         yosys("original_connectivity", f"read_liberty -lib {liberty}; read_verilog {source}; hierarchy -check -top {C2}; write_json {before_json}")
         old = json.loads(before_json.read_text())["modules"][C2]
+        retained_aliases = storage_pin_aliases(old)
+        result["retained_storage_pin_aliases"] = retained_aliases
         # Read actual Liberty functions, blackbox only storage, and flatten only
         # combinational logic. No sequential synthesis/reset/config transformation.
         yosys("remap", "\n".join([
@@ -137,6 +163,7 @@ def main():
             "blackbox sg13cmos5l_dlhq_1 sg13cmos5l_dfrbpq_1",
             f"read_verilog {source}", f"hierarchy -check -top {C2}",
             f"setattr -set keep 1 {C2}/t:sg13cmos5l_dlhq_1 {C2}/t:sg13cmos5l_dfrbpq_1",
+            "setattr -set keep 1 " + " ".join(C2 + "/w:" + name for name in retained_aliases),
             "flatten -wb", "techmap", "opt", f"abc -liberty {liberty}",
             # Flatten discarded the combinational cell declarations. ABC adds
             # mapped instances but does not reload their port directions. Restore

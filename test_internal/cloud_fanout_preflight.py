@@ -64,6 +64,18 @@ def transform(value, function):
     return function(value) if isinstance(value, str) else value
 
 
+def macro_contract(macros):
+    """Canonicalize only 3.1's newly serialized default Instance.array=None.
+
+    Every view/path, location, orientation and non-null array remains strict.
+    """
+    canonical = json.loads(json.dumps(macros))
+    for macro in canonical.values():
+        for instance in macro.get("instances", {}).values():
+            instance.setdefault("array", None)
+    return canonical
+
+
 def prepare():
     import shutil
     bundle = ROOT / "build/fanout_preflight_source"
@@ -248,7 +260,9 @@ def run(archive, expected):
             # the actual step configuration, not only our input JSON.
             if resolved.get("CELL_LIBS") != source_config["LIB"]:
                 raise RuntimeError("Resolved CTS changed original Liberty corner maps")
-            for key in ("MACROS", "CLOCK_PORT", "CLOCK_PERIOD",
+            if macro_contract(resolved.get("MACROS", {})) != macro_contract(source_config["MACROS"]):
+                raise RuntimeError("Resolved CTS changed macro views or placement contract")
+            for key in ("CLOCK_PORT", "CLOCK_PERIOD",
                     "CLOCK_UNCERTAINTY_CONSTRAINT", "CLOCK_TRANSITION_CONSTRAINT",
                     "FALLBACK_SDC", "PNR_SDC_FILE", "MAX_FANOUT_CONSTRAINT"):
                 if resolved.get(key) != source_config.get(key):

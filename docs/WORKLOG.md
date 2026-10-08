@@ -48,6 +48,15 @@ timed out on one status query; allowed single retry succeeds, no bypass.
 Prepared small hash-bound historical C2 synthesis input with Apache license/
 attribution for native stage isolation; agent prepares separate cloud probe.
 
+**Next independent diagnostic reviewed:** D-058 C2 stage script/workflow ready;
+authenticated five passing NLs/control XML and exact synthesis/finalC2 hashes,
+safe licensed input archive uploaded to existing experimental release. Three
+fresh copied workdirs, onlyC2 substitution, six real-loaded stress/reset cases;
+all outcomes retained, every failure remains nonzero. AST/YAML/bash syntax,
+safe extraction/SHA and XML failure controls pass locally, no local EDA.
+Corrected driver37708459393 and latest regressions active; no cancellation
+or push touching frozen hardware. Two agents finished their bounded tasks.
+
 ## 2026-10-07 (session66: access restored; same-layout physical closure)
 **Done:** user requested continued work and explanation of the review limit.
 Fresh authorized GitHub retry succeeds; no bypass used. Downloaded successful

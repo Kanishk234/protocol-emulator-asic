@@ -1,6 +1,20 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-07). Evidence and software improvements are grouped into authorized commits; hosted validation is being launched. The README flow and all local checks passed from a source export and fresh venv on the development machine; the phase checklist still asks for a clean machine or container. Separate checkpoint experiments do not close that requirement.
+**Status:** in progress (updated 2026-10-07). Clean README reproduction now
+passes on a fresh hosted runner37690896748: rebuilt bitstreams, loaded30/30
+and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
+checklist item is complete; numerical evidence audit and all-required-CI gates
+remain open. This is a separate reproducibility result from checkpoint experiments.
+
+The compact scratch layout now passes same-layout native routing, full
+Magic/KLayout and shell LVS (37669731197/37674839060). Shell setup/hold pass,
+but slew9/fanout33 and native/configured-fabric qualification remain open.
+The stronger driver's legal placement passes37689324316; its first route
+37690243797 fails on stale moved-pin wires, and corrected37708459393 is
+active. Separate C2 synthesis/final loaded diagnostics target the native
+failure before new tile hardening. Frozen G1 remains the fallback. See
+[current physical evidence](../reports/compact_clean_layout_20261007.md) and
+[fanout/native plan](../reports/compact_fanout_native_next_20261007.md).
 
 Compact37516794406 now reaches zero native router/antenna violations, but later
 physical checks fail. All248 KLayout markers associate with inserted decaps;
@@ -92,7 +106,7 @@ timing still prevent promotion. Frozen G1 remains the fallback. New48-case
 loaded UART phase/read-delay stress passes37671919707. See
 docs/reports/compact_clean_layout_20261007.md for the exact remaining gates.
 
-- Repeat in a clean machine or container to satisfy the checklist literally.
+- Clean README reproduction is complete (37690896748); missing historic routed-tile timing artifacts remain a separate gap.
 - Finish the numerical-source audit in `docs/EVIDENCE.md` and run CI for the new verification and documentation changes.
 - Tick the remaining Phase 5 exit items only after that evidence exists.
 

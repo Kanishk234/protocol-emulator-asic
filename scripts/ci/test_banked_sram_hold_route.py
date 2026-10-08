@@ -76,5 +76,5 @@ def test_route_workflow_downloads_repair_artifact_without_repeating_headroom():
     assert len(downloads) == 2
     assert downloads[0]['if'] == "inputs.repaired_source_run_id == ''"
     assert downloads[1]['if'] == "inputs.repaired_source_run_id != ''"
-    assert downloads[1]['with']['name'] == "${{ inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37806209914' && 'gds-drop-leaf-hold' || inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}"
+    assert downloads[1]['with']['name'] == "${{ inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37818177484' && 'gds-drop-driver' || inputs.source_variant == 'bs-event-late' && inputs.repaired_source_run_id == '37806209914' && 'gds-drop-leaf-hold' || inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}"
     assert any('placement-repaired-run.json' in s.get('run', '') for s in steps)

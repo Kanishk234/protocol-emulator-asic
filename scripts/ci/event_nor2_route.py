@@ -13,11 +13,13 @@ from route_source import validate_identity
 
 SCREEN_RUN = 37736921949
 HOLD_SCREEN_RUN = 37806209914
+DRIVER_SCREEN_RUN = 37818177484
 
 
 def validate_run(run, selected):
     sources = {SCREEN_RUN: ('nor2', 'gds-event-nor2-screen'),
-               HOLD_SCREEN_RUN: ('hold', 'gds-drop-leaf-hold-screen')}
+               HOLD_SCREEN_RUN: ('hold', 'gds-drop-leaf-hold-screen'),
+               DRIVER_SCREEN_RUN: ('driver', 'gds-drop-driver-screen')}
     if int(selected) not in sources:
         raise ValueError('Unqualified NOR2 screen provenance')
     profile, workflow = sources[int(selected)]
@@ -52,9 +54,28 @@ def validate_hold_history(gates):
         raise ValueError('Unreviewed hold checkpoint history or margin policy')
 
 
-def validate_repair_chain(root, state, held=False):
+def validate_driver_history(gates):
+    if (gates.get('eco_profile') != 'drop-driver'
+            or gates.get('source_screen') != HOLD_SCREEN_RUN
+            or gates.get('minimum_fast_hold_ns') != 0.05
+            or gates.get('fast_hold_margin_pass') is not True):
+        raise ValueError('Unreviewed driver checkpoint history or margin policy')
+
+
+def validate_repair_chain(root, state, held=False, driver=False):
     """Audit every netlist transition; never trust a final netlist in isolation."""
-    if held:
+    if driver:
+        prior_root = Path('runs/drop-hold')
+        prior = json.loads((prior_root / 'antenna/3-openroad-checkantennas-1/eco_state.json').read_text())
+        validate_repair_chain(prior_root, prior, held=True)
+        baseline = root / 'grt/1-openroad-globalrouting/tt_um_tripwire.baseline.nl.v'
+        if logical_cells(Path(prior['nl']).read_text()) != logical_cells(baseline.read_text()):
+            raise ValueError('Driver source snapshot mismatch')
+        from event_nor2_screen import validate_driver_netlist
+        changed = root / 'grt/1-openroad-globalrouting/tt_um_tripwire.eco.nl.v'
+        validate_driver_netlist(baseline.read_text(), changed.read_text())
+        validate_antenna_only_changes(changed.read_text(), Path(state['nl']).read_text())
+    elif held:
         prior_root = Path('runs/event-nor2')
         prior = json.loads((prior_root / 'antenna/3-openroad-checkantennas-1/eco_state.json').read_text())
         validate_repair_chain(prior_root, prior)
@@ -91,7 +112,8 @@ def main():
     profile = validate_run(json.loads(Path('/tmp/placement-repaired-run.json').read_text()),
                            os.environ['REPAIRED_SOURCE_RUN_ID'])
     held = profile == 'hold'
-    root = Path('runs/drop-hold' if held else 'runs/event-nor2')
+    driver = profile == 'driver'
+    root = Path('runs/drop-driver' if driver else 'runs/drop-hold' if held else 'runs/event-nor2')
     source = root / 'antenna/3-openroad-checkantennas-1/eco_state.json'
     antenna = json.loads(source.with_name('or_metrics_out.json').read_text())
     timing = json.loads((root / 'timing/comparison.json').read_text())
@@ -101,6 +123,8 @@ def main():
     validate_gate(gates, timing, antenna, source)
     if held:
         validate_hold_history(gates)
+    if driver:
+        validate_driver_history(gates)
     validate_overflow((root / 'grt/1-openroad-globalrouting/openroad-globalrouting.log').read_text())
     validate_antenna_overflow((root / 'antenna/2-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log').read_text())
     state = json.loads(source.read_text())
@@ -109,7 +133,7 @@ def main():
             raise ValueError(f'Missing NOR2 checkpoint {key}')
     if any(state.get(k) is not None for k in ('spef', 'sdf', 'lib')):
         raise ValueError('Stale repaired checkpoint views')
-    validate_repair_chain(root, state, held=held)
+    validate_repair_chain(root, state, held=held, driver=driver)
     identity = validate_identity(json.loads((root / 'source_identity.json').read_text()), Path.cwd(), VARIANT)
     expected = validate_identity(json.loads(Path('/tmp/placement-source-identity.json').read_text()), Path.cwd(), VARIANT)
     if identity != expected or identity['source_run_id'] != SOURCE_RUN:
@@ -124,7 +148,7 @@ def main():
         raise ValueError('NOR2 routing clock/constraints/config changed')
     # Ordinary image: all reviewed repairs are already present and must not repeat.
     os.environ['LIBRELANE_IMAGE_OVERRIDE'] = 'tripwire-hotspot:local'
-    sta_root = out / ('hold-leaves-sta' if held else 'event-nor2-sta')
+    sta_root = out / ('drop-driver-sta' if driver else 'hold-leaves-sta' if held else 'event-nor2-sta')
     screen(config_path, source, sta_root, os.environ['PDK_ROOT'],
            repaired=source, sdc=Path('src/signoff.sdc'))
     fresh = json.loads((sta_root / 'comparison.json').read_text())
@@ -132,7 +156,8 @@ def main():
     (out / 'gates.json').write_text(json.dumps({'state': str(source),
         'timing_and_antenna_pass': ready,
         'nor2_screen_run': SCREEN_RUN,
-        **({'hold_screen_run': HOLD_SCREEN_RUN} if held else {})}, indent=2) + '\n')
+        **({'hold_screen_run': HOLD_SCREEN_RUN} if held or driver else {}),
+        **({'driver_screen_run': DRIVER_SCREEN_RUN} if driver else {})}, indent=2) + '\n')
     if not ready:
         raise ValueError('Fresh NOR2 timing fails; DRT refused')
     base.update(PNR_CORNERS=list(CORNERS), RSZ_CORNERS=list(CORNERS), OPENROAD_THREADS=4,

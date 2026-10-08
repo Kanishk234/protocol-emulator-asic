@@ -1,0 +1,52 @@
+name: compact pre-CTS fanout preflight
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_fanout_preflight.py'
+      - '.github/workflows/fanout_preflight.yaml'
+  workflow_dispatch:
+    inputs:
+      source_release:
+        description: Release containing authenticated fanout-preflight-source.tar.gz
+        required: true
+        type: string
+      source_sha256:
+        description: Full archive SHA256 from cloud_fanout_preflight.py prepare
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: warp-fanout-preflight-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+      WARP_SOURCE_RELEASE: ${{ inputs.source_release || 'compact-checkpoint-20261006-iter8' }}
+      WARP_SOURCE_SHA256: ${{ inputs.source_sha256 || 'd32c6375fffb932ce77cce3da5df82dc3477c78e8ba7feed222fa10fb87db112' }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned tools and authenticated original pre-CTS inputs
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download "$WARP_SOURCE_RELEASE" -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+      - name: Bounded baseline and cluster-eight CTS with estimated STA
+        timeout-minutes: 32
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_fanout_preflight.py run --archive build/fanout-preflight-source.tar.gz --sha256 "$WARP_SOURCE_SHA256"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-fanout-preflight-${{ github.run_id }}
+          path: build/fanout_preflight/
+          retention-days: 3

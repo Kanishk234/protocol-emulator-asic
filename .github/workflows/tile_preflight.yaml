@@ -1,0 +1,40 @@
+name: matched native C2 floorplan preflight
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_tile_preflight.py'
+      - '.github/workflows/tile_preflight.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-tile-preflight-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Project venv and authenticated physical inputs
+        timeout-minutes: 10
+        run: |
+          python3 -m venv .venv
+          bash spikes/cloud/fetch_pdk.sh
+          timeout 120s gh release download compact-checkpoint-20261006-iter8 \
+            --repo "$GITHUB_REPOSITORY" --pattern tile-preflight-c2.tar.gz --dir build
+      - name: Exact mapped import and two signal-pin comparisons
+        timeout-minutes: 12
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_tile_preflight.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: matched-tile-preflight-${{ github.run_id }}
+          path: build/tile_preflight/
+          retention-days: 3

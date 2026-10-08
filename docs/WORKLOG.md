@@ -34,6 +34,20 @@ build cache or local EDA. AST/YAML/README lookup/XML negative controls pass
 locally. Native audit recommends stage isolation with passing original-control
 mapping before paying for new tile hardening; no unsupported mux-only claim.
 
+**Independent gate passed:** clean README37690896748 on962da93 succeeds.
+Downloaded result/command provenance and all XMLs: all stages0, loaded30/30
+no skips and cosim1/1, default idle17/default UART1 documented skips only.
+Tool/package/README/source checks pass. Ticked Phase5 clean reproduction task
+and exit item with this evidence; remaining phase items stay unchecked.
+Main ECO37690243797 fails native DRT-0206 on moved-input net u_cfg._17_ after
+source22/bootstrap27. BUG46: stale pin escapes. Prepared exact affected-signal
+wire ripup before incremental routing; PG rails/other routing and all logical
+topology preserved, final connectivity gate unchanged. Primary pinned API
+verified; Tcl completeness/whitespace checks pass. Automatic approval review
+timed out on one status query; allowed single retry succeeds, no bypass.
+Prepared small hash-bound historical C2 synthesis input with Apache license/
+attribution for native stage isolation; agent prepares separate cloud probe.
+
 ## 2026-10-07 (session66: access restored; same-layout physical closure)
 **Done:** user requested continued work and explanation of the review limit.
 Fresh authorized GitHub retry succeeds; no bypass used. Downloaded successful

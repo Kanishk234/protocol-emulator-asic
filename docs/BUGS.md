@@ -1,5 +1,12 @@
 # Bugs
 
+## 46: Moved ECO pins retain stale routed signal-net connections
+- **Date:**2026-10-07.
+- **Symptom/check:**37690243797 legal driver ECO starts22 native markers, bootstrap27, then first late pass fails DRT-0206 checkConnectivity on u_cfg._17_ (driver u_cfg._53_/Y). No routed or timing acceptance.
+- **Root cause:** legal cell moves invalidate existing pin escapes. Reusing those partially stale complete-net wires as an incremental input leaves a pin unvisited; the native connectivity gate correctly rejects it. The failed net connects the moved driver's input, so it belongs to the intended affected signal set.
+- **Fix/coverage:** remove complete ordinary signal wires only for nets touching the exact three moved cells before routing; preserve all power rails, other routing and logical/port connectivity. Require exact moved-cell inventory, unchanged topology after ripup and after routing, fresh native0 and stock antenna/critical-connectivity checks. Retain ripped-net names and failure evidence. Corrected cloud result pending; no check waiver.
+- **Primary API:** pinned OpenDB dbWire::destroy removes wire geometry rather than logical dbNet/ITerms; [pinned header](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/include/odb/db.h). Runtime checks required Tcl binding before mutation.
+
 ## 45: Placement preflight misreads a void successful checker return
 - **Date:**2026-10-07.
 - **Symptom/check:**37688867787 fails before resizing with custom "Source placement is not legal", without native placement violations.

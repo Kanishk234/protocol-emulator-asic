@@ -81,3 +81,14 @@ This targets the open README reproduction gate; it does not replace physical
 checks, SDF/native mapping evidence or every CI parameter variant. No checklist
 box is ticked until an actual successful run is inspected. Missing historic
 G1 tile parasitics remain a separate unresolved timing reproduction gap.
+
+**Verified run37690896748, commit962da93:** result.passed true; all seven
+command stages return0. fetch26.16s/check_all118.61s/rebuild7.13s/UART compile
+0.61s/audit0.06s/loaded533.13s/cosim14.59s. Downloaded XML verifies loaded
+30/30 and cosim1/1 with no failure/error/skip. Default idle suite30 cases has
+17 deliberate skips; default protocol UART8 cases has1 parameter-specific
+skip; these are explicitly separate from the no-skip loaded/cosim suites.
+White-box2/2, UVM1/1 and all default protocol XMLs also inspected. Tool/package
+version, README command/hash and unchanged tracked-source checks passed.
+This closes the README reproduction checklist item, not historic routed-tile
+timing recovery, native/SDF signoff or the entire phase's remaining gates.

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Prepared extraction/STA diagnostic; requires an actual completed clean route."""
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -11,6 +12,20 @@ STEPS = ["Odb.RemoveRoutingObstructions", "OpenROAD.CheckAntennas", "Checker.TrD
          "Odb.ReportDisconnectedPins", "Checker.DisconnectedPins", "Odb.ReportWireLength",
          "Checker.WireLength", "OpenROAD.FillInsertion", "Odb.CellFrequencyTables",
          "OpenROAD.RCX", "OpenROAD.STAPostPNR"]
+
+
+def preserve_signoff_constraints(source, output):
+    """Export the exact STA input separately from inherited PnR state views."""
+    data = source.read_bytes()
+    saved = output / 'effective-signoff.sdc'
+    saved.write_bytes(data)
+    (output / 'constraint_identity.json').write_text(json.dumps({
+        'sta_constraint_file': str(saved.resolve()),
+        'source_constraint_file': str(source.resolve()),
+        'sha256': hashlib.sha256(data).hexdigest(),
+        'inherited_state_sdc_is_signoff_evidence': False,
+    }, indent=2) + '\n')
+    return saved.resolve()
 
 
 def route_checkpoint(root):
@@ -35,10 +50,11 @@ def main(route_root=Path("runs/repaired-route/drt")):
                   OPENROAD_THREADS=4, STA_THREADS=3,
                   SIGNOFF_SDC_FILE=str(Path("src/signoff.sdc").resolve()))
     config["STA_CORNERS"] = ["nom_fast_1p32V_m40C", "nom_slow_1p08V_125C", "nom_typ_1p20V_25C"]
-    path = Path("src/config_extracted_timing.json")
-    path.write_text(json.dumps(config, indent=2) + "\n")
     output = Path("runs/extracted-timing")
     output.mkdir(parents=True, exist_ok=False)
+    config['SIGNOFF_SDC_FILE'] = str(preserve_signoff_constraints(Path('src/signoff.sdc'), output))
+    path = Path("src/config_extracted_timing.json")
+    path.write_text(json.dumps(config, indent=2) + "\n")
     subprocess.run([sys.executable, "-m", "librelane", "--pdk-root", os.environ["PDK_ROOT"],
                     "--docker-no-tty", "--dockerized", "--pdk", "ihp-sg13cmos5l",
                     "--manual-pdk", "--run-tag", "extracted-timing", "--force-run-dir", str(output),

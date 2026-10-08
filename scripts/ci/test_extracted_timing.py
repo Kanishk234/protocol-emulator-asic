@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent))
-from extracted_timing import route_checkpoint
+from extracted_timing import route_checkpoint, preserve_signoff_constraints
 
 
 def test_timeout_is_not_a_route_checkpoint(tmp_path):
@@ -34,3 +34,22 @@ def test_completed_clean_route_files_are_required(tmp_path):
     saved.unlink()
     with pytest.raises(ValueError, match="Missing final route"):
         route_checkpoint(tmp_path)
+
+
+def test_effective_constraints_survive_source_removal_and_differ_from_inherited(tmp_path):
+    import hashlib
+    source = tmp_path / 'signoff.sdc'
+    source.write_bytes(b'create_clock -period 20 [get_ports clk]\n# Live config paths timed\n')
+    output = tmp_path / 'evidence'
+    output.mkdir()
+    inherited = output / 'inherited.sdc'
+    inherited.write_text('set_false_path -setup -to [get_pins config/D]\n')
+    original = source.read_bytes()
+    saved = preserve_signoff_constraints(source, output)
+    source.unlink()
+    assert saved.read_bytes() == original
+    assert saved.read_bytes() != inherited.read_bytes()
+    identity = json.loads((output / 'constraint_identity.json').read_text())
+    assert identity['sha256'] == hashlib.sha256(original).hexdigest()
+    assert identity['sta_constraint_file'] == str(saved)
+    assert identity['inherited_state_sdc_is_signoff_evidence'] is False

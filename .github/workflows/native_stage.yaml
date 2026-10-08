@@ -1,0 +1,52 @@
+name: native C2 synthesis-stage diagnostic
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_native_stage.py'
+      - '.github/workflows/native_stage.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-native-stage-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Standard tools and project simulation venv
+        run: |
+          sudo apt-get update && sudo apt-get install -y iverilog yosys python3-venv
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install -r test/requirements.txt pyyaml==6.0.3
+      - name: Fetch pinned checkpoint, PDK, passing control and original synthesis
+        timeout-minutes: 10
+        run: |
+          bash spikes/cloud/fetch_checkpoint.sh
+          bash spikes/cloud/fetch_pdk.sh
+          mkdir -p "$HOME/.cache/warp/iverilog-13" build/native_stage_input/passing_control
+          curl -sfL -o build/iverilog13.deb https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb
+          dpkg-deb -x build/iverilog13.deb "$HOME/.cache/warp/iverilog-13"
+          timeout 120s gh run download 37659171115 --repo "$GITHUB_REPOSITORY" \
+            --name native-lut-variant-37659171115 --dir build/native_stage_input/passing_control
+          timeout 120s gh release download compact-checkpoint-20261006-iter8 --repo "$GITHUB_REPOSITORY" \
+            --pattern native-stage-c2.tar.gz --dir build/native_stage_input
+      - name: Six real-loaded native cases, continuing after semantic failures
+        timeout-minutes: 35
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_native_stage.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-stage-${{ github.run_id }}
+          path: build/native_stage_evidence/
+          retention-days: 3

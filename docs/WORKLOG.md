@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (driver repair qualifies; detailed routing continues)
+- Driver37818177484 succeeds: all-corner setup WS0/zero timing violations, fast hold+0.0717144ns/slow+0.336162ns/typ+0.168788ns, antennas0/0. Gate remains50ps; positive fixed-wire gains are not declared extracted closure.
+- Launched guarded DRT37819598187 on97e6f84 from exact successful driver screen; original37533969613/bs-event-late, no repeated sizing or hold repair. In_progress at confirmation. Native mapping37819169130 AREA0/AREA1 jobs are independently running through stock GRT/STA; routedGL37815131566 still active.
+- In-progress Phase2 summary refreshed with rejected banked/extracted regressions and current driver/native work. All394 selected helper checks execute/pass; diff checks pass. No phase ticks, no main hardware/config/template edits.
+- Next: inspect DRT/extraction/GL and native full-chip area/overflow/all-corner measurements, then select clean official-flow reproduction based on actual results. Original−0.179789ns remains best extracted setup baseline.
+
+## 2026-10-08: Codex (native full-design comparison running; all helper checks execute)
+- Published3156476 conditional driver continuation,d78fc03 native helper,3440eb4 workflows and97e6f84 evidence to remote main. Launched stock-image native mapping37819169130: matched AREA0/AREA1 full2/4 event-late, no regional wrapper or checkpoint ECO. Main RTL/config and official jobs unchanged.
+- AREA1 local module40393.6092→40144.3938µm² and13.142539→12.479320ns targeted ideal-wire delay supports this comparison; no full-chip gain claimed. D-080 records scope/cost/adoption limits.
+-394 related tests pass with zero skips using an isolated argument-preserving cached-STA Tcl shim; no system packages installed. Driver37818177484 measurement step succeeds, upload active; routedGL37815131566 still running. No phase ticks.
+- Next: verify completed driver gates/metrics, launch prepared DRT if qualified, inspect native all-corner/area/overflow comparison and protocol GL. Continue toward extracted and official closure without changing the timing contract.
+
 ## 2026-10-08: Codex (driver screen launched; clean-build mapping explored)
 - Published99c69d7 driver guards,9ef5d1c effective-constraint evidence,663b341 workflow andccddb80 research to remote main. Launched37818177484 with antenna repair; provenance passes and pinned image builds at check. RoutedGL37815131566 remains active.
 - Prepared local exact-driver-screen DRT continuation;83 continuation tests pass. It rejects unsuccessful/incomplete source and audits every prior repair plus fresh STA; no DRT launched from pending screen.

@@ -6,6 +6,7 @@ Newest entry at the top. One entry per work session.
 - Raw logs are not committed; link to them instead.
 
 ## 2026-10-08: Codex (extracted dropped-event bottleneck isolated)
+- Published a12aeb5 tools,4bc3fd3 workflow,5b13ebe evidence to remote main.263 helper tests pass. Dispatched [37803300460](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37803300460), queued at confirmation; one31567 NOR2 change, antenna repair enabled, no DRT.
 - Downloaded extracted artifact11535321738 from37743628998.9 printed negative slow paths terminate at dropped counters;31567 NOR2 delay2.300487ns dominates the worst branch. Prior RX timer is no longer worst.
 - Local independent STA reproduces all-corner CI baseline within1e-6ns.31567 strength1→2 gives slow WNS-0.004851231ns; plus38387 inverter strength1→2 yields0 reported WNS/no printed setup failures and preserves fast hold+0.035871472ns. Combined cell-area increment5.4432µm²; fixed-wire evidence only.
 - Discarded nonexistent upstream o21ai_2/xor2_2 black-box probes (BUG80). Prepared guarded single-cell physical screen from qualified37736921949; inverter remains a separate experiment. No RTL/config/official source changes or phase ticks.

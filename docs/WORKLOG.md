@@ -5,6 +5,57 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (approved residual-screen publication)
+- User explicitly approves the scoped commit/push/dispatch commands, overriding the latest git restriction for these groups. Reviewed diff checks and outgoing hardware history (none); no main source/config/macro edit. FIPE, comparison helper and unused hold prototypes excluded.
+- Publishing tested tools, separate workflow and evidence groups, then launching residual setup screen from qualified driver37818177484. Actual routed/extracted improvements remain unproven; no phase tick. Launch receipt follows once confirmed.
+
+## 2026-10-08: Codex (residual two-branch prototype ready)
+-24 new all-corner fixed-wire probes: exact place6860 BUF2 +44061 A21OI2 +27962 NOR4_2 gives setupWS0 all corners;9 previous failing endpoints slow+0.098701492..+0.731180489ns. Worst hold unchanged fast+0.067579724ns. Cost18.144µm² library area; no state/connectivity changes; physical improvement unproven.
+- Prepared guarded three-cell screen from successful37818177484, complete inherited history, powered/exact-change audit, strict routing/antenna evidence and unchanged50ps fast hold gate. Actual extracted NL rehearsal passes;120 targeted regressions pass with real cached Tcl runtime (physical APIs mocked), workflow/source audit and shell/diff checks pass.
+- New files and recent audit/comparison docs remain local. Latest supplied AGENTS.md explicitly prohibits Codex git commits/pushes, so no publication/dispatch claimed; user scoped commands are needed. FIPE and unused prototypes excluded. Next: publish/run screen, then fresh physical/extracted/protocol qualification only if gates pass. No phase tick.
+
+## 2026-10-08: Codex (27 fresh extracted-baseline sizing measurements)
+- Retrieved exact driver NL/SPEF and ran27 fixed-wire all-corner STA probes; baseline all six metrics match CI within1e-6ns, missing masters/errors rejected. Best place6860 BUF1→2 reduces slowWS−0.147084132→−0.020914827ns; worst hold unchanged+0.067579724ns. NOR4-only gives−0.039319661ns.
+- Larger BUF4 and NOR4+BUF2 pair add no global benefit; residual endpoint47981 now worst and47775 remains−0.009077184ns. Report updated; no timing closure/promotion or new physical launch. Next inspect residual branch before a guarded minimal physical repair. Diff check passes.
+
+## 2026-10-08: Codex (driver routed protocols pass; active runs finish)
+- At19:36UTC driver routedGL37825505461 succeeds:22 tests/22 pass/0 fail/0 skip. Main has no in-progress workflows; legacy37655518919 GL and37655518925 extraction remain queued. Latest driver routing/extraction/native screens and unit/lint/test/docs completed.
+- Diagnostic workflow success is not timing closure: driver extracted slow setup−0.147084ns, fast hold+0.067580ns. No phase tick. Next: exact fresh critical-cone probes and native hold/full-flow reproduction; no official GDS currently active.
+
+## 2026-10-08: Codex (19:07 UTC workflow check)
+- Verified latest main runs: only driver routedGL37825505461 remains active, expanded L3 (~31min elapsed). Driver route/extraction, native mapping and latest unit/lint/test/docs completed successfully as workflows; extracted slow setup remains−0.147084ns and does not pass timing.
+- Initial status request stalled; direct bounded retry and run-list check succeeded. No new result, launch, hardware change or phase tick. Next: driver GL result and fresh critical-cone probes.
+
+## 2026-10-08: Codex (fresh critical cone and native physical evidence)
+- Retrieved selected slow max report from exact extraction37825505569/artifact11570759230. Nine failures now begin48909/unit0 cfg word1 bit1; worst47775−0.147084ns. Dominant25443 O21AI1/25445 XOR2_1 loaded arcs have1.25/1.42ns delays; pinned library lacks stronger versions. Documented supported NOR4/upstream/load-splitting probes, pending exact-net/all-corner rehearsal.
+- Native final repair GRT tables have zero overflow for both jobs. AREA0 final cell-type total510004.37µm²/33191 cells; AREA1 506758.41µm²/32768, about0.636% less reported area. Neither meets50ps fast hold continuation margin; no promotion or phase tick.
+- Report updated with exact evidence and distinction between moved bottleneck and quantified positive margins. Static diff check passes. Next: exact current-baseline fixed-wire probes and matched native hold/full-flow recipe; driver GL remains dependency.
+
+## 2026-10-08: Codex (driver extracted improvement; native results)
+- Driver route37819598187 completes successfully; extraction37825505569 reports setup fast/typ0, slow−0.14708412681900332ns. Hold fast+0.06757972150942818ns/slow+0.34680981290632085ns/typ+0.1754376693575883ns. New best measured extracted setup, still failing; no official closure.
+- Native37819169130 completes diagnostically: AREA0 setupWS0 all corners but fast hold−0.00416389ns; AREA1 setupWS0 all corners, fast hold+0.0404413ns (below50ps continuation margin), slow+0.220399ns/typ+0.118338ns. Neither qualifies automatic promotion; area/overflow audit pending.
+- Prior hold routedGL37815131566 passes22/22, zero skips. Only active main workflow is new driver routedGL37825505461, expanded L3 started18:35:50UTC. Latest unit/lint/test/docs complete green. Initial GH request stalls; bounded API retry succeeds.
+- Next: inspect fresh driver slow critical reports and native area/overflow evidence before selecting follow-up; await exact driver routedGL. No phase ticks.
+
+## 2026-10-08: Codex (18:08 UTC workflow ETA snapshot)
+- Verified six active main runs: driver37819598187 pre-DRT antenna/fresh timing (~18min elapsed); native37819169130 both GRT/timing (~21min); routedGL37815131566 expanded L3 (~53min); unit37818162329/37819155058/37819814438 chip-level RTL (~29/21/16min). Other unit jobs complete.
+- Remaining estimates, not deadlines: driver45–75min, native20–60min per parallel job, routedGL10–25min, units respectively5–20/10–30/15–35min. Detailed-route downstream extraction remains a later dependency; no official GDS active. No new result or phase tick.
+
+## 2026-10-08: Codex (parallel native-result comparison helper)
+- Prepared compare_native_timing.py for downloaded AREA0/AREA1 artifacts: requires expected native manifest, all three corners, finite setup/hold slack and identical referenced constraint bytes. Prints per-corner differences while explicitly marking non-extracted/non-official evidence; does not select/promote a winner or claim area/overflow qualification.
+- Five regressions pass, including missing corner, custom-image manifest, mismatched constraints and NaN rejection. Diff check passes. Helper/tests remain local; existing native/driver runs still active at check. No hardware/config change, workflow launch or phase tick.
+- Next: use completed artifact evidence to compare timing, separately inspect full-chip area/overflow/antenna metrics and exact provenance before selecting a matched full-flow follow-up.
+
+## 2026-10-08: Codex (native repair ordering resolved)
+- Inspected pinned LibreLane3.1.0.dev3 Classic ordering and post-GRT repair implementation. Stock official flow already invokes native repair, but after design/antenna repair; current screen resumes directly from initial GRT. Documented why input checkpoints and globally changing RSZ_CORNERS are not equivalent.
+- Main workflow check: driver37819598187 active in antenna/fresh timing preflight; native37819169130 both jobs active in GRT/timing; routedGL37815131566 active in expanded L3. Latest lint/test/docs pass, unit runs active. No finished new physical result, launch or phase tick.
+- Static audit and git diff check pass. Next: inspect native matched results and exact post-antenna stock-flow repair before accepting official reproducibility; inspect driver extracted timing when downstream run completes.
+
+## 2026-10-08: Codex (parallel official-recipe audit)
+- Audited isolated full2/4 official preparation against running native screens. Found older PNR SDC retains latch setup exceptions; current screen uses fully timed signoff constraints throughout. Recorded exact config differences and the unresolved separate all-corner repair sequence in PHASE2_NATIVE_OFFICIAL_RECIPE_AUDIT.md.
+- Checked main: native37819169130 AREA0/AREA1 both running GRT/fresh timing; driver DRT37819598187 checking antennas/fresh timing before DRT. Latest lint/test/docs green; unit runs active. No new physical launch, hardware/config change or phase tick.
+- Validation: inspected config/SDC/helper/workflow inputs; git diff check. Next: compare finished native full-chip area/overflow/timing, inspect driver extraction and routed GL; require a reproducible matched official recipe before promotion.
+
 ## 2026-10-08: Codex (driver repair qualifies; detailed routing continues)
 - Driver37818177484 succeeds: all-corner setup WS0/zero timing violations, fast hold+0.0717144ns/slow+0.336162ns/typ+0.168788ns, antennas0/0. Gate remains50ps; positive fixed-wire gains are not declared extracted closure.
 - Launched guarded DRT37819598187 on97e6f84 from exact successful driver screen; original37533969613/bs-event-late, no repeated sizing or hold repair. In_progress at confirmation. Native mapping37819169130 AREA0/AREA1 jobs are independently running through stock GRT/STA; routedGL37815131566 still active.

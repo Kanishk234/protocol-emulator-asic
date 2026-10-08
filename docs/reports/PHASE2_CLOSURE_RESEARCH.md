@@ -74,3 +74,38 @@ Resolved the8 earlier local wrapper skips with an isolated `/tmp` Tcl command sh
 
 
 Driver screen37818177484 completed successfully: setup WS0 in all corners with zero timing violations, hold fast+0.0717144ns/slow+0.336162ns/typical+0.168788ns, antennas0/0. It meets the unchanged50ps gate. Launched [guarded DRT37819598187](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37819598187) on97e6f84 from this exact successful source, original37533969613/bs-event-late, without repeated sizing/hold repair. Actual extracted gain remains pending. Native mapping37819169130 remains in progress.
+
+## Driver extraction and native comparison: completed results
+
+Driver DRT37819598187 succeeds. Extraction37825505569/artifact11570759230 reports slow setup−0.14708412681900332ns, fast/typ setup0; hold fast+0.06757972150942818ns, slow+0.34680981290632085ns, typ+0.1754376693575883ns. This beats original−0.179789ns by about0.032705ns but still fails setup. New driver routedGL37825505461 is pending; prior hold routedGL37815131566 passes22/22.
+
+Selected exact extracted slow max report contains9 negative paths, all starting at48909 (unit0 configuration word1 bit1). Worst endpoint47775 is−0.147084ns; others47981/47982/47985/47983/47979/47980/47984/47774 range−0.117838..−0.020139ns. Previous8 printed failing endpoints are absent from this report; this is not a quantified positive-margin measurement of those endpoints.
+
+New worst path includes25443 O21AI1 (fanout2,0.100257pF,1.252590ns arc,1.512237ns output slew),25445 XOR2_1 (fanout2,0.080263pF,1.415335ns arc,1.166218ns output slew), followed by27852 NAND3_1 and previously strengthened27853 NOR2_2.25445 drives unit3 sel. Pinned slow library only has XOR2_1/O21AI1/NAND3_1, while NOR4 has1/2 strengths. Thus an invented XOR2_2 or O21AI2 trial is invalid. Next independent fixed-wire probes should inspect supported upstream sizing, NOR4_27962_ strength2 and buffer/load splitting possibilities; first map the exact nets and validate all three corners on this new extracted baseline. Do not blindly repeat38386/38387 experiments for a different bottleneck.
+
+Native mapping37819169130 completes. AREA0 final fresh fast hold−0.00416389ns fails; AREA1+0.0404413ns is positive but below50ps continuation margin. Both setupWS0 in all three corners. Final repair GRT tables report zero overflow: AREA0 usage239260/601423(39.78%), AREA1 236798/601423(39.37%). Corresponding final repair cell-type report totals are510004.37µm²/33191 cells versus506758.41µm²/32768 cells (AREA1 about0.636% less reported area). These totals must not be presented as standard-cell-only die occupancy without separately identifying the SRAM contribution. No detailed routing, extracted timing or official qualification follows from these GRT measurements. AREA1 remains the better native lead but needs hold margin and matched stock post-antenna sequence evidence.
+
+## Fresh-baseline fixed-wire probes
+
+Downloaded driver extracted final NL/SPEF from artifact11570759230. Ran27 STA processes across9 variants/control instances and three corners; baseline reproduces all six CI values within1e-6ns. Missing masters/black boxes/errors rejected. Evidence stays under `/tmp/tripwire-closure-probes-37825505569` and `/tmp/tripwire-driver-pair-probes-37825505569`.
+
+| Exact cell substitution | Slow setup WS(ns) |
+|---|---:|
+|Baseline|−0.147084132|
+|27962 NOR4_1→2|−0.039319661|
+|place7068 BUF1→2|−0.092601486|
+|place6758 BUF1→2|−0.126224369|
+|place6860 BUF1→2|−0.020914827|
+|27962 NOR4_2 plus place6758 BUF2|−0.039319661|
+|27962 NOR4_2 plus place6860 BUF2|−0.020914827|
+|place6860 BUF1→4|−0.020914827|
+
+All retain fast/typ setupWS0 and worst hold fast+0.067579724ns, slow+0.346809804ns, typ+0.175437674ns on fixed wires. Best one-buffer result moves worst endpoint to47981;47775 remains−0.009077184ns, so no closure is claimed. Larger buffer/pair spending has no measured global benefit. Next inspect the residual branch and its slew/load before adding another cell change. No new physical workflow launched from these still-negative estimates.
+
+## Residual two-branch repair: qualified fixed-wire prototype
+
+Ran24 further three-corner probes from the current driver extracted baseline. Tail44061 A21OI1→2 or28681 NOR4_1→2 alone do not improve global WS because the other branch dominates. Combining place6860 BUF1→2 with either tail repair moves global slow WS to−0.009077184ns. Adding27962 NOR4_1→2 to the place6860/44061 pair gives setupWS0 in all corners, with unchanged worst hold fast+0.067579724ns/slow+0.346809804ns/typ+0.175437674ns. Explicit slow endpoint reports measure all9 former failures+0.098701492..+0.731180489ns; globalWS0 includes transparent latches and is not positive global WNS. Three-cell library area cost18.144µm², no added state or connectivity change. Fixed-wire gains remain unqualified physically.
+
+Prepared `gds-residual-setup-screen` from successful driver source37818177484. Its three-cell helper preflights all targets, masters, pins, nets and supplies before any mutation. Complete inherited repair history, unchanged source fingerprints, fresh NL/PNL, exact three-master-only change, strict zero-overflow routing/antenna checks and fresh all-corner timing with50ps fast hold remain required. No DRT launched by the screen. Actual extracted NL rehearsal passes.120 selected new/prior sizing and continuation regressions pass with cached Tcl interpreter; physical commands in tests are mocked. Workflow/source audit and shell/diff checks pass. Source/profile choice is frozen; no arbitrary sizing input accepted.
+
+Prepared helper/workflow/report changes remain local. The latest user-supplied AGENTS.md prohibits Codex commits/pushes; publishing requires the user to run the scoped commands. Prior general command approval is not treated as overriding that later explicit git rule. FIPE and unused hold prototypes remain outside the publication groups. Once published, dispatch only this screen, inspect actual results, and prepare DRT continuation only if all gates qualify.

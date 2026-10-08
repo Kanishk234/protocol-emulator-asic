@@ -33,6 +33,14 @@ strict. Negative loaded/unproven-alias/bad-binding controls pass; independent
 mock unknown/wrong/correct Q checks fail/fail/pass. Python AST/whitespace
 pass; no local EDA. Preparing scoped test/docs push to replay all six cases.
 
+**Launched:**075ec2b diagnostic fix and dff0a4e bug/decision/worklog pushed.
+Corrected six-case37709917442 is active; driver37708459393 remains active.
+Canceled only redundant original-macro37709917421 autoqueued by the shared
+probe edit. Prior ae7fecb lint/docs/test/unit all pass; new regressions active.
+No frozen hardware path touched or routing canceled. Next read corrected
+control and individual stage results, then the driver's fresh native/
+physical/electrical outcomes; do not infer completion from jobs being active.
+
 ## 2026-10-07 (session67: route the legal ECO; independent reproduction/native audits)
 **Done:** proactively checked corrected placement37689324316; success.
 Downloaded actual placement-only ODB7b2811c291443d4208bcb1154fbe37ab6eeb7be6702c52060f135d0318509adf

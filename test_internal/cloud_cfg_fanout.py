@@ -242,6 +242,7 @@ def run():
         (OUT / "config.json").write_text(json.dumps(config, indent=2) + "\n")
         save()
         def sta(label, odb, nl):
+            (OUT / label).mkdir(exist_ok=False)
             state = {"odb": str(odb), "nl": str(nl), "sdc": str(derived / "sdc/tt_um_warp.sdc"), "metrics": {}}
             state_path = OUT / (label + "_state.json")
             state_path.write_text(json.dumps(state) + "\n")

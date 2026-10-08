@@ -5,6 +5,12 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (approved hold-qualified detailed routing launched)
+- User explicitly approved publishing and launch. Committed tools/tests450d29a, workflowfa6101a and evidence89d7537; pushed and verified remote main equals89d7537856b8e3b1de0742ea4884aa3fd9fcce1f. FIPE and unused local prototypes remain untracked.
+- Launched [37807978035](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37807978035), queued at receipt: original source37533969613/bs-event-late, repaired source37806209914, pre-route hold target source, no repeated post-antenna hold repair. Source screen succeeded with fast hold+0.109256ns, all-corner setup WS0 and zero timing/antenna violations.
+-62 continuation regressions pass after final edits; prior broader311 pass/8 skip and diff checks recorded. No hardware source, official config or phase checklist change.
+- Next: monitor exact-source qualification and DRT final DRC; inspect downstream extracted timing and routed GL before promotion. Official clean-build portability remains unresolved.
+
 ## 2026-10-08: Codex (nine-leaf hold screen qualifies; DRT continuation prepared)
 - Screen37806209914 succeeded in9.5 minutes. Matched artifact11563058526: all-corner setup WS0, zero setup/hold violations, hold fast+0.109256ns/slow+0.371234ns/typ+0.202929ns; antennas0/0. Fast hold exceeds unchanged50ps gate.
 - Prepared local exact-source continuation with complete netlist-transition audit, trusted fingerprints, strict routing/antenna evidence and fresh STA before DRT. Workflow preserves inherited setup/hold evidence and uses ordinary routing image without repeated repairs.

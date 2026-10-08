@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (NOR2 detailed-routing continuation launched)
+- Published continuation448f423, workflow24343bf and readiness564f7c6 to remote main.240 related helper tests pass; diff checks pass. No source, macro, info or official configuration changed.
+- Launched [37737970080](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37737970080) on564f7c6: source37533969613, bs-event-late, repaired checkpoint37736921949, no repeated hold repair or sizing. GitHub confirms in_progress. Fresh all-corner STA/50ps fast hold and saved antenna/provenance gates precede DRT.
+- No phase checklist tick. Next: inspect DRT final DRC, then extracted timing and routed GL; official clean-build portability remains unresolved. FIPE and unused SRAM prototypes remain local-only.
+
 ## 2026-10-08: Codex (antenna-clean NOR2 screen succeeds)
 - Screen37736921949 on d150bb7 succeeded. Final antennas0 nets/0 pins; all-corner setup WS0 and no setup/hold violations. Hold fast+0.0932422ns, slow+0.393571ns, typical+0.212009ns. Repair adds36 diodes;34189 cells, instance area524911.48µm².
 - Successful source meets local continuation's50ps fast-hold gate. Updated prepared continuation to this exact run; prior failed runs remain rejected.240 helper tests pass. Continuation remains local/unpublished; no DRT launched.

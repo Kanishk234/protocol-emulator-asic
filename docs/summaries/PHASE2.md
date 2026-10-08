@@ -1,34 +1,36 @@
 # Phase 2: building and fitting the chip
 
-**Status:** in progress, updated 2026-10-06. The measured R4 candidate has 2 lanes, 4 pin units and U0 full; these are experimental counts, not an adopted change to the frozen specification. See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
+**Status:** in progress, updated 2026-10-07. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
 
 ## The goal
 
-Build the lanes, token fabric, timed pin units, host interface and routine memory, verify them against an independent software model, and fit a 6x4 layout that operates at the 20 ns clock target.
+Build the lanes, token fabric, timed pin units, host interface and routine memory, verify them against an independent software model, and make the full chip pass physical checks and timing in the official GDS workflow.
 
 ## What we did
 
-The RTL exists and the candidate passed one million comparison clocks with no divergences; injection tests caught both deliberate bugs. UART, SPI and I2C work through the pins with reference-model and sigrok checks. The expanded protocol suite now has 22 cases. The latest actual routed netlist passed 22/22 under Tiny Tapeout Icarus 13 in [37417248117](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37417248117), with no failures, errors or skipped tests. This checks function, without SDF timing simulation.
+The core RTL exists. The frozen2/4 candidate passed one million model/RTL comparison clocks, and injection checks caught two deliberate bugs. UART, SPI and I2C have pin-level reference-model and sigrok evidence. Expanded routed gate-level checks pass22/22 for original event-late125ps run37581139271 and shared-RX run37659138336. These check function without SDF timing simulation; they do not prove physical timing.
 
-A historical standard GDS run 36799356107 passed DRC/LVS/antenna/precheck and typical timing, but slow setup was −10.698 ns. Later repairs produced −6.178 ns and −5.630ns extracted slow setup. Timing-driven placement with all-corner repair then completed [routing 37412965189](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37412965189). Its [extraction 37417248079](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37417248079) reports slow setup −1.731802 ns and fast hold −0.035371 ns. The subsequent SRAM-buffer extraction37499559422 improved slow setup to−1.385050ns and made hold positive at all three corners. Clock-clustering extraction37502135749 regressed to−1.996169ns setup and−0.004410ns fast hold. Setup remains open; SRAM is the best measured trial. Improvements compare complete physical flows, not one isolated cell change.
+Historical official GDS run36799356107 passed DRC/LVS/antenna/precheck and typical timing, but slow setup was -10.698ns. Later full-design extracted experiments improved slow timing. The strongest measured setup candidate is original event-late plus125ps hold repair: slow setup -0.179789ns and fast hold +0.037290ns (extraction37581139249). Its two reported failures end at RX timer bits through live pin configuration and pin feedback.
 
-We tested six independent RTL/placement ideas. Timing-driven placement provided the strongest no-storage follow-up. Estimated setup/hold passed before routing, yet extraction revealed 119 slow setup violations and 4 fast hold violations. Most reported slow failing paths start at U0 period configuration and end in the token fabric. Three hold paths run from lane slot latches into execution controls; one runs from pin configuration into RX state. Live configuration remains timed; we have not added false paths or changed cycles to hide failures.
+A larger shared-RX arithmetic change proved equivalent and passed function, but its extracted setup regressed to -1.427891ns at dropped-event counter/fabric endpoints. It is not promoted. The smaller banked pin selector retains original RX and passes60pin tests,5chip tests and2048model-comparison clocks. Its routing screen had one -22.37ps SRAM address hold failure.
 
-Paired experiments tested clock-sink clustering, lane/SRAM control buffers and a saturating dropped-token counter rewrite. The counter passes module equivalence, functional tests and one million model-comparison clocks, but only estimated physical timing is measured. Three newer structural prototypes pass module equivalence, their affected unit tests, five chip tests and2048-clock comparisons. A local mapped-delay probe favors simplifying bit-clock resync: PERIOD→RX-load delay13.81→10.67ns, at about3% more module area. Carry-save arithmetic and parallel fabric drop qualification were slower in their probes. These are screening results, not routed gains. The user directed official timing closure at2/4 first, then a3/6 attempt if area allows (D-070).
+A guarded SRAM address buffer plus bounded repair now passes pre-routing checks in37690561695: setup WS0 at all corners, post-antenna fast hold +0.0700513ns, positive slow/typ hold, zero antenna violations and zero global-routing overflow. The repair adds422hold buffers and increases area about3.03% from its source checkpoint. A continuation is prepared to measure detailed routing and extraction; no closure claim is made from routing estimates.
 
 ## What we found
 
-Routing estimates are useful for screening, but do not predict extracted signoff reliably enough to declare closure. The electrical reports matter too: the current extracted route has 101 slow slew violations and 187 fanout violations, plus capacitance violations. Clock leaves and long weakly driven data nets need separate treatment. The candidate's standard cells plus SRAM occupy about 56.43% of core; filler-inclusive area must not be mistaken for logic utilization or guaranteed repair capacity.
+Equivalent logic can shift mapping, placement and critical paths elsewhere in the chip. Faster local arithmetic did not guarantee better full-chip timing. Routing screens are useful filters, but extracted parasitics have repeatedly exposed regressions. Live configuration remains timed; no false paths or changed cycles hide failing behavior.
+
+Functional evidence is strong. Physical timing and area must still be judged together on the exact final candidate. Saved-checkpoint improvements also need a reproducible clean-build recipe in the official flow.
 
 ## What's left
 
-- Close actual all-corner setup/hold and electrical violations at 20 ns, using one isolated physical change per route.
-- Complete full selected-candidate DRC/LVS/antenna/precheck/viewer evidence; split route/extraction diagnostics do not replace the standard GDS flow.
-- Implement the user-directed2/4 official closure target, then test3/6 if feasible; document/regenerate any adopted resource/spec change. Area/budget is the first unchecked phase-exit item.
-- Keep required CI green on final main and repeat matching functional checks before any hardware adoption.
+- Route and extract the reviewed repaired banked candidate, then compare with the original -0.179789ns baseline.
+- Achieve positive setup WNS and nonnegative all-corner hold, without losing protocol or live-configuration behavior.
+- Reproduce the selected full design in official GDS; pass DRC/LVS/antenna/precheck and matching gate-level tests.
+- Complete the routable-budget decision, revalidate the adopted hardware and keep required CI green on final main. Phase2 stays open until all exit requirements pass.
 
 ## One-line takeaway
 
-The routed chip passes its 22 functional tests and best measured slow timing has improved to−1.385ns, but phase 2 remains open until physical timing, signoff and resource decisions are complete.
+The full chip works in simulation and the strongest extracted setup result is179.8ps short; the next repaired candidate passes preliminary timing gates but still needs routing, extraction and official validation.
 
-Detailed evidence: [independent screens](../reports/PHASE2_INDEPENDENT_TIMING_SCREENS.md), [parallel electrical audit](../reports/PHASE2_PLACEMENT_PARALLEL_AUDIT.md), [exit evidence audit](../reports/PHASE2_EXIT_EVIDENCE_AUDIT.md).
+Detailed evidence: [baseline recovery](../reports/PHASE2_SHARED_RX_REGRESSION.md), [repair-only screen](../reports/PHASE2_BANKED_SRAM_HOLD_SCREEN.md), [routed follow-up review](../reports/PHASE2_BANKED_SRAM_HOLD_ROUTE.md).

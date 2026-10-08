@@ -5,7 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-07: Codex (approved repaired banked routing publication)
+- User approves separate tools/workflow/report commits, push and detailed-route launch. Rechecked245 helper tests and diff; no src/info/macro history changes or main hardening active.
+- Tools committed7af0b1d; workflowa2e7e4b. Exact repaired source37690561695 has independently checked all-corner/50ps/antenna/identity gates; no repeat SRAM insertion or repair. FIPE and unrelated addr0 prototypes excluded.
+- No phase boxes ticked. Next: push approved groups, launch exact continuation and inspect route/extraction/GL before any official promotion.
+
+## 2026-10-07: Codex (repair passes; routed continuation prepared)
+- Repair37690561695 passes: post-antenna setup0 all corners, holdfast/slow/typ +0.0700513/+0.376972/+0.198153ns; zero counts/antenna/GRToverflow. Artifact11513594590 independently validates36source hashes against frozen plus tested BS/IO and all checkpoint files. Seed buffer retained.
+- Repair adds422 hold buffers; area526445/count34104, +3.03% from banked source. No extracted gain claim. Latest3c494c0 lint/test/docs/unit green.
+- Prepared optional repaired-checkpoint continuation in existing route workflow; strict dual provenance, identity, saved/fresh50ps/all-corner/antenna checks, no repeated insertion/repair, original failing source refused.245 helper tests pass. Review PHASE2_BANKED_SRAM_HOLD_ROUTE.md; phase summary updated.
+- No phase ticks, commit/push or DRT dispatch. Next: publish reviewed continuation and route exact repaired37690561695, then actual extraction/22caseGL before official-flow integration.
+
 ## 2026-10-07: Codex (repair wrapper PATH fix)
+- Published e5d626f tools,da950eb workflow,3c494c0 docs to remote main. New repair-only37690561695 queued on3c494c023c65fea002665ebc04e0c31a809c4cf4; no DRT.
 - Run37689746190 passes config guard but fails before STA because companion wrapper is not on LibreLane runtime PATH. Logged BUG76; delegate via installed wrapper directory, preserving actual script arguments.
 -225 helper tests pass, including STA delegation and malformed/valid insertion with installation directory absent from PATH. Added container wrapper smoke before physical measurements. No physical mutation/timing result inferred from this failure.
 - Next: publish corrective tool/workflow/docs groups and relaunch under existing repair-only authorization. No phase ticks or DRT.

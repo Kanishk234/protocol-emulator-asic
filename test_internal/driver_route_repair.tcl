@@ -16,7 +16,7 @@ foreach key {WARP_REPAIR_SOURCE WARP_REPAIR_OUT WARP_REPAIR_EXPECTED_MARKERS} {
         error "Missing required environment variable $key"
     }
 }
-foreach command {drt::step_dr drt::step_end drt::check_drc drt::detailed_route_num_drvs} {
+foreach command {drt::step_dr drt::step_end drt::check_drc drt::detailed_route_num_drvs odb::dbWire_destroy} {
     if {![llength [info commands $command]]} {
         error "Pinned router API missing: $command"
     }
@@ -65,7 +65,39 @@ proc warp_repair_count {path} {
     return [regexp -all -line {^violation type:} $report]
 }
 set topology [warp_repair_topology $block]
-puts "WARP_REPAIR checking authenticated source before mutation"
+# Cells moved, so their old routed signal nets are not a valid incremental
+# input. Rip the complete affected signal nets; preserve every logical net,
+# all unaffected routing and all power rails. Otherwise late repair hits
+# DRT-0206 on old pin escapes (37690243797, u_cfg._17_).
+set moved {u_cfg._54_ u_cfg._72_ {u_cfg.g_row[4].u_row._124__468}}
+set found {}
+set affected {}
+foreach inst [$block getInsts] {
+    set name [string map {\\ ""} [$inst getName]]
+    if {$name ni $moved} {continue}
+    lappend found $name
+    foreach term [$inst getITerms] {
+        set net [$term getNet]
+        if {$net eq "NULL" || [$net getSigType] in {POWER GROUND}} {continue}
+        if {[[$term getMTerm] getSigType] in {POWER GROUND}} {continue}
+        if {[$net getSigType] ne "SIGNAL"} {error "Unexpected non-signal ECO net"}
+        dict set affected [$net getName] $net
+    }
+}
+if {[lsort $found] ne [lsort $moved] || [dict size $affected] == 0} {
+    error "Missing exact moved-cell signal inventory"
+}
+set channel [open "$out/ripped_signal_nets.txt" w]
+foreach name [lsort [dict keys $affected]] {
+    set net [dict get $affected $name]
+    set wire [$net getWire]
+    if {$wire ne "NULL"} {odb::dbWire_destroy $wire}
+    puts $channel $name
+    puts "WARP_REPAIR ripped stale signal net $name"
+}
+close $channel
+if {[warp_repair_topology $block] ne $topology} {error "Wire ripup changed logical topology"}
+puts "WARP_REPAIR checking remaining geometry after signal ripup"
 drt::check_drc -output_file "$out/before.drc.rpt" -marker_name WARP_REPAIR_BEFORE
 set before [warp_repair_count "$out/before.drc.rpt"]
 puts "WARP_REPAIR before=$before expected=$expected"

@@ -15,7 +15,7 @@ on:
         type: choice
         options: [placement, lane, sram, cts, bs-resync, bs-event-late, bs-event-drop-qual, bs-event-rx-timer, bs-event-rx-shared, bs-event-pin-banked, bs-load-flat]
       repaired_source_run_id:
-        description: Audited banked SRAM repair-only run (37690561695), otherwise empty
+        description: Audited banked SRAM or event NOR2 repair-only run, otherwise empty
         required: false
         default: ""
         type: string
@@ -128,11 +128,11 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ inputs.source_run_id }}
 
-      - name: Download the audited repaired banked checkpoint
+      - name: Download the audited repaired candidate checkpoint
         if: inputs.repaired_source_run_id != ''
         uses: actions/download-artifact@v7
         with:
-          name: gds-banked-sram-hold-${{ inputs.repaired_source_run_id }}
+          name: ${{ inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
@@ -169,6 +169,7 @@ jobs:
           path: |
             runs/rtl-grt-screen/**
             runs/placement-route/**
+            runs/event-nor2/**
             runs/slew-screen/**
             src/**
             macro/**

@@ -104,6 +104,15 @@ Native self-miter failure remains recorded; no further blind remap rerun.
 trials. Zero electrical violations/configured timing/native final views remain
 required. No phase boxes ticked.
 
+**Configuration follow-up:**37814078677 adds/legalizes ten identity buffers
+and passes exact3596-original-instance/18073-terminal contracted topology
+and fixed macro audit, then STA CLI rejects a missing run directory (BUG55).
+Prepared mkdir fix; no timing result claimed. Canceled only redundant
+37814339957 replay of the same bug. Tile37814078650 and corrected official
+37814339758 remain active and untouched. No local EDA or phase boxes.
+**Next:** verify all-corner fanout after the fixed STA entry, official pin
+check, and matched tile final physical/netlist evidence.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

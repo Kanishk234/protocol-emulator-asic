@@ -1,5 +1,11 @@
 # Bugs
 
+## 55: Configuration fanout STA replay omits required run directory
+- **Date:**2026-10-08.
+- **Symptom/check:**37814078677 inserts/legalizes ten buffers and passes exact3596-instance/18073-terminal contraction audit, then CLI rejects nonexistent baseline_sta --force-run-dir before timing.
+- **Root cause:** new helper omitted mkdir required by LibreLane's existing-directory CLI path validator; other physical helpers already create it.
+- **Fix/coverage:** create each unique STA run directory before invocation. Preserve baseline-five/candidate-zero/all-three-corner and protected-input gates. AST/whitespace pass; actual timing result pending. Canceled only the redundant unchanged replay37814339957 to avoid repeating this known setup failure; tile/precheck remain active.
+
 ## 54: Experimental view packaging violates official precheck input contract
 - **Date:**2026-10-08.
 - **Symptom/check:** official37811985173 fails six of nine checks: multiple GDS top cells and apparent LEF/template die mismatch.

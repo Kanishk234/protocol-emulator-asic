@@ -2,6 +2,12 @@ name: gds-event-nor2-screen
 
 on:
   workflow_dispatch:
+    inputs:
+      repair_antennas:
+        description: One bounded antenna repair followed by fresh checks
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -23,6 +29,7 @@ jobs:
       VARIANT: timing-placement
       SOURCE_VARIANT: bs-event-late
       SOURCE_RUN_ID: "37533969613"
+      REPAIR_ECO_ANTENNAS: ${{ inputs.repair_antennas && '1' || '0' }}
 
     steps:
       - name: Check out the measured R4 candidate

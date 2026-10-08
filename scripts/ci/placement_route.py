@@ -68,6 +68,9 @@ def selected_hold_margin(variant, selected):
 
 def main():
     if os.environ.get('REPAIRED_SOURCE_RUN_ID'):
+        if os.environ.get('SOURCE_VARIANT') == 'bs-event-late':
+            from event_nor2_route import main as route_nor2
+            return route_nor2()
         from banked_sram_hold_route import main as route_repaired
         return route_repaired()
     root = Path('runs/rtl-grt-screen')

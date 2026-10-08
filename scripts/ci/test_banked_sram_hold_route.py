@@ -59,6 +59,7 @@ def test_repaired_branch_delegates_before_original_failed_source_is_read(monkeyp
     import placement_route
     import banked_sram_hold_route
     monkeypatch.setenv('REPAIRED_SOURCE_RUN_ID', str(REPAIR_RUN))
+    monkeypatch.setenv('SOURCE_VARIANT', VARIANT)
     monkeypatch.setattr(banked_sram_hold_route, 'main', lambda: 'guarded repaired route')
     assert placement_route.main() == 'guarded repaired route'
 
@@ -75,5 +76,5 @@ def test_route_workflow_downloads_repair_artifact_without_repeating_headroom():
     assert len(downloads) == 2
     assert downloads[0]['if'] == "inputs.repaired_source_run_id == ''"
     assert downloads[1]['if'] == "inputs.repaired_source_run_id != ''"
-    assert downloads[1]['with']['name'] == 'gds-banked-sram-hold-${{ inputs.repaired_source_run_id }}'
+    assert downloads[1]['with']['name'] == "${{ inputs.source_variant == 'bs-event-late' && 'gds-event-nor2' || 'gds-banked-sram-hold' }}-${{ inputs.repaired_source_run_id }}"
     assert any('placement-repaired-run.json' in s.get('run', '') for s in steps)

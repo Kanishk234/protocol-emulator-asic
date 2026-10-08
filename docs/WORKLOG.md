@@ -90,6 +90,20 @@ Heavy steps remain cloud-only; reports/phase summary/FIFO claim updated.
 **Next:** inspect official precheck, one-tile hardening and config fanout;
 fix actual failures without relaxing checks. No checklist box ticked.
 
+**Actual launches and official checking:**9eee2a8 starts tile37814078650 and
+configuration fanout37814078677; both authenticated setup stages pass and
+actual physical/STA stages begin. Official37813220689 passes eight of nine
+checks, including full IHP DRC225.78s. Single-top publication verifies724
+referenced cells identical including shapes/labels/instance transforms and
+arrays; exact remaining source tops are original fill1/fill2/tt_um_warp.
+Pin check alone crashes on native RECT double spacing. Prepared single-space
+geometry-token formatting; all842 actual native RECTs meet pinned syntax with
+exact Decimal values unchanged. No geometry or official checker modification.
+Native self-miter failure remains recorded; no further blind remap rerun.
+**Next:** inspect pin-check formatting rerun and both independent physical
+trials. Zero electrical violations/configured timing/native final views remain
+required. No phase boxes ticked.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

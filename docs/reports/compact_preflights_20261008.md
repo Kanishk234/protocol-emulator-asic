@@ -54,3 +54,15 @@ checks; rerun before claiming precheck acceptance. No routed geometry alteration
 Original driver37708459393 remains the physical/slew closure evidence. Regular
 0309544 lint37811985150/docs37811985067/test37811985057/unit37811985064 all pass.
 Frozen G1 remains fallback; no phase exit box ticked by these diagnostics.
+
+Corrected official37813220689 passes eight of nine checks, including full
+SG13CMOS5L DRC225.78s. Publication confirms the two extra tops were original
+fill1/fill2 and preserves all724 reachable cells exactly (shape/label/instance
+transforms/arrays and DBU). Remaining Pin check parser error is native RECT
+double spacing. Formatting correction preserves exact values; all842 actual
+RECTs now match pinned official syntax. Final pin acceptance still pending.
+
+Identical-original proof control37813220521 fails with retained witness,
+including four differing routing buses. Candidate proof/simulation does not
+advance. This establishes current proof construction cannot judge the remap;
+programmable feedback equations need a sound common-cut treatment first.

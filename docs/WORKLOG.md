@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (pinpoint and fix antenna audit regression)
+- Failed screen37735461986 actually passes all-corner timing but fails47 antenna nets/52 pins. Repair itself reaches0 violations; the full audit reroute added afterward recreates them (BUG79).
+- Removed full audit reroute; antenna configuration disallows congestion, wrapper asserts policy before/after repair and records completion, runner checks evidence and retains independent antennas/netlist/STA gates.
+- Evidence:240 helper tests pass; shell syntax/diff checks pass. User explicitly authorized corrective commits and push. Only screen tools/tests and evidence groups selected; DRT preparation and FIPE remain local.
+- No checklist ticks. Next: rerun corrected antenna screen and inspect actual final antenna/timing metrics before DRT qualification.
+
+## 2026-10-08: Codex (parallel continuation provenance hardening)
+- User-approved screen/tool and documentation commits c709085/44c2bc7 were pushed to remote main. Corrected antenna screen37735461986 launched and is building its pinned image after source/PDK setup passed.
+- Updated local DRT preparation from failed37733684248 to corrected37735461986. Strengthened shared congestion validation: require one audit marker and a complete zero-overflow report after it; reject stale preceding reports and ambiguous/missing markers.
+- Evidence:240 related helper tests pass; git diff --check passes. New hardening/continuation edits remain local; active screen uses44c2bc7. No DRT, official workflow or phase checklist tick.
+- Next: inspect corrected physical antenna/timing result; publish continuation only with a qualifying successful source, then measure detailed routing, extracted timing and routed GL.
+
 ## 2026-10-08: Codex (NOR2 antenna overflow-report correction)
 - Checked main: two unit runs active; older extracted-timing and routed-GL runs queued. Latest NOR2 screen37733684248 failed after diode repair because incremental routing omitted the full congestion table; fresh post-repair STA did not run.
 - Fixed BUG78 locally: explicitly reroute after diode repair before parasitic estimation/export, then require the full zero-overflow report, independent antennas and all-corner STA. Wrapper rejects missing/duplicate insertion points. Physical rerouting may expose new antenna failures; no gate relaxed.

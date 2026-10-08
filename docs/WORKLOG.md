@@ -77,6 +77,19 @@ configuration fanout experiment. No local heavy EDA, frozen edits or boxes ticke
 **Next:** inspect official rerun and self-miter, review continuation inputs
 before bounded tile hardening/config fanout cloud trials.
 
+**Proof-control finding and physical continuation:**5cc9b97 launches official
+37813220689 and native37813220521. Identical-original self-miter37813220521
+fails, witness retained: routing buses S2BEG/N2BEG/E2BEG/E1BEG differ between
+identical unconstrained-feedback copies. The current proof construction cannot
+judge remap equivalence; candidate proof/simulation correctly not advanced.
+No native pass or formal claim. D063 faithful passing-C2 hardening and D064
+five-net identity-buffer preflight prepared with strict source/topology/geometry
+and all-corner measurement gates. Original constraints unchanged; reviewed
+configuration-only pinned3.1 tile API/order, AST/YAML/archive/SHA checks pass.
+Heavy steps remain cloud-only; reports/phase summary/FIFO claim updated.
+**Next:** inspect official precheck, one-tile hardening and config fanout;
+fix actual failures without relaxing checks. No checklist box ticked.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

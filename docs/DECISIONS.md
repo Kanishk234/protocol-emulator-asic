@@ -2,6 +2,18 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-064: Buffer the five measured configuration-column fanout nets
+- **Date:**2026-10-08. **Status:** accepted bounded placement/estimated-STA diagnostic, no routing or promotion.
+- **Evidence:**37811985079 cluster8 clears all clock fanout violations but leaves five configuration-column outputs with12 loads against effective Liberty limit8. Original design MAX_FANOUT_CONSTRAINT10 remains unchanged. Input cluster8 ODB0a0af0c1a0e4c413f52c43de70772dfff857a7c98402fa9b5b7e8dac19a53f99, NL5bcc7ceb770d8f20fce68e43b90b8a23bdcb1aa05fc7e17f2672248bbc23c9fe and original SDC2fd4e213532d83ee258899b6fc1ed48c4e5d91ddb0ccbe21eea0226cc90fd56e authenticated.
+- **Decision:** add exactly two identity buffers per target net, each driving six original loads. Require supplied Liberty function A, unchanged all original masters/terminals after contracting ten buffers, unchanged fixed macro and native legal placement. Measure baseline and candidate across all three original corners by explicitly setting PNR_CORNERS; same library files, clock/SDC/electrical constraints. Baseline must reproduce five fanout failures per corner; candidate must report zero per corner.
+- **Cost/limits:** standard cloud25min job, edit3min and each estimated-STA5min bound. Ten added buffers plus legalization can cost area, load, power and skew; no generic architecture/equal-area improvement claim. No repair_design blanket resizing or second CTS; detailed route and extracted all-corner setup/hold/slew/cap/function remain required before selection.
+
+## D-063: Harden the exact passing C2 at its original physical interface
+- **Date:**2026-10-08. **Status:** accepted one-tile cloud diagnostic, no frozen hardware or full-chip promotion.
+- **Evidence:** passing C2 loaded native control37709917442; matched-pin37811985092 original and passing NL both reproduce306 signal ports and exact die. Use passing NL03c21b8e400e1774390e67b0939422959d37e26849adca18fa082f492cf5cdaf and tile-harden-c2 archive356c909c1415d2d56f7925e304b3d862055ed471af585cc206af92257c2bb2d8.
+- **Decision:** bypass synthesis, replay original physical settings/pinned I/O and output-only buffering adapters. Preserve190.08x196.56um die, exact PDN, all20 routing obstructions, signal Metal2–4 and signal/power interfaces. Configuration-only loading against actual3.1 succeeds; exact sequence PDN→I/O→output buffer→global placement checked. Retain standard detailed route/antenna/disconnect, Magic/KLayout and actual GDS LVS/extraction checks, stage-completion and zero-count gates. Preserve failed baseline checkpoints before investigating known filler/decap geometry separately.
+- **Cost/limits:** free standard cloud120min job/110min container bound. No protocol primitive or chip source change. Extra buffers/diodes/fillers may change area/power/parasitics. Original CLOCK_PORT=null remains, so extracted STA is diagnostic and cannot establish configured timing. Passing final netlist needs loaded-image retest and complete fabric integration before selection; every required check stays enabled.
+
 ## D-062: Strict official precheck on the passing experimental driver layout
 - **Date:**2026-10-08. **Status:** accepted bounded cloud diagnostic; no submission or hardware promotion.
 - **Evidence:** driver37708459393 has fresh native/antenna/critical-connectivity0 and Magic/KLayout/shell LVS0, but official Tiny Tapeout precheck is untested. Use accepted overlaid GDS bb415750feace175e140d2fbb3a9aca4b72731c248a884b46999eb933e3f3246 and matching final ODB b71f5f377faee63410781c4f108a7b9b06d26e2552ce9f3418b5f227fbf67285; raw streamout is a different layout hash.

@@ -12,8 +12,14 @@ slew and capacitance pass at all supplied corners; fanout33 remains.
 Native37709917442 passes the control after BUG47's configuration-audit fix,
 then fails when original C2 is substituted at either synthesis or final
 physical output. The failure already exists before physical routing.
-State-preserving mapping isolation, matched-tile preflight and clock-tree
-fanout preflight proceed independently. Frozen G1 remains the fallback. See
+Matched-tile preflight37811985092 now passes exact original die/all306 signal
+ports for the passing C2. Fanout37811985079 clears27 clock violations with
+cluster8, leaving five configuration nets in estimated typical-corner STA;
+extra39 cells/+1056um2 area are measured costs. Native remap37811985147
+passes storage audit but fails binary SAT; an identical-original proof control
+is queued. Official precheck37811985173 finds orphan-top/LEF-format packaging
+issues; a geometry-preserving export correction is queued. Actual matched
+routing, configured timing and official checks remain open. Frozen G1 remains the fallback. See
 [current physical/native evidence](../reports/compact_driver_native_20261008.md) and
 [fanout/native plan](../reports/compact_fanout_native_next_20261007.md).
 

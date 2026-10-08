@@ -71,7 +71,7 @@ The organizers asked for the flow from a protocol description to a bitstream, ho
 | Protocol designs | RTL tests against independent reference models (and sigrok), both forms (hard blocks / plain logic), 8 designs | CI `unit` 36451328364 |
 | Chip, RTL fabric | chip-level tests loading real bitstreams through the pins | CI `fabric` 36451328356 |
 | Chip, gate level | the same tests on the hardened shell netlist with fabric RTL | CI `gl_test` 36451108163 |
-| Formal | F1, F2, F4 in CI; F3 FIFO locally at depths 2 and 4 | CI `formal` 36383587298; local `scripts/formal.sh f3_fifo.sby`, 2026-09-28 |
+| Formal | F1, F2, F4 in CI; F3 FIFO depth2/depth4 unbounded ABC PDR proofs | CI `formal`36383587298; F3 both tasks36491754401, retained engine PASS/property-proved logs inspected; proof/RTL unchanged from that commit |
 | Shell random transactions | SPI transactions checked against an independent model, with command × state and error coverage | `test_internal/uvm`, local seed 1: 2,288 transactions, 79/79 coverage bins, 0 mismatches (2026-09-28) |
 | Co-simulation | the UART as a bitstream vs its source RTL: identical TX waveforms, equal RX | `test_internal/cosim`; CI `fabric` 36451328356 |
 | Mutation | 11 planted bugs, all caught | `docs/reports/mutation.md` (local), `scripts/mutation.py` |

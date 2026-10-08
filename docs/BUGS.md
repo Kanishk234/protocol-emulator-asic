@@ -1,5 +1,23 @@
 # Bugs
 
+## 53: Default instance-array serialization fails protected macro audit
+- **Date:**2026-10-08.
+- **Symptom/check:** fanout37810652597 completes baseline CTS/resizer/STA, then strict MACROS comparison rejects the resolved configuration.
+- **Root cause:** pinned LibreLane3.1 adds array:null to the unchanged macro instance; original3.0 serialization omits this default. All view paths, location and orientation match.
+- **Fix/coverage:** canonicalize only omitted-versus-null array. Changed views, location, orientation and non-null arrays still reject in artifact-based controls. Library/clock/SDC/fanout/native-placement audits remain. Baseline reports32 fanout violations at estimated typical corner; not all-corner acceptance. Corrected paired run pending.
+
+## 52: Native pin observer treats LibreLane Path as pathlib Path
+- **Date:**2026-10-08.
+- **Symptom/check:** tile37810652641 completes original three-step floorplan flow then fails on LLPath.parent, before pin comparison.
+- **Root cause:** state output paths use LibreLane's string wrapper, which lacks pathlib parent.
+- **Fix/coverage:** convert explicitly with Path(str(path)) before observation. Fresh design header retains only its actual top module, excluding imported Liberty definitions misidentified as hierarchical macros. No netlist/pin/geometry alteration. AST/whitespace checks pass; actual original/candidate geometry comparison still pending.
+
+## 51: Constant folding removes evidence alias for retained storage pin
+- **Date:**2026-10-08.
+- **Symptom/check:** native37810652570 passes restored cell declaration/check gate, then original-storage audit rejects _1700_.RESET_B before proof/simulation.
+- **Root cause:** original _0815_ reset wire is driven by tiehi_2243_; Liberty folding preserves value1 but deletes the original named binding used by the strict audit.
+- **Fix/coverage:** retain one original named wire per storage-pin bit before flatten/opt. No forced values or state changes. Artifact-based alias restoration passes all537 state-cell bindings; mutation of reset1 to0 still rejects. Binary proof and loaded native tests remain mandatory; cloud result pending.
+
 ## 50: Legacy null pad-library selector breaks pinned physical preflight
 - **Date:**2026-10-08.
 - **Symptom/check:** fanout37809673156 passes source placement/load observation but stops before CTS on OpenROAD.prepare_env/filter_views TypeError: NoneType not iterable.

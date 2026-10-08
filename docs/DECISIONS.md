@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-062: Strict official precheck on the passing experimental driver layout
+- **Date:**2026-10-08. **Status:** accepted bounded cloud diagnostic; no submission or hardware promotion.
+- **Evidence:** driver37708459393 has fresh native/antenna/critical-connectivity0 and Magic/KLayout/shell LVS0, but official Tiny Tapeout precheck is untested. Use accepted overlaid GDS bb415750feace175e140d2fbb3a9aca4b72731c248a884b46999eb933e3f3246 and matching final ODB b71f5f377faee63410781c4f108a7b9b06d26e2552ce9f3418b5f227fbf67285; raw streamout is a different layout hash.
+- **Decision:** authenticate compact-precheck-source.tar.gz SHA25604ed04ee60dc4f586309fed368b86b9577cdc9821ffdc0519cafd790eb83b2e6. Export native top-block LEF and power-aware Verilog from that unchanged ODB. Invoke unmodified tt-support-tools d66cf179e7bc4d296362ab7e2e3b344dc3c4f665 official precheck in its pinned Nix environment, following tt-gds-action3412659307918422f3f0727917cf9b499aaca588. Require all nine IHP checks present and passing, no skipped checks or geometry changes.
+- **Cost/limits:** free standard cloud65min job, official checks40min bound. No local EDA, pin edits, PDK edits or check waivers. Fanout33, native C2 function and configured-fabric timing remain independent blockers even if precheck passes. Source package contains only public-project generated views, metadata/license and attribution, published to the existing experimental release.
+
 ## D-061: Preserve original C2 storage while remapping combinational gates
 - **Date:**2026-10-08. **Status:** accepted bounded diagnostic; no architecture or frozen-hardware change.
 - **Evidence:**37709917442 control passes both28-TX/28-RX loaded cases, but original synthesis and finalC2 substitutions fail UART X with all9164 actual configuration latches known/matching. Failure exists before physical processing; precise combinational/reset cause not established.

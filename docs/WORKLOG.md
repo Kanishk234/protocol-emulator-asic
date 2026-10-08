@@ -35,6 +35,33 @@ declaration/native-observer/empty-selector fixes, with all original gates
 preserved. Native/tile negative controls, AST/Tcl/YAML/whitespace pass; no
 local EDA. No design-success claim follows from these setup corrections.
 
+**Independent evidence audit:** recovered existing formal36491754401 F3
+artifact. Both depth2/depth4 logs contain Property proved/abc pdr PASS;
+proof/RTL files unchanged from ee259cb. Corrected stale local-only EVIDENCE
+row and wrote FIFO evidence report; no whole-chip formal claim or new phase
+box. Corrected preflights37810652641/37810652597 active; native37810652570
+passes restored declaration/check gate but storage-binding audit rejects
+_1700_.RESET_B before proof/sim. Investigating lost alias versus actual
+change; no binding waiver or constant force. Official compact precheck
+preparation proceeds separately on authenticated passing driver GDS.
+
+**Second audit and bounded corrections:**26411c6 lint37810652598/docs37810652650/
+test37810652599/unit37810652664 all pass. Corrected native run loses a
+folded tie-high reset alias (BUG51); preserve original storage-wire names
+without forcing values. Tile original floorplan completes before LLPath
+observer error (BUG52); convert native path wrapper and retain only the top
+in JSON header. Fanout baseline actual CTS/resizer/STA completes before
+new default array:null serialization rejects MACROS (BUG53); normalize
+only that proven default, preserving all view/placement audits. Baseline
+has32 fanout at estimated typ, not all-corner acceptance. Prepared D062
+strict official precheck separately. Automatic upload review initially
+rejected possible private-artifact export; verified repository public and
+archive census entirely public-project generated views/metadata/licenses.
+Same upload approved on retry with that evidence. No permission bypass.
+**Next:** review corrected paired experiments and official precheck results;
+retain actual failures and don't promote until native/physical/timing gates
+all pass. No phase boxes ticked.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

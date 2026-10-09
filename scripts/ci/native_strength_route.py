@@ -9,8 +9,8 @@ from native_hold100_size import SOURCE_SHA256, validate_change
 from native_stock_route import fingerprints, qualified, run_step
 from postgrt_timing import screen
 
-SOURCE_RUN = 37943825506
-SOURCE_SHA = 'f2c2a82b81195ac380ebf7e6fbcbd48ee0315923'
+SOURCE_RUN = 37949660848
+SOURCE_SHA = 'b6515e5ca22111b5f54489aadf9034cda7d2d266'
 
 
 def validate_provenance(run, gates):

@@ -8,7 +8,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: gds-native-strength-route-37943825506
+  group: gds-native-strength-route-37949660848
   cancel-in-progress: false
 
 jobs:
@@ -120,11 +120,11 @@ jobs:
       - name: Download qualified six-strength checkpoint
         uses: actions/download-artifact@v7
         with:
-          name: gds-native-hold100-strength-37943825506
+          name: gds-native-hold100-strength-37949660848
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          run-id: 37943825506
+          run-id: 37949660848
 
       - name: Verify native run provenance
         env:
@@ -133,7 +133,7 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           test "$PWD" = /home/runner/work/protocol-emulator-asic/protocol-emulator-asic
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs/37943825506" > /tmp/native-strength-source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/37949660848" > /tmp/native-strength-source-run.json
 
       - name: Qualify fresh timing and antennas, route and extract
         timeout-minutes: 325

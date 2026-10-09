@@ -86,7 +86,7 @@ def test_workflow_downloads_exact_qualified_screen():
     steps=workflow['jobs']['harden']['steps']
     download=next(s for s in steps if 'download-artifact@' in s.get('uses',''))
     assert int(download['with']['run-id'])==runner.SOURCE_RUN
-    assert download['with']['name']=='gds-native-hold100-strength-37943825506'
+    assert download['with']['name']=='gds-native-hold100-strength-37949660848'
 
 
 @pytest.mark.parametrize('failure', [None,'state','hold','baseline','change','missing','cleanup','overflow','reset'])

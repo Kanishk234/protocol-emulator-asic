@@ -3,6 +3,7 @@
 Pins, instances and placement must stay exact within each routing-only case.
 Native congestion evidence is required; this never qualifies chip timing/views.
 """
+import argparse
 import json
 import os
 from pathlib import Path
@@ -20,6 +21,23 @@ INPUT = ROOT / "build/fanout_grt_input"
 BUFFERED = {"odb": "b5968bc650ffdb24d01639fcc08b4c51ccd6f857ae589bd072ec077e2e246f66",
             "nl": "3e3e9fd0a7632c1669858c99ff968aebcd671550488736f4c51c8d2222722136",
             "sdc": DERIVED["sdc"]}
+ORIGINAL_ROUTING_CONFIG_SHA = "660afb662cbb5307b1bf5b9bc8235461d0f05f1819310247b04b921b8692b4c0"
+
+
+def configure_iterations(source, original, iterations):
+    """Materialize authenticated native defaults; change only iteration budget."""
+    if iterations not in (50, 150): raise ValueError("Only original50 or diagnostic150 iterations are supported")
+    if original.get("GRT_OVERFLOW_ITERS") != 50 or original.get("GRT_ALLOW_CONGESTION") is not False:
+        raise ValueError("Original native routing policy is not strict 50-iteration baseline")
+    protected = {key: val for key, val in original.items() if key.startswith(("GRT_", "RT_"))}
+    if any(key in source and source[key] != val for key, val in protected.items()):
+        raise ValueError("Original source and native routing settings disagree")
+    baseline = dict(source, **protected)
+    selected = dict(baseline, GRT_OVERFLOW_ITERS=iterations)
+    if {key for key in baseline if baseline[key] != selected[key]} != (
+            {"GRT_OVERFLOW_ITERS"} if iterations != 50 else set()):
+        raise ValueError("Iteration diagnostic changed other settings")
+    return selected, protected
 
 
 def parse_congestion(text):
@@ -60,11 +78,12 @@ def authenticate_views(paths, expected):
     return actual
 
 
-def main():
+def main(iterations):
     OUT.mkdir(exist_ok=False)
     result = {"passed": False, "scope": "paired GRT-only congestion screen",
               "physical_or_timing_acceptance": False, "configured_timing_acceptance": False,
               "detailed_routing": False, "driver_resize": False, "stages": {},
+              "selected_grt_overflow_iterations": iterations,
               "source_runs": {"cluster8": 37811985079, "ten_buffers": 37956470190}}
     def save(): (OUT / "result.json").write_text(json.dumps(result, indent=2) + "\n")
     save()
@@ -98,6 +117,17 @@ def main():
         if config.get("PAD_LIBS") is None: config["PAD_LIBS"] = {}
         config["CTS_SINK_CLUSTERING_SIZE"] = 8
         config["meta"] = {"version": 2, "flow": ["OpenROAD.GlobalRouting"]}
+        previous_configs = [INPUT / "previous_screen" / label / "1-openroad-globalrouting/config.json"
+                            for label in ("cluster8", "ten_buffers")]
+        if any(sha(path) != ORIGINAL_ROUTING_CONFIG_SHA for path in previous_configs):
+            raise ValueError("Original actual GRT configuration authentication failed")
+        original_routing = json.loads(previous_configs[0].read_text())
+        config, protected = configure_iterations(config, original_routing, iterations)
+        result["original_routing_config_sha256"] = ORIGINAL_ROUTING_CONFIG_SHA
+        result["original_native_routing_run"] = 37958932549
+        result["original_routing_settings"] = protected
+        result["effective_routing_settings"] = {key: config[key] for key in protected}
+        result["only_native_setting_change"] = "GRT_OVERFLOW_ITERS 50 to150" if iterations == 150 else "none; exact original50 replay"
         config_path = OUT / "config.json"
         config_path.write_text(json.dumps(config, indent=2) + "\n")
         result["identical_case_config_sha256"] = sha(config_path)
@@ -134,6 +164,10 @@ def main():
                 if len(stages) != 1: raise ValueError("Missing unique GRT stage")
                 stage = stages[0]
                 rawlog = (stage / "openroad-globalrouting.log").read_text()
+                actual = re.findall(r"(?m)^\+ global_route -congestion_iterations (\d+)\b[^\n]*", rawlog)
+                entry["native_command_iteration_counts"] = [int(value) for value in actual]
+                if not actual or any(int(value) != iterations for value in actual):
+                    raise ValueError("Native GRT command did not use exact selected iteration budget")
                 entry["native_congestion"] = parse_congestion(rawlog)
                 if entry["returncode"] != 0: raise RuntimeError("Native GRT failed")
                 final = json.loads((stage / "state_out.json").read_text())
@@ -156,7 +190,7 @@ def main():
                 if resolved["CELL_LIBS"] != config["LIB"] or macro_contract(resolved["MACROS"]) != macro_contract(config["MACROS"]):
                     raise ValueError("GRT changed actual library/macro inputs")
                 for key, val in config.items():
-                    if key.startswith("GRT_") or key in ("CLOCK_PORT", "CLOCK_PERIOD", "MAX_FANOUT_CONSTRAINT", "PNR_SDC_FILE", "FALLBACK_SDC"):
+                    if key.startswith(("GRT_", "RT_")) or key in ("CLOCK_PORT", "CLOCK_PERIOD", "MAX_FANOUT_CONSTRAINT", "PNR_SDC_FILE", "FALLBACK_SDC"):
                         if resolved.get(key) != val: raise ValueError("GRT changed protected setting " + key)
                 entry["passed"] = True
             except Exception as exc:
@@ -172,4 +206,7 @@ def main():
     finally: save()
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--iterations", type=int, choices=(50, 150), default=os.environ.get("WARP_GRT_ITERATIONS", "150"))
+    main(parser.parse_args().iterations)

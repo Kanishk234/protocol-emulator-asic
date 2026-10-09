@@ -24,6 +24,20 @@ controls pass, no local EDA. Retention/power interface audit prepared separately
 native power-interface census; correct actual PG access/tile fanout/configured
 timing without false abstracts, constraint changes or check waivers.
 
+**Measured result:** explicit-corner fanout37956470190 SUCCESS. Baseline5
+and buffered0 independently at fast/slow/typ; all supplied estimated shell
+slew/cap/setup/hold gates also pass. Exact3596 original instances/18073
+terminals preserved after ten identity buffers; fixed macro exact. Cost1550
+cells legalized/moved,21.6um maximum axis displacement; no routed acceptance.
+Prepared audit-only default for the retained failing C2 physical workflow:
+read exact authenticated completed ODB/metrics and original source archive,
+run two native pin observers, preserve original timing failure. Full hardening
+remains explicit mode; avoid repeating known timing-failed routing merely to
+collect a missing interface report.
+**Next:** review actual final-C2 native result, read-only signal/PG census and
+strict PGabstract export correction; then integrate measured electrical fixes
+into a fresh route rather than accepting estimated timing alone.
+
 ## 2026-10-08 (session69: driver closure; isolate native mapping and preflight fanout)
 **Done:** proactively audited latest workflows. HEAD03851ee lint37709970909/
 docs37709970944/test37709970924/unit37709970902 all pass. Downloaded driver

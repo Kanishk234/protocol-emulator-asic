@@ -34,9 +34,140 @@ CHECKS = {"KLayout pin label overlapping drawing", "KLayout SG13CMOS5L DRC",
     "Layer check", "Cell name check", "Analog pin check"}
 EXPORT = r"""
 read_db $::env(WARP_PRECHECK_ODB)
-if {[[ord::get_db_block] getName] != "tt_um_warp"} {error "Unexpected top block"}
-# write_lef emits the technology/library; native write_abstract_lef emits the
-# top macro and preserves existing signal/power pin geometry and use types.
+set block [ord::get_db_block]
+if {[$block getName] != "tt_um_warp" || [$block getDbUnitsPerMicron] != 1000} {
+    error "Unexpected top block or DBU"
+}
+foreach command {odb::dbBox_destroy odb::dbBPin_destroy} {
+    if {![llength [info commands $command]]} {error "Missing pinned native API: $command"}
+}
+proc warp_box_rect {box} {
+    return [list [$box xMin] [$box yMin] [$box xMax] [$box yMax]]
+}
+proc warp_pin_census {block} {
+    set terms {}; set boxes {}
+    foreach term [$block getBTerms] {
+        set net [$term getNet]
+        if {$net eq "NULL"} {error "Disconnected original BTerm: [$term getName]"}
+        lappend terms [list [$term getName] [$net getName] [$term getSigType] [$term getIoType]]
+        foreach pin [$term getBPins] {
+            foreach box [$pin getBoxes] {
+                lappend boxes [list [$term getName] [$pin getId] [$pin getPlacementStatus] \
+                    [[$box getTechLayer] getName] {*}[warp_box_rect $box]]
+            }
+        }
+    }
+    return [list [lsort $terms] [lsort $boxes]]
+}
+proc warp_special_census {block} {
+    set records {}
+    foreach net [$block getNets] {
+        foreach wire [$net getSWires] {
+            lappend records [list SWIRE [$net getName] [$net getSigType] [$wire getId] [$wire getWireType]]
+            foreach box [$wire getWires] {
+                if {[$box isVia]} {
+                    set via [$box getTechVia]
+                    set kind TECH
+                    if {$via eq "NULL"} {set via [$box getBlockVia]; set kind BLOCK}
+                    if {$via eq "NULL"} {error "Special via lacks definition"}
+                    set layer [list VIA $kind [$via getName] \
+                        [$box getViaBottomLayerMask] [$box getViaCutLayerMask] [$box getViaTopLayerMask]]
+                } else {
+                    set layer [list METAL [[$box getTechLayer] getName]]
+                }
+                lappend records [list SBOX [$net getName] [$wire getId] [$box getId] $layer \
+                    [$box getWireShapeType] [$box getDirection] {*}[warp_box_rect $box]]
+            }
+        }
+    }
+    return [lsort $records]
+}
+proc warp_existing_supply_covers {net rect} {
+    lassign $rect lx by rx ty
+    set intervals {}
+    foreach wire [$net getSWires] {
+        foreach box [$wire getWires] {
+            if {[$box isVia] || [[$box getTechLayer] getName] ne "Metal4"} {continue}
+            if {[$box xMin] <= $lx && [$box xMax] >= $rx} {
+                lappend intervals [list [$box yMin] [$box yMax]]
+            }
+        }
+    }
+    set covered $by
+    foreach interval [lsort -integer -index 0 $intervals] {
+        lassign $interval low high
+        if {$high <= $covered} {continue}
+        if {$low > $covered} {break}
+        set covered $high
+        if {$covered >= $ty} {return 1}
+    }
+    return 0
+}
+# Only abstract access metadata is changed in this in-memory copy. The actual
+# connected supply dbSWire/dbSBox conductors and source GDS/ODB stay intact.
+set targets [dict create VPWR {1266150 7340 1268250 691960} \
+    VGND {1270470 7340 1272570 691960}]
+set die [$block getDieArea]
+set die_before [warp_box_rect $die]
+set pins_before [warp_pin_census $block]
+set special_before [warp_special_census $block]
+set removals {}; set kept_pg {}; set expected_boxes {}
+set found [dict create VPWR 0 VGND 0]
+foreach term [$block getBTerms] {
+    set name [$term getName]
+    foreach pin [$term getBPins] {
+        foreach box [$pin getBoxes] {
+            set layer [[$box getTechLayer] getName]
+            set rect [warp_box_rect $box]
+            set record [list $name [$pin getId] [$pin getPlacementStatus] $layer {*}$rect]
+            if {[dict exists $targets $name] && $layer eq "Metal4" && $rect eq [dict get $targets $name]} {
+                if {[$term getSigType] ni {POWER GROUND} || [[$term getNet] getName] ne $name} {
+                    error "Target is not its original same-name supply net"
+                }
+                if {![warp_existing_supply_covers [$term getNet] $rect]} {
+                    error "Short access is not covered by existing same-net Metal4 conductor: $name $rect"
+                }
+                dict incr found $name
+                lappend removals [list $box $pin $name $rect]
+            } else {
+                lappend expected_boxes $record
+                if {[$term getSigType] in {POWER GROUND}} {
+                    lassign $rect lx by rx ty
+                    if {$name ni {VPWR VGND} || $layer ne "Metal4" || $rx-$lx < 2100 || \
+                        $by > 10000 || [$die yMax]-$ty > 10000 || $lx < [$die xMin] || \
+                        $rx > [$die xMax] || $by < [$die yMin] || $ty > [$die yMax]} {
+                        error "Unexpected remaining boundary power access: $record"
+                    }
+                    lappend kept_pg [list $name $layer {*}$rect]
+                }
+            }
+        }
+    }
+}
+if {[dict get $found VPWR] != 1 || [dict get $found VGND] != 1 || \
+    [llength $removals] != 2 || [llength $kept_pg] != 26} {
+    error "Expected exactly two short access boxes and26 existing full-span accesses"
+}
+puts "WARP_ABSTRACT_POWER before28 after26 removed=$targets"
+# Mutate a stable list, never a live dbSet iterator; remove an empty BPin only.
+foreach removal $removals {
+    lassign $removal box pin name rect
+    odb::dbBox_destroy $box
+    if {![llength [$pin getBoxes]]} {odb::dbBPin_destroy $pin}
+}
+set pins_after [warp_pin_census $block]
+if {[lindex $pins_after 0] ne [lindex $pins_before 0] || \
+    [lindex $pins_after 1] ne [lsort $expected_boxes]} {
+    error "Abstract derivation changed BTerms/connections or another pin box"
+}
+if {[warp_special_census $block] ne $special_before || \
+    [warp_box_rect [$block getDieArea]] ne $die_before} {
+    error "Abstract derivation changed native special-wire geometry or die"
+}
+puts "WARP_ABSTRACT_POWER preserved_signal_and_other_pg_boxes=1 preserved_bterms_and_connections=1"
+puts "WARP_ABSTRACT_POWER preserved_special_records=[llength $special_before] retained_accesses=[lsort $kept_pg]"
+# Native writer emits the26 real retained access shapes. No source database
+# is rewritten and no LEF coordinates or physical conductors are fabricated.
 write_abstract_lef $::env(WARP_PRECHECK_LEF)
 write_verilog -include_pwr_gnd $::env(WARP_PRECHECK_VERILOG)
 """

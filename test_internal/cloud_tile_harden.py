@@ -40,7 +40,10 @@ def retain_physical(odb, metrics):
     # Include them in the same native census rather than trusting policy alone.
     observer.write_text(preflight.PIN_OBSERVER.replace(
         '    if {[$term getSigType] in {POWER GROUND}} {continue}',
-        '    if {[$term getSigType] in {POWER GROUND}} {puts "WARP_POWER\\t[$term getName]\\t[$term getSigType]"}'))
+        '    if {[$term getSigType] in {POWER GROUND}} {puts "WARP_POWER\\t[$term getName]\\t[$term getSigType]"}')
+        # An unquoted Tcl semicolon ends the join command, leaving its default
+        # space separator. Signal pins had one box, so only PG exposed this.
+        .replace('[join [lsort $boxes] ;]', '[join [lsort $boxes] {;}]'))
     def census(label, path):
         log = OUT / f"{label}_signal_pins.log"
         with log.open("w") as stream:

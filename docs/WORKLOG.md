@@ -5,6 +5,12 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (publish approved relocation continuation)
+- Published approved tools, CI, tests and evidence in separate commits through `0fa2b9f44a06b053142295e41b69d5640e547495`; verified remote `main` matches. FIPE and unrelated untracked prototypes remain local.
+- Dispatched [gds-sram-relocate-route 37983933655](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37983933655) on that exact SHA; queued at dispatch verification. It continues the successful relocation screen through detailed routing and fresh extraction, then compares timing and electrical violations with the passing strength route.
+- Validation before publication: 91 focused checks passed; `git diff --check` passed. No hardware-history changes pending. No phase checklist boxes ticked.
+- Next: inspect actual detailed-route DRC, extracted all-corner setup/hold and electrical counts; retain the original strength route if relocation regresses. A relocated-netlist GL run and official clean-flow closure remain required.
+
 ## 2026-10-09: Codex (strength extraction passes timing, electrical remains open)
 - Prepared exact SRAM relocation DRT/extraction continuation and manual workflow for37978260010/head815f78c. Original routed NL hash, move-only logic/antenna chain, post-cleanup retained site/history, trusted config/views and saved gates checked; fresh stock antenna/STA before DRT, no repeated physical repair. Old extraction preserved; new before/after summary separates target cap, timing and full electrical qualification.91 focused tests pass; actual downloaded baseline/logic/antenna/history/site audit passes. No dispatch yet; next scoped reviewed publication/launch, keep original passing checkpoint and FIPE local.
 - Result check: strength GL37975960876 passes22/22,0fail/skip in57min; servo959.61s explains normal test7 pause. Exact strength route/NL hash validated; relocated candidate not covered by this GL. Latest test/lint/docs/unit green; no main runs active, only legacy37655518919/37655518925 queued.

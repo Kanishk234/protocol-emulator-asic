@@ -21,10 +21,10 @@ Companions: `OVERVIEW_TRIPWIRE.md`, `ARCHITECTURE.md`, `VERIFICATION.md`.
 |---|---|---|
 | Template | `TinyTapeout/ttihp-verilog-template`, branch **cmos5l** | Linked from the Jane Street post |
 | Build action | `TinyTapeout/tt-gds-action@ihp-cmos5l`, `pdk: ihp-sg13cmos5l` | Used by the template's `gds` workflow |
-| Tile size | **6x4** (1289.28 × 710.64 µm die; core ≈ 902K µm²) | 8x4 is "being worked on" by Jane Street and Tiny Tapeout; not designed for until confirmed in writing |
+| Tile size | **6x4** (1289.28 × 710.64 µm die; core ≈ 902K µm²) | Organizer email supplied2026-10-09: planned maximum8x4, template expected around mid-October; retain6x4 until released and evaluated |
 | Routing layers | Metal1–Metal4 for the project (TopMetal1 belongs to the Tiny Tapeout top level) | One fewer layer than SG13G2, so congestion matters more |
 | Clock | `CLOCK_PERIOD` 20 ns (50 MHz); `CLOCK_PORT` `clk` | Sign-off corner is typical; slow-corner results are reported honestly |
-| Pads | Specified to ~66 MHz, up to ~10 ns insertion delay | Do not claim sub-ns timing at the pins |
+| Pads | CMOS5L has no characterized pad timing numbers yet | Organizer email supplied2026-10-09; Tiny Tapeout is investigating comparable SG13G2 data. Do not assert a66MHz pad specification or measured pin timing |
 | Top module | `tt_um_tripwire` with the template's ports | All outputs assigned; unused inputs in a `_unused` wire; `ena` ignored |
 | Hardening time (6x4, macro design) | ~4–5 h per `gds` run in comparable public designs | GitHub kills jobs at **6 h** |
 

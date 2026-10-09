@@ -88,15 +88,15 @@ Honesty labels:
 
 | Item | Value | Source |
 |---|---|---|
-| Must build | Open-source, general-purpose protocol emulator: a small processor for reading and writing pins, counting cycles and hitting timing precisely, with protocols in firmware | Jane Street post |
+| Must build | Open-source, reprogrammable protocol emulator with its software/toolchain and example protocols; a CPU is not required | Jane Street post; organizer email supplied2026-10-09 |
 | Required protocols | UART, SPI, I2C | Jane Street post |
 | Stretch goals | Low-speed USB, 10 Mbit Ethernet | Jane Street post |
 | Also suggested | JTAG, SWD, PS/2, CAN | Jane Street post |
 | Judging | "Unique functionality" and "novel approaches to design and verification methodologies"; formal, constrained-random and AI-assisted verification are welcomed | Jane Street post |
 | Template | `TinyTapeout/ttihp-verilog-template`, branch **cmos5l** (cloned locally in WSL) | Jane Street post |
-| Area | **6x4 tiles** (1289.28 × 710.64 µm; core ≈ 902K µm²). 8x4 is "being worked on" | Jane Street post; Loom's measurements |
+| Area | **6x4 tiles** (1289.28 × 710.64 µm; core ≈ 902K µm²). Planned competition maximum8x4; template expected around mid-October, design to6x4 until released | Organizer email supplied2026-10-09; existing6x4 measurements |
 | Process | IHP SG13CMOS5L 130 nm; routing layers up to Metal4 | Tiny Tapeout |
-| Clock | 50 MHz sign-off default; pads specified to ~66 MHz with up to ~10 ns insertion delay | Tiny Tapeout docs, via Loom's facts file |
+| Clock | TRIPWIRE targets50MHz/20ns. Competition sets no fixed frequency; choose one that closes routed timing and supports demonstrated protocols. CMOS5L pad timing is not yet characterized | Organizer email supplied2026-10-09; TRIPWIRE target |
 | Pins | `ui_in[7:0]` in, `uo_out[7:0]` out, `uio[7:0]` bidirectional (with `uio_oe`), plus `clk`, `rst_n`, `ena` | Template `project.v` |
 | SRAM | IHP macros such as 512x16 (45.3K µm²) and 1024x16 (79.7K µm²); integrated on cmos5l by Loom | Loom `docs/tt_cmos5l_facts.md` |
 | CI | Workflows `test`, `gds` (gds + precheck + gl_test + viewer → GitHub Pages), `docs`, `fpga` (manual, iCE40UP5K bitstream; informational since D-022) | Template |

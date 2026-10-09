@@ -99,3 +99,63 @@ def test_strength_rejects_repeated_repair(tmp_path):
     path.write_text(json.dumps(gates))
     with pytest.raises(ValueError, match='repair history'):
         validate(root, run)
+
+
+def relocated_fixture(tmp_path):
+    import hashlib
+    root, _, old_step = fixture(tmp_path, 37870374707)
+    route = root / 'runs/native-sram-relocate-route'
+    old_step.parent.parent.rename(route)
+    step = route / 'drt/1-openroad-detailedrouting'
+    gates = dict(qualified=True, source_run=37978260010, minimum_fast_hold_ns=.05,
+                 repair_repeated=False, relocation_repeated=False)
+    (route / 'gates.json').write_text(json.dumps(gates))
+    state = dict(metrics={'route__drc_errors': 0},
+                 nl='/runner/runs/native-sram-relocate-route/drt/1-openroad-detailedrouting/tt_um_tripwire.nl.v')
+    (step / 'state_out.json').write_text(json.dumps(state))
+    config = json.loads((step / 'config.json').read_text())
+    config.update(GRT_ALLOW_CONGESTION=False, GRT_RESIZER_HOLD_SLACK_MARGIN=.10)
+    (step / 'config.json').write_text(json.dumps(config))
+    (root / 'src/config_native_sram_relocate_route.json').write_text(json.dumps(config))
+    run = dict(id=37983933655, head_sha='0fa2b9f44a06b053142295e41b69d5640e547495',
+               head_branch='main', conclusion='success', path='.github/workflows/gds-sram-relocate-route.yaml')
+    digest = hashlib.sha256((step / 'tt_um_tripwire.nl.v').read_bytes()).hexdigest()
+    return root, run, step, digest
+
+
+def test_relocated_functional_identity(tmp_path):
+    from native_route_gl import validate_relocated
+    root, run, step, digest = relocated_fixture(tmp_path)
+    result = validate_relocated(root, run, digest)
+    assert result['netlist'] == str(step / 'tt_um_tripwire.nl.v')
+    assert result['functional_simulation_only'] is True
+    assert result['official_signoff'] is False
+
+
+@pytest.mark.parametrize('fault', ['hash', 'unreviewed', 'running', 'source', 'repeat',
+                                 'drc', 'state', 'congestion', 'clock', 'hold'])
+def test_relocated_rejects_unmatched_evidence(tmp_path, fault):
+    from native_route_gl import validate_relocated
+    root, run, step, digest = relocated_fixture(tmp_path)
+    if fault == 'hash': digest = '0' * 64
+    elif fault == 'unreviewed': digest = None
+    elif fault == 'running': run['conclusion'] = ''
+    elif fault in ('source', 'repeat'):
+        path = step.parent.parent / 'gates.json'
+        data = json.loads(path.read_text())
+        data['source_run' if fault == 'source' else 'relocation_repeated'] = 1 if fault == 'source' else True
+        path.write_text(json.dumps(data))
+    elif fault in ('drc', 'state'):
+        path = step / 'state_out.json'
+        data = json.loads(path.read_text())
+        if fault == 'drc': data['metrics']['route__drc_errors'] = 1
+        else: data['nl'] = '/runner/runs/native-strength-route/drt/1-openroad-detailedrouting/tt_um_tripwire.nl.v'
+        path.write_text(json.dumps(data))
+    else:
+        path = root / 'src/config_native_sram_relocate_route.json'
+        data = json.loads(path.read_text())
+        key, value = {'congestion': ('GRT_ALLOW_CONGESTION', True),
+                      'clock': ('CLOCK_PERIOD', 25), 'hold': ('GRT_RESIZER_HOLD_SLACK_MARGIN', .05)}[fault]
+        data[key] = value
+        path.write_text(json.dumps(data))
+    with pytest.raises(ValueError): validate_relocated(root, run, digest)

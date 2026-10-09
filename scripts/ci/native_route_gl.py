@@ -2,6 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
+import re
 
 STRENGTH_NETLIST_SHA = 'd5cc09ed3a7db5cbf941fbcacc30347ffac0f3a8488f56b964b9d46f36e327dc'
 
@@ -13,6 +14,56 @@ SOURCES = {
     37870374707: ('73a35ce3d22d0b63f213078cdeddc5565f0c1d97', 'hold100',
                   37866086829, 'gds-native-hold100-route'),
 }
+
+
+def validate_relocated(root, run, reviewed_netlist_sha):
+    """Prepare relocation GL only after reviewing the completed artifact hash.
+
+    This entry point is intentionally not registered in the dispatch workflow
+    until the running experiment completes and its artifact is reviewed.
+    Functional GL remains useful even if extracted electrical/timing gates fail.
+    """
+    if not re.fullmatch(r'[0-9a-f]{64}', reviewed_netlist_sha or ''):
+        raise ValueError('Reviewed relocated netlist hash required')
+    if (run.get('id') != 37983933655
+            or run.get('head_sha') != '0fa2b9f44a06b053142295e41b69d5640e547495'
+            or run.get('head_branch') != 'main' or run.get('conclusion') != 'success'
+            or run.get('path') != '.github/workflows/gds-sram-relocate-route.yaml'):
+        raise ValueError('Relocated routing provenance mismatch')
+    route = root / 'runs/native-sram-relocate-route'
+    gates = json.loads((route / 'gates.json').read_text())
+    if (gates.get('qualified') is not True or gates.get('source_run') != 37978260010
+            or gates.get('minimum_fast_hold_ns') != .05
+            or gates.get('repair_repeated') is not False
+            or gates.get('relocation_repeated') is not False):
+        raise ValueError('Relocated pre-route qualification mismatch')
+    states = list((route / 'drt').glob('*-openroad-detailedrouting/state_out.json'))
+    if len(states) != 1:
+        raise ValueError('Exactly one completed relocated DRT checkpoint required')
+    step = states[0].parent
+    state = json.loads(states[0].read_text())
+    suffix = '/runs/native-sram-relocate-route/drt/' + step.name + '/tt_um_tripwire.nl.v'
+    if (state.get('metrics', {}).get('route__drc_errors') != 0
+            or not str(state.get('nl', '')).endswith(suffix)):
+        raise ValueError('Relocated route DRC or netlist identity mismatch')
+    config = json.loads((step / 'config.json').read_text())
+    recipe = json.loads((root / 'src/config_native_sram_relocate_route.json').read_text())
+    for data in (config, recipe):
+        if (data.get('CLOCK_PERIOD') != 20 or data.get('GRT_ADJUSTMENT') != .16
+                or data.get('GRT_ALLOW_CONGESTION') is not False
+                or not str(data.get('PNR_SDC_FILE', '')).endswith('/src/signoff.sdc')):
+            raise ValueError('Relocated route configuration mismatch')
+    if recipe.get('SYNTH_STRATEGY') != 'AREA 1' or recipe.get('GRT_RESIZER_HOLD_SLACK_MARGIN') != .10:
+        raise ValueError('Relocated full recipe mismatch')
+    netlist = step / 'tt_um_tripwire.nl.v'
+    text = netlist.read_text()
+    if 'module tt_um_tripwire' not in text or 'RM_IHPSG13_1P_512x16_c2_bm_bist' not in text:
+        raise ValueError('Full-chip SRAM netlist missing')
+    digest = hashlib.sha256(netlist.read_bytes()).hexdigest()
+    if digest != reviewed_netlist_sha:
+        raise ValueError('Relocated routed netlist hash mismatch')
+    return dict(netlist=str(netlist), sha256=digest, route_run=run['id'],
+                profile='relocated100', functional_simulation_only=True, official_signoff=False)
 
 
 def validate(root, run):

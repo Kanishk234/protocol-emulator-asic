@@ -194,6 +194,32 @@ def native_config_bindings(module):
             for name, cell in module["cells"].items() if cell["type"] == "sg13cmos5l_dlhq_1"}
 
 
+def runtime_debug_alias_value(tile, module, name):
+    """Read an optional debug alias from the exact matched netlist, without force.
+
+    OpenROAD's netlist writer can discard internal wire aliases. Absence from
+    the authoritative cone means this debug field was not retained; it does
+    not relax checks on actual storage, loaded configuration or UART behavior.
+    A declared live bit with no observable same-bit alias remains an error.
+    """
+    net = module["netnames"].get(name)
+    if net is None:
+        return "not retained in matched netlist (debug alias only)"
+    if len(net["bits"]) != 1:
+        raise ValueError("runtime debug alias is not scalar: " + name)
+    bit = net["bits"][0]
+    if isinstance(bit, str):
+        return bit
+    aliases = [name] + sorted(alias for alias, peer in module["netnames"].items()
+                              if alias != name and peer["bits"] == [bit])
+    for alias in aliases:
+        try:
+            return str(tile[alias].value)
+        except (AttributeError, KeyError):
+            continue
+    raise KeyError("matched runtime debug bit has no observable alias: " + name)
+
+
 def report_runtime(dut, label):
     """Localize unknowns at shell, clock/reset and logic-cell boundaries."""
     top = dut.user_project
@@ -245,8 +271,13 @@ def report_runtime(dut, label):
         flop = next(cell for cell in module["cells"].values()
                     if state_bit in cell["connections"].get("Q", []))
         for name in ("LUT_flop", "c_out_mux", "c_reset_value", "O"):
+            # These two optional debug names are not storage or an acceptance
+            # property. Mandatory Q/O observations and actual D/reset traces
+            # remain strict, including when a debug alias is not retained.
+            value = (runtime_debug_alias_value(tile, module, prefix + name)
+                     if name in ("c_out_mux", "c_reset_value") else tile[prefix + name].value)
             dut._log.info("UART SOURCE %s %s %s=%s", label, tile._name,
-                          name, tile[prefix + name].value)
+                          name, value)
         for port in ("D", "RESET_B"):
             trace_unknown_cone(dut, label + " UART_SOURCE_" + port, module,
                                tile, flop["connections"][port][0])

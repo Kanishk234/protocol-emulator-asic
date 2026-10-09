@@ -75,3 +75,30 @@ typ-11.514293844ns; fanout62 at each supplied corner. Original CLOCK_PORT=null
 uses a virtual clock, not a validated configured-fabric clock contract. Do not
 call timing accepted. Retained actual final views need native loaded retest,
 power/signal interface census and configuration-specific timing analysis.
+
+## October 9 follow-up
+
+[Explicit six-process fanout replay37956470190](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37956470190)
+passes: baseline5/candidate0 fanout violations independently at fast/slow/typ.
+Ten Liberty-proven identity buffers preserve all3596 original instances and
+18073 terminals after contraction. Legalization moves1550 original cells,
+maximum axis/Manhattan displacement21.6um. This is a real electrical
+improvement with placement and added-buffer costs; no routed acceptance.
+
+| Estimated shell corner | Candidate setup slack(ns) | Hold slack(ns) | Fanout/slew/cap violations |
+|---|---:|---:|---:|
+| Fast |14.5106|0.116698|0/0/0|
+| Slow |12.7739|0.634802|0/0/0|
+| Typical |13.862|0.303978|0/0/0|
+
+[Actual hardened C2 native test37956821834](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37956821834)
+passes both control cases. Candidate cases load9164 actual configuration
+latches known/image-matched, then abort before RUN on an optional debug alias
+removed by OpenROAD. It does not establish a candidate UART regression.
+BUG57 records a narrow logging correction; mandatory function checks remain.
+
+[Official precheck37814339758](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37814339758)
+passes eight checks; the two short internal supply access entries fail the
+external boundary contract. D066 derives an abstract retaining26 actual
+full-span accesses only after same-net conductor proof and complete invariant
+census. Original physical files/checks remain unchanged; fresh result pending.

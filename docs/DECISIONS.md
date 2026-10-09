@@ -2,6 +2,14 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-066: Export only valid existing external power accesses
+- **Date:**2026-10-09. **Status:** accepted abstract-only cloud experiment; no hardware promotion.
+- **Evidence:** official37814339758 passes eight checks; Pin check rejects two internal Metal4 side-grid access boxes ending18.68um below the top boundary. Twenty-six existing full-span supply accesses remain available.
+- **Decision:** derive the native LEF from an in-memory copy of the authenticated driver ODB. Remove exactly the two identified access metadata boxes only after proving complete same-net existing Metal4 conductor coverage. Retain all26 valid access rectangles, every signal pin, supply BTerm/net association, die and native special-wire/via geometry; exact native before/after census is mandatory. Never rewrite source ODB/GDS or invent coordinates. Run all nine unchanged official checks.
+- **Reason/alternatives:** external abstracts may expose a subset of actual conductor accesses; an internal side-grid segment need not be an external boundary access. Extending physical rails would require new routing/DRC/LVS and is deferred unless existing-conductor proof fails.
+- **Cost/limits:** no silicon-area or protocol resource change; two fewer advertised external access rectangles. No timing, fanout, native function or complete fabric acceptance follows. The official result remains pending.
+- **Sources:** [pinned official power-pin checks](https://github.com/TinyTapeout/tt-support-tools/blob/d66cf179e7bc4d296362ab7e2e3b344dc3c4f665/precheck/pin_check.py), [native box destruction](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/src/db/dbBox.cpp), [native LEF access export](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/src/lefout/lefout.cpp).
+
 ## D-065: Retest actual hardened C2 through the real loader
 - **Date:**2026-10-09. **Status:** accepted bounded native diagnostic; no physical/timing promotion.
 - **Evidence:**37814078650 actual hardened C2 finishes route/antenna/Magic/KLayout/LVS with zero findings but fails deferred virtual-clock setup and has62 fanout violations. Exact final NL13cac0eabdbdcaf000b1e57c521fc9d417aac957be18a68c5808f8c920529e7c is available; its native behavior has not been retested.

@@ -1,10 +1,20 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-08). Clean README reproduction now
+**Status:** in progress (updated 2026-10-09). Clean README reproduction now
 passes on a fresh hosted runner37690896748: rebuilt bitstreams, loaded30/30
 and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
 remain open. This is a separate reproducibility result from checkpoint experiments.
+
+The shell fanout remedy37956470190 now passes all three explicit estimated
+corner measurements: five remaining violations become zero with ten identity
+buffers. Routing and extracted timing still need confirmation. The actual
+hardened C2 reaches zero route/antenna/Magic/KLayout/LVS in37814078650 but
+fails its virtual-clock setup and has62 fanout violations. Its loaded retest
+37956821834 stops before UART on missing debug aliases; a logging correction
+is prepared. Official precheck37814339758 passes eight checks and rejects two
+internal supply access entries. An invariant-checked abstract correction is
+prepared. None of these results qualifies the compact design or changes G1.
 
 The compact stronger-driver trial37708459393 passes same-layout native
 routing, antenna, full Magic/KLayout and shell LVS. Fresh shell setup/hold,

@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-09 (session71: repair diagnostic aliases and external power abstract)
+**Done:** latest a713e69 lint37957273503/unit37957273537/test37957273530/
+docs37957273620 pass. Native final-C2 run37956821834 control passes;
+candidate configuration passes9164 known/matching actual latches, then optional
+debug alias KeyError aborts before RUN. No UART regression is established.
+Reviewed narrow matched-cone debug fix; all mandatory configuration/storage,
+UART/STOP/reset checks stay strict. Same-bit/literal/observed-X positives and
+missing-live/wrong-bit/nonscalar negatives pass locally with no EDA.
+Reviewed D066 abstract-only export: exactly two short internal supply access
+metadata boxes removed only after same-net conductor proof;26 existing valid
+accesses and complete other-pin/special-wire census must remain unchanged.
+Original source GDS/ODB immutable. Native Tcl/coverage controls pass; all nine
+unchanged official checks still required. Retained C2 audit37957273575 fails;
+inner artifact proves unquoted Tcl separator merged multi-box PG records.
+Quoted separator fixes serialization; strict308-port/three-box PG parsing
+controls pass. Frozen hardware unchanged.
+**Boxes ticked:** none.
+**Next:** push scoped fixes, inspect fresh four native cases and official
+precheck, fix audit setup if evidenced; then fresh route/extracted shell timing
+for measured fanout remedies and genuine configured-tile timing/electrical closure.
+
 ## 2026-10-09 (session70: explicit corner replay and actual final C2 function)
 **Done:** resumed pending work after automatic approval service usage-limit
 failure prevented prior commits; no rejected command was executed or bypassed.

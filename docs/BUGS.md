@@ -1,10 +1,28 @@
 # Bugs
 
+## 59: Native power-interface observer loses multiple-box separators
+- **Date:**2026-10-09.
+- **Symptom/check:** retained C2 audit37957273575 aborts parsing the original VPWR access before candidate comparison.
+- **Root cause:** inherited Tcl join delimiter is an unquoted semicolon. Default-space serialization had worked for single-box signal pins but merged three real rectangles per supply port.
+- **Fix/coverage:** quote the delimiter as {;} in the observer clone. Strict parsing remains unchanged; Tcl formatting and retained308-port census controls preserve all three rectangles per PG net. No physical or original timing-status changes. Fresh audit pending.
+
+## 58: Internal supply access metadata fails external boundary contract
+- **Date:**2026-10-09.
+- **Symptom/check:** official37814339758 passes eight checks but Pin check rejects two Metal4 supply rectangles ending18.68um below top (limit10um).
+- **Root cause:** native full-block abstract exports short internal side-grid access entries alongside26 full-span external supply entries. This is distinct from BUG54 formatting.
+- **Fix/coverage:** D066 removes only the exact two metadata boxes in an in-memory export copy after native same-net conductor coverage proof. Exact all-other-pin/BTerm/connection/die/special-wire census must match; source ODB/GDS stay unchanged. Gap/narrow-conductor controls reject. All nine official checks still required; cloud result pending.
+
+## 57: Optional runtime debug aliases disappear during native serialization
+- **Date:**2026-10-09.
+- **Symptom/check:** final-C2 native37956821834 loads9164 actual configuration latches successfully but aborts before RUN with KeyError for c_out_mux. No candidate UART result was obtained.
+- **Root cause:** OpenROAD netlist serialization removes optional c_out_mux/c_reset_value aliases starting at floorplan. The unconditional debug logger assumes they survive.
+- **Fix/coverage:** consult the exact matched cone for these two debug fields. Proven absent aliases are explicitly logged; declared bits use only same-bit observable aliases, and missing live bits/nonscalar names still fail. Actual LUT_flop/O reads, all storage/configuration checks and external UART/STOP/reset checks remain strict. Positive/negative mock controls pass, including preserving observed X; fresh four-case cloud test pending.
+
 ## 56: Mid-PnR STA reports only its first loaded timing corner
 - **Date:**2026-10-08.
 - **Symptom/check:**37814494048 completes baseline STA with PNR_CORNERS listing fast/slow/typ, but strict three-corner gate finds only fast metrics.
 - **Root cause:** pinned sta/corner.tcl explicitly takes the first corner for its per-process reports. Loading all three libraries does not produce all three independent reports.
-- **Fix/coverage:** six explicit processes: baseline and candidate at each original fast/slow/typ corner, with that single PNR_CORNERS/DEFAULT_CORNER selection. All original library maps/clock/SDC/macro/constraints retained; exact requested metric mandatory. Actual fast5 accepted only as fast; wrong/missing/extra-corner controls reject. Baseline5/candidate0 per corner still required. No coverage waiver; cloud result pending.
+- **Fix/coverage:** six explicit processes: baseline and candidate at each original fast/slow/typ corner, with that single PNR_CORNERS/DEFAULT_CORNER selection. All original library maps/clock/SDC/macro/constraints retained; exact requested metric mandatory. Actual fast5 accepted only as fast; wrong/missing/extra-corner controls reject. Verified37956470190 reproduces baseline5/candidate0 independently at fast/slow/typ. No coverage waiver.
 
 ## 55: Configuration fanout STA replay omits required run directory
 - **Date:**2026-10-08.

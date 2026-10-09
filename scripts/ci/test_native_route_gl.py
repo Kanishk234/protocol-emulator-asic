@@ -8,26 +8,30 @@ def fixture(tmp_path, run_id):
     run = dict(id=run_id, head_sha=sha, head_branch='main', conclusion='success',
                path=f'.github/workflows/{workflow}.yaml')
     root = tmp_path
-    route = root / 'runs/native-stock-route'
+    route_name = 'native-strength-route' if profile == 'strength100' else 'native-stock-route'
+    route = root / 'runs' / route_name
     step = route / 'drt/1-openroad-detailedrouting'
     step.mkdir(parents=True)
     (route / 'gates.json').write_text(json.dumps(dict(qualified=True, profile=profile,
-            source_run=source, minimum_fast_hold_ns=0.05)))
+            source_run=source, minimum_fast_hold_ns=0.05, repair_repeated=False)))
     (step / 'state_out.json').write_text(json.dumps(dict(metrics={'route__drc_errors': 0},
-        nl='/runner/runs/native-stock-route/drt/1-openroad-detailedrouting/tt_um_tripwire.nl.v')))
+        nl='/runner/runs/' + route_name + '/drt/1-openroad-detailedrouting/tt_um_tripwire.nl.v')))
     (step / 'config.json').write_text(json.dumps(dict(CLOCK_PERIOD=20,
         SYNTH_STRATEGY='AREA 1', GRT_ADJUSTMENT=0.16, PNR_SDC_FILE='/runner/src/signoff.sdc')))
     (root / 'src').mkdir()
     (root / 'src/config_native_stock.json').write_text(json.dumps(dict(CLOCK_PERIOD=20,
         SYNTH_STRATEGY='AREA 1', GRT_ADJUSTMENT=0.16, PNR_SDC_FILE='/runner/src/signoff.sdc',
-        GRT_RESIZER_HOLD_SLACK_MARGIN=.10 if profile == 'hold100' else .125)))
+        GRT_RESIZER_HOLD_SLACK_MARGIN=.10 if profile in ('hold100', 'strength100') else .125)))
     (step / 'tt_um_tripwire.nl.v').write_text('module tt_um_tripwire; RM_IHPSG13_1P_512x16_c2_bm_bist s(); endmodule')
     return root, run, step
 
 
 @pytest.mark.parametrize('run_id', list(SOURCES))
-def test_both_exact_native_routes(tmp_path, run_id):
+def test_both_exact_native_routes(tmp_path, run_id, monkeypatch):
     root, run, step = fixture(tmp_path, run_id)
+    if run_id == 37954320974:
+        import hashlib, native_route_gl
+        monkeypatch.setattr(native_route_gl, "STRENGTH_NETLIST_SHA", hashlib.sha256((step / "tt_um_tripwire.nl.v").read_bytes()).hexdigest())
     result = validate(root, run)
     assert result['functional_simulation_only'] is True
     assert result['official_signoff'] is False
@@ -81,3 +85,17 @@ def test_step_config_may_omit_synthesis_but_full_recipe_is_required(tmp_path):
     config = json.loads(path.read_text()); config['GRT_RESIZER_HOLD_SLACK_MARGIN'] = .05
     path.write_text(json.dumps(config))
     with pytest.raises(ValueError, match='full recipe'): validate(root, run)
+
+
+def test_strength_rejects_different_final_netlist(tmp_path):
+    root, run, step = fixture(tmp_path, 37954320974)
+    with pytest.raises(ValueError, match='hash mismatch'):
+        validate(root, run)
+
+def test_strength_rejects_repeated_repair(tmp_path):
+    root, run, step = fixture(tmp_path, 37954320974)
+    path = root / 'runs/native-strength-route/gates.json'
+    gates = json.loads(path.read_text()); gates['repair_repeated'] = True
+    path.write_text(json.dumps(gates))
+    with pytest.raises(ValueError, match='repair history'):
+        validate(root, run)

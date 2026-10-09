@@ -2,7 +2,7 @@ name: l3-native-routed-gl
 
 on:
   workflow_run:
-    workflows: [gds-native-stock-route, gds-native-hold100-route]
+    workflows: [gds-native-stock-route, gds-native-hold100-route, gds-native-strength-route]
     types: [completed]
   workflow_dispatch:
     inputs:
@@ -15,7 +15,7 @@ on:
         description: Successful completed routing run containing the final netlist
         required: true
         type: string
-        default: "37870374707"
+        default: "37954320974"
 
 permissions:
   actions: read
@@ -55,7 +55,7 @@ jobs:
       - name: Download the candidate repaired-netlist artifact
         uses: actions/download-artifact@v7
         with:
-          name: gds-native-${{ (github.event.workflow_run.name == 'gds-native-stock-route' || inputs.route_run_id == '37859526262') && 'stock' || 'hold100' }}-route-${{ github.event.workflow_run.id || inputs.route_run_id }}
+          name: gds-native-${{ (github.event.workflow_run.name == 'gds-native-strength-route' || inputs.route_run_id == '37954320974') && 'strength' || (github.event.workflow_run.name == 'gds-native-stock-route' || inputs.route_run_id == '37859526262') && 'stock' || 'hold100' }}-route-${{ github.event.workflow_run.id || inputs.route_run_id }}
           path: artifacts
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}

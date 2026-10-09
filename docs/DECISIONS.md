@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-067: Measure actual routing cost of the ten-buffer fanout remedy
+- **Date:**2026-10-09. **Status:** accepted paired bounded global-routing experiment; no promotion.
+- **Evidence:**37956470190 passes explicit three-corner estimated shell fanout/slew/cap/setup/hold with ten identity buffers on cluster8;1550 cells move during legalization. Stronger-driver37708459393 is a different layout/tree and cannot supply this checkpoint's route acceptance.
+- **Decision:** compare exact cluster8 checkpoint37811985079 against exact buffered checkpoint37956470190 using only stock OpenROAD.GlobalRouting with identical authenticated original library/macro/clock/SDC/routing settings. Require native legal placement, before/after instance/master/connection equality, complete actual final congestion table with zero H/V/total overflow, positive native wirelength and actual guides. Preserve both outcomes and all reports/state hashes even on failure.
+- **Cost/limits:** standard cloud45min job, each GRT900s. Candidate cost remains ten buffers and measured legalization displacement; congestion/wirelength are measured rather than inferred from cell count. No synthesis, new driver resize, antenna repair, detailed route, extra resource or protocol tuning. Zero global overflow cannot certify detailed-route/geometry/function/extracted or configured timing. Next step is fresh native routing and extracted checks only when actual congestion evidence supports it.
+- **Source:** [pinned OpenROAD global-routing interface](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/README.md).
+
 ## D-066: Export only valid existing external power accesses
 - **Date:**2026-10-09. **Status:** accepted abstract-only cloud experiment; no hardware promotion.
 - **Evidence:** official37814339758 passes eight checks; Pin check rejects two internal Metal4 side-grid access boxes ending18.68um below the top boundary. Twenty-six existing full-span supply accesses remain available.

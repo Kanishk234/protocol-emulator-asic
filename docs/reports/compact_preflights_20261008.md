@@ -102,3 +102,22 @@ passes eight checks; the two short internal supply access entries fail the
 external boundary contract. D066 derives an abstract retaining26 actual
 full-span accesses only after same-net conductor proof and complete invariant
 census. Original physical files/checks remain unchanged; fresh result pending.
+
+[Retained final-C2 interface audit37958116371](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37958116371)
+passes after BUG59's serialization correction. All306 signal ports and both
+power ports match original directions/types/layers and every rectangle,
+including three rectangles per power port. Authenticated final ODB is
+ed22fd1da8caa0fc3386c85183110c3bcecca641192c80171f91f96a183720c9.
+Retained native route/antenna/critical-disconnect/Magic/KLayout/LVS counts are
+all zero; this is a read-only audit of37814078650, not a new hardening or
+timing pass. Its original deferred setup failure and62 fanout violations remain.
+
+[Actual routed-C2 real-loaded retest37958116481](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37958116481)
+passes all four cases: control normal/USER_RESET and only final-C2 substitution
+normal/USER_RESET. Exact final C2 netlist13cac0eabdbdcaf000b1e57c521fc9d417aac957be18a68c5808f8c920529e7c;
+all other control tiles unchanged. Actual9164 configuration latches are
+known/image-matched; external28TX/28RX, STOP and user reset pass. No state or
+configuration forces; original D023 data-routing simulation harness remains.
+No SDF timing result. This closes this tile's post-hardening functional retest,
+not the other regenerated tiles' physical qualification, complete fabric
+integration,62 tile fanout failures or configured-fabric timing.

@@ -18,6 +18,29 @@ unchanged official checks still required. Retained C2 audit37957273575 fails;
 inner artifact proves unquoted Tcl separator merged multi-box PG records.
 Quoted separator fixes serialization; strict308-port/three-box PG parsing
 controls pass. Frozen hardware unchanged.
+**Cloud follow-up:** fixes committed9e623f8/89e33bd/cb1e2c2/c527502 and
+pushed. Official37958116017/final-C237958116481/native37958115960 active.
+Read-only native audit37958116371 SUCCESS: all306signal+2PG ports and all
+original rectangles match, retained native route/antenna/Magic/KLayout/LVS0.
+Original timing/fanout rejection remains. Preparing paired global-routing
+screen for actual cluster8/ten-buffer checkpoint; old stronger-driver route
+cannot be reused because its placements/tree differ.
+**New blocker:** official37958116017 fails before metadata edits because
+pinned Tcl dbBPin does not expose C++ getId. Binding-compatible census fix
+in progress; do not infer any geometry or official-check result from this run.
+**Functional milestone:** actual37958116481 SUCCESS; both passing control
+cases and both actual routed-C2 cases pass9164 known/matched configuration,
+28TX/28RX,STOP/reset. Only C2 differs; no SDF/state/configuration forces.
+Other tiles' physical qualification, tile62fanout and configured timing remain.
+Latest c527502 ordinary lint/unit/test/docs all pass. Original native probe
+37958115960 remains failed with RTL control passing; final-C2 success is a
+separate tested source, not qualification of the original failed netlist.
+**Next-route preparation:** reviewed new D067 paired GRT-only helper/workflow
+with exact cluster8/ten-buffer ODB/NL/SDC authentication, identical protected
+settings, native before/after placement/connectivity and actual complete
+zero-overflow congestion tables. Actual pinned C2 log parsing and malformed/
+nonzero metric controls pass. No local EDA; free standard hosted job only.
+No stronger driver, detailed route or estimated/extracted timing added.
 **Boxes ticked:** none.
 **Next:** push scoped fixes, inspect fresh four native cases and official
 precheck, fix audit setup if evidenced; then fresh route/extracted shell timing

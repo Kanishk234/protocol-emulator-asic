@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**October9 follow-up:** C2 hardening37814078650 finishes63 stages in about
+7min including route/antenna/Magic/KLayout/LVS0, but fails deferred virtual-clock
+setup and retains62 fanout violations. Read-only37958116371 confirms all306
+signal plus both power interfaces and every original rectangle. Actual final
+C2 loaded function passes both normal/USER_RESET cases37958116481 without SDF. Shell buffer experiment37956470190 clears
+five remaining fanout failures independently at all three estimated corners;
+its changed placement still requires fresh routing and extracted timing.
+
 **Latest verified compact trial (October8):** stronger-driver37708459393
 passes in30m05s (00:34:18–01:04:23UTC): fresh native0/antenna0/critical
 disconnected0, full Magic0/KLayout0/GDS-based shell LVS0, with fresh extracted

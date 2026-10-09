@@ -10,9 +10,10 @@ The shell fanout remedy37956470190 now passes all three explicit estimated
 corner measurements: five remaining violations become zero with ten identity
 buffers. Routing and extracted timing still need confirmation. The actual
 hardened C2 reaches zero route/antenna/Magic/KLayout/LVS in37814078650 but
-fails its virtual-clock setup and has62 fanout violations. Its loaded retest
-37956821834 stops before UART on missing debug aliases; a logging correction
-is prepared. Official precheck37814339758 passes eight checks and rejects two
+fails its virtual-clock setup and has62 fanout violations. Its first loaded retest37956821834 stops on missing debug aliases; after
+correcting logging,37958116481 passes actual SPI-loaded configuration, UART,
+STOP and reset in both normal and USER_RESET cases. Other regenerated tiles
+and configured timing still require qualification. Official precheck37814339758 passes eight checks and rejects two
 internal supply access entries. An invariant-checked abstract correction is
 prepared. None of these results qualifies the compact design or changes G1.
 

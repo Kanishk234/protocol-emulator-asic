@@ -1,10 +1,16 @@
 # Bugs
 
+## 60: Native abstract census assumes an unexposed object-ID method
+- **Date:**2026-10-09.
+- **Symptom/check:** precheck37958116017 aborts before abstract mutation: pinned Tcl dbBPin lacks getId.
+- **Root cause:** upstream C++ dbObject::getId exists but is not inherited by the pinned exposed Tcl class. Native binding availability was not proven by the source API check.
+- **Fix/coverage:** use native SWIG pointer-derived object handles for exact surviving BPin grouping and SWire/SBox identity. Every remaining used method is declared in the actually wrapped pinned db.h. Keep exact all-other-pin/connection/special-wire/die invariants and existing-conductor proof; no abstraction is accepted from this failed run. Fresh cloud result pending.
+
 ## 59: Native power-interface observer loses multiple-box separators
 - **Date:**2026-10-09.
 - **Symptom/check:** retained C2 audit37957273575 aborts parsing the original VPWR access before candidate comparison.
 - **Root cause:** inherited Tcl join delimiter is an unquoted semicolon. Default-space serialization had worked for single-box signal pins but merged three real rectangles per supply port.
-- **Fix/coverage:** quote the delimiter as {;} in the observer clone. Strict parsing remains unchanged; Tcl formatting and retained308-port census controls preserve all three rectangles per PG net. No physical or original timing-status changes. Fresh audit pending.
+- **Fix/coverage:** quote the delimiter as {;} in the observer clone. Strict parsing remains unchanged; Tcl formatting and retained308-port census controls preserve all three rectangles per PG net. No physical or original timing-status changes. Verified37958116371 matches all306 signal and both PG ports with every rectangle preserved.
 
 ## 58: Internal supply access metadata fails external boundary contract
 - **Date:**2026-10-09.
@@ -16,7 +22,7 @@
 - **Date:**2026-10-09.
 - **Symptom/check:** final-C2 native37956821834 loads9164 actual configuration latches successfully but aborts before RUN with KeyError for c_out_mux. No candidate UART result was obtained.
 - **Root cause:** OpenROAD netlist serialization removes optional c_out_mux/c_reset_value aliases starting at floorplan. The unconditional debug logger assumes they survive.
-- **Fix/coverage:** consult the exact matched cone for these two debug fields. Proven absent aliases are explicitly logged; declared bits use only same-bit observable aliases, and missing live bits/nonscalar names still fail. Actual LUT_flop/O reads, all storage/configuration checks and external UART/STOP/reset checks remain strict. Positive/negative mock controls pass, including preserving observed X; fresh four-case cloud test pending.
+- **Fix/coverage:** consult the exact matched cone for these two debug fields. Proven absent aliases are explicitly logged; declared bits use only same-bit observable aliases, and missing live bits/nonscalar names still fail. Actual LUT_flop/O reads, all storage/configuration checks and external UART/STOP/reset checks remain strict. Positive/negative mock controls pass, including preserving observed X; verified37958116481 passes all four actual loaded normal/USER_RESET control/candidate cases.
 
 ## 56: Mid-PnR STA reports only its first loaded timing corner
 - **Date:**2026-10-08.

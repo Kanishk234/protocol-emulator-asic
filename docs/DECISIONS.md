@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-068: Bounded longer global-routing search on unchanged checkpoints
+- **Date:**2026-10-09. **Status:** accepted tool-only diagnostic; no promotion.
+- **Evidence:**37958932549 authentic cluster8/ten-buffer cases fail native GRT-0116 with complete final congestion148/169 respectively. Both original settings use GRT_OVERFLOW_ITERS50 and keep congestion disallowed; current placement is unqualified.
+- **Decision:** replay both exact inputs, changing only GRT_OVERFLOW_ITERS50→150 in the copied cloud config. Authenticate both prior resolved configs and require original50 before overriding, explicit selected value, same library/macro/clock/SDC/layers/adjustments and native before/after placement/connectivity. Keep all D067 complete-table/zero-overflow/guide/wirelength gates. Manual50 remains available for reproduction; push/default150 is the new isolated search. Preserve timeout/nonzero evidence.
+- **Cost/limits:** each GRT900s and total hosted job45min remain bounded; more search may not resolve local congestion. No buffer/master/placement change, capacity inflation, congestion allowance, routing-layer expansion or detailed route. A pass would justify further detailed-route measurement only, not timing or physical qualification.
+
 ## D-067: Measure actual routing cost of the ten-buffer fanout remedy
 - **Date:**2026-10-09. **Status:** accepted paired bounded global-routing experiment; no promotion.
 - **Evidence:**37956470190 passes explicit three-corner estimated shell fanout/slew/cap/setup/hold with ten identity buffers on cluster8;1550 cells move during legalization. Stronger-driver37708459393 is a different layout/tree and cannot supply this checkpoint's route acceptance.
@@ -11,8 +17,8 @@ Format for each entry: ID, date, status (Proposed / Accepted / Superseded), deci
 
 ## D-066: Export only valid existing external power accesses
 - **Date:**2026-10-09. **Status:** accepted abstract-only cloud experiment; no hardware promotion.
-- **Evidence:** official37814339758 passes eight checks; Pin check rejects two internal Metal4 side-grid access boxes ending18.68um below the top boundary. Twenty-six existing full-span supply accesses remain available.
-- **Decision:** derive the native LEF from an in-memory copy of the authenticated driver ODB. Remove exactly the two identified access metadata boxes only after proving complete same-net existing Metal4 conductor coverage. Retain all26 valid access rectangles, every signal pin, supply BTerm/net association, die and native special-wire/via geometry; exact native before/after census is mandatory. Never rewrite source ODB/GDS or invent coordinates. Run all nine unchanged official checks.
+- **Evidence:** official37814339758 passes eight checks; Pin check rejects two internal Metal4 side-grid access boxes ending18.68um below the top boundary. Twenty-four existing full-span supply accesses remain available.
+- **Decision:** derive the native LEF from an in-memory copy of the authenticated driver ODB. Remove exactly the two identified access metadata boxes only after proving complete same-net existing Metal4 conductor coverage. Retain all24 valid access rectangles, every signal pin, supply BTerm/net association, die and native special-wire/via geometry; exact native before/after census is mandatory. Never rewrite source ODB/GDS or invent coordinates. Run all nine unchanged official checks.
 - **Reason/alternatives:** external abstracts may expose a subset of actual conductor accesses; an internal side-grid segment need not be an external boundary access. Extending physical rails would require new routing/DRC/LVS and is deferred unless existing-conductor proof fails.
 - **Cost/limits:** no silicon-area or protocol resource change; two fewer advertised external access rectangles. No timing, fanout, native function or complete fabric acceptance follows. The official result remains pending.
 - **Sources:** [pinned official power-pin checks](https://github.com/TinyTapeout/tt-support-tools/blob/d66cf179e7bc4d296362ab7e2e3b344dc3c4f665/precheck/pin_check.py), [native box destruction](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/src/db/dbBox.cpp), [native LEF access export](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/src/lefout/lefout.cpp).

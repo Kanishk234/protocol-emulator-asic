@@ -11,7 +11,7 @@ Reviewed narrow matched-cone debug fix; all mandatory configuration/storage,
 UART/STOP/reset checks stay strict. Same-bit/literal/observed-X positives and
 missing-live/wrong-bit/nonscalar negatives pass locally with no EDA.
 Reviewed D066 abstract-only export: exactly two short internal supply access
-metadata boxes removed only after same-net conductor proof;26 existing valid
+metadata boxes removed only after same-net conductor proof;24 existing valid
 accesses and complete other-pin/special-wire census must remain unchanged.
 Original source GDS/ODB immutable. Native Tcl/coverage controls pass; all nine
 unchanged official checks still required. Retained C2 audit37957273575 fails;
@@ -45,10 +45,29 @@ No stronger driver, detailed route or estimated/extracted timing added.
 new official37958932525 and paired GRT37958932549 in progress on5442acd.
 Added compact_closure_next_20261009.md with measured scope, exact remaining
 blockers and ordered fresh-route/complete-fabric acceptance steps.
+**Actual routing result:**37958932549 FAIL real native congestion: baseline148
+vs ten-buffer169 finaloverflow. This does not qualify candidate routing;
+congestion/placement remedy investigation remains necessary. Precheck37958932525
+fails before metadata mutation on wrong expectedPGcount: authentic source has
+13 rectangles pernet/26total including2short, so retain12pernet/24total.
+Correcting exact count with independent nativeLEF provenance, no waiver.
+**Independent follow-ups:** C2 config-only branch plan estimates149 leaf
+buffers while preserving49 forwarding paths, covering49cfgviolations and
+leaving13user violations. Loaded UART actually selects N_GBUF_END[3] for
+all8 C2 userFF; virtual-clock reports cannot certify these real endpoints.
+Recorded bounded future experiments in closure plan, not implemented/promoted.
+**Next bounded search:** D068 changes copied GRT iteration budget50→150
+on unchanged cluster8/ten-buffer sources, authenticating prior native resolved
+settings before alteration. Keep congestion disallowed and every zero-overflow/
+source/placement gate; no capacity/layer/electrical-limit change. Each900s
+and hosted45min cap remain. Corrected PGinventory proven against exact source
+LEF:24 full-span rectangles/12persupply after2short metadata removals.
 **Boxes ticked:** none.
-**Next:** push scoped fixes, inspect fresh four native cases and official
-precheck, fix audit setup if evidenced; then fresh route/extracted shell timing
-for measured fanout remedies and genuine configured-tile timing/electrical closure.
+**Next:** inspect actual corrected D066 precheck and D068150-iteration GRT
+results. If congestion persists, investigate localized placement/clock-tree
+routing before another hardware trial. Then tile config/user fanout remedies,
+genuine configured clock timing, remaining physical tiles and complete-fabric
+integration; preserve authenticated source checkpoints before CI retention expires.
 
 ## 2026-10-09 (session70: explicit corner replay and actual final C2 function)
 **Done:** resumed pending work after automatic approval service usage-limit

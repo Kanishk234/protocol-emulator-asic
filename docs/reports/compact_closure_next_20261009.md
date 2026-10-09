@@ -17,7 +17,9 @@ successor is not qualified. G1 remains frozen. Phase5 exit gates stay open.
    conductor census, then run all nine unmodified checks. Pinned Tcl API
    compatibility fix follows37958116017;37958932525 is the fresh run.
 2. D067 paired GRT screen37958932549: compare authentic cluster8 and ten-buffer
-   sources with identical settings. Native complete final overflow must be
+   sources with identical settings. Actual result: control148 and candidate169
+   overflow; both fail. Investigate localized congestion before another
+   placement/route experiment. Native complete final overflow must be
    zero; retain actual congestion/wirelength/guides and exact placements.
    This screens routing cost without another long detailed-route trial.
 3. If routing evidence supports continuation, route from this actual source
@@ -48,3 +50,27 @@ Local work uses only lightweight source, hash, parser and mock checks. Saved
 CI artifacts are temporary; preserve authenticated source views/manifests and
 reproduction instructions before retention expires. No submission view or
 frozen hardware is replaced by these diagnostics.
+
+## Next tile diagnostics prepared from actual retained C2
+
+Actual37814078650 fanout inventory splits49 configuration nets from13 user/data
+nets. A configuration-only buffering candidate can retain the49 existing
+forwarding buffers directly on their original inputs and add equal-depth leaf
+branches only to529 latch D and529 latch GATE sinks. Count-derived estimate:
+82 FrameData plus67 FrameStrobe buffers (149 total) with at most8 latch loads
+per leaf. These are analytical buffer counts, not measured area/timing/routing
+results. Keep forwarding routes and all storage instances/pin bindings exact;
+configuration data/strobe skew and loaded operation must be tested again.
+Thirteen user/data violations require separate treatment. Generic repair_design
+also resizes and repairs slew/capacitance, so it would not isolate this change.
+
+Timing must use the clock actually selected by the loaded configuration.
+The exact final C2 has529 configuration latches and8 userFF; the latter share
+clock mux _1288_. In the tested UART image, C2 instances X2Y1/X2Y3 select
+N_GBUF_END[3] using Frame0 bits20/21 both high. There is no physical tile port
+named GCLK. A tile-local diagnostic must trace the selected port through its
+real clock mux/buffers; complete-fabric analysis must trace the upstream
+configured network as well. User reset operates through data logic and must
+remain timed. Exact real latch values and all8 FF clock endpoints need audit
+before any case analysis is accepted. These are planning observations from
+37958116481's authenticated source, not a configured timing pass.

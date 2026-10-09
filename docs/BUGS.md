@@ -1,5 +1,11 @@
 # Bugs
 
+## 61: Abstract audit overcounts existing supply accesses
+- **Date:**2026-10-09.
+- **Symptom/check:** precheck37958932525 passes native API and conductor checks but aborts on expected two removals/26 survivors before mutation.
+- **Root cause:** the original exported LEF has13 rectangles per supply net, including one short entry each:26 total,24 survivors. The initial census expectation incorrectly counted28 total.
+- **Fix/coverage:** independently count authentic native LEF37814339758 and require12 full-span survivors per net/24 total after exactly two removals. Keep exact geometry/connections/grouping invariants and all official checks. No result accepted from the failed run.
+
 ## 60: Native abstract census assumes an unexposed object-ID method
 - **Date:**2026-10-09.
 - **Symptom/check:** precheck37958116017 aborts before abstract mutation: pinned Tcl dbBPin lacks getId.
@@ -15,7 +21,7 @@
 ## 58: Internal supply access metadata fails external boundary contract
 - **Date:**2026-10-09.
 - **Symptom/check:** official37814339758 passes eight checks but Pin check rejects two Metal4 supply rectangles ending18.68um below top (limit10um).
-- **Root cause:** native full-block abstract exports short internal side-grid access entries alongside26 full-span external supply entries. This is distinct from BUG54 formatting.
+- **Root cause:** native full-block abstract exports short internal side-grid access entries alongside24 full-span external supply entries. This is distinct from BUG54 formatting.
 - **Fix/coverage:** D066 removes only the exact two metadata boxes in an in-memory export copy after native same-net conductor coverage proof. Exact all-other-pin/BTerm/connection/die/special-wire census must match; source ODB/GDS stay unchanged. Gap/narrow-conductor controls reject. All nine official checks still required; cloud result pending.
 
 ## 57: Optional runtime debug aliases disappear during native serialization

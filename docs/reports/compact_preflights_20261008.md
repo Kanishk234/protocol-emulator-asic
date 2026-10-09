@@ -99,7 +99,7 @@ BUG57 records a narrow logging correction; mandatory function checks remain.
 
 [Official precheck37814339758](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37814339758)
 passes eight checks; the two short internal supply access entries fail the
-external boundary contract. D066 derives an abstract retaining26 actual
+external boundary contract. D066 derives an abstract retaining24 actual
 full-span accesses only after same-net conductor proof and complete invariant
 census. Original physical files/checks remain unchanged; fresh result pending.
 
@@ -121,3 +121,17 @@ configuration forces; original D023 data-routing simulation harness remains.
 No SDF timing result. This closes this tile's post-hardening functional retest,
 not the other regenerated tiles' physical qualification, complete fabric
 integration,62 tile fanout failures or configured-fabric timing.
+
+[Paired native GRT37958932549](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37958932549)
+fails actual congestion with both authenticated sources: cluster8 control148
+final overflow; ten-buffer candidate169. Metal1/2/3/4 totals are17/70/27/34
+and22/61/36/50 respectively. Resources104745/104722; demands34760/35455.
+This rejects route readiness of the measured placements despite estimated
+fanout improvement. No detailed route or timing acceptance. Both original
+inputs remain unchanged and both native failed reports retained. Investigate
+localized congestion and measured placement changes before another physical trial.
+
+Precheck37958932525 stops before abstract mutation on an incorrect audit count.
+Authentic native LEF has13 entries per supply,26 total including two short
+internal entries; the correct invariant is24 surviving external accesses
+(12 per net). BUG61 corrects the count, retaining all coordinates and checks.

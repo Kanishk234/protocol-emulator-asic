@@ -109,6 +109,15 @@ proc warp_existing_supply_covers {net rect} {
 # connected supply dbSWire/dbSBox conductors and source GDS/ODB stay intact.
 set targets [dict create VPWR {1266150 7340 1268250 691960} \
     VGND {1270470 7340 1272570 691960}]
+# Independently audited from the authenticated source LEF: each supply has
+# twelve full-span stripes plus its one short side-grid access.
+set expected_pg {}; set kept_count [dict create VPWR 0 VGND 0]
+foreach {name first_x} {VPWR 22470 VGND 26570} {
+    for {set i 0} {$i < 12} {incr i} {
+        set lx [expr {$first_x + $i * 109920}]
+        lappend expected_pg [list $name Metal4 $lx 3560 [expr {$lx + 2100}] 707080]
+    }
+}
 set die [$block getDieArea]
 set die_before [warp_box_rect $die]
 set pins_before [warp_pin_census $block]
@@ -141,16 +150,19 @@ foreach term [$block getBTerms] {
                         error "Unexpected remaining boundary power access: $record"
                     }
                     lappend kept_pg [list $name $layer {*}$rect]
+                    dict incr kept_count $name
                 }
             }
         }
     }
 }
 if {[dict get $found VPWR] != 1 || [dict get $found VGND] != 1 || \
-    [llength $removals] != 2 || [llength $kept_pg] != 26} {
-    error "Expected exactly two short access boxes and26 existing full-span accesses"
+    [llength $removals] != 2 || [llength $kept_pg] != 24 || \
+    [dict get $kept_count VPWR] != 12 || [dict get $kept_count VGND] != 12 || \
+    [lsort $kept_pg] ne [lsort $expected_pg]} {
+    error "Expected exactly two short access boxes and24 exact full-span accesses (12 per supply)"
 }
-puts "WARP_ABSTRACT_POWER before28 after26 removed=$targets"
+puts "WARP_ABSTRACT_POWER before26 after24 per_net_before=13 per_net_after=12 removed=$targets"
 # Mutate a stable list, never a live dbSet iterator; remove an empty BPin only.
 foreach removal $removals {
     lassign $removal box pin name rect
@@ -168,7 +180,7 @@ if {[warp_special_census $block] ne $special_before || \
 }
 puts "WARP_ABSTRACT_POWER preserved_signal_and_other_pg_boxes=1 preserved_bterms_and_connections=1"
 puts "WARP_ABSTRACT_POWER preserved_special_records=[llength $special_before] retained_accesses=[lsort $kept_pg]"
-# Native writer emits the26 real retained access shapes. No source database
+# Native writer emits the24 real retained access shapes. No source database
 # is rewritten and no LEF coordinates or physical conductors are fabricated.
 write_abstract_lef $::env(WARP_PRECHECK_LEF)
 write_verilog -include_pwr_gnd $::env(WARP_PRECHECK_VERILOG)

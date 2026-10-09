@@ -23,7 +23,7 @@ import re
 from pathlib import Path
 
 import cocotb
-from cocotb.triggers import ClockCycles, FallingEdge, ReadOnly, RisingEdge, ValueChange
+from cocotb.triggers import ClockCycles, FallingEdge, ReadOnly, RisingEdge, ValueChange, with_timeout
 from cocotb.utils import get_sim_time
 
 from chiplib import HM, TAGS, Wire, hex_bytes, load as _load, sigrok, start, write_vcd
@@ -251,11 +251,15 @@ async def test_l3_dshot_tx(dut):
 
 async def _servo_edge(dut, level):
     """Wait for UO0 to reach `level`; the testbench exposes UO as a packed vector."""
-    while True:
-        await ValueChange(dut.uo_out)
-        await ReadOnly()
-        if int(dut.uo_out.value) & 1 == level:
-            return get_sim_time(unit="ns") // 20
+    async def edge():
+        while True:
+            await ValueChange(dut.uo_out)
+            await ReadOnly()
+            if int(dut.uo_out.value) & 1 == level:
+                return get_sim_time(unit="ns") // 20
+
+    # Normal frames are20ms; a missing edge must fail rather than hang CI.
+    return await with_timeout(edge(), 25, "ms")
 
 
 async def _servo_pulse(dut):
@@ -271,7 +275,11 @@ def _write_edge_vcd(path, transitions):
         "$timescale 20 ns $end", "$scope module chip $end", "$var wire 1 ! pwm $end",
         "$upscope $end", "$enddefinitions $end", "#0", "0!",
     ]
-    lines.extend(f"#{clock}\n{level}!" for clock, level in transitions)
+    for clock, level in transitions:
+        tick = int(clock)
+        if tick != clock:
+            raise ValueError("Sparse VCD edge is not on a whole clock")
+        lines.append(f"#{tick}\n{level}!")
     with open(path, "w", encoding="ascii") as vcd:
         vcd.write("\n".join(lines) + "\n")
 

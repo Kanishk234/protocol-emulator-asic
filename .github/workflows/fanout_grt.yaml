@@ -6,6 +6,13 @@ on:
       - 'test_internal/cloud_fanout_grt.py'
       - '.github/workflows/fanout_grt.yaml'
   workflow_dispatch:
+    inputs:
+      iterations:
+        description: Native GRT overflow iteration budget; original50 or diagnostic150
+        type: choice
+        options: ['150', '50']
+        default: '150'
+        required: true
 permissions:
   contents: read
   actions: read
@@ -19,6 +26,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      WARP_GRT_ITERATIONS: ${{ inputs.iterations || '150' }}
       LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
     steps:
       - uses: actions/checkout@v6
@@ -31,6 +39,7 @@ jobs:
           gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
           timeout 120s gh run download 37811985079 -R "$GITHUB_REPOSITORY" --name compact-fanout-preflight-37811985079 --dir build/fanout_grt_input/cluster8
           timeout 120s gh run download 37956470190 -R "$GITHUB_REPOSITORY" --name compact-cfg-fanout-37956470190 --dir build/fanout_grt_input/ten_buffers
+          timeout 120s gh run download 37958932549 -R "$GITHUB_REPOSITORY" --name compact-fanout-grt-37958932549 --dir build/fanout_grt_input/previous_screen
       - name: Two bounded native GRT cases, without detailed routing
         timeout-minutes: 36
         run: |

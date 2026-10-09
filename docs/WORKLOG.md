@@ -5,6 +5,60 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (native six-strength physical screen prepared)
+- Added isolated pinned-base image/wrapper, physical runner and gds-native-hold100-strength-screen workflow for exact route37870374707. Trusted pre-download hardware/config checks, exact extracted NL hash, six sizing receipts, legalization/freshGRT0overflow, conditional congestion-disallowed antenna cleanup/fresh NL+PNL, cleared stale parasitics and fresh allcorner STA/50ps fast hold enforced. No repeated timing repair, full GRT after antennas, DRT or relaxed gates.
+-83 focused tests pass, including full orchestration pass/fail hold and optional cleanup, real shell injection, Tcl all-target preflight, exact-change/physical-view audits and workflow source identity. Shell syntax/diff checks pass; physical APIs mocked locally, not a physical pass. One documentation patch missed its long-line context, corrected with exact text.
+- Workflow/helper changes remain local and unlaunched under supplied git rule. SRAM relocation remains a separate next trial. Next publish reviewed groups via user-run git commands and launch physical strength screen plus exact-source native GL; review actual screen before DRT/extraction. No source hardware/spec change or phase tick. FIPE excluded.
+
+## 2026-10-09: Codex (guarded native sizing contract)
+- Prepared native_hold100_size.py/.tcl: exact extracted source hash, six targets from one Python contract, all-target preflight before mutations, power/signal pin compatibility and unchanged nets. Actual extracted prototype exact six-change rehearsal passes.
+- Found/fixed BUG83: existing logical-cell audit silently skipped multiline SRAM buses. Added bus-rewire rejection and reaudited actual full netlist successfully.70 focused Python/Tcl/helper tests pass; Tcl physical APIs mocked, no physical pass. Initial malformed synthetic fixture corrected before validation.
+- Changes remain local. Physical wrapper/workflow still required; do not claim launched/repaired layout. Next wire sizing into isolated legalization/GRT/antenna/STA, then actual extraction if qualified, preserving50ps hold gate. No hardware/spec edit, phase tick or publication.
+- SRAM DOUT0 trace: single existing wire9447 BUF4 sink; SPEF interconnect0.126627pF dominates reported0.130419pF. Prioritize moving existing buffer near macro before adding cells. Placement/routing evidence still needed; no area/timing benefit claimed yet.
+
+## 2026-10-09: Codex (hold100 targeted setup and reserve investigation)
+- Downloaded actual hold100 max/min/checks, states and final NL/SPEF/SDCs. Electrical slow/typ/fast slew132/37/4, fanout186each, cap6each. SRAM DOUT0 cap0.130419vs0.064pF and REN slew1.265403vs0.595200ns remain. All independent baseline six setup/hold metrics match CI within1e-6ns.
+- Four strength changes give setupWS0allcorners at20ns with holdfast+0.053669680 unchanged, added library area21.7728µm². Removing NAND change fails−0.185588434. Two electrical strength additions retain setup0, reduce slow slew132→112, but cap/fanout remain. Four-cell reserve fails19.9ns; extras on old cone do not help.
+- Traced limiting reserve path cfgword15bit4→tokenproducer tok[14]. NOR4_2 at38013 plus A21OI_2 at30044, in addition to four-cell set, pass allcorner setup at19.8ns with unchanged hold:200ps fixed-parasitic reserve. Missing NAND4_2 probe safely rejected; initial strict clock-match refused20.0000, corrected before reserve evidence. Report PHASE2_HOLD100_EXTRACTED_REPAIR.md records successful/negative controls and limits.23 helper checks/diff check pass. No physical reroute, official claim, phase tick, publication or pending local terminal.
+- Next prepare guarded physical trial of measured six-strength set, address macro/fanout capacitance with buffering, and run exact-netlist GL. User-supplied git rule still applies; changes local. FIPE local only.
+
+## 2026-10-09: Codex (hold100 extracted result receipt)
+- Hold100 route37870374707 completes successfully in65min; both latest unit runs green, no main runs in progress. Two legacy main runs37655518919 GL/37655518925 extraction remain queued, unrelated to current hold100 continuation.
+- Actual artifact11591942595 corner_summary: slow setup−0.522092606ns, fast/typ setup0; holdfast+0.053669681ns/typ+0.135278459ns/slow+0.291619737ns. Slow setup improves about0.902ns vs native125−1.423654124, but still fails; fast hold exceeds50ps gate by only3.67ps. No official promotion or phase tick.
+- Selective download saved eight reports under/tmp/tripwire-completed-hold100-route; electrical counts not yet retrieved. Full log request stalled and was terminated after successful artifact/status retry. Next retrieve exact critical/electrical reports and target remaining522ps setup deficit without losing hold. All changes local.
+
+## 2026-10-08: Codex (combined electrical/timing prototype checks)
+- Hold10037870374707 still active at check. Twelve actual fixed-wire all-corner STA processes combine REN/functional driver sizing on native125 and prior six-cell timing prototype. Baselines match established metrics within1e-6ns; global timing unchanged. Six-cell-plus-two setupWS0 all corners, holdfast+0.094072364ns. Slew133/34/3→113/13/2; cap/fanout unchanged. Combined added library area25.4016µm²; no physical closure claimed.
+- Tightened local native GL workflow to require frozen candidate3393eea;23 helper/workflow/electrical/extraction tests and diff check pass. Changes remain local under supplied git rule. Next hold100 extraction review, remaining buffer/load repair and physical qualification. No phase tick.
+
+## 2026-10-08: Codex (parallel functional fanout probe)
+- Main hold10037870374707 and unit37870419756/37870374880 still active; latest test/lint/docs green. Native125 fanout triage:164 clock-buffer-named violations,24 other drivers, no clock exemption inferred.
+- Six all-corner extracted processes test only driver28820 NOR2_1→2. Baseline timing matches CI within1e-6ns; setup/hold unchanged. Slow slew133→113 and typ34→14, fast unchanged3; cap6/fanout188 unchanged every corner. Added library area3.6288µm². Exact driver slow slew failure disappears; load still exceeds capacitance limit. Report updated, raw logs/tmp; no physical improvement or closure claim.
+- Next actual hold100 result, then targeted buffer/strength physical experiment using measured baseline. Changes local, no phase tick or publication.
+
+## 2026-10-08: Codex (native routed GL preparation)
+- Hold10037870374707 remains active. Prepared separate l3-native-routed-gl workflow using existing L3 suite/pinned Icarus13 and matching native route artifacts. Exact reviewed route IDs/SHAs/profile/source gates, DRT0DRC, config and netlist identity validated; returned hash labels functional evidence only.
+-22 focused native-GL/electrical/extraction tests pass; YAML/wiring audit and diff check pass. Workflow/helper remain local and have not run protocol GL. No hardware edit, publication or phase tick. Next inspect hold100 extraction, review/publish prepared follow-up within authorization, then test its exact netlist.
+
+## 2026-10-08: Codex (measured SRAM REN sizing probe)
+- Hold10037870374707 remains in progress. Ran six actual extracted native125 STA processes; baseline setup/hold matches CI within1e-6ns. One NOR2B_1→2 driver change improves slow SRAM REN slew1.411568→0.722519ns, still above0.595200ns; removes fast/typ REN violations. Global setup/hold unchanged, cap/fanout failures unchanged. Cost+3.6288µm² library area; no physical reroute claim.
+- Report records baseline/probe electrical counts and exact pin limits. Raw evidence stays /tmp/tripwire-native-ren-probe-37859526262. No source hardware change, phase tick, commit or push. Next actual hold100 result; buffering/remapping required for remaining slow REN slew.
+
+## 2026-10-08: Codex (fresh extraction electrical evidence)
+- Hold10037870374707 still runs route/extraction. Connected electrical audit to extraction output with fresh per-corner reports and row/printed-total agreement checks.11 audit/extraction regressions pass; actual saved native125 slow report still audits correctly. Changes local; current workflow uses earlier code.
+- Pinned library confirms NOR2B_2 available, same footprint, +3.6288µm² over REN driver NOR2B_1. Traced shared driver branch through hold11848 to write-enable inverter, so any sizing probe must check both setup and hold. Recorded concrete target; no physical improvement claimed.
+- Next inspect actual hold100 reports and choose one qualified electrical probe. No phase tick, commit or push; FIPE remains local.
+
+## 2026-10-08: Codex (electrical report audit helper)
+- Hold100 route37870374707 remains in route/extraction stage; no new extracted result. Added electrical_report.py to distinguish slew/fanout/capacitance violations and refuse missing/duplicate report sections. Diagnostic output explicitly denies official signoff.
+- Five focused tests pass. Actual native125 slow checks report reproduces133 slew/188 fanout/6 capacitance rows, matching its printed totals. Fanout was absent from the earlier electrical summary; recorded here rather than implying slew/cap alone exhaust the failures. Raw JSON stays in/tmp.
+- Changes remain local under latest supplied git rule. No hardware edit or phase tick. Next audit hold100 final electrical report and timing, then choose one physical correction.
+
+## 2026-10-08: Codex (parallel SRAM electrical audit)
+- Native hold100 route37870374707 remains running, now in fresh antenna/timing qualification→route/extraction. Latest test/lint/docs jobs green; two unit runs still active. No new physical result claimed.
+- Traced native125 SRAM REN to mapped NOR2B driver29426; separated input-slew repair from macro-output fanout/capacitance buffering. Reviewed pinned stock electrical-repair Tcl and upstream resizer documentation; recorded exact failures, experiment order and extracted/GL gates in PHASE2_SRAM_ELECTRICAL_NEXT_STEPS.md. Official-prep old PNR masking still needs correction before adoption.
+- No hardware, constraint, git history or remote edits; FIPE stays local. Next inspect hold100 extraction, then select one measured electrical correction. No phase tick.
+
 ## 2026-10-08: Codex (hold100 guarded routing continuation)
 - Prepared native hold100 continuation for successful screen37866086829/head7b87718f0b28be7c5815cded40db05eb52c27be8. Exact source/workflow/100ps target registry, trusted hardware/full-config equality, fresh antenna cleanup/STA/50ps fast hold, DRT0DRC requirement and automatic extraction remain enforced. Stock125 profile unchanged; no named-cell ECO.
 -72 helper checks pass, including full orchestration for both source profiles and refusal of mismatched targets, bad cleanup/timing and insufficient hold. Workflow static audit and diff check pass. Published23a9c53/bfd4e52/73a35ce; verified remote main73a35ce3d22d0b63f213078cdeddc5565f0c1d97. Launched hold100 route37870374707 on that exact SHA, running at receipt. Next inspect fresh antenna/STA and actual extraction; no phase tick or electrical readiness claim. FIPE remains local.

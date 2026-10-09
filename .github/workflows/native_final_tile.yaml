@@ -4,6 +4,7 @@ on:
     branches: [efpga]
     paths:
       - 'test_internal/cloud_native_final_tile.py'
+      - 'test_internal/compact_gate_probe.py'
       - '.github/workflows/native_final_tile.yaml'
   workflow_dispatch:
 permissions:

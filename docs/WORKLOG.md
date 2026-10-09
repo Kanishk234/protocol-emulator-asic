@@ -5,7 +5,12 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (reset strength checkpoint qualifies)
+- Screen37949660848/headb6515e5 succeeds in11min, artifact11625986970. Receipt confirms33041 ordinary wires reset; qualification passes. Estimated setupWS0allcorners; holdfast+0.101697ns/typ+0.204571ns/slow+0.383296ns. Electrical slewfast1/typ1/slow17, fanout187each, cap0each; not electrical closure or extracted signoff.
+- Updated continuation helper/workflow/test source registry to this exact successful checkpoint; old mixed-wire source is superseded. Next publish these scoped files and run native-strength-route, then inspect DRT/extracted timing/electrical results. Latest supplied AGENTS Git rule leaves commits/pushes to the user. FIPE remains local only; no phase tick.
+
 ## 2026-10-09: Codex (native DRT restart geometry fixed)
+- Publication receipt: remote main verified b6515e5ca22111b5f54489aadf9034cda7d2d266; corrected strength screen37949660848 is running on that exact SHA. Source download/provenance checks pass; physical sizing/routing/qualification step is active. Latest test/lint/docs pass; unit remains running. Next inspect reset receipt and fresh timing before registering any detailed-routing continuation. No new extracted timing result.
 - Continuation37945867391 fails DRT-0206 after fresh qualification, unvisited24874/Y (_19292_) and24895/Y (_19312_). No extraction/new WNS. Actual post-ECO GRT DEF retains original detailed ROUTED segments on both nets; BUG86 records mixed routing restart.
 - Added ordinary signal/clock dbWire cleanup after legalization and before first GRT, preserving POWER/GROUND/special routing and logical connectivity. Pinned API/positive-reset receipt required; continuation rejects older screen lacking receipt. No full GRT after antenna cleanup.81 focused tests pass including real Tcl reset cases/power preservation, source/history guards and orchestrated timing gates; diff/shell checks pass.
 - Next publish scoped correction and rerun strength screen from original hold100; require fresh success before registering new DRT source. Existing approval applies; FIPE excluded, no hardware/spec change or phase tick. Actual physical fix not yet proven.

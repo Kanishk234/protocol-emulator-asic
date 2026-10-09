@@ -9,6 +9,7 @@ Newest entry at the top. One entry per work session.
 - Prepared native_strength_route.py and gds-native-strength-route for exact successful screen37943825506/headf2c2a82. Trusted hardware/full config, originalNLhash, complete six-change/antenna-only chain, saved checkpoint identity, zero-overflow and cleanup history are checked; fresh antennas and allcorner STA/50ps hold gate before stock DRT. No repair/GRT repeated.
 - Preserves older extraction separately before fresh DRT0DRC-required extraction, including electrical audit/effective signoff constraints.76 focused tests pass (24 new provenance/chain/orchestration cases), diff check passes. No extracted gain or phase tick yet.
 - Existing explicit commit/push/launch approval covers this continuation; next publish scoped helper/workflow/evidence groups and dispatch. FIPE/unused prototypes excluded. SRAM relocation remains separate electrical work.
+- Published2e812b1/03181d9/f9845e3; verified remote mainf9845e3303c3fe11d3e762b4c5f960f589a7a6e0. Dispatched native strength route37945867391 on that exact SHA, queued at receipt. No hardware changes in outgoing history. Next fresh qualification, DRT0DRC and actual extraction audit.
 
 ## 2026-10-09: Codex (native strength screen qualifies)
 - Corrected strength37943825506 succeeds in8min; artifact11622704162. All six sizing receipts, legalization, fresh routing0overflow, antenna cleanup and fresh STA gate pass. SetupWS0allcorners; holdfast+0.100882ns/typ+0.204349ns/slow+0.382839ns. Gates qualified=true, physical_screen_only=true, official=false.

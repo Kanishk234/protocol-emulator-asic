@@ -2,6 +2,16 @@
 
 ## 2026-10-09 corrected checkpoint triage
 
+### Clock-load audit while the independent screens run
+
+Clock trial now has local manual gds-native-clock8-screen.yaml plus guarded opt-in native_stock_screen integration. It starts from the frozen full2/4 bs-event-late RTL, clean AREA1 synthesis and stock Classic steps, stops after stock post-GRT timing repair and runs fresh allcorner STA; no checkpoint artifact or volatile six-cell ECO is reused. It is compared with the earlier native hold100 clean build, not claimed as a reproduction of the passing six-strength route. Only CTS_SINK_CLUSTERING_SIZE=8 changes the native recipe; clock20ns/density56/hold100/fully timed constraints stay fixed. Recipe receipt explicitly records the clock-clustering trial.76 focused clean-screen/clock-trial/native-route tests pass including unchanged default configuration, one-key difference, invalid settings and clean-build orchestration. Workflow/helper changes remain local; no third screen dispatched. Both approved REN/branch screens remain in physical qualification at the latest check.
+
+Exact original strength NL/electrical report audit maps all164 clock-buffer-named fanout violations to clk_regs. Actual attached sink-pin histogram:10(7drivers),11(4),12(14),13(24),14(42),15(47),16(24),17(2). None has antenna cells. Aggregate attached pins comprise2187 dfrbpq clock inputs,96 inverter inputs and22 BUF8 inputs. This isolates a clock-tree loading problem from the data-branch antenna problem. Raw audit remains /tmp/tripwire-strength-clock-fanout-audit.json; counts are actual pin connectivity, not an assumption about weighted fanout or a signoff exemption.
+
+Pinned LibreLane3.1.0.dev3 cts.tcl forwards CTS_SINK_CLUSTERING_SIZE directly to -sink_clustering_size. A separate clean-build size8 trial is prepared by local clock_cluster_trial.py: it validates full native AREA1/20ns/density56/GRT0.16/allcorner/hold100 recipe and fully timed PNR/signoff paths, changes only that clustering key, refuses disabled/pre-overridden clustering and existing output, and labels the receipt unmeasured/nonofficial. Ten focused tests pass; applying it to the downloaded full continuation recipe writes /tmp/tripwire-clock8-recipe.json with exactly one changed key. No new clock tree has been built, no buffer/area bound proven, and no clock8 workflow launched. Skew, allcorner hold, actual final fanout and repair-added loads must be measured before adopting it; 8 is not guaranteed final fanout.
+
+Approved independent screens REN37989633910 and antenna branch37989637064 are both executing their fresh physical qualification steps at the latest check. No measured outcomes yet.
+
 ### One-buffer antenna-aware branch screen prepared locally
 
 Original strength route37954320974 has15 attached sink pins on28807/Y net03831:7antenna and8other. Four distal sink/diode pairs nearx1245–1259µm are selected for a single BUF4 branch:ANTENNA2/3/4/5 and28936/28973/29032/29046. All15 old pins remain connected through their original net or the one identity buffer. Seven old upstream sinks plus buffer input give8upstream pins;8downstream pins give8on the new buffer. These are actual pin counts, not a guarantee of weighted STA fanout or electrical closure.

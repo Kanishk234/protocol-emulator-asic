@@ -58,4 +58,14 @@ Corrected strength37895412132 passes source/config/hash checks but fails all-tar
 
 ### SRAM output placement target
 
+## Qualified physical strength screen
+
+Corrected run37943825506 succeeds in8min (artifact11622704162): all six replacements, legalization, freshGRT0overflow, antenna cleanup and fresh allcorner STA qualify. SetupWS0everycorner; holdfast+0.100882ns/typ+0.204349ns/slow+0.382839ns. Fresh slew counts slow18/typ0/fast0; cap1eachcorner. The screen gate is true but electrical closure is not established. These are GRT-estimated results; do not substitute them for actual extracted hold100−0.522ns setup/+0.05367ns fast hold. Next matched DRT/extraction and exact modified-netlist GL, preserving all source/gate evidence.
+
+## Guarded detailed-route continuation
+
+native_strength_route.py and separate gds-native-strength-route workflow qualify only successful main screen37943825506/headf2c2a82b81195ac380ebf7e6fbcbd48ee0315923. They verify trusted hardware/full config, exact original NL hash, unchanged sizing baseline, exact six replacements, antenna-only additions, six receipts, zero overflow and congestion-disallowed cleanup history. The saved STA after_state must identify the reviewed antenna checkpoint. Fresh antennas and STA repeat50ps fast-hold/nonnegative setup/hold gates before stock DRT. No ECO, GRT or resizer repair repeats.
+
+Completed clean DRT is required for extraction. Older runs/extracted-timing is preserved under the continuation as source-extracted-timing, then a fresh extraction records actual timing, electrical reports and explicit signoff constraints.76 focused checks pass, including24 new exact provenance, full repair-chain rejection and fresh-gate orchestration cases. Local physical operations are mocked in tests; actual extracted benefit remains unproven until the continuation finishes.
+
 Actual DOUT0 net maps to lane0 mem_rdata[0] and has only one standard-cell sink: wire9447, a BUF4 input. It already isolates downstream fanout. Nominal SPEF uses1pF units and gives this net interconnect capacitance0.126627pF; reported macro output load is0.130419pF. Thus the measured load is dominated by routing, not multiple logic sinks. First test relocating the existing output buffer near the macro boundary with legalization/rerouting, rather than assuming another buffer is needed. This is a potential zero-added-cell-area repair, not a measured improvement. Preserve downstream connectivity and check SRAM read setup/hold at every corner.

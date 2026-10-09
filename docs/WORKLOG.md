@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (qualified strength DRT continuation prepared)
+- Prepared native_strength_route.py and gds-native-strength-route for exact successful screen37943825506/headf2c2a82. Trusted hardware/full config, originalNLhash, complete six-change/antenna-only chain, saved checkpoint identity, zero-overflow and cleanup history are checked; fresh antennas and allcorner STA/50ps hold gate before stock DRT. No repair/GRT repeated.
+- Preserves older extraction separately before fresh DRT0DRC-required extraction, including electrical audit/effective signoff constraints.76 focused tests pass (24 new provenance/chain/orchestration cases), diff check passes. No extracted gain or phase tick yet.
+- Existing explicit commit/push/launch approval covers this continuation; next publish scoped helper/workflow/evidence groups and dispatch. FIPE/unused prototypes excluded. SRAM relocation remains separate electrical work.
+
+## 2026-10-09: Codex (native strength screen qualifies)
+- Corrected strength37943825506 succeeds in8min; artifact11622704162. All six sizing receipts, legalization, fresh routing0overflow, antenna cleanup and fresh STA gate pass. SetupWS0allcorners; holdfast+0.100882ns/typ+0.204349ns/slow+0.382839ns. Gates qualified=true, physical_screen_only=true, official=false.
+- Fresh electrical counts slewslow18/typ0/fast0, cap1eachcorner; not electrically clean. This is estimated GRT timing, not new DRT/extracted timing. Original hold100 GL22/22 remains valid only for original routed netlist.
+- Nightly/test/lint/docs green; two recent unit jobs still active at receipt. Next guarded DRT/extraction of exact qualified strength checkpoint, then electrical/GL review. No phase tick or official launch.
+
 ## 2026-10-09: Codex (native GL passes; physical name guard fixed)
 - Corrected native GL37895415098 passes22/22,0fail,0skip on exact original hold100 routed NL. Latest routine CI green. Strength37895412132 fails at all-target connectivity preflight before mutations; no physical timing result.
 - Exported failure baseline matches all six logical targets. Actual downloaded ODB/DEF proves hierarchical bracket escapes preserved in physical names; generated targets/mocks omitted them. Fixed BUG85 by generating exact names, retaining strict comparisons/preflight and improving mismatch diagnostics.85 focused tests pass including real Tcl runtime/observed name spelling, source hash generation and orchestration. No gate relaxation.

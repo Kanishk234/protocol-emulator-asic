@@ -1,5 +1,11 @@
 # Bugs
 
+## 56: Mid-PnR STA reports only its first loaded timing corner
+- **Date:**2026-10-08.
+- **Symptom/check:**37814494048 completes baseline STA with PNR_CORNERS listing fast/slow/typ, but strict three-corner gate finds only fast metrics.
+- **Root cause:** pinned sta/corner.tcl explicitly takes the first corner for its per-process reports. Loading all three libraries does not produce all three independent reports.
+- **Fix/coverage:** six explicit processes: baseline and candidate at each original fast/slow/typ corner, with that single PNR_CORNERS/DEFAULT_CORNER selection. All original library maps/clock/SDC/macro/constraints retained; exact requested metric mandatory. Actual fast5 accepted only as fast; wrong/missing/extra-corner controls reject. Baseline5/candidate0 per corner still required. No coverage waiver; cloud result pending.
+
 ## 55: Configuration fanout STA replay omits required run directory
 - **Date:**2026-10-08.
 - **Symptom/check:**37814078677 inserts/legalizes ten buffers and passes exact3596-instance/18073-terminal contraction audit, then CLI rejects nonexistent baseline_sta --force-run-dir before timing.

@@ -66,3 +66,12 @@ Identical-original proof control37813220521 fails with retained witness,
 including four differing routing buses. Candidate proof/simulation does not
 advance. This establishes current proof construction cannot judge the remap;
 programmable feedback equations need a sound common-cut treatment first.
+
+Matched C2 hardening37814078650 completes all physical stages in roughly7min
+including setup. Fresh route/antenna/critical-disconnect0, Magic0/KLayout0 and
+actual-GDS LVS0. Final router iterations1232→680→629→0. Job correctly fails
+setup: worst slacks fast-3.395669619ns, slow-25.343514671ns,
+typ-11.514293844ns; fanout62 at each supplied corner. Original CLOCK_PORT=null
+uses a virtual clock, not a validated configured-fabric clock contract. Do not
+call timing accepted. Retained actual final views need native loaded retest,
+power/signal interface census and configuration-specific timing analysis.

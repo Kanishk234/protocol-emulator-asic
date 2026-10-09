@@ -113,6 +113,21 @@ Prepared mkdir fix; no timing result claimed. Canceled only redundant
 **Next:** verify all-corner fanout after the fixed STA entry, official pin
 check, and matched tile final physical/netlist evidence.
 
+**Measured next blockers:**37814494048 completes baseline STA but emits
+only fast5 despite loading three corners; BUG56 first-corner reporting.
+Prepared six explicit single-corner processes, same original inputs/limits,
+actual requested metric mandatory. Buffer legalization moves1550 original
+cells, max axis/Manhattan displacement21600DBU; cost recorded, not hidden.
+Tile37814078650 finishes all stages, native/antenna/critical-disconnect0,
+Magic0/KLayout0/actual-GDS LVS0, but correctly fails deferred setup. Tile
+fanout62 each corner; slow setup-25.3435ns/typ-11.5143ns/fast-3.39567ns on
+original null-clock/virtual-clock policy. No configured timing or promotion.
+Agents analyze paths/load categories and prepare actual final-C2 native retest;
+geometry/pin audits must remain usable even after timing failure.
+**Next:** complete explicit shell fanout corners, inspect official pin check,
+audit final tile physical interfaces and retest actual final netlist before
+any configured timing/physical changes. No phase boxes ticked.
+
 ## 2026-10-07 (session68: current status and stronger native audit)
 **Done:** checked live GitHub status in response to the user. Corrected
 driver37708459393 remains in bounded route/extraction/checks; setup passed.

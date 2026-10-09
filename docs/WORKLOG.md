@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (native source config failure fixed)
+- GL37895041603 fails source validation; strength37895037616 also fails same validator before physical work. Actual source DRT config omits synthesis/hold settings; full src/config_native_stock.json contains AREA1/100ps/20ns. BUG84 records mistaken step/full config assumption.
+- Fixed validator to check step clock/routing separately from full recipe; physical runner now uses fully audited native config.84 focused tests pass, including omitted step synthesis and wrong full hold target. Downloaded actual source metadata/NL/full config and reproduced passing validation; routed NL SHA256a75d8719dd48838ae6b1f051f1147b1835d7a050c55dbd7144d5ef14b438f8bb. No hardware/timing test ran in failed jobs; gates unchanged.
+- Existing explicit publication approval covers correction/relaunch; next push scoped helper/test/bug evidence and launch fresh jobs. FIPE remains excluded; no phase tick.
+
 ## 2026-10-09: Codex (native six-strength physical screen prepared)
 - User explicitly approved executing reviewed grouped publication/launch commands. Published08c482d/b9765e8/8553807; verified remote main8553807c762c140970c34801fdec383c8b833883 matches local. Strength screen37895037616 and native GL37895041603 both running on that exact SHA; routine CI active, unit queued at receipt. FIPE/unused prototypes excluded; no main hardware change. Next actual fresh physical timing/antenna results and protocol GL outcome.
 - Added isolated pinned-base image/wrapper, physical runner and gds-native-hold100-strength-screen workflow for exact route37870374707. Trusted pre-download hardware/config checks, exact extracted NL hash, six sizing receipts, legalization/freshGRT0overflow, conditional congestion-disallowed antenna cleanup/fresh NL+PNL, cleared stale parasitics and fresh allcorner STA/50ps fast hold enforced. No repeated timing repair, full GRT after antennas, DRT or relaxed gates.

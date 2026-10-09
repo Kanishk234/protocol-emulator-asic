@@ -1,0 +1,44 @@
+name: compact paired fanout GRT screen
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_fanout_grt.py'
+      - '.github/workflows/fanout_grt.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-fanout-grt-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned tools and authenticated baseline/candidate inputs
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+          timeout 120s gh run download 37811985079 -R "$GITHUB_REPOSITORY" --name compact-fanout-preflight-37811985079 --dir build/fanout_grt_input/cluster8
+          timeout 120s gh run download 37956470190 -R "$GITHUB_REPOSITORY" --name compact-cfg-fanout-37956470190 --dir build/fanout_grt_input/ten_buffers
+      - name: Two bounded native GRT cases, without detailed routing
+        timeout-minutes: 36
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_fanout_grt.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-fanout-grt-${{ github.run_id }}
+          path: build/fanout_grt/
+          retention-days: 3

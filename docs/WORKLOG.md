@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (native DRT restart geometry fixed)
+- Continuation37945867391 fails DRT-0206 after fresh qualification, unvisited24874/Y (_19292_) and24895/Y (_19312_). No extraction/new WNS. Actual post-ECO GRT DEF retains original detailed ROUTED segments on both nets; BUG86 records mixed routing restart.
+- Added ordinary signal/clock dbWire cleanup after legalization and before first GRT, preserving POWER/GROUND/special routing and logical connectivity. Pinned API/positive-reset receipt required; continuation rejects older screen lacking receipt. No full GRT after antenna cleanup.81 focused tests pass including real Tcl reset cases/power preservation, source/history guards and orchestrated timing gates; diff/shell checks pass.
+- Next publish scoped correction and rerun strength screen from original hold100; require fresh success before registering new DRT source. Existing approval applies; FIPE excluded, no hardware/spec change or phase tick. Actual physical fix not yet proven.
+
 ## 2026-10-09: Codex (qualified strength DRT continuation prepared)
 - Prepared native_strength_route.py and gds-native-strength-route for exact successful screen37943825506/headf2c2a82. Trusted hardware/full config, originalNLhash, complete six-change/antenna-only chain, saved checkpoint identity, zero-overflow and cleanup history are checked; fresh antennas and allcorner STA/50ps hold gate before stock DRT. No repair/GRT repeated.
 - Preserves older extraction separately before fresh DRT0DRC-required extraction, including electrical audit/effective signoff constraints.76 focused tests pass (24 new provenance/chain/orchestration cases), diff check passes. No extracted gain or phase tick yet.

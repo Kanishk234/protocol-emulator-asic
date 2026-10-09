@@ -36,10 +36,12 @@ def test_missing_and_detailed_route_checkpoints_rejected(tmp_path):
     with pytest.raises(ValueError): runner.checkpoint(tmp_path)
 
 
-@pytest.mark.parametrize('hold_target',[.10,.125])
-def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target):
+@pytest.mark.parametrize('hold_target,clock_cluster',[(.10,None),(.125,None),(.10,'8')])
+def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('NATIVE_HOLD_TARGET',str(hold_target))
+    if clock_cluster is None: monkeypatch.delenv('NATIVE_CLOCK_CLUSTER_SIZE', raising=False)
+    else: monkeypatch.setenv('NATIVE_CLOCK_CLUSTER_SIZE',clock_cluster)
     for k, v in dict(VARIANT='bs-event-late', NATIVE_MAPPING_STRATEGY='AREA 1',
                      PDK_ROOT='/pdk', LIBRELANE_IMAGE_OVERRIDE='old:custom').items():
         monkeypatch.setenv(k, v)
@@ -53,6 +55,7 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, ho
         assert '--with-initial-state' not in args
         assert args[args.index('--to') + 1] == 'OpenROAD.ResizerTimingPostGRT'
         assert json.loads(Path(args[-1]).read_text())['GRT_RESIZER_HOLD_SLACK_MARGIN']==hold_target
+        assert json.loads(Path(args[-1]).read_text()).get('CTS_SINK_CLUSTERING_SIZE') == (8 if clock_cluster else None)
         stage = Path('runs/native-stock-screen/flow/45-openroad-resizertimingpostgrt')
         stage.mkdir()
         view = stage/'saved'; view.write_text('view')
@@ -70,6 +73,19 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, ho
     assert receipt['checkpoint_ecos'] is False
     assert receipt['hold_target_ns']==hold_target
     assert receipt['official_signoff'] is False
+    assert receipt.get('clock_sink_clustering_size') == (8 if clock_cluster else None)
+
+
+def test_clean_clock_trial_changes_only_cluster_key(tmp_path):
+    original=dict(CLOCK_PERIOD=20,PL_TARGET_DENSITY_PCT=56)
+    sdc=tmp_path/'src/signoff.sdc'
+    base=runner.configure(original,'AREA 1',sdc,hold_target=.10)
+    trial=runner.configure(original,'AREA 1',sdc,hold_target=.10,clock_cluster=8)
+    assert set(trial)-set(base)=={'CTS_SINK_CLUSTERING_SIZE'}
+    assert all(trial[k]==v for k,v in base.items())
+    for bad in [4,16,'8',True]:
+        with pytest.raises(ValueError):runner.configure(original,'AREA 1',sdc,hold_target=.10,clock_cluster=bad)
+    with pytest.raises(ValueError):runner.configure(original,'AREA 1',sdc,hold_target=.125,clock_cluster=8)
 
 
 

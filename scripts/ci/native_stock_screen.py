@@ -10,7 +10,7 @@ from postgrt_timing import CORNERS, screen
 from rtl_grt_screen import native_mapping_strategy
 
 
-def configure(original, strategy, sdc, design_repair=False, hold_target=0.125):
+def configure(original, strategy, sdc, design_repair=False, hold_target=0.125, clock_cluster=None):
     if type(design_repair) is not bool:
         raise ValueError('Design repair selection must be boolean')
     if type(hold_target) not in (int, float) or hold_target not in (0.10, 0.125):
@@ -33,6 +33,11 @@ def configure(original, strategy, sdc, design_repair=False, hold_target=0.125):
     config['meta'] = {'version': original.get('meta', {}).get('version', 1), 'flow': 'Classic'}
     if design_repair:
         config['RUN_POST_GRT_DESIGN_REPAIR'] = True
+    if clock_cluster is not None:
+        if type(clock_cluster) is not int or clock_cluster != 8:
+            raise ValueError('Unreviewed clock clustering trial')
+        from clock_cluster_trial import configure as configure_clock
+        config = configure_clock(config)
     return config
 
 
@@ -57,9 +62,13 @@ def main():
     repair = os.environ.get('NATIVE_DESIGN_REPAIR', '0')
     if repair not in {'0', '1'}:
         raise ValueError('Unknown native design repair selection')
+    cluster = os.environ.get('NATIVE_CLOCK_CLUSTER_SIZE')
+    if cluster not in (None, '8'):
+        raise ValueError('Unknown native clock clustering selection')
     config = configure(original, os.environ['NATIVE_MAPPING_STRATEGY'], sdc,
                        design_repair=repair == '1',
-                       hold_target=float(os.environ.get('NATIVE_HOLD_TARGET', '0.125')))
+                       hold_target=float(os.environ.get('NATIVE_HOLD_TARGET', '0.125')),
+                       clock_cluster=8 if cluster == '8' else None)
     path = Path('src/config_native_stock.json')
     path.write_text(json.dumps(config, indent=2) + '\n')
     root = Path('runs/native-stock-screen')
@@ -73,14 +82,17 @@ def main():
     source = checkpoint(flow)
     # STA-only rereads of this exact checkpoint; do not invoke another repair.
     screen(path, source, root / 'timing', os.environ['PDK_ROOT'], repaired=source, sdc=sdc)
-    (root / 'recipe.json').write_text(json.dumps({
+    recipe = {
         'source_variant': 'bs-event-late', 'synthesis_strategy': config['SYNTH_STRATEGY'],
         'repair_corners': list(CORNERS),
         'hold_target_ns': config['GRT_RESIZER_HOLD_SLACK_MARGIN'],
         'stock_sequence': True, 'checkpoint_ecos': False,
         'post_grt_design_repair': repair == '1',
         'extracted': False, 'official_signoff': False,
-    }, indent=2) + '\n')
+    }
+    if cluster is not None:
+        recipe['clock_sink_clustering_size'] = config['CTS_SINK_CLUSTERING_SIZE']
+    (root / 'recipe.json').write_text(json.dumps(recipe, indent=2) + '\n')
 
 
 if __name__ == '__main__':

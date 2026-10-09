@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (native exact-baseline probes and bounded clean recipe)
+- Actual native NL/SPEF baseline six metrics match CI within1e-6ns.54 all-corner probes: seven strength changes improve slow−1.423654→−0.262711ns; replacing two SD3 hold cells with SD2 gives setupWS0 all corners, holdfast+0.094072364ns unchanged. Added library area29.0304µm²; no physical or official pass claimed.
+- Mapped dropped endpoint47345 and RX rt[23] endpoint46391; improving one branch moves the bottleneck. Prepared independent clean-build AREA1 hold100ps screen changing one repair option vs125ps, keeping clock/uncertainty/hardware/density fixed; acceptance gates remain unchanged.
+-54 helper checks pass including actual hold-target propagation/default preservation and workflow audit.30 additional minimization processes reduce the fixed-wire set to six changes, setup0allcorners and holdfast+0.094072364ns, area+18.144µm². Total84 local STA processes. Earlier checkpoint electrical audit finds slewslow91/typ3/fast1 and capslow6/typ7/fast7: timing pass is not full electrical closure. User explicitly approves grouped commit/push/hold100 dispatch; publication receipt follows. No phase tick.
+
+## 2026-10-08: Codex (native completed results audited)
+- Verified native route37859526262 and electrical cleanup37858535440 complete successfully as workflows; no active main runs. Actual native extracted slow setup−1.423654124ns fails; holdfast+0.094072364ns/typ+0.196308975ns/slow+0.370721020ns. Slow electrical133slew/6cap. No promotion or official launch.
+- Cleanup screen clears cap counts all corners but slewslow18/fast1/typ1 remain; setup0allcorners, holdfast+0.104755ns, finalGRT0overflow/39.76%, area524416.15µm² inclSRAM. Not yet routed/extracted.
+- Retrieved actual slow critical path: live unit0configword0bit4→pin feedback→endpoint47345; loaded7221 BUF/24875 O21AI/24876 INV contribute0.899/1.159/0.721ns arcs. Best residual checkpoint remains extracted0/+0.062789ns and22/22 GL; do not replace with weaker native result. Report PHASE2_NATIVE_EXTRACTED_RESULTS.md records exact distinctions. No phase tick. Next independent extracted-baseline probes or qualified alternative clean-build recipe; raw reports outsidegit.
+
 ## 2026-10-08: Codex (native route antenna gate failure fixed)
 - Run37858532319 fails safely before DRT: fresh setupWS0/holdfast+0.119326ns, but post-timing antenna15nets/17pins. Exact fresh artifact11584854275 confirms; source provenance/config/STA all pass. Electrical cleanup37858535440 remains active.
 - Added conditional stock antenna cleanup with congestion disallowed and audited resolved config/repair command. Preserve repaired guides; proposed full reroute rejected locally after reviewing BUG79, before publication. Fresh CheckAntennas and STA use cleaned ODB; remaining antennas, timing or50ps hold failure still refuse DRT.

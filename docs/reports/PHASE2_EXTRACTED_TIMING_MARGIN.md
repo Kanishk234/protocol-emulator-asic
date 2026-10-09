@@ -26,3 +26,7 @@ The complete analyzed extracted design tolerates a150ps period reduction from20n
 Native stock37853023857 remains the clean-build dependency. Its AREA0/AREA1 results must establish whether closure survives fresh synthesis and stock repair; favorable screen results still need their own detailed routing, extraction, protocol regression and official GDS evidence.
 
 Local raw evidence stays outside git: /tmp/tripwire-margin-37844735445/results.json and /tmp/tripwire-margin-fine-37844735445/results.json; scripts /tmp/run-residual-margin.py and /tmp/run-residual-margin-fine.py. Download failure during SPEF retrieval was retried successfully before any STA run.
+
+## Electrical qualification limit
+
+Subsequent exact checks.rpt audit finds slew violations slow91/typ3/fast1 and capacitance violations slow6/typ7/fast7 in this same extraction37844735445. These do not invalidate the reported setup/hold/period sweep, but the checkpoint is not electrically clean or official-ready. See PHASE2_NATIVE_EXTRACTED_PROBES.md.

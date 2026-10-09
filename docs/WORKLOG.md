@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-09 (session70: explicit corner replay and actual final C2 function)
+**Done:** resumed pending work after automatic approval service usage-limit
+failure prevented prior commits; no rejected command was executed or bypassed.
+Latest590d226 lint37814494057/unit37814494350/test37814494144/docs37814494238
+all pass. Official37814339758 still fails only Pin check: two short side-grid
+power access rectangles end18.68um below top; maximum is10um. Eight actual
+other checks pass. This is now a real external power-pin contract issue,
+not formatting; compare internal side-grid access metadata versus physical
+rail extension before fixing. Frozen hardware and PDK unchanged.
+Committed/pushed reviewed six explicit single-corner fanout measurement fix
+c14d394/9782c1e; actual37956470190 starts. Independently reviewed new four-case
+native retest of actual hardened C2 final NL13cac0eabdbdcaf000b1e57c521fc9d417aac957be18a68c5808f8c920529e7c:
+passing control and only finalC2 replacement, normal/USER_RESET each. Requires
+unchanged D023 real loader,9164 known/matching configuration latches,28TX/28RX,
+STOP/reset and exact XML success; retains all four failures/successes. Source
+hardening timing failure remains explicit. Local AST/YAML/hash/negative marker
+controls pass, no local EDA. Retention/power interface audit prepared separately.
+**Boxes ticked:** none.
+**Next:** inspect all six actual corner metrics, final-C2 native cases and
+native power-interface census; correct actual PG access/tile fanout/configured
+timing without false abstracts, constraint changes or check waivers.
+
 ## 2026-10-08 (session69: driver closure; isolate native mapping and preflight fanout)
 **Done:** proactively audited latest workflows. HEAD03851ee lint37709970909/
 docs37709970944/test37709970924/unit37709970902 all pass. Downloaded driver

@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-065: Retest actual hardened C2 through the real loader
+- **Date:**2026-10-09. **Status:** accepted bounded native diagnostic; no physical/timing promotion.
+- **Evidence:**37814078650 actual hardened C2 finishes route/antenna/Magic/KLayout/LVS with zero findings but fails deferred virtual-clock setup and has62 fanout violations. Exact final NL13cac0eabdbdcaf000b1e57c521fc9d417aac957be18a68c5808f8c920529e7c is available; its native behavior has not been retested.
+- **Decision:** compare authenticated passing five-tile control37659171115 with only C2 replaced by that actual final NL. Run normal/USER_RESET for each with unchanged D023 harness, fresh raw connectivity JSON/source hashes and actual SPI configuration audit. Require9164 actual latches known/image-matched,28TX/28RX,STOP/reset and exactly one passing/non-skipped XML case each. Retain all four outcomes even if one semantic case fails; no state force or input edits.
+- **Cost/limits:** free standard cloud45min job, four cases each300s. No new resource, protocol block or configuration format. A functional pass cannot qualify timing, electrical limits, complete macro geometry or any other untested tile. Original failed hardening outcome retained alongside final source hash.
+
 ## D-064: Buffer the five measured configuration-column fanout nets
 - **Date:**2026-10-08. **Status:** accepted bounded placement/estimated-STA diagnostic, no routing or promotion.
 - **Evidence:**37811985079 cluster8 clears all clock fanout violations but leaves five configuration-column outputs with12 loads against effective Liberty limit8. Original design MAX_FANOUT_CONSTRAINT10 remains unchanged. Input cluster8 ODB0a0af0c1a0e4c413f52c43de70772dfff857a7c98402fa9b5b7e8dac19a53f99, NL5bcc7ceb770d8f20fce68e43b90b8a23bdcb1aa05fc7e17f2672248bbc23c9fe and original SDC2fd4e213532d83ee258899b6fc1ed48c4e5d91ddb0ccbe21eea0226cc90fd56e authenticated.

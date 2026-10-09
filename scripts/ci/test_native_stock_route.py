@@ -21,6 +21,37 @@ def test_source_accepts_exact_recipe_and_rejects_hardware_changes():
         runner.validate_source(run,recipe,config,{'src/trw_defs.vh':'a'}, {'src/trw_defs.vh':'b'})
 
 
+@pytest.mark.parametrize('fault',[None,'size','receipt','repair','disabled','sha'])
+def test_clock8_source_requires_exact_trial(fault):
+    run,recipe,config=source()
+    run_id,sha,workflow,target=runner.profile_values('clock8')
+    run.update(id=run_id,head_sha=sha,path=f'.github/workflows/{workflow}.yaml')
+    recipe.update(hold_target_ns=target,clock_sink_clustering_size=8,post_grt_design_repair=False)
+    config.update(GRT_RESIZER_HOLD_SLACK_MARGIN=target,CTS_SINK_CLUSTERING_SIZE=8)
+    if fault=='size':config['CTS_SINK_CLUSTERING_SIZE']=16
+    if fault=='receipt':recipe['clock_sink_clustering_size']=16
+    if fault=='repair':recipe['post_grt_design_repair']=True
+    if fault=='disabled':config['CTS_SINK_CLUSTERING_ENABLE']=False
+    if fault=='sha':run['head_sha']='wrong'
+    if fault is None:runner.validate_source(run,recipe,config,{}, {},profile='clock8')
+    else:
+        with pytest.raises(ValueError):runner.validate_source(run,recipe,config,{}, {},profile='clock8')
+
+
+def test_clock8_route_workflow_uses_exact_checkpoint_and_trusted_prepare():
+    import yaml
+    p=Path(__file__).resolve().parents[2]/'.github/workflows/gds-native-clock8-route.yaml'
+    job=yaml.safe_load(p.read_text())['jobs']['harden']
+    assert job['env']['NATIVE_ROUTE_PROFILE']=='clock8'
+    steps=job['steps']
+    download=next(s for s in steps if 'download-artifact@' in s.get('uses',''))
+    assert download['with']['run-id']==37990280838
+    assert download['with']['name']=='gds-native-clock8-area1-37990280838'
+    prepare=next(s for s in steps if s['name'].startswith('Prepare trusted'))
+    assert steps.index(prepare)<steps.index(download)
+    assert job['timeout-minutes']==350
+
+
 @pytest.mark.parametrize('part,key,value',[
     (0,'head_sha','wrong'),(0,'head_branch','trial'),(0,'conclusion','failure'),
     (0,'id',1),(0,'path','wrong'),(1,'synthesis_strategy','AREA 0'),
@@ -53,7 +84,7 @@ def test_antenna_and_positive_margin_required():
 @pytest.mark.parametrize('setup_ok',[True,False])
 @pytest.mark.parametrize('cleanup_needed',[True,False])
 @pytest.mark.parametrize('bad_cleanup',[None,'policy','log','antenna'])
-@pytest.mark.parametrize('profile',['stock125','hold100'])
+@pytest.mark.parametrize('profile',['stock125','hold100','clock8'])
 def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_ok,cleanup_needed,bad_cleanup,profile):
     import json, sys, types
     monkeypatch.chdir(tmp_path)
@@ -67,6 +98,9 @@ def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_
     run.update(id=run_id,head_sha=sha,path=f'.github/workflows/{workflow}.yaml')
     recipe['hold_target_ns']=target
     config['GRT_RESIZER_HOLD_SLACK_MARGIN']=target
+    if profile=='clock8':
+        config['CTS_SINK_CLUSTERING_SIZE']=8
+        recipe.update(clock_sink_clustering_size=8,post_grt_design_repair=False)
     Path('src/config_native_stock.json').write_text(json.dumps(config))
     root=Path('runs/native-stock-screen');root.mkdir(parents=True)
     (root/'recipe.json').write_text(json.dumps(recipe))
@@ -122,7 +156,8 @@ def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_
     elif setup_ok and not (cleanup_needed and bad_cleanup=='antenna'):
         runner.main()
         assert calls==prefix+['OpenROAD.DetailedRouting','extract']
-        gates=json.loads(Path('runs/native-stock-route/gates.json').read_text())
+        gates=json.loads(Path('runs/native-clock8-route/gates.json' if profile=='clock8'
+                             else 'runs/native-stock-route/gates.json').read_text())
         assert gates['source_run']==run_id and gates['profile']==profile
         assert gates['minimum_fast_hold_ns']==.05
     else:

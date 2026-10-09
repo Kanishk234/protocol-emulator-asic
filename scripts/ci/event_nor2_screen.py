@@ -34,7 +34,7 @@ def logical_cells(text):
             continue
         if name in cells:
             raise ValueError('Duplicate mapped cell')
-        cells[name] = (master, tuple(sorted(re.findall(r'\.(\w+)\((.*?)\)', ports))))
+        cells[name] = (master, tuple(sorted(re.findall(r'\.(\w+)\((.*?)\)', ports, re.S))))
     if not cells:
         raise ValueError('Missing mapped cells')
     return cells

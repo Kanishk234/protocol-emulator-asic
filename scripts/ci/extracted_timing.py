@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from electrical_report import audit_corners
 
 STEPS = ["Odb.RemoveRoutingObstructions", "OpenROAD.CheckAntennas", "Checker.TrDRC",
          "Odb.ReportDisconnectedPins", "Checker.DisconnectedPins", "Odb.ReportWireLength",
@@ -74,6 +75,8 @@ def main(route_root=Path("runs/repaired-route/drt")):
             key = f"timing__{kind}__ws__corner:{corner}"
             fresh[key] = metrics[key]
     (output / "corner_summary.json").write_text(json.dumps(fresh, indent=2) + "\n")
+    electrical = audit_corners(states[0].parent, config['STA_CORNERS'])
+    (output / 'electrical_summary.json').write_text(json.dumps(electrical, indent=2) + '\n')
     print(json.dumps(fresh, indent=2))
     # Deliberately retain negative results as diagnostic evidence. This is not
     # the official full GDS/DRC/LVS/precheck signoff workflow.

@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 from event_nor2_screen import logical_cells, validate_antenna_only_changes, validate_overflow
 from native_hold100_size import SOURCE_SHA256, validate_change
@@ -46,6 +47,9 @@ def validate_checkpoint(root):
     log = (grt / 'openroad-globalrouting.log').read_text()
     if log.count('TRIPWIRE native hold100 setup:') != 6:
         raise ValueError('Wrong native sizing history')
+    resets = re.findall(r'TRIPWIRE native route reset: cleared ([0-9]+) ordinary routed wires', log)
+    if len(resets) != 1 or int(resets[0]) == 0:
+        raise ValueError('Native source lacks detailed-wire reset before GRT')
     validate_overflow(log)
     if 'antenna-cleanup' in state_path.parts:
         cleanup = root / 'antenna-cleanup'

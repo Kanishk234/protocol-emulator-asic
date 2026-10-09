@@ -1,6 +1,7 @@
 """Physical six-strength screen from exact completed native100 route; no DRT."""
 import json
 import os
+import re
 from pathlib import Path
 from event_nor2_screen import logical_cells, validate_overflow, validate_antenna_only_changes
 from native_hold100_size import prepare, validate_change
@@ -80,6 +81,9 @@ def main():
     log = (paths[0].parent / 'openroad-globalrouting.log').read_text()
     if log.count('TRIPWIRE native hold100 setup:') != 6:
         raise ValueError('Missing or repeated native sizing receipt')
+    resets = re.findall(r'TRIPWIRE native route reset: cleared ([0-9]+) ordinary routed wires', log)
+    if len(resets) != 1 or int(resets[0]) == 0:
+        raise ValueError('Missing or ambiguous native detailed-wire reset')
     validate_overflow(log)
     changed = promote(paths[0], baseline)
     # Same pinned image; wrapper only exports fresh antenna views in cleanup.

@@ -61,6 +61,7 @@ def test_wrapper_injects_only_reviewed_stages(tmp_path, stage):
     assert ('native_hold100_targets.tcl' in result.stdout) == (stage == 'grt')
     assert ('.eco.nl.v' in result.stdout) == (stage != 'sta')
     assert ('common/dpl.tcl' in result.stdout) == (stage == 'grt')
+    assert ('tripwire_clear_native_signal_routes' in result.stdout) == (stage == 'grt')
     if stage == 'grt':
         script.write_text('read_current_odb\nread_current_odb\n')
         result = subprocess.run(['bash', str(wrapper), str(script)], env=env,
@@ -119,7 +120,8 @@ def test_orchestration_uses_fresh_views_and_never_reroutes_after_cleanup(tmp_pat
             write(stage / 'state_out.json', {'odb': str(odb)})
             odb.with_suffix('.baseline.nl.v').write_text(netlist())
             for ext in ('.eco.nl.v', '.eco.pnl.v'): odb.with_suffix(ext).write_text(netlist(True))
-            (stage / 'openroad-globalrouting.log').write_text('TRIPWIRE native hold100 setup:\n' * 6)
+            (stage / 'openroad-globalrouting.log').write_text('TRIPWIRE native hold100 setup:\n' * 6 +
+                'TRIPWIRE native route reset: cleared 20 ordinary routed wires\n')
         else:
             inherited = json.loads(Path(state).read_text())
             assert inherited['nl'].endswith('.eco.nl.v')

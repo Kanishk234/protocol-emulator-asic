@@ -23,7 +23,8 @@ if [[ "$script_name" == "grt.tcl" || "$script_name" == "antenna_repair.tcl" ]]; 
                 'write_verilog [file rootname $::env(SAVE_ODB)].baseline.nl.v' \
                 'source /usr/local/share/tripwire/native_hold100_size.tcl' \
                 'source /usr/local/share/tripwire/native_hold100_targets.tcl' \
-                'source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl'
+                'source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl' \
+                'tripwire_clear_native_signal_routes'
             else
                 printf '%s\n' 'if {$::env(GRT_ALLOW_CONGESTION)} {error "Native antenna repair must disallow congestion"}'
             fi

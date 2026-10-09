@@ -1,4 +1,23 @@
 # Preflight every target before any mutation. Caller audits prior source history.
+proc tripwire_clear_native_signal_routes {} {
+    if {[llength [info commands odb::dbWire_destroy]] != 1} {
+        error "Pinned OpenDB wire cleanup API missing"
+    }
+    set saved {}
+    foreach net [[ord::get_db_block] getNets] {
+        if {[$net getSigType] in {POWER GROUND}} {continue}
+        set wire [$net getWire]
+        if {$wire ne "NULL"} {lappend saved [list $net $wire]}
+    }
+    if {![llength $saved]} {error "Expected routed native source; cleanup repeated or wrong source"}
+    foreach entry $saved {
+        lassign $entry net wire
+        odb::dbWire_destroy $wire
+        if {[$net getWire] ne "NULL"} {error "Native signal wire cleanup failed"}
+    }
+    puts "TRIPWIRE native route reset: cleared [llength $saved] ordinary routed wires; power/special routing preserved"
+}
+
 proc tripwire_size_native_hold100 {targets} {
     set saved {}
     foreach target $targets {

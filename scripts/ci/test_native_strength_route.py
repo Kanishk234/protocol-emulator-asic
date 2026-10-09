@@ -89,7 +89,7 @@ def test_workflow_downloads_exact_qualified_screen():
     assert download['with']['name']=='gds-native-hold100-strength-37943825506'
 
 
-@pytest.mark.parametrize('failure', [None,'state','hold','baseline','change','missing','cleanup','overflow'])
+@pytest.mark.parametrize('failure', [None,'state','hold','baseline','change','missing','cleanup','overflow','reset'])
 def test_complete_checkpoint_chain_is_required(tmp_path,monkeypatch,failure):
     import hashlib
     from test_native_hold100_size import netlist
@@ -104,7 +104,8 @@ def test_complete_checkpoint_chain_is_required(tmp_path,monkeypatch,failure):
     grt=root/'grt/1-openroad-globalrouting'
     write(grt/'tt_um_tripwire.baseline.nl.v',netlist())
     write(grt/'tt_um_tripwire.eco.nl.v',netlist(True))
-    write(grt/'openroad-globalrouting.log','TRIPWIRE native hold100 setup:\n'*6)
+    write(grt/'openroad-globalrouting.log','TRIPWIRE native hold100 setup:\n'*6 +
+          ('' if failure=='reset' else 'TRIPWIRE native route reset: cleared 20 ordinary routed wires\n'))
     def overflow(log):
         if failure=='overflow':raise ValueError('overflow')
     monkeypatch.setattr(runner,'validate_overflow',overflow)

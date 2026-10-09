@@ -7,7 +7,7 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-10-08: Codex (hold100 guarded routing continuation)
 - Prepared native hold100 continuation for successful screen37866086829/head7b87718f0b28be7c5815cded40db05eb52c27be8. Exact source/workflow/100ps target registry, trusted hardware/full-config equality, fresh antenna cleanup/STA/50ps fast hold, DRT0DRC requirement and automatic extraction remain enforced. Stock125 profile unchanged; no named-cell ECO.
--72 helper checks pass, including full orchestration for both source profiles and refusal of mismatched targets, bad cleanup/timing and insufficient hold. Workflow static audit and diff check pass. Next publish/launch this continuation of the approved100ps experiment and inspect extracted results; no phase tick or electrical readiness claim. FIPE remains local.
+-72 helper checks pass, including full orchestration for both source profiles and refusal of mismatched targets, bad cleanup/timing and insufficient hold. Workflow static audit and diff check pass. Published23a9c53/bfd4e52/73a35ce; verified remote main73a35ce3d22d0b63f213078cdeddc5565f0c1d97. Launched hold100 route37870374707 on that exact SHA, running at receipt. Next inspect fresh antenna/STA and actual extraction; no phase tick or electrical readiness claim. FIPE remains local.
 
 ## 2026-10-08: Codex (hold100 completed screen audited)
 - Hold100 screen37866086829 succeeds in42min; no active main workflows. SetupWS0allcorners, holdfast+0.100882ns/typ+0.204349ns/slow+0.382839ns. Actual artifact11589244417.

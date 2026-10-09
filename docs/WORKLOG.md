@@ -62,6 +62,11 @@ settings before alteration. Keep congestion disallowed and every zero-overflow/
 source/placement gate; no capacity/layer/electrical-limit change. Each900s
 and hosted45min cap remain. Corrected PGinventory proven against exact source
 LEF:24 full-span rectangles/12persupply after2short metadata removals.
+**Latest verified queue:** f070fea/c29a681/ec27310/7c34567 pushed; actual
+corrected official37960021923 and longer pairedGRT37960021920 in progress
+on7c34567. Latest prior9897f53 ordinary lint37959298488/docs37959298339/
+test37959298227/unit37959298442 all pass. No frozen hardware changed;
+source GDS/ODB remain immutable, all heavy validation hosted.
 **Boxes ticked:** none.
 **Next:** inspect actual corrected D066 precheck and D068150-iteration GRT
 results. If congestion persists, investigate localized placement/clock-tree

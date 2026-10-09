@@ -2,6 +2,40 @@
 
 ## 2026-10-09 corrected checkpoint triage
 
+### One-buffer antenna-aware branch screen prepared locally
+
+Original strength route37954320974 has15 attached sink pins on28807/Y net03831:7antenna and8other. Four distal sink/diode pairs nearx1245–1259µm are selected for a single BUF4 branch:ANTENNA2/3/4/5 and28936/28973/29032/29046. All15 old pins remain connected through their original net or the one identity buffer. Seven old upstream sinks plus buffer input give8upstream pins;8downstream pins give8on the new buffer. These are actual pin counts, not a guarantee of weighted STA fanout or electrical closure.
+
+Added local antenna_branch.py validates exact original NL hash and accepts only one BUF4 plus the eight selected pin rewires. It rejects cell deletion (including any antenna), resizing, inversion, unrelated net changes and incorrect buffer connections. Actual-source synthetic topology fixture passes this audit; it is not a physical/netlist simulation result. antenna_branch.tcl preflights complete branch connectivity, driver/master/antenna identities, duplicate names and supply connections before mutation; it creates one buffer and retains every antenna cell. Initial location(1250.40,291.06)µm is near four pairs and explicitly needs DPL, not an audited empty site.
+
+The separate local wrapper/image/manual gds-antenna-branch-screen reuses only original strength route37954320974. Shared orchestration adds an independently selected antenna-branch target: fresh baseline/rewired views, DPL, old ordinary wire reset, one GRT with0overflow, one optional antenna cleanup, then fresh fully timed allcorner STA and50ps fast hold gate. Repair repeats and simultaneous other move receipts fail. No resizing, constraint change, weakened gate or diode deletion is introduced. Later routing/antenna repair can still add cells and recreate fanout violations; reject unsuccessful qualification, retain original route and require detailed extraction before claiming success. Clock-driver violations remain separate work.
+
+142 focused helper/orchestration/Tcl/wrapper/GL tests pass after local preparation. Physical APIs in tests are mocked; no branch physical run, new GL pass or timing benefit is claimed. REN and branch screens remain uncommitted/unlaunched; FIPE remains local. OpenROAD documents repair_design as a buffer/resizing electrical repair command ([primary documentation](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html)); pinned LibreLane3.1.0.dev3 uses stock repair before antenna insertion, so this controlled post-insertion branch experiment tests a concrete load that the earlier stage did not see.
+
+### Independent REN screen prepared after relocation continuation launch
+
+**Completed continuation37983933655: target cap improvement, candidate rejected.** Exact head0fa2b9f; artifact11644161675. DRT ends0routeDRC and fresh extraction reports0antenna violating nets/pins. Allcorner setupWS remains0, but fast hold+0.04677774966446284ns misses the unchanged50ps gate by3.22225033553716ps. Typical hold+0.14150903072087115ns, slow+0.30641623439206794ns. Keep original strength route37954320974 as the qualified timing baseline; no Phase2 checklist change.
+
+| Extracted metric | Original strength route | DOUT0-relocated route |
+|---|---|---|
+| Slow/typ/fast slew violations |130/11/4|166/36/4|
+| Fanout violations, each corner |196|204|
+| Slow/typ/fast capacitance violations |5/5/6|6/6/6|
+| DOUT0 cap violation, all corners |present|cleared|
+| Fast hold |+56.3235ps|+46.7777ps|
+
+Fresh checks reports independently reproduce electrical_summary.json. Original DOUT0 slow cap0.102889pF against0.064pF clears after routing. Slow cap failures now include DOUT2/3/4/5 plus28820/Y and29451/Y; DOUT4 reaches0.083259pF. DOUT1,28807 andplace8554 cap failures also clear, so the six-count result represents changed offending branches rather than failure of the local DOUT0 objective.
+
+Exact DRT netlistSHA256 `eeb374d6eedc991a1c2f3dfebeb6d3f487189ceba7f09eccdcd17b8e5b87e03c`. Local reviewed GL artifact validation passes against completed run/config/gates/state/hash, but no GL simulation run or functional pass is claimed for this candidate. Comparing logical cells to original strength route finds65 added sg13cmos5l_antennanp cells, no removed cells and no changed existing cells/connections; antenna count213→278. All eight new fanout violators have antenna loading:26706(7antenna/8other),28764(4/7),29456(6/3),29464(1/8),47069(1/8),place8807(1/8),place8833(2/8),place8846(6/6). These pin counts are connectivity evidence, not assumed equal to weighted STA fanout.
+
+Detailed fast min report has two paths below50ps:47709→46991 at46.778ps and47705→46990 at48.221ps. They are configuration-latch-to-flop paths, not the moved SRAM output. Third reported path is52.360ps. The measured regression therefore requires whole-chip routing/clock awareness; restoring local SRAM delay alone is not an established fix. Do not mask live configuration timing or lower the gate. The broader electrical result strengthens the case for bounded antenna-aware repair and reproducible macro-interface placement, preserving the original route while independent REN screening remains a separate hypothesis.
+
+Continuation37983933655 was launched on exact head0fa2b9f and completed; the measured decision is recorded above.
+
+Prepared a separate local REN screen using the original strength route37954320974, not the output-relocated checkpoint. It moves only `_29426_` NOR2B_1 from(438.72,226.80)FS to audited row64(123.84,245.70)N. Pinned LEF footprint2.4×3.78µm, exact A/B_N/Y connections, power-pin presence, source orientation, target occupancy and post-DPL master/site/nets are guarded. No sizing or buffer insertion is performed by the move helper. Downstream antenna repair may add cells, so zero added total area is not claimed.
+
+Common screen orchestration accepts `--target ren`, selects a separate wrapper/image/output path, exports and compares fresh logical views, clears inherited routing, requires zero overflow, checks/repairs antennas once and enforces unchanged20ns/nonnegative setup/hold/50ps fast hold. Mixed REN/output move receipts are rejected. Manual `gds-sram-ren-relocate-screen.yaml` is prepared locally with separate concurrency and the original exact source.115 focused checks pass, covering mocked physical APIs, both orchestration branches, recipe/provenance checks and wrappers. No REN physical run has been launched; helper/workflow changes remain uncommitted. Actual pin access, input-wire cost, shared write-enable hold and extracted slew remain unmeasured.
+
 ### Broader antenna-load audit and independent REN placement
 
 Exact extracted-route netlist mapping of all32 non-clock fanout violators finds antenna cells on every one:29 drivers have eight other attached pins, three have seven;78 total antenna pins accompany253 other pins. All ANTENNA-named cells are verified sg13cmos5l_antennanp masters, not inferred solely from names. Example28820 now has13 antenna/7 other pins after DRT repair;28807 has7/8. This strongly motivates an antenna-aware post-insertion fanout repair experiment. It does not justify diode removal or prove all pre-antenna constraints pass; weighted STA fanout and actual connectivity remain the acceptance evidence.

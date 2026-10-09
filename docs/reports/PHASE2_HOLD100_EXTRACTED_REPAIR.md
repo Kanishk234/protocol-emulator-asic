@@ -52,4 +52,12 @@ gds-native-hold100-strength-screen downloads only reviewed route37870374707, ver
 
 ## SRAM output placement target
 
+## Physical screen receipts and protocol evidence
+
+Initial strength37895037616/GL37895041603 fail source config validation (BUG84); corrected GL37895415098 passes22/22,0fail,0skip on original hold100 DRT netlist a75d8719dd48838ae6b1f051f1147b1835d7a050c55dbd7144d5ef14b438f8bb. It does not validate the uncompleted six-cell physical repair.
+
+Corrected strength37895412132 passes source/config/hash checks but fails all-target connectivity preflight before mutation. Actual pre-mutation exported NL matches all six target masters/connections. Downloaded actual source ODB and DEF show hierarchical bracket escapes preserved (unit index as g_unit\\[0\\]); generated targets had omitted them. BUG85 fix emits exact ODB names, keeps strict equality and adds specific mismatch diagnostics.85 focused tests pass, including real Tcl mocks with observed physical spelling; no gate relaxed. Physical rerun remains required.
+
+### SRAM output placement target
+
 Actual DOUT0 net maps to lane0 mem_rdata[0] and has only one standard-cell sink: wire9447, a BUF4 input. It already isolates downstream fanout. Nominal SPEF uses1pF units and gives this net interconnect capacitance0.126627pF; reported macro output load is0.130419pF. Thus the measured load is dominated by routing, not multiple logic sinks. First test relocating the existing output buffer near the macro boundary with legalization/rerouting, rather than assuming another buffer is needed. This is a potential zero-added-cell-area repair, not a measured improvement. Preserve downstream connectivity and check SRAM read setup/hold at every corner.

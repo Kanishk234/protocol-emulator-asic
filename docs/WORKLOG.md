@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (native GL passes; physical name guard fixed)
+- Corrected native GL37895415098 passes22/22,0fail,0skip on exact original hold100 routed NL. Latest routine CI green. Strength37895412132 fails at all-target connectivity preflight before mutations; no physical timing result.
+- Exported failure baseline matches all six logical targets. Actual downloaded ODB/DEF proves hierarchical bracket escapes preserved in physical names; generated targets/mocks omitted them. Fixed BUG85 by generating exact names, retaining strict comparisons/preflight and improving mismatch diagnostics.85 focused tests pass including real Tcl runtime/observed name spelling, source hash generation and orchestration. No gate relaxation.
+- Full-log approval review timed out; completed evidence retrieval via read-only job-log/artifact retries and terminated stalled request. Next scoped approved correction push and strength-only dispatch; do not repeat passing GL. FIPE excluded; no phase tick.
+
 ## 2026-10-09: Codex (native source config failure fixed)
 - GL37895041603 fails source validation; strength37895037616 also fails same validator before physical work. Actual source DRT config omits synthesis/hold settings; full src/config_native_stock.json contains AREA1/100ps/20ns. BUG84 records mistaken step/full config assumption.
 - Fixed validator to check step clock/routing separately from full recipe; physical runner now uses fully audited native config.84 focused tests pass, including omitted step synthesis and wrong full hold target. Downloaded actual source metadata/NL/full config and reproduced passing validation; routed NL SHA256a75d8719dd48838ae6b1f051f1147b1835d7a050c55dbd7144d5ef14b438f8bb. No hardware/timing test ran in failed jobs; gates unchanged.

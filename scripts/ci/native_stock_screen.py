@@ -10,9 +10,11 @@ from postgrt_timing import CORNERS, screen
 from rtl_grt_screen import native_mapping_strategy
 
 
-def configure(original, strategy, sdc, design_repair=False):
+def configure(original, strategy, sdc, design_repair=False, hold_target=0.125):
     if type(design_repair) is not bool:
         raise ValueError('Design repair selection must be boolean')
+    if type(hold_target) not in (int, float) or hold_target not in (0.10, 0.125):
+        raise ValueError('Unreviewed native hold target')
     native_mapping_strategy('bs-event-late', strategy)
     if strategy is None:
         raise ValueError('Explicit native mapping strategy required')
@@ -23,7 +25,7 @@ def configure(original, strategy, sdc, design_repair=False):
                   OPENROAD_THREADS=4, PL_OPTIMIZE_MIRRORING=False,
                   PL_TIMING_DRIVEN=True, PL_RESIZER_SETUP_SLACK_MARGIN=0,
                   GRT_RESIZER_SETUP_SLACK_MARGIN=0,
-                  GRT_RESIZER_HOLD_SLACK_MARGIN=0.125,
+                  GRT_RESIZER_HOLD_SLACK_MARGIN=hold_target,
                   PNR_SDC_FILE=str(sdc.resolve()), SIGNOFF_SDC_FILE=str(sdc.resolve()),
                   PNR_CORNERS=list(CORNERS), RSZ_CORNERS=list(CORNERS),
                   RUN_POST_GRT_RESIZER_TIMING=True)
@@ -56,7 +58,8 @@ def main():
     if repair not in {'0', '1'}:
         raise ValueError('Unknown native design repair selection')
     config = configure(original, os.environ['NATIVE_MAPPING_STRATEGY'], sdc,
-                       design_repair=repair == '1')
+                       design_repair=repair == '1',
+                       hold_target=float(os.environ.get('NATIVE_HOLD_TARGET', '0.125')))
     path = Path('src/config_native_stock.json')
     path.write_text(json.dumps(config, indent=2) + '\n')
     root = Path('runs/native-stock-screen')
@@ -72,7 +75,8 @@ def main():
     screen(path, source, root / 'timing', os.environ['PDK_ROOT'], repaired=source, sdc=sdc)
     (root / 'recipe.json').write_text(json.dumps({
         'source_variant': 'bs-event-late', 'synthesis_strategy': config['SYNTH_STRATEGY'],
-        'repair_corners': list(CORNERS), 'hold_target_ns': 0.125,
+        'repair_corners': list(CORNERS),
+        'hold_target_ns': config['GRT_RESIZER_HOLD_SLACK_MARGIN'],
         'stock_sequence': True, 'checkpoint_ecos': False,
         'post_grt_design_repair': repair == '1',
         'extracted': False, 'official_signoff': False,

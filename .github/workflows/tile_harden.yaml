@@ -1,4 +1,4 @@
-name: matched native C2 tile hardening
+name: matched native C2 physical validation
 on:
   push:
     branches: [efpga]
@@ -7,6 +7,12 @@ on:
       - '.github/workflows/tile_harden.yaml'
   workflow_dispatch:
     inputs:
+      mode:
+        description: Audit retained failed hardening or run a new full hardening
+        type: choice
+        options: [audit, run]
+        default: audit
+        required: true
       source_release:
         description: Release containing tile-harden-c2.tar.gz
         required: true
@@ -17,6 +23,7 @@ on:
         type: string
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: warp-matched-c2-harden-${{ github.ref }}
   cancel-in-progress: false
@@ -25,6 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
+      WARP_MODE: ${{ inputs.mode || 'audit' }}
       GH_TOKEN: ${{ github.token }}
       PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
       WARP_SOURCE_RELEASE: ${{ inputs.source_release || 'compact-checkpoint-20261006-iter8' }}
@@ -37,14 +45,21 @@ jobs:
           python3 -m venv .venv
           bash spikes/cloud/fetch_pdk.sh
           timeout 120s gh release download "$WARP_SOURCE_RELEASE" -R "$GITHUB_REPOSITORY" --pattern tile-harden-c2.tar.gz --dir build
-      - name: Exact mapped C2 route and strict physical checks
+          if [ "$WARP_MODE" = "audit" ]; then
+            timeout 120s gh run download 37814078650 -R "$GITHUB_REPOSITORY" --name matched-c2-harden-37814078650 --dir build/tile_harden_checkpoint
+          fi
+      - name: Native physical interface audit or explicit full hardening
         timeout-minutes: 112
         run: |
           source .venv/bin/activate
-          python test_internal/cloud_tile_harden.py run --archive build/tile-harden-c2.tar.gz --sha256 "$WARP_SOURCE_SHA256"
+          if [ "$WARP_MODE" = "audit" ]; then
+            python test_internal/cloud_tile_harden.py audit --archive build/tile-harden-c2.tar.gz --sha256 "$WARP_SOURCE_SHA256" --checkpoint build/tile_harden_checkpoint/last_completed
+          else
+            python test_internal/cloud_tile_harden.py run --archive build/tile-harden-c2.tar.gz --sha256 "$WARP_SOURCE_SHA256"
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: matched-c2-harden-${{ github.run_id }}
+          name: matched-c2-${{ env.WARP_MODE }}-${{ github.run_id }}
           path: build/tile_harden/
           retention-days: 3

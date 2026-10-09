@@ -179,6 +179,23 @@ def verify_connections(before, after):
             "original_cell_max_axis_displacement_database_units": max(max(dx, dy) for dx, dy in displacement)}
 
 
+def single_corner_config(config, corner):
+    """corner.tcl reports its first corner; run each original corner separately."""
+    if corner not in config["STA_CORNERS"]: raise ValueError("Corner is not an original STA corner")
+    selected = dict(config, PNR_CORNERS=[corner], DEFAULT_CORNER=corner)
+    if any(selected[key] != value for key, value in config.items()
+           if key not in {"PNR_CORNERS", "DEFAULT_CORNER"}):
+        raise ValueError("Corner selection changed original inputs")
+    return selected
+
+
+def exact_corner_fanout(metrics, corner):
+    prefix = "design__max_fanout_violation__count__corner:"
+    counts = {key: value for key, value in metrics.items() if key.startswith(prefix)}
+    if set(counts) != {prefix + corner}: raise ValueError("Missing/wrong actual STA corner metric")
+    return counts
+
+
 def run():
     OUT.mkdir(exist_ok=False)
     result = {"passed": False, "physical_or_timing_acceptance": False, "detailed_routing": False,
@@ -209,11 +226,12 @@ def run():
             raise ValueError("Original timing constraints differ")
         if config.get("PAD_LIBS") is None: config["PAD_LIBS"] = {}
         config["CTS_SINK_CLUSTERING_SIZE"] = 8
-        # The earlier mid-PnR step used only DEFAULT_CORNER because PNR_CORNERS
-        # was null. Extend measurement coverage, without changing corner files.
-        config["PNR_CORNERS"] = config["STA_CORNERS"]
-        if len(config["PNR_CORNERS"]) != 3: raise ValueError("Expected exactly three original STA corners")
-        result["measurement_corners"] = config["PNR_CORNERS"]
+        # Pinned corner.tcl explicitly reports only the first defined corner.
+        # Separate processes give real coverage of all original timing corners.
+        corners = config["STA_CORNERS"]
+        if len(corners) != 3 or len(set(corners)) != 3: raise ValueError("Expected exactly three original STA corners")
+        result["measurement_corners"] = corners
+        result["measurement_method"] = "six explicit single-corner STAMidPNR runs; identical ODB per design"
         config["meta"] = {"version": 2, "flow": ["OpenROAD.STAMidPNR"]}
         # Independently verify the chosen primitive's actual Liberty function.
         import re
@@ -241,14 +259,17 @@ def run():
                                      (("odb", "WARP_OUTPUT_ODB"), ("nl", "WARP_OUTPUT_NL"))}
         (OUT / "config.json").write_text(json.dumps(config, indent=2) + "\n")
         save()
-        def sta(label, odb, nl):
+        def sta(label, odb, nl, corner):
             (OUT / label).mkdir(exist_ok=False)
+            selected = single_corner_config(config, corner)
+            config_path = OUT / (label + "_config.json")
+            config_path.write_text(json.dumps(selected, indent=2) + "\n")
             state = {"odb": str(odb), "nl": str(nl), "sdc": str(derived / "sdc/tt_um_warp.sdc"), "metrics": {}}
             state_path = OUT / (label + "_state.json")
             state_path.write_text(json.dumps(state) + "\n")
             command = [sys.executable, "-m", "librelane", "--docker-no-tty", "--dockerized", "--pdk", "ihp-sg13cmos5l",
                    "--pdk-root", os.environ["PDK_ROOT"], "--manual-pdk", "--hide-progress-bar", "--force-run-dir", str(OUT / "sta"),
-                   "--with-initial-state", str(state_path), str(OUT / "config.json")]
+                   "--with-initial-state", str(state_path), str(config_path)]
             command[command.index("--force-run-dir") + 1] = str(OUT / label)
             with (OUT / (label + ".log")).open("w") as log:
                 subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=300)
@@ -258,17 +279,25 @@ def run():
             if resolved["CELL_LIBS"] != config["LIB"] or macro_contract(resolved["MACROS"]) != macro_contract(config["MACROS"]):
                 raise ValueError("STA changed library/macro inputs")
             for key in ("CLOCK_PORT", "CLOCK_PERIOD", "CLOCK_UNCERTAINTY_CONSTRAINT", "CLOCK_TRANSITION_CONSTRAINT",
-                        "MAX_FANOUT_CONSTRAINT", "PNR_SDC_FILE", "FALLBACK_SDC", "PNR_CORNERS"):
-                if resolved.get(key) != config.get(key): raise ValueError("STA changed constraint " + key)
+                        "MAX_FANOUT_CONSTRAINT", "PNR_SDC_FILE", "FALLBACK_SDC", "PNR_CORNERS", "DEFAULT_CORNER"):
+                if resolved.get(key) != selected.get(key): raise ValueError("STA changed constraint/corner " + key)
             metrics = json.loads((stages[0] / "state_out.json").read_text())["metrics"]
-            counts = {key: value for key, value in metrics.items() if key.startswith("design__max_fanout_violation__count__corner:")}
-            if len(counts) != 3: raise ValueError("Missing all three corner fanout counts")
-            result[label] = {"metrics": metrics, "fanout_corner_counts": counts}
+            counts = exact_corner_fanout(metrics, corner)
+            result[label] = {"metrics": metrics, "fanout_corner_counts": counts, "corner": corner,
+                             "odb_sha256": sha(Path(odb)), "sdc_sha256": sha(derived / "sdc/tt_um_warp.sdc")}
             save()
             return counts
-        baseline = sta("baseline_sta", derived / "odb/tt_um_warp.odb", derived / "nl/tt_um_warp.nl.v")
+        baseline = {}
+        for corner in corners:
+            baseline.update(sta("baseline_sta_" + corner, derived / "odb/tt_um_warp.odb", derived / "nl/tt_um_warp.nl.v", corner))
+        if len(baseline) != 3: raise ValueError("Missing three independently measured baseline corners")
         if not all(value == 5 for value in baseline.values()): raise ValueError("Baseline fanout failure did not reproduce")
-        fanout = sta("buffered_sta", env["WARP_OUTPUT_ODB"], env["WARP_OUTPUT_NL"])
+        fanout = {}
+        for corner in corners:
+            fanout.update(sta("buffered_sta_" + corner, env["WARP_OUTPUT_ODB"], env["WARP_OUTPUT_NL"], corner))
+        if len(fanout) != 3: raise ValueError("Missing three independently measured candidate corners")
+        result["baseline_fanout_corner_counts"] = baseline
+        result["buffered_fanout_corner_counts"] = fanout
         for kind, digest in DERIVED.items():
             path = derived / kind / ("tt_um_warp." + ("nl.v" if kind == "nl" else kind))
             if sha(path) != digest: raise ValueError("Diagnostic mutated authenticated source " + kind)

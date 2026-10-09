@@ -7,8 +7,17 @@ import re
 from event_nor2_screen import logical_cells
 from native_route_gl import STRENGTH_NETLIST_SHA
 
+TARGETS = {
+    'dout0': dict(instance='wire9447', master='sg13cmos5l_buf_4',
+                  pins={'X': 'net9447', 'A': '\\u_chip.g_lane[0].u_lane.mem_rdata[0] '},
+                  location=(473760, 230580, 'N'), pin=(22.75, 231.21)),
+    'ren': dict(instance='_29426_', master='sg13cmos5l_nor2b_1',
+                pins={'A': '_04439_', 'B_N': '_04440_', 'Y': '_00076_'},
+                location=(438720, 226800, 'FS'), pin=(128.26, 231.21)),
+}
 
-def occupancy(text, lef, units):
+
+def occupancy(text, lef, units, instance='wire9447', master='sg13cmos5l_buf_4'):
     if hashlib.sha256(lef.read_bytes()).hexdigest() != 'c47c436758ae87288324aa1f5a84fcc8faf813bf19df1a400b32258fff4e1219':
         raise ValueError('Unreviewed standard-cell geometry')
     sizes = {}
@@ -19,38 +28,43 @@ def occupancy(text, lef, units):
     sizes['RM_IHPSG13_1P_512x16_c2_bm_bist'] = (236800, 191340)
     section = text.split('COMPONENTS ', 1)[1].split('END COMPONENTS', 1)[0]
     placed = []
-    for name, master, attrs in re.findall(r'^\s*- (\S+) (\S+)(.*?);', section, re.M | re.S):
+    for name, component_master, attrs in re.findall(r'^\s*- (\S+) (\S+)(.*?);', section, re.M | re.S):
         match = re.search(r'\+ (?:PLACED|FIXED) \(\s*(\d+)\s+(\d+)\s*\) (\S+)', attrs)
         if not match:
             raise ValueError('Unplaced component ' + name)
-        if master not in sizes or match[3] not in ('N', 'S', 'FN', 'FS'):
+        if component_master not in sizes or match[3] not in ('N', 'S', 'FN', 'FS'):
             raise ValueError('Unknown component geometry ' + name)
         x, y = int(match[1]), int(match[2])
-        width, height = sizes[master]
-        if name != 'wire9447':
+        width, height = sizes[component_master]
+        if name != instance:
             placed.append((name, x, y, x + width, y + height))
-    return sizes['sg13cmos5l_buf_4'], placed
+    return sizes[master], placed
 
 
-def plan(netlist, layout, lef=None):
+def plan(netlist, layout, lef=None, target='dout0'):
     if hashlib.sha256(layout.read_bytes()).hexdigest() != 'c2496ceec0cfcd6bf74b4f0f69373c737ef5ed7eb081a1343d0478e7ed1a8e2f':
         raise ValueError('Unreviewed routed layout')
     if hashlib.sha256(netlist.read_bytes()).hexdigest() != STRENGTH_NETLIST_SHA:
         raise ValueError('Unreviewed routed netlist')
     cells = logical_cells(netlist.read_text())
-    expected = ('sg13cmos5l_buf_4', tuple(sorted({
-        'X': 'net9447', 'A': '\\u_chip.g_lane[0].u_lane.mem_rdata[0] '}.items())))
-    if cells.get('wire9447') != expected:
-        raise ValueError('Wrong SRAM buffer connectivity')
+    selected = TARGETS[target]
+    instance, master = selected['instance'], selected['master']
+    expected = (master, tuple(sorted(selected['pins'].items())))
+    if cells.get(instance) != expected:
+        raise ValueError('Wrong SRAM target connectivity')
     text = layout.read_text()
     units = int(re.search(r'UNITS DISTANCE MICRONS (\d+)', text)[1])
     if units != 1000:
         raise ValueError('Unexpected layout units')
-    geometry = occupancy(text, lef, units) if lef else None
-    if not re.search(r'wire9447 sg13cmos5l_buf_4[^;]*PLACED \( 473760 230580 \) N', text):
-        raise ValueError('Wrong SRAM buffer placement')
+    geometry = occupancy(text, lef, units, instance, master) if lef else None
+    old_x, old_y, old_orientation = selected['location']
+    placement = (re.escape(instance) + ' ' + re.escape(master)
+                 + r'[^;]*PLACED \( ' + str(old_x) + ' ' + str(old_y)
+                 + r' \) ' + old_orientation)
+    if not re.search(placement, text):
+        raise ValueError('Wrong SRAM target placement')
     # Pin center from pinned macro LEF and observed FS placement (12,40).
-    pin_x, pin_y = 22.75, 231.21
+    pin_x, pin_y = selected['pin']
     rows = []
     pattern = r'^ROW (\S+) CoreSite (\d+) (\d+) (\S+) DO (\d+) BY 1 STEP (\d+) 0 ;'
     for name, x, y, orient, count, pitch in re.findall(pattern, text, re.M):
@@ -88,7 +102,7 @@ def plan(netlist, layout, lef=None):
         rows.append(candidate)
     if not rows:
         raise ValueError('No candidate row')
-    return dict(source_route=37954320974, instance='wire9447',
+    return dict(source_route=37954320974, instance=instance, master=master,
                 candidates=sorted(rows, key=lambda r: r['origin_distance_um'])[:3],
                 physical_change_applied=False, occupancy_checked=bool(geometry),
                 pin_access_checked=False, power_connectivity_checked=False,
@@ -100,5 +114,6 @@ if __name__ == '__main__':
     parser.add_argument('netlist', type=Path)
     parser.add_argument('layout', type=Path)
     parser.add_argument('--lef', type=Path)
+    parser.add_argument('--target', choices=TARGETS, default='dout0')
     args = parser.parse_args()
-    print(json.dumps(plan(args.netlist, args.layout, args.lef), indent=2))
+    print(json.dumps(plan(args.netlist, args.layout, args.lef, args.target), indent=2))

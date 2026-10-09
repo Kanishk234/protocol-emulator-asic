@@ -15,6 +15,17 @@ from postgrt_timing import CORNERS, screen
 
 SOURCE_RUN = 37853023857
 SOURCE_SHA = 'a53dd57b44438d2a10f3363e1418d489a175397e'
+PROFILES = {
+    'stock125': (SOURCE_RUN, SOURCE_SHA, 'gds-native-stock-screen', 0.125),
+    'hold100': (37866086829, '7b87718f0b28be7c5815cded40db05eb52c27be8',
+                'gds-native-hold100-screen', 0.10),
+}
+
+
+def profile_values(profile):
+    if profile not in PROFILES:
+        raise ValueError('Unqualified native route profile')
+    return PROFILES[profile]
 
 
 def fingerprints(root):
@@ -27,23 +38,24 @@ def fingerprints(root):
             for p in sorted(files)}
 
 
-def validate_source(run, recipe, config, expected, actual):
-    if (run['id'] != SOURCE_RUN or run['conclusion'] != 'success'
-            or run['head_branch'] != 'main' or run['head_sha'] != SOURCE_SHA
-            or run['path'] != '.github/workflows/gds-native-stock-screen.yaml'):
+def validate_source(run, recipe, config, expected, actual, profile='stock125'):
+    run_id, sha, workflow, hold_target = profile_values(profile)
+    if (run['id'] != run_id or run['conclusion'] != 'success'
+            or run['head_branch'] != 'main' or run['head_sha'] != sha
+            or run['path'] != f'.github/workflows/{workflow}.yaml'):
         raise ValueError('Wrong native source provenance')
     if (recipe.get('synthesis_strategy') != 'AREA 1'
             or recipe.get('source_variant') != 'bs-event-late'
             or recipe.get('stock_sequence') is not True
             or recipe.get('checkpoint_ecos') is not False
             or recipe.get('repair_corners') != list(CORNERS)
-            or recipe.get('hold_target_ns') != 0.125):
+            or recipe.get('hold_target_ns') != hold_target):
         raise ValueError('Wrong native recipe')
     if (config['CLOCK_PERIOD'] != 20 or config['PL_TARGET_DENSITY_PCT'] != 56
             or config['SYNTH_STRATEGY'] != 'AREA 1' or config['GRT_ADJUSTMENT'] != 0.16
             or config['RSZ_CORNERS'] != list(CORNERS)
             or config.get('RUN_POST_GRT_RESIZER_TIMING') is not True
-            or config['GRT_RESIZER_HOLD_SLACK_MARGIN'] != 0.125
+            or config['GRT_RESIZER_HOLD_SLACK_MARGIN'] != hold_target
             or Path(config['PNR_SDC_FILE']).resolve() != Path('src/signoff.sdc').resolve()
             or Path(config['SIGNOFF_SDC_FILE']).resolve() != Path('src/signoff.sdc').resolve()):
         raise ValueError('Wrong native physical config')
@@ -81,6 +93,8 @@ def run_step(config, source, output, steps):
 
 
 def main():
+    profile = os.environ.get('NATIVE_ROUTE_PROFILE', 'stock125')
+    run_id, _, _, _ = profile_values(profile)
     root = Path('runs/native-stock-screen')
     config_path = Path('src/config_native_stock.json')
     config = json.loads(config_path.read_text())
@@ -89,7 +103,7 @@ def main():
     validate_source(json.loads(Path('/tmp/native-source-run.json').read_text()),
                     json.loads((root / 'recipe.json').read_text()), config,
                     json.loads(Path('/tmp/native-trusted-files.json').read_text()),
-                    fingerprints(Path.cwd()))
+                    fingerprints(Path.cwd()), profile=profile)
     source = checkpoint(root / 'flow')
     log = source.parent / 'openroad-resizertimingpostgrt.log'
     validate_overflow(log.read_text())
@@ -125,7 +139,7 @@ def main():
            repaired=source, sdc=Path('src/signoff.sdc'))
     timing = json.loads((out / 'timing/comparison.json').read_text())
     ready = qualified(timing, antenna)
-    (out / 'gates.json').write_text(json.dumps({'source_run': SOURCE_RUN,
+    (out / 'gates.json').write_text(json.dumps({'source_run': run_id, 'profile': profile,
         'strategy': 'AREA 1', 'state': str(source), 'qualified': ready,
         'minimum_fast_hold_ns': 0.05, 'official_signoff': False}, indent=2) + '\n')
     if not ready:
@@ -142,9 +156,10 @@ if __name__ == '__main__':
     parser.add_argument('--prepare', action='store_true')
     args = parser.parse_args()
     if args.prepare:
+        _, _, _, hold_target = profile_values(os.environ.get('NATIVE_ROUTE_PROFILE', 'stock125'))
         Path('/tmp/native-trusted-files.json').write_text(json.dumps(fingerprints(Path.cwd())))
         expected = configure(json.loads(Path('src/config_merged.json').read_text()),
-                             'AREA 1', Path('src/signoff.sdc'))
+                             'AREA 1', Path('src/signoff.sdc'), hold_target=hold_target)
         Path('/tmp/native-trusted-config.json').write_text(json.dumps(expected))
     else:
         main()

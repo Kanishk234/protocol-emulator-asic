@@ -53,7 +53,8 @@ def test_antenna_and_positive_margin_required():
 @pytest.mark.parametrize('setup_ok',[True,False])
 @pytest.mark.parametrize('cleanup_needed',[True,False])
 @pytest.mark.parametrize('bad_cleanup',[None,'policy','log','antenna'])
-def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_ok,cleanup_needed,bad_cleanup):
+@pytest.mark.parametrize('profile',['stock125','hold100'])
+def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_ok,cleanup_needed,bad_cleanup,profile):
     import json, sys, types
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('PDK_ROOT','/pdk')
@@ -61,6 +62,11 @@ def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_
     Path('src').mkdir()
     Path('src/signoff.sdc').write_text('fully timed')
     run,recipe,config=source()
+    monkeypatch.setenv('NATIVE_ROUTE_PROFILE',profile)
+    run_id,sha,workflow,target=runner.profile_values(profile)
+    run.update(id=run_id,head_sha=sha,path=f'.github/workflows/{workflow}.yaml')
+    recipe['hold_target_ns']=target
+    config['GRT_RESIZER_HOLD_SLACK_MARGIN']=target
     Path('src/config_native_stock.json').write_text(json.dumps(config))
     root=Path('runs/native-stock-screen');root.mkdir(parents=True)
     (root/'recipe.json').write_text(json.dumps(recipe))
@@ -116,6 +122,35 @@ def test_main_gates_route_and_extract_without_repair(tmp_path,monkeypatch,setup_
     elif setup_ok and not (cleanup_needed and bad_cleanup=='antenna'):
         runner.main()
         assert calls==prefix+['OpenROAD.DetailedRouting','extract']
+        gates=json.loads(Path('runs/native-stock-route/gates.json').read_text())
+        assert gates['source_run']==run_id and gates['profile']==profile
+        assert gates['minimum_fast_hold_ns']==.05
     else:
         with pytest.raises(ValueError,match='routing refused'):runner.main()
         assert calls==prefix
+
+
+
+def test_hold100_requires_exact_source_and_matched_target():
+    run,recipe,config=source()
+    run.update(id=37866086829,head_sha='7b87718f0b28be7c5815cded40db05eb52c27be8',
+               path='.github/workflows/gds-native-hold100-screen.yaml')
+    recipe['hold_target_ns']=.10
+    config['GRT_RESIZER_HOLD_SLACK_MARGIN']=.10
+    runner.validate_source(run,recipe,config,{}, {}, profile='hold100')
+    with pytest.raises(ValueError):runner.validate_source(run,recipe,config,{}, {})
+    recipe['hold_target_ns']=.125
+    with pytest.raises(ValueError):runner.validate_source(run,recipe,config,{}, {},profile='hold100')
+    recipe['hold_target_ns']=.10;config['GRT_RESIZER_HOLD_SLACK_MARGIN']=.125
+    with pytest.raises(ValueError):runner.validate_source(run,recipe,config,{}, {},profile='hold100')
+    with pytest.raises(ValueError):runner.profile_values('unknown')
+
+
+def test_hold100_workflow_downloads_exact_candidate():
+    import yaml
+    wf=yaml.safe_load((Path(__file__).parents[2]/'.github/workflows/gds-native-hold100-route.yaml').read_text())
+    job=wf['jobs']['harden']
+    assert job['env']['NATIVE_ROUTE_PROFILE']=='hold100'
+    download=next(s for s in job['steps'] if 'download-artifact' in s.get('uses',''))
+    assert download['with']['name']=='gds-native-hold100-area1-37866086829'
+    assert download['with']['run-id']==37866086829

@@ -41,6 +41,10 @@ settings, native before/after placement/connectivity and actual complete
 zero-overflow congestion tables. Actual pinned C2 log parsing and malformed/
 nonzero metric controls pass. No local EDA; free standard hosted job only.
 No stronger driver, detailed route or estimated/extracted timing added.
+**Launch evidence:** committed6abab37/8b849fd/5f6c02f/5442acd; verified
+new official37958932525 and paired GRT37958932549 in progress on5442acd.
+Added compact_closure_next_20261009.md with measured scope, exact remaining
+blockers and ordered fresh-route/complete-fabric acceptance steps.
 **Boxes ticked:** none.
 **Next:** push scoped fixes, inspect fresh four native cases and official
 precheck, fix audit setup if evidenced; then fresh route/extracted shell timing

@@ -1,5 +1,44 @@
 # SRAM electrical closure: targets and experiment order
 
+## 2026-10-09 corrected checkpoint triage
+
+### Passing-route SRAM placement: concrete relocation targets
+
+Route37954320974 actual DRT DEF places the SRAM at(12,40)µm, orientationFS, with pinned macro LEF size236.8×191.34µm. Applying that orientation to LEF pin centers gives the following placement audit. Distances use buffer origins, not input pin centers or routed lengths.
+
+| Macro output | Pin center µm | Existing sink | Sink origin µm | Manhattan distance µm |
+|---|---|---|---|---|
+| A_DOUT[0] |22.75,231.21 |wire9447/A |473.76,230.58 |451.64 |
+| A_DOUT[1] |33.99,231.21 |wire9440/A |359.04,234.36 |328.20 |
+| A_DOUT[2] |45.23,231.21 |wire9439/A |341.28,230.58 |296.68 |
+| A_DOUT[5] |78.95,231.21 |_33966_/A and max_cap9436/A |345.60/350.40,238.14 |273.58/278.38 |
+
+Bits0/1/2 each have exactly one mapped standard-cell input sink in the final netlist. Bit5 has two and needs a separate load assessment. REN pin center(128.26,231.21)µm is approximately314.87µm Manhattan distance from driver29426 at(438.72,226.80)µm. These findings are on the newly timing-passing route, not just the older baseline.
+
+First bounded experiment: relocate only existing wire9447 closer to A_DOUT[0], selecting a legal standard-cell row above the macro and verifying pin access, supply connections and no macro/obstruction overlap. Preserve cell master and all nets; legalize, reroute with no inherited detailed wires, recheck antennas, and extract all corners. Compare macro-output capacitance, both upstream and downstream timing, cell displacement, overflow and hold. Added standard-cell area is zero if no later repair inserts cells; total area/routing consequences remain unmeasured. Do not move all outputs or REN simultaneously. Hold margin on this route is only6.32ps above the50ps gate.
+
+Occupancy follow-up: local read-only sram_buffer_plan.py pins both actual route NL/DEF and standard-cell LEF hashes, validates exact wire9447 connectivity/old location, and checks placed footprints including fillers/macro. BUF4 size3.84×3.78µm. The initial row63 site(22.56,241.92) overlaps two components; it is not a valid relocation. Gap search yields row65(20.64,249.48)FS,20.38µm pin-to-origin estimate; row63(12.48,241.92)FS,20.98µm; row64(30.72,245.70)N,22.46µm. Independent complete placed-footprint overlap checks pass all three. Occupancy clearance is not pin-access, PDN, routing-obstruction or physical legalization evidence. No instance moved or routed timing benefit measured.
+
+Local physical prototype: sram_buffer_relocate.tcl validates BUF4, exact source placement/size/orientation, complete data/power pin connectivity and target occupancy before moving only wire9447. Changes orientation before setting lower-left position, then verifies unchanged master/nets; a post-legalization guard requires the exact audited site. OpenDB documents the orientation/location ordering and DEF lower-left semantics ([primary API](https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/src/odb/include/odb/db.h)); the pinned physical Tcl binding must still be exercised in CI.
+
+Separate wrapper/Dockerfile restrict relocation to first GRT checkpoint read, export fresh NL/PNL, legalize and verify, then clear inherited ordinary routing before GRT. Antenna cleanup only exports fresh views and disallows congestion; DRT passes through unchanged.21 focused actual Tcl/shell/reset checks pass with mocked physical APIs, including pre-mutation rejection and wrapper ordering. No workflow/orchestration has been published or launched for relocation. Next add exact-source hardware/config/ODB baseline checks, unchanged-netlist promotion, fresh allcorner/antenna gates and separate screen artifact. No new electrical or timing result yet.
+
+Standalone orchestration now prepared locally: sram_relocate_screen.py and gds-sram-relocate-screen.yaml download only strength route37954320974, reuse exact run/NL validation plus DEF/source buffer guards, compare trusted full hardware/config, and require exported ODB baseline equal to measured NL. Fresh post-move logical cells/connections must be unchanged; old SPEF/SDF/lib cleared. Unique relocation/legalization/reset receipts and zero overflow precede antenna check/optional congestion-disallowed cleanup, with no full GRT after cleanup. Fresh allcorner STA preserves20ns, nonnegative setup/hold and50ps fast hold. Gates label zero logical changes/one relocated instance/physical screen only.53 focused tests pass including full cleanup/timing-pass and timing-fail orchestration, stale-view clearing and bad history rejection. Python/Tcl physical APIs are mocked for orchestration tests. Workflow remains manual and local; no new physical results or detailed route launched.
+
+Exact final ECO netlist sink mapping (same artifact):28820 is NOR2_1 driving_03844_ with19 attached pins,12 antenna and7 other pins; reported fanout20 is the STA fanout metric, not assumed equal to pin count.28807 is NAND3_1 driving_03831_ with15 pins,7 antenna and8 other pins. REN driver29426 NOR2B_1 drives_00076_ with ANTENNA_53/A,hold11848/A and SRAM A_REN. Thus a bounded antenna-aware partition/routing experiment is more concrete than indiscriminately splitting firmware logic. Preserve antenna protection, verify exact connectivity and fresh antenna checks after every repair; deleting diodes to improve fanout is not a valid fix.
+
+Final DEF placement supports spatial partitioning:28820 origin(782.40,309.96)µm has two data sinks aroundx1261µm and three aroundx1010–1020µm, plus a sink nearx442µm.28807 origin(622.08,404.46)µm drives five data sinks aroundx1186–1259µm,y283–299µm, and others nearx425/x788µm. These clusters motivate one distal branch buffer per experiment rather than buffering solely by sink count. Partial origin mapping covers18/19 and14/15 pins; observed Manhattan distances262–504µm and276–758µm are placement estimates, not routed lengths or pin-level distances. Raw mapping remains /tmp/tripwire-reset-electrical-placement.json. Exact macro pin positions and unmapped hold/place-buffer records still need inspection before choosing coordinates.
+
+Pinned LibreLane3.1.0.dev3 wheel confirms CTS_SINK_CLUSTERING_ENABLE defaults true and CTS_SINK_CLUSTERING_SIZE is optional and forwarded to OpenROAD as -sink_clustering_size. A size8 clean-build trial is technically available but is not a guaranteed final fanout limit; later repair and inserted loads must be measured. Keep this separate from current checkpoint continuation and retain all corner skew/hold/area checks.
+
+Actual checks reports from successful screen37949660848/artifact11625986970 identify187 fanout violations per corner:164 clock-buffer-named drivers and23 other drivers. Naming is triage, not an exemption. Largest other loads are28820/Y20,28807/Y15,place8892/X14 andplace6434/place8379/place8636 each12 against limit8. Antenna cells are present on the remaining slow-slew branch; include their loading when planning splits.
+
+SRAM A_REN violates every corner: slow0.995801ns against0.595200, typical0.638253 against0.476000, fast0.410739 against0.380000. The other16 slow slew rows are28807/Y and receivers/antenna pins on its branch, exceeding limits by approximately7–10ps. Prioritize bounded REN drive/placement repair and a load split on this branch, preserving enable semantics and checking write-enable hold too. Stronger drivers alone do not fix fanout counts.
+
+Independent preparation order: map these23 data drivers to sinks/placement, estimate minimal buffer partitions at eight loads including antenna pins, and inspect the pinned clock clustering/repair controls for the164 clock drivers. Keep clock repair separate because skew and hold can regress. Require fresh routing/extraction for any physical modification; do not treat this estimated checkpoint as electrical closure. Stock STAMidPNR checks reports omit empty capacitance sections, so the stricter extracted-report auditor correctly rejects them as incomplete; use reported screen metrics for cap0 rather than infer it from absent sections.
+
+Current detailed routing/extraction37954320974 is active. Official adoption still needs a reproducible clean-build sizing rule rather than volatile synthesized instance names, exact-netlist protocol GL, and the unmodified official workflow gates.
+
 This is a preparation report, not a timing or electrical pass. Native hold100 routing run37870374707 is still in progress at this audit. Keep the full 2-lane/4-unit design, 20ns clock, fully timed constraints and unchanged protocol latency.
 
 ## Measured failures

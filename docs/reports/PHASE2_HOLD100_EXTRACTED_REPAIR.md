@@ -50,8 +50,6 @@ gds-native-hold100-strength-screen downloads only reviewed route37870374707, ver
 
 83 focused tests pass, including full orchestration with/without antenna cleanup and pass/fail hold gates, exact-change audits, real shell wrapper injection, Tcl preflight checks, connectivity regression and workflow source selection. Physical OpenROAD operations are mocked in local orchestration tests; no screen has been launched yet. SRAM-buffer relocation remains a separate next trial.
 
-## SRAM output placement target
-
 ## Physical screen receipts and protocol evidence
 
 Initial strength37895037616/GL37895041603 fail source config validation (BUG84); corrected GL37895415098 passes22/22,0fail,0skip on original hold100 DRT netlist a75d8719dd48838ae6b1f051f1147b1835d7a050c55dbd7144d5ef14b438f8bb. It does not validate the uncompleted six-cell physical repair.

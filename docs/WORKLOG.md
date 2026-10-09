@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-08: Codex (hold100 guarded routing continuation)
+- Prepared native hold100 continuation for successful screen37866086829/head7b87718f0b28be7c5815cded40db05eb52c27be8. Exact source/workflow/100ps target registry, trusted hardware/full-config equality, fresh antenna cleanup/STA/50ps fast hold, DRT0DRC requirement and automatic extraction remain enforced. Stock125 profile unchanged; no named-cell ECO.
+-72 helper checks pass, including full orchestration for both source profiles and refusal of mismatched targets, bad cleanup/timing and insufficient hold. Workflow static audit and diff check pass. Next publish/launch this continuation of the approved100ps experiment and inspect extracted results; no phase tick or electrical readiness claim. FIPE remains local.
+
+## 2026-10-08: Codex (hold100 completed screen audited)
+- Hold100 screen37866086829 succeeds in42min; no active main workflows. SetupWS0allcorners, holdfast+0.100882ns/typ+0.204349ns/slow+0.382839ns. Actual artifact11589244417.
+- Final cell area514025.08µm² inclSRAM vs stock125ps524688.31 (−10663.23µm²/~2.03%);33245cells vs33898. GRT39.56%/0overflow. Electrical still fails: slewslow18/typ1/fast1, cap1eachcorner. No routed/extracted improvement or official closure claimed.
+- Initial status tool stalled; terminated after read-only retry. Report updated locally. Next guarded hold100 route/extraction to measure actual setup benefit, while addressing electrical constraints separately. No phase tick; best earlier timing checkpoint preserved.
+
 ## 2026-10-08: Codex (native exact-baseline probes and bounded clean recipe)
 - Actual native NL/SPEF baseline six metrics match CI within1e-6ns.54 all-corner probes: seven strength changes improve slow−1.423654→−0.262711ns; replacing two SD3 hold cells with SD2 gives setupWS0 all corners, holdfast+0.094072364ns unchanged. Added library area29.0304µm²; no physical or official pass claimed.
 - Mapped dropped endpoint47345 and RX rt[23] endpoint46391; improving one branch moves the bottleneck. Prepared independent clean-build AREA1 hold100ps screen changing one repair option vs125ps, keeping clock/uncertainty/hardware/density fixed; acceptance gates remain unchanged.

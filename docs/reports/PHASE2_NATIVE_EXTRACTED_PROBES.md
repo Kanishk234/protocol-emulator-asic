@@ -40,3 +40,11 @@ The100ps option is an experimental repair target, not a lowered acceptance thres
 30 further all-corner minimization processes: reverting the two INV2 substitutions and30202 NOR3 sizing retains setupWS0 and unchanged hold. Final six-change estimate is place7221 BUF4,37732 NAND2_2,24896 NOR2_2,29918 NOR3_2,hold12888 SD2 andhold12418 SD2. Added library area18.144µm². Reverting37732, weakening place7221 toBUF2 or reverting24896 reintroduces negative setup in tested controls. This is a measured reduced set, not an exhaustive minimum-cell proof. Total84 local STA processes across the original and reduced probes; no physical pass claimed.
 
 Fresh review of earlier passing extraction37844735445 checks.rpt finds slew counts slow91/typ3/fast1 and cap counts slow6/typ7/fast7. That checkpoint passes measured setup/hold and routed protocol tests but is not electrically clean. Official readiness must address these constraints as well as clean-build setup reproduction; do not treat earlier timing closure as all-requirements closure.
+
+## Hold100 screen result
+
+Run37866086829 succeeds in42min on7b87718. SetupWS0 every corner; holdfast+0.100882ns/typ+0.204349ns/slow+0.382839ns. Post-repair area514025.08µm² including SRAM (−10663.23µm²/~2.03% vs125ps baseline),33245cells vs33898; finalGRT39.56% with zero overflow. Electrical violations remain slewslow18/typ1/fast1 and cap1everycorner. The reduced native hold target changes physical cell choices and reduces area, but extracted setup benefit is unproven until this exact checkpoint is routed/extracted. Evidence artifact11589244417. No promotion or official closure.
+
+## Prepared hold100 routing qualification
+
+Exact screen37866086829/head7b87718 now has a guarded native_stock_route hold100 profile and separate gds-native-hold100-route workflow. It preserves100ps repair target but requires the same50ps fast-hold gate, nonnegative all-corner timing and fresh antenna clearance before DRT. Congestion-disallowed post-timing cleanup preserves repaired guides; successful zero-DRC DRT triggers extraction.72 helper checks pass with both source profiles and exact source/config rejection. No extracted improvement or electrical readiness inferred from the screen.

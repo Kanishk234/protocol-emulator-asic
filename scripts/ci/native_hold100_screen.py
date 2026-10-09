@@ -59,7 +59,8 @@ def main():
     route = Path('runs/native-stock-route/drt')
     states = list(route.glob('*-openroad-detailedrouting/state_out.json'))
     source = states[0]
-    config = json.loads((source.parent / 'config.json').read_text())
+    # Step configs omit synthesis/resizer variables; use the audited full recipe.
+    config = json.loads(Path('src/config_native_stock.json').read_text())
     if config.get('GRT_RESIZER_HOLD_SLACK_MARGIN') != 0.10:
         raise ValueError('Native hold target mismatch')
     config['GRT_ALLOW_CONGESTION'] = False

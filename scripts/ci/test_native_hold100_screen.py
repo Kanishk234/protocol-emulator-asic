@@ -92,14 +92,15 @@ def test_orchestration_uses_fresh_views_and_never_reroutes_after_cleanup(tmp_pat
     source = tmp_path / 'runs/native-stock-route/drt/1-openroad-detailedrouting/state_out.json'
     write(source, {})
     write(source.parent / 'config.json', {'GRT_RESIZER_HOLD_SLACK_MARGIN': .10})
-    write(tmp_path / 'src/config_native_stock.json', {})
+    write(tmp_path / 'src/config_native_stock.json', {'GRT_RESIZER_HOLD_SLACK_MARGIN': .10})
     baseline = tmp_path / 'runs/extracted-timing/final/nl/tt_um_tripwire.nl.v'
     baseline.parent.mkdir(parents=True)
     baseline.write_text(netlist())
     def read_json(path):
         path = Path(path)
         if str(path) == '/tmp/native-eco-source-run.json': return {'id': 37870374707}
-        if str(path) in ('/tmp/native-trusted-config.json', '/tmp/native-trusted-files.json'): return {}
+        if str(path) == '/tmp/native-trusted-config.json': return {'GRT_RESIZER_HOLD_SLACK_MARGIN': .10}
+        if str(path) == '/tmp/native-trusted-files.json': return {}
         return json.loads(original_read(path))
     original_read = Path.read_text
     monkeypatch.setattr(runner, 'validate', lambda *args: None)

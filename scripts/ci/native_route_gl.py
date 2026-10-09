@@ -39,10 +39,16 @@ def validate(root, run):
     if not str(state.get('nl', '')).endswith(suffix):
         raise ValueError('Native route netlist identity mismatch')
     config = json.loads((step / 'config.json').read_text())
-    if (config.get('CLOCK_PERIOD') != 20 or config.get('SYNTH_STRATEGY') != 'AREA 1'
+    if (config.get('CLOCK_PERIOD') != 20
             or config.get('GRT_ADJUSTMENT') != 0.16
             or not str(config.get('PNR_SDC_FILE', '')).endswith('/src/signoff.sdc')):
         raise ValueError('Native route configuration mismatch')
+    recipe = json.loads((root / 'src/config_native_stock.json').read_text())
+    if (recipe.get('CLOCK_PERIOD') != 20 or recipe.get('SYNTH_STRATEGY') != 'AREA 1'
+            or recipe.get('GRT_ADJUSTMENT') != 0.16
+            or recipe.get('GRT_RESIZER_HOLD_SLACK_MARGIN') != (0.10 if profile == 'hold100' else 0.125)
+            or not str(recipe.get('PNR_SDC_FILE', '')).endswith('/src/signoff.sdc')):
+        raise ValueError('Native full recipe mismatch')
     text = netlist.read_text()
     if ('module tt_um_tripwire' not in text
             or 'RM_IHPSG13_1P_512x16_c2_bm_bist' not in text):

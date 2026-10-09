@@ -17,6 +17,10 @@ def fixture(tmp_path, run_id):
         nl='/runner/runs/native-stock-route/drt/1-openroad-detailedrouting/tt_um_tripwire.nl.v')))
     (step / 'config.json').write_text(json.dumps(dict(CLOCK_PERIOD=20,
         SYNTH_STRATEGY='AREA 1', GRT_ADJUSTMENT=0.16, PNR_SDC_FILE='/runner/src/signoff.sdc')))
+    (root / 'src').mkdir()
+    (root / 'src/config_native_stock.json').write_text(json.dumps(dict(CLOCK_PERIOD=20,
+        SYNTH_STRATEGY='AREA 1', GRT_ADJUSTMENT=0.16, PNR_SDC_FILE='/runner/src/signoff.sdc',
+        GRT_RESIZER_HOLD_SLACK_MARGIN=.10 if profile == 'hold100' else .125)))
     (step / 'tt_um_tripwire.nl.v').write_text('module tt_um_tripwire; RM_IHPSG13_1P_512x16_c2_bm_bist s(); endmodule')
     return root, run, step
 
@@ -65,3 +69,15 @@ def test_native_workflow_uses_exact_candidate_and_validator():
     download = next(step for step in steps if 'download-artifact@' in step.get('uses', ''))
     assert 'gds-native-' in download['with']['name']
     assert download['with']['run-id'] == '${{ github.event.workflow_run.id || inputs.route_run_id }}'
+
+
+def test_step_config_may_omit_synthesis_but_full_recipe_is_required(tmp_path):
+    root, run, step = fixture(tmp_path, 37870374707)
+    path = step / 'config.json'
+    config = json.loads(path.read_text()); del config['SYNTH_STRATEGY']
+    path.write_text(json.dumps(config))
+    validate(root, run)
+    path = root / 'src/config_native_stock.json'
+    config = json.loads(path.read_text()); config['GRT_RESIZER_HOLD_SLACK_MARGIN'] = .05
+    path.write_text(json.dumps(config))
+    with pytest.raises(ValueError, match='full recipe'): validate(root, run)

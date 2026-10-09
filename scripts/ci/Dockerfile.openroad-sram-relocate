@@ -1,0 +1,4 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY --chmod=755 openroad_sram_relocate_wrapper.sh /usr/local/bin/tripwire-openroad-sram-relocate
+COPY native_hold100_size.tcl sram_buffer_relocate.tcl /usr/local/share/tripwire/
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-openroad-sram-relocate

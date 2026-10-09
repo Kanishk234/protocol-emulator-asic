@@ -57,9 +57,23 @@ def test_workflow_exact_source_and_screen_only():
     assert next(s for s in steps if s['name'].startswith('Relocate one'))['run'].endswith('sram_relocate_screen.py')
 
 
+def test_ren_workflow_is_independent_and_uses_original_strength_source():
+    import yaml
+    path = Path(__file__).resolve().parents[2] / '.github/workflows/gds-sram-ren-relocate-screen.yaml'
+    data = yaml.safe_load(path.read_text())
+    steps = data['jobs']['harden']['steps']
+    download = next(s for s in steps if 'download-artifact@' in s.get('uses', ''))
+    assert int(download['with']['run-id']) == 37954320974
+    assert download['with']['name'] == 'gds-native-strength-route-37954320974'
+    command = next(s for s in steps if s['name'].startswith('Relocate only'))['run']
+    assert command.endswith('sram_relocate_screen.py --target ren')
+    assert data['concurrency']['group'] == 'gds-sram-ren-relocate-37954320974'
+
+
 @pytest.mark.parametrize('cleanup_needed', [False, True])
 @pytest.mark.parametrize('timing_ok', [False, True])
-def test_orchestration_uses_fresh_views_and_never_reroutes_after_cleanup(tmp_path, monkeypatch, cleanup_needed, timing_ok):
+@pytest.mark.parametrize('target', ['dout0', 'ren', 'antenna-branch'])
+def test_orchestration_uses_fresh_views_and_never_reroutes_after_cleanup(tmp_path, monkeypatch, cleanup_needed, timing_ok, target):
     import sram_relocate_screen as runner
     from postgrt_timing import CORNERS
     monkeypatch.chdir(tmp_path)
@@ -84,7 +98,15 @@ def test_orchestration_uses_fresh_views_and_never_reroutes_after_cleanup(tmp_pat
     original_read = Path.read_text
     monkeypatch.setattr(runner, 'validate', lambda *args: None)
     monkeypatch.setattr(runner, 'fingerprints', lambda *args: {})
-    monkeypatch.setattr(runner, 'plan', lambda *args: {})
+    def audited_plan(*args, **kwargs):
+        assert kwargs['target'] == target
+        return {}
+    monkeypatch.setattr(runner, 'plan', audited_plan)
+    branch_audits = []
+    if target == 'antenna-branch':
+        import antenna_branch
+        monkeypatch.setattr(antenna_branch, 'validate_source', lambda text: None)
+        monkeypatch.setattr(antenna_branch, 'validate_change', lambda before, after: branch_audits.append((before, after)))
     monkeypatch.setattr(Path, 'read_text', lambda path, *a, **kw: json.dumps(read_json(path))
                         if str(path).startswith('/tmp/native-') else original_read(path, *a, **kw))
     calls = []
@@ -98,7 +120,11 @@ def test_orchestration_uses_fresh_views_and_never_reroutes_after_cleanup(tmp_pat
             write(stage / 'state_out.json', {'odb': str(odb)})
             odb.with_suffix('.baseline.nl.v').write_text(netlist())
             for ext in ('.eco.nl.v', '.eco.pnl.v'): odb.with_suffix(ext).write_text(netlist())
-            (stage / 'openroad-globalrouting.log').write_text('TRIPWIRE SRAM relocation: wire9447 moved\nexact site/master/nets retained after legalization\n' +
+            receipt = {'dout0': 'TRIPWIRE SRAM relocation: wire9447 ', 'ren': 'TRIPWIRE SRAM REN relocation: _29426_ ',
+                       'antenna-branch': 'TRIPWIRE antenna branch: _03831_ '}[target]
+            legal = ('TRIPWIRE antenna branch: legalization completed' if target == 'antenna-branch'
+                     else 'exact site/master/nets retained after legalization')
+            (stage / 'openroad-globalrouting.log').write_text(receipt + 'moved\n' + legal + '\n' +
                 'TRIPWIRE native route reset: cleared 20 ordinary routed wires\n')
         else:
             inherited = json.loads(Path(state).read_text())
@@ -127,19 +153,34 @@ def test_orchestration_uses_fresh_views_and_never_reroutes_after_cleanup(tmp_pat
     monkeypatch.setattr(runner, 'screen', sta)
     monkeypatch.setattr(runner, 'validate_overflow', lambda log: None)
     monkeypatch.setattr(subprocess, 'run', lambda *a, **kw: None)
-    if timing_ok: runner.main()
+    if timing_ok: runner.main(target)
     else:
-        with pytest.raises(ValueError, match='fails timing'): runner.main()
-    evidence = tmp_path / 'runs/native-sram-relocate'
+        with pytest.raises(ValueError, match='fails timing'): runner.main(target)
+    evidence = tmp_path / {'dout0': 'runs/native-sram-relocate', 'ren': 'runs/native-sram-ren-relocate',
+                          'antenna-branch': 'runs/native-antenna-branch'}[target]
     json.loads((evidence / 'source_plan.json').read_text())
     gates = json.loads((evidence / 'gates.json').read_text())
     assert gates['qualified'] is timing_ok
-    assert gates['changes'] == 0 and gates['relocated_instances'] == 1
+    assert gates['changes'] == (1 if target == 'antenna-branch' else 0)
+    assert gates['relocated_instances'] == (0 if target == 'antenna-branch' else 1)
+    assert len(branch_audits) == (1 if target == 'antenna-branch' else 0)
     assert gates['physical_screen_only'] is True
+    assert gates['target'] == target
     assert calls.count(['OpenROAD.GlobalRouting']) == 1
     assert not any('OpenROAD.DetailedRouting' in steps for steps in calls)
     assert calls[-1] == (['OpenROAD.RepairAntennas', 'OpenROAD.CheckAntennas'] if cleanup_needed
                         else ['OpenROAD.CheckAntennas'])
+
+
+@pytest.mark.parametrize('target', ['dout0', 'ren'])
+def test_reject_combined_relocation_history(target, monkeypatch):
+    import sram_relocate_screen as runner
+    monkeypatch.setattr(runner, 'validate_overflow', lambda log: None)
+    log = ('TRIPWIRE SRAM relocation: wire9447 moved\n'
+           'TRIPWIRE SRAM REN relocation: _29426_ moved\n'
+           'exact site/master/nets retained after legalization\n'
+           'TRIPWIRE native route reset: cleared 20 ordinary routed wires\n')
+    with pytest.raises(ValueError, match='Missing/repeated'): runner.validate_history(log, target)
 
 
 @pytest.mark.parametrize('failure', ['missing', 'repeat', 'legalization', 'sizing', 'reset', 'empty_reset'])

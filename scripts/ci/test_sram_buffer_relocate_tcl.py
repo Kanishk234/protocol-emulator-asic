@@ -72,25 +72,30 @@ foreach name {block buffer master box other otherbox A X VDD VSS netA netX netVD
 
 
 @pytest.mark.parametrize('name', ['grt.tcl', 'antenna_repair.tcl', 'drt.tcl'])
-def test_wrapper_only_relocates_at_first_grt_read(tmp_path, name):
+@pytest.mark.parametrize('target', ['dout0', 'ren'])
+def test_wrapper_only_relocates_at_first_grt_read(tmp_path, name, target):
     fake = tmp_path / 'openroad'
     fake.write_text('#!/bin/bash\ncat "${@: -1}"\n')
     fake.chmod(0o755)
     source = tmp_path / name
     source.write_text('read_current_odb\nputs done\n')
-    wrapper = Path(__file__).with_name('openroad_sram_relocate_wrapper.sh')
+    wrapper = Path(__file__).with_name('openroad_sram_relocate_wrapper.sh' if target == 'dout0'
+                                     else 'openroad_sram_ren_relocate_wrapper.sh')
     env = dict(os.environ, PATH=str(tmp_path) + ':' + os.environ['PATH'], RUNNER_TEMP=str(tmp_path))
     result = subprocess.run(['bash', str(wrapper), '-exit', str(source)],
                             capture_output=True, text=True, env=env)
     assert result.returncode == 0, result.stderr
     if name == 'grt.tcl':
-        operations = ['read_current_odb', 'tripwire_relocate_sram_output0',
-                      'common/dpl.tcl', 'tripwire_verify_sram_output0',
+        suffix = 'output0' if target == 'dout0' else 'ren'
+        operations = ['read_current_odb', 'tripwire_relocate_sram_' + suffix,
+                      'common/dpl.tcl', 'tripwire_verify_sram_' + suffix,
                       'tripwire_clear_native_signal_routes']
         assert [result.stdout.index(op) for op in operations] == sorted(result.stdout.index(op) for op in operations)
-        assert result.stdout.count('tripwire_relocate_sram_output0') == 1
+        assert result.stdout.count('tripwire_relocate_sram_' + suffix) == 1
+        assert ('tripwire_relocate_sram_ren' if target == 'dout0' else 'tripwire_relocate_sram_output0') not in result.stdout
     else:
         assert 'tripwire_relocate_sram_output0' not in result.stdout
+        assert 'tripwire_relocate_sram_ren' not in result.stdout
         assert 'tripwire_clear_native_signal_routes' not in result.stdout
     assert 'native_hold100_targets' not in result.stdout
     if name == 'antenna_repair.tcl':
@@ -98,13 +103,15 @@ def test_wrapper_only_relocates_at_first_grt_read(tmp_path, name):
 
 
 @pytest.mark.parametrize('reads', [0, 2])
-def test_wrapper_rejects_ambiguous_checkpoint_read(tmp_path, reads):
+@pytest.mark.parametrize('target', ['dout0', 'ren'])
+def test_wrapper_rejects_ambiguous_checkpoint_read(tmp_path, reads, target):
     source = tmp_path / 'grt.tcl'
     source.write_text('read_current_odb\n' * reads)
     fake = tmp_path / 'openroad'
     fake.write_text('#!/bin/bash\nexit 99\n'); fake.chmod(0o755)
     env = dict(os.environ, PATH=str(tmp_path) + ':' + os.environ['PATH'])
-    result = subprocess.run(['bash', str(Path(__file__).with_name('openroad_sram_relocate_wrapper.sh')), str(source)],
+    wrapper = 'openroad_sram_relocate_wrapper.sh' if target == 'dout0' else 'openroad_sram_ren_relocate_wrapper.sh'
+    result = subprocess.run(['bash', str(Path(__file__).with_name(wrapper)), str(source)],
                             capture_output=True, text=True, env=env)
     assert result.returncode == 1
     assert 'Expected one native checkpoint read' in result.stderr

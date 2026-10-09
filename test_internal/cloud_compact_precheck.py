@@ -52,7 +52,9 @@ proc warp_pin_census {block} {
         lappend terms [list [$term getName] [$net getName] [$term getSigType] [$term getIoType]]
         foreach pin [$term getBPins] {
             foreach box [$pin getBoxes] {
-                lappend boxes [list [$term getName] [$pin getId] [$pin getPlacementStatus] \
+                # Tcl's SWIG dbSet typemap returns pointer-derived object
+                # handles; retain the handle to preserve exact BPin grouping.
+                lappend boxes [list [$term getName] $pin [$pin getPlacementStatus] \
                     [[$box getTechLayer] getName] {*}[warp_box_rect $box]]
             }
         }
@@ -63,7 +65,7 @@ proc warp_special_census {block} {
     set records {}
     foreach net [$block getNets] {
         foreach wire [$net getSWires] {
-            lappend records [list SWIRE [$net getName] [$net getSigType] [$wire getId] [$wire getWireType]]
+            lappend records [list SWIRE [$net getName] [$net getSigType] $wire [$wire getWireType]]
             foreach box [$wire getWires] {
                 if {[$box isVia]} {
                     set via [$box getTechVia]
@@ -75,7 +77,7 @@ proc warp_special_census {block} {
                 } else {
                     set layer [list METAL [[$box getTechLayer] getName]]
                 }
-                lappend records [list SBOX [$net getName] [$wire getId] [$box getId] $layer \
+                lappend records [list SBOX [$net getName] $wire $box $layer \
                     [$box getWireShapeType] [$box getDirection] {*}[warp_box_rect $box]]
             }
         }
@@ -119,7 +121,7 @@ foreach term [$block getBTerms] {
         foreach box [$pin getBoxes] {
             set layer [[$box getTechLayer] getName]
             set rect [warp_box_rect $box]
-            set record [list $name [$pin getId] [$pin getPlacementStatus] $layer {*}$rect]
+            set record [list $name $pin [$pin getPlacementStatus] $layer {*}$rect]
             if {[dict exists $targets $name] && $layer eq "Metal4" && $rect eq [dict get $targets $name]} {
                 if {[$term getSigType] ni {POWER GROUND} || [[$term getNet] getName] ne $name} {
                     error "Target is not its original same-name supply net"

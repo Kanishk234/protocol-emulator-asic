@@ -22,10 +22,51 @@ INPUT = ROOT / "build/tile_harden_input"
 SOURCE = ROOT / "build/arch_explore/tiles_5x3_phase/fabulous-tiles/tiles/tiny/LUT4x8_ha_C2/runs/RUN_2026-09-29_17-38-37"
 PLUGIN = Path("/nix/store/d1l0dv6k4hn42rf4czqyvqlaiam4xchm-python3-3.13.9-env/lib/python3.13/site-packages/librelane_plugin_fabulous")
 IMAGE = preflight.IMAGE
+PHYSICAL_GATES = ("route__drc_errors", "design__critical_disconnected_pin__count",
+    "antenna__violating__nets", "antenna__violating__pins", "magic__drc_error__count",
+    "klayout__drc_error__count", "design__lvs_error__count")
+RETAINED_ODB_SHA = "ed22fd1da8caa0fc3386c85183110c3bcecca641192c80171f91f96a183720c9"
+RETAINED_METRICS_SHA = "25c02e6f64ca6a336cfd5f802428996e164b15cfa36d2e7c6a0462ed9f59fab9"
 
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def retain_physical(odb, metrics):
+    """Read-only cloud census; geometry evidence does not override flow failure."""
+    observer = OUT / "observe_pins.tcl"
+    # Original post-PDN ODB carries the exact external power rectangles too.
+    # Include them in the same native census rather than trusting policy alone.
+    observer.write_text(preflight.PIN_OBSERVER.replace(
+        '    if {[$term getSigType] in {POWER GROUND}} {continue}',
+        '    if {[$term getSigType] in {POWER GROUND}} {puts "WARP_POWER\\t[$term getName]\\t[$term getSigType]"}'))
+    def census(label, path):
+        log = OUT / f"{label}_signal_pins.log"
+        with log.open("w") as stream:
+            subprocess.run(["openroad", "-exit", str(observer)],
+                env=dict(os.environ, WARP_TILE_PIN_INPUT=str(path)), stdout=stream,
+                stderr=subprocess.STDOUT, timeout=60, check=True)
+        text = log.read_text()
+        inventory = preflight.parse_pin_inventory(text)
+        inventory["power_types"] = {fields[1]: fields[2] for line in text.splitlines()
+            if (fields := line.split("\t"))[0] == "WARP_POWER"}
+        return inventory
+    reference = census("reference", INPUT / "original_pins.odb")
+    final = census("final", odb)
+    signal_count = len(final["pins"]) - len(final["power_types"])
+    interfaces_match = final == reference and signal_count == 306 and bool(final["power_types"])
+    for label, inventory in (("reference", reference), ("final", final)):
+        (OUT / f"{label}_pin_inventory.json").write_text(json.dumps(inventory, indent=2) + "\n")
+    gates = {key: metrics.get(key) for key in PHYSICAL_GATES}
+    summary = {"physical_gate_metrics": gates,
+        "physical_gate_metrics_zero": all(value == 0 for value in gates.values()),
+        "original_signal_power_interfaces_match": interfaces_match,
+        "signal_ports": signal_count, "power_port_types": final["power_types"],
+        "final_odb_sha256": sha(Path(odb)), "metrics": metrics,
+        "configured_fabric_timing_acceptance": False, "no_fullchip_promotion": True}
+    (OUT / "physical_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    return summary
 
 
 def prepare():
@@ -156,52 +197,49 @@ def inner(config_only=False):
             key=lambda path: int(path.parent.name.split("-", 1)[0]))
         if completed_states:
             checkpoint = completed_states[-1]
-            State.loads(checkpoint.read_text()).save_snapshot(OUT / "last_completed")
+            retained = State.loads(checkpoint.read_text())
+            retained.save_snapshot(OUT / "last_completed")
             provisional["last_completed_state"] = str(checkpoint.relative_to(OUT))
+            try:
+                provisional["retained_physical_evidence"] = retain_physical(
+                    retained[DesignFormat.ODB], retained.metrics.to_raw_dict())
+            except Exception as audit_error:
+                provisional["physical_retention_error"] = str(audit_error)
         (OUT / "result.json").write_text(json.dumps(provisional, indent=2) + "\n")
         raise
     completed = {step.id for step in flow.step_objects or [] if step.state_out is not None}
     if not required.issubset(completed):
         raise RuntimeError("Required strict physical stages did not complete")
-    observer = OUT / "observe_pins.tcl"
-    # Original post-PDN ODB carries the exact external power rectangles too.
-    # Include them in the same native census rather than trusting policy alone.
-    observer.write_text(preflight.PIN_OBSERVER.replace(
-        '    if {[$term getSigType] in {POWER GROUND}} {continue}',
-        '    if {[$term getSigType] in {POWER GROUND}} {puts "WARP_POWER\\t[$term getName]\\t[$term getSigType]"}'))
-    def census(label, path):
-        log = OUT / f"{label}_signal_pins.log"
-        with log.open("w") as stream:
-            subprocess.run(["openroad", "-exit", str(observer)],
-                env=dict(os.environ, WARP_TILE_PIN_INPUT=str(path)), stdout=stream,
-                stderr=subprocess.STDOUT, timeout=60, check=True)
-        text = log.read_text()
-        inventory = preflight.parse_pin_inventory(text)
-        inventory["power_types"] = {fields[1]: fields[2] for line in text.splitlines()
-            if (fields := line.split("\t"))[0] == "WARP_POWER"}
-        return inventory
-    reference = census("reference", INPUT / "original_pins.odb")
-    final = census("final", state[DesignFormat.ODB])
-    signal_count = len(final["pins"]) - len(final["power_types"])
-    if final != reference or signal_count != 306 or not final["power_types"]:
+    evidence = retain_physical(state[DesignFormat.ODB], state.metrics.to_raw_dict())
+    if not evidence["original_signal_power_interfaces_match"]:
         raise RuntimeError("Hardened signal/power geometry differs from authenticated original")
-    metrics = state.metrics.to_raw_dict()
-    for key in ("route__drc_errors", "design__critical_disconnected_pin__count",
-            "antenna__violating__nets", "antenna__violating__pins",
-            "magic__drc_error__count", "klayout__drc_error__count", "design__lvs_error__count"):
-        if metrics.get(key) != 0:
+    for key, value in evidence["physical_gate_metrics"].items():
+        if value != 0:
             raise RuntimeError(f"Missing/nonzero strict final tile gate: {key}")
     final_dir = OUT / "final"
     state.save_snapshot(str(final_dir))
-    (OUT / "result.json").write_text(json.dumps({"physical_checks_pass": True,
+    (OUT / "result.json").write_text(json.dumps({**evidence, "physical_checks_pass": True,
         "passing_nl_sha256": preflight.PASSING_SHA, "original_signal_pins_match": True,
-        "signal_ports": signal_count, "power_interfaces_match": True,
-        "power_port_types": final["power_types"], "final_odb_sha256": sha(Path(state[DesignFormat.ODB])),
-        "metrics": metrics, "configured_fabric_timing_acceptance": False,
-        "no_fullchip_promotion": True}, indent=2) + "\n")
+        "power_interfaces_match": True}, indent=2) + "\n")
 
 
-def run(archive, digest):
+def audit_retained(checkpoint):
+    """Cloud-only read of the authenticated failed run; never routes again."""
+    odb = checkpoint / "odb" / (preflight.TOP + ".odb")
+    metrics = checkpoint / "metrics.json"
+    if sha(odb) != RETAINED_ODB_SHA or sha(metrics) != RETAINED_METRICS_SHA:
+        raise RuntimeError("Retained C2 checkpoint is not authenticated run37814078650")
+    evidence = retain_physical(odb, json.loads(metrics.read_text()))
+    (OUT / "result.json").write_text(json.dumps({**evidence,
+        "source_run": 37814078650, "audit_only_no_hardening": True,
+        "physical_checks_pass": False, "original_strict_flow_failure_retained": True,
+        "original_error": "Deferred typical-corner setup gate failed",
+        "passing_nl_sha256": preflight.PASSING_SHA}, indent=2) + "\n")
+    if not evidence["original_signal_power_interfaces_match"]:
+        raise RuntimeError("Retained native interfaces differ from original")
+
+
+def run(archive, digest, checkpoint=None):
     if sha(archive) != digest:
         raise RuntimeError("Hardening archive authentication failed")
     OUT.mkdir(exist_ok=False)
@@ -217,23 +255,30 @@ def run(archive, digest):
     preflight.unpack(source / "tile-preflight-c2.tar.gz")
     command = ["docker", "run", "--rm", "-v", f"{ROOT}:{ROOT}", "-w", str(ROOT),
         "-e", "PDK_ROOT=" + os.environ["PDK_ROOT"], IMAGE, "python3",
-        "test_internal/cloud_tile_harden.py", "--inside-container"]
+        "test_internal/cloud_tile_harden.py"]
+    command += ["--inside-container"] if checkpoint is None else ["--inside-container-audit", str(checkpoint.resolve())]
     with (OUT / "harden.log").open("w") as log:
-        subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, timeout=6600, check=True)
+        subprocess.run(command, stdout=log, stderr=subprocess.STDOUT,
+            timeout=6600 if checkpoint is None else 240, check=True)
 
 
 if __name__ == "__main__":
     if sys.argv[1:] == ["--inside-container"]:
         inner()
+    elif len(sys.argv) == 3 and sys.argv[1] == "--inside-container-audit":
+        audit_retained(Path(sys.argv[2]))
     else:
         parser = argparse.ArgumentParser(description=__doc__)
-        parser.add_argument("mode", choices=("prepare", "run"))
+        parser.add_argument("mode", choices=("prepare", "run", "audit"))
         parser.add_argument("--archive", type=Path)
         parser.add_argument("--sha256")
+        parser.add_argument("--checkpoint", type=Path)
         args = parser.parse_args()
         if args.mode == "prepare":
             prepare()
         elif args.archive is None or len(args.sha256 or "") != 64:
             parser.error("run requires --archive and full SHA256")
+        elif args.mode == "audit" and args.checkpoint is None:
+            parser.error("audit requires --checkpoint (retained last_completed directory)")
         else:
-            run(args.archive, args.sha256)
+            run(args.archive, args.sha256, args.checkpoint if args.mode == "audit" else None)

@@ -5,7 +5,9 @@ from pathlib import Path
 import pytest
 
 from native_hold100_size import TARGETS as NATIVE_TARGETS, target_call
-TARGETS = tuple((n, "sg13cmos5l_" + o, "sg13cmos5l_" + r, {p: v.strip().removeprefix(chr(92)) for p,v in pins.items()}) for n,o,r,pins in NATIVE_TARGETS)
+TARGETS = tuple((n, "sg13cmos5l_" + o, "sg13cmos5l_" + r,
+                {p: v.strip().removeprefix(chr(92)).replace('[', '\\[').replace(']', '\\]')
+                 for p,v in pins.items()}) for n,o,r,pins in NATIVE_TARGETS)
 
 
 @pytest.mark.parametrize('failure', ['none', 'master', 'missing', 'pins', 'net', 'power', 'post_net'])

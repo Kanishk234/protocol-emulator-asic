@@ -1,5 +1,5 @@
 import pytest
-from native_hold100_size import TARGETS, validate_change, prepare
+from native_hold100_size import TARGETS, validate_change, prepare, target_call
 
 
 def netlist(changed=False):
@@ -39,3 +39,10 @@ def test_multiline_sram_bus_rewire_is_rejected():
     validate_change(before, netlist(True) + macro)
     with pytest.raises(ValueError, match='additional logic or wiring'):
         validate_change(before, netlist(True) + macro.replace('b}', 'other}'))
+
+
+def test_generated_names_match_observed_odb_bracket_escaping():
+    call = target_call()
+    assert '{u_chip.g_unit\\[0\\].u_unit.c_in}' in call
+    assert '{u_chip.g_unit\\[0\\].u_unit.g_bs.u_bs.smp_done}' in call
+    assert '{u_chip.g_unit[0].u_unit.c_in}' not in call

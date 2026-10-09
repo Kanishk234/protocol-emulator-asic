@@ -17,7 +17,9 @@ proc tripwire_size_native_hold100 {targets} {
         foreach pin $pins {
             set net [[$inst findITerm $pin] getNet]
             if {$net eq "NULL"} {error "Native hold100 disconnected pin"}
-            if {[dict exists $expected $pin] && [$net getName] ne [dict get $expected $pin]} {error "Native hold100 connectivity changed"}
+            if {[dict exists $expected $pin] && [$net getName] ne [dict get $expected $pin]} {
+                error "Native hold100 connectivity changed at $name/$pin: expected '[dict get $expected $pin]', actual '[$net getName]'"
+            }
             dict set nets $pin $net
         }
         dict set saved $name $nets

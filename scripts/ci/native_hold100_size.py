@@ -32,9 +32,11 @@ def validate_change(before, after):
 
 
 def target_call():
-    # Verilog escaped identifiers are plain hierarchical names in OpenDB.
+    # This source ODB preserves escapes on hierarchical array brackets.
+    # Proven against actual37870374707 ODB/DEF, not just Verilog output.
     def word(value):
         value = value.strip().removeprefix('\\')
+        value = value.replace('[', '\\[').replace(']', '\\]')
         if any(c in value for c in '{}\n\r'):
             raise ValueError('Unsafe Tcl target')
         return '{' + value + '}'

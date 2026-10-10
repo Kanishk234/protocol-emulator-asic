@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 from event_nor2_screen import logical_cells
 
-SOURCE_SHA256 = '15eba6e2995b1235d8372e81c9063e95ce9de3558cf283f320b879549767c019'
+SOURCE_SHA256 = 'f4098dfd7ac36eb044867ab6d8728c98a58f0ce1754b60d7ba0d0e47b9f0a43e'
+DRT_SHA256 = '15eba6e2995b1235d8372e81c9063e95ce9de3558cf283f320b879549767c019'
 TARGETS = (('_24812_', 'inv_1', 'inv_4', {'A': '_19231_', 'Y': '\\u_chip.g_unit[2].u_unit.b_in '}),
  ('_24876_', 'inv_1', 'inv_4', {'A': '_19293_', 'Y': '\\u_chip.g_unit[0].u_unit.a_in '}),
  ('_24896_',

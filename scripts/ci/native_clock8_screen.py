@@ -4,7 +4,7 @@ import os
 import re
 from pathlib import Path
 from event_nor2_screen import logical_cells, validate_overflow, validate_antenna_only_changes
-from native_clock8_size import prepare, validate_change, SOURCE_SHA256
+from native_clock8_size import prepare, validate_change, SOURCE_SHA256, DRT_SHA256
 from native_stock_route import validate_source
 import hashlib
 from native_stock_route import run_step, qualified, fingerprints
@@ -80,8 +80,10 @@ def main():
     for key in ("odb", "def", "nl", "pnl", "sdc"):
         if not Path(state[key]).is_file():
             raise ValueError("Missing clock8 checkpoint " + key)
-    if hashlib.sha256(Path(state["nl"]).read_bytes()).hexdigest() != SOURCE_SHA256:
+    if hashlib.sha256(Path(state["nl"]).read_bytes()).hexdigest() != DRT_SHA256:
         raise ValueError("Wrong clock8 DRT netlist")
+    if logical_cells(Path(state['nl']).read_text()) != logical_cells(baseline.read_text()):
+        raise ValueError('Clock8 DRT/exported topology mismatch')
     # Step configs omit synthesis/resizer variables; use the audited full recipe.
     config = json.loads(Path('src/config_native_stock.json').read_text())
     if config.get('GRT_RESIZER_HOLD_SLACK_MARGIN') != 0.10:

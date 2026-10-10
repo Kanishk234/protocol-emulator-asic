@@ -46,3 +46,10 @@ def test_generated_names_match_observed_odb_bracket_escaping():
     assert '{u_chip.g_unit\\[0\\].u_unit.c_in}' in call
     assert '{u_chip.g_unit\\[0\\].u_unit.g_bs.u_bs.smp_done}' in call
     assert '{u_chip.g_unit[0].u_unit.c_in}' not in call
+
+
+def test_distinct_exported_and_drt_hashes():
+    from native_clock8_size import SOURCE_SHA256, DRT_SHA256
+    assert SOURCE_SHA256 == 'f4098dfd7ac36eb044867ab6d8728c98a58f0ce1754b60d7ba0d0e47b9f0a43e'
+    assert DRT_SHA256 == '15eba6e2995b1235d8372e81c9063e95ce9de3558cf283f320b879549767c019'
+    assert SOURCE_SHA256 != DRT_SHA256

@@ -117,7 +117,7 @@ jobs:
       - name: Prepare trusted hardware before downloading evidence
         run: python workflow-src/scripts/ci/native_stock_route.py --prepare
 
-      - name: Download measured native hold100 route
+      - name: Download measured clock8 route
         uses: actions/download-artifact@v7
         with:
           name: gds-native-clock8-route-37998284236
@@ -135,7 +135,7 @@ jobs:
           test "$PWD" = /home/runner/work/protocol-emulator-asic/protocol-emulator-asic
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/37998284236" > /tmp/native-eco-source-run.json
 
-      - name: Size six cells, legalize, route and qualify fresh timing
+      - name: Size twelve cells, legalize, route and qualify fresh timing
         timeout-minutes: 95
         run: python workflow-src/scripts/ci/native_clock8_screen.py
 

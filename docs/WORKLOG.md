@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (publish approved clock8 strength screen)
+- User approved publication/launch. Separate tools/CI/docs commits775381d/45c5cd3/53584bd pushed; remote main verified at53584bd7cb93484521466b5828168a194c929b20. Dispatched [gds-native-clock8-strength-screen38011244004](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38011244004) on that exact revision; queued at dispatch verification. Prior102focused checks passed; hardware history check showed no pending src/info/macro commits.
+- FIPE and unrelated prototypes remain local; existing readiness/SRAM edits are not included. Next inspect actual physical sizing/legalization,0overflow, fresh antennas and allcorner/50pshold result before proposing extracted continuation. Electrical closure and official Phase2 gates remain open; no boxes ticked.
+
 ## 2026-10-09: Codex (prepare twelve-strength physical screen)
 - Prepared local exact-source clock8 sizing screen and separate manual workflow. Pins route37998284236/headaceb926a/final NL SHA, validates trusted full hardware/clock8 recipe, preflights12target master/connectivity changes, legalizes, resets old signal wires, requires0overflow, fresh antenna checks/at most one cleanup, and allcorner/50pshold qualification. Existing electrical violations still need repair; screen is not official closure or final extraction.
 - Validation:102focused tests pass with project Tcl runtime on PATH; initial Tcl invocation failed because tclsh was absent from default PATH, corrected without code changes. YAML parses and git diff check passes. No commit/push/dispatch or phase checkbox. Next publish the reviewed helper/workflow under the user Git rules, run the physical screen, then evaluate actual qualification before DRT/extraction.

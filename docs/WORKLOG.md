@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (relaunch corrected clock8 strength screen)
+- Published necessary BUG89 source-validation correction to the approved screen in tools/CI/docs groups455e5ef/6498da2/bf217bf; remote main verified atbf217bfcc95a54a37f0b3e07ccdf8e2e52d832d3. Relaunched [clock8 strength screen38017421599](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38017421599) on that exact head; in progress at verification. Previously103focused checks and real exported-source preparation passed. No src/info/macro history changes; FIPE/unrelated local changes excluded.
+- Next inspect fresh physical sizing/GRT/antenna/timing before any DRT continuation. Original strength timing baseline retained; no new timing or phase pass claimed.
+
 ## 2026-10-09: Codex (diagnose clock8 screen startup failure)
 - Workflow38011244004 failed at source hash validation before sizing/routing; routine main test/lint/unit/docs green, no running main jobs, two legacy queued. DRT/exported netlist hashes differ but all33779 logical cells/connections match. Corrected separate pinned hashes and added topology comparison; BUG89 logged.103 focused tests and actual exported-source target generation pass; diff check clean. Fix local, no new dispatch or phase checkbox. Next publish source-validation fix and rerun screen.
 

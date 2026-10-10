@@ -5,6 +5,9 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (diagnose clock8 screen startup failure)
+- Workflow38011244004 failed at source hash validation before sizing/routing; routine main test/lint/unit/docs green, no running main jobs, two legacy queued. DRT/exported netlist hashes differ but all33779 logical cells/connections match. Corrected separate pinned hashes and added topology comparison; BUG89 logged.103 focused tests and actual exported-source target generation pass; diff check clean. Fix local, no new dispatch or phase checkbox. Next publish source-validation fix and rerun screen.
+
 ## 2026-10-09: Codex (publish approved clock8 strength screen)
 - User approved publication/launch. Separate tools/CI/docs commits775381d/45c5cd3/53584bd pushed; remote main verified at53584bd7cb93484521466b5828168a194c929b20. Dispatched [gds-native-clock8-strength-screen38011244004](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38011244004) on that exact revision; queued at dispatch verification. Prior102focused checks passed; hardware history check showed no pending src/info/macro commits.
 - FIPE and unrelated prototypes remain local; existing readiness/SRAM edits are not included. Next inspect actual physical sizing/legalization,0overflow, fresh antennas and allcorner/50pshold result before proposing extracted continuation. Electrical closure and official Phase2 gates remain open; no boxes ticked.

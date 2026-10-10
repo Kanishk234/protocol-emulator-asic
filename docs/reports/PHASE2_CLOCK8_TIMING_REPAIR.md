@@ -31,3 +31,5 @@ Raw temporary comparisons: /tmp/tripwire-clock8-strength-probes-37998284236/comp
 Next: prepare a standalone exact-source physical screen with old-wire reset, unchanged logical audit,0overflow, fresh antennas and allcorner/50pshold gates. Detailed extraction and exact-netlist protocol GL remain required before selecting it. The official20ns/50MHz/6x4/full2-4 contract and electrical/Phase2 gates stay unchanged.
 
 Reserve evidence: /tmp/tripwire-clock8-margin-next/comparison.json. Twelve changes retain setupWS0 at 20 ns at all corners and fast hold +0.094165012 ns in the earlier closure comparison; fixed-wire diagnostics are not a new routed signoff result.
+
+Startup failure38011244004 (BUG89): source guard used DRT hash against exported final NL. Corrected exported hash `f4098dfd7ac36eb044867ab6d8728c98a58f0ce1754b60d7ba0d0e47b9f0a43e`, retains DRT hash above and requires identical topology.103 focused tests and actual exported-source target generation pass locally. No sizing or routing occurred in failed screen; no new timing result. Publication/rerun pending.

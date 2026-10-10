@@ -5,6 +5,13 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-09: Codex (prepare clock8 strength extraction continuation)
+- Read actual screen38017421599 artifact11656728386: setupWS0all, holdfast/typ/slow+100.129/+203.273/+378.213ps; estimated slewslow/typ/fast4/1/1,fanout25each,cap0each. Prepared standalone exact-source DRT/extraction continuation with original NL/12change/antenna/history/fullrecipe/fresh timing gates; no repeated ECO/GRT.109focused tests pass and diff check clean. Publication pending under Git reservation; no phase checkbox. Next publish/launch reviewed continuation, inspect extracted timing/electrical before candidate promotion.
+
+## 2026-10-09: Codex (clock8 strength screen succeeds)
+- Checked run38017421599: success, job114110697858 completed02:43:35UTC after9m43s. All steps green; job log confirms all12master substitutions. Successful wrapper completes exact logical audit, wire reset/0overflow, fresh antenna and allcorner/50pshold gates. This is estimated GRT qualification, not fresh DRT/extraction, electrical closure or official GDS.
+- At check, main unit38017447593/38017413473 still in progress; legacy placement runs remain queued. Next read precise timing/electrical artifact and prepare exact-source detailed-route/extraction continuation. No phase checklist ticked.
+
 ## 2026-10-09: Codex (relaunch corrected clock8 strength screen)
 - Published necessary BUG89 source-validation correction to the approved screen in tools/CI/docs groups455e5ef/6498da2/bf217bf; remote main verified atbf217bfcc95a54a37f0b3e07ccdf8e2e52d832d3. Relaunched [clock8 strength screen38017421599](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38017421599) on that exact head; in progress at verification. Previously103focused checks and real exported-source preparation passed. No src/info/macro history changes; FIPE/unrelated local changes excluded.
 - Next inspect fresh physical sizing/GRT/antenna/timing before any DRT continuation. Original strength timing baseline retained; no new timing or phase pass claimed.

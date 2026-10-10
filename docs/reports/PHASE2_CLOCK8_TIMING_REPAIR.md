@@ -33,3 +33,9 @@ Next: prepare a standalone exact-source physical screen with old-wire reset, unc
 Reserve evidence: /tmp/tripwire-clock8-margin-next/comparison.json. Twelve changes retain setupWS0 at 20 ns at all corners and fast hold +0.094165012 ns in the earlier closure comparison; fixed-wire diagnostics are not a new routed signoff result.
 
 Startup failure38011244004 (BUG89): source guard used DRT hash against exported final NL. Corrected exported hash `f4098dfd7ac36eb044867ab6d8728c98a58f0ce1754b60d7ba0d0e47b9f0a43e`, retains DRT hash above and requires identical topology.103 focused tests and actual exported-source target generation pass locally. No sizing or routing occurred in failed screen; no new timing result. Publication/rerun pending.
+
+## Qualified physical screen38017421599
+
+Successful screen on bf217bfcc95a54a37f0b3e07ccdf8e2e52d832d3; artifact11656728386. Actual fresh post-antenna comparison: setupWS0 at allcorners; fast/typ/slow hold +0.100129/+0.203273/+0.378213ns. Slow/typ/fast slew4/1/1, fanout25each, cap0each. This is GRT-estimated timing, not a new extracted result. All twelve master substitutions executed and source/history/0overflow/antenna gates passed.
+
+Prepared separate local native_clock8_strength_route.py and gds-native-clock8-strength-route workflow. Pins successful exact screen/run/SHA, its twelve-change receipt, original exported hash, before/after logical chain, wire-reset receipt and saved qualified checkpoint. Rechecks trusted hardware/full clock8 recipe, fresh antennas and allcorner/50ps gates; then stock detailed routing and new extraction without repeating sizing or GRT. Old extraction is preserved separately.109focused continuation/sizing/route tests pass. Publication/dispatch pending; no official or electrical-closure claim.

@@ -57,3 +57,10 @@ Physical trialD-080 is running38167016013:24same-row cells shift1.92µm into
 authenticated free tail and one reset tie moves next to its receiver. This is
 one bounded copied-placement policy, preserving all other instances and exact
 connectivity; native legality and six electrical/timing screens precede routing.
+
+Further execution: independent C/shell-model coverage22tests and conditional
+operating-report generation implemented; root board/host385testsPASS. Actual
+cloud helper behavioral retry38167350632 pytest462PASS. Same-job loaded helper
+workflow38167521573 running; loaded success not yet claimed. Receiver-local
+row policy reduces native146→145 in38167244563, still fails; D081 tests interaction
+with separately measurednet683136 rather than assuming additive gains.

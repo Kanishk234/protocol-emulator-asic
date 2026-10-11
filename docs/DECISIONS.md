@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-081: Measure interaction of two individually beneficial reset-placement policies
+- **Date:**2026-10-11. **Status:** accepted copied-checkpoint interaction trial, no promotion.
+- **Evidence:** net683 relocation38163542037 reduces146→136; net643/row policy38167244563 reduces146→145 with101vs111markers. Both native routes still fail; reductions are not assumed additive.
+- **Decision:** combine exactD078 andD080 placements on original38101405271 source. New26-instance plan retains all masters/orientations/statuses/connectivity/power phase and every other placement. Native legality and six identical electrical/timing screens precede paired routing. Report original146 and prior independent136/145 separately; no isolated causal claim from combined result.
+- **Cost:** no additional cells; same-row redistribution and two existing ties alter wire geometry. Reject illegality/electrical regressions and measure actual route policy unchanged. No frozen hardware/spec changes.
+
 ## D-080: Receiver-local reset tie with one-row whitespace redistribution
 - **Date:**2026-10-11. **Status:** accepted copied-checkpoint physical-policy trial, no frozen hardware promotion.
 - **Evidence:** native inventory38166250744 authenticates365 actual fragmented rows; row468720 extends to111360DBU with free tail from100320. Independent net694 relocation worsens146→154 despite shorter distance, so arbitrary remote gaps are rejected. net643 connects tie u_shell.u_crc._329__644 to register_329_/RESET_B; original tie row529200 is60.48µm away.

@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (antenna screen completion check)
+- Antenna38101471390 succeeds in11m23s/artifact11687872556; exact fresh estimated timing/electrical comparison retrieved. Both independent screens nowcomplete; onlytwo mainunitjobsactive at check. These are GRTscreenresults, not extractedclosure. Holdcontinuation remains prepared/pendingpublicationapproval; no newdispatch/phasebox. Next compare exact results and qualify extracted continuation before any combination/integration.
+
+## 2026-10-10: Codex (prepare qualified hold extraction continuation)
+- Hold38101472930 exactartifact topology/history/0overflow/antenna/savedtiming independently pass; estimatedsetup0all,fast hold100.798ps, slew2/1/1fanout36eachcap0. Prepared guarded hold-only DRT/extraction helper/manualworkflow without repeating ECO/GRT.124focused tests pass, actual chain audit passes, diffcheckclean. Antenna38101471390 stillruns; no unmeasured combination selected.
+- Publication pending under scopedGitreservation; no phasebox. Next approved exact-source continuation then inspect extracted setup/hold/electrical, retainoriginalbaselineuntil qualification. Two main unitruns alsoactive.
+
+## 2026-10-10: Codex (residual workflow status check)
+- Hold screen38101472930 succeeds in7m16s/artifact11687693810; fresh timing comparison retrieved (GRT estimates, not extracted closure). Antenna38101471390 is in physical repair/routing/timing step; two main unit runs active, two legacy placement runs queued. No Phase2 gates ticked; next inspect both precise comparisons and choose exact-source extracted continuation only after qualification review.
+
 ## 2026-10-10: Codex (publish approved independent residual screens)
 - User approved both screens and reaffirmed short-term target: Phase2/no violations/allcorner timing/officialgreenGDS. Published separate helper/CI/docs groups09c989b/65e9d58/6f89770; remote main verified at6f89770559aa0531ba1167358ac21c107325f065. Launched [antenna screen38101471390](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38101471390) and [hold screen38101472930](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38101472930), independently on that exact head; both queued at verification.125focused checks passed before publication; no pending hardware-history changes.
 - FIPE/unrelated prototypes/readiness edits excluded. Next inspect physical preflight/legalization/0overflow/antenna/allcorner results separately, then select measured follow-up; original timing baseline retained. Final zeroelectrical/DRC/antenna, exactGL, integration and officialGDS/precheck remain required. No phasebox ticked.

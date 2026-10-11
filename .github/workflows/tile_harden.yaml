@@ -1,10 +1,7 @@
 name: matched native C2 physical validation
 on:
-  push:
-    branches: [efpga]
-    paths:
-      - 'test_internal/cloud_tile_harden.py'
-      - '.github/workflows/tile_harden.yaml'
+  # Explicit original-view audit/run only. Shared reporting fixes must not
+  # automatically request expired historical artifacts.
   workflow_dispatch:
     inputs:
       mode:

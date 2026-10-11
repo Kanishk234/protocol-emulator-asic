@@ -92,3 +92,34 @@ Reuses strict canonical topology validator and preflight physical binding; scree
 Screen38102524361 succeeds onacf2827167d1c34c87824f80304ee82aec345206; artifact11689015681. Estimated setupWS0all; fast/typ/slow hold+0.100739/+0.203280/+0.378222ns. Slow/typ/fast slew11/1/1,fanout8each,cap0each. Actual canonical saved proposal/39buffer topology/antenna-only cleanup/0overflow/fresh timing gates independently audited and pass. Remaining fanout: four internal clocks16loads/no diodes; place8354(16loads/8diodes),28820(13/6),place7616(13/6),26701(9/4). Two-load diode reserve is insufficient on some rerouted branches and new violations can appear on previously compliant nets. No aggregate zero-violation claim.
 
 Prepared clock8_fanout_route.py and manual gds-clock8-fanout-route: exact successfulsourceSHA/run,39bufferqualificationreceipt, canonical savedproposal and fullsourcechain; sourceviews include explicit actual tt_um_tripwire.def basename (BUG90 fix). Trusted fullclock8hardware/recipe, freshantenna/allcorner50psgate, stockDRT and newextraction; no repeated repair/GRT.151focused residual/hold/fanoutcontinuation/nativeroute checks pass plusactualartifactaudit. Initial Tcl-suite invocation lacked runtime PATH; corrected invocation passes without code workaround. Source extrapolation is not signoff; finalelectrical/area/DRC/LVS/GL/officialGDS still open.
+
+
+## Independent internal clock branch screen prepared (2026-10-10)
+
+Hold route [38102572131](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38102572131) and fanout route [38103189246](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38103189246) are in the fresh qualification/routing/extraction step at this check. Neither has final extracted evidence yet.
+
+The new `clock` residual policy starts independently from the exact NL/DEF of source 38019338907. Each of four reviewed BUF8 clock drivers currently feeds sixteen BUF8 inputs. Eight added BUF8 cells split these into two spatial groups of eight per original driver; upstream fanout becomes two. Existing cells, leaf clock pins, reset pins, hardware and signoff constraints stay fixed. The OpenDB binding preserves each source net's signal type on its new downstream net. This changes internal clock distribution and can regress skew, setup or hold; fresh allcorner timing and the existing 50 ps fast-hold gate remain mandatory.
+
+Verification: 155 focused planner/screen/hold-route/fanout-route/native-route checks pass. Exact actual-source hashes, canonical partition, generated Tcl and synthetic identity-topology audit pass. This proves preparation/connectivity only, not physical legality, timing, area closure or official signoff. The separate manual `gds-clock8-clock-screen` workflow is prepared locally and has not been published or dispatched. No Phase 2 checklist box is ticked.
+
+
+### Publication commands for the prepared clock screen
+
+Additional clock-specific rejection checks cover altered source drivers, altered sink masters, absent placements, missing loads and unplanned rewires. The focused suite now passes 165 checks. Both route runs remain in progress at this session's status check. The shared wire-reset helper clears ordinary clock wires as well as data wires (preserving power/ground), so this screen cannot retain the old routed clock branches after the topology change. Actual physical behavior still needs CI measurement.
+
+Latest supplied AGENTS.md reserves history/remote commands for the user. Run these groups to publish only the prepared screen; unrelated local reports and FIPE are excluded. Before pushing while hardening runs, inspect the required hardware-history guard:
+
+```bash
+git log origin/main..main -- src info.yaml macro
+git add scripts/ci/clock8_residual_plan.py scripts/ci/clock8_residual.tcl scripts/ci/clock8_residual_screen.py scripts/ci/test_clock8_residual_plan.py scripts/ci/test_clock8_residual_screen.py
+git commit -m "ci: prepare audited internal clock branch repair"
+git add .github/workflows/gds-clock8-clock-screen.yaml
+git commit -m "ci: add independent clock branch screen"
+git add docs/WORKLOG.md docs/reports/PHASE2_CLOCK8_TIMING_REPAIR.md
+git commit -m "docs: record clock branch screen preparation"
+git push origin main
+gh workflow run gds-clock8-clock-screen.yaml --ref main
+```
+
+
+The user subsequently explicitly approved publication. The prepared helper and workflow groups are committed as eb21e49 and 931973c; publication/dispatch verification follows. This approval supersedes the earlier user-run publication handoff for these groups.

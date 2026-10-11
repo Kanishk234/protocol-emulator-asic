@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (publish approved clock branch screen)
+- User explicitly approves publication, overriding latest AGENTS Git reservation for this group. Tools eb21e49 and workflow 931973c committed separately; 165 focused checks and actual-source audit passed before publication. Both extracted hold/fanout routes remain running. Unrelated local files and FIPE excluded; no src/info/macro history changes.
+- Next push the reviewed docs/tools/CI groups, verify remote head, launch independent clock screen, and compare fresh physical evidence before any integration. No phase box.
+
+## 2026-10-10: Codex (clock screen rejection coverage and publication handoff)
+- Hold38102572131 and fanout38103189246 remain in qualification/routing/extraction. Added clock source/master/placement/load-count and unplanned wiring rejection coverage; 165 focused checks pass, diff check clean. Confirmed shared reset clears old ordinary clock routes as well as data routes.
+- Exact per-group user-run commit/push/dispatch commands are in PHASE2_CLOCK8_TIMING_REPAIR.md; latest AGENTS reserves those actions for user. No physical result, publication, dispatch or phase box. Next inspect extracted results and run the independent clock screen once published.
+
+## 2026-10-10: Codex (prepare independent internal clock branch screen)
+- Both hold38102572131 and fanout38103189246 run fresh qualification/routing/extraction; no final result yet. Prepared separate exact-source clock policy: four sixteen-load BUF8 branches become two eight-load branches each, eight BUF8 added. New nets preserve source signal type; leaf clock/reset pins and constraints unchanged.
+- 155 focused checks and actual-source canonical/connectivity/target-generation audit pass; diff check clean. Physical benefit remains unmeasured. No phase box, commit, push or dispatch in this session, following latest supplied AGENTS Git rule. Next publish the reviewed tool/CI/docs groups via user-run commands, launch independent clock screen, and inspect both extracted route results before combination or official promotion.
+
 ## 2026-10-10: Codex (launch qualified fanout continuation)
 - Published reviewedtools/CI/docs e716435/e2c8cd8/ad189c0; remoteverified atad189c03a2d9f46826365bb7e452721fc3be0f95. Launched [fanoutroute38103189246](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38103189246) onexacthead;queuedatverification. Holdroute38102572131 stillruns freshgates/DRT/extraction.151focused checks/actualartifactoryaudit pass; nohardwarehistorychanges.
 - Next comparefresh extractedallcorner/electrical/DRC evidence, diagnose4clock+4databranches ifretainedafterroute, then finalGL/integration/officialGDSonlyafterqualification. No phasebox; unrelatedlocalprototypesandFIPEremainexcluded.

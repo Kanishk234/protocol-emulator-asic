@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (publish approved independent residual screens)
+- User approved both screens and reaffirmed short-term target: Phase2/no violations/allcorner timing/officialgreenGDS. Published separate helper/CI/docs groups09c989b/65e9d58/6f89770; remote main verified at6f89770559aa0531ba1167358ac21c107325f065. Launched [antenna screen38101471390](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38101471390) and [hold screen38101472930](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38101472930), independently on that exact head; both queued at verification.125focused checks passed before publication; no pending hardware-history changes.
+- FIPE/unrelated prototypes/readiness edits excluded. Next inspect physical preflight/legalization/0overflow/antenna/allcorner results separately, then select measured follow-up; original timing baseline retained. Final zeroelectrical/DRC/antenna, exactGL, integration and officialGDS/precheck remain required. No phasebox ticked.
+
 ## 2026-10-10: Codex (prepare independent residual physical screens)
 - Completed local runner, Docker/OpenROAD wrapper and two manual workflows for independent antenna/hold proposals from38019338907/head77bc7608. Enforces exactNL/DEF/fulltrustedrecipe/hardware, one kind/two buffers, DPL, oldwire reset,0overflow, fresh topology/antenna cleanup/allcorner/50ps gates. Source extracted failure remains rejected; screens may fail and upload evidence. No fullclosure claim.
 -125focused tests pass; shellsyntax/Pythoncompile/diffchecks pass. New physical APIs remain unexecuted. Reviewed details in PHASE2_CLOCK8_TIMING_REPAIR.md. No commit/push/dispatch or checklist ticks. Next user-scoped publication approval then launch both independent screens and compare actual results. FIPE/unrelated prototypes excluded.

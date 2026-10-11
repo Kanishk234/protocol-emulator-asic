@@ -1,5 +1,10 @@
 name: compact configuration fanout fixed-original placement diagnostic
 on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_cfg_fanout_local.py'
+      - '.github/workflows/cfg_fanout_local.yaml'
   workflow_dispatch:
 permissions:
   contents: read

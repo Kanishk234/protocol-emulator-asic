@@ -20,6 +20,18 @@ SOURCE = 'source $::env(SCRIPTS_DIR)/openroad/common/grt.tcl'
 COMMAND = 'log_cmd global_route {*}$arg_list'
 
 
+def hotspot_record(path, overflow):
+    if not isinstance(overflow, int) or overflow < 0:
+        raise ValueError("Missing/invalid actual native final overflow")
+    if not path.is_file():
+        if overflow != 0:
+            raise RuntimeError("Missing native hotspot report with nonzero overflow")
+        return {"report_present": False}
+    if overflow and not path.stat().st_size:
+        raise RuntimeError("Empty native hotspot report with nonzero overflow")
+    return {"report_present": True, "report_sha256": sha(path), "report_bytes": path.stat().st_size}
+
+
 def instrument(top, common, directory):
     if sha(top) != TOP_SHA or sha(common) != COMMON_SHA:
         raise ValueError("Pinned original Tcl source hashes differ")
@@ -103,14 +115,14 @@ def main():
                   "underlying_route_passed": result["passed"], "underlying_error": error,
                   "native_launches": launch_count, "cases": {}}
     for label in ("cluster8", "ten_buffers"):
-        reports = list((OUT / label).glob("*-openroad-globalrouting/native-congestion.rpt"))
+        stages = list((OUT / label).glob("*-openroad-globalrouting"))
         entry = result["stages"].get(label, {})
-        if len(reports) != 1 or not entry.get("native_congestion"):
+        if len(stages) != 1 or not entry.get("native_congestion"):
             raise RuntimeError("Missing actual native hotspot evidence for " + label)
         overflow = entry["native_congestion"][-1]["total_overflow"]
-        if overflow and not reports[0].stat().st_size:
-            raise RuntimeError("Empty native hotspot report with nonzero overflow")
-        resolved = json.loads((reports[0].parent / "config.json").read_text())
+        report = stages[0] / "native-congestion.rpt"
+        evidence = hotspot_record(report, overflow)
+        resolved = json.loads((stages[0] / "config.json").read_text())
         source_config = json.loads((OUT / "config.json").read_text())
         for key, val in source_config.items():
             if key.startswith(("GRT_", "RT_")) or key in (
@@ -120,9 +132,10 @@ def main():
         if resolved["CELL_LIBS"] != source_config["LIB"] or paired.macro_contract(resolved["MACROS"]) != paired.macro_contract(source_config["MACROS"]):
             raise RuntimeError("Native library or fixed macro views changed")
         diagnostic["cases"][label] = {"route_passed": entry["passed"], "native_error": entry.get("error"),
-            "overflow": overflow, "raw_hotspot_report": str(reports[0].relative_to(OUT)),
-            "report_sha256": sha(reports[0]), "report_bytes": reports[0].stat().st_size,
+            "overflow": overflow, **evidence,
             "resolved_native_policy_exact": True}
+        if evidence["report_present"]:
+            diagnostic["cases"][label]["raw_hotspot_report"] = str(report.relative_to(OUT))
     if launch_count != 2 or result.get("authenticated_sources_unchanged") is not True:
         raise RuntimeError("Incomplete authenticated native diagnostic")
     diagnostic["diagnostic_collection_passed"] = True

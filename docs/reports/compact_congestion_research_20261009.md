@@ -100,6 +100,102 @@ No new physical checkpoint was produced for this report. No area/timing benefit
 is claimed for the proposed counterfactuals, no source hardware was edited,
 and no phase or competition acceptance gate was completed.
 
+## October10 actual native hotspot result
+
+[Run38100978078](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38100978078)
+successfully collects both native reports while preserving failed routing:
+cluster8 overflow148 and ten-buffer169. The reports have114 and116 markers,
+respectively; their horizontal/vertical marker-overflow sums happen to equal
+the corresponding final table totals in this run. The parser does not assume
+that equality in general.
+
+Authentic report hashes:
+
+- cluster8: `c49fcfb2dfe5f8ae9333cd8345c020cbb645792524a496969ddf1c5e91e36a22`
+- ten buffers: `a33e207b5e5f5f0a96f8264ffb8bc0d4f106a32645a7d1938a4623688c37a53b`
+
+The dominant native coordinate band is x0–121.44,y475.2–525.6: baseline62
+markers/90 overflow, candidate55 markers/95 overflow. None of these markers
+has zero capacity. Their real net sources repeatedly include shell CRC/SPI
+logic and clock leaf25. Baseline worst is overflow7 at
+(43.2,504)–(50.4,511.2); buffered worst in this band is overflow6 at
+(7.2,504)–(14.4,511.2). The narrow bottom band y0–15.12 accounts for only
+11 and13 overflow. Clock-only or bottom configuration-only fixes therefore
+miss most of the observed congestion. Net appearances are not independent
+contributions: one marker can name many nets.
+
+These coordinates are micrometers, preserved as exact native decimal text
+without conversion. The [pinned TR writer](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/src/db/dbMarker.cpp#L215)
+divides each bounding-box coordinate by the native block database units per
+micrometer before formatting four decimals. Configured macro location is
+121.44,15.12µm, with source LEF size1120.32×669.06µm. Thus this dominant
+band is physically in the left shell. The existing instance-origin census is
+not a substitute for actual placed cell rectangles.
+
+The revised next isolated experiment is **local one-site placement padding
+around actual CRC/SPI cells overlapping the dominant band**, using native block units and actual placed rectangles. Keep cluster8, the exact macro/RTL/masters, layers and timing
+constraints unchanged. Require legal placement, preserved connections/config
+storage, bounded displacement, six-corner STA and strict GRT. Padding changes
+placement whitespace, not intrinsic cell area; report any actual displacement
+and congestion improvement or regression. This is a hypothesis, not a measured
+fix. Adding bottom-column buffers or more routing iterations is lower priority:
+the actual150-iteration run38100977984 still fails149/169 overflow.
+
+`test_internal/audit_congestion_report.py` strictly validates every four-line
+marker, source, native layer, box ordering and overflow arithmetic, and can
+require the manifest SHA. It retains all marker coordinates and net names.
+Positive parsing of actual reports and arithmetic/box/truncation/category/hash
+negative controls pass without EDA.
+
+The [pinned FastRoute marker implementation](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/fastroute/src/utility.cpp#L2635)
+creates horizontal/vertical planar marker boxes, capacity/usage/overflow comments
+and net sources; it does not assign a physical layer. Consequently every actual
+`Layer -` remains unset in our output. It also writes a report only if a marker
+category exists: the collector now records legitimate native zero-overflow with
+no file as `report_present:false`, without inventing a report hash or count.
+
+### Concrete bounded padding implementation plan
+
+Start from cluster8 ODB SHA
+`0a0af0c1a0e4c413f52c43de70772dfff857a7c98402fa9b5b7e8dac19a53f99`
+and the existing authenticated NL/SDC. Keep the ten-buffer insertion out of this
+first experiment so exactly one placement policy changes. The remaining five
+configuration fanout violations are unchanged baseline blockers, not waivers.
+
+Inside the pinned container, read the native block's database units per micron,
+rows/site width and every instance's real `getBBox`. Select only original
+standard-cell instances with names under `u_shell.u_crc.` or `u_shell.u_spi.`
+whose actual box intersects x0–121.44,y475.2–525.6µm. Exclude macros and fixed
+instances; require a nonempty exact selection census recording names, masters,
+boxes, original placement statuses and the single site width. Match masters
+and complete pin connectivity with the pre-existing strict census.
+
+Apply `set_placement_padding -instances <selected native names> -left 1 -right 1`
+and native detailed placement. The original resolved `DPL_CELL_PADDING` is0.
+Because OpenDP has padding precedence rules, prove this instance rule actually
+takes effect before running the experiment; retain native padding/bounding-box
+evidence. Do not substitute a global rule or master rule, which would change
+the experimental scope. Native legality must pass, every original master,
+orientation, status and connection must remain unchanged, and fixed macro
+geometry must match exactly. Reject if any original cell moves more than22µm
+on either axis; this is an audit bound, not an added placement optimization knob.
+Record every displacement and the exact changed output ODB/NL hashes.
+
+Run the existing explicit fast/slow/typ STA mechanism on both baseline and
+candidate. Require candidate fanout count no greater than the existing five
+at each corner, zero slew/capacitance violations, positive setup/hold and
+unchanged20ns shell clock. This does not establish configured-fabric timing.
+Run identical50-iteration native GRT plus the already reviewed copied reporting
+script on both, preserving strict zero overflow for route acceptance and all
+failures. Limit each STA process180s and each route900s in a standard hosted
+45-minute job, with image pull before observer timeouts and always-uploaded
+artifacts. Do not advance to DRT merely because overflow decreases.
+
+This plan needs a new controlled placement producer plus six explicit STA
+processes, source authentication and native effective-padding proof. No partial
+workflow is shipped that could report success without those gates. Existing
+map collector and parser are ready to consume the resulting native reports.
+
 ## October 10 continuation
 
 Actual150-iteration run37960021920 leaves the buffered overflow at169. Its

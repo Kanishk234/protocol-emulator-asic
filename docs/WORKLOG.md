@@ -18,6 +18,18 @@ limited genuine-clock STA preparation and one zero-original-movement buffer
 legalization counterfactual. No local EDA or frozen hardware change.
 The local source bundle's public upload remains blocked pending exact approval;
 no workaround or indirect publication attempted.
+**Concrete continuation:** native maps identify the left-shell CRC/SPI/clock
+band as dominant,90 baseline/95 buffered planar overflow; pinned dbMarker.cpp
+confirms coordinates are micrometers. Strict parser preserves raw coordinates,
+unset layer and all net sources. Preventive BUG63 retains genuine zero/no-file
+behavior without manufacturing evidence. Reviewed fixed-original-placement
+counterfactual retains all3596 masters/origins/orientations/statuses and the same
+ten buffers plus six STA guards; local census positives/negatives and static
+checks pass. User explicitly authorized session push after automatic review
+rejected the first docs commit; subsequent scoped20597a4/2e43612/5319e91/ed0b8bf
+commits and push succeed. BUG64 branch-only dispatch404 fixed with narrow
+helper/workflow push trigger; actual38101405271 is running. No physical or
+configured timing pass follows from preparation or launch.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

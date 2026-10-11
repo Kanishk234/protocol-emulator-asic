@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-071: Isolate buffer insertion from incidental original-cell movement
+- **Date:**2026-10-10. **Status:** accepted bounded copied-checkpoint diagnostic; no hardware promotion.
+- **Evidence:** ten-buffer37956470190 clears five estimated fanout failures in all three explicit corners but moves1550 original instances. Actual paired GRT38100977984 fails baseline149/candidate169 after150 iterations; native maps38100978078 localize most congestion to left-shell CRC/SPI/clock wiring.
+- **Decision:** reuse hash-pinned cloud_cfg_fanout.py source, authenticated cluster8 checkpoint and exactly the same ten buffers/connections/initial centroids. Change only legalization policy: temporarily FIRM all3595 original PLACED instances, preserve existing FIRM macro, restore every original status, and require exact3596 original master/origin/orientation/status records plus contracted topology and native placement legality. Retain failed trial census/database without promotion. Run the same six explicit-corner estimated STA guards only after successful mutation. Never combine driver, CTS or routing-policy changes.
+- **Cost/limits:** standard hosted25min workflow, separate pinned-image pull5min, inherited native edit180s and STA300s/process. No frozen source or intrinsic cell change beyond the previously measured ten buffers. Lack of legal whitespace rejects this trial. Success only establishes legal placement and estimated electrical screening; new native GRT/extraction/function/configured timing still required. It cannot by itself fix the baseline shell hotspot.
+- **Evidence files:** test_internal/cloud_cfg_fanout_local.py and separate cfg_fanout_local.yaml. Static/census positive and movement/master/orientation/status negative controls pass; run38101405271 pending native execution.
+
 ## D-070: Collect native routing hotspot coordinates without hardware changes
 - **Date:**2026-10-10. **Status:** accepted bounded reporting diagnostic; no promotion.
 - **Evidence:**37958932549 reports148/169 overflow;37960021920 increases search to150 but buffered remains169. Baseline150 did not execute because cold Docker pull exceeded observer120s. Clock NDR fallbacks and1550 moved original cells are clues, not proof of the root cause.

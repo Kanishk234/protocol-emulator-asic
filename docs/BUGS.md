@@ -1,10 +1,22 @@
 # Bugs
 
+## 64: New manual-only branch workflow is not registered for dispatch
+- **Date:**2026-10-10.
+- **Symptom/check:** after5319e91 is pushed to efpga, dispatching cfg_fanout_local.yaml returns GitHub HTTP404 before any diagnostic job starts.
+- **Root cause:** a new workflow existing only on the project branch is not available through the workflow dispatch endpoint yet; main holds the separate design.
+- **Fix/coverage:** add an efpga-only push trigger restricted to this diagnostic's helper and workflow, following existing branch diagnostic workflows. Preserve manual dispatch, native guards, limits and unchanged template jobs. The next push must produce a real run before claiming execution.
+
+## 63: Congestion collector assumes every native route emits a report
+- **Date:**2026-10-10; preventive source review, not an observed failed CI.
+- **Symptom/check:** the collector would reject a genuine zero-overflow route if no marker file exists. Both actual cases in38100978078 have nonzero overflow and reports, so this did not affect that run.
+- **Root cause:** pinned FastRoute writes the TR file only when its marker category exists; a clean route can have no congestion category.
+- **Fix/coverage:** permit an absent report only with an actual parsed final native zero-overflow table and unchanged protected routing/library/macro policy. Record `report_present:false` without inventing a hash, file, marker count or pass. Missing/empty reports with nonzero overflow remain errors. Lightweight zero/absent positive and missing/empty nonzero negative controls pass; existing native failure remains explicit.
+
 ## 62: Cold container pull consumes native observer timeout
 - **Date:**2026-10-10.
 - **Symptom/check:**37960021920 baseline native-placement observer times out120s during first image download; candidate later reaches genuine150-iteration congestion169. No new baseline routing measurement exists.
 - **Root cause:** image provisioning happens inside the short observer subprocess timeout.
-- **Fix/coverage:** explicit pinned-image pull with separate5min workflow setup bound before native observers. Keep observer120s, routing900s and45min job bounds; no routing check waived. Genuine candidate congestion remains failed. Fresh hosted validation pending.
+- **Fix/coverage:** explicit pinned-image pull with separate5min workflow setup bound before native observers. Keep observer120s, routing900s and45min job bounds; no routing check waived. Both cases execute genuine150-iteration routing in38100977984 and retain failed149/169 overflow; report collection38100978078 also completes. Provisioning failure is fixed, congestion remains.
 
 ## 61: Abstract audit overcounts existing supply accesses
 - **Date:**2026-10-09.

@@ -35,23 +35,31 @@ def plan_replay(samples: Sequence[int], *, max_gap_clocks: int,
     samples = list(samples)
     intervals = decode_capture(samples, stamp_bits=stamp_bits,
         stamp_shift=stamp_shift, max_gap_clocks=max_gap_clocks, overflow=overflow)
+    quantum = 1 << stamp_shift
+    # Exact feasibility under the assumed gap bound: reachable integer times
+    # form one interval. A gap in 0..G expands it to [lo, hi+G]; intersect it
+    # with the next unwrapped timestamp bin. This catches contradictions in
+    # any subsequence, not just windows measured from the first event.
+    reachable_low, reachable_high, unwrapped_ticks = 0, quantum - 1, 0
+    for interval in intervals:
+        unwrapped_ticks += interval.delta_ticks
+        bin_low = unwrapped_ticks * quantum
+        reachable_low = max(reachable_low, bin_low)
+        reachable_high = min(reachable_high + max_gap_clocks,
+                             bin_low + quantum - 1)
+        if reachable_low > reachable_high:
+            raise ValueError("trace has no consistent cumulative timing window")
     _integer(start_event, "start_event", 0, max(0, len(samples) - 1))
     if event_count is not None:
         _integer(event_count, "event_count", 1, max(1, len(samples)))
         if start_event + event_count > len(samples):
             raise ValueError("selected events extend beyond the capture")
     stop = len(samples) if event_count is None else start_event + event_count
-    if start_event != 0 or stop != len(samples):
-        # Check cumulative contradictions outside the requested replay slice
-        # as well; a convenient trigger must not hide an invalid session.
-        plan_replay(samples, max_gap_clocks=max_gap_clocks,
-            stamp_bits=stamp_bits, stamp_shift=stamp_shift, overflow=overflow)
     selected = samples[start_event:stop]
     if not selected:
         return []
     result = [ReplayEvent(start_event, selected[0], 0, 0)]
     ticks = minimum = maximum = 0
-    quantum = 1 << stamp_shift
     for index in range(start_event + 1, stop):
         interval = intervals[index - 1]
         ticks += interval.delta_ticks

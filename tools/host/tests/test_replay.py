@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from itertools import product
 
 import pytest
 
@@ -67,6 +68,35 @@ def test_trimming_does_not_hide_invalid_capture():
         plan_replay([0, 1, 2], max_gap_clocks=1, stamp_shift=2, start_event=2)
     assert plan_replay([], max_gap_clocks=10) == []
     assert plan_replay([5], max_gap_clocks=10)[0].latest_clock == 0
+
+
+def test_late_quantization_contradiction_cannot_hide_behind_earlier_slack():
+    with pytest.raises(ValueError, match="cumulative"):
+        plan_replay([0, 0, 0, 1, 2], stamp_shift=1, max_gap_clocks=1)
+
+
+def test_small_traces_match_independent_exhaustive_clock_schedules():
+    # Enumerate clocks, not interval formulas. Include every four-event trace
+    # and schedules with zero gaps; timestamps have two bits and quantum two.
+    schedules = {}
+    for first in (0, 1):
+        for gaps in product(range(2), repeat=3):
+            clocks = [first]
+            for gap in gaps:
+                clocks.append(clocks[-1] + gap)
+            stamps = tuple((clock // 2) % 4 for clock in clocks)
+            schedules.setdefault(stamps, []).append(clocks)
+    for tail in product(range(4), repeat=3):
+        stamps = (0,) + tail
+        if stamps not in schedules:
+            with pytest.raises(ValueError):
+                plan_replay(stamps, stamp_bits=2, stamp_shift=1, max_gap_clocks=1)
+            continue
+        events = plan_replay(stamps, stamp_bits=2, stamp_shift=1, max_gap_clocks=1)
+        for clocks in schedules[stamps]:
+            for event in events:
+                delta = clocks[event.observed_index] - clocks[0]
+                assert event.earliest_clock <= delta <= event.latest_clock
 
 
 def test_cli_emits_scoped_windows_and_rejects_loss(tmp_path):

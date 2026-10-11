@@ -21,8 +21,10 @@ indices. Its first event is clock zero. `earliest_clock` and `latest_clock`
 bound later events relative to it. With prescaling, cumulative timestamp phase
 uncertainty is at most one quantum minus one clock on either side, rather than
 adding that uncertainty for each event. External gap bounds can narrow windows.
-The whole input is validated before slicing; selection cannot hide a malformed
-interval or loss. Multiple wraps over a long trace are supported when each
+The whole input is checked for a coherent quantized clock schedule before
+slicing, by propagating reachable clock intervals through successive timestamp
+bins. Selection cannot hide a contradictory subsequence, malformed interval or
+loss. Multiple wraps over a long trace are supported when each
 individual event gap satisfies the supplied unambiguous-wrap bound.
 
 These windows are correlated through the shared counter phase. They are a
@@ -35,5 +37,6 @@ supported protocol-rate claim follows from a plan.
 
 Validation: `python -m pytest -q tools/host/tests/test_capture.py
 tools/host/tests/test_replay.py` in the project venv. Tests use independent
-absolute-clock traces across counter phases, wraps and selected origins, plus
-loss/malformed-input and CLI checks. No local EDA is required.
+absolute-clock traces across counter phases, wraps and selected origins,
+exhaustively enumerated small clock schedules, plus loss/malformed-input and
+CLI checks. No local EDA is required.

@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-11 (session75: actual delayed tile routes; loaded validation prepared)
+**Done:** proactively checked38114298036: all actual native physical gates0, exact original signal/power geometry and eight retained delay cells, but workflow fails original virtual-clock setup and Decimal evidence serialization (BUG69). Downloaded/authenticated actual final artifacts; report compact_c2_delay_physical_20261011.md separates these outcomes. Fixed Decimal serialization without relaxing checkers. Parameterized the existing actual loaded-C2 harness with explicit final hash/source run/input/output provenance, preserving default behavior; prepared new authenticated candidate workflow for all four original control/candidate normal/USER_RESET cases. Local actual-hash/gate/interface/delay audit, serializer fixtures and AST/YAML pass. No local EDA or frozen hardware change. Current routine lint/docs/test/unit38114310761/721/796/737 all SUCCESS.
+**Boxes ticked:** none; no full-chip or configured timing pass.
+**Next step:** cloud actual loaded validation of38114298036 candidate, then its own extracted conditional timing and continued shell congestion diagnosis.
+
 ## 2026-10-11 (session74: breadth goal and physical runner repair)
 **Done:** reaffirmed broad practical reprogrammability: UART/SPI/I2C are baseline demonstrations, not an architecture limit. Existing organizer report records this goal; universal coverage remains an aspiration rather than a measured claim. Proactively checked38113928620: fails before routing because shared delay-transform import pulls cocotb into a physical-only environment. Deferred timing-audit imports to timing execution/CLI, retaining identical transformation and input authentication (BUG68). Lightweight project-venv Python with site packages disabled imports the physical helper and authenticates the actual38113263802 intrinsic result. Routine unit38113928552 SUCCESS. No local EDA, frozen hardware change or physical/timing acceptance.
 **Boxes ticked:** none.

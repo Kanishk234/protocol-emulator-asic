@@ -1,5 +1,11 @@
 # Bugs
 
+## 69: Native Decimal metrics prevent physical evidence serialization
+- **Date:**2026-10-11.
+- **Symptom/check:**38114298036 completes all physical stages with seven native zero gates and exact interfaces, then fails to retain the physical summary with `Object of type Decimal is not JSON serializable`. Original virtual-clock setup failure remains genuine.
+- **Root cause:** LibreLane State metrics retain Decimal values; the summary used the standard JSON encoder directly.
+- **Fix/coverage:** normalize native metrics once with a Decimal-specific encoder before constructing the summary; integral/finite values retain numeric semantics, nonfinite sentinel values remain explicit strings, unsupported objects still reject. Local serializer fixtures pass. Independently authenticated actual retained metrics/pin inventories prove seven zero physical gates, 306 exact signal ports and all eight live delay instances; no rerouting or timing waiver. Next cloud execution must exercise the repaired report writer.
+
 ## 68: Physical delay helper eagerly imports simulation dependencies
 - **Date:**2026-10-11.
 - **Symptom/check:**38113928620 fails before physical execution with missing cocotb; no routing was attempted and no physical artifacts were produced.

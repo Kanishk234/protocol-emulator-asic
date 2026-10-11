@@ -1,5 +1,11 @@
 # Bugs
 
+## 78: Loaded fault-window test omits shell output-register latency
+- **Date:**2026-10-11.
+- **Symptom/check:** actual loaded38168413654 sees the correct four-cycle inversion at chip cycles7..10, while the test expects user-logic cycles6..9.
+- **Root cause:** expectation includes synchronized input/edge acceptance but omits ARCHITECTURE §6's one-clock registered output latency.
+- **Fix/coverage:** chip-port expectation includes that documented extra clock; source tests retain acceptance-relative timing. No RTL, synchronizer or fault timing change; cloud retry must establish remaining loaded checks.
+
 ## 76: Operating report accepts impossible or reversed pin mappings
 - **Date:**2026-10-11.
 - **Symptom/check:** adversarial report fixtures with FAB_IN99 or a reversed FAB_IN0 role pass syntactic metadata validation.

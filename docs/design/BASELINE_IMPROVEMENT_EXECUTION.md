@@ -68,3 +68,22 @@ with separately measurednet683136 rather than assuming additive gains.
 Actual loaded helper38167521573SUCCESS: same-job compile/bitstream/realSPI load,
 A5serial/completion/USER_RESET/STOP chip-port case passes with strict1-caseXML.
 ExistingD023RTLfabric scope, no native/SDF or new physical clock claim.
+
+## Current measured continuation (session84)
+
+Portable C checked word/WBIT loading and sticky-error recovery are implemented
+and independently model-tested. Root board/host regression415PASS; four new
+scheduler source tests skip locally by policy and await cloud Icarus. Operating
+reports now authenticate architecture pin-table provenance and physical labels.
+These are baseline-compatible software changes, with no board-speed claim.
+
+Autonomous triggered UART fault demo compiler38168186117PASS:57/88LC,2/2timers,
+2/2shifts. ActualimageSHAa74a2909c144951c41e1f5276e110ae1e7619fb4d078062a83fb886438aefefb.
+Loaded run38168215538 fails before loading because the workflow selected the
+wrong filename; corrected same-job retry38168413654 pending. No loaded pass yet.
+
+Combined exact placement paired38168159774 improves146→133overflow and111→91
+markers, still nativeFAIL. New connectivity audit finds34/91markers without any
+tie-driven net; overlapping membership is not causal attribution. See
+compact_congestion_membership_20261011.md for hashes and next bounded buffer
+placement hypothesis. No phase boxes ticked or successor promoted.

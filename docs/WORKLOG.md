@@ -5,6 +5,13 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (prepare fanout extracted continuation)
+- Exact fanout38102524361 artifactproposal/39buffer/topology/antenna/overflow/timingaudit passes. Remaining8fanoutdrivers:4clock16loads and4antenna-loadeddata (8354,28820,7616,26701);diode reserve not universallysufficient. Prepared pin-validated no-repeatDRT/extractionhelper/workflow, carryingexplicitDEFbasename fix.151focused checks pass withTclruntimePATH andactualauditpasses. Hold38102572131 stillinphysicalroute/extractionstep.
+- Next publish/launch understandingworkflowapproval and inspectrealextractedresults beforefollow-upclock/datarepairs orpromotion. No phasecheckbox; allfinalzero-violation/GL/officialgatesremainopen.
+
+## 2026-10-10: Codex (fanout screen result check)
+- Fanout38102524361 succeeds in7m46s/artifact11689015681; precise GRT-estimated corner/electrical comparison retrieved. Holdroute38102572131 in freshqualification/routing/extraction step;6unitrunsactive and2legacyplacementsqueued atcheck. No extracted fanoutresult orPhase2pass yet; next auditremainingdrivers and qualifyfanoutDRT continuation whileholdroutefinishes.
+
 ## 2026-10-10: Codex (verify corrected hold relaunch)
 - BUG90 tools/docs fixes069f756/8336e5a pushed;127focusedchecks pass. Relaunched [holdroute38102572131](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38102572131) on8336e5ac1ef36971426e77291f34f442c3a4de35; queuedatverification. Datafanout38102524361 running/downloadingcheckpoint. These are independentfull2/4/20ns experiments; no resultpromotion/checklisttick. Next inspect sourceguards, freshallcornergates and extractedholdroute plus datafanout/electrical/overflow.
 

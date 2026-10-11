@@ -79,3 +79,51 @@ def test_launch_refuses_reusing_existing_flow(tmp_path, monkeypatch):
     def unexpected(*args, **kwargs): raise AssertionError('Must refuse before CLI')
     monkeypatch.setattr(runner.subprocess, 'run', unexpected)
     with pytest.raises(FileExistsError): runner.start_clean_flow(Path('config.json'), flow, '/pdk')
+
+
+@pytest.mark.parametrize('fault', [None, 'congestion', 'command', 'rewire', 'missing', 'remaining'])
+def test_post_timing_antenna_repair_preserves_logic_and_checks_policy(tmp_path, monkeypatch, fault):
+    import json
+    def write(path, data):
+        path.parent.mkdir(parents=True, exist_ok=True); path.write_text(data)
+    nl = 'sg13cmos5l_buf_1 original (.A(a), .X(x));'
+    original = tmp_path/'original.v'; original.write_text(nl)
+    source = tmp_path/'source.json'; source.write_text(json.dumps({'nl':str(original)}))
+    calls = []
+    def step(config, initial, cleanup, steps):
+        assert config['GRT_ALLOW_CONGESTION'] is False and initial == source
+        calls.append(steps)
+        write(cleanup/'resolved.json', json.dumps({'GRT_ALLOW_CONGESTION':fault == 'congestion'}))
+        write(cleanup/'1-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log',
+              'repair_antennas'+(' -allow_congestion' if fault == 'command' else ''))
+        checked = cleanup/'2-openroad-checkantennas'
+        views = {}
+        for key in ('odb','def','nl','pnl','sdc'):
+            path = checked/('chip.'+key)
+            data = nl.replace('.A(a)', '.A(other)') if fault == 'rewire' else nl
+            write(path, data+'\nsg13cmos5l_antennanp newdiode (.A(x));')
+            views[key] = str(path)
+        if fault == 'missing': Path(views['odb']).unlink()
+        write(checked/'state_out.json', json.dumps(views))
+        write(checked/'or_metrics_out.json', json.dumps({'antenna__violating__nets':1 if fault == 'remaining' else 0,
+                                                       'antenna__violating__pins':0}))
+    monkeypatch.setattr(runner, 'run_step', step)
+    args = ({'GRT_ALLOW_CONGESTION':False}, source, tmp_path/'output', {'antenna__violating__nets':15,'antenna__violating__pins':17})
+    if fault in ('congestion','command','rewire','missing'):
+        with pytest.raises(ValueError): runner.repair_remaining_antennas(*args)
+    else:
+        checked, metrics = runner.repair_remaining_antennas(*args)
+        assert checked != source
+        from postgrt_timing import CORNERS
+        timing = {'corners':{c:{'after':{f'timing__setup__ws__corner:{c}':0,
+                                      f'timing__hold__ws__corner:{c}':.08}} for c in CORNERS}}
+        assert runner.qualified(timing, metrics) == (fault != 'remaining')
+    assert calls == [['OpenROAD.RepairAntennas', 'OpenROAD.CheckAntennas']]
+
+
+def test_clean_antennas_skip_repair_and_no_congestion_waiver(tmp_path, monkeypatch):
+    def unexpected(*args): raise AssertionError('No repair needed')
+    monkeypatch.setattr(runner, 'run_step', unexpected)
+    source = tmp_path/'source.json'; metrics = {'antenna__violating__nets':0,'antenna__violating__pins':0}
+    assert runner.repair_remaining_antennas({'GRT_ALLOW_CONGESTION':False},source,tmp_path,metrics) == (source,metrics)
+    with pytest.raises(ValueError): runner.repair_remaining_antennas({'GRT_ALLOW_CONGESTION':True},source,tmp_path,metrics)

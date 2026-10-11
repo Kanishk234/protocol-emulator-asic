@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from event_nor2_screen import logical_cells, validate_overflow
+from event_nor2_screen import logical_cells, validate_overflow, validate_antenna_only_changes
 from native_stock_route import fingerprints, qualified, run_step
 from native_stock_screen import checkpoint
 from residual_data_screen import validate_inputs
@@ -46,6 +46,30 @@ def start_clean_flow(path, flow, pdk_root):
         '--to', 'OpenROAD.ResizerTimingPostGRT', str(path)], check=True)
 
 
+def repair_remaining_antennas(config, source, output, antenna):
+    if config.get('GRT_ALLOW_CONGESTION') is not False:
+        raise ValueError('Clean antenna repair must disallow congestion')
+    if not (antenna.get('antenna__violating__nets') or antenna.get('antenna__violating__pins')):
+        return source, antenna
+    cleanup = output/'antenna-cleanup'
+    run_step(config, source, cleanup, ['OpenROAD.RepairAntennas', 'OpenROAD.CheckAntennas'])
+    resolved = json.loads((cleanup/'resolved.json').read_text())
+    logs = list(cleanup.glob('*-openroad-repairantennas/*-openroad-diodeinsertion/openroad-diodeinsertion.log'))
+    states = list(cleanup.glob('*-openroad-checkantennas/state_out.json'))
+    metrics = list(cleanup.glob('*-openroad-checkantennas/or_metrics_out.json'))
+    if len(logs) != 1 or len(states) != 1 or len(metrics) != 1:
+        raise ValueError('Missing unique clean antenna repair evidence')
+    log = logs[0].read_text()
+    if resolved.get('GRT_ALLOW_CONGESTION') is not False or 'repair_antennas' not in log or '-allow_congestion' in log:
+        raise ValueError('Clean antenna repair routing policy mismatch')
+    before, after = json.loads(source.read_text()), json.loads(states[0].read_text())
+    for key in ('odb', 'def', 'nl', 'pnl', 'sdc'):
+        if not Path(after[key]).is_file(): raise ValueError('Missing repaired clean view '+key)
+    validate_antenna_only_changes(Path(before['nl']).read_text(), Path(after['nl']).read_text())
+    # Preserve incrementally repaired guides; do not invoke full GRT again.
+    return states[0], json.loads(metrics[0].read_text())
+
+
 def main():
     root = Path.cwd()
     trusted = json.loads(Path('/tmp/native-trusted-config.json').read_text())
@@ -83,8 +107,9 @@ def main():
     run_step(config, source, antenna, ['OpenROAD.CheckAntennas'])
     metrics = list(antenna.glob('*-openroad-checkantennas/or_metrics_out.json'))
     if len(metrics) != 1: raise ValueError('Missing fresh antenna evidence')
+    source, antenna_metrics = repair_remaining_antennas(config, source, output, json.loads(metrics[0].read_text()))
     screen(path, source, output/'timing', os.environ['PDK_ROOT'], repaired=source, sdc=Path('src/signoff.sdc'))
-    ready = qualified(json.loads((output/'timing/comparison.json').read_text()), json.loads(metrics[0].read_text()))
+    ready = qualified(json.loads((output/'timing/comparison.json').read_text()), antenna_metrics)
     (output/'gates.json').write_text(json.dumps(dict(source_run=38172640071,
         clean_from_rtl=True, stock_classic=True, custom_image=False,
         added_cells_by_policy=0, relocated_instances=len(proposal['proposals']),

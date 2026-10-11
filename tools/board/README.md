@@ -51,3 +51,26 @@ Limits: the shell needs every SPI pin level to last 4 project clocks; MicroPytho
 - `tools/board/tests/test_warp.py` (pytest): transactions, CRC (incl. the pure-Python fallback), `.wbit` parsing and status decoding equal the reference host (`tools/host/protocol.py`) and bitstream code, byte for byte.
 - `test/test_bitstream.py::test_board_loader` (cocotb): this module's code, unchanged, drives the chip's pins in simulation: checked load of `uart16`, RUN, bytes out as UART frames, a frame in read back over the host channel.
 - **Not tested on hardware** (no board yet): the `ttboard` glue (`on_demo_board`) and real pin timing.
+
+## Host service budget
+
+Before choosing a streaming rate, use the analytical planner from the project
+root (activate the project venv first):
+
+```sh
+PYTHONPATH=tools python -m board.budget --clock-hz 8000000 --sck-hz 1000000 \
+  --arrival-bytes-s 1000 --direction read --blackout-us 2000 --queue-bytes 2
+```
+
+This example intentionally flags insufficient buffering despite adequate
+average service capacity. It includes the existing API's one STATUS poll plus
+one channel command per payload byte, conservative CS framing and optional
+`--overhead-us` per transaction. Supply worst-case host scheduling overhead,
+not just ideal wire timing. The planner assumes an initially empty queue,
+a bounded arrival burst and one initial blackout followed by guaranteed service
+intervals. Repeated pauses, opposite-direction traffic and extra status polls
+must be covered by the service budget; simultaneous traffic is not independently
+certified by two single-direction plans. The existing shell has two FIFO entries
+per direction; a larger requested queue is a hypothetical design budget, not
+additional chip storage. Protocol-side readiness and physical timing remain
+separate requirements. No board throughput is measured by this tool.

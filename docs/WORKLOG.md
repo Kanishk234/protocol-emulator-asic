@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (parallel current-screen electrical preparation)
+- Setup-route38108912678running. Current cleanedsetup screen15fanout=11data+4clock;28807new16load/8diodefailure. SRAMREN/ADDR0/ADDR6remain slow slewtargs. Recomputed exactcurrentNL/DEF reviewedLEF footprints; previousoutput0/RENcandidate sitesstill0overlap.
+- Prepared30BUF4spatialpartitions for11data drivers withinitialupstream/downstreamloads<=4; independentfullsink/diode conservationchecks pass. No physicalECO/newdispatch/phasebox; proposalsunlegalized/unmeasured andmustberepinned afterDRT. Next inspectextractedsetupresult andapplynextone measuredrepair on selectedlineage.
+
 ## 2026-10-10: Codex (verify selected setup route launch)
 - Tools/CI/docs ec5aaec/1826080/e87e348 pushed; remoteheadverifiede87e348b605c7c2359d4141f5fa607c571bffd9e. [Selectedsetup route38108912678](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38108912678) queuedonexacthead. 136focusedchecks/actualchainauditpass. No unrelatedfiles/hardwarehistorychanges.
 - Next inspectfresh extractedsetup/hold/electrical/DRC then continue residualrepairs on thissinglelineage. No phasebox oracceptedofficialclosure.

@@ -135,7 +135,7 @@ jobs:
           test "$PWD" = /home/runner/work/protocol-emulator-asic/protocol-emulator-asic
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/38172640071" > /tmp/native-eco-source-run.json
 
-      - name: Apply one dominant data-net split, legalize, route and qualify timing
+      - name: Run clean Classic with SRAM bank placement and qualify timing
         timeout-minutes: 95
         run: python workflow-src/scripts/ci/sram_bank_clean_screen.py
 

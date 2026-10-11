@@ -5,6 +5,25 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (prepare independent residual physical screens)
+- Completed local runner, Docker/OpenROAD wrapper and two manual workflows for independent antenna/hold proposals from38019338907/head77bc7608. Enforces exactNL/DEF/fulltrustedrecipe/hardware, one kind/two buffers, DPL, oldwire reset,0overflow, fresh topology/antenna cleanup/allcorner/50ps gates. Source extracted failure remains rejected; screens may fail and upload evidence. No fullclosure claim.
+-125focused tests pass; shellsyntax/Pythoncompile/diffchecks pass. New physical APIs remain unexecuted. Reviewed details in PHASE2_CLOCK8_TIMING_REPAIR.md. No commit/push/dispatch or checklist ticks. Next user-scoped publication approval then launch both independent screens and compare actual results. FIPE/unrelated prototypes excluded.
+
+## 2026-10-10: Codex (prepare exact-source branch and hold repairs)
+- Added local canonical planner/connectivity validator and preflight Tcl binding for independent repairs on route38019338907. Worst29457branch: twoBUF4split20loads into8upstream/7/7downstream; all existing antenna cells retained. Hold proposal: separateBUF1on46984/D and46597/D. Pins exact routed NL/DEF; proposed placement is not legalized/timed.
+-16focused topology/rejection/Tclsyntax tests pass; actual-source synthetic audits and target generation pass for both proposals. Physical APIs remain untested. No publication/dispatch or phasebox; FIPE/unrelated local work retained. Next prepare bounded independent physical screens with DPL/wire reset/0overflow/fresh antenna/allcorner gates; assess area and actual extracted benefit.
+
+## 2026-10-10: Codex (resume status audit)
+- Refreshed worklog, Phase2 exit checklist, repair/readiness evidence and live main workflows. Local/remote main both5dbdec4; latest nightly38056452189 and test/lint/docs/unit allgreen; no main jobs in progress, legacy37655518919/37655518925 stillqueued. Uncommitted residual timing analysis and unrelated local prototypes retained; FIPE remainslocal.
+- Current extracted baseline remains original strength37954320974 (setup0all,fast hold56.32ps,22/22GL), electricalclosureopen. Latest clock8 strength38019338907 improves setup to−88.38ps but fast hold42.69psfailsgate; best localfixedwireprobe−28.38ps stillfails. Next prepare antenna-aware branching/targetedholddelay physical experiments, then freshallcornerextraction/finalGL/officialintegration. No phasebox; historical official GDS36799356107 passes typicaltiming/precheck but does not establish currentallcornertargetclosure.
+
+## 2026-10-09: Codex (diagnose extracted clock8 residuals)
+- Downloaded exact route38019338907 paths/NL/SPEF/SDC and independently reproduced six timing numbers within1e-6ns plus allcorner electrical summaries. All34fanout failures classify as4clock16load branches and30antenna-loadeddata branches. Two sub50pshold endpoints46984/46597 originate U3word6bit2/U1word4bit8, separate from long U0setupcone.
+- Tested seven exact-source sizing variants, allcorner/fixedwire. Best combined NOR43917_2/place7312BUF4 improves slow setup−88.38ps→−28.38ps; fast hold remains42.69ps and electrical counts unchanged, so still not accepted. Other targeted upsizing stalls at alternate word4 cone or slightly worsens it. Evidence in PHASE2_CLOCK8_TIMING_REPAIR.md; raw probes stay/tmp. No publication/dispatch or phasebox. Next prepare antenna-aware fanout/load splits and targeted hold delay, then evaluate setup reserve with physical qualification instead of blindly accumulating sizes.
+
+## 2026-10-09: Codex (clock8 strength extracted result)
+- Route38019338907 completed successfully in38m14s/artifact11658572276. Fresh extracted slow setup−0.088384413ns,typ/fast0; fast hold+42.690352ps (fails50psgate),typ+136.529902ps,slow+293.931998ps. Screen estimate did not survive DRT; do not promote. Electrical counts read from fresh artifact; original strength37954320974 remains timing baseline. One unit run active at check; two legacy placement workflows queued. Next diagnose exact extracted residual setup/hold paths and load/antenna effects before further physical trials. No phase checkbox.
+
 ## 2026-10-09: Codex (publish clock8 strength route continuation)
 - User approved continuation publication/launch. Separate tools/CI/docs groupsb5e2549/463bc35/77bc760 pushed and remote main verified at77bc7608790352d118ad399b6f9c1704adab0cc1. Launched [gds-native-clock8-strength-route38019338907](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38019338907) on that exact head; in progress at verification.109focused tests and actual screen topology/antenna/overflow/timing audits passed before publication. No pending hardware-history changes; FIPE/unrelated local work excluded.
 - Next inspect fresh pre-DRT gates, detailed-route DRC and extracted allcorner timing/electrical results. Retain original strength baseline until new extracted evidence qualifies; no phase boxes ticked.

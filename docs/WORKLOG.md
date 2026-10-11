@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (selected setup screen passes; prepare extraction)
+- Setup38108151690 succeeds/artifact11691540879: estimated setup0all, holdfast100.801ps; slew3/1/1slow/typ/fast,fanout15each,cap0each. Actualexactone-master/source/topology/antenna/0overflow/history auditpasses. Not extractedclosure.
+- Prepared strict exactscreen continuation tostockDRT/freshextraction, no repeatedECO/SRAMcombination. 136focusedchecks pass. Next publish/launchunderongoingapproval then assess extractedsetup/electrical andrepin SRAMrepair. No phasebox.
+
 ## 2026-10-10: Codex (prepare guarded SRAM output0 movement)
 - Setup38108151690 stillrunsphysicalstep/no reportedfailure. Prepared separate selected-source output0relocation Tcl: unchangedwire9447BUF4/nets, exactold/newbbox, occupiedsite/power/master/wiring preflight, post-DPLverification. 28focusedchecks pass; actualselectedDEF/LEF independentfootprintaudit0overlap.
 - PhysicalOpenDBmove/routing/timingunexecuted. Next inspectsetupresult, repin/recompute siteagainstresultingcheckpoint andapplyonlyone measuredrelocation. No extraindependentworkflow/phasebox; no stalehistoricalsiteuse.

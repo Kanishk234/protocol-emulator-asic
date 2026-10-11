@@ -1,0 +1,10 @@
+top: helper_demo
+pins:
+  clk: clk
+  rst_n: rst_n
+  request: FAB_IN0
+  rx: FAB_IN1
+  tx: FAB_OUT0
+  ready: FAB_OUT1
+  complete: FAB_OUT2
+  tick: FAB_OUT3

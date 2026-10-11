@@ -43,6 +43,10 @@ proc geometry {path} {
 check_placement -verbose
 census $::env(WARP_BEFORE)
 geometry $::env(WARP_GEOMETRY_BEFORE)
+set original_orientation {}
+foreach inst [$block getInsts] {
+    dict set original_orientation [$inst getName] [list [$inst getOrient] [$inst getPlacementStatus]]
+}
 set selected {}
 foreach inst [$block getInsts] {
     set name [$inst getName]
@@ -59,7 +63,28 @@ foreach name [lsort $selected] {puts $out $name}
 close $out
 # Native setter forwards each dbInst to Opendp::setPadding(inst,1,1).
 foreach name $selected {dpl::set_padding_inst [$block findInst $name] 1 1}
-detailed_placement
+# Positive values are required: zero selects native defaults, not zero movement.
+# Pinned Tcl converts22um to45 horizontal sites and5 rows on this source.
+detailed_placement -max_displacement {22 22}
+census ${::env(WARP_AFTER)}.canonical
+geometry ${::env(WARP_GEOMETRY_AFTER)}.canonical
+# Undo OpenDP orientation normalization at the SAME legalized physical bbox.
+foreach inst [$block getInsts] {
+    lassign [dict get $original_orientation [$inst getName]] orient status
+    if {[$inst getPlacementStatus] ne $status} {error "Native placement status changed"}
+    if {[$inst getOrient] ne $orient} {
+        if {$status ne "PLACED"} {error "Native fixed orientation changed"}
+        set box [$inst getBBox]
+        set left [$box xMin]; set bottom [$box yMin]
+        set right [$box xMax]; set top [$box yMax]
+        $inst setOrient $orient
+        $inst setLocation $left $bottom
+        set restored [$inst getBBox]
+        if {[$restored xMin] != $left || [$restored yMin] != $bottom || [$restored xMax] != $right || [$restored yMax] != $top} {
+            error "Restored orientation changed legalized physical bbox"
+        }
+    }
+}
 check_placement -verbose
 census $::env(WARP_AFTER)
 geometry $::env(WARP_GEOMETRY_AFTER)
@@ -113,10 +138,16 @@ def audit_placement(before, after, geometry_before, geometry_after, selected):
     moved = []
     for name, value in old.items():
         if value[0] != new[name][0] or value[2:] != new[name][2:]: raise ValueError("Master/orientation/status changed: " + name)
+        if obox[name][0] != nbox[name][0]: raise ValueError("Native master type changed")
+        oldrect, newrect = obox[name][1], nbox[name][1]
+        if (oldrect[2]-oldrect[0],oldrect[3]-oldrect[1]) != (newrect[2]-newrect[0],newrect[3]-newrect[1]): raise ValueError("Actual native cell dimensions changed")
+        box_delta = tuple(abs(a-b) for a,b in zip(oldrect,newrect))
+        if max(box_delta) > 22*dbu: raise ValueError("Actual native bbox movement exceeds22um bound")
         original = tuple(map(int, value[1].split())); actual = tuple(map(int, new[name][1].split()))
         delta = tuple(abs(a-b) for a,b in zip(original, actual))
         if len(delta) != 2 or max(delta) > 22*dbu: raise ValueError("Movement exceeds22um per-axis bound")
-        if any(delta): moved.append({"instance": name, "axis_displacement_dbu": delta})
+        if any(delta): moved.append({"instance": name, "axis_displacement_dbu": delta,
+                                    "bbox_displacement_dbu": box_delta})
         if name == "u_fabric" and (value != new[name] or obox[name] != nbox[name]): raise ValueError("Fixed macro changed")
     pre = gap_witnesses(geometry_before, selected)
     post = gap_witnesses(geometry_after, selected)

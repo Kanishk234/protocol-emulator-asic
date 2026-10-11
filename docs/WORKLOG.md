@@ -5,6 +5,9 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (fanout dispatch and hold source-path fix)
+- Published generalfanout helpers/CI/evidence8401450/9425863/acf2827 and launched [fanoutscreen38102524361](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38102524361) onacf2827167d1c34c87824f80304ee82aec345206; runningatverification. Holdroute38102291599 fails beforefreshSTA/DRT on mistaken siblingfilename.nl.def (BUG90). Corrected actualDEFpath and fixturethatmirroredbug; no newtimingresult. Next relaunch correctedholdcontinuation underongoingworkflowapproval, inspectbothactualresults. No phasebox.
+
 ## 2026-10-10: Codex (prepare general antenna-aware data fanout repair)
 - Actual antenna result confirms29457 cleared; new failures elsewhere hide target improvement inaggregate36. Prepared canonical general split for30auditeddata drivers,39BUF4added,initialsource/branches<=6 to reserve2antenna loads; all diodes/cellsretained,4clockbranchesunchanged. Added independent fanoutscreen and dynamicstrictreceiptcount.127focused checks pass plusactualsource topology/targetgeneration; bracketescapingmatchesobservedODBbinding. No physical area/timingbenefit orphasepass claimed.
 - User workflowpushapproval persists. Next publish/launchreviewedscreen while holdroute38102291599 runs; preserveoriginalbaseline and inspectfreshoverflow/antenna/timing/electrical beforepromotion.

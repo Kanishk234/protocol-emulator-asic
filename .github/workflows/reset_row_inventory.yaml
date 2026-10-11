@@ -1,0 +1,40 @@
+name: compact native reset row inventory
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_reset_row_inventory.py'
+      - '.github/workflows/reset_row_inventory.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-reset-row-inventory-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch authenticated fixed-original source
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          timeout 120s gh run download 38101405271 -R "$GITHUB_REPOSITORY" --name compact-cfg-fanout-local-38101405271 --dir build/reset_row_inventory_input/fixed_original
+      - name: Provision pinned native image
+        timeout-minutes: 5
+        run: docker pull ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+      - name: Export actual rows and blockages without mutations
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_reset_row_inventory.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-reset-row-inventory-${{ github.run_id }}
+          path: build/reset_row_inventory/
+          retention-days: 7

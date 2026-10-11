@@ -668,3 +668,26 @@ resize on the newly recovered layout.
 - **Reason:** final native0 database37516794406 was not retained (BUG40). No-decap replay37648945387 on saved iteration52 has0 KLayout but12 LVS differences, two fewer layout nets and four extra signal-pin incidences on VGND. Native source still has3 markers; remaining signal shorts are a hypothesis, not a proved cause of LVS12.
 - **Decision:** warm-start the authenticated iteration52/3-marker ODB with16 iterations and15-minute routing-step limit, retaining stock antenna/disconnected checks. Only after native0 run no-decap geometry/LVS; retain final checked ODB/DEF/GDS/netlist/SPEF and exact metrics/hashes. Keep original driver; do not combine D-049 resize. One physical field change is DECAP_CELLS=[] already measured in D-048. Frozen source/config/macro/PDK stay unchanged.
 - **Cost/limits:** bounded compute, possible diode/parasitic changes; decap/power cost remains open. No new resource or protocol-specific hardware. No full native-function/configured timing acceptance. Magic result is recorded separately; partial KLayout/LVS success cannot make all-three-geometry-zero true. A timeout/nonzero native result stops geometry and preserves completed evidence.
+
+## D-082: Measure one existing buffer relocation on the combined placement
+
+**Date:**2026-10-11. **Status:** isolated copied-checkpoint experiment; native
+legality/electrical/routing pending, no frozen architecture change.
+
+Actual38168159774 improves146→133 but still rejects congestion. Authenticated
+marker/connectivity audit finds73/91markers sharing fanout-repair branches,
+without causal attribution. Exact365native row fragments and3606instance boxes
+identify a free site for existingfanout35 (buf_1,MY): bbox
+[102720,457380,104640,461160]→[96000,472500,97920,476280]DBU.
+The21.84µm displacement preserves site/orientation/power phase; source row
+ROW_124_1 spans2880..111360 at472500, with a free96000..111360 tail.
+
+Reproduce combined26-move control, then add this one buffer move. All other
+instances/connectivity stay exact; no cells, protocol blocks or area are added.
+It affects generic CRC/configuration shell routing, not a dedicated protocol.
+Its output-net35 cell-center aggregate proxy worsens36.96µm while input-net40
+improves87.36µm. This deliberate tradeoff requires measured electrical and native
+routing results, not selecting by proxy alone. Six electrical/setup/hold guards
+and native legality precede routing; compare to measured133 control at identical
+clock/routing policy, retain original146control reproduction, reject regression.
+No protocol fit/rate or equal-area superiority claim follows.

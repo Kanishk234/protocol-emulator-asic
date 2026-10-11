@@ -30,6 +30,7 @@ jobs:
           bash spikes/cloud/fetch_pdk.sh
           gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
           timeout 120s gh run download 38101405271 -R "$GITHUB_REPOSITORY" --name compact-cfg-fanout-local-38101405271 --dir build/hotspot_padding_input/fixed_original
+          timeout 120s gh run download 38101639866 -R "$GITHUB_REPOSITORY" --name compact-fanout-local-grt-38101639866 --dir build/hotspot_padding_input/map
       - name: Pull the pinned native image before the mutation timeout
         timeout-minutes: 5
         run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"

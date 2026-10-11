@@ -140,6 +140,13 @@ BUG67 corrects only that proved omission; all actual margins remain exact.
 Candidate was not routed. Retain table/report before policy checks, validate
 actual original/current configs and negative changed-margin/CTS controls, then
 rerun the matched pair. No congestion or electrical guard is relaxed.
+Corrected paired38113003427 is running. In parallel, D-076 prepares a generic
+eight-D-pin identity-delay screen using the exact measured fast Liberty and
+unchanged source image/margins. Both variants explicitly omit parasitics; no
+old SPEF is reused after adding nets. Source contraction/malformed source/path
+negative controls and prepared constraints/AST/YAML pass without local EDA.
+No new physical layout or timing acceptance; later physical cost and loaded
+checks remain mandatory even if intrinsic hold improves.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

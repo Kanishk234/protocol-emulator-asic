@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-10 (session73: resumed real hotspot and iteration results)
+**Done:** resumed existing cloud jobs on fd62279; container provisioning passes
+before observers in both jobs. Downloaded paired150-iteration38100977984:
+both cases actually route and reject native congestion, baseline149 and
+ten-buffer169. More iterations do not close these checkpoints. Downloaded
+38100978078 SUCCESS diagnostic collection: authenticated sources/policies exact,
+actual50-iteration native hotspot files retained, underlying148/169 route
+failures preserved. No diagnostic success is reported as physical acceptance.
+Lint38100977937/docs38100977903/test38100977932/unit38100978024 pass.
+Updated EVIDENCE with separately scoped official9-check
+pass, actual final-C2 loaded function and remaining electrical/timing limits.
+Parallel work continues on strict hotspot parsing/location interpretation,
+limited genuine-clock STA preparation and one zero-original-movement buffer
+legalization counterfactual. No local EDA or frozen hardware change.
+The local source bundle's public upload remains blocked pending exact approval;
+no workaround or indirect publication attempted.
+**Boxes ticked:** none.
+**Next:** inspect actual hotspot source-net geometry, review native configured
+clock/stability checks and legalizer census before launching bounded experiments.
+
 ## 2026-10-10 (session72: parallel research, official pass and hotspot preparation)
 **Done:** resumed cloud checks independently; latest754cf0e lint37960151250/
 docs37960151308/test37960151353/unit37960151280 all pass. Downloaded official

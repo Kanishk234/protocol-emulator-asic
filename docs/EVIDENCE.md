@@ -124,3 +124,36 @@ all pass. No compact promotion, matched native/configured
 timing or equal-area superiority claim follows from these scratch results.
 Exact hashes/limits: `docs/reports/compact_clean_layout_20261007.md` and
 `docs/reports/compact_fanout_native_next_20261007.md`.
+
+## 11. October 10 compact diagnostic update
+
+The unchanged stronger-driver layout now passes all nine unmodified official
+IHP prechecks in [37960021923](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37960021923).
+This complements its native physical results in37708459393; it does not
+qualify the subsequent fanout-buffer layout or configured fabric timing.
+
+The regenerated C2 tile's exact routed final netlist passes real SPI-loaded
+UART, STOP and USER_RESET in both candidate cases, with both controls also
+passing in [37958116481](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37958116481).
+All9164 actual configuration latches match the842-word image; each case checks
+28TX/28RX bytes. This is one substituted tile type with regenerated control
+netlists elsewhere, no SDF. The original mapped C2 failure remains a separate
+open issue; the passing final tile retains its original deferred virtual-clock
+timing failure and62 fanout violations per corner from37814078650.
+
+The shell ten-buffer experiment eliminates the five remaining fanout violations
+in all three explicitly evaluated estimated corners in37956470190. It moves
+1550 original cells, so it cannot inherit the stronger-driver layout's route.
+Paired actual150-iteration global routing in
+[38100977984](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38100977984)
+still fails: cluster8 baseline149 overflow, ten-buffer candidate169. The
+50-iteration native hotspot collection in
+[38100978078](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38100978078)
+successfully retains actual coordinate/net reports while preserving routing
+failure148/169. Diagnostic collection success is not routing acceptance.
+
+The next experiments isolate incidental legalization movement and establish
+genuine image-selected register clocks. Neither full compact qualification,
+an operating frequency nor equal-area superiority is established. See
+`docs/reports/compact_congestion_research_20261009.md` and
+`docs/reports/compact_configured_timing_plan_20261009.md`.

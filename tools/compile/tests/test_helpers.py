@@ -49,7 +49,8 @@ end
 edge_tick; check(ready && !complete && result==expected);
 repeat(3) begin edge_tick; check(result==expected); end
 // Timer remained paused throughout shifting. Resume and check its exact edge count.
-@(negedge clk); enable=1;
+// Allow continuous en/tc/elapsed assignments to settle before sampling.
+@(negedge clk); enable=1; #1;
 for(i=0;i<{cycles};i=i+1) begin
  check(elapsed==(i=={cycles}-1));
  edge_tick;

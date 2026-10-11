@@ -5,6 +5,7 @@ bypasses synthesis, and retains strict routing/signoff and extracted STA. The
 original CLOCK_PORT=null contract cannot establish configured-fabric timing.
 """
 import argparse
+from decimal import Decimal
 import hashlib
 import json
 import os
@@ -31,6 +32,15 @@ RETAINED_METRICS_SHA = "25c02e6f64ca6a336cfd5f802428996e164b15cfa36d2e7c6a0462ed
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def metric_json(value):
+    """Serialize LibreLane numeric metrics without changing gate semantics."""
+    if isinstance(value, Decimal):
+        if not value.is_finite():
+            return str(value)
+        return int(value) if value == value.to_integral_value() else float(value)
+    raise TypeError("Unsupported metric value: " + type(value).__name__)
 
 
 def retain_physical(odb, metrics):
@@ -61,6 +71,8 @@ def retain_physical(odb, metrics):
     interfaces_match = final == reference and signal_count == 306 and bool(final["power_types"])
     for label, inventory in (("reference", reference), ("final", final)):
         (OUT / f"{label}_pin_inventory.json").write_text(json.dumps(inventory, indent=2) + "\n")
+    # Normalize once so the returned evidence is also serializable by callers.
+    metrics = json.loads(json.dumps(metrics, default=metric_json))
     gates = {key: metrics.get(key) for key in PHYSICAL_GATES}
     summary = {"physical_gate_metrics": gates,
         "physical_gate_metrics_zero": all(value == 0 for value in gates.values()),

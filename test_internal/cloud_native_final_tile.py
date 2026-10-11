@@ -29,10 +29,14 @@ def semantic_evidence(text, reset):
             "user_reset_observed": not reset or "after USER_RESET" in text}
 
 
-def main():
+def main(*, final_sha=FINAL_SHA, source_hardening_run=37814078650,
+         input_dir=INPUT, out_dir=OUT):
+    # Explicit provenance permits a new physical candidate without relabeling
+    # its views as the original authenticated hardening.
+    FINAL_SHA, INPUT, OUT = final_sha, input_dir, out_dir
     OUT.mkdir(exist_ok=False)
     result = {"scope": "actual hardened-final C2 loaded functionality only; source timing job FAILED; no physical/timing acceptance",
-              "control_run": "37659171115", "source_hardening_run": "37814078650",
+              "control_run": "37659171115", "source_hardening_run": str(source_hardening_run),
               "source_final_c2_sha256": FINAL_SHA, "physical_or_timing_qualified": False,
               "configuration_tied_to_constants": False, "original_inputs_edited": False,
               "harness": "unchanged D-023 data-routing X hold/pulse; no configuration/user-state force",

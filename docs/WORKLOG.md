@@ -147,6 +147,20 @@ old SPEF is reused after adding nets. Source contraction/malformed source/path
 negative controls and prepared constraints/AST/YAML pass without local EDA.
 No new physical layout or timing acceptance; later physical cost and loaded
 checks remain mandatory even if intrinsic hold improves.
+Actual38113003427 now completes both native routes: baseline146/padded146;
+the111-marker files are byte-identical to the original fixed-original report.
+Fully contained left band retains53markers/85planar overflow, target4. The
+small spacing trial establishes legality/electrical screening, no routing
+improvement; do not promote or repeat unchanged.
+Actual38113263802 passes all twelve intrinsic cases: candidate fast holds
+0.035163/0.022388ns versus−0.049636/−0.061607ns baseline, all six candidate
+setup/hold labels clear. Catalogue area and exact scope are recorded in
+compact_c2_delay_screen_20261011.md; root verifies every hash/path summary.
+D-077 prepares one physical feature trial from pre-buffer source03c21b8e…,
+avoiding duplicate output adapters and retaining all strict physical gates.
+Actual source/contraction/tamper/AST/YAML controls pass, no local EDA. Further
+routing analysis will target actual congested net endpoints rather than merely
+cells intersecting a marker; most selected SPI cells were not on its source nets.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

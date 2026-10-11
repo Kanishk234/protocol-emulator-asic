@@ -2,6 +2,14 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-077: Physically test the generic eight-register delay feature
+- **Date:**2026-10-11. **Status:** accepted copied-input macro trial, no promotion.
+- **Evidence:** intrinsic38113263802 clears all examined delay-case hold/setup at two UART positions/three corners under unchanged margins. Data paths pay additional delay; run catalogue area14.5152µm²/cell, eight cells116.1216µm² excluding physical overhead. This is not routed timing or total chip area.
+- **Decision:** authenticate existing original source archive and derive exactly eight identity D delays from its pre-buffer mapped C2 source. Reuse the original no-synthesis physical flow without duplicating output adapters. Keep190.08×196.56µm footprint and original PG, pin rectangles, routing layers,20ns virtual-clock policy and every physical checker. Retain original mapped source, reversible change inventory, exact input hashes and eight surviving delay instances.
+- **Benefits/cost:** protocol-agnostic register timing repair, useful to future register-based designs; no UART/SPI/I2C engine or new user resource. Every program pays data-path delay and placement/routing/power cost. Actual physical area/corners/loading costs must be measured. No equal-area superiority or architecture claim from intrinsic data.
+- **Limits/alternatives:** existing virtual-clock constraints still cannot prove programmed timing. Full clock/configuration modes, fresh extracted configured STA, loaded functionality and other tile types remain necessary. Genuine sensitization analysis or smaller buffers remain alternatives. Any strict routing/geometry/interface/delay-retention failure rejects the trial. Preserve deferred timing errors independently; diagnostic success only records actual zero physical gates.
+- **Evidence:** cloud_c2_delay_harden.py/c2_delay_harden.yaml, actual intrinsic-source validation, exact pre-buffer contraction/tamper controls and AST/YAML pass without local EDA. Standard65min hosted job/3000s native bound, compact artifact retention. No frozen/generated RTL or upstream source edits.
+
 ## D-076: Screen generic user-register delay against measured fast hold paths
 - **Date:**2026-10-10. **Status:** accepted intrinsic-only copied-netlist diagnostic; no architecture or physical promotion.
 - **Data/benefit:**38112173902 reports fast self-feedback hold−0.032927/−0.037383ns at two loaded UART positions. Read the exact pinned fast Liberty used by that run, matching SHAaf12d75a…; it includes non-inverting dlygate4sd1_1 with X=A. A standard data-delay repair is protocol-agnostic and could help every design using registers; no protocol controller or new user resource is added.

@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (audit SRAM screen and prepare extracted continuation)
+- Downloaded selected evidence from artifact 11692116594. Canonical source/proposal, unchanged cells/nets, final relocated site and zero-overflow checks pass. Screen setup WS 0 ns all corners; fast hold 95.3164 ps. Electrical slow/typ/fast slew 34/1/1, fanout 18 each, capacitance 0 each: electrical closure still fails. Screen comparison uses the same state on both sides, so no before/after benefit claim.
+- Prepared separate selected_sram_route.py and gds-selected-sram-route workflow pinned to successful screen 38111368461/head d6c39dd. Rechecks source/history/placement/antenna/timing before stock DRT and fresh extraction; no repeated move. 71 focused tests pass with the configured Tcl runtime; initial run omitted its PATH and was rerun successfully. User-supplied current Git rules reserve commit/push for the user; files remain local and no new workflow launched. Next user publishes this group, then launch and inspect extracted timing/electrical results. No phase boxes ticked.
+
+## 2026-10-10: Codex (confirm selected SRAM screen completion)
+- GitHub confirms selected SRAM screen 38111368461 succeeded on d6c39ddda6793033b45fde94a8d50517fb3a743d. Job logs confirm wire9447 relocation and exact site/master/nets retained after legalization. Screen reports setup WS 0 ns in all three corners and fast hold 0.0953164 ns, typical 0.20328 ns, slow 0.378222 ns.
+- These are screen results, not final extracted timing or official GDS closure. Next retrieve and independently audit artifact electrical/topology/antenna evidence, then prepare guarded detailed-routing and extraction continuation. No phase boxes ticked; no commits or pushes in this session.
+
 ## 2026-10-10: Codex (verify selected SRAM screen launch)
 - Tools/CI/docs ad54e1e/f58b587/d6c39dd pushed; remoteexactheadverifiedd6c39ddda6793033b45fde94a8d50517fb3a743d. [SelectedSRAM screen38111368461](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38111368461) queuedonexacthead. Oneexistingoutput0bufferrelocationonselectedlatestsetup route; 138focusedchecks/actualsourcegeometryauditpass.
 - Next inspectactualmovement/legalization/antenna/allcorner/electrical/overflow beforequalifiedDRT/extraction. No phasebox;FIPE/unrelatedlocalprototypesexcluded,nohardwarehistorychanges.

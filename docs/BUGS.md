@@ -4,7 +4,7 @@
 - **Date:**2026-10-11.
 - **Symptom/check:**38163818509 authenticates/prepares all six cases, then all containers reject working directory with returncode125; no STA command executed.
 - **Root cause:** new candidate adapter omitted the original STA CLI's resolve() conversion for output/physical/PDK paths.
-- **Fix/coverage:** resolve those paths before invoking the unchanged STA engine. Original case hashes, own SPEF, loaded-result authentication and all margins remain unchanged. Retained actual logs establish setup-only failure; static check verifies all three paths are resolved. Fresh cloud execution required; no timing conclusion from failed launch.
+- **Fix/coverage:** resolve those paths before invoking the unchanged STA engine. Original case hashes, own SPEF, loaded-result authentication and all margins remain unchanged. Retained actual logs establish setup-only failure; static check verifies all three paths are resolved. Actual retry38164099529 executes all six native cases with complete reports/eight clock endpoints each; examined setup/hold violations0. No timing conclusion from the failed launch itself.
 
 ## 70: Loaded candidate workflow depends on an expired control artifact
 - **Date:**2026-10-11.

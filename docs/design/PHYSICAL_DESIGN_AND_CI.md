@@ -2,7 +2,19 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
-**October10 update:** official precheck37960021923 passes all9 checks on the
+**October11 current checkpoint:** eight-delay C2 native physical stages complete
+with seven zero gates38114298036 (10m05s whole hosted job), real-loaded native
+UART/USER_RESET passes38163199372, and six conditional extracted internal
+timing cases pass38164099529 (1m53s whole hosted job), worst examined hold
++0.042992ns. Source virtual-clock failure remains; loading/I/O/intertile/other
+tile/active annotation gates remain open. Separately, exact one-reset-tie
+placement38163199430 passes legality/six estimated electrical cases; paired
+GRT38163542037 measures146→136 overflow under original50iteration policy,
+both cases fail. Historical artifact-based original-view replays are now
+manual-only; the current candidate regenerates/tests controls from durable
+approved sources and checks exact hashes. All heavy EDA remains hosted.
+
+**October10 historical checkpoint:** official precheck37960021923 passes all9 checks on the
 stronger-driver37708459393 layout, with authentic geometry/native export
 invariants. New cluster8/ten-buffer placement still fails GRT:148/169 in
 37958932549; actual150-iteration38100977984 fails149/169 after both cases

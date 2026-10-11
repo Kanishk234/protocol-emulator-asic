@@ -1,24 +1,29 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-10). Clean README reproduction now
+**Status:** in progress (updated 2026-10-11). Clean README reproduction now
 passes on a fresh hosted runner37690896748: rebuilt bitstreams, loaded30/30
 and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
 remain open. This is a separate reproducibility result from checkpoint experiments.
 
-Official Tiny Tapeout precheck now passes all nine checks37960021923 on the
-stronger-driver experimental layout. Its precheck blocker is closed. The
-new fanout-free shell placement still has routing congestion169 even after
-150iterations38100977984; its baseline also actually routes and fails149.
-Native hotspot capture38100978078 succeeds while retaining failed148/169
-routing. Most reported congestion lies in the left-shell CRC/SPI/clock band,
-not the bottom configuration corner. The reviewed fixed-original-placement
-counterfactual38101405271 is running in the cloud; it requires all3596
-original cell placements unchanged before six explicit estimated STA screens.
-Parallel research adds strict electrical/hotspot-report audits and real
-loaded-clock inventory. RUN configuration-stability proof and configured
-timing remain open. These are separate
-measured scopes; the complete compact successor is still unqualified.
+Official Tiny Tapeout precheck passes all nine checks37960021923 on the
+stronger-driver experimental layout. The fanout-free fixed-original placement
+passes six estimated STA screens38101405271 but fails native routing146overflow.
+Five-cell spacing leaves146 unchanged38113003427; moving one actual reset-net
+endpoint lowers146→13638163542037. Both routes still fail, and the left-shell
+band remains congested. This is measured progress with a specific next lead:
+many constant reset drivers are far from their single loads, but nearby rows
+are dense, so repair needs actual legal whitespace rather than blind shifts.
+
+The eight-delay C2 candidate has zero native physical gates38114298036 and
+passes genuine SPI-loaded UART/USER_RESET38163199372. Fresh extracted timing
+38164099529 clears all examined internal setup/hold paths at two programmed
+positions/three corners, worst hold+0.042992ns under unchanged margins.
+Stationary configuration, incomplete annotation/I/O/loading/intertile/other
+tiles/programs remain limits; no full-chip timing acceptance. RUN configuration
+property38102131236 passes only its84-cycle assumptions/bound. See the dated
+physical/extracted reports for precise evidence. The complete compact
+successor remains unqualified; no phase boxes or hardware-freeze changes.
 
 Older investigation paragraphs below describe intermediate checkpoints and
 their limits at the time; the current official-precheck result is the nine-check

@@ -151,5 +151,5 @@ def main(kind):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--kind', choices=['antenna', 'hold', 'fanout'], required=True)
+    parser.add_argument('--kind', choices=['antenna', 'hold', 'fanout', 'clock'], required=True)
     main(parser.parse_args().kind)

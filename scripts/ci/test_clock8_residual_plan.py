@@ -10,6 +10,11 @@ def fixture(monkeypatch, kind):
         rows = ['sg13cmos5l_nand2_1 _29457_ (.A(a), .B(b), .Y(_04467_));']
         rows += [f'sg13cmos5l_antennanp ANTENNA_{i} (.A(_04467_));' for i in range(12)]
         rows += [f'sg13cmos5l_buf_1 sink{i} (.A(_04467_), .X(out{i}));' for i in range(8)]
+    elif kind == 'clock':
+        rows = []
+        for branch in range(4):
+            rows.append(f'sg13cmos5l_buf_8 clkbuf_2_{branch}_0_clk_regs (.A(root), .X(clock{branch}));')
+            rows += [f'sg13cmos5l_buf_8 leaf{branch}_{i} (.A(clock{branch}), .X(leafnet{branch}_{i}));' for i in range(16)]
     else:
         rows = []
         for endpoint, net, driver, master in repair.HOLD:
@@ -41,7 +46,7 @@ def test_exact_identity_repair(monkeypatch, kind):
     assert not result['physical_timing_measured']
 
 
-@pytest.mark.parametrize('kind', ['antenna', 'hold'])
+@pytest.mark.parametrize('kind', ['antenna', 'hold', 'clock'])
 @pytest.mark.parametrize('mutation', ['source', 'layout', 'delete', 'invert', 'rewire', 'proposal'])
 def test_no_unreviewed_change(monkeypatch, kind, mutation):
     before, layout, after, proposal = fixture(monkeypatch, kind)
@@ -49,12 +54,16 @@ def test_no_unreviewed_change(monkeypatch, kind, mutation):
     if mutation == 'layout': layout += '\n// altered layout'
     if mutation == 'delete': after = after[:after.rfind('\n')]
     if mutation == 'invert': after = after.replace(proposal['buffer_master']+' tripwire', 'sg13cmos5l_inv_4 tripwire')
-    if mutation == 'rewire': after = after.replace('.CLK(clk)', '.CLK(other)') if kind == 'hold' else after.replace('.B(b)', '.B(other)')
+    if mutation == 'rewire':
+        old, new = {'hold': ('.CLK(clk)', '.CLK(other)'),
+                    'antenna': ('.B(b)', '.B(other)'),
+                    'clock': ('.A(root)', '.A(other)')}[kind]
+        after = after.replace(old, new)
     if mutation == 'proposal': proposal = copy.deepcopy(proposal);proposal['groups'][0]['sinks'].pop()
     with pytest.raises(ValueError): repair.validate_change(before, layout, after, proposal)
 
 
-@pytest.mark.parametrize('kind', ['antenna', 'hold'])
+@pytest.mark.parametrize('kind', ['antenna', 'hold', 'clock'])
 def test_generated_tcl_is_complete_and_bounded(monkeypatch, kind, tmp_path):
     import subprocess
     from pathlib import Path
@@ -121,3 +130,41 @@ def test_data_fanout_targets_preserve_observed_bracket_encoding(monkeypatch):
     call = repair.target_call(before, layout, 'fanout')
     assert '{u_chip.g_unit\\[0\\].r\\[1\\]}' in call
     assert '{u_chip.g_unit[0].r[1]}' not in call
+
+
+def test_clock_branch_identity_and_bounds(monkeypatch):
+    before, layout, after, proposal = fixture(monkeypatch, 'clock')
+    repair.validate_change(before, layout, after, proposal)
+    assert proposal['added_buffers'] == 8
+    assert proposal['buffer_master'] == 'sg13cmos5l_buf_8'
+    assert proposal['upstream_sink_pins'] == 2
+    assert proposal['downstream_sink_pins'] == [8]*8
+    for mutation in (after.replace('.A(clock0)', '.A(wrong)'),
+                     after.replace('sg13cmos5l_buf_8 tripwire', 'sg13cmos5l_inv_8 tripwire')):
+        with pytest.raises(ValueError):
+            repair.validate_change(before, layout, mutation, proposal)
+
+
+def test_clock_branch_rejects_unreviewed_sink(monkeypatch):
+    before, layout, after, proposal = fixture(monkeypatch, 'clock')
+    before = before.replace('leaf0_0 (.A(clock0)', 'leaf0_0 (.CLK(clock0)')
+    monkeypatch.setattr(repair, 'NL_SHA', hashlib.sha256(before.encode()).hexdigest())
+    with pytest.raises(ValueError, match='clock buffer loads'):
+        repair.plan(before, layout, 'clock')
+
+
+@pytest.mark.parametrize('mutation', ['driver_master', 'load_master', 'placement', 'load_count'])
+def test_clock_branch_source_guard(monkeypatch, mutation):
+    before, layout, after, proposal = fixture(monkeypatch, 'clock')
+    if mutation == 'driver_master':
+        before = before.replace('sg13cmos5l_buf_8 clkbuf_2_0', 'sg13cmos5l_buf_4 clkbuf_2_0')
+    elif mutation == 'load_master':
+        before = before.replace('sg13cmos5l_buf_8 leaf0_0 ', 'sg13cmos5l_buf_4 leaf0_0 ')
+    elif mutation == 'placement':
+        layout = '\n'.join(line for line in layout.splitlines() if not line.startswith('- leaf0_0 '))
+    else:
+        before = '\n'.join(line for line in before.splitlines() if ' leaf0_0 ' not in line)
+    monkeypatch.setattr(repair, 'NL_SHA', hashlib.sha256(before.encode()).hexdigest())
+    monkeypatch.setattr(repair, 'DEF_SHA', hashlib.sha256(layout.encode()).hexdigest())
+    with pytest.raises(ValueError):
+        repair.plan(before, layout, 'clock')

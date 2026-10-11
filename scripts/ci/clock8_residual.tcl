@@ -1,6 +1,6 @@
 # Exact NL/DEF and canonical-plan audit must precede this binding. Preflight all
 # groups before mutation. Caller must legalize, clear old signal wires, reroute,
-# check topology, antennas and fresh allcorner setup/hold. No clock pins allowed.
+# check topology, antennas and fresh allcorner setup/hold. Only buffer inputs may be moved on the reviewed clock branches; no leaf clock/reset pins.
 proc tripwire_clock8_residual {master_name expectations groups} {
     set block [ord::get_db_block]
     set master [[ord::get_db] findMaster $master_name]
@@ -49,6 +49,7 @@ proc tripwire_clock8_residual {master_name expectations groups} {
         lassign $group buffer_name net_name source rails location terms
         set buffer [odb::dbInst_create $block $master $buffer_name]
         set downstream [odb::dbNet_create $block $net_name]
+        $downstream setSigType [$source getSigType]
         [$buffer findITerm A] connect $source
         [$buffer findITerm X] connect $downstream
         foreach term $terms {$term disconnect; $term connect $downstream}

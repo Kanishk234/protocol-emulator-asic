@@ -97,6 +97,30 @@ def plan(before, layout, kind):
         if len(selected_drivers) != 30:
             raise ValueError('Expected thirty audited antenna-loaded data drivers')
         upstream = 6
+    elif kind == 'clock':
+        # Split only the four audited internal clock-buffer branches.
+        # Leaf clock pins and all existing buffer masters remain unchanged.
+        for branch in range(4):
+            driver = f'clkbuf_2_{branch}_0_clk_regs'
+            if cells.get(driver, (None,))[0] != 'sg13cmos5l_buf_8':
+                raise ValueError('Wrong reviewed clock branch driver')
+            net = dict(cells[driver][1]).get('X')
+            if not net:
+                raise ValueError('Missing clock branch output')
+            sinks = [s for s in attached(cells, net) if s != (driver, 'X')]
+            if len(sinks) != 16 or any(p != 'A' or cells[n][0] != 'sg13cmos5l_buf_8' for n, p in sinks):
+                raise ValueError('Wrong reviewed clock buffer loads')
+            if any(n not in positions for n, p in sinks) or driver not in positions:
+                raise ValueError('Missing clock branch placements')
+            axis = max(range(2), key=lambda j: max(positions[n][j] for n, p in sinks)-min(positions[n][j] for n, p in sinks))
+            sinks.sort(key=lambda x: (positions[x[0]][axis], x))
+            for index in range(2):
+                selected = sinks[index*8:(index+1)*8]
+                name = f'tripwire_clock8_clock_{branch}_{index}'
+                groups.append(dict(buffer=name, net=name+'_net', source_net=net,
+                    rail_source=driver, sinks=selected,
+                    location=[sum(positions[n][j] for n, p in selected)//8 for j in range(2)]))
+        upstream = 2
     elif kind == 'hold':
         for endpoint, net, driver, master in HOLD:
             if cells.get(endpoint, (None,))[0] != 'sg13cmos5l_dfrbpq_1' or dict(cells[endpoint][1]).get('D') != net:
@@ -110,7 +134,7 @@ def plan(before, layout, kind):
         upstream = 1
     else:
         raise ValueError('Unreviewed repair kind')
-    master = 'sg13cmos5l_buf_1' if kind == 'hold' else 'sg13cmos5l_buf_4'
+    master = {'hold': 'sg13cmos5l_buf_1', 'clock': 'sg13cmos5l_buf_8'}.get(kind, 'sg13cmos5l_buf_4')
     old_nets = {v for _, pins in cells.values() for _, v in pins}
     if any(g['buffer'] in cells or g['net'] in old_nets for g in groups):
         raise ValueError('Repeated repair names')
@@ -167,6 +191,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('netlist', type=Path)
     parser.add_argument('layout', type=Path)
-    parser.add_argument('--kind', choices=['antenna', 'hold', 'fanout'], required=True)
+    parser.add_argument('--kind', choices=['antenna', 'hold', 'fanout', 'clock'], required=True)
     args = parser.parse_args()
     print(json.dumps(plan(args.netlist.read_text(), args.layout.read_text(), args.kind), indent=2))

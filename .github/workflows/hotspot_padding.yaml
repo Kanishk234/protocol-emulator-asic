@@ -1,0 +1,46 @@
+name: compact local shell hotspot padding diagnostic
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_hotspot_padding.py'
+      - '.github/workflows/hotspot_padding.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-hotspot-padding-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch authenticated original provenance and fixed-original checkpoint
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+          timeout 120s gh run download 38101405271 -R "$GITHUB_REPOSITORY" --name compact-cfg-fanout-local-38101405271 --dir build/hotspot_padding_input/fixed_original
+      - name: Pull the pinned native image before the mutation timeout
+        timeout-minutes: 5
+        run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"
+      - name: Apply local one-site padding, audit actual geometry and six corners
+        timeout-minutes: 35
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_hotspot_padding.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-hotspot-padding-${{ github.run_id }}
+          path: build/hotspot_padding/
+          retention-days: 3

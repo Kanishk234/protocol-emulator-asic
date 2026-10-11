@@ -5,6 +5,29 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (clock extracted result; select fanout convergence checkpoint)
+- Clock38104539932 succeeds/artifact11689569002. Fresh slow setup-186.608ps,fast hold76.139ps; complete electrical audits match slew177/5/5 slow/typ/fast,fanout36each,cap4each. Clockfanoutcleared, overallsetup/electricalfails. Allthreeindependentroutesnowmeasured.
+- Select fanout38103189246 as convergence checkpoint (-65.507pssetup,93.254psfasthold,120slowslew/14fanout/2cap), retainoriginalpassingtimingreference. Next oneintegrated follow-up on exactfanout residuals/setup/SRAM/clocks; no blindtransplant or additiveclaims. No phasebox/promotion/newdispatch.
+
+## 2026-10-10: Codex (parallel integrated residual target analysis)
+- Retrieved exact final fanout NL/critical paths; mapped14fanout failures to4clock/10data targets and diode counts. Shared two failing setup paths U0word0bit4→U2TXeq13/14 include24811 NAND3_1 with1.349ns slow cell delay; candidate sizing probe, not measured gain. Hold12461 lies on both paths and must remain protected.
+- Identified place8636 BUF1 cap failure at8loads; SRAM DOUT0→wire9447BUF4, REN29426/sharedhold11833, MEN29663 and ADDR6/0→place7514/7516. Concrete evidence in timing report. Clock route still active; next measured sizing/placement and combined repair on selected checkpoint, no new independent launch/phase box.
+
+## 2026-10-10: Codex (fanout extracted results audited)
+- Fanout38103189246 succeeds/artifact11689887054; slow setup-65.507ps, fast hold93.254ps; typ/fast setup0. Independent allcorner electrical audit passes: slew120/22/6 slow/typ/fast,fanout14each,cap2each. Four residual clocks/ten data; cap place8636 and SRAM DOUT0. Estimated fanout8/slow slew11 did not survive DRT.
+- Prefer fanout over hold as provisional convergence checkpoint (41→14fanout,187→120slow slew,4→2cap; similar timing). Clock38104539932 still runs; select integrated follow-up after its evidence, no new independent candidate launch/phase box/promotion.
+
+## 2026-10-10: Codex (hold extracted results audited)
+- Hold38102572131 succeeds/artifact11689807226. Fresh slow setup-67.697ps; fast hold91.668ps (passes50ps),typ187.180ps,slow353.128ps; typ/fast setup0. Allcorner electrical report reparse matches summaries: slew187/22/6 slow/typ/fast,fanout41each,cap4each. Hold fix survives extraction, but setup/electrical closure fails; no promotion/phase box.
+- Fanout38103189246/clock38104539932 still running. Next compare their extracted evidence and diagnose post-antenna/SRAM/critical setup repairs; retain original timing baseline.
+
+## 2026-10-10: Codex (hold route reaches evidence upload)
+- Hold38102572131 reaches artifact upload; fanout38103189246 and clock38104539932 still run combined qualification/routing/extraction. Latest main lint/test/docs remain successful, unit active. Artifact upload alone does not prove timing closure; inspect physical-step conclusion and final extracted reports next. No phase box.
+
+## 2026-10-10: Codex (three route workflow status check)
+- Hold38102572131, fanout38103189246 and clock38104539932 are in progress at the combined fresh qualification/routing/extraction step; setup/download/provenance steps succeed. No final artifacts or extracted timing conclusion read this session. Latest main test38104699981/lint38104699951/docs38104699969 succeed; unit38104699937 still active.
+- Next retrieve completed route artifacts and compare allcorner setup/hold/electrical/DRC before selecting post-antenna repair source. No phase box or promotion.
+
 ## 2026-10-10: Codex (parallel post-antenna load diagnosis)
 - All three extracted routes remain in progress. Added exact-netlist electrical load auditor; four checks pass and actual clock report confirms31data/0clockfanout branches, including20loads/12diodes on29457. Incomplete reports, wrong totals and absent drivers fail closed.
 - Documented bounded post-antenna residual repair plan with actual loads, possible four-load/multilevel partition and strict fresh antenna/electrical/timing/overflow rechecks. Physical policy not implemented or launched; await extracted checkpoint selection. No phase box or promotion.

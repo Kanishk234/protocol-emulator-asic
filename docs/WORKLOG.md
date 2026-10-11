@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (implement SRAM locality planner and clean portability prototype)
+- Implemented exact-source read-only sram_bank_plan with separate routed/clean-stage hashes, macro pin geometry, complete row-gap allocation and combined overlap guards; actual DRT14move and cleanGPL16move proposals pass with0addedcells. Generates reviewed MANUAL_GLOBAL_PLACEMENTS candidate fragments; no main config edits.
+- Inspected official action/support and exactLibreLane3.1.0.dev3 source: native Classic manual-placement step exists; actual archived cleanstage32NL proves all16interfaceBUF4 names already exist before it. Prepared clean stock-image synthesis-to-GRT screen/workflow, no checkpoint initial state/customimage/step replacement, strict pre-manual topology/placement/legalization/overflow/freshantenna/allcorner50ps gates.97focusedchecks pass; physicalscreen unexecuted.
+- Documented clean-build integration route and necessary future reviewed config-whitelist exception in PHASE2_OFFICIAL_FLOW_PORTABILITY_AUDIT.md. Residual extraction38179535945 last observed in progress. Next publish reviewed locality prototype and launch under scopedapproval; inspect physical results before adoption. No phaseboxes/commit/push/newdispatch; FIPE/unrelatedfiles untouched.
+
+## 2026-10-11: Codex (publish and launch residual data extraction)
+- User continuation of proposedpublication/launch executed: tools4e091d5, CIde14daf, docs9f4f465 pushed to remotemain. Exactremotehead9f4f4655a330c3a32e45fd02af39a5d136410687 verified. [Residual data routing/extraction38179535945](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38179535945) queued on that exactcommit.
+- Next inspect extracted allcorner timing/electrical and routing/antenna evidence before nextpolicyrepair. No phaseboxes ticked. Unrelated files/FIPE excluded; launchreceipt remainslocal.
+
 ## 2026-10-11: Codex (audit residual data screen and prepare extraction)
 - Downloaded66selected evidencefiles; actualsource/canonical fourbranch partition/allcell/logic/diode conservation, receipts/singlewire reset/zerooverflow and antennaonly congestiondisallowed cleanup audits pass. _28820_ absent from finalscreen fanout failures;13slow slew/24fanout reportrows matchmetrics.
 - Prepared residual_data_route.py/test/workflow pinned to exactscreen38178293907/head2105f48, fresh antenna/allcorner50psgate beforestockDRT/extraction, no repeatedsplit.117focusedtests pass including complete checkpoint rejection. No physicalextraction/newdispatch/phaseboxes; next publish reviewedtools/CI/docs under scopedapproval and launch.

@@ -1,5 +1,11 @@
 # Bugs
 
+## 68: Physical delay helper eagerly imports simulation dependencies
+- **Date:**2026-10-11.
+- **Symptom/check:**38113928620 fails before physical execution with missing cocotb; no routing was attempted and no physical artifacts were produced.
+- **Root cause:** importing the shared identity-delay transformation also imported the configured simulation audit through the timing-screen module, although physical preparation does not use that audit.
+- **Fix/coverage:** load configured timing dependencies only within timing execution or the timing-screen command entry point. The physical helper imports and authenticates the actual intrinsic result under project-venv Python with site packages disabled. Cloud retry must still validate native physical execution; this import check is not a physical pass.
+
 ## 67: Paired routing observer treats omitted CTS setting as a change
 - **Date:**2026-10-10.
 - **Symptom/check:**38112711226 runs baseline native GRT and reproduces146 overflow, then stops its observer before the padded case because CTS_SINK_CLUSTERING_SIZE is absent in the resolved stage config.

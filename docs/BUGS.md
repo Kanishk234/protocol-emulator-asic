@@ -1,5 +1,11 @@
 # Bugs
 
+## 72: New C channel reader can consume an unreported arriving byte
+- **Date:**2026-10-11.
+- **Symptom/check:** deeper host-driver review against actual wp_spi_target/wp_shell handshake found direct empty CH_READ polling unsafe. STATUS snapshots near CS start, but rd_hit latches FIFO validity at opcode completion; a byte arriving between these events can be popped even when returned status.rx_valid was0. Initial scripted callback tests did not model this interval.
+- **Root cause:** driver assumed opcode-time status and read-hit sampled at the same point.
+- **Fix/coverage:** poll harmless READ_ID first; issue CH_READ only after observed RUNNING/rx_valid under exclusive host ownership, matching existing Python behavior. Add callback regression requiring no empty CH_READ and ordered progress/error cases. Corrected driver plus root integrated board/host tests pass locally; scripted arrival-race fixture asserts empty polls use only READ_ID before the nonempty read. No board speed claim or RTL change.
+
 ## 71: Candidate extracted-STA adapter passes relative Docker paths
 - **Date:**2026-10-11.
 - **Symptom/check:**38163818509 authenticates/prepares all six cases, then all containers reject working directory with returncode125; no STA command executed.

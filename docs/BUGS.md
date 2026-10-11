@@ -1,5 +1,23 @@
 # Bugs
 
+## 76: Operating report accepts impossible or reversed pin mappings
+- **Date:**2026-10-11.
+- **Symptom/check:** adversarial report fixtures with FAB_IN99 or a reversed FAB_IN0 role pass syntactic metadata validation.
+- **Root cause:** compiler report pin names/roles were not checked against the selected architecture's actual pin table.
+- **Fix/coverage:** authenticate pins.csv against compiler provenance; reject unknown pins, incompatible roles and duplicate definitions. Tests cover each failure and actual38167697759 pin table; report includes actual fabric locations/chip labels. This establishes mapping consistency only.
+
+## 77: Triggered fault loaded workflow assumes the wrong bitstream filename
+- **Date:**2026-10-11.
+- **Symptom/check:** independently downloaded compiler38168186117 produces trigger.wbit; pending loaded workflow specifies uart_trigger_fault_top.wbit.
+- **Root cause:** workflow assumed top module filename rather than the pin-map-derived compiler output name.
+- **Fix/coverage:** use actual trigger.wbit in same-job load environment; cloud retry required. No simulation pass inferred from compiler success.
+
+## 75: C loader rejects a valid recovery because of an old sticky error
+- **Date:**2026-10-11.
+- **Symptom/check:** independent shell-model recovery tests show successful configuration reaches LOADED while a previous wrong-architecture or bad-command error remains sticky, causing the new C loader to return WARP_LOAD.
+- **Root cause:** successful LOAD_BEGIN/LOAD_END do not clear old ERROR_CODE; the driver assumed final errors belonged to the current load.
+- **Fix/coverage:** after architecture/non-RUNNING guards, explicitly read/clear prior errors before LOAD_BEGIN, then check final load state/error. Model regressions cover both recovery paths; no RTL change or ambiguous-I/O retry.
+
 ## 74: Helper one-cycle delay test samples before combinational settling
 - **Date:**2026-10-11.
 - **Symptom/check:** cloud38167100528 fails only helper[3-0-1] at time120; other two parameter cases pass and compiler38167100577 succeeds separately.

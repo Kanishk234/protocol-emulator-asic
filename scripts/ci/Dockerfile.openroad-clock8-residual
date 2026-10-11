@@ -1,0 +1,4 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY --chmod=755 openroad_clock8_residual_wrapper.sh /usr/local/bin/tripwire-openroad-clock8-residual
+COPY native_hold100_size.tcl clock8_residual.tcl clock8_residual_targets.tcl /usr/local/share/tripwire/
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-openroad-clock8-residual

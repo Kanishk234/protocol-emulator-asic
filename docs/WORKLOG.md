@@ -37,6 +37,14 @@ property with original F2 assumptions and nonvacuous RUN cover; BMC84/cover84
 remain unexecuted, no configured STA claim. Tools/workflow committed1c7fdd0/
 aba52fa for bounded hosted execution. No full physical or configured timing
 pass follows from these separately scoped results.
+**Parallel launch preparation:** authenticated fixed-original GRT replay
+committed930280b/1ebc2c5; actual38101639866 runs both unchanged50-iteration
+cases with native report capture. Mode property38101606932 is running;
+depth84 may cover only a minimal sync-only load, not a complete five-row write,
+so no bounded pass will justify arbitrary full-load STA by itself. Added
+software-only frozen-G1 design-set nine-build seed sweep, keeping all trial
+failures, tool/input hashes and compiler estimates; local report/matrix and
+dedicated-process-group cleanup controls pass, no local synthesis/P&R.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

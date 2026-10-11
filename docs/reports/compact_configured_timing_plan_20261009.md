@@ -94,3 +94,25 @@ connections. No frequency, competition readiness, all-image safety or hardware
 promotion follows from this preparation. The next action is review of boundary
 constraints, clock/annotation coverage and mode properties before adding a
 bounded cloud STA workflow.
+
+## October 10 mode-property preparation
+
+New cloud_run_config_property.py authenticates the actual compact shared-CRC
+shell and configuration pipeline, rather than substituting current fallback
+RTL. Instrumented copies retain original F2 checks and its explicit assumption
+that the abstract SPI receiver does not deliver a byte while CRC is busy.
+Fabric response outputs are arbitrary; mapped configuration storage is not
+included. Added assertions check cfg_strobe/restart/frame strobes inactive in
+RUN and cfg_word/frame_data stable across consecutive RUN cycles. No RUN or
+configuration stability assumption is introduced. Require both84-cycle BMC
+and all84-cycle covers, including reachable RUN. Source preparation controls
+pass; hosted38101606932 is pending. This is not an STA execution.
+
+The shared CRC takes32 cycles per word. Depth84 may reach RUN after a minimal
+sync-only load but cannot demonstrate a complete five-row frame write followed
+by RUN. Even a pass therefore supplies only the stated short bounded evidence;
+it is insufficient alone to justify constant case analysis after arbitrary
+full loads. A separate full-frame-write→RUN reachability check needs a larger
+justified bound or a partitioned invariant proof. Actual loaded-image simulation
+already covers the concrete longer UART execution, without proving all traces.
+async2sync/dffunmap model clock-cycle behavior, not analog reset or pulse safety.

@@ -157,3 +157,11 @@ genuine image-selected register clocks. Neither full compact qualification,
 an operating frequency nor equal-area superiority is established. See
 `docs/reports/compact_congestion_research_20261009.md` and
 `docs/reports/compact_configured_timing_plan_20261009.md`.
+
+The fixed-original counterfactual subsequently passes in
+[38101405271](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38101405271):
+all3596 original placements/orientations/masters/statuses remain exact, movement0,
+with the same ten buffer connections and all three explicit estimated candidate
+fanout/slew/cap/setup/hold violation counts0. See
+`docs/reports/compact_fixed_original_buffers_20261010.md`. Fresh native routing
+and extraction remain necessary; this is no configured-fabric timing pass.

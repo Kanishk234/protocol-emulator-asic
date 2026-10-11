@@ -1,0 +1,46 @@
+name: conditional C2 internal timing diagnostic
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_configured_c2_sta.py'
+      - '.github/workflows/configured_c2_sta.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-configured-c2-sta-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Venv and exact original physical/loaded evidence
+        timeout-minutes: 12
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install -r test/requirements.txt pyyaml==6.0.3
+          bash spikes/cloud/fetch_checkpoint.sh
+          bash spikes/cloud/fetch_pdk.sh
+          timeout 120s gh run download 37814078650 -R "$GITHUB_REPOSITORY" --name matched-c2-harden-37814078650 --dir build/configured_c2_input/physical
+          timeout 120s gh run download 37958116481 -R "$GITHUB_REPOSITORY" --name native-final-tile-37958116481 --dir build/configured_c2_input/native
+      - name: Conditional stationary image; six bounded internal timing cases
+        timeout-minutes: 25
+        run: |
+          source .venv/bin/activate
+          docker pull ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          WARP_WORDS=$(python -c 'import json; from pathlib import Path; m=json.load(open("build/cloud_input/materialized.json")); print(Path(m["native_work"]).parent/"compiled_structural/uart_words.hex")')
+          python test_internal/cloud_configured_c2_sta.py --native-evidence build/configured_c2_input/native --physical-evidence build/configured_c2_input/physical --words "$WARP_WORDS" --out build/configured_c2_sta_evidence --pdk-root "$PDK_ROOT" --execute-cloud
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: conditional-configured-c2-sta-${{ github.run_id }}
+          path: build/configured_c2_sta_evidence/
+          retention-days: 3

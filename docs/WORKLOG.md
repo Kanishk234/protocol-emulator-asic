@@ -5,6 +5,25 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (audit residual data screen and prepare extraction)
+- Downloaded66selected evidencefiles; actualsource/canonical fourbranch partition/allcell/logic/diode conservation, receipts/singlewire reset/zerooverflow and antennaonly congestiondisallowed cleanup audits pass. _28820_ absent from finalscreen fanout failures;13slow slew/24fanout reportrows matchmetrics.
+- Prepared residual_data_route.py/test/workflow pinned to exactscreen38178293907/head2105f48, fresh antenna/allcorner50psgate beforestockDRT/extraction, no repeatedsplit.117focusedtests pass including complete checkpoint rejection. No physicalextraction/newdispatch/phaseboxes; next publish reviewedtools/CI/docs under scopedapproval and launch.
+
+## 2026-10-11: Codex (residual data screen preliminary result)
+- Run38178293907 succeeds; artifact11716543233 saved timing/gates retrieved. Gate confirms source38172640071 and one _28820_ split withfourBUF4s, preliminary qualification. Screen metrics below are not extractedclosure or direct comparison to parentextractedcounts.
+- nom_fast_1p32V_m40C: setup 0 ns, hold 0.0903697 ns; slew/fanout/cap 1/24/0.
+- nom_slow_1p08V_125C: setup 0 ns, hold 0.378202 ns; slew/fanout/cap 13/24/0.
+- nom_typ_1p20V_25C: setup 0 ns, hold 0.203265 ns; slew/fanout/cap 1/24/0.
+- Next independentlyaudit topology/diodes/antenna/overflow then prepare exact-source DRT/extraction. No phase ticks/newdispatch.
+
+## 2026-10-11: Codex (high-leverage closure research)
+- Reviewed official workflow/template restrictions, nativeclock8recipe, phasegates and upstream primary OpenROAD/LibreLane repair/CTS docs. Recorded ranked macro-locality, antenna-aware electrical policy, clocktrunk load limits, general Boolean replication, timing-reserve targets and cleanofficialflow reproduction ideas in residual report.
+- No new physical change/test/dispatch or phase tick; research is hypotheses, flags unverified on pinnedengine. Current closure requires one exact final extracted/netlist/GDS commit; archived ECO checkpoint success alone is insufficient. Next inspect running residual data screen then choose measured policy experiment, with portability/area/overflow checks.
+
+## 2026-10-11: Codex (publish and launch residual data screen)
+- User instruction to continue proposed publication/launch executed: tools117f96c, CI7781d7a, docs2105f48 pushed to remote main. Exact remote head2105f48a6439b84a3898488f47b173a563ffbf33 verified. [Residual data screen38178293907](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38178293907) queued on that exact commit; one _28820_ split on latest timing-qualified checkpoint38172640071.
+- Next inspect actual split/legalization/topology/antenna/overflow/allcorner/electrical before extractedcontinuation. No phase boxes ticked; unrelated files/FIPE excluded. Launch receipt remainslocal.
+
 ## 2026-10-11: Codex (prepare residual data split and macro-bank hypothesis)
 - Retrieved latest NL/DEF/path views and mapped156slow slew rows. _28820_ has14rows/13loads/6diodes. Prepared one-net fourBUF4 guarded screen from exact38172640071/head2697084; source hashes/conservation audited,124focusedchecks pass. No physicalsplit run.
 - Read-only all16SRAMoutputbuffer proximity audit proposes14existingbuffer moves within30.82um worst moved pin-origin distance. ReviewedLEF sequentialgap plus independentfinalallfootprint overlap0 checks pass. No cells/wiring added; hypotheticalDEF/proposals stay/tmp; physicalpinaccess/power/downstreamtiming unqualified. Reportupdated. Next publish reviewed data-screen group under scopedapproval and measure; no phaseboxes/newdispatch.

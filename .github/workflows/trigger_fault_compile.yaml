@@ -66,7 +66,7 @@ jobs:
         run: |
           source .venv/bin/activate
           export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
-          export WARP_TRIGGER_BITFILE="$GITHUB_WORKSPACE/build/uart-trigger-fault/uart_trigger_fault_top.wbit"
+          export WARP_TRIGGER_BITFILE="$GITHUB_WORKSPACE/build/uart-trigger-fault/trigger.wbit"
           export PYTHONPATH="$GITHUB_WORKSPACE/tools:$GITHUB_WORKSPACE/test_internal:$GITHUB_WORKSPACE/test"
           rm -f test/results.xml
           set -o pipefail

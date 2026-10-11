@@ -115,5 +115,5 @@ if __name__ == "__main__":
         # execution. This process-local explicit provenance is not an old-view
         # pass: VIEWS are independently pinned to the new physical experiment.
         sta.PHYSICAL = VIEWS
-        if not sta.execute_cloud(args.out, args.physical, args.pdk_root):
+        if not sta.execute_cloud(args.out.resolve(), args.physical.resolve(), args.pdk_root.resolve()):
             raise SystemExit("One or more actual internal timing diagnostics failed")

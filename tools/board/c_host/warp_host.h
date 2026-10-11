@@ -8,7 +8,13 @@
 typedef int (*warp_transfer_fn)(void *, const uint8_t *, uint8_t *, size_t);
 typedef struct { warp_transfer_fn transfer; void *context; } warp_host;
 enum { WARP_OK = 0, WARP_TIMEOUT = 1, WARP_STATE = 2,
-       WARP_IO = 3, WARP_ARGUMENT = 4 };
+       WARP_IO = 3, WARP_ARGUMENT = 4, WARP_FORMAT = 5,
+       WARP_ARCH = 6, WARP_LOAD = 7 };
+int warp_read_id(warp_host *, uint16_t *architecture);
+/* chunk_words must be 1..64; no heap allocations or automatic RUN. */
+int warp_load_words(warp_host *, uint16_t architecture, const uint32_t *,
+                    size_t word_count, size_t chunk_words);
+int warp_load_wbit(warp_host *, const uint8_t *, size_t length, size_t chunk_words);
 int warp_poll(warp_host *, uint8_t *status);
 int warp_read_status(warp_host *, uint8_t *status, uint8_t *error);
 int warp_channel_write(warp_host *, uint8_t byte, int last, size_t polls);

@@ -7,6 +7,8 @@ import ctypes as ct
 import random
 import shutil
 import subprocess
+import struct
+import zlib
 from pathlib import Path
 
 import pytest
@@ -46,6 +48,10 @@ def driver(tmp_path_factory):
         getattr(lib, name).argtypes = args
     lib.warp_poll.argtypes = [ct.POINTER(Host), ct.POINTER(U8)]
     lib.warp_read_status.argtypes = [ct.POINTER(Host), ct.POINTER(U8), ct.POINTER(U8)]
+    lib.warp_read_id.argtypes = [ct.POINTER(Host), ct.POINTER(ct.c_uint16)]
+    lib.warp_load_words.argtypes = [ct.POINTER(Host), ct.c_uint16,
+                                    ct.POINTER(ct.c_uint32), SIZE, SIZE]
+    lib.warp_load_wbit.argtypes = [ct.POINTER(Host), ct.POINTER(U8), SIZE, SIZE]
     return lib
 
 
@@ -178,3 +184,119 @@ def test_sticky_flags_only_clear_on_explicit_read_status(driver):
     assert status.value & 5 == 5 and error.value == 1
     assert model.code == 0 and model.overflow == 0
     assert model.tx == [(1, 0), (2, 0)] and not bridge.errors
+
+
+def wbit(words, arch=1):
+    body = b"".join(struct.pack(">I", word) for word in words)
+    return b"WBIT" + struct.pack(">HHII", arch, 0, len(words), zlib.crc32(body)) + body
+
+
+@pytest.mark.parametrize("chunk", [1, 3, 64])
+@pytest.mark.parametrize("format", ["words", "wbit"])
+def test_checked_loader_chunks_and_leaves_stopped(driver, chunk, format):
+    words = [0xFAB0FAB1] + list(range(137))
+    model = ShellModel(1)
+    bridge = Bridge(model)
+    if format == "words":
+        data = (ct.c_uint32 * len(words))(*words)
+        rc = driver.warp_load_words(ct.byref(bridge.host), 1, data, len(words), chunk)
+    else:
+        raw = wbit(words)
+        data = (U8 * len(raw)).from_buffer_copy(raw)
+        rc = driver.warp_load_wbit(ct.byref(bridge.host), data, len(raw), chunk)
+    assert rc == 0 and model.state == LOADED
+    assert model.forwarded == words and model.code == 0
+    assert all(len(t) <= 1 + 4 * chunk for t in bridge.transactions if t[0] == 0x11)
+    assert not any(t[0] == RUN for t in bridge.transactions)
+    assert not bridge.errors
+
+
+@pytest.mark.parametrize("mutation", ["magic", "crc", "length", "sync", "truncate"])
+def test_corrupt_wbit_rejected_without_io(driver, mutation):
+    raw = bytearray(wbit([0xFAB0FAB1, 7]))
+    if mutation == "magic":
+        raw[0] ^= 1
+    elif mutation == "crc":
+        raw[-1] ^= 1
+    elif mutation == "length":
+        raw[11] += 1
+    elif mutation == "sync":
+        raw = bytearray(wbit([0x12345678, 7]))
+    else:
+        raw = raw[:15]
+    bridge = Bridge(ShellModel(1))
+    data = (U8 * len(raw)).from_buffer_copy(raw)
+    assert driver.warp_load_wbit(ct.byref(bridge.host), data, len(raw), 64) == 5
+    assert not bridge.transactions and not bridge.errors
+
+
+def test_loader_bad_arguments_and_state_arch_guards(driver):
+    bridge = Bridge(ShellModel(1))
+    host = ct.byref(bridge.host)
+    data = (ct.c_uint32 * 1)(0xFAB0FAB1)
+    for count, chunk in [(0, 1), (65536, 1), (1, 0), (1, 65)]:
+        assert driver.warp_load_words(host, 1, data, count, chunk) == 4
+    bad = (ct.c_uint32 * 1)(7)
+    assert driver.warp_load_words(host, 1, bad, 1, 1) == 5
+    assert not bridge.transactions
+    assert driver.warp_load_words(host, 2, data, 1, 1) == 6
+    assert bridge.transactions == [[1, 0, 0, 0, 0]]
+    bridge.model.state = LOADED
+    bridge.model.transaction([RUN])
+    bridge.transactions.clear()
+    assert driver.warp_load_words(host, 1, data, 1, 1) == 2
+    assert all(t[0] == READ_ID for t in bridge.transactions)
+    assert bridge.model.state == RUNNING and not bridge.errors
+
+
+def test_loader_io_failure_is_not_retried(driver):
+    model = ShellModel(1)
+    commands = []
+
+    @TRANSFER
+    def callback(context, tx, rx, n):
+        command = list(tx[:n])
+        commands.append(command)
+        response = model.transaction(command)
+        for i, byte in enumerate(response):
+            rx[i] = 0 if byte is None else byte
+        return int(command[0] == 0x11)
+
+    host = Host(callback, None)
+    words = (ct.c_uint32 * 2)(0xFAB0FAB1, 7)
+    assert driver.warp_load_words(ct.byref(host), 1, words, 2, 1) == 3
+    assert commands[-1] == [0x11, 0xfa, 0xb0, 0xfa, 0xb1]
+    assert sum(t[0] == 0x11 for t in commands) == 1
+    assert model.forwarded == [0xFAB0FAB1]
+
+
+def test_read_id_rejects_magic_and_preserves_output(driver):
+    @TRANSFER
+    def callback(context, tx, rx, n):
+        for i in range(n):
+            rx[i] = 0
+        return 0
+
+    host = Host(callback, None)
+    arch = ct.c_uint16(0x1234)
+    assert driver.warp_read_id(ct.byref(host), ct.byref(arch)) == 5
+    assert arch.value == 0x1234
+
+
+def test_loader_rejects_chip_reported_crc_error(driver):
+    model = ShellModel(1)
+
+    @TRANSFER
+    def callback(context, tx, rx, n):
+        command = list(tx[:n])
+        if command[0] == 0x12:
+            command[-1] ^= 1
+        response = model.transaction(command)
+        for i, byte in enumerate(response):
+            rx[i] = 0 if byte is None else byte
+        return 0
+
+    host = Host(callback, None)
+    words = (ct.c_uint32 * 1)(0xFAB0FAB1)
+    assert driver.warp_load_words(ct.byref(host), 1, words, 1, 1) == 7
+    assert model.state != LOADED

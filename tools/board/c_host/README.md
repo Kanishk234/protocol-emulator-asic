@@ -5,6 +5,22 @@ WARP shell. It uses a caller-supplied synchronous SPI callback, so an RP2040
 hardware-SPI backend or another host can supply transport without changing
 the chip. No board backend or measured speedup is claimed here.
 
+`warp_read_id` checks the WP magic and returns the architecture version.
+`warp_load_words` loads native uint32_t words in big-endian wire order;
+`warp_load_wbit` accepts the existing WBIT file format, checking its magic,
+length, sync word and IEEE CRC-32 before device I/O. Both loaders require
+1..64 words per chunk, a nonempty image and a 16-bit word count. They verify
+the device architecture, refuse RUNNING, issue LOAD_BEGIN/DATA/END and check
+the final LOADED state/error. They do not issue RUN. Two fixed 257-byte
+transaction buffers bound temporary storage independently of image size;
+the caller owns the image storage. No heap or system initialization is used.
+Input image memory must remain valid and unchanged until the call returns.
+As with channels, exclusive ownership and callback timing are required.
+Load transport errors leave an uncertain partial configuration and return
+immediately; recover deliberately with a fresh load rather than retrying a
+possibly completed transaction. File checks do not prove fabric frame
+semantics: valid bitstreams must come from the matching compiler.
+
 Each callback invocation is exactly one complete CS-low transaction. Supply
 mode 0, MSB-first bytes, SCK no faster than project clock / 8, at least eight
 project clocks from CS falling to first SCK rising, and at least four project

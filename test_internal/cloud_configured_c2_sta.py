@@ -93,8 +93,8 @@ report_parasitic_annotation -report_unannotated > annotation.rpt
 check_setup -verbose -unconstrained_endpoints -multiple_clock -no_clock -no_input_delay -loops -generated_clocks > coverage.rpt
 report_clock_properties > clocks.rpt
 report_clock_latency > clock_latency.rpt
-report_checks -from $user_q -to $user_d -path_delay max -format full_clock_expanded -group_path_count 64 -endpoint_path_count 8 > r2r_max.rpt
-report_checks -from $user_q -to $user_d -path_delay min -format full_clock_expanded -group_path_count 64 -endpoint_path_count 8 > r2r_min.rpt
+report_checks -from $user_q -to $user_d -path_delay max -format full_clock_expanded -group_path_count 64 -endpoint_path_count 8 -digits 6 -fields {slew capacitance fanout input_pin net} > r2r_max.rpt
+report_checks -from $user_q -to $user_d -path_delay min -format full_clock_expanded -group_path_count 64 -endpoint_path_count 8 -digits 6 -fields {slew capacitance fanout input_pin net} > r2r_min.rpt
 report_checks -unconstrained -group_path_count 10000 > unconstrained.rpt
 foreach pin $user_clk {
     # Preserve actual propagated arrival evidence for each individual CLK.

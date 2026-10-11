@@ -1,0 +1,13 @@
+top: uart_trigger_fault_top
+params:
+  DIV: 16
+  DELAY_CYCLES: 4
+  WINDOW_CYCLES: 4
+  COUNTER_BITS: 4
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  event_i: FAB_IN1
+  fault_i: FAB_IN2
+  tx_o: FAB_OUT0

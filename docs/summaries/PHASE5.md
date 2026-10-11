@@ -135,6 +135,18 @@ RTL-fabric/no-SDF limits and do not replace the open clean-machine/CI gates.
 Evidence: `docs/reports/g1_uart_capture.md`.
 
 ## What's left
+October10: official precheck37960021923 passes all nine checks for the
+stronger-driver layout. Exact final C2 loaded UART passes37958116481, but other
+tiles still need matching physical views. Fixed-original buffers38101405271
+clear estimated electrical limits without moving original cells; fresh GRT
+38101639866 still fails146 overflow. Conditional configured timing38111705892
+finds positive examined setup and small fast hold failures, with loading/I/O/
+intertile timing outside its scope. Short RUN-mode proof38102131236 passes with
+explicit bounds/assumptions. Broad and localized padding probes remain rejected
+before routing; no successor is promoted. Independent seed38101717810 fits all
+nine planned G1 builds. New organizer guidance and board reload/AI disclosure
+are documented; broad protocol flexibility remains the user priority.
+
 October7: the compact scratch checkpoint now passes native routing and full
 Magic/KLayout/shell LVS on one recovered layout (37669731197/37674839060).
 Shell setup/hold pass, but electrical limits and configured-fabric function/

@@ -114,6 +114,12 @@ Same-row probe38112069098 is running. Preparing a reporting-only timing replay
 with six-digit slack and per-pin/net/load detail: actual fast X2Y1 has six
 VIOLATED labels, two rounded0.00ns; X2Y3 has two. No false paths or altered
 margins. Pinned report_checks arguments and source SHA independently verified.
+38112069098 fails actual native placed-in-rows check at configuration cell
+_100_: the seven-move all-right plan exceeds legal row extent despite valid
+cell gaps. Retain rejection. A revised exact-source five-move plan uses the
+actual left gap for hold1200/_251__684; max1.44µm, unchanged rows/orientations,
+no configuration-cell movement. Geometry/AST/Tcl checks pass, native validation
+pending. Precise timing replay38112173902 is running independently.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

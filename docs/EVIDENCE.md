@@ -172,3 +172,15 @@ with the same ten buffer connections and all three explicit estimated candidate
 fanout/slew/cap/setup/hold violation counts0. See
 `docs/reports/compact_fixed_original_buffers_20261010.md`. Fresh native routing
 and extraction remain necessary; this is no configured-fabric timing pass.
+
+Its fresh paired native GRT38101639866 still fails148baseline/146candidate,
+improving the older moved-cell169 result without closing routing. BMC84/cover84
+38102131236 passes the explicit bounded RUN-mode properties, not arbitrary
+complete-frame or mapped-latch stability. Conditional internal C2 timing
+38111705892 examines the exact loaded UART image with a propagated clock and
+nominal SPEF across three PVT libraries: setup positive on examined paths,
+fast hold−0.03/−0.04ns at two positions. No full timing pass; unconstrained
+loading/I/O/intertile paths persist. See
+[conditional timing report](reports/compact_conditional_c2_sta_20261010.md).
+Independent frozen-G1 seed sweep38101717810 compiles all nine design-set trials;
+its model timing is not ASIC timing or newly loaded functionality.

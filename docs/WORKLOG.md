@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (verify selected setup route launch)
+- Tools/CI/docs ec5aaec/1826080/e87e348 pushed; remoteheadverifiede87e348b605c7c2359d4141f5fa607c571bffd9e. [Selectedsetup route38108912678](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38108912678) queuedonexacthead. 136focusedchecks/actualchainauditpass. No unrelatedfiles/hardwarehistorychanges.
+- Next inspectfresh extractedsetup/hold/electrical/DRC then continue residualrepairs on thissinglelineage. No phasebox oracceptedofficialclosure.
+
 ## 2026-10-10: Codex (selected setup screen passes; prepare extraction)
 - Setup38108151690 succeeds/artifact11691540879: estimated setup0all, holdfast100.801ps; slew3/1/1slow/typ/fast,fanout15each,cap0each. Actualexactone-master/source/topology/antenna/0overflow/history auditpasses. Not extractedclosure.
 - Prepared strict exactscreen continuation tostockDRT/freshextraction, no repeatedECO/SRAMcombination. 136focusedchecks pass. Next publish/launchunderongoingapproval then assess extractedsetup/electrical andrepin SRAMrepair. No phasebox.

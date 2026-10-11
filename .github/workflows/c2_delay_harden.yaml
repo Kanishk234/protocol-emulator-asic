@@ -1,0 +1,58 @@
+name: C2 eight-delay physical diagnostic
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_c2_delay_harden.py'
+      - '.github/workflows/c2_delay_harden.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-c2-delay-harden-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Authenticated original flow and actual intrinsic result
+        timeout-minutes: 10
+        run: |
+          python3 -m venv .venv
+          bash spikes/cloud/fetch_pdk.sh
+          timeout 120s gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern tile-harden-c2.tar.gz --dir build
+          timeout 120s gh run download 38113263802 -R "$GITHUB_REPOSITORY" --name c2-intrinsic-delay-38113263802 --dir build/c2_delay_physical_reference
+      - name: Provision pinned EDA image
+        timeout-minutes: 5
+        run: docker pull ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+      - name: One feature change; original native physical checks retained
+        timeout-minutes: 51
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_c2_delay_harden.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: c2-delay-physical-${{ github.run_id }}
+          path: |
+            build/c2_delay_harden/*.json
+            build/c2_delay_harden/*.log
+            build/c2_delay_harden/candidate_prebuffer.nl.v
+            build/c2_delay_harden/source/manifest.json
+            build/c2_delay_harden/source/original_resolved.json
+            build/c2_delay_harden/source/LICENSE
+            build/c2_delay_harden/source/ATTRIBUTION.md
+            build/c2_delay_harden/final/
+            build/c2_delay_harden/last_completed/
+            build/c2_delay_harden/run/*/*.log
+            build/c2_delay_harden/run/*/*.rpt
+            build/c2_delay_harden/run/*/*.json
+            build/c2_delay_harden/run/*/*.xml
+            build/c2_delay_harden/run/*/*.txt
+          retention-days: 3

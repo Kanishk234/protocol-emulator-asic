@@ -196,6 +196,38 @@ processes, source authentication and native effective-padding proof. No partial
 workflow is shipped that could report success without those gates. Existing
 map collector and parser are ready to consume the resulting native reports.
 
+### Actual padding rejection and bounded correction
+
+Padding run38102082569 selects151 cells and produces the requested spacing,
+but correctly fails its placement-preservation audit. Actual native boxes show
+334 physically moved instances, including32 beyond22µm and a maximum56.7µm.
+Separately, OpenDP normalizes1,602 orientations, often changing the instance
+origin while retaining exactly the same physical box:1,377 orientation changes
+have unchanged boxes. For example `_117_` keeps box
+(82.56,589.68)–(84.96,593.46)µm despite R180→MX origin normalization.
+The distinction does not rescue the32 excessive real moves.
+
+The correction uses native `detailed_placement -max_displacement {22 22}`.
+Both entries are positive because the pinned implementation substitutes default
+displacement when either native argument is zero. The pinned Tcl converts the
+micrometer bounds to integral sites/rows, so these bounds are conservative for
+the480DBU site width and3780DBU row height. Retain the canonicalized intermediate
+census, restore each original orientation with `setOrient` followed by
+`setLocation` at the captured legalized box's lower-left corner, and require
+all four actual box coordinates to remain identical through this restoration.
+Re-run native legality and effective-spacing proof afterward. Original statuses,
+orientations, dimensions and connections remain strict; both instance-origin
+and actual-box displacement must stay within22µm. A failed bounded placement
+or invalid restored row orientation rejects the trial rather than relaxing it.
+
+The source mapping is pinned
+[OpenDP Tcl](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/dpl/src/Opendp.tcl)
+and [native detailed placement](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/dpl/src/Opendp.cpp#L99).
+Lightweight controls confirm positive bounds and anchor capture precedes
+orientation restoration. Reconstructing original orientation anchors for the
+failed actual geometry still rejects its excessive physical displacement.
+No corrected native run or improvement is claimed here.
+
 ## October 10 continuation
 
 Actual150-iteration run37960021920 leaves the buffered overflow at169. Its

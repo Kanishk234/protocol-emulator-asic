@@ -1,5 +1,11 @@
 # Bugs
 
+## 66: Unbounded padding legalization changes orientations and moves distant cells
+- **Date:**2026-10-10.
+- **Symptom/check:**38102082569 native placement and requested spacing complete, but strict producer rejects changed orientation at _117_ before STA/routing. All masters/statuses/terminals remain exact;151 selected CRC/SPI cells obtain the requested gaps.
+- **Root cause:** default detailed placement canonicalizes1602 instance orientations and physically moves334 bounding boxes, including32 beyond22µm (maximum56.7µm). getOrigin differences additionally count1377 unchanged-box orientation normalizations, so1707 origin changes overstate physical movement. This is a rejected localized-policy experiment, not a routed hardware pass.
+- **Fix/coverage:** implemented native positive22µm legalization bounds and original-orientation restoration at the unchanged legalized bounding-box anchor, followed by fresh native legality, spacing, topology and both origin/box movement guards. Do not waive22µm or orientation invariants. Actual failed geometry remains rejected even with reconstructed original anchors; fresh hosted validation pending. No STA/routing result is claimed from the first trial.
+
 ## 65: Bounded-property wrapper rejects successful SBY metadata
 - **Date:**2026-10-10.
 - **Symptom/check:**38101606932 workflow fails although both engines return0 and complete PASS; bounded checks cover84 frames, both RUN covers reach step57.

@@ -58,6 +58,18 @@ boxes/site width/units, direct pinned per-instance setter, native legality,
 observable one/two-site whitespace, all3606 masters/orientations/statuses/pins
 and macro exact, maximum22µm axis movement. Forced STA directories created
 before CLI. Committed74fcf5e/9300548; hosted execution pending push.
+**New failures checked without user prompting:** padding38102082569 rejects
+1602 canonicalized orientations and physical moves beyond22µm; actual boxes
+show334 physical moves (32 over bound), distinct from1707 origin changes.
+All151 selected gap constraints pass, but no electrical/routing promotion.
+BUG66 records the exact native-policy issue; constrained legalization is next.
+Mode38101606932 engines both PASS/BMC84 and bothRUN covers reach57, but wrapper
+rejects pinned SBY status metadata. BUG65 strict parser fix/actual-status and
+malformed/nonzero controls pass; committed972620e/e69f0d1; rerun38102131236 active.
+Prepared six conditional C2 timing review bundles: exact529 cfgQ/eight FF
+inventory per position, genuine20ns boundary clock, unchanged source margins,
+no IO budgets/cuts/user state cases. Root reproduces preparation without EDA;
+committed13120df. No STA or full-mode/physical timing acceptance claimed.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

@@ -12,7 +12,6 @@ from pathlib import Path
 import re
 import subprocess
 
-import cloud_configured_c2_sta as original
 from cloud_native_stage import sha
 
 MASTER = "sg13cmos5l_dlygate4sd1_1"
@@ -76,6 +75,7 @@ def timing_summary(text, expected_instances, mode):
 
 
 def execute(bundle, physical, pdk_root, reference):
+    import cloud_configured_c2_sta as original
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise ValueError("STA execution is GitHub-only")
     meta = json.loads((bundle / "conditional/preparation.json").read_text())
@@ -184,6 +184,7 @@ def execute(bundle, physical, pdk_root, reference):
 
 
 if __name__ == "__main__":
+    import cloud_configured_c2_sta as original
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("native-evidence", "physical-evidence", "words", "out"):
         parser.add_argument("--" + name, type=Path, required=True)

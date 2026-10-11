@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (prepare residual data split and macro-bank hypothesis)
+- Retrieved latest NL/DEF/path views and mapped156slow slew rows. _28820_ has14rows/13loads/6diodes. Prepared one-net fourBUF4 guarded screen from exact38172640071/head2697084; source hashes/conservation audited,124focusedchecks pass. No physicalsplit run.
+- Read-only all16SRAMoutputbuffer proximity audit proposes14existingbuffer moves within30.82um worst moved pin-origin distance. ReviewedLEF sequentialgap plus independentfinalallfootprint overlap0 checks pass. No cells/wiring added; hypotheticalDEF/proposals stay/tmp; physicalpinaccess/power/downstreamtiming unqualified. Reportupdated. Next publish reviewed data-screen group under scopedapproval and measure; no phaseboxes/newdispatch.
+
+## 2026-10-11: Codex (retained DOUT2 extracted result)
+- Run38172640071 succeeds; artifact11715973741 selectively retrieved after initial approval-review timeout and successful status retry. All complete electrical reports independently match saved summaries; no phase closure inferred from workflowgreen.
+- Extracted timing: timing__setup__ws__corner:nom_fast_1p32V_m40C=0 ns, timing__hold__ws__corner:nom_fast_1p32V_m40C=0.07531597780841746 ns, timing__setup__ws__corner:nom_slow_1p08V_125C=0 ns, timing__hold__ws__corner:nom_slow_1p08V_125C=0.3462281670472696 ns, timing__setup__ws__corner:nom_typ_1p20V_25C=0 ns, timing__hold__ws__corner:nom_typ_1p20V_25C=0.17292889831788993 ns.
+- Electrical: nom_fast_1p32V_m40C {'slew': 5, 'fanout': 25, 'capacitance': 3}, nom_slow_1p08V_125C {'slew': 156, 'fanout': 25, 'capacitance': 2}, nom_typ_1p20V_25C {'slew': 33, 'fanout': 25, 'capacitance': 3}. Next compare retained timing-qualified parent, examine remaining cap targets and exact routed paths/layout before nextrepair. No newdispatch/phaseboxes.
+
+## 2026-10-11: Codex (publish and launch retained SRAM2 extraction)
+- Explicit approval executed: toolsb2710b6, CI6a2d16a, docs2697084 pushed to remote main. Exact remote head2697084754c8ed614dc8933966976b2f6471c4c0 verified. [Retained DOUT2 routing/extraction38172640071](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38172640071) queued on that exact commit.
+- Next inspect actual extracted allcorner timing/electrical, routing and antenna evidence; retain timing-qualified parent if childregresses. No phase boxes ticked. Unrelated local files/FIPE excluded; launch receipt remains local.
+
 ## 2026-10-11: Codex (audit retained DOUT2 screen; prepare extraction)
 - Retrieved66 selected evidence files. Actual source/proposal/unchanged all-cell wiring/final destination/master, antenna-only cleanup/congestionpolicy, single movement/legalization/reset and zerooverflow audits pass. DOUT2 screen qualifies estimated allcorner setupWS0 and fast hold100.790ps; electrical residuals remain.
 - Prepared exact screen38171124079/head07f6258 continuation retained_sram2_route and workflow: verifies complete saved history/site/views, rechecks antennas/allcorner50pshold then stockDRT/newextraction without repeated movement.129focusedtests pass including full checkpoint rejection cases. No newdispatch/phaseboxes; next publish reviewed group under scopedapproval and launch.

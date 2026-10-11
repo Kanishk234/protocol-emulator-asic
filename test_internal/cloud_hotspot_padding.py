@@ -68,43 +68,30 @@ foreach name [lsort $selected] {puts $out $name}
 close $out
 # Native setter forwards each dbInst to Opendp::setPadding(inst,1,1).
 foreach name $selected {dpl::set_padding_inst [$block findInst $name] 1 1}
-# Preserve each original row and orientation. Global OpenDP moved unrelated
-# cells between opposite power phases in38111705881. Compact only to the right
-# where actual one-site gaps demand it, consuming existing same-row whitespace.
-set target_rows {}
-foreach name $selected {
-    set box [[$block findInst $name] getBBox]
-    dict set target_rows [$box yMin] [$box yMax]
+# Exact source-geometry spacing plan. The previous all-right plan exceeded
+# a real row boundary at u_cfg row1 _100_ (38112069098). Consume the available
+# left gap on the lower row instead; retain every row and orientation.
+set moves {
+    {u_shell.u_spi._181_ 84960 502740 86880 506520 85440}
+    {_141_ 87360 502740 89760 506520 87840}
+    {u_shell.u_spi._150_ 89760 502740 91680 506520 90720}
+    {hold1200 84960 510300 89280 514080 83520}
+    {u_shell.u_spi._251__684 89280 510300 91200 514080 88320}
 }
-dict for {bottom top} $target_rows {
-    set entries {}
-    foreach inst [$block getInsts] {
-        if {[[$inst getMaster] getType] ne "CORE"} {continue}
-        set box [$inst getBBox]
-        if {[$box yMin] != $bottom} {continue}
-        if {[$box yMax] != $top} {error "Mixed cell heights in target row"}
-        lappend entries [list [$box xMin] [$inst getName] [$box xMax]]
+if {$dbu != 1000 || $site != 480} {error "Exact source-plan units differ"}
+foreach move $moves {
+    lassign $move name left bottom right top target
+    set inst [$block findInst $name]
+    if {$inst eq "NULL" || [$inst getPlacementStatus] ne "PLACED"} {error "Source-plan cell missing/fixed"}
+    set box [$inst getBBox]
+    if {[$box xMin] != $left || [$box yMin] != $bottom || [$box xMax] != $right || [$box yMax] != $top} {
+        error "Exact source-plan geometry changed"
     }
-    set previous_end {}; set previous_pad 0
-    foreach entry [lsort -integer -index 0 $entries] {
-        lassign $entry left name right
-        set inst [$block findInst $name]
-        set pad [expr {[lsearch -exact $selected $name] >= 0 ? $site : 0}]
-        set target $left
-        if {$previous_end ne ""} {
-            set target [expr {max($left,$previous_end+$previous_pad+$pad)}]
-        }
-        if {$target != $left} {
-            if {[$inst getPlacementStatus] ne "PLACED"} {error "Compaction would move a fixed cell"}
-            if {$target-$left > 22*$dbu || ($target-$left)%$site != 0} {error "Compaction exceeds source movement/site contract"}
-            $inst setLocation $target $bottom
-            set moved [$inst getBBox]
-            if {[$moved xMin] != $target || [$moved yMin] != $bottom || [$moved xMax] != $target+$right-$left || [$moved yMax] != $top} {
-                error "Native same-row anchor or dimensions changed"
-            }
-        }
-        set previous_end [expr {$target+$right-$left}]
-        set previous_pad $pad
+    if {abs($target-$left) > 22*$dbu || ($target-$left)%$site != 0} {error "Source-plan movement/site contract changed"}
+    $inst setLocation $target $bottom
+    set moved [$inst getBBox]
+    if {[$moved xMin] != $target || [$moved yMin] != $bottom || [$moved xMax] != $target+$right-$left || [$moved yMax] != $top} {
+        error "Native same-row anchor or dimensions changed"
     }
 }
 census ${::env(WARP_AFTER)}.canonical
@@ -224,8 +211,8 @@ def audit_placement(before, after, geometry_before, geometry_after, selected):
         if value[0] != new[name][0] or value[2:] != new[name][2:]: raise ValueError("Master/orientation/status changed: " + name)
         if obox[name][0] != nbox[name][0]: raise ValueError("Native master type changed")
         oldrect, newrect = obox[name][1], nbox[name][1]
-        if oldrect[1] != newrect[1] or oldrect[3] != newrect[3] or newrect[0] < oldrect[0]:
-            raise ValueError("Same-row rightward placement contract changed")
+        if oldrect[1] != newrect[1] or oldrect[3] != newrect[3] :
+            raise ValueError("Same-row placement contract changed")
         if (oldrect[2]-oldrect[0],oldrect[3]-oldrect[1]) != (newrect[2]-newrect[0],newrect[3]-newrect[1]): raise ValueError("Actual native cell dimensions changed")
         box_delta = tuple(abs(a-b) for a,b in zip(oldrect,newrect))
         if max(box_delta) > 22*dbu: raise ValueError("Actual native bbox movement exceeds22um bound")

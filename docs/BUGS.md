@@ -1,5 +1,11 @@
 # Bugs
 
+## 70: Loaded candidate workflow depends on an expired control artifact
+- **Date:**2026-10-11.
+- **Symptom/check:**38162860520 stops before any candidate simulation because37659171115 no longer has downloadable artifacts. Automatically triggered historical replay38162860294 also fails its artifact prerequisites.
+- **Root cause:** generated controls were retained for only three days; later diagnostics treated them as durable inputs.
+- **Fix/coverage:** regenerate and test original controls from the already-approved durable checkpoint inside the candidate job; retain required exact five netlist hashes, all three control XML checks and actual candidate normal/USER_RESET tests. Record the fresh control's actual run ID. Make historical original-view workflow manual-only so shared helper updates do not automatically start obsolete input-dependent replays. Candidate static checks pass; fresh cloud execution is required. No publication of the separately pending source archive or manufactured old test evidence.
+
 ## 69: Native Decimal metrics prevent physical evidence serialization
 - **Date:**2026-10-11.
 - **Symptom/check:**38114298036 completes all physical stages with seven native zero gates and exact interfaces, then fails to retain the physical summary with `Object of type Decimal is not JSON serializable`. Original virtual-clock setup failure remains genuine.

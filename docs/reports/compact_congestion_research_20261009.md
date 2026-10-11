@@ -268,3 +268,10 @@ pulls the pinned image separately before native observers. Its successful
 report collection is explicitly distinct from the retained route failure.
 This launches no new hardware or placement change; actual hotspot data still
 needs to be collected and interpreted before the proposed counterfactual.
+# 2026-10-11 continuation: actual endpoint hypothesis
+
+Actual paired38113003427 has unchanged146 overflow and byte-identical baseline/five-move marker maps. The successful spacing producer is not a routing improvement. Native endpoint census shows _150_,_181_,_189_ are not attached to the source nets named in the worst marker. Existing tiehi_251__684/L_HI and register_251_/RESET_B are the only two terminals on marker source net683.
+
+The pinned [OpenROAD makeItermPins implementation](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/GlobalRouter.cpp) transforms each master pin rectangle into placed coordinates. Subsequent access-point/grid choices use router-specific logic; cell bounding-box intersection or pin centroid alone does not prove a congestion contribution.
+
+Using the pinned [CMOS5L LEF](https://github.com/IHP-GmbH/IHP-Open-PDK/blob/2bbec755dc67ca3db0261c3d6163e15735d66710/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lef/sg13cmos5l_stdcell.lef), the actual MY tie origin91.20,510.30µm places L_HI at x89.615–89.900,y512.465–513.210µm. Proposed bbox91.68–93.60,y502.74–506.52µm gives MY origin93.60,502.74 and L_HI x92.015–92.300,y504.905–505.650µm. Actual R180 receiver RESET_B is x89.890–90.495,y508.335–508.790µm. These transformed shapes motivate testing removal of a coarse511.2µm vertical-band crossing, not an asserted routing fix. D-078 requires exact one-cell movement, unchanged connectivity/all other instances, same vertical power phase, native legality and six shell STA/electrical guards before routing comparison. No new hardware source change or protocol-specific resource.

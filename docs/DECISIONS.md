@@ -2,6 +2,14 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-078: Test one actual reset-net endpoint relocation
+- **Date:**2026-10-11. **Status:** accepted bounded copied-checkpoint producer; no promotion.
+- **Evidence:** paired native38113003427 reports identical146 overflow and byte-identical marker maps before/after five-cell spacing. Actual census shows three selected combinational cells do not connect to the worst marker's source nets. net683 has exactly two endpoints: SPI register_251_/RESET_B and tiehi_251__684/L_HI. The marker names net683.
+- **Decision:** on the exact fixed-original ten-buffer checkpoint38101405271, move only this existing tiehi from bbox89.28–91.20,y510.30–514.08µm to91.68–93.60,y502.74–506.52µm. The two-row shift preserves vertical power phase, orientation, master, status and connectivity. Native legality plus every other instance exact and six unchanged estimated shell STA/electrical cases are mandatory. No padding, RTL, clock-policy or macro move.
+- **Hypothesis:** pinned PDK Metal1 L_HI shape changes from y512.465–513.210µm to504.905–505.650µm; receiver RESET_B lies at508.335–508.790µm. Moving this two-pin net into the same coarse vertical band may reduce demand near511.2µm. Actual GRT pin-access/grid selection and overflow must be measured; transformed LEF geometry alone does not prove an improvement.
+- **Cost/alternatives:** one existing generic constant cell relocates; no new protocol primitive or cell area. Wiring/parasitics/pin access can worsen elsewhere. Reject native illegality, unexpected movement or electrical/timing failure; compare actual paired routing before promotion. Remaining CRC, configuration and clock source nets still need analysis.
+- **Sources:** pinned OpenROAD dcf36133a369abc8f3c5e5738cd4d82e4903c0e0 src/grt/src/GlobalRouter.cpp makeItermPins applies instance transforms to master rectangles; later pin access uses router-specific positions. Pinned PDK2bbec755dc67ca3db0261c3d6163e15735d66710 LEF SHA c47c436758ae87288324aa1f5a84fcc8faf813bf19df1a400b32258fff4e1219 (see research report for exact source and measured geometry).
+
 ## D-077: Physically test the generic eight-register delay feature
 - **Date:**2026-10-11. **Status:** accepted copied-input macro trial, no promotion.
 - **Evidence:** intrinsic38113263802 clears all examined delay-case hold/setup at two UART positions/three corners under unchanged margins. Data paths pay additional delay; run catalogue area14.5152µm²/cell, eight cells116.1216µm² excluding physical overhead. This is not routed timing or total chip area.

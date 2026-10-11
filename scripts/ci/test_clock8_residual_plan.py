@@ -71,3 +71,53 @@ def test_generated_tcl_is_complete_and_bounded(monkeypatch, kind, tmp_path):
     result = subprocess.run(['tclsh', str(check)], text=True, capture_output=True)
     assert result.returncode == 0 and 'complete' in result.stdout.splitlines()
     assert not result.stderr
+
+
+def fanout_fixture(monkeypatch):
+    rows = []
+    for i in range(30):
+        net = f'net{i}'
+        rows.append(f'sg13cmos5l_nand2_1 driver{i} (.A(a), .B(b), .Y({net}));')
+        for j in range(20 if i == 0 else 9):
+            master = 'sg13cmos5l_antennanp' if j >= 8 else 'sg13cmos5l_buf_1'
+            rows.append(f'{master} sink{i}_{j} (.A({net}));')
+    before = '\n'.join(rows)
+    cells = logical_cells(before)
+    layout = '\n'.join(f'- {n} {m} + PLACED ( {i*100} {i*30} ) N ;' for i,(n,(m,p)) in enumerate(cells.items()))
+    monkeypatch.setattr(repair, 'NL_SHA', hashlib.sha256(before.encode()).hexdigest())
+    monkeypatch.setattr(repair, 'DEF_SHA', hashlib.sha256(layout.encode()).hexdigest())
+    return before, layout
+
+
+def test_fanout_policy_reserves_loads_and_preserves_diodes(monkeypatch):
+    before, layout = fanout_fixture(monkeypatch)
+    proposal = repair.plan(before, layout, 'fanout')
+    assert proposal['added_buffers'] == 32
+    assert max(proposal['downstream_sink_pins']) <= 6
+    cells = logical_cells(before)
+    moved = {(n,p):g['net'] for g in proposal['groups'] for n,p in g['sinks']}
+    rows = []
+    for n,(m,pins) in cells.items():
+        ports = ', '.join(f'.{p}({moved.get((n,p),v)})' for p,v in pins)
+        rows.append(f'{m} {n} ({ports});')
+    for g in proposal['groups']:
+        rows.append(f"{proposal['buffer_master']} {g['buffer']} (.A({g['source_net']}), .X({g['net']}));")
+    after = '\n'.join(rows)
+    repair.validate_change(before, layout, after, proposal)
+    nets = {}
+    for n,(m,pins) in logical_cells(after).items():
+        for p,v in pins: nets.setdefault(v,[]).append((n,p))
+    for i in range(30):
+        assert len(nets[f'net{i}'])-1 <= 6
+    assert repair.target_call(before, layout, 'fanout').count('tripwire_clock8_residual ') == 1
+    with pytest.raises(ValueError):
+        repair.validate_change(before, layout, after.replace('sg13cmos5l_antennanp sink0_8', 'sg13cmos5l_buf_1 sink0_8'), proposal)
+
+
+def test_data_fanout_targets_preserve_observed_bracket_encoding(monkeypatch):
+    before, layout = fanout_fixture(monkeypatch)
+    before = before.replace('net0)', '\\u_chip.g_unit[0].r[1] )')
+    monkeypatch.setattr(repair, 'NL_SHA', hashlib.sha256(before.encode()).hexdigest())
+    call = repair.target_call(before, layout, 'fanout')
+    assert '{u_chip.g_unit\\[0\\].r\\[1\\]}' in call
+    assert '{u_chip.g_unit[0].r[1]}' not in call

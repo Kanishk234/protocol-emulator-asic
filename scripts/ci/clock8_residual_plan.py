@@ -52,6 +52,51 @@ def plan(before, layout, kind):
                 source_net=net, rail_source=driver, sinks=selected,
                 location=[sum(positions[n][j] for n, p in selected)//7 for j in range(2)]))
         upstream = 8
+    elif kind == 'fanout':
+        # One general physical policy: reserve two loads for later antenna repair.
+        nets = {}
+        for name, (master, pins) in cells.items():
+            for pin, net in pins:
+                nets.setdefault(net, []).append((name, pin))
+        selected_drivers = []
+        for driver, (master, pins) in sorted(cells.items()):
+            if driver.startswith(('clkbuf', 'delaybuf')):
+                continue
+            for pin, net in pins:
+                if pin not in ('Y', 'X', 'Q'):
+                    continue
+                sinks = sorted(s for s in nets[net] if s != (driver, pin))
+                if len(sinks) <= 8:
+                    continue
+                if any(p in ('CLK', 'GCLK', 'GATE', 'RESET_B') for n, p in sinks):
+                    raise ValueError('Data fanout policy encountered clock/reset loads')
+                if any(n not in positions for n, p in sinks) or driver not in positions:
+                    raise ValueError('Missing data branch placements')
+                count = len(sinks)
+                # Minimize added buffers, then retain as many nearby loads as possible.
+                options = [(k, keep) for k in range(1, count) for keep in range(7)
+                           if keep+k <= 6 and 1 <= count-keep <= 6*k]
+                if not options:
+                    raise ValueError('Data load count exceeds bounded single-level split')
+                k, keep = min(options, key=lambda v: (v[0], -v[1]))
+                origin = positions[driver]
+                ordered = sorted(sinks, key=lambda x: (sum(abs(positions[x[0]][j]-origin[j]) for j in range(2)), x))
+                distal = ordered[keep:]
+                axis = max(range(2), key=lambda j: max(positions[n][j] for n, p in distal)-min(positions[n][j] for n, p in distal))
+                distal.sort(key=lambda x: (positions[x[0]][axis], x))
+                offset = 0
+                for index in range(k):
+                    size = len(distal)//k + (index < len(distal)%k)
+                    sinks_group = distal[offset:offset+size]
+                    offset += size
+                    name = f'tripwire_clock8_fanout_{driver}_{index}'
+                    groups.append(dict(buffer=name, net=name+'_net', source_net=net,
+                        rail_source=driver, sinks=sinks_group,
+                        location=[sum(positions[n][j] for n, p in sinks_group)//size for j in range(2)]))
+                selected_drivers.append(driver)
+        if len(selected_drivers) != 30:
+            raise ValueError('Expected thirty audited antenna-loaded data drivers')
+        upstream = 6
     elif kind == 'hold':
         for endpoint, net, driver, master in HOLD:
             if cells.get(endpoint, (None,))[0] != 'sg13cmos5l_dfrbpq_1' or dict(cells[endpoint][1]).get('D') != net:
@@ -65,12 +110,12 @@ def plan(before, layout, kind):
         upstream = 1
     else:
         raise ValueError('Unreviewed repair kind')
-    master = 'sg13cmos5l_buf_4' if kind == 'antenna' else 'sg13cmos5l_buf_1'
+    master = 'sg13cmos5l_buf_1' if kind == 'hold' else 'sg13cmos5l_buf_4'
     old_nets = {v for _, pins in cells.values() for _, v in pins}
     if any(g['buffer'] in cells or g['net'] in old_nets for g in groups):
         raise ValueError('Repeated repair names')
     return dict(source_run=38019338907, netlist_sha256=NL_SHA, def_sha256=DEF_SHA,
-                kind=kind, buffer_master=master, groups=groups, added_buffers=2,
+                kind=kind, buffer_master=master, groups=groups, added_buffers=len(groups),
                 upstream_sink_pins=upstream, downstream_sink_pins=[len(g['sinks']) for g in groups],
                 retained_antenna_cells=True, legal_site_verified=False,
                 physical_timing_measured=False, official_signoff=False)
@@ -85,7 +130,7 @@ def validate_change(before, layout, after, proposal):
     added = {g['buffer'] for g in groups}
     rewires = {(n, p): g['net'] for g in groups for n, p in g['sinks']}
     if set(new) != set(old) | added:
-        raise ValueError('Expected exactly two identity buffers; preserve existing cells')
+        raise ValueError('Expected only planned identity buffers; preserve existing cells')
     for n, (master, pins) in old.items():
         if new[n] != (master, tuple(sorted((p, rewires.get((n, p), v)) for p, v in pins))):
             raise ValueError('Unexpected existing logic or wiring change')
@@ -99,8 +144,10 @@ def target_call(before, layout, kind):
     proposal = plan(before, layout, kind)
     cells = logical_cells(before)
     def word(value):
-        if not re.fullmatch(r'[A-Za-z0-9_./]+', value):
+        value = value.strip().removeprefix('\\')
+        if not re.fullmatch(r'[A-Za-z0-9_./\[\]]+', value):
             raise ValueError('Unsafe residual Tcl identity')
+        value = value.replace('[', '\\[').replace(']', '\\]')
         return '{' + value + '}'
     expectations = []
     for net in sorted({g['source_net'] for g in proposal['groups']}):
@@ -120,6 +167,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('netlist', type=Path)
     parser.add_argument('layout', type=Path)
-    parser.add_argument('--kind', choices=['antenna', 'hold'], required=True)
+    parser.add_argument('--kind', choices=['antenna', 'hold', 'fanout'], required=True)
     args = parser.parse_args()
     print(json.dumps(plan(args.netlist.read_text(), args.layout.read_text(), args.kind), indent=2))

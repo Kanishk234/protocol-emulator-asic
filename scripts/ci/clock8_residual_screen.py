@@ -1,4 +1,4 @@
-"""Independent branch or hold screen from exact clock8 strength route; no DRT."""
+"""Independent residual repair screen from exact clock8 strength route; no DRT."""
 import json
 import os
 import re
@@ -105,7 +105,7 @@ def main(kind):
     if len(paths) != 1:
         raise ValueError('Fresh native GRT missing')
     log = (paths[0].parent / 'openroad-globalrouting.log').read_text()
-    if log.count('TRIPWIRE clock8 residual:') != 2:
+    if log.count('TRIPWIRE clock8 residual:') != proposal['added_buffers']:
         raise ValueError('Missing or repeated native sizing receipt')
     resets = re.findall(r'TRIPWIRE native route reset: cleared ([0-9]+) ordinary routed wires', log)
     if len(resets) != 1 or int(resets[0]) == 0:
@@ -143,7 +143,7 @@ def main(kind):
     timing = json.loads((output / 'timing/comparison.json').read_text())
     ready = qualified(timing, metrics)
     (output / 'gates.json').write_text(json.dumps(dict(source_run=run['id'],
-        kind=kind, added_buffers=2, qualified=ready, minimum_fast_hold_ns=0.05,
+        kind=kind, added_buffers=proposal['added_buffers'], qualified=ready, minimum_fast_hold_ns=0.05,
         physical_screen_only=True, official_signoff=False), indent=2) + '\n')
     if not ready:
         raise ValueError('Native strength screen fails timing/hold/antenna gates')
@@ -151,5 +151,5 @@ def main(kind):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--kind', choices=['antenna', 'hold'], required=True)
+    parser.add_argument('--kind', choices=['antenna', 'hold', 'fanout'], required=True)
     main(parser.parse_args().kind)

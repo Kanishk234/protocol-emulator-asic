@@ -23,7 +23,7 @@ def test_promote_checks_actual_topology_and_clears_parasitics(tmp_path, monkeypa
     with pytest.raises(ValueError): runner.promote(state, baseline, physical, proposal)
 
 
-@pytest.mark.parametrize('kind', ['antenna', 'hold'])
+@pytest.mark.parametrize('kind', ['antenna', 'hold', 'fanout'])
 def test_independent_workflows_pin_route_and_upload_new_results(kind):
     import yaml
     root = Path(__file__).resolve().parents[2]

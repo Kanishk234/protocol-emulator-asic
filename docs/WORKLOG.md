@@ -70,6 +70,16 @@ Prepared six conditional C2 timing review bundles: exact529 cfgQ/eight FF
 inventory per position, genuine20ns boundary clock, unchanged source margins,
 no IO budgets/cuts/user state cases. Root reproduces preparation without EDA;
 committed13120df. No STA or full-mode/physical timing acceptance claimed.
+**Verified continuation:**38102131236 now passes BMC84/cover84 with RUN reached
+at57 after the strict SBY metadata parser correction. This remains a short
+cycle-model proof, not complete-frame or mapped-latch timing qualification.
+Bounded padding38102423038 fails genuine native DPL-0036 on eleven entries
+(five unique CRC/SPI/fanout cells), before audit, STA or routing. Retain this
+feasibility rejection; do not relax22µm or retry the unchanged151-cell target.
+Parallel analysis is narrowing the physical hypothesis. All routine checks on
+8e3761e pass: lint38102423065/docs38102423094/test38102423041/unit38102423068.
+D-074 records the separate six-case conditional configured C2 timing diagnostic;
+its cloud workflow is being reviewed, with no local EDA or acceptance claim.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

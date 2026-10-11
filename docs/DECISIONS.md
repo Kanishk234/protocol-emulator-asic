@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-074: Measure conditional configured C2 internal timing in hosted CI
+- **Date:**2026-10-10. **Status:** accepted isolated diagnostic; no hardware or timing qualification.
+- **Decision:** authenticate final physical C2 views from37814078650 and actual loaded UART evidence from37958116481. Run the two concrete C2 positions at all three original PVT Liberty corners, using extracted nominal SPEF and a genuine20ns propagated clock at N_GBUF_END[3]. Preserve original clock margins. Exactly529 image-derived configuration Q values per tile are stationary conditions; all eight user FF states remain dynamic. Add no false paths, loop cuts or I/O budgets.
+- **Checks:** retain annotation, setup/loop/unconstrained reports, expanded internal register paths and actual rise/fall arrival evidence at every user CLK. Missing commands, reports or clock coverage reject diagnostic completion. Preserve every failed case. Pinned OpenSTA command signatures were checked against its source before execution.
+- **Cost/limits:** standard hosted40min job, six180s STA cases. Nominal parasitics with three PVT libraries are not three RC corners. Upstream clock/intertile/shell timing, loading-mode capture and universal full-load stability remain outside this conditional probe. Acceptance stays false even when collection succeeds. BMC84 passing38102131236 does not prove arbitrary complete frame loading or mapped latch stability.
+- **Evidence:** cloud_configured_c2_sta.py and configured_c2_sta.yaml; source hashes and six prepared constraint bundles reproduced locally without EDA. Actual cloud execution remains pending.
+
 ## D-073: Test local whitespace at the measured CRC/SPI shell hotspot
 - **Date:**2026-10-10. **Status:** accepted isolated copied-checkpoint placement diagnostic; no promotion.
 - **Evidence:**38101639866 fixed-original candidate still fails146 overflow;53 native markers/85 planar overflow remain at x0–121.44,y475.2–525.6µm. Native coordinates are micrometers by pinned dbMarker.cpp. Source38101405271 has legal exact hardware and zero estimated fanout/slew/cap/setup/hold violations at all three explicit corners.

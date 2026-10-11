@@ -106,7 +106,9 @@ included. Added assertions check cfg_strobe/restart/frame strobes inactive in
 RUN and cfg_word/frame_data stable across consecutive RUN cycles. No RUN or
 configuration stability assumption is introduced. Require both84-cycle BMC
 and all84-cycle covers, including reachable RUN. Source preparation controls
-pass; hosted38101606932 is pending. This is not an STA execution.
+pass. Original38101606932 engines pass but its wrapper rejects SBY status
+metadata (BUG65). Corrected retry38102131236 succeeds: BMC84 and cover84
+PASS, with RUN reached at step57. This is not an STA execution.
 
 The shared CRC takes32 cycles per word. Depth84 may reach RUN after a minimal
 sync-only load but cannot demonstrate a complete five-row frame write followed
@@ -116,3 +118,10 @@ full loads. A separate full-frame-write→RUN reachability check needs a larger
 justified bound or a partitioned invariant proof. Actual loaded-image simulation
 already covers the concrete longer UART execution, without proving all traces.
 async2sync/dffunmap model clock-cycle behavior, not analog reset or pulse safety.
+
+The next isolated measurement is D-074: six hosted conditional internal C2
+STA cases using the exact loaded UART image, genuine boundary clock, final
+netlist and nominal extracted SPEF. Stationary configuration is explicitly a
+condition, not inferred from the short proof. Reports retain clock coverage,
+annotation, loops, disabled arcs and unconstrained paths; diagnostic completion
+never becomes full-fabric timing acceptance.

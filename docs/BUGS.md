@@ -10,7 +10,7 @@
 - **Date:**2026-10-10.
 - **Symptom/check:**38101606932 workflow fails although both engines return0 and complete PASS; bounded checks cover84 frames, both RUN covers reach step57.
 - **Root cause:** wrapper compares the entire status file to literal PASS; pinned SymbiYosys writes PASS followed by exit-code/elapsed metadata (actual PASS 0 321 and PASS 0 30).
-- **Fix/coverage:** accept exact PASS or PASS with zero exit-code/numeric elapsed metadata, require subprocess return0, retain raw status and reject malformed/nonzero/PASS-prefix strings. Actual retained statuses and negative controls pass locally without EDA. Fresh workflow pending; original properties/assumptions/bounds remain unchanged. This does not fix or qualify any hardware behavior.
+- **Fix/coverage:** accept exact PASS or PASS with zero exit-code/numeric elapsed metadata, require subprocess return0, retain raw status and reject malformed/nonzero/PASS-prefix strings. Actual retained statuses and negative controls pass locally without EDA. Retry38102131236 succeeds: BMC84 PASS 0 357 and cover84 PASS 0 31, RUN reachable at57. Original properties/assumptions/bounds remain unchanged. This does not qualify timing or arbitrary full-load behavior.
 
 ## 64: New manual-only branch workflow is not registered for dispatch
 - **Date:**2026-10-10.

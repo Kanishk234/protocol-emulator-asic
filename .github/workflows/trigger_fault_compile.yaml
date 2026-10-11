@@ -1,0 +1,69 @@
+name: baseline autonomous UART fault compiler screen
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'protocols/uart_monitor/**'
+      - 'test_internal/test_trigger_fault_loaded.py'
+      - '.github/workflows/trigger_fault_compile.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-trigger-fault-compile-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  sweep:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Python prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-venv python3-tk iverilog
+      - name: Cache pinned Yosys suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Fetch pinned Yosys suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/warp-seed-ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/warp-seed-ocs.tgz -C ~
+      - name: Cache pinned nextpnr suite
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+      - name: Install pinned project tools and tile library
+        run: |
+          scripts/setup_venv.sh
+          source .venv/bin/activate
+          bash scripts/fetch_nextpnr.sh
+          bash scripts/fetch_tiles.sh
+      - name: Compile autonomous fault example on frozen G1
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          export PATH="$HOME/oss-cad-suite/bin:$PATH"
+          export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
+          PYTHONPATH=tools python -m compile.compile --arch arch/warp_g1 --strict-ports --pins protocols/uart_monitor/trigger.yaml -o build/uart-trigger-fault protocols/uart_monitor/uart_trigger_fault_top.v protocols/uart_monitor/uart_fault_monitor_top.v protocols/uart_monitor/uart_monitor_top.v protocols/uart/uart_top.v protocols/uart/uart_tx.v protocols/uart/uart_rx.v protocols/uart/uart_tx_p.v protocols/uart/uart_rx_p.v
+      - name: Generate explicitly conditional operating report
+        run: |
+          source .venv/bin/activate
+          printf '%s\n' '{"clock_hz":8000000,"sck_hz":1000000,"arrival_bytes_s":1000,"direction":"read","blackout_us":0,"overhead_us":0,"burst_bytes":1,"queue_bytes":2}' > build/uart-trigger-fault/budget.json
+          PYTHONPATH=tools python -m host.certificate build/uart-trigger-fault/report.json arch/warp_g1/arch.yaml build/uart-trigger-fault/budget.json > build/uart-trigger-fault/planning.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: baseline-trigger-fault-compile-${{ github.run_id }}
+          path: build/uart-trigger-fault/
+          retention-days: 3

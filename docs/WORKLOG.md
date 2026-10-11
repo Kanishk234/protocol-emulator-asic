@@ -110,6 +110,10 @@ seven same-row rightward moves, max1.44µm, achieving all requested gaps.
 Reviewed replacement avoids global OpenDP, retains original rows/orientations
 and native placement plus six STA guards. Actual Tcl runs against geometry
 mocks and proves planned gaps/movement without local EDA; native run pending.
+Same-row probe38112069098 is running. Preparing a reporting-only timing replay
+with six-digit slack and per-pin/net/load detail: actual fast X2Y1 has six
+VIOLATED labels, two rounded0.00ns; X2Y3 has two. No false paths or altered
+margins. Pinned report_checks arguments and source SHA independently verified.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

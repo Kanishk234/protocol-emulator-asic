@@ -8,7 +8,7 @@ import sys
 import pytest
 
 from compile.bitfile import BitFile
-from host.certificate import certificate
+from host.certificate import certificate, operating_summary
 from host.protocol import SYNC_WORD
 
 
@@ -23,6 +23,8 @@ def evidence(tmp_path):
     bitfile.save(image)
     digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
     report = {"design": "user", "arch": "warp_g1", "arch_version": "0x0003",
+        "params": {"DIV": 16}, "tools": {"yosys": "test-fixture version"},
+        "build_options": {"seed": 1, "min_ctrl": 4, "strict_ports": True},
         "words": 2, "crc32": f"0x{bitfile.crc:08X}", "fmax_mhz": 60.0,
         "meets_50mhz": True, "timing_corner": "nom_slow_1p08V_125C",
         "utilisation": {"FABULOUS_LC": {"used": 80, "available": 88},
@@ -122,3 +124,36 @@ def test_cli_writes_scoped_artifact_from_audited_compile_inputs(evidence, tmp_pa
     assert result["physical_timing_verified"] is False
     assert result["board_rate_measured"] is False
     assert result["resources"]["wp_timer"] == {"used": 2, "available": 2}
+    text = subprocess.run(command + ["--format", "text"], env=env, text=True, capture_output=True)
+    assert text.returncode == 0, text.stderr
+    assert "Physical timing: unverified. Board rate: unmeasured." in text.stdout
+    assert "FAB_IN0.i: event_i" in text.stdout
+    assert '"DIV": 16' in text.stdout
+
+
+@pytest.mark.parametrize("field,value,message", [
+    ("params", {"DIV": [16]}, "parameters"),
+    ("params", {"DIV": float("inf")}, "parameters"),
+    ("tools", {"yosys": 123}, "tool versions"),
+    ("build_options", None, "build options"),
+    ("pins", {"FAB_IN0": {"bad": "event_i"}}, "pin mapping"),
+    ("pins", {"FAB_IN0": {"i": None}}, "pin mapping"),
+    ("unmapped_outputs_open", "tx", "unmapped"),
+])
+def test_malformed_user_facing_metadata_rejected(evidence, field, value, message):
+    report_path, architecture, report, budget, _ = evidence
+    report[field] = value
+    report_path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match=message):
+        certificate(report_path, architecture, budget)
+
+
+def test_summary_reports_unknown_timing_and_failed_host_model(evidence):
+    report_path, architecture, report, budget, _ = evidence
+    report.update(fmax_mhz=None, meets_50mhz=False)
+    report_path.write_text(json.dumps(report))
+    budget["arrival_bytes_s"] = 1000000
+    text = operating_summary(certificate(report_path, architecture, budget))
+    assert "Compiler clock estimate: unknown; requested clock unknown." in text
+    assert "service margin False; queue sufficient False" in text
+    assert "Physical timing: unverified. Board rate: unmeasured." in text

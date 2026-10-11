@@ -82,3 +82,11 @@ host scheduling remain separate evidence. Simultaneous read/write traffic needs
 a shared bandwidth guarantee; two individually acceptable budgets are not a
 concurrency proof. Run `python -m pytest -q tools/host/tests/test_certificate.py`
 for pure Python validation without EDA.
+
+Add `--format text` for a readable operating summary of the same freshly audited
+inputs. It lists parameters, pin roles, resource counts, tied/open ports and
+tool versions alongside separate model timing and host queue results. Unknown
+timing is printed as unknown. The summary explicitly labels physical timing
+unverified and board rate unmeasured. Malformed pin roles, parameter values,
+tool-version metadata and tied/open port lists are rejected rather than silently
+displayed as valid compiler evidence. JSON remains the default artifact format.

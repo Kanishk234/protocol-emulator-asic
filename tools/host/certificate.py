@@ -22,6 +22,31 @@ def _count(value, label):
     return value
 
 
+def _metadata(report):
+    """Validate metadata exposed to users; do not infer missing fields."""
+    for pin, roles in report["pins"].items():
+        if (not isinstance(pin, str) or not pin or not isinstance(roles, dict)
+                or not roles or any(role not in ("i", "o", "oe")
+                or not isinstance(port, str) or not port for role, port in roles.items())):
+            raise ValueError("malformed compiler pin mapping")
+    params = report.get("params")
+    if not isinstance(params, dict) or any(not isinstance(key, str) or not key
+            or not isinstance(value, (str, int, float, bool))
+            or isinstance(value, float) and not math.isfinite(value)
+            for key, value in params.items()):
+        raise ValueError("malformed compiler parameters")
+    versions = report.get("tools")
+    if not isinstance(versions, dict) or any(not isinstance(key, str) or not key
+            or not isinstance(value, str) or not value for key, value in versions.items()):
+        raise ValueError("malformed compiler tool versions")
+    if not isinstance(report.get("build_options"), dict):
+        raise ValueError("missing compiler build options")
+    for key in ("unmapped_inputs_tied_0", "unmapped_outputs_open"):
+        ports = report.get(key)
+        if not isinstance(ports, list) or any(not isinstance(port, str) or not port for port in ports):
+            raise ValueError("malformed compiler " + key)
+
+
 def certificate(report_path, architecture_path, budget_inputs):
     """Generate a self-consistency artifact using current compiler schema.
 
@@ -39,6 +64,7 @@ def certificate(report_path, architecture_path, budget_inputs):
         raise ValueError("missing compiler design identity")
     if not isinstance(report.get("pins"), dict):
         raise ValueError("missing compiler pin mapping")
+    _metadata(report)
     try:
         problems = audit(report_path)
     except (KeyError, TypeError) as exc:
@@ -118,17 +144,48 @@ def certificate(report_path, architecture_path, budget_inputs):
             "Protocol logic timing, I/O, loading and full-chip physical signoff remain separate"]}
 
 
+def operating_summary(result):
+    """Readable presentation of an already generated planning artifact."""
+    estimate = result["compiler_estimate"]
+    within = estimate["requested_clock_within_estimate"]
+    clock_status = "unknown" if within is None else "within estimate" if within else "exceeds estimate"
+    frequency = "unknown" if estimate["fmax_mhz"] is None else f"{estimate['fmax_mhz']} MHz"
+    budget = result["host_budget"]
+    lines = [f"Design: {result['design']} ({result['architecture']} {result['arch_version']})",
+        "Physical timing: unverified. Board rate: unmeasured.",
+        f"Compiler clock estimate: {frequency}; requested clock {clock_status}.",
+        f"Host model ({budget['direction']}): service margin {budget['strict_service_margin']}; "
+        f"queue sufficient {budget['queue_sufficient_under_model']} "
+        f"({budget['required_queue_bytes']} required, {budget['queue_bytes']} available).",
+        "Parameters: " + json.dumps(result["params"], sort_keys=True),
+        "Resources: " + ", ".join(f"{name} {value['used']}/{value['available']}"
+            for name, value in sorted(result["resources"].items())), "Pin mapping:"]
+    for pin, roles in sorted(result["pins"].items()):
+        for role, port in sorted(roles.items()):
+            lines.append(f"  {pin}.{role}: {port}")
+    lines.extend(["Inputs tied zero: " + json.dumps(result["unmapped_inputs_tied_0"]),
+        "Outputs open: " + json.dumps(result["unmapped_outputs_open"]),
+        "Tool versions: " + json.dumps(result["tools"], sort_keys=True),
+        "Report SHA256: " + result["compile_report_sha256"],
+        "Scope: " + result["scope"]])
+    return "\n".join(lines) + "\n"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
     parser.add_argument("architecture", type=Path)
     parser.add_argument("budget", type=Path, help="JSON arguments for board.budget.plan")
+    parser.add_argument("--format", choices=("json", "text"), default="json")
     args = parser.parse_args()
     try:
         result = certificate(args.report, args.architecture, json.loads(args.budget.read_text()))
     except (OSError, ValueError, KeyError) as exc:
         parser.error(str(exc))
-    print(json.dumps(result, indent=2))
+    if args.format == "text":
+        print(operating_summary(result), end="")
+    else:
+        print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

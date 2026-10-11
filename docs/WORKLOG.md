@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (parallel post-antenna load diagnosis)
+- All three extracted routes remain in progress. Added exact-netlist electrical load auditor; four checks pass and actual clock report confirms31data/0clockfanout branches, including20loads/12diodes on29457. Incomplete reports, wrong totals and absent drivers fail closed.
+- Documented bounded post-antenna residual repair plan with actual loads, possible four-load/multilevel partition and strict fresh antenna/electrical/timing/overflow rechecks. Physical policy not implemented or launched; await extracted checkpoint selection. No phase box or promotion.
+
+## 2026-10-10: Codex (rank closure ideas from current evidence)
+- Reviewed latest actual residual reports, prior SRAM placement/sizing results and official OpenROAD resizer/global-routing documentation. Highest-priority hypotheses: bounded post-antenna electrical repair with fresh antenna/timing checks; macro-adjacent output buffer and local SRAM control drive; compact28807load tree; combine only independently extracted-qualified clock/data repairs; then optimize exact slow critical cones for measured positive reserve. Existing relocation/sizing ideas are follow-ups, not novel or already-proven closure.
+- OpenROAD references: https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html and https://openroad.readthedocs.io/en/latest/main/src/grt/README.html. Latest docs are capability references; pinned LibreLane/OpenROAD command support must be checked before implementation. No experiment launched or phase box; waiting for extracted routes before selecting a combined candidate.
+
 ## 2026-10-10: Codex (verify parallel clock route launch)
 - Reviewed tools/CI/docs def38f5/a3d7d51/cbf2735 pushed; remote head verified cbf2735d66bf293243e3b00e0c2ef7ce36bf1de3. [Clock route38104539932](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38104539932) queued on exact head; hold38102572131/fanout38103189246 still running. 189 focused checks pass; no hardware-history changes or unrelated local files published.
 - Next inspect fresh extracted setup/hold/electrical/DRC evidence for each independent experiment before combining or promoting. No phase box.

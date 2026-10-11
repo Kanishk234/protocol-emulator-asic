@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-072: Check the actual compact RUN configuration-gate premise before STA
+- **Date:**2026-10-10. **Status:** accepted bounded diagnostic, no timing claim.
+- **Reason:** existing F2 proves accepted-load provenance, not inactivity of configuration gates during RUN. Current fallback RTL is not the exact compact shared-CRC shell. Case analysis on loaded latch Q values needs a separately stated mode premise.
+- **Decision:** authenticate the exact ten compact source files from the existing checkpoint, retain original F2 instrumentation/assumptions, and instrument copies only. Abstract SPI receiver outputs and user-fabric responses while keeping shell/reset/configuration FSM and decoders. Assert RUN has no cfg_strobe/restart/frame_strobe/live_frame_strobe, and word/frame-data stability across consecutive RUN cycles. No RUN, word or frame-strobe constraint is assumed. Require both84-cycle BMC and all84-cycle covers, including reachable RUN.
+- **Cost/limits:** pinned hosted formal tools, each task900s, workflow40min. Raw reset is low for first four cycles; original F2 no-rx_valid-during-crc_busy assumption remains explicit. async2sync/dffunmap produce a cycle model, not analog reset/pulse safety. A bounded pass is not an unbounded invariant, mapped529-latch equivalence, all-image safety or configured timing signoff. Preserve actual source/result/tool provenance and failures.
+- **Evidence:** cloud_run_config_property.py preparation/source-preservation/wrong-hash/missing-F2/duplicate-wrapper controls and AST/YAML pass without local EDA. Hosted results pending.
+
 ## D-071: Isolate buffer insertion from incidental original-cell movement
 - **Date:**2026-10-10. **Status:** accepted bounded copied-checkpoint diagnostic; no hardware promotion.
 - **Evidence:** ten-buffer37956470190 clears five estimated fanout failures in all three explicit corners but moves1550 original instances. Actual paired GRT38100977984 fails baseline149/candidate169 after150 iterations; native maps38100978078 localize most congestion to left-shell CRC/SPI/clock wiring.

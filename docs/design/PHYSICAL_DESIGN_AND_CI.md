@@ -5,8 +5,13 @@ Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabri
 **October10 update:** official precheck37960021923 passes all9 checks on the
 stronger-driver37708459393 layout, with authentic geometry/native export
 invariants. New cluster8/ten-buffer placement still fails GRT:148/169 in
-37958932549; buffered stays169 with150iterations37960021920. That latter
-baseline never routes because cold image pull times out the observer (BUG62).
+37958932549; actual150-iteration38100977984 fails149/169 after both cases
+execute. Explicit pinned-image provisioning fixes the prior cold-pull timeout
+(BUG62). Report collection38100978078 succeeds and retains actual failed
+148/169 routing and native hotspot coordinates; it is not route acceptance.
+Fixed-original-placement buffer counterfactual38101405271 is running, with
+strict legality/connectivity/census and six estimated STA guards before any
+future fresh route. No heavy EDA runs locally.
 No complete successor or configured timing acceptance.
 
 **October9 follow-up:** C2 hardening37814078650 finishes63 stages in about

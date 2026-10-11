@@ -9,10 +9,20 @@ remain open. This is a separate reproducibility result from checkpoint experimen
 Official Tiny Tapeout precheck now passes all nine checks37960021923 on the
 stronger-driver experimental layout. Its precheck blocker is closed. The
 new fanout-free shell placement still has routing congestion169 even after
-150iterations37960021920; its control case stopped during image download.
-Parallel research adds a strict electrical-report audit and real loaded-clock
-inventory while preparing native hotspot coordinates. These are separate
+150iterations38100977984; its baseline also actually routes and fails149.
+Native hotspot capture38100978078 succeeds while retaining failed148/169
+routing. Most reported congestion lies in the left-shell CRC/SPI/clock band,
+not the bottom configuration corner. The reviewed fixed-original-placement
+counterfactual38101405271 is running in the cloud; it requires all3596
+original cell placements unchanged before six explicit estimated STA screens.
+Parallel research adds strict electrical/hotspot-report audits and real
+loaded-clock inventory. RUN configuration-stability proof and configured
+timing remain open. These are separate
 measured scopes; the complete compact successor is still unqualified.
+
+Older investigation paragraphs below describe intermediate checkpoints and
+their limits at the time; the current official-precheck result is the nine-check
+pass above. No checklist or hardware-freeze change follows from these trials.
 
 The shell fanout remedy37956470190 now passes all three explicit estimated
 corner measurements: five remaining violations become zero with ten identity

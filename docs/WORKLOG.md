@@ -28,8 +28,15 @@ ten buffers plus six STA guards; local census positives/negatives and static
 checks pass. User explicitly authorized session push after automatic review
 rejected the first docs commit; subsequent scoped20597a4/2e43612/5319e91/ed0b8bf
 commits and push succeed. BUG64 branch-only dispatch404 fixed with narrow
-helper/workflow push trigger; actual38101405271 is running. No physical or
-configured timing pass follows from preparation or launch.
+helper/workflow push trigger; actual38101405271 SUCCESS verified:0 original
+movement, exact3596 original placements/18073 terminal contractions, legality
+passes, all three explicit estimated candidate fanout/slew/cap/setup/hold
+violations0. Source hashes and slacks recorded in compact_fixed_original_buffers_20261010.md.
+Prepared/reviewed authenticated exact compact shared-CRC RUN gate/stability
+property with original F2 assumptions and nonvacuous RUN cover; BMC84/cover84
+remain unexecuted, no configured STA claim. Tools/workflow committed1c7fdd0/
+aba52fa for bounded hosted execution. No full physical or configured timing
+pass follows from these separately scoped results.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

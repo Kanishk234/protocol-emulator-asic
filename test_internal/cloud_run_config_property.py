@@ -52,6 +52,12 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def task_passed(returncode, status):
+    # The pinned SBY status includes exit code and elapsed seconds. Accept
+    # exactly the documented successful token/metadata, never PASS prefixes.
+    return returncode == 0 and re.fullmatch(r"PASS(?: 0 \d+(?:\.\d+)?)?", status) is not None
+
+
 def instrument_top(text):
     pattern = r"    warp_g1_prune_clock_primpruned_5x3_compact_edges u_fabric \(.*?\n    \);"
     matches = list(re.finditer(pattern, text, re.S))
@@ -142,7 +148,7 @@ def main():
                     status_path = args.out / ("run_config_" + task) / "status"
                     status = status_path.read_text().strip() if status_path.is_file() else "MISSING"
                     result["tasks"][task] = {"returncode": completed.returncode, "status": status,
-                                              "passed": completed.returncode == 0 and status == "PASS"}
+                                              "passed": task_passed(completed.returncode, status)}
                 except subprocess.TimeoutExpired:
                     result["tasks"][task] = {"passed": False, "status": "TIMEOUT"}
             result["passed"] = all(v["passed"] for v in result["tasks"].values())

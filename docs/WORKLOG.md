@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (verify selected setup screen launch)
+- Tools/CI/docs f62297d/ea817c5/d39b014 pushed; remote exactheadverified d39b014f73b8105828fa3218c247b8e51a2ad4f4. [Selectedsetup screen38108151690](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38108151690) queuedonexacthead. 161 focusedchecks/actualsourceauditpass; oneBUFstrengthchangeonselectedfanoutcheckpoint, notindependentarchitecturebranch.
+- Next inspectfreshphysicaltiming/electrical/antenna/overflow, then exactDRT/extractionandresidualrepair. No phasebox orpromotedresult; FIPE/unrelatedlocalfilesexcluded.
+
 ## 2026-10-10: Codex (prepare one-buffer screen on convergence checkpoint)
 - Prepared guarded place7307BUF1→4 physicalscreen from exactselectedfanout38103189246 NL/DEF/head; no addedcells/wiring/hardwareconstraintchanges. Fullsource/trustedrecipe checks, canonicaltopology, DPL/wirereset/0overflow, freshantenna/allcorner50pshold qualification. 161 focusedchecks andactualsourceauditpass.
 - This measures setuphypothesis withpinnedCI, notlocalCRPRoffset. ElectricalclosureandDRT/extractionstillmandatory; no phasebox. Next publish/launchunderongoingapproval and inspectactualresult beforefurtherintegratedrepair.

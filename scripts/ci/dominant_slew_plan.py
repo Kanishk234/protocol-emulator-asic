@@ -1,5 +1,6 @@
 """Read-only dominant-net partitions; repin extracted geometry before physical use."""
 import hashlib
+import json
 import re
 from event_nor2_screen import logical_cells
 
@@ -57,7 +58,7 @@ def plan(before, layout, driver):
 
 def validate_change(before, layout, after, proposal):
     canonical = plan(before, layout, proposal['driver'])
-    if canonical != proposal:
+    if json.loads(json.dumps(canonical)) != json.loads(json.dumps(proposal)):
         raise ValueError('Unreviewed partition proposal')
     expected = logical_cells(before)
     rewires = {(n, p):g['net'] for g in canonical['groups'] for n, p in g['sinks']}

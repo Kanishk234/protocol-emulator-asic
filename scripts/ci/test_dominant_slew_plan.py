@@ -34,6 +34,8 @@ def test_complete_partition_conserves_logic_and_diodes(monkeypatch):
     assert [len(g['sinks']) for g in p['groups']] == [4]*4
     assert len({tuple(s) for g in p['groups'] for s in g['sinks']}) == 16
     runner.validate_change(nl, layout, changed(nl, p), p)
+    import json
+    runner.validate_change(nl, layout, changed(nl, p), json.loads(json.dumps(p)))
     assert not p['physical_timing_measured'] and not p['legal_site_verified']
 
 

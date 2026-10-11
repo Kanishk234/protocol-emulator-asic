@@ -1,0 +1,52 @@
+name: compact RUN configuration-gate bounded property
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_run_config_property.py'
+      - '.github/workflows/run_config_property.yaml'
+permissions:
+  contents: read
+concurrency:
+  group: warp-run-config-property-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  bounded:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Project venv and authenticated checkpoint
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install pyyaml==6.0.3
+          bash spikes/cloud/fetch_checkpoint.sh
+      - uses: actions/cache@v5
+        id: ocs
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Install pinned formal tools
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+      - name: Actual compact shell and configuration pipeline BMC plus nonvacuous RUN cover
+        timeout-minutes: 32
+        run: |
+          source .venv/bin/activate
+          export PATH="$HOME/oss-cad-suite/bin:$PATH"
+          python test_internal/cloud_run_config_property.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-run-config-property-${{ github.run_id }}
+          path: build/run_config_property_evidence/
+          retention-days: 3

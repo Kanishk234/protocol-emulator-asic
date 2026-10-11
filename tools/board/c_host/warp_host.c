@@ -45,12 +45,20 @@ int warp_channel_read(warp_host *host, uint8_t *byte, size_t polls)
     size_t i;
     const uint8_t tx[] = {0x31, 0};
     uint8_t rx[2];
+    uint8_t status;
     if (!host || !host->transfer || !byte) return WARP_ARGUMENT;
     for (i = 0; i < polls; ++i) {
-        int rc = transfer(host, tx, rx, sizeof tx);
+        int rc = warp_poll(host, &status);
         if (rc) return rc;
-        if ((rx[0] >> 5) != 3) return WARP_STATE;
-        if (rx[0] & 0x10) { *byte = rx[1]; return WARP_OK; }
+        if ((status >> 5) != 3) return WARP_STATE;
+        if (status & 0x10) {
+            rc = transfer(host, tx, rx, sizeof tx);
+            if (rc) return rc;
+            if ((rx[0] >> 5) != 3) return WARP_STATE;
+            if (!(rx[0] & 0x10)) return WARP_STATE;
+            *byte = rx[1];
+            return WARP_OK;
+        }
     }
     return WARP_TIMEOUT;
 }

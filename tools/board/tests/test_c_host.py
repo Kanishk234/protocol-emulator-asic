@@ -36,24 +36,26 @@ int main(void) {
     uint8_t byte = 0xcc, status = 0, error = 0;
     assert(warp_channel_write_many(&h,data,2,1,2,&done)==WARP_OK);
     assert(done==2 && p.index==5);
-    { const step reads[] = {{2,{0x31,0},{0x60,0xff},0},
+    { const step reads[] = {{1,{1},{0x60},0},
+                            {1,{1},{0x70},0},
                             {2,{0x31,0},{0x70,0x00},0},
+                            {1,{1},{0x70},0},
                             {2,{0x31,0},{0x70,0x81},0}};
       uint8_t out[2]={0xaa,0xbb};
-      p=(peer){reads,3,0};
+      p=(peer){reads,5,0};
       assert(warp_channel_read_many(&h,out,2,2,&done)==WARP_OK);
-      assert(done==2 && out[0]==0 && out[1]==0x81 && p.index==3);
+      assert(done==2 && out[0]==0 && out[1]==0x81 && p.index==5);
     }
     { const step full[]={{1,{1},{0x60},0},{1,{1},{0x60},0}};
       p=(peer){full,2,0};
       assert(warp_channel_write(&h,7,0,2)==WARP_TIMEOUT);
       assert(p.index==2);
     }
-    { const step empty[]={{2,{0x31,0},{0x60,0xff},0}};
+    { const step empty[]={{1,{1},{0x60},0}};
       p=(peer){empty,1,0};
       assert(warp_channel_read(&h,&byte,1)==WARP_TIMEOUT && byte==0xcc);
     }
-    { const step stopped[]={{1,{1},{0x48},0},{2,{0x31,0},{0x50,9},0}};
+    { const step stopped[]={{1,{1},{0x48},0},{1,{1},{0x50},0}};
       p=(peer){stopped,2,0};
       assert(warp_channel_write(&h,1,0,1)==WARP_STATE);
       assert(warp_channel_read(&h,&byte,1)==WARP_STATE && byte==0xcc);
@@ -68,12 +70,23 @@ int main(void) {
       assert(warp_channel_write_many(&h,data,2,1,1,&done)==WARP_IO);
       assert(done==1 && p.index==4);
     }
-    { const step partial_read[]={{2,{0x31,0},{0x70,0x42},0},
+    { const step partial_read[]={{1,{1},{0x70},0},
+                                 {2,{0x31,0},{0x70,0x42},0},
+                                 {1,{1},{0x70},0},
                                  {2,{0x31,0},{0x70,0x43},1}};
       uint8_t out[2]={0xaa,0xbb};
-      p=(peer){partial_read,2,0};
+      p=(peer){partial_read,4,0};
       assert(warp_channel_read_many(&h,out,2,3,&done)==WARP_IO);
-      assert(done==1 && out[0]==0x42 && out[1]==0xbb && p.index==2);
+      assert(done==1 && out[0]==0x42 && out[1]==0xbb && p.index==4);
+    }
+    /* A byte arrives during an initially empty opcode. READ_ID must be used
+       for the empty poll; CH_READ there would pop the newly arrived byte
+       despite its opcode-start status saying empty. The next poll sees it. */
+    { const step race[]={{1,{1},{0x60},0},{1,{1},{0x70},0},
+                        {2,{0x31,0},{0x70,0x9c},0}};
+      p=(peer){race,3,0};
+      assert(warp_channel_read(&h,&byte,2)==WARP_OK);
+      assert(byte==0x9c && p.index==3);
     }
     { const step status_steps[]={{1,{1},{0x67},0},
                                 {3,{2,0,0},{0x67,0x65,0x12},0}};

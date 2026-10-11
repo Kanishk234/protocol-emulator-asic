@@ -14,9 +14,13 @@ any transport failure. The driver itself does not generate pin timing.
 `warp_poll` uses the opcode-time status of READ_ID and does not clear sticky
 errors. `warp_read_status` explicitly reads and clears shell status/error
 flags according to the architecture contract. Writes poll for RUNNING and
-tx_ready before sending one CH_WRITE transaction. Reads issue CH_READ and
-accept the response only when that transaction's opcode-time rx_valid is
-set; an empty read never produces a fabricated byte. Poll limits bound
+tx_ready before sending one CH_WRITE transaction. Reads first poll READ_ID
+and issue CH_READ only after observing rx_valid. This matters because the
+shell captures outgoing status near CS assertion but decides whether to pop
+at opcode completion: an empty CH_READ can consume a byte that arrives
+during its opcode even though its returned status said empty. Non-destructive
+READ_ID polling avoids that race and avoids bad-command errors outside RUNNING.
+The driver also verifies the CH_READ response status. Poll limits bound
 transaction attempts, not elapsed time. Both functions reject a non-RUNNING
 state. A zero poll limit performs no I/O and returns WARP_TIMEOUT.
 
@@ -26,7 +30,8 @@ send individual protocol commands: there is no unsupported burst opcode.
 CH_READ has no last flag in the host response.
 
 The caller must exclusively own the host interface across each operation,
-including polling and writes: another writer can invalidate tx_ready.
+including polling and transfers: another reader can invalidate rx_valid and
+another writer can invalidate tx_ready.
 Serialize callbacks and prevent concurrent STOP/reset/reconfiguration.
 On an I/O error the current byte may already have been accepted or consumed;
 do not blindly retry it. Return buffers/progress exclude that uncertain byte.

@@ -25,8 +25,9 @@ async def capture_window(dut, host, busy_edge=False, held=False, monitor=False):
         if bit(dut.uo_out, 2) == 0:
             low_cycles.append(cycle)
     # Two synchronizer flops then user edge acceptance: acceptance at index2;
-    # delay4 starts at index6; width4 ends after index9. Idle UART is high.
-    assert low_cycles == [6, 7, 8, 9], f"wrong delayed inversion schedule: {low_cycles}"
+    # user inversion is at indices6..9; ARCHITECTURE §6 output register
+    # adds one clock before chip-port observation: indices7..10. Idle UART is high.
+    assert low_cycles == [7, 8, 9, 10], f"wrong delayed inversion schedule: {low_cycles}"
     await FallingEdge(dut.clk)
     host.set_fab_in(1)
     await ClockCycles(dut.clk, 6)

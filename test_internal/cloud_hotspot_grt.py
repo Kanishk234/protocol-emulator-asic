@@ -25,6 +25,19 @@ RESULT_SHA = "3fa452da2289c65dbb69e77b375e5a687826f751b31d42d1974a733923b2999a"
 PADDED = dict(BUFFERED, odb="13e88cf8935be6fe594449d86749e3e78ae38f7aa8b2d34637bb60fa02d8f5a5")
 
 
+def validate_native_policy(resolved, config, original):
+    omitted = {}
+    for key, value in config.items():
+        if key.startswith(("GRT_", "RT_")) or key in ("CLOCK_PORT", "CLOCK_PERIOD", "CLOCK_UNCERTAINTY_CONSTRAINT", "CLOCK_TRANSITION_CONSTRAINT", "TIME_DERATING_CONSTRAINT", "CTS_SINK_CLUSTERING_SIZE", "MAX_FANOUT_CONSTRAINT", "PNR_SDC_FILE", "FALLBACK_SDC"):
+            if key == "CTS_SINK_CLUSTERING_SIZE" and key not in resolved:
+                if key in original or value != 8:
+                    raise ValueError("Original omitted CTS stage setting differs")
+                omitted[key] = "Absent in both actual GRT configs; no CTS stage runs"
+            elif resolved.get(key) != value:
+                raise ValueError("Protected native policy changed: " + key)
+    return omitted
+
+
 def validate_padding(directory, baseline):
     if routing.sha(directory / "result.json") != RESULT_SHA:
         raise ValueError("Wrong measured padding result")
@@ -87,7 +100,8 @@ def main():
     previous = INPUT / "previous/ten_buffers/1-openroad-globalrouting/config.json"
     if routing.sha(previous) != routing.ORIGINAL_ROUTING_CONFIG_SHA:
         raise ValueError("Original actual routing policy differs")
-    config, protected = routing.configure_iterations(config, json.loads(previous.read_text()), 50)
+    original = json.loads(previous.read_text())
+    config, protected = routing.configure_iterations(config, original, 50)
     result["original_routing_config_sha256"] = routing.ORIGINAL_ROUTING_CONFIG_SHA
     result["protected_routing_settings"] = protected
     config_path = OUT / "config.json"
@@ -138,13 +152,11 @@ def main():
         entry.update({"returncode": process.returncode, "native_congestion": congestion,
                       "overflow": congestion[-1]["total_overflow"], "native_iteration_counts": iterations})
         entry.update(reporting.hotspot_record(stage / "native-congestion.rpt", entry["overflow"]))
+        save()
         resolved = json.loads((stage / "config.json").read_text())
         if resolved["CELL_LIBS"] != config["LIB"] or cfg.macro_contract(resolved["MACROS"]) != cfg.macro_contract(config["MACROS"]):
             raise ValueError("Actual library/macro changed")
-        for key, value in config.items():
-            if key.startswith(("GRT_", "RT_")) or key in ("CLOCK_PORT", "CLOCK_PERIOD", "CLOCK_UNCERTAINTY_CONSTRAINT", "CLOCK_TRANSITION_CONSTRAINT", "TIME_DERATING_CONSTRAINT", "CTS_SINK_CLUSTERING_SIZE", "MAX_FANOUT_CONSTRAINT", "PNR_SDC_FILE", "FALLBACK_SDC"):
-                if resolved.get(key) != value:
-                    raise ValueError("Protected native policy changed: " + key)
+        entry["irrelevant_stage_settings_omitted"] = validate_native_policy(resolved, config, original)
         if process.returncode == 0:
             final = json.loads((stage / "state_out.json").read_text())
             routing.require_zero_overflow(congestion, final["metrics"])

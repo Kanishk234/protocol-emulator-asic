@@ -1,0 +1,4 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY --chmod=755 openroad_selected_sram_wrapper.sh /usr/local/bin/tripwire-openroad-selected-sram
+COPY native_hold100_size.tcl selected_sram_output0.tcl /usr/local/share/tripwire/
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-openroad-selected-sram

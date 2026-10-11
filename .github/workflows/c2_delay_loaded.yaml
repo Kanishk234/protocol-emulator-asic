@@ -1,0 +1,50 @@
+name: C2 routed eight-delay loaded diagnostic
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_c2_delay_loaded.py'
+      - '.github/workflows/c2_delay_loaded.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-c2-delay-loaded-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - name: Standard simulation tools and project venv
+        run: |
+          sudo apt-get update && sudo apt-get install -y iverilog yosys python3-venv
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install -r test/requirements.txt pyyaml==6.0.3
+      - name: Exact original checkpoint and actual delay physical evidence
+        timeout-minutes: 10
+        run: |
+          bash spikes/cloud/fetch_checkpoint.sh
+          bash spikes/cloud/fetch_pdk.sh
+          mkdir -p "$HOME/.cache/warp/iverilog-13" build/c2_delay_loaded_input/passing_control
+          curl -sfL -o build/iverilog13.deb https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb
+          dpkg-deb -x build/iverilog13.deb "$HOME/.cache/warp/iverilog-13"
+          timeout 120s gh run download 37659171115 -R "$GITHUB_REPOSITORY" --name native-lut-variant-37659171115 --dir build/c2_delay_loaded_input/passing_control
+          timeout 120s gh run download 38114298036 -R "$GITHUB_REPOSITORY" --name c2-delay-physical-38114298036 --dir build/c2_delay_loaded_input/hardened
+      - name: Actual real-loaded control and eight-delay candidate cases
+        timeout-minutes: 35
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_c2_delay_loaded.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: c2-delay-loaded-${{ github.run_id }}
+          path: build/c2_delay_loaded/
+          retention-days: 3

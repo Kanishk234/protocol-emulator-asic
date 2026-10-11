@@ -35,3 +35,26 @@ PYTHONPATH=tools python -m compile.compile --pins protocols/uart_monitor/trigger
 ```
 
 The wrappers are regular Verilog sources supplied to the unchanged compiler.
+
+## Measured validation
+
+Cloud38168609080 compiles and loads the same image through actual shell SPI,
+then passes exactly one non-skipped chip-port test. Resource use is57/88logic
+cells,2/2timers and2/2shifters. The bitstream SHA256 is
+`a74a2909c144951c41e1f5276e110ae1e7619fb4d078062a83fb886438aefefb`.
+It checks the four-clock delay/window, ignored busy edge, held-high trigger,
+idle retrigger, event counting during inversion, USER_RESET while idle, and
+STOP parking. Chip-pin observation includes the documented shell synchronizer
+and output-register latency.
+
+Source scheduler parameter tests also pass within cloud532-check job
+38168413502/114555697291, covering zero delay, one-cycle/max windows, counter
+maximum, busy retrigger and active reset cancellation. The transparent source
+fixture isolates scheduling; it does not establish UART behavior.
+
+Loaded checks use the existing D-023 RTL-fabric simulation accommodations. They
+do not establish native macro/SDF timing, active-window USER_RESET over SPI,
+simultaneous UART traffic under faults, receiver error detection, board rates
+or silicon operation. This demo consumes all existing timer/shift resources;
+31logic cells remain, but additional protocol engines may need those occupied
+primitives. Compilation alone does not guarantee an additional design fits.

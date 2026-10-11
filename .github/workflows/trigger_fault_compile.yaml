@@ -61,6 +61,18 @@ jobs:
           source .venv/bin/activate
           printf '%s\n' '{"clock_hz":8000000,"sck_hz":1000000,"arrival_bytes_s":1000,"direction":"read","blackout_us":0,"overhead_us":0,"burst_bytes":1,"queue_bytes":2}' > build/uart-trigger-fault/budget.json
           PYTHONPATH=tools python -m host.certificate build/uart-trigger-fault/report.json arch/warp_g1/arch.yaml build/uart-trigger-fault/budget.json > build/uart-trigger-fault/planning.json
+      - name: Load same-job triggered fault image through real SPI and test chip ports
+        timeout-minutes: 8
+        run: |
+          source .venv/bin/activate
+          export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
+          export WARP_TRIGGER_BITFILE="$GITHUB_WORKSPACE/build/uart-trigger-fault/uart_trigger_fault_top.wbit"
+          export PYTHONPATH="$GITHUB_WORKSPACE/tools:$GITHUB_WORKSPACE/test_internal:$GITHUB_WORKSPACE/test"
+          rm -f test/results.xml
+          set -o pipefail
+          make -C test WARP_FABRIC=rtl COCOTB_TEST_MODULES=test_trigger_fault_loaded 2>&1 | tee build/uart-trigger-fault/loaded.log
+          cp test/results.xml build/uart-trigger-fault/loaded_results.xml
+          python -c 'import xml.etree.ElementTree as E; r=E.parse("test/results.xml").getroot(); c=r.findall(".//testcase"); assert len(c)==1 and not r.findall(".//failure") and not r.findall(".//error") and not r.findall(".//skipped"), "Expected one actual passing loaded triggered fault case"'
       - uses: actions/upload-artifact@v7
         if: always()
         with:

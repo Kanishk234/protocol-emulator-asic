@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (prepare one-buffer screen on convergence checkpoint)
+- Prepared guarded place7307BUF1→4 physicalscreen from exactselectedfanout38103189246 NL/DEF/head; no addedcells/wiring/hardwareconstraintchanges. Fullsource/trustedrecipe checks, canonicaltopology, DPL/wirereset/0overflow, freshantenna/allcorner50pshold qualification. 161 focusedchecks andactualsourceauditpass.
+- This measures setuphypothesis withpinnedCI, notlocalCRPRoffset. ElectricalclosureandDRT/extractionstillmandatory; no phasebox. Next publish/launchunderongoingapproval and inspectactualresult beforefurtherintegratedrepair.
+
+## 2026-10-10: Codex (isolate CRPR mismatch; measure local setup reserve)
+- Expanded self-feedback46328hold paths isolate0.2588ps discrepancy to clockreconvergence correction: finalclockwirelate1.516232ps minusearly1.257439ps. Otherpatharrivals/librarycheckmatch; STAimplementation/settingsdifferenceinferred. No slackoffset/tolerancewaiver or acceptedreproductionclaim.
+- Explicit local fixed-wire place7307BUF1→4 gives +19.589664ps/+46.403769ps setup at46883/46884. Electricalunchanged; smallmargin/unqualifiedphysicalresult. Next pinnedenginecheck and guarded one-buffer physicalqualification on selectedfanoutcheckpoint, followed residualelectricalrepair. No phasebox/newdispatch.
+
+## 2026-10-10: Codex (selected-checkpoint setup strength probes)
+- Retrieved exactfanoutNL/SPEF/SDC; NAND3hasnostrongervariant. Local fixed-wire place7307BUF1→4 or7308BUF1→4 each yields slow setupWS0; INV24812_4→2 worsens setup. Electrical countsunchanged. Strict batch baselinefails slowhold reproduction by0.258804ps; otherfive valuesmatch1e-6ns. No accepted timingresult/physicalchange/phasebox.
+- Next explain slowhold mismatch withoutrelaxingtolerance, then physicallyqualify onebufferchange with positive-reserve assessment on convergedfanoutcheckpoint and residualelectricalrepairs. Rawlogs stay/tmp; no newworkflowlaunch.
+
 ## 2026-10-10: Codex (clock extracted result; select fanout convergence checkpoint)
 - Clock38104539932 succeeds/artifact11689569002. Fresh slow setup-186.608ps,fast hold76.139ps; complete electrical audits match slew177/5/5 slow/typ/fast,fanout36each,cap4each. Clockfanoutcleared, overallsetup/electricalfails. Allthreeindependentroutesnowmeasured.
 - Select fanout38103189246 as convergence checkpoint (-65.507pssetup,93.254psfasthold,120slowslew/14fanout/2cap), retainoriginalpassingtimingreference. Next oneintegrated follow-up on exactfanout residuals/setup/SRAM/clocks; no blindtransplant or additiveclaims. No phasebox/promotion/newdispatch.

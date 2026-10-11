@@ -22,3 +22,13 @@ Important coverage remains open. Every case reports152 inputs without I/O delays
 The first candidate attempt38163818509 never reached STA because Docker rejected relative working directories (BUG71). The successful retry corrects paths only; no timing margins, source, libraries, cases or parasitics were changed.
 
 Next: retain this as a qualified diagnostic candidate; audit active annotation/coverage and loading-mode constraints, harden/verify the other tile types with matched views, and solve the remaining full-chip routing before combining/promoting hardware.
+
+### Read-only annotation follow-up
+
+`audit_c2_unannotated_loads.py` authenticates actual loaded graph313a7c727a0105813daef7b12efa1b52b921663905089cc902a2450d882fb5a4 and mapped sourcea986a0864ab51f09f6157422ba7dff935585b6456e6accc7b64ac8228725e882 from38163199372/38114298036. All six actual annotation reports from38164099529 contain exactly the same four unannotated drivers and zero partial drivers. Graph connectivity independently shows N2END[1], S2END[5], W2END[3] and TIE_ZERO_zero_/L_LO have **zero cell input/inout loads and zero output/inout boundary aliases**. Therefore these four reported omissions do not feed a path in this exact tile graph. This removes one annotation concern for the examined tile; it does not cover intertile parasitics, other tile types, configuration loading, unconstrained endpoints or full-chip timing. No report or acceptance gate was altered.
+
+Reproduce using the retained actual artifacts:
+```sh
+source .venv/bin/activate
+python test_internal/audit_c2_unannotated_loads.py build/cloud_c2_delay_loaded_38163199372/hardened_final_c2/matched_native_cone.json build/cloud_c2_delay_sta_38164099529
+```

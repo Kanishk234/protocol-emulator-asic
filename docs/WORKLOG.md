@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-11 (session77: active cloud placement trial and annotation coverage audit)
+**Done:** proactively inspected net694 producer38165505343: authentic source fetch succeeds, pinned native image pull is running; no placement/STA result yet. Independent read-only annotation audit authenticates exact actual loaded graph313a7c72… and physical sourcea986a086… and all six38164099529 native annotation reports. All four reported drivers have zero cell input/inout loads and zero output/inout boundary aliases in the actual tile graph. Recorded scoped evidence in compact_c2_delay_extracted_20261011.md; other timing coverage limits remain. No local EDA or frozen hardware changes.
+**Boxes ticked:** none.
+**Next step:** finish inspecting actual38165505343 producer, authenticate candidate result/ODB/NL and only then launch unchanged-policy paired routing. Continue legal-whitespace investigation for the remaining dense receiver rows; retain full-chip timing/physical gate requirements.
+
 ## 2026-10-11 (session76: reproducible reset locality audit and next cloud trial)
 **Done:** proactively checked latest routine lint38164925205/docs38164925086/unit38164925085/test38164925068: all SUCCESS. Added read-only native census/geometry/congestion audit with input hashes, conservative same-power-phase interior slots and explicit placement-proxy limits. Actual38163199430/38163542037 inputs yield445 reset ties,116 row-separated≥30µm, maximum139.86µm;70 ties appear in markers and68 have no improving interior slot within20µm receiver row. net694 has five marker memberships and one proxy-improving slot62.94→49.38µm. Prepared D-079 exact one-existing-cell copied-checkpoint trial and independent cloud workflow with source authentication, all-other-instance immobility, native legality and six electrical/estimated STA guards. Actual census/geometry positive fixture passes, wrong orientation rejects, AST/YAML parse passes. Reviewed official OpenROAD placement documentation; no unpinned options adopted. No local EDA or frozen hardware edits.
 **Boxes ticked:** none; full-chip136-overflow candidate still fails routing and conditional C2 timing is not full-chip acceptance.

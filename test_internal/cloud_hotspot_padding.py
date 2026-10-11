@@ -19,6 +19,10 @@ from cloud_fanout_grt import authenticate_views
 ROOT = cfg.ROOT
 INPUT = ROOT / "build/hotspot_padding_input"
 OUT = ROOT / "build/hotspot_padding"
+HOTSPOT_REPORT_SHA = "4892d8460230f76823f9d885a12f5d097a0d559b75fb3803cef8281e8b497bb1"
+HOTSPOT_BOX = ("86.4", "504", "93.6", "511.2")
+SELECTED_NAMES = {"u_shell.u_spi." + name for name in
+                  ("_150_", "_181_", "_189_", "_251_", "_251__684")}
 
 EDIT = r'''
 read_db $::env(WARP_INPUT_ODB)
@@ -53,11 +57,12 @@ foreach inst [$block getInsts] {
     if {![string match {u_shell.u_crc.*} $name] && ![string match {u_shell.u_spi.*} $name]} {continue}
     if {[$inst getPlacementStatus] ne "PLACED" || [[$inst getMaster] getType] ne "CORE"} {error "Target is not a movable standard cell"}
     set box [$inst getBBox]
-    if {[$box xMin] < 121.44*$dbu && [$box xMax] > 0 && [$box yMin] < 525.6*$dbu && [$box yMax] > 475.2*$dbu} {
+    if {[$box xMin] < 93.6*$dbu && [$box xMax] > 86.4*$dbu && [$box yMin] < 511.2*$dbu && [$box yMax] > 504*$dbu} {
         lappend selected $name
     }
 }
-if {[llength $selected] == 0} {error "No actual target cells"}
+set expected_selected {u_shell.u_spi._150_ u_shell.u_spi._181_ u_shell.u_spi._189_ u_shell.u_spi._251_ u_shell.u_spi._251__684}
+if {[lsort $selected] ne [lsort $expected_selected]} {error "Exact five-cell hotspot scope differs"}
 set out [open $::env(WARP_SELECTION) w]
 foreach name [lsort $selected] {puts $out $name}
 close $out
@@ -68,6 +73,21 @@ foreach name $selected {dpl::set_padding_inst [$block findInst $name] 1 1}
 detailed_placement -max_displacement {22 22}
 census ${::env(WARP_AFTER)}.canonical
 geometry ${::env(WARP_GEOMETRY_AFTER)}.canonical
+check_placement -verbose
+# R0/MY retain the vertical axis; MX/R180 reverse it. Restoring an old
+# orientation after an odd-row move could reverse VDD/VSS relative to the row.
+# Native overlap legality alone is not sufficient evidence of power alignment.
+set vertical_flip [dict create R0 0 MY 0 MX 1 R180 1]
+foreach inst [$block getInsts] {
+    lassign [dict get $original_orientation [$inst getName]] orient status
+    set canonical [$inst getOrient]
+    if {![dict exists $vertical_flip $orient] || ![dict exists $vertical_flip $canonical]} {
+        error "Unsupported orientation for explicit vertical power-phase proof"
+    }
+    if {[dict get $vertical_flip $orient] != [dict get $vertical_flip $canonical]} {
+        error "Native legalization changed vertical power phase: [$inst getName] $orient to $canonical"
+    }
+}
 # Undo OpenDP orientation normalization at the SAME legalized physical bbox.
 foreach inst [$block getInsts] {
     lassign [dict get $original_orientation [$inst getName]] orient status
@@ -109,6 +129,38 @@ def boxes(text):
     return dbu, site, result
 
 
+def same_vertical_phase(original, canonical):
+    """Standard orientation transforms: horizontal mirror may change, Y sign may not."""
+    flips = {"R0": 0, "MY": 0, "MX": 1, "R180": 1}
+    if original not in flips or canonical not in flips:
+        raise ValueError("Unsupported orientation for power-phase proof")
+    return flips[original] == flips[canonical]
+
+
+def select_hotspot(geometry):
+    from decimal import Decimal
+    dbu, _, instances = boxes(geometry)
+    x0,y0,x1,y1 = (Decimal(value)*dbu for value in HOTSPOT_BOX)
+    selected = {name for name,(kind,rect) in instances.items() if kind == "CORE" and
+                name.startswith(("u_shell.u_crc.","u_shell.u_spi.")) and
+                rect[0]<x1 and rect[2]>x0 and rect[1]<y1 and rect[3]>y0}
+    if selected != SELECTED_NAMES: raise ValueError("Exact five-cell native hotspot selection differs")
+    return selected
+
+
+def authenticate_hotspot(path):
+    from audit_congestion_report import audit
+    from decimal import Decimal
+    measured = audit(path,HOTSPOT_REPORT_SHA)
+    box = tuple(map(Decimal,HOTSPOT_BOX))
+    matches = [row for row in measured["markers"] if
+               tuple(map(Decimal,row["bbox_native_decimal_text"])) == box]
+    if len(matches)!=1 or matches[0]["overflow"]!=4:
+        raise ValueError("Exact native worst hotspot marker differs")
+    return {"source_run":38101639866,"report_sha256":HOTSPOT_REPORT_SHA,
+            "coordinate_unit":"micrometers","native_marker":matches[0]}
+
+
 def gap_witnesses(geometry, selected):
     dbu, site, instances = boxes(geometry)
     witnesses = []
@@ -129,11 +181,7 @@ def audit_placement(before, after, geometry_before, geometry_after, selected):
     if set(old) != set(new) or opins != npins or len(old) != 3606: raise ValueError("Instances or actual connectivity changed")
     dbu, site, obox = boxes(geometry_before); ndu, nsite, nbox = boxes(geometry_after)
     if (dbu, site, set(obox)) != (ndu, nsite, set(nbox)) or set(obox) != set(old): raise ValueError("Native geometry changed scope")
-    from decimal import Decimal
-    expected = {name for name, (kind, rect) in obox.items() if kind == "CORE" and
-        name.startswith(("u_shell.u_crc.", "u_shell.u_spi.")) and
-        rect[0] < Decimal('121.44')*dbu and rect[2] > 0 and
-        rect[1] < Decimal('525.6')*dbu and rect[3] > Decimal('475.2')*dbu}
+    expected = select_hotspot(geometry_before)
     if not selected or set(selected) != expected or len(selected) != len(set(selected)): raise ValueError("Native selected set is not exact measured region")
     moved = []
     for name, value in old.items():
@@ -195,6 +243,7 @@ def main():
     try:
         source=INPUT/"fixed_original"
         result["source_immobility"]=validate_candidate(source)
+        result["selection_provenance"]=authenticate_hotspot(INPUT/"map/ten_buffers/1-openroad-globalrouting/native-congestion.rpt")
         baseline={"odb":source/"buffered.odb","nl":source/"buffered.nl.v","sdc":source/"buffered_sta_nom_typ_1p20V_25C/final/sdc/tt_um_warp.sdc"}
         authenticate_views(baseline,BUFFERED)
         archive=ROOT/"build/fanout-preflight-source.tar.gz"

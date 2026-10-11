@@ -1,5 +1,11 @@
 # Bugs
 
+## 67: Paired routing observer treats omitted CTS setting as a change
+- **Date:**2026-10-10.
+- **Symptom/check:**38112711226 runs baseline native GRT and reproduces146 overflow, then stops its observer before the padded case because CTS_SINK_CLUSTERING_SIZE is absent in the resolved stage config.
+- **Root cause:** the new stricter observer compares an input-only CTS parameter8 with the GRT stage's filtered config. Both the original38101639866 and new actual GRT configs omit it; this flow runs no CTS stage. Clock uncertainty0.25, transition0.15, derating5 and every routing policy remain present/exact.
+- **Fix/coverage:** accept only this specific omission when both actual configs omit it and input stays8; otherwise reject. Preserve source clock-cell census and all real margin/layer/library/macro guards. Retain native table/report before post-route policy checks so a wrapper rejection cannot discard the measured baseline. Actual retained config pair passes; changed margins, changed input CTS size and a differing original presence are rejected. Padded routing remains unexecuted in the first run; corrected paired execution pending.
+
 ## 66: Unbounded padding legalization changes orientations and moves distant cells
 - **Date:**2026-10-10.
 - **Symptom/check:**38102082569 native placement and requested spacing complete, but strict producer rejects changed orientation at _117_ before STA/routing. All masters/statuses/terminals remain exact;151 selected CRC/SPI cells obtain the requested gaps.

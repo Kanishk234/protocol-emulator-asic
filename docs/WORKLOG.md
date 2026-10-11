@@ -134,6 +134,12 @@ positive setup/hold. Candidate ODB13e88cf8…/NL3e3e9fd0…; actual resultSHA
 D-075 prepares matched native GRT against real fixed-original baseline under
 identical original50 policy. Complete source manifest/view/result/geometry/
 six-corner/policy checks pass locally; no routing benefit or acceptance claimed.
+Paired38112711226 reaches baseline actual146overflow, then observer wrongly
+rejects a CTS-only input absent from both original/current GRT stage configs.
+BUG67 corrects only that proved omission; all actual margins remain exact.
+Candidate was not routed. Retain table/report before policy checks, validate
+actual original/current configs and negative changed-margin/CTS controls, then
+rerun the matched pair. No congestion or electrical guard is relaxed.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

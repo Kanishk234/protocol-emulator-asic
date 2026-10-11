@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-075: Route the authenticated five-move placement against its real baseline
+- **Date:**2026-10-10. **Status:** accepted paired hosted diagnostic; no promotion.
+- **Evidence:**38112272623 passes native placement, exact five moves/max1.44µm, all3606 masters/orientations/statuses/terminals preserved, fixed macro exact and all six estimated shell STA screens with zero electrical violations/positive setup/hold. Source NL is unchanged; physical routing has not been tested.
+- **Decision:** compare exact fixed-original38101405271 baseline to the exact five-move producer, using identical hash-authenticated original50-iteration native GRT policy from38101639866. Same total area/masters/configuration/shell and20ns target. Preserve source-placement, library/macro, routing-layer/adjustment/electrical/margin guards, actual native tables, hotspot reports and failures. No allow-congestion, capacity inflation or extra hardware change.
+- **Cost/limits:** free standard45min hosted job, two900s native routes, separate5min image provisioning. Diagnostic collection may succeed with either route failing; result records underlying acceptance separately. Full detailed routing/extraction/geometry/antenna/function/configured timing remain later gates.
+- **Evidence:** cloud_hotspot_grt.py and hotspot_grt.yaml; root reproduced source-result/complete-manifest/view/policy hashes, exact geometry and six-corner guards without local EDA. Actual routing pending.
+
 ## D-074: Measure conditional configured C2 internal timing in hosted CI
 - **Date:**2026-10-10. **Status:** accepted isolated diagnostic; no hardware or timing qualification.
 - **Decision:** authenticate final physical C2 views from37814078650 and actual loaded UART evidence from37958116481. Run the two concrete C2 positions at all three original PVT Liberty corners, using extracted nominal SPEF and a genuine20ns propagated clock at N_GBUF_END[3]. Preserve original clock margins. Exactly529 image-derived configuration Q values per tile are stationary conditions; all eight user FF states remain dynamic. Add no false paths, loop cuts or I/O budgets.

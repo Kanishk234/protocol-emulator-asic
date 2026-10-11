@@ -34,6 +34,27 @@ report_checks options; constraints, physical views and image stay identical.
 Self-feedback timing sensitization needs separate analysis; these structural
 reports alone do not prove that the feedback paths can toggle in real operation.
 
+## Precise replay
+
+Reporting-only38112173902 succeeds on eba1988 with the same paths, physical
+views, image, clocks and corner choices. Worst setup/hold ns:
+
+| Position | fast | slow | typ |
+|---|---:|---:|---:|
+| X2Y1 setup |17.888203|15.228059|16.904188|
+| X2Y1 hold |−0.032927|0.246960|0.074609|
+| X2Y3 setup |18.112841|15.745416|17.231125|
+| X2Y3 hold |−0.037383|0.236427|0.066758|
+
+All six fast X2Y1 violations are self-feedback of _1823_,_1825_,_1827_;
+the smallest is−0.000184ns, previously rounded0.00. Both X2Y3 violations
+are _1821_ self-feedback. Exact pin/net/load detail is retained, and all report
+hashes/path counts match. Result SHA is
+c60dd4177a3fe5891d35bac1146aec31a70f733c4b75cf71c36c26d4bb9ca7a6.
+Hold failure is not repaired by a longer clock period alone. Investigate real
+path sensitization and a generic data-delay repair under the same uncertainty;
+do not hide the reports by changing margins or imposing an unjustified cut.
+
 Coverage retains152 inputs without delays,529 unclocked configuration latch
 pins and679 unconstrained endpoints per case. Case analysis does not magically
 make the loading network timed. Four drivers lack parasitic annotation:

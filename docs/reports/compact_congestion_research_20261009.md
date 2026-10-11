@@ -1,5 +1,18 @@
 # Compact shell congestion: measured locality and next experiment
 
+**October10 verified continuation:** broad151-cell padding failed bounded
+legalization38102423038; five-cell global legalization38111705881 reversed an
+unrelated cell's vertical phase; same-row all-right38112069098 exceeded a real
+row boundary. Each was rejected before STA/routing. Refined exact-source
+left/right placement38112272623 passes native legality and all six estimated
+shell STA screens. Exactly five cells move by at most1.44µm, preserving all
+3606 masters/orientations/statuses/terminals and the fixed macro. Five selected
+cells have proved gaps; NL remains3e3e9fd0… and new ODB is13e88cf8….
+This is placement/electrical screening, not routing closure. D-075 compares its
+actual routing with the fixed-original146-overflow baseline under identical
+original50-iteration policy. The historical investigations below retain their
+original scope and rejected results.
+
 The highest-leverage next step is to capture **native overflow coordinates**
 on the unchanged cluster8 baseline. Configuration-buffer insertion is a
 secondary comparison: the baseline already fails before those ten cells exist.

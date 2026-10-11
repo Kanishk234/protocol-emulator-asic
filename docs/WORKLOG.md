@@ -120,6 +120,20 @@ cell gaps. Retain rejection. A revised exact-source five-move plan uses the
 actual left gap for hold1200/_251__684; max1.44µm, unchanged rows/orientations,
 no configuration-cell movement. Geometry/AST/Tcl checks pass, native validation
 pending. Precise timing replay38112173902 is running independently.
+Precise38112173902 now succeeds: all six report hashes/path inventories checked;
+fast hold−0.032927ns(X2Y1 six self-feedback violations) and−0.037383ns(X2Y3 two).
+setup and slower-corner hold remain positive within the conditional scope.
+The small−0.000184ns native violation explains a rounded0.00 label. Investigate
+feedback sensitization/data delay; reducing clock frequency alone cannot fix
+hold. Latest bidirectional five-move producer38112272623 remains running.
+38112272623 now passes: root reproduces exact five moved cells/max1440DBU,
+five selected cells/zero spacing conflicts, all3606 masters/orientations/
+statuses/pins preserved and all six estimated shell electrical counts0 with
+positive setup/hold. Candidate ODB13e88cf8…/NL3e3e9fd0…; actual resultSHA
+3fa452da2289c65dbb69e77b375e5a687826f751b31d42d1974a733923b2999a.
+D-075 prepares matched native GRT against real fixed-original baseline under
+identical original50 policy. Complete source manifest/view/result/geometry/
+six-corner/policy checks pass locally; no routing benefit or acceptance claimed.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

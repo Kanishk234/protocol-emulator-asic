@@ -42,3 +42,25 @@ Extracted run 38116800326 succeeds on bb7125ea2f963c78dcdc95961019a783bddfd5ee; 
 Exact DRT NL SHA 402b87e6f798a8c760b277bf148a048527a74e92a87069db2801d148a0301e90, DEF SHA 73abf7de3ab00c578ca5d6718d6670f930d189c26ecb30ae8bd5d4c3d083d3eb. Worst slow slew _25245_ NOR4_1 output is 4.498456 ns against 2.5074 ns and drives eight logic pins/no diodes. Prepared exactly one NOR4_1 to NOR4_2 physical screen using existing guarded sizing binding, preserving all five signal pins and every other cell/net. Reviewed LEF footprint increases from 2.88x3.78 to 5.76x3.78 um: +10.8864 um2, no added cell. DPL and fresh timing/antenna/electrical/overflow are mandatory; strength alone may be insufficient for this severe wire load.
 
 95 focused tests pass plus real source/hash/topology and Tcl escaped-bracket argument checks. No physical sizing has run. Separate gds-residual-nor4-screen workflow uses exact successful source 38116800326 and original full hardware/recipe, unchanged 50 ps gate. Next publish reviewed helper/tests/workflow/evidence then measure. _28820_ remains a separate 14-row slew/13-load branch target; do not combine changes before measuring this screen.
+
+## Parallel capacitance repair preparation during NOR4 screen
+
+NOR4 screen38162764354 is in progress (last observed preparing generated config). Read-only checks use timing-qualified DRT38116800326 only; all geometry must be revalidated after the running screen's resulting layout.
+
+| Repair candidate | Current evidence | Proposed cost | Qualification still needed |
+|---|---|---|---|
+| Move DOUT2 buffer wire9439 closer to macro | Cap 0.101150–0.101696 pF versus0.064; BUF4 at341.28,230.58N; candidate45.12,245.70N | No added cell/master/net change; origin distance296.68→14.60 um | Physical pin access, power, legality, antenna and extracted timing/cap |
+| Move DOUT4 buffer wire9437 closer to macro | Cap0.064554–0.065100 pF versus0.064; BUF4 at291.84,238.14N; candidate67.68,245.70N | No added cell/master/net change; origin distance231.06→14.52 um | Same; current overage is small, no guaranteed result |
+| Isolate distal place8636 branch | BUF1 drives8 pins,7 logic/1diode; cap0.323056–0.327563 pF versus0.300 | One BUF4 candidate14.5152 um2; move only _36028_/A1 and ANTENNA_38/A to its downstream net; original upstream7 loads, new branch2 loads | Exact topology, legal placement near distal pair, physical RC, antenna rerun and hold/setup |
+
+DOUT proposals were computed from pinned macro LEF pin centers, fixed SRAM placement12,40 FS, exact current DEF and reviewed standard-cell LEF. Both complete footprints have zero overlap on row64, independent candidates. These are origin distances, not routed wire lengths or guaranteed delay reductions. Raw proposals stay in /tmp.
+
+place8636 is at249.12,264.60. Its distal logic _36028_ is at1154.40,98.28 and associated ANTENNA_38 at1155.36,94.50, over1mm Manhattan distance from current driver. The other six sinks span255.36–659.04 in x. One distal identity branch could shield the original BUF1 from the long wire, preserving both original logic and diode; blanket upsizing cannot reliably fix the physical capacitance limit. This is a topology/placement hypothesis, not a measured repair.
+
+None of wire9439, wire9437, place8636 or _28820_ appears in the saved reported fast-hold or slow-setup path sets. Reports are truncated path samples, so this does not prove these changes cannot affect hold/setup; the15.626ps fast-hold reserve must be rechecked physically.
+
+Priority after current screen/extraction: DOUT2 proximity first for a large zero-added-cell cap deficit; DOUT4 proximity if actual resulting layout still has a cap failure; isolate place8636 distal branch if its cap failure persists; continue selected data/clock fanout policy. Keep one physical change per measured hardening and preserve original signoff limits.
+
+## NOR4 screen audited; extraction prepared
+
+Screen38162764354 qualifies: setup WS0 all corners, hold fast100.728ps/typ203.267ps/slow378.209ps; slew slow/typ/fast15/1/0, fanout24each, cap metrics0. Exact one-master/topology/antenna-only/receipt/reset/zero-overflow history independently audited against66 downloaded files. These estimated figures do not establish electrical closure or improvement against extracted counts. Prepared exact screen continuation residual_nor4_route.py and gds-residual-nor4-route;112 focused tests pass. Fresh antenna and all-corner50ps timing qualification precede stockDRT/extraction; no repeated sizing. Publication/launch pending scoped approval.

@@ -5,6 +5,25 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (audit NOR4 screen and prepare extraction)
+- Downloaded 66 selected evidence files. Exact source/proposal, sole NOR4 master change/all wiring, antenna-only cleanup, one sizing receipt/wire reset and zero-overflow audit pass. Slow electrical report row count matches15. Prepared residual_nor4_route.py and separate workflow on exact screen38162764354/head0b4d4ac; no repeated sizing, fresh antenna/timing50ps gate before stockDRT/newextraction.
+- 112 focused tests pass, including full checkpoint refusal cases and fresh pre-DRT gates. New physical extraction not run. Next publish reviewed tools/CI/docs group under scoped approval and launch; then re-pin DOUT2 proximity repair if its cap failure remains. No phase boxes/new dispatch.
+
+## 2026-10-11: Codex (NOR4 preliminary screen result)
+- Run38162764354 succeeds; artifact11711366639 retrieved for saved timing/gates. One cell-strength repair qualifies preliminary all-corner timing/50ps hold gates. Electrical counts and exact slack recorded below; not detailed-route/extracted closure.
+- nom_fast_1p32V_m40C: setup 0 ns, hold 0.100728 ns; slew/fanout/cap 0/24/0.
+- nom_slow_1p08V_125C: setup 0 ns, hold 0.378209 ns; slew/fanout/cap 15/24/0.
+- nom_typ_1p20V_25C: setup 0 ns, hold 0.203267 ns; slew/fanout/cap 1/24/0.
+- Next independent exact one-master/topology/antenna/overflow audit, then detailed routing/extraction before deciding next repair. No phase ticks/new dispatch.
+
+## 2026-10-11: Codex (parallel zero-added-cell capacitance proposals)
+- NOR4 screen38162764354 is in progress preparing config. On exact timing-qualified parent38116800326, computed DOUT2/4 buffer relocation sites45.12,245.70N and67.68,245.70N with full reviewed-LEF footprints0overlap; pin-to-origin distances296.68→14.60um and231.06→14.52um. No added cells; physical power/pinaccess/timing not qualified.
+- Mapped place8636 cap failure to8loads, distal _36028_/A1 plus ANTENNA_38/A over1mm from driver. Prepared one-BUF4 isolation hypothesis: upstream7loads/downstream2,14.5152um2 nominal footprint; preserve every prior sink/diode. Targets absent from saved reported critical path samples, not proof of timing independence. Report updated; no ECO/launch/phase boxes. Revalidate exact resulting layout before implementing next one measured repair.
+
+## 2026-10-11: Codex (publish and launch residual NOR4 screen)
+- Explicit user approval executed: tools 4aaa316, CI455b713 and docs0b4d4ac pushed to remote main. Exact remote head0b4d4ac7647d34bacdb0ad9928b8cb66546eb8e2 verified. [Residual NOR4 screen38162764354](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38162764354) queued on that commit; one master change on timing-qualified extracted checkpoint38116800326.
+- Next inspect physical sizing/legalization/topology, antenna/overflow, all-corner setup/hold and electrical evidence. No phase boxes ticked; unrelated files and FIPE excluded. Launch receipt is local.
+
 ## 2026-10-11: Codex (prepare one-cell electrical strength screen)
 - Retrieved exact timing-qualified DRT NL/DEF and paths; mapped slew clusters. Worst _25245_ output 4.498456 ns versus2.5074 ns drives eight logic pins/no diodes. Prepared exact NOR4_1→NOR4_2 screen on run38116800326; +10.8864 um2/no added cells, original full recipe and 50 ps gate preserved. Exact source hashes, all-cell wiring conservation and actual Tcl escaped bracket args audited.
 - 95 focused tests pass. New sizing not physically run; no commit/push/dispatch or phase ticks. Next publish reviewed tools/CI/docs and launch under scoped approval; inspect actual repair effect before DRT or next _28820_ branch repair. Remaining cap DOUT2/DOUT4/place8636 and24fanout remain.

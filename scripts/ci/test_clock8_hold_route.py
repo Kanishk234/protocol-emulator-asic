@@ -101,7 +101,7 @@ def test_complete_hold_chain_is_required(tmp_path, monkeypatch, failure):
         path.write_text(value)
     original = Path('runs/native-clock8-strength-route/drt/1-openroad-detailedrouting/tt_um_tripwire.nl.v')
     write(original, before)
-    write(original.with_suffix('.def'), layout if failure != 'layout' else layout+'changed')
+    write(original.with_name('tt_um_tripwire.def'), layout if failure != 'layout' else layout+'changed')
     if failure == 'proposal': proposal['kind'] = 'antenna'
     write(root/'proposal.json', json.dumps(proposal))
     grt = root/'grt/1-openroad-globalrouting'

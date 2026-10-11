@@ -36,7 +36,7 @@ def validate_checkpoint(root):
     if not qualified(timing, antenna):
         raise ValueError('Saved native strength timing/hold/antenna gate fails')
     original = Path('runs/native-clock8-strength-route/drt/1-openroad-detailedrouting/tt_um_tripwire.nl.v')
-    layout = original.with_suffix('.def')
+    layout = original.with_name('tt_um_tripwire.def')
     proposal = plan(original.read_text(), layout.read_text(), 'hold')
     saved = json.loads((root / 'proposal.json').read_text())
     if json.loads(json.dumps(proposal)) != saved:

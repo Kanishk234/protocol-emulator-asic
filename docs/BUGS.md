@@ -1,5 +1,11 @@
 # Bugs
 
+## 73: Replay origin-only bounds admit an incoherent quantized trace
+- **Date:**2026-10-11.
+- **Symptom/check:** adversarial review finds stamps[0,0,0,1,2], quantum2, maximumgap1 pass origin-only cumulative bounds despite no coherent absolute-clock schedule.
+- **Root cause:** cumulative uncertainty relative to the origin can hide incompatible consecutive timestamp advances later in a trace.
+- **Fix/coverage:** propagate the reachable clock interval through each unwrapped timestamp bin before allowing slicing. Independent exhaustive four-event/two-bit traces compared to enumerated absolute-clock schedules plus the explicit failing regression pass; full host tests45PASS. Relative output windows remain correlated and do not infer pin values or a waveform.
+
 ## 72: New C channel reader can consume an unreported arriving byte
 - **Date:**2026-10-11.
 - **Symptom/check:** deeper host-driver review against actual wp_spi_target/wp_shell handshake found direct empty CH_READ polling unsafe. STATUS snapshots near CS start, but rd_hit latches FIFO validity at opcode completion; a byte arriving between these events can be popped even when returned status.rx_valid was0. Initial scripted callback tests did not model this interval.

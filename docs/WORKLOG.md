@@ -99,6 +99,17 @@ User guide now states board power-loss/reselection reload requirements and
 distinguishes USER_RESET from restoring lost configuration. EVIDENCE discloses
 Claude/Codex assistance and ties acceptance to actual checks rather than AI
 review, following the organizer's submission guidance.
+**New results verified:**38111705892 completes all six conditional timing
+cases and eight real clock arrivals each. Examined setup positive, fast hold
+reports−0.03ns(X2Y1)/−0.04ns(X2Y3); all report hashes/path counts verified.
+Actual coverage/annotation and scope are recorded in
+compact_conditional_c2_sta_20261010.md; acceptance remains false.
+Five-cell padding38111705881 fails explicit power-phase guard after unrelated
+odd-row relocation, before restoration/STA/routing. Source geometry yields
+seven same-row rightward moves, max1.44µm, achieving all requested gaps.
+Reviewed replacement avoids global OpenDP, retains original rows/orientations
+and native placement plus six STA guards. Actual Tcl runs against geometry
+mocks and proves planned gaps/movement without local EDA; native run pending.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

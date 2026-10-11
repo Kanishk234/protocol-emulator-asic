@@ -1,5 +1,11 @@
 # Bugs
 
+## 71: Candidate extracted-STA adapter passes relative Docker paths
+- **Date:**2026-10-11.
+- **Symptom/check:**38163818509 authenticates/prepares all six cases, then all containers reject working directory with returncode125; no STA command executed.
+- **Root cause:** new candidate adapter omitted the original STA CLI's resolve() conversion for output/physical/PDK paths.
+- **Fix/coverage:** resolve those paths before invoking the unchanged STA engine. Original case hashes, own SPEF, loaded-result authentication and all margins remain unchanged. Retained actual logs establish setup-only failure; static check verifies all three paths are resolved. Fresh cloud execution required; no timing conclusion from failed launch.
+
 ## 70: Loaded candidate workflow depends on an expired control artifact
 - **Date:**2026-10-11.
 - **Symptom/check:**38162860520 stops before any candidate simulation because37659171115 no longer has downloadable artifacts. Automatically triggered historical replay38162860294 also fails its artifact prerequisites.

@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (verify selected SRAM screen launch)
+- Tools/CI/docs ad54e1e/f58b587/d6c39dd pushed; remoteexactheadverifiedd6c39ddda6793033b45fde94a8d50517fb3a743d. [SelectedSRAM screen38111368461](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38111368461) queuedonexacthead. Oneexistingoutput0bufferrelocationonselectedlatestsetup route; 138focusedchecks/actualsourcegeometryauditpass.
+- Next inspectactualmovement/legalization/antenna/allcorner/electrical/overflow beforequalifiedDRT/extraction. No phasebox;FIPE/unrelatedlocalprototypesexcluded,nohardwarehistorychanges.
+
 ## 2026-10-10: Codex (prepare SRAM cap repair on exact latest route)
 - RetrievedlatestDRTNL/DEF/criticalpaths; same48179start,worstendpointnow46391. Repinned exactlatestNL/DEF andverified output0nearbycandidatefootprint0overlap. Prepared dedicated one-existing-buffer relocation screen/binding/image/workflow, no sizing/addedcells/wiring/specchange; strictsource/position/master/power/occupancy/post-DPL/post-antenna location andfreshallcornergates.
 - 138focusedchecks andactualsource/geometryauditpass; realnewphysicalmoveunexecuted. Next publish/launchunderongoingapproval, inspectscreenthenfreshDRT/extraction. No phasebox/promotion; othercap/setup/electricalresiduals remain.

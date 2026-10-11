@@ -38,3 +38,9 @@ This experiment does not change architecture, firmware/protocol support or50MHz.
 ## Initial launch failure and correction
 
 Clean bank38180541456 failed before synthesis because the launcher did not create the nested flow directory required by the pinned --force-run-dir CLI. BUG92 records the cause. Corrected helper creates a fresh empty directory before CLI invocation and refuses reuse; regression checks the actual directory at launch, stock-image selection and no checkpoint initial state.99focusedtests pass. This failure provides no physical evidence for or against SRAM locality; corrected rerun remains under the previously approved experiment scope.
+
+## Physical clean placement reproduced; post-timing antenna failure
+
+Corrected run38181853373 (artifact11718259505) reaches the final qualification gate, after reference-topology/manual/DPLplacement checks and cleanGRT. Saved setupWS0all/fast hold83.3254ps, electrical slew slow/typ/fast10/1/1,fanout8each,capmetrics0. Antenna15nets/17pins causes proper refusal. These are estimates before post-timing cleanup, not extractedclosure.
+
+BUG93: clean screen omitted the conditional stock post-timing antenna cleanup already used in native_stock_route. Added disallowed-congestion stockRepairAntennas/CheckAntennas, unique physical views/log/metrics checks, antenna-only topology validation and fresh allcornerSTA on repaired state. No fullGRT or timing-limit relaxation.106focusedtests pass; rerun remains within approved cleanbank scope. Official adoption still requires reviewed config exception and final clean DRT/GL/GDS evidence.

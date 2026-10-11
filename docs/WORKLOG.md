@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (diagnose clean-bank antenna failure; complete cleanup)
+- Cleanbank38181853373 fails finalantenna gate, nottiming/placement: saved15nets/17pins; estimatedsetupWS0all, fast hold83.3254ps, slew slow/typ/fast10/1/1,fanout8each,capmetrics0. Reference topology/manual/DPLsite checks and cleanflow/GRT had completed. Alllatestlint/test/docs/unitgreen.
+- Added conditionalstock post-timing antenna cleanup matching native_stock_route: no congestion waiver or fullGRT, completeantenna-only wiring/view/history checks, freshSTA onrepaired state and unchanged50psgate. BUG93logged;106focusedtests pass. Nextpublish correction andrerun underalready-approved cleanbankexperiment scope; no phaseboxes/template/mainconfigchanges.
+
+## 2026-10-11: Codex (parallel exact-route hold and electrical preparation)
+- Cleanbank38181853373 remainsinprogress atclean placement/timing step atfirstcheck. RetrievedlatestresidualDRTviews; remainingcaponlyDOUT1. Classified27fanout=4clock/23data; recordedactual diode loads toguide generaldistributionpolicy.
+- Identified55.629psworsthold final40391→46597oneleaf. Prepared exact-source read-onlyoneBUF1proposal atfree430.08,676.62N,7.2576um2; fullcell/net/clock/resetconservation andactualfreefootprintauditpass.17focusedplanner/Tcltests pass. No physicalbufferinsertion/workflow/newcommit orphaseboxes; inspectcleanbankresultbeforechoosing nextmeasuredrepair. Unrelated files/FIPE untouched.
+
+## 2026-10-11: Codex (refresh all main workflows; audit residual extraction)
+- Residualroute38179535945success; artifact11718049045 selective timing/electrical retrieval and complete-report reparses match. Cleanbankrerun38181853373inprogress at cleanClassicplacement/timing step; unit38181853705inprogress at chipRTL/L3, Verilator/internaljobscomplete; latestlint/test/docsgreen. Oldunit38180535914success; oldplacementGL37655518919/extracted37655518925queued.
+- Extracted timing: timing__setup__ws__corner:nom_fast_1p32V_m40C=0ns, timing__hold__ws__corner:nom_fast_1p32V_m40C=0.05562922502322864ns, timing__setup__ws__corner:nom_slow_1p08V_125C=0ns, timing__hold__ws__corner:nom_slow_1p08V_125C=0.30682413034285133ns, timing__setup__ws__corner:nom_typ_1p20V_25C=0ns, timing__hold__ws__corner:nom_typ_1p20V_25C=0.1524679314845825ns.
+- Electrical: nom_fast_1p32V_m40C {'slew': 5, 'fanout': 27, 'capacitance': 1}, nom_slow_1p08V_125C {'slew': 123, 'fanout': 27, 'capacitance': 1}, nom_typ_1p20V_25C {'slew': 26, 'fanout': 27, 'capacitance': 1}. Compare retained timing-qualified parent beforepromotion; nextinspectcleanbankresult andrepin exactcandidate. No phaseboxes/newdispatch.
+
+## 2026-10-11: Codex (verify clean launcher fix rerun)
+- Approvedscreen-scope fix commits575b9cc/83ae54d/0ddafb5 pushed; remoteexacthead0ddafb5e8963430e8981cf55a8fc4bdae71390fc verified. Corrected cleanbank rerun[38181853373](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38181853373) inprogress onthathead.
+- Latestmainactive: rerun38181853373, residualroute38179535945, olderunit38180535914 plusnewlint/test/docs/unit38181853759/38181853770/38181853682/38181853705. Two oldplacementworkflows remainqueued37655518919/37655518925. No officialGDSrun orphaseclosure. Next inspectphysicalrerun/results; unrelatedfiles/FIPE excluded andreceiptlocal.
+
 ## 2026-10-11: Codex (all-main workflow audit; fix clean launcher)
 - Mainstatus: residual extraction38179535945running routing/extraction, unit38180535914running chipRTL/L3 (Verilator/internaljobscomplete); latesttest/lint/docsgreen. Oldplacement GL37655518919 and extracted37655518925 remainqueued. Cleanbank38180541456fails before synthesis due absentforce-run-dirflowdirectory, no measuredbankplacementresult.
 - Fixed launcher tocreatefresh directorybeforepinnedCLI andrefuse reuse; addedactual launchcontract tests, corrected workflowstepname, loggedBUG92.99focusedtests/diffpass. This correction/rerun stays within prior approvedcleanbankscreen scope; next publishfix andrerun, then inspectphysicalresult. No phaseboxes/hardwareconfigchanges.

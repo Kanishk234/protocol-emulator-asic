@@ -123,3 +123,10 @@ gh workflow run gds-clock8-clock-screen.yaml --ref main
 
 
 The user subsequently explicitly approved publication. The prepared helper and workflow groups are committed as eb21e49 and 931973c; publication/dispatch verification follows. This approval supersedes the earlier user-run publication handoff for these groups.
+
+
+## Clock screen audit and independent extracted continuation
+
+Screen 38103503234 artifact 11688563140 passes an independent exact-source canonical topology/antenna-retention/zero-overflow audit. All four original internal clock branches now have two loads; each of eight added BUF8 outputs has eight loads. None of these clock drivers remains in the fresh fanout violation table. The 31 remaining fanout violations are data branches. Fresh complete electrical tables confirm slew slow/typ/fast 12/2/1 and one capacitance failure in every corner: SRAM A_DOUT[0] (fast 0.068412 pF versus 0.064 pF limit). Slow slew failures include SRAM A_REN, A_MEN, A_ADDR[6] and the _28807_ data cone. These are independent of the repaired clock fanout. The saved comparison uses the same final state for before/after; its zero deltas do not measure benefit against the original source.
+
+Prepared independent `gds-clock8-clock-route` continuation pins screen 38103503234/head fd5c64173acacb3e8cbaf08fd4b4491b357d3f55, its eight-buffer canonical proposal and exact source NL/DEF. It rechecks topology, antenna-only changes, routing history and fresh allcorner/50 ps hold/antenna gates before stock detailed routing and fresh extraction; it does not repeat the clock ECO or combine unmeasured repairs. 189 focused checks pass. Existing user publication approval applies. No Phase 2 tick or promotion; final zero-electrical, DRC, GL and official requirements remain open.

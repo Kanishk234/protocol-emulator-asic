@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (parallel clock audit and extracted continuation)
+- Audited actual clock screen canonical NL/DEF/topology/antenna retention/zero overflow; four clock branches now2loads, eight new branches8loads and none remain in fanout violations. Remaining31fanout data-only; SRAM DOUT0cap and REN/MEN/ADDR6 plus28807cone slew remain. No baseline delta inferred from same-state comparison.
+- Prepared exact-source guarded clock DRT/extraction continuation; 189 focused checks pass. Hold/fanout routes still running at check. Next publish/launch under user approval, compare three extracted experiments before combinations/integration. No phase box.
+
+## 2026-10-10: Codex (clock screen completed; routes still running)
+- Clock38103503234 succeeds in about8min; artifact11688563140 comparison/gates retrieved. GRT-estimated setup WS0 allcorners; hold fast95.724ps, typ200.516ps, slow378.551ps. Electrical slew slow/typ/fast12/2/1, fanout31 each, capacitance1 each. Screen qualifies timing/hold but not zero-electrical or extracted/official closure. Comparison before/after both reference the same final state; do not interpret zero deltas as baseline improvement.
+- Hold38102572131 and fanout38103189246 remain in fresh qualification/routing/extraction; five unit jobs active at check. No phase box or promotion. Next audit clock branch-specific final connectivity/electrical evidence and compare fresh extracted routes before choosing combinations.
+
 ## 2026-10-10: Codex (verify clock screen launch)
 - Approved helper/workflow/docs eb21e49/931973c/fd5c641 pushed; remote main verified at fd5c64173acacb3e8cbaf08fd4b4491b357d3f55. Launched [clock screen38103503234](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38103503234) on that exact head; in progress at verification. Hold38102572131 and fanout38103189246 still run. No phase box or result promotion.
 - Next inspect independent clock timing/electrical/antenna/overflow gates and extracted hold/fanout results. 165 focused checks pass; unrelated local prototypes and FIPE remain excluded.

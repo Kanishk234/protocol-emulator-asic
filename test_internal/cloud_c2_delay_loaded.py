@@ -64,7 +64,8 @@ def main():
     # checks all actual latches and executes normal/USER_RESET UART cases.
     try:
         native.main(final_sha=FILES["last_completed/nl/LUT4x8_ha_C2.nl.v"],
-                    source_hardening_run=PHYSICAL_RUN, input_dir=INPUT, out_dir=OUT)
+                    source_hardening_run=PHYSICAL_RUN, input_dir=INPUT, out_dir=OUT,
+                    control_run=int(os.environ["GITHUB_RUN_ID"]))
     finally:
         if OUT.is_dir():
             (OUT / "physical_input_audit.json").write_text(json.dumps(audit, indent=2) + "\n")

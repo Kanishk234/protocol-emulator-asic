@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (prepare general antenna-aware data fanout repair)
+- Actual antenna result confirms29457 cleared; new failures elsewhere hide target improvement inaggregate36. Prepared canonical general split for30auditeddata drivers,39BUF4added,initialsource/branches<=6 to reserve2antenna loads; all diodes/cellsretained,4clockbranchesunchanged. Added independent fanoutscreen and dynamicstrictreceiptcount.127focused checks pass plusactualsource topology/targetgeneration; bracketescapingmatchesobservedODBbinding. No physical area/timingbenefit orphasepass claimed.
+- User workflowpushapproval persists. Next publish/launchreviewedscreen while holdroute38102291599 runs; preserveoriginalbaseline and inspectfreshoverflow/antenna/timing/electrical beforepromotion.
+
+## 2026-10-10: Codex (publish approved hold continuation)
+- User explicitly approved workflow/helper pushes and continued work toward Phase2 zero-violation/allcorner/officialGDS goal. Separate tools/CI/docs groups ea66133/355892e/1ecdad2 pushed; remote verified at1ecdad27ceb24e054089f45df19e23b3e9fedbf3. Launched [hold route38102291599](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38102291599) on that exact head; running at verification.124focused checks/actualsourceaudit passed beforepublication.
+- Both earlier screens pass estimatedtiming; antenna split leaves36fanout and11slow slew vs hold36fanout/2slow slew. Next inspect branch-specific antenna loads while holdrouteextracts. No phasebox; sourcecandidate stillfails extractedsetup/hold and originaltimingbaseline retained.
+
 ## 2026-10-10: Codex (antenna screen completion check)
 - Antenna38101471390 succeeds in11m23s/artifact11687872556; exact fresh estimated timing/electrical comparison retrieved. Both independent screens nowcomplete; onlytwo mainunitjobsactive at check. These are GRTscreenresults, not extractedclosure. Holdcontinuation remains prepared/pendingpublicationapproval; no newdispatch/phasebox. Next compare exact results and qualify extracted continuation before any combination/integration.
 

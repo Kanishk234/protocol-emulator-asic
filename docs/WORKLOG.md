@@ -80,6 +80,13 @@ Parallel analysis is narrowing the physical hypothesis. All routine checks on
 8e3761e pass: lint38102423065/docs38102423094/test38102423041/unit38102423068.
 D-074 records the separate six-case conditional configured C2 timing diagnostic;
 its cloud workflow is being reviewed, with no local EDA or acceptance claim.
+Read the complete organizer email; organizer_update_20261010.md records6×4
+baseline/optional8×4, SRAM hypotheses, reset/reload, pad characterization and
+submission implications. User emphasizes broad usable protocol coverage;
+UART/SPI/I2C remain demonstrations, not an architectural ceiling. The linked
+SRAM tutorial is not accessible through the research browser, so its contents
+are not represented as reviewed. Parallel workers hit a usage limit after
+preparing changes; root continues their review and lightweight checks.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

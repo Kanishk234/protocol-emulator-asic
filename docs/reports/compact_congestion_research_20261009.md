@@ -228,6 +228,19 @@ orientation restoration. Reconstructing original orientation anchors for the
 failed actual geometry still rejects its excessive physical displacement.
 No corrected native run or improvement is claimed here.
 
+The orientation-restoration correction also requires identical **vertical
+mirror phase before restoration**. R0/MY preserve the vertical axis, whereas
+MX/R180 reverse it. Actual38102082569 contains142 cross-group transitions;
+these cannot be treated as harmless horizontal normalization because restoring
+the old orientation could invert power-pin alignment on the new row. The
+collector retains canonical intermediate census/geometry, checks native
+canonical legality, then rejects any vertical-phase change before modifying
+orientation. Only same-phase normalization can reach the restoration and final
+native legality/spacing checks. Unknown orientations also reject. Lightweight
+controls accept the two same-phase normalizations and reject all four observed
+cross-phase classes plus an unsupported orientation. This is a strict extra
+guard, not a claim of extracted power connectivity signoff.
+
 ## October 10 continuation
 
 Actual150-iteration run37960021920 leaves the buffered overflow at169. Its

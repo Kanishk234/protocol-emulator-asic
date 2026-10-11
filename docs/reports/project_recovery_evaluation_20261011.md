@@ -11,7 +11,7 @@ The frozen G1 is the documented submission fallback. The compact successor is an
 | Stronger-driver compact physical layout | 37708459393, official precheck37960021923 | Native routing/full geometry/shell LVS and all nine official checks pass on that layout. Fanout33 remains; macros abstract in shell timing. |
 | Ten-buffer shell candidate | 38101405271 | All six estimated electrical/setup/hold cases pass, but native routing subsequently fails. This is not the physical layout above. |
 | Reset net683 relocation | 38163199430 / 38163542037 | Actual native paired overflow146→136 with unchanged policy; both reject congestion. |
-| Reset net694 relocation | 38165505343 | Legal one-cell move, exact all-other placements/connectivity, all six estimated screens pass. Paired routing38165931145 is running at this audit. It starts independently from146 baseline, not136 net683 candidate. |
+| Reset net694 relocation | 38165505343 | Legal one-cell move, exact all-other placements/connectivity, all six estimated screens pass. Paired routing38165931145 rejects this candidate:146→154 native overflow, same50iteration policy. It starts independently from146 baseline, not136 net683 candidate. |
 | Delayed actual C2 tile | 38114298036 / 38163199372 / 38164099529 | Physical gates0; real-loaded UART/reset passes; examined conditional internal setup/hold pass at two positions/three libraries with own nominal SPEF. Source virtual-clock setup fails. Other tiles, loading, I/O and intertile timing remain open. |
 | C2 annotation follow-up | Authenticated retained graph38163199372 and six reports38164099529 | Four unannotated drivers have no cell loads/output aliases in this exact tile graph; does not resolve other unconstrained endpoints. |
 
@@ -27,7 +27,7 @@ The frozen G1 is the documented submission fallback. The compact successor is an
 
 | Priority | Action | Completion gate | Dependency |
 |---|---|---|---|
-| P0 | Compare net694 actual GRT to exact146 baseline | Retain both native outcomes/marker maps; reject worsening or unchanged candidate | Running38165931145 |
+| P0 | Compare net694 actual GRT to exact146 baseline | Retain both native outcomes/marker maps; reject worsening or unchanged candidate | Completed38165931145; reject worsened154 candidate. |
 | P0 | Export native fragmented rows/blockages and quantify legal local whitespace | Authenticated read-only DEF/census, immutable source; identify sites with actual row boundaries and macro/blockage subtraction | New cloud_reset_row_inventory workflow |
 | P0 | Reserve targeted receiver-local tie space or redistribute a small affected region | One copied-checkpoint policy; native legality/power alignment, unchanged masters/connections/macros/pins and six electrical screens | Actual rows, then measured placement policy decision |
 | P0 | Route the selected fanout-clean shell | Zero native overflow then detailed-route/antenna/critical-disconnect gates | Legal/electrically clean placement candidate |
@@ -50,3 +50,5 @@ OpenROAD primary references: [placement padding and legality](https://openroad.r
 ## Working policy
 
 Use cloud runners for heavy EDA. Inspect native results, not only workflow conclusions. Each experiment changes one physical hypothesis and retains exact input hashes. Promote only measured improvements; do not bypass congestion, power-phase, timing or foundry checks. Keep a single current acceptance matrix so newer results do not silently inherit older passes. No phase completion, universal-protocol support, USB/Ethernet support or silicon claim is established here.
+
+Measured follow-up: paired38165931145 result SHA700f317f91b7a43719f63d063bf1af208cc11729faee9129b928c4ab38f44664; native baseline146, net694154. Both native routes reject congestion. Candidate marker SHA209a8c2cce5a77150fc0286fe4f5a87620c6baf0a5c98485c21c02a4af8c93ad. The shorter placement proxy failed as a routing predictor; do not combine or promote this move. Actual row inventory38166250744 is executing independently.

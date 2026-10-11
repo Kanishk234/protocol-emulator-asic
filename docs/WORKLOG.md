@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (prepare guarded SRAM output0 movement)
+- Setup38108151690 stillrunsphysicalstep/no reportedfailure. Prepared separate selected-source output0relocation Tcl: unchangedwire9447BUF4/nets, exactold/newbbox, occupiedsite/power/master/wiring preflight, post-DPLverification. 28focusedchecks pass; actualselectedDEF/LEF independentfootprintaudit0overlap.
+- PhysicalOpenDBmove/routing/timingunexecuted. Next inspectsetupresult, repin/recompute siteagainstresultingcheckpoint andapplyonlyone measuredrelocation. No extraindependentworkflow/phasebox; no stalehistoricalsiteuse.
+
 ## 2026-10-10: Codex (parallel selected-source SRAM placement proposals)
 - Setup38108151690 runsphysicalrepair/timing. Prepared exactfanoutNL/DEF+reviewedLEFgeometry SRAMplanner: output0wire9447 candidate25.92,245.70N gives17.66µmpin-to-origin versus451.64µm; RENcandidate132.96,245.70N gives19.19 versus314.87. Fullfootprints have0overlap on selectedsource; pinaccess/power/legalization/routingstillunproved.
 - 16planner/setupchecks pass plusactualboth-targetsource/geometry audits. Nophysicalmove/newdispatch/phasebox; next inspectsetupscreen andregenerate placementonits exactcheckpoint beforeone measuredoutput0relocation. No unsolicitedcombination orareaclosureclaim.

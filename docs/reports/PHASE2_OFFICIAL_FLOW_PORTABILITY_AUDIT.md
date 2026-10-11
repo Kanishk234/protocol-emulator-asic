@@ -34,3 +34,7 @@ Separate `gds-sram-bank-clean-screen.yaml` uses frozen full2/4 candidate3393eea,
 5. Integrate approved hardware/config/constraints on one main commit; official GDS/precheck/gl_test/viewer plus independent all-corner zero-electrical audit must pass on that commit. A current-branch GDS run without integration would rebuild the existing main design instead.
 
 This experiment does not change architecture, firmware/protocol support or50MHz. Legal geometry does not establish pin access, power integrity, routability, timing or electrical closure.
+
+## Initial launch failure and correction
+
+Clean bank38180541456 failed before synthesis because the launcher did not create the nested flow directory required by the pinned --force-run-dir CLI. BUG92 records the cause. Corrected helper creates a fresh empty directory before CLI invocation and refuses reuse; regression checks the actual directory at launch, stock-image selection and no checkpoint initial state.99focusedtests pass. This failure provides no physical evidence for or against SRAM locality; corrected rerun remains under the previously approved experiment scope.

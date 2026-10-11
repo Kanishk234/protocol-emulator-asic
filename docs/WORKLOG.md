@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (all-main workflow audit; fix clean launcher)
+- Mainstatus: residual extraction38179535945running routing/extraction, unit38180535914running chipRTL/L3 (Verilator/internaljobscomplete); latesttest/lint/docsgreen. Oldplacement GL37655518919 and extracted37655518925 remainqueued. Cleanbank38180541456fails before synthesis due absentforce-run-dirflowdirectory, no measuredbankplacementresult.
+- Fixed launcher tocreatefresh directorybeforepinnedCLI andrefuse reuse; addedactual launchcontract tests, corrected workflowstepname, loggedBUG92.99focusedtests/diffpass. This correction/rerun stays within prior approvedcleanbankscreen scope; next publishfix andrerun, then inspectphysicalresult. No phaseboxes/hardwareconfigchanges.
+
+## 2026-10-11: Codex (publish and launch clean SRAM locality screen)
+- Explicit approval executed: tools0f07d62, CI8429f34, docs82fa689 pushed to remote main. Exact remote head82fa68912591ac6b8297f2a4681dafc89779e053 verified. [Clean SRAM bank screen38180541456](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38180541456) in progress on that exactcommit; clean RTL→stockClassic with built-in16buffer placement policy, no checkpointinitialstate/customimage.
+- Next inspect source-reference/topology reproduction, actual manual/DPL placements, overflow/antennas/allcorner timing/electrical before clean DRT/adoption. No phaseboxes ticked or mainconfig/templatejob changes. Unrelatedfiles/FIPE excluded; launchreceipt remainslocal.
+
 ## 2026-10-11: Codex (implement SRAM locality planner and clean portability prototype)
 - Implemented exact-source read-only sram_bank_plan with separate routed/clean-stage hashes, macro pin geometry, complete row-gap allocation and combined overlap guards; actual DRT14move and cleanGPL16move proposals pass with0addedcells. Generates reviewed MANUAL_GLOBAL_PLACEMENTS candidate fragments; no main config edits.
 - Inspected official action/support and exactLibreLane3.1.0.dev3 source: native Classic manual-placement step exists; actual archived cleanstage32NL proves all16interfaceBUF4 names already exist before it. Prepared clean stock-image synthesis-to-GRT screen/workflow, no checkpoint initial state/customimage/step replacement, strict pre-manual topology/placement/legalization/overflow/freshantenna/allcorner50ps gates.97focusedchecks pass; physicalscreen unexecuted.

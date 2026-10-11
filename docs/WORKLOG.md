@@ -5,6 +5,18 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (audit dominant screen; prepare extracted continuation)
+- Downloaded 66 selected evidence files. Canonical source/topology/diode conservation, four repair receipts, single wire reset, zero overflow and antenna-only/disallowed-congestion cleanup audits pass. Target _28807_ no longer violates fanout in screen. Remaining slow slew concentrates on _25245_ branch (9 rows), SRAM REN and ADDR0; fanout 21 remains.
+- Prepared guarded dominant_slew_route continuation on exact screen 38115998705/head ecc6bcf; 116 focused tests pass including complete checkpoint guards. Fixed/logged BUG91 tuple/list JSON proposal mismatch without weakening connectivity checks. Next publish reviewed tools/CI/docs under scoped approval, launch DRT/extraction and measure actual timing/electrical. No phase boxes or new dispatch.
+
+## 2026-10-11: Codex (dominant-net screen result)
+- Run 38115998705 succeeds; artifact 11693474079. Saved gate confirms selected source 38112320460, one _28807_ split, four added buffers and preliminary qualification. Screen setup WS 0 ns all corners; hold fast 98.2493 ps, typical 203.273 ps, slow 378.216 ps. Electrical slow/typ/fast slew 11/1/1, fanout 21 each, capacitance 0 each.
+- These are global-route estimates, not fresh detailed-route/extracted closure; electrical fanout still fails. Prior SRAM GRT screen had slow slew 34 and fanout 18, so aggregates improve slew but worsen fanout across these successive screens; do not compare estimates to extracted 147/20/4 as a measured ECO benefit. Next independently audit actual topology/antenna/overflow history and residual loads, then prepare exact-source DRT/extraction. No phase boxes ticked or new dispatch.
+
+## 2026-10-11: Codex (publish and launch dominant-net repair screen)
+- User approved reviewed tools/CI/docs: commits c5976b7/f58b45b/ecc6bcf pushed to remote main. ls-remote verifies ecc6bcf5cc4dadd2f246a4256ba11a019aca72cf. [Dominant slew screen 38115998705](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38115998705) is queued on that exact commit, targeting only _28807_ with four BUF4 branches on selected extracted SRAM source.
+- Next inspect actual topology/legalization, overflow, antenna repair, all-corner timing and electrical results before detailed routing. 123 focused checks passed before publication. No phase boxes ticked; unrelated pending files and FIPE stayed local. Launch receipt is a local work-log update.
+
 ## 2026-10-11: Codex (prepare extracted-source dominant-net screen)
 - Retrieved latest DRT NL/DEF and critical paths. Repinned dominant planner to actual extracted-source hashes; both real topology partition audits pass. Worst slow setup _48179_ to _46883_; worst fast hold _48776_ to _46037_. Prepared one-net _28807_ screen with four BUF4s using existing guarded binding/image/wrapper, complete source/recipe/topology/antenna/overflow/fresh 50 ps hold checks.
 - 123 focused tests pass. Updated residual report; no physical split, push or dispatch this session and no phase boxes ticked. Next publish reviewed tools/CI/docs group under user Git authorization, launch screen and inspect measured electrical/timing before DRT continuation. Unrelated files and FIPE remain excluded.

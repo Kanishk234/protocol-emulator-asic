@@ -56,6 +56,11 @@ jobs:
           export PATH="$HOME/oss-cad-suite/bin:$PATH"
           export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
           PYTHONPATH=tools python -m compile.compile --arch arch/warp_g1 --strict-ports --pins tools/compile/helpers/helper_demo.yaml -o build/helpers-demo tools/compile/helpers/helper_demo.v tools/compile/helpers/wp_delay.v tools/compile/helpers/wp_shift_transaction.v
+      - name: Generate explicitly conditional operating report
+        run: |
+          source .venv/bin/activate
+          printf '%s\n' '{"clock_hz":8000000,"sck_hz":1000000,"arrival_bytes_s":1000,"direction":"read","blackout_us":0,"overhead_us":0,"burst_bytes":1,"queue_bytes":2}' > build/helpers-demo/budget.json
+          PYTHONPATH=tools python -m host.certificate build/helpers-demo/report.json arch/warp_g1/arch.yaml build/helpers-demo/budget.json > build/helpers-demo/planning.json
       - name: Load same-job helper image through real SPI and test chip ports
         timeout-minutes: 8
         run: |

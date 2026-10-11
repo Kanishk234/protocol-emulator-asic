@@ -9,9 +9,14 @@ invariants. New cluster8/ten-buffer placement still fails GRT:148/169 in
 execute. Explicit pinned-image provisioning fixes the prior cold-pull timeout
 (BUG62). Report collection38100978078 succeeds and retains actual failed
 148/169 routing and native hotspot coordinates; it is not route acceptance.
-Fixed-original-placement buffer counterfactual38101405271 is running, with
-strict legality/connectivity/census and six estimated STA guards before any
-future fresh route. No heavy EDA runs locally.
+Fixed-original-placement buffer counterfactual38101405271 passes with zero
+original movement and all six estimated STA guards; fresh paired GRT38101639866
+still fails148baseline/146candidate. Broad151-cell padding38102423038 cannot
+legalize within22µm. A five-cell worst-marker probe38111705881 and conditional
+configured C2 timing38111705892 are now running, independently and in hosted
+CI. RUN-mode proof38102131236 passes84-cycle BMC/cover with explicit assumptions;
+it does not prove arbitrary full-frame loading or mapped configuration stability.
+No heavy EDA runs locally.
 No complete successor or configured timing acceptance.
 
 **October9 follow-up:** C2 hardening37814078650 finishes63 stages in about

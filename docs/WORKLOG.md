@@ -84,9 +84,21 @@ Read the complete organizer email; organizer_update_20261010.md records6×4
 baseline/optional8×4, SRAM hypotheses, reset/reload, pad characterization and
 submission implications. User emphasizes broad usable protocol coverage;
 UART/SPI/I2C remain demonstrations, not an architectural ceiling. The linked
-SRAM tutorial is not accessible through the research browser, so its contents
-are not represented as reviewed. Parallel workers hit a usage limit after
+SRAM tutorial was initially inaccessible through the browser; subsequently
+read its complete public HTML through GitHub. Recorded interface, Metal4
+power/signal collision, simulation and sign-off lessons without copying
+project waivers or assuming its geometry fits WARP. Parallel workers hit a usage limit after
 preparing changes; root continues their review and lightweight checks.
+Reviewed and pushed scoped tools/CI/docs through292ad9b. Actual targeted
+padding38111705881 and six-case conditional timing38111705892 have started on
+standard hosted runners. Exact worst marker hash, five-cell selection and five
+spacing conflicts reproduce; clock-arrival malformed/missing-edge controls,
+power-phase controls, AST/YAML and all six prepared timing cases pass locally
+without EDA. No source/arch/macro hardware commits or raw build logs added.
+User guide now states board power-loss/reselection reload requirements and
+distinguishes USER_RESET from restoring lost configuration. EVIDENCE discloses
+Claude/Codex assistance and ties acceptance to actual checks rather than AI
+review, following the organizer's submission guidance.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

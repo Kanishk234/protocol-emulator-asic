@@ -21,6 +21,14 @@ your_protocol.v + pins.yaml ──tools/compile──▶ .wbit ──loader (hos
 
 A bitstream holds one design at a time; loading another replaces it (stop first). The chip keeps every fabric pin **parked** (outputs 0, bidirectional pins released) and the design **in reset** whenever it is not RUNNING.
 
+On the Tiny Tapeout demo board, deselecting the chip powers it down and loses
+its configuration and user state. After selecting it again, apply `rst_n`,
+check the chip's identity/architecture, load the complete bitstream and check
+load status before starting it. Keep the bitstream on the host for this purpose.
+USER_RESET resets a loaded user design; it does not restore configuration lost
+through power removal. This board lifecycle comes from the organizers' October
+update; WARP has not been tested on a physical board.
+
 ## 2. Writing a design
 
 A design is a synthesizable Verilog-2005 module (ARCHITECTURE.md §10):

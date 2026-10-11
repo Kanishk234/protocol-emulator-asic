@@ -2,6 +2,13 @@
 
 For a reader with 20 minutes. Every number has a source: a CI run ID (GitHub Actions on `efpga`), a report in `docs/reports/`, or a named local script. Claims and their status: `docs/CLAIMS.md`. **Nothing here is measured on silicon or a board; all results are simulation, formal proof, or physical-design reports.**
 
+AI tools (Claude and Codex) assisted project planning, source/tool/test changes,
+prior-art research, report analysis and workflow diagnosis. AI-generated
+suggestions are hypotheses until supported by the named checks and retained
+evidence. Passing simulation, bounded formal properties and physical checks
+are reported separately; AI review does not replace those checks. The worklog
+records the experiments, failures, corrections and remaining limitations.
+
 Key CI runs: [frozen-chip GDS, precheck and gate-level tests (36383587262)](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36383587262), [Phase 4 GDS and gate-level tests (36451108163)](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36451108163), [Phase 4 fabric tests and co-simulation (36451328356)](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36451328356), [protocol tests (36451328364)](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36451328364), [formal F1/F2/F4 (36383587298)](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36383587298).
 
 ## 1. The problem and the constraint

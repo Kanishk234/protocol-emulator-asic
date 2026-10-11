@@ -29,10 +29,20 @@ so core timing alone does not establish external signal performance.
 
 The email explicitly permits multiple IHP SRAM macros when they fit and pass
 precheck. It links [Ken Pettit's walkthrough](https://kdp1965.github.io/ihp-um-janestreet-prism/ihp_sram_macro.html)
-for RTL, LibreLane configuration, Metal4 power and sign-off. The linked page
-was not accessible through the research browser during this session; its
-contents have not yet been independently reviewed. Do not claim copied or
-validated integration instructions.
+for RTL, LibreLane configuration, Metal4 power and sign-off. The browser could
+not access the page, but its complete public HTML source was subsequently
+read through GitHub at site/ihp_sram_macro.html.
+
+The [walkthrough source](https://github.com/kdp1965/ihp-um-janestreet-prism/blob/main/site/ihp_sram_macro.html)
+describes explicit SRAM instantiation, separate synthesis black boxes and
+functional RTL/GL models, registered reads, mask/enable semantics, corner
+libraries and CDL. Its Metal4 grid must align with both supply groups and
+avoid signal pins; full-height stripes can collide with another macro.
+It also documents antenna repair and project-specific Magic overlap waivers.
+These are useful integration lessons, not validated WARP settings. We will
+retain WARP's checks, inspect real conductor geometry and use unmodified
+official precheck rather than copy waivers or whitelist patches. Its PDK pin
+matches spikes/cloud/fetch_pdk.sh, but macro details still need authentication.
 
 Useful hypotheses include generic sample/capture storage, queues and larger
 user state. SRAM cannot directly replace all distributed configuration latch

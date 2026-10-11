@@ -4,6 +4,7 @@ on:
     branches: [efpga]
     paths:
       - 'tools/compile/helpers/**'
+      - 'test_internal/test_helper_loaded.py'
       - '.github/workflows/helper_compile.yaml'
   workflow_dispatch:
 permissions:
@@ -24,7 +25,7 @@ jobs:
       - name: Python prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-venv python3-tk
+          sudo apt-get install -y python3-venv python3-tk iverilog
       - name: Cache pinned Yosys suite
         id: ocs
         uses: actions/cache@v5
@@ -55,6 +56,18 @@ jobs:
           export PATH="$HOME/oss-cad-suite/bin:$PATH"
           export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
           PYTHONPATH=tools python -m compile.compile --arch arch/warp_g1 --strict-ports --pins tools/compile/helpers/helper_demo.yaml -o build/helpers-demo tools/compile/helpers/helper_demo.v tools/compile/helpers/wp_delay.v tools/compile/helpers/wp_shift_transaction.v
+      - name: Load same-job helper image through real SPI and test chip ports
+        timeout-minutes: 8
+        run: |
+          source .venv/bin/activate
+          export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
+          export WARP_HELPER_BITFILE="$GITHUB_WORKSPACE/build/helpers-demo/helper_demo.wbit"
+          export PYTHONPATH="$GITHUB_WORKSPACE/tools:$GITHUB_WORKSPACE/test_internal:$GITHUB_WORKSPACE/test"
+          rm -f test/results.xml
+          set -o pipefail
+          make -C test WARP_FABRIC=rtl COCOTB_TEST_MODULES=test_helper_loaded 2>&1 | tee build/helpers-demo/loaded.log
+          cp test/results.xml build/helpers-demo/loaded_results.xml
+          python -c 'import xml.etree.ElementTree as E; r=E.parse("test/results.xml").getroot(); c=r.findall(".//testcase"); assert len(c)==1 and not r.findall(".//failure") and not r.findall(".//error") and not r.findall(".//skipped"), "Expected one actual passing loaded helper case"'
       - uses: actions/upload-artifact@v7
         if: always()
         with:

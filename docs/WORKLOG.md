@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (verify parallel clock route launch)
+- Reviewed tools/CI/docs def38f5/a3d7d51/cbf2735 pushed; remote head verified cbf2735d66bf293243e3b00e0c2ef7ce36bf1de3. [Clock route38104539932](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38104539932) queued on exact head; hold38102572131/fanout38103189246 still running. 189 focused checks pass; no hardware-history changes or unrelated local files published.
+- Next inspect fresh extracted setup/hold/electrical/DRC evidence for each independent experiment before combining or promoting. No phase box.
+
 ## 2026-10-10: Codex (parallel clock audit and extracted continuation)
 - Audited actual clock screen canonical NL/DEF/topology/antenna retention/zero overflow; four clock branches now2loads, eight new branches8loads and none remain in fanout violations. Remaining31fanout data-only; SRAM DOUT0cap and REN/MEN/ADDR6 plus28807cone slew remain. No baseline delta inferred from same-state comparison.
 - Prepared exact-source guarded clock DRT/extraction continuation; 189 focused checks pass. Hold/fanout routes still running at check. Next publish/launch under user approval, compare three extracted experiments before combinations/integration. No phase box.

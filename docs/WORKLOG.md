@@ -38,13 +38,26 @@ remain unexecuted, no configured STA claim. Tools/workflow committed1c7fdd0/
 aba52fa for bounded hosted execution. No full physical or configured timing
 pass follows from these separately scoped results.
 **Parallel launch preparation:** authenticated fixed-original GRT replay
-committed930280b/1ebc2c5; actual38101639866 runs both unchanged50-iteration
-cases with native report capture. Mode property38101606932 is running;
+committed930280b/1ebc2c5; actual38101639866 finishes diagnostic collection;
+both unchanged50-iteration cases still fail, baseline148/fixed-original146.
+Candidate111 markers/53left-band markers/85planar overflow retain CRC/SPI/clock
+hotspot; avoiding old incidental moves improves169→146 without closing routing.
+Mode property38101606932 is running;
 depth84 may cover only a minimal sync-only load, not a complete five-row write,
 so no bounded pass will justify arbitrary full-load STA by itself. Added
 software-only frozen-G1 design-set nine-build seed sweep, keeping all trial
 failures, tool/input hashes and compiler estimates; local report/matrix and
 dedicated-process-group cleanup controls pass, no local synthesis/P&R.
+Actual seed38101717810 SUCCESS verified: all nine planned fresh UART/SPI/I2C
+builds fit, no timeout/failure, input hashes unchanged. Compiler estimates
+retained with their model-only scope in seed_robustness_plan_20261010.md.
+Prepared localized CRC/SPI padding as the next single physical counterfactual;
+effective spacing must be proved from native padding API or placed geometry.
+Reviewed complete padding producer plus six-corner gates: actual OpenDB cell
+boxes/site width/units, direct pinned per-instance setter, native legality,
+observable one/two-site whitespace, all3606 masters/orientations/statuses/pins
+and macro exact, maximum22µm axis movement. Forced STA directories created
+before CLI. Committed74fcf5e/9300548; hosted execution pending push.
 **Boxes ticked:** none.
 **Next:** inspect actual hotspot source-net geometry, review native configured
 clock/stability checks and legalizer census before launching bounded experiments.

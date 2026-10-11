@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-073: Test local whitespace at the measured CRC/SPI shell hotspot
+- **Date:**2026-10-10. **Status:** accepted isolated copied-checkpoint placement diagnostic; no promotion.
+- **Evidence:**38101639866 fixed-original candidate still fails146 overflow;53 native markers/85 planar overflow remain at x0–121.44,y475.2–525.6µm. Native coordinates are micrometers by pinned dbMarker.cpp. Source38101405271 has legal exact hardware and zero estimated fanout/slew/cap/setup/hold violations at all three explicit corners.
+- **Decision:** authenticate that exact fixed-original candidate. Select original movable CORE CRC/SPI cells by actual OpenDB bounding-box intersection with the measured band. Apply one left/right placement site via pinned native per-instance setter; legalize and retain exact masters/orientations/statuses/all terminals/fixed macro with22µm maximum per-axis movement. Require actual site-width/DBU geometry, preexisting spacing-conflict witnesses and zero post-padding conflicts (two sites between two selected cells). Run six explicit baseline/candidate STA screens under unchanged source libraries/macro/20ns/electrical constraints. No blanket clock/driver/RTL change.
+- **Cost/limits:** free standard45min workflow, pinned image pull5min, native edit180s and STA300s/process. Whitespace may improve wire demand or worsen displacement/skew; no measured benefit yet. Padding is process-local placement policy, not an ODB-persisted silicon resource. Fail on illegal/unproven spacing, changed topology or electrical rejection. Fresh native routing/extraction/function/configured timing remain separate after any producer pass.
+- **Evidence files:** cloud_hotspot_padding.py and hotspot_padding.yaml. Source authentication, geometry controls, AST/YAML and Tcl completeness pass without local EDA. Root reviewed native dpl::set_padding_inst wrapper and creates forced STA run directories before invocation (BUG34).
+
 ## D-072: Check the actual compact RUN configuration-gate premise before STA
 - **Date:**2026-10-10. **Status:** accepted bounded diagnostic, no timing claim.
 - **Reason:** existing F2 proves accepted-load provenance, not inactivity of configuration gates during RUN. Current fallback RTL is not the exact compact shared-CRC shell. Case analysis on loaded latch Q values needs a separately stated mode premise.

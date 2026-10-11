@@ -1,6 +1,6 @@
 # Frozen-G1 design-set seed robustness plan
 
-Prepared 2026-10-10; **not executed**. No fit, rate or timing result is claimed.
+Prepared and executed 2026-10-10. Results below are compiler evidence only.
 
 New narrowly triggered workflow `seed_robustness.yaml` uses the existing project
 compiler on unmodified frozen G1 (`hw-freeze`:
@@ -57,3 +57,24 @@ compilation, scoped branch trigger and actual frozen-view/three-parameter
 map checks also pass. No local
 EDA. Root should include the final verification outcomes and future hosted run
 ID in WORKLOG; no phase checklist was changed.
+
+## Verified hosted result
+
+[38101717810](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38101717810),
+ec91fb9, succeeds in1min39s including hosted setup. Downloaded summary retains
+all nine distinct planned trials, all compiled, no timeout/failure and unchanged
+input hashes. Each fresh image/report carries compiler provenance. No loaded
+simulation, new ASIC layout or configured physical timing is included.
+
+| Existing design | Seed0 / seed1 / seed2 model Fmax (MHz) |
+|---|---|
+| UART | 89.90 / 90.71 / 90.30 |
+| SPI controller | 77.97 / 77.97 / 76.77 |
+| I2C controller | 51.74 / 52.97 / 52.56 |
+
+These are existing slow-corner compiler-model estimates, not validated chip
+frequencies. Three seeds provide a bounded robustness sample, not a distribution
+or best-seed optimization. The I2C controller's smaller estimated margin is a
+reason to prioritize actual configured timing; it is not a timing signoff result.
+This software/evidence improvement applies to frozen G1 independently of the
+compact experiment. No architecture change or held-out retuning occurred.

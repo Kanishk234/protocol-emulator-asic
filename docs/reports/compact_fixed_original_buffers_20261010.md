@@ -38,3 +38,21 @@ cluster8 baseline, with identical original50-iteration routing policy. It can
 measure the effect of avoiding incidental placement movement, but baseline
 congestion and the dominant CRC/SPI/clock hotspot may remain. No successor
 promotion, architecture advantage or operating-frequency claim follows.
+
+## Fresh native routing result
+
+[38101639866](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38101639866)
+completes diagnostic collection with strict native failures retained:
+unchanged cluster8 overflow148, fixed-original candidate146. Both actually
+execute original50-iteration GRT under the same authenticated routing policy.
+The earlier moved-original candidate was169 in38100978078; avoiding that
+movement improves this diagnostic but does not reach zero or qualify routing.
+
+The baseline native marker file is byte-identical to38100978078. Candidate
+marker SHA256 is
+`4892d8460230f76823f9d885a12f5d097a0d559b75fb3803cef8281e8b497bb1`.
+Its111 planar markers include53 in the x0–121.44,y475.2–525.6µm band, with
+85 planar overflow there; the baseline has62/90. These are exact native marker
+sums, not attributed per-net or per-layer congestion. The CRC/SPI/clock shell
+hotspot remains. Next isolate local placement whitespace while retaining
+electrical constraints, connectivity and strict native routing acceptance.

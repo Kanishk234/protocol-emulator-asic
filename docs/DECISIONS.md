@@ -2,6 +2,13 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-079: Test the measured net694 interior-slot relocation
+- **Date:** 2026-10-11. **Status:** accepted copied-checkpoint experiment; no hardware promotion.
+- **Evidence:** read-only audit of actual producer38163199430 and native markers38163542037 finds445 single-load reset ties,116 separated by at least30µm in row coordinates. Of70 marker-associated reset ties,68 lack an improving conservative interior slot within20µm of the receiver row. net694 appears in five markers and has a same-power-phase slot reducing bbox-center Manhattan proxy62.94→49.38µm. These proxies are not routed wirelength.
+- **Decision:** from exact fixed-original38101405271, move only existing generic tiehi u_shell.u_spi._244__695 from bbox(40.80,529.20)-(42.72,532.98) to(92.64,506.52)-(94.56,510.30)µm. Preserve MX orientation, status, every other instance, connectivity, masters, macros and pins. Six-row vertical shift retains power phase. Native placement legality and all six unchanged estimated shell electrical/timing cases must pass before paired routing.
+- **Cost/alternatives:** no new cells or protocol primitives; lateral displacement increases and routing can worsen. This independent one-cell trial uses the original checkpoint, not the preceding net683 candidate; compare against its146-overflow baseline. Do not add the two moves without testing their interaction. Larger whitespace policies remain necessary for most affected ties.
+- **Research:** OpenROAD documents instance padding before legalization and native check_placement separately: https://openroad.readthedocs.io/en/latest/main/src/dpl/README.html . Documentation is contextual; retain our pinned implementation and actual native guards, without assuming newer legalizer options exist.
+
 ## D-078: Test one actual reset-net endpoint relocation
 - **Date:**2026-10-11. **Status:** accepted bounded copied-checkpoint producer; no promotion.
 - **Evidence:** paired native38113003427 reports identical146 overflow and byte-identical marker maps before/after five-cell spacing. Actual census shows three selected combinational cells do not connect to the worst marker's source nets. net683 has exactly two endpoints: SPI register_251_/RESET_B and tiehi_251__684/L_HI. The marker names net683.

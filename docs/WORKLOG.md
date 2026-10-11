@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (prepare retained-parent DOUT2 relocation)
+- Selected retained timing-qualified parent38116800326 after NOR4 child setup regression. Prepared one existingBUF4 wire9439 relocation341.28,230.58N→45.12,245.70N, no master/cell/net changes. Dedicated plan/Tcl/wrapper/image/screen/workflow preserve source hashes/provenance/fullrecipe/occupiedsite/power/post-DPL/post-antenna/50pshold guards.
+- 101 focused tests pass; actual retained NL/DEF canonical/topology/destination and complete-footprint overlap0 audit pass; shellsyntax/diff checks pass. Physical move not executed. Next publish reviewed tools/CI/docs group under scoped approval and launch. No phase boxes/newdispatch; unrelated files/FIPE untouched.
+
+## 2026-10-11: Codex (NOR4 extracted result independently audited)
+- Run38164037268 succeeds; artifact11712414909 selectively retrieved after first status request approval-review timeout and successful retry. All complete electrical reports independently match saved summaries; workflow success is not physical closure.
+- Extracted timing: timing__setup__ws__corner:nom_fast_1p32V_m40C=0 ns, timing__hold__ws__corner:nom_fast_1p32V_m40C=0.0879490394294608 ns, timing__setup__ws__corner:nom_slow_1p08V_125C=-0.07229061998075095 ns, timing__hold__ws__corner:nom_slow_1p08V_125C=0.35893233845505135 ns, timing__setup__ws__corner:nom_typ_1p20V_25C=0 ns, timing__hold__ws__corner:nom_typ_1p20V_25C=0.19154633976666885 ns.
+- Electrical: nom_fast_1p32V_m40C {'slew': 5, 'fanout': 27, 'capacitance': 5}, nom_slow_1p08V_125C {'slew': 128, 'fanout': 27, 'capacitance': 3}, nom_typ_1p20V_25C {'slew': 5, 'fanout': 27, 'capacitance': 3}. Next compare retained timing-qualified parent and choose repair on exact newgeometry; do not blindly promote if timing regresses. No newdispatch/phase ticks.
+
+## 2026-10-11: Codex (publish and launch NOR4 extraction)
+- Explicit approval executed: tools9be115f, CIb0c7e1c, docs715f2cc pushed to remote main. Exact remote head715f2cc2e4a35b54a90b4a40dec7600e467fe8ec verified. [NOR4 detailed-route/extraction38164037268](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38164037268) queued on that commit.
+- Next inspect extracted all-corner setup/hold, electrical counts, routing and antenna evidence; retain timing-qualified parent if newroute regresses. No phase boxes ticked. Unrelated files/FIPE excluded; launch receipt remains local.
+
 ## 2026-10-11: Codex (audit NOR4 screen and prepare extraction)
 - Downloaded 66 selected evidence files. Exact source/proposal, sole NOR4 master change/all wiring, antenna-only cleanup, one sizing receipt/wire reset and zero-overflow audit pass. Slow electrical report row count matches15. Prepared residual_nor4_route.py and separate workflow on exact screen38162764354/head0b4d4ac; no repeated sizing, fresh antenna/timing50ps gate before stockDRT/newextraction.
 - 112 focused tests pass, including full checkpoint refusal cases and fresh pre-DRT gates. New physical extraction not run. Next publish reviewed tools/CI/docs group under scoped approval and launch; then re-pin DOUT2 proximity repair if its cap failure remains. No phase boxes/new dispatch.

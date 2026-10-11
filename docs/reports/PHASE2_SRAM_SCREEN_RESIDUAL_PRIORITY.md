@@ -64,3 +64,11 @@ Priority after current screen/extraction: DOUT2 proximity first for a large zero
 ## NOR4 screen audited; extraction prepared
 
 Screen38162764354 qualifies: setup WS0 all corners, hold fast100.728ps/typ203.267ps/slow378.209ps; slew slow/typ/fast15/1/0, fanout24each, cap metrics0. Exact one-master/topology/antenna-only/receipt/reset/zero-overflow history independently audited against66 downloaded files. These estimated figures do not establish electrical closure or improvement against extracted counts. Prepared exact screen continuation residual_nor4_route.py and gds-residual-nor4-route;112 focused tests pass. Fresh antenna and all-corner50ps timing qualification precede stockDRT/extraction; no repeated sizing. Publication/launch pending scoped approval.
+
+## NOR4 extracted regression; retained-source DOUT2 relocation
+
+NOR4 route38164037268 succeeds but regresses slow setup to -72.290620 ps; fast hold87.949039 ps. Electrical slow/typ/fast slew128/5/5, fanout27each, cap3/3/5. Retain timing-qualified parent38116800326 (setupWS0all,fast hold65.626395ps); do not stack another repair on the regressed NOR4 child.
+
+Prepared retained_sram2_plan/screen/output2 Tcl/wrapper/image and separate gds-retained-sram2-screen. Source pinned to retained parent38116800326/headbb7125ea2f963c78dcdc95961019a783bddfd5ee and exact prior NL/DEF hashes. Only wire9439 existingBUF4 is moved from341.28,230.58N to45.12,245.70N; every cell/master/net is unchanged. Original site/pins/power/fixed/master preflight, full destination footprint occupancy, post-DPL and post-antenna exact-site checks, old-signal-wire reset, zero-overflow/antenna-only cleanup and unchanged fresh50psallcorner gates retained.
+
+101 focused tests pass; actual source hashes/cell/net preservation and complete footprint zero-overlap independently verified on retained DEF with reviewedLEF. This is unexecuted physical repair, not a guarantee of capacitance or timing improvement. Nominal added cell area0; new routing/antenna costs may differ. Next publish reviewed group and launch under scoped approval, then audit and extract if qualified.

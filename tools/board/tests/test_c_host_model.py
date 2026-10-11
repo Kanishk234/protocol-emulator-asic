@@ -300,3 +300,32 @@ def test_loader_rejects_chip_reported_crc_error(driver):
     words = (ct.c_uint32 * 1)(0xFAB0FAB1)
     assert driver.warp_load_words(ct.byref(host), 1, words, 1, 1) == 7
     assert model.state != LOADED
+
+
+@pytest.mark.parametrize("prior_error", ["wrong_arch", "bad_command"])
+def test_loader_recovers_after_sticky_error(driver, prior_error):
+    model = ShellModel(1)
+    if prior_error == "wrong_arch":
+        model.transaction([0x10, 0, 2, 0, 1])
+    else:
+        model.transaction([0xff])
+    assert model.code != 0
+    bridge = Bridge(model)
+    words = (ct.c_uint32 * 2)(0xFAB0FAB1, 7)
+    assert driver.warp_load_words(ct.byref(bridge.host), 1, words, 2, 1) == 0
+    assert model.state == LOADED and model.code == 0
+    before_begin = bridge.transactions[:next(i for i, t in enumerate(bridge.transactions)
+                                             if t[0] == 0x10)]
+    assert [0x02, 0, 0] in before_begin
+    assert not bridge.errors
+
+
+def test_wbit_reserved_and_arch_bytes_match_python_format(driver):
+    model = ShellModel(0x1234)
+    bridge = Bridge(model)
+    raw = bytearray(wbit([0xFAB0FAB1], arch=0x1234))
+    raw[6:8] = b"\xa5\x5a"
+    data = (U8 * len(raw)).from_buffer_copy(raw)
+    assert driver.warp_load_wbit(ct.byref(bridge.host), data, len(raw), 1) == 0
+    assert [0x10, 0x12, 0x34, 0, 1] in bridge.transactions
+    assert model.state == LOADED and not bridge.errors

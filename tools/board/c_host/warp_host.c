@@ -48,6 +48,11 @@ static int load(warp_host *host, uint16_t arch, const uint32_t *words,
     rc = warp_poll(host, &status);
     if (rc) return rc;
     if ((status >> 5) == 3) return WARP_STATE;
+    /* Successful LOAD_BEGIN/END do not clear a prior sticky error. Clear it
+       deliberately before this load so the final error belongs to this load. */
+    rc = warp_read_status(host, &status, &error);
+    if (rc) return rc;
+    if ((status >> 5) == 3) return WARP_STATE;
     tx[0] = 0x10; tx[1] = (uint8_t)(arch >> 8); tx[2] = (uint8_t)arch;
     tx[3] = (uint8_t)(count >> 8); tx[4] = (uint8_t)count;
     rc = transfer(host, tx, rx, 5);

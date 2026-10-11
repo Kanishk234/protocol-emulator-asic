@@ -20,6 +20,13 @@ Load transport errors leave an uncertain partial configuration and return
 immediately; recover deliberately with a fresh load rather than retrying a
 possibly completed transaction. File checks do not prove fabric frame
 semantics: valid bitstreams must come from the matching compiler.
+Once the architecture and stopped state are checked, the loaders explicitly
+read/clear prior sticky shell errors before LOAD_BEGIN. Successful loading
+does not itself clear an old error, so this allows recovery from a failed
+earlier load and makes the final error check specific to the new load.
+WBIT's reserved two header bytes are ignored, matching both existing Python
+parsers; they are not a format-version field. Compiler-generated files write
+them as zero.
 
 Each callback invocation is exactly one complete CS-low transaction. Supply
 mode 0, MSB-first bytes, SCK no faster than project clock / 8, at least eight

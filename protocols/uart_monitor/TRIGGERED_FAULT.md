@@ -19,7 +19,7 @@ Supported compile-time parameter domain:
 - WINDOW_CYCLES: 1–2**COUNTER_BITS.
 - DIV: use the existing UART's supported divider domain.
 
-Invalid values are unsupported and can truncate; synthesis HDL deliberately contains no initial assertions. Check parameters before compiling. One counter is reused for delay and duration. This consumes soft logic only: it adds no hard timer or shift resources beyond the two timers and two shifters already used by UART. Area/fit and behavior require cloud evidence; no achieved rate, physical timing, or loaded-fabric pass is claimed here.
+Invalid values are unsupported and can truncate; synthesis HDL deliberately contains no initial assertions. Check parameters before compiling. One counter is reused for delay and duration. This consumes soft logic only: it adds no hard timer or shift resources beyond the two timers and two shifters already used by UART. Measured fit and loaded behavior are below; no physical clock or board rate is claimed.
 
 ## Compile
 

@@ -17,7 +17,7 @@ def fixture(monkeypatch):
     return nl, layout
 
 
-def test_actual_target_shape_preserves_thirteen_loads_six_diodes(monkeypatch):
+def target_fixture(monkeypatch):
     nl = 'sg13cmos5l_nor2_1 _28820_ (.A(a), .B(b), .Y(_03844_));\n'
     layout = ''
     for i in range(13):
@@ -27,6 +27,11 @@ def test_actual_target_shape_preserves_thirteen_loads_six_diodes(monkeypatch):
         layout += f'- sink{i} {master} + PLACED ( {i*100} 200 ) N ;\n'
     monkeypatch.setattr(runner, 'NL_SHA', hashlib.sha256(nl.encode()).hexdigest())
     monkeypatch.setattr(runner, 'DEF_SHA', hashlib.sha256(layout.encode()).hexdigest())
+    return nl, layout
+
+
+def test_actual_target_shape_preserves_thirteen_loads_six_diodes(monkeypatch):
+    nl, layout = target_fixture(monkeypatch)
     p = runner.plan(nl, layout, '_28820_')
     assert [len(g['sinks']) for g in p['groups']] == [4, 4, 4, 1]
     runner.validate_change(nl, layout, changed(nl, p), p)

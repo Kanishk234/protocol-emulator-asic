@@ -1,0 +1,8 @@
+--- a/librelane/scripts/openroad/common/grt.tcl
++++ b/librelane/scripts/openroad/common/grt.tcl
+@@ -26,3 +26,5 @@
+ 
++lappend arg_list -congestion_report_file $::env(STEP_DIR)/native-congestion.rpt
++lappend arg_list -congestion_report_iter_step $::env(GRT_OVERFLOW_ITERS)
+ log_cmd global_route {*}$arg_list
+ 

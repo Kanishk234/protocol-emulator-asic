@@ -5,6 +5,23 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (prepare one-cell electrical strength screen)
+- Retrieved exact timing-qualified DRT NL/DEF and paths; mapped slew clusters. Worst _25245_ output 4.498456 ns versus2.5074 ns drives eight logic pins/no diodes. Prepared exact NOR4_1→NOR4_2 screen on run38116800326; +10.8864 um2/no added cells, original full recipe and 50 ps gate preserved. Exact source hashes, all-cell wiring conservation and actual Tcl escaped bracket args audited.
+- 95 focused tests pass. New sizing not physically run; no commit/push/dispatch or phase ticks. Next publish reviewed tools/CI/docs and launch under scoped approval; inspect actual repair effect before DRT or next _28820_ branch repair. Remaining cap DOUT2/DOUT4/place8636 and24fanout remain.
+
+## 2026-10-11: Codex (retrieve audited dominant extracted timing)
+- Artifact 11695645171 retrieved selectively from successful 38116800326. All-corner electrical checks independently match saved summaries. Exact timing and counts recorded below; no official GDS or phase closure inferred.
+- Extracted timing: timing__setup__ws__corner:nom_fast_1p32V_m40C=0 ns, timing__hold__ws__corner:nom_fast_1p32V_m40C=0.06562639506465884 ns, timing__setup__ws__corner:nom_slow_1p08V_125C=0 ns, timing__hold__ws__corner:nom_slow_1p08V_125C=0.33758508055611963 ns, timing__setup__ws__corner:nom_typ_1p20V_25C=0 ns, timing__hold__ws__corner:nom_typ_1p20V_25C=0.1652720229674064 ns.
+- Electrical: nom_fast_1p32V_m40C {'slew': 4, 'fanout': 24, 'capacitance': 3}, nom_slow_1p08V_125C {'slew': 134, 'fanout': 24, 'capacitance': 3}, nom_typ_1p20V_25C {'slew': 21, 'fanout': 24, 'capacitance': 3}. Next repin final topology/layout and prioritize repairs using these extracted results; no dispatch or phase ticks.
+
+## 2026-10-11: Codex (confirm dominant extraction completion)
+- GitHub confirms dominant route/extraction 38116800326 succeeds with no failed steps. Final artifact metadata/report retrieval still pending; no extracted timing or closure inferred from workflow success.
+- Parallel screen topology analysis: _25245_ NOR4_1 drives eight logic inputs, zero diodes, unlike prior dominant branch. Reviewed pinned standard-cell LEF contains NOR4_2 and NOR2B_2 alternatives; selective strength/placement repair may avoid unnecessary added buffers, but extracted loads/paths and hold budgets must be checked first. SRAM REN driver _29426_ still shares output with hold11833 and antenna diode. No physical change, commit/push, dispatch or phase ticks this session.
+
+## 2026-10-11: Codex (publish dominant route continuation)
+- User instruction to continue reviewed publication/launch executed: cd77ee9/d5f02a3/bb7125e pushed to remote main, exact remote head bb7125ea2f963c78dcdc95961019a783bddfd5ee verified. [Dominant route/extraction 38116800326](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38116800326) is in progress on that exact head.
+- Next inspect extracted all-corner setup/hold, electrical, routing and antenna results before next repair. No phase boxes ticked; unrelated local files/FIPE excluded. Launch receipt remains local.
+
 ## 2026-10-11: Codex (audit dominant screen; prepare extracted continuation)
 - Downloaded 66 selected evidence files. Canonical source/topology/diode conservation, four repair receipts, single wire reset, zero overflow and antenna-only/disallowed-congestion cleanup audits pass. Target _28807_ no longer violates fanout in screen. Remaining slow slew concentrates on _25245_ branch (9 rows), SRAM REN and ADDR0; fanout 21 remains.
 - Prepared guarded dominant_slew_route continuation on exact screen 38115998705/head ecc6bcf; 116 focused tests pass including complete checkpoint guards. Fixed/logged BUG91 tuple/list JSON proposal mismatch without weakening connectivity checks. Next publish reviewed tools/CI/docs under scoped approval, launch DRT/extraction and measure actual timing/electrical. No phase boxes or new dispatch.

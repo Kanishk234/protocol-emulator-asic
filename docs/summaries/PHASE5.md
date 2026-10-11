@@ -1,10 +1,18 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-09). Clean README reproduction now
+**Status:** in progress (updated 2026-10-10). Clean README reproduction now
 passes on a fresh hosted runner37690896748: rebuilt bitstreams, loaded30/30
 and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
 remain open. This is a separate reproducibility result from checkpoint experiments.
+
+Official Tiny Tapeout precheck now passes all nine checks37960021923 on the
+stronger-driver experimental layout. Its precheck blocker is closed. The
+new fanout-free shell placement still has routing congestion169 even after
+150iterations37960021920; its control case stopped during image download.
+Parallel research adds a strict electrical-report audit and real loaded-clock
+inventory while preparing native hotspot coordinates. These are separate
+measured scopes; the complete compact successor is still unqualified.
 
 The shell fanout remedy37956470190 now passes all three explicit estimated
 corner measurements: five remaining violations become zero with ten identity

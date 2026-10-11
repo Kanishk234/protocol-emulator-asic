@@ -2,6 +2,13 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**October10 update:** official precheck37960021923 passes all9 checks on the
+stronger-driver37708459393 layout, with authentic geometry/native export
+invariants. New cluster8/ten-buffer placement still fails GRT:148/169 in
+37958932549; buffered stays169 with150iterations37960021920. That latter
+baseline never routes because cold image pull times out the observer (BUG62).
+No complete successor or configured timing acceptance.
+
 **October9 follow-up:** C2 hardening37814078650 finishes63 stages in about
 7min including route/antenna/Magic/KLayout/LVS0, but fails deferred virtual-clock
 setup and retains62 fanout violations. Read-only37958116371 confirms all306

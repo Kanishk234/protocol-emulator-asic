@@ -12,10 +12,12 @@ successor is not qualified. G1 remains frozen. Phase5 exit gates stay open.
 
 ## Next physical experiments
 
-1. D066 official precheck: keep source driver GDS/ODB immutable, derive only
+1. D066 official precheck37960021923 now passes all nine checks. Source driver
+   GDS/ODB stay immutable; export derives only
    valid existing external PG accesses, require exact native remaining-pin and
    conductor census, then run all nine unmodified checks. Pinned Tcl API
-   compatibility fix follows37958116017;37958932525 is the fresh run.
+   and exact24-access count fixes are verified. This precheck result applies
+   only to driver37708459393, not the changed fanout placement.
 2. D067 paired GRT screen37958932549: compare authentic cluster8 and ten-buffer
    sources with identical settings. Actual result: control148 and candidate169
    overflow; both fail. Investigate localized congestion before another
@@ -74,3 +76,9 @@ configured network as well. User reset operates through data logic and must
 remain timed. Exact real latch values and all8 FF clock endpoints need audit
 before any case analysis is accepted. These are planning observations from
 37958116481's authenticated source, not a configured timing pass.
+
+[Broader eFPGA research](efpga_research_20261009.md) records primary sources,
+fallback applicability and compromise/acceptance gates. [Clock audit plan](compact_configured_timing_plan_20261009.md)
+prepares1058 image values/16 endpoints without STA. [Native congestion work](compact_congestion_research_20261009.md)
+now isolates hotspot reporting before a physical change. All are reviewable
+phase5 evidence and bounded successor diagnostics; no architecture promotion.

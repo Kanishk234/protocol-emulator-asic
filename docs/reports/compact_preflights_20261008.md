@@ -135,3 +135,25 @@ Precheck37958932525 stops before abstract mutation on an incorrect audit count.
 Authentic native LEF has13 entries per supply,26 total including two short
 internal entries; the correct invariant is24 surviving external accesses
 (12 per net). BUG61 corrects the count, retaining all coordinates and checks.
+
+## October 10 verified results and independent work
+
+[Official precheck37960021923](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37960021923)
+SUCCESS: all nine original checks, no failures/skips/waivers. Native export
+preserves1797 special-wire records, source GDS/ODB and all other signal/PG
+pins; exactly24 valid supply accesses remain. Publication preserves724 actual
+referenced GDS cells. This applies to driver37708459393's layout, not the new
+clock-tree/buffer placement, original failed native mapping or configured timing.
+
+[Longer search37960021920](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/37960021920)
+keeps actual buffered overflow169 at150iterations. Baseline case stops before
+routing on cold image-download observer timeout; it supplies no new baseline
+result. Separate image setup fixes that infrastructure issue. Increasing search
+alone has not solved the measured candidate congestion.
+
+Independent [research](efpga_research_20261009.md), [congestion analysis](compact_congestion_research_20261009.md)
+and [configured timing preparation](compact_configured_timing_plan_20261009.md)
+now identify concrete next experiments and boundaries. Strict report auditor
+reproduces62 tile fanout failures in all three corners, including blank-slack
+rows. Actual image/clock audit verifies1058 configuration values and16 real
+user-clock endpoints; no STA, constraints, frequency or physical pass follows.

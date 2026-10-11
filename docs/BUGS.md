@@ -1,16 +1,22 @@
 # Bugs
 
+## 62: Cold container pull consumes native observer timeout
+- **Date:**2026-10-10.
+- **Symptom/check:**37960021920 baseline native-placement observer times out120s during first image download; candidate later reaches genuine150-iteration congestion169. No new baseline routing measurement exists.
+- **Root cause:** image provisioning happens inside the short observer subprocess timeout.
+- **Fix/coverage:** explicit pinned-image pull with separate5min workflow setup bound before native observers. Keep observer120s, routing900s and45min job bounds; no routing check waived. Genuine candidate congestion remains failed. Fresh hosted validation pending.
+
 ## 61: Abstract audit overcounts existing supply accesses
 - **Date:**2026-10-09.
 - **Symptom/check:** precheck37958932525 passes native API and conductor checks but aborts on expected two removals/26 survivors before mutation.
 - **Root cause:** the original exported LEF has13 rectangles per supply net, including one short entry each:26 total,24 survivors. The initial census expectation incorrectly counted28 total.
-- **Fix/coverage:** independently count authentic native LEF37814339758 and require12 full-span survivors per net/24 total after exactly two removals. Keep exact geometry/connections/grouping invariants and all official checks. No result accepted from the failed run.
+- **Fix/coverage:** independently count authentic native LEF37814339758 and require12 full-span survivors per net/24 total after exactly two removals. Keep exact geometry/connections/grouping invariants and all official checks. No result accepted from the failed run. Verified corrected37960021923 passes all nine official checks with exactly24 retained accesses.
 
 ## 60: Native abstract census assumes an unexposed object-ID method
 - **Date:**2026-10-09.
 - **Symptom/check:** precheck37958116017 aborts before abstract mutation: pinned Tcl dbBPin lacks getId.
 - **Root cause:** upstream C++ dbObject::getId exists but is not inherited by the pinned exposed Tcl class. Native binding availability was not proven by the source API check.
-- **Fix/coverage:** use native SWIG pointer-derived object handles for exact surviving BPin grouping and SWire/SBox identity. Every remaining used method is declared in the actually wrapped pinned db.h. Keep exact all-other-pin/connection/special-wire/die invariants and existing-conductor proof; no abstraction is accepted from this failed run. Fresh cloud result pending.
+- **Fix/coverage:** use native SWIG pointer-derived object handles for exact surviving BPin grouping and SWire/SBox identity. Every remaining used method is declared in the actually wrapped pinned db.h. Keep exact all-other-pin/connection/special-wire/die invariants and existing-conductor proof; no abstraction is accepted from this failed run. Verified37960021923 passes native invariant census and all nine official checks.
 
 ## 59: Native power-interface observer loses multiple-box separators
 - **Date:**2026-10-09.
@@ -22,7 +28,7 @@
 - **Date:**2026-10-09.
 - **Symptom/check:** official37814339758 passes eight checks but Pin check rejects two Metal4 supply rectangles ending18.68um below top (limit10um).
 - **Root cause:** native full-block abstract exports short internal side-grid access entries alongside24 full-span external supply entries. This is distinct from BUG54 formatting.
-- **Fix/coverage:** D066 removes only the exact two metadata boxes in an in-memory export copy after native same-net conductor coverage proof. Exact all-other-pin/BTerm/connection/die/special-wire census must match; source ODB/GDS stay unchanged. Gap/narrow-conductor controls reject. All nine official checks still required; cloud result pending.
+- **Fix/coverage:** D066 removes only the exact two metadata boxes in an in-memory export copy after native same-net conductor coverage proof. Exact all-other-pin/BTerm/connection/die/special-wire census must match; source ODB/GDS stay unchanged. Gap/narrow-conductor controls reject. Verified37960021923 passes all nine official checks, preserving actual conductors and all remaining pins.
 
 ## 57: Optional runtime debug aliases disappear during native serialization
 - **Date:**2026-10-09.

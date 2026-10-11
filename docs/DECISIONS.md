@@ -2,6 +2,19 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-070: Collect native routing hotspot coordinates without hardware changes
+- **Date:**2026-10-10. **Status:** accepted bounded reporting diagnostic; no promotion.
+- **Evidence:**37958932549 reports148/169 overflow;37960021920 increases search to150 but buffered remains169. Baseline150 did not execute because cold Docker pull exceeded observer120s. Clock NDR fallbacks and1550 moved original cells are clues, not proof of the root cause.
+- **Decision:** on authenticated unchanged checkpoints and original routing policy, request native congestion report coordinates and keep them even on genuine GRT failure. A local attributed copy of pinned routing scripts may add only the native report-file/iteration-report flags; verify pinned originals and exact differences. The reporting-only change is recorded in patches/librelane-congestion-report.patch; runtime copies retain upstream headers and attribution. Never edit installed/upstream scripts, allow congestion, inflate capacity or alter electrical/layer/macro/clock constraints. Pull pinned image before short observers. Record diagnostic collection separately from routing acceptance.
+- **Cost/limits:** standard hosted bounded jobs only. This adds evidence, not hardware or a performance claim. Cross-check actual hotspots against native pin/macro geometry before choosing one physical change. Full route/DRC/LVS/function/configured timing remain required.
+- **Sources:** [pinned global-routing reports](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/README.md), docs/reports/compact_congestion_research_20261009.md.
+
+## D-069: Preserve measured experimental sources before artifact expiry
+- **Date:**2026-10-10. **Status:** accepted local preparation; public upload pending explicit approval.
+- **Decision:** prepare compact-proven-sources-20261009.tar.gz with30 allowlisted generated C2/control/fanout views, provenance, licenses and manifests. Verify actual finalC2 NL/ODB anchors, passing loaded/interface/estimated-fanout evidence and all input hashes. Retain original setup/fanout/congestion rejection; no qualified-successor flag. Exclude raw logs, secrets and original PDK libraries. Existing base checkpoint remains an explicitly hash-pinned dependency.
+- **Reason/cost:** CI artifacts expire; a small durable source bundle avoids losing exact tested views. No silicon or tool behavior changes. Source SHA25662c31885fb9771b7cf3de162b1a34715759768bfa06aa53241f81b8162134a7a,3620241bytes. Public release destination is the existing compact-checkpoint-20261006-iter8, but automatic approval review requires user authorization for this exact payload/destination. The attempted upload did not execute; do not bypass it.
+- **Evidence:** preserve_compact_sources.py prepare/verify plus duplicate/traversal/tamper/scope negative controls. Generated archive stays in ignored build/; no raw artifacts committed.
+
 ## D-068: Bounded longer global-routing search on unchanged checkpoints
 - **Date:**2026-10-09. **Status:** accepted tool-only diagnostic; no promotion.
 - **Evidence:**37958932549 authentic cluster8/ten-buffer cases fail native GRT-0116 with complete final congestion148/169 respectively. Both original settings use GRT_OVERFLOW_ITERS50 and keep congestion disallowed; current placement is unqualified.

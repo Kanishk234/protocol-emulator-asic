@@ -2,6 +2,44 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-10 (session72: parallel research, official pass and hotspot preparation)
+**Done:** resumed cloud checks independently; latest754cf0e lint37960151250/
+docs37960151308/test37960151353/unit37960151280 all pass. Downloaded official
+37960021923 SUCCESS: all nine checks present, none failed/skipped. Native
+abstract exports26→24 actual accesses/12 per supply with all1797 special-wire
+records and every other signal/PG pin unchanged; all724 referenced GDS cells
+preserved. This qualifies official precheck for driver37708459393, not compact
+native/configured timing or combined fanout layout.
+LongerGRT37960021920: buffered actual150iterations still169overflow; baseline
+never routed because cold container download exceeded120s observer timeout.
+Corrected workflow explicitly pulls pinned image before short observers.
+Three parallel agents reviewed primary FABulous/TinyFABulous/IHP/PRISM/research
+papers and added cited efpga_research_20261009.md. Implemented strict fanout
+report auditor: all3 actual tile corners reproduce62=49cfg+13other, retaining
+blank-slack violations. Self-tests/negative malformed-report controls pass.
+Actual configuration/clock preparation verifies1058 image-derived latch values
+and16 userFFclock endpoints across twoC2instances; no STA/SDC/models edited.
+Native locality diagnostic authenticates sources and identifies59 clock-name
+heuristic moved cells; clocks are investigation targets, not proved rootcause.
+Preparing separate native overflow-coordinate observer without relaxingrouting.
+Prepared30-file3.6MB durable source archive and exact manifest/anchors;
+duplicate/path-traversal/tamper/qualification controls pass. Public release
+upload was rejected by automatic approval review because exact payload/destination
+approval is required; explicit approval question pending, archive stays local.
+Other work continues. No frozen hardware/held-out/reference model change.
+**Reviewed cloud observer:** new cloud_congestion_map.py/congestion_map.yaml
+uses the existing authenticated paired-source gates with pinned API flow and
+local attributed Tcl copies; exact hashes and two reporting flags required.
+Preserves underlying native errors/zero-overflow requirements; diagnostic
+collection is explicitly not routing acceptance. Reporting-only patch tracked
+in patches/. Pinned-source positive/wrong-hash controls, AST/YAML and whitespace
+pass. Host image provision is separate from120s observers. No local EDA.
+**Boxes ticked:** none.
+**Next:** commit reviewed evidence/tools, launch bounded native hotspot capture;
+use actual boxes before a placement or CTS physical change. Continue genuine
+clock/boundary timing and tile electrical preparation. Publish source bundle
+only if the specific pending approval arrives; preserve input reproduction.
+
 ## 2026-10-09 (session71: repair diagnostic aliases and external power abstract)
 **Done:** latest a713e69 lint37957273503/unit37957273537/test37957273530/
 docs37957273620 pass. Native final-C2 run37956821834 control passes;

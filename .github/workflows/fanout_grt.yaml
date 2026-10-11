@@ -40,6 +40,9 @@ jobs:
           timeout 120s gh run download 37811985079 -R "$GITHUB_REPOSITORY" --name compact-fanout-preflight-37811985079 --dir build/fanout_grt_input/cluster8
           timeout 120s gh run download 37956470190 -R "$GITHUB_REPOSITORY" --name compact-cfg-fanout-37956470190 --dir build/fanout_grt_input/ten_buffers
           timeout 120s gh run download 37958932549 -R "$GITHUB_REPOSITORY" --name compact-fanout-grt-37958932549 --dir build/fanout_grt_input/previous_screen
+      - name: Pull pinned EDA image before short native observers
+        timeout-minutes: 5
+        run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"
       - name: Two bounded native GRT cases, without detailed routing
         timeout-minutes: 36
         run: |

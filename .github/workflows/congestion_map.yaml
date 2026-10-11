@@ -1,0 +1,48 @@
+name: compact native congestion map
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_congestion_map.py'
+      - '.github/workflows/congestion_map.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-congestion-map-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Pinned tools and authenticated baseline/candidate inputs
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+          timeout 120s gh run download 37811985079 -R "$GITHUB_REPOSITORY" --name compact-fanout-preflight-37811985079 --dir build/fanout_grt_input/cluster8
+          timeout 120s gh run download 37956470190 -R "$GITHUB_REPOSITORY" --name compact-cfg-fanout-37956470190 --dir build/fanout_grt_input/ten_buffers
+          timeout 120s gh run download 37958932549 -R "$GITHUB_REPOSITORY" --name compact-fanout-grt-37958932549 --dir build/fanout_grt_input/previous_screen
+      - name: Pull pinned EDA image before short native observers
+        timeout-minutes: 5
+        run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"
+      - name: Collect native hotspot reports; preserve strict route failures
+        timeout-minutes: 36
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_congestion_map.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-congestion-map-${{ github.run_id }}
+          path: build/congestion_map/
+          retention-days: 3

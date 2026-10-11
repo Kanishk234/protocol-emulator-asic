@@ -72,3 +72,9 @@ NOR4 route38164037268 succeeds but regresses slow setup to -72.290620 ps; fast h
 Prepared retained_sram2_plan/screen/output2 Tcl/wrapper/image and separate gds-retained-sram2-screen. Source pinned to retained parent38116800326/headbb7125ea2f963c78dcdc95961019a783bddfd5ee and exact prior NL/DEF hashes. Only wire9439 existingBUF4 is moved from341.28,230.58N to45.12,245.70N; every cell/master/net is unchanged. Original site/pins/power/fixed/master preflight, full destination footprint occupancy, post-DPL and post-antenna exact-site checks, old-signal-wire reset, zero-overflow/antenna-only cleanup and unchanged fresh50psallcorner gates retained.
 
 101 focused tests pass; actual source hashes/cell/net preservation and complete footprint zero-overlap independently verified on retained DEF with reviewedLEF. This is unexecuted physical repair, not a guarantee of capacitance or timing improvement. Nominal added cell area0; new routing/antenna costs may differ. Next publish reviewed group and launch under scoped approval, then audit and extract if qualified.
+
+## Retained DOUT2 screen audited; extraction prepared
+
+Screen38171124079 succeeds on07f6258d687934613f801b16bf6d83a74487e65e; artifact11714536120. Actual source/proposal/unchanged full topology/final wire9439 site/master, antenna-only cleanup with congestiondisallowed, one relocation/legalization/reset and zerooverflow audits pass. Estimated setupWS0all, holdfast100.790ps; slew slow/typ/fast12/1/0, fanout24each, capmetrics0. This is not extracted cap/timing closure.
+
+Prepared retained_sram2_route.py and gds-retained-sram2-route pinned to exact successful screen. Complete checkpoint/history/source/site/fullrecipe/freshantenna/allcorner50pshold qualification precedes stockDRT/freshextraction; old extraction preserved, no repeated move.129focusedtests pass. Publication/launch awaiting scopedapproval.

@@ -5,6 +5,21 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (audit retained DOUT2 screen; prepare extraction)
+- Retrieved66 selected evidence files. Actual source/proposal/unchanged all-cell wiring/final destination/master, antenna-only cleanup/congestionpolicy, single movement/legalization/reset and zerooverflow audits pass. DOUT2 screen qualifies estimated allcorner setupWS0 and fast hold100.790ps; electrical residuals remain.
+- Prepared exact screen38171124079/head07f6258 continuation retained_sram2_route and workflow: verifies complete saved history/site/views, rechecks antennas/allcorner50pshold then stockDRT/newextraction without repeated movement.129focusedtests pass including full checkpoint rejection cases. No newdispatch/phaseboxes; next publish reviewed group under scopedapproval and launch.
+
+## 2026-10-11: Codex (retained DOUT2 preliminary result)
+- Run38171124079 succeeds; artifact11714536120 saved timing/gates retrieved after initial status approval-review timeout and successful retry. Gate confirms retained source38116800326, one relocation, unchanged masters/cells/nets and preliminary qualification. Physical-screen success is not extracted closure.
+- nom_fast_1p32V_m40C: setup 0 ns, hold 0.10079 ns; slew/fanout/cap 0/24/0.
+- nom_slow_1p08V_125C: setup 0 ns, hold 0.378216 ns; slew/fanout/cap 12/24/0.
+- nom_typ_1p20V_25C: setup 0 ns, hold 0.203273 ns; slew/fanout/cap 1/24/0.
+- Next auditactual source/topology/placement/antenna/overflow, then prepare exact-checkpoint detailed routing/extraction. No phase ticks/newdispatch.
+
+## 2026-10-11: Codex (publish and launch retained SRAM2 screen)
+- Explicit approval executed: tools5aa987e, CIa205143, docs07f6258 pushed to remote main. Exact head07f6258d687934613f801b16bf6d83a74487e65e verified. [Retained DOUT2 screen38171124079](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38171124079) queued on that commit, moving existingwire9439 on retained timing-qualified parent38116800326.
+- Next inspect movement/site/master/nets/legalization, antenna/overflow and fresh all-corner timing/electrical before detailed extraction. No phase boxes ticked; unrelated files/FIPE excluded. Launch receipt remains local.
+
 ## 2026-10-11: Codex (prepare retained-parent DOUT2 relocation)
 - Selected retained timing-qualified parent38116800326 after NOR4 child setup regression. Prepared one existingBUF4 wire9439 relocation341.28,230.58N→45.12,245.70N, no master/cell/net changes. Dedicated plan/Tcl/wrapper/image/screen/workflow preserve source hashes/provenance/fullrecipe/occupiedsite/power/post-DPL/post-antenna/50pshold guards.
 - 101 focused tests pass; actual retained NL/DEF canonical/topology/destination and complete-footprint overlap0 audit pass; shellsyntax/diff checks pass. Physical move not executed. Next publish reviewed tools/CI/docs group under scoped approval and launch. No phase boxes/newdispatch; unrelated files/FIPE untouched.

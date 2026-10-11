@@ -36,6 +36,16 @@ def verify_stage(layout, proposal):
             raise ValueError('Clean SRAM placement missing or changed at '+item['instance'])
 
 
+def start_clean_flow(path, flow, pdk_root):
+    # The pinned CLI validates --force-run-dir before starting the flow.
+    flow.mkdir(parents=True, exist_ok=False)
+    os.environ.pop('LIBRELANE_IMAGE_OVERRIDE', None)
+    subprocess.run([sys.executable, '-m', 'librelane', '--pdk-root', pdk_root,
+        '--docker-no-tty', '--dockerized', '--pdk', 'ihp-sg13cmos5l', '--manual-pdk',
+        '--run-tag', 'sram-bank-clean', '--force-run-dir', str(flow), '--hide-progress-bar',
+        '--to', 'OpenROAD.ResizerTimingPostGRT', str(path)], check=True)
+
+
 def main():
     root = Path.cwd()
     trusted = json.loads(Path('/tmp/native-trusted-config.json').read_text())
@@ -55,12 +65,8 @@ def main():
     output = Path('runs/sram-bank-clean-screen'); output.mkdir(exist_ok=False)
     (output/'proposal.json').write_text(json.dumps(proposal, indent=2)+'\n')
     path = Path('src/config_sram_bank_clean.json'); path.write_text(json.dumps(config, indent=2)+'\n')
-    os.environ.pop('LIBRELANE_IMAGE_OVERRIDE', None)
     flow = output/'flow'
-    subprocess.run([sys.executable, '-m', 'librelane', '--pdk-root', os.environ['PDK_ROOT'],
-        '--docker-no-tty', '--dockerized', '--pdk', 'ihp-sg13cmos5l', '--manual-pdk',
-        '--run-tag', 'sram-bank-clean', '--force-run-dir', str(flow), '--hide-progress-bar',
-        '--to', 'OpenROAD.ResizerTimingPostGRT', str(path)], check=True)
+    start_clean_flow(path, flow, os.environ['PDK_ROOT'])
     before = list(flow.glob('*-openroad-repairdesignpostgpl/tt_um_tripwire.nl.v'))
     placed = list(flow.glob('*-odb-manualglobalplacement/tt_um_tripwire.def'))
     legalized = list(flow.glob('*-openroad-detailedplacement/tt_um_tripwire.def'))

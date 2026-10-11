@@ -57,3 +57,25 @@ def test_workflow_uses_clean_script_and_keeps_frozen_shape():
     download = next(s for s in steps if 'download-artifact@' in s.get('uses',''))
     assert download['with']['run-id'] == 38172640071
     assert any(s.get('run') == 'python workflow-src/scripts/ci/sram_bank_clean_screen.py' for s in steps)
+
+
+def test_launch_creates_required_directory_before_cli_and_uses_clean_stock_flow(tmp_path, monkeypatch):
+    flow = tmp_path/'screen/flow'
+    monkeypatch.setenv('LIBRELANE_IMAGE_OVERRIDE', 'unreviewed')
+    calls = []
+    def run(args, check):
+        assert flow.is_dir() and not list(flow.iterdir())
+        assert 'LIBRELANE_IMAGE_OVERRIDE' not in runner.os.environ
+        assert args[args.index('--force-run-dir')+1] == str(flow)
+        assert '--with-initial-state' not in args and check is True
+        calls.append(args)
+    monkeypatch.setattr(runner.subprocess, 'run', run)
+    runner.start_clean_flow(Path('src/config_trial.json'), flow, '/pdk')
+    assert len(calls) == 1
+
+
+def test_launch_refuses_reusing_existing_flow(tmp_path, monkeypatch):
+    flow = tmp_path/'flow'; flow.mkdir()
+    def unexpected(*args, **kwargs): raise AssertionError('Must refuse before CLI')
+    monkeypatch.setattr(runner.subprocess, 'run', unexpected)
+    with pytest.raises(FileExistsError): runner.start_clean_flow(Path('config.json'), flow, '/pdk')

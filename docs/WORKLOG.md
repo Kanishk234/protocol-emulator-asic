@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (parallel selected-source SRAM placement proposals)
+- Setup38108151690 runsphysicalrepair/timing. Prepared exactfanoutNL/DEF+reviewedLEFgeometry SRAMplanner: output0wire9447 candidate25.92,245.70N gives17.66µmpin-to-origin versus451.64µm; RENcandidate132.96,245.70N gives19.19 versus314.87. Fullfootprints have0overlap on selectedsource; pinaccess/power/legalization/routingstillunproved.
+- 16planner/setupchecks pass plusactualboth-targetsource/geometry audits. Nophysicalmove/newdispatch/phasebox; next inspectsetupscreen andregenerate placementonits exactcheckpoint beforeone measuredoutput0relocation. No unsolicitedcombination orareaclosureclaim.
+
 ## 2026-10-10: Codex (verify selected setup screen launch)
 - Tools/CI/docs f62297d/ea817c5/d39b014 pushed; remote exactheadverified d39b014f73b8105828fa3218c247b8e51a2ad4f4. [Selectedsetup screen38108151690](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38108151690) queuedonexacthead. 161 focusedchecks/actualsourceauditpass; oneBUFstrengthchangeonselectedfanoutcheckpoint, notindependentarchitecturebranch.
 - Next inspectfreshphysicaltiming/electrical/antenna/overflow, then exactDRT/extractionandresidualrepair. No phasebox orpromotedresult; FIPE/unrelatedlocalfilesexcluded.

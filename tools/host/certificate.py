@@ -4,8 +4,10 @@ The artifact is a planning certificate, not timing signoff or measured rate
 certification. Compiler timing, resource fit and host service are separate.
 """
 import argparse
+import csv
 from fractions import Fraction
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
@@ -47,6 +49,38 @@ def _metadata(report):
             raise ValueError("malformed compiler " + key)
 
 
+def _pinout(architecture_path, inputs, mapped_pins):
+    """Crosscheck user-facing pins against the hashed architecture pin table."""
+    pin_path = architecture_path.with_name("pins.csv")
+    pin_bytes = pin_path.read_bytes()
+    pin_hash = hashlib.sha256(pin_bytes).hexdigest()
+    if not any(Path(entry["path"]).resolve() == pin_path.resolve()
+               and entry["sha256"] == pin_hash for entry in inputs):
+        raise ValueError("architecture pins.csv is not a hashed compiler input")
+    reader = csv.DictReader(io.StringIO(pin_bytes.decode("utf-8")))
+    if not reader.fieldnames or not {"pin", "bel", "direction", "chip_pin"}.issubset(reader.fieldnames):
+        raise ValueError("architecture pin table has missing columns")
+    directions = {"clock": {"i"}, "in": {"i"}, "out": {"o"},
+                  "out_en": {"oe"}, "inout": {"i", "o", "oe"}}
+    table = {}
+    for row in reader:
+        if (any(not isinstance(row.get(key), str) or not row[key]
+                for key in ("pin", "bel", "direction", "chip_pin"))
+                or row["pin"] in table or row["direction"] not in directions):
+            raise ValueError("architecture pin table has malformed or duplicate pins")
+        table[row["pin"]] = row
+    pinout = {}
+    for pin, roles in mapped_pins.items():
+        if pin not in table:
+            raise ValueError("compiler maps an unknown architecture pin: " + pin)
+        row = table[pin]
+        if not set(roles).issubset(directions[row["direction"]]):
+            raise ValueError("compiler pin role contradicts architecture direction: " + pin)
+        pinout[pin] = {"ports": roles, "direction": row["direction"],
+                       "bel": row["bel"], "chip_pin": row["chip_pin"]}
+    return pinout, pin_hash
+
+
 def certificate(report_path, architecture_path, budget_inputs):
     """Generate a self-consistency artifact using current compiler schema.
 
@@ -57,7 +91,10 @@ def certificate(report_path, architecture_path, budget_inputs):
     report_bytes = report_path.read_bytes()
     report = json.loads(report_bytes)
     architecture_bytes = architecture_path.read_bytes()
-    architecture = yaml.safe_load(architecture_bytes)
+    try:
+        architecture = yaml.safe_load(architecture_bytes)
+    except yaml.YAMLError as exc:
+        raise ValueError("malformed architecture YAML") from exc
     if not isinstance(architecture, dict) or not isinstance(report, dict):
         raise ValueError("report and architecture must be objects")
     if not isinstance(report.get("design"), str) or not report["design"]:
@@ -84,6 +121,7 @@ def certificate(report_path, architecture_path, budget_inputs):
     if not any(Path(entry["path"]).resolve() == architecture_path.resolve()
                and entry["sha256"] == arch_hash for entry in inputs):
         raise ValueError("selected architecture is not a hashed compiler input")
+    pinout, pin_hash = _pinout(architecture_path, inputs, report["pins"])
     resources = report.get("utilisation")
     if not isinstance(resources, dict) or "FABULOUS_LC" not in resources:
         raise ValueError("missing compiler resource utilisation")
@@ -124,6 +162,7 @@ def certificate(report_path, architecture_path, budget_inputs):
         "scope": "audited local compile evidence plus analytical host model; not physical signoff or measured performance",
         "compile_report_sha256": hashlib.sha256(report_bytes).hexdigest(),
         "architecture_sha256": arch_hash,
+        "architecture_pins_sha256": pin_hash,
         "image_sha256": report["provenance"]["bitfile_sha256"],
         "design": report.get("design"), "architecture": report["arch"],
         "params": report.get("params"), "tools": report.get("tools"),
@@ -131,6 +170,7 @@ def certificate(report_path, architecture_path, budget_inputs):
         "compile_provenance_scope": report["provenance"].get("scope"),
         "arch_version": report["arch_version"], "resources": resources,
         "pins": report.get("pins"),
+        "pinout": pinout,
         "unmapped_inputs_tied_0": report.get("unmapped_inputs_tied_0"),
         "unmapped_outputs_open": report.get("unmapped_outputs_open"),
         "compiler_estimate": {"fmax_mhz": fmax, "corner": report.get("timing_corner"),
@@ -162,7 +202,9 @@ def operating_summary(result):
             for name, value in sorted(result["resources"].items())), "Pin mapping:"]
     for pin, roles in sorted(result["pins"].items()):
         for role, port in sorted(roles.items()):
-            lines.append(f"  {pin}.{role}: {port}")
+            pinout = result.get("pinout", {}).get(pin)
+            label = "" if pinout is None else f" [{pinout['chip_pin']}]"
+            lines.append(f"  {pin}.{role}: {port}{label}")
     lines.extend(["Inputs tied zero: " + json.dumps(result["unmapped_inputs_tied_0"]),
         "Outputs open: " + json.dumps(result["unmapped_outputs_open"]),
         "Tool versions: " + json.dumps(result["tools"], sort_keys=True),

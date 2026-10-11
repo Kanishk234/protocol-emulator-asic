@@ -90,3 +90,12 @@ timing is printed as unknown. The summary explicitly labels physical timing
 unverified and board rate unmeasured. Malformed pin roles, parameter values,
 tool-version metadata and tied/open port lists are rejected rather than silently
 displayed as valid compiler evidence. JSON remains the default artifact format.
+
+Mapped pin names and roles are also checked against the selected architecture's
+`pins.csv`, which must be a hashed compiler input. This rejects plausible-looking
+but nonexistent pins and reversed direction roles. JSON includes the pin-table
+hash and each mapped pin's physical chip label, direction and fabric BEL; the
+text summary adds the physical chip label beside each mapped user port. Host
+channel and user-reset labels describe shell signals rather than extra external
+package pins. Pin-table agreement establishes a documented mapping, not board
+wiring verification or electrical compatibility with an external device.

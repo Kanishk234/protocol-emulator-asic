@@ -16,6 +16,8 @@ from host.protocol import SYNC_WORD
 def evidence(tmp_path):
     architecture = tmp_path / "arch.yaml"
     architecture.write_text("name: warp_g1\narch_version: 3\nluts: 88\nprimitives:\n  wp_timer: 2\n  wp_shift: 2\n")
+    pins = tmp_path / "pins.csv"
+    pins.write_text("pin,bel,direction,chip_pin\nFAB_IN0,X5Y1/A,in,ui[3]\n")
     source = tmp_path / "user.v"
     source.write_text("module user; endmodule\n")
     image = tmp_path / "user.wbit"
@@ -32,7 +34,7 @@ def evidence(tmp_path):
         "pins": {"FAB_IN0": {"i": "event_i"}}, "unmapped_inputs_tied_0": [],
         "unmapped_outputs_open": [],
         "provenance": {"inputs": [{"path": str(path), "sha256": digest(path)}
-            for path in (source, architecture)], "bitfile": str(image), "bitfile_sha256": digest(image)}}
+            for path in (source, architecture, pins)], "bitfile": str(image), "bitfile_sha256": digest(image)}}
     report_path = tmp_path / "report.json"
     report_path.write_text(json.dumps(report))
     budget = {"clock_hz": 50000000, "sck_hz": 1000000, "arrival_bytes_s": 1000}
@@ -47,6 +49,7 @@ def test_certificate_keeps_estimates_separate_and_hashes_exact_input(evidence):
     assert result["host_budget"]["queue_sufficient_under_model"] is True
     assert result["physical_timing_verified"] is False
     assert result["board_rate_measured"] is False
+    assert result["pinout"]["FAB_IN0"]["chip_pin"] == "ui[3]"
 
 
 def test_unknown_and_insufficient_model_timing_are_preserved(evidence):
@@ -128,6 +131,7 @@ def test_cli_writes_scoped_artifact_from_audited_compile_inputs(evidence, tmp_pa
     assert text.returncode == 0, text.stderr
     assert "Physical timing: unverified. Board rate: unmeasured." in text.stdout
     assert "FAB_IN0.i: event_i" in text.stdout
+    assert "[ui[3]]" in text.stdout
     assert '"DIV": 16' in text.stdout
 
 
@@ -157,3 +161,35 @@ def test_summary_reports_unknown_timing_and_failed_host_model(evidence):
     assert "Compiler clock estimate: unknown; requested clock unknown." in text
     assert "service margin False; queue sufficient False" in text
     assert "Physical timing: unverified. Board rate: unmeasured." in text
+
+
+@pytest.mark.parametrize("pins,message", [
+    ({"FAB_IN99": {"i": "event_i"}}, "unknown architecture pin"),
+    ({"FAB_IN0": {"o": "event_i"}}, "contradicts architecture direction"),
+])
+def test_syntactically_valid_pin_mapping_must_match_architecture(evidence, pins, message):
+    report_path, architecture, report, budget, _ = evidence
+    report["pins"] = pins
+    report_path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match=message):
+        certificate(report_path, architecture, budget)
+
+
+def test_unlisted_pin_table_is_not_accepted(evidence):
+    report_path, architecture, report, budget, _ = evidence
+    report["provenance"]["inputs"] = report["provenance"]["inputs"][:2]
+    report_path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="pins.csv is not a hashed compiler input"):
+        certificate(report_path, architecture, budget)
+
+
+def test_changed_pin_table_and_duplicate_hashed_pin_rows_rejected(evidence):
+    report_path, architecture, report, budget, _ = evidence
+    pins = architecture.with_name("pins.csv")
+    pins.write_text(pins.read_text() + "FAB_IN0,X5Y1/B,in,ui[4]\n")
+    with pytest.raises(ValueError, match="audit failed"):
+        certificate(report_path, architecture, budget)
+    report["provenance"]["inputs"][-1]["sha256"] = hashlib.sha256(pins.read_bytes()).hexdigest()
+    report_path.write_text(json.dumps(report))
+    with pytest.raises(ValueError, match="duplicate pins"):
+        certificate(report_path, architecture, budget)

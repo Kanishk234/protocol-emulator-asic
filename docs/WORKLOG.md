@@ -5,6 +5,9 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (verify corrected hold relaunch)
+- BUG90 tools/docs fixes069f756/8336e5a pushed;127focusedchecks pass. Relaunched [holdroute38102572131](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38102572131) on8336e5ac1ef36971426e77291f34f442c3a4de35; queuedatverification. Datafanout38102524361 running/downloadingcheckpoint. These are independentfull2/4/20ns experiments; no resultpromotion/checklisttick. Next inspect sourceguards, freshallcornergates and extractedholdroute plus datafanout/electrical/overflow.
+
 ## 2026-10-10: Codex (fanout dispatch and hold source-path fix)
 - Published generalfanout helpers/CI/evidence8401450/9425863/acf2827 and launched [fanoutscreen38102524361](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38102524361) onacf2827167d1c34c87824f80304ee82aec345206; runningatverification. Holdroute38102291599 fails beforefreshSTA/DRT on mistaken siblingfilename.nl.def (BUG90). Corrected actualDEFpath and fixturethatmirroredbug; no newtimingresult. Next relaunch correctedholdcontinuation underongoingworkflowapproval, inspectbothactualresults. No phasebox.
 

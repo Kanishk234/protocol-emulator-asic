@@ -5,7 +5,8 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 ## 2026-10-11 (session74: breadth goal and physical runner repair)
 **Done:** reaffirmed broad practical reprogrammability: UART/SPI/I2C are baseline demonstrations, not an architecture limit. Existing organizer report records this goal; universal coverage remains an aspiration rather than a measured claim. Proactively checked38113928620: fails before routing because shared delay-transform import pulls cocotb into a physical-only environment. Deferred timing-audit imports to timing execution/CLI, retaining identical transformation and input authentication (BUG68). Lightweight project-venv Python with site packages disabled imports the physical helper and authenticates the actual38113263802 intrinsic result. Routine unit38113928552 SUCCESS. No local EDA, frozen hardware change or physical/timing acceptance.
 **Boxes ticked:** none.
-**Next step:** retry the unchanged eight-delay physical candidate in cloud, then inspect actual native routing/signoff and extracted timing. Continue targeting actual congestion-net endpoints rather than cell bounding boxes; the prior five-cell spacing trial had unchanged146 overflow and is not a routing improvement.
+**Cloud continuation:** scoped repair/evidence pushed as fffc6a7/42afad7; unchanged physical candidate retry38114298036 queued on42afad7. No source/macro hardening cancellation occurs.
+**Next step:** inspect retry38114298036 actual native routing/signoff and extracted timing. Continue targeting actual congestion-net endpoints rather than cell bounding boxes; the prior five-cell spacing trial had unchanged146 overflow and is not a routing improvement.
 
 ## 2026-10-10 (session73: resumed real hotspot and iteration results)
 **Done:** resumed existing cloud jobs on fd62279; container provisioning passes

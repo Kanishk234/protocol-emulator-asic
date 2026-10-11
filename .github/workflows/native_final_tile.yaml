@@ -1,11 +1,8 @@
 name: native final C2 loaded diagnostic
 on:
-  push:
-    branches: [efpga]
-    paths:
-      - 'test_internal/cloud_native_final_tile.py'
-      - 'test_internal/compact_gate_probe.py'
-      - '.github/workflows/native_final_tile.yaml'
+  # Historical original-view replay requires retained 37814078650 artifacts.
+  # Shared-helper changes use the current candidate workflow instead; avoid
+  # automatically launching obsolete artifact-dependent jobs.
   workflow_dispatch:
 permissions:
   contents: read

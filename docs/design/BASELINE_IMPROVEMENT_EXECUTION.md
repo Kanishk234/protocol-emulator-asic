@@ -64,3 +64,7 @@ cloud helper behavioral retry38167350632 pytest462PASS. Same-job loaded helper
 workflow38167521573 running; loaded success not yet claimed. Receiver-local
 row policy reduces native146→145 in38167244563, still fails; D081 tests interaction
 with separately measurednet683136 rather than assuming additive gains.
+
+Actual loaded helper38167521573SUCCESS: same-job compile/bitstream/realSPI load,
+A5serial/completion/USER_RESET/STOP chip-port case passes with strict1-caseXML.
+ExistingD023RTLfabric scope, no native/SDF or new physical clock claim.

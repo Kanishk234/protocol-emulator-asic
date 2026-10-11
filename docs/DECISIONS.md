@@ -2,6 +2,12 @@
 
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
+## D-080: Receiver-local reset tie with one-row whitespace redistribution
+- **Date:**2026-10-11. **Status:** accepted copied-checkpoint physical-policy trial, no frozen hardware promotion.
+- **Evidence:** native inventory38166250744 authenticates365 actual fragmented rows; row468720 extends to111360DBU with free tail from100320. Independent net694 relocation worsens146→154 despite shorter distance, so arbitrary remote gaps are rejected. net643 connects tie u_shell.u_crc._329__644 to register_329_/RESET_B; original tie row529200 is60.48µm away.
+- **Decision:** from exact38101405271 source, move24 cells starting atx21120 on row468720 right1.92µm, consuming actual free tail; move only existing net643 tie from bbox(9120,529200,11040,532980) into(20160,468720,22080,472500), adjacent to its receiver. Exact25-instance plan is test_internal/reset643_plan.json. All orientations/statuses/masters/connections and every other instance/macro/pin stay exact. The tie shifts16 rows, preserving power phase. Native legality and unchanged six electrical/estimated timing screens are mandatory before routing.
+- **Cost:** no new cells;24 cells move horizontally and their parasitics/pin access can worsen. No RTL or architecture change. Compare actual same-policy routing before promotion; source netlist remains identical. This is one placement-localization policy, not multiple hardware features.
+
 ## D-079: Test the measured net694 interior-slot relocation
 - **Date:** 2026-10-11. **Status:** accepted copied-checkpoint experiment; no hardware promotion.
 - **Evidence:** read-only audit of actual producer38163199430 and native markers38163542037 finds445 single-load reset ties,116 separated by at least30µm in row coordinates. Of70 marker-associated reset ties,68 lack an improving conservative interior slot within20µm of the receiver row. net694 appears in five markers and has a same-power-phase slot reducing bbox-center Manhattan proxy62.94→49.38µm. These proxies are not routed wirelength.

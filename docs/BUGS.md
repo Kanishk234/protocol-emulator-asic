@@ -1,5 +1,11 @@
 # Bugs
 
+## 74: Helper one-cycle delay test samples before combinational settling
+- **Date:**2026-10-11.
+- **Symptom/check:** cloud38167100528 fails only helper[3-0-1] at time120; other two parameter cases pass and compiler38167100577 succeeds separately.
+- **Root cause:** bench drives enable=1 then immediately samples elapsed in the same simulator delta cycle. With CYCLES1 the paused terminal count is already0, so enable→timer.tc→elapsed must settle before observing it.
+- **Fix/coverage:** insert#1 after resume input drive, preserving all tested clock edges, timer interval expectations and helper RTL. Cloud retry required; local EDA deliberately not run.
+
 ## 73: Replay origin-only bounds admit an incoherent quantized trace
 - **Date:**2026-10-11.
 - **Symptom/check:** adversarial review finds stamps[0,0,0,1,2], quantum2, maximumgap1 pass origin-only cumulative bounds despite no coherent absolute-clock schedule.

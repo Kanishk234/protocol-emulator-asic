@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (prepare SRAM cap repair on exact latest route)
+- RetrievedlatestDRTNL/DEF/criticalpaths; same48179start,worstendpointnow46391. Repinned exactlatestNL/DEF andverified output0nearbycandidatefootprint0overlap. Prepared dedicated one-existing-buffer relocation screen/binding/image/workflow, no sizing/addedcells/wiring/specchange; strictsource/position/master/power/occupancy/post-DPL/post-antenna location andfreshallcornergates.
+- 138focusedchecks andactualsource/geometryauditpass; realnewphysicalmoveunexecuted. Next publish/launchunderongoingapproval, inspectscreenthenfreshDRT/extraction. No phasebox/promotion; othercap/setup/electricalresiduals remain.
+
+## 2026-10-10: Codex (selected setup extracted result)
+- Setup-route38108912678 succeeds/artifact11691393395; extractedslowsetup-38.932ps,fasthold63.538ps (13.538psreserveabovegate),typ166.744ps/slow327.864pshold. Allcornerelectricalreparsematches slew142/22/6 slow/typ/fast,fanout17each,cap2/3/3. SRAMDOUT0/2capfailallcorners,DOUT5typ/fast.
+- Setupimprovesparent-65.507ps,butholdreserve/electricalworsen; preserveparent/child checkpoints,no unconditionalpromotion/phasebox. Next auditexactchildcriticalpaths/loads/placements andchoose measuredrepairwithoutreusingstaleplans. No newdispatch.
+
 ## 2026-10-10: Codex (parallel current-screen electrical preparation)
 - Setup-route38108912678running. Current cleanedsetup screen15fanout=11data+4clock;28807new16load/8diodefailure. SRAMREN/ADDR0/ADDR6remain slow slewtargs. Recomputed exactcurrentNL/DEF reviewedLEF footprints; previousoutput0/RENcandidate sitesstill0overlap.
 - Prepared30BUF4spatialpartitions for11data drivers withinitialupstream/downstreamloads<=4; independentfullsink/diode conservationchecks pass. No physicalECO/newdispatch/phasebox; proposalsunlegalized/unmeasured andmustberepinned afterDRT. Next inspectextractedsetupresult andapplynextone measuredrepair on selectedlineage.

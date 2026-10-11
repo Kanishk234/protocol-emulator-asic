@@ -87,3 +87,9 @@ markers, still nativeFAIL. New connectivity audit finds34/91markers without any
 tie-driven net; overlapping membership is not causal attribution. See
 compact_congestion_membership_20261011.md for hashes and next bounded buffer
 placement hypothesis. No phase boxes ticked or successor promoted.
+
+Actual corrected loaded38168609080SUCCESS: independently authenticated strict
+onecaseXML/no failures/errors/skips and unchanged imageSHAa74a2909….
+Autonomous window/trigger/event/reset-idle/STOP behavior passes through realSPI
+under D023RTLfabric scope. Source scheduler corners execute in cloud532-check
+pytest job38168413502/114555697291. No new physical or native clock claim.

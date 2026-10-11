@@ -1,0 +1,64 @@
+name: frozen G1 design-set compiler seed robustness
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_seed_robustness.py'
+      - '.github/workflows/seed_robustness.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-seed-robustness-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  sweep:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Python prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-venv python3-tk
+      - name: Cache pinned Yosys suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Fetch pinned Yosys suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/warp-seed-ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/warp-seed-ocs.tgz -C ~
+      - name: Cache pinned nextpnr suite
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+      - name: Install pinned project tools and tile library
+        run: |
+          scripts/setup_venv.sh
+          source .venv/bin/activate
+          bash scripts/fetch_nextpnr.sh
+          bash scripts/fetch_tiles.sh
+      - name: Nine fresh fixed-parameter compiler builds and complete retained evidence
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          export PATH="$HOME/oss-cad-suite/bin:$PATH"
+          export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
+          python test_internal/cloud_seed_robustness.py --self-test
+          python test_internal/cloud_seed_robustness.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: frozen-g1-seed-robustness-${{ github.run_id }}
+          path: build/seed_robustness/
+          retention-days: 3

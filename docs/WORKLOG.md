@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-10: Codex (verify clock screen launch)
+- Approved helper/workflow/docs eb21e49/931973c/fd5c641 pushed; remote main verified at fd5c64173acacb3e8cbaf08fd4b4491b357d3f55. Launched [clock screen38103503234](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38103503234) on that exact head; in progress at verification. Hold38102572131 and fanout38103189246 still run. No phase box or result promotion.
+- Next inspect independent clock timing/electrical/antenna/overflow gates and extracted hold/fanout results. 165 focused checks pass; unrelated local prototypes and FIPE remain excluded.
+
 ## 2026-10-10: Codex (publish approved clock branch screen)
 - User explicitly approves publication, overriding latest AGENTS Git reservation for this group. Tools eb21e49 and workflow 931973c committed separately; 165 focused checks and actual-source audit passed before publication. Both extracted hold/fanout routes remain running. Unrelated local files and FIPE excluded; no src/info/macro history changes.
 - Next push the reviewed docs/tools/CI groups, verify remote head, launch independent clock screen, and compare fresh physical evidence before any integration. No phase box.

@@ -270,6 +270,8 @@ This launches no new hardware or placement change; actual hotspot data still
 needs to be collected and interpreted before the proposed counterfactual.
 # 2026-10-11 continuation: actual endpoint hypothesis
 
+The one-cell producer [38163199430](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38163199430) passes native legality, exact one-cell placement and all six estimated shell STA/electrical guards. Candidate ODB SHA8a2091f16365ba2eb3391b610fbb401bbf4f632f8d2b24118dcbbc086234852a; NL stays3e3e9fd0a7632c1669858c99ff968aebcd671550488736f4c51c8d2222722136. Actual result SHA0d2375d73627d7ac4d766883c3d68619ddd5e92651b28c97021419cb1b47e70c. Baseline and relocated estimated slacks match: fast setup14.5141/hold.116141ns, slow12.7828/.635476ns, typical13.8665/.304198ns, all fanout/slew/cap counts0. This producer has not run routing; the hypothesis below still needs its paired native GRT result.
+
 Actual paired38113003427 has unchanged146 overflow and byte-identical baseline/five-move marker maps. The successful spacing producer is not a routing improvement. Native endpoint census shows _150_,_181_,_189_ are not attached to the source nets named in the worst marker. Existing tiehi_251__684/L_HI and register_251_/RESET_B are the only two terminals on marker source net683.
 
 The pinned [OpenROAD makeItermPins implementation](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/GlobalRouter.cpp) transforms each master pin rectangle into placed coordinates. Subsequent access-point/grid choices use router-specific logic; cell bounding-box intersection or pin centroid alone does not prove a congestion contribution.

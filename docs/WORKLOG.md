@@ -5,6 +5,30 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (prepare extracted-source dominant-net screen)
+- Retrieved latest DRT NL/DEF and critical paths. Repinned dominant planner to actual extracted-source hashes; both real topology partition audits pass. Worst slow setup _48179_ to _46883_; worst fast hold _48776_ to _46037_. Prepared one-net _28807_ screen with four BUF4s using existing guarded binding/image/wrapper, complete source/recipe/topology/antenna/overflow/fresh 50 ps hold checks.
+- 123 focused tests pass. Updated residual report; no physical split, push or dispatch this session and no phase boxes ticked. Next publish reviewed tools/CI/docs group under user Git authorization, launch screen and inspect measured electrical/timing before DRT continuation. Unrelated files and FIPE remain excluded.
+
+## 2026-10-11: Codex (selected SRAM extracted result)
+- Run 38112320460 succeeded; artifact 11692334939 selectively retrieved. Fresh extracted slow setup -2.614797 ps, fast hold 48.963834 ps (fails 50 ps gate by 1.036166 ps), typical hold 148.131511 ps, slow hold 305.765422 ps; typical/fast setup WS 0 ns.
+- Complete all-corner electrical report audits match saved summaries. Electrical closure still fails; slow slew 147, fanout 20, capacitance 4. Output0 no longer appears in fast cap failures, but DOUT1 and dominant data branches do. Setup improves versus parent -38.932 ps; reduced hold reserve and electrical regression prohibit promotion. Next retrieve exact new topology/geometry/critical paths and re-pin one dominant-net repair with hold-budget checks. No phase boxes ticked or new dispatch.
+
+## 2026-10-10: Codex (prepare dominant-net physical binding input)
+- Selected SRAM extraction 38112320460 remains in progress at physical route/extract step. Extended dominant_slew_plan with target_call for existing guarded clock8_residual Tcl operation: exact source driver/sink/master preflight, four identity BUF4 groups, existing driver power rails and centroid hints. No new physical mutation or workflow dispatch.
+- Forty focused planner/binding tests pass, including actual Tcl argument parsing and unique complete sink coverage. Centroids are not legal sites; extracted-source hash/geometry repinning, DPL, topology/antenna checks and fresh timing remain required. No phase boxes or physical qualification claims; pending files remain local.
+
+## 2026-10-10: Codex (prepare guarded dominant-net topology repair)
+- Extraction 38112320460 remains in progress at physical routing/extraction step. Prepared read-only dominant_slew_plan.py pinned to exact SRAM screen NL/DEF; four spatial BUF4 branches per dominant driver, all sink/diode connectivity preserved, clock/reset/output loads rejected and cell/net collisions guarded. No physical binding or workflow launched.
+- Seven targeted tests pass; both real screen target proposals pass independently generated synthetic netlist conservation audits. These are topology checks, not physical qualification. Next re-pin extracted checkpoint, recompute/legalize placements and implement one dominant-net physical repair. Files remain local; no phase boxes ticked.
+
+## 2026-10-10: Codex (parallel residual concentration analysis)
+- Independently matched slow slew/fanout report rows to metrics and exact screen topology: 31/34 slew rows concentrate on two antenna-loaded data nets (_28807_, _28820_). Fanout failures comprise 14 data and four clock branches. Documented focused repairs, SRAM control targets and prior clock-split timing risk in PHASE2_SRAM_SCREEN_RESIDUAL_PRIORITY.md.
+- Read-only spatial groups conserve all 29 sinks/diodes once with four branches per source and at most four initial loads per branch; eight proposed BUF4 footprint 116.1216 um2, excluding routing/diodes/whitespace. No physical ECO, launch or closure claim; re-pin after ongoing extracted run before implementing. No phase boxes ticked.
+
+## 2026-10-10: Codex (publish and launch selected SRAM extraction)
+- Explicit user approval executed: continuation commit 15d5cd1 and audit documentation a6e44b4 pushed to remote main; ls-remote confirms a6e44b457e11e368ebcdd2f3fdafdfd68147cde0. Selected SRAM detailed-routing/extraction run [38112320460](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38112320460) is in progress on that exact head.
+- Next inspect fresh extracted setup/hold, electrical counts, routing and antenna evidence. No phase boxes ticked. Unrelated modified/untracked files and local-only FIPE document excluded from both commits.
+
 ## 2026-10-10: Codex (audit SRAM screen and prepare extracted continuation)
 - Downloaded selected evidence from artifact 11692116594. Canonical source/proposal, unchanged cells/nets, final relocated site and zero-overflow checks pass. Screen setup WS 0 ns all corners; fast hold 95.3164 ps. Electrical slow/typ/fast slew 34/1/1, fanout 18 each, capacitance 0 each: electrical closure still fails. Screen comparison uses the same state on both sides, so no before/after benefit claim.
 - Prepared separate selected_sram_route.py and gds-selected-sram-route workflow pinned to successful screen 38111368461/head d6c39dd. Rechecks source/history/placement/antenna/timing before stock DRT and fresh extraction; no repeated move. 71 focused tests pass with the configured Tcl runtime; initial run omitted its PATH and was rerun successfully. User-supplied current Git rules reserve commit/push for the user; files remain local and no new workflow launched. Next user publishes this group, then launch and inspect extracted timing/electrical results. No phase boxes ticked.

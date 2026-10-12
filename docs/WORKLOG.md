@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (shared delay gains139ps; next critical cone prepared)
+- Independently inspected38316962855artifact11777218133: mediumsharedDLY4SD2 improves small4setup-0.413884→-0.274630ns;shortestDLY4SD1 andextraINV24812offer nofurtherglobalgain. Baselineexact;fasthold0.0215ps/slowslew93remain. Noqualification.
+- Newworstlaunch48112→47345;delayhold12766andNOR329918dominate. Prepared6casefixedSPEF frontierstudy currentbest+medium/shortdelay andNOR3_2 individually/combined. Noarbitrarydelaybypass/constraints/clockchange/DRT. Sixactualsourceconservationchecks and46focusedtests pass.
+- Nextpublish/launchfrontierstudy thencombine measuredsetupimprovements withendpointlocalhold/electricalrepair andstrictphysicalscreen gates. NoPhase2ticks orofficialGDSclaim.
+
+## 2026-10-12: Codex (follow-up calculation passed; upload pending)
+-38316962855study step success; workflowstilluploading matchedscreen evidence. Artifactnotyetlisted, so no setup/holdbenefitclaim untilactualresults inspected. Latestmainlint/test/docs success; unit38317328384running.
+- Nextinspectactualsixcasemeasurementsafterupload; keep strictphysicalscreenqualificationbeforeDRT. Noedits/dispatch/Phase2ticks. Statusreceiptlocal.
+
 ## 2026-10-12: Codex (follow-up still computing; endpoint hold proposal prepared)
 - Checked38316962855: stillin_progress, initiallysourceartifactdownload, nowbaseline/sizingcaseexecution. No completedmeasurement/artifactclaim.
 - Prepared exactNL/DEF/fastminreport-bound19endpointlocalDLY4SD1proposal. Actualsource offline complete-footprintallocation adds275.7888um2, maximumsinkorigindisplacement10.44um. Preserve everyclock/reset/originalcell/diode; syntheticactualsource19leafnetlistconservation passes. No physicalECO applied. ExistinggenericTclbinding correctlyrefuses unregisteredsource; do notbypassthatguard orlaunchincompletephysicalrepair.

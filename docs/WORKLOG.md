@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (segment export inspected; restoration source bound)
+- Export38293466146 succeeds, artifact11767790828. Actualfinalsegments33909nets/268616segments, SHA860b8c777de3b4d555ad9967ec4a1487dd540b71cb89e3401b8b36b73a794588. Receipts/segmentgrammar inspected; alltiming/electricalvalues exactly reproduce unqualified38287515824baseline. No physicalpassclaim.
+- Preparedrestorationgroups438552d/e2db4be/2b6fcf9 already pushed; now pinned exactsegmentchecksum/counts. 27focusedtests pass. Next publishbinding/launchno-edit restoration underongoingauthorization; noDRT/Phase2tick.
+
 ## 2026-10-12: Codex (no-edit restoration diagnostic prepared during export)
 - Export38293466146 finishedphysicalstep and is uploading evidence. Prepared fullsource/recipe/policy/segmentbinding validation and no-editincremental restoration runner/wrapper/workflow; nophysicalrepair orDRT. Exactallnetgeometry/NL and matchedallcornertiming/electricalaudits required.
 - 27focused tests pass, compile/bashsyntax/diff pass. Freshrestoration outcomeunknown; sourceelectricalqualification not implied. Next inspect finalcaptureartifact, then publish/launchrestore underongoingauthorization. NoPhase2tick.

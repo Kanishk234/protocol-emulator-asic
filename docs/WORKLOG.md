@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (parallel routed GL preparation)
+- Route38305592967 remains in_progress; setup/provenance/download complete and combined fresh qualification/DRT/extraction step active. GitHub step status alone does not identify its internal routing stage. Mainlint/test/docs green at latest check.
+- Prepared separate manual L3 electrical-routed GL workflow. It refuses dispatch qualification until exact route38305592967/head2d73b6f is successful, pre-route/extracted gates qualified, DRT0, matching20ns/AREA1/125psrepair recipe, fresh finalNL and independently reviewedSHA256. No auto-trigger or fabricated hash; no GL launch before actual artifact review.
+- 58focused GL/route tests pass, compile/diff checks pass. Official-flow adoption gap documented: archived multistage/ECO recipe must reproduce from cleanRTL under reviewed config/hook policy; templatejobs/mainconfig remain unchanged. Nextinspect extracted result, review finalNLhash and launch preparedGL only ifqualified; then cleanreproduction/officialsignoff. NoPhase2ticks.
+
+## 2026-10-12: Codex (qualified DRT continuation launched)
+- Published tools2c25ab5/CI0b502ff/docs2d73b6f; remote main verified2d73b6fe4b3ee22337fe7db2240cda7761dcda5e. Initial dispatch404 during GitHub workflow registration; retry succeeded once registered.
+- [Electrical route38305592967](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38305592967) confirmed in_progress on exacthead. Source is strict passing screen38304235648. No physicalrepair/GRT repeated; freshscreen gate beforeDRT and strictextractedgate afterwards. Next inspect live progress and extractedresults. NoPhase2ticks. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (strict electrical screen passes; DRT continuation prepared)
 - Independently inspected actual [38304235648](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38304235648) artifact11772311428: qualified timing/electrical/antenna gates true; setupWS0allcorners; fast/typ/slow hold56.7571/140.803/291.967ps. Slew/fanout/cap0allcorners; antenna0; overflow0; livecapacity and postrebase preservation gates pass. Initialfullroute changes7915nets, then audited14buffer+9antenna nets; no claim oldgold routes survived fullrebase.
 - Prepared exact-source stock DRT/extraction continuation: fresh allcorner electrical/timing/antenna gate beforeDRT; preserve final measuredODB and freshNL/PNL; validate routedNL; require DRT0 then extracted timing/50pshold/electrical/antenna gate. No repair/GRT replay; custom screen image removed before routing. Full2/4 hardware/20ns/constraints fixed.

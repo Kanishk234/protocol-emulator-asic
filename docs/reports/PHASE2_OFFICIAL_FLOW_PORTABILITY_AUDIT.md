@@ -145,3 +145,15 @@ Previous allocator excluded every row below SRAM top, even far-right rows; new m
 Run38286752555 fails before physical mutations: NOR4 sizing expected port_state[45], but pinned OpenDB reports closing-bracket escape port_state[45\]. Artifact11764465151,437124753bytes. No new timing/electrical result. BUG99 replaces reused raw-name sizing check with dedicated electrical net resolver: normalize bracket escape spellings, require exactly one matching physical net, compare actual connected net objects, preserve those same objects after replacement. Missing nets and canonical-name alias collisions fail. Buffer source expectations use the same unique resolver. Existing native_hold100_size.tcl remains unchanged.
 
 117focused checks pass, including Tcl runtime tests for actual escape representation, missing nets and ambiguous aliases; bash syntax/diff pass. Seven buffers, NOR4 master/site, sources and constraints unchanged. Publish/rerun covered by user's ongoing Phase2 authorization.
+
+
+## Targeted repair executes; timing passes but electrical closure moves again
+
+Run38287515824 fails final electrical gate, not preflight. Artifact11763968351,539241591bytes. Sevenbuffers/oneNOR4resize applied and allconnectivityguards passed. SetupWS0all; holdfast56.771ps, typical140.816ps, slow291.986ps. Timing/antenna-qualifiedtrue, electricalfalse. Cap0all, slewslow/typical/fast7/0/0, fanout3all. NOR4_25245_slew and priorfanout/holdleaf repairs worked. Newviolators fanout_28820_/Y14,_26845_/X9,place8806/X9. Seven slowslew rows belong to_28807_/Y and its attached sinks/diodes, maximum2.514342ns versus2.5074ns limit. Do not advance to DRT.
+
+Repeated fullreroute/antenna cleanup changes other near-limit nets, reducing confidence in isolated reroute candidates. Inspected exact pinned common/grt.tcl: always invokes full global_route, not incremental mode. [Primary OpenROAD routing documentation](https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/src/grt/README.md) documents start/end_incremental and route-segment restoration in current upstream; availability and restoration semantics in our pinned image are not yet established. Next verify pinned capabilities and unchanged-net route preservation before adopting incremental repair. No routing exception or unsupported API assumed; no new run dispatched.
+
+
+## Pinned routing capability probe
+
+Prepared lightweight gds-routing-capability-probe on LibreLane3.1.0.dev3 image, without PDK or loaded design. Captures image digest, OpenROAD version and command/help availability for global_route incremental flags, read_guides and route-segment read/write. Local cached OpenROAD lacks Qt shared-library dependency; do not treat its execution as pinned CI verification. Parser rejects incomplete/duplicate evidence and explicitly does not claim checkpoint restoration or unchanged-route preservation. 122focused checks pass. Next inspect actual pinned capabilities and test saved-state restoration before changing repair routing.

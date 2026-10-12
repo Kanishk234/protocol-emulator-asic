@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (pinned routing capability probe prepared)
+- PinnedLibreLanecommon/grt.tcl alwaysfullroutes; upstreamincrementalcommands cannot be assumed on pinnedimage. CachedlocalOpenROAD cannotstart due missingQtdependency, so prepared lightweight read-only pinnedDockerimage introspection workflow. No designloaded, PDK/hardware edits ortimingconstraintchanges.
+- Probe capturesimage digest/version, globalroute incrementalflags andguide/segmentreadwrite availability. Summary explicitlystates checkpointrestoration/unchangedroutepreservation not tested; no closureclaims. 122focused tests pass with Tclruntime, Pythoncompile/diffpass.
+- Next publish/launchprobe under ongoingauthorization, then test route-restoration semantics before applying remainingelectricalrepairs. NoPhase2tick.
+
+## 2026-10-12: Codex (targeted physical repair timing passes; electrical remains)
+- Targeted38287515824 completedphysicalrepair then failed electricalgate. SetupWS0all, fast hold56.771ps, typical140.816ps, slow291.986ps; timing/antennaqualifiedtrue. Newfanout3each:28820/Y14,26845/X9,place8806/X9. Slow7slew rows from28807/Ysharednet; cap0all. NOR4/priorfanout/holdrepairs worked but reroute shiftsnear-limitfailures.
+- Selectivelyretrieved42reports fromartifact11763968351. Pinnedcommon/grt.tcl uses fullrouting everytime. Read primary upstreamincrementalrouting docs; pinnedimage support/route-restoration semantics stillneedverification beforechangingpolicy. No newcandidate/dispatch/commit/Phase2tick. Nextverify route-preserving repair capability and inspect remainingphysicalnets.
+
+## 2026-10-12: Codex (publish net identity fix and restart targeted screen)
+- Ongoinguserauthorization executed: toolsfca242b/docs1ea0fd0 pushed to main. [Corrected targetedscreen38287515824](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38287515824) dispatched on1ea0fd057a5b7f8cc341a2a7732fa2feaf63d174, initiallyqueued.
+- Physicalpolicy/sites/constraints unchanged; only physicalnetname preflight/resolution corrected. Nextinspect actual mutation then finaltiming/electrical gates; noDRT/Phase2ticks. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (physical net-name preflight fixed)
 - Targeted38286752555 fails before mutation: NOR4 input rawname differs only bracketescaperepresentation inOpenDB. No newtiming/electrical measurements. BUG99 documents exactfailure and dedicated electrical object-identity resolver.
 - Resolver normalizesbracketescapes, requiresuniqueactualnet, rejects missing/ambiguousaliases andchecks connections byobjectidentity; exactnetobjects retained afterresize. Existingnativehelperunchanged; electricalwrappernowusesdedicatedsizing. Same7buffers/1resize/sites/constraints.

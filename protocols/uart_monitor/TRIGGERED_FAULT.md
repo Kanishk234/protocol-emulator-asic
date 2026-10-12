@@ -72,3 +72,12 @@ retained. The three-bit image hash is
 `2acb33f6c51aff7515946743823ec70a05fcb02f4f65d73199b7f110814ad235`;
 the four-bit image retains the previously recorded hash. Both XML files have
 exactly one case and no failure/error/skip. Native/SDF/board timing remains open.
+
+### Concurrent receive validation
+
+Cloud38279446388 passes both counter variants with unchanged image hashes and
+strict one-case XML:0x6A is received through real CH_READ while0xA5 transmits
+with its bounded fault window and the event counter increments, then0x3C
+transmits cleanly. This establishes tested simultaneous UART RX/TX/event/fault
+behavior in loaded RTL-fabric simulation. It does not establish external peer
+error detection, native/SDF timing, board rates or arbitrary traffic/service.

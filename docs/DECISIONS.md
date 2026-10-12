@@ -717,3 +717,26 @@ use57/88LC and2/2timers+2/2shifts and pass realSPI-loaded full TX waveform,
 fault/event and clean-frame recovery tests. No resource gain is measured;
 retain existing four-bit default and broader configurable interval domain.
 This does not modify chip architecture or qualify native physical timing.
+
+## D-085: Compare routing net ordering without changing capacity or placement
+
+**Date:**2026-10-12. **Status:** isolated native routing diagnostic, pending.
+Buffer234 also worsens combined133→141 in38274085899; rejectD083 as a routing
+improvement and retain exactcombined133source38167697696. Two displacedbuffer
+experiments failed, so next test changes routing order instead of placement.
+
+On identical authenticated original146 and combined133 checkpoints, compare
+no-randomization control with seed41 using OpenROAD set_global_routing_random,
+explicit capacities_perturbation_percentage0. This shuffles nets without the
+optional edge-capacity perturbation. All track reductions/layers/50iterations,
+margins, cells, netlists and placement remain fixed; no allow_congestion,
+infinite capacity, negative adjustment, partial-net route or timing waiver.
+The copied pinned Tcl is instrumented with patches/grt_net_order.tcl; originals
+and headers remain untouched. Runtime records exact patch/copied-script hashes
+and native command evidence. Source instrumentation fixtures authenticate both
+pinned hashes; actual command support/execution and outcomes require cloud.
+
+This changes one algorithm policy, adds no hardware/area/protocol block, and
+benefits no protocol until matched physical/function/timing qualification. A
+zero-overflow result would still require detailed routing and full sign-off.
+Primary source: [OpenROAD global routing](https://openroad.readthedocs.io/en/latest/main/src/grt/README.html).

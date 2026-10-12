@@ -9,7 +9,7 @@ remain open. This is a separate reproducibility result from checkpoint experimen
 Latest baseline additions now have actual loaded evidence: primitive-helper
 38167521573 and autonomous UART fault/event demo38168609080 pass real SPI-loaded
 chip-port tests on unchanged G1. The latter uses57/88LC and both timers/shifters;
-UART traffic under faults is the next behavioral extension. Portable C checked
+Actual UART TX traffic under faults and clean-frame recovery now pass38273574240; narrower counter still uses57LC, so default4 remains. Portable C checked
 loading/recovery and authenticated pin-mapping operating summaries are implemented;
 cloud pytest38168413502 passes532checks. None establishes board throughput.
 

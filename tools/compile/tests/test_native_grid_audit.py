@@ -44,3 +44,18 @@ def test_missing_guides_are_explicit(tmp_path):
 def test_guide_inventory_must_match_native_connectivity(tmp_path):
     p=tmp_path/"guides";p.write_text("NET\tnet\t1\t1\t0\n")
     with pytest.raises(ValueError):guide_coverage(p,CENSUS)
+
+
+def test_alternate_router_output_matches_artifact_scope():
+    import ast
+    root=Path(__file__).resolve().parents[3]
+    module=ast.parse((root/"test_internal/cloud_cugr.py").read_text())
+    values={n.targets[0].attr:n.value.right.value for n in ast.walk(module)
+        if isinstance(n,ast.Assign) and len(n.targets)==1
+        and isinstance(n.targets[0],ast.Attribute) and n.targets[0].attr in ("INPUT","OUT")
+        and isinstance(n.value,ast.BinOp) and isinstance(n.value.right,ast.Constant)}
+    assert values=={"INPUT":"build/cugr_input","OUT":"build/cugr"}
+    import yaml
+    workflow=yaml.safe_load((root/".github/workflows/cugr.yaml").read_text())
+    upload=workflow["jobs"]["diagnostic"]["steps"][-1]
+    assert upload["with"]["path"].rstrip("/")==values["OUT"]

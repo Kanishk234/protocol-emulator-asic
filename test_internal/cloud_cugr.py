@@ -64,7 +64,9 @@ def require_clean(stage, entry, final, census):
 
 def main():
     combo.INPUT = ROOT / "build/cugr_input"
-    combo.OUT = ROOT / "build/grid_observer"
+    combo.OUT = ROOT / "build/cugr"
+    if combo.OUT.name != "cugr" or combo.INPUT.name != "cugr_input":
+        raise ValueError("CUGR run/artifact directories differ")
     # The unchanged paired engine launches this wrapper inside the pinned image.
     reporting.__file__ = str(Path(__file__).resolve())
     error = None

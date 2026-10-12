@@ -39,3 +39,11 @@ def require_live_demand(log):
         match=re.search(r'^\s*Total\s+\d+\s+(\d+)\s+',report,re.M)
         if not match or int(match[1])<=0:raise ValueError('Routing demand was not initialized')
     return True
+
+
+def reported_antenna_nets(report):
+    """Pinned checker writes only violating nets without -verbose."""
+    names=re.findall(r'^Net: (\S+)\s*$',report,re.M)
+    if (not names and report.strip()) or len(names)!=len(set(names)):
+        raise ValueError('Missing or duplicate pre-repair antenna violations')
+    return sorted(names)

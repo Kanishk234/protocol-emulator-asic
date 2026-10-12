@@ -50,6 +50,7 @@ if [[ "$script_name" == grt.tcl ]]; then
                 'write_verilog $::env(STEP_DIR)/after_buffers.nl.v' \
                 'write_def $::env(STEP_DIR)/after_buffers.def' \
                 'write_global_route_segments $::env(STEP_DIR)/after_buffers.segments' \
+                'check_antennas -report_file $::env(STEP_DIR)/before_antenna.rpt' \
                 'set diode_cell [lindex [split $::env(DIODE_CELL) "/"] 0]' \
                 'set antenna_args [list $diode_cell -iterations $::env(GRT_ANTENNA_REPAIR_ITERS) -ratio_margin $::env(GRT_ANTENNA_REPAIR_MARGIN)]' \
                 'append_if_flag antenna_args GRT_ANTENNA_REPAIR_JUMPER_ONLY -jumper_only' \

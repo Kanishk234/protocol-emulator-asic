@@ -18,6 +18,8 @@ def test_one_full_initial_route_precedes_live_incremental_and_inline_antennas(tm
     assert r.stdout.count(full)==1 and 'read_global_route_segments' not in r.stdout
     assert r.stdout.index(full)<r.stdout.index('global_route -start_incremental')<r.stdout.index('electrical_incremental_targets.tcl')<r.stdout.index('repair_antennas')<r.stdout.index('tripwire_restore_placement_status')<r.stdout.index('write_views')
     assert r.stdout.count('global_route -start_incremental')==2
+    assert r.stdout.index('after_buffers.segments')<r.stdout.index('check_antennas -report_file')<r.stdout.index('log_cmd repair_antennas')
+    assert 'check_antennas -verbose' not in r.stdout
 
 
 def test_separate_antenna_process_refused(tmp_path):

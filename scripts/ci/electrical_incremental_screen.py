@@ -7,7 +7,7 @@ import re
 import subprocess
 from electrical_repair_plan import plan, target_call, validate_change
 from event_nor2_screen import logical_cells, validate_antenna_only_changes, validate_overflow
-from incremental_repair_audit import audit, added_antenna_nets, require_live_demand
+from incremental_repair_audit import audit, added_antenna_nets, require_live_demand, reported_antenna_nets
 from native_stock_route import fingerprints, qualified, run_step, validate_source
 from postgrt_timing import screen
 from route_restore_screen import SEGMENT_SHA
@@ -97,8 +97,12 @@ def main():
           (raw.parent/'after_buffers.segments').read_text(),proposal)
     final=changed_state
     antenna_nets=added_antenna_nets(after_buffers,Path(final['nl']).read_text())
+    # Jumper repairs change geometry without adding diode instances. Permit
+    # only nets independently reported as violating before repair.
+    reported_nets=reported_antenna_nets((raw.parent/'before_antenna.rpt').read_text())
+    repair_nets=sorted(set(antenna_nets)|set(reported_nets))
     preservation=audit(layout.read_text(),Path(final['def']).read_text(),rebased_segments,
-        Path(final['odb']).with_suffix('.segments').read_text(),proposal,antenna_nets=antenna_nets)
+        Path(final['odb']).with_suffix('.segments').read_text(),proposal,antenna_nets=repair_nets)
     run_step(config,changed,output/'antenna',['OpenROAD.CheckAntennas'])
     checked=unique(output/'antenna','*-openroad-checkantennas/state_out.json')
     antenna=json.loads((checked.parent/'or_metrics_out.json').read_text())
@@ -119,7 +123,7 @@ def main():
         unrelated_routes_preserved_after_rebase=preservation['unchanged_routes_preserved'],
         initial_full_route=True,live_capacity_initialized=True,
         rebase_changed_route_nets=compare(original,rebased_segments)['changed_nets'],
-        antenna_repaired_nets=antenna_nets,
+        antenna_repaired_nets=antenna_nets,pre_repair_antenna_violation_nets=reported_nets,
         changed_route_nets=preservation['changed_nets'],custom_image=True,physical_screen_only=True,official_signoff=False)
     (output/'gates.json').write_text(json.dumps(gates,indent=2)+'\n')
     if not gates['qualified']:raise ValueError('Incremental electrical screen fails strict physical gates')

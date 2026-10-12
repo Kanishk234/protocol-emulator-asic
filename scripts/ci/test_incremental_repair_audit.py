@@ -30,3 +30,15 @@ def test_live_demand_is_required_before_and_after_edits(fault):
     if fault=='none':assert require_live_demand(text)
     else:
         with pytest.raises(ValueError):require_live_demand(text)
+
+
+def test_jumper_routes_require_independent_pre_repair_violation_evidence():
+    from incremental_repair_audit import reported_antenna_nets
+    report='Net: jumper_net\n  Pin: gate/A\n'
+    assert reported_antenna_nets(report)==['jumper_net']
+    extra=S.replace('net','jumper_net')
+    assert audit(D,D,S,S+extra,P,reported_antenna_nets(report))['unchanged_routes_preserved']
+    with pytest.raises(ValueError):audit(D,D,S,S+extra.replace('jumper_net','unrelated'),P,reported_antenna_nets(report))
+    assert reported_antenna_nets('')==[]
+    for bad in ('malformed report',report+report):
+        with pytest.raises(ValueError):reported_antenna_nets(bad)

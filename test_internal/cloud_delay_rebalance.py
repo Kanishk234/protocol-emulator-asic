@@ -14,6 +14,7 @@ NEW = "sg13cmos5l_dlygate4sd2_1"
 EVIDENCE_SHA = "3866682f1cbb486f1bbd1f39e642406b89d765dcede5f3b26563217a22c3a0f8"
 EDIT = r'''
 read_db $::env(WARP_INPUT_ODB)
+foreach library $::env(WARP_CELL_LIBS) {read_liberty $library}
 set block [ord::get_db_block]
 set master [[ord::get_db] findMaster sg13cmos5l_dlygate4sd2_1]
 if {$master == "NULL"} {error "Missing smaller delay master"}
@@ -97,7 +98,11 @@ def main():
         selected = select(json.loads(evidence.read_text()))
         (OUT / "selected.txt").write_text("\n".join(sorted(selected))+"\n")
         script = OUT / "edit.tcl"; script.write_text(cfg.CENSUS + EDIT)
-        env = {"WARP_INPUT_ODB": source.SOURCE/"padded.odb", "WARP_SELECTED": OUT/"selected.txt",
+        config = json.loads((source.SOURCE/"config.json").read_text())
+        libraries = config["LIB"]["nom_fast_1p32V_m40C"]
+        if not libraries or any(not Path(p).is_file() or any(c.isspace() for c in p) for p in libraries):
+            raise ValueError("Missing/unsupported pinned library paths")
+        env = {"WARP_CELL_LIBS": " ".join(libraries), "WARP_INPUT_ODB": source.SOURCE/"padded.odb", "WARP_SELECTED": OUT/"selected.txt",
             "WARP_AFTER":OUT/"after.tsv", "WARP_GEOMETRY":OUT/"geometry_after.tsv",
             "WARP_OUTPUT_ODB":OUT/"candidate.odb", "WARP_OUTPUT_NL":OUT/"candidate.nl.v"}
         command=["docker","run","--rm","-v",f"{ROOT}:{ROOT}","-w",str(ROOT)]
@@ -107,7 +112,7 @@ def main():
             subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=120)
         result["audit"] = audit_change((source.SOURCE/"after.tsv").read_text(),(OUT/"after.tsv").read_text(),
             (source.SOURCE/"geometry_after.tsv").read_text(),(OUT/"geometry_after.tsv").read_text(),selected)
-        config = json.loads((source.SOURCE/"config.json").read_text()); guards.OUT = OUT
+        guards.OUT = OUT
         sdc = source.SOURCE/"padded_sta_nom_typ_1p20V_25C/final/sdc/tt_um_warp.sdc"
         if cfg.sha(sdc) != "2fd4e213532d83ee258899b6fc1ed48c4e5d91ddb0ccbe21eea0226cc90fd56e":
             raise ValueError("Source SDC differs")

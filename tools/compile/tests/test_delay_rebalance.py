@@ -43,3 +43,8 @@ def test_undeclared_physical_or_connectivity_change_rejected(mutation):
     elif mutation=='wrong_master':new=new.replace(NEW,'other')
     elif mutation=='growth':modified=modified.replace('cell0\tCORE\t0\t0\t3840','cell0\tCORE\t0\t0\t4800')
     with pytest.raises(ValueError):audit_change(old,new,geometry,modified,{'cell0'})
+
+
+def test_native_editor_loads_liberty_before_master_swap():
+    from cloud_delay_rebalance import EDIT
+    assert EDIT.index('read_db') < EDIT.index('read_liberty') < EDIT.index('swapMaster')

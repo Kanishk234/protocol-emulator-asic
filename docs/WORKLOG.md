@@ -4,6 +4,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-10-12 (session92: complete delay timing observations and measured rebalance)
 **Done:** actual corrected38315257114SUCCESS, downloaded resultSHA3866682f… authenticates590 constrained min/max queries at all3 original PVT corners. All150 direct feedback paths are in configuration registers; fast hold slack0.176544–0.217264ns. All original electrical/timing guards pass. Best routing control remains133overflow. PreparedD090 isolated smaller-delay policy only on251 other delays with measured fast hold slack>=0.3ns; native geometry/connectivity/origin immutability and3-corner timing/electrical guards plus>=0.1ns hold gate required before routing. Focused selection/preservation/payload regressions21PASS locally. No frozen hardware edits or phase boxes ticked.
+**Cloud failure diagnosed:**38315996276 native editor crashes on BUG82 missing Liberty before swapMaster. Original fast-corner libraries now load after database load and before master edits; no policy or margin change. Local ordering regression added; cloud retry required.
 **Next step:** inspect actual D090 producer; if guards pass, compare native routing to the133 control on unchanged capacities/margins. Record actual footprint saving only from native geometry.
 
 ## 2026-10-12 (session91: approved pushes and per-delay timing diagnostic)

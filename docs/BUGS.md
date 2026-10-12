@@ -1,5 +1,12 @@
 # Bugs
 
+## 82: OpenROAD master-swap editor lacks Liberty timing cells
+- **Date:**2026-10-12.
+- **Symptom/check:**38315996276 crashes with signal11 before candidate STA; stack ends in dbStaCbk::inDbInstSwapMasterBefore → equivCellsArcs → ConcreteCell::portCount.
+- **Root cause:** the copied-ODB editor called swapMaster without first loading Liberty; OpenSTA's callback lacks timing-cell models for its equivalence check.
+- **Fix/coverage:** load original fast-corner standard-cell/IO Liberty files after read_db and before swapMaster. Source-library files remain pinned and all3-corner STA checks remain unchanged. Regression checks editor ordering; cloud retry needed. No accepted producer or routing result from the crash.
+
+
 ## 81: Read-only timing diagnostic recreates downloaded source directory
 - **Date:**2026-10-12.
 - **Symptom/check:**38314895635 fails before STA with FileExistsError for reset_combined/original_source.

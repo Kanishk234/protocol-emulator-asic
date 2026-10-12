@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (extracted route fails physical gates; parser corrected)
+-38305592967 completed zeroDRC DRT, routedNL conservation and extraction, then parser failed on omitted zero-count sections (BUG103). Exact saved reports independently audited after correction: slowsetup-1.008813ns; fasthold0.0215ps; slew93/8/0slow/typ/fast, fanout9all, cap0/1/1; antenna0. Physicalgates still fail, not merelyhelper issue. No reroute to recover existingevidence.
+-31focusedparser/extraction/route tests pass; zero sections accepted onlywithuniqueexplicitzero totals. Prepared sourcebound nextrepair analysis in PHASE2_EXTRACTED_INCREMENTAL_REPAIR.md:71/73reportedsetupfailures fromoneconfiglatch, sharedpath targets,19holdpaths below50ps,19slewnets,9diode-loadedfanoutnets. ActualLEF/DEF offline sizingcandidate fourcells14.5152um2, threeatoldorigin/one10.44um displacement, not applied or timingproven.
+- Next prepare matched extracted-aware shared-cone sizing/load isolation plus endpointlocal hold and diodeheadroom repair, verify exact conservation and final strictgates. PreparedGL remains blocked by unqualified source; no officialGDS/Phase2tick. Mainlint/unit/test/docs green atcheck; no replacement physicalrun launched blindly.
+
 ## 2026-10-12: Codex (parallel routed GL preparation)
 - Route38305592967 remains in_progress; setup/provenance/download complete and combined fresh qualification/DRT/extraction step active. GitHub step status alone does not identify its internal routing stage. Mainlint/test/docs green at latest check.
 - Prepared separate manual L3 electrical-routed GL workflow. It refuses dispatch qualification until exact route38305592967/head2d73b6f is successful, pre-route/extracted gates qualified, DRT0, matching20ns/AREA1/125psrepair recipe, fresh finalNL and independently reviewedSHA256. No auto-trigger or fabricated hash; no GL launch before actual artifact review.

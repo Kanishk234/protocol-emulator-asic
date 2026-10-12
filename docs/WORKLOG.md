@@ -5,6 +5,22 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (native electrical repair prepared)
+- Refreshed latest main runs: reserve38206133048 failure, lint/test/docs/unit green; no recent run active. Inspected pinned repair scripts and Classic step controls. Reserve repeatedly selects U3 config latch `_47655_/D`; positive setup margin is poorly matched to these zero-slack borrowed paths.
+- Prepared isolated electrical mode/workflow: stock post-GRT design repair before antenna insertion, native 10% slew/cap margins, setup margin0 and hold125ps. Frozen RTL, 20ns/50ps gate, strict congestion and antenna checks remain. Require executed repair and zero overflow. No commit/push/dispatch or phase boxes.
+- Validation: 69 focused placement/screen/route tests passed; diff whitespace check passed. Next publish scoped helper/tests/CI/evidence and run electrical screen; only qualifying evidence warrants matched extraction. Preserve timing-qualified ECO parents.
+
+## 2026-10-12: Codex (reserve timeout diagnosed; all-main refresh)
+- Reserve38206133048failed; latestlint38206123742/test38206123837/docs38206123739/unit38206123726success. No maininprogress; oldplacementGL37655518919/timing37655518925queued. GitHubfailedlogs empty; retrieved37artifactlogs from11730202099 instead.
+- Check-run114669919755 annotation confirms physicalstep95minute timeout (05:03:20–06:38:32UTC). Lastflowstage43 ResizerTimingPostGRT shows setuprepair past510iterations, WNS/TNS0 and2065margin endpoints without closure; no finalSTA/gates/extractedresult. Do not treat partialoptimization output as qualifiedtiming ormerely increase timeout. Next diagnose reserveendpoint/nonconvergence behavior andprepare bounded target/repair work before rerun; retain qualifiedparent. No codechange/dispatch/phaseboxes; statusentrylocal.
+
+## 2026-10-12: Codex (all-main workflow status check)
+- Timingreserve38206133048inprogress; unit38206123726inprogress. Latestlint38206123742/test38206123837/docs38206123739success. Twoolderplacementruns37655518919/37655518925 remainqueued; no newlatestfailure. No newtimingresult/physicalchange/dispatch/phaseboxes; next inspectreserve resultwhencomplete.
+
+## 2026-10-12: Codex (publish and launch clean timing-reserve screen)
+- User continuation of proposedpublication/launch executed: tools622a76f, CI7632302, docs87b1d3b pushed to remote main. Exact remotehead87b1d3bd6b1dbd549688270f9cbb6e1e838bb920 verified. [Clean SRAM reserve screen38206133048](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38206133048) inprogress onthatcommit; nativeGRTsetup1ns/hold125psrepair targets with20ns/50psacceptance unchanged.
+- Next inspect cleanplacement/topology reproduction, repairarea/overflow/antenna/allcorner/electrical before extraction. No phaseboxes/mainconfig/templatejobchanges. Unrelatedfiles/FIPE/holdproposal/residualreportpending edits excluded; launchreceiptlocal.
+
 ## 2026-10-11: Codex (diagnose clean critical paths; prepare reserve trial)
 - RetrievedcleanDRTviews/pathreports. WorstsetupU0configword0bit4→dropped[67] viaweak37732NAND2_1(0.962903ns); earlierstrengthECOs/place7307BUF4 absentfromcleanbuild, so no causalclaimSRAMlocalityalonecausedregression. WorstholdU3RXrt[6]46988, differentfromold46597proposal; avoidblindholdstack.
 - Prepared nativeclean --reserve screen: same16bufferplacement/frozen2/4stockrecipe, GRTsetupmargin1.0ns/holdtarget125ps only,20ns/SDC/50psgate fixed, separateworkflow/output.142focusedtests/compile/diffpass. Physicalreserveunexecuted; nextpublishreviewedgroups under scopedapproval andscreen thenextraction. No phaseboxes/dispatch/mainconfig/template edits; unrelatedfiles/FIPE excluded.

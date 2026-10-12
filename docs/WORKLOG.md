@@ -5,6 +5,10 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (no-edit restoration diagnostic prepared during export)
+- Export38293466146 finishedphysicalstep and is uploading evidence. Prepared fullsource/recipe/policy/segmentbinding validation and no-editincremental restoration runner/wrapper/workflow; nophysicalrepair orDRT. Exactallnetgeometry/NL and matchedallcornertiming/electricalaudits required.
+- 27focused tests pass, compile/bashsyntax/diff pass. Freshrestoration outcomeunknown; sourceelectricalqualification not implied. Next inspect finalcaptureartifact, then publish/launchrestore underongoingauthorization. NoPhase2tick.
+
 ## 2026-10-12: Codex (segment capture launched; preservation audit prepared in parallel)
 - Ongoingauthorization published tools5abcf24/CIb60d6de/docs241f7dd; remote mainverified241f7dd11e4198b5be3a9a7a34f3c910baf3d414. [Route segment export38293466146](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38293466146) running baseline reproduction/segmentcapture. Samephysicalpolicy/constraints; exportdoesnotclaimqualification.
 - Parallel route_segment_audit.py parses exactpinned sixfieldsegments, preserves duplicatedgeometry and compares pernetroutes. Rejects malformed/truncated/duplicatedexports and unexpectedchangednets; allows only explicitlynamedchangednets. Eightnew tests pass, compile/diffpass. Geometryequality alone isnot STA/signoff; freshrestoration/STA stillneeded.

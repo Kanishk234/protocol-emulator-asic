@@ -138,3 +138,10 @@ Proposed6BUF4fanout branches for host_wdata[8] and place8808, with4loadbudget/he
 Previous allocator excluded every row below SRAM top, even far-right rows; new mode admits lower-row segments only to right ofx260um while preserving lower-left macro exclusion. This avoids forcing lower-right repair buffers far above the SRAM and unnecessarily stretching their nets. Same strict zerooverflow/antenna/allcorner/electrical checks; no DRT. Bracket-escaped DEF source net normalization now aligns literal OpenDB/Verilog identities (BUG98).
 
 116focused tests, compile/bash syntax/diff checks pass. Actual final netlist accepts a synthetic exact seven-buffer/one-resize conservation replay, including allold cells/diodes; actualsource Tcl parses7buffer/1resize operations. These checks verify proposal/audit representation, not physical behavior. Publishedpinnedimagewrapper adds existing master/pin/supply guarded sizing helper and placement binding. Custom-image diagnostic/officialportability limits remain. Physicalrun and publication pending approval.
+
+
+## Targeted repair preflight naming failure fixed
+
+Run38286752555 fails before physical mutations: NOR4 sizing expected port_state[45], but pinned OpenDB reports closing-bracket escape port_state[45\]. Artifact11764465151,437124753bytes. No new timing/electrical result. BUG99 replaces reused raw-name sizing check with dedicated electrical net resolver: normalize bracket escape spellings, require exactly one matching physical net, compare actual connected net objects, preserve those same objects after replacement. Missing nets and canonical-name alias collisions fail. Buffer source expectations use the same unique resolver. Existing native_hold100_size.tcl remains unchanged.
+
+117focused checks pass, including Tcl runtime tests for actual escape representation, missing nets and ambiguous aliases; bash syntax/diff pass. Seven buffers, NOR4 master/site, sources and constraints unchanged. Publish/rerun covered by user's ongoing Phase2 authorization.

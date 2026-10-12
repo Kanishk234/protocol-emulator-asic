@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (physical net-name preflight fixed)
+- Targeted38286752555 fails before mutation: NOR4 input rawname differs only bracketescaperepresentation inOpenDB. No newtiming/electrical measurements. BUG99 documents exactfailure and dedicated electrical object-identity resolver.
+- Resolver normalizesbracketescapes, requiresuniqueactualnet, rejects missing/ambiguousaliases andchecks connections byobjectidentity; exactnetobjects retained afterresize. Existingnativehelperunchanged; electricalwrappernowusesdedicatedsizing. Same7buffers/1resize/sites/constraints.
+- 117focusedchecks pass including Tclruntime escaped/missing/aliasrefusal, bashsyntax/diffpass. Nextpublish/rerun under ongoinguserauthorization; noPhase2tick.
+
+## 2026-10-12: Codex (publish targeted repair; ongoing authorization)
+- User approved targetedrepair and instructed no repeated permission questions. This authorizes ongoing scoped commits/pushes/workflowlaunches toward Phase2 timing/electrical closure. Published tools e8564fe, CI9566a56, docs c69fcf6; verified remote mainc69fcf606ed28225519b8b5e73fc91aaffd1cad1.
+- [Targeted electrical/hold screen38286752555](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38286752555) dispatched onexacthead after transientnewworkflowindex404/retry, initiallyqueued. Sixfanoutbuffers+holdBUF1+NOR4strength change; strictgates unchanged andnoDRT. Unrelatedpendingfiles/FIPEexcluded.
+- Next inspect actualphysical/electrical/timing results andcontinue necessarycorrections without repeatedpublicationapproval. No Phase2ticks; launchreceiptlocal.
+
 ## 2026-10-12: Codex (targeted slew/fanout/hold screen prepared)
 - Prepared exact38283838612source follow-up:6BUF4fanout branches,1BUF1on singleholdleaf and NOR4_25245_strength1→2 with identicalpins. Totaladdedfootprint105.2352um2, combinedoverlap0. Holdbuffer1.920umfromendpoint; resizedcellmoves4.800um. Newmode uses legal lower-right rows instead of forcing everybufferaboveSRAM.
 - Runner audits bothparentrepairhistories and exactlatestfailedsource measurements; outgoing20ns/50ps/zeroelectrical/antenna/overflow gates unchanged. No DRT. DEFbracketnormalization BUG98 handles hostwdata8net.

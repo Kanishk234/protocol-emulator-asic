@@ -38,16 +38,27 @@ def test_freeze_restores_only_original_placement_statuses(tmp_path):
     script=tmp_path/'freeze.tcl'
     script.write_text('source {'+str(helper)+'}\n'+r'''
 namespace eval ord {proc get_db_block {} {return block}}
-proc block {method args} {return {old macro}}
-set old_status PLACED
-set macro_status FIXED
-set new_status PLACED
-proc old {method args} {global old_status; if {$method eq "getPlacementStatus"} {return $old_status}; set old_status [lindex $args 0]}
-proc macro {method args} {global macro_status; if {$method eq "getPlacementStatus"} {return $macro_status}; set macro_status [lindex $args 0]}
+proc block {method args} {return {old firm macro cover}}
+array set statuses {old PLACED firm FIRM macro LOCKED cover COVER new PLACED}
+# Exact dbPlacementStatus values from pinned OpenROAD dcf36133.
+proc instance {name method args} {
+    global statuses
+    if {$method eq "getPlacementStatus"} {return $statuses($name)}
+    if {$method ne "setPlacementStatus"} {error "unexpected method"}
+    set value [lindex $args 0]
+    if {$value ni {NONE UNPLACED SUGGESTED PLACED LOCKED FIRM COVER}} {
+        error "Unknown placement status"
+    }
+    set statuses($name) $value
+}
+foreach name {old firm macro cover new} {interp alias {} $name {} instance $name}
+if {![catch {old setPlacementStatus FIXED}]} {error "invalid enum accepted"}
 set saved [tripwire_freeze_existing_placement]
-if {$old_status ne "FIXED" || $macro_status ne "FIXED"} {error freeze}
+if {[llength $saved] != 2} {error "wrong saved instances"}
+foreach name {old firm macro} {if {$statuses($name) ne "LOCKED"} {error freeze}}
+if {$statuses(cover) ne "COVER"} {error "cover changed"}
 tripwire_restore_placement_status $saved
-if {$old_status ne "PLACED" || $macro_status ne "FIXED" || $new_status ne "PLACED"} {error restore}
+if {$statuses(old) ne "PLACED" || $statuses(firm) ne "FIRM" || $statuses(macro) ne "LOCKED" || $statuses(cover) ne "COVER" || $statuses(new) ne "PLACED"} {error restore}
 puts complete
 ''')
     r=subprocess.run([tcl,str(script)],capture_output=True,text=True,check=True)

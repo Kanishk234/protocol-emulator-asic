@@ -6,7 +6,7 @@ proc tripwire_freeze_existing_placement {} {
         set status [$inst getPlacementStatus]
         if {$status in {PLACED FIRM}} {
             lappend saved [list $inst $status]
-            $inst setPlacementStatus FIXED
+            $inst setPlacementStatus LOCKED
         }
     }
     return $saved

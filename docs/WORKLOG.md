@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (extracted shared-cone sizing sensitivity prepared)
+- Prepared seven-case stockOpenSTA fixed-SPEF sensitivity using failedroute38305592967's exact extractedNL/hash and completedzeroDRCcheckpoint: baseline,4individualsizes,combined andstronginputbuffers/inverters. Exactsource/head/hardware/constraints checked; unchangedbaseline mustreproduce originalallcorner WS within1e-6ns beforecandidatecases run.
+- This ranks sharedsetup-cone sizing withactual extractedwireRC, not a physicalECO/signoff. Modifiedstates removeODB/DEF/PNL/SDF/lib views; onlyNL/SPEF+same20ns/signoffconstraints consumed. NoDRT orrepair launched by thisworkflow. Explicitphysical_qualified=false.
+- All7actualsource topologyconservation checks pass;30focusedtests pass, compile/diffchecks pass. Nextpublish/launchsensitivity then select actualmeasuredbenefit forphysicalrepair whilepreparing hold/electricaltargeting. NoPhase2tick orestimatedclosureclaim.
+
 ## 2026-10-12: Codex (extracted route fails physical gates; parser corrected)
 -38305592967 completed zeroDRC DRT, routedNL conservation and extraction, then parser failed on omitted zero-count sections (BUG103). Exact saved reports independently audited after correction: slowsetup-1.008813ns; fasthold0.0215ps; slew93/8/0slow/typ/fast, fanout9all, cap0/1/1; antenna0. Physicalgates still fail, not merelyhelper issue. No reroute to recover existingevidence.
 -31focusedparser/extraction/route tests pass; zero sections accepted onlywithuniqueexplicitzero totals. Prepared sourcebound nextrepair analysis in PHASE2_EXTRACTED_INCREMENTAL_REPAIR.md:71/73reportedsetupfailures fromoneconfiglatch, sharedpath targets,19holdpaths below50ps,19slewnets,9diode-loadedfanoutnets. ActualLEF/DEF offline sizingcandidate fourcells14.5152um2, threeatoldorigin/one10.44um displacement, not applied or timingproven.

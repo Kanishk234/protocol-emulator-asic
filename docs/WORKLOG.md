@@ -5,6 +5,25 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (audit clean bank; prepare extracted continuation)
+- Retrieved177selected views/config/historyfiles. Actualcanonicalcleanproposal/fullrecipe/reference pre-GPL topology/manual+DPL16positions/zerooverflow/post-cleanupantenna0 and allcorner50ps gate audits pass. FreshsourceODB is cleanedphysicalstate; NL/PNL inherited fromflow43, so no claim thoseviewsprove postcleanupconnectivity.
+- Prepared sram_bank_clean_route/workflow exactscreen38184574265/head96b19be: fullhardware/recipe/source/history/placement/antenna checks, freshantenna/allcorner gate thenstockDRT/extraction. Added mandatoryfreshDRTNL antenna-only conservation audit beforeextraction; BUG94logged.140focusedtests pass, including fullcheckpoint/freshgate/staleNL detection. No newdispatch/phaseboxes; nextpublish reviewedgroups under scopedapproval andlaunch.
+
+## 2026-10-11: Codex (clean bank screen succeeds; all-main status refresh)
+- Cleanbank38184574265success; latestunit38184574547/test38184574566/docs38184574471/lint38184574486success. No maininprogress; oldplacementGL37655518919 and timing37655518925 remainqueued. Artifact11720082047 savedpost-cleanupmetrics retrieved afterfirstmetadataapprovaltimeout/successfulretry; no phaseclosureinferred.
+- nom_fast_1p32V_m40C: setup 0ns, hold 0.0833254ns; slew/fanout/cap 1/8/0.
+- nom_slow_1p08V_125C: setup 0ns, hold 0.380307ns; slew/fanout/cap 10/8/0.
+- nom_typ_1p20V_25C: setup 0ns, hold 0.189382ns; slew/fanout/cap 1/8/0.
+- Next independentfullhistory/placement/antenna audit, then prepare exactcleancheckpointDRT/extraction. No newdispatch/phaseboxes; statusentrylocal.
+
+## 2026-10-11: Codex (all-main workflow status refresh)
+- Mainactive: cleanbank38184574265running cleanClassicplacement/timing step; unit38184574547running. Latesttest38184574566/docs38184574471/lint38184574486success; previousunit38181853705success. Twoolder placementruns37655518919/37655518925remainqueued. No newfailure onlatestcommit orofficialGDSrun; historicalcleanbankfailure38181853373superseded bycurrentrerun.
+- No newtimingresult/physicalchange/dispatch/phaseboxes. Next inspectcleanbankrepairedantennas/freshallcorner metrics whencomplete. Statusentrylocal.
+
+## 2026-10-11: Codex (publish antenna cleanup and rerun clean bank)
+- Already-approved experiment correction commits4eab1d0/96b19be pushed. Remoteexacthead96b19be921b9cafc83b3e8b51cd5eb5f139cabba verified. [Clean bank rerun38184574265](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38184574265) queued onthathead, with stockpost-timingantcleanup/freshSTA and unchangedgates.
+- Next inspect actual repairedantenna/topology/routing/allcorner/electrical result. No phaseboxes orofficialGDSclosure; unrelatedfiles/FIPE/holdproposal excluded fromcommits; receiptlocal.
+
 ## 2026-10-11: Codex (diagnose clean-bank antenna failure; complete cleanup)
 - Cleanbank38181853373 fails finalantenna gate, nottiming/placement: saved15nets/17pins; estimatedsetupWS0all, fast hold83.3254ps, slew slow/typ/fast10/1/1,fanout8each,capmetrics0. Reference topology/manual/DPLsite checks and cleanflow/GRT had completed. Alllatestlint/test/docs/unitgreen.
 - Added conditionalstock post-timing antenna cleanup matching native_stock_route: no congestion waiver or fullGRT, completeantenna-only wiring/view/history checks, freshSTA onrepaired state and unchanged50psgate. BUG93logged;106focusedtests pass. Nextpublish correction andrerun underalready-approved cleanbankexperiment scope; no phaseboxes/template/mainconfigchanges.

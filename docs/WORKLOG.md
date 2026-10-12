@@ -7,6 +7,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 Launched alternate-engine38286631182. Stopped obsolete rejected five-cell replay38286631115 accidentally triggered by shared observer refactor; made that own workflow manual-only to avoid stale automatic runs. Existing duplexunit38282629451SUCCESS.
 **Retry diagnosis:**38286631182 fails before useful routing on BUG79 retained build/grid_observer output versus CUGR artifact/instrumentation scope. Corrected paths and added source/workflow scope regression; no design outcome from this launch.
 **Native retry:**38287135030 reachesCUGR then BUG80 observer argument shadowed by Tcl path. Independent retained-data audit finds3691requirednets/zero missingguides, nonzero weightedgrid overflow and six tinynegativeusage values. Preserve signed observations without clamping; clean gate stillrejects. Corrected shadowing and percaseobserverrejection to measureboth controls; retry pending.
+Prepared independent compiled-C realSPI integration workflow with samejobhostecho image: actual C checkedload/oldstickyerror recovery,31byte duplex order/last/status/reset/STOP planned, not yet passing. No localEDA.
 **Next step:** inspect actual CUGR API/guide/overflow outcomes and latestduplexCI; only a positive native result can proceed to detailed routing and fullsamebuild signoff. Preserve133control and passing fallback demos.
 
 ## 2026-10-12 (session88: original5x3 status and measured pin-access qualification)

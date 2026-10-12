@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session90: authenticated C integration and hold allocation)
+**Done:** latest test/unit/lint/docs and C-host loaded workflows all SUCCESS. Downloaded 38293580979 artifact: exactly one passing XML case, authenticated image hash and 23/88 LC report; documented actual SPI-loaded C integration scope. Recorded corrected CUGR 38292828402 diagnostic success with both underlying routes rejected for nonzero weighted grid overflow. Added read-only hold allocation audit; producer38167697696 has590 delay cells,16.50% of CORE cell bounding-box area and150 direct FF feedback paths. No removability or causal claim. See `docs/reports/status_and_hold_allocation_20261012.md`. No hardware changes, local EDA or phase boxes ticked.
+**Next step:** per-path hold/constraint analysis before proposing enable/placement alternatives; retain best133-overflow control and passing fallback. No routing job currently running.
+
 ## 2026-10-12 (session89: calibrated observer and alternate routing engine)
 **Done:** actual38282629603SUCCESS observer collection, underlying146/133routes remainfail. Strict nativegrid parser independently matches eachMetal1–4overflow to original table,10 malformedgrid/guide fixturesPASS. PreparedD088CUGR comparison on identical physical inputs/capacity/margins, nativeerrors retained; requires complete grid, zero overflow and complete guide census before even global-route acceptance. Extended own paired runner with optional observation hooks; defaultFastRoute checks unchanged. No localEDA/hardware/spec changes or phase boxes ticked.
 Launched alternate-engine38286631182. Stopped obsolete rejected five-cell replay38286631115 accidentally triggered by shared observer refactor; made that own workflow manual-only to avoid stale automatic runs. Existing duplexunit38282629451SUCCESS.

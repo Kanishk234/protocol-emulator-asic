@@ -42,3 +42,21 @@ Prepared `gds-extracted-sizing-sensitivity` runs seven stock OpenSTA cases on th
 ### Sensitivity baseline launcher correction — 38314443440
 
 The first sensitivity attempt fails with `KeyError: odb`: pinned LibreLane STAPostPNR accesses its optional ODB for filtering unannotated-net reports after timing analysis. The corrected diagnostic retains the exact source ODB for that filtering only; no resized physical geometry is claimed. OpenSTA timing reads the hypothetical netlist and original SPEF, with unchanged signoff constraints. Input metrics remain empty. Pinned MultiCornerSTA stores fresh aggregate results in `state_out.json`, so the helper reads that file and requires every fresh corner report rather than an OpenROAD-only `or_metrics_out.json`. BUG104 and35focused regression tests cover both contract issues. Baseline reproduction still gates all candidate cases; no detailed routing or physical qualification is permitted.
+
+### Sizing results — 38315236792
+
+Actual artifact11777610336 reproduces source baseline exactly. Fixed-SPEF slow setup results:
+
+| Case | Slow setup WS ns | Gain vs baseline ns |
+|---|---:|---:|
+| baseline | -1.008813 | 0 |
+| place7221 BUF2 | -0.628672 | 0.380140 |
+|24876 INV2 | -0.795021 | 0.213792 |
+|30202 NOR3_2 | -0.672397 | 0.336415 |
+|37732 NAND2_2 | -0.672397 | 0.336415 |
+| four small upgrades | -0.413884 | 0.594929 |
+| stronger BUF4/INV4 inputs | -0.413884 | 0.594929 |
+
+Every case retains fast hold0.0215ps and93slow slew violations; no physical qualification. Stronger input cells do not improve global worst slack further. The combined case's new worst path still launches at48179 but ends at46883, followed by46391/46884. Its slow shared delayhold12828contributes0.611189ns, and NAND3_24811drives0.116261pF with1.576679ns slew. NAND3has no stronger libraryvariant;INV24812is a reviewed adjacent sizing option.
+
+Prepared follow-up diagnostic cases retain the four small upgrades and compare shared delay variantsDLY4SD2/DLY4SD1, with/withoutINV24812_2. These remain noninverting A/X delaycells, with unchanged connectivity and existingextractedSPEF. Baseline must reproduce source before cases run; measure allcorner hold after reducing shared delay. No delay bypass, clock change, constraints relaxation, physicalqualification orDRT is allowed. Allsixactualsource conservation checks and43focusedtests pass. A physically legalized/routed implementation remains required for any promising combination.

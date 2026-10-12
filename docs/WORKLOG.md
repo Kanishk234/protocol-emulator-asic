@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (sizing study gains595ps; shared delay follow-up prepared)
+- Independently read38315236792artifact11777610336: baseline exactreproduction, four smallupgrades slowsetup-1.008813 to-0.413884ns(+594.929ps); strongerBUF4/INV4combination noadditionalgain. Fasthold0.0215ps and93slowslew unchanged. Noqualification.
+- Actualcombinedworstpath shifts to48179→46883; sharedhold12828contributes611psslowdelay. Prepared6casefixedSPEFfollowup:baseline,small4,shorterDLY4SD2/DLY4SD1,with/withoutadjacentINV24812_2. Allcorners/baselinereproduction required; noarbitrarybypass orDRT. This evaluates setup/holdtradeoff, notphysicalsignoff.
+- Sixactualsourceconservation checks and43focusedtests pass;compile/diffchecks pass. Nextpublish/launchfollowup, thenpreparematchedphysicalscreenonlyfrommeasuredbenefit while fixingallhold/electricalviolations. NoPhase2ticks.
+
+## 2026-10-12: Codex (corrected sizing cases complete; upload active)
+-38315236792 baseline/sizing step is success; workflow uploading matched evidence. Artifact not yet listed; no candidate timing improvement claim until actual results inspected. Latestmainlint/test/docs success; unit38315237165/38314429625/38314140399 stillin_progress. Oldqueued37655518919/37655518925 remain untouched.
+- Next inspect seven-case results afterupload, select verifiedrepairbenefit andrequire allphysicalscreen gates beforeDRT. NoPhase2ticks/sourcechanges/newdispatch. Statusreceiptlocal.
+
+## 2026-10-12: Codex (corrected extracted sensitivity published and launched)
+- Userrequestedcorrectedpush: publishedtools9d4839a/docs1d67911; verifiedremote main1d6791120000bc9ffb36fb7f38c50966f9557435. [Correctedsensitivity38315236792](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38315236792) confirmedin_progress onexacthead.
+-35focusedtests pass; retainoriginalODB onlyforannotationfilter, freshmulticornerSTAoutputcontract corrected; strictbaselinereproduction before7cases. NoDRT orphysicalqualification. Nextinspectbaseline/candidatebenefits andpreparequalifiedphysicalscreen. Launchreceiptlocal; noPhase2tick.
+
 ## 2026-10-12: Codex (fixed-SPEF baseline helper corrected)
 -38314443440 failed baseline with KeyError odb in pinnedSTAPostPNR annotationfilter afterSTA. No candidate results ornewphysicalclosure. BUG104 records pinned optionalODB dereference; sourceaudit also caught incorrect metricsfilename assumption beforeits execution.
 - Retain unchangedoriginalODB solelyforannotationfilter, keephypotheticalNL+sameSPEF timinginputs, clear allinputmetrics and readfreshaggregated state_out metrics withfreshallcornerreports. Baseline reproduction/20ns/signoffconstraints anddiagnostic-only labels unchanged. NoDRT.

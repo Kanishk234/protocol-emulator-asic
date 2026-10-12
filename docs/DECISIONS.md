@@ -888,3 +888,24 @@ delay for all programs; actual area/congestion effect is pending measurement.
 
 [OpenROAD repair timing](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html) places timing repair after CTS with propagated clocks.
 [LibreLane global placement](https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html) supplies the placement variables and standard stages used by this scratch flow.
+
+## D-093: Restore known fanout distribution after the pre-CTS experiment
+
+**Date:**2026-10-12. **Status:** copied-checkpoint producer prepared.
+ActualD09238319615838 completes both cases. Control reproduces original pre-buffer
+ODB0a0af0c1…/netlist5bcc7ceb… byte-for-byte. Reflow rebuilds clock/repairs and
+retains fast hold0.100232ns plus positive setup/hold and zero slew/cap at all3
+corners. Both retain the known5 configuration-distribution fanout violations.
+Reflow has3645instances versus3596control; count alone is not an advantage.
+
+Apply the established10 buf_2 identity-buffer repair (two6-load groups on each
+of5 measured column nets) to the authenticated reflow views. Generalize only
+original-count protection to3645; FIRM-lock all existing PLACED instances during
+legalization and restore their exact statuses. Contract buffer branches to prove
+every original connection unchanged; require identical master/origin/orientation
+for all originals and fixed physical macro/pins/die/rows. Native legality and
+actual ROW power phase precede all3 original-corner timing/electrical checks,
+including>=0.1ns hold. No constraints, source/spec, capacity or user protocol
+changes. The buffers cost actual native footprint/wires for every program;
+benefit is removal of the known distribution electrical violations, not a
+claimed routing improvement. Only a passing producer proceeds to GRT versus133.

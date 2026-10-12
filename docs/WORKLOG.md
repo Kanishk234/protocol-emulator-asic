@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (follow-up still computing; endpoint hold proposal prepared)
+- Checked38316962855: stillin_progress, initiallysourceartifactdownload, nowbaseline/sizingcaseexecution. No completedmeasurement/artifactclaim.
+- Prepared exactNL/DEF/fastminreport-bound19endpointlocalDLY4SD1proposal. Actualsource offline complete-footprintallocation adds275.7888um2, maximumsinkorigindisplacement10.44um. Preserve everyclock/reset/originalcell/diode; syntheticactualsource19leafnetlistconservation passes. No physicalECO applied. ExistinggenericTclbinding correctlyrefuses unregisteredsource; do notbypassthatguard orlaunchincompletephysicalrepair.
+-38focusedhold/sizingtests pass,diffcheckpass. Nextinspectshared-delaysetup/holdtradeoff; updateendpointset ifnewholdfailures appear, combine withallremainingelectricalrepair andstrictscreen gatesbeforeDRT. NoPhase2ticks. Parallelpreparationonly.
+
+## 2026-10-12: Codex (shared delay follow-up launched)
+- Publishedtoolse93b0ce/CI75a55ff/docs11b752a;remote mainverified11b752a5777b6fbf9fa210d4c66da36b24c2ab39. [Followup38316962855](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38316962855) dispatched onexacthead,initiallyqueued.
+-43focusedtests pass;sixactualsource conservationchecks. Baseline/allcornerfixedSPEF setup-holdtradeoff only, nophysicalqualification/DRT. Nextinspectbenefits andcontinue strictphysicalscreenpreparation. NoPhase2tick. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (sizing study gains595ps; shared delay follow-up prepared)
 - Independently read38315236792artifact11777610336: baseline exactreproduction, four smallupgrades slowsetup-1.008813 to-0.413884ns(+594.929ps); strongerBUF4/INV4combination noadditionalgain. Fasthold0.0215ps and93slowslew unchanged. Noqualification.
 - Actualcombinedworstpath shifts to48179→46883; sharedhold12828contributes611psslowdelay. Prepared6casefixedSPEFfollowup:baseline,small4,shorterDLY4SD2/DLY4SD1,with/withoutadjacentINV24812_2. Allcorners/baselinereproduction required; noarbitrarybypass orDRT. This evaluates setup/holdtradeoff, notphysicalsignoff.

@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (capacity limitation caught; live-process repair prepared)
+- Independentlyinspected38294805019 restorationartifact: exactgeometry/NL/timing preserved, butcongestiondemand0. BUG100/exactpinnedsource showscoldsegmentload lacksfull2D/3Dusage; blocked unsafe coldrepair rather thanclaimcorrectcapacity.
+- Prepared10BUF4 live-processscreen145.152um2:8fanout+2localNAND3outputisolation. NoNAND3_2 inactualLEF. Existingplacementsfrozen/restored; onefullGRTinitializescapacity then edits/antenna repair stayinprocess. Initialrebasechangedroutes explicitlyreported; afterrebase onlyplanned/newdiode-net changesallowed. Positiveinitial/finaldemand, zerooverflow/antenna/electrical and20ns/50ps gates required. NoDRT.
+- 134focusedtests pass, actualsource synthetic10buffer conservation/Tclroundtrip pass, compile/bashsyntax/diffpass. Nextpublish/launchnow underongoingauthorization, inspectactualgates. NoPhase2ticks.
+
+## 2026-10-12: Codex (restoration audit step passed; upload pending)
+- GitHubREST confirms38294805019 restoration/no-edit auditstep success,19:02:41–19:08:12UTC. Workflowcurrentlyuploading matched evidence; artifactnotyetlisted atcheck. No finalartifactinspection orphysicalclosureclaim.
+- Next inspectactualgeometry/netlist/timing receipt afterupload, thenprepare remainingelectricalrepair usingverifiedincrementalmethod. NoPhase2tick/dispatch/sourcechanges. Statusentrylocal.
+
+## 2026-10-12: Codex (launch exact no-edit route restoration)
+- Publishedsegmentbindingtools7b735bb/docsef62598 underongoingauthorization; verifiedremote mainef6259831d3a5531931ff82ae65bda16698d54ae. [Restoration38294805019](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38294805019) dispatched onexacthead, initiallyqueued.
+- Test restores inspected live segments and no-editincrementalrouting, then exactallnetgeometry/NL and matchedallcornerSTA/electricalcomparison. Source remainsunqualified; diagnostic doesnotadvance DRT orPhase2. Nextinspectrestoration outcome before routing-policychange. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (segment export inspected; restoration source bound)
 - Export38293466146 succeeds, artifact11767790828. Actualfinalsegments33909nets/268616segments, SHA860b8c777de3b4d555ad9967ec4a1487dd540b71cb89e3401b8b36b73a794588. Receipts/segmentgrammar inspected; alltiming/electricalvalues exactly reproduce unqualified38287515824baseline. No physicalpassclaim.
 - Preparedrestorationgroups438552d/e2db4be/2b6fcf9 already pushed; now pinned exactsegmentchecksum/counts. 27focusedtests pass. Next publishbinding/launchno-edit restoration underongoingauthorization; noDRT/Phase2tick.

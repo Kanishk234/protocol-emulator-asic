@@ -180,3 +180,16 @@ Wrapper replaces only pinned grt.tcl's unique full-routing source statement with
 ## Segment export inspected and restoration source fixed
 
 Export38293466146 succeeds, artifact11767790828(541577365bytes). Read final cleaned segment file and capture/timing receipts. FileSHA860b8c777de3b4d555ad9967ec4a1487dd540b71cb89e3401b8b36b73a794588,33909routednets/268616segments, grammar/orthogonalgeometry audit passes. It belongs to final antenna-cleanup ODB, not pre-cleanup routing. All measured setup/hold/electrical values exactly reproduce38287515824: setup0all, fast hold56.771ps, typical140.816ps, slow291.986ps; electricalslew7/0/0slow/typical/fast, fanout3all, cap0. qualified=false preserved. Restoration runner now pins exact segmentSHA/counts in addition to run/head/receipt/state/recipe. Next launch no-edit restoration; electrical/signoff gates remain outstanding.
+
+
+## Restoration evidence inspected; cold capacity limitation found
+
+Run38294805019 succeeds at ef6259831d3a5531931ff82ae65bda16698d54ae; artifact11768991337(621985214bytes). Independently re-parsed geometry/NL and timing: exact33909net/268616segment roundtrip/no-edit geometry, unchangedfunctional NL, allsetup/hold/electrical values match. This confirms geometry/STA behavior only. Actualno-op congestion table haszeroMetal2/3/4demand despiteexistingroutes. Exactpinned readSegments doesnotupdateedgeusage; startIncremental resetsFastRoute capacities. readGuides updates3Dusage only, leaving2Daccounting unresolved. BUG100 documents why no cold-restored physicalrepair is launched.
+
+## Single-process electrical repair prepared
+
+Prepared gds-electrical-incremental-screen from verified diagnostic38294805019, restoredDEF SHA7626616e05699cffde246ab26e501d212a2d889d6671ed7a8186796fb49137a1. Libraryoffers NAND3_1only, so replace speculative NAND3strength2 with two localBUF4s isolating its six existing loads into3/3groups. Combinedplan:8fanoutBUF4 +2slewisolationBUF4,145.152um2, combinedproposedfootprintoverlap0. Slewbuffers2.400/3.780um fromNAND3origin. Everyoriginalcell/diode retained, noclock/reset rewiring ormaster changes.
+
+Correctcapacitystrategy: one explicitstockfullGRT initializes live2D/3Dusage, records rebasedODB/DEF/NL/fullsegments; then bufferedits+legalization, incrementalrouting, stockantenna repair and finalno-editincrementalreport occur in the sameprocess. Existingplacedcells frozen forlegalization and statusesrestored beforefinalsave. This initialfullroute maychange oldroutes andis separatelyreported; do not claim preservation acrossit. Exactafter-buffer routeaudit permitsonly plannedsource/newnets. Finalantennaroute allowance derivedonly fromactualnewdiodeNL additions after strictantenna-only topology check. Everypriorcellplacement mustremain unchanged. Positiveinitial/finaldemand andzerooverflow required. No separatecoldantenna process orDRT.
+
+FreshallcornerSTA compares explicitrebasedbaseline tofinalphysicalcheckpoint; outgoing setup>=0, fasthold>=50ps, zeroelectrical/antenna gates unchanged. Source remainsunqualified; one-processwrapper isdiagnostic and officialcleanreproduction outstanding. 134focusedtests pass, actualrestoredsource synthetic10buffer conservation/Tclroundtrip pass, compile/bashsyntax/diffpass. Actualphysical outcomeunknown; publication/launch underongoingauthorization.

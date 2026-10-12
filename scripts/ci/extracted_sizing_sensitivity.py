@@ -18,6 +18,7 @@ TARGETS={
     '_30202_':('sg13cmos5l_nor3_1','sg13cmos5l_nor3_2'),
     '_37732_':('sg13cmos5l_nand2_1','sg13cmos5l_nand2_2'),
 }
+EXTRA_VARIANTS={}
 CASES={'baseline':{},**{name:{name:new} for name,(old,new) in TARGETS.items()},
        'combined':{name:new for name,(old,new) in TARGETS.items()},
        'strong_inputs':dict(place7221='sg13cmos5l_buf_4',_24876_='sg13cmos5l_inv_4',
@@ -33,7 +34,7 @@ def validate_run(run):
 def change_netlist(text,changes):
     old=logical_cells(text);result=text
     for name,new in changes.items():
-        if name not in TARGETS or new not in ({TARGETS[name][1]}|({'sg13cmos5l_buf_4'} if name=='place7221' else {'sg13cmos5l_inv_4'} if name=='_24876_' else set())):
+        if name not in TARGETS or new not in ({TARGETS[name][1]}|({'sg13cmos5l_buf_4'} if name=='place7221' else {'sg13cmos5l_inv_4'} if name=='_24876_' else set())|EXTRA_VARIANTS.get(name,set())):
             raise ValueError('Unreviewed sizing target')
         master=TARGETS[name][0]
         if old.get(name,(None,))[0]!=master:raise ValueError('Wrong original sizing master')
@@ -78,7 +79,7 @@ def sta_input_state(state,modified):
     proposal['def']=None
     return proposal
 
-def main():
+def main(output=Path('runs/extracted-sizing-sensitivity')):
     validate_run(json.loads(Path('/tmp/native-strength-source-run.json').read_text()))
     trusted=json.loads(Path('/tmp/native-trusted-files.json').read_text());actual=fingerprints(Path.cwd())
     hardware=lambda values:{k:v for k,v in values.items() if not(k.startswith('src/config') and k.endswith('.json'))}
@@ -95,7 +96,7 @@ def main():
         raise ValueError('Source physical recipe mismatch')
     config.update(STA_CORNERS=list(CORNERS),STA_THREADS=3,SIGNOFF_SDC_FILE=str(Path('src/signoff.sdc').resolve()))
     config.pop('STA_EXTRA_CORNER_TCL_FILE',None)
-    output=Path('runs/extracted-sizing-sensitivity');output.mkdir(exist_ok=False)
+    output.mkdir(exist_ok=False)
     os.environ.pop('LIBRELANE_IMAGE_OVERRIDE',None)
     reference=json.loads((root/'corner_summary.json').read_text());results={}
     for name,changes in CASES.items():

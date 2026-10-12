@@ -157,3 +157,12 @@ Repeated fullreroute/antenna cleanup changes other near-limit nets, reducing con
 ## Pinned routing capability probe
 
 Prepared lightweight gds-routing-capability-probe on LibreLane3.1.0.dev3 image, without PDK or loaded design. Captures image digest, OpenROAD version and command/help availability for global_route incremental flags, read_guides and route-segment read/write. Local cached OpenROAD lacks Qt shared-library dependency; do not treat its execution as pinned CI verification. Parser rejects incomplete/duplicate evidence and explicitly does not claim checkpoint restoration or unchanged-route preservation. 122focused checks pass. Next inspect actual pinned capabilities and test saved-state restoration before changing repair routing.
+
+
+## Pinned incremental capability confirmed; exact state export diagnostic
+
+Probe38292662761 succeeds, artifact11766453346(1298bytes). Image reports OpenROADdcf36133a369abc8f3c5e5738cd4d82e4903c0e0; incremental start/end flags plus read_guides/read/write_global_route_segments available. Exact commit GlobalRouter.cpp confirms readGuides warns it cannot supply guide-based parasitics estimation; readSegments loads raw routes and verifies connectivity and pin coverage. Do not infer matched incremental state from guide rectangles.
+
+Prepared gds-route-segment-export repeating the same reviewed finish baseline, with no new physical repair. Wrapper exports live full segment data after GRT and antenna cleanup. Dedicated --capture-segments requires finish mode and nonempty final ODB-matched segment file. Receipt retains actual qualified/timing/electrical fields and adds route_segment_capture_only=true, checkpoint_restoration_tested=false. Export diagnostic can succeed while qualified=false; this is not electrical/signoff acceptance and cannot advance to DRT. Regular screen gates unchanged. 127focused tests pass, including export-after-physical-step ordering, ambiguous input-read refusal and explicit diagnostic workflow/mode checks.
+
+Next inspect live segments, test exact fresh-process roundtrip/STA and zero-edit incremental behavior, then apply remaining eight-buffer/NAND3 repair with measured unchanged-route preservation if supported. No false/multicycle paths, relaxed electrical/hold gates or official completion claims.

@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (pinned route restoration path confirmed; export diagnostic prepared)
+- Probe38292662761 passes: pinnedOpenROADdcf36133supports incremental/guide/segmentcommands. Exactsource readGuides warnsparasestimation cannotuseguides; readSegments verifiesactualrouteconnectivity/pincoverage. Needlivefullsegments before claimingstatepreservation.
+- Preparedread-onlysegmentexports after existingGRT/antenna process and separate exportdiagnostic reproducingreviewedfinishbaseline. No newrepair. Capture receipt retains actualqualifiedfalse if electricalfails; exportsuccess isnotphysicalacceptance. Regularscreen50ps/zeroelectrical gatesunchanged.
+- 127focusedtests pass, compile/bashsyntax/diffpass. Nextpublish/launchexport under ongoingauthorization, inspectsegments andfreshprocess restoration/STA/no-opincremental before remainingrepairs. NoPhase2tick.
+
+## 2026-10-12: Codex (publish routing probe; remaining loads traced in parallel)
+- Tools c13c6b4/CIe8e3c99/docs8045f96 pushed under ongoingauthorization; remote mainverified8045f96142594c71f64c595fe0a119cd589215de. [Read-only routing probe38292662761](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38292662761) running pinnedOpenROAD introspection. No designmutation.
+- Retrieved14finalphysicalviews from38287515824 inparallel. Remainingfanouts:28820NOR2_1 drives14(7diodes),26845OR2_1 drives9(1diode),place8806BUF1drives9(1diode). Four-loadheadroom inventory proposes8buffers. Sharedslownet03831 driver28807 isNAND3_1, notNOR4; consider strength2 afterpinnedroutingcapability evidence. No newphysicalcandidate/DRT/Phase2tick.
+- Next inspectprobecommand/version evidence, test route-restoration/preservation semantics, then applyremainingrepair toexactcheckpoint. Launch/statusreceiptlocal.
+
 ## 2026-10-12: Codex (pinned routing capability probe prepared)
 - PinnedLibreLanecommon/grt.tcl alwaysfullroutes; upstreamincrementalcommands cannot be assumed on pinnedimage. CachedlocalOpenROAD cannotstart due missingQtdependency, so prepared lightweight read-only pinnedDockerimage introspection workflow. No designloaded, PDK/hardware edits ortimingconstraintchanges.
 - Probe capturesimage digest/version, globalroute incrementalflags andguide/segmentreadwrite availability. Summary explicitlystates checkpointrestoration/unchangedroutepreservation not tested; no closureclaims. 122focused tests pass with Tclruntime, Pythoncompile/diffpass.

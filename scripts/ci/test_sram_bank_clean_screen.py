@@ -178,3 +178,15 @@ def test_electrical_workflow_uses_isolated_outputs_and_same_hardware():
     assert w['jobs']['harden']['env']['CANDIDATE_SHA'] == '3393eea9a58c5cad9077cc360a8515d0e5ec8284'
     upload = next(s for s in steps if 'upload-artifact@' in s.get('uses',''))
     assert 'runs/sram-bank-electrical-screen/**' in upload['with']['path']
+
+
+@pytest.mark.parametrize('fault', ['none', 'slew', 'fanout', 'cap', 'missing_metric', 'missing_corner'])
+def test_electrical_gate_requires_explicit_zero_in_all_corners(fault):
+    corners = ['nom_fast_1p32V_m40C', 'nom_typ_1p20V_25C', 'nom_slow_1p08V_125C']
+    d = {'corners': {c: {'after': {f'design__max_{k}_violation__count__corner:{c}': 0
+        for k in ('slew', 'fanout', 'cap')}} for c in corners}}
+    if fault in ('slew', 'fanout', 'cap'):
+        d['corners'][corners[0]]['after'][f'design__max_{fault}_violation__count__corner:{corners[0]}'] = 1
+    elif fault == 'missing_metric': d['corners'][corners[0]]['after'].clear()
+    elif fault == 'missing_corner': d['corners'].pop(corners[0])
+    assert runner.electrical_clean(d) == (fault == 'none')

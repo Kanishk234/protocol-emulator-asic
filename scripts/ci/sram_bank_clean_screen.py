@@ -41,6 +41,19 @@ def configure(original, proposal, reserve=False, electrical=False):
     return result
 
 
+def electrical_clean(comparison):
+    """Require explicit zero electrical counts at every measured corner."""
+    corners = comparison.get('corners', {})
+    expected = {'nom_fast_1p32V_m40C', 'nom_typ_1p20V_25C', 'nom_slow_1p08V_125C'}
+    if set(corners) != expected: return False
+    for corner, result in corners.items():
+        metrics = result.get('after', {})
+        for kind in ('slew', 'fanout', 'cap'):
+            key = f'design__max_{kind}_violation__count__corner:{corner}'
+            if key not in metrics or metrics[key] != 0: return False
+    return True
+
+
 def verify_stage(layout, proposal):
     import re
     for item in proposal['proposals']:
@@ -129,7 +142,10 @@ def main(reserve=False, electrical=False):
     if len(metrics) != 1: raise ValueError('Missing fresh antenna evidence')
     source, antenna_metrics = repair_remaining_antennas(config, source, output, json.loads(metrics[0].read_text()))
     screen(path, source, output/'timing', os.environ['PDK_ROOT'], repaired=source, sdc=Path('src/signoff.sdc'))
-    ready = qualified(json.loads((output/'timing/comparison.json').read_text()), antenna_metrics)
+    comparison = json.loads((output/'timing/comparison.json').read_text())
+    timing_ready = qualified(comparison, antenna_metrics)
+    electrical_ready = electrical_clean(comparison)
+    ready = timing_ready and (electrical_ready if electrical else True)
     gates = dict(source_run=38172640071,
         clean_from_rtl=True, stock_classic=True, custom_image=False,
         added_cells_by_policy=0, relocated_instances=len(proposal['proposals']),
@@ -138,10 +154,11 @@ def main(reserve=False, electrical=False):
     if reserve:
         gates.update(timing_reserve_trial=True, setup_repair_target_ns=1.0, hold_repair_target_ns=.125)
     if electrical:
-        gates.update(native_postgrt_electrical_repair=True, setup_repair_target_ns=0.0,
+        gates.update(native_postgrt_electrical_repair=True, timing_antenna_qualified=timing_ready,
+                     electrical_qualified=electrical_ready, setup_repair_target_ns=0.0,
                      hold_repair_target_ns=.125, slew_margin_pct=10, cap_margin_pct=10)
     (output/'gates.json').write_text(json.dumps(gates, indent=2)+'\n')
-    if not ready: raise ValueError('Clean bank screen fails timing/50ps hold/antenna gate')
+    if not ready: raise ValueError('Clean bank screen fails required timing/hold/antenna/electrical gates')
 
 
 if __name__ == '__main__':

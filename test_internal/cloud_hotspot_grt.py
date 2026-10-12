@@ -69,7 +69,7 @@ def validate_padding(directory, baseline):
     return measured
 
 
-def main():
+def main(observer=None):
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise ValueError("Native routing is allowed only on the GitHub runner")
     OUT.mkdir(exist_ok=False)
@@ -146,12 +146,16 @@ def main():
         iterations = re.findall(r"(?m)^\+ global_route -congestion_iterations (\d+)\b", raw)
         if not iterations or any(int(n) != 50 for n in iterations):
             raise ValueError("Actual native routing budget differs")
-        congestion = routing.parse_congestion(raw)
-        if not congestion:
-            raise ValueError("Missing actual native congestion table")
-        entry.update({"returncode": process.returncode, "native_congestion": congestion,
-                      "overflow": congestion[-1]["total_overflow"], "native_iteration_counts": iterations})
-        entry.update(reporting.hotspot_record(stage / "native-congestion.rpt", entry["overflow"]))
+        if observer is None:
+            congestion = routing.parse_congestion(raw)
+            if not congestion:
+                raise ValueError("Missing actual native congestion table")
+            entry.update({"returncode":process.returncode,"native_congestion":congestion,
+                          "overflow":congestion[-1]["total_overflow"],"native_iteration_counts":iterations})
+            entry.update(reporting.hotspot_record(stage / "native-congestion.rpt",entry["overflow"]))
+        else:
+            entry.update(observer.collect(stage,raw))
+            entry.update({"returncode":process.returncode,"native_iteration_counts":iterations})
         save()
         resolved = json.loads((stage / "config.json").read_text())
         if resolved["CELL_LIBS"] != config["LIB"] or cfg.macro_contract(resolved["MACROS"]) != cfg.macro_contract(config["MACROS"]):
@@ -159,7 +163,10 @@ def main():
         entry["irrelevant_stage_settings_omitted"] = validate_native_policy(resolved, config, original)
         if process.returncode == 0:
             final = json.loads((stage / "state_out.json").read_text())
-            routing.require_zero_overflow(congestion, final["metrics"])
+            if observer is None:
+                routing.require_zero_overflow(congestion, final["metrics"])
+            else:
+                observer.require_clean(stage,entry,final,census)
             if not (stage / "after_grt.guide").is_file() or not (stage / "after_grt.guide").stat().st_size:
                 raise ValueError("Missing actual routing guides")
             if cfg.parse_census(observe(label + "_after", final["odb"])) != cfg.parse_census(census):

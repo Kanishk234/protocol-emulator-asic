@@ -5,6 +5,33 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (27-buffer electrical repair screen prepared)
+- Prepared exact-source finalDEF repair planner, identity-buffer Tcl binding, pinned-image wrapper, strict screen runner and separate workflow. Canonical27buffers:8clockBUF8,18dataBUF4,1RENBUF4; total464.4864um2. Sequential full-footprint allocator finds combined zerooverlap; REN buffer19.190um from macro pin center. Detailed legalization/power/pin access/timing still required.
+- Screen preserves all existing cells/diodes and planned sink connections; verifies fresh ODB-exported NL conservation, strict GRToverflow, refreshed antenna cleanup, allcorner timing/50pshold and zero electrical counts. No DRT. Custom-image diagnostic disclosed; official reproducibility remains outstanding.
+- 95focused tests pass, compile/bash syntax/diff pass; actual-source Tcl targets parse17sourcecalls/27groups. No commit/push/dispatch or phase tick. Next publish reviewed tools/test, CI and evidence groups on approval, run screen, and inspect actual physical/gate evidence before considering detailed routing.
+
+## 2026-10-12: Codex (final-load inventory and bounded repair counts)
+- Read final antenna-cleanup DEF connectivity, not inherited pre-cleanup NL. All16 fanout report counts match actual final sinks. Antenna diodes explain much of data fanout; worst_29457_ has8functional+12diode loads. Four clock branches each drive16BUF8inputs.
+- Added read-only electrical_load_inventory.py/tests: reject report/DEF mismatch, clock/reset loads in data splits and missing unique REN driver. Bounded proposal8clock+18data buffers, with6loaddata groups leaving2load antenna reserve. REN NOR2B_1 driver confirmed about315um from macro pin origin. No physical change or timing claim.
+- 80focused tests pass; whitespace check clean. Changes remain local, no dispatch/commit/push or Phase2 ticks. Next legal-site/conservation guarded physical repair and fresh post-antenna screen; do not route before screen electrical/timing/hold gates pass.
+
+## 2026-10-12: Codex (repair screen before routing; strict electrical gate)
+- Followed user instruction to fix known screen violations before routing. Retrieved40 selective reports/views/logs from electrical38272508875. Actual slew violation is SRAM A_REN (slow0.962052ns versus0.595200 limit); fanout16violations comprise4clock branches and12data drivers. Native electrical step inserted0buffers/resized0cells.
+- Fixed omitted electrical acceptance in electrical mode (BUG95): explicit zero slew/fanout/cap metrics in every corner required; missing metrics fail. Separate timing/antenna and electrical receipt fields. 75 focused tests pass, diff check clean. Changes local; no routing, commit, push or dispatch.
+- Next repair REN slew and clock/data fanout on actual final checkpoint, then repeat screen and antenna/timing/strict electrical checks before detailed routing. No Phase 2 boxes ticked.
+
+## 2026-10-12: Codex (electrical screen completed and qualification read)
+- Electrical38272508875 succeeded; artifact11760700148, 227535861bytes. Selectively retrieved10 qualification/timing/antenna reports. Estimated setupWS0all corners; fast hold107.319ps, typical220.270ps, slow404.687ps. Electrical each corner slew1/fanout16/cap0. Final antenna0nets/0pins after conditional cleanup. Qualifiedscreen true, physical_screen_only true, official_signoff false.
+- No workflows currently running; two old placement runs37655518919/37655518925 still queued. Latest main lint/test/unit/docs passed. No new dispatch or Phase 2 tick. Next audit full matched recipe/history and prepare routed extraction of this exact successful checkpoint; remaining electrical violations and final timing/signoff gates are unresolved.
+
+## 2026-10-12: Codex (all workflow status refresh)
+- Electrical screen38272508875 is the only in-progress run across branches; active step is clean Classic physical flow and timing qualification. No new final timing measurements. Main test38272492027/unit38272492025/lint38272491970/docs38272491966 all passed.
+- Two old main runs remain queued: placement GL37655518919 and extracted timing37655518925. Latest efpga runs all completed successfully; no new failure beyond previously diagnosed reserve38206133048. No dispatch, hardware edits or Phase 2 ticks. Next inspect electrical screen result and matched metrics when available. Status receipt local.
+
+## 2026-10-12: Codex (publish and launch native electrical repair)
+- Explicit user approval executed in separate commits: tools c1d43a9, CI 8d3248f, docs 9a65064. Remote main verified at 9a65064a2cf51d10577e416acabd74d1fad46758. [Electrical screen38272508875](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38272508875) dispatched on that exact head; initially queued.
+- No hardware/config/template edits included; unrelated pending files and local-only FIPE excluded. Next inspect actual post-GRT electrical repair, area, overflow, antennas and all-corner timing; only qualified results justify matched extracted routing. No Phase 2 boxes ticked. This launch receipt remains local.
+
 ## 2026-10-12: Codex (native electrical repair prepared)
 - Refreshed latest main runs: reserve38206133048 failure, lint/test/docs/unit green; no recent run active. Inspected pinned repair scripts and Classic step controls. Reserve repeatedly selects U3 config latch `_47655_/D`; positive setup margin is poorly matched to these zero-slack borrowed paths.
 - Prepared isolated electrical mode/workflow: stock post-GRT design repair before antenna insertion, native 10% slew/cap margins, setup margin0 and hold125ps. Frozen RTL, 20ns/50ps gate, strict congestion and antenna checks remain. Require executed repair and zero overflow. No commit/push/dispatch or phase boxes.

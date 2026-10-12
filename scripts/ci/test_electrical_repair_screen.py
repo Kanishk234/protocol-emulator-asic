@@ -93,3 +93,15 @@ def test_finish_workflow_uses_exact_source_and_separate_output():
     assert any(s.get('run')=='python workflow-src/scripts/ci/electrical_repair_screen.py --finish' for s in steps)
     u=next(s for s in steps if 'upload-artifact@' in s.get('uses',''))
     assert 'runs/electrical-finish-screen/**' in u['with']['path']
+
+
+def test_segment_capture_does_not_accept_other_source_modes():
+    from electrical_repair_screen import main
+    with pytest.raises(ValueError,match='reviewed finish baseline'): main(capture_segments=True)
+
+
+def test_segment_export_workflow_is_explicit_diagnostic():
+    root=Path(__file__).resolve().parents[2]
+    w=yaml.safe_load((root/'.github/workflows/gds-route-segment-export.yaml').read_text())
+    assert any(s.get('run')=='python workflow-src/scripts/ci/electrical_repair_screen.py --finish --capture-segments'
+        for s in w['jobs']['harden']['steps'])

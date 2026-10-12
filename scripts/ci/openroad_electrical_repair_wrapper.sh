@@ -32,6 +32,11 @@ if [[ "$script_name" == "grt.tcl" || "$script_name" == "antenna_repair.tcl" ]]; 
                 'set ::env(SAVE_PNL) [file rootname $::env(SAVE_ODB)].eco.pnl.v'
         fi
     done < "$script_path" > "$patched_tcl"
+    # Export the live router's full segments after routing/antenna repair.
+    # Guide rectangles alone do not restore matched parasitics.
+    printf '%s\n' \
+        'write_global_route_segments [file rootname $::env(SAVE_ODB)].segments' \
+        'puts "TRIPWIRE route segments: exported live router state"' >> "$patched_tcl"
     args[$script_index]="$patched_tcl"
 fi
 exec "$real_openroad" "${args[@]}"

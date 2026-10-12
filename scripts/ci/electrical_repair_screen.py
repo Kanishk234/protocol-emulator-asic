@@ -79,7 +79,8 @@ def validate_finish_measurements(comparison,antenna):
         raise ValueError('Latest source has unreviewed antennas')
 
 
-def main(residual=False, finish=False):
+def main(residual=False, finish=False, capture_segments=False):
+    if capture_segments and not finish: raise ValueError('Segment capture requires the reviewed finish baseline')
     root=Path('runs/sram-bank-electrical-screen')
     run=json.loads(Path('/tmp/native-strength-source-run.json').read_text())
     if finish:
@@ -189,8 +190,16 @@ def main(residual=False, finish=False):
         added_buffers=proposal['added_buffers'],minimum_fast_hold_ns=.05,physical_screen_only=True,
         custom_image=True,official_signoff=False)
     if finish: gates['resized_cells']=len(proposal['resizes'])
+    if capture_segments:
+        final_state=json.loads(checked.read_text())
+        segments=Path(final_state['odb']).with_suffix('.segments')
+        if not segments.is_file() or segments.stat().st_size==0:
+            raise ValueError('Missing live final-checkpoint route segments')
+        gates.update(route_segment_capture_only=True,route_segments=str(segments),
+                     checkpoint_restoration_tested=False)
     (output/'gates.json').write_text(json.dumps(gates,indent=2)+'\n')
-    if not ready: raise ValueError('Electrical repair screen fails strict timing/electrical/antenna gates')
+    if not ready and not capture_segments:
+        raise ValueError('Electrical repair screen fails strict timing/electrical/antenna gates')
 
 
 if __name__=='__main__':
@@ -199,5 +208,6 @@ if __name__=='__main__':
     modes=parser.add_mutually_exclusive_group()
     modes.add_argument('--residual',action='store_true')
     modes.add_argument('--finish',action='store_true')
+    parser.add_argument('--capture-segments',action='store_true')
     args=parser.parse_args()
-    main(residual=args.residual,finish=args.finish)
+    main(residual=args.residual,finish=args.finish,capture_segments=args.capture_segments)

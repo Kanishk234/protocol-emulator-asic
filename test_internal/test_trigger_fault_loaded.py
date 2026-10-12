@@ -7,7 +7,7 @@ from cocotb.triggers import ClockCycles, FallingEdge, RisingEdge, Timer
 
 from compile.bitfile import BitFile
 from host.protocol import (Op, State, checked_load_transactions, parse_byte,
-                           parse_read_id, tx_read_id, tx_simple, tx_user_status)
+                           parse_read_id, tx_ch_write, tx_read_id, tx_simple, tx_user_status)
 from test_bitstream import REAL_FABRIC, hold_x, leave_fabric, settle_routing_loops
 from warp_host import bit, expect, parked, reset
 
@@ -31,6 +31,48 @@ async def capture_window(dut, host, busy_edge=False, held=False, monitor=False):
     await FallingEdge(dut.clk)
     host.set_fab_in(1)
     await ClockCycles(dut.clk, 6)
+
+
+async def uart_frame_with_fault(dut, host, byte, inject=False):
+    """Observe a complete 8N1 frame while SPI independently supplies its byte."""
+    waveform = []
+    first_start = None
+    trigger_sample = None
+
+    async def observe():
+        nonlocal first_start, trigger_sample
+        for cycle in range(640):
+            await FallingEdge(dut.clk)
+            trigger = inject and first_start is not None and cycle == first_start + 32
+            event = inject and first_start is not None and cycle == first_start + 39
+            host.set_fab_in(1 | (int(event) << 1) | (int(trigger) << 2))
+            if trigger:
+                trigger_sample = cycle
+            await RisingEdge(dut.clk)
+            await Timer(1, unit="ns")
+            level = bit(dut.uo_out, 2)
+            waveform.append(level)
+            if first_start is None and level == 0:
+                first_start = cycle
+        await FallingEdge(dut.clk)
+        host.set_fab_in(1)
+
+    recording = cocotb.start_soon(observe())
+    await host.xfer(tx_ch_write(byte))
+    await recording
+    assert first_start is not None, "UART did not transmit the host byte"
+    assert first_start + 160 < len(waveform), "recording missed end of frame"
+    frame = [0] + [(byte >> bit_index) & 1 for bit_index in range(8)] + [1]
+    mismatches = []
+    for offset in range(160):
+        cycle = first_start + offset
+        expected = frame[offset // 16]
+        if inject and trigger_sample + 7 <= cycle < trigger_sample + 11:
+            expected ^= 1
+        if waveform[cycle] != expected:
+            mismatches.append((offset, waveform[cycle], expected))
+    assert not mismatches, f"incorrect UART/fault waveform: {mismatches}"
+    assert all(waveform[first_start + 160:]), "UART failed to return idle after frame"
 
 
 @cocotb.test(skip=not REAL_FABRIC)
@@ -76,6 +118,11 @@ async def test_triggered_fault_loaded(dut):
     assert bit(dut.uo_out, 2) == 1
     await capture_window(dut, host, monitor=True)
     assert parse_byte(await host.xfer(tx_user_status())) >> 4 == 1
+    # Actual UART data flows while the independent scheduler corrupts four
+    # clocks of a data bit. A subsequent byte must transmit cleanly.
+    await uart_frame_with_fault(dut, host, 0xA5, inject=True)
+    assert parse_byte(await host.xfer(tx_user_status())) >> 4 == 2
+    await uart_frame_with_fault(dut, host, 0x3C)
     await host.xfer(tx_simple(Op.STOP))
     await expect(host, State.LOADED)
     assert parked(dut)

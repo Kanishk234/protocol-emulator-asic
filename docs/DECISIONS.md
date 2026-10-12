@@ -819,7 +819,7 @@ Observation is not full extracted or configured-fabric timing acceptance.
 
 ## D-090: Rebalance only delay cells with measured hold headroom
 
-**Date:**2026-10-12. **Status:** isolated producer prepared, not a promoted chip.
+**Date:**2026-10-12. **Status:** producer38316322592 passed native placement and3-corner shell guards; paired routing pending, not a promoted chip.
 D089 run38315257114 completes all590 per-delay min/max queries at each of3
 original PVT corners and retains all electrical/setup/hold guards. The150
 direct feedback paths all belong to configuration registers and have fast

@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session93: native delay producer passes; route comparison prepared)
+**Done:** corrected38316322592SUCCESS; downloaded resultdd19fa05… verifies251 smaller-delay cells,455.4144µm² CORE footprint saving, exact origins/connections/unselected boxes and fixed macro. All3 estimated shell setup/hold/electrical gates pass; worsthold0.112282ns retains0.1ns guard. Prepared paired native routing against authenticated best133 control38167697696 using unchanged50iterations/capacities/margins. Actual downloaded-artifact adapter validation passes locally; focused regressions35PASS. No localEDA, frozen source edits, full physical/timing acceptance or phase boxes ticked. Latestb71464f lint/docs/test/unit SUCCESS; fabric still running at inspection.
+**Next step:** inspect paired routing, then only a zero-overflow candidate may proceed to detailed routing/geometry/extraction and remaining native mode/timing coverage.
+
 ## 2026-10-12 (session92: complete delay timing observations and measured rebalance)
 **Done:** actual corrected38315257114SUCCESS, downloaded resultSHA3866682f… authenticates590 constrained min/max queries at all3 original PVT corners. All150 direct feedback paths are in configuration registers; fast hold slack0.176544–0.217264ns. All original electrical/timing guards pass. Best routing control remains133overflow. PreparedD090 isolated smaller-delay policy only on251 other delays with measured fast hold slack>=0.3ns; native geometry/connectivity/origin immutability and3-corner timing/electrical guards plus>=0.1ns hold gate required before routing. Focused selection/preservation/payload regressions21PASS locally. No frozen hardware edits or phase boxes ticked.
 **Cloud failure diagnosed:**38315996276 native editor crashes on BUG82 missing Liberty before swapMaster. Original fast-corner libraries now load after database load and before master edits; no policy or margin change. Local ordering regression added; cloud retry required.

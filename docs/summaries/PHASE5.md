@@ -21,6 +21,11 @@ Read-only hold allocation identifies590 delay cells and150 direct feedback paths
 in compact producer38167697696. D089 queries every delay path in the cloud before
 any repair changes; the best fanout-clean routing control still has133overflow.
 
+Measured smaller-delay producer38316322592 now passes native placement and
+3-corner estimated shell guards, saving455.4144µm² standard-cell footprint
+while retaining worsthold0.112282ns and unchanged chip outline/clock policy.
+Paired routing against the133 control is the next gate; no closure claim.
+
 Combined shell placement38168159774 improves146→133native overflow and111→91
 markers, still fails routing. Buffer producer38172225275 passes native legality
 and six preliminary electrical/timing guards; identical-policy routing is now

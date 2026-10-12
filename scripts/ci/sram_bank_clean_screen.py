@@ -13,8 +13,10 @@ from postgrt_timing import screen
 from sram_bank_plan import plan, placement_fragment, MACRO_LEF_SHA
 
 
-def configure(original, proposal, reserve=False):
-    if type(reserve) is not bool: raise ValueError("Timing reserve selection must be boolean")
+def configure(original, proposal, reserve=False, electrical=False):
+    if type(reserve) is not bool or type(electrical) is not bool:
+        raise ValueError("Repair selection must be boolean")
+    if reserve and electrical: raise ValueError("Repair modes must be independent")
     if (original.get('CLOCK_PERIOD') != 20 or original.get('PL_TARGET_DENSITY_PCT') != 56
             or original.get('SYNTH_STRATEGY') != 'AREA 1'
             or original.get('GRT_RESIZER_HOLD_SLACK_MARGIN') != .10
@@ -28,6 +30,14 @@ def configure(original, proposal, reserve=False):
     result = dict(original, GRT_ALLOW_CONGESTION=False, **placement_fragment(proposal))
     if reserve:
         result.update(GRT_RESIZER_SETUP_SLACK_MARGIN=1.0, GRT_RESIZER_HOLD_SLACK_MARGIN=.125)
+    if electrical:
+        result.update(RUN_POST_GRT_DESIGN_REPAIR=True,
+                      GRT_DESIGN_REPAIR_RUN_GRT=True,
+                      GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=0,
+                      GRT_DESIGN_REPAIR_MAX_SLEW_PCT=10,
+                      GRT_DESIGN_REPAIR_MAX_CAP_PCT=10,
+                      GRT_RESIZER_SETUP_SLACK_MARGIN=0.0,
+                      GRT_RESIZER_HOLD_SLACK_MARGIN=.125)
     return result
 
 
@@ -74,7 +84,7 @@ def repair_remaining_antennas(config, source, output, antenna):
     return states[0], json.loads(metrics[0].read_text())
 
 
-def main(reserve=False):
+def main(reserve=False, electrical=False):
     root = Path.cwd()
     trusted = json.loads(Path('/tmp/native-trusted-config.json').read_text())
     validate_inputs(root, json.loads(Path('/tmp/native-eco-source-run.json').read_text()),
@@ -89,8 +99,8 @@ def main(reserve=False):
     if len(macros) != 1 or len(std) != 1:
         raise ValueError('Missing or ambiguous pinned LEF geometry')
     proposal = plan(nl.read_text(), layout.read_text(), std[0], macros[0], clean_postgpl=True)
-    config = configure(trusted, proposal, reserve=reserve)
-    name = 'sram-bank-reserve' if reserve else 'sram-bank-clean'
+    config = configure(trusted, proposal, reserve=reserve, electrical=electrical)
+    name = 'sram-bank-electrical' if electrical else ('sram-bank-reserve' if reserve else 'sram-bank-clean')
     output = Path('runs/'+name+'-screen'); output.mkdir(exist_ok=False)
     (output/'proposal.json').write_text(json.dumps(proposal, indent=2)+'\n')
     path = Path('src/config_'+name.replace('-', '_')+'.json'); path.write_text(json.dumps(config, indent=2)+'\n')
@@ -107,6 +117,11 @@ def main(reserve=False):
     routing_logs = list(flow.glob('*-openroad-globalrouting/openroad-globalrouting.log'))
     if len(routing_logs) != 1: raise ValueError('Missing clean routing evidence')
     validate_overflow(routing_logs[0].read_text())
+    if electrical:
+        repairs = list(flow.glob('*-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log'))
+        if len(repairs) != 1 or 'repair_design' not in repairs[0].read_text():
+            raise ValueError('Missing executed native post-GRT electrical repair')
+        validate_overflow(repairs[0].read_text())
     source = checkpoint(flow)
     antenna = output/'antenna'
     run_step(config, source, antenna, ['OpenROAD.CheckAntennas'])
@@ -122,6 +137,9 @@ def main(reserve=False):
         official_signoff=False)
     if reserve:
         gates.update(timing_reserve_trial=True, setup_repair_target_ns=1.0, hold_repair_target_ns=.125)
+    if electrical:
+        gates.update(native_postgrt_electrical_repair=True, setup_repair_target_ns=0.0,
+                     hold_repair_target_ns=.125, slew_margin_pct=10, cap_margin_pct=10)
     (output/'gates.json').write_text(json.dumps(gates, indent=2)+'\n')
     if not ready: raise ValueError('Clean bank screen fails timing/50ps hold/antenna gate')
 
@@ -129,5 +147,8 @@ def main(reserve=False):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--reserve', action='store_true')
-    main(reserve=parser.parse_args().reserve)
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--reserve', action='store_true')
+    modes.add_argument('--electrical', action='store_true')
+    args = parser.parse_args()
+    main(reserve=args.reserve, electrical=args.electrical)

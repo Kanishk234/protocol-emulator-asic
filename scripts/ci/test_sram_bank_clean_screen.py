@@ -152,3 +152,29 @@ def test_clean_antennas_skip_repair_and_no_congestion_waiver(tmp_path, monkeypat
     source = tmp_path/'source.json'; metrics = {'antenna__violating__nets':0,'antenna__violating__pins':0}
     assert runner.repair_remaining_antennas({'GRT_ALLOW_CONGESTION':False},source,tmp_path,metrics) == (source,metrics)
     with pytest.raises(ValueError): runner.repair_remaining_antennas({'GRT_ALLOW_CONGESTION':True},source,tmp_path,metrics)
+
+
+def test_electrical_mode_preserves_contract_and_avoids_latch_setup_reserve(tmp_path, monkeypatch):
+    config, proposal = inputs(tmp_path, monkeypatch)
+    original = copy.deepcopy(config)
+    baseline = runner.configure(config, proposal)
+    result = runner.configure(config, proposal, electrical=True)
+    expected = dict(RUN_POST_GRT_DESIGN_REPAIR=True, GRT_DESIGN_REPAIR_RUN_GRT=True,
+        GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=0, GRT_DESIGN_REPAIR_MAX_SLEW_PCT=10,
+        GRT_DESIGN_REPAIR_MAX_CAP_PCT=10, GRT_RESIZER_SETUP_SLACK_MARGIN=0.0,
+        GRT_RESIZER_HOLD_SLACK_MARGIN=.125)
+    assert result == dict(baseline, **expected)
+    assert config == original
+    with pytest.raises(ValueError): runner.configure(config, proposal, reserve=True, electrical=True)
+    with pytest.raises(ValueError): runner.configure(config, proposal, electrical='yes')
+
+
+def test_electrical_workflow_uses_isolated_outputs_and_same_hardware():
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    w = yaml.safe_load((root/'.github/workflows/gds-sram-bank-electrical-screen.yaml').read_text())
+    steps = w['jobs']['harden']['steps']
+    assert any(s.get('run') == 'python workflow-src/scripts/ci/sram_bank_clean_screen.py --electrical' for s in steps)
+    assert w['jobs']['harden']['env']['CANDIDATE_SHA'] == '3393eea9a58c5cad9077cc360a8515d0e5ec8284'
+    upload = next(s for s in steps if 'upload-artifact@' in s.get('uses',''))
+    assert 'runs/sram-bank-electrical-screen/**' in upload['with']['path']

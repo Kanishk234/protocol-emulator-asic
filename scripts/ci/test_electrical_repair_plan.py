@@ -27,3 +27,24 @@ def test_unplanned_mutations_refused(fault):
 
 def test_unreviewed_physical_source_refused():
     with pytest.raises(ValueError,match='checkpoint'): plan('unreviewed','',None,None)
+
+
+def bus_case():
+    before='RM_IHPSG13_1P_512x16_c2_bm_bist ram (.A_ADDR({n8,n7,n6,n5,n4,n3,net,n1,n0}), .A_REN(ren)); sg13cmos5l_buf_1 driver (.A(in), .X(net));'
+    after=before.replace('n3,net,n1','n3,branch,n1')+' sg13cmos5l_buf_4 added (.A(net), .X(branch));'
+    p={'groups':[dict(buffer='added',net='branch',master='sg13cmos5l_buf_4',source_net='net',sinks=[('ram','A_ADDR[2]')])]}
+    return before,after,p
+
+
+def test_indexed_address_pin_matches_nine_bit_verilog_bus():
+    assert validate_change(*bus_case())
+
+
+@pytest.mark.parametrize('fault',['other_bit','wrong_target','width','non_bus'])
+def test_sram_bus_audit_preserves_every_unplanned_bit(fault):
+    before,after,p=bus_case()
+    if fault=='other_bit': after=after.replace('n8,n7','changed,n7')
+    elif fault=='wrong_target': after=after.replace('n3,branch,n1','branch,net,n1')
+    elif fault=='width': after=after.replace('n8,n7,','n8,')
+    else: after=after.replace('{n8,n7,n6,n5,n4,n3,branch,n1,n0}','address')
+    with pytest.raises(ValueError): validate_change(before,after,p)

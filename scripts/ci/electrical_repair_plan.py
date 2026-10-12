@@ -95,7 +95,21 @@ def validate_change(before, after, proposal):
     old,new=logical_cells(before),logical_cells(after)
     normalize=lambda v:v.strip().removeprefix('\\')
     def normalized(cells):
-        return {normalize(n):(m,tuple(sorted((p,normalize(v)) for p,v in pins))) for n,(m,pins) in cells.items()}
+        result={}
+        for n,(m,pins) in cells.items():
+            expanded=[]
+            for pin,value in pins:
+                if m=='RM_IHPSG13_1P_512x16_c2_bm_bist' and pin=='A_ADDR':
+                    value=value.strip()
+                    if not value.startswith('{') or not value.endswith('}'):
+                        raise ValueError('Unsupported SRAM address bus representation')
+                    bits=value[1:-1].split(',')
+                    if len(bits)!=9 or any(not b.strip() or '{' in b or '}' in b for b in bits):
+                        raise ValueError('Wrong nine-bit SRAM address bus')
+                    expanded.extend((f'A_ADDR[{8-i}]',normalize(b)) for i,b in enumerate(bits))
+                else: expanded.append((pin,normalize(value)))
+            result[normalize(n)]=(m,tuple(sorted(expanded)))
+        return result
     old,new=normalized(old),normalized(new)
     groups=proposal['groups']; added={g['buffer'] for g in groups}
     rewires={}

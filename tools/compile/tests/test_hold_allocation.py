@@ -29,3 +29,33 @@ def test_missing_path_is_retained_not_zero():
 ])
 def test_incomplete_or_invalid_observation_rejected(text):
     with pytest.raises(ValueError): parse_queries(text, {"hold1"})
+
+
+def test_existing_payload_authenticated_without_archive_overwrite(tmp_path):
+    import json
+    from cloud_hold_allocation import prepare_payload, cfg
+    unpack = tmp_path / "original_source"
+    bundle = unpack / "fanout_source"
+    bundle.mkdir(parents=True)
+    payload = bundle / "file"
+    payload.write_text("original")
+    (bundle / "manifest.json").write_text(json.dumps({
+        "source_odb_sdc_nl": cfg.EXPECTED, "files": {"file": cfg.sha(payload)}}))
+    assert prepare_payload(tmp_path / "archive-not-opened", unpack, cfg.sha(bundle / "manifest.json")) == bundle
+    assert payload.read_text() == "original"
+    payload.write_text("tampered")
+    with pytest.raises(ValueError, match="payload differs"):
+        prepare_payload(tmp_path / "archive-not-opened", unpack, cfg.sha(bundle / "manifest.json"))
+
+
+def test_existing_payload_manifest_cannot_escape_bundle(tmp_path):
+    import json
+    from cloud_hold_allocation import prepare_payload, cfg
+    unpack = tmp_path / "original_source"
+    bundle = unpack / "fanout_source"
+    bundle.mkdir(parents=True)
+    (unpack / "outside").write_text("outside")
+    (bundle / "manifest.json").write_text(json.dumps({
+        "source_odb_sdc_nl": cfg.EXPECTED, "files": {"../outside": "ignored"}}))
+    with pytest.raises(ValueError, match="payload differs"):
+        prepare_payload(tmp_path / "archive-not-opened", unpack, cfg.sha(bundle / "manifest.json"))

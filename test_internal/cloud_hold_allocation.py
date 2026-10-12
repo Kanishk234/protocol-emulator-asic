@@ -44,6 +44,25 @@ def parse_queries(text, names):
     return {mode: {name: records[name, mode] for name in sorted(names)} for mode in ("min", "max")}
 
 
+def prepare_payload(archive, unpack, manifest_sha="319504362ce877b895ea883a98d6414b868274b069bd5ace731be7d0d051feab"):
+
+    """Reuse authenticated producer payload without overwriting downloaded files."""
+    if not unpack.exists():
+        unpack.mkdir(exist_ok=False)
+        with tarfile.open(archive) as tf: tf.extractall(unpack, filter="data")
+    bundle = unpack / "fanout_source"
+    if cfg.sha(bundle / "manifest.json") != manifest_sha:
+        raise ValueError("Original manifest hash differs")
+    manifest = json.loads((bundle / "manifest.json").read_text())
+    if manifest["source_odb_sdc_nl"] != cfg.EXPECTED:
+        raise ValueError("Original manifest differs")
+    for name, digest in manifest["files"].items():
+        path = (bundle / name).resolve()
+        if not path.is_relative_to(bundle.resolve()) or cfg.sha(path) != digest:
+            raise ValueError("Original payload differs")
+    return bundle
+
+
 def main():
     OUT.mkdir(exist_ok=False)
     result = {"observation_complete": False, "physical_acceptance": False,
@@ -55,16 +74,7 @@ def main():
             if cfg.sha(SOURCE / name) != digest: raise ValueError("Producer view differs: " + name)
         archive = ROOT / "build/fanout-preflight-source.tar.gz"
         if cfg.sha(archive) != cfg.SOURCE_SHA: raise ValueError("Source archive differs")
-        unpack = SOURCE / "original_source"
-        unpack.mkdir(exist_ok=False)
-        with tarfile.open(archive) as tf: tf.extractall(unpack, filter="data")
-        bundle = unpack / "fanout_source"
-        manifest = json.loads((bundle / "manifest.json").read_text())
-        if manifest["source_odb_sdc_nl"] != cfg.EXPECTED: raise ValueError("Original manifest differs")
-        for name, digest in manifest["files"].items():
-            path = (bundle / name).resolve()
-            if not path.is_relative_to(bundle.resolve()) or cfg.sha(path) != digest:
-                raise ValueError("Original payload differs")
+        prepare_payload(archive, SOURCE / "original_source")
         config = json.loads((SOURCE / "config.json").read_text())
         if config.get("STA_EXTRA_CORNER_TCL_FILE") is not None:
             raise ValueError("Existing STA hook cannot be replaced")

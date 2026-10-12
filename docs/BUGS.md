@@ -1,5 +1,11 @@
 # Bugs
 
+## 80: Native observer argument is overwritten by a Tcl path
+- **Date:**2026-10-12.
+- **Symptom/check:**38287135030 completes native CUGR then adapter fails with PosixPath has no attribute collect.
+- **Root cause:** the new observer argument reused a name already assigned to the census Tcl script path in the shared runner.
+- **Fix/coverage:** distinct observer_module argument plus lexical-shadow regression; observer gate rejection remains per-case so both physical controls can be measured. CUGR weighted grid retains nonzero overflow and six tiny negative usage observations; signed values may be recorded without clamping, but cannot satisfy a clean gate. No success inferred from native returncode0.
+
 ## 79: Alternate-router adapter retains observer output directory
 - **Date:**2026-10-12.
 - **Symptom/check:**38286631182 fails before meaningful native routing with missing stage log under build/grid_observer; workflow uploads build/cugr and finds no artifact.

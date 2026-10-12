@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (strict electrical failure diagnosed; eight-buffer follow-up prepared)
+- Electrical repair38281277834 failed finalstrictgate, not crash. Actual27buffers applied; setupWS0all, fasthold53.5457ps, antenna0. REN/clockfailuresfixed; remaining electricalslow slew1/address2, fanout3each, cap0. Exactviolators _28813_/X12, _26701_/Y9, place8642/X9; address2slew614.024psvs595.200limit. Retrieved13reports+20checkpoint/pathviews selectively.
+- Diode additions exceeded2loadheadroom and affected previously compliant branches. Prepared residual screen fromexactfailedsource with timing/antenna pass; adds7fanoutBUF4 with4loadheadroom +1address2BUF4 near macro. 116.1216um2 and combinedsiteoverlap0. Keeps allprior27buffers/cells/diodes. No DRT/dispatch/publication/phase tick.
+- 101focused tests pass, actualparent27bufferconservation pass, compile/diff pass. BUG96 catches parentplan area-roundoff mismatch without weakening exact geometry/wiring audits. Next publish/launch reviewed residualgroup on scopedapproval; inspect allgates before any detailed routing.
+
+## 2026-10-12: Codex (publish and launch strict electrical repair screen)
+- Explicit approval executed: tools5045f28, CI746da10, docsf85c6c6 pushed to remote main. Remote head verified f85c6c674e34b183f0af92b61d75a9e607f738f5. [Electrical repair screen38281277834](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38281277834) dispatched on that exact head, initially queued.
+- Includes strict electrical gate correction and27buffer repair screen, no DRT. Unrelated pending files and local-only FIPE excluded; no hardware/config/template edits. Next inspect actual source/preflight/repair/export/overflow/antenna/allcorner timing and zero electrical counts. No Phase2 tick; launch receipt local.
+
 ## 2026-10-12: Codex (27-buffer electrical repair screen prepared)
 - Prepared exact-source finalDEF repair planner, identity-buffer Tcl binding, pinned-image wrapper, strict screen runner and separate workflow. Canonical27buffers:8clockBUF8,18dataBUF4,1RENBUF4; total464.4864um2. Sequential full-footprint allocator finds combined zerooverlap; REN buffer19.190um from macro pin center. Detailed legalization/power/pin access/timing still required.
 - Screen preserves all existing cells/diodes and planned sink connections; verifies fresh ODB-exported NL conservation, strict GRToverflow, refreshed antenna cleanup, allcorner timing/50pshold and zero electrical counts. No DRT. Custom-image diagnostic disclosed; official reproducibility remains outstanding.

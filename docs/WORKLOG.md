@@ -4,6 +4,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-10-12 (session94: reject smaller-cell route; congestion-driven placement)
 **Done:** actual paired38316844576SUCCESS collector, nativecontrol133/candidate145overflow andboth returncode1. ResultSHA c8b7a005…; rejectD090 for routing despite footprint/timing producer pass. PreparedD091 congestion-driven redistribution on original133control, retaining all masters/hold repairs and original clock/capacity policy. Native pin/die/row/connectivity/macro immutability and actual ROW power phase checks precede3-corner timing/electrical guards. Source control/actual row inventory passes3605CORE phase checks locally. Focused regressions43PASS. No localEDA, source/spec changes, native acceptance or phase boxes ticked.
+**Cloud launched:**38317781400 in_progress on6b3cc70; lint/docs SUCCESS, current test/unit/fabric pending at inspection. Frozen hardware sources unchanged.
 **Next step:** inspect D091 producer; if native/legal/power/timing guards pass, pair its routing with133control. Smaller footprints alone do not solve the routing bottleneck.
 
 ## 2026-10-12 (session93: native delay producer passes; route comparison prepared)

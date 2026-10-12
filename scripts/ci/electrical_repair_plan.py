@@ -186,7 +186,7 @@ def target_call(layout, proposal):
     calls=[]
     for resize in proposal.get('resizes',[]):
         pins=' '.join(word(p)+' '+word(n) for p,n in sorted(resize['pins'].items()))
-        calls.append('tripwire_size_native_hold100 {{'+word(resize['instance'])+' '+word(resize['old_master'])+' '+word(resize['new_master'])+' {'+pins+'}}}')
+        calls.append('tripwire_size_electrical {{'+word(resize['instance'])+' '+word(resize['old_master'])+' '+word(resize['new_master'])+' {'+pins+'}}}')
         x,y,o=resize['location']
         calls.append('tripwire_place_electrical_resize '+word(resize['instance'])+' '+word(resize['new_master'])+' {'+f'{x} {y} {o}'+'}')
     # Group each source's complete partition into one preflighted mutation.

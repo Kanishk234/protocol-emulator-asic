@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (targeted slew/fanout/hold screen prepared)
+- Prepared exact38283838612source follow-up:6BUF4fanout branches,1BUF1on singleholdleaf and NOR4_25245_strength1→2 with identicalpins. Totaladdedfootprint105.2352um2, combinedoverlap0. Holdbuffer1.920umfromendpoint; resizedcellmoves4.800um. Newmode uses legal lower-right rows instead of forcing everybufferaboveSRAM.
+- Runner audits bothparentrepairhistories and exactlatestfailedsource measurements; outgoing20ns/50ps/zeroelectrical/antenna/overflow gates unchanged. No DRT. DEFbracketnormalization BUG98 handles hostwdata8net.
+- 116focused tests pass; compile/bashsyntax/diff pass; actualsource synthetic7buffer/1resize conservation and Tclroundtrip pass. No physicalrun/commit/push/phaseboxes. Next publish reviewedgroups/launch on scopedapproval and inspect finalgates before routing.
+
+## 2026-10-12: Codex (corrected residual acceptance failure fully traced)
+- Corrected38283838612 reaches finalstrictgate; busauditpasses. Fast hold49.6594ps misses50ps by0.3406ps; setupWS0all. Slow9slew failures all trace NOR4_1_25245_/Y net19647/eight receivers. Fanout2all: hostwdata8flop47490/Q14loads(7diodes), place8808/X9loads(1diode). Cap0all; SRAMaddress2fixed. Artifact11762243560 selective42reports+14finalviews retrieved.
+- FinalDEF confirms hold endpoint45710/D net00296 from33530A21OI/Y is a single-sink leaf, enabling isolated hold repair. Next assess NOR4strength/loadisolation, remainingtwofanoutpartitions andholdleafbuffer with route stability; no thresholdwaiver, DRT, dispatch, publication orPhase2tick. Changeslocal.
+
+## 2026-10-12: Codex (publish validator correction and rerun approved residual screen)
+- Toolsba57efc/docs64023d7 pushed to main under existing approved residualexperiment bugfix scope. [Corrected screen38283838612](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38283838612) dispatched at64023d720a832189323a275d3fbdc1abcff4b1b9, initiallyqueued.
+- Same8buffer physicalpolicy/sites, source and20ns/50psconstraints; fix affects SRAMbus audit only. Next inspect actual antenna/timing/electrical gates. No DRT/Phase2tick; launchreceiptlocal.
+
 ## 2026-10-12: Codex (residual bus-pin validator fixed)
 - Run38282937757 failed connectivity audit after eight-buffer insertion/GRT with zerooverflow; no final timing/electrical gate. Exactsource artifact11762706145 retrieved8target views. Rootcause DEFindexed A_ADDR[2] versus Verilog9bitconcatenation, BUG97.
 - Fixed known SRAM address bus mapping, preserving exact unplannedbit checks. 106focused tests pass; actual failed-run baseline/repaired netlists now pass exact8bufferconservation. No physical policy/constraints changed. Next publish scoped bugfix and rerun existing approved residualscreen. No Phase2 tick.

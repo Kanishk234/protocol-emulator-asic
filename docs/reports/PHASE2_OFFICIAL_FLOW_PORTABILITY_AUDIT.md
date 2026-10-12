@@ -118,3 +118,23 @@ Prepared residual mode and separate gds-electrical-residual-screen from exact fa
 ## Residual audit bug fixed before rerun
 
 Run38282937757 reached eight-buffer insertion and zero-overflow GRT, then failed validate_change before antenna/timing qualification. Artifact11762706145 (351496425bytes). No final electrical or timing result exists. Reproduced exact failing sink: DEF A_ADDR[2] is represented inside nine-bit Verilog A_ADDR concatenation. BUG97 fixes explicit9bit mapping in validator, preserving exact comparison of every unplanned bit. Actual baseline/repaired netlists now pass exact eight-buffer conservation. 106focused tests pass including wrong-bit, wrong-width and unsupported representation refusal. Repair policy, sites, source and signoff constraints unchanged; rerun under existing approved residual experiment scope.
+
+
+## Corrected residual run reaches physical acceptance and fails
+
+Run38283838612 on64023d720a832189323a275d3fbdc1abcff4b1b9 fails final strict gate; bus validator now passes. Artifact11762243560,436539755bytes. SetupWS0all, holdfast49.6594ps (0.3406ps below50psgate), typical137.200ps, slow291.978ps. Electrical slew slow/typical/fast9/0/0, fanout2all, cap0all. The eight-buffer follow-up is not qualified and must not advance to DRT.
+
+Final physical connectivity independently traces nine slow slew rows to one NOR4_1_25245_/Y net_19647_: driver plus eight receivingpins, output slew2.619903ns versus2.5074limit. Thus these are one electrical root cause, not nine independent repairs. Fanout_47490_/Q drives host_wdata[8] with7functional+7diode loads (14total); place8808/X has8functional+1diode load(9total). SRAM address2 and earlier REN/clock failures are fixed. Worst fast hold path49331latch→45710flop ends33530A21OI/Y net_00296_, exclusively connected to45710/D in finalDEF.
+
+Next evaluate targeted isolation/strength on NOR4 load, partition two remaining data fanouts with diode reserve, and an identity delay buffer on the single hold leaf. Preserve actual repaired source; do not waive50pshold or electrical counts. Repeated full GRT/antenna cleanup shifts failures to other long nets, so further repair must also assess route stability rather than merely add loads and reroute blindly. No new physical proposal has been qualified or launched.
+
+
+## Targeted slew/fanout/hold follow-up prepared
+
+Prepared --finish mode and separate gds-electrical-finish-screen from exact run38283838612/head64023d720a832189323a275d3fbdc1abcff4b1b9, finalDEF SHA5a436a81e547204e1ffbb73830664a8245b2844a5e3dad76ae85a2adf2188cfd. Incoming failed source is accepted only for repair with its exact unqualified receipt and measured0setup/49.6594psfast hold/9slow slew/2fanout/cap0/finalantenna0. Both preceding27buffer and8buffer canonical plans/netlist histories are audited before using this source. Output50pshold and zeroelectrical acceptance gates remain unchanged.
+
+Proposed6BUF4fanout branches for host_wdata[8] and place8808, with4loadbudget/headroom;1BUF1identity delay only on33530/Y→45710/D net00296; and NOR4_1_25245_→NOR4_2 strength change with identical A/B/C/D/Y and supply connectivity. No other masters/clock/reset pins change. BUF1site672.480,37.800FS is1.920um from endpoint. NOR4 replacement legal footprint allocated444.960,366.660N,4.800um displacement. Newbufferfootprint94.3488um2 plus resize10.8864um2, total105.2352um2. Allplanned footprints reserved together, zerooverlap; physical legalization/power/pinaccess/timing still required.
+
+Previous allocator excluded every row below SRAM top, even far-right rows; new mode admits lower-row segments only to right ofx260um while preserving lower-left macro exclusion. This avoids forcing lower-right repair buffers far above the SRAM and unnecessarily stretching their nets. Same strict zerooverflow/antenna/allcorner/electrical checks; no DRT. Bracket-escaped DEF source net normalization now aligns literal OpenDB/Verilog identities (BUG98).
+
+116focused tests, compile/bash syntax/diff checks pass. Actual final netlist accepts a synthetic exact seven-buffer/one-resize conservation replay, including allold cells/diodes; actualsource Tcl parses7buffer/1resize operations. These checks verify proposal/audit representation, not physical behavior. Publishedpinnedimagewrapper adds existing master/pin/supply guarded sizing helper and placement binding. Custom-image diagnostic/officialportability limits remain. Physicalrun and publication pending approval.

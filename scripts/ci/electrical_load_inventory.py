@@ -6,7 +6,8 @@ from pathlib import Path
 import re
 
 
-def inventory(layout, checks):
+def inventory(layout, checks, data_budget=6):
+    if data_budget not in (4,6): raise ValueError('Unreviewed antenna headroom budget')
     components = layout.split('COMPONENTS ', 1)[1].split('END COMPONENTS', 1)[0]
     masters = {n: m for n, m in re.findall(r'^\s*- (\S+) (\S+)', components, re.M)}
     section = layout.split('\nNETS ', 1)[1].split('END NETS', 1)[0]
@@ -33,7 +34,7 @@ def inventory(layout, checks):
             raise ValueError('Unreviewed clock topology')
         if not clock and any(p in ('CLK', 'GCLK', 'GATE', 'RESET_B') for n, p in sinks):
             raise ValueError('Data split contains clock/reset sinks')
-        budget = 8 if clock else 6
+        budget = 8 if clock else data_budget
         options = [(k, keep) for k in range(1, 9) for keep in range(budget + 1)
                    if keep + k <= budget and 0 < len(sinks) - keep <= budget * k]
         k, keep = min(options, key=lambda v: (v[0], -v[1]))

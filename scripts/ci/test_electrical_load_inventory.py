@@ -37,3 +37,13 @@ def test_clock_branch_with_data_load_refused():
 def test_missing_ren_refused():
     layout, report = fixture()
     with pytest.raises(ValueError, match='SRAM REN'): inventory(layout.replace('A_REN','OTHER'), report)
+
+
+def test_four_load_headroom_is_explicit_and_bounded():
+    layout,report=fixture()
+    x=inventory(layout,report,data_budget=4)
+    d=x['drivers'][0]
+    assert d['group_load_budget']==4
+    assert d['retained_loads']+d['proposed_buffers']<=4
+    assert d['loads']-d['retained_loads']<=4*d['proposed_buffers']
+    with pytest.raises(ValueError): inventory(layout,report,data_budget=8)

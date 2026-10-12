@@ -39,3 +39,29 @@ def test_workflow_frozen_hardware_exact_source_and_separate_output():
     assert any(s.get('run')=='python workflow-src/scripts/ci/electrical_repair_screen.py' for s in steps)
     upload=next(s for s in steps if 'upload-artifact@' in s.get('uses',''))
     assert 'runs/electrical-repair-screen/**' in upload['with']['path']
+
+
+@pytest.mark.parametrize('fault',['none','failed_timing','wrong_head','claimed_pass'])
+def test_residual_source_accepts_only_known_electrical_failure(fault):
+    from electrical_repair_screen import validate_residual_provenance
+    run=dict(id=38281277834,head_sha='f85c6c674e34b183f0af92b61d75a9e607f738f5',head_branch='main',conclusion='failure',path='.github/workflows/gds-electrical-repair-screen.yaml')
+    gates=dict(source_run=38272508875,qualified=False,timing_antenna_qualified=True,
+        electrical_qualified=False,added_buffers=27,minimum_fast_hold_ns=.05,
+        physical_screen_only=True,custom_image=True,official_signoff=False)
+    if fault=='failed_timing': gates['timing_antenna_qualified']=False
+    elif fault=='wrong_head': run['head_sha']='other'
+    elif fault=='claimed_pass': run['conclusion']='success'
+    if fault=='none': validate_residual_provenance(run,gates)
+    else:
+        with pytest.raises(ValueError): validate_residual_provenance(run,gates)
+
+
+def test_parent_plan_only_tolerates_area_roundoff():
+    from electrical_repair_screen import same_plan
+    a=dict(added_footprint_um2=464.4864,groups=[{'sinks':[('one','A')]}])
+    b=dict(added_footprint_um2=464.4863999999999,groups=[{'sinks':[['one','A']]}])
+    assert same_plan(a,b)
+    b['added_footprint_um2']=465
+    assert not same_plan(a,b)
+    b['added_footprint_um2']=464.4864;b['groups'][0]['sinks'][0][0]='other'
+    assert not same_plan(a,b)

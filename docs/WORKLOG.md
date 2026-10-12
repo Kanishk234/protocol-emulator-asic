@@ -4,6 +4,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-10-12 (session89: calibrated observer and alternate routing engine)
 **Done:** actual38282629603SUCCESS observer collection, underlying146/133routes remainfail. Strict nativegrid parser independently matches eachMetal1–4overflow to original table,10 malformedgrid/guide fixturesPASS. PreparedD088CUGR comparison on identical physical inputs/capacity/margins, nativeerrors retained; requires complete grid, zero overflow and complete guide census before even global-route acceptance. Extended own paired runner with optional observation hooks; defaultFastRoute checks unchanged. No localEDA/hardware/spec changes or phase boxes ticked.
+Launched alternate-engine38286631182. Stopped obsolete rejected five-cell replay38286631115 accidentally triggered by shared observer refactor; made that own workflow manual-only to avoid stale automatic runs. Existing duplexunit38282629451SUCCESS.
 **Next step:** inspect actual CUGR API/guide/overflow outcomes and latestduplexCI; only a positive native result can proceed to detailed routing and fullsamebuild signoff. Preserve133control and passing fallback demos.
 
 ## 2026-10-12 (session88: original5x3 status and measured pin-access qualification)

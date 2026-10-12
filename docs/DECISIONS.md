@@ -740,3 +740,23 @@ This changes one algorithm policy, adds no hardware/area/protocol block, and
 benefits no protocol until matched physical/function/timing qualification. A
 zero-overflow result would still require detailed routing and full sign-off.
 Primary source: [OpenROAD global routing](https://openroad.readthedocs.io/en/latest/main/src/grt/README.html).
+
+## D-086: Test horizontal mirroring with unchanged placement bboxes
+
+**Date:**2026-10-12. **Status:** copied-checkpoint native producer pending.
+ActualD085 seed41 worsens combined133→143; seed0 reproduces133. Resource
+totals match acrossseeds for eachphysicalplacement. Rejectseed41 as a gain.
+Next test uses pinned optimize_mirroring to change cell pin access without
+shifting bboxes, adding cells, altering masters/netlists or changing clock/routing
+capacity. Reproduce exactcombined26move control and authenticate its census,
+geometry/result; then allow only horizontal mirrors of movable CORE cells.
+All3606bboxes, masters, connections and statuses stayexact; vertical orientation
+phase must match. Macro/fixed changes or unsupported transforms reject.
+Native legality and all six electrical/preliminary setup/hold guards precede
+routing; no geometric/HPWL gain implies congestion improvement.
+
+This is one placement policy, no architecture/resource/area/protocol change.
+Every loaded design pays any wiring/timing tradeoff; no successor promotion or
+protocol rate claim follows. Tool primary documentation describes a wirelength
+heuristic, not a congestion guarantee:
+[OpenROAD detailed placement](https://openroad.readthedocs.io/en/latest/main/src/dpl/README.html).

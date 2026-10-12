@@ -201,3 +201,9 @@ The live-process experiment failed before its first global route, because the pl
 ### Live repair route audit — 38302884774
 
 The LOCKED correction worked. The actual routing process retained initialized capacity (final demand241307), zero overflow, all original placements and exact intended ten-buffer connectivity. The buffer phase changed only its14planned nets. Native antenna repair then inserted6jumpers and3diodes on9nets; the final audit stopped before STA because it allowed only new-diode nets. BUG102 records this incomplete evidence rule. The revised wrapper captures the pinned nonverbose checker report before antenna repair, and the audit allows only reported violating nets plus strictly verified added-diode nets. Unrelated routes remain rejected. Local32focused tests pass; a physical rerun and final strict timing/electrical checks remain required.
+
+### Strict screen qualifies — 38304235648
+
+Actual artifact11772311428 confirms zero slew/fanout/cap violations in every corner, zero antenna violations and zero routing overflow. Setup worst slack is0ns in fast/typ/slow corners; hold is56.7571/140.803/291.967ps respectively. The fast margin exceeds the50ps gate by6.7571ps. The full initial rebase changes7915nets; only the subsequent14planned buffer and9antenna route edits are covered by the preservation claim. All qualification gates are true. These are estimated global-routing results, not extracted timing or official signoff.
+
+The prepared exact-source continuation uses the stock image, rechecks all screen gates, routes the measured checkpoint without repeating ECO/GRT, validates a fresh routed netlist and zeroDRC, and runs extraction with unchanged signoff constraints. Its final success requires nonnegative all-corner setup/hold, at least50ps fast hold and zero electrical/antenna violations after extraction. Local61focused tests pass. Official full GDS/LVS/precheck/GL and clean-flow reproducibility still remain.

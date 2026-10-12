@@ -5,10 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (strict electrical screen passes; DRT continuation prepared)
+- Independently inspected actual [38304235648](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38304235648) artifact11772311428: qualified timing/electrical/antenna gates true; setupWS0allcorners; fast/typ/slow hold56.7571/140.803/291.967ps. Slew/fanout/cap0allcorners; antenna0; overflow0; livecapacity and postrebase preservation gates pass. Initialfullroute changes7915nets, then audited14buffer+9antenna nets; no claim oldgold routes survived fullrebase.
+- Prepared exact-source stock DRT/extraction continuation: fresh allcorner electrical/timing/antenna gate beforeDRT; preserve final measuredODB and freshNL/PNL; validate routedNL; require DRT0 then extracted timing/50pshold/electrical/antenna gate. No repair/GRT replay; custom screen image removed before routing. Full2/4 hardware/20ns/constraints fixed.
+- 61focused tests pass including source/head/view refusal, preDRT hold/electrical/antenna failures and postextraction failures. Next publish/launch continuation, inspect actual extracted outcome. NoPhase2tick or officialGDS claim.
+
 ## 2026-10-12: Codex (live routing succeeds; jumper audit corrected)
 - Run38302884774 failed after routing, before STA. Inspected selectively downloaded actual segments/DEF/NL: buffer edits change exactly14planned routes; antenna phase changes9nets, with6jumpers/3diodes in log. Live final demand241307 and zerooverflow. Previous LOCKED fix succeeded.
 - BUG102: audit omitted jumper-only antenna repairs. Verified pinned checker API/report source; capture nonverbose pre-repair violating-net report and allow only its nets plus validated added-diode nets. Preserve strict old-placement/connectivity and unrelated-route guards; missing report cannot pass.
-- 32focused tests pass, shell syntax/diff checks pass. Next publish corrected helper/tests and evidence, launch new screen; require final all-corner electrical/timing/antenna qualification before DRT. No Phase2 ticks or new timing claim.
+- Published helpers678deeb/docsf069c10; remote main verified f069c10f3fe6cb7f29a987d2e8c0c7669ce72fec. Corrected [screen38304235648](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38304235648) confirmed in_progress on that head. Launch receipt local.
+- 32focused tests pass, shell syntax/diff checks pass. Next inspect corrected screen; require final all-corner electrical/timing/antenna qualification before DRT. No Phase2 ticks or new timing claim.
 
 ## 2026-10-12: Codex (approved placement fix pushed; corrected screen launched)
 - User explicitly authorized the supplied commands. Published helper/test commit90287ee and evidence commit8f61c70; verified remote main8f61c703c159da7c3b8921db459e9d4954e0893e.

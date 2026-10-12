@@ -63,3 +63,24 @@ Recovery requires application-level synchronization or reset/reload.
 Build with `cc -std=c99 -Wall -Wextra -Werror -c warp_host.c`. The native
 tests compile and execute a scripted callback harness under pytest; they
 validate wire framing/backpressure/error handling, not silicon behavior.
+
+## Bounded duplex service
+
+`warp_channel_duplex` services up to one incoming byte, then one outgoing byte
+per round. A full TX queue does not block polling/draining RX, and an empty RX
+queue does not block sending TX. Use disjoint buffers and progress pointers,
+exclusive host ownership and an explicit maximum round count. The final `last`
+flag belongs only to the final outgoing byte.
+
+On timeout, both counters identify confirmed prefixes; the caller can resume
+the remaining slices. On I/O failure the current transaction may have been
+accepted despite the callback failure: retain reported progress but resolve
+that ambiguity before retrying. Other state/errors stop immediately. No heap,
+automatic RUN, bulk hardware opcode or unbounded polling is introduced.
+
+45 focused C wire/model tests pass locally, including independent shell-model
+backpressure, ordered duplex bytes/last flags, partial progress and a write
+accepted before I/O failure. This is transaction-level verification; callback
+timing, real board performance and cycle-level SPI validation remain separate.
+The current budget planner remains single-direction and does not certify this
+round-robin service's full-duplex throughput.

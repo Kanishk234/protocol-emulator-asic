@@ -25,4 +25,10 @@ int warp_channel_write_many(warp_host *, const uint8_t *, size_t length,
                             int last, size_t polls_per_byte, size_t *completed);
 int warp_channel_read_many(warp_host *, uint8_t *, size_t length,
                            size_t polls_per_byte, size_t *completed);
+/* Read-first round-robin: at most one byte per direction per round.
+ * Buffers must be disjoint. Timeout reports confirmed progress for both lanes.
+ * Empty RX/full TX skips that lane; other state/IO errors stop immediately. */
+int warp_channel_duplex(warp_host *, const uint8_t *tx, size_t tx_length,
+                        int last, uint8_t *rx, size_t rx_length, size_t rounds,
+                        size_t *tx_completed, size_t *rx_completed);
 #endif

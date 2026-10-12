@@ -52,6 +52,8 @@ def driver(tmp_path_factory):
     lib.warp_load_words.argtypes = [ct.POINTER(Host), ct.c_uint16,
                                     ct.POINTER(ct.c_uint32), SIZE, SIZE]
     lib.warp_load_wbit.argtypes = [ct.POINTER(Host), ct.POINTER(U8), SIZE, SIZE]
+    lib.warp_channel_duplex.argtypes = [ct.POINTER(Host), ct.POINTER(U8), SIZE,
+        ct.c_int, ct.POINTER(U8), SIZE, SIZE, ct.POINTER(SIZE), ct.POINTER(SIZE)]
     return lib
 
 
@@ -329,3 +331,68 @@ def test_wbit_reserved_and_arch_bytes_match_python_format(driver):
     assert driver.warp_load_wbit(ct.byref(bridge.host), data, len(raw), 1) == 0
     assert [0x10, 0x12, 0x34, 0, 1] in bridge.transactions
     assert model.state == LOADED and not bridge.errors
+
+
+def test_duplex_backpressure_preserves_both_lanes_and_last(driver):
+    model = running_model()
+    sent = list(range(47))
+    incoming = [255 - i for i in range(61)]
+    pending = incoming.copy()
+    consumed = []
+    calls = [0]
+    def peer(m, command):
+        calls[0] += 1
+        if m.tx and calls[0] % 7 == 0:
+            consumed.append(m.tx.pop(0))
+        if pending and len(m.rx) < FIFO_DEPTH:
+            m.rx.append(pending.pop(0))
+    bridge = Bridge(model, peer)
+    tx = (U8 * len(sent))(*sent)
+    rx = (U8 * len(incoming))()
+    nt, nr = SIZE(), SIZE()
+    assert driver.warp_channel_duplex(ct.byref(bridge.host), tx, len(sent), 1,
+        rx, len(incoming), 500, ct.byref(nt), ct.byref(nr)) == 0
+    consumed.extend(model.tx)
+    assert consumed == [(v, int(i == len(sent)-1)) for i, v in enumerate(sent)]
+    assert list(rx) == incoming and (nt.value, nr.value) == (len(sent),len(incoming))
+    assert not model.overflow and not bridge.errors
+
+
+def test_duplex_timeout_reports_both_confirmed_prefixes(driver):
+    model = running_model()
+    model.rx = [0, 255]
+    bridge = Bridge(model)
+    tx = (U8 * 4)(1,2,3,4)
+    rx = (U8 * 3)(99,99,99)
+    nt, nr = SIZE(), SIZE()
+    assert driver.warp_channel_duplex(ct.byref(bridge.host), tx, 4, 1,
+        rx, 3, 3, ct.byref(nt), ct.byref(nr)) == 1
+    assert (nt.value,nr.value)==(2,2) and list(rx)==[0,255,99]
+    assert model.tx==[(1,0),(2,0)] and not model.overflow and not bridge.errors
+
+
+def test_duplex_stopped_or_zero_rounds_do_not_send(driver):
+    model = running_model(); model.transaction([STOP])
+    bridge = Bridge(model);tx=(U8 * 1)(7);rx=(U8 * 1)();nt,nr=SIZE(),SIZE()
+    assert driver.warp_channel_duplex(ct.byref(bridge.host),tx,1,0,rx,1,1,
+        ct.byref(nt),ct.byref(nr))==2
+    assert not model.tx and not model.rx and nt.value==nr.value==0
+    bridge.transactions.clear()
+    assert driver.warp_channel_duplex(ct.byref(bridge.host),tx,1,0,rx,1,0,
+        ct.byref(nt),ct.byref(nr))==1
+    assert not bridge.transactions
+
+
+def test_duplex_ambiguous_write_stops_without_retry(driver):
+    model=running_model();commands=[]
+    def fail_after_accept(context,tx,rx,n):
+        command=list(tx[:n]);commands.append(command)
+        result=model.transaction(command)
+        for i,v in enumerate(result):rx[i]=0 if v is None else v
+        return int(command[0]==CH_WRITE)
+    callback=TRANSFER(fail_after_accept);host=Host(callback,None)
+    data=(U8 * 1)(0xA5);nt,nr=SIZE(),SIZE()
+    assert driver.warp_channel_duplex(ct.byref(host),data,1,1,None,0,9,
+        ct.byref(nt),ct.byref(nr))==3
+    assert nt.value==nr.value==0 and model.tx==[(0xA5,1)]
+    assert sum(c[0]==CH_WRITE for c in commands)==1

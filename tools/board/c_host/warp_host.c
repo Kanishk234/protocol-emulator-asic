@@ -192,3 +192,33 @@ int warp_channel_read_many(warp_host *host, uint8_t *data, size_t length,
     }
     return WARP_OK;
 }
+
+int warp_channel_duplex(warp_host *host, const uint8_t *tx, size_t tx_length,
+                        int last, uint8_t *rx, size_t rx_length, size_t rounds,
+                        size_t *tx_completed, size_t *rx_completed)
+{
+    size_t round;
+    if (!tx_completed || !rx_completed || tx_completed == rx_completed)
+        return WARP_ARGUMENT;
+    *tx_completed = 0; *rx_completed = 0;
+    if (!host || !host->transfer || (!tx && tx_length) || (!rx && rx_length))
+        return WARP_ARGUMENT;
+    for (round = 0; round < rounds; ++round) {
+        int rc;
+        if (*rx_completed < rx_length) {
+            rc = warp_channel_read(host, rx + *rx_completed, 1);
+            if (rc == WARP_OK) ++*rx_completed;
+            else if (rc != WARP_TIMEOUT) return rc;
+        }
+        if (*tx_completed < tx_length) {
+            rc = warp_channel_write(host, tx[*tx_completed],
+                     last && *tx_completed == tx_length - 1, 1);
+            if (rc == WARP_OK) ++*tx_completed;
+            else if (rc != WARP_TIMEOUT) return rc;
+        }
+        if (*tx_completed == tx_length && *rx_completed == rx_length)
+            return WARP_OK;
+    }
+    return *tx_completed == tx_length && *rx_completed == rx_length
+           ? WARP_OK : WARP_TIMEOUT;
+}

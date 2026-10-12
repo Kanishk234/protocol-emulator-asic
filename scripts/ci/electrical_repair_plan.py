@@ -15,10 +15,12 @@ RESIDUAL_DEF_SHA = '1f037dcdee9826d876c82ecd7ce71c699e342df4fea4bb83c373ed5cc13d
 
 FINISH_DEF_SHA = '5a436a81e547204e1ffbb73830664a8245b2844a5e3dad76ae85a2adf2188cfd'
 
-def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False):
-    if type(residual) is not bool or type(finish) is not bool or (residual and finish): raise ValueError('Invalid repair selection')
-    source_sha = FINISH_DEF_SHA if finish else (RESIDUAL_DEF_SHA if residual else DEF_SHA)
-    prefix = 'tripwire_finish' if finish else ('tripwire_residual' if residual else 'tripwire_electrical')
+INCREMENTAL_DEF_SHA='7626616e05699cffde246ab26e501d212a2d889d6671ed7a8186796fb49137a1'
+
+def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False, incremental=False):
+    if any(type(v) is not bool for v in (residual,finish,incremental)) or sum((residual,finish,incremental))>1: raise ValueError('Invalid repair selection')
+    source_sha = INCREMENTAL_DEF_SHA if incremental else (FINISH_DEF_SHA if finish else (RESIDUAL_DEF_SHA if residual else DEF_SHA))
+    prefix = 'tripwire_incremental' if incremental else ('tripwire_finish' if finish else ('tripwire_residual' if residual else 'tripwire_electrical'))
     if hashlib.sha256(layout.encode()).hexdigest() != source_sha:
         raise ValueError('Wrong final electrical checkpoint')
     if hashlib.sha256(macro_lef.read_bytes()).hexdigest() != MACRO_LEF_SHA:
@@ -27,7 +29,7 @@ def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False):
         raise ValueError('Wrong DEF units')
     if not re.search(r'- u_chip.u_sram.sram RM_IHPSG13_1P_512x16_c2_bm_bist\s+\+ FIXED \( 12000 40000 \) FS', layout):
         raise ValueError('Wrong SRAM placement')
-    audit = inventory(layout, checks, data_budget=4 if residual or finish else 6)
+    audit = inventory(layout, checks, data_budget=4 if residual or finish or incremental else 6)
     sizes = {}
     boxes = None
     for master in (('sg13cmos5l_buf_4','sg13cmos5l_buf_8','sg13cmos5l_buf_1','sg13cmos5l_nor4_2') if finish else ('sg13cmos5l_buf_4','sg13cmos5l_buf_8')):
@@ -36,8 +38,8 @@ def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False):
         if boxes is None: boxes = occupied
     rows = [(int(x),int(y),o,int(n),int(p)) for x,y,o,n,p in re.findall(
         r'^ROW \S+ CoreSite (\d+) (\d+) (N|FS) DO (\d+) BY 1 STEP (\d+) 0 ;', layout,re.M)
-        if finish or int(y)>=241920]
-    if finish:
+        if finish or incremental or int(y)>=241920]
+    if finish or incremental:
         # Lower rows are usable to the right of the SRAM halo. Do not force
         # remote lower-right sinks up above the macro. Keep lower-left excluded.
         rows=[(x+max(0,(260000-x+p-1)//p)*p,y,o,n-max(0,(260000-x+p-1)//p),p)
@@ -63,7 +65,21 @@ def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False):
                 target=[sum(positions[n][j] for n,p in sinks)//length for j in range(2)],
                 kind='clock' if driver['clock_branch'] else 'data'))
     resizes=[]
-    if finish:
+    if incremental:
+        # This library has no NAND3_2. Shorten the weak NAND3 output load by
+        # feeding two local BUF4s, preserving every prior functional/diode sink.
+        sections=layout.split('\nNETS ',1)[1].split('END NETS',1)[0]
+        entry=re.search(r'^\s*- _03831_\s+([^;]+);',sections,re.M)
+        terms=re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry[1]) if entry else []
+        sinks=sorted(p for p in terms if p!=('_28807_','Y'))
+        if len(sinks)!=6 or not re.search(r'- _28807_ sg13cmos5l_nand3_1\b',layout):
+            raise ValueError('Changed weak NAND3 source')
+        for index in range(2):
+            selected=sinks[index*3:(index+1)*3]
+            groups.append(dict(buffer=prefix+'_slew'+str(index),net=prefix+'_slew_net'+str(index),
+                source_net='_03831_',rail_source='_28807_',master='sg13cmos5l_buf_4',
+                sinks=selected,target=list(positions['_28807_']),kind='slew-isolation'))
+    elif finish:
         sections=layout.split('\nNETS ',1)[1].split('END NETS',1)[0]
         nets={}
         for entry in sections.split(';'):
@@ -112,7 +128,7 @@ def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False):
         width,height=sizes[group['master']];x,y,o=group['location']
         if any(n!=group['buffer'] and l<x+width and r>x and b<y+height and t>y
                for n,l,b,r,t in boxes): raise ValueError('Combined repair overlap')
-    result = dict(source_run=38283838612 if finish else (38281277834 if residual else 38272508875),def_sha256=source_sha,groups=groups,
+    result = dict(source_run=38294805019 if incremental else (38283838612 if finish else (38281277834 if residual else 38272508875)),def_sha256=source_sha,groups=groups,
         added_buffers=len(groups),added_footprint_um2=sum(sizes[g['master']][0]*sizes[g['master']][1]/1e6 for g in groups),
         footprint_overlap_count=0,source_connectivity_verified=True,
         detailed_legalization_required=True,power_connectivity_verified=False,
@@ -172,7 +188,7 @@ def validate_change(before, after, proposal):
 def target_call(layout, proposal):
     if (hashlib.sha256(layout.encode()).hexdigest()!=proposal['def_sha256']
             or (proposal['source_run'],proposal['def_sha256']) not in
-            {(38272508875,DEF_SHA),(38281277834,RESIDUAL_DEF_SHA),(38283838612,FINISH_DEF_SHA)}):
+            {(38272508875,DEF_SHA),(38281277834,RESIDUAL_DEF_SHA),(38283838612,FINISH_DEF_SHA),(38294805019,INCREMENTAL_DEF_SHA)}):
         raise ValueError('Wrong repair source')
     components=layout.split('COMPONENTS ',1)[1].split('END COMPONENTS',1)[0]
     masters=dict(re.findall(r'^\s*- (\S+) (\S+)',components,re.M))

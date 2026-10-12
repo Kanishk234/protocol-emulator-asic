@@ -1,0 +1,4 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY --chmod=755 openroad_electrical_incremental_wrapper.sh /usr/local/bin/tripwire-electrical-incremental
+COPY electrical_repair.tcl incremental_placement.tcl electrical_incremental_targets.tcl /usr/local/share/tripwire/
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-electrical-incremental

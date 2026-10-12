@@ -1,0 +1,50 @@
+name: compact measured delay rebalance paired routing
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_delay_rebalance_grt.py'
+      - '.github/workflows/delay_rebalance_grt.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-delay-rebalance-grt-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch exact measured baseline and padded producer
+        timeout-minutes: 12
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+          timeout 120s gh run download 38167697696 -R "$GITHUB_REPOSITORY" --name compact-reset-combined-38167697696 --dir build/delay_rebalance_grt_input/baseline
+          timeout 120s gh run download 38316322592 -R "$GITHUB_REPOSITORY" --name compact-delay-rebalance-38316322592 --dir build/delay_rebalance_grt_input/padded
+          timeout 120s gh run download 38315257114 -R "$GITHUB_REPOSITORY" --name compact-hold-allocation-38315257114 --dir build/delay_rebalance_grt_input/timing
+          timeout 120s gh run download 38101639866 -R "$GITHUB_REPOSITORY" --name compact-fanout-local-grt-38101639866 --dir build/delay_rebalance_grt_input/previous
+      - name: Provision pinned EDA image before native timers
+        timeout-minutes: 5
+        run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"
+      - name: Paired unchanged policy and native hotspot collection
+        timeout-minutes: 34
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_delay_rebalance_grt.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-delay-rebalance-grt-${{ github.run_id }}
+          path: build/delay_rebalance_grt/
+          retention-days: 3

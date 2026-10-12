@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-11: Codex (diagnose clean critical paths; prepare reserve trial)
+- RetrievedcleanDRTviews/pathreports. WorstsetupU0configword0bit4→dropped[67] viaweak37732NAND2_1(0.962903ns); earlierstrengthECOs/place7307BUF4 absentfromcleanbuild, so no causalclaimSRAMlocalityalonecausedregression. WorstholdU3RXrt[6]46988, differentfromold46597proposal; avoidblindholdstack.
+- Prepared nativeclean --reserve screen: same16bufferplacement/frozen2/4stockrecipe, GRTsetupmargin1.0ns/holdtarget125ps only,20ns/SDC/50psgate fixed, separateworkflow/output.142focusedtests/compile/diffpass. Physicalreserveunexecuted; nextpublishreviewedgroups under scopedapproval andscreen thenextraction. No phaseboxes/dispatch/mainconfig/template edits; unrelatedfiles/FIPE excluded.
+
+## 2026-10-11: Codex (clean bank extracted result; all-main workflows refresh)
+- Cleanroute38188484920success; latestlint38188478952/test38188479048/docs38188478991/unit38188479068success. No maininprogress; olderplacementGL37655518919/timing37655518925queued. Artifact11721449509selectivelyretrieved aftermetadatareviewtimeout/retry; allcompleteelectricalreports independentlymatchsavedsummary.
+- Extracted timing: timing__setup__ws__corner:nom_fast_1p32V_m40C=0ns, timing__hold__ws__corner:nom_fast_1p32V_m40C=0.04055866868268371ns, timing__setup__ws__corner:nom_slow_1p08V_125C=-0.7372378471931175ns, timing__hold__ws__corner:nom_slow_1p08V_125C=0.28533953785188937ns, timing__setup__ws__corner:nom_typ_1p20V_25C=0ns, timing__hold__ws__corner:nom_typ_1p20V_25C=0.13197443511573353ns.
+- Electrical: nom_fast_1p32V_m40C {'slew': 2, 'fanout': 17, 'capacitance': 1}, nom_slow_1p08V_125C {'slew': 134, 'fanout': 17, 'capacitance': 1}, nom_typ_1p20V_25C {'slew': 19, 'fanout': 17, 'capacitance': 1}. No phaseclosureinferred fromworkflowgreen; next inspectexactcriticalpaths/loads andcomparecleanvsretainedECOparent beforepolicyrepair/adoption. No newdispatch/phaseboxes.
+
+## 2026-10-11: Codex (publish and launch clean SRAM bank extraction)
+- Explicit approval executed: tools25cedd5, CI656293f, docs830c75a pushed to remote main. Exact remote head830c75ad0f74376df9c686b75e3ca9aa91c6df64 verified. [Clean SRAM bank routing/extraction38188484920](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38188484920) queued on that exactcommit.
+- Next inspect freshDRTNL conservation, routeDRC/antenna and extracted allcorner timing/electrical before nextrepair/adoption. No phaseboxes/mainconfig/templatejobchanges. Unrelatedfiles/FIPE/holdproposal/residualreport pendingchanges excluded fromcommits; launchreceiptlocal.
+
 ## 2026-10-11: Codex (audit clean bank; prepare extracted continuation)
 - Retrieved177selected views/config/historyfiles. Actualcanonicalcleanproposal/fullrecipe/reference pre-GPL topology/manual+DPL16positions/zerooverflow/post-cleanupantenna0 and allcorner50ps gate audits pass. FreshsourceODB is cleanedphysicalstate; NL/PNL inherited fromflow43, so no claim thoseviewsprove postcleanupconnectivity.
 - Prepared sram_bank_clean_route/workflow exactscreen38184574265/head96b19be: fullhardware/recipe/source/history/placement/antenna checks, freshantenna/allcorner gate thenstockDRT/extraction. Added mandatoryfreshDRTNL antenna-only conservation audit beforeextraction; BUG94logged.140focusedtests pass, including fullcheckpoint/freshgate/staleNL detection. No newdispatch/phaseboxes; nextpublish reviewedgroups under scopedapproval andlaunch.

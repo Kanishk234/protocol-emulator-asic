@@ -18,6 +18,7 @@ from sram_bank_plan import plan as bank_plan, MACRO_LEF_SHA
 
 SOURCE_RUN=38293466146
 SOURCE_SHA='241f7dd11e4198b5be3a9a7a34f3c910baf3d414'
+SEGMENT_SHA='860b8c777de3b4d555ad9967ec4a1487dd540b71cb89e3401b8b36b73a794588'
 
 
 def validate_provenance(run,gates):
@@ -66,7 +67,9 @@ def main():
     state=json.loads(source.read_text())
     segments=Path(state['odb']).with_suffix('.segments')
     if segments.resolve()!=Path(gates['route_segments']).resolve(): raise ValueError('Segments do not belong to final ODB')
-    original=segments.read_text();parse(original)
+    if hashlib.sha256(segments.read_bytes()).hexdigest()!=SEGMENT_SHA: raise ValueError('Changed captured route segments')
+    original=segments.read_text();routes=parse(original)
+    if len(routes)!=33909 or sum(map(len,routes.values()))!=268616: raise ValueError('Changed captured route inventory')
     validate_antenna_only_changes(odb.with_suffix('.eco.nl.v').read_text(),Path(state['nl']).read_text())
     if list(root.rglob('*-openroad-detailedrouting')): raise ValueError('Capture unexpectedly contains DRT')
     if not re.fullmatch(r'[A-Za-z0-9_./-]+',str(segments.resolve())): raise ValueError('Unsafe segment path')

@@ -1,0 +1,83 @@
+name: portable C host real-loaded integration
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'tools/board/c_host/**'
+      - 'test_internal/test_c_host_loaded.py'
+      - '.github/workflows/c_host_loaded.yaml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-c-host-loaded-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  sweep:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Python prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-venv python3-tk iverilog
+      - name: Cache pinned Yosys suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Fetch pinned Yosys suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/warp-seed-ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/warp-seed-ocs.tgz -C ~
+      - name: Cache pinned nextpnr suite
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+      - name: Install pinned project tools and tile library
+        run: |
+          scripts/setup_venv.sh
+          source .venv/bin/activate
+          bash scripts/fetch_nextpnr.sh
+          bash scripts/fetch_tiles.sh
+      - name: Compile host echo and portable C library on frozen G1
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          export PATH="$HOME/oss-cad-suite/bin:$PATH"
+          export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
+          PYTHONPATH=tools python -m compile.compile --arch arch/warp_g1 --strict-ports --pins tools/compile/examples/hostecho.yaml -o build/c-host-loaded tools/compile/examples/hostecho.v
+          cc -std=c99 -Wall -Wextra -Werror -pedantic -shared -fPIC tools/board/c_host/warp_host.c -o build/c-host-loaded/warp_host.so
+      - name: Generate explicitly conditional operating report
+        run: |
+          source .venv/bin/activate
+          printf '%s\n' '{"clock_hz":8000000,"sck_hz":1000000,"arrival_bytes_s":1000,"direction":"read","blackout_us":0,"overhead_us":0,"burst_bytes":1,"queue_bytes":2}' > build/c-host-loaded/budget.json
+          PYTHONPATH=tools python -m host.certificate build/c-host-loaded/report.json arch/warp_g1/arch.yaml build/c-host-loaded/budget.json > build/c-host-loaded/planning.json
+      - name: Run C loading and duplex exchange through actual SPI chip ports
+        timeout-minutes: 8
+        run: |
+          source .venv/bin/activate
+          export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
+          export WARP_C_HOST_LIB="$GITHUB_WORKSPACE/build/c-host-loaded/warp_host.so"
+          export WARP_C_HOST_BITFILE="$GITHUB_WORKSPACE/build/c-host-loaded/hostecho.wbit"
+          export PYTHONPATH="$GITHUB_WORKSPACE/tools:$GITHUB_WORKSPACE/test_internal:$GITHUB_WORKSPACE/test"
+          rm -f test/results.xml
+          set -o pipefail
+          make -C test WARP_FABRIC=rtl COCOTB_TEST_MODULES=test_c_host_loaded 2>&1 | tee build/c-host-loaded/loaded.log
+          cp test/results.xml build/c-host-loaded/loaded_results.xml
+          python -c 'import xml.etree.ElementTree as E; r=E.parse("test/results.xml").getroot(); c=r.findall(".//testcase"); assert len(c)==1 and not r.findall(".//failure") and not r.findall(".//error") and not r.findall(".//skipped"), "Expected one actual passing loaded C-host case"'
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: baseline-c-host-loaded-${{ github.run_id }}
+          path: build/c-host-loaded/
+          retention-days: 3

@@ -863,3 +863,28 @@ equal; altered placement can change wire delay/skew for every loaded protocol.
 No area/rate/congestion benefit is claimed before native measurements.
 
 [OpenROAD global placement](https://openroad.readthedocs.io/en/latest/main/src/gpl/README.html) describes RUDY-based congestion estimation and cell inflation in its placement objective; the estimate is not a zero-overflow guarantee. Native command/help and all failures are retained in cloud artifacts.
+
+## D-092: Move congestion intervention before clock-tree construction
+
+**Date:**2026-10-12. **Status:** isolated pre-CTS comparison prepared.
+CorrectedD09138318370803 passes native placement, immutable physical boundary
+pins/die/rows/masters/connections/macro and3605CORE row power-phase checks.
+It moves3599instances, but fast hold slack0.05714ns loses the retained0.1ns
+guard. Reject before routing; do not weaken the guard or reuse that layout.
+
+Use the authenticated original pre-CTS archive. Compare original placement
+versus GlobalPlacement/DetailedPlacement before CTS, then rebuild CTS and
+ResizerTimingPostCTS in both cases with cluster8. New placement uses density55,
+routability-driven, skip-initial placement and no timing-driven resizing.
+All original libraries/macros/clock/uncertainty/transition/derates/SDC/fanout
+constraints remain exact. No frozen source, instruction/resource or protocol
+block changes. Native exporter preflight runs on the unchanged source first.
+Fixed macro/boundary pins/die/rows and actual post-repair power phase must pass;
+explicit single-corner STA records every electrical/setup/hold count at all3
+original PVT corners. Nonzero electrical counts or hold below0.1ns are rejects,
+even if the evidence-collection job is green. No chip or configured timing
+acceptance follows. Cost is a new clock tree/repair allocation and changed wire
+delay for all programs; actual area/congestion effect is pending measurement.
+
+[OpenROAD repair timing](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html) places timing repair after CTS with propagated clocks.
+[LibreLane global placement](https://librelane.readthedocs.io/en/latest/reference/step_config_vars.html) supplies the placement variables and standard stages used by this scratch flow.

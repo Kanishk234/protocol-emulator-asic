@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session91: approved pushes and per-delay timing diagnostic)
+**Done:** user explicitly overrides Git restriction; pushed2e21275/ed67fcd. Ground-up follow-up finds standard fast-corner min report has543 paths but only238/590 distinct delay cells and8/150 direct feedback repairs. PreparedD089 cloud-only read-only per-delay min/max query at all3 original PVT corners through LibreLane's existing hook. Native ODB/netlist/SDC/config/payload authenticated; original constraints and electrical/setup/hold guards retained. Missing queries remain explicit. Parser rejection fixtures and native-grid regressions24/24PASS locally; no localEDA or frozen hardware edits.
+**Next step:** launch own hold-allocation workflow and inspect actual native path coverage/slack before proposing implementation changes. No phase boxes ticked.
+
 ## 2026-10-12 (session90: authenticated C integration and hold allocation)
 **Done:** latest test/unit/lint/docs and C-host loaded workflows all SUCCESS. Downloaded 38293580979 artifact: exactly one passing XML case, authenticated image hash and 23/88 LC report; documented actual SPI-loaded C integration scope. Recorded corrected CUGR 38292828402 diagnostic success with both underlying routes rejected for nonzero weighted grid overflow. Added read-only hold allocation audit; producer38167697696 has590 delay cells,16.50% of CORE cell bounding-box area and150 direct FF feedback paths. No removability or causal claim. See `docs/reports/status_and_hold_allocation_20261012.md`. No hardware changes, local EDA or phase boxes ticked.
 **Next step:** per-path hold/constraint analysis before proposing enable/placement alternatives; retain best133-overflow control and passing fallback. No routing job currently running.

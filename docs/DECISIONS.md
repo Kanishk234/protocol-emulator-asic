@@ -798,3 +798,21 @@ This adds no hardware/area/protocol-specific block; guides/timing tradeoffs appl
 to all loaded programs and do not establish a protocol/rate advantage.
 Copied Tcl/patches retain source hashes, licenses and policy attribution.
 Pinned engine: [OpenROAD](https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/GlobalRouter.cpp).
+
+## D-089: Query hold-delay paths before proposing repair changes
+
+**Date:** 2026-10-12. **Status:** read-only cloud observation prepared; no hardware change.
+Producer38167697696 contains590 delay cells and150 direct FF feedback paths.
+The default fast-corner endpoint report includes238 distinct delay cells and
+only8 of those feedback paths; endpoint-worst reports do not cover every repair.
+Use LibreLane's existing `STA_EXTRA_CORNER_TCL_FILE` hook to query worst
+constrained min/max paths through each actual delay input at each original PVT
+corner. Keep authenticated ODB/netlist/SDC/config, placement parasitics, original
+clock uncertainty/transition/derates and electrical/timing guards unchanged.
+Absent paths remain explicitly absent, never zero slack or removable repairs.
+No hard blocks, area/resource changes, held-out tuning or clock gating is
+implemented. Every loaded protocol retains the same silicon and constraints.
+
+The upstream [corner script](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/scripts/openroad/sta/corner.tcl) supports the extra Tcl hook.
+[OpenROAD repair timing](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html) inserts hold repairs after CTS; its buffer budget is a limit, not evidence that reducing repairs preserves timing.
+Observation is not full extracted or configured-fabric timing acceptance.

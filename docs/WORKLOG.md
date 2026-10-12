@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session89: calibrated observer and alternate routing engine)
+**Done:** actual38282629603SUCCESS observer collection, underlying146/133routes remainfail. Strict nativegrid parser independently matches eachMetal1–4overflow to original table,10 malformedgrid/guide fixturesPASS. PreparedD088CUGR comparison on identical physical inputs/capacity/margins, nativeerrors retained; requires complete grid, zero overflow and complete guide census before even global-route acceptance. Extended own paired runner with optional observation hooks; defaultFastRoute checks unchanged. No localEDA/hardware/spec changes or phase boxes ticked.
+**Next step:** inspect actual CUGR API/guide/overflow outcomes and latestduplexCI; only a positive native result can proceed to detailed routing and fullsamebuild signoff. Preserve133control and passing fallback demos.
+
 ## 2026-10-12 (session88: original5x3 status and measured pin-access qualification)
 **Done:** compact5x3 remains active, not accepted. Earlier clean physical checkpoint retainsfanout33; currentfanout-clean variant retains133globaloverflow and complete timing gaps. Mirroringproducer38280342663SUCCESS: actual158horizontalmirrors, all3606bboxes/connectivity/masters/statuses and verticalpowerphases exact; independently reproduced exactcontrol and sixpositive electrical/timing guards. ResultSHA83826ca4da9720a77b104b47c2506430bd9d7fd93385b73a4a7bd7fa07842f41; ODBd26c3de781b528029086225ff1041ba0eca50e607b17e58303a923329f131e01; unchangedNL. Prepared authenticated identical-policy routing with extraactualcontrol artifact; no routing improvement claimed. No localEDA/frozenhardware/spec changes or phase boxes ticked.
 **Independent baseline:** added bounded read-first portable C duplex service; empty/full lanes do not starve the opposite lane, confirmed progress/last retained, ambiguous IO stops without retry. Focused C wire/model45PASS, no board/cycle-level speed claim.

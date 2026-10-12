@@ -774,3 +774,27 @@ grid fields; calibrate dimensions/semantics before alternative-engine judgments.
 This adds no cells/area/protocol features and stays in copied runtime scripts
 with patch/license/hash attribution; no frozen hardware or template-job edits.
 Pinned API: [OpenDB](https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/include/odb/db.h).
+
+## D-088: Evaluate pinned CUGR with calibrated grid and complete-guide gates
+
+**Date:**2026-10-12. **Status:** isolated alternate-engine cloud experiment pending.
+Read-only preflight38282629603 reproduces146/133 native failures; independent
+grid parser reproduces eachMetal1–4 overflow exactly. Ten fixtures reject
+missing/duplicate/nonfinite/negative/out-of-range cells and guide census gaps.
+Now select pinned -use_cugr on the same authenticated original/combined physical
+placements, netlists, libraries, clock/margins and capacity-adjustment policy.
+No net randomization, capacity perturbation, congestion bypass or cell edits.
+The engine's internal algorithm differs;50 remains the command argument, not
+a claim of equal algorithm steps or equal runtime.
+
+CUGR does not emit FastRoute's final table. Report native OpenDB grid fields
+explicitly as grid observations, preserve native failure status, require exact
+fullgrid dimensions/Metal1–4coverage and zero observed overflow. If nativeflow
+succeeds, also require nonempty usage/guides, complete required-net guide census,
+immutable placement/topology and finite wirelength. Partial guides/missing data
+reject; no invented FastRoute table. Detailed routing, DRC/antenna/LVS/official
+precheck, native loaded behavior and complete timing remain mandatory afterward.
+This adds no hardware/area/protocol-specific block; guides/timing tradeoffs apply
+to all loaded programs and do not establish a protocol/rate advantage.
+Copied Tcl/patches retain source hashes, licenses and policy attribution.
+Pinned engine: [OpenROAD](https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/GlobalRouter.cpp).

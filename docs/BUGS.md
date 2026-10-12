@@ -1,5 +1,12 @@
 # Bugs
 
+## 81: Read-only timing diagnostic recreates downloaded source directory
+- **Date:**2026-10-12.
+- **Symptom/check:**38314895635 fails before STA with FileExistsError for reset_combined/original_source.
+- **Root cause:** producer artifact includes its authenticated original payload; the new diagnostic assumed it was absent.
+- **Fix/coverage:** reuse existing payload only after manifest/source hashes and path-containment validation, with no overwrite; extract the authenticated archive only if absent. Local tests cover reuse, tampering and traversal rejection. Native retry required; no physical outcome from the failed launch.
+
+
 ## 80: Native observer argument is overwritten by a Tcl path
 - **Date:**2026-10-12.
 - **Symptom/check:**38287135030 completes native CUGR then adapter fails with PosixPath has no attribute collect.

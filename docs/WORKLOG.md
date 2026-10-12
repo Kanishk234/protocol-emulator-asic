@@ -5,6 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (residual bus-pin validator fixed)
+- Run38282937757 failed connectivity audit after eight-buffer insertion/GRT with zerooverflow; no final timing/electrical gate. Exactsource artifact11762706145 retrieved8target views. Rootcause DEFindexed A_ADDR[2] versus Verilog9bitconcatenation, BUG97.
+- Fixed known SRAM address bus mapping, preserving exact unplannedbit checks. 106focused tests pass; actual failed-run baseline/repaired netlists now pass exact8bufferconservation. No physical policy/constraints changed. Next publish scoped bugfix and rerun existing approved residualscreen. No Phase2 tick.
+
+## 2026-10-12: Codex (publish and launch eight-buffer residual repair)
+- Explicit approval executed in scoped groups: toolsf53bace, CI7fd35fc, docs70e97db pushed. Remote main verified70e97dbe5d47dd0c71471f9c99f827dc8c68dd6c. [Residual electrical screen38282937757](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38282937757) dispatched on exacthead, initially queued.
+- Eight-buffer follow-up preserves earlier27repairs, frozen RTL and20ns/50ps gates; no DRT. Unrelated pending docs/tools and local-only FIPE excluded. Next inspect actual residual source/repair/antenna/timing/electrical qualification; no Phase2 boxes ticked. Launch receipt local.
+
 ## 2026-10-12: Codex (strict electrical failure diagnosed; eight-buffer follow-up prepared)
 - Electrical repair38281277834 failed finalstrictgate, not crash. Actual27buffers applied; setupWS0all, fasthold53.5457ps, antenna0. REN/clockfailuresfixed; remaining electricalslow slew1/address2, fanout3each, cap0. Exactviolators _28813_/X12, _26701_/Y9, place8642/X9; address2slew614.024psvs595.200limit. Retrieved13reports+20checkpoint/pathviews selectively.
 - Diode additions exceeded2loadheadroom and affected previously compliant branches. Prepared residual screen fromexactfailedsource with timing/antenna pass; adds7fanoutBUF4 with4loadheadroom +1address2BUF4 near macro. 116.1216um2 and combinedsiteoverlap0. Keeps allprior27buffers/cells/diodes. No DRT/dispatch/publication/phase tick.

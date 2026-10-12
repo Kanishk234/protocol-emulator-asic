@@ -4,7 +4,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-10-12 (session87: reject second buffer regression and change routing hypothesis)
 **Done:** authenticated38274085899 native baseline146/candidate141, worse than retainedcombined133; rejectD083. ResultSHAc1df7ae288fd7eb51ddd49a5e73a4b846e817cdddc0abc933ef50f1acf925af6. PreparedD085 algorithm-only net-order seed0/41 comparison with explicitzero capacity perturbation, exact unchanged placements/netlists/50iterations/margins. Copied pinnedTcl instrumentation fixtures passboth seeds, originalupstream untouched and patch/hash/native command evidence retained. No localEDA, hardware/spec changes or phase boxes ticked.
-Launched ordering38279250531. Prepared additional concurrent RX test: receive0x6A while sending faulted0xA5 and counting event; actual pass pending, source syntax checked without localEDA.
+Launched ordering38279250531. Prepared additional concurrent RX test: receive0x6A while sending faulted0xA5 and counting event; actual full-duplex38279446388SUCCESS bothvariants; independently authenticated strictonecaseXML/no failures/errors/skips and unchangedimagehashes/resource57LC. RX0x6A/TXfaulted0xA5/eventcounter/clean0x3C allpass. PinnedCUGR research identifies differentreporting branch; observermustadapt beforefutureengine test, no missingreport-as-zero claim.
 **Next step:** inspect actual cloud ordering results, including command support/native reports. If routing improves, require detailed-route and complete timing/physical qualification on exactsamebuild; no acceptance inferred from diagnostic success.
 
 ## 2026-10-12 (session86: reject routing regression and extend loaded workload)

@@ -691,3 +691,19 @@ routing results, not selecting by proxy alone. Six electrical/setup/hold guards
 and native legality precede routing; compare to measured133 control at identical
 clock/routing policy, retain original146control reproduction, reject regression.
 No protocol fit/rate or equal-area superiority claim follows.
+
+## D-083: Reject fanout35 regression; qualify a smaller same-row buffer move
+
+**Date:**2026-10-12. **Status:** isolated copied placement, native guards pending.
+Paired38178351037 reproduces146original but fanout35 yields143, worse than
+combined133; rejectD082 as an improvement. Preserved133control starts this trial.
+Existingfanout234 buf_1 R180 shifts left1.44µm on the same row:
+bbox[57600,559440,59520,563220]→[56160,559440,58080,563220]DBU.
+ActualROW147_1 spans2880..111360; independent all3606bbox overlap check clears
+the target excluding the moved cell. Same orientation/power phase and all other
+placements/connectivity must stay exact, with original26-move control replay.
+Net234 shares six candidate markers; aggregate terminal-center proxy improves
+2.88µm, not a wirelength or causal routing claim. No cells/area/protocol blocks
+are added; no user protocol is tuned. Native legality/six electrical guards then
+identical-policy routing must qualify this candidate. Reject if not better than
+133; do not borrow physical or complete timing passes from other builds.

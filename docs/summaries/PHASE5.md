@@ -6,6 +6,19 @@ and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
 remain open. This is a separate reproducibility result from checkpoint experiments.
 
+Latest baseline additions now have actual loaded evidence: primitive-helper
+38167521573 and autonomous UART fault/event demo38168609080 pass real SPI-loaded
+chip-port tests on unchanged G1. The latter uses57/88LC and both timers/shifters;
+UART traffic under faults is the next behavioral extension. Portable C checked
+loading/recovery and authenticated pin-mapping operating summaries are implemented;
+cloud pytest38168413502 passes532checks. None establishes board throughput.
+
+Combined shell placement38168159774 improves146→133native overflow and111→91
+markers, still fails routing. Buffer producer38172225275 passes native legality
+and six preliminary electrical/timing guards; identical-policy routing is now
+queued. Exact shared-marker connectivity identifies broader congestion than reset
+ties alone; it does not causally assign overflow to individual nets.
+
 Official Tiny Tapeout precheck passes all nine checks37960021923 on the
 stronger-driver experimental layout. The fanout-free fixed-original placement
 passes six estimated STA screens38101405271 but fails native routing146overflow.

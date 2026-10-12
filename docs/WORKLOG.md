@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (setup frontier reaches-106ps; remaining branch study prepared)
+- Independently read38318579237artifact11778420571: NOR329918_2orsecondshareddelayshortening improveglobalsetup-274.630→-105.761ps. Combinationoffersnoextrabenefit. PreferNOR3candidatewithoutshorteningsecondsharedhold. Fasthold0.0215ps/slowslew93remain; nophysicalqualification.
+- Newworstpath returns48179→46883. Prepared5case fixedSPEFcheckshorterfirsthold12828andINV24812_2withcurrentbest;earlierresults were maskedbyotherbranch. Fiveactualsourceconservationchecks and53focusedtests pass; noDRT/clock/constraintchanges.
+- Nextpublish/launchsmallremaining-branchstudy thenintegrate usefulsetup/load/holdchanges into qualifiedphysicalscreen. NoPhase2ticks orofficialpassclaim.
+
+## 2026-10-12: Codex (evidence-based closure brainstorming)
+- Reviewedremainingphasechecklist,actualsetup/hold/electricalfailures, livecfgD-066 andpin-selection/statusRTL. ResearchedprimaryOpenROADestimate/RCcorrelation/resizer sources. Prioritizedsharedroot/localholdredistribution,noncriticalfanoutisolation,diodeheadroom,macro-pinlocality andscreenRCcalibration; generalpinmux/dropcounter RTLalternatives ifphysicalworkplateaus.
+- WrotePHASE2_TIMING_CLOSURE_BRAINSTORM.md withcosts, risks andstrictscreen→DRT→extracted→GL→cleanofficialsequence. NoRTL/spec/constraintchanges ornewdispatch. Latest38318579237check stillin_progress sourceartifactdownload; noresultclaimed. NoPhase2ticks. Brainstorm/sessionevidence local.
+
+## 2026-10-12: Codex (next extracted setup cone study launched)
+- Publishedtoolsc64046a/CIc85a7c4/docs8545600;verifiedremote main8545600e63bbbd17aed0c334a3837d370f4b6182. [Setupfrontier38318579237](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38318579237) dispatched onexacthead, initiallyqueued.
+-46focusedtests/sixactualsourceconservationchecks pass. FixedSPEFdiagnostic only;baseline reproduction beforecases, noDRT. Nextinspectmeasuredsetup/hold thenpreparestrictphysicalrepair screen. NoPhase2tick. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (shared delay gains139ps; next critical cone prepared)
 - Independently inspected38316962855artifact11777218133: mediumsharedDLY4SD2 improves small4setup-0.413884→-0.274630ns;shortestDLY4SD1 andextraINV24812offer nofurtherglobalgain. Baselineexact;fasthold0.0215ps/slowslew93remain. Noqualification.
 - Newworstlaunch48112→47345;delayhold12766andNOR329918dominate. Prepared6casefixedSPEF frontierstudy currentbest+medium/shortdelay andNOR3_2 individually/combined. Noarbitrarydelaybypass/constraints/clockchange/DRT. Sixactualsourceconservationchecks and46focusedtests pass.

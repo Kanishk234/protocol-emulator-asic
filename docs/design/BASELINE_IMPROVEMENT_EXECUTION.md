@@ -93,3 +93,15 @@ onecaseXML/no failures/errors/skips and unchanged imageSHAa74a2909….
 Autonomous window/trigger/event/reset-idle/STOP behavior passes through realSPI
 under D023RTLfabric scope. Source scheduler corners execute in cloud532-check
 pytest job38168413502/114555697291. No new physical or native clock claim.
+
+## Confirmed loaded continuation (2026-10-12)
+
+Loaded38279446388 passes full-duplex UART RX during autonomous TX faults,
+concurrent event counting and later clean-frame recovery for both counter widths.
+Both remain57/88LC with2/2timers and2/2shifts; keep the4-bit counter.
+Compiled C integration38293580979 passes real simulated SPI loading/recovery,
+31-byte duplex order/last indication, USER_RESET and STOP on a fresh hostecho
+image using23/88LC. Exact image/hash/XML evidence: status_and_hold_allocation_20261012.md.
+These baseline additions use D-023 configured-fabric RTL scope; no new physical
+clock, native/SDF or board throughput claim. Their earlier pending statuses above
+are historical, superseded by these named runs.

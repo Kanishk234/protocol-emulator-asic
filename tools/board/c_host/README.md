@@ -81,6 +81,8 @@ automatic RUN, bulk hardware opcode or unbounded polling is introduced.
 45 focused C wire/model tests pass locally, including independent shell-model
 backpressure, ordered duplex bytes/last flags, partial progress and a write
 accepted before I/O failure. This is transaction-level verification; callback
-timing, real board performance and cycle-level SPI validation remain separate.
+timing on a board and real board performance remain separate.
+
+[Loaded integration run38293580979](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38293580979) compiles this C driver and connects its callback to actual simulated SPI pins. A fresh hostecho image is loaded with stale-error recovery, then31bytes are exchanged in both directions with order, final indication, USER_RESET and STOP checks. This passes under the documented D-023 configured-fabric RTL simulation scope; no board/backend speed or native/SDF acceptance follows.
 The current budget planner remains single-direction and does not certify this
 round-robin service's full-duplex throughput.

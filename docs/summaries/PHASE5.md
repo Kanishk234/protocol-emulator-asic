@@ -1,6 +1,6 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-11). Clean README reproduction now
+**Status:** in progress (updated 2026-10-12). Clean README reproduction now
 passes on a fresh hosted runner37690896748: rebuilt bitstreams, loaded30/30
 and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
@@ -12,6 +12,14 @@ chip-port tests on unchanged G1. The latter uses57/88LC and both timers/shifters
 Actual UART TX traffic under faults and clean-frame recovery now pass38273574240; narrower counter still uses57LC, so default4 remains. Portable C checked
 loading/recovery and authenticated pin-mapping operating summaries are implemented;
 cloud pytest38168413502 passes532checks. None establishes board throughput.
+
+Full-duplex UART fault/recovery now passes38279446388 with concurrent RX and
+event counting for both counter widths. Portable compiled-C loaded integration
+38293580979 passes checked loading/recovery and31-byte duplex through simulated
+SPI. All retain the existing D-023 RTL scope; no board or native timing claim.
+Read-only hold allocation identifies590 delay cells and150 direct feedback paths
+in compact producer38167697696. D089 queries every delay path in the cloud before
+any repair changes; the best fanout-clean routing control still has133overflow.
 
 Combined shell placement38168159774 improves146→133native overflow and111→91
 markers, still fails routing. Buffer producer38172225275 passes native legality

@@ -707,3 +707,13 @@ Net234 shares six candidate markers; aggregate terminal-center proxy improves
 are added; no user protocol is tuned. Native legality/six electrical guards then
 identical-policy routing must qualify this candidate. Reject if not better than
 133; do not borrow physical or complete timing passes from other builds.
+
+## D-084: Keep default counter width after a measured no-gain workload comparison
+
+**Date:**2026-10-12. **Status:** software/user-bitstream comparison completed.
+Cloud38273574240 compares COUNTER_BITS4vs3 for the same DIV16/delay4/window4
+autonomous UART fault workload, same frozenG1 area/clock/compiler/pins. Both
+use57/88LC and2/2timers+2/2shifts and pass realSPI-loaded full TX waveform,
+fault/event and clean-frame recovery tests. No resource gain is measured;
+retain existing four-bit default and broader configurable interval domain.
+This does not modify chip architecture or qualify native physical timing.

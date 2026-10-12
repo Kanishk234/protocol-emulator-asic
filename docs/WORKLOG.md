@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (segment capture launched; preservation audit prepared in parallel)
+- Ongoingauthorization published tools5abcf24/CIb60d6de/docs241f7dd; remote mainverified241f7dd11e4198b5be3a9a7a34f3c910baf3d414. [Route segment export38293466146](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38293466146) running baseline reproduction/segmentcapture. Samephysicalpolicy/constraints; exportdoesnotclaimqualification.
+- Parallel route_segment_audit.py parses exactpinned sixfieldsegments, preserves duplicatedgeometry and compares pernetroutes. Rejects malformed/truncated/duplicatedexports and unexpectedchangednets; allows only explicitlynamedchangednets. Eightnew tests pass, compile/diffpass. Geometryequality alone isnot STA/signoff; freshrestoration/STA stillneeded.
+- Next inspect exportedrouterstate and matchingoriginaltiming, test freshprocess roundtrip/no-opincremental, then remainingelectricalrepair. NoDRT/Phase2tick.
+
 ## 2026-10-12: Codex (pinned route restoration path confirmed; export diagnostic prepared)
 - Probe38292662761 passes: pinnedOpenROADdcf36133supports incremental/guide/segmentcommands. Exactsource readGuides warnsparasestimation cannotuseguides; readSegments verifiesactualrouteconnectivity/pincoverage. Needlivefullsegments before claimingstatepreservation.
 - Preparedread-onlysegmentexports after existingGRT/antenna process and separate exportdiagnostic reproducingreviewedfinishbaseline. No newrepair. Capture receipt retains actualqualifiedfalse if electricalfails; exportsuccess isnotphysicalacceptance. Regularscreen50ps/zeroelectrical gatesunchanged.

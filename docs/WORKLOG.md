@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (setup diagnostic reaches-21ps; combined placement preparation)
+- Independentlyinspected38320018572artifact11778138651: shortfirstdelay+INV24812_2 improvesglobalsetup-105.761→-20.938ps;fasthold0.0215ps/slowslew93remain. Noqualification.
+- Offlineallocatedall7setupchanges onactualsource, netarea21.7728um2,maxdisplacement10.44um;noECOapplied. Existing19endpointproposal275.7888um2 remainsbaselineonly; rechecknewholdpaths afterchanges.
+- Newworstpath48179→46391showsNOR224896/AND425926largeincrements,strongervariantsavailable. Prepared5casefixedSPEFcomparisonindividual/combinedupgrades.52focusedtests/fiveactualsourceconservationchecks pass. Nextpublish/launchthenassembleallgatephysicalscreen, noDRT/Phase2tick.
+
+## 2026-10-12: Codex (remaining setup branch diagnostic launched)
+- Publishedtoolsab69c9d/CId2054c5/docs2d06a49;remote mainverified2d06a49db5e0644d2ff25e7ad52a70953b01af0c. [Residualbranch38320018572](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38320018572) dispatched onexacthead,initiallyqueued.
+-53focusedtests/fiveactualsourceconservationchecks pass. FixedSPEFdiagnosticonly;baseline/allcorner checks/noDRT unchanged. Nextinspectresults thenpreparestrictcombinedphysicalscreen. NoPhase2tick. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (setup frontier reaches-106ps; remaining branch study prepared)
 - Independently read38318579237artifact11778420571: NOR329918_2orsecondshareddelayshortening improveglobalsetup-274.630→-105.761ps. Combinationoffersnoextrabenefit. PreferNOR3candidatewithoutshorteningsecondsharedhold. Fasthold0.0215ps/slowslew93remain; nophysicalqualification.
 - Newworstpath returns48179→46883. Prepared5case fixedSPEFcheckshorterfirsthold12828andINV24812_2withcurrentbest;earlierresults were maskedbyotherbranch. Fiveactualsourceconservationchecks and53focusedtests pass; noDRT/clock/constraintchanges.

@@ -76,3 +76,9 @@ The medium-delay case's worst launch moves to48112, endpoints47345/47343/47347. 
 Actualartifact11778420571:baseline-1.008813ns,currentbest-0.274630ns,NOR329918_2alone-0.105761ns,shorterhold12766alone-0.105761ns,combined/shortestsecond-delay also-0.105761ns. Allcaseskeepworstfasthold0.0215ps/slowslew93. PreferNOR3upgradeoversecondshared-delay shortening for equalglobalgainwithoutthatdelayreduction; physicalcost/loadimpactstillrequiresverification. The newworstpath returns to48179→46883/46391/46884, withNAND324811delay1.326203ns andINV24812delay0.534501ns.
 
 Preparedfivecase remaining-branch sensitivity:baseline,currentbestwithNOR3upgrade,shorterfirsthold12828DLY4SD1,INV24812_2,combined. Earlierfirst-delay variants were maskedby anotherbranch at-0.274630ns; this study checks whether their benefit can remove the remaining106ps. Baselinereproduction/allcornerreports anddiagnostic-onlylabels remainfixed; noDRT. Fiveactualsourceconservationchecks and53focusedtests pass. Hold/electricalrepairsremainrequired regardlessofsetupstudy result.
+
+### Remaining branch results — 38320018572
+
+Actualartifact11778138651:baseline-1.008813ns,currentbest-0.105761ns,shortfirstdelay-0.022682ns,INV24812_2alone-0.104016ns,shortfirstdelay+INV24812_2-0.020938ns. Fasthold0.0215ps/slowslew93remain; diagnosticnotqualified. Allsevenchanges inbestcasehaveofflinecomplete-footprintallocations againstactualDEF/LEF withnet21.7728um2area growth andmax10.44umdisplacement; nophysicalchangeapplied.
+
+Newworstpath48179→46391includesNOR224896(1.471833nscellincrement),AND425926(0.786891ns), andBUF1place7173(0.480636ns). NOR2/AND4havevalid_2variants. PreparedfivecasefixedSPEFstudy baseline,currentbest,NOR2_2,AND4_2,combined toselectusefulfinalsetupcandidate. Fiveactualsourceconservationchecks and52focusedtests pass. Namefinishdoesnotmeanphaseclosure: localhold/allelectricalrepairs,physicalscreen andofficialsignoffremainoutstanding. NoDRT.

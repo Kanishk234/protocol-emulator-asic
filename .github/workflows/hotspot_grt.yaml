@@ -1,11 +1,6 @@
 name: compact five-move paired routing diagnostic
 on:
   workflow_dispatch:
-  push:
-    branches: [efpga]
-    paths:
-      - 'test_internal/cloud_hotspot_grt.py'
-      - '.github/workflows/hotspot_grt.yaml'
 permissions:
   contents: read
   actions: read

@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session94: reject smaller-cell route; congestion-driven placement)
+**Done:** actual paired38316844576SUCCESS collector, nativecontrol133/candidate145overflow andboth returncode1. ResultSHA c8b7a005…; rejectD090 for routing despite footprint/timing producer pass. PreparedD091 congestion-driven redistribution on original133control, retaining all masters/hold repairs and original clock/capacity policy. Native pin/die/row/connectivity/macro immutability and actual ROW power phase checks precede3-corner timing/electrical guards. Source control/actual row inventory passes3605CORE phase checks locally. Focused regressions43PASS. No localEDA, source/spec changes, native acceptance or phase boxes ticked.
+**Next step:** inspect D091 producer; if native/legal/power/timing guards pass, pair its routing with133control. Smaller footprints alone do not solve the routing bottleneck.
+
 ## 2026-10-12 (session93: native delay producer passes; route comparison prepared)
 **Done:** corrected38316322592SUCCESS; downloaded resultdd19fa05… verifies251 smaller-delay cells,455.4144µm² CORE footprint saving, exact origins/connections/unselected boxes and fixed macro. All3 estimated shell setup/hold/electrical gates pass; worsthold0.112282ns retains0.1ns guard. Prepared paired native routing against authenticated best133 control38167697696 using unchanged50iterations/capacities/margins. Actual downloaded-artifact adapter validation passes locally; focused regressions35PASS. No localEDA, frozen source edits, full physical/timing acceptance or phase boxes ticked. Latestb71464f lint/docs/test/unit SUCCESS; fabric still running at inspection.
 **Cloud launched:**38316844576 in_progress on18f5bd8; latest lint SUCCESS, other current regressions pending. Frozen hardware unchanged; no existing routing cancellation.

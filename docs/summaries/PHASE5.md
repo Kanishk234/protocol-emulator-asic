@@ -24,7 +24,9 @@ any repair changes; the best fanout-clean routing control still has133overflow.
 Measured smaller-delay producer38316322592 now passes native placement and
 3-corner estimated shell guards, saving455.4144µm² standard-cell footprint
 while retaining worsthold0.112282ns and unchanged chip outline/clock policy.
-Paired routing against the133 control is the next gate; no closure claim.
+Paired38316844576 worsens133→145overflow; reject smaller-delay candidate for
+routing. Preserve133 control and test congestion-driven redistribution with
+all original masters/repairs retained; no closure claim.
 
 Combined shell placement38168159774 improves146→133native overflow and111→91
 markers, still fails routing. Buffer producer38172225275 passes native legality

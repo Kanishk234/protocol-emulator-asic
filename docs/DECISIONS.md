@@ -819,7 +819,7 @@ Observation is not full extracted or configured-fabric timing acceptance.
 
 ## D-090: Rebalance only delay cells with measured hold headroom
 
-**Date:**2026-10-12. **Status:** producer38316322592 passed native placement and3-corner shell guards; paired routing pending, not a promoted chip.
+**Date:**2026-10-12. **Status:** producer38316322592 passed native placement and3-corner shell guards; routing38316844576 worsens133→145, reject for routing.
 D089 run38315257114 completes all590 per-delay min/max queries at each of3
 original PVT corners and retains all electrical/setup/hold guards. The150
 direct feedback paths all belong to configuration registers and have fast
@@ -841,3 +841,25 @@ effect remain pending native producer/GRT evidence. Fewer/smaller cells alone
 do not establish congestion improvement. Only a passing producer can proceed
 to paired routing against the best133 control; full physical/native timing
 gates remain mandatory and architecture superiority is not claimed.
+
+## D-091: Congestion-driven redistribution after smaller-cell routing regression
+
+**Date:**2026-10-12. **Status:** isolated placement producer prepared.
+D090 reduces standard-cell footprint but paired38316844576 worsens native
+overflow133→145; reject that placement/master policy for routing. Preserve
+original best133 control38167697696 and all its masters, including hold repairs.
+Use native global_placement with skip_initial_place, routability_driven and
+density0.55, then detailed_placement. No timing-driven resizing, clock-cell
+insertion, I/O relocation, capacity change, margin relaxation or hardware edit.
+
+Native checks must prove identical instances/masters/nets/statuses/dimensions,
+fixed macro and identical physical boundary pins/die/rows. After legalization,
+verify every CORE cell's vertical power phase against its actual fragmented
+ROW record, rather than restoring an old orientation after an odd-row move.
+Source38167697696/row inventory38166250744 covers3605CORE cells with this checker.
+Then original3-corner setup/hold/electrical checks and>=0.1ns worst hold guard
+must pass before routing. Total physical outline/resources and20ns clock stay
+equal; altered placement can change wire delay/skew for every loaded protocol.
+No area/rate/congestion benefit is claimed before native measurements.
+
+[OpenROAD global placement](https://openroad.readthedocs.io/en/latest/main/src/gpl/README.html) describes RUDY-based congestion estimation and cell inflation in its placement objective; the estimate is not a zero-overflow guarantee. Native command/help and all failures are retained in cloud artifacts.

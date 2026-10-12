@@ -54,7 +54,21 @@ fixture isolates scheduling; it does not establish UART behavior.
 
 Loaded checks use the existing D-023 RTL-fabric simulation accommodations. They
 do not establish native macro/SDF timing, active-window USER_RESET over SPI,
-simultaneous UART traffic under faults, receiver error detection, board rates
+simultaneous RX traffic under faults, receiver error detection, board rates
 or silicon operation. This demo consumes all existing timer/shift resources;
 31logic cells remain, but additional protocol engines may need those occupied
 primitives. Compilation alone does not guarantee an additional design fits.
+
+### Traffic and counter-width comparison
+
+Cloud38273574240 runs separate COUNTER_BITS3/4 jobs. Both compile on frozenG1
+and pass genuine same-job SPI-loaded chip-port tests: every clock of the
+0xA5 8N1 frame matches expected serial bits except the specified four-clock
+inversion, independent event counting continues, and subsequent0x3C transmits
+cleanly. This tests corruption/recovery during TX traffic, not receiver error
+detection or simultaneous RX traffic. Both versions use57/88LC; narrowing the
+counter gives no measured resource saving, so the existing four-bit default is
+retained. The three-bit image hash is
+`2acb33f6c51aff7515946743823ec70a05fcb02f4f65d73199b7f110814ad235`;
+the four-bit image retains the previously recorded hash. Both XML files have
+exactly one case and no failure/error/skip. Native/SDF/board timing remains open.

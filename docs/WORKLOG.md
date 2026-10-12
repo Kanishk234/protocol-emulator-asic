@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (incremental screen placement enum corrected)
+- Screen [38301813030](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38301813030) failed before initial global routing: OpenDB rejected FIXED. No new physical/timing measurements.
+- Verified exact pinned OpenROAD dcf36133 dbTypes.h: LOCKED means an instance cannot move; FIXED is not a valid enum. Corrected freeze helper, preserved original-status restoration and tightened regression to reject invalid enums (BUG101).
+- 31 focused tests pass with project venv and Tcl runtime. No Phase 2 boxes ticked. Next: publish only helper/tests and session evidence, then dispatch a new electrical incremental screen on the corrected head. The latest supplied AGENTS.md reserves Git history/remote changes for the user, so no commit/push/dispatch performed this session.
+
+## 2026-10-12: Codex (publish and launch live incremental electrical repair)
+- Ongoingauthorization publishedtoolscd2cf32/CI21ae71b/docs26fd96a afterreviewtimeout/retry. Remote mainverified26fd96a15401804ac406e35a3da7f98fd2060f94. [Liveelectricalscreen38301813030](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38301813030) dispatched onexacthead, initiallyqueued.
+- SamefrozenRTL/20ns/50psgates; tenBUF4s andsingle-process routing/antrepair. Initialrebase explicitlyrecorded; positiveinitial/finaldemand, zerooverflow, preservedoldplacements, justifiedpostrebase netchanges and finalstrictphysicalgates required. NoDRT/Phase2tick. Nextinspectactualoutcome andcontinue withoutrepeatedapproval. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (capacity limitation caught; live-process repair prepared)
 - Independentlyinspected38294805019 restorationartifact: exactgeometry/NL/timing preserved, butcongestiondemand0. BUG100/exactpinnedsource showscoldsegmentload lacksfull2D/3Dusage; blocked unsafe coldrepair rather thanclaimcorrectcapacity.
 - Prepared10BUF4 live-processscreen145.152um2:8fanout+2localNAND3outputisolation. NoNAND3_2 inactualLEF. Existingplacementsfrozen/restored; onefullGRTinitializescapacity then edits/antenna repair stayinprocess. Initialrebasechangedroutes explicitlyreported; afterrebase onlyplanned/newdiode-net changesallowed. Positiveinitial/finaldemand, zerooverflow/antenna/electrical and20ns/50ps gates required. NoDRT.

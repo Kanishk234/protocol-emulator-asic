@@ -1,0 +1,31 @@
+name: gds-routing-capability-probe
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gds-routing-capability-probe
+  cancel-in-progress: false
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Inspect pinned OpenROAD capabilities without a design
+        run: |
+          set -euo pipefail
+          mkdir -p runs/routing-capability-probe
+          docker pull ghcr.io/librelane/librelane:3.1.0.dev3
+          docker image inspect ghcr.io/librelane/librelane:3.1.0.dev3 --format '{{json .RepoDigests}}' > runs/routing-capability-probe/image-digests.json
+          docker run --rm --entrypoint openroad ghcr.io/librelane/librelane:3.1.0.dev3 -version > runs/routing-capability-probe/version.txt
+          docker run --rm -v "$PWD:/work" --entrypoint openroad ghcr.io/librelane/librelane:3.1.0.dev3 -exit /work/scripts/ci/routing_capability_probe.tcl > runs/routing-capability-probe/probe.log 2>&1
+          python scripts/ci/routing_capability_probe.py runs/routing-capability-probe/probe.log runs/routing-capability-probe/summary.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: routing-capability-${{ github.run_id }}
+          path: runs/routing-capability-probe/**

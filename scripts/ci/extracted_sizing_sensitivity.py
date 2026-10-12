@@ -47,7 +47,10 @@ def change_netlist(text,changes):
 
 
 def corner_metrics(stage):
-    metrics=json.loads((stage/'or_metrics_out.json').read_text());result={}
+    # Pinned MultiCornerSTA aggregates generated metrics into state_out.json;
+    # it does not emit the OpenROAD-only or_metrics_out.json. Input metrics
+    # are empty, so these keys cannot be inherited from the source.
+    metrics=json.loads((stage/'state_out.json').read_text())['metrics'];result={}
     for c in CORNERS:
         for report in ('ws.max.rpt','ws.min.rpt','checks.rpt'):
             if c not in (stage/c/report).read_text():raise ValueError('Missing fresh extracted corner report')
@@ -63,6 +66,17 @@ def baseline_matches(metrics,reference):
             key=f'timing__{kind}__ws__corner:{c}'
             if not math.isfinite(row[key]) or not math.isfinite(reference[key]) or abs(row[key]-reference[key])>1e-6:raise ValueError('Fixed-SPEF baseline does not reproduce source')
 
+
+
+def sta_input_state(state,modified):
+    # Pinned STAPostPNR dereferences the optional ODB after STA to filter
+    # unannotated net reports. Keep the original ODB for that check only;
+    # OpenSTA timing still consumes modified NL plus unchanged SPEF.
+    if not state.get('odb') or not Path(state['odb']).is_file():
+        raise ValueError('Missing reference ODB for pinned annotation check')
+    proposal=dict(state,nl=str(modified.resolve()),pnl=None,sdf=None,lib=None,metrics={})
+    proposal['def']=None
+    return proposal
 
 def main():
     validate_run(json.loads(Path('/tmp/native-strength-source-run.json').read_text()))
@@ -86,10 +100,7 @@ def main():
     reference=json.loads((root/'corner_summary.json').read_text());results={}
     for name,changes in CASES.items():
         modified=output/(name+'.v');modified.write_text(change_netlist(text,changes))
-        # STA consumes NL/SPEF only. Remove physically inconsistent views and
-        # inherited timing outputs from this deliberately hypothetical state.
-        proposal=dict(state,nl=str(modified.resolve()),odb=None,pnl=None,sdf=None,lib=None,metrics={})
-        proposal['def']=None
+        proposal=sta_input_state(state,modified)
         checkpoint=output/(name+'.json');checkpoint.write_text(json.dumps(proposal,indent=2)+'\n')
         run_step(config,checkpoint,output/name,['OpenROAD.STAPostPNR'])
         stage=unique(output/name,'*-openroad-stapostpnr/state_out.json').parent
@@ -97,7 +108,7 @@ def main():
         if name=='baseline':baseline_matches(metrics,reference)
         results[name]=dict(changes=changes,corners=metrics)
         (output/'results.json').write_text(json.dumps(dict(source_run=SOURCE_RUN,
-            fixed_spef=True,physical_change_applied=False,physical_qualified=False,official_signoff=False,
+            fixed_spef=True,reference_odb_for_annotation_only=True,physical_change_applied=False,physical_qualified=False,official_signoff=False,
             cases=results),indent=2)+'\n')
         print(name,json.dumps(metrics),flush=True)
 

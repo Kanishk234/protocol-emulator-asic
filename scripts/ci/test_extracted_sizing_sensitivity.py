@@ -59,3 +59,35 @@ def test_workflow_downloads_exact_route_and_launches_only_sensitivity():
     code=(root/'scripts/ci/extracted_sizing_sensitivity.py').read_text()
     assert "['OpenROAD.STAPostPNR']" in code and 'OpenROAD.DetailedRouting' not in code
     assert 'physical_qualified=False' in code and 'fixed_spef=True' in code
+
+
+def test_pinned_sta_receives_reference_odb_and_no_inherited_metrics(tmp_path):
+    odb=tmp_path/'original.odb';odb.write_bytes(b'original geometry')
+    modified=tmp_path/'hypothetical.v';modified.write_text(netlist())
+    source=dict(odb=str(odb),nl='original.v',spef={'nom_*':'source.spef'},pnl='original.pnl.v',sdf={'c':'stale.sdf'},lib={'c':'stale.lib'},metrics={'stale':1},**{'def':'original.def'})
+    state=runner.sta_input_state(source,modified)
+    assert state['odb']==source['odb'] and state['spef']==source['spef']
+    assert odb.read_bytes()==b'original geometry' and state['nl']==str(modified.resolve())
+    assert state['metrics']=={} and all(state[k] is None for k in ('def','pnl','sdf','lib'))
+    assert source['metrics']=={'stale':1}
+    for bad in (dict(source,odb=None),dict(source,odb='/missing')):
+        with pytest.raises(ValueError):runner.sta_input_state(bad,modified)
+
+
+@pytest.mark.parametrize('fault',[None,'missing_report','wrong_corner','missing_metric'])
+def test_metrics_use_pinned_multicorner_output_and_fresh_reports(tmp_path,fault):
+    metrics={}
+    for c in CORNERS:
+        stage=tmp_path/c;stage.mkdir()
+        for report in ('ws.max.rpt','ws.min.rpt','checks.rpt'):(stage/report).write_text(c)
+        metrics.update({f'timing__{kind}__ws__corner:{c}':0 if kind=='setup' else .06 for kind in ('setup','hold')})
+        metrics.update({f'design__max_{kind}_violation__count__corner:{c}':0 for kind in ('slew','fanout','cap')})
+    report=tmp_path/CORNERS[0]/'checks.rpt'
+    if fault=='missing_report':report.unlink()
+    if fault=='wrong_corner':report.write_text('wrong corner')
+    if fault=='missing_metric':metrics.pop(f'timing__setup__ws__corner:{CORNERS[0]}')
+    (tmp_path/'state_out.json').write_text(json.dumps({'metrics':metrics}))
+    assert not (tmp_path/'or_metrics_out.json').exists()
+    if fault:
+        with pytest.raises((ValueError,KeyError,FileNotFoundError)):runner.corner_metrics(tmp_path)
+    else:assert set(runner.corner_metrics(tmp_path))==set(CORNERS)

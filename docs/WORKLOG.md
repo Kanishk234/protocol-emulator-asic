@@ -4,6 +4,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-10-12 (session93: native delay producer passes; route comparison prepared)
 **Done:** corrected38316322592SUCCESS; downloaded resultdd19fa05… verifies251 smaller-delay cells,455.4144µm² CORE footprint saving, exact origins/connections/unselected boxes and fixed macro. All3 estimated shell setup/hold/electrical gates pass; worsthold0.112282ns retains0.1ns guard. Prepared paired native routing against authenticated best133 control38167697696 using unchanged50iterations/capacities/margins. Actual downloaded-artifact adapter validation passes locally; focused regressions35PASS. No localEDA, frozen source edits, full physical/timing acceptance or phase boxes ticked. Latestb71464f lint/docs/test/unit SUCCESS; fabric still running at inspection.
+**Cloud launched:**38316844576 in_progress on18f5bd8; latest lint SUCCESS, other current regressions pending. Frozen hardware unchanged; no existing routing cancellation.
 **Next step:** inspect paired routing, then only a zero-overflow candidate may proceed to detailed routing/geometry/extraction and remaining native mode/timing coverage.
 
 ## 2026-10-12 (session92: complete delay timing observations and measured rebalance)

@@ -13,6 +13,7 @@ ROOT=source.ROOT
 OUT=ROOT/"build/congestion_reflow"
 EDIT=r'''
 read_db $::env(WARP_INPUT_ODB)
+set block [ord::get_db_block]
 foreach library $::env(WARP_CELL_LIBS) {read_liberty $library}
 help global_placement
 write_def $::env(WARP_DEF_BEFORE)

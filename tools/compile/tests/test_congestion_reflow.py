@@ -30,3 +30,7 @@ def test_reflow_does_not_enable_sizing_or_move_io_pins():
     assert '-timing_driven' not in EDIT and '-place_ios' not in EDIT
     assert 'swapMaster' not in EDIT and 'repair_timing' not in EDIT
     assert EDIT.index('read_liberty') < EDIT.index('global_placement -') < EDIT.index('check_placement')
+
+
+def test_geometry_export_has_database_handle():
+    assert EDIT.index('set block [ord::get_db_block]') < EDIT.index('[$block getRows]')

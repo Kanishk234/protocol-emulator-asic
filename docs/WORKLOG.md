@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (live routing succeeds; jumper audit corrected)
+- Run38302884774 failed after routing, before STA. Inspected selectively downloaded actual segments/DEF/NL: buffer edits change exactly14planned routes; antenna phase changes9nets, with6jumpers/3diodes in log. Live final demand241307 and zerooverflow. Previous LOCKED fix succeeded.
+- BUG102: audit omitted jumper-only antenna repairs. Verified pinned checker API/report source; capture nonverbose pre-repair violating-net report and allow only its nets plus validated added-diode nets. Preserve strict old-placement/connectivity and unrelated-route guards; missing report cannot pass.
+- 32focused tests pass, shell syntax/diff checks pass. Next publish corrected helper/tests and evidence, launch new screen; require final all-corner electrical/timing/antenna qualification before DRT. No Phase2 ticks or new timing claim.
+
+## 2026-10-12: Codex (approved placement fix pushed; corrected screen launched)
+- User explicitly authorized the supplied commands. Published helper/test commit90287ee and evidence commit8f61c70; verified remote main8f61c703c159da7c3b8921db459e9d4954e0893e.
+- Launched [electrical incremental screen38302884774](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38302884774) on that exact head; confirmed in_progress. Push-triggered lint/unit/test/docs also running. Unrelated local files excluded.
+- Next inspect startup, initialized routing capacity, conservation and strict all-corner physical gates. No timing/closure claim or Phase 2 ticks. This launch receipt remains local pending the next evidence publication.
+
 ## 2026-10-12: Codex (incremental screen placement enum corrected)
 - Screen [38301813030](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38301813030) failed before initial global routing: OpenDB rejected FIXED. No new physical/timing measurements.
 - Verified exact pinned OpenROAD dcf36133 dbTypes.h: LOCKED means an instance cannot move; FIXED is not a valid enum. Corrected freeze helper, preserved original-status restoration and tightened regression to reject invalid enums (BUG101).

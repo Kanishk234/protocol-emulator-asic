@@ -760,3 +760,17 @@ Every loaded design pays any wiring/timing tradeoff; no successor promotion or
 protocol rate claim follows. Tool primary documentation describes a wirelength
 heuristic, not a congestion guarantee:
 [OpenROAD detailed placement](https://openroad.readthedocs.io/en/latest/main/src/dpl/README.html).
+
+## D-087: Calibrate a native grid observer before alternate-engine routing
+
+**Date:**2026-10-12. **Status:** read-only copied-script cloud preflight pending.
+Mirroring38281724422 worsens combined133→151; rejectD086. AlternativeCUGR is
+supported by pinnedOpenROAD, but skips FastRoute's standard final report.
+Add read-only getGCellGrid/getGridX/Y/getCapacity/getUsage collection to unchanged
+FastRoute control runs first. Catch/rethrow the exact native global_route error
+after observation; no congestion bypass, placement/capacity/clock change or
+missing-report-as-zero acceptance. Keep native table/TR reports separately from
+grid fields; calibrate dimensions/semantics before alternative-engine judgments.
+This adds no cells/area/protocol features and stays in copied runtime scripts
+with patch/license/hash attribution; no frozen hardware or template-job edits.
+Pinned API: [OpenDB](https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/include/odb/db.h).

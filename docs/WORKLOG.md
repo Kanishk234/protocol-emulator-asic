@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (fixed-SPEF baseline helper corrected)
+-38314443440 failed baseline with KeyError odb in pinnedSTAPostPNR annotationfilter afterSTA. No candidate results ornewphysicalclosure. BUG104 records pinned optionalODB dereference; sourceaudit also caught incorrect metricsfilename assumption beforeits execution.
+- Retain unchangedoriginalODB solelyforannotationfilter, keephypotheticalNL+sameSPEF timinginputs, clear allinputmetrics and readfreshaggregated state_out metrics withfreshallcornerreports. Baseline reproduction/20ns/signoffconstraints anddiagnostic-only labels unchanged. NoDRT.
+-35focusedtests pass, compile/diff checks pass. Nextpublishcorrectedhelper/evidence and dispatchnewrun oncorrectedhead. NoPhase2tick; mainhardware/config/templatejobs andunrelatedlocalfiles unchanged.
+
+## 2026-10-12: Codex (extracted sizing diagnostic launched)
+- Publishedtools4b3dc63/CI3163692/docsc22bce3; verifiedremote mainc22bce37ac36421dfd412cf1da908167251bb5e3. [Sensitivity38314443440](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38314443440) dispatched onexacthead, initiallyqueued.
+- Sevenfixed-SPEFcases, baseline reproduction required, nophysicalqualification/DRT. Nextinspect measuredcase benefits thenprepare matchedphysicalrepair withunchanged gates. NoPhase2tick. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (extracted shared-cone sizing sensitivity prepared)
 - Prepared seven-case stockOpenSTA fixed-SPEF sensitivity using failedroute38305592967's exact extractedNL/hash and completedzeroDRCcheckpoint: baseline,4individualsizes,combined andstronginputbuffers/inverters. Exactsource/head/hardware/constraints checked; unchangedbaseline mustreproduce originalallcorner WS within1e-6ns beforecandidatecases run.
 - This ranks sharedsetup-cone sizing withactual extractedwireRC, not a physicalECO/signoff. Modifiedstates removeODB/DEF/PNL/SDF/lib views; onlyNL/SPEF+same20ns/signoffconstraints consumed. NoDRT orrepair launched by thisworkflow. Explicitphysical_qualified=false.

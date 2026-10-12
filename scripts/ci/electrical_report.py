@@ -19,10 +19,13 @@ def audit(text):
             current = None
         elif '(VIOLATED)' in line and current:
             sections[current].append(line.strip())
-    if set(sections) != {'slew', 'fanout', 'capacitance'}:
-        raise ValueError('Incomplete electrical report')
     for label, key in [('slew', 'slew'), ('fanout', 'fanout'), ('cap', 'capacitance')]:
         totals = re.findall(r'^max ' + label + r' violation count (\d+)\s*$', text, re.M)
+        # OpenSTA -violators omits a section with no violations. Only an
+        # explicit zero total can supply that missing section.
+        if key not in sections:
+            if totals != ['0']:raise ValueError('Incomplete electrical report')
+            sections[key] = []
         if totals and (len(totals) != 1 or int(totals[0]) != len(sections[key])):
             raise ValueError('Electrical rows disagree with printed total')
     return {'counts': {key: len(rows) for key, rows in sections.items()},

@@ -46,3 +46,11 @@ def test_corner_evidence_is_required(tmp_path):
     report.write_text('fast Corner\nmax slew\nmax fanout\nmax capacitance\n')
     with pytest.raises(ValueError, match='corner mismatch'):
         audit_corners(tmp_path, ['slow'])
+
+
+def test_zero_totals_supply_only_omitted_zero_violation_sections():
+    report='max fanout\npin 9 (VIOLATED)\nmax slew violation count 0\nmax fanout violation count 1\nmax cap violation count 0\n'
+    assert audit(report)['counts']=={'slew':0,'fanout':1,'capacitance':0}
+    assert not audit(report)['no_reported_electrical_violations']
+    for bad in (report.replace('max slew violation count 0','max slew violation count 1'),report.replace('max cap violation count 0',''),report+'max cap violation count 0\n'):
+        with pytest.raises(ValueError):audit(bad)

@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session95: distinguish design regressions from experiment bugs)
+**Done:** inspected38317781400 immediately: global/detailed placement completes, exporter fails on BUG83 omitted block handle before any STA. Fixed exporter scope and added regression. Compact best remains133overflow; smaller-delay routing145 was a genuine regression, unlike this setup failure. Latest19c3b25 lint/docs/test SUCCESS; unit/fabric pending at inspection. No phase boxes ticked, source/spec edits or localEDA.
+**Next step:** retry congestion-driven producer and inspect immutable geometry/rows/power phase and all3 original-corner timing guards before routing. Maintain an outcome ledger separating setup failures, rejected physical changes and accepted improvements; do not count diagnostics as closure.
+
 ## 2026-10-12 (session94: reject smaller-cell route; congestion-driven placement)
 **Done:** actual paired38316844576SUCCESS collector, nativecontrol133/candidate145overflow andboth returncode1. ResultSHA c8b7a005…; rejectD090 for routing despite footprint/timing producer pass. PreparedD091 congestion-driven redistribution on original133control, retaining all masters/hold repairs and original clock/capacity policy. Native pin/die/row/connectivity/macro immutability and actual ROW power phase checks precede3-corner timing/electrical guards. Source control/actual row inventory passes3605CORE phase checks locally. Focused regressions43PASS. No localEDA, source/spec changes, native acceptance or phase boxes ticked.
 **Cloud launched:**38317781400 in_progress on6b3cc70; lint/docs SUCCESS, current test/unit/fabric pending at inspection. Frozen hardware sources unchanged.

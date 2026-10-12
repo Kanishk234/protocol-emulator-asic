@@ -1,5 +1,12 @@
 # Bugs
 
+## 83: Congestion-placement geometry exporter lacks database handle
+- **Date:**2026-10-12.
+- **Symptom/check:**38317781400 completes global/detailed placement then fails exporting geometry with missing variable block.
+- **Root cause:** reusing the exporter omitted the original editor's top-level database handle assignment; census has its own local handle.
+- **Fix/coverage:** explicitly bind block after read_db; regression checks the handle precedes geometry export. No candidate acceptance or timing/routing result from this run; native retry required.
+
+
 ## 82: OpenROAD master-swap editor lacks Liberty timing cells
 - **Date:**2026-10-12.
 - **Symptom/check:**38315996276 crashes with signal11 before candidate STA; stack ends in dbStaCbk::inDbInstSwapMasterBefore → equivCellsArcs → ConcreteCell::portCount.

@@ -1,5 +1,11 @@
 # Bugs
 
+## 79: Alternate-router adapter retains observer output directory
+- **Date:**2026-10-12.
+- **Symptom/check:**38286631182 fails before meaningful native routing with missing stage log under build/grid_observer; workflow uploads build/cugr and finds no artifact.
+- **Root cause:** new adapter changed its input and instrumentation scope but retained the old main output path. Scope guard correctly rejects the copied script, then shared runner cannot find its unstarted native log.
+- **Fix/coverage:** use build/cugr consistently and verify input/output directory names before launch. Source/configured-workflow path regression checks run locally without EDA; cloud retry required. No design/routing failure or passing result inferred from this run.
+
 ## 78: Loaded fault-window test omits shell output-register latency
 - **Date:**2026-10-11.
 - **Symptom/check:** actual loaded38168413654 sees the correct four-cycle inversion at chip cycles7..10, while the test expects user-logic cycles6..9.

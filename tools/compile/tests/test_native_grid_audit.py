@@ -59,3 +59,21 @@ def test_alternate_router_output_matches_artifact_scope():
     workflow=yaml.safe_load((root/".github/workflows/cugr.yaml").read_text())
     upload=workflow["jobs"]["diagnostic"]["steps"][-1]
     assert upload["with"]["path"].rstrip("/")==values["OUT"]
+
+
+def test_signed_usage_observation_preserves_raw_values(tmp_path):
+    p=tmp_path/"grid";p.write_text(grid().replace("\t2\t1","\t2\t-0.0000000000000001",1))
+    report=audit(p,allow_negative_usage=True)
+    assert report["negative_usage_cells"][0]["raw_usage"]=="-1E-16"
+    assert report["layers"]["Metal1"]["usage"]<0
+    with pytest.raises(ValueError):audit(p)
+
+
+def test_observer_argument_is_not_overwritten_by_path_assignment():
+    import ast
+    root=Path(__file__).resolve().parents[3]
+    module=ast.parse((root/"test_internal/cloud_hotspot_grt.py").read_text())
+    fn=next(n for n in module.body if isinstance(n,ast.FunctionDef) and n.name=="main")
+    assert [a.arg for a in fn.args.args]==["observer_module"]
+    assert not any(isinstance(n,ast.Name) and isinstance(n.ctx,ast.Store)
+                   and n.id=="observer_module" for n in ast.walk(fn))

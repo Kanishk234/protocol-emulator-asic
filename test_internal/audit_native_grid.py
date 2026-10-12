@@ -7,17 +7,17 @@ from pathlib import Path
 LAYERS = {"Metal1", "Metal2", "Metal3", "Metal4"}
 
 
-def number(text):
+def number(text, nonnegative=True):
     try:
         value = Decimal(text)
     except InvalidOperation:
         raise ValueError("Invalid grid number") from None
-    if not value.is_finite() or value < 0:
+    if not value.is_finite() or (nonnegative and value < 0):
         raise ValueError("Nonfinite or negative grid value")
     return value
 
 
-def audit(path):
+def audit(path, allow_negative_usage=False):
     rows = Path(path).read_text().splitlines()
     if len(rows) < 7:
         raise ValueError("Missing grid")
@@ -34,6 +34,7 @@ def audit(path):
         coords=list(map(int,fields[1].split()))
         if len(coords)!=count or any(a>=b for a,b in zip(coords,coords[1:])):
             raise ValueError("Invalid grid axis")
+    negative=[]
     seen=set();counts=Counter();stats=defaultdict(lambda:[Decimal(0),Decimal(0),Decimal(0)])
     for line in rows[3:]:
         fields=line.split("\t")
@@ -44,7 +45,9 @@ def audit(path):
         if not(0<=x<nx-1 and 0<=y<ny-1) or key in seen:
             raise ValueError("Duplicate/out-of-range grid cell")
         seen.add(key);counts[layer]+=1
-        capacity,usage=number(capacity),number(usage)
+        capacity,usage=number(capacity),number(usage,nonnegative=not allow_negative_usage)
+        if usage < 0:
+            negative.append({"layer":layer,"x":x,"y":y,"raw_usage":str(usage)})
         stats[layer][0]+=capacity;stats[layer][1]+=usage;stats[layer][2]+=max(Decimal(0),usage-capacity)
     if set(counts)!=LAYERS or any(counts[layer]!=(nx-1)*(ny-1) for layer in LAYERS):
         raise ValueError("Incomplete native grid")
@@ -55,6 +58,7 @@ def audit(path):
         "layers":{layer:dict(capacity=float(v[0]),usage=float(v[1]),overflow=float(v[2]))
                   for layer,v in sorted(stats.items())},
         "total_overflow":float(sum(v[2] for v in stats.values())),
+        "negative_usage_cells":negative,
         "scope":"Native OpenDB grid observation; not detailed-routing/physical acceptance"}
 
 

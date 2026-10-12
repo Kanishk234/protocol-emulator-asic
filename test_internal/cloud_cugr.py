@@ -41,8 +41,10 @@ original_instrument = reporting.instrument
 
 
 def collect(stage, raw):
-    grid = audit_grid(stage / "native-grid.tsv")
-    return {"native_grid":grid,"overflow":grid["total_overflow"],
+    grid = audit_grid(stage / "native-grid.tsv",allow_negative_usage=True)
+    census = (stage.parent.parent / (stage.parent.name + "_before.tsv")).read_text()
+    coverage = guide_coverage(stage / "native-guides.tsv",census)
+    return {"native_grid":grid,"guide_coverage":coverage,"overflow":grid["total_overflow"],
         "overflow_source":"native OpenDB grid, not a FastRoute report",
         "native_marker_report_present":(stage / "native-congestion.rpt").is_file(),
         "engine":"CUGR"}
@@ -51,6 +53,8 @@ def collect(stage, raw):
 def require_clean(stage, entry, final, census):
     if entry["native_grid"]["total_overflow"]!=0:
         raise ValueError("Nonzero native CUGR grid overflow")
+    if entry["native_grid"]["negative_usage_cells"]:
+        raise ValueError("Native grid retains negative usage values")
     if sum(v["usage"] for v in entry["native_grid"]["layers"].values())<=0:
         raise ValueError("Empty routing usage")
     coverage=guide_coverage(stage / "native-guides.tsv",census)
@@ -74,7 +78,7 @@ def main():
         paired.INPUT,paired.OUT = combo.INPUT,combo.OUT
         paired.SOURCE_RUN,paired.RESULT_SHA,paired.PADDED = combo.SOURCE_RUN,combo.RESULT_SHA,combo.CANDIDATE
         paired.validate_padding = combo.validate_move
-        paired.main(observer=sys.modules[__name__])
+        paired.main(observer_module=sys.modules[__name__])
     except Exception as exc:
         error = str(exc)
         raise

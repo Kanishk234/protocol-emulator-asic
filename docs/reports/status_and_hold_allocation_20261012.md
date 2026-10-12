@@ -14,3 +14,9 @@ Census SHA256: `3d8a7d032a84720fa1b4e5a243cccadde5678630f0067d846f25352ba4905aa3
 Geometry SHA256: `c2317b8ffbb2c2f008b85bb8a0ee910075b4db37a3df84a4776cfa9fb688652f`.
 
 The next physical investigation is path-level timing and constraint coverage for this delay allocation. Do not remove repairs or relax uncertainty to force routing. Any alternative enable implementation must first demonstrate reset/enable equivalence and usable mapped cells, then compare unchanged constraints and total physical area. Frozen chip sources and template workflows remain untouched. Full same-build physical acceptance and complete native timing coverage remain open.
+
+## Actual per-delay follow-up
+
+[38315257114](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38315257114) completes590 constrained min and590 constrained max queries at each of3 original PVT corners, with no missing paths and unchanged shell timing/electrical guards. Result SHA256: `3866682f1cbb486f1bbd1f39e642406b89d765dcede5f3b26563217a22c3a0f8`. All150 direct feedback paths belong to configuration registers; their fast-corner hold slack spans0.176544–0.217264ns. The eight feedback paths present in the original fast endpoint report traverse delay cells contributing0.235120–0.236332ns; removing that contribution without considering other timing changes is unjustified.
+
+D090 now tests a smaller delay master only on251 non-feedback cells whose measured fast hold slack is at least0.3ns. The150 feedback repairs remain untouched. This is an unqualified copied-layout producer until native legality and all electrical/timing guards pass. The candidate must also retain at least0.1ns worst hold slack before any routing comparison.

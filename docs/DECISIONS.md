@@ -816,3 +816,28 @@ implemented. Every loaded protocol retains the same silicon and constraints.
 The upstream [corner script](https://github.com/librelane/librelane/blob/3.1.0.dev3/librelane/scripts/openroad/sta/corner.tcl) supports the extra Tcl hook.
 [OpenROAD repair timing](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html) inserts hold repairs after CTS; its buffer budget is a limit, not evidence that reducing repairs preserves timing.
 Observation is not full extracted or configured-fabric timing acceptance.
+
+## D-090: Rebalance only delay cells with measured hold headroom
+
+**Date:**2026-10-12. **Status:** isolated producer prepared, not a promoted chip.
+D089 run38315257114 completes all590 per-delay min/max queries at each of3
+original PVT corners and retains all electrical/setup/hold guards. The150
+direct feedback paths all belong to configuration registers and have fast
+hold slack0.176544–0.217264ns. Keep those repairs untouched. Exactly251 other
+delay cells have measured worst constrained fast hold slack >=0.3ns.
+
+On a scratch copy of producer38167697696, replace only that measured251-cell
+set from dlygate4sd3_1 to smaller dlygate4sd2_1. Both pinned Liberty cells have
+X=A behavior, but their delays/footprints differ; no deletion, bypass or false
+path. Actual OpenDB must preserve all pins/nets/instance origins/orientations,
+all unselected boxes and the fixed macro; changed boxes must shrink inside
+original bounds. Native placement legality plus3 original-corner electrical
+and setup/hold checks must pass, with >=0.1ns worst hold slack retained.
+No constraints, derates, capacity, protocol blocks or frozen sources change.
+
+This is a generic physical-cell policy: every loaded protocol uses the same
+shell. Potential cost is less hold headroom; actual area cost/saving and routing
+effect remain pending native producer/GRT evidence. Fewer/smaller cells alone
+do not establish congestion improvement. Only a passing producer can proceed
+to paired routing against the best133 control; full physical/native timing
+gates remain mandatory and architecture superiority is not claimed.

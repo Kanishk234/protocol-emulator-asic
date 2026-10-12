@@ -891,7 +891,7 @@ delay for all programs; actual area/congestion effect is pending measurement.
 
 ## D-093: Restore known fanout distribution after the pre-CTS experiment
 
-**Date:**2026-10-12. **Status:** copied-checkpoint producer prepared.
+**Date:**2026-10-12. **Status:**38320631258 producer passes all declared native/electrical/timing guards; routing comparison pending.
 ActualD09238319615838 completes both cases. Control reproduces original pre-buffer
 ODB0a0af0c1…/netlist5bcc7ceb… byte-for-byte. Reflow rebuilds clock/repairs and
 retains fast hold0.100232ns plus positive setup/hold and zero slew/cap at all3

@@ -32,3 +32,9 @@ The recent small producers take minutes, including cloud provisioning. Historic 
 This ledger distinguishes actual chip progress, functional improvements, improved diagnosis and experiment setup. No phase exit box is ticked by this document.
 
 Actual before-CTS comparison result SHA256: `f8db35215e1070f84fdda2450748e3d9b0e5b215bcba73e30c9b2eb461c942bd`. Control reproduces the previously measured pre-buffer ODB/netlist exactly. Reflow's additional49instances and restored timing margin are diagnosis/provenance results; routing benefit remains unmeasured.
+
+## Fanout-clean earlier-stage candidate
+
+[38320631258](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38320631258) passes native ten-buffer placement, exact immutability of all3645original instances, contracted signal connectivity and physical interface/power phase checks. All3 original-corner setup/hold/electrical checks pass; fast hold remains0.100232ns. Result SHA256: `df6f07c502518e2d9a1ec95facd43de5f5d060df11206dab6f59d484da33271b`. This is a newly qualified placement/electrical candidate, not routing closure or full native timing acceptance.
+
+Candidate ODB: `90940c876925b362f0589d6e3052d37527d3fdae75b71388848b717d0d82bb17`; netlist: `d53fd05fb028b4589f7b855daaed84415cc4425fe2b88c840938e002a3d5d35f`. Prepared unchanged-policy GRT comparison with best133control. Adapter checks pass against actual downloaded artifacts.

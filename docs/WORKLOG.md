@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session96: earlier-stage fanout-clean producer passes)
+**Done:** actual38320631258SUCCESS; resultSHA df6f07c5… verifies ten identity buffers, all3645 originals unmoved/unchanged and contracted connections exact. Native physical interface/ROW power phase passes; all3 original-corner electrical/setup/hold gates pass with fast hold0.100232ns. Prepared direct unchanged-policy GRT comparison to best133control, using authenticated candidate90940c87…/d53fd05f… . Local adapter validates actual downloaded artifacts; focused regressions48PASS. This advances producer qualification, not native routing/signoff. No frozen source/spec changes or phase boxes ticked.
+**Next step:** inspect new paired route; reject regressions, and proceed to detailed routing only on a native zero-overflow candidate. Existing G1 fallback/software remains separate and intact.
+
 ## 2026-10-12 (session95: distinguish design regressions from experiment bugs)
 **Done:** inspected38317781400 immediately: global/detailed placement completes, exporter fails on BUG83 omitted block handle before any STA. Fixed exporter scope and added regression. Compact best remains133overflow; smaller-delay routing145 was a genuine regression, unlike this setup failure. Latest19c3b25 lint/docs/test SUCCESS; unit/fabric pending at inspection. No phase boxes ticked, source/spec edits or localEDA.
 **Actual corrected outcome:**38318370803 passes placement/physical interface and3605CORE power-phase checks, but fast hold0.05714ns fails retained0.1ns guard. Reject before routing. PreparedD092 pre-CTS original-placement versus congestion-driven comparison, rebuilding CTS/repairs with identical cluster8 and original timing policy. Source native export preflight precedes mutation; every corner electrical/timing count remains explicit. Focused regressions46PASS. Added compact_progress_ledger_20261012.md separating actual progress, diagnosis and setup failures.

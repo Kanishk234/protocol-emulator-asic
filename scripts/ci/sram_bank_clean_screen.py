@@ -13,7 +13,8 @@ from postgrt_timing import screen
 from sram_bank_plan import plan, placement_fragment, MACRO_LEF_SHA
 
 
-def configure(original, proposal):
+def configure(original, proposal, reserve=False):
+    if type(reserve) is not bool: raise ValueError("Timing reserve selection must be boolean")
     if (original.get('CLOCK_PERIOD') != 20 or original.get('PL_TARGET_DENSITY_PCT') != 56
             or original.get('SYNTH_STRATEGY') != 'AREA 1'
             or original.get('GRT_RESIZER_HOLD_SLACK_MARGIN') != .10
@@ -24,7 +25,10 @@ def configure(original, proposal):
         raise ValueError('Wrong clean stock baseline recipe')
     if proposal.get('source_stage') != 'postgpl-clean':
         raise ValueError('Clean placement requires pre-manual-stage geometry')
-    return dict(original, GRT_ALLOW_CONGESTION=False, **placement_fragment(proposal))
+    result = dict(original, GRT_ALLOW_CONGESTION=False, **placement_fragment(proposal))
+    if reserve:
+        result.update(GRT_RESIZER_SETUP_SLACK_MARGIN=1.0, GRT_RESIZER_HOLD_SLACK_MARGIN=.125)
+    return result
 
 
 def verify_stage(layout, proposal):
@@ -70,7 +74,7 @@ def repair_remaining_antennas(config, source, output, antenna):
     return states[0], json.loads(metrics[0].read_text())
 
 
-def main():
+def main(reserve=False):
     root = Path.cwd()
     trusted = json.loads(Path('/tmp/native-trusted-config.json').read_text())
     validate_inputs(root, json.loads(Path('/tmp/native-eco-source-run.json').read_text()),
@@ -85,10 +89,11 @@ def main():
     if len(macros) != 1 or len(std) != 1:
         raise ValueError('Missing or ambiguous pinned LEF geometry')
     proposal = plan(nl.read_text(), layout.read_text(), std[0], macros[0], clean_postgpl=True)
-    config = configure(trusted, proposal)
-    output = Path('runs/sram-bank-clean-screen'); output.mkdir(exist_ok=False)
+    config = configure(trusted, proposal, reserve=reserve)
+    name = 'sram-bank-reserve' if reserve else 'sram-bank-clean'
+    output = Path('runs/'+name+'-screen'); output.mkdir(exist_ok=False)
     (output/'proposal.json').write_text(json.dumps(proposal, indent=2)+'\n')
-    path = Path('src/config_sram_bank_clean.json'); path.write_text(json.dumps(config, indent=2)+'\n')
+    path = Path('src/config_'+name.replace('-', '_')+'.json'); path.write_text(json.dumps(config, indent=2)+'\n')
     flow = output/'flow'
     start_clean_flow(path, flow, os.environ['PDK_ROOT'])
     before = list(flow.glob('*-openroad-repairdesignpostgpl/tt_um_tripwire.nl.v'))
@@ -110,12 +115,19 @@ def main():
     source, antenna_metrics = repair_remaining_antennas(config, source, output, json.loads(metrics[0].read_text()))
     screen(path, source, output/'timing', os.environ['PDK_ROOT'], repaired=source, sdc=Path('src/signoff.sdc'))
     ready = qualified(json.loads((output/'timing/comparison.json').read_text()), antenna_metrics)
-    (output/'gates.json').write_text(json.dumps(dict(source_run=38172640071,
+    gates = dict(source_run=38172640071,
         clean_from_rtl=True, stock_classic=True, custom_image=False,
         added_cells_by_policy=0, relocated_instances=len(proposal['proposals']),
         qualified=ready, minimum_fast_hold_ns=.05, physical_screen_only=True,
-        official_signoff=False), indent=2)+'\n')
+        official_signoff=False)
+    if reserve:
+        gates.update(timing_reserve_trial=True, setup_repair_target_ns=1.0, hold_repair_target_ns=.125)
+    (output/'gates.json').write_text(json.dumps(gates, indent=2)+'\n')
     if not ready: raise ValueError('Clean bank screen fails timing/50ps hold/antenna gate')
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--reserve', action='store_true')
+    main(reserve=parser.parse_args().reserve)

@@ -28,6 +28,31 @@ def test_config_changes_only_manual_placement_and_strict_congestion(tmp_path, mo
     assert result == original
 
 
+def test_reserve_changes_only_optimizer_targets_keeps_signoff_and_clock(tmp_path, monkeypatch):
+    config, proposal = inputs(tmp_path, monkeypatch)
+    baseline = runner.configure(config, proposal)
+    result = runner.configure(config, proposal, reserve=True)
+    assert result.pop('GRT_RESIZER_SETUP_SLACK_MARGIN') == 1.0
+    assert result['GRT_RESIZER_HOLD_SLACK_MARGIN'] == .125
+    result['GRT_RESIZER_HOLD_SLACK_MARGIN'] = baseline['GRT_RESIZER_HOLD_SLACK_MARGIN']
+    baseline.pop('GRT_RESIZER_SETUP_SLACK_MARGIN', None)
+    assert result == baseline
+    assert result['CLOCK_PERIOD'] == 20 and result['SIGNOFF_SDC_FILE'] == 'unchanged.sdc'
+    with pytest.raises(ValueError): runner.configure(config, proposal, reserve='1')
+
+
+def test_reserve_workflow_selects_separate_output_and_same_hardware_source():
+    import yaml
+    root = Path(__file__).resolve().parents[2]
+    w = yaml.safe_load((root/'.github/workflows/gds-sram-bank-reserve-screen.yaml').read_text())
+    steps = w['jobs']['harden']['steps']
+    assert any(s.get('run') == 'python workflow-src/scripts/ci/sram_bank_clean_screen.py --reserve' for s in steps)
+    d = next(s for s in steps if 'download-artifact@' in s.get('uses',''))
+    assert d['with']['run-id'] == 38172640071
+    upload = next(s for s in steps if 'upload-artifact@' in s.get('uses',''))
+    assert 'runs/sram-bank-reserve-screen/**' in upload['with']['path']
+
+
 @pytest.mark.parametrize('key,value', [('CLOCK_PERIOD',25),('PL_TARGET_DENSITY_PCT',60),
     ('SYNTH_STRATEGY','DELAY 1'),('GRT_RESIZER_HOLD_SLACK_MARGIN',.05),
     ('CTS_SINK_CLUSTERING_SIZE',16),('meta',{'flow':'Custom'}),

@@ -62,3 +62,15 @@ proc tripwire_electrical_repair {master_name expectations groups} {
         puts "TRIPWIRE electrical repair: $buffer_name $master_name; moved [llength $terms] sink pins; all prior cells retained"
     }
 }
+
+proc tripwire_place_electrical_resize {name master location} {
+    set inst [[ord::get_db_block] findInst $name]
+    if {$name ne "_25245_" || $master ne "sg13cmos5l_nor4_2" || $inst eq "NULL" || [[$inst getMaster] getName] ne $master} {
+        error "Unreviewed electrical resize placement"
+    }
+    lassign $location x y orient
+    if {[llength $location] != 3 || $orient ni {N FS}} {error "Invalid resize location"}
+    if {$orient eq "N"} {$inst setOrient R0} else {$inst setOrient MX}
+    $inst setLocation $x $y
+    $inst setPlacementStatus PLACED
+}

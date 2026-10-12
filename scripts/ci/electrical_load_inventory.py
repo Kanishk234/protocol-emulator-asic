@@ -6,6 +6,9 @@ from pathlib import Path
 import re
 
 
+def def_identifier(value):
+    return value.replace('\\[','[').replace('\\]',']')
+
 def inventory(layout, checks, data_budget=6):
     if data_budget not in (4,6): raise ValueError('Unreviewed antenna headroom budget')
     components = layout.split('COMPONENTS ', 1)[1].split('END COMPONENTS', 1)[0]
@@ -15,7 +18,7 @@ def inventory(layout, checks, data_budget=6):
     for entry in section.split(';'):
         hit = re.search(r'^\s*- (\S+)', entry)
         if not hit: continue
-        net = hit[1]
+        net = def_identifier(hit[1])
         for name, pin in re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)', entry.split(' + ', 1)[0]):
             key = (name, pin)
             if key in attached: raise ValueError('Pin attached to multiple nets')

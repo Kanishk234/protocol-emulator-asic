@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
-from electrical_load_inventory import inventory
+from electrical_load_inventory import inventory, def_identifier
 from fanout_sram_plan import occupancy
 from sram_bank_plan import allocate, MACRO_LEF_SHA
 
@@ -13,10 +13,12 @@ DEF_SHA = 'e8512f53f6f4d4c16bab1724b48f91ed9fad34ee105a11d0579ac3a8bef0e11b'
 
 RESIDUAL_DEF_SHA = '1f037dcdee9826d876c82ecd7ce71c699e342df4fea4bb83c373ed5cc13d38a9'
 
-def plan(layout, checks, std_lef, macro_lef, residual=False):
-    if type(residual) is not bool: raise ValueError('Invalid residual selection')
-    source_sha = RESIDUAL_DEF_SHA if residual else DEF_SHA
-    prefix = 'tripwire_residual' if residual else 'tripwire_electrical'
+FINISH_DEF_SHA = '5a436a81e547204e1ffbb73830664a8245b2844a5e3dad76ae85a2adf2188cfd'
+
+def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False):
+    if type(residual) is not bool or type(finish) is not bool or (residual and finish): raise ValueError('Invalid repair selection')
+    source_sha = FINISH_DEF_SHA if finish else (RESIDUAL_DEF_SHA if residual else DEF_SHA)
+    prefix = 'tripwire_finish' if finish else ('tripwire_residual' if residual else 'tripwire_electrical')
     if hashlib.sha256(layout.encode()).hexdigest() != source_sha:
         raise ValueError('Wrong final electrical checkpoint')
     if hashlib.sha256(macro_lef.read_bytes()).hexdigest() != MACRO_LEF_SHA:
@@ -25,17 +27,23 @@ def plan(layout, checks, std_lef, macro_lef, residual=False):
         raise ValueError('Wrong DEF units')
     if not re.search(r'- u_chip.u_sram.sram RM_IHPSG13_1P_512x16_c2_bm_bist\s+\+ FIXED \( 12000 40000 \) FS', layout):
         raise ValueError('Wrong SRAM placement')
-    audit = inventory(layout, checks, data_budget=4 if residual else 6)
+    audit = inventory(layout, checks, data_budget=4 if residual or finish else 6)
     sizes = {}
     boxes = None
-    for master in ('sg13cmos5l_buf_4','sg13cmos5l_buf_8'):
+    for master in (('sg13cmos5l_buf_4','sg13cmos5l_buf_8','sg13cmos5l_buf_1','sg13cmos5l_nor4_2') if finish else ('sg13cmos5l_buf_4','sg13cmos5l_buf_8')):
         size, occupied = occupancy(layout, std_lef, 1000, '__none__', master)
         sizes[master] = size
         if boxes is None: boxes = occupied
     rows = [(int(x),int(y),o,int(n),int(p)) for x,y,o,n,p in re.findall(
         r'^ROW \S+ CoreSite (\d+) (\d+) (N|FS) DO (\d+) BY 1 STEP (\d+) 0 ;', layout,re.M)
-        if int(y)>=241920]
-    if not rows: raise ValueError('Missing legal rows above macro halo')
+        if finish or int(y)>=241920]
+    if finish:
+        # Lower rows are usable to the right of the SRAM halo. Do not force
+        # remote lower-right sinks up above the macro. Keep lower-left excluded.
+        rows=[(x+max(0,(260000-x+p-1)//p)*p,y,o,n-max(0,(260000-x+p-1)//p),p)
+              if y<241920 else (x,y,o,n,p) for x,y,o,n,p in rows]
+        rows=[r for r in rows if r[3]>0]
+    if not rows: raise ValueError('Missing legal rows')
     positions = {name:(left,bottom) for name,left,bottom,right,top in boxes}
     groups = []
     for driver in audit['drivers']:
@@ -54,24 +62,45 @@ def plan(layout, checks, std_lef, macro_lef, residual=False):
                 source_net=driver['net'],rail_source=driver['instance'],master=master,sinks=sinks,
                 target=[sum(positions[n][j] for n,p in sinks)//length for j in range(2)],
                 kind='clock' if driver['clock_branch'] else 'data'))
-    pin_name = 'A_ADDR[2]' if residual else 'A_REN'
-    body=re.search(r'PIN '+re.escape(pin_name)+r'\s(.*?)END '+re.escape(pin_name),macro_lef.read_text(),re.S)
-    rect=re.search(r'RECT\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)',body[1]) if body else None
-    if not rect: raise ValueError('Missing macro REN pin')
-    x1,y1,x2,y2=map(float,rect.groups())
-    pin=[round((12+(x1+x2)/2)*1000),round((40+191.34-(y1+y2)/2)*1000)]
-    source_net=audit['ren']['net']; rail_source=audit['ren']['driver'][0]
-    sink=audit['ren']['pin']
-    if residual:
-        if not re.search(r'- place7515 sg13cmos5l_buf_1\b',layout): raise ValueError('Wrong address driver')
-        entry=re.search(r'^\s*- net7515\s+([^;]+);',layout.split('\nNETS ',1)[1],re.M)
-        terms=re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry[1]) if entry else []
-        if sorted(terms)!=sorted([('place7515','X'),('u_chip.u_sram.sram','A_ADDR[2]')]):
-            raise ValueError('Wrong isolated address load')
-        source_net='net7515';rail_source='place7515';sink=('u_chip.u_sram.sram','A_ADDR[2]')
-    groups.append(dict(buffer=prefix+('_macro' if residual else '_ren'),net=prefix+('_macro_net' if residual else '_ren_net'),
-        source_net=source_net,rail_source=rail_source,master='sg13cmos5l_buf_4',
-        sinks=[sink],target=pin,kind='address' if residual else 'ren'))
+    resizes=[]
+    if finish:
+        sections=layout.split('\nNETS ',1)[1].split('END NETS',1)[0]
+        nets={}
+        for entry in sections.split(';'):
+            hit=re.search(r'^\s*- (\S+)',entry)
+            if hit: nets[def_identifier(hit[1])]=re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry.split(' + ',1)[0])
+        if sorted(nets.get('_00296_',[]))!=sorted([('_33530_','Y'),('_45710_','D')]):
+            raise ValueError('Hold leaf changed')
+        groups.append(dict(buffer=prefix+'_hold',net=prefix+'_hold_net',source_net='_00296_',
+            rail_source='_45710_',master='sg13cmos5l_buf_1',sinks=[('_45710_','D')],
+            target=list(positions['_45710_']),kind='hold'))
+        if not re.search(r'- _25245_ sg13cmos5l_nor4_1\b',layout): raise ValueError('Wrong slew driver')
+        pins={p:net for net,terms in nets.items() for n,p in terms if n=='_25245_'}
+        if set(pins)!={'A','B','C','D','Y'} or pins['Y']!='_19647_': raise ValueError('Wrong NOR4 connections')
+        width,height=sizes['sg13cmos5l_nor4_2']
+        distance,x,y,orient=allocate(rows,boxes,'_25245_',width,height,positions['_25245_'])
+        boxes=[b for b in boxes if b[0]!='_25245_']+[('_25245_',x,y,x+width,y+height)]
+        resizes.append(dict(instance='_25245_',old_master='sg13cmos5l_nor4_1',new_master='sg13cmos5l_nor4_2',
+            pins=pins,location=[x,y,orient],origin_displacement_dbu=distance))
+    else:
+        pin_name = 'A_ADDR[2]' if residual else 'A_REN'
+        body=re.search(r'PIN '+re.escape(pin_name)+r'\s(.*?)END '+re.escape(pin_name),macro_lef.read_text(),re.S)
+        rect=re.search(r'RECT\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)',body[1]) if body else None
+        if not rect: raise ValueError('Missing macro REN pin')
+        x1,y1,x2,y2=map(float,rect.groups())
+        pin=[round((12+(x1+x2)/2)*1000),round((40+191.34-(y1+y2)/2)*1000)]
+        source_net=audit['ren']['net']; rail_source=audit['ren']['driver'][0]
+        sink=audit['ren']['pin']
+        if residual:
+            if not re.search(r'- place7515 sg13cmos5l_buf_1\b',layout): raise ValueError('Wrong address driver')
+            entry=re.search(r'^\s*- net7515\s+([^;]+);',layout.split('\nNETS ',1)[1],re.M)
+            terms=re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry[1]) if entry else []
+            if sorted(terms)!=sorted([('place7515','X'),('u_chip.u_sram.sram','A_ADDR[2]')]):
+                raise ValueError('Wrong isolated address load')
+            source_net='net7515';rail_source='place7515';sink=('u_chip.u_sram.sram','A_ADDR[2]')
+        groups.append(dict(buffer=prefix+('_macro' if residual else '_ren'),net=prefix+('_macro_net' if residual else '_ren_net'),
+            source_net=source_net,rail_source=rail_source,master='sg13cmos5l_buf_4',
+            sinks=[sink],target=pin,kind='address' if residual else 'ren'))
     for group in groups:
         name=group['buffer']; width,height=sizes[group['master']]
         if name in positions or re.search(r'^\s*- '+re.escape(group['net'])+r'\s',layout,re.M):
@@ -83,11 +112,14 @@ def plan(layout, checks, std_lef, macro_lef, residual=False):
         width,height=sizes[group['master']];x,y,o=group['location']
         if any(n!=group['buffer'] and l<x+width and r>x and b<y+height and t>y
                for n,l,b,r,t in boxes): raise ValueError('Combined repair overlap')
-    return dict(source_run=38281277834 if residual else 38272508875,def_sha256=source_sha,groups=groups,
+    result = dict(source_run=38283838612 if finish else (38281277834 if residual else 38272508875),def_sha256=source_sha,groups=groups,
         added_buffers=len(groups),added_footprint_um2=sum(sizes[g['master']][0]*sizes[g['master']][1]/1e6 for g in groups),
         footprint_overlap_count=0,source_connectivity_verified=True,
         detailed_legalization_required=True,power_connectivity_verified=False,
         physical_timing_measured=False,official_signoff=False)
+    if finish:
+        result.update(resizes=resizes,resize_added_footprint_um2=2.88*3.78)
+    return result
 
 
 def validate_change(before, after, proposal):
@@ -111,6 +143,12 @@ def validate_change(before, after, proposal):
             result[normalize(n)]=(m,tuple(sorted(expanded)))
         return result
     old,new=normalized(old),normalized(new)
+    for resize in proposal.get('resizes',[]):
+        name=resize['instance'];master,pins=old[name]
+        if (name!='_25245_' or master!='sg13cmos5l_nor4_1' or resize['old_master']!=master
+                or resize['new_master']!='sg13cmos5l_nor4_2' or dict(pins)!=resize['pins']):
+            raise ValueError('Unreviewed resize or changed resize connections')
+        old[name]=(resize['new_master'],pins)
     groups=proposal['groups']; added={g['buffer'] for g in groups}
     rewires={}
     for g in groups:
@@ -134,18 +172,23 @@ def validate_change(before, after, proposal):
 def target_call(layout, proposal):
     if (hashlib.sha256(layout.encode()).hexdigest()!=proposal['def_sha256']
             or (proposal['source_run'],proposal['def_sha256']) not in
-            {(38272508875,DEF_SHA),(38281277834,RESIDUAL_DEF_SHA)}):
+            {(38272508875,DEF_SHA),(38281277834,RESIDUAL_DEF_SHA),(38283838612,FINISH_DEF_SHA)}):
         raise ValueError('Wrong repair source')
     components=layout.split('COMPONENTS ',1)[1].split('END COMPONENTS',1)[0]
     masters=dict(re.findall(r'^\s*- (\S+) (\S+)',components,re.M))
     entries={}
     for entry in layout.split('\nNETS ',1)[1].split('END NETS',1)[0].split(';'):
         hit=re.search(r'^\s*- (\S+)',entry)
-        if hit: entries[hit[1]]=re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry.split(' + ',1)[0])
+        if hit: entries[def_identifier(hit[1])]=re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry.split(' + ',1)[0])
     def word(value):
         if not re.fullmatch(r'[A-Za-z0-9_./\[\]\-]+',value): raise ValueError('Unsafe Tcl identity')
         return '{'+value+'}'
     calls=[]
+    for resize in proposal.get('resizes',[]):
+        pins=' '.join(word(p)+' '+word(n) for p,n in sorted(resize['pins'].items()))
+        calls.append('tripwire_size_native_hold100 {{'+word(resize['instance'])+' '+word(resize['old_master'])+' '+word(resize['new_master'])+' {'+pins+'}}}')
+        x,y,o=resize['location']
+        calls.append('tripwire_place_electrical_resize '+word(resize['instance'])+' '+word(resize['new_master'])+' {'+f'{x} {y} {o}'+'}')
     # Group each source's complete partition into one preflighted mutation.
     for net in dict.fromkeys(g['source_net'] for g in proposal['groups']):
         groups=[g for g in proposal['groups'] if g['source_net']==net]

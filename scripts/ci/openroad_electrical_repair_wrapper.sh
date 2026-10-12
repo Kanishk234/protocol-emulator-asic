@@ -21,6 +21,7 @@ if [[ "$script_name" == "grt.tcl" || "$script_name" == "antenna_repair.tcl" ]]; 
             if [[ "$script_name" == "grt.tcl" ]]; then
             printf '%s\n' \
                 'write_verilog [file rootname $::env(SAVE_ODB)].baseline.nl.v' \
+                'source /usr/local/share/tripwire/native_hold100_size.tcl' \
                 'source /usr/local/share/tripwire/electrical_repair.tcl' \
                 'source /usr/local/share/tripwire/electrical_repair_targets.tcl' \
                 'source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl'

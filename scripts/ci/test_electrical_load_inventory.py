@@ -47,3 +47,8 @@ def test_four_load_headroom_is_explicit_and_bounded():
     assert d['retained_loads']+d['proposed_buffers']<=4
     assert d['loads']-d['retained_loads']<=4*d['proposed_buffers']
     with pytest.raises(ValueError): inventory(layout,report,data_budget=8)
+
+
+def test_def_bus_identifier_normalizes_for_open_db_and_verilog():
+    from electrical_load_inventory import def_identifier
+    assert def_identifier(r'u_chip.g_lane\[0\].host_wdata\[8\]')=='u_chip.g_lane[0].host_wdata[8]'

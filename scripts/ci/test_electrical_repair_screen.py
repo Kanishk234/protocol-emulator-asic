@@ -65,3 +65,31 @@ def test_parent_plan_only_tolerates_area_roundoff():
     assert not same_plan(a,b)
     b['added_footprint_um2']=464.4864;b['groups'][0]['sinks'][0][0]='other'
     assert not same_plan(a,b)
+
+
+@pytest.mark.parametrize('fault',['none','hold_changed','missing_corner','antenna'])
+def test_latest_unqualified_measurements_are_exact_source_evidence(fault):
+    from electrical_repair_screen import validate_finish_measurements
+    values={'nom_fast_1p32V_m40C':(.0496594,0),'nom_typ_1p20V_25C':(.1372,0),'nom_slow_1p08V_125C':(.291978,9)}
+    comparison={'corners':{c:{'after':{f'timing__setup__ws__corner:{c}':0,
+        f'timing__hold__ws__corner:{c}':hold,f'design__max_slew_violation__count__corner:{c}':slew,
+        f'design__max_fanout_violation__count__corner:{c}':2,f'design__max_cap_violation__count__corner:{c}':0}}
+        for c,(hold,slew) in values.items()}}
+    antenna={'antenna__violating__nets':0,'antenna__violating__pins':0}
+    if fault=='hold_changed': comparison['corners']['nom_fast_1p32V_m40C']['after']['timing__hold__ws__corner:nom_fast_1p32V_m40C']=.05
+    elif fault=='missing_corner':comparison['corners'].pop('nom_fast_1p32V_m40C')
+    elif fault=='antenna':antenna['antenna__violating__nets']=1
+    if fault=='none':validate_finish_measurements(comparison,antenna)
+    else:
+        with pytest.raises(ValueError):validate_finish_measurements(comparison,antenna)
+
+
+def test_finish_workflow_uses_exact_source_and_separate_output():
+    root=Path(__file__).resolve().parents[2]
+    w=yaml.safe_load((root/'.github/workflows/gds-electrical-finish-screen.yaml').read_text())
+    steps=w['jobs']['harden']['steps']
+    d=next(s for s in steps if 'download-artifact@' in s.get('uses',''))
+    assert d['with']['run-id']==38283838612
+    assert any(s.get('run')=='python workflow-src/scripts/ci/electrical_repair_screen.py --finish' for s in steps)
+    u=next(s for s in steps if 'upload-artifact@' in s.get('uses',''))
+    assert 'runs/electrical-finish-screen/**' in u['with']['path']

@@ -10,7 +10,7 @@ from postgrt_timing import screen
 from sram_bank_clean_route import unique, validate_checkpoint
 from sram_bank_clean_screen import configure, electrical_clean
 from sram_bank_plan import plan as bank_plan, MACRO_LEF_SHA
-from electrical_repair_plan import plan, target_call, validate_change, DEF_SHA, RESIDUAL_DEF_SHA
+from electrical_repair_plan import plan, target_call, validate_change, DEF_SHA, RESIDUAL_DEF_SHA, FINISH_DEF_SHA
 from clock8_residual_screen import promote_antenna
 
 SOURCE_RUN=38272508875
@@ -53,10 +53,38 @@ def validate_residual_provenance(run,gates):
     if gates!=expected: raise ValueError('Source failure is not solely electrical qualification')
 
 
-def main(residual=False):
+def validate_finish_provenance(run,gates):
+    if (run.get('id')!=38283838612 or run.get('head_sha')!='64023d720a832189323a275d3fbdc1abcff4b1b9'
+            or run.get('head_branch')!='main' or run.get('conclusion')!='failure'
+            or run.get('path')!='.github/workflows/gds-electrical-residual-screen.yaml'):
+        raise ValueError('Wrong latest hold/electrical source')
+    expected=dict(source_run=38281277834,qualified=False,timing_antenna_qualified=False,
+        electrical_qualified=False,added_buffers=8,minimum_fast_hold_ns=.05,
+        physical_screen_only=True,custom_image=True,official_signoff=False)
+    if gates!=expected: raise ValueError('Wrong unqualified latest source receipt')
+
+
+def validate_finish_measurements(comparison,antenna):
+    expected={'nom_fast_1p32V_m40C':(.0496594,0),
+              'nom_typ_1p20V_25C':(.1372,0),'nom_slow_1p08V_125C':(.291978,9)}
+    if set(comparison.get('corners',{}))!=set(expected): raise ValueError('Missing measured corners')
+    for c,(hold,slew) in expected.items():
+        actual=comparison['corners'][c]['after']
+        values={f'timing__setup__ws__corner:{c}':0,f'timing__hold__ws__corner:{c}':hold,
+                f'design__max_slew_violation__count__corner:{c}':slew,
+                f'design__max_fanout_violation__count__corner:{c}':2,
+                f'design__max_cap_violation__count__corner:{c}':0}
+        if any(actual.get(k)!=v for k,v in values.items()): raise ValueError('Changed latest source measurements')
+    if antenna.get('antenna__violating__nets')!=0 or antenna.get('antenna__violating__pins')!=0:
+        raise ValueError('Latest source has unreviewed antennas')
+
+
+def main(residual=False, finish=False):
     root=Path('runs/sram-bank-electrical-screen')
     run=json.loads(Path('/tmp/native-strength-source-run.json').read_text())
-    if not residual:
+    if finish:
+        validate_finish_provenance(run,json.loads(Path('runs/electrical-residual-screen/gates.json').read_text()))
+    elif not residual:
         validate_provenance(run,json.loads((root/'gates.json').read_text()))
     else:
         validate_residual_provenance(run,json.loads(Path('runs/electrical-repair-screen/gates.json').read_text()))
@@ -76,7 +104,7 @@ def main(residual=False):
     config=configure(trusted,bank,electrical=True)
     if config!=json.loads(Path('src/config_sram_bank_electrical.json').read_text()): raise ValueError('Changed source recipe')
     source=validate_checkpoint(root,bank)
-    if residual:
+    if residual or finish:
         parent=Path('runs/electrical-repair-screen')
         prior=json.loads(source.read_text())
         old_plan=plan(Path(prior['def']).read_text(),(root/'timing/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/checks.rpt').read_text(),std[0],macros[0])
@@ -95,15 +123,35 @@ def main(residual=False):
         if not qualified(comparison,metrics): raise ValueError('Parent timing/antenna gate fails')
         validate_antenna_only_changes(repaired.read_text(),Path(json.loads(source.read_text())['nl']).read_text())
         root=parent
+    if finish:
+        parent=Path('runs/electrical-residual-screen')
+        prior=json.loads(source.read_text())
+        old_plan=plan(Path(prior['def']).read_text(),(root/'timing/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/checks.rpt').read_text(),std[0],macros[0],residual=True)
+        if not same_plan(old_plan,json.loads((parent/'proposal.json').read_text())): raise ValueError('Wrong eight-buffer parent plan')
+        grt_state=json.loads(unique(parent/'grt','*-openroad-globalrouting/state_out.json').read_text())
+        grt_odb=Path(grt_state['odb'])
+        baseline=grt_odb.with_suffix('.baseline.nl.v'); repaired=grt_odb.with_suffix('.eco.nl.v')
+        validate_antenna_only_changes(Path(prior['nl']).read_text(),baseline.read_text())
+        validate_change(baseline.read_text(),repaired.read_text(),old_plan)
+        validate_overflow(unique(parent/'grt','*-openroad-globalrouting/openroad-globalrouting.log').read_text())
+        comparison=json.loads((parent/'timing/comparison.json').read_text())
+        source=Path(comparison['after_state'])
+        allowed=unique(parent/'antenna-cleanup','*-openroad-checkantennas/eco_state.json')
+        if source.resolve()!=allowed.resolve(): raise ValueError('Wrong latest physical checkpoint')
+        metrics=json.loads((source.parent/'or_metrics_out.json').read_text())
+        # This exact source fails hold/electrical. Accept it for repair, never as qualification.
+        validate_finish_measurements(comparison,metrics)
+        validate_antenna_only_changes(repaired.read_text(),Path(json.loads(source.read_text())['nl']).read_text())
+        root=parent
     saved=json.loads(source.read_text()); layout=Path(saved['def'])
-    if hashlib.sha256(layout.read_bytes()).hexdigest()!=(RESIDUAL_DEF_SHA if residual else DEF_SHA): raise ValueError('Wrong final DEF')
+    if hashlib.sha256(layout.read_bytes()).hexdigest()!=(FINISH_DEF_SHA if finish else (RESIDUAL_DEF_SHA if residual else DEF_SHA)): raise ValueError('Wrong final DEF')
     if list(root.rglob('*-openroad-detailedrouting')): raise ValueError('Source contains DRT')
     checks=root/'timing/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/checks.rpt'
-    proposal=plan(layout.read_text(),checks.read_text(),std[0],macros[0],residual=residual)
+    proposal=plan(layout.read_text(),checks.read_text(),std[0],macros[0],residual=residual,finish=finish)
     targets=Path('workflow-src/scripts/ci/electrical_repair_targets.tcl')
     if targets.exists(): raise ValueError('Repeated electrical repair')
     targets.write_text(target_call(layout.read_text(),proposal))
-    output=Path('runs/electrical-residual-screen' if residual else 'runs/electrical-repair-screen');output.mkdir(exist_ok=False)
+    output=Path('runs/electrical-finish-screen' if finish else ('runs/electrical-residual-screen' if residual else 'runs/electrical-repair-screen'));output.mkdir(exist_ok=False)
     (output/'proposal.json').write_text(json.dumps(proposal,indent=2)+'\n')
     subprocess.run(['docker','build','-t','tripwire-electrical-repair:local','-f',
         'workflow-src/scripts/ci/Dockerfile.openroad-electrical-repair','workflow-src/scripts/ci'],check=True)
@@ -136,15 +184,20 @@ def main(residual=False):
     comparison=json.loads((output/'timing/comparison.json').read_text())
     timing_ready=qualified(comparison,metrics);electrical_ready=electrical_clean(comparison)
     ready=timing_ready and electrical_ready
-    (output/'gates.json').write_text(json.dumps(dict(source_run=38281277834 if residual else SOURCE_RUN,qualified=ready,
+    gates=dict(source_run=38283838612 if finish else (38281277834 if residual else SOURCE_RUN),qualified=ready,
         timing_antenna_qualified=timing_ready,electrical_qualified=electrical_ready,
         added_buffers=proposal['added_buffers'],minimum_fast_hold_ns=.05,physical_screen_only=True,
-        custom_image=True,official_signoff=False),indent=2)+'\n')
+        custom_image=True,official_signoff=False)
+    if finish: gates['resized_cells']=len(proposal['resizes'])
+    (output/'gates.json').write_text(json.dumps(gates,indent=2)+'\n')
     if not ready: raise ValueError('Electrical repair screen fails strict timing/electrical/antenna gates')
 
 
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--residual',action='store_true')
-    main(residual=parser.parse_args().residual)
+    modes=parser.add_mutually_exclusive_group()
+    modes.add_argument('--residual',action='store_true')
+    modes.add_argument('--finish',action='store_true')
+    args=parser.parse_args()
+    main(residual=args.residual,finish=args.finish)

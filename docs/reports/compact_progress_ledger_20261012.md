@@ -38,3 +38,9 @@ Actual before-CTS comparison result SHA256: `f8db35215e1070f84fdda2450748e3d9b0e
 [38320631258](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38320631258) passes native ten-buffer placement, exact immutability of all3645original instances, contracted signal connectivity and physical interface/power phase checks. All3 original-corner setup/hold/electrical checks pass; fast hold remains0.100232ns. Result SHA256: `df6f07c502518e2d9a1ec95facd43de5f5d060df11206dab6f59d484da33271b`. This is a newly qualified placement/electrical candidate, not routing closure or full native timing acceptance.
 
 Candidate ODB: `90940c876925b362f0589d6e3052d37527d3fdae75b71388848b717d0d82bb17`; netlist: `d53fd05fb028b4589f7b855daaed84415cc4425fe2b88c840938e002a3d5d35f`. Prepared unchanged-policy GRT comparison with best133control. Adapter checks pass against actual downloaded artifacts.
+
+## Actual earlier-stage routing outcome: reject reflow
+
+[38321208948](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38321208948) completes the comparison: original133 versus reflow6544overflow, both native returncode1. Result SHA256: `e6eeb39ec5ee5a6f3fe7fcc517aa83f417c1de778b7b4c4dd8903aeb201ef65a`. Producer qualification was real, but did not improve routing. Retain133 control.
+
+Native geometry moves cells toward the thin north corridor:76→443CORE cells; west3231→2892, east7→7. This is distribution evidence, not causal attribution. D094 changes only the placement estimator to native FastRoute feedback, retaining density55 and original clock/repair/layer/capacity policies. Runtime-copied GPL source is pinned/licensed and actual command execution is required. Final zero-overflow, electrical/timing and full physical gates remain unchanged.

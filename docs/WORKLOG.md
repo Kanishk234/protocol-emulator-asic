@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-12 (session97: reject reflow route; native estimator test)
+**Done:** actual38321208948 collectorSUCCESS, control133/reflow6544overflow, bothnative returncode1. ResultSHA e6eeb39e…; reject broad RUDY reflow. Native geometry northCORE76→443, west3231→2892, east7unchanged; no per-violation causal claim. PreparedD094 same before-CTS/density55/CTS8/clock/repair policy with only estimator changed to native FastRoute. Runtime copy GPL source b293515d… retains attribution/license; actual flag and routing policy checked, all existing physical/corner rejection gates retained. Focused regressions50PASS. No source/spec changes, waived gates, localEDA or phase boxes ticked.
+**Next step:** inspect native-estimator stage and corner results before another fanout/routing comparison. Preserve133 control; setup/producer success never counts as routing closure.
+
 ## 2026-10-12 (session96: earlier-stage fanout-clean producer passes)
 **Done:** actual38320631258SUCCESS; resultSHA df6f07c5… verifies ten identity buffers, all3645 originals unmoved/unchanged and contracted connections exact. Native physical interface/ROW power phase passes; all3 original-corner electrical/setup/hold gates pass with fast hold0.100232ns. Prepared direct unchanged-policy GRT comparison to best133control, using authenticated candidate90940c87…/d53fd05f… . Local adapter validates actual downloaded artifacts; focused regressions48PASS. This advances producer qualification, not native routing/signoff. No frozen source/spec changes or phase boxes ticked.
 **Cloud launched:**38321208948 in_progress on4b937d4; inputs fetched, pinned image provisioning underway at inspection. No localEDA or active hardening cancellation.

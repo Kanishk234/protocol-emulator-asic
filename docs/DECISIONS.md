@@ -909,3 +909,25 @@ including>=0.1ns hold. No constraints, source/spec, capacity or user protocol
 changes. The buffers cost actual native footprint/wires for every program;
 benefit is removal of the known distribution electrical violations, not a
 claimed routing improvement. Only a passing producer proceeds to GRT versus133.
+
+## D-094: Replace misleading placement congestion proxy with native routing feedback
+
+**Date:**2026-10-12. **Status:** isolated estimator comparison prepared.
+Actual38321208948 retainscontrol133overflow but fanout-clean reflow reaches6544;
+rejectD092/D093 reflow for routing despite its producer gates. Native geometry
+shows north-corridorCORE cells increase76→443 (control38167697696 versus
+producer38320631258), west3231→2892, east remains7. Membership/distribution
+suggests corridor pressure, but is not proof of each violation's cause.
+
+Keep the same pre-CTS reflow density55, source, CTS8 and repair/clock policy;
+change only placement estimation from RUDY to native FastRoute via
+-routability_use_grt. Copy pinned GPL Tcl at runtime, retaining license headers
+and exact sourceSHA b293515d…; upstream source stays untouched. Require actual
+native command execution and exact Metal1–4/adjustment0.3/layer-adjustments/
+macro-extension policy. The unchanged final GRT zero-overflow gate still applies;
+temporary placement estimation is not a final congestion waiver. All physical
+interface/power phase and3-corner electrical/timing rejection gates remain.
+No source/spec/resource or protocol changes; every program pays any altered
+wiring/repair tradeoff. Actual area and routing benefit remain unmeasured.
+
+[OpenROAD global placement](https://openroad.readthedocs.io/en/latest/main/src/gpl/README.html) documents native GRT as a more precise, higher-runtime alternative to its default RUDY estimate. Native-runtime failure or missing source/flag evidence rejects this experiment; no physical advantage is assumed.

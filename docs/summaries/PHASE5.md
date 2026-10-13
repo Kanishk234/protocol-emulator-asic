@@ -32,7 +32,8 @@ Earlier-stage placement38319615838 rebuilds CTS/repairs and restores the
 retained hold guard after post-CTS redistribution failed it. Known fanout
 repair38320631258 now passes native placement/connection/interface checks
 and all3 original-corner estimated shell electrical/timing gates, retaining
-fast hold0.100232ns. Routing comparison38321208948 is active against133;
+fast hold0.100232ns. Routing comparison38321208948 rejects reflow:6544versus133;
+D094 now evaluates native routing feedback in placement at unchanged policy;
 no routing or complete chip-timing pass is claimed. The progress ledger
 separates setup failures, rejected changes and actual qualified results.
 

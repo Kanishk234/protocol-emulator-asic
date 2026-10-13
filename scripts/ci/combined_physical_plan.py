@@ -127,11 +127,18 @@ def plan(netlist,layout,hold_report,checks,std_lef,macro_lef,binding=None):
                 name,pin=row.split()[0].rsplit('/',1);source=attached[(name,pin)]
                 failures.setdefault(source,set()).add(kind)
     if len(checks)!=3 or len(failures)!=cfg['electrical_nets']:raise ValueError('Wrong measured electrical target set')
+    resize_only=set(cfg.get('resize_only_slew_drivers',()))
+    handled_resize_only=set()
     for source,kinds in sorted(failures.items()):
         terms=nets[source]
         drivers=[p for p in terms if p[1] in ('X','Y','Q') or p[1].startswith('A_DOUT[')]
         if len(drivers)!=1:raise ValueError('Missing unique data driver')
         driver=drivers[0]
+        if driver[0] in resize_only:
+            if kinds!={'slew'} or driver[0] not in setup or driver[1] not in ('X','Y','Q'):
+                raise ValueError('Unreviewed resize-only electrical repair')
+            handled_resize_only.add(driver[0])
+            continue
         remaining=[p for p in terms if p!=driver and p not in moved]
         protected=[p for p in remaining if p[1] in ('CLK','GCLK','GATE','RESET_B')]
         preserved=0
@@ -153,6 +160,7 @@ def plan(netlist,layout,hold_report,checks,std_lef,macro_lef,binding=None):
             elif 'slew' in kinds:target=list(loc[driver[0]][1:3])
             else:target=[sum(point(p)[i] for p in selected)//len(selected) for i in (0,1)]
             add(source,selected,'sg13cmos5l_buf_4',target,'electrical')
+    if handled_resize_only!=resize_only:raise ValueError('Missing resize-only slew source')
     for group in groups:
         x,y,o=group['location'];w,h=sizes[group['master']]
         if any(n!=group['buffer'] and l<x+w and rr>x and b<y+h and t>y for n,l,b,rr,t in boxes):raise ValueError('Combined footprint overlap')

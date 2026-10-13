@@ -1,0 +1,6 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY --chmod=755 openroad_decode_combined_wrapper.sh /usr/local/bin/tripwire-combined-screen
+COPY electrical_repair.tcl native_hold100_size.tcl incremental_placement.tcl combined_physical_targets.tcl /usr/local/share/tripwire/
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-combined-screen
+COPY strength_fanout.tcl /usr/local/share/tripwire/combined_physical.tcl
+COPY post_antenna_fanout.tcl /usr/local/share/tripwire/

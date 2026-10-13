@@ -24,6 +24,8 @@ Clean-build stock screens37853023857 AREA0/AREA1 both report setupWS0 and positi
 
 The latest repair screen38356513586 passes every requested estimated-routing gate: no reported setup violations, fast hold73.499ps, and zero slew, fanout, capacitance, antenna and overflow violations. Electrical repair now runs after antenna insertion in the same router process, resolving the cycle where new diode loads overloaded different nets. This is a checkpoint screen; its detailed routing/extraction, protocol regression and official clean-flow reproduction are still required.
 
+Its continuation38358706808 now completes0DRC detailed routing and passes antenna checks, but extraction fails slow setup at-0.230241ns and reports27 slow-slew rows plus5 fanout nets. Fast hold61.103ps passes our50ps gate; capacitance violations remain0. Detailed routing inserts27 antenna diodes, so electrical repair must also account for that later stage. A new source-bound decode-cone sizing diagnostic is prepared; no official integration has been made.
+
 ## What we found
 
 Equivalent logic can shift mapping, placement and critical paths elsewhere in the chip. Faster local arithmetic did not guarantee better full-chip timing. Routing screens are useful filters, but extracted parasitics have repeatedly exposed regressions. Live configuration remains timed; no false paths or changed cycles hide failing behavior.
@@ -32,13 +34,13 @@ Functional evidence is strong. Physical timing and area must still be judged tog
 
 ## What's left
 
-- Continue the qualified screen38356513586 through zero-DRC detailed routing, strict extracted timing/electrical checks and routed protocol verification; then reproduce the recipe in the clean official flow.
+- Repair latest extracted slow setup and electrical failures, including diode loads introduced during detailed routing; repeat strict physical/extracted gates and routed protocol verification before official reproduction.
 - Preserve measured setup/hold reserve without losing protocol or live-configuration behavior; distinguish latch-reported zero WS from actual endpoint margins.
 - Reproduce the selected full design in official GDS; pass DRC/LVS/antenna/precheck and matching gate-level tests.
 - Complete the routable-budget decision, revalidate the adopted hardware and keep required CI green on final main. Phase2 stays open until all exit requirements pass.
 
 ## One-line takeaway
 
-The current screen passes timing and all electrical/antenna checks; detailed extraction, routed protocols and official GDS still decide Phase2 completion.
+The latest route passes DRC, antenna and hold; extracted setup and electrical violations still block Phase2 and official GDS.
 
 Detailed evidence: [closure research](../reports/PHASE2_CLOSURE_RESEARCH.md), [baseline recovery](../reports/PHASE2_SHARED_RX_REGRESSION.md), [repair-only screen](../reports/PHASE2_BANKED_SRAM_HOLD_SCREEN.md), [routed follow-up review](../reports/PHASE2_BANKED_SRAM_HOLD_ROUTE.md).

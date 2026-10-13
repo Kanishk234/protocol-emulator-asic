@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (DRT/extraction genuine residual failure; decode study prepared)
+-38358706808 artifact11795955910: fresh stock allgate recheck passes; detailed route0DRC/conservedNL and antenna0. Actual extracted setupslow-0.230241ns;fast hold61.103ps (passes50);typ166.093ps,slow339.983ps; cap0;slow slew27,fanout5each. No helper bug/gate waiver. Raw job API supplied logs when rendered gh logs were empty.
+- Seven printed failing setup paths share configuration latch48107 and decode cone; prepared5-case fixedSPEF strength study30044/A21OI2,43917/NOR2_2,43915/AND3_2 with exact newest source/baseline reproduction.29 focusedtests and five actual-source conservationchecks pass.
+- DRT adds27 native antenna diodes, creating5 fanout failures despite clean GRT. Slow slew rows mapto7driver nets including SRAMADDR8. Four sub75ps hold endpoints available for reserve. Next publish/launchsetup diagnostic while preparing extracted-load/post-DRT repair strategy. No new physicalscreen untilsetupselection resolved; no official/Phase2 tick. Unrelated files excluded.
+
+## 2026-10-13: Codex (qualified post-antenna DRT/extraction launched)
+- Published tools610bc10/CIb6d0544/docs8e77722;remote main verified8e77722239af612fad2f590c322cab84600f76d0. [Post-antenna route38358706808](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38358706808) confirmed in_progress on exact head.
+- Source38356513586 independently passes every required screen gate;97 focused tests and actual-artifact audit pass. Fresh stock allgate check before DRT,0DRC/freshNL/extracted strict gates required. Next inspect extracted results;no official/Phase2 completion claim. Receipt local pending next publication.
+
 ## 2026-10-13: Codex (strict post-antenna screen passes; exact DRT continuation prepared)
 -38356513586 actualartifact11793266699:setupWS0 all corners;fast/typ/slow hold73.4991/172.911/347.727ps;slew/fanout/cap0 all corners,antenna0,overflow0. Same-process correction converges in1batch/3BUF4 beyond8initialbuffers. Independently reaudited actual canonical plan/placements/connectivity/history/live routing/gates; BUG106 physical screen evidence updated.
 - Prepared exact-successful-source stock DRT/extraction continuation, fresh strict gates before DRT, no repair/fullGRT replay,0DRC/freshNL conservation, unchanged extracted50ps/electrical/allcorner gates. Preserve old extracted evidence. BUG107 area-total roundoff caught/fixed prelaunch; BUG108 missing/empty extracted electrical summaries now refused.

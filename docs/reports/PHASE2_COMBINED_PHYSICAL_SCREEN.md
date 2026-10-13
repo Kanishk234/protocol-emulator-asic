@@ -30,3 +30,11 @@ Saved1000pathreportscontain10negativesetuppathsand4sub50psholdpaths. Worstsetup4
 The13slowslewrowsmaptoonlytwodrivers:NAND444589/net17361andNOR443311/net16410. TheNAND4hasnostrongervariant;boundedlocaloutputloadisolationisacandidate. NOR4_2isavailable. Fanoutdriversplace8647/place9151have10loads(2/4diodes);24514/28879/45622/place7856have9loads(1diodeeach). Theold76newcellsand8resizesmustberetained;onlyresidualsource-boundcorrectionsareproposed.
 
 NewroutedNL SHA:c98fb068c21b40c07263a67f63e446e1099f8116b5a9fb0806841ea612e7d386;DEF:c28307f932c670729b1abb6fe5f987c49f659adb1897fc57dbf73b504b2524f7;extractedfillNL:08f99cf0d24fc7cc238ca80252d388500a0e845f4c6888dcbc71d4e7f5e00e1a. Nextpreparematchedresidualsetup/load/holdscreen;calibrateagainstnowmeasured16psfastholdscreen-to-extractedlossand0.399nssetupdeficitwithoutchangingofficialconstraints. NoDRTuntilcorrectedscreenpasses;officialGL/GDSremainopen.
+
+## Residual diagnostic and next preparation
+
+Completed fixed-SPEF study38342469816 improves slow setup from -0.399145617ns to -0.199742450ns with NOR2_2 at43582. BUF4/BUF8 and NOR4 alternatives tested in that study do not reduce the resulting global worst slack further. Fast hold stays38.505ps. This does not qualify physical timing.
+
+The next six-case diagnostic compares the NOR2 change with individual and joint DLY4SD3-to-DLY4SD2 changes at hold12766 and hold12715. It keeps the measured source SPEF and checks all corners; shorter delays may expose hold paths, so inspect their results before choosing physical changes.
+
+A source-bound residual physical screen is prepared but must remain undispatched until setup selection is resolved. Its provisional proposal retains previous repairs and adds32 endpoint-local DLY4SD1 cells for endpoints below75ps plus21 electrical BUF4 cells, with4 provisional resizes. Joint footprint growth is801.9648um2 with zero offline overlaps. The75ps repair selection does not change the50ps fast-hold acceptance gate. Recompute affected hold targets if the shared-delay study changes the selected source timing. All physical gates still require fresh evidence; detailed routing and official integration remain pending.

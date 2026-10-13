@@ -5,6 +5,13 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (residual study reviewed; next diagnostic prepared)
+- Completed setup study38342469816: baseline slow setup -0.399145617ns; NOR2 upgrade improves it to -0.199742450ns. Other tested sizing combinations do not improve that worst slack further. Fast hold remains38.505ps. Fixed-SPEF evidence is diagnostic, not physical qualification.
+- Prepared six-case shared-delay study on the same extracted source: NOR2 plus individual/joint DLY4SD3-to-DLY4SD2 changes. Preserve functional connections and constraints; baseline reproduction and all-corner evidence required.
+- Prepared residual physical screen with32 endpoints below75ps,21 electrical buffers and4 provisional resizes (53 new cells;801.9648um2 footprint growth). The75ps selection adds repair margin; acceptance remains50ps. Do not launch this screen until setup selection is resolved, or proceed to detailed routing before every strict screen gate passes.
+- Validation:62 focused tests pass across combined planning/screening, sizing provenance, residual studies and hold selection; git diff --check and publication-script bash syntax pass.
+- Current main has no in-progress runs; two older placement workflows remain queued (37655518919,37655518925). Latest supplied AGENTS.md reserves history/remote changes for the user, so preparation stays local and exact publication commands are provided. No Phase2 checkbox changed.
+
 ## 2026-10-12: Codex (new-source residual setup sensitivity prepared)
 - Prepared6casefixedSPEFstudy on improvedcombinedroute38336141213:baseline,NOR243582_2,BUF4place7208,NOR425727_2,combined,strongBUF8combination. Exactnewsource/head/extractedNL hash,completed0DRC andbaseline-0.399146ns/38.505ps reproduction required. Preserveallold76cells/8resizes.
 - Sixactualnewsourceconservationchecks and37focusedtests pass;diffcheckpass. Nextpublish/launchstudy whilepreparing4endpoint/2slewnet/6fanoutnet residualphysicalproposal. NoDRT/Phase2tick orqualificationclaim.

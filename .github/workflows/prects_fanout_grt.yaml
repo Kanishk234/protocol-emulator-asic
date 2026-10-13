@@ -1,11 +1,7 @@
 name: compact rebuilt placement paired routing
 on:
   workflow_dispatch:
-  push:
-    branches: [efpga]
-    paths:
-      - 'test_internal/cloud_prects_fanout_grt.py'
-      - '.github/workflows/prects_fanout_grt.yaml'
+  # Historical RUDY experiment: replay manually; shared helper edits must not rerun it.
 permissions:
   contents: read
   actions: read

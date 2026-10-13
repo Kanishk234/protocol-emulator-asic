@@ -1,0 +1,42 @@
+name: compact read-only macro boundary audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_boundary_audit.py'
+      - '.github/workflows/boundary_audit.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-boundary-audit-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch authenticated best133 producer
+        timeout-minutes: 4
+        run: |
+          python3 -m venv .venv
+          timeout 120s gh run download 38167697696 -R "$GITHUB_REPOSITORY" --name compact-reset-combined-38167697696 --dir build/reset_combined
+      - name: Provision pinned cloud tools
+        timeout-minutes: 5
+        run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"
+      - name: Export native pins obstructions and tracks without routing
+        timeout-minutes: 3
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_boundary_audit.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-boundary-audit-${{ github.run_id }}
+          path: build/boundary_audit/
+          retention-days: 7

@@ -5,6 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (fresh-screen hold and diode fanout correction prepared)
+- Used38347662810's exact fresh NL/DEF/reports:47 endpoints below75ps; two fanout nets include6/8 antenna diodes. Preserve all diodes and prior repairs; propose47 local DLY4SD1 plus7 BUF4 partitions, no resizes,783.8208um2 footprint growth, zero offline overlaps.
+- Fresh global-screen provenance/receipt/antenna/live-routing checks added; all ordinary signal/clock wires must be absent in this source. Existing DRT zero-DRC/positive wire-cleanup guards remain unchanged. Strict50ps/setup/electrical/antenna/overflow acceptance fixed; no detailed-route step.
+-79 focused tests pass (58+21); actual-source54-buffer synthetic conservation and generated Tcl round-trip pass; diff/bash syntax checks pass. Next publish/launch follow-up screen and inspect actual physical gate results. No Phase2 ticks or official claim; unrelated/FIPE files excluded.
+
+## 2026-10-12: Codex (residual screen status and genuine gate failure)
+-38347662810 completed failure; evidence upload succeeded (artifact11788839389). Physical repair/conservation and all-corner timing ran; strict acceptance gate stopped detailed routing as intended.
+- SetupWS0 all corners; fast/typ/slow hold33.3996/138.314/325.319ps. Slew/cap0 all corners; fanout2 all corners (28764/Y loads13; tripwire_combined_42/X loads12 against8). New sub50ps hold endpoints45749,45784,46935,45781; these differ from the extracted-source repair targets after full rerouting.
+- Next source-bound correction must use these fresh physical reports: endpoint-local hold delays and the two remaining diode/load-aware fanout partitions, then repeat screening. No gate waiver or detailed routing. Unit38347650799 was still running at status check; two old placement workflows remain queued. No Phase2 checkbox tick; receipt local.
+
+## 2026-10-12: Codex (selected residual physical screen launched)
+- Published tools3bbba1e/docs cb16ebd; verified remote maincb16ebda06c8b915e2059a10ce606ea1a73c46ae. [Residual physical screen38347662810](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38347662810) confirmed in_progress on the exact head.
+-63 focused tests, actual-source three-resize/53-buffer synthetic conservation, Tcl round-trip and diff checks pass. Strict fresh physical gates remain required; no detailed routing launched. Next inspect screen results before preparing continuation. No Phase2 gate tick. Launch receipt local pending the next documentation publication.
+
 ## 2026-10-12: Codex (shared-delay study clears diagnostic setup; physical screen selected)
 -38345601171 succeeded on72b7bfc; artifact11789351739 confirms NOR2_2 at43582 plus DLY4SD2 at hold12766 clears reported setup violations in all corners. Extra hold12715/BUF4/NOR4 changes add no reported setup benefit. No positive-margin/physical signoff claim.
 - Fast hold remains38.505ps, slow slew13 and fanout6 each corner. Actual selected-candidate min report preserves exactly32 sub75ps endpoints and their baseline slacks. Retain local hold targets; acceptance remains50ps.

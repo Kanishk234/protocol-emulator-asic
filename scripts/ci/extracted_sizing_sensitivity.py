@@ -11,6 +11,8 @@ from sram_bank_clean_route import unique
 
 SOURCE_RUN=38305592967
 SOURCE_SHA='2d73b6fe4b3ee22337fe7db2240cda7761dcda5e'
+SOURCE_WORKFLOW='.github/workflows/gds-electrical-incremental-route.yaml'
+SOURCE_DRT_ROOT=Path('runs/electrical-incremental-route/drt')
 NETLIST_SHA='54538d3f6c830927b5d7947cb22ddf02db01652899d34433605c0aa5c3397b6a'
 TARGETS={
     'place7221':('sg13cmos5l_buf_1','sg13cmos5l_buf_2'),
@@ -27,7 +29,7 @@ CASES={'baseline':{},**{name:{name:new} for name,(old,new) in TARGETS.items()},
 
 def validate_run(run):
     expected=dict(id=SOURCE_RUN,head_sha=SOURCE_SHA,head_branch='main',conclusion='failure',
-                  path='.github/workflows/gds-electrical-incremental-route.yaml')
+                  path=SOURCE_WORKFLOW)
     if any(run.get(k)!=v for k,v in expected.items()):raise ValueError('Wrong extracted diagnostic source')
 
 
@@ -89,7 +91,7 @@ def main(output=Path('runs/extracted-sizing-sensitivity')):
     if hashlib.sha256(nl.read_bytes()).hexdigest()!=NETLIST_SHA:raise ValueError('Wrong exact extracted netlist')
     if not state.get('spef') or any(not Path(p).is_file() for p in state['spef'].values()):
         raise ValueError('Missing existing extracted SPEF')
-    drt=unique(Path('runs/electrical-incremental-route/drt'),'*-openroad-detailedrouting/state_out.json')
+    drt=unique(SOURCE_DRT_ROOT,'*-openroad-detailedrouting/state_out.json')
     if json.loads(drt.read_text())['metrics'].get('route__drc_errors')!=0:raise ValueError('Source DRT incomplete')
     config=json.loads(Path('src/config_electrical_incremental_route.json').read_text())
     if config.get('CLOCK_PERIOD')!=20 or config.get('SYNTH_STRATEGY')!='AREA 1' or config.get('GRT_ALLOW_CONGESTION') is not False:

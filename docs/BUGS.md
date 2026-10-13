@@ -1,5 +1,10 @@
 # Bugs
 
+## 84: Native placement checker compares omitted input to resolved defaults
+- **Symptom/check:**38334401344 failed after placement with GRT_ADJUSTMENT mismatch.
+- **Root cause:** input omits routing defaults; resolved native config contains0.3. Actual candidate and control resizer policies match.
+- **Fix/coverage:** compare resolved candidate and control resizer policies and require exact original five-field policy. Actual cloud configs and three focused regressions pass; jointly changed capacities rejected. Corrected full cloud result pending.
+
 ## 83: Congestion-placement geometry exporter lacks database handle
 - **Date:**2026-10-12.
 - **Symptom/check:**38317781400 completes global/detailed placement then fails exporting geometry with missing variable block.

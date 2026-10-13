@@ -87,7 +87,11 @@ def main(profile=None):
     raw=unique(output/'grt','*-openroad-globalrouting/state_out.json');final=json.loads(raw.read_text());odb=Path(final['odb'])
     before=odb.with_suffix('.baseline.nl.v').read_text();edited=(raw.parent/'after_edits.nl.v').read_text();nl=odb.with_suffix('.eco.nl.v');pnl=odb.with_suffix('.eco.pnl.v')
     if logical_cells(before)!=logical_cells(baseline):raise ValueError('Physical ODB input disagrees with source NL')
-    conserve(before,edited,proposal);validate_antenna_only_changes(edited,nl.read_text())
+    conserve(before,edited,proposal)
+    postant={}
+    if 'post_antenna_audit' in profile:
+        postant=profile['post_antenna_audit'](edited,nl.read_text(),raw.parent,(raw.parent/'openroad-globalrouting.log').read_text())
+    else:validate_antenna_only_changes(edited,nl.read_text())
     validate_placements(layout,Path(final['def']).read_text(),proposal)
     log=(raw.parent/'openroad-globalrouting.log').read_text();validate_overflow(log);require_live_demand(log)
     reset_count=validate_route_reset(log,profile.get('source_kind')=='global-screen')
@@ -105,6 +109,7 @@ def main(profile=None):
         full_reroute=True,custom_image=True,physical_screen_only=True,official_signoff=False)
     if profile.get('source_kind')=='global-screen':
         receipt.update(source_global_screen=True,source_detailed_wire_reset_count=reset_count)
+    receipt.update(postant)
     (output/'gates.json').write_text(json.dumps(receipt,indent=2)+'\n')
     if not ready:raise ValueError('Combined physical screen fails timing/electrical/antenna gates; no DRT')
 

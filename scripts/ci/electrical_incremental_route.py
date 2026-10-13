@@ -49,7 +49,7 @@ def validate_checkpoint(root):
     return source
 
 
-def continue_route(config,source,output):
+def continue_route(config,source,output,source_run=SOURCE_RUN):
     output.mkdir(exist_ok=False)
     os.environ.pop('LIBRELANE_IMAGE_OVERRIDE',None)
     run_step(config,source,output/'antenna',['OpenROAD.CheckAntennas'])
@@ -58,7 +58,7 @@ def continue_route(config,source,output):
     screen(path,source,output/'timing',os.environ['PDK_ROOT'],repaired=source,sdc=Path('src/signoff.sdc'))
     timing=json.loads((output/'timing/comparison.json').read_text())
     ready=qualified(timing,antenna) and electrical_clean(timing)
-    (output/'gates.json').write_text(json.dumps(dict(source_run=SOURCE_RUN,qualified=ready,
+    (output/'gates.json').write_text(json.dumps(dict(source_run=source_run,qualified=ready,
         minimum_fast_hold_ns=.05,repair_repeated=False,official_signoff=False),indent=2)+'\n')
     if not ready:raise ValueError('Fresh electrical/timing/antenna gates fail; DRT refused')
     run_step(config,source,output/'drt',['OpenROAD.DetailedRouting'])
@@ -75,7 +75,7 @@ def continue_route(config,source,output):
     extracted_ready=qualified({'corners':corners},final_ant) and all(
         row['no_reported_electrical_violations'] for row in electrical.values())
     (output/'extracted_gates.json').write_text(json.dumps(dict(qualified=extracted_ready,
-        source_run=SOURCE_RUN,minimum_fast_hold_ns=.05,official_signoff=False),indent=2)+'\n')
+        source_run=source_run,minimum_fast_hold_ns=.05,official_signoff=False),indent=2)+'\n')
     if not extracted_ready:raise ValueError('Extracted timing/electrical/antenna gates fail')
 
 

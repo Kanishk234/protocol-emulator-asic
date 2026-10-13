@@ -47,3 +47,6 @@ Native geometry moves cells toward the thin north corridor:76→443CORE cells; w
 
 ### October13: native placement feedback result
 Run38339209412 completes; resultSHA c22a7e67b1e41e900a388e37c18cfb4ab664f05bac5b860e8f56b7fea03d3b96. Candidate3670instances; fixed macro/interface and actual ROW phase checked. Three corners show zero setup/hold/slew/cap violations, five configuration fanout violations each. Fast estimated hold0.101014ns exceeds0.1guard; not extracted/full-chip timing signoff. Candidate ODB7ac798a5…/NLeb7d5e87… authenticated. Next: same ten identity buffers with every original instance fixed, then repeat all guards and only then routing against133 control. Collector green is not physical acceptance.
+
+### October13: native feedback fanout repair qualifies
+38452773248 producerSUCCESS in2m10s hosted job; resultSHA b804c57b3de1a1096535686d2adcdfcbb8904766218891fdfa32d826c278b946. Ten identity buffers,3670 originals unchanged,18369 original terminals checked with exact contracted connectivity. All three PVT electrical/setup/hold guards pass; fast hold0.101014ns retained. ODB71cb27c8…/NL68b84c66… authenticated. Prepared unchanged-policy paired GRT against133 control; actual routing still pending. No compact signoff claim.

@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-13 (session100: repaired native feedback layout enters routing)
+**Done:**38452773248SUCCESS, resultSHA b804c57b…; all3670 original instances fixed,18369 terminals checked, ten identity buffers, contracted connectivity exact. Zero fanout/slew/cap/setup/hold violations at all three original corners; fast estimated hold0.101014ns. Candidate ODB71cb27c8…/NL68b84c66… pinned. Prepared paired native GRT against authenticated133control with unchanged capacities/layers/margins. Actual downloaded producer and baseline pass routing adapter validation; six focused tests PASS. No full timing/routing pass, architecture changes, localEDA or phase boxes.
+**Next step:** inspect native paired route; reject regressions, advance only zero-overflow qualified layout to detailed routing/extraction and matched timing coverage.
+
 ## 2026-10-13 (session99: native feedback candidate qualifies for fanout repair)
 **Done:**38339209412 diagnosticSUCCESS; authenticated resultSHA c22a7e67…; actual3670-instance census. Native placement preserves physical interface; all three corners show zero setup/hold/slew/cap violations, five configuration fanout violations. Fast hold0.101014ns, slow0.598685ns, typical0.279020ns; shell estimated timing scope only. Prepared identical ten-buffer repair with pinned source views and count; all old instances locked and checked unchanged. Six focused tests PASS. Latest docs/test/unit/lint/fabric allSUCCESS onbfe6149. No hardware freeze changes, routing pass, localEDA or phase boxes.
 **Next step:** cloud native-fanout producer; require zero electrical violations and original hold guard at all corners before direct native route against133 control. Reject any guard regression.

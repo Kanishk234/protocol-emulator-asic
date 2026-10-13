@@ -7,7 +7,7 @@ from residual_combined_plan import BINDING,plan,target_call
 def test_binding_uses_new_source_without_repeating_existing_repairs():
     assert BINDING['source_run']==38336141213
     assert BINDING['hold_count']==32 and BINDING['electrical_nets']==8
-    assert set(BINDING['setup'])=={'_43582_','place7208','_25727_','_43311_'}
+    assert set(BINDING['setup'])=={'_43582_','hold12766','_43311_'}
     assert BINDING['prefix']=='tripwire_residual_'
     assert BINDING['hold_target_ns']==.075
     assert not set(engine.SETUP)&set(BINDING['setup'])
@@ -37,3 +37,9 @@ def test_prepared_workflow_binds_residual_source_and_cannot_route():
     assert PROFILE['route_root']=='runs/combined-physical-route'
     assert PROFILE['output_root']=='runs/residual-combined-screen'
     assert PROFILE['run_binding']['conclusion']=='failure'
+
+
+def test_selected_setup_matches_smallest_successful_diagnostic():
+    from residual_delay_sensitivity import CASES
+    assert {n:m for n,m in BINDING['setup'].items() if n!='_43311_'}==CASES['medium12766']
+    assert 'hold12715' not in BINDING['setup']

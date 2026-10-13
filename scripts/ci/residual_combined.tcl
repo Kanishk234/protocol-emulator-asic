@@ -1,6 +1,6 @@
 # Exact generated proposal preflights all identities/connectivity before sizing.
 proc tripwire_place_combined {name master location} {
-    set allowed [dict create _43582_ sg13cmos5l_nor2_2 place7208 sg13cmos5l_buf_4 _25727_ sg13cmos5l_nor4_2 _43311_ sg13cmos5l_nor4_2]
+    set allowed [dict create _43582_ sg13cmos5l_nor2_2 hold12766 sg13cmos5l_dlygate4sd2_1 _43311_ sg13cmos5l_nor4_2]
     set inst [[ord::get_db_block] findInst $name]
     if {![dict exists $allowed $name] || [dict get $allowed $name] ne $master || $inst eq "NULL" || [[$inst getMaster] getName] ne $master} {
         error "Unreviewed combined resize placement"

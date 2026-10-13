@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (timing-clean follow-up; fanout-only screen prepared)
+-38349702735 actualartifact11790677207:setupWS0 all corners; fast/typ/slow hold75.1412/174.423/346.912ps; slew/cap0 and antenna0. Genuine remaining electrical failure:two new nine-load nets29534/Y and place9211/X, each with one new antenna diode. No detailed routing.
+- Prepared exact fresh-source6BUF4 fanout-only correction,87.0912um2 footprint growth, zero offline overlap; preserve every diode and all old timing repairs. Complete hash-bound fast min report has no sub75ps endpoints, so no new hold cells.
+-82 focused tests (61+21), actual-source six-buffer synthetic conservation and Tcl round-trip pass;diffcheck pass. Next publish/launch strict fanout-only screen, then inspect all gates before any detailed-route continuation. No Phase2 tick or official claim; unrelated files excluded.
+
+## 2026-10-13: Codex (fresh-screen follow-up launched)
+- Published tools8206355/CIea3134f/docs2dcd16e; verified remote main2dcd16eb188774373a53400a0b1f892cc996e201. [Follow-up screen38349702735](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38349702735) confirmed in_progress on the exact head.
+-79 focused tests plus actual-source conservation/Tcl round-trip pass.47 local hold delays/7 fanout buffers; acceptance unchanged. Next inspect every fresh physical screen gate before considering detailed routing. No Phase2 tick or official claim. Receipt local pending next documentation publication.
+
 ## 2026-10-13: Codex (fresh-screen hold and diode fanout correction prepared)
 - Used38347662810's exact fresh NL/DEF/reports:47 endpoints below75ps; two fanout nets include6/8 antenna diodes. Preserve all diodes and prior repairs; propose47 local DLY4SD1 plus7 BUF4 partitions, no resizes,783.8208um2 footprint growth, zero offline overlaps.
 - Fresh global-screen provenance/receipt/antenna/live-routing checks added; all ordinary signal/clock wires must be absent in this source. Existing DRT zero-DRC/positive wire-cleanup guards remain unchanged. Strict50ps/setup/electrical/antenna/overflow acceptance fixed; no detailed-route step.

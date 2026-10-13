@@ -5,6 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (qualified decode screen independently audited; route prepared)
+-38421594711 actualartifact11828740117 independently reaudited:canonical2resizes/28cells,sourceNL/DEF/old placements,all rewires including SRAMADDR8,antenna-only interval/livezerooverflow andstrictgates pass. SetupWS0 all corners,fast hold77.8488ps,zero electrical/antenna;0postantbatches.
+- Prepared exactsuccessfulsource stock DRT/extraction continuation. Freshallgate recheck beforeDRT, no repair/fullGRTreplay,0DRC/conservedfreshNL andunchanged extracted50ps/setup/electrical/allcorner/antenna gates. Preserve priorfailedextraction separately.
+-58 focusedcontinuation tests andactualartifact audit/diffpass. Nextpublish/launchcontinuation;post-DRTdiodes/extractedtiming stilldecisive. NoPhase2tick/officialclaim;unrelatedfilesexcluded.
+
+## 2026-10-13: Codex (combined decode screen status verified)
+-38421594711 completed success; actualartifact11828740117 strictreceipt qualifiedtrue:2resizes/28buffers,zero post-antbatches. Saved fresh metrics:setupWS0 all corners;fast/typ/slow hold77.8488/174.230/345.514ps; slew/fanout/cap0 eachcorner;antenna0. This is screen qualification, not extracted/official closure.
+- Latest main test38421557710/lint38421557911/docs38421557926/unit38421557893 allgreen. No in-progress main runs; old l3-placement-routed-gl37655518919 and gds-placement-extracted-timing37655518925 remainqueued.
+- Next independently reaudit actual canonical source/views/placement/history, then prepare exact-checkpoint stock detailed-routing/extraction continuation. No new workflow dispatched during this status check; noPhase2tick. Receiptlocalpendingnextpublication.
+
+## 2026-10-13: Codex (combined extracted decode repair screen launched)
+- Published tools688752a/CI524fa58/docs0225eec;remote main verified0225eecc6798b1bea2e7ff37cc9e56eda89ebb23. [Combined decode screen38421594711](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38421594711) confirmed in_progress on exact head.
+-69 focused tests plus actual-source conservation/Tcl checks pass.2resizes/28newcells with bounded post-antfanout;strictgatesfixed. Nextinspect physical resultbeforeDRT;finalextracted/post-DRTdiode checksremainmandatory. NoPhase2tick/officialpass. Receiptlocalpendingnextpublication.
+
 ## 2026-10-13: Codex (decode study clears diagnostic setup; combined repair prepared)
 -38418432056 artifact11825992255:baseline-0.230241ns;A21OI2 alone-0.113562ns;NOR2_2 alone-0.009507ns;two gates0 allcorner setupWS,thirdaddsno reported benefit. Fast hold61.103ps unchanged. Select2gates, no physical/positive-margin claim.
 - Complete selected-candidate min report preserves identical4sub75ps endpoints. Exact extracted-source proposal:2resizes,4local holdDLY4SD1,24electricalBUF4 across12measurednets,415.4976um2 growth, zero offline overlaps; retain all prior diodes/cells. SRAMADDR8buffer preservesremainingbits. Actual-source synthetic conservation and Tcl round-trip pass.

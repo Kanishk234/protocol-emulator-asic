@@ -8,7 +8,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: gds-screen-fanout-finish-38349702735
+  group: gds-screen-fanout-finish-38352108106
   cancel-in-progress: false
 
 jobs:
@@ -120,11 +120,11 @@ jobs:
       - name: Download completed extracted route evidence
         uses: actions/download-artifact@v7
         with:
-          name: gds-screen-followup-38349702735
+          name: gds-screen-fanout-finish-38352108106
           path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          run-id: 38349702735
+          run-id: 38352108106
 
       - name: Verify native run provenance
         env:
@@ -133,7 +133,7 @@ jobs:
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           test "$PWD" = /home/runner/work/protocol-emulator-asic/protocol-emulator-asic
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs/38349702735" > /tmp/native-strength-source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/38352108106" > /tmp/native-strength-source-run.json
 
       - name: Apply reviewed combined repairs and strict physical screening
         timeout-minutes: 95

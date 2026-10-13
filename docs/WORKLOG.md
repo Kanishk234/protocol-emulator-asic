@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (shared-delay study clears diagnostic setup; physical screen selected)
+-38345601171 succeeded on72b7bfc; artifact11789351739 confirms NOR2_2 at43582 plus DLY4SD2 at hold12766 clears reported setup violations in all corners. Extra hold12715/BUF4/NOR4 changes add no reported setup benefit. No positive-margin/physical signoff claim.
+- Fast hold remains38.505ps, slow slew13 and fanout6 each corner. Actual selected-candidate min report preserves exactly32 sub75ps endpoints and their baseline slacks. Retain local hold targets; acceptance remains50ps.
+- Revised physical proposal:3 resizes/53 added cells,782.0064um2 net footprint, zero offline overlaps. Actual-source synthetic conservation and generated Tcl round-trip pass. Next publish/launch physical screen only, strict all gates before detailed routing. No Phase2 checklist change.
+
+## 2026-10-12: Codex (residual diagnostic published and launched)
+- User explicitly authorized the prepared publication script. Published tools b916806, CI e18fa9b and docs72b7bfc; verified remote main72b7bfc7968a386f9c295d2e048c3f61adaa79f1.
+- Initial new-workflow dispatch returned404; retry succeeded. [Residual delay study38345601171](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38345601171) confirmed in_progress on the exact published head. No duplicate dispatch after successful request.
+- Next inspect baseline reproduction and all six setup/hold outcomes before selecting physical repairs. Residual physical screen remains undispatched; no detailed routing or Phase2 gate changes. FIPE and unrelated local files excluded. This launch receipt is local pending the next documentation publication.
+
 ## 2026-10-12: Codex (residual study reviewed; next diagnostic prepared)
 - Completed setup study38342469816: baseline slow setup -0.399145617ns; NOR2 upgrade improves it to -0.199742450ns. Other tested sizing combinations do not improve that worst slack further. Fast hold remains38.505ps. Fixed-SPEF evidence is diagnostic, not physical qualification.
 - Prepared six-case shared-delay study on the same extracted source: NOR2 plus individual/joint DLY4SD3-to-DLY4SD2 changes. Preserve functional connections and constraints; baseline reproduction and all-corner evidence required.

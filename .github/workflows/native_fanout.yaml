@@ -1,0 +1,46 @@
+name: compact native placement fanout repair
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_native_fanout.py'
+      - '.github/workflows/native_fanout.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-native-fanout-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch authenticated producer and original source payload
+        timeout-minutes: 12
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          timeout 120s gh run download 38339209412 -R "$GITHUB_REPOSITORY" --name compact-prects-native-estimator-38339209412 --dir build/prects_native_estimator
+      - name: Provision pinned cloud tools
+        timeout-minutes: 5
+        run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"
+      - name: Insert ten identity buffers without moving original instances; verify all corners
+        timeout-minutes: 16
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_native_fanout.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-native-fanout-${{ github.run_id }}
+          path: build/native_fanout/
+          retention-days: 3

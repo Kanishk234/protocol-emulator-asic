@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (one residual fanout net; revised screen prepared)
+-38352108106 failed its strict electrical gate; actualartifact11791747745 confirmssetupWS0 all corners,fast hold76.7236ps,typ174.305ps,slow345.928ps,slew/cap0,antenna0. Previous two targets pass; one new place9271 net has8 functional loads+6 antenna diodes=14 against8. No DRT.
+- Revised fanout-only workflow to bind newest fresh NL/DEF/reports and retain all prior cells/diodes.4 BUF4 branches,58.0608um2, zero offline overlaps; no extra hold/sizing changes.82 focused tests plus actual-source conservation/Tcl round-trip pass.
+- Next publish/launch revision and recheck all strict gates. Full reroute can create new diode-loaded nets, so no guaranteed closure claim. No Phase2 tick; unrelated/FIPE files excluded.
+
+## 2026-10-13: Codex (fanout-only physical screen launched)
+- Published tools4eaf928/CIf0450e8/docs3308827; remote main verified3308827fa8cb9471cf7b04f9edb08cdf2fd8acf4. [Fanout-only screen38352108106](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38352108106) confirmed in_progress on exact head.
+-82 tests and actual-source conservation/Tcl checks pass;6 buffers/87.0912um2, no added hold changes. Next inspect strict physical gate results before any detailed routing. No Phase2 tick or official pass. Receipt local pending next documentation publication.
+
 ## 2026-10-13: Codex (timing-clean follow-up; fanout-only screen prepared)
 -38349702735 actualartifact11790677207:setupWS0 all corners; fast/typ/slow hold75.1412/174.423/346.912ps; slew/cap0 and antenna0. Genuine remaining electrical failure:two new nine-load nets29534/Y and place9211/X, each with one new antenna diode. No detailed routing.
 - Prepared exact fresh-source6BUF4 fanout-only correction,87.0912um2 footprint growth, zero offline overlap; preserve every diode and all old timing repairs. Complete hash-bound fast min report has no sub75ps endpoints, so no new hold cells.

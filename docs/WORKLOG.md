@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (recurring diode fanout; same-process correction prepared)
+-38353731199 completed genuine electrical failure; artifact11792092356 confirmssetupWS0 all corners,fast hold74.5192ps,typ170.826ps,slow342.264ps,slew/cap0,antenna0. New overloaded nets place7616(14 loads/7 diodes),place8061(13/5). Targeted previous net passes; no DRT. Main test/lint/docs green at status check.
+- Logged BUG106:full rerouting/native antenna insertion recreates fanout failures after prior net repairs. Prepared bounded post-antenna BUF4 partition in same initialized router, incremental edits/route/native antenna cleanup, maximum2 batches/64 buffers, exact exported batch/antenna-interval conservation and fixed final gates.
+- Exact newestsource initial8BUF4 proposal116.1216um2 has zero offline overlaps; actual-source synthetic conservation/bounded audit/Tcl round-trip pass.100 focused tests (39+61) and syntax/diff pass. Next publish/launch guarded screen; actual dynamic placement/routing/convergence remain pending. No Phase2 tick/official claim; unrelated files excluded.
+
+## 2026-10-13: Codex (single-net fanout revision launched)
+- Published toolsebd08fa/CIddb2256/docs1b58a13;verified remote main1b58a13fd9bfa650dccbdea9b6b0add161b9ea29. [Revised fanout screen38353731199](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38353731199) confirmed in_progress on exact head.
+-4 buffers/58.0608um2;82 focused tests and actual-source conservation/Tcl checks pass. Next inspect all fresh gates before detailed routing. No Phase2 tick or official pass. Receipt local pending next publication.
+
 ## 2026-10-13: Codex (one residual fanout net; revised screen prepared)
 -38352108106 failed its strict electrical gate; actualartifact11791747745 confirmssetupWS0 all corners,fast hold76.7236ps,typ174.305ps,slow345.928ps,slew/cap0,antenna0. Previous two targets pass; one new place9271 net has8 functional loads+6 antenna diodes=14 against8. No DRT.
 - Revised fanout-only workflow to bind newest fresh NL/DEF/reports and retain all prior cells/diodes.4 BUF4 branches,58.0608um2, zero offline overlaps; no extra hold/sizing changes.82 focused tests plus actual-source conservation/Tcl round-trip pass.

@@ -25,13 +25,37 @@ def validate_placements(layout,changed,proposal):
     if not {g['buffer'] for g in proposal['groups']}<=set(new):raise ValueError('Missing proposed buffers')
 
 
+def source_checkpoint(root,profile):
+    if profile.get('source_kind','detailed-route')=='detailed-route':
+        source=unique(root/'drt','*-openroad-detailedrouting/state_out.json')
+        if json.loads(source.read_text())['metrics'].get('route__drc_errors')!=0:
+            raise ValueError('Source DRT incomplete')
+        return source
+    if profile.get('source_kind')!='global-screen':raise ValueError('Unreviewed source kind')
+    receipt=json.loads((root/'gates.json').read_text())
+    if receipt!=profile['source_gate_receipt']:raise ValueError('Wrong source screen gate receipt')
+    previous=unique(root/'grt','*-openroad-globalrouting/openroad-globalrouting.log')
+    text=previous.read_text();validate_overflow(text);require_live_demand(text)
+    checked=unique(root/'antenna','*-openroad-checkantennas/or_metrics_out.json')
+    antenna=json.loads(checked.read_text())
+    if antenna.get('antenna__violating__nets')!=0 or antenna.get('antenna__violating__pins')!=0:
+        raise ValueError('Source screen antenna gate failed')
+    return unique(root/'grt','*-openroad-globalrouting/eco_state.json')
+
+
+def validate_route_reset(log,global_source=False):
+    resets=re.findall(r'TRIPWIRE native route reset: cleared (\d+) ordinary routed wires',log)
+    if len(resets)!=1 or (int(resets[0])!=0 if global_source else int(resets[0])<=0):
+        raise ValueError('Wrong source detailed-wire cleanup receipt')
+    return int(resets[0])
+
+
 def main(profile=None):
     profile={} if profile is None else profile
     build=profile.get('plan',plan);emit=profile.get('target_call',target_call);conserve=profile.get('validate_change',validate_change)
     validate_run(json.loads(Path('/tmp/native-strength-source-run.json').read_text()),profile.get('run_binding'))
     root=Path(profile.get('route_root','runs/electrical-incremental-route'))
-    source=unique(root/'drt','*-openroad-detailedrouting/state_out.json');state=json.loads(source.read_text())
-    if state['metrics'].get('route__drc_errors')!=0:raise ValueError('Source DRT incomplete')
+    source=source_checkpoint(root,profile);state=json.loads(source.read_text())
     for k in ('nl','pnl','odb','def','sdc'):
         if not Path(state[k]).is_file():raise ValueError('Missing routed source '+k)
     trusted=json.loads(Path('/tmp/native-trusted-config.json').read_text())
@@ -45,10 +69,10 @@ def main(profile=None):
     bank=bank_plan((ref/'tt_um_tripwire.nl.v').read_text(),(ref/'tt_um_tripwire.def').read_text(),std[0],macro[0],clean_postgpl=True)
     config=configure(trusted,bank,electrical=True)
     if config!=json.loads(Path(profile.get('recipe_path','src/config_electrical_incremental_route.json')).read_text()):raise ValueError('Wrong complete physical recipe')
-    sta=unique(Path('runs/extracted-timing'),'*openroad-stapostpnr/state_out.json').parent
+    sta=Path(profile['timing_root']) if 'timing_root' in profile else unique(Path('runs/extracted-timing'),'*openroad-stapostpnr/state_out.json').parent
     baseline=Path(state['nl']).read_text();layout=Path(state['def']).read_text()
-    proposal=build(baseline,layout,(sta/'nom_fast_1p32V_m40C/min.rpt').read_text(),
-        {c:(sta/c/'checks.rpt').read_text() for c in ('nom_fast_1p32V_m40C','nom_typ_1p20V_25C','nom_slow_1p08V_125C')},std[0],macro[0])
+    proposal=build(baseline,layout,(sta/profile.get('timing_corner_format','{corner}').format(corner='nom_fast_1p32V_m40C')/'min.rpt').read_text(),
+        {c:(sta/profile.get('timing_corner_format','{corner}').format(corner=c)/'checks.rpt').read_text() for c in ('nom_fast_1p32V_m40C','nom_typ_1p20V_25C','nom_slow_1p08V_125C')},std[0],macro[0])
     target=Path('workflow-src/scripts/ci/combined_physical_targets.tcl')
     if target.exists():raise ValueError('Repeated combined repair')
     target.write_text(emit(layout,proposal))
@@ -66,8 +90,7 @@ def main(profile=None):
     conserve(before,edited,proposal);validate_antenna_only_changes(edited,nl.read_text())
     validate_placements(layout,Path(final['def']).read_text(),proposal)
     log=(raw.parent/'openroad-globalrouting.log').read_text();validate_overflow(log);require_live_demand(log)
-    resets=re.findall(r'TRIPWIRE native route reset: cleared (\d+) ordinary routed wires',log)
-    if len(resets)!=1 or int(resets[0])<=0:raise ValueError('Missing source detailed-wire cleanup')
+    reset_count=validate_route_reset(log,profile.get('source_kind')=='global-screen')
     final.update(nl=str(nl.resolve()),pnl=str(pnl.resolve()),spef=None,sdf=None,lib=None)
     changed=raw.with_name('eco_state.json');changed.write_text(json.dumps(final,indent=2)+'\n')
     run_step(config,changed,output/'antenna',['OpenROAD.CheckAntennas'])
@@ -76,10 +99,13 @@ def main(profile=None):
     screen(path,source,output/'timing',os.environ['PDK_ROOT'],repaired=checked,sdc=Path('src/signoff.sdc'))
     timing=json.loads((output/'timing/comparison.json').read_text())
     ready=qualified(timing,antenna) and electrical_clean(timing)
-    (output/'gates.json').write_text(json.dumps(dict(source_run=profile.get('source_run',38305592967),qualified=ready,
+    receipt=dict(source_run=profile.get('source_run',38305592967),qualified=ready,
         added_buffers=proposal['added_buffers'],resized_cells=len(proposal['resizes']),minimum_fast_hold_ns=.05,
-        all_original_connections_audited=True,source_detailed_wires_cleared=True,
-        full_reroute=True,custom_image=True,physical_screen_only=True,official_signoff=False),indent=2)+'\n')
+        all_original_connections_audited=True,source_detailed_wires_cleared=reset_count>0,
+        full_reroute=True,custom_image=True,physical_screen_only=True,official_signoff=False)
+    if profile.get('source_kind')=='global-screen':
+        receipt.update(source_global_screen=True,source_detailed_wire_reset_count=reset_count)
+    (output/'gates.json').write_text(json.dumps(receipt,indent=2)+'\n')
     if not ready:raise ValueError('Combined physical screen fails timing/electrical/antenna gates; no DRT')
 
 

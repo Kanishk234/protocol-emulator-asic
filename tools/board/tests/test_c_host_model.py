@@ -396,3 +396,67 @@ def test_duplex_ambiguous_write_stops_without_retry(driver):
         ct.byref(nt),ct.byref(nr))==3
     assert nt.value==nr.value==0 and model.tx==[(0xA5,1)]
     assert sum(c[0]==CH_WRITE for c in commands)==1
+
+
+@pytest.mark.parametrize("api", ["words", "wbit"])
+@pytest.mark.parametrize("accepted", [False, True], ids=["before_accept", "after_accept"])
+@pytest.mark.parametrize("fail_at", range(9), ids=[
+    "identity", "state_poll", "clear_status", "load_begin", "first_chunk",
+    "middle_chunk", "last_chunk", "load_end", "final_status",
+])
+def test_loader_transport_fault_every_boundary_and_explicit_reload(
+        driver, api, accepted, fail_at):
+    """An IO error may hide a committed transaction, including LOAD_END.
+
+    The caller must receive uncertainty immediately, without retry or RUN.
+    A caller-selected complete reload must then recover from any resulting
+    stopped shell state. This is transaction-level evidence, not SPI timing.
+    """
+    words = [0xFAB0FAB1, 0, 0xffffffff, 0x12345678, 0xa5a55a5a]
+    word_data = (ct.c_uint32 * len(words))(*words)
+    raw = wbit(words)
+    image_data = (U8 * len(raw)).from_buffer_copy(raw)
+    model = ShellModel(1)
+    commands, errors = [], []
+
+    @TRANSFER
+    def faulty_transfer(context, tx, rx, n):
+        try:
+            command = list(tx[:n])
+            index = len(commands)
+            commands.append(command)
+            if index == fail_at and not accepted:
+                return 1
+            response = model.transaction(command)
+            for i, byte in enumerate(response):
+                rx[i] = 0 if byte is None else byte
+            return int(index == fail_at)
+        except Exception as exc:
+            errors.append(exc)
+            return 1
+
+    def load_image(host):
+        if api == "words":
+            return driver.warp_load_words(ct.byref(host), 1, word_data,
+                                          len(words), 2)
+        return driver.warp_load_wbit(ct.byref(host), image_data, len(raw), 2)
+
+    host = Host(faulty_transfer, None)
+    assert load_image(host) == 3  # WARP_IO even when the chip accepted LOAD_END.
+    expected_opcodes = [READ_ID, READ_ID, 0x02, 0x10, 0x11, 0x11, 0x11, 0x12, 0x02]
+    assert [command[0] for command in commands] == expected_opcodes[:fail_at + 1]
+    assert model.state != RUNNING
+    assert not errors
+    # In particular, an ambiguous commit remains LOADED while the host reports
+    # IO. It must not be reclassified as success from the chip's side effect.
+    if fail_at == 7 and accepted:
+        assert model.state == LOADED and model.forwarded == words
+
+    forwarded_before_reload = list(model.forwarded)
+    recovery = Bridge(model)
+    assert load_image(recovery.host) == 0
+    assert model.state == LOADED and model.code == 0
+    # forwarded is a lifetime event trace, including partially accepted loads.
+    assert model.forwarded == forwarded_before_reload + words
+    assert not any(command[0] == RUN for command in recovery.transactions)
+    assert not recovery.errors

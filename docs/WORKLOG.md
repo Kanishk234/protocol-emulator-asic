@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (fanout route residuals reviewed; focused strength study prepared)
+-38456657314 artifact11847110752:0DRC/0antenna;fast/typ/slow hold69.901/152.859/302.502ps;slow setup-36.168ps (othercorners0),slow slew15,fanout4allcorners,cap0. Clockfanoutnowpasses andfunctionalclockconnectionsremainconserved;nogatewaiver/officialclaim.
+- Exact pathanalysis:one printed failing setup path48179→46883;newcone27475/A21OI1,27477/NAND2_1,24568/AND3_1. Slewrowsmapto2weakdrivers29456/NOR2_1 and29529/NAND2_1. Datafanoutremainingplace7993/32074/place8055/place8797.
+- Prepared6case exact-source fixedSPEF setup/slew strengthstudy;30focusedtests and6actualsourceconservationchecks pass. Nextpublish/launchstudy,thenchoose combinedphysicalrepair fromresults. Phase2summaryupdated;no checklisttick;unrelatedfilesexcluded.
+
+## 2026-10-13: Codex (qualified fanout detailed-route continuation launched)
+- Published toolsd928b00/CI4a45ca5/docse6379fb;remote main verifiede6379fb46a48bcc7c3c0942b30b492fe1a25210c. [Fanout route38456657314](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38456657314) confirmedin_progress onexacthead.
+-74focusedtests andindependent actualsource/functionalclock-reset audits pass. Require freshstock allgatesbeforeDRT,0DRC/conservedNL andstrict extractedtiming/electrical/antenna. Nextinspect outcomeincludingnativeDRTdiodeloads;noofficial/Phase2completionclaim. Receiptlocalpendingnextpublication.
+
 ## 2026-10-13: Codex (qualified fanout-load screen independently audited; route prepared)
 -38453218365 actualartifact11842440456 reaudited:canonical28cells/sourceNL/DEF/old placements/bufferconnectivity/antenna-only interval/livezerooverflow andstrictgates pass. Actual functional CLK/GCLK/GATE/RESET_B pins retainoriginalnets. SetupWS0 allcorners,fast hold77.3791ps,zeroelectrical/antenna;0postantbatches. BUG109 physicalevidenceupdated.
 - Prepared exactsuccessfulsource stock DRT/extraction continuation; freshallgatesbeforeDRT,no repair/fullGRTreplay,0DRC/conservedfreshNL/unchanged extracted50ps/setup/allcorner electrical/antenna gates. Preserve old extraction separately.

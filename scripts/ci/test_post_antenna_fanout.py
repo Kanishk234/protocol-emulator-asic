@@ -143,6 +143,30 @@ def test_tcl_batch_preflights_and_writes_auditable_branch_receipt(tmp_path,fault
     else:assert 'RESULT 1 CREATED 0' in result.stdout
 
 
+@pytest.mark.parametrize('iteration',[0,1])
+def test_inherited_postant_cells_and_orphan_nets_are_preserved(tmp_path,iteration):
+    helper=Path(__file__).with_name('post_antenna_fanout.tcl').resolve()
+    electrical=Path(__file__).with_name('electrical_repair.tcl').resolve()
+    text=f'source {{{electrical}}}\nsource {{{helper}}}\n'+MOCK
+    text+=r'''
+rename block original_block
+proc block {method args} {
+    if {$method eq "findInst" && [lindex $args 0] eq $::occupied_inst} {return inherited}
+    if {$method eq "findNet" && [lindex $args 0] eq $::occupied_net} {return orphan}
+    return [original_block $method {*}$args]
+}
+'''
+    text+=f'set occupied_inst tripwire_postant_{iteration}_0\nset occupied_net tripwire_postant_{iteration}_1_net\n'
+    receipt=tmp_path/'batch.json'
+    text+=f'set rc [catch {{set g [tripwire_post_antenna_groups {iteration}];tripwire_post_antenna_apply $g {{{receipt}}}}} message]\nputs "RESULT $rc CREATED $created $message"\n'
+    path=tmp_path/'inherited.tcl';path.write_text(text)
+    result=subprocess.run([os.environ.get('TRIPWIRE_TCLSH','tclsh'),str(path)],capture_output=True,text=True)
+    assert result.returncode==0 and 'RESULT 0 CREATED 3' in result.stdout,result.stdout+result.stderr
+    groups=json.loads(receipt.read_text())['groups']
+    assert [g['buffer'] for g in groups]==[f'tripwire_postant_{iteration}_{i}' for i in (2,3,4)]
+    assert len({tuple(s) for g in groups for s in g['sinks']})==9
+
+
 def test_wrapper_runs_post_antenna_repair_in_initialized_process(tmp_path):
     binary=tmp_path/'openroad';binary.write_text('#!/bin/bash\ncat "${@: -1}"\n');binary.chmod(0o755)
     source='source $::env(SCRIPTS_DIR)/openroad/common/grt.tcl'

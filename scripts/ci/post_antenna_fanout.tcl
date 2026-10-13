@@ -9,6 +9,7 @@ proc tripwire_json_string {value} {
 proc tripwire_post_antenna_groups {iteration} {
     set block [ord::get_db_block]
     set groups {}
+    set next_index 0
     foreach net [$block getNets] {
         if {[$net getSigType] in {POWER GROUND CLOCK}} {continue}
         set drivers {};set sinks {};set protected 0
@@ -32,7 +33,13 @@ proc tripwire_post_antenna_groups {iteration} {
         set ordered [lsort -integer -index 0 $ordered]
         for {set start 0} {$start<[llength $ordered]} {incr start 4} {
             set selected [lrange $ordered $start [expr {$start+3}]]
-            set name tripwire_postant_${iteration}_[llength $groups]
+            # Routed checkpoints can already contain buffers from an earlier
+            # post-antenna pass. Preserve them and allocate unused identities.
+            while {1} {
+                set name tripwire_postant_${iteration}_${next_index}
+                incr next_index
+                if {[$block findInst $name] eq "NULL" && [$block findNet ${name}_net] eq "NULL"} {break}
+            }
             lappend groups [list $name ${name}_net $net $anchor $selected]
         }
     }

@@ -18,3 +18,10 @@ def test_wrong_corner_missing_paths_or_unreviewed_endpoints_fail(bad):
 
 def test_exact_source_binding_rejects_unreviewed_inputs(tmp_path):
     with pytest.raises(ValueError,match='Wrong extracted hold source'):plan('wrong','wrong',report(),tmp_path/'std.lef')
+
+
+def test_extra_hold_reserve_selects_borderline_endpoints_without_relaxing_acceptance():
+    text=report()+report('_borderline_', '.06')+report('_safe_', '.09')
+    assert set(endpoints(text))=={'_46591_'}
+    assert set(endpoints(text,.075))=={'_46591_','_borderline_'}
+    with pytest.raises(ValueError):endpoints(text,.01)

@@ -27,8 +27,8 @@ CASES={'baseline':{},**{name:{name:new} for name,(old,new) in TARGETS.items()},
                             _30202_='sg13cmos5l_nor3_2',_37732_='sg13cmos5l_nand2_2')}
 
 
-def validate_run(run):
-    expected=dict(id=SOURCE_RUN,head_sha=SOURCE_SHA,head_branch='main',conclusion='failure',
+def validate_run(run,expected=None):
+    if expected is None:expected=dict(id=SOURCE_RUN,head_sha=SOURCE_SHA,head_branch='main',conclusion='failure',
                   path=SOURCE_WORKFLOW)
     if any(run.get(k)!=v for k,v in expected.items()):raise ValueError('Wrong extracted diagnostic source')
 

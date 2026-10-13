@@ -14,7 +14,8 @@ REPORT_SHA='94577900dc2cc7b6b073e96ad8ab17785048f4af45ebf54507629fadb885a899'
 MASTER='sg13cmos5l_dlygate4sd1_1'
 
 
-def endpoints(report):
+def endpoints(report,minimum=.05):
+    if minimum not in (.05,.075,.1):raise ValueError('Unreviewed hold repair target')
     if 'nom_fast_1p32V_m40C' not in report:raise ValueError('Wrong hold corner')
     result={}
     blocks=report.split('Startpoint:')[1:]
@@ -24,7 +25,7 @@ def endpoints(report):
         endpoint=re.search(r'^Endpoint: (\S+) \(rising edge-triggered flip-flop',block,re.M)
         if len(slack)!=1:raise ValueError('Incomplete or ambiguous hold path')
         value=float(slack[0])
-        if value<.05:
+        if value<minimum:
             if not endpoint:raise ValueError('Unreviewed hold endpoint type')
             name=endpoint[1];result[name]=min(value,result.get(name,value))
     if not result:raise ValueError('No sub-50ps endpoints')

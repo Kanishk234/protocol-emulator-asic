@@ -25,9 +25,11 @@ def validate_placements(layout,changed,proposal):
     if not {g['buffer'] for g in proposal['groups']}<=set(new):raise ValueError('Missing proposed buffers')
 
 
-def main():
-    validate_run(json.loads(Path('/tmp/native-strength-source-run.json').read_text()))
-    root=Path('runs/electrical-incremental-route')
+def main(profile=None):
+    profile={} if profile is None else profile
+    build=profile.get('plan',plan);emit=profile.get('target_call',target_call);conserve=profile.get('validate_change',validate_change)
+    validate_run(json.loads(Path('/tmp/native-strength-source-run.json').read_text()),profile.get('run_binding'))
+    root=Path(profile.get('route_root','runs/electrical-incremental-route'))
     source=unique(root/'drt','*-openroad-detailedrouting/state_out.json');state=json.loads(source.read_text())
     if state['metrics'].get('route__drc_errors')!=0:raise ValueError('Source DRT incomplete')
     for k in ('nl','pnl','odb','def','sdc'):
@@ -42,18 +44,18 @@ def main():
     ref=Path('runs/native-stock-screen/flow/32-openroad-repairdesignpostgpl')
     bank=bank_plan((ref/'tt_um_tripwire.nl.v').read_text(),(ref/'tt_um_tripwire.def').read_text(),std[0],macro[0],clean_postgpl=True)
     config=configure(trusted,bank,electrical=True)
-    if config!=json.loads(Path('src/config_electrical_incremental_route.json').read_text()):raise ValueError('Wrong complete physical recipe')
+    if config!=json.loads(Path(profile.get('recipe_path','src/config_electrical_incremental_route.json')).read_text()):raise ValueError('Wrong complete physical recipe')
     sta=unique(Path('runs/extracted-timing'),'*openroad-stapostpnr/state_out.json').parent
     baseline=Path(state['nl']).read_text();layout=Path(state['def']).read_text()
-    proposal=plan(baseline,layout,(sta/'nom_fast_1p32V_m40C/min.rpt').read_text(),
+    proposal=build(baseline,layout,(sta/'nom_fast_1p32V_m40C/min.rpt').read_text(),
         {c:(sta/c/'checks.rpt').read_text() for c in ('nom_fast_1p32V_m40C','nom_typ_1p20V_25C','nom_slow_1p08V_125C')},std[0],macro[0])
     target=Path('workflow-src/scripts/ci/combined_physical_targets.tcl')
     if target.exists():raise ValueError('Repeated combined repair')
-    target.write_text(target_call(layout,proposal))
-    output=Path('runs/combined-physical-screen');output.mkdir(exist_ok=False)
+    target.write_text(emit(layout,proposal))
+    output=Path(profile.get('output_root','runs/combined-physical-screen'));output.mkdir(exist_ok=False)
     (output/'proposal.json').write_text(json.dumps(proposal,indent=2)+'\n')
-    subprocess.run(['docker','build','-t','tripwire-combined-screen:local','-f','workflow-src/scripts/ci/Dockerfile.openroad-combined-screen','workflow-src/scripts/ci'],check=True)
-    os.environ['LIBRELANE_IMAGE_OVERRIDE']='tripwire-combined-screen:local'
+    subprocess.run(['docker','build','-t',profile.get('image','tripwire-combined-screen:local'),'-f',profile.get('dockerfile','workflow-src/scripts/ci/Dockerfile.openroad-combined-screen'),'workflow-src/scripts/ci'],check=True)
+    os.environ['LIBRELANE_IMAGE_OVERRIDE']=profile.get('image','tripwire-combined-screen:local')
     # Discard obsolete extraction outputs from the old physical database.
     clean=dict(state,spef=None,sdf=None,lib=None,metrics={})
     initial=output/'source_state.json';initial.write_text(json.dumps(clean,indent=2)+'\n')
@@ -61,7 +63,7 @@ def main():
     raw=unique(output/'grt','*-openroad-globalrouting/state_out.json');final=json.loads(raw.read_text());odb=Path(final['odb'])
     before=odb.with_suffix('.baseline.nl.v').read_text();edited=(raw.parent/'after_edits.nl.v').read_text();nl=odb.with_suffix('.eco.nl.v');pnl=odb.with_suffix('.eco.pnl.v')
     if logical_cells(before)!=logical_cells(baseline):raise ValueError('Physical ODB input disagrees with source NL')
-    validate_change(before,edited,proposal);validate_antenna_only_changes(edited,nl.read_text())
+    conserve(before,edited,proposal);validate_antenna_only_changes(edited,nl.read_text())
     validate_placements(layout,Path(final['def']).read_text(),proposal)
     log=(raw.parent/'openroad-globalrouting.log').read_text();validate_overflow(log);require_live_demand(log)
     resets=re.findall(r'TRIPWIRE native route reset: cleared (\d+) ordinary routed wires',log)
@@ -70,11 +72,11 @@ def main():
     changed=raw.with_name('eco_state.json');changed.write_text(json.dumps(final,indent=2)+'\n')
     run_step(config,changed,output/'antenna',['OpenROAD.CheckAntennas'])
     checked=unique(output/'antenna','*-openroad-checkantennas/state_out.json');antenna=json.loads((checked.parent/'or_metrics_out.json').read_text())
-    path=Path('src/config_combined_physical_screen.json');path.write_text(json.dumps(config,indent=2)+'\n')
+    path=Path(profile.get('screen_config','src/config_combined_physical_screen.json'));path.write_text(json.dumps(config,indent=2)+'\n')
     screen(path,source,output/'timing',os.environ['PDK_ROOT'],repaired=checked,sdc=Path('src/signoff.sdc'))
     timing=json.loads((output/'timing/comparison.json').read_text())
     ready=qualified(timing,antenna) and electrical_clean(timing)
-    (output/'gates.json').write_text(json.dumps(dict(source_run=38305592967,qualified=ready,
+    (output/'gates.json').write_text(json.dumps(dict(source_run=profile.get('source_run',38305592967),qualified=ready,
         added_buffers=proposal['added_buffers'],resized_cells=len(proposal['resizes']),minimum_fast_hold_ns=.05,
         all_original_connections_audited=True,source_detailed_wires_cleared=True,
         full_reroute=True,custom_image=True,physical_screen_only=True,official_signoff=False),indent=2)+'\n')

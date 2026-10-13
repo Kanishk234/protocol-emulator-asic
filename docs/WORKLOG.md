@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (post-antenna inherited-name collision fixed)
+- Screen38483400076 failed in GRT helper before final timing: Repeated or invalid post-antenna group. Job115591127920 confirms initial global routing0overflow; source38456657314 already contains tripwire_postant_0_0/1/2 and corresponding nets. No physical qualification claimed.
+- BUG110: allocate unused instance/net identities instead of restarting names that collide with retained earlier repair cells. Preserve old topology, complete preflight, same-process routing, exact batch audit and unchanged budgets/gates.
+- 57 focused tests pass with project venv/Tcl adapter, including inherited instances and orphan-net collisions in each batch; diff check passes. Next publish the scoped helper/tests and documentation correction, then launch a new strict screen on the same physical source. No RTL/config/acceptance change or Phase2 tick.
+
+## 2026-10-13: Codex (combined strength/fanout screen published and launched)
+- User explicitly authorized execution of the prepared publication script. Published scoped tools958424f, CI46ac595 and docse49290b; local HEAD and remote main both verified e49290bd64fe297074ee2c635ae39ff6ee4763a4.
+- [Strict physical screen38483400076](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38483400076) confirmed in_progress on that exact head. Require all screen timing/electrical/antenna/overflow gates before detailed routing. No official/Phase2 completion claim; unrelated local files excluded. Next inspect fresh physical results. Launch receipt remains local for the next documentation publication.
+
 ## 2026-10-13: Codex (strength diagnostic reviewed; next strict physical screen prepared)
 - [Diagnostic 38479292241](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38479292241) passed; artifact 11857335115 reproduces routed baseline. Four reviewed resizes remove the reported slow setup deficit (-36.168 ps to setup WS 0) and all 15 slow slew rows on fixed SPEF. Fast hold remains 69.901 ps; four data fanout violations remain. This is diagnostic evidence only, not positive global setup margin or physical qualification.
 - Prepared source-bound strength/fanout/hold screen: four resizes, 12 BUF4 fanout branches and nine local DLY4SD1 cells; net footprint growth 321.1488 um2, offline overlap count 0. Two reviewed slew-only drivers are repaired by sizing without redundant load buffers; fresh strict electrical gates remain mandatory. Every functional clock/reset connection is retained.

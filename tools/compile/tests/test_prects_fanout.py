@@ -21,3 +21,12 @@ def test_no_original_orientation_change_accepted(monkeypatch):
     new=old.replace('cell7\tbuffer\t0 0\tR0','cell7\tbuffer\t0 0\tMY')
     monkeypatch.setattr(repair.cfg,'verify_connections',lambda a,b:{'contracted_connectivity_exact':True})
     with pytest.raises(ValueError,match='moved or changed'):repair.immutability(old,new)
+
+
+def test_native_producer_count_is_pinned_and_originals_are_locked(monkeypatch):
+    monkeypatch.setattr(repair,'INSTANCE_COUNT',3670)
+    script=repair.editor(3670)
+    assert 'dict size $original_instances] != 3670' in script
+    assert '3669' in script
+    with pytest.raises(ValueError):
+        repair.editor(3645)

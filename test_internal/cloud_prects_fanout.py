@@ -8,6 +8,8 @@ import cloud_cfg_fanout_local as fixed
 import cloud_hotspot_padding as guards
 import cloud_prects_reflow as stage
 
+INSTANCE_COUNT=3645
+SOURCE_RUN=38319615838
 ROOT=cfg.ROOT
 SOURCE=ROOT/'build/prects_reflow'
 OUT=ROOT/'build/prects_fanout'
@@ -18,24 +20,24 @@ EXPECTED={'odb':'7dccd603c72ed7dc3039b61dc2e13cd061107ce5084a821edeba14c00e21b48
 
 
 def editor(count):
-    if count!=3645:raise ValueError('Unexpected measured original instance count')
-    snapshot=fixed.SNAPSHOT.replace('3596','3645').replace('3595','3644')
+    if count!=INSTANCE_COUNT:raise ValueError('Unexpected measured original instance count')
+    snapshot=fixed.SNAPSHOT.replace('3596',str(INSTANCE_COUNT)).replace('3595',str(INSTANCE_COUNT-1))
     start='census $::env(WARP_BEFORE)\n';legal='detailed_placement\ncheck_placement -verbose\n'
     if cfg.EDIT.count(start)!=1 or cfg.EDIT.count(legal)!=1:raise ValueError('Buffer edit anchors changed')
-    return cfg.EDIT.replace(start,start+snapshot,1).replace(legal,fixed.LEGALIZE.replace('3596','3645'),1)
+    return cfg.EDIT.replace(start,start+snapshot,1).replace(legal,fixed.LEGALIZE.replace('3596',str(INSTANCE_COUNT)),1)
 
 
 def immutability(before,after):
     audit=cfg.verify_connections(before,after)
     old,_=cfg.parse_census(before);new,_=cfg.parse_census(after)
-    if len(old)!=3645 or any(new[n]!=v for n,v in old.items()):raise ValueError('Original instance moved or changed')
+    if len(old)!=INSTANCE_COUNT or any(new[n]!=v for n,v in old.items()):raise ValueError('Original instance moved or changed')
     return audit
 
 
 def main():
     OUT.mkdir(exist_ok=False)
     result={'producer_passed':False,'physical_acceptance':False,'routing_executed':False,
-        'source_run':38319615838,'corners':{}}
+        'source_run':SOURCE_RUN,'corners':{}}
     def save():(OUT/'result.json').write_text(json.dumps(result,indent=2)+'\n')
     save()
     try:
@@ -50,7 +52,7 @@ def main():
         paths={k:final/kind/('tt_um_warp.'+ext) for k,kind,ext in (('odb','odb','odb'),('nl','nl','nl.v'),('sdc','sdc','sdc'))}
         for key,path in paths.items():
             if cfg.sha(path)!=EXPECTED[key]:raise ValueError('Measured source view differs')
-        script=OUT/'buffer.tcl';script.write_text(cfg.CENSUS+editor(3645))
+        script=OUT/'buffer.tcl';script.write_text(cfg.CENSUS+editor(INSTANCE_COUNT))
         env={'WARP_INPUT_ODB':paths['odb'],'WARP_BEFORE':OUT/'before.tsv','WARP_AFTER':OUT/'after.tsv',
              'WARP_OUTPUT_ODB':OUT/'buffered.odb','WARP_OUTPUT_NL':OUT/'buffered.nl.v'}
         cmd=['docker','run','--rm','-v',f'{ROOT}:{ROOT}','-w',str(ROOT)]

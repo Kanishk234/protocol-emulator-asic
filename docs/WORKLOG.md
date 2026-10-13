@@ -5,6 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (qualified fanout-load screen independently audited; route prepared)
+-38453218365 actualartifact11842440456 reaudited:canonical28cells/sourceNL/DEF/old placements/bufferconnectivity/antenna-only interval/livezerooverflow andstrictgates pass. Actual functional CLK/GCLK/GATE/RESET_B pins retainoriginalnets. SetupWS0 allcorners,fast hold77.3791ps,zeroelectrical/antenna;0postantbatches. BUG109 physicalevidenceupdated.
+- Prepared exactsuccessfulsource stock DRT/extraction continuation; freshallgatesbeforeDRT,no repair/fullGRTreplay,0DRC/conservedfreshNL/unchanged extracted50ps/setup/allcorner electrical/antenna gates. Preserve old extraction separately.
+-74focusedcontinuation tests andactualartifact audits/diffpass. Nextpublish/launchcontinuation;post-DRTdiodes remain decisive. NoPhase2tick/officialclaim;unrelatedfilesexcluded.
+
+## 2026-10-13: Codex (fanout-load screen status verified)
+-38453218365 completed success;actualartifact11842440456 strictqualifiedtrue. Savedmetrics:setupWS0 allcorners;fast/typ/slowhold77.3791/174.240/345.834ps; slew/fanout/cap0allcorners;antenna0.28plannedcells;0postantbatches. Screenqualification only;freshpost-DRT/extractedchecks stillrequired.
+- Latestmain test38453187352/lint38453187361/docs38453187306 pass;unit38453188504 stillin_progress atcheck. Old l3-placement-routed-gl37655518919 andgds-placement-extracted-timing37655518925 remainqueued. Noother in-progressmainruns.
+- Nextreauditactualcanonicalphysicalsource/clock-pinconservation andprepareexactsource stock DRT/extraction continuation. None dispatched duringstatuscheck;noPhase2tick/officialpass. Receiptlocalpendingnextpublication.
+
+## 2026-10-13: Codex (fanout and clock-diode isolation screen launched)
+- Published tools8928a3a/CI69fc361/docs5702819;remote main verified57028198781956737a0709e16b88d18c7cd40d67. [Fanout load screen38453218365](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38453218365) confirmedin_progress onexacthead.
+-94 focusedtests andactualsource conservation/clock-resetnet checks/Tclroundtrip pass.28newcells,diode-only clockbranch;strictallgatesfixed. Nextinspect freshtiming/electrical/antenna beforeDRT;noofficial/Phase2completionclaim. Receiptlocalpendingnextpublication.
+
 ## 2026-10-13: Codex (nine-net fanout and clock-diode repair prepared)
 - Exact clock inventory38433037592:6functional DLHQ GATE loads+6antenna diodes. Proposed2BUF4 diode-only branches leave every functional clock/reset pin on its original net;rootload6+2=8. Preserveall diodes; antenna protection must be rechecked after isolation.
 - Eightdatafanout repairs24BUF4 plus2clock-diodeBUF4 and2localholdDLY4SD1:28cells/406.4256um2,zeroofflineoverlap,noresizes. SourceNL/DEF/allcornerreports/pinnedLEFs bound. BUG109 escaped hierarchical instance lookup caught/fixed beforelaunch; Tcl alias and protected-leaf checks covered.

@@ -48,3 +48,5 @@ Functional evidence is strong. Physical timing and area must still be judged tog
 The latest route passes DRC, antenna and hold with clock fanout repaired; a small setup deficit and data electrical violations still block Phase2 and official GDS.
 
 Detailed evidence: [closure research](../reports/PHASE2_CLOSURE_RESEARCH.md), [baseline recovery](../reports/PHASE2_SHARED_RX_REGRESSION.md), [repair-only screen](../reports/PHASE2_BANKED_SRAM_HOLD_SCREEN.md), [routed follow-up review](../reports/PHASE2_BANKED_SRAM_HOLD_ROUTE.md).
+
+The latest strength study38479292241 identifies four small gate resizes that clear the reported setup and slew failures on the existing extracted wires. Four fanout violations remain, and fast hold stays69.901ps. A combined physical screen is prepared with those resizes,12fanout buffers and9local hold-delay cells (321.1488um2 additional footprint).45focused tests and actual-source connection audits pass. Fresh physical timing is still pending; this does not close Phase2 or establish positive global setup margin.

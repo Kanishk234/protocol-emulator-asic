@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (strength diagnostic reviewed; next strict physical screen prepared)
+- [Diagnostic 38479292241](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38479292241) passed; artifact 11857335115 reproduces routed baseline. Four reviewed resizes remove the reported slow setup deficit (-36.168 ps to setup WS 0) and all 15 slow slew rows on fixed SPEF. Fast hold remains 69.901 ps; four data fanout violations remain. This is diagnostic evidence only, not positive global setup margin or physical qualification.
+- Prepared source-bound strength/fanout/hold screen: four resizes, 12 BUF4 fanout branches and nine local DLY4SD1 cells; net footprint growth 321.1488 um2, offline overlap count 0. Two reviewed slew-only drivers are repaired by sizing without redundant load buffers; fresh strict electrical gates remain mandatory. Every functional clock/reset connection is retained.
+- Validation: 45 focused tests pass with project venv and local Tcl adapter; actual-source full cell/pin conservation and generated Tcl argument round-trip pass; diff check passes. No Phase 2 checklist tick. Next publish the scoped tools/CI/docs groups, launch gds-strength-fanout-screen, and require every screen gate before detailed routing. Latest supplied AGENTS.md reserves history/remote changes to the user; this preparation remains local.
+
+## 2026-10-13: Codex (latest setup/slew strength diagnostic launched)
+- Published tools5188efb/CIee2ded5/docsbf21dcd;remote main verifiedbf21dcdabb4227db88a57038b6e6af3eba40fabb. [Setup/slew study38479292241](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38479292241) confirmedin_progress onexacthead.
+-30focusedtests and6actualsourceconservationchecks pass;fixedSPEFdiagnostic only. Nextinspect outcomesbeforechoosing physicalrepair;retain clock/hold/DRC/antenna gains andstrictgates. Noofficial/Phase2completionclaim. Receiptlocalpendingnextpublication.
+
 ## 2026-10-13: Codex (fanout route residuals reviewed; focused strength study prepared)
 -38456657314 artifact11847110752:0DRC/0antenna;fast/typ/slow hold69.901/152.859/302.502ps;slow setup-36.168ps (othercorners0),slow slew15,fanout4allcorners,cap0. Clockfanoutnowpasses andfunctionalclockconnectionsremainconserved;nogatewaiver/officialclaim.
 - Exact pathanalysis:one printed failing setup path48179→46883;newcone27475/A21OI1,27477/NAND2_1,24568/AND3_1. Slewrowsmapto2weakdrivers29456/NOR2_1 and29529/NAND2_1. Datafanoutremainingplace7993/32074/place8055/place8797.

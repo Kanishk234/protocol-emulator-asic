@@ -85,7 +85,7 @@ def plan(netlist,layout,hold_report,checks,std_lef,macro_lef,binding=None):
         old_size,_=occupancy(layout,std_lef,1000,name,old)
         resizes.append(dict(instance=name,old_master=old,new_master=new,pins=pins,
             location=[x,y,o],origin_displacement_dbu=distance,area_delta_um2=(width*height-old_size[0]*old_size[1])/1e6))
-    failing=endpoints(hold_report,cfg.get('hold_target_ns',.05))
+    failing=endpoints(hold_report,cfg.get('hold_target_ns',.05),allow_empty=cfg['hold_count']==0)
     if len(failing)!=cfg['hold_count']:raise ValueError('Wrong hold endpoint set')
     groups=[];moved=set()
     def add(source,sinks,master,target,kind):

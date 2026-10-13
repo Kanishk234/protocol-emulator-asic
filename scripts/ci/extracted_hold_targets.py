@@ -14,7 +14,7 @@ REPORT_SHA='94577900dc2cc7b6b073e96ad8ab17785048f4af45ebf54507629fadb885a899'
 MASTER='sg13cmos5l_dlygate4sd1_1'
 
 
-def endpoints(report,minimum=.05):
+def endpoints(report,minimum=.05,allow_empty=False):
     if minimum not in (.05,.075,.1):raise ValueError('Unreviewed hold repair target')
     if 'nom_fast_1p32V_m40C' not in report:raise ValueError('Wrong hold corner')
     result={}
@@ -28,7 +28,7 @@ def endpoints(report,minimum=.05):
         if value<minimum:
             if not endpoint:raise ValueError('Unreviewed hold endpoint type')
             name=endpoint[1];result[name]=min(value,result.get(name,value))
-    if not result:raise ValueError('No sub-50ps endpoints')
+    if not result and not allow_empty:raise ValueError('No sub-50ps endpoints')
     return result
 
 

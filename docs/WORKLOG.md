@@ -5,6 +5,20 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (combined setup/hold/electrical physical screen prepared)
+- Combinedactualsource8setupchanges/19localholdDLY4SD1/57electricalBUF4 buffers, all29violating nets. Jointallocationzerooverlap;netfootprint1126.7424um2. ExactNL/DEF/hold/all3checks/SRAMLEF binds;actual8resize/76buffer syntheticconservation andgeneratedTclargumentroundtrip pass.
+- Preparedscreenonly: sourcepreflight, sizing/fixedoldplacements, DPLnewcells, positiveold detailed-wirecleanup, onenativefullGRT+inlineantrepair withlivecapacity, freshNL/PNL, exactfunctional/oldplacementconservation, allcornerstrict20ns/50ps/electrical/antenna/overflowgates. NoDRT orofficialflowclaim.
+- CaughtmacroVDD!/VSS!anchor mismatchbeforelaunch (BUG105);standardcellanchorsrequired.53focusedtests/compile/bashsyntax/diffpass. Nextpublish/launchnow underongoingauthorization, inspectactualgateoutcome beforeDRT. NoPhase2ticks. Unrelatedfilesexcluded.
+
+## 2026-10-12: Codex (fixed-SPEF setup closes; physical gates remain open)
+- Independentlyinspected38321212600artifact11779199738: NOR2orAND4upgrade closesdiagnosticslowsetup-20.938ps→0;AND4caseall3cornerssetup0. Fast0.0215pshold/slew93slow/fanout9all/cap1fasttypremain; nophysicalqualification.
+- Comparedactualsource/pinnedLEF8changefootprints: AND4candidate net23.5872um2versusNOR225.4016um2. PreferAND4provisionally;completeofflinefootprintsavailablebutnotphysicallyapplied. Noadditionalsetup-onlystudylaunched.
+- Nextassemblecombinedsetup/localhold/allelectricalphysicalproposal, reenumerateholdtargetsandallocateallchangesjointly, strictscreen/correlationbeforeDRT. NoPhase2tick/officialpassclaim. Measuredresultsevidence localpendingnextpublication.
+
+## 2026-10-12: Codex (residual NOR2/AND4 sizing launched)
+- Publishedtools4c61a76/CI7577ece/docs2a77457;remote mainverified2a7745722b8a434b23ed65e2a319098e132c09f2. [Residualgates38321212600](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38321212600) dispatchedonexacthead,initiallyqueued.
+-52focusedtests/fiveactualsourceconservationchecks pass. FixedSPEFdiagnosticonly;noDRT. Nextinspectsetup/hold/electricalthenfinishcombinedphysicalscreenpreparation. NoPhase2tick. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (setup diagnostic reaches-21ps; combined placement preparation)
 - Independentlyinspected38320018572artifact11778138651: shortfirstdelay+INV24812_2 improvesglobalsetup-105.761→-20.938ps;fasthold0.0215ps/slowslew93remain. Noqualification.
 - Offlineallocatedall7setupchanges onactualsource, netarea21.7728um2,maxdisplacement10.44um;noECOapplied. Existing19endpointproposal275.7888um2 remainsbaselineonly; rechecknewholdpaths afterchanges.

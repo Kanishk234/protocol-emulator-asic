@@ -82,3 +82,9 @@ Preparedfivecase remaining-branch sensitivity:baseline,currentbestwithNOR3upgrad
 Actualartifact11778138651:baseline-1.008813ns,currentbest-0.105761ns,shortfirstdelay-0.022682ns,INV24812_2alone-0.104016ns,shortfirstdelay+INV24812_2-0.020938ns. Fasthold0.0215ps/slowslew93remain; diagnosticnotqualified. Allsevenchanges inbestcasehaveofflinecomplete-footprintallocations againstactualDEF/LEF withnet21.7728um2area growth andmax10.44umdisplacement; nophysicalchangeapplied.
 
 Newworstpath48179→46391includesNOR224896(1.471833nscellincrement),AND425926(0.786891ns), andBUF1place7173(0.480636ns). NOR2/AND4havevalid_2variants. PreparedfivecasefixedSPEFstudy baseline,currentbest,NOR2_2,AND4_2,combined toselectusefulfinalsetupcandidate. Fiveactualsourceconservationchecks and52focusedtests pass. Namefinishdoesnotmeanphaseclosure: localhold/allelectricalrepairs,physicalscreen andofficialsignoffremainoutstanding. NoDRT.
+
+### Diagnostic setup closes — 38321212600
+
+Actualartifact11779199738:baseline-1.008813ns,currentbest-0.020938ns,NOR224896_2alone0ns,AND425926_2alone0ns,combined0ns slowsetup. AllthreecornerssetupWS0forAND4candidate. Noadditionaldiagnosticsetupcasesneeded before combinedphysicalrepairpreparation. Fast/typ/slowhold0.0000215383/0.0810825874/0.2183033816ns; fanout9each,slow/typ/fastslew93/8/0,cap0/1/1remain. This is fixedSPEF and explicitlynotphysicalqualification/signoff.
+
+Prefer theAND4candidate provisionally: sameglobalsetupresult asNOR2,8totalsetupchanges andnet23.5872um2cellarea versus25.4016um2forNOR2. Offline completefootprintallocation againstexactsource/pinnedLEF succeeds. Neitherphysicalrouting norupstreamloading robustness isproven. Combine selectedsetupchanges withlocalholdandallelectricalrepairs, allocateallfootprintstogether, validateeveryoriginalconnection, and requirestrictphysicalscreen/correlationbeforeDRT. Thebaseline19delayproposal275.7888um2mustberecheckedfornewfastpaths fromthesechanges.

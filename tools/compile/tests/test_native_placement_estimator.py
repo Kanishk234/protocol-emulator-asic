@@ -22,3 +22,13 @@ def test_wrong_source_or_duplicate_command_rejected(tmp_path,monkeypatch):
     with pytest.raises(ValueError,match='Nonunique'):native.instrument(original,tmp_path/'copy')
     monkeypatch.setattr(native,'GPL_SHA','0'*64)
     with pytest.raises(ValueError,match='Pinned'):native.instrument(original,tmp_path/'copy')
+
+
+def test_resolved_defaults_match_control_but_changed_capacity_is_rejected():
+    control=dict(native.ROUTING_POLICY)
+    native.verify_routing_policy(dict(control),control)
+    changed=dict(control,GRT_ADJUSTMENT=0.4)
+    with pytest.raises(ValueError,match='GRT_ADJUSTMENT'):
+        native.verify_routing_policy(changed,control)
+    with pytest.raises(ValueError,match='GRT_ADJUSTMENT'):
+        native.verify_routing_policy(changed,changed)

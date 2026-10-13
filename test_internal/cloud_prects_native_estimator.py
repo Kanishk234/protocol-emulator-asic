@@ -13,6 +13,15 @@ GPL_SHA='b293515d3bf5ac4bdd45498f9de9d842926f16eeb078c78ec48bfc683dffb547'
 ANCHOR='log_cmd global_placement {*}$arg_list'
 INSERT='lappend arg_list -routability_use_grt\n'
 ORIGINAL_STAGE=trial.run_stage
+ROUTING_POLICY={'RT_MIN_LAYER':'Metal1','RT_MAX_LAYER':'Metal4',
+    'GRT_ADJUSTMENT':0.3,'GRT_LAYER_ADJUSTMENTS':[0,0,0,0,0],'GRT_MACRO_EXTENSION':0}
+
+
+def verify_routing_policy(resolved, control):
+    # Compare resolved defaults, not absent fields in the input config.
+    for key, expected in ROUTING_POLICY.items():
+        if control.get(key)!=expected or resolved.get(key)!=control.get(key):
+            raise ValueError('Placement routing policy changed: '+key)
 
 
 def instrument(original,directory):
@@ -56,8 +65,8 @@ def dispatch(config,state,label):
     # Fail closed if the advertised estimator flag never reached native execution.
     stage,=run.glob('*-openroad-globalplacement')
     resolved=json.loads((stage/'config.json').read_text())
-    for key in ('RT_MIN_LAYER','RT_MAX_LAYER','GRT_ADJUSTMENT','GRT_LAYER_ADJUSTMENTS','GRT_MACRO_EXTENSION'):
-        if resolved.get(key)!=config.get(key):raise ValueError('Placement routing policy changed: '+key)
+    control_stage,=(OUT/'control').glob('*-openroad-resizertimingpostcts')
+    verify_routing_policy(resolved,json.loads((control_stage/'config.json').read_text()))
     raw=(stage/'openroad-globalplacement.log').read_text()
     commands=[line for line in raw.splitlines() if line.startswith('+ global_placement ')]
     if not commands or any('-routability_use_grt' not in line for line in commands):

@@ -8,6 +8,7 @@ import cloud_hotspot_grt as paired
 import cloud_hold_allocation as payload
 import cloud_cfg_fanout as cfg
 
+SOURCE_RUN=38320631258
 ROOT=cfg.ROOT
 INPUT=ROOT/'build/prects_fanout_grt_input'
 OUT=ROOT/'build/prects_fanout_grt'
@@ -20,7 +21,7 @@ def validate(directory,baseline):
     adapter.validate_control(baseline)
     if cfg.sha(directory/'result.json')!=RESULT_SHA:raise ValueError('Measured reflow producer differs')
     result=json.loads((directory/'result.json').read_text())
-    if result.get('producer_passed') is not True or result.get('source_run')!=38319615838:
+    if result.get('producer_passed') is not True or result.get('source_run')!=producer.SOURCE_RUN:
         raise ValueError('Wrong or failed fanout-clean producer')
     audit=producer.immutability((directory/'producer_before.tsv').read_text(),(directory/'after.tsv').read_text())
     if audit!=result['audit']:raise ValueError('Measured immutability/connectivity audit differs')
@@ -37,7 +38,7 @@ def validate(directory,baseline):
         keys += [f'timing__{s}_vio__count__corner:{corner}' for s in ('setup','hold')]
         if any(m[k]!=0 for k in keys):raise ValueError('Producer electrical/timing violations')
     # Native snapshot already proves macro and physical boundary/row identity.
-    return {'original_instances':3645,'added_identity_buffers':10,'producer_audit':audit}
+    return {'original_instances':producer.INSTANCE_COUNT,'added_identity_buffers':10,'producer_audit':audit}
 
 
 def main():
@@ -57,7 +58,7 @@ def main():
     shutil.copyfile(baseline/'after.tsv',candidate/'before.tsv')
     (candidate/'original_source').symlink_to(baseline/'original_source',target_is_directory=True)
     paired.INPUT,paired.OUT=INPUT,OUT
-    paired.SOURCE_RUN,paired.RESULT_SHA=38320631258,RESULT_SHA
+    paired.SOURCE_RUN,paired.RESULT_SHA=SOURCE_RUN,RESULT_SHA
     paired.BUFFERED,paired.PADDED=adapter.BASELINE,CANDIDATE
     paired.validate_candidate,paired.validate_padding=adapter.validate_control,validate
     try:paired.main()

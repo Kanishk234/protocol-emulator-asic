@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-13 (session101: reject broad reflow; parallel diagnosis and robustness)
+**Done:**38453870785 diagnosticSUCCESS but native route rejects6000overflow versus133control; resultSHA c840a2cb… . Logged rejection in ledger/DECISIONS/phase summary. Stopped automatic historical RUDY producer/route reruns on shared-helper edits (manual replay retained; parsed trigger checks pass). Parallel primary-source research written in research_next_20261013.md; physical audit investigates actual macro crossings before another placement. Added36 C-loader transaction-fault/reload cases (before/after acceptance at9boundaries, words/WBIT APIs); independently rerun81testsPASS in1.47s. No hardware/spec changes, localEDA, routing/timing signoff or phase boxes.
+**Next step:** launch read-only native boundary/obstruction export on best133control, attribute remaining hotspots, and choose one localized physical experiment only from measured evidence. Research successor hardware proposals remain separate from frozen G1.
+
 ## 2026-10-13 (session100: repaired native feedback layout enters routing)
 **Done:**38452773248SUCCESS, resultSHA b804c57b…; all3670 original instances fixed,18369 terminals checked, ten identity buffers, contracted connectivity exact. Zero fanout/slew/cap/setup/hold violations at all three original corners; fast estimated hold0.101014ns. Candidate ODB71cb27c8…/NL68b84c66… pinned. Prepared paired native GRT against authenticated133control with unchanged capacities/layers/margins. Actual downloaded producer and baseline pass routing adapter validation; six focused tests PASS. No full timing/routing pass, architecture changes, localEDA or phase boxes.
 **Next step:** inspect native paired route; reject regressions, advance only zero-overflow qualified layout to detailed routing/extraction and matched timing coverage.

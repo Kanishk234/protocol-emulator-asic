@@ -931,3 +931,5 @@ No source/spec/resource or protocol changes; every program pays any altered
 wiring/repair tradeoff. Actual area and routing benefit remain unmeasured.
 
 [OpenROAD global placement](https://openroad.readthedocs.io/en/latest/main/src/gpl/README.html) documents native GRT as a more precise, higher-runtime alternative to its default RUDY estimate. Native-runtime failure or missing source/flag evidence rejects this experiment; no physical advantage is assumed.
+
+**D-094 outcome, October13:**38453870785 native route rejects candidate6000overflow versus133control. Three-corner repaired producer success38452773248 did not predict routing closure. Reject broad native-feedback re-placement, preserve best133control, and inspect localized routing topology before further placement experiments. Historical RUDY workflow replays are manual-only; no architecture or routing-capacity waiver.

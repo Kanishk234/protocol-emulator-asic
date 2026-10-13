@@ -204,3 +204,5 @@ docs/reports/compact_clean_layout_20261007.md for the exact remaining gates.
 The frozen chip's Phase 4 claims now have green CI evidence; Phase 5 is turning the local verification and documentation into a reproducible, reviewable submission package.
 
 October13 update: native routing-feedback placement38339209412 and fixed-instance fanout repair38452773248 complete. All three estimated shell timing/electrical corners pass after repair; original3670 cells stay fixed. Direct routing comparison to133 control is next. This does not establish routing closure or complete matched extracted timing; phase5 remains open.
+
+October13 routing result:38453870785 measures133control versus6000native-feedback candidate overflow. Reject this candidate despite clean estimated electrical/timing guards. Broad re-placement has failed with both estimators; the next physical work is a localized topology audit on the best control. Phase5 remains open.

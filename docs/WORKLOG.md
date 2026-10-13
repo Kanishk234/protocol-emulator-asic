@@ -2,6 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-13 (session99: native feedback candidate qualifies for fanout repair)
+**Done:**38339209412 diagnosticSUCCESS; authenticated resultSHA c22a7e67…; actual3670-instance census. Native placement preserves physical interface; all three corners show zero setup/hold/slew/cap violations, five configuration fanout violations. Fast hold0.101014ns, slow0.598685ns, typical0.279020ns; shell estimated timing scope only. Prepared identical ten-buffer repair with pinned source views and count; all old instances locked and checked unchanged. Six focused tests PASS. Latest docs/test/unit/lint/fabric allSUCCESS onbfe6149. No hardware freeze changes, routing pass, localEDA or phase boxes.
+**Next step:** cloud native-fanout producer; require zero electrical violations and original hold guard at all corners before direct native route against133 control. Reject any guard regression.
+
 ## 2026-10-12 (session98: repair resolved-policy comparison)
 **Done:**38334401344 failed after native placement because routing defaults omitted in input were compared to resolved0.3. Actual downloaded control resizer and candidate GPL configs match all five pinned routing fields. Checker now compares these resolved policies and also requires exact original capacities/layers. Three focused tests PASS, including changed-capacity rejection. Logged BUG84. Lint38334466584/test38334466623/docs38334466603/unit38334466721 allSUCCESS. No physical pass, hardware edits, localEDA, waived guards or phase boxes.
 **Next step:** rerun corrected collector and inspect three corner guards before unchanged133-control routing comparison. Routing remains unresolved.

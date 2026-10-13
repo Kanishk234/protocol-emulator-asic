@@ -5,6 +5,19 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (new-source residual setup sensitivity prepared)
+- Prepared6casefixedSPEFstudy on improvedcombinedroute38336141213:baseline,NOR243582_2,BUF4place7208,NOR425727_2,combined,strongBUF8combination. Exactnewsource/head/extractedNL hash,completed0DRC andbaseline-0.399146ns/38.505ps reproduction required. Preserveallold76cells/8resizes.
+- Sixactualnewsourceconservationchecks and37focusedtests pass;diffcheckpass. Nextpublish/launchstudy whilepreparing4endpoint/2slewnet/6fanoutnet residualphysicalproposal. NoDRT/Phase2tick orqualificationclaim.
+
+## 2026-10-12: Codex (combined route completes but extracted residual gates fail)
+-38336141213 actualartifact11785924491:0DRC/0antenna;completedextraction/conservedNL. Genuinegatefailure:slowsetup-0.399146ns,fasthold38.505ps<50;slow/typ/fastslew13/0/0,fanout6all,cap0all. Betterthanprevious-1.009ns/0.0215ps/93slew/9fanout/cap1; notqualification. Nohelperfix/gatewaiver/identicalrerun.
+- Reviewedactual1000pathreports:10negativesetuppaths,4holdendpoints;13slewrowsare2nets. RetrievedactualnewNL/DEFandhashedsource. Residualtargets43582/place7208/25727sharedsetup,4endpointlocaldelays,2slewnets,6diode-loadedfanoutnets;retainold76cells/8resizes.
+- Nextsource-boundresidualproposalandscreen,withmeasuredscreen/extractedcorrelationandmargin;noDRTuntilscreenallgatespass. NoPhase2ticks/officialclaim. Detailedresult/targetevidencelocalpendingpublication.
+
+## 2026-10-12: Codex (qualified combined route launched)
+- Publishedtools007b1ac/CIf17491e/docsa1642e6;verifiedremote maina1642e654ceaae36ee082555e1144b728e3fcb22. [Combinedroute38336141213](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38336141213) confirmedin_progress onexacthead.
+- Source38334245126passedallrequestedphysicalscreen gates.45focusedtests pass;freshstock allgate check beforeDRT,0DRC/freshNL/extractedstrictgates required afterrouting. Nextinspectactualextractedoutcome;noofficialpass/Phase2tick. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (combined physical screen qualifies; strict DRT continuation prepared)
 - Independently inspected38334245126artifact11784965210:allcorner setup0, fast/typ/slowhold54.2228/142.567/297.464ps;allcorner slew/fanout/cap0,antenna0,overflow0. Conservation/placement/livecapacity/oldwirecleanup gates pass. Fastholdheadroom4.2228ps; noextractedclosureclaim.
 - Prepared exactsuccessfulsource continuation, canonicalproposal/history/freshNL audit, stockimagefresh allgate recheck beforeDRT; norepair/GRTreplay. Preserveoldfailedextractionevidence; require0DRC/freshNLconservation andstrict extractedtiming/50ps/electrical/antenna gates.

@@ -13,6 +13,20 @@ proc tripwire_electrical_find_net {block name} {
     return [lindex $matches 0]
 }
 
+# DEF/STA spell hierarchy brackets differently. Resolve the physical instance
+# uniquely when direct lookup cannot find the canonical spelling.
+proc tripwire_electrical_find_inst {block name} {
+    set wanted [tripwire_electrical_net_name $name]
+    set inst [$block findInst $name]
+    if {$inst ne "NULL" && ![regexp {\[|\]} $wanted]} {return $inst}
+    set matches {}
+    foreach candidate [$block getInsts] {
+        if {[tripwire_electrical_net_name [$candidate getName]] eq $wanted} {lappend matches $candidate}
+    }
+    if {[llength $matches]!=1} {error "Missing or ambiguous electrical source instance: $name"}
+    return [lindex $matches 0]
+}
+
 proc tripwire_size_electrical {targets} {
     set saved {}
     foreach target $targets {
@@ -66,12 +80,12 @@ proc tripwire_electrical_repair {master_name expectations groups} {
         if {$net eq "NULL" || [llength [$net getBTerms]]} {error "Missing or exposed residual source net"}
         set actual {}
         foreach term [$net getITerms] {
-            lappend actual "[[$term getInst] getName]/[[$term getMTerm] getName]"
+            lappend actual "[tripwire_electrical_net_name [[$term getInst] getName]]/[tripwire_electrical_net_name [[$term getMTerm] getName]]"
         }
         if {[lsort $actual] ne [lsort $pins]} {error "Residual source net connectivity changed"}
         foreach pair $masters {
             lassign $pair name old
-            set inst [$block findInst $name]
+            set inst [tripwire_electrical_find_inst $block $name]
             if {$inst eq "NULL" || [[$inst getMaster] getName] ne $old} {error "Residual master changed"}
         }
     }
@@ -81,7 +95,7 @@ proc tripwire_electrical_repair {master_name expectations groups} {
         if {[$block findInst $buffer_name] ne "NULL" || [$block findNet $net_name] ne "NULL"} {error "Repeated residual repair"}
         if {[llength $location] != 3 || [lindex $location 2] ni {N FS}} {error "Invalid repair placement"}
         set source [tripwire_electrical_find_net $block $source_name]
-        set rail_inst [$block findInst $rail_name]
+        set rail_inst [tripwire_electrical_find_inst $block $rail_name]
         set rails {}
         foreach pin {VDD VSS} {
             set term [$rail_inst findITerm $pin]
@@ -92,7 +106,7 @@ proc tripwire_electrical_repair {master_name expectations groups} {
         foreach sink $sinks {
             lassign $sink name pin
             if {$pin in {CLK GCLK GATE RESET_B}} {error "Residual repair must not move clock/reset pins"}
-            set term [[$block findInst $name] findITerm $pin]
+            set term [[tripwire_electrical_find_inst $block $name] findITerm $pin]
             if {$term eq "NULL" || [$term getNet] ne $source} {error "Residual sink changed"}
             lappend terms $term
         }

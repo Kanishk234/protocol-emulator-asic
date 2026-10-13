@@ -20,13 +20,13 @@ def source_binding():
     return dict(source_run=38305592967,nl_sha=NL_SHA,def_sha=DEF_SHA,report_sha=REPORT_SHA,
         checks_sha=CHECKS_SHA,setup=SETUP,targets=TARGETS,prefix='tripwire_combined_',hold_count=19,electrical_nets=29)
 
-def connections(layout):
+def connections(layout,normalize_instances=False):
     nets={};attached={}
     for entry in layout.split('\nNETS ',1)[1].split('END NETS',1)[0].split(';'):
         hit=re.search(r'^\s*- (\S+)',entry)
         if not hit:continue
         name=def_identifier(hit[1])
-        terms=[(n,def_identifier(p)) for n,p in re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry.split(' + ',1)[0])]
+        terms=[(def_identifier(n) if normalize_instances else n,def_identifier(p)) for n,p in re.findall(r'\(\s*(\S+)\s+(\S+)\s*\)',entry.split(' + ',1)[0])]
         if name in nets:raise ValueError('Duplicate source net')
         nets[name]=terms
         for pin in terms:
@@ -63,13 +63,28 @@ def macro_pin(layout,macro_lef,pin):
     return [round((12+(x1+x2)/2)*1000),round((40+191.34-(y1+y2)/2)*1000)]
 
 
+def clock_diode_partition(source,driver,sinks,cells,cfg):
+    if source not in cfg.get('clock_diode_sources',()):raise ValueError('Unreviewed protected electrical source')
+    if driver!=(cfg['clock_driver'],'X') or cells[driver[0]][0]!='sg13cmos5l_buf_8':raise ValueError('Wrong reviewed clock diode driver')
+    movable=[p for p in sinks if cells[p[0]][0]=='sg13cmos5l_antennanp' and p[1]=='A']
+    kept=[p for p in sinks if p not in movable]
+    if len(kept)!=6 or any(p[1]!='GATE' or cells[p[0]][0]!='sg13cmos5l_dlhq_1' for p in kept) or len(movable)!=6:
+        raise ValueError('Wrong six-latch/six-diode clock partition')
+    return movable,len(kept)
+
+
 def plan(netlist,layout,hold_report,checks,std_lef,macro_lef,binding=None):
     cfg=source_binding() if binding is None else binding
     setup,targets=cfg['setup'],cfg['targets']
     for text,digest in ((netlist,cfg['nl_sha']),(layout,cfg['def_sha']),(hold_report,cfg['report_sha'])):
         if hashlib.sha256(text.encode()).hexdigest()!=digest:raise ValueError('Wrong combined source')
     if hashlib.sha256(macro_lef.read_bytes()).hexdigest()!=MACRO_LEF_SHA:raise ValueError('Wrong macro LEF')
-    loc=placements(layout);nets,attached=connections(layout);rows=source_rows(layout)
+    loc=placements(layout)
+    if cfg.get('normalize_instances'):
+        normalized={def_identifier(n):v for n,v in loc.items()}
+        if len(normalized)!=len(loc):raise ValueError('Ambiguous canonical instance aliases')
+        loc=normalized
+    nets,attached=connections(layout,cfg.get('normalize_instances',False));rows=source_rows(layout)
     cells={n.strip().removeprefix('\\'):(m,p) for n,(m,p) in logical_cells(netlist).items()}
     sizes={};boxes=None
     for master in set(setup.values())|{'sg13cmos5l_buf_4','sg13cmos5l_dlygate4sd1_1'}:
@@ -118,11 +133,15 @@ def plan(netlist,layout,hold_report,checks,std_lef,macro_lef,binding=None):
         if len(drivers)!=1:raise ValueError('Missing unique data driver')
         driver=drivers[0]
         remaining=[p for p in terms if p!=driver and p not in moved]
+        protected=[p for p in remaining if p[1] in ('CLK','GCLK','GATE','RESET_B')]
+        preserved=0
+        if protected:
+            remaining,preserved=clock_diode_partition(source,driver,remaining,cells,cfg)
         # Old hold sinks on this source already become one delay-input load.
         # Leave one slot for each existing new hold input; all other consumers
         # move behind max4-load buffers, including existing antenna diodes.
         hold_inputs=sum(g['source_net']==source for g in groups)
-        if hold_inputs+(len(remaining)+3)//4>8:raise ValueError('Source driver would remain over fanout budget')
+        if preserved+hold_inputs+(len(remaining)+3)//4>8:raise ValueError('Source driver would remain over fanout budget')
         def point(pin):
             n,p=pin
             return macro_pin(layout,macro_lef,p) if n=='u_chip.u_sram.sram' else list(loc[n][1:3])
@@ -169,7 +188,8 @@ def target_call(layout,proposal,binding=None):
     cfg=source_binding() if binding is None else binding
     if hashlib.sha256(layout.encode()).hexdigest()!=cfg['def_sha'] or proposal['source_run']!=cfg['source_run'] or proposal['def_sha256']!=cfg['def_sha']:
         raise ValueError('Wrong combined Tcl source')
-    nets,_=connections(layout);masters={n:p[0] for n,p in placements(layout).items()}
+    nets,_=connections(layout,cfg.get('normalize_instances',False))
+    masters={(def_identifier(n) if cfg.get('normalize_instances') else n):p[0] for n,p in placements(layout).items()}
     def word(value):
         if not re.fullmatch(r'[A-Za-z0-9_./\[\]\-]+',value):raise ValueError('Unsafe combined Tcl identity')
         return '{'+value+'}'

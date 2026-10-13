@@ -51,7 +51,7 @@ def test_measured_current_views_and_all_gates_required(tmp_path,fault):
     else:assert runner.validate_checkpoint(root)==ant/'state_out.json'
 
 
-@pytest.mark.parametrize('fault',[None,'hold','slew','antenna','extracted_hold','extracted_slew'])
+@pytest.mark.parametrize('fault',[None,'hold','slew','antenna','extracted_hold','extracted_slew','extracted_missing','extracted_empty'])
 def test_fresh_gates_block_drt_and_extracted_failures_are_not_success(tmp_path,monkeypatch,fault):
     import sys,types
     monkeypatch.chdir(tmp_path);monkeypatch.setenv('PDK_ROOT','/pdk');monkeypatch.setenv('LIBRELANE_IMAGE_OVERRIDE','custom')
@@ -69,7 +69,11 @@ def test_fresh_gates_block_drt_and_extracted_failures_are_not_success(tmp_path,m
     def extract(root):
         calls.append('extract');out=Path('runs/extracted-timing');out.mkdir()
         metrics={f'timing__{kind}__ws__corner:{c}':(.049 if fault=='extracted_hold' else .06) if kind=='hold' else 0 for c in CORNERS for kind in ('setup','hold')}
-        (out/'corner_summary.json').write_text(json.dumps(metrics));(out/'electrical_summary.json').write_text(json.dumps({c:{'no_reported_electrical_violations':fault!='extracted_slew'} for c in CORNERS}))
+        (out/'corner_summary.json').write_text(json.dumps(metrics))
+        electrical={c:{'no_reported_electrical_violations':fault!='extracted_slew'} for c in CORNERS}
+        if fault=='extracted_missing':electrical.pop(CORNERS[0])
+        if fault=='extracted_empty':electrical={}
+        (out/'electrical_summary.json').write_text(json.dumps(electrical))
         p=out/'2-openroad-checkantennas/or_metrics_out.json';p.parent.mkdir();p.write_text(json.dumps({'antenna__violating__nets':0,'antenna__violating__pins':0}))
     monkeypatch.setattr(runner,'run_step',step);monkeypatch.setattr(runner,'screen',sta);monkeypatch.setattr(runner,'validate_final_route',lambda *args:None)
     monkeypatch.setitem(sys.modules,'extracted_timing',types.SimpleNamespace(main=extract))

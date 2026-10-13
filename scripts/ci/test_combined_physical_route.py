@@ -22,5 +22,5 @@ def test_workflow_exact_source_and_no_repair_replay():
     assert d['with']['run-id']==SOURCE_RUN and d['with']['name']==f'gds-combined-physical-screen-{SOURCE_RUN}'
     validate_provenance(*source())
     code=(root/'scripts/ci/combined_physical_route.py').read_text()
-    assert 'source_run=SOURCE_RUN' in code and 'continue_route(config,source,output' in code
+    assert "profile.get('source_run',SOURCE_RUN)" in code and 'continue_route(config,source,output' in code
     assert 'OpenROAD.GlobalRouting' not in code and 'docker' not in code

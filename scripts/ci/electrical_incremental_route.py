@@ -72,8 +72,8 @@ def continue_route(config,source,output,source_run=SOURCE_RUN):
     electrical=json.loads((extracted/'electrical_summary.json').read_text())
     corners={c:{'after':summary} for c in timing['corners']}
     final_ant=json.loads(unique(extracted,'*-openroad-checkantennas/or_metrics_out.json').read_text())
-    extracted_ready=qualified({'corners':corners},final_ant) and all(
-        row['no_reported_electrical_violations'] for row in electrical.values())
+    extracted_ready=qualified({'corners':corners},final_ant) and set(electrical)==set(timing['corners']) and all(
+        row.get('no_reported_electrical_violations') is True for row in electrical.values())
     (output/'extracted_gates.json').write_text(json.dumps(dict(qualified=extracted_ready,
         source_run=source_run,minimum_fast_hold_ns=.05,official_signoff=False),indent=2)+'\n')
     if not extracted_ready:raise ValueError('Extracted timing/electrical/antenna gates fail')

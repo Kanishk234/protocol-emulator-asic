@@ -28,6 +28,14 @@ Paired38316844576 worsens133→145overflow; reject smaller-delay candidate for
 routing. Preserve133 control and test congestion-driven redistribution with
 all original masters/repairs retained; no closure claim.
 
+Earlier-stage placement38319615838 rebuilds CTS/repairs and restores the
+retained hold guard after post-CTS redistribution failed it. Known fanout
+repair38320631258 now passes native placement/connection/interface checks
+and all3 original-corner estimated shell electrical/timing gates, retaining
+fast hold0.100232ns. Routing comparison38321208948 is active against133;
+no routing or complete chip-timing pass is claimed. The progress ledger
+separates setup failures, rejected changes and actual qualified results.
+
 Combined shell placement38168159774 improves146→133native overflow and111→91
 markers, still fails routing. Buffer producer38172225275 passes native legality
 and six preliminary electrical/timing guards; identical-policy routing is now

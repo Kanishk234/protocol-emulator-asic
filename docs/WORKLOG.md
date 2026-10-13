@@ -4,6 +4,7 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-10-12 (session96: earlier-stage fanout-clean producer passes)
 **Done:** actual38320631258SUCCESS; resultSHA df6f07c5… verifies ten identity buffers, all3645 originals unmoved/unchanged and contracted connections exact. Native physical interface/ROW power phase passes; all3 original-corner electrical/setup/hold gates pass with fast hold0.100232ns. Prepared direct unchanged-policy GRT comparison to best133control, using authenticated candidate90940c87…/d53fd05f… . Local adapter validates actual downloaded artifacts; focused regressions48PASS. This advances producer qualification, not native routing/signoff. No frozen source/spec changes or phase boxes ticked.
+**Cloud launched:**38321208948 in_progress on4b937d4; inputs fetched, pinned image provisioning underway at inspection. No localEDA or active hardening cancellation.
 **Next step:** inspect new paired route; reject regressions, and proceed to detailed routing only on a native zero-overflow candidate. Existing G1 fallback/software remains separate and intact.
 
 ## 2026-10-12 (session95: distinguish design regressions from experiment bugs)

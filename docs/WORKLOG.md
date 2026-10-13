@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (decode study clears diagnostic setup; combined repair prepared)
+-38418432056 artifact11825992255:baseline-0.230241ns;A21OI2 alone-0.113562ns;NOR2_2 alone-0.009507ns;two gates0 allcorner setupWS,thirdaddsno reported benefit. Fast hold61.103ps unchanged. Select2gates, no physical/positive-margin claim.
+- Complete selected-candidate min report preserves identical4sub75ps endpoints. Exact extracted-source proposal:2resizes,4local holdDLY4SD1,24electricalBUF4 across12measurednets,415.4976um2 growth, zero offline overlaps; retain all prior diodes/cells. SRAMADDR8buffer preservesremainingbits. Actual-source synthetic conservation and Tcl round-trip pass.
+-69 focusedtests(30+39),diff/bashsyntax pass. Next publish/launch combined physical screen with real detailed-wire cleanup and bounded post-antfanout; noDRTuntilallstrictgatespass. Post-DRT diode additions remain a required final extracted check. No Phase2 tick/official claim; unrelated files excluded.
+
+## 2026-10-13: Codex (new extracted decode-cone diagnostic launched)
+- Published tools21ef87c/CIeedc65f/docs9d91d41;remote main verified9d91d414b2ab64f7e7d7e3f0647964793157b5e5. [Extracted decode study38418432056](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38418432056) confirmed in_progress on exact head.
+-29 focused tests and five actual-source conservationchecks pass; fixedSPEF diagnostic only. Next inspect setup/hold/electrical outcome and finish post-DRT antenna/load repair strategy before next physical screen. No Phase2 tick/official pass. Receipt local pending next publication.
+
 ## 2026-10-13: Codex (DRT/extraction genuine residual failure; decode study prepared)
 -38358706808 artifact11795955910: fresh stock allgate recheck passes; detailed route0DRC/conservedNL and antenna0. Actual extracted setupslow-0.230241ns;fast hold61.103ps (passes50);typ166.093ps,slow339.983ps; cap0;slow slew27,fanout5each. No helper bug/gate waiver. Raw job API supplied logs when rendered gh logs were empty.
 - Seven printed failing setup paths share configuration latch48107 and decode cone; prepared5-case fixedSPEF strength study30044/A21OI2,43917/NOR2_2,43915/AND3_2 with exact newest source/baseline reproduction.29 focusedtests and five actual-source conservationchecks pass.

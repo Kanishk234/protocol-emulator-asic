@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-12: Codex (combined physical screen qualifies; strict DRT continuation prepared)
+- Independently inspected38334245126artifact11784965210:allcorner setup0, fast/typ/slowhold54.2228/142.567/297.464ps;allcorner slew/fanout/cap0,antenna0,overflow0. Conservation/placement/livecapacity/oldwirecleanup gates pass. Fastholdheadroom4.2228ps; noextractedclosureclaim.
+- Prepared exactsuccessfulsource continuation, canonicalproposal/history/freshNL audit, stockimagefresh allgate recheck beforeDRT; norepair/GRTreplay. Preserveoldfailedextractionevidence; require0DRC/freshNLconservation andstrict extractedtiming/50ps/electrical/antenna gates.
+-45focusedtests/compile/diffpass. Nextpublish/launchcontinuation underongoingauthorization because requestedphysicalscreen gatespassed; inspectextractedresultsbeforeofficialintegration. NoPhase2tick.
+
+## 2026-10-12: Codex (combined physical screen published and launched)
+- Publishedtoolse622f53/CI3cf5197/docs08d9279;verifiedremote main08d9279b0f0ec3718cbcc5c36dc1529415013de9. [Combinedscreen38334245126](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38334245126) confirmedin_progress onexacthead.
+-53focusedtests plusactualjointallocation/conservation/Tclroundtrip pass. Eightsetupchanges/76newcells, strictallcorner50ps/electrical/antenna/overflow gates, noDRT. Nextinspectactualphysical result andscreen/extractedcorrelation. NoPhase2tick. Launchreceiptlocal.
+
 ## 2026-10-12: Codex (combined setup/hold/electrical physical screen prepared)
 - Combinedactualsource8setupchanges/19localholdDLY4SD1/57electricalBUF4 buffers, all29violating nets. Jointallocationzerooverlap;netfootprint1126.7424um2. ExactNL/DEF/hold/all3checks/SRAMLEF binds;actual8resize/76buffer syntheticconservation andgeneratedTclargumentroundtrip pass.
 - Preparedscreenonly: sourcepreflight, sizing/fixedoldplacements, DPLnewcells, positiveold detailed-wirecleanup, onenativefullGRT+inlineantrepair withlivecapacity, freshNL/PNL, exactfunctional/oldplacementconservation, allcornerstrict20ns/50ps/electrical/antenna/overflowgates. NoDRT orofficialflowclaim.

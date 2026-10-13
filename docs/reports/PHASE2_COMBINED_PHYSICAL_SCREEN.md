@@ -14,3 +14,9 @@ The proposal combines that candidate with19endpoint-local DLY4SD1 hold cells and
 - Require setup>=0allcorners, fast hold>=50ps, zero slew/fanout/cap allcorners and zero antenna violations. Failure writes gate evidence and fails the workflow. No detailed-route step or automated continuation exists.
 
 53focused tests pass; actual-source joint allocation and eight-resize/76-buffer synthetic conservation pass; actual generated Tcl argument round-trip passes. Tcl/OpenDB behavior, new routing, power connectivity and timing still require the physical run. This uses a custom wrapper on pinned LibreLane3.1.0.dev3, not the official final GDS flow. Estimated-screen/extracted correlation remains a required follow-up before trusting a green screen as sufficient margin. Official clean-flow reproduction, GL and GDS/LVS/precheck remain outstanding.
+
+## Screen outcome — 38334245126
+
+Actualartifact11784965210 confirms strictqualification:allcorner setupWS0;fast/typ/slowhold54.2228/142.567/297.464ps;allcorner slew/fanout/cap0;antenna0;overflow0. Exact8resize/76buffer conservation, originalplacements except reviewedresizes, positiveinitial/finaldemand andsource detailed-wirecleanup allpassed. This is estimated globalrouting, not extracted closure. Fastholdheadroom is4.2228ps aboveacceptance, soextraction remains decisive.
+
+Prepared exact-source continuation validates run/head/completegates andcanonicalproposal/actualfreshviews/history, uses stockimage, rechecks strictallcorner timing/electrical/antenna beforeDRT, and doesnotrepeatphysicalrepair/fullGRT. Detailedrouting mustfinish with0DRC andfreshnetlistconservation; extraction retains unchangedsignoffconstraints andmustpass allcorner setup/hold plus50psfasthold andzeroelectrical/antenna. Originalfailedextracted evidence ispreserved separately beforefreshoutput.45focusedtests pass. No officialsignoff/Phase2tick.

@@ -5,6 +5,21 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (nine-net fanout and clock-diode repair prepared)
+- Exact clock inventory38433037592:6functional DLHQ GATE loads+6antenna diodes. Proposed2BUF4 diode-only branches leave every functional clock/reset pin on its original net;rootload6+2=8. Preserveall diodes; antenna protection must be rechecked after isolation.
+- Eightdatafanout repairs24BUF4 plus2clock-diodeBUF4 and2localholdDLY4SD1:28cells/406.4256um2,zeroofflineoverlap,noresizes. SourceNL/DEF/allcornerreports/pinnedLEFs bound. BUG109 escaped hierarchical instance lookup caught/fixed beforelaunch; Tcl alias and protected-leaf checks covered.
+-94 focused tests(46+48),actual-source28buffer conservation/unchangedclock-resetpin checks/Tclroundtrip/diff pass. Nextpublish/launch strict physicalscreen;noDRTuntilallgatespass,andpost-DRTdiodes stillneed extractedchecks. NoPhase2tick/officialclaim;unrelatedfilesexcluded.
+
+## 2026-10-13: Codex (decode route status: extracted timing passes; fanout remains)
+-38433037592 completed genuine extracted electrical failure;artifact11833878873. Actual summaries:setupWS0 all corners;fast/typ/slow hold68.172303/167.606822/347.524241ps;DRC0,antenna0,slew/cap0 everycorner. Only remaining electrical category isfanout9eachcorner. Noofficial/Phase2completion claim.
+- Remainingdrivers:clockbuffer clkbuf_1_0__f_u_chip.g_unit[0].u_cfg.g_word[3].g_stored.gclk (12loads),place9170(11),place8842(10),29538/45886/47069/place7854/place8807/place8992(9). Theclockbranchrequirescontrolledclock-tree repair;genericdatahelpermustnotrewireprotectedclockpins.
+- Latestmain test38433012231/lint38433012206/unit38433012397/docs38433012299 allgreen. No in-progressmainruns;oldl3-placement-routed-gl37655518919 andgds-placement-extracted-timing37655518925 stillqueued.
+- Next auditpost-DRTdiode/loadchanges anddesignsource-bound datafanout plusclockbranch correction withunchanged timing/zeroelectrical gates. No newworkflow dispatched duringstatuscheck. Receiptlocalpendingnextpublication.
+
+## 2026-10-13: Codex (qualified decode detailed-route continuation launched)
+- Published tools27a41f0/CI0794a81/docs18dd627;remote main verified18dd627c8671e82d650b6978236857724cb258fa. [Decode route38433037592](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38433037592) confirmedin_progress onexacthead.
+-58 focusedtests andindependent actualsourceaudits pass. Require freshstock allgates beforeDRT,0DRC/conservedNL andstrict extractedtiming/electrical/antenna. Nextinspect outcomeincluding nativeDRTdiodeloads;noofficial/Phase2completion claim. Receiptlocalpendingnextpublication.
+
 ## 2026-10-13: Codex (qualified decode screen independently audited; route prepared)
 -38421594711 actualartifact11828740117 independently reaudited:canonical2resizes/28cells,sourceNL/DEF/old placements,all rewires including SRAMADDR8,antenna-only interval/livezerooverflow andstrictgates pass. SetupWS0 all corners,fast hold77.8488ps,zero electrical/antenna;0postantbatches.
 - Prepared exactsuccessfulsource stock DRT/extraction continuation. Freshallgate recheck beforeDRT, no repair/fullGRTreplay,0DRC/conservedfreshNL andunchanged extracted50ps/setup/electrical/allcorner/antenna gates. Preserve priorfailedextraction separately.

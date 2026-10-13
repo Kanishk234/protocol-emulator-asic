@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (strict post-antenna screen passes; exact DRT continuation prepared)
+-38356513586 actualartifact11793266699:setupWS0 all corners;fast/typ/slow hold73.4991/172.911/347.727ps;slew/fanout/cap0 all corners,antenna0,overflow0. Same-process correction converges in1batch/3BUF4 beyond8initialbuffers. Independently reaudited actual canonical plan/placements/connectivity/history/live routing/gates; BUG106 physical screen evidence updated.
+- Prepared exact-successful-source stock DRT/extraction continuation, fresh strict gates before DRT, no repair/fullGRT replay,0DRC/freshNL conservation, unchanged extracted50ps/electrical/allcorner gates. Preserve old extracted evidence. BUG107 area-total roundoff caught/fixed prelaunch; BUG108 missing/empty extracted electrical summaries now refused.
+-97 focused tests (58+39) and actual-artifact audit/diff pass. Next publish/launch continuation. Phase2 summary updated at milestone; no checklist tick/official claim. Unrelated local files excluded.
+
+## 2026-10-13: Codex (bounded post-antenna screen launched)
+- Published toolsf9e75fe/CI24c7939/docs5671a0d;remote main verified5671a0d06461aad776cbdfd55c262644d3b26370. [Post-antenna fanout screen38356513586](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38356513586) confirmed in_progress on exact head.
+-100 focused tests and actual-source synthetic conservation/bounded audit/Tcl checks pass. Same-process bounded post-antenna repair replaces the repeated one-net/full-reroute-only sequence. Next inspect native execution, per-batch audit and all strict gates before DRT. No Phase2 tick/official pass. Receipt local pending next publication.
+
 ## 2026-10-13: Codex (recurring diode fanout; same-process correction prepared)
 -38353731199 completed genuine electrical failure; artifact11792092356 confirmssetupWS0 all corners,fast hold74.5192ps,typ170.826ps,slow342.264ps,slew/cap0,antenna0. New overloaded nets place7616(14 loads/7 diodes),place8061(13/5). Targeted previous net passes; no DRT. Main test/lint/docs green at status check.
 - Logged BUG106:full rerouting/native antenna insertion recreates fanout failures after prior net repairs. Prepared bounded post-antenna BUF4 partition in same initialized router, incremental edits/route/native antenna cleanup, maximum2 batches/64 buffers, exact exported batch/antenna-interval conservation and fixed final gates.

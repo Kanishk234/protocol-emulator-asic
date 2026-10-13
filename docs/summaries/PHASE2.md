@@ -1,6 +1,6 @@
 # Phase 2: building and fitting the chip
 
-**Status:** in progress, updated 2026-10-08. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
+**Status:** in progress, updated 2026-10-13. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
 
 ## The goal
 
@@ -22,6 +22,8 @@ Driver extraction37825505569 improved slow setup to−0.147084ns and passed22/22
 
 Clean-build stock screens37853023857 AREA0/AREA1 both report setupWS0 and positive hold; AREA1 fast hold+0.119326ns, final GRT zero overflow and cell area524688.31µm² including SRAM. Electrical checks still fail: AREA1 has21 slow slew violations and one cap violation per corner. Native AREA1 route37859526262 then completed but extracted slow setup regressed to−1.423654ns, with133slow slew and6cap failures. Stock design-repair screen37858535440 clears screen cap counts but leaves18slow slew failures. The earlier residual checkpoint remains the best measured candidate; clean-build closure and official electrical closure remain unproven.
 
+The latest repair screen38356513586 passes every requested estimated-routing gate: no reported setup violations, fast hold73.499ps, and zero slew, fanout, capacitance, antenna and overflow violations. Electrical repair now runs after antenna insertion in the same router process, resolving the cycle where new diode loads overloaded different nets. This is a checkpoint screen; its detailed routing/extraction, protocol regression and official clean-flow reproduction are still required.
+
 ## What we found
 
 Equivalent logic can shift mapping, placement and critical paths elsewhere in the chip. Faster local arithmetic did not guarantee better full-chip timing. Routing screens are useful filters, but extracted parasitics have repeatedly exposed regressions. Live configuration remains timed; no false paths or changed cycles hide failing behavior.
@@ -30,13 +32,13 @@ Functional evidence is strong. Physical timing and area must still be judged tog
 
 ## What's left
 
-- Qualify the clean-build native candidate through fresh antennas, detailed routing, extraction and routed protocol verification; resolve slew/capacitance failures.
+- Continue the qualified screen38356513586 through zero-DRC detailed routing, strict extracted timing/electrical checks and routed protocol verification; then reproduce the recipe in the clean official flow.
 - Preserve measured setup/hold reserve without losing protocol or live-configuration behavior; distinguish latch-reported zero WS from actual endpoint margins.
 - Reproduce the selected full design in official GDS; pass DRC/LVS/antenna/precheck and matching gate-level tests.
 - Complete the routable-budget decision, revalidate the adopted hardware and keep required CI green on final main. Phase2 stays open until all exit requirements pass.
 
 ## One-line takeaway
 
-The checkpoint candidate passes extracted setup/hold and routed protocols; clean-build extraction, electrical cleanup and official GDS are the remaining physical gates.
+The current screen passes timing and all electrical/antenna checks; detailed extraction, routed protocols and official GDS still decide Phase2 completion.
 
 Detailed evidence: [closure research](../reports/PHASE2_CLOSURE_RESEARCH.md), [baseline recovery](../reports/PHASE2_SHARED_RX_REGRESSION.md), [repair-only screen](../reports/PHASE2_BANKED_SRAM_HOLD_SCREEN.md), [routed follow-up review](../reports/PHASE2_BANKED_SRAM_HOLD_ROUTE.md).

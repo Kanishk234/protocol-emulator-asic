@@ -1,7 +1,7 @@
 """Exact fresh-screen fanout-only repair; retain all previous repairs."""
 from combined_physical_plan import plan as build,target_call as emit,validate_change as conserve
 
-BINDING={'source_run': 38349702735, 'nl_sha': 'ee5597b7dabd821453f42f62746a12f23e7d9ca95ed3d24c48651db95ecb4921', 'def_sha': 'bd3c676fcb27f8d0f6b09543c8512f73a9b9171d57474b645646f348879bbb38', 'report_sha': '59be915f27bc0c72a4b1869b6ac031938312171a2084b7731106331f214d15d6', 'checks_sha': {'nom_fast_1p32V_m40C': 'a51a6725a30ba6531b7fd562d07ae446e1bf65112e87ff7d4bccb64a93a9ff10', 'nom_typ_1p20V_25C': '770bc0acfa6e1f488c1445180940cffa6440e5bface583f4e564c79f3dcacad9', 'nom_slow_1p08V_125C': 'e571e89767b24afd58de605886f88880cac5ec6d668cb31aeec9177255b48d6b'}, 'prefix': 'tripwire_fanout_finish_', 'hold_count': 0, 'hold_target_ns': 0.075, 'electrical_nets': 2, 'setup': {}, 'targets': {}}
+BINDING={'source_run': 38352108106, 'nl_sha': '3751a3e59a3eb03f4e47375467427fe43cabee7fbc6979ddb8a748b111c3ddcb', 'def_sha': 'aeb3147060e978849dc225b4baeb2123301b9c943c3ff4d67447b502fc46be2d', 'report_sha': '8aa036d1475f906fd98c85cdbb0332bda755bc96589cfb61270f32257697cf36', 'checks_sha': {'nom_fast_1p32V_m40C': 'c82c5d8c6312307dd0c4cc8d18b80b9712954b2ab7e93856dae7737ff158a019', 'nom_typ_1p20V_25C': 'da0c61f27562c035871a53cdffdcbcf52104d67014b5f63fa004bfbcbc43c3ea', 'nom_slow_1p08V_125C': 'c5c88f9acd9d2c36302c4652d245190d4b4bb8dedc40dac12018f0b7a063c81d'}, 'prefix': 'tripwire_fanout_finish_v2_', 'hold_count': 0, 'hold_target_ns': 0.075, 'electrical_nets': 1, 'setup': {}, 'targets': {}}
 
 
 def plan(*args):return build(*args,binding=BINDING)

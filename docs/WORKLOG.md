@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (new extracted hold/electrical residuals diagnosed; correction prepared)
+- Route38507730942 artifact11870487854 completes0DRC/0antenna, setupWS0allcorners, cap0allcorners;fast/typ/slowhold38.266/140.617/304.537ps. Strict extracted gate correctly fails50psfast-hold reserve,3fanout nets and9slow-slew rows. Evidence upload took~11min; no blind rerun or helper-failure claim.
+- Actual-source mapping: all9slew rows on NOR4_2 instance25245/net19647,8loads/0diodes;fanoutplace8880 has10loads/4diodes,29491 has9loads/3diodes,45812 has9loads/1diode.5endpoints below50ps,44below75ps,132below100ps. Since latest screen-to-extracted loss is38.386ps, prepared100ps endpoint-selection reserve rather than repeating75ps selection; final acceptance remains50ps.
+- Prepared source-bound combined screen:132local DLY4SD1 cells and11BUF4 branches across4electrical nets;143cells/2075.6736um2,0resizes/0offlineoverlap. All prior cells, diodes and functional clock/reset pins conserved.57focused tests, actual-source complete connection audit, generated Tcl round-trip and diffcheck pass. Next strict physical screen must pass all timing/electrical/antenna/overflow gates before any DRT. No official/Phase2 completion claim; unrelated local files excluded.
+
+## 2026-10-13: Codex (qualified residual route published and launched)
+- Published tools37a9fe1/CIb05eaaf/docsc242b5a;local HEAD and remote main verifiedc242b5a71ae48252fafcafde8d197b202f6001f9. [Stock residual routing/extraction38507730942](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38507730942) confirmed in_progress onexacthead.
+-63focused tests and independent actual-screen audits pass. All screen gates passed before DRT authorization; fresh pre-DRT/final extracted gates remain mandatory. Next inspect physical result; no official/Phase2 completion claim. Receipt local pending next documentation publication.
+
 ## 2026-10-13: Codex (qualified residual screen audited; route continuation prepared)
 - Screen38505802817 artifact11868871043 passes all gates:setupWS0allcorners;fast/typ/slowhold76.6519/174.960/346.606ps;allcorner slew/fanout/cap0;antenna0;live0overflow.20plannedBUF4,0resizes,0post-antbatches. Canonical actual-source proposal, complete connections, old placements, functional clocks/resets, antenna interval and wire-cleanup audits independently pass.
 - Prepared exact successful-source stock DRT/extraction continuation; fresh strict gates required beforeDRT. No repair/fullGRTreplay; require0DRC/conservedNL and fresh allcorner extracted setup/hold/50psfast-hold/electrical/antenna gates, preserving prior extraction separately.

@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (setup study reviewed; combined one-gate/fanout screen prepared)
+- Successfulstudy38583171270 artifact11905661594 reproducesactual-5.886847psslowsetup/96.233psextractedfast-hold baseline. NOR2_2at24896 alone,AND3_2at24568 alone andpair eachreportsetupWS0allcorners,unchangedhold/slew/cap and3fanout. ChooseoneNOR2resize onlargestdelay/loadarc;fixedSPEFdiagnosticonly/no positiveglobalmarginclaim.
+- Prepared exactroute38515215944 combinedscreen:1NOR2resize+9BUF4,netgrowth134.2656um2,0holdcells/0offlineoverlap. Preserveallpriordelays andfunctionalclock/resetpins;partition3datafanoutnets atmost4loadsperbranch. ExactNL/DEF/reportsandpinnedgeometrybound;boundedpost-antrepair/freshstrictgatesretained.
+-62focusedtests,actual-source complete master/pin conservation,generatedTclround-trip anddiffcheckpass. Nextpublish/launch gds-final-combined-screen;noDRTuntilallgatespass. Officialclean-flow/routedprotocol/GDS/precheckandPhase2remainopen;unrelatedfilesexcluded.
+
+## 2026-10-14: Codex (focused setup diagnostic launched; fanout partitions prepared)
+- Published toolsc4455b9/CI1428a61/docs330f636;local HEAD and remote main verified330f636f9f07809146d012f8cbbc18663884b54a. [Focused setup diagnostic38583171270](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38583171270) confirmedin_progress onexacthead.28focusedtests and4actual-netlist master/pin conservation checks pass;fixedSPEFdiagnosticonly.
+- Independently prepared three-source fanout partitions fromactualroute38515215944:9BUF4/130.6368um2,0offlineoverlap,atmost4loadsperbranch,no clock/reset sinks or new holdcells. Binding/proposal/Tcl saved locally under/tmp/final-fanout-*;notphysicalqualification. Recomputejointplacement with selectedsetupresize afterstudy;no physicalscreen launched while setupselection unresolved.
+- Nextinspect study andcombine smallestusefulresize with9fanoutbuffers,strictscreenbeforeDRT;retain96.233psextractedhold baseline andallacceptancegates. Noofficial/Phase2completionclaim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (hold passes extraction; remaining setup/fanout study prepared)
 - Route38515215944 artifact11874630377:0DRC/0antenna/0slew/capallcorners;fast/typ/slowhold96.233/201.176/381.790ps pass. Slowsetup-5.886847ps(othercorners0) and3fanout nets eachcorner remain. Latestmain test/lint/unit/docs/nightly allgreen atcheck;noofficial/Phase2tick.
 - Printed failingpath48179→46391: NOR2_1 driver24896 has1.527919nsarc/0.151735pF;upstreamAND3_1 driver24568 has0.461998nsarc. Remainingfanout47432/live:9loads/3diodes;place8839:9loads/2diodes;place9256:9loads/1diode.

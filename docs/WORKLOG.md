@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (combined NOR2/fanout screen qualified; route prepared)
+- Screen38616858805 artifact11922346071 passes all strict gates:setupWS0allcorners;fast/typ/slowhold72.5852/169.564/341.777ps;allcorner slew/fanout/cap0;antenna0;live0overflow.1resize/9plannedBUF4;1post-antbatch adds3BUF4/converges. Canonical actual-source proposal, complete connectivity/oldplacements, functionalclock/resetpins, boundedhistory andnativewirecleanup independently audited.
+- Prepared exact successful-source stock DRT/extraction continuation;freshstrictgates beforeDRT,0DRC/conservedNLandfreshallcorner extractedsetup/hold/50psfast-hold/electrical/antennagates. No repair/fullGRTreplay;oldextraction preservedseparately.63focusedtests anddiffcheckpass.
+- Nextpublish/launch gds-final-combined-route;screenqualificationdoesnotguaranteeextractedmargin orofficialclosure. NoPhase2tick;officialclean-flow/routedprotocol/GDS/precheck remainopen. Unrelatedfilesexcluded.
+
+## 2026-10-14: Codex (one-gate/fanout combined screen published and queued)
+- Published tools7055fe5/CI3f56941/docsb894656;localHEADandremotemainverifiedb89465636e249658e0501c6bf6b0f4948cd7d415. [Combinedphysicalscreen38616858805](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38616858805) confirmedqueuedonexacthead.
+-62focusedtests andactual-source connection/placement/Tclchecks pass.1NOR2resize+9BUF4/134.2656um2;allpriorholdrepairs andstrictgatesfixed. Nextinspectscreen,noDRTbeforequalification/noofficialorPhase2claim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (setup study reviewed; combined one-gate/fanout screen prepared)
 - Successfulstudy38583171270 artifact11905661594 reproducesactual-5.886847psslowsetup/96.233psextractedfast-hold baseline. NOR2_2at24896 alone,AND3_2at24568 alone andpair eachreportsetupWS0allcorners,unchangedhold/slew/cap and3fanout. ChooseoneNOR2resize onlargestdelay/loadarc;fixedSPEFdiagnosticonly/no positiveglobalmarginclaim.
 - Prepared exactroute38515215944 combinedscreen:1NOR2resize+9BUF4,netgrowth134.2656um2,0holdcells/0offlineoverlap. Preserveallpriordelays andfunctionalclock/resetpins;partition3datafanoutnets atmost4loadsperbranch. ExactNL/DEF/reportsandpinnedgeometrybound;boundedpost-antrepair/freshstrictgatesretained.

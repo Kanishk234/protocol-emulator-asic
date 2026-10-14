@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (hold passes extraction; remaining setup/fanout study prepared)
+- Route38515215944 artifact11874630377:0DRC/0antenna/0slew/capallcorners;fast/typ/slowhold96.233/201.176/381.790ps pass. Slowsetup-5.886847ps(othercorners0) and3fanout nets eachcorner remain. Latestmain test/lint/unit/docs/nightly allgreen atcheck;noofficial/Phase2tick.
+- Printed failingpath48179→46391: NOR2_1 driver24896 has1.527919nsarc/0.151735pF;upstreamAND3_1 driver24568 has0.461998nsarc. Remainingfanout47432/live:9loads/3diodes;place8839:9loads/2diodes;place9256:9loads/1diode.
+- Prepared4case exact-source fixedSPEF baseline/NOR2_2/AND3_2/pair study;28focusedtests and4actual-source master/pin conservation checks pass. Nextpublish/launchstudy,selectsmallest usefulresize andcombinewith3datafanout repairs instrictscreenbeforeDRT. Diagnosticonly/no physicalmarginclaim;unrelatedfilesexcluded.
+
+## 2026-10-14: Codex (qualified hold/electrical route published and launched)
+- Published tools95eca72/CI1a47370/docsad0f3ec;local HEAD and remote main verifiedad0f3ec1fa2bf66341ca79ef00df6f51a09b0066. [Stock hold/electrical routing/extraction38515215944](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38515215944) confirmedin_progress onexacthead.
+-63focused tests and actual-source screen audits pass. All strict screen gates passed before DRT authorization; fresh pre-DRT and final extracted gates remain fixed. Next inspect actual outcome; no official/Phase2 completion claim. Receipt local pending next documentation publication.
+
 ## 2026-10-14: Codex (qualified hold/electrical screen audited; routing continuation prepared)
 - Screen38512982007 artifact11871360565 passes strict gates:setupWS0allcorners;fast/typ/slowhold78.7037/175.417/347.113ps;allcorner slew/fanout/cap0;antenna0;live0overflow.143plannedcells(132DLY4SD1+11BUF4),0resizes/0post-antbatches. Canonical actual-source connection/old-placement/antenna-history/native-wire-reset audits and original clock/reset pin comparison pass.
 - Prepared exact successful-source stock DRT/extraction continuation; fresh strict gates beforeDRT,0DRC/conservedfreshNL and strict fresh allcorner extracted timing/electrical/antenna including50psfast-hold gate. No repair/fullGRT replay; old extraction preserved separately.63focused tests and diffcheck pass.

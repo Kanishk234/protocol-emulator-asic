@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (extracted timing passes; residual electrical screen prepared)
+- Route38499287760 artifact11867052893 completes0DRC/0antenna and passes all-corner extracted setupWS0. Fast/typ/slowhold86.049/185.395/357.429ps, cap0allcorners. Final strict gate legitimately fails sixfanout nets eachcorner and4slowslew rows; no helper error or acceptance waiver.
+- Exact inventory: slew rows all belong to NOR4_1 driver44053/net16976 with3loads. Fanoutplace8587 has13loads/5diodes;45618/45871/place8640/place9178/place9207 have9loads/1diodeeach. Prepared source-bound seven-net load isolation:20BUF4,290.304um2,0offlineoverlap,0resizes/0holdcells; preserve all prior repairs and functional clock/reset nets.
+- Actual-source full cell/pin conservation and Tcl round-trip pass. 57focused tests pass and validate exact failed-route source, bounded post-antenna cleanup and strict screen-before-DRT flow. Next publish/launch gds-strength-residual-screen; detailed routing only after all new screen gates pass. Official clean-flow reproduction, routed protocol regression and Phase2 remain open; unrelated local files excluded.
+
+## 2026-10-13: Codex (qualified strength route published and launched)
+- Published tools82d1d52/CIa6311bd/docs0501e0a; local HEAD and remote main verified0501e0a50a5fb3832c6ac81d6fa48b6fe330555d. [Stock routing/extraction38499287760](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38499287760) confirmed in_progress on exact head.
+-68focused tests and independent actual-screen audits pass. All screen gates passed before authorizing detailed routing; fresh pre-DRT and final extracted gates remain mandatory. Next inspect outcome; no official/Phase2 completion claim. Launch receipt local pending next documentation publication.
+
 ## 2026-10-13: Codex (qualified strength/fanout screen audited; routing continuation prepared)
 - Successful screen38484835284 artifact11859039943 independently audited: canonical4resizes/21plannedcells, complete connection/old-placement checks, functional clock/reset pins, native wire cleanup, live0overflow and strict gates pass. Post-antenna batch adds3BUF4/converges, preserving inherited repairs (BUG110 physical evidence). SetupWS0allcorners; fast/typ/slowhold77.0365/175.748/347.200ps; slew/fanout/cap0allcorners; antenna0.
 - Prepared exact successful-source stock DRT/extraction continuation. Require fresh strict timing/electrical/antenna checks before DRT; no repair/fullGRT replay. Then require0DRC and conserved fresh NL, fresh extraction at all corners, setup>=0 and fast hold>=50ps with0electrical/antenna. Old extraction preserved separately.

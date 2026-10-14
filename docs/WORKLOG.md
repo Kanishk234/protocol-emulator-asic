@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (qualified strength/fanout screen audited; routing continuation prepared)
+- Successful screen38484835284 artifact11859039943 independently audited: canonical4resizes/21plannedcells, complete connection/old-placement checks, functional clock/reset pins, native wire cleanup, live0overflow and strict gates pass. Post-antenna batch adds3BUF4/converges, preserving inherited repairs (BUG110 physical evidence). SetupWS0allcorners; fast/typ/slowhold77.0365/175.748/347.200ps; slew/fanout/cap0allcorners; antenna0.
+- Prepared exact successful-source stock DRT/extraction continuation. Require fresh strict timing/electrical/antenna checks before DRT; no repair/fullGRT replay. Then require0DRC and conserved fresh NL, fresh extraction at all corners, setup>=0 and fast hold>=50ps with0electrical/antenna. Old extraction preserved separately.
+- Actual-artifact audit and68focused continuation checks pass; no Phase2 tick or official claim. Next publish/launch gds-strength-fanout-route and inspect actual post-DRT electrical loads and extracted timing. Latest main test/lint/unit/docs allgreen; unrelated local files excluded.
+
+## 2026-10-13: Codex (collision correction published; strict rerun queued)
+- Published tools532332d/docs4b4794a; local HEAD and remote main verified4b4794ac554db70a90a18c590df9f0e1e193c1ac. Corrected screen[38484835284](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38484835284) confirmed queued on that exact head.
+-57focused tests pass; BUG110 fixes reused buffer/net identities without changing hardware proposal, budgets or strict gates. Next inspect physical outcome; no DRT until all screen gates pass. Receipt local pending next documentation publication.
+
 ## 2026-10-13: Codex (post-antenna inherited-name collision fixed)
 - Screen38483400076 failed in GRT helper before final timing: Repeated or invalid post-antenna group. Job115591127920 confirms initial global routing0overflow; source38456657314 already contains tripwire_postant_0_0/1/2 and corresponding nets. No physical qualification claimed.
 - BUG110: allocate unused instance/net identities instead of restarting names that collide with retained earlier repair cells. Preserve old topology, complete preflight, same-process routing, exact batch audit and unchanged budgets/gates.

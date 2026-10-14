@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (SRAM/data screen qualified and audited; stock route prepared)
+- Screen38637997316 artifact11930301234 passes every strict gate: setupWS0allcorners;fast/typical/slowhold71.009/167.376/338.328ps;allcorner slew/fanout/cap0;antenna0;live0overflow. Eight plannedBUF4,zeroresizes;onepost-antbatch adds3BUF4/converges. Canonical actualsource proposal, complete cell/pin/all-SRAM-address-bit conservation, oldplacements, clock/resetpins, boundedhistory andnativewirecleanup independently pass.
+- Prepared exact successful-source stock DRT/extraction continuation. Fresh strict gates required beforeDRT;then0DRC/conservedfreshNL and fresh allcorner setup/hold/50psfast-hold/electrical/antenna gates. No repair/fullGRTreplay;previous extraction preserved separately.79focused tests anddiffcheck pass.
+- Next publish/launch gds-sram-residual-route; physicalscreen71.009ps doesnotguarantee extractedmargin. Officialclean-flow/routedprotocol/GDS/precheck andPhase2remainopen;no checklisttick. Unrelatedlocalfilesexcluded.
+
+## 2026-10-14: Codex (SRAM/data electrical screen published and queued)
+- Published toolsf0df5fc/CIc0ffb5b/docsf9058ec; local HEAD and remote main verifiedf9058ec6b895ec3a401f87988d6c26cfcd9e2a4f. [SRAM/data residual screen38637997316](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38637997316) confirmed queued on exact head.
+-73focused tests and actual-source all-cell/all-address-bit/clock-reset conservation plus placement/Tcl checks pass. Eight BUF4 cells/116.1216um2; retain extracted timing-passing source and unchanged strict gates. Next inspect fresh physicalscreen; no DRT before qualification and no official/Phase2 completion claim. Launch receipt local pending next documentation publication.
+
 ## 2026-10-14: Codex (four electrical residual sources mapped; SRAM/data repair prepared)
 - Actual route 38621290574 inventory: slow address slew is on hold11774/DLY4SD3 output net11773 with SRAM A_ADDR[1] and one antenna diode. SRAM A_DOUT[11] drives max_cap9445/A and 23862/A. Remaining fanout place6594 has10loads/2diodes;29464 has9loads/1diode. No reported endpoints below75ps; retain all existing hold and setup repairs.
 - Prepared exact-source screen: eight BUF4 cells across four measured electrical nets,116.1216um2 added footprint,zero resizes/hold cells/offline overlaps. Macro branch coordinates use actual FS-transformed LEF pin geometry; power anchors are standard cells. All old cells/diodes and functional clock/reset pins are retained.

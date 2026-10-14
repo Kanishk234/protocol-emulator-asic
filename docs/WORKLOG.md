@@ -5,6 +5,21 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (four electrical residual sources mapped; SRAM/data repair prepared)
+- Actual route 38621290574 inventory: slow address slew is on hold11774/DLY4SD3 output net11773 with SRAM A_ADDR[1] and one antenna diode. SRAM A_DOUT[11] drives max_cap9445/A and 23862/A. Remaining fanout place6594 has10loads/2diodes;29464 has9loads/1diode. No reported endpoints below75ps; retain all existing hold and setup repairs.
+- Prepared exact-source screen: eight BUF4 cells across four measured electrical nets,116.1216um2 added footprint,zero resizes/hold cells/offline overlaps. Macro branch coordinates use actual FS-transformed LEF pin geometry; power anchors are standard cells. All old cells/diodes and functional clock/reset pins are retained.
+-73focused tests pass, including SRAM bus preservation/refusal checks. Actual-source complete pin/cell conservation covers all nine address bits; generated Tcl round-trip and diffcheck pass. Next publish/launch gds-sram-residual-screen; all strict screen gates must pass before DRT. No official/Phase2 completion claim; unrelated local files excluded.
+
+## 2026-10-14: Codex (workflow status and extracted residuals checked)
+- Run 38621290574 completed with a genuine extracted electrical failure. Artifact 11925204768 confirms zero DRC and antenna violations; setup WS is 0 at all corners; fast/typical/slow hold is 88.855/196.330/376.765 ps, passing the 50 ps fast-hold gate.
+- Remaining electrical failures: two fanout nets per corner (place6594/X, 29464/Y), one capacitance violation per corner (SRAM A_DOUT[11], slow 0.068202 pF against 0.064 pF), and one slow slew violation (SRAM A_ADDR[1], 0.616297 ns against 0.5952 ns).
+- No in-progress main workflows. Old l3-placement-routed-gl 37655518919 and gds-placement-extracted-timing 37655518925 remain queued. Latest test 38621290587, lint 38621290909, unit 38621290602 and docs 38621290493 passed.
+- Next inventory these four residual electrical sources and prepare a source-bound load-isolation screen that retains passing timing. No new workflow launched during this status check; no official or Phase 2 completion claim. Status receipt remains local for the next documentation publication.
+
+## 2026-10-14: Codex (qualified combined route published and launched)
+- Published tools2fdc9c9/CI36b3fdb/docs372fcac;localHEADandremotemainverified372fcace90fd6bc278a099dcc7fd677dc7134bae. [Stockcombinedrouting/extraction38621290574](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38621290574) confirmedin_progressonexacthead.
+-63focusedtests andindependentactual-screenaudits pass. Allscreen gates passedbeforeDRTauthorization;freshpre-DRT/finalextractedgatesremainmandatory. Nextinspectactualresult;noofficial/Phase2completionclaim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (combined NOR2/fanout screen qualified; route prepared)
 - Screen38616858805 artifact11922346071 passes all strict gates:setupWS0allcorners;fast/typ/slowhold72.5852/169.564/341.777ps;allcorner slew/fanout/cap0;antenna0;live0overflow.1resize/9plannedBUF4;1post-antbatch adds3BUF4/converges. Canonical actual-source proposal, complete connectivity/oldplacements, functionalclock/resetpins, boundedhistory andnativewirecleanup independently audited.
 - Prepared exact successful-source stock DRT/extraction continuation;freshstrictgates beforeDRT,0DRC/conservedNLandfreshallcorner extractedsetup/hold/50psfast-hold/electrical/antennagates. No repair/fullGRTreplay;oldextraction preservedseparately.63focusedtests anddiffcheckpass.

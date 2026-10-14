@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (SRAM extracted checks clear; two-net fanout correction prepared)
+- Route38641675550 artifact11934458136 completes0DRC/0antenna and passes allcorner setupWS0,fast/typical/slowhold85.390/184.750/357.691ps,0slew/cap. Only remaining final-gate failures are two fanout nets percorner: place7535 has14loads/7diodes;45611/Q has9loads/1diode. Neither has protected clock/reset sinks.
+- Prepared exact-source two-net repair:7BUF4/101.6064um2,0resizes/holdcells/offlineoverlaps,all prior SRAM/setup/hold repairs retained. BUG111: prelaunch source replay caught an inherited tripwire_fanout_finish_ prefix collision; new identities include source-run ID and existing cells/nets are retained.
+-57focused tests,actual-source complete pin/cell conservation and generatedTcl round-trip pass;diffcheck passes. Nextpublish/launch gds-fanout-finish-screen;allstrictscreen gates beforeDRT and finalextractedchecks remainmandatory. Noofficial/Phase2 completion claim;unrelatedfilesexcluded.
+
+## 2026-10-14: Codex (qualified SRAM route published and queued)
+- Published tools5686ff1/CIe0f61f5/docs44cdfdf;localHEADandremotemainverified44cdfdff239a63813b91f1678dc3503c94f37213. [Stock SRAM/data routing/extraction38641675550](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38641675550) confirmedqueuedonexacthead.
+-79focused tests andindependentactual-screenaudits pass. Allscreen gates passed beforeDRTauthorization;freshpre-DRT/finalextractedgatesremainfixed. Nextinspectactualresult;noofficial/Phase2completionclaim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (SRAM/data screen qualified and audited; stock route prepared)
 - Screen38637997316 artifact11930301234 passes every strict gate: setupWS0allcorners;fast/typical/slowhold71.009/167.376/338.328ps;allcorner slew/fanout/cap0;antenna0;live0overflow. Eight plannedBUF4,zeroresizes;onepost-antbatch adds3BUF4/converges. Canonical actualsource proposal, complete cell/pin/all-SRAM-address-bit conservation, oldplacements, clock/resetpins, boundedhistory andnativewirecleanup independently pass.
 - Prepared exact successful-source stock DRT/extraction continuation. Fresh strict gates required beforeDRT;then0DRC/conservedfreshNL and fresh allcorner setup/hold/50psfast-hold/electrical/antenna gates. No repair/fullGRTreplay;previous extraction preserved separately.79focused tests anddiffcheck pass.

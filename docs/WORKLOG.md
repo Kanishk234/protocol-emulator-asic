@@ -5,6 +5,16 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (qualified hold/electrical screen audited; routing continuation prepared)
+- Screen38512982007 artifact11871360565 passes strict gates:setupWS0allcorners;fast/typ/slowhold78.7037/175.417/347.113ps;allcorner slew/fanout/cap0;antenna0;live0overflow.143plannedcells(132DLY4SD1+11BUF4),0resizes/0post-antbatches. Canonical actual-source connection/old-placement/antenna-history/native-wire-reset audits and original clock/reset pin comparison pass.
+- Prepared exact successful-source stock DRT/extraction continuation; fresh strict gates beforeDRT,0DRC/conservedfreshNL and strict fresh allcorner extracted timing/electrical/antenna including50psfast-hold gate. No repair/fullGRT replay; old extraction preserved separately.63focused tests and diffcheck pass.
+- Artifact transfer had intermittent network errors; required audit files and missing small timing/antenna reports were recovered and all measured gates independently checked. Next publish/launch gds-hold-electrical-route. Screen78.704ps does not establish100psminimum or guarantee extraction; no official/Phase2tick. Unrelated local files excluded.
+
+## 2026-10-13: Codex (hold/electrical correction published and launched)
+- Status check confirms38507730942 remains the latest failed physical run; prepared correction had not yet executed. Latestmain test38507730717/lint38507730751/docs38507730762/unit38507730818 allgreen.
+- Published tools4b571a4/CI1f191d8/docs888d467;local HEAD and remote main verified888d467db8ff7858ab61928124c8cd2d5450942b. [Combined hold/electrical screen38512982007](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38512982007) confirmed in_progress onexacthead.
+-57focused tests and actual-source connection/placement/Tcl audits pass.132local delay cells/11electrical buffers,100ps endpoint-selection reserve; final50ps acceptance and all strict gates fixed. Nextinspect screen; no DRT beforequalification/no official/Phase2 completion claim. Unrelated local files excluded; launch receipt local pending next documentation publication.
+
 ## 2026-10-13: Codex (new extracted hold/electrical residuals diagnosed; correction prepared)
 - Route38507730942 artifact11870487854 completes0DRC/0antenna, setupWS0allcorners, cap0allcorners;fast/typ/slowhold38.266/140.617/304.537ps. Strict extracted gate correctly fails50psfast-hold reserve,3fanout nets and9slow-slew rows. Evidence upload took~11min; no blind rerun or helper-failure claim.
 - Actual-source mapping: all9slew rows on NOR4_2 instance25245/net19647,8loads/0diodes;fanoutplace8880 has10loads/4diodes,29491 has9loads/3diodes,45812 has9loads/1diode.5endpoints below50ps,44below75ps,132below100ps. Since latest screen-to-extracted loss is38.386ps, prepared100ps endpoint-selection reserve rather than repeating75ps selection; final acceptance remains50ps.

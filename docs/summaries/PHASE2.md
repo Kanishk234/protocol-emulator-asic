@@ -1,6 +1,6 @@
 # Phase 2: building and fitting the chip
 
-**Status:** in progress, updated 2026-10-13. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
+**Status:** in progress, updated 2026-10-14. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
 
 ## The goal
 
@@ -58,3 +58,5 @@ Its detailed-routing continuation38499287760 now passes all-corner extracted set
 Residual screen38505802817 passes every estimated-routing gate with76.6519psfast hold, no reported setup violations, and zero electrical/antenna/overflow violations.20newBUF4cells repair the seven measured electrical sources; no further sizing/hold cells or post-antenna batches were needed. Independent connection/placement audits and63focused tests pass. Its exact-checkpoint stock routing/extraction continuation is prepared; final extracted electrical checks and official evidence are still required.
 
 The next extracted route38507730942 retains setup closure and0DRC/0antenna/0capacitance failures, but fast hold falls to38.266ps, below our50psreserve. Threefanout nets and nine slow-slew rows remain. A combined correction is prepared:132local hold-delay cells for reported endpoints below100ps and11electrical buffers,2075.6736um2 added footprint, retaining existing timing repairs and clocks/resets.57focused tests and connection/placement/Tcl audits pass. Fresh screen and final extracted closure remain mandatory; this shows that a green estimated screen still does not guarantee extracted timing.
+
+Hold/electrical screen38512982007 passes every estimated-routing gate:78.7037psfast hold, no reported setup violations and0electrical/antenna/overflow failures. All143plannedcells are audited; original placements and functional clock/reset connections are retained.63focused tests pass and an exact-checkpoint stock DRT/extraction continuation is prepared. The selected100psendpoint reserve does not mean the measured minimum is100ps; final extracted hold and electrical closure still need verification.

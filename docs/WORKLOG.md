@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-13: Codex (qualified residual screen audited; route continuation prepared)
+- Screen38505802817 artifact11868871043 passes all gates:setupWS0allcorners;fast/typ/slowhold76.6519/174.960/346.606ps;allcorner slew/fanout/cap0;antenna0;live0overflow.20plannedBUF4,0resizes,0post-antbatches. Canonical actual-source proposal, complete connections, old placements, functional clocks/resets, antenna interval and wire-cleanup audits independently pass.
+- Prepared exact successful-source stock DRT/extraction continuation; fresh strict gates required beforeDRT. No repair/fullGRTreplay; require0DRC/conservedNL and fresh allcorner extracted setup/hold/50psfast-hold/electrical/antenna gates, preserving prior extraction separately.
+-63focused tests and diffcheck pass. Next publish/launch gds-strength-residual-route. No official/Phase2 completion claim; source timing already passed extraction but later diode loads remain decisive. Latestmain test/lint/docs green;unit38505802296 stillin_progress atstatuscheck. Unrelated local files excluded.
+
+## 2026-10-13: Codex (residual electrical screen published and launched)
+- Published toolsca3d942/CI0297b16/docs1fb72d7; local HEAD and remote main verified1fb72d7074c71b73bdbde431a276879a4ffbf173. [Residual electrical screen38505802817](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38505802817) confirmed in_progress on exact head.
+-57focused tests and actual-source connection/placement/Tcl checks pass. Source already passes extracted timing/DRC/antenna; target only seven measured electrical sources with20BUF4 and unchanged strict gates. Next inspect fresh screen; no DRT before qualification and no official/Phase2 completion claim. Receipt local pending next documentation publication.
+
 ## 2026-10-13: Codex (extracted timing passes; residual electrical screen prepared)
 - Route38499287760 artifact11867052893 completes0DRC/0antenna and passes all-corner extracted setupWS0. Fast/typ/slowhold86.049/185.395/357.429ps, cap0allcorners. Final strict gate legitimately fails sixfanout nets eachcorner and4slowslew rows; no helper error or acceptance waiver.
 - Exact inventory: slew rows all belong to NOR4_1 driver44053/net16976 with3loads. Fanoutplace8587 has13loads/5diodes;45618/45871/place8640/place9178/place9207 have9loads/1diodeeach. Prepared source-bound seven-net load isolation:20BUF4,290.304um2,0offlineoverlap,0resizes/0holdcells; preserve all prior repairs and functional clock/reset nets.

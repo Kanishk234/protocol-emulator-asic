@@ -83,9 +83,10 @@
         "docs/reports/compact_progress_ledger_20261012.md",
         "docs/reports/route_trace_analysis_20261015.md: all10 zero-capacity markers validate edge indexing; individual own-net release leaves44-edge cuts and no reachable macro portal",
         "38778082059 at6370e1f: exact133/source/segments retained; cached2D133/assigned3D133; conditional3Dmaze calls skipped",
-        "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged"
+        "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged",
+        "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can"
       ],
-      "next_action": "Observe calibrated native grid on exact15/121 segment hash, then attribute remaining cuts before any physical change; retain original50/133 separately.",
+      "next_action": "Attribute nets occupying the25-edge residual cut before a targeted reroute. Stock incremental API filters unchanged pin positions; avoid no-op mark-dirty and set_nets_to_route dropping other guides.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",
@@ -216,12 +217,13 @@
       "priority": 3,
       "title": "Complete controlled mutation evidence",
       "track": "phase5",
-      "status": "awaiting_evidence",
+      "status": "validated",
       "evidence": [
         "38820879351:10simulation mutants killed; valid pristineF1proof blocked by status grammarBUG94",
-        "66f5487: exact-status/split-engine witness parser fixed; full hosted retry pending"
+        "66f5487: exact-status/split-engine witness parser fixed; full hosted retry pending",
+        "38823961384 at454b9e0: retained artifacts independently reclassified;6 pristine controls PASS,11 explicit assertion/property rejections"
       ],
-      "next_action": "Inspect corrected full campaign controls, exact test failures and formal property rejection; never count harness/tool failures as kills.",
+      "next_action": "Retain strict classification and pristine controls when adding mutations; historical failed campaign remains failed.",
       "acceptance": [
         "All six pristine configurations pass and all11 named mutations have real executed assertion/property witnesses."
       ],

@@ -139,7 +139,7 @@ The organizers asked for the flow from a protocol description to a bitstream, ho
 | Formal | F1, F2, F4 in CI; F3 FIFO depth2/depth4 unbounded ABC PDR proofs | CI `formal`36383587298; F3 both tasks36491754401, retained engine PASS/property-proved logs inspected; proof/RTL unchanged from that commit |
 | Shell random transactions | SPI transactions checked against an independent model, with command × state and error coverage | `test_internal/uvm`, seed1 passes in hosted unit38780941428; historical local census remains in its report |
 | Co-simulation | the UART as a bitstream vs its source RTL: identical TX waveforms, equal RX | `test_internal/cosim`; CI `fabric` 36451328356 |
-| Mutation | Historical local campaign reports detections; new controlled refresh requires pristine controls and actual assertion/property rejection | `docs/reports/mutation.md`; BUG91 and controlled hosted38820879351 pending |
+| Mutation | All6 pristine controls pass; all11 planted defects have executed assertion/property rejection | Hosted38823961384 at454b9e0; `docs/reports/mutation_evidence_repair_20261015.md` |
 | Timing model | historical local primitive boundary-path cross-check; matching original tile netlist/SPEF unavailable for a fresh audit | `tools/timing/README.md`, D-028; [artifact gap](reports/reproduction.md) |
 
 Bugs and investigations, with the checks and limits recorded for each: `docs/BUGS.md`.

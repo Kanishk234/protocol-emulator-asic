@@ -38,3 +38,10 @@ numeric status fields, keeps strict PASS/FAIL/exit/output checks, and examines
 engine logfile variants for a real property failure. Actual retained pristine
 evidence now classifies PASS;25local fixtures pass. Corrected full hosted
 campaign remains pending, and the earlier failed campaign stays failed.
+
+Corrected hosted38823961384 at454b9e0 succeeds. Downloaded attempt1 artifacts
+were independently reclassified using their actual command logs, XML and
+formal status/engine witnesses: all six pristine controls pass and all eleven
+mutants are rejected. The parking mutant has actual FAIL status and an engine
+assertion failure, while pristine F1 passes. This replaces the pending current
+evidence, not the history of38820879351. No timeout/setup error counted as a kill.

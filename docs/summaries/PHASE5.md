@@ -11,8 +11,9 @@ all12 emitted images retained/rehashed, loaded30/cosim1 and corrected UART
 discovery. Corrected source profiling38820879331 validates24trials and555LUT4
 current total with reviewed roles. Native early-stop pair38820879445 improves
 original133→121 on unchanged physical inputs; both fail routing and no
-successor is promoted. Controlled mutation refresh needs BUG94 parser retry;
-ten simulation kills are actual, formal parking rejection remains pending.
+successor is promoted. Controlled mutation refresh38823961384 passes all6 pristine controls and
+rejects all11 planted defects with actual assertion/property witnesses. Exact121
+grid38824245540 reproduces the candidate segments; routing remains unaccepted.
 
 Latest baseline additions now have actual loaded evidence: primitive-helper
 38167521573 and autonomous UART fault/event demo38168609080 pass real SPI-loaded

@@ -36,8 +36,8 @@ def test_missing_and_detailed_route_checkpoints_rejected(tmp_path):
     with pytest.raises(ValueError): runner.checkpoint(tmp_path)
 
 
-@pytest.mark.parametrize('hold_target,clock_cluster',[(.10,None),(.125,None),(.10,'8')])
-def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster):
+@pytest.mark.parametrize('hold_target,clock_cluster,native_margin',[(.10,None,False),(.125,None,False),(.10,'8',False),(.10,'8',True)])
+def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster, native_margin):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('NATIVE_HOLD_TARGET',str(hold_target))
     if clock_cluster is None: monkeypatch.delenv('NATIVE_CLOCK_CLUSTER_SIZE', raising=False)
@@ -56,6 +56,11 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, ho
         assert args[args.index('--to') + 1] == 'OpenROAD.ResizerTimingPostGRT'
         assert json.loads(Path(args[-1]).read_text())['GRT_RESIZER_HOLD_SLACK_MARGIN']==hold_target
         assert json.loads(Path(args[-1]).read_text()).get('CTS_SINK_CLUSTERING_SIZE') == (8 if clock_cluster else None)
+        if native_margin:
+            cfg = json.loads(Path(args[-1]).read_text())
+            assert cfg['GRT_DESIGN_REPAIR_MAX_SLEW_PCT'] == 55
+            assert cfg['GRT_DESIGN_REPAIR_MAX_CAP_PCT'] == 55
+            assert cfg['RUN_POST_GRT_DESIGN_REPAIR'] is True
         stage = Path('runs/native-stock-screen/flow/45-openroad-resizertimingpostgrt')
         stage.mkdir()
         view = stage/'saved'; view.write_text('view')
@@ -64,15 +69,22 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, ho
     def sta(config, source, output, pdk, **kwargs):
         assert kwargs['repaired'] == source
         assert kwargs['sdc'] == Path('src/signoff.sdc')
+        if native_margin:
+            assert kwargs['extra_tcl'] == Path('probe.tcl')
         calls.append('sta')
     monkeypatch.setattr(runner.subprocess, 'run', flow)
     monkeypatch.setattr(runner, 'screen', sta)
-    runner.main()
+    if native_margin:
+        from native_margin_screen import configure
+        runner.main(config_transform=configure, extra_tcl=Path('probe.tcl'))
+    else:
+        runner.main()
     assert calls == ['flow', 'sta']
     receipt = json.loads(Path('runs/native-stock-screen/recipe.json').read_text())
     assert receipt['checkpoint_ecos'] is False
     assert receipt['hold_target_ns']==hold_target
     assert receipt['official_signoff'] is False
+    assert receipt['post_grt_design_repair'] is native_margin
     assert receipt.get('clock_sink_clustering_size') == (8 if clock_cluster else None)
 
 

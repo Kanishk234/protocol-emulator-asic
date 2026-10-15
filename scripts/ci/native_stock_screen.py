@@ -54,7 +54,7 @@ def checkpoint(root):
     return stages[0]
 
 
-def main():
+def main(config_transform=None, extra_tcl=None):
     if os.environ['VARIANT'] != 'bs-event-late':
         raise ValueError('Unreviewed source variant')
     original = json.loads(Path('src/config_merged.json').read_text())
@@ -69,6 +69,8 @@ def main():
                        design_repair=repair == '1',
                        hold_target=float(os.environ.get('NATIVE_HOLD_TARGET', '0.125')),
                        clock_cluster=8 if cluster == '8' else None)
+    if config_transform is not None:
+        config = config_transform(config)
     path = Path('src/config_native_stock.json')
     path.write_text(json.dumps(config, indent=2) + '\n')
     root = Path('runs/native-stock-screen')
@@ -81,13 +83,14 @@ def main():
                     '--hide-progress-bar', '--to', 'OpenROAD.ResizerTimingPostGRT', str(path)], check=True)
     source = checkpoint(flow)
     # STA-only rereads of this exact checkpoint; do not invoke another repair.
-    screen(path, source, root / 'timing', os.environ['PDK_ROOT'], repaired=source, sdc=sdc)
+    extra = {'extra_tcl': extra_tcl} if extra_tcl is not None else {}
+    screen(path, source, root / 'timing', os.environ['PDK_ROOT'], repaired=source, sdc=sdc, **extra)
     recipe = {
         'source_variant': 'bs-event-late', 'synthesis_strategy': config['SYNTH_STRATEGY'],
         'repair_corners': list(CORNERS),
         'hold_target_ns': config['GRT_RESIZER_HOLD_SLACK_MARGIN'],
         'stock_sequence': True, 'checkpoint_ecos': False,
-        'post_grt_design_repair': repair == '1',
+        'post_grt_design_repair': config.get('RUN_POST_GRT_DESIGN_REPAIR', False),
         'extracted': False, 'official_signoff': False,
     }
     if cluster is not None:

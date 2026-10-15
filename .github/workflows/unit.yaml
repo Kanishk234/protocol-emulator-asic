@@ -58,8 +58,13 @@ jobs:
           cd protocols/uart/test
           for args in "DIV=16" "DIV=13" "DIV=16 RUNTIME_DIV=1" "DIV=16 PRIMS=1" "DIV=13 PRIMS=1" "DIV=5 PRIMS=1"; do
             rm -f results.xml
+            # Runtime-only test is registered only by the applicable design.
+            expected_cases=7
+            if [[ "$args" == *"RUNTIME_DIV=1"* ]]; then
+              expected_cases=8
+            fi
             make $args
-            python ../../../tools/autonomy/check_xml.py results.xml
+            python ../../../tools/autonomy/check_xml.py results.xml --minimum-cases "$expected_cases"
           done
 
       - name: SPI controller RTL tests (four modes, two speeds; plain logic and hard primitives)

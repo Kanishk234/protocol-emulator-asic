@@ -5,6 +5,11 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (final failure confirmed; three-source fanout/slew screen prepared)
+- Completed route38668749394 artifact11945797871 confirms0DRC/0antenna,allcorner setupWS0,fast/typical/slowhold92.313/206.909/392.883ps and0cap. Only electrical failures:2fanout nets eachcorner(place7883/place8063,9loads with2/1diodes),7slow-slew rows on NAND3_1 driver43736/net16739(6loads,4diodes). Actual trace raises the combined gate legitimately; no timing or helper crash.
+- Prepared source-bound three-net load isolation:8BUF4/116.1216um2,0resizes/holdcells/offlineoverlaps. Retain all prior timing/SRAM/diode repairs and functional clocks/resets.70focused tests,actual-source complete cell/pin audit,Tclround-trip anddiffcheckpass. Early small summary upload guarded by current screen receipt; full evidence retained.
+- Read-only broader inventory finds846data nets with7loads and1524with8loads; blind splitting would add thousands of buffers. This correction stays targeted to measured failures. Diagnostic logging/early route summary improvement already published at255ae81. Nextpublish/launch gds-fanout-slew-screen,strictallgatesbeforeDRT;noofficial/Phase2claim. Unrelatedfilesexcluded.
+
 ## 2026-10-14: Codex (current extracted failure investigated; diagnostic visibility fixed)
 - Run38668749394 failed the final extracted gate and is uploading bulk evidence. User trace shows allcorner setupWS0 andfast/typical/slowhold92.313/206.909/392.883ps pass timing; electrical/antenna component reports are still unavailable. No physical residual is guessed and no blind rerun dispatched.
 - BUG112: shared helper now prints exact timing/electrical/antenna evidence before rejection. Separate custom fanout route uploads tiny gate summaries before bulk only if its current output has an extraction receipt, avoiding stale source-summary publication. Gates, receipts, physical design and official jobs remain unchanged.

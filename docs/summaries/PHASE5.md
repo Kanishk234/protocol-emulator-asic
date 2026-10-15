@@ -206,3 +206,5 @@ The frozen chip's Phase 4 claims now have green CI evidence; Phase 5 is turning 
 October13 update: native routing-feedback placement38339209412 and fixed-instance fanout repair38452773248 complete. All three estimated shell timing/electrical corners pass after repair; original3670 cells stay fixed. Direct routing comparison to133 control is next. This does not establish routing closure or complete matched extracted timing; phase5 remains open.
 
 October13 routing result:38453870785 measures133control versus6000native-feedback candidate overflow. Reject this candidate despite clean estimated electrical/timing guards. Broad re-placement has failed with both estimators; the next physical work is a localized topology audit on the best control. Phase5 remains open.
+
+October14 verification: corrected loaded active-window cancellation38676257805 passes after authenticated parameter check(counter9/window256). USER_RESET cancels a live window, STOP parks then RUN recovers, and a fresh edge produces full256-clock window. Image8c8fc691… fits70/88LC. This extends frozenG1 functional evidence under D023; compact routing remains133overflow and phase5 remains incomplete.

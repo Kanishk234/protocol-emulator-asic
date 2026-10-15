@@ -40,3 +40,18 @@ retained actual design-set log
 `resource_capacity` with `FABULOUS_LC: 95/88`. This is local parser evidence,
 not a new compilation or CI run. No physical tool run was needed. Routing-message
 fixtures are synthetic; unrecognized future vendor wording remains unknown.
+
+## Repeated parameter-option fix (BUG85)
+
+Actual cloud run 38676021166 exposed a CLI issue: repeated `--set` options
+silently discarded the earlier parameter group, so an intended larger counter
+retained its default width. The parser now extends parameter groups rather than
+replacing them. A single group remains supported; repeated names retain the
+existing last-value-wins behavior. Three mocked CLI regressions verify the
+single-group form, separate groups and repeated-name precedence without EDA.
+
+Local focused validation after this fix: `python -m pytest -q
+tools/compile/tests/test_diagnostics.py` — **15 passed in 0.27s**. This tests the
+parser-to-compiler parameter contract; root separately verifies actual compiled
+parameters and loaded waveforms in cloud. No hardware or parameter defaults
+changed.

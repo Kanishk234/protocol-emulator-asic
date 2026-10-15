@@ -1,5 +1,11 @@
 # Bugs
 
+## 86: Trace replay depends on expired historical artifact
+- **Date:**2026-10-14.
+- **Symptom/check:**38676296904 fails source-fetch with no valid artifacts; native routing never starts.
+- **Root cause:** old best133 source and original policy artifacts have finite retention. A durable approved pre-CTS archive exists but trace replay still fetched old derived outputs.
+- **Fix/coverage:** regenerate derived control from approved archive and enforce exact recorded view hashes; retain exact13-field RT_/GRT_ policy subset from authenticated660afb…config with normalizedSHA691d8fec… . Native regeneration/replay pending; no physical result from failed setup.
+
 ## 85: Repeated compiler parameter option silently drops earlier group
 - **Date:**2026-10-14.
 - **Symptom/check:**38676021166 active-window loaded test compiled but waveform had16 low cycles rather than256.

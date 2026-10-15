@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import re
 from event_nor2_screen import logical_cells,validate_antenna_only_changes
-from electrical_repair_plan import validate_change
+from electrical_repair_plan import validate_change,expanded_pins
 
 
 def validate_batch(before,after,proposal,iteration,reviewed_sources=None):
@@ -13,14 +13,7 @@ def validate_batch(before,after,proposal,iteration,reviewed_sources=None):
     cells={}
     normalize=lambda value:value.strip().removeprefix('\\')
     for name,(master,pins) in logical_cells(before).items():
-        expanded=[]
-        for pin,value in pins:
-            if master=='RM_IHPSG13_1P_512x16_c2_bm_bist' and pin=='A_ADDR':
-                bits=value.strip()[1:-1].split(',')
-                if len(bits)!=9:raise ValueError('Wrong source SRAM address bus')
-                expanded.extend((f'A_ADDR[{8-i}]',normalize(v)) for i,v in enumerate(bits))
-            else:expanded.append((pin,normalize(value)))
-        cells[normalize(name)]=(master,expanded)
+        cells[normalize(name)]=(master,expanded_pins(master,pins))
     sources={};moved=set()
     for group in groups:
         if set(group)!={'buffer','net','source_net','master','sinks'}:raise ValueError('Unexpected post-antenna group fields')

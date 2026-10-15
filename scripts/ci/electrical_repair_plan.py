@@ -138,6 +138,24 @@ def plan(layout, checks, std_lef, macro_lef, residual=False, finish=False, incre
     return result
 
 
+def expanded_pins(master, pins):
+    """Match known SRAM input bus bits to OpenDB's individual terminals."""
+    normalize=lambda v:v.strip().removeprefix('\\')
+    expanded=[]
+    widths={'A_ADDR':9,'A_DIN':16}
+    for pin,value in pins:
+        if master=='RM_IHPSG13_1P_512x16_c2_bm_bist' and pin in widths:
+            width=widths[pin];value=value.strip()
+            if not value.startswith('{') or not value.endswith('}'):
+                raise ValueError('Unsupported SRAM input bus representation')
+            bits=value[1:-1].split(',')
+            if len(bits)!=width or any(not b.strip() or '{' in b or '}' in b for b in bits):
+                raise ValueError('Wrong SRAM input bus width or representation')
+            expanded.extend((f'{pin}[{width-1-i}]',normalize(b)) for i,b in enumerate(bits))
+        else:expanded.append((pin,normalize(value)))
+    return tuple(sorted(expanded))
+
+
 def validate_change(before, after, proposal):
     from event_nor2_screen import logical_cells
     old,new=logical_cells(before),logical_cells(after)
@@ -145,18 +163,7 @@ def validate_change(before, after, proposal):
     def normalized(cells):
         result={}
         for n,(m,pins) in cells.items():
-            expanded=[]
-            for pin,value in pins:
-                if m=='RM_IHPSG13_1P_512x16_c2_bm_bist' and pin=='A_ADDR':
-                    value=value.strip()
-                    if not value.startswith('{') or not value.endswith('}'):
-                        raise ValueError('Unsupported SRAM address bus representation')
-                    bits=value[1:-1].split(',')
-                    if len(bits)!=9 or any(not b.strip() or '{' in b or '}' in b for b in bits):
-                        raise ValueError('Wrong nine-bit SRAM address bus')
-                    expanded.extend((f'A_ADDR[{8-i}]',normalize(b)) for i,b in enumerate(bits))
-                else: expanded.append((pin,normalize(value)))
-            result[normalize(n)]=(m,tuple(sorted(expanded)))
+            result[normalize(n)]=(m,expanded_pins(m,pins))
         return result
     old,new=normalized(old),normalized(new)
     for resize in proposal.get('resizes',[]):

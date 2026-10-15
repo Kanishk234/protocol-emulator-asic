@@ -50,6 +50,21 @@ def validate_route_reset(log,global_source=False):
     return int(resets[0])
 
 
+def resume_grt(output,proposal):
+    from combined_physical_route import validate_canonical_proposal
+    if any((output/name).exists() for name in ('antenna','timing','gates.json')):
+        raise ValueError('Replay refuses existing qualification outputs')
+    validate_canonical_proposal(json.loads((output/'proposal.json').read_text()),proposal)
+    raw=unique(output/'grt','*-openroad-globalrouting/state_out.json')
+    state=json.loads(raw.read_text());odb=Path(state['odb'])
+    if odb.resolve().parent!=raw.resolve().parent or Path(state['def']).resolve()!=odb.with_suffix('.def').resolve():
+        raise ValueError('Replay physical views point outside saved GRT checkpoint')
+    for path in (odb,Path(state['def']),odb.with_suffix('.baseline.nl.v'),
+                 odb.with_suffix('.eco.nl.v'),odb.with_suffix('.eco.pnl.v'),raw.parent/'after_edits.nl.v'):
+        if not path.is_file():raise ValueError('Missing saved replay view '+str(path))
+    return raw
+
+
 def main(profile=None):
     profile={} if profile is None else profile
     build=profile.get('plan',plan);emit=profile.get('target_call',target_call);conserve=profile.get('validate_change',validate_change)
@@ -73,17 +88,23 @@ def main(profile=None):
     baseline=Path(state['nl']).read_text();layout=Path(state['def']).read_text()
     proposal=build(baseline,layout,(sta/profile.get('timing_corner_format','{corner}').format(corner='nom_fast_1p32V_m40C')/'min.rpt').read_text(),
         {c:(sta/profile.get('timing_corner_format','{corner}').format(corner=c)/'checks.rpt').read_text() for c in ('nom_fast_1p32V_m40C','nom_typ_1p20V_25C','nom_slow_1p08V_125C')},std[0],macro[0])
-    target=Path('workflow-src/scripts/ci/combined_physical_targets.tcl')
-    if target.exists():raise ValueError('Repeated combined repair')
-    target.write_text(emit(layout,proposal))
-    output=Path(profile.get('output_root','runs/combined-physical-screen'));output.mkdir(exist_ok=False)
-    (output/'proposal.json').write_text(json.dumps(proposal,indent=2)+'\n')
-    subprocess.run(['docker','build','-t',profile.get('image','tripwire-combined-screen:local'),'-f',profile.get('dockerfile','workflow-src/scripts/ci/Dockerfile.openroad-combined-screen'),'workflow-src/scripts/ci'],check=True)
-    os.environ['LIBRELANE_IMAGE_OVERRIDE']=profile.get('image','tripwire-combined-screen:local')
-    # Discard obsolete extraction outputs from the old physical database.
-    clean=dict(state,spef=None,sdf=None,lib=None,metrics={})
-    initial=output/'source_state.json';initial.write_text(json.dumps(clean,indent=2)+'\n')
-    run_step(config,initial,output/'grt',['OpenROAD.GlobalRouting'])
+    output=Path(profile.get('output_root','runs/combined-physical-screen'))
+    if profile.get('resume_grt_run'):
+        validate_run(json.loads(Path('/tmp/inline-replay-source-run.json').read_text()),profile['resume_grt_run'])
+        resume_grt(output,proposal)
+        os.environ.pop('LIBRELANE_IMAGE_OVERRIDE',None)
+    else:
+        target=Path('workflow-src/scripts/ci/combined_physical_targets.tcl')
+        if target.exists():raise ValueError('Repeated combined repair')
+        target.write_text(emit(layout,proposal))
+        output.mkdir(exist_ok=False)
+        (output/'proposal.json').write_text(json.dumps(proposal,indent=2)+'\n')
+        subprocess.run(['docker','build','-t',profile.get('image','tripwire-combined-screen:local'),'-f',profile.get('dockerfile','workflow-src/scripts/ci/Dockerfile.openroad-combined-screen'),'workflow-src/scripts/ci'],check=True)
+        os.environ['LIBRELANE_IMAGE_OVERRIDE']=profile.get('image','tripwire-combined-screen:local')
+        # Discard obsolete extraction outputs from the old physical database.
+        clean=dict(state,spef=None,sdf=None,lib=None,metrics={})
+        initial=output/'source_state.json';initial.write_text(json.dumps(clean,indent=2)+'\n')
+        run_step(config,initial,output/'grt',['OpenROAD.GlobalRouting'])
     raw=unique(output/'grt','*-openroad-globalrouting/state_out.json');final=json.loads(raw.read_text());odb=Path(final['odb'])
     before=odb.with_suffix('.baseline.nl.v').read_text();edited=(raw.parent/'after_edits.nl.v').read_text();nl=odb.with_suffix('.eco.nl.v');pnl=odb.with_suffix('.eco.pnl.v')
     if logical_cells(before)!=logical_cells(baseline):raise ValueError('Physical ODB input disagrees with source NL')
@@ -111,6 +132,8 @@ def main(profile=None):
     if profile.get('source_kind')=='global-screen':
         receipt.update(source_global_screen=True,source_detailed_wire_reset_count=reset_count)
     receipt.update(postant)
+    if profile.get('resume_grt_run'):
+        receipt.update(qualification_replayed_from=profile['resume_grt_run']['id'],physical_changes_repeated=False)
     (output/'gates.json').write_text(json.dumps(receipt,indent=2)+'\n')
     if not ready:raise ValueError('Combined physical screen fails timing/electrical/antenna gates; no DRT')
 

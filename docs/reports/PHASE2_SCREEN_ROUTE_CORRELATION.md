@@ -35,3 +35,14 @@ Validation: 20 focused tests passed; actual-source proposal and geometry allocat
 
 Run the reserved screen before any DRT. If it passes, inspect the per-family reserve and slow-corner transitions before authorizing routing. Separately investigate a bounded post-DRT antenna/electrical repair loop with fresh extraction: the pinned router can reinitialize capacities on detailed-route input, so cold incremental routing requires explicit live-capacity, DRC and connectivity audits. Do not remove necessary diodes, loosen gates or claim official closure from experimental checkpoints.
 
+
+## Reserve screen result and routing continuation
+
+[Screen 38687129808](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38687129808) succeeded on exact main head 682ba0d0c8cabc032eaa927f031e18baf4b31d96. Bulk artifact 11951605789; gate artifact 11950034250.
+
+- Setup WS 0 and no reported setup/hold violations at all three corners. Hold slack fast/typical/slow: 72.5907 / 168.950 / 340.245 ps.
+- All-corner slew/fanout/capacitance counts zero, antenna nets/pins zero, live GRT overflow zero.
+- Nineteen planned BUF4 plus three BUF4 from one bounded post-antenna batch. All 26 reviewed source/branch nets have at most four loads; internal six-load reserve passes.
+- Independently recomputed exact proposal from pinned source reports and LEFs; checked baseline identity, logical conservation, post-antenna history, original placements, live routing capacity/overflow, strict gates and actual family loads using downloaded artifact views. All passed.
+
+Prepared `gds-route-reserve-route.yaml` and `route_reserve_route.py`. They bind the complete successful receipt and screen SHA, recompute reserve from the saved DEF, repeat existing checkpoint/antenna/connectivity/placement checks, then perform fresh stock pre-DRT qualification, detailed routing and extraction without another full GRT/ECO pass. Final timing/electrical/antenna gates remain unchanged. Early summary upload precedes bulk evidence. Thirty-four focused tests pass. Routing/extracted signoff and official GDS are still unproven.

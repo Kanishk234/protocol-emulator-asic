@@ -5,7 +5,13 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-15: Codex (reserve screen passed; audited stock route prepared)
+- Screen 38687129808 succeeded on 682ba0d: setup WS 0 all corners, hold fast/typical/slow 72.5907/168.950/340.245 ps, all-corner electrical counts zero, antenna zero and live GRT overflow zero. Nineteen planned plus three bounded post-antenna BUF4. All 26 repaired source/branch nets have at most four loads against internal six-load gate.
+- Downloaded selected actual artifact views and independently audited proposal/source hashes, baseline identity, logical connectivity, antenna/buffer history, original placements, strict gates and reserve. Passed. Added exact-source stock DRT/extraction continuation with reserve recomputation and early summaries; 34 focused tests pass. See docs/reports/PHASE2_SCREEN_ROUTE_CORRELATION.md.
+- Next publish scoped continuation and dispatch it under existing approval. No detailed-route/official/Phase 2 completion claim; no checklist boxes ticked.
+
 ## 2026-10-15: Codex (approved reserve screen publication)
+- Published tools cae00c9, CI 7a80b08 and docs 682ba0d. Local HEAD and remote main both verified as 682ba0d0c8cabc032eaa927f031e18baf4b31d96. Dispatched [reserve screen 38687129808](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38687129808), confirmed queued on that exact head. Launch receipt local pending next documentation publication. Next inspect strict screen/reserve gates before considering DRT.
 - User explicitly approved Codex commits, push and dispatch. Committed scoped tools cae00c9 and CI 7a80b08; 20 focused tests and git diff --check pass again. Preparing documentation commit, remote-main verification and manual gds-route-reserve-screen dispatch. Unrelated working-tree changes remain excluded.
 - Screen only: no detailed routing until all strict gates and the internal repaired-family six-load reserve pass. No Phase 2 checklist changes.
 

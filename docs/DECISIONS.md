@@ -1010,3 +1010,13 @@ successful return justifies downstream detailed-route/extraction/complete
 timing/function qualification. No source, silicon, placement, resource or
 protocol architecture change. Existing standalone trajectory workflow is now
 manual-only to avoid a duplicate control replay on shared-helper edits.
+
+**D097 outcome:** paired38820879445 atf8ed2a0 authenticates original133,
+then candidate15 reaches121. Same104726 routing resources, same source views,
+native return1 in both cases. Per-layer overflow13/53/31/36 becomes19/40/18/44;
+retain a lower-total routing point, not a uniform layer or full-chip win.
+Full candidate segment SHA19b14132c36cfa3e863edc34d0f23e7783694da80f586c438833783337a1da2c.
+Next observation exports the calibrated native grid at this exact15/121 point;
+require the same segment hash/121 and native per-layer grid/table agreement.
+Original133 remains the reference for original50 policy. No further budget
+sweep or physical acceptance follows from this retained measurement.

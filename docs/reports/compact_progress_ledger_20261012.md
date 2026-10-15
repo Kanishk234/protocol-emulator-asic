@@ -1,6 +1,10 @@
 # Compact progress ledger and next decision
 
-The compact successor is **not accepted**. Best fanout-clean routing remains133 overflow. Diagnostic setup fixes and green evidence-collection jobs are not improvements to the chip.
+The compact successor is **not accepted**. Original50-budget fanout-clean control
+remains133. October15 paired38820879445 establishes a lower-total15-budget
+point at121 on identical physical views/resources; both still fail native
+routing. Preserve policy identity rather than treating121 as the old50control.
+Diagnostic setup fixes and green evidence-collection jobs are not chip acceptance.
 
 | Work | Actual evidence | Result and meaning |
 |---|---|---|

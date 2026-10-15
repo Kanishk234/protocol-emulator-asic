@@ -6,6 +6,14 @@ and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
 remain open. This is a separate reproducibility result from checkpoint experiments.
 
+Latest same-day evidence: fresh8e4c117 reproduction38780941472 passes with
+all12 emitted images retained/rehashed, loaded30/cosim1 and corrected UART
+discovery. Corrected source profiling38820879331 validates24trials and555LUT4
+current total with reviewed roles. Native early-stop pair38820879445 improves
+original133→121 on unchanged physical inputs; both fail routing and no
+successor is promoted. Controlled mutation refresh needs BUG94 parser retry;
+ten simulation kills are actual, formal parking rejection remains pending.
+
 Latest baseline additions now have actual loaded evidence: primitive-helper
 38167521573 and autonomous UART fault/event demo38168609080 pass real SPI-loaded
 chip-port tests on unchanged G1. The latter uses57/88LC and both timers/shifters;

@@ -10,7 +10,11 @@ the standalone UART image has same-job audit evidence only. This is no
 physical/native timing refresh. [Exact evidence and omissions](reports/reproduction_refresh_20261015.md).
 
 **October 15 status:** frozen G1 remains the supported fallback; phase 5 is
-incomplete. Unchanged-control trace
+incomplete. Paired native routing38820879445 establishes a lower-total point:
+original50-budget133 versus15-budget121 on identical authenticated views and
+layer resources. Both routes still fail; Metal1/4 overflow worsens while
+Metal2/3 improves. No physical acceptance or clock claim follows. Preserve
+original50/133 separately from new15/121. Unchanged-control trace
 [38676688402](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38676688402)
 reproduces **133 native global-routing overflow**, retaining native failure.
 It identifies long south/east detours, not routing closure. Exact source and

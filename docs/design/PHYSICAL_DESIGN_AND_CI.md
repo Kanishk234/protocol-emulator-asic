@@ -2,6 +2,17 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**October15 current diagnostic:** paired38820879445 atf8ed2a0 reproduces
+exact50-budget133 and measures15-budget121 on the same authenticated source
+ODB/netlist/SDC/interface, original three-corner producer guards, capacities
+and clock margins. Both native runs return1/GRT-0116; no detailed-route or
+configured timing acceptance. Original per-layer overflow13/53/31/36 becomes
+19/40/18/44, so locality is mixed despite lower total. Preserve both policy
+identities. Follow-up calibrated grid observation must match the exact121
+full-segment hash before attributing its remaining cuts. See D097 and
+`docs/reports/router_2d_next_20261015.md`. Earlier dated checkpoints below
+remain historical rather than current acceptance claims.
+
 **October11 current checkpoint:** eight-delay C2 native physical stages complete
 with seven zero gates38114298036 (10m05s whole hosted job), real-loaded native
 UART/USER_RESET passes38163199372, and six conditional extracted internal

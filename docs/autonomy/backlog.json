@@ -12,6 +12,15 @@
       "route_run": "38168159774",
       "overflow": 133,
       "accepted": false
+    },
+    "compact_best_measured_routing": {
+      "source_producer_run": "38167697696",
+      "paired_run": "38820879445",
+      "iteration_budget": 15,
+      "overflow": 121,
+      "segments_sha256": "19b14132c36cfa3e863edc34d0f23e7783694da80f586c438833783337a1da2c",
+      "accepted": false,
+      "scope": "Native routing-policy point only; original50/133 remains a separate control"
     }
   },
   "tasks": [
@@ -73,9 +82,10 @@
         "docs/reports/research_next_20261013.md",
         "docs/reports/compact_progress_ledger_20261012.md",
         "docs/reports/route_trace_analysis_20261015.md: all10 zero-capacity markers validate edge indexing; individual own-net release leaves44-edge cuts and no reachable macro portal",
-        "38778082059 at6370e1f: exact133/source/segments retained; cached2D133/assigned3D133; conditional3Dmaze calls skipped"
+        "38778082059 at6370e1f: exact133/source/segments retained; cached2D133/assigned3D133; conditional3Dmaze calls skipped",
+        "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged"
       ],
-      "next_action": "Inspect pinned copyBR/removeLoops/pre-assignment sttrees and prove a headless observation path; scalar diagnostic is complete. Attribute actual 2D competition before choosing any physical change.",
+      "next_action": "Observe calibrated native grid on exact15/121 segment hash, then attribute remaining cuts before any physical change; retain original50/133 separately.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",
@@ -114,11 +124,12 @@
       "priority": 5,
       "title": "Validate actionable compiler failure classifications",
       "track": "frozen_g1",
-      "status": "needs_review",
+      "status": "validated",
       "hypothesis": "Separating capacity, pin conflict, routing and tool failures helps users act without false fit promises.",
       "evidence": [
         "docs/WORKLOG.md session102: reviewed4031469,12focused tests PASS; agent broader58PASS",
-        "tools/compile/tests/test_diagnostics.py"
+        "tools/compile/tests/test_diagnostics.py",
+        "38820879322 unitSUCCESS onf8ed2a0; CLI string/integer traceback repair92 covered with existing diagnostic/stale-image fixtures"
       ],
       "next_action": "Review current implementation and tests; retain actual focused outcomes and run existing hosted compile regressions on exact integrated SHA.",
       "acceptance": [
@@ -157,15 +168,16 @@
       "priority": 7,
       "title": "Validate current clean-checkout user path",
       "track": "phase5",
-      "status": "awaiting_evidence",
+      "status": "validated",
       "hypothesis": "Recent host/compiler changes need current-source reproduction beyond the historical clean-run evidence.",
       "evidence": [
         "37690896748 at962da93: historical clean reproduction",
         "38293580979: compiled C actual simulated SPI pass",
         "docs/reports/reproduction.md",
-        "38777288608 at77edd2d: fresh hosted README reproduction running at final inspection"
+        "38777288608 at77edd2d: fresh hosted README reproduction running at final inspection",
+        "38780941472 at8e4c117:14XML records, loaded30/cosim1, all12 emitted image bytes independently hash-match reports"
       ],
-      "next_action": "Inspect running38777288608 without duplicate dispatch; retain exact source scope and expected loaded/cosim census. Followup6370e1f unit814tests/37protocolentries passes separately.",
+      "next_action": "Retain authenticated8e4c117 reproduction scope; rerun only when new user-flow changes justify it. Original primitive timing views remain a separate gap.",
       "acceptance": [
         "Fresh pinned runner builds documented examples and passes expected loaded/cosim tests.",
         "Exact source and tool pins retained; no board/backend-speed claim."
@@ -198,6 +210,25 @@
         "P5-EVIDENCE",
         "REPRO-CURRENT"
       ]
+    },
+    {
+      "id": "MUTATION-CONTROLS",
+      "priority": 3,
+      "title": "Complete controlled mutation evidence",
+      "track": "phase5",
+      "status": "awaiting_evidence",
+      "evidence": [
+        "38820879351:10simulation mutants killed; valid pristineF1proof blocked by status grammarBUG94",
+        "66f5487: exact-status/split-engine witness parser fixed; full hosted retry pending"
+      ],
+      "next_action": "Inspect corrected full campaign controls, exact test failures and formal property rejection; never count harness/tool failures as kills.",
+      "acceptance": [
+        "All six pristine configurations pass and all11 named mutations have real executed assertion/property witnesses."
+      ],
+      "rejection": [
+        "Missing witness, control failure, timeout, unexplained error or surviving mutant."
+      ],
+      "depends_on": []
     }
   ],
   "rejected_hypotheses": [

@@ -51,6 +51,14 @@ Keep two distinct tracks:
   Preserve its authenticated inputs and exact routing/clock policy. Never
   combine another layout's geometry pass with its electrical or timing pass.
 
+October15 follow-up: keep that original50-budget133 reference intact. Paired
+38820879445 also establishes a **121-overflow** point at native15 iterations
+on the same physical views/resources. It remains failed routing, with mixed
+per-layer changes and no downstream signoff. Treat routing policy as part of
+checkpoint identity; never compare a new physical change against133 while
+silently applying the15 policy. Replay the explicit121 checkpoint with exact
+segment hashes before using its grid or calling it a new comparison control.
+
 The source of truth for outcomes remains reports, CLAIMS, BUGS and DECISIONS.
 `../autonomy/backlog.json` is an actionable index, not stronger evidence.
 
@@ -73,6 +81,11 @@ and integrates shared changes. Release/reuse finished slots for the next
 bottleneck; do not spawn agents just to keep them busy. A specialist reviewing
 reference-model semantics must not inspect the checked RTL if that would break
 the project's independence rule.
+
+If a specialist becomes unavailable or reaches its usage limit, preserve its
+working-tree changes and let the coordinator take over review and verification.
+Do not commit partially reviewed edits or repeatedly restart an unavailable
+agent. Record which work was independently validated and which remains open.
 
 ## Work cycle
 

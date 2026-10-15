@@ -127,6 +127,11 @@ def plan(netlist,layout,hold_report,checks,std_lef,macro_lef,binding=None):
                 name,pin=row.split()[0].rsplit('/',1);source=attached[(name,pin)]
                 failures.setdefault(source,set()).add(kind)
     if len(checks)!=3 or len(failures)!=cfg['electrical_nets']:raise ValueError('Wrong measured electrical target set')
+    measured_count=len(failures)
+    for source,kinds in cfg.get('preventive_sources',{}).items():
+        if source not in nets or not kinds or not set(kinds)<={'slew','fanout','capacitance'}:
+            raise ValueError('Invalid reviewed preventive source')
+        failures.setdefault(source,set()).update(kinds)
     resize_only=set(cfg.get('resize_only_slew_drivers',()))
     handled_resize_only=set()
     for source,kinds in sorted(failures.items()):
@@ -164,11 +169,14 @@ def plan(netlist,layout,hold_report,checks,std_lef,macro_lef,binding=None):
     for group in groups:
         x,y,o=group['location'];w,h=sizes[group['master']]
         if any(n!=group['buffer'] and l<x+w and rr>x and b<y+h and t>y for n,l,b,rr,t in boxes):raise ValueError('Combined footprint overlap')
-    return dict(source_run=cfg['source_run'],def_sha256=cfg['def_sha'],netlist_sha256=cfg['nl_sha'],
+    result=dict(source_run=cfg['source_run'],def_sha256=cfg['def_sha'],netlist_sha256=cfg['nl_sha'],
         groups=groups,resizes=resizes,added_buffers=len(groups),hold_delay_cells=cfg['hold_count'],
         electrical_target_nets=cfg['electrical_nets'],added_footprint_um2=sum(sizes[g['master']][0]*sizes[g['master']][1]/1e6 for g in groups),
         resize_area_delta_um2=sum(r['area_delta_um2'] for r in resizes),footprint_overlap_count=0,
         detailed_legalization_required=True,physical_change_applied=False,physical_timing_measured=False,official_signoff=False)
+    if cfg.get('preventive_sources'):
+        result.update(preventive_target_nets=len(failures)-measured_count,total_electrical_target_nets=len(failures))
+    return result
 
 
 def setup_netlist(text,proposal,binding=None):

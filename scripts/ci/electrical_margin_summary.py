@@ -64,8 +64,8 @@ def paired(screen, extracted):
     for corner in CORNERS:
         before, after = screen[corner]['nets'], extracted[corner]['nets']
         rows = []
-        for net in before.keys() & after.keys():
-            for kind in before[net].keys() & after[net].keys():
+        for net in sorted(before.keys() & after.keys()):
+            for kind in sorted(before[net].keys() & after[net].keys()):
                 a, b = before[net][kind], after[net][kind]
                 if a['limit'] != b['limit']:
                     raise ValueError('Paired electrical limit changed')
@@ -79,5 +79,5 @@ def paired(screen, extracted):
             screen_only_nets=len(before.keys()-after.keys()),
             extracted_only_nets=len(after.keys()-before.keys()),
             newly_failing=[r for r in rows if r['screen'] <= 1 < r['extracted']],
-            largest_drift=sorted(rows, key=lambda r: r['drift'], reverse=True)[:100])
+            largest_drift=sorted(rows, key=lambda r: (-r['drift'], r['net'], r['kind']))[:100])
     return result

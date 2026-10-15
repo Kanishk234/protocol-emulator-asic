@@ -92,3 +92,22 @@ def test_saved_input_hashes_detect_changes_and_missing_views(tmp_path):
     netlist.unlink()
     with pytest.raises(ValueError, match='Missing saved probe input'):
         input_hashes({'screen': state})
+
+
+def test_paired_summary_order_is_stable_across_hash_seeds():
+    import os
+    import subprocess
+    import sys
+    code = '''import copy,json
+from electrical_margin_summary import paired
+from postgrt_timing import CORNERS
+row={'slew':{'limit':2.5,'actual':2.0,'utilization':.8}}
+a={c:{'nets':{'z':copy.deepcopy(row),'a':copy.deepcopy(row)}} for c in CORNERS}
+b=copy.deepcopy(a)
+for d in b.values():
+ for v in d['nets'].values():v['slew']['utilization']=1.1
+print(json.dumps(paired(a,b),sort_keys=True))
+'''
+    outputs = [subprocess.check_output([sys.executable,'-c',code],
+        env=dict(os.environ,PYTHONHASHSEED=str(seed)),text=True) for seed in (1,2)]
+    assert outputs[0] == outputs[1]

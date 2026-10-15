@@ -26,7 +26,7 @@ def fresh_metrics(root, step, corner):
     return metrics
 
 
-def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None, repair_corners=None, hold_margin=None):
+def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None, repair_corners=None, hold_margin=None, extra_tcl=None):
     if repair_corners is not None and tuple(repair_corners) != CORNERS:
         raise ValueError("Repair corners must be the complete pinned corner set")
     base = json.loads(config_path.read_text())
@@ -35,6 +35,8 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup
     # Source-run CLI overrides may not be present in config_merged.json.
     # The workflow validates 0.16 in the actual GlobalRouting step config.
     base["GRT_ADJUSTMENT"] = 0.16
+    if extra_tcl is not None:
+        base['STA_EXTRA_CORNER_TCL_FILE'] = str(extra_tcl.resolve())
     if sdc is not None:
         base["PNR_SDC_FILE"] = str(sdc.resolve())
     if setup_margin is not None:

@@ -100,7 +100,8 @@ def main(profile=None):
     run_step(config,changed,output/'antenna',['OpenROAD.CheckAntennas'])
     checked=unique(output/'antenna','*-openroad-checkantennas/state_out.json');antenna=json.loads((checked.parent/'or_metrics_out.json').read_text())
     path=Path(profile.get('screen_config','src/config_combined_physical_screen.json'));path.write_text(json.dumps(config,indent=2)+'\n')
-    screen(path,source,output/'timing',os.environ['PDK_ROOT'],repaired=checked,sdc=Path('src/signoff.sdc'))
+    extra={'extra_tcl':Path(profile['electrical_margin_tcl'])} if profile.get('electrical_margin_tcl') else {}
+    screen(path,source,output/'timing',os.environ['PDK_ROOT'],repaired=checked,sdc=Path('src/signoff.sdc'),**extra)
     timing=json.loads((output/'timing/comparison.json').read_text())
     ready=qualified(timing,antenna) and electrical_clean(timing)
     receipt=dict(source_run=profile.get('source_run',38305592967),qualified=ready,

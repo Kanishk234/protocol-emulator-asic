@@ -53,3 +53,16 @@ def test_manual_workflow_requires_reviewed_hash_and_fixed_source():
     assert d['with']['name']=='gds-electrical-incremental-route-38305592967'
     code=next(s['run'] for s in steps if s['name']=='Validate artifact and repaired netlist')
     assert 'validate_electrical' in code and "os.environ['REVIEWED_NETLIST_SHA']" in code
+
+
+def test_reviewed_single_step_config_uses_full_recipe_for_omitted_fields(tmp_path):
+    run,digest,route,step=fixture(tmp_path)
+    stage=step/'config.json';data=json.loads(stage.read_text())
+    del data['SYNTH_STRATEGY'];del data['GRT_RESIZER_HOLD_SLACK_MARGIN']
+    stage.write_text(json.dumps(data))
+    with pytest.raises(ValueError):validate_electrical(tmp_path,run,digest)
+    profile={'step_config_sha256':hashlib.sha256(stage.read_bytes()).hexdigest(),
+             'recipe_sha256':hashlib.sha256((tmp_path/'src/config_electrical_incremental_route.json').read_bytes()).hexdigest()}
+    assert validate_electrical(tmp_path,run,digest,profile=profile)['sha256']==digest
+    stage.write_text(stage.read_text()+'\n')
+    with pytest.raises(ValueError,match='bytes changed'):validate_electrical(tmp_path,run,digest,profile=profile)

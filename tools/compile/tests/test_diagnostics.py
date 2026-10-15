@@ -81,3 +81,39 @@ def test_missing_placer_keeps_the_original_tool_error(flow, monkeypatch):
     with pytest.raises(compiler.CompileError, match="nextpnr installation missing"):
         compiler.compile_design([], pins, arch, out)
     assert not (out / "failure.json").exists()
+
+
+@pytest.mark.parametrize("text,util,category", [
+    ("ERROR: Unable to place cell 'x', no BELs remaining to implement cell type 'FABULOUS_LC'",
+     {"FABULOUS_LC": {"used": 95, "available": 88}}, "resource_capacity"),
+    ("ERROR: Unable to place cell 'x', no BELs remaining to implement cell type 'FABULOUS_LC'",
+     {"FABULOUS_LC": {"used": 70, "available": 88}}, "placement"),
+    ("ERROR: Unable to place cell 'x'", {}, "placement"),
+    ("ERROR: Failed to route net 'x'", {"FABULOUS_LC": {"used": 70, "available": 88}}, "routing"),
+    ("Info: routing failed in earlier attempt\nERROR: unsupported device", {}, "unknown"),
+    ("ERROR: unknown failure", {}, "unknown"),
+])
+def test_failure_classification_requires_observed_evidence(text, util, category):
+    diagnosis = compiler.diagnose_pnr_failure(text, util)
+    assert diagnosis["category"] == category
+    assert all(line.startswith("ERROR:") for line in diagnosis["fatal_messages"])
+    assert diagnosis["advice"]
+
+
+def test_routing_failure_keeps_fatal_net_and_seed_in_diagnostic(flow, monkeypatch):
+    pins, _, out, arch = flow
+    def vendor(cmd, log, cwd, env=None):
+        if Path(cmd[0]).name == "nextpnr-generic":
+            Path(log).write_text("Info: FABULOUS_LC: 70/ 88 79%\n"
+                                 "ERROR: Failed to route net 'event_count[3]'\n")
+            raise compiler.CompileError("route failed")
+        Path(log).write_text("synthesis stub\n")
+    monkeypatch.setattr(compiler, "run", vendor)
+    with pytest.raises(compiler.CompileError, match="Routing failed"):
+        compiler.compile_design([], pins, arch, out, seed=17)
+    failure = json.loads((out / "failure.json").read_text())
+    assert failure["seed"] == 17
+    assert failure["diagnosis"]["category"] == "routing"
+    assert failure["diagnosis"]["fatal_messages"] == ["ERROR: Failed to route net 'event_count[3]'"]
+    assert not failure["diagnosis"]["over_capacity"]
+    assert not (out / "user.wbit").exists()

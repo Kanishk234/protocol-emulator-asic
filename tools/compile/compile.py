@@ -357,6 +357,40 @@ def parse_pnr_log(log: Path):
     return util, (fmax[-1] if fmax else None)
 
 
+def diagnose_pnr_failure(text, utilisation):
+    """Classify observed failure evidence without treating low usage as fit.
+
+    Unknown vendor messages stay unknown; advice is not a root-cause proof.
+    Only fatal messages classify placement/routing, so progress text cannot.
+    """
+    errors = [line.strip() for line in text.splitlines()
+              if re.match(r"^\s*(?:ERROR|FATAL):", line)]
+    over = [f"{name}: {row['used']}/{row['available']}"
+            for name, row in utilisation.items() if row["used"] > row["available"]]
+    if over:
+        category = "resource_capacity"
+        advice = ("Resource capacity exceeded (" + ", ".join(over) +
+                  "). Reduce logic/widths or reuse available primitives.")
+    elif any("no BELs remaining" in line or "Unable to place cell" in line
+             for line in errors):
+        category = "placement"
+        advice = ("Placement failed: no compatible placement was found. Check shared "
+                  "reset/enable groups and fixed pin/BEL constraints; totals within "
+                  "capacity do not establish legal placement.")
+    elif any(re.search(r"(?:failed to route|unable to route|routing failed)", line, re.I)
+             for line in errors):
+        category = "routing"
+        advice = ("Routing failed. Inspect the reported nets and pin locations, reduce "
+                  "fanout or long connections, and compare routing seeds. Resource "
+                  "totals alone do not establish routability.")
+    else:
+        category = "unknown"
+        advice = ("Check shared reset/enable groups and routing constraints; "
+                  "resource totals alone do not guarantee placement.")
+    return {"category": category, "fatal_messages": errors,
+            "over_capacity": over, "advice": advice}
+
+
 def fingerprint_inputs(paths):
     """Snapshot explicitly listed inputs; includes are not discovered recursively."""
     rows = []
@@ -426,17 +460,14 @@ def compile_design(sources, pins_file, arch_dir, out, seed=1, set_params=None, s
             out / "pnr_stdout.log", out, env)
     except CompileError as exc:
         util, _ = parse_pnr_log(out / "pnr_stdout.log")
+        diagnosis = diagnose_pnr_failure(
+            (out / "pnr_stdout.log").read_text(errors="replace"), util)
         failure = {"design": top, "arch": meta["name"], "stage": "place_route",
                    "seed": seed, "utilisation": util, "error": str(exc),
-                   "tools": tool_versions()}
+                   "tools": tool_versions(), "diagnosis": diagnosis}
         diagnostic = out / "failure.json"
         diagnostic.write_text(json.dumps(failure, indent=2) + "\n")
-        over = [f"{name}: {row['used']}/{row['available']}"
-                for name, row in util.items() if row["used"] > row["available"]]
-        advice = ("Resource capacity exceeded (" + ", ".join(over) +
-                  "). Reduce logic/widths or reuse available primitives.") if over else (
-                  "Check shared reset/enable groups and routing constraints; "
-                  "resource totals alone do not guarantee placement.")
+        advice = diagnosis["advice"]
         raise CompileError(f"{exc}\n{advice}\nDiagnostic: {diagnostic}") from exc
 
     # WARP bitgen (BUGS #13); every row, the edge rows included, is written

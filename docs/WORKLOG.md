@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (two-net fanout screen qualified and audited; route prepared)
+- Screen38652802189 artifact11936966317 passes every strict gate:setupWS0allcorners;fast/typical/slowhold78.496/175.233/346.404ps;allcorner slew/fanout/cap0;antenna0;live0overflow. SevenplannedBUF4,zeroresizes/zeroadditionalpost-antbatches. Actualcanonicalproposal/sourceNL/completeconnections/oldplacements/clock-resetpins/antenna-history/nativewirecleanup independently pass;BUG111 source-qualified names retaininherited repairs.
+- Prepared exactsuccessful-source stock DRT/extraction continuation: freshstrictgates beforeDRT,then0DRC/conservedfreshNL andfreshallcorner setup/hold/50psfast-hold/electrical/antennagates. No repair/fullGRTreplay;oldextraction preservedseparately.63focusedtests anddiffcheckpass.
+- Nextpublish/launch gds-fanout-finish-route;screenqualification doesnotguaranteefinalextractedclosure. Officialclean-flow/routedprotocol/GDS/precheckandPhase2remainopen;nochecklisttick. Unrelatedfilesexcluded.
+
+## 2026-10-14: Codex (two-net fanout screen published and launched)
+- Published tools53ca135/CI718e43b/docs95695ed;localHEADandremotemainverified95695ed7e7813977a2134075f73b15a369e399a9. [Two-netfanoutscreen38652802189](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38652802189) confirmedin_progressonexacthead.
+-57focusedtests andactual-source cell/pin/clock-reset/placement/Tcl audits pass. SevenBUF4/101.6064um2;source-qualified identities retaininheritedrepairs. Nextinspect strictscreen; noDRTbeforequalification andnoofficial/Phase2claim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (SRAM extracted checks clear; two-net fanout correction prepared)
 - Route38641675550 artifact11934458136 completes0DRC/0antenna and passes allcorner setupWS0,fast/typical/slowhold85.390/184.750/357.691ps,0slew/cap. Only remaining final-gate failures are two fanout nets percorner: place7535 has14loads/7diodes;45611/Q has9loads/1diode. Neither has protected clock/reset sinks.
 - Prepared exact-source two-net repair:7BUF4/101.6064um2,0resizes/holdcells/offlineoverlaps,all prior SRAM/setup/hold repairs retained. BUG111: prelaunch source replay caught an inherited tripwire_fanout_finish_ prefix collision; new identities include source-run ID and existing cells/nets are retained.

@@ -153,6 +153,19 @@ def test_d097_budget_comparison_changes_exactly_one_native_field():
         trace.selected_policy(dict(source,GRT_ADJUSTMENT=0.1),15)
 
 
+def test_grid_replay_uses_only_calibrated_read_only_body():
+    import cloud_route_121_grid as grid
+    patch=grid.PATCH.read_text()
+    modified=grid.observed_trace(trace.TRACE,patch)
+    body=patch[patch.index('set warp_grid '):patch.index('close $warp_grid_file')+len('close $warp_grid_file')]+'\n'
+    assert modified.replace(body,'',1)==trace.TRACE
+    assert modified.count('log_cmd global_route')==1
+    assert modified.index(body)<modified.index('if {$warp_route_code != 0}')
+    for bad in (patch.replace('close $warp_grid_file',''),patch+patch,
+                patch.replace('set warp_grid_file','global_route\nset warp_grid_file')):
+        with pytest.raises(ValueError):grid.observed_trace(trace.TRACE,bad)
+
+
 def test_scalar_debug_instrumentation_only_adds_observation(tmp_path, monkeypatch):
     import json
     original = 'before\n' + trace.reports.COMMAND + '\nafter\n'

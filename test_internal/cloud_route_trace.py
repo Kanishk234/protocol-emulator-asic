@@ -212,7 +212,7 @@ def selected_policy(config, iterations):
     return selected, protected
 
 
-def main(iterations=50):
+def main(iterations=50, worker=None):
     if os.environ.get('GITHUB_ACTIONS') != 'true':
         raise ValueError('Native replay only on hosted runner')
     if iterations not in (15, 50):
@@ -243,7 +243,7 @@ def main(iterations=50):
         run=OUT/'replay';run.mkdir()
         cmd=['docker','run','--rm','-v',f'{ROOT}:{ROOT}','-w',str(ROOT),'-e',
             f"PDK_ROOT={os.environ['PDK_ROOT']}",'--entrypoint','python3',cfg.IMAGE,
-            str(Path(__file__).resolve()),'--inside',str(path),str(state),str(run)]
+            str(Path(worker or __file__).resolve()),'--inside',str(path),str(state),str(run)]
         with (OUT/'replay.log').open('w') as log:
             process=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,timeout=900)
         stage,=run.glob('*-openroad-globalrouting')

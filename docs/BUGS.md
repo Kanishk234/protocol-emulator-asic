@@ -1,5 +1,11 @@
 # Bugs
 
+## 94: Controlled formal evidence parser assumes a bare SBY status word
+- **Date:** 2026-10-15.
+- **Symptom/check:** campaign38820879351 detects10simulation mutants but blocks the parking mutant despite pristine F1 proof exit0 and successful k-induction.
+- **Root cause:** actual pinned SBY writes `PASS 0 0`, and split smtbmc logs use `logfile_basecase.txt`/`logfile_induction.txt`; the new parser expected bare PASS/FAIL and a single logfile.txt.
+- **Fix/coverage:** accept only the observed status grammar with optional two numeric fields, retain DONE/return-code consistency, and inspect retained engine logfile variants for actual assertion rejection. Add actual-format and malformed-status fixtures; retained pristine artifact now correctly classifies PASS. Update upload pattern for split witnesses. Corrected full campaign pending; prior run is not relabeled successful.
+
 ## 93: Current I2C target state escapes the historical profiling role map
 - **Date:** 2026-10-15.
 - **Symptom/check:** hosted profile38780941523 has valid current LUT totals but assigns zero target FFs to counter/shift; actual retained netlist contains four `g_logic.n` and eight `g_logic.sr` state bits.

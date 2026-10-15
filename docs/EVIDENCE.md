@@ -53,28 +53,33 @@ Key CI runs: [frozen-chip GDS, precheck and gate-level tests (36383587262)](http
 
 The competition asks for a chip that can be reprogrammed after fabrication to speak hardware protocols (UART, SPI, I2C to start), on Tiny Tapeout (IHP 130 nm CMOS5L). WARP puts a small **FPGA fabric** on the chip, and chooses what that fabric contains from measurements.
 
-The hard constraint is area. The historical local tile study estimated about
-**5,090 µm² per LUT4** including configuration, switch matrix and routing;
-this is a local measurement without a CI run, not a current signoff result
-([dated setup and limitations](reports/tile_cmos5l.md)). It motivated the
-generic **96-LUT4** grid later hardened in CI36353540402
+The hard constraint is area. The historical tile study includes configuration,
+switch matrix and routing ([dated setup and limitations](reports/tile_cmos5l.md));
+its local per-cell area estimate is not repeated as a current verified number.
+The generic **96-LUT4** grid was subsequently hardened in CI36353540402
 ([G0 results](reports/g0_results.md)).
 
 ## 2. What protocol logic is spent on
 
 We wrote the four design-set protocols (UART, SPI controller, I2C controller,
 I2C target) as ordinary Verilog and attributed every LUT to what it does.
-The **historical local synthesis profile**, without a CI run, reports
-**648 LUT4s**, of which **counters 23 %, shift registers 17 %, storage 21 %**
-(mostly the I2C target's register map). The plain UART uses144 LUT4s in that
-profile. These are phase-1 synthesis counts, distinct from placed logic-cell
-counts in the later comparison. [Method, parameters and source](reports/profiling.md).
+The corrected hosted refresh
+[38820879331](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38820879331)
+atf8ed2a0 reports **555 LUT4s** across the current plain-logic design-set
+sources: UART144, SPI85, I2C controller141 and I2C target185. Counters account
+for125(22.5%), shift105(18.9%) and storage100(18.0%). All24LUT/carry trials,
+actual raw cell counts and listed source/output hashes are retained; the
+handwritten role map was reviewed after BUG93 exposed renamed state.
+These are synthesis counts, distinct from placed fabric cells and the original
+historical phase1 profile that motivated G1. The refresh does not reconstruct
+that historical revision. [Current evidence](reports/profile_refresh_20261015.md);
+[historical method and data](reports/profiling.md).
 
 Before profiling we sealed a **held-out set** of four more protocols (WS2812, 1-Wire, SWD, CAN; commit 0171cf7) that no part of the architecture was allowed to see until the hardware was frozen (D-003).
 
 ## 3. The architecture, chosen at equal area
 
-The generic hard blocks selected from profiling are a **loadable 16-bit timer** and an **8-bit shift register with a bit count** (D-002, D-026). The three supported design-set protocols use both; the I2C target uses the shift register but does not fit the chip. Two of each fit in one fabric tile slot at **0.97 × a LUT tile's area** (D-026). The chip's fabric **G1** is a 4 × 3 grid with one slot holding them: **88 LUT4 + 2 timers + 2 shift registers**; the baseline **G0** has the same macro with all 12 slots LUT tiles (96 LUT4).
+The generic hard blocks selected from profiling are a **loadable 16-bit timer** and an **8-bit shift register with a bit count** (D-002, D-026). The three supported design-set protocols use both; the I2C target uses the shift register but does not fit the chip. Two of each occupy one fabric tile slot in hardened G1(CI36376994834). The chip's fabric **G1** is a 4 × 3 grid with one slot holding them: **88 LUT4 + 2 timers + 2 shift registers**; the baseline **G0** has the same macro with all 12 slots LUT tiles (96 LUT4).
 
 | Fabric (same macro, same area) | Design-set protocols that place and route | Logic cells: UART / SPI / I2C controller / I2C target |
 |---|---|---|
@@ -83,7 +88,7 @@ The generic hard blocks selected from profiling are a **loadable 16-bit timer** 
 
 Sources: `docs/reports/architecture_comparison.md` (chart `architecture_comparison.svg`), `g1_results.md`, `g0_results.md`; G1 fits checked in CI `fabric` (`compile.protocols --require`, e.g. 36376994866).
 
-Phase 3 then tried three more specializations, each measured and dropped (D-030, D-031, D-034): a faster timer output (no gain for the slowest design), buffering inside the primitive tile (does not fit the tile), a register-file tile (the I2C target would still need 110–123 of 80 cells). Control sets and the number of hard blocks were measured not to be limits (`docs/reports/g1_limits.md`). **G1 is the frozen chip** (`hw-freeze` → 3047dea, D-033); the I2C target does not fit and is not supported (D-035).
+Phase 3 then tried three more specializations, each measured and dropped (D-030, D-031, D-034): a faster timer output (no gain for the slowest design), buffering inside the primitive tile (does not fit the tile), and a register-file tile (the I2C target still exceeds available logic). Their historical/local measurements and limits remain in the decision records and `docs/reports/g1_limits.md`. **G1 is the frozen chip** (`hw-freeze` → 3047dea, D-033); the I2C target does not fit and is not supported (D-035).
 
 ## 4. The chip
 
@@ -128,9 +133,9 @@ The organizers asked for the flow from a protocol description to a bitstream, ho
 | Chip, RTL fabric | chip-level tests loading real bitstreams through the pins | CI `fabric` 36451328356 |
 | Chip, gate level | the same tests on the hardened shell netlist with fabric RTL | CI `gl_test` 36451108163 |
 | Formal | F1, F2, F4 in CI; F3 FIFO depth2/depth4 unbounded ABC PDR proofs | CI `formal`36383587298; F3 both tasks36491754401, retained engine PASS/property-proved logs inspected; proof/RTL unchanged from that commit |
-| Shell random transactions | SPI transactions checked against an independent model, with command × state and error coverage | `test_internal/uvm`, local seed 1: 2,288 transactions, 79/79 coverage bins, 0 mismatches (2026-09-28) |
+| Shell random transactions | SPI transactions checked against an independent model, with command × state and error coverage | `test_internal/uvm`, seed1 passes in hosted unit38780941428; historical local census remains in its report |
 | Co-simulation | the UART as a bitstream vs its source RTL: identical TX waveforms, equal RX | `test_internal/cosim`; CI `fabric` 36451328356 |
-| Mutation | 11 planted bugs, all caught | `docs/reports/mutation.md` (local), `scripts/mutation.py` |
+| Mutation | Historical local campaign reports detections; new controlled refresh requires pristine controls and actual assertion/property rejection | `docs/reports/mutation.md`; BUG91 and controlled hosted38820879351 pending |
 | Timing model | historical local primitive boundary-path cross-check; matching original tile netlist/SPEF unavailable for a fresh audit | `tools/timing/README.md`, D-028; [artifact gap](reports/reproduction.md) |
 
 Bugs and investigations, with the checks and limits recorded for each: `docs/BUGS.md`.

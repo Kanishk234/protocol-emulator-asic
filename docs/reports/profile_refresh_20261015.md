@@ -25,3 +25,13 @@ counter and eight shift FFs without changing the cell total. The collector
 now rejects a conserving matrix that loses the expected timing/shift state.
 Actual corrected hosted refresh is pending; no corrected shares are claimed
 from local synthesis. Reanalysis uses retained JSON only, no local EDA.
+
+**Actual corrected refresh:**38820879331SUCCESS at
+f8ed2a0a74030f0d1e4a6cb2445ba9dd730ec61b. Downloaded listed-source hashes
+match exact Git bytes, both output fingerprints match and all24conservation/
+expected-state checks pass. LUT4total remains555; corrected categories are
+counter125, shift105, storage100, control107, shared88, pin27, sync3.
+All four workloads retain identified counter and shift state. Result SHA256:
+`be18a833a62b9461446d68cbcc79ad51360776ae48fe4a7e94a639c37f76e224`.
+This closes the fresh profile's attribution defect; original phase1 tables
+remain historical data, and no chip area or validated rate follows.

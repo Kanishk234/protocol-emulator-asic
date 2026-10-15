@@ -27,3 +27,14 @@ The specialist agent reached its usage limit after preparing the patch. The
 coordinator reviewed it, added mixed setup/assertion and contradictory-outcome
 rejections, and independently ran its fixtures alongside compiler/route checks
 (77PASS/2SKIP, skipped Tcl unavailable). No local simulation/formal run occurred.
+
+Actual38820879351 atf8ed2a0 establishes five simulation controls and kills
+all ten simulation mutants with named executed assertion failures. It does
+not execute the formal parking mutant because the new status parser rejects
+the valid pristine proof's `PASS 0 0` status despite exit0 and DONE(PASS).
+This is BUG94, not a chip failure or an undetected mutant. Split smtbmc engine
+logs also need retention. The corrected parser accepts the exact optional
+numeric status fields, keeps strict PASS/FAIL/exit/output checks, and examines
+engine logfile variants for a real property failure. Actual retained pristine
+evidence now classifies PASS;25local fixtures pass. Corrected full hosted
+campaign remains pending, and the earlier failed campaign stays failed.

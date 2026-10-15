@@ -51,3 +51,26 @@ The next experiment is read-only: export transformed signal pin rectangles for e
 The collector uses `dbITerm.getGeometries`, already exercised by our existing route geometry exporter, and the [OpenDB APIs for master/block obstructions and pins](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/odb/include/odb/db.h). Master OBS coordinates remain explicitly local, avoiding a hidden transform assumption; the collector requires the actual R0 macro orientation. DEF preserves track declarations without inventing a track-grid API.
 
 After export: join those ten zero-capacity markers to their exact endpoint shapes and nearest OBS/track boundaries, then quantify the west-channel y450–550 cut with true pin endpoints. Choose one local intervention only if that evidence isolates one. Retain the measured133 control; no source hardware, margins, capacities, layer policy or phase gate changes are made by this audit.
+
+## Successful native export and endpoint result
+
+[38456351705](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38456351705) completed the read-only collector. All source hashes remained unchanged. Export contains3606 cells,21101 signal-pin rectangles including412 macro pin rectangles,43 top boundary shapes and four macro OBS rectangles. No separate block OBS records were present. The macro's full-footprint Metal1–Metal4 obstructions are confirmed in native OpenDB, not only the source LEF.
+
+- Result SHA256: `59c08e6d3cd1c5a91a92d826b2210e56649cb8d02addd317a40a467a8de73cff`.
+- Native geometry SHA256: `27523c434dc0e91e0c39a380519c8e9f6bf4dcc2db3998023d924846cd595772`.
+- Native DEF SHA256: `c0ea048ecf469780ff45562b1d04fe3c20004197627a4041dd59cb7a2aa31e82`.
+
+**None of the ten zero-capacity markers overlaps a same-net endpoint rectangle.** Minimum same-net endpoint distance ranges108.76–406.51µm, using Manhattan gap between rectangles. Thus these particular markers are not direct pin-escape markers. They describe failed route allocation far from the implicated endpoints.
+
+| Net | Actual macro pin rectangle (µm) | Other actual endpoint |
+|---|---|---|
+| cell_val[30] | Metal2 x397.72–398.12,y15.12–15.52 | u_shell._0851_/A near x88.02–88.695,y222.06–222.615 |
+| cell_pad[27] | Metal2 x770.20–770.60,y683.78–684.18 | u_shell.u_to_design._114_/X near x87.175–87.63,y234.94–237.57 |
+| cell_pad[31] | Metal2 x411.16–411.56,y15.12–15.52 | u_shell._0848_/Y and u_shell._0849_/B in west shell |
+| cell_val[27] | Metal2 x777.88–778.28,y683.78–684.18 | u_shell.u_to_host._131_/B and _155_/B in west shell |
+
+The cell_val[30] marker chain at x115.2–158.4/y14.4–36 is hundreds of micrometers from both endpoints. The cell_pad[27] zero-capacity markers are at the **south** macro edge even though its macro endpoint is at the **north** edge. That is concrete evidence to inspect routing detours and planar/layer allocation. It does not justify moving pins or deleting obstructions.
+
+The west-channel congestion has a different character:64/68 markers overlap the XY projection of a same-net endpoint shape; one additional marker is within1µm Manhattan distance. Projection overlap does not identify the physical violation layer or prove pin-access failure. Actual occupied-cell area divided by fragmented-row area reaches97.34% in x0–50/y450–500µm,94.05% in x0–50/y500–550 and93.78% in x50–100/y500–550. Rows use actual DEF fragments,480DBU site width and3780DBU height consistent with the exported cells/source row inventory. These local densities are not whole-chip utilization or a new area claim.
+
+The next diagnostic should retain best133 exactly and capture the actual global-route/tree segments for the four listed nets, plus per-layer blocked-edge information around their zero-capacity markers. Determine whether an infeasible initial tree survives negotiation, whether layer allocation introduces the blocked segments, or whether pin access-point snapping changes the endpoint used by the router. Do not infer those causes from planar markers alone. No new placement intervention is supported yet; speculative pin moves and broad reflow remain rejected.

@@ -40,12 +40,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('targets', type=Path)
     parser.add_argument('--grid', type=Path, help='Optional calibrated D-087 native-grid.tsv')
+    parser.add_argument('--release-group', action='append', default=[],
+                        help='Comma-separated target names to free together in the static graph; requires --grid')
     args = parser.parse_args()
     data = json.loads(args.targets.read_text())
+    if args.release_group and not args.grid:
+        parser.error('--release-group requires --grid')
     result = {name: summarize(segments) for name, segments in data['targets'].items()}
     if args.grid:
         result['peripheral_slices'] = peripheral_slices(args.grid)
-        result['static_residual_connectivity'] = residual_connectivity(args.grid, data['targets'])
+        result['static_residual_connectivity'] = residual_connectivity(
+            args.grid, data['targets'], [group.split(',') for group in args.release_group])
     print(json.dumps(result, indent=2))
 
 
@@ -82,7 +87,22 @@ def peripheral_slices(path):
     return result
 
 
-def residual_connectivity(path, targets):
+def release_allocations(cells, targets, names):
+    """Free unique edges per net, preserving multiplicity across different nets."""
+    if not names or len(set(names)) != len(names):
+        raise ValueError('Release group must contain distinct target names')
+    adjusted = dict(cells)
+    for name in names:
+        if name not in targets:
+            raise ValueError('Unknown release target: ' + name)
+        for edge in planar_edges(targets[name]):
+            if edge not in adjusted:
+                raise ValueError('Own route edge outside observed grid')
+            adjusted[edge] += 1
+    return adjusted
+
+
+def residual_connectivity(path, targets, groups=()):
     """Optimistic graph with free vias; current-net usage is NOT removed."""
     # Validate before independently interpreting preferred-direction cell edges.
     peripheral_slices(path)
@@ -97,16 +117,19 @@ def residual_connectivity(path, targets):
     released = {}
     for name, segments in targets.items():
         own = planar_edges(segments)
-        adjusted = dict(cells)
-        for edge in own:
-            if edge not in adjusted:
-                raise ValueError('Own route edge outside observed grid')
-            adjusted[edge] += 1
+        adjusted = release_allocations(cells, targets, [name])
         observation = residual_paths(adjusted, len(xs)-1, len(ys)-1, {name: segments})[name]
         observation['released_unique_planar_edges'] = len(own)
         observation['scope'] = 'Read-only unit own-allocation release; free vias; boundary access exempt; not a negotiated reroute'
         released[name] = observation
-    return {'original': original, 'one_target_released': released}
+    grouped = []
+    for names in groups:
+        observation = residual_paths(release_allocations(cells, targets, names),
+                                     len(xs)-1, len(ys)-1, targets)
+        grouped.append({'released_targets': names, 'connectivity': observation,
+                        'scope': 'Optimistic static unit-allocation release; free vias; boundary access exempt; not simultaneous route feasibility'})
+    return {'original': original, 'one_target_released': released,
+            'target_groups_released': grouped}
 
 
 def planar_edges(segments):

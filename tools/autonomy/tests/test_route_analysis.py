@@ -48,3 +48,16 @@ def test_native_edge_indexing_reversed_segments_and_duplicate_occupancy():
         ('Metal3',0,1), ('Metal3',1,1), ('Metal2',0,0), ('Metal2',0,1)}
     with pytest.raises(ValueError, match='Nonpreferred'):
         module.planar_edges([[3600,3600,'Metal2',10800,3600,'Metal2']])
+
+
+def test_group_release_preserves_per_net_multiplicity_and_original_grid():
+    segment = [3600,3600,'Metal1',10800,3600,'Metal1']
+    cells = {('Metal1',0,0): -1}
+    targets = {'a': [segment, segment], 'b': [segment]}
+    assert module.release_allocations(cells, targets, ['a', 'b']) == {('Metal1',0,0): 1}
+    assert cells == {('Metal1',0,0): -1}
+    for names in ([], ['a', 'a'], ['missing']):
+        with pytest.raises(ValueError):
+            module.release_allocations(cells, targets, names)
+    with pytest.raises(ValueError, match='outside'):
+        module.release_allocations({}, targets, ['a'])

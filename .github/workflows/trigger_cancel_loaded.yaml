@@ -57,7 +57,11 @@ jobs:
           source .venv/bin/activate
           export PATH="$HOME/oss-cad-suite/bin:$PATH"
           export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
-          PYTHONPATH=tools python -m compile.compile --arch arch/warp_g1 --strict-ports --pins protocols/uart_monitor/trigger.yaml -o build/uart-trigger-fault protocols/uart_monitor/uart_trigger_fault_top.v protocols/uart_monitor/uart_fault_monitor_top.v protocols/uart_monitor/uart_monitor_top.v protocols/uart/uart_top.v protocols/uart/uart_tx.v protocols/uart/uart_rx.v protocols/uart/uart_tx_p.v protocols/uart/uart_rx_p.v --set COUNTER_BITS=9 --set WINDOW_CYCLES=256
+          PYTHONPATH=tools python -m compile.compile --arch arch/warp_g1 --strict-ports --pins protocols/uart_monitor/trigger.yaml -o build/uart-trigger-fault protocols/uart_monitor/uart_trigger_fault_top.v protocols/uart_monitor/uart_fault_monitor_top.v protocols/uart_monitor/uart_monitor_top.v protocols/uart/uart_top.v protocols/uart/uart_tx.v protocols/uart/uart_rx.v protocols/uart/uart_tx_p.v protocols/uart/uart_rx_p.v --set COUNTER_BITS=9 WINDOW_CYCLES=256
+      - name: Require intended compiled scheduler parameters
+        run: |
+          source .venv/bin/activate
+          python -c 'import json; p=json.load(open("build/uart-trigger-fault/report.json"))["params"]; assert p["COUNTER_BITS"]==9 and p["WINDOW_CYCLES"]==256 and p["DELAY_CYCLES"]==4, p'
       - name: Generate explicitly conditional operating report
         run: |
           source .venv/bin/activate

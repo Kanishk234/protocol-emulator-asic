@@ -1,6 +1,8 @@
 # Phase 2: building and fitting the chip
 
-**Status:** in progress, updated 2026-10-14. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
+**Status:** in progress, updated 2026-10-15. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
+
+Latest milestone: [qualification38777752196](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38777752196) passes fresh all-corner timing/electrical and antenna checks, with fast hold+70.88ps. A new conservative guard also passes: estimated slew and capacitance stay below45%of their limits before detailed routing. This follows a measured roughly1.8×screen-to-extracted slew increase on earlier failures and a bounded incremental repair of16additional risk nets. Stock detailed routing/extraction is next. Phase2 and official GDS closure remain incomplete; setupWS0 is not a claim of positive global setup margin.
 
 ## The goal
 

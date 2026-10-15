@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (fanout/slew screen qualified and audited; stock route prepared)
+- Screen38676308492 succeeds;small summary artifact11946544528(1997bytes) exposed gates before bulk artifact11947551723. SetupWS0allcorners;fast/typical/slowhold72.176/168.511/339.753ps;allcorner slew/fanout/cap0;antenna0;live0overflow. EightplannedBUF4,zeroresizes;onepost-antbatch adds3BUF4/converges.
+- Canonical actual-source proposal/sourceNL/allcell-pinconnections/oldplacements/functionalclock-resetpins/boundedhistory/nativewirecleanup independently pass. Prepared exact successful-source stock DRT/extraction continuation withfreshstrictgates beforeDRT,0DRC/conservedfreshNL andfreshallcorner extractedtiming/electrical/antenna including50psfast-hold. No repair/fullGRTreplay;oldextraction preservedseparately.
+-66focused tests anddiffcheckpass. Early extractedsummaryupload retainscurrent-receipt guard;failedfinalgate printscomponent evidence. Nextpublish/launch gds-fanout-slew-route;noofficial/Phase2completionclaim;unrelatedfilesexcluded.
+
+## 2026-10-14: Codex (three-source fanout/slew screen published and queued)
+- Published toolsebb1fb2/CI0f6a3aa/docs8e08020;localHEADandremotemainverified8e0802002278fea9c790ec26ba15077ab61325af. [Fanout/slew screen38676308492](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38676308492) confirmedqueuedonexacthead.
+-70focusedtests andactual-source conservation/placement/Tcl checks pass. EightBUF4/116.1216um2;allpriorrepairs andstrictgates retained. Freshgate summariesuploadbeforebulk;nextinspectscreen,noDRTbeforequalification/noofficialorPhase2claim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (final failure confirmed; three-source fanout/slew screen prepared)
 - Completed route38668749394 artifact11945797871 confirms0DRC/0antenna,allcorner setupWS0,fast/typical/slowhold92.313/206.909/392.883ps and0cap. Only electrical failures:2fanout nets eachcorner(place7883/place8063,9loads with2/1diodes),7slow-slew rows on NAND3_1 driver43736/net16739(6loads,4diodes). Actual trace raises the combined gate legitimately; no timing or helper crash.
 - Prepared source-bound three-net load isolation:8BUF4/116.1216um2,0resizes/holdcells/offlineoverlaps. Retain all prior timing/SRAM/diode repairs and functional clocks/resets.70focused tests,actual-source complete cell/pin audit,Tclround-trip anddiffcheckpass. Early small summary upload guarded by current screen receipt; full evidence retained.

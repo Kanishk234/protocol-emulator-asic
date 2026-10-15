@@ -1,0 +1,40 @@
+# Reproduce the clean routed checkpoint from RTL
+
+The measured baseline is route/extraction [38784492656](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38784492656), followed by exact-netlist protocol regression [38796998628](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38796998628): **22 passed, no failures, errors or skips**. These runs establish the checkpoint's measured timing, electrical and exercised functional behavior. They do not establish clean-build reproduction or official GDS/LVS/precheck.
+
+## Integration preparation
+
+Prepared `/tmp/tripwire-clean-inline-official-prep-20261015` from a fresh Git archive of `3393eea9a58c5cad9077cc360a8515d0e5ec8284` plus exactly `bs_event_late.patch`. It contains the real TT wrapper, generated 2/4 specification/fabric, U0 full, 12 slots per lane and the 512-word SRAM. Metadata names the actual resources rather than the frozen spike's stale 3/6 description.
+
+- `tools/gen/gen.py --check` passes on the isolated candidate.
+- The two source lists match, with all 19 source modules present.
+- Fully timed signoff SDC hash remains `63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa`; no latch setup false path is introduced.
+- `candidate_manifest.json`, `official-hardware-review.patch`, `official-native-config-proposal.json` and `native-config-delta.json` make the integration and settings reviewable. The proposed configuration is separate and unapplied.
+- Full-wrapper RTL replay of the current 22-case suite is running locally with sigrok. The first sandboxed invocation decoded no UART bytes because libusb initialization was denied; replaying the same captured waveform outside the sandbox decoded every expected byte. The rerun uses working decoders. No RTL failure is inferred from the sandbox result.
+
+Main's hardware, frozen specification and template GDS jobs have not been replaced by this preparation.
+
+## Native electrical-margin experiment
+
+Prepared `gds-native-margin55-screen.yaml` and `native_margin_screen.py`. Starting from clean synthesis, the native AREA1/clock8/100 ps hold-target recipe enables stock post-GRT design repair with 55% slew and capacitance repair margins. This tests whether native settings can supply the conservative electrical headroom without source-bound checkpoint ECOs. Signoff timing/load constraints remain fixed at the measured 20 ns recipe; the measured fast-hold gate remains 50 ps.
+
+The pinned LibreLane 3.1.0.dev3 wheel exposes `GRT_DESIGN_REPAIR_MAX_SLEW_PCT` and `GRT_DESIGN_REPAIR_MAX_CAP_PCT` and passes them directly to OpenROAD's native `repair_design`. [OpenROAD documents these margin controls](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html#repair-design) as a way to compensate for the difference between estimated and routed parasitics. The selected reserve is motivated by the project's paired measurements and successful 0.45 utilization guard; it is an experiment, not evidence that native repair will converge or reproduce the checkpoint.
+
+The screen uses the stock image and Classic step ordering, all three repair corners, identical fully timed PNR/signoff SDC, and no checkpoint edits. It stops after native post-GRT timing repair. Fresh STA plus the read-only per-net diagnostic must independently show:
+
+1. Nonnegative setup and hold at all corners; fast hold at least 50 ps.
+2. Zero slew, fanout and capacitance violations.
+3. Zero antenna violations and final GRT overflow.
+4. Estimated slew/capacitance utilization no greater than 0.45 at all corners.
+
+Missing evidence fails closed. No detailed routing is included. Native timing repair comes after design repair and may consume its reserve, which is why the final measured guard is required.
+
+The inherited checkpoint recipe disables `ERROR_ON_MAGIC_DRC` and `ERROR_ON_ILLEGAL_OVERLAPS`. The new proposal enables both. Zero detailed-router DRC is not evidence of passing full Magic DRC or LVS.
+
+## Remaining portability gaps
+
+Clean synthesis may choose different strengths and buffering than the accumulated checkpoint repairs. Native margins also do not reproduce the custom routing reservation, source-specific fanout/hold buffers, exact positions or the live incremental repair loop. This trial must pass its own gates; a failed screen does not invalidate the passing checkpoint, and a passing screen still needs extraction and exact-netlist protocol regression.
+
+If native reproduction passes, review the full integration/configuration changes and run the unchanged official Tiny Tapeout flow on the complete selected design. If it fails, use the measured failing paths and loads to choose a general RTL or supported-flow repair. Do not copy synthesized instance-name ECOs into a clean build or weaken acceptance gates.
+
+Local helper verification: 70 focused tests pass across the native margin policy, stock runner, clock clustering and saved-checkpoint STA. Physical convergence and official signoff remain unmeasured. No Phase 2 checklist box is changed by this preparation.

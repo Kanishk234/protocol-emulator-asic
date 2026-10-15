@@ -1,6 +1,35 @@
 # TRIPWIRE work log
 
 Newest entry at the top. One entry per work session.
+
+## 2026-10-15 — Prepare clean-source integration and native margin reproduction
+
+- Prepared isolated `/tmp/tripwire-clean-inline-official-prep-20261015` from frozen3393eea plus exact event-late patch. Generation check passes; both 19-module source lists agree; signoff SDC hash matches the measured baseline. Integration patch, source manifest and unapplied native configuration proposal are available there. No main hardware/spec/config replacement.
+- Full 22-case wrapper RTL replay is running locally in managed terminal `78708`, with output `/tmp/tripwire-clean-inline-rtl-l3.log`. Restarted after confirming sandbox libusb failure suppressed sigrok output for an otherwise correctly decoded UART waveform; the rerun uses working decoders. Final result pending.
+- Prepared stock clean-synthesis `gds-native-margin55-screen`, native 55% post-GRT slew/cap repair targets, no checkpoint ECO/custom image/DRT, fresh strict timing/electrical/antenna/overflow plus 0.45 global margin guards. Added D-081 and PHASE2_CLEAN_BUILD_REPRODUCTION.md. 70 focused tests and static pinned-variable/workflow checks pass. Refreshed baseline/claims/summary with actual 22/22 routed protocol evidence.
+- No checklist boxes ticked. Next publish/launch the reviewed native reproduction screen after scoped publication approval; inspect local RTL replay and native measured failures before any DRT. Official full GDS/LVS/precheck remains outstanding.
+
+
+## 2026-10-15 — Full routed protocol regression passes
+
+- [Routed L3 run 38796998628](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38796998628) succeeded. Independently downloaded `results_l3_gl.xml`: 22 test cases, zero failures, errors or skips. Includes required UART/SPI/I2C and all currently implemented expanded L3 cases, on reviewed netlist `ac646d7424b75d53d61c5726dac5a83780753dd397e4b2b45c1a90b11ed8221d` from clean extracted route `38784492656`.
+- This is functional gate-level simulation without SDF, combined with separately passing extracted physical gates; it is not exhaustive protocol conformance or official GDS/LVS/precheck evidence.
+- No phase checklist boxes changed. Next: document/adopt the checkpoint repair recipe in a reproducible clean full-design build, then obtain official Tiny Tapeout GDS, LVS, precheck and gate-level results before closing Phase 2.
+
+
+## 2026-10-15 — Confirm breadth of routed protocol regression
+
+- User requested verification beyond UART/SPI/I2C. Inspected `l3-inline-margin-routed-gl.yaml`: it invokes the complete current `test_l3` module without a case filter, using the exact reviewed routed netlist. All 22 tests are already included, spanning required protocols plus MIDI, DMX, WS2812, DShot, servo PWM, I2S, PS/2, 1-Wire, JTAG, SWD, SMBus, HDLC, LIN, CAN and IR NEC repeat reception.
+- These are exercised cases, not exhaustive protocol conformance: SPI mode 0, standard-speed 1-Wire and limited CAN/IR cases remain narrower than roadmap capabilities. USB LS remains a model feasibility study and Ethernet has no implementation support claim.
+- No checklist boxes ticked. Next: inspect all 22 JUnit results from run `38796998628`, then distinguish uncovered modes/error paths from passing cases before broadening tests. Live status lookup in this check hit restricted network access; no run outcome inferred.
+
+
+## 2026-10-15 — Publish routed L3 regression and dispatch
+
+- Published reviewed tools, CI and timing evidence as separate commits `12ff1a1`, `1c45280`, `35c76c9`, with explicit user approval. Verified remote `main` equals `35c76c9896f91eae1c07713aa28c6c753f4b52ce`.
+- Dispatched [l3-inline-margin-routed-gl 38796998628](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38796998628), initially queued, for successful route `38784492656` and reviewed netlist SHA256 `ac646d7424b75d53d61c5726dac5a83780753dd397e4b2b45c1a90b11ed8221d`.
+- No phase boxes ticked. Next: inspect the exact routed-netlist protocol regression, then resolve clean-build recipe integration before official GDS/LVS/precheck. Experimental extracted gates pass; official signoff remains pending.
+
 - Keep entries short.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.

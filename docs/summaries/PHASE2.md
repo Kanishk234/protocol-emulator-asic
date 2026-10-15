@@ -2,7 +2,7 @@
 
 **Status:** in progress, updated 2026-10-15. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
 
-Latest milestone: [routing/extraction 38784492656](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38784492656) passes all measured timing and electrical gates after detailed routing, with zero final routing DRC and antenna violations. Fast hold is +89.75 ps; setup WS is 0 at all three corners. The conservative screen and bounded incremental repair survived extraction for this checkpoint. Exact-netlist protocol regression is next, followed by clean-build and official-flow reproduction. Phase 2 remains incomplete; setup WS 0 is not a claim of positive global setup margin. See [the measured baseline](../reports/PHASE2_CLEAN_EXTRACTED_BASELINE.md).
+Latest milestone: [routing/extraction 38784492656](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38784492656) passes all measured timing and electrical gates after detailed routing, with zero final routing DRC and antenna violations. Fast hold is +89.75 ps; setup WS is 0 at all three corners. The conservative screen and bounded incremental repair survived extraction for this checkpoint. [Exact-netlist protocol regression 38796998628](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38796998628) also passes all 22 cases. Clean-build and official-flow reproduction are next. Phase 2 remains incomplete; setup WS 0 is not a claim of positive global setup margin. See [the measured baseline](../reports/PHASE2_CLEAN_EXTRACTED_BASELINE.md).
 
 ## The goal
 

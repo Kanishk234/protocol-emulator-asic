@@ -30,7 +30,7 @@ The conservative screen followed by live, bounded electrical/antenna repair surv
 
 ## Remaining work
 
-1. Run the unchanged expanded UART/SPI/I2C L3 regression on this exact final netlist with pinned Icarus 13 and sigrok. Prepared `l3-inline-margin-routed-gl`; functional simulation does not include SDF.
+1. Completed: [expanded routed L3 run 38796998628](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38796998628) passes all 22 cases with zero failures, errors or skips on this exact netlist, using Icarus 13 and sigrok. Functional simulation does not include SDF.
 2. Preserve this checkpoint as the measured baseline while preparing a reproducible clean-build recipe. Current main's Tiny Tapeout top is still the earlier placeholder; dispatching its unchanged official workflow would not test this prototype.
 3. Review/adopt a complete real-design source/configuration candidate and an official-compatible way to reproduce the physical policy. The current experiment depends on accumulated, source-bound checkpoint ECOs; a passing checkpoint does not prove that clean synthesis or the untouched official flow reproduces it. Respect AGENTS configuration restrictions and template jobs.
 4. Obtain official full GDS/LVS/precheck/gl_test evidence and finish the remaining Phase 2 checklist. No Phase 2 completion or official green GDS claim yet.

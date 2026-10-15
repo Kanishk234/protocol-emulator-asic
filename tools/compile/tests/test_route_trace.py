@@ -138,6 +138,21 @@ def test_scalar_observer_requires_both_exact_final_route_hashes():
             trace.validate_trace_hashes(segments, targets)
 
 
+def test_d097_budget_comparison_changes_exactly_one_native_field():
+    source={'CLOCK_PERIOD':20,'CLOCK_UNCERTAINTY_CONSTRAINT':0.25,
+            'MACROS':{'fabric':'unchanged'},'meta':{'version':2}}
+    control,protected=trace.selected_policy(source,50)
+    candidate,original=trace.selected_policy(source,15)
+    assert protected==original==trace.ORIGINAL_POLICY
+    assert {key for key in control if control[key]!=candidate[key]}=={'GRT_OVERFLOW_ITERS'}
+    assert candidate['GRT_ALLOW_CONGESTION'] is False
+    for budget in (0,14,16,100,150):
+        with pytest.raises(ValueError,match='budget supported'):
+            trace.selected_policy(source,budget)
+    with pytest.raises(ValueError,match='disagree'):
+        trace.selected_policy(dict(source,GRT_ADJUSTMENT=0.1),15)
+
+
 def test_scalar_debug_instrumentation_only_adds_observation(tmp_path, monkeypatch):
     import json
     original = 'before\n' + trace.reports.COMMAND + '\nafter\n'

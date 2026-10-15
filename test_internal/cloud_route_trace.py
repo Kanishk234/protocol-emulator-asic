@@ -201,12 +201,26 @@ def authenticate_regeneration(result):
 
 
 
-def main():
+def selected_policy(config, iterations):
+    if iterations not in (15, 50):
+        raise ValueError('Only authenticated50 or D097 early-stop15 budget supported')
+    baseline, protected = routing.configure_iterations(config, dict(ORIGINAL_POLICY), 50)
+    selected = dict(baseline, GRT_OVERFLOW_ITERS=iterations)
+    if {key for key in baseline if baseline[key] != selected[key]} != (
+            {'GRT_OVERFLOW_ITERS'} if iterations == 15 else set()):
+        raise ValueError('Early-stop changes more than the iteration budget')
+    return selected, protected
+
+
+def main(iterations=50):
     if os.environ.get('GITHUB_ACTIONS') != 'true':
         raise ValueError('Native replay only on hosted runner')
+    if iterations not in (15, 50):
+        raise ValueError('Unapproved native iteration budget')
     OUT.mkdir(exist_ok=False)
     result={'diagnostic_completed':False,'physical_acceptance':False,'route_passed':False,
-            'source_run':38167697696,'reference_route_run':38453870785}
+            'source_run':38167697696,'reference_route_run':38453870785,
+            'iteration_budget':iterations,'experimental_budget':iterations!=50}
     try:
         authenticate()
         archive=ROOT/'build/fanout-preflight-source.tar.gz'
@@ -218,8 +232,9 @@ def main():
         config['CTS_SINK_CLUSTERING_SIZE']=8
         config['meta']={'version':2,'flow':['OpenROAD.GlobalRouting']}
         original=dict(ORIGINAL_POLICY)
-        config,protected=routing.configure_iterations(config,original,50)
+        config,protected=selected_policy(config,iterations)
         result['protected_routing_settings']=protected
+        result['selected_routing_settings']={key:config[key] for key in protected}
         path=OUT/'config.json';path.write_text(json.dumps(config))
         sdc=SOURCE/'padded_sta_nom_typ_1p20V_25C/final/sdc/tt_um_warp.sdc'
         if cfg.sha(sdc)!=SDC_SHA:raise ValueError('Source SDC differs')
@@ -235,13 +250,22 @@ def main():
         raw=(stage/'openroad-globalrouting.log').read_text()
         result['returncode']=process.returncode
         result['native_congestion']=routing.parse_congestion(raw)
-        if not result['native_congestion'] or result['native_congestion'][-1]['total_overflow']!=133:
-            raise ValueError('Replay no longer reproduces133')
-        if cfg.sha(stage/'native-congestion.rpt')!=REPORT_SHA:
-            raise ValueError('Replay markers differ from measured control')
-        if process.returncode==0 or 'GRT-0116' not in (stage/'native-return.txt').read_text():
-            raise ValueError('Original native failure not retained')
-        if re.findall(r'(?m)^\+ global_route -congestion_iterations (\d+)\b',raw)!=['50']:
+        overflow=result['native_congestion'][-1]['total_overflow']
+        if {row['layer']:row['resource'] for row in result['native_congestion'][:-1]} != {
+                'Metal1':16596,'Metal2':27616,'Metal3':34082,'Metal4':26432}:
+            raise ValueError('Original per-layer resources changed')
+        result['native_global_route_passed']=process.returncode==0 and overflow==0
+        if overflow:
+            if process.returncode==0 or 'GRT-0116' not in (stage/'native-return.txt').read_text():
+                raise ValueError('Native congestion failure not retained')
+        elif process.returncode!=0:
+            raise ValueError('Zero overflow still has native routing error')
+        if iterations==50:
+            if overflow!=133:
+                raise ValueError('Replay no longer reproduces133')
+            if cfg.sha(stage/'native-congestion.rpt')!=REPORT_SHA:
+                raise ValueError('Replay markers differ from measured control')
+        if re.findall(r'(?m)^\+ global_route -congestion_iterations (\d+)\b',raw)!=[str(iterations)]:
             raise ValueError('Native routing budget/call count differs')
         resolved=json.loads((stage/'config.json').read_text())
         validate_native_policy(resolved,config,original)
@@ -251,8 +275,9 @@ def main():
         (OUT/'target-segments.json').write_text(json.dumps(summary,indent=2)+'\n')
         result['segments_sha256']=cfg.sha(stage/'native-segments.txt')
         result['targets_sha256']=cfg.sha(OUT/'target-segments.json')
-        validate_trace_hashes(result['segments_sha256'], result['targets_sha256'])
-        result['final_route_segments_exact']=True
+        if iterations==50:
+            validate_trace_hashes(result['segments_sha256'], result['targets_sha256'])
+        result['final_route_segments_exact']=result['segments_sha256']==SEGMENTS_SHA and result['targets_sha256']==TARGETS_SHA
         if re.findall(r'(?m)^\+ set_debug_level GRT grtSteps (\d+)\b',raw)!=['1']:
             raise ValueError('Native scalar debug command missing or repeated')
         result['stage_scalars']=parse_stage_scalars(raw)

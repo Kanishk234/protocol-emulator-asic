@@ -72,9 +72,10 @@
       "evidence": [
         "docs/reports/research_next_20261013.md",
         "docs/reports/compact_progress_ledger_20261012.md",
-        "docs/reports/route_trace_analysis_20261015.md: all10 zero-capacity markers validate edge indexing; individual own-net release leaves44-edge cuts and no reachable macro portal"
+        "docs/reports/route_trace_analysis_20261015.md: all10 zero-capacity markers validate edge indexing; individual own-net release leaves44-edge cuts and no reachable macro portal",
+        "38778082059 at6370e1f: exact133/source/segments retained; cached2D133/assigned3D133; conditional3Dmaze calls skipped"
       ],
-      "next_action": "Research exact pinned FastRouteCore::run headless stage export around copyBR/removeLoops/layerAssignment/mazeRouteMSMDOrder3D. Existing set_debug_level GRT grtSteps 1 supplies scalar stage overflow only; GUI StTreeVisualization redrawAndPause is not a hosted tree export. Preserve exact133 final hashes; no new physical edit/workflow until a discriminating supported observer is specified.",
+      "next_action": "Inspect pinned copyBR/removeLoops/pre-assignment sttrees and prove a headless observation path; scalar diagnostic is complete. Attribute actual 2D competition before choosing any physical change.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",
@@ -156,14 +157,15 @@
       "priority": 7,
       "title": "Validate current clean-checkout user path",
       "track": "phase5",
-      "status": "ready",
+      "status": "awaiting_evidence",
       "hypothesis": "Recent host/compiler changes need current-source reproduction beyond the historical clean-run evidence.",
       "evidence": [
         "37690896748 at962da93: historical clean reproduction",
         "38293580979: compiled C actual simulated SPI pass",
-        "docs/reports/reproduction.md"
+        "docs/reports/reproduction.md",
+        "38777288608 at77edd2d: fresh hosted README reproduction running at final inspection"
       ],
-      "next_action": "Use existing hosted clean reproduction workflow for integrated SHA; authenticate expected image and XML case census.",
+      "next_action": "Inspect running38777288608 without duplicate dispatch; retain exact source scope and expected loaded/cosim census. Followup6370e1f unit814tests/37protocolentries passes separately.",
       "acceptance": [
         "Fresh pinned runner builds documented examples and passes expected loaded/cosim tests.",
         "Exact source and tool pins retained; no board/backend-speed claim."

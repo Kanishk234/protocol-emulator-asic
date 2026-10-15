@@ -85,13 +85,32 @@ For topology, inspect `FastRouteCore::getPlanarRoute`, `sttrees_[netID]` and `St
 
 `StTreeVisualization()` invokes `fastrouteRender()->redrawAndPause()`, so the GUI tree switches do not supply a proven hosted headless export. No supported stock Tcl command was established for obtaining those intermediate per-net arrays. Building a custom observer binary would add a tool-build variable and requires separate source/build authentication and control equivalence; it is not approved by this report as a casual next workflow. Prefer the existing scalar debug hook first if a new replay is warranted, while researching a headless observer or reproducer before spending on physical changes.
 
-## Scalar observer prepared; hosted execution pending
+## Scalar observer preparation (before actual run below)
 
 `test_internal/cloud_route_trace.py` now inserts only logged `set_debug_level GRT grtSteps 1` before its existing native route observation in the attributed runtime Tcl copy. It leaves the error-preserving TRACE body unchanged. Original133, exact congestion report hash, source hashes and all protected routing fields remain mandatory. It additionally **requires**, rather than merely records, full segment SHA256 `aee9b65f2cfc5f653793de924dedd919a7b68d67fa3ef3febf7ca17e3f1ad7ca` and target JSON SHA256 `f00a6206d105a949428454017fe32fa6553bf07c89428c95ac1d7ead661e37d4`. A logging-induced change in final routing rejects the observation.
 
 The parser recognizes the pinned source's exact `After LayerAssignment - 2D/3D cong: integer/integer` and `After MazeRoute3D - 3Dcong: integer` lines, without equating2D and3D metrics. Repeated stages reject; incomplete/unrecognized stage text is recorded as `parsed:false`, preserving the native log without a scalar result claim. Execution must show exactly one logged debug command. No seed, hardware, routing policy, capacities or acceptance gates change.
 
-Local focused trace tests:12PASS/2SKIP (no local Tcl interpreter), including both final-route hash rejection cases, stage grammar/missing/repeated cases and exact runtime-copy insertion. Existing error-preservation Tcl tests remain unchanged and skipped for the previously documented interpreter limitation. No local EDA was run. Existing `route_trace.yaml` can perform this bounded hosted observation; actual execution and scalar results remain pending.
+Local focused trace tests:12PASS/2SKIP (no local Tcl interpreter), including both final-route hash rejection cases, stage grammar/missing/repeated cases and exact runtime-copy insertion. Existing error-preservation Tcl tests remain unchanged and skipped for the previously documented interpreter limitation. No local EDA was run. Existing `route_trace.yaml` can perform this bounded hosted observation; execution was pending at preparation; the authenticated result follows below.
+
+## Actual scalar observation: run38778082059
+
+[38778082059](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38778082059) completesSUCCESS on exact revision `6370e1f5ae71a2d768fbe6cb87a062b2c1d21134`. The collector succeeds as a diagnostic; actual routing still fails with returncode1/GRT-0116. Its existing parser recognizes both native lines without alteration:
+
+```text
+After LayerAssignment - 2D/3D cong: 133/133
+After MazeRoute3D - 3Dcong: 133
+```
+
+The debug command appears exactly once (native log line16); the two lines are at296–297. All13 protected routing fields remain unchanged, source authentication passes before/after, report hash remains `8e2f5c5003e495d3d347be7d593bb4bbc7801723db2902c3cb530e70a157a1df`, full segment hash remains `aee9b65f2cfc5f653793de924dedd919a7b68d67fa3ef3febf7ca17e3f1ad7ca`, and target JSON hash remains `f00a6206d105a949428454017fe32fa6553bf07c89428c95ac1d7ead661e37d4`. Collector records `source_unchanged:true`, `final_route_segments_exact:true`, `stage_scalars.parsed:true`,3659nets and final133. Independent local SHA256 checks reproduce those hashes. Result JSON SHA256 `74911ca8326933bbf9fae74eb11448d7ffb6b1a13c8d9c536711fa337ea24a7c`; raw native log SHA256 `862b88560283e42f8c57122c4d447656eda9fcbe00b74066bbf5bc7ad08a3322`.
+
+**Interpretation requires the actual source condition.** The first133 is cached `past_cong` from2D negotiation; the later `getOverflow2Dmaze` after possible `copyBR()`/loop removal does not assign its return value back to that variable. It must not be described as an independently captured fresh pre-assignment tree measurement. The next133 is3D overflow measured after layer assignment. Most decisively, both `mazeRouteMSMDOrder3D(...)` calls are guarded by `if (past_cong == 0)`. With observed past_cong133, those calls are **skipped**. The line labeled `After MazeRoute3D` appears after that conditional; it does not prove3D maze repair executed.
+
+This discriminates against a hypothesis that a passing2D solution becomes133 solely during3D assignment: the cached negotiated2D metric is already133. It does not establish the four targets' intermediate topology or rule out compensating layer-assignment changes. Existing2D congestion prevents this native flow from attempting its conditional3D maze refinement. Final scalar133 matching the original133 is diagnostic evidence, not progress toward acceptance.
+
+No additional route replay or parser change is necessary to interpret these retained lines. The remaining useful next source investigation is the last best2D checkpoint (`copyBR`), subsequent `removeLoops`, and exact per-net `sttrees_` geometry immediately before assignment, joined to the already measured north/south throat occupancy. A forced3D repair or modified router would be a new algorithm experiment requiring its own decision/control evidence; this observation does not authorize claiming its success. No physical edit is selected.
+
+Artifacts are retained locally at `build/autonomy_stage_trace/compact-route-trace-38778082059/`. No local EDA was run for this analysis, and no phase boxes are ticked.
 
 ## Reproduction
 

@@ -2,6 +2,18 @@
 
 **Status:** v1, written 2026-09-26 at the end of phase 1. Every check has an ID; bugs in `docs/BUGS.md` name the check that caught them and the one that now covers them.
 
+**Current-status pointer (2026-10-15):** the v1 status cells below are historical
+planning notes, not the latest execution ledger. Use
+[`EVIDENCE.md`](../EVIDENCE.md), [`WORKLOG.md`](../WORKLOG.md),
+the [phase5 audit](../reports/evidence_audit_20261015.md) and
+[autonomous integration evidence](../reports/autonomous_integration_20261015.md)
+for actual run identities and scope. Real-fabric protocol/cosim evidence now
+uses strict executed-case XML checks; fixed-divisor UART registers only its
+applicable tests. An `efpga`-only nightly schedule is not configured: repository
+default `main` is TRIPWIRE. See the
+[active-session operating procedure](AUTONOMOUS_DEVELOPMENT.md) for test
+supervision, failure classification and continuation.
+
 ## Principles
 - **Independent references.** Reference models (`tools/refmodels/`) are written from the protocol specifications before, and without reading, the RTL they check. Where sigrok has a decoder, it is a second, fully independent oracle. Honest limit so far: one author wrote models and RTL, so independence is by order of writing plus sigrok.
 - **Real interfaces.** Pin-level tests (`test/`) touch only top-level ports and also run on the gate-level netlist (`gl_test`). Bitstreams are loaded through the real host interface (ARCHITECTURE §2–3), never pre-initialized, except in the labelled fast "emulation" mode (V2).

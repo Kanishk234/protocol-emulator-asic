@@ -29,10 +29,35 @@ GitHub archive digests are API-reported identities; the supervisor computes per-
 
 Unit38777137520 correctly fails after strict XML validation encounters the inapplicable runtime-divisor test in fixed-divisor variants. BUG89 corrects discovery rather than relaxing evidence checks. The corrected UART matrix requires seven fixed/eight runtime cases. Hosted corrected result is recorded in WORKLOG after the follow-up push.
 
+**Actual correction:** unit38778082137 succeeds on
+`6370e1f5ae71a2d768fbe6cb87a062b2c1d21134`; all protocol matrix steps run with
+strict XML checks. Test38778081786/lint38778081814/docs38778082198 and
+autonomy38778081816 also succeed on this revision. See
+[UART discovery evidence](unit_xml_discovery_20261015.md) for the actual census.
+
+**Real supervisor dispatch:** a separate bounded campaign was launched with
+`--tasks c-host --launch --max-launches 1`. Its persisted state reports exactly
+one launch, then independently verifies run38778194236 attempt1 on6370e1f.
+The workflow's requested-SHA guard passes before provisioning. Actual C image
+SHA256 remains `14b61127da67dbb37d68e746f5720675a809b03ce315c4a6090bbcf1bcf1d8ed`.
+Artifact ID11993564422 has GitHub API archive digest
+`sha256:1c79f001bcdc8ff7a65c46167de5fe89964e28dc0d4c9359d16e8b2d70e162a0`;
+downloaded XML/report/image and per-file fingerprints pass. This validates
+real dispatch, persistent discovery and artifact acceptance, not only mocks.
+Both bounded local campaigns finish naturally after their checks are verified.
+
 The same checker now covers fabric loaded/cosim and local default protocol runs. The shell-only idle suite intentionally skips real-fabric cases and remains a distinct check. Broader tools locally reported785PASS/9SKIP before follow-up tests; the skipped cloud-only HDL and unavailable Tcl checks were never counted as passes.
 
 ## Continue the engineering loop
 
 The routing specialist authenticated grid-to-segment indexing, accounted for blockage encoding and tested per-net own-allocation release. Each target still faces a saturated cut; arbitrary seed42 is withdrawn in view of rejected seed41. The next useful step is staged topology observation on the exact133 control, with unchanged final markers/segments required. See [route analysis](route_trace_analysis_20261015.md).
+
+The scalar observation has now run successfully in38778082059: all source,
+marker and full/selected segment hashes match the133 control. Actual cached
+2D overflow and assigned3D overflow are both133. Pinned source skips3Dmaze
+calls when unresolved2D congestion remains, so the later stage label is not
+proof that3D repair executed. This supports investigating actual2D negotiation
+and tree restoration before a physical intervention; it does not establish
+selected-net topology or feasible capacity.
 
 Use the [active-session playbook](../design/AUTONOMOUS_DEVELOPMENT.md) and [backlog](../autonomy/backlog.json). Agents perform research and implementation in the live session. The bounded supervisor automates test dispatch/collection; no continuing AI process after chat closure is claimed.

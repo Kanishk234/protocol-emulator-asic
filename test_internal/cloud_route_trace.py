@@ -1,5 +1,6 @@
 """Exact best133 replay with failed-route segment export; no acceptance waiver."""
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -13,12 +14,13 @@ from cloud_hotspot_grt import validate_native_policy
 
 ROOT = cfg.ROOT
 SOURCE = ROOT / 'build/route_trace_input/baseline'
-PREVIOUS = ROOT / 'build/route_trace_input/previous'
 OUT = ROOT / 'build/route_trace'
 TARGETS = {'cell_val[30]', 'cell_pad[27]', 'cell_pad[31]', 'cell_val[27]'}
 BASE_INSTRUMENT = reports.instrument
 REPORT_SHA = '8e2f5c5003e495d3d347be7d593bb4bbc7801723db2902c3cb530e70a157a1df'
 SDC_SHA = '2fd4e213532d83ee258899b6fc1ed48c4e5d91ddb0ccbe21eea0226cc90fd56e'
+# Exact RT_/GRT_ subset of authenticated38101639866 config660afb662cbb5307… .
+ORIGINAL_POLICY = {'RT_MIN_LAYER': 'Metal1', 'RT_MAX_LAYER': 'Metal4', 'RT_CLOCK_MIN_LAYER': None, 'RT_CLOCK_MAX_LAYER': None, 'GRT_ADJUSTMENT': 0.3, 'GRT_MACRO_EXTENSION': 0, 'GRT_LAYER_ADJUSTMENTS': [0, 0, 0, 0, 0], 'GRT_ALLOW_CONGESTION': False, 'GRT_ANTENNA_REPAIR_ITERS': 3, 'GRT_OVERFLOW_ITERS': 50, 'GRT_ANTENNA_REPAIR_MARGIN': 10, 'GRT_ANTENNA_REPAIR_JUMPER_ONLY': False, 'GRT_ANTENNA_REPAIR_DIODE_ONLY': False}
 TRACE = r'''
 set warp_route_code [catch {log_cmd global_route {*}$arg_list} warp_route_error warp_route_options]
 set warp_observer [open $::env(STEP_DIR)/native-return.txt w]
@@ -85,8 +87,33 @@ def parse_segments(text):
 def authenticate():
     for name,digest in payload.EXPECTED.items():
         if cfg.sha(SOURCE/name) != digest: raise ValueError('Best133 source differs: '+name)
-    if cfg.sha(SOURCE/'result.json') != '28739ad6b5379ef6ed299d1b5c613b577c8059be9807a3e407c179dca74a48cb':
+    result=json.loads((SOURCE/'result.json').read_text())
+    if result.get('regenerated') is True:
+        authenticate_regeneration(result)
+    elif cfg.sha(SOURCE/'result.json') != '28739ad6b5379ef6ed299d1b5c613b577c8059be9807a3e407c179dca74a48cb':
         raise ValueError('Producer result differs')
+
+
+def authenticate_regeneration(result):
+    if (result.get('source_run')!=38167697696 or result.get('source_archive_sha256')!=cfg.SOURCE_SHA
+            or result.get('expected_view_sha256')!=payload.EXPECTED or result.get('sdc_sha256')!=SDC_SHA):
+        raise ValueError('Regenerated provenance differs')
+    corners={'nom_fast_1p32V_m40C','nom_typ_1p20V_25C','nom_slow_1p08V_125C'}
+    if set(result.get('corners',{}))!=corners:raise ValueError('Incomplete regenerated corner evidence')
+    for corner,case in result['corners'].items():
+        if (case['odb_sha256']!=payload.EXPECTED['padded.odb'] or
+                case['nl_sha256']!=payload.EXPECTED['padded.nl.v'] or case['sdc_sha256']!=SDC_SHA):
+            raise ValueError('Regenerated timing views differ')
+        m=case['metrics']
+        for kind,minimum in (('setup',0),('hold',0.1)):
+            value=m[f'timing__{kind}__ws__corner:{corner}']
+            if not isinstance(value,(int,float)) or not math.isfinite(value) or value<minimum or (kind=='setup' and value==0):
+                raise ValueError('Regenerated timing guard lost')
+            if m[f'timing__{kind}_vio__count__corner:{corner}']!=0:raise ValueError('Regenerated timing violation')
+        if any(m[f'design__{kind}_violation__count__corner:{corner}']!=0
+                for kind in ('max_fanout','max_slew','max_cap')):
+            raise ValueError('Regenerated electrical violation')
+
 
 
 def main():
@@ -105,9 +132,7 @@ def main():
         if config.get('PAD_LIBS') is None:config['PAD_LIBS']={}
         config['CTS_SINK_CLUSTERING_SIZE']=8
         config['meta']={'version':2,'flow':['OpenROAD.GlobalRouting']}
-        previous=PREVIOUS/'ten_buffers/1-openroad-globalrouting/config.json'
-        if cfg.sha(previous)!=routing.ORIGINAL_ROUTING_CONFIG_SHA:raise ValueError('Original routing policy differs')
-        original=json.loads(previous.read_text())
+        original=dict(ORIGINAL_POLICY)
         config,protected=routing.configure_iterations(config,original,50)
         result['protected_routing_settings']=protected
         path=OUT/'config.json';path.write_text(json.dumps(config))

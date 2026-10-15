@@ -84,3 +84,8 @@ def test_global_margin_checks_legal_rows_at_every_corner(tmp_path, actual, passe
     result=json.loads((tmp_path/'gates.json').read_text())
     assert result['qualified'] is passes
     assert result['estimated_margin_pass'] is passes
+    for corner in CORNERS:
+        rows = result['estimated_margin_offenders'][corner]['slew']
+        assert [r['net'] for r in rows] == ([] if passes else ['n'])
+        if rows:
+            assert rows[0]['pin'] == 'sink/A'

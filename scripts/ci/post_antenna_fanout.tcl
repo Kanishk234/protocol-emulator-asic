@@ -6,7 +6,7 @@ proc tripwire_json_string {value} {
     return "\"$safe\""
 }
 
-proc tripwire_post_antenna_groups {iteration} {
+proc tripwire_post_antenna_groups {iteration {margin_sources {}}} {
     set block [ord::get_db_block]
     set groups {}
     set next_index 0
@@ -19,7 +19,8 @@ proc tripwire_post_antenna_groups {iteration} {
             if {$pin in {X Y Q}} {lappend drivers $term} else {lappend sinks $term}
         }
         if {$protected || [llength [$net getBTerms]]} {continue}
-        if {[llength $sinks]<=8} {continue}
+        set canonical [tripwire_electrical_net_name [$net getName]]
+        if {[llength $sinks]<=8 && ![dict exists $margin_sources $canonical]} {continue}
         if {[llength $sinks]>32} {error "Post-antenna source exceeds bounded fanout tree"}
         if {[llength $drivers]!=1} {error "Ambiguous overloaded post-antenna data net"}
         set driver [lindex $drivers 0];set anchor [$driver getInst]

@@ -6,7 +6,7 @@ from event_nor2_screen import logical_cells,validate_antenna_only_changes
 from electrical_repair_plan import validate_change
 
 
-def validate_batch(before,after,proposal,iteration):
+def validate_batch(before,after,proposal,iteration,reviewed_sources=None):
     if set(proposal)!={'groups'} or not isinstance(proposal['groups'],list):raise ValueError('Invalid post-antenna receipt')
     groups=proposal['groups']
     if iteration not in (0,1) or not 1<=len(groups)<=32:raise ValueError('Post-antenna batch exceeds reviewed budget')
@@ -33,7 +33,7 @@ def validate_batch(before,after,proposal,iteration):
                 attached.append((name,pin))
                 if pin in ('X','Y','Q'):drivers.append((name,pin,master))
                 if pin in ('CLK','GCLK','GATE','RESET_B'):raise ValueError('Protected post-antenna source')
-        if len(drivers)!=1 or len(attached)-1<=8 or not drivers[0][2].startswith('sg13cmos5l_'):
+        if len(drivers)!=1 or (len(attached)-1<=8 and source not in (reviewed_sources or ())) or not drivers[0][2].startswith('sg13cmos5l_'):
             raise ValueError('Source is not a unique overloaded standard-cell data net')
         sources.setdefault(source,set())
         for sink in group['sinks']:
@@ -48,7 +48,7 @@ def validate_batch(before,after,proposal,iteration):
     return len(groups)
 
 
-def audit(before,after,root,log):
+def audit(before,after,root,log,margin_audit=None):
     root=Path(root);receipts=sorted(root.glob('postant_*.json'))
     if len(receipts)>2:raise ValueError('Too many post-antenna batches')
     match=re.findall(r'TRIPWIRE post-antenna fanout: converged after (\d+) batches',log)
@@ -59,7 +59,8 @@ def audit(before,after,root,log):
         first=(root/f'postant_{iteration}.before.nl.v').read_text()
         last=(root/f'postant_{iteration}.after.nl.v').read_text()
         validate_antenna_only_changes(previous,first)
-        count=validate_batch(first,last,json.loads(path.read_text()),iteration)
+        reviewed=margin_audit(root,iteration) if margin_audit is not None else None
+        count=validate_batch(first,last,json.loads(path.read_text()),iteration,reviewed)
         if f'TRIPWIRE post-antenna fanout: batch {iteration} added {count} BUF4 cells' not in log:
             raise ValueError('Post-antenna batch log mismatch')
         total+=count;previous=last

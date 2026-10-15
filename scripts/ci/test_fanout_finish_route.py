@@ -30,3 +30,18 @@ def test_workflow_uses_successful_screen_and_shared_stock_continuation():
     assert d['with']['run-id']==38652802189 and d['with']['name']=='gds-fanout-finish-screen-38652802189'
     assert any(s.get('run')=='python workflow-src/scripts/ci/fanout_finish_route.py' for s in steps)
     assert not any('GlobalRouting' in s.get('run','') or 'docker build' in s.get('run','') for s in steps)
+
+
+def test_gate_evidence_is_published_before_bulk_only_with_fresh_receipt():
+    import yaml
+    root=Path(__file__).resolve().parents[2]
+    w=yaml.safe_load((root/'.github/workflows/gds-fanout-finish-route.yaml').read_text())
+    uploads=[s for s in w['jobs']['harden']['steps'] if 'upload-artifact@' in s.get('uses','')]
+    assert len(uploads)==2
+    summary,bulk=uploads
+    assert summary['if']=="always() && hashFiles('runs/fanout-finish-route/extracted_gates.json') != ''"
+    assert 'electrical_summary.json' in summary['with']['path']
+    assert 'corner_summary.json' in summary['with']['path']
+    assert 'extracted_gates.json' in summary['with']['path']
+    assert summary['with']['name']!=bulk['with']['name']
+    assert 'runs/**' in bulk['with']['path']

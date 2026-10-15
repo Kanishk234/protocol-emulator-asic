@@ -139,6 +139,18 @@ jobs:
         timeout-minutes: 325
         run: python workflow-src/scripts/ci/fanout_finish_route.py
 
+      - name: Upload extracted gate summaries first
+        if: always() && hashFiles('runs/fanout-finish-route/extracted_gates.json') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-fanout-finish-route-gates-${{ github.run_id }}
+          path: |
+            runs/fanout-finish-route/extracted_gates.json
+            runs/extracted-timing/corner_summary.json
+            runs/extracted-timing/electrical_summary.json
+            runs/extracted-timing/*-openroad-checkantennas/or_metrics_out.json
+          if-no-files-found: error
+
       - name: Upload matched screen evidence
         if: always()
         uses: actions/upload-artifact@v7

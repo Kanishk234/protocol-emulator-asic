@@ -64,10 +64,7 @@ for mk in protocols/*/test/Makefile; do
   step "$d: protocol RTL tests (default configuration)"
   rm -f "$d/results.xml"
   make -C "$d" >/dev/null
-  if grep -q failure "$d/results.xml"; then
-    echo "error: failures in $d/results.xml" >&2
-    exit 1
-  fi
+  python tools/autonomy/check_xml.py "$d/results.xml"
   echo "ok"
 done
 

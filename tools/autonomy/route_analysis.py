@@ -93,7 +93,42 @@ def residual_connectivity(path, targets):
     for row in rows[3:]:
         _, layer, x, y, capacity, usage = row.split('\t')
         cells[layer, int(x), int(y)] = float(capacity)-float(usage)
-    return residual_paths(cells, len(xs)-1, len(ys)-1, targets)
+    original = residual_paths(cells, len(xs)-1, len(ys)-1, targets)
+    released = {}
+    for name, segments in targets.items():
+        own = planar_edges(segments)
+        adjusted = dict(cells)
+        for edge in own:
+            if edge not in adjusted:
+                raise ValueError('Own route edge outside observed grid')
+            adjusted[edge] += 1
+        observation = residual_paths(adjusted, len(xs)-1, len(ys)-1, {name: segments})[name]
+        observation['released_unique_planar_edges'] = len(own)
+        observation['scope'] = 'Read-only unit own-allocation release; free vias; boundary access exempt; not a negotiated reroute'
+        released[name] = observation
+    return {'original': original, 'one_target_released': released}
+
+
+def planar_edges(segments):
+    """Native positive-direction edge indices, once per net/layer edge."""
+    edges = set()
+    for x, y, layer, xx, yy, other in segments:
+        if layer != other:
+            continue
+        if any((value-3600) % 7200 for value in (x,y,xx,yy)):
+            raise ValueError('Segment is not on observed grid centers')
+        a,b,aa,bb = ((value-3600)//7200 for value in (x,y,xx,yy))
+        if y == yy:
+            if layer not in ('Metal1', 'Metal3'):
+                raise ValueError('Nonpreferred planar segment cannot be released')
+            edges.update((layer, i, b) for i in range(min(a,aa),max(a,aa)))
+        elif x == xx:
+            if layer not in ('Metal2', 'Metal4'):
+                raise ValueError('Nonpreferred planar segment cannot be released')
+            edges.update((layer, a, j) for j in range(min(b,bb),max(b,bb)))
+        else:
+            raise ValueError('Diagonal planar segment')
+    return edges
 
 
 def residual_paths(cells, nx, ny, targets, box=(121440, 15120, 1241760, 684180)):
@@ -144,10 +179,19 @@ def residual_paths(cells, nx, ny, targets, box=(121440, 15120, 1241760, 684180))
                 if q not in distances:
                     distances[q] = distances[p]+1
                     queue.append(q)
+        cut = []
+        for x,y in distances:
+            for xx,yy in ((x-1,y),(x+1,y),(x,y-1),(x,y+1)):
+                if not (0 <= xx < nx and 0 <= yy < ny) or not outside((xx,yy)) or (xx,yy) in distances:
+                    continue
+                layers = ('Metal1', 'Metal3') if y == yy else ('Metal2', 'Metal4')
+                cut.append({'from': (x,y), 'to': (xx,yy), 'residual': {
+                    layer: cells.get((layer,min(x,xx),min(y,yy)),0) for layer in layers}})
         result[name] = {'reachable_peripheral_centers': len(distances),
             'shell_terminals_reachable': [p in distances for p in starts],
             'macro_portals': [{'grid_index':p, 'reachable':p in distances,
                 'static_path_dbu':distances[p]*7200 if p in distances else None} for p in portals],
+            'saturated_cut_edges': sorted(cut, key=lambda item: (item['from'],item['to'])),
             'scope': 'Optimistic free-via static residual graph; own net usage retained; boundary pin-access step exempt'}
     return result
 

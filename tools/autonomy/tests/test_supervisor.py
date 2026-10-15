@@ -2,6 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
+import random
 
 import pytest
 
@@ -291,3 +292,75 @@ def test_resumed_verified_evidence_is_rechecked_before_reusing_status(tmp_path, 
     assert resumed["tasks"]["active-cancel"]["status"] == "evidence_rejected"
     assert not any(call[:2] in (("workflow", "run"), ("run", "download"))
                    for call in github.calls)
+
+
+def phase_bundle(directory):
+    """Producer's fixed campaign matrix, with explicit per-row observations."""
+    xml(directory / "results.xml", '<testsuite><testcase name="uart_phase_and_read_delay"/></testsuite>')
+    trace = {"scope": "frozen_G1_SPI_loaded_RTL_function_only",
+             "bitfile_sha256": "a" * 64, "physical_or_timing_acceptance": False,
+             "passed": True, "cases": []}
+    for seed in (11, 20261007, 0x57415250):
+        rng = random.Random(seed)
+        sent_values = [0, 255, 0x55, 0xAA, 1, 0x80, 0xFE, 0x7F]
+        sent_values += [rng.randrange(256) for _ in range(8)]
+        for index, sent in enumerate(sent_values):
+            phases = ([1] * 10 if index == 0 else [19] * 10 if index == 1
+                      else [rng.randrange(1, 20) for _ in range(10)])
+            trace["cases"].append({"seed": seed, "index": index, "sent": sent,
+                                   "edge_phases_ns": phases,
+                                   "read_delay_clocks": rng.randrange(129),
+                                   "rx_valid_before_read": True,
+                                   "received": sent, "user_status": 0})
+    write(directory / "phase_trace.json", trace)
+    return trace
+
+
+def test_phase_trace_accepts_complete_observed_campaign(tmp_path, monkeypatch):
+    monkeypatch.setattr(s, "phase_fixture_sha", lambda revision: "a" * 64)
+    phase_bundle(tmp_path)
+    result = s.validate_evidence(tmp_path, "phase", REV)
+    assert result["test"] == "uart_phase_and_read_delay"
+    assert result["physical_acceptance"] is result["timing_acceptance"] is False
+
+
+@pytest.mark.parametrize("mutation", [
+    "duplicate", "missing", "wrong_seed", "wrong_index", "mismatch", "not_ready",
+    "framing", "overrun", "phase_count", "phase_range", "delay_range",
+    "invalid_byte", "physical_claim", "wrong_image",
+])
+def test_phase_trace_rejects_false_green_or_incomplete_observations(tmp_path, mutation, monkeypatch):
+    monkeypatch.setattr(s, "phase_fixture_sha", lambda revision: "a" * 64)
+    trace = phase_bundle(tmp_path)
+    row = trace["cases"][0]
+    if mutation == "duplicate":
+        trace["cases"][-1] = dict(row)
+    elif mutation == "missing":
+        trace["cases"].pop()
+    elif mutation == "wrong_seed":
+        row["seed"] = 99
+    elif mutation == "wrong_index":
+        row["index"] = 16
+    elif mutation == "mismatch":
+        row["received"] = row["sent"] ^ 1
+    elif mutation == "not_ready":
+        row["rx_valid_before_read"] = False
+    elif mutation == "framing":
+        row["user_status"] = 4
+    elif mutation == "overrun":
+        row["user_status"] = 2
+    elif mutation == "phase_count":
+        row["edge_phases_ns"].pop()
+    elif mutation == "phase_range":
+        row["edge_phases_ns"][0] = 20
+    elif mutation == "delay_range":
+        row["read_delay_clocks"] = 129
+    elif mutation == "invalid_byte":
+        row["sent"] = row["received"] = 256
+    elif mutation == "physical_claim":
+        trace["physical_or_timing_acceptance"] = True
+    else:
+        trace["bitfile_sha256"] = "b" * 64
+    write(tmp_path / "phase_trace.json", trace)
+    with pytest.raises(ValueError):
+        s.validate_evidence(tmp_path, "phase", REV)

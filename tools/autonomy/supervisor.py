@@ -45,6 +45,12 @@ def sha(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def phase_fixture_sha(revision):
+    data = subprocess.check_output(["git", "show", f"{revision}:test/bitstreams/uart16.wbit"],
+                                   cwd=ROOT, timeout=10)
+    return hashlib.sha256(data).hexdigest()
+
+
 def one(directory, name):
     paths = list(directory.rglob(name))
     if len(paths) != 1:
@@ -75,8 +81,25 @@ def validate_evidence(directory, kind, revision):
     if kind == "phase":
         result["test"] = strict_xml(one(directory, "results.xml"))
         trace = json.loads(one(directory, "phase_trace.json").read_text())
-        if result["test"] != "uart_phase_and_read_delay" or trace.get("passed") is not True or len(trace.get("cases", [])) != 48:
+        cases = trace.get("cases", [])
+        expected = {(seed, index) for seed in (11, 20261007, 0x57415250) for index in range(16)}
+        if (result["test"] != "uart_phase_and_read_delay" or trace.get("passed") is not True or
+                trace.get("scope") != "frozen_G1_SPI_loaded_RTL_function_only" or
+                trace.get("physical_or_timing_acceptance") is not False or len(cases) != 48 or
+                {(c["seed"], c["index"]) for c in cases} != expected):
             raise ValueError("Incomplete phase sweep")
+        for case in cases:
+            phases = case["edge_phases_ns"]
+            if (type(case["sent"]) is not int or not 0 <= case["sent"] <= 255 or
+                    case["received"] != case["sent"] or case["rx_valid_before_read"] is not True or
+                    type(case["user_status"]) is not int or not 0 <= case["user_status"] <= 255 or
+                    case["user_status"] & 0x06 or len(phases) != 10 or
+                    any(type(p) is not int or not 1 <= p <= 19 for p in phases) or
+                    type(case["read_delay_clocks"]) is not int or not 0 <= case["read_delay_clocks"] <= 128):
+                raise ValueError("Invalid or contradictory phase observation")
+        # Bind to the run's revision, even after this checkout advances.
+        if trace.get("bitfile_sha256") != phase_fixture_sha(revision):
+            raise ValueError("Phase sweep image differs from committed fixture")
     elif kind in ("cancel", "c-host"):
         result["test"] = strict_xml(one(directory, "loaded_results.xml"))
         expected_test = "test_active_window_cancel_loaded" if kind == "cancel" else "test_portable_c_host_loaded"

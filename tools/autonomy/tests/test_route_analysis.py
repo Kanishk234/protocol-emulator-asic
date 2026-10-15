@@ -39,3 +39,12 @@ def test_residual_graph_switches_preferred_layers_and_keeps_own_usage():
     cells['Metal4',1,0] = 0
     result = module.residual_paths(cells, 2, 2, {'net':segments}, (100000,100000,200000,200000))['net']
     assert result['shell_terminals_reachable'] == [True, False]
+
+
+def test_native_edge_indexing_reversed_segments_and_duplicate_occupancy():
+    horizontal = [18000,10800,'Metal3',3600,10800,'Metal3']
+    vertical = [3600,18000,'Metal2',3600,3600,'Metal2']
+    assert module.planar_edges([horizontal, horizontal, vertical]) == {
+        ('Metal3',0,1), ('Metal3',1,1), ('Metal2',0,0), ('Metal2',0,1)}
+    with pytest.raises(ValueError, match='Nonpreferred'):
+        module.planar_edges([[3600,3600,'Metal2',10800,3600,'Metal2']])

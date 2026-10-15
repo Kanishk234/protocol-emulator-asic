@@ -46,6 +46,16 @@ w.stop()                                       # every fabric pin parked
 
 Limits: the shell needs every SPI pin level to last 4 project clocks; MicroPython pin writes take microseconds, so any project clock of 1 MHz or more is safe. No SPI hardware peripheral is used (the host pins are ordinary project inputs).
 
+If pin I/O raises an exception or the transfer is interrupted, `xfer` attempts
+to release CS with SCK and MOSI low, keeps FAB_IN unchanged, and re-raises the
+original exception. It does not retry the command. Some bytes or a complete
+command may already have reached the chip; a failed channel write or read has
+an uncertain outcome. Restore the transport before inspecting chip status and
+choosing recovery. An interrupted configuration load should be restarted from
+`LOAD_BEGIN` with a complete checked image while the chip is stopped. If idle
+cleanup also fails, re-establish CS high and the required idle interval before
+any new transaction. Successful cleanup does not undo chip state changes.
+
 ## Tested
 
 - `tools/board/tests/test_warp.py` (pytest): transactions, CRC (incl. the pure-Python fallback), `.wbit` parsing and status decoding equal the reference host (`tools/host/protocol.py`) and bitstream code, byte for byte.

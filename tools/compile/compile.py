@@ -533,7 +533,18 @@ def main(argv=None):
             name, sep, value = kv.partition("=")
             if not sep or not name:
                 raise CompileError(f"--set {kv!r}: expected NAME=VALUE")
-            overrides[name] = int(value, 0) if re.fullmatch(r"-?(0[xXbBoO])?[0-9a-fA-F_]+", value) else value
+            # Keep Verilog expressions/literals as strings for Yosys. Only
+            # plain integer-like values belong to the host integer parser;
+            # bare identifiers such as "face" are not hexadecimal numbers.
+            if re.fullmatch(r"[+-]?[0-9][A-Za-z0-9_]*", value):
+                unsigned = value.lstrip("+-")
+                base = 0 if unsigned.lower().startswith(("0x", "0b", "0o")) else 10
+                try:
+                    overrides[name] = int(value, base)
+                except ValueError as exc:
+                    raise CompileError(f"--set {kv!r}: invalid integer literal") from exc
+            else:
+                overrides[name] = value
         path, rep = compile_design(a.sources, a.pins, a.arch, a.out, a.seed,
                                    set_params=overrides, strict_ports=a.strict_ports)
     except CompileError as e:

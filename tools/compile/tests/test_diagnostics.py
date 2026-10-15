@@ -140,3 +140,36 @@ def test_cli_parameter_groups_preserve_every_override(monkeypatch, arguments, ex
     assert compiler.main(["user.v", "--pins", "pins.yaml", "-o", "unused",
                           *arguments]) == 0
     assert captured == expected
+
+
+@pytest.mark.parametrize("value,expected", [
+    ("face", "face"), ("dead", "dead"), ("FALSE", "FALSE"),
+    ("8'hff", "8'hff"), ("'0", "'0"), ("1.5", "1.5"),
+    ("8+1", "8+1"), ("1<<4", "1<<4"), ("8/2", "8/2"),
+    ("42", 42), ("08", 8), ("-12", -12), ("+12", 12),
+    ("1_024", 1024), ("0xFa_ce", 0xFACE), ("-0x10", -16),
+    ("+0b10", 2), ("0o17", 15), ("-0o10", -8),
+])
+def test_cli_preserves_strings_and_parses_integer_formats(monkeypatch, value, expected):
+    captured = {}
+    def compile_stub(*args, **kwargs):
+        captured.update(kwargs["set_params"])
+        raise compiler.CompileError("stop after parameter capture")
+    monkeypatch.setattr(compiler, "compile_design", compile_stub)
+    assert compiler.main(["user.v", "--pins", "pins.yaml", "-o", "unused",
+                          "--set", "VALUE=" + value]) == 1
+    assert captured == {"VALUE": expected}
+
+
+@pytest.mark.parametrize("value", ["0b2", "0o8", "0xGG", "0x", "12oops", "1__2"])
+def test_cli_malformed_integer_is_actionable_before_compile(monkeypatch, capsys, value):
+    def unexpected_compile(*args, **kwargs):
+        pytest.fail("malformed parameter reached compilation")
+    monkeypatch.setattr(compiler, "compile_design", unexpected_compile)
+    assert compiler.main(["user.v", "--pins", "pins.yaml", "-o", "unused",
+                          "--set", "VALUE=" + value]) == 1
+    error = capsys.readouterr().err
+    assert "compile: error:" in error
+    assert "invalid integer literal" in error
+    assert "VALUE=" + value in error
+    assert "Traceback" not in error

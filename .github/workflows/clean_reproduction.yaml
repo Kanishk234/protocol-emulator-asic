@@ -60,6 +60,8 @@ jobs:
           path: |
             build/clean_reproduction/
             build/uart/report.json
+            build/uart/*.wbit
             build/uart/*.log
             build/compile/*/report.json
+            build/compile/*/*.wbit
           retention-days: 3

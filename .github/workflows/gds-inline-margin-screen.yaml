@@ -159,6 +159,20 @@ jobs:
             runs/inline-margin-screen/antenna/*-openroad-checkantennas/or_metrics_out.json
           if-no-files-found: error
 
+      - name: Upload repair audit evidence before bulk
+        if: always() && hashFiles('runs/inline-margin-screen/grt/*/openroad-globalrouting.log') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-inline-margin-audit-${{ github.run_id }}
+          path: |
+            runs/inline-margin-screen/grt/*/postant_*.json
+            runs/inline-margin-screen/grt/*/postant_*.nl.v
+            runs/inline-margin-screen/grt/*/postant_margin_*.rpt
+            runs/inline-margin-screen/grt/*/after_edits.nl.v
+            runs/inline-margin-screen/grt/*/*.eco.nl.v
+            runs/inline-margin-screen/grt/*/openroad-globalrouting.log
+          if-no-files-found: error
+
       - name: Upload matched screen evidence
         if: always()
         uses: actions/upload-artifact@v7

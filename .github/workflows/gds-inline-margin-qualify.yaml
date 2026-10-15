@@ -1,0 +1,188 @@
+name: gds-inline-margin-qualify
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gds-inline-margin-qualify-38773856018
+  cancel-in-progress: false
+
+jobs:
+  harden:
+    name: Reaudit saved inline margin repair and qualify fresh timing
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      GRT_ADJUSTMENT: "0.16"
+      ALL_CORNER_REPAIR: "1"
+      VARIANT: bs-event-late
+      NATIVE_MAPPING_STRATEGY: AREA 1
+      NATIVE_ROUTE_PROFILE: clock8
+
+    steps:
+      - name: Check out the measured R4 candidate
+        uses: actions/checkout@v6
+        with:
+          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check out experiment helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Apply exactly one independent timing trial
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          python workflow-src/scripts/ci/timing_trial.py
+          sha256sum src/config.json src/trw_chan_port.v src/trw_pin_bs.v src/trw_pin_rx.v src/trw_pin_io.v
+
+      - name: Check out Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: ihp-sg13cmos5l
+          path: tt
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tt/requirements.txt
+
+      - name: Install Tiny Tapeout prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+
+      - name: Install flow dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: Install IHP PDK
+        run: ./.tt-gds-action/install_sg13cmos5l.sh
+
+      - name: Install pinned LibreLane
+        run: pip install librelane==3.1.0.dev3
+
+      - name: Validate candidate and prepare generated config
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          grt_adjustment = os.environ["GRT_ADJUSTMENT"]
+          assert grt_adjustment in {"0.12", "0.16"}, grt_adjustment
+
+          cfg = json.loads(Path("src/config.json").read_text())
+          assert float(cfg["CLOCK_PERIOD"]) == 20.0
+          assert int(cfg["PL_TARGET_DENSITY_PCT"]) == 56
+
+          defs = Path("src/trw_defs.vh").read_text().splitlines()
+          expected = {
+              "TRW_LANES": "2",
+              "TRW_UNITS": "4",
+              "TRW_PC_UNITS_PULSE": "4'b0001",
+              "TRW_PC_UNITS_CARRIER": "4'b0001",
+              "TRW_PC_UNITS_BITSYNC": "4'b0001",
+          }
+          for name, value in expected.items():
+              assert f"`define {name} {value}" in defs, name
+          print(f"Pinned candidate: {os.environ['CANDIDATE_SHA']}")
+          print("Candidate shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
+          print(f"Matched RTL variant: {os.environ['VARIANT']}; clock/density/resource shape unchanged")
+          PY
+          python tt/tt_tool.py --create-user-config --ihp
+
+      - name: Prepare trusted hardware before downloading evidence
+        run: python workflow-src/scripts/ci/native_stock_route.py --prepare
+
+      - name: Download completed extracted route evidence
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-inline-margin-screen-38773856018
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 38773856018
+
+      - name: Download complete paired margin measurements
+        uses: actions/download-artifact@v7
+        with:
+          name: gds-electrical-margin-probe-38762064184
+          path: runs/electrical-margin-probe
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 38762064184
+
+      - name: Verify native run provenance
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test "$PWD" = /home/runner/work/protocol-emulator-asic/protocol-emulator-asic
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/38689478738" > /tmp/native-strength-source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/38773856018" > /tmp/inline-replay-source-run.json
+
+      - name: Reaudit completed physical repair and measure fresh qualification
+        timeout-minutes: 150
+        run: python workflow-src/scripts/ci/inline_margin_qualify.py
+
+      - name: Upload fresh gate summaries first
+        if: always() && hashFiles('runs/inline-margin-screen/gates.json') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-inline-margin-qualify-gates-${{ github.run_id }}
+          path: |
+            runs/inline-margin-screen/gates.json
+            runs/inline-margin-screen/timing/comparison.json
+            runs/inline-margin-screen/antenna/*-openroad-checkantennas/or_metrics_out.json
+          if-no-files-found: error
+
+      - name: Upload repair audit evidence before bulk
+        if: always() && hashFiles('runs/inline-margin-screen/grt/*/openroad-globalrouting.log') != ''
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-inline-margin-qualify-audit-${{ github.run_id }}
+          path: |
+            runs/inline-margin-screen/grt/*/postant_*.json
+            runs/inline-margin-screen/grt/*/postant_*.nl.v
+            runs/inline-margin-screen/grt/*/postant_margin_*.rpt
+            runs/inline-margin-screen/grt/*/after_edits.nl.v
+            runs/inline-margin-screen/grt/*/*.eco.nl.v
+            runs/inline-margin-screen/grt/*/openroad-globalrouting.log
+          if-no-files-found: error
+
+      - name: Upload matched screen evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gds-inline-margin-qualify-${{ github.run_id }}
+          path: |
+            runs/**
+            macro/**
+            src/**
+            info.yaml
+            workflow-src/spikes/r4_floorplan/*.patch
+          if-no-files-found: warn

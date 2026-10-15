@@ -192,7 +192,6 @@ async def test_rx_overrun_keeps_first_byte(dut):
     assert int(dut.h_status.value) & 0b100, "overrun not set"
 
 
-@cocotb.test(skip=not RUNTIME_DIV)
 async def test_runtime_divisor(dut):
     await reset(dut)
     new = DIV + 7
@@ -209,3 +208,10 @@ async def test_runtime_divisor(dut):
     await drive_wave(dut, rxw)
     await col
     assert got == [0x7E]
+
+
+# Register only when the compiled design has a runtime divisor. Cocotb 2
+# records filtered-out tests as skipped XML, so filtering cannot provide a
+# strict all-executed suite for fixed-divisor variants.
+if RUNTIME_DIV:
+    test_runtime_divisor = cocotb.test()(test_runtime_divisor)

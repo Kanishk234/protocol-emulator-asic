@@ -152,3 +152,36 @@ def test_scalar_debug_instrumentation_only_adds_observation(tmp_path, monkeypatc
     assert actual.count(trace.STAGE_DEBUG) == 1
     assert actual.replace(trace.STAGE_DEBUG+trace.TRACE,trace.reports.COMMAND,1) == original
     assert json.loads((tmp_path/'source-sha256.json').read_text())['trace_common'] == trace.cfg.sha(tmp_path/'common-grt.tcl')
+
+
+def test_negotiation_trajectory_preserves_ndr_epochs_and_incremented_counter():
+    raw = '''[INFO GRT-0102] Start extra iteration 1/50
+=== Overflow Iteration 2 - TotalOverflow 180 - OverflowIter 50 - OverflowIncreases 0 - MaxOverIncr 25 ===
+[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clk
+[INFO GRT-0102] Start extra iteration 1/50
+=== Overflow Iteration 2 - TotalOverflow 150 - OverflowIter 50 - OverflowIncreases 0 - MaxOverIncr 25 ===
+[INFO GRT-0102] Start extra iteration 2/50
+=== Overflow Iteration 3 - TotalOverflow 133 - OverflowIter 50 - OverflowIncreases 0 - MaxOverIncr 25 ===
+[DEBUG GRT-congestionIterations] Minimal overflow 133 occurring at round 2.
+'''
+    result = trace.parse_negotiation_epochs(raw)
+    assert result['parsed'] is True
+    assert result['started_iteration_total'] == 3
+    assert result['epochs'][0]['disabled_ndr_after'] == ['clk']
+    assert [s['overflow'] for s in result['epochs'][1]['samples']] == [150,133]
+    assert result['native_minimum']['round'] == 2
+    assert trace.parse_negotiation_epochs(raw.replace('OverflowIter 50','OverflowIter BAD'))['parsed'] is False
+    with pytest.raises(ValueError, match='restart without'):
+        trace.parse_negotiation_epochs(raw.replace('[WARNING GRT-0273] Disabled NDR (to reduce congestion) for net: clk\n',''))
+    with pytest.raises(ValueError, match='post-increment'):
+        trace.parse_negotiation_epochs(raw.replace('Overflow Iteration 2','Overflow Iteration 1',1))
+    with pytest.raises(ValueError, match='Duplicate'):
+        trace.parse_negotiation_epochs(raw + raw.splitlines()[-2]+'\n')
+
+
+def test_prior_native_log_has_no_invented_iteration_trajectory():
+    raw = '[INFO GRT-0102] Start extra iteration 1/50\n'
+    result = trace.parse_negotiation_epochs(raw)
+    assert result['parsed'] is False
+    assert result['observed_epoch_start_counts'] == [1]
+    assert trace.parse_negotiation_epochs('')['parsed'] is False

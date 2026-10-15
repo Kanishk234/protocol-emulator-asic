@@ -21,7 +21,8 @@ REPORT_SHA = '8e2f5c5003e495d3d347be7d593bb4bbc7801723db2902c3cb530e70a157a1df'
 SDC_SHA = '2fd4e213532d83ee258899b6fc1ed48c4e5d91ddb0ccbe21eea0226cc90fd56e'
 SEGMENTS_SHA = 'aee9b65f2cfc5f653793de924dedd919a7b68d67fa3ef3febf7ca17e3f1ad7ca'
 TARGETS_SHA = 'f00a6206d105a949428454017fe32fa6553bf07c89428c95ac1d7ead661e37d4'
-STAGE_DEBUG = 'log_cmd set_debug_level GRT grtSteps 1\n'
+STAGE_DEBUG = ('log_cmd set_debug_level GRT grtSteps 1\n'
+               'log_cmd set_debug_level GRT congestionIterations 1\n')
 # Exact RT_/GRT_ subset of authenticated38101639866 config660afb662cbb5307… .
 ORIGINAL_POLICY = {'RT_MIN_LAYER': 'Metal1', 'RT_MAX_LAYER': 'Metal4', 'RT_CLOCK_MIN_LAYER': None, 'RT_CLOCK_MAX_LAYER': None, 'GRT_ADJUSTMENT': 0.3, 'GRT_MACRO_EXTENSION': 0, 'GRT_LAYER_ADJUSTMENTS': [0, 0, 0, 0, 0], 'GRT_ALLOW_CONGESTION': False, 'GRT_ANTENNA_REPAIR_ITERS': 3, 'GRT_OVERFLOW_ITERS': 50, 'GRT_ANTENNA_REPAIR_MARGIN': 10, 'GRT_ANTENNA_REPAIR_JUMPER_ONLY': False, 'GRT_ANTENNA_REPAIR_DIODE_ONLY': False}
 TRACE = r'''
@@ -54,7 +55,7 @@ def instrument(top, common, directory):
     hashes['trace_common'] = cfg.sha(copied)
     (directory / 'source-sha256.json').write_text(json.dumps(hashes, indent=2)+'\n')
     with (directory / 'ATTRIBUTION.md').open('a') as f:
-        f.write('Observer enables existing GRT/grtSteps level1 scalar reporting, exports raw segments after native routing, then rethrows its original failure.\n')
+        f.write('Observer enables existing GRT/grtSteps and congestionIterations level1 reporting, exports raw segments after native routing, then rethrows its original failure.\n')
     return result
 
 
@@ -109,6 +110,63 @@ def parse_stage_scalars(raw):
 def validate_trace_hashes(segments_sha, targets_sha):
     if segments_sha != SEGMENTS_SHA or targets_sha != TARGETS_SHA:
         raise ValueError('Scalar observer changed authenticated final route segments')
+
+
+def parse_negotiation_epochs(raw):
+    """Keep source loop counters and NDR resets distinct from command budget."""
+    epochs = []
+    minimum = None
+    missing = False
+    for line in raw.splitlines():
+        start = re.search(r'\[INFO GRT-0102\] Start extra iteration (\d+)/(\d+)$', line)
+        if start:
+            iteration, budget = map(int, start.groups())
+            if iteration == 1:
+                if epochs and not epochs[-1]['disabled_ndr_after']:
+                    raise ValueError('Negotiation restart without native NDR-reset witness')
+                epochs.append({'budget': budget, 'started_iterations': [],
+                               'samples': [], 'disabled_ndr_after': []})
+            if not epochs or budget != epochs[-1]['budget']:
+                raise ValueError('Negotiation budget/epoch mismatch')
+            expected = len(epochs[-1]['started_iterations']) + 1
+            if iteration != expected or iteration > budget:
+                raise ValueError('Nonsequential native negotiation iterations')
+            epochs[-1]['started_iterations'].append(iteration)
+        sample = re.search(r'=== Overflow Iteration (\d+) - TotalOverflow (\d+) - OverflowIter (\d+) - OverflowIncreases (-?\d+) - MaxOverIncr (\d+) ===$', line)
+        if sample:
+            counter, overflow, budget, increases, maximum = map(int, sample.groups())
+            if not epochs or not epochs[-1]['started_iterations']:
+                raise ValueError('Negotiation sample without iteration')
+            epoch = epochs[-1]
+            if counter != epoch['started_iterations'][-1]+1 or budget != epoch['budget']:
+                raise ValueError('Negotiation post-increment counter mismatch')
+            if len(epoch['samples']) >= len(epoch['started_iterations']):
+                raise ValueError('Duplicate negotiation sample')
+            epoch['samples'].append({'post_increment_counter': counter,
+                'overflow': overflow, 'overflow_increases': increases,
+                'maximum_overflow_increases': maximum})
+        disabled = re.search(r'\[WARNING GRT-0273\] Disabled NDR \(to reduce congestion\) for net: (.+)$', line)
+        if disabled:
+            if not epochs:
+                raise ValueError('NDR reset before negotiation epoch')
+            epochs[-1]['disabled_ndr_after'].append(disabled[1])
+        best = re.search(r'Minimal overflow (\d+) occurring at round (\d+)\.$', line)
+        if best:
+            if minimum is not None:
+                raise ValueError('Repeated native minimal-overflow report')
+            minimum = {'overflow': int(best[1]), 'round': int(best[2]),
+                       'scope': 'Native cached minimum/round; not a saved tree checkpoint'}
+    if not epochs:
+        return {'parsed': False, 'reason': 'No native negotiation epochs; raw log retained'}
+    for epoch in epochs:
+        if len(epoch['samples']) != len(epoch['started_iterations']):
+            missing = True
+    if missing:
+        return {'parsed': False, 'reason': 'Incomplete exact native iteration samples; raw log retained',
+                'observed_epoch_start_counts': [len(e['started_iterations']) for e in epochs]}
+    return {'parsed': True, 'epochs': epochs, 'native_minimum': minimum,
+            'started_iteration_total': sum(len(e['started_iterations']) for e in epochs),
+            'scope': 'Native per-epoch scalar trajectory, post-increment counters; no intermediate net trees'}
 
 
 def authenticate():
@@ -198,6 +256,9 @@ def main():
         if re.findall(r'(?m)^\+ set_debug_level GRT grtSteps (\d+)\b',raw)!=['1']:
             raise ValueError('Native scalar debug command missing or repeated')
         result['stage_scalars']=parse_stage_scalars(raw)
+        if re.findall(r'(?m)^\+ set_debug_level GRT congestionIterations (\d+)\b',raw)!=['1']:
+            raise ValueError('Native iteration debug command missing or repeated')
+        result['negotiation_epochs']=parse_negotiation_epochs(raw)
         result['native_net_count']=summary['native_net_count']
         authenticate()
         result['source_unchanged']=True

@@ -1,5 +1,11 @@
 # Bugs
 
+## 85: Repeated compiler parameter option silently drops earlier group
+- **Date:**2026-10-14.
+- **Symptom/check:**38676021166 active-window loaded test compiled but waveform had16 low cycles rather than256.
+- **Root cause:** workflow used --set twice; argparse default store kept only WINDOW_CYCLES=256, dropping COUNTER_BITS=9 override and retaining four-bit counter. Simulation final full-window assertion caught truncation; cancellation coverage is not established by this run.
+- **Fix/coverage:** pass both overrides in one group and require exact compiled report params before simulation. CLI repeated-group regression/fix prepared separately. Corrected cloud loaded result pending.
+
 ## 84: Native placement checker compares omitted input to resolved defaults
 - **Symptom/check:**38334401344 failed after placement with GRT_ADJUSTMENT mismatch.
 - **Root cause:** input omits routing defaults; resolved native config contains0.3. Actual candidate and control resizer policies match.

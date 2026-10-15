@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-15 — Native clean-build screen published and running
+
+- With explicit scoped user approval, published tools `0c436d3`, CI `6068f72` and evidence `2d2b697`; verified remote main is `2d2b697fb6268d61e2d9be6df16901dc2f281b17`. No `src/`, `info.yaml` or `macro/` commit in this push.
+- [Native margin55 screen 38823883005](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38823883005) is in progress on that exact head. Initial dispatch briefly returned 404 while GitHub indexed the workflow; retry succeeded and one matching run is confirmed. Automatic publication review also timed out twice; authorized retries completed.
+- Local clean-source RTL replay has passed seven cases including servo PWM and is running I2S (8/22). No final local regression result claimed. Next inspect that result and the native screen's measured gates; no DRT until strict screening passes, and no official GDS claim yet. No phase boxes ticked.
+- Additional integration checks: isolated candidate's four top-level smoke tests pass; reviewed integration inventory covers 17 differing text files and nine macro views. Actual final route state also confirms 543,854µm² instance area, 902,417µm² core, 60.27% utilization and 35,490 instances; baseline report updated without claiming downstream signoff or closing the area gate.
+
+
 ## 2026-10-15 — Prepare clean-source integration and native margin reproduction
 
 - Prepared isolated `/tmp/tripwire-clean-inline-official-prep-20261015` from frozen3393eea plus exact event-late patch. Generation check passes; both 19-module source lists agree; signoff SDC hash matches the measured baseline. Integration patch, source manifest and unapplied native configuration proposal are available there. No main hardware/spec/config replacement.

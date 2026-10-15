@@ -14,6 +14,8 @@
 
 Final detailed-route DRC errors: **0**. Final antenna violating nets/pins: **0/0**. Final extracted qualification is true, including the unchanged 50 ps fast-hold requirement. Setup WS 0 is a nonnegative acceptance result; latch-related reporting means it is not a strictly positive global setup-margin claim.
 
+The saved final state reports 543,854 µm² total instance area in a 902,417 µm² core (60.27% utilization), including 498,545 µm² of standard cells and one 45,309.3 µm² SRAM macro. Final instance count is 35,490. These are checkpoint metrics before downstream fill/signoff, not an official area-budget exit claim.
+
 ## Identity and independent review
 
 - Bulk artifact `12000974401`; gate artifact `12000179151`.

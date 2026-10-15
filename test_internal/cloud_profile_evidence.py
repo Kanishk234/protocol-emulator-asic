@@ -46,6 +46,8 @@ def validate_profile(data):
                         any(type(v) is not int or v < 0 for v in counts.values()) or
                         sum(counts.values()) != total):
                     raise ValueError("Attribution does not conserve cell count")
+            if row['ff_by_fn'].get('counter',0) <= 0 or row['ff_by_fn'].get('shift',0) <= 0:
+                raise ValueError('Expected timing/shift state is unclassified; review role map')
             if variant == "LUT4":
                 aggregate.update(row["lut_by_fn"])
     return {"trials": 24, "lut4_total": sum(aggregate.values()),

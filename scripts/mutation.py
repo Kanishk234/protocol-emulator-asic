@@ -1,22 +1,135 @@
 #!/usr/bin/env python3
 """Fault-injection (mutation) campaign, phase 4 (VERIFICATION.md): plant one realistic bug at a
 time in a throwaway copy of the repository and run the checks that should catch it. A mutant is
-"killed" when its check fails. Survivors are findings: either a gap in the checks or an
+"killed" only when its expected executed check rejects the planted behavior. Survivors are findings: either a gap in the checks or an
 equivalent mutant (explained in the report).
 
-Usage: scripts/mutation.py [names...]      Output: docs/reports/mutation.md (and build/mutation/)
+Usage: scripts/mutation.py [names...]      Output: build/mutation/results.json and REPORT.md
 Needs: the project venv, the OSS CAD Suite, a fetched tile library (WARP_TILES), SymbiYosys.
 """
 import json
 import os
+import re
 import shutil
+import signal
 import subprocess
 import sys
 import time
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WORK = ROOT / "build" / "mutation"
+
+# Checks deliberately include excluded cocotb cases. Only these explicit names
+# may skip; every expected case must actually execute in both control/mutant.
+CHIP_CASES = {
+    "test_reset_state", "test_read_id", "test_load_run_stop", "test_wrong_arch_version",
+    "test_bad_crc", "test_length_mismatch", "test_bad_sync_word", "test_empty_load_rejected",
+    "test_bad_commands_change_nothing", "test_aborted_transaction_keeps_whole_words",
+    "test_reload_from_loaded", "test_host_channel_overflow", "test_user_inputs_do_not_affect_parking",
+}
+LOADED_CASES = {
+    "test_counter4", "test_two_bitstreams", "test_logic4", "test_host_channel", "test_prims",
+    "test_uart", "test_spi_ctrl", "test_i2c_ctrl", "test_board_loader", "test_board_examples_spi",
+    "test_board_examples_i2c", "test_ws2812", "test_onewire", "test_swd",
+    "test_corrupt_load_over_running_design", "test_uart_input_phase", "test_showcase_protocol_switching",
+}
+
+
+def expectation(command):
+    if "sby" in command:
+        return {"formal": "formal/f1_isolation", "required": set(), "skips": set()}
+    if "test_internal/uvm" in command:
+        return {"xml": "test_internal/uvm/results.xml", "required": {"ShellRandomTest"}, "skips": set()}
+    if "test_internal" in command:
+        return {"xml": "test_internal/results.xml", "required": {"test_timer_matches_model", "test_shift_matches_model"}, "skips": set()}
+    if "COCOTB_TEST_FILTER=" in command:
+        selected = command.split("COCOTB_TEST_FILTER=", 1)[1].split()[0]
+        return {"xml": "test/results.xml", "required": {selected}, "skips": (CHIP_CASES | LOADED_CASES) - {selected}}
+    return {"xml": "test/results.xml", "required": CHIP_CASES, "skips": LOADED_CASES}
+
+
+def classify(repo, command, code, output, timed_out=False):
+    """Return pass/rejected/error; only an explicit behavioral rejection kills."""
+    if timed_out or code < 0:
+        return "error", "timeout or terminated process"
+    if re.search(r'ModuleNotFoundError|ImportError|FileNotFoundError|SyntaxError|command not found|Unable to import module', output):
+        return "error", "tool or harness setup exception in command output"
+    spec = expectation(command)
+    if "formal" in spec:
+        status = repo / spec["formal"] / "status"
+        if not status.is_file():
+            return "error", "missing formal status"
+        value = status.read_text().strip()
+        if value == "PASS" and code == 0 and "DONE (PASS" in output:
+            return "pass", "explicit formal PASS"
+        engine = repo / spec["formal"] / "engine_0/logfile.txt"
+        text = engine.read_text() if engine.is_file() else ""
+        if value == "FAIL" and code != 0 and "DONE (FAIL" in output and "Assert failed" in text:
+            return "rejected", "formal property assertion failed"
+        return "error", "formal failure lacks explicit property rejection"
+    try:
+        root = ET.parse(repo / spec["xml"]).getroot()
+        cases = list(root.iter("testcase"))
+        names = [case.get("name") for case in cases]
+        if root.tag not in ("testsuite", "testsuites") or not cases or len(names) != len(set(names)):
+            raise ValueError("missing, duplicate or malformed testcase census")
+        if set(names) != spec["required"] | spec["skips"]:
+            raise ValueError("unexpected testcase census")
+        if list(root.iter("error")):
+            raise ValueError("harness/error testcase")
+        failed = set()
+        for case in cases:
+            name = case.get("name")
+            if sum(case.find(tag) is not None for tag in ("skipped", "failure", "error")) > 1:
+                raise ValueError("contradictory testcase outcomes")
+            if case.find("skipped") is not None:
+                if name not in spec["skips"]:
+                    raise ValueError("required test skipped")
+            elif case.find("failure") is not None:
+                if name not in spec["required"]:
+                    raise ValueError("unexpected non-target failure")
+                failed.add(name)
+        for suite in root.iter():
+            if suite.tag in ("testsuite", "testsuites"):
+                for field in ("failures", "errors", "skipped"):
+                    if field in suite.attrib and (not suite.attrib[field].isdigit()):
+                        raise ValueError("malformed suite counter")
+                    tags = {"failures": "failure", "errors": "error", "skipped": "skipped"}
+                    if field in suite.attrib and int(suite.attrib[field]) != len(list(suite.iter(tags[field]))):
+                        raise ValueError("contradictory suite counter")
+                if int(suite.get("errors", "0")):
+                    raise ValueError("nonzero suite error count")
+        if failed and code != 0 and "AssertionError" in output:
+            return "rejected", "executed expected test assertion failed: " + ",".join(sorted(failed))
+        if failed or code != 0:
+            raise ValueError("command failure is not an identified test assertion")
+        return "pass", "expected tests executed and passed"
+    except (OSError, ValueError, ET.ParseError) as exc:
+        return "error", str(exc)
+
+
+def run_check(repo, command, env, log, timeout=600):
+    """Bound the shell and all simulator/formal descendants as one process group."""
+    started = time.monotonic()
+    with log.open("w") as stream:
+        child = subprocess.Popen(["bash", "-c", command], cwd=repo, env=env,
+                                 stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
+        timed_out = False
+        try:
+            code = child.wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            child.wait()
+            code = child.returncode
+    verdict, detail = classify(repo, command, code, log.read_text(), timed_out)
+    return {"verdict": verdict, "detail": detail, "returncode": code,
+            "timed_out": timed_out, "seconds": round(time.monotonic()-started, 2)}
 
 # name: (description, [(file, old, new)], command, what should catch it)
 MUTANTS = {
@@ -105,47 +218,82 @@ def drop_config_bit(repo):
 
 
 def main(argv):
-    names = argv or list(MUTANTS)
+    names = list(dict.fromkeys(argv or MUTANTS))
+    if any(name not in MUTANTS for name in names):
+        raise ValueError("Unknown mutant requested")
+    if Path(sys.prefix).resolve() != (ROOT / ".venv").resolve():
+        raise RuntimeError("Run mutation campaign in the project venv")
+    # Never merge a subset with stale results from another source/campaign.
+    WORK.mkdir(parents=True, exist_ok=False)
     env = dict(os.environ)
-    env.setdefault("WARP_TILES", subprocess.check_output([str(ROOT / "scripts/fetch_tiles.sh")], text=True).strip())
-    old = WORK / "results.json"                  # keep earlier mutants' results when running a subset
-    results = json.loads(old.read_text()) if argv and old.exists() else {}
-    for name in names:
-        desc, edits, cmd, catcher = MUTANTS[name]
-        repo = WORK / name
-        copy_repo(repo)
-        detail = ""
-        if edits == "BITSTREAM":
-            detail = "`" + drop_config_bit(repo) + "`"
-        else:
-            for f, old, new in edits:
-                p = repo / f
-                s = p.read_text()
-                assert s.count(old) == 1, f"{name}: mutation point not unique in {f}"
-                p.write_text(s.replace(old, new))
-        t0 = time.time()
-        r = subprocess.run(["bash", "-c", cmd], cwd=repo, env=env, capture_output=True, text=True)
-        out = r.stdout + r.stderr
-        failed = r.returncode != 0 or "FAIL=0" not in out and "TESTS=" in out
-        if "sby" in cmd:
-            failed = "DONE (PASS" not in out
-        results[name] = {"description": desc, "check": catcher, "command": cmd, "killed": failed,
-                         "seconds": round(time.time() - t0), "detail": detail}
-        print(f"{name}: {'KILLED' if failed else 'SURVIVED'} ({results[name]['seconds']} s)", flush=True)
-        (WORK / f"{name}.log").write_text(out)
-    (WORK / "results.json").write_text(json.dumps(results, indent=2) + "\n")
-    lines = ["# Mutation campaign (phase 4)", "",
-             "Each mutant plants one realistic bug in a throwaway copy of the repository (`scripts/mutation.py`); the check listed must fail. Local run.", "",
-             "| Mutant | Bug planted | Check that should catch it | Result |", "|---|---|---|---|"]
-    for n, r in results.items():
-        d = r["description"] + (f" ({r['detail']})" if r["detail"] else "")
-        lines.append(f"| `{n}` | {d} | {r['check']} | {'**killed**' if r['killed'] else '**survived**'} |")
-    report = ROOT / "docs/reports/mutation.md"
-    notes = report.read_text().split("\n## Notes", 1) if report.exists() else []
-    if len(notes) == 2:                          # the hand-written notes section is kept
-        lines += ["", "## Notes" + notes[1].rstrip("\n")]
-    report.write_text("\n".join(lines) + "\n")
-    return 0 if all(r["killed"] for r in results.values()) else 1
+    # Do not inherit user filters or build-mode overrides into controls.
+    for key in ("COCOTB_TESTCASE", "COCOTB_TEST_FILTER", "TESTCASE", "WARP_FABRIC",
+                "COCOTB_TEST_MODULES", "COCOTB_RESULTS_FILE", "SIM_BUILD", "GATES"):
+        env.pop(key, None)
+    result = {"scope": "mutation checks; not hardened-tile equivalence or chip timing",
+              "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+              "workflow_run": os.environ.get("GITHUB_RUN_ID"),
+              "workflow_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "passed": False, "controls": {}, "mutants": {}}
+
+    def save():
+        (WORK / "results.json").write_text(json.dumps(result, indent=2) + "\n")
+        lines = ["# Mutation evidence campaign", "", result["scope"], "",
+                 "| Mutant | Outcome | Detail |", "|---|---|---|"]
+        for name, row in result["mutants"].items():
+            lines.append(f"| {name} | {row['outcome']} | {row.get('detail', '')} |")
+        (WORK / "REPORT.md").write_text("\n".join(lines)+"\n")
+
+    save()
+    try:
+        if not env.get("WARP_TILES"):
+            env["WARP_TILES"] = subprocess.check_output(
+                ["bash", str(ROOT / "scripts/fetch_tiles.sh")], text=True, timeout=120).strip()
+        # Establish every distinct pristine check before planting any mutation.
+        for name in names:
+            command = MUTANTS[name][2]
+            if command in result["controls"]:
+                continue
+            label = f"control_{len(result['controls'])}"
+            repo = WORK / label
+            copy_repo(repo)
+            result["controls"][command] = run_check(repo, command, env, WORK / (label+".log"))
+            save()
+        for name in names:
+            description, edits, command, catcher = MUTANTS[name]
+            row = {"description": description, "command": command, "check": catcher,
+                   "outcome": "error", "killed": False}
+            result["mutants"][name] = row
+            if result["controls"][command]["verdict"] != "pass":
+                row["detail"] = "Pristine control did not pass; mutant not executed"
+                save()
+                continue
+            try:
+                repo = WORK / name
+                copy_repo(repo)
+                if edits == "BITSTREAM":
+                    row["mutation"] = drop_config_bit(repo)
+                else:
+                    for filename, old, new in edits:
+                        path = repo / filename
+                        original = path.read_text()
+                        if original.count(old) != 1:
+                            raise ValueError(f"Mutation point is not unique: {filename}")
+                        path.write_text(original.replace(old, new))
+                row.update(run_check(repo, command, env, WORK / (name+".log")))
+                row["outcome"] = {"pass": "survived", "rejected": "killed", "error": "error"}[row["verdict"]]
+                row["killed"] = row["outcome"] == "killed"
+            except (OSError, ValueError, subprocess.SubprocessError) as exc:
+                row["detail"] = str(exc)
+            save()
+            print(f"{name}: {row['outcome'].upper()}", flush=True)
+        result["passed"] = all(row["killed"] for row in result["mutants"].values())
+    except Exception as exc:
+        result["error"] = str(exc)
+        raise
+    finally:
+        save()
+    return 0 if result["passed"] else 1
 
 
 if __name__ == "__main__":

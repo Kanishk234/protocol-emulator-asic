@@ -10,8 +10,8 @@ import cloud_profile_evidence as evidence
 
 
 def profile():
-    return {design: {variant: {"luts": 3, "ffs": 2,
-                    "lut_by_fn": {"counter": 1, "shared": 2}, "ff_by_fn": {"control": 2}}
+    return {design: {variant: {"luts": 3, "ffs": 4,
+                    "lut_by_fn": {"counter": 1, "shared": 2}, "ff_by_fn": {"control": 2, "counter": 1, "shift": 1}}
                     for variant in evidence.VARIANTS} for design in evidence.DESIGNS}
 
 
@@ -44,3 +44,10 @@ def test_partial_or_contradictory_profile_rejects(kind):
         row["ffs"] = True
     with pytest.raises(ValueError):
         evidence.validate_profile(copy.deepcopy(data))
+
+
+def test_conserving_but_stale_function_map_does_not_pass():
+    data=profile()
+    data['i2c_target']['LUT4']['ff_by_fn']={'control':4}
+    with pytest.raises(ValueError,match='unclassified'):
+        evidence.validate_profile(data)

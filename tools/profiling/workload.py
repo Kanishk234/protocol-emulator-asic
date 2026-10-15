@@ -87,8 +87,8 @@ PROTOCOLS: List[Protocol] = [
     Protocol(
         "i2c_target", "i2c_target_top", ["protocols/i2c_target/i2c_target_top.v"],
         {"NREGS": 4},
-        [(r"nbit$", "counter"),
-         (r"(^|\.)shift$", "shift"),
+        [(r"nbit$|g_logic\.n$", "counter"),
+         (r"(^|\.)shift$|g_logic\.sr$", "shift"),
          (r"sda_s$|scl_s$", "sync"), (r"sda_oe$", "pin"),
          (r"regs|h_rdata$|dirty$", "storage"),
          (r".*", "control")],

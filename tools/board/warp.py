@@ -142,20 +142,31 @@ class Warp:
         self._drive()
 
     def xfer(self, mosi_bytes):
-        """One transaction (CS low ... CS high); returns the MISO bytes."""
-        self._set(0, 0, 0, CS_SETUP)
-        miso = []
-        for byte in mosi_bytes:
-            r = 0
-            for i in range(7, -1, -1):
-                bit = (byte >> i) & 1
-                self._set(0, 0, bit, HALF)
-                r = (r << 1) | (self.pins.read_uo() & 1)      # sampled before the rising edge
-                self._set(0, 1, bit, HALF)
-            miso.append(r)
-        self._set(0, 0, 0, HALF)
-        self._set(1, 0, 0, CS_IDLE)
-        return miso
+        """One transaction; abort to idle on transport failure without retrying.
+
+        A failed transfer may already have changed the chip. Cleanup is best
+        effort; preserve the original exception even if idle cannot be driven.
+        """
+        try:
+            self._set(0, 0, 0, CS_SETUP)
+            miso = []
+            for byte in mosi_bytes:
+                r = 0
+                for i in range(7, -1, -1):
+                    bit = (byte >> i) & 1
+                    self._set(0, 0, bit, HALF)
+                    r = (r << 1) | (self.pins.read_uo() & 1)  # before rising edge
+                    self._set(0, 1, bit, HALF)
+                miso.append(r)
+            self._set(0, 0, 0, HALF)
+            self._set(1, 0, 0, CS_IDLE)
+            return miso
+        except BaseException:
+            try:
+                self._set(1, 0, 0, CS_IDLE)
+            except BaseException:
+                pass
+            raise
 
     # ---- commands
     def read_id(self):

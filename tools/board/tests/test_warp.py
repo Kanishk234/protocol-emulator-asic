@@ -126,3 +126,70 @@ def test_command_bytes_match_reference():
     assert [warp.USER_STATUS, 0] == [int(b) for b in protocol.tx_user_status()]
     for name in ("RUN", "STOP", "USER_RESET"):
         assert getattr(warp, name) == int(protocol.Op[name])
+
+
+class FaultPins:
+    """Inject a one-shot fault at a concrete pin operation boundary."""
+    def __init__(self):
+        self.events = []
+        self.fail_at = None
+        self.cleanup_fails = False
+        self.original = OSError("injected SPI failure")
+        self.failed = False
+        self.value = 0
+
+    def operation(self, name, value=None):
+        self.events.append((name, value))
+        if not self.failed and len(self.events) == self.fail_at:
+            self.failed = True
+            raise self.original
+        if self.failed and self.cleanup_fails:
+            raise OSError("idle cleanup also failed")
+
+    def write_ui(self, value):
+        self.operation("write", value)
+        self.value = value
+
+    def read_uo(self):
+        self.operation("read")
+        return 1
+
+    def wait(self, clocks):
+        self.operation("wait", clocks)
+
+
+def _fault_test_board():
+    pins = FaultPins()
+    board = warp.Warp(pins)
+    board.set_fab_in(0x15)
+    pins.events.clear()
+    return board, pins
+
+
+# Two bytes: setup (2 operations), 16 bits (5 each), termination (4).
+@pytest.mark.parametrize("fail_at", range(1, 87))
+def test_xfer_fault_releases_cs_preserves_inputs_and_allows_fresh_transaction(fail_at):
+    board, pins = _fault_test_board()
+    pins.fail_at = fail_at
+    with pytest.raises(OSError) as raised:
+        board.xfer([warp.CH_WRITE, 0xA5])
+    assert raised.value is pins.original
+    assert pins.value == (0x15 << 3) | (1 << warp.CS_N)
+    assert pins.events[-1] == ("wait", warp.CS_IDLE)
+    # No automatic command retry: after the fault only idle cleanup occurs.
+    assert pins.events[fail_at:] == [
+        ("write", (0x15 << 3) | (1 << warp.CS_N)), ("wait", warp.CS_IDLE)]
+    pins.events.clear()
+    assert board.xfer([warp.READ_ID]) == [0xFF]
+    assert pins.events[0] == ("write", 0x15 << 3)
+    assert pins.value & 7 == 1 << warp.CS_N
+
+
+def test_xfer_preserves_original_error_when_cleanup_also_fails():
+    board, pins = _fault_test_board()
+    pins.fail_at = 5
+    pins.cleanup_fails = True
+    with pytest.raises(OSError) as raised:
+        board.xfer([warp.RUN])
+    assert raised.value is pins.original
+    assert pins.events[-1] == ("write", (0x15 << 3) | (1 << warp.CS_N))

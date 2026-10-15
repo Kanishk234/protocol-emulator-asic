@@ -106,6 +106,19 @@ def test_formal_requires_actual_property_status(tmp_path, status, code, output, 
     assert m.classify(tmp_path, "cd formal && sby -f f1_isolation.sby", code, output)[0] == expected
 
 
+@pytest.mark.parametrize('status,code,output,expected',[
+    ('PASS 0 0',0,'DONE (PASS, rc=0)','pass'),
+    ('FAIL 0 1',1,'DONE (FAIL, rc=1)','rejected'),
+    ('PASS garbage',0,'DONE (PASS, rc=0)','error'),
+])
+def test_actual_sby_status_counters_and_split_engine_logs(tmp_path,status,code,output,expected):
+    directory=tmp_path/'formal/f1_isolation'
+    (directory/'engine_0').mkdir(parents=True)
+    (directory/'status').write_text(status+'\n')
+    (directory/'engine_0/logfile_basecase.txt').write_text('Assert failed in tt_um_warp: isolation')
+    assert m.classify(tmp_path,'cd formal && sby -f f1_isolation.sby',code,output)[0]==expected
+
+
 @pytest.mark.parametrize("control_verdict,expected_calls", [("pass", 3), ("error", 1)])
 def test_controls_deduplicated_and_failed_control_blocks_mutants(tmp_path, monkeypatch, control_verdict, expected_calls):
     monkeypatch.setattr(m, "ROOT", tmp_path)

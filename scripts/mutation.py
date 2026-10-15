@@ -61,11 +61,12 @@ def classify(repo, command, code, output, timed_out=False):
         status = repo / spec["formal"] / "status"
         if not status.is_file():
             return "error", "missing formal status"
-        value = status.read_text().strip()
+        observed = re.fullmatch(r'(PASS|FAIL)(?:\s+\d+\s+\d+)?', status.read_text().strip())
+        value = observed[1] if observed else None
         if value == "PASS" and code == 0 and "DONE (PASS" in output:
             return "pass", "explicit formal PASS"
-        engine = repo / spec["formal"] / "engine_0/logfile.txt"
-        text = engine.read_text() if engine.is_file() else ""
+        engines = sorted((repo / spec["formal"]).glob('engine_*/logfile*.txt'))
+        text = '\n'.join(path.read_text() for path in engines if path.is_file())
         if value == "FAIL" and code != 0 and "DONE (FAIL" in output and "Assert failed" in text:
             return "rejected", "formal property assertion failed"
         return "error", "formal failure lacks explicit property rejection"

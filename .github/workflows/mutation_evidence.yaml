@@ -60,6 +60,6 @@ jobs:
             build/mutation/*/test_internal/results.xml
             build/mutation/*/test_internal/uvm/results.xml
             build/mutation/*/formal/f1_isolation/status
-            build/mutation/*/formal/f1_isolation/engine_0/logfile.txt
+            build/mutation/*/formal/f1_isolation/engine_*/logfile*.txt
           retention-days: 30
           if-no-files-found: error

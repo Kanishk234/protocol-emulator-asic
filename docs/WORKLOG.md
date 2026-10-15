@@ -5,7 +5,14 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-15: Codex (clean extracted route achieved; exact routed L3 prepared)
+- Route/extraction38784492656 succeeds on88850b1. Actual final DRT state confirms0DRC; all3detailed checks reports show0slew/fanout/cap violations; antenna0/0. Extracted setupWS0 allcorners; holdfast/typ/slow89.7503/188.2766/367.8210ps. Final qualified=true with unchanged50psgate. No positive global setup/LVS/precheck/official claim.
+- Downloaded final NL/DEF/state/config/constraint identity and reports. Final NL SHA ac646d7424b75d53d61c5726dac5a83780753dd397e4b2b45c1a90b11ed8221d. Original35,481mapped cells/connections retained;9newantenna diodes. The stricter screening policy survived this actual extracted run.
+- Prepared fixed-source L3 workflow/helper with exact route/head/netlist/full-recipe/step-config identities and extracted evidence checks, Icarus13 and unchanged22-case protocol suite.48focused tests and actual-artifact validator pass. See docs/reports/PHASE2_CLEAN_EXTRACTED_BASELINE.md.
+- Next publish/launch l3-inline-margin-routed-gl under existing approval, then address clean-build/official-flow portability. Main TT top/recipe is not this accumulated checkpoint ECO experiment. No phase boxes ticked; official full GDS/LVS/precheck remains required.
+
 ## 2026-10-15: Codex (global margin qualification passes; stock routing prepared)
+- Published tools7129c5c/CI63408dc/docs88850b1; localHEAD and remote main verified88850b1241a4d83609537602dc7d8c7857a9c3a8. [Stock inline-margin routing38784492656](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38784492656) confirmed in progress on that exact head. Launch receipt local pending next documentation publication. Next inspect fresh pre-DRT qualification, final DRC and extracted timing/electrical/antenna gates.
 - Qualification38777752196 succeeds on86fa845: fresh setupWS0/all-corner electrical0, holdfast/typ/slow70.8775/166.924/338.733ps, antenna0/0. Global.45margin gate and six-load repaired-family reserve pass. Initial123+dynamic24BUF4. No extracted/official claim.
 - Downloaded selected actual qualification views and independently checked full receipt, canonical proposal/source, initial ECO, SRAM-aware dynamic connectivity/antenna intervals, original placements, live zero overflow/reset and fresh final timing/electrical/antenna/global/family guards. All pass.
 - Prepared exact-success stock DRT/extraction continuation with global/family guards recomputed from actual saved reports/DEF, fresh pre-DRT gate and unchanged final extracted checks.89focused tests pass; diff clean. Next publish/launch gds-inline-margin-route under existing approval. No phase boxes ticked; official/full extracted closure still pending.

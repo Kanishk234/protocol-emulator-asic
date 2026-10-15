@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-15 (session105: retain improvements and refine blockers)
+**Status:** latest321aec8 lint38825286548/unit38825286596/test38825286524/docs38825286568/supervisor38825286561SUCCESS; fabric38825286537 still running at inspection, previousbc8df85fabric38824245022SUCCESS. User asks continued work and overall retention blockers. Existing commits/pushes remain authorized this session.
+**Done:** added reusable strict cut-ownership analysis and regression cases; actual121 artifact reproduces359 competing net owners over50 layer edges,6 unowned; each southern target occupies one boundary edge.9focused testsPASS; broader autonomy suite106PASS in0.56s. Refreshed dated evidence audit and physical status to distinguish completed software validation from remaining physical/numeric gaps. No hardware/source/spec changes or phase boxes.
+**Next:** inspect precise southern-edge competitors and alternative paths, qualify a bounded intervention before another EDA run; continue historical numerical evidence audit. Preserve G1, original50/133 and measured15/121 separately. Improvements are retained as validated source or experimental checkpoints according to their evidence, not discarded for failing unrelated signoff.
+
 ## 2026-10-15 (session104: continue diagnosis and replace local-only evidence)
 **Status:** G1 remains the verified fallback; compact fanout-clean control remains133 native overflow. User asks to continue all useful work; resumed coordinator plus three specialists under existing session authorization. No phase boxes ticked.
 **New completed evidence:** fresh hosted README reproduction38777288608SUCCESS at77edd2d; independently inspected14XML files, exact30loaded/1cosim cases,200listed-source fingerprints and11committed-image report hashes. Standalone emitted image bytes were omitted from upload; retain them in next hosted reproduction rather than claim independent downloaded-byte authentication. Earlier fabric38777137217SUCCESS; followup6370e1f fabric38778082028 still in its normal loaded-suite stage at inspection. Details in `docs/reports/reproduction_refresh_20261015.md`.

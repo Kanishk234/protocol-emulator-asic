@@ -8,8 +8,9 @@ ODB/netlist/SDC/interface, original three-corner producer guards, capacities
 and clock margins. Both native runs return1/GRT-0116; no detailed-route or
 configured timing acceptance. Original per-layer overflow13/53/31/36 becomes
 19/40/18/44, so locality is mixed despite lower total. Preserve both policy
-identities. Follow-up calibrated grid observation must match the exact121
-full-segment hash before attributing its remaining cuts. See D097 and
+identities. Calibrated grid38824245540 matches the exact121 full-segment hash and
+per-layer native overflow. Cut ownership analysis is recorded in
+`docs/reports/route_121_grid_20261015.md`. See D097 and
 `docs/reports/router_2d_next_20261015.md`. Earlier dated checkpoints below
 remain historical rather than current acceptance claims.
 

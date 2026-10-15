@@ -79,3 +79,25 @@ were corrected in77edd2d. Hosted supervisor38777137622 and four independently
 checked campaign artifacts now validate that integration within their specific
 scope; unit38777137520 exposes BUG89, so no overall green claim is made.
 See [actual integration outcomes](autonomous_integration_20261015.md).
+
+## Current follow-up after321aec8
+
+The earlier blocker table is a dated audit, not the current execution ledger.
+Current profile38820879331 supplies24 authenticated trials/555LUT4 aggregate;
+controlled mutation38823961384 supplies6 passing pristine controls and11 actual
+rejections. Reproduction38780941472 retains/re-hashes all12 emitted images with
+loaded30/cosim1 passes. Original local/historical tables remain separately
+identified; these refreshes do not recreate their source revisions.
+
+Compact routing now has a measured15-budget121 point in38820879445, preserved
+exactly by grid38824245540. Original50-budget133 remains a separate reference.
+Neither is accepted; downstream extraction and complete configured timing are
+still required. Latest321aec8 lint38825286548/unit38825286596/test38825286524/
+docs38825286568/supervisor38825286561 pass; fabric38825286537 was still running
+at inspection. Previousbc8df85 fabric38824245022 passes. No final phase gate
+is inferred from that partial latest batch.
+
+Current software fixes are therefore hosted-validated, rather than local-only.
+Remaining evidence work includes historical numeric architecture/model tables
+and original matching primitive timing views. Missing timing evidence limits
+claims; it does not require discarding independently tested software fixes.

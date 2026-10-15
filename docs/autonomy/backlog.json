@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "updated": "2026-10-15",
+  "authority": "Planning index only; phase checklists and authenticated reports control acceptance.",
+  "protected_controls": {
+    "frozen_g1": [
+      "36383587262",
+      "36451108163"
+    ],
+    "compact_best133": {
+      "producer_run": "38167697696",
+      "route_run": "38168159774",
+      "overflow": 133,
+      "accepted": false
+    }
+  },
+  "tasks": [
+    {
+      "id": "P5-EVIDENCE",
+      "priority": 1,
+      "title": "Complete final evidence and claim audit",
+      "track": "phase5",
+      "status": "in_progress",
+      "hypothesis": "A matched-source evidence matrix can expose remaining unsupported numbers without changing frozen hardware.",
+      "evidence": [
+        "docs/design/phases/PHASE5_EVIDENCE_DOCS.md",
+        "docs/EVIDENCE.md",
+        "docs/CLAIMS.md",
+        "docs/reports/evidence_audit_20261015.md: historical/local/shell-only labels corrected; original primitive timing views still missing"
+      ],
+      "next_action": "Audit every quantitative claim against exact run/source and scope; resolve or soften unsupported statements.",
+      "acceptance": [
+        "Every number has a supporting run or is explicitly scoped as local/historical.",
+        "No compact successor result is presented as G1 or whole-chip signoff."
+      ],
+      "rejection": [
+        "Any required source/run link is missing or mismatched."
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "TRACE133",
+      "priority": 2,
+      "title": "Authenticate unchanged-control routing segment trace",
+      "track": "compact_diagnostic",
+      "status": "validated",
+      "hypothesis": "Actual net segments can distinguish southern detours from pin escapes on the retained133 control.",
+      "evidence": [
+        "38676296904: expired artifact setup failure, BUG86",
+        "38456351705: native boundary export",
+        "docs/WORKLOG.md: session102",
+        "38676688402: exact133 reproduction, native failure retained, 3659 exported nets",
+        "docs/reports/route_trace_analysis_20261015.md"
+      ],
+      "next_action": "Completed authentication and static residual-capacity diagnosis; use LOCAL-HYPOTHESIS for per-net occupancy/cut attribution.",
+      "acceptance": [
+        "Unchanged control reproduces133 under original capacity/margin policy.",
+        "Complete native segment/edge attribution is authenticated; endpoint overlap is measured."
+      ],
+      "rejection": [
+        "Source/policy/control mismatch, missing native segments or changed capacities."
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "LOCAL-HYPOTHESIS",
+      "priority": 3,
+      "title": "Choose one measured local routing intervention",
+      "track": "compact_experiment",
+      "status": "ready",
+      "hypothesis": "A measured overloaded edge and actual net occupancy may identify a localized change that broad reflow missed.",
+      "evidence": [
+        "docs/reports/research_next_20261013.md",
+        "docs/reports/compact_progress_ledger_20261012.md"
+      ],
+      "next_action": "Validate native segment-to-edge indexing against original marker/grid evidence; release only target-net own allocations in read-only residual model, then attribute saturated cuts before any physical intervention.",
+      "acceptance": [
+        "Immutable interface/connectivity/row power guards pass.",
+        "All original3-corner guards pass including0.1ns hold.",
+        "Paired native overflow improves133; only zero permits detailed-route advancement."
+      ],
+      "rejection": [
+        "Equal/worse overflow, any timing/electrical guard regression, or a repeated rejected configuration without new evidence."
+      ],
+      "depends_on": [
+        "TRACE133"
+      ]
+    },
+    {
+      "id": "ACTIVE-CANCEL",
+      "priority": 4,
+      "title": "Retain and document loaded active-window reset/STOP coverage",
+      "track": "frozen_g1",
+      "status": "validated",
+      "hypothesis": "Real loaded tests can prove cancellation and fresh-window behavior without hardware changes.",
+      "evidence": [
+        "38676257805: exactly1 passing XML case, counter9/window256/delay4",
+        "38676021166: wrong compiled counter4 due repeated --set, BUG85"
+      ],
+      "next_action": "Verify manifest/image hash and ensure evidence/user documentation reflects actual active-window scope.",
+      "acceptance": [
+        "Compiled report has counter9/window256/delay4 and actual loaded test passes.",
+        "No stale resumption; fresh exact256-clock window is observed."
+      ],
+      "rejection": [
+        "Wrong compiled parameters, missing XML case, source-only test or claimed native/SDF scope."
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "COMPILER-DIAGNOSTICS",
+      "priority": 5,
+      "title": "Validate actionable compiler failure classifications",
+      "track": "frozen_g1",
+      "status": "needs_review",
+      "hypothesis": "Separating capacity, pin conflict, routing and tool failures helps users act without false fit promises.",
+      "evidence": [
+        "docs/WORKLOG.md session102: reviewed4031469,12focused tests PASS; agent broader58PASS",
+        "tools/compile/tests/test_diagnostics.py"
+      ],
+      "next_action": "Review current implementation and tests; retain actual focused outcomes and run existing hosted compile regressions on exact integrated SHA.",
+      "acceptance": [
+        "Distinct actionable classes cover actual failure fixtures.",
+        "Failed rebuild cannot retain stale success report or target image.",
+        "Existing design-set images still compile/load."
+      ],
+      "rejection": [
+        "Misclassified infrastructure failure, stale loadable output, or treating spare LUTs as a routability guarantee."
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "TIMING-INVENTORY",
+      "priority": 6,
+      "title": "Prepare matched-build native timing obligations",
+      "track": "phase5",
+      "status": "ready",
+      "hypothesis": "An explicit inventory prevents conditional tile or estimated shell timing from becoming a whole-chip claim.",
+      "evidence": [
+        "docs/reports/compact_timing_modes_gap_audit_20261012.md",
+        "38164099529: conditional C2 paths only"
+      ],
+      "next_action": "Inventory available exact tile/shell views and remaining LOAD/RUN/RESET/intertile/external/annotation obligations; defer post-route timing to a qualified routed build.",
+      "acceptance": [
+        "Every required path class maps to exact views or an explicit missing-evidence obligation.",
+        "Active clocks, unmatched tiles and unconstrained endpoints remain visible."
+      ],
+      "rejection": [
+        "Combining unmatched layouts, stationary configuration in LOAD or invented external budgets."
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "REPRO-CURRENT",
+      "priority": 7,
+      "title": "Validate current clean-checkout user path",
+      "track": "phase5",
+      "status": "ready",
+      "hypothesis": "Recent host/compiler changes need current-source reproduction beyond the historical clean-run evidence.",
+      "evidence": [
+        "37690896748 at962da93: historical clean reproduction",
+        "38293580979: compiled C actual simulated SPI pass",
+        "docs/reports/reproduction.md"
+      ],
+      "next_action": "Use existing hosted clean reproduction workflow for integrated SHA; authenticate expected image and XML case census.",
+      "acceptance": [
+        "Fresh pinned runner builds documented examples and passes expected loaded/cosim tests.",
+        "Exact source and tool pins retained; no board/backend-speed claim."
+      ],
+      "rejection": [
+        "Cached/stale outputs, absent expected tests, skips or source/hash mismatch."
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "PHASE5-CLOSE",
+      "priority": 8,
+      "title": "Close phase5 only after final evidence and CI audit",
+      "track": "phase5",
+      "status": "blocked",
+      "hypothesis": "Complete auditable evidence is a competition deliverable even while compact routing stays experimental.",
+      "evidence": [
+        "docs/design/phases/PHASE5_EVIDENCE_DOCS.md"
+      ],
+      "next_action": "Finish plain-language PHASE5 summary and inspect all required CI workflows on exact efpga revision before checking exit items.",
+      "acceptance": [
+        "Every phase5 exit box passes with evidence.",
+        "All required CI results are green and applicable manual-workflow treatment is documented.",
+        "WORKLOG identifies accepted baseline and outstanding limits."
+      ],
+      "rejection": [
+        "Pending/failed required workflow, incomplete evidence report or missing phase summary."
+      ],
+      "depends_on": [
+        "P5-EVIDENCE",
+        "REPRO-CURRENT"
+      ]
+    }
+  ],
+  "rejected_hypotheses": [
+    {
+      "id": "BROAD-RUDY-REFLOW",
+      "evidence": [
+        "38321208948:133->6544 overflow"
+      ],
+      "reason": "Broad reflow regresses actual native routing."
+    },
+    {
+      "id": "BROAD-NATIVE-FEEDBACK",
+      "evidence": [
+        "38453870785:133->6000 overflow"
+      ],
+      "reason": "Changing placement estimator did not fix broad redistribution."
+    },
+    {
+      "id": "SMALLER-DELAY-POLICY",
+      "evidence": [
+        "38316844576:133->145 overflow"
+      ],
+      "reason": "Footprint reduction did not improve routing."
+    },
+    {
+      "id": "POST-CTS-REDISTRIBUTION",
+      "evidence": [
+        "38318370803:fast hold0.05714ns below0.1ns guard"
+      ],
+      "reason": "Retained hold gate fails before routing."
+    },
+    {
+      "id": "MIRRORING-PLACEMENT",
+      "evidence": [
+        "38281724422:146->151 overflow"
+      ],
+      "reason": "Pin-access mirroring worsens actual route."
+    },
+    {
+      "id": "CUGR-AS-CLOSURE",
+      "evidence": [
+        "38292828402:nonzero weighted grid overflow"
+      ],
+      "reason": "Complete guides are insufficient; metric is not comparable to FastRoute count."
+    },
+    {
+      "id": "NET-ORDER-SEED41",
+      "evidence": [
+        "38279250531: original146/combined133 -> seed41 154/143"
+      ],
+      "reason": "Seed perturbation alone regressed; arbitrary seed42 proposal withdrawn October15. Require discriminating new topology evidence before another order experiment."
+    }
+  ]
+}

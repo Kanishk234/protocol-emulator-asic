@@ -1,12 +1,31 @@
 # WARP: evidence report
 
+**October 15 status:** frozen G1 remains the supported fallback; phase 5 is
+incomplete. Unchanged-control trace
+[38676688402](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38676688402)
+reproduces **133 native global-routing overflow**, retaining native failure.
+It identifies long south/east detours, not routing closure. Exact source and
+segment provenance: [route analysis](reports/route_trace_analysis_20261015.md).
+Broad redistribution is rejected: native-feedback38453870785 has6000 overflow
+and RUDY38321208948 has6544, against133. Keep those outcomes separate from G1.
+Loaded active-window USER_RESET/STOP cancellation38676257805 passes on frozen
+G1 with authenticated counter9/window256/delay4 parameters and70/88LC, under
+D-023 scope. The current agent supervisor, strict XML checks and Python board
+exception-cleanup changes have local validation only until their own hosted
+runs are inspected. [Numerical-source audit and remaining gates](reports/evidence_audit_20261015.md).
+
 **October11 experimental progress:** actual routed eight-delay C2 reaches zero native physical gates38114298036, passes real SPI-loaded UART/USER_RESET38163199372, and clears the examined conditional internal setup/hold paths in all six extracted cases38164099529. Worst examined hold is+0.042992ns under unchanged margins. Scope and remaining annotation/I/O/loading/intertile/other-tile gates: [report](reports/compact_c2_delay_extracted_20261011.md). Separately, combined reset placement lowers paired native global-routing overflow146→133 in38168159774; both cases still fail routing. These are measured advances, not a complete successor or universal protocol/timing claim.
 
 **Baseline software/bitstream progress:** autonomous delayed UART fault plus concurrent event counting passes genuine same-job SPI-loaded chip-port test38168609080, using57/88LC and2/2timers+2/2shifts. Additional loaded matrix38273574240 passes full UART TX waveform corruption, concurrent event counting and later clean-frame recovery for counter widths3/4; both use57LC, so no counter-width area gain is claimed. [Full-duplex loaded matrix38279446388](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38279446388) also passes concurrent RX during TX corruption for both counter widths. These tests retain existing D-023 RTL-fabric accommodations; native/SDF/full-chip timing and board operation remain separate. Portable C loading/recovery and architecture-authenticated pin mapping are independently tested; source cloud pytest38168413502 passes532checks.
 
 **Portable C end-to-end evidence:** [38293580979](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38293580979) passes compiled-C checked loading through actual simulated SPI and31-byte ordered duplex exchange on a freshly compiled23/88LC hostecho image. Downloaded XML/image/report authentication and exact scope are recorded in [the status report](reports/status_and_hold_allocation_20261012.md).
 
-For a reader with 20 minutes. Every number has a source: a CI run ID (GitHub Actions on `efpga`), a report in `docs/reports/`, or a named local script. Claims and their status: `docs/CLAIMS.md`. **Nothing here is measured on silicon or a board; all results are simulation, formal proof, or physical-design reports.**
+For a reader with 20 minutes. Sources below include CI run IDs (GitHub Actions
+on `efpga`) and historical local reports. The final numerical-source audit is
+still open: a local report is not a CI run, and some historical timing views
+are unavailable. Claims and their status: `docs/CLAIMS.md`. **Nothing here is
+measured on silicon or a board; all results are simulation, formal proof, or
+physical-design reports.**
 
 AI tools (Claude and Codex) assisted project planning, source/tool/test changes,
 prior-art research, report analysis and workflow diagnosis. AI-generated
@@ -19,13 +38,24 @@ Key CI runs: [frozen-chip GDS, precheck and gate-level tests (36383587262)](http
 
 ## 1. The problem and the constraint
 
-The competition asks for a chip that can be reprogrammed after fabrication to speak hardware protocols (UART, SPI, I2C to start), on Tiny Tapeout (IHP 130 nm CMOS5L). Most entries are expected to be small CPUs. WARP instead puts a small **FPGA fabric** on the chip, and chooses what that fabric contains from measurements.
+The competition asks for a chip that can be reprogrammed after fabrication to speak hardware protocols (UART, SPI, I2C to start), on Tiny Tapeout (IHP 130 nm CMOS5L). WARP puts a small **FPGA fabric** on the chip, and chooses what that fabric contains from measurements.
 
-The hard constraint is area. On CMOS5L one FABulous LUT4 costs about **5,090 µm²** once its configuration latches, switch matrix and routing are counted (C2, `docs/reports/tile_cmos5l.md`), so a 6x4 Tiny Tapeout project holds roughly **96 LUT4s** next to the management shell.
+The hard constraint is area. The historical local tile study estimated about
+**5,090 µm² per LUT4** including configuration, switch matrix and routing;
+this is a local measurement without a CI run, not a current signoff result
+([dated setup and limitations](reports/tile_cmos5l.md)). It motivated the
+generic **96-LUT4** grid later hardened in CI36353540402
+([G0 results](reports/g0_results.md)).
 
 ## 2. What protocol logic is spent on
 
-We wrote the four design-set protocols (UART, SPI controller, I2C controller, I2C target) as ordinary Verilog and attributed every LUT to what it does (`docs/reports/profiling.md`, synthesis, phase 1): **648 LUT4s** in total, of which **counters 23 %, shift registers 17 %, storage 21 %** (mostly the I2C target's register map). A plain UART alone needs 144 LUT4s, more than the chip holds.
+We wrote the four design-set protocols (UART, SPI controller, I2C controller,
+I2C target) as ordinary Verilog and attributed every LUT to what it does.
+The **historical local synthesis profile**, without a CI run, reports
+**648 LUT4s**, of which **counters 23 %, shift registers 17 %, storage 21 %**
+(mostly the I2C target's register map). The plain UART uses144 LUT4s in that
+profile. These are phase-1 synthesis counts, distinct from placed logic-cell
+counts in the later comparison. [Method, parameters and source](reports/profiling.md).
 
 Before profiling we sealed a **held-out set** of four more protocols (WS2812, 1-Wire, SWD, CAN; commit 0171cf7) that no part of the architecture was allowed to see until the hardware was frozen (D-003).
 
@@ -47,7 +77,7 @@ Phase 3 then tried three more specializations, each measured and dropped (D-030,
 | | Result | Source |
 |---|---|---|
 | Tiny Tapeout flow | `gds`, precheck pass; routing DRC 0, LVS 0, antenna 0, Magic DRC 0 | CI 36383587262 (3047dea) |
-| Timing at 50 MHz | setup WS +12.48 ns (slow corner), hold WS +0.112 ns (fast) | same run |
+| Shell timing at 50 MHz target | setup WS +12.48 ns (slow corner), hold WS +0.112 ns (fast); fabric is a black box to STA | same run; not configured-fabric timing |
 | Shell | 3,723 standard cells, 60,567 µm² | same run |
 | Fabric macro | 1016.64 × 669.06 µm, 88 LUT4 + 2 + 2 hard blocks | `macro/warp_g1`, D-027 |
 | Formal | F1 output isolation (unbounded), F2 loader (BMC depth 84), F4 primitives = specification (unbounded) | CI `formal` 36367067725; `docs/reports/formal.md` |
@@ -88,13 +118,13 @@ The organizers asked for the flow from a protocol description to a bitstream, ho
 | Shell random transactions | SPI transactions checked against an independent model, with command × state and error coverage | `test_internal/uvm`, local seed 1: 2,288 transactions, 79/79 coverage bins, 0 mismatches (2026-09-28) |
 | Co-simulation | the UART as a bitstream vs its source RTL: identical TX waveforms, equal RX | `test_internal/cosim`; CI `fabric` 36451328356 |
 | Mutation | 11 planted bugs, all caught | `docs/reports/mutation.md` (local), `scripts/mutation.py` |
-| Timing model | primitive timing arcs checked against STA of the hardened primitive tile | `tools/timing/README.md`, D-028 |
+| Timing model | historical local primitive boundary-path cross-check; matching original tile netlist/SPEF unavailable for a fresh audit | `tools/timing/README.md`, D-028; [artifact gap](reports/reproduction.md) |
 
 Bugs and investigations, with the checks and limits recorded for each: `docs/BUGS.md`.
 
 ## 9. Known limits
 
-- **No hardware results**: no silicon, no board; rates are model estimates (Fmax 53–91 MHz for the supported designs, `tools/timing/README.md`), not measurements.
+- **No hardware results**: no silicon, no board. Protocol Fmax values in the historical local reports are compiler-model estimates, not validated whole-chip rates; original routed primitive timing views remain unavailable for a fresh cross-check (`tools/timing/README.md`, [artifact gap](reports/reproduction.md)).
 - **Capacity**: 88 cells; the I2C target and CAN do not fit. One bitstream runs at a time, but it can contain concurrent functions: UART-plus-event-monitor fits at 37/88 cells and passes local loaded RTL/synthesized gate-shell tests (`docs/reports/g1_uart_monitor.md`, C11) and fresh hosted compile/loaded RTL in37512249763. There is no new hardened macro/SDF result from that hosted demonstration.
 - **Fault-control showcase**: the UART/monitor plus externally timed TX line inversion fits at38/88 cells and passes two-case loaded RTL and synthesized-shell suites (`docs/reports/g1_uart_fault_monitor.md`, C12). This controls selected corruption and preserves monitoring; it is not an autonomous fault scheduler or a silicon result.
 - **Soft capture**: UART plus a two-entry six-bit timestamp queue fits at83/88cells and passes loaded ordering/overflow/wrap/backpressure/TX/RX/reset tests (`docs/reports/g1_uart_capture.md`, C13). Default timestamps wrap at64clocks; an85-cell option trades four-clock resolution for256-clock wrap, with loaded quantization/wrap checks. The eight-bit stored timestamp version exceeds capacity at91cells. No new hardware or native gate timing evidence.
@@ -132,7 +162,7 @@ latches. Corrected37709917442 passes both control cases with9164 real latches
 known/matching; original synthesis/finalC2 substitutions fail real UART X
 despite the same complete configuration pass. The functional issue is present
 at original synthesis, with exact cause still under investigation.
-Latest d826baf docs37708777806/lint37708777982/test37708777749/unit37708777707
+At that historical checkpoint, d826baf docs37708777806/lint37708777982/test37708777749/unit37708777707
 all pass. No compact promotion, matched native/configured
 timing or equal-area superiority claim follows from these scratch results.
 Exact hashes/limits: `docs/reports/compact_clean_layout_20261007.md` and
@@ -165,8 +195,8 @@ still fails: cluster8 baseline149 overflow, ten-buffer candidate169. The
 successfully retains actual coordinate/net reports while preserving routing
 failure148/169. Diagnostic collection success is not routing acceptance.
 
-The next experiments isolate incidental legalization movement and establish
-genuine image-selected register clocks. Neither full compact qualification,
+At that historical checkpoint, planned experiments aimed to isolate incidental
+legalization movement and establish genuine image-selected register clocks. Neither full compact qualification,
 an operating frequency nor equal-area superiority is established. See
 `docs/reports/compact_congestion_research_20261009.md` and
 `docs/reports/compact_configured_timing_plan_20261009.md`.

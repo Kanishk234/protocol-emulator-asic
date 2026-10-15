@@ -1,6 +1,6 @@
 # Phase 5 summary: evidence and documentation
 
-**Status:** in progress (updated 2026-10-12). Clean README reproduction now
+**Status:** in progress (updated 2026-10-15). Clean README reproduction now
 passes on a fresh hosted runner37690896748: rebuilt bitstreams, loaded30/30
 and cosim1/1 with strict XML/tool/README/source provenance. The clean-machine
 checklist item is complete; numerical evidence audit and all-required-CI gates
@@ -25,22 +25,22 @@ Measured smaller-delay producer38316322592 now passes native placement and
 3-corner estimated shell guards, saving455.4144µm² standard-cell footprint
 while retaining worsthold0.112282ns and unchanged chip outline/clock policy.
 Paired38316844576 worsens133→145overflow; reject smaller-delay candidate for
-routing. Preserve133 control and test congestion-driven redistribution with
-all original masters/repairs retained; no closure claim.
+routing. Preserve133 control; later broad redistribution trials also failed,
+as recorded below. No closure claim.
 
 Earlier-stage placement38319615838 rebuilds CTS/repairs and restores the
 retained hold guard after post-CTS redistribution failed it. Known fanout
 repair38320631258 now passes native placement/connection/interface checks
 and all3 original-corner estimated shell electrical/timing gates, retaining
 fast hold0.100232ns. Routing comparison38321208948 rejects reflow:6544versus133;
-D094 now evaluates native routing feedback in placement at unchanged policy;
+D094 subsequently failed routing6000versus133 in38453870785;
 no routing or complete chip-timing pass is claimed. The progress ledger
 separates setup failures, rejected changes and actual qualified results.
 
 Combined shell placement38168159774 improves146→133native overflow and111→91
 markers, still fails routing. Buffer producer38172225275 passes native legality
-and six preliminary electrical/timing guards; identical-policy routing is now
-queued. Exact shared-marker connectivity identifies broader congestion than reset
+and six preliminary electrical/timing guards; its routing38178351037 later
+regressed against133 and was rejected. Exact shared-marker connectivity identifies broader congestion than reset
 ties alone; it does not causally assign overflow to individual nets.
 
 Official Tiny Tapeout precheck passes all nine checks37960021923 on the
@@ -140,7 +140,8 @@ Make WARP's design choice, results, limits and use understandable to a judge, an
 
 ## What we found
 - The pinned FABulous release requires Python 3.12 or newer; the README and agent guidance now say so.
-- All Phase 4 tests reached green CI, but the new F3 and pyuvm checks still need CI evidence after the current changes are committed and pushed.
+- All Phase 4 tests reached green CI. Subsequent F3 evidence is36491754401;
+  the original paragraph's pending status is historical, not a current blocker.
 - The evidence report still needs a final pass over local-only measurements and their reproducible source references before its checklist item can be ticked.
 
 ## October 5 milestone
@@ -208,3 +209,16 @@ October13 update: native routing-feedback placement38339209412 and fixed-instanc
 October13 routing result:38453870785 measures133control versus6000native-feedback candidate overflow. Reject this candidate despite clean estimated electrical/timing guards. Broad re-placement has failed with both estimators; the next physical work is a localized topology audit on the best control. Phase5 remains open.
 
 October14 verification: corrected loaded active-window cancellation38676257805 passes after authenticated parameter check(counter9/window256). USER_RESET cancels a live window, STOP parks then RUN recovers, and a fresh edge produces full256-clock window. Image8c8fc691… fits70/88LC. This extends frozenG1 functional evidence under D023; compact routing remains133overflow and phase5 remains incomplete.
+
+October15: an active coordinator/specialist team now uses a persistent backlog,
+rejection history and evidence review procedure. A bounded test supervisor
+preserves source/run-attempt identity and checks actual XML/images/parameters;
+it does not provide background AI after the session ends. Independent routing
+analysis of38676688402 confirms long peripheral detours, then rejects an
+arbitrary new-seed proposal because seed41 already regressed. Current residual
+capacity observations motivate targeted diagnosis before another physical edit.
+Board SPI error cleanup and strict protocol-CI XML validation are fixed with
+local regressions; new hosted evidence is recorded in WORKLOG after push.
+The numerical audit now labels historical/local measurements and shell-only
+timing explicitly; missing original primitive timing views and compact
+same-build closure remain open. No phase boxes are ticked.

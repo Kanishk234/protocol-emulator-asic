@@ -15,6 +15,7 @@ WARP is our entry to the Jane Street Protocol Emulator ASIC competition (Tiny Ta
 | Verification: formal proofs, mutation campaign | [docs/reports/formal.md](docs/reports/formal.md), [docs/reports/mutation.md](docs/reports/mutation.md) |
 | The hardware contract | [docs/design/ARCHITECTURE.md](docs/design/ARCHITECTURE.md) |
 | Decisions, bugs, phase summaries | [docs/DECISIONS.md](docs/DECISIONS.md), [docs/BUGS.md](docs/BUGS.md), [docs/summaries/](docs/summaries/) |
+| Autonomous development, agent roles and experiment backlog | [Operating procedure](docs/design/AUTONOMOUS_DEVELOPMENT.md), [backlog](docs/autonomy/backlog.json) |
 | Tiny Tapeout datasheet page | [docs/info.md](docs/info.md) |
 
 ## Quick start (simulation)

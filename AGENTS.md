@@ -25,6 +25,11 @@ Architecture in one line: a small **embedded FPGA fabric specialized for protoco
 4. `docs/design/VERIFICATION.md`: layers, check IDs, tools.
 5. `docs/design/PHYSICAL_DESIGN_AND_CI.md`: TT flow, fabric hardening, routing limits, workflows.
 6. The latest entries in `docs/DECISIONS.md` and `docs/BUGS.md`.
+7. For autonomous/team work, `docs/design/AUTONOMOUS_DEVELOPMENT.md` and
+   `docs/autonomy/backlog.json`: inspect existing runs, assign disjoint files,
+   review rejected hypotheses, and preserve authenticated controls. Delegate
+   when the session authorizes agents; keep session-specific Git approval
+   separate from standing repository rules.
 
 ## Phase gates (hard rules)
 - Work in phase order: 0 setup → 1 profile/specify/de-risk → 2 baseline fabric + shell → 3 specialize, compare, hardware freeze → 4 protocols, showcase, held-out evaluation → 5 evidence/docs → 6 submission. Phase 7 (hardware prototyping) is optional and off the critical path.

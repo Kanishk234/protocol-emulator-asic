@@ -1,10 +1,26 @@
 # Bugs
 
+## 88: Protocol CI accepts missing or incomplete XML evidence
+- **Date:** 2026-10-15.
+- **Symptom/check:** adversarial XML fixtures show `! grep -q failure results.xml` succeeds for a missing file (grep exits2), and for empty, skipped or error-only suites.
+- **Root cause:** shell text search does not establish that any test actually executed successfully.
+- **Fix:** all eight protocol loops in WARP's `unit` workflow now use the common strict XML checker; both unit jobs use project venvs. Missing/malformed/empty results, failure/error/skip elements and nonzero failure counters reject the run.
+- **Coverage:** `tools/autonomy/tests/test_check_xml.py`, 24 local passing tests; actual hosted workflow result is recorded in the session handoff after push. No hardware or template-job edits.
+
+## 87: Python board SPI exception leaves chip-select asserted
+- **Date:** 2026-10-15.
+- **Symptom/check:** injected read/write/wait failures leave CS low; a subsequent command can continue an interrupted transaction.
+- **Root cause:** `Warp.xfer` released CS only on its normal return path.
+- **Fix:** attempt CS-high/SCK-low/MOSI-low idle on any interruption; preserve FAB_IN and the original exception, even if cleanup fails. Never retry a partially accepted command. Transport cleanup is best effort, not rollback.
+- **Coverage:** faults at all86 pin-operation boundaries and secondary cleanup failure in `tools/board/tests/test_warp.py`; independently rerun board+host suites542PASS, `build/autonomy_board_host.xml`. Software pin-adapter scope; no physical board claim.
+
 ## 86: Trace replay depends on expired historical artifact
 - **Date:**2026-10-14.
 - **Symptom/check:**38676296904 fails source-fetch with no valid artifacts; native routing never starts.
 - **Root cause:** old best133 source and original policy artifacts have finite retention. A durable approved pre-CTS archive exists but trace replay still fetched old derived outputs.
 - **Fix/coverage:** regenerate derived control from approved archive and enforce exact recorded view hashes; retain exact13-field RT_/GRT_ policy subset from authenticated660afb…config with normalizedSHA691d8fec… . Native regeneration/replay pending; no physical result from failed setup.
+
+**BUG86 follow-up:** hosted38676688402 regenerates authenticated best133 views and reproduces133 native overflow with exact original markers, unchanged sources and actual segment exports. Infrastructure repair succeeds; routing remains failed. See `docs/reports/route_trace_analysis_20261015.md`.
 
 ## 85: Repeated compiler parameter option silently drops earlier group
 - **Date:**2026-10-14.

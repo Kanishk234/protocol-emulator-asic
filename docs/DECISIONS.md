@@ -933,3 +933,27 @@ wiring/repair tradeoff. Actual area and routing benefit remain unmeasured.
 [OpenROAD global placement](https://openroad.readthedocs.io/en/latest/main/src/gpl/README.html) documents native GRT as a more precise, higher-runtime alternative to its default RUDY estimate. Native-runtime failure or missing source/flag evidence rejects this experiment; no physical advantage is assumed.
 
 **D-094 outcome, October13:**38453870785 native route rejects candidate6000overflow versus133control. Three-corner repaired producer success38452773248 did not predict routing closure. Reject broad native-feedback re-placement, preserve best133control, and inspect localized routing topology before further placement experiments. Historical RUDY workflow replays are manual-only; no architecture or routing-capacity waiver.
+
+## D-095: Evidence-driven autonomous development with an active agent team
+
+**Date:** 2026-10-15. **Status:** user-authorized session setup; hosted validation pending.
+
+Use the coordinator plus explicitly assigned specialists for independent research,
+implementation and adversarial evidence review. Persist actionable tasks and rejected
+hypotheses in `docs/autonomy/backlog.json`; follow
+`docs/design/AUTONOMOUS_DEVELOPMENT.md`. GitHub remains the substantial test/EDA
+executor. Preserve frozen G1 and authenticated best133; no hardware, capacity,
+clock, spec or acceptance change follows from this infrastructure.
+
+Add a bounded allowlisted test supervisor with atomic state, a single-writer lock,
+source/revision and attempt checks, actual XML/image/parameter verification,
+downloaded evidence fingerprints, finite launch/concurrency limits and a STOP
+file. It supervises tests; the live session supplies engineering judgment. No
+model credentials or unattended AI worker are provisioned. User Git approval is
+for this session; it does not grant future sessions or scheduled code writes.
+
+Default branch remains TRIPWIRE `main`. GitHub schedules run on the default
+branch, so do not advertise an `efpga`-only cron as active. Use branch-filtered
+push/manual observation and an explicitly launched bounded supervisor instead.
+Sources: [GitHub workflow events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows),
+[OpenAI non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode).

@@ -35,9 +35,29 @@ A fixed-column/row residual screen of that grid gives concrete competition evide
 
 The read-only analyzer now also traverses the full peripheral grid using both preferred horizontal layers (Metal1/3) and both vertical layers (Metal2/4), permitting cost-free layer switches at every center. It excludes centers strictly inside native macro OBS and admits one outward access portal for each actual exported snapped macro terminal. Edges require strictly positive capacity-minus-current-usage in at least one applicable layer. This optimistic static graph connects all measured shell terminals into the same1621-center component, but reaches **none** of the four macro portals: north(107,95)/(108,95), south(57,1)/(55,1). Thus simply finding another unused centerline around the fixed current allocation does not repair these paths in this graph.
 
-This is deliberately **not an infeasibility proof**. The current target net's own occupied resources are still included in usage; global negotiation can release them, displace other nets and change the cut. Cost-free vias omit real access constraints, while the single portal exempts its boundary access step and does not prove that step legal. Grid fields are interpreted as preferred-direction edge resources from each indexed center to its positive-axis neighbor, consistent with the calibrated observer's direction convention; aggregate calibration alone does not independently prove every physical edge correspondence. Neither an unreachable portal nor a hypothetical reachable one establishes a legal complete route.
+This is deliberately **not an infeasibility proof**. The original graph includes each target net's own resources; the follow-up below releases them individually. Global negotiation can also displace other nets and change the cut. Cost-free vias omit real access constraints, while the single portal exempts its boundary access step and does not prove that step legal. The source/index cross-check and encoded-capacity refinement appear in the follow-up below. Neither an unreachable portal nor a hypothetical reachable one establishes a legal complete route.
 
-Consequently the next discriminating observation should preserve per-net occupancy or release **only each target net's recorded planar allocation in a read-only accounting model**, then compare residual reachability with the original model. Do not modify the native design or claim the artificial residual model is a negotiated route. Before subtracting occupancy, verify segment-to-edge indexing against exact reported marker coordinates and ensure snapped pin extensions are not incorrectly charged as ordinary routed edges. If own-allocation subtraction opens a short north-west path, staged tree evidence becomes specifically relevant: why was that path not chosen after rip-up? If it stays closed, enumerate the saturated residual cut's actual other-net membership before considering any targeted placement or routing-order intervention. This supplies a concrete measurable next step without another EDA workflow.
+## Validated own-allocation release follow-up
+
+Pinned [FastRoute source](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/fastroute/src/FastRoute.cpp) fixes the interpretation: `incrementEdge3DUsage` traverses horizontal indices[x1,x2) or vertical[y1,y2). `updateDbCongestion` encodes capacity as physical capacity plus reduction, and usage as horizontal/vertical occupancy plus reductions. Consequently **the grid's positive capacity field is not a count of usable unblocked tracks**. Residual subtraction cancels the encoded reductions. Earlier fixed-slice positive-capacity statements refer only to the recorded fields.
+
+Cross-check against all ten remote zero-capacity marker boxes passes: preferred-layer residual overflows reproduce respectively1,3,1,1,1,1,1,1,1,1 at indices(19,4),(41,2),(17,4),(20,4),(38,2),(16,4),(39,2),(18,4),(21,3),(21,2). At(41,2), the exact reported three-net marker is independently explained by exported Metal1 occupancy from cell_pad[31]/cell_val[27] (encoded17capacity/19usage) and Metal3 occupancy from cell_pad[27] (17/18). At(19,4), cell_val[30] supplies the exported Metal3 segment and grid17/18 gives overflow1. This verifies edge index/direction rather than merely matching aggregate totals.
+
+The analyzer now releases one unit of occupancy for each **unique planar edge of one target net**, independently for each experiment. It does not release vias, other nets or blockage, and rejects nonpreferred or off-grid segments. Each target's supplied segments meet these conditions. Original usage is not clamped or replaced; this is a read-only accounting hypothesis, not native rerouting.
+
+| Released target only | Unique planar edges released | Reachable peripheral centers | Target macro portal reachable |
+|---|---:|---:|---|
+| none |0|1621|no for all4|
+| cell_pad[27] |373|1623|no|
+| cell_pad[31] |82|1623|no|
+| cell_val[27] |376|1667|no|
+| cell_val[30] |77|1621|no|
+
+Every source-component cut contains44 saturated preferred-direction geometric edges, including peripheral throats at north x118.8→126/y687.6 and694.8, and south x126→133.2/y3.6 and10.8. The observed graph therefore does not open an unused legal-perimeter path merely by releasing any one suspect net. Remaining nets must be reconsidered or a stage must have allocated an infeasible route. These static findings still do not prove a globally negotiated reroute impossible, identify an optimal edit, or account for via/access restrictions.
+
+Concrete northern-throat membership at x118.8→126/y687.6 includes Metal1 cell_pad[7],cell_val[17/18/20/24]; Metal3 cell_en[24],cell_pad[24/26],cell_val[19/21/22/25/26],clk,net15. At the row above, y694.8, Metal1 has cell_en[26]; Metal3 includes cell_en[25],cell_pad[25],u_in_sync._016_,net2/3/4/10/11/12/245/246. This census is actual exported segment membership, not usable track counts: blockage encoding and any routing edge costs mean raw net counts need not equal recorded usage. A physical change aimed only at the four failed-detour signals lacks support; competition includes unrelated fabric inputs/clock and north shell signals.
+
+The next discriminating **algorithm-stage observation** is now specific: capture initial, post-negotiation2D and post-assignment3D topology for cell_pad[27], plus occupancy/reduction at the two-row northern throat above. Keep the exact133 control and require unchanged final segment/report hashes. Determine when the route commits to the south/east perimeter and whether the northern throat is already saturated at that stage. This is better supported than a new seed, broad placement, pin move or capacity alteration. Actual headless stage-export support must be established in pinned source before introducing an observer workflow.
 
 A targeted hypothesis remains: for the north-bound nets27, competition in the west/north corridor makes the router select the much longer south/east perimeter. Alternative hypothesis: those detours originate before the negotiated route or layer assignment despite a feasible north-west route. Final segments alone cannot distinguish these. Moving cells or changing capacity now would confound them.
 
@@ -49,7 +69,29 @@ The existing read-only artifacts already establish that cell_pad[27] has only on
 
 Observation acceptance requires unchanged source/physical-policy hashes, native133 and exact congestion-report hash, plus identical target segment hash to38676688402. If the observer changes routes, reject its causal comparison. The decisive measurement is where the south/east topology first appears and whether each north-west alternative has a continuous finite-capacity path with competing demand counted. If the initial tree already detours with available north-west resources, investigate topology/maze negotiation; if it changes only in3D, inspect layer allocation. If north-west edges are saturated, a separate endpoint/cell-level congestion intervention needs that local evidence before proposing a one-variable edit.
 
-Still missing: staged trees and a full corridor connectivity/capacity analysis rather than two fixed slices and any route passing all downstream checks. Current evidence does not support a specific hardware or placement edit. The west-channel450–550µm concentration and high local cell occupancy remain unresolved by the four-net analysis. Preserve133; no regression or diagnostic counts as physical acceptance.
+Completed: full static peripheral connectivity, independently checked indexing, one-target occupancy release and cut membership. Still missing: native staged topology/occupancy evidence and a complete negotiated route passing downstream legality, timing and function checks. Current evidence does not support a specific hardware or placement edit. The west-channel450–550µm concentration and high local cell occupancy remain unresolved by the four-net analysis. Preserve133; no regression or diagnostic counts as physical acceptance.
+
+## Exact upstream observation hook and remaining headless limitation
+
+Start with `FastRouteCore::run()` in the pinned `src/grt/src/fastroute/src/FastRoute.cpp`, immediately around `removeLoops()`, `layerAssignment()` and the two conditional `mazeRouteMSMDOrder3D(...)` calls. Existing logger group `GRT/grtSteps` reports scalar overflow after layer assignment and after3D maze routing. The next lightweight helper can insert only:
+
+```tcl
+set_debug_level GRT grtSteps 1
+```
+
+before the unchanged native global_route command in an attributed runtime Tcl copy. It must retain native error and final133/marker/segment hashes. These existing source hooks can distinguish whether3D processing increases/decreases congestion at all, but cannot expose a selected net's intermediate tree or prove the northern throat was available. Do not mislabel scalar debug output as staged topology.
+
+For topology, inspect `FastRouteCore::getPlanarRoute`, `sttrees_[netID]` and `StTreeVisualization` in that same file, plus `GlobalRouter::findRouting()` in `GlobalRouter.cpp`, which performs `addRemainingGuides`, `connectPadPins` and `mergeSegments` after the core run. The existing2D debug display occurs **before** potential `copyBR()` restoration, loop removal and layer assignment; therefore its displayed tree is not automatically the exact tree passed to layer assignment. A proper observer needs a second capture immediately before `layerAssignment()` and one after assignment before3D maze updates. This is a concrete source-order requirement from the pinned implementation.
+
+`StTreeVisualization()` invokes `fastrouteRender()->redrawAndPause()`, so the GUI tree switches do not supply a proven hosted headless export. No supported stock Tcl command was established for obtaining those intermediate per-net arrays. Building a custom observer binary would add a tool-build variable and requires separate source/build authentication and control equivalence; it is not approved by this report as a casual next workflow. Prefer the existing scalar debug hook first if a new replay is warranted, while researching a headless observer or reproducer before spending on physical changes.
+
+## Scalar observer prepared; hosted execution pending
+
+`test_internal/cloud_route_trace.py` now inserts only logged `set_debug_level GRT grtSteps 1` before its existing native route observation in the attributed runtime Tcl copy. It leaves the error-preserving TRACE body unchanged. Original133, exact congestion report hash, source hashes and all protected routing fields remain mandatory. It additionally **requires**, rather than merely records, full segment SHA256 `aee9b65f2cfc5f653793de924dedd919a7b68d67fa3ef3febf7ca17e3f1ad7ca` and target JSON SHA256 `f00a6206d105a949428454017fe32fa6553bf07c89428c95ac1d7ead661e37d4`. A logging-induced change in final routing rejects the observation.
+
+The parser recognizes the pinned source's exact `After LayerAssignment - 2D/3D cong: integer/integer` and `After MazeRoute3D - 3Dcong: integer` lines, without equating2D and3D metrics. Repeated stages reject; incomplete/unrecognized stage text is recorded as `parsed:false`, preserving the native log without a scalar result claim. Execution must show exactly one logged debug command. No seed, hardware, routing policy, capacities or acceptance gates change.
+
+Local focused trace tests:12PASS/2SKIP (no local Tcl interpreter), including both final-route hash rejection cases, stage grammar/missing/repeated cases and exact runtime-copy insertion. Existing error-preservation Tcl tests remain unchanged and skipped for the previously documented interpreter limitation. No local EDA was run. Existing `route_trace.yaml` can perform this bounded hosted observation; actual execution and scalar results remain pending.
 
 ## Reproduction
 
@@ -60,4 +102,4 @@ python tools/autonomy/route_analysis.py build/autonomy_initial_trace/compact-rou
 pytest -q tools/autonomy/tests/test_route_analysis.py
 ```
 
-Six focused tests pass locally on October15, including crossing-versus-touching geometry, malformed/diagonal/cross-layer rejection, and residual connectivity across preferred-layer switches with a saturated-edge cut. No local EDA was run, no phase boxes ticked, and the known133 control remains preserved.
+Seven focused tests pass locally on October15, including crossing-versus-touching geometry, malformed/diagonal/cross-layer rejection, residual connectivity across preferred-layer switches with a saturated-edge cut, and reversed/duplicate native edge indexing. No local EDA was run, no phase boxes ticked, and the known133 control remains preserved.

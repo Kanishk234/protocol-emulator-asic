@@ -1,11 +1,25 @@
 # Bugs
 
+## 90: Phase supervisor trusts row count without validating observations
+- **Date:** 2026-10-15.
+- **Symptom/check:** adversarial evidence can contain48 duplicate/contradictory phase records with `passed:true` and a passing XML stub.
+- **Root cause:** the first supervisor checked aggregate status/count but omitted exact campaign membership and individual observations.
+- **Fix/coverage:** require exact3-seed/16-index census, successful byte/read/status observations, valid phase/delay ranges, and actual fixture SHA from the run revision's Git blob. Fourteen adversarial mutations plus complete valid evidence cover rejection/acceptance; actual38777137234 downloaded phase evidence passes the stronger checker. No claim that the original cloud simulation was wrong.
+
+## 89: Strict UART CI exposes an inapplicable registered test
+- **Date:** 2026-10-15.
+- **Symptom/check:** hosted unit38777137520 rejects fixed-divisor UART XML because runtime-divisor test is intentionally skipped.
+- **Root cause:** runtime-only test was registered in every variant using `skip=not RUNTIME_DIV`. Cocotb2 also emits skipped XML for test-filter exclusions, so a filter does not resolve strict executed-case validation.
+- **Fix/coverage:** conditionally register the runtime-divisor test only for its applicable variant; preserve its existing test body and strict zero-skips checker. Require7 cases for fixed-divisor and8 for runtime-divisor UART runs. Actual corrected hosted matrix pending; no RTL change.
+
 ## 88: Protocol CI accepts missing or incomplete XML evidence
 - **Date:** 2026-10-15.
 - **Symptom/check:** adversarial XML fixtures show `! grep -q failure results.xml` succeeds for a missing file (grep exits2), and for empty, skipped or error-only suites.
 - **Root cause:** shell text search does not establish that any test actually executed successfully.
 - **Fix:** all eight protocol loops in WARP's `unit` workflow now use the common strict XML checker; both unit jobs use project venvs. Missing/malformed/empty results, failure/error/skip elements and nonzero failure counters reject the run.
 - **Coverage:** `tools/autonomy/tests/test_check_xml.py`, 24 local passing tests; actual hosted workflow result is recorded in the session handoff after push. No hardware or template-job edits.
+
+**BUG88 follow-up:** the same strict checker now covers real-bitstream and co-simulation XML in WARP's `fabric` workflow, plus default protocol suites in `scripts/check_all.sh`. Idle-fabric shell checks retain their separately intentional skipped bitstream cases; this change does not silently claim those executed.
 
 ## 87: Python board SPI exception leaves chip-select asserted
 - **Date:** 2026-10-15.

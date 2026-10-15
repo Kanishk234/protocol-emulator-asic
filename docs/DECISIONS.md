@@ -957,3 +957,13 @@ branch, so do not advertise an `efpga`-only cron as active. Use branch-filtered
 push/manual observation and an explicitly launched bounded supervisor instead.
 Sources: [GitHub workflow events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows),
 [OpenAI non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode).
+
+**D095 session follow-up:** the actual hosted strict-XML failure exposed BUG89
+(an inapplicable UART test), fixed by conditional discovery rather than weaker
+acceptance. Actual four-check campaign on77edd2d is independently verified.
+Read-only route/grid research now supports one bounded observation: enable
+existing pinned `GRT/grtSteps` scalar reporting on the unchanged133 control.
+Require identical full native segment and selected-target hashes in addition
+to original marker/policy/source checks. Scalar stages may locate where
+congestion arises; they do not provide selected-net topology or physical
+acceptance. No random-seed, placement, resource, margin or hardware change.

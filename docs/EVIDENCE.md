@@ -10,9 +10,13 @@ Broad redistribution is rejected: native-feedback38453870785 has6000 overflow
 and RUDY38321208948 has6544, against133. Keep those outcomes separate from G1.
 Loaded active-window USER_RESET/STOP cancellation38676257805 passes on frozen
 G1 with authenticated counter9/window256/delay4 parameters and70/88LC, under
-D-023 scope. The current agent supervisor, strict XML checks and Python board
-exception-cleanup changes have local validation only until their own hosted
-runs are inspected. [Numerical-source audit and remaining gates](reports/evidence_audit_20261015.md).
+D-023 scope. Hosted supervisor38777137622 passes63 checks; the four separate
+campaign artifacts are independently verified on77edd2d: phase38777137234,
+active-cancel38777137304, C-host38777137259 and nine compiler builds38777137439.
+Unit38777137520's tools job passes, but its protocol job correctly exposes an
+inapplicable UART skip; corrected discovery still needs its own hosted result.
+[Integration evidence](reports/autonomous_integration_20261015.md) and
+[numerical-source audit and remaining gates](reports/evidence_audit_20261015.md).
 
 **October11 experimental progress:** actual routed eight-delay C2 reaches zero native physical gates38114298036, passes real SPI-loaded UART/USER_RESET38163199372, and clears the examined conditional internal setup/hold paths in all six extracted cases38164099529. Worst examined hold is+0.042992ns under unchanged margins. Scope and remaining annotation/I/O/loading/intertile/other-tile gates: [report](reports/compact_c2_delay_extracted_20261011.md). Separately, combined reset placement lowers paired native global-routing overflow146→133 in38168159774; both cases still fail routing. These are measured advances, not a complete successor or universal protocol/timing claim.
 

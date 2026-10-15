@@ -73,3 +73,9 @@ The current phase summary does correctly record the later6000 rejection and
 active-cancellation pass at its end, but those additions do not resolve its
 older contradictory prospective text. This audit owns EVIDENCE and this report
 only; it does not silently mark the summary or checklist complete.
+
+**Coordinator follow-up:** the phase5 summary's stale pending/queued passages
+were corrected in77edd2d. Hosted supervisor38777137622 and four independently
+checked campaign artifacts now validate that integration within their specific
+scope; unit38777137520 exposes BUG89, so no overall green claim is made.
+See [actual integration outcomes](autonomous_integration_20261015.md).

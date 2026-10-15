@@ -71,9 +71,10 @@
       "hypothesis": "A measured overloaded edge and actual net occupancy may identify a localized change that broad reflow missed.",
       "evidence": [
         "docs/reports/research_next_20261013.md",
-        "docs/reports/compact_progress_ledger_20261012.md"
+        "docs/reports/compact_progress_ledger_20261012.md",
+        "docs/reports/route_trace_analysis_20261015.md: all10 zero-capacity markers validate edge indexing; individual own-net release leaves44-edge cuts and no reachable macro portal"
       ],
-      "next_action": "Validate native segment-to-edge indexing against original marker/grid evidence; release only target-net own allocations in read-only residual model, then attribute saturated cuts before any physical intervention.",
+      "next_action": "Research exact pinned FastRouteCore::run headless stage export around copyBR/removeLoops/layerAssignment/mazeRouteMSMDOrder3D. Existing set_debug_level GRT grtSteps 1 supplies scalar stage overflow only; GUI StTreeVisualization redrawAndPause is not a hosted tree export. Preserve exact133 final hashes; no new physical edit/workflow until a discriminating supported observer is specified.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",

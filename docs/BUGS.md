@@ -1,5 +1,24 @@
 # Bugs
 
+## 93: Current I2C target state escapes the historical profiling role map
+- **Date:** 2026-10-15.
+- **Symptom/check:** hosted profile38780941523 has valid current LUT totals but assigns zero target FFs to counter/shift; actual retained netlist contains four `g_logic.n` and eight `g_logic.sr` state bits.
+- **Root cause:** primitive integration renamed the plain-logic registers while the historical role regexes still matched only `nbit` and `shift`; the fallback labeled them control.
+- **Fix/coverage:** extend only the target's role map to its actual generated plain-logic names. Reanalysis of retained native JSON restores4counter/8shift FFs without changing185total LUTs. The evidence collector now rejects a conserving matrix missing expected timing/shift state. New hosted refresh pending; original historical profile remains separately labeled.
+
+## 92: CLI numeric heuristic raises a traceback for ordinary parameter strings
+- **Date:** 2026-10-15.
+- **Symptom/check:** `--set VALUE=face` or malformed numeric `VALUE=0xGG` can raise an uncaught integer-parser ValueError instead of an actionable compiler result.
+- **Root cause:** a hexadecimal-character regex treated bare identifiers as integers, while the conversion exception bypassed CompileError handling.
+- **Fix/coverage:** parse only integer-looking strings, support signed decimal/prefixed integers and underscores, preserve nonnumeric Verilog strings/expressions, and report malformed integer literals before compilation. Focused CLI fixtures cover strings, formats, malformed values and existing repeated-option behavior in `tools/compile/tests/test_diagnostics.py`; hosted regression pending.
+
+## 91: Mutation runner counts infrastructure failure as a detected defect
+- **Date:** 2026-10-15.
+- **Symptom/check:** a missing tool, malformed/missing XML or harness import failure exits nonzero and was reported as a killed mutant.
+- **Root cause:** the runner inferred rejection from exit status/text without pristine controls or actual executed testcase/property evidence.
+- **Fix:** establish each distinct pristine command first; require exact applicable case census and assertion rejection, or explicit formal property FAIL. Missing tools, setup exceptions, compile errors, timeouts, skipped required cases and contradictory results are errors. Bound child process groups; write fresh campaign evidence under build, preserving the historical committed report.
+- **Coverage:** adversarial fixtures and deduplicated-control tests in `tools/autonomy/tests/test_mutation_evidence.py`; actual controlled hosted campaign pending. No claim that every historical detection was false, or that the new campaign has already killed all mutants.
+
 ## 90: Phase supervisor trusts row count without validating observations
 - **Date:** 2026-10-15.
 - **Symptom/check:** adversarial evidence can contain48 duplicate/contradictory phase records with `passed:true` and a passing XML stub.

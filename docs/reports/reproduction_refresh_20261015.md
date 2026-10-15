@@ -6,6 +6,18 @@ passes on **77edd2dfdc12184a9b69c98cfa5041e9137ac016**. The actual job runs
 that revision's documented source/compile/RTL path. It does not validate later
 6370e1f discovery/CI changes or establish physical/native/SDF timing.
 
+**Later refresh with emitted bytes:**38780941472 succeeds on
+8e4c117537401528814ff25fadd64de697654db5, including corrected discovery and
+strict local protocol checks. Its artifact now contains all12 emitted images
+(standalone UART plus11 examples). Each actual downloaded image's SHA256
+matches its own same-job report; no image authentication is inferred solely
+from a report. The14 XML records include loaded30/30 and cosim1/1, zero
+default UART skips after discovery repair, and17 intentional idle-chip skips.
+Result SHA256:
+`013865c1e55ad1b476b5db36921f6a99bcd65db6bd4a7b94e579a67d909073f2`.
+The earlier omission described below applies to38777288608 only. Original
+primitive timing views remain missing; neither refresh is a timing signoff.
+
 Downloaded artifact `clean-readme-reproduction-38777288608` is retained locally
 under ignored `build/reproduction_refresh_20261015/`. Independent inspection
 checks actual files, not merely the workflow's green conclusion:

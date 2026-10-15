@@ -27,3 +27,25 @@ The parser retains native per-epoch iteration starts, post-increment summary cou
 After a matching observer completes, inspect the final epoch's last10 overflow samples and best-round history. If overflow continues falling into the50-start boundary, propose one bounded native budget100 versus50 comparison, retaining capacities/margins/source and all final acceptance guards; this reaches documented native history regimes rather than inventing a new algorithm. If the trajectory plateaus, oscillates or repeatedly worsens, do not spend on a blind budget increase: use the measured throat cut and cached-history behavior to select a narrower topology/negotiation diagnostic. If there are early-stop or NDR resets, report them explicitly rather than inferring budget exhaustion from the command argument.
 
 A candidate below133 is only experimental progress; only zero native overflow can advance to detailed routing, extraction, all original electrical/timing checks and complete physical/function acceptance. Exact-control mismatch rejects the observation. No workflow was dispatched and no physical intervention is selected by this report.
+
+## Actual trajectory and selected next experiment
+
+Run38780941495 succeeds as a diagnostic on8e4c117537401528814ff25fadd64de697654db5.
+Original source/133/report/full-segment/target hashes all match. Independent
+inspection finds the exact243 starts, epoch lengths49/49/49/46/50 and four
+native NDR resets described above. Per-epoch minima are140,138,119,121,110.
+The last minimum110 occurs at start14. Final last-ten samples are
+138,139,145,135,153,145,149,134,155,133. This is oscillation, not a declining
+tail. Do not spend on the previously conditional100-budget increase.
+Result JSON SHA256:
+`8dead5a818dca11fa619a1601f401b94681d71bd5ffe6e6acfeddb0689fd7a79`.
+
+D097 instead prepares one native early-stop pair50versus15 on the same
+authenticated physical views, keeping capacities/margins and all original
+producer checks. A fresh50control must reproduce exact133 and route hashes.
+Stopping earlier might retain a lower-congestion solution, but changes when
+native NDR restarts occur; it does not recover the observed round14 tree by
+definition. A worse/equal candidate is rejected without a budget sweep.
+The paired workflow is a diagnostic collector, so success alone is not a
+chip result. Candidate native return/table/segments and selected policy are
+retained separately; nonzero overflow blocks detailed routing and acceptance.

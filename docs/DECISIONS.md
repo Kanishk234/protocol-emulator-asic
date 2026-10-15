@@ -987,3 +987,26 @@ hashes. This closes a local-only evidence gap, not an architecture advantage
 or a reconstructed historical run. Preserve held-out boundaries and label
 current results separately from historical profile values. Retain emitted
 example images in clean-reproduction artifacts for independent byte checks.
+
+## D-097: Test one native early-stop budget after observing oscillation
+
+**Date:** 2026-10-15. **Status:** paired diagnostic prepared.
+
+Actual trajectory38780941495 retains exact133 control/source/segments. Final
+epoch oscillates: its last ten overflows are138,139,145,135,153,145,149,134,155,133;
+the transient minimum is110 at start14. Reject an unsupported larger-budget
+run. Instead test native budget15 versus original50 on identical authenticated
+views, one bounded pair, with unchanged layer resources/capacities, libraries,
+clock margins, physical interface and original three-corner producer guards.
+This is a hypothesis that earlier stopping can retain a lower-congestion
+solution, not an assertion that budget15 reproduces the observed round14:
+native NDR resets and their histories will also occur at different times.
+
+Replay50 must match original133, marker and full/target segment hashes in the
+same job. Candidate15 changes exactly GRT_OVERFLOW_ITERS, retains native error
+and actual diagnostics, and is rejected if overflow does not improve133.
+Nonzero improvement is still experimental; only native zero overflow with
+successful return justifies downstream detailed-route/extraction/complete
+timing/function qualification. No source, silicon, placement, resource or
+protocol architecture change. Existing standalone trajectory workflow is now
+manual-only to avoid a duplicate control replay on shared-helper edits.

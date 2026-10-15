@@ -117,3 +117,26 @@ def test_routing_failure_keeps_fatal_net_and_seed_in_diagnostic(flow, monkeypatc
     assert failure["diagnosis"]["fatal_messages"] == ["ERROR: Failed to route net 'event_count[3]'"]
     assert not failure["diagnosis"]["over_capacity"]
     assert not (out / "user.wbit").exists()
+
+
+@pytest.mark.parametrize("arguments,expected", [
+    (["--set", "COUNTER_BITS=9", "WINDOW_CLKS=256"],
+     {"COUNTER_BITS": 9, "WINDOW_CLKS": 256}),
+    (["--set", "COUNTER_BITS=9", "--set", "WINDOW_CLKS=256"],
+     {"COUNTER_BITS": 9, "WINDOW_CLKS": 256}),
+    (["--set", "COUNTER_BITS=4", "--set", "COUNTER_BITS=9"],
+     {"COUNTER_BITS": 9}),
+])
+def test_cli_parameter_groups_preserve_every_override(monkeypatch, arguments, expected):
+    captured = {}
+    def compile_stub(*args, **kwargs):
+        captured.update(kwargs["set_params"])
+        return Path("unused.wbit"), {
+            "words": 1, "crc32": "test", "arch_version": "test",
+            "fmax_mhz": None, "timing_corner": "test", "utilisation": {},
+            "unmapped_inputs_tied_0": [], "unmapped_outputs_open": [],
+        }
+    monkeypatch.setattr(compiler, "compile_design", compile_stub)
+    assert compiler.main(["user.v", "--pins", "pins.yaml", "-o", "unused",
+                          *arguments]) == 0
+    assert captured == expected

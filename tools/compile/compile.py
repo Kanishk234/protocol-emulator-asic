@@ -524,7 +524,7 @@ def main(argv=None):
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--strict-ports", action="store_true",
                     help="reject unmapped inputs/outputs before synthesis instead of tying/opening them")
-    ap.add_argument("--set", nargs="*", default=[], metavar="NAME=VALUE",
+    ap.add_argument("--set", nargs="*", action="extend", default=[], metavar="NAME=VALUE",
                     help="override a parameter of the user top (e.g. DIV=87 for 115200 baud at 10 MHz)")
     a = ap.parse_args(argv)
     try:

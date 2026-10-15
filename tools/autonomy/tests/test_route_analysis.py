@@ -61,3 +61,19 @@ def test_group_release_preserves_per_net_multiplicity_and_original_grid():
             module.release_allocations(cells, targets, names)
     with pytest.raises(ValueError, match='outside'):
         module.release_allocations({}, targets, ['a'])
+
+
+def test_cut_owners_count_once_per_net_keep_empty_layers_and_deduplicate_cut():
+    segment = [3600,3600,'Metal1',10800,3600,'Metal1']
+    cut = {'from': [0,0], 'to': [1,0], 'residual': {'Metal1': -1, 'Metal3': 0}}
+    reverse = dict(cut, **{'from': [1,0], 'to': [0,0]})
+    result = module.cut_ownership({'b': [segment], 'a': [segment, segment]}, [cut, reverse])
+    assert result['net_cut_edge_counts'] == {'a': 1, 'b': 1}
+    assert result['unowned_layer_edges'] == 1
+    assert result['layer_edges'] == [
+        {'layer': 'Metal1', 'x': 0, 'y': 0, 'owners': ['a', 'b']},
+        {'layer': 'Metal3', 'x': 0, 'y': 0, 'owners': []}]
+    with pytest.raises(ValueError, match='adjacent'):
+        module.cut_ownership({}, [dict(cut, to=[2,0])])
+    with pytest.raises(ValueError, match='layers'):
+        module.cut_ownership({}, [dict(cut, residual={'Metal2': 0})])

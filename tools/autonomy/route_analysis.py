@@ -154,6 +154,31 @@ def planar_edges(segments):
     return edges
 
 
+def cut_ownership(nets, cut):
+    """Attribute a static cut to coarse per-net allocations, including empty edges."""
+    edges = set()
+    for item in cut:
+        x, y = item['from']
+        xx, yy = item['to']
+        if abs(x-xx) + abs(y-yy) != 1:
+            raise ValueError('Cut must contain adjacent grid centers')
+        layers = ('Metal1', 'Metal3') if y == yy else ('Metal2', 'Metal4')
+        if set(item['residual']) != set(layers):
+            raise ValueError('Cut layers disagree with preferred direction')
+        edges.update((layer, min(x, xx), min(y, yy)) for layer in layers)
+    owners = {edge: [] for edge in edges}
+    for name, segments in sorted(nets.items()):
+        for edge in planar_edges(segments) & edges:
+            owners[edge].append(name)
+    return {'layer_edges': [dict(layer=layer, x=x, y=y, owners=owners[layer,x,y])
+                            for layer,x,y in sorted(edges)],
+            'net_cut_edge_counts': dict(sorted(Counter(
+                name for names in owners.values() for name in names).items(),
+                key=lambda item: (-item[1], item[0]))),
+            'unowned_layer_edges': sum(not names for names in owners.values()),
+            'scope': 'Coarse segment occupancy; blockage encoding also affects residual; no causal or detailed-route claim'}
+
+
 def residual_paths(cells, nx, ny, targets, box=(121440, 15120, 1241760, 684180)):
     """Static preferred-direction graph; DBU7200 grid, center offset3600."""
     def index(x, y):

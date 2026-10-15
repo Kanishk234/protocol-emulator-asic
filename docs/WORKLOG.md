@@ -5,6 +5,15 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-14: Codex (current extracted failure investigated; diagnostic visibility fixed)
+- Run38668749394 failed the final extracted gate and is uploading bulk evidence. User trace shows allcorner setupWS0 andfast/typical/slowhold92.313/206.909/392.883ps pass timing; electrical/antenna component reports are still unavailable. No physical residual is guessed and no blind rerun dispatched.
+- BUG112: shared helper now prints exact timing/electrical/antenna evidence before rejection. Separate custom fanout route uploads tiny gate summaries before bulk only if its current output has an extraction receipt, avoiding stale source-summary publication. Gates, receipts, physical design and official jobs remain unchanged.
+-42focused tests pass, including final antenna rejection, missing electrical corners, unchanged false qualification and early-upload receipt/order guards;diffcheck passes. Next publish these scoped diagnostics while awaiting current reports, then prepare only the measured physical repair. Noofficial/Phase2claim; unrelatedlocalfilesexcluded.
+
+## 2026-10-14: Codex (qualified fanout route published and launched)
+- Published tools736c1e7/CIe068776/docse54a07b;localHEADandremotemainverifiede54a07b661a53337e16b49aca846cafc0efbef1d. [Stock two-netfanout routing/extraction38668749394](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38668749394) confirmedin_progressonexacthead.
+-63focusedtests andindependentactual-screen audits pass. Allstrictscreen gates passedbeforeDRTauthorization;freshpre-DRT/finalextractedgatesremainfixed. Nextinspectactualresult;noofficial/Phase2completionclaim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (two-net fanout screen qualified and audited; route prepared)
 - Screen38652802189 artifact11936966317 passes every strict gate:setupWS0allcorners;fast/typical/slowhold78.496/175.233/346.404ps;allcorner slew/fanout/cap0;antenna0;live0overflow. SevenplannedBUF4,zeroresizes/zeroadditionalpost-antbatches. Actualcanonicalproposal/sourceNL/completeconnections/oldplacements/clock-resetpins/antenna-history/nativewirecleanup independently pass;BUG111 source-qualified names retaininherited repairs.
 - Prepared exactsuccessful-source stock DRT/extraction continuation: freshstrictgates beforeDRT,then0DRC/conservedfreshNL andfreshallcorner setup/hold/50psfast-hold/electrical/antennagates. No repair/fullGRTreplay;oldextraction preservedseparately.63focusedtests anddiffcheckpass.

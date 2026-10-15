@@ -9,6 +9,11 @@ on:
       - 'test_internal/test_trigger_cancel_loaded.py'
       - '.github/workflows/trigger_cancel_loaded.yaml'
   workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Optional exact source SHA required by the supervisor
+        required: false
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -21,6 +26,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
+      - name: Require requested source revision before provisioning
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: test -z "$EXPECTED_SHA" || test "$GITHUB_SHA" = "$EXPECTED_SHA"
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0

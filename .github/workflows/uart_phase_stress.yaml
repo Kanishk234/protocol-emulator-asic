@@ -6,6 +6,11 @@ on:
       - 'test_internal/uart_phase_stress.py'
       - '.github/workflows/uart_phase_stress.yaml'
   workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Optional exact source SHA required by the supervisor
+        required: false
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -16,6 +21,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
+      - name: Require requested source revision before provisioning
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: test -z "$EXPECTED_SHA" || test "$GITHUB_SHA" = "$EXPECTED_SHA"
       - uses: actions/checkout@v6
       - name: Pinned project dependencies and standard simulator
         run: |

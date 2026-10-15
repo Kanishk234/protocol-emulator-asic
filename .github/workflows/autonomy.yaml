@@ -1,0 +1,52 @@
+name: autonomous development supervisor checks
+on:
+  push:
+    branches: [efpga]
+    paths:
+      - 'tools/autonomy/**'
+      - '.github/workflows/autonomy.yaml'
+      - 'docs/autonomy/backlog.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-autonomy-observe-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Create project venv with pinned test dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install -r requirements-dev.txt
+      - name: Test supervisor safety and evidence handling
+        env:
+          PYTHONPATH: tools
+        run: |
+          source .venv/bin/activate
+          mkdir -p build/autonomy
+          python -m pytest -q tools/autonomy/tests --junitxml=build/autonomy/supervisor_tests.xml
+      - name: Observe exact-revision checks without dispatching
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: tools
+          WARP_OBSERVE_REVISION: ${{ github.sha }}
+        run: |
+          source .venv/bin/activate
+          python -m autonomy.supervisor --revision "$WARP_OBSERVE_REVISION" --tasks active-cancel c-host compiler-seeds uart-phase
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: autonomy-observation-${{ github.run_id }}
+          path: build/autonomy/
+          retention-days: 30
+          if-no-files-found: warn

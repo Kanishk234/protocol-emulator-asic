@@ -116,3 +116,39 @@ def test_regeneration_requires_complete_provenance_and_corner_evidence():
     result['source_archive_sha256']='wrong'
     with pytest.raises(ValueError,match='provenance'):
         trace.authenticate_regeneration(result)
+
+
+def test_scalar_stage_parser_names_native_scopes_and_rejects_repeats():
+    raw = 'After LayerAssignment - 2D/3D cong: 80/145\nAfter MazeRoute3D - 3Dcong: 133\n'
+    result = trace.parse_stage_scalars(raw)
+    assert result['parsed'] is True
+    assert result['after_layer_assignment_2d'] == 80
+    assert result['after_layer_assignment_3d'] == 145
+    assert result['after_maze_route_3d'] == 133
+    with pytest.raises(ValueError, match='Repeated'):
+        trace.parse_stage_scalars(raw + raw)
+    for incomplete in ('', 'After MazeRoute3D - 3Dcong: nan\n', raw.splitlines()[0]):
+        assert trace.parse_stage_scalars(incomplete)['parsed'] is False
+
+
+def test_scalar_observer_requires_both_exact_final_route_hashes():
+    trace.validate_trace_hashes(trace.SEGMENTS_SHA, trace.TARGETS_SHA)
+    for segments, targets in (('wrong',trace.TARGETS_SHA), (trace.SEGMENTS_SHA,'wrong')):
+        with pytest.raises(ValueError, match='changed authenticated final route'):
+            trace.validate_trace_hashes(segments, targets)
+
+
+def test_scalar_debug_instrumentation_only_adds_observation(tmp_path, monkeypatch):
+    import json
+    original = 'before\n' + trace.reports.COMMAND + '\nafter\n'
+    def base(top, common, directory):
+        (directory/'common-grt.tcl').write_text(original)
+        (directory/'source-sha256.json').write_text('{}')
+        (directory/'ATTRIBUTION.md').write_text('Original attribution\n')
+        return 'copied top'
+    monkeypatch.setattr(trace, 'BASE_INSTRUMENT', base)
+    assert trace.instrument(None, None, tmp_path) == 'copied top'
+    actual = (tmp_path/'common-grt.tcl').read_text()
+    assert actual.count(trace.STAGE_DEBUG) == 1
+    assert actual.replace(trace.STAGE_DEBUG+trace.TRACE,trace.reports.COMMAND,1) == original
+    assert json.loads((tmp_path/'source-sha256.json').read_text())['trace_common'] == trace.cfg.sha(tmp_path/'common-grt.tcl')

@@ -19,6 +19,9 @@ TARGETS = {'cell_val[30]', 'cell_pad[27]', 'cell_pad[31]', 'cell_val[27]'}
 BASE_INSTRUMENT = reports.instrument
 REPORT_SHA = '8e2f5c5003e495d3d347be7d593bb4bbc7801723db2902c3cb530e70a157a1df'
 SDC_SHA = '2fd4e213532d83ee258899b6fc1ed48c4e5d91ddb0ccbe21eea0226cc90fd56e'
+SEGMENTS_SHA = 'aee9b65f2cfc5f653793de924dedd919a7b68d67fa3ef3febf7ca17e3f1ad7ca'
+TARGETS_SHA = 'f00a6206d105a949428454017fe32fa6553bf07c89428c95ac1d7ead661e37d4'
+STAGE_DEBUG = 'log_cmd set_debug_level GRT grtSteps 1\n'
 # Exact RT_/GRT_ subset of authenticated38101639866 config660afb662cbb5307… .
 ORIGINAL_POLICY = {'RT_MIN_LAYER': 'Metal1', 'RT_MAX_LAYER': 'Metal4', 'RT_CLOCK_MIN_LAYER': None, 'RT_CLOCK_MAX_LAYER': None, 'GRT_ADJUSTMENT': 0.3, 'GRT_MACRO_EXTENSION': 0, 'GRT_LAYER_ADJUSTMENTS': [0, 0, 0, 0, 0], 'GRT_ALLOW_CONGESTION': False, 'GRT_ANTENNA_REPAIR_ITERS': 3, 'GRT_OVERFLOW_ITERS': 50, 'GRT_ANTENNA_REPAIR_MARGIN': 10, 'GRT_ANTENNA_REPAIR_JUMPER_ONLY': False, 'GRT_ANTENNA_REPAIR_DIODE_ONLY': False}
 TRACE = r'''
@@ -42,15 +45,16 @@ def instrument(top, common, directory):
     original = copied.read_text()
     if original.count(reports.COMMAND) != 1:
         raise ValueError('Nonunique native route call')
-    modified = original.replace(reports.COMMAND, TRACE)
-    if modified.replace(TRACE, reports.COMMAND, 1) != original:
+    observation = STAGE_DEBUG + TRACE
+    modified = original.replace(reports.COMMAND, observation)
+    if modified.replace(observation, reports.COMMAND, 1) != original:
         raise ValueError('Unexpected observer mutation')
     copied.write_text(modified)
     hashes = json.loads((directory / 'source-sha256.json').read_text())
     hashes['trace_common'] = cfg.sha(copied)
     (directory / 'source-sha256.json').write_text(json.dumps(hashes, indent=2)+'\n')
     with (directory / 'ATTRIBUTION.md').open('a') as f:
-        f.write('Observer additionally exports raw segments after native routing, then rethrows its original failure.\n')
+        f.write('Observer enables existing GRT/grtSteps level1 scalar reporting, exports raw segments after native routing, then rethrows its original failure.\n')
     return result
 
 
@@ -82,6 +86,29 @@ def parse_segments(text):
         raise ValueError('Measured suspect nets absent in route export')
     return {'native_net_count':len(nets), 'coordinate_unit':'database units; native source DBU1000',
             'targets':{name:nets[name] for name in sorted(TARGETS)}}
+
+
+def parse_stage_scalars(raw):
+    """Only two exact pinned FastRoute logger grammars; no tree inference."""
+    patterns = {
+        'after_layer_assignment': r'^After LayerAssignment - 2D/3D cong: (\d+)/(\d+)$',
+        'after_maze_route_3d': r'^After MazeRoute3D - 3Dcong: (\d+)$',
+    }
+    found = {name: re.findall(pattern, raw, re.MULTILINE) for name, pattern in patterns.items()}
+    if any(len(values) > 1 for values in found.values()):
+        raise ValueError('Repeated scalar routing stages')
+    if not all(found.values()):
+        return {'parsed': False, 'reason': 'Exact pinned stage lines incomplete; retain native log without scalar claim'}
+    planar, assigned = map(int, found['after_layer_assignment'][0])
+    return {'parsed': True, 'after_layer_assignment_2d': planar,
+            'after_layer_assignment_3d': assigned,
+            'after_maze_route_3d': int(found['after_maze_route_3d'][0]),
+            'scope': 'Native scalar stage observations only; no selected-net topology'}
+
+
+def validate_trace_hashes(segments_sha, targets_sha):
+    if segments_sha != SEGMENTS_SHA or targets_sha != TARGETS_SHA:
+        raise ValueError('Scalar observer changed authenticated final route segments')
 
 
 def authenticate():
@@ -166,6 +193,11 @@ def main():
         (OUT/'target-segments.json').write_text(json.dumps(summary,indent=2)+'\n')
         result['segments_sha256']=cfg.sha(stage/'native-segments.txt')
         result['targets_sha256']=cfg.sha(OUT/'target-segments.json')
+        validate_trace_hashes(result['segments_sha256'], result['targets_sha256'])
+        result['final_route_segments_exact']=True
+        if re.findall(r'(?m)^\+ set_debug_level GRT grtSteps (\d+)\b',raw)!=['1']:
+            raise ValueError('Native scalar debug command missing or repeated')
+        result['stage_scalars']=parse_stage_scalars(raw)
         result['native_net_count']=summary['native_net_count']
         authenticate()
         result['source_unchanged']=True

@@ -1,5 +1,15 @@
 # Phase 5 clean-source reproduction
 
+**October15 refresh:** clean hosted38777288608 succeeds on exact
+77edd2dfdc12184a9b69c98cfa5041e9137ac016. Independent downloaded-artifact review
+verifies all14XML hashes/counts, loaded30/30 and cosim1/1 with no skips,
+all200 listed compiler-source fingerprints and11 rebuilt-image report hashes
+against committed image bytes. The download omits emitted `.wbit` files;
+standalone UART image validation is same-job audit evidence rather than an
+independent downloaded-image rehash. Full scope, tool pins, runtime and
+omissions: [refresh report](reproduction_refresh_20261015.md). Historical
+original primitive timing-view gaps below remain open.
+
 **Date:** 2026-09-28. **Environment:** Ubuntu/WSL, Python 3.12.4 in a newly created project venv, Icarus 12.0, Verilator 5.020, Yosys 0.66+179 (OSS CAD Suite 2026-06-29), nextpnr 0.11.1-34 (OSS CAD Suite 2026-09-27), sigrok-cli 0.7.2. The CAD suites and sigrok were already installed on the machine. The pinned tile library was fetched into the export.
 
 **Source:** `git archive HEAD` at 14e7063 extracted to `/tmp/warp-repro.vVyH1n`, with the proposed README and the Phase 5 source files under test copied into that export. A new venv was created there from the candidate `requirements-dev.txt`. This is an isolated source export and fresh venv on the same machine, not a clean machine or container. The working-tree changes still need CI after commit and push.

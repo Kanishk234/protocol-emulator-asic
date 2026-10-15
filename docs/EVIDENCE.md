@@ -1,5 +1,14 @@
 # WARP: evidence report
 
+**October15 reproduction refresh:** clean hosted
+[38777288608](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38777288608)
+on77edd2d passes the documented fresh source/compile/RTL path. Independent
+artifact review verifies loaded30/30, cosim1/1, all14XML hashes/counts,
+200 listed-source fingerprints and11 rebuilt-image report hashes against
+exact-revision committed images. Emitted images are omitted from the artifact;
+the standalone UART image has same-job audit evidence only. This is no
+physical/native timing refresh. [Exact evidence and omissions](reports/reproduction_refresh_20261015.md).
+
 **October 15 status:** frozen G1 remains the supported fallback; phase 5 is
 incomplete. Unchanged-control trace
 [38676688402](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38676688402)

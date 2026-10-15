@@ -967,3 +967,23 @@ Require identical full native segment and selected-target hashes in addition
 to original marker/policy/source checks. Scalar stages may locate where
 congestion arises; they do not provide selected-net topology or physical
 acceptance. No random-seed, placement, resource, margin or hardware change.
+
+## D-096: Refresh attributable evidence before another routing-budget experiment
+
+**Date:** 2026-10-15. **Status:** prepared for hosted measurement.
+
+Actual38778082059 contains243 negotiation starts across five automatic
+NDR-reset epochs even though the unchanged command budget is50. Final epoch
+reaches50; the pinned checkpoint-saving branches are not reached. Enable
+only existing `GRT/congestionIterations` logging to measure the trajectory,
+retaining exact source, capacities, margins,133 control and final-route hashes.
+Do not infer that a larger budget will help from the command limit alone.
+Only an improving final trajectory can justify a separate bounded native
+budget comparison; no geometry, architecture or acceptance change is made.
+
+Separately refresh the original design-set synthesis profile on pinned hosted
+tools, preserving all24 trials, parameters, attribution roles and listed-input
+hashes. This closes a local-only evidence gap, not an architecture advantage
+or a reconstructed historical run. Preserve held-out boundaries and label
+current results separately from historical profile values. Retain emitted
+example images in clean-reproduction artifacts for independent byte checks.

@@ -1,12 +1,8 @@
 name: compact exact control failed-route trace
 on:
   workflow_dispatch:
-  push:
-    branches: [efpga]
-    paths:
-      - 'test_internal/cloud_route_trace.py'
-      - 'test_internal/cloud_regenerate_control.py'
-      - '.github/workflows/route_trace.yaml'
+# Exact-control observation is complete. The paired experiment below reruns
+# its own control; shared-helper edits must not launch a duplicate replay.
 permissions:
   contents: read
   actions: read

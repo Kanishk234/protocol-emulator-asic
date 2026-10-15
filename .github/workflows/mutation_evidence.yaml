@@ -1,0 +1,65 @@
+name: controlled mutation evidence
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'scripts/mutation.py'
+      - '.github/workflows/mutation_evidence.yaml'
+permissions:
+  contents: read
+concurrency:
+  group: warp-mutation-evidence-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  campaign:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install simulator and project prerequisites
+        run: sudo apt-get update && sudo apt-get install -y iverilog python3-venv python3-tk
+      - name: Cache pinned synthesis and formal tools
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Fetch pinned synthesis and formal tools
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/warp-mutation-ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/warp-mutation-ocs.tgz -C ~
+      - name: Project venv and pinned tile library
+        run: |
+          scripts/setup_venv.sh
+          bash scripts/fetch_tiles.sh
+      - name: Pristine controls then eleven independent mutations
+        timeout-minutes: 40
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          export WARP_TILES="$GITHUB_WORKSPACE/build/third_party/fabulous-tiles"
+          python scripts/mutation.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: controlled-mutation-${{ github.run_id }}
+          path: |
+            build/mutation/results.json
+            build/mutation/REPORT.md
+            build/mutation/*.log
+            build/mutation/*/test/results.xml
+            build/mutation/*/test_internal/results.xml
+            build/mutation/*/test_internal/uvm/results.xml
+            build/mutation/*/formal/f1_isolation/status
+            build/mutation/*/formal/f1_isolation/engine_0/logfile.txt
+          retention-days: 30
+          if-no-files-found: error

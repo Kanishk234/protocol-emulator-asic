@@ -5,6 +5,7 @@ on:
     branches: [efpga]
     paths:
       - 'test_internal/cloud_profile_evidence.py'
+      - 'tools/profiling/workload.py'
       - '.github/workflows/profile_evidence.yaml'
 permissions:
   contents: read

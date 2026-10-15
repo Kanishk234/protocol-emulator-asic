@@ -1,0 +1,55 @@
+name: compact paired routing early-stop experiment
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_route_early_stop.py'
+      - '.github/workflows/route_early_stop.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-route-early-stop-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Fetch approved durable source and pinned tools
+        timeout-minutes: 12
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+      - name: Provision pinned EDA image before native timers
+        timeout-minutes: 5
+        run: docker pull "$LIBRELANE_IMAGE_OVERRIDE"
+      - name: Reproduce exact control views and original three-corner guards
+        timeout-minutes: 20
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_regenerate_control.py
+      - name: Compare original50 with native15 on identical physical inputs
+        timeout-minutes: 17
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_route_early_stop.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compact-route-early-stop-${{ github.run_id }}
+          path: |
+            build/route_early_stop/
+            build/control_regeneration/
+            build/reset_combined/
+          retention-days: 30

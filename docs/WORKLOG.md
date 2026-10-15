@@ -5,6 +5,27 @@ Newest entry at the top. One entry per work session.
 - Evidence means a CI run ID, a test command and its result, or a file path.
 - Raw logs are not committed; link to them instead.
 
+## 2026-10-15: Codex (approved reserve screen publication)
+- User explicitly approved Codex commits, push and dispatch. Committed scoped tools cae00c9 and CI 7a80b08; 20 focused tests and git diff --check pass again. Preparing documentation commit, remote-main verification and manual gds-route-reserve-screen dispatch. Unrelated working-tree changes remain excluded.
+- Screen only: no detailed routing until all strict gates and the internal repaired-family six-load reserve pass. No Phase 2 checklist changes.
+
+## 2026-10-15: Codex (confirmed diode causes and prepared reserve screen)
+- Final route 38679335674 DEF/netlist confirms six new diodes (635, 637, 639, 645, 646, 647) cause the six eight-to-nine fanout changes. NAND4 slew net retains its two original sinks. Added reusable correlation tool and regression checks.
+- Prepared source-hash-bound route-reserve screen: seven measured nets, 19 BUF4 cells, 275.7888 um² added footprint, no computed overlaps. Added internal six-load gate on all repaired source/branch families; final signoff limits unchanged. No NAND4_2 exists in pinned LEF. See docs/reports/PHASE2_SCREEN_ROUTE_CORRELATION.md.
+- Twenty focused tests pass; actual-source geometry/proposal, synthetic proposed connectivity conservation and generated Tcl completeness pass. Physical ECO/timing unmeasured. Latest 15 main runs contain no active workflow. No phase boxes ticked.
+- Publication/launch remains pending. The supplied AGENTS.md explicitly assigns git commit/push to the user; changes are local and scoped. Next publish tools, CI and docs as separate groups, then manually run gds-route-reserve-screen; no DRT until strict screen and added reserve pass.
+
+## 2026-10-15: Codex (screen versus route failure diagnosis)
+- Route [38679335674](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38679335674) completed with failure at final extracted gates. Early artifact 11948674778 reports setup WS 0 at all corners, fast hold 90.416 ps, zero capacitance and antenna violations, six fanout violations and three slow-slew rows. Timing passes the current gates; electrical closure does not.
+- Compared all six failing drivers with the actual green screen 38676308492 DEF/netlist: each had eight loads before DRT and reports nine after routing. Added antenna diode loads are the leading explanation under the route's antenna-only connectivity conservation check; exact new diode identities still require the final routed netlist comparison.
+- The slow-slew rows describe one NAND4 net (_44692_/Y, _44693_/C, ANTENNA_191/A). Its screen net already has those two sinks, supporting estimated-versus-extracted parasitic drift as a separate mechanism. Worst measured transition 2.596800 ns exceeds 2.507400 ns.
+- Reviewed screen/route/extraction code and official OpenROAD estimation, extraction, resizer and pinned router sources. Current green-screen gates are strict, and stock pre-DRT checks pass; the repair loop precedes later diode/parasitic changes. Full rerouting after each small ECO can move failures to different nets.
+- Next: correlate pre/post-DRT connectivity and parasitics, add targeted internal screening reserve without changing acceptance limits, and evaluate a bounded post-antenna electrical repair/reroute/re-extraction loop. Pinned router capacity and connectivity audits remain required. No physical trial launched and no phase checklist boxes ticked in this diagnostic session.
+
+## 2026-10-14: Codex (qualified fanout/slew route published and queued)
+- Published tools53b3b4e/CI936fdf5/docsb049a17;localHEADandremotemainverifiedb049a17343b3ff9912f596aa9953be1397c5baf7. [Stockfanout/slew routing/extraction38679335674](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38679335674) confirmedqueuedonexacthead.
+-66focusedtests andindependentactual-screen audits pass. Allstrictscreen gates passedbeforeDRTauthorization;freshpre-DRT/finalextractedgatesfixed. Earlygateartifact andcomponentfailurelogging retained. Nextinspectresult;noofficial/Phase2claim. Launchreceiptlocalpendingnextdocumentationpublication.
+
 ## 2026-10-14: Codex (fanout/slew screen qualified and audited; stock route prepared)
 - Screen38676308492 succeeds;small summary artifact11946544528(1997bytes) exposed gates before bulk artifact11947551723. SetupWS0allcorners;fast/typical/slowhold72.176/168.511/339.753ps;allcorner slew/fanout/cap0;antenna0;live0overflow. EightplannedBUF4,zeroresizes;onepost-antbatch adds3BUF4/converges.
 - Canonical actual-source proposal/sourceNL/allcell-pinconnections/oldplacements/functionalclock-resetpins/boundedhistory/nativewirecleanup independently pass. Prepared exact successful-source stock DRT/extraction continuation withfreshstrictgates beforeDRT,0DRC/conservedfreshNL andfreshallcorner extractedtiming/electrical/antenna including50psfast-hold. No repair/fullGRTreplay;oldextraction preservedseparately.

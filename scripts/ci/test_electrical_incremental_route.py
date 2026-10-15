@@ -51,8 +51,8 @@ def test_measured_current_views_and_all_gates_required(tmp_path,fault):
     else:assert runner.validate_checkpoint(root)==ant/'state_out.json'
 
 
-@pytest.mark.parametrize('fault',[None,'hold','slew','antenna','extracted_hold','extracted_slew','extracted_missing','extracted_empty'])
-def test_fresh_gates_block_drt_and_extracted_failures_are_not_success(tmp_path,monkeypatch,fault):
+@pytest.mark.parametrize('fault',[None,'hold','slew','antenna','extracted_hold','extracted_slew','extracted_antenna','extracted_missing','extracted_empty'])
+def test_fresh_gates_block_drt_and_extracted_failures_are_not_success(tmp_path,monkeypatch,capsys,fault):
     import sys,types
     monkeypatch.chdir(tmp_path);monkeypatch.setenv('PDK_ROOT','/pdk');monkeypatch.setenv('LIBRELANE_IMAGE_OVERRIDE','custom')
     Path('src').mkdir();Path('runs').mkdir();calls=[]
@@ -74,7 +74,7 @@ def test_fresh_gates_block_drt_and_extracted_failures_are_not_success(tmp_path,m
         if fault=='extracted_missing':electrical.pop(CORNERS[0])
         if fault=='extracted_empty':electrical={}
         (out/'electrical_summary.json').write_text(json.dumps(electrical))
-        p=out/'2-openroad-checkantennas/or_metrics_out.json';p.parent.mkdir();p.write_text(json.dumps({'antenna__violating__nets':0,'antenna__violating__pins':0}))
+        p=out/'2-openroad-checkantennas/or_metrics_out.json';p.parent.mkdir();p.write_text(json.dumps({'antenna__violating__nets':1 if fault=='extracted_antenna' else 0,'antenna__violating__pins':0}))
     monkeypatch.setattr(runner,'run_step',step);monkeypatch.setattr(runner,'screen',sta);monkeypatch.setattr(runner,'validate_final_route',lambda *args:None)
     monkeypatch.setitem(sys.modules,'extracted_timing',types.SimpleNamespace(main=extract))
     if fault:
@@ -82,3 +82,12 @@ def test_fresh_gates_block_drt_and_extracted_failures_are_not_success(tmp_path,m
     else:runner.continue_route({},source,Path('runs/route'))
     if fault in ('hold','slew','antenna'):assert calls==['OpenROAD.CheckAntennas']
     else:assert calls==['OpenROAD.CheckAntennas','OpenROAD.DetailedRouting','extract']
+    output=capsys.readouterr().out
+    prefix='TRIPWIRE extracted gate evidence: '
+    if fault and fault.startswith('extracted_'):
+        payload=json.loads(output.split(prefix,1)[1])
+        assert payload['timing']==json.loads(Path('runs/extracted-timing/corner_summary.json').read_text())
+        assert payload['electrical']==json.loads(Path('runs/extracted-timing/electrical_summary.json').read_text())
+        assert payload['antenna']['antenna__violating__nets']==(1 if fault=='extracted_antenna' else 0)
+        assert json.loads(Path('runs/route/extracted_gates.json').read_text())['qualified'] is False
+    else:assert prefix not in output

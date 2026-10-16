@@ -1,5 +1,6 @@
 """D098: distinguish southern pin-access failure from full-chip competition."""
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -20,8 +21,14 @@ def isolation_trace(original, names):
     # Braced Tcl literals prevent [] substitution; all names are fixed above.
     selection = 'set warp_selected_nets {' + ' '.join(names) + '}\n'
     selection += ('foreach warp_name $warp_selected_nets {\n'
-                  '    if {[[ord::get_db_block] findNet $warp_name] == "NULL"} {error "Missing selected net"}\n'
-                  '}\nlog_cmd set_nets_to_route $warp_selected_nets\n')
+                  '    set warp_matches {}\n'
+                  '    foreach warp_net [[ord::get_db_block] getNets] {\n'
+                  '        set warp_normal [string map [list [format %c 92] {}] [$warp_net getName]]\n'
+                  '        if {$warp_normal eq $warp_name} {lappend warp_matches $warp_net}\n'
+                  '    }\n'
+                  '    if {[llength $warp_matches] != 1} {error "Missing or ambiguous selected net"}\n'
+                  '    log_cmd grt::add_net_to_route [lindex $warp_matches 0]\n'
+                  '}\n')
     return selection + observed
 
 
@@ -34,7 +41,10 @@ def capacities(path):
 def main():
     output = trace.ROOT / 'build/route_isolation'
     output.mkdir(exist_ok=False)
-    results = {'diagnostic_completed': False, 'physical_acceptance': False, 'cases': {}}
+    results = {'diagnostic_completed': False, 'physical_acceptance': False, 'cases': {},
+               'source_revision': os.environ.get('GITHUB_SHA'),
+               'workflow_run': os.environ.get('GITHUB_RUN_ID'),
+               'workflow_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
     reference = None
     try:
         for name, names in CASES.items():
@@ -51,6 +61,9 @@ def main():
             result['capacity_arrays_identical_to_control'] = grid == reference
             result['selected_nets'] = names
             result['native_grid'] = audit(stage/'native-grid.tsv')
+            for row in result['native_congestion'][:-1]:
+                if result['native_grid']['layers'][row['layer']]['overflow'] != row['total_overflow']:
+                    raise ValueError('Native grid and routing table overflow disagree')
             result['reduced_case_only'] = names is not None
             if names and result['native_net_count'] != len(names):
                 raise ValueError('Reduced native route census differs')

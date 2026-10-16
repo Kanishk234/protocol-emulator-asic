@@ -67,3 +67,14 @@ def test_missing_electrical_evidence_rejected():
     reports[CORNERS[1]] = ''
     with pytest.raises(ValueError):
         evaluate(timing, antenna, reports, margin)
+
+
+def test_watched_recipe_changes_only_logging(tmp_path):
+    from native_margin_watched_screen import configure as watched
+    source = stock_configure(dict(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=56),
+                             'AREA 1', tmp_path/'src/signoff.sdc',
+                             hold_target=.10, clock_cluster=8)
+    expected = configure(source)
+    result = watched(source)
+    assert result.pop('YOSYS_LOG_LEVEL') == 'WARNING'
+    assert result == expected

@@ -38,8 +38,8 @@ def evaluate(timing, antenna, reports, margin):
                 official_signoff=False)
 
 
-def main():
-    stock_screen(config_transform=configure,
+def main(config_transform=configure):
+    stock_screen(config_transform=config_transform,
                  extra_tcl=Path('workflow-src/scripts/ci/electrical_margin_probe.tcl'))
     root = Path('runs/native-stock-screen')
     source = checkpoint(root/'flow')

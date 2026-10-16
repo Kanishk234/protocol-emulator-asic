@@ -1,0 +1,72 @@
+name: pinned router repair build
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: warp-router-force-build-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            extra-substituters = https://nix-cache.fossi-foundation.org
+            extra-trusted-public-keys = nix-cache.fossi-foundation.org:3+K59iFwXqKsL7BNu6Guy0v+uTlwsxYQxjspXzqLYQs=
+            max-jobs = 1
+            cores = 2
+      - name: Fetch exact existing toolchain without editing upstream
+        timeout-minutes: 8
+        run: |
+          mkdir -p build/router_build_evidence
+          git clone --quiet https://github.com/mole99/fabulous-tiles build/router_toolchain
+          git -C build/router_toolchain checkout --quiet 7999e5a91dab77357fe9d401b6dfb0758f438bf1
+          echo 'aaef0ac1bac971f54fe44565fa12284e18dc88718d153a2f92201e957070084f  build/router_toolchain/flake.lock' | sha256sum --check
+          cp build/router_toolchain/flake.lock build/router_build_evidence/toolchain.lock
+          sha256sum patches/openroad_force_reroute.patch tools/router_build/default.nix > build/router_build_evidence/inputs.sha256
+          git rev-parse HEAD > build/router_build_evidence/source-revision.txt
+          printf '%s\n' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" > build/router_build_evidence/workflow.txt
+          nix --version > build/router_build_evidence/nix-version.txt
+          curl -sfL --max-time 30 https://raw.githubusercontent.com/The-OpenROAD-Project/OpenROAD/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/LICENSE -o build/router_build_evidence/OPENROAD-LICENSE
+          cp docs/reports/force_reroute_design_20261015.md build/router_build_evidence/ATTRIBUTION.md
+      - name: Build stock reference and patched router with pinned dependencies
+        timeout-minutes: 90
+        run: |
+          set -euo pipefail
+          nix build --impure --file tools/router_build/default.nix --arg force false --out-link build/router_stock_tool -L 2>&1 | tee build/router_build_evidence/stock-build.log
+          nix derivation show --impure --file tools/router_build/default.nix > build/router_build_evidence/derivation.json
+          nix build --impure --file tools/router_build/default.nix --out-link build/router_force_tool -L 2>&1 | tee build/router_build_evidence/force-build.log
+      - name: Check linked Tcl interface and preserve tool identities
+        timeout-minutes: 3
+        run: |
+          cat > build/router_build_evidence/interface.tcl <<'TCL'
+          if {[llength [info commands grt::force_reroute_pair]] != 1} {error "Missing force interface"}
+          set code [catch {grt::force_reroute_pair NULL NULL} message]
+          if {$code != 1 || ![string match {*Force reroute requires idle initialized FastRoute*} $message]} {error "Unexpected interface rejection: $message"}
+          puts "PASS: linked force API rejects uninitialized state"
+          TCL
+          build/router_force_tool/bin/openroad -exit build/router_build_evidence/interface.tcl > build/router_build_evidence/interface.log 2>&1
+          build/router_stock_tool/bin/openroad -version > build/router_build_evidence/stock-version.txt
+          build/router_force_tool/bin/openroad -version > build/router_build_evidence/force-version.txt
+          sha256sum "$(readlink -f build/router_stock_tool)/bin/openroad" "$(readlink -f build/router_force_tool)/bin/openroad" > build/router_build_evidence/binaries.sha256
+          find -L build/router_stock_tool/bin build/router_force_tool/bin -maxdepth 1 -type f -exec sha256sum {} + > build/router_build_evidence/bin-directory.sha256
+          readlink -f build/router_stock_tool build/router_force_tool > build/router_build_evidence/tool-paths.txt
+      - name: Export authenticated runtime closure for later controlled regressions
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          nix-store --query --requisites build/router_stock_tool build/router_force_tool > build/router_build_evidence/closure-paths.txt
+          xargs nix-store --export < build/router_build_evidence/closure-paths.txt | gzip -1 > build/router_build_evidence/router-closure.nar.gz
+          sha256sum build/router_build_evidence/router-closure.nar.gz > build/router_build_evidence/closure.sha256
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: pinned-router-repair-build-${{ github.run_id }}
+          path: build/router_build_evidence/
+          retention-days: 30
+          if-no-files-found: error

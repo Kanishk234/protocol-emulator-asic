@@ -1,10 +1,27 @@
 """Fail-closed custom-router checkpoint and final evidence tests; no local EDA."""
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'test_internal'))
 import cloud_route_force_repair as force
+
+
+def test_runtime_mounts_add_individual_outputs_without_hiding_container_store(monkeypatch):
+    root = '/nix/store/' + 'a'*32 + '-openroad'
+    dependency = '/nix/store/' + 'b'*32 + '-runtime'
+    monkeypatch.setattr(force.Path, 'is_file', lambda self: True)
+    monkeypatch.setattr(force.Path, 'exists', lambda self: True)
+    def query(command, **kwargs):
+        assert command == ['nix-store', '--query', '--requisites', root]
+        return SimpleNamespace(stdout=root+'\n'+dependency+'\n')
+    monkeypatch.setattr(force.subprocess, 'run', query)
+    options = force.docker_options(root+'/bin/openroad')
+    force.trace.validate_execution_options('cloud_route_force_repair.py', options, ('GRT-0116',), False)
+    assert '/nix/store:/nix/store:ro' not in options
+    assert root+':'+root+':ro' in options
+    assert dependency+':'+dependency+':ro' in options
 
 
 def test_force_runs_only_after_both_same_process_identity_hash_gates():

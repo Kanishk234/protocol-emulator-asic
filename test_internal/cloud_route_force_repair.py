@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 import cloud_route_trace as trace
@@ -162,7 +163,19 @@ def docker_options(binary):
     path = Path(binary)
     if not re.fullmatch(r'/nix/store/[a-z0-9]{32}-[^/]+/bin/openroad', str(path)) or not path.is_file():
         raise ValueError('Expected existing exact Nix-store OpenROAD executable')
-    return ('-v', '/nix/store:/nix/store:ro', '-e', '_LLN_OVERRIDE_OPENROAD=' + str(path))
+    root = str(path.parent.parent)
+    closure = subprocess.run(['nix-store', '--query', '--requisites', root],
+                             check=True, capture_output=True, text=True, timeout=30).stdout.splitlines()
+    if not closure or root not in closure or len(set(closure)) != len(closure):
+        raise ValueError('Incomplete or duplicated custom tool runtime closure')
+    options = []
+    for member in sorted(closure):
+        if not re.fullmatch(r'/nix/store/[a-z0-9]{32}-[A-Za-z0-9+._=-]+', member) or not Path(member).exists():
+            raise ValueError('Invalid or missing runtime store path')
+        options.extend(('-v', member + ':' + member + ':ro'))
+    # Mount individual outputs; mounting the store root hides container Python.
+    options.extend(('-e', '_LLN_OVERRIDE_OPENROAD=' + str(path)))
+    return tuple(options)
 
 
 def main():
@@ -176,6 +189,10 @@ def main():
               'source_revision': os.environ.get('GITHUB_SHA'), 'workflow_run': os.environ.get('GITHUB_RUN_ID'),
               'workflow_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
     try:
+        command = ['docker', 'run', '--rm', *options, '--entrypoint', 'python3', trace.cfg.IMAGE,
+                   '-c', 'import librelane,os,subprocess,sys; print(sys.version); subprocess.run([os.environ["_LLN_OVERRIDE_OPENROAD"],"-version"],check=True)']
+        with (output/'runtime-smoke.log').open('w') as log:
+            subprocess.run(command, check=True, stdout=log, stderr=subprocess.STDOUT, timeout=60)
         for name, repair in [('default_identity', False), ('forced_pair', True)]:
             trace.OUT = output/name
             trace.main(15, worker=__file__, docker_args=options,

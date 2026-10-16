@@ -220,10 +220,21 @@ def validate_execution_options(worker, docker_args, native_error_codes, repair_o
         raise ValueError('Custom tool execution requires explicit repair worker')
     if native_error_codes not in (('GRT-0116',), ('GRT-0116', 'GRT-0232')):
         raise ValueError('Unapproved native diagnostic error codes')
-    if (not isinstance(docker_args, (list, tuple)) or len(docker_args) != 4 or
-            list(docker_args[:3]) != ['-v', '/nix/store:/nix/store:ro', '-e'] or
-            not re.fullmatch(r'_LLN_OVERRIDE_OPENROAD=/nix/store/[0-9a-z]{32}-[^/]+/bin/openroad', docker_args[3])):
+    if (not isinstance(docker_args, (list, tuple)) or len(docker_args) < 4 or len(docker_args) % 2 or
+            docker_args[-2] != '-e' or not re.fullmatch(
+                r'_LLN_OVERRIDE_OPENROAD=/nix/store/[0-9a-z]{32}-[A-Za-z0-9+._=-]+/bin/openroad', docker_args[-1])):
         raise ValueError('Only read-only pinned Nix tool override is supported')
+    mounted = set()
+    for index in range(0, len(docker_args)-2, 2):
+        fields = docker_args[index+1].split(':')
+        if (docker_args[index] != '-v' or len(fields) != 3 or fields[0] != fields[1] or
+                fields[2] != 'ro' or not re.fullmatch(
+                    r'/nix/store/[0-9a-z]{32}-[A-Za-z0-9+._=-]+', fields[0]) or fields[0] in mounted):
+            raise ValueError('Nix mounts must be distinct individual read-only store paths')
+        mounted.add(fields[0])
+    root = str(Path(docker_args[-1].split('=', 1)[1]).parent.parent)
+    if root not in mounted:
+        raise ValueError('Custom tool output is not mounted')
 
 
 def main(iterations=50, worker=None, reduced_nets=None, docker_args=None,

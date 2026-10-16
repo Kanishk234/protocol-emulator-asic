@@ -11,13 +11,15 @@ import cloud_route_trace as trace
 
 
 def test_tool_override_requires_explicit_readonly_pinned_repair_worker():
-    args = ['-v', '/nix/store:/nix/store:ro', '-e',
+    root = '/nix/store/' + 'a'*32 + '-openroad'
+    args = ['-v', root + ':' + root + ':ro', '-e',
             '_LLN_OVERRIDE_OPENROAD=/nix/store/' + 'a'*32 + '-openroad/bin/openroad']
     trace.validate_execution_options(None, None, ('GRT-0116',), False)
     trace.validate_execution_options('cloud_route_force_repair.py', args, ('GRT-0116', 'GRT-0232'), True)
     for worker, options, errors in (
         ('other.py', args, ('GRT-0116',)),
-        ('cloud_route_force_repair.py', ['-v', '/nix/store:/nix/store:rw', *args[2:]], ('GRT-0116',)),
+        ('cloud_route_force_repair.py', ['-v', root + ':' + root + ':rw', *args[2:]], ('GRT-0116',)),
+        ('cloud_route_force_repair.py', ['-v', '/nix/store:/nix/store:ro', *args[2:]], ('GRT-0116',)),
         ('cloud_route_force_repair.py', args, ('ANY',)),
         ('cloud_route_force_repair.py', [*args[:3], '_LLN_OVERRIDE_OPENROAD=/tmp/openroad'], ('GRT-0116',)),
     ):

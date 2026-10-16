@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-15 (session107: remain with the active repair)
+**Goal:** user explicitly asks to continue through long runs instead of ending at launch. Actual38828164038 repair build remains compiling; chained38829241239 correctly waits before provisioning/EDA. No duplicate dispatch, hardware change or phase box.
+**Review:** additional independent agent verifies pinned SWIG exception conversion, final full-guide regeneration, default-identity worker path and runtime closure checks; no concrete blocker found.
+**Analysis:** full3659-net exact121 geometry scan identifies remote OBS-edge crossings on cell_en[27]/cell_pad[27]/cell_pad[30], beyond the original133 suspect set. Reusable input remains38824245540; documented heuristic/limits and raw ignored analysis. This supports actual congestion-competitor expansion instead of assuming the initial pair is the entire problem.
+**Actual:** build38828164038SUCCESS in31m15s, linked Tcl smoke and authenticated runtime closure retained. Chained38829241239 authenticates closure and passes real native GCD regression:2default tools,3invalid rejections,1actual two-net repair;563full routes and579required guide nets, no missing guides. Original guards regenerate. Chip routing never starts due broad Nix mount hiding container Python(BUG97), not a router failure. Fixed individual read-only closure mounts plus actual container runtime smoke;56focused testsPASS/2SKIP. Reuse compiled build for retry.
+**Next:** inspect corrected custom-default exact121 and bounded pair-repair results, fixing any concrete failure without ending at launch.
+
 ## 2026-10-15 (session106: diagnose routing and implement bounded repair experiment)
 **Goal:** user asks expert diagnosis and an actual fix, not repeated failure statements. Retained original50/133, measured15/121 and frozenG1. Read-only specialist independently verifies unchanged-pin filter and unsafe native placement fallback.
 **Diagnosis:** full121 includes distributed perimeter competition; both southern nets share southwest Metal3 edge(16,1). D09838827025802 reproduces full121 but subset lookup fails on escaped dbNet names(BUG95), never routes reduced case. Fixed exact normalized object resolution and actual Python Tcl regression. Corrected38827410988 at647a536SUCCESS: full121/native1, pad31/val30/pair0/native0 with census1/1/2. Downloaded arrays have6 decreased Metal3 entries, no increase; no selected path uses changed entries and all endpoints match. Native coarse access is demonstrated in reduced cases; full-chip closure/detailed access not claimed. ResultSHAb87a603f98e2cb0ea245d286b876b6be14acf4ad4b31f9a7e41e5dc9141fd188.

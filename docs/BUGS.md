@@ -1,5 +1,11 @@
 # Bugs
 
+## 97: Custom Nix store mount hides the container's Python runtime
+- **Date:**2026-10-15.
+- **Symptom/check:**38829241239 authenticates tools and passes actual GCD regression, then docker cannot start python3; no chip routing stage exists.
+- **Root cause:** binding host /nix/store over the complete container store hides its Python/LibreLane dependency paths.
+- **Fix/coverage:** query the authenticated tool's runtime closure and bind each individual store output at its identical path read-only. Reject broad store-root/read-write/remapped/duplicate mounts. Add actual container Python+LibreLane+custom-tool runtime smoke before chip input.56focused testsPASS/2existingSKIP; rerun with existing successful build, not a rebuilt solver. Earlier failure remains infrastructure, not routing evidence.
+
 ## 95: Reduced router diagnostic looks up normalized bus names in escaped database
 - **Date:**2026-10-15.
 - **Symptom/check:**38827025802 reproduces exact121 full control, then pad31 stops before routing with Missing selected net; no final congestion report.

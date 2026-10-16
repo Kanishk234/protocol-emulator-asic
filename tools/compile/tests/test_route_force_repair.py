@@ -179,6 +179,33 @@ def test_real_boundary_grid_has_complete_directional_edges(tmp_path):
     assert result['overflow_by_layer']['Metal1'] == 2
 
 
+def test_boundary_accepts_actual_native_integral_decimal_format(tmp_path):
+    # Hosted38853662972 emitted: EDGE Metal1 H 0 97 29.0 12.0.
+    # Keep its measured resource spellings in a small complete grid fixture.
+    path = tmp_path/'boundary.tsv'
+    rows = boundary_text().splitlines()
+    fields = rows[1].split('\t')
+    fields[-2:] = ['29.0', '12.0']
+    rows[1] = '\t'.join(fields)
+    path.write_text('\n'.join(rows)+'\n')
+    result = force.audit_boundary_grid(path)
+    assert result['capacities'][('Metal1', 'H', 0, 2)] == 29
+    assert result['total_overflow'] == 0
+
+
+@pytest.mark.parametrize('invalid', ['-1.0', 'NaN', 'Infinity', '-Infinity', '1.5', 'not-a-number'])
+@pytest.mark.parametrize('field', [-2, -1])
+def test_boundary_rejects_invalid_resource_numbers(tmp_path, invalid, field):
+    path = tmp_path/'boundary.tsv'
+    rows = boundary_text().splitlines()
+    fields = rows[1].split('\t')
+    fields[field] = invalid
+    rows[1] = '\t'.join(fields)
+    path.write_text('\n'.join(rows)+'\n')
+    with pytest.raises(ValueError):
+        force.audit_boundary_grid(path)
+
+
 @pytest.mark.parametrize('corrupt', ['missing', 'duplicate', 'negative', 'wrong_direction', 'wrong_boundary', 'bad_dimensions'])
 def test_boundary_grid_rejects_malformed_or_incomplete_census(tmp_path, corrupt):
     path = tmp_path/'boundary.tsv'

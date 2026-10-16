@@ -13,7 +13,7 @@ import cloud_route_trace as trace
 from cloud_route_121_grid import PATCH, EXPECTED_SEGMENTS, observed_trace
 from cloud_route_isolation import capacities
 from cloud_boundary_audit import SCRIPT as BOUNDARY_SCRIPT
-from audit_native_grid import audit, guide_coverage
+from audit_native_grid import audit, guide_coverage, number
 
 EXPECTED_GRID = '278fdd4a3e55eea60f586571bae98191e3a07623b2790aeb642e3a83d6c163ae'
 MARKER = 'WARP_FORCE_REPAIR_BEGIN'
@@ -75,10 +75,14 @@ def audit_boundary_grid(path):
     overflow = {layer: 0 for layer in BOUNDARY_DIRECTIONS}
     for line in rows[1:]:
         fields = line.split('\t')
-        if len(fields) != 7 or fields[0] != 'EDGE' or not all(re.fullmatch(r'[0-9]+', v) for v in fields[3:]):
+        if len(fields) != 7 or fields[0] != 'EDGE' or not all(re.fullmatch(r'[0-9]+', v) for v in fields[3:5]):
             raise ValueError('Malformed or negative boundary edge')
         _, layer, direction, x, y, cap, usage = fields
-        x, y, cap, usage = map(int, (x, y, cap, usage))
+        x, y = map(int, (x, y))
+        cap, usage = number(cap), number(usage)
+        if any(value != value.to_integral_value() for value in (cap, usage)):
+            raise ValueError('Fractional boundary edge resource count')
+        cap, usage = int(cap), int(usage)
         key = (layer, direction, x, y)
         if key not in expected or key in seen:
             raise ValueError('Duplicate or invalid real boundary edge')

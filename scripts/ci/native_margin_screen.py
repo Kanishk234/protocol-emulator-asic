@@ -33,6 +33,7 @@ def evaluate(timing, antenna, reports, margin):
              and margin['estimated_margin_pass'] is True)
     return dict(qualified=ready, minimum_fast_hold_ns=.05,
                 native_electrical_margin_pct=55, electrical=electrical,
+                antenna=antenna,
                 **margin, checkpoint_ecos=False, custom_image=False,
                 clean_synthesis=True, physical_screen_only=True,
                 official_signoff=False)

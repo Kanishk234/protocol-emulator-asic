@@ -43,6 +43,7 @@ def test_strict_gate_accepts_measured_clean_screen_only():
     assert result['qualified'] is True
     assert result['official_signoff'] is False
     assert result['checkpoint_ecos'] is False
+    assert result['antenna']['antenna__violating__nets'] == 0
 
 
 @pytest.mark.parametrize('failure', ['setup', 'hold', 'antenna', 'electrical', 'margin'])
@@ -60,6 +61,8 @@ def test_each_independent_failure_blocks_routing(failure):
     else:
         margin['estimated_margin_pass'] = False
     assert evaluate(timing, antenna, reports, margin)['qualified'] is False
+    if failure == 'antenna':
+        assert evaluate(timing, antenna, reports, margin)['antenna']['antenna__violating__nets'] == 1
 
 
 def test_missing_electrical_evidence_rejected():
@@ -101,4 +104,18 @@ def test_clockspacing_trial_preserves_wire_repair_and_all_constraints(tmp_path):
     expected = wire_repair(source)
     result = clockspacing(source)
     assert result.pop('CTS_DISTANCE_BETWEEN_BUFFERS') == 100
+    assert result == expected
+
+
+def test_shortwire_changes_only_data_wire_length(tmp_path):
+    from native_clockspacing_screen import configure as clockspacing
+    from native_shortwire_screen import configure as shortwire
+    source = stock_configure(dict(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=56),
+                             'AREA 1', tmp_path/'src/signoff.sdc',
+                             hold_target=.10, clock_cluster=8)
+    expected = clockspacing(source)
+    result = shortwire(source)
+    assert result['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == 100
+    assert expected.pop('GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH') == 200
+    result.pop('GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH')
     assert result == expected

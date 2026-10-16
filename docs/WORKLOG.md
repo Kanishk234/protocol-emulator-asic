@@ -2,6 +2,31 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-15 — Prepare bounded watched native replay
+
+- User requested a revised workflow for apparent stall38823883005. Prepared separate `gds-native-margin55-watched-screen` with stock source/policy, quieter Yosys logging, full file artifacts,30second stage/log/container heartbeats,15minute synthesis and115minute overall deadlines, and failure container cleanup. Original strict gates and no-DRT policy remain.
+- Inspection found pinned SYNTH_SHARE_RESOURCES flag is unused while share executes unconditionally; removed that ineffective bypass from preparation. No synthesis mapping or custom image change. Underlying compute/log-delivery stall cause remains unproven; recorded BUG116/117.
+-76focused tests pass, including real child success/failure/timeouts and stage transitions; original native recipe differs only in logging. Next publish/launch the watched revision within the approved native-screen work, then inspect live stage/CPU evidence before cancelling or replacing the original. No phase boxes ticked.
+
+
+## 2026-10-15 — Investigate quiet native screen
+
+- Run38823883005 remains in progress, but active-job downloadable log and blob Last-Modified stop at23:32:14UTC during Yosys SHARE activation-pattern analysis. Checked at23:55UTC: roughly23minutes without persisted log output. No explicit error or final screen result.
+- Compared successful same-source native clock8 baseline37990280838: identical Yosys0.66 revision and resource-sharing point; SHARE starts20:59:14.263 and next OPT_EXPR begins20:59:14.648 (about0.385s). New55% repair targets have not been reached in available logs, so no evidence those physical settings caused this silence.
+- Hosted runner remains assigned; REST logs may omit uncommitted live chunks, and remote CPU/process state is unavailable. Treat as suspected stalled synthesis/runner/log delivery, not proven deadlock or timing failure. Run left intact. Next recheck output growth or final job result before deciding on a same-revision retry. No phase boxes changed.
+
+
+## 2026-10-15 — Clean-source local protocol replay completes
+
+- Managed terminal78708 exits0. Independently parsed `/tmp/tripwire-clean-inline-rtl-l3.xml`: 22 cases, zero failures, errors or skips. Full isolated 2/4 TT wrapper RTL, unchanged current expanded L3 tests and working sigrok decoders. Candidate manifest now records the result and XML hash; reproduction report updated.
+- This joins the independent 22/22 exact routed-netlist regression and four local integration smoke passes. It is functional simulation evidence, not a new physical timing result. Native clean-build screen38823883005 and eventual official GDS/LVS/precheck remain separate gates. No phase boxes ticked.
+
+
+## 2026-10-15 — Local protocol replay status
+
+- Clean-source wrapper RTL replay has passed 18/22 cases with no reported failures; HDLC loopback (19/22) is active. Simulator verified outside the sandbox at 14m18s elapsed, 99.8% CPU. Final JUnit report not yet written. Remaining cases after HDLC: LIN, CAN and IR NEC repeat RX. No phase boxes changed; next inspect final XML before claiming the local suite passes.
+
+
 ## 2026-10-15 — Native clean-build screen published and running
 
 - With explicit scoped user approval, published tools `0c436d3`, CI `6068f72` and evidence `2d2b697`; verified remote main is `2d2b697fb6268d61e2d9be6df16901dc2f281b17`. No `src/`, `info.yaml` or `macro/` commit in this push.

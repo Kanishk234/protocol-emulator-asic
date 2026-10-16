@@ -2,6 +2,19 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-16 — Clock fanout cleared; reserve and antenna blockers confirmed
+
+- CTS10038852051738 completes without timeout in3117.20s. Allcorners electrical0/0/0; setupWS0, holdfast/typ/slow84.4582/190.385/376.4ps. Three slow reserve misses remain: MEN.621934,_03775_.499177,_07690_.466863. Stage41area548406µm²/60.7708%,36439instances;2862native data buffers and1239CTS buffers reported.
+- Selectively downloaded fresh antenna reports:4nets/4pins (_03933_,net13143,net13209,net14240). Corrected initial interpretation that failure was only reserve. Gate receipt now stores antenna counts explicitly; next early artifact includes actual reports (BUG119). No antenna waiver or DRT.
+- Prepared one-setting native wire100 comparison retaining CTS100. MEN strength1driver-to-macro placement separation~152µm supports testing100versus200µm bound. D-084 records area/hold/congestion risks and unchanged gates;79focused tests/workflow checks pass. Next publish/launch bounded clean screen within approved work, then inspect every guard. No phase boxes ticked.
+
+
+## 2026-10-16 — Native clock-spacing screen published and queued
+
+- Published tools100b422/CIca2528a/docs1792cee within approved native-screen work; verified remote main1792ceeb5cde25645bd989373e6adf39c28315e3. Automatic approval review timed out; allowed retry succeeded. No hardware/config/template job changes in push.
+- [Native clockspacing100 screen38852051738](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38852051738) confirmed queued on that exact head. One physical change from wire200: native CTS buffer spacing100µm.78focused tests and YAML/shell checks pass. Next inspect actual clock fanout and all final timing/electrical/antenna/overflow/reserve gates; no DRT or phase completion claim.
+
+
 ## 2026-10-16 — Wire200 clears data violations; native clock-spacing trial prepared
 
 - Wire20038848420485 fails measured gates without timeout after1952.50s. Actual repair inserts2885buffers on1646nets; stage41area545570µm²/60.4565%,36331instances. Allcorners slew/capacitance0; only four clock fanout16>8 failures remain. SetupWS0, holdfast/typ/slow95.9118/200.231/380.109ps. Four slow slew reserve misses remain (MEN.626,ADDR5.571,_03775_.498,_07690_.467), so no DRT.

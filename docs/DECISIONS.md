@@ -1089,6 +1089,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Scope: one generated setting `CTS_DISTANCE_BETWEEN_BUFFERS=100`, forwarded by pinned stock CTS to its native command. Keep complete2/4 source, AREA1/clock8,20ns/allcorners, wire200/55%repair,100ps hold target/50ps minimum and all strict guards. This is not a guarantee that spacing enforces a hard fanout bound; original four reserve misses remain blocking too.
 - Cost: more clock cells/routing, altered insertion delay/skew and possible hold/setup/overflow degradation. Measure actual clock fanout, area and final gates before promotion or DRT.78focused helper tests and workflow checks pass; no main config/template edit and no official adoption implied.
 
+## D-084 (2026-10-16; isolated diagnostic): shorter native data-wire segments
+- General need: CTS spacing100 clears all actual electrical violations in38852051738, but three slow slew reserve misses and four fresh antenna violations remain. Test native data-wire limit100µm instead of200, retaining the successful clock topology setting. Actual weak MEN driver is roughly152µm from the macro input, so this specific connection lies between the two limits. No protocol-specific block, state or contract change.
+- Scope: one physical setting versus the measured CTS100/wire200 recipe. Complete2/4 source,20ns/allcorners, AREA1/clock8, CTS100,55% margins and50ps fast minimum retained. Fresh antenna counts/reports now explicit in early evidence; no gate relaxation or main config/template change.
+- Cost: added buffers/area, congestion and potential hold/setup movement. Shorter wires may reduce reserve/antenna risks but neither improvement is assumed.79focused tests pass; require fresh all-gate screen before any DRT or promotion.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

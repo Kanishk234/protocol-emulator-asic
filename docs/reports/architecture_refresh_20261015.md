@@ -90,3 +90,25 @@ compiled and authenticated here, not loaded in this campaign. Listed-input
 hashes do not discover recursive includes or recover the missing original
 physical primitive timing views. The run does not measure new total area,
 provide configured/SDF timing, or qualify the experimental compact successor.
+
+## Portable verifier and fresh hosted regression, October16
+
+`tools/autonomy/architecture_evidence.py` reuses the existing native validator
+with exact-revision specifications and Git-object input resolution. The
+read-only supervisor adapter binds explicit run, attempt and full revision;
+its four dispatch campaigns remain unchanged.101focused tests pass, including
+altered native usage with coherently rehashed files, corrupt images, missing
+provenance/source/cases, unsafe paths, unknown setup errors and worktree-spec
+isolation. Both default and supplied source specifications still require an
+explicit PRIMS selection.
+
+After the refactor, hosted38951648258 at
+`b5f402d8c34504f3eebba4f8f804342bf8eff073`, attempt1, completes all eight cases.
+GitHub API identity is checked independently before downloading. The portable
+CLI accepts the moved actual artifact and rechecks449 exact input hashes,
+all eight native results and four CRC/architecture/image outputs. Its eight
+summaries, including four image hashes, equal the preceding38852379083 campaign.
+Fresh result SHA:
+`b70d0fb9dcd24ae54ab93442366e2adfda581df7271c1e3435b8e9b0f333f468`.
+This is a real hosted regression of the refactored default path plus a local
+read-only artifact audit, not another physical area/timing or loaded test.

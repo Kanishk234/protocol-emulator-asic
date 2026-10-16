@@ -1,5 +1,11 @@
 # Bugs
 
+## 95: Reduced router diagnostic looks up normalized bus names in escaped database
+- **Date:**2026-10-15.
+- **Symptom/check:**38827025802 reproduces exact121 full control, then pad31 stops before routing with Missing selected net; no final congestion report.
+- **Root cause:** native segment names are normalized by the parser, while OpenDB stores escaped brackets; direct findNet on the display name fails.
+- **Fix/coverage:** resolve normalized names by scanning actual database net objects, require exactly one match, and call the same grt::add_net_to_route API used by pinned set_nets_to_route. Avoid STA pattern matching and keep native selected-net census guard. Add escaped-name fixture; repeat hosted diagnostic. Failed run is not a pin-access finding.
+
 ## 94: Controlled formal evidence parser assumes a bare SBY status word
 - **Date:** 2026-10-15.
 - **Symptom/check:** campaign38820879351 detects10simulation mutants but blocks the parking mutant despite pristine F1 proof exit0 and successful k-induction.

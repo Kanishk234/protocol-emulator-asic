@@ -76,9 +76,15 @@ def compiled_image(directory):
     return report
 
 
-def validate_evidence(directory, kind, revision):
+def validate_evidence(directory, kind, revision, *, run_id=None, attempt=None, tile_repository=None):
     result = {"scope": kind, "physical_acceptance": False, "timing_acceptance": False}
-    if kind == "phase":
+    if kind == "architecture":
+        # Read-only adapter only: the four existing dispatch campaigns stay
+        # unchanged until this workflow has its own expected-SHA launch guard.
+        from autonomy.architecture_evidence import audit
+        result['architecture'] = audit(directory, revision=revision, run_id=run_id,
+                                       attempt=attempt, tile_repository=tile_repository)
+    elif kind == "phase":
         result["test"] = strict_xml(one(directory, "results.xml"))
         trace = json.loads(one(directory, "phase_trace.json").read_text())
         cases = trace.get("cases", [])

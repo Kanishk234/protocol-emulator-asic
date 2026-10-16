@@ -45,15 +45,20 @@ def parameters(design, arch):
     return dict(params, PRIMS=ARCHES[arch])
 
 
-def validate_case(directory, design, arch):
+def validate_case(directory, design, arch, *, source_spec=None, source_arch=None, read_input=None):
     directory = Path(directory)
     row = json.loads((directory/'case.json').read_text())
-    expected = parameters(design, arch)
+    if design not in DESIGNS or arch not in ARCHES:
+        raise ValueError('Unapproved design/architecture')
+    spec = source_spec if source_spec is not None else yaml.safe_load((ROOT/'protocols'/design/'pins.yaml').read_text())
+    if 'PRIMS' not in spec['params']:
+        raise ValueError('Missing explicit primitive selection')
+    expected = dict(spec['params'], PRIMS=ARCHES[arch])
     if row['params'] != expected or row['design'] != design or row['arch'] != arch:
         raise ValueError('Actual case identity/parameters differ')
     if row['timing_corner'] != compiler.SLOW_CORNER or row['seed'] != 1:
         raise ValueError('Timing model/seed differs')
-    top = yaml.safe_load((ROOT/'protocols'/design/'pins.yaml').read_text())['top']
+    top = spec['top']
     if compiler.chparam(expected, top) not in (directory/'synth.ys').read_text().splitlines():
         raise ValueError('Actual synthesis parameters differ')
     estimate = compiler.cell_estimate(directory/'design.json', 'warp_top')
@@ -67,7 +72,8 @@ def validate_case(directory, design, arch):
         if report['tools'] != row['tools'] or report['build_options']['seed'] != 1:
             raise ValueError('Native report tool/seed identity differs')
         for item in report['provenance']['inputs']:
-            if sha(item['path']) != item['sha256']:
+            actual = hashlib.sha256(read_input(item['path'])).hexdigest() if read_input else sha(item['path'])
+            if actual != item['sha256']:
                 raise ValueError('Retained compile input fingerprint differs')
         util, fmax = compiler.parse_pnr_log(directory/'pnr.log')
         if not util or report['utilisation'] != util or report['fmax_mhz'] != fmax:
@@ -76,7 +82,7 @@ def validate_case(directory, design, arch):
             raise ValueError('Successful placement exceeds resource capacity')
         image = directory/(report['design']+'.wbit')
         bitfile = BitFile.load(image)
-        arch_meta, _ = compiler.load_arch(ROOT/'arch'/arch)
+        arch_meta = source_arch if source_arch is not None else compiler.load_arch(ROOT/'arch'/arch)[0]
         if (bitfile.arch_version != int(arch_meta['arch_version']) or
                 sha(image) != report['provenance']['bitfile_sha256'] or
                 len(bitfile.words) != report['words'] or

@@ -1,5 +1,13 @@
 # Design-set protocols on G1 (fabric + hard timer and shift register)
 
+**Historical local compiler report, September 27, 2026.** Values and “Open”
+items below preserve the state of that dated experiment. G1 was subsequently
+integrated and frozen; chip-level GDS/precheck/gate-shell tests are recorded in
+CI [36383587262](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/36383587262).
+The [paired current compiler refresh](architecture_refresh_20261015.md) is
+separate. Nonfitting LC counts below are synthesis demand estimates, not placed
+cells. Compiler Fmax remains model timing, not configured physical timing.
+
 **Date:** 2026-09-27 · **Architecture:** `arch/warp_g1` (ARCH_VERSION 0x0003): G0's grid with one LUT-tile slot (X2Y2) replaced by the primitive tile `PRIM2T2S` (D-026) = **88 LUT4+FF** (LCs), **2 × `wp_timer` + 2 × `wp_shift`**, 36 IO cells; macro `macro/warp_g1`, 1016.64 × 669.06 µm (same size and ports as G0; stitched, KLayout DRC 0, antenna 0) · **Flow:** `python -m compile.protocols --arch arch/warp_g1`, designs with `PRIMS: 1` in `protocols/*/pins.yaml`, profiling parameters, slow corner `nom_slow_1p08V_125C`, nextpnr seed 1 · Local run, not CI. Not in the chip yet (the chip is G0).
 
 ## Result
@@ -12,7 +20,11 @@
 | I2C target (4 registers) | **no** | 169 | 127 (11) | 61 | 0, 1 | 15 | - | 184 LCs, no fit |
 | I2C target (2 registers) | **no** | 123 | 97 (8) | 41 | 0, 1 | 15 | - | 142 LCs, no fit |
 
-The two fabrics take the same chip area: the primitive tile is 0.97 × a LUT tile in the same footprint (D-026), and the macros have identical size. This is a like-for-like comparison of the two fabrics under one compile flow, in the spirit of D-004; the full phase-3 comparison (routing, shell and configuration included, more variants) is still to come.
+The two fabrics have identical macro outlines. The historical local primitive
+tile estimate is 0.97 × a LUT tile's standard-cell area in that footprint
+(D-026). This compares two fabrics under one dated compile flow; matching
+outlines alone do not independently establish identical internal routing,
+configuration-storage cost or power. The ratio is not a new CI area measurement.
 
 ## Timing
 

@@ -1,6 +1,12 @@
 # Architecture comparison at equal area (phase 3)
 
-**Date:** 2026-09-28 · **Rule:** D-004: variants are compared at equal total area and the same clock target (50 MHz). Every variant here uses the same chip: the same shell, the same fabric macro size (1016.64 × 669.06 µm) and placement, the same configuration path; only the content of one 4 × 3 tile slot differs, and the primitive tile is 0.97 × a LUT tile's standard-cell area in the same footprint (D-026). **Metrics:** coverage = design-set protocols that place and route on the fabric (of 4: UART, SPI controller, I2C controller, I2C target); performance = the worst nextpnr Fmax estimate among those that fit (slow corner, timing model of `tools/timing/README.md`; a model, not a claim).
+**Historical report, September 28, 2026.** The numbers below retain the original
+local compiler/model and specialization measurements; they are not a current
+paired hosted measurement. Physical-build CI IDs establish the named builds,
+not every compiler or component-area number in this table. See the
+[current refresh](architecture_refresh_20261015.md) for its separate status.
+
+**Date:** 2026-09-28 · **Rule:** D-004 requires equal total area and the same clock target (50 MHz). The historical G0/G1 comparison uses the same shell and fabric macro outline (1016.64 × 669.06 µm), placement and configuration interface, replacing one 4 × 3 tile slot. Those matched physical boundaries do not establish identical internal routing or configuration-storage costs. The primitive-tile standard-cell ratio recorded in D-026 is a historical local estimate, not a freshly authenticated area result. **Metrics:** coverage = design-set protocols that place and route on the fabric (of 4: UART, SPI controller, I2C controller, I2C target); performance = the worst nextpnr Fmax estimate among those that fit (slow corner, timing model of `tools/timing/README.md`; a model, not a physical rate).
 
 ![coverage vs worst-case Fmax](architecture_comparison.svg)
 
@@ -16,10 +22,10 @@
 
 ## What the comparison says
 
-- **G1 dominates G0** at equal area: three protocols instead of one, and every one of them above the 50 MHz clock in the model. The price is 8 LUT4s of general logic and a lower worst-case Fmax (53 vs 68 MHz, the I2C controller being a larger design than the SPI controller that is G0's only fit).
-- **No measured candidate improves on G1 for the design set.** D-030 moves UART up but not the worst design; D-031 does not fit; the unbuilt ones fail on the data before building (the phase 3 method's step 7: kept only if the measured benefit justifies the cost).
+- **The historical compiler comparison reports three fitting protocols on G1 and one on G0**, within matched macro outlines and at a common 50 MHz assessment target. G1 exchanges 8 LUT4s for hard primitives. Its 53 MHz worst model estimate is for I2C controller, whereas G0's 68 MHz is for SPI, so those aggregate values do not compare the same workload. These observations do not establish a new physical area or timing advantage.
+- **The examined historical candidates did not establish a better overall design-set result than G1 under that selection method.** D-030 improves UART's model estimate but not the slowest fitting design; D-031 fails placement. The unbuilt candidates remain projections from the recorded resource/control-set data, not measured replacement chips.
 - **Open limits** that a different fabric would have to address: the I2C target (about twice G1's logic) and the I2C controller's timing margin (53 MHz model estimate vs 50 MHz).
 
 ## Not covered here
 - The held-out protocols (phase 4) are not in these numbers, by design (D-003). Whether G1's primitives generalize is phase 4's result, measured on the frozen chip against a G0 build.
-- Area and power beyond standard-cell area (routing, configuration storage) are the same for all rows, since the macro and shell are identical.
+- Matched macro outlines do not independently measure equal internal routing cost, configuration-storage cost or power. No new total-area or power measurement is provided here, and unbuilt rows do not inherit physical qualification from G0 or G1.

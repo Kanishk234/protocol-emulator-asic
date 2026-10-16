@@ -1,8 +1,15 @@
 # Design-set protocols on G0 (plain fabric)
 
+**Historical local compiler report, September 27, 2026.** Values below preserve
+that dated experiment; they are not current hosted results. The
+[paired refresh](architecture_refresh_20261015.md) reports its status separately.
+For designs that did not place, LC counts are synthesized demand estimates,
+not actual placed cells. The later frozen chip uses G1; this report describes
+the G0 baseline at the time of the experiment.
+
 **Date:** 2026-09-27 · **Architecture:** `arch/warp_g0` (ARCH_VERSION 0x0002), 4 × 3 `LUT4x8_ha` = **96 LUT4+FF** (LCs), 36 IO cells · **Flow:** `tools/compile` (`python -m compile.protocols --arch arch/warp_g0 --set PRIMS=0`), pin maps `protocols/*/pins.yaml`, profiling parameters (`tools/profiling/workload.py`), timing corner `nom_slow_1p08V_125C`, nextpnr seed 1 · Local run, not CI.
 
-## Result (current flow)
+## Result (flow at the recorded date)
 
 | Protocol | Fits? | LCs (nextpnr) | LUTs (of which carry) | FFs | IO cells | Fmax (slow corner) |
 |---|---|---|---|---|---|---|

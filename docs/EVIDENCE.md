@@ -1,13 +1,12 @@
 # WARP: evidence report
 
 **October15 reproduction refresh:** clean hosted
-[38777288608](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38777288608)
-on77edd2d passes the documented fresh source/compile/RTL path. Independent
-artifact review verifies loaded30/30, cosim1/1, all14XML hashes/counts,
-200 listed-source fingerprints and11 rebuilt-image report hashes against
-exact-revision committed images. Emitted images are omitted from the artifact;
-the standalone UART image has same-job audit evidence only. This is no
-physical/native timing refresh. [Exact evidence and omissions](reports/reproduction_refresh_20261015.md).
+[38780941472](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38780941472)
+on8e4c117 passes the documented fresh source/compile/RTL path. Independent
+artifact review verifies loaded30/30, cosim1/1 and all12 actual emitted image
+bytes against their report hashes, superseding the earlier artifact omission.
+This does not refresh physical/native timing.
+[Exact evidence and historical omissions](reports/reproduction_refresh_20261015.md).
 
 **October 15 status:** frozen G1 remains the supported fallback; phase 5 is
 incomplete. Paired native routing38820879445 establishes a lower-total point:
@@ -26,8 +25,8 @@ G1 with authenticated counter9/window256/delay4 parameters and70/88LC, under
 D-023 scope. Hosted supervisor38777137622 passes63 checks; the four separate
 campaign artifacts are independently verified on77edd2d: phase38777137234,
 active-cancel38777137304, C-host38777137259 and nine compiler builds38777137439.
-Unit38777137520's tools job passes, but its protocol job correctly exposes an
-inapplicable UART skip; corrected discovery still needs its own hosted result.
+Unit38777137520 exposed an inapplicable UART skip; corrected discovery and
+the complete unit workflow subsequently pass38778082137 and38820879322.
 [Integration evidence](reports/autonomous_integration_20261015.md) and
 [numerical-source audit and remaining gates](reports/evidence_audit_20261015.md).
 
@@ -85,12 +84,21 @@ Before profiling we sealed a **held-out set** of four more protocols (WS2812, 1-
 
 The generic hard blocks selected from profiling are a **loadable 16-bit timer** and an **8-bit shift register with a bit count** (D-002, D-026). The three supported design-set protocols use both; the I2C target uses the shift register but does not fit the chip. Two of each occupy one fabric tile slot in hardened G1(CI36376994834). The chip's fabric **G1** is a 4 × 3 grid with one slot holding them: **88 LUT4 + 2 timers + 2 shift registers**; the baseline **G0** has the same macro with all 12 slots LUT tiles (96 LUT4).
 
-| Fabric (same macro, same area) | Design-set protocols that place and route | Logic cells: UART / SPI / I2C controller / I2C target |
-|---|---|---|
-| G0: 96 LUT4 | 1 of 4 | 124 / 86 / 115 / 184 |
-| **G1: 88 LUT4 + hard blocks** | **3 of 4** | **29 / 47 / 70** / 169 |
+Current hosted compiler comparison atba0cb76, seed1, common50MHz assessment
+target and the same slow-corner model:
 
-Sources: `docs/reports/architecture_comparison.md` (chart `architecture_comparison.svg`), `g1_results.md`, `g0_results.md`; G1 fits checked in CI `fabric` (`compile.protocols --require`, e.g. 36376994866).
+| Fabric | Design-set protocols that place and route | UART LCs | SPI LCs | I2C controller LCs | I2C target LCs |
+|---|---|---|---|---|---|
+| G0: 96 LUT4 | 1 of 4 | nonfit; demand124 | 86 placed | nonfit; demand115 | nonfit; demand185 |
+| **G1: 88 LUT4 + hard blocks** | **3 of 4** | **29 placed** | **47 placed** | **70 placed** | nonfit; demand169 |
+
+Source: [38852379083](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38852379083),
+[retained native reports and images](reports/architecture_refresh_20261015.md).
+Demand means a synthesis estimate for a design rejected by native placement,
+not a placed-cell count. This refresh does not remeasure total physical area
+or validate configured timing. Historical matched outlines and specialization
+decisions remain in [the dated comparison](reports/architecture_comparison.md);
+matching outlines alone do not establish identical internal resource costs.
 
 Phase 3 then tried three more specializations, each measured and dropped (D-030, D-031, D-034): a faster timer output (no gain for the slowest design), buffering inside the primitive tile (does not fit the tile), and a register-file tile (the I2C target still exceeds available logic). Their historical/local measurements and limits remain in the decision records and `docs/reports/g1_limits.md`. **G1 is the frozen chip** (`hw-freeze` → 3047dea, D-033); the I2C target does not fit and is not supported (D-035).
 

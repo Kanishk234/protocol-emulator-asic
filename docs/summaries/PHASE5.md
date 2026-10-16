@@ -15,6 +15,15 @@ successor is promoted. Controlled mutation refresh38823961384 passes all6 pristi
 rejects all11 planted defects with actual assertion/property witnesses. Exact121
 grid38824245540 reproduces the candidate segments; routing remains unaccepted.
 
+Current eight-case design-set compiler refresh38852379083 atba0cb76 passes:
+G0 fits SPI at86LC; G1 fits UART/SPI/I2C controller at29/47/70LC. Four other
+cases have explicit native capacity rejections, whose reported LC demand is
+a synthesis estimate. Retained images/native logs have matching listed hashes;
+this refresh does not establish configured timing or new equal-total-area
+superiority. Historical comparison wording now carries that distinction.
+Corrected forced router build38851788423 and chained38851859215 remain active;
+the preceding139-overflow repair is rejected for changed capacity accounting.
+
 Latest baseline additions now have actual loaded evidence: primitive-helper
 38167521573 and autonomous UART fault/event demo38168609080 pass real SPI-loaded
 chip-port tests on unchanged G1. The latter uses57/88LC and both timers/shifters;

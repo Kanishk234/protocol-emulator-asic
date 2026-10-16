@@ -85,9 +85,10 @@
         "38778082059 at6370e1f: exact133/source/segments retained; cached2D133/assigned3D133; conditional3Dmaze calls skipped",
         "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged",
         "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can",
-        "38827410988 at647a536: exact full121; southern singleton/pair native0, endpoints unchanged;6 capacity decreases off selected routes, explicit confound retained"
+        "38827410988 at647a536: exact full121; southern singleton/pair native0, endpoints unchanged;6 capacity decreases off selected routes, explicit confound retained",
+        "38828164038 pinned patch build running;38829241239 authenticated follow-on waits then native GCD/default121 gates before fixed pair repair"
       ],
-      "next_action": "Inspect pinned repair build38828164038 at63a4180. Require compiled/SWIG and minimal regression plus default exact121 equivalence before explicit pair repair. D099 patch not chip-qualified.",
+      "next_action": "Inspect actual38828164038/38829241239 results and artifacts. A collector success is not routing closure. On native0 require downstream detailed routing/extraction/full matched checks; on error diagnose retained witness, never reuse partial state.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",

@@ -45,7 +45,7 @@ jobs:
       - name: Project venv and pinned compiler tools
         run: |
           scripts/setup_venv.sh
-          scripts/fetch_nextpnr.sh
+          bash scripts/fetch_nextpnr.sh
       - name: Eight paired design-set compiles
         timeout-minutes: 85
         run: |

@@ -1,14 +1,33 @@
 """Evidence rejection tests only; no local EDA."""
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'test_internal'))
 import cloud_arch_comparison as evidence
+
+
+def test_workflow_setup_scripts_can_be_invoked_from_checkout():
+    workflow = yaml.safe_load((evidence.ROOT/'.github/workflows/arch_comparison_evidence.yaml').read_text())
+    count = 0
+    for step in workflow['jobs']['compare']['steps']:
+        for line in step.get('run', '').splitlines():
+            words = line.strip().split()
+            if not words:
+                continue
+            if words[0].startswith('scripts/'):
+                assert os.access(evidence.ROOT/words[0], os.X_OK), words[0]
+                count += 1
+            elif words[0] == 'bash' and len(words) > 1 and words[1].startswith('scripts/'):
+                assert (evidence.ROOT/words[1]).is_file(), words[1]
+                count += 1
+    assert count == 2
 
 
 def failed_case(tmp_path, monkeypatch, category='resource_capacity'):

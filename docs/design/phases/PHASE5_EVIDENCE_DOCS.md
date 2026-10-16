@@ -19,4 +19,4 @@
 - [x] Clean-checkout reproduction succeeded (2026-10-07, fresh Ubuntu24.04 runner37690896748,962da93; retained result/command logs/XML inspected, docs/reports/reproduction.md)
 - [x] User guide and datasheet written (`docs/USER_GUIDE.md`, `docs/EXAMPLES.md`, `docs/info.md`, `info.yaml`)
 - [ ] All CI workflows green on `efpga`
-- [ ] `docs/summaries/PHASE5.md` written
+- [x] `docs/summaries/PHASE5.md` written (2026-10-16: current plain-language goal/results/limits/next steps with run links; phase remains in progress)

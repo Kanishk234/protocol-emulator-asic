@@ -165,10 +165,33 @@ with a documented regeneration path; do not invent missing historical views.
 Record actual full hashes from artifacts, never expand abbreviated report
 hashes by guessing. No raw logs, databases, waves or bitstreams go into Git.
 
+## Recheck downloaded architecture evidence
+
+The portable auditor reuses the hosted compiler evidence checks against the
+explicit project revision and pinned tile-library Git objects. It does not
+trust current working-tree pin specifications, launch workflows or run EDA.
+Both repositories must contain the named objects; missing objects reject the
+audit rather than substitute newer files.
+
+```sh
+source .venv/bin/activate
+PYTHONPATH=tools python -m autonomy.architecture_evidence \
+  build/arch109/current-architecture-comparison-38852379083 \
+  --revision ba0cb76ac717b8656c7d081fc453ca9222b6e8d5 \
+  --run-id 38852379083 --attempt 1
+```
+
+Supply the actual downloaded artifact directory and authenticated run identity
+for another campaign. The read-only supervisor adapter accepts the same
+explicit identity. Its four dispatch campaigns are unchanged: architecture
+compilation is not added to automatic launches because that workflow lacks
+the expected-SHA input guard. Tool hashes here are retained identities, not a
+fresh binary execution or a physical timing qualification.
+
 ## Authorization and durable handoff
 
 The user authorized agent delegation, commits and pushes **for the October 15,
-2026 session**. This overrides the Git restriction for that session only;
+2026 session, continued October 16**. This overrides the Git restriction for that session only;
 it is not permission for future sessions or autonomous scheduled writes.
 Normal repository rules, protected architecture/spec decisions and phase gates
 still apply. Commit by file group. Before pushing while hardening is active,

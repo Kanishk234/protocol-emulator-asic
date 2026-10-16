@@ -87,9 +87,10 @@
         "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged",
         "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can",
         "38827410988 at647a536: exact full121; southern singleton/pair native0, endpoints unchanged;6 capacity decreases off selected routes, explicit confound retained",
-        "38948702750 atf433609: exactdefault121; boundedforce endsGRT0232/observedfullgrid132(15/52/24/41), all69064interior+550boundarycapacities and geometry/censusunchanged; no postrepair finaltable, two selectedguidesmissing; rejectversus121"
+        "38948702750 atf433609: exactdefault121; boundedforce endsGRT0232/observedfullgrid132(15/52/24/41), all69064interior+550boundarycapacities and geometry/censusunchanged; no postrepair finaltable, two selectedguidesmissing; rejectversus121",
+        "D101 observerpatch72257372...; build38950370119 and dependentqualification38950416231 atcb54249 active; exactrejected132 identity required before perpass interpretation"
       ],
-      "next_action": "Instrument existing bounded forced passes without changing routing behavior; require exact38948702750 final132 grid/segment hashes before interpreting pass snapshots/actual expansion membership. Determine whether earlier whole-grid states improve or expansion omits actual congested owners. Preserve original50/133, best15/121, and rejected controlled132 separately.",
+      "next_action": "Inspect actual38950370119/38950416231. Authenticate build/native regression/exact121 and exact132 final equivalence before interpreting all five whole-grid snapshots and persistent actual net memberships. If any observer identity changes, reject observation. Preserve best15/121, original50/133 and rejected132 separately.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",

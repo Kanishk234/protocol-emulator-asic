@@ -2,6 +2,19 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-16 — Wire200 clears data violations; native clock-spacing trial prepared
+
+- Wire20038848420485 fails measured gates without timeout after1952.50s. Actual repair inserts2885buffers on1646nets; stage41area545570µm²/60.4565%,36331instances. Allcorners slew/capacitance0; only four clock fanout16>8 failures remain. SetupWS0, holdfast/typ/slow95.9118/200.231/380.109ps. Four slow slew reserve misses remain (MEN.626,ADDR5.571,_03775_.498,_07690_.467), so no DRT.
+- Prepared one-setting native CTS distance100µm comparison on wire200 source/recipe, with unchanged allcorner gates and extra early CTS evidence. D-083/reproduction report describe hypothesis, preserved constraints and skew/area risks.78focused tests plus workflow YAML/shell checks pass. Next publish/launch within approved native-screen work, inspect actual clock topology/fanout and all final gates; no phase boxes changed.
+
+
+## 2026-10-16 — Positive native wire-limit comparison running
+
+- Published tools `f853b60`, CI `a694756`, evidence `c2c603b`; remote main verified `c2c603b0f42e4484fa3bc1bb2c70c8ab05d6fc47`. No hardware/config/template job edits in push.
+- [Native margin55 wire200 screen38848420485](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38848420485) confirmed in progress on that head. One changed physical setting: native maximum wire length200µm versus0, all other watched-screen settings/gates retained.77focused tests and YAML/shell checks pass.
+- Next inspect actual repair buffer/resize counts and strict final gates. Clock-fanout fixes remain separate; do not infer that positive wire repair fixes clocks or qualifies DRT. Official GDS/precheck still pending; no phase boxes ticked.
+
+
 ## 2026-10-16 — Native repair no-op isolated; one-setting trial prepared
 
 - Downloaded full217MB watched artifact12016788617. Actual native repair receives55% margins and0wire limit, reports61slew/21capacitance but makes0resizes/0buffers. Before/after netlists are byte-identical SHA256d73ed3a1d2a43a464110c40555c0bed04d83360234a036495615ee71f07df4c3,33446cells. Local independent receipt `/tmp/tripwire-native-repair-noop-proof.json`.

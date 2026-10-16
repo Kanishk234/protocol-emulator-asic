@@ -1084,6 +1084,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Scope: one generated diagnostic setting relative to the watched native recipe. Stock image, full2/4 source, fully timed20ns, allcorners,100ps repair target/50ps fast acceptance,55% margins, watchdog and strict no-DRT-until-pass gates remain. Main configuration/template jobs unchanged; no official adoption implied.
 - Cost: potentially more buffering/area and worse hold, setup or congestion. Actual buffer/resize activity and final gates decide usefulness. The zero limit is a testable hypothesis, not a proven root cause; clock fanout may require a separate native CTS fix.77focused tests and workflow checks pass; physical comparison pending.
 
+## D-083 (2026-10-16; isolated diagnostic): native clock-buffer spacing
+- General need: wire200 clean run38848420485 clears all actual slew/capacitance failures and data fanout failures, leaving four intermediate clock branches with16loads against8. Test native CTS spacing100µm on the measured wire200 recipe; no clock gating, reset, protocol or architecture change.
+- Scope: one generated setting `CTS_DISTANCE_BETWEEN_BUFFERS=100`, forwarded by pinned stock CTS to its native command. Keep complete2/4 source, AREA1/clock8,20ns/allcorners, wire200/55%repair,100ps hold target/50ps minimum and all strict guards. This is not a guarantee that spacing enforces a hard fanout bound; original four reserve misses remain blocking too.
+- Cost: more clock cells/routing, altered insertion delay/skew and possible hold/setup/overflow degradation. Measure actual clock fanout, area and final gates before promotion or DRT.78focused helper tests and workflow checks pass; no main config/template edit and no official adoption implied.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

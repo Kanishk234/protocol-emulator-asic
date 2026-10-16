@@ -1,5 +1,9 @@
 # Review-only targeted unchanged-net routing experiment
 
+The current patch additionally contains D101 observation-only hooks; their
+build and exact132 equivalence are pending. D100 measured results below refer
+to its separately authenticated73e55881… tool, not the new observer binary.
+
 **D100 accounting correction passes; bounded chip repair regresses121 to132 and is rejected.** The original patch
 compiled and executed, but its chip trial was rejected for changed capacity
 accounting; the measured outcome and correction are recorded below. The accompanying
@@ -262,3 +266,23 @@ The failed hosted run remains failed; revalidation is scoped to its retained
 default artifact. Focused89testsPASS/2existingSKIP after correction.
 Retry38948702750 atf433609 reuses build38851788423. No solver rebuild,
 physical promotion or changed congestion/timing threshold follows.
+
+## D101 observer preparation
+
+Instrumented patch SHA:
+`72257372cd11e3ca3cdc9f53bbda13764f2dedf6bf79c2309f56f3006948c864`.
+Explicit force-mode/output-directory opt-in records the exact native input-net
+vector and merged routes after each of the existing five passes. The reporting
+export contains the unchanged canonical interior format and separate real
+preferred boundary edges, using actual technology layer directions. No routing
+selection, capacity, cost, budget, placement or timing policy is changed.
+
+Two independent source reviews and exact pinned-source patch dry-run pass.
+Focused102testsPASS/2existingSKIP. The collector requires exact final rejected
+132 segment/interior/boundary hashes from38948702750 before interpreting any
+snapshot. All five snapshots must retain the complete3659-net inventory,
+unchanged observed capacities/axes, strict identity counts and native file-size
+witnesses. The last snapshot must semantically match final grids and segments;
+integer/decimal serialization differences do not weaken native final hash gates.
+The source's persistent congestion-net set justifies monotonic input membership.
+These are prepared checks, not compiled/observed pass results yet.

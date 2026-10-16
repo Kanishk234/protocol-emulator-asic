@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-16 — Native repair no-op isolated; one-setting trial prepared
+
+- Downloaded full217MB watched artifact12016788617. Actual native repair receives55% margins and0wire limit, reports61slew/21capacitance but makes0resizes/0buffers. Before/after netlists are byte-identical SHA256d73ed3a1d2a43a464110c40555c0bed04d83360234a036495615ee71f07df4c3,33446cells. Local independent receipt `/tmp/tripwire-native-repair-noop-proof.json`.
+- Prepared native margin55 wire200 screen: exactly one physical setting changes from watched recipe, max wire length0→200µm. Keep stock image, complete2/4 source, clock8/AREA1,20ns/allcorner constraints,55%margins,50ps measured gate and no DRT until all guards pass. Early artifact includes actual repair log/config/metrics.77focused tests and YAML/shell checks pass. D-082/BUG118 record hypothesis and costs; clock fanout remains an independently known problem.
+- Next publish/launch this bounded native-screen correction within approved work, inspect actual edit counts and final gates, then address the clock tree using measured evidence. No physical gain or phase completion claim; main hardware/config/template jobs unchanged.
+
+
+## 2026-10-16 — Watched native screen finishes with measured rejection
+
+- Watched38827554368 and original38823883005 are completed failures. Watched run progressed through synthesis, native routing/repair, fresh STA and antenna check; watchdog receipt exits1 after1919.98s with timeout_reason=null. Thus revised run did not stall or hit the watchdog deadline.
+- Downloaded early gate artifact and independently inspected counts: fast/typical1slew, slow11slew, allcorners7fanout, capacitance0. Conservative0.45margin guard also fails. Clock branches still drive16loads against8; SRAM REN/address and data nets remain problematic. No DRT dispatched.
+- Next analyze the full native repair log/effective settings to determine why the native55% policy leaves these loads unresolved, then choose a supported clean-build fix. Passing checkpoint38784492656 and its22/22GL remain the baseline; no phase boxes changed.
+
+
+## 2026-10-16 UTC — Watched replay published and queued
+
+- Published corrective tools `ca31740`, CI `5089484`, docs `3e37cb6` within approved native-screen work; verified remote main `3e37cb6aff909dac765ff6be8ca1a6960ba6eb7a`.
+- Dispatched [watched native margin screen38827554368](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38827554368), confirmed queued on that exact head. Original38823883005 remains intact pending replacement startup.76focused tests and workflow YAML/shell checks pass. Next confirm replacement heartbeat, synthesis progress and unchanged strict gates. No claim that an underlying synthesis hang is fixed before this run proves progress; no phase boxes changed.
+
+
 ## 2026-10-15 — Prepare bounded watched native replay
 
 - User requested a revised workflow for apparent stall38823883005. Prepared separate `gds-native-margin55-watched-screen` with stock source/policy, quieter Yosys logging, full file artifacts,30second stage/log/container heartbeats,15minute synthesis and115minute overall deadlines, and failure container cleanup. Original strict gates and no-DRT policy remain.

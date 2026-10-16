@@ -1079,6 +1079,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Scope: generated diagnostic configuration only, stock pinned LibreLane image and Classic ordering. Keep 20ns, all three repair corners, fully timed PNR/signoff constraints, and the measured 50ps fast-hold gate. Enable Magic DRC/overlap error gates rather than inheriting the checkpoint's disabled flags. Main hardware/configuration and template jobs remain unchanged.
 - Cost: native buffering/sizing can increase area, consume hold/setup reserve or create routing overflow. Zero electrical/antenna/overflow, nonnegative timing and the conservative global margin must be measured after the final native repair; failure stops before detailed routing. No physical improvement, official portability or signoff claim from preparation. See PHASE2_CLEAN_BUILD_REPRODUCTION.md; 70 focused helper tests pass. Official adoption beyond the configuration whitelist remains a separate reviewed step.
 
+## D-082 (2026-10-16; isolated diagnostic): positive native wire-repair limit
+- General need: clean watched38827554368 receives55% margins but post-GRT design repair makes zero physical/logical changes despite counting61slew/21capacitance problems. Before/after33446-cell netlists have identical SHA256d73ed3a1d2a43a464110c40555c0bed04d83360234a036495615ee71f07df4c3. Test the native maximum wire length at200µm rather than the effective0 default; no state, architecture, protocol-specific primitive or timing-constraint change.
+- Scope: one generated diagnostic setting relative to the watched native recipe. Stock image, full2/4 source, fully timed20ns, allcorners,100ps repair target/50ps fast acceptance,55% margins, watchdog and strict no-DRT-until-pass gates remain. Main configuration/template jobs unchanged; no official adoption implied.
+- Cost: potentially more buffering/area and worse hold, setup or congestion. Actual buffer/resize activity and final gates decide usefulness. The zero limit is a testable hypothesis, not a proven root cause; clock fanout may require a separate native CTS fix.77focused tests and workflow checks pass; physical comparison pending.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

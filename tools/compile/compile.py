@@ -58,7 +58,7 @@ def tool(name):
         np = Path(os.environ.get("WARP_NEXTPNR") or
                   Path.home() / ".cache" / "warp" / f"ocs-{NEXTPNR_TAG}" / "oss-cad-suite" / "bin" / name)
         if not np.exists():
-            raise CompileError(f"{np} not found: run scripts/fetch_nextpnr.sh (D-028)")
+            raise CompileError(f"{np} not found: run bash scripts/fetch_nextpnr.sh (D-028)")
         return str(np)
     path = shutil.which(name)
     if not path:

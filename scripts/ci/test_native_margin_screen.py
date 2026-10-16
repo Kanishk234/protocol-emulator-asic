@@ -78,3 +78,15 @@ def test_watched_recipe_changes_only_logging(tmp_path):
     result = watched(source)
     assert result.pop('YOSYS_LOG_LEVEL') == 'WARNING'
     assert result == expected
+
+
+def test_wire_repair_trial_changes_only_positive_wire_limit(tmp_path):
+    from native_margin_watched_screen import configure as watched
+    from native_margin_wire_screen import configure as wire_repair
+    source = stock_configure(dict(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=56),
+                             'AREA 1', tmp_path/'src/signoff.sdc',
+                             hold_target=.10, clock_cluster=8)
+    expected = watched(source)
+    result = wire_repair(source)
+    assert result.pop('GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH') == 200
+    assert result == expected

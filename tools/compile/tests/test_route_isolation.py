@@ -1,8 +1,6 @@
 """Connection isolation must be explicit and preserve routing rejection."""
 from pathlib import Path
 import sys
-import shutil
-import subprocess
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / 'test_internal'))
@@ -33,9 +31,8 @@ def test_arbitrary_reduced_sets_rejected():
 
 @pytest.mark.parametrize('duplicate', [False, True])
 def test_actual_tcl_resolves_escaped_database_names_and_rejects_ambiguity(duplicate):
-    tcl = shutil.which('tclsh')
-    if not tcl:
-        pytest.skip('Tcl interpreter unavailable')
+    tkinter = pytest.importorskip('tkinter')
+    interpreter = tkinter.Tcl()
     prefix = r'''
 namespace eval ord {proc get_db_block {} {return block}}
 namespace eval grt {proc add_net_to_route {net} {lappend ::selected $net}}
@@ -46,7 +43,11 @@ set selected {}
 '''
     prefix += 'proc block {method} {return {' + ('net31 net31 net30' if duplicate else 'net31 net30') + '}}\n'
     code = isolate.isolation_trace(trace.TRACE, isolate.CASES['south_pair']).split('set warp_route_code', 1)[0]
-    script = prefix + '\nset code [catch {\n' + code + '\n} message]\n'
-    script += ('if {$code != 1 || $message ne "Missing or ambiguous selected net"} {exit 1}\n' if duplicate
-               else 'if {$code != 0 || $selected ne "net31 net30"} {puts stderr $message; exit 1}\n')
-    subprocess.run([tcl], input=script, text=True, capture_output=True, check=True)
+    interpreter.eval(prefix)
+    result = interpreter.call('catch', code, 'message')
+    if duplicate:
+        assert result == 1
+        assert interpreter.eval('set message') == 'Missing or ambiguous selected net'
+    else:
+        assert result == 0, interpreter.eval('set message')
+        assert interpreter.eval('set selected') == 'net31 net30'

@@ -204,6 +204,22 @@ def main():
         result['diagnostic_completed'] = True
     except Exception as exc:
         result['error'] = str(exc)
+        # A rejected invariant must not hide the actual native failure evidence.
+        # These observations remain explicitly unqualified, never a passed case.
+        observations = {}
+        for name in ('default_identity', 'forced_pair'):
+            stages = list((output/name/'replay').glob('*-openroad-globalrouting'))
+            if len(stages) != 1:
+                continue
+            stage = stages[0]
+            observed = {'physical_acceptance': False, 'validated': False}
+            try:
+                observed['native_grid'] = audit(stage/'native-grid.tsv', allow_negative_usage=True)
+                observed['native_return'] = (stage/'native-return.txt').read_text()
+            except (OSError, ValueError) as evidence_error:
+                observed['evidence_error'] = str(evidence_error)
+            observations[name] = observed
+        result['unvalidated_observations'] = observations
         raise
     finally:
         (output/'result.json').write_text(json.dumps(result, indent=2)+'\n')

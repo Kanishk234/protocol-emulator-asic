@@ -37,7 +37,17 @@
          && (!net->isMergedNet() || !netIsCovered(db_net, pins_not_covered))) {
        dirty_nets.push_back(db_net_map_[db_net]);
        routes_[db_net].clear();
-@@ -5658,6 +5659,60 @@
+@@ -1338,4 +1339,7 @@
+   // add resources for pin access in macro/pad pins after defining their on grid
+-  // position
+-  addResourcesForPinAccess();
++  // position. Forced unchanged-net repair retains the original grid and pin
++  // geometry; its existing access credits must not be added a second time.
++  if (!force_reroute_mode_) {
++    addResourcesForPinAccess();
++  }
+   fastroute_->initAuxVar();
+@@ -5658,6 +5662,60 @@
    return groute_renderer_.get();
  }
  
@@ -98,7 +108,7 @@
  void GlobalRouter::addDirtyNet(odb::dbNet* net)
  {
    db_net_map_[net]->setDirtyNet(true);
-@@ -5718,13 +5773,18 @@
+@@ -5718,13 +5776,18 @@
        // The maximum number of times that the nets traversing the congestion
        // area will be added
        int add_max = 30;
@@ -118,7 +128,7 @@
          // The nets that cross the congestion area are obtained and added to
          // the set
          // if the nets have wires
-@@ -5737,7 +5797,7 @@
+@@ -5737,7 +5800,7 @@
          }
          // When every attempt to increase the congestion region failed, try
          // legalizing the buffers inserted

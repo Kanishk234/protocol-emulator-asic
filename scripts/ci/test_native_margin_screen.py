@@ -90,3 +90,15 @@ def test_wire_repair_trial_changes_only_positive_wire_limit(tmp_path):
     result = wire_repair(source)
     assert result.pop('GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH') == 200
     assert result == expected
+
+
+def test_clockspacing_trial_preserves_wire_repair_and_all_constraints(tmp_path):
+    from native_margin_wire_screen import configure as wire_repair
+    from native_clockspacing_screen import configure as clockspacing
+    source = stock_configure(dict(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=56),
+                             'AREA 1', tmp_path/'src/signoff.sdc',
+                             hold_target=.10, clock_cluster=8)
+    expected = wire_repair(source)
+    result = clockspacing(source)
+    assert result.pop('CTS_DISTANCE_BETWEEN_BUFFERS') == 100
+    assert result == expected

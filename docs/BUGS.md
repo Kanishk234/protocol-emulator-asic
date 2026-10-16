@@ -1,5 +1,11 @@
 # Bugs
 
+## 98: Forced unchanged-net repair re-credits existing macro pin access
+- **Date:**2026-10-15.
+- **Symptom/check:**38849978485 passes custom-default exact121, then forced repair ends GRT0232/grid139 and203 encoded capacity increases despite identical physical census/geometry. Exact capacity guard correctly rejects the case.
+- **Root cause:** initFastRouteIncr calls initNetlist for the initial reroute and each expansion; initNetlist unconditionally calls addResourcesForPinAccess across all mapped macro/pad pins, adding edge_cap+1 again. Route clearing releases usage only, not these credits. Our new forced unchanged-pin path incorrectly reused this initialization without suppressing duplicate credits.
+- **Fix/coverage:** retain original initial crediting and ordinary incremental behavior; skip only while force_reroute_mode_ is true (no changed/new pins or placement). Two independent source reviews agree. Updated pinned patch dry-run passes; new build/native regression/default121/cellwise-capacity guard must pass before interpreting retry.139 is an uncontrolled failed result, not evidence of a clean algorithm regression.
+
 ## 97: Custom Nix store mount hides the container's Python runtime
 - **Date:**2026-10-15.
 - **Symptom/check:**38829241239 authenticates tools and passes actual GCD regression, then docker cannot start python3; no chip routing stage exists.

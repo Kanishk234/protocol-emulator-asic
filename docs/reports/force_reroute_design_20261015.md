@@ -175,3 +175,47 @@ Root review and integrated local regression168PASS/2SKIP; new escaped-name Tcl
 fixtures execute using Python Tcl, while two existing Tcl-shell fixtures lack
 a shell interpreter. YAML and shell syntax checks pass. No native regression
 or chip-repair execution has yet occurred.
+
+## Native observation and pin-access credit correction
+
+Hosted38849978485 executes the native GCD API regression and reproduces the
+custom default exact121 checkpoint. The forced southern pair then reaches
+GRT-0232 with final calibrated grid139 (Metal1/2/3/4:9/51/32/47). Full instance,
+terminal and geometry inventories remain unchanged, but203 encoded capacity
+entries increase:126 onMetal2 and77 onMetal3. This fails the experiment's
+capacity-control requirement. It is not an unchanged-capacity comparison or
+an accepted route, and139 must not be used to reject the clean joint-reroute
+hypothesis on its own.
+
+Pinned-source review identifies a concrete mechanism. `initFastRouteIncr`
+calls `initNetlist` for the initial selected reroute and each congestion
+expansion. The original `initNetlist` unconditionally calls
+`addResourcesForPinAccess`. That function traverses **all** known macro/pad
+pins and uses `addAdjustment(..., edge_cap + 1, false)`: it is an increment,
+not an idempotent declaration. Initial full routing already added those
+access credits; calling it again during unchanged-net repair credits the
+same physical access repeatedly. The forced run has an initial reroute and
+four expansions, so this path can execute five additional times. The observed
+encoded-capacity increase is consistent with repeated access crediting; this
+source mechanism does not claim a per-cell accounting reconstruction of203.
+
+The review-only patch now skips only that call while `force_reroute_mode_`
+is true. Its default-false path still executes the original function, and
+ordinary incremental routing remains untouched. This does not remove the
+initial full-route pin access resources. `findFastRoutePins` reads saved
+on-grid pins; `makeFastrouteNet`/`addNet`/`clearNetRoute`/`releaseNetResources`
+reset route trees and usage but do not remove those capacity credits.
+`initAuxVar` initializes scratch arrays. Forced mode permits neither new
+nets/pins nor physical movement and stops before placement fallback, so
+there is no legitimate new pin access to reserve in this restricted path.
+If those restrictions change, this skip requires renewed review rather than
+being generalized to ordinary incremental repair.
+
+Updated patch SHA256:
+`73e5588175fadd8d08793f19c09d4aa2b50c744d0c2b5229c9e503c592fc8aef`.
+`patch --dry-run -p1` succeeds against unchanged copies of the same pinned
+three upstream files. This correction has not been compiled or executed.
+A new pinned build must repeat native GCD/default identity before one bounded
+chip retry, and the existing cellwise before/after capacity guard must pass.
+The139 trial and its failed control are retained. No capacity acceptance,
+congestion threshold or hardware/timing constraint is relaxed.

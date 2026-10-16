@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-15 (session108: continue actual repair and correct accounting defect)
+**Actual:** resumed after user interruption; build38828164038SUCCESS, firstchain38829241239failed only at container start after native GCD passed. Corrected individual read-only closure mounts (BUG97), actual container smoke, and169local testsPASS/2existingSKIP. Retry38849978485 at7897bf3 imports tools, passes GCD and regenerated source guards, reproduces custom-default exact121, and executes actual forced pair.
+**Rejected trial:** forced final nativeGRT0232/grid139 (9/51/32/47) with203 encoded capacity increases (126Metal2/77Metal3), geometry and census byte-identical. Capacity guard rejects; preserve121, do not treat139 as a controlled comparison.
+**Diagnosis/fix:** source initNetlist repeatedly credits all macro/pad pin access during forced initialization/expansions while clearing routes releases only usage. Two independent reviewers confirm existing credits persist. D100 guards that call only during unchanged forced mode. PatchSHA73e55881… dry-run passes on exact original sources. Ordinary/default calls unchanged; native proof pending. Retain unqualified final grid/error even when invariant validation aborts.
+**Next:** build corrected patch, repeat real native regression/default121 and bounded pair; stay with actual outcomes. Parallel design-set-only G0/G1 evidence refresh is being prepared while the solver compiles. No phase boxes/hardware/spec/margin changes.
+
 ## 2026-10-15 (session107: remain with the active repair)
 **Goal:** user explicitly asks to continue through long runs instead of ending at launch. Actual38828164038 repair build remains compiling; chained38829241239 correctly waits before provisioning/EDA. No duplicate dispatch, hardware change or phase box.
 **Review:** additional independent agent verifies pinned SWIG exception conversion, final full-guide regeneration, default-identity worker path and runtime closure checks; no concrete blocker found.

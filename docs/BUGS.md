@@ -670,3 +670,9 @@ pass actual SPI-loaded native UART. Matched original-LUT resynthesis37553190074
 also passes, so a mux-only causal claim is unsupported. Original hardened
 netlists still fail; regenerated netlists require matching physical/timing
 validation. Next coverage adds real USER_RESET and preserves candidate netlists.
+
+## 96: New branch-only manual workflow is not yet registered for dispatch
+- **Date:**2026-10-15.
+- **Symptom/check:** initial router_force_build.yaml dispatch at6665d84 returns GitHub404; no build launched.
+- **Root cause:** the new workflow exists only on efpga while repository default main is TRIPWIRE, and a manual-only workflow has not been registered there.
+- **Fix/coverage:** narrowly trigger on pushes editing its own workflow on efpga; retain manual replay, read-only token and finite build timeout. Do not modify main or interpret404 as a build failure. Verify actual Actions run identity after registration.

@@ -17,6 +17,9 @@ from audit_native_grid import audit, guide_coverage
 
 EXPECTED_GRID = '278fdd4a3e55eea60f586571bae98191e3a07623b2790aeb642e3a83d6c163ae'
 MARKER = 'WARP_FORCE_REPAIR_BEGIN'
+# IHP CMOS5L tech LEF at 2bbec755dc67ca3db0261c3d6163e15735d66710:
+# sg13cmos5l_tech.lef SHA256 3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5.
+BOUNDARY_DIRECTIONS = {'Metal1': 'H', 'Metal2': 'V', 'Metal3': 'H', 'Metal4': 'V'}
 
 
 def grid_body(name):
@@ -24,6 +27,70 @@ def grid_body(name):
     start = text.index('set warp_grid [[ord::get_db_block] getGCellGrid]')
     stop = text.index('close $warp_grid_file', start) + len('close $warp_grid_file')
     return text[start:stop].replace('native-grid.tsv', name) + '\n'
+
+
+def boundary_grid_body(name):
+    """Real preferred edges omitted by the historical interior-grid format.
+
+    Native OpenDB export duplicates H last-column/V last-row for display;
+    export only actual H last-row and V last-column edges here.
+    """
+    return r'''
+set warp_boundary_file [open $::env(STEP_DIR)/@NAME@ w]
+puts $warp_boundary_file "META\t[llength $warp_x]\t[llength $warp_y]"
+foreach warp_layer [[[ord::get_db] getTech] getLayers] {
+    set warp_name [$warp_layer getName]
+    if {$warp_name ni {Metal1 Metal2 Metal3 Metal4}} {continue}
+    set warp_direction [$warp_layer getDirection]
+    set warp_expected [dict get {Metal1 HORIZONTAL Metal2 VERTICAL Metal3 HORIZONTAL Metal4 VERTICAL} $warp_name]
+    if {$warp_direction ne $warp_expected} {error "Boundary layer direction differs from pinned CMOS5L tech LEF"}
+    if {$warp_direction eq "HORIZONTAL"} {
+        set warp_yi [expr {[llength $warp_y]-1}]
+        for {set warp_xi 0} {$warp_xi < [llength $warp_x]-1} {incr warp_xi} {
+            puts $warp_boundary_file "EDGE\t$warp_name\tH\t$warp_xi\t$warp_yi\t[$warp_grid getCapacity $warp_layer $warp_xi $warp_yi]\t[$warp_grid getUsage $warp_layer $warp_xi $warp_yi]"
+        }
+    } else {
+        set warp_xi [expr {[llength $warp_x]-1}]
+        for {set warp_yi 0} {$warp_yi < [llength $warp_y]-1} {incr warp_yi} {
+            puts $warp_boundary_file "EDGE\t$warp_name\tV\t$warp_xi\t$warp_yi\t[$warp_grid getCapacity $warp_layer $warp_xi $warp_yi]\t[$warp_grid getUsage $warp_layer $warp_xi $warp_yi]"
+        }
+    }
+}
+close $warp_boundary_file
+'''.replace('@NAME@', name)
+
+
+def audit_boundary_grid(path):
+    rows = Path(path).read_text().splitlines()
+    if not rows or not re.fullmatch(r'META\t[0-9]+\t[0-9]+', rows[0]):
+        raise ValueError('Missing boundary grid dimensions')
+    nx, ny = map(int, rows[0].split('\t')[1:])
+    if min(nx, ny) < 2:
+        raise ValueError('Degenerate boundary grid')
+    expected = {(layer, direction, x, ny-1) for layer, direction in BOUNDARY_DIRECTIONS.items()
+                if direction == 'H' for x in range(nx-1)}
+    expected |= {(layer, direction, nx-1, y) for layer, direction in BOUNDARY_DIRECTIONS.items()
+                 if direction == 'V' for y in range(ny-1)}
+    seen, caps = set(), {}
+    overflow = {layer: 0 for layer in BOUNDARY_DIRECTIONS}
+    for line in rows[1:]:
+        fields = line.split('\t')
+        if len(fields) != 7 or fields[0] != 'EDGE' or not all(re.fullmatch(r'[0-9]+', v) for v in fields[3:]):
+            raise ValueError('Malformed or negative boundary edge')
+        _, layer, direction, x, y, cap, usage = fields
+        x, y, cap, usage = map(int, (x, y, cap, usage))
+        key = (layer, direction, x, y)
+        if key not in expected or key in seen:
+            raise ValueError('Duplicate or invalid real boundary edge')
+        seen.add(key)
+        caps[key] = cap
+        overflow[layer] += max(0, usage-cap)
+    if seen != expected:
+        raise ValueError('Incomplete real boundary edge census')
+    return {'dimensions': [nx, ny], 'observed_edges': len(seen), 'capacities': caps,
+            'overflow_by_layer': overflow, 'total_overflow': sum(overflow.values()),
+            'sha256': trace.cfg.sha(Path(path)),
+            'scope': 'Native OpenDB real preferred boundary edges; excludes display sentinel duplicates'}
 
 
 def geometry_body(name):
@@ -64,7 +131,7 @@ if {$warp_route_code == 0 || ![string match {*GRT-0116*} $warp_route_error]} {
 }
 write_global_route_segments $::env(STEP_DIR)/initial-segments.txt
 '''
-    text += grid_body('initial-grid.tsv')
+    text += grid_body('initial-grid.tsv') + boundary_grid_body('initial-boundary-grid.tsv')
     # Hash gates execute inside the SAME process before any force call.
     for filename, expected in [('initial-segments.txt', EXPECTED_SEGMENTS), ('initial-grid.tsv', EXPECTED_GRID)]:
         text += ('if {[lindex [exec sha256sum $::env(STEP_DIR)/' + filename + '] 0] ne "' + expected +
@@ -89,7 +156,7 @@ close $warp_observer
 # Export diagnostic state even when repair exhausted; never waive native failure.
 write_global_route_segments $::env(STEP_DIR)/native-segments.txt
 '''
-    text += grid_body('native-grid.tsv') + GUIDES
+    text += grid_body('native-grid.tsv') + boundary_grid_body('native-boundary-grid.tsv') + GUIDES
     text += 'census $::env(STEP_DIR)/after-census.tsv\n' + geometry_body('after-geometry.tsv')
     text += 'if {$warp_route_code != 0} {return -options $warp_route_options $warp_route_error}\n'
     return text
@@ -108,6 +175,13 @@ def validate_stage(stage, repair):
         raise ValueError('Initial exact121 checkpoint differs')
     before = audit(stage/'initial-grid.tsv')
     after = audit(stage/'native-grid.tsv')
+    before_boundary = audit_boundary_grid(stage/'initial-boundary-grid.tsv')
+    after_boundary = audit_boundary_grid(stage/'native-boundary-grid.tsv')
+    if (before_boundary['dimensions'] != before['dimensions'] or
+            after_boundary['dimensions'] != after['dimensions']):
+        raise ValueError('Boundary/interior grid dimensions differ')
+    if before_boundary['capacities'] != after_boundary['capacities']:
+        raise ValueError('Force repair changes real boundary capacity arrays')
     if before['total_overflow'] != 121:
         raise ValueError('Initial grid is not121')
     if capacities(stage/'initial-grid.tsv') != capacities(stage/'native-grid.tsv'):
@@ -124,7 +198,8 @@ def validate_stage(stage, repair):
     code = int(returned[0])
     if code and not any(error in '\n'.join(returned[1:]) for error in ('GRT-0116', 'GRT-0232')):
         raise ValueError('Unexpected native repair error')
-    if not code and after['total_overflow'] != 0:
+    full_overflow = after['total_overflow'] + after_boundary['total_overflow']
+    if not code and full_overflow != 0:
         raise ValueError('Native success contradicts grid overflow')
     coverage = guide_coverage(stage/'native-guides.tsv', (stage/'after-census.tsv').read_text())
     raw = (stage/'openroad-globalrouting.log').read_text()
@@ -136,11 +211,12 @@ def validate_stage(stage, repair):
             table = trace.routing.parse_congestion(tail)
         except (ValueError, IndexError):
             table = None
-        if table and table[-1]['total_overflow'] != after['total_overflow']:
+        if table and table[-1]['total_overflow'] != full_overflow:
             raise ValueError('Final native table contradicts final grid')
         if table:
             for row in table[:-1]:
-                if after['layers'][row['layer']]['overflow'] != row['total_overflow']:
+                if (after['layers'][row['layer']]['overflow'] +
+                        after_boundary['overflow_by_layer'][row['layer']] != row['total_overflow']):
                     raise ValueError('Final native layer table contradicts final grid')
         if code == 0 and (not table or coverage['missing_guides']):
             raise ValueError('Passing route lacks final table or complete guides')
@@ -148,14 +224,28 @@ def validate_stage(stage, repair):
         table = trace.routing.parse_congestion(raw)
         if trace.cfg.sha(stage/'native-segments.txt') != EXPECTED_SEGMENTS or after['sha256'] != EXPECTED_GRID:
             raise ValueError('Custom default tool does not reproduce exact121')
+        if before_boundary['sha256'] != after_boundary['sha256']:
+            raise ValueError('Custom default changes boundary grid')
+        if table[-1]['total_overflow'] != full_overflow:
+            raise ValueError('Default native table contradicts interior plus boundary grid')
+        for row in table[:-1]:
+            if (after['layers'][row['layer']]['overflow'] +
+                    after_boundary['overflow_by_layer'][row['layer']] != row['total_overflow']):
+                raise ValueError('Default native layer table contradicts final grid')
+    # Internal tuple-key capacity maps are compared above, not serialized.
+    before_boundary.pop('capacities')
+    after_boundary.pop('capacities')
     return {'initial_grid': before, 'final_grid': after,
+            'initial_boundary_grid': before_boundary, 'final_boundary_grid': after_boundary,
+            'final_observed_full_grid_overflow': full_overflow,
             'initial_segments_sha256': trace.cfg.sha(stage/'initial-segments.txt'),
             'final_segments_sha256': trace.cfg.sha(stage/'native-segments.txt'),
             'full_native_net_count': len(final_names),
             'physical_census_and_geometry_unchanged': True, 'capacities_unchanged': True,
+            'capacity_identity_scope': 'OpenDB reporting capacities on canonical interior and real preferred boundary edges; native final table independently scans all raw H/V edges',
             'native_tcl_returncode': code, 'native_error': '\n'.join(returned[1:]),
             'final_table_available': bool(table), 'final_native_table': table,
-            'guide_coverage': coverage, 'native_repair_passed': repair and code == 0 and after['total_overflow'] == 0,
+            'guide_coverage': coverage, 'native_repair_passed': repair and code == 0 and full_overflow == 0,
             'physical_acceptance': False}
 
 

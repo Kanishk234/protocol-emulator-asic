@@ -1,11 +1,44 @@
 """Fail-closed custom-router checkpoint and final evidence tests; no local EDA."""
 from pathlib import Path
+import re
 import sys
 from types import SimpleNamespace
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'test_internal'))
 import cloud_route_force_repair as force
+
+
+def test_boundary_directions_match_independent_pinned_cmos5l_lef_extract():
+    # Verbatim layer/direction statements from sg13cmos5l_tech.lef at PDK
+    # 2bbec755dc67ca3db0261c3d6163e15735d66710, lines73/75,116/118,
+    # 158/160,200/202. Full file SHA256:
+    # 3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5.
+    lef_extract = '''LAYER Metal1
+  TYPE ROUTING ;
+  DIRECTION HORIZONTAL ;
+LAYER Metal2
+  TYPE ROUTING ;
+  DIRECTION VERTICAL ;
+LAYER Metal3
+  TYPE ROUTING ;
+  DIRECTION HORIZONTAL ;
+LAYER Metal4
+  TYPE ROUTING ;
+  DIRECTION VERTICAL ;
+'''
+    actual = {layer: direction[0] for layer, direction in
+              re.findall(r'LAYER (Metal[1-4])\s+TYPE ROUTING ;\s+DIRECTION (HORIZONTAL|VERTICAL) ;', lef_extract)}
+    assert actual == force.BOUNDARY_DIRECTIONS
+
+
+def boundary_text(nx=3, ny=3, extra_usage=0):
+    rows = [f'META\t{nx}\t{ny}']
+    for layer, direction in force.BOUNDARY_DIRECTIONS.items():
+        positions = ((x, ny-1) for x in range(nx-1)) if direction == 'H' else ((nx-1, y) for y in range(ny-1))
+        for index, (x, y) in enumerate(positions):
+            rows.append(f'EDGE\t{layer}\t{direction}\t{x}\t{y}\t10\t{10+extra_usage if layer == "Metal1" and index == 0 else 0}')
+    return '\n'.join(rows)+'\n'
 
 
 def test_runtime_mounts_add_individual_outputs_without_hiding_container_store(monkeypatch):
@@ -69,8 +102,10 @@ def stage(tmp_path, monkeypatch):
     (tmp_path/'native-return.txt').write_text('1\nGRT-0232 failed\n')
     (tmp_path/'openroad-globalrouting.log').write_text('initial121table\n'+force.MARKER+'\nno final table')
     data = {'final_overflow': 119, 'missing': ['some_net'], 'table': None}
+    for name in ('initial-boundary-grid.tsv', 'native-boundary-grid.tsv'):
+        (tmp_path/name).write_text(boundary_text())
     monkeypatch.setattr(force.trace.cfg, 'sha', lambda p: force.EXPECTED_SEGMENTS if 'segments' in p.name else force.EXPECTED_GRID)
-    monkeypatch.setattr(force, 'audit', lambda p: {'total_overflow': 121 if p.name.startswith('initial') else data['final_overflow'], 'sha256': force.EXPECTED_GRID})
+    monkeypatch.setattr(force, 'audit', lambda p: {'total_overflow': 121 if p.name.startswith('initial') else data['final_overflow'], 'sha256': force.EXPECTED_GRID, 'dimensions': [3, 3]})
     monkeypatch.setattr(force, 'capacities', lambda p: ('same', {}))
     monkeypatch.setattr(force, 'net_names', lambda p: list(range(3659)))
     monkeypatch.setattr(force, 'guide_coverage', lambda *a: {'missing_guides': data['missing']})
@@ -133,6 +168,110 @@ def test_final_table_contradiction_rejected(stage):
     data['table'] = [{'total_overflow': 121}]
     with pytest.raises(ValueError, match='contradicts final grid'):
         force.validate_stage(path, True)
+
+
+def test_real_boundary_grid_has_complete_directional_edges(tmp_path):
+    path = tmp_path/'boundary.tsv'
+    path.write_text(boundary_text(4, 3, extra_usage=2))
+    result = force.audit_boundary_grid(path)
+    assert result['observed_edges'] == 2*(4-1)+2*(3-1)
+    assert result['total_overflow'] == 2
+    assert result['overflow_by_layer']['Metal1'] == 2
+
+
+@pytest.mark.parametrize('corrupt', ['missing', 'duplicate', 'negative', 'wrong_direction', 'wrong_boundary', 'bad_dimensions'])
+def test_boundary_grid_rejects_malformed_or_incomplete_census(tmp_path, corrupt):
+    path = tmp_path/'boundary.tsv'
+    rows = boundary_text().splitlines()
+    if corrupt == 'missing':
+        rows.pop()
+    elif corrupt == 'duplicate':
+        rows.append(rows[-1])
+    elif corrupt == 'negative':
+        rows[1] = rows[1].rsplit('\t', 1)[0]+'\t-1'
+    elif corrupt == 'wrong_direction':
+        fields = rows[1].split('\t')
+        fields[2] = 'V'
+        rows[1] = '\t'.join(fields)
+    elif corrupt == 'wrong_boundary':
+        fields = rows[1].split('\t')
+        fields[4] = '0'
+        rows[1] = '\t'.join(fields)
+    else:
+        rows[0] = 'META\t1\t3'
+    path.write_text('\n'.join(rows)+'\n')
+    with pytest.raises(ValueError):
+        force.audit_boundary_grid(path)
+
+
+def test_boundary_capacity_change_rejected_even_when_interior_is_identical(stage):
+    path, _ = stage
+    file = path/'native-boundary-grid.tsv'
+    file.write_text(file.read_text().replace('\t10\t', '\t11\t', 1))
+    with pytest.raises(ValueError, match='boundary capacity arrays'):
+        force.validate_stage(path, True)
+
+
+def test_boundary_overflow_prevents_false_zero_interior_success(stage):
+    path, data = stage
+    data['final_overflow'] = 0
+    (path/'native-return.txt').write_text('0\n')
+    (path/'native-boundary-grid.tsv').write_text(boundary_text(extra_usage=1))
+    with pytest.raises(ValueError, match='contradicts grid'):
+        force.validate_stage(path, True)
+
+
+def test_table_reconciles_boundary_plus_interior_overflow(stage):
+    path, data = stage
+    (path/'native-boundary-grid.tsv').write_text(boundary_text(extra_usage=2))
+    data['table'] = [{'total_overflow': 121}]
+    result = force.validate_stage(path, True)
+    assert result['final_observed_full_grid_overflow'] == 121
+    assert result['final_boundary_grid']['total_overflow'] == 2
+    data['table'] = [{'total_overflow': 119}]
+    with pytest.raises(ValueError, match='contradicts final grid'):
+        force.validate_stage(path, True)
+
+
+def test_sidecar_preserves_legacy_export_and_omits_display_sentinels():
+    text = force.boundary_grid_body('initial-boundary-grid.tsv')
+    assert '[llength $warp_y]-1' in text and '[llength $warp_x]-1' in text
+    assert 'getDirection' in text and 'Metal1 HORIZONTAL' in text
+    assert '\\tH\\t' in text and '\\tV\\t' in text
+    combined = force.force_trace(True)
+    assert combined.index('initial-boundary-grid.tsv') < combined.index('log_cmd grt::force_reroute_pair')
+    assert combined.index('native-boundary-grid.tsv') > combined.index('log_cmd grt::force_reroute_pair')
+    assert force.grid_body('initial-grid.tsv') in combined
+
+
+def test_boundary_tcl_exports_actual_complete_sidecar(tmp_path):
+    tkinter = pytest.importorskip('tkinter')
+    interp = tkinter.Tcl()
+    interp.setvar('env(STEP_DIR)', str(tmp_path))
+    interp.eval('''
+        namespace eval ord {proc get_db {} {return warp_db}}
+        proc warp_db {method args} {return warp_tech}
+        proc warp_tech {method args} {return {Metal1 Metal2 Metal3 Metal4}}
+        proc Metal1 {method args} {if {$method eq "getName"} {return Metal1}; return HORIZONTAL}
+        proc Metal2 {method args} {if {$method eq "getName"} {return Metal2}; return VERTICAL}
+        proc Metal3 {method args} {if {$method eq "getName"} {return Metal3}; return HORIZONTAL}
+        proc Metal4 {method args} {if {$method eq "getName"} {return Metal4}; return VERTICAL}
+        proc warp_grid_command {method args} {
+            if {$method eq "getCapacity"} {return 10}
+            if {$method eq "getUsage"} {return 0}
+            error "Unexpected grid method"
+        }
+        set warp_grid warp_grid_command
+        set warp_x {0 7200 14400 21600}
+        set warp_y {0 7200 14400}
+    ''')
+    interp.eval(force.boundary_grid_body('native-boundary-grid.tsv'))
+    data = force.audit_boundary_grid(tmp_path/'native-boundary-grid.tsv')
+    assert data['dimensions'] == [4, 3] and data['observed_edges'] == 10
+    assert data['total_overflow'] == 0
+    interp.eval('proc Metal1 {method args} {if {$method eq "getName"} {return Metal1}; return VERTICAL}')
+    with pytest.raises(tkinter.TclError, match='differs from pinned CMOS5L'):
+        interp.eval(force.boundary_grid_body('rejected-boundary-grid.tsv'))
 
 
 def test_changed_complete_net_census_rejected(stage, monkeypatch):

@@ -1,6 +1,11 @@
 name: pinned router repair build
 on:
   workflow_dispatch:
+  # Register/run the branch-only workflow without modifying TRIPWIRE's main.
+  push:
+    branches: [efpga]
+    paths:
+      - '.github/workflows/router_force_build.yaml'
 permissions:
   contents: read
 concurrency:

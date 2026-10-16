@@ -1094,6 +1094,11 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Scope: one physical setting versus the measured CTS100/wire200 recipe. Complete2/4 source,20ns/allcorners, AREA1/clock8, CTS100,55% margins and50ps fast minimum retained. Fresh antenna counts/reports now explicit in early evidence; no gate relaxation or main config/template change.
 - Cost: added buffers/area, congestion and potential hold/setup movement. Shorter wires may reduce reserve/antenna risks but neither improvement is assumed.79focused tests pass; require fresh all-gate screen before any DRT or promotion.
 
+## D-085 (2026-10-16; isolated diagnostic): native antenna repair reserve
+- General need: CTS100/wire100 clean run38920116440 passes timing/electrical/reserve but leaves2antenna failures after final native timing rerouting. Earlier antenna repair/check is0/0; both failing nets retain identical terminals. Increase native antenna-ratio repair margin10→50 to test protection against that physical drift; no logic/state/protocol change.
+- Scope: one generated setting `GRT_ANTENNA_REPAIR_MARGIN=50`, passed by pinned stock script to `repair_antennas`. Preserve Classic ordering, complete2/4 source, CTS100/wire100,20ns/allcorners,55% electrical margins and50ps measured minimum. Final antenna0/0 remains required; this is a repair target, not relaxed antenna acceptance.
+- Cost: extra diode loads/routing may affect area, fanout, slew, setup/hold and reserve. Require all final strict gates before DRT.80focused tests/workflow checks pass. Main hardware/config/template unchanged; no official adoption or physical improvement claim yet.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-16 — Antenna drift traced; one-setting reserve trial prepared
+
+- Selected intermediate history from artifact12058185022 for38920116440: native antenna repair uses iterations3/margin10and reports0violations; its fresh stage43check is0/0. Stage44adds2setup/22hold buffers and reroutes; finalcheck2/2. net13678andnet14679 retain identical cell/pin connections across these stages. Actual failing cumulative ratios224.80and304.58against200.
+- Prepared native antenna50 screen: only antenna repair ratio margin10→50 changes from timing/electrical/reserve-passing CTS100/wire100 recipe. Keep standard ordering/image, fullsource and every final guard; extra diode/routing loads may affect prior passes, so no improvement assumed. Early evidence includes actual native antenna repair logs/config/metrics.80focused tests plus YAML/shell checks pass. D-085/BUG120 record evidence and risk.
+- Next publish/launch within approved native-screen work and inspect finalantenna plus all timing/electrical/reserve/overflow gates before any DRT. No phase boxes ticked; official GDS/precheck pending.
+
+
+## 2026-10-16 — CTS100/wire100 passes timing, electrical and reserve; two antenna failures remain
+
+- Run38920116440 finishes with a measured gate failure after3243.43s, no watchdog timeout. Downloaded early artifact and independently checked: setupWS0allcorners; holdfast/typ/slow81.9512/188.14/364.049ps; allcorners slew/fanout/capacitance0; conservative0.45reserve passes every corner/check.
+- Sole remaining qualification blocker in the fresh receipt is antenna2nets/2pins, improved from4. No DRT dispatched and no full-screen pass claim. Next inspect the two antenna nets and native repair ordering, prepare a bounded antenna-only correction, then recheck all original gates. Passing extracted checkpoint38784492656 remains preserved; no phase boxes ticked.
+
+
+## 2026-10-16 — CTS100/wire100 comparison published and queued
+
+- Published tools0cb25df/CI1723f85/docsf522ce4 within approved native-screen work. Remote main verifiedf522ce48782d613916827d62bcbbf987d992d40a. No main hardware/config/template changes.
+- [Native CTS100/wire100 screen38920116440](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38920116440) confirmed queued on that head.79focused tests plus YAML/shell checks pass. Keep all reserve/antenna/electrical/overflow/timing gates; next inspect every fresh result before any DRT. No phase boxes ticked.
+
+
 ## 2026-10-16 — Clock fanout cleared; reserve and antenna blockers confirmed
 
 - CTS10038852051738 completes without timeout in3117.20s. Allcorners electrical0/0/0; setupWS0, holdfast/typ/slow84.4582/190.385/376.4ps. Three slow reserve misses remain: MEN.621934,_03775_.499177,_07690_.466863. Stage41area548406µm²/60.7708%,36439instances;2862native data buffers and1239CTS buffers reported.

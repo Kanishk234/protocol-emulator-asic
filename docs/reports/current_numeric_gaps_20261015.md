@@ -6,6 +6,12 @@ inspect or refresh held-out inputs. The current eight-case compiler campaign
 is `38852379083` at `ba0cb76`; its outcome was pending when this audit was
 prepared. A workflow run starting is not measurement evidence.
 
+Follow-up:38852379083 completed successfully and its native artifacts/images
+were independently checked. The current design-set table and C6 now use that
+run; dated report banners and scope corrections are applied, stale reproduction
+and unit status updated, and unhosted showcase resource details removed from
+the judge-facing summary. The physical timing/area limits below remain open.
+
 ## Actions after the paired campaign
 
 | Exact remaining claim or presentation | Current evidence problem | Can the eight-case refresh close it? | Required action |

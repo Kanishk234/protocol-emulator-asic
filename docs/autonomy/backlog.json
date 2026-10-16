@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-10-15",
+  "updated": "2026-10-16",
   "authority": "Planning index only; phase checklists and authenticated reports control acceptance.",
   "protected_controls": {
     "frozen_g1": [
@@ -35,9 +35,10 @@
         "docs/design/phases/PHASE5_EVIDENCE_DOCS.md",
         "docs/EVIDENCE.md",
         "docs/CLAIMS.md",
-        "docs/reports/evidence_audit_20261015.md: historical/local/shell-only labels corrected; original primitive timing views still missing"
+        "docs/reports/evidence_audit_20261015.md: historical/local/shell-only labels corrected; original primitive timing views still missing",
+        "38852379083 atba0cb76: eight current G0/G1 cases independently authenticated; current placed counts separated from synthesis nonfit estimates; docs/reports/architecture_refresh_20261015.md"
       ],
-      "next_action": "Audit every quantitative claim against exact run/source and scope; resolve or soften unsupported statements.",
+      "next_action": "Current design-set compiler numeric refresh is complete. Resolve only remaining scoped gaps listed in current_numeric_gaps_20261015.md: original matched timing views and physical/equal-total-area claims remain unproven; historical variants stay explicitly historical. Do not repeat the successful eight-case campaign for documentation-only changes.",
       "acceptance": [
         "Every number has a supporting run or is explicitly scoped as local/historical.",
         "No compact successor result is presented as G1 or whole-chip signoff."
@@ -86,13 +87,13 @@
         "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged",
         "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can",
         "38827410988 at647a536: exact full121; southern singleton/pair native0, endpoints unchanged;6 capacity decreases off selected routes, explicit confound retained",
-        "38828164038 build passes;38829241239 runtime mount failureBUG97;38849978485 exactdefault121 and actual pair139 rejected for203 capacity increasesBUG98; corrected D100 build38851788423 and chained38851859215 running atcb7bd3d"
+        "38948702750 atf433609: exactdefault121; boundedforce endsGRT0232/observedfullgrid132(15/52/24/41), all69064interior+550boundarycapacities and geometry/censusunchanged; no postrepair finaltable, two selectedguidesmissing; rejectversus121"
       ],
-      "next_action": "Inspect corrected38851788423/38851859215 actual results. Require exact initial121 and unchanged cellwise capacities before interpreting bounded repair; on native0 require downstream detailed routing/extraction/full matched checks. Diagnose retained failures without reusing partial state.",
+      "next_action": "Instrument existing bounded forced passes without changing routing behavior; require exact38948702750 final132 grid/segment hashes before interpreting pass snapshots/actual expansion membership. Determine whether earlier whole-grid states improve or expansion omits actual congested owners. Preserve original50/133, best15/121, and rejected controlled132 separately.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",
-        "Paired native overflow improves133; only zero permits detailed-route advancement."
+        "Paired native routing improves preserved15/121 under identical policy and physical resources; only zero with full table, coverage and downstream gates permits advancement."
       ],
       "rejection": [
         "Equal/worse overflow, any timing/electrical guard regression, or a repeated rejected configuration without new evidence."
@@ -284,6 +285,14 @@
         "38279250531: original146/combined133 -> seed41 154/143"
       ],
       "reason": "Seed perturbation alone regressed; arbitrary seed42 proposal withdrawn October15. Require discriminating new topology evidence before another order experiment."
+    },
+    {
+      "id": "SOUTHERN-PAIR-FOUR-EXPANSIONS",
+      "evidence": [
+        "38948702750 atf433609: controlled121->132 observedgrid; nativeGRT0232; all observed real-edge capacities and geometry/census unchanged",
+        "docs/reports/force_repair_controlled_result_20261016.md"
+      ],
+      "reason": "This exact two-net seed plus four native congestion expansions regresses the preserved15/121 control. Do not repeat without a new discriminating observation or changed, justified hypothesis."
     }
   ]
 }

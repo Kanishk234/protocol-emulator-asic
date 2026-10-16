@@ -21,8 +21,12 @@ cases have explicit native capacity rejections, whose reported LC demand is
 a synthesis estimate. Retained images/native logs have matching listed hashes;
 this refresh does not establish configured timing or new equal-total-area
 superiority. Historical comparison wording now carries that distinction.
-Corrected forced router build38851788423 and chained38851859215 remain active;
-the preceding139-overflow repair is rejected for changed capacity accounting.
+Corrected forced router build38851788423 succeeds. Controlled38948702750
+holds geometry and all observed real-edge capacities exact but regresses
+best121 to132; nativeGRT0232 and incomplete guides reject it. The earlier139
+trial remains separately rejected for changed capacity accounting. The next
+step observes whole-grid states and actual expansion membership without
+changing the existing repair policy; no routing or physical promotion follows.
 
 Latest baseline additions now have actual loaded evidence: primitive-helper
 38167521573 and autonomous UART fault/event demo38168609080 pass real SPI-loaded

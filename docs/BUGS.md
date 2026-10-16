@@ -1,22 +1,29 @@
 # Bugs
 
+## 101: Boundary validator rejects OpenDB decimal-formatted numbers
+- **Date:**2026-10-16.
+- **Symptom/check:**38853662972 passes native GCD and reproduces exact121, then fails default validation with Malformed or negative boundary edge. Pair repair is not attempted.
+- **Root cause:** new boundary parser requires integer text for capacity/usage, while actual Tcl OpenDB getters emit values such as29.0 and12.0. The existing interior parser already supports finite Decimal values.
+- **Fix/coverage:** reuse the interior numeric policy for capacities/usage, requiring integral counts while retaining integer coordinates, complete census, negative/nonfinite rejection and exact before/after capacity checks.89focused testsPASS/2existingSKIP; downloaded actual default validates550boundaryedges with zero overflow and unchanged capacities. Retry38948702750 reuses successful D100build38851788423; no solver rebuild. Failed run remains a collector error, not a routing result.
+
 ## 100: Forced repair capacity comparison omits real boundary edges
 - **Date:**2026-10-15.
 - **Symptom/check:** independent source review finds the calibrated interior export omits horizontal last-row and vertical last-column edges; claiming complete capacity-array identity from it exceeds its scope.
 - **Root cause:** historical interior format loops x<nx-1,y<ny-1 for every layer. Native reportCongestion scans all real edges, while incremental getOverflow3D scans touched edges. The existing mandatory final native table already prevents accepting hidden boundary overflow, but boundary capacity changes were not explicitly compared.
-- **Fix/coverage:** retain exact121 interior hashes; add separate direction-aware initial/final boundary exports, complete edge census, capacity equality and combined overflow reconciliation with the full native table. Query actual layer directions and require pinned CMOS5L Metal1/3 horizontal, Metal2/4 vertical (tech LEF SHA3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5). Root review caught and corrected a reversed draft assumption before commit.76focused testsPASS/2existingSKIP, including actual Tcl export/direction mismatch fixtures. Hosted boundary capture remains pending; old runs retain their observed-interior scope.
+- **Fix/coverage:** retain exact121 interior hashes; add separate direction-aware initial/final boundary exports, complete edge census, capacity equality and combined overflow reconciliation with the full native table. Query actual layer directions and require pinned CMOS5L Metal1/3 horizontal, Metal2/4 vertical (tech LEF SHA3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5). Root review caught and corrected a reversed draft assumption before commit.76focused testsPASS/2existingSKIP, including actual Tcl export/direction mismatch fixtures. Actual38948702750 captures both states and passes all550boundarycapacity comparisons; old runs retain their observed-interior scope.
 
 ## 99: Architecture evidence setup executes a non-executable fetch script
 - **Date:**2026-10-15.
 - **Symptom/check:**38851943119 stops with permission denied for scripts/fetch_nextpnr.sh before any design compile; no measurement artifact exists.
 - **Root cause:** the tracked script has mode100644, but the new workflow invoked it directly.
-- **Fix/coverage:** invoke through bash, matching its interpreter. The workflow invocation regression checks direct script permissions and explicit bash invocations;30 focused tests pass. Repeat hosted execution before claiming compiler results.
+- **Fix/coverage:** invoke through bash, matching its interpreter; the compiler's missing-tool instruction now names the same executable command. The workflow invocation regression checks direct script permissions and explicit bash invocations;30 focused tests pass. Actual retry38852379083 succeeds with all eight cases and independently checked native artifacts. Compiler diagnostic suite40PASS after the instruction correction.
 
 ## 98: Forced unchanged-net repair re-credits existing macro pin access
 - **Date:**2026-10-15.
 - **Symptom/check:**38849978485 passes custom-default exact121, then forced repair ends GRT0232/grid139 and203 encoded capacity increases despite identical physical census/geometry. Exact capacity guard correctly rejects the case.
 - **Root cause:** initFastRouteIncr calls initNetlist for the initial reroute and each expansion; initNetlist unconditionally calls addResourcesForPinAccess across all mapped macro/pad pins, adding edge_cap+1 again. Route clearing releases usage only, not these credits. Our new forced unchanged-pin path incorrectly reused this initialization without suppressing duplicate credits.
-- **Fix/coverage:** retain original initial crediting and ordinary incremental behavior; skip only while force_reroute_mode_ is true (no changed/new pins or placement). Two independent source reviews agree. Updated pinned patch dry-run passes; new build/native regression/default121/cellwise-capacity guard must pass before interpreting retry.139 is an uncontrolled failed result, not evidence of a clean algorithm regression.
+- **Fix/coverage:** retain original initial crediting and ordinary incremental behavior; skip only while force_reroute_mode_ is true (no changed/new pins or placement). Corrected build38851788423 and native regression pass; controlled38948702750 preserves all69064interior+550boundarycapacities through actual pair execution. The accounting fix passes, but repair grid132/nativeGRT0232 regresses best121 and is rejected.139 remains an uncontrolled failed result.
+- **Upstream confirmation:** immutable09f16990f662d522b51094a6c3085c25f3ade024 suppresses repeated credits during native incremental calls; merged PR9510 after our pinned source. D100 is a narrower forced-only correction. See docs/reports/upstream_pin_access_research_20261016.md.
 
 ## 97: Custom Nix store mount hides the container's Python runtime
 - **Date:**2026-10-15.

@@ -1,6 +1,6 @@
 # Review-only targeted unchanged-net routing experiment
 
-**Current D100 correction awaits native qualification.** The original patch
+**D100 accounting correction passes; bounded chip repair regresses121 to132 and is rejected.** The original patch
 compiled and executed, but its chip trial was rejected for changed capacity
 accounting; the measured outcome and correction are recorded below. The accompanying
 `patches/openroad_force_reroute.patch` is a concrete review artifact against
@@ -240,3 +240,25 @@ match; pinned OpenDB Tcl enum bindings return those literal direction strings.
 Focused tests76PASS/2existingSKIP include executed Tcl and malformed, missing,
 changed-capacity and boundary-only-overflow rejection. Hosted sidecar evidence
 is pending; this does not retroactively add boundary observations to old runs.
+
+## Actual corrected build and boundary collector retry, October16
+
+D100 build38851788423 atcb7bd3d succeeds in55m09s, including linked Tcl smoke,
+identity manifest and runtime closure. Tool output is
+`/nix/store/shfl4m8xzdxicwb7flx5c9hsmibg4idc-openroad-warp-force-review-2026-02-17`;
+wrapper SHA780f315649499bcba681e0fb2245dbe7d7b4b867c565af800209e3547ebbe70a.
+Boundary-aware38853662972 passes native GCD regression and regenerates the
+original corner guards. Its actual custom default matches the exact121 segment
+and interior hashes. The new collector then rejects decimal-formatted OpenDB
+resource text (`29.0`, `12.0`), so pair repair is not attempted (BUG101).
+
+The parser fix uses finite nonnegative integral Decimal resource counts;
+coordinates remain strict integers. Read-only validation of the downloaded
+actual default now passes, including all550 real preferred boundary edges,
+zero boundary overflow, identical capacities and full native table121.
+Initial/final boundary SHA:
+`20f6e7ba7e8ed300215e48292eff30b04cdc32b9f7be7e35a1cbe67dd75529e9`.
+The failed hosted run remains failed; revalidation is scoped to its retained
+default artifact. Focused89testsPASS/2existingSKIP after correction.
+Retry38948702750 atf433609 reuses build38851788423. No solver rebuild,
+physical promotion or changed congestion/timing threshold follows.

@@ -2,6 +2,18 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**October16 controlled repair:** D100tool build38851788423 succeeds55m09s
+(software build, not chip hardening). Collector38948702750 atf433609 reproduces
+exact15/121, then bounded southern-pair repair ends nativeGRT0232 and observed
+full-grid132(15/52/24/41). All69064interior+550real-boundary capacities and
+geometry/connectivity remain unchanged; boundary overflow is zero. No final
+postrepair native congestion table exists, and both selected guides are absent
+after the exception. The repeated-credit defect is fixed, but this strategy
+regresses best121 and is rejected. Preserve original50/133 separately.
+See `docs/reports/force_repair_controlled_result_20261016.md`; no physical
+acceptance or timing-margin change. Next observation must reproduce exact132
+before interpreting actual expansion membership and whole-grid pass states.
+
 **October15 current diagnostic:** paired38820879445 atf8ed2a0 reproduces
 exact50-budget133 and measures15-budget121 on the same authenticated source
 ODB/netlist/SDC/interface, original three-corner producer guards, capacities

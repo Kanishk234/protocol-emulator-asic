@@ -10,6 +10,21 @@ sys.path.insert(0, str(ROOT / 'test_internal'))
 import cloud_route_trace as trace
 
 
+def test_tool_override_requires_explicit_readonly_pinned_repair_worker():
+    args = ['-v', '/nix/store:/nix/store:ro', '-e',
+            '_LLN_OVERRIDE_OPENROAD=/nix/store/' + 'a'*32 + '-openroad/bin/openroad']
+    trace.validate_execution_options(None, None, ('GRT-0116',), False)
+    trace.validate_execution_options('cloud_route_force_repair.py', args, ('GRT-0116', 'GRT-0232'), True)
+    for worker, options, errors in (
+        ('other.py', args, ('GRT-0116',)),
+        ('cloud_route_force_repair.py', ['-v', '/nix/store:/nix/store:rw', *args[2:]], ('GRT-0116',)),
+        ('cloud_route_force_repair.py', args, ('ANY',)),
+        ('cloud_route_force_repair.py', [*args[:3], '_LLN_OVERRIDE_OPENROAD=/tmp/openroad'], ('GRT-0116',)),
+    ):
+        with pytest.raises(ValueError):
+            trace.validate_execution_options(worker, options, errors, True)
+
+
 def sample():
     return ''.join(name+'\n(\n10 20 Metal1 10 20 Metal2\n10 20 Metal2 10 40 Metal2\n)\n'
                    for name in sorted(trace.TARGETS))

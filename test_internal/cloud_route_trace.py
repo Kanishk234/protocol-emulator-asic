@@ -212,11 +212,27 @@ def selected_policy(config, iterations):
     return selected, protected
 
 
-def main(iterations=50, worker=None, reduced_nets=None):
+def validate_execution_options(worker, docker_args, native_error_codes, repair_observation):
+    custom = bool(docker_args) or native_error_codes != ('GRT-0116',) or repair_observation
+    if not custom:
+        return
+    if worker is None or Path(worker).name != 'cloud_route_force_repair.py':
+        raise ValueError('Custom tool execution requires explicit repair worker')
+    if native_error_codes not in (('GRT-0116',), ('GRT-0116', 'GRT-0232')):
+        raise ValueError('Unapproved native diagnostic error codes')
+    if (not isinstance(docker_args, (list, tuple)) or len(docker_args) != 4 or
+            list(docker_args[:3]) != ['-v', '/nix/store:/nix/store:ro', '-e'] or
+            not re.fullmatch(r'_LLN_OVERRIDE_OPENROAD=/nix/store/[0-9a-z]{32}-[^/]+/bin/openroad', docker_args[3])):
+        raise ValueError('Only read-only pinned Nix tool override is supported')
+
+
+def main(iterations=50, worker=None, reduced_nets=None, docker_args=None,
+         native_error_codes=('GRT-0116',), repair_observation=False):
     if os.environ.get('GITHUB_ACTIONS') != 'true':
         raise ValueError('Native replay only on hosted runner')
     if iterations not in (15, 50):
         raise ValueError('Unapproved native iteration budget')
+    validate_execution_options(worker, docker_args, native_error_codes, repair_observation)
     if reduced_nets is not None and (iterations != 15 or not reduced_nets or
             not set(reduced_nets) <= {'cell_pad[31]', 'cell_val[30]'} or
             len(set(reduced_nets)) != len(reduced_nets)):
@@ -224,7 +240,8 @@ def main(iterations=50, worker=None, reduced_nets=None):
     OUT.mkdir(exist_ok=False)
     result={'diagnostic_completed':False,'physical_acceptance':False,'route_passed':False,
             'source_run':38167697696,'reference_route_run':38453870785,
-            'iteration_budget':iterations,'experimental_budget':iterations!=50}
+            'iteration_budget':iterations,'experimental_budget':iterations!=50,
+            'experimental_tool_override':bool(docker_args), 'incremental_repair_observation':repair_observation}
     try:
         authenticate()
         archive=ROOT/'build/fanout-preflight-source.tar.gz'
@@ -245,7 +262,7 @@ def main(iterations=50, worker=None, reduced_nets=None):
         state=OUT/'state.json';state.write_text(json.dumps({'odb':str(SOURCE/'padded.odb'),
             'nl':str(SOURCE/'padded.nl.v'),'sdc':str(sdc),'metrics':{}}))
         run=OUT/'replay';run.mkdir()
-        cmd=['docker','run','--rm','-v',f'{ROOT}:{ROOT}','-w',str(ROOT),'-e',
+        cmd=['docker','run','--rm',*(docker_args or []),'-v',f'{ROOT}:{ROOT}','-w',str(ROOT),'-e',
             f"PDK_ROOT={os.environ['PDK_ROOT']}",'--entrypoint','python3',cfg.IMAGE,
             str(Path(worker or __file__).resolve()),'--inside',str(path),str(state),str(run)]
         with (OUT/'replay.log').open('w') as log:
@@ -262,7 +279,7 @@ def main(iterations=50, worker=None, reduced_nets=None):
         result['diagnostic_reduced_nets'] = reduced_nets
         result['native_global_route_passed']=process.returncode==0 and overflow==0
         if overflow:
-            if process.returncode==0 or 'GRT-0116' not in (stage/'native-return.txt').read_text():
+            if process.returncode==0 or not any(code in (stage/'native-return.txt').read_text() for code in native_error_codes):
                 raise ValueError('Native congestion failure not retained')
         elif process.returncode!=0:
             raise ValueError('Zero overflow still has native routing error')
@@ -286,10 +303,14 @@ def main(iterations=50, worker=None, reduced_nets=None):
         result['final_route_segments_exact']=result['segments_sha256']==SEGMENTS_SHA and result['targets_sha256']==TARGETS_SHA
         if re.findall(r'(?m)^\+ set_debug_level GRT grtSteps (\d+)\b',raw)!=['1']:
             raise ValueError('Native scalar debug command missing or repeated')
-        result['stage_scalars']=parse_stage_scalars(raw)
+        result['stage_scalars']=(
+            {'parsed':False,'reason':'Multiple native incremental runs; retain raw logs without single-run inference'}
+            if repair_observation else parse_stage_scalars(raw))
         if re.findall(r'(?m)^\+ set_debug_level GRT congestionIterations (\d+)\b',raw)!=['1']:
             raise ValueError('Native iteration debug command missing or repeated')
-        result['negotiation_epochs']=parse_negotiation_epochs(raw)
+        result['negotiation_epochs']=(
+            {'parsed':False,'reason':'Multiple native incremental runs; retain raw logs without single-run inference'}
+            if repair_observation else parse_negotiation_epochs(raw))
         result['native_net_count']=summary['native_net_count']
         authenticate()
         result['source_unchanged']=True

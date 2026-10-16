@@ -1,0 +1,61 @@
+name: current G0 G1 compile evidence
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'test_internal/cloud_arch_comparison.py'
+      - '.github/workflows/arch_comparison_evidence.yaml'
+permissions:
+  contents: read
+concurrency:
+  group: warp-arch-comparison-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  compare:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 105
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Python prerequisites
+        run: sudo apt-get update && sudo apt-get install -y python3-tk
+      - name: Cache pinned synthesis suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Fetch pinned synthesis suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/warp-arch-ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/warp-arch-ocs.tgz -C ~
+      - name: Cache pinned primitive-aware nextpnr
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+      - name: Project venv and pinned compiler tools
+        run: |
+          scripts/setup_venv.sh
+          scripts/fetch_nextpnr.sh
+      - name: Eight paired design-set compiles
+        timeout-minutes: 85
+        run: |
+          source .venv/bin/activate
+          export PATH="$HOME/oss-cad-suite/bin:$PATH"
+          python test_internal/cloud_arch_comparison.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: current-architecture-comparison-${{ github.run_id }}
+          path: build/arch_comparison/
+          retention-days: 30
+          if-no-files-found: error

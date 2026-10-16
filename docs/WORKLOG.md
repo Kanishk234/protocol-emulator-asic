@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-15 (session109: continue through native outcomes)
+**Active:** corrected D100 router build38851788423 atcb7bd3d and chained38851859215 remain running; latter waits for successful authenticated build. Original50/133, exact15/121 and frozenG1 remain separate controls.
+**Fixed:** architecture comparison38851943119 failed before any compile because the workflow directly executed mode100644 fetch_nextpnr.sh. Invoke bash explicitly;30focused tests pass, shell syntax reviewed, BUG99 recorded. Pushed b3c26e0/ba0cb76; actual retry38852379083 runs atba0cb76. No measurement claim from setup failure.
+**Validation:** compiler/autonomy suites337PASS/9SKIP in33.48s; build/continuation109_tools.xml. Skips remain unavailable local HDL/Tcl checks, not successes. No local EDA, hardware/spec change or phase box.
+**Review:** intermediate incremental router overflow counters cover touched edges; do not mistake first repair-pass24 for whole-chip121-to24 progress. Full exported grid remains the acceptance metric. Specialist prepares exact expansion-observation plan while compiler evidence and corrected native build execute.
+**Actual compiler evidence:**38852379083SUCCESS atba0cb76; all eight cases complete, G0 SPI86placed and G1 UART29/SPI47/I2Ccontroller70placed; four explicit native capacity rejections. Root downloaded and rehashed every listed per-case artifact; resultSHA3216cbceb1886d5e64f3dc33aef4270e47c7bdd5b9914e0d84bc1c0a3b3a15cb. Independent native/source/image review follows. Current summary separates placed counts from nonfit synthesis demand; historical tables retain original numbers under dated scope. No physical-timing/equal-area superiority claim.
+**Next:** inspect actual eight-case comparison and corrected native regression/default121/pair-capacity results; diagnose retained failures, then update this entry with observed outcomes.
+
 ## 2026-10-15 (session108: continue actual repair and correct accounting defect)
 **Actual:** resumed after user interruption; build38828164038SUCCESS, firstchain38829241239failed only at container start after native GCD passed. Corrected individual read-only closure mounts (BUG97), actual container smoke, and169local testsPASS/2existingSKIP. Retry38849978485 at7897bf3 imports tools, passes GCD and regenerated source guards, reproduces custom-default exact121, and executes actual forced pair.
 **Rejected trial:** forced final nativeGRT0232/grid139 (9/51/32/47) with203 encoded capacity increases (126Metal2/77Metal3), geometry and census byte-identical. Capacity guard rejects; preserve121, do not treat139 as a controlled comparison.

@@ -76,7 +76,7 @@
       "priority": 3,
       "title": "Choose one measured local routing intervention",
       "track": "compact_experiment",
-      "status": "ready",
+      "status": "in_progress",
       "hypothesis": "A measured overloaded edge and actual net occupancy may identify a localized change that broad reflow missed.",
       "evidence": [
         "docs/reports/research_next_20261013.md",
@@ -86,9 +86,9 @@
         "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged",
         "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can",
         "38827410988 at647a536: exact full121; southern singleton/pair native0, endpoints unchanged;6 capacity decreases off selected routes, explicit confound retained",
-        "38828164038 pinned patch build running;38829241239 authenticated follow-on waits then native GCD/default121 gates before fixed pair repair"
+        "38828164038 build passes;38829241239 runtime mount failureBUG97;38849978485 exactdefault121 and actual pair139 rejected for203 capacity increasesBUG98; corrected D100 build38851788423 and chained38851859215 running atcb7bd3d"
       ],
-      "next_action": "Inspect actual38828164038/38829241239 results and artifacts. A collector success is not routing closure. On native0 require downstream detailed routing/extraction/full matched checks; on error diagnose retained witness, never reuse partial state.",
+      "next_action": "Inspect corrected38851788423/38851859215 actual results. Require exact initial121 and unchanged cellwise capacities before interpreting bounded repair; on native0 require downstream detailed routing/extraction/full matched checks. Diagnose retained failures without reusing partial state.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",

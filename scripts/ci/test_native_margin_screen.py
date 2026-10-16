@@ -119,3 +119,19 @@ def test_shortwire_changes_only_data_wire_length(tmp_path):
     assert expected.pop('GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH') == 200
     result.pop('GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH')
     assert result == expected
+
+
+def test_antenna_margin_changes_one_repair_target_and_preserves_constraints(tmp_path):
+    from native_shortwire_screen import configure as shortwire
+    from native_antenna_margin_screen import configure as antenna_margin
+    source = stock_configure(dict(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=56,
+                                  GRT_ANTENNA_REPAIR_MARGIN=10),
+                             'AREA 1', tmp_path/'src/signoff.sdc',
+                             hold_target=.10, clock_cluster=8)
+    expected = shortwire(source)
+    result = antenna_margin(source)
+    assert result.pop('GRT_ANTENNA_REPAIR_MARGIN') == 50
+    assert expected.pop('GRT_ANTENNA_REPAIR_MARGIN') == 10
+    assert result == expected
+    with pytest.raises(ValueError):
+        antenna_margin(dict(source, GRT_ANTENNA_REPAIR_MARGIN=30))

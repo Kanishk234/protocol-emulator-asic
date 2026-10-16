@@ -1,6 +1,8 @@
 # Review-only targeted unchanged-net routing experiment
 
-**Not compiled, not executed, not validated.** The accompanying
+**Current D100 correction awaits native qualification.** The original patch
+compiled and executed, but its chip trial was rejected for changed capacity
+accounting; the measured outcome and correction are recorded below. The accompanying
 `patches/openroad_force_reroute.patch` is a concrete review artifact against
 OpenROAD `dcf36133a369abc8f3c5e5738cd4d82e4903c0e0`. It is not an accepted
 router change or a claim that the compact successor routes. No upstream tree,
@@ -219,3 +221,22 @@ A new pinned build must repeat native GCD/default identity before one bounded
 chip retry, and the existing cellwise before/after capacity guard must pass.
 The139 trial and its failed control are retained. No capacity acceptance,
 congestion threshold or hardware/timing constraint is relaxed.
+
+## Boundary capacity evidence refinement (BUG100)
+
+The historical calibrated179×98 export contains only the interior69064 cells.
+It excludes genuine horizontal last-row and vertical last-column edges.
+The existing passing gate requires a final native congestion table; its pinned
+`computeCongestionInformation` scans all real preferred edges, so an interior
+zero alone has never sufficed for acceptance. The before/after capacity claim
+from old artifacts must nevertheless be limited to the observed interior.
+
+The updated runner preserves that exact interior hash and exports separate
+initial/final real-boundary sidecars, comparing their capacities and reconciling
+interior plus boundary overflow with the native full table. Pinned CMOS5L LEF
+SHA3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5
+specifies Metal1/3 horizontal, Metal2/4 vertical. Runtime `getDirection` must
+match; pinned OpenDB Tcl enum bindings return those literal direction strings.
+Focused tests76PASS/2existingSKIP include executed Tcl and malformed, missing,
+changed-capacity and boundary-only-overflow rejection. Hosted sidecar evidence
+is pending; this does not retroactively add boundary observations to old runs.

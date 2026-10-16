@@ -1,5 +1,11 @@
 # Bugs
 
+## 100: Forced repair capacity comparison omits real boundary edges
+- **Date:**2026-10-15.
+- **Symptom/check:** independent source review finds the calibrated interior export omits horizontal last-row and vertical last-column edges; claiming complete capacity-array identity from it exceeds its scope.
+- **Root cause:** historical interior format loops x<nx-1,y<ny-1 for every layer. Native reportCongestion scans all real edges, while incremental getOverflow3D scans touched edges. The existing mandatory final native table already prevents accepting hidden boundary overflow, but boundary capacity changes were not explicitly compared.
+- **Fix/coverage:** retain exact121 interior hashes; add separate direction-aware initial/final boundary exports, complete edge census, capacity equality and combined overflow reconciliation with the full native table. Query actual layer directions and require pinned CMOS5L Metal1/3 horizontal, Metal2/4 vertical (tech LEF SHA3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5). Root review caught and corrected a reversed draft assumption before commit.76focused testsPASS/2existingSKIP, including actual Tcl export/direction mismatch fixtures. Hosted boundary capture remains pending; old runs retain their observed-interior scope.
+
 ## 99: Architecture evidence setup executes a non-executable fetch script
 - **Date:**2026-10-15.
 - **Symptom/check:**38851943119 stops with permission denied for scripts/fetch_nextpnr.sh before any design compile; no measurement artifact exists.

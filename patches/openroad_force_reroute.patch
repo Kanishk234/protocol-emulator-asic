@@ -1,44 +1,22 @@
 --- a/src/grt/include/grt/GlobalRouter.h
 +++ b/src/grt/include/grt/GlobalRouter.h
-@@ -220,6 +220,8 @@
-   // Incremental global routing functions.
-   // See class IncrementalGRoute.
-   void addDirtyNet(odb::dbNet* net);
+@@ -222,0 +223,2 @@
 +  // Experimental, explicit unchanged-net repair; never called by default flow.
 +  void forceRerouteNets(const std::vector<odb::dbNet*>& nets);
-   std::set<odb::dbNet*> getDirtyNets() { return dirty_nets_; }
-   // check_antennas
-   bool haveRoutes();
-@@ -551,6 +553,8 @@
-   odb::dbBlock* block_;
- 
-   std::set<odb::dbNet*> dirty_nets_;
+@@ -553,0 +556,2 @@
 +  std::set<odb::dbNet*> forced_reroute_nets_;
 +  bool force_reroute_mode_{false};
-   std::vector<odb::dbNet*> nets_to_route_;
- 
-   RepairAntennas* repair_antennas_;
 --- a/src/grt/src/GlobalRouter.cpp
 +++ b/src/grt/src/GlobalRouter.cpp
-@@ -18,6 +18,7 @@
- #include <random>
- #include <set>
- #include <sstream>
+@@ -9,0 +10,2 @@
++#include <cstdlib>
++#include <iomanip>
+@@ -20,0 +23 @@
 +#include <stdexcept>
- #include <string>
- #include <tuple>
- #include <unordered_map>
-@@ -854,7 +855,7 @@
-     destroyNetWire(net);
-     std::string pins_not_covered;
-     // compare new positions with last positions & add on vector
+@@ -857 +860 @@
 -    if (pinPositionsChanged(net)
 +    if ((pinPositionsChanged(net) || forced_reroute_nets_.count(db_net) != 0)
-         && (!net->isMergedNet() || !netIsCovered(db_net, pins_not_covered))) {
-       dirty_nets.push_back(db_net_map_[db_net]);
-       routes_[db_net].clear();
-@@ -1338,4 +1339,7 @@
-   // add resources for pin access in macro/pad pins after defining their on grid
+@@ -1339,2 +1342,5 @@
 -  // position
 -  addResourcesForPinAccess();
 +  // position. Forced unchanged-net repair retains the original grid and pin
@@ -46,11 +24,7 @@
 +  if (!force_reroute_mode_) {
 +    addResourcesForPinAccess();
 +  }
-   fastroute_->initAuxVar();
-@@ -5658,6 +5662,60 @@
-   return groute_renderer_.get();
- }
- 
+@@ -5660,0 +5667,54 @@
 +// REVIEW-ONLY WARP experiment, pinned upstream dcf36133. No physical edits.
 +void GlobalRouter::forceRerouteNets(const std::vector<odb::dbNet*>& nets)
 +{
@@ -105,44 +79,173 @@
 +  cleanup();
 +}
 +
- void GlobalRouter::addDirtyNet(odb::dbNet* net)
- {
-   db_net_map_[net]->setDirtyNet(true);
-@@ -5718,13 +5776,18 @@
-       // The maximum number of times that the nets traversing the congestion
-       // area will be added
-       int add_max = 30;
+@@ -5709,0 +5770,147 @@
++    // Contingent WARP observer only: no tool configuration or routing changes.
++    // Enable explicitly with a PREEXISTING writable artifact directory.
++    const char* observer_dir = force_reroute_mode_
++                                   ? std::getenv("WARP_FORCE_OBSERVER_DIR")
++                                   : nullptr;
++    int observed_pass = 0;
++    std::set<std::string> previous_observed_names;
++    auto observe_merged_pass = [&](const std::vector<Net*>& observed_nets) {
++      if (observer_dir == nullptr || observer_dir[0] == '\0') {
++        return;
++      }
++      const std::string prefix = std::string(observer_dir) + "/pass_"
++                                 + std::to_string(observed_pass++);
++      std::vector<std::string> names;
++      for (const Net* net : observed_nets) {
++        names.emplace_back(net->getConstName());
++      }
++      std::ranges::sort(names);
++      const auto unique_end = std::unique(names.begin(), names.end());
++      if (unique_end != names.end()) {
++        throw std::runtime_error("Observer found duplicate expansion names");
++      }
++      int added = 0;
++      for (const std::string& name : names) {
++        added += previous_observed_names.count(name) == 0;
++      }
++      std::ofstream census(prefix + ".nets.tsv");
++      if (!census) {
++        throw std::runtime_error("Cannot write forced-routing observer census");
++      }
++      census << "META\t" << observed_pass - 1 << "\t" << names.size()
++             << "\t" << added << "\n";
++      for (const std::string& name : names) {
++        census << "NET\t" << name << "\t"
++               << (previous_observed_names.count(name) == 0) << "\n";
++      }
++      census.close();
++      if (!census) {
++        throw std::runtime_error("Incomplete forced-routing observer census");
++      }
++      previous_observed_names = std::set<std::string>(names.begin(), names.end());
++
++      // Existing native exporter updates only OpenDB's reporting grid. Bypass
++      // GlobalRouter::updateDbCongestion to avoid heatmap callbacks here.
++      int min_layer, max_layer;
++      getMinMaxLayer(min_layer, max_layer);
++      fastroute_->updateDbCongestion(min_layer, max_layer);
++      odb::dbGCellGrid* reporting_grid = block_->getGCellGrid();
++      if (reporting_grid == nullptr) {
++        throw std::runtime_error("No complete native observer grid");
++      }
++      std::vector<int> xs, ys;
++      reporting_grid->getGridX(xs);
++      reporting_grid->getGridY(ys);
++      if (xs.size() < 2 || ys.size() < 2) {
++        throw std::runtime_error("Degenerate complete native observer grid");
++      }
++      std::ofstream grid_file(prefix + ".native-grid.tsv");
++      if (!grid_file) {
++        throw std::runtime_error("Cannot write complete native observer grid");
++      }
++      grid_file << std::fixed << std::setprecision(1);
++      grid_file << "META\t" << xs.size() << "\t" << ys.size() << "\nX\t";
++      for (size_t x = 0; x < xs.size(); ++x) {
++        grid_file << (x == 0 ? "" : " ") << xs[x];
++      }
++      grid_file << "\nY\t";
++      for (size_t y = 0; y < ys.size(); ++y) {
++        grid_file << (y == 0 ? "" : " ") << ys[y];
++      }
++      grid_file << "\n";
++      for (odb::dbTechLayer* layer : db_->getTech()->getLayers()) {
++        const int level = layer->getRoutingLevel();
++        if (level < 1 || level > 4) {
++          continue;
++        }
++        for (size_t x = 0; x + 1 < xs.size(); ++x) {
++          for (size_t y = 0; y + 1 < ys.size(); ++y) {
++            grid_file << "CELL\t" << layer->getName() << "\t" << x << "\t"
++                      << y << "\t" << reporting_grid->getCapacity(layer, x, y)
++                      << "\t" << reporting_grid->getUsage(layer, x, y) << "\n";
++          }
++        }
++      }
++      grid_file.close();
++      if (!grid_file) {
++        throw std::runtime_error("Incomplete native observer grid write");
++      }
++      // Real preferred boundary edges, matching the calibrated Tcl sidecar.
++      // H last-column and V last-row are display endpoints, not physical edges.
++      std::ofstream boundary(prefix + ".boundary-native-grid.tsv");
++      if (!boundary) {
++        throw std::runtime_error("Cannot write native observer boundary");
++      }
++      boundary << std::fixed << std::setprecision(1);
++      boundary << "META\t" << xs.size() << "\t" << ys.size() << "\n";
++      for (odb::dbTechLayer* layer : db_->getTech()->getLayers()) {
++        const int level = layer->getRoutingLevel();
++        if (level < 1 || level > 4) {
++          continue;
++        }
++        const auto direction = layer->getDirection();
++        if (direction == odb::dbTechLayerDir::HORIZONTAL) {
++          const size_t y = ys.size() - 1;
++          for (size_t x = 0; x + 1 < xs.size(); ++x) {
++            boundary << "EDGE\t" << layer->getName() << "\tH\t" << x << "\t"
++                     << y << "\t" << reporting_grid->getCapacity(layer, x, y)
++                     << "\t" << reporting_grid->getUsage(layer, x, y) << "\n";
++          }
++        } else if (direction == odb::dbTechLayerDir::VERTICAL) {
++          const size_t x = xs.size() - 1;
++          for (size_t y = 0; y + 1 < ys.size(); ++y) {
++            boundary << "EDGE\t" << layer->getName() << "\tV\t" << x << "\t"
++                     << y << "\t" << reporting_grid->getCapacity(layer, x, y)
++                     << "\t" << reporting_grid->getUsage(layer, x, y) << "\n";
++          }
++        } else {
++          throw std::runtime_error("Unexpected observer layer direction");
++        }
++      }
++      boundary.close();
++      if (!boundary) {
++        throw std::runtime_error("Incomplete native observer boundary write");
++      }
++      // Caller invokes only AFTER mergeResults has completed for this pass.
++      const std::string segment_path = prefix + ".segments.txt";
++      writeSegments(segment_path.c_str());
++      std::ifstream snapshot(segment_path, std::ios::binary);
++      if (!snapshot) {
++        throw std::runtime_error("Cannot read back observer segments");
++      }
++      std::ostringstream segment_bytes;
++      segment_bytes << snapshot.rdbuf();
++      const std::string contents = segment_bytes.str();
++      if (snapshot.bad() || contents.empty() || contents.back() != '\n') {
++        throw std::runtime_error("Incomplete observer segment readback");
++      }
++      // A separate strict artifact parser must verify full3659-net census and
++      // hash every retained byte; this readback alone is not proof of coverage.
++      logger_->report("WARP_FORCE_OBSERVER pass={} nets={} added={} segment_bytes={} interior_grid=true boundary_preferred=true prefix={}",
++                      observed_pass - 1,
++                      names.size(),
++                      added,
++                      contents.size(),
++                      prefix);
++    };
++
+@@ -5714,0 +5922 @@
++    observe_merged_pass(dirty_nets);
+@@ -5720,0 +5929 @@
 +      int force_expansions = 0;
-       // The set will contain the nets for routing
-       std::set<odb::dbNet*> congestion_nets;
-       // The dirty nets that could not be routed are added
-       for (auto& it : dirty_nets) {
-         congestion_nets.insert(it->getDbNet());
-       }
+@@ -5727 +5936,5 @@
 -      while (fastroute_->has2Doverflow() && reroutingOverflow && add_max >= 0) {
 +      while (fastroute_->has2Doverflow() && reroutingOverflow && add_max >= 0
 +             && (!force_reroute_mode_ || force_expansions < 4)) {
 +        if (force_reroute_mode_) {
 +          ++force_expansions;
 +        }
-         // The nets that cross the congestion area are obtained and added to
-         // the set
-         // if the nets have wires
-@@ -5737,7 +5800,7 @@
-         }
-         // When every attempt to increase the congestion region failed, try
-         // legalizing the buffers inserted
+@@ -5740 +5953 @@
 -        if (add_max == 0) {
 +        if (add_max == 0 && !force_reroute_mode_) {
-           opendp_->detailedPlacement(0, 0, "");
-           updateDirtyNets(dirty_nets);
-           for (auto& it : dirty_nets) {
+@@ -5761,0 +5975 @@
++        observe_merged_pass(dirty_nets);
 --- a/src/grt/src/GlobalRouter.i
 +++ b/src/grt/src/GlobalRouter.i
-@@ -182,6 +182,13 @@
-   return getGlobalRouter()->repairAntennas(diode_mterm, iterations, ratio_margin, jumper_only, diode_only, num_threads);
- }
- 
+@@ -184,0 +185,7 @@
 +// Exact dbNet handles; no glob expansion, pin motion, or netlist mutation.
 +// Experimental southern-pair interface; duplicate/null handles fail closed.
 +void force_reroute_pair(odb::dbNet* first, odb::dbNet* second)
@@ -150,6 +253,3 @@
 +  getGlobalRouter()->forceRerouteNets({first, second});
 +}
 +
- void
- add_net_to_route(odb::dbNet* net)
- {

@@ -84,9 +84,10 @@
         "docs/reports/route_trace_analysis_20261015.md: all10 zero-capacity markers validate edge indexing; individual own-net release leaves44-edge cuts and no reachable macro portal",
         "38778082059 at6370e1f: exact133/source/segments retained; cached2D133/assigned3D133; conditional3Dmaze calls skipped",
         "38820879445: identical-input native50/15 pair133->121, both fail; current resources104726 unchanged",
-        "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can"
+        "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can",
+        "38827410988 at647a536: exact full121; southern singleton/pair native0, endpoints unchanged;6 capacity decreases off selected routes, explicit confound retained"
       ],
-      "next_action": "Attribute nets occupying the25-edge residual cut before a targeted reroute. Stock incremental API filters unchanged pin positions; avoid no-op mark-dirty and set_nets_to_route dropping other guides.",
+      "next_action": "Inspect pinned repair build38828164038 at63a4180. Require compiled/SWIG and minimal regression plus default exact121 equivalence before explicit pair repair. D099 patch not chip-qualified.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",

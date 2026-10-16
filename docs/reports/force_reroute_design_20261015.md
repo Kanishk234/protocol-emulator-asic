@@ -147,3 +147,31 @@ and binary identities, upstream license, logs and the runtime closure. A linked
 Tcl smoke test must reject uninitialized state through the actual C++ method.
 This still does not execute a chip repair or waive the default-equivalence and
 real contention-regression gates above. No local compiler/EDA run occurred.
+
+## Guarded follow-on execution
+
+A separate branch-only manual `router_force_repair` workflow awaits the selected
+successful build, authenticates its run/attempt/source/patch and runtime closure,
+then runs a pinned upstream Nangate45 GCD regression with the stock and patched
+tools. The fixture checks default identity, three actual invalid rejections
+(duplicate/null/database-clock), a native two-net reroute witness, zero native
+overflow, unchanged unselected routes/physical census and complete guides.
+It is a noncongested API regression, not a proof of congestion convergence.
+Other invalid classes and injected expansion-exhaustion cleanup remain untested;
+the chip trial accepts only the two fixed authenticated nonclock seed nets in
+a disposable process, with strict before/after guards. This does not qualify
+the general API for production use.
+
+After that regression passes, the custom tool must reproduce exact121 with
+repair disabled in a separate run. The actual pair trial additionally hashes
+the initial121 grid and full segments in the same process before invoking the
+API. It retains full instance/terminal/geometry/OBS/guide/net inventories and
+compares capacity arrays. GRT0232 is an exhausted diagnostic failure; its
+initial121 table is never mislabeled as the final result. Final native success
+requires an actual final table, zero calibrated grid and complete guides.
+All output retains physical_acceptance:false pending downstream signoff.
+
+Root review and integrated local regression168PASS/2SKIP; new escaped-name Tcl
+fixtures execute using Python Tcl, while two existing Tcl-shell fixtures lack
+a shell interpreter. YAML and shell syntax checks pass. No native regression
+or chip-repair execution has yet occurred.

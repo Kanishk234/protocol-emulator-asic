@@ -1020,3 +1020,11 @@ Next observation exports the calibrated native grid at this exact15/121 point;
 require the same segment hash/121 and native per-layer grid/table agreement.
 Original133 remains the reference for original50 policy. No further budget
 sweep or physical acceptance follows from this retained measurement.
+
+## D-098: Isolate southern connections before choosing a routing correction
+- **Date:**2026-10-15. **Status:** accepted bounded diagnostic, no hardware promotion.
+- Exact121 grid38824245540 shows both southern target allocations share Metal3 grid edge(16,1), with nine other net owners; freeing both opens an optimistic perimeter path while each alone does not. This implicates joint congestion but does not exclude terminal-access defects.
+- Reproduce exact15/121 full control, then independently route cell_pad[31], cell_val[30], and the pair from identical authenticated physical inputs. Use pinned supported set_nets_to_route, preserving all cells/obstructions/margins. Unselected nets intentionally lack guides: reduced successes are never full-chip acceptance.
+- Export calibrated native capacity arrays in every case. Net selection may change pin-dependent capacity adjustments; record differences explicitly rather than interpreting them as controlled improvements. Original full-control resource/hash guards remain mandatory. Only these two fixed diagnostic nets may bypass the full-resource equality rejection; their actual arrays/tables remain retained.
+- Keep native congestion errors, actual routed-net census and full-source provenance. No congestion allowance, removed obstruction, hardware change, new binary, or capacity increase. Runtime Tcl copies retain existing upstream attribution. Upstream supported interface is pinned in docs/reports/routing_policy_research_20261014.md.
+- If isolated nets fail: inspect pin access/grid and construct a minimal upstream reproducer. If isolated routes pass on identical capacities: pursue joint congestion reoptimization, not another unmeasured placement/seed sweep. Existing incremental engine may support an explicitly forced selected-net patch, but stock unchanged-pin callbacks are insufficient; custom tool work needs its own decision and baseline identity check.

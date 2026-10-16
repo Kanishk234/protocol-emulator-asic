@@ -212,11 +212,15 @@ def selected_policy(config, iterations):
     return selected, protected
 
 
-def main(iterations=50, worker=None):
+def main(iterations=50, worker=None, reduced_nets=None):
     if os.environ.get('GITHUB_ACTIONS') != 'true':
         raise ValueError('Native replay only on hosted runner')
     if iterations not in (15, 50):
         raise ValueError('Unapproved native iteration budget')
+    if reduced_nets is not None and (iterations != 15 or not reduced_nets or
+            not set(reduced_nets) <= {'cell_pad[31]', 'cell_val[30]'} or
+            len(set(reduced_nets)) != len(reduced_nets)):
+        raise ValueError('Unapproved diagnostic net reduction')
     OUT.mkdir(exist_ok=False)
     result={'diagnostic_completed':False,'physical_acceptance':False,'route_passed':False,
             'source_run':38167697696,'reference_route_run':38453870785,
@@ -251,9 +255,11 @@ def main(iterations=50, worker=None):
         result['returncode']=process.returncode
         result['native_congestion']=routing.parse_congestion(raw)
         overflow=result['native_congestion'][-1]['total_overflow']
-        if {row['layer']:row['resource'] for row in result['native_congestion'][:-1]} != {
-                'Metal1':16596,'Metal2':27616,'Metal3':34082,'Metal4':26432}:
+        result['original_resources_identical'] = {row['layer']:row['resource'] for row in result['native_congestion'][:-1]} == {
+                'Metal1':16596,'Metal2':27616,'Metal3':34082,'Metal4':26432}
+        if not result['original_resources_identical'] and reduced_nets is None:
             raise ValueError('Original per-layer resources changed')
+        result['diagnostic_reduced_nets'] = reduced_nets
         result['native_global_route_passed']=process.returncode==0 and overflow==0
         if overflow:
             if process.returncode==0 or 'GRT-0116' not in (stage/'native-return.txt').read_text():

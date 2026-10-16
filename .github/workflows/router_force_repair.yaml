@@ -1,0 +1,109 @@
+name: controlled native pair repair
+on:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        description: Successful pinned router repair build run
+        required: true
+        default: '38828164038'
+        type: string
+  push:
+    branches: [efpga]
+    paths: ['.github/workflows/router_force_repair.yaml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-force-repair-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  repair:
+    # A cheap skipped push registers the branch-only workflow for manual use.
+    if: github.ref == 'refs/heads/efpga' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: ${{ github.token }}
+      WARP_BUILD_RUN: ${{ inputs.build_run }}
+      PDK_ROOT: ${{ github.workspace }}/build/cloud_pdk
+      LIBRELANE_IMAGE_OVERRIDE: ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+    steps:
+      - uses: actions/checkout@v6
+      - name: Await the explicitly selected build before provisioning EDA
+        timeout-minutes: 100
+        run: |
+          set -euo pipefail
+          [[ "$WARP_BUILD_RUN" =~ ^[0-9]+$ ]]
+          mkdir -p build/force_build
+          gh run watch "$WARP_BUILD_RUN" --exit-status --interval 60 | tee build/force_build/build-wait.log
+      - uses: cachix/install-nix-action@v31
+      - name: Project venv and exact source
+        timeout-minutes: 12
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install librelane==3.1.0.dev3
+          bash spikes/cloud/fetch_pdk.sh
+          gh release download compact-checkpoint-20261006-iter8 -R "$GITHUB_REPOSITORY" --pattern fanout-preflight-source.tar.gz --dir build
+      - name: Fetch selected completed build
+        timeout-minutes: 12
+        run: |
+          [[ "$WARP_BUILD_RUN" =~ ^[0-9]+$ ]]
+          mkdir -p build/force_build
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$WARP_BUILD_RUN" --jq '{id,head_sha,head_branch,name,status,conclusion,run_attempt}' > build/force_build/run-identity.json
+          gh run download "$WARP_BUILD_RUN" --name "pinned-router-repair-build-$WARP_BUILD_RUN" --dir build/force_build
+          source .venv/bin/activate
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          p=Path('build/force_build');r=json.loads((p/'run-identity.json').read_text())
+          assert str(r['id'])==os.environ['WARP_BUILD_RUN']
+          assert r['status']=='completed' and r['conclusion']=='success'
+          assert r['name']=='pinned router repair build' and r['head_branch']=='efpga'
+          assert (p/'source-revision.txt').read_text().strip()==r['head_sha']
+          assert (p/'workflow.txt').read_text().splitlines()==[str(r['id']),str(r['run_attempt'])]
+          expected=(p/'closure.sha256').read_text().split()
+          assert len(expected)==2 and expected[1]=='build/router_build_evidence/router-closure.nar.gz'
+          with (p/'router-closure.nar.gz').open('rb') as f:
+              assert hashlib.file_digest(f,'sha256').hexdigest()==expected[0]
+          PY
+          sha256sum --check build/force_build/inputs.sha256
+      - name: Import retained tools and check exact runtime identities
+        timeout-minutes: 8
+        run: |
+          set -euo pipefail
+          gzip -dc build/force_build/router-closure.nar.gz | nix-store --import > build/force_build/imported-paths.txt
+          mapfile -t warp_tools < build/force_build/tool-paths.txt
+          [[ ${#warp_tools[@]} == 2 ]]
+          ln -s -- "${warp_tools[0]}" build/router_stock_tool
+          ln -s -- "${warp_tools[1]}" build/router_force_tool
+          printf 'WARP_FORCE_OPENROAD=%s/bin/openroad\n' "${warp_tools[1]}" >> "$GITHUB_ENV"
+          sha256sum --check build/force_build/binaries.sha256
+          sha256sum --check build/force_build/bin-directory.sha256
+          docker pull "$LIBRELANE_IMAGE_OVERRIDE"
+      - name: Run pinned upstream fixture before chip experiment
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_router_regression.py
+      - name: Regenerate authenticated source and unchanged corner guards
+        timeout-minutes: 20
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_regenerate_control.py
+      - name: Qualify custom default routing before bounded pair repair
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          python test_internal/cloud_route_force_repair.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: controlled-native-pair-repair-${{ github.run_id }}
+          path: |
+            build/route_force_repair/
+            build/router_regression/
+            build/control_regeneration/
+            build/reset_combined/
+            build/force_build/run-identity.json
+          retention-days: 30

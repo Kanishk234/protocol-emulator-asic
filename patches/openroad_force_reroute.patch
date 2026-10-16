@@ -1,0 +1,145 @@
+--- a/src/grt/include/grt/GlobalRouter.h
++++ b/src/grt/include/grt/GlobalRouter.h
+@@ -220,6 +220,8 @@
+   // Incremental global routing functions.
+   // See class IncrementalGRoute.
+   void addDirtyNet(odb::dbNet* net);
++  // Experimental, explicit unchanged-net repair; never called by default flow.
++  void forceRerouteNets(const std::vector<odb::dbNet*>& nets);
+   std::set<odb::dbNet*> getDirtyNets() { return dirty_nets_; }
+   // check_antennas
+   bool haveRoutes();
+@@ -551,6 +553,8 @@
+   odb::dbBlock* block_;
+ 
+   std::set<odb::dbNet*> dirty_nets_;
++  std::set<odb::dbNet*> forced_reroute_nets_;
++  bool force_reroute_mode_{false};
+   std::vector<odb::dbNet*> nets_to_route_;
+ 
+   RepairAntennas* repair_antennas_;
+--- a/src/grt/src/GlobalRouter.cpp
++++ b/src/grt/src/GlobalRouter.cpp
+@@ -18,6 +18,7 @@
+ #include <random>
+ #include <set>
+ #include <sstream>
++#include <stdexcept>
+ #include <string>
+ #include <tuple>
+ #include <unordered_map>
+@@ -854,7 +855,7 @@
+     destroyNetWire(net);
+     std::string pins_not_covered;
+     // compare new positions with last positions & add on vector
+-    if (pinPositionsChanged(net)
++    if ((pinPositionsChanged(net) || forced_reroute_nets_.count(db_net) != 0)
+         && (!net->isMergedNet() || !netIsCovered(db_net, pins_not_covered))) {
+       dirty_nets.push_back(db_net_map_[db_net]);
+       routes_[db_net].clear();
+@@ -5658,6 +5659,60 @@
+   return groute_renderer_.get();
+ }
+ 
++// REVIEW-ONLY WARP experiment, pinned upstream dcf36133. No physical edits.
++void GlobalRouter::forceRerouteNets(const std::vector<odb::dbNet*>& nets)
++{
++  if (force_reroute_mode_ || grouter_cbk_ != nullptr || !dirty_nets_.empty()
++      || !initialized_ || routes_.empty() || use_cugr_ || allow_congestion_
++      || haveDetailedRoutes() || nets.empty() || nets.size() > 2) {
++    throw std::runtime_error("Force reroute requires idle initialized FastRoute "
++                             "global routes, no detailed wires, and 1-2 nets");
++  }
++  std::set<odb::dbNet*> selected;
++  for (odb::dbNet* db_net : nets) {
++    const auto it = db_net_map_.find(db_net);
++    if (db_net == nullptr || it == db_net_map_.end() || it->second == nullptr
++        || db_net->isSpecial() || db_net->getSigType().isSupply()
++        || db_net->getSigType() == odb::dbSigType::CLOCK
++        || db_net->getBlock() != block_ || it->second->isClockNet()
++        || it->second->isMergedNet() || it->second->isLocal()
++        || it->second->getNumPins() < 2
++        || routes_.find(db_net) == routes_.end()
++        || routes_.at(db_net).empty() || !selected.insert(db_net).second) {
++      throw std::runtime_error("Invalid/duplicate force-reroute signal net");
++    }
++  }
++  const bool old_incremental = is_incremental_;
++  const float old_critical = fastroute_->getCriticalNetsPercentage();
++  auto cleanup = [&]() {
++    if (grouter_cbk_ != nullptr) {
++      grouter_cbk_->removeOwner();
++      delete grouter_cbk_;
++      grouter_cbk_ = nullptr;
++    }
++    fastroute_->setIncrementalGrt(false);
++    fastroute_->setCriticalNetsPercentage(old_critical);
++    fastroute_->setCongestionReportIterStep(congestion_report_iter_step_);
++    forced_reroute_nets_.clear();
++    force_reroute_mode_ = false;
++    is_incremental_ = old_incremental;
++  };
++  force_reroute_mode_ = true;
++  forced_reroute_nets_ = selected;
++  try {
++    startIncremental();
++    for (odb::dbNet* db_net : selected) {
++      addDirtyNet(db_net);
++    }
++    endIncremental(true);
++  } catch (...) {
++    cleanup();
++    // Routing state is not transactional. Discard this process on any error.
++    throw;
++  }
++  cleanup();
++}
++
+ void GlobalRouter::addDirtyNet(odb::dbNet* net)
+ {
+   db_net_map_[net]->setDirtyNet(true);
+@@ -5718,13 +5773,18 @@
+       // The maximum number of times that the nets traversing the congestion
+       // area will be added
+       int add_max = 30;
++      int force_expansions = 0;
+       // The set will contain the nets for routing
+       std::set<odb::dbNet*> congestion_nets;
+       // The dirty nets that could not be routed are added
+       for (auto& it : dirty_nets) {
+         congestion_nets.insert(it->getDbNet());
+       }
+-      while (fastroute_->has2Doverflow() && reroutingOverflow && add_max >= 0) {
++      while (fastroute_->has2Doverflow() && reroutingOverflow && add_max >= 0
++             && (!force_reroute_mode_ || force_expansions < 4)) {
++        if (force_reroute_mode_) {
++          ++force_expansions;
++        }
+         // The nets that cross the congestion area are obtained and added to
+         // the set
+         // if the nets have wires
+@@ -5737,7 +5797,7 @@
+         }
+         // When every attempt to increase the congestion region failed, try
+         // legalizing the buffers inserted
+-        if (add_max == 0) {
++        if (add_max == 0 && !force_reroute_mode_) {
+           opendp_->detailedPlacement(0, 0, "");
+           updateDirtyNets(dirty_nets);
+           for (auto& it : dirty_nets) {
+--- a/src/grt/src/GlobalRouter.i
++++ b/src/grt/src/GlobalRouter.i
+@@ -182,6 +182,13 @@
+   return getGlobalRouter()->repairAntennas(diode_mterm, iterations, ratio_margin, jumper_only, diode_only, num_threads);
+ }
+ 
++// Exact dbNet handles; no glob expansion, pin motion, or netlist mutation.
++// Experimental southern-pair interface; duplicate/null handles fail closed.
++void force_reroute_pair(odb::dbNet* first, odb::dbNet* second)
++{
++  getGlobalRouter()->forceRerouteNets({first, second});
++}
++
+ void
+ add_net_to_route(odb::dbNet* net)
+ {

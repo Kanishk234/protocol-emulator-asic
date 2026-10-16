@@ -13,6 +13,8 @@ on:
       - 'protocols/**'
       - 'spikes/fab_demo/**'
       - 'tools/**'
+      # Evidence supervision is checked by unit/autonomy CI; it does not build hardware.
+      - '!tools/autonomy/**'
       - 'requirements-dev.txt'
       - '.github/workflows/fabric.yaml'
   workflow_dispatch:

@@ -312,3 +312,122 @@ def test_changed_complete_net_census_rejected(stage, monkeypatch):
 def test_binary_override_rejects_uncontrolled_paths(binary):
     with pytest.raises(ValueError):
         force.docker_options(binary)
+
+
+def test_observer_is_enabled_only_inside_the_caught_force_call():
+    text = force.force_trace(True)
+    assert text.index('initial-grid.tsv') < text.index('set ::env(WARP_FORCE_OBSERVER_DIR)')
+    assert text.index('set ::env(WARP_FORCE_OBSERVER_DIR)') < text.index('catch {log_cmd grt::force_reroute_pair')
+    assert text.index('catch {log_cmd grt::force_reroute_pair') < text.index('unset ::env(WARP_FORCE_OBSERVER_DIR)')
+    assert 'WARP_FORCE_OBSERVER_DIR' not in force.force_trace(False)
+
+
+def test_observer_names_reject_invented_members_and_wrong_added_count(tmp_path):
+    path = tmp_path/'names.tsv'
+    path.write_text('META\t0\t2\t2\nNET\tcell_pad[31]\t1\nNET\tcell_val[30]\t1\n')
+    names, added = force.parse_observer_names(path, 0, set(), force.SEEDS)
+    assert names == added == force.SEEDS
+    path.write_text(path.read_text().replace('2\t2', '2\t1'))
+    with pytest.raises(ValueError, match='count/order'):
+        force.parse_observer_names(path, 0, set(), force.SEEDS)
+    path.write_text('META\t0\t2\t2\nNET\tcell_pad[31]\t1\nNET\tunknown\t1\n')
+    with pytest.raises(ValueError, match='unknown identity'):
+        force.parse_observer_names(path, 0, set(), force.SEEDS)
+
+
+@pytest.fixture
+def observer(tmp_path, monkeypatch):
+    import hashlib
+    names = sorted(force.SEEDS | {'cell_pad[27]', 'cell_val[27]'} | {f'net{i}' for i in range(3655)})
+    route = ''.join(name+'\n(\n3600 3600 Metal1 10800 3600 Metal1\n)\n' for name in names)
+    def grid():
+        text = 'META\t3\t3\nX\t0 7200 14400\nY\t0 7200 14400\n'
+        for layer, over in [('Metal1', 15), ('Metal2', 52), ('Metal3', 24), ('Metal4', 41)]:
+            for x in range(2):
+                for y in range(2):
+                    text += f'CELL\t{layer}\t{x}\t{y}\t17.0\t{17+over if x==y==0 else 0}.0\n'
+        return text
+    for name in ('initial-segments.txt', 'native-segments.txt'):
+        (tmp_path/name).write_text(route)
+    for name in ('initial-grid.tsv', 'native-grid.tsv'):
+        (tmp_path/name).write_text(grid())
+    for name in ('initial-boundary-grid.tsv', 'native-boundary-grid.tsv'):
+        (tmp_path/name).write_text(boundary_text())
+    directory = tmp_path/'force-observer'; directory.mkdir()
+    previous, log = set(), force.MARKER+'\n'
+    for index in range(5):
+        current = force.SEEDS | set(names[:index])
+        added = current-previous
+        prefix = directory/f'pass_{index}'
+        (directory/f'pass_{index}.nets.tsv').write_text(f'META\t{index}\t{len(current)}\t{len(added)}\n'+
+            ''.join(f'NET\t{name}\t{int(name not in previous)}\n' for name in sorted(current)))
+        for suffix, content in [('native-grid.tsv', grid()), ('boundary-native-grid.tsv', boundary_text()), ('segments.txt', route)]:
+            (directory/f'pass_{index}.{suffix}').write_text(content)
+        log += f'WARP_FORCE_OBSERVER pass={index} nets={len(current)} added={len(added)} segment_bytes={len(route.encode())} interior_grid=true boundary_preferred=true prefix={prefix}\n'
+        previous = current
+    (tmp_path/'openroad-globalrouting.log').write_text(log)
+    original_sha = force.trace.cfg.sha
+    def identity(path):
+        if path.parent == tmp_path:
+            values = {'native-segments.txt': 'segments', 'native-grid.tsv': 'interior', 'native-boundary-grid.tsv': 'boundary'}
+            if path.name in values:
+                return force.REFERENCE_REPAIR[values[path.name]]
+        return original_sha(path)
+    monkeypatch.setattr(force.trace.cfg, 'sha', identity)
+    validated = {'native_tcl_returncode': 1, 'native_error': 'GRT-0232 failed',
+        'final_observed_full_grid_overflow': 132, 'final_boundary_grid': {'total_overflow': 0},
+        'final_grid': {'layers': {name: {'overflow': value} for name,value in
+            [('Metal1',15),('Metal2',52),('Metal3',24),('Metal4',41)]}},
+        'guide_coverage': {'required_net_count': 3691, 'missing_guides': sorted(force.SEEDS)}}
+    return tmp_path, validated
+
+
+def test_observer_validates_all_five_complete_snapshots_after_reference_gate(observer):
+    stage, data = observer
+    result = force.validate_observer(stage, data)
+    assert result['observer_equivalence_verified'] and len(result['passes']) == 5
+    assert not result['physical_acceptance'] and not result['routing_improvement']
+    assert all(row['observed_full_grid_overflow'] == 132 for row in result['passes'])
+
+
+def test_observer_rejects_changed_final_reference_before_interpretation(observer, monkeypatch):
+    stage, data = observer
+    monkeypatch.setattr(force.trace.cfg, 'sha', lambda path: 'wrong')
+    with pytest.raises(ValueError, match='changes measured132'):
+        force.validate_observer(stage, data)
+
+
+@pytest.mark.parametrize('corruption', ['missing', 'extra', 'linked', 'census', 'capacity', 'usage', 'bytes', 'witness'])
+def test_observer_corruption_rejected(observer, corruption):
+    stage, data = observer
+    directory = stage/'force-observer'
+    if corruption == 'missing':
+        (directory/'pass_2.nets.tsv').unlink()
+    elif corruption == 'extra':
+        (directory/'unrecognized').write_text('extra')
+    elif corruption == 'linked':
+        path = directory/'pass_0.nets.tsv'
+        text = path.read_text(); path.unlink()
+        other = stage/'names-copy'; other.write_text(text); path.symlink_to(other)
+    elif corruption == 'census':
+        path = directory/'pass_3.segments.txt'; path.write_text('cell_pad[31]\n(\n3600 3600 Metal1 10800 3600 Metal1\n)\n')
+    elif corruption in ('capacity', 'usage'):
+        path = directory/('pass_1.native-grid.tsv' if corruption=='capacity' else 'pass_4.native-grid.tsv')
+        text = path.read_text().replace('17.0\t32.0', '18.0\t32.0' if corruption=='capacity' else '17.0\t33.0',1)
+        path.write_text(text)
+    elif corruption == 'bytes':
+        path = directory/'pass_2.segments.txt'; path.write_text(path.read_text()+'\n')
+    else:
+        path = stage/'openroad-globalrouting.log'; path.write_text(path.read_text().replace('pass=2 nets=', 'pass=3 nets='))
+    with pytest.raises(ValueError):
+        force.validate_observer(stage, data)
+
+
+def test_snapshot_numeric_spelling_and_segment_direction_are_semantic(observer):
+    stage, data = observer
+    directory = stage/'force-observer'
+    path = directory/'pass_4.native-grid.tsv'; path.write_text(path.read_text().replace('.0', ''))
+    path = directory/'pass_4.boundary-native-grid.tsv'; path.write_text(path.read_text().replace('.0', ''))
+    path = directory/'pass_4.segments.txt'
+    path.write_text(path.read_text().replace('3600 3600 Metal1 10800 3600 Metal1','10800 3600 Metal1 3600 3600 Metal1'))
+    assert force.validate_observer(stage, data)['observer_equivalence_verified']

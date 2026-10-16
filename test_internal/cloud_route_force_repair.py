@@ -17,6 +17,13 @@ from audit_native_grid import audit, guide_coverage, number
 
 EXPECTED_GRID = '278fdd4a3e55eea60f586571bae98191e3a07623b2790aeb642e3a83d6c163ae'
 MARKER = 'WARP_FORCE_REPAIR_BEGIN'
+# Observer must reproduce the rejected capacity-corrected run38948702750.
+REFERENCE_REPAIR = {
+    'segments': '805a3f9af53c39e0ff179433ee9bfd98d8f91d179f3bb303d71248e259e8c90d',
+    'interior': '6a648ef741a2bb9071f5bcd33c4eccd9dd0be8fe813770ba903f611ecc7b1c03',
+    'boundary': '24a84793cd7507483da418601a676c21bb497c3c8ee8e321cf2f8ebbe16efc53',
+}
+SEEDS = {'cell_pad[31]', 'cell_val[30]'}
 # IHP CMOS5L tech LEF at 2bbec755dc67ca3db0261c3d6163e15735d66710:
 # sg13cmos5l_tech.lef SHA256 3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5.
 BOUNDARY_DIRECTIONS = {'Metal1': 'H', 'Metal2': 'V', 'Metal3': 'H', 'Metal4': 'V'}
@@ -150,7 +157,11 @@ close $warp_initial
     if repair:
         text += RESOLVE + 'puts "' + MARKER + '"\n'
         text += r'''
+file mkdir $::env(STEP_DIR)/force-observer
+if {[info exists ::env(WARP_FORCE_OBSERVER_DIR)]} {error "Unexpected inherited observer directory"}
+set ::env(WARP_FORCE_OBSERVER_DIR) $::env(STEP_DIR)/force-observer
 set warp_route_code [catch {log_cmd grt::force_reroute_pair {*}$warp_handles} warp_route_error warp_route_options]
+unset ::env(WARP_FORCE_OBSERVER_DIR)
 '''
     text += r'''
 set warp_observer [open $::env(STEP_DIR)/native-return.txt w]
@@ -253,6 +264,139 @@ def validate_stage(stage, repair):
             'physical_acceptance': False}
 
 
+def grid_resources(path):
+    """Strict semantic grid identity; numeric17 and17.0 are equivalent."""
+    audit(path)
+    rows = Path(path).read_text().splitlines()
+    axes = tuple(tuple(map(int, row.split('\t')[1].split())) for row in rows[1:3])
+    cells = {}
+    for row in rows[3:]:
+        _, layer, x, y, cap, usage = row.split('\t')
+        cells[layer, int(x), int(y)] = (number(cap), number(usage))
+    return axes, cells
+
+
+def boundary_resources(path):
+    audit_boundary_grid(path)
+    cells = {}
+    for row in Path(path).read_text().splitlines()[1:]:
+        _, layer, direction, x, y, cap, usage = row.split('\t')
+        cells[layer, direction, int(x), int(y)] = (number(cap), number(usage))
+    return cells
+
+
+def segment_map(path):
+    text = Path(path).read_text()
+    trace.parse_segments(text)
+    lines, index, result = text.splitlines(), 0, {}
+    while index < len(lines):
+        name = lines[index].replace('\\', '')
+        index += 2
+        route = []
+        while lines[index] != ')':
+            x, y, layer, xx, yy, other = lines[index].split()
+            route.append(tuple(sorted(((int(x), int(y), layer), (int(xx), int(yy), other)))))
+            index += 1
+        result[name] = tuple(sorted(route))
+        index += 1
+    return result
+
+
+def parse_observer_names(path, pass_index, previous, complete_names):
+    rows = Path(path).read_text().splitlines()
+    if not rows or not re.fullmatch(r'META\t[0-9]+\t[0-9]+\t[0-9]+', rows[0]):
+        raise ValueError('Malformed observer identity header')
+    actual_pass, count, added = map(int, rows[0].split('\t')[1:])
+    names, new_names, raw_names = set(), set(), []
+    for line in rows[1:]:
+        fields = line.split('\t')
+        if len(fields) != 3 or fields[0] != 'NET' or fields[2] not in ('0', '1') or not fields[1]:
+            raise ValueError('Malformed observer identity row')
+        raw, new = fields[1], fields[2] == '1'
+        name = raw.replace('\\', '')
+        if name in names or name not in complete_names or new != (name not in previous):
+            raise ValueError('Observer duplicate/unknown identity or new-name contradiction')
+        names.add(name); raw_names.append(raw)
+        if new:
+            new_names.add(name)
+    if (actual_pass != pass_index or count != len(names) or added != len(new_names) or
+            raw_names != sorted(raw_names) or not previous <= names or not SEEDS <= names):
+        raise ValueError('Observer identity count/order/pass/expansion contradiction')
+    if pass_index == 0 and names != SEEDS:
+        raise ValueError('Observer first pass is not the selected pair')
+    return names, new_names
+
+
+def validate_observer(stage, validated_stage):
+    """Interpret per-pass evidence only after exact failed132 route equivalence."""
+    stage = Path(stage)
+    expected_files = {'segments': 'native-segments.txt', 'interior': 'native-grid.tsv',
+                      'boundary': 'native-boundary-grid.tsv'}
+    if any(trace.cfg.sha(stage/name) != REFERENCE_REPAIR[key] for key, name in expected_files.items()):
+        raise ValueError('Observer changes measured132 final route/grid hashes')
+    normal_missing = {name.replace('\\', '') for name in validated_stage['guide_coverage']['missing_guides']}
+    if (validated_stage['native_tcl_returncode'] != 1 or 'GRT-0232' not in validated_stage['native_error'] or
+            validated_stage['final_observed_full_grid_overflow'] != 132 or
+            validated_stage['final_boundary_grid']['total_overflow'] != 0 or
+            validated_stage['guide_coverage']['required_net_count'] != 3691 or normal_missing != SEEDS):
+        raise ValueError('Observer no longer reproduces failed132 outcome/coverage')
+    expected_layers = {'Metal1': 15, 'Metal2': 52, 'Metal3': 24, 'Metal4': 41}
+    if {name: row['overflow'] for name, row in validated_stage['final_grid']['layers'].items()} != expected_layers:
+        raise ValueError('Observer final132 layer accounting differs')
+    directory = stage/'force-observer'
+    expected = {f'pass_{i}.{suffix}' for i in range(5)
+                for suffix in ('nets.tsv', 'native-grid.tsv', 'boundary-native-grid.tsv', 'segments.txt')}
+    if (not directory.is_dir() or any(p.is_symlink() or not p.is_file() for p in directory.iterdir()) or
+            {p.name for p in directory.iterdir()} != expected):
+        raise ValueError('Observer snapshot files are incomplete/extra/linked')
+    raw = (stage/'openroad-globalrouting.log').read_text()
+    witnesses = re.findall(r'^WARP_FORCE_OBSERVER pass=(\d+) nets=(\d+) added=(\d+) segment_bytes=(\d+) interior_grid=true boundary_preferred=true prefix=(.+)$', raw, re.M)
+    if [int(row[0]) for row in witnesses] != list(range(5)):
+        raise ValueError('Missing/repeated/out-of-order native observer witnesses')
+    complete = set(net_names(stage/'initial-segments.txt'))
+    before_axes, before_cells = grid_resources(stage/'initial-grid.tsv')
+    before_caps = {edge: value[0] for edge, value in before_cells.items()}
+    before_boundary = audit_boundary_grid(stage/'initial-boundary-grid.tsv')
+    previous, observations = set(), []
+    for index, witness in enumerate(witnesses):
+        paths = {kind: directory/f'pass_{index}.{suffix}' for kind, suffix in
+                 [('names', 'nets.tsv'), ('interior', 'native-grid.tsv'),
+                  ('boundary', 'boundary-native-grid.tsv'), ('segments', 'segments.txt')]}
+        names, added = parse_observer_names(paths['names'], index, previous, complete)
+        if (len(names) != int(witness[1]) or len(added) != int(witness[2]) or
+                paths['segments'].stat().st_size != int(witness[3]) or
+                not witness[4].endswith('/force-observer/pass_'+str(index))):
+            raise ValueError('Native observer witness contradicts retained snapshot bytes/identity')
+        # Parse all retained bytes, not merely native write/open success or names header count.
+        if set(net_names(paths['segments'])) != complete or len(complete) != 3659:
+            raise ValueError('Observer pass loses complete3659-net census')
+        interior = audit(paths['interior'])
+        boundary = audit_boundary_grid(paths['boundary'])
+        axes, cells = grid_resources(paths['interior'])
+        if (axes != before_axes or {edge: value[0] for edge, value in cells.items()} != before_caps or
+                boundary['capacities'] != before_boundary['capacities'] or
+                interior['dimensions'] != before_boundary['dimensions'] or
+                boundary['dimensions'] != before_boundary['dimensions']):
+            raise ValueError('Observer pass changes actual capacity arrays/grid geometry')
+        boundary.pop('capacities')
+        observations.append({'pass': index, 'actual_native_pass_net_count': len(names),
+            'newly_added_net_count': len(added), 'net_names': sorted(names), 'new_net_names': sorted(added),
+            'interior_grid': interior, 'preferred_boundary_grid': boundary,
+            'observed_full_grid_overflow': interior['total_overflow']+boundary['total_overflow'],
+            'files_sha256': {kind: trace.cfg.sha(path) for kind, path in paths.items()}})
+        previous = names
+    for kind, filename in expected_files.items():
+        snapshot = directory/('pass_4.'+{'segments': 'segments.txt', 'interior': 'native-grid.tsv',
+                                      'boundary': 'boundary-native-grid.tsv'}[kind])
+        parser = {'segments': segment_map, 'interior': grid_resources, 'boundary': boundary_resources}[kind]
+        if parser(snapshot) != parser(stage/filename):
+            raise ValueError('Last observer snapshot differs from final native export')
+    return {'reference_run': 38948702750, 'observer_equivalence_verified': True,
+            'final_observed_full_grid_overflow': 132, 'passes': observations,
+            'physical_acceptance': False, 'routing_improvement': False,
+            'scope': 'Identical rejected132 route; per-pass complete reporting-grid and merged-segment observation'}
+
+
 def docker_options(binary):
     path = Path(binary)
     if not re.fullmatch(r'/nix/store/[a-z0-9]{32}-[^/]+/bin/openroad', str(path)) or not path.is_file():
@@ -294,6 +438,8 @@ def main():
                        repair_observation=repair)
             stage, = (trace.OUT/'replay').glob('*-openroad-globalrouting')
             result['cases'][name] = validate_stage(stage, repair)
+            if repair:
+                result['cases'][name]['observer'] = validate_observer(stage, result['cases'][name])
             # The next case starts only after full custom-default identity passed.
         result['diagnostic_completed'] = True
     except Exception as exc:

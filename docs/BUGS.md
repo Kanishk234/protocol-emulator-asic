@@ -1,5 +1,11 @@
 # Bugs
 
+## 99: Architecture evidence setup executes a non-executable fetch script
+- **Date:**2026-10-15.
+- **Symptom/check:**38851943119 stops with permission denied for scripts/fetch_nextpnr.sh before any design compile; no measurement artifact exists.
+- **Root cause:** the tracked script has mode100644, but the new workflow invoked it directly.
+- **Fix/coverage:** invoke through bash, matching its interpreter. The workflow invocation regression checks direct script permissions and explicit bash invocations;30 focused tests pass. Repeat hosted execution before claiming compiler results.
+
 ## 98: Forced unchanged-net repair re-credits existing macro pin access
 - **Date:**2026-10-15.
 - **Symptom/check:**38849978485 passes custom-default exact121, then forced repair ends GRT0232/grid139 and203 encoded capacity increases despite identical physical census/geometry. Exact capacity guard correctly rejects the case.

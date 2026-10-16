@@ -1,6 +1,10 @@
 # Current G0/G1 compile evidence refresh
 
-Prepared collector and separate hosted workflow; **no measurement run yet**.
+Prepared collector and separate hosted workflow; **no completed measurement yet**.
+First hosted run `38851943119` stopped during tool setup: the tracked
+`scripts/fetch_nextpnr.sh` has mode `100644`, so direct execution failed with
+permission denied. The workflow now invokes it through `bash`; no compile
+result came from that failed setup run.
 Historical local tables in `g0_results.md` and `g1_results.md` remain historical.
 
 The new matrix explicitly selects UART, SPI controller, I2C controller and
@@ -25,7 +29,8 @@ The paired compiler measurement does not remeasure total chip area: historical
 matched outlines and clock targets remain separate evidence, and this refresh
 cannot establish a new equal-total-area architectural superiority claim.
 
-Local evidence validation: 29 tests pass, covering paired parameters,
+Local evidence validation: 30 tests pass, covering workflow script invocation,
+paired parameters,
 native capacity/placement rejection, unknown/routing/setup errors, stale success,
 actual synthesis parameter drift, CRC/image/native usage corruption and bounded
 process-group termination. No EDA was executed locally.

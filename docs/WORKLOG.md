@@ -2,8 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-18 — Prepare expanded protocol replay while native route runs
+
+- Route39149073496 is in progress: candidate/config preparation, artifact download and run-provenance steps passed; qualification/routing/extraction step active. No new extracted measurements available. Unit39149073297 also remains active at the status check.
+- Prepared manual l3-native-post-timing-antenna-routed-gl workflow and native_post_antenna_gl validator, bound to route39149073496/head5867ea0 and source screen39141162581. Requires successful route, exact pre/post-route gates, zero DRT DRC, independently reviewed final NL/full-recipe/step-config hashes, matching native physical recipe and fresh all-corner extracted electrical/timing/antenna evidence. Reuses unchanged expanded test_l3 suite, SRAM/PDK models and TT Icarus13; functional simulation only, no SDF claim.
+-55focused GL validation tests pass, including running/wrong-head/hash/config/DRC/hold/setup/electrical/antenna/missing-corner rejection and full nested route-path selection. YAML/shell syntax and whitespace checks pass. No replay dispatched: final routed bytes and extracted results must be reviewed first. No hardware/config/template changes or phase boxes ticked.
+- Next inspect route39149073496, independently review its output hashes and measurements, then dispatch this prepared full-suite protocol replay only if qualified; official hardware/config integration and GDS/LVS/precheck remain later gates.
+
 ## 2026-10-18 — Clean native screen qualifies; prepare exact detailed-route continuation
 
+- Published tools/tests2d07f00, CI407adee, evidence5867ea0; remote main verified5867ea0688b4443a44f7e2d5851245cdfe0f33dc. [Qualified native antenna route39149073496](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39149073496) confirmed queued on that head; no hardware commits in push. Launch receipt remains local until the next evidence commit.
 - Screen39141162581 succeeded in55minutes. Independently checked downloaded receipts/reports: setupWS0 and zero setup violations allcorners; fast/typ/slow hold81.9512/188.140/364.049ps; electrical0/0/0allcorners; antenna0nets/0pins; all0.45reserve checks pass. Final native antenna repair detects2violations, adds1jumper/1diode, ends0. No detailed route or official signoff claim.
 - Prepared separate native_post_antenna_route tools/workflow, source-bound to39141162581/head8dbebcc. Trusted config/hardware are generated before artifact download; independently reaudits original connectivity, matching ODB/netlist/readback and exact saved gates; freshly checks all screen gates before routing. Reuses existing connectivity/zero-DRC and strict extracted timing/electrical/antenna gates after routing. No repair or full GRT repeated.
 -73focused tests pass with the real pinned LibreLane installed temporarily; workflow shell/YAML and whitespace checks pass. Downloaded full261.5MBartifact and executed the actual new config/provenance/checkpoint validators successfully against a local mirror with only runner absolute-path prefixes remapped. Original artifact preserved. Automatic approval review timed out on an artifact-list read; permitted retry succeeded.

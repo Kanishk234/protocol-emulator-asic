@@ -21,6 +21,8 @@ Prepared `native_post_antenna_route.py` and the separate manual `gds-native-post
 
 This is a pre-DRT screen pass, not detailed-route, Magic DRC, LVS, precheck or official GDS evidence. The main hardware/template flow has not been promoted; Phase 2 remains incomplete.
 
+Detailed-route continuation [39149073496](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39149073496) is active on `5867ea0688b4443a44f7e2d5851245cdfe0f33dc`. A separate manual `l3-native-post-timing-antenna-routed-gl` workflow is prepared for its final netlist. It retains the expanded `test_l3` suite and pinned TT Icarus 13, requires independently reviewed SHA256 values for the netlist/full recipe/DRT step config, and independently checks route provenance, physical recipe, completed route DRC and all extracted timing/electrical/antenna evidence. It is intentionally not dispatched before the route completes and those bytes are reviewed. Its simulation provides functional evidence, not SDF timing or official signoff.
+
 ## Integration preparation
 
 Prepared `/tmp/tripwire-clean-inline-official-prep-20261015` from a fresh Git archive of `3393eea9a58c5cad9077cc360a8515d0e5ec8284` plus exactly `bs_event_late.patch`. It contains the real TT wrapper, generated 2/4 specification/fabric, U0 full, 12 slots per lane and the 512-word SRAM. Metadata names the actual resources rather than the frozen spike's stale 3/6 description.

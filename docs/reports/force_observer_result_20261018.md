@@ -15,3 +15,11 @@ The coordinator reran validate_stage for both actual downloaded cases and valida
 No observed pass improves121. In particular, the touched-only native counter24 does not establish a full-chip improvement. The final GRT0232 failure has no native final congestion table and lacks the two selected guides. No transient snapshot is promoted to a usable checkpoint.
 
 The next single-change experiment is D102: force-only restoration of positive-usage grid membership after incremental clearUsed, adapted from immutable upstream50d692be (see upstream_incremental_scope_20261016.md). This tests a source-supported omission affecting congestion discovery and native history updates; these measurements do not prove that it will close routing. Preserve default121 and same-binary legacy132 controls before enabling the candidate. Retain native return, full grid, capacities, geometry, census and final guide/table guards; physical acceptance remains false even if global routing succeeds.
+
+## Initial-owner coverage cross-check
+
+Read-only attribution on the exact initial121 segments/grid independently reproduces103 overflowing cells and439 distinct preferred-route owners. Intersecting that **initial** owner set with validated native pass inputs gives2/46/376/426/438 owners; missing counts437/393/63/13/1. Names are normalized through the strict observer parser, including native escaped brackets.
+
+The sole omitted initial owner at the final pass is `net1134`. Its route is byte-semantically unchanged, and its initial overflowing Metal2 edge at grid(1,65) remains overflowing in the final reporting grid. This is a concrete missed owner, rather than an inference from a partial scalar. It does not establish that routing this net alone resolves congestion: almost all initial owners already entered the expansion, and all measured passes remained worse than121. Later changed routes can introduce new owners/overloads; this analysis deliberately makes no later ownership claim from preferred-only initial attribution.
+
+The ignored reproducible summary is build/observer109_initial_owner_coverage.json. The D102 helper body was also compared directly with immutable upstream50d692be and matches exactly; the WARP opt-in scope and activation reporting are separate adaptations.

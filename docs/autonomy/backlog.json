@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-10-16",
+  "updated": "2026-10-18",
   "authority": "Planning index only; phase checklists and authenticated reports control acceptance.",
   "protected_controls": {
     "frozen_g1": [
@@ -89,9 +89,10 @@
         "38824245540: exact15/121 segments preserved; calibrated native grid agrees19/40/18/44; individual release cannot connect portals; southern-pair static release can",
         "38827410988 at647a536: exact full121; southern singleton/pair native0, endpoints unchanged;6 capacity decreases off selected routes, explicit confound retained",
         "38948702750 atf433609: exactdefault121; boundedforce endsGRT0232/observedfullgrid132(15/52/24/41), all69064interior+550boundarycapacities and geometry/censusunchanged; no postrepair finaltable, two selectedguidesmissing; rejectversus121",
-        "D101 observerpatch72257372...; build38950370119 and dependentqualification38950416231 atcb54249 active; exactrejected132 identity required before perpass interpretation"
+        "38950416231 atcb54249: observer exact132 equivalence independently passes; full-grid125/123/139/140/132, actualnetcounts2/53/489/637/678; no pass improves121",
+        "D102 at a81eac9: build39143345968 and dependentqualification39143364213 active; force-only used-grid restoration after exact same-binary121/default and132/legacy controls"
       ],
-      "next_action": "Inspect actual38950370119/38950416231. Authenticate build/native regression/exact121 and exact132 final equivalence before interpreting all five whole-grid snapshots and persistent actual net memberships. If any observer identity changes, reject observation. Preserve best15/121, original50/133 and rejected132 separately.",
+      "next_action": "Inspect39143345968/39143364213 through actual results. Reject if default121 or legacy132 controls differ. Candidate requires actual native activation and unchanged geometry/capacities/census, final native table and guides for success. No routing or physical win inferred from launch; retain original133/best121/rejected132.",
       "acceptance": [
         "Immutable interface/connectivity/row power guards pass.",
         "All original3-corner guards pass including0.1ns hold.",
@@ -202,7 +203,8 @@
       "status": "in_progress",
       "hypothesis": "Complete auditable evidence is a competition deliverable even while compact routing stays experimental.",
       "evidence": [
-        "docs/design/phases/PHASE5_EVIDENCE_DOCS.md"
+        "docs/design/phases/PHASE5_EVIDENCE_DOCS.md",
+        "2026-10-18: latest6e59ead lint/docs/unit/test/fabric allSUCCESS; source trees for formal and gds declared hardware inputs unchanged from successful earlier runs; current formal39143521760 and unit39143345967 SUCCESS; templateFPGA39143524179 reproduces known missing-macro limitation, already excluded by D020. Full CI exit remains open."
       ],
       "next_action": "Evidence content and plain-language summary now pass independently reviewed file gates. Inspect actual CI run/source applicability and pending observerbuild38950370119/qualification38950416231 before considering all-CI exit. Do not claim compact route or timing acceptance.",
       "acceptance": [

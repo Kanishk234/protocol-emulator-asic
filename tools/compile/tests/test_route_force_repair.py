@@ -464,3 +464,47 @@ def test_native_activation_witness_is_required_only_for_candidate(tmp_path,name,
     else:
         with pytest.raises(ValueError):
             force.validate_rebuild_witness(tmp_path,name)
+
+
+@pytest.mark.parametrize('failed_control,expected_cases', [
+    ('default_identity', ['default_identity']),
+    ('legacy_observer', ['default_identity', 'forced_pair']),
+    (None, ['default_identity', 'forced_pair', 'rebuilt_pair']),
+])
+def test_candidate_cannot_run_before_both_controls_pass(tmp_path,monkeypatch,failed_control,expected_cases):
+    (tmp_path/'build').mkdir()
+    monkeypatch.setattr(force.trace, 'ROOT', tmp_path)
+    monkeypatch.setattr(force.trace, 'OUT', tmp_path/'unused')
+    monkeypatch.setenv('WARP_FORCE_OPENROAD', '/unused/bin/openroad')
+    monkeypatch.setattr(force, 'docker_options', lambda _: ())
+    monkeypatch.setattr(force.trace.cfg, 'sha', lambda _: '0'*64)
+    monkeypatch.setattr(force.subprocess, 'run', lambda *a, **kw: None)
+    called = []
+    def replay(*args, **kwargs):
+        name = force.trace.OUT.name
+        called.append(name)
+        stage = force.trace.OUT/'replay'/'1-openroad-globalrouting'
+        stage.mkdir(parents=True)
+        (stage/'openroad-globalrouting.log').write_text(
+            'WARP_FORCE_REBUILD_USED_GRIDS\n' if name == 'rebuilt_pair' else '')
+    monkeypatch.setattr(force.trace, 'main', replay)
+    def stage_validator(stage, repair):
+        if stage.parent.parent.name == failed_control:
+            raise ValueError('Injected failed default identity')
+        return {}
+    def observer_validator(*args):
+        if failed_control == 'legacy_observer':
+            raise ValueError('Injected failed legacy route identity')
+        return {'observer_equivalence_verified': True}
+    monkeypatch.setattr(force, 'validate_stage', stage_validator)
+    monkeypatch.setattr(force, 'validate_observer', observer_validator)
+    if failed_control:
+        with pytest.raises(ValueError, match='Injected failed'):
+            force.main()
+    else:
+        force.main()
+    assert called == expected_cases
+    import json
+    result = json.loads((tmp_path/'build/route_force_repair/result.json').read_text())
+    assert result['diagnostic_completed'] is (failed_control is None)
+    assert result['physical_acceptance'] is False

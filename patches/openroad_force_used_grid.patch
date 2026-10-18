@@ -1,0 +1,109 @@
+--- a/src/grt/src/GlobalRouter.cpp
++++ b/src/grt/src/GlobalRouter.cpp
+@@ -5687,6 +5687,11 @@
+       throw std::runtime_error("Invalid/duplicate force-reroute signal net");
+     }
+   }
++  const char* rebuild_option = std::getenv("WARP_FORCE_REBUILD_USED_GRIDS");
++  if (rebuild_option != nullptr && std::strcmp(rebuild_option, "1") != 0) {
++    throw std::runtime_error("WARP_FORCE_REBUILD_USED_GRIDS must be unset or exactly1");
++  }
++  const bool old_rebuild_used_grids = fastroute_->forceRebuildUsedGridsEnabled();
+   const bool old_incremental = is_incremental_;
+   const float old_critical = fastroute_->getCriticalNetsPercentage();
+   auto cleanup = [&]() {
+@@ -5696,6 +5701,7 @@
+       grouter_cbk_ = nullptr;
+     }
+     fastroute_->setIncrementalGrt(false);
++    fastroute_->setForceRebuildUsedGrids(old_rebuild_used_grids);
+     fastroute_->setCriticalNetsPercentage(old_critical);
+     fastroute_->setCongestionReportIterStep(congestion_report_iter_step_);
+     forced_reroute_nets_.clear();
+@@ -5705,6 +5711,7 @@
+   force_reroute_mode_ = true;
+   forced_reroute_nets_ = selected;
+   try {
++    fastroute_->setForceRebuildUsedGrids(rebuild_option != nullptr);
+     startIncremental();
+     for (odb::dbNet* db_net : selected) {
+       addDirtyNet(db_net);
+--- a/src/grt/src/fastroute/include/FastRoute.h
++++ b/src/grt/src/fastroute/include/FastRoute.h
+@@ -277,6 +277,15 @@
+   void getPlanarRoute(odb::dbNet* db_net, GRoute& route);
+   void get3DRoute(odb::dbNet* db_net, GRoute& route);
+   void setIncrementalGrt(bool is_incremental);
++  // WARP controlled experiment: enabled only by explicit forced repair.
++  void setForceRebuildUsedGrids(bool enabled)
++  {
++    force_rebuild_used_grids_ = enabled;
++  }
++  bool forceRebuildUsedGridsEnabled() const
++  {
++    return force_rebuild_used_grids_;
++  }
+ 
+  private:
+   int getEdgeCapacity(FrNet* net, int x1, int y1, EdgeDirection direction);
+@@ -631,6 +640,7 @@
+   bool enable_resistance_aware_ = false;
+   bool is_3d_step_ = false;
+   bool is_incremental_grt_ = false;
++  bool force_rebuild_used_grids_{false};
+   float worst_slack_;
+   float worst_net_resistance_;
+   int worst_net_length_;
+--- a/src/grt/src/fastroute/src/FastRoute.cpp
++++ b/src/grt/src/fastroute/src/FastRoute.cpp
+@@ -1333,6 +1333,12 @@
+   }
+ 
+   graph2d_.clearUsed();
++  // Force-only adaptation of upstream 50d692bea57e0840f2bd738223ea8700fbcb5362.
++  // Restore committed positive-usage membership; never change capacities/usage.
++  if (force_rebuild_used_grids_ && is_incremental_grt_) {
++    graph2d_.rebuildUsedGrids();
++    logger_->report("WARP_FORCE_REBUILD_USED_GRIDS");
++  }
+   preProcessTechLayers();
+ 
+   int tUsage;
+--- a/src/grt/src/fastroute/include/Graph2D.h
++++ b/src/grt/src/fastroute/include/Graph2D.h
+@@ -57,6 +57,7 @@
+   void InitLastUsage(int upType);
+   void clear();
+   void clearUsed();
++  void rebuildUsedGrids();
+   bool hasEdges() const;
+ 
+   uint16_t getUsageH(int x, int y) const;
+--- a/src/grt/src/fastroute/src/graph2d.cpp
++++ b/src/grt/src/fastroute/src/graph2d.cpp
+@@ -86,6 +86,25 @@
+ {
+   v_used_ggrid_.clear();
+   h_used_ggrid_.clear();
++}
++
++// From OpenROAD 50d692bea57e0840f2bd738223ea8700fbcb5362 (BSD-3-Clause).
++void Graph2D::rebuildUsedGrids()
++{
++  for (int x = 0; x < x_grid_ - 1; x++) {
++    for (int y = 0; y < y_grid_; y++) {
++      if (h_edges_[x][y].usage > 0) {
++        h_used_ggrid_.insert({x, y});
++      }
++    }
++  }
++  for (int x = 0; x < x_grid_; x++) {
++    for (int y = 0; y < y_grid_ - 1; y++) {
++      if (v_edges_[x][y].usage > 0) {
++        v_used_ggrid_.insert({x, y});
++      }
++    }
++  }
+ }
+ 
+ // Clears the NDR lists

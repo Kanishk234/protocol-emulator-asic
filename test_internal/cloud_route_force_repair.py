@@ -132,10 +132,11 @@ close $warp_guides_file
 '''
 
 
-def force_trace(repair):
-    if not isinstance(repair, bool):
+def force_trace(repair, rebuild=False):
+    if not isinstance(repair, bool) or not isinstance(rebuild, bool) or (rebuild and not repair):
         raise ValueError('Repair selection must be boolean')
     text = trace.cfg.CENSUS + r'''
+if {[info exists ::env(WARP_FORCE_REBUILD_USED_GRIDS)]} {error "Unexpected inherited used-grid experiment"}
 set warp_route_code [catch {log_cmd global_route {*}$arg_list} warp_route_error warp_route_options]
 if {$warp_route_code == 0 || ![string match {*GRT-0116*} $warp_route_error]} {
     error "Custom tool initial route did not reproduce failed control"
@@ -160,9 +161,11 @@ close $warp_initial
 file mkdir $::env(STEP_DIR)/force-observer
 if {[info exists ::env(WARP_FORCE_OBSERVER_DIR)]} {error "Unexpected inherited observer directory"}
 set ::env(WARP_FORCE_OBSERVER_DIR) $::env(STEP_DIR)/force-observer
+@REBUILD_BEGIN@
 set warp_route_code [catch {log_cmd grt::force_reroute_pair {*}$warp_handles} warp_route_error warp_route_options]
 unset ::env(WARP_FORCE_OBSERVER_DIR)
-'''
+@REBUILD_END@
+'''.replace('@REBUILD_BEGIN@', 'set ::env(WARP_FORCE_REBUILD_USED_GRIDS) 1' if rebuild else '').replace('@REBUILD_END@', 'unset ::env(WARP_FORCE_REBUILD_USED_GRIDS)' if rebuild else '')
     text += r'''
 set warp_observer [open $::env(STEP_DIR)/native-return.txt w]
 puts $warp_observer $warp_route_code
@@ -416,6 +419,16 @@ def docker_options(binary):
     return tuple(options)
 
 
+def validate_rebuild_witness(stage, name):
+    if name not in ('default_identity', 'forced_pair', 'rebuilt_pair'):
+        raise ValueError('Unknown used-grid case')
+    raw = (Path(stage)/'openroad-globalrouting.log').read_text()
+    count = len(re.findall(r'^WARP_FORCE_REBUILD_USED_GRIDS$', raw, re.M))
+    if (name == 'rebuilt_pair' and not 1 <= count <= 5) or (name != 'rebuilt_pair' and count):
+        raise ValueError('Used-grid activation witness contradicts selected case')
+    return count
+
+
 def main():
     binary = os.environ['WARP_FORCE_OPENROAD']
     options = docker_options(binary)
@@ -424,6 +437,7 @@ def main():
     result = {'diagnostic_completed': False, 'physical_acceptance': False, 'cases': {},
               'custom_binary': binary, 'custom_binary_sha256': trace.cfg.sha(Path(binary)),
               'patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_force_reroute.patch'),
+              'used_grid_patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_force_used_grid.patch'),
               'source_revision': os.environ.get('GITHUB_SHA'), 'workflow_run': os.environ.get('GITHUB_RUN_ID'),
               'workflow_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
     try:
@@ -431,15 +445,16 @@ def main():
                    '-c', 'import librelane,os,subprocess,sys; print(sys.version); subprocess.run([os.environ["_LLN_OVERRIDE_OPENROAD"],"-version"],check=True)']
         with (output/'runtime-smoke.log').open('w') as log:
             subprocess.run(command, check=True, stdout=log, stderr=subprocess.STDOUT, timeout=60)
-        for name, repair in [('default_identity', False), ('forced_pair', True)]:
+        for name, repair in [('default_identity', False), ('forced_pair', True), ('rebuilt_pair', True)]:
             trace.OUT = output/name
             trace.main(15, worker=__file__, docker_args=options,
                        native_error_codes=('GRT-0116', 'GRT-0232') if repair else ('GRT-0116',),
                        repair_observation=repair)
             stage, = (trace.OUT/'replay').glob('*-openroad-globalrouting')
             result['cases'][name] = validate_stage(stage, repair)
-            if repair:
+            if name == 'forced_pair':
                 result['cases'][name]['observer'] = validate_observer(stage, result['cases'][name])
+            result['cases'][name]['used_grid_rebuild_calls'] = validate_rebuild_witness(stage, name)
             # The next case starts only after full custom-default identity passed.
         result['diagnostic_completed'] = True
     except Exception as exc:
@@ -447,7 +462,7 @@ def main():
         # A rejected invariant must not hide the actual native failure evidence.
         # These observations remain explicitly unqualified, never a passed case.
         observations = {}
-        for name in ('default_identity', 'forced_pair'):
+        for name in ('default_identity', 'forced_pair', 'rebuilt_pair'):
             stages = list((output/name/'replay').glob('*-openroad-globalrouting'))
             if len(stages) != 1:
                 continue
@@ -468,9 +483,9 @@ def main():
 if __name__ == '__main__':
     if len(sys.argv) == 5 and sys.argv[1] == '--inside':
         case = Path(sys.argv[2]).parent.name
-        if case not in ('default_identity', 'forced_pair'):
+        if case not in ('default_identity', 'forced_pair', 'rebuilt_pair'):
             raise ValueError('Unknown force repair stage')
-        trace.TRACE = force_trace(case == 'forced_pair')
+        trace.TRACE = force_trace(case != 'default_identity', rebuild=case == 'rebuilt_pair')
         trace.reports.instrument = trace.instrument
         trace.reports.inside(*(Path(p) for p in sys.argv[2:]))
     elif len(sys.argv) == 1:

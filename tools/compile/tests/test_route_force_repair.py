@@ -431,3 +431,36 @@ def test_snapshot_numeric_spelling_and_segment_direction_are_semantic(observer):
     path = directory/'pass_4.segments.txt'
     path.write_text(path.read_text().replace('3600 3600 Metal1 10800 3600 Metal1','10800 3600 Metal1 3600 3600 Metal1'))
     assert force.validate_observer(stage, data)['observer_equivalence_verified']
+
+
+def test_used_grid_candidate_is_scoped_between_same_process_controls():
+    text = force.force_trace(True, rebuild=True)
+    call = text.index('log_cmd grt::force_reroute_pair')
+    assert text.index(force.EXPECTED_GRID) < text.index('set ::env(WARP_FORCE_REBUILD_USED_GRIDS) 1') < call
+    assert call < text.index('unset ::env(WARP_FORCE_REBUILD_USED_GRIDS)')
+    assert 'set ::env(WARP_FORCE_REBUILD_USED_GRIDS) 1' not in force.force_trace(True)
+    assert 'set ::env(WARP_FORCE_REBUILD_USED_GRIDS) 1' not in force.force_trace(False)
+    for repair, rebuild in [(False, True), (True, 1), (True, '1')]:
+        with pytest.raises(ValueError):
+            force.force_trace(repair, rebuild)
+
+
+def test_every_case_rejects_inherited_candidate_setting():
+    for repair, rebuild in [(False, False), (True, False), (True, True)]:
+        text = force.force_trace(repair, rebuild)
+        assert text.index('Unexpected inherited used-grid experiment') < text.index('log_cmd global_route')
+
+
+@pytest.mark.parametrize('name,count,valid', [
+    ('default_identity',0,True), ('default_identity',1,False),
+    ('forced_pair',0,True), ('forced_pair',1,False),
+    ('rebuilt_pair',0,False), ('rebuilt_pair',1,True),
+    ('rebuilt_pair',5,True), ('rebuilt_pair',6,False), ('unknown',1,False),
+])
+def test_native_activation_witness_is_required_only_for_candidate(tmp_path,name,count,valid):
+    (tmp_path/'openroad-globalrouting.log').write_text('WARP_FORCE_REBUILD_USED_GRIDS\n'*count)
+    if valid:
+        assert force.validate_rebuild_witness(tmp_path,name) == count
+    else:
+        with pytest.raises(ValueError):
+            force.validate_rebuild_witness(tmp_path,name)

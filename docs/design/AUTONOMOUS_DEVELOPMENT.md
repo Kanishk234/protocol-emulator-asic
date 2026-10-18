@@ -212,3 +212,31 @@ session starts with this prompt, adapting its authorization to that session:
 > Do not repeat rejected hypotheses or promote incomplete physical/timing
 > evidence. Record exact provenance and end with a WORKLOG handoff. Apply only
 > the Git authorization actually provided in this session.
+
+
+## Recheck downloaded native repair evidence
+
+`autonomy.repair_evidence` reuses the hosted grid/geometry/census/native-table/
+guide validators, strict121/default and132/legacy observer controls, and exact
+Git-object patch identities. It does not execute EDA, change hardware, dispatch,
+or promote a route. Fetch the identity separately from the GitHub API; a local
+JSON file is caller-supplied metadata, not independent proof of its own origin.
+
+```sh
+gh api repos/Kanishk234/protocol-emulator-asic/actions/runs/38950416231 \
+  --jq '{id,head_sha,head_branch,name,status,conclusion,run_attempt}' \
+  > build/observer109_result/run-identity.json
+source .venv/bin/activate
+PYTHONPATH=tools python -m autonomy.repair_evidence \
+  build/observer109_result/controlled-native-pair-repair-38950416231/route_force_repair \
+  --identity build/observer109_result/run-identity.json \
+  --revision cb542492775ba0ee3b5a68e38e923956c09708dd \
+  --run-id 38950416231 --attempt 1
+```
+
+Use `--candidate` only for a three-case D102 artifact; the auditor rejects an
+old two-case observer as candidate evidence. Candidate native activation must
+be witnessed, both legacy controls must revalidate, and retained result fields
+must agree with freshly parsed native files. Physical acceptance always stays
+false. Fetch the actual selected run's artifacts and API identity before
+substituting its explicit run/attempt/full revision. No newest-run guessing.

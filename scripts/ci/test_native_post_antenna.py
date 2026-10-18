@@ -76,7 +76,8 @@ def test_bad_readback_rejected(tmp_path, bad):
 
 
 @pytest.mark.parametrize('antenna_count', [0, 2])
-def test_main_uses_fresh_postrepair_evidence_and_keeps_antenna_gate(tmp_path, monkeypatch, antenna_count):
+@pytest.mark.parametrize('custom_audit', [False, True])
+def test_main_uses_fresh_postrepair_evidence_and_keeps_antenna_gate(tmp_path, monkeypatch, antenna_count, custom_audit):
     monkeypatch.chdir(tmp_path); monkeypatch.setenv('PDK_ROOT', '/pdk')
     before, repaired, _ = fixture_states(tmp_path)
     root = Path('runs/native-stock-screen'); root.mkdir(parents=True)
@@ -89,7 +90,7 @@ def test_main_uses_fresh_postrepair_evidence_and_keeps_antenna_gate(tmp_path, mo
     monkeypatch.setattr(runner, 'check_post_antenna_command', lambda config, source: None)
     def stock(**kw):
         assert kw['stop_step'] == 'OpenROAD.RepairAntennas-1'
-        assert kw['extra_tcl'].name == 'native_post_antenna_audit.tcl'
+        assert kw['extra_tcl'].name == ('native_timing_headroom_audit.tcl' if custom_audit else 'native_post_antenna_audit.tcl')
         output = root/'timing'
         output.mkdir()
         rows = {}
@@ -113,10 +114,11 @@ def test_main_uses_fresh_postrepair_evidence_and_keeps_antenna_gate(tmp_path, mo
         assert len(paths) == 3 and all('/timing/after-' in str(p) for p in paths)
         return {'estimated_margin_pass': True}
     monkeypatch.setattr(runner, 'measure', margin)
+    options = {'audit_tcl': Path('native_timing_headroom_audit.tcl')} if custom_audit else {}
     if antenna_count:
-        with pytest.raises(ValueError): runner.main(final_antenna_repair=True)
+        with pytest.raises(ValueError): runner.main(final_antenna_repair=True, **options)
     else:
-        runner.main(final_antenna_repair=True)
+        runner.main(final_antenna_repair=True, **options)
     gate = json.loads((root/'gates.json').read_text())
     assert gate['qualified'] is (antenna_count == 0)
     assert gate['stock_sequence'] is False and gate['final_native_antenna_repair'] is True

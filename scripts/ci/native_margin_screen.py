@@ -81,11 +81,11 @@ def audit_post_antenna(before_state, repaired_state, timing_root):
     return path
 
 
-def main(config_transform=configure, final_antenna_repair=False):
+def main(config_transform=configure, final_antenna_repair=False, audit_tcl=None):
     extra = {'stop_step': 'OpenROAD.RepairAntennas-1'} if final_antenna_repair else {}
     probe = 'native_post_antenna_audit.tcl' if final_antenna_repair else 'electrical_margin_probe.tcl'
     stock_screen(config_transform=config_transform,
-                 extra_tcl=Path('workflow-src/scripts/ci')/probe, **extra)
+                 extra_tcl=Path(audit_tcl) if audit_tcl is not None else Path('workflow-src/scripts/ci')/probe, **extra)
     root = Path('runs/native-stock-screen')
     before_antenna = checkpoint(root/'flow')
     source = checkpoint(root/'flow', final_antenna=True) if final_antenna_repair else before_antenna

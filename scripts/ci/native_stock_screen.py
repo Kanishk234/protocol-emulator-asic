@@ -41,10 +41,11 @@ def configure(original, strategy, sdc, design_repair=False, hold_target=0.125, c
     return config
 
 
-def checkpoint(root):
+def checkpoint(root, final_antenna=False):
     if list(root.glob('*-openroad-detailedrouting')):
         raise ValueError('Unexpected detailed routing')
-    stages = list(root.glob('*-openroad-resizertimingpostgrt/state_out.json'))
+    name = 'openroad-repairantennas-1' if final_antenna else 'openroad-resizertimingpostgrt'
+    stages = list(root.glob(f'*-{name}/state_out.json'))
     if len(stages) != 1:
         raise ValueError('Exactly one stock post-GRT repair checkpoint required')
     state = json.loads(stages[0].read_text())
@@ -54,7 +55,7 @@ def checkpoint(root):
     return stages[0]
 
 
-def main(config_transform=None, extra_tcl=None):
+def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimingPostGRT'):
     if os.environ['VARIANT'] != 'bs-event-late':
         raise ValueError('Unreviewed source variant')
     original = json.loads(Path('src/config_merged.json').read_text())
@@ -71,6 +72,12 @@ def main(config_transform=None, extra_tcl=None):
                        clock_cluster=8 if cluster == '8' else None)
     if config_transform is not None:
         config = config_transform(config)
+    if stop_step not in ('OpenROAD.ResizerTimingPostGRT', 'OpenROAD.RepairAntennas-1'):
+        raise ValueError('Unreviewed native screen stop step')
+    final_antenna = stop_step == 'OpenROAD.RepairAntennas-1'
+    if final_antenna and config['meta'].get('substituting_steps') != {
+            '+OpenROAD.ResizerTimingPostGRT': 'OpenROAD.RepairAntennas'}:
+        raise ValueError('Missing reviewed post-timing antenna insertion')
     path = Path('src/config_native_stock.json')
     path.write_text(json.dumps(config, indent=2) + '\n')
     root = Path('runs/native-stock-screen')
@@ -80,8 +87,8 @@ def main(config_transform=None, extra_tcl=None):
     subprocess.run([sys.executable, '-m', 'librelane', '--pdk-root', os.environ['PDK_ROOT'],
                     '--docker-no-tty', '--dockerized', '--pdk', 'ihp-sg13cmos5l',
                     '--manual-pdk', '--run-tag', 'native-stock', '--force-run-dir', str(flow),
-                    '--hide-progress-bar', '--to', 'OpenROAD.ResizerTimingPostGRT', str(path)], check=True)
-    source = checkpoint(flow)
+                    '--hide-progress-bar', '--to', stop_step, str(path)], check=True)
+    source = checkpoint(flow, final_antenna=final_antenna)
     # STA-only rereads of this exact checkpoint; do not invoke another repair.
     extra = {'extra_tcl': extra_tcl} if extra_tcl is not None else {}
     screen(path, source, root / 'timing', os.environ['PDK_ROOT'], repaired=source, sdc=sdc, **extra)
@@ -89,7 +96,7 @@ def main(config_transform=None, extra_tcl=None):
         'source_variant': 'bs-event-late', 'synthesis_strategy': config['SYNTH_STRATEGY'],
         'repair_corners': list(CORNERS),
         'hold_target_ns': config['GRT_RESIZER_HOLD_SLACK_MARGIN'],
-        'stock_sequence': True, 'checkpoint_ecos': False,
+        'stock_sequence': not final_antenna, 'checkpoint_ecos': False,
         'post_grt_design_repair': config.get('RUN_POST_GRT_DESIGN_REPAIR', False),
         'extracted': False, 'official_signoff': False,
     }

@@ -2,8 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-18 — Clean native screen qualifies; prepare exact detailed-route continuation
+
+- Screen39141162581 succeeded in55minutes. Independently checked downloaded receipts/reports: setupWS0 and zero setup violations allcorners; fast/typ/slow hold81.9512/188.140/364.049ps; electrical0/0/0allcorners; antenna0nets/0pins; all0.45reserve checks pass. Final native antenna repair detects2violations, adds1jumper/1diode, ends0. No detailed route or official signoff claim.
+- Prepared separate native_post_antenna_route tools/workflow, source-bound to39141162581/head8dbebcc. Trusted config/hardware are generated before artifact download; independently reaudits original connectivity, matching ODB/netlist/readback and exact saved gates; freshly checks all screen gates before routing. Reuses existing connectivity/zero-DRC and strict extracted timing/electrical/antenna gates after routing. No repair or full GRT repeated.
+-73focused tests pass with the real pinned LibreLane installed temporarily; workflow shell/YAML and whitespace checks pass. Downloaded full261.5MBartifact and executed the actual new config/provenance/checkpoint validators successfully against a local mirror with only runner absolute-path prefixes remapped. Original artifact preserved. Automatic approval review timed out on an artifact-list read; permitted retry succeeded.
+- Next publish tools/tests, CI and evidence separately within the user's command approval, launch the qualified detailed route, then assess extracted measurements before protocol replay and official integration. No phase boxes ticked; main hardware/config/template untouched.
+
 ## 2026-10-18 — Fix pinned LibreLane preflight import
 
+- Published test b4b50b7, CI e70c233, docs 8dbebcc; verified remote main8dbebcc76aea4f2c47875a521e24c1eacf951bb6. Replacement [39141162581](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39141162581) confirmed queued on that exact head.
 - Run39140902494 failed before synthesis: Classic is not exported by librelane.flows in pinned3.1.0.dev3. Corrected import to librelane.flows.classic; BUG121 records the failure and coverage. This run provides no new timing or physical measurements.
 - Installed the exact pinned wheel and dependencies into an isolated /tmp directory using the project venv. Executed the workflow's actual preflight Python successfully: ResizerTimingPostGRT → RepairAntennas-1 → STAMidPNR-3, before DetailedRouting. Added optional installed-library integration coverage; all90focused tests pass with the real library, no skips. Acceptance gates and physical recipe unchanged.
 - Next publish the corrective tools/CI/docs groups under the user's explicit command approval, relaunch, and verify startup before awaiting measured gates. No phase boxes ticked.

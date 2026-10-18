@@ -2,6 +2,25 @@
 
 The measured baseline is route/extraction [38784492656](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38784492656), followed by exact-netlist protocol regression [38796998628](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38796998628): **22 passed, no failures, errors or skips**. These runs establish the checkpoint's measured timing, electrical and exercised functional behavior. They do not establish clean-build reproduction or official GDS/LVS/precheck.
 
+## Clean native screen passes; detailed route is next
+
+[Native post-timing antenna screen 39141162581](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39141162581) passed on `8dbebcc76aea4f2c47875a521e24c1eacf951bb6` in about 55 minutes. Independently downloaded gate/recipe/timing evidence confirms clean synthesis, the unchanged 2/4 candidate and 20 ns constraints, stock image, and the declared extra native antenna pass after final timing. No checkpoint ECOs were applied.
+
+| Measured screen check | Result |
+| --- | --- |
+| Setup worst slack, fast / typical / slow | 0 / 0 / 0 ns; zero setup violations |
+| Hold worst slack, fast / typical / slow | +0.0819512 / +0.188140 / +0.364049 ns |
+| Slew / fanout / capacitance violations, all corners | 0 / 0 / 0 |
+| Antenna violating nets / pins | 0 / 0 |
+| Maximum estimated slew utilization, slow | 0.415238893, below 0.45 guard |
+| Maximum estimated capacitance utilization, all corners | 0.361833333, below 0.45 guard |
+
+The final native antenna log sees two violations, inserts one jumper on one net and one diode, then reports zero. Fresh ODB exports preserve original connectivity and agree across all three corner reads. This fixes the measured ordering issue without consuming the previously measured setup/hold/electrical gates. Setup WS is reported as zero, not demonstrated positive global setup margin.
+
+Prepared `native_post_antenna_route.py` and the separate manual `gds-native-post-timing-antenna-route` workflow. The continuation binds run ID/head/branch/path, generates trusted full config/hardware fingerprints before downloading the artifact, independently audits the saved final ODB/netlist correspondence and all saved screen evidence, then remeasures the strict timing/electrical/antenna/reserve gates. Only a full fresh pass permits DRT. Shared route qualification requires connectivity conservation, zero completed-route DRC, extracted all-corner setup/hold, fast hold at least 50 ps, zero electrical and zero antenna violations. It repeats no repair or full global routing.
+
+This is a pre-DRT screen pass, not detailed-route, Magic DRC, LVS, precheck or official GDS evidence. The main hardware/template flow has not been promoted; Phase 2 remains incomplete.
+
 ## Integration preparation
 
 Prepared `/tmp/tripwire-clean-inline-official-prep-20261015` from a fresh Git archive of `3393eea9a58c5cad9077cc360a8515d0e5ec8284` plus exactly `bs_event_late.patch`. It contains the real TT wrapper, generated 2/4 specification/fabric, U0 full, 12 slots per lane and the 512-word SRAM. Metadata names the actual resources rather than the frozen spike's stale 3/6 description.

@@ -123,7 +123,7 @@ jobs:
           python - <<'PY'
           import sys
           sys.path.insert(0, 'workflow-src/scripts/ci')
-          from librelane.flows import Classic
+          from librelane.flows.classic import Classic
           from native_post_antenna_screen import SUBSTITUTIONS
           ids = [step.id for step in Classic.Substitute(SUBSTITUTIONS).Steps]
           final = ids.index('OpenROAD.RepairAntennas-1')

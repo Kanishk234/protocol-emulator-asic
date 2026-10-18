@@ -1099,6 +1099,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Scope: one generated setting `GRT_ANTENNA_REPAIR_MARGIN=50`, passed by pinned stock script to `repair_antennas`. Preserve Classic ordering, complete2/4 source, CTS100/wire100,20ns/allcorners,55% electrical margins and50ps measured minimum. Final antenna0/0 remains required; this is a repair target, not relaxed antenna acceptance.
 - Cost: extra diode loads/routing may affect area, fanout, slew, setup/hold and reserve. Require all final strict gates before DRT.80focused tests/workflow checks pass. Main hardware/config/template unchanged; no official adoption or physical improvement claim yet.
 
+## D-086 (2026-10-18; isolated declarative-flow diagnostic): antenna repair after final timing
+- General need: antenna50trial38952217127 leaves the same two failures and identical timing; earlier native repair finds0but final timing reroute leaves2. Fix ordering using a supported native configuration mechanism, not further arbitrary margin tuning or net-specific RTL.
+- Add metadata substitution `+OpenROAD.ResizerTimingPostGRT → OpenROAD.RepairAntennas`, inheriting Classic and its gating controls. Stop screening at duplicate-normalized `OpenROAD.RepairAntennas-1`, before DRT. All source/CTS100/wire100/antenna50/electrical55 settings and20ns/allcorner/50ps acceptance remain.
+- Fresh ODB STA and read-only NL/PNL exports must conserve existing connections and permit only diode additions; discard inherited parasitics and recheck every gate. Native final repair must disallow congestion. Recipe explicitly distinguishes this inserted-step sequence from stock Classic ordering.
+- Cost: diode loads/routing can affect prior timing/electrical/reserve results.89focused tests and CI insertion-ID verification prepared; physical improvement unproven. Main hardware/config/template jobs unchanged. Official adoption requires review of native flow metadata/configuration-policy exception and TT merge behavior after measurement; this preparation does not approve or claim official signoff.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-18 — Recheck workflow status and validate publication package
+
+- GitHub main status: no in-progress runs. Two October 7 runs remain queued with no jobs assigned: 37655518919 (l3-placement-routed-gl), 37655518925 (gds-placement-extracted-timing). Latest antenna50 screen 38952217127 failed; subsequent nightly runs 39029241005 and 39125650079 passed.
+- Re-ran the six focused helper test modules: 89 passed; git diff whitespace check passed. Prepared user-run publication/dispatch commands at `/tmp/tripwire-publish-post-antenna.sh`, syntax checked, with separate tools/CI/docs commits and a hardware-history guard before push. Unrelated modified/untracked files are excluded.
+- Latest supplied AGENTS.md reserves commits/pushes for the user, so no history/remote mutation or new dispatch performed this session. Next: user runs the publication script, then inspect the inserted native antenna pass and every final gate before detailed routing. No phase boxes ticked.
+
+## 2026-10-18 — Stop ineffective margin tuning; prepare native post-timing antenna insertion
+
+- Antenna50run38952217127 fails with the same2antenna violations and identical timing/electrical/reserve as wire100. Actual repair command has margin50but finds0violations before timing. Final setupWS0allcorners, fast hold81.9512ps, electrical0and reservepass. No DRT.
+- Prepared declarative Classic metadata substitution inserting stock RepairAntennas after final timing, explicit stop atRepairAntennas-1. Supported pinned mechanism preserves Classic gating, uses no custom image/net-bound ECO or SDC mutation. Added CI validation of actual library insertion order/IDs. Recipe/gates mark modified ordering explicitly; official TT merge/config-policy review remains needed.
+- Native antenna step inherits oldNL/PNL, so prepared read-only ODB exports during fresh allcorner STA plus independent original-connection conservation, corner/ODB identity and stale-parasitics removal. All final gates use exact repaired state.89focused tests pass, including final-stop selection, wrong-ODB/clock/missing-export rejection and residual antenna gate. D-086 and reproduction report updated.
+- Next publish/launch within approved native-screen work, inspect final native repair activity and every gate before routing. No phase boxes ticked; official GDS/precheck pending.
+
+
+## 2026-10-16 — Native antenna reserve screen published and queued
+
+- Published tools7f7a8fb/CIec8828e/docs429c0df within approved native-screen work; verified remote main429c0dff3f6d11caf5981223a4b2f2c53ec84708. No main hardware/config/template changes.
+- [Native antenna50 screen38952217127](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38952217127) confirmed queued on that head. One changed repair target from the otherwise passing CTS100/wire100 recipe: antenna ratio margin10→50.80focused tests and YAML/shell checks pass. Next inspect actual repair activity and every final guard; no DRT until all pass and no phase completion claim.
+
+
 ## 2026-10-16 — Antenna drift traced; one-setting reserve trial prepared
 
 - Selected intermediate history from artifact12058185022 for38920116440: native antenna repair uses iterations3/margin10and reports0violations; its fresh stage43check is0/0. Stage44adds2setup/22hold buffers and reroutes; finalcheck2/2. net13678andnet14679 retain identical cell/pin connections across these stages. Actual failing cumulative ratios224.80and304.58against200.

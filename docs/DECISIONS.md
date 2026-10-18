@@ -1105,6 +1105,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Fresh ODB STA and read-only NL/PNL exports must conserve existing connections and permit only diode additions; discard inherited parasitics and recheck every gate. Native final repair must disallow congestion. Recipe explicitly distinguishes this inserted-step sequence from stock Classic ordering.
 - Cost: diode loads/routing can affect prior timing/electrical/reserve results.89focused tests and CI insertion-ID verification prepared; physical improvement unproven. Main hardware/config/template jobs unchanged. Official adoption requires review of native flow metadata/configuration-policy exception and TT merge behavior after measurement; this preparation does not approve or claim official signoff.
 
+## D-087 — Test native buffer-chain cost and hold reserve after extraction
+
+- General need: clean native route39149073496 clears electrical, antenna and DRT DRC but fails slow setup−4.218642ns and fast hold42.531646ps against50ps. Its config-latch→dropped-counter critical path contains49buffer output arcs/10.790404ns buffer delay. Native wire100 repair may impose excessive delay; a specific causal improvement remains unproven.
+- Test wire150µm/hold-target125ps as one coupled physical-repair policy comparison to wire100/100ps. Retain complete2/4hardware,20ns/fully timed constraints, allcorner repair, CTS100/clock8/electrical55/antenna50/final antenna pass, stock image and every acceptance gate. Add read-only FF-capture setup/hold reports so zero-slack latch endpoint paths do not monopolize diagnostic reporting.
+- Cost/risk: longer segments may lose electrical reserve, while extra hold repair may increase setup delay/area/congestion. Neither change guarantees improvement; no gate waiver, protocol-specific hardware, RTL/ISA/latency change or official configuration adoption. Screen all guards before any new DRT. Evidence and next steps: docs/reports/PHASE2_NATIVE_ROUTE_TIMING_GAP.md.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

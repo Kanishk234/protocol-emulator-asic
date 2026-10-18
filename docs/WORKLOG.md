@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-18 — Fix pinned LibreLane preflight import
+
+- Run39140902494 failed before synthesis: Classic is not exported by librelane.flows in pinned3.1.0.dev3. Corrected import to librelane.flows.classic; BUG121 records the failure and coverage. This run provides no new timing or physical measurements.
+- Installed the exact pinned wheel and dependencies into an isolated /tmp directory using the project venv. Executed the workflow's actual preflight Python successfully: ResizerTimingPostGRT → RepairAntennas-1 → STAMidPNR-3, before DetailedRouting. Added optional installed-library integration coverage; all90focused tests pass with the real library, no skips. Acceptance gates and physical recipe unchanged.
+- Next publish the corrective tools/CI/docs groups under the user's explicit command approval, relaunch, and verify startup before awaiting measured gates. No phase boxes ticked.
+
+## 2026-10-18 — Approved post-timing antenna screen published and launched
+
+- User explicitly approved running the prepared commands. Published separate tools e6c43b6, CI 705ee1f, and docs 1fd8eb6 commits; verified remote main is 1fd8eb6108f3b6b6d67217e5a064237ccce158bb. Hardware-history guard found no pending src/info.yaml/macro commits.
+- Dispatched [native post-timing antenna screen 39140902494](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39140902494), confirmed in progress on that exact head. Prior verification: 89 focused tests passed. Unrelated local files, including FIPE review, remain excluded.
+- Next inspect pinned insertion validation, actual final antenna repair activity, and every timing/electrical/antenna/reserve gate before detailed routing. No phase boxes ticked or official GDS pass claimed.
+
 ## 2026-10-18 — Recheck workflow status and validate publication package
 
 - GitHub main status: no in-progress runs. Two October 7 runs remain queued with no jobs assigned: 37655518919 (l3-placement-routed-gl), 37655518925 (gds-placement-extracted-timing). Latest antenna50 screen 38952217127 failed; subsequent nightly runs 39029241005 and 39125650079 passed.

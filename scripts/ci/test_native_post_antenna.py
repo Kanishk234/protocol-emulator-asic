@@ -10,6 +10,17 @@ BEFORE = 'sg13cmos5l_buf_1 data (.A(a), .X(n));\nsg13cmos5l_buf_1 clock (.A(clk)
 AFTER = BEFORE + 'sg13cmos5l_antennanp diode (.A(n));\n'
 
 
+def test_workflow_preflight_with_installed_librelane():
+    """Exercise the actual workflow Python against the pinned library when installed."""
+    pytest.importorskip('librelane')
+    import yaml
+    workflow = Path(__file__).resolve().parents[2] / '.github/workflows/gds-native-post-timing-antenna-screen.yaml'
+    steps = yaml.safe_load(workflow.read_text())['jobs']['harden']['steps']
+    step = next(s for s in steps if s['name'] == 'Verify the pinned declarative insertion and stop point')
+    code = step['run'].split("python - <<'PY'\n", 1)[1].rsplit('\nPY', 1)[0]
+    exec(compile(code, str(workflow), 'exec'), {})
+
+
 def fixture_states(tmp_path):
     nl = tmp_path/'before.v'; nl.write_text(BEFORE)
     before = tmp_path/'before.json'; before.write_text(json.dumps({'nl': str(nl), 'odb': '/before.odb'}))

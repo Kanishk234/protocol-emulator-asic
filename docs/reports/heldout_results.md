@@ -1,5 +1,13 @@
 # Held-out protocols on the frozen chip (phase 4)
 
+**Historical phase-4 report.** Resource/model-Fmax values below retain the
+dated compiler experiments; they are not a freshly authenticated paired
+hosted measurement. Nonfit resource figures are synthesis demand estimates,
+not placed cells. Successful loaded behavior is separately supported by
+gl_test36451108163/fabric36451328356 under D-023, and RTL suites by
+unit36451328364. Those runs do not independently identify every paired G0
+resource-count producer or establish physical operating rates.
+
 **Chip:** G1 as frozen (`hw-freeze` → 3047dea; 88 LUT4 + 2 timers + 2 shift registers, D-033). **Set:** `docs/design/HELDOUT.md`, sealed 2026-09-25 before profiling, unsealed 2026-09-28 after the freeze; nothing in the architecture was chosen with these in mind (D-003). **Method per protocol:** an independent reference model written first from the protocol's own specification (`tools/refmodels/`), then the user design, RTL tests against the model in both forms (hard primitives / plain logic), compile onto the frozen fabric and onto G0 (the plain-LUT baseline at equal area) with the same flow, and a chip-level test through the host interface. Fmax is nextpnr's estimate at the slow corner (a model, `tools/timing/README.md`), not a claim.
 
 | # | Protocol | Fits G1? | G1 LCs (timers, shifts) | G1 Fmax | G0 LCs (plain) | G0 Fmax | RTL tests | Chip test | Limits found |

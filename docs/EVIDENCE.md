@@ -30,16 +30,17 @@ the complete unit workflow subsequently pass38778082137 and38820879322.
 [Integration evidence](reports/autonomous_integration_20261015.md) and
 [numerical-source audit and remaining gates](reports/evidence_audit_20261015.md).
 
-**October11 experimental progress:** actual routed eight-delay C2 reaches zero native physical gates38114298036, passes real SPI-loaded UART/USER_RESET38163199372, and clears the examined conditional internal setup/hold paths in all six extracted cases38164099529. Worst examined hold is+0.042992ns under unchanged margins. Scope and remaining annotation/I/O/loading/intertile/other-tile gates: [report](reports/compact_c2_delay_extracted_20261011.md). Separately, combined reset placement lowers paired native global-routing overflow146→133 in38168159774; both cases still fail routing. These are measured advances, not a complete successor or universal protocol/timing claim.
+**October11 experimental progress:** the routed eight-delay C2 passes the listed tile-level physical checks38114298036, passes real SPI-loaded UART/USER_RESET38163199372, and clears the examined conditional internal setup/hold paths in all six extracted cases38164099529. Worst examined hold is+0.042992ns under unchanged margins. Scope and remaining annotation/I/O/loading/intertile/other-tile gates: [report](reports/compact_c2_delay_extracted_20261011.md). Separately, combined reset placement lowers paired native global-routing overflow146→133 in38168159774; both cases still fail routing. These are measured advances, not a complete successor or universal protocol/timing claim.
 
 **Baseline software/bitstream progress:** autonomous delayed UART fault plus concurrent event counting passes genuine same-job SPI-loaded chip-port test38168609080, using57/88LC and2/2timers+2/2shifts. Additional loaded matrix38273574240 passes full UART TX waveform corruption, concurrent event counting and later clean-frame recovery for counter widths3/4; both use57LC, so no counter-width area gain is claimed. [Full-duplex loaded matrix38279446388](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38279446388) also passes concurrent RX during TX corruption for both counter widths. These tests retain existing D-023 RTL-fabric accommodations; native/SDF/full-chip timing and board operation remain separate. Portable C loading/recovery and architecture-authenticated pin mapping are independently tested; source cloud pytest38168413502 passes532checks.
 
 **Portable C end-to-end evidence:** [38293580979](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38293580979) passes compiled-C checked loading through actual simulated SPI and31-byte ordered duplex exchange on a freshly compiled23/88LC hostecho image. Downloaded XML/image/report authentication and exact scope are recorded in [the status report](reports/status_and_hold_allocation_20261012.md).
 
 For a reader with 20 minutes. Sources below include CI run IDs (GitHub Actions
-on `efpga`) and historical local reports. The final numerical-source audit is
-still open: a local report is not a CI run, and some historical timing views
-are unavailable. Claims and their status: `docs/CLAIMS.md`. **Nothing here is
+on `efpga`) and explicitly scoped historical reports. The
+[current audit](reports/evidence_gate_remaining_20261016.md) separates direct
+run evidence from historical limits; some original timing views remain
+unavailable. Claims and their status: `docs/CLAIMS.md`. **Nothing here is
 measured on silicon or a board; all results are simulation, formal proof, or
 physical-design reports.**
 
@@ -80,7 +81,7 @@ that historical revision. [Current evidence](reports/profile_refresh_20261015.md
 
 Before profiling we sealed a **held-out set** of four more protocols (WS2812, 1-Wire, SWD, CAN; commit 0171cf7) that no part of the architecture was allowed to see until the hardware was frozen (D-003).
 
-## 3. The architecture, chosen at equal area
+## 3. Architecture and measured compiler coverage
 
 The generic hard blocks selected from profiling are a **loadable 16-bit timer** and an **8-bit shift register with a bit count** (D-002, D-026). The three supported design-set protocols use both; the I2C target uses the shift register but does not fit the chip. Two of each occupy one fabric tile slot in hardened G1(CI36376994834). The chip's fabric **G1** is a 4 × 3 grid with one slot holding them: **88 LUT4 + 2 timers + 2 shift registers**; the baseline **G0** has the same macro with all 12 slots LUT tiles (96 LUT4).
 
@@ -109,12 +110,12 @@ Phase 3 then tried three more specializations, each measured and dropped (D-030,
 | Tiny Tapeout flow | `gds`, precheck pass; routing DRC 0, LVS 0, antenna 0, Magic DRC 0 | CI 36383587262 (3047dea) |
 | Shell timing at 50 MHz target | setup WS +12.48 ns (slow corner), hold WS +0.112 ns (fast); fabric is a black box to STA | same run; not configured-fabric timing |
 | Shell | 3,723 standard cells, 60,567 µm² | same run |
-| Fabric macro | 1016.64 × 669.06 µm, 88 LUT4 + 2 + 2 hard blocks | `macro/warp_g1`, D-027 |
+| Fabric macro | 1016.64 × 669.06 µm, 88 LUT4 + 2 + 2 hard blocks | G1 integration36367067731 and frozen chip36383587262; `macro/warp_g1`, D-027 |
 | Formal | F1 output isolation (unbounded), F2 loader (BMC depth 84), F4 primitives = specification (unbounded) | CI `formal` 36367067725; `docs/reports/formal.md` |
 
 Hardening history and every intermediate run: `docs/design/PHYSICAL_DESIGN_AND_CI.md`.
 
-## 5. Reprogrammable after fabrication, shown on the hardened netlist
+## 5. Reconfiguration through the gate-level shell
 
 Real bitstreams, compiled from Verilog by `tools/compile`, are loaded through the chip's SPI host port (checked: architecture version, length, CRC-32) into the **gate-level chip netlist** and run: a counter, combinational logic, the host byte channel, both hard primitives, and the UART, SPI controller and I2C controller against independent reference devices. CI `gl_test` 36383587262: **21/21** (the fabric is modelled from its RTL, D-023). A loaded design can be replaced by another without a reset; a corrupt load leaves every pin parked and the chip refusing to run until a good load (`test_corrupt_load_over_running_design`).
 
@@ -124,14 +125,19 @@ Real bitstreams, compiled from Verilog by `tools/compile`, are loaded through th
 
 Opened only after `hw-freeze`; each with a reference model written first from its own specification (`docs/reports/heldout_results.md`):
 
-| Held-out protocol | Frozen chip (88 cells) | Plain G0 (96) | Result |
-|---|---|---|---|
-| WS2812 | **runs**, 32 cells | 82 | 8 LEDs through the host interface, within the datasheet's timing |
-| 1-Wire | **runs**, 77 cells | 126: does not fit | reset/presence, READ ROM with CRC |
-| SWD | **runs**, 44 cells | 61 | connect, DPIDR, AP write/read, WAIT; packets in host software |
-| CAN 2.0A | does not fit (207) | 241 | correct in RTL only |
+| Held-out protocol | Frozen G1 result | Demonstrated scope |
+|---|---|---|
+| WS2812 | **runs** | Host-driven LED updates; simulated waveform timing checks |
+| 1-Wire | **runs** | reset/presence, READ ROM with CRC |
+| SWD | **runs** | connect, DPIDR, AP write/read, WAIT; packets in host software |
+| CAN 2.0A | **unsupported** | RTL reference-model tests only; no successful loaded G1 result |
 
-Every held-out design used the hard blocks, in ways the design set did not (a pulse-width generator, a 480 µs one-shot, an SWD bit clock, a CAN sample point). Chip-level tests pass in CI `gl_test` 36451108163 and `fabric` 36451328356.
+The successful loaded cases are supported by CI `gl_test`36451108163 and
+`fabric`36451328356; the protocol RTL suites are in `unit`36451328364.
+These are D-023 simulations, not ASIC operating-rate measurements. The designs
+use the primitives for pulse generation, reset timing, bit clocks and sampling.
+Historical compiler resource counts remain in the dated held-out report;
+this summary does not present an unauthenticated paired G0 resource comparison.
 
 ## 7. The software side (D-032)
 
@@ -155,7 +161,7 @@ Bugs and investigations, with the checks and limits recorded for each: `docs/BUG
 ## 9. Known limits
 
 - **No hardware results**: no silicon, no board. Protocol Fmax values in the historical local reports are compiler-model estimates, not validated whole-chip rates; original routed primitive timing views remain unavailable for a fresh cross-check (`tools/timing/README.md`, [artifact gap](reports/reproduction.md)).
-- **Capacity**: 88 cells; the I2C target and CAN do not fit. One bitstream runs at a time, but it can contain concurrent functions: UART-plus-event-monitor fits at 37/88 cells and passes local loaded RTL/synthesized gate-shell tests (`docs/reports/g1_uart_monitor.md`, C11) and fresh hosted compile/loaded RTL in37512249763. There is no new hardened macro/SDF result from that hosted demonstration.
+- **Capacity**: 88 cells; the I2C target does not fit and CAN remains unsupported. One bitstream runs at a time, but it can contain concurrent functions: UART-plus-event-monitor fits at 37/88 cells and passes local loaded RTL/synthesized gate-shell tests (`docs/reports/g1_uart_monitor.md`, C11) and fresh hosted compile/loaded RTL in37512249763. There is no new hardened macro/SDF result from that hosted demonstration.
 - **Fault-control showcase**: UART/monitor with externally timed TX line inversion passes local loaded RTL and synthesized-shell suites ([dated scope and resource measurements](reports/g1_uart_fault_monitor.md), C12). This controls selected corruption and preserves monitoring; it is not an autonomous fault scheduler or a silicon result.
 - **Soft capture**: UART with a timestamp queue passes local loaded ordering, overflow, wrap, backpressure, TX/RX and reset tests. Coarser timestamp resolution extends the wrap period; a wider stored timestamp exceeds capacity in the dated local experiment ([scope and resource measurements](reports/g1_uart_capture.md), C13). These are not new hosted physical or native gate-timing results.
 - **Host link**: one byte per SPI transaction; a protocol needing a byte every few µs (WS2812) needs a fast host.

@@ -34,9 +34,8 @@ is an observer and validation check, not a model brain or continuous agent.
 
 ## Current priority and protected results
 
-The first unfinished phase is phase 5. Its first unchecked task is the final
-`docs/EVIDENCE.md` audit. The exit also needs all CI green on `efpga` and the
-phase summary. See `phases/PHASE5_EVIDENCE_DOCS.md`; do not start submission
+The first unfinished phase is phase 5. Its report-content and summary gates have evidence; the remaining exit gate is
+all required CI green on `efpga`, with source applicability audited. See `phases/PHASE5_EVIDENCE_DOCS.md`; do not start submission
 tasks until every exit item passes. A new experiment does not itself tick a box.
 
 Keep two distinct tracks:

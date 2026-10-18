@@ -1,5 +1,12 @@
 # Evidence audit, October 15
 
+**Historical audit:** profile38820879331, controlled mutation38823961384,
+paired architecture38852379083 and its hosted regression38951648258 now supply
+the respective fresh evidence that the older blocker list requested. The
+[October16 follow-up](evidence_gate_remaining_20261016.md) records the remaining
+editorial/scope corrections. Original matched primitive timing views remain a
+disclosed limitation; do not rerun completed campaigns to satisfy this dated list.
+
 Phase 5 remains open. This audit checks committed reports and the downloaded
 unchanged-control routing trace; it does not refresh expired historical
 artifacts or establish a new chip timing result. `docs/EVIDENCE.md` now labels

@@ -29,16 +29,17 @@
       "priority": 1,
       "title": "Complete final evidence and claim audit",
       "track": "phase5",
-      "status": "in_progress",
+      "status": "validated",
       "hypothesis": "A matched-source evidence matrix can expose remaining unsupported numbers without changing frozen hardware.",
       "evidence": [
         "docs/design/phases/PHASE5_EVIDENCE_DOCS.md",
         "docs/EVIDENCE.md",
         "docs/CLAIMS.md",
         "docs/reports/evidence_audit_20261015.md: historical/local/shell-only labels corrected; original primitive timing views still missing",
-        "38852379083 atba0cb76: eight current G0/G1 cases independently authenticated; current placed counts separated from synthesis nonfit estimates; docs/reports/architecture_refresh_20261015.md"
+        "38852379083 atba0cb76: eight current G0/G1 cases independently authenticated; current placed counts separated from synthesis nonfit estimates; docs/reports/architecture_refresh_20261015.md",
+        "2026-10-16 independent content review: docs/reports/evidence_gate_remaining_20261016.md; EVIDENCE/CLAIMS scope/citations corrected; content checklist passes, phaseCIexit pending"
       ],
-      "next_action": "Current design-set compiler numeric refresh is complete. Resolve only remaining scoped gaps listed in current_numeric_gaps_20261015.md: original matched timing views and physical/equal-total-area claims remain unproven; historical variants stay explicitly historical. Do not repeat the successful eight-case campaign for documentation-only changes.",
+      "next_action": "Maintain reviewed limited-baseline report as new results arrive. Recover missing original timing views only for stronger timing claims; no duplicate profile/mutation/compiler campaign required to complete this content gate.",
       "acceptance": [
         "Every number has a supporting run or is explicitly scoped as local/historical.",
         "No compact successor result is presented as G1 or whole-chip signoff."
@@ -156,9 +157,10 @@
       "hypothesis": "An explicit inventory prevents conditional tile or estimated shell timing from becoming a whole-chip claim.",
       "evidence": [
         "docs/reports/compact_timing_modes_gap_audit_20261012.md",
-        "38164099529: conditional C2 paths only"
+        "38164099529: conditional C2 paths only",
+        "docs/reports/g1_timing_recovery_feasibility_20261016.md: original sources and embedded target GDS cell survive; no existing original-G1 hosted rebuild adapter; require NL and exact recursive geometry/view binding before freshSPEF reuse"
       ],
-      "next_action": "Inventory available exact tile/shell views and remaining LOAD/RUN/RESET/intertile/external/annotation obligations; defer post-route timing to a qualified routed build.",
+      "next_action": "Optional stronger-timing evidence task: prepare separately bounded original-control rebuild only if pursuing recovery. Require exact original NL plus normalized all-layer geometry/text/pins/units and fresh NL/ODB/GDS/SPEF binding; NL equality alone cannot qualify frozen layout. Missing views remain honestly disclosed and do not block limited report content.",
       "acceptance": [
         "Every required path class maps to exact views or an explicit missing-evidence obligation.",
         "Active clocks, unmatched tiles and unconstrained endpoints remain visible."
@@ -197,12 +199,12 @@
       "priority": 8,
       "title": "Close phase5 only after final evidence and CI audit",
       "track": "phase5",
-      "status": "blocked",
+      "status": "in_progress",
       "hypothesis": "Complete auditable evidence is a competition deliverable even while compact routing stays experimental.",
       "evidence": [
         "docs/design/phases/PHASE5_EVIDENCE_DOCS.md"
       ],
-      "next_action": "Finish plain-language PHASE5 summary and inspect all required CI workflows on exact efpga revision before checking exit items.",
+      "next_action": "Evidence content and plain-language summary now pass independently reviewed file gates. Inspect actual CI run/source applicability and pending observerbuild38950370119/qualification38950416231 before considering all-CI exit. Do not claim compact route or timing acceptance.",
       "acceptance": [
         "Every phase5 exit box passes with evidence.",
         "All required CI results are green and applicable manual-workflow treatment is documented.",

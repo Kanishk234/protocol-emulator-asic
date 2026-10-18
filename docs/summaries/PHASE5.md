@@ -65,10 +65,12 @@ Fixing the accounting defect did not solve routing.
 
 ## What remains
 
-- Complete the numerical/source audit in [EVIDENCE](../EVIDENCE.md). Current
-  compiler coverage is authenticated; missing original primitive netlist/SPEF
-  timing views, historical local measurements and physical timing limits must
-  remain explicit. See [remaining numerical gaps](../reports/current_numeric_gaps_20261015.md).
+- Keep the completed [EVIDENCE](../EVIDENCE.md) and claims audit current as new
+  results arrive. The [independent content review](../reports/evidence_gate_remaining_20261016.md)
+  passes after unsupported quantitative summary detail was removed. Missing
+  original primitive netlist/SPEF timing views and physical timing limits
+  remain explicit; recovering those views is needed for stronger timing
+  claims, rather than for the report's limited baseline claims.
 - Confirm all required CI gates for the final applicable revision before
   closing the phase. A diagnostic collector passing does not mean its route
   passed. No phase-completion claim follows from a launch or pending job.

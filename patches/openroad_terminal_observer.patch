@@ -1,0 +1,347 @@
+--- a/src/grt/include/grt/GlobalRouter.h
++++ b/src/grt/include/grt/GlobalRouter.h
+@@ -223,6 +223,7 @@
+   // Experimental, explicit unchanged-net repair; never called by default flow.
+   void forceRerouteNets(const std::vector<odb::dbNet*>& nets);
+   void exportNativeCorridorState();
++  void exportNativeTerminalState();
+   std::set<odb::dbNet*> getDirtyNets() { return dirty_nets_; }
+   // check_antennas
+   bool haveRoutes();
+--- a/src/grt/src/GlobalRouter.cpp
++++ b/src/grt/src/GlobalRouter.cpp
+@@ -5669,6 +5669,171 @@
+ 
+ // REVIEW-ONLY WARP experiment, pinned upstream dcf36133. No physical edits.
+ // WARP explicit observer only. No routing, placement, cost or grid setters.
++
++// WARP explicit read-only terminal/access observation; never invoked by routing.
++void GlobalRouter::exportNativeTerminalState()
++{
++  const char* dir = std::getenv("WARP_TERMINAL_DIR");
++  if (dir == nullptr || dir[0] == '\0' || force_reroute_mode_
++      || is_incremental_ || grouter_cbk_ != nullptr || !dirty_nets_.empty()
++      || !initialized_ || block_ == nullptr || grid_ == nullptr
++      || routes_.empty() || use_cugr_ || haveDetailedRoutes()
++      || grid_->getTileSize() <= 0) {
++    throw std::runtime_error("Native terminal observer requires explicit directory and idle initialized global routes");
++  }
++  auto field = [](const std::string& value) {
++    if (value.empty() || value.find_first_of("\t\r\n") != std::string::npos) {
++      throw std::runtime_error("Native terminal text cannot be encoded");
++    }
++    return value;
++  };
++  std::ostringstream out;
++  out << "SCHEMA\twarp-native-terminals-v1\n"
++      << "MODEL_GATE\tterminal_join_verified\tfalse\n"
++      << "SCOPE\tcoarse_pin_membership_and_tree_access_not_physical_via_feasibility\n"
++      << "INDEXING\tnative_layers_zero_based_database_routing_levels_one_based\n"
++      << "DBU\t" << block_->getDbUnitsPerMicron() << '\n'
++      << "GLOBAL_GRID\t" << grid_->getXGrids() << '\t' << grid_->getYGrids()
++      << '\t' << grid_->getNumLayers() << '\t' << grid_->getXMin()
++      << '\t' << grid_->getYMin() << '\t' << grid_->getTileSize() << '\n';
++  for (int l = 1; l <= grid_->getNumLayers(); ++l) {
++    odb::dbTechLayer* layer = db_->getTech()->findRoutingLayer(l);
++    if (layer == nullptr) {
++      throw std::runtime_error("Missing native terminal layer join");
++    }
++    out << "LAYER\t" << l - 1 << '\t' << layer->getId() << '\t'
++        << layer->getRoutingLevel() << '\t' << field(layer->getName())
++        << '\t' << field(layer->getDirection().getString()) << '\n';
++  }
++  std::vector<std::pair<odb::dbNet*, Net*>> ordered;
++  for (const auto& entry : db_net_map_) {
++    if (entry.first == nullptr || entry.second == nullptr
++        || entry.second->getDbNet() != entry.first) {
++      throw std::runtime_error("Inconsistent GlobalRouter terminal net map");
++    }
++    ordered.push_back(entry);
++  }
++  std::sort(ordered.begin(), ordered.end(), [](const auto& a, const auto& b) {
++    return a.first->getId() < b.first->getId();
++  });
++  size_t physical_pins = 0;
++  size_t memberships = 0;
++  std::vector<odb::dbNet*> database_nets;
++  for (odb::dbNet* net : block_->getNets()) {
++    database_nets.push_back(net);
++  }
++  std::sort(database_nets.begin(), database_nets.end(), [](auto* a, auto* b) {
++    return a->getId() < b->getId();
++  });
++  for (odb::dbNet* net : database_nets) {
++    out << "DATABASE_NET\t" << net->getId() << '\t' << field(net->getName())
++        << '\t' << net->isSpecial() << '\t' << net->getSigType().isSupply()
++        << '\t' << (net->getSigType() == odb::dbSigType::CLOCK)
++        << '\t' << (db_net_map_.find(net) != db_net_map_.end())
++        << '\t' << fastroute_->nativeTerminalSlot(net)
++        << '\t' << net->getITerms().size() << '\t' << net->getBTerms().size()
++        << '\n';
++  }
++  out << "DATABASE_COMPLETE\t" << database_nets.size() << '\n';
++  for (const auto& [db_net, net] : ordered) {
++    const int max_layer = getNetMaxRoutingLayer(net);
++    const auto route = routes_.find(db_net);
++    out << "GLOBAL_NET\t" << db_net->getId() << '\t' << field(net->getName())
++        << '\t' << net->isLocal() << '\t' << net->isMergedNet()
++        << '\t' << net->isClockNet() << '\t' << net->getPins().size()
++        << '\t' << net->getNumPins() << '\t' << max_layer
++        << '\t' << (route != routes_.end()) << '\t'
++        << (route == routes_.end() ? 0 : route->second.size()) << '\t'
++        << fastroute_->nativeTerminalSlot(db_net) << '\n';
++    size_t ordinal = 0;
++    for (Pin& pin : net->getPins()) {
++      const auto position = pin.getOnGridPosition();
++      const int original_layer = pin.getConnectionLayer();
++      const int clamped_layer = std::min(original_layer, max_layer);
++      // Exactly findFastRoutePins arithmetic, without calling its builder.
++      const int x = (position.x() - grid_->getXMin()) / grid_->getTileSize();
++      const int y = (position.y() - grid_->getYMin()) / grid_->getTileSize();
++      const bool eligible = !(x < 0 || x >= grid_->getXGrids() || y < -1
++                              || y >= grid_->getYGrids()
++                              || clamped_layer > grid_->getNumLayers()
++                              || clamped_layer <= 0);
++      uint32_t term_id = 0;
++      uint32_t instance_id = 0;
++      uint32_t master_term_id = 0;
++      int driver = -1;
++      std::string name = "UNRESOLVED";
++      if (pin.isPort()) {
++        if (const odb::dbBTerm* term = pin.getBTerm()) {
++          term_id = term->getId();
++          name = pin.getName();
++          driver = pin.isDriver();
++        }
++      } else if (const odb::dbITerm* term = pin.getITerm()) {
++        term_id = term->getId();
++        const odb::dbInst* instance = term->getInst();
++        const odb::dbMTerm* master_term = term->getMTerm();
++        if (instance != nullptr && master_term != nullptr) {
++          instance_id = instance->getId();
++          master_term_id = master_term->getId();
++          name = pin.getName();
++          driver = pin.isDriver();
++        }
++      }
++      const auto matches = fastroute_->nativeTerminalMatches(
++          db_net, x, y, clamped_layer - 1);
++      out << "GLOBAL_PIN\t" << db_net->getId() << '\t' << ordinal << '\t'
++          << (pin.isPort() ? "BTERM" : "ITERM") << '\t' << term_id << '\t'
++          << instance_id << '\t' << master_term_id << '\t' << field(name)
++          << '\t' << driver << '\t' << position.x() << '\t'
++          << position.y() << '\t' << original_layer << '\t' << clamped_layer
++          << '\t' << x << '\t' << y << '\t' << eligible << '\t'
++          << matches.first << '\t' << matches.second.size() << '\n';
++      for (const int native_pin : matches.second) {
++        out << "MEMBER\t" << db_net->getId() << '\t' << ordinal << '\t'
++            << matches.first << '\t' << native_pin << '\n';
++        ++memberships;
++      }
++      ++ordinal;
++      ++physical_pins;
++    }
++  }
++  out << "GLOBAL_COMPLETE\t" << ordered.size() << '\t' << physical_pins
++      << '\t' << memberships << '\n';
++  fastroute_->exportNativeTerminalState(out);
++  out << "COMPLETE\twarp-native-terminals-v1\n";
++  if (!out) {
++    throw std::runtime_error("Incomplete native terminal serialization");
++  }
++  const std::string bytes = out.str();
++  const std::string path = std::string(dir) + "/native-terminals.tsv";
++  const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW,
++                        0600);
++  if (fd < 0) {
++    throw std::runtime_error("Cannot exclusively create native terminal output");
++  }
++  size_t offset = 0;
++  while (offset < bytes.size()) {
++    const size_t remaining = bytes.size() - offset;
++    const size_t chunk = remaining < 1048576 ? remaining : 1048576;
++    const ssize_t written = ::write(fd, bytes.data() + offset, chunk);
++    if (written < 0 && errno == EINTR) {
++      continue;
++    }
++    if (written <= 0) {
++      const int close_status = ::close(fd);
++      if (close_status != 0) {
++        throw std::runtime_error("Native terminal write and close failed");
++      }
++      throw std::runtime_error("Incomplete native terminal output write");
++    }
++    offset += static_cast<size_t>(written);
++  }
++  if (::close(fd) != 0) {
++    throw std::runtime_error("Cannot close native terminal observer output");
++  }
++  logger_->report("WARP_NATIVE_TERMINAL_COMPLETE path={}", path);
++}
++
+ void GlobalRouter::exportNativeCorridorState()
+ {
+   const char* dir = std::getenv("WARP_CORRIDOR_DIR");
+--- a/src/grt/src/GlobalRouter.i
++++ b/src/grt/src/GlobalRouter.i
+@@ -184,6 +184,11 @@
+ 
+ // Exact dbNet handles; no glob expansion, pin motion, or netlist mutation.
+ // Experimental southern-pair interface; duplicate/null handles fail closed.
++void export_native_terminal_state()
++{
++  getGlobalRouter()->exportNativeTerminalState();
++}
++
+ void export_native_corridor_state()
+ {
+   getGlobalRouter()->exportNativeCorridorState();
+--- a/src/grt/src/fastroute/include/FastRoute.h
++++ b/src/grt/src/fastroute/include/FastRoute.h
+@@ -279,6 +279,10 @@
+   void get3DRoute(odb::dbNet* db_net, GRoute& route);
+   void setIncrementalGrt(bool is_incremental);
+   void exportNativeCorridorState(std::ostream& out) const;
++  void exportNativeTerminalState(std::ostream& out) const;
++  int nativeTerminalSlot(odb::dbNet* net) const;
++  std::pair<int, std::vector<int>> nativeTerminalMatches(
++      odb::dbNet* net, int x, int y, int layer) const;
+   // WARP controlled experiment: enabled only by explicit forced repair.
+   void setForceRebuildUsedGrids(bool enabled)
+   {
+--- a/src/grt/src/fastroute/src/FastRoute.cpp
++++ b/src/grt/src/fastroute/src/FastRoute.cpp
+@@ -1036,6 +1036,133 @@
+ // Read-only WARP export, BSD-3-Clause under the upstream file license.
+ // Tree-step rows preserve multiplicity; they are NOT an accepted usage ledger
+ // until an independent auditor reconciles every raw 3D edge against them.
++
++// Lookup never creates map entries; -1 explicitly classifies absent native nets.
++int FastRouteCore::nativeTerminalSlot(odb::dbNet* db_net) const
++{
++  const auto it = db_net_id_map_.find(db_net);
++  if (it == db_net_id_map_.end()) {
++    return -1;
++  }
++  const int id = it->second;
++  if (id < 0 || static_cast<size_t>(id) >= nets_.size()
++      || nets_[id] == nullptr || nets_[id]->getDbNet() != db_net) {
++    throw std::runtime_error("Inconsistent native terminal membership map");
++  }
++  return id;
++}
++
++std::pair<int, std::vector<int>> FastRouteCore::nativeTerminalMatches(
++    odb::dbNet* db_net, int x, int y, int layer) const
++{
++  const int id = nativeTerminalSlot(db_net);
++  if (id < 0) {
++    return {-1, {}};
++  }
++  const FrNet* net = nets_[id];
++  if (net->getNumPins() < 0
++      || static_cast<size_t>(net->getNumPins()) != net->getPinX().size()
++      || net->getPinX().size() != net->getPinY().size()
++      || net->getPinX().size() != net->getPinL().size()) {
++    throw std::runtime_error("Inconsistent native pin coordinate vectors");
++  }
++  std::vector<int> matches;
++  for (int p = 0; p < net->getNumPins(); ++p) {
++    if (net->getPinX(p) == x && net->getPinY(p) == y
++        && net->getPinL(p) == layer) {
++      matches.push_back(p);
++    }
++  }
++  return {id, matches};
++}
++
++// Separate schema: preserve raw access sentinels; never fabricate a via range.
++void FastRouteCore::exportNativeTerminalState(std::ostream& out) const
++{
++  if (x_grid_ < 2 || y_grid_ < 2 || num_layers_ <= 0
++      || sttrees_.size() != nets_.size()) {
++    throw std::runtime_error("Invalid native terminal dimensions/census");
++  }
++  out << "NATIVE_GRID\t" << x_grid_ << '\t' << y_grid_ << '\t' << num_layers_
++      << '\t' << x_corner_ << '\t' << y_corner_ << '\t' << tile_size_ << '\n';
++  size_t live = 0;
++  size_t nodes = 0;
++  size_t mappings = 0;
++  for (size_t id = 0; id < nets_.size(); ++id) {
++    const FrNet* net = nets_[id];
++    if (net == nullptr) {
++      out << "NATIVE_EMPTY_SLOT\t" << id << '\n';
++      continue;
++    }
++    const auto mapping = db_net_id_map_.find(net->getDbNet());
++    if (net->getDbNet() == nullptr || mapping == db_net_id_map_.end()
++        || mapping->second != static_cast<int>(id)
++        || net->getNumPins() < 0
++        || static_cast<size_t>(net->getNumPins()) != net->getPinX().size()
++        || net->getPinX().size() != net->getPinY().size()
++        || net->getPinX().size() != net->getPinL().size()) {
++      throw std::runtime_error("Inconsistent native terminal identity/pins");
++    }
++    const std::string name = net->getName();
++    if (name.empty() || name.find_first_of("\t\r\n") != std::string::npos) {
++      throw std::runtime_error("Native terminal net name cannot be encoded");
++    }
++    const auto& tree = sttrees_[id];
++    // layerAssignment initializes alias/access fields for every node of each
++    // routed tree. Local/unrouted empty/degenerate trees have no such promise.
++    // Never inspect potentially uninitialized stackAlias/assigned fields there.
++    const bool access_supported = is_3d_step_ && net->getNumPins() >= 2
++                                  && tree.num_terminals >= 2
++                                  && !tree.nodes.empty() && !tree.edges.empty();
++    out << "NATIVE_NET\t" << id << '\t' << net->getDbNet()->getId() << '\t'
++        << name << '\t' << net->getNumPins() << '\t' << net->getMinLayer()
++        << '\t' << net->getMaxLayer() << '\t' << net->getDriverIdx()
++        << '\t' << tree.num_terminals << '\t' << tree.nodes.size()
++        << '\t' << tree.edges.size() << '\t' << tree.node_to_pin_idx.size()
++        << '\n';
++    out << "TREE_ACCESS_SUPPORTED\t" << id << '\t' << access_supported << '\n';
++    for (int p = 0; p < net->getNumPins(); ++p) {
++      out << "NATIVE_PIN\t" << id << '\t' << p << '\t' << net->getPinX(p)
++          << '\t' << net->getPinY(p) << '\t' << net->getPinL(p) << '\n';
++    }
++    for (size_t n = 0; n < tree.nodes.size(); ++n) {
++      if (!access_supported) {
++        out << "NODE_UNSUPPORTED\t" << id << '\t' << n
++            << "\tno_initialized_routed_tree_access_contract\n";
++        ++nodes;
++        continue;
++      }
++      const auto& node = tree.nodes[n];
++      out << "NODE\t" << id << '\t' << n << '\t'
++          << static_cast<int>(node.x) << '\t' << static_cast<int>(node.y)
++          << '\t' << node.stackAlias << '\t' << static_cast<int>(node.botL)
++          << '\t' << static_cast<int>(node.topL) << '\t' << node.hID
++          << '\t' << node.lID << '\n';
++      int low = std::numeric_limits<int16_t>::max();
++      int high = -1;
++      size_t matches = 0;
++      // Exact getViaStackRange matching, independently reading const state.
++      for (int p = 0; p < net->getNumPins(); ++p) {
++        if (net->getPinX(p) == node.x && net->getPinY(p) == node.y) {
++          low = std::min(low, net->getPinL(p));
++          high = std::max(high, net->getPinL(p));
++          ++matches;
++        }
++      }
++      out << "VIA_RANGE\t" << id << '\t' << n << '\t' << low << '\t'
++          << high << '\t' << matches << '\n';
++      ++nodes;
++    }
++    for (const auto& [node, pin] : tree.node_to_pin_idx) {
++      out << "NODE_PIN\t" << id << '\t' << node << '\t' << pin << '\n';
++      ++mappings;
++    }
++    ++live;
++  }
++  out << "NATIVE_COMPLETE\t" << nets_.size() << '\t' << live << '\t'
++      << nodes << '\t' << mappings << '\n';
++}
++
+ void FastRouteCore::exportNativeCorridorState(std::ostream& out) const
+ {
+   if (x_grid_ < 2 || y_grid_ < 2 || num_layers_ <= 0

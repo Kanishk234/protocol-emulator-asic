@@ -1118,6 +1118,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Add a stricter estimated screen gate requiring slow FF-capture setup minimum≥3.5ns after all original gates pass. Keep20ns fully timed SDC, final50ps hold acceptance and zero electrical/antenna/overflow/0.45reserve. Missing/nonfinite/wrong-type reports fail closed. Never substitute the requested4ns target for observed slack.
 - Cost/risk: optimizer may not converge or may add area, alter hold, or consume electrical/routing reserve. This margin is a test based on one paired result, not a routed closure guarantee. No DRT until measured guards pass; no architecture/ISA/RTL/latency changes or official configuration adoption. Evidence: PHASE2_NATIVE_ROUTE_TIMING_GAP.md.
 
+## D-089 — Test native delay mapping after global setup-margin timeout
+
+- General need: setup4screen39304947404 times out after6900s in native timing repair, reporting zero-slack latch endpoints. It supplies no new qualified timing or physical result. Global positive slack repair is too expensive for this bounded trial; exact internal convergence is unproven.
+- Test native SYNTH_STRATEGY AREA1→DELAY0 on the prior wire150/hold125 recipe with global setup margin0. The exact pinned schema and synthesis code support/use this mapping choice; preflight checks the real installed schema. Keep source guards explicit and actual generated config/recipe/artifact labels truthful.
+- Retain20ns fully timed constraints, hold125target/final50ps minimum, allcorner/CTS100/wire150/clock8/electrical55/antenna50/final antenna pass and every zero-violation/reserve gate. Keep the measured slow FF-capture setup guard≥3.5ns; requesting a delay strategy is not evidence of headroom. No DRT until guards pass.
+- Cost/risk: mapping may grow area, worsen electrical loads/hold or congestion, or fail synthesis/runtime bounds. No timing improvement guaranteed and no RTL/ISA/latency, main hardware/config/template or official-policy adoption. Existing900s synthesis/6900s total deadlines stay. Evidence: PHASE2_NATIVE_ROUTE_TIMING_GAP.md; BUG124.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

@@ -1,6 +1,7 @@
 """Bounded feasibility of an explicitly declared layer graph, NOT chip routing.
 
-Every listed terminal of each net must connect inside the supplied graph. Physical
+Every listed terminal of each net must connect inside the supplied graph (v1),
+or through explicitly declared net-private frozen exterior components (v2). Physical
 wires are undirected resources: an edge's capacity charges each occupying net
 once, including a shared trunk serving multiple terminals. Layer costs and fixed
 background usage are input contracts, never inferred from OpenDB display counts.
@@ -27,6 +28,9 @@ MAX_NETS = 128
 MAX_VARIABLES = 500_000
 MAX_INPUT_BYTES = 16 * 1024 * 1024
 MAX_COUNT = 1_000_000
+MAX_EXTERIOR_LINKS = 12_000
+EXTERIOR_BOUNDARY = "declared_net_private_frozen_exterior_components"
+EXTERIOR_CONTRACT = "existing_boundary_terminals_equivalence_only"
 CONTRACT = {
     "graph": "explicit_undirected_layer_graph",
     "occupancy": "per_net_edge_union",
@@ -84,13 +88,19 @@ def validate_graph(value: Any) -> dict:
     state. In particular, encoded reporting-grid capacities are not raw tracks.
     """
     _keys(value, {"schema_version", "contract", "provenance", "layers", "nodes", "edges", "nets"}, "graph")
-    if type(value["schema_version"]) is not int or value["schema_version"] != 1:
-        raise InputError("schema_version: require integer1")
+    if type(value["schema_version"]) is not int or value["schema_version"] not in (1, 2):
+        raise InputError("schema_version: require integer1 or integer2")
+    exterior = value['schema_version'] == 2
     contract = value["contract"]
-    _keys(contract, set(CONTRACT) | {"vias", "nonpreferred", "omitted_constraints"}, "contract")
+    _keys(contract, set(CONTRACT) | {"vias", "nonpreferred", "omitted_constraints"} |
+          ({'exterior_connectivity'} if exterior else set()), "contract")
     for key, expected in CONTRACT.items():
+        if exterior and key == 'boundary':
+            expected = EXTERIOR_BOUNDARY
         if contract[key] != expected:
             raise InputError(f"contract.{key}: require {expected!r}")
+    if exterior and contract['exterior_connectivity'] != EXTERIOR_CONTRACT:
+        raise InputError('contract.exterior_connectivity: require explicit net-private frozen equivalence')
     if contract["vias"] not in ("forbidden", "explicit_capacity_edges", "unlimited_coarse_edges"):
         raise InputError("contract.vias: require forbidden, explicit_capacity_edges or unlimited_coarse_edges")
     if contract["nonpreferred"] not in ("forbidden", "explicit_edges"):
@@ -169,14 +179,25 @@ def validate_graph(value: Any) -> dict:
                 raise InputError("wire: nonpreferred motion forbidden")
         edges[name] = edge
     nets = {}
+    exterior_links = 0
     for net in _items(value["nets"], "nets", MAX_NETS, 1):
-        _keys(net, {"id", "terminals", "boundary_terminals", "track_demand_by_layer", "via_track_demand", "allowed_planar_layers"}, "net")
+        _keys(net, {"id", "terminals", "boundary_terminals", "track_demand_by_layer", "via_track_demand", "allowed_planar_layers"} |
+              ({'frozen_exterior_components'} if exterior else set()), "net")
         name = _name(net["id"], "net.id")
         if name in nets:
             raise InputError("net: duplicate ID")
         terminals = _names(net["terminals"], "net.terminals", set(nodes), minimum=1)
         boundary = _names(net["boundary_terminals"], "net.boundary_terminals", set(terminals))
-        del boundary  # Validation only; all are pinned, required terminals.
+        if exterior:
+            members = set()
+            for component in _items(net['frozen_exterior_components'], 'frozen_exterior_components', MAX_NODES//2):
+                component = _names(component, 'frozen exterior component', set(boundary), minimum=2)
+                if members.intersection(component):
+                    raise InputError('frozen exterior components: members must be disjoint within each net')
+                members.update(component)
+                exterior_links += len(component)-1
+                if exterior_links > MAX_EXTERIOR_LINKS:
+                    raise InputError('frozen exterior connectivity exceeds total virtual-link limit')
         demand = net["track_demand_by_layer"]
         _keys(demand, set(layers), "net.track_demand_by_layer")
         for layer, count in demand.items():
@@ -199,6 +220,8 @@ def validate_graph(value: Any) -> dict:
         net["terminals"].sort()
         net["boundary_terminals"].sort()
         net["allowed_planar_layers"].sort()
+        if exterior:
+            net['frozen_exterior_components'] = sorted(sorted(c) for c in net['frozen_exterior_components'])
     return result
 
 
@@ -216,12 +239,18 @@ def _edge_demand(net: dict, edge: dict, nodes: dict) -> int:
     return net["track_demand_by_layer"][nodes[edge["u"]]["layer"]]
 
 
-def _connected(edges: dict, selected: set[str], root: str) -> set[str]:
+def _connected(edges: dict, selected: set[str], root: str, exterior_components=()) -> set[str]:
     neighbors = defaultdict(list)
     for name in selected:
         edge = edges[name]
         neighbors[edge["u"]].append(edge["v"])
         neighbors[edge["v"]].append(edge["u"])
+    # Net-private connectivity only: these are not geometry, vias or resources.
+    for component in exterior_components:
+        anchor = component[0]
+        for member in component[1:]:
+            neighbors[anchor].append(member)
+            neighbors[member].append(anchor)
     reached, pending = {root}, deque([root])
     while pending:
         for node in neighbors[pending.popleft()]:
@@ -241,7 +270,7 @@ def validate_witness(graph: dict, witness: Any) -> dict:
     usage = {name: edge["fixed_usage"] for name, edge in edges.items()}
     for name, net in nets.items():
         selected = set(_names(witness[name], f"witness.{name}", set(edges)))
-        reached = _connected(edges, selected, net["terminals"][0])
+        reached = _connected(edges, selected, net["terminals"][0], net.get('frozen_exterior_components', ()))
         if not set(net["terminals"]) <= reached:
             raise InputError(f"witness.{name}: required terminal disconnected")
         if any(edges[item]["u"] not in reached or edges[item]["v"] not in reached for item in selected):
@@ -280,7 +309,8 @@ def solve(graph: dict, *, max_seconds: float = 30, max_deterministic_time: float
     # One occupied-edge Boolean plus one signed aggregate connectivity flow per
     # edge/net. Flow sends one unit to every non-root terminal; trunk occupancy
     # is still charged ONCE, not once per unit or sink.
-    variable_count = len(edges) * len(graph["nets"]) * 2
+    exterior_variables = sum(len(c)-1 for net in graph['nets'] for c in net.get('frozen_exterior_components', ()))
+    variable_count = len(edges) * len(graph["nets"]) * 2 + exterior_variables
     if variable_count > max_variables:
         raise InputError(f"model requires {variable_count} variables, exceeds declared limit {max_variables}")
     try:
@@ -314,11 +344,18 @@ def solve(graph: dict, *, max_seconds: float = 30, max_deterministic_time: float
             contributions[edge["id"]].append(_edge_demand(net, edge, nodes) * used)
         required = set(net["terminals"])
         root = net["terminals"][0]
+        private_incident = defaultdict(list)
+        for ci, component in enumerate(net.get('frozen_exterior_components', ())):
+            anchor = component[0]
+            for mi, member in enumerate(component[1:]):
+                transfer = model.NewIntVar(-sinks, sinks, f'exterior_{ni}_{ci}_{mi}')
+                private_incident[anchor].append(transfer)
+                private_incident[member].append(-transfer)
         for node in graph["nodes"]:
             name = node["id"]
             balance = sinks if name == root else -1 if name in required else 0
-            if incident[name] or balance:
-                model.Add(sum(sign * flow[edge] for edge, sign in incident[name]) == balance)
+            if incident[name] or private_incident[name] or balance:
+                model.Add(sum(sign * flow[edge] for edge, sign in incident[name]) + sum(private_incident[name]) == balance)
     for edge in graph["edges"]:
         if edge["capacity"] is not None:
             model.Add(sum(contributions[edge["id"]]) + edge["fixed_usage"] <= edge["capacity"])
@@ -340,7 +377,7 @@ def solve(graph: dict, *, max_seconds: float = 30, max_deterministic_time: float
         raise RuntimeError("unexpected CP-SAT response (including MODEL_INVALID); no feasibility conclusion")
     native = names[status]
     result = {
-        "schema_version": 1, "status": "FEASIBLE" if native in ("OPTIMAL", "FEASIBLE") else native,
+        "schema_version": graph['schema_version'], "status": "FEASIBLE" if native in ("OPTIMAL", "FEASIBLE") else native,
         "native_status": native, "solver": {"name": "ortools-cp-sat", "version": ortools.__version__},
         "graph_sha256": digest(canonical_bytes(graph)),
         "model_sha256": digest(model.Proto().SerializeToString(deterministic=True)),
@@ -356,11 +393,14 @@ def solve(graph: dict, *, max_seconds: float = 30, max_deterministic_time: float
         "response_stats": solver.ResponseStats(), "witness": None, "witness_sha256": None,
         "witness_check": None,
     }
+    if graph['schema_version'] == 2:
+        result['model_size']['net_private_exterior_flow_variables'] = exterior_variables
+        result['exterior_connectivity_scope'] = 'Declared frozen net-private boundary equivalence; no physical resources or native authentication'
     if result["status"] == "FEASIBLE":
         witness = {}
         for net in graph["nets"]:
             selected = {edge for edge in edges if solver.Value(occupancy[(net["id"], edge)])}
-            reached = _connected(edges, selected, net["terminals"][0])
+            reached = _connected(edges, selected, net["terminals"][0], net.get('frozen_exterior_components', ()))
             # CP-SAT may set irrelevant disconnected occupancy bits. Dropping
             # those can only decrease resource consumption; verify afterwards.
             witness[net["id"]] = sorted(edge for edge in selected if edges[edge]["u"] in reached)

@@ -49,6 +49,10 @@ def brute_feasible(g):
             while True:
                 expanded = reached | {endpoint for e in selected if e["u"] in reached or e["v"] in reached
                                       for endpoint in (e["u"], e["v"])}
+                # Independent set closure; no CP flow or production BFS helper.
+                for component in net.get('frozen_exterior_components', []):
+                    if set(component) & reached:
+                        expanded.update(component)
                 if expanded == reached:
                     break
                 reached = expanded
@@ -67,6 +71,117 @@ def brute_feasible(g):
         if feasible:
             return True
     return False
+
+
+def version2(g=None):
+    g=deepcopy(graph() if g is None else g)
+    g['schema_version']=2
+    g['contract']['boundary']=c.EXTERIOR_BOUNDARY
+    g['contract']['exterior_connectivity']=c.EXTERIOR_CONTRACT
+    for net in g['nets']:net['frozen_exterior_components']=[]
+    return g
+
+
+@requires_solver
+def test_declared_frozen_connection_avoids_artificial_interior_route():
+    old=graph();old['edges']=[]
+    assert c.solve(old)['status']=='INFEASIBLE'
+    g=version2(old);g['nets'][0]['frozen_exterior_components']=[['a','c']]
+    result=c.solve(g)
+    assert result['status']=='FEASIBLE' and result['witness']=={'n':[]}
+    assert result['model_size']['edges']==0
+    assert result['model_size']['net_private_exterior_flow_variables']==1
+    assert not result['native_inputs_authenticated'] and not result['physical_acceptance']
+    assert result['schema_version']==2
+
+
+@requires_solver
+def test_disconnected_exterior_components_still_need_real_connecting_route():
+    g=version2();g['nets'][0]['terminals']=['a','b','c','d']
+    g['nets'][0]['boundary_terminals']=['a','b','c','d']
+    g['nets'][0]['frozen_exterior_components']=[['a','b'],['c','d']]
+    g['edges']=[e for e in g['edges'] if e['id']=='bc']
+    result=c.solve(g)
+    assert result['status']=='FEASIBLE' and result['witness']=={'n':['bc']}
+    assert result['witness_check']['edge_usage']=={'bc':1}
+    with pytest.raises(c.InputError,match='disconnected'):c.validate_witness(g,{'n':[]})
+    g['edges']=[]
+    assert c.solve(g)['status']=='INFEASIBLE'
+
+
+@requires_solver
+def test_other_net_cannot_borrow_frozen_exterior_equivalence():
+    g=version2();g['edges']=[]
+    g['nets'][0]['frozen_exterior_components']=[['a','c']]
+    other=deepcopy(g['nets'][0]);other.update(id='other',frozen_exterior_components=[])
+    g['nets'].append(other)
+    assert c.solve(g)['status']=='INFEASIBLE'
+    with pytest.raises(c.InputError,match='other.*disconnected'):c.validate_witness(g,{'n':[],'other':[]})
+
+
+@requires_solver
+@pytest.mark.parametrize('capacity,expected',[(1,'INFEASIBLE'),(2,'FEASIBLE')])
+def test_private_relations_do_not_waive_physical_shared_capacity(capacity,expected):
+    g=version2();g['nets'][0].update(terminals=['a','b','c','d'],boundary_terminals=['a','b','c','d'],
+                                   frozen_exterior_components=[['a','b'],['c','d']])
+    other=deepcopy(g['nets'][0]);other.update(id='other',terminals=['b','c'],boundary_terminals=['b','c'],frozen_exterior_components=[])
+    g['nets'].append(other);g['edges']=[dict(e,capacity=capacity) for e in g['edges'] if e['id']=='bc']
+    assert c.solve(g)['status']==expected
+    if capacity==1:
+        with pytest.raises(c.InputError,match='capacity exceeded'):c.validate_witness(g,{'n':['bc'],'other':['bc']})
+
+
+@pytest.mark.parametrize('components',[[['a']],[['a','a']],[['a','c'],['a','d']],[['a','b']],[['a','unknown']],['a']])
+def test_bad_exterior_components_rejected(components):
+    g=version2();g['nets'][0]['frozen_exterior_components']=components
+    with pytest.raises(c.InputError):c.validate_graph(g)
+
+
+def test_exterior_schema_and_contract_are_explicit_no_v1_relaxation():
+    g=graph();g['nets'][0]['frozen_exterior_components']=[['a','c']]
+    with pytest.raises(c.InputError):c.validate_graph(g)
+    g=version2();g['contract']['boundary']=c.CONTRACT['boundary']
+    with pytest.raises(c.InputError):c.validate_graph(g)
+    g=version2();g['contract'].pop('exterior_connectivity')
+    with pytest.raises(c.InputError):c.validate_graph(g)
+
+
+def test_exterior_links_count_towards_existing_variable_limit():
+    g=version2();g['edges']=[];g['nets'][0]['terminals']=['a','c','d'];g['nets'][0]['boundary_terminals']=['a','c','d']
+    g['nets'][0]['frozen_exterior_components']=[['a','c','d']]
+    with pytest.raises(c.InputError,match='requires 2 variables'):c.solve(g,max_variables=1)
+
+
+def test_exterior_component_and_global_link_limits(monkeypatch):
+    g=version2();g['nets'][0]['frozen_exterior_components']=[['a','c']]
+    monkeypatch.setattr(c,'MAX_EXTERIOR_LINKS',0)
+    with pytest.raises(c.InputError,match='virtual-link limit'):c.validate_graph(g)
+    monkeypatch.setattr(c,'MAX_EXTERIOR_LINKS',12000)
+    g['nets'][0]['frozen_exterior_components']=[['a','c']]*(c.MAX_NODES//2+1)
+    with pytest.raises(c.InputError,match='list of size'):c.validate_graph(g)
+
+
+@requires_solver
+def test_exterior_component_order_is_canonical_without_changing_layer_order():
+    g=version2();g['nets'][0].update(terminals=['a','b','c','d'],boundary_terminals=['a','b','c','d'],
+                                   frozen_exterior_components=[['a','b'],['c','d']])
+    before=deepcopy(g);first=c.solve(g)
+    assert g==before
+    g['nets'][0]['frozen_exterior_components']=[['d','c'],['b','a']]
+    second=c.solve(g)
+    assert first['graph_sha256']==second['graph_sha256'] and first['model_sha256']==second['model_sha256']
+
+
+@requires_solver
+@pytest.mark.parametrize('capacities',list(itertools.product(range(3),repeat=3)))
+@pytest.mark.parametrize('component',[[],[['a','c']],[['c','d']]])
+def test_private_exterior_matches_independent_exhaustive_subsets(capacities,component):
+    g=version2();g['nets'][0].update(terminals=['a','c','d'],boundary_terminals=['a','c','d'],frozen_exterior_components=component)
+    other=deepcopy(g['nets'][0]);other.update(id='other',terminals=['c','d'],boundary_terminals=['c','d'],frozen_exterior_components=[])
+    g['nets'].append(other)
+    for edge,capacity in zip(g['edges'],capacities):edge['capacity']=capacity
+    expected='FEASIBLE' if brute_feasible(g) else 'INFEASIBLE'
+    assert c.solve(g)['status']==expected
 
 
 def test_validate_copies_and_canonicalizes_without_mutating():

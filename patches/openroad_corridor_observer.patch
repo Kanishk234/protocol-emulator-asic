@@ -1,0 +1,234 @@
+--- a/src/grt/include/grt/GlobalRouter.h
++++ b/src/grt/include/grt/GlobalRouter.h
+@@ -222,6 +222,7 @@
+   void addDirtyNet(odb::dbNet* net);
+   // Experimental, explicit unchanged-net repair; never called by default flow.
+   void forceRerouteNets(const std::vector<odb::dbNet*>& nets);
++  void exportNativeCorridorState();
+   std::set<odb::dbNet*> getDirtyNets() { return dirty_nets_; }
+   // check_antennas
+   bool haveRoutes();
+--- a/src/grt/src/GlobalRouter.cpp
++++ b/src/grt/src/GlobalRouter.cpp
+@@ -8,6 +8,9 @@
+ #include <cmath>
+ #include <cstdint>
+ #include <cstdlib>
++#include <cerrno>
++#include <fcntl.h>
++#include <unistd.h>
+ #include <iomanip>
+ #include <cstring>
+ #include <fstream>
+@@ -5665,6 +5668,54 @@
+ }
+ 
+ // REVIEW-ONLY WARP experiment, pinned upstream dcf36133. No physical edits.
++// WARP explicit observer only. No routing, placement, cost or grid setters.
++void GlobalRouter::exportNativeCorridorState()
++{
++  const char* dir = std::getenv("WARP_CORRIDOR_DIR");
++  if (dir == nullptr || dir[0] == '\0' || force_reroute_mode_
++      || is_incremental_ || grouter_cbk_ != nullptr
++      || !dirty_nets_.empty() || !initialized_
++      || routes_.empty() || use_cugr_ || haveDetailedRoutes()) {
++    throw std::runtime_error("Native corridor observer requires explicit directory and idle initialized global routes");
++  }
++  const std::string path = std::string(dir) + "/native-corridor.tsv";
++  // Serialize before creating the final artifact; failed export leaves no file.
++  std::ostringstream out;
++  fastroute_->exportNativeCorridorState(out);
++  if (!out) {
++    throw std::runtime_error("Incomplete native corridor serialization");
++  }
++  const std::string bytes = out.str();
++  // Linux hosted worker: atomic exclusive creation, including dangling symlinks.
++  const int fd = ::open(path.c_str(), O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW,
++                        0600);
++  if (fd < 0) {
++    throw std::runtime_error("Cannot exclusively create native corridor output");
++  }
++  size_t offset = 0;
++  while (offset < bytes.size()) {
++    const size_t remaining = bytes.size() - offset;
++    const size_t chunk = remaining < 1048576 ? remaining : 1048576;
++    const ssize_t written = ::write(fd, bytes.data() + offset, chunk);
++    if (written < 0 && errno == EINTR) {
++      continue;
++    }
++    if (written <= 0) {
++      // Preserve partial artifact for diagnosis, but emit no success witness.
++      const int close_status = ::close(fd);
++      if (close_status != 0) {
++        throw std::runtime_error("Native corridor write and close failed");
++      }
++      throw std::runtime_error("Incomplete native corridor output write");
++    }
++    offset += static_cast<size_t>(written);
++  }
++  if (::close(fd) != 0) {
++    throw std::runtime_error("Cannot close native corridor observer output");
++  }
++  logger_->report("WARP_NATIVE_CORRIDOR_COMPLETE path={}", path);
++}
++
+ void GlobalRouter::forceRerouteNets(const std::vector<odb::dbNet*>& nets)
+ {
+   if (force_reroute_mode_ || grouter_cbk_ != nullptr || !dirty_nets_.empty()
+--- a/src/grt/src/GlobalRouter.i
++++ b/src/grt/src/GlobalRouter.i
+@@ -184,6 +184,11 @@
+ 
+ // Exact dbNet handles; no glob expansion, pin motion, or netlist mutation.
+ // Experimental southern-pair interface; duplicate/null handles fail closed.
++void export_native_corridor_state()
++{
++  getGlobalRouter()->exportNativeCorridorState();
++}
++
+ void force_reroute_pair(odb::dbNet* first, odb::dbNet* second)
+ {
+   getGlobalRouter()->forceRerouteNets({first, second});
+--- a/src/grt/src/fastroute/include/FastRoute.h
++++ b/src/grt/src/fastroute/include/FastRoute.h
+@@ -5,6 +5,7 @@
+ 
+ #include <cstdint>
+ #include <memory>
++#include <iosfwd>
+ #include <set>
+ #include <string>
+ #include <tuple>
+@@ -277,6 +278,7 @@
+   void getPlanarRoute(odb::dbNet* db_net, GRoute& route);
+   void get3DRoute(odb::dbNet* db_net, GRoute& route);
+   void setIncrementalGrt(bool is_incremental);
++  void exportNativeCorridorState(std::ostream& out) const;
+   // WARP controlled experiment: enabled only by explicit forced repair.
+   void setForceRebuildUsedGrids(bool enabled)
+   {
+--- a/src/grt/src/fastroute/src/FastRoute.cpp
++++ b/src/grt/src/fastroute/src/FastRoute.cpp
+@@ -8,6 +8,9 @@
+ #include <cstdint>
+ #include <limits>
+ #include <memory>
++#include <ostream>
++#include <stdexcept>
++#include <string>
+ #include <tuple>
+ #include <unordered_set>
+ #include <utility>
+@@ -1030,6 +1033,112 @@
+   }
+ }
+ 
++// Read-only WARP export, BSD-3-Clause under the upstream file license.
++// Tree-step rows preserve multiplicity; they are NOT an accepted usage ledger
++// until an independent auditor reconciles every raw 3D edge against them.
++void FastRouteCore::exportNativeCorridorState(std::ostream& out) const
++{
++  if (x_grid_ < 2 || y_grid_ < 2 || num_layers_ <= 0
++      || sttrees_.size() != nets_.size()) {
++    throw std::runtime_error("Native corridor state has invalid dimensions/census");
++  }
++  out << "SCHEMA\twarp-native-corridor-v1\n"
++      << "INDEXING\tzero_based_fast_route_layers_and_grid\n"
++      << "MODEL_GATE\tusage_ledger_verified\tfalse\n"
++      << "VIA_MODEL\tglobal_route_steps_only_no_physical_cut_capacity\n"
++      << "GRID\t" << x_grid_ << '\t' << y_grid_ << '\t' << num_layers_
++      << '\t' << x_corner_ << '\t' << y_corner_ << '\t' << tile_size_ << '\n';
++  auto emit_edge = [&](const char direction, int l, int x, int y,
++                       const Edge3D& edge) {
++    out << "EDGE\t" << direction << '\t' << l << '\t' << x << '\t' << y
++        << '\t' << static_cast<int64_t>(edge.cap)
++        << '\t' << static_cast<int64_t>(edge.usage)
++        << '\t' << static_cast<int64_t>(edge.red)
++        << '\t' << static_cast<int64_t>(edge.real_cap) << '\n';
++  };
++  for (int l = 0; l < num_layers_; ++l) {
++    for (int y = 0; y < y_grid_; ++y) {
++      for (int x = 0; x < x_grid_ - 1; ++x) {
++        emit_edge('H', l, x, y, h_edges_3D_[l][y][x]);
++      }
++    }
++    for (int y = 0; y < y_grid_ - 1; ++y) {
++      for (int x = 0; x < x_grid_; ++x) {
++        emit_edge('V', l, x, y, v_edges_3D_[l][y][x]);
++      }
++    }
++  }
++  size_t exported_nets = 0;
++  size_t exported_steps = 0;
++  for (size_t id = 0; id < nets_.size(); ++id) {
++    FrNet* net = nets_[id];
++    if (net == nullptr) {
++      out << "EMPTY_SLOT\t" << id << '\n';
++      continue;
++    }
++    odb::dbNet* db_net = net->getDbNet();
++    const auto mapping = db_net_id_map_.find(db_net);
++    if (db_net == nullptr || mapping == db_net_id_map_.end()
++        || mapping->second != static_cast<int>(id)) {
++      throw std::runtime_error("Native corridor net mapping is inconsistent");
++    }
++    const std::string name = net->getName();
++    if (name.find_first_of("\t\r\n") != std::string::npos) {
++      throw std::runtime_error("Native corridor net name cannot be encoded");
++    }
++    ++exported_nets;
++    out << "NET\t" << id << '\t' << db_net->getId() << '\t' << name
++        << '\t' << net->isClock() << '\t' << net->isSoftNDR()
++        << '\t' << static_cast<int>(net->getEdgeCost())
++        << '\t' << net->getMinLayer() << '\t' << net->getMaxLayer()
++        << '\t' << net->getDriverIdx() << '\t' << net->getNumPins() << '\n';
++    for (int l = 0; l < num_layers_; ++l) {
++      out << "DEMAND\t" << id << '\t' << l << '\t'
++          << static_cast<int>(net->getLayerEdgeCost(l)) << '\n';
++    }
++    for (int p = 0; p < net->getNumPins(); ++p) {
++      out << "PIN\t" << id << '\t' << p << '\t' << net->getPinX(p)
++          << '\t' << net->getPinY(p) << '\t' << net->getPinL(p) << '\n';
++    }
++    const auto& tree = sttrees_[id];
++    out << "TREE\t" << id << '\t' << tree.num_terminals << '\t'
++        << tree.nodes.size() << '\t' << tree.edges.size() << '\n';
++    for (size_t e = 0; e < tree.edges.size(); ++e) {
++      const auto& edge = tree.edges[e];
++      const auto& route = edge.route;
++      if (route.routelen < 0
++          || (route.routelen > 0
++              && route.grids.size() < static_cast<size_t>(route.routelen) + 1)) {
++        throw std::runtime_error("Native corridor tree route is incomplete");
++      }
++      out << "TREE_EDGE\t" << id << '\t' << e << '\t' << edge.len
++          << '\t' << edge.n1 << '\t' << edge.n2 << '\t' << edge.n1a
++          << '\t' << edge.n2a << '\t' << route.routelen
++          << '\t' << route.grids.size() << '\n';
++      for (int s = 0; s < route.routelen; ++s) {
++        const auto& a = route.grids[s];
++        const auto& b = route.grids[s + 1];
++        if (a.layer < 0 || a.layer >= num_layers_
++            || b.layer < 0 || b.layer >= num_layers_) {
++          throw std::runtime_error("Native corridor step layer out of bounds");
++        }
++        // Exact releaseNetResources weighting; retain nonunit/invalid geometry
++        // for downstream rejection, never expand or deduplicate these rows.
++        const int demand = a.layer == b.layer
++                               ? static_cast<int>(net->getLayerEdgeCost(a.layer))
++                               : 0;
++        out << "STEP\t" << id << '\t' << e << '\t' << s << '\t'
++            << a.x << '\t' << a.y << '\t' << a.layer << '\t'
++            << b.x << '\t' << b.y << '\t' << b.layer << '\t'
++            << demand << '\n';
++        ++exported_steps;
++      }
++    }
++  }
++  out << "COMPLETE\t" << nets_.size() << '\t' << exported_nets
++      << '\t' << exported_steps << '\n';
++}
++
+ void FastRouteCore::get3DRoute(odb::dbNet* db_net, GRoute& route)
+ {
+   int netID;

@@ -8,5 +8,5 @@ in
 assert stock.src.rev == "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0";
 if !force then stock else stock.overrideAttrs (old: {
   pname = "openroad-warp-force-review";
-  patches = (old.patches or []) ++ [ ../../patches/openroad_force_reroute.patch ../../patches/openroad_force_used_grid.patch ];
+  patches = (old.patches or []) ++ [ ../../patches/openroad_force_reroute.patch ../../patches/openroad_force_used_grid.patch ../../patches/openroad_corridor_observer.patch ];
 })

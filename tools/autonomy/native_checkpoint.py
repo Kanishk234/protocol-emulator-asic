@@ -40,6 +40,8 @@ def fingerprint(path: Path) -> dict:
     nets = list(snapshot.nets.items())
     groups = {
         "resource_sha256": _digest_rows([snapshot.grid] + [[key, value] for key, value in snapshot.edges.items()]),
+        "capacity_sha256": _digest_rows([snapshot.grid] + [[key, [value[0], value[2], value[3]]]
+                                                           for key, value in snapshot.edges.items()]),
         "net_id_sha256": _digest_rows([[snapshot.empty_slots]] + [[slot, net["db_id"], net["name"]] for slot, net in nets]),
         "terminal_sha256": _digest_rows([[slot, net["db_id"], net["name"], net["pins"], net["driver_index"],
                                            net["tree_terminals"], net["tree_nodes"]] for slot, net in nets]),
@@ -70,6 +72,11 @@ def audit(paths: dict) -> dict:
             raise CheckpointError(f"{case}: require exactly initial and final snapshots")
         observations[case] = {phase: fingerprint(paths[case][phase]) for phase in PHASES}
     reference = observations["default_identity"]["initial"]
+    for case in CASES:
+        for phase in PHASES:
+            candidate = observations[case][phase]
+            if candidate["groups"]["capacity_sha256"] != reference["groups"]["capacity_sha256"]:
+                raise CheckpointError(f"{case}/{phase}: raw capacity/reduction/real-capacity changed")
     comparisons = []
     for case, phase in [(case, "initial") for case in CASES[1:]] + [("default_identity", "final")]:
         candidate = observations[case][phase]
@@ -80,6 +87,7 @@ def audit(paths: dict) -> dict:
                                   f"{candidate['file_sha256']} != {reference['file_sha256']}")
         comparisons.append({"case": case, "phase": phase, "byte_identical": True})
     return {"schema_version": 1, "checkpoint_identity_verified": True,
+            "all_raw_capacity_fields_unchanged": True,
             "reference_sha256": reference["file_sha256"], "comparisons": comparisons,
             "observations": observations, "repaired_finals_required_identical": False,
             "native_inputs_authenticated": False, "physical_pin_join_authenticated": False,

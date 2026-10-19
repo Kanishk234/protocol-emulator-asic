@@ -88,6 +88,20 @@ def test_identity_does_not_waive_independent_usage_ledger(bundle):
     assert n.audit_file(paths["default_identity"]["initial"])["model_gate"] == "FAIL"
 
 
+@pytest.mark.parametrize("case", ["forced_pair", "rebuilt_pair"])
+@pytest.mark.parametrize("replacement", [
+    "EDGE\tV\t0\t1\t0\t1\t0\t0\t0",  # nonpreferred capacity
+    "EDGE\tV\t0\t1\t0\t0\t0\t1\t0",  # reduction
+    "EDGE\tV\t0\t1\t0\t0\t0\t0\t1",  # real capacity
+])
+def test_changed_repair_final_cannot_change_raw_resource_fields(bundle, case, replacement):
+    paths = c.bundle_paths(bundle)
+    path = paths[case]["final"]
+    path.write_text(BASE.replace("EDGE\tV\t0\t1\t0\t0\t0\t0\t0", replacement))
+    with pytest.raises(c.CheckpointError, match="raw capacity/reduction/real-capacity"):
+        c.audit(paths)
+
+
 def test_missing_case_or_phase_rejected(bundle):
     paths = c.bundle_paths(bundle)
     del paths["forced_pair"]["final"]

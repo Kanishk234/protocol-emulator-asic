@@ -19,16 +19,18 @@ ROOT = Path('runs/native-stock-screen')
 OUTPUT = Path('runs/native-post-timing-antenna-route')
 
 
-def prepare():
+def prepare(config_transform=final_configure):
     expected = configure(json.loads(Path('src/config_merged.json').read_text()),
                          'AREA 1', Path('src/signoff.sdc'), hold_target=.10, clock_cluster=8)
-    Path('/tmp/native-trusted-config.json').write_text(json.dumps(final_configure(expected)))
+    Path('/tmp/native-trusted-config.json').write_text(json.dumps(config_transform(expected)))
     Path('/tmp/native-trusted-files.json').write_text(json.dumps(fingerprints(Path.cwd())))
 
 
-def validate_provenance(run, gates, recipe):
-    expected = dict(id=SOURCE_RUN, head_sha=SOURCE_SHA, head_branch='main', conclusion='success',
-                    path='.github/workflows/gds-native-post-timing-antenna-screen.yaml')
+def validate_provenance(run, gates, recipe, profile=None):
+    profile = {} if profile is None else profile
+    expected = dict(id=profile.get('source_run', SOURCE_RUN),
+                    head_sha=profile.get('source_sha', SOURCE_SHA), head_branch='main', conclusion='success',
+                    path=profile.get('source_workflow', '.github/workflows/gds-native-post-timing-antenna-screen.yaml'))
     if any(run.get(k) != v for k, v in expected.items()):
         raise ValueError('Wrong qualified native antenna source')
     required = dict(qualified=True, minimum_fast_hold_ns=.05, clean_synthesis=True,
@@ -39,7 +41,7 @@ def validate_provenance(run, gates, recipe):
         raise ValueError('Unqualified native antenna gate receipt')
     required = dict(source_variant='bs-event-late', synthesis_strategy='AREA 1',
                     stock_sequence=False, stock_prefix_sequence=True, checkpoint_ecos=False,
-                    post_grt_design_repair=True, hold_target_ns=.10, clock_sink_clustering_size=8,
+                    post_grt_design_repair=True, hold_target_ns=profile.get('hold_target_ns', .10), clock_sink_clustering_size=8,
                     repair_corners=list(CORNERS), extra_native_steps=['OpenROAD.RepairAntennas'])
     if any(recipe.get(k) != v for k, v in required.items()):
         raise ValueError('Wrong native antenna recipe')
@@ -79,7 +81,10 @@ def validate_checkpoint(config, gates, recipe):
     return source
 
 
-def main():
+def main(profile=None):
+    profile = {} if profile is None else profile
+    output = Path(profile.get('output', OUTPUT))
+    source_run = profile.get('source_run', SOURCE_RUN)
     config = json.loads(Path('src/config_native_stock.json').read_text())
     if config != json.loads(Path('/tmp/native-trusted-config.json').read_text()):
         raise ValueError('Wrong full native antenna physical config')
@@ -92,27 +97,27 @@ def main():
         raise ValueError('Native antenna hardware/constraints fingerprint mismatch')
     gates = json.loads((ROOT/'gates.json').read_text())
     recipe = json.loads((ROOT/'recipe.json').read_text())
-    validate_provenance(json.loads(Path('/tmp/native-source-run.json').read_text()), gates, recipe)
+    validate_provenance(json.loads(Path('/tmp/native-source-run.json').read_text()), gates, recipe, profile=profile)
     source = validate_checkpoint(config, gates, recipe)
-    OUTPUT.mkdir(exist_ok=False)
+    output.mkdir(exist_ok=False)
     os.environ.pop('LIBRELANE_IMAGE_OVERRIDE', None)
     # Fresh checks retain the strict reserve gate before DRT; no repair is repeated.
-    run_step(config, source, OUTPUT/'antenna', ['OpenROAD.CheckAntennas'])
+    run_step(config, source, output/'antenna', ['OpenROAD.CheckAntennas'])
     path = Path('src/config_native_post_antenna_route.json')
     path.write_text(json.dumps(config, indent=2)+'\n')
-    screen(path, source, OUTPUT/'timing', os.environ['PDK_ROOT'], repaired=source,
+    screen(path, source, output/'timing', os.environ['PDK_ROOT'], repaired=source,
            sdc=Path('src/signoff.sdc'),
            extra_tcl=Path('workflow-src/scripts/ci/electrical_margin_probe.tcl'))
-    antenna = json.loads(unique(OUTPUT/'antenna', '*-openroad-checkantennas/or_metrics_out.json').read_text())
-    fresh = evaluate_saved(OUTPUT, OUTPUT/'timing', antenna)
-    fresh.update(source_run=SOURCE_RUN, repair_repeated=False, state=str(source))
-    (OUTPUT/'gates.json').write_text(json.dumps(fresh, indent=2)+'\n')
+    antenna = json.loads(unique(output/'antenna', '*-openroad-checkantennas/or_metrics_out.json').read_text())
+    fresh = evaluate_saved(output, output/'timing', antenna)
+    fresh.update(source_run=source_run, repair_repeated=False, state=str(source))
+    (output/'gates.json').write_text(json.dumps(fresh, indent=2)+'\n')
     if not fresh['qualified']:
         raise ValueError('Fresh native antenna gates fail; detailed routing refused')
     # Shared continuation audits DRT connectivity/zero DRC, extracts all corners,
     # and rejects negative setup, fast hold below 50ps, electrical or antenna errors.
     from electrical_incremental_route import continue_route
-    continue_route(config, source, OUTPUT/'qualified-route', source_run=SOURCE_RUN)
+    continue_route(config, source, output/'qualified-route', source_run=source_run)
 
 
 if __name__ == '__main__':

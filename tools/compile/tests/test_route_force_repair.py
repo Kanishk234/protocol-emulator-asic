@@ -4,9 +4,124 @@ import re
 import sys
 from types import SimpleNamespace
 import pytest
+import hashlib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'test_internal'))
 import cloud_route_force_repair as force
+
+
+@pytest.fixture
+def corridor_controls(tmp_path, monkeypatch):
+    stages, cases, calls = {}, {}, []
+    for name, overflow in [('default_identity', 121), ('forced_pair', 132), ('rebuilt_pair', 139)]:
+        stage = tmp_path/name/'replay'/'1-openroad-globalrouting';stage.mkdir(parents=True)
+        stages[name] = stage
+        witnesses=[]
+        for phase in ('initial', 'final'):
+            directory=stage/('corridor-'+phase);directory.mkdir()
+            path=directory/'native-corridor.tsv';path.write_text('native-fixture\n')
+            witnesses.append('WARP_NATIVE_CORRIDOR_COMPLETE path='+str(path))
+        (stage/'openroad-globalrouting.log').write_text('\n'.join(witnesses)+'\n')
+        for filename in ('native-segments.txt','native-grid.tsv','native-boundary-grid.tsv'):
+            (stage/filename).write_text('unchanged')
+        cases[name]={'native_tcl_returncode':1,'native_error':'GRT-0116' if name=='default_identity' else 'GRT-0232',
+            'final_observed_full_grid_overflow':overflow,'capacities_unchanged':True,
+            'physical_census_and_geometry_unchanged':True,'physical_acceptance':False,
+            'final_boundary_grid':{'total_overflow':0},
+            'final_grid':{'layers':{k:{'overflow':v} for k,v in {'Metal1':15,'Metal2':66,'Metal3':26,'Metal4':32}.items()}}}
+    def sha(path):
+        path=Path(path)
+        keys={'native-segments.txt':'segments','native-grid.tsv':'interior','native-boundary-grid.tsv':'boundary'}
+        if path.name in keys and 'default_identity' in path.parts and path.read_text()=='unchanged':
+            return force.EXPECTED_SEGMENTS if path.name=='native-segments.txt' else force.EXPECTED_GRID
+        if path.name in keys and path.read_text()=='unchanged':return force.REFERENCE_REBUILT[keys[path.name]]
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    monkeypatch.setattr(force.trace.cfg,'sha',sha)
+    monkeypatch.setattr(force,'validate_observer',lambda *args:calls.append('legacy-qualified'))
+    def parse(path):
+        calls.append(('parse',Path(path)))
+        return {'model_gate':'PASS','input_sha256':sha(path),'native_inputs_authenticated':False,'physical_acceptance':False}
+    monkeypatch.setattr(force,'native_corridor_audit',parse)
+    return stages,cases,calls
+
+
+def test_native_corridor_all_controls_qualified_before_any_parser(corridor_controls):
+    stages,cases,calls=corridor_controls
+    result=force.qualify_native_corridors(stages,cases)
+    assert calls[0]=='legacy-qualified' and len(calls)==7
+    assert result['controls_qualified'] and result['model_gate']
+    assert not result['native_inputs_authenticated'] and not result['physical_acceptance']
+
+
+@pytest.mark.parametrize('failure',['missing_case','wrong_default','changed121','changed139','wrong_native_error','geometry'])
+def test_failed_control_prevents_raw_native_interpretation(corridor_controls,failure):
+    stages,cases,calls=corridor_controls
+    if failure=='missing_case':cases.pop('default_identity')
+    elif failure=='wrong_default':cases['default_identity']['final_observed_full_grid_overflow']=120
+    elif failure=='changed121':(stages['default_identity']/'native-grid.tsv').write_text('changed')
+    elif failure=='changed139':(stages['rebuilt_pair']/'native-grid.tsv').write_text('changed')
+    elif failure=='wrong_native_error':cases['rebuilt_pair']['native_error']='Unexpected exporter error'
+    else:cases['forced_pair']['physical_census_and_geometry_unchanged']=False
+    with pytest.raises(ValueError):force.qualify_native_corridors(stages,cases)
+    assert not any(isinstance(call,tuple) and call[0]=='parse' for call in calls)
+
+
+@pytest.mark.parametrize('failure',['missing_witness','duplicate_witness','reversed_witness','wrong_path','missing_file'])
+def test_failed_native_export_or_witness_prevents_parsing(corridor_controls,failure):
+    stages,cases,calls=corridor_controls;stage=stages['rebuilt_pair'];log=stage/'openroad-globalrouting.log'
+    rows=log.read_text().splitlines()
+    if failure=='missing_witness':rows.pop()
+    elif failure=='duplicate_witness':rows.append(rows[-1])
+    elif failure=='reversed_witness':rows.reverse()
+    elif failure=='wrong_path':rows[-1]=rows[-1].replace('/corridor-final/','/corridor-other/')
+    else:(stage/'corridor-final/native-corridor.tsv').unlink()
+    log.write_text('\n'.join(rows)+'\n')
+    with pytest.raises(ValueError):force.qualify_native_corridors(stages,cases)
+    assert not any(isinstance(call,tuple) and call[0]=='parse' for call in calls)
+
+
+def test_native_ledger_mismatch_is_diagnostic_not_fabricated_success(corridor_controls,monkeypatch):
+    stages,cases,_=corridor_controls
+    monkeypatch.setattr(force,'native_corridor_audit',lambda p:{'model_gate':'FAIL','input_sha256':force.trace.cfg.sha(p),'usage_ledger_reconciled':False,
+        'native_inputs_authenticated':False,'physical_acceptance':False})
+    result=force.qualify_native_corridors(stages,cases)
+    assert result['controls_qualified'] and result['model_gate'] is False
+    assert not result['physical_acceptance']
+
+
+def test_malformed_native_state_is_collection_error(corridor_controls,monkeypatch):
+    stages,cases,_=corridor_controls
+    def malformed(path):raise ValueError('Malformed native ledger')
+    monkeypatch.setattr(force,'native_corridor_audit',malformed)
+    with pytest.raises(ValueError,match='Malformed native'):force.qualify_native_corridors(stages,cases)
+
+
+def test_corridor_initial_export_follows_exact_and_physical_guards():
+    text=force.force_trace(True,True)
+    for expected in [force.EXPECTED_GRID,force.EXPECTED_SEGMENTS,*force.BEFORE_PHYSICAL.values()]:
+        assert text.index(expected)<text.index('set warp_corridor_dir $::env(STEP_DIR)/corridor-initial')
+    assert text.index('corridor-initial')<text.index('log_cmd grt::force_reroute_pair')<text.index('corridor-final')
+    assert text.count('log_cmd grt::export_native_corridor_state')==2
+
+
+def test_failed_native_export_unsets_environment_and_preserves_error(tmp_path):
+    tkinter=pytest.importorskip('tkinter');interp=tkinter.Tcl()
+    interp.setvar('env(STEP_DIR)',str(tmp_path))
+    interp.eval('namespace eval grt {proc export_native_corridor_state {} {error "Native writer failed"}}')
+    interp.eval('proc log_cmd {args} {uplevel 1 $args}')
+    with pytest.raises(tkinter.TclError,match='Native writer failed'):
+        interp.eval(force.corridor_export_body('initial'))
+    assert interp.eval('info exists ::env(WARP_CORRIDOR_DIR)')=='0'
+    assert not (tmp_path/'corridor-initial/native-corridor.tsv').exists()
+
+
+def test_native_export_rejects_existing_directory_without_calling_writer(tmp_path):
+    tkinter=pytest.importorskip('tkinter');interp=tkinter.Tcl()
+    interp.setvar('env(STEP_DIR)',str(tmp_path));(tmp_path/'corridor-initial').mkdir()
+    interp.eval('namespace eval grt {proc export_native_corridor_state {} {error "Writer must not execute"}}')
+    interp.eval('proc log_cmd {args} {uplevel 1 $args}')
+    with pytest.raises(tkinter.TclError,match='already exists'):
+        interp.eval(force.corridor_export_body('initial'))
 
 
 def test_boundary_directions_match_independent_pinned_cmos5l_lef_extract():
@@ -498,6 +613,8 @@ def test_candidate_cannot_run_before_both_controls_pass(tmp_path,monkeypatch,fai
         return {'observer_equivalence_verified': True}
     monkeypatch.setattr(force, 'validate_stage', stage_validator)
     monkeypatch.setattr(force, 'validate_observer', observer_validator)
+    monkeypatch.setattr(force, 'validate_rebuilt_control', lambda *args: None)
+    monkeypatch.setattr(force, 'qualify_native_corridors', lambda *args: {'controls_qualified': True})
     if failed_control:
         with pytest.raises(ValueError, match='Injected failed'):
             force.main()

@@ -23,6 +23,15 @@ REFERENCE_REPAIR = {
     'interior': '6a648ef741a2bb9071f5bcd33c4eccd9dd0be8fe813770ba903f611ecc7b1c03',
     'boundary': '24a84793cd7507483da418601a676c21bb497c3c8ee8e321cf2f8ebbe16efc53',
 }
+REFERENCE_REBUILT = {
+    'segments': '10dffe113661bd822b02fa099b5c536bc87f310bb672999e09e7acac32296a46',
+    'interior': '9c7b0cc1152930ccf13a415faadd68ef244e9bba137dc5278c3becb7b7f2febf',
+    'boundary': '7f72b3bdcbf5c8ddc9ef03eda4de1adfc28849ec963e86f382ce36ca32f31669',
+}
+BEFORE_PHYSICAL = {
+    'before-census.tsv': '3d8a7d032a84720fa1b4e5a243cccadde5678630f0067d846f25352ba4905aa3',
+    'before-geometry.tsv': '27523c434dc0e91e0c39a380519c8e9f6bf4dcc2db3998023d924846cd595772',
+}
 SEEDS = {'cell_pad[31]', 'cell_val[30]'}
 # IHP CMOS5L tech LEF at 2bbec755dc67ca3db0261c3d6163e15735d66710:
 # sg13cmos5l_tech.lef SHA256 3edd5a1ad31e8307be537d0d1b85c3258fefeb21aac04aaa476e4f72de4cffd5.
@@ -111,6 +120,22 @@ def geometry_body(name):
             '$::env(STEP_DIR)/' + name) + '\n')
 
 
+def corridor_export_body(phase):
+    if phase not in ('initial', 'final'):
+        raise ValueError('Unknown native corridor export phase')
+    return r'''
+if {[info exists ::env(WARP_CORRIDOR_DIR)]} {error "Unexpected inherited native corridor directory"}
+if {[llength [info commands grt::export_native_corridor_state]] != 1} {error "Native corridor API missing"}
+set warp_corridor_dir $::env(STEP_DIR)/corridor-@PHASE@
+if {![catch {file lstat $warp_corridor_dir warp_corridor_stat}]} {error "Native corridor directory already exists"}
+file mkdir $warp_corridor_dir
+set ::env(WARP_CORRIDOR_DIR) $warp_corridor_dir
+set warp_corridor_code [catch {log_cmd grt::export_native_corridor_state} warp_corridor_error warp_corridor_options]
+unset ::env(WARP_CORRIDOR_DIR)
+if {$warp_corridor_code != 0} {return -options $warp_corridor_options $warp_corridor_error}
+'''.replace('@PHASE@', phase)
+
+
 RESOLVE = r'''
 set warp_handles {}
 foreach warp_name {cell_pad[31] cell_val[30]} {
@@ -149,6 +174,10 @@ write_global_route_segments $::env(STEP_DIR)/initial-segments.txt
         text += ('if {[lindex [exec sha256sum $::env(STEP_DIR)/' + filename + '] 0] ne "' + expected +
                  '"} {error "Custom tool initial checkpoint hash mismatch"}\n')
     text += 'census $::env(STEP_DIR)/before-census.tsv\n' + geometry_body('before-geometry.tsv')
+    for filename, expected in BEFORE_PHYSICAL.items():
+        text += ('if {[lindex [exec sha256sum $::env(STEP_DIR)/' + filename + '] 0] ne "' + expected +
+                 '"} {error "Initial physical census differs from authenticated121"}\n')
+    text += corridor_export_body('initial')
     text += r'''
 set warp_initial [open $::env(STEP_DIR)/initial-return.txt w]
 puts $warp_initial $warp_route_code
@@ -176,6 +205,7 @@ write_global_route_segments $::env(STEP_DIR)/native-segments.txt
 '''
     text += grid_body('native-grid.tsv') + boundary_grid_body('native-boundary-grid.tsv') + GUIDES
     text += 'census $::env(STEP_DIR)/after-census.tsv\n' + geometry_body('after-geometry.tsv')
+    text += corridor_export_body('final')
     text += 'if {$warp_route_code != 0} {return -options $warp_route_options $warp_route_error}\n'
     return text
 
@@ -429,6 +459,85 @@ def validate_rebuild_witness(stage, name):
     return count
 
 
+def validate_rebuilt_control(stage, validated):
+    """D102 final139 is a noninterference control, never an improvement."""
+    stage = Path(stage)
+    files = {'segments': 'native-segments.txt', 'interior': 'native-grid.tsv',
+             'boundary': 'native-boundary-grid.tsv'}
+    if any(trace.cfg.sha(stage/name) != REFERENCE_REBUILT[key] for key, name in files.items()):
+        raise ValueError('Native observer changes exactD102139 route/grid hashes')
+    if (validated['native_tcl_returncode'] != 1 or validated['native_error'] != 'GRT-0232' or
+            validated['final_observed_full_grid_overflow'] != 139 or
+            validated['final_boundary_grid']['total_overflow'] != 0 or
+            {name: row['overflow'] for name, row in validated['final_grid']['layers'].items()} !=
+            {'Metal1': 15, 'Metal2': 66, 'Metal3': 26, 'Metal4': 32}):
+        raise ValueError('Native observer no longer reproduces rejectedD102139')
+
+
+def native_corridor_audit(path):
+    # Hosted runner starts with test_internal on sys.path; add only project tools.
+    sys.path.insert(0, str(trace.ROOT/'tools'))
+    from autonomy.native_corridor import audit_file
+    return audit_file(path)
+
+
+def qualify_native_corridors(stages, cases):
+    """No raw-state interpretation until all three native controls qualify."""
+    names = ('default_identity', 'forced_pair', 'rebuilt_pair')
+    if set(stages) != set(names) or set(cases) != set(names):
+        raise ValueError('Native corridor qualification requires all three controls')
+    for name in names:
+        case = cases[name]
+        expected_overflow = {'default_identity': 121, 'forced_pair': 132, 'rebuilt_pair': 139}[name]
+        expected_error = 'GRT-0116' if name == 'default_identity' else 'GRT-0232'
+        if (case['native_tcl_returncode'] != 1 or case['native_error'] != expected_error or
+                case['final_observed_full_grid_overflow'] != expected_overflow or
+                case['capacities_unchanged'] is not True or
+                case['physical_census_and_geometry_unchanged'] is not True or
+                case['physical_acceptance'] is not False):
+            raise ValueError('Failed native control before raw-state qualification')
+    default = Path(stages['default_identity'])
+    if (trace.cfg.sha(default/'native-segments.txt') != EXPECTED_SEGMENTS or
+            trace.cfg.sha(default/'native-grid.tsv') != EXPECTED_GRID):
+        raise ValueError('Native corridor observer changes exact121 default exports')
+    validate_observer(stages['forced_pair'], cases['forced_pair'])
+    validate_rebuilt_control(stages['rebuilt_pair'], cases['rebuilt_pair'])
+    # All controls above must pass before even one parser invocation below.
+    exports, completions = {}, {}
+    for name in names:
+        stage = Path(stages[name])
+        raw = (stage/'openroad-globalrouting.log').read_text()
+        witnesses = re.findall(r'^WARP_NATIVE_CORRIDOR_COMPLETE path=(.+)$', raw, re.M)
+        if len(witnesses) != 2:
+            raise ValueError('Missing or repeated native corridor completion witness')
+        for index, phase in enumerate(('initial', 'final')):
+            directory = stage/('corridor-'+phase)
+            path = directory/'native-corridor.tsv'
+            suffix = '/'+name+'/replay/'+stage.name+'/corridor-'+phase+'/native-corridor.tsv'
+            if (not witnesses[index].endswith(suffix) or not directory.is_dir() or directory.is_symlink() or
+                    {p.name for p in directory.iterdir()} != {'native-corridor.tsv'} or
+                    not path.is_file() or path.is_symlink()):
+                raise ValueError('Malformed native corridor witness or export inventory')
+            exports[name, phase] = path
+            completions[name, phase] = witnesses[index]
+    observations = {}
+    for name in names:
+        observations[name] = {}
+        for phase in ('initial', 'final'):
+            path = exports[name, phase]
+            parsed = native_corridor_audit(path)  # Format errors abort collection.
+            file_sha = trace.cfg.sha(path)
+            if parsed['input_sha256'] != file_sha:
+                raise ValueError('Native corridor bytes changed during accounting audit')
+            observations[name][phase] = {'file_sha256': file_sha, 'native_completion_verified': True,
+                                          'native_completion_witness': completions[name, phase],
+                                          'audit': parsed}
+    gates = [row['audit']['model_gate'] == 'PASS' for phases in observations.values() for row in phases.values()]
+    return {'controls_qualified': True, 'model_gate': all(gates), 'observations': observations,
+            'native_inputs_authenticated': False, 'physical_acceptance': False,
+            'scope': 'Authenticated routing controls plus raw export accounting; ledger mismatch is diagnostic only'}
+
+
 def main():
     binary = os.environ['WARP_FORCE_OPENROAD']
     options = docker_options(binary)
@@ -445,17 +554,22 @@ def main():
                    '-c', 'import librelane,os,subprocess,sys; print(sys.version); subprocess.run([os.environ["_LLN_OVERRIDE_OPENROAD"],"-version"],check=True)']
         with (output/'runtime-smoke.log').open('w') as log:
             subprocess.run(command, check=True, stdout=log, stderr=subprocess.STDOUT, timeout=60)
+        stages = {}
         for name, repair in [('default_identity', False), ('forced_pair', True), ('rebuilt_pair', True)]:
             trace.OUT = output/name
             trace.main(15, worker=__file__, docker_args=options,
                        native_error_codes=('GRT-0116', 'GRT-0232') if repair else ('GRT-0116',),
                        repair_observation=repair)
             stage, = (trace.OUT/'replay').glob('*-openroad-globalrouting')
+            stages[name] = stage
             result['cases'][name] = validate_stage(stage, repair)
             if name == 'forced_pair':
                 result['cases'][name]['observer'] = validate_observer(stage, result['cases'][name])
             result['cases'][name]['used_grid_rebuild_calls'] = validate_rebuild_witness(stage, name)
+            if name == 'rebuilt_pair':
+                validate_rebuilt_control(stage, result['cases'][name])
             # The next case starts only after full custom-default identity passed.
+        result['native_corridor'] = qualify_native_corridors(stages, result['cases'])
         result['diagnostic_completed'] = True
     except Exception as exc:
         result['error'] = str(exc)

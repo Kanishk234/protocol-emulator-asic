@@ -133,6 +133,12 @@ set ::env(WARP_CORRIDOR_DIR) $warp_corridor_dir
 set warp_corridor_code [catch {log_cmd grt::export_native_corridor_state} warp_corridor_error warp_corridor_options]
 unset ::env(WARP_CORRIDOR_DIR)
 if {$warp_corridor_code != 0} {return -options $warp_corridor_options $warp_corridor_error}
+set warp_corridor_output $warp_corridor_dir/native-corridor.tsv
+if {[catch {file lstat $warp_corridor_output warp_corridor_output_stat}] ||
+    $warp_corridor_output_stat(type) ne "file"} {error "Native corridor export is not a regular file"}
+# The exclusive native writer starts0600 as container root. Permit only this
+# successfully completed, known artifact to be read by the hosted collector.
+file attributes $warp_corridor_output -permissions 0644
 '''.replace('@PHASE@', phase)
 
 

@@ -107,12 +107,53 @@ def test_corridor_initial_export_follows_exact_and_physical_guards():
 def test_failed_native_export_unsets_environment_and_preserves_error(tmp_path):
     tkinter=pytest.importorskip('tkinter');interp=tkinter.Tcl()
     interp.setvar('env(STEP_DIR)',str(tmp_path))
-    interp.eval('namespace eval grt {proc export_native_corridor_state {} {error "Native writer failed"}}')
+    interp.eval('''namespace eval grt {proc export_native_corridor_state {} {
+        set out [open $::env(WARP_CORRIDOR_DIR)/native-corridor.tsv w]
+        puts $out partial
+        close $out
+        file attributes $::env(WARP_CORRIDOR_DIR)/native-corridor.tsv -permissions 0600
+        error "Native writer failed"
+    }}''')
     interp.eval('proc log_cmd {args} {uplevel 1 $args}')
     with pytest.raises(tkinter.TclError,match='Native writer failed'):
         interp.eval(force.corridor_export_body('initial'))
     assert interp.eval('info exists ::env(WARP_CORRIDOR_DIR)')=='0'
-    assert not (tmp_path/'corridor-initial/native-corridor.tsv').exists()
+    partial=tmp_path/'corridor-initial/native-corridor.tsv'
+    assert partial.read_text()=='partial\n'
+    assert partial.stat().st_mode & 0o777==0o600
+
+
+def test_successful_native_export_changes_only_known_owner_only_artifact_to_readable(tmp_path):
+    tkinter=pytest.importorskip('tkinter');interp=tkinter.Tcl()
+    interp.setvar('env(STEP_DIR)',str(tmp_path))
+    unrelated=tmp_path/'unrelated.tsv';unrelated.write_text('private');unrelated.chmod(0o600)
+    interp.eval('''namespace eval grt {proc export_native_corridor_state {} {
+        set out [open $::env(WARP_CORRIDOR_DIR)/native-corridor.tsv w]
+        puts $out complete
+        close $out
+        file attributes $::env(WARP_CORRIDOR_DIR)/native-corridor.tsv -permissions 0600
+    }}''')
+    interp.eval('proc log_cmd {args} {uplevel 1 $args}')
+    interp.eval(force.corridor_export_body('initial'))
+    output=tmp_path/'corridor-initial/native-corridor.tsv'
+    assert output.read_text()=='complete\n' and output.stat().st_mode & 0o777==0o644
+    assert unrelated.stat().st_mode & 0o777==0o600
+    assert interp.eval('info exists ::env(WARP_CORRIDOR_DIR)')=='0'
+
+
+def test_native_export_rejects_symlink_before_permission_change(tmp_path):
+    tkinter=pytest.importorskip('tkinter');interp=tkinter.Tcl()
+    interp.setvar('env(STEP_DIR)',str(tmp_path))
+    target=tmp_path/'private.tsv';target.write_text('private');target.chmod(0o600)
+    interp.setvar('warp_test_target',str(target))
+    interp.eval('''namespace eval grt {proc export_native_corridor_state {} {
+        file link -symbolic $::env(WARP_CORRIDOR_DIR)/native-corridor.tsv $::warp_test_target
+    }}''')
+    interp.eval('proc log_cmd {args} {uplevel 1 $args}')
+    with pytest.raises(tkinter.TclError,match='not a regular file'):
+        interp.eval(force.corridor_export_body('initial'))
+    assert target.stat().st_mode & 0o777==0o600
+    assert interp.eval('info exists ::env(WARP_CORRIDOR_DIR)')=='0'
 
 
 def test_native_export_rejects_existing_directory_without_calling_writer(tmp_path):

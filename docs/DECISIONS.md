@@ -1111,6 +1111,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Test wire150µm/hold-target125ps as one coupled physical-repair policy comparison to wire100/100ps. Retain complete2/4hardware,20ns/fully timed constraints, allcorner repair, CTS100/clock8/electrical55/antenna50/final antenna pass, stock image and every acceptance gate. Add read-only FF-capture setup/hold reports so zero-slack latch endpoint paths do not monopolize diagnostic reporting.
 - Cost/risk: longer segments may lose electrical reserve, while extra hold repair may increase setup delay/area/congestion. Neither change guarantees improvement; no gate waiver, protocol-specific hardware, RTL/ISA/latency change or official configuration adoption. Screen all guards before any new DRT. Evidence and next steps: docs/reports/PHASE2_NATIVE_ROUTE_TIMING_GAP.md.
 
+## D-088 — Native setup reserve must be measured before routing
+
+- General need: wire150/hold125route39278561678attempt2 passes hold/electrical/antenna/DRT DRC but slow setup is−1.608072ns.108negative reported paths originate at two configuration latches; worst dropped-counter endpoint changes from estimated+1.611147ns to extracted−1.608072ns, with a changed worst startpoint. Zero global WS and electrical reserve are insufficient setup evidence.
+- Test one native setting, GRT_RESIZER_SETUP_SLACK_MARGIN0→4ns, on the otherwise fixed wire150/hold125 recipe. Pin all prior source/image/corner/constraints/physical settings. Native pinned Tcl forwards setup margin to repair_timing; no custom image or source-bound ECO.
+- Add a stricter estimated screen gate requiring slow FF-capture setup minimum≥3.5ns after all original gates pass. Keep20ns fully timed SDC, final50ps hold acceptance and zero electrical/antenna/overflow/0.45reserve. Missing/nonfinite/wrong-type reports fail closed. Never substitute the requested4ns target for observed slack.
+- Cost/risk: optimizer may not converge or may add area, alter hold, or consume electrical/routing reserve. This margin is a test based on one paired result, not a routed closure guarantee. No DRT until measured guards pass; no architecture/ISA/RTL/latency changes or official configuration adoption. Evidence: PHASE2_NATIVE_ROUTE_TIMING_GAP.md.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

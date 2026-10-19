@@ -2,8 +2,65 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-19 — Concentrated setup frontier; prepare stronger measured native screen
+
+- Retrieved selected exact attempt2 artifact12210790306:108of1000reported worst slow paths violate, originating at config latches48179(unit0word0bit4) and48093(unit0word4bit2). Worst endpoint47215/dropped[14] has estimated+1.611147ns from48093 but extracted−1.608072ns from48179. Endpoint-level3.219ns gap is not same-path attribution.
+- Prepared one-setting native wire150-setup4 trial: setup-repair margin0→4ns, retaining wire150/hold125 and every prior constraint/physical policy/gate. Pinned LibreLane forwards setup margin directly; checked primary OpenROAD documentation. Added measured slow FF-capture setup guard≥3.5ns after original screen qualification. Missing/malformed/nonfinite/wrong-type evidence persists qualified=false; other failed gates cannot be overridden. Post-GRT repair logs/config/metrics included in early artifacts.
+-60focused tests pass; parser checked against actual prior capture reports (slow1.483047fails new guard); YAML/shell/whitespace checks pass. D-088/paired report record area/hold/electrical/congestion risks and no routed guarantee. Next publish/launch screen within standing command approval, inspect actual repair activity and all guards before DRT. No hardware/config/template changes or phase boxes ticked.
+
+## 2026-10-19 — Wire150 extracted hold/physical checks pass; slow setup remains
+
+- User-requested status check: original docs/lint/test/unit all passed; route39278561678attempt2 failed at strict extracted gates after completed DRT/extraction. Independently downloaded early gate receipts: slow setup−1.608071943ns; fast/typ/slow hold107.658663/219.348990/417.386360ps; allcorner electrical0/0/0, antenna0/0, DRT DRC0. Actual gate failure is slow setup, not an import or cancellation issue.
+- Compared with wire100route39149073496: slow setup improves2.610570ns and hold now clears50ps. Instance area574597µm² versus592373; instances39113versus42698. Coupled policy prevents attributing changes to either setting alone. Paired report updated; failing route's protocol replay remains blocked. No phase boxes ticked.
+- Four duplicate runs cancelled, duplicate test passed; no additional runs launched this check. Initial read-only status approval timed out; permitted retry succeeded. Next inspect actual newly critical slow setup paths against estimated capture reports and retain current hold/electrical/antenna/DRC gains.
+
+## 2026-10-19 — Cancellation states settle; original route/unit restarted successfully
+
+- Latest user status request: original docs39278561411/lint39278561458/test39278561430 passed; original route39278561678/unit39278561412 and four duplicates cancelled, while duplicate test39279558733 passed. No physical gate failure inferred from cancellation.
+- Completed the user's earlier relaunch authorization by rerunning only original route/unit, leaving successful checks and duplicate cancellations intact. Both now attempt2/in_progress. Route job118182912383 has runner GitHub Actions1000008093 and active step "Qualify fresh antenna and timing, route and extract". No new extracted result yet.
+- Interrupted artifact inspection resumed: selected file list shows original attempt stopped during pre-route STA, with no DRT output; a byte-range SSL handshake timed out before all selected logs saved. Direct original-job log retrieval approval timed out; this optional read did not prevent successful restarts or status verification. No code/history changes or phase boxes ticked. Next monitor route attempt2 and independently inspect every final gate.
+
+## 2026-10-19 — Recover successful docs logs despite missing step metadata
+
+- User could see only docs job success, no steps/logs. Both run-view and jobs REST responses for39278561411/job118148580634 return steps=[]; ordinary gh run view --log yields0bytes. Direct GET actions/jobs/118148580634/logs succeeds with66589bytes, saved /tmp/tripwire-docs-job-118148580634.log.
+- Raw logs prove checkout, Tiny Tapeout documentation check passed, Typst datasheet generation, and successful PDF artifact upload12199131046(31448compressed bytes). Job executes15:30:50–15:31:28UTC. This is missing/inconsistent step telemetry, not evidence of an empty or skipped docs build; BUG123 records the workaround. Previous-run comparison endpoint returned502; no broader root cause proven.
+- No workflow/code changes or dispatch performed. Use direct job logs when normal step-based retrieval is empty, and distinguish API state/step visibility from actual execution evidence. No phase boxes ticked.
+
+## 2026-10-19 — Original route transitions to in-progress
+
+- Latest status: original route39278561678 and lint39278561458 in_progress, original docs39278561411 passed; original unit39278561412/test39278561430 queued. Job APIs expose no step details yet, so detailed routing itself is not confirmed started.
+- All five fresh duplicates still queued; cancellation completion remains unconfirmed. Two stale October7runs also queued (repository total2running/9queued). No new failures or timing measurements. No mutation/dispatch/cancellation performed; next inspect original route's steps and eventual extracted gates. No phase boxes ticked.
+
+## 2026-10-19 — User requests duplicate cancellation; originals remain visible
+
+- User reports requesting cancellation of the five newly dispatched duplicates. Latest API still lists all five queued, so cancellation completion is not confirmed; no additional cancellation or relaunch submitted this turn.
+- Original docs39278561411 now passed, lint39278561458 running, unit39278561412/test39278561430/route39278561678 queued. Both sets target the same07aa6b3head; cancelling duplicates does not discard unique hardware changes or completed timing evidence. Next follow originals and verify duplicate cancellations settle; do not launch more copies. No phase boxes ticked.
+
+## 2026-10-19 — Queue status: original docs/lint obtain runners
+
+- User-requested all-workflow check: original docs39278561411 and lint39278561458 now in_progress with assigned GitHub-hosted runners. No individual active step exposed yet. Original unit39278561412/test39278561430/route39278561678 remain queued; all five fresh duplicates39279550694/39279554522/39279558733/39279563849/39279568719 remain queued.
+- Repository-wide status query returns2in-progress and10queued, including the two stale October7runs37655518919/37655518925. Both current route attempts have no runner assigned; no new route measurements or completed failures. Latest nightly39270782264 and wire150screen39177724036 passed. No changes/dispatch/cancellation performed; next wait for route runner assignment and inspect its exact run ID when results exist. No phase boxes ticked.
+
+## 2026-10-19 — Explicitly requested fresh duplicate workflow dispatches
+
+- User requested new duplicate runs despite the originals' inconsistent queued/cancellation state. Confirmed all five existing workflows support workflow_dispatch; dispatched each exactly once on main without file/history changes.
+- Fresh runs on exact head07aa6b3dbe2bda7ba81007f0d1d35dd069ce149c: unit39279550694, lint39279554522, test39279558733, docs39279563849, wire150/hold125 route39279568719. GitHub accepted all five; all initially queued at15:38:35–44UTC. Original runs remain separately visible; no additional cancellation or duplicate dispatch attempted.
+- Next monitor fresh runner assignment and use the new route run ID for subsequent artifact/provenance review if it completes. This creates fresh attempts but does not prove the queue issue is resolved. No phase boxes ticked, constraints changed or hardware modified.
+
+## 2026-10-19 — User-requested cancellation/relaunch blocked by GitHub run state
+
+- User explicitly requested cancelling and relaunching the five queued main runs. Standard cancellation accepted for unit39278561412 and route39278561678, but lint39278561458/test39278561430/docs39278561411 returned already-completed errors. All five REST run records still report queued/null conclusion/attempt1, including cache-bypassed queries.
+- Rerun requests rejected for all five; raw route rerun response403 says "This workflow is already running" (CLI's generic possible-broken-workflow message is not evidence of a YAML defect). Documented force-cancel fallback rejected four with409not-in-progress; accepted for route, whose status remained queued and rerun still403 after a bounded wait.
+- Cancellation requests were submitted but cancellation completion and replacement attempts are not confirmed. No duplicate dispatch, dummy commit, workflow edit or hardware change made. External GitHub state prevents completing the requested restart now; next recheck terminal states and rerun only once GitHub permits it. No phase boxes ticked.
+
+## 2026-10-19 — Check newly queued main workflows
+
+- At15:32:56UTC, the five runs created15:30:46UTC (unit, lint, test, docs and wire150/hold125 route39278561678) are queued, roughly2minutes old. Route job118148587046 has no assigned runner or executed steps; check output has no error/annotation. No repository-wide in-progress run was reported, and route concurrency group is unique to this source screen.
+- GitHub's public status API reports Actions operational with no current incidents. Exact scheduling cause is not exposed by the available run/check data; no billing or capacity failure established. Leave existing runs intact rather than dispatch duplicates or edit working workflow labels after this brief wait. Next recheck runner assignment if queue persists. No phase boxes ticked or hardware/config/workflow changes made.
+
 ## 2026-10-19 — Wire150/hold125 passes; prepare exact routed check
 
+- Published tools5fade90, CI6480cc6, docs07aa6b3; remote main verified07aa6b3dbe2bda7ba81007f0d1d35dd069ce149c. [Qualified wire150/hold125 route39278561678](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39278561678) confirmed queued on that head; no hardware commits in push. Receipt remains local until next evidence commit.
 - Screen39177724036/head e711710 succeeded. Downloaded early receipts and actual20-path FF-capture reports: fast/typ/slow hold108.167/220.712/417.586ps; global setupWS0; worst reported FF-capture setup12.175408/8.205976/1.483047ns. Electrical0/0/0allcorners, antenna0/0, reservepass(max slow slew0.448249980<0.45). These are estimates, not extracted closure.
 - Prepared source-bound native_wire150_route and separate manual workflow using the existing independently audited continuation. Trusted recipe generated before download, profile binds source ID/head/workflow/125ps target; actual source/config/hardware/readback and saved/fresh gate checks remain. DRT only after fresh gates; unchanged zero-DRC/extracted timing/electrical/antenna checks afterward; no repair repeated.
 -62focused route/screen/extraction tests pass; YAML/shell/whitespace pass. Preserve prior failed route and passing extracted baseline independently. Next publish/launch exact qualified route, inspect extracted results before GL or official integration. No phase boxes ticked; main hardware/config/template jobs unchanged.

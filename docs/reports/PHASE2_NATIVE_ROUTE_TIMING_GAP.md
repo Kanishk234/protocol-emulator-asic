@@ -45,3 +45,29 @@ Protocol replay for route39149073496 remains blocked because the route does not 
 All-corner electrical slew/fanout/capacitance violations remain zero; antenna nets/pins zero; estimated electrical reserve passes. Maximum slow slew utilization is0.448249980 against0.45, so that guard has little remaining room. The 20-path capture reports expose actual positive estimated FF-capture setup headroom; they do not establish positive global setup slack or guarantee extracted closure.
 
 Prepared `native_wire150_route.py` and separate manual `gds-native-wire150-hold125-route`, bound to the exact successful screen. Shared continuation retains full independent source/config/hardware/readback/gate audits, repeats no repair, requalifies before DRT, and rejects extracted slow setup below zero, fast hold below50ps or any electrical/antenna/route-DRC violations. The prior failing route's protocol replay remains undispatched. Only extracted measurements of this new checkpoint can establish whether the policy addresses the gap.
+
+## Wire150/hold125 extracted result: setup is the remaining blocker
+
+[Route39278561678, attempt2](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39278561678/attempts/2) completed routing/extraction and failed the strict extracted gate solely on slow setup. Source remains screen39177724036; rerun uses exact head07aa6b3dbe2bda7ba81007f0d1d35dd069ce149c. Independently downloaded the early gate artifact and confirmed:
+
+| Extracted check | Wire100/hold100 route39149073496 | Wire150/hold125 route39278561678 attempt2 |
+| --- | --- | --- |
+| Slow setup WS | −4.218641555 ns | −1.608071943 ns |
+| Fast hold WS | +0.042531646 ns | +0.107658663 ns |
+| Typical hold WS | +0.131662907 ns | +0.219348990 ns |
+| Slow hold WS | +0.281998433 ns | +0.417386360 ns |
+| Electrical/antenna/route DRC violations | 0 / 0 / 0 | 0 / 0 / 0 |
+| Instance area including macro | 592373 µm² | 574597 µm² |
+| Instances | 42698 | 39113 |
+
+Fast/typical setup WS remains0. The coupled policy improves slow setup by2.610570ns, clears the50ps fast-hold gate, and reduces instance area by about17776µm² and count by3585. These are paired physical results, not isolated attribution to either parameter. Slow setup still fails; do not launch the gated protocol replay or claim Phase2/official signoff. Next inspect the newly critical extracted slow path and compare its estimated timing before choosing a targeted setup correction, while preserving the electrical/antenna/hold gains.
+
+## Targeted native setup-reserve trial
+
+Inspected exact attempt2 extracted slow `max.rpt` and final NL from artifact12210790306. Of1000reported worst paths,108are negative, driven by only two startpoints: `_48179_` (unit0configuration word0bit4) and `_48093_` (unit0word4bit2). Worst endpoint remains `_47215_`/`u_chip.dropped[14]`. Its extracted worst path has−1.608072ns; the estimated report's worst path to that endpoint has+1.611147ns, from the other latch. This is a roughly3.219ns endpoint-level estimate-to-extracted gap, not a same-path delay decomposition; startpoint ordering changes.
+
+Prepare `gds-native-wire150-setup4-screen`, changing only `GRT_RESIZER_SETUP_SLACK_MARGIN` from0to4ns on wire150/hold125. The exact pinned LibreLane timing Tcl forwards this setting as `-setup_margin` to native `repair_timing` for setup and hold repair. [OpenROAD's primary repair-timing documentation](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html#repair-timing) describes the additional setup margin; no current-only optimizer flags are assumed available in the pinned image.
+
+After all original strict screen checks pass, require the actual slow-corner FF-capture setup report minimum to be at least3.5ns. Missing/malformed reports, wrong path types or latch endpoints fail closed; original qualification cannot be restored after another gate failed. The guard uses measured reports, not global WS0 or the requested optimizer target. Preserve the20ns fully timed SDC,125ps hold repair target,50ps final hold acceptance, wire150/CTS100/clock8/electrical55/antenna50 and final native antenna pass.
+
+This stronger screen is motivated by the measured endpoint gap, not proof that3.5ns will cover every future routed path. Native repair may fail to reach it, consume electrical reserve or increase area/congestion. No new DRT until it passes. Early artifacts include actual post-GRT timing-repair config/log/metrics to verify margin consumption and repair activity. Main hardware/config/template jobs remain unchanged.

@@ -31,3 +31,17 @@ Prepare `gds-native-wire150-hold125-screen`: change the native wire-length repai
 All 20 ns signoff, 50 ps final fast-hold, zero electrical/antenna/overflow and 0.45 estimated electrical reserve gates remain fixed. No DRT until the new screen passes all gates. If electrical reserve fails, inspect offenders rather than waive the guard. If setup headroom remains inadequate, prioritize general carry/telemetry and configuration fanout paths using the measured capture reports; no RTL/ISA/latency change is authorized by this test.
 
 Protocol replay for route39149073496 remains blocked because the route does not qualify. No Phase 2 boxes ticked.
+
+## Wire150/hold125 screen result
+
+[Screen39177724036](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39177724036), exact head `e7117101dd77e87cc7c1099c156b77c89e9cc54e`, passes all existing gates. Independently downloaded early artifact receipts and capture reports show:
+
+| Corner | Global setup WS | Worst reported FF-capture setup slack | Hold WS |
+| --- | --- | --- | --- |
+| Fast | 0 ns | +12.175408 ns | +0.108167 ns |
+| Typical | 0 ns | +8.205976 ns | +0.220712 ns |
+| Slow | 0 ns | +1.483047 ns | +0.417586 ns |
+
+All-corner electrical slew/fanout/capacitance violations remain zero; antenna nets/pins zero; estimated electrical reserve passes. Maximum slow slew utilization is0.448249980 against0.45, so that guard has little remaining room. The 20-path capture reports expose actual positive estimated FF-capture setup headroom; they do not establish positive global setup slack or guarantee extracted closure.
+
+Prepared `native_wire150_route.py` and separate manual `gds-native-wire150-hold125-route`, bound to the exact successful screen. Shared continuation retains full independent source/config/hardware/readback/gate audits, repeats no repair, requalifies before DRT, and rejects extracted slow setup below zero, fast hold below50ps or any electrical/antenna/route-DRC violations. The prior failing route's protocol replay remains undispatched. Only extracted measurements of this new checkpoint can establish whether the policy addresses the gap.

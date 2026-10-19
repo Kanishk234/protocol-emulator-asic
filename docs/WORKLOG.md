@@ -2,8 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-19 — Wire150/hold125 passes; prepare exact routed check
+
+- Screen39177724036/head e711710 succeeded. Downloaded early receipts and actual20-path FF-capture reports: fast/typ/slow hold108.167/220.712/417.586ps; global setupWS0; worst reported FF-capture setup12.175408/8.205976/1.483047ns. Electrical0/0/0allcorners, antenna0/0, reservepass(max slow slew0.448249980<0.45). These are estimates, not extracted closure.
+- Prepared source-bound native_wire150_route and separate manual workflow using the existing independently audited continuation. Trusted recipe generated before download, profile binds source ID/head/workflow/125ps target; actual source/config/hardware/readback and saved/fresh gate checks remain. DRT only after fresh gates; unchanged zero-DRC/extracted timing/electrical/antenna checks afterward; no repair repeated.
+-62focused route/screen/extraction tests pass; YAML/shell/whitespace pass. Preserve prior failed route and passing extracted baseline independently. Next publish/launch exact qualified route, inspect extracted results before GL or official integration. No phase boxes ticked; main hardware/config/template jobs unchanged.
+
 ## 2026-10-18 — Diagnose clean route timing failure; prepare wire150/hold125 screen
 
+- Published toolsda7a14b, CI5ad0f0f, docse711710; verified remote maine7117101dd77e87cc7c1099c156b77c89e9cc54e. [Wire150/hold125 screen39177724036](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39177724036) confirmed queued on that head. No hardware commits in push; launch receipt remains local until the next evidence commit.
 - Route39149073496 completed DRT/extraction but fails strict timing: slow setup−4.218641555ns, fast hold+42.531646ps<50ps. Typical/slow hold+131.662907/+281.998433ps; electrical0/0/0allcorners, antenna0/0, DRT DRC0 after iteration8. Effective SDC hash unchanged63a9ac8d…; no workflow import failure or timeout. Downloaded gate artifact and selected full reports/netlist using authenticated range reads; read-only approval timeout retried successfully.
 - Worst setup is config latch48225(unit0word0bit0)→47215(u_chip.dropped[14]); data cell delay19.025774ns includes49buffer output arcs/10.790404ns. Worst fast hold47933(unit1word5bit15)→46696(unit1TXer[7]). Estimated top1000setup reports omit the routed critical pair amid zero-slack latch endpoints. Exact estimation cause remains under investigation; electrical reserve did survive routing but did not guarantee timing reserve.
 - Prepared coupled native wire150µm/hold125ps screen retaining all original constraints/gates and final antenna step, plus read-only FF capture reports (OpenSTA primary command source/pinned LibreLane reporting syntax checked).64focused tests pass, including actual Tcl wrapper execution, optional audit selection and unchanged rejection of antenna failures; YAML/shell/whitespace pass. D-087/BUG122 and paired report record evidence, costs and limits.

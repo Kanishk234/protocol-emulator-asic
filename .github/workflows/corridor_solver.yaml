@@ -1,0 +1,47 @@
+name: exact corridor solver qualification
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'tools/autonomy/corridor_solver.py'
+      - 'tools/autonomy/tests/test_corridor_solver.py'
+      - 'requirements-routing.txt'
+      - '.github/workflows/corridor_solver.yaml'
+permissions:
+  contents: read
+concurrency:
+  group: warp-corridor-solver-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  qualify:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install pinned solver into project venv
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install pytest==8.4.2 -r requirements-routing.txt
+      - name: Qualify explicit graph model and independent witnesses
+        env:
+          PYTHONPATH: tools
+        run: |
+          source .venv/bin/activate
+          mkdir -p build/corridor_solver
+          python -m pip freeze > build/corridor_solver/packages.txt
+          git rev-parse HEAD > build/corridor_solver/source-revision.txt
+          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py --junitxml=build/corridor_solver/results.xml
+          python -m autonomy.check_xml build/corridor_solver/results.xml
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: corridor-solver-qualification-${{ github.run_id }}
+          path: build/corridor_solver/
+          retention-days: 30
+          if-no-files-found: warn

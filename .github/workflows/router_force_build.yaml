@@ -33,7 +33,7 @@ jobs:
           git -C build/router_toolchain checkout --quiet 7999e5a91dab77357fe9d401b6dfb0758f438bf1
           echo 'aaef0ac1bac971f54fe44565fa12284e18dc88718d153a2f92201e957070084f  build/router_toolchain/flake.lock' | sha256sum --check
           cp build/router_toolchain/flake.lock build/router_build_evidence/toolchain.lock
-          sha256sum patches/openroad_force_reroute.patch patches/openroad_force_used_grid.patch patches/openroad_corridor_observer.patch tools/router_build/default.nix > build/router_build_evidence/inputs.sha256
+          sha256sum patches/openroad_force_reroute.patch patches/openroad_force_used_grid.patch patches/openroad_corridor_observer.patch patches/openroad_terminal_observer.patch tools/router_build/default.nix > build/router_build_evidence/inputs.sha256
           git rev-parse HEAD > build/router_build_evidence/source-revision.txt
           printf '%s\n' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" > build/router_build_evidence/workflow.txt
           nix --version > build/router_build_evidence/nix-version.txt
@@ -58,6 +58,10 @@ jobs:
           set code [catch {grt::export_native_corridor_state} message]
           if {$code != 1 || ![string match {*Native corridor observer requires explicit directory and idle initialized global routes*} $message]} {error "Unexpected observer rejection: $message"}
           puts "PASS: linked native observer rejects uninitialized state"
+          if {[llength [info commands grt::export_native_terminal_state]] != 1} {error "Missing terminal observer interface"}
+          set code [catch {grt::export_native_terminal_state} message]
+          if {$code != 1 || ![string match {*Native terminal observer requires explicit directory and idle initialized global routes*} $message]} {error "Unexpected terminal observer rejection: $message"}
+          puts "PASS: linked terminal observer rejects uninitialized state"
           TCL
           build/router_force_tool/bin/openroad -exit build/router_build_evidence/interface.tcl > build/router_build_evidence/interface.log 2>&1
           build/router_stock_tool/bin/openroad -version > build/router_build_evidence/stock-version.txt

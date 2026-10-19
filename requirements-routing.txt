@@ -1,0 +1,4 @@
+# Optional explicit-graph oracle only; not part of the RTL/compiler environment.
+# Stable upstream release: https://github.com/google/or-tools/releases/tag/v9.14
+# Published Python package: https://pypi.org/project/ortools/9.14.6206/
+ortools==9.14.6206

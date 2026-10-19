@@ -58,8 +58,8 @@ def enforce(root):
         raise ValueError('Native setup reserve screen fails; no detailed routing')
 
 
-def main():
-    margin_screen(config_transform=configure, final_antenna_repair=True,
+def main(config_transform=configure):
+    margin_screen(config_transform=config_transform, final_antenna_repair=True,
                   audit_tcl=Path('workflow-src/scripts/ci/native_timing_headroom_audit.tcl'))
     enforce(Path('runs/native-stock-screen'))
 

@@ -57,14 +57,16 @@ def test_gate_fails_closed_and_preserves_original_qualification(tmp_path,fault):
     assert gate['minimum_slow_capture_setup_ns']==3.5
 
 
-def test_entrypoint_reuses_all_original_native_gates(tmp_path,monkeypatch):
+@pytest.mark.parametrize('override', [False, True])
+def test_entrypoint_reuses_all_original_native_gates(tmp_path,monkeypatch,override):
     monkeypatch.chdir(tmp_path);called=[]
     def screen(**options):
         called.append(options)
         evidence(Path('runs/native-stock-screen'))
     monkeypatch.setattr(target,'margin_screen',screen)
-    target.main()
-    assert called[0]['config_transform'] is target.configure
+    transform = (lambda config: config) if override else target.configure
+    target.main(config_transform=transform)
+    assert called[0]['config_transform'] is transform
     assert called[0]['final_antenna_repair'] is True
     assert called[0]['audit_tcl'].name=='native_timing_headroom_audit.tcl'
     assert json.loads(Path('runs/native-stock-screen/gates.json').read_text())['estimated_setup_reserve_pass'] is True

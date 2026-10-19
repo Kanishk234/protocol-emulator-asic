@@ -255,9 +255,10 @@
         "39290648912 atde26ea4:117executedPASS/0skip in dedicatedhostedqualification; localcombined138PASS; independentmodelreview no blockers; nativeinputs/authentication remainfalse",
         "39304728263 at75d4378: native observer build and linked API smoke SUCCESS; no algorithm change",
         "39331153087 at675b659: bounded exact121/132/139 native accounting qualification active; not yet a result",
-        "b35e6ba/675b659: parser+collector157focusedPASS; cbd5eec native checkpoint checker27PASS; portable auditor strict native mode in8497bec"
+        "b35e6ba/675b659: parser+collector157focusedPASS; cbd5eec native checkpoint checker27PASS; portable auditor strict native mode in8497bec",
+        "39331845906 at6b19d03: exactcontrols and all6raw139228edge ledgers PASS; allinitial/defaultfinal nativebytesidentical; initialone repeatedcfg_word edge blocks globalunioncompatibility; preferredlegacy132 versusbothdirection134 explicitlyseparate; native_corridor_run_20261019.md"
       ],
-      "next_action": "Inspect39331153087 actual controls/raw usage ledger; independently compare all initial native snapshots and unchanged default final. Authenticate physical-pin-to-FrNet mapping and exterior connectivity before solver model. Do not repeat rejected routing policies or relax accounting gates.",
+      "next_action": "Ledger and checkpoint identity qualified. Prepare physical-pin/coarse-terminal/treealias/via-access observer and bounded exterior-connectivity adapter before native solver application. Preserve exact multiset release; do not infer physical access from ledger or replace preferred132 by unlabeledraw134. Soft scalar divergence exists but does not cause a raw3D ledger residual.",
       "acceptance": [
         "FEASIBLE includes independently checked union occupancy/connectivity witness with explicit resource/terminal contracts.",
         "INFEASIBLE is scoped to the supplied model; UNKNOWN/timeouts remain inconclusive.",

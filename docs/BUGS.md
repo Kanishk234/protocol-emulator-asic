@@ -1,5 +1,11 @@
 # Bugs
 
+## 102: Private native exports are unreadable across the Docker boundary
+- **Date:**2026-10-19.
+- **Symptom/check:** native qualification39331153087 reaches all three routing controls, then host raw parser raises PermissionError opening native-corridor.tsv. Artifact upload also fails EACCES; GitHub retains no artifact. Failed run remains infrastructure, not ledger or routing qualification.
+- **Root cause:** the observer intentionally creates exclusive mode0600 files inside root-run Docker. The unprivileged runner owns neither file and cannot read it for Python accounting or upload.
+- **Fix/coverage:** retain exclusive0600 native creation, then have the container Tcl wrapper make only the successful regular non-symlink native-corridor.tsv readable0644 before returning control. No recursive chmod, directory permission relaxation or native algorithm change. Actual Tcl fixtures verify successful0600->0644, untouched unrelated0600 file, failed partial0600 and symlink rejection;90runner testsPASS. Fix6b19d03; corrected native replay39331845906 SUCCESS with host parser and artifact upload working, reusing successful build39304728263. All six raw exports independently audit successfully.
+
 ## 101: Boundary validator rejects OpenDB decimal-formatted numbers
 - **Date:**2026-10-16.
 - **Symptom/check:**38853662972 passes native GCD and reproduces exact121, then fails default validation with Malformed or negative boundary edge. Pair repair is not attempted.

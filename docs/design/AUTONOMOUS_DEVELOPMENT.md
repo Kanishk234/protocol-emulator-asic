@@ -296,3 +296,13 @@ clamped/deduplicated FrNet terminals, account for endpoint via stacks, and
 preserve each selected net's exterior connected components at every corridor
 crossing. An exact solver result stays scoped to that declared graph until
 native replay and physical/timing checks pass.
+
+Native follow-up: retry39331845906 at6b19d03 completes after BUG102's exact-file
+permission handoff. Portable native audit and byte-identical checkpoint checks
+pass; all6 weighted ledgers reconcile139228edges. Initial one repeated
+cfg_word[23] traversal prevents whole-state union equivalence. Legacy reported
+132 and both-direction raw134 differ by two nonpreferred overflows. Preserve
+both metric scopes. See native_corridor_run_20261019.md and independent
+native_corridor_result_review_20261019.md. Next terminal/access export and
+net-private exterior connectivity are separate reviewed implementations, not
+native model qualification yet.

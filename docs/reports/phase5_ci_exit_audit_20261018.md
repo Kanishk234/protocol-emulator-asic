@@ -21,3 +21,13 @@ The coordinator initially dispatched the template FPGA refresh without noticing 
 Experimental collectors can deliberately retain native failures and rejected hypotheses. Their green collection status does not make a rejected physical result acceptable. Preserve original133, best121 and rejected132 separately. No phase checkbox is ticked by this interim audit.
 
 Run links use https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/ followed by the listed ID. Existing phase5 content review and plain-language summary remain the evidence for their separate completed gates.
+
+
+## October19 independent transitive-input correction
+
+The independent review in phase5_ci_exit_review_20261019.md finds a consumed input beyond the direct trees checked above: test/test_bitstream.py dynamically imports tools/board/warp.py, which changed after the historical GDS run. Physical GDS/precheck evidence remains applicable, but historical gl_test does not cover the updated helper. Therefore the phase5 gate remains open. Existing unmodified GDS workflow39280550500 at0165bef is dispatched to refresh this coverage; do not start phase6 or claim a new pass while it is pending. The old audit's direct-tree equality is insufficient for full gate-test input equivalence.
+
+
+## Closure, October19
+
+Fresh39280550500 at0165bef succeeds in all four GDS jobs. Downloaded strictXML confirms30clean gate cases and nine prechecks pass; independent phase5_ci_exit_review_20261019.md confirms resolution. Laterde26ea4 changes add only the optional abstract solver/its tests/isolated requirement/qualification workflow; no consumed hardware, gate-test, fabric or formal input changes. Its current core checks39290648874(lint)/39290648769(docs)/39290648743(test)/39290648803(unit)/39290648762(autonomy) allSUCCESS, and dedicated39290648912 executes117clean solver tests. Phase5all-applicableCI exit closes with the existing D020/D095 scope; compact routing remains rejected. This supersedes the interim pending status above without rewriting its historical findings.

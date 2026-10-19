@@ -1,8 +1,8 @@
 # Phase 5: evidence and documentation
 
-**In progress, October 16, 2026.** Frozen G1 remains the supported submission
+**Complete, October 19, 2026.** Frozen G1 remains the supported submission
 baseline. The larger compact successor remains experimental. No board or
-silicon has been tested, and phase 6 has not started.
+silicon has been tested. Final submission/release steps remain for phase 6.
 
 ## Goal
 
@@ -41,6 +41,13 @@ a fresh checkout. Separate measured results from estimates and hypotheses.
   Their individual limits remain in [EVIDENCE](../EVIDENCE.md) and
   [CLAIMS](../CLAIMS.md); none establishes board operation.
 
+- Fresh baseline [39280550500](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39280550500)
+  passes GDS, all nine prechecks and thirty executed gate-shell/RTL-fabric
+  cases without skips, including the updated board loader. Current core checks
+  and the applicable fabric/formal checks pass; the independent
+  [CI review](../reports/phase5_ci_exit_review_20261019.md) resolves the
+  previously missed transitive dependency.
+
 ## What we found
 
 The compiler coverage advantage is reproducible on current sources. Model
@@ -63,6 +70,14 @@ postrepair native table, so 132 is an independently audited grid observation.
 See [the controlled result](../reports/force_repair_controlled_result_20261016.md).
 Fixing the accounting defect did not solve routing.
 
+The next controlled [used-grid correction39143364213](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39143364213)
+restored discovery of all initial overflow owners but ended at139, again worse
+than121. It is rejected. That prompted a change of method: a bounded exact
+feasibility oracle with independently checked witnesses. Its
+[117 hosted qualification tests39290648912](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39290648912)
+pass, but no native WARP graph is authenticated yet. Native resource/NDR/pin
+export and reconciliation are the next prerequisite, not another blind sweep.
+
 ## What remains
 
 - Keep the completed [EVIDENCE](../EVIDENCE.md) and claims audit current as new
@@ -71,18 +86,15 @@ Fixing the accounting defect did not solve routing.
   original primitive netlist/SPEF timing views and physical timing limits
   remain explicit; recovering those views is needed for stronger timing
   claims, rather than for the report's limited baseline claims.
-- Confirm all required CI gates for the final applicable revision before
-  closing the phase. A diagnostic collector passing does not mean its route
-  passed. No phase-completion claim follows from a launch or pending job.
-- Continue the compact routing investigation under unchanged hardware,
-  capacities and timing margins. The current observation-only build records
-  actual expansion membership and whole-grid states after each existing pass;
-  it must reproduce the rejected 132 final identity before its snapshots can
-  support another intervention. Exact active run IDs live in the newest
-  [WORKLOG](../WORKLOG.md) entry and [backlog](../autonomy/backlog.json).
-- Retain frozen G1, original 50/133, best measured 15/121 and rejected 132 as
+- Prepare phase6's final rule check and release/submission process from the
+  supported baseline. This phase's CI gate is complete; a final release still
+  needs its own qualified commit and results. No submission has been sent.
+- Continue compact routing through authenticated native state and a simultaneous
+  feasibility model. Abstract solver results cannot promote a chip. Live status
+  remains in [WORKLOG](../WORKLOG.md) and the [backlog](../autonomy/backlog.json).
+- Retain frozen G1, original 50/133, best measured 15/121, rejected132 and rejected139 as
   distinct checkpoints. Detailed routing, extraction, complete configured
   timing and physical signoff remain necessary for any successor promotion.
 
 **Takeaway:** the baseline and current compiler evidence are retained and
-reproducible; compact routing and the final phase-5 evidence gates remain open.
+reproducible and phase5 is complete; compact routing remains an independently gated experiment.

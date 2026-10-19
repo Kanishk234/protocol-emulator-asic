@@ -18,5 +18,5 @@
 - [x] `docs/CLAIMS.md` audited (`docs/CLAIMS.md`, 2026-09-28; C1–C10 each carry CI or explicitly local evidence)
 - [x] Clean-checkout reproduction succeeded (2026-10-07, fresh Ubuntu24.04 runner37690896748,962da93; retained result/command logs/XML inspected, docs/reports/reproduction.md)
 - [x] User guide and datasheet written (`docs/USER_GUIDE.md`, `docs/EXAMPLES.md`, `docs/info.md`, `info.yaml`)
-- [ ] All CI workflows green on `efpga`
-- [x] `docs/summaries/PHASE5.md` written (2026-10-16: current plain-language goal/results/limits/next steps with run links; phase remains in progress)
+- [x] All CI workflows green on `efpga` (2026-10-19: de26ea4 core lint39290648874/docs39290648769/test39290648743/unit39290648803/autonomy39290648762 and oracle39290648912 SUCCESS; applicable fabric39144029882/formal39143521760 and fresh GDS39280550500 including30 clean gate cases/9 prechecks; independent applicability review docs/reports/phase5_ci_exit_review_20261019.md; standing D020/D095 scope)
+- [x] `docs/summaries/PHASE5.md` written (2026-10-19: updated plain-language completed-phase summary with fresh GDS and reviewed CI evidence)

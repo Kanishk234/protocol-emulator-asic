@@ -34,9 +34,11 @@ is an observer and validation check, not a model brain or continuous agent.
 
 ## Current priority and protected results
 
-The first unfinished phase is phase 5. Its report-content and summary gates have evidence; the remaining exit gate is
-all required CI green on `efpga`, with source applicability audited. See `phases/PHASE5_EVIDENCE_DOCS.md`; do not start submission
-tasks until every exit item passes. A new experiment does not itself tick a box.
+Phase 5 is complete as of October 19: the fresh GDS/gate-test run39280550500,
+applicable formal/fabric runs and current core checks passed independent source
+applicability review. See `phases/PHASE5_EVIDENCE_DOCS.md` for exact evidence.
+Phase 6 begins with a read-only rules check; final submission remains open.
+A new compact diagnostic does not itself tick a submission box.
 
 Keep two distinct tracks:
 
@@ -240,3 +242,57 @@ be witnessed, both legacy controls must revalidate, and retained result fields
 must agree with freshly parsed native files. Physical acceptance always stays
 false. Fetch the actual selected run's artifacts and API identity before
 substituting its explicit run/attempt/full revision. No newest-run guessing.
+
+
+## Escaping a rejected hypothesis class
+
+D102 restored initial-owner discovery without improving routing. Require a new
+kind of discriminating evidence before repeating that class of repair. Track
+geometric cuts, simultaneous topology choices, native cost/history accounting,
+layer assignment and exporter correctness separately; keep rejected outcomes
+in the backlog. More agent opinions or a new tool name do not qualify a route.
+
+The exact explicit-graph oracle is `autonomy.corridor_solver`. Its optional
+requirement lives in requirements-routing.txt and its separate bounded hosted
+qualification is corridor_solver.yaml. Install only in the project venv:
+
+```sh
+source .venv/bin/activate
+python -m pip install -r requirements-routing.txt
+PYTHONPATH=tools python -m autonomy.corridor_solver graph.json --output build/corridor/result.json
+```
+
+Input contracts explicitly declare capacities, fixed demand, per-layer net
+weights, pinned terminals, nonpreferred motion and via assumptions. A shared
+multisink trunk consumes one net's edge demand, not a separate wire per sink.
+An independent witness checker verifies union occupancy and connectivity.
+FEASIBLE/INFEASIBLE describe this graph only; UNKNOWN includes inconclusive
+limits. No output authenticates native WARP inputs or grants physical acceptance.
+See routing_escape_options_20261019.md and native_corridor_contract_20261019.md
+in docs/reports for extraction and native reconciliation prerequisites.
+
+## Native corridor qualification (October 19)
+
+The observer build39304728263 passes compiled API smoke. Native qualification
+39331153087 at675b659 remains a diagnostic until its actual controls and
+accounting are inspected. The parser preserves weighted route-step multiplicity
+and rejects missing usage rather than inventing background occupancy.
+
+Use `PYTHONPATH=tools python -m autonomy.native_checkpoint <bundle> --output <json>`
+to require all three initial native exports and the default final to be byte
+identical. This check is separate from raw usage accounting and physical pin
+mapping. Source tests include27 checkpoint cases and69 parser cases.
+
+Portable `autonomy.repair_evidence --candidate --native-corridor` additionally
+requires an exact Git-authenticated observer patch field and rechecks all six
+exports. Run39331153087 predates that collector metadata field: retain its
+original evidence and use the authenticated build manifest plus direct
+`qualify_native_corridors` and checkpoint checks. Do not edit its result to make
+the stricter portable CLI accept it or repeat EDA solely for missing metadata.
+
+Even a reconciled raw ledger does not establish physical pin access or via
+legality. Next extraction must join actual GlobalRouter pin identities and
+clamped/deduplicated FrNet terminals, account for endpoint via stacks, and
+preserve each selected net's exterior connected components at every corridor
+crossing. An exact solver result stays scoped to that declared graph until
+native replay and physical/timing checks pass.

@@ -2,6 +2,22 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**October19 current baseline refresh:** GDS39280550500 at0165bef succeeds
+in GDS/precheck/gl_test/viewer. Hosted job wall times:21m51s GDS,5m36s
+precheck,29m51s gl_test; end-to-end51m45s with overlapping jobs. Downloaded
+strict XML has30executedPASS/0skip/error/failure including current board loader;
+all nine precheck rowsPASS. No hardware or margin change. D023 gate-shell plus
+RTL-fabric scope remains; no native configured/SDF timing or compact promotion.
+See `docs/reports/g1_gate_refresh_20261019.md`.
+
+**October19 compact diagnosis:** D102tool build39143345968 succeeds32m57s
+(hosted software-build job). Actual three-case39143364213 retains exact121
+and132 controls; used-grid candidate139/GRT0232 is rejected with identical
+capacities/geometry/census. Complete initial-owner discovery is restored but
+insufficient. See `docs/reports/used_grid_result_20261019.md`. New direction:
+explicitgraph exactfeasibility oracle plus authenticated native cost/terminal
+export; abstract-model qualification is not a WARP routing result.
+
 **October16 controlled repair:** D100tool build38851788423 succeeds55m09s
 (software build, not chip hardening). Collector38948702750 atf433609 reproduces
 exact15/121, then bounded southern-pair repair ends nativeGRT0232 and observed

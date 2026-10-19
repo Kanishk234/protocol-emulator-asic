@@ -41,7 +41,9 @@ def check_identity(identity, result, *, revision, run_id, attempt):
         raise ValueError('Collector identity/completion/physical scope differs')
 
 
-def audit(directory, identity, *, revision, run_id, attempt, candidate=False):
+def audit(directory, identity, *, revision, run_id, attempt, candidate=False, native_corridor=False):
+    if type(native_corridor) is not bool or (native_corridor and candidate is not True):
+        raise ValueError('Native corridor audit requires explicit candidate mode')
     directory = Path(directory)
     if directory.is_symlink() or not directory.is_dir():
         raise ValueError('Expected regular downloaded repair directory')
@@ -51,6 +53,8 @@ def audit(directory, identity, *, revision, run_id, attempt, candidate=False):
     result_path = directory/'result.json'
     result = json.loads(result_path.read_text())
     check_identity(identity, result, revision=revision, run_id=run_id, attempt=attempt)
+    if not native_corridor and ('native_corridor' in result or 'corridor_observer_patch_sha256' in result):
+        raise ValueError('Native corridor evidence requires explicit native-corridor audit mode')
     if result.get('patch_sha256') != source_hash(revision, 'patches/openroad_force_reroute.patch'):
         raise ValueError('Retained primary patch differs from exact Git source')
     cases = ['default_identity', 'forced_pair'] + (['rebuilt_pair'] if candidate else [])
@@ -58,7 +62,9 @@ def audit(directory, identity, *, revision, run_id, attempt, candidate=False):
         raise ValueError('Missing/extra cases or wrong candidate audit mode')
     if candidate and result.get('used_grid_patch_sha256') != source_hash(revision, 'patches/openroad_force_used_grid.patch'):
         raise ValueError('Candidate patch differs from exact Git source')
-    summary = {}
+    if native_corridor and result.get('corridor_observer_patch_sha256') != source_hash(revision, 'patches/openroad_corridor_observer.patch'):
+        raise ValueError('Native corridor observer patch differs from exact Git source')
+    summary, reparsed, native_stages = {}, {}, {}
     for name in cases:
         stages = list((directory/name/'replay').glob('*-openroad-globalrouting'))
         if len(stages) != 1 or not stages[0].is_dir():
@@ -72,6 +78,7 @@ def audit(directory, identity, *, revision, run_id, attempt, candidate=False):
         stored = result['cases'][name]
         if any(stored.get(key) != value for key, value in actual.items()):
             raise ValueError('Retained collector result contradicts independently parsed '+name)
+        reparsed[name], native_stages[name] = actual, stage
         summary[name] = {'overflow': actual['final_observed_full_grid_overflow'],
                          'native_repair_passed': actual['native_repair_passed'],
                          'native_error': actual['native_error'],
@@ -81,10 +88,16 @@ def audit(directory, identity, *, revision, run_id, attempt, candidate=False):
                 {'pass': row['pass'], 'nets': row['actual_native_pass_net_count'],
                  'overflow': row['observed_full_grid_overflow']}
                 for row in actual['observer']['passes']]
-    return {'verified': True, 'run_id': str(run_id), 'attempt': attempt,
+    output = {'verified': True, 'run_id': str(run_id), 'attempt': attempt,
             'source_revision': revision, 'result_sha256': hashlib.sha256(result_path.read_bytes()).hexdigest(),
             'cases': summary, 'physical_acceptance': False,
             'scope': 'Downloaded native evidence audit; no physical promotion or local EDA'}
+    if native_corridor:
+        actual_corridor = hosted.qualify_native_corridors(native_stages, reparsed)
+        if result.get('native_corridor') != actual_corridor:
+            raise ValueError('Stored native corridor result contradicts independently audited exports')
+        output['native_corridor'] = actual_corridor
+    return output
 
 
 def main():
@@ -95,9 +108,12 @@ def main():
     p.add_argument('--run-id', required=True)
     p.add_argument('--attempt', type=int, required=True)
     p.add_argument('--candidate', action='store_true')
+    p.add_argument('--native-corridor', action='store_true',
+                   help='Require candidate mode and independently audit all six raw native exports')
     a = p.parse_args()
     print(json.dumps(audit(a.directory, json.loads(a.identity.read_text()), revision=a.revision,
-                           run_id=a.run_id, attempt=a.attempt, candidate=a.candidate), indent=2))
+                           run_id=a.run_id, attempt=a.attempt, candidate=a.candidate,
+                           native_corridor=a.native_corridor), indent=2))
 
 
 if __name__ == '__main__':

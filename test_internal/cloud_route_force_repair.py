@@ -547,6 +547,7 @@ def main():
               'custom_binary': binary, 'custom_binary_sha256': trace.cfg.sha(Path(binary)),
               'patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_force_reroute.patch'),
               'used_grid_patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_force_used_grid.patch'),
+              'corridor_observer_patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_corridor_observer.patch'),
               'source_revision': os.environ.get('GITHUB_SHA'), 'workflow_run': os.environ.get('GITHUB_RUN_ID'),
               'workflow_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
     try:

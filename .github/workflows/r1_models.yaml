@@ -56,7 +56,7 @@ jobs:
           source .venv/bin/activate
           mkdir -p build/r1_checks
           python -m pytest -q tools/profiling/tests/test_config_cost.py tools/profiling/tests/test_r1_generator.py tools/profiling/tests/test_connectivity.py tools/profiling/tests/test_r1_resource.py tools/profiling/tests/test_r1_resource_campaign.py --junitxml=build/r1_checks/results.xml
-          python -m tools.autonomy.check_xml build/r1_checks/results.xml --minimum-cases 46
+          python -m tools.autonomy.check_xml build/r1_checks/results.xml --minimum-cases 47
           git rev-parse HEAD > build/r1_checks/source-revision.txt
       - name: Count original full-fabric storage and mux structure
         run: |

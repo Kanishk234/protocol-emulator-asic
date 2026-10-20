@@ -31,3 +31,9 @@ Retained ignored directory build/fresh_baseline_hosted. Local direct Git-object 
 Reject the unmeasured assumption that112–128cells plus the original2/2primitives automatically delivers the primary gain. The measured2/2 implementation demands138cells before placement. A3/3 implementation demands103, but needs extra reusable primitives and adequate routing. Existing primitive tiles provide pairs, so screen the area/tool implications of a denser3/3 arrangement versus existing4/4 availability; do not select either without full-cost measurement. A103-cell estimate near a104-cell capacity is not a comfortable routability result.
 
 The combined103 demand exceeds the separate29+47 counts by27cells under this flow, illustrating composition/host/packing cost; do not identify all27 as a measured physical host-arbiter area. Next: UART+I2C characterization and area/connectivity census, fresh evaluation sealing, then a written candidate specification. Production architecture unchanged; no phase box or successor promotion.
+
+## Expanded hosted completion
+
+39470823794 at5796293 completes both corrected jobsSUCCESS; downloaded17XML files strictly verify40passes (24checker+16SPI). Expanded39471254787 at5f03060 completes compiler and both-workload simulationSUCCESS. Downloaded21XML files strictly verify44passes. Independent direct Git-object audit verifies362source/library hashes and183caseartifacts across15cases.
+
+UART+I2C allhard demands123cells/3timers/3shifts; hardUART/softI2C173cells/2pairs; reverse218cells/1pair; bothsoft270cells/0pairs. Allfour fail with native G1 capacity/placement diagnostics. These are synthesis demand, not placed counts. R1_REQUIREMENTS.md records the resulting resource options; no architecture selected or physical gain claimed.

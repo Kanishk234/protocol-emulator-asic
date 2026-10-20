@@ -271,7 +271,8 @@
         "39456418346 at49da841 SUCCESS: downloaded strict518executedPASS; BUG106 lightweight optional-dependency fixture fixed794dafd; correctedautonomy39456947108SUCCESS",
         "Local authenticated15cut resume terminatesselection_INFEASIBLE for<=5extras. Six-extra followup adds7>2cut thenselection_INFEASIBLE with16cuts. Seven-extra boundedfollowup active. No native guide installed.",
         "Manifest19016bytes/15cuts to GitHubworkflowinputs rejected by automatic approval review; specific payload/destination approval pending. No manifest transmitted, no bypass. Local work unaffected.",
-        "docs/reports/congestion_proposal_20261020.md; local strict1004PASS; new sourceaa33398; hostedqualification39470166730 pending"
+        "docs/reports/congestion_proposal_20261020.md; local strict1004PASS; new sourceaa33398; hostedqualification39470166730 pending",
+        "Hosted39470166730 atfc7a3acSUCCESS; downloadedstrict607executedPASS; nativehandoff source review retained."
       ],
       "next_action": "Retain uninstalled independently checked121\u2192118coarse proposal. Pinned readSegments review shows append/ledger hazards: require unchanged complete-inventory round-trip and native weighted-ledger equivalence before candidate handoff. Stop expanding strict zero-selected-overflow cohorts as sole approach. Bestnative121 unchanged; hosted private-cut manifest and externalAI packet remain held pending specific approval.",
       "acceptance": [
@@ -296,9 +297,11 @@
       "evidence": [
         "docs/design/FRESH_CANDIDATE_PLAN.md",
         "protocols/uart_spi:16mode/primitive pin simulationsPASS;22checker testsPASS",
-        "sourcefc7a3ac; hosted39470166731 compiler jobSUCCESS, simulation job setupFAILfixedad5c445; independent360source/139artifact auditPASS; docs/reports/fresh_baseline_20261020.md"
+        "sourcefc7a3ac; hosted39470166731 compiler jobSUCCESS, simulation job setupFAILfixedad5c445; independent360source/139artifact auditPASS; docs/reports/fresh_baseline_20261020.md",
+        "Expanded39471254787 at5f03060SUCCESS;15nativecases;362Git-bound source/library and183artifact hashes checked;44strict hosted passes; docs/design/R1_REQUIREMENTS.md",
+        "tools/profiling/connectivity.py;8testsPASS; applied6authenticated placements; docs/reports/r1_connectivity_20261020.md"
       ],
-      "next_action": "Authenticate corrected hosted simulation retry. UART+SPI allhard103cells/3pairs versus mixed138cells/2pairs; revise resource targets before any topology selection. Continue UART+I2C comparison, area/connectivity costs and fresh evaluation sealing.",
+      "next_action": "Baseline and first locality census complete. Measure configuration/switch cost and specify at most three generator/nextpnr/bitstream-compatible topology screens. R1_REQUIREMENTS.md controls capability comparisons; no candidate selected. Selected held-out identities remain local pending explicit publication approval.",
       "acceptance": [
         "Six supported personalities preserved in paired current compiler census.",
         "Concurrent workloads use identical semantics/pins/host framing across candidates.",

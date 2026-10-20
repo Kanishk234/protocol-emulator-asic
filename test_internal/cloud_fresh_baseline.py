@@ -42,7 +42,7 @@ def specification(name):
     return pins, sources, params
 
 
-def validate(directory, name):
+def validate(directory, name, *, read_input=None):
     directory = Path(directory)
     pins, _, params = specification(name)
     row = json.loads((directory / 'case.json').read_text())
@@ -69,7 +69,8 @@ def validate(directory, name):
         if report['meets_50mhz'] != (fmax is not None and fmax >= 50):
             raise ValueError('Model clock assessment differs')
         for item in report['provenance']['inputs']:
-            if sha(item['path']) != item['sha256']:
+            actual = hashlib.sha256(read_input(item['path'])).hexdigest() if read_input else sha(item['path'])
+            if actual != item['sha256']:
                 raise ValueError('Successful source fingerprint differs')
         images = list(directory.glob('*.wbit'))
         if len(images) != 1:

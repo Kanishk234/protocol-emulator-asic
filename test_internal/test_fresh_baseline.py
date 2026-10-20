@@ -169,3 +169,23 @@ def test_tampered_success_is_rejected(successful, mutation):
     write()
     with pytest.raises(ValueError):
         campaign.validate(path, name)
+
+
+def test_portable_verifier_uses_exact_source_bytes(successful):
+    path, name, report, write = successful
+    payload = b'original pinned source'
+    report['provenance']['inputs'] = [{'path': '/foreign/source.yaml',
+                                      'sha256': campaign.hashlib.sha256(payload).hexdigest()}]
+    write()
+    seen = []
+    def read_input(name):
+        seen.append(name)
+        return payload
+    assert campaign.validate(path, name, read_input=read_input)['fits']
+    assert seen == ['/foreign/source.yaml']
+
+
+def test_portable_verifier_rejects_wrong_source_bytes(successful):
+    path, name, _, _ = successful
+    with pytest.raises(ValueError, match='fingerprint'):
+        campaign.validate(path, name, read_input=lambda _: b'changed')

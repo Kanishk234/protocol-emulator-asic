@@ -46,4 +46,32 @@ Prepared separate manual `gds-native-cfg-staging-setup-reserve-screen`, bound to
 
 Local evidence: `/tmp/tripwire-cfg-staging-verified-20261020`, including cfg_staging_receipt.json, phase/proof logs, map-baseline/map-staged and mapping_comparison.json. Raw logs and netlists are not committed.
 
-Verified configuration RTL SHA256: `d17c05bfe5ca002eb5ca09885727bee039766f815817c27a9b56da6041b7adc7`; event-late BITSYNC SHA256: `bb65c952124198014308a6b2c3eb74a11312d635a870b2466c741e7cff426066`. Full-suite XML SHA256: `b820f4885f6c2c27833fc08a33d140223546f18bcf721cf7cfe4448d71d1b409`. No physical timing result exists for this candidate yet.
+Verified configuration RTL SHA256: `d17c05bfe5ca002eb5ca09885727bee039766f815817c27a9b56da6041b7adc7`; event-late BITSYNC SHA256: `bb65c952124198014308a6b2c3eb74a11312d635a870b2466c741e7cff426066`. Full-suite XML SHA256: `b820f4885f6c2c27833fc08a33d140223546f18bcf721cf7cfe4448d71d1b409`. The native screen result is recorded below; no extracted timing result exists for this candidate.
+
+## Native screen result — 2026-10-20
+
+[Screen 39378465307](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39378465307), exact head `6d640f3`, completes in 2015.54 seconds without timeout but fails electrical reserve. Actual electrical violations are zero at all corners; antenna nets/pins are zero. Fast/typical/slow hold is +100.667/+221.363/+429.733 ps. Companion test/lint/unit/docs workflows passed.
+
+Slow slew reserve utilization is 0.785857 on `_11513_` at `wire12720/A`, and 0.483185 on `_15192_` at `_41849_/S`, against the fixed 0.45 limit. The first net also exceeds typical reserve at 0.510384. Capacitance reserve passes. These are reserve misses, not actual maximum-transition violations; both distinctions matter.
+
+The independent production capture parser gives setup minima +12.273766 ns fast, +8.347774 ns typical, and **+1.725550 ns slow**. Slow headroom improves 0.242503 ns over the original event-late wire150 screen, but is still 1.774450 ns below the unchanged +3.5 ns guard. The run stops at the earlier electrical reserve gate, so the stronger setup guard does not execute; the saved report independently demonstrates that it would fail too. Global setup WS remains0, which does not establish positive usable headroom.
+
+Do not route this checkpoint, relax the gates or claim extracted timing improvement. Next inspect these exact source-bound nets and the updated worst configuration path. The local 153→22 load reduction was real, but this physical result shows it was insufficient to meet the chosen reserve. Keep the event-late routed baseline separately. Early evidence: `/tmp/tripwire-cfg-staging-gates-39378465307`; direct job log: `/tmp/tripwire-cfg-staging-job-39378465307.log`.
+
+## Exact-netlist diagnosis and composed follow-up
+
+The audited post-antenna netlist from screen39378465307 confirms the actual worst start `_49003_` is **U0 configuration word15 bit1, SJW[1]**, not a mode bit inferred from an older run. Its endpoint `_46962_` is `u_chip.g_unit[0].u_prod.tok[14]`. The report gives 2.180271ns of time borrowed at the launch latch and data arrival3.615038ns before the SJW arithmetic cone. Staging moved the limiting path; it did not remove every deep configuration-to-token path.
+
+The final reserve offenders are distinct: `_11513_` is driven by `_37593_`/a221oi_1 and feeds wire12720/buf_1, with structural downstream endpoints in lane1 output/register/routine control; `_15192_` is driven by `_41848_`/nor4_1, feeds five mux select pins and two buffers, and reaches the16TX cursor eq flops. These are structural cone observations, not proof that every enumerated path is sensitizable, and neither is the configuration staging write-enable net.
+
+Native electrical repair was active: its actual command uses max_wire_length150/slew_margin55/cap_margin55, finds68slew/27capacitance problems and2302long wires, and inserts4857buffers in2306nets, with zero resizes. Later timing repair inserts36hold buffers. These logs do not establish exactly when the final two reserve misses appeared; intermediate missing-route warnings alone do not prove incorrect final STA. Future physical repair work must distinguish these cases rather than assume an unused knob or a single failing stage.
+
+The next isolated variant is **bs-resync-event-cfg-staging**: keep the verified staging module byte-identical and apply the previously proven resync arithmetic cancellation to the now-critical SJW path. This changes one hardware optimization relative to staging alone. It replaces sample-time evaluation through the corrected boundary with saturated expressions using the precomputed nominal sample time, without adding state or cycles. The two electrical cones are not directly rewritten, so reserve clearance remains a separate measured requirement.
+
+Fresh evidence in `/tmp/tripwire-resync-cfg-staging-20261020`:892bit-clock equivalence points;403/385/445/399configuration equivalence points and10400phase checks per build;60full pin tests, five chip tests,2048L2comparison clocks. Focused helper/gate tests:92passed. Expanded protocol replay passes **22/22, zero failures/skips**, in 207.42 seconds under Verilator with independent decoders enabled. Evidence: `test_internal/chip/results_l3_resync_cfg_staging.xml`, `l3.log` and the source-bound `cfg_staging_receipt.json` in the composed trial directory. All owned local checks have finished. The dedicated verifier now checks both bit-clock and configuration modules; generic verification still rejects these variants to avoid using the wrong clock model.
+
+Paired local mapping:26445→26550cells and395625.9888→397041.4098µm² standard-cell area (+105cells,+1415.4210µm²,+0.358%) over staging alone; resettable flops remain2266. Versus original event-late, total standard-cell increase is about1.620%. Same local recipe/library and unchanged SRAM, not native or routed area.
+
+Prepared `gds-native-resync-cfg-staging-setup-reserve-screen`, binding configuration hash `d17c05bfe5ca002eb5ca09885727bee039766f815817c27a9b56da6041b7adc7` and bit-clock hash `c77f87ce20a8b2f7eec2b58b4db72476ccf4eb5fc89dde4d60b9461f486a346d`. AREA1,20ns, wire150/hold125, all electrical/antenna/reserve/hold guards and measured slow capture≥3.5ns are unchanged. No physical result yet; no DRT until qualification.
+
+Combined full-suite XML SHA256: `111edc19756b247930c7fb2fd051776595c8d8d94508d423ecf0758185b41ec0`. Exact frozen-source comparison confirms only trw_pin_bs.v and trw_pin_cfg.v differ. The native screen remains unlaunched pending publication; every original gate remains mandatory.

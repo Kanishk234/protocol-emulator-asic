@@ -1140,6 +1140,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Evidence: full/basic × latch/flop phase comparisons pass 10400 checks each; clocked-host sequential equivalence proves 403/385/445/399 points, induction cap 6. The host-clock model is justified by trw_spi's registered write pulse/address/data and combinational trw_host decode; it is not unrestricted asynchronous-input equivalence or whole-chip formal. Both pin builds pass 60 tests, five chip tests and 2048 L2 clocks pass. Expanded protocol replay passes 22/22 with no skips under Verilator; see reports/PHASE2_CFG_STAGING.md.
 - Physical qualification requires the existing native wire 150/hold 125 policy and every unchanged gate, including measured slow capture ≥3.5 ns before detailed routing. No clean-build or official timing claim yet.
 
+## D-092 — Compose verified staging and resync arithmetic against the newly limiting path
+
+- Evidence: staging screen39378465307's audited final netlist identifies worst setup launch as U0 word15bit1 (SJW[1]), ending at U0 producer token bit14. It borrows2.180271ns at the launch latch; data arrives3.615038ns. The previous unstaged resync screen instead started at U0 word0bit3. The old distribution and new arithmetic bottlenecks must be assessed together.
+- General change: add only the already-proven resync algebra rewrite to the verified unit-local staging candidate. Its saturated sample-time equations cancel correction before a25-bit arithmetic stage; no state, ISA or architectural cycle changes. Keep event-late selection, all staging behavior and the physical recipe fixed. Separate source variant bs-resync-event-cfg-staging binds both module hashes.
+- Cost: local typical-library mapping adds105cells/+1415.4210µm² (+0.358%) over staging alone, with no extra flops. Total mapped standard-cell area397041.4098µm², about1.620% over the event-late baseline; SRAM unchanged. These are not native/routed costs.
+- Verification:892bit-clock equivalence points; identical staging source with four renewed clocked-host/phase checks;60full-pin tests, five chip tests and2048L2clocks pass. Expanded protocol replay passes 22/22 with no skips in207.42seconds under Verilator. See reports/PHASE2_CFG_STAGING.md.
+- The two slew reserve failures are on separate lane1 and TX-cursor cones; this arithmetic rewrite does not directly repair those drivers. Whole-design remapping may change their physical outcome, but no electrical or setup improvement is assumed. Retain every existing gate, including slow capture≥3.5ns, and reject before DRT if any fails. No main hardware/config/template/spec changes or official adoption.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

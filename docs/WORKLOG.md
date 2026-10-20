@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Diagnose exact staging cones and verify composed resync follow-up
+
+- Retrieved selected source-bound netlist, slow report and native repair logs by ZIP byte ranges from artifact12245349300 (250275257bytes), retaining data under /tmp/tripwire-cfg-staging-critical-39378465307. Audited final netlist confirms worst path SJW[1]/U0word15bit1→U0producer token[14], with2.180271ns borrowed and3.615038ns launch data arrival. No prior-run instance mapping reused.
+- Identified reserve drivers: net11513/a221oi1 feeds a lane1 cone; net15192/nor4_1 feeds16TX cursor eq flops. Neither is the staging write-enable net. Native design repair genuinely inserts4857buffers on2306nets at wire150/margins55; timing repair later inserts36hold buffers. No unsupported assertion about when the reserve failures first appeared.
+- Prepared isolated bs-resync-event-cfg-staging variant: only the previously proven resync arithmetic rewrite added to staging, unchanged cfg bytes and physical policy. D-092 and staging report record targeted SJW motivation, separate unresolved electrical risk and costs. No main src/config/spec/template changes.
+- Fresh892bit-clock equivalence points; four configuration clocked-host proofs and10400phase checks each;60full pin tests, five chip tests and2048L2clocks pass.92focused helper tests pass. Expanded Verilator replay passes **22/22 with no failures/skips**, independent decoders enabled, in207.42seconds. Source-bound evidence: /tmp/tripwire-resync-cfg-staging-20261020/test_internal/chip/results_l3_resync_cfg_staging.xml and cfg_staging_receipt.json. All local verification processes finished. Local mapping adds105cells/+1415.4210µm² (+0.358%) versus staging, no additional flops; total1.620% standard-cell area over event-late, macro unchanged. No native/routed improvement claimed.
+- Separate manual combined screen prepared, both source hashes bound and every acceptance/watchdog gate fixed. No workflow launch, commits/pushes or phase boxes ticked. Prepared grouped publication/dispatch commands at /tmp/tripwire-publish-resync-cfg-staging-screen.sh. Current AGENTS.md reserves publication for the user; the prior override covered staging-only publication. Next publish reviewed groups, then inspect measured setup and electrical reserves before DRT.
+
+## 2026-10-20 — Configuration staging screen rejected by reserve checks
+
+- Verified [screen 39378465307](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39378465307) failed on exact head 6d640f3c79d9a6c3ba59ea15a74583354eb3b8d4. Watch receipt: exit1, 2015.54 seconds, no timeout. Companion test/lint/docs/unit all passed; later nightly39424274837 also passed.
+- Artifact /tmp/tripwire-cfg-staging-gates-39378465307 proves all-corner actual electrical counts zero, antenna nets/pins zero, global setup WS0 and fast/typ/slow hold100.667/221.363/429.733ps. The persisted gate failure is electrical reserve: slow slew utilization0.785857 at net11513/wire12720/A and0.483185 at net15192/cell41849/S; limit0.45. First net also exceeds typical reserve at0.510384. Capacitance reserve passes.
+- Independently parsed all capture reports using the production parser: fast12.273766ns, typical8.347774ns, slow1.725550ns. Slow is0.242503ns above the matched original event-late wire150 screen, but still1.774450ns below the fixed3.5ns guard. The stronger guard did not execute because the earlier reserve gate rejected; independent evidence shows it would also fail. These are estimates, not routed WNS.
+- No DRT, threshold relaxation, source changes, publication or phase boxes ticked. Recorded outcome in the paired/staging reports and phase summary. Next inspect the two reserve-offending nets and the updated critical configuration path in this exact source netlist; do not reuse cell IDs from earlier runs or assume staging enables caused them without evidence. Preserve the known event-late routed baseline.
+
+## 2026-10-20 — Approved staging publication and native screen launch
+
+- User explicitly approved the reviewed cfg-staging publication script. Published separate commits: patch9ce822d, tests4847ab7, tools70d9fe7, CIae4de1c, docs6d640f3. Verified remote main6d640f3c79d9a6c3ba59ea15a74583354eb3b8d4. No src/info.yaml/macro changes or unpublished hardware commits were included; unrelated dirty files and local-only FIPE notes remain excluded.
+- Dispatched exactly one [native configuration staging screen39378465307](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39378465307), confirmed in_progress on that exact head. Test39378464554, docs39378464526 and lint39378464576 are in progress; unit39378464527 is queued.
+- This tests the independently verified staging change against the known event-late source with unchanged timing/hold/electrical/reserve/antenna gates and watchdogs. No physical measurements yet, no DRT until qualification, no phase boxes ticked. Next inspect measured slow capture headroom and every original gate. Launch receipt remains local until the next evidence update.
+
 ## 2026-10-20 — Prototype and verify unit-local configuration staging
 
 - Created isolated bs-event-cfg-staging trial against frozen 3393eea plus the known event-late baseline. The only additional RTL behavior change is per-unit write enable on existing configuration data staging; main src/config/spec remain untouched. D-091 records the general need and measured costs. This targets the confirmed 153-latch shared broadcast rather than the rejected resync rewrite.

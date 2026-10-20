@@ -47,7 +47,8 @@ def stage_config(config):
 
 def main():
     root = Path('runs/native-stock-screen')
-    config = json.loads(Path('src/config_native_stock.json').read_text())
+    source_config = Path('src/config_native_stock.json')
+    config = json.loads(source_config.read_text())
     validate(json.loads(Path('/tmp/native-source-run.json').read_text()), config)
     output = Path('runs/native-stage-probe'); output.mkdir(exist_ok=False)
     receipt = dict(source_run=SOURCE_RUN, source_sha=SOURCE_SHA, diagnostic_only=True,
@@ -60,7 +61,11 @@ def main():
             raise ValueError('Wrong stage database')
         before = digest(odb)
         cfg = stage_config(config)
-        path = output/(stage+'.json'); path.write_text(json.dumps(cfg, indent=2)+'\n')
+        # LibreLane resolves dir:: paths against the config file's directory.
+        # Keep the original src/ anchor for SRAM macro and PDK view references.
+        path = source_config.with_name('config_stage_probe_'+stage+'.json')
+        path.write_text(json.dumps(cfg, indent=2)+'\n')
+        (output/(stage+'.json')).write_text(json.dumps(cfg, indent=2)+'\n')
         out = output/stage; out.mkdir()
         subprocess.run([sys.executable, '-m', 'librelane', '--pdk-root', os.environ['PDK_ROOT'],
             '--docker-no-tty', '--dockerized', '--pdk', 'ihp-sg13cmos5l', '--manual-pdk',

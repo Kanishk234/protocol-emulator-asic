@@ -50,7 +50,8 @@ def test_pinned_rerouting_default_is_accepted_but_explicit_disable_is_rejected(v
 
 
 @pytest.mark.parametrize('fault', [None, 'setup', 'electrical'])
-def test_checkpoint_never_authorizes_route_and_retains_strict_gates(tmp_path, monkeypatch, fault):
+@pytest.mark.parametrize('wire_length', [150, 2000])
+def test_checkpoint_never_authorizes_route_and_retains_strict_gates(tmp_path, monkeypatch, fault, wire_length):
     monkeypatch.chdir(tmp_path); monkeypatch.setenv('PDK_ROOT', '/pdk')
     # Real source artifact omits the pinned step's default rerouting setting.
     original = config(); original.pop('GRT_DESIGN_REPAIR_RUN_GRT')
@@ -66,6 +67,7 @@ def test_checkpoint_never_authorizes_route_and_retains_strict_gates(tmp_path, mo
     monkeypatch.setattr(trial, 'validate', lambda *a: None)
     calls = []
     def run_step(cfg, state, output, steps):
+        assert cfg['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == wire_length
         calls.append(steps)
         output.mkdir(parents=True)
         for i, step in enumerate(steps):
@@ -92,14 +94,18 @@ def test_checkpoint_never_authorizes_route_and_retains_strict_gates(tmp_path, mo
     monkeypatch.setattr(trial, 'screen', screen)
     monkeypatch.setattr(trial, 'measure', lambda paths: {})
     monkeypatch.setattr(trial, 'evaluate', lambda *a: {'qualified': fault != 'electrical'})
+    output = Path('runs/native-posthold-margin60' if wire_length == 150 else 'runs/native-posthold-wire2000')
+    def transform(original):
+        return dict(trial.configure(original), GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=wire_length)
     if fault:
-        with pytest.raises(ValueError): trial.main()
+        with pytest.raises(ValueError): trial.main(config_transform=transform, output=output)
     else:
-        trial.main()
-    receipt = json.loads(Path('runs/native-posthold-margin60/gates.json').read_text())
+        trial.main(config_transform=transform, output=output)
+    receipt = json.loads((output/'gates.json').read_text())
     assert receipt['qualified'] is False and receipt['route_authorized'] is False
     assert receipt['clean_synthesis'] is False and receipt['reproduction_required'] is True
     assert receipt['minimum_slow_capture_setup_ns'] == 3.5
+    assert receipt['posthold_max_wire_length_um'] == wire_length
     assert odb.read_bytes() == b'original'
     assert calls == [['OpenROAD.RepairDesignPostGRT', 'OpenROAD.RepairAntennas'], ['OpenROAD.CheckAntennas']]
 

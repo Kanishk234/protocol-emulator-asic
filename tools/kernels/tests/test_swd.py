@@ -98,12 +98,13 @@ def test_dpidr_read_and_ap_write_read(period, tmp_path):
         assert "IDCODE" in out and "W SELECT" in out and "RDBUFF" in out
 
 
-def test_wait_ack_then_retry():
-    chip, tgt = make(20, wait_on={0})
+@pytest.mark.parametrize("period", [50, 20, 10, 6])
+def test_wait_ack_then_retry(period):
+    chip, tgt = make(period, wait_on={0})
     bus = Bus(chip, tgt)
     push_read(chip, 0, 0x0)                             # answered WAIT: no data phase
     push_read(chip, 0, 0x0)                             # retry
-    bus.run(3 * 60 * 20 + 2000)
+    bus.run(3 * 60 * period + 2000)
     w = host_words(chip)
     assert w[0] == WAIT
     assert read_result(w[1:5]) == (OK, DPIDR, True)

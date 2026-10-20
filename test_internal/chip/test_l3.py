@@ -771,57 +771,58 @@ async def test_l3_smbus_word_pec(dut):
 @cocotb.test()
 async def test_l3_swd_dpidr_read_with_wait_retry(dut):
     """L3-SWD: receive WAIT, retry a DP IDCODE read, and check turnaround has no bus contention."""
-    period = 6                                    # 8.3 MHz SWCLK, the program's supported ceiling
-    p = await start(dut, uio=0xFF, clock=True)
-    await load(p, "swd", PERIOD=period)
-    target = SWDTarget(wait_on={0})
-    rec = {"swclk": [], "swdio": []}
-    contentions = {"n": 0}
+    # Exercise turnaround scheduling at the ceiling and slower clock settings.
+    for index, period in enumerate((6, 10, 20, 50)):
+        p = await start(dut, uio=0xFF, clock=index == 0)
+        await load(p, "swd", PERIOD=period)
+        target = SWDTarget(wait_on={0})
+        rec = {"swclk": [], "swdio": []}
+        contentions = {"n": 0}
 
-    async def bus_task():
-        while True:
-            await RisingEdge(dut.clk)
-            await ReadOnly()
-            swclk = int(dut.uo_out.value) & 1
-            uio_out, uio_oe = int(dut.uio_out.value), int(dut.uio_oe.value)
-            host_oe = uio_oe & 1
-            if host_oe and target.oe:
-                contentions["n"] += 1
-            dio = (uio_out & 1) if host_oe else (target.value if target.oe else 1)
-            rec["swclk"].append(swclk)
-            rec["swdio"].append(dio)
-            target.step(swclk, dio)
-            await FallingEdge(dut.clk)
-            dut.uio_in.value = 0xFE | dio
+        async def bus_task():
+            while True:
+                await RisingEdge(dut.clk)
+                await ReadOnly()
+                swclk = int(dut.uo_out.value) & 1
+                uio_out, uio_oe = int(dut.uio_out.value), int(dut.uio_oe.value)
+                host_oe = uio_oe & 1
+                if host_oe and target.oe:
+                    contentions["n"] += 1
+                dio = (uio_out & 1) if host_oe else (target.value if target.oe else 1)
+                rec["swclk"].append(swclk)
+                rec["swdio"].append(dio)
+                target.step(swclk, dio)
+                await FallingEdge(dut.clk)
+                dut.uio_in.value = 0xFE | dio
 
-    task = cocotb.start_soon(bus_task())
-    request = 1 | (1 << 2) | (1 << 5) | (1 << 7)       # start, RnW, request parity, park
-    token = 0x7000 | request
-    await p.push(token, DATA)                            # first request gets WAIT
-    await p.push(token, DATA)                            # identical retry gets OK + DPIDR
-    got = []
-    for _ in range(200):
-        response = await p.pop()
-        if response is not None:
-            got.append(response)
-        if len(got) == 5:
-            break
-    await ClockCycles(dut.clk, 4 * period)
-    task.cancel()
+        task = cocotb.start_soon(bus_task())
+        request = 1 | (1 << 2) | (1 << 5) | (1 << 7)       # start, RnW, request parity, park
+        token = 0x7000 | request
+        await p.push(token, DATA)                            # first request gets WAIT
+        await p.push(token, DATA)                            # identical retry gets OK + DPIDR
+        got = []
+        for _ in range(200):
+            response = await p.pop()
+            if response is not None:
+                got.append(response)
+            if len(got) == 5:
+                break
+        await ClockCycles(dut.clk, 4 * period)
+        task.cancel()
 
-    expected = [(DATA, SWD_WAIT), (DATA, SWD_OK), (DATA, DPIDR & 0xFFFF),
-                (DATA, DPIDR >> 16)]
-    assert got[:4] == expected and len(got) == 5, got
-    # RX2 returns parity in bit 0 and the following turnaround sample in bit 1.
-    assert got[4][0] == DATA and got[4][1] & 1 == swd_parity(DPIDR), got
-    assert contentions["n"] == 0, contentions
-    assert target.protocol_errors == 0 and [entry[4] for entry in target.log] == [SWD_WAIT, SWD_OK], target.log
-    write_vcd("swd_dpidr.vcd", rec)
-    out = sigrok("swd_dpidr.vcd", "swd:swclk=swclk:swdio=swdio", "swd")
-    if out is not None:
-        assert "WAIT" in out and "IDCODE" in out and "OK" in out, out
-        values = [int(value, 16) for value in re.findall(r"0x([0-9a-f]{8})", out)]
-        assert DPIDR in values, out
+        expected = [(DATA, SWD_WAIT), (DATA, SWD_OK), (DATA, DPIDR & 0xFFFF),
+                    (DATA, DPIDR >> 16)]
+        assert got[:4] == expected and len(got) == 5, got
+        # RX2 returns parity in bit 0 and the following turnaround sample in bit 1.
+        assert got[4][0] == DATA and got[4][1] & 1 == swd_parity(DPIDR), got
+        assert contentions["n"] == 0, contentions
+        assert target.protocol_errors == 0 and [entry[4] for entry in target.log] == [SWD_WAIT, SWD_OK], target.log
+        write_vcd("swd_dpidr.vcd", rec)
+        out = sigrok("swd_dpidr.vcd", "swd:swclk=swclk:swdio=swdio", "swd")
+        if out is not None:
+            assert "WAIT" in out and "IDCODE" in out and "OK" in out, out
+            values = [int(value, 16) for value in re.findall(r"0x([0-9a-f]{8})", out)]
+            assert DPIDR in values, out
 
 
 @cocotb.test()

@@ -2,6 +2,17 @@ name: bounded native-derived solver campaign
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: Fixed pair of graphs or four-round cut-guided joint cohort (SCIP only)
+        required: true
+        default: fixed
+        type: choice
+        options: [fixed, joint]
+      seed_manifest:
+        description: Optional compressed constraint archive, rebuilt against the authenticated native snapshot
+        required: false
+        default: ''
+        type: string
       native_run:
         description: Successful terminal-enabled controlled native repair run
         required: true
@@ -44,6 +55,8 @@ jobs:
       WARP_NATIVE_REV: ${{ inputs.native_revision }}
       WARP_NATIVE_ATTEMPT: ${{ inputs.native_attempt }}
       WARP_SOLVER_BACKEND: ${{ inputs.backend }}
+      WARP_SOLVER_MODE: ${{ inputs.mode }}
+      WARP_SEED_MANIFEST: ${{ inputs.seed_manifest }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -58,7 +71,7 @@ jobs:
         run: |
           source .venv/bin/activate
           mkdir -p build/native_solver_checks
-          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py tools/autonomy/tests/test_corridor_mip.py tools/autonomy/tests/test_native_solver_campaign.py tools/autonomy/tests/test_coarse_global.py --junitxml=build/native_solver_checks/results.xml
+          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py tools/autonomy/tests/test_corridor_mip.py tools/autonomy/tests/test_native_solver_campaign.py tools/autonomy/tests/test_coarse_global.py tools/autonomy/tests/test_capacity_cut.py tools/autonomy/tests/test_cut_cohort.py tools/autonomy/tests/test_cut_cohort_native.py tools/autonomy/tests/test_corridor_reduce.py tools/autonomy/tests/test_cut_refinement.py tools/autonomy/tests/test_native_joint_campaign.py --junitxml=build/native_solver_checks/results.xml
           python -m autonomy.check_xml build/native_solver_checks/results.xml
           git rev-parse HEAD > build/native_solver_checks/tool-revision.txt
           python -m pip freeze > build/native_solver_checks/packages.txt
@@ -69,13 +82,20 @@ jobs:
           [[ "$WARP_NATIVE_REV" =~ ^[0-9a-f]{40}$ ]]
           [[ "$WARP_NATIVE_ATTEMPT" =~ ^[1-9][0-9]*$ ]]
           [[ "$WARP_SOLVER_BACKEND" == scip || "$WARP_SOLVER_BACKEND" == cp_sat ]]
+          [[ "$WARP_SOLVER_MODE" == fixed || "$WARP_SOLVER_MODE" == joint ]]
+          [[ "$WARP_SOLVER_MODE" == fixed || "$WARP_SOLVER_BACKEND" == scip ]]
+          [[ "$WARP_SOLVER_MODE" == joint || -z "$WARP_SEED_MANIFEST" ]]
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$WARP_NATIVE_RUN" --jq '{id,head_sha,head_branch,name,status,conclusion,run_attempt}' > build/native_solver_checks/native-identity.json
           git fetch --no-tags --depth=1 origin "$WARP_NATIVE_REV"
           gh run download "$WARP_NATIVE_RUN" --name "controlled-native-pair-repair-$WARP_NATIVE_RUN" --dir build/native_solver_input
-      - name: Authenticate all controls and run two bounded declared models
+      - name: Authenticate controls and run the selected finite diagnostic
         run: |
           source .venv/bin/activate
-          python -m autonomy.native_solver_campaign build/native_solver_input/route_force_repair --identity build/native_solver_checks/native-identity.json --revision "$WARP_NATIVE_REV" --run-id "$WARP_NATIVE_RUN" --attempt "$WARP_NATIVE_ATTEMPT" --backend "$WARP_SOLVER_BACKEND" --output build/native_solver_campaign
+          if [[ "$WARP_SOLVER_MODE" == joint ]]; then
+            python -m autonomy.native_joint_campaign build/native_solver_input/route_force_repair --identity build/native_solver_checks/native-identity.json --revision "$WARP_NATIVE_REV" --run-id "$WARP_NATIVE_RUN" --attempt "$WARP_NATIVE_ATTEMPT" --seed-manifest "$WARP_SEED_MANIFEST" --output build/native_solver_campaign
+          else
+            python -m autonomy.native_solver_campaign build/native_solver_input/route_force_repair --identity build/native_solver_checks/native-identity.json --revision "$WARP_NATIVE_REV" --run-id "$WARP_NATIVE_RUN" --attempt "$WARP_NATIVE_ATTEMPT" --backend "$WARP_SOLVER_BACKEND" --output build/native_solver_campaign
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:

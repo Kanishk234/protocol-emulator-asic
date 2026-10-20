@@ -123,6 +123,102 @@ def test_failed_native_export_unsets_environment_and_preserves_error(tmp_path):
     assert partial.stat().st_mode & 0o777==0o600
 
 
+@pytest.mark.parametrize('fails', [False, True])
+def test_terminal_export_uses_separate_api_directory_and_permission_handoff(tmp_path, fails):
+    tkinter=pytest.importorskip('tkinter');interp=tkinter.Tcl()
+    interp.setvar('env(STEP_DIR)',str(tmp_path))
+    interp.setvar('warp_test_fail', int(fails))
+    interp.eval('''namespace eval grt {proc export_native_terminal_state {} {
+        if {[info exists ::env(WARP_CORRIDOR_DIR)]} {error "Wrong observer environment"}
+        set out [open $::env(WARP_TERMINAL_DIR)/native-terminals.tsv w]
+        puts $out terminal-state
+        close $out
+        file attributes $::env(WARP_TERMINAL_DIR)/native-terminals.tsv -permissions 0600
+        if {$::warp_test_fail} {error "Terminal writer failed"}
+    }}''')
+    interp.eval('proc log_cmd {args} {uplevel 1 $args}')
+    if fails:
+        with pytest.raises(tkinter.TclError,match='Terminal writer failed'):
+            interp.eval(force.terminal_export_body('initial'))
+    else:
+        interp.eval(force.terminal_export_body('initial'))
+    output=tmp_path/'terminal-initial/native-terminals.tsv'
+    assert output.read_text()=='terminal-state\n'
+    assert output.stat().st_mode & 0o777==(0o600 if fails else 0o644)
+    assert interp.eval('info exists ::env(WARP_TERMINAL_DIR)')=='0'
+
+
+def test_terminal_exports_bind_each_raw_checkpoint_before_error_return():
+    text=force.force_trace(True,True)
+    assert text.index('corridor-initial')<text.index('terminal-initial')<text.index('log_cmd grt::force_reroute_pair')
+    assert text.index('corridor-final')<text.index('terminal-final')<text.index('if {$warp_route_code != 0}')
+    assert text.count('log_cmd grt::export_native_terminal_state')==2
+    with pytest.raises(ValueError):
+        force.native_export_body('initial','unrecognized')
+
+
+@pytest.fixture
+def terminal_controls(corridor_controls, monkeypatch):
+    from autonomy import native_checkpoint
+    stages,cases,calls=corridor_controls
+    for name,stage in stages.items():
+        with (stage/'openroad-globalrouting.log').open('a') as log:
+            for phase in ('initial','final'):
+                directory=stage/('terminal-'+phase);directory.mkdir()
+                path=directory/'native-terminals.tsv';path.write_text('terminal-fixture\n')
+                log.write('WARP_NATIVE_TERMINAL_COMPLETE path='+str(path)+'\n')
+    monkeypatch.setattr(native_checkpoint,'audit',lambda paths:{'checkpoint_identity_verified':True})
+    def parse(raw,terminal):
+        calls.append(('terminal-parse',Path(terminal)))
+        return {'model_gate':'FAIL','unsupported_access':['fixture'],
+                'native_sha256':force.trace.cfg.sha(raw),'terminal_sha256':force.trace.cfg.sha(terminal),
+                'native_inputs_authenticated':False,'physical_acceptance':False}
+    monkeypatch.setattr(force,'native_terminal_audit',parse)
+    corridor={'controls_qualified':True,'model_gate':True,
+              'native_inputs_authenticated':False,'physical_acceptance':False}
+    return stages,cases,calls,corridor
+
+
+def test_terminal_unsupported_access_is_diagnostic_without_promoting_native_model(terminal_controls):
+    stages,cases,calls,corridor=terminal_controls
+    result=force.qualify_native_terminals(stages,cases,corridor)
+    assert result['unchanged_terminal_identity_verified']
+    assert not result['native_inputs_authenticated'] and not result['physical_acceptance']
+    assert len([x for x in calls if isinstance(x,tuple) and x[0]=='terminal-parse'])==6
+    assert result['observations']['rebuilt_pair']['final']['audit']['model_gate']=='FAIL'
+
+
+def test_failed_raw_ledger_blocks_terminal_interpretation(terminal_controls):
+    stages,cases,calls,corridor=terminal_controls;corridor['model_gate']=False
+    with pytest.raises(ValueError,match='qualified controls and raw ledger'):
+        force.qualify_native_terminals(stages,cases,corridor)
+    assert not calls
+
+
+def test_terminal_missing_completion_blocks_interpretation(terminal_controls):
+    stages,cases,calls,corridor=terminal_controls
+    path=stages['default_identity']/'openroad-globalrouting.log'
+    path.write_text(path.read_text().replace('WARP_NATIVE_TERMINAL_COMPLETE','WRONG'))
+    with pytest.raises(ValueError,match='completion witness'):
+        force.qualify_native_terminals(stages,cases,corridor)
+    assert not calls
+
+
+def test_terminal_initial_native_identity_cannot_be_waived(terminal_controls):
+    stages,cases,calls,corridor=terminal_controls
+    (stages['forced_pair']/'terminal-initial/native-terminals.tsv').write_text('different terminal state\n')
+    with pytest.raises(ValueError,match='differ byte-for-byte'):
+        force.qualify_native_terminals(stages,cases,corridor)
+
+
+def test_terminal_schema_failure_is_collection_failure(terminal_controls,monkeypatch):
+    stages,cases,calls,corridor=terminal_controls
+    def malformed(*args):raise ValueError('Malformed terminal schema')
+    monkeypatch.setattr(force,'native_terminal_audit',malformed)
+    with pytest.raises(ValueError,match='Malformed terminal schema'):
+        force.qualify_native_terminals(stages,cases,corridor)
+
+
 def test_successful_native_export_changes_only_known_owner_only_artifact_to_readable(tmp_path):
     tkinter=pytest.importorskip('tkinter');interp=tkinter.Tcl()
     interp.setvar('env(STEP_DIR)',str(tmp_path))
@@ -656,6 +752,7 @@ def test_candidate_cannot_run_before_both_controls_pass(tmp_path,monkeypatch,fai
     monkeypatch.setattr(force, 'validate_observer', observer_validator)
     monkeypatch.setattr(force, 'validate_rebuilt_control', lambda *args: None)
     monkeypatch.setattr(force, 'qualify_native_corridors', lambda *args: {'controls_qualified': True})
+    monkeypatch.setattr(force, 'qualify_native_terminals', lambda *args: {'controls_and_raw_ledger_qualified': True})
     if failed_control:
         with pytest.raises(ValueError, match='Injected failed'):
             force.main()

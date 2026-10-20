@@ -120,26 +120,36 @@ def geometry_body(name):
             '$::env(STEP_DIR)/' + name) + '\n')
 
 
-def corridor_export_body(phase):
+def native_export_body(phase, kind):
+    if kind not in ('corridor', 'terminal'):
+        raise ValueError('Unknown native observer kind')
     if phase not in ('initial', 'final'):
-        raise ValueError('Unknown native corridor export phase')
+        raise ValueError(f'Unknown native {kind} export phase')
     return r'''
-if {[info exists ::env(WARP_CORRIDOR_DIR)]} {error "Unexpected inherited native corridor directory"}
-if {[llength [info commands grt::export_native_corridor_state]] != 1} {error "Native corridor API missing"}
-set warp_corridor_dir $::env(STEP_DIR)/corridor-@PHASE@
-if {![catch {file lstat $warp_corridor_dir warp_corridor_stat}]} {error "Native corridor directory already exists"}
-file mkdir $warp_corridor_dir
-set ::env(WARP_CORRIDOR_DIR) $warp_corridor_dir
-set warp_corridor_code [catch {log_cmd grt::export_native_corridor_state} warp_corridor_error warp_corridor_options]
-unset ::env(WARP_CORRIDOR_DIR)
-if {$warp_corridor_code != 0} {return -options $warp_corridor_options $warp_corridor_error}
-set warp_corridor_output $warp_corridor_dir/native-corridor.tsv
-if {[catch {file lstat $warp_corridor_output warp_corridor_output_stat}] ||
-    $warp_corridor_output_stat(type) ne "file"} {error "Native corridor export is not a regular file"}
+if {[info exists ::env(WARP_@UPPER@_DIR)]} {error "Unexpected inherited native @KIND@ directory"}
+if {[llength [info commands grt::export_native_@KIND@_state]] != 1} {error "Native @KIND@ API missing"}
+set warp_@KIND@_dir $::env(STEP_DIR)/@KIND@-@PHASE@
+if {![catch {file lstat $warp_@KIND@_dir warp_@KIND@_stat}]} {error "Native @KIND@ directory already exists"}
+file mkdir $warp_@KIND@_dir
+set ::env(WARP_@UPPER@_DIR) $warp_@KIND@_dir
+set warp_@KIND@_code [catch {log_cmd grt::export_native_@KIND@_state} warp_@KIND@_error warp_@KIND@_options]
+unset ::env(WARP_@UPPER@_DIR)
+if {$warp_@KIND@_code != 0} {return -options $warp_@KIND@_options $warp_@KIND@_error}
+set warp_@KIND@_output $warp_@KIND@_dir/@FILE@
+if {[catch {file lstat $warp_@KIND@_output warp_@KIND@_output_stat}] ||
+    $warp_@KIND@_output_stat(type) ne "file"} {error "Native @KIND@ export is not a regular file"}
 # The exclusive native writer starts0600 as container root. Permit only this
 # successfully completed, known artifact to be read by the hosted collector.
-file attributes $warp_corridor_output -permissions 0644
-'''.replace('@PHASE@', phase)
+file attributes $warp_@KIND@_output -permissions 0644
+'''.replace('@PHASE@', phase).replace('@KIND@', kind).replace('@UPPER@', kind.upper()).replace('@FILE@', 'native-corridor.tsv' if kind == 'corridor' else 'native-terminals.tsv')
+
+
+def corridor_export_body(phase):
+    return native_export_body(phase, 'corridor')
+
+
+def terminal_export_body(phase):
+    return native_export_body(phase, 'terminal')
 
 
 RESOLVE = r'''
@@ -183,7 +193,7 @@ write_global_route_segments $::env(STEP_DIR)/initial-segments.txt
     for filename, expected in BEFORE_PHYSICAL.items():
         text += ('if {[lindex [exec sha256sum $::env(STEP_DIR)/' + filename + '] 0] ne "' + expected +
                  '"} {error "Initial physical census differs from authenticated121"}\n')
-    text += corridor_export_body('initial')
+    text += corridor_export_body('initial') + terminal_export_body('initial')
     text += r'''
 set warp_initial [open $::env(STEP_DIR)/initial-return.txt w]
 puts $warp_initial $warp_route_code
@@ -211,7 +221,7 @@ write_global_route_segments $::env(STEP_DIR)/native-segments.txt
 '''
     text += grid_body('native-grid.tsv') + boundary_grid_body('native-boundary-grid.tsv') + GUIDES
     text += 'census $::env(STEP_DIR)/after-census.tsv\n' + geometry_body('after-geometry.tsv')
-    text += corridor_export_body('final')
+    text += corridor_export_body('final') + terminal_export_body('final')
     text += 'if {$warp_route_code != 0} {return -options $warp_route_options $warp_route_error}\n'
     return text
 
@@ -544,6 +554,60 @@ def qualify_native_corridors(stages, cases):
             'scope': 'Authenticated routing controls plus raw export accounting; ledger mismatch is diagnostic only'}
 
 
+def native_terminal_audit(raw_path, terminal_path):
+    sys.path.insert(0, str(trace.ROOT/'tools'))
+    from autonomy.native_terminals import audit_files
+    return audit_files(raw_path, terminal_path)
+
+
+def qualify_native_terminals(stages, cases, corridor):
+    """Bind terminal observations only after complete control/ledger checks."""
+    names = ('default_identity', 'forced_pair', 'rebuilt_pair')
+    if (set(stages) != set(names) or set(cases) != set(names) or
+            corridor.get('controls_qualified') is not True or corridor.get('model_gate') is not True or
+            corridor.get('native_inputs_authenticated') is not False or
+            corridor.get('physical_acceptance') is not False):
+        raise ValueError('Terminal observation requires qualified controls and raw ledger')
+    sys.path.insert(0, str(trace.ROOT/'tools'))
+    from autonomy.native_checkpoint import audit as checkpoint_audit
+    raw_paths = {name: {phase: Path(stages[name])/('corridor-'+phase)/'native-corridor.tsv'
+                       for phase in ('initial', 'final')} for name in names}
+    checkpoint = checkpoint_audit(raw_paths)
+    observations = {}
+    for name in names:
+        stage = Path(stages[name])
+        witnesses = re.findall(r'^WARP_NATIVE_TERMINAL_COMPLETE path=(.+)$',
+                               (stage/'openroad-globalrouting.log').read_text(), re.M)
+        if len(witnesses) != 2:
+            raise ValueError('Missing or repeated terminal completion witness')
+        observations[name] = {}
+        for index, phase in enumerate(('initial', 'final')):
+            directory = stage/('terminal-'+phase)
+            path = directory/'native-terminals.tsv'
+            suffix = '/'+name+'/replay/'+stage.name+'/terminal-'+phase+'/native-terminals.tsv'
+            if (not witnesses[index].endswith(suffix) or not directory.is_dir() or directory.is_symlink() or
+                    {p.name for p in directory.iterdir()} != {'native-terminals.tsv'} or
+                    not path.is_file() or path.is_symlink()):
+                raise ValueError('Malformed terminal witness or export inventory')
+            before_sha = trace.cfg.sha(path)
+            raw_sha = trace.cfg.sha(raw_paths[name][phase])
+            parsed = native_terminal_audit(raw_paths[name][phase], path)
+            if trace.cfg.sha(path) != before_sha or trace.cfg.sha(raw_paths[name][phase]) != raw_sha:
+                raise ValueError('Native or terminal bytes changed during membership audit')
+            if parsed.get('native_sha256') != raw_sha or parsed.get('terminal_sha256') != before_sha:
+                raise ValueError('Terminal audit input hashes contradict exported files')
+            observations[name][phase] = {'file_sha256': before_sha, 'audit': parsed,
+                                          'native_completion_witness': witnesses[index]}
+    reference = observations['default_identity']['initial']['file_sha256']
+    if any(observations[name][phase]['file_sha256'] != reference
+           for name, phase in [('forced_pair', 'initial'), ('rebuilt_pair', 'initial'), ('default_identity', 'final')]):
+        raise ValueError('Unchanged terminal snapshots differ byte-for-byte')
+    return {'controls_and_raw_ledger_qualified': True, 'raw_checkpoint': checkpoint,
+            'unchanged_terminal_identity_verified': True, 'observations': observations,
+            'native_inputs_authenticated': False, 'physical_acceptance': False,
+            'scope': 'Physical-to-coarse membership and exported access observation; no physical via legality'}
+
+
 def main():
     binary = os.environ['WARP_FORCE_OPENROAD']
     options = docker_options(binary)
@@ -554,6 +618,7 @@ def main():
               'patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_force_reroute.patch'),
               'used_grid_patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_force_used_grid.patch'),
               'corridor_observer_patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_corridor_observer.patch'),
+              'terminal_observer_patch_sha256': trace.cfg.sha(trace.ROOT/'patches/openroad_terminal_observer.patch'),
               'source_revision': os.environ.get('GITHUB_SHA'), 'workflow_run': os.environ.get('GITHUB_RUN_ID'),
               'workflow_attempt': os.environ.get('GITHUB_RUN_ATTEMPT')}
     try:
@@ -577,6 +642,7 @@ def main():
                 validate_rebuilt_control(stage, result['cases'][name])
             # The next case starts only after full custom-default identity passed.
         result['native_corridor'] = qualify_native_corridors(stages, result['cases'])
+        result['native_terminals'] = qualify_native_terminals(stages, result['cases'], result['native_corridor'])
         result['diagnostic_completed'] = True
     except Exception as exc:
         result['error'] = str(exc)

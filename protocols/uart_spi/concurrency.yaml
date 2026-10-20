@@ -1,0 +1,17 @@
+top: uart_spi_top
+params:
+  DIV: 434
+  HALF: 25
+  CPOL: 0
+  CPHA: 0
+  UART_PRIMS: 1
+  SPI_PRIMS: 0
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  miso_i: FAB_IN1
+  tx_o: FAB_OUT0
+  sck_o: FAB_OUT1
+  mosi_o: FAB_OUT2
+  cs_n_o: FAB_OUT3

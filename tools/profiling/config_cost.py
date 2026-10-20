@@ -106,18 +106,21 @@ def fabric_tiles(text):
 def census(fabric, rtl_dir):
     fabric = Path(fabric)
     rtl_dir = Path(rtl_dir)
-    inputs = {str(fabric): hashlib.sha256(fabric.read_bytes()).hexdigest()}
-    counts = fabric_tiles(fabric.read_text())
+    inputs = {}
+    def read(path):
+        data = path.read_bytes()
+        inputs[str(path)] = hashlib.sha256(data).hexdigest()
+        return data.decode('utf-8')
+    counts = fabric_tiles(read(fabric))
     result = {}
     for tile, copies in sorted(counts.items()):
         paths = [rtl_dir/(tile+'.v'), rtl_dir/(tile+'_switch_matrix.v')]
         storage = rtl_dir/(tile+'_ConfigMem.v')
         if storage.exists():
             paths.append(storage)
-        for p in paths:
-            inputs[str(p)] = hashlib.sha256(p.read_bytes()).hexdigest()
-        result[tile] = dict(copies=copies, **tile_cost(paths[0].read_text(),
-            storage.read_text() if storage.exists() else None, paths[1].read_text()))
+        text = {p: read(p) for p in paths}
+        result[tile] = dict(copies=copies, **tile_cost(text[paths[0]],
+            text.get(storage), text[paths[1]]))
     totals = {key: sum(t['copies']*t[key] for t in result.values())
               for key in ('stored_bits', 'switch_bits', 'nonswitch_bits')}
     return dict(tiles=result, totals=totals, input_sha256=inputs,

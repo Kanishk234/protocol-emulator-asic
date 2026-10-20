@@ -64,3 +64,19 @@ def test_grid_count_and_unsupported_cells():
     for text in ('FabricBegin\nA\nA,B\nFabricEnd', 'FabricBegin\nA,\nFabricEnd', 'A,B', 'FabricEnd\nFabricBegin'):
         with pytest.raises(ValueError):
             fabric_tiles(text)
+
+
+def test_hash_and_parse_share_the_same_source_buffer(tmp_path,monkeypatch):
+    import hashlib
+    from pathlib import Path
+    from profiling.config_cost import census
+    fabric=tmp_path/'fabric.csv';fabric.write_text('FabricBegin\nA\nFabricEnd\n')
+    tile=tmp_path/'A.v';tile.write_text('parameter NoConfigBits=1;')
+    (tmp_path/'A_ConfigMem.v').write_text('parameter NoConfigBits=1;\nconfig_latch a(.Q(ConfigBits[0]));')
+    (tmp_path/'A_switch_matrix.v').write_text(matrix(2))
+    def forbid_read_text(*args,**kwargs):
+        raise AssertionError('Do not reopen sources separately from hashing')
+    monkeypatch.setattr(Path,'read_text',forbid_read_text)
+    value=census(fabric,tmp_path)
+    assert value['totals']['stored_bits']==1
+    assert value['input_sha256'][str(tile)]==hashlib.sha256(tile.read_bytes()).hexdigest()

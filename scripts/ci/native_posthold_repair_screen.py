@@ -29,16 +29,16 @@ def configure(original):
                 GRT_DESIGN_REPAIR_MAX_CAP_PCT=60, GRT_DESIGN_REPAIR_RUN_GRT=True)
 
 
-def main():
+def main(config_transform=configure, output=Path('runs/native-posthold-margin60')):
     original = json.loads(Path('src/config_native_stock.json').read_text())
     validate(json.loads(Path('/tmp/native-source-run.json').read_text()), original)
-    config = configure(original)
+    config = config_transform(original)
     source = Path('runs/native-stock-screen/flow/44-openroad-resizertimingpostgrt/state_out.json')
     source_odb = Path(json.loads(source.read_text())['odb'])
     if source_odb.resolve() != (source.parent/'tt_um_tripwire.odb').resolve():
         raise ValueError('Wrong post-hold database')
     before = digest(source_odb)
-    root = Path('runs/native-posthold-margin60'); root.mkdir(exist_ok=False)
+    root = Path(output); root.mkdir(exist_ok=False)
     os.environ.pop('LIBRELANE_IMAGE_OVERRIDE', None)
     # No synthesis or timing repair is repeated; exact native repair then antenna.
     run_step(config, source, root/'flow', ['OpenROAD.RepairDesignPostGRT', 'OpenROAD.RepairAntennas'])
@@ -46,7 +46,7 @@ def main():
     raw = unique(root/'flow', '*-openroad-repairantennas/state_out.json')
     validate_overflow((prior.parent/'openroad-repairdesignpostgrt.log').read_text())
     check_post_antenna_command(config, raw)
-    path = Path('src/config_native_posthold_margin60.json')
+    path = Path('src')/('config_'+root.name.replace('-', '_')+'.json')
     path.write_text(json.dumps(config, indent=2)+'\n')
     timing = root/'timing'
     screen(path, raw, timing, os.environ['PDK_ROOT'], repaired=raw,
@@ -61,7 +61,8 @@ def main():
     gates.update(source_run=39468700509, clean_synthesis=False, checkpoint_continuation=True,
                  reproduction_required=True, route_authorized=False,
                  final_state=str(audited), source_native_electrical_margin_pct=55,
-                 native_electrical_margin_pct=60, posthold_electrical_margin_pct=60)
+                 native_electrical_margin_pct=60, posthold_electrical_margin_pct=60,
+                 posthold_max_wire_length_um=config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'])
     (root/'gates.json').write_text(json.dumps(gates, indent=2)+'\n')
     if digest(source_odb) != before:
         raise ValueError('Source database changed')

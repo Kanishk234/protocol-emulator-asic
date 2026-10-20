@@ -24,34 +24,44 @@ def digest(p):
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
-def validate(run, config):
-    expected = dict(id=SOURCE_RUN, head_sha=SOURCE_SHA, head_branch='main', conclusion='failure',
-                    path='.github/workflows/gds-native-tx-cursor-setup-reserve-screen.yaml')
+def default_profile():
+    return dict(source_run=SOURCE_RUN, source_sha=SOURCE_SHA,
+                source_workflow='.github/workflows/gds-native-tx-cursor-setup-reserve-screen.yaml',
+                hashes=dict(HASHES), nets=('_09431_', '_21816_'),
+                audit_tcl='workflow-src/scripts/ci/native_stage_probe.tcl',
+                output='runs/native-stage-probe')
+
+
+def validate(run, config, profile=None):
+    profile = default_profile() if profile is None else profile
+    expected = dict(id=profile['source_run'], head_sha=profile['source_sha'], head_branch='main', conclusion='failure',
+                    path=profile['source_workflow'])
     if any(run.get(k) != v for k, v in expected.items()):
         raise ValueError('Wrong failed source provenance')
     if config.get('CLOCK_PERIOD') != 20 or config.get('PL_TARGET_DENSITY_PCT') != 56:
         raise ValueError('Wrong source timing or density')
-    for name, expected_hash in HASHES.items():
+    for name, expected_hash in profile['hashes'].items():
         if digest(Path('src') / name) != expected_hash:
             raise ValueError('Wrong source bytes: '+name)
 
 
-def stage_config(config):
+def stage_config(config, audit_tcl='workflow-src/scripts/ci/native_stage_probe.tcl'):
     return dict(config, meta={'version': config.get('meta', {}).get('version', 1),
                              'flow': ['OpenROAD.STAMidPNR']},
                 PNR_CORNERS=[CORNER], RSZ_CORNERS=[CORNER], OPENROAD_THREADS=4,
                 PNR_SDC_FILE=str(Path('src/signoff.sdc').resolve()),
                 SIGNOFF_SDC_FILE=str(Path('src/signoff.sdc').resolve()),
-                STA_EXTRA_CORNER_TCL_FILE=str(Path('workflow-src/scripts/ci/native_stage_probe.tcl').resolve()))
+                STA_EXTRA_CORNER_TCL_FILE=str(Path(audit_tcl).resolve()))
 
 
-def main():
+def main(profile=None):
+    profile = default_profile() if profile is None else profile
     root = Path('runs/native-stock-screen')
     source_config = Path('src/config_native_stock.json')
     config = json.loads(source_config.read_text())
-    validate(json.loads(Path('/tmp/native-source-run.json').read_text()), config)
-    output = Path('runs/native-stage-probe'); output.mkdir(exist_ok=False)
-    receipt = dict(source_run=SOURCE_RUN, source_sha=SOURCE_SHA, diagnostic_only=True,
+    validate(json.loads(Path('/tmp/native-source-run.json').read_text()), config, profile)
+    output = Path(profile['output']); output.mkdir(exist_ok=False)
+    receipt = dict(source_run=profile['source_run'], source_sha=profile['source_sha'], diagnostic_only=True,
                    qualified=False, repair_performed=False, stages={})
     for stage in STAGES:
         state = root/'flow'/stage/'state_out.json'
@@ -60,7 +70,7 @@ def main():
         if not odb.resolve().is_relative_to(state.parent.resolve()) or odb.name != 'tt_um_tripwire.odb':
             raise ValueError('Wrong stage database')
         before = digest(odb)
-        cfg = stage_config(config)
+        cfg = stage_config(config, profile['audit_tcl'])
         # LibreLane resolves dir:: paths against the config file's directory.
         # Keep the original src/ anchor for SRAM macro and PDK view references.
         path = source_config.with_name('config_stage_probe_'+stage+'.json')
@@ -78,7 +88,7 @@ def main():
         if len(reports) != 1 or len(captures) != 1:
             raise ValueError('Missing unique stage evidence')
         corner, electrical = parse(reports[0].read_text())
-        if corner != CORNER or set(electrical['nets']) != {'_09431_', '_21816_'}:
+        if corner != CORNER or set(electrical['nets']) != set(profile['nets']):
             raise ValueError('Wrong stage diagnostic coverage')
         receipt['stages'][stage] = dict(odb_sha256=before,
             capture_setup_ns=capture_setup(captures[0].read_text()), electrical=electrical)

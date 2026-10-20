@@ -73,14 +73,13 @@ routine disp:
     out O1, r2, DATA                    # ACK to the host
     tstf 0
     br ok if rz
-    load16 r1, WAITF                    # WAIT/FAULT: 2 turnaround cycles, then drive again
-    out O0, r1, CTRL
-    load16 r1, CLK2
-    out O1, r1, CTRL
-    load16 r1, WAITF
-    out O0, r1, CTRL
-    load16 r1, OE1
-    out O0, r1, CTRL
+    load16 r1, WAITF                    # Prepare commands before starting the short burst.
+    load16 r0, CLK2
+    load16 r3, OE1
+    out O0, r1, CTRL                    # arm first fall before its clock
+    out O1, r0, CTRL
+    out O0, r1, CTRL                    # arm final fall before the two-clock burst ends
+    out O0, r3, CTRL
     setst IDLE
     ret
   ok:

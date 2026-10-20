@@ -72,3 +72,16 @@ At128 selected nets, dense construction admits at most390 edges under the defaul
 5. Fail-closed extraction: omitted final-row/column edge, invalid layer join, incomplete tree/pin alias map, out-of-window terminal, changed initial checkpoint and exceeded node/edge/net/variable limits. No silent expansion, inferred terminal or resource relaxation.
 
 Only after the actual ledger is known should a single bounded extraction be selected and qualified against those tests. The first useful result may be an explicit unsupported access state or a restricted infeasible window; report it precisely instead of calling it routing closure.
+
+## Implemented exterior-model follow-up
+
+Commit1dc0aed adds explicit schema2 net-private frozen-exterior equivalence
+components among declared boundary terminals. It retains schema1 strictness
+and resource accounting; the earlier current-schema limitation above records
+why the extension was needed. Private connectivity flows count toward model
+limits and never become shared geometric/capacity edges. Witness connectivity
+checks close only the selected net's relations.213 tests pass, including96
+new tests with81 independent exhaustive capacity/component cases; independent
+review is in corridor_exterior_review_20261019.md. Hosted39333075002 at1dc0aed passes213executed tests with downloaded strict XML and pinned solver version verified.
+This does not extract or authenticate any WARP exterior component, waive the
+initial repeated-step release requirement, or qualify physical terminals.

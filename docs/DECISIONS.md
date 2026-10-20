@@ -1070,3 +1070,15 @@ sweep or physical acceptance follows from this retained measurement.
 - DGR/CUGR2 is a separately scoped alternative requiring capacity-compatible export; AlphaChip targets placement and AutoTuner is not a reason to reopen rejected knobs. Research in routing_escape_options_20261019.md. Different reasoning agents/models can challenge assumptions, but only checkable artifacts change acceptance.
 
 - **D103 observation artifact:** patches/openroad_corridor_observer.patch against exactdcf36133 afterD101+D102, source-reviewedSHAb7493c2fc4e4c7074363550fd0a059064ee739a4fc593f3eaf14081167a5ff65. ExplicitAPI/read-only native rawcost/resource/STEP export, guarded idle state and exclusive output; no default call or algorithm change. ODB companion patches/corridor_contract_observer.tcl and schema in native_corridor_contract_20261019.md. Build39304728263 at75d4378 succeeds, including linked API smoke. Exact121/132/139 controls and ledger reconciliation remain pending in39331153087 at675b659; compiled observation is not native model qualification.
+
+- **D103 terminal follow-up:** raw observer qualification39331845906 reconciles
+  all6 snapshots exactly and preserves native checkpoint identity. Native pins
+  still lack physical membership/alias/access joins. Add separate explicit
+  terminal observer patchSHA5ec2f809d784e5d81e59a1470bef566423f7a35cb1aea573564b35734396393b,
+  after existing3patches, with independent source review and exact no-fuzz
+  dry-application. Export database/GlobalRouter/native inventories, physical
+  membership, layers, existing node aliases and via-range sentinels; no route,
+  cost, geometry or configuration change. Local/degenerate unsupported access
+  stays explicit. Build and native join qualification remain pending; retain
+  exact121/132/139 controls and all raw ledger/capacity/identity gates before
+  interpretation. This is software observation, not a hardware contract change.

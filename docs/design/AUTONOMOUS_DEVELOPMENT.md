@@ -306,3 +306,14 @@ both metric scopes. See native_corridor_run_20261019.md and independent
 native_corridor_result_review_20261019.md. Next terminal/access export and
 net-private exterior connectivity are separate reviewed implementations, not
 native model qualification yet.
+
+Terminal follow-up build39333325323 succeeds, retaining raw schema1. Native
+terminal qualification39367564921 at8782e28 is pending; its parser and collector
+passed independent source review. Portable auditing of a terminal-enabled
+bundle requires all three flags `--candidate --native-corridor --native-terminals`
+and the exact Git-authenticated fourth patch. It rechecks raw accounting,
+checkpoint capacities/identity, native completion, terminal inventory, hashes
+and unchanged terminal identity before comparing stored joins. Diagnostic
+unsupported access stays false; malformed joins fail collection. Clock joins
+compare raw native clock with database CLOCK, preserving the distinct cached
+GlobalRouter nonleaf flag. No hardware/physical acceptance follows.

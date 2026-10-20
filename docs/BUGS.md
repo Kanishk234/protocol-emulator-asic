@@ -1,5 +1,11 @@
 # Bugs
 
+## 103: Terminal validator equates database clocks with nonleaf router clocks
+- **Date:**2026-10-19.
+- **Symptom/check:** independent source review of the new terminal parser finds that joining FrNet.isClock to GLOBAL_NET.isClockNet would reject legitimate leaf-clock observations before any native terminal trial.
+- **Root cause:** FrNet clock is built from database signal type CLOCK; GlobalRouter caches a narrower nonleaf-clock classification. Those flags have different meanings.
+- **Fix/coverage:** join raw native clock to DATABASE_NET.clock, preserve GLOBAL_NET.clock separately. Hand-computed regression accepts both leaf/nonleaf global flags when DB/native agree and rejects DB/native contradiction.56parser testsPASS; independent final review confirms fix; committed3abf0cb before native qualification39367564921. No failed native terminal result was reclassified.
+
 ## 102: Private native exports are unreadable across the Docker boundary
 - **Date:**2026-10-19.
 - **Symptom/check:** native qualification39331153087 reaches all three routing controls, then host raw parser raises PermissionError opening native-corridor.tsv. Artifact upload also fails EACCES; GitHub retains no artifact. Failed run remains infrastructure, not ledger or routing qualification.

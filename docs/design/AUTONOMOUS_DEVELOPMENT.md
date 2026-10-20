@@ -376,3 +376,9 @@ executes a finite diagnostic and does not create continuous background AI.
 User approved FRESH_CANDIDATE_PLAN.md; begin paired G1 capability census before choosing hardware. New framed UART+SPI workload passes16mode/primitive simulations and22evidence-checker tests. Fully hard-backed combination requires three timers/three shifts, correcting the initial two/two assumption. Hosted39470166731 atfc7a3ac is pending; do not infer fit from standalone cell sums. Preserve all six personalities and seal a fresh evaluation set before hardware tuning.
 
 Incremental congestion sourceaa33398 retains an uninstalled121→118coarse proposal with whole-grid independent checks. Native best remains121. Pinned readSegments review finds append/accounting hazards; require a pristine full-inventory/native-ledger round-trip before handoff. Strict capacity-feasibility cuts and partial-overflow objectives answer different questions. No automatic promotion.
+
+## R1 evaluation seal — do not open selected identities
+
+Four roles are sealed in `HELDOUT_R1_SEALED.json`, SHA256 a36c0e2ebc4b04555d744c1433e6ebbbff96fad36dfcdc77084aa979b71e026d. Read only `HELDOUT_R1_MANIFEST.json` before R1 hardware freeze. The entire six-role public pool in that manifest is excluded from training, profiling and new RTL/models until freeze. `.rgignore` excludes the selected file from ordinary searches; do not bypass it. The coordinator used SystemRandom without printing or reading selected identities; this is a procedural seal, not independent-agent selection or encryption. Never replace/reseed the seal after candidate tuning.
+
+Automatic approval review rejected committing the selected JSON to repository history. Keep that file local while explicit payload approval is pending; commit only the public manifest/hash and exclusion rules. No selected identities were uploaded. This leaves recovery dependent on the local file; do not regenerate it if lost.

@@ -30,3 +30,6 @@ formal/*.log
 
 # TT support tools (CI checks them out here; scripts/preflight.sh links the local copy)
 /tt
+
+# Local-only evaluation identities; public manifest binds their hash.
+/docs/design/HELDOUT_R1_SEALED.json

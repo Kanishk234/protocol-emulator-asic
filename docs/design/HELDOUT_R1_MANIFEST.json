@@ -1,0 +1,16 @@
+{
+  "evaluation": "After freeze, preserve existing pin/host budget and report fit, functionality, host servicing and timing scope. Any scope reduction must be reported, never silently substituted.",
+  "excluded_training_pool": [
+    "i2s_receiver",
+    "jtag_controller",
+    "manchester_transmitter",
+    "microwire_controller",
+    "nec_ir_receiver",
+    "ps2_host"
+  ],
+  "independence": "Random selection hidden from tuning coordinator; all six pool roles excluded from training. No independent human/agent selection claimed.",
+  "path": "docs/design/HELDOUT_R1_SEALED.json",
+  "schema_version": 1,
+  "selected_count": 4,
+  "sha256": "a36c0e2ebc4b04555d744c1433e6ebbbff96fad36dfcdc77084aa979b71e026d"
+}

@@ -35,7 +35,7 @@ jobs:
           mkdir -p build/corridor_solver
           python -m pip freeze > build/corridor_solver/packages.txt
           git rev-parse HEAD > build/corridor_solver/source-revision.txt
-          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py tools/autonomy/tests/test_corridor_mip.py tools/autonomy/tests/test_capacity_cut.py tools/autonomy/tests/test_cut_cohort.py tools/autonomy/tests/test_cut_cohort_native.py tools/autonomy/tests/test_corridor_reduce.py tools/autonomy/tests/test_cut_refinement.py --junitxml=build/corridor_solver/results.xml
+          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py tools/autonomy/tests/test_corridor_mip.py tools/autonomy/tests/test_capacity_cut.py tools/autonomy/tests/test_cut_cohort.py tools/autonomy/tests/test_cut_cohort_native.py tools/autonomy/tests/test_corridor_reduce.py tools/autonomy/tests/test_cut_refinement.py tools/autonomy/tests/test_corridor_congestion.py tools/autonomy/tests/test_corridor_proposal.py --junitxml=build/corridor_solver/results.xml
           python -m autonomy.check_xml build/corridor_solver/results.xml
       - uses: actions/upload-artifact@v7
         if: always()

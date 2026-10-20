@@ -71,7 +71,7 @@ jobs:
         run: |
           source .venv/bin/activate
           mkdir -p build/native_solver_checks
-          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py tools/autonomy/tests/test_corridor_mip.py tools/autonomy/tests/test_native_solver_campaign.py tools/autonomy/tests/test_coarse_global.py tools/autonomy/tests/test_capacity_cut.py tools/autonomy/tests/test_cut_cohort.py tools/autonomy/tests/test_cut_cohort_native.py tools/autonomy/tests/test_corridor_reduce.py tools/autonomy/tests/test_cut_refinement.py tools/autonomy/tests/test_native_joint_campaign.py --junitxml=build/native_solver_checks/results.xml
+          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py tools/autonomy/tests/test_corridor_mip.py tools/autonomy/tests/test_native_solver_campaign.py tools/autonomy/tests/test_coarse_global.py tools/autonomy/tests/test_capacity_cut.py tools/autonomy/tests/test_cut_cohort.py tools/autonomy/tests/test_cut_cohort_native.py tools/autonomy/tests/test_corridor_reduce.py tools/autonomy/tests/test_cut_refinement.py tools/autonomy/tests/test_corridor_congestion.py tools/autonomy/tests/test_corridor_proposal.py tools/autonomy/tests/test_native_joint_campaign.py --junitxml=build/native_solver_checks/results.xml
           python -m autonomy.check_xml build/native_solver_checks/results.xml
           git rev-parse HEAD > build/native_solver_checks/tool-revision.txt
           python -m pip freeze > build/native_solver_checks/packages.txt

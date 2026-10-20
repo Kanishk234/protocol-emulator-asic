@@ -33,10 +33,28 @@ def test_only_repair_targets_change(fault):
     assert after['GRT_DESIGN_REPAIR_MAX_SLEW_PCT'] == after['GRT_DESIGN_REPAIR_MAX_CAP_PCT'] == 60
 
 
+@pytest.mark.parametrize('value', ['omitted', True, False, None, 1])
+def test_pinned_rerouting_default_is_accepted_but_explicit_disable_is_rejected(value):
+    before = config()
+    before.pop('GRT_DESIGN_REPAIR_RUN_GRT')
+    if value != 'omitted':
+        before['GRT_DESIGN_REPAIR_RUN_GRT'] = value
+    saved = copy.deepcopy(before)
+    if value == 'omitted' or value is True:
+        result = trial.configure(before)
+        assert result['GRT_DESIGN_REPAIR_RUN_GRT'] is True
+    else:
+        with pytest.raises(ValueError, match='requires global rerouting'):
+            trial.configure(before)
+    assert before == saved
+
+
 @pytest.mark.parametrize('fault', [None, 'setup', 'electrical'])
 def test_checkpoint_never_authorizes_route_and_retains_strict_gates(tmp_path, monkeypatch, fault):
     monkeypatch.chdir(tmp_path); monkeypatch.setenv('PDK_ROOT', '/pdk')
-    Path('src').mkdir(); Path('src/config_native_stock.json').write_text(json.dumps(config()))
+    # Real source artifact omits the pinned step's default rerouting setting.
+    original = config(); original.pop('GRT_DESIGN_REPAIR_RUN_GRT')
+    Path('src').mkdir(); Path('src/config_native_stock.json').write_text(json.dumps(original))
     source = Path('runs/native-stock-screen/flow/44-openroad-resizertimingpostgrt')
     source.mkdir(parents=True); odb = source/'tt_um_tripwire.odb'; odb.write_bytes(b'original')
     (source/'state_out.json').write_text(json.dumps({'odb': str(odb.resolve())}))

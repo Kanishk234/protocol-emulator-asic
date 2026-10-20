@@ -1,0 +1,88 @@
+name: R1 configuration and generator qualification
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'tools/profiling/config_cost.py'
+      - 'tools/profiling/tests/test_config_cost.py'
+      - 'tools/profiling/tests/test_r1_generator.py'
+      - 'spikes/r1/**'
+      - 'test_internal/cloud_r1_resource.py'
+      - '.github/workflows/r1_models.yaml'
+permissions:
+  contents: read
+concurrency:
+  group: warp-r1-models-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OSS_CAD_SUITE_TAG: '2026-06-29'
+jobs:
+  qualify:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Python prerequisites
+        run: sudo apt-get update && sudo apt-get install -y python3-tk
+      - name: Cache pinned synthesis suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Fetch pinned synthesis suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/warp-r1-ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/warp-r1-ocs.tgz -C ~
+      - name: Cache pinned compiler nextpnr
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+      - name: Project environment and pinned source
+        run: |
+          scripts/setup_venv.sh
+          bash scripts/fetch_tiles.sh
+          bash scripts/fetch_nextpnr.sh
+      - name: Qualify census and model identity guards
+        run: |
+          source .venv/bin/activate
+          mkdir -p build/r1_checks
+          python -m pytest -q tools/profiling/tests/test_config_cost.py tools/profiling/tests/test_r1_generator.py tools/profiling/tests/test_connectivity.py tools/profiling/tests/test_r1_resource.py tools/profiling/tests/test_r1_resource_campaign.py --junitxml=build/r1_checks/results.xml
+          python -m tools.autonomy.check_xml build/r1_checks/results.xml --minimum-cases 46
+          git rev-parse HEAD > build/r1_checks/source-revision.txt
+      - name: Count original full-fabric storage and mux structure
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools python -m profiling.config_cost --fabric arch/warp_g1/fabric.csv --rtl macro/warp_g1/rtl --out build/r1_checks/config-cost.json
+      - name: Reproduce G1 graph and configuration maps from clean source
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
+          python spikes/r1/qualify_generator.py --tiles build/third_party/fabulous-tiles --out build/r1_checks/control > build/r1_checks/control.log 2>&1
+      - name: Generate oversized capacity control
+        run: |
+          source .venv/bin/activate
+          export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
+          python spikes/r1/resource_control.py --control build/r1_checks/control --out build/r1_checks/resource > build/r1_checks/resource.log 2>&1
+      - name: Compile both concurrent workloads on capacity control
+        timeout-minutes: 22
+        run: |
+          source .venv/bin/activate
+          export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
+          python test_internal/cloud_r1_resource.py build/r1_checks/resource build/r1_checks/compile
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-model-qualification-${{ github.run_id }}
+          path: build/r1_checks/
+          retention-days: 30
+          if-no-files-found: error

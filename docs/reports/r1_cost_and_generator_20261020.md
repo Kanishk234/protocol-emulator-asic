@@ -29,3 +29,9 @@ Hosted39477188058 at70e0244 passes46checker tests, full cost census, clean G1 re
 ## Next gate
 
 Authenticate corrected hosted resource-model compilation before interpreting capacity. Then screen a physically plausible organization with complete configuration/routing/shell cost and actual pin-access/channel budget. Full native physical closure and all six retained personalities plus the primary concurrency target remain replacement requirements. Original121/experimental118coarse proposal and frozen G1 remain unchanged.
+
+## Corrected compile result and portability gap
+
+39479506675 at55c4120SUCCESS:47checks, clean control and both concurrent images pass. Native user-fabric PNR places103/128cells for UART+SPI and123/128 for UART+I2C, each using3of4timers/shifts; each image962words. This is the oversized model with placeholder timing, not silicon routing or an equal-area advantage.
+
+Downloaded audit verifies API/source identity, strict47XML cases, original-control hashes/graphs/maps and installed FABulous module hashes. Candidate-model audit stops because the default artifact policy omitted its hidden .FABulous directory. BUG112; rerun with explicit hidden generated-model retention before calling evidence fully portable. Separately, exact-buffer census hashing regression raises local qualification count to48.

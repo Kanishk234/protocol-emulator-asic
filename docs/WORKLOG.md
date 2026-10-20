@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-20 (R1 resource-model fit; audit retention fix)
+**Actual:**39479506675 at55c4120SUCCESS with47strict checker passes. Both concurrent designs place/route in the oversized abstract model: UART+SPI103/128LC, UART+I2C123/128LC, each3/4timers and3/4shifts;962-word CRC-checked diagnostic images. No loaded-fabric/physical/timing/equal-area acceptance. Complete independent model/image audit remains pending because upload omits hidden .FABulous directory (BUG112). Fix prepared to retain hidden generated files only under build/r1_checks; no private native/heldout payload involved.
+**Other fix:** configuration census hash+parse now share exact byte buffer (BUG113);22focused testsPASS, total48qualification cases expected. No model or workload changes for retention retry.
+**Next:** push retention fix, download fresh complete artifact, verify all model/source/image hashes and regenerate each image. Then select costed physical/topology screens; original candidate still121native overflow,118proposal uninstalled, G1 protected.
+
 ## 2026-10-20 (R1 cost and clean-source generator qualification)
 **Done:** complete G1 census7860stored/6032switch bits including borders (interior6656/4940). Strict selector/latch/mux-padding checker21testsPASS. Clean generator control catches cached prior-pruning contamination3546missingPIPs (BUG110); exact Git archive plus owned overlay restores19450PIPs,133BEL and3185BELv2records with exact bit maps. Six actual FASM streams regenerate original722words each locally. New software-only128LC/4timer/4shift reference uses11408stored bits, explicitly oversized/unqualified. Commits2468cf8/28091ca/70e0244 pushed; D104 records experimental scope.
 **Actual hosted:**39477188058 at70e0244 passes46tests/census/cleancontrol/resourcegeneration, then setupFAIL before placement: missing corner-named PIP file (BUG111). Export fix plus test gives47localPASS; retry prepared. No abstract fit result yet, no physical hardening or successor selection. All core CI at2f116ce was green before these software additions; current checks pending.

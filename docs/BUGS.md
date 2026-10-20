@@ -1,5 +1,17 @@
 # Bugs
 
+## 113: Configuration census hashes and parses separate file reads
+- **Date:**2026-10-20.
+- **Symptom/check:** source review finds file hashes were captured before reopening text, allowing a concurrent edit to make the stored hash describe different bytes than the parsed census. No incorrect observed G1 count claimed.
+- **Root cause:** hash and parse used separate reads.
+- **Fix/coverage:** one immutable byte buffer supplies both digest and UTF8 decoding. Regression forbids reopening via read_text;22cost-checker testsPASS.
+
+## 112: R1 artifact upload drops hidden generated model files
+- **Date:**2026-10-20.
+- **Symptom/check:**39479506675 compiler passes, but independent downloaded-artifact audit cannot find resource/macro/fabulous/.FABulous/bel.txt. Entire hidden model directory was omitted.
+- **Root cause:** upload-artifact defaults exclude hidden files even under selected build directory.
+- **Fix/coverage:** enable include-hidden-files only for the owned R1 build-artifact path, which contains the Git-archived public library and generated models. No selected held-out file or private native routing manifest is under that path. Require actual downloaded model hashes and image regeneration before accepting portable evidence. Hosted retry pending.
+
 ## 111: R1 resource model omits compiler-required corner PIP filename
 - **Date:**2026-10-20.
 - **Symptom/check:**39477188058 passes generator/census gates but nextpnr stops before placement on missing pips.nom_slow_1p08V_125C.txt. Native categoryunknown retained; never counted as capacity/routing failure.

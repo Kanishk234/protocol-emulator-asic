@@ -1125,6 +1125,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Retain20ns fully timed constraints, hold125target/final50ps minimum, allcorner/CTS100/wire150/clock8/electrical55/antenna50/final antenna pass and every zero-violation/reserve gate. Keep the measured slow FF-capture setup guard≥3.5ns; requesting a delay strategy is not evidence of headroom. No DRT until guards pass.
 - Cost/risk: mapping may grow area, worsen electrical loads/hold or congestion, or fail synthesis/runtime bounds. No timing improvement guaranteed and no RTL/ISA/latency, main hardware/config/template or official-policy adoption. Existing900s synthesis/6900s total deadlines stay. Evidence: PHASE2_NATIVE_ROUTE_TIMING_GAP.md; BUG124.
 
+## D-090 — Reverify and physically screen the general resync/event combination
+
+- General need: native DELAY0mapping delivers only~0.132ns extra estimated slow capture slack and fails electrical reserve. Address the shared bit-clock sample/event cone instead of continuing mapping tweaks. Existing resync+event prototype preserves every documented cycle and protocol primitive (D-071/D-072).
+- Test exactly bs_resync_event.patch on frozen2/4candidate3393eea9, changing only trw_pin_bs.v: direct elapsed-nonzero comparison, algebraically cancelled saturated resync sample arithmetic, and existing late event qualification. No extra state, latency, encoding or protocol-specific block. Keep AREA1wire150/hold125, global setup repair margin0, all prior fully timed20ns/corner/hold/electrical/antenna/overflow/reserve gates and measured slow FF-capture setup≥3.5ns.
+- Fresh proof:892bit-clock compare points close under induction;21pin tests,5chip tests and2048L2clocks pass on the isolated candidate. Expanded protocol replay with matching current firmware/tests is required before launch (BUG125); frozen RTL/spec stay fixed. Native source guard explicitly permits only existing event-late and the reviewed resync-event variant and records the actual name; the patch-application guard still enforces exact frozen hardware and allowed file changes.
+- Cost: prior isolated typical mapping estimates~1069µm² extra bit-clock area versus event-late, plus physical placement/fanout/hold risks; routed area/overflow and extraction decide. No main hardware/config/template changes, spec/latency change, official adoption or phase completion implied. Evidence: PHASE2_NATIVE_ROUTE_TIMING_GAP.md.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

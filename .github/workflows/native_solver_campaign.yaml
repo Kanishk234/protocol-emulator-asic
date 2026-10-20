@@ -1,0 +1,87 @@
+name: bounded native-derived solver campaign
+on:
+  workflow_dispatch:
+    inputs:
+      native_run:
+        description: Successful terminal-enabled controlled native repair run
+        required: true
+        default: '39367564921'
+        type: string
+      native_revision:
+        description: Exact 40-character source SHA of that native run
+        required: true
+        default: '8782e284e94706486f20f25248c7067eecdf0d70'
+        type: string
+      native_attempt:
+        description: Exact native run attempt
+        required: true
+        default: '1'
+        type: string
+      backend:
+        description: Separately qualified bounded graph solver
+        required: true
+        default: scip
+        type: choice
+        options: [scip, cp_sat]
+  push:
+    branches: [efpga]
+    paths: ['.github/workflows/native_solver_campaign.yaml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-native-solver-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  solve:
+    if: github.ref == 'refs/heads/efpga' && github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONPATH: tools
+      WARP_NATIVE_RUN: ${{ inputs.native_run }}
+      WARP_NATIVE_REV: ${{ inputs.native_revision }}
+      WARP_NATIVE_ATTEMPT: ${{ inputs.native_attempt }}
+      WARP_SOLVER_BACKEND: ${{ inputs.backend }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Project venv and pinned solver
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install pytest==8.4.2 pyyaml==6.0.3 -r requirements-routing.txt
+      - name: Verify finite campaign and original-layer checker fixtures
+        run: |
+          source .venv/bin/activate
+          mkdir -p build/native_solver_checks
+          python -m pytest -q tools/autonomy/tests/test_corridor_solver.py tools/autonomy/tests/test_corridor_mip.py tools/autonomy/tests/test_native_solver_campaign.py tools/autonomy/tests/test_coarse_global.py --junitxml=build/native_solver_checks/results.xml
+          python -m autonomy.check_xml build/native_solver_checks/results.xml
+          git rev-parse HEAD > build/native_solver_checks/tool-revision.txt
+          python -m pip freeze > build/native_solver_checks/packages.txt
+      - name: Fetch explicit native evidence and its exact source objects
+        run: |
+          set -euo pipefail
+          [[ "$WARP_NATIVE_RUN" =~ ^[1-9][0-9]*$ ]]
+          [[ "$WARP_NATIVE_REV" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$WARP_NATIVE_ATTEMPT" =~ ^[1-9][0-9]*$ ]]
+          [[ "$WARP_SOLVER_BACKEND" == scip || "$WARP_SOLVER_BACKEND" == cp_sat ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$WARP_NATIVE_RUN" --jq '{id,head_sha,head_branch,name,status,conclusion,run_attempt}' > build/native_solver_checks/native-identity.json
+          git fetch --no-tags --depth=1 origin "$WARP_NATIVE_REV"
+          gh run download "$WARP_NATIVE_RUN" --name "controlled-native-pair-repair-$WARP_NATIVE_RUN" --dir build/native_solver_input
+      - name: Authenticate all controls and run two bounded declared models
+        run: |
+          source .venv/bin/activate
+          python -m autonomy.native_solver_campaign build/native_solver_input/route_force_repair --identity build/native_solver_checks/native-identity.json --revision "$WARP_NATIVE_REV" --run-id "$WARP_NATIVE_RUN" --attempt "$WARP_NATIVE_ATTEMPT" --backend "$WARP_SOLVER_BACKEND" --output build/native_solver_campaign
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: native-derived-solver-${{ github.run_id }}
+          path: |
+            build/native_solver_campaign/
+            build/native_solver_checks/
+          retention-days: 30
+          if-no-files-found: error

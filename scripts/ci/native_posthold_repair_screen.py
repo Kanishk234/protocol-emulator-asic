@@ -17,12 +17,16 @@ def configure(original):
     expected = dict(GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=150,
         GRT_DESIGN_REPAIR_MAX_SLEW_PCT=55, GRT_DESIGN_REPAIR_MAX_CAP_PCT=55,
         GRT_RESIZER_HOLD_SLACK_MARGIN=.125, GRT_RESIZER_SETUP_SLACK_MARGIN=0,
-        GRT_DESIGN_REPAIR_RUN_GRT=True, GRT_ALLOW_CONGESTION=False)
+        GRT_ALLOW_CONGESTION=False)
     if any(original.get(k) != v for k, v in expected.items()):
         raise ValueError('Wrong post-hold repair source policy')
+    # Pinned LibreLane3.1.0.dev3 defaults this to True; the archived input
+    # config omits defaults. Keep explicit False/null invalid and serialize True.
+    if original.get('GRT_DESIGN_REPAIR_RUN_GRT', True) is not True:
+        raise ValueError('Post-hold repair requires global rerouting')
     # Physical repair targets only: the measured 0.45 reserve limit stays fixed.
     return dict(original, GRT_DESIGN_REPAIR_MAX_SLEW_PCT=60,
-                GRT_DESIGN_REPAIR_MAX_CAP_PCT=60)
+                GRT_DESIGN_REPAIR_MAX_CAP_PCT=60, GRT_DESIGN_REPAIR_RUN_GRT=True)
 
 
 def main():

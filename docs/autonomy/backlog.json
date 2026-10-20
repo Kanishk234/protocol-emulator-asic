@@ -292,7 +292,7 @@
       "priority": 2,
       "title": "Measure G1 baseline before fresh fabric selection",
       "track": "successor",
-      "status": "in_progress",
+      "status": "validated",
       "hypothesis": "A paired mixed hard/soft concurrency census distinguishes primitive shortage from logic or route limits before selecting R1 resources.",
       "evidence": [
         "docs/design/FRESH_CANDIDATE_PLAN.md",
@@ -301,7 +301,7 @@
         "Expanded39471254787 at5f03060SUCCESS;15nativecases;362Git-bound source/library and183artifact hashes checked;44strict hosted passes; docs/design/R1_REQUIREMENTS.md",
         "tools/profiling/connectivity.py;8testsPASS; applied6authenticated placements; docs/reports/r1_connectivity_20261020.md"
       ],
-      "next_action": "Baseline and first locality census complete. Measure configuration/switch cost and specify at most three generator/nextpnr/bitstream-compatible topology screens. R1_REQUIREMENTS.md controls capability comparisons; no candidate selected. Selected held-out identities remain local pending explicit publication approval.",
+      "next_action": "Paired baseline and locality census complete; continue R1-MODELS. No physical architecture selected.",
       "acceptance": [
         "Six supported personalities preserved in paired current compiler census.",
         "Concurrent workloads use identical semantics/pins/host framing across candidates.",
@@ -311,6 +311,31 @@
         "Any baseline regression, unknown fatal, input drift or stale successful artifact."
       ],
       "depends_on": []
+    },
+    {
+      "id": "R1-MODELS",
+      "priority": 2,
+      "title": "Qualify clean R1 software models and full cost census",
+      "track": "successor",
+      "status": "in_progress",
+      "hypothesis": "Exact G1 regeneration plus complete configuration accounting exposes stale-source and resource-only improvements before physical experiments.",
+      "evidence": [
+        "docs/reports/r1_cost_and_generator_20261020.md",
+        "D104; completeG17860bits; clean19450PIPcontrol; sixexact722wordstreams locally",
+        "39477188058 at70e0244:46tests/controlgenerationPASS; compile setupFAILmissingcornerfile; BUG111fixed47localPASS"
+      ],
+      "next_action": "Push corrected placeholder-corner export; authenticate hosted capacity results. Then specify physically plausible topology/control cost with routing channels and configuration distribution; do not promote oversized model.",
+      "acceptance": [
+        "Original graph multiplicities and bit mappings match before any model experiments.",
+        "Full-grid config storage/mux census includes border tiles.",
+        "Both workload images compile with explicit diagnostic timing/physical scope."
+      ],
+      "rejection": [
+        "Any source/control mismatch, missing compiler input, native setup/unknown failure or unsupported area/timing claim."
+      ],
+      "depends_on": [
+        "R1-BASELINE"
+      ]
     }
   ],
   "rejected_hypotheses": [

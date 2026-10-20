@@ -1082,3 +1082,11 @@ sweep or physical acceptance follows from this retained measurement.
   stays explicit. Build and native join qualification remain pending; retain
   exact121/132/139 controls and all raw ledger/capacity/identity gates before
   interpretation. This is software observation, not a hardware contract change.
+
+## D-104: Qualify clean source and full configuration cost before R1 topology selection
+- **Date:**2026-10-20. **Status:** accepted bounded software exploration under D-037/user-approved R1 plan; no production hardware selection.
+- Paired39471254787 shows UART+SPI demands103cells with3timer/shift pairs, versus138cells using2pairs; UART+I2C123versus173. An extra reusable pair benefits both workload families. No new primitive behavior or hard protocol block is introduced. Actual added physical area remains unmeasured, including routing/pins/configuration and cost to nonusers.
+- Count the complete fabric: G1 has7860stored bits, including6032switch bits, rather than treating interior6656as the whole macro. Source counts are not physical area. Do not rank pruning by removed PIP count alone.
+- Start with an exact regenerated G1 graph/configuration control from a clean pinned Git archive; cached tile sources are not authoritative. Reject mismatched graph multiplicities or bit mappings before any candidate model compile.
+- Use an isolated oversized128-LUT/four-pair model only to establish compiler capacity/representation for the concurrent workloads. Its11408stored bits and unchanged tile geometry do not demonstrate equal-area viability; physical_candidate=false and timing_acceptance=false. It is not a selected R1 architecture and must not enter production inputs.
+- Gate: source/control identity, strict checker XML, real native compiler/image diagnostics, then a physically plausible costed topology. Configuration loads must ultimately work through the real interface on mapped fabric before promotion. No weaker margins/capacity credits, no changed G1 ABI/RTL and no held-out-pool tuning. New owned r1_models workflow executes bounded qualification; template jobs unchanged.

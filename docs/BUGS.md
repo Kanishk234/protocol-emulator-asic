@@ -1,5 +1,17 @@
 # Bugs
 
+## 111: R1 resource model omits compiler-required corner PIP filename
+- **Date:**2026-10-20.
+- **Symptom/check:**39477188058 passes generator/census gates but nextpnr stops before placement on missing pips.nom_slow_1p08V_125C.txt. Native categoryunknown retained; never counted as capacity/routing failure.
+- **Root cause:** generic generator emits pips.txt while the production compile API requests its explicit slow-corner filename.
+- **Fix/coverage:** diagnostic model exports that filename with placeholder/uncharacterized timing metadata and false timing/physical acceptance. Export test added;47focused checksPASS. Hosted retry pending.
+
+## 110: Cached tile source contaminates a fresh G1 generator control
+- **Date:**2026-10-20.
+- **Symptom/check:** disposable G1 regeneration from old build/tile_cmos5l cache retains BEL interfaces but loses3546original PIP records; configuration maps differ. Caught by control comparison before any candidate compile.
+- **Root cause:** cache CSVs select prior clock-protected LUT/primitive pruning instead of pinned original matrices.
+- **Fix/coverage:** archive the exact pinned Git tree into a fresh directory; overlay only owned committed primitive definitions. Compare complete PIP multiplicities/BEL records/configuration maps, bind source/library hashes and reject mutated model inputs. Missing/duplicate graph and map-corruption tests cover the gate; clean local regeneration matches all19450PIPs and six original word streams. Hosted39477188058 source-control stepsPASS.
+
 ## 109: Fresh baseline checker CI omits compiler import dependency
 - **Date:**2026-10-20.
 - **Symptom/check:** hosted39470166731 concurrency-rtl fails collection with missing fasm; compiler census job continues independently. No simulated/fit result from failed step.

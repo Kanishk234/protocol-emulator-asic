@@ -1162,6 +1162,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Costs/risks: extra buffering/sizing/rerouting can worsen setup, area or hold. Existing slow capture3.003406ns is below3.5ns; electrical repair is not assumed to close it. Fresh measured gates must report all misses. Even a passing checkpoint requires clean synthesis reproduction before route authorization; receipt explicitly records clean_synthesis=false, reproduction_required=true and route_authorized=false.
 - Verification:55focused policy/provenance/parser/capture tests pass, including wrong source policy, setup/electrical rejection and successful checkpoint remaining unqualified for routing. Workflow syntax passes. No main config or template job change, official adoption or phase checklist tick.
 
+## D-095 — Isolate long-wire buffering from late electrical repair
+
+- Evidence: native post-hold run39481743524 repairs5slew problems and1450long wires, inserts1481buffers with zero resizes, clears the lane1 reserve miss but leaves channel0sel1 at0.464444utilization and reduces capture minimum3.003406→2.008383ns. This does not justify repeating the same broad late repair.
+- Controlled checkpoint experiment: start again at original TX source39468700509/state44, not its overbuffered descendant. Keep60% slew/cap repair targets, native repair/antenna ordering and all constraints; change only the late repair wire-length threshold150→2000µm relative to D-094. A positive large threshold avoids the pinned zero-length no-buffer behavior and should reduce gratuitous long-wire repair. It is a physical optimization target, not a relaxed signoff constraint; actual long-wire counts must be measured.
+- Cost/risk: fewer inserted wire buffers may preserve setup/area but can worsen routed RC or leave electrical problems. Require all existing20ns/50ps hold/zero electrical/antenna/overflow/0.45reserve/+3.5ns capture checks. No DRT, main configuration change or official adoption; even a passing checkpoint needs clean reproduction.
+- Separate source-bound workflow and shared qualification runner; tests cover both wire profiles, failure persistence, source-database preservation and route_authorized=false. No phase checklist tick.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

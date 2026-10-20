@@ -2,6 +2,23 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Isolate late repair long-wire cost
+
+- Confirmed native repair log:5slew problems,1450long wires,1481buffers and zero resizes. Prepared a single-control follow-up from original source39468700509/state44: late max_wire_length2000µm versus150; all other late margin60/antenna/acceptance settings unchanged. Avoid zero max length because pinned native behavior disables buffering there. Do not call this wire-free repair; measure actual activity.
+- Shared runner now accepts a reviewed config transform/output directory and records the effective late wire threshold. Separate native_posthold_wire2000_screen wrapper/workflow retains every existing qualification gate, source hashes/provenance and clean-reproduction requirement. Tests exercise both full mocked profiles including setup/electrical failures, macro config anchoring and unchanged source ODB. Workflow syntax/whitespace checks pass. D-095 records motivation/costs; no main hardware/config/template changes or phase ticks.
+- Next publish tool/test/CI/docs groups under standing authorization and launch exactly one wire2000 follow-up. Its result tests whether late buffering cost can be reduced; channel0's persistent decode remains independently unresolved.
+
+## 2026-10-20 — Post-hold native repair runs but fails physical reserves
+
+- Run39481743524 on620319f completes actual native repair and fresh measurements, then fails qualification; this is not another preflight/config bug. Early artifact12292186940 at/tmp/tripwire-posthold-gates-39481743524; selected bulk evidence12292212031 at/tmp/tripwire-posthold-critical-39481743524. No follow-up launch or source edits in this result check.
+- All actual electrical counts and antenna counts remain zero. Fast hold74.3461ps passes50ps; typical198.371ps/slow407.338ps. All capacitance reserves pass. Lane1 reserve offender no longer appears; one slow slew miss remains net21816/place7842/A,1.164546ns/utilization0.46444365 versus0.45. Exact repaired netlist still uses original channel0sel1 driver27383/nor4_1.
+- Slow capture regresses3.003406→2.008383ns (−0.995023), versus3.5ns guard; typical8.636272ns/fast12.471828ns. Fresh exact netlist maps worst launch to U0TXMODE[0]/configuration word0bit0 latch49431→dropped[68] FF48552, launch data arrival3.038594ns including1.555316ns borrowing. Do not reuse the previous PERIOD[2] endpoint mapping.
+- Additional native design repair finds5slew violations and1450long wires, inserts1481buffers in1455nets. Broad late wire150 repair fixes one reserve cone but consumes setup; do not repeat unchanged or promote this checkpoint. Separate long-wire buffering cost from genuinely targeted electrical repair; channel0decode remains a local unresolved target. Receipt correctly preserves electrical and setup failures together, route_authorized=false and reproduction_required=true. No phase boxes ticked.
+
+## 2026-10-20 — Post-hold experiment relaunched after preflight fix
+
+- Published toolsc2e9bf1/testsade4943/docs620319f; verified remote main620319f4775f7ec03a99a05997ac1d1c40ed979d. Dispatched exactly one corrected [post-hold screen39481743524](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39481743524), confirmed in progress on that head.60focused tests and actual archived-config replay pass. No new timing result, hardware/gate change or phase box tick. Next inspect measured physical outcomes. Receipt remains local until next evidence publication.
+
 ## 2026-10-20 — Fix omitted pinned default in post-hold preflight (BUG128)
 
 - Run39480456836 fails before any physical repair at configure(): source config omits GRT_DESIGN_REPAIR_RUN_GRT. Pinned LibreLane3.1.0.dev3 Step registry confirms default=True; resolved original repair step usesTrue. All other guarded values match. Reproduced exact failure against the actual archived input JSON; no timing conclusion from this failed attempt.

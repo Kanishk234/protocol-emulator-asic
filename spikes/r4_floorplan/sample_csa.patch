@@ -1,0 +1,15 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -137,7 +137,11 @@
+     // arithmetic stage from the resync path without changing its saturation behavior.
+     wire [24:0] tb_r = !smp_done ? ((e < sj) ? per : tb + sj) : ((tb < sj) ? 25'd0 : tb - sj);
+     wire [24:0] sp   = sof - per;                               // sample time - boundary time
+-    wire [24:0] x_n  = sp + tb;                                 // the sample time, from this clock's start
++    // Three-operand sample time, modulo 2^25. Keep the first stage carry-free.
++    wire [24:0] per_inv = ~per;
++    wire [24:0] sample_sum = sof ^ per_inv ^ tb;
++    wire [24:0] sample_carry = ((sof & per_inv) | (sof & tb) | (per_inv & tb)) << 1;
++    wire [24:0] x_n = sample_sum + (sample_carry | 25'd1);
+     // Cancel the saturated correction before doing sample-time arithmetic.
+     // These identities hold modulo 2^25, including timer wrap and live writes.
+     wire [24:0] x_r = !smp_done ? ((e < sj) ? sof : x_n + sj) :

@@ -1,0 +1,17 @@
+--- a/src/trw_pin_tx.v
++++ b/src/trw_pin_tx.v
+@@ -280,7 +280,13 @@
+         end
+     end
+     wire        r_wrap = (rn == presc);
+-    wire [15:0] q_inc  = (r_wrap && (qn != 16'h7fff)) ? qn + 16'd1 : qn;
++    // Compute cursor arithmetic independently of the late token selection.
++    wire q_reset = tk && !h_ext && (c_sync || tk_late);
++    wire q_delay = tk && !h_ext && !(c_sync || tk_late) && (c_gap || tk_timed);
++    wire base_wrap = (r_b == presc);
++    wire [15:0] base_inc = (base_wrap && (q_b != 16'h7fff)) ? q_b + 16'd1 : q_b;
++    wire [15:0] delay_inc = (base_wrap && (q_sub[15:0] != 16'h7fff)) ? q_sub[15:0] + 16'd1 : q_sub[15:0];
++    wire [15:0] q_inc = q_reset ? 16'd0 : q_delay ? delay_inc : base_inc;
+     wire [7:0]  r_inc  = r_wrap ? 8'h00 : rn + 8'd1;
+ 
+     always @(posedge clk) begin

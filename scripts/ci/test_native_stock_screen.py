@@ -37,12 +37,13 @@ def test_missing_and_detailed_route_checkpoints_rejected(tmp_path):
 
 
 @pytest.mark.parametrize('hold_target,clock_cluster,native_margin,final_antenna',[(.10,None,False,False),(.125,None,False,False),(.10,'8',False,False),(.10,'8',True,False),(.10,'8',True,True)])
-def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster, native_margin, final_antenna):
+@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-resync-event'])
+def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster, native_margin, final_antenna, variant):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('NATIVE_HOLD_TARGET',str(hold_target))
     if clock_cluster is None: monkeypatch.delenv('NATIVE_CLOCK_CLUSTER_SIZE', raising=False)
     else: monkeypatch.setenv('NATIVE_CLOCK_CLUSTER_SIZE',clock_cluster)
-    for k, v in dict(VARIANT='bs-event-late', NATIVE_MAPPING_STRATEGY='AREA 1',
+    for k, v in dict(VARIANT=variant, NATIVE_MAPPING_STRATEGY='AREA 1',
                      PDK_ROOT='/pdk', LIBRELANE_IMAGE_OVERRIDE='old:custom').items():
         monkeypatch.setenv(k, v)
     Path('src').mkdir()
@@ -84,6 +85,7 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, ho
         runner.main()
     assert calls == ['flow', 'sta']
     receipt = json.loads(Path('runs/native-stock-screen/recipe.json').read_text())
+    assert receipt['source_variant'] == variant
     assert receipt['checkpoint_ecos'] is False
     assert receipt['stock_sequence'] is (not final_antenna)
     assert receipt['hold_target_ns']==hold_target

@@ -33,8 +33,8 @@ def verify(variant, output, simulate=False):
     if output == ROOT or ROOT in output.parents:
         raise ValueError("Trial output must be outside the repository")
     output.mkdir(parents=True, exist_ok=False)
-    for revision, paths in [(CANDIDATE, ['src', 'spec', 'programs']),
-                            ('HEAD', ['tools', 'test_internal'])]:
+    for revision, paths in [(CANDIDATE, ['src', 'spec']),
+                            ('HEAD', ['tools', 'test_internal', 'programs'])]:
         data = subprocess.check_output(['git', 'archive', revision, *paths], cwd=ROOT)
         with tarfile.open(fileobj=io.BytesIO(data)) as archive:
             archive.extractall(output, filter='data')

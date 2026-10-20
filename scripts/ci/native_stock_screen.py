@@ -56,7 +56,7 @@ def checkpoint(root, final_antenna=False):
 
 
 def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimingPostGRT'):
-    if os.environ['VARIANT'] != 'bs-event-late':
+    if os.environ['VARIANT'] not in {'bs-event-late', 'bs-resync-event'}:
         raise ValueError('Unreviewed source variant')
     original = json.loads(Path('src/config_merged.json').read_text())
     sdc = Path('src/signoff.sdc')
@@ -93,7 +93,7 @@ def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimin
     extra = {'extra_tcl': extra_tcl} if extra_tcl is not None else {}
     screen(path, source, root / 'timing', os.environ['PDK_ROOT'], repaired=source, sdc=sdc, **extra)
     recipe = {
-        'source_variant': 'bs-event-late', 'synthesis_strategy': config['SYNTH_STRATEGY'],
+        'source_variant': os.environ['VARIANT'], 'synthesis_strategy': config['SYNTH_STRATEGY'],
         'repair_corners': list(CORNERS),
         'hold_target_ns': config['GRT_RESIZER_HOLD_SLACK_MARGIN'],
         'stock_sequence': not final_antenna, 'checkpoint_ecos': False,

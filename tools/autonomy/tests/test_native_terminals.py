@@ -256,3 +256,26 @@ def test_database_clock_and_nonleaf_global_clock_have_distinct_semantics():
     assert joined(rb, tb)["model_gate"] == "PASS"
     tb = change(tb, "GLOBAL_NET\t11\tnet a\t0\t0\t0", "GLOBAL_NET\t11\tnet a\t0\t0\t1")
     assert joined(rb, tb)["model_gate"] == "PASS"
+
+
+def test_explicit_subset_does_not_waive_whole_inventory_limitations():
+    rb,tb=fixture(outside=True)
+    result=n.audit_selection(raw.parse_bytes(rb),n.parse_bytes(tb),[0])
+    assert result['selected_membership_and_access_verified']
+    assert not result['whole_inventory_terminal_join_verified']
+    assert result['excluded_unsupported_observations']==1
+    assert not result['native_inputs_authenticated'] and not result['physical_acceptance']
+
+
+def test_selected_unsupported_access_stays_rejected():
+    rb,tb=fixture(supported=False)
+    result=n.audit_selection(raw.parse_bytes(rb),n.parse_bytes(tb),[0])
+    assert not result['selected_membership_and_access_verified']
+    assert result['unsupported_selected_access']==[dict(reason='unsupported_tree_access',slot=0)]
+
+
+@pytest.mark.parametrize('slots',[[],[0,0],[True],[1],list(range(129))])
+def test_subset_admission_requires_explicit_valid_unique_slots(slots):
+    rb,tb=fixture()
+    with pytest.raises(n.FormatError,match='unique existing'):
+        n.audit_selection(raw.parse_bytes(rb),n.parse_bytes(tb),slots)

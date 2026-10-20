@@ -328,3 +328,34 @@ def audit_files(raw_path: Path, terminal_path: Path) -> dict:
     with Path(raw_path).open("rb") as stream:
         raw = corridor.parse_bytes(stream.read(corridor.MAX_BYTES + 1))
     return audit_join(raw, parse_file(terminal_path))
+
+
+def audit_selection(snapshot: corridor.Snapshot, state: TerminalState, slots: list[int]) -> dict:
+    """Explicit subset admission; preserve the whole-inventory gate unchanged.
+
+    This verifies selected memberships/access, never physical via feasibility.
+    Unscoped unsupported observations fail closed rather than disappearing.
+    """
+    if (not isinstance(slots, list) or not 1 <= len(slots) <= 128 or
+            any(type(slot) is not int or slot not in snapshot.nets for slot in slots) or
+            len(set(slots)) != len(slots)):
+        raise FormatError('Require one to128 unique existing native slots')
+    whole = audit_join(snapshot, state)
+    if not corridor.audit(snapshot)['usage_ledger_reconciled']:
+        raise FormatError('Selected model requires reconciled raw usage ledger')
+    selected = set(slots)
+    dbids = {snapshot.nets[slot]['db_id'] for slot in selected}
+    relevant = []
+    for item in whole['unsupported_access']:
+        if ('slot' not in item and 'db_id' not in item) or item.get('slot') in selected or item.get('db_id') in dbids:
+            relevant.append(item)
+    return {'schema': 'warp-selected-terminal-admission-v1',
+            'native_sha256': snapshot.sha256, 'terminal_sha256': state.sha256,
+            'selected_slots': sorted(selected), 'selected_database_ids': sorted(dbids),
+            'selected_membership_and_access_verified': not relevant,
+            'whole_inventory_terminal_join_verified': whole['terminal_join_verified'],
+            'unsupported_selected_access': relevant,
+            'excluded_unsupported_observations': len(whole['unsupported_access'])-len(relevant),
+            'raw_usage_ledger_reconciled': True,
+            'native_inputs_authenticated': False, 'physical_acceptance': False, 'timing_acceptance': False,
+            'scope': 'Explicit selected coarse memberships/access only; frozen exterior and physical via legality unverified'}

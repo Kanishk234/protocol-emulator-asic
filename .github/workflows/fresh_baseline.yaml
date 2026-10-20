@@ -74,11 +74,12 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y iverilog
           python -m venv .venv
-          .venv/bin/python -m pip install -r test/requirements.txt pyyaml==6.0.3
+          .venv/bin/python -m pip install -r test/requirements.txt pyyaml==6.0.3 fabulous-fasm==0.2.0
       - name: Baseline evidence checker tests
         run: |
           source .venv/bin/activate
-          python -m pytest -q test_internal/test_fresh_baseline.py
+          mkdir -p build/uart_spi_checks
+          python -m pytest -q test_internal/test_fresh_baseline.py --junitxml=build/uart_spi_checks/evidence-checker.xml
       - name: Concurrent traffic across modes and primitive selections
         run: |
           source .venv/bin/activate

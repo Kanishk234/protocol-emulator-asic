@@ -14,6 +14,7 @@ from verify_timing_trial import regenerate_python_tables
 
 ROOT = Path(__file__).resolve().parents[2]
 VARIANT = 'bs-event-cfg-staging'
+VARIANTS = (VARIANT, 'bs-resync-event-cfg-staging')
 
 
 def proof_script(flops):
@@ -91,7 +92,9 @@ def verify_phases(output):
     return results
 
 
-def prepare(output):
+def prepare(output, variant=VARIANT):
+    if variant not in VARIANTS:
+        raise ValueError('Unreviewed configuration staging variant')
     output = Path(output).resolve()
     if output == ROOT or ROOT in output.parents:
         raise ValueError('Use a fresh output directory outside the repository')
@@ -103,19 +106,48 @@ def prepare(output):
     regenerate_python_tables(output)
     source = output / 'src/trw_pin_cfg.v'
     (output / 'gold_trw_pin_cfg.v').write_bytes(source.read_bytes())
-    patch = ROOT / 'spikes/r4_floorplan' / PATCHES[VARIANT][0]
+    (output / 'gold_trw_pin_bs.v').write_bytes((output / 'src/trw_pin_bs.v').read_bytes())
+    patch = ROOT / 'spikes/r4_floorplan' / PATCHES[variant][0]
     subprocess.run(['git', 'apply', str(patch)], cwd=output, check=True)
     return output
+
+
+def verify_bs(output):
+    script = output / 'bs-equivalence.ys'
+    script.write_text('''read_verilog -DSYNTHESIS -Isrc gold_trw_pin_bs.v
+rename trw_pin_bs gold
+read_verilog -DSYNTHESIS -Isrc src/trw_pin_bs.v
+rename trw_pin_bs gate
+proc
+memory
+opt
+equiv_make gold gate equiv
+hierarchy -top equiv
+equiv_simple
+equiv_induct -seq 2
+equiv_status -assert
+''')
+    log_path = output / 'bs-equivalence.log'
+    with log_path.open('w') as log:
+        subprocess.run(['yosys', '-Q', '-s', str(script)], cwd=output,
+                       stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
+    match = re.search(r'Of those cells (\d+) are proven and 0 are unproven', log_path.read_text())
+    if not match:
+        raise ValueError('Missing complete bit-clock proof receipt')
+    return int(match.group(1))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--variant', choices=VARIANTS, default=VARIANT)
     args = parser.parse_args()
-    output = prepare(args.output)
+    output = prepare(args.output, args.variant)
+    bs_points = verify_bs(output)
     results = verify_phases(output)
-    receipt = dict(candidate=CANDIDATE, variant=VARIANT, checks=results,
+    receipt = dict(candidate=CANDIDATE, variant=args.variant, checks=results,
                    proof_scope='Sequential module equivalence with clocked host writes; induction cap6, not whole-chip formal',
+                   bit_clock_equivalence_points=bs_points,
                    phase_bench_sha256=hashlib.sha256((ROOT / 'test_internal/cfg_staging/tb_cfg_staging.v').read_bytes()).hexdigest(),
                    rtl_sha256={name: hashlib.sha256((output / 'src' / name).read_bytes()).hexdigest()
                                for name in ('trw_pin_cfg.v', 'trw_pin_bs.v')})

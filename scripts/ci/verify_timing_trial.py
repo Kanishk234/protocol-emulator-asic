@@ -28,7 +28,7 @@ def regenerate_python_tables(output):
 
 
 def verify(variant, output, simulate=False):
-    if variant == 'bs-event-cfg-staging':
+    if variant in {'bs-event-cfg-staging', 'bs-resync-event-cfg-staging'}:
         raise ValueError('Use verify_cfg_staging.py for clocked-host latch equivalence')
     patch, source = PATCHES[variant]
     output = output.resolve()

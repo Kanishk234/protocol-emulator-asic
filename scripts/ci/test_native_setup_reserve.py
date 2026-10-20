@@ -82,3 +82,36 @@ def test_workflow_keeps_capture_reports_and_exact_runner_setup():
     assert 'librelane==3.1.0.dev3' in commands
     early=next(s for s in steps if s['name']=='Upload early gate evidence')['with']['path']
     assert 'capture_setup.rpt' in early and 'gates.json' in early
+
+
+@pytest.mark.parametrize('slack,prior', [('2.918062',False), ('3.6',False), ('3.6',True)])
+def test_electrical_rejection_records_setup_without_masking_failure(tmp_path,monkeypatch,slack,prior):
+    monkeypatch.chdir(tmp_path)
+    original = ValueError('Native electrical reserve rejected')
+    def screen(**options):
+        evidence(Path('runs/native-stock-screen'),slack=slack,prior=prior)
+        raise original
+    monkeypatch.setattr(target,'margin_screen',screen)
+    with pytest.raises(ValueError) as caught:
+        target.main()
+    assert caught.value is original
+    gate=json.loads(Path('runs/native-stock-screen/gates.json').read_text())
+    assert gate['qualified'] is False
+    assert gate['capture_setup_minimum_ns'][target.CORNERS[1]]==float(slack)
+    assert gate['estimated_setup_reserve_pass'] is (float(slack)>=3.5)
+
+
+@pytest.mark.parametrize('partial',[False,True])
+def test_failed_flow_preserves_original_error_without_complete_evidence(tmp_path,monkeypatch,partial):
+    monkeypatch.chdir(tmp_path)
+    original=RuntimeError('Flow failed before final STA')
+    def screen(**options):
+        if partial:
+            root=Path('runs/native-stock-screen');root.mkdir(parents=True)
+            (root/'gates.json').write_text('{"qualified": true}')
+        raise original
+    monkeypatch.setattr(target,'margin_screen',screen)
+    with pytest.raises(RuntimeError) as caught:target.main()
+    assert caught.value is original
+    if partial:
+        assert json.loads(Path('runs/native-stock-screen/gates.json').read_text())['qualified'] is False

@@ -57,7 +57,10 @@ def test_workflow_downloads_failed_source_and_never_runs_route():
         assert net in tcl
 
 
-def test_main_preserves_relative_macro_paths_through_every_stage(tmp_path, monkeypatch):
+@pytest.mark.parametrize('lane_mask', [False, True])
+def test_main_preserves_relative_macro_paths_through_every_stage(tmp_path, monkeypatch, lane_mask):
+    from native_lane_mask_stage_probe import PROFILE
+    profile = PROFILE if lane_mask else probe.default_profile()
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('PDK_ROOT', '/pdk')
     Path('src').mkdir(); Path('macro').mkdir()
@@ -94,9 +97,39 @@ def test_main_preserves_relative_macro_paths_through_every_stage(tmp_path, monke
         calls.append(command)
     monkeypatch.setattr(probe.subprocess, 'run', run)
     monkeypatch.setattr(probe, 'capture_setup', lambda text: 3.0)
-    monkeypatch.setattr(probe, 'parse', lambda text: (probe.CORNER, {'nets': {'_09431_': {}, '_21816_': {}}}))
-    probe.main()
+    monkeypatch.setattr(probe, 'parse', lambda text: (probe.CORNER, {'nets': {n: {} for n in profile['nets']}}))
+    probe.main(profile if lane_mask else None)
     assert len(calls) == len(probe.STAGES) == 5
-    receipt = json.loads(Path('runs/native-stage-probe/diagnosis.json').read_text())
+    receipt = json.loads((Path(profile['output'])/'diagnosis.json').read_text())
     assert receipt['qualified'] is False and receipt['repair_performed'] is False
     assert set(receipt['stages']) == set(probe.STAGES)
+    assert receipt['source_run'] == profile['source_run']
+    assert receipt['source_sha'] == profile['source_sha']
+
+
+@pytest.mark.parametrize('fault', [None, 'id', 'head_sha', 'path', 'trw_lane.v', 'trw_chan_port.v', 'signoff.sdc'])
+def test_lane_mask_diagnosis_binds_failed_run_and_all_source_hashes(monkeypatch, fault):
+    from native_lane_mask_stage_probe import PROFILE
+    run = dict(id=PROFILE['source_run'], head_sha=PROFILE['source_sha'], head_branch='main',
+               conclusion='failure', path=PROFILE['source_workflow'])
+    if fault in run: run[fault] = 'wrong'
+    monkeypatch.setattr(probe, 'digest', lambda p: 'wrong' if p.name == fault else PROFILE['hashes'][p.name])
+    if fault:
+        with pytest.raises(ValueError): probe.validate(run, dict(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=56), PROFILE)
+    else: probe.validate(run, dict(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=56), PROFILE)
+
+
+def test_lane_mask_workflow_uses_exact_artifact_and_read_only_probe():
+    from native_lane_mask_stage_probe import PROFILE
+    root = Path(__file__).resolve().parents[2]
+    job = yaml.safe_load((root/'.github/workflows/gds-native-lane-mask-stage-diagnosis.yaml').read_text())['jobs']['harden']
+    download = next(s for s in job['steps'] if 'download-artifact@' in s.get('uses', ''))['with']
+    assert download['run-id'] == PROFILE['source_run']
+    assert download['name'] == f"gds-native-lane-mask-setup-reserve-area1-{PROFILE['source_run']}"
+    commands = '\n'.join(s.get('run', '') for s in job['steps'])
+    assert 'native_lane_mask_stage_probe.py' in commands
+    for name, digest in PROFILE['hashes'].items():
+        if name != 'signoff.sdc': assert digest in commands
+    tcl = (root/'scripts/ci/native_lane_mask_stage_probe.tcl').read_text()
+    for name in PROFILE['nets']: assert name in tcl
+    assert not any(command in tcl for command in ['repair_design', 'repair_timing', 'global_route', 'detailed_route'])

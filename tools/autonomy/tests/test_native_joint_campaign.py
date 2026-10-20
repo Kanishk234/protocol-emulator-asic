@@ -9,6 +9,7 @@ def setup(tmp_path,monkeypatch):
     calls=[]
     monkeypatch.setattr(campaign.fixed,'load_inputs',lambda *a,**k:(calls.append('authenticate') or ({'result_sha256':'a'*64},'raw','term','segments')))
     monkeypatch.setattr(campaign.coarse_global,'build',lambda *a,**k:(calls.append('seed') or {'graph':aggregate_graph()}))
+    monkeypatch.setattr(campaign.capacity_cut,'discover_partition_certificate',lambda g:campaign.capacity_cut.certify_partition(g,side_nodes=['left']))
     def refine(*a,**kw):
         calls.append('refine')
         assert kw['max_additional']==5 and kw['max_rounds']==4 and kw['max_variables']==150000

@@ -7,6 +7,7 @@ import pytest
 import verify_cfg_staging as target
 from verify_timing_trial import verify
 import native_cfg_staging_screen as screen
+import native_resync_cfg_staging_screen as combined_screen
 
 
 @pytest.fixture(scope='module')
@@ -39,38 +40,55 @@ def test_phase_comparator_rejects_regressions(prepared, tmp_path, mutation):
     assert result.returncode != 0 and 'Configuration staging changes observable phase behavior' in result.stdout
 
 
-def test_generic_verifier_does_not_use_wrong_clock_model(tmp_path):
+@pytest.mark.parametrize('variant', target.VARIANTS)
+def test_generic_verifier_does_not_use_wrong_clock_model(tmp_path, variant):
     with pytest.raises(ValueError, match='clocked-host'):
-        verify(target.VARIANT, tmp_path / 'trial')
+        verify(variant, tmp_path / 'trial')
     assert not (tmp_path / 'trial').exists()
 
 
-def test_screen_keeps_existing_policy_and_requires_reviewed_variant(monkeypatch):
+@pytest.mark.parametrize('runner,variant', [(screen, target.VARIANT), (combined_screen, target.VARIANTS[1])])
+def test_screen_keeps_existing_policy_and_requires_reviewed_variant(monkeypatch, runner, variant):
     calls = []
-    monkeypatch.setattr(screen, 'reserve_screen', lambda **kw: calls.append(kw))
+    monkeypatch.setattr(runner, 'reserve_screen', lambda **kw: calls.append(kw))
     monkeypatch.setenv('VARIANT', 'bs-resync-event')
     with pytest.raises(ValueError):
-        screen.main()
-    monkeypatch.setenv('VARIANT', target.VARIANT)
-    screen.main()
+        runner.main()
+    monkeypatch.setenv('VARIANT', variant)
+    runner.main()
     from native_wire150_screen import configure
     assert calls == [{'config_transform': configure}]
 
 
-def test_workflow_binds_both_rtl_hashes_and_same_clock():
+@pytest.mark.parametrize('variant,filename', [
+    (target.VARIANT, 'gds-native-cfg-staging-setup-reserve-screen.yaml'),
+    (target.VARIANTS[1], 'gds-native-resync-cfg-staging-setup-reserve-screen.yaml')])
+def test_workflow_binds_both_rtl_hashes_and_same_clock(variant, filename):
     import hashlib
     import yaml
-    path = target.ROOT / '.github/workflows/gds-native-cfg-staging-setup-reserve-screen.yaml'
+    path = target.ROOT / '.github/workflows' / filename
     job = yaml.safe_load(path.read_text())['jobs']['harden']
-    assert job['env']['VARIANT'] == target.VARIANT
+    assert job['env']['VARIANT'] == variant
     assert job['env']['CANDIDATE_SHA'] == target.CANDIDATE
     commands = '\n'.join(step.get('run', '') for step in job['steps'])
-    assert 'native_cfg_staging_screen.py' in commands
+    assert ('native_resync_cfg_staging_screen.py' if variant == target.VARIANTS[1] else 'native_cfg_staging_screen.py') in commands
     assert 'float(cfg["CLOCK_PERIOD"]) == 20.0' in commands
     assert 'timing_trial.py' in commands
     # prepare() and hash checks bind the exact archived source plus reviewed patch.
     import tempfile
     with tempfile.TemporaryDirectory() as temporary:
-        output = target.prepare(Path(temporary) / 'trial')
+        output = target.prepare(Path(temporary) / 'trial', variant)
         for name in ('trw_pin_cfg.v', 'trw_pin_bs.v'):
             assert hashlib.sha256((output / 'src' / name).read_bytes()).hexdigest() in commands
+
+
+def test_combination_preserves_verified_configuration_source(prepared, tmp_path):
+    combined = target.prepare(tmp_path / 'trial', target.VARIANTS[1])
+    assert (combined / 'src/trw_pin_cfg.v').read_bytes() == (prepared / 'src/trw_pin_cfg.v').read_bytes()
+    assert (combined / 'src/trw_pin_bs.v').read_bytes() != (prepared / 'src/trw_pin_bs.v').read_bytes()
+
+
+def test_prepare_rejects_unreviewed_source_before_mutation(tmp_path):
+    with pytest.raises(ValueError, match='Unreviewed'):
+        target.prepare(tmp_path / 'trial', 'unknown')
+    assert not (tmp_path / 'trial').exists()

@@ -37,7 +37,7 @@ def test_missing_and_detailed_route_checkpoints_rejected(tmp_path):
 
 
 @pytest.mark.parametrize('hold_target,clock_cluster,native_margin,final_antenna',[(.10,None,False,False),(.125,None,False,False),(.10,'8',False,False),(.10,'8',True,False),(.10,'8',True,True)])
-@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging'])
+@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging'])
 def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster, native_margin, final_antenna, variant):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('NATIVE_HOLD_TARGET',str(hold_target))

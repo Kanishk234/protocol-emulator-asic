@@ -2,7 +2,7 @@
 
 The entire pool is excluded from R1 training until freeze. This prevents the
 coordinator's knowledge of the pool from authorizing profiling any member.
-Selection uses SystemRandom; committed bytes and SHA256 bind the evaluation.
+Selection uses SystemRandom; retained bytes and committed SHA256 bind the evaluation.
 """
 import hashlib
 import json

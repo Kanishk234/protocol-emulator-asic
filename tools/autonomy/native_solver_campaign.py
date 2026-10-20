@@ -67,11 +67,17 @@ def run(bundle,identity,*,revision,run_id,attempt,output,backend='cp_sat'):
                     raise ValueError('Solver witness contradicts independently checked capacity cut')
                 _write(output,'local-cut.json',cut)
                 summary[name]['independent_cut_infeasible']=cut['independently_verified_graph_infeasible']
-            elif result['status']=='FEASIBLE':
-                checked=coarse_global.allocate_and_check(snapshot,terminals,model,result['witness'])
-                _write(output,'global-checked-layers.json',checked)
-                summary[name]['proposed_raw_overflow']=checked['proposed_raw_overflow']
-                summary[name]['native_route_installed']=False
+            else:
+                cut=capacity_cut.discover_partition_certificate(model['graph'])
+                _write(output,'global-cut.json',cut)
+                summary[name]['independent_cut_infeasible']=cut is not None
+                if cut is not None and result['status']=='FEASIBLE':
+                    raise ValueError('Solver witness contradicts independent global capacity cut')
+                if result['status']=='FEASIBLE':
+                    checked=coarse_global.allocate_and_check(snapshot,terminals,model,result['witness'])
+                    _write(output,'global-checked-layers.json',checked)
+                    summary[name]['proposed_raw_overflow']=checked['proposed_raw_overflow']
+                    summary[name]['native_route_installed']=False
         summary['diagnostic_completed']=True
     except Exception as exc:
         summary['error']=str(exc)

@@ -18,6 +18,7 @@ def inputs(tmp_path,monkeypatch):
     monkeypatch.setattr(campaign,'TERMINAL_SHA',hashlib.sha256(term).hexdigest())
     monkeypatch.setattr(campaign.repair_evidence.hosted,'EXPECTED_SEGMENTS',hashlib.sha256(segments).hexdigest())
     calls=[]
+    monkeypatch.setattr(campaign.capacity_cut,'discover_partition_certificate',lambda g:None)
     monkeypatch.setattr(campaign.repair_evidence,'audit',lambda *a,**k:(calls.append('audit') or {'result_sha256':'a'*64}))
     monkeypatch.setattr(campaign.native_corridor,'parse_bytes',lambda *a:'raw')
     monkeypatch.setattr(campaign.native_terminals,'parse_bytes',lambda *a:'term')
@@ -103,4 +104,26 @@ def test_backend_cannot_change_graph_identity_scope_or_status(inputs,monkeypatch
     def corrupt(*a,**k):r=original(*a,**k);r[field]=value;return r
     monkeypatch.setattr(campaign.corridor_solver,'solve',corrupt)
     with pytest.raises(ValueError):campaign.run(bundle,{},**kwargs)
+    assert not json.loads((kwargs['output']/'summary.json').read_text())['diagnostic_completed']
+
+
+def test_campaign_retains_independent_global_certificate(inputs,monkeypatch):
+    bundle,kwargs,_,_=inputs
+    certificate={'independently_verified_graph_infeasible':True,'fixture':'independent-cut'}
+    monkeypatch.setattr(campaign.capacity_cut,'discover_partition_certificate',lambda g:certificate)
+    result=campaign.run(bundle,{},**kwargs)
+    assert result['global']['independent_cut_infeasible']
+    assert json.loads((kwargs['output']/'global-cut.json').read_text())==certificate
+    assert result['global']['status']=='UNKNOWN'
+
+
+def test_campaign_refuses_feasible_solver_contradicting_global_cut(inputs,monkeypatch):
+    bundle,kwargs,_,_=inputs;original=campaign.corridor_solver.solve
+    def solve(g,**kw):
+        r=original(g,**kw)
+        if r['status']=='UNKNOWN':r['status']='FEASIBLE'
+        return r
+    monkeypatch.setattr(campaign.corridor_solver,'solve',solve)
+    monkeypatch.setattr(campaign.capacity_cut,'discover_partition_certificate',lambda g:{'independently_verified_graph_infeasible':True})
+    with pytest.raises(ValueError,match='independent global capacity cut'):campaign.run(bundle,{},**kwargs)
     assert not json.loads((kwargs['output']/'summary.json').read_text())['diagnostic_completed']

@@ -1,0 +1,15 @@
+top: uart_i2c_top
+params:
+  DIV: 434
+  Q: 125
+  UART_PRIMS: 1
+  I2C_PRIMS: 0
+pins:
+  clk: clk
+  rst_n: rst_n
+  rx_i: FAB_IN0
+  tx_o: FAB_OUT0
+  sda_i: FAB_IO0.i
+  sda_oe: FAB_IO0.oe
+  scl_i: FAB_IO1.i
+  scl_oe: FAB_IO1.oe

@@ -103,3 +103,9 @@ def test_existing_stage_directory_cannot_be_overwritten(setup,tmp_path):
     args,calls=setup;out=tmp_path/'preserved';out.mkdir();(out/'good').write_text('keep')
     with pytest.raises(FileExistsError):loop.run(None,None,output=out,**args)
     assert (out/'good').read_text()=='keep' and not calls
+
+
+def test_explicit_larger_model_census_keeps_time_and_memory_bounds(setup):
+    args,calls=setup;r=loop.run(None,None,max_variables=150000,**args)
+    assert calls==[dict(max_seconds=30,max_memory_mb=1024,max_variables=150000)]
+    assert r['limits']['route_variables']==150000

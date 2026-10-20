@@ -20,7 +20,7 @@ def validate(problem):
         if name in ids:raise ValueError('Duplicate candidate')
         ids.add(name);contract._integer(candidate['old_steps'],'old_steps',0,10000000)
     cut_ids=set();total_resources=0
-    for cut in contract._items(problem['cuts'],'cuts',16,1):
+    for cut in contract._items(problem['cuts'],'cuts',64,1):
         contract._keys(cut,{'id','required_demand','crossing_demand','resources'},'cut')
         name=contract._name(cut['id'],'cut id')
         if name in cut_ids:raise ValueError('Duplicate cut')

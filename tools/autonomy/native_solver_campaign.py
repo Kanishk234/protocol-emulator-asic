@@ -22,8 +22,7 @@ def _write(directory,name,value):
         stream.write(json.dumps(value,indent=2,sort_keys=True)+'\n')
 
 
-def run(bundle,identity,*,revision,run_id,attempt,output,backend='cp_sat'):
-    if backend not in ('cp_sat','scip'):raise ValueError('Unsupported bounded solver backend')
+def load_inputs(bundle,identity,*,revision,run_id,attempt):
     # This parses every actual control/export; never trust stored collector booleans.
     audited=repair_evidence.audit(bundle,identity,revision=revision,run_id=run_id,attempt=attempt,
         candidate=True,native_corridor=True,native_terminals=True)
@@ -36,7 +35,13 @@ def run(bundle,identity,*,revision,run_id,attempt,output,backend='cp_sat'):
     if hashlib.sha256(segment_bytes).hexdigest()!=repair_evidence.hosted.EXPECTED_SEGMENTS:
         raise ValueError('Campaign initial published segments differ')
     snapshot=native_corridor.parse_bytes(raw_bytes);terminals=native_terminals.parse_bytes(terminal_bytes)
-    local=corridor_extract.extract(snapshot,terminals,segment_bytes.decode('utf-8'),slots=COHORT,window=WINDOW)
+    return audited,snapshot,terminals,segment_bytes.decode('utf-8')
+
+
+def run(bundle,identity,*,revision,run_id,attempt,output,backend='cp_sat'):
+    if backend not in ('cp_sat','scip'):raise ValueError('Unsupported bounded solver backend')
+    audited,snapshot,terminals,segments=load_inputs(bundle,identity,revision=revision,run_id=run_id,attempt=attempt)
+    local=corridor_extract.extract(snapshot,terminals,segments,slots=COHORT,window=WINDOW)
     global_model=coarse_global.build(snapshot,terminals,slots=COHORT)
     output=Path(output);output.mkdir(parents=True,exist_ok=False)
     _write(output,'input-audit.json',audited)

@@ -13,8 +13,8 @@ def run(snapshot,state,*,baseline_slots,records,max_additional=4,max_rounds=4,ma
     corridor_solver._integer(max_rounds,'max_rounds',1,8)
     corridor_solver._integer(max_additional,'max_additional',1,8)
     corridor_solver._integer(max_variables,'max_variables',1,corridor_solver.MAX_VARIABLES)
-    if not isinstance(records,list) or not records or len(records)+max_rounds>16:
-        raise ValueError('Seed cuts plus bounded rounds must fit16 records')
+    if not isinstance(records,list) or not records or len(records)+max_rounds>64:
+        raise ValueError('Seed cuts plus bounded rounds must fit64 records')
     records=deepcopy(records)
     directory=Path(output) if output is not None else None
     if directory is not None:directory.mkdir(parents=True,exist_ok=False)

@@ -8,8 +8,8 @@ from autonomy import coarse_global,capacity_cut,cut_cohort,corridor_solver
 
 
 def build(snapshot,state,*,baseline_slots,records,max_additional=3):
-    if not isinstance(records,list) or not 1<=len(records)<=16:
-        raise ValueError('Require1..16 authenticated model/cut records')
+    if not isinstance(records,list) or not 1<=len(records)<=64:
+        raise ValueError('Require1..64 authenticated model/cut records')
     _,fixed=coarse_global._state(snapshot,state,baseline_slots)
     nl=snapshot.grid[2]
     candidates={i:n for i,n in snapshot.nets.items() if i not in baseline_slots and

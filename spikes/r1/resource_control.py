@@ -1,0 +1,93 @@
+"""Generate an oversized software capacity reference, not a physical candidate."""
+import argparse
+from collections import Counter
+import csv
+import io
+import json
+from pathlib import Path
+import pickle
+import shutil
+
+from qualify_generator import ROOT, compare_control, digest
+
+
+def expanded_csv(text):
+    rows = list(csv.reader(io.StringIO(text)))
+    start = next(i for i,r in enumerate(rows) if r and r[0] == 'FabricBegin')
+    end = next(i for i,r in enumerate(rows) if r and r[0] == 'FabricEnd')
+    grid = rows[start+1:end]
+    if len(grid) != 5 or any(len(row) != 6 for row in grid):
+        raise ValueError('Expected frozen G1 grid')
+    if Counter(t for row in grid for t in row)['LUT4x8_ha'] != 11:
+        raise ValueError('Wrong control resource mix')
+    lut = 'LUT4x8_ha'
+    replacement = [['NW_term', *(['N_IO']*6), 'NE_term'],
+                   ['W_IO4', *([lut]*6), 'E_IO4'],
+                   ['W_IO4', lut, 'PRIM2T2S', lut, lut, 'PRIM2T2S', lut, 'E_IO4'],
+                   ['W_IO4', *([lut]*6), 'E_IO4'],
+                   ['SW_term', *(['S_IO2']*6), 'SE_term']]
+    out = io.StringIO()
+    csv.writer(out, lineterminator='\n').writerows(rows[:start+1]+replacement+rows[end:])
+    return out.getvalue()
+
+
+def run(control, out):
+    from fabulous.fabulous_api import FABulous_API
+    from fabulous.fabric_generator.code_generator.code_generator_Verilog import VerilogCodeGenerator
+    import yaml
+    control, out = Path(control).resolve(), Path(out).resolve()
+    check = json.loads((control/'qualification.json').read_text())
+    if check['passed'] is not True:
+        raise ValueError('Control not qualified')
+    compare_control(control, ROOT/'macro/warp_g1/fabulous')
+    for name, expected in check['generated_sha256'].items():
+        if digest((control/name).read_bytes()) != expected:
+            raise ValueError('Changed qualified control output')
+    library = control/'library'
+    actual = {str(p.relative_to(library)):digest(p.read_bytes()) for p in sorted(library.rglob('*')) if p.is_file()}
+    if actual != check['library_sha256']:
+        raise ValueError('Changed qualified library')
+    if out == control or control in out.parents or out in control.parents:
+        raise ValueError('Output and control must be disjoint')
+    out.mkdir(parents=True, exist_ok=False)
+    modeldir = out/'macro/fabulous/.FABulous'
+    modeldir.mkdir(parents=True)
+    fabric = out/'r1_resource_control.csv'
+    fabric.write_text(expanded_csv((control/'r1_g1_control.csv').read_text()))
+    api = FABulous_API(VerilogCodeGenerator())
+    api.loadFabric(fabric)
+    model = api.gen_routing_model()
+    for name,text in zip(('pips.txt','bel.txt','bel.v2.txt','bel.v3.txt','template.pcf'),model):
+        (modeldir/name).write_text(text)
+    spec = api.genBitStreamSpec()
+    (modeldir.parent/'bitStreamSpec.bin').write_bytes(pickle.dumps(spec))
+    # Timing is a placeholder for compatibility only; never qualify Fmax here.
+    shutil.copyfile(ROOT/'macro/warp_g1/fabulous/.FABulous/placement_estimate.txt', modeldir/'placement_estimate.txt')
+    counts = Counter(line.split(',')[4] for line in model[1].splitlines() if line and not line.startswith('#'))
+    expected = {'FABULOUS_LC':128,'wp_timer':4,'wp_shift':4,'IOBUF':42}
+    if any(counts[k] != v for k,v in expected.items()):
+        raise ValueError('Generated resource census differs')
+    pins = list(csv.DictReader((ROOT/'arch/warp_g1/pins.csv').open()))
+    for pin in pins:
+        if pin['bel'].startswith('X5Y'):
+            pin['bel'] = pin['bel'].replace('X5Y','X7Y',1)
+    with (out/'pins.csv').open('w') as stream:
+        writer=csv.DictWriter(stream,fieldnames=list(pins[0]));writer.writeheader();writer.writerows(pins)
+    (out/'arch.yaml').write_text(yaml.safe_dump(dict(name='r1_resource_control',arch_version=0x00FE,
+        macro=str(out/'macro'),luts=128,primitives=dict(wp_timer=4,wp_shift=4),
+        include_border_rows=True,config_rows=5,config_cols=8),sort_keys=False))
+    result = dict(passed=True,control_qualification_sha256=digest((control/'qualification.json').read_bytes()),
+                  resources=dict(counts),source_fabric_sha256=digest(fabric.read_bytes()),
+                  generated_sha256={str(p.relative_to(out)):digest(p.read_bytes()) for p in sorted(out.rglob('*')) if p.is_file()},
+                  scope='Oversized six-column software capacity control only. Original tile geometry does not establish equal-area fit. No production architecture selected; diagnostic architecture ID0x00FE cannot load on G1.',
+                  physical_acceptance=False,timing_acceptance=False,physical_candidate=False)
+    (out/'resource-control.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+    return result
+
+
+if __name__ == '__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--control',type=Path,required=True)
+    parser.add_argument('--out',type=Path,required=True)
+    args=parser.parse_args()
+    print(json.dumps(run(args.control,args.out)['resources'],sort_keys=True))

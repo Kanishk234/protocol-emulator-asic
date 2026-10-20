@@ -31,6 +31,17 @@ def expanded_csv(text):
     return out.getvalue()
 
 
+DIAGNOSTIC_CORNER = 'nom_slow_1p08V_125C'
+
+
+def placeholder_corner(modeldir, pips):
+    """Export the compiler-required filename without claiming characterized delay."""
+    (modeldir/f'pips.{DIAGNOSTIC_CORNER}.txt').write_text(pips)
+    (modeldir/'timing-unqualified.json').write_text(json.dumps(dict(
+        timing_acceptance=False, characterized=False, corner_label=DIAGNOSTIC_CORNER,
+        scope='Filename compatibility only; generated placeholder PIP delays. Do not compare rates or Fmax.'),indent=2)+'\n')
+
+
 def run(control, out):
     from fabulous.fabulous_api import FABulous_API
     from fabulous.fabric_generator.code_generator.code_generator_Verilog import VerilogCodeGenerator
@@ -59,6 +70,7 @@ def run(control, out):
     model = api.gen_routing_model()
     for name,text in zip(('pips.txt','bel.txt','bel.v2.txt','bel.v3.txt','template.pcf'),model):
         (modeldir/name).write_text(text)
+    placeholder_corner(modeldir, model[0])
     spec = api.genBitStreamSpec()
     (modeldir.parent/'bitStreamSpec.bin').write_bytes(pickle.dumps(spec))
     # Timing is a placeholder for compatibility only; never qualify Fmax here.
@@ -80,7 +92,8 @@ def run(control, out):
                   resources=dict(counts),source_fabric_sha256=digest(fabric.read_bytes()),
                   generated_sha256={str(p.relative_to(out)):digest(p.read_bytes()) for p in sorted(out.rglob('*')) if p.is_file()},
                   scope='Oversized six-column software capacity control only. Original tile geometry does not establish equal-area fit. No production architecture selected; diagnostic architecture ID0x00FE cannot load on G1.',
-                  physical_acceptance=False,timing_acceptance=False,physical_candidate=False)
+                  physical_acceptance=False,timing_acceptance=False,physical_candidate=False,
+                  timing_policy='explicit_placeholder_corner_file_not_characterized')
     (out/'resource-control.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
     return result
 

@@ -28,3 +28,11 @@ def test_resource_control_expands_only_grid():
 def test_wrong_control_rejected():
     with pytest.raises(ValueError):
         m.expanded_csv((ROOT/'arch/warp_g1/fabric.csv').read_text().replace('LUT4x8_ha','WRONG'))
+
+
+def test_corner_filename_is_exported_with_unqualified_policy(tmp_path):
+    import json
+    m.placeholder_corner(tmp_path,'example pips\n')
+    assert (tmp_path/f'pips.{m.DIAGNOSTIC_CORNER}.txt').read_text()=='example pips\n'
+    policy=json.loads((tmp_path/'timing-unqualified.json').read_text())
+    assert policy['characterized'] is False and policy['timing_acceptance'] is False

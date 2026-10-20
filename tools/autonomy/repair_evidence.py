@@ -41,9 +41,12 @@ def check_identity(identity, result, *, revision, run_id, attempt):
         raise ValueError('Collector identity/completion/physical scope differs')
 
 
-def audit(directory, identity, *, revision, run_id, attempt, candidate=False, native_corridor=False):
+def audit(directory, identity, *, revision, run_id, attempt, candidate=False, native_corridor=False,
+          native_terminals=False):
     if type(native_corridor) is not bool or (native_corridor and candidate is not True):
         raise ValueError('Native corridor audit requires explicit candidate mode')
+    if type(native_terminals) is not bool or (native_terminals and native_corridor is not True):
+        raise ValueError('Native terminal audit requires explicit native corridor mode')
     directory = Path(directory)
     if directory.is_symlink() or not directory.is_dir():
         raise ValueError('Expected regular downloaded repair directory')
@@ -53,6 +56,8 @@ def audit(directory, identity, *, revision, run_id, attempt, candidate=False, na
     result_path = directory/'result.json'
     result = json.loads(result_path.read_text())
     check_identity(identity, result, revision=revision, run_id=run_id, attempt=attempt)
+    if not native_terminals and ('native_terminals' in result or 'terminal_observer_patch_sha256' in result):
+        raise ValueError('Terminal evidence requires explicit native-terminals audit mode')
     if not native_corridor and ('native_corridor' in result or 'corridor_observer_patch_sha256' in result):
         raise ValueError('Native corridor evidence requires explicit native-corridor audit mode')
     if result.get('patch_sha256') != source_hash(revision, 'patches/openroad_force_reroute.patch'):
@@ -64,6 +69,8 @@ def audit(directory, identity, *, revision, run_id, attempt, candidate=False, na
         raise ValueError('Candidate patch differs from exact Git source')
     if native_corridor and result.get('corridor_observer_patch_sha256') != source_hash(revision, 'patches/openroad_corridor_observer.patch'):
         raise ValueError('Native corridor observer patch differs from exact Git source')
+    if native_terminals and result.get('terminal_observer_patch_sha256') != source_hash(revision, 'patches/openroad_terminal_observer.patch'):
+        raise ValueError('Native terminal observer patch differs from exact Git source')
     summary, reparsed, native_stages = {}, {}, {}
     for name in cases:
         stages = list((directory/name/'replay').glob('*-openroad-globalrouting'))
@@ -97,6 +104,11 @@ def audit(directory, identity, *, revision, run_id, attempt, candidate=False, na
         if result.get('native_corridor') != actual_corridor:
             raise ValueError('Stored native corridor result contradicts independently audited exports')
         output['native_corridor'] = actual_corridor
+        if native_terminals:
+            actual_terminals = hosted.qualify_native_terminals(native_stages, reparsed, actual_corridor)
+            if result.get('native_terminals') != actual_terminals:
+                raise ValueError('Stored terminal result contradicts independently audited exports')
+            output['native_terminals'] = actual_terminals
     return output
 
 
@@ -110,10 +122,12 @@ def main():
     p.add_argument('--candidate', action='store_true')
     p.add_argument('--native-corridor', action='store_true',
                    help='Require candidate mode and independently audit all six raw native exports')
+    p.add_argument('--native-terminals', action='store_true',
+                   help='Require native corridor mode and independently audit all terminal joins')
     a = p.parse_args()
     print(json.dumps(audit(a.directory, json.loads(a.identity.read_text()), revision=a.revision,
                            run_id=a.run_id, attempt=a.attempt, candidate=a.candidate,
-                           native_corridor=a.native_corridor), indent=2))
+                           native_corridor=a.native_corridor, native_terminals=a.native_terminals), indent=2))
 
 
 if __name__ == '__main__':

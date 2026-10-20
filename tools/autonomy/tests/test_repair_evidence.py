@@ -7,6 +7,39 @@ from autonomy import repair_evidence as audit
 REV = 'a'*40
 
 
+@pytest.mark.parametrize('native_corridor', [False, True])
+def test_terminal_mode_requires_candidate_and_raw_mode(tmp_path,native_corridor):
+    with pytest.raises(ValueError,match='requires explicit'):
+        audit.audit(tmp_path,{},revision=REV,run_id='123',attempt=2,
+                    native_corridor=native_corridor,native_terminals=True)
+
+
+@pytest.mark.parametrize('tamper', [None, 'patch', 'stored', 'omit_mode'])
+def test_terminal_adapter_authenticates_patch_and_reaudits_stored_result(tmp_path,monkeypatch,tamper):
+    r,_=corridor_fixture(tmp_path,monkeypatch)
+    r['terminal_observer_patch_sha256']='1'*64 if tamper=='patch' else '0'*64
+    actual={'controls_and_raw_ledger_qualified':True,'native_inputs_authenticated':False,
+            'physical_acceptance':False,'observations':{'unsupported_access':['fixture']}}
+    r['native_terminals']=dict(actual)
+    if tamper=='stored':r['native_terminals']['physical_acceptance']=True
+    calls=[]
+    def qualify(stages,cases,corridor):
+        calls.append('terminal-reaudit')
+        assert corridor==r['native_corridor']
+        assert set(stages)==set(cases)==set(r['cases'])
+        return actual
+    monkeypatch.setattr(audit.hosted,'qualify_native_terminals',qualify)
+    (tmp_path/'result.json').write_text(json.dumps(r))
+    kwargs=dict(revision=REV,run_id='123',attempt=2,candidate=True,native_corridor=True,
+                native_terminals=tamper!='omit_mode')
+    if tamper:
+        with pytest.raises(ValueError):audit.audit(tmp_path,identity(),**kwargs)
+        assert calls==(['terminal-reaudit'] if tamper=='stored' else [])
+    else:
+        output=audit.audit(tmp_path,identity(),**kwargs)
+        assert calls==['terminal-reaudit'] and output['native_terminals']==actual
+
+
 def identity():
     return dict(id=123, head_sha=REV, run_attempt=2, head_branch='efpga',
                 name='controlled native pair repair', status='completed', conclusion='success')

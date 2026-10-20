@@ -111,3 +111,13 @@ A buffer-only traversal of the exact route 39278561678 attempt2 netlist confirms
 A separately controlled unit-local, write-enabled staging trial could restrict each full-unit data bit to its 22 unit latches instead of all 153. Its costs include additional data flops and enable muxes; buffer removal and net area require synthesis/physical measurement. It must preserve reset, high/low latch phase behavior, live reconfiguration and the carrier predicate contract. No such RTL change is implemented or adopted here. Raw traversal receipt: /tmp/tripwire-config-staging-broadcast-39278561678.json.
 
 Verified SWD firmware SHA256: `567e2c4e3ebd304363448a0e79d3db251381d5fbcfa11baba85476577551c77c`. Expanded test module SHA256: `bfd414a15fb5094b7ae2e2fc383c2dd770b409026681404f5a4d012415ef3339`. Full-suite XML SHA256: `8b6333ae95b944585b5c63d0069ca37ae1e41b34c31e3f89448189f817f4cee0`. These are simulation provenance, not physical signoff hashes.
+
+## Native resync/event result — 2026-10-20
+
+[Screen 39369398106](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39369398106), head `ecc54d4`, completes without timeout in 3969.64 seconds but **fails the measured setup reserve only**. All-corner electrical counts are zero, antenna nets/pins are zero, and electrical reserve checks pass (maximum slow slew utilization 0.415918481). Fast/typical/slow hold is +91.5819/+202.331/+392.965 ps; global setup WS is 0 at all corners.
+
+Actual minimum FF-capture setup is +11.737211 ns fast, +7.481034 ns typical and **+0.164620 ns slow**, below the fixed +3.5 ns screening guard. Slow estimated headroom is 1.318427 ns lower than the original AREA1 wire150 event-late screen. These are pre-route measurements; no extracted WNS or routeability improvement is established. Do not route this candidate or weaken the guard to qualify it. All companion lint/test/unit/docs runs passed.
+
+The worst reported slow path runs from configuration latch `_48493_` in U0 word0 to FF `_47526_`; source-bound netlist inspection is needed for exact bit/endpoint mapping. Instance IDs from older netlists cannot be reused. Keep the known event-late physical baseline while preparing a separately verified unit-local staging experiment against the established shared write-data broadcast. Artifact evidence remains local at `/tmp/tripwire-resync-gates-39369398106`; no raw logs committed.
+
+The separate unit-local staging prototype, clocked-host proof scope, mapping costs and planned unchanged physical gates are documented in [PHASE2_CFG_STAGING.md](PHASE2_CFG_STAGING.md). It returns to the event-late baseline; the resync rewrite is excluded so that the staging change is isolated.

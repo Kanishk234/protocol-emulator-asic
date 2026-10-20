@@ -1132,6 +1132,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Fresh proof:892bit-clock compare points close under induction;21pin tests,5chip tests and2048L2clocks pass on the isolated candidate. Expanded protocol replay with matching current firmware/tests is required before launch (BUG125); frozen RTL/spec stay fixed. Native source guard explicitly permits only existing event-late and the reviewed resync-event variant and records the actual name; the patch-application guard still enforces exact frozen hardware and allowed file changes.
 - Cost: prior isolated typical mapping estimates~1069µm² extra bit-clock area versus event-late, plus physical placement/fanout/hold risks; routed area/overflow and extraction decide. No main hardware/config/template changes, spec/latency change, official adoption or phase completion implied. Evidence: PHASE2_NATIVE_ROUTE_TIMING_GAP.md.
 
+## D-091 — Isolated unit-local configuration write staging
+
+- General need: bound the distribution load of host configuration data without changing protocol engines, ISA, programming visibility or live reconfiguration. The routed event-late baseline merges identical unconditional staging registers across both lanes and all four pin units, giving the critical data bits 153 latch loads and 49–51 distribution buffers.
+- Experiment only: retain event-late BITSYNC RTL, and update each existing pin-unit wdata_q only when that unit's write enable is asserted. Reset behavior, latch enables, restart and cached carrier logic stay unchanged. The per-unit enables prevent global register merging. No main hardware/config/template changes or timing exceptions are authorized by this decision.
+- Cost: paired local typical-library flat mapping adds 64 flops and 144 cells; standard-cell area 390711.0816→395625.9888 µm² (+4914.9072 µm², 1.258%). SRAM unchanged. Native synthesis, placement, congestion, hold/electrical repair and extracted area/timing remain unmeasured.
+- Evidence: full/basic × latch/flop phase comparisons pass 10400 checks each; clocked-host sequential equivalence proves 403/385/445/399 points, induction cap 6. The host-clock model is justified by trw_spi's registered write pulse/address/data and combinational trw_host decode; it is not unrestricted asynchronous-input equivalence or whole-chip formal. Both pin builds pass 60 tests, five chip tests and 2048 L2 clocks pass. Expanded protocol replay passes 22/22 with no skips under Verilator; see reports/PHASE2_CFG_STAGING.md.
+- Physical qualification requires the existing native wire 150/hold 125 policy and every unchanged gate, including measured slow capture ≥3.5 ns before detailed routing. No clean-build or official timing claim yet.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

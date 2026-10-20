@@ -1,0 +1,20 @@
+--- a/src/trw_lane.v
++++ b/src/trw_lane.v
+@@ -244,8 +244,15 @@
+     wire [1:0]  ia   = ex_rt ? (rt_ctl ? rt_crd : rt_ara) : ex_asrc[1:0];
+     wire [1:0]  ib   = ex_rt ? (rt_ctl ? ((rt_sub == `TRW_RT_SUB_OUT) ? rt_ora : rt_mra) : rt_b[1:0])
+                              : ex_imm[1:0];
+-    wire [15:0] rd_a = regs[16*ia +: 16];
+-    wire [15:0] rd_b = regs[16*ib +: 16];
++    // Parallel decoded reads, with unchanged cycle and register selection.
++    wire [15:0] rd_a = ({16{ia == 2'd0}} & regs[15:0])
++                     | ({16{ia == 2'd1}} & regs[31:16])
++                     | ({16{ia == 2'd2}} & regs[47:32])
++                     | ({16{ia == 2'd3}} & regs[63:48]);
++    wire [15:0] rd_b = ({16{ib == 2'd0}} & regs[15:0])
++                     | ({16{ib == 2'd1}} & regs[31:16])
++                     | ({16{ib == 2'd2}} & regs[47:32])
++                     | ({16{ib == 2'd3}} & regs[63:48]);
+ 
+     reg  [3:0]  alu_op;
+     reg  [15:0] alu_a, alu_b;

@@ -14,14 +14,15 @@ spec.loader.exec_module(campaign)
 
 
 def test_explicit_matrix_and_dependencies():
-    assert len(set(campaign.CASES)) == 11
+    assert len(set(campaign.CASES)) == 15
     for name in campaign.CASES:
         pins, sources, params = campaign.specification(name)
         assert pins.is_file() and all(p.is_file() for p in sources)
-        if name.startswith('uart_spi'):
+        if name in campaign.PAIRS:
             assert len(sources) == 7
             assert params['UART_PRIMS'] == int(name[-2])
-            assert params['SPI_PRIMS'] == int(name[-1])
+            engine = 'SPI' if name.startswith('uart_spi') else 'I2C'
+            assert params[engine + '_PRIMS'] == int(name[-1])
     with pytest.raises(ValueError):
         campaign.specification('arbitrary_protocol')
 

@@ -16,7 +16,8 @@ from compile.bitfile import BitFile
 from cloud_arch_comparison import run_bounded, require_nonfit_fatals
 
 SINGLES = ('uart', 'spi_ctrl', 'i2c_ctrl', 'ws2812', 'onewire', 'swd', 'i2c_target')
-CASES = (*SINGLES, 'uart_spi_11', 'uart_spi_10', 'uart_spi_01', 'uart_spi_00')
+PAIRS = tuple(f'uart_{engine}_{mode}' for engine in ('spi', 'i2c') for mode in ('11', '10', '01', '00'))
+CASES = (*SINGLES, *PAIRS)
 OUT = ROOT / 'build/fresh_baseline'
 
 
@@ -34,11 +35,13 @@ def specification(name):
         params = dict(yaml.safe_load(pins.read_text())['params'])
         params['PRIMS'] = 1
     else:
-        pins = ROOT / 'protocols/uart_spi/concurrency.yaml'
+        engine = 'spi' if name.startswith('uart_spi') else 'i2c'
+        pins = ROOT / f'protocols/uart_{engine}/concurrency.yaml'
         sources = sorted((ROOT / 'protocols/uart').glob('*.v')) + [
-            ROOT / 'protocols/spi_ctrl/spi_ctrl_top.v', ROOT / 'protocols/uart_spi/uart_spi_top.v']
+            ROOT / f'protocols/{engine}_ctrl/{engine}_ctrl_top.v',
+            ROOT / f'protocols/uart_{engine}/uart_{engine}_top.v']
         params = dict(yaml.safe_load(pins.read_text())['params'])
-        params.update(UART_PRIMS=int(name[-2]), SPI_PRIMS=int(name[-1]))
+        params.update(UART_PRIMS=int(name[-2]), **{engine.upper() + '_PRIMS': int(name[-1])})
     return pins, sources, params
 
 
@@ -80,7 +83,7 @@ def validate(directory, name, *, read_input=None):
                 or f'0x{image.crc:08X}' != report['crc32']
                 or sha(images[0]) != report['provenance']['bitfile_sha256']):
             raise ValueError('Image identity/CRC mismatch')
-        if name.startswith('uart_spi') and (report['unmapped_inputs_tied_0'] or report['unmapped_outputs_open']):
+        if name in PAIRS and (report['unmapped_inputs_tied_0'] or report['unmapped_outputs_open']):
             raise ValueError('Concurrent workload has unmapped ports')
         row.update(placed_utilisation=util, model_fmax_mhz=fmax,
                    model_meets_50mhz=report['meets_50mhz'], words=report['words'])
@@ -114,7 +117,7 @@ def worker(name, path):
     row = dict(name=name, params=params, seed=1, fits=False, tools=compiler.tool_versions())
     try:
         compiler.compile_design(sources, pins, ROOT / 'arch/warp_g1', directory,
-                                seed=1, set_params=params, strict_ports=name.startswith('uart_spi'))
+                                seed=1, set_params=params, strict_ports=name in PAIRS)
         row['fits'] = True
     except compiler.CompileError:
         if not (directory / 'failure.json').exists():

@@ -1148,6 +1148,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Verification:892bit-clock equivalence points; identical staging source with four renewed clocked-host/phase checks;60full-pin tests, five chip tests and2048L2clocks pass. Expanded protocol replay passes 22/22 with no skips in207.42seconds under Verilator. See reports/PHASE2_CFG_STAGING.md.
 - The two slew reserve failures are on separate lane1 and TX-cursor cones; this arithmetic rewrite does not directly repair those drivers. Whole-design remapping may change their physical outcome, but no electrical or setup improvement is assumed. Retain every existing gate, including slow capture≥3.5ns, and reject before DRT if any fails. No main hardware/config/template/spec changes or official adoption.
 
+## D-093 — Independent sample-time and TX cursor arithmetic trials
+
+- General need: reduce same-cycle timer/configuration-to-event depth and late cursor-control loading without protocol-specific blocks or architectural changes. Combined screen39458833532 improves slow capture to2.530992ns but fails3.5ns reserve; its actual worst path is PERIOD[0]→dropped[22]. Two slow slew reserve misses feed U1/U3 TX cursor eq banks.
+- Isolated changes, independently compared against D-092: sample-csa compresses sof/~per/tb before one carry-propagating normal sample-time sum, retaining saturated resync cancellation; tx-late-cursor computes base/delayed increments before final token selection. Neither adds state, cycles, ISA encodings or storage. Keep the original resync, saturation, reset and live-write behavior.
+- Cost: paired whole-chip typical-library mapping397041.4098→395532.9252µm² for sample CSA (−135cells/−0.380%) and396655.4340µm² for TX cursor (−85cells/−0.097%); flops remain2266 and SRAM unchanged. These are local estimates, not native/routed timing or congestion.
+- Module sequential equivalence proves895/511points, cap2; both full pin suites pass60/60. Full replay and physical qualification outcomes belong in reports/PHASE2_ARITHMETIC_FOLLOWUPS.md. Earlier D-071 CSA had worse ideal-wire delay and is not erased by these new mapping results. No official adoption or phase checklist tick; retain every existing reserve/acceptance gate and qualify before DRT.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

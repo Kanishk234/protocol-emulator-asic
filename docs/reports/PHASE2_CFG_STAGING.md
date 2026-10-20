@@ -74,4 +74,14 @@ Paired local mapping:26445→26550cells and395625.9888→397041.4098µm² standa
 
 Prepared `gds-native-resync-cfg-staging-setup-reserve-screen`, binding configuration hash `d17c05bfe5ca002eb5ca09885727bee039766f815817c27a9b56da6041b7adc7` and bit-clock hash `c77f87ce20a8b2f7eec2b58b4db72476ccf4eb5fc89dde4d60b9461f486a346d`. AREA1,20ns, wire150/hold125, all electrical/antenna/reserve/hold guards and measured slow capture≥3.5ns are unchanged. No physical result yet; no DRT until qualification.
 
-Combined full-suite XML SHA256: `111edc19756b247930c7fb2fd051776595c8d8d94508d423ecf0758185b41ec0`. Exact frozen-source comparison confirms only trw_pin_bs.v and trw_pin_cfg.v differ. The native screen remains unlaunched pending publication; every original gate remains mandatory.
+Combined full-suite XML SHA256: `111edc19756b247930c7fb2fd051776595c8d8d94508d423ecf0758185b41ec0`. Exact frozen-source comparison confirms only trw_pin_bs.v and trw_pin_cfg.v differ.
+
+## Combined native result
+
+[Run39458833532](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39458833532), exact headd59e5029c1891ee13e9cffbb2b5a142c3508bc79, fails reserve qualification after2897.68seconds with no timeout. Actual slew/fanout/capacitance violations are zero at every corner; antenna nets/pins are zero. Fast/typical/slow hold is116.140/224.812/411.522ps.
+
+Independent production capture parsing gives fast12.598294ns, typical8.867908ns, slow**2.530992ns**. Slow improves0.805442ns versus staging alone and1.047945ns versus original event-late wire150, but remains0.969008ns below the fixed3.5ns guard. This guard does not execute after the earlier electrical rejection; independently parsing the saved evidence establishes the additional miss. These are estimated capture slacks, not extracted routed WNS.
+
+Three slow slew reserve misses remain: net16512/cell43737/S at0.5204765893 utilization, net04145/cell29483/A2 at0.4578715004, and net14969/cell41759/S at0.4502073861, against0.45. Typical/fast slew and all capacitance reserves pass. The new worst slow path is latch49194→FF48306; the report's launch-clock branch is U0 configuration word4. Exact bit/endpoint and electrical cone identities require this run's netlist; earlier run mappings are not reused.
+
+Early artifact12284532332 is retained at /tmp/tripwire-combined-gates-39458833532. No detailed routing or gate relaxation is justified. Next map the exact new path and electrical drivers, then select a targeted follow-up.

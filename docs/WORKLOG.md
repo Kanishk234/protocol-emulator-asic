@@ -2,6 +2,32 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Verify arithmetic follow-ups; reject CSA and prepare TX screen
+
+- Traced combined screen's PERIOD[0]→dropped[22] arithmetic path and all three reserve nets. Two reserve drivers reach U1/U3 TX cursor eq banks; third is channel2source-select-zero decode from port_state[25:22], with broad structural reachability. These are source-bound connectivity observations, not sensitizability claims.
+- Built independent sample-CSA and TX late-cursor deltas, no main hardware edits. Module equivalence proves895/511points; both60pin suites pass. Paired local whole-chip mapping saves135/85cells and0.380%/0.097% standard-cell area, no new flops. Both full expanded protocol suites pass22/22 with no skips (360.88/365.53s). TX additionally passes5chip tests and2048L2clocks.
+- Matched ideal-wire slow-library BS timing rejects CSA10.893814ns and a prefix-adder follow-up10.713595ns versus9.929828ns base. No CSA physical launch; discarded prepared CSA workflow. TX inputs→cursor D improves12.693307→11.702561ns locally; this is not native/routed improvement. Reports, D-093, source-bound helper and negative controls preserve scope and rejected evidence.
+- Focused helper/provenance/reserve tests101passed; new TX workflow syntax/whitespace checks pass. Prepared exact three-source-bound native TX screen, same physical policy and every gate unchanged. Standing authorization covers grouped publication/push/launch. No phase boxes ticked; detailed routing remains blocked until every screen gate passes.
+
+## 2026-10-20 — Combined screen improves setup but misses reserve
+
+- Confirmed run39458833532 failed on exact d59e502 after2897.68s without timeout. Downloaded early gates and seven selected source-bound netlist/report files. All actual electrical counts and antenna nets/pins remain zero; fast hold116.140ps passes.
+- Production capture parser measures slow2.530992ns (+0.805442ns over staging), typical8.867908ns and fast12.598294ns. Slow is still0.969008ns below3.5ns. Electrical reserve rejects three slow slew nets at0.5204766/0.4578715/0.4502074 versus0.45. Recorded evidence and distinction between reserve and actual violations in PHASE2_CFG_STAGING.md.
+- Exact audited netlist maps worst path to U0configuration word4bit0 latch49194→chip dropped[22] FF48306. This is a different frontier from staging-only SJW[1]→producer token; do not assume another resync rewrite fixes it. Next inspect this configuration-to-drop cone and source-bound reserve drivers. No DRT, source edits, threshold relaxation or checklist ticks.
+
+## 2026-10-20 — Independent follow-up analysis during combined screening
+
+- Confirmed combined screen39458833532 remains in progress. Inspected TX cursor next-state logic, remaining slot staging and native route provenance; recorded ranked hypotheses and exact qualification requirements in reports/PHASE2_COMBINED_SCREEN_FOLLOWUPS.md.
+- Prioritized stage-by-stage electrical reserve diagnosis, parallel TX cursor arithmetic/late selection and lane-local slot staging. These are unimplemented hypotheses with explicit area/behavior risks, not measured improvements. Existing route helpers deliberately bind the older event-late variant; a passing combined source needs its own exact binding and fresh capture-reserve validation.
+- Existing route provenance/continuation regression:33passed in0.73s; git diff --check passed. No main hardware changes, extra physical launch or phase checklist ticks. Next inspect combined results and choose a measured bottleneck before another hardware experiment. Notes remain local pending an evidence publication group.
+
+## 2026-10-20 — Standing publication authorization; combined screen launched
+
+- User explicitly approved the reviewed combined publication and instructed not to keep asking. Treat this as standing authorization for subsequent commits, pushes and workflow launches needed for this Phase 2 timing work, overriding the supplied Git restriction within that scope. Continue preserving file groups, review/testing, unrelated work and fixed acceptance requirements.
+- Published patch3725627, toolsc7fd1ba, tests62d667c, CI21c3867, docsd59e502. Verified remote main d59e5029c1891ee13e9cffbb2b5a142c3508bc79. No src/info.yaml/macro changes or unpublished hardware commits were included; unrelated local files and FIPE notes excluded.
+- Dispatched exactly one [combined resync/configuration staging screen39458833532](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39458833532), confirmed in progress on that head. Companion test39458832998/unit39458833002/lint39458833026/docs39458833155 are all in progress. No physical result yet; all timing/electrical/reserve/antenna gates unchanged and no DRT before qualification.
+- No phase boxes ticked. Next inspect the source-bound measured setup and every electrical reserve outcome, then continue under standing authorization without repeating publication permission requests. Launch receipt remains local until the next evidence update.
+
 ## 2026-10-20 — Diagnose exact staging cones and verify composed resync follow-up
 
 - Retrieved selected source-bound netlist, slow report and native repair logs by ZIP byte ranges from artifact12245349300 (250275257bytes), retaining data under /tmp/tripwire-cfg-staging-critical-39378465307. Audited final netlist confirms worst path SJW[1]/U0word15bit1→U0producer token[14], with2.180271ns borrowed and3.615038ns launch data arrival. No prior-run instance mapping reused.

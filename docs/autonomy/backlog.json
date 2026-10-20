@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-10-19",
+  "updated": "2026-10-20",
   "authority": "Planning index only; phase checklists and authenticated reports control acceptance.",
   "protected_controls": {
     "frozen_g1": [
@@ -261,9 +261,19 @@
         "39333325323 ate5c2e25: terminal observer buildSUCCESS31m13s, linkedAPIguardpasses; finalpatch5ec2f809 source+dryapplyreviewPASS",
         "39367564921 at8782e28: native terminal qualification active after correctedclocksemantics; local545autonomyPASS and189integratedPASS, no nativejoin resultyet",
         "39367564921 at8782e28 SUCCESS: all6terminalaudits independently reproduced; globalFAIL285localempty/32absent/2supply retained, scopedcohortadmitted; native_terminal_run_20261019.md",
-        "a3eb447 localmodel: 5owners,400nodes1020edges10200vars, INFEASIBLE with independent5>4x16cut; corridor_south_exact_20261019.md;567localautonomyPASS"
+        "a3eb447 localmodel: 5owners,400nodes1020edges10200vars, INFEASIBLE with independent5>4x16cut; corridor_south_exact_20261019.md;567localautonomyPASS",
+        "da76cee global unit/all-layer model and original-layer verifier:13focused/589autonomyPASS; global CP-SAT UNKNOWN, not infeasibility",
+        "ea8cc27 SCIP backend:88focusedPASS, both backends301executedPASS; actual five/six global INFEASIBLE corroborated by independent partition cuts4>1 and5>2; seven-net model rejected by cut6>2 without solver; global_cohort_obstructions_20261019.md",
+        "39371954205 atbe895de SUCCESS:326executedPASS; downloaded source/graph/LP hashes and local/globalINFEASIBLE independently confirmed, separate4>1globalcertificate",
+        "39371931884 atbe895de SUCCESS:301executedPASS/0skip; latest local autonomy703executedPASS",
+        "Four joint2extra candidate models independently cut-rejected before routing solve; exploratory<=3extra/all7cut selectionMIP UNKNOWN, not qualified retained planner",
+        "07573aa/ed3d11c/98433f0/a468bd7/49da841: retained joint selector, exact reducer, exclusive-stage finite refiner, source-bound resume;915localexecutedPASS; joint_cohort_planner_20261020.md",
+        "39456418346 at49da841 SUCCESS: downloaded strict518executedPASS; BUG106 lightweight optional-dependency fixture fixed794dafd; correctedautonomy39456947108SUCCESS",
+        "Local authenticated15cut resume terminatesselection_INFEASIBLE for<=5extras. Six-extra followup adds7>2cut thenselection_INFEASIBLE with16cuts. Seven-extra boundedfollowup active. No native guide installed.",
+        "Manifest19016bytes/15cuts to GitHubworkflowinputs rejected by automatic approval review; specific payload/destination approval pending. No manifest transmitted, no bypass. Local work unaffected.",
+        "docs/reports/congestion_proposal_20261020.md; local strict1004PASS; new sourceaa33398; hostedqualification39470166730 pending"
       ],
-      "next_action": "Escape the certified local cut by measuring alternative crossings/exterior topology or an expanded released cohort, not repeating native negotiation. Whole-terminal gate staysfalse; native guidehandoff and physicalvia/timing legality remain open. Preserve exact source/resource identities and rawmultiset release.",
+      "next_action": "Retain uninstalled independently checked121\u2192118coarse proposal. Pinned readSegments review shows append/ledger hazards: require unchanged complete-inventory round-trip and native weighted-ledger equivalence before candidate handoff. Stop expanding strict zero-selected-overflow cohorts as sole approach. Bestnative121 unchanged; hosted private-cut manifest and externalAI packet remain held pending specific approval.",
       "acceptance": [
         "FEASIBLE includes independently checked union occupancy/connectivity witness with explicit resource/terminal contracts.",
         "INFEASIBLE is scoped to the supplied model; UNKNOWN/timeouts remain inconclusive.",
@@ -275,6 +285,29 @@
       "depends_on": [
         "LOCAL-HYPOTHESIS"
       ]
+    },
+    {
+      "id": "R1-BASELINE",
+      "priority": 2,
+      "title": "Measure G1 baseline before fresh fabric selection",
+      "track": "successor",
+      "status": "in_progress",
+      "hypothesis": "A paired mixed hard/soft concurrency census distinguishes primitive shortage from logic or route limits before selecting R1 resources.",
+      "evidence": [
+        "docs/design/FRESH_CANDIDATE_PLAN.md",
+        "protocols/uart_spi:16mode/primitive pin simulationsPASS;22checker testsPASS",
+        "sourcefc7a3ac; hosted39470166731 compiler jobSUCCESS, simulation job setupFAILfixedad5c445; independent360source/139artifact auditPASS; docs/reports/fresh_baseline_20261020.md"
+      ],
+      "next_action": "Authenticate corrected hosted simulation retry. UART+SPI allhard103cells/3pairs versus mixed138cells/2pairs; revise resource targets before any topology selection. Continue UART+I2C comparison, area/connectivity costs and fresh evaluation sealing.",
+      "acceptance": [
+        "Six supported personalities preserved in paired current compiler census.",
+        "Concurrent workloads use identical semantics/pins/host framing across candidates.",
+        "Full native diagnostics distinguish nonfit from setup/unknown failure."
+      ],
+      "rejection": [
+        "Any baseline regression, unknown fatal, input drift or stale successful artifact."
+      ],
+      "depends_on": []
     }
   ],
   "rejected_hypotheses": [

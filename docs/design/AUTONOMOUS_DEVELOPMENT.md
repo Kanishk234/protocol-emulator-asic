@@ -274,8 +274,8 @@ in docs/reports for extraction and native reconciliation prerequisites.
 ## Native corridor qualification (October 19)
 
 The observer build39304728263 passes compiled API smoke. Native qualification
-39331153087 at675b659 remains a diagnostic until its actual controls and
-accounting are inspected. The parser preserves weighted route-step multiplicity
+39331153087 at675b659 failed the Docker file-permission handoff and retained no
+artifact; retry39331845906 subsequently passed the accounting controls. The parser preserves weighted route-step multiplicity
 and rejects missing usage rather than inventing background occupancy.
 
 Use `PYTHONPATH=tools python -m autonomy.native_checkpoint <bundle> --output <json>`
@@ -285,10 +285,10 @@ mapping. Source tests include27 checkpoint cases and69 parser cases.
 
 Portable `autonomy.repair_evidence --candidate --native-corridor` additionally
 requires an exact Git-authenticated observer patch field and rechecks all six
-exports. Run39331153087 predates that collector metadata field: retain its
-original evidence and use the authenticated build manifest plus direct
-`qualify_native_corridors` and checkpoint checks. Do not edit its result to make
-the stricter portable CLI accept it or repeat EDA solely for missing metadata.
+exports. Run39331153087 predates the required observer metadata and failed artifact
+collection (BUG102); it supplies no usable native ledger. The successful retry
+39331845906 reuses the same observer build and carries strict source metadata.
+Do not modify retained results to force portable audit acceptance.
 
 Even a reconciled raw ledger does not establish physical pin access or via
 legality. Next extraction must join actual GlobalRouter pin identities and
@@ -308,8 +308,9 @@ net-private exterior connectivity are separate reviewed implementations, not
 native model qualification yet.
 
 Terminal follow-up build39333325323 succeeds, retaining raw schema1. Native
-terminal qualification39367564921 at8782e28 is pending; its parser and collector
-passed independent source review. Portable auditing of a terminal-enabled
+terminal qualification39367564921 at8782e28 SUCCESS; all six raw/terminal audits
+were independently reproduced. The global terminal gate stays false for local
+empty/absent trees and supplies; explicit selected supported cohorts can qualify. Portable auditing of a terminal-enabled
 bundle requires all three flags `--candidate --native-corridor --native-terminals`
 and the exact Git-authenticated fourth patch. It rechecks raw accounting,
 checkpoint capacities/identity, native completion, terminal inventory, hashes
@@ -317,3 +318,61 @@ and unchanged terminal identity before comparing stored joins. Diagnostic
 unsupported access stays false; malformed joins fail collection. Clock joins
 compare raw native clock with database CLOCK, preserving the distinct cached
 GlobalRouter nonleaf flag. No hardware/physical acceptance follows.
+
+
+## Finite cut-guided joint routing campaigns (October20)
+
+The five-net full-grid coarse problem is independently cut-infeasible, not just
+window-limited. Known cuts also reject successive small expansions. Keep the
+native121 result protected; these are frozen-other-route constraints, not proof
+that the complete chip is unroutable. See
+[global cohort evidence](../reports/global_cohort_obstructions_20261019.md).
+
+`cut_cohort` chooses additional unit/all-layer nets against known necessary cut
+inequalities. It checks selected margins using original integer resources;
+selection is never a routing witness. `cut_cohort_native` reconstructs every
+supplied graph/certificate against native inputs before making the cut problem.
+`corridor_reduce` prunes terminal-free leaves and contracts chains. Its optional
+topological coordinates are computational indices; every feasible witness must
+expand through original paths, original resources and native pin connectivity.
+Parallel chains retain separate original paths for unit-capacity allocation.
+
+`cut_refinement.run` performs at most eight requested rounds (four in the hosted
+joint entry). Each newly discovered deficit becomes a checked counterexample;
+a routing solver runs only after necessary-cut discovery returns none. UNKNOWN
+stays inconclusive. Stage JSON files are exclusive and retained before later
+steps, so a failure does not erase an earlier proposal or certificate. Seed cuts
+and bounded history support resume. A missing cut is not a feasibility proof.
+
+The manual `native_solver_campaign.yaml` supports `mode=fixed` or `mode=joint`.
+Both import the explicit successful native run/source/attempt/API identity and
+rerun all three portable audit modes first. Joint mode uses SCIP, at most five
+extra nets, four rounds,30s/1024MB/one worker per solve, and an explicit150k route
+variable cap (inside the existing500k hard bound). Its larger model census
+accommodates broader cohorts required by the cuts; time and memory budgets do
+not increase. Fixed mode retains its100k cap. The job has a12minute outer bound,
+read-only GitHub permissions, artifact upload and no route installation/promotion.
+
+For resume, `native_joint_campaign.encode_seeds(snapshot,state,records)` creates
+an archive of checkpoint hashes, cohort IDs and partition node sets only. The
+optional `seed_manifest` workflow input accepts at most50k encoded bytes; decoded
+content is bounded to2MB/32cuts. Every imported model and deficit is reconstructed
+from the newly authenticated snapshot. Stored status booleans are not imported.
+Known-cut storage allows64cuts with a10k resource bound; each invocation still
+has a finite round limit. Preserve generated models/logs in artifacts, not Git.
+
+A local equivalent, after fetching native artifacts and their API identity:
+
+```sh
+source .venv/bin/activate
+PYTHONPATH=tools python -m autonomy.native_joint_campaign <bundle> --identity <api-json> --revision 8782e284e94706486f20f25248c7067eecdf0d70 --run-id 39367564921 --attempt 1 --seed-manifest "$WARP_SEED_MANIFEST" --output build/joint-<unique>
+```
+
+The session reviews outcomes and chooses the next hypothesis. The workflow
+executes a finite diagnostic and does not create continuous background AI.
+
+## Fresh successor exploration (October20)
+
+User approved FRESH_CANDIDATE_PLAN.md; begin paired G1 capability census before choosing hardware. New framed UART+SPI workload passes16mode/primitive simulations and22evidence-checker tests. Fully hard-backed combination requires three timers/three shifts, correcting the initial two/two assumption. Hosted39470166731 atfc7a3ac is pending; do not infer fit from standalone cell sums. Preserve all six personalities and seal a fresh evaluation set before hardware tuning.
+
+Incremental congestion sourceaa33398 retains an uninstalled121→118coarse proposal with whole-grid independent checks. Native best remains121. Pinned readSegments review finds append/accounting hazards; require a pristine full-inventory/native-ledger round-trip before handoff. Strict capacity-feasibility cuts and partial-overflow objectives answer different questions. No automatic promotion.

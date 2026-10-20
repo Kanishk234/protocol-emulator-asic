@@ -1,5 +1,41 @@
 # Bugs
 
+## 109: Fresh baseline checker CI omits compiler import dependency
+- **Date:**2026-10-20.
+- **Symptom/check:** hosted39470166731 concurrency-rtl fails collection with missing fasm; compiler census job continues independently. No simulated/fit result from failed step.
+- **Root cause:** lightweight job installs simulation dependencies, but its evidence checker imports the compiler bitstream module, which requires fabulous-fasm. Local full venv masked the omission.
+- **Fix/coverage:** install existing pinned fabulous-fasm0.2.0 in that job; retain checker XML before simulation.22checker tests and16mode simulations passed locally; hosted retry required.
+
+## 108: Concurrent response tag can change while host is stalled
+- **Date:**2026-10-20.
+- **Symptom/check:** source review of the uncommitted concurrency draft finds combinational arbitration can change an offered SPI tag when UART data arrives during backpressure.
+- **Root cause:** header selection was not latched until handshake.
+- **Fix/coverage:** latch the response lane before asserting header valid and hold through payload acceptance. All16mode/primitive simulations explicitly stall the SPI header while UART becomes ready; strict XMLPASS. Fixed before first workload commit a5c7075.
+
+## 107: Congestion proposal excludes its native positive control
+- **Date:**2026-10-20.
+- **Symptom/check:** original slot387 route uses zero-capacity H_0_17_2; blanket prohibition prevents reproducing native window overflow23. Positive-control witness caught this before proposal acceptance.
+- **Root cause:** feasibility-oriented cap0 exclusion was incorrectly carried into an incremental-overflow objective.
+- **Fix/coverage:** permit only the original net on its exact originally used cap0 edge; still charge overflow against unchanged zero capacity. Baseline reproduces23; tests reject new/net-swapped cap0 shortcuts. Integrated1004 testsPASS; independent full-grid checker verifies proposed118, uninstalled.
+
+## 106: Lightweight autonomy tests accidentally require optional OR-Tools
+- **Date:**2026-10-20.
+- **Symptom/check:** autonomy39456418372 at49da841 fails four joint-campaign orchestration fixtures with ModuleNotFoundError:ortools;672pass/239optional skips remain. Dedicated solver qualification518passes because it intentionally installs the routing extra.
+- **Root cause:** the new orchestration fixture mocked native data and planners but called actual mincut discovery for its seed, unintentionally importing the optional solver.
+- **Fix/coverage:** fixture supplies the same seed deficit through the independent arithmetic partition checker. Source794dafd. Full base environment simulated with OR-Tools unavailable:676PASS/239expected optional skips; focused75PASS/32expected skips. Dedicated real-solver qualification remains separate; corrected hosted autonomy run pending.
+
+## 105: Topological chain contraction creates unsupported parallel edge pairs
+- **Date:**2026-10-20.
+- **Symptom/check:** new exhaustive bend/branch tests fail because two internally disjoint chains contract to the same endpoint pair, which the existing graph validator correctly rejects. Caught before committing the reducer.
+- **Root cause:** draft contraction emitted one edge per chain without representing their parallel capacity.
+- **Fix/coverage:** aggregate parallel unit-demand chain capacities while retaining every original path; expansion assigns each used net to a path with remaining original capacity and revalidates original resource usage/connectivity.126reducer testsPASS, including distinct path allocation, exhaustive original/reduced feasibility and tampered mapping rejection. No native route improvement claimed.
+
+## 104: Arbitrary cut certificate applies planar demand to a crossing via
+- **Date:**2026-10-19.
+- **Symptom/check:** independent source review constructs a feasible two-layer net using a capacity1 via with demand1, but the draft arbitrary-partition checker compares planar demand2 and falsely reports2>1 infeasible.
+- **Root cause:** unlike an axis partition, an arbitrary node subset can separate co-located layers. Its crossing resources need not all charge planar demand.
+- **Fix/coverage:** conservatively refuse every via-crossing explicit partition. Regression first validates the feasible via witness then requires checker rejection.21cut testsPASS; source corrected before commit. Actual global certificates use a single collapsed layer, so their arithmetic is unaffected. Existing axis checker unchanged.
+
 ## 103: Terminal validator equates database clocks with nonleaf router clocks
 - **Date:**2026-10-19.
 - **Symptom/check:** independent source review of the new terminal parser finds that joining FrNet.isClock to GLOBAL_NET.isClockNet would reject legitimate leaf-clock observations before any native terminal trial.

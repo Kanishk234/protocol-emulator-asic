@@ -147,3 +147,17 @@ scalar-minus-layer residual is positive on200 legacy/198 rebuilt edges; actual
 residual support is empty. This falsifies that simple explanation for a raw3D
 ledger error at these checkpoints. It does not measure graph2d usage or prove
 what caused failed negotiation. Main actual report: native_corridor_run_20261019.md.
+
+## Exact upstream reset check
+
+Coordinator read upstream master at recorded immutable revision
+`80f5e2f56b360704c8278ebcdf1829fb1b6ac2c4`, then fetched that exact Git object.
+Its FrNet::reset still assigns the scalar/layer-vector without resetting the
+soft-NDR flag. Thus no verified upstream reset fix was found to substitute for
+our investigation. This does not establish whether sticky soft state is an
+upstream bug or prove it causes WARP's failed negotiation. Current upstream
+also has additional NDR resource-handling code outside our pin; no broad
+upgrade or patch adoption follows. The source is
+[FastRoute.cpp at80f5e2f](https://github.com/The-OpenROAD-Project/OpenROAD/blob/80f5e2f56b360704c8278ebcdf1829fb1b6ac2c4/src/grt/src/fastroute/src/FastRoute.cpp).
+The current observer does not export graph2d usage. Keep that unmeasured
+question separate from the proven clean raw3D ledgers.

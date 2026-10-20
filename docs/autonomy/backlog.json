@@ -256,9 +256,14 @@
         "39304728263 at75d4378: native observer build and linked API smoke SUCCESS; no algorithm change",
         "39331153087 at675b659: bounded exact121/132/139 native accounting qualification active; not yet a result",
         "b35e6ba/675b659: parser+collector157focusedPASS; cbd5eec native checkpoint checker27PASS; portable auditor strict native mode in8497bec",
-        "39331845906 at6b19d03: exactcontrols and all6raw139228edge ledgers PASS; allinitial/defaultfinal nativebytesidentical; initialone repeatedcfg_word edge blocks globalunioncompatibility; preferredlegacy132 versusbothdirection134 explicitlyseparate; native_corridor_run_20261019.md"
+        "39331845906 at6b19d03: exactcontrols and all6raw139228edge ledgers PASS; allinitial/defaultfinal nativebytesidentical; initialone repeatedcfg_word edge blocks globalunioncompatibility; preferredlegacy132 versusbothdirection134 explicitlyseparate; native_corridor_run_20261019.md",
+        "39333075002 at1dc0aed: hosted213executedPASS including v2net-private exterior equivalence, source/version/XML checked",
+        "39333325323 ate5c2e25: terminal observer buildSUCCESS31m13s, linkedAPIguardpasses; finalpatch5ec2f809 source+dryapplyreviewPASS",
+        "39367564921 at8782e28: native terminal qualification active after correctedclocksemantics; local545autonomyPASS and189integratedPASS, no nativejoin resultyet",
+        "39367564921 at8782e28 SUCCESS: all6terminalaudits independently reproduced; globalFAIL285localempty/32absent/2supply retained, scopedcohortadmitted; native_terminal_run_20261019.md",
+        "a3eb447 localmodel: 5owners,400nodes1020edges10200vars, INFEASIBLE with independent5>4x16cut; corridor_south_exact_20261019.md;567localautonomyPASS"
       ],
-      "next_action": "Ledger and checkpoint identity qualified. Prepare physical-pin/coarse-terminal/treealias/via-access observer and bounded exterior-connectivity adapter before native solver application. Preserve exact multiset release; do not infer physical access from ledger or replace preferred132 by unlabeledraw134. Soft scalar divergence exists but does not cause a raw3D ledger residual.",
+      "next_action": "Escape the certified local cut by measuring alternative crossings/exterior topology or an expanded released cohort, not repeating native negotiation. Whole-terminal gate staysfalse; native guidehandoff and physicalvia/timing legality remain open. Preserve exact source/resource identities and rawmultiset release.",
       "acceptance": [
         "FEASIBLE includes independently checked union occupancy/connectivity witness with explicit resource/terminal contracts.",
         "INFEASIBLE is scoped to the supplied model; UNKNOWN/timeouts remain inconclusive.",

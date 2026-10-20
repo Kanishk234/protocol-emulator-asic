@@ -6,6 +6,7 @@ import subprocess
 
 CANDIDATE = "3393eea9a58c5cad9077cc360a8515d0e5ec8284"
 PATCHES = {
+    "bs-resync-cfg-tx-cursor": ("bs_resync_cfg_tx_cursor.patch", ("src/trw_pin_bs.v", "src/trw_pin_cfg.v", "src/trw_pin_tx.v")),
     "bs-resync-event-cfg-staging": ("bs_resync_event_cfg_staging.patch", ("src/trw_pin_bs.v", "src/trw_pin_cfg.v")),
     "bs-event-cfg-staging": ("bs_event_cfg_staging.patch", ("src/trw_pin_bs.v", "src/trw_pin_cfg.v")),
     "bs-event-pin-banked": ("bs_event_pin_banked.patch", ("src/trw_pin_bs.v", "src/trw_pin_io.v")),

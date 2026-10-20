@@ -28,8 +28,8 @@ def regenerate_python_tables(output):
 
 
 def verify(variant, output, simulate=False):
-    if variant in {'bs-event-cfg-staging', 'bs-resync-event-cfg-staging'}:
-        raise ValueError('Use verify_cfg_staging.py for clocked-host latch equivalence')
+    if variant in {'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor'}:
+        raise ValueError('Use verify_cfg_staging.py and, for arithmetic deltas, verify_arithmetic_trial.py; retain clocked-host latch equivalence')
     patch, source = PATCHES[variant]
     output = output.resolve()
     if output == ROOT or ROOT in output.parents:

@@ -2,6 +2,24 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Prepare bounded native post-hold electrical repair experiment
+
+- Inspected pinned3.1.0.dev3 Tcl: both design and timing repair rerun GRT and estimate global-route parasitics; mid-PNR STA uses global routes when present. Same lane1 driver/sink placement and masters do not rule out changed route RC. No unsupported claim that hold buffers were added directly to the offending net. Pinned library has nor4_2 but no stronger a221oi variant, so blind upsizing cannot address both drivers uniformly.
+- Prepared native_posthold_repair_screen.py plus a separate manual workflow starting at exact failed TX state44. It runs one native electrical repair at60% slew/cap margins, wire150 unchanged, then native antenna repair and fresh all-corner strict checks. No RTL edit, synthesis, further timing repair or DRT. This is a controlled checkpoint experiment; even passing physical checks do not authorize routing until a clean reproduction.
+- All original20ns/50ps hold/zero electrical/antenna/overflow/0.45reserve/+3.5ns capture gates remain. Capture reports are parsed even when electrical qualification fails.55focused tests and workflow YAML/bash/Python/whitespace checks pass. D-094 records general need, costs and reproduction requirement. No phase boxes ticked; publish reviewed groups and launch once under standing authorization.
+
+## 2026-10-20 — Saved-stage diagnosis completes and separates repair regressions
+
+- Corrected read-only run39476734281 succeeds on537524a in about5m25s. Downloaded artifact12289922208 to/tmp/tripwire-stage-diagnosis-39476734281; receipt explicitly diagnostic_only=true/qualified=false/repair_performed=false. Source databases unchanged. No design fix, route or new workflow launched in this result check.
+- Stage39/41/43/44/45 slow capture minima:3.544516/2.994758/2.994758/3.003406/3.003406ns. Thus electrical-design repair consumes0.549758ns of minimum headroom; timing/hold repair recovers0.008648ns. Worst launch shifts PERIOD[1]→PERIOD[2], same dropped[69] endpoint; these are frontier minima, not one unchanged path.
+- Lane1 net09431 slew utilization:0.233435/0.283680/0.283680/0.616083/0.616083. Its reserve failure first appears across timing/hold repair. Estimated cap increases0.032795→0.076652pF at that transition. Exact readbacks and DEF show unchanged driver/sink masters, three immediate loads and identical placement of driver35433, muxes35438/35609 and bufferplace7455. Investigate changed estimated RC/global-route annotation rather than assert an added sink or moved instance caused it.
+- Channel0sel1 net21816 utilization:0.464528 before design repair,0.464442 thereafter. It already misses0.45 initially and repair leaves its seven immediate loads/driver unchanged. Neither antenna stage changes these two-net measurements or capture minima. This does not claim all other nets are unaffected.
+- Next prioritize setup cost during electrical repair, the persistent C0 decode load, and the timing-repair-associated lane1 estimated-load increase. Do not blindly add global buffers or infer setup closure from pre-repair3.544516ns; other gates are unqualified there. No phase boxes ticked. Brainstorm/roadmap remains in chat.
+
+## 2026-10-20 — Corrected stage diagnostic relaunched
+
+- Published toola9b78a1/testbaf3f42/docs537524a and verified remote main537524addacc9371a26423aa5aa96624ef570413. Dispatched exactly one corrected [read-only diagnosis39476734281](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39476734281), confirmed in progress on that exact head. No hardware or acceptance gate changes. Next inspect stage measurements; no phase boxes ticked.
+
 ## 2026-10-20 — Fix diagnostic configuration path anchor (BUG127)
 
 - Run39476080033 failed before STA, not on design timing. Direct job118812278751 log shows LibreLane resolving MACROS SRAM GDS to runs/native-stage-probe/../macro, which does not exist. Moving the generated config from src changed the dir:: path anchor; source run/artifact validation had passed. No stage measurements were produced.

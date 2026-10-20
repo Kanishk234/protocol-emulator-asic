@@ -1155,6 +1155,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost: paired whole-chip typical-library mapping397041.4098→395532.9252µm² for sample CSA (−135cells/−0.380%) and396655.4340µm² for TX cursor (−85cells/−0.097%); flops remain2266 and SRAM unchanged. These are local estimates, not native/routed timing or congestion.
 - Module sequential equivalence proves895/511points, cap2; both full pin suites pass60/60. Full replay and physical qualification outcomes belong in reports/PHASE2_ARITHMETIC_FOLLOWUPS.md. Earlier D-071 CSA had worse ideal-wire delay and is not erased by these new mapping results. No official adoption or phase checklist tick; retain every existing reserve/acceptance gate and qualify before DRT.
 
+## D-094 — Bounded native electrical repair after timing/hold repair
+
+- General need: saved-stage diagnostic39476734281 demonstrates a late electrical reserve regression in the complete TX candidate. Lane1 net09431 changes from0.283680slew utilization after design repair to0.616083 after timing/hold repair, while immediate connectivity/masters/placement stay fixed and estimated capacitance rises0.032795→0.076652pF. Channel0sel1 net21816 already misses0.45reserve before repair and remains0.464442. Both antenna stages leave these measurements unchanged. Pinned timing repair reruns GRT, so do not assume an added sink or cell movement caused the lane1 change.
+- Experiment only: from exact saved post-hold state44 of failed source39468700509, run one stock OpenROAD.RepairDesignPostGRT with60% slew/cap repair margins, then stock antenna repair and fresh all-corner STA/electrical/antenna audits. Wire150,20ns, resource floor, original constraints and all measured acceptance gates stay fixed. No custom cell edits, RTL changes, additional timing repair, DRT or unbounded repair loop.
+- Costs/risks: extra buffering/sizing/rerouting can worsen setup, area or hold. Existing slow capture3.003406ns is below3.5ns; electrical repair is not assumed to close it. Fresh measured gates must report all misses. Even a passing checkpoint requires clean synthesis reproduction before route authorization; receipt explicitly records clean_synthesis=false, reproduction_required=true and route_authorized=false.
+- Verification:55focused policy/provenance/parser/capture tests pass, including wrong source policy, setup/electrical rejection and successful checkpoint remaining unqualified for routing. Workflow syntax passes. No main config or template job change, official adoption or phase checklist tick.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

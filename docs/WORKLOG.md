@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Read-only stage diagnosis prepared
+
+- Continued with evidence collection before selecting another fix. Archived source39468700509 has the five intermediate ODB checkpoints but lacks per-net reserve reports at each stage. Prepared source-bound native_stage_probe.py/.tcl and a separate manual gds-native-tx-stage-diagnosis workflow, reusing that failed artifact without synthesis, repair or routing.
+- Measures only slow-corner nets09431/21816 plus20FF-capture setup paths after global routing, design repair, first antenna repair, timing/hold repair and final antenna repair. Checks exact failed-run provenance, three RTL hashes/SDC hash, database location and before/after database SHA. Output is explicitly diagnostic_only/qualified=false; no acceptance thresholds or main hardware change.
+- Verified archived antenna-stage ODBs are in their diode-insertion subdirectories; validator accepts those exact stage descendants rather than wrongly assuming wrapper-local ODBs. Workflow YAML/bash/embedded Python syntax passes;40focused provenance/parser/capture tests pass in0.75s; whitespace checks pass. Local cached OpenROAD cannot run due missing libortools, so use the pinned CI environment for these read-only measurements.
+- No phase boxes ticked. Publish reviewed tool/test/CI/worklog groups under standing authorization, launch once, then locate the first measured reserve loss before proposing a repair. User's roadmap/brainstorm stays in chat; no separate report added.
+
+## 2026-10-20 — Diagnose failed TX screen; no fixes or launches
+
+- User requested analysis before changes. Read completed screen39468700509 on exact53b35a6, downloaded early artifact12288157230 and selected exact netlist/report files from12289381028. Watch reports exit1 after2424.285s, no timeout. Candidate validation/setup/upload steps succeeded. No design/helper/workflow changes, commits, pushes or launches; this entry records diagnosis only.
+- Persisted rejection is electrical reserve: two slow slew offenders, net09431/cell35438/S1 actual1.544767ns (utilization0.6160832) and net21816/place7842/A actual1.164543ns (0.4644425), fixed limit0.45. All actual slew/fanout/cap counts and antenna counts are zero. Fast hold77.455ps passes50ps; typical202.574ps/slow398.500ps.
+- Independent production capture parser measures slow3.003406ns (+0.472414ns versus combined), typical9.182113ns, fast12.828052ns. The3.5ns capture guard never executes after earlier reserve rejection, but saved reports establish it would miss by0.496594ns. Global setup WS0 does not change this conclusion. No extracted timing exists for this source.
+- Exact netlist maps worst path to U0PERIOD[2] latch49299→dropped[69] FF48553, through bit-clock logic. Reserve net09431 comes from a221oi1/cell35433 into lane1 mux selects; net21816 is nor4_1/cell27383 decoding channel0source-select1 (port_state[5:2]), feeding shared fabric cones. No TX cursor-select net appears among final reserve offenders; reachability is structural, not proof of sensitizability or a same-path speedup.
+- Native design repair inserted5314buffers versus5216 in combined baseline; hold buffers299 versus101. Stage44 instance area587138 versus585019µm², count40385 versus40177. These native post-repair figures differ from the local synthesis estimate and show physical repair costs offset its saving. Worst slow slew utilization worsens0.520477→0.616083 despite offender count3→2. Do not claim global electrical improvement or attribute new misses to a particular stage without intermediate evidence. Next diagnostic, before selecting a fix: determine when these exact nets lose reserve and decompose the still-limiting PERIOD-to-drop path. No phase boxes ticked.
+
+## 2026-10-20 — Published TX follow-up and launched native qualification
+
+- Under standing authorization, published patch674d752/tools ea9cec9/tests5ac58b8/CI82cc4e7/docs53b35a6 in separate groups. Verified remote main53b35a63873ebc4181f60dab1a6a09f9de6b7518. No src/info.yaml/macro changes or unpublished hardware commits were included; unrelated local work and FIPE notes remain excluded.
+- Dispatched exactly one [native TX cursor screen39468700509](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39468700509), confirmed in progress on that head after initially queuing. Companion unit39468699764/test39468699801/lint39468699768 are in progress. Prior d59e502 test/unit/lint/docs all passed; combined physical screen failed as recorded below.
+- Both protocol replays, module proofs, mappings and owned local simulations have completed. Final helper/provenance/reserve regression101passed in16.50s. CSA and prefix alternatives remain rejected for physical launch; lane-local slot staging remains deferred. No phase boxes ticked. Next inspect exact-source TX electrical reserves and measured slow capture before considering any routing. Launch receipt remains local for the next evidence publication.
+
 ## 2026-10-20 — Verify arithmetic follow-ups; reject CSA and prepare TX screen
 
 - Traced combined screen's PERIOD[0]→dropped[22] arithmetic path and all three reserve nets. Two reserve drivers reach U1/U3 TX cursor eq banks; third is channel2source-select-zero decode from port_state[25:22], with broad structural reachability. These are source-bound connectivity observations, not sensitizability claims.

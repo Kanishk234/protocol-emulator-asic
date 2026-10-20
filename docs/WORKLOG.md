@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Fix omitted pinned default in post-hold preflight (BUG128)
+
+- Run39480456836 fails before any physical repair at configure(): source config omits GRT_DESIGN_REPAIR_RUN_GRT. Pinned LibreLane3.1.0.dev3 Step registry confirms default=True; resolved original repair step usesTrue. All other guarded values match. Reproduced exact failure against the actual archived input JSON; no timing conclusion from this failed attempt.
+- Accept only the omitted pinned default or explicitTrue, reject explicitFalse/null/nonboolean values, and serializeTrue into the derived config. Added regression cases and exercised the full mocked runner with the same omitted-default shape. Actual archived input now passes configure.60focused tests pass; hardware, source provenance, repair targets and all acceptance gates unchanged. BUG128 records cause and coverage.
+- Latest fe220c4 test/lint/docs workflows passed; unit remains in progress. Automatic approval review initially timed out retrieving the read-only job log; one permitted retry succeeded, so no authorization blocker remains. Publish tool/test/docs fixes and relaunch once under standing authorization. No phase boxes ticked or physical repair performed yet.
+
+## 2026-10-20 — Bounded post-hold native repair launched
+
+- Published tools12711ca/tests3953492/CI360f400/docsfe220c4 under standing authorization; verified remote mainfe220c4e3a1fb1f3944691c78ca736643d1b2baa. Dispatched exactly one [post-hold margin60 screen39480456836](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39480456836), confirmed in progress on that head.
+- Final focused suite55passed in0.69s; pinned LibreLane SequentialFlow accepts exactly RepairDesignPostGRT→RepairAntennas. Hardware, constraints and all acceptance gates unchanged. Source checkpoint remains route-unauthorized even if measurements pass; clean reproduction required. No phase boxes ticked. Next inspect all electrical/hold/setup/antenna outcomes and repair cost, not only the original two nets. Receipt remains local until the next evidence publication.
+
 ## 2026-10-20 — Prepare bounded native post-hold electrical repair experiment
 
 - Inspected pinned3.1.0.dev3 Tcl: both design and timing repair rerun GRT and estimate global-route parasitics; mid-PNR STA uses global routes when present. Same lane1 driver/sink placement and masters do not rule out changed route RC. No unsupported claim that hold buffers were added directly to the offending net. Pinned library has nor4_2 but no stronger a221oi variant, so blind upsizing cannot address both drivers uniformly.

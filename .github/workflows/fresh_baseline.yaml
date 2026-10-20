@@ -6,6 +6,7 @@ on:
     paths:
       - 'test_internal/cloud_fresh_baseline.py'
       - 'protocols/uart_spi/**'
+      - 'protocols/uart_i2c/**'
       - '.github/workflows/fresh_baseline.yaml'
 permissions:
   contents: read
@@ -18,7 +19,7 @@ jobs:
   compare:
     if: github.ref == 'refs/heads/efpga'
     runs-on: ubuntu-24.04
-    timeout-minutes: 130
+    timeout-minutes: 175
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -47,8 +48,8 @@ jobs:
         run: |
           scripts/setup_venv.sh
           bash scripts/fetch_nextpnr.sh
-      - name: Eleven explicit G1 baseline cases
-        timeout-minutes: 115
+      - name: Fifteen explicit G1 baseline cases
+        timeout-minutes: 160
         run: |
           source .venv/bin/activate
           export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
@@ -84,10 +85,13 @@ jobs:
         run: |
           source .venv/bin/activate
           bash scripts/check_uart_spi.sh
+          bash scripts/check_uart_i2c.sh
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: fresh-concurrency-rtl-${{ github.run_id }}
-          path: build/uart_spi_checks/
+          path: |
+            build/uart_spi_checks/
+            build/uart_i2c_checks/
           if-no-files-found: error
           retention-days: 30

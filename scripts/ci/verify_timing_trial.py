@@ -28,6 +28,8 @@ def regenerate_python_tables(output):
 
 
 def verify(variant, output, simulate=False):
+    if variant == 'bs-event-cfg-staging':
+        raise ValueError('Use verify_cfg_staging.py for clocked-host latch equivalence')
     patch, source = PATCHES[variant]
     output = output.resolve()
     if output == ROOT or ROOT in output.parents:

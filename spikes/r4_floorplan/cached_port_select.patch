@@ -1,0 +1,36 @@
+--- a/src/trw_chan_port.v
++++ b/src/trw_chan_port.v
+@@ -52,6 +52,16 @@
+     output reg             last_seq,
+     output reg  [7:0]      dropped
+ );
++    reg [N-1:0] select_mask;
++    integer sm;
++    always @(posedge clk) begin
++        if (!rst_n)
++            select_mask <= {{(N-1){1'b0}}, 1'b1};
++        else if (cfg_we)
++            for (sm = 0; sm < N; sm = sm + 1)
++                select_mask[sm] <= ({28'd0, cfg_sel} == sm);
++    end
++
+     // selected source; a sel beyond the list selects nothing
+     reg        s_valid, s_seq, s_load, w_seq;
+     reg [17:0] s_tok;
+@@ -63,11 +73,11 @@
+         s_tok   = 18'd0;
+         w_seq   = 1'b0;
+         for (n = 0; n < N; n = n + 1) begin
+-            if ({28'd0, sel} == n) begin
+-                s_valid = src_valid[n];
+-                s_seq   = src_seq[n];
+-                s_load  = src_load[n];
+-                s_tok   = src_tok[18*n +: 18];
++            if (select_mask[n]) begin
++                s_valid = s_valid | src_valid[n];
++                s_seq   = s_seq | src_seq[n];
++                s_load  = s_load | src_load[n];
++                s_tok   = s_tok | src_tok[18*n +: 18];
+             end
+             if ({28'd0, cfg_sel} == n)
+                 w_seq = src_seq[n];          // F5: the newly selected source's seq

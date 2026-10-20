@@ -56,7 +56,7 @@ def checkpoint(root, final_antenna=False):
 
 
 def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimingPostGRT'):
-    if os.environ['VARIANT'] not in {'bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select'}:
+    if os.environ['VARIANT'] not in {'bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select', 'bs-resync-cfg-tx-cached-lane-mask'}:
         raise ValueError('Unreviewed source variant')
     original = json.loads(Path('src/config_merged.json').read_text())
     sdc = Path('src/signoff.sdc')

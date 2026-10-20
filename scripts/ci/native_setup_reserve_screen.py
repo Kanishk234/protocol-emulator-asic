@@ -59,9 +59,24 @@ def enforce(root):
 
 
 def main(config_transform=configure):
-    margin_screen(config_transform=config_transform, final_antenna_repair=True,
-                  audit_tcl=Path('workflow-src/scripts/ci/native_timing_headroom_audit.tcl'))
-    enforce(Path('runs/native-stock-screen'))
+    root = Path('runs/native-stock-screen')
+    try:
+        margin_screen(config_transform=config_transform, final_antenna_repair=True,
+                      audit_tcl=Path('workflow-src/scripts/ci/native_timing_headroom_audit.tcl'))
+    except Exception:
+        # A completed electrical rejection still has useful setup evidence.
+        # Preserve the original failure even if setup evidence is incomplete.
+        if (root/'gates.json').is_file():
+            try:
+                path = root/'gates.json'
+                receipt = json.loads(path.read_text())
+                receipt['qualified'] = False
+                path.write_text(json.dumps(receipt, indent=2)+'\n')
+                enforce(root)
+            except Exception as diagnostic_error:
+                print(f'Additional setup gate result: {diagnostic_error}', flush=True)
+        raise
+    enforce(root)
 
 
 if __name__ == '__main__':

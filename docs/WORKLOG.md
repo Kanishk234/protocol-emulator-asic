@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Fix diagnostic configuration path anchor (BUG127)
+
+- Run39476080033 failed before STA, not on design timing. Direct job118812278751 log shows LibreLane resolving MACROS SRAM GDS to runs/native-stage-probe/../macro, which does not exist. Moving the generated config from src changed the dir:: path anchor; source run/artifact validation had passed. No stage measurements were produced.
+- Keep executable diagnostic configs beside src/config_native_stock.json; retain copies under diagnostic outputs for audit only. Original hardware, macro bytes, SDC, repair policy and qualification gates unchanged. BUG127 records symptom/root cause/coverage.
+- Added end-to-end mocked-runner regression covering every saved stage, exact relative macro resolution, source-database preservation and qualified=false receipt. Focused provenance/parser/capture suite41passed in0.68s; whitespace checks pass. Publish separate tool/test/docs groups and relaunch the read-only workflow once under standing authorization. No phase boxes ticked or physical repair performed.
+
+## 2026-10-20 — Saved-stage diagnostic launched; reject local interval rewrite
+
+- Published toolsdc4d3be/testsafba92f/CI63d3b37/docsdebf9aa under standing authorization, verified remote main debf9aa176e168368c49f8cbf3564ca9f0db422f. Dispatched exactly one read-only [stage diagnostic39476080033](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39476080033), confirmed in progress. No hardware, repair policy, acceptance gate or template job changed.
+- In parallel, built an isolated unsigned modular interval predicate for e<sj against the TX candidate, moving PERIOD out of the subtract stage into comparisons. Full bit-clock module equivalence proves870points with zero unproven, cap2. Matched isolated slow-library ideal-wire PERIOD→RX-load timing worsens9.929828→10.272210ns. Reject physical promotion; prototype and raw evidence stay in/tmp/tripwire-resync-predicate-20261020, no main changes or new physical screen.
+- No phase boxes ticked. Next use the five saved-stage measurements to establish the first reserve loss for nets09431/21816, then select a targeted repair. Diagnostic success will not imply timing qualification. Launch receipt remains local for the next evidence update.
+
 ## 2026-10-20 — Read-only stage diagnosis prepared
 
 - Continued with evidence collection before selecting another fix. Archived source39468700509 has the five intermediate ODB checkpoints but lacks per-net reserve reports at each stage. Prepared source-bound native_stage_probe.py/.tcl and a separate manual gds-native-tx-stage-diagnosis workflow, reusing that failed artifact without synthesis, repair or routing.

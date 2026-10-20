@@ -2,6 +2,19 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Wire2000 control rejected; cached selection fully replayed
+
+- Wire2000 experiment39484385869 completes physical measurements but fails reserve gates. Native pass counts5slew problems yet final table has0buffers/0resizes/0%area/0placement displacement; unlike wire150 late repair it avoids1481newbuffers but makes no useful cell edits. All measured setup/hold/electrical reserve values reproduce original TX: slow capture3.003406ns, fast hold77.455ps, same two slow slew misses0.616083/0.464442, actual electrical/antenna zero. Do not repeat native margin/wire sweeps as a substitute for a targeted structural change.
+- Cached selection full Verilator replay completes22/22 with no failures/skips in348.97s, independent sigrok decoders enabled. XML SHA8ec5da8f97affcb51fabfe7331e690374a3a1167ac7b139f0c41d489920c49ed; source-hashed cached_select_receipt.json records all four module hashes and all N1..16proofs. All owned local simulations/proofs/mapping jobs have completed.93focused helper/source/screen/capture tests and workflow syntax/whitespace pass.
+- D-096, claims and in-progress summary updated with measured scope/costs and explicit absence of native/routed evidence. Dedicated four-source-bound clean native cached-select screen retains the TX control's wire150/hold125/initial55% recipe and every original gate. This changes one RTL optimization relative to that control, independently of the rejected wire experiments. Publish reviewed patch/tool/test/CI/docs groups under standing authorization, then launch once; no DRT or phase boxes ticked.
+
+## 2026-10-20 — Wire2000 control running; verify independent cached-selection prototype
+
+- Published tools1d8e0e1/testsfa0091f/CI8b00126/docs3e12226; verified remote main3e1222680563bf1712ee93af235f7e99cf559e3c. Dispatched exactly one [late wire2000 screen39484385869](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39484385869), confirmed in progress.67policy/provenance/parser/capture tests and workflow syntax pass. This keeps the original source44 and late60% repair, changing only the wire threshold; no DRT authorization.
+- In parallel built general cached fabric source selection against exact TX source: only trw_chan_port.v differs. Original→named-reference and named-reference→cache proofs pass for all N1..16 (98reference points;99..114cached points), cap4. Seven fabric tests,5chip tests and2048L2clocks pass. Wrong configuration-enable mutation fails proof. Initial priority mux form has higher area; masked OR implementation chosen after renewed proofs/fabric tests.
+- Paired local mapping adds52flops/271cells/+3560.4198µm² (+0.898% std-cell area), unchanged macro. Matched isolated N6 ideal-wire slow-library source-load→dropped-D delay1.751492→1.218096ns. Local old OpenSTA parser needed removal of the unused signed integer-loop-wire qualifier in its mapped test view; functional RTL and mapping remain unchanged. D-096 records reset/cycle scope and costs. No physical improvement claimed.
+- Dedicated verifier/delta/full frozen patches and prospective four-hash native screen prepared.93focused helper/screen/source/capture tests pass; workflow syntax/whitespace pass. Full22-case Verilator replay still running with independent decoders; no cached-selection publication/physical launch until it passes. No main RTL/spec/config change or phase boxes ticked. Evidence/tmp/tripwire-cached-port-select-20261020.
+
 ## 2026-10-20 — Isolate late repair long-wire cost
 
 - Confirmed native repair log:5slew problems,1450long wires,1481buffers and zero resizes. Prepared a single-control follow-up from original source39468700509/state44: late max_wire_length2000µm versus150; all other late margin60/antenna/acceptance settings unchanged. Avoid zero max length because pinned native behavior disables buffering there. Do not call this wire-free repair; measure actual activity.

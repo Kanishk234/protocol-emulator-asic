@@ -10,7 +10,7 @@ from verify_sample_delta_low8 import FIXTURE
 VARIANT = 'bs-resync-cfg-tx-cached-lane-mask-drop-parallel-delta8'
 
 
-def main():
+def validate_source():
     hashes = {f: h['after'] for f, h in json.loads(
         (FIXTURE / 'source_hashes.json').read_text()).items()}
     hashes.update({
@@ -21,6 +21,10 @@ def main():
     if os.environ.get('VARIANT') != VARIANT or any(
             digest(Path('src') / f) != h for f, h in hashes.items()):
         raise ValueError('Wrong verified low-eight-bit configuration-cache source')
+
+
+def main():
+    validate_source()
     run_screen()
 
 

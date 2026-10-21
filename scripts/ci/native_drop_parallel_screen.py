@@ -53,14 +53,14 @@ def main():
     run_screen()
 
 
-def run_screen():
+def run_screen(*, config_transform=configure):
     """Execute unchanged strict screen after the caller validates its source."""
     subprocess.run(['docker', 'build', '-t', IMAGE, '-f',
                     'workflow-src/scripts/ci/Dockerfile.openroad-native-incremental',
                     'workflow-src/scripts/ci'], check=True)
     root = Path('runs/native-stock-screen')
     try:
-        reserve_screen(config_transform=configure, image_override=IMAGE,
+        reserve_screen(config_transform=config_transform, image_override=IMAGE,
                        audit_tcl=Path('workflow-src/scripts/ci/native_no_final_grt_audit.tcl'))
     except Exception:
         if (root/'gates.json').is_file():

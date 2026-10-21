@@ -54,3 +54,17 @@ def test_workflow_source_binding():
     download = next(s for s in job['steps'] if 'download-artifact@' in s.get('uses', ''))['with']
     assert download['run-id'] == trial.PROFILE['source_run']
     assert any(s.get('run') == 'python workflow-src/scripts/ci/native_incremental_route_control.py' for s in job['steps'])
+
+
+def test_custom_image_metadata_preserves_measured_rejection():
+    original = dict(qualified=False, diagnostic_only=True, custom_image=False,
+                    checkpoint_measured_gates_pass=False,
+                    estimated_margin_pass=False, capture_setup_minimum_ns={'slow': 3.030177})
+    result = trial.record_control_image(original, 'tripwire-native-incremental-route:local')
+    assert result['custom_image'] is True
+    assert result['native_routing_modified'] is True
+    assert result['capture_setup_minimum_ns'] == original['capture_setup_minimum_ns']
+    assert result['checkpoint_measured_gates_pass'] is False
+    assert original['custom_image'] is False
+    with pytest.raises(ValueError):
+        trial.record_control_image(dict(original, qualified=True), 'image')

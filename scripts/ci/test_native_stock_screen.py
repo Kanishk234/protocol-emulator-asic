@@ -37,8 +37,9 @@ def test_missing_and_detailed_route_checkpoints_rejected(tmp_path):
 
 
 @pytest.mark.parametrize('hold_target,clock_cluster,native_margin,final_antenna',[(.10,None,False,False),(.125,None,False,False),(.10,'8',False,False),(.10,'8',True,False),(.10,'8',True,True)])
-@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select', 'bs-resync-cfg-tx-cached-lane-mask'])
-def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster, native_margin, final_antenna, variant):
+@pytest.mark.parametrize('variant', ['bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select', 'bs-resync-cfg-tx-cached-lane-mask', 'bs-resync-cfg-tx-cached-lane-mask-drop-parallel'])
+@pytest.mark.parametrize('image_override', [None, 'tripwire-native-incremental-route:local'])
+def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, hold_target, clock_cluster, native_margin, final_antenna, variant, image_override):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('NATIVE_HOLD_TARGET',str(hold_target))
     if clock_cluster is None: monkeypatch.delenv('NATIVE_CLOCK_CLUSTER_SIZE', raising=False)
@@ -52,7 +53,7 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, ho
     calls = []
     def flow(args, **kwargs):
         import os
-        assert 'LIBRELANE_IMAGE_OVERRIDE' not in os.environ
+        assert os.environ.get('LIBRELANE_IMAGE_OVERRIDE') == image_override
         assert '--with-initial-state' not in args
         assert args[args.index('--to') + 1] == ('OpenROAD.RepairAntennas-1' if final_antenna else 'OpenROAD.ResizerTimingPostGRT')
         assert json.loads(Path(args[-1]).read_text())['GRT_RESIZER_HOLD_SLACK_MARGIN']==hold_target
@@ -77,17 +78,19 @@ def test_main_uses_stock_stop_and_never_repeats_repair(tmp_path, monkeypatch, ho
     monkeypatch.setattr(runner, 'screen', sta)
     if final_antenna:
         from native_post_antenna_screen import configure
-        runner.main(config_transform=configure, extra_tcl=Path('probe.tcl'), stop_step='OpenROAD.RepairAntennas-1')
+        runner.main(config_transform=configure, extra_tcl=Path('probe.tcl'), stop_step='OpenROAD.RepairAntennas-1', image_override=image_override)
     elif native_margin:
         from native_margin_screen import configure
-        runner.main(config_transform=configure, extra_tcl=Path('probe.tcl'))
+        runner.main(config_transform=configure, extra_tcl=Path('probe.tcl'), image_override=image_override)
     else:
-        runner.main()
+        runner.main(image_override=image_override)
     assert calls == ['flow', 'sta']
     receipt = json.loads(Path('runs/native-stock-screen/recipe.json').read_text())
     assert receipt['source_variant'] == variant
     assert receipt['checkpoint_ecos'] is False
-    assert receipt['stock_sequence'] is (not final_antenna)
+    assert receipt['stock_sequence'] is (not final_antenna and image_override is None)
+    assert receipt['custom_image'] is (image_override is not None)
+    assert receipt['custom_image_name'] == image_override
     assert receipt['hold_target_ns']==hold_target
     assert receipt['official_signoff'] is False
     assert receipt['post_grt_design_repair'] is native_margin

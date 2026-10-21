@@ -1,0 +1,41 @@
+{
+  "source_run": 39677316308,
+  "source_head": "4d48ccd48ebf5b7cf9dd7bd69ffc119373882502",
+  "source_path": ".github/workflows/gds-native-delta8-wire600-screen.yaml",
+  "source_state": "runs/native-stock-screen/flow/45-openroad-repairantennas-1/audited_state.json",
+  "files": {
+    "odb": {
+      "path": "runs/native-stock-screen/flow/45-openroad-repairantennas-1/1-openroad-diodeinsertion/tt_um_tripwire.odb",
+      "sha256": "727f588be7248dc6f0cf368f25bcdbab7c6c63bd21027fe3d5babf359d6e50b2"
+    },
+    "nl": {
+      "path": "runs/native-stock-screen/timing/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/native_antenna.nl.v",
+      "sha256": "369a4803faf50bf4d63d1260a0b872309fb869ac3c4f0904989d1e7f6a240667"
+    },
+    "def": {
+      "path": "runs/native-stock-screen/flow/45-openroad-repairantennas-1/1-openroad-diodeinsertion/tt_um_tripwire.def",
+      "sha256": "deb05152a91ab0f604c6e3ac86a3c7a12881af3aa06e10f243bcc2bbe06e768e"
+    },
+    "gates": {
+      "path": "runs/native-stock-screen/gates.json",
+      "sha256": "6d2c8eafb9791792bcee75f506fde6d0e7446f7568e6212efca628617accee67"
+    },
+    "config": {
+      "path": "src/config_native_stock.json",
+      "sha256": "8f957ea12ff07b7fcbf35d1cca3c3fd2d8ad358194085d68a4c4de6259ebfb59"
+    },
+    "state": {
+      "path": "runs/native-stock-screen/flow/45-openroad-repairantennas-1/audited_state.json",
+      "sha256": "fec87aef15345b934c886b1aee1d48e79a19c458cf9d43526eaae9d1599761ff"
+    },
+    "signoff_sdc": {
+      "path": "src/signoff.sdc",
+      "sha256": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa"
+    },
+    "defs": {
+      "path": "src/trw_defs.vh",
+      "sha256": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848"
+    }
+  },
+  "proposal_sha256": "e30bcc8db95c325052c67fb9ee406c6bb4a5b2496b874a8b449cf740e46fd66f"
+}

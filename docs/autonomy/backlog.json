@@ -325,9 +325,10 @@
         "39477188058 at70e0244:46tests/controlgenerationPASS; compile setupFAILmissingcornerfile; BUG111fixed47localPASS",
         "39480270318 at4a1f35aSUCCESS;48strict checks; complete independent source/model/FASM-image audit; both concurrent fits103/123LC",
         "October21 globaltrack graph screen: interior selector cost unchanged;54combined local checksPASS; report records border-only savings",
-        "October21: four-track copied-source RTL/model generated; strict full census10976storedbits;57local qualifier passes; matched eight-case hosted campaigns prepared"
+        "October21: four-track copied-source RTL/model generated; strict full census10976storedbits;57local qualifier passes; matched eight-case hosted campaigns prepared",
+        "39686140206 atb838632: both4/8track jobs57checks+8workloadsPASS; independent all16image/source/model auditsPASS; local10tile elaborationPASS"
       ],
-      "next_action": "Authenticate matched four/eight-track eight-workload hosted outcomes, diagnose any native failures; assess physical total-cost benefit before any successor acceptance.",
+      "next_action": "Use matched regenerated baseline/candidate technology mapping including configuration latches and muxes; screen tile geometry/pin access before physical compaction. Four-track seed1 compiler gate passed; functional/seed/physical gates remain open.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

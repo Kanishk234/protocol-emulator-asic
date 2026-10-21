@@ -63,3 +63,14 @@ Next experiment: regenerate a four-global-track model from clean owned transform
 ## Four-track generation checkpoint
 
 Owned transform and resource generator now emit fresh tile, switch and configuration RTL from a copied clean library, narrowing actual directional wire declarations. Local build/r1_four_tracks_v2 succeeds with128LC/4timer/4shift/42IO; strict generated-RTL census confirms10976stored bits (8326switch,2650other), including borders. LUT tile retains566stored bits with four-bit directional channel ports. Initial empty-corner setup failure is BUG114, covered by regression. Updated generator automatically retains/hash-binds the flat RTL and census in its output. Matched hosted four/eight-track jobs now test six retained personalities plus both concurrent workloads; outcomes pending.57local qualifier cases pass. No physical run or chip acceptance.
+
+
+## Matched compiler gate passed
+
+[39686140206](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39686140206), sourceb8386327105d4f963ed4cf0f4d402f5025cf62d4: both four/eight-track jobs SUCCESS, each57strict tests and eight native user-fabric PNR/image successes. Independent downloaded audits separately verify147source/generated inputs,284clean-library files,121FABulous modules, every candidate generated-file hash, native/report/synthesis resource agreement, image CRC/version and exact FASM regeneration of all eight962-word images per topology. Local audits: build/r1_matched_hosted/tracks{4,8}/independent-audit.json.
+
+Both topologies place the same workload demands: UART29, SPI47, I2C70, WS2812 32,1-Wire77,SWD44,UART+SPI103,UART+I2C123LCs. Concurrency uses3timer/shift pairs. These are seed1 compiler checks with placeholder timing; they do not demonstrate loaded-design functional behavior, seed robustness or silicon routing/timing. The four-track topology survives this first compiler rejection gate.
+
+Regenerated all-ten-tile hierarchy elaboration passes locally with upstream SystemVerilog primitives (`iverilog -g2012 -tnull`); strict Verilog2005 parsing of those upstream primitive files is unsuitable because they contain always_ff. The generator now performs this bounded elaboration automatically and retains diagnostics. Local final build/r1_four_tracks_v4 completes with strict census and elaboration.
+
+Cost caution: LUT padded programmable mux slots rise1100→1132 while select state stays414bits. Pin reduction is not a mux-area reduction. A disposable Yosys synthesis probe leaves configuration latches unmapped; its reported area totals are rejected as incomplete. No area number or causal gain is accepted from it. Before hardening, use matched regenerated control/candidate RTL and the actual technology mapping for configuration latches and custom muxes, then inspect pin access/channel geometry. Retain complete live configuration state. Existing native121/118evidence remains separate.

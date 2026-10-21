@@ -24,15 +24,22 @@ def fold_csv(text, tracks):
     return out.getvalue()
 
 
-def transform(library, tiles, tracks):
+def transform(library, tiles, tracks, radix='full'):
     """Replace matrices from canonical connections, then narrow wire declarations."""
     library = Path(library)
+    if radix not in ('full','radix8_2'):
+        raise ValueError('Unknown switch policy')
     proposals = {}
     for tile in tiles:
         if not tile.switch_matrix.connections:
             # Empty corner has no data channels or switch choices to fold.
             continue
         proposal = screen(tile.switch_matrix.connections, tracks)
+        if radix == 'radix8_2' and tile.name in ('LUT4x8_ha','PRIM2T2S'):
+            from reduced_radix import reduce
+            proposal['connections'],proposal['radix_screen']=reduce(proposal['connections'])
+            proposal['select_bits']=proposal['radix_screen']['select_bits']
+            proposal['max_fanin']=max(map(len,proposal['connections'].values()))
         if not proposal['custom_mux_arity_supported']:
             raise ValueError('Unsupported folded mux arity')
         directory = library/'tiles/tiny'/tile.name

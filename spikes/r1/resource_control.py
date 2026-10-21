@@ -43,10 +43,12 @@ def placeholder_corner(modeldir, pips):
         scope='Filename compatibility only; generated placeholder PIP delays. Do not compare rates or Fmax.'),indent=2)+'\n')
 
 
-def run(control, out, tracks=8, emit_rtl=False):
+def run(control, out, tracks=8, emit_rtl=False, radix='full'):
     from fabulous.fabulous_api import FABulous_API
     from fabulous.fabric_generator.code_generator.code_generator_Verilog import VerilogCodeGenerator
     import yaml
+    if radix not in ('full','radix8_2') or (radix != 'full' and tracks != 4):
+        raise ValueError('Reduced radix is only declared for four global tracks')
     control, out = Path(control).resolve(), Path(out).resolve()
     check = json.loads((control/'qualification.json').read_text())
     if check['passed'] is not True:
@@ -70,7 +72,7 @@ def run(control, out, tracks=8, emit_rtl=False):
         copied = out/'library'
         shutil.copytree(library, copied)
         if tracks != 8:
-            proposals = transform(copied, original.getTiles(), tracks)
+            proposals = transform(copied, original.getTiles(), tracks, radix)
         library = copied
     modeldir = out/'macro/fabulous/.FABulous'
     modeldir.mkdir(parents=True)
@@ -100,7 +102,11 @@ def run(control, out, tracks=8, emit_rtl=False):
             for source in (library/'tiles/tiny'/tile.name).glob('*.v'):
                 shutil.copyfile(source, flat/source.name)
         cost = census(fabric, flat)
-        if tracks == 4 and cost['totals']['stored_bits'] != 10976:
+        if proposals:
+            for tile,proposal in proposals.items():
+                if cost['tiles'][tile]['switch_bits'] != proposal['select_bits']:
+                    raise ValueError('Regenerated switch census differs from structural proposal')
+        if tracks == 4 and radix == 'full' and cost['totals']['stored_bits'] != 10976:
             raise ValueError('Generated storage differs from folded graph projection')
         (out/'configuration-cost.json').write_text(json.dumps(cost, indent=2, sort_keys=True)+'\n')
         # Upstream primitive sources use SystemVerilog; generated tile RTL is Verilog.
@@ -137,7 +143,7 @@ def run(control, out, tracks=8, emit_rtl=False):
     (out/'arch.yaml').write_text(yaml.safe_dump(dict(name='r1_resource_control',arch_version=0x00FE,
         macro=str(out/'macro'),luts=128,primitives=dict(wp_timer=4,wp_shift=4),
         include_border_rows=True,config_rows=5,config_cols=8),sort_keys=False))
-    result = dict(passed=True,global_tracks=tracks,track_proposals=proposals,
+    result = dict(passed=True,global_tracks=tracks,radix=radix,track_proposals=proposals,
                   control_qualification_sha256=digest((control/'qualification.json').read_bytes()),
                   resources=dict(counts),source_fabric_sha256=digest(fabric.read_bytes()),
                   generated_sha256={str(p.relative_to(out)):digest(p.read_bytes()) for p in sorted(out.rglob('*')) if p.is_file()},
@@ -154,5 +160,6 @@ if __name__ == '__main__':
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--tracks',type=int,choices=(4,8),default=8)
     parser.add_argument('--emit-rtl',action='store_true')
+    parser.add_argument('--radix',choices=('full','radix8_2'),default='full')
     args=parser.parse_args()
-    print(json.dumps(run(args.control,args.out,args.tracks,args.emit_rtl)['resources'],sort_keys=True))
+    print(json.dumps(run(args.control,args.out,args.tracks,args.emit_rtl,args.radix)['resources'],sort_keys=True))

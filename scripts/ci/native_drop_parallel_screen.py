@@ -50,6 +50,11 @@ def main():
     if (os.environ.get('VARIANT') != 'bs-resync-cfg-tx-cached-lane-mask-drop-parallel'
             or digest(Path('src/trw_chan_port.v')) != TRIAL_HASH):
         raise ValueError('Wrong verified parallel counter variant')
+    run_screen()
+
+
+def run_screen():
+    """Execute unchanged strict screen after the caller validates its source."""
     subprocess.run(['docker', 'build', '-t', IMAGE, '-f',
                     'workflow-src/scripts/ci/Dockerfile.openroad-native-incremental',
                     'workflow-src/scripts/ci'], check=True)

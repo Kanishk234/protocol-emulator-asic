@@ -6,6 +6,7 @@ import subprocess
 
 CANDIDATE = "3393eea9a58c5cad9077cc360a8515d0e5ec8284"
 PATCHES = {
+    "bs-resync-cfg-tx-cached-lane-mask-drop-parallel-delta8": ("bs_resync_cfg_tx_cached_lane_mask_drop_parallel_delta8.patch", ('src/trw_pin_bs.v', 'src/trw_pin_cfg.v', 'src/trw_pin_tx.v', 'src/trw_chan_port.v', 'src/trw_lane.v', 'src/trw_pin_unit.v', 'src/trw_chip.v')),
     "bs-resync-cfg-tx-cached-lane-mask-drop-parallel": ("bs_resync_cfg_tx_cached_lane_mask_drop_parallel.patch", ("src/trw_pin_bs.v", "src/trw_pin_cfg.v", "src/trw_pin_tx.v", "src/trw_chan_port.v", "src/trw_lane.v")),
     "bs-resync-cfg-tx-cached-lane-mask": ("bs_resync_cfg_tx_cached_lane_mask.patch", ("src/trw_pin_bs.v", "src/trw_pin_cfg.v", "src/trw_pin_tx.v", "src/trw_chan_port.v", "src/trw_lane.v")),
     "bs-resync-cfg-tx-cached-select": ("bs_resync_cfg_tx_cached_select.patch", ("src/trw_pin_bs.v", "src/trw_pin_cfg.v", "src/trw_pin_tx.v", "src/trw_chan_port.v")),

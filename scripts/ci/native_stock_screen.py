@@ -58,7 +58,7 @@ def checkpoint(root, final_antenna=False):
 def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimingPostGRT', image_override=None):
     if image_override not in (None, 'tripwire-native-incremental-route:local'):
         raise ValueError('Unreviewed native screen image')
-    if os.environ['VARIANT'] not in {'bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select', 'bs-resync-cfg-tx-cached-lane-mask', 'bs-resync-cfg-tx-cached-lane-mask-drop-parallel'}:
+    if os.environ['VARIANT'] not in {'bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select', 'bs-resync-cfg-tx-cached-lane-mask', 'bs-resync-cfg-tx-cached-lane-mask-drop-parallel', 'bs-resync-cfg-tx-cached-lane-mask-drop-parallel-delta8'}:
         raise ValueError('Unreviewed source variant')
     original = json.loads(Path('src/config_merged.json').read_text())
     sdc = Path('src/signoff.sdc')

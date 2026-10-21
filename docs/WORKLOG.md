@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per work session.
 
+
+## 2026-10-21 — Diagnose full feedback path and prepare initial wire600 control
+
+- Retrieved bulk artifact12369491656 from39643357168 under/tmp/tripwire-delta8-bulk-39643357168. Verified final netlist SHA375a262e…eaf64 against saved gate receipt before interpreting numeric cells. Start49681=U0cfgword0bit2/TXMODE[2]; endpoint48548=dropped[23], then48577=dropped[27],48502=dropped[2]. The path traverses mode decode, internal output feedback, sensed pin, event/fabric/drop logic. This is concrete evidence for the new limiter; no claim that the prior sample-time optimization is physically beneficial.
+- Saved per-path cell/arc bindings and delay breakdown under/tmp. First path has6.555408ns buffer/inverter arcs,0.662734ns hold delay,9.108915ns other cell arcs including launch and0.085205ns interconnect. Latch time given1.723868ns is separate. DEFs show the five-buffer chains were already present at initial snapshot, span hundreds of microns and stay fixed through final routing. Initial native design repair reports2383long wires/5642buffers at150µm,55% margins; this is a different intervention point from the null late wire2000 experiment.
+- Prepared D-102 single-variable clean wire600 screen with identical delta8 hardware and same strict checks. Shared runner accepts an explicit config transform with unchanged default; extracted source validation is reused before building. New tests verify exactly one effective config field changes, wrong source rejects before flow, default behavior and gate failures stay intact, and all workflow Bash/Python blocks parse.49 tests pass; git diff --check passes. No physical pass, DRT authorization, gate changes or phase boxes.
+- Next publish only scoped tools/tests/workflow/docs, check src/info/macro history, launch one wire600 screen on exact remote main and compare actual buffer counts, all-corner capture/setup/hold, electrical reserve, antenna and guide receipts against39643357168. Main hardware/config/template and unrelated local files/FIPE notes remain untouched.
+
+## 2026-10-21 — Timing-cache screen rejects physical promotion
+
+- Checked completed run39643357168 on exact26d5812: failure in the clean screen step, after all source/image preflights passed. Both evidence uploads succeed. Retrieved small gate artifact12369831990(191129bytes) under/tmp/tripwire-delta8-gates-39643357168; bulk artifact12369491656(291075930bytes) remains available for exact netlist/placement diagnosis.
+- Actual slew/cap/fanout counts0 at all corners; antenna nets/pins0. SetupWS0allcorners; fast hold+0.0918751ns passes50ps acceptance. Capture slow/typ/fast1.545619/8.314069/12.253133ns: slow misses3.5ns by1.954381ns and regresses0.715943ns versus counter-only39629337108. Low8 cache is not selected for promotion.
+- One conservative slow slew reserve miss: net02897, pin43518/B,1.137305ns against2.5074ns library limit, utilization45.35794% versus45% reserve gate. This is a reserve miss, not an actual max-slew violation. Cap reserves pass, maximum41.96167%. All39329 signal nets have guides, native incremental tracking/snapshots validated; guide presence alone does not prove detailed routing.
+- All first20 slow capture paths launch from49681, clocked through U0cfgword0 gate; worst endpoint48548, with one0.662734ns hold-delay cell in the reported path. Do not transfer numeric cell meanings from earlier candidates; exact bit/endpoint identity still requires this run's matching final netlist. The earlier PERIOD-target local improvement did not improve whole-design physical headroom.
+- No DRT, official run, unchanged rerun, gate relaxation, new hardware change or phase boxes. Next bind this run's final netlist to its saved snapshot hash, identify word0 bit/endpoints and compare logic/hold/clock contributions before choosing another controlled optimization. Record this as a legitimate physical rejection, not a CI bug. Unrelated local files preserved.
+
+## 2026-10-21 — Publish authorized timing-cache screen
+
+- User explicitly instructed “u do it” after being told publication/launch was pending; this authorizes the scoped commit/push/dispatch despite the supplied AGENTS Git reservation.
+- Published separate patches164e1bb, tools434f9a2, tests1d09c38, CI098edf6 and docs26d5812 groups. Push succeeded; local HEAD and remote main both26d5812bec63693ce8accc39ece24e139a7da3dd. Pre-push hardware-history check empty. Unrelated local files and FIPE notes excluded.
+- Dispatched [gds-native-sample-delta8-screen39643357168](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39643357168), verified in_progress on the exact published main head26d5812. No physical result or phase box claimed. Next verify the run head/source preflight, then examine strict all-corner timing/electrical/antenna/route evidence before considering detailed routing. This publication receipt remains local until the next evidence update.
+
 ## 2026-10-21 — Verify partial timing-value cache and prepare strict clean screen
 
 - Continued from failed counter screen39629337108. Main-branch latest test39629324487/lint39629324839/docs39629324422/unit39629324459 are green; latest physical screen remains failed on setup reserve. No replacement physical measurement or official pass claimed.

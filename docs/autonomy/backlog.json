@@ -328,9 +328,10 @@
         "October21: four-track copied-source RTL/model generated; strict full census10976storedbits;57local qualifier passes; matched eight-case hosted campaigns prepared",
         "39686140206 atb838632: both4/8track jobs57checks+8workloadsPASS; independent all16image/source/model auditsPASS; local10tile elaborationPASS",
         "39689008902 at7f8d1b8: matched62tests+20tilemappings+16compilerimagesPASS; independent pinned-PDK/cell-area audit; fourtrack fullcellcost-1.83%, LUT+2.24%; unchanged G1 outline packing rejected",
-        "D105 thirdprofile radix8_2:8736gridbits, local10tile elaboration/live-latch mappingPASS; BUG115 firstdraft rejected/fixed;71focusedchecksPASS"
+        "D105 thirdprofile radix8_2:8736gridbits, local10tile elaboration/live-latch mappingPASS; BUG115 firstdraft rejected/fixed;71focusedchecksPASS",
+        "39696113043 at0690b6b: both controlsSUCCESS with independent71test/source/model/8image audits; reducedradix compiler step still active; local complete fabric elaborationPASS"
       ],
-      "next_action": "Authenticate three-profile hosted mapping and all8workload outcomes; no new topology or seed search. Require capability preservation and plausible cost before representative physical work; configured-function/PDN/pin/seed/full-chip gates remain open.",
+      "next_action": "Await bounded reduced-radix compiler outcomes in39696113043; independently audit candidate cost/native cases/images before fit or nonfit claims. Preserve all3profiles; no new sweep. Follow-up source adds complete assembly elaboration and per-case progress persistence.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

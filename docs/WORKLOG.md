@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-21 (complete matched technology mapping prepared)
+**Done:** both clean regenerated4/8track model variants emit tile/config/switch RTL from isolated copied libraries. New mapped_cost.py uses pinned CMOS5L Liberty and PDK latch map; rejects unmapped logic and missing/extra live configuration latches. All10tile types map locally for each topology; multiplicity-weighted latch totals10976/11408 match full-grid census. Local outputs build/r1_mapped_grid_{four,eight}; no hosted area claim yet. Preliminary cost result is modest, with larger LUT-tile cell cost offset by border savings; this is not a demonstrated compact chip.
+**Checks:**62focused casesPASS in build/r1_mapping_checks.xml. Current previous R1 qualification39686638834 at6c35fcbSUCCESS; test/lint/docs/unit/autonomy green when inspected. Workflow now prepares reproducible matched full-grid mapping plus the existing8workload compiler gate; hosted run pending after push.
+**Next:** authenticate hosted mapping inputs/netlists/census and quantitative costs, then assess actual tile geometry/pin-access with shell and physical overhead included before selecting further topology/hardening. G1 protected; no physical attempts or phase boxes.
+
 ## 2026-10-21 (matched eight-workload gate passed and independently audited)
 **Actual:**39686140206 atb838632SUCCESS for both4/8track jobs. Each57strict checks and all8workloads pass native compiler/image generation. Each downloaded audit verifies147input hashes,284clean-library files,121FABulous modules, all candidate generated hashes and all8exact962-word FASM→image regenerations; CRC/version/native utilization match. Local audits build/r1_matched_hosted/tracks{4,8}/independent-audit.json. Both concurrency demands103/123LC retained. This is seed1 abstract routing, not loaded behavior/physical closure.
 **Further:** all10generated tile hierarchies elaborate successfully; generator now automatically runs bounded Icarus elaboration (SV mode for upstream primitives). Final local build/r1_four_tracks_v4 passes generation/census/elaboration. LUT padded mux slots1100→1132 is a cost risk despite reduced pins. Disposable synthesis area probe rejected because configuration latches remain unmapped; no area gain claimed.

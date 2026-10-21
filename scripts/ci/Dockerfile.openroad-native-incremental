@@ -1,0 +1,7 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY native_route_trace.py /usr/local/share/tripwire/native_route_trace.py
+COPY --chmod=755 openroad_route_trace_wrapper.sh /usr/local/bin/tripwire-route-trace
+RUN python3 -c "from pathlib import Path; import runpy, librelane; m=runpy.run_path('/usr/local/share/tripwire/native_route_trace.py'); m['instrument']((Path(librelane.__file__).parent/'scripts/openroad/rsz_timing_postgrt.tcl').read_text(), incremental=True)"
+RUN python3 -c "from pathlib import Path; import subprocess; p=Path('/tmp/tripwire-grt-help.tcl'); p.write_text('help global_route\nexit\n'); r=subprocess.run(['openroad','-exit',str(p)],capture_output=True,text=True,check=True); assert all(flag in r.stdout for flag in ('-start_incremental','-end_incremental')), r.stdout+r.stderr"
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-route-trace
+ENV TRIPWIRE_ROUTE_MODE=incremental

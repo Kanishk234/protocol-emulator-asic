@@ -9,7 +9,7 @@ SCRIPT_SHA256 = '17a7b1f4a7bce58cd2e33f6b7fc4a9a822a3332cee8901216184897e437ddec
 STAGES = ('initial_route', 'timing_repair', 'placement', 'final_route')
 
 
-def instrument(text):
+def instrument(text, incremental=False):
     if hashlib.sha256(text.encode()).hexdigest() != SCRIPT_SHA256:
         raise ValueError('Unexpected pinned native timing script')
     preamble = '''
@@ -36,13 +36,29 @@ proc tripwire_route_snapshot {stage} {
     final = '    source $::env(SCRIPTS_DIR)/openroad/common/grt.tcl\n}'
     text = text.replace(final, final.replace('\n}',
                         '\n    tripwire_route_snapshot final_route\n}'), 1)
+    if incremental:
+        # Track native setup/hold repair and DPL, not just newly inserted cells.
+        # The initial full GRT remains unchanged and initializes all routes.
+        anchor = 'estimate_parasitics -global_routing\n'
+        final_route = '    source $::env(SCRIPTS_DIR)/openroad/common/grt.tcl\n'
+        if text.count(anchor) != 1 or text.count(final_route) != 1:
+            raise ValueError('Ambiguous incremental route instrumentation')
+        text = text.replace(anchor, anchor+'global_route -start_incremental\n'
+                            'puts "TRIPWIRE_INCREMENTAL begin"\n', 1)
+        text = text.replace(final_route,
+            '    global_route -end_incremental\n'
+            '    puts "TRIPWIRE_INCREMENTAL end"\n'
+            '    write_guide $::env(STEP_DIR)/after_grt.guide\n', 1)
     return preamble + text
 
 
 def main():
     args = sys.argv[1:]
     if args and Path(args[-1]).name == 'rsz_timing_postgrt.tcl':
-        patched = instrument(Path(args[-1]).read_text())
+        mode = os.environ.get('TRIPWIRE_ROUTE_MODE', 'trace')
+        if mode not in ('trace', 'incremental'):
+            raise ValueError('Unknown route control mode')
+        patched = instrument(Path(args[-1]).read_text(), incremental=mode == 'incremental')
         with tempfile.NamedTemporaryFile(mode='w', suffix='.tcl', delete=False) as out:
             out.write(patched)
             args[-1] = out.name

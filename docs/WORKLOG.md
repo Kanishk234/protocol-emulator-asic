@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-21 (four-track generated model; matched campaign prepared)
+**Done:** copied-source global-channel transform emits real four-bit directional ports and regenerated switch/config/tile RTL. Local build/r1_four_tracks_v3 succeeds; automatic strict census10976stored/8326switch/2650other bits confirms prior graph projection,128LC/4timer/4shift/42IO retained. Initial empty-corner setup failure fixed and covered (BUG114).57focused qualifier testsPASS in build/r1_four_track_checks.xml. D104 records bounded software scope.
+**CI:** latest prior R1 qualification39685228590 at5eaec28SUCCESS; core test/lint/docs/autonomy passed, unit/fabric were in progress when inspected. Expanded workflow prepares matched4/8track jobs, each compiling six retained personalities plus two concurrent workloads, complete generated-artifact retention and finite timeouts. Hosted outcomes pending after push.
+**Next:** authenticate each matched compiler result, inspect any native routing failure and retain/reject topology on evidence. Physical compaction is still unmeasured; no phase boxes ticked, G1 untouched,121native control/118uninstalled proposal unchanged.
+
 ## 2026-10-21 (portable capacity audit and channel-cost screen)
 **Done:** complete hosted39480270318 at4a1f35aSUCCESS; independent downloaded audit48strict checks,53source/generated inputs,284library files,121FABulous modules; both962-word images reproduce exactly. UART+SPI103/128LC and UART+I2C123/128LC, each3/4primitive pairs. Abstract capacity/tool qualification only; no physical/timing/equal-area acceptance.
 **Screen:** global-only track folding preserves local jump/clock/carry wiring and explicitly builds mux choices for merged destinations. Six focused tests;54combined qualifier testsPASS in build/r1_track_combined.xml. Interior414LUT/386primitive select bits do not shrink at4/6tracks; complete128LC projected11408→11228/10976bits comes only from borders. Boundary pin reduction remains an ungenerated projection. Report records evidence and rejection criteria; no source hardware change or phase box ticked.

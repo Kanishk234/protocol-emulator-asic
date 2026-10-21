@@ -1,5 +1,11 @@
 # Bugs
 
+## 114: Track transformation rejects a legitimate empty corner
+- **Date:**2026-10-21.
+- **Symptom/check:** first local four-track generation stops before model export with Empty switch matrix.
+- **Root cause:** strict nonempty graph screen was applied to a corner tile with no switch connections.
+- **Fix/coverage:** transformation preserves empty corners; regression verifies merged direct edges become mux choices while the empty corner remains untouched. Second local generation and full10976-bit RTL census pass. No compiler or physical nonfit inferred from the initial setup failure.
+
 ## 113: Configuration census hashes and parses separate file reads
 - **Date:**2026-10-20.
 - **Symptom/check:** source review finds file hashes were captured before reopening text, allowing a concurrent edit to make the stored hash describe different bytes than the parsed census. No incorrect observed G1 count claimed.

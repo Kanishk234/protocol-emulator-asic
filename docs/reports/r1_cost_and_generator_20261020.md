@@ -35,3 +35,26 @@ Authenticate corrected hosted resource-model compilation before interpreting cap
 39479506675 at55c4120SUCCESS:47checks, clean control and both concurrent images pass. Native user-fabric PNR places103/128cells for UART+SPI and123/128 for UART+I2C, each using3of4timers/shifts; each image962words. This is the oversized model with placeholder timing, not silicon routing or an equal-area advantage.
 
 Downloaded audit verifies API/source identity, strict47XML cases, original-control hashes/graphs/maps and installed FABulous module hashes. Candidate-model audit stops because the default artifact policy omitted its hidden .FABulous directory. BUG112; rerun with explicit hidden generated-model retention before calling evidence fully portable. Separately, exact-buffer census hashing regression raises local qualification count to48.
+
+
+## Complete portable audit (October 21)
+
+[Run 39480270318](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39480270318), source4a1f35a7eeeff67b8cbac618e5dda5395c441cc0, succeeds with48strict checks and complete hidden model retention. Independent downloaded-artifact audit checks53source/generated inputs,284library files and121FABulous Python modules. Both FASM streams regenerate the emitted962-word CRC-checked images exactly. Native user-fabric placement reports103/128cells for UART+SPI and123/128 for UART+I2C, each3/4timer/shift pairs. The previous portable-audit gap is closed. Local audit: build/r1_hosted_complete/independent-audit.json. Physical, timing and equal-area acceptance remain false.
+
+## Global-channel folding screen (October 21)
+
+`tools/profiling/track_screen.py` folds only directional global channel names, retains eight local jump tracks and preserves clock/reset/carry names. Sources of merged destinations become explicit mux choices; aliases are never wired together. This is a graph proposal, not generated hardware. Six focused tests cover retained connections, direct-edge mux creation, source deduplication, supported arity and malformed inputs;54combined qualifier tests pass locally.
+
+Applied to the clean qualified G1 canonical switch connections:
+
+| Global tracks | LUT switch bits | Primitive switch bits | Projected complete 128LC control stored bits |
+|---|---:|---:|---:|
+| 8 | 414 | 386 | 11408 |
+| 6 | 414 | 386 | 11228 |
+| 4 | 414 | 386 | 10976 |
+
+Savings are entirely at borders:180or432bits. Merging direct global paths creates additional selections, offsetting interior savings. All projected mux fan-ins remain at most16. Raw ignored screen output: build/r1_track_proposals.json. Counts are analytical graph projections; regenerated configuration maps must confirm them.
+
+A LUT tile currently exposes306port bits, including192directional data-channel bits. Keeping its114fixed bits would project258ports at six tracks or210at four. This could reduce pin-access pressure, but neither port projection establishes a smaller legal macro, physical routability or timing. Retained local jump edges also do not establish whole-workload routability after global track loss.
+
+Next experiment: regenerate a four-global-track model from clean owned transformations, verify ports/configuration, then compile all six retained personalities and both concurrent workloads. Reject it on lost capability or insufficient total-cost benefit. Keep the unmodified eight-track oversized control for comparison; choose any third topology only after this screen. Physical evaluation still requires equal total area, the same50MHz target and complete native routing/timing evidence. No physical attempt has been consumed by these software screens.

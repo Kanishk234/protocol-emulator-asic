@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-21 (portable capacity audit and channel-cost screen)
+**Done:** complete hosted39480270318 at4a1f35aSUCCESS; independent downloaded audit48strict checks,53source/generated inputs,284library files,121FABulous modules; both962-word images reproduce exactly. UART+SPI103/128LC and UART+I2C123/128LC, each3/4primitive pairs. Abstract capacity/tool qualification only; no physical/timing/equal-area acceptance.
+**Screen:** global-only track folding preserves local jump/clock/carry wiring and explicitly builds mux choices for merged destinations. Six focused tests;54combined qualifier testsPASS in build/r1_track_combined.xml. Interior414LUT/386primitive select bits do not shrink at4/6tracks; complete128LC projected11408→11228/10976bits comes only from borders. Boundary pin reduction remains an ungenerated projection. Report records evidence and rejection criteria; no source hardware change or phase box ticked.
+**Next:** clean four-track port/config/RTL regeneration and all-six-plus-two compiler qualification before considering physical compaction. G1 protected; native121control unchanged and118proposal remains uninstalled. No new physical hardening attempt.
+
 ## 2026-10-20 (R1 resource-model fit; audit retention fix)
 **Actual:**39479506675 at55c4120SUCCESS with47strict checker passes. Both concurrent designs place/route in the oversized abstract model: UART+SPI103/128LC, UART+I2C123/128LC, each3/4timers and3/4shifts;962-word CRC-checked diagnostic images. No loaded-fabric/physical/timing/equal-area acceptance. Complete independent model/image audit remains pending because upload omits hidden .FABulous directory (BUG112). Fix prepared to retain hidden generated files only under build/r1_checks; no private native/heldout payload involved.
 **Other fix:** configuration census hash+parse now share exact byte buffer (BUG113);22focused testsPASS, total48qualification cases expected. No model or workload changes for retention retry.

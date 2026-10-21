@@ -12,9 +12,10 @@ sys.path.insert(0,str(ROOT/'test_internal'))
 from compile import compile as compiler
 from compile.bitfile import BitFile
 from cloud_arch_comparison import run_bounded
-from cloud_fresh_baseline import specification
+from cloud_fresh_baseline import specification, SINGLES
 
-CASES=('uart_spi_11','uart_i2c_11')
+PAIRS=('uart_spi_11','uart_i2c_11')
+CASES=(*(name for name in SINGLES if name != 'i2c_target'), *PAIRS)
 
 
 def worker(case, model, directory):
@@ -22,16 +23,16 @@ def worker(case, model, directory):
         raise RuntimeError('Explicit resource-control case must run hosted')
     directory=Path(directory);directory.mkdir(exist_ok=False)
     pins,sources,params=specification(case)
-    _,report=compiler.compile_design(sources,pins,Path(model),directory,seed=1,set_params=params,strict_ports=True)
+    _,report=compiler.compile_design(sources,pins,Path(model),directory,seed=1,set_params=params,strict_ports=case in PAIRS)
     util,fmax=compiler.parse_pnr_log(directory/'pnr.log')
     if util!=report['utilisation'] or not util or any(v['used']>v['available'] for v in util.values()):
         raise ValueError('Native usage/report mismatch')
     if (report['params']!=params or report['arch']!='r1_resource_control'
-            or report['unmapped_inputs_tied_0'] or report['unmapped_outputs_open']
+            or (case in PAIRS and (report['unmapped_inputs_tied_0'] or report['unmapped_outputs_open']))
             or report['build_options']['seed']!=1):
         raise ValueError('Concurrent workload identity differs')
     for resource in ('wp_timer','wp_shift'):
-        if util[resource]['used']!=3 or util[resource]['available']!=4:
+        if (case in PAIRS and util[resource]['used']!=3) or util[resource]['available']!=4:
             raise ValueError('Incorrect hard primitive usage')
     images=list(directory.glob('*.wbit'))
     if len(images)!=1:raise ValueError('Missing/ambiguous image')

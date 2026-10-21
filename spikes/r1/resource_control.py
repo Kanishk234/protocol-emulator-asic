@@ -42,7 +42,7 @@ def placeholder_corner(modeldir, pips):
         scope='Filename compatibility only; generated placeholder PIP delays. Do not compare rates or Fmax.'),indent=2)+'\n')
 
 
-def run(control, out):
+def run(control, out, tracks=8):
     from fabulous.fabulous_api import FABulous_API
     from fabulous.fabric_generator.code_generator.code_generator_Verilog import VerilogCodeGenerator
     import yaml
@@ -61,12 +61,46 @@ def run(control, out):
     if out == control or control in out.parents or out in control.parents:
         raise ValueError('Output and control must be disjoint')
     out.mkdir(parents=True, exist_ok=False)
+    proposals = None
+    if tracks != 8:
+        from fold_tracks import transform
+        original = FABulous_API(VerilogCodeGenerator())
+        original.loadFabric(control/'r1_g1_control.csv')
+        copied = out/'library'
+        shutil.copytree(library, copied)
+        proposals = transform(copied, original.getTiles(), tracks)
+        library = copied
     modeldir = out/'macro/fabulous/.FABulous'
     modeldir.mkdir(parents=True)
     fabric = out/'r1_resource_control.csv'
-    fabric.write_text(expanded_csv((control/'r1_g1_control.csv').read_text()))
+    fabric.write_text(expanded_csv((control/'r1_g1_control.csv').read_text()).replace(
+        str(control/'library'), str(library)))
     api = FABulous_API(VerilogCodeGenerator())
     api.loadFabric(fabric)
+    if proposals is not None:
+        from fabulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMemInit
+        for tile in api.getTiles():
+            directory = library/'tiles/tiny'/tile.name
+            if tile.globalConfigBits:
+                config = directory/(tile.name+'_ConfigMem.csv')
+                generateConfigMemInit(config, tile.globalConfigBits,
+                                      api.fabric.frameBitsPerRow, api.fabric.maxFramesPerCol)
+                api.setWriterOutputFile(directory/(tile.name+'_ConfigMem.v'))
+                api.genConfigMem(tile.name, config)
+            api.setWriterOutputFile(directory/(tile.name+'_switch_matrix.v'))
+            api.genSwitchMatrix(tile.name)
+            api.setWriterOutputFile(directory/(tile.name+'.v'))
+            api.genTile(tile.name)
+        from profiling.config_cost import census
+        flat = out/'rtl'
+        flat.mkdir()
+        for tile in api.getTiles():
+            for source in (library/'tiles/tiny'/tile.name).glob('*.v'):
+                shutil.copyfile(source, flat/source.name)
+        cost = census(fabric, flat)
+        if tracks == 4 and cost['totals']['stored_bits'] != 10976:
+            raise ValueError('Generated storage differs from folded graph projection')
+        (out/'configuration-cost.json').write_text(json.dumps(cost, indent=2, sort_keys=True)+'\n')
     model = api.gen_routing_model()
     for name,text in zip(('pips.txt','bel.txt','bel.v2.txt','bel.v3.txt','template.pcf'),model):
         (modeldir/name).write_text(text)
@@ -88,7 +122,8 @@ def run(control, out):
     (out/'arch.yaml').write_text(yaml.safe_dump(dict(name='r1_resource_control',arch_version=0x00FE,
         macro=str(out/'macro'),luts=128,primitives=dict(wp_timer=4,wp_shift=4),
         include_border_rows=True,config_rows=5,config_cols=8),sort_keys=False))
-    result = dict(passed=True,control_qualification_sha256=digest((control/'qualification.json').read_bytes()),
+    result = dict(passed=True,global_tracks=tracks,track_proposals=proposals,
+                  control_qualification_sha256=digest((control/'qualification.json').read_bytes()),
                   resources=dict(counts),source_fabric_sha256=digest(fabric.read_bytes()),
                   generated_sha256={str(p.relative_to(out)):digest(p.read_bytes()) for p in sorted(out.rglob('*')) if p.is_file()},
                   scope='Oversized six-column software capacity control only. Original tile geometry does not establish equal-area fit. No production architecture selected; diagnostic architecture ID0x00FE cannot load on G1.',
@@ -102,5 +137,6 @@ if __name__ == '__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--control',type=Path,required=True)
     parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--tracks',type=int,choices=(4,8),default=8)
     args=parser.parse_args()
-    print(json.dumps(run(args.control,args.out)['resources'],sort_keys=True))
+    print(json.dumps(run(args.control,args.out,args.tracks)['resources'],sort_keys=True))

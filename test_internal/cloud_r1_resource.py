@@ -18,6 +18,17 @@ PAIRS=('uart_spi_11','uart_i2c_11')
 CASES=(*(name for name in SINGLES if name != 'i2c_target'), *PAIRS)
 
 
+def failure_record(case, directory, error):
+    path=Path(directory)/'pnr.log'
+    diagnosis=dict(category='unobserved',fatal_messages=[],over_capacity=[],
+                   advice='No native PNR log; this is not evidence of architecture nonfit.')
+    if path.is_file():
+        util,_=compiler.parse_pnr_log(path)
+        diagnosis=compiler.diagnose_pnr_failure(path.read_text(errors='replace'),util)
+    return dict(case=case,status='failed',error=str(error)[:2000],native_diagnosis=diagnosis,
+                physical_acceptance=False,timing_acceptance=False)
+
+
 def worker(case, model, directory):
     if os.environ.get('GITHUB_ACTIONS')!='true' or case not in CASES:
         raise RuntimeError('Explicit resource-control case must run hosted')
@@ -67,11 +78,16 @@ def main(model,out):
                 physical_acceptance=False,timing_acceptance=False,equal_area_comparison=False)
     try:
         for case in CASES:
-            run_bounded([sys.executable,str(Path(__file__).resolve()),'--worker',case,str(model),str(out/case)],out/(case+'.log'))
-            row=json.loads((out/case/'case.json').read_text())
-            if row['case']!=case or row['tools']!=versions:raise ValueError('Worker identity differs')
-            result['cases'][case]=row
+            try:
+                run_bounded([sys.executable,str(Path(__file__).resolve()),'--worker',case,str(model),str(out/case)],out/(case+'.log'))
+                row=json.loads((out/case/'case.json').read_text())
+                if row['case']!=case or row['tools']!=versions:raise ValueError('Worker identity differs')
+                result['cases'][case]=row
+            except Exception as exc:
+                result['cases'][case]=failure_record(case,out/case,exc)
         if hashes()!=before:raise ValueError('Model changed during compile')
+        if any(row.get('status')=='failed' for row in result['cases'].values()):
+            raise RuntimeError('One or more workload checks failed; all outcomes retained')
         result['passed']=True
     except Exception as exc:
         result['error']=str(exc)

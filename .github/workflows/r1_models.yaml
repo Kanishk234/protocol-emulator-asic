@@ -8,6 +8,7 @@ on:
       - 'tools/profiling/tests/test_config_cost.py'
       - 'tools/profiling/track_screen.py'
       - 'tools/profiling/tests/test_track_screen.py'
+      - 'tools/profiling/tests/test_r1_track_transform.py'
       - 'tools/profiling/tests/test_r1_generator.py'
       - 'spikes/r1/**'
       - 'test_internal/cloud_r1_resource.py'
@@ -23,7 +24,11 @@ jobs:
   qualify:
     if: github.ref == 'refs/heads/efpga'
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        tracks: [8, 4]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -57,8 +62,8 @@ jobs:
         run: |
           source .venv/bin/activate
           mkdir -p build/r1_checks
-          python -m pytest -q tools/profiling/tests/test_config_cost.py tools/profiling/tests/test_r1_generator.py tools/profiling/tests/test_connectivity.py tools/profiling/tests/test_r1_resource.py tools/profiling/tests/test_r1_resource_campaign.py tools/profiling/tests/test_track_screen.py --junitxml=build/r1_checks/results.xml
-          python -m tools.autonomy.check_xml build/r1_checks/results.xml --minimum-cases 54
+          python -m pytest -q tools/profiling/tests/test_config_cost.py tools/profiling/tests/test_r1_generator.py tools/profiling/tests/test_connectivity.py tools/profiling/tests/test_r1_resource.py tools/profiling/tests/test_r1_resource_campaign.py tools/profiling/tests/test_track_screen.py tools/profiling/tests/test_r1_track_transform.py --junitxml=build/r1_checks/results.xml
+          python -m tools.autonomy.check_xml build/r1_checks/results.xml --minimum-cases 57
           git rev-parse HEAD > build/r1_checks/source-revision.txt
       - name: Count original full-fabric storage and mux structure
         run: |
@@ -74,9 +79,9 @@ jobs:
         run: |
           source .venv/bin/activate
           export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
-          python spikes/r1/resource_control.py --control build/r1_checks/control --out build/r1_checks/resource > build/r1_checks/resource.log 2>&1
-      - name: Compile both concurrent workloads on capacity control
-        timeout-minutes: 22
+          python spikes/r1/resource_control.py --control build/r1_checks/control --out build/r1_checks/resource --tracks ${{ matrix.tracks }} > build/r1_checks/resource.log 2>&1
+      - name: Compile six retained and two concurrent workloads
+        timeout-minutes: 82
         run: |
           source .venv/bin/activate
           export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
@@ -84,7 +89,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: r1-model-qualification-${{ github.run_id }}
+          name: r1-model-qualification-${{ github.run_id }}-tracks${{ matrix.tracks }}
           path: build/r1_checks/
           retention-days: 30
           include-hidden-files: true

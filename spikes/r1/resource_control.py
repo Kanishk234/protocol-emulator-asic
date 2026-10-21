@@ -43,7 +43,7 @@ def placeholder_corner(modeldir, pips):
         scope='Filename compatibility only; generated placeholder PIP delays. Do not compare rates or Fmax.'),indent=2)+'\n')
 
 
-def run(control, out, tracks=8):
+def run(control, out, tracks=8, emit_rtl=False):
     from fabulous.fabulous_api import FABulous_API
     from fabulous.fabric_generator.code_generator.code_generator_Verilog import VerilogCodeGenerator
     import yaml
@@ -63,13 +63,14 @@ def run(control, out, tracks=8):
         raise ValueError('Output and control must be disjoint')
     out.mkdir(parents=True, exist_ok=False)
     proposals = None
-    if tracks != 8:
+    if tracks != 8 or emit_rtl:
         from fold_tracks import transform
         original = FABulous_API(VerilogCodeGenerator())
         original.loadFabric(control/'r1_g1_control.csv')
         copied = out/'library'
         shutil.copytree(library, copied)
-        proposals = transform(copied, original.getTiles(), tracks)
+        if tracks != 8:
+            proposals = transform(copied, original.getTiles(), tracks)
         library = copied
     modeldir = out/'macro/fabulous/.FABulous'
     modeldir.mkdir(parents=True)
@@ -78,7 +79,7 @@ def run(control, out, tracks=8):
         str(control/'library'), str(library)))
     api = FABulous_API(VerilogCodeGenerator())
     api.loadFabric(fabric)
-    if proposals is not None:
+    if tracks != 8 or emit_rtl:
         from fabulous.fabric_generator.gen_fabric.gen_configmem import generateConfigMemInit
         for tile in api.getTiles():
             directory = library/'tiles/tiny'/tile.name
@@ -152,5 +153,6 @@ if __name__ == '__main__':
     parser.add_argument('--control',type=Path,required=True)
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--tracks',type=int,choices=(4,8),default=8)
+    parser.add_argument('--emit-rtl',action='store_true')
     args=parser.parse_args()
-    print(json.dumps(run(args.control,args.out,args.tracks)['resources'],sort_keys=True))
+    print(json.dumps(run(args.control,args.out,args.tracks,args.emit_rtl)['resources'],sort_keys=True))

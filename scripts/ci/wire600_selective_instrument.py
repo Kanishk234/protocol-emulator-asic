@@ -9,10 +9,15 @@ from native_route_trace_base import instrument as native_instrument
 
 def instrument(text):
     result = native_instrument(text, incremental=True)
-    anchor = 'puts "TRIPWIRE_INCREMENTAL begin"\n'
+    anchor = 'estimate_parasitics -global_routing\n'
     if result.count(anchor) != 1:
         raise ValueError('Ambiguous native selective insertion')
-    edits = '''write_verilog $::env(STEP_DIR)/selective.before.v
+    # Do not seed estimator caches before direct ODB connectivity edits. A
+    # second estimate does not necessarily clear invalid incremental state.
+    # Finish edit routing first, estimate once, then retain the native timing
+    # repair's independent incremental-routing interval.
+    edits = '''global_route -start_incremental
+write_verilog $::env(STEP_DIR)/selective.before.v
 source /usr/local/share/tripwire/electrical_repair.tcl
 source /usr/local/share/tripwire/incremental_placement.tcl
 set selective_frozen [tripwire_freeze_existing_placement]
@@ -21,11 +26,9 @@ source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl
 tripwire_restore_placement_status $selective_frozen
 write_verilog $::env(STEP_DIR)/selective.after.v
 global_route -end_incremental
-global_route -start_incremental
-estimate_parasitics -global_routing
-puts "TRIPWIRE_SELECTIVE repaired and refreshed; native timing repair follows"
 '''
-    return result.replace(anchor, anchor + edits, 1)
+    marker = 'puts "TRIPWIRE_SELECTIVE repaired and refreshed; native timing repair follows"\n'
+    return result.replace(anchor, edits + anchor + marker, 1)
 
 
 def main():

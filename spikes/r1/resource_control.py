@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import pickle
 import shutil
+import subprocess
 
 from qualify_generator import ROOT, compare_control, digest
 
@@ -101,6 +102,19 @@ def run(control, out, tracks=8):
         if tracks == 4 and cost['totals']['stored_bits'] != 10976:
             raise ValueError('Generated storage differs from folded graph projection')
         (out/'configuration-cost.json').write_text(json.dumps(cost, indent=2, sort_keys=True)+'\n')
+        # Upstream primitive sources use SystemVerilog; generated tile RTL is Verilog.
+        sources = [library/'models_pack.v', *sorted(flat.glob('*.v'))]
+        sources += [library/'primitives'/name/'fabulous'/(name+'.v')
+                    for name in ('FABULOUS_LC','IOBUF','GBUF','SYS_RESET')]
+        sources += sorted((library/'primitives/WARP/fabulous').glob('*.v'))
+        command = ['iverilog','-g2012','-tnull']
+        for tile in api.getTiles():
+            command += ['-s', tile.name]
+        elaboration = subprocess.run(command+list(map(str,sources)), capture_output=True,
+                                     text=True, timeout=120)
+        (out/'rtl-elaboration.txt').write_text(elaboration.stdout+elaboration.stderr)
+        if elaboration.returncode:
+            raise ValueError('Generated tile hierarchy does not elaborate')
     model = api.gen_routing_model()
     for name,text in zip(('pips.txt','bel.txt','bel.v2.txt','bel.v3.txt','template.pcf'),model):
         (modeldir/name).write_text(text)

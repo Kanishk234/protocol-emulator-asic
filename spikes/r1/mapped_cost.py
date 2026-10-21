@@ -3,6 +3,7 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import subprocess
@@ -19,6 +20,21 @@ def validate_cells(cells, expected_latches):
         raise ValueError('Unmapped cell types: '+str(sorted(unknown)))
     if cells.get('sg13cmos5l_dlhq_1',0) != expected_latches:
         raise ValueError('Configuration storage count changed')
+
+
+def accounted_area(modules, cells):
+    total=0.0
+    for name,count in cells.items():
+        if name == '$scopeinfo':
+            continue
+        try:
+            area=float(modules[name]['attributes']['area'])
+        except (KeyError,TypeError,ValueError) as exc:
+            raise ValueError('Cell has no library area: '+name) from exc
+        if not math.isfinite(area) or area <= 0:
+            raise ValueError('Invalid library area: '+name)
+        total += count*area
+    return total
 
 
 def run(model, pdk, out, tile='LUT4x8_ha'):
@@ -59,12 +75,16 @@ def run(model, pdk, out, tile='LUT4x8_ha'):
     with (out/'yosys.log').open('w') as log:
         subprocess.run(['yosys','-Q','-T','-s',str(script)],stdout=log,stderr=subprocess.STDOUT,
                        check=True,timeout=180)
-    netlist = json.loads((out/'mapped.json').read_text())['modules'][tile]
+    modules = json.loads((out/'mapped.json').read_text())['modules']
+    netlist = modules[tile]
     cells = Counter(cell['type'] for cell in netlist['cells'].values())
     validate_cells(cells, expected_latches)
     if before != {str(p):sha(p) for p in inputs}:
         raise ValueError('Inputs changed during synthesis')
     stat = json.loads((out/'stat.json').read_text())['modules']['\\'+tile]
+    area=accounted_area(modules,cells)
+    if not math.isclose(area,stat.get('area',0),rel_tol=1e-8,abs_tol=1e-4):
+        raise ValueError('Native statistics disagree with full cell-area accounting')
     result = dict(passed=True,tile=tile,expected_configuration_latches=expected_latches,
                   global_tracks=description['global_tracks'],
                   input_sha256=before,cell_counts=dict(cells),mapped_cell_area_um2=stat.get('area',0),

@@ -86,7 +86,10 @@ def test_instrument_preserves_native_timing_after_audited_edits():
     assert result.index('tripwire_restore_placement_status') < result.index('selective.after.v')
     assert result.count('global_route -end_incremental') == 2
     assert result.count('global_route -start_incremental') == 2
-    assert 'global_route -end_incremental\nglobal_route -start_incremental\nestimate_parasitics -global_routing' in result
+    assert result.count('estimate_parasitics -global_routing') == 1
+    assert (result.index('selective.after.v') < result.index('global_route -end_incremental')
+            < result.index('estimate_parasitics -global_routing')
+            < result.index('TRIPWIRE_INCREMENTAL begin') < result.index('repair_timing'))
     with pytest.raises(ValueError, match='pinned'):
         instrument(original+'# unknown change\n')
 
@@ -116,6 +119,24 @@ set ::env(GRT_RESIZER_RUN_GRT) 1
 rename source real_source
 proc source {path} {puts "SOURCE [file tail $path]"}
 proc unknown {args} {return {}}
+set parasitics_ready 0
+set invalid_parasitics 0
+rename source observed_source
+proc source {path} {
+    if {[file tail $path] eq "wire600_selective_targets.tcl" && $::parasitics_ready} {
+        set ::invalid_parasitics 1
+    }
+    observed_source $path
+}
+proc estimate_parasitics {args} {set ::parasitics_ready 1}
+proc repair_timing {args} {
+    if {[lsearch -exact $args -hold]>=0 && $::invalid_parasitics} {
+        error "EST-0104: edits after estimator initialization"
+    }
+}
+proc log_cmd {command args} {
+    if {$command eq "repair_timing"} {repair_timing {*}$args}
+}
 proc write_db {path} {set f [open $path w]; puts $f database; close $f}
 proc write_def {path} {write_db $path}
 proc write_verilog {path} {write_db $path}
@@ -127,6 +148,17 @@ proc write_verilog {path} {write_db $path}
     assert result.stdout.count('SOURCE wire600_selective_targets.tcl') == 1
     assert result.stdout.count('TRIPWIRE_SELECTIVE repaired and refreshed') == 1
     assert all((tmp_path/f'selective.{stage}.v').is_file() for stage in ('before', 'after'))
+    # Model the estimator guard's dirty-cache precondition. Reintroducing an
+    # estimate before direct ODB edits must reject even if estimated again.
+    bad = instrument(original).replace('write_verilog $::env(STEP_DIR)/selective.before.v',
+        'estimate_parasitics -global_routing\nwrite_verilog $::env(STEP_DIR)/selective.before.v', 1)
+    script.write_text(prelude+bad)
+    negative_root = tmp_path/'negative'
+    negative_root.mkdir()
+    (negative_root/'after_grt.guide').write_text('guides')
+    negative = subprocess.run([tcl, str(script), str(negative_root)], capture_output=True, text=True)
+    assert negative.returncode != 0
+    assert 'EST-0104: edits after estimator initialization' in negative.stderr
 
 
 def test_checkpoint_workflow_has_no_detailed_route_and_parses():

@@ -18,6 +18,14 @@ from wire600_selective_plan import BINDING, digest, plan, target_call, validate_
 OUTPUT = Path('runs/wire600-selective-screen')
 
 
+def timing_config(config):
+    # MACROS may contain dir::../macro/... references. The timing helper writes
+    # sibling configs, so retain the source config's directory for all of them.
+    path = Path(BINDING['files']['config']['path']).with_name('config_wire600_selective.json')
+    path.write_text(json.dumps(config, indent=2)+'\n')
+    return path
+
+
 def validate_run(run):
     if any(run.get(k) != v for k, v in {
         'id': BINDING['source_run'], 'head_sha': BINDING['source_head'],
@@ -70,8 +78,7 @@ def main():
         raise ValueError('Missing native incremental routing execution')
     validate_overflow(log)
     check_post_antenna_command(config, raw)
-    cfg = OUTPUT/'config.json'
-    cfg.write_text(json.dumps(config, indent=2)+'\n')
+    cfg = timing_config(config)
     timing = OUTPUT/'timing'
     screen(cfg, raw, timing, os.environ['PDK_ROOT'], repaired=raw,
            sdc=Path('src/signoff.sdc'),

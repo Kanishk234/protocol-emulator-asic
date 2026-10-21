@@ -1,0 +1,155 @@
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -31,6 +31,7 @@
+     input  wire [15:0]             wdata,
+     output wire [`TRW_PC_BITS-1:0] cfg,
+     output wire                    carrier_active,
++    output wire [24:0]             sample_delta,
+     output reg                     restart
+ );
+     localparam NW = `TRW_PC_WORDS;
+@@ -90,6 +91,60 @@
+             assign carrier_active = 1'b0;
+         end
+     endgenerate
++
++    // Configuration-only arithmetic; same high-phase visibility as its inputs.
++    wire [24:0] sample_delta_value = {1'b0, cfg[`TRW_PC_SAMPLEOFS_MSB:`TRW_PC_SAMPLEOFS_LSB]}
++                                   - {1'b0, cfg[`TRW_PC_PERIOD_MSB:`TRW_PC_PERIOD_LSB]};
++`ifdef TRW_PIN_CFG_FLOPS
++    assign sample_delta = sample_delta_value;
++`else
++    generate if (FULL != 0) begin: g_sample_delta
++        wire delta_write = we && (waddr >= (`TRW_PC_PERIOD_LSB / 16))
++                              && (waddr <= (`TRW_PC_SAMPLEOFS_MSB / 16));
++        wire [15:0] delta_data = rst_n ? wdata : 16'd0;
++        wire [23:0] next_period = (waddr == (`TRW_PC_PERIOD_LSB / 16))
++                               ? {cfg[`TRW_PC_PERIOD_MSB:`TRW_PC_PERIOD_LSB+16], delta_data}
++                               : (waddr == (`TRW_PC_PERIOD_MSB / 16))
++                               ? {delta_data[7:0], cfg[`TRW_PC_PERIOD_LSB+15:`TRW_PC_PERIOD_LSB]}
++                               : cfg[`TRW_PC_PERIOD_MSB:`TRW_PC_PERIOD_LSB];
++        wire [23:0] next_sample = (waddr == (`TRW_PC_SAMPLEOFS_LSB / 16))
++                               ? {cfg[`TRW_PC_SAMPLEOFS_MSB:`TRW_PC_SAMPLEOFS_LSB+16], delta_data}
++                               : (waddr == (`TRW_PC_SAMPLEOFS_MSB / 16))
++                               ? {delta_data[7:0], cfg[`TRW_PC_SAMPLEOFS_LSB+15:`TRW_PC_SAMPLEOFS_LSB]}
++                               : cfg[`TRW_PC_SAMPLEOFS_MSB:`TRW_PC_SAMPLEOFS_LSB];
++        wire [8:0] next_delta = {1'b0, next_sample[7:0]} - {1'b0, next_period[7:0]};
++        reg [8:0] delta_stage;
++        always @(posedge clk) begin
++            if (!rst_n)
++                delta_stage <= delta_write ? next_delta : 9'd0;
++            else if (delta_write)
++                delta_stage <= next_delta;
++        end
++        wire delta_gclk;
++`ifdef SYNTHESIS
++        sg13cmos5l_lgcp_1 u_icg_delta (.GCLK(delta_gclk), .CLK(clk), .GATE(delta_write));
++`else
++        reg delta_en_l;
++        /* verilator lint_off LATCH */
++        always @* begin
++            if (!clk) delta_en_l = delta_write;
++        end
++        /* verilator lint_on LATCH */
++        assign delta_gclk = clk & delta_en_l;
++`endif
++        reg [8:0] delta_q;
++        /* verilator lint_off LATCH */
++        always @* begin
++            if (delta_gclk) delta_q = delta_stage;
++        end
++        /* verilator lint_on LATCH */
++        wire [17:0] upper_sub = {1'b0, cfg[`TRW_PC_SAMPLEOFS_MSB:`TRW_PC_SAMPLEOFS_LSB+8], 1'b0}
++                                          - {1'b0, cfg[`TRW_PC_PERIOD_MSB:`TRW_PC_PERIOD_LSB+8], delta_q[8]};
++        assign sample_delta = {upper_sub[17:1], delta_q[7:0]};
++    end else begin: g_no_sample_delta
++        assign sample_delta = sample_delta_value;
++    end endgenerate
++`endif
+ 
+     always @(posedge clk) begin
+         if (!rst_n)
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -44,7 +44,7 @@
+ `include "trw_defs.vh"
+ `include "trw_assert.vh"
+ 
+-module trw_pin_bs (
++module trw_pin_bs #(parameter USE_SAMPLE_DELTA = 0) (
+     input  wire        clk,
+     input  wire        rst_n,
+     input  wire        restart,
+@@ -58,6 +58,7 @@
+     input  wire        oe_auto,
+     input  wire [1:0]  delim,        // 0 none, 1 flag, 2 se0
+     input  wire [23:0] period,       // 16.8 clocks
++    input  wire [24:0] sample_delta,
+     input  wire [23:0] sampleofs,    // 16.8 clocks after the bit start
+     input  wire [23:0] sjw,          // 16.8 clocks, 0 = hard sync only
+     input  wire [4:0]  idle_bits,
+@@ -136,7 +137,7 @@
+     // tb - min(tb, sjw) is either zero or tb - sjw. This removes one 25-bit
+     // arithmetic stage from the resync path without changing its saturation behavior.
+     wire [24:0] tb_r = !smp_done ? ((e < sj) ? per : tb + sj) : ((tb < sj) ? 25'd0 : tb - sj);
+-    wire [24:0] sp   = sof - per;                               // sample time - boundary time
++    wire [24:0] sp   = (USE_SAMPLE_DELTA != 0) ? sample_delta : sof - per;                               // sample time - boundary time
+     wire [24:0] x_n  = sp + tb;                                 // the sample time, from this clock's start
+     // Cancel the saturated correction before doing sample-time arithmetic.
+     // These identities hold modulo 2^25, including timer wrap and live writes.
+--- a/src/trw_pin_unit.v
++++ b/src/trw_pin_unit.v
+@@ -22,6 +22,7 @@
+ 
+ module trw_pin_unit #(
+     parameter FULL = 0,
++    parameter USE_SAMPLE_DELTA = 0,
+     parameter FRAC = 8           // time fraction bits; 8 is the spec (16.8). FRAC < 8 is a measurement
+                                  // variant only: it uses the top FRAC bits of the fraction fields
+ ) (
+@@ -30,6 +31,7 @@
+     input  wire                    restart,
+     input  wire                    live,
+     input  wire [`TRW_PC_BITS-1:0] cfg,
++    input  wire [24:0]             sample_delta,
+     input  wire                    carrier_active,
+     input  wire [23:0]             pads,
+     // consumer port head (TX half)
+@@ -165,11 +167,11 @@
+     wire [15:0] data_b;
+     generate
+         if (FULL != 0) begin : g_bs
+-            trw_pin_bs u_bs (
++            trw_pin_bs #(.USE_SAMPLE_DELTA(USE_SAMPLE_DELTA)) u_bs (
+                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .active (bs_on),
+                 .idle (idle), .order (order), .tx_lentok (tx_lentok), .nrzi (nrzi), .oe_auto (oe_auto),
+                 .delim (delim), .period (period),
+-                .sampleofs (sampleofs), .sjw (sjw),
++                .sampleofs (sampleofs), .sample_delta (sample_delta), .sjw (sjw),
+                 .idle_bits (idle_bits), .resync_both (resync), .nbits (nbits), .rx_nbits (rx_nbits),
+                 .stuff_n (stuff_n), .stuff_lvl (stuff_lvl), .crc_width (crc_width), .crc_skip (crc_skip),
+                 .crc_poly (crc_poly), .crc_init (crc_init), .crc_res (crc_res), .crc_xor (crc_xor),
+--- a/src/trw_chip.v
++++ b/src/trw_chip.v
+@@ -176,16 +176,17 @@
+             localparam FULL = (`TRW_PC_UNITS_PULSE >> u) & 1;               // D-040: U0-U1 full
+             wire [`TRW_PC_BITS-1:0] cfg;
+             wire        carrier_active;
++            wire [24:0] sample_delta;
+             wire        restart, rx_load, rx_free;
+             wire [1:0]  rx_tag;
+             wire [15:0] rx_data;
+             trw_pin_cfg #(.FULL (FULL)) u_cfg (
+                 .clk (clk), .rst_n (rst_n), .we (pcfg_we[u]), .waddr (pcfg_waddr), .wdata (hwd),
+-                .cfg (cfg), .carrier_active (carrier_active), .restart (restart)
+-            );
+-            trw_pin_unit #(.FULL (FULL)) u_unit (
++                .cfg (cfg), .carrier_active (carrier_active), .sample_delta (sample_delta), .restart (restart)
++            );
++            trw_pin_unit #(.FULL (FULL), .USE_SAMPLE_DELTA(1)) u_unit (
+                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg),
+-                .carrier_active (carrier_active), .pads (pads),
++                .carrier_active (carrier_active), .sample_delta (sample_delta), .pads (pads),
+                 .tx_avail (avail[C_U+u]), .tx_tag (head[18*(C_U+u)+16 +: 2]), .tx_data (head[18*(C_U+u) +: 16]),
+                 .tx_take (take[C_U+u]),
+                 .rx_free (rx_free), .rx_load (rx_load), .rx_tag (rx_tag), .rx_data (rx_data),

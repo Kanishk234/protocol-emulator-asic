@@ -19,6 +19,13 @@ from sram_bank_clean_route import unique
 OUTPUT = Path('runs/native-incremental-route-control')
 
 
+def record_control_image(gates, image):
+    if gates.get('qualified') is not False or gates.get('diagnostic_only') is not True:
+        raise ValueError('Incremental image metadata requires a diagnostic-only receipt')
+    return dict(gates, custom_image=True, custom_image_name=image,
+                native_routing_modified=True)
+
+
 def main():
     original = json.loads(Path('src/config_native_stock.json').read_text())
     validate(json.loads(Path('/tmp/native-source-run.json').read_text()), original, PROFILE)
@@ -59,6 +66,7 @@ def main():
     margin = measure(list(timing.glob('after-*/*-openroad-stamidpnr/electrical_margin.rpt')))
     gates = evaluate(json.loads((timing/'comparison.json').read_text()), antenna, reports, margin)
     gates = record_capture(gates, timing)
+    gates = record_control_image(gates, image)
     coverage = {c: routing_objects(unique(timing/f'after-{c}',
                 '*-openroad-stamidpnr/route_coverage.rpt').read_text(), c) for c in CORNERS}
     if any(v != coverage[CORNERS[0]] for v in coverage.values()):

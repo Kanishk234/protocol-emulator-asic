@@ -55,8 +55,10 @@ def checkpoint(root, final_antenna=False):
     return stages[0]
 
 
-def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimingPostGRT'):
-    if os.environ['VARIANT'] not in {'bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select', 'bs-resync-cfg-tx-cached-lane-mask'}:
+def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimingPostGRT', image_override=None):
+    if image_override not in (None, 'tripwire-native-incremental-route:local'):
+        raise ValueError('Unreviewed native screen image')
+    if os.environ['VARIANT'] not in {'bs-event-late', 'bs-resync-event', 'bs-event-cfg-staging', 'bs-resync-event-cfg-staging', 'bs-resync-cfg-tx-cursor', 'bs-resync-cfg-tx-cached-select', 'bs-resync-cfg-tx-cached-lane-mask', 'bs-resync-cfg-tx-cached-lane-mask-drop-parallel'}:
         raise ValueError('Unreviewed source variant')
     original = json.loads(Path('src/config_merged.json').read_text())
     sdc = Path('src/signoff.sdc')
@@ -84,6 +86,8 @@ def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimin
     flow = root / 'flow'
     flow.mkdir(parents=True, exist_ok=False)
     os.environ.pop('LIBRELANE_IMAGE_OVERRIDE', None)
+    if image_override is not None:
+        os.environ['LIBRELANE_IMAGE_OVERRIDE'] = image_override
     subprocess.run([sys.executable, '-m', 'librelane', '--pdk-root', os.environ['PDK_ROOT'],
                     '--docker-no-tty', '--dockerized', '--pdk', 'ihp-sg13cmos5l',
                     '--manual-pdk', '--run-tag', 'native-stock', '--force-run-dir', str(flow),
@@ -96,9 +100,12 @@ def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimin
         'source_variant': os.environ['VARIANT'], 'synthesis_strategy': config['SYNTH_STRATEGY'],
         'repair_corners': list(CORNERS),
         'hold_target_ns': config['GRT_RESIZER_HOLD_SLACK_MARGIN'],
-        'stock_sequence': not final_antenna, 'checkpoint_ecos': False,
+        'stock_sequence': not final_antenna and image_override is None, 'checkpoint_ecos': False,
         'post_grt_design_repair': config.get('RUN_POST_GRT_DESIGN_REPAIR', False),
         'extracted': False, 'official_signoff': False,
+        'custom_image': image_override is not None,
+        'custom_image_name': image_override,
+        'native_routing_modified': image_override is not None,
     }
     if cluster is not None:
         recipe['clock_sink_clustering_size'] = config['CTS_SINK_CLUSTERING_SIZE']

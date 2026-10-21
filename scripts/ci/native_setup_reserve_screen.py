@@ -58,11 +58,13 @@ def enforce(root):
         raise ValueError('Native setup reserve screen fails; no detailed routing')
 
 
-def main(config_transform=configure):
+def main(config_transform=configure, image_override=None, audit_tcl=None):
     root = Path('runs/native-stock-screen')
+    extra = {} if image_override is None else {'image_override': image_override}
     try:
         margin_screen(config_transform=config_transform, final_antenna_repair=True,
-                      audit_tcl=Path('workflow-src/scripts/ci/native_timing_headroom_audit.tcl'))
+                      audit_tcl=Path(audit_tcl) if audit_tcl is not None else
+                      Path('workflow-src/scripts/ci/native_timing_headroom_audit.tcl'), **extra)
     except Exception:
         # A completed electrical rejection still has useful setup evidence.
         # Preserve the original failure even if setup evidence is incomplete.

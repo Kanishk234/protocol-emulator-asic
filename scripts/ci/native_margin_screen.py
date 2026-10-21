@@ -81,8 +81,10 @@ def audit_post_antenna(before_state, repaired_state, timing_root):
     return path
 
 
-def main(config_transform=configure, final_antenna_repair=False, audit_tcl=None):
+def main(config_transform=configure, final_antenna_repair=False, audit_tcl=None, image_override=None):
     extra = {'stop_step': 'OpenROAD.RepairAntennas-1'} if final_antenna_repair else {}
+    if image_override is not None:
+        extra['image_override'] = image_override
     probe = 'native_post_antenna_audit.tcl' if final_antenna_repair else 'electrical_margin_probe.tcl'
     stock_screen(config_transform=config_transform,
                  extra_tcl=Path(audit_tcl) if audit_tcl is not None else Path('workflow-src/scripts/ci')/probe, **extra)
@@ -117,7 +119,10 @@ def main(config_transform=configure, final_antenna_repair=False, audit_tcl=None)
                        json.loads(metrics[0].read_text()), reports, margin)
     receipt.update(final_state=str(source), final_timing_root=str(timing_root),
                    final_native_antenna_repair=final_antenna_repair,
-                   stock_sequence=not final_antenna_repair)
+                   stock_sequence=not final_antenna_repair and image_override is None,
+                   custom_image=image_override is not None,
+                   custom_image_name=image_override,
+                   native_routing_modified=image_override is not None)
     (root/'gates.json').write_text(json.dumps(receipt, indent=2)+'\n')
     if not receipt['qualified']:
         raise ValueError('Native clean-build margin screen fails; no detailed routing')

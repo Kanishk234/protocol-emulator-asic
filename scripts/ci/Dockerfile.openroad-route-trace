@@ -1,0 +1,5 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY native_route_trace.py /usr/local/share/tripwire/native_route_trace.py
+COPY --chmod=755 openroad_route_trace_wrapper.sh /usr/local/bin/tripwire-route-trace
+RUN python3 -c "from pathlib import Path; import runpy, librelane; m=runpy.run_path('/usr/local/share/tripwire/native_route_trace.py'); m['instrument']((Path(librelane.__file__).parent/'scripts/openroad/rsz_timing_postgrt.tcl').read_text())"
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-route-trace

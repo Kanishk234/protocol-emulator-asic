@@ -1,5 +1,11 @@
 # Bugs
 
+## 115: Reduced-radix paired LUT choices leave dead shared configuration
+- **Date:**2026-10-21.
+- **Symptom/check:** strict local technology mapping of first radix8_2 draft retains428of438LUT configuration latches and fails admission.
+- **Root cause:** adjacent paired LUT input subsets overlap, leaving some shared gather outputs disconnected; synthesis removes dead selector state.
+- **Fix/coverage:** choose complementary halves for paired LUTs, preserving all four shared gather paths. Regression checks complete pair coverage. Corrected v2 all-ten-tile mapping retains438LUT/334primitive bits and full8736grid latch census. No cost or compiler result accepted from the first draft.
+
 ## 114: Track transformation rejects a legitimate empty corner
 - **Date:**2026-10-21.
 - **Symptom/check:** first local four-track generation stops before model export with Empty switch matrix.

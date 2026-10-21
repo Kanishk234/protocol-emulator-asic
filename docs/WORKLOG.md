@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-21 (third bounded topology implemented)
+**Done:** D105 radix8_2 structural transform caps local escape at8choices and local/LUT gather at2; matching preserves every cell output per cardinal bank, complementary paired inputs preserve shared gather use. Clock/reset/enable/carry, primitive input selectors and border choices unchanged from four-track control. Regenerated8736grid bits,438LUT/334primitive stored bits. First draft dead shared paths remove10latches; BUG115 rejected/fixed. Corrected v2 all10hierarchies elaborate and all10mapped tile latch censuses pass locally. No hosted area/fit claim yet.
+**Autonomy:** campaign now retains all8workload outcomes after a failed worker, classifies native fatal evidence and labels absent PNR as unobserved. Workflow fixes3profiles, retains complete artifacts, maps alltiles and runs all8workloads; mapping failure remains red while independent compiler diagnostics may proceed. 71focused source checksPASS in build/r1_radix_checks.xml.
+**Next:** hosted qualification and independent allprofile audit; reject capability loss or inadequate physical cost. Representative pin/PDN/geometry and configured functionality remain unproven. No physical attempt or phase boxes; G1 and121/118evidence protected.
+
 ## 2026-10-21 (hosted mapping audited; unchanged-outline shrink rejected)
 **Actual:**39689008902 at7f8d1b8bothjobsSUCCESS:62strict checks,20mappedtiletypes,16nativecompiler/image successes. Independent source/model/image audits pass; separate pinned-PDK Git-object/Liberty audit verifies129mapping inputs per topology, every mapped cell area, counts and weighted full-grid sums. Actual synthesis cell sums665981.9082→653775.5700µm² (1.83%reduction), while LUT cell cost grows2.24%; ports306→210. These are idealized cell sums, not physical area/timing/equal-area acceptance.
 **Decision:** unchanged G1 outline/borders would allocate27145.8432µm² per6x3interior slot, below measured32790.4416µm² LUT cell cost before physical overhead. Reject simple unchanged-outline shrink; retain four-track software control. No hardening attempt spent on that infeasible packing assumption.

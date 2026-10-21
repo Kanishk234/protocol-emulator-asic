@@ -5,6 +5,20 @@ Newest entry at the top. One entry per work session.
 
 
 
+
+
+## 2026-10-21 — Correct selective-repair parasitic initialization order
+
+- Inspected failed39688233973/job119527642100 on4c30423. Source/proposal/image preflights pass; all68buffers are inserted and legalized (maximum displacement29.9µm). Native setup repair reports no setup violations, then hold repair aborts EST-0104 inconsistent parasitics state. No final all-corner physical gates exist; do not classify this run as an electrical/timing rejection or a passing screen.
+- Downloaded evidence12388805267(10816991bytes) under/tmp/tripwire-selective-failed-39688233973. Independently audited actual CI selective.before.v→selective.after.v against canonical proposal: all identity connections and68new cells conserved. This confirms execution of planned edits, not physical qualification.
+- Logged BUG131. Initial hook estimated parasitics before direct ODB edits and re-estimated inside a routing interval; current upstream estimator code checks a dirty-state precondition at incremental guard entry. Exact internal callback lifecycle not reproduced locally. Pinned LibreLane3.1.0.dev3 wheel confirms common/grt.tcl routes/writes guides without estimating parasitics. Corrected hook therefore edits/legalizes/reroutes before the first estimate, estimates once, then enters the original native setup/hold interval. Same source,68buffers, repair targets, constraints and strict gates; no new candidate or timing exception.
+- Regression checks execute corrected Tcl ordering under an estimator-state model and reject an intentionally early estimate; this is not a real OpenROAD estimator reproduction.33focused checks pass without skips, including pinned-script hash guard, actual Tcl execution, image module layout and prior incremental controls. Raw CI source/edits/evidence retained outside Git. Next publish scoped fix/tests/docs and rerun one selective screen; actual pinned execution must validate the correction before any physical claim. No phase boxes, DRT or official run.
+
+## 2026-10-21 — Publish and launch selective electrical checkpoint
+
+- Continuing authorized Phase2 closure work, published scoped toolsc90cc5f, tests142bb67, CIe24aca9 and docs4c30423. Push succeeded; local HEAD and remote main both4c3042322d0b56925114f5659533426f5ea80231. Pre-push src/info/macro history empty; unrelated local files and FIPE notes excluded.
+- Dispatched [gds-wire600-selective-screen39688233973](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39688233973), verified in_progress on the exact published head. It tests68identity buffers on37measured electrical sources from the exact post-antenna wire600 checkpoint, preserving all strict gates and native timing/antenna repair. Physical results remain pending; no phase boxes, official pass or routing authorization. Next inspect source/image preflight, connectivity audit and complete measured gates; a passing checkpoint still requires clean reproduction. Publication receipt remains local until next evidence update.
+
 ## 2026-10-21 — Prepare targeted electrical checkpoint with complete source audits
 
 - Retrieved wire600 bulk12386845617 under/tmp/tripwire-wire600-bulk-39677316308. Verified final-route snapshot hashes, then traced the actual final post-antenna state: ODB727f588b…e50b2, NL369a4803…40667, DEFdeb05152…e768e. Several actual fanout failures are late diode loads: place7545 goes8→16,27445 goes7→13,wire12382 goes5→10. Other failed drivers also include diode loads. This recurs under known BUG106; initial-route topology is not sufficient for a final repair proposal.

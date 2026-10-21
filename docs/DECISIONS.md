@@ -1198,6 +1198,15 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost/risk: new pinned wrapper image and one checkpoint experiment. Incremental routing may still detour, may expose a tool interaction with internal resizer routing, and does not fix the independent20400reserve or guarantee3.5ns slow capture. Build-time script-hash/API checks and local Tcl/sequence tests precede physical execution. If beneficial, clean synthesis/native-flow reproduction remains mandatory.
 - Status: prepared locally; not physically executed or adopted. Official incremental routing reference: https://openroad.readthedocs.io/en/latest/main/src/grt/README.html . Local cached OpenROAD advertises both tracking options; the pinned container must pass its own help check before execution.
 
+## D-100 (2026-10-21): test parallel drop-counter updates without new state
+
+- General need: configuration→pin-unit readiness→fabric drop counting remains a slow capture path. The generic8-bit saturating counter must preserve reset, configuration-write exclusion and simultaneous drop-over-clear priority for every consumer, independent of protocol.
+- Isolated delta: form each bit's carry/toggle from registered count state, XOR with the late increment predicate, and apply clear through a common keep predicate. No new state/cycle/encoding/port; keep model independent and unchanged. A wrong clear/drop-priority negative control fails on all8count bits. Exact cached-port base1ffd8c…508ba→167449…da657; source-bound delta and frozen five-file trial patches prepared.
+- Evidence: module equivalence for N1..16 (four-step induction cap), fresh22/22expanded protocol tests,7channel tests and2,048clock Icarus model/RTL lockstep all pass. Local standard-cell area398672.9334→398222.5086µm² (−0.113%); FF2318/latches2065 unchanged; ideal-wire/clock worst FF slack4.942345→5.275478ns. Cell count alone is not routeability evidence. Stateless selected-mode launch arrival14.099759→13.440187ns; this selected-pin metric is separate from all-FF capture timing.
+- Rejected/held alternatives: operation-forwarded counter proves functional equivalence but worsens whole-chip ideal timing despite improving selected mode paths; separate routine-word storage adds area and also worsens mapping, with its internal correspondence proof incomplete. Neither is selected for physical screening.
+- Prepare one clean-source counter screen with the D-099 incremental routing wrapper, native final antenna, unchanged20ns/hold50ps/capture3.5ns/electrical45% gates, all-corner route-object checks and no DRT. Image selection is explicit and restricted; prior workflows retain the stock image default. A physical result, zero reserve misses, clean-flow reproduction and official signoff remain required. No main RTL/config/template change adopted.
+- Status: proved locally and prepared for separate screening; physical improvement unproven.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

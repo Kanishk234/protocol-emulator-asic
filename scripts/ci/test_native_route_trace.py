@@ -19,7 +19,8 @@ def test_pinned_script_preserves_commands():
     assert all(patched.count('tripwire_route_snapshot '+stage+'\n') == 1 for stage in STAGES)
 
 
-def test_tcl_snapshot_execution(tmp_path):
+@pytest.mark.parametrize('incremental', [False, True])
+def test_tcl_snapshot_execution(tmp_path, incremental):
     tcl = shutil.which('tclsh') or shutil.which('tclsh8.6')
     if not tcl:
         pytest.skip('Tcl interpreter unavailable')
@@ -37,16 +38,31 @@ proc write_def {path} {write_db $path}
 proc write_verilog {path} {write_db $path}
 '''
     script = tmp_path/'instrumented.tcl'
-    script.write_text(prelude+instrument(original))
+    script.write_text(prelude+instrument(original, incremental=incremental))
     (tmp_path/'after_grt.guide').write_text('guides')
     result = subprocess.run([tcl, str(script), str(tmp_path)], capture_output=True, text=True, check=True)
     assert set(collect(tmp_path, result.stdout)) == set(STAGES)
     observed = [line for line in result.stdout.splitlines()
                 if line.startswith('TRIPWIRE_') or line.endswith('grt.tcl') or line.endswith('dpl.tcl')]
-    assert observed == ['NATIVE_SOURCE grt.tcl', 'TRIPWIRE_ROUTE_SNAPSHOT initial_route',
+    expected = ['NATIVE_SOURCE grt.tcl', 'TRIPWIRE_ROUTE_SNAPSHOT initial_route',
                         'TRIPWIRE_ROUTE_SNAPSHOT timing_repair', 'NATIVE_SOURCE dpl.tcl',
                         'TRIPWIRE_ROUTE_SNAPSHOT placement', 'NATIVE_SOURCE grt.tcl',
                         'TRIPWIRE_ROUTE_SNAPSHOT final_route']
+    if incremental:
+        expected.pop(-2)
+        observed = [line for line in observed if not line.startswith('TRIPWIRE_INCREMENTAL')]
+        assert result.stdout.count('TRIPWIRE_INCREMENTAL begin\n') == 1
+        assert result.stdout.count('TRIPWIRE_INCREMENTAL end\n') == 1
+    assert observed == expected
+
+
+def test_incremental_tracks_repair_and_placement():
+    original = Path(__file__).with_name('fixtures').joinpath('native_rsz_timing_postgrt.tcl').read_text()
+    patched = instrument(original, incremental=True)
+    assert patched.count('source $::env(SCRIPTS_DIR)/openroad/common/grt.tcl') == 1
+    assert patched.index('global_route -start_incremental') < patched.index('# Resize')
+    assert patched.index('source $::env(SCRIPTS_DIR)/openroad/common/dpl.tcl') < patched.index('global_route -end_incremental')
+    assert patched.index('global_route -end_incremental') < patched.index('tripwire_route_snapshot final_route')
 
 
 def test_reject_unknown_script():

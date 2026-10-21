@@ -76,6 +76,7 @@ def main(model,out):
                 run=os.environ.get('GITHUB_RUN_ID'),attempt=os.environ.get('GITHUB_RUN_ATTEMPT'),
                 source=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                 physical_acceptance=False,timing_acceptance=False,equal_area_comparison=False)
+    (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
     try:
         for case in CASES:
             try:
@@ -85,6 +86,9 @@ def main(model,out):
                 result['cases'][case]=row
             except Exception as exc:
                 result['cases'][case]=failure_record(case,out/case,exc)
+            (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
+            print(json.dumps(dict(case=case,status=result['cases'][case].get('status','passed'),
+                                  native_category=result['cases'][case].get('native_diagnosis',{}).get('category'))),flush=True)
         if hashes()!=before:raise ValueError('Model changed during compile')
         if any(row.get('status')=='failed' for row in result['cases'].values()):
             raise RuntimeError('One or more workload checks failed; all outcomes retained')

@@ -37,6 +37,10 @@ def test_campaign_records_failure_and_still_runs_all_workloads(tmp_path,monkeypa
     called=[]
     def execute(command,log):
         case=command[3];called.append(case)
+        if len(called)>1:
+            partial=json.loads((tmp_path/'out/result.json').read_text())
+            assert partial['passed'] is False
+            assert set(partial['cases'])==set(called[:-1])
         folder=Path(command[-1]);folder.mkdir()
         if len(called)==1:
             (folder/'pnr.log').write_text('ERROR: failed to route net example\n')

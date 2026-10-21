@@ -122,6 +122,16 @@ def run(control, out, tracks=8, emit_rtl=False, radix='full'):
         (out/'rtl-elaboration.txt').write_text(elaboration.stdout+elaboration.stderr)
         if elaboration.returncode:
             raise ValueError('Generated tile hierarchy does not elaborate')
+        assembled=out/'fabric.v'
+        api.setWriterOutputFile(assembled)
+        api.genFabric()
+        assembled_check=subprocess.run(
+            ['iverilog','-g2012','-tnull','-s',api.fabric.name,
+             str(assembled),*map(str,sources)],
+            capture_output=True,text=True,timeout=120)
+        (out/'fabric-elaboration.txt').write_text(assembled_check.stdout+assembled_check.stderr)
+        if assembled_check.returncode:
+            raise ValueError('Generated assembled fabric does not elaborate')
     model = api.gen_routing_model()
     for name,text in zip(('pips.txt','bel.txt','bel.v2.txt','bel.v3.txt','template.pcf'),model):
         (modeldir/name).write_text(text)

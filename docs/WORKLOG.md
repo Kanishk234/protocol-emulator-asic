@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-20 — Confirm routed detour and prepare native final-reroute control
+
+- Compared source43and44 DEFs/readback NL: main driver36506 and sinkwire12246 have identical masters/positions/orientations and connectivity. Net20400 driver25897 and selected sinks31605/40886 also unchanged. Source41/44after_grt.guide for10742 changes from local Y187.2..201.6µm to detourY194.4..640.8µm; nominal source/sink separation113.76µm. Geometry proves a global-route guide detour alongside the measured6.278xcap rise. No assumption of directly attached hold buffers or tool bug.
+- D-098: prepare a checkpoint-only stock GRT_RESIZER_RUN_GRT=False control from exact source43 ODB96d32d5a…a4cf, leaving initial GRT,125pshold repair, final native antenna and every acceptance threshold unchanged. All three corners get fresh connectivity/STA/electrical/reserve measurements and route-object counts. Diagnostics never authorize DRT/official use; workflow success means completed measurements, while checkpoint_measured_gates_pass separately reports physical gate status. Missing/malformed evidence and source mutation still fail.
+-76local tests pass with isolated/tmp Tcl interpreter (no system install), including real Tcl branches, exact-policy/default checks, wrong/mutated source, setup/electrical/routing failures and prior stage/reporting regressions. Actual downloaded sourceODB hash, API/source hashes and archived config replay pass (only checkout-specific absolute SDC paths reanchored for local replay). Pinned3.1.0.dev3 bool/default/step sequence and workflow syntax checked. Code prepared in separate helper/Tcl/test/workflow files; no main src/config/template changes. No phase boxes ticked.
+- Next publish reviewed groups under continuing authorization and launch exactly one native-no-final-grt-control. This isolates route churn; independent net20400reserve and~0.55ns setup headroom deficit remain unresolved. Preserve unrelated dirty files/FIPE notes. No new clean hardening or detailed route yet.
+
+## 2026-10-20 — Read-only lane diagnosis succeeds; isolate repair-stage wire load
+
+- Checked completed success [39508461951](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39508461951), job118923251311, duration5m43s. Artifact12305095236; selected reports and diagnosis JSON saved/tmp/tripwire-lane-mask-diagnosis-39508461951. Success means measurements completed, not physical qualification: receipt retains qualified=false/repair_performed=false and exact failed source39498376778/f365a50.
+- Stages39/41/43/44/45 slow capture2.897949/3.027365/3.027365/2.958014/2.952390ns. No stage meets3.5ns. Main net10742 slew utilization34.869%→15.505%→15.505%→75.555%→75.555%; fanout4→1→1→1→1. Between43and44 its estimated capacitance rises0.015147→0.095090pF (6.278x), same logical driver/load count. This localizes that reserve regression to timing/hold repair plus its placement/rerouting/RC estimation; it does not yet identify which physical sub-operation caused it.
+- Second net20400 already misses45% reserve at stage39(48.560%), then47.699% after design repair and47.031% after timing repair/final antenna. Fanout8 throughout. Final antenna leaves the two target-net electrical measurements unchanged; slow capture decreases5.624ps. Do not infer all-net antenna neutrality.
+- Next compare exact driver/sink masters/positions and routing topology across43→44, then target that wire-load regression and the independent pre-existing net20400 reserve. Native design repair initially helps main net; broad late repair previously cost setup, so do not repeat a blind broad sweep. No new physical run, no DRT, no phase box ticked. Evidence entry local until next publication.
+
+## 2026-10-20 — Published exact-source read-only lane diagnosis
+
+- Continued approved troubleshooting with grouped tool6648b2d/test1bd8131/CI82dbd1f/docs5cb3708 commits and successful push. Local/remote main both5cb3708467dad3163282b63c98c1c54871621d82. No src/info/macro history in publication; unrelated files and local-only FIPE notes preserved.
+- Dispatched exactly one [gds-native-lane-mask-stage-diagnosis39508461951](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39508461951), confirmed queued on that exact head.44focused checks and actual archive/source preflight pass. Probe reuses failed39498376778 databases with pinned toolchain; no synthesis or repair/routing and no qualification authority.
+- Next compare stage39/41/43/44/45 target-net slew/cap/fanout and slow FF capture to choose a source-bound repair. No unchanged lane-mask rerun or DRT. No phase boxes ticked. This launch receipt remains local until next evidence publication.
+
 ## 2026-10-20 — Lane-mask screen rejected; prepare pinned read-only stage diagnosis
 
 - Inspected completed failure39498376778, job118889258996, gate artifact12304232186 and selected physical netlists from bulk12304676156. No helper crash: all actual electrical counts/antenna zero, fast hold0.119808ns, slow/typ/fast FF capture2.952390/9.174344/12.817332ns. Slow capture misses3.5ns and slew reserve fails slow nets10742(0.7555471803),20400(0.4703070910) and typical10742(0.4859288506). Reporting fix correctly preserves setup and electrical rejection together. No DRT/official promotion or phase boxes.

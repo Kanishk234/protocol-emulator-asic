@@ -11,7 +11,7 @@ import native_route_trace
 sys.modules['native_route_trace_base'] = native_route_trace
 from wire600_selective_instrument import instrument
 from wire600_selective_plan import BINDING, nearest_row, partition, power_anchor, validate_files, validate_proposal
-from wire600_selective_screen import validate_run
+from wire600_selective_screen import timing_config, validate_run
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -76,6 +76,24 @@ def test_source_provenance_is_exact():
         bad = dict(run, **{key: 'wrong'})
         with pytest.raises(ValueError):
             validate_run(bad)
+
+
+def test_timing_configs_preserve_relative_macro_base(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path/'src').mkdir()
+    macro = tmp_path/'macro/sram.gds'
+    macro.parent.mkdir()
+    macro.write_text('geometry')
+    config = {'MACROS': {'sram': {'gds': ['dir::../macro/sram.gds']}}, 'CLOCK_PERIOD': 20}
+    path = timing_config(config)
+    assert path.parent == Path(BINDING['files']['config']['path']).parent
+    assert path.parent == Path('src')
+    import json
+    assert json.loads(path.read_text()) == config
+    relative = config['MACROS']['sram']['gds'][0].removeprefix('dir::')
+    for sibling in (path, path.with_name('config_timing_after-fast.json')):
+        assert (sibling.parent/relative).resolve() == macro.resolve()
+        assert (sibling.parent/relative).is_file()
 
 
 def test_instrument_preserves_native_timing_after_audited_edits():

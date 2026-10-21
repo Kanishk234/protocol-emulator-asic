@@ -7,6 +7,19 @@ Newest entry at the top. One entry per work session.
 
 
 
+
+
+## 2026-10-21 — Selective native repair completes; correct STA macro path base
+
+- Checked failed39692139740/job119540647143 onb13ba2c. Downloaded evidence12390215081(57213654bytes) under/tmp/tripwire-selective-check-39692139740. Native resizer and subsequent antenna repair now complete without EST-0104, validating execution beyond BUG131. It then fails while loading the first STAMidPNR config, before final gate measurements.
+- Exact error resolves SRAM GDS relative to runs/wire600-selective-screen/../macro rather than the repository macro directory. Logged BUG132: new runner relocated a source config with relative macro references, and postgrt_timing generated sibling configs at that incorrect base. Corrected timing config location to src, alongside the bound source config; values, hardware, source database, identity plan, repair targets and gates unchanged.
+- Added regression checking source/sibling config macro-base resolution and unchanged config content.34focused checks pass without skips; git diff --check passes. No new final setup/hold/electrical/antenna qualification or phase boxes. Next publish the scoped path fix/test/evidence and rerun one selective checkpoint; physical results are still required. Initial read-only status approval review timed out, then succeeded on its single allowed retry; no work remains blocked by approval.
+
+## 2026-10-21 — Publish and rerun estimator-order correction
+
+- Published scoped toolsbaa162d, tests0ec5949 and docsb13ba2c. Push succeeds; local HEAD and remote main bothb13ba2c943b75cd2abe4741612f810c9d7e17f8b. Pre-push hardware history empty; unrelated local files and FIPE notes excluded.
+- Dispatched corrected [gds-wire600-selective-screen39692139740](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39692139740), verified in_progress on exact published head. Same source checkpoint,68identity buffers and strict gates; only estimator initialization order changes. Actual pinned correction and final physical measurements remain pending. Next check execution beyond native hold repair and all final gates. No phase boxes or detailed routing authorized. Launch receipt remains local until next evidence update.
+
 ## 2026-10-21 — Correct selective-repair parasitic initialization order
 
 - Inspected failed39688233973/job119527642100 on4c30423. Source/proposal/image preflights pass; all68buffers are inserted and legalized (maximum displacement29.9µm). Native setup repair reports no setup violations, then hold repair aborts EST-0104 inconsistent parasitics state. No final all-corner physical gates exist; do not classify this run as an electrical/timing rejection or a passing screen.

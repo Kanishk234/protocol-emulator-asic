@@ -22,7 +22,7 @@ def reference():
 
 
 def test_only_reviewed_masters_change_and_all_pins_stay(monkeypatch):
-    monkeypatch.setattr(trial, 'validate_proposal', lambda p: None)
+    monkeypatch.setattr(trial, 'validate_proposal', lambda p, review=None: None)
     proposal = {'groups': [], 'resizes': copy.deepcopy(trial.REVIEW['resizes'])}
     before = reference()
     after = trial.resized_reference(before, proposal)
@@ -39,7 +39,7 @@ def test_only_reviewed_masters_change_and_all_pins_stay(monkeypatch):
 
 @pytest.mark.parametrize('wrong', ['master', 'pins'])
 def test_wrong_resize_source_rejected(monkeypatch, wrong):
-    monkeypatch.setattr(trial, 'validate_proposal', lambda p: None)
+    monkeypatch.setattr(trial, 'validate_proposal', lambda p, review=None: None)
     before = reference()
     if wrong == 'master':
         before = before.replace('sg13cmos5l_nor3_1', 'sg13cmos5l_nand3_1')

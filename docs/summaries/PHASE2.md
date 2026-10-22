@@ -2,6 +2,9 @@
 
 **Status:** in progress, updated 2026-10-22. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
 
+Latest routed result: [39806020090](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39806020090) finishes with zero routing DRC but fails slow extracted setup at−1.468ns and four fanout nets. Fast hold+118.720ps and slew/cap limits pass. The exact preparation netlist passes22/22protocol cases in39806026713. Eight diode loads added during DRT explain the new fanout failures. A targeted strength/partition follow-up now has positive slow capture sensitivity with old extracted wires, but new physical screening remains unproven; Phase2 is still open.
+
+
 Latest milestone: [clean synthesis reproduction39718836864](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39718836864) rebuilds the full delta8/wire600 candidate from RTL without a source checkpoint download. All eight reviewed source hashes match exactly. The same73identity buffers and2equivalent strength changes then pass every preparation gate: slow capture reserve3.871081ns, fast hold125.034ps, zero actual electrical/antenna violations, and all conservative electrical reserves. The last slow slew reserve is44.9812% of its limit against45%, leaving little preparation headroom. SetupWS0 is not positive global setup margin. Clean preparation is now reproduced; detailed routing/extraction and exact-netlist protocol replay are next. Official GDS and Phase2 remain incomplete. Earlier experiment paragraphs below record the progression to this result.
 
 

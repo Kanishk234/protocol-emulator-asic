@@ -56,3 +56,26 @@ Ninety focused regression checks pass, including wrong provenance/bytes, missing
 clean reproduction claims, source validation blocking routing, original screen
 profiles, workflow shell/Python parsing and unchanged pinned source inputs.
 No main RTL/config/template changes or phase checklist boxes accompany this step.
+
+## Routed result and targeted follow-up (2026-10-22)
+
+[Route39806020090](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39806020090)
+completes0DRC but fails extraction: slow setup−1.467647ns, fast hold+0.118720ns,
+slew/cap0, four fanout failures. DRT adds42diodes only; eight added loads are
+net8721:+4,21968:+2,lane0slotwdata13:+1,net8083:+1. This confirms why legal
+screening fanout does not guarantee legal final fanout. Protocol run39806026713
+passes22/22 on the preparation netlist, not the final routed result.
+
+D-106 tests eleven functionally equivalent strength changes and eight extra
+identity buffers on the four diode-sensitive sources, from fresh synthesis.
+The same old extracted SPEF with a freshly reloaded modified netlist gives slow
+capture+0.155355ns,typical+7.429067ns,fast+11.656955ns and fast hold+0.118720ns.
+Global setupWS0 remains distinct from positive global margin. This fixed-wire
+sensitivity excludes new branches and physical movement; it is not a signoff
+pass or a prediction guaranteed to survive routing. Incremental area before
+native repair is163.296µm² versus the prior passing profile. Canonical totals
+are81buffers/13strength changes/250sink rewires/59nets. All gates remain fixed.
+Raw diagnostic receipts/proofs remain under/tmp/tripwire-wire600-fixed-selected11
+and/tmp/tripwire-wire600-strength-proofs; report/database artifacts remain outside
+Git. The separate gds-wire600-extracted-clean workflow stops before DRT and must
+pass all preparation checks before any routing continuation.

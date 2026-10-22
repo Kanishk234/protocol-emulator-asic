@@ -185,6 +185,11 @@ jobs:
             runs/wire600-clean-route/qualified-route/extracted_gates.json
             runs/extracted-timing/corner_summary.json
             runs/extracted-timing/electrical_summary.json
+            runs/extracted-timing/*-openroad-stapostpnr/*/max.rpt
+            runs/extracted-timing/*-openroad-stapostpnr/*/min.rpt
+            runs/extracted-timing/*-openroad-stapostpnr/*/ws.max.rpt
+            runs/extracted-timing/*-openroad-stapostpnr/*/checks.rpt
+            runs/extracted-timing/*-openroad-checkantennas/or_metrics_out.json
             runs/wire600-clean-route/timing/after-*/*/capture_setup.rpt
             runs/wire600-clean-route/timing/after-*/*/route_coverage.rpt
             runs/wire600-clean-route/qualified-route/drt/*/or_metrics_out.json

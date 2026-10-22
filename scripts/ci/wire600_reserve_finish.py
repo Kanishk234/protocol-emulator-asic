@@ -16,13 +16,15 @@ from wire600_selective_screen import main as screen
 REVIEW = json.loads((Path(__file__).parent/'fixtures/wire600_selective/reserve_finish.json').read_text())
 
 
-def _build(root, macro_lef):
+def _build(root, macro_lef, review=REVIEW):
     proposal = copy.deepcopy(base_plan(root, macro_lef))
     layout = (Path(root)/BINDING['files']['def']['path']).read_text()
     nets, _ = connections(layout, True)
     loc = placements(layout)
     rows = source_rows(layout)
-    for net, expected in sorted(REVIEW['extra_sources'].items()):
+    # Preserve frozen fixture order so an appended repair retains all existing
+    # buffer identities and adds only the final new group.
+    for net, expected in review['extra_sources'].items():
         if sorted(map(list, nets[net])) != expected['terms']:
             raise ValueError('Residual source connectivity changed')
         driver, groups = partition(nets[net], loc)
@@ -34,7 +36,7 @@ def _build(root, macro_lef):
                 rail_source=power_anchor(nets[net], loc, driver), master='sg13cmos5l_buf_4',
                 sinks=sinks, location=nearest_row(rows, loc[driver[0]][1:3]), reasons=['slew']))
         proposal['source_targets'][net] = ['slew']
-    proposal['resizes'] = copy.deepcopy(REVIEW['resizes'])
+    proposal['resizes'] = copy.deepcopy(review['resizes'])
     moved = {tuple(p) for g in proposal['groups'] for p in g['sinks']}
     for resize in proposal['resizes']:
         if loc[resize['instance']][0] != resize['old_master']:
@@ -44,23 +46,23 @@ def _build(root, macro_lef):
         pin = 'Q' if resize['old_master'].startswith('sg13cmos5l_dfrbpq_') else 'Y'
         proposal['source_targets'][resize['pins'][pin]] = ['capacitance' if pin == 'Q' else 'slew']
     proposal.update(buffers=len(proposal['groups']), target_count=len(proposal['source_targets']),
-                    residual_evidence_run=REVIEW['evidence_run'])
+                    residual_evidence_run=review['evidence_run'])
     return proposal
 
 
-def validate_proposal(proposal):
-    if hashlib.sha256(json.dumps(proposal, sort_keys=True).encode()).hexdigest() != REVIEW['proposal_sha256']:
+def validate_proposal(proposal, review=REVIEW):
+    if hashlib.sha256(json.dumps(proposal, sort_keys=True).encode()).hexdigest() != review['proposal_sha256']:
         raise ValueError('Unreviewed residual repair proposal')
 
 
-def plan(root, macro_lef):
-    result = _build(root, macro_lef)
-    validate_proposal(result)
+def plan(root, macro_lef, review=REVIEW):
+    result = _build(root, macro_lef, review)
+    validate_proposal(result, review)
     return result
 
 
-def target_call(layout, proposal):
-    validate_proposal(proposal)
+def target_call(layout, proposal, review=REVIEW):
+    validate_proposal(proposal, review)
     if hashlib.sha256(layout.encode()).hexdigest() != BINDING['files']['def']['sha256']:
         raise ValueError('Wrong residual source DEF')
     nets, _ = connections(layout, True)
@@ -95,8 +97,8 @@ def target_call(layout, proposal):
     return '\n'.join(lines)+'\n'
 
 
-def resized_reference(before, proposal):
-    validate_proposal(proposal)
+def resized_reference(before, proposal, review=REVIEW):
+    validate_proposal(proposal, review)
     old = logical_cells(before)
     result = before
     for r in proposal['resizes']:
@@ -111,8 +113,8 @@ def resized_reference(before, proposal):
     return result
 
 
-def validate_change(before, after, proposal):
-    return audit_buffers(resized_reference(before, proposal), after, {'groups': proposal['groups']})
+def validate_change(before, after, proposal, review=REVIEW):
+    return audit_buffers(resized_reference(before, proposal, review), after, {'groups': proposal['groups']})
 
 
 def main():

@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-22 — Prepare one-cell setup margin after6.391ps routed miss
+
+- Downloaded full39837795296 evidence to/tmp/tripwire-extracted-route-full-39837795296. Worst path49681→48577; both reported setup violations traverse26761/mux2_1, outside the current worst fast-hold path. Preserve all electrical/antenna/DRC success and all previous81buffers/13sizes.
+- D-107 strengthens only26761 mux2_1→mux2_2, same A0/A1/S/X nets; added library area1.8144µm². New canonical81buffers/14sizes/250sink rewires/60nets. Full source topology/master audit passes, wrong-source negative rejects; generated Tcl executes81groups/250sink tuples/14sizes/unlocks under validating stubs. Actual placement and new parasitics remain unproven.
+- Fixed-SPEF diagnostic now accepts explicit reviewed source/target profiles without changing old defaults, so it does not reapply old changes to the new source. Fresh baseline reproduces all current CI setup/hold within1fs report precision. One mux strength gives slow capture+0.093824ns,typ7.386047ns,fast11.638515ns; fast hold0.104631ns unchanged. SetupWS0 remains distinct from positive global margin. Raw receipts/tmp/tripwire-mux-margin-fixed; no physical qualification claimed.
+- Single mux proof passes all3Liberty corners (one output/five total equivalence points each); corrected proof receipt parser to permit additional proven internal points while still requiring zero unproven. Wrong select wiring negative rejects; original seven-pair proofs still pass. Proofs/tmp/tripwire-mux-margin-proofs-v2.107focused checks pass without skips, new workflow shell/Python parse and diff check pass.
+- Prepared separate gds-wire600-mux-margin-clean: fresh original-source reconstruction then one-cell extension, identical20ns/50ps/3.5ns/45%/zero-actual gates, no DRT. Next publish scoped tools/tests/CI/evidence and launch one clean screen. No main hardware/template changes or phase boxes. Unrelated local/FIPE files preserved.
+
+
+## 2026-10-22 — Targeted route clears electrical violations; setup misses by6.391ps
+
+- Checked39837795296: completes DRT/extraction, fails strict extracted timing gate. Downloaded small gates to/tmp/tripwire-extracted-route-gates-39837795296. Slow setup−0.006391332089ns versus prior−1.467647378502ns: improvement1.461256046413ns. Fast hold+0.104631195558ns; typ+0.217632362736ns,slow+0.416388713073ns. Setup fast/typ0. All actual slew/cap/fanout counts0allcorners; final antenna0/0 and routeDRC0. No tolerance or gate relaxation:6.391ps remains a genuine miss, no official signoff.
+-39837799952 succeeds: XML under/tmp/tripwire-extracted-gl-39837799952 verifies22cases,0failures/errors/skips on exact81buffer/13size preparation netlist. Companion lint/test/unit/docs all succeed. Both experiment runs completed; none of the recent jobs remains active.
+- Targeted strength/fanout repairs survive physical routing for all electrical checks and remove almost all setup deficit. Next inspect newly included worst-path reports for a small margin-building correction, preserving hold/electrical success; require new screening and routing, no unchanged rerun or phase boxes. Final routed-netlist replay/official fullGDS still required. Unrelated local/FIPE files preserved.
+
+
+## 2026-10-22 — Publish and launch targeted clean routing plus protocol replay
+
+- Published toolsa029d0f, testsc41bad2, CI4de9a3b and docs50976a0 in separate groups. Push succeeded; local HEAD and remote main both50976a0ca2a0902de8b1589f816d266ebfaf17f7. Hardware history empty before push; unrelated reports/tools and local FIPE notes excluded.
+- Launched [gds-wire600-extracted-route39837795296](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39837795296), verified in_progress, and [l3-wire600-extracted-gl39837799952](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39837799952), verified queued at exact published SHA. Routing must pass fresh strict preparation before DRT/extraction; GL runs22cases on the new hash-bound81buffer/13size preparation. Companion CI started/queued. Next inspect actual DRT/extracted and protocol results; no official GDS claim or phase boxes. Launch receipt remains local until next evidence update.
+
+
 ## 2026-10-22 — Bind targeted clean repair for routing and protocol replay
 
 - Downloaded full39824026639 evidence12451010823 to/tmp/tripwire-extracted-clean-full-39824026639. Reviewed netlist SHA2c40479252b0411f115ffb63eb23e97e82e90f9efef76dd52704d6a116a29f1a. New extracted_route binding covers244files including original source hashes, clean receipts, proposal/edit logs, physical views and three-corner reports. All hashes match; actual81buffer/13size connectivity audit and independently recomputed preparation gates pass.

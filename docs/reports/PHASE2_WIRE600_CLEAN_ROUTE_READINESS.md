@@ -105,3 +105,22 @@ Independent actual-artifact connection audit and report-based preparation gate
 recomputation pass.102focused checks pass, including unchanged old-profile
 behavior, explicit new-root use and wrong-source/receipt rejection. Full evidence
 is under/tmp/tripwire-extracted-clean-full-39824026639 and remains outside Git.
+
+## Targeted route nearly closes setup; one-cell margin follow-up
+
+[39837795296](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39837795296)
+finishes detailed routing/extraction with routeDRC0, antenna0/0, all electrical
+counts0, and fast hold+0.104631ns. Slow setup remains−0.006391332ns, which still
+fails. Both reported violations share26761/mux2_1. Preparation replay39837799952
+passes22/22 on the81buffer/13size netlist; final-route replay remains required.
+
+D-107 changes just that mux to mux2_2, keeping every connection and prior repair.
+Its area increment is1.8144µm². A fresh netlist reload with the exact latest
+extracted SPEF and constraints reproduces baseline timing, then reports slow
+capture+0.093824ns and unchanged fast hold+0.104631ns. These are diagnostic results,
+not actual re-placed/re-routed measurements. The new clean screen must pass all
+unchanged gates before another route is authorized. Canonical totals81buffers,
+14sizes,250sink rewires,60nets. Mux output equivalence passes all3corners, wrong
+select wiring rejects, full source topology/Tcl preflights pass,107checks pass.
+Raw receipts/proofs stay under/tmp/tripwire-mux-margin-fixed and
+/tmp/tripwire-mux-margin-proofs-v2. All source hashes are in the frozen review.

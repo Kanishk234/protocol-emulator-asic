@@ -34,10 +34,15 @@ def validate_run(run):
         raise ValueError('Wrong selective checkpoint provenance')
 
 
-def main(*, plan_builder=plan, target_emitter=target_call,
-         connectivity_audit=validate_change, output=OUTPUT):
+def checkpoint_source_check():
     validate_run(json.loads(Path('/tmp/native-source-run.json').read_text()))
     validate_files(Path.cwd())
+
+
+def main(*, plan_builder=plan, target_emitter=target_call,
+         connectivity_audit=validate_change, output=OUTPUT,
+         source_check=checkpoint_source_check):
+    source_check()
     files = BINDING['files']
     source = Path(BINDING['source_state'])
     state = json.loads(source.read_text())

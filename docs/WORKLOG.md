@@ -2,8 +2,28 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-21 — Prepare clean synthesis reproduction of passing wire600 screen
+
+- Added separate gds-wire600-clean-reproduction and helper. Starts with no native-stock source directory, no downloaded provenance, runs unchanged frozen delta8/wire600 clean synthesis through final antenna screening, then requires every original bound source hash (ODB/DEF/netlist/config/state/constraints/defs/source gates) before applying the exact passing73buffer/2resize profile. No adapting fresh geometry to numeric instance names; any differing bytes stop for review. Original checkpoint runner defaults unchanged.
+- Only the known completed control electrical rejection is caught, because reviewed identity repairs address those measured loads. All other failures propagate. Repair sequence reuses existing image, topology audit, fixed gates and three-corner measurements. Fresh synthesis state required and DRT forbidden. Reproduction receipt records success separately; final qualification and official signoff remain false pending protocol replay and detailed/extracted checks. No source/config/template changes or phase boxes.
+-50focused checks pass without skips, including rejection of infrastructure/setup errors, missing hashes/synthesis and unexpected DRT; workflow shell/embedded Python parse, source environment unchanged. Initial test caught missing parent directory creation in new helper; corrected before publication. Next launch clean reproduction on published main and inspect exact hash and physical receipts. Unrelated local/FIPE files preserved.
 
 
+## 2026-10-21 — One-net checkpoint screen passes all measured gates
+
+- Verified [39713878980](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39713878980) completed successfully. Gate artifact12399055557 downloaded to /tmp/tripwire-reserve-last-gates-39713878980. checkpoint_measured_gates_pass=true; identity connectivity audited,73 buffers/2 resizes/44 targets. Latest companion docs/lint/test/unit runs all green.
+- Slow capture3.871081ns clears3.5ns; fast hold+0.125034ns clears0.05ns. Reported setup WS0all corners, no positive global setup-margin claim. Actual slew/cap/fanout0all corners; antenna nets/pins0. All electrical reserve exceedances0; maximum slow slew44.9812% against45%, max cap42.53%. Slow slew reserve has only0.0188 percentage points remaining, so detailed-route robustness remains unproven.
+- This is checkpoint preparation evidence only: clean_synthesis=false, qualified=false, route_authorized=false, reproduction_required=true. No phase boxes, detailed routing or official GDS signoff. Next reproduce the complete repair sequence from clean synthesis, then verify the exact final netlist across the protocol suite and proceed through detailed routing/extracted gates only after reproduction passes. Unrelated local files and FIPE notes preserved.
+
+
+
+
+
+
+## 2026-10-21 — Publish and launch one-net slew reserve follow-up
+
+- Published scoped tools19e2925, tests59aed42, CIeacadaa and docs1eaeaba. Push succeeded; local HEAD and remote main both1eaeaba1b8a7726444ec9df516eaf488f88d71ae. Pre-push hardware history empty; unrelated local files and FIPE notes excluded.
+- Dispatched [gds-wire600-reserve-last-screen39713878980](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39713878980), verified in_progress on exact published head. Adds one BUF4 on11520 to the prior72buffer/2size plan, preserving every acceptance gate. Actual physical result pending; no DRT, official signoff or phase boxes. Next inspect source/edit audit and all measured gates; a checkpoint pass still requires clean reproduction. Launch receipt remains local until next evidence update.
 
 ## 2026-10-21 — Setup reserve clears; prepare one remaining slew repair
 

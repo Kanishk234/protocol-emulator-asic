@@ -1,6 +1,9 @@
 # Phase 2: building and fitting the chip
 
-**Status:** in progress, updated 2026-10-21. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
+**Status:** in progress, updated 2026-10-22. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
+
+Latest milestone: [clean synthesis reproduction39718836864](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39718836864) rebuilds the full delta8/wire600 candidate from RTL without a source checkpoint download. All eight reviewed source hashes match exactly. The same73identity buffers and2equivalent strength changes then pass every preparation gate: slow capture reserve3.871081ns, fast hold125.034ps, zero actual electrical/antenna violations, and all conservative electrical reserves. The last slow slew reserve is44.9812% of its limit against45%, leaving little preparation headroom. SetupWS0 is not positive global setup margin. Clean preparation is now reproduced; detailed routing/extraction and exact-netlist protocol replay are next. Official GDS and Phase2 remain incomplete. Earlier experiment paragraphs below record the progression to this result.
+
 
 Latest checkpoint experiment: [incremental routing39551558196](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39551558196) avoids a reproduced long wire detour, with zero actual electrical/antenna violations and fast hold+119.809ps. Its slow capture reserve improves to3.030177ns, below the3.5ns preparation target; one slew-reserve miss remains at47.70% utilization versus45%. This is an incomplete preparatory result, not routed or official signoff.
 

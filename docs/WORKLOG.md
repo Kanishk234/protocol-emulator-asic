@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-22 — Bind clean result for detailed routing and expanded protocol replay
+
+- Downloaded full clean artifact12403112336 to/tmp/tripwire-clean-full-39718836864. Reviewed final netlist SHA01397ef7c91e999d144d9ebe346f96de4c661bbf509b7fb0e71a49ec9a8eed57; tracked binding covers244source/physical/measurement files. Source hashes, saved identity connectivity and independent report-based preparation gates all pass locally.
+- Prepared wire600_clean_route with exact successful run provenance, canonical73buffer/2resize proposal, source topology and post-antenna readback audits. Fresh setup/hold/capture/electrical45%/antenna/coverage checks precede DRT. Reuses stock continuation for zero routing DRC, connectivity audit and all-corner extraction with setup≥0, hold≥0/fast≥50ps and zero actual electrical/antenna failures. No edits/repair/global route repeated, gate changes or official signoff claim.
+- Prepared separate gds-wire600-clean-route and l3-wire600-clean-gl. GL binds the exact preparation netlist and runs all22expanded protocol cases using pinned Icarus13/cell/SRAM models; later final-route replay still required.90focused checks pass without skips; workflow shell/embedded Python parse and git diff --check pass. Updated phase summary/readiness evidence; no phase boxes or main hardware/template changes. Next publish scoped groups and launch both on verified main. Unrelated local/FIPE files excluded.
+
+
+## 2026-10-22 — Clean synthesis reproduces passing repaired preparation
+
+- Verified [39718836864](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39718836864) completed successfully, job119627332641. Gate artifact12402557245 downloaded under/tmp/tripwire-clean-gates-39718836864; full evidence artifact12403112336 available. Fresh RTL synthesis, no source artifact download; all8bound source hashes exactly reproduce, including ODB/DEF/netlist/state/config/gates/signoff/defs. Outer reproduction receipt confirms repaired_measured_gates_pass=true.
+- Same73buffers/2resizes/44targets and audited identity connectivity. Slow capture3.871081ns, typ9.655537ns, fast13.045062ns; fast hold+0.125034ns, setupWS0allcorners. Actual slew/cap/fanout and antenna counts0; all45%reserve checks pass, maximum slow slew44.9812%, maxcap42.53%. All33937signal nets have routing objects; this does not prove detailed-route completeness.
+- Shared inner gates retain checkpoint-only conservative metadata; outer receipt supplies the independently verified clean-synthesis provenance. No official signoff, final qualification, detailed-route result or phase boxes. Clean preparation reproduction hurdle is cleared; next bind this successful clean artifact and prepare exact-netlist replay plus detailed routing/extraction with unchanged acceptance gates. Slow slew reserve remains narrow. Unrelated local/FIPE files preserved.
+
+
+## 2026-10-21 — Publish and launch clean wire600 reproduction
+
+- With explicit user approval, committed tools695de9b, tests9f81124, CI1d6cfad and docsbab5e46 separately. Push succeeded; local HEAD and remote main verified bab5e46186cd8aa1791c5d913d437a271cc89442. Pre-push hardware history empty. Unrelated files/FIPE notes excluded.
+- Dispatched [gds-wire600-clean-reproduction39718836864](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39718836864), verified in_progress at exact published SHA. Fresh RTL synthesis followed by source hash verification and the passing73buffer/2size profile; no checkpoint downloads, changed gates, DRT or official signoff. Next inspect clean source match and repaired physical receipts. Publication receipt remains local until next evidence update; no phase boxes.
+
+
 ## 2026-10-21 — Prepare clean synthesis reproduction of passing wire600 screen
 
 - Added separate gds-wire600-clean-reproduction and helper. Starts with no native-stock source directory, no downloaded provenance, runs unchanged frozen delta8/wire600 clean synthesis through final antenna screening, then requires every original bound source hash (ODB/DEF/netlist/config/state/constraints/defs/source gates) before applying the exact passing73buffer/2resize profile. No adapting fresh geometry to numeric instance names; any differing bytes stop for review. Original checkpoint runner defaults unchanged.

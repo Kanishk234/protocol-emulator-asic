@@ -124,3 +124,27 @@ unchanged gates before another route is authorized. Canonical totals81buffers,
 select wiring rejects, full source topology/Tcl preflights pass,107checks pass.
 Raw receipts/proofs stay under/tmp/tripwire-mux-margin-fixed and
 /tmp/tripwire-mux-margin-proofs-v2. All source hashes are in the frozen review.
+
+## Single-mux preparation clears screening
+
+[39856540600](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39856540600)
+passes fresh source reconstruction and all strict preparation gates for81buffers
+and14sizes. Slow capture3.735021ns, fast hold0.125034ns, all actual electrical and
+antenna counts0, and all conservative reserves pass. The headline estimates match
+the prior candidate; only fresh detailed routing/extraction can demonstrate the
+intended improvement over the previous−6.391ps result.
+
+The next separate continuations are gds-wire600-mux-margin-route and
+l3-wire600-mux-margin-gl. Both bind the successful run39856540600 and its exact
+new netlist. They preserve source topology validation, fresh preparation gates,
+stock DRT/extraction and all22protocol replay cases. No new repair is applied
+during routing, no acceptance limit changes, and final-route replay/official
+fullGDS signoff remain required.
+
+Independent full-artifact review confirms26761remains mux2_2 after native repair;
+all14reviewed strength masters remain present. Final preparation netlist SHA256:
+654bae23a2ace5c8c2275ce2be4b8dd55d071916e75914d9d74be8f1b3aefaca.
+The mux_margin_route.json fixture binds244source/physical/measurement files.
+Actual edit topology and recomputed strict preparation gates pass.111focused
+checks pass, including both older profiles and explicit single-mux source binding.
+Full evidence stays under/tmp/tripwire-mux-clean-full-39856540600 outside Git.

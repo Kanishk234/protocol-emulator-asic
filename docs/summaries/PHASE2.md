@@ -2,6 +2,9 @@
 
 **Status:** in progress, updated 2026-10-22. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
 
+Latest preparation: [single-mux screen39856540600](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39856540600) passes clean synthesis reconstruction, slow capture3.735021ns, fast hold125.034ps and zero actual electrical/antenna violations with81buffers/14sizes. The mux change still needs detailed routing/extraction and exact-netlist replay; the previous81buffer/13size route missed setup by6.391ps. No official signoff or Phase2 completion yet.
+
+
 Latest detailed route: [39837795296](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39837795296) clears all actual electrical/antenna/routing DRC violations and has fast hold+104.631ps. Slow setup is−6.391ps, improved from−1.468ns but still failing. The matching preparation netlist passes22/22protocol tests. A single stronger mux adds1.8144µm² and gives+93.824ps slow capture margin with old extracted wires in a fresh-netlist diagnostic; actual clean screening and routing must verify it. No official timing closure or phase completion yet.
 
 

@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-22 — Bind passing mux preparation for routing and expanded replay
+
+- Full39856540600 artifact12463528990 downloaded to/tmp/tripwire-mux-clean-full-39856540600. Confirmed final native readback retains26761 mux2_2 and all14reviewed strength masters. Netlist SHA654bae23a2ace5c8c2275ce2be4b8dd55d071916e75914d9d74be8f1b3aefaca; new mux_margin_route binding covers244files.
+- Original source hashes, full actual81buffer/14size edit graph, and independent report-based preparation gates all pass. New wire600_mux_margin_route/gl wrappers use existing shared continuation with the exact new binding/root/proposal/audit; old defaults unchanged. Prepared separate gds-wire600-mux-margin-route and l3-wire600-mux-margin-gl; no repeated repair or changed gates. Final routed-netlist replay and official flow remain pending.
+-111focused checks pass without skips; new workflow shell/embedded Python parse, diff check and pre-publication hardware history pass. Current main docs/test/lint/unit all green. Next publish scoped groups and launch both continuations on verified main. No main hardware/template edits or phase boxes. Unrelated modified reports, local tools and FIPE notes preserved.
+
+
+## 2026-10-22 — Single-mux clean screen passes all preparation gates
+
+- Verified39856540600 succeeds at5dede14340d348b7c05823c2062c45ff482c3420,21:21:14→22:37:05UTC. Gate artifact12462779951 downloaded under/tmp/tripwire-mux-clean-gates-39856540600; full12463528990 available. Fresh synthesis/no checkpoint download, exact source reproduced and repaired measured gates pass.81buffers/14sizes, identity audited.
+- Slow capture3.735021ns,typ9.626485ns,fast13.028982ns; fast hold+0.125034ns,typ+0.238276ns,slow+0.431282ns. SetupWS0allcorners. Actual slew/cap/fanout0allcorners, antenna0/0, all45%electrical reserves pass; routing-object coverage complete. These headline estimates match the prior profile; they do not establish the targeted extracted improvement.
+- One-mux physical preparation is now clean and passing. Next independently bind full artifact and continue detailed routing/extraction plus exact new-netlist protocol replay. Prior route missed6.391ps; only new extracted evidence can show whether mux strength recovers margin. Official GDS/Phase2 remain open; no boxes ticked. Unrelated local/FIPE files preserved.
+
+
+## 2026-10-22 — Publish and launch single-mux clean margin screen
+
+- Published toolsfdfcc25, tests272dc42, CId5db377 and docs5dede14 separately. Push succeeded; local HEAD and remote main both5dede14340d348b7c05823c2062c45ff482c3420. Hardware history empty before push; unrelated reports/tools and FIPE notes excluded.
+- Launched [gds-wire600-mux-margin-clean39856540600](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39856540600), verified queued at exact published SHA. Only new physical change versus prior candidate is26761 mux2_1→mux2_2,1.8144µm². Fresh source reconstruction, all prior repairs and20ns/50ps/3.5ns/45%/zero-actual gates remain fixed; no DRT. Next inspect actual clean gates before routing; local fixed-SPEF+93.824ps capture result is diagnostic, not signoff. No phase boxes. Launch receipt remains local until next evidence update.
+
+
 ## 2026-10-22 — Prepare one-cell setup margin after6.391ps routed miss
 
 - Downloaded full39837795296 evidence to/tmp/tripwire-extracted-route-full-39837795296. Worst path49681→48577; both reported setup violations traverse26761/mux2_1, outside the current worst fast-hold path. Preserve all electrical/antenna/DRC success and all previous81buffers/13sizes.

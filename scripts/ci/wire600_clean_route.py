@@ -24,15 +24,15 @@ def review():
     return json.loads(REVIEW_PATH.read_text())
 
 
-def validate_bundle(root, run):
+def validate_bundle(root, run, *, bound=None, screen_root=ROOT):
     root = Path(root)
-    bound = review()
+    bound = review() if bound is None else bound
     if any(run.get(k) != v for k, v in bound['run_binding'].items()):
         raise ValueError('Wrong clean reproduction provenance')
     for name, sha in bound['files'].items():
         if digest(root/name) != sha:
             raise ValueError('Changed clean reproduction file: '+name)
-    receipt = json.loads((root/ROOT/'reproduction.json').read_text())
+    receipt = json.loads((root/Path(screen_root)/'reproduction.json').read_text())
     required = dict(clean_synthesis=True, source_artifact_downloaded=False,
                     exact_source_reproduced=True, repaired_measured_gates_pass=True,
                     official_signoff=False, qualified=False)
@@ -58,18 +58,20 @@ def measured_gates(root, timing, antenna):
     return gates
 
 
-def validate_checkpoint():
+def validate_checkpoint(*, bound=None, screen_root=ROOT, proposal_review=REVIEW,
+                        connectivity_audit=validate_change):
     validate_files(Path.cwd())
-    source = validate_bundle(Path.cwd(), json.loads(Path('/tmp/wire600-clean-source-run.json').read_text()))
-    repaired = ROOT/'repaired'
+    source = validate_bundle(Path.cwd(), json.loads(Path('/tmp/wire600-clean-source-run.json').read_text()),
+                             bound=bound, screen_root=screen_root)
+    repaired = Path(screen_root)/'repaired'
     proposal = json.loads((repaired/'proposal.json').read_text())
-    validate_proposal(proposal, REVIEW)
+    validate_proposal(proposal, proposal_review)
     prior = unique(repaired/'flow', '*-openroad-resizertimingpostgrt/state_out.json')
     raw = unique(repaired/'flow', '*-openroad-repairantennas/state_out.json')
     before = (prior.parent/'selective.before.v').read_text()
     if logical_cells(before) != logical_cells(Path(BINDING['files']['nl']['path']).read_text()):
         raise ValueError('Wrong clean repair input topology')
-    validate_change(before, (prior.parent/'selective.after.v').read_text(), proposal)
+    connectivity_audit(before, (prior.parent/'selective.after.v').read_text(), proposal)
     log = (prior.parent/'openroad-resizertimingpostgrt.log').read_text()
     validate_overflow(log)
     if any(log.count(marker+'\n') != 1 for marker in (
@@ -90,23 +92,30 @@ def validate_checkpoint():
     return config, source
 
 
-def main():
-    config, source = validate_checkpoint()
-    OUTPUT.mkdir(exist_ok=False)
+def main(profile=None):
+    if profile is None:
+        config, source = validate_checkpoint()
+        bound, screen_root, output = review(), ROOT, OUTPUT
+    else:
+        bound, screen_root, output = profile['binding'], profile['screen_root'], Path(profile['output'])
+        config, source = validate_checkpoint(bound=bound, screen_root=screen_root,
+            proposal_review=profile['proposal_review'], connectivity_audit=profile['connectivity_audit'])
+    output.mkdir(exist_ok=False)
     os.environ.pop('LIBRELANE_IMAGE_OVERRIDE', None)
-    run_step(config, source, OUTPUT/'antenna', ['OpenROAD.CheckAntennas'])
-    cfg = Path('src/config_wire600_clean_route.json')
+    run_step(config, source, output/'antenna', ['OpenROAD.CheckAntennas'])
+    cfg = Path('src/config_'+output.name.replace('-', '_')+'.json')
     cfg.write_text(json.dumps(config, indent=2)+'\n')
-    screen(cfg, source, OUTPUT/'timing', os.environ['PDK_ROOT'], repaired=source,
+    screen(cfg, source, output/'timing', os.environ['PDK_ROOT'], repaired=source,
            sdc=Path('src/signoff.sdc'),
            extra_tcl=Path('workflow-src/scripts/ci/native_no_final_grt_audit.tcl'))
-    antenna = json.loads(unique(OUTPUT/'antenna', '*-openroad-checkantennas/or_metrics_out.json').read_text())
-    fresh = measured_gates(OUTPUT, OUTPUT/'timing', antenna)
+    antenna = json.loads(unique(output/'antenna', '*-openroad-checkantennas/or_metrics_out.json').read_text())
+    fresh = measured_gates(output, output/'timing', antenna)
     fresh.update(clean_preparation_reproduced=True, repair_repeated=False,
-                 source_run=review()['run_binding']['id'], drt_preparation_pass=True)
-    (OUTPUT/'preparation_gates.json').write_text(json.dumps(fresh, indent=2)+'\n')
-    continue_route(config, source, OUTPUT/'qualified-route', source_run=review()['run_binding']['id'])
-    validate_bundle(Path.cwd(), json.loads(Path('/tmp/wire600-clean-source-run.json').read_text()))
+                 source_run=bound['run_binding']['id'], drt_preparation_pass=True)
+    (output/'preparation_gates.json').write_text(json.dumps(fresh, indent=2)+'\n')
+    continue_route(config, source, output/'qualified-route', source_run=bound['run_binding']['id'])
+    validate_bundle(Path.cwd(), json.loads(Path('/tmp/wire600-clean-source-run.json').read_text()),
+                    bound=bound, screen_root=screen_root)
 
 
 if __name__ == '__main__':

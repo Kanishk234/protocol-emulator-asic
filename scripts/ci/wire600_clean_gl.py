@@ -1,12 +1,12 @@
 """Functional-only protocol replay of the exact clean preparation netlist."""
 from pathlib import Path
-from wire600_clean_route import review, validate_bundle
+from wire600_clean_route import ROOT, review, validate_bundle
 from wire600_selective_plan import digest
 
 
-def validate(root, run):
-    validate_bundle(root, run)
-    bound = review()
+def validate(root, run, *, bound=None, screen_root=ROOT):
+    bound = review() if bound is None else bound
+    validate_bundle(root, run, bound=bound, screen_root=screen_root)
     netlist = Path(root)/bound['netlist']
     if digest(netlist) != bound['files'][bound['netlist']]:
         raise ValueError('Wrong clean preparation netlist')

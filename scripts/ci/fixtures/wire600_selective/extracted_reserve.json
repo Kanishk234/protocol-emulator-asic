@@ -1,0 +1,426 @@
+{
+  "evidence_run": 39806020090,
+  "evidence_gates_sha256": "570152f7f7a214c66bcd091272306288f28e39f0ac400501766ae423b1415d1b",
+  "evidence_def_sha256": "63fceba481a2a8b643df7fbaf8b4ec410b222d9e9ca047edf4f5be91737c1044",
+  "extra_sources": {
+    "_02935_": {
+      "terms": [
+        [
+          "ANTENNA_1",
+          "A"
+        ],
+        [
+          "_28210_",
+          "Y"
+        ],
+        [
+          "wire12414",
+          "A"
+        ]
+      ],
+      "driver": [
+        "_28210_",
+        "Y"
+      ]
+    },
+    "_11512_": {
+      "terms": [
+        [
+          "ANTENNA_56",
+          "A"
+        ],
+        [
+          "_37558_",
+          "Y"
+        ],
+        [
+          "_37559_",
+          "B1"
+        ]
+      ],
+      "driver": [
+        "_37558_",
+        "Y"
+      ]
+    },
+    "_17445_": {
+      "terms": [
+        [
+          "_44790_",
+          "Y"
+        ],
+        [
+          "_44793_",
+          "A2"
+        ]
+      ],
+      "driver": [
+        "_44790_",
+        "Y"
+      ]
+    },
+    "_19926_": {
+      "terms": [
+        [
+          "_25383_",
+          "Y"
+        ],
+        [
+          "_25392_",
+          "A"
+        ],
+        [
+          "place7019",
+          "A"
+        ]
+      ],
+      "driver": [
+        "_25383_",
+        "Y"
+      ]
+    },
+    "_11520_": {
+      "terms": [
+        [
+          "_37574_",
+          "Y"
+        ],
+        [
+          "_37575_",
+          "B1"
+        ]
+      ],
+      "driver": [
+        "_37574_",
+        "Y"
+      ]
+    },
+    "net8721": {
+      "driver": [
+        "place8721",
+        "X"
+      ],
+      "terms": [
+        [
+          "_31235_",
+          "B"
+        ],
+        [
+          "_49387_",
+          "D"
+        ],
+        [
+          "_49390_",
+          "D"
+        ],
+        [
+          "_49413_",
+          "D"
+        ],
+        [
+          "_49446_",
+          "D"
+        ],
+        [
+          "place8718",
+          "A"
+        ],
+        [
+          "place8719",
+          "A"
+        ],
+        [
+          "place8720",
+          "A"
+        ],
+        [
+          "place8721",
+          "X"
+        ]
+      ],
+      "reasons": [
+        "fanout",
+        "antenna-reserve"
+      ]
+    },
+    "_21968_": {
+      "driver": [
+        "_27464_",
+        "Y"
+      ],
+      "terms": [
+        [
+          "_27464_",
+          "Y"
+        ],
+        [
+          "_27618_",
+          "A2"
+        ],
+        [
+          "_27656_",
+          "A2"
+        ],
+        [
+          "_27716_",
+          "A2"
+        ],
+        [
+          "_27736_",
+          "A2"
+        ],
+        [
+          "_44612_",
+          "B"
+        ],
+        [
+          "_45998_",
+          "A2"
+        ],
+        [
+          "place7224",
+          "A"
+        ]
+      ],
+      "reasons": [
+        "fanout",
+        "antenna-reserve"
+      ]
+    },
+    "u_chip.g_lane[0].u_slots.wdata_q[13]": {
+      "driver": [
+        "_46850_",
+        "Q"
+      ],
+      "terms": [
+        [
+          "_46850_",
+          "Q"
+        ],
+        [
+          "_49951_",
+          "D"
+        ],
+        [
+          "_50078_",
+          "D"
+        ],
+        [
+          "_50115_",
+          "D"
+        ],
+        [
+          "_50163_",
+          "D"
+        ],
+        [
+          "_50211_",
+          "D"
+        ],
+        [
+          "place8938",
+          "A"
+        ],
+        [
+          "place8940",
+          "A"
+        ],
+        [
+          "place8944",
+          "A"
+        ]
+      ],
+      "reasons": [
+        "fanout",
+        "antenna-reserve"
+      ]
+    },
+    "net8083": {
+      "driver": [
+        "place8083",
+        "X"
+      ],
+      "terms": [
+        [
+          "_45932_",
+          "A2"
+        ],
+        [
+          "_46021_",
+          "A2"
+        ],
+        [
+          "_46112_",
+          "A2"
+        ],
+        [
+          "_46209_",
+          "A2"
+        ],
+        [
+          "_46264_",
+          "B"
+        ],
+        [
+          "_46311_",
+          "B1"
+        ],
+        [
+          "place8080",
+          "A"
+        ],
+        [
+          "place8082",
+          "A"
+        ],
+        [
+          "place8083",
+          "X"
+        ]
+      ],
+      "reasons": [
+        "fanout",
+        "antenna-reserve"
+      ]
+    }
+  },
+  "resizes": [
+    {
+      "instance": "_30349_",
+      "old_master": "sg13cmos5l_nor3_1",
+      "new_master": "sg13cmos5l_nor3_2",
+      "pins": {
+        "A": "_04892_",
+        "B": "net8106",
+        "C": "net7643",
+        "Y": "u_chip.g_lane[0].u_slots.g_word[45].dec"
+      }
+    },
+    {
+      "instance": "_46960_",
+      "old_master": "sg13cmos5l_dfrbpq_1",
+      "new_master": "sg13cmos5l_dfrbpq_2",
+      "pins": {
+        "CLK": "clknet_6_32_0_clk_regs",
+        "D": "_00304_",
+        "Q": "u_chip.g_lane[0].state[3]",
+        "RESET_B": "net11425"
+      }
+    },
+    {
+      "instance": "_38658_",
+      "old_master": "sg13cmos5l_nor3_1",
+      "new_master": "sg13cmos5l_nor3_2",
+      "pins": {
+        "A": "u_chip.g_unit[0].u_unit.g_bs.u_bs.st_v",
+        "B": "_12013_",
+        "C": "_12509_",
+        "Y": "_12511_"
+      }
+    },
+    {
+      "instance": "_38755_",
+      "old_master": "sg13cmos5l_a21oi_1",
+      "new_master": "sg13cmos5l_a21oi_2",
+      "pins": {
+        "A1": "_12511_",
+        "A2": "net6382",
+        "B1": "_12007_",
+        "Y": "_12607_"
+      }
+    },
+    {
+      "instance": "place7018",
+      "old_master": "sg13cmos5l_buf_1",
+      "new_master": "sg13cmos5l_buf_4",
+      "pins": {
+        "A": "_20070_",
+        "X": "net7018"
+      }
+    },
+    {
+      "instance": "_28099_",
+      "old_master": "sg13cmos5l_inv_1",
+      "new_master": "sg13cmos5l_inv_2",
+      "pins": {
+        "A": "_02827_",
+        "Y": "_02828_"
+      }
+    },
+    {
+      "instance": "_28100_",
+      "old_master": "sg13cmos5l_nand2_1",
+      "new_master": "sg13cmos5l_nand2_2",
+      "pins": {
+        "A": "u_chip.g_unit[3].u_cfg.g_word[3].g_stored.g_bit[10].g_latch.q",
+        "B": "_02828_",
+        "Y": "_02829_"
+      }
+    },
+    {
+      "instance": "_28101_",
+      "old_master": "sg13cmos5l_and2_1",
+      "new_master": "sg13cmos5l_and2_2",
+      "pins": {
+        "A": "u_chip.g_unit[3].u_unit.u_rx.fc[0]",
+        "B": "_02829_",
+        "X": "_02830_"
+      }
+    },
+    {
+      "instance": "_32036_",
+      "old_master": "sg13cmos5l_and2_1",
+      "new_master": "sg13cmos5l_and2_2",
+      "pins": {
+        "A": "_06465_",
+        "B": "_06468_",
+        "X": "_06469_"
+      }
+    },
+    {
+      "instance": "place7143",
+      "old_master": "sg13cmos5l_buf_1",
+      "new_master": "sg13cmos5l_buf_2",
+      "pins": {
+        "A": "net7144",
+        "X": "net7143"
+      }
+    },
+    {
+      "instance": "place6382",
+      "old_master": "sg13cmos5l_buf_1",
+      "new_master": "sg13cmos5l_buf_4",
+      "pins": {
+        "A": "_12604_",
+        "X": "net6382"
+      }
+    },
+    {
+      "instance": "place6383",
+      "old_master": "sg13cmos5l_buf_1",
+      "new_master": "sg13cmos5l_buf_4",
+      "pins": {
+        "A": "_12511_",
+        "X": "net6383"
+      }
+    },
+    {
+      "instance": "_26695_",
+      "old_master": "sg13cmos5l_and2_1",
+      "new_master": "sg13cmos5l_and2_2",
+      "pins": {
+        "A": "u_chip.g_unit[0].u_unit.u_rx.fc[0]",
+        "B": "_21210_",
+        "X": "_21212_"
+      }
+    }
+  ],
+  "proposal_sha256": "7df4a6c1bc5cec991213a8f9c40c3ae54b24b44758c3d31bbb0ee8fde0cbd402",
+  "diagnostic_binding": {
+    "runs/extracted-timing/08-openroad-fillinsertion/tt_um_tripwire.nl.v": "d97bce48c8e59983d1ccd0ae91d1c05a9e1c0c26867388d27b05cf514ecbe198",
+    "runs/extracted-timing/10-openroad-rcx/nom/tt_um_tripwire.nom.spef": "d509b6c57bbc66b847fa9c3da1403a0e6623698132400ab437b71c8076809191",
+    "runs/extracted-timing/final/sdc/tt_um_tripwire.sdc": "256652b5043c2bb4c85a5880399c9ef5c273a3d56171422d6b3ff3e565c44f1e",
+    "runs/extracted-timing/effective-signoff.sdc": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa",
+    "runs/extracted-timing/corner_summary.json": "27b045c8e961e37fb298d51a7f57087b426352d16389678399a8b5284d88589f"
+  }
+}

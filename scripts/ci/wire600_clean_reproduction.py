@@ -34,9 +34,11 @@ def validate_clean_source():
         raise ValueError('Missing unique fresh synthesis state')
 
 
-def main():
+def main(*, plan_builder=plan, target_emitter=target_call,
+         connectivity_audit=validate_change, output=OUTPUT):
+    output = Path(output)
     require_empty_source()
-    OUTPUT.mkdir(parents=True, exist_ok=False)
+    output.mkdir(parents=True, exist_ok=False)
     try:
         clean_screen()
     except ValueError as error:
@@ -50,17 +52,17 @@ def main():
                    route_authorized=False,
                    files={k: dict(path=v['path'], sha256=digest(v['path']))
                           for k, v in BINDING['files'].items()})
-    (OUTPUT/'source_reproduction.json').write_text(json.dumps(receipt, indent=2)+'\n')
-    repair_screen(plan_builder=plan, target_emitter=target_call,
-                  connectivity_audit=validate_change,
-                  output=OUTPUT/'repaired', source_check=validate_clean_source)
-    gates = json.loads((OUTPUT/'repaired/gates.json').read_text())
+    (output/'source_reproduction.json').write_text(json.dumps(receipt, indent=2)+'\n')
+    repair_screen(plan_builder=plan_builder, target_emitter=target_emitter,
+                  connectivity_audit=connectivity_audit,
+                  output=output/'repaired', source_check=validate_clean_source)
+    gates = json.loads((output/'repaired/gates.json').read_text())
     if not gates['checkpoint_measured_gates_pass']:
         raise ValueError('Fresh repaired reproduction fails measured gates')
     receipt.update(repaired_measured_gates_pass=True,
                    final_state=gates['final_state'], qualified=False,
                    detailed_routing_required=True, exact_netlist_replay_required=True)
-    (OUTPUT/'reproduction.json').write_text(json.dumps(receipt, indent=2)+'\n')
+    (output/'reproduction.json').write_text(json.dumps(receipt, indent=2)+'\n')
 
 
 if __name__ == '__main__':

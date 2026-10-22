@@ -34,8 +34,8 @@ def _build(root, macro_lef, review=REVIEW):
             name = f'tripwire_wire600_{len(proposal["groups"])}'
             proposal['groups'].append(dict(buffer=name, net=name+'_net', source_net=net,
                 rail_source=power_anchor(nets[net], loc, driver), master='sg13cmos5l_buf_4',
-                sinks=sinks, location=nearest_row(rows, loc[driver[0]][1:3]), reasons=['slew']))
-        proposal['source_targets'][net] = ['slew']
+                sinks=sinks, location=nearest_row(rows, loc[driver[0]][1:3]), reasons=list(expected.get('reasons', ['slew']))))
+        proposal['source_targets'][net] = list(expected.get('reasons', ['slew']))
     proposal['resizes'] = copy.deepcopy(review['resizes'])
     moved = {tuple(p) for g in proposal['groups'] for p in g['sinks']}
     for resize in proposal['resizes']:
@@ -43,7 +43,10 @@ def _build(root, macro_lef, review=REVIEW):
             raise ValueError('Wrong resize source master')
         if any(n == resize['instance'] for n, p in moved):
             raise ValueError('Identity partition changes a resize input')
-        pin = 'Q' if resize['old_master'].startswith('sg13cmos5l_dfrbpq_') else 'Y'
+        outputs = [p for p in resize['pins'] if p in {'Q', 'X', 'Y'}]
+        if len(outputs) != 1:
+            raise ValueError('Resize must have one reviewed output')
+        pin = outputs[0]
         proposal['source_targets'][resize['pins'][pin]] = ['capacitance' if pin == 'Q' else 'slew']
     proposal.update(buffers=len(proposal['groups']), target_count=len(proposal['source_targets']),
                     residual_evidence_run=review['evidence_run'])

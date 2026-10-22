@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 
@@ -16,13 +17,16 @@ PAIRS = [
 ]
 
 
-def prove(library_dir, output):
+def prove(library_dir, output, *, pairs=None):
+    pairs = PAIRS if pairs is None else pairs
+    if not pairs:
+        raise ValueError('Missing strength equivalence targets')
     output = Path(output).resolve()
     output.mkdir(exist_ok=False)
     wrapper = ''
     for variant, module in enumerate(('gold','gate')):
-        wrapper += f'module {module}(input a,b,c,output [6:0] y);\n'
-        for i, (old,new,pins,out) in enumerate(PAIRS):
+        wrapper += f'module {module}(input a,b,c,output [{len(pairs)-1}:0] y);\n'
+        for i, (old,new,pins,out) in enumerate(pairs):
             ports = ','.join('.'+p+'('+v+')' for p,v in zip(pins, ['a','b','c']))
             wrapper += f'sg13cmos5l_{(old,new)[variant]} u{i}({ports},.{out}(y[{i}]));\n'
         wrapper += 'endmodule\n'
@@ -45,9 +49,10 @@ equiv_status -assert
             subprocess.run(['yosys','-Q','-s',corner+'.ys'],cwd=output,
                            stdout=log,stderr=subprocess.STDOUT,check=True,timeout=60)
         text = (output/(corner+'.log')).read_text()
-        if 'Equivalence successfully proven!' not in text or '7 are proven and 0 are unproven' not in text:
+        proven = re.search(r'Of those cells (\d+) are proven and 0 are unproven', text)
+        if 'Equivalence successfully proven!' not in text or not proven or int(proven[1]) < len(pairs):
             raise ValueError('Incomplete strength equivalence proof')
-        result.append(dict(corner=corner, proven_outputs=7,
+        result.append(dict(corner=corner, proven_outputs=len(pairs),equivalence_points=int(proven[1]),
                            library_sha256=hashlib.sha256(lib.read_bytes()).hexdigest()))
     (output/'receipt.json').write_text(json.dumps(result,indent=2)+'\n')
     return result

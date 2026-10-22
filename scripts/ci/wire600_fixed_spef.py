@@ -19,12 +19,13 @@ CORNERS = [('slow_1p08V_125C','slow_1p08V_125C'),
            ('fast_1p32V_m40C','fast_1p32V_m55C')]
 
 
-def changed_netlist(text):
+def changed_netlist(text, targets=None):
     old = logical_cells(text)
     result = text
     expected = dict(old)
     # The first two substitutions belong to the already executed preparation.
-    for target in REVIEW['resizes'][2:]:
+    targets = REVIEW['resizes'][2:] if targets is None else targets
+    for target in targets:
         name, master, new = (target[k] for k in ('instance','old_master','new_master'))
         if old.get(name,(None,))[0] != master:
             raise ValueError('Wrong extracted strength source')
@@ -48,9 +49,9 @@ def slack(report):
     return min(map(float,values))
 
 
-def diagnose(root, library_dir, macro_dir, sta, output):
+def diagnose(root, library_dir, macro_dir, sta, output, *, review=REVIEW):
     root, output = Path(root).resolve(), Path(output).resolve()
-    for name, sha in REVIEW['diagnostic_binding'].items():
+    for name, sha in review['diagnostic_binding'].items():
         if hashlib.sha256((root/name).read_bytes()).hexdigest() != sha:
             raise ValueError('Wrong fixed-SPEF input: '+name)
     output.mkdir(exist_ok=False)
@@ -59,8 +60,9 @@ def diagnose(root, library_dir, macro_dir, sta, output):
     text = source.read_text()
     reference = json.loads((prefix/'corner_summary.json').read_text())
     results = {}
-    selected = 'strength'+str(len(REVIEW['resizes'])-2)
-    for case, nl in [('baseline',text),(selected,changed_netlist(text))]:
+    targets = review.get('diagnostic_resizes', review['resizes'][2:])
+    selected = 'strength'+str(len(targets))
+    for case, nl in [('baseline',text),(selected,changed_netlist(text, targets))]:
         netlist = output/(case+'.v'); netlist.write_text(nl)
         results[case] = {}
         for corner, macro_corner in CORNERS:
@@ -99,9 +101,9 @@ exit
                        macro_sha256=hashlib.sha256(macro.read_bytes()).hexdigest())
             results[case][corner] = row
             print(case,corner,json.dumps(row),flush=True)
-    receipt = dict(source_run=39806020090,fixed_spef=True,physical_qualified=False,
+    receipt = dict(source_run=review['evidence_run'],fixed_spef=True,physical_qualified=False,
                    official_signoff=False,connectivity_audited=True,
-                   source_bindings=REVIEW['diagnostic_binding'],
+                   source_bindings=review['diagnostic_binding'],
                    sta_sha256=hashlib.sha256(Path(sta).read_bytes()).hexdigest(),cases=results)
     (output/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
     return receipt

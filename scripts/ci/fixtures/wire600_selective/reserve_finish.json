@@ -1,0 +1,108 @@
+{
+  "evidence_run": 39696487052,
+  "evidence_gates_sha256": "c13769141c13137c6c1cbe17b0d3bf9c3dc85dfb7e03b50bfa029b3fc7deca1f",
+  "evidence_def_sha256": "d5d42701733fb17bb5b9fe134cc01641c9c8b00b3e9f6827da8df16f93b092dd",
+  "extra_sources": {
+    "_02935_": {
+      "terms": [
+        [
+          "ANTENNA_1",
+          "A"
+        ],
+        [
+          "_28210_",
+          "Y"
+        ],
+        [
+          "wire12414",
+          "A"
+        ]
+      ],
+      "driver": [
+        "_28210_",
+        "Y"
+      ]
+    },
+    "_11512_": {
+      "terms": [
+        [
+          "ANTENNA_56",
+          "A"
+        ],
+        [
+          "_37558_",
+          "Y"
+        ],
+        [
+          "_37559_",
+          "B1"
+        ]
+      ],
+      "driver": [
+        "_37558_",
+        "Y"
+      ]
+    },
+    "_17445_": {
+      "terms": [
+        [
+          "_44790_",
+          "Y"
+        ],
+        [
+          "_44793_",
+          "A2"
+        ]
+      ],
+      "driver": [
+        "_44790_",
+        "Y"
+      ]
+    },
+    "_19926_": {
+      "terms": [
+        [
+          "_25383_",
+          "Y"
+        ],
+        [
+          "_25392_",
+          "A"
+        ],
+        [
+          "place7019",
+          "A"
+        ]
+      ],
+      "driver": [
+        "_25383_",
+        "Y"
+      ]
+    }
+  },
+  "resizes": [
+    {
+      "instance": "_30349_",
+      "old_master": "sg13cmos5l_nor3_1",
+      "new_master": "sg13cmos5l_nor3_2",
+      "pins": {
+        "A": "_04892_",
+        "B": "net8106",
+        "C": "net7643",
+        "Y": "u_chip.g_lane[0].u_slots.g_word[45].dec"
+      }
+    },
+    {
+      "instance": "_46960_",
+      "old_master": "sg13cmos5l_dfrbpq_1",
+      "new_master": "sg13cmos5l_dfrbpq_2",
+      "pins": {
+        "CLK": "clknet_6_32_0_clk_regs",
+        "D": "_00304_",
+        "Q": "u_chip.g_lane[0].state[3]",
+        "RESET_B": "net11425"
+      }
+    }
+  ],
+  "proposal_sha256": "3841e32001ec60bcb81e27024b6ffba97846e32d422db355a15c1c8d57551b1e"
+}

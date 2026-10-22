@@ -34,7 +34,8 @@ def validate_run(run):
         raise ValueError('Wrong selective checkpoint provenance')
 
 
-def main():
+def main(*, plan_builder=plan, target_emitter=target_call,
+         connectivity_audit=validate_change, output=OUTPUT):
     validate_run(json.loads(Path('/tmp/native-source-run.json').read_text()))
     validate_files(Path.cwd())
     files = BINDING['files']
@@ -46,13 +47,14 @@ def main():
     macro = [p for p in Path('macro').rglob('*.lef') if digest(p) == MACRO_LEF_SHA]
     if len(macro) != 1:
         raise ValueError('Missing pinned SRAM geometry')
-    proposal = plan(Path.cwd(), macro[0])
+    proposal = plan_builder(Path.cwd(), macro[0])
     target = Path('workflow-src/scripts/ci/wire600_selective_targets.tcl')
     if target.exists():
         raise ValueError('Repeated selective target generation')
-    target.write_text(target_call(Path(files['def']['path']).read_text(), proposal))
-    OUTPUT.mkdir(exist_ok=False)
-    (OUTPUT/'proposal.json').write_text(json.dumps(proposal, indent=2)+'\n')
+    target.write_text(target_emitter(Path(files['def']['path']).read_text(), proposal))
+    output = Path(output)
+    output.mkdir(exist_ok=False)
+    (output/'proposal.json').write_text(json.dumps(proposal, indent=2)+'\n')
     image = 'tripwire-wire600-selective:local'
     subprocess.run(['docker', 'build', '-t', image, '-f',
                     'workflow-src/scripts/ci/Dockerfile.openroad-wire600-selective',
@@ -60,17 +62,17 @@ def main():
     os.environ['LIBRELANE_IMAGE_OVERRIDE'] = image
     config = json.loads(Path(files['config']['path']).read_text())
     # Discard metrics/derived views from the source; retain physical source files.
-    initial = OUTPUT/'source_state.json'
+    initial = output/'source_state.json'
     initial.write_text(json.dumps(dict(state, metrics={}, spef=None, sdf=None, lib=None), indent=2)+'\n')
-    run_step(config, initial, OUTPUT/'flow',
+    run_step(config, initial, output/'flow',
              ['OpenROAD.ResizerTimingPostGRT', 'OpenROAD.RepairAntennas'])
-    prior = unique(OUTPUT/'flow', '*-openroad-resizertimingpostgrt/state_out.json')
-    raw = unique(OUTPUT/'flow', '*-openroad-repairantennas/state_out.json')
+    prior = unique(output/'flow', '*-openroad-resizertimingpostgrt/state_out.json')
+    raw = unique(output/'flow', '*-openroad-repairantennas/state_out.json')
     before = (prior.parent/'selective.before.v').read_text()
     after = (prior.parent/'selective.after.v').read_text()
     if logical_cells(before) != logical_cells(Path(files['nl']['path']).read_text()):
         raise ValueError('Selective input netlist disagrees with exact source')
-    validate_change(before, after, proposal)
+    connectivity_audit(before, after, proposal)
     log = (prior.parent/'openroad-resizertimingpostgrt.log').read_text()
     if log.count('TRIPWIRE_SELECTIVE repaired and refreshed; native timing repair follows') != 1:
         raise ValueError('Missing selective repair execution receipt')
@@ -79,13 +81,13 @@ def main():
     validate_overflow(log)
     check_post_antenna_command(config, raw)
     cfg = timing_config(config)
-    timing = OUTPUT/'timing'
+    timing = output/'timing'
     screen(cfg, raw, timing, os.environ['PDK_ROOT'], repaired=raw,
            sdc=Path('src/signoff.sdc'),
            extra_tcl=Path('workflow-src/scripts/ci/native_no_final_grt_audit.tcl'))
     audited = audit_post_antenna(prior, raw, timing)
-    run_step(config, audited, OUTPUT/'antenna', ['OpenROAD.CheckAntennas'])
-    antenna = json.loads(unique(OUTPUT/'antenna', '*-openroad-checkantennas/or_metrics_out.json').read_text())
+    run_step(config, audited, output/'antenna', ['OpenROAD.CheckAntennas'])
+    antenna = json.loads(unique(output/'antenna', '*-openroad-checkantennas/or_metrics_out.json').read_text())
     reports = {c: unique(timing/f'after-{c}', '*-openroad-stamidpnr/checks.rpt').read_text() for c in CORNERS}
     margins = measure(list(timing.glob('after-*/*-openroad-stamidpnr/electrical_margin.rpt')))
     gates = record_capture(evaluate(json.loads((timing/'comparison.json').read_text()), antenna, reports, margins), timing)
@@ -96,11 +98,12 @@ def main():
     gates.update(source_run=BINDING['source_run'], identity_connectivity_audited=True,
                  custom_image=True, custom_image_name=image, native_routing_modified=True,
                  selective_buffers=proposal['buffers'], selective_targets=proposal['target_count'],
+                 selective_resizes=len(proposal.get('resizes', [])),
                  final_state=str(audited), routing_object_counts=coverage,
                  all_signal_nets_have_routing_objects=covered, routing_completeness_proven=False,
                  checkpoint_measured_gates_pass=gates['checkpoint_measured_gates_pass'] and covered)
     validate_files(Path.cwd())
-    (OUTPUT/'gates.json').write_text(json.dumps(gates, indent=2)+'\n')
+    (output/'gates.json').write_text(json.dumps(gates, indent=2)+'\n')
     print(json.dumps(gates, indent=2), flush=True)
     if not gates['checkpoint_measured_gates_pass']:
         raise ValueError('Selective electrical checkpoint fails strict gates; no routing')

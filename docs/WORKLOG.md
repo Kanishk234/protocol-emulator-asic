@@ -3,11 +3,25 @@
 Newest entry at the top. One entry per work session.
 
 
+## 2026-10-21 — Target remaining reserve sources and shared critical load
 
+- Retrieved full39696487052 evidence12390558995 under/tmp/tripwire-selective-full-39696487052. Bound final NL/DEF through audited post-antenna state. Residual19926 driver25383/a221oi1 lies on the worst capture path, with1.089998ns cell arc/1.257505ns slew and61.646fF load. This gives a shared electrical/setup target instead of an unrelated optimization sweep.
+- All six residual terminal sets and driver placements match the original wire600 source: four weak combinational outputs02935/11512/17445/19926, slot45.dec driven by30349/nor3_1, and state3 driven by46960/dfrbpq_1. D-104 extends original68buffer plan with4BUF4s and two compatible strength substitutions. Never rewire ICG/GATE; only its original NOR3 driver changes size. Total72buffers/2resizes/218sink rewires/43nets, area increment67.1328µm² versus68buffer plan. No changed RTL/state/cycles/constraints or acceptance limits.
+- Source-bound canonical fixture verifies the extended proposal. Full-source synthetic connection/master audit passes; wrong identity input and wrong resized master reject. Functional resize proof passes at each of3Liberty corners,2q/y points each with induction cap2 and explicit asynchronous reset modeling; wrong logic and reset negatives reject. New portable proof helper retains receipts outsideGit. Actual generated Tcl executes72groups/218sink tuples/2resizes/2placement unlocks under validating stubs.40focused tests pass; helper syntax and all new workflow shell/Python blocks parse; git diff --check passes.
+- Prepared separate gds-wire600-reserve-finish-screen against original39677316308 checkpoint, retaining all original guards, image/routing/native hold/antenna handling and immutability checks. Shared runner adds explicit builder/emitter/audit/output overrides with old defaults intact. Native actual sizing/legalization/parasitics and physical gates remain unproven for the extension. Next publish scoped tool/test/CI/docs groups and launch one run on verified remote main. No routing, phase boxes or unchanged reruns; unrelated local files/FIPE notes preserved.
 
+## 2026-10-21 — Selective repair clears actual electrical failures; reserve gates reject
 
+- Checked completed39696487052/job119554995697 on6b5a696. Source/proposal/image/native repair/antenna/STA all execute; BUG131/132 no longer block measurement. Downloaded small gate artifact12391741311(85861bytes) under/tmp/tripwire-selective-gates-39696487052; full evidence12390558995(156163309bytes) available. This is a measured physical rejection, not a runner crash.
+- All actual slew/capacitance/fanout counts0 at all3corners, antenna nets/pins0. Fast hold+0.125034ns, slow+0.431282ns,typ+0.238276ns; setupWS0allcorners. Identity connectivity audited,68buffer additions/37targets, all signal nets have routing objects; no claim that guides prove detailed routes.
+- Slow capture3.212737ns misses unchanged3.5ns preparation gate by0.287263ns; typ9.370891/fast12.941559ns. Versus source wire6003.595163ns, loses0.382426ns. Same reported start49681→endpoint48502 leads the slow report. This remains estimated routing, not extracted/official timing.
+- Electrical reserve remaining: slow5slew/1cap,typ2slew/1cap,fast0slew/1cap. Five unique slew sources11512, lane0slot45.dec,17445,19926,02935; cap source lane0state3. Worstslow slew74.2802%, fastcap52.781% versus45%. Slot45 target includes ICG/GATE: do not use generic sink-rewire code on protected clock-control pins; investigate compatible driver sizing without changing connectivity.
+- Conclusion: six actual fanout failures and original SRAM cap reserve misses are cleared, but setup and electrical reserve gates still reject. Keep qualified=false, route_authorized=false, clean_synthesis=false; no DRT, official run, phase boxes, threshold changes or unchanged rerun. Next bind exact final netlist/DEF to diagnose six residual nets and the287ps setup deficit, separating native hold/reroute changes from original identity edits. Unrelated local files/FIPE notes preserved.
 
+## 2026-10-21 — Publish macro-path fix and launch corrected measurement
 
+- Published scoped toolsc0e6e81, testsfca8ea8 and docs6b5a696. Push succeeded; local HEAD and remote main both6b5a696f4a0f8c14766ba8aa2691a70b29a63af2. Pre-push hardware history empty; unrelated files and local FIPE notes excluded.
+- Dispatched [gds-wire600-selective-screen39696487052](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39696487052), verified in_progress on exact published head. Same repair plan and strict gates; timing config now retains source macro path base. No physical pass or phase boxes; inspect STA startup and final measurements when available. Launch receipt remains local until next evidence update.
 
 ## 2026-10-21 — Selective native repair completes; correct STA macro path base
 

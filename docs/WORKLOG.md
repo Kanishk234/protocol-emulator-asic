@@ -3,6 +3,21 @@
 Newest entry at the top. One entry per work session.
 
 
+
+
+## 2026-10-21 — Setup reserve clears; prepare one remaining slew repair
+
+- Inspected39700222717/job119567388569 on828cf68. Gate artifact12391939464(90089bytes) under/tmp/tripwire-reserve-finish-gates-39700222717; full12391934645(156168424bytes) under/tmp/tripwire-reserve-finish-full-39700222717. Full runner/measurements complete, no infrastructure error.
+- Slow/typ/fast capture3.871081/9.655537/13.045062ns; slow improves0.658344ns over previous selective result and clears3.5ns gate by0.371081ns. Fast hold+0.125034ns; actual electrical counts0allcorners; antenna0; cap reserves pass, max42.53%. Only slow slew reserve11520→37575/B1 remains:1.681281ns/2.5074ns=67.0528%, limit45%. qualified=false, no DRT/phase boxes/official signoff.
+- Exact current DEF and original source agree:37574/o21ai1 drives37575/B1 across518.4µm, one data sink, no protected clock/reset/exposed pin. D-105 adds one local BUF4 to the same original source/profile, retaining all72prior buffers and2sizes. Total73buffers/2sizes/219sink rewires/44nets, added area14.5152µm². No threshold, native hold target, source shape, RTL/config/template or other hardware change.
+- Refactored shared reserve builder/emitter/audits to accept explicit frozen review records while keeping old defaults and original canonical proposal unchanged. Fixture insertion order preserves prior buffer identities when appending the one new group. Actual CI72buffer edit graph audits correctly; extended73buffer graph passes, wrong new buffer input rejects. New generated Tcl executes73groups/219sink tuples/2sizes/2placement unlocks under validating stubs.43focused tests pass with no skips, including unchanged source/gate environment and workflow syntax. Raw evidence remains outside Git.
+- Prepared separate gds-wire600-reserve-last-screen. Next publish scoped tools/tests/CI/docs and launch once on verified remote main; inspect actual edits and all measured gates. No unchanged rerun or routing authorization; even a passing checkpoint still needs clean synthesis reproduction. Unrelated local/FIPE files preserved.
+
+## 2026-10-21 — Publish and launch residual reserve repair
+
+- Published scoped toolsaabdbf2, tests5ba5db5, CIee33861 and docs828cf68. Push succeeded; local HEAD and remote main both828cf6811842ac13f884fcffd91769fb5a280631. Pre-push hardware history empty; unrelated local files and FIPE notes excluded.
+- Dispatched [gds-wire600-reserve-finish-screen39700222717](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39700222717), verified in_progress on exact published head. Same original wire600 checkpoint,72identity buffers and two proved strength changes; targets include the1.09ns critical-path driver and all six residual reserve sources. All original gates remain fixed. Actual sizing/legalization and final physical gates pending; no DRT, official claim or phase boxes. Next inspect preflight, executed edit audit and full gate receipt. Launch receipt remains local until next evidence update.
+
 ## 2026-10-21 — Target remaining reserve sources and shared critical load
 
 - Retrieved full39696487052 evidence12390558995 under/tmp/tripwire-selective-full-39696487052. Bound final NL/DEF through audited post-antenna state. Residual19926 driver25383/a221oi1 lies on the worst capture path, with1.089998ns cell arc/1.257505ns slew and61.646fF load. This gives a shared electrical/setup target instead of an unrelated optimization sweep.

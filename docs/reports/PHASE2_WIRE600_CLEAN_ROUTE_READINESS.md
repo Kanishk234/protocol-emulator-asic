@@ -79,3 +79,29 @@ Raw diagnostic receipts/proofs remain under/tmp/tripwire-wire600-fixed-selected1
 and/tmp/tripwire-wire600-strength-proofs; report/database artifacts remain outside
 Git. The separate gds-wire600-extracted-clean workflow stops before DRT and must
 pass all preparation checks before any routing continuation.
+
+## Strength-profile clean screen passes (2026-10-22)
+
+[39824026639](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39824026639)
+passes fresh synthesis reconstruction and all preparation gates for81buffers,
+13sizes and59target nets. Slow capture3.735021ns, fast hold0.125034ns, setupWS0,
+zero actual electrical/antenna counts, and conservative electrical reserves pass.
+All33,945signal nets have routing objects. This is estimated preparation evidence;
+new extracted results and exact-netlist protocol replay remain required.
+
+Separate gds-wire600-extracted-route and l3-wire600-extracted-gl continue only this
+clean run. Explicit source/root/proposal/audit overrides retain the older profile
+unchanged and prevent cross-use of its measurements/netlist. Routing repeats no
+edits or global repair; fresh strict preparation checks still precede DRT and
+all-corner extraction. Replay runs all22cases on the new preparation netlist;
+a later replay on the final routed netlist remains necessary. No main hardware,
+constraints, acceptance limits, template jobs or phase checklist boxes change.
+
+The new source binding is scripts/ci/fixtures/wire600_selective/extracted_route.json:
+244files from clean run39824026639 at808223d2396f3e981930389088b7bd0e55885825.
+The final preparation netlist SHA256 is
+2c40479252b0411f115ffb63eb23e97e82e90f9efef76dd52704d6a116a29f1a.
+Independent actual-artifact connection audit and report-based preparation gate
+recomputation pass.102focused checks pass, including unchanged old-profile
+behavior, explicit new-root use and wrong-source/receipt rejection. Full evidence
+is under/tmp/tripwire-extracted-clean-full-39824026639 and remains outside Git.

@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-22 — Bind targeted clean repair for routing and protocol replay
+
+- Downloaded full39824026639 evidence12451010823 to/tmp/tripwire-extracted-clean-full-39824026639. Reviewed netlist SHA2c40479252b0411f115ffb63eb23e97e82e90f9efef76dd52704d6a116a29f1a. New extracted_route binding covers244files including original source hashes, clean receipts, proposal/edit logs, physical views and three-corner reports. All hashes match; actual81buffer/13size connectivity audit and independently recomputed preparation gates pass.
+- Shared routing/replay helpers accept explicit binding/root/proposal/audit overrides, preserving prior defaults. New wire600_extracted_route and wire600_extracted_gl pin only39824026639. Fresh strict preparation checks precede unchanged stock DRT/extraction; no repeated repair/GRT, gate changes or new hardware. GL runs22cases on the new preparation netlist; final-route replay remains required.
+- Prepared separate gds-wire600-extracted-route and l3-wire600-extracted-gl, both bound to the successful source artifact and frozen candidate shape.102focused checks pass without skips, including wrong-source/root fallback refusal, both profiles, workflow shell/embedded Python parse and actual artifact checks. git diff --check passes; pre-publication hardware history empty. Next publish scoped tools/tests/CI/evidence and launch both on verified main. No phase boxes or official signoff; unrelated local/FIPE files preserved.
+
+
+## 2026-10-22 — Extracted-path repair profile passes clean preparation
+
+- Verified [39824026639](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39824026639) succeeds at808223d2396f3e981930389088b7bd0e55885825,17:35:25→18:51:30UTC. Small artifact12450855943 under/tmp/tripwire-extracted-clean-gates-39824026639; full12451010823 available. Outer reproduction confirms fresh synthesis/no source download, exact eight source bindings and repaired_measured_gates_pass=true.81buffers/13sizes/59targets, actual identity connectivity audited.
+- Physical preparation slow capture3.735021ns,typ9.626485ns,fast13.028982ns; fast hold+0.125034ns,typ+0.238276ns,slow+0.431282ns. SetupWS0allcorners. All actual slew/cap/fanout and antenna violations0; all45%reserve gates pass, worst slow slew44.9812%, maxcap42.53%. All33945signal nets have routing objects. Slow capture is0.136060ns below previous preparation but0.235021ns above fixed3.5ns gate; no claim of extracted improvement from this estimate.
+- New strength/fanout profile is now physically screened from clean synthesis. It has not completed detailed routing/extraction or its own exact-netlist protocol replay; prior22/22 applies to the older73buffer/two-size preparation. Next bind this successful clean artifact, independently audit report/readback evidence, then route/extract and replay protocols without changing gates. Official GDS/Phase2 remain open; no boxes ticked. Unrelated local/FIPE files preserved.
+
+
+## 2026-10-22 — Publish and launch extracted-path clean repair screen
+
+- Published tools98500cd, tests9a28584, CI4101e1a and docs808223d separately. Push succeeded; local HEAD and remote main both808223d2396f3e981930389088b7bd0e55885825. Pre-push src/info/macro history empty; unrelated modified reports, untracked tools and FIPE notes excluded.
+- Launched [gds-wire600-extracted-clean39824026639](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39824026639), verified in_progress at exact published SHA. Fresh source reconstruction followed by81buffers/13sizes, including11measured extracted-path strengths and four diode-sensitive fanout partitions. Same20ns/50ps/3.5ns/45%/zero-actual gates, no DRT or official signoff. Next inspect fresh source match, edit audit and all physical preparation gates; local fixed-SPEF pass does not qualify actual geometry. No phase boxes. Launch receipt remains local until next evidence update.
+
+
 ## 2026-10-22 — Diagnose extracted failure and prepare measured strength/diode reserve follow-up
 
 - Full route39806020090 artifact12442539207 downloaded under/tmp/tripwire-clean-route-full-39806020090. Source→DRT topology audit confirms exactly42new antenna diodes and no other logical changes. Eight loads on four failing sources: net8721+4,21968+2,lane0slotwdata13+1,net8083+1. Worst slow path49681(configuration word0bit2)→48502(drop counter) includes several1ns+weak gates; fanout is BUG106recurrence and estimated-vs-extracted gap remains BUG122.

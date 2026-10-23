@@ -1,5 +1,11 @@
 # Bugs
 
+## 118: Physical pin preparer rewrites retained primitive metadata
+- **Date:**2026-10-23.
+- **Symptom/check:** initial preparer passes source admission, then model-hash guard rejects six regenerated primitive JSON files after FABulous loadFabric on relocated artifact paths.
+- **Root cause:** the API derives primitive JSON with source-path metadata while loading; operating directly on the downloaded library changes authenticated bytes.
+- **Fix/coverage:** generate pins from an isolated copied library; check the original model before and after. Restore exact original metadata bytes from retained control files only after expected SHA equality. Final local preparation passes both model guards; no physical/native result accepted from the first attempt.
+
 ## 116: Bounded routing timeout is reported only as unknown worker failure
 - **Date:**2026-10-23.
 - **Symptom/check:**39696703659 UART+I2C has no native fatal and an unknown classifier result despite explicit600-second watchdog expiry.

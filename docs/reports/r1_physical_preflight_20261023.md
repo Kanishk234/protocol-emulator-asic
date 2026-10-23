@@ -1,0 +1,7 @@
+# R1 exact mapped LUT physical preflight
+
+D106 freezes the audited LUT cell netlist from39696703659, including438configuration latches and210signal bits. The new preparer exports it without synthesis, checks source identity, and generates a pin order from a disposable copy. Original model hashes must remain exact. Scalar carry-port print metadata is normalized while cell/port connectivity is asserted unchanged. The physical API's single-tile pin format is converted explicitly to the pinned I/O adapter's format.
+
+Two fixed widths219.84and154.08µm at185.22µm height use the same mapped cells, margins and I/O policy. This is a floorplan/pin hypothesis, not a chip-outline decision. Pinned LibreLane stages import the netlist, create floorplan rows, connect power metadata and place signal pins. Native checks require all210ports with positive nonoverlapping same-layer rectangles inside the die, exact cell counts/438latches, and cell area no larger than the actual placeable core. Six admission-check tests pass locally; final input preparation succeeds under build/r1_physical_prepared_native.
+
+No local Docker/native physical run is claimed. Hosted workflow pending. CLOCK_PORT=null and absence of placement/PDN/routing stages mean no timing, power-grid connectivity, routed/signoff or chip-fit acceptance. Per-column PG phase, actual routing/buffers, loaded mapped behavior and real-shell integration remain later gates. No full-chip hardening attempt used.

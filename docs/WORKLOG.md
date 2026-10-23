@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (all-type R1 interface gate prepared)
+**Done:** D108 freezes all10mapped JSONs from39696703659; isolated copied-library pin preparation succeeds, preserving original model hashes and exact passing LUT netlist SHA. Connectivity-only elaboration finds40grid instances/3064adjacent bit pairs/no nonadjacent direct pairs. New native screen imports alltypes at both existing footprints, checks exact cells/bounded literal bindings/core/pin geometry/directions, then actual connected neighbor layer/edge/center alignment.53local R1testsPASS; no architecture/graph/production change.
+**Next:** run owned hosted all-type gate, audit every footprint/type and interface before extending representative physical routing or full-grid integration. Other column PGphases, primitive/border physical routing, full-grid/timing and secondary I2Ctimeout remain open. No phase boxes ticked or full-chip attempt consumed; G1protected.
+
 ## 2026-10-23 (paired representative tile gate green)
 **Actual:**40009616432 at6b2908894d2eefe53bbb1e523d5e924761ef6e8f attempt1SUCCESS, bothwidths. Root API/source/result/geometry/ODB-hash replayPASS; each ODB exactly matches preceding run. Zero final global overflow/PGviolations;438latches/2486PGterminals.49local R1testsPASS. Commits preserve adapter provenance and checker fixes; G1 unchanged.
 **Next:** qualify other tile types, column phases and shared interfaces, then complete-fabric physical integration. Narrow tile92.5429%utilized: retain limited reserve. No timing/detailed-routing/whole-fabric acceptance, no phase boxes ticked or whole-chip attempt consumed. Secondary UART+I2C600s compiler timeout remains unresolved.

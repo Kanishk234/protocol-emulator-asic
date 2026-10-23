@@ -27,9 +27,40 @@ FULL_MAPPED_SHA={
 'SW_term':'a5306fbf62dc1ad6c8446b4cb24a9ff92311d03b86ee2a9973e423d9c8f6eb7c',
 'S_IO2':'7790459362b2aba666c2e205888a96ceebafd290f303a83ba0c13a15ccfdc87c',
 'W_IO4':'6dfe7498d1fc34d3012fa5e977f679ddbc6c72144a939a1aefb585b0a8df1a77'}
+NATIVE_BALANCED_SHA={
+'PRIM2T2S':'eae4727e546ab12e15978c780981a69b7d568222759d387f173ffbf5a0e28bf1',
+'W_IO4':'979833b6a2d2b6c65067e5cd628f8812d0ab8525a52f00ab6445f7305ec620cc',
+'NW_term':'9998abeb3819c42ba50ab841316e6109c088f3eaad546f875ff41342c08739b3',
+'SW_term':'90a0f9a9a598ecdad2279324a85a9c200b45c6a04d2b0dd0ed44fddb88b7c0b2'}
 
 
-def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None):
+def balanced_native_exports(root,baseline):
+    root,baseline=Path(root).resolve(),Path(baseline).resolve();exports={};records=[]
+    cases={'west_io':('W_IO4','47_52','12.00'),'northwest':('NW_term','47_52','12.00'),
+           'southwest':('SW_term','47_52','12.00'),'primitive1':('PRIM2T2S','164_64','30.24'),
+           'primitive4':('PRIM2T2S','164_64','107.04')}
+    for name,(tile,width,phase) in cases.items():
+        folder=root/('r1-balanced-leaf-40030916359-'+name)/'native'
+        record=folder/'result.json';data=json.loads(record.read_text());records.append(record)
+        row=data['cases']['width'+width]
+        if (not data['passed'] or data['run']!='40030916359' or data['attempt']!='1' or
+            data['tile']!=tile or data['balanced_case']['name']!=name or not row['passed'] or
+            row['power_phase']['center_um']!=phase or data['mapped_nl_sha256']!=FULL_MAPPED_SHA[tile] or
+            data['input_manifest_sha256']!=hashlib.sha256((baseline/'manifest.json').read_bytes()).hexdigest()):
+            raise ValueError('Unqualified balanced native source: '+name)
+        if any(row['final_power_grid_violations'].values()) or any(c['total_overflow'] or c['max_h_overflow'] or c['max_v_overflow'] for c in row['congestion']):
+            raise ValueError('Native physical gates did not pass')
+        nl=folder/('width'+width)/'10-openroad-detailedplacement'/(tile+'.nl.v')
+        if hashlib.sha256(nl.read_bytes()).hexdigest()!=NATIVE_BALANCED_SHA[tile]:raise ValueError('Changed native balanced netlist')
+        exports[tile]=nl
+    return exports,records
+
+
+def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None):
+    native_primitive=postphysical_primitive is not None or postphysical_balanced is not None
+    if native_primitive and mapped_bundle is None:raise ValueError('Postphysical overrides require all-mapped baseline')
+    if postphysical_primitive is not None and postphysical_balanced is not None:raise ValueError('Choose one native export profile')
+    native_records=[]
     from cocotb_tools.runner import get_runner
     from compile.bitfile import BitFile
     model,case,out=(Path(p).resolve() for p in (model,case,out))
@@ -97,6 +128,15 @@ eFPGA fabric(
             replacements={'LUT4x8_ha':Path(mapped_lut).resolve()}
         if any(hashlib.sha256(path.read_bytes()).hexdigest()!=FULL_MAPPED_SHA[t] for t,path in replacements.items()):
             raise ValueError('Require exact audited mapped tile netlist exports')
+        if postphysical_primitive is not None:
+            if mapped_bundle is None:raise ValueError('Native primitive override requires all-mapped baseline')
+            native=Path(postphysical_primitive).resolve()
+            if hashlib.sha256(native.read_bytes()).hexdigest()!='eae4727e546ab12e15978c780981a69b7d568222759d387f173ffbf5a0e28bf1':
+                raise ValueError('Require exact successful40027428283native primitive export')
+            replacements['PRIM2T2S']=native
+        if postphysical_balanced is not None:
+            native_exports,native_records=balanced_native_exports(postphysical_balanced,mapped_bundle)
+            replacements.update(native_exports)
         sources=[p for p in sources if p not in {model/'rtl'/(t+'.v') for t in replacements}]
         sources.extend(replacements.values())
         revision='2bbec755dc67ca3db0261c3d6163e15735d66710'
@@ -129,7 +169,7 @@ eFPGA fabric(
     for name,digest in manifest['generated_sha256'].items():
         if hashlib.sha256((model/name).read_bytes()).hexdigest()!=digest:
             raise ValueError('Model changed during configured simulation')
-    provenance=[*sources,Path(__file__),ROOT/'test_internal/r1_configured/test_loaded.py',image]
+    provenance=[*sources,Path(__file__),ROOT/'test_internal/r1_configured/test_loaded.py',image,*native_records]
     result=dict(passed=True,strict_tests=len(tests),params=params,
                 input_sha256={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in provenance},
                 model_manifest_sha256=hashlib.sha256((model/'resource-control.json').read_bytes()).hexdigest(),
@@ -142,7 +182,14 @@ eFPGA fabric(
                 mapped_lut_tiles_tested=16 if mapped else 0,
                 mapped_primitive_tiles_tested=2 if mapped_bundle is not None else 0,
                 mapped_tile_instances_tested=40 if mapped_bundle is not None else (16 if mapped else 0),
-                scope=('Configured fabric with all40tile instances mapped, real frame-FSM loading, UART TX/RX plus SPI0/backpressure. No management SPI shell, extracted/SDF timing, post-route or whole-chip acceptance.'
+                postphysical_primitive_tiles_tested=2 if native_primitive else 0,
+                postphysical_west_tile_instances_tested=5 if postphysical_balanced is not None else 0,
+                postphysical_source_run='40030916359' if postphysical_balanced is not None else ('40027428283' if postphysical_primitive is not None else None),
+                scope=('Configured fabric uses exact native40030916359output-buffered/placed exports in7instances (2primitive/5west) and mapped baseline in33others. Real frame-FSM loading and UART TX/RX plus SPI0/backpressure; no management SPI shell, extracted/SDF timing, detailed route or whole-chip acceptance.'
+                       if postphysical_balanced is not None else
+                       'Configured fabric with both primitive instances using the exact native40027428283output-buffered/placed export; all other tiles mapped baseline. Real frame-FSM loading and UART TX/RX plus SPI0/backpressure; no management SPI shell, extracted/SDF timing, detailed route or whole-chip acceptance.'
+                       if postphysical_primitive is not None else
+                       'Configured fabric with all40tile instances mapped, real frame-FSM loading, UART TX/RX plus SPI0/backpressure. No management SPI shell, extracted/SDF timing, post-route or whole-chip acceptance.'
                        if mapped_bundle is not None else
                        'Configured fabric with mapped LUT tiles and RTL other tiles; no extracted timing, management SPI shell or whole-fabric gate-level acceptance.'
                        if mapped_lut is not None else
@@ -155,8 +202,12 @@ if __name__=='__main__':
     for key in ('model','case','out'):parser.add_argument('--'+key,type=Path,required=True)
     parser.add_argument('--mapped-lut',type=Path);parser.add_argument('--pdk',type=Path)
     parser.add_argument('--mapped-bundle',type=Path)
+    parser.add_argument('--postphysical-primitive',type=Path)
+    parser.add_argument('--postphysical-balanced',type=Path)
     parser.add_argument('--icarus-root',type=Path)
     a=parser.parse_args()
     if a.mapped_lut is not None and a.mapped_bundle is not None:parser.error('Choose one mapped mode')
     if (a.mapped_lut is not None or a.mapped_bundle is not None)!=(a.pdk is not None):parser.error('Mapped tiles require pinned PDK directory')
-    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle)
+    if a.postphysical_primitive is not None and a.mapped_bundle is None:parser.error('Postphysical primitive requires all-mapped baseline')
+    if a.postphysical_balanced is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None):parser.error('Balanced native profile requires all-mapped baseline and cannot mix native profiles')
+    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced)

@@ -148,3 +148,22 @@ The mux_margin_route.json fixture binds244source/physical/measurement files.
 Actual edit topology and recomputed strict preparation gates pass.111focused
 checks pass, including both older profiles and explicit single-mux source binding.
 Full evidence stays under/tmp/tripwire-mux-clean-full-39856540600 outside Git.
+
+## Current single-mux route passes extracted gates
+
+[39868597887](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39868597887)
+succeeds with extracted_gates.qualified=true. All3setupWS0; hold fast0.107281187ns,
+typ0.218979507ns,slow0.415699931ns. All actual slew/cap/fanout0at all3corners;
+final antenna0/0 and routeDRC0. The50psfast hold gate and20nsclock remain fixed.
+This is measured experimental extracted evidence, not official GDS/LVS/precheck.
+Preparation replay39868604202passes22/22with no errors/skips. Exact-final-route
+replay remains required before claiming that scope of protocol evidence. The
+successful clean physical recipe must also be integrated and verified under the
+official template workflow before Phase2 can close. No checklist boxes change.
+
+Exact final routed replay binding: netlist
+c60823d33a9aa63b20ff4e07a934a4f1daa8b519c4ef2581c9d0b53599f13225
+from39868597887. The mux_routed_gl fixture binds27critical final evidence files;
+independent actual-report/electrical/timing/gate/config and fill-connectivity
+checks pass.150focused checks pass. The separate l3-wire600-mux-routed-gl tests
+this final routed netlist; the prior preparation replay is not substituted.

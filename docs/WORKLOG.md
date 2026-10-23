@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-22 — Bind exact passing routed netlist for final protocol replay
+
+- Downloaded full39868597887route evidence to/tmp/tripwire-mux-route-full-39868597887. Final DRT netlist SHAc60823d33a9aa63b20ff4e07a934a4f1daa8b519c4ef2581c9d0b53599f13225. Reviewed full recipe SHA8f957ea12ff07b7fcbf35d1cca3c3fd2d8ad358194085d68a4c4de6259ebfb59 and DRT config SHA3b5b9c3e73839e58de379e49ddf0982780e4dff6ab201c6c9b18c3a4f94df9da. Bound27final-netlist/geometry/config/constraint/gate/report files in mux_routed_gl fixture.
+- Independent actual-artifact validator passes: exact run/head/config/NL, pre-route/extracted strict receipts, fresh electrical reports equal summaries, aggregate timing equals fresh state and passes all corners, antenna0 and routeDRC0. Final DRT and fill/extraction netlists have identical logical cells/connections. New wire600_mux_routed_gl and separate l3-wire600-mux-routed-gl replay this exact DRT netlist rather than its preparation predecessor.150focused checks pass, no skips; workflow shell/Python parse and diff check pass.
+- Official integration audit reads current TT action/tool primary source and pinned LibreLane3.1.0.dev3 wheel. Main still has phase0 TT wrapper/source list; official action merges src/config then executes LibreLane with its normal image. Checkpoint/custom-image helpers are not automatically inherited. Config flow metadata supports registered stock step lists, while STA_EXTRA_CORNER_TCL_FILE executes in STA corner scripts and is not a physical-resizer integration hook. Main/template jobs unchanged. Next publish/launch exact routed replay and prepare an isolated reviewable source/recipe integration while it runs; no official signoff/phase boxes.
+
+
+## 2026-10-22 — Single-mux route passes every measured extracted gate
+
+- Verified [39868597887](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39868597887) succeeds,22:57:46UTC→2026-10-23T00:16:05UTC. Downloaded small gate evidence under/tmp/tripwire-mux-route-gates-39868597887. extracted_gates.qualified=true, source39856540600, fast hold acceptance50ps unchanged. SetupWS0at fast/typ/slow; hold+0.107281186971/+0.218979507392/+0.415699930689ns. Final all-corner slew/cap/fanout counts0; antenna0/0 and detailed-routeDRC0. Constraints/clock unchanged; no positive global setup-margin claim.
+- [39868604202](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39868604202) succeeds; XML under/tmp/tripwire-mux-gl-39868604202 verifies22cases,0failures/errors/skips on the81buffer/14size preparation netlist. It is not a replay of the new final routed netlist. Detailed-route topology audit passed as part of the successful continuation.
+- This establishes a clean-from-RTL, reproduced and routed full2/4/U0-full/SRAM physical candidate passing measured extracted timing/electrical/antenna/DRC gates at20ns. Official flow signoff remains false: final routed-netlist replay, source/physical-recipe integration, official GDS/LVS/precheck/viewer and refreshed phase evidence still required. No phase boxes ticked. Next bind full successful route artifact and run exact-final-netlist replay, then prepare reviewable official integration without altering template jobs. Unrelated local/FIPE files preserved.
+
+
+## 2026-10-22 — Publish and launch single-mux routing and protocol replay
+
+- Published tools0268a53, tests38096a8, CI196d5d6 and docs498ece1 separately. Push succeeded; local HEAD and remote main both498ece144a5a5b03a342950b038e03db5ea8d252. Pre-push hardware history empty; unrelated files and local FIPE notes excluded.
+- Launched [gds-wire600-mux-margin-route39868597887](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39868597887), verified in_progress, and [l3-wire600-mux-margin-gl39868604202](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39868604202), verified queued, at exact published SHA. Routing must freshly pass unchanged strict preparation before DRT/extraction; GL runs22cases on the new hash-bound81buffer/14size preparation. Companion CI in_progress. Next inspect actual extracted timing/electrical/DRC/antenna and protocol results. No official signoff or phase boxes. Launch receipt remains local until next evidence update.
+
+
 ## 2026-10-22 — Bind passing mux preparation for routing and expanded replay
 
 - Full39856540600 artifact12463528990 downloaded to/tmp/tripwire-mux-clean-full-39856540600. Confirmed final native readback retains26761 mux2_2 and all14reviewed strength masters. Netlist SHA654bae23a2ace5c8c2275ce2be4b8dd55d071916e75914d9d74be8f1b3aefaca; new mux_margin_route binding covers244files.

@@ -1,0 +1,56 @@
+name: gds-wire600-mux-precheck
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gds-wire600-mux-precheck-39883160399
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: Bind exact exported GDS and classify macro markers
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Download exact GDS and signoff evidence
+        uses: actions/download-artifact@v7
+        with:
+          name: wire600-mux-signoff-39883160399
+          path: artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 39883160399
+
+      - name: Validate provenance and package unchanged GDS
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/39883160399" > /tmp/precheck-source-run.json
+          python scripts/ci/wire600_mux_precheck.py
+
+      - name: Publish precheck input
+        uses: actions/upload-artifact@v7
+        with:
+          name: tt_submission
+          path: submission-package/
+          if-no-files-found: error
+
+  precheck:
+    name: Unchanged Tiny Tapeout precheck on diagnostic GDS
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: TinyTapeout/tt-gds-action/precheck@ihp-cmos5l

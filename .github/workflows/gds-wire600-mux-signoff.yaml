@@ -1,0 +1,80 @@
+name: gds-wire600-mux-signoff
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: gds-wire600-mux-signoff-39868597887
+  cancel-in-progress: false
+
+jobs:
+  signoff:
+    name: Stock GDS, Magic DRC and LVS diagnostic on passing route
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    env:
+      PDK_ROOT: /home/runner/pdk
+      PDK_REV: 2bbec755dc67ca3db0261c3d6163e15735d66710
+    steps:
+      - name: Check out matching candidate
+        uses: actions/checkout@v6
+        with:
+          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          submodules: recursive
+
+      - name: Check out diagnostic helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Download exact successful route
+        uses: actions/download-artifact@v7
+        with:
+          name: wire600-mux-margin-route-evidence-39868597887
+          path: .
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: 39868597887
+
+      - name: Check out IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install pinned PDK, macro and flow
+        run: |
+          set -euo pipefail
+          ./.tt-gds-action/install_sg13cmos5l.sh
+          spikes/r3_sram/fetch_macro.sh
+          pip install librelane==3.1.0.dev3
+
+      - name: Validate route and run stock physical verification tail
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/39868597887" > /tmp/signoff-source-run.json
+          python workflow-src/scripts/ci/wire600_mux_signoff.py
+
+      - name: Upload physical verification evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: wire600-mux-signoff-${{ github.run_id }}
+          path: |
+            runs/wire600-mux-signoff/
+            runs/wire600-mux-signoff-input.json
+            src/config_native_wire600-mux-signoff.json
+          if-no-files-found: warn

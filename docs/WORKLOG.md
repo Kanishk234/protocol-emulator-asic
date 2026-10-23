@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (paired representative PDN/placement/GRT prepared)
+**Done:** D107 runner consumes authenticated39996455894 frozen bundle and pinned output-buffer adapter. Fixed reference/narrow footprints differ only in dimensions/boundary obstructions. Adds native PDN, tap/endcap handling, output-only buffers,96%density placement and fixed50iteration/0.3adjustment Metal2–4GRT. Requires zero native final overflow/PGviolations, correct first-column full-height PGphase and original nonbuffer cells/438latches. Matrix runs both independently with45min native limits; failed checkpoints/results retained. Three focused policy/phase testsPASS; full source checks rerun before push.
+**Scope:** CLOCK_PORTnull, no configured timing/CTS/timing repair/resynthesis/detailed routing/signoff/full-chip acceptance. Original20ns eventual target unchanged. Other tile phases/types/shell and secondary UART+I2Ctimeout remain open. No new graph/seed/budget sweep or full-chip attempt; G1/native121/118protected.
+**Next:** dispatch owned workflow, inspect actual PDN/placement/congestion and physical overhead, then audit before further physical changes.
+
 ## 2026-10-23 (both-width native pin/core gate passes)
 **Actual:**39996455894 at46682a2attempt1SUCCESS:10strict admission cases, reference219.84and narrowed154.08µm native floorplan/pin cases, mapped-primary functional step. Independent audit checks10prepared files, frozen mapped/NL hashes,210native names/directions/rectangles/nonoverlap,438latches, exact original cell counts+2literal drivers, retainedODB hashes and pinned-LEF/native cell-area arithmetic. Data/config/global-buffer/carry pin centers align for same-type neighbors at both widths. Mixed mapped primary1strictPASS reauthenticates47input/twoexecutable hashes.
 **Measured scope:** height185.22; native cell-shape sum23688.8064µm² both. Core38033.4528→26350.5312µm²; narrowed bare occupancy89.90% before further physical overhead. Reports/CLAIMS record run ID and limits. No placement/PDN/global/detailed routing/SDF/whole-chip acceptance; no phase box or whole-chip hardening attempt consumed.

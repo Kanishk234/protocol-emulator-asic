@@ -335,9 +335,10 @@
         "39986366251 import/floorplan setupPASS, strictIO setupFAILphantom disabled UserCLK/CLKo; BUG119 whitelist+complete realpin matching fixes prepared;8focusedtestsPASS",
         "39987539298 referenceIO allocationFAIL from equal bus segmentation; BUG120 ordered-side grouping fixed. Local all16mappedLUT+RTLothers loaded primaryPASS with Icarus13 (BUG121);81checksPASS",
         "39989251719 reference210pin geometry/438latchesPASS; census catchesonly2native literal drivers (BUG122 fix). Hosted16mappedLUT primaryPASS independently47inputs/twoexecutables audited.",
-        "39996455894 at46682a2SUCCESS: bothwidths210pin/438latch/nativecore gate; independentprepared/ODB/LEF audit; mixedmappedprimary1PASS+47input/2binaryhash reauth. No placement/routing/timing acceptance."
+        "39996455894 at46682a2SUCCESS: bothwidths210pin/438latch/nativecore gate; independentprepared/ODB/LEF audit; mixedmappedprimary1PASS+47input/2binaryhash reauth. No placement/routing/timing acceptance.",
+        "D107 paired representative PDN/placement/GRT runner prepared from39996455894; fixedpolicy/phase3testsPASS; no routed/timing acceptance yet"
       ],
-      "next_action": "Proceed to one fixed representative PDN/placement/routing experiment with frozen mapped cells and verified narrowed interface; preserve target/layer/margin policies and check power phase/physical overhead. No new graph/seed/budget sweep. Secondary timeout/full shell/other tile interfaces remain open.",
+      "next_action": "Observe fixed paired representative physical run: zero PGviolations/final native overflow, exact phase/state-cell retention and measured physical overhead. Preserve both outcomes and budgets; no graph/seed sweep.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

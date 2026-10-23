@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (balanced native qualification implemented)
+**Done:** D112input capsule reused from authenticated40013513454; no RTL/model regeneration or synthesis. Actual40instances derive13native geometries and3064neighbor bit pairs with per-instance dimensions. Five dependent physical jobs cover narrowedwest W_IO4/NW/SWand balancedprimitivephases30.24/107.04. Shared runner preserves original policies, adds final routed pin/direction/PGgeometry checks for185.22/56.7heights.64localR1testsPASS,18focused guards. Old unbalanced reserve workflow manual-only; G1protected.
+**Next:** push/inspect native interface gate, then five independent PG/placement/GRTcases; retain any failures and audit actual artifacts. Other leaf phases/postphysical function/full-grid/detailed routing/configured timing remain open; secondaryI2Ctimeout preserved. No phase boxes/full-chip attempt consumed.
+
 ## 2026-10-23 (primitive reserve routes; full-layout power catch retained)
 **Actual:**40027428283 atb2c54f9 attempt1SUCCESS both164.64primitive leaves; zero final GRT/PGviolations,334latches/2906power terminals,90.0816%native utilization. Root source/ODB/config/PG/finaltable auditPASS. Prior all20tile/interfaces and40mapped primary40013513454 remain authenticated; G1protected.
 **New integration finding:** D111unbalanced growth leaves eastborderunpowered despite an external chip pair (BUG129). Reject full-layout proposal, retain passing primitive width. D112static reallocation west68.64→47.52offsets the two widerprimitive columns exactly, restores old1061.76outerwidth/eastPGphase. All8column static power gates pass; westbare+onebuf/output modeled reserve remains.60local R1testsPASS; source/hash guarded budget artifact build/r1_layout_budget/budget.json.

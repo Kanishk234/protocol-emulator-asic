@@ -1,0 +1,191 @@
+name: gds-wire600-integrated-proof
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: gds-wire600-integrated-proof-3393eea
+  cancel-in-progress: false
+
+jobs:
+  harden:
+    name: Fresh RTL through passing repairs, extraction, GDS and LVS (${{ matrix.strategy }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        strategy: ['AREA 1']
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CANDIDATE_SHA: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+      GRT_ADJUSTMENT: "0.16"
+      ALL_CORNER_REPAIR: "1"
+      NATIVE_HOLD_TARGET: "0.10"
+      NATIVE_CLOCK_CLUSTER_SIZE: "8"
+      VARIANT: bs-resync-cfg-tx-cached-lane-mask-drop-parallel-delta8
+      NATIVE_MAPPING_STRATEGY: ${{ matrix.strategy }}
+
+    steps:
+      - name: Check out the measured R4 candidate
+        uses: actions/checkout@v6
+        with:
+          ref: 3393eea9a58c5cad9077cc360a8515d0e5ec8284
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Check out experiment helpers
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          path: workflow-src
+
+      - name: Apply exactly one independent timing trial
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          python workflow-src/scripts/ci/timing_trial.py
+          sha256sum src/config.json src/trw_chan_port.v src/trw_pin_bs.v src/trw_pin_rx.v src/trw_pin_io.v
+
+      - name: Check out Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: ihp-sg13cmos5l
+          path: tt
+
+      - name: Check out the pinned IHP installer
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-gds-action
+          ref: ihp-cmos5l
+          path: .tt-gds-action
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tt/requirements.txt
+
+      - name: Install Tiny Tapeout prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+
+      - name: Install flow dependencies
+        run: pip install -r tt/requirements.txt
+
+      - name: Install IHP PDK
+        run: ./.tt-gds-action/install_sg13cmos5l.sh
+
+      - name: Install pinned LibreLane
+        run: pip install librelane==3.1.0.dev3
+
+      - name: Validate candidate and prepare generated config
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          python3 - <<'PY'
+          import json
+          import hashlib
+          import os
+          from pathlib import Path
+
+          grt_adjustment = os.environ["GRT_ADJUSTMENT"]
+          assert grt_adjustment in {"0.12", "0.16"}, grt_adjustment
+
+          cfg = json.loads(Path("src/config.json").read_text())
+          assert float(cfg["CLOCK_PERIOD"]) == 20.0
+          assert int(cfg["PL_TARGET_DENSITY_PCT"]) == 56
+
+          assert hashlib.sha256(Path("src/trw_pin_bs.v").read_bytes()).hexdigest() == "83f82e436b67d79efddae6dc60bdfa4902cf5b250b1cd587ffe2a4c9c1e08340", "RTL differs from locally verified configuration staging source"
+
+          assert hashlib.sha256(Path("src/trw_pin_cfg.v").read_bytes()).hexdigest() == "644bc463b1b3711611c665a91dc384eeec31b3d82f9b87c51a5e730f602841c0", "Configuration staging differs from locally verified source"
+
+          assert hashlib.sha256(Path("src/trw_pin_tx.v").read_bytes()).hexdigest() == "29bdf26b9cf3d1939d8b8efe7833ac7d6ca1042c71e33c7065462f10e3c7951f", "TX source differs from verified trial"
+
+          assert hashlib.sha256(Path("src/trw_chan_port.v").read_bytes()).hexdigest() == "16744944aba3d689112be8871a6defb228ded9c6c867442b646f25f7d87da657", "Cached selection differs from locally verified source"
+
+          assert hashlib.sha256(Path("src/trw_lane.v").read_bytes()).hexdigest() == "5a2905a6c59ac4eb6efb621e95d5bd18d1b9f2dc1ad599f5c7690573760ffd06", "Lane source differs from locally verified trial"
+
+          assert hashlib.sha256(Path("src/trw_pin_unit.v").read_bytes()).hexdigest() == "f419dfafa4cb5b77618388c44670397896b6deb9a9621b230c4a8608b852e8f2", "Wrong cache wiring"
+          assert hashlib.sha256(Path("src/trw_chip.v").read_bytes()).hexdigest() == "d0a9b1ec97e6ba618ece628bfe12e9ac0861a6be618fe225461e65565898d765", "Wrong cache wiring"
+
+          defs = Path("src/trw_defs.vh").read_text().splitlines()
+          expected = {
+              "TRW_LANES": "2",
+              "TRW_UNITS": "4",
+              "TRW_PC_UNITS_PULSE": "4'b0001",
+              "TRW_PC_UNITS_CARRIER": "4'b0001",
+              "TRW_PC_UNITS_BITSYNC": "4'b0001",
+          }
+          for name, value in expected.items():
+              assert f"`define {name} {value}" in defs, name
+          print(f"Pinned candidate: {os.environ['CANDIDATE_SHA']}")
+          print("Candidate shape: 2 lanes, 4 pin units, U0 full; 20 ns; density 56%")
+          print(f"Matched RTL variant: {os.environ['VARIANT']}; clock/density/resource shape unchanged")
+          PY
+          python tt/tt_tool.py --create-user-config --ihp
+
+      - name: Verify the pinned declarative insertion and stop point
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, 'workflow-src/scripts/ci')
+          from librelane.flows.classic import Classic
+          from native_post_antenna_screen import SUBSTITUTIONS
+          ids = [step.id for step in Classic.Substitute(SUBSTITUTIONS).Steps]
+          final = ids.index('OpenROAD.RepairAntennas-1')
+          assert final == ids.index('OpenROAD.ResizerTimingPostGRT') + 1
+          assert final < ids.index('OpenROAD.DetailedRouting')
+          print('Verified native Classic insertion:', ids[final-1:final+2])
+          PY
+
+      - name: Read this live run provenance
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > /tmp/wire600-clean-source-run.json
+
+      - name: Reproduce complete physical chain from fresh RTL without checkpoint downloads
+        timeout-minutes: 330
+        run: |
+          python workflow-src/scripts/ci/ci_flow_watch.py \
+            --log runs/wire600-integrated-proof-console.log \
+            --heartbeat 30 --synthesis-timeout 900 --total-timeout 19200 --docker-stats \
+            -- python -u workflow-src/scripts/ci/wire600_integrated_proof.py
+
+      - name: Stop remaining flow containers after failure
+        if: failure() || cancelled()
+        run: docker ps -q | xargs -r docker stop -t 10
+
+      - name: Publish exact fresh GDS for precheck
+        uses: actions/upload-artifact@v7
+        with:
+          name: tt_submission
+          path: submission-package/
+          if-no-files-found: error
+
+      - name: Upload physical chain evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: wire600-integrated-proof-${{ github.run_id }}
+          path: |
+            runs/**
+            src/**
+            submission-package/diagnostic_identity.json
+          if-no-files-found: warn
+
+  precheck:
+    name: Unchanged TT precheck on freshly reproduced GDS
+    needs: harden
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: TinyTapeout/tt-gds-action/precheck@ihp-cmos5l

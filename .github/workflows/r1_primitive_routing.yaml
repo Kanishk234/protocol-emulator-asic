@@ -1,13 +1,6 @@
 name: R1 primitive actual-column PDN placement and global route
 on:
   workflow_dispatch:
-  push:
-    branches: [efpga]
-    paths:
-      - 'spikes/r1/physical_route.py'
-      - 'tools/profiling/tests/test_r1_physical_route.py'
-      - '.github/workflows/r1_primitive_routing.yaml'
-      - 'patches/r1_explicit_buffer_cell.patch'
 permissions:
   contents: read
   actions: read

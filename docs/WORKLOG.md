@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (all-mapped configured primary works locally)
+**Actual:** D109 all40tile instances mapped with frozen10exports; unchanged primary compiler image loaded through real RTL frame FSM. Local1strictPASS at build/r1_full_mapped_smoke_v3/results.xml,47input hashes checked. ConcurrentUARTTX/RX+SPI0/backpressure/divider assertions retained. BUG127 removes an RTL-only debug-name lookup that prevented first traffic launch.55local R1testsPASS.
+**Pending:** hosted committed-source all-mapped replay added independently after native gate. D108repaired native run40012576053 still active. No managementSPI shell/CRC/parking, post-route/SDF/timing or whole-chip acceptance; no phase boxes/full-chip attempts. G1protected.
+
 ## 2026-10-23 (all-type gate catches alias import and border alignment)
 **Actual:**40011371177 at234acca admits18/20geometry/core/cell cases; both S_IO2 imports lose12chained clock-feed alias ports, caught by strict pin matcher. Other native geometry shows real N_IO/LUT pin mismatch53.28vs18.72µm, consistent with216planned neighbor-index mismatches. No other-type physical route or full-grid acceptance.
 **Prepared:** BUG125 print-only4alias flattening validates identical input/output bit IDs; BUG126 six facing-side track families derived from actual generated connectivity with proven LUT anchors. Frozen cell/config graph unchanged; local isolated preparation and exact assembled port/cell connection replayPASS.55local R1testsPASS, preserving strict geometry and unknown-port rejection.

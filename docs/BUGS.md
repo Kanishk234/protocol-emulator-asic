@@ -857,3 +857,9 @@ validation. Next coverage adds real USER_RESET and preserves candidate netlists.
 - **Symptom/check:**40011371177 retained native narrow N_IO.N1END[0] center53.28µm versus connected LUT.N1BEG[0]18.72µm, same Metal2/opposite edges. Planned order reveals216/3064connected bit pairs with inconsistent indices.
 - **Root cause:** generic per-tile pin generation orders port direction groups differently at borders; same-type LUT alignment does not cover mixed-type neighbors.
 - **Fix/coverage:** derive common ordered track equivalence classes from actual generated fabric connections, separately for six facing-side families. Preserve proven LUT N/E anchor order, require every facing side exposes identical unique classes, emit exact scalar pin regexes. Missing/aliased classes, wrong sides and unsupported order policies rejected. Local55R1testsPASS and isolated10tile preparationPASS; native rerun required. Logical graph/configuration unchanged.
+
+## 127: Configured smoke debug log assumes an RTL-only hierarchy
+- **Date:**2026-10-23.
+- **Symptom/check:**first all-mapped local launch loads image, then raises AttributeError on SW_term.GBUF_D_IN before traffic; strict XML rejects it.
+- **Root cause:** nonasserting clock debug log references an RTL-only internal name removed by mapped export.
+- **Fix/coverage:** remove internal hierarchy diagnostics; retain all loader and adapter-pin traffic/backpressure/rate assertions. Local full-mapped40instance test now executes1PASS, strict XML and47input hashes checked. No RTL/PDK/image change or stimulus relaxation.

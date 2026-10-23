@@ -14,6 +14,7 @@ from postgrt_timing import CORNERS, screen
 from sram_bank_clean_route import unique
 from sram_bank_plan import MACRO_LEF_SHA
 from wire600_selective_plan import BINDING, digest, plan, target_call, validate_files
+from physical_runtime import prepare_image
 
 OUTPUT = Path('runs/wire600-selective-screen')
 
@@ -61,9 +62,7 @@ def main(*, plan_builder=plan, target_emitter=target_call,
     output.mkdir(exist_ok=False)
     (output/'proposal.json').write_text(json.dumps(proposal, indent=2)+'\n')
     image = 'tripwire-wire600-selective:local'
-    subprocess.run(['docker', 'build', '-t', image, '-f',
-                    'workflow-src/scripts/ci/Dockerfile.openroad-wire600-selective',
-                    'workflow-src/scripts/ci'], check=True)
+    prepare_image(image, 'workflow-src/scripts/ci/Dockerfile.openroad-wire600-selective')
     os.environ['LIBRELANE_IMAGE_OVERRIDE'] = image
     config = json.loads(Path(files['config']['path']).read_text())
     # Discard metrics/derived views from the source; retain physical source files.

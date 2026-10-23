@@ -12,6 +12,7 @@ import sys
 from event_nor2_screen import validate_overflow
 from native_stock_screen import checkpoint, configure
 from postgrt_timing import CORNERS, screen
+from physical_runtime import container_flags
 
 SOURCE_RUN = 37853023857
 SOURCE_SHA = 'a53dd57b44438d2a10f3363e1418d489a175397e'
@@ -94,7 +95,7 @@ def run_step(config, source, output, steps):
     path.write_text(json.dumps(cfg, indent=2) + '\n')
     output.mkdir(parents=True, exist_ok=False)
     subprocess.run([sys.executable, '-m', 'librelane', '--pdk-root', os.environ['PDK_ROOT'],
-                    '--docker-no-tty', '--dockerized', '--pdk', 'ihp-sg13cmos5l',
+                    *container_flags(), '--pdk', 'ihp-sg13cmos5l',
                     '--manual-pdk', '--run-tag', output.name, '--force-run-dir', str(output),
                     '--hide-progress-bar', '--with-initial-state', str(source), str(path)], check=True)
 

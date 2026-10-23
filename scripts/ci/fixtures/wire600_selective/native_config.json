@@ -1,0 +1,139 @@
+{
+  "PL_TARGET_DENSITY_PCT": 56,
+  "CLOCK_PERIOD": 20,
+  "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
+  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.125,
+  "RUN_LINTER": 1,
+  "LINTER_INCLUDE_PDK_MODELS": 1,
+  "CLOCK_PORT": "clk",
+  "MACROS": {
+    "RM_IHPSG13_1P_512x16_c2_bm_bist": {
+      "instances": {
+        "u_chip.u_sram.sram": {
+          "location": [
+            12,
+            40
+          ],
+          "orientation": "FS"
+        }
+      },
+      "gds": [
+        "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.gds"
+      ],
+      "lef": [
+        "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.lef"
+      ],
+      "lib": {
+        "*_typ_*": [
+          "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib"
+        ],
+        "*_fast_*": [
+          "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib"
+        ],
+        "*_slow_*": [
+          "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib"
+        ]
+      },
+      "nl": [
+        "dir::./RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+      ],
+      "spice": [
+        "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl"
+      ]
+    }
+  },
+  "PDN_MACRO_CONNECTIONS": [
+    "u_chip.u_sram.sram VPWR VGND VDD! VSS!",
+    "u_chip.u_sram.sram VPWR VGND VDDARRAY! VSS!"
+  ],
+  "PDN_CFG": "dir::pdn_cfg.tcl",
+  "PNR_SDC_FILE": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/src/signoff.sdc",
+  "SIGNOFF_SDC_FILE": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/src/signoff.sdc",
+  "DRT_OPT_ITERS": 64,
+  "CTS_APPLY_NDR": "none",
+  "MAGIC_MACRO_STD_CELL_SOURCE": "PDK",
+  "ERROR_ON_MAGIC_DRC": true,
+  "ERROR_ON_ILLEGAL_OVERLAPS": true,
+  "MAGIC_EXT_ABSTRACT_CELLS": [
+    "RM_IHPSG13_.*"
+  ],
+  "RUN_KLAYOUT_XOR": 0,
+  "RUN_KLAYOUT_DRC": 0,
+  "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
+  "TOP_MARGIN_MULT": 1,
+  "BOTTOM_MARGIN_MULT": 1,
+  "LEFT_MARGIN_MULT": 6,
+  "RIGHT_MARGIN_MULT": 6,
+  "FP_SIZING": "absolute",
+  "GRT_ALLOW_CONGESTION": false,
+  "FP_IO_HLENGTH": 2,
+  "FP_IO_VLENGTH": 2,
+  "FP_PDN_VPITCH": 67.44,
+  "FP_PDN_VWIDTH": 2.1,
+  "FP_PDN_VSPACING": 3.52,
+  "FP_PDN_VOFFSET": 26.36,
+  "RUN_CTS": 1,
+  "FP_PDN_MULTILAYER": 0,
+  "MAGIC_DEF_LABELS": 0,
+  "MAGIC_WRITE_LEF_PINONLY": 1,
+  "DESIGN_NAME": "tt_um_tripwire",
+  "VERILOG_FILES": [
+    "dir::tt_um_tripwire.v",
+    "dir::trw_chip.v",
+    "dir::trw_sync.v",
+    "dir::trw_fabric.v",
+    "dir::trw_chan_port.v",
+    "dir::trw_chan_prod.v",
+    "dir::trw_host.v",
+    "dir::trw_spi.v",
+    "dir::trw_lane.v",
+    "dir::trw_alu.v",
+    "dir::trw_slots.v",
+    "dir::trw_sram.v",
+    "dir::trw_pin_cfg.v",
+    "dir::trw_pin_io.v",
+    "dir::trw_pin_tx.v",
+    "dir::trw_pin_rx.v",
+    "dir::trw_pin_bs.v",
+    "dir::trw_pin_unit.v",
+    "dir::trw_pins.v"
+  ],
+  "DIE_AREA": "0 0 1289.28 710.64",
+  "FP_DEF_TEMPLATE": "dir::../tt/tech/ihp-sg13cmos5l/def/tt_block_6x4_pgvdd.def",
+  "VDD_PIN": "VPWR",
+  "GND_PIN": "VGND",
+  "RT_MAX_LAYER": "Metal4",
+  "SYNTH_STRATEGY": "AREA 1",
+  "GRT_ADJUSTMENT": 0.16,
+  "OPENROAD_THREADS": 4,
+  "PL_OPTIMIZE_MIRRORING": false,
+  "PL_TIMING_DRIVEN": true,
+  "PL_RESIZER_SETUP_SLACK_MARGIN": 0,
+  "GRT_RESIZER_SETUP_SLACK_MARGIN": 0,
+  "PNR_CORNERS": [
+    "nom_fast_1p32V_m40C",
+    "nom_slow_1p08V_125C",
+    "nom_typ_1p20V_25C"
+  ],
+  "RSZ_CORNERS": [
+    "nom_fast_1p32V_m40C",
+    "nom_slow_1p08V_125C",
+    "nom_typ_1p20V_25C"
+  ],
+  "RUN_POST_GRT_RESIZER_TIMING": true,
+  "meta": {
+    "version": 1,
+    "flow": "Classic",
+    "substituting_steps": {
+      "+OpenROAD.ResizerTimingPostGRT": "OpenROAD.RepairAntennas"
+    }
+  },
+  "CTS_SINK_CLUSTERING_SIZE": 8,
+  "RUN_POST_GRT_DESIGN_REPAIR": true,
+  "GRT_DESIGN_REPAIR_MAX_SLEW_PCT": 55,
+  "GRT_DESIGN_REPAIR_MAX_CAP_PCT": 55,
+  "YOSYS_LOG_LEVEL": "WARNING",
+  "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 600,
+  "CTS_DISTANCE_BETWEEN_BUFFERS": 100,
+  "GRT_ANTENNA_REPAIR_MARGIN": 50
+}

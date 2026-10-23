@@ -11,6 +11,7 @@ from native_wire150_screen import configure as wire_configure
 from postgrt_timing import CORNERS
 from sram_bank_clean_route import unique
 from verify_drop_parallel import digest, TRIAL_HASH
+from physical_runtime import prepare_image
 
 IMAGE = 'tripwire-native-incremental-route:local'
 
@@ -55,9 +56,7 @@ def main():
 
 def run_screen(*, config_transform=configure):
     """Execute unchanged strict screen after the caller validates its source."""
-    subprocess.run(['docker', 'build', '-t', IMAGE, '-f',
-                    'workflow-src/scripts/ci/Dockerfile.openroad-native-incremental',
-                    'workflow-src/scripts/ci'], check=True)
+    prepare_image(IMAGE, 'workflow-src/scripts/ci/Dockerfile.openroad-native-incremental')
     root = Path('runs/native-stock-screen')
     try:
         reserve_screen(config_transform=config_transform, image_override=IMAGE,

@@ -8,6 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 from electrical_report import audit_corners
+from physical_runtime import container_flags
 
 STEPS = ["Odb.RemoveRoutingObstructions", "OpenROAD.CheckAntennas", "Checker.TrDRC",
          "Odb.ReportDisconnectedPins", "Checker.DisconnectedPins", "Odb.ReportWireLength",
@@ -57,7 +58,7 @@ def main(route_root=Path("runs/repaired-route/drt")):
     path = Path("src/config_extracted_timing.json")
     path.write_text(json.dumps(config, indent=2) + "\n")
     subprocess.run([sys.executable, "-m", "librelane", "--pdk-root", os.environ["PDK_ROOT"],
-                    "--docker-no-tty", "--dockerized", "--pdk", "ihp-sg13cmos5l",
+                    *container_flags(), "--pdk", "ihp-sg13cmos5l",
                     "--manual-pdk", "--run-tag", "extracted-timing", "--force-run-dir", str(output),
                     "--hide-progress-bar", "--with-initial-state", str(checkpoint), str(path)], check=True)
     states = list(output.glob("*-openroad-stapostpnr/state_out.json"))

@@ -18,7 +18,14 @@ def digest(path):
 
 def validate_files(root):
     root = Path(root)
-    for item in BINDING['files'].values():
+    from physical_runtime import native
+    for key, item in BINDING['files'].items():
+        if key == 'config' and native():
+            reference = Path(__file__).parent/'fixtures/wire600_selective/native_config.json'
+            if (digest(reference) != item['sha256'] or
+                    json.loads((root/item['path']).read_text()) != json.loads(reference.read_text())):
+                raise ValueError('Wrong semantic native physical config')
+            continue
         if digest(root / item['path']) != item['sha256']:
             raise ValueError('Wrong selective electrical source: ' + item['path'])
 

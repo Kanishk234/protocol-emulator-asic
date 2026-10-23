@@ -32,6 +32,10 @@ EOF
 make_src=$(sed -n 's/^PROJECT_SOURCES *= *//p' test/Makefile)
 SOURCES=()
 for f in $yaml_src; do SOURCES+=("src/$f"); done
+# The SRAM's port-only module is a MACROS view, not an RTL source in info.yaml.
+if [ -f src/RM_IHPSG13_1P_512x16_c2_bm_bist.v ]; then
+  SOURCES+=(src/RM_IHPSG13_1P_512x16_c2_bm_bist.v)
+fi
 
 step() { echo; echo "=== $* ==="; }
 
@@ -53,11 +57,23 @@ verilator --lint-only -Wno-UNUSEDSIGNAL -Isrc "$defs_tb"
 echo "ok"
 
 step "L0-LINT: verilator --lint-only -Wall"
-verilator --lint-only -Wall -Isrc --top-module tt_um_tripwire "${SOURCES[@]}"
+verilator --lint-only -Wall scripts/ci/promoted_rtl.vlt -Isrc --top-module tt_um_tripwire "${SOURCES[@]}"
 echo "ok"
 
 step "L0-SYNTH: yosys synth sanity"
-yosys -q -p "read_verilog -Isrc ${SOURCES[*]}; synth -top tt_um_tripwire; check -assert; select -assert-none t:\$dlatch t:\$_DLATCH_*"
+SYNTH_LIBRARY=""
+if [ -f src/RM_IHPSG13_1P_512x16_c2_bm_bist.v ]; then
+  CHECK_PDK_REV=2bbec755dc67ca3db0261c3d6163e15735d66710
+  CHECK_PDK_ROOT="${PDK_ROOT:-${XDG_CACHE_HOME:-$HOME/.cache}/tripwire/pdk-$CHECK_PDK_REV}"
+  CHECK_LIB="$CHECK_PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib"
+  if [ ! -s "$CHECK_LIB" ]; then
+    mkdir -p "$(dirname "$CHECK_LIB")"
+    curl -sfL -o "$CHECK_LIB" "https://raw.githubusercontent.com/IHP-GmbH/IHP-Open-PDK/$CHECK_PDK_REV/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib"
+  fi
+  # The real latch stores instantiate the library clock gate in synthesis.
+  SYNTH_LIBRARY="read_liberty -lib $CHECK_LIB;"
+fi
+yosys -q -p "$SYNTH_LIBRARY read_verilog -Isrc ${SOURCES[*]}; synth -top tt_um_tripwire; check -assert; select -assert-none t:\$dlatch t:\$_DLATCH_* %u N:*trw_slots* N:*trw_pin_cfg* %u %d"
 echo "ok"
 
 step "sigrok: UART decode of a VCD (toolchain smoke test)"

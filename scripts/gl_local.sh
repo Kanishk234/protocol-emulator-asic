@@ -73,8 +73,11 @@ print(" ".join("src/" + f for f in yaml.safe_load(open("info.yaml"))["project"][
 EOF
 )
   TOP=$(python -c 'import yaml; print(yaml.safe_load(open("info.yaml"))["project"]["top_module"])')
+  if [ -f src/RM_IHPSG13_1P_512x16_c2_bm_bist.v ]; then
+    SOURCES="$SOURCES src/RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+  fi
   LIB="$REF/sg13cmos5l_stdcell/lib/$LIB_CORNER"
-  yosys -q -p "read_verilog -Isrc $SOURCES; synth -top $TOP -flatten; dfflibmap -liberty $LIB; abc -liberty $LIB; opt_clean; write_verilog -noattr -noexpr $NETLIST"
+  yosys -q -p "read_liberty -lib $LIB; read_verilog -Isrc $SOURCES; synth -top $TOP -flatten; dfflibmap -liberty $LIB; abc -liberty $LIB; opt_clean; write_verilog -noattr -noexpr $NETLIST"
 fi
 
 echo "=== test/: pin-level suite on the netlist"
@@ -82,11 +85,11 @@ export PATH="$IV/usr/bin:$PATH"
 export IVERILOG_VPI_MODULE_PATH="$IV/usr/lib/ivl"
 export COMPILE_ARGS="-B $IV/usr/lib/ivl"   # the Makefile appends its own GL defines
 export PDK_ROOT
-rm -rf test/sim_build/gl test/results.xml
-GATES=yes make -C test 2>&1 | grep -v "sorry: ifnone with an edge-sensitive path"
+rm -rf test/sim_build/gl-local
+GATES=yes make -C test SIM_BUILD=sim_build/gl-local COCOTB_RESULTS_FILE=sim_build/gl-local/results.xml 2>&1 | grep -v "sorry: ifnone with an edge-sensitive path"
 
-test -f test/results.xml
-if grep -q failure test/results.xml; then
+test -f test/sim_build/gl-local/results.xml
+if grep -q failure test/sim_build/gl-local/results.xml; then
   echo "gl_local: FAIL" >&2
   exit 1
 fi

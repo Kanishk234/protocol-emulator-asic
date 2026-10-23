@@ -25,9 +25,11 @@ TAIL = ['Magic.StreamOut', 'KLayout.StreamOut', 'Magic.WriteLEF',
         'Magic.SpiceExtraction', 'Netgen.LVS', 'Checker.LVS']
 
 
-def live_profile(run, run_id, head):
+def live_profile(run, run_id, head, workflow=WORKFLOW):
+    if workflow not in (WORKFLOW, '.github/workflows/gds.yaml'):
+        raise ValueError('Unreviewed integration workflow')
     expected = dict(id=int(run_id), head_sha=head, head_branch='main',
-                    path=WORKFLOW, conclusion=None, status='in_progress')
+                    path=workflow, conclusion=None, status='in_progress')
     if any(run.get(k) != v for k, v in expected.items()):
         raise ValueError('Wrong live integration run provenance')
     profile = route_profile()
@@ -82,14 +84,14 @@ def export_package(config, state, output, package_root):
                 precheck_required=True, precheck_passed=False, exported_sha256=hashes)
 
 
-def main():
+def main(workflow=WORKFLOW):
     for path in ('runs/native-stock-screen', 'runs/wire600-mux-margin-clean',
                  'runs/wire600-mux-margin-route', 'runs/extracted-timing', str(OUTPUT),
                  'submission-package', '/tmp/native-source-run.json'):
         if Path(path).exists():
             raise ValueError('Integration requires fresh workspace: '+path)
     run = json.loads(Path('/tmp/wire600-clean-source-run.json').read_text())
-    profile = live_profile(run, os.environ['GITHUB_RUN_ID'], os.environ['GITHUB_SHA'])
+    profile = live_profile(run, os.environ['GITHUB_RUN_ID'], os.environ['GITHUB_SHA'], workflow)
     clean()
     route(profile)
     drt = unique(profile['output']/'qualified-route/drt', '*-openroad-detailedrouting/state_out.json')

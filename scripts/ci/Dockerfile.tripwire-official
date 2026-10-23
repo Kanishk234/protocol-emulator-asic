@@ -1,0 +1,13 @@
+FROM ghcr.io/librelane/librelane:3.1.0.dev3
+COPY *.py *.tcl /usr/local/share/tripwire/
+COPY fixtures /usr/local/share/tripwire/fixtures/
+COPY librelane_plugin_tripwire /usr/local/share/tripwire/librelane_plugin_tripwire/
+COPY native_route_trace.py /usr/local/share/tripwire/native_route_trace_base.py
+COPY --chmod=755 official_openroad_wrapper.sh /usr/local/bin/tripwire-official-openroad
+RUN printf '3.1.0.dev3\n' > /usr/local/share/tripwire/official-runtime-v1
+ENV PYTHONPATH=/usr/local/share/tripwire
+ENV TRIPWIRE_NATIVE_RUNTIME=1
+ENV _LLN_OVERRIDE_OPENROAD=/usr/local/bin/tripwire-official-openroad
+RUN python3 -c "import librelane.plugins; from librelane.flows import Flow; assert Flow.factory.get('TripwireReproduced') is not None"
+RUN python3 -c "from pathlib import Path; import librelane; from native_route_trace_base import instrument; instrument((Path(librelane.__file__).parent/'scripts/openroad/rsz_timing_postgrt.tcl').read_text(), incremental=True)"
+RUN python3 -c "from pathlib import Path; import subprocess; p=Path('/tmp/tripwire-grt-help.tcl'); p.write_text('help global_route\nexit\n'); r=subprocess.run(['openroad','-exit',str(p)],capture_output=True,text=True,check=True); assert all(flag in r.stdout for flag in ('-start_incremental','-end_incremental')), r.stdout+r.stderr"

@@ -1,13 +1,14 @@
 """Insert exact identity-buffer edits inside tracked native timing repair."""
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 
 from native_route_trace_base import instrument as native_instrument
 
 
-def instrument(text):
+def instrument(text, target_path=None):
     result = native_instrument(text, incremental=True)
     anchor = 'estimate_parasitics -global_routing\n'
     if result.count(anchor) != 1:
@@ -28,6 +29,12 @@ write_verilog $::env(STEP_DIR)/selective.after.v
 global_route -end_incremental
 '''
     marker = 'puts "TRIPWIRE_SELECTIVE repaired and refreshed; native timing repair follows"\n'
+    if target_path is not None:
+        target_path = str(target_path)
+        if not re.fullmatch(r'/[A-Za-z0-9_./-]+', target_path):
+            raise ValueError('Unsafe native selective target path')
+        edits = edits.replace('source /usr/local/share/tripwire/wire600_selective_targets.tcl',
+                              'source {'+target_path+'}')
     return result.replace(anchor, edits + anchor + marker, 1)
 
 

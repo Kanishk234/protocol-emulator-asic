@@ -1,0 +1,17 @@
+`verilator_config
+// Narrow lint annotations for the byte-identical routed candidate. The five-bit
+// word address is compared with constant word indices 4..7; the unsized integer
+// expressions expand the comparison width without truncating either operand.
+lint_off -rule WIDTH -file "*trw_pin_cfg.v" -lines 102-112
+// The delta8 cache consumes low bytes and a borrow; these other expressions and
+// high bits are optimized away. Keeping the source unchanged preserves route
+// identity and the existing functional/equivalence evidence.
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_cfg.v" -match "*'sample_delta_value'*"
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_cfg.v" -match "*'next_period'*"
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_cfg.v" -match "*'next_sample'*"
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_cfg.v" -match "*'upper_sub'*"
+// Shared full/lean interface; lean units do not use the full-unit delta input.
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_unit.v" -match "*'sample_delta'*"
+// Dead intermediates retained from the independently checked TX/resync rewrites.
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_tx.v" -match "*'qn'*"
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_bs.v" -match "*'w_tok'*"

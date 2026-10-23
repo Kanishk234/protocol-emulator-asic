@@ -9,6 +9,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from physical_runtime import container_flags
 
 CORNERS = ("nom_fast_1p32V_m40C", "nom_slow_1p08V_125C", "nom_typ_1p20V_25C")
 
@@ -67,7 +68,7 @@ def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup
         root.mkdir()
         subprocess.run([
             sys.executable, "-m", "librelane", "--pdk-root", pdk_root,
-            "--docker-no-tty", "--dockerized", "--pdk", "ihp-sg13cmos5l",
+            *container_flags(), "--pdk", "ihp-sg13cmos5l",
             "--manual-pdk", "--run-tag", tag, "--force-run-dir", str(root),
             "--hide-progress-bar", "--with-initial-state", str(checkpoint), str(path),
         ], check=True)

@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 from postgrt_timing import CORNERS, screen
+from physical_runtime import container_flags
 from rtl_grt_screen import native_mapping_strategy
 
 
@@ -89,7 +90,7 @@ def main(config_transform=None, extra_tcl=None, stop_step='OpenROAD.ResizerTimin
     if image_override is not None:
         os.environ['LIBRELANE_IMAGE_OVERRIDE'] = image_override
     subprocess.run([sys.executable, '-m', 'librelane', '--pdk-root', os.environ['PDK_ROOT'],
-                    '--docker-no-tty', '--dockerized', '--pdk', 'ihp-sg13cmos5l',
+                    *container_flags(), '--pdk', 'ihp-sg13cmos5l',
                     '--manual-pdk', '--run-tag', 'native-stock', '--force-run-dir', str(flow),
                     '--hide-progress-bar', '--to', stop_step, str(path)], check=True)
     source = checkpoint(flow, final_antenna=final_antenna)

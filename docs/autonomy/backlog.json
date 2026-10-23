@@ -336,9 +336,11 @@
         "39987539298 referenceIO allocationFAIL from equal bus segmentation; BUG120 ordered-side grouping fixed. Local all16mappedLUT+RTLothers loaded primaryPASS with Icarus13 (BUG121);81checksPASS",
         "39989251719 reference210pin geometry/438latchesPASS; census catchesonly2native literal drivers (BUG122 fix). Hosted16mappedLUT primaryPASS independently47inputs/twoexecutables audited.",
         "39996455894 at46682a2SUCCESS: bothwidths210pin/438latch/nativecore gate; independentprepared/ODB/LEF audit; mixedmappedprimary1PASS+47input/2binaryhash reauth. No placement/routing/timing acceptance.",
-        "D107 paired representative PDN/placement/GRT runner prepared from39996455894; fixedpolicy/phase3testsPASS; no routed/timing acceptance yet"
+        "D107 paired representative PDN/placement/GRT runner prepared from39996455894; fixedpolicy/phase3testsPASS; no routed/timing acceptance yet",
+        "40009049924 atd853696: both fixed LUT footprints finish native GRT with zero final overflow and final PGviolations;438latches/2486PGterminals each. BUG124 overstrict auxiliary BPin patch assertion repaired;49local tests and retained ODB/result replayPASS. Hosted corrected replay40009616432 active.",
+        "40009616432 at6b290889 attempt1SUCCESS both widths; authenticated API/source/result/PGgeometry/ODB hash replayPASS, exact prior ODB reproduction. Representative LUT PDN/placement/GRT only."
       ],
-      "next_action": "Observe fixed paired representative physical run: zero PGviolations/final native overflow, exact phase/state-cell retention and measured physical overhead. Preserve both outcomes and budgets; no graph/seed sweep.",
+      "next_action": "Qualify other tile types/column phases/shared interfaces before whole-grid hardening. Narrow core92.5429% utilized; no timing/detailed routing/full-fabric acceptance. Preserve secondary I2C timeout and no graph/seed sweep.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

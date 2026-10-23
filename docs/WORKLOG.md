@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (paired representative tile gate green)
+**Actual:**40009616432 at6b2908894d2eefe53bbb1e523d5e924761ef6e8f attempt1SUCCESS, bothwidths. Root API/source/result/geometry/ODB-hash replayPASS; each ODB exactly matches preceding run. Zero final global overflow/PGviolations;438latches/2486PGterminals.49local R1testsPASS. Commits preserve adapter provenance and checker fixes; G1 unchanged.
+**Next:** qualify other tile types, column phases and shared interfaces, then complete-fabric physical integration. Narrow tile92.5429%utilized: retain limited reserve. No timing/detailed-routing/whole-fabric acceptance, no phase boxes ticked or whole-chip attempt consumed. Secondary UART+I2C600s compiler timeout remains unresolved.
+
 ## 2026-10-23 (both representative footprints reach zero-overflow GRT)
 **Actual:**40009049924 sourced853696 completes PDN, placement and global routing at both fixed widths. Every final layer overflow0, final VPWR/VGND grid violations0,2486power terminals,438latches; unchanged native area24385.5µm² rounded. Core utilization64.116%reference/92.5429%narrow; aggregate routing resource usage41.40%/58.58%. No timing or full-fabric acceptance.
 **Checker repair:** BUG124 full-height stripe plus auxiliary200nm edge patches were incorrectly rejected rectangle-by-rectangle. New grouped check still rejects boundary-only stripes and phase/geometry errors.49local R1testsPASS; retained results and both ODB SHA hashes replayPASS. Hosted aggregate remains red until corrected checker replay.

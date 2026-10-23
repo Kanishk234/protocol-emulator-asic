@@ -18,3 +18,5 @@ Run40009049924, sourced85369625ec047ce5a521a9b1f0516ad24143f62, completes both n
 |154.08|24385.5|92.5429%|58.58%|0|
 
 Native run40009049924 supplies these measurements. Narrowed tile has limited placement reserve. This is one first-column LUT tile, output-buffered, no configured timing or detailed signal routing; other tile types, column power phases, shell and full-grid integration remain unqualified. It does not establish equal-total-area superiority over G1.
+
+**Hosted replay accepted within representative scope:**40009616432 at6b2908894d2eefe53bbb1e523d5e924761ef6e8f attempt1SUCCESS, both matrix jobs. Root recomputation authenticates API identity, mapped/adapter hashes, all final layer overflow fields, zero final PG violations,2486PGterminals,438latches, grouped stripe geometry and retained ODB SHA. ODB hashes exactly reproduce40009049924: reference3bc82ec3b9402873a890b03896d4c2429e6f430471f87899d4066f7a2640efec; narrow5e1aa36e26cdae9c1ceabae85e4c8e277850519924a1187445d1c25f097bfc5a. No independent specialist review claimed.

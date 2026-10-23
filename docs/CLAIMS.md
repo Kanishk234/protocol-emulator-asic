@@ -58,3 +58,6 @@ Every public claim about the chip, with its evidence. If there is no evidence, i
 - Superiority over a CPU/PIO design or a generic fabric without an equal-area measurement.
 - Generality beyond the held-out results.
 - "First" or "novel" without a prior-art check.
+
+### Representative R1 LUT PDN/placement/global routing (2026-10-23)
+Run40009616432 at6b2908894d2eefe53bbb1e523d5e924761ef6e8f attempt1 passes both219.84and154.08µm widths, height185.22, same frozen mapped LUT logic/output-buffer policy. Each reports zero final global overflow and final VPWR/VGND grid violations,438configuration latches and2486checked PGterminals. Core utilization64.116%/92.5429%. See reports/r1_representative_route_20261023.md for hash replay and policy. This qualifies one first-column representative LUT tile only; no detailed signal routing, configured timing, other tile/column integration, whole-fabric acceptance or equal-total-area advantage over G1 claimed.

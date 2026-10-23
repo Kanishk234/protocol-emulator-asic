@@ -1,17 +1,6 @@
 name: R1 balanced native interfaces and critical leaves
 on:
   workflow_dispatch:
-  push:
-    branches: [efpga]
-    paths:
-      - 'spikes/r1/layout_budget.py'
-      - 'spikes/r1/physical_route.py'
-      - 'spikes/r1/interface_preflight.py'
-      - 'tools/profiling/tests/test_r1_layout_budget.py'
-      - 'tools/profiling/tests/test_r1_interface_preflight.py'
-      - 'tools/profiling/tests/test_r1_physical_route.py'
-      - '.github/workflows/r1_balanced.yaml'
-      - 'patches/r1_explicit_buffer_cell.patch'
 permissions:
   contents: read
   actions: read

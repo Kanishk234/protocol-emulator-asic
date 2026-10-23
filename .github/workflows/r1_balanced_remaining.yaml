@@ -1,0 +1,94 @@
+name: R1 remaining balanced leaf contexts
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/r1/physical_route.py'
+      - 'spikes/r1/layout_budget.py'
+      - 'tools/profiling/tests/test_r1_layout_budget.py'
+      - 'tools/profiling/tests/test_r1_physical_route.py'
+      - '.github/workflows/r1_balanced_remaining.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-balanced-remaining-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  admission:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Check fixed geometry and empty-wire guards
+        run: |
+          scripts/setup_venv.sh
+          source .venv/bin/activate
+          mkdir -p build/r1_remaining_checks
+          python -m pytest -q tools/profiling/tests/test_r1_layout_budget.py tools/profiling/tests/test_r1_physical_route.py --junitxml=build/r1_remaining_checks/checks.xml
+          python -m tools.autonomy.check_xml build/r1_remaining_checks/checks.xml --minimum-cases 13
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-remaining-guards-${{ github.run_id }}
+          path: build/r1_remaining_checks/
+          retention-days: 30
+          if-no-files-found: error
+  remaining_leaf:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        case: [northeast, east_io, southeast, lut0, lut1, lut2, lut3, lut4, lut5,
+               north0, north1, north2, north3, north4, north5,
+               south0, south1, south2, south3, south4, south5]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_balanced_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate exact frozen maps and buffer adapter
+        timeout-minutes: 15
+        run: |
+          scripts/setup_venv.sh
+          mkdir -p build/r1_balanced_remaining
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/40013513454 > build/r1_balanced_remaining/producer.json
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/40030916359 > build/r1_balanced_remaining/balanced-parent.json
+          source .venv/bin/activate
+          python -c 'import json; d=json.load(open("build/r1_balanced_remaining/balanced-parent.json")); assert d["head_sha"]=="00216eac8dcd14c03503afd17d303118a4d3440f" and d["run_attempt"]==1 and d["conclusion"]=="success"'
+          python -c 'import json; d=json.load(open("build/r1_balanced_remaining/producer.json")); assert d["head_sha"]=="8d42ac1202864ac92c6488b75f34c0a63fcbaebf" and d["run_attempt"]==1 and d["conclusion"]=="success"'
+          gh run download 40013513454 --name r1-interfaces-40013513454 --dir build/r1_balanced_source
+          curl -sfL https://raw.githubusercontent.com/mole99/librelane_plugin_fabulous/dcc038217472822330b33f61fadbc06e0c3cc96d/librelane_plugin_fabulous/scripts/add_buffers.tcl -o build/r1_balanced_remaining/add_buffers.tcl
+          echo 'bd134f7e02a401ade48c365f0c9ed2b6d950526ccc92c71a777d039ff0fd8e0e  build/r1_balanced_remaining/add_buffers.tcl' | sha256sum -c -
+          mkdir -p build/r1_balanced_remaining/adapter/librelane_plugin_fabulous/scripts
+          cp build/r1_balanced_remaining/add_buffers.tcl build/r1_balanced_remaining/adapter/librelane_plugin_fabulous/scripts/
+          patch --batch --fuzz=0 -p1 -d build/r1_balanced_remaining/adapter < patches/r1_explicit_buffer_cell.patch
+          cp build/r1_balanced_remaining/adapter/librelane_plugin_fabulous/scripts/add_buffers.tcl build/r1_balanced_remaining/add_buffers.tcl
+          echo '7b9526fcc9676d6f266e457344c6b71921eebea7e2600c3df489de1475c1f2e6  build/r1_balanced_remaining/add_buffers.tcl' | sha256sum -c -
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Native fixed balanced case
+        timeout-minutes: 45
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e GITHUB_RUN_ID -e GITHUB_RUN_ATTEMPT \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            python3 spikes/r1/physical_route.py --bundle build/r1_balanced_source/input --buffers build/r1_balanced_remaining/add_buffers.tcl --out build/r1_balanced_remaining/native --balanced-case ${{ matrix.case }} > build/r1_balanced_remaining/native.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-balanced-remaining-${{ github.run_id }}-${{ matrix.case }}
+          path: build/r1_balanced_remaining/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

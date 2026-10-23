@@ -2,6 +2,32 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-23 — Validate full stock-flow project and prepare stock-only screen
+
+- Assembled ignored build/stock-official-20261023 from main archive plus the21-file design-only patch. Copied and SHA-verified all8pinned SRAM views. Main src/config/RTL/official gds.yaml remain unchanged.
+- Strict project config changes only density56and existing SRAM-integration fields. No custom flow metadata, image/runtime, physical ECO, synthesis/resizer policy or checker waiver. Uses default stock base.sdc rather than experimental hold-uncertainty0.10ns; stock0.25ns default is stricter. This is a new stock baseline, not reproduction of the custom repair chain.
+- Actual unchanged TT tools d66cf179e7bc4d296362ab7e2e3b344dc3c4f665 pass --create-user-config/HDL port checks on this project; generator check passes. Workflow byte identity and full design/macro hashes verified. YoWASP overlays/tmp, so relocated candidate under ignored build/after absolute-path port checks failed under/tmp; no TT tool modification. Temporary Python validation dependencies stay in/tmp, installed through project venv.
+- Prepared separate gds-stock-official-baseline-screen.yaml using unchanged stock image/Classic sequence through OpenROAD.STAMidPNR-3, stopping before DRT. Real pinned LibreLane API verifies that stop point immediately precedes DetailedRouting; all shell/embedded Python syntax checks pass. No automatic routing or qualification from job success: actual reports require review. Source/config/receipt are spikes/phase2_stock_flow. No new physical job, commit or push; supplied Git rule reserves publication for owner. Next publish this scoped diagnostic/input bundle and run the stock baseline, then diagnose actual paths/counts. No Phase2boxes ticked; watcher remains stopped.
+
+## 2026-10-23 — Prepare design-only recovery path
+
+- Extracted a separate21-file verified_design_only.patch under spikes/phase2_stock_flow, excluding src/config.json, all workflow/runtime/plugin edits and physical ECOs. git apply --check passes. Manifest binds every proposed source file to the previously tested full2/4prototype. Bundle remains unapplied; it is not complete SRAM integration or stock-flow qualification.
+- Read the organizer-linked Ken Pettit SRAM walkthrough. It explicitly documents the same Magic abstract-view overlap and recommends project-level KLayout DRC in place of Magic with explicit overlap exceptions. This clarifies that strict raw-Magic-zero is not established by that SRAM recipe. No checker-policy changes adopted; custom steps/precheck patches in the reference are excluded.
+- Confirmed stock timing reproduction remains open: successful custom sequence includes incremental routing and81buffers/14strengthchanges/250sinkrewires, none transferable merely by copying RTL. Earlier native-stock qualification/recipe audit records the ordering differences and stock electrical failures. Need a matched stock-flow measurement before choosing further RTL optimizations.
+- Main CI snapshot: unit39985536087 running; test39985536116,lint39985536439,docs39985536109 and package39985552504 successful. No new dispatch, commits/pushes or official workflow/main input changes. No phase boxes ticked. Next prepare permitted SRAM/project inputs and exact stock-flow baseline; preserve50MHz/full2/4and all real timing/electrical/physical gates.
+
+## 2026-10-23 — Owner confirms unchanged official flow is the acceptance target
+
+- Withdrew D-108 custom-flow integration and marked its local promotion bundle/review as do-not-apply. No official workflow, main RTL or main config changed. No commits, pushes or workflow dispatches performed in this correction.
+- Acceptance requires the unchanged official workflow/action and stock hardening checks. Custom images/plugins/repair orchestration and bypassed stock checks are excluded. Existing experimental passes remain useful diagnostics, not proof of official-flow readiness.
+- Next: prepare a separate design-only promotion without custom flow metadata or template edits, establish the full2/4/U0-full/SRAM stock-flow baseline, and fix actual timing/electrical/physical failures. Raw Magic/overlap failure39883160399 remains a stock-flow blocker; separate precheck success does not erase it. No Phase2boxes ticked. Preserve unrelated local files and keep watcher stopped.
+
+## 2026-10-23 — Resume final export verification
+
+- Package-only CI39985552504 passed the real Docker build/plugin/native-instrumentation checks at72ad5de. Reviewed promotion patches are now durable local files under spikes/phase2_main_promotion; both pass git apply --check. Main hardware/config/template workflow remain unapplied.
+- Fresh integrated final filled netlist SHA35875710de59c1403171a8157bf1810b3e1b3b0327cb6b5afef35a76f9aaaeff differs from the pre-fill DRT replay netlist. Additional official-style replay of this exact exported netlist passes4/4 in152.42s, with independent XML validation and zero failures/errors/skips. Wrapper exited127 after simulation because the script was updated while Bash was reading it; no wrapper-pass claim. No new timing experiment launched.
+- No phase boxes ticked. Next: inspect final-export replay, obtain D-108 engineering exceptions for protected config/template-job edits, then prepare the official main build. Current supplied Git rule reserves commits/pushes for the user; no history/remote mutation in this resumed session. Watcher remains stopped.
+
 ## 2026-10-23 — Prepare main promotion and registered official-action adapter
 
 - Prepared22-file source/spec/generated/top-test/metadata/docs promotion patch and exact protected GDS setup patch under/tmp/tripwire-official-mux-candidate-20261022/review; git apply --check passes. Neither main hardware/config nor template gds.yaml was changed. Proposed D-108 explicitly requests config-whitelist/template-job exceptions; review is PHASE2_MAIN_PROMOTION_REVIEW.md. Unrelated reports/tools/FIPE note preserved.

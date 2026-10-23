@@ -1,6 +1,6 @@
 # Main promotion and official-flow setup review
 
-Status: prepared locally; protected main configuration and GDS job patches are unapplied. No Phase 2 boxes are closed by this proposal. D-108 requires owner approval for the two project-policy exceptions.
+Status: WITHDRAWN by owner direction on2026-10-23. Do not apply this promotion bundle. The official workflow/action/tool flow must remain unchanged. Main hardware/config/GDS job patches are unapplied. The custom-flow proposal below is historical, not the current plan. No Phase2boxes are closed.
 
 ## What is promoted
 
@@ -8,9 +8,9 @@ The exact full 2-lane / 4-pin-unit / U0-full / SRAM RTL from successful fresh re
 
 The scoped patches are prepared at:
 
-- `/tmp/tripwire-official-mux-candidate-20261022/review/main-promotion.patch`:22source/spec/generated/test/metadata/documentation changes, including the proposed main config.
-- `/tmp/tripwire-official-mux-candidate-20261022/review/official-gds-setup.patch`: the exact protected job changes.
-- `/tmp/tripwire-official-mux-candidate-20261022/review/protected-config-diff.json`: all37config-key changes from current main.
+- `spikes/phase2_main_promotion/verified_source.patch`:22source/spec/generated/test/metadata/documentation changes, including the proposed main config.
+- `spikes/phase2_main_promotion/official_gds_setup.patch`: the exact protected job changes.
+- `spikes/phase2_main_promotion/config_diff.json`: all37config-key changes from current main.
 
 Both patches pass `git apply --check`. Runtime preparation pins30source/config/test/metadata files and8macro views by SHA256; generated TT user_config is deliberately not treated as a tracked input. Unused legacy pnr.sdc is not promoted. Both actual PNR/signoff constraints use fully timed signoff.sdc.
 
@@ -44,8 +44,14 @@ The custom flow uses the same selected export/LVS chain as successful39907035580
 - Narrow lint annotations cover bounded address comparisons and named dead/lean-only signals in the byte-identical RTL; unrelated warnings remain fatal. Our own lint/unit workflows and local scripts include the SRAM blackbox.
 - L2 fault tests now use fresh per-case compile/results directories and support the late-cursor form. The previous shared compiled model could be reused across source directories. Fresh unmodified rx/cursor baselines pass; priority-flip is detected at99compared clocks and cursor-off-by-one at326directed clocks. The old ignored default compilation cache was cleared.
 
-The Docker image cannot be built locally because Docker is unavailable. Separate official-flow-package-check performs only image/plugin/native-instrumentation checks in CI, without synthesis or routing. A complete physical run through the official adapter is still required; the first official GDS run is that integration validation, not a new timing candidate.
+The Docker image cannot be built locally because Docker is unavailable. Package CI [39985552504](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39985552504) passed the real Docker image build, plugin registration and native instrumentation checks at72ad5de, without synthesis or routing. A complete physical run through the official adapter is still required; the first official GDS run is that integration validation, not a new timing candidate.
 
-## After approval
+## Historical implementation instructions — withdrawn
 
 Apply the reviewed source/config/template patches, verify generation/source bindings, commit in scoped groups and push main once. That hardware push starts the actual official GDS workflow. Inspect its real GDS, timing/electrical/antenna/LVS, precheck, GL and viewer results before updating Phase2exit evidence. Preserve unrelated modified reports, local tools and the local-only FIPE note. No additional timing screen is planned unless an actual regression needs diagnosis.
+
+Final-export follow-up: fresh run39907035580 filled netlist SHA35875710de59c1403171a8157bf1810b3e1b3b0327cb6b5afef35a76f9aaaeff passes all4official-style GL cases (152.42s, zero failures/errors/skips). The wrapper exited127 after simulation because its script was replaced while Bash was reading it; the independent XML and cocotb summary both confirm4/4. This is a local wrapper invocation error, not a passing wrapper exit.
+
+## Current route to acceptance
+
+Use the unchanged official workflow and stock Tiny Tapeout hardening flow. Prepare a new design-only promotion separately: exclude registered-flow metadata/context, image overrides, injected scripts, template edits and checker bypasses. Establish an unmodified-flow baseline for the full2/4/U0-full/SRAM implementation, then address actual failing timing/electrical/physical checks through design changes and permitted project configuration. Experimental results are diagnostic evidence only. In particular, prior stock signoff39883160399 failed57924raw Magic DRC/10overlaps despite LVS0; that failure remains unresolved for stock-flow acceptance. Do not replace it with the separate precheck pass or claim readiness based on custom-chain results.

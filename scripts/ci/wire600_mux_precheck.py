@@ -65,7 +65,14 @@ def validate(root, run):
             raise ValueError('Unexpected signoff metric: '+metric)
     # Compare each overlap against the documented Metal4 PDN gap in the FS
     # SRAM view. These classifications are evidence, never a precheck waiver.
-    items = list(ET.parse(root/PREFIX/'07-magic-spiceextraction/feedback.xml').getroot().iter('item'))
+    count = classify_overlaps(root/PREFIX/'07-magic-spiceextraction/feedback.xml')
+    audit.update(overlap_markers_in_pdn_gap=count, lvs_errors=0,
+                 official_signoff=False, precheck_passed=False)
+    return audit
+
+
+def classify_overlaps(path):
+    items = list(ET.parse(path).getroot().iter('item'))
     if len(items) != PROFILE['overlap_count']:
         raise ValueError('Wrong overlap feedback count')
     for item in items:
@@ -80,9 +87,7 @@ def validate(root, run):
                 and any(c-Decimal('1.05') <= min(xs) <= max(xs) <= c+Decimal('1.05')
                         for c in map(Decimal, ('29.24', '96.68', '164.12', '231.56')))):
             raise ValueError('Overlap outside reviewed PDN obstruction gap')
-    audit.update(overlap_markers_in_pdn_gap=len(items), lvs_errors=0,
-                 official_signoff=False, precheck_passed=False)
-    return audit
+    return len(items)
 
 
 def package(root, run, output):

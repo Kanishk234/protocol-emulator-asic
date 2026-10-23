@@ -1,13 +1,6 @@
 name: R1 measured primitive placement reserve
 on:
   workflow_dispatch:
-  push:
-    branches: [efpga]
-    paths:
-      - 'spikes/r1/physical_route.py'
-      - 'tools/profiling/tests/test_r1_physical_route.py'
-      - '.github/workflows/r1_primitive_reserve.yaml'
-      - 'patches/r1_explicit_buffer_cell.patch'
 permissions:
   contents: read
   actions: read

@@ -32,6 +32,29 @@ NATIVE_BALANCED_SHA={
 'W_IO4':'979833b6a2d2b6c65067e5cd628f8812d0ab8525a52f00ab6445f7305ec620cc',
 'NW_term':'9998abeb3819c42ba50ab841316e6109c088f3eaad546f875ff41342c08739b3',
 'SW_term':'90a0f9a9a598ecdad2279324a85a9c200b45c6a04d2b0dd0ed44fddb88b7c0b2'}
+NATIVE_COMPLETE_SHA={**NATIVE_BALANCED_SHA,
+'E_IO4':'e715751729ff6894eb362738381b82a6d5dc6f089ad9a2ec57af7c7d50bf494e',
+'LUT4x8_ha':'5d32817052df82d29993076e59ad4718e6c04b7d3ca86c461284681b2f3423a7',
+'NE_term':'a3dcaff47a92d7aabc396114e6eaeae62c352565a274e5d1d83f17e01dfb842b',
+'N_IO':'e74836a3c019e84d2cf723b886a3c47ce6d82666ef9ac45cf11b14f3e936eab6',
+'SE_term':'69560dd40cd426096cc918ee149d55fa775d3c7173fca63c4fb52477b1927344',
+'S_IO2':'e561271cac3864b2a9d5539347e15ce6ee7c18a59e5725ec6f8742581e85b41c'}
+
+
+def complete_native_exports(audit_path):
+    data=json.loads(Path(audit_path).read_text())
+    if (data.get('passed') is not True or data.get('leaf_contexts')!=26 or data.get('grid_instances')!=40 or
+        data.get('wire_feedthroughs_with_guides')!=52 or data.get('source_runs')!=
+        dict(baseline='40013513454',critical='40030916359',remaining='40033384495') or
+        set(data.get('native_exports',{}))!=set(NATIVE_COMPLETE_SHA)):
+        raise ValueError('Require complete independently audited native source coverage')
+    exports={}
+    for tile,expected in NATIVE_COMPLETE_SHA.items():
+        row=data['native_exports'][tile];path=Path(row['path']).resolve()
+        if row['sha256']!=expected or hashlib.sha256(path.read_bytes()).hexdigest()!=expected:
+            raise ValueError('Changed complete native export: '+tile)
+        exports[tile]=path
+    return exports
 
 
 def balanced_native_exports(root,baseline):
@@ -56,10 +79,10 @@ def balanced_native_exports(root,baseline):
     return exports,records
 
 
-def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None):
-    native_primitive=postphysical_primitive is not None or postphysical_balanced is not None
+def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None,postphysical_complete=None):
+    native_primitive=any(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))
     if native_primitive and mapped_bundle is None:raise ValueError('Postphysical overrides require all-mapped baseline')
-    if postphysical_primitive is not None and postphysical_balanced is not None:raise ValueError('Choose one native export profile')
+    if sum(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))>1:raise ValueError('Choose one native export profile')
     native_records=[]
     from cocotb_tools.runner import get_runner
     from compile.bitfile import BitFile
@@ -137,6 +160,9 @@ eFPGA fabric(
         if postphysical_balanced is not None:
             native_exports,native_records=balanced_native_exports(postphysical_balanced,mapped_bundle)
             replacements.update(native_exports)
+        if postphysical_complete is not None:
+            replacements.update(complete_native_exports(postphysical_complete))
+            native_records=[Path(postphysical_complete).resolve()]
         sources=[p for p in sources if p not in {model/'rtl'/(t+'.v') for t in replacements}]
         sources.extend(replacements.values())
         revision='2bbec755dc67ca3db0261c3d6163e15735d66710'
@@ -183,9 +209,14 @@ eFPGA fabric(
                 mapped_primitive_tiles_tested=2 if mapped_bundle is not None else 0,
                 mapped_tile_instances_tested=40 if mapped_bundle is not None else (16 if mapped else 0),
                 postphysical_primitive_tiles_tested=2 if native_primitive else 0,
-                postphysical_west_tile_instances_tested=5 if postphysical_balanced is not None else 0,
-                postphysical_source_run='40030916359' if postphysical_balanced is not None else ('40027428283' if postphysical_primitive is not None else None),
-                scope=('Configured fabric uses exact native40030916359output-buffered/placed exports in7instances (2primitive/5west) and mapped baseline in33others. Real frame-FSM loading and UART TX/RX plus SPI0/backpressure; no management SPI shell, extracted/SDF timing, detailed route or whole-chip acceptance.'
+                postphysical_west_tile_instances_tested=5 if postphysical_balanced is not None or postphysical_complete is not None else 0,
+                postphysical_tile_instances_tested=40 if postphysical_complete is not None else (7 if postphysical_balanced is not None else (2 if postphysical_primitive is not None else 0)),
+                postphysical_placed_instances_tested=39 if postphysical_complete is not None else (7 if postphysical_balanced is not None else (2 if postphysical_primitive is not None else 0)),
+                postphysical_wire_only_instances_tested=1 if postphysical_complete is not None else 0,
+                postphysical_source_run='40030916359+40033384495' if postphysical_complete is not None else ('40030916359' if postphysical_balanced is not None else ('40027428283' if postphysical_primitive is not None else None)),
+                scope=('All40leaf instances use audited native exports:39placed/output-buffered and1cell-free routed wire tile. Generated RTL interconnect and RTL frame FSM load the primary UART TX/RX plus SPI0/backpressure sample. No management SPI shell, detailed route, SDF/extracted/configured timing, physical macro assembly or whole-chip acceptance.'
+                       if postphysical_complete is not None else
+                       'Configured fabric uses exact native40030916359output-buffered/placed exports in7instances (2primitive/5west) and mapped baseline in33others. Real frame-FSM loading and UART TX/RX plus SPI0/backpressure; no management SPI shell, extracted/SDF timing, detailed route or whole-chip acceptance.'
                        if postphysical_balanced is not None else
                        'Configured fabric with both primitive instances using the exact native40027428283output-buffered/placed export; all other tiles mapped baseline. Real frame-FSM loading and UART TX/RX plus SPI0/backpressure; no management SPI shell, extracted/SDF timing, detailed route or whole-chip acceptance.'
                        if postphysical_primitive is not None else
@@ -204,10 +235,12 @@ if __name__=='__main__':
     parser.add_argument('--mapped-bundle',type=Path)
     parser.add_argument('--postphysical-primitive',type=Path)
     parser.add_argument('--postphysical-balanced',type=Path)
+    parser.add_argument('--postphysical-complete',type=Path)
     parser.add_argument('--icarus-root',type=Path)
     a=parser.parse_args()
     if a.mapped_lut is not None and a.mapped_bundle is not None:parser.error('Choose one mapped mode')
     if (a.mapped_lut is not None or a.mapped_bundle is not None)!=(a.pdk is not None):parser.error('Mapped tiles require pinned PDK directory')
     if a.postphysical_primitive is not None and a.mapped_bundle is None:parser.error('Postphysical primitive requires all-mapped baseline')
     if a.postphysical_balanced is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None):parser.error('Balanced native profile requires all-mapped baseline and cannot mix native profiles')
-    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced)
+    if a.postphysical_complete is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None or a.postphysical_balanced is not None):parser.error('Complete native profile requires all-mapped baseline and cannot mix native profiles')
+    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced,a.postphysical_complete)

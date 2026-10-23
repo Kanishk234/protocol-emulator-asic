@@ -1120,3 +1120,6 @@ sweep or physical acceptance follows from this retained measurement.
 
 
 - **D106 compatibility follow-up:**39987539298 resolves port names but legacy equal per-bus segmentation leaves31slots for32FrameData bits at reference width. Merge only identical-policy bus groups per side, preserving order; strict210pin matching and rejection of differing policies remain. Footprints/cells/graph unchanged. Optional exact mapped-LUT functional check now uses the existing Icarus13tool binding with unmodified pinned PDK models; all16LUT tile instances mapped, other tile typesRTL. Local loaded-primary testPASS; no SDF/fullmapped/timing/physical promotion.
+
+
+- **D106 native literal accounting:**39989251719 proves reference210pin geometry/nonoverlap and438latches, but exact census observes one tiehi/one tielo for constant literals. Preserve exact original mapped cell counts; admit exactly these2driver cells with explicit L_HI→one_/L_LO→zero_ bindings and include their native area. No generic import-change allowance. Same run hosted mixed mapped-LUT primary testPASS, independently audited47inputs/twoexecutables; no whole-fabric gate-level/SDF/timing/physical acceptance.

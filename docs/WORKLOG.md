@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (reference native pin geometry succeeds; literal accounting)
+**Actual:**39989251719 atdbca630 native reference import/floorplan/210signalpin placement/bounds/nonoverlap/438latches pass. Exact cell census then rejects only2native constant drivers (one tiehi/tielo); every original mapped count matches. Narrowed width not reached; no complete preflight or routing/timing acceptance. BUG122 explicit2driver binding/count+area accounting prepared; other cell differences remain fatal.
+**Hosted mixed-mapped proof:** same run's mapped-primary stepSUCCESS; independent audit1strictXML/47source-model-image hashes/twoIcarus13executablesPASS. All16LUT tile instances mapped; primitive/IOtilesRTL. Source/script/PDK unchanged during simulation. No SDF/fullmapped/shell/physical acceptance. Combined focused checks rerun before push.
+**Next:** unchanged preflight retry with native constant materialization correctly budgeted; audit bothwidths and driver bindings before placement/routing. G1/native121/118protected; no hardening/fullchip attempts or phase boxes; secondary routing timeout stays explicit.
+
 ## 2026-10-23 (legacy pin grouping diagnosed; mapped LUT behavior passes)
 **Actual:**39987539298 at4e1934e reaches native reference-width import/floorplan/real-pin matching, then I/O placer starves32-bit FrameData group with31slots after equal per-group segmentation. No narrowed geometry result. BUG120 same-policy per-bus groups now merge into one ordered side group; all210realpin checks remain strict and differing policies rejected.81combined focused testsPASS.
 **New functional evidence:** all16LUT tile instances replaced with exact audited mapped-cell netlist; unchanged pinned PDK models. Icarus12 delayed_* behavior givesX; documentedIcarus13binding fixes it (BUG121). Local1strict loadedUARTTX/RX+SPI0/backpressure/rate PASS at build/r1_mapped_lut_smoke_iv13/results.xml; final binary-hash/version-guard rerun alsoPASS at build/r1_mapped_lut_smoke_final/results.xml. Other tiles remain RTL; no SDF/fullmapped/shell/physical acceptance. Owned workflow adds this check independently of pin result.

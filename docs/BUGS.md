@@ -1,5 +1,11 @@
 # Bugs
 
+## 122: Native import census omits materialized constant drivers
+- **Date:**2026-10-23.
+- **Symptom/check:**39989251719 successfully places all210reference signal pins and retains438latches, then strict cell equality rejects two extra cells.
+- **Root cause:** OpenROAD materializes Verilog literals as exactly one sg13cmos5l_tiehi and one sg13cmos5l_tielo. All original mapped cell counts match; this is not configuration storage tied to constants.
+- **Fix/coverage:** require every original cell count plus exactly those two physical drivers, explicitly verify L_HI→one_ and L_LO→zero_ bindings, and include their actual area in the native core budget. Regression rejects altered latches, extra buffers/ties or missing drivers. No other import differences admitted; narrowed geometry still pending retry.
+
 ## 120: Per-bus pin groups starve the frame-data bus in legacy placer
 - **Date:**2026-10-23.
 - **Symptom/check:**39987539298 resolves disabled clocks but aborts at reference-width I/O placement: the32-bit frame-data bus receives31slots after equal side segmentation.

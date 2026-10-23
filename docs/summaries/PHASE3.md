@@ -1,5 +1,7 @@
 # Phase 3 summary: specialize, compare, hardware freeze
 
+**Current successor work (2026-10-23):** the G1 freeze below is historical and remains protected. D037 reopened phase3 for successor experiments. R1 preserves all six retained compiler cases and fits simultaneous UART+SPI; its secondary UART+I2C compiler route still times out. Representative LUT run40009616432 passes PDN/placement/global routing at both fixed footprints, with zero final overflow/PGviolations; no whole-grid or timing acceptance. Hosted40013513454 passes full-mapped40tile primary function after real frame loading, all20native tile/footprint cases and3064neighbor bit pairs at each width. This fixed duplicate exported alias drivers and border pin ordering without hardware insertion. Next qualify primitive/border physical routing and actual column power phases; narrowed bare primitive occupancy is93.961% before buffers. R1 has not replaced G1 or established an equal-total-area advantage.
+
 **Status:** complete (2026-09-28). Every exit item passed; `hw-freeze` → 3047dea; all CI green on `efpga` at a578359.
 
 ## Goal

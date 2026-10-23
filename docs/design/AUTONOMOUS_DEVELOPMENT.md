@@ -38,6 +38,8 @@ Fresh reduced-radix profile preserves all six retained compiler cases and primar
 
 Representative first-column LUT run40009049924 now completes PDN/placement/GRT at both fixed widths with zero final overflow and zero final PG violations. BUG124 checker rejected auxiliary boundary patches despite full-height stripes; corrected retained-result/ODB replay and49local tests pass, hosted replay40009616432 at6b290889 attempt1SUCCESS both widths, with authenticated source/result/geometry and exact ODB-hash replay. Next qualify other tile types, column phases and shared interfaces before full-grid hardening; no new topology/seed/budget sweep. Native pin/core success is not routing/timing/whole-chip acceptance. Keep the narrowed core's limited reserve explicit; audit column power phase and other tile-type interfaces. Secondary UART+I2C remains a600-second compiler routing timeout, so its aggregate model workflow stays red. Freeze/replacement gates and G1 protection remain unchanged. All three initial graph profiles are already used.
 
+D108/D109now pass in40013513454 at8d42ac1:20native tile/footprint cases,3064actual neighbor bit pairs at each width and all40mapped primary1strictPASS. Root88prepared/47functional/twoexecutable plus native geometry/census/area/ODB auditPASS. BUG125duplicate port assignments fixed without added hardware; BUG126canonical connected-track ordering fixed. Next D110primitive routing at actual columns1/4, both existing widths; same fixed physical policy. Bare narrow PRIM93.961%occupied before buffers. Border power/routing and remaining LUT phases/full-grid/timing remain open.
+
 ## Current priority and protected results
 
 Phase 5 is complete as of October 19: the fresh GDS/gate-test run39280550500,

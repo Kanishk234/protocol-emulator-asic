@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (all interfaces and full-mapped primary green; primitive physical next)
+**Actual:**40013513454 at8d42ac1 attempt1SUCCESS: all20native tile/footprint cases,3064actual neighbor bit pairs at both widths, all40mapped primary1strictPASS. Root audit16checker cases/88prepared hashes/nativepins/cells/LEF-area/core/20ODB hashes/allconnections plus47functional/twoexecutable hashesPASS. South-I/O155pins preserved; weighted8736configuration latches. No other-type routing/timing or full-chip acceptance.
+**Next:** D110frozenPRIM at actual columns1/4(fabricX2/X5), both existing widths, unchanged D107policy and finite budgets. Bare narrow PRIM93.961%core beforebuffering is the risk being measured.56localR1testsPASS. No graph/seed/density sweep, full-chip attempt or phase boxes. G1protected; secondaryI2Ctimeout explicit.
+
 ## 2026-10-23 (duplicate export drivers isolated without hardware change)
 **Actual:**40012576053 still18/20: flattened aliases alone fail, hypothesis rejected. Local native original/flat/dedup probe gives143/143/155ports and isolates4duplicate continuous assignments. Guarded dedup after frozen-bit flattening restores all155in diagnostic import, no buffer/cell insertion. Updated S_IO2export SHA77904593…; nineotherexports unchanged. Canonical N_IO/LUT witness in hosted geometry now aligns18.72µm both sides.
 **Next:** hosted full20case/3064pair replay with exact duplicate removal and all-mapped primary proof; preserve both failed runs and root-cause probe.55local R1testsPASS; full-mapped updated-export replay running. G1/held-out protections and no full-chip attempt/phase acceptance unchanged.

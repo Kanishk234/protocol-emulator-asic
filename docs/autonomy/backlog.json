@@ -338,9 +338,12 @@
         "39996455894 at46682a2SUCCESS: bothwidths210pin/438latch/nativecore gate; independentprepared/ODB/LEF audit; mixedmappedprimary1PASS+47input/2binaryhash reauth. No placement/routing/timing acceptance.",
         "D107 paired representative PDN/placement/GRT runner prepared from39996455894; fixedpolicy/phase3testsPASS; no routed/timing acceptance yet",
         "40009049924 atd853696: both fixed LUT footprints finish native GRT with zero final overflow and final PGviolations;438latches/2486PGterminals each. BUG124 overstrict auxiliary BPin patch assertion repaired;49local tests and retained ODB/result replayPASS. Hosted corrected replay40009616432 active.",
-        "40009616432 at6b290889 attempt1SUCCESS both widths; authenticated API/source/result/PGgeometry/ODB hash replayPASS, exact prior ODB reproduction. Representative LUT PDN/placement/GRT only."
+        "40009616432 at6b290889 attempt1SUCCESS both widths; authenticated API/source/result/PGgeometry/ODB hash replayPASS, exact prior ODB reproduction. Representative LUT PDN/placement/GRT only.",
+        "D108 all-type native40011371177/40012576053 admit18/20; strict south-I/O port retention catches duplicate output-alias assignments (BUG125). Native143/143/155port original/flat/dedup probe isolates cause without hardware insertion. Canonical actual-net pin ordering fixes observed border mismatch (BUG126).55local R1testsPASS.",
+        "D109 local all40mapped configured primary1strictPASS with final deduplicated export; hosted40013051752 all-mapped stepSUCCESS (aggregate red for older alias export). Final combined40013513454 at8d42ac1 active.",
+        "40013513454 at8d42ac1 attempt1SUCCESS:20native pin/core cases+3064neighbor bits/width and40mapped primary1strictPASS. Root88prepared/47functional/2binary/nativegeometry/census/area/ODB auditPASS. D110four-case actual PRIMcolumns1/4 physical screen prepared;56localtestsPASS."
       ],
-      "next_action": "Qualify other tile types/column phases/shared interfaces before whole-grid hardening. Narrow core92.5429% utilized; no timing/detailed routing/full-fabric acceptance. Preserve secondary I2C timeout and no graph/seed sweep.",
+      "next_action": "Observe D110primitive routing at actual column indices1/4 and both fixed widths with unchanged D107policy. Narrow bare PRIM93.961%utilized beforebuffers. Preserve all outcomes; then border PDN/routing, remaining LUTphases and full-grid integration. No timing/replacement acceptance; secondary I2C timeout remains open.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

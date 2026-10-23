@@ -58,3 +58,13 @@ def test_campaign_records_failure_and_still_runs_all_workloads(tmp_path,monkeypa
 def test_absent_pnr_log_is_not_reported_as_architecture_nonfit(tmp_path):
     row=m.failure_record('uart',tmp_path,RuntimeError('missing compiler executable'))
     assert row['native_diagnosis']['category']=='unobserved'
+
+
+def test_timeout_records_observed_router_stage_without_inventing_native_fatal(tmp_path):
+    import subprocess
+    (tmp_path/'pnr.log').write_text('Info: Routing..\nInfo: Routing 580 arcs.\n')
+    row=m.failure_record('uart_i2c_11',tmp_path,subprocess.TimeoutExpired(['worker'],600))
+    assert row['failure_kind']=='timeout' and row['timeout_seconds']==600
+    assert row['observed_stage']=='routing'
+    assert row['native_diagnosis']['category']=='unknown'
+    assert row['native_diagnosis']['fatal_messages']==[]

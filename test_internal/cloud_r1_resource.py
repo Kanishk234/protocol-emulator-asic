@@ -25,7 +25,17 @@ def failure_record(case, directory, error):
     if path.is_file():
         util,_=compiler.parse_pnr_log(path)
         diagnosis=compiler.diagnose_pnr_failure(path.read_text(errors='replace'),util)
+    stage='unobserved'
+    if path.is_file():
+        text=path.read_text(errors='replace')
+        if 'Info: Routing..' in text:
+            stage='routing'
+        elif 'placer' in text:
+            stage='placement'
     return dict(case=case,status='failed',error=str(error)[:2000],native_diagnosis=diagnosis,
+                failure_kind='timeout' if isinstance(error,subprocess.TimeoutExpired) else 'worker_failure',
+                timeout_seconds=error.timeout if isinstance(error,subprocess.TimeoutExpired) else None,
+                observed_stage=stage,
                 physical_acceptance=False,timing_acceptance=False)
 
 

@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (legacy pin grouping diagnosed; mapped LUT behavior passes)
+**Actual:**39987539298 at4e1934e reaches native reference-width import/floorplan/real-pin matching, then I/O placer starves32-bit FrameData group with31slots after equal per-group segmentation. No narrowed geometry result. BUG120 same-policy per-bus groups now merge into one ordered side group; all210realpin checks remain strict and differing policies rejected.81combined focused testsPASS.
+**New functional evidence:** all16LUT tile instances replaced with exact audited mapped-cell netlist; unchanged pinned PDK models. Icarus12 delayed_* behavior givesX; documentedIcarus13binding fixes it (BUG121). Local1strict loadedUARTTX/RX+SPI0/backpressure/rate PASS at build/r1_mapped_lut_smoke_iv13/results.xml; final binary-hash/version-guard rerun alsoPASS at build/r1_mapped_lut_smoke_final/results.xml. Other tiles remain RTL; no SDF/fullmapped/shell/physical acceptance. Owned workflow adds this check independently of pin result.
+**Next:** unchanged-geometry native retry with compatible grouping and hosted mapped-LUT test; independently audit both before representative placement/routing. No physical hardening/full-chip attempts or phase boxes. G1/native121/uninstalled118protected; secondary compile timeout still explicit.
+
 ## 2026-10-23 (native preflight reaches floorplan; pin-policy fix)
 **Actual:**39986366251 at01604c9 passes source/setup/sixchecks and native netlist import/floorplan setup, then strictIO aborts on UserCLK/UserCLKo emitted for disabled user-clock ports. Target narrowed width is not reached; no footprint pass/nonfit, routing/timing or phase acceptance. Actual artifacts build/r1_physical_hosted.
 **Fix:** BUG119 adapter removes only the2known disabled/absent entries and verifies all remaining regex patterns match real pins and each real pin once. Native unmatched checking stays both; no graph/cell/geometry/tool/seed change. Eight focused testsPASS, fixed local preparation succeeds with original source hashes unchanged. Combined focused checks are rerun before push.

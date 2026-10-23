@@ -332,9 +332,10 @@
         "39696113043 at0690b6b: both controlsSUCCESS with independent71test/source/model/8image audits; reducedradix compiler step still active; local complete fabric elaborationPASS",
         "39696703659 at9768c77: seven fits/images audited, secondaryI2C routing600stimeout unresolved; ten mappedcells/pinnedPDK auditPASS; local configured primaryUARTTXRX+SPI0/backpressure/ratePASS;72checkerPASS",
         "39983146325 at0ade702: hosted configured primaryPASS; independent1XML/45inputs and72checker/sevenimage audits; secondary stillroutingtimeout. D106 exactmapped physical preflight39986366251 active;78localchecksPASS",
-        "39986366251 import/floorplan setupPASS, strictIO setupFAILphantom disabled UserCLK/CLKo; BUG119 whitelist+complete realpin matching fixes prepared;8focusedtestsPASS"
+        "39986366251 import/floorplan setupPASS, strictIO setupFAILphantom disabled UserCLK/CLKo; BUG119 whitelist+complete realpin matching fixes prepared;8focusedtestsPASS",
+        "39987539298 referenceIO allocationFAIL from equal bus segmentation; BUG120 ordered-side grouping fixed. Local all16mappedLUT+RTLothers loaded primaryPASS with Icarus13 (BUG121);81checksPASS"
       ],
-      "next_action": "Run unchanged-geometry native preflight retry after exact disabled-clock policy fix; audit all210pins/nativecellcounts/corearea. No footprint/routing/timing result yet; keep secondary timeout and full-shell gates explicit.",
+      "next_action": "Retry exact native geometry with compatible grouped pin policy; authenticate hosted mapped-LUT test. Preserve all graph/footprint/tool controls and explicit secondary timeout; no placement/routing/timing acceptance yet.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

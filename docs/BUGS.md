@@ -1,5 +1,17 @@
 # Bugs
 
+## 120: Per-bus pin groups starve the frame-data bus in legacy placer
+- **Date:**2026-10-23.
+- **Symptom/check:**39987539298 resolves disabled clocks but aborts at reference-width I/O placement: the32-bit frame-data bus receives31slots after equal side segmentation.
+- **Root cause:** FABulous2.2emits one group per bus; the pinned legacy placer divides tracks equally among groups regardless of bus width. Overall pin capacity is not the observed failure.
+- **Fix/coverage:** combine same-policy buses into one ordered group per side, as in the legacy format. Preserve pattern order and reject unequal policies instead of merging them silently. Regression verifies grouping and policy rejection; exact210pin coverage remains mandatory. No narrowed geometry or routing result accepted from the failed run.
+
+## 121: Mapped-cell smoke inherits unsupported Icarus12 timing-net behavior
+- **Date:**2026-10-23.
+- **Symptom/check:** first optional mapped-LUT smoke has known frame configuration/global clock but unknown host-ready state with stock Icarus12.
+- **Root cause:** this PDK's delayed_* timing-check nets require the documented TinyTapeout Icarus13 setup (scripts/gl_local.sh); the source-RTL smoke's default simulator is insufficient for mapped cells.
+- **Fix/coverage:** optional mapped mode uses pinned Icarus13 through build-local executable/backend wrappers, validates version and records both executable hashes. PDK models are unchanged and byte-checked against pinned Git objects. Identical loaded primary testPASS with all16LUT tile instances mapped; other tiles remain RTL, no SDF/physical timing acceptance.
+
 ## 119: Physical pin generator emits disabled user-clock ports
 - **Date:**2026-10-23.
 - **Symptom/check:** native39986366251 imports/floorplans the frozen netlist, then strict I/O placement rejects UserCLK and UserCLKo, which are absent from the actual210-bit interface.

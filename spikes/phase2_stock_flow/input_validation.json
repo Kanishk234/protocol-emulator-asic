@@ -1,0 +1,13 @@
+{
+  "status": "input-validation-only-not-physical-qualification",
+  "isolated_project": "/home/younix/protocol-emulator-asic/build/stock-official-20261023",
+  "official_tools_revision": "d66cf179e7bc4d296362ab7e2e3b344dc3c4f665",
+  "tt_create_user_config_passed": true,
+  "canonical_generation_passed": true,
+  "stock_stop_point_verified": "OpenROAD.STAMidPNR-3 immediately before OpenROAD.DetailedRouting",
+  "official_workflow_unchanged": true,
+  "project_config_sha256": "9585550fc035c458aeb6e0653050e81e117917c4b89b3641c9fef4b199e5dd03",
+  "stock_constraints": "Default base.sdc; no latch false paths or explicit uncertainty reduction",
+  "checker_waivers_added": false,
+  "physical_run_started": false
+}

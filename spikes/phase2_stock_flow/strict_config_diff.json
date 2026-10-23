@@ -1,0 +1,78 @@
+{
+  "PL_TARGET_DENSITY_PCT": {
+    "main": 60,
+    "proposed": 56
+  },
+  "FP_PDN_VPITCH": {
+    "main": 50.0,
+    "proposed": 67.44
+  },
+  "MACROS": {
+    "main": null,
+    "proposed": {
+      "RM_IHPSG13_1P_512x16_c2_bm_bist": {
+        "instances": {
+          "u_chip.u_sram.sram": {
+            "location": [
+              12,
+              40
+            ],
+            "orientation": "FS"
+          }
+        },
+        "gds": [
+          "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.gds"
+        ],
+        "lef": [
+          "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.lef"
+        ],
+        "lib": {
+          "*_typ_*": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib"
+          ],
+          "*_fast_*": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib"
+          ],
+          "*_slow_*": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib"
+          ]
+        },
+        "nl": [
+          "dir::./RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+        ],
+        "spice": [
+          "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl"
+        ]
+      }
+    }
+  },
+  "PDN_MACRO_CONNECTIONS": {
+    "main": null,
+    "proposed": [
+      "u_chip.u_sram.sram VPWR VGND VDD! VSS!",
+      "u_chip.u_sram.sram VPWR VGND VDDARRAY! VSS!"
+    ]
+  },
+  "PDN_CFG": {
+    "main": null,
+    "proposed": "dir::pdn_cfg.tcl"
+  },
+  "FP_PDN_VSPACING": {
+    "main": null,
+    "proposed": 3.52
+  },
+  "FP_PDN_VOFFSET": {
+    "main": null,
+    "proposed": 26.36
+  },
+  "MAGIC_MACRO_STD_CELL_SOURCE": {
+    "main": null,
+    "proposed": "PDK"
+  },
+  "MAGIC_EXT_ABSTRACT_CELLS": {
+    "main": null,
+    "proposed": [
+      "RM_IHPSG13_.*"
+    ]
+  }
+}

@@ -63,6 +63,10 @@ def test_port_alias_normalization_preserves_frozen_bit_identity():
     bad=deepcopy(ports);bad['second']['bits']=[8]
     with pytest.raises(ValueError):direct_port_aliases(source,bad)
     with pytest.raises(ValueError):direct_port_aliases(' assign first = second;\n assign second = first;\n',ports)
+    duplicate='  assign second = source;\n'+source
+    clean,changes=direct_port_aliases(duplicate,ports)
+    assert clean.count('assign second = source;')==1
+    assert any(c.get('removed_duplicate') for c in changes)
 
 
 def test_connected_track_classes_align_different_border_bus_order():

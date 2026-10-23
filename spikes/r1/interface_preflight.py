@@ -62,7 +62,11 @@ def direct_port_aliases(text,ports):
         for i,bit in enumerate(port['bits']):
             bits[name if len(port['bits'])==1 else f'{name}[{i+port.get("offset",0)}]']=(bit,port['direction'])
     pattern=re.compile(r'^(\s*assign\s+)(\w+(?:\[\d+\])?)(\s*=\s*)(\w+(?:\[\d+\])?)(\s*;)$',re.M)
-    aliases={m[2]:m[4] for m in pattern.finditer(text) if m[2] in bits and m[4] in bits}
+    aliases={}
+    for match in pattern.finditer(text):
+        if match[2] in bits and match[4] in bits:
+            if bits[match[2]][0]!=bits[match[4]][0]:raise ValueError('Port alias differs from frozen graph')
+            aliases[match[2]]=match[4]
     changed=[]
     def replace(match):
         lhs,rhs=match[2],match[4]
@@ -76,7 +80,18 @@ def direct_port_aliases(text,ports):
             raise ValueError('Alias rewrite is not an identical input/output port bit')
         changed.append(dict(output=lhs,old_source=rhs,input=root))
         return match[1]+lhs+match[3]+root+match[5]
-    return pattern.sub(replace,text),changed
+    text=pattern.sub(replace,text)
+    seen={}
+    def deduplicate(match):
+        lhs,rhs=match[2],match[4]
+        if lhs not in aliases:return match[0]
+        if lhs in seen:
+            if seen[lhs]!=rhs:raise ValueError('Conflicting top-level port alias drivers')
+            changed.append(dict(output=lhs,input=rhs,removed_duplicate=True))
+            return ''
+        seen[lhs]=rhs
+        return match[0]
+    return pattern.sub(deduplicate,text),changed
 
 
 def align_pin_orders(design,orders,port_names):

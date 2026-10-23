@@ -31,6 +31,8 @@ Never claim: zero latency, sub-ns timing, USB/Ethernet support, real-hardware te
 
 | 15 | Isolated cached fabric selection preserves the checked port behavior and passes the22-case RTL protocol suite | For every legal N1..16: original→named-reference equivalence98points and reference→cached99..114points, induction cap4; wrong-enable mutation rejected;7fabric/5chip tests,2048L2clocks, Verilator22/22 no skips in348.97s; D-096 and source-hashed /tmp/tripwire-cached-port-select-20261020/cached_select_receipt.json | tested | Module proofs with reset/state correspondence, not whole-chip formal or pre-reset behavior. Local mapping adds52flops/0.898% standard-cell area; isolated ideal-wire timing is not physical or official closure. Native screen pending |
 
+| 16 | The clean-reproduced full2/4/U0-full/SRAM experimental candidate passes measured extracted timing/electrical/routing/antenna gates, final22-case protocol replay, LVS and unchanged Tiny Tapeout precheck on its exact GDS | Route39868597887; final GL39880054906 XML22/22/0skips; LVS39883160399; precheck39890538270 XML9/9 including SG13CMOS5L DRC; PHASE2_PASSING_ROUTE_INTEGRATION.md | tested | Specific experimental artifact, not main official GDS workflow/Phase2 completion. SetupWS0 is not positive global margin; no SDF/silicon/exhaustive protocol claim. Raw Magic diagnostic39883160399 remains failed on recorded macro-contained markers; official continuous source/recipe integration unfinished |
+
 ## Known limits (state them wherever the related claim appears)
 
 

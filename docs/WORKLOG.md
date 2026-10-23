@@ -2,6 +2,23 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-23 — Prepare continuous fresh source-to-GDS integration proof
+
+- Added wire600_integrated_proof and separate gds-wire600-integrated-proof workflow. No physical checkpoint downloads: fresh synthesis/repair, unchanged strict pre-routing measurements, detailed routing/extraction, exact finalNL identity, fresh stock GDS/LEF/LVS, then unchanged TT precheck in dependent job. No main hardware/config/template edits.
+- Bound current live run provenance explicitly, retaining56historically reviewed physical/constraint/source/audited-state/proposal hashes while excluding runtime/statistics/log fingerprints from fresh-execution identity. Existing historical fixtures/default routes unchanged. Actual historical physical bundle passes this live identity-only validator; actual existing GDS classification still57924inside SRAM/10PDN-gap overlaps.
+-32focused checks pass (including fresh-workspace, provenance, LVS/overlap/foreign-GDS rejection, workflow shell/Python and no checkpoint-download checks); diff check passes. Raw Magic diagnostic is not rerun or marked passed; all expected overlap evidence stays in receipt and unchanged merged-GDS precheck remains required. FinalNL must equal c60823... from successful22-case replay, otherwise abort. Receipt retains official_signoff=false. Next publish scoped groups and run integrated proof; official template portability remains open, no phase boxes.
+
+## 2026-10-23 — Exact routed GDS passes unchanged Tiny Tapeout precheck
+
+- Verified [39890538270](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39890538270) conclusion success. Downloaded precheck_reports to/tmp/tripwire-precheck-39890538270; XML contains9checks, no failures/errors/skips. KLayout SG13CMOS5L DRC passes (8276.18s), as do pin-label overlap, zero-area, general KLayout, pin, boundary, layer, cell-name and analog-pin checks.
+- Together with route39868597887, exact final replay39880054906(22/22) and LVS in39883160399, this establishes timing/electrical/routing/antenna, protocol replay, LVS and unchanged TT precheck evidence for this exact experimental full2/4/U0-full/SRAM GDS. Raw Magic diagnostic remains failed and its markers remain recorded; precheck does not retroactively make that job green.
+- Updated integration report, claims and phase summary. Official main GDS workflow/source-recipe portability still open, no phase boxes ticked. Next reproduce complete passing recipe through a reviewable official integration without changing constraints or hiding macro markers. Main hardware/template jobs and unrelated local/FIPE files preserved.
+
+## 2026-10-22 — Publish and launch exact-GDS Tiny Tapeout precheck
+
+- Published scoped tools61a8537/tests98b1330/CIb217f1b/docscf08352; verified local and remote main cf08352ad517d79a4993f7246a65d31577b55f61. Main hardware history empty; no template job edits, unrelated/FIPE files excluded.
+- Launched [gds-wire600-mux-precheck39890538270](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39890538270), verified in_progress at exact published SHA. It packages byte-identical primary GDS/fresh LEF from39883160399 and runs unchanged TT precheck. Marker classification does not waive failures. Final routed replay22/22 and stock LVS match are now measured; merged-GDS precheck and official integration remain pending. No phase boxes changed. Receipt local until next evidence publication.
+
 ## 2026-10-22 — Classify macro signoff markers and verify final routed replay
 
 - Final routed replay39880054906 succeeds; downloaded XML independently confirms22tests,0failures/errors/skips on exact final routed netlist.

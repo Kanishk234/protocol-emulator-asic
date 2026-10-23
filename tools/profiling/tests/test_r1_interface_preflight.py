@@ -49,3 +49,33 @@ def test_only_exact_original_cells_and_bounded_literal_drivers_are_accepted():
     assert import_counts({**original,'sg13cmos5l_tiehi':1},original)=={'sg13cmos5l_tiehi':1}
     for bad in ({'sg13cmos5l_dlhq_1':333},{**original,'sg13cmos5l_tiehi':2},{**original,'sg13cmos5l_buf_1':1}):
         with pytest.raises(ValueError):import_counts(bad,original)
+
+
+def test_port_alias_normalization_preserves_frozen_bit_identity():
+    from interface_preflight import direct_port_aliases
+    ports={'source':dict(bits=[7],direction='input'),
+           'first':dict(bits=[7],direction='output'),
+           'second':dict(bits=[7],direction='output')}
+    source='  assign first = source;\n  assign second = first;\n'
+    text,changed=direct_port_aliases(source,ports)
+    assert text=='  assign first = source;\n  assign second = source;\n'
+    assert len(changed)==1 and changed[0]['old_source']=='first'
+    bad=deepcopy(ports);bad['second']['bits']=[8]
+    with pytest.raises(ValueError):direct_port_aliases(source,bad)
+    with pytest.raises(ValueError):direct_port_aliases(' assign first = second;\n assign second = first;\n',ports)
+
+
+def test_connected_track_classes_align_different_border_bus_order():
+    from interface_preflight import align_pin_orders
+    design=dict(cells={
+        'a':dict(type='LUT4x8_ha',connections={'a':[7,8]}),
+        'b':dict(type='N_IO',connections={'b':[7,8]})})
+    group=lambda pins:[dict(pins=pins,sort_mode='bus_major',reverse_result=False,min_distance=None)]
+    orders={'LUT4x8_ha':{'N':group([r'a\[\d+\]'])},
+            'N_IO':{'S':group([r'b\[1\]',r'b\[0\]'])}}
+    names={'LUT4x8_ha':{'a[0]','a[1]'},'N_IO':{'b[0]','b[1]'}}
+    report=align_pin_orders(design,orders,names)
+    assert report[0]['anchor']==['LUT4x8_ha','N']
+    assert orders['N_IO']['S'][0]['pins']==[r'b\[0\]',r'b\[1\]']
+    bad=deepcopy(orders);bad['N_IO']['S'][0]['pins']=[r'b\[0\]']
+    with pytest.raises((KeyError,ValueError)):align_pin_orders(design,bad,names)

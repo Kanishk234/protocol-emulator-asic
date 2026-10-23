@@ -51,6 +51,84 @@ def import_counts(actual,original):
     return extra
 
 
+def direct_port_aliases(text,ports):
+    """Flatten output-to-output port aliases to the original input bit.
+
+    This changes only Verilog spelling. Every replacement is checked against
+    the frozen graph's identical port bit IDs; no cells or nets are inserted.
+    """
+    bits={}
+    for name,port in ports.items():
+        for i,bit in enumerate(port['bits']):
+            bits[name if len(port['bits'])==1 else f'{name}[{i+port.get("offset",0)}]']=(bit,port['direction'])
+    pattern=re.compile(r'^(\s*assign\s+)(\w+(?:\[\d+\])?)(\s*=\s*)(\w+(?:\[\d+\])?)(\s*;)$',re.M)
+    aliases={m[2]:m[4] for m in pattern.finditer(text) if m[2] in bits and m[4] in bits}
+    changed=[]
+    def replace(match):
+        lhs,rhs=match[2],match[4]
+        if lhs not in aliases:return match[0]
+        seen={lhs};root=rhs
+        while root in aliases:
+            if root in seen:raise ValueError('Cyclic top-level port aliases')
+            seen.add(root);root=aliases[root]
+        if root==rhs:return match[0]
+        if bits[lhs][0]!=bits[root][0] or bits[lhs][1]!='output' or bits[root][1]!='input':
+            raise ValueError('Alias rewrite is not an identical input/output port bit')
+        changed.append(dict(output=lhs,old_source=rhs,input=root))
+        return match[1]+lhs+match[3]+root+match[5]
+    return pattern.sub(replace,text),changed
+
+
+def align_pin_orders(design,orders,port_names):
+    """Derive common slot order for each facing-side family from actual nets."""
+    parents={};families={}
+    def find(table,a):
+        table.setdefault(a,a)
+        if table[a]!=a:table[a]=find(table,table[a])
+        return table[a]
+    def union(table,a,b):
+        a,b=find(table,a),find(table,b)
+        table[max(a,b)]=min(a,b)
+    slots={};side_of={}
+    for tile,order in orders.items():
+        for side,groups in order.items():
+            if not groups:continue
+            if len(groups)!=1 or groups[0].get('reverse_result') or groups[0]['sort_mode']!='bus_major':
+                raise ValueError('Unsupported pin side policy')
+            names=[]
+            for pattern in groups[0]['pins']:
+                names+=sorted((n for n in port_names[tile] if re.fullmatch(pattern,n)),
+                              key=lambda n:(n.split('[')[0],int(n.split('[')[1][:-1]) if '[' in n else -1))
+            slots[tile,side]=names
+            for name in names:side_of[tile,name]=side
+    nets=defaultdict(list)
+    for cell in design['cells'].values():
+        for port,bits in cell['connections'].items():
+            for i,bit in enumerate(bits):
+                if isinstance(bit,int):nets[bit].append((cell['type'],port if len(bits)==1 else f'{port}[{i}]'))
+    for ends in nets.values():
+        if len(ends)<2:continue
+        if len(ends)!=2:raise ValueError('Unexpected shared macro-interface net')
+        a,b=ends;sa,sb=(a[0],side_of[a]),(b[0],side_of[b])
+        if {sa[1],sb[1]} not in ({'N','S'},{'E','W'}):raise ValueError('Neighbor ports are not on opposite sides')
+        union(parents,a,b);union(families,sa,sb)
+    groups=defaultdict(list)
+    for side in families:groups[find(families,side)].append(side)
+    report=[]
+    for sides in groups.values():
+        # Preserve the proven LUT interface wherever it belongs to a family.
+        anchor=min(sides,key=lambda s:(s[0]!='LUT4x8_ha',{'N':0,'E':1,'S':2,'W':3}[s[1]],s[0]))
+        classes=[find(parents,(anchor[0],n)) for n in slots[anchor]]
+        if len(set(classes))!=len(classes):raise ValueError('Aliased slots within one physical side')
+        for tile,side in sides:
+            by_class={find(parents,(tile,n)):n for n in slots[tile,side]}
+            if set(by_class)!=set(classes) or len(by_class)!=len(slots[tile,side]):
+                raise ValueError('Facing sides do not expose the same track classes')
+            orders[tile][side][0]['pins']=[re.escape(by_class[c]) for c in classes]
+        report.append(dict(anchor=list(anchor),slots=len(classes),sides=[list(s) for s in sorted(sides)]))
+    return report
+
+
 def prepare(evidence,io,out):
     import yaml
     from fabulous.fabulous_api import FABulous_API
@@ -75,6 +153,7 @@ def prepare(evidence,io,out):
     manifest['yosys_version']=subprocess.check_output(['yosys','-V'],text=True).strip()
     (out/'ATTRIBUTION.md').write_text('I/O placement: librelane_plugin_fabulous dcc038217472822330b33f61fadbc06e0c3cc96d, Apache-2.0; original notice retained. WARP generated design: project Apache-2.0. PDK separately pinned to2bbec755dc67ca3db0261c3d6163e15735d66710.\n')
     side_names={'N':'NORTH','S':'SOUTH','E':'EAST','W':'WEST'}
+    orders={}
     for tile,digest in MAPPED.items():
         mapped=evidence/'mapped-cost'/tile/'mapped.json'
         if sha(mapped)!=digest:raise ValueError('Changed frozen map: '+tile)
@@ -91,6 +170,8 @@ def prepare(evidence,io,out):
                           '\nwrite_verilog -selected -noattr -noexpr '+json.dumps(str(nl))+'\n')
         with (folder/'export.log').open('w') as log:
             subprocess.run(['yosys','-Q','-T','-s',str(script)],stdout=log,stderr=subprocess.STDOUT,check=True,timeout=120)
+        text,alias_changes=direct_port_aliases(nl.read_text(),module['ports'])
+        nl.write_text(text)
         header=dict(module);header['cells']={n:c for n,c in module['cells'].items() if c['type']!='$scopeinfo'}
         (folder/'header.json').write_text(json.dumps(dict(modules={tile:header}))+'\n')
         cfg=yaml.safe_load((out/'library/tiles/tiny'/tile/'config.yaml').read_text())
@@ -98,15 +179,22 @@ def prepare(evidence,io,out):
         api.gen_io_pin_order_config(api.getTile(tile),folder/'pins-generated.yaml',external_port_side=getattr(Side,side_names[external]))
         pins,removed=physical_pin_order(yaml.safe_load((folder/'pins-generated.yaml').read_text()),signal_names(module['ports']),api.fabric.disableUserCLK)
         (folder/'pins.yaml').write_text(yaml.safe_dump(pins,sort_keys=False))
+        orders[tile]=pins
         manifest['tiles'][tile]=dict(mapped_sha256=digest,expected_cells=dict(counts),ports=module['ports'],
                                      configuration_latches=counts['sg13cmos5l_dlhq_1'],external_side=external,
-                                     removed_disabled_clock_ports=removed)
+                                     removed_disabled_clock_ports=removed,port_alias_normalization=alias_changes)
     # Preserve the actual generated fabric connectivity, using frozen macro headers.
     script=out/'connections.ys'
     script.write_text(''.join('read_verilog -lib '+json.dumps(str(out/t/'tile.nl.v'))+'\n' for t in MAPPED)+
                       'read_verilog '+json.dumps(str(out/'fabric.v'))+'\nhierarchy -check -top eFPGA\nwrite_json '+json.dumps(str(out/'connections.json'))+'\n')
     with (out/'connections.log').open('w') as log:
         subprocess.run(['yosys','-Q','-T','-s',str(script)],stdout=log,stderr=subprocess.STDOUT,check=True,timeout=120)
+    alignment=align_pin_orders(json.loads((out/'connections.json').read_text())['modules']['eFPGA'],orders,
+                               {t:signal_names(m['ports']) for t,m in manifest['tiles'].items()})
+    for tile,pins in orders.items():
+        shutil.copyfile(out/tile/'pins.yaml',out/tile/'pins-before-alignment.yaml')
+        (out/tile/'pins.yaml').write_text(yaml.safe_dump(pins,sort_keys=False))
+    (out/'pin-alignment.json').write_text(json.dumps(alignment,indent=2,sort_keys=True)+'\n')
     manifest['files']={str(p.relative_to(out)):sha(p) for p in out.rglob('*') if p.is_file() and 'library' not in p.relative_to(out).parts}
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n');guard()
 

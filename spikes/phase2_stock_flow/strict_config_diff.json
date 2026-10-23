@@ -78,5 +78,9 @@
   "PL_RESIZER_SETUP_SLACK_MARGIN": {
     "main": null,
     "proposed": 0
+  },
+  "CTS_APPLY_NDR": {
+    "main": null,
+    "proposed": "none"
   }
 }

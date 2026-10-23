@@ -6,11 +6,11 @@
   "canonical_generation_passed": true,
   "stock_stop_point_verified": "OpenROAD.STAMidPNR-3 immediately before OpenROAD.DetailedRouting",
   "official_workflow_unchanged": true,
-  "project_config_sha256": "c05808b842fe01516745ac1a206528547b62e6399dc172a56caed2e9cf9bbf76",
+  "project_config_sha256": "9acaa9c40870d0078fe863276938f550d4e6ef24645811a87eb3e8cbb558d720",
   "stock_constraints": "Default base.sdc; no latch false paths or explicit uncertainty reduction",
   "checker_waivers_added": false,
   "physical_run_started": false,
-  "baseline_run": 39996448720,
-  "baseline_result": "timeout in post-CTS setup-margin repair",
-  "followup": "One project setting: PL_RESIZER_SETUP_SLACK_MARGIN=0; unchanged stock flow and signoff gates"
+  "baseline_run": 40026122208,
+  "baseline_result": "setup/hold repair completed; global routing timed out repeatedly disabling clock NDR",
+  "followup": "One further project setting: CTS_APPLY_NDR=none; unchanged stock engine, ordering, constraints and checker gates"
 }

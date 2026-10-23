@@ -29,3 +29,5 @@ The separate gds-stock-official-baseline-screen workflow prepares this full desi
 The normal official gds workflow will be used for final acceptance once actual stock-flow measurements justify promotion. The custom integration proposal remains withdrawn.
 
 Follow-up diagnosis and exact fresh metrics: docs/reports/PHASE2_STOCK_BASELINE_TIMEOUT.md. Do not interpret diagnostic-job success as timing qualification.
+
+After40026122208completed repair but timed out relaxing clock NDR, D-110adds only CTS_APPLY_NDR=none to this diagnostic configuration. This restores the normal-spacing project policy already documented in D-043, without stock-flow or checker changes. Fresh typical hold+0.273668ns is progress, not routed/all-corner qualification;169fanout violations remain.

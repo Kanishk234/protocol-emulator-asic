@@ -33,6 +33,8 @@ Never claim: zero latency, sub-ns timing, USB/Ethernet support, real-hardware te
 
 | 16 | The clean-reproduced full2/4/U0-full/SRAM experimental candidate passes measured extracted timing/electrical/routing/antenna gates, final22-case protocol replay, LVS and unchanged Tiny Tapeout precheck on its exact GDS | Route39868597887; final GL39880054906 XML22/22/0skips; LVS39883160399; precheck39890538270 XML9/9 including SG13CMOS5L DRC; PHASE2_PASSING_ROUTE_INTEGRATION.md | tested | Specific experimental artifact, not main official GDS workflow/Phase2 completion. SetupWS0 is not positive global margin; no SDF/silicon/exhaustive protocol claim. Raw Magic diagnostic39883160399 remains failed on recorded macro-contained markers; official continuous source/recipe integration unfinished |
 
+The candidate in claim16 was subsequently reproduced end-to-end from fresh RTL without downloaded physical checkpoints in [39907035580](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39907035580). Fresh extracted results reproduce setupWS0/fast hold+107.281ps, electrical0; GDS/LVS pass and unchanged TT precheck XML9/9 passes with0CMOS5L DRC items. This remains separate orchestration, not the main official GDS workflow. See PHASE2_PASSING_ROUTE_INTEGRATION.md for artifact hashes and the main-integration gap.
+
 ## Known limits (state them wherever the related claim appears)
 
 

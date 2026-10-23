@@ -1,5 +1,7 @@
 # Phase 2: building and fitting the chip
 
+**Fresh reproduction now passes:** [39907035580](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39907035580) rebuilds from RTL without downloaded physical checkpoints, passes repairs/routing/extraction, exports GDS with LVS0, and passes9/9unchanged TT prechecks. The CMOS5L DRC report has0violation items. Final netlist matches the22/22tested route. Remaining work is promoting the coherent source and carrying its physical recipe through main's official GDS workflow; no new timing candidate is planned.
+
 **2026-10-23 milestone:** [unchanged TT precheck39890538270](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39890538270) passes all9applicable checks, including full merged-GDS CMOS5L KLayout DRC, on the exact passing experimental route. Final protocol replay passes22/22 and LVS matches. The earlier raw Magic diagnostic remains failed on recorded macro-contained markers; no gate was suppressed. Remaining work is official continuous source/physical-recipe integration and a green main official GDS workflow. Phase2 is still open.
 
 **Status:** in progress, updated 2026-10-22. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).

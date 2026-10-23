@@ -1,0 +1,66 @@
+name: R1 loaded RTL controls from frozen compiler images
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/r1/configured_smoke.py'
+      - 'test_internal/r1_configured/**'
+      - 'tools/profiling/tests/test_r1_configured_adapter.py'
+      - '.github/workflows/r1_loaded_controls.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-loaded-controls-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  loaded_rtl:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tracks: 8
+            radix: full
+          - tracks: 4
+            radix: full
+          - tracks: 4
+            radix: radix8_2
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate fixed compiled control
+        timeout-minutes: 15
+        run: |
+          sudo apt-get update && sudo apt-get install -y iverilog
+          scripts/setup_venv.sh
+          mkdir -p build/r1_loaded_control
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/39696703659 > build/r1_loaded_control/compiler.json
+          source .venv/bin/activate
+          python -c 'import json; d=json.load(open("build/r1_loaded_control/compiler.json")); assert d["head_sha"]=="9768c77325ca34b93d408f526c0d8c902b62ce4a" and d["run_attempt"]==1'
+          gh run download 39696703659 --name r1-model-qualification-39696703659-tracks${{ matrix.tracks }}-${{ matrix.radix }} --dir build/r1_loaded_source
+      - name: Check diagnostic input coverage
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_configured_adapter.py --junitxml=build/r1_loaded_control/checks.xml
+          python -m tools.autonomy.check_xml build/r1_loaded_control/checks.xml --minimum-cases 1
+      - name: Run unchanged primary on generated RTL control
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools python spikes/r1/configured_smoke.py --model build/r1_loaded_source/resource --case build/r1_loaded_source/compile/uart_spi_11 --out build/r1_loaded_control/smoke > build/r1_loaded_control/smoke.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-loaded-control-${{ github.run_id }}-tracks${{ matrix.tracks }}-${{ matrix.radix }}
+          path: build/r1_loaded_control/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

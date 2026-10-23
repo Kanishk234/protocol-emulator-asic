@@ -1,0 +1,51 @@
+from copy import deepcopy
+from pathlib import Path
+import sys
+import pytest
+sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
+from interface_preflight import footprint,import_counts,check_neighbors
+
+
+def grid():
+    cells={f'Tile_X{x}Y{y}_LUT4x8_ha':dict(type='LUT4x8_ha',connections={}) for y in range(5) for x in range(8)}
+    cells['Tile_X1Y1_LUT4x8_ha']['connections']={'east':[7]}
+    cells['Tile_X2Y1_LUT4x8_ha']['connections']={'west':[7]}
+    inv={'LUT4x8_ha':dict(die=[0,0,154080,185220],pins={
+        'east':dict(direction='OUTPUT',boxes=[['Metal3',153680,1000,154080,1400]]),
+        'west':dict(direction='INPUT',boxes=[['Metal3',0,1000,400,1400]])})}
+    return dict(cells=cells),inv
+
+
+def test_borders_preserve_row_and_column_dimensions():
+    assert footprint('PRIM2T2S',154.08)==(154.08,185.22)
+    assert footprint('N_IO',154.08)==(154.08,56.70)
+    assert footprint('W_IO4',154.08)==(68.64,185.22)
+    assert footprint('NE_term',154.08)==(68.64,56.70)
+    with pytest.raises(ValueError):footprint('LUT4x8_ha',160)
+
+
+def test_actual_connected_bits_require_same_layer_center_and_opposite_edges():
+    design,inv=grid();assert check_neighbors(design,inv,154.08)['adjacent_bit_pairs']==1
+    for mutate in ('center','layer','edge','direction','die'):
+        bad=deepcopy(inv);pin=bad['LUT4x8_ha']['pins']['west']
+        if mutate=='center':pin['boxes'][0][2]+=1
+        if mutate=='layer':pin['boxes'][0][0]='Metal2'
+        if mutate=='edge':pin['boxes'][0][1]=1
+        if mutate=='direction':pin['direction']='OUTPUT'
+        if mutate=='die':bad['LUT4x8_ha']['die'][2]+=1
+        with pytest.raises(ValueError):check_neighbors(design,bad,154.08)
+
+
+def test_incomplete_grid_and_nonadjacent_direct_wire_are_rejected():
+    design,inv=grid();bad=deepcopy(design);bad['cells'].pop('Tile_X0Y0_LUT4x8_ha')
+    with pytest.raises(ValueError):check_neighbors(bad,inv,154.08)
+    design['cells']['Tile_X3Y1_LUT4x8_ha']['connections']={'west':[7]}
+    with pytest.raises(ValueError):check_neighbors(design,inv,154.08)
+
+
+def test_only_exact_original_cells_and_bounded_literal_drivers_are_accepted():
+    original={'sg13cmos5l_dlhq_1':334}
+    assert import_counts(original,original)=={}
+    assert import_counts({**original,'sg13cmos5l_tiehi':1},original)=={'sg13cmos5l_tiehi':1}
+    for bad in ({'sg13cmos5l_dlhq_1':333},{**original,'sg13cmos5l_tiehi':2},{**original,'sg13cmos5l_buf_1':1}):
+        with pytest.raises(ValueError):import_counts(bad,original)

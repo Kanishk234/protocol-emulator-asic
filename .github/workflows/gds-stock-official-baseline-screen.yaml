@@ -41,6 +41,7 @@ jobs:
         assert config['CLOCK_PERIOD'] == 20
         assert config['PL_TARGET_DENSITY_PCT'] == 56
         assert config['PL_RESIZER_SETUP_SLACK_MARGIN'] == 0
+        assert config['CTS_APPLY_NDR'] == 'none'
         assert not any(k.startswith('TRIPWIRE_') for k in config)
         assert 'PNR_SDC_FILE' not in config and 'SIGNOFF_SDC_FILE' not in config
         assert 'ERROR_ON_MAGIC_DRC' not in config and 'ERROR_ON_ILLEGAL_OVERLAPS' not in config

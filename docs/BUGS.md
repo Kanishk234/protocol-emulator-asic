@@ -845,3 +845,15 @@ validation. Next coverage adds real USER_RESET and preserves candidate netlists.
 - **Symptom/check:**40009049924 both widths finish GRT with zero final overflow, then fail full-height pin assertion.
 - **Root cause:** native BPin geometry includes full-height stripes plus 200nm edge patches. Checker incorrectly required every rectangle to span the height.
 - **Fix/coverage:** validate every rectangle positive/in bounds/on correct phase; group by exact stripe x bounds and require a full-height rectangle for each group. Boundary-only patches remain rejected. Focused positive/negative tests and retained ODB-hash/result replay pass at both widths; hosted replay pending.
+
+## 125: Native south-I/O import drops chained multi-output alias ports
+- **Date:**2026-10-23.
+- **Symptom/check:**40011371177 all-type gate passes18/20cases; both S_IO2 pin stages reject N_GBUF_BEG/E_GBUF_END/E_GBUF_BEG patterns. Native DEF has143pins versus155frozen signals; all12clock-feed alias ports absent.
+- **Root cause under test:** exported four-bit chain N_GBUF_BEG=E_GBUF_END then E_GBUF_BEG=N_GBUF_BEG is not retained by native import. No clock-feed cells are present on this transparent path. Other18imports/censuses pass.
+- **Repair hypothesis/coverage:** flatten only the4output-to-output aliases to the identical frozen input bit; validate bit IDs/directions and reject cycles/mismatches, no cell insertion. Exact assembled ports/cell connections unchanged locally; hosted retention replay required. Do not filter absent ports or weaken strict unmatched checks.
+
+## 126: Border direction-group order misaligns actual neighbor pins
+- **Date:**2026-10-23.
+- **Symptom/check:**40011371177 retained native narrow N_IO.N1END[0] center53.28µm versus connected LUT.N1BEG[0]18.72µm, same Metal2/opposite edges. Planned order reveals216/3064connected bit pairs with inconsistent indices.
+- **Root cause:** generic per-tile pin generation orders port direction groups differently at borders; same-type LUT alignment does not cover mixed-type neighbors.
+- **Fix/coverage:** derive common ordered track equivalence classes from actual generated fabric connections, separately for six facing-side families. Preserve proven LUT N/E anchor order, require every facing side exposes identical unique classes, emit exact scalar pin regexes. Missing/aliased classes, wrong sides and unsupported order policies rejected. Local55R1testsPASS and isolated10tile preparationPASS; native rerun required. Logical graph/configuration unchanged.

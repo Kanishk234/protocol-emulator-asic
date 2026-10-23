@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (all-type gate catches alias import and border alignment)
+**Actual:**40011371177 at234acca admits18/20geometry/core/cell cases; both S_IO2 imports lose12chained clock-feed alias ports, caught by strict pin matcher. Other native geometry shows real N_IO/LUT pin mismatch53.28vs18.72µm, consistent with216planned neighbor-index mismatches. No other-type physical route or full-grid acceptance.
+**Prepared:** BUG125 print-only4alias flattening validates identical input/output bit IDs; BUG126 six facing-side track families derived from actual generated connectivity with proven LUT anchors. Frozen cell/config graph unchanged; local isolated preparation and exact assembled port/cell connection replayPASS.55local R1testsPASS, preserving strict geometry and unknown-port rejection.
+**Next:** hosted unchanged-footprint replay; inspect south-I/O port retention and all3064actual neighbor pairs at both widths before further physical integration. No phase boxes/full-chip attempt; G1protected.
+
 ## 2026-10-23 (all-type R1 interface gate prepared)
 **Done:** D108 freezes all10mapped JSONs from39696703659; isolated copied-library pin preparation succeeds, preserving original model hashes and exact passing LUT netlist SHA. Connectivity-only elaboration finds40grid instances/3064adjacent bit pairs/no nonadjacent direct pairs. New native screen imports alltypes at both existing footprints, checks exact cells/bounded literal bindings/core/pin geometry/directions, then actual connected neighbor layer/edge/center alignment.53local R1testsPASS; no architecture/graph/production change.
 **Next:** run owned hosted all-type gate, audit every footprint/type and interface before extending representative physical routing or full-grid integration. Other column PGphases, primitive/border physical routing, full-grid/timing and secondary I2Ctimeout remain open. No phase boxes ticked or full-chip attempt consumed; G1protected.

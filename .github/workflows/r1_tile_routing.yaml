@@ -1,0 +1,63 @@
+name: Representative R1 PDN placement and global route
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/r1/physical_route.py'
+      - 'tools/profiling/tests/test_r1_physical_route.py'
+      - '.github/workflows/r1_tile_routing.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-tile-route-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  route:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [219.84, 154.08]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_route_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Project environment and authenticated frozen preflight
+        timeout-minutes: 15
+        run: |
+          scripts/setup_venv.sh
+          mkdir -p build/r1_tile_route
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/39996455894 > build/r1_tile_route/producer.json
+          source .venv/bin/activate
+          python -c 'import json; d=json.load(open("build/r1_tile_route/producer.json")); assert d["head_sha"]=="46682a2b43d6f370d68ca82202577835f8e2312a" and d["run_attempt"]==1 and d["conclusion"]=="success"'
+          gh run download 39996455894 --name r1-physical-preflight-39996455894 --dir build/r1_route_source
+          curl -sfL https://raw.githubusercontent.com/mole99/librelane_plugin_fabulous/dcc038217472822330b33f61fadbc06e0c3cc96d/librelane_plugin_fabulous/scripts/add_buffers.tcl -o build/r1_tile_route/add_buffers.tcl
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Check fixed policy and power-phase admission
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_physical_route.py --junitxml=build/r1_tile_route/checks.xml
+          python -m tools.autonomy.check_xml build/r1_tile_route/checks.xml --minimum-cases 3
+      - name: Native fixed-footprint PDN placement and global routing
+        timeout-minutes: 45
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e GITHUB_RUN_ID -e GITHUB_RUN_ATTEMPT \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            python3 spikes/r1/physical_route.py --bundle build/r1_route_source/input --buffers build/r1_tile_route/add_buffers.tcl --out build/r1_tile_route/native --width ${{ matrix.width }} > build/r1_tile_route/native.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-tile-routing-${{ github.run_id }}-width${{ matrix.width }}
+          path: build/r1_tile_route/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

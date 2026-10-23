@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (all balanced global leaf contexts pass; complete native function)
+**Actual:**40033384495 atc6eba01 attempt1SUCCESS all21remaining contexts+13guards. Together with40030916359critical5, all26leaf contexts cover40instances. Reusable independent auditPASS: API/source/88inputs/completeactualcontext coverage/cell-config-LEFarea/ODB/policy/absolutePGphase/unchanged signalpins; emptyNEall52native feedthroughs have guides,0cells and3326µmglobalwirelength. Ten native exports byte-identical pertype acrosscontexts.70focused testsPASS.
+**Functional:**40032527005 at71d902aSUCCESS7native proof independently1XML/52inputs/2binaries checked. Complete40native local primary1strictPASS/48inputs;39placed+1wiretile, RTLinterconnect/frameFSM; committed-source hosted replay prepared behind independent audit.
+**Next:** inspect hosted complete-native proof, then detailed routing/full macro assembly and real-management-SPI/shell/timing qualification. No full-grid/GDS/timing/equal-area replacement acceptance or phase box/full-chip attempt; G1protected, secondaryI2Ctimeout open.
+
 ## 2026-10-23 (remaining balanced contexts prepared)
 **Done:** D114enumerates21remaining actual balanced contexts, combined26cover40instances. Parent40030916359critical success is required. Allnonempty policies unchanged; emptyNEhas checked0cell/0cfg/52directalias source, explicit PDN/GRTwire-only path with native52port-net/positivewirelength checks and no claimed placement.66localR1testsPASS. Prior critical/unbalanced workflows manual-only; no graph/geometry change.
 **Next:** observe new21case campaign and D113hosted7native-instance primary proof, diagnose retained failures before full-grid/detailed routing/timing. G1protected, secondaryI2Ctimeout open; no phase boxes or full-chip attempts consumed.

@@ -343,9 +343,11 @@
         "D109 local all40mapped configured primary1strictPASS with final deduplicated export; hosted40013051752 all-mapped stepSUCCESS (aggregate red for older alias export). Final combined40013513454 at8d42ac1 active.",
         "40013513454 at8d42ac1 attempt1SUCCESS:20native pin/core cases+3064neighbor bits/width and40mapped primary1strictPASS. Root88prepared/47functional/2binary/nativegeometry/census/area/ODB auditPASS. D110four-case actual PRIMcolumns1/4 physical screen prepared;56localtestsPASS.",
         "40014699181 at90f9f79: wide primitive columns1/4 passzeroGRT/PG; narrowboth GPL-0301 effective101.909% before GRT. Root paired/hash/config/stage auditPASS. MatchedLUT40014699032SUCCESS. D111single mathematically derived164.64primitive-column correction;57localtestsPASS.",
-        "40027428283 atb2c54f9 SUCCESS both164.64primitive leaf cases, root source/ODB/PG/config/congestion auditPASS; unbalanced full-layout rejects east-borderpower BUG129. D112west47.52reallocation retains1061.76outerwidth and staticall8columnPGpairs;60localR1testsPASS, native balanced layout gates pending."
+        "40027428283 atb2c54f9 SUCCESS both164.64primitive leaf cases, root source/ODB/PG/config/congestion auditPASS; unbalanced full-layout rejects east-borderpower BUG129. D112west47.52reallocation retains1061.76outerwidth and staticall8columnPGpairs;60localR1testsPASS, native balanced layout gates pending.",
+        "40030916359 at00216ea SUCCESS13native geometries/3064neighbor pairs then5balancedcritical leaves zeroGRT/PG; root88prepared hashes/pinnedLEF/core/cell/13ODB/3064pairs/5finalnative auditsPASS.",
+        "40032527005 at71d902a SUCCESS1loadedprimary with7native critical instances/33mappedbaseline; root52inputs/twoIcarus13binaries/XML/source reauthPASS. D114remaining21contexts40033384495 atc6eba01active;66localtestsPASS."
       ],
-      "next_action": "Run native W_IO4/NW/SW at westwidth47.52, PRIM164.64 at balanced phases30.24/107.04, and all changed-column interfaces from D112layout_budget. Keep original uniform capacity failure/unbalanced eastpower rejection and passing leaf widths; no physical/timing/full-grid acceptance until measured. Secondary I2C timeout and protected G1 remain.",
+      "next_action": "Observe all21remaining actual leaf contexts40033384495, including explicit cell-free NE52alias/nativewire gate. After all26leaf contexts qualify, move to detailed routing/full-grid assembly and management-SPI/shell/timing integration; keep physical and primary functional scope distinct. G1/secondary I2C timeout preserved.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

@@ -1,0 +1,68 @@
+name: R1 exact mapped LUT floorplan and pins
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/r1/physical_preflight.py'
+      - 'tools/profiling/tests/test_r1_physical_preflight.py'
+      - '.github/workflows/r1_physical_preflight.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-physical-preflight-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  preflight:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_preflight_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Project environment and pinned source evidence
+        timeout-minutes: 12
+        run: |
+          sudo apt-get update && sudo apt-get install -y python3-tk
+          scripts/setup_venv.sh
+          mkdir -p build/r1_physical_preflight
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/39696703659 > build/r1_physical_preflight/producer.json
+          source .venv/bin/activate
+          python -c 'import json; d=json.load(open("build/r1_physical_preflight/producer.json")); assert d["head_sha"]=="9768c77325ca34b93d408f526c0d8c902b62ce4a" and d["run_attempt"]==1'
+          gh run download 39696703659 --name r1-model-qualification-39696703659-tracks4-radix8_2 --dir build/r1_preflight_evidence
+          curl -sfL https://raw.githubusercontent.com/mole99/librelane_plugin_fabulous/dcc038217472822330b33f61fadbc06e0c3cc96d/librelane_plugin_fabulous/scripts/io_place.py -o build/r1_physical_preflight/io_place.py
+          curl -sfL https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2026-06-29/oss-cad-suite-linux-x64-20260629.tgz -o /tmp/r1-preflight-ocs.tgz
+          tar -xzf /tmp/r1-preflight-ocs.tgz -C ~
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Validate native pin admission checks
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_physical_preflight.py --junitxml=build/r1_physical_preflight/checks.xml
+          python -m tools.autonomy.check_xml build/r1_physical_preflight/checks.xml --minimum-cases 6
+      - name: Prepare exact netlist and generated pin order in isolation
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
+          python spikes/r1/physical_preflight.py prepare --evidence build/r1_preflight_evidence --io build/r1_physical_preflight/io_place.py --out build/r1_physical_preflight/input > build/r1_physical_preflight/prepare.log 2>&1
+      - name: Import, floorplan and check signal-pin geometry at two fixed widths
+        timeout-minutes: 10
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e GITHUB_RUN_ID -e GITHUB_RUN_ATTEMPT \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            python3 spikes/r1/physical_preflight.py inside --bundle build/r1_physical_preflight/input --out build/r1_physical_preflight/native > build/r1_physical_preflight/native.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-physical-preflight-${{ github.run_id }}
+          path: build/r1_physical_preflight/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

@@ -13,7 +13,12 @@ on:
       - 'tools/profiling/tests/test_r1_reduced_radix.py'
       - 'test_internal/r1_configured/**'
       - 'tools/profiling/tests/test_r1_generator.py'
-      - 'spikes/r1/**'
+      - 'spikes/r1/qualify_generator.py'
+      - 'spikes/r1/resource_control.py'
+      - 'spikes/r1/fold_tracks.py'
+      - 'spikes/r1/reduced_radix.py'
+      - 'spikes/r1/mapped_cost.py'
+      - 'spikes/r1/configured_smoke.py'
       - 'test_internal/cloud_r1_resource.py'
       - '.github/workflows/r1_models.yaml'
 permissions:

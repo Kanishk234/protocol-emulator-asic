@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (both representative footprints reach zero-overflow GRT)
+**Actual:**40009049924 sourced853696 completes PDN, placement and global routing at both fixed widths. Every final layer overflow0, final VPWR/VGND grid violations0,2486power terminals,438latches; unchanged native area24385.5µm² rounded. Core utilization64.116%reference/92.5429%narrow; aggregate routing resource usage41.40%/58.58%. No timing or full-fabric acceptance.
+**Checker repair:** BUG124 full-height stripe plus auxiliary200nm edge patches were incorrectly rejected rectangle-by-rectangle. New grouped check still rejects boundary-only stripes and phase/geometry errors.49local R1testsPASS; retained results and both ODB SHA hashes replayPASS. Hosted aggregate remains red until corrected checker replay.
+**Next:** push/inspect hosted replay, then qualify other tile types and column interfaces before complete-fabric hardening. No phase box or whole-chip attempt consumed; G1 protected.
+
 ## 2026-10-23 (representative route adapter provenance repaired)
 **Actual:**40007850249 rejects both widths before native flow because downloaded upstream buffer script differs from the locally cached explicit-cell adapter. Frozen netlist hash matches. No placement or congestion result exists from this run.
 **Fix:** BUG123/D107 records the exact two-line owned patch, authenticates upstream bd134f7e… and patched7b9526fc… independently, preserves upstream license, stages a copy, and applies with zero fuzz. No physical policy or hardware changes. Next: rerun both fixed widths and inspect actual native outcomes; no phase boxes ticked.

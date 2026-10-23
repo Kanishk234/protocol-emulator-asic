@@ -839,3 +839,9 @@ validation. Next coverage adds real USER_RESET and preserves candidate netlists.
 - **Symptom/check:**40007850249 both widths fail frozen input admission before native flow.
 - **Root cause:** expected cached adapter hash includes explicit SYNTH_BUFFER_CELL arguments on both buffer_ports calls; workflow fetched unchanged pinned upstream lacking those two arguments. Netlist hash is correct.
 - **Fix/coverage:** owned patches/r1_explicit_buffer_cell.patch under D107, staged copy, upstream SHA bd134f7e02a401ade48c365f0c9ed2b6d950526ccc92c71a777d039ff0fd8e0e and patched SHA7b9526fcc9676d6f266e457344c6b71921eebea7e2600c3df489de1475c1f2e6 checked before flow. Zero-fuzz patch and exact digest replay locally; hosted retry required. No routing conclusion from admission failure.
+
+## 124: Full-height power pin checker rejects auxiliary boundary patches
+- **Date:**2026-10-23.
+- **Symptom/check:**40009049924 both widths finish GRT with zero final overflow, then fail full-height pin assertion.
+- **Root cause:** native BPin geometry includes full-height stripes plus 200nm edge patches. Checker incorrectly required every rectangle to span the height.
+- **Fix/coverage:** validate every rectangle positive/in bounds/on correct phase; group by exact stripe x bounds and require a full-height rectangle for each group. Boundary-only patches remain rejected. Focused positive/negative tests and retained ODB-hash/result replay pass at both widths; hosted replay pending.

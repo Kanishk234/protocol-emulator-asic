@@ -9,3 +9,12 @@ The verified narrower core starts at89.90%bare occupancy (39996455894), so actua
 CLOCK_PORT=null permits geometry/congestion observations but provides no configured clock/timing acceptance. No CTS/timing repair, detailed routing, antenna/signoff, SDF, other tile types, real shell or whole-chip acceptance. Source/buffer adapter hashes and resolved policies are retained. Hosted results pending.
 
 Run40007850249 stopped at source admission for both widths: original upstream buffer script was fetched while the guard expected its explicit-buffer-cell adapter. Frozen netlist unchanged. BUG123 owns and authenticates the exact two-line patch; this run provides no PDN, placement or routing outcome.
+
+Run40009049924, sourced85369625ec047ce5a521a9b1f0516ad24143f62, completes both native flows through global routing. Final native overflow is zero on every layer, and final VPWR/VGND grid checks have zero violations;2486power terminals checked and438configuration latches retained in each. Workflow is red only because BUG124 rejected auxiliary200nm boundary pin patches despite full-height stripes. Corrected checker replay against both retained result files and ODB SHA hashes passes locally; hosted green replay still required.
+
+| Width (µm) | Native instance area (µm², rounded metric) | Core utilization | Global routing resource usage | Final overflow |
+|---|---:|---:|---:|---:|
+|219.84|24385.5|64.116%|41.40%|0|
+|154.08|24385.5|92.5429%|58.58%|0|
+
+Native run40009049924 supplies these measurements. Narrowed tile has limited placement reserve. This is one first-column LUT tile, output-buffered, no configured timing or detailed signal routing; other tile types, column power phases, shell and full-grid integration remain unqualified. It does not establish equal-total-area superiority over G1.

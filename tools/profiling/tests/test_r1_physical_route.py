@@ -23,6 +23,10 @@ def test_global_power_phase_and_full_height_are_required():
     boxes=[dict(net='VPWR',layer='Metal4',rect=[52230,0,54330,185220]),
            dict(net='VGND',layer='Metal4',rect=[56330,0,58430,185220])]
     check_power_boxes(boxes,154.08)
+    patches=[dict(net='VPWR',layer='Metal4',rect=[52230,0,54330,200]),
+             dict(net='VPWR',layer='Metal4',rect=[52230,185020,54330,185220])]
+    check_power_boxes(boxes+patches,154.08)
+    with pytest.raises(ValueError):check_power_boxes(boxes[1:]+patches,154.08)
     with pytest.raises(ValueError):check_power_boxes(boxes[:1],154.08)
     boxes[0]['rect'][0]+=1
     with pytest.raises(ValueError):check_power_boxes(boxes,154.08)

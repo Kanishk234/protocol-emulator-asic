@@ -50,11 +50,16 @@ def check_power_boxes(boxes,width):
     for net,expected in centers.items():
         found=[box for box in boxes if box['net']==net and box['layer']=='Metal4']
         if not found:raise ValueError('Missing Metal4 power pin: '+net)
+        stripes={}
         for box in found:
             x0,y0,x1,y1=box['rect']
+            if x1<=x0 or y1<=y0 or y0<0 or y1>185220:
+                raise ValueError('Invalid power pin geometry')
             if (Decimal(x0+x1)/2-expected)%Decimal(109920)!=0:
                 raise ValueError('Power stripe phase differs from global fabric grid')
-            if y0>0 or y1<185220:
+            stripes.setdefault((x0,x1),[]).append((y0,y1))
+        for spans in stripes.values():
+            if (0,185220) not in spans:
                 raise ValueError('Power pin does not span tile height')
 
 

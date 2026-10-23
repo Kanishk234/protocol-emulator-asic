@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (primitive routing result; one measured capacity correction)
+**Actual:**40014699181 at90f9f79: bothwide primitive columnsPASS zero final GRT/PGviolations,334latches/92buffers/2906power terminals; identical routed ODB. Bothnarrow fail before routing with effective pin-adjusted101.909%utilization, not padding or iteration shortage. Matched LUT40014699032 bothwidthsSUCCESS. Root four-outcome/hash/config/PG/finaltable/stage auditPASS.
+**Next:** D111one derived164.64width in two primitive columns, fixed96%density and physical policy, actual heterogeneous prefix PGphases. Proposed macro1082.88width fits geometric chip bounds/full east power pair; no whole-grid routing promise.57local R1testsPASS. Original rejected uniform matrix manual-only; no new graph/seed/clock/layer/density sweep or full-chip attempt. Other tile/column integration/timing stillopen; G1protected.
+
 ## 2026-10-23 (all interfaces and full-mapped primary green; primitive physical next)
 **Actual:**40013513454 at8d42ac1 attempt1SUCCESS: all20native tile/footprint cases,3064actual neighbor bit pairs at both widths, all40mapped primary1strictPASS. Root audit16checker cases/88prepared hashes/nativepins/cells/LEF-area/core/20ODB hashes/allconnections plus47functional/twoexecutable hashesPASS. South-I/O155pins preserved; weighted8736configuration latches. No other-type routing/timing or full-chip acceptance.
 **Next:** D110frozenPRIM at actual columns1/4(fabricX2/X5), both existing widths, unchanged D107policy and finite budgets. Bare narrow PRIM93.961%core beforebuffering is the risk being measured.56localR1testsPASS. No graph/seed/density sweep, full-chip attempt or phase boxes. G1protected; secondaryI2Ctimeout explicit.

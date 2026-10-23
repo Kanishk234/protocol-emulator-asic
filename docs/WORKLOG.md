@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (corrected native state gate authenticated; fast controls separated)
+**Actual:**40039667532at29e644e attempt1SUCCESS:5guard cases, all40native primary1strictPASS, all43scalarinputsdriven and8736defined Qstates across40observed tiles. Root48input/2binary/XML/source/snapshot auditPASS; snapshot484e7383…matches local before/afterresetfix. One artifact-transfer timeout recovered on bounded retry. All26globalleaf contexts/independent audit retained;71focused local testsPASS. Current corelint/docs/test/unit CIgreen; fabric/compiler controls stillinprogress when checked, no wholephase-green claim.
+**Environment:** separate fast frozen-image RTL controls for3profiles from heavy graph/compiler campaigns. Preserve ongoing compiler outcomes and secondaryI2Ctimeout; no acceptance weakening. Real evidence and next-step status updated in plan/summary/backlog/claims.
+**Next:** RUN-onlyestimatedtiming with observed config and clock/path coverage, detailed routing and macro/fixed-shell assembly, real managementSPI/reload/CRC/parking/runtime parity. No configuredtiming/macro/signoff/replacement claim, phase box or full-chip attempt. G1/native121/uninstalled118protected; sealed R1set untouched.
+
 ## 2026-10-23 (hosted complete native pass; configuration state observed)
 **Actual:**40037694777 at75529b6 attempt1SUCCESS: independent26leaf audit/4guardcases and all40native primary1strictPASS. Root48inputs/twoexecutables/XML/source/audit reauthPASS. No assembled macro or timing acceptance.
 **New verification:** D116read-only native Qcapture yields8736defined configuration values after image loading; exact per-instance counts. Input review finds BUG130auxiliary reset was omitted from diagnostic adapter; corrected~rst_npolarity matches production, all43scalarinputs driven. Corrected local all40native primary1strictPASS; snapshot484e7383…unchangedbyfix.71focused testsPASS. Hosted corrected/config-observed replay prepared.

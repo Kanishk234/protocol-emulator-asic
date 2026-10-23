@@ -315,7 +315,7 @@
     {
       "id": "R1-MODELS",
       "priority": 2,
-      "title": "Qualify clean R1 software models and full cost census",
+      "title": "Qualify R1 compiler, native leaf and integration gates",
       "track": "successor",
       "status": "in_progress",
       "hypothesis": "Exact G1 regeneration plus complete configuration accounting exposes stale-source and resource-only improvements before physical experiments.",
@@ -345,9 +345,11 @@
         "40014699181 at90f9f79: wide primitive columns1/4 passzeroGRT/PG; narrowboth GPL-0301 effective101.909% before GRT. Root paired/hash/config/stage auditPASS. MatchedLUT40014699032SUCCESS. D111single mathematically derived164.64primitive-column correction;57localtestsPASS.",
         "40027428283 atb2c54f9 SUCCESS both164.64primitive leaf cases, root source/ODB/PG/config/congestion auditPASS; unbalanced full-layout rejects east-borderpower BUG129. D112west47.52reallocation retains1061.76outerwidth and staticall8columnPGpairs;60localR1testsPASS, native balanced layout gates pending.",
         "40030916359 at00216ea SUCCESS13native geometries/3064neighbor pairs then5balancedcritical leaves zeroGRT/PG; root88prepared hashes/pinnedLEF/core/cell/13ODB/3064pairs/5finalnative auditsPASS.",
-        "40032527005 at71d902a SUCCESS1loadedprimary with7native critical instances/33mappedbaseline; root52inputs/twoIcarus13binaries/XML/source reauthPASS. D114remaining21contexts40033384495 atc6eba01active;66localtestsPASS."
+        "40032527005 at71d902a SUCCESS1loadedprimary with7native critical instances/33mappedbaseline; root52inputs/twoIcarus13binaries/XML/source reauthPASS. D114remaining21contexts40033384495 atc6eba01active;66localtestsPASS.",
+        "40030916359/40033384495 SUCCESSall26balancedgloballeaf contexts for40instances; reusable independent API/88input/config-cell/LEFarea/ODB/policy/absolutePGphase/pin/52wireguide auditPASS.",
+        "40039667532at29e644e attempt1SUCCESS corrected40native primary; root5guards/1functional/48inputs/2binaries;43scalarinputsdriven and8736defined configuration Qstates, snapshot484e7383\u2026;71focusedtestsPASS."
       ],
-      "next_action": "Observe all21remaining actual leaf contexts40033384495, including explicit cell-free NE52alias/nativewire gate. After all26leaf contexts qualify, move to detailed routing/full-grid assembly and management-SPI/shell/timing integration; keep physical and primary functional scope distinct. G1/secondary I2C timeout preserved.",
+      "next_action": "Begin scoped configured RUN-only estimated timing from observed Qstates, audit clock/path coverage; qualify detailed routing/physical views and full macro/fixed-shell integration at unchanged6x4/20ns. Then real managementSPI/CRC/reload/parking and full retained-runtime parity. Keep secondary UART+I2Ccompiler timeout explicit, no sealed tuning or G1replacement yet.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

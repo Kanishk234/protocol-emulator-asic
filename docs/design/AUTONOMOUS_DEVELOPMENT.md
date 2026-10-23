@@ -42,6 +42,10 @@ D108/D109now pass in40013513454 at8d42ac1:20native tile/footprint cases,3064actu
 
 D110/D111now measured:40014699181wide primitive cases pass; uniform154.08fails GPL-0301 effective pin-adjusted101.909%. One derived164.64leaf width passes both tested phases in40027428283 (zero final GRT/PGerrors,334latches). BUG129rejects the unbalanced full layout's unpowered eastborder. Next D112static reallocation west47.52/interior[154.08,164.64,154.08,154.08,164.64,154.08]/east68.64keeps1061.76outerwidth and all8column staticpowerpairs. Run native narrowedwest3types, newPRIMphases30.24/107.04and changed interfaces before full-grid integration. See layout_budget.py/report and backlog; static gates do not establish physical/timing acceptance.
 
+Latest checkpoint: D114all26global-leaf contexts pass40030916359/40033384495, independently audited by `tools/autonomy/r1_balanced_audit.py`. D115/D116corrected40native primary40039667532at29e644e passes1functional+5guard cases; root48inputs/2binary checks and8736defined configuration states (snapshot484e7383…) reauthenticated. All43scalarTileinputs driven; BUG130fixed. Loaded-RTL compatibility now consumes frozen compiler images separately from generator/compiler qualification, avoiding unrelated repeated secondary routing attempts. The optional secondaryUART+I2Ctimeout is still open, not hidden.
+
+Next sequence: use observed configuration for scoped RUN-onlyestimated timing (no chip-build constant tying; audit clock/path coverage), qualify detailed leaf routing/physical views, assemble the complete macro and fixed shell within original6x4/20ns constraints, then real managementSPI/reload/CRC/parking and full retained-runtime parity. Global guides/simulation do not imply any of these passes; do not touch sealed R1protocols before the hardware-freeze gate. Keep G1selected and native121/uninstalled118protected.
+
 ## Current priority and protected results
 
 Phase 5 is complete as of October 19: the fresh GDS/gate-test run39280550500,

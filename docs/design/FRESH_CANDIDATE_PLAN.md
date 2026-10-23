@@ -2,6 +2,8 @@
 
 Date: 2026-10-20. Status: proposed experimental specification and acceptance plan; no implementation selected, no replacement of frozen G1. R1 is a working label, not a promised resource count. Exploration follows D-037; the production architecture contract remains unchanged.
 
+**Measured checkpoint (2026-10-23):** third/final graph screen uses reduced radix with128LC/4timers/4shifts as a diagnostic reference. Six retained personality compiler cases and primary UART+SPI fit; optional concurrentUART+I2C remains a600-second compiler-routing timeout. Balanced geometry reallocates west-border width to primitive columns without changing the1061.76×669.06planned outer footprint. All26actual leaf contexts pass global routing/PGgates (40030916359/40033384495), and corrected40native-leaf primary simulation/configuration observation passes40039667532. These do not select R1 or establish detailed routing, assembled-chip fit, real managementSPI, configured timing, full retained-protocol runtime parity or equal-total-area advantage. G1protection/minimum replacement criteria below remain unchanged.
+
 ## Objective and protected baseline
 
 Build a physically routable eFPGA with more useful communication capability than G1 inside the same TT 6x4 CMOS5L envelope at the same 50 MHz target. Fewer routing switches are useful only if measured workloads benefit. Neither a smaller chip nor a larger nominal LUT count alone earns replacement.

@@ -67,3 +67,8 @@ Run40009616432 at6b2908894d2eefe53bbb1e523d5e924761ef6e8f attempt1 passes both21
 
 ### Primitive reserve leaf routing (2026-10-23)
 40027428283 atb2c54f97e26ead978a8eb615f9f13619d8108b64 passes two164.64µm primitive leaf cases at phases9.12/85.92µm with334latches, zero final global overflow/PGviolations and90.0816%native core utilization. Root source/ODB/config/PG/congestion replay checked. Wider-layout integration is rejected by static east-border PGphase (BUG129); D112balanced geometry and its different phases remain unqualified. No complete-fabric, timing or equal-area advantage claimed.
+
+### Balanced R1 complete global-leaf and native primary gates (2026-10-23)
+40030916359at00216ea plus40033384495atc6eba01qualify all26distinct global-route leaf contexts covering40instances; independent reusable audit validates source identities,88inputs, original/config-cell counts, pinned-LEFarea/ODB/policy/absolutePGphase and unchanged signalpins. All final native overflow/PGviolations0. Cell-free NEhas52native feedthrough nets with nonempty route guides; no placement claim for that tile.
+
+Corrected native primary40039667532at29e644e attempt1SUCCESS uses39placed/buffered instances plus1routed wire tile, with generated RTL interconnect/frameFSM. Root5guard+1functional XML/48input/2binary auditPASS; all43scalarinputs driven and8736configuration Qstates defined after primary-image loading (snapshot484e7383…). UARTTX/RX+SPI0/backpressure/divider assertions pass. No independent expected-bit equality, managementSPI/parking, detailed routing, physical macro assembly/SDF/configured timing or equal-total-area superiority claimed. G1remains selected.

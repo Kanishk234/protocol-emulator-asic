@@ -5,6 +5,8 @@ on:
     branches: [efpga]
     paths:
       - 'spikes/r1/interface_preflight.py'
+      - 'spikes/r1/configured_smoke.py'
+      - 'test_internal/r1_configured/**'
       - 'tools/profiling/tests/test_r1_interface_preflight.py'
       - '.github/workflows/r1_interfaces.yaml'
 permissions:
@@ -58,6 +60,16 @@ jobs:
             -e PDK_ROOT -e GITHUB_RUN_ID -e GITHUB_RUN_ATTEMPT \
             ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
             python3 spikes/r1/interface_preflight.py inside --bundle build/r1_interfaces/input --out build/r1_interfaces/native > build/r1_interfaces/native.log 2>&1
+      - name: Loaded all-mapped primary with pinned Icarus13
+        if: ${{ !cancelled() && hashFiles('build/r1_interfaces/input/manifest.json') != '' }}
+        timeout-minutes: 5
+        run: |
+          mkdir -p "$HOME/.cache/warp/iverilog-13"
+          curl -sfL https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb -o /tmp/r1-interface-iverilog13.deb
+          dpkg-deb -x /tmp/r1-interface-iverilog13.deb "$HOME/.cache/warp/iverilog-13"
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          PYTHONPATH=tools python spikes/r1/configured_smoke.py --model build/r1_interface_source/resource --case build/r1_interface_source/compile/uart_spi_11 --mapped-bundle build/r1_interfaces/input --pdk build/r1_interface_pdk/ihp-sg13cmos5l --out build/r1_interfaces/full-mapped-primary > build/r1_interfaces/full-mapped-primary.log 2>&1
       - uses: actions/upload-artifact@v7
         if: always()
         with:

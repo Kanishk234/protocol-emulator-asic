@@ -7,6 +7,7 @@ on:
       - 'spikes/r1/physical_route.py'
       - 'tools/profiling/tests/test_r1_physical_route.py'
       - '.github/workflows/r1_tile_routing.yaml'
+      - 'patches/r1_explicit_buffer_cell.patch'
 permissions:
   contents: read
   actions: read
@@ -40,6 +41,12 @@ jobs:
           python -c 'import json; d=json.load(open("build/r1_tile_route/producer.json")); assert d["head_sha"]=="46682a2b43d6f370d68ca82202577835f8e2312a" and d["run_attempt"]==1 and d["conclusion"]=="success"'
           gh run download 39996455894 --name r1-physical-preflight-39996455894 --dir build/r1_route_source
           curl -sfL https://raw.githubusercontent.com/mole99/librelane_plugin_fabulous/dcc038217472822330b33f61fadbc06e0c3cc96d/librelane_plugin_fabulous/scripts/add_buffers.tcl -o build/r1_tile_route/add_buffers.tcl
+          echo 'bd134f7e02a401ade48c365f0c9ed2b6d950526ccc92c71a777d039ff0fd8e0e  build/r1_tile_route/add_buffers.tcl' | sha256sum -c -
+          mkdir -p build/r1_tile_route/adapter/librelane_plugin_fabulous/scripts
+          cp build/r1_tile_route/add_buffers.tcl build/r1_tile_route/adapter/librelane_plugin_fabulous/scripts/
+          patch --batch --fuzz=0 -p1 -d build/r1_tile_route/adapter < patches/r1_explicit_buffer_cell.patch
+          cp build/r1_tile_route/adapter/librelane_plugin_fabulous/scripts/add_buffers.tcl build/r1_tile_route/add_buffers.tcl
+          echo '7b9526fcc9676d6f266e457344c6b71921eebea7e2600c3df489de1475c1f2e6  build/r1_tile_route/add_buffers.tcl' | sha256sum -c -
           bash spikes/cloud/fetch_pdk.sh
       - name: Check fixed policy and power-phase admission
         run: |

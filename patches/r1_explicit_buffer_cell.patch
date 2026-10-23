@@ -1,0 +1,16 @@
+--- a/librelane_plugin_fabulous/scripts/add_buffers.tcl
++++ b/librelane_plugin_fabulous/scripts/add_buffers.tcl
+@@ -21,11 +21,11 @@
+ }
+ 
+ if { $::env(DESIGN_REPAIR_BUFFER_INPUT_PORTS) } {
+-    buffer_ports -inputs
++    buffer_ports -inputs -buffer_cell [lindex [split $::env(SYNTH_BUFFER_CELL) "/"] 0]
+ }
+ 
+ if { $::env(DESIGN_REPAIR_BUFFER_OUTPUT_PORTS) } {
+-    buffer_ports -outputs
++    buffer_ports -outputs -buffer_cell [lindex [split $::env(SYNTH_BUFFER_CELL) "/"] 0]
+ }
+ 
+ report_floating_nets -verbose

@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-22 — Classify macro signoff markers and verify final routed replay
+
+- Final routed replay39880054906 succeeds; downloaded XML independently confirms22tests,0failures/errors/skips on exact final routed netlist.
+- Signoff diagnostic39883160399 fails strict Magic57924DRC/10overlap gates; GDS exports and LVS match succeed. Downloaded full artifact, parsed every DRC rectangle:0outside SRAM footprint. Total matches historical precheck-passing R4run5 count but does not prove every marker harmless. All10feedback polygons confined to documented VPWR/obsm4 gap. BUG134 records diagnostic classification gap; no suppressed gates or physical edits.
+- Prepared separate gds-wire600-mux-precheck using unchanged TT precheck action on exact primary KLayout GDS/fresh LEF,9file hashbinding,6x4/50MHz metadata. Actual-artifact packaging passes;19focused tests pass. No official GDS/Phase2 closure. Next publish scoped tools/tests/CI/evidence and launch independent merged-GDS precheck; main hardware/template jobs and unrelated/FIPE files untouched.
+
+## 2026-10-22 — Publish and launch routed physical verification diagnostic
+
+- User explicitly authorized publication. Committed scoped tools d46a060, tests9f50368, CI0f75253 and docs8cfdfce separately; pushed main successfully and verified local/remote SHA8cfdfce14dcdf070a6daded58d142b3123a447cd. Pre-push hardware history empty. Unrelated reports/tools and local FIPE note excluded.
+- Launched [gds-wire600-mux-signoff39883160399](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39883160399), verified in_progress on that SHA. It tests GDS export/Magic DRC/overlap/LVS on the exact passing route, not official GDS integration. Final routed replay39880054906 also remains in_progress. Companion test/lint/unit/docs running. Next inspect fresh physical verification and full replay evidence; no phase boxes ticked. Launch receipt remains local until next documentation publication.
+
 ## 2026-10-22 — Prepare stock GDS/DRC/LVS tail while final replay runs
 
 - Final routed replay39880054906 remains in_progress in the expanded L3 simulation; artifact validation passed. No replay completion claim.

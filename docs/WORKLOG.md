@@ -2,12 +2,19 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-23 — Diagnose next stock timeout in clock routing
+
+- Inspected40026122208direct job log/artifact12539217630. Setup-margin0control works: native setup repair completes; hold repair completes with3408buffers. Fresh stage38typical setupWS0ns,holdWS+0.273668ns,slew0/cap0/fanout169. No fresh all-corner or extracted pass claimed.
+- Failure moved to GlobalRouting: default CTS_APPLY_NDR=half causes50extra rounds then one clock-net NDR removal;13GRT-0273warnings before145minute timeout. This is the D-043known issue omitted from stripped baseline, not a repeated setup stall. BUG141and report record exact stages/evidence.
+- Prepared D-110diagnostic-only CTS_APPLY_NDR=none, restoring normal clock spacing with no other physical-setting change. Main src/config/official workflow,RTL,image/scripts,20ns,0.25ns uncertainty and checker gates unchanged. Real pinned CTS schema, unchanged TT --create-user-config, exact one-key diff,21source hashes,official workflow identity and shell/Python checks pass. Main adoption outside whitelist remains separate owner review.
+- Next publish scoped input/CI/evidence and launch stock pre-DRT control; no route continuation or phase boxes. Need fresh corners and zero electrical/antenna failures before routing. Watcher remains stopped.
+
 ## 2026-10-23 — Diagnose stock repair stall and prepare setting-only follow-up
 
 - Direct job log for39996448720 confirms145minute timeout in post-CTS setup repair, not a launch failure.2074endpoints persist through4054iterations. Stage36sampled1000zero-slack time-borrowing latch paths; repeated worst endpoint49332is a cfg latch. Extra50ps repair target is the leading hypothesis, not yet a proven causal fix.
 - Downloaded54MiB artifact12527314901under/tmp. Fresh completed typical metrics: setup0ns, hold−0.577002ns, slew0/cap0/fanout169. Fast/slow metrics in cumulative state are inherited, not fresh post-CTS; no all-corner pass claim. Hold repair/global routing were not reached. BUG140/report preserve this distinction.
 - Prepared D-109diagnostic-only setting PL_RESIZER_SETUP_SLACK_MARGIN=0in proposed screen inputs, keeping20ns,stock0.25ns uncertainty,native scripts/order,image,source/macros and acceptance fixed. Main adoption outside config whitelist requires explicit owner review; no main src/config or official template edit. Actual TT --create-user-config passes, exact one-setting diff and workflow shell/Python/hash checks pass. No longer timeout or bypassed checks proposed.
-- Next publish scoped input/CI/docs groups and launch the stock pre-DRT follow-up. No phase boxes ticked. Read-only API approval review timed out once; allowed retry succeeded. gh run --log returned empty, direct job-log API supplied actual evidence. Watcher remains stopped.
+- Published tools5112ec2,CI8099c39,evidencef01ad68; verified remote mainf01ad683f43d3a2ffb7e40a85d6855d08ea696f5. Launched [40026122208](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40026122208) at that head; verified in_progress. Outgoing main src/info/macro/official-workflow history empty. Next inspect the matched stock pre-DRT follow-up; this launch receipt is local until next evidence publication. No phase boxes ticked. Read-only API approval review timed out once; allowed retry succeeded. gh run --log returned empty, direct job-log API supplied actual evidence. Watcher remains stopped.
 
 ## 2026-10-23 — Diagnose stock baseline launch failure
 

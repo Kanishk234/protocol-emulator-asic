@@ -1279,6 +1279,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Diagnostic only: proposed screen project config sets PL_RESIZER_SETUP_SLACK_MARGIN=0. No flow substitutions, custom images, modified scripts, ECOs or main inputs.20ns,0.25ns uncertainty, actual timing/electrical/physical acceptance remain unchanged. Cost/risk: removing extra repair headroom may expose later setup/hold/route failures; the next run must measure them and stop before DRT.
 - Main adoption is not authorized by this diagnostic: the field is outside the current src/config whitelist. No architecture/ISA/spec change. PHASE2_STOCK_BASELINE_TIMEOUT.md records exact evidence and fresh-vs-inherited metric distinction. Actual TT project configuration and single-setting/syntax/hash audits pass; physical validation pending.
 
+## D-110 (2026-10-23): restore normal clock spacing in stock-only routing diagnostic
+
+- General need:40026122208completes setup/hold repair but global routing repeatedly relaxes optional clock NDR one net at a time and times out. Saved CTS setting is the native default half; D-043already documented none for this floorplan.
+- Diagnostic-only single setting CTS_APPLY_NDR=none, preserving prior setup-margin0and every other project setting. Stock engine/scripts/order/image,20ns,0.25ns uncertainty, source/resources and all gates stay fixed. Cost/risk: normal clock spacing can alter coupling/skew/hold and routing; all fresh/extracted corners still require measurement. PDK minimum spacing and actual DRC checks remain enforced.
+- No main src/config/template edit or authority to adopt fields beyond the main whitelist. Schema/official TT config and exact one-key/source/workflow audits pass. PHASE2_STOCK_BASELINE_TIMEOUT.md records fresh typical setup0/hold+0.273668ns/fanout169; not all-corner or routed closure. Physical control pending.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

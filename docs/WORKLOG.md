@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-22 — Prepare stock GDS/DRC/LVS tail while final replay runs
+
+- Final routed replay39880054906 remains in_progress in the expanded L3 simulation; artifact validation passed. No replay completion claim.
+- Prepared separate gds-wire600-mux-signoff workflow, wire600_mux_signoff helper and 15-file source-view binding. It runs stock stream-out/Magic DRC/overlap/LVS on exact successful route39868597887, without physical edits or official signoff claims. Missing synthesis metadata views are explicitly omitted only because none of the selected steps consumes them; all physical/netlist/constraint views retained. KLayout DRC/XOR remain unverified.
+- Actual downloaded artifact preflight passes;13 focused tests pass including fail-closed metric/output checks; diff check passes. Main hardware/template jobs and unrelated files untouched. Latest user-supplied Git rules reserve commits/pushes for user, so changes remain local, not launched. Next user publishes scoped tools/tests/CI/docs, then launch independent diagnostic and inspect final replay. Official portability remains open; no phase boxes ticked.
+
+## 2026-10-22 — Validate isolated integration candidate while final replay runs
+
+- Exact final routed replay [39880054906](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39880054906) launched at remote/main ced952c413ac15b73eea0d6402c985dc92984677; artifact validation passed and expanded 22-test suite is running.
+- Assembled isolated candidate `/tmp/tripwire-official-mux-candidate-20261022`; regenerated outputs/check pass with every bound routed source hash preserved. All 19 source files exist and info/Makefile lists match, 6x4/50MHz. Four top-level RTL smoke tests pass, zero failures/skips, using project venv/system Icarus12. Source/config/test audit saved under candidate review/source_audit.json.
+- Added PHASE2_PASSING_ROUTE_INTEGRATION.md distinguishing passing experimental route from unfinished official portability. Stock action lacks custom image and second audited physical repair stage; an unapplied config proposal alone cannot reproduce passing route. Main hardware/template jobs untouched, no policy exceptions assumed, unrelated/FIPE files preserved, no phase boxes ticked. Next complete final replay and prepare continuous full-flow integration before official promotion.
+
 ## 2026-10-22 — Bind exact passing routed netlist for final protocol replay
 
 - Downloaded full39868597887route evidence to/tmp/tripwire-mux-route-full-39868597887. Final DRT netlist SHAc60823d33a9aa63b20ff4e07a934a4f1daa8b519c4ef2581c9d0b53599f13225. Reviewed full recipe SHA8f957ea12ff07b7fcbf35d1cca3c3fd2d8ad358194085d68a4c4de6259ebfb59 and DRT config SHA3b5b9c3e73839e58de379e49ddf0982780e4dff6ab201c6c9b18c3a4f94df9da. Bound27final-netlist/geometry/config/constraint/gate/report files in mux_routed_gl fixture.

@@ -14,7 +14,24 @@ from physical_preflight import TOP,sha,check_pins,signal_names
 ROOT=Path(__file__).resolve().parents[2]
 BUFFER_SHA='7b9526fcc9676d6f266e457344c6b71921eebea7e2600c3df489de1475c1f2e6'
 NL_SHA='b743335546eb7cbecd98d9fd129a26855e900ca4f868caea2f5a43167faf6b1a'
-from layout_budget import RESERVE_COLUMNS,reserve_geometry,balanced_case
+from layout_budget import RESERVE_COLUMNS,reserve_geometry,balanced_case,BALANCED_CASES
+
+
+def wire_pairs(header):
+    if header['cells']:raise ValueError('Wire-only source contains cells')
+    inputs={}
+    pairs=[]
+    for name,port in header['ports'].items():
+        if port['direction']!='input':continue
+        for i,bit in enumerate(port['bits']):
+            inputs[bit]=name if len(port['bits'])==1 else f'{name}[{i+port.get("offset",0)}]'
+    for name,port in header['ports'].items():
+        if port['direction']!='output':continue
+        for i,bit in enumerate(port['bits']):
+            if bit not in inputs:raise ValueError('Wire-only output is not a direct input alias')
+            pairs.append((inputs[bit],name if len(port['bits'])==1 else f'{name}[{i+port.get("offset",0)}]'))
+    if len(pairs)!=52:raise ValueError('Frozen wire-only feedthrough census changed')
+    return pairs
 
 
 def power_phase(width,column=0,columns=None):
@@ -103,7 +120,8 @@ def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None,primi
         from interface_preflight import MAPPED
         from configured_smoke import FULL_MAPPED_SHA
         top=case['tile'];design=bundle/top;column=case['x'];source_preflight='40013513454'
-        latches={'W_IO4':81,'NW_term':4,'SW_term':20,'PRIM2T2S':334}[top]
+        latches={'W_IO4':81,'NW_term':4,'SW_term':20,'PRIM2T2S':334,'LUT4x8_ha':438,
+                 'E_IO4':73,'N_IO':35,'S_IO2':60,'NE_term':0,'SE_term':4}[top]
         nl_sha=FULL_MAPPED_SHA[top];tile=manifest['tiles'][top]
         if tile['mapped_sha256']!=MAPPED[top]:raise ValueError('Changed balanced tile mapping provenance')
         expected_cells=tile['expected_cells']
@@ -122,6 +140,9 @@ def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None,primi
         raise ValueError('Changed frozen netlist or pinned buffer adapter')
     if any(sha(bundle/name)!=digest for name,digest in manifest['files'].items()):
         raise ValueError('Prepared native inputs changed')
+    wire_only=bool(case and case['wire_only'])
+    aliases=wire_pairs(json.loads((design/'header.json').read_text())['modules'][top]) if wire_only else []
+    if wire_only and expected_cells:raise ValueError('Wire-only source has mapped resources')
     class TileIO(Odb.CustomIOPlacement):
         id='Odb.R1PhysicalPins'
         def get_script_path(self):return str(bundle/'io_place.py')
@@ -129,10 +150,12 @@ def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None,primi
         id='OpenROAD.R1OutputBuffers'
         def get_script_path(self):return str(buffers)
     class Route(SequentialFlow):
-        Steps=[OpenROAD.Floorplan,Odb.SetPowerConnections,TileIO,
+        Steps=([OpenROAD.Floorplan,Odb.SetPowerConnections,TileIO,
+                OpenROAD.GeneratePDN,Odb.AddRoutingObstructions,OpenROAD.GlobalRouting]
+               if wire_only else [OpenROAD.Floorplan,Odb.SetPowerConnections,TileIO,
                OpenROAD.TapEndcapInsertion,OpenROAD.GeneratePDN,Odb.AddRoutingObstructions,
                OutputBuffers,Odb.SetPowerConnections,OpenROAD.GlobalPlacement,
-               OpenROAD.DetailedPlacement,OpenROAD.GlobalRouting]
+               OpenROAD.DetailedPlacement,OpenROAD.GlobalRouting])
     out.mkdir(parents=True,exist_ok=False)
     observer=out/'observe.tcl'
     observer.write_text('''read_db $::env(R1_ODB)
@@ -164,6 +187,9 @@ foreach net {VPWR VGND} {
   check_power_grid -net $net -error_file $report
 }
 foreach term [$block getBTerms] {
+  set net [$term getNet]
+  if {[catch {$net getName} net_name]} {set net_name ""}
+  puts "R1_PORT_NET\t[$term getName]\t$net_name"
   if {[$term getName] ni {VPWR VGND}} {continue}
   foreach pin [$term getBPins] {
     foreach box [$pin getBoxes] {
@@ -174,6 +200,7 @@ foreach term [$block getBTerms] {
 ''')
     result=dict(passed=False,cases={},source_preflight=source_preflight,mapped_nl_sha256=nl_sha,tile=top,column=column,
                 balanced_case=case,column_index_kind='fabric_x' if case else 'interior',
+                wire_only=wire_only,placement_required=not wire_only,
                 reserve_geometry=reserve_geometry() if primitive_reserve else None,
                 input_manifest_sha256=sha(bundle/'manifest.json'),buffer_adapter_sha256=BUFFER_SHA,
                 openroad_version=subprocess.check_output(['openroad','-version'],text=True).strip(),
@@ -220,7 +247,7 @@ foreach term [$block getBTerms] {
                                stdout=stream,stderr=subprocess.STDOUT,check=True,timeout=120)
             text=log.read_text();counts=next(l for l in text.splitlines() if l.startswith('R1_CELLS\t')).split('\t')[1].split()
             row['power_terminals_checked']=int(next(l for l in text.splitlines() if l.startswith('R1_POWER_TERMINALS\t')).split('\t')[1])
-            if row['power_terminals_checked']<=0:raise ValueError('No native cell power terminals checked')
+            if row['power_terminals_checked']<=0 and not wire_only:raise ValueError('No native cell power terminals checked')
             row['final_power_grid_violations']={}
             for net in ('VPWR','VGND'):
                 with (folder/(net+'-final-grid-errors.rpt')).open() as report:
@@ -228,8 +255,15 @@ foreach term [$block getBTerms] {
             if any(row['final_power_grid_violations'].values()):
                 raise ValueError('Final placed design power-grid check failed')
             row['native_cells']=dict(zip(counts[::2],map(int,counts[1::2])))
-            if row['native_cells'].get('sg13cmos5l_dlhq_1')!=latches:
+            if row['native_cells'].get('sg13cmos5l_dlhq_1',0)!=latches:
                 raise ValueError('Configuration storage changed during physical flow')
+            if wire_only:
+                if row['native_cells'] or row['power_terminals_checked']!=0:raise ValueError('Wire-only physical flow inserted unexpected cells')
+                nets={line.split('\t')[1]:line.split('\t')[2] for line in text.splitlines() if line.startswith('R1_PORT_NET\t')}
+                if any(not nets.get(a) or a not in nets or b not in nets or nets[a]!=nets[b] for a,b in aliases):
+                    raise ValueError('Native wire-only feedthrough connectivity changed')
+                if metrics.get('global_route__wirelength',0)<=0:raise ValueError('Wire-only route has no measured wirelength')
+                row['native_feedthrough_pairs']=len(aliases)
             for master,count in expected_cells.items():
                 if master=='$scopeinfo' or master.startswith('sg13cmos5l_buf_'):continue
                 if row['native_cells'].get(master,0)!=count:
@@ -261,7 +295,7 @@ if __name__=='__main__':
     p.add_argument('--width',type=float,choices=(219.84,154.08))
     p.add_argument('--primitive-column',type=int,choices=(1,4))
     p.add_argument('--primitive-reserve',action='store_true')
-    p.add_argument('--balanced-case',choices=('west_io','northwest','southwest','primitive1','primitive4'))
+    p.add_argument('--balanced-case',choices=BALANCED_CASES)
     a=p.parse_args()
     if a.primitive_reserve and (a.width is not None or a.primitive_column is None):p.error('Reserve mode uses its one derived width and requires the actual primitive column')
     if a.balanced_case and (a.width is not None or a.primitive_column is not None or a.primitive_reserve):p.error('Choose one declared balanced case without other geometry flags')

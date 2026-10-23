@@ -19,7 +19,11 @@ def reserve_geometry():
 
 
 D=lambda value:Decimal(str(value))
-BALANCED_CASES=('west_io','northwest','southwest','primitive1','primitive4')
+CRITICAL_CASES=('west_io','northwest','southwest','primitive1','primitive4')
+REMAINING_CASES=('northeast','east_io','southeast',
+                 *('lut'+str(i) for i in range(6)),*('north'+str(i) for i in range(6)),
+                 *('south'+str(i) for i in range(6)))
+BALANCED_CASES=CRITICAL_CASES+REMAINING_CASES
 
 
 def balanced_geometry(x,y):
@@ -31,13 +35,18 @@ def balanced_geometry(x,y):
 def balanced_case(name):
     declared={'west_io':('W_IO4',0,1),'northwest':('NW_term',0,0),
               'southwest':('SW_term',0,4),'primitive1':('PRIM2T2S',2,2),
-              'primitive4':('PRIM2T2S',5,2)}
+              'primitive4':('PRIM2T2S',5,2),'east_io':('E_IO4',7,1),
+              'northeast':('NE_term',7,0),'southeast':('SE_term',7,4)}
+    for i in range(6):
+        declared['lut'+str(i)]=('LUT4x8_ha',i+1,1)
+        declared['north'+str(i)]=('N_IO',i+1,0)
+        declared['south'+str(i)]=('S_IO2',i+1,4)
     if name not in declared:raise ValueError('Undeclared balanced-layout case')
     tile,x,y=declared[name];layout=layouts()['reallocated_west'];w,h=balanced_geometry(x,y)
     phase=layout['column_power'][x]['full_core_power_pairs_um'][0][0]
     return dict(name=name,tile=tile,x=x,y=y,width=w,height=h,center_um=phase,
                 core_offset_um=str(D(phase)-D('2.88')),pitch_um='109.92',
-                macro_width_um=layout['macro_width_um'])
+                macro_width_um=layout['macro_width_um'],wire_only=tile=='NE_term')
 
 
 def describe(west,columns,east=68.64):

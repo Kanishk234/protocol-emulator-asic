@@ -55,3 +55,28 @@ def test_short_corner_power_pins_need_full_corner_height_and_in_die_width():
     with pytest.raises(ValueError):check_power_boxes(boxes,47.52,expected_center='12')
     boxes[0]['rect'][0]=-1
     with pytest.raises(ValueError):check_power_boxes(boxes,47.52,height=56.70,expected_center='12')
+
+
+def test_all_balanced_leaf_contexts_are_covered_once_without_geometry_sweep():
+    from layout_budget import BALANCED_CASES,CRITICAL_CASES,REMAINING_CASES,balanced_case
+    assert len(CRITICAL_CASES)==5 and len(REMAINING_CASES)==21
+    specs=[balanced_case(name) for name in BALANCED_CASES]
+    assert len({(c['tile'],c['width'],c['height'],c['center_um']) for c in specs})==26
+    assert {c['name'] for c in specs if c['wire_only']}=={'northeast'}
+
+
+def test_empty_corner_requires_exact_direct_feedthroughs_without_hidden_cells():
+    from copy import deepcopy
+    from physical_route import wire_pairs
+    h=dict(cells={},ports={
+        'FrameData':dict(direction='input',bits=list(range(32))),
+        'FrameData_O':dict(direction='output',bits=list(range(32))),
+        'FrameStrobe':dict(direction='input',bits=list(range(32,52))),
+        'FrameStrobe_O':dict(direction='output',bits=list(range(32,52)))})
+    assert len(wire_pairs(h))==52
+    bad=deepcopy(h);bad['cells']={'hidden':{}}
+    with pytest.raises(ValueError):wire_pairs(bad)
+    bad=deepcopy(h);bad['ports']['FrameData_O']['bits'][0]=100
+    with pytest.raises(ValueError):wire_pairs(bad)
+    bad=deepcopy(h);bad['ports']['FrameStrobe_O']['bits'].pop()
+    with pytest.raises(ValueError):wire_pairs(bad)

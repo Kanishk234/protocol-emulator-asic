@@ -833,3 +833,9 @@ validation. Next coverage adds real USER_RESET and preserves candidate netlists.
 - **Symptom/check:** initial router_force_build.yaml dispatch at6665d84 returns GitHub404; no build launched.
 - **Root cause:** the new workflow exists only on efpga while repository default main is TRIPWIRE, and a manual-only workflow has not been registered there.
 - **Fix/coverage:** narrowly trigger on pushes editing its own workflow on efpga; retain manual replay, read-only token and finite build timeout. Do not modify main or interpret404 as a build failure. Verify actual Actions run identity after registration.
+
+## 123: Representative route buffer adapter provenance mismatch
+- **Date:**2026-10-23.
+- **Symptom/check:**40007850249 both widths fail frozen input admission before native flow.
+- **Root cause:** expected cached adapter hash includes explicit SYNTH_BUFFER_CELL arguments on both buffer_ports calls; workflow fetched unchanged pinned upstream lacking those two arguments. Netlist hash is correct.
+- **Fix/coverage:** owned patches/r1_explicit_buffer_cell.patch under D107, staged copy, upstream SHA bd134f7e02a401ade48c365f0c9ed2b6d950526ccc92c71a777d039ff0fd8e0e and patched SHA7b9526fcc9676d6f266e457344c6b71921eebea7e2600c3df489de1475c1f2e6 checked before flow. Zero-fuzz patch and exact digest replay locally; hosted retry required. No routing conclusion from admission failure.

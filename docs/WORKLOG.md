@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (representative route adapter provenance repaired)
+**Actual:**40007850249 rejects both widths before native flow because downloaded upstream buffer script differs from the locally cached explicit-cell adapter. Frozen netlist hash matches. No placement or congestion result exists from this run.
+**Fix:** BUG123/D107 records the exact two-line owned patch, authenticates upstream bd134f7e… and patched7b9526fc… independently, preserves upstream license, stages a copy, and applies with zero fuzz. No physical policy or hardware changes. Next: rerun both fixed widths and inspect actual native outcomes; no phase boxes ticked.
+
 ## 2026-10-23 (paired representative PDN/placement/GRT prepared)
 **Done:** D107 runner consumes authenticated39996455894 frozen bundle and pinned output-buffer adapter. Fixed reference/narrow footprints differ only in dimensions/boundary obstructions. Adds native PDN, tap/endcap handling, output-only buffers,96%density placement and fixed50iteration/0.3adjustment Metal2–4GRT. Requires zero native final overflow/PGviolations, correct first-column full-height PGphase and original nonbuffer cells/438latches. Matrix runs both independently with45min native limits; failed checkpoints/results retained. Three focused policy/phase testsPASS; full source checks rerun before push.
 **Scope:** CLOCK_PORTnull, no configured timing/CTS/timing repair/resynthesis/detailed routing/signoff/full-chip acceptance. Original20ns eventual target unchanged. Other tile phases/types/shell and secondary UART+I2Ctimeout remain open. No new graph/seed/budget sweep or full-chip attempt; G1/native121/118protected.

@@ -26,3 +26,25 @@ Optional configured smoke replaces the LUT tile module with its exact exported m
 39989251719 atdbca630 successfully imports/floorplans the reference-width frozen netlist and places all210real signal pins; rectangle bounds/nonoverlap checks and438-latch count pass. Full cell census then stops because OpenROAD adds exactly one tiehi and one tielo to represent the netlist's constant literals. All original mapped counts are unchanged. BUG122 adds exact constant-driver bindings/counts, with their area included; it admits no other added/deleted/resized cells. No narrowed-width or physical routing result accepted yet.
 
 The independent mapped-primary step in that runSUCCESS: downloaded audit checks one executed XMLPASS,47source/model/image hashes against retained artifacts/pinned Git objects and both Icarus13executable hashes. All16LUT tile instances use the frozen mapped netlist; primitive/I/O tiles remain RTL. Audit build/r1_physical_grouped_hosted/mapped-primary/independent-audit.json. This is now hosted mixed mapped/RTL functional evidence, excluding management shell/SDF/timing/physical acceptance. Retry keeps graph/cells/footprints/pin policy fixed and accounts only for native literal materialization.
+
+
+## Both-width native preflight passed and independently audited
+
+[39996455894](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39996455894), source46682a2b43d6f370d68ca82202577835f8e2312a, attempt1SUCCESS. Ten strict admission tests, both native floorplan/pin cases and the independent mapped-primary functional step pass.
+
+Downloaded audit verifies all ten prepared-file hashes, frozen mapped/exported netlist identities, every native signal name/direction, rectangle bounds and same-layer nonoverlap, every original cell count,438configuration latches and the exact two constant-driver bindings. Native ODB hashes match retained artifacts. Independent arithmetic reconciles actual master geometry against the pinned **LEF** (physical shapes), rather than assuming Liberty synthesis areas are identical. Source/pinned-LEF audit: build/r1_physical_pass_hosted/native/independent-audit.json.
+
+| Native measured quantity, run39996455894 | Reference219.84µm width | Narrowed154.08µm width |
+|---|---:|---:|
+| Height, µm | 185.22 | 185.22 |
+| Signal pins | 210 | 210 |
+| Configuration latches | 438 | 438 |
+| Physical cell-shape sum including constant drivers, µm² | 23688.8064 | 23688.8064 |
+| Placeable core area, µm² | 38033.4528 | 26350.5312 |
+| Bare cell/core occupancy | 62.28% | 89.90% |
+
+Same-type neighboring data, configuration, global-buffer and carry interface pin centers align at both widths. This does not establish alignment with primitive/border tile types. The narrowed case has limited reserve before taps, buffers, clock/power infrastructure and routing. No standard-cell placement, PDN connectivity, global/detailed routing, extracted timing or whole-chip fit was tested or accepted.
+
+The latest mapped-primary XML independently contains1executedPASS. Its47source/model/image hashes and both pinned Icarus13binary hashes equal the previously authenticated case; run/source identity and scope are checked. Audit: build/r1_physical_pass_hosted/mapped-primary/independent-audit.json. All16LUT tiles mapped, other tile typesRTL; no shell/SDF/fullmapped acceptance.
+
+Next experiment: one fixed, costed representative PDN/placement/routing run using the frozen netlist and verified narrowed interface; retain original target/layer/margin policy and verify global power phase before integration. Measure added physical cells and actual congestion. Preserve the primary proof and leave secondary UART+I2C timeout explicit. Whole-chip hardening budget remains unused.

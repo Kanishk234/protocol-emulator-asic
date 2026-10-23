@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (both-width native pin/core gate passes)
+**Actual:**39996455894 at46682a2attempt1SUCCESS:10strict admission cases, reference219.84and narrowed154.08µm native floorplan/pin cases, mapped-primary functional step. Independent audit checks10prepared files, frozen mapped/NL hashes,210native names/directions/rectangles/nonoverlap,438latches, exact original cell counts+2literal drivers, retainedODB hashes and pinned-LEF/native cell-area arithmetic. Data/config/global-buffer/carry pin centers align for same-type neighbors at both widths. Mixed mapped primary1strictPASS reauthenticates47input/twoexecutable hashes.
+**Measured scope:** height185.22; native cell-shape sum23688.8064µm² both. Core38033.4528→26350.5312µm²; narrowed bare occupancy89.90% before further physical overhead. Reports/CLAIMS record run ID and limits. No placement/PDN/global/detailed routing/SDF/whole-chip acceptance; no phase box or whole-chip hardening attempt consumed.
+**Next:** fixed representative PDN/placement/routing from frozen cells/verified interface, keeping target/layers/margins and checking column power phase. Other tile-type interfaces and real shell remain open; secondaryUART+I2Ctimeout stays explicit. G1/native121/uninstalled118 protected.
+
 ## 2026-10-23 (reference native pin geometry succeeds; literal accounting)
 **Actual:**39989251719 atdbca630 native reference import/floorplan/210signalpin placement/bounds/nonoverlap/438latches pass. Exact cell census then rejects only2native constant drivers (one tiehi/tielo); every original mapped count matches. Narrowed width not reached; no complete preflight or routing/timing acceptance. BUG122 explicit2driver binding/count+area accounting prepared; other cell differences remain fatal.
 **Hosted mixed-mapped proof:** same run's mapped-primary stepSUCCESS; independent audit1strictXML/47source-model-image hashes/twoIcarus13executablesPASS. All16LUT tile instances mapped; primitive/IOtilesRTL. Source/script/PDK unchanged during simulation. No SDF/fullmapped/shell/physical acceptance. Combined focused checks rerun before push.

@@ -32,6 +32,12 @@ contents and Actions; it does not launch experiments. The retained XML,
 state/dashboard and evidence artifacts support review for 30 days. The workflow
 is an observer and validation check, not a model brain or continuous agent.
 
+## October23 R1 handoff
+
+Fresh reduced-radix profile preserves all six retained compiler cases and primary UART+SPI. Hosted loaded generated RTL and mixed mapped-LUT primary tests pass, with independent source/image/tool audits. Native preflight39996455894 at46682a2passes both fixed widths,210signal pins/438latches and exact native constant accounting. See reports/r1_physical_preflight_20261023.md and backlog R1-MODELS.
+
+Next is representative PDN/placement/routing, not another topology/seed/budget sweep. Native pin/core success is not routing/timing/whole-chip acceptance. Keep the narrowed core's limited reserve explicit; audit column power phase and other tile-type interfaces. Secondary UART+I2C remains a600-second compiler routing timeout, so its aggregate model workflow stays red. Freeze/replacement gates and G1 protection remain unchanged. All three initial graph profiles are already used.
+
 ## Current priority and protected results
 
 Phase 5 is complete as of October 19: the fresh GDS/gate-test run39280550500,

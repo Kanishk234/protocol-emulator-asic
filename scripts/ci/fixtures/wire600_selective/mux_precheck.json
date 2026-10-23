@@ -1,0 +1,31 @@
+{
+  "run": {
+    "id": 39883160399,
+    "head_sha": "8cfdfce14dcdf070a6daded58d142b3123a447cd",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-wire600-mux-signoff.yaml",
+    "conclusion": "failure"
+  },
+  "files": {
+    "runs/wire600-mux-signoff/02-klayout-streamout/tt_um_tripwire.gds": "b2374c18fa5b18ba3d751626e1224bf27c41a3271fff0dcef047a0aba61311d8",
+    "runs/wire600-mux-signoff/02-klayout-streamout/state_out.json": "a90de6c6f21be35130fb4b212e7ea4e3b56ec6fbb91f1f67ce4ff8b7f7ecc45c",
+    "runs/wire600-mux-signoff/03-magic-writelef/tt_um_tripwire.lef": "e418a7c256182bae414721dbbb7e4d7b04e0942aa46ed165b7262df56b9de681",
+    "runs/wire600-mux-signoff/05-magic-drc/reports/drc.magic.rpt": "ea861f2c61c80cd08345f83de2377efcc2af4fc4d64ebcbb9281b0d50b949f9b",
+    "runs/wire600-mux-signoff/05-magic-drc/state_out.json": "11b1b6fc7495613dabaae9e48c6f4b961b2b30e98e96c4a56dc79d3e2ac6a5b7",
+    "runs/wire600-mux-signoff/07-magic-spiceextraction/feedback.xml": "fba48d3edc8ecd034f9097848fd8162da597e7f3be4c7b27d39a034bcfe8811d",
+    "runs/wire600-mux-signoff/07-magic-spiceextraction/state_out.json": "5729625ae9bbb807d577a3b53964b3e4d7a7697fca2b86479964edc93db6912e",
+    "runs/wire600-mux-signoff/09-netgen-lvs/state_out.json": "dcf2b4c6219e4b7fe444a5e836b27367b7da52620e65f775b3b71546db5f7268",
+    "runs/wire600-mux-signoff/09-netgen-lvs/reports/lvs.netgen.rpt": "de70e591bdcf862612017bb864352a1e93ddbd0a9b4fe86d342fb2878df4af54"
+  },
+  "gds": "runs/wire600-mux-signoff/02-klayout-streamout/tt_um_tripwire.gds",
+  "lef": "runs/wire600-mux-signoff/03-magic-writelef/tt_um_tripwire.lef",
+  "macro_bbox_um": [
+    "12",
+    "40",
+    "248.8",
+    "231.34"
+  ],
+  "magic_drc_count": 57924,
+  "overlap_count": 10,
+  "official_signoff": false
+}

@@ -1,12 +1,43 @@
 """Static geometry/power screen; never substitutes for native physical gates."""
 import argparse
-from decimal import Decimal
+from decimal import Decimal, ROUND_CEILING
 import json
 from pathlib import Path
-from physical_route import RESERVE_COLUMNS,reserve_geometry
 from physical_preflight import sha
 
+RESERVE_COLUMNS=(154.08,164.64,154.08,154.08,164.64,154.08)
+
+
+def reserve_geometry():
+    # Round native three-decimal reports upward, then include the largest
+    # observed reference routability inflation at unchanged 96% density.
+    required=(Decimal('26853.447')+Decimal('225.661'))/(Decimal('.96')*Decimal('177.66'))+Decimal('5.76')
+    width=(required/Decimal('.48')).to_integral_value(rounding=ROUND_CEILING)*Decimal('.48')
+    return dict(width_um=str(width),required_width_um=str(required),
+                column_widths=list(RESERVE_COLUMNS),macro_width_um=str(Decimal('137.28')+sum(map(lambda w:Decimal(str(w)),RESERVE_COLUMNS))),
+                source_run='40014699181',pin_adjusted_area_upper_um2='26853.447',routing_inflation_upper_um2='225.661')
+
+
 D=lambda value:Decimal(str(value))
+BALANCED_CASES=('west_io','northwest','southwest','primitive1','primitive4')
+
+
+def balanced_geometry(x,y):
+    if x not in range(8) or y not in range(5):raise ValueError('Position outside frozen grid')
+    layout=layouts()['reallocated_west']
+    return float(layout['column_widths_um'][x]),56.70 if y in (0,4) else 185.22
+
+
+def balanced_case(name):
+    declared={'west_io':('W_IO4',0,1),'northwest':('NW_term',0,0),
+              'southwest':('SW_term',0,4),'primitive1':('PRIM2T2S',2,2),
+              'primitive4':('PRIM2T2S',5,2)}
+    if name not in declared:raise ValueError('Undeclared balanced-layout case')
+    tile,x,y=declared[name];layout=layouts()['reallocated_west'];w,h=balanced_geometry(x,y)
+    phase=layout['column_power'][x]['full_core_power_pairs_um'][0][0]
+    return dict(name=name,tile=tile,x=x,y=y,width=w,height=h,center_um=phase,
+                core_offset_um=str(D(phase)-D('2.88')),pitch_um='109.92',
+                macro_width_um=layout['macro_width_um'])
 
 
 def describe(west,columns,east=68.64):

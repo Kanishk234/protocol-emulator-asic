@@ -3,28 +3,18 @@
 Frozen mapped logic, two predeclared widths, no synthesis or timing acceptance.
 """
 import argparse
-from decimal import Decimal, ROUND_CEILING
+from decimal import Decimal
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
 
-from physical_preflight import TOP,sha
+from physical_preflight import TOP,sha,check_pins,signal_names
 ROOT=Path(__file__).resolve().parents[2]
 BUFFER_SHA='7b9526fcc9676d6f266e457344c6b71921eebea7e2600c3df489de1475c1f2e6'
 NL_SHA='b743335546eb7cbecd98d9fd129a26855e900ca4f868caea2f5a43167faf6b1a'
-RESERVE_COLUMNS=(154.08,164.64,154.08,154.08,164.64,154.08)
-
-
-def reserve_geometry():
-    # Round native three-decimal reports upward, then include the largest
-    # observed reference routability inflation at unchanged 96% density.
-    required=(Decimal('26853.447')+Decimal('225.661'))/(Decimal('.96')*Decimal('177.66'))+Decimal('5.76')
-    width=(required/Decimal('.48')).to_integral_value(rounding=ROUND_CEILING)*Decimal('.48')
-    return dict(width_um=str(width),required_width_um=str(required),
-                column_widths=list(RESERVE_COLUMNS),macro_width_um=str(Decimal('137.28')+sum(map(lambda w:Decimal(str(w)),RESERVE_COLUMNS))),
-                source_run='40014699181',pin_adjusted_area_upper_um2='26853.447',routing_inflation_upper_um2='225.661')
+from layout_budget import RESERVE_COLUMNS,reserve_geometry,balanced_case
 
 
 def power_phase(width,column=0,columns=None):
@@ -62,8 +52,18 @@ def routing_policy(width,column=0,columns=None):
                     for box in ([0,-1,width,0],[0,185.22,width,186.22],[-1,0,0,185.22],[width,0,width+1,185.22])])
 
 
-def check_power_boxes(boxes,width,column=0,columns=None):
-    primary=Decimal(power_phase(width,column,columns)['center_um'])*1000
+def balanced_policy(name):
+    case=balanced_case(name);w,h=case['width'],case['height']
+    policy=routing_policy(154.08)
+    policy.update(DIE_AREA=[0,0,w,h],PDN_VOFFSET=float(case['core_offset_um']),
+                  ROUTING_OBSTRUCTIONS=[[layer,*box] for layer in ('Metal1','Metal2','Metal3','Metal4','TopMetal1')
+                    for box in ([0,-1,w,0],[0,h,w,h+1],[-1,0,0,h],[w,0,w+1,h])])
+    return policy
+
+
+def check_power_boxes(boxes,width,column=0,columns=None,height=185.22,expected_center=None):
+    primary=Decimal(expected_center if expected_center is not None else power_phase(width,column,columns)['center_um'])*1000
+    max_x,max_y=round(width*1000),round(height*1000)
     centers={'VPWR':primary,'VGND':primary+4100}
     for net,expected in centers.items():
         found=[box for box in boxes if box['net']==net and box['layer']=='Metal4']
@@ -71,17 +71,17 @@ def check_power_boxes(boxes,width,column=0,columns=None):
         stripes={}
         for box in found:
             x0,y0,x1,y1=box['rect']
-            if x1<=x0 or y1<=y0 or y0<0 or y1>185220:
+            if not (0<=x0<x1<=max_x and 0<=y0<y1<=max_y):
                 raise ValueError('Invalid power pin geometry')
             if (Decimal(x0+x1)/2-expected)%Decimal(109920)!=0:
                 raise ValueError('Power stripe phase differs from global fabric grid')
             stripes.setdefault((x0,x1),[]).append((y0,y1))
         for spans in stripes.values():
-            if (0,185220) not in spans:
+            if (0,max_y) not in spans:
                 raise ValueError('Power pin does not span tile height')
 
 
-def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None,primitive_reserve=False):
+def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None,primitive_reserve=False,balanced_name=None):
     from librelane.common import Path as LLPath
     from librelane.flows import SequentialFlow
     from librelane.state import State,DesignFormat
@@ -90,12 +90,24 @@ def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None,primi
     sys.path.insert(0,str(ROOT/'test_internal'))
     from cloud_fanout_grt import parse_congestion,require_zero_overflow
     from cloud_tile_harden import metric_json
+    from cloud_tile_preflight import PIN_OBSERVER,parse_pin_inventory
     bundle,buffers,out=(Path(p).resolve() for p in (bundle,buffers,out))
     manifest=json.loads((bundle/'manifest.json').read_text())
     columns=RESERVE_COLUMNS if primitive_reserve else None
     if primitive_reserve and (primitive_column not in (1,4) or widths!=(164.64,)):
         raise ValueError('Reserve screen requires one fixed derived width and an actual primitive column')
-    if primitive_column is None:
+    case=balanced_case(balanced_name) if balanced_name else None
+    if case:
+        if primitive_column is not None or primitive_reserve or widths!=(case['width'],):
+            raise ValueError('Balanced screen uses one declared case without mixed profile flags')
+        from interface_preflight import MAPPED
+        from configured_smoke import FULL_MAPPED_SHA
+        top=case['tile'];design=bundle/top;column=case['x'];source_preflight='40013513454'
+        latches={'W_IO4':81,'NW_term':4,'SW_term':20,'PRIM2T2S':334}[top]
+        nl_sha=FULL_MAPPED_SHA[top];tile=manifest['tiles'][top]
+        if tile['mapped_sha256']!=MAPPED[top]:raise ValueError('Changed balanced tile mapping provenance')
+        expected_cells=tile['expected_cells']
+    elif primitive_column is None:
         design=bundle;top=TOP;latches=438;nl_sha=NL_SHA;column=0;source_preflight='39996455894'
         expected_cells=manifest['expected_cells']
     else:
@@ -161,6 +173,7 @@ foreach term [$block getBTerms] {
 }
 ''')
     result=dict(passed=False,cases={},source_preflight=source_preflight,mapped_nl_sha256=nl_sha,tile=top,column=column,
+                balanced_case=case,column_index_kind='fabric_x' if case else 'interior',
                 reserve_geometry=reserve_geometry() if primitive_reserve else None,
                 input_manifest_sha256=sha(bundle/'manifest.json'),buffer_adapter_sha256=BUFFER_SHA,
                 openroad_version=subprocess.check_output(['openroad','-version'],text=True).strip(),
@@ -169,7 +182,8 @@ foreach term [$block getBTerms] {
     (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
     for width in widths:
         name='width'+str(width).replace('.','_');folder=out/name;folder.mkdir()
-        row=dict(passed=False,policy=routing_policy(width,column,columns),power_phase=power_phase(width,column,columns))
+        row=dict(passed=False,policy=balanced_policy(balanced_name) if case else routing_policy(width,column,columns),
+                 power_phase=case if case else power_phase(width,column,columns))
         result['cases'][name]=row
         (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
         config=dict(row['policy'],DESIGN_NAME=top,VERILOG_FILES=[str(design/'tile.nl.v')],
@@ -187,6 +201,18 @@ foreach term [$block getBTerms] {
             if metrics.get('design__power_grid_violation__count')!=0:
                 raise ValueError('Power grid completeness not established')
             odb=Path(str(state[DesignFormat.ODB]));row['odb_sha256']=sha(odb)
+            if case:
+                pin_observer=folder/'pin-observer.tcl'
+                pin_observer.write_text(PIN_OBSERVER.replace('[join [lsort $boxes] ;]','[join [lsort $boxes] {;}]'))
+                with (folder/'pin-census.log').open('w') as stream:
+                    subprocess.run(['openroad','-exit',str(pin_observer)],stdout=stream,stderr=subprocess.STDOUT,
+                                   env=dict(os.environ,WARP_TILE_PIN_INPUT=str(odb)),check=True,timeout=120)
+                pins=parse_pin_inventory((folder/'pin-census.log').read_text())
+                check_pins(pins,signal_names(tile['ports']))
+                directions={pin:p['direction'].upper() for n,p in tile['ports'].items() for pin in
+                            ([n] if len(p['bits'])==1 else [f'{n}[{i}]' for i in range(p.get('offset',0),p.get('offset',0)+len(p['bits']))])}
+                if any(p['direction']!=directions[n] for n,p in pins['pins'].items()):raise ValueError('Routed native pin direction changed')
+                (folder/'pins.json').write_text(json.dumps(pins,indent=2)+'\n');row['signal_pins']=len(pins['pins'])
             log=folder/'native-census.log'
             with log.open('w') as stream:
                 subprocess.run(['openroad','-exit',str(observer)],
@@ -213,7 +239,9 @@ foreach term [$block getBTerms] {
             for line in text.splitlines():
                 if line.startswith('R1_PG\t'):
                     _,net,layer,*coords=line.split('\t');pg.append(dict(net=net,layer=layer,rect=list(map(int,coords))))
-            row['power_pins']=pg;check_power_boxes(pg,width,column,columns)
+            row['power_pins']=pg
+            check_power_boxes(pg,width,column,columns,height=case['height'] if case else 185.22,
+                              expected_center=case['center_um'] if case else None)
             row['passed']=True
         except Exception as exc:
             row['error']=str(exc)
@@ -233,6 +261,9 @@ if __name__=='__main__':
     p.add_argument('--width',type=float,choices=(219.84,154.08))
     p.add_argument('--primitive-column',type=int,choices=(1,4))
     p.add_argument('--primitive-reserve',action='store_true')
+    p.add_argument('--balanced-case',choices=('west_io','northwest','southwest','primitive1','primitive4'))
     a=p.parse_args()
     if a.primitive_reserve and (a.width is not None or a.primitive_column is None):p.error('Reserve mode uses its one derived width and requires the actual primitive column')
-    inside(a.bundle,a.buffers,a.out,(164.64,) if a.primitive_reserve else ((a.width,) if a.width else (219.84,154.08)),a.primitive_column,a.primitive_reserve)
+    if a.balanced_case and (a.width is not None or a.primitive_column is not None or a.primitive_reserve):p.error('Choose one declared balanced case without other geometry flags')
+    widths=(balanced_case(a.balanced_case)['width'],) if a.balanced_case else ((164.64,) if a.primitive_reserve else ((a.width,) if a.width else (219.84,154.08)))
+    inside(a.bundle,a.buffers,a.out,widths,a.primitive_column,a.primitive_reserve,a.balanced_case)

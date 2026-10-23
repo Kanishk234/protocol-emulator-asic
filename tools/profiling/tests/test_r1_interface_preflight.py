@@ -83,3 +83,21 @@ def test_connected_track_classes_align_different_border_bus_order():
     assert orders['N_IO']['S'][0]['pins']==[r'b\[0\]',r'b\[1\]']
     bad=deepcopy(orders);bad['N_IO']['S'][0]['pins']=[r'b\[0\]']
     with pytest.raises((KeyError,ValueError)):align_pin_orders(design,bad,names)
+
+
+def test_balanced_neighbors_select_each_actual_column_width():
+    from layout_budget import balanced_geometry
+    from interface_preflight import balanced_specs
+    cells={f'Tile_X{x}Y{y}_LUT4x8_ha':dict(type='LUT4x8_ha',connections={}) for x in range(8) for y in range(5)}
+    cells['Tile_X1Y1_LUT4x8_ha']['connections']={'east':[7]}
+    cells['Tile_X2Y1_LUT4x8_ha']['connections']={'west':[7]}
+    design=dict(cells=cells);inventories={}
+    for tile,w,h in balanced_specs(design):
+        right=round(w*1000)
+        inventories[tile,w,h]=dict(die=[0,0,right,round(h*1000)],pins={
+            'east':dict(direction='OUTPUT',boxes=[['Metal3',right-400,1000,right,1400]]),
+            'west':dict(direction='INPUT',boxes=[['Metal3',0,1000,400,1400]])})
+    assert balanced_geometry(1,1)!=(balanced_geometry(2,1))
+    assert check_neighbors(design,inventories,balanced=True)['adjacent_bit_pairs']==1
+    bad=deepcopy(inventories);bad['LUT4x8_ha',164.64,185.22]['die'][2]=154080
+    with pytest.raises(ValueError):check_neighbors(design,bad,balanced=True)

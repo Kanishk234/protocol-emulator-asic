@@ -214,21 +214,40 @@ def prepare(evidence,io,out):
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n');guard()
 
 
-def check_neighbors(design,inventories,width):
+def balanced_specs(design):
+    from layout_budget import balanced_geometry
+    specs=set()
+    for name,cell in design['cells'].items():
+        match=re.fullmatch(r'Tile_X(\d+)Y(\d+)_(.+)',name)
+        if not match or cell['type'] not in MAPPED:raise ValueError('Unexpected balanced fabric instance')
+        specs.add((cell['type'],*balanced_geometry(int(match[1]),int(match[2]))))
+    return sorted(specs)
+
+
+def check_neighbors(design,inventories,width=None,balanced=False):
     """Check actual adjacent cell nets, not inferred port-name pair lists."""
-    for tile,inventory in inventories.items():
-        w,h=footprint(tile,width)
-        if inventory['die']!=[0,0,round(w*1000),round(h*1000)]:
-            raise ValueError('Native tile dimensions differ from declared grid')
-    nets=defaultdict(list);positions={}
+    if not balanced:
+        for tile,inventory in inventories.items():
+            w,h=footprint(tile,width)
+            if inventory['die']!=[0,0,round(w*1000),round(h*1000)]:
+                raise ValueError('Native tile dimensions differ from declared grid')
+    nets=defaultdict(list);positions={};instance_inventory={}
     for name,cell in design['cells'].items():
         m=re.fullmatch(r'Tile_X(\d+)Y(\d+)_(.+)',name)
         if not m or cell['type'] not in MAPPED:raise ValueError('Unexpected fabric instance')
         x,y=int(m[1]),int(m[2]);tile=cell['type'];positions[name]=(x,y,tile)
+        if balanced:
+            from layout_budget import balanced_geometry
+            w,h=balanced_geometry(x,y);inventory=inventories[tile,w,h]
+            if inventory['die']!=[0,0,round(w*1000),round(h*1000)]:
+                raise ValueError('Native tile dimensions differ from balanced column/row')
+        else:inventory=inventories[tile]
+        instance_inventory[name]=inventory
         for port,bits in cell['connections'].items():
             for i,bit in enumerate(bits):
                 if isinstance(bit,int):nets[bit].append((name,port if len(bits)==1 else f'{port}[{i}]'))
-    if len(positions)!=40:raise ValueError('Incomplete assembled grid')
+    if len(positions)!=40 or {(x,y) for x,y,_ in positions.values()}!={(x,y) for x in range(8) for y in range(5)}:
+        raise ValueError('Incomplete assembled grid')
     checked=0;types=Counter();nonadjacent=[]
     for bit,ends in nets.items():
         for i,(a,pa) in enumerate(ends):
@@ -237,7 +256,7 @@ def check_neighbors(design,inventories,width):
                 if a==b:continue
                 if abs(ax-bx)+abs(ay-by)!=1:
                     nonadjacent.append([a,pa,b,pb]);continue
-                ia=inventories[at];ib=inventories[bt]
+                ia=instance_inventory[a];ib=instance_inventory[b]
                 aa=ia['pins'][pa];bb=ib['pins'][pb]
                 if sorted((aa['direction'],bb['direction']))!=['INPUT','OUTPUT']:
                     raise ValueError('Adjacent connection is not one driver and one sink')
@@ -262,7 +281,7 @@ def check_neighbors(design,inventories,width):
     return dict(adjacent_bit_pairs=checked,type_pairs=dict(types),grid_instances=len(positions))
 
 
-def inside(bundle,out):
+def inside(bundle,out,balanced=False):
     from librelane.common import Path as LLPath
     from librelane.flows import SequentialFlow
     from librelane.state import State,DesignFormat
@@ -297,13 +316,15 @@ puts "R1_CELLS\t$counts"
 puts "R1_AREA\t$area"
 puts "R1_CORE\t[$core xMin]\t[$core yMin]\t[$core xMax]\t[$core yMax]"
 ''')
-    result=dict(passed=False,cases={},neighbors={},run=os.environ.get('GITHUB_RUN_ID'),attempt=os.environ.get('GITHUB_RUN_ATTEMPT'),input_manifest_sha256=sha(bundle/'manifest.json'),timing_acceptance=False,physical_acceptance=False)
-    for width in WIDTHS:
+    design=json.loads((bundle/'connections.json').read_text())['modules']['eFPGA']
+    result=dict(passed=False,cases={},neighbors={},balanced=balanced,run=os.environ.get('GITHUB_RUN_ID'),attempt=os.environ.get('GITHUB_RUN_ATTEMPT'),input_manifest_sha256=sha(bundle/'manifest.json'),timing_acceptance=False,physical_acceptance=False)
+    for width in ((None,) if balanced else WIDTHS):
         inventories={}
-        for tile,m in manifest['tiles'].items():
-            key=tile+'-width'+str(width).replace('.','_');folder=out/key;folder.mkdir();row=dict(passed=False)
+        specs=balanced_specs(design) if balanced else [(t,*footprint(t,width)) for t in manifest['tiles']]
+        for tile,w,h in specs:
+            m=manifest['tiles'][tile]
+            key=tile+'-width'+str(w if balanced else width).replace('.','_');folder=out/key;folder.mkdir();row=dict(passed=False,tile=tile,width=w,height=h)
             result['cases'][key]=row
-            w,h=footprint(tile,width)
             try:
                 config=dict(DESIGN_NAME=tile,VERILOG_FILES=[str(bundle/tile/'tile.nl.v')],CLOCK_PERIOD=20,CLOCK_PORT=None,
                             FP_SIZING='absolute',DIE_AREA=[0,0,w,h],BOTTOM_MARGIN_MULT=1,TOP_MARGIN_MULT=1,LEFT_MARGIN_MULT=6,RIGHT_MARGIN_MULT=6,
@@ -324,14 +345,14 @@ puts "R1_CORE\t[$core xMin]\t[$core yMin]\t[$core xMax]\t[$core yMax]"
                 core=list(map(int,next(l for l in text.splitlines() if l.startswith('R1_CORE\t')).split('\t')[1:]))
                 area=int(next(l for l in text.splitlines() if l.startswith('R1_AREA\t')).split('\t')[1]);capacity=(core[2]-core[0])*(core[3]-core[1])
                 if capacity<=0 or area>capacity:raise ValueError('Mapped cells exceed native core')
-                (folder/'pins.json').write_text(json.dumps(inv,indent=2)+'\n');inventories[tile]=inv
+                (folder/'pins.json').write_text(json.dumps(inv,indent=2)+'\n');inventories[(tile,w,h) if balanced else tile]=inv
                 row.update(passed=True,odb_sha256=sha(odb),signal_pins=len(inv['pins']),cells=counts,constant_drivers=extra,cell_area_dbu2=area,core_area_dbu2=capacity)
             except Exception as exc:row['error']=str(exc)
             (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
         try:
-            if set(inventories)!=set(MAPPED):raise ValueError('Missing admitted tile geometry')
-            result['neighbors'][str(width)]=dict(passed=True,**check_neighbors(json.loads((bundle/'connections.json').read_text())['modules']['eFPGA'],inventories,width))
-        except Exception as exc:result['neighbors'][str(width)]=dict(passed=False,error=str(exc))
+            if set(inventories)!=(set(specs) if balanced else set(MAPPED)):raise ValueError('Missing admitted tile geometry')
+            result['neighbors']['balanced' if balanced else str(width)]=dict(passed=True,**check_neighbors(design,inventories,width,balanced))
+        except Exception as exc:result['neighbors']['balanced' if balanced else str(width)]=dict(passed=False,error=str(exc))
     result['passed']=all(r['passed'] for r in result['cases'].values()) and all(r['passed'] for r in result['neighbors'].values())
     (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
     if not result['passed']:raise RuntimeError('All-type pin/core/interface screen failed; outcomes retained')
@@ -340,6 +361,7 @@ puts "R1_CORE\t[$core xMin]\t[$core yMin]\t[$core xMax]\t[$core yMax]"
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('mode',choices=('prepare','inside'))
     for name in ('evidence','io','bundle','out'):p.add_argument('--'+name,type=Path,required=name=='out')
+    p.add_argument('--balanced',action='store_true')
     a=p.parse_args()
     if a.mode=='prepare':prepare(a.evidence,a.io,a.out)
-    else:inside(a.bundle,a.out)
+    else:inside(a.bundle,a.out,a.balanced)

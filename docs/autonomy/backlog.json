@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated": "2026-10-21",
+  "updated": "2026-10-23",
   "authority": "Planning index only; phase checklists and authenticated reports control acceptance.",
   "protected_controls": {
     "frozen_g1": [
@@ -329,9 +329,10 @@
         "39686140206 atb838632: both4/8track jobs57checks+8workloadsPASS; independent all16image/source/model auditsPASS; local10tile elaborationPASS",
         "39689008902 at7f8d1b8: matched62tests+20tilemappings+16compilerimagesPASS; independent pinned-PDK/cell-area audit; fourtrack fullcellcost-1.83%, LUT+2.24%; unchanged G1 outline packing rejected",
         "D105 thirdprofile radix8_2:8736gridbits, local10tile elaboration/live-latch mappingPASS; BUG115 firstdraft rejected/fixed;71focusedchecksPASS",
-        "39696113043 at0690b6b: both controlsSUCCESS with independent71test/source/model/8image audits; reducedradix compiler step still active; local complete fabric elaborationPASS"
+        "39696113043 at0690b6b: both controlsSUCCESS with independent71test/source/model/8image audits; reducedradix compiler step still active; local complete fabric elaborationPASS",
+        "39696703659 at9768c77: seven fits/images audited, secondaryI2C routing600stimeout unresolved; ten mappedcells/pinnedPDK auditPASS; local configured primaryUARTTXRX+SPI0/backpressure/ratePASS;72checkerPASS"
       ],
-      "next_action": "Await bounded reduced-radix compiler outcomes in39696113043; independently audit candidate cost/native cases/images before fit or nonfit claims. Preserve all3profiles; no new sweep. Follow-up source adds complete assembly elaboration and per-case progress persistence.",
+      "next_action": "Authenticate hosted configured-primary check. Keep secondary routing timeout explicit and workflow red; no new graph/seed/budget sweep. Prepare representative mapped tile pin/PDN/core-margin validation, with full shell/physical/function gates open.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

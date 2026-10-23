@@ -1,5 +1,17 @@
 # Bugs
 
+## 116: Bounded routing timeout is reported only as unknown worker failure
+- **Date:**2026-10-23.
+- **Symptom/check:**39696703659 UART+I2C has no native fatal and an unknown classifier result despite explicit600-second watchdog expiry.
+- **Root cause:** failure_record retained exception text but not exception type, budget or observed native stage.
+- **Fix/coverage:** retain TimeoutExpired classification/budget separately from native fatal diagnosis and mark observed routing/placement stage from native log. Regression checks routing timeout leaves native fatal classification unknown. Never infer structural nonfit from watchdog expiry.
+
+## 117: Configured diagnostic harness setup and failure admission
+- **Date:**2026-10-23.
+- **Symptom/check:** initial harness omits inactive bidirectional pad mapping; after setup fix, too-short direct word gaps leave configuration incorrect and h_wready unknown. Cocotb runner returns normally with failed XML.
+- **Root cause:** diagnostic adapter lacks inout default handling, direct configuration headers overlap the stretched frame strobe, and runner completion alone does not prove test success.
+- **Fix/coverage:** tie unused inout inputs safely, space words until frame strobes settle, and require strict executed XML success. Final local configured UART TX/RX+SPI/backpressure/rate checkPASS; source/model hashes retained. Management SPI naturally has larger word gaps; no production configuration RTL changed.
+
 ## 115: Reduced-radix paired LUT choices leave dead shared configuration
 - **Date:**2026-10-21.
 - **Symptom/check:** strict local technology mapping of first radix8_2 draft retains428of438LUT configuration latches and fails admission.

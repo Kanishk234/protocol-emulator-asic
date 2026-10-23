@@ -48,11 +48,7 @@ async def loaded_concurrent_uart_spi(d):
         # The real management SPI path spaces words much farther apart.
         d.cfg_strobe.value=0;await cycle(d,5)
     await cycle(d,10);d.rst_n.value=1;await cycle(d,10)
-    for path in ('Tile_X0Y4_SW_term','Tile_X1Y4_S_IO2'):
-        tile=getattr(d.fabric,path)
-        d._log.info('%s config=%s',path,str(tile.ConfigBits.value))
-    d._log.info('clock in=%s out=%s',d.fabric.Tile_X0Y4_SW_term.GBUF_D_IN.value,
-                d.fabric.Tile_X0Y4_SW_term.GBUF_D_OUT.value)
+    d._log.info('Compiler image loaded through frame FSM; starting pin-level traffic')
 
     async def uart_tx():
         for _ in range(20000):

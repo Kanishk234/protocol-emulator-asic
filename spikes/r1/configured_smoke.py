@@ -16,8 +16,20 @@ import shlex
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
 
+FULL_MAPPED_SHA={
+'E_IO4':'3ddf61bd9cb82af25aeb8396daaa5bf42845ef3ce69aceddbeb1507e3d32e383',
+'LUT4x8_ha':'b743335546eb7cbecd98d9fd129a26855e900ca4f868caea2f5a43167faf6b1a',
+'NE_term':'9a665269d493de74a8791e5dc587f00ad0d22bd41bddfae04e1cf6cce6cb13e3',
+'NW_term':'3f6acfbab923dc4161f741ad1b938978c601292bb1b079e0dc7846f5ccd4c094',
+'N_IO':'f838036ef518e63b18590e410599381f328d0c6fe7b89cfd6e34ebefd22aca92',
+'PRIM2T2S':'c1e0504142bf07a8b2a4bd15f3d931e8d01ddc09b71e6705083e5e58ba6134b1',
+'SE_term':'18a40e0e2ca01d89713ef2feec952cc95fe0b60e5dc1887f9213ae0df9526bc1',
+'SW_term':'a5306fbf62dc1ad6c8446b4cb24a9ff92311d03b86ee2a9973e423d9c8f6eb7c',
+'S_IO2':'79c673ac9028864d5a6d246be3a9ccafa98333ecf9679539af30d4edff7229c9',
+'W_IO4':'6dfe7498d1fc34d3012fa5e977f679ddbc6c72144a939a1aefb585b0a8df1a77'}
 
-def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None):
+
+def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None):
     from cocotb_tools.runner import get_runner
     from compile.bitfile import BitFile
     model,case,out=(Path(p).resolve() for p in (model,case,out))
@@ -73,14 +85,20 @@ eFPGA fabric(
     sources += [lib/'primitives'/n/'fabulous'/(n+'.v') for n in ('FABULOUS_LC','IOBUF','GBUF','SYS_RESET')]
     sources += sorted((lib/'primitives/WARP/fabulous').glob('*.v'))
     sources += [ROOT/'src'/n for n in ('wp_fabric_cfg.v','wp_frame_select.v','fabric_gen/ConfigFSM.v','fabric_gen/Frame_Data_Reg.v')]
-    if mapped_lut is not None:
-        mapped_lut=Path(mapped_lut).resolve();pdk=Path(pdk).resolve()
-        if (manifest.get('radix')!='radix8_2' or
-                hashlib.sha256(mapped_lut.read_bytes()).hexdigest()!=
-                'b743335546eb7cbecd98d9fd129a26855e900ca4f868caea2f5a43167faf6b1a'):
-            raise ValueError('Require exact audited mapped LUT netlist export')
-        sources=[p for p in sources if p!=model/'rtl/LUT4x8_ha.v']
-        sources.append(mapped_lut)
+    mapped=mapped_lut is not None or mapped_bundle is not None
+    if mapped:
+        if mapped_lut is not None and mapped_bundle is not None:raise ValueError('Choose one mapped mode')
+        if manifest.get('radix')!='radix8_2':raise ValueError('Require frozen reduced-radix model')
+        pdk=Path(pdk).resolve()
+        if mapped_bundle is not None:
+            mapped_bundle=Path(mapped_bundle).resolve()
+            replacements={t:mapped_bundle/t/'tile.nl.v' for t in FULL_MAPPED_SHA}
+        else:
+            replacements={'LUT4x8_ha':Path(mapped_lut).resolve()}
+        if any(hashlib.sha256(path.read_bytes()).hexdigest()!=FULL_MAPPED_SHA[t] for t,path in replacements.items()):
+            raise ValueError('Require exact audited mapped tile netlist exports')
+        sources=[p for p in sources if p not in {model/'rtl'/(t+'.v') for t in replacements}]
+        sources.extend(replacements.values())
         revision='2bbec755dc67ca3db0261c3d6163e15735d66710'
         for name in ('sg13cmos5l_stdcell.v','sg13cmos5l_udp.v'):
             path=pdk/'libs.ref/sg13cmos5l_stdcell/verilog'/name
@@ -117,13 +135,16 @@ eFPGA fabric(
                 model_manifest_sha256=hashlib.sha256((model/'resource-control.json').read_bytes()).hexdigest(),
                 simulator=subprocess.run(['iverilog','-V'],capture_output=True,text=True,check=True).stdout.splitlines()[0],
                 tool_binary_sha256=({name:hashlib.sha256((icarus_root/'usr/bin'/name).read_bytes()).hexdigest()
-                                     for name in ('iverilog','vvp')} if mapped_lut is not None else {}),
+                                     for name in ('iverilog','vvp')} if mapped else {}),
                 run=os.environ.get('GITHUB_RUN_ID'),attempt=os.environ.get('GITHUB_RUN_ATTEMPT'),
                 source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                 physical_acceptance=False,timing_acceptance=False,management_spi_shell_tested=False,
-                mapped_lut_tiles_tested=16 if mapped_lut is not None else 0,
-                mapped_primitive_tiles_tested=0,
-                scope=('Configured fabric with mapped LUT tiles and RTL other tiles; no extracted timing, management SPI shell or whole-fabric gate-level acceptance.'
+                mapped_lut_tiles_tested=16 if mapped else 0,
+                mapped_primitive_tiles_tested=2 if mapped_bundle is not None else 0,
+                mapped_tile_instances_tested=40 if mapped_bundle is not None else (16 if mapped else 0),
+                scope=('Configured fabric with all40tile instances mapped, real frame-FSM loading, UART TX/RX plus SPI0/backpressure. No management SPI shell, extracted/SDF timing, post-route or whole-chip acceptance.'
+                       if mapped_bundle is not None else
+                       'Configured fabric with mapped LUT tiles and RTL other tiles; no extracted timing, management SPI shell or whole-fabric gate-level acceptance.'
                        if mapped_lut is not None else
                        'Configured generated RTL UART TX/RX plus SPI mode0 and response backpressure, loading through WARP frame FSM. No management SPI shell or physical timing test.'))
     (out/'configured-smoke.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
@@ -133,7 +154,9 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     for key in ('model','case','out'):parser.add_argument('--'+key,type=Path,required=True)
     parser.add_argument('--mapped-lut',type=Path);parser.add_argument('--pdk',type=Path)
+    parser.add_argument('--mapped-bundle',type=Path)
     parser.add_argument('--icarus-root',type=Path)
     a=parser.parse_args()
-    if (a.mapped_lut is None)!=(a.pdk is None):parser.error('Mapped LUT requires pinned PDK directory')
-    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root)
+    if a.mapped_lut is not None and a.mapped_bundle is not None:parser.error('Choose one mapped mode')
+    if (a.mapped_lut is not None or a.mapped_bundle is not None)!=(a.pdk is not None):parser.error('Mapped tiles require pinned PDK directory')
+    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle)

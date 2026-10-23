@@ -22,3 +22,21 @@ def test_disjoint_signal_pins_and_cross_layer_overlap_are_accepted():
     ({'a':[['M2',0,0,5,10]],'b':[['M2',4,0,10,10]]},{'a','b'})])
 def test_invalid_native_pin_evidence_rejected(boxes,expected):
     with pytest.raises(ValueError):check_pins(inventory(boxes),expected)
+
+
+def test_only_known_disabled_clock_entries_removed():
+    from physical_preflight import physical_pin_order
+    generated={'X0Y0':{'NORTH':[dict(pins=['UserCLKo'],min_distance=None),
+                                dict(pins=['real'],min_distance=None)],
+                       'SOUTH':[dict(pins=['UserCLK'],min_distance=None)]}}
+    order,removed=physical_pin_order(generated,{'real'},True)
+    assert removed==['UserCLK','UserCLKo'] and order['N'][0]['pins']==['real']
+    with pytest.raises(ValueError):physical_pin_order(generated,{'real'},False)
+    generated['X0Y0']['NORTH'].append(dict(pins=['other_missing']))
+    with pytest.raises(ValueError):physical_pin_order(generated,{'real'},True)
+
+
+def test_missing_or_duplicate_actual_pins_never_filtered_out():
+    from physical_preflight import physical_pin_order
+    with pytest.raises(ValueError):physical_pin_order({'X0Y0':{'NORTH':[dict(pins=['a'])]}},{'a','b'},True)
+    with pytest.raises(ValueError):physical_pin_order({'X0Y0':{'NORTH':[dict(pins=['a','a'])]}},{'a'},True)

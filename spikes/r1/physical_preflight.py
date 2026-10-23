@@ -4,6 +4,7 @@ from collections import Counter
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -17,6 +18,38 @@ IMAGE='ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f494940
 
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def signal_names(ports):
+    result=set()
+    for name,port in ports.items():
+        if len(port['bits'])==1:result.add(name)
+        else:result.update(f'{name}[{i}]' for i in range(port.get('offset',0),port.get('offset',0)+len(port['bits'])))
+    return result
+
+
+def physical_pin_order(generated,expected,disabled_user_clk):
+    if set(generated)!={'X0Y0'}:
+        raise ValueError('Expected one ordinary tile in pin-order output')
+    sides={'NORTH':'N','EAST':'E','SOUTH':'S','WEST':'W'}
+    legacy={};removed=[]
+    for side,groups in generated['X0Y0'].items():
+        legacy[sides[side]]=[]
+        for group in groups:
+            pins=[]
+            for pattern in group['pins']:
+                if disabled_user_clk and pattern in ('UserCLK','UserCLKo'):
+                    if pattern in expected:raise ValueError('Disabled user clock exists in mapped ports')
+                    removed.append(pattern)
+                else:pins.append(pattern)
+            if pins:
+                legacy[sides[side]].append({**{k:v for k,v in group.items() if k not in ('max_distance','pins')},'pins':pins})
+    patterns=[p for groups in legacy.values() for group in groups for p in group['pins']]
+    if any(not any(re.fullmatch(pattern,name) for name in expected) for pattern in patterns):
+        raise ValueError('Pin-order pattern names an absent port')
+    if any(sum(bool(re.fullmatch(pattern,name)) for pattern in patterns)!=1 for name in expected):
+        raise ValueError('Mapped port missing or multiply matched in pin policy')
+    return legacy,sorted(removed)
 
 
 def check_pins(inventory,expected):
@@ -81,17 +114,14 @@ def prepare(evidence,io,out):
     api=FABulous_API(VerilogCodeGenerator());api.loadFabric(csv)
     api.gen_io_pin_order_config(api.getTile(TOP),out/'pins-generated.yaml')
     generated=yaml.safe_load((out/'pins-generated.yaml').read_text())
-    if set(generated)!={'X0Y0'}:
-        raise ValueError('Expected one ordinary tile in pin-order output')
-    sides={'NORTH':'N','EAST':'E','SOUTH':'S','WEST':'W'}
-    legacy={sides[side]:[{k:v for k,v in group.items() if k!='max_distance'} for group in groups]
-            for side,groups in generated['X0Y0'].items()}
+    legacy,removed=physical_pin_order(generated,signal_names(module['ports']),api.fabric.disableUserCLK)
     (out/'pins.yaml').write_text(yaml.safe_dump(legacy,sort_keys=False))
     check_model()
     shutil.copyfile(io,out/'io_place.py')
     (out/'ATTRIBUTION.md').write_text('I/O placement: pinned librelane_plugin_fabulous dcc038217472822330b33f61fadbc06e0c3cc96d, Apache-2.0; original header retained. WARP generated design: project Apache-2.0. PDK fetched separately at2bbec755dc67ca3db0261c3d6163e15735d66710.\n')
     manifest=dict(source_run='39696703659',source_revision='9768c77325ca34b93d408f526c0d8c902b62ce4a',
                   mapped_sha256=MAPPED_SHA,files={p.name:sha(p) for p in out.iterdir() if p.is_file()},
+                  removed_disabled_user_clock_ports=removed,
                   expected_cells=dict(counts),expected_ports=module['ports'],
                   widths=[219.84,154.08],height=185.22,physical_acceptance=False,timing_acceptance=False)
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
@@ -130,10 +160,7 @@ foreach inst [$block getInsts] {
 }
 puts "R1_CELL_AREA\t$cell_area"
 ''')
-    expected=set()
-    for name,port in m['expected_ports'].items():
-        if len(port['bits'])==1:expected.add(name)
-        else:expected.update(f'{name}[{i}]' for i in range(port.get('offset',0),port.get('offset',0)+len(port['bits'])))
+    expected=signal_names(m['expected_ports'])
     result=dict(passed=False,stages={},source_run=m['source_run'],
                 input_manifest_sha256=sha(bundle/'manifest.json'),
                 synthesis_executed=False,physical_acceptance=False,timing_acceptance=False,

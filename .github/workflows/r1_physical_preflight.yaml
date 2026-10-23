@@ -44,7 +44,7 @@ jobs:
         run: |
           source .venv/bin/activate
           python -m pytest -q tools/profiling/tests/test_r1_physical_preflight.py --junitxml=build/r1_physical_preflight/checks.xml
-          python -m tools.autonomy.check_xml build/r1_physical_preflight/checks.xml --minimum-cases 6
+          python -m tools.autonomy.check_xml build/r1_physical_preflight/checks.xml --minimum-cases 8
       - name: Prepare exact netlist and generated pin order in isolation
         timeout-minutes: 5
         run: |

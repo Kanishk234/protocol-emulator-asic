@@ -40,3 +40,13 @@ def test_missing_or_duplicate_actual_pins_never_filtered_out():
     from physical_preflight import physical_pin_order
     with pytest.raises(ValueError):physical_pin_order({'X0Y0':{'NORTH':[dict(pins=['a'])]}},{'a','b'},True)
     with pytest.raises(ValueError):physical_pin_order({'X0Y0':{'NORTH':[dict(pins=['a','a'])]}},{'a'},True)
+
+
+def test_legacy_side_groups_preserve_bus_order_without_equal_segment_starvation():
+    from physical_preflight import physical_pin_order
+    generated={'X0Y0':{'EAST':[dict(pins=['data'],min_distance=None,sort_mode='bus_major'),
+                               dict(pins=['frame'],min_distance=None,sort_mode='bus_major')]}}
+    order,_=physical_pin_order(generated,{'data','frame'},True)
+    assert len(order['E'])==1 and order['E'][0]['pins']==['data','frame']
+    generated['X0Y0']['EAST'][1]['min_distance']=3
+    with pytest.raises(ValueError):physical_pin_order(generated,{'data','frame'},True)

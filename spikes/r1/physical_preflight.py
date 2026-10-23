@@ -44,6 +44,14 @@ def physical_pin_order(generated,expected,disabled_user_clk):
                 else:pins.append(pattern)
             if pins:
                 legacy[sides[side]].append({**{k:v for k,v in group.items() if k not in ('max_distance','pins')},'pins':pins})
+    # The pinned legacy placer divides side tracks equally per group. Keep
+    # the ordered buses in one common side group, as in its original policy.
+    for side,groups in legacy.items():
+        if not groups:continue
+        policy={k:v for k,v in groups[0].items() if k!='pins'}
+        if any({k:v for k,v in group.items() if k!='pins'}!=policy for group in groups):
+            raise ValueError('Different per-bus spacing policies cannot be merged')
+        legacy[side]=[{**policy,'pins':[pin for group in groups for pin in group['pins']]}]
     patterns=[p for groups in legacy.values() for group in groups for p in group['pins']]
     if any(not any(re.fullmatch(pattern,name) for name in expected) for pattern in patterns):
         raise ValueError('Pin-order pattern names an absent port')

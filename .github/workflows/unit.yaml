@@ -45,7 +45,7 @@ jobs:
 
       - name: Verilator lint of the whole chip (trw_chip, macro blackboxed)
         run: |
-          verilator --lint-only -Wall -Isrc --top-module trw_chip \
+          verilator --lint-only -Wall scripts/ci/promoted_rtl.vlt -Isrc --top-module trw_chip \
             src/trw_chip.v src/trw_sync.v src/trw_fabric.v src/trw_chan_port.v src/trw_chan_prod.v \
             src/trw_host.v src/trw_spi.v src/trw_lane.v src/trw_alu.v src/trw_slots.v src/trw_sram.v \
             src/trw_pin_cfg.v src/trw_pin_io.v src/trw_pin_tx.v src/trw_pin_rx.v src/trw_pin_bs.v src/trw_pin_unit.v src/trw_pins.v \

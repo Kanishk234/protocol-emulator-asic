@@ -1,0 +1,39 @@
+name: official-flow-package-check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Verify native container and registered flow without hardening
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build reviewed native flow image
+        run: docker build -t tripwire-official:reviewed -f scripts/ci/Dockerfile.tripwire-official scripts/ci
+
+      - name: Check real container plugin and instrumentation parity
+        run: |
+          docker run --rm tripwire-official:reviewed python3 -c '
+          from pathlib import Path
+          import tempfile
+          import librelane, librelane.plugins
+          from librelane.flows import Flow
+          from physical_runtime import native, container_flags
+          from official_openroad_runtime import instrument
+          from native_route_trace_base import instrument as base
+          from wire600_selective_instrument import instrument as selective
+          assert native() and container_flags() == []
+          assert Flow.factory.get("TripwireReproduced") is not None
+          script = (Path(librelane.__file__).parent / "scripts/openroad/rsz_timing_postgrt.tcl").read_text()
+          assert instrument(script, "tripwire-native-incremental-route:local") == base(script, incremental=True)
+          with tempfile.NamedTemporaryFile() as target:
+              expected = selective(script).replace("source /usr/local/share/tripwire/wire600_selective_targets.tcl", "source {"+target.name+"}")
+              assert instrument(script, "tripwire-wire600-selective:local", target.name) == expected
+          print("PASS: real native container, registered flow and exact instrumentation parity; no hardening performed")
+          '

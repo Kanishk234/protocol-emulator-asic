@@ -32,4 +32,7 @@ jobs:
       - name: Verilator lint of the RTL (L0-LINT)
         run: |
           SOURCES=$(python -c 'import yaml; print(" ".join("src/" + f for f in yaml.safe_load(open("info.yaml"))["project"]["source_files"]))')
-          verilator --lint-only -Wall -Isrc --top-module tt_um_tripwire $SOURCES
+          if [ -f src/RM_IHPSG13_1P_512x16_c2_bm_bist.v ]; then
+            SOURCES="$SOURCES src/RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+          fi
+          verilator --lint-only -Wall scripts/ci/promoted_rtl.vlt -Isrc --top-module tt_um_tripwire $SOURCES

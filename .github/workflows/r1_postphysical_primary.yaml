@@ -1,4 +1,4 @@
-name: R1 loaded native critical-leaf primary
+name: R1 loaded complete native-leaf primary
 on:
   workflow_dispatch:
   push:
@@ -7,6 +7,8 @@ on:
       - 'spikes/r1/configured_smoke.py'
       - 'test_internal/r1_configured/**'
       - '.github/workflows/r1_postphysical_primary.yaml'
+      - 'tools/autonomy/r1_balanced_audit.py'
+      - 'tools/autonomy/tests/test_r1_balanced_audit.py'
 permissions:
   contents: read
   actions: read
@@ -34,13 +36,15 @@ jobs:
           gh api repos/$GITHUB_REPOSITORY/actions/runs/39696703659 > build/r1_postphysical/compiler.json
           gh api repos/$GITHUB_REPOSITORY/actions/runs/40013513454 > build/r1_postphysical/mapped.json
           gh api repos/$GITHUB_REPOSITORY/actions/runs/40030916359 > build/r1_postphysical/native.json
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/40033384495 > build/r1_postphysical/remaining.json
           source .venv/bin/activate
           python - <<'PY'
           import json
           from pathlib import Path
           expected={'compiler':('9768c77325ca34b93d408f526c0d8c902b62ce4a',None),
                     'mapped':('8d42ac1202864ac92c6488b75f34c0a63fcbaebf','success'),
-                    'native':('00216eac8dcd14c03503afd17d303118a4d3440f','success')}
+                    'native':('00216eac8dcd14c03503afd17d303118a4d3440f','success'),
+                    'remaining':('c6eba0161edf611270b563a434a06a8731da2cb9','success')}
           for name,(revision,conclusion) in expected.items():
               d=json.loads((Path('build/r1_postphysical')/(name+'.json')).read_text())
               assert d['head_sha']==revision and d['run_attempt']==1
@@ -48,19 +52,32 @@ jobs:
           PY
           gh run download 39696703659 --name r1-model-qualification-39696703659-tracks4-radix8_2 --dir build/r1_post_model
           gh run download 40013513454 --name r1-interfaces-40013513454 --dir build/r1_post_mapped
-          gh run download 40030916359 --pattern 'r1-balanced-leaf-40030916359-*' --dir build/r1_post_balanced
+          gh run download 40030916359 --dir build/r1_post_balanced
+          gh run download 40033384495 --dir build/r1_post_balanced
           bash spikes/cloud/fetch_pdk.sh
           mkdir -p "$HOME/.cache/warp/iverilog-13"
           curl -sfL https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb -o /tmp/r1-post-iverilog13.deb
           dpkg-deb -x /tmp/r1-post-iverilog13.deb "$HOME/.cache/warp/iverilog-13"
-      - name: Load audited image with all seven native critical-leaf instances
+      - name: Independently audit all twenty-six native contexts
+        timeout-minutes: 3
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q tools/autonomy/tests/test_r1_balanced_audit.py --junitxml=build/r1_postphysical/audit-checks.xml
+          python -m tools.autonomy.check_xml build/r1_postphysical/audit-checks.xml --minimum-cases 4
+          PYTHONPATH=tools python -m autonomy.r1_balanced_audit \
+            --baseline build/r1_post_mapped/input --baseline-identity build/r1_postphysical/mapped.json \
+            --critical build/r1_post_balanced --critical-identity build/r1_postphysical/native.json \
+            --remaining build/r1_post_balanced --remaining-identity build/r1_postphysical/remaining.json \
+            --lef "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lef/sg13cmos5l_stdcell.lef" \
+            --out build/r1_postphysical/leaf-audit.json
+      - name: Load audited image with all forty native leaf instances
         timeout-minutes: 5
         run: |
           source .venv/bin/activate
           PYTHONPATH=tools python spikes/r1/configured_smoke.py \
             --model build/r1_post_model/resource --case build/r1_post_model/compile/uart_spi_11 \
             --mapped-bundle build/r1_post_mapped/input \
-            --postphysical-balanced build/r1_post_balanced \
+            --postphysical-complete build/r1_postphysical/leaf-audit.json \
             --pdk build/r1_post_pdk/ihp-sg13cmos5l --out build/r1_postphysical/smoke > build/r1_postphysical/smoke.log 2>&1
       - uses: actions/upload-artifact@v7
         if: always()

@@ -5,8 +5,6 @@ on:
     branches: [efpga]
     paths:
       - 'spikes/r1/interface_preflight.py'
-      - 'spikes/r1/configured_smoke.py'
-      - 'test_internal/r1_configured/**'
       - 'tools/profiling/tests/test_r1_interface_preflight.py'
       - '.github/workflows/r1_interfaces.yaml'
 permissions:

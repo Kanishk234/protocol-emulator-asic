@@ -1,0 +1,72 @@
+name: R1 loaded native critical-leaf primary
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/r1/configured_smoke.py'
+      - 'test_internal/r1_configured/**'
+      - '.github/workflows/r1_postphysical_primary.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-native-primary-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  native_primary:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_post_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate compiler mapped and native sources
+        timeout-minutes: 18
+        run: |
+          scripts/setup_venv.sh
+          mkdir -p build/r1_postphysical
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/39696703659 > build/r1_postphysical/compiler.json
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/40013513454 > build/r1_postphysical/mapped.json
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/40030916359 > build/r1_postphysical/native.json
+          source .venv/bin/activate
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          expected={'compiler':('9768c77325ca34b93d408f526c0d8c902b62ce4a',None),
+                    'mapped':('8d42ac1202864ac92c6488b75f34c0a63fcbaebf','success'),
+                    'native':('00216eac8dcd14c03503afd17d303118a4d3440f','success')}
+          for name,(revision,conclusion) in expected.items():
+              d=json.loads((Path('build/r1_postphysical')/(name+'.json')).read_text())
+              assert d['head_sha']==revision and d['run_attempt']==1
+              if conclusion is not None:assert d['conclusion']==conclusion
+          PY
+          gh run download 39696703659 --name r1-model-qualification-39696703659-tracks4-radix8_2 --dir build/r1_post_model
+          gh run download 40013513454 --name r1-interfaces-40013513454 --dir build/r1_post_mapped
+          gh run download 40030916359 --pattern 'r1-balanced-leaf-40030916359-*' --dir build/r1_post_balanced
+          bash spikes/cloud/fetch_pdk.sh
+          mkdir -p "$HOME/.cache/warp/iverilog-13"
+          curl -sfL https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb -o /tmp/r1-post-iverilog13.deb
+          dpkg-deb -x /tmp/r1-post-iverilog13.deb "$HOME/.cache/warp/iverilog-13"
+      - name: Load audited image with all seven native critical-leaf instances
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools python spikes/r1/configured_smoke.py \
+            --model build/r1_post_model/resource --case build/r1_post_model/compile/uart_spi_11 \
+            --mapped-bundle build/r1_post_mapped/input \
+            --postphysical-balanced build/r1_post_balanced \
+            --pdk build/r1_post_pdk/ihp-sg13cmos5l --out build/r1_postphysical/smoke > build/r1_postphysical/smoke.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-postphysical-primary-${{ github.run_id }}
+          path: build/r1_postphysical/
+          include-hidden-files: true
+          retention-days: 30
+          if-no-files-found: error

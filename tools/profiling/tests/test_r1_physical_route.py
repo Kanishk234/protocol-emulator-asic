@@ -44,3 +44,24 @@ def test_actual_primitive_columns_use_global_grid_phase_without_other_policy_cha
         check_power_boxes(boxes,154.08,column)
         with pytest.raises(ValueError):check_power_boxes(boxes,154.08)
     with pytest.raises(ValueError):routing_policy(154.08,6)
+
+
+def test_measured_reserve_width_keeps_actual_prefix_phase_and_chip_channel_pair():
+    from physical_route import reserve_geometry,RESERVE_COLUMNS
+    from decimal import Decimal
+    report=reserve_geometry()
+    assert Decimal(report['width_um'])==Decimal('164.64')
+    assert Decimal(report['required_width_um'])<=Decimal('164.64')
+    assert Decimal(report['required_width_um'])>Decimal('164.16')
+    assert power_phase(164.64,1,RESERVE_COLUMNS)['center_um']=='9.12'
+    assert power_phase(164.64,4,RESERVE_COLUMNS)['center_um']=='85.92'
+    assert Decimal(report['macro_width_um'])==Decimal('1082.88')
+    # Fixed G1-phase macro origin and core edge; a full east stripe pair remains.
+    end=Decimal('121.44')+Decimal(report['macro_width_um'])
+    assert end<Decimal('1232.64')-Decimal('1.05')
+    assert Decimal('1232.64')+Decimal('4.1')+Decimal('1.05')<Decimal('1286.4')
+    policy=routing_policy(164.64,4,RESERVE_COLUMNS)
+    assert policy['PL_TARGET_DENSITY_PCT']==96 and policy['PL_ROUTABILITY_DRIVEN']
+    assert policy['PDN_VOFFSET']==83.04
+    with pytest.raises(ValueError):routing_policy(164.64,4)
+    with pytest.raises(ValueError):power_phase(164.64,4,(164.64,)*6)

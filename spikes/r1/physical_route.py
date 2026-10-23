@@ -3,7 +3,7 @@
 Frozen mapped logic, two predeclared widths, no synthesis or timing acceptance.
 """
 import argparse
-from decimal import Decimal
+from decimal import Decimal, ROUND_CEILING
 import json
 import os
 from pathlib import Path
@@ -14,20 +14,37 @@ from physical_preflight import TOP,sha
 ROOT=Path(__file__).resolve().parents[2]
 BUFFER_SHA='7b9526fcc9676d6f266e457344c6b71921eebea7e2600c3df489de1475c1f2e6'
 NL_SHA='b743335546eb7cbecd98d9fd129a26855e900ca4f868caea2f5a43167faf6b1a'
+RESERVE_COLUMNS=(154.08,164.64,154.08,154.08,164.64,154.08)
 
 
-def power_phase(width,column=0):
+def reserve_geometry():
+    # Round native three-decimal reports upward, then include the largest
+    # observed reference routability inflation at unchanged 96% density.
+    required=(Decimal('26853.447')+Decimal('225.661'))/(Decimal('.96')*Decimal('177.66'))+Decimal('5.76')
+    width=(required/Decimal('.48')).to_integral_value(rounding=ROUND_CEILING)*Decimal('.48')
+    return dict(width_um=str(width),required_width_um=str(required),
+                column_widths=list(RESERVE_COLUMNS),macro_width_um=str(Decimal('137.28')+sum(map(lambda w:Decimal(str(w)),RESERVE_COLUMNS))),
+                source_run='40014699181',pin_adjusted_area_upper_um2='26853.447',routing_inflation_upper_um2='225.661')
+
+
+def power_phase(width,column=0,columns=None):
     width=Decimal(str(width));pitch=Decimal('109.92')
-    center=(Decimal('12')-Decimal('68.64')-column*width)%pitch
+    if columns is not None:
+        if tuple(columns)!=RESERVE_COLUMNS or width!=Decimal(str(columns[column])):
+            raise ValueError('Only the measured primitive-reserve layout is declared')
+        preceding=sum((Decimal(str(w)) for w in columns[:column]),Decimal(0))
+    else:preceding=column*width
+    center=(Decimal('12')-Decimal('68.64')-preceding)%pitch
     if center<0:center+=pitch
     return dict(center_um=str(center),core_offset_um=str(center-Decimal('2.88')),
                 pitch_um=str(pitch),column=column)
 
 
-def routing_policy(width,column=0):
-    if width not in (219.84,154.08):raise ValueError('Only the two audited footprints are declared')
+def routing_policy(width,column=0,columns=None):
+    if width not in (219.84,154.08) and not (width==164.64 and columns==RESERVE_COLUMNS):
+        raise ValueError('Undeclared footprint')
     if column not in range(6):raise ValueError('Invalid interior column')
-    phase=power_phase(width,column)
+    phase=power_phase(width,column,columns)
     return dict(CLOCK_PERIOD=20,CLOCK_PORT=None,FP_SIZING='absolute',DIE_AREA=[0,0,width,185.22],
                 BOTTOM_MARGIN_MULT=1,TOP_MARGIN_MULT=1,LEFT_MARGIN_MULT=6,RIGHT_MARGIN_MULT=6,
                 VDD_NETS=['VPWR'],GND_NETS=['VGND'],
@@ -45,8 +62,8 @@ def routing_policy(width,column=0):
                     for box in ([0,-1,width,0],[0,185.22,width,186.22],[-1,0,0,185.22],[width,0,width+1,185.22])])
 
 
-def check_power_boxes(boxes,width,column=0):
-    primary=Decimal(power_phase(width,column)['center_um'])*1000
+def check_power_boxes(boxes,width,column=0,columns=None):
+    primary=Decimal(power_phase(width,column,columns)['center_um'])*1000
     centers={'VPWR':primary,'VGND':primary+4100}
     for net,expected in centers.items():
         found=[box for box in boxes if box['net']==net and box['layer']=='Metal4']
@@ -64,7 +81,7 @@ def check_power_boxes(boxes,width,column=0):
                 raise ValueError('Power pin does not span tile height')
 
 
-def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None):
+def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None,primitive_reserve=False):
     from librelane.common import Path as LLPath
     from librelane.flows import SequentialFlow
     from librelane.state import State,DesignFormat
@@ -75,6 +92,9 @@ def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None):
     from cloud_tile_harden import metric_json
     bundle,buffers,out=(Path(p).resolve() for p in (bundle,buffers,out))
     manifest=json.loads((bundle/'manifest.json').read_text())
+    columns=RESERVE_COLUMNS if primitive_reserve else None
+    if primitive_reserve and (primitive_column not in (1,4) or widths!=(164.64,)):
+        raise ValueError('Reserve screen requires one fixed derived width and an actual primitive column')
     if primitive_column is None:
         design=bundle;top=TOP;latches=438;nl_sha=NL_SHA;column=0;source_preflight='39996455894'
         expected_cells=manifest['expected_cells']
@@ -141,6 +161,7 @@ foreach term [$block getBTerms] {
 }
 ''')
     result=dict(passed=False,cases={},source_preflight=source_preflight,mapped_nl_sha256=nl_sha,tile=top,column=column,
+                reserve_geometry=reserve_geometry() if primitive_reserve else None,
                 input_manifest_sha256=sha(bundle/'manifest.json'),buffer_adapter_sha256=BUFFER_SHA,
                 openroad_version=subprocess.check_output(['openroad','-version'],text=True).strip(),
                 synthesis_executed=False,detailed_routing=False,physical_acceptance=False,timing_acceptance=False,
@@ -148,7 +169,7 @@ foreach term [$block getBTerms] {
     (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
     for width in widths:
         name='width'+str(width).replace('.','_');folder=out/name;folder.mkdir()
-        row=dict(passed=False,policy=routing_policy(width,column),power_phase=power_phase(width,column))
+        row=dict(passed=False,policy=routing_policy(width,column,columns),power_phase=power_phase(width,column,columns))
         result['cases'][name]=row
         (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
         config=dict(row['policy'],DESIGN_NAME=top,VERILOG_FILES=[str(design/'tile.nl.v')],
@@ -192,7 +213,7 @@ foreach term [$block getBTerms] {
             for line in text.splitlines():
                 if line.startswith('R1_PG\t'):
                     _,net,layer,*coords=line.split('\t');pg.append(dict(net=net,layer=layer,rect=list(map(int,coords))))
-            row['power_pins']=pg;check_power_boxes(pg,width,column)
+            row['power_pins']=pg;check_power_boxes(pg,width,column,columns)
             row['passed']=True
         except Exception as exc:
             row['error']=str(exc)
@@ -211,4 +232,7 @@ if __name__=='__main__':
     for name in ('bundle','buffers','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--width',type=float,choices=(219.84,154.08))
     p.add_argument('--primitive-column',type=int,choices=(1,4))
-    a=p.parse_args();inside(a.bundle,a.buffers,a.out,(a.width,) if a.width else (219.84,154.08),a.primitive_column)
+    p.add_argument('--primitive-reserve',action='store_true')
+    a=p.parse_args()
+    if a.primitive_reserve and (a.width is not None or a.primitive_column is None):p.error('Reserve mode uses its one derived width and requires the actual primitive column')
+    inside(a.bundle,a.buffers,a.out,(164.64,) if a.primitive_reserve else ((a.width,) if a.width else (219.84,154.08)),a.primitive_column,a.primitive_reserve)

@@ -24,9 +24,10 @@ def power_phase(width,column=0):
                 pitch_um=str(pitch),column=column)
 
 
-def routing_policy(width):
+def routing_policy(width,column=0):
     if width not in (219.84,154.08):raise ValueError('Only the two audited footprints are declared')
-    phase=power_phase(width)
+    if column not in range(6):raise ValueError('Invalid interior column')
+    phase=power_phase(width,column)
     return dict(CLOCK_PERIOD=20,CLOCK_PORT=None,FP_SIZING='absolute',DIE_AREA=[0,0,width,185.22],
                 BOTTOM_MARGIN_MULT=1,TOP_MARGIN_MULT=1,LEFT_MARGIN_MULT=6,RIGHT_MARGIN_MULT=6,
                 VDD_NETS=['VPWR'],GND_NETS=['VGND'],
@@ -44,8 +45,8 @@ def routing_policy(width):
                     for box in ([0,-1,width,0],[0,185.22,width,186.22],[-1,0,0,185.22],[width,0,width+1,185.22])])
 
 
-def check_power_boxes(boxes,width):
-    primary=Decimal(power_phase(width)['center_um'])*1000
+def check_power_boxes(boxes,width,column=0):
+    primary=Decimal(power_phase(width,column)['center_um'])*1000
     centers={'VPWR':primary,'VGND':primary+4100}
     for net,expected in centers.items():
         found=[box for box in boxes if box['net']==net and box['layer']=='Metal4']
@@ -63,7 +64,7 @@ def check_power_boxes(boxes,width):
                 raise ValueError('Power pin does not span tile height')
 
 
-def inside(bundle,buffers,out,widths=(219.84,154.08)):
+def inside(bundle,buffers,out,widths=(219.84,154.08),primitive_column=None):
     from librelane.common import Path as LLPath
     from librelane.flows import SequentialFlow
     from librelane.state import State,DesignFormat
@@ -74,7 +75,18 @@ def inside(bundle,buffers,out,widths=(219.84,154.08)):
     from cloud_tile_harden import metric_json
     bundle,buffers,out=(Path(p).resolve() for p in (bundle,buffers,out))
     manifest=json.loads((bundle/'manifest.json').read_text())
-    if sha(bundle/'tile.nl.v')!=NL_SHA or sha(buffers)!=BUFFER_SHA:
+    if primitive_column is None:
+        design=bundle;top=TOP;latches=438;nl_sha=NL_SHA;column=0;source_preflight='39996455894'
+        expected_cells=manifest['expected_cells']
+    else:
+        if primitive_column not in (1,4):raise ValueError('Only actual primitive columns are declared')
+        design=bundle/'PRIM2T2S';top='PRIM2T2S';latches=334;column=primitive_column;source_preflight='40013513454'
+        nl_sha='c1e0504142bf07a8b2a4bd15f3d931e8d01ddc09b71e6705083e5e58ba6134b1'
+        tile=manifest['tiles'][top]
+        if tile['mapped_sha256']!='8dbbb5a187251d323ece80a6abad473f00b2aaac041c9d89907b8519d6137f24':
+            raise ValueError('Changed primitive mapping provenance')
+        expected_cells=tile['expected_cells']
+    if sha(design/'tile.nl.v')!=nl_sha or sha(buffers)!=BUFFER_SHA:
         raise ValueError('Changed frozen netlist or pinned buffer adapter')
     if any(sha(bundle/name)!=digest for name,digest in manifest['files'].items()):
         raise ValueError('Prepared native inputs changed')
@@ -128,24 +140,24 @@ foreach term [$block getBTerms] {
   }
 }
 ''')
-    result=dict(passed=False,cases={},source_preflight='39996455894',mapped_nl_sha256=NL_SHA,
+    result=dict(passed=False,cases={},source_preflight=source_preflight,mapped_nl_sha256=nl_sha,tile=top,column=column,
                 input_manifest_sha256=sha(bundle/'manifest.json'),buffer_adapter_sha256=BUFFER_SHA,
                 openroad_version=subprocess.check_output(['openroad','-version'],text=True).strip(),
                 synthesis_executed=False,detailed_routing=False,physical_acceptance=False,timing_acceptance=False,
-                scope='Representative first-column LUT PDN/placement/global routing only. Null clock port; no configured timing, signoff or whole-chip acceptance.')
+                scope='Representative tile/declared-column PDN/placement/global routing only. Null clock port; no configured timing, signoff or whole-chip acceptance.')
     (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
     for width in widths:
         name='width'+str(width).replace('.','_');folder=out/name;folder.mkdir()
-        row=dict(passed=False,policy=routing_policy(width),power_phase=power_phase(width))
+        row=dict(passed=False,policy=routing_policy(width,column),power_phase=power_phase(width,column))
         result['cases'][name]=row
         (out/'result.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
-        config=dict(row['policy'],DESIGN_NAME=TOP,VERILOG_FILES=[str(bundle/'tile.nl.v')],
-                    IO_PIN_ORDER_CFG=str(bundle/'pins.yaml'))
+        config=dict(row['policy'],DESIGN_NAME=top,VERILOG_FILES=[str(design/'tile.nl.v')],
+                    IO_PIN_ORDER_CFG=str(design/'pins.yaml'))
         try:
             flow=Route(config,design_dir=str(bundle),pdk='ihp-sg13cmos5l',pdk_root=os.environ['PDK_ROOT'])
             (folder/'policy.json').write_text(json.dumps(dict(config=config,steps=[s.id for s in flow.Steps]),indent=2)+'\n')
-            state=flow.start(with_initial_state=State({DesignFormat.NETLIST:LLPath(str(bundle/'tile.nl.v')),
-                       DesignFormat.JSON_HEADER:LLPath(str(bundle/'header.json'))}),_force_run_dir=str(folder))
+            state=flow.start(with_initial_state=State({DesignFormat.NETLIST:LLPath(str(design/'tile.nl.v')),
+                       DesignFormat.JSON_HEADER:LLPath(str(design/'header.json'))}),_force_run_dir=str(folder))
             metrics=state.metrics.to_raw_dict();row['metrics']=metrics
             logs=list(folder.glob('*-openroad-globalrouting/openroad-globalrouting.log'))
             if len(logs)!=1:raise ValueError('Missing/ambiguous native global-route log')
@@ -169,9 +181,9 @@ foreach term [$block getBTerms] {
             if any(row['final_power_grid_violations'].values()):
                 raise ValueError('Final placed design power-grid check failed')
             row['native_cells']=dict(zip(counts[::2],map(int,counts[1::2])))
-            if row['native_cells'].get('sg13cmos5l_dlhq_1')!=438:
+            if row['native_cells'].get('sg13cmos5l_dlhq_1')!=latches:
                 raise ValueError('Configuration storage changed during physical flow')
-            for master,count in manifest['expected_cells'].items():
+            for master,count in expected_cells.items():
                 if master=='$scopeinfo' or master.startswith('sg13cmos5l_buf_'):continue
                 if row['native_cells'].get(master,0)!=count:
                     raise ValueError('Original mapped cell count changed: '+master)
@@ -180,7 +192,7 @@ foreach term [$block getBTerms] {
             for line in text.splitlines():
                 if line.startswith('R1_PG\t'):
                     _,net,layer,*coords=line.split('\t');pg.append(dict(net=net,layer=layer,rect=list(map(int,coords))))
-            row['power_pins']=pg;check_power_boxes(pg,width)
+            row['power_pins']=pg;check_power_boxes(pg,width,column)
             row['passed']=True
         except Exception as exc:
             row['error']=str(exc)
@@ -198,4 +210,5 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     for name in ('bundle','buffers','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--width',type=float,choices=(219.84,154.08))
-    a=p.parse_args();inside(a.bundle,a.buffers,a.out,(a.width,) if a.width else (219.84,154.08))
+    p.add_argument('--primitive-column',type=int,choices=(1,4))
+    a=p.parse_args();inside(a.bundle,a.buffers,a.out,(a.width,) if a.width else (219.84,154.08),a.primitive_column)

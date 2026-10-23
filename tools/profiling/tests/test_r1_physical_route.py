@@ -30,3 +30,17 @@ def test_global_power_phase_and_full_height_are_required():
     with pytest.raises(ValueError):check_power_boxes(boxes[:1],154.08)
     boxes[0]['rect'][0]+=1
     with pytest.raises(ValueError):check_power_boxes(boxes,154.08)
+
+
+def test_actual_primitive_columns_use_global_grid_phase_without_other_policy_changes():
+    base=routing_policy(154.08)
+    for column,center,offset in [(1,9.12,6.24),(4,96.48,93.60)]:
+        policy=routing_policy(154.08,column)
+        assert policy['PDN_VOFFSET']==offset
+        assert {k for k in base if base[k]!=policy[k]}=={'PDN_VOFFSET'}
+        c=round(center*1000)
+        boxes=[dict(net='VPWR',layer='Metal4',rect=[c-1050,0,c+1050,185220]),
+               dict(net='VGND',layer='Metal4',rect=[c+3050,0,c+5150,185220])]
+        check_power_boxes(boxes,154.08,column)
+        with pytest.raises(ValueError):check_power_boxes(boxes,154.08)
+    with pytest.raises(ValueError):routing_policy(154.08,6)

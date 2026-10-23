@@ -5,3 +5,10 @@ D106 freezes the audited LUT cell netlist from39696703659, including438configura
 Two fixed widths219.84and154.08µm at185.22µm height use the same mapped cells, margins and I/O policy. This is a floorplan/pin hypothesis, not a chip-outline decision. Pinned LibreLane stages import the netlist, create floorplan rows, connect power metadata and place signal pins. Native checks require all210ports with positive nonoverlapping same-layer rectangles inside the die, exact cell counts/438latches, and cell area no larger than the actual placeable core. Six admission-check tests pass locally; final input preparation succeeds under build/r1_physical_prepared_native.
 
 No local Docker/native physical run is claimed. Hosted workflow pending. CLOCK_PORT=null and absence of placement/PDN/routing stages mean no timing, power-grid connectivity, routed/signoff or chip-fit acceptance. Per-column PG phase, actual routing/buffers, loaded mapped behavior and real-shell integration remain later gates. No full-chip hardening attempt used.
+
+
+## First native run and bounded adapter correction
+
+39986366251 at01604c9 passes source preparation and six checker cases, then imports the frozen cells and completes floorplan setup. Strict custom I/O placement stops before its result because the generated policy names UserCLK/UserCLKo although DisableUserCLK is true. Narrowed geometry is not reached; this is a pin-policy compatibility failure, not an architectural fit result. Native artifacts retained under build/r1_physical_hosted. BUG119.
+
+The owned adapter now removes only those two exact disabled/absent entries, validates every other policy pattern against the full mapped interface, and requires each real pin once. Eight focused checker cases pass; fixed local preparation preserves original model hashes and records exactly those two removals. Native unmatched checks remain both. Retry uses identical cells, footprints, margins and tools; no budget/seed/graph change.

@@ -1,5 +1,11 @@
 # Bugs
 
+## 119: Physical pin generator emits disabled user-clock ports
+- **Date:**2026-10-23.
+- **Symptom/check:** native39986366251 imports/floorplans the frozen netlist, then strict I/O placement rejects UserCLK and UserCLKo, which are absent from the actual210-bit interface.
+- **Root cause:** the FABulous2.2pin-order helper emits these entries despite the fabric's DisableUserCLK flag.
+- **Fix/coverage:** owned adapter removes exactly these two names only when disabled and absent from the mapped interface. Every remaining pattern must match a real port and every real port must match once; unmatched-native checks stay both. Tests reject any other absent/duplicate/missing pin. Local fixed preparation records the two removals and preserves model hashes. No new native success or footprint nonfit inferred from the first setup failure.
+
 ## 118: Physical pin preparer rewrites retained primitive metadata
 - **Date:**2026-10-23.
 - **Symptom/check:** initial preparer passes source admission, then model-hash guard rejects six regenerated primitive JSON files after FABulous loadFabric on relocated artifact paths.

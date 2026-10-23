@@ -330,9 +330,11 @@
         "39689008902 at7f8d1b8: matched62tests+20tilemappings+16compilerimagesPASS; independent pinned-PDK/cell-area audit; fourtrack fullcellcost-1.83%, LUT+2.24%; unchanged G1 outline packing rejected",
         "D105 thirdprofile radix8_2:8736gridbits, local10tile elaboration/live-latch mappingPASS; BUG115 firstdraft rejected/fixed;71focusedchecksPASS",
         "39696113043 at0690b6b: both controlsSUCCESS with independent71test/source/model/8image audits; reducedradix compiler step still active; local complete fabric elaborationPASS",
-        "39696703659 at9768c77: seven fits/images audited, secondaryI2C routing600stimeout unresolved; ten mappedcells/pinnedPDK auditPASS; local configured primaryUARTTXRX+SPI0/backpressure/ratePASS;72checkerPASS"
+        "39696703659 at9768c77: seven fits/images audited, secondaryI2C routing600stimeout unresolved; ten mappedcells/pinnedPDK auditPASS; local configured primaryUARTTXRX+SPI0/backpressure/ratePASS;72checkerPASS",
+        "39983146325 at0ade702: hosted configured primaryPASS; independent1XML/45inputs and72checker/sevenimage audits; secondary stillroutingtimeout. D106 exactmapped physical preflight39986366251 active;78localchecksPASS",
+        "39986366251 import/floorplan setupPASS, strictIO setupFAILphantom disabled UserCLK/CLKo; BUG119 whitelist+complete realpin matching fixes prepared;8focusedtestsPASS"
       ],
-      "next_action": "Authenticate hosted configured-primary check. Keep secondary routing timeout explicit and workflow red; no new graph/seed/budget sweep. Prepare representative mapped tile pin/PDN/core-margin validation, with full shell/physical/function gates open.",
+      "next_action": "Run unchanged-geometry native preflight retry after exact disabled-clock policy fix; audit all210pins/nativecellcounts/corearea. No footprint/routing/timing result yet; keep secondary timeout and full-shell gates explicit.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-23 — Diagnose stock baseline launch failure
+
+- Read failed39994480535 log: source preparation/official configuration passed, stock image pulled, but Docker launch failed with input device is not a TTY before synthesis. No timing/electrical baseline was produced. Root cause is omitted --docker-no-tty in the separate diagnostic; BUG139 records it.
+- Added --docker-no-tty before --dockerized, matching the existing physical runtime helper and pinned CLI option-order requirement. Real LibreLane3.1.0.dev3 Click CLI with intercepted container launch confirms fixed workflow forwards tty=False; old control forwards tty=True. Stock image and remaining arguments unchanged. Shell syntax/diff checks pass. No official template, RTL, constraints, project configuration or checker changes.
+- Next publish scoped CI/evidence fix and relaunch only the stock pre-DRT screen. No phase boxes ticked. Initial read-only log request's automatic approval review timed out; authorized retry succeeded without additional user permission. Watcher stays stopped.
+
+## 2026-10-23 — Publish and launch the approved stock baseline screen
+
+- User explicitly authorized executing the supplied commit/push/launch commands. Published scoped commits0919d9c(inputs),93deb2d(separate CI),4071fa8(withdrawal/evidence). Verified remote main4071fa8530c395f0a509e7e17c2af18628e08a21. Outgoing src/info/macro/official-gds history was empty; official workflow and main hardware remain unchanged. Unrelated dirty files/local-only FIPE note excluded.
+- Launched [39994480535](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39994480535) on exact4071fa8; verified in_progress. Full-design preparation, source/macro/workflow identity checks, official tool checkout and dependency setup passed. IHP PDK installation active at inspection. Stock Classic screen stops before DetailedRouting; no automatic routing, custom image/repair Tcl/ECO or official signoff claim.
+- Corrected run-directory creation before publication to satisfy LibreLane force-run-dir validation; shell/Python syntax, actual Classic stop-point API and source patch checks pass. No phase boxes ticked. Next inspect stock pre-DRT measurements; fix actual failures before any route continuation. This launch receipt is local until the next evidence publication. No autonomous watcher restarted.
+
 ## 2026-10-23 — Validate full stock-flow project and prepare stock-only screen
 
 - Assembled ignored build/stock-official-20261023 from main archive plus the21-file design-only patch. Copied and SHA-verified all8pinned SRAM views. Main src/config/RTL/official gds.yaml remain unchanged.

@@ -20,6 +20,15 @@ IMAGE='ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f494940
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def check_import_counts(actual,original):
+    # OpenROAD materializes Verilog literals as one physical driver each.
+    expected=dict(original)
+    for cell in ('sg13cmos5l_tiehi','sg13cmos5l_tielo'):
+        expected[cell]=expected.get(cell,0)+1
+    if actual!=expected:
+        raise ValueError('Native mapped cell census differs beyond the two constant drivers')
+
+
 def signal_names(ports):
     result=set()
     for name,port in ports.items():
@@ -157,6 +166,14 @@ def inside(bundle,out):
 set counts [dict create]
 foreach inst [$block getInsts] {
   dict incr counts [[$inst getMaster] getName]
+  set master [[$inst getMaster] getName]
+  if {$master in {sg13cmos5l_tiehi sg13cmos5l_tielo}} {
+    foreach pin [$inst getITerms] {
+      if {[[$pin getMTerm] getIoType] eq "OUTPUT"} {
+        puts "R1_TIE\t$master\t[[$pin getMTerm] getName]\t[[$pin getNet] getName]"
+      }
+    }
+  }
 }
 puts "R1_CELLS\t$counts"
 set core [$block getCoreArea]
@@ -197,7 +214,10 @@ puts "R1_CELL_AREA\t$cell_area"
             counts=dict(zip(counts_line[::2],map(int,counts_line[1::2])))
             if counts.get('sg13cmos5l_dlhq_1')!=438:raise ValueError('Native configuration storage changed')
             original={name:count for name,count in m['expected_cells'].items() if name!='$scopeinfo'}
-            if counts!=original:raise ValueError('Native mapped cell census changed during import')
+            check_import_counts(counts,original)
+            constants={tuple(line.split('\t')[1:]) for line in text.splitlines() if line.startswith('R1_TIE\t')}
+            if constants!={('sg13cmos5l_tiehi','L_HI','one_'),('sg13cmos5l_tielo','L_LO','zero_')}:
+                raise ValueError('Native constant driver binding differs')
             core=list(map(int,next(l for l in text.splitlines() if l.startswith('R1_CORE\t')).split('\t')[1:]))
             cell_area=int(next(l for l in text.splitlines() if l.startswith('R1_CELL_AREA\t')).split('\t')[1])
             core_area=(core[2]-core[0])*(core[3]-core[1])
@@ -206,7 +226,8 @@ puts "R1_CELL_AREA\t$cell_area"
             (out/(name+'-pins.json')).write_text(json.dumps(pins,indent=2)+'\n')
             result['stages'][name]=dict(width=width,signal_pins=len(pins['pins']),configuration_latches=438,
                                        odb_sha256=sha(odb),cells=counts,core_record=[l for l in text.splitlines() if l.startswith('R1_CORE')])
-            result['stages'][name].update(core_area_dbu2=core_area,cell_area_dbu2=cell_area)
+            result['stages'][name].update(core_area_dbu2=core_area,cell_area_dbu2=cell_area,
+                                         constant_drivers=sorted(constants))
         result['passed']=True
     except Exception as exc:
         result['error']=str(exc)

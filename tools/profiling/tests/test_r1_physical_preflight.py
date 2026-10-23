@@ -50,3 +50,14 @@ def test_legacy_side_groups_preserve_bus_order_without_equal_segment_starvation(
     assert len(order['E'])==1 and order['E'][0]['pins']==['data','frame']
     generated['X0Y0']['EAST'][1]['min_distance']=3
     with pytest.raises(ValueError):physical_pin_order(generated,{'data','frame'},True)
+
+
+def test_native_import_accepts_only_two_physical_constant_drivers():
+    from physical_preflight import check_import_counts
+    original={'sg13cmos5l_dlhq_1':438,'sg13cmos5l_mux2_1':8}
+    actual={**original,'sg13cmos5l_tiehi':1,'sg13cmos5l_tielo':1}
+    check_import_counts(actual,original)
+    for changed in ({**actual,'sg13cmos5l_dlhq_1':437},
+                    {**actual,'sg13cmos5l_tiehi':2},
+                    {**actual,'sg13cmos5l_buf_1':1},original):
+        with pytest.raises(ValueError):check_import_counts(changed,original)

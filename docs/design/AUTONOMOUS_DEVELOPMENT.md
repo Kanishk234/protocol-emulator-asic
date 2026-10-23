@@ -40,6 +40,8 @@ Representative first-column LUT run40009049924 now completes PDN/placement/GRT a
 
 D108/D109now pass in40013513454 at8d42ac1:20native tile/footprint cases,3064actual neighbor bit pairs at each width and all40mapped primary1strictPASS. Root88prepared/47functional/twoexecutable plus native geometry/census/area/ODB auditPASS. BUG125duplicate port assignments fixed without added hardware; BUG126canonical connected-track ordering fixed. Next D110primitive routing at actual columns1/4, both existing widths; same fixed physical policy. Bare narrow PRIM93.961%occupied before buffers. Border power/routing and remaining LUT phases/full-grid/timing remain open.
 
+D110/D111now measured:40014699181wide primitive cases pass; uniform154.08fails GPL-0301 effective pin-adjusted101.909%. One derived164.64leaf width passes both tested phases in40027428283 (zero final GRT/PGerrors,334latches). BUG129rejects the unbalanced full layout's unpowered eastborder. Next D112static reallocation west47.52/interior[154.08,164.64,154.08,154.08,164.64,154.08]/east68.64keeps1061.76outerwidth and all8column staticpowerpairs. Run native narrowedwest3types, newPRIMphases30.24/107.04and changed interfaces before full-grid integration. See layout_budget.py/report and backlog; static gates do not establish physical/timing acceptance.
+
 ## Current priority and protected results
 
 Phase 5 is complete as of October 19: the fresh GDS/gate-test run39280550500,

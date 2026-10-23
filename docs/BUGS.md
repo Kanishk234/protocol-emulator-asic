@@ -871,3 +871,9 @@ validation. Next coverage adds real USER_RESET and preserves candidate netlists.
 - **Symptom/check:**40014699181 both154.08µm primitive columns fail GPL-0301 before routing; both219.84µm cases pass final global overflow/PGchecks.
 - **Root cause:** narrow core26350.5312µm², physical cells+92output buffers25427.0016µm², native pin-density area adjustment1426.445µm² rounded. Effective26853.446µm² exceeds core (101.909%). GPL/DPLpadding are both0; raising placement density cannot fix this capacity failure. Uniform154.08primitive outline rejected; no evidence of compiler/config/latch loss.
 - **Proposed coverage:** D111one measured corrective width164.64only at primitive columns, preserving96%density/routability reserve/graph/layers/clock. Derived using rounded-up pin-adjusted area plus largest225.660µm² reference routing inflation; core-height/margins/site grid fixed.57local R1testsPASS; corrected native routing pending. No whole-grid/timing acceptance.
+
+## 129: External east power pair does not prove east-border tile is powered
+- **Date:**2026-10-23.
+- **Symptom/check:** D111primitive growth1082.88µm outer width retains a chip east-channel pair, but fixed68.64east-border tile starts at macro-local1014.24 and its next VPWRstripe is local96.96, outside the tile.
+- **Root cause:** chip-channel geometric check misses each leaf's independent Metal4grid phase. The leaf primitive routing pass does not qualify the proposed full layout.
+- **Fix/coverage:** static layout_budget.py checks a complete in-core VPWR/VGNDpair in all eight column footprints and rejects this layout. D112reallocate21.12µm from underfilled west border (68.64→47.52) to two primitive columns, preserving1061.76outerwidth/eastborderphase8.16. Pure arithmetic/onebuffer-per-output model passes; native westborder/newprimitive-phase/interface gates still required.60local R1testsPASS; no production change.

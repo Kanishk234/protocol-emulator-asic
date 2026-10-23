@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (primitive reserve routes; full-layout power catch retained)
+**Actual:**40027428283 atb2c54f9 attempt1SUCCESS both164.64primitive leaves; zero final GRT/PGviolations,334latches/2906power terminals,90.0816%native utilization. Root source/ODB/config/PG/finaltable auditPASS. Prior all20tile/interfaces and40mapped primary40013513454 remain authenticated; G1protected.
+**New integration finding:** D111unbalanced growth leaves eastborderunpowered despite an external chip pair (BUG129). Reject full-layout proposal, retain passing primitive width. D112static reallocation west68.64→47.52offsets the two widerprimitive columns exactly, restores old1061.76outerwidth/eastPGphase. All8column static power gates pass; westbare+onebuf/output modeled reserve remains.60local R1testsPASS; source/hash guarded budget artifact build/r1_layout_budget/budget.json.
+**Next:** native narrowed W_IO4/NW/SWpin/core/PDN/placement/GRT plus primitive newphases30.24/107.04 and changed-column interfaces, then complete-grid integration. These new physical gates are not run yet. Full-grid/detailed routing/configured timing/equal-area replacement and secondaryI2Ccompiler timeout remain open. No full-chip attempt or phase boxes consumed.
+
 ## 2026-10-23 (primitive routing result; one measured capacity correction)
 **Actual:**40014699181 at90f9f79: bothwide primitive columnsPASS zero final GRT/PGviolations,334latches/92buffers/2906power terminals; identical routed ODB. Bothnarrow fail before routing with effective pin-adjusted101.909%utilization, not padding or iteration shortage. Matched LUT40014699032 bothwidthsSUCCESS. Root four-outcome/hash/config/PG/finaltable/stage auditPASS.
 **Next:** D111one derived164.64width in two primitive columns, fixed96%density and physical policy, actual heterogeneous prefix PGphases. Proposed macro1082.88width fits geometric chip bounds/full east power pair; no whole-grid routing promise.57local R1testsPASS. Original rejected uniform matrix manual-only; no new graph/seed/clock/layer/density sweep or full-chip attempt. Other tile/column integration/timing stillopen; G1protected.

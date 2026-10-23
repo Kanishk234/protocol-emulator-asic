@@ -64,3 +64,6 @@ Run40009616432 at6b2908894d2eefe53bbb1e523d5e924761ef6e8f attempt1 passes both21
 
 ### R1 all-type interfaces and all-mapped primary (2026-10-23)
 40013513454 at8d42ac1202864ac92c6488b75f34c0a63fcbaebf attempt1SUCCESS qualifies20native tile/footprint pin/core cases and3064actual neighbor bit pairs at each fixed width. Same run loads the primary UARTTX/RX+SPI0image into a fabric with all40tile instances mapped and passes1strict traffic/backpressure/rate test. Root audit:88prepared/47functional input/twoexecutable hashes,16checker cases, native pin/cell/area/core/ODB and connected-edge recomputation. See reports/r1_interfaces_20261023.md and r1_full_mapped_20261023.md. Scope excludes management SPI shell, other-type PDN/physical routing, extracted timing and whole-chip/equal-total-area acceptance; only the primary sample is exercised.
+
+### Primitive reserve leaf routing (2026-10-23)
+40027428283 atb2c54f97e26ead978a8eb615f9f13619d8108b64 passes two164.64µm primitive leaf cases at phases9.12/85.92µm with334latches, zero final global overflow/PGviolations and90.0816%native core utilization. Root source/ODB/config/PG/congestion replay checked. Wider-layout integration is rejected by static east-border PGphase (BUG129); D112balanced geometry and its different phases remain unqualified. No complete-fabric, timing or equal-area advantage claimed.

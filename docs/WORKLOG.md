@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (balanced critical physical gates pass; native function replay)
+**Actual:**40030916359 at00216ea attempt1SUCCESS:13native geometries/3064neighbor pairs, all5critical leaves zero final GRT/PGviolations. Root source88hashes/18strictguards/nativepins/cells/LEF-area/core/13ODB/allconnections plus5finalsignalpin/phase/PG/census/ODB auditPASS. WestWIO74.1991%,NW9.90274%,SW68.5234%,PRIM90.0816%native utilization. No full-grid or timing acceptance.
+**Functional front:** D113loads unchanged primary image with7native critical-leaf instances and33mapped baseline instances. Local1strictPASS/52input hashes; both nativePRIMexports byte-identical to prior passing size. Hosted committed-source replay prepared;64localR1testsPASS.
+**Next:** authenticate hosted native-function replay, then remaining21leaf/type/phase combinations (including empty NEpass-through handling) and full-grid integration. ManagementSPI shell/detailed routing/SDF/configured timing/secondaryI2Ctimeout remain open. G1protected; no phase boxes or whole-chip attempts.
+
 ## 2026-10-23 (balanced native qualification implemented)
 **Done:** D112input capsule reused from authenticated40013513454; no RTL/model regeneration or synthesis. Actual40instances derive13native geometries and3064neighbor bit pairs with per-instance dimensions. Five dependent physical jobs cover narrowedwest W_IO4/NW/SWand balancedprimitivephases30.24/107.04. Shared runner preserves original policies, adds final routed pin/direction/PGgeometry checks for185.22/56.7heights.64localR1testsPASS,18focused guards. Old unbalanced reserve workflow manual-only; G1protected.
 **Next:** push/inspect native interface gate, then five independent PG/placement/GRTcases; retain any failures and audit actual artifacts. Other leaf phases/postphysical function/full-grid/detailed routing/configured timing remain open; secondaryI2Ctimeout preserved. No phase boxes/full-chip attempt consumed.

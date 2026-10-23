@@ -74,5 +74,9 @@
     "proposed": [
       "RM_IHPSG13_.*"
     ]
+  },
+  "PL_RESIZER_SETUP_SLACK_MARGIN": {
+    "main": null,
+    "proposed": 0
   }
 }

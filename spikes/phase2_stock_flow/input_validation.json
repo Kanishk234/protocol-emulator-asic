@@ -6,8 +6,11 @@
   "canonical_generation_passed": true,
   "stock_stop_point_verified": "OpenROAD.STAMidPNR-3 immediately before OpenROAD.DetailedRouting",
   "official_workflow_unchanged": true,
-  "project_config_sha256": "9585550fc035c458aeb6e0653050e81e117917c4b89b3641c9fef4b199e5dd03",
+  "project_config_sha256": "c05808b842fe01516745ac1a206528547b62e6399dc172a56caed2e9cf9bbf76",
   "stock_constraints": "Default base.sdc; no latch false paths or explicit uncertainty reduction",
   "checker_waivers_added": false,
-  "physical_run_started": false
+  "physical_run_started": false,
+  "baseline_run": 39996448720,
+  "baseline_result": "timeout in post-CTS setup-margin repair",
+  "followup": "One project setting: PL_RESIZER_SETUP_SLACK_MARGIN=0; unchanged stock flow and signoff gates"
 }

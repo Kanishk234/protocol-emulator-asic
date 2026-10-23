@@ -3,6 +3,11 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (hosted complete native pass; configuration state observed)
+**Actual:**40037694777 at75529b6 attempt1SUCCESS: independent26leaf audit/4guardcases and all40native primary1strictPASS. Root48inputs/twoexecutables/XML/source/audit reauthPASS. No assembled macro or timing acceptance.
+**New verification:** D116read-only native Qcapture yields8736defined configuration values after image loading; exact per-instance counts. Input review finds BUG130auxiliary reset was omitted from diagnostic adapter; corrected~rst_npolarity matches production, all43scalarinputs driven. Corrected local all40native primary1strictPASS; snapshot484e7383…unchangedbyfix.71focused testsPASS. Hosted corrected/config-observed replay prepared.
+**Next:** audit corrected hosted gate, then RUN-onlyestimated timing using observed configuration and detailed-route/macro/shell integration. Snapshot is not an independent expected-bit check or timing result. G1protected; no phase boxes/full-chip attempts; secondaryI2Ctimeout explicit.
+
 ## 2026-10-23 (all balanced global leaf contexts pass; complete native function)
 **Actual:**40033384495 atc6eba01 attempt1SUCCESS all21remaining contexts+13guards. Together with40030916359critical5, all26leaf contexts cover40instances. Reusable independent auditPASS: API/source/88inputs/completeactualcontext coverage/cell-config-LEFarea/ODB/policy/absolutePGphase/unchanged signalpins; emptyNEall52native feedthroughs have guides,0cells and3326µmglobalwirelength. Ten native exports byte-identical pertype acrosscontexts.70focused testsPASS.
 **Functional:**40032527005 at71d902aSUCCESS7native proof independently1XML/52inputs/2binaries checked. Complete40native local primary1strictPASS/48inputs;39placed+1wiretile, RTLinterconnect/frameFSM; committed-source hosted replay prepared behind independent audit.

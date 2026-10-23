@@ -62,8 +62,8 @@ jobs:
         timeout-minutes: 3
         run: |
           source .venv/bin/activate
-          python -m pytest -q tools/autonomy/tests/test_r1_balanced_audit.py --junitxml=build/r1_postphysical/audit-checks.xml
-          python -m tools.autonomy.check_xml build/r1_postphysical/audit-checks.xml --minimum-cases 4
+          python -m pytest -q tools/autonomy/tests/test_r1_balanced_audit.py tools/profiling/tests/test_r1_configured_adapter.py --junitxml=build/r1_postphysical/audit-checks.xml
+          python -m tools.autonomy.check_xml build/r1_postphysical/audit-checks.xml --minimum-cases 5
           PYTHONPATH=tools python -m autonomy.r1_balanced_audit \
             --baseline build/r1_post_mapped/input --baseline-identity build/r1_postphysical/mapped.json \
             --critical build/r1_post_balanced --critical-identity build/r1_postphysical/native.json \
@@ -77,7 +77,7 @@ jobs:
           PYTHONPATH=tools python spikes/r1/configured_smoke.py \
             --model build/r1_post_model/resource --case build/r1_post_model/compile/uart_spi_11 \
             --mapped-bundle build/r1_post_mapped/input \
-            --postphysical-complete build/r1_postphysical/leaf-audit.json \
+            --postphysical-complete build/r1_postphysical/leaf-audit.json --capture-configuration \
             --pdk build/r1_post_pdk/ihp-sg13cmos5l --out build/r1_postphysical/smoke > build/r1_postphysical/smoke.log 2>&1
       - uses: actions/upload-artifact@v7
         if: always()

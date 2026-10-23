@@ -53,10 +53,16 @@ module tb_pin #(
 `ifdef TRIPWIRE_CACHED_CARRIER
     wire carrier_active;
 `endif
+`ifdef TRIPWIRE_SAMPLE_DELTA
+    wire [24:0] sample_delta;
+`endif
     trw_pin_cfg #(.FULL (FULL)) u_cfg (
         .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg), .restart (restart)
 `ifdef TRIPWIRE_CACHED_CARRIER
         , .carrier_active (carrier_active)
+`endif
+`ifdef TRIPWIRE_SAMPLE_DELTA
+        , .sample_delta (sample_delta)
 `endif
     );
 
@@ -101,6 +107,9 @@ module tb_pin #(
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
 `ifdef TRIPWIRE_CACHED_CARRIER
         .carrier_active (carrier_active),
+`endif
+`ifdef TRIPWIRE_SAMPLE_DELTA
+        .sample_delta (sample_delta),
 `endif
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .rx_free (free), .rx_load (rload), .rx_tag (rtag), .rx_data (rdata),

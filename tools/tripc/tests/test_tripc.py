@@ -112,7 +112,7 @@ def test_load_writes_every_pin_unit():
     assert set(image["pins"]) == {"U0", "U1"}
     chip.pin_written.clear()
     tripc.load(chip, image, run=False)
-    assert chip.pin_written == set(range(6))
+    assert chip.pin_written == set(range(len(chip.pins)))
     assert chip.pins[3].cfg.pin_a is None
 
 

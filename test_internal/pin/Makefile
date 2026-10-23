@@ -4,11 +4,16 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 FULL ?= 0
 FRAC ?= 8
-CACHED_CARRIER ?= 0
+SRC_DIR ?= $(PWD)/../../src
+# Keep the harness compatible with both the earlier and promoted interfaces.
+CACHED_CARRIER ?= $(shell grep -Eq 'output[[:space:]]+wire.*carrier_active' $(SRC_DIR)/trw_pin_cfg.v && echo 1 || echo 0)
+CACHED_SAMPLE_DELTA ?= $(shell grep -Eq 'output[[:space:]]+wire.*sample_delta' $(SRC_DIR)/trw_pin_cfg.v && echo 1 || echo 0)
 ifeq ($(CACHED_CARRIER),1)
 COMPILE_ARGS += -DTRIPWIRE_CACHED_CARRIER
 endif
-SRC_DIR ?= $(PWD)/../../src
+ifeq ($(CACHED_SAMPLE_DELTA),1)
+COMPILE_ARGS += -DTRIPWIRE_SAMPLE_DELTA
+endif
 SIM_BUILD = sim_build/full$(FULL)_frac$(FRAC)
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_pin_cfg.v $(SRC_DIR)/trw_pin_io.v $(SRC_DIR)/trw_pin_tx.v \

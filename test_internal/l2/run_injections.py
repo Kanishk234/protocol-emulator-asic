@@ -22,6 +22,26 @@ def mutate_file(tree: pathlib.Path, filename: str, before: str, after: str) -> N
     path.write_text(source.replace(before, after, 1))
 
 
+def cursor_mutation(source: str) -> tuple[str, str]:
+    """Inject the same normal-cursor increment fault in either reviewed form."""
+    forms = (
+        ("wire [15:0] q_inc  = (r_wrap && (qn != 16'h7fff)) ? qn + 16'd1 : qn;",
+         "wire [15:0] q_inc  = (r_wrap && (qn != 16'h7fff)) ? qn + 16'd2 : qn;"),
+        ("wire [15:0] base_inc = (base_wrap && (q_b != 16'h7fff)) ? q_b + 16'd1 : q_b;",
+         "wire [15:0] base_inc = (base_wrap && (q_b != 16'h7fff)) ? q_b + 16'd2 : q_b;"),
+    )
+    found = [pair for pair in forms if source.count(pair[0]) == 1]
+    if len(found) != 1 or any(source.count(pair[0]) > 1 for pair in forms):
+        raise RuntimeError('Expected exactly one reviewed cursor mutation form')
+    return found[0]
+
+
+def isolated_make(directory: pathlib.Path) -> list[str]:
+    """Source paths alone do not invalidate a newer compiled Verilator model."""
+    return MAKE + [f'SIM_BUILD={directory / "sim_build"}',
+                   f'COCOTB_RESULTS_FILE={directory / "results.xml"}']
+
+
 def run_baseline(scenario: str, clocks: int = 1024) -> None:
     """Require the untouched candidate to pass before crediting a mutation."""
     env = os.environ.copy()
@@ -31,8 +51,9 @@ def run_baseline(scenario: str, clocks: int = 1024) -> None:
         "L2_SCENARIO": scenario,
         "L2_CYCLES": str(clocks),
     })
-    result = subprocess.run(MAKE, cwd=ROOT, env=env, text=True,
-                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    with tempfile.TemporaryDirectory(prefix=f'tripwire-l2-baseline-{scenario}-') as tmp:
+        result = subprocess.run(isolated_make(pathlib.Path(tmp)), cwd=ROOT, env=env, text=True,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if result.returncode != 0 or "first lockstep divergence" in result.stdout:
         print(result.stdout[-6000:])
         raise SystemExit(f"L2-INJECT {scenario}: clean RTL baseline failed; mutation evidence is invalid")
@@ -52,7 +73,7 @@ def run_mutation(name: str, relative_file: str, before: str, after: str,
             "L2_SCENARIO": scenario,
             "L2_CYCLES": str(clocks),
         })
-        result = subprocess.run(MAKE, cwd=ROOT, env=env, text=True,
+        result = subprocess.run(isolated_make(pathlib.Path(tmp)), cwd=ROOT, env=env, text=True,
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         if result.returncode == 0:
             raise SystemExit(f"L2-INJECT {name}: mutation escaped; RTL/model comparison passed")
@@ -76,10 +97,10 @@ def main() -> None:
         "rx", 1024,
     )
     run_baseline("cursor", 1024)
+    before, after = cursor_mutation((RTL_DIR / 'trw_pin_tx.v').read_text())
     run_mutation(
         "cursor-off-by-one", "trw_pin_tx.v",
-        "wire [15:0] q_inc  = (r_wrap && (qn != 16'h7fff)) ? qn + 16'd1 : qn;",
-        "wire [15:0] q_inc  = (r_wrap && (qn != 16'h7fff)) ? qn + 16'd2 : qn;",
+        before, after,
         "cursor", 1024,
     )
 

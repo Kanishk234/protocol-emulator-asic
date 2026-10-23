@@ -3,6 +3,10 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-10-23 (duplicate export drivers isolated without hardware change)
+**Actual:**40012576053 still18/20: flattened aliases alone fail, hypothesis rejected. Local native original/flat/dedup probe gives143/143/155ports and isolates4duplicate continuous assignments. Guarded dedup after frozen-bit flattening restores all155in diagnostic import, no buffer/cell insertion. Updated S_IO2export SHA77904593…; nineotherexports unchanged. Canonical N_IO/LUT witness in hosted geometry now aligns18.72µm both sides.
+**Next:** hosted full20case/3064pair replay with exact duplicate removal and all-mapped primary proof; preserve both failed runs and root-cause probe.55local R1testsPASS; full-mapped updated-export replay running. G1/held-out protections and no full-chip attempt/phase acceptance unchanged.
+
 ## 2026-10-23 (all-mapped configured primary works locally)
 **Actual:** D109 all40tile instances mapped with frozen10exports; unchanged primary compiler image loaded through real RTL frame FSM. Local1strictPASS at build/r1_full_mapped_smoke_v3/results.xml,47input hashes checked. ConcurrentUARTTX/RX+SPI0/backpressure/divider assertions retained. BUG127 removes an RTL-only debug-name lookup that prevented first traffic launch.55local R1testsPASS.
 **Pending:** hosted committed-source all-mapped replay added independently after native gate. D108repaired native run40012576053 still active. No managementSPI shell/CRC/parking, post-route/SDF/timing or whole-chip acceptance; no phase boxes/full-chip attempts. G1protected.

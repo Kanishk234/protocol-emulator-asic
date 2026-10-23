@@ -1,0 +1,103 @@
+# Separate measurement workflow; official gds.yaml and stock flow are unchanged.
+name: gds-stock-official-baseline-screen
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: gds-stock-official-baseline-screen
+  cancel-in-progress: false
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 170
+    env:
+      PDK_ROOT: /home/runner/pdk
+    steps:
+    - name: Check out project
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Prepare the full design with strict stock project inputs
+      run: |-
+        set -euo pipefail
+        git apply --check spikes/phase2_stock_flow/verified_design_only.patch
+        git apply spikes/phase2_stock_flow/verified_design_only.patch
+        cp spikes/phase2_stock_flow/strict_project_config.json src/config.json
+        spikes/r3_sram/fetch_macro.sh macro/RM_IHPSG13_1P_512x16_c2_bm_bist
+        python - <<'PYCODE'
+        import hashlib, json
+        from pathlib import Path
+        manifest = json.loads(Path('spikes/phase2_stock_flow/design_manifest.json').read_text())
+        for name, sha in manifest['files'].items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+        assert hashlib.sha256(Path('.github/workflows/gds.yaml').read_bytes()).hexdigest() == manifest['official_workflow_sha256']
+        macros = json.loads(Path('scripts/ci/fixtures/wire600_selective/promoted_source.json').read_text())['macro_files']
+        for name, sha in macros.items():
+            path = Path('macro/RM_IHPSG13_1P_512x16_c2_bm_bist') / name
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == sha, name
+        config = json.loads(Path('src/config.json').read_text())
+        assert 'meta' not in config
+        assert config['CLOCK_PERIOD'] == 20
+        assert config['PL_TARGET_DENSITY_PCT'] == 56
+        assert not any(k.startswith('TRIPWIRE_') for k in config)
+        assert 'PNR_SDC_FILE' not in config and 'SIGNOFF_SDC_FILE' not in config
+        assert 'ERROR_ON_MAGIC_DRC' not in config and 'ERROR_ON_ILLEGAL_OVERLAPS' not in config
+        PYCODE
+    - name: Check out Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: ihp-sg13cmos5l
+        path: tt
+    - name: Check out the pinned IHP installer
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-gds-action
+        ref: ihp-cmos5l
+        path: .tt-gds-action
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install Tiny Tapeout prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install flow dependencies
+      run: pip install -r tt/requirements.txt
+    - name: Install IHP PDK
+      run: ./.tt-gds-action/install_sg13cmos5l.sh
+    - name: Install pinned LibreLane
+      run: pip install librelane==3.1.0.dev3
+    - name: Generate project configuration with unchanged TT tools
+      run: python tt/tt_tool.py --create-user-config --ihp
+    - name: Run stock Classic through the final pre-routing STA
+      timeout-minutes: 145
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        mkdir -p runs
+        mkdir runs/stock-official-baseline
+        python -m librelane --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --manual-pdk --run-tag stock-official-baseline --force-run-dir runs/stock-official-baseline --hide-progress-bar --to OpenROAD.STAMidPNR-3 src/config_merged.json
+        # This is measurement only. No detailed routing or qualification claim.
+        python - <<'PYCODE'
+        from pathlib import Path
+        root = Path('runs/stock-official-baseline')
+        assert not list(root.glob('*-openroad-detailedrouting')), 'Unexpected detailed routing'
+        assert len(list(root.glob('*-openroad-stamidpnr-3/state_out.json'))) == 1, 'Missing final stock pre-routing STA'
+        PYCODE
+    - name: Upload complete stock baseline measurements
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: stock-official-baseline-${{ github.run_id }}
+        path: |-
+          runs/stock-official-baseline/**
+          src/**
+          info.yaml
+          macro/**
+        if-no-files-found: warn

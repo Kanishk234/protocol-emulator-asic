@@ -1,6 +1,9 @@
 """Configured-fabric concurrent UART/SPI smoke; frame-FSM loading, no SPI shell."""
 import os
+import json
+from pathlib import Path
 import cocotb
+from cocotb.handle import HierarchyObject
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge,Timer,with_timeout
 from compile.bitfile import BitFile
@@ -49,6 +52,15 @@ async def loaded_concurrent_uart_spi(d):
         d.cfg_strobe.value=0;await cycle(d,5)
     await cycle(d,10);d.rst_n.value=1;await cycle(d,10)
     d._log.info('Compiler image loaded through frame FSM; starting pin-level traffic')
+    if os.environ.get('R1_CFG_SNAPSHOT'):
+        tiles={}
+        for tile in d.fabric:
+            if not isinstance(tile,HierarchyObject) or not tile._name.startswith('Tile_'):
+                continue
+            values={cell._name:str(cell.Q.value) for cell in tile
+                    if isinstance(cell,HierarchyObject) and cell._def_name=='sg13cmos5l_dlhq_1'}
+            tiles[tile._name]=dict(tile_type=tile._def_name,q=values)
+        Path(os.environ['R1_CFG_SNAPSHOT']).write_text(json.dumps(dict(tiles=tiles),indent=2,sort_keys=True)+'\n')
 
     async def uart_tx():
         for _ in range(20000):

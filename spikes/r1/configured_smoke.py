@@ -41,6 +41,16 @@ NATIVE_COMPLETE_SHA={**NATIVE_BALANCED_SHA,
 'S_IO2':'e561271cac3864b2a9d5539347e15ce6ee7c18a59e5725ec6f8742581e85b41c'}
 
 
+def drive_auxiliary_inputs(fabric_text,connections):
+    ports=set(re.findall(r'\binput\s+(?:wire\s+)?(?:\[[^\]]+\]\s*)?(Tile_\w+)',fabric_text))
+    reset='Tile_X0Y4_SYS_RESET_RESET_top'
+    if reset not in ports:raise ValueError('Expected frozen fabric auxiliary reset input')
+    connections[reset]='~rst_n'
+    for port in ports:connections.setdefault(port,"1'b0")
+    if any(not connections[p] for p in ports):raise ValueError('Undriven diagnostic fabric input')
+    return sorted(ports)
+
+
 def complete_native_exports(audit_path):
     data=json.loads(Path(audit_path).read_text())
     if (data.get('passed') is not True or data.get('leaf_contexts')!=26 or data.get('grid_instances')!=40 or
@@ -79,10 +89,11 @@ def balanced_native_exports(root,baseline):
     return exports,records
 
 
-def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None,postphysical_complete=None):
+def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None,postphysical_complete=None,capture_configuration=False):
     native_primitive=any(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))
     if native_primitive and mapped_bundle is None:raise ValueError('Postphysical overrides require all-mapped baseline')
     if sum(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))>1:raise ValueError('Choose one native export profile')
+    if capture_configuration and postphysical_complete is None:raise ValueError('Configuration-state observation requires complete native profile')
     native_records=[]
     from cocotb_tools.runner import get_runner
     from compile.bitfile import BitFile
@@ -113,8 +124,7 @@ def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=N
         coordinate,letter=row['bel'].split('/')
         suffix={'in':'OUT_top','inout':'OUT_top','clock':'OUT_top','out':'IN_top','out_en':'EN_top'}[row['direction']]
         connection[f'Tile_{coordinate}_{letter}_{suffix}']=signal or ("1'b0" if suffix=='OUT_top' else '')
-    ports=re.findall(r'\binput\s+(Tile_\w+_OUT_top)',(model/'fabric.v').read_text())
-    for port in ports:connection.setdefault(port,"1'b0")
+    driven_inputs=drive_auxiliary_inputs((model/'fabric.v').read_text(),connection)
     source='''`timescale 1ns/1ps
 `default_nettype none
 module r1_tb;
@@ -187,11 +197,30 @@ eFPGA fabric(
         if 'version 13.0' not in version:raise ValueError('Mapped PDK models require Icarus13')
     runner=get_runner('icarus')
     runner.build(sources=sources,hdl_toplevel='r1_tb',build_dir=out/'sim',build_args=['-g2012'],always=True)
+    extra_env={'R1_IMAGE':str(image),'R1_DIV':str(params['DIV']),'R1_HALF':str(params['HALF'])}
+    if capture_configuration:extra_env['R1_CFG_SNAPSHOT']=str(out/'configuration-state.json')
     runner.test(hdl_toplevel='r1_tb',test_module='test_loaded',test_dir=ROOT/'test_internal/r1_configured',
-                results_xml=str(out/'results.xml'),extra_env={'R1_IMAGE':str(image),'R1_DIV':str(params['DIV']),
-                                                            'R1_HALF':str(params['HALF'])})
+                results_xml=str(out/'results.xml'),extra_env=extra_env)
     from autonomy.check_xml import check_xml
     tests=check_xml(out/'results.xml',1)
+    snapshot=None
+    if capture_configuration:
+        captured=json.loads((out/'configuration-state.json').read_text())['tiles']
+        baseline=json.loads((mapped_bundle/'manifest.json').read_text())
+        expected=json.loads((mapped_bundle/'connections.json').read_text())['modules']['eFPGA']['cells']
+        if set(captured)-set(expected):raise ValueError('Unknown observed fabric tile')
+        count=0
+        for name,cell in expected.items():
+            required=baseline['tiles'][cell['type']]['configuration_latches']
+            row=captured.get(name,dict(tile_type=cell['type'],q={}))
+            if row['tile_type']!=cell['type'] or len(row['q'])!=required:
+                raise ValueError('Native configuration observation census differs: '+name)
+            if any(value not in ('0','1') for value in row['q'].values()):
+                raise ValueError('Unresolved native configuration state: '+name)
+            count+=len(row['q'])
+        if count!=8736:raise ValueError('Incomplete native configuration-state observation')
+        snapshot=dict(configuration_latches=count,sha256=hashlib.sha256((out/'configuration-state.json').read_bytes()).hexdigest(),
+                      scope='Observed Q states after real frame loading for this primary image; not an independent expected-bit comparison or timing acceptance.')
     for name,digest in manifest['generated_sha256'].items():
         if hashlib.sha256((model/name).read_bytes()).hexdigest()!=digest:
             raise ValueError('Model changed during configured simulation')
@@ -205,6 +234,8 @@ eFPGA fabric(
                 run=os.environ.get('GITHUB_RUN_ID'),attempt=os.environ.get('GITHUB_RUN_ATTEMPT'),
                 source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                 physical_acceptance=False,timing_acceptance=False,management_spi_shell_tested=False,
+                driven_scalar_tile_inputs=len(driven_inputs),auxiliary_system_reset_driven=True,
+                configuration_snapshot=snapshot,
                 mapped_lut_tiles_tested=16 if mapped else 0,
                 mapped_primitive_tiles_tested=2 if mapped_bundle is not None else 0,
                 mapped_tile_instances_tested=40 if mapped_bundle is not None else (16 if mapped else 0),
@@ -236,6 +267,7 @@ if __name__=='__main__':
     parser.add_argument('--postphysical-primitive',type=Path)
     parser.add_argument('--postphysical-balanced',type=Path)
     parser.add_argument('--postphysical-complete',type=Path)
+    parser.add_argument('--capture-configuration',action='store_true')
     parser.add_argument('--icarus-root',type=Path)
     a=parser.parse_args()
     if a.mapped_lut is not None and a.mapped_bundle is not None:parser.error('Choose one mapped mode')
@@ -243,4 +275,5 @@ if __name__=='__main__':
     if a.postphysical_primitive is not None and a.mapped_bundle is None:parser.error('Postphysical primitive requires all-mapped baseline')
     if a.postphysical_balanced is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None):parser.error('Balanced native profile requires all-mapped baseline and cannot mix native profiles')
     if a.postphysical_complete is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None or a.postphysical_balanced is not None):parser.error('Complete native profile requires all-mapped baseline and cannot mix native profiles')
-    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced,a.postphysical_complete)
+    if a.capture_configuration and a.postphysical_complete is None:parser.error('Configuration observation requires complete native profile')
+    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced,a.postphysical_complete,a.capture_configuration)

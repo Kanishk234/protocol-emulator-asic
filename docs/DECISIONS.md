@@ -1273,6 +1273,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost: image/setup code and workflow integration maintenance; no physical area change relative to the passing candidate. Main requires one coherent, already verified source promotion. Older source/model/CI assumptions are corrected, not new hardware logic. Conservative source/config/connectivity/physical audits remain fail-closed.
 - Review/evidence: PHASE2_MAIN_PROMOTION_REVIEW.md and exact unapplied patches under/tmp/tripwire-official-mux-candidate-20261022/review. Existing fresh run39907035580 and finalNLc60823... provide physical baseline. Local full checks,340tool tests,120pin tests,4official-style GL cases,1million lockstep comparisons and real plugin API checks pass. Image package CI and the actual official run are separate remaining evidence; no phase boxes ticked.
 
+## D-109 (2026-10-23): stock-only latch setup-margin diagnostic
+
+- General need: stock baseline39996448720 cannot finish post-CTS setup repair.2074endpoints persist for over2hours; sampled time-borrowing latch paths report0slack while the native extra setup target is50ps. Diagnose optimizer runtime without hiding timing paths or changing hardware behavior.
+- Diagnostic only: proposed screen project config sets PL_RESIZER_SETUP_SLACK_MARGIN=0. No flow substitutions, custom images, modified scripts, ECOs or main inputs.20ns,0.25ns uncertainty, actual timing/electrical/physical acceptance remain unchanged. Cost/risk: removing extra repair headroom may expose later setup/hold/route failures; the next run must measure them and stop before DRT.
+- Main adoption is not authorized by this diagnostic: the field is outside the current src/config whitelist. No architecture/ISA/spec change. PHASE2_STOCK_BASELINE_TIMEOUT.md records exact evidence and fresh-vs-inherited metric distinction. Actual TT project configuration and single-setting/syntax/hash audits pass; physical validation pending.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

@@ -2,11 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-23 — Diagnose stock repair stall and prepare setting-only follow-up
+
+- Direct job log for39996448720 confirms145minute timeout in post-CTS setup repair, not a launch failure.2074endpoints persist through4054iterations. Stage36sampled1000zero-slack time-borrowing latch paths; repeated worst endpoint49332is a cfg latch. Extra50ps repair target is the leading hypothesis, not yet a proven causal fix.
+- Downloaded54MiB artifact12527314901under/tmp. Fresh completed typical metrics: setup0ns, hold−0.577002ns, slew0/cap0/fanout169. Fast/slow metrics in cumulative state are inherited, not fresh post-CTS; no all-corner pass claim. Hold repair/global routing were not reached. BUG140/report preserve this distinction.
+- Prepared D-109diagnostic-only setting PL_RESIZER_SETUP_SLACK_MARGIN=0in proposed screen inputs, keeping20ns,stock0.25ns uncertainty,native scripts/order,image,source/macros and acceptance fixed. Main adoption outside config whitelist requires explicit owner review; no main src/config or official template edit. Actual TT --create-user-config passes, exact one-setting diff and workflow shell/Python/hash checks pass. No longer timeout or bypassed checks proposed.
+- Next publish scoped input/CI/docs groups and launch the stock pre-DRT follow-up. No phase boxes ticked. Read-only API approval review timed out once; allowed retry succeeded. gh run --log returned empty, direct job-log API supplied actual evidence. Watcher remains stopped.
+
 ## 2026-10-23 — Diagnose stock baseline launch failure
 
 - Read failed39994480535 log: source preparation/official configuration passed, stock image pulled, but Docker launch failed with input device is not a TTY before synthesis. No timing/electrical baseline was produced. Root cause is omitted --docker-no-tty in the separate diagnostic; BUG139 records it.
 - Added --docker-no-tty before --dockerized, matching the existing physical runtime helper and pinned CLI option-order requirement. Real LibreLane3.1.0.dev3 Click CLI with intercepted container launch confirms fixed workflow forwards tty=False; old control forwards tty=True. Stock image and remaining arguments unchanged. Shell syntax/diff checks pass. No official template, RTL, constraints, project configuration or checker changes.
-- Next publish scoped CI/evidence fix and relaunch only the stock pre-DRT screen. No phase boxes ticked. Initial read-only log request's automatic approval review timed out; authorized retry succeeded without additional user permission. Watcher stays stopped.
+- Published CI1357258and evidence1a590d5; verified remote main1a590d57bc92b887f73662584ec41e89a4323671. Replacement screen [39996448720](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39996448720) is in_progress at that exact head. No hardware/official-workflow history in push. Next inspect its actual stock measurements; this launch receipt remains local until next evidence publication. No phase boxes ticked. Initial read-only log request's automatic approval review timed out; authorized retry succeeded without additional user permission. Watcher stays stopped.
 
 ## 2026-10-23 — Publish and launch the approved stock baseline screen
 

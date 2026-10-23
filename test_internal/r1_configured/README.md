@@ -1,0 +1,5 @@
+# Diagnostic configured R1 primary workload
+
+Run `spikes/r1/configured_smoke.py` with an authenticated generated model and its successful `uart_spi_11` compiler case. Python runs in the project venv; use system Icarus12 as in test/fabric CI. The driver validates model hashes and emitted-image identity, generates a pin-map adapter and loads the actual words through unchanged WARP frame-FSM/frame-register modules configured for5rows/8columns. Configuration word gaps allow the stretched frame strobe to settle, as the real management SPI path does.
+
+The test runs concurrent UART TX/RX and SPI mode0 with compiled DIV/HALF values, checks SPI payload/clock spacing, framed responses and backpressure stability. Strict XML must pass, and retained provenance binds every source/image. It excludes the management SPI shell, its CRC/parking/reset protocol, mapped-cell simulation, all other SPI modes, other compiled workloads and physical/SDF timing. It is an internal diagnostic, not a chip acceptance test.

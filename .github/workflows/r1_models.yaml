@@ -11,6 +11,7 @@ on:
       - 'tools/profiling/tests/test_r1_track_transform.py'
       - 'tools/profiling/tests/test_r1_mapped_cost.py'
       - 'tools/profiling/tests/test_r1_reduced_radix.py'
+      - 'test_internal/r1_configured/**'
       - 'tools/profiling/tests/test_r1_generator.py'
       - 'spikes/r1/**'
       - 'test_internal/cloud_r1_resource.py'
@@ -43,7 +44,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Python prerequisites
-        run: sudo apt-get update && sudo apt-get install -y python3-tk
+        run: sudo apt-get update && sudo apt-get install -y python3-tk iverilog
       - name: Cache pinned synthesis suite
         id: ocs
         uses: actions/cache@v5
@@ -71,7 +72,7 @@ jobs:
           source .venv/bin/activate
           mkdir -p build/r1_checks
           python -m pytest -q tools/profiling/tests/test_config_cost.py tools/profiling/tests/test_r1_generator.py tools/profiling/tests/test_connectivity.py tools/profiling/tests/test_r1_resource.py tools/profiling/tests/test_r1_resource_campaign.py tools/profiling/tests/test_track_screen.py tools/profiling/tests/test_r1_track_transform.py tools/profiling/tests/test_r1_mapped_cost.py tools/profiling/tests/test_r1_reduced_radix.py --junitxml=build/r1_checks/results.xml
-          python -m tools.autonomy.check_xml build/r1_checks/results.xml --minimum-cases 71
+          python -m tools.autonomy.check_xml build/r1_checks/results.xml --minimum-cases 72
           git rev-parse HEAD > build/r1_checks/source-revision.txt
       - name: Count original full-fabric storage and mux structure
         run: |
@@ -101,12 +102,21 @@ jobs:
           export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
           python spikes/r1/mapped_cost.py --model build/r1_checks/resource --pdk build/r1_mapping_pdk/ihp-sg13cmos5l --out build/r1_checks/mapped-cost --tile all > build/r1_checks/mapped-cost.log 2>&1
       - name: Compile six retained and two concurrent workloads
+        id: compile_workloads
         if: ${{ success() || steps.mapping.outcome == 'failure' }}
         timeout-minutes: 82
         run: |
           source .venv/bin/activate
           export PATH="$PWD/.venv/bin:$HOME/oss-cad-suite/bin:$PATH"
           python test_internal/cloud_r1_resource.py build/r1_checks/resource build/r1_checks/compile
+      - name: Exercise configured primary workload through frame FSM
+        if: ${{ !cancelled() && (steps.compile_workloads.outcome == 'success' || steps.compile_workloads.outcome == 'failure') }}
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          # Match test/fabric CI's system Icarus; retain venv Python first.
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          PYTHONPATH=tools python spikes/r1/configured_smoke.py --model build/r1_checks/resource --case build/r1_checks/compile/uart_spi_11 --out build/r1_checks/configured-primary > build/r1_checks/configured-primary.log 2>&1
       - uses: actions/upload-artifact@v7
         if: always()
         with:

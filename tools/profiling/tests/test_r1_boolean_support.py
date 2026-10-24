@@ -58,3 +58,13 @@ def test_unexposed_feedback_is_not_claimed_proven():
     m=feedback();m['cells']['gate']=cell('buf',{'A':3},2)
     with pytest.raises(ValueError,match='Root feedback was not exposed'):
         cone(m,{},'root')
+
+
+def test_all_feedback_varies_each_recursion_cut_independently():
+    m=feedback();m['cells']['gate']=cell('xor2',{'A':2,'B':3},2)
+    m['cells']['other']=cell('buf',{'A':3},3)
+    _,own=cone(m,{},'root')
+    text,all_cuts=cone(m,{},'root',all_feedback=True)
+    assert len(own['varying_ports'])==1 and len(all_cuts['varying_ports'])==2
+    assert ".i0(1'b0),.i1(1'b0)" in text
+    assert '.i0(i0),.i1(i1)' in text

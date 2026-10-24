@@ -1,8 +1,10 @@
 """Bounded binary feedback-support diagnostics, never a timing-arc waiver.
 
 A cone replaces sequential outputs, module inputs and recursion/depth boundaries
-with unconstrained binary variables. Both copies share those variables, except
-one feedback value is 0 in one copy and 1 in the other. An UNSAT difference
+with unconstrained binary variables. The own-feedback copies share those variables, except
+one feedback value is 0 in one copy and 1 in the other. A stronger variant
+compares all recursively encountered feedback cuts fixed at 0 against arbitrary
+values, while sharing all other boundaries. An UNSAT difference
 proves independence for this overapproximation of stable binary behavior only.
 It says nothing about glitches, analog settling or delay through reconvergence.
 """
@@ -27,7 +29,7 @@ def validate(plan):
             raise ValueError('Changed diagnostic input: '+path)
 
 
-def cone(module, state, root, depth=64, limit=2048):
+def cone(module, state, root, depth=64, limit=2048, all_feedback=False):
     if depth < 1 or limit < 1:
         raise ValueError('Positive cone bounds required')
     constants = {}
@@ -106,14 +108,19 @@ def cone(module, state, root, depth=64, limit=2048):
     if wires:
         text += 'wire '+','.join(wires)+';\n'
     text += '\n'.join(nodes)+'\nassign y='+y+';\nendmodule\n'
-    shared = [value for value in cuts.values() if value != target]
+    varying = {port for bit, port in cuts.items() if reasons[bit] == 'feedback'} if all_feedback else {target}
+    shared = list(cuts.values()) if all_feedback else [value for value in cuts.values() if value != target]
     text += 'module miter('+('input '+','.join(shared)+', ' if shared else '')+'output diff);wire a,b;\n'
     for i, value in enumerate(('0', '1')):
-        ports = ['.'+pin+'('+(("1'b"+value) if pin == target else pin)+')' for pin in cuts.values()]
+        ports = []
+        for pin in cuts.values():
+            binding = ("1'b0" if i == 0 and pin in varying else pin) if all_feedback else (("1'b"+value) if pin == target else pin)
+            ports.append('.'+pin+'('+binding+')')
         ports.append('.y('+('a' if i == 0 else 'b')+')')
         text += 'cone c'+str(i)+' ('+','.join(ports)+');\n'
     text += 'assign diff=a^b;endmodule\n'
     return text, dict(root=root, cells=len(nodes), cut_inputs=len(cuts), target=target,
+                     cofactor='all_feedback' if all_feedback else 'own_feedback', varying_ports=sorted(varying),
                      cuts={str(bit): dict(port=port, reason=reasons[bit]) for bit, port in cuts.items()})
 
 
@@ -159,6 +166,10 @@ def render(out):
             raise
         (out/(root+'.v')).write_text(text)
         cases[root] = row
+        text, row = cone(module, state['q'], root, plan['depth'], plan['limit'], all_feedback=True)
+        name = root+'_all_feedback'
+        (out/(name+'.v')).write_text(text)
+        cases[name] = row
     # The negative control must produce a counterexample; identical copies must not.
     for name, expression in [('control_positive', 'f^f'), ('control_negative', 'f^!f')]:
         (out/(name+'.v')).write_text('module miter(input f, output diff);assign diff='+expression+';endmodule\n')

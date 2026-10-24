@@ -1,6 +1,8 @@
 # Autonomous development in an active Codex session
 **October24 integration update:** BUG132 is repaired locally by D118 opt-in grounding of186unused padded GND mux outputs (593existing config bits), preserving all active features/hardware. All40native leaves now pass configured reset/secondSPI and full managementSPI/error/FIFO/USER_RESET/STOP/reload/secondSPI;8736Q remain defined and match across reload. Original-image failure is retained. Hosted repair40109928699 atd5d9228 passes; root source/XML/50+55+64input/two-binary checks pass; detailed routing/timing/runtime parity and replacement remain open. G1protected. See reports/r1_management_shell_20261024.md.
 
+**Next probes (October24):** D119 configured cell-delay coverage and D120 frozen primitive detailed routing run separately from the green functional gate. Local clock/storage coverage is complete, but six loop-policy-sensitive endpoints keep BUG133/timing qualification open. Local detailed routing timed out before completion; the hosted fixed32-iteration case has a1200-second wall bound and immutable cell/pin/connectivity checks. Preserve both failures/results and source closures; no blanket false paths, footprint/seed sweeps or full-chip promotion. See reports/r1_timing_and_detail_20261024.md.
+
 
 This is the operating procedure for a coordinator and specialist agents working
 on WARP in one active session. GitHub executes substantial tests and heavy EDA;

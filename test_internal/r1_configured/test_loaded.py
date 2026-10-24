@@ -91,7 +91,7 @@ async def loaded_concurrent_uart_spi(d):
         activity['uart_rx']=(start,get_sim_time(unit='ns'))
         await cycle(d,div)
 
-    async def spi_peer():
+    async def spi_peer(expected=0x3c,record=True):
         for _ in range(20000):
             if not int(d.cs_n_o.value):break
             await cycle(d)
@@ -106,8 +106,8 @@ async def loaded_concurrent_uart_spi(d):
                 last_edge=elapsed
                 value=(value<<1)|int(d.mosi_o.value);count+=1
             previous=now;await cycle(d);elapsed+=1
-        assert count==8 and value==0x3c
-        activity['spi']=(start,get_sim_time(unit='ns'))
+        assert count==8 and value==expected
+        if record:activity['spi']=(start,get_sim_time(unit='ns'))
 
     tx=cocotb.start_soon(uart_tx());rx=cocotb.start_soon(uart_rx());spi=cocotb.start_soon(spi_peer())
     await put(d,0);await put(d,0xa5);await put(d,3);await put(d,0x3c)
@@ -123,3 +123,11 @@ async def loaded_concurrent_uart_spi(d):
     if os.environ.get('R1_ACTIVITY'):
         Path(os.environ['R1_ACTIVITY']).write_text(json.dumps(dict(windows_ns=activity,overlap_ns=overlap),indent=2,sort_keys=True)+'\n')
     assert int(d.cs_n_o.value)==1
+    if os.environ.get('R1_RESTART_PROBE')=='1':
+        d._log.info('Resetting configured user logic for second SPI transfer')
+        d.rst_n.value=0;await cycle(d,10);d.rst_n.value=1;await cycle(d,10)
+        peer=cocotb.start_soon(spi_peer(0x5a,False))
+        await put(d,3);await put(d,0x5a)
+        assert [await get(d),await get(d)]==[1,0xff]
+        await with_timeout(peer,1000,'us')
+        d._log.info('Configured user reset and second SPI transfer passed')

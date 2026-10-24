@@ -55,3 +55,25 @@ Test three explicit project options together:
 This is a coherent recipe test, not a single-variable attribution claim. No hardware/source/ISA/latency, clock20ns/uncertainty0.25ns, native scripts/order/image, checker or official-workflow changes. Keep clock8,spacingnone,setup extra margin0and default10%native electrical margins. Post-GRT timing repair remains disabled; that is not silently bundled in. Default resizer RSZ_CORNERS=None already inherits all3STA_CORNERS in pinned ResizerStep; changing that field alone would be a no-op. Mid-PNR reports default to typical, which is why the separate fresh audit remains necessary.
 
 Cost/risk: buffering/sizing and rerouting may increase area, worsen hold or alter setup. Both global overflow and all fresh corner metrics must be measured again. Main adoption outside the config whitelist remains separately reviewed. Actual TT config generation, pinned-variable compilation and Classic step gating checks pass; exact3-key/source/template and shell/Python audits pass. No new physical result yet and no routing continuation.
+
+## Native electrical-repair run40120999838
+
+[40120999838](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40120999838), heade9bece31fbb85eafa536c17a5479f24cd810ddc4, completed in74m31s. Independently matched the repeated read-only receipt to all6fresh metric files. Source physical files remained unchanged during the audit.
+
+| Corner | Setup WS ns | Hold WS ns | Slew | Cap | Fanout |
+|---|---:|---:|---:|---:|---:|
+| Fast |0|+0.015865|0|0|0|
+| Typical |0|+0.150728|0|0|0|
+| Slow |-0.447463|+0.383769|0|0|0|
+
+All actual electrical counts are zero at all3corners. Saved initial and native repair final routing tables both have0overflow (final native repair usage42.38%,wirelength2497629um). Final nested antenna check0nets/0pins after37diodes. These are estimated-parasitic screen measurements, not extracted routing/signoff. Native repair pre-antenna instance area582150.36um²; buffering/sizing cost must remain part of later qualification.
+
+Slow setup improves−1.31005→−0.447463ns, but still fails. Fast hold decreases43.0439→15.865ps, still short of50ps reserve. No DRT/phase qualification. A green diagnostic job is not an all-gates pass.
+
+## Next stock timing-repair control (D-113)
+
+The existing native post-GRT timing-repair step remains disabled. Enable RUN_POST_GRT_RESIZER_TIMING=true, set GRT_RESIZER_SETUP_SLACK_MARGIN=0to avoid chasing borrowed-latch50ps pseudo-margin, and GRT_RESIZER_HOLD_SLACK_MARGIN=0.125ns to target margin above the50ps acceptance gate. Those are exactly3project-field changes; all existing electrical-repair/capacity settings remain. Stock engine/scripts/order,image,full hardware,20ns,0.25ns uncertainty and checker gates unchanged. No main src/config or official-workflow edit; main adoption outside whitelist remains separate owner review.
+
+Cost/risk: late timing repair can disturb electrical loading, antenna, routing and area. Do not assume the newly clean counts survive. Add stock CheckAntennas as a read-only measurement on the final timing-repaired checkpoint, alongside repeated3corner STA. Use only fresh raw antenna metrics and enforce source state/ODB/DEF/NL/PNL/SDC hash immutability after every audit. Do not move or insert physical repair steps in the stock flow. All physical changes remain native Classic behavior.
+
+Actual TT configuration generation, pinned schema variable compilation/step gating, exact3-key/source/template/syntax checks pass. Audit guard controls cover clean data, missing/nonrepeatable corner metrics, physical mutations by either measurement and missing antenna metrics. These controls are synthetic guard checks, not timing evidence. Final source antenna readback must replace inherited pre-timing antenna counts before any routing decision. No automatic routing continuation.

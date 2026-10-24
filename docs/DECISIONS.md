@@ -1299,6 +1299,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost/risk: inserted buffers/area, altered skew/load/setup/hold and congestion. No guarantee of closure; repeated fresh corner audit and all physical gates required before DRT. Native resizer already defaults to all STA corners; no redundant corner-only control added. Main adoption beyond whitelist remains separate owner review.
 - PHASE2_STOCK_BASELINE_RESULTS.md records actual baseline/receipt/raw metrics. Actual TT generation,pinned-variable compiler/gating and exact3-key/source/template/syntax checks pass. Main hardware/template unchanged; physical result pending.
 
+## D-113 (2026-10-24): enable stock post-routing timing repair before DRT
+
+- General need: D-112run40120999838clears all3corner electrical counts and saved routing overflow,final antenna0, but slow setup−0.447463ns and fast hold15.865ps still fail project gates. Preserve full hardware/protocol behavior and stock production flow.
+- Diagnostic control: enable native RUN_POST_GRT_RESIZER_TIMING,set its extra setup margin0and hold target125ps. Actual acceptance stays nonnegative setup/50psfast hold/zero electrical/antenna/DRC. Stock20ns/0.25ns uncertainty,scripts/order/image and current electrical repair unchanged. Main adoption beyond whitelist remains separate owner review.
+- Cost/risk: late sizing/buffering/rerouting can reintroduce electrical/antenna errors or area pressure. Add only read-only stock CheckAntennas after final physical flow for fresh measurement, not another repair. Hash state/physical files before and after all audits; do not use inherited antenna metrics to qualify new timing state.
+- Actual TT configuration,pinned-variable/gating,exact3-key/source/template/syntax checks and6audit guard controls pass. PHASE2_STOCK_BASELINE_RESULTS.md records raw/receipt evidence. New physical result pending; DRT blocked.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

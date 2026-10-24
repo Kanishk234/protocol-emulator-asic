@@ -2,12 +2,20 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-24 — Verify electrical closure; prepare stock final timing repair
+
+-40120999838completes in74m31s. Retrieved19critical reports fromartifact12573407645by ZIP ranges. Independently matched all6fresh corner metrics to read-only receipt. All slew/cap/fanout counts0at every corner; saved GRT tables0overflow; final antenna0nets/0pins after37diodes. Pre-antenna native repair area582150.36um². No extracted/DRT result.
+- Fresh fast/typ/slow setup0/0/−0.447463ns;hold+0.015865/+0.150728/+0.383769ns. Slow setup improved but still fails; fast hold still below50ps. No route/phase qualification from job green.
+- D-113prepares exactly3diagnostic fields: enable native post-GRT timing repair,extra setup margin0,hold target125ps. All prior electrical/capacity settings,RTL/resources,20ns/0.25ns,native scripts/order/image/checkers and main src/config/official workflow unchanged. Main adoption beyond whitelist remains separate owner review.
+- Added fresh read-only stock CheckAntennas after final physical flow, before final source-hash validation. This avoids inherited pre-timing antenna credit. Existing repeated3corner STA retained. Actual TT configuration,pinned schema/gating,exact3-key/source/template/syntax checks pass;6synthetic audit controls cover clean case,source mutations,missing/nonrepeatable metrics and missing antenna data. No extra physical repair or custom Tcl/image.
+- Next publish scoped input/CI/evidence and launch stock timing-repair screen. Requalify actual electrical/antenna/overflow as well as timing after late repair; no DRT until required gates pass. Preserve unrelated dirty reports/tools/local-only FIPE; watcher stopped.
+
 ## 2026-10-24 — Verify clock-fanout closure; prepare native electrical-repair recipe
 
 -40110884653completes in71m01s. Retrieved17critical reports from189.7MBartifact12568612065using bounded ZIP ranges. Independently matched read-only receipt against all6fresh metric files; source physical hashes unchanged. Clock fanout169→0. Fresh fast/typ/slow setup0/0/−1.31005ns;hold+0.0430439/+0.218061/+0.528453ns. Signal fanout14eachcorner; slow slew50and SRAM cap overload remain. Pre-antenna GRT overflow3979;final antenna0/0after91diodes. No DRT/phase qualification.
 - D-112prepares exactly3diagnostic project fields: enable existing post-GRT design repair,buffering length600um,route adjustment0.16. Native schema says0length disables buffer insertion. Default ResizerStep already inherits all STA corners; an explicit corner-list-only change would not fix this. Native scripts/order,image,fullRTL/resources,20ns,0.25ns uncertainty,checker gates and main official workflow unchanged.
 - Actual TT --create-user-config,pinned-variable compilation and Classic gating checks pass; exact3-key/source/template/workflow syntax audits pass. Repeated audit independently checked fresh before/after values against receipt. No main src/config changes or authority to adopt outside-whitelist settings. Paired recipe cost/risk recorded: buffering area,changed hold/setup/congestion; not single-variable attribution.
-- Next publish scoped inputs/CI/evidence and launch stock repair screen plus fresh corner audit. No routing until all required gates pass. Preserve unrelated dirty reports/local tools/FIPE note; watcher stopped. Prior read-only API review timed out once; retry succeeded. User interruption did not lose work; local config validation completed successfully.
+- Published inputsca92396,CIfface41,evidencee9bece3; verified remote maine9bece31fbb85eafa536c17a5479f24cd810ddc4. Launched [40120999838](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40120999838) at that head; verified in_progress. No outgoing src/info/macro/official-workflow history. Next inspect stock repair screen plus fresh corner audit; launch receipt remains local until next evidence publication. No routing until all required gates pass. Preserve unrelated dirty reports/local tools/FIPE note; watcher stopped. Prior read-only API review timed out once; retry succeeded. User interruption did not lose work; local config validation completed successfully.
 
 ## 2026-10-24 — Brainstorm closure options against actual stock failures
 

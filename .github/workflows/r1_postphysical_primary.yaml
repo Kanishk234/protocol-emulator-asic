@@ -12,6 +12,8 @@ on:
       - 'tools/profiling/r1_shell_adapter.py'
       - 'tools/profiling/tests/test_r1_shell_adapter.py'
       - 'tools/profiling/tests/test_r1_configured_adapter.py'
+      - 'tools/profiling/r1_quiesce.py'
+      - 'tools/profiling/tests/test_r1_quiesce.py'
 permissions:
   contents: read
   actions: read
@@ -65,8 +67,8 @@ jobs:
         timeout-minutes: 3
         run: |
           source .venv/bin/activate
-          python -m pytest -q tools/autonomy/tests/test_r1_balanced_audit.py tools/profiling/tests/test_r1_configured_adapter.py tools/profiling/tests/test_r1_shell_adapter.py --junitxml=build/r1_postphysical/audit-checks.xml
-          python -m tools.autonomy.check_xml build/r1_postphysical/audit-checks.xml --minimum-cases 7
+          python -m pytest -q tools/autonomy/tests/test_r1_balanced_audit.py tools/profiling/tests/test_r1_configured_adapter.py tools/profiling/tests/test_r1_shell_adapter.py tools/profiling/tests/test_r1_quiesce.py --junitxml=build/r1_postphysical/audit-checks.xml
+          python -m tools.autonomy.check_xml build/r1_postphysical/audit-checks.xml --minimum-cases 12
           PYTHONPATH=tools python -m autonomy.r1_balanced_audit \
             --baseline build/r1_post_mapped/input --baseline-identity build/r1_postphysical/mapped.json \
             --critical build/r1_post_balanced --critical-identity build/r1_postphysical/native.json \
@@ -82,14 +84,24 @@ jobs:
             --mapped-bundle build/r1_post_mapped/input \
             --postphysical-complete build/r1_postphysical/leaf-audit.json --capture-configuration \
             --pdk build/r1_post_pdk/ihp-sg13cmos5l --out build/r1_postphysical/smoke > build/r1_postphysical/smoke.log 2>&1
-      - name: Load and run through unchanged production management shell
+      - name: Qualify quiescent image with configured reset and second SPI transfer
+        timeout-minutes: 3
+        run: |
+          source .venv/bin/activate
+          timeout 90s env PYTHONPATH=tools python spikes/r1/configured_smoke.py \
+            --model build/r1_post_model/resource --case build/r1_post_model/compile/uart_spi_11 \
+            --mapped-bundle build/r1_post_mapped/input \
+            --postphysical-complete build/r1_postphysical/leaf-audit.json --capture-configuration \
+            --quiesce-unused --restart-probe \
+            --pdk build/r1_post_pdk/ihp-sg13cmos5l --out build/r1_postphysical/quiescent > build/r1_postphysical/quiescent.log 2>&1
+      - name: Load quiescent image through unchanged production management shell
         timeout-minutes: 10
         run: |
           source .venv/bin/activate
           timeout 240s env PYTHONPATH=tools python spikes/r1/configured_smoke.py \
             --model build/r1_post_model/resource --case build/r1_post_model/compile/uart_spi_11 \
             --mapped-bundle build/r1_post_mapped/input \
-            --postphysical-complete build/r1_postphysical/leaf-audit.json --management-shell --capture-configuration \
+            --postphysical-complete build/r1_postphysical/leaf-audit.json --management-shell --capture-configuration --quiesce-unused \
             --pdk build/r1_post_pdk/ihp-sg13cmos5l --out build/r1_postphysical/shell > build/r1_postphysical/shell.log 2>&1
       - uses: actions/upload-artifact@v7
         if: always()

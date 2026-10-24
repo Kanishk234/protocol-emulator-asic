@@ -198,11 +198,19 @@ eFPGA fabric(
     runner=get_runner('icarus')
     runner.build(sources=sources,hdl_toplevel='r1_tb',build_dir=out/'sim',build_args=['-g2012'],always=True)
     extra_env={'R1_IMAGE':str(image),'R1_DIV':str(params['DIV']),'R1_HALF':str(params['HALF'])}
+    extra_env['R1_ACTIVITY']=str(out/'activity.json')
     if capture_configuration:extra_env['R1_CFG_SNAPSHOT']=str(out/'configuration-state.json')
     runner.test(hdl_toplevel='r1_tb',test_module='test_loaded',test_dir=ROOT/'test_internal/r1_configured',
                 results_xml=str(out/'results.xml'),extra_env=extra_env)
     from autonomy.check_xml import check_xml
     tests=check_xml(out/'results.xml',1)
+    activity=json.loads((out/'activity.json').read_text())
+    if set(activity['windows_ns'])!={'uart_tx','uart_rx','spi'}:
+        raise ValueError('Incomplete concurrent activity observation')
+    windows=list(activity['windows_ns'].values())
+    overlap=min(end for start,end in windows)-max(start for start,end in windows)
+    if any(end<=start for start,end in windows) or overlap<=0 or activity['overlap_ns']!=overlap:
+        raise ValueError('Primary activity does not overlap')
     snapshot=None
     if capture_configuration:
         captured=json.loads((out/'configuration-state.json').read_text())['tiles']
@@ -236,6 +244,7 @@ eFPGA fabric(
                 physical_acceptance=False,timing_acceptance=False,management_spi_shell_tested=False,
                 driven_scalar_tile_inputs=len(driven_inputs),auxiliary_system_reset_driven=True,
                 configuration_snapshot=snapshot,
+                concurrent_activity=activity,
                 mapped_lut_tiles_tested=16 if mapped else 0,
                 mapped_primitive_tiles_tested=2 if mapped_bundle is not None else 0,
                 mapped_tile_instances_tested=40 if mapped_bundle is not None else (16 if mapped else 0),

@@ -6,6 +6,7 @@ import cocotb
 from cocotb.handle import HierarchyObject
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge,Timer,with_timeout
+from cocotb.utils import get_sim_time
 from compile.bitfile import BitFile
 
 async def cycle(d,n=1):
@@ -62,22 +63,27 @@ async def loaded_concurrent_uart_spi(d):
             tiles[tile._name]=dict(tile_type=tile._def_name,q=values)
         Path(os.environ['R1_CFG_SNAPSHOT']).write_text(json.dumps(dict(tiles=tiles),indent=2,sort_keys=True)+'\n')
 
+    activity={}
     async def uart_tx():
         for _ in range(20000):
             if int(d.tx_o.value)==0:break
             await cycle(d)
         else:raise AssertionError('configured UART never starts')
+        start=get_sim_time(unit='ns')
         await cycle(d,div+div//2)
         value=0
         for bit in range(8):
             value|=int(d.tx_o.value)<<bit
             await cycle(d,div)
         assert value==0xa5 and int(d.tx_o.value)==1
+        activity['uart_tx']=(start,get_sim_time(unit='ns'))
 
     async def uart_rx():
         await cycle(d,12)
+        start=get_sim_time(unit='ns')
         for level in [0]+[(0x69>>i)&1 for i in range(8)]+[1]:
             d.rx_i.value=level;await cycle(d,div)
+        activity['uart_rx']=(start,get_sim_time(unit='ns'))
         await cycle(d,div)
 
     async def spi_peer():
@@ -85,6 +91,7 @@ async def loaded_concurrent_uart_spi(d):
             if not int(d.cs_n_o.value):break
             await cycle(d)
         else:raise AssertionError('configured SPI never selects')
+        start=get_sim_time(unit='ns')
         value=0;previous=int(d.sck_o.value);count=0;elapsed=0;last_edge=None
         while not int(d.cs_n_o.value):
             now=int(d.sck_o.value)
@@ -95,6 +102,7 @@ async def loaded_concurrent_uart_spi(d):
                 value=(value<<1)|int(d.mosi_o.value);count+=1
             previous=now;await cycle(d);elapsed+=1
         assert count==8 and value==0x3c
+        activity['spi']=(start,get_sim_time(unit='ns'))
 
     tx=cocotb.start_soon(uart_tx());rx=cocotb.start_soon(uart_rx());spi=cocotb.start_soon(spi_peer())
     await put(d,0);await put(d,0xa5);await put(d,3);await put(d,0x3c)
@@ -104,4 +112,9 @@ async def loaded_concurrent_uart_spi(d):
         assert tag not in packets;packets[tag]=value
     assert packets=={0:0x69,1:0xff}
     for task in (tx,rx,spi):await with_timeout(task,1000,'us')
+    overlap=min(end for start,end in activity.values())-max(start for start,end in activity.values())
+    assert len(activity)==3 and overlap>0, f'No simultaneous UART TX/RX and SPI activity: {activity}'
+    d._log.info('Simultaneous UART TX/RX and SPI activity: %s ns; windows=%s',overlap,activity)
+    if os.environ.get('R1_ACTIVITY'):
+        Path(os.environ['R1_ACTIVITY']).write_text(json.dumps(dict(windows_ns=activity,overlap_ns=overlap),indent=2,sort_keys=True)+'\n')
     assert int(d.cs_n_o.value)==1

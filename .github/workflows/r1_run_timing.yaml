@@ -5,6 +5,8 @@ on:
     branches: [efpga]
     paths:
       - 'spikes/r1/run_timing.py'
+      - 'spikes/r1/boolean_support.py'
+      - 'tools/profiling/tests/test_r1_boolean_support.py'
       - 'tools/profiling/tests/test_r1_run_timing.py'
       - '.github/workflows/r1_run_timing.yaml'
 permissions:
@@ -59,8 +61,8 @@ jobs:
       - name: Check guards and independently authenticate all native contexts
         run: |
           source .venv/bin/activate
-          python -m pytest -q tools/profiling/tests/test_r1_run_timing.py tools/autonomy/tests/test_r1_balanced_audit.py --junitxml=build/r1_timing/guards.xml
-          python -m tools.autonomy.check_xml build/r1_timing/guards.xml --minimum-cases 11
+          python -m pytest -q tools/profiling/tests/test_r1_run_timing.py tools/profiling/tests/test_r1_boolean_support.py tools/autonomy/tests/test_r1_balanced_audit.py --junitxml=build/r1_timing/guards.xml
+          python -m tools.autonomy.check_xml build/r1_timing/guards.xml --minimum-cases 17
           PYTHONPATH=tools python -m autonomy.r1_balanced_audit \
             --baseline build/r1_timing/mapped/input --baseline-identity build/r1_timing/provider-mapped.json \
             --critical build/r1_timing/leaves --critical-identity build/r1_timing/provider-critical.json \
@@ -82,6 +84,23 @@ jobs:
             ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
             sh -c 'set -eu; yosys -V > build/r1_timing/analysis/yosys-version.txt; sta -version > build/r1_timing/analysis/sta-version.txt; yosys -Qq -s build/r1_timing/analysis/elaborate.ys; timeout 90s sta -no_init -no_splash -exit build/r1_timing/analysis/static.tcl > build/r1_timing/analysis/static.log 2>&1; timeout 90s sta -no_init -no_splash -exit build/r1_timing/analysis/dynamic.tcl > build/r1_timing/analysis/dynamic.log 2>&1' \
             > build/r1_timing/analysis/tool.log 2>&1
+      - name: Prepare source-bound binary feedback-support diagnostic
+        run: |
+          source .venv/bin/activate
+          python spikes/r1/boolean_support.py prepare --timing build/r1_timing/analysis --out build/r1_timing/support
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            sh -c 'yosys -V; yosys -Q -T -s build/r1_timing/support/export.ys' \
+            > build/r1_timing/support/export.log 2>&1
+          python spikes/r1/boolean_support.py render --out build/r1_timing/support
+      - name: Prove bounded binary support with positive and negative controls
+        timeout-minutes: 10
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            sh -c 'set -eu; for taskscript in build/r1_timing/support/L*.ys build/r1_timing/support/control*.ys; do yosys -Q -T -s "$taskscript" > "${taskscript%.ys}.log" 2>&1; done'
+          source .venv/bin/activate
+          python spikes/r1/boolean_support.py audit --out build/r1_timing/support
       - name: Refuse altered topology missing coverage or loop-sensitive timing
         if: always()
         run: |

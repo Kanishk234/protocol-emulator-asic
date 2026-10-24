@@ -1,4 +1,6 @@
 # Fresh eFPGA candidate plan — R1 exploration
+**October24 integration update:** D117 full managementSPI/reset/reload/second-transfer gate passes generatedRTL on Icarus12/13, but exposes native BUG132 at the first post-restart CH_WRITE (also without reload). All8,736configuration values match after reload. Native full-shell completion remains open; diagnose the mapped scheduler path before promotion. Hosted direct-native overlap40066466677 and three RTLcontrols40066466659 pass; G1protected. See reports/r1_management_shell_20261024.md.
+
 
 Date: 2026-10-20. Status: proposed experimental specification and acceptance plan; no implementation selected, no replacement of frozen G1. R1 is a working label, not a promised resource count. Exploration follows D-037; the production architecture contract remains unchanged.
 

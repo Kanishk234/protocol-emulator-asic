@@ -347,9 +347,10 @@
         "40030916359 at00216ea SUCCESS13native geometries/3064neighbor pairs then5balancedcritical leaves zeroGRT/PG; root88prepared hashes/pinnedLEF/core/cell/13ODB/3064pairs/5finalnative auditsPASS.",
         "40032527005 at71d902a SUCCESS1loadedprimary with7native critical instances/33mappedbaseline; root52inputs/twoIcarus13binaries/XML/source reauthPASS. D114remaining21contexts40033384495 atc6eba01active;66localtestsPASS.",
         "40030916359/40033384495 SUCCESSall26balancedgloballeaf contexts for40instances; reusable independent API/88input/config-cell/LEFarea/ODB/policy/absolutePGphase/pin/52wireguide auditPASS.",
-        "40039667532at29e644e attempt1SUCCESS corrected40native primary; root5guards/1functional/48inputs/2binaries;43scalarinputsdriven and8736defined configuration Qstates, snapshot484e7383\u2026;71focusedtestsPASS."
+        "40039667532at29e644e attempt1SUCCESS corrected40native primary; root5guards/1functional/48inputs/2binaries;43scalarinputsdriven and8736defined configuration Qstates, snapshot484e7383\u2026;71focusedtestsPASS.",
+        "40066466677 ate192b67: all40native primary+8736definedQ+explicit8340ns logical overlapPASS; root48inputs/2binary/XML/source/snapshot auditPASS; RTLcontrols40066466659 all3PASS. D117 full managementSPI test passes generatedRTL on Icarus12/13 but native BUG132 second-transfer CH_WRITE stalls after restart, also without reload; all8736cfgvalues unchanged after reload.73focused guardsPASS; native full-shell gate not passed."
       ],
-      "next_action": "Begin scoped configured RUN-only estimated timing from observed Qstates, audit clock/path coverage; qualify detailed routing/physical views and full macro/fixed-shell integration at unchanged6x4/20ns. Then real managementSPI/CRC/reload/parking and full retained-runtime parity. Keep secondary UART+I2Ccompiler timeout explicit, no sealed tuning or G1replacement yet.",
+      "next_action": "Authenticate hosted D117 gate, minimize native BUG132 first post-restart CH_WRITE and identify nonconverging mapped path. Then RUN-only timing/clock-path coverage and detailed-route/macro integration. Secondary UART+I2C600s routing timeout remains open. G1 protected; no full-chip acceptance.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",

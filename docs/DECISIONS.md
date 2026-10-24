@@ -1,5 +1,11 @@
 # Decisions
 
+## D-117: Qualify the fresh candidate through the unchanged management shell
+- **Date:** 2026-10-24. **Status:** accepted diagnostic integration gate; no production architecture change.
+- **Decision:** derive a simulation adapter from the frozen R1 pin map, instantiate production `wp_shell`, synchronization, registered outputs and parking, and use diagnostic ARCH `0x00fe` with the candidate frame dimensions. Reuse the real host SPI transport and independent protocol library. Keep direct-frame native/configuration observation as a separate control.
+- **Reason:** the native-leaf test proved primary behavior behind direct frame loading but excluded host SPI, CRC, FIFO integration and shell reset/parking. Require error rejection, full load, concurrent UART/SPI responses with backpressure, STOP/restart and successful post-reload SPI traffic before closing this simulation gap.
+- **Cost/evidence:** diagnostic software/test/workflow only; no added chip cells, G1 edits, graph changes or full-chip hardening attempt. See `reports/r1_management_shell_20261024.md`; actual execution identities belong in WORKLOG. Native exports and original compiler image remain authenticated; no detailed-route or timing acceptance is inferred.
+
 Format for each entry: ID, date, status (Proposed / Accepted / Superseded), decision, reason, alternatives considered, cost, evidence.
 
 ## D-081: Measure interaction of two individually beneficial reset-placement policies

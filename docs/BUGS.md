@@ -1,5 +1,16 @@
 # Bugs
 
+## 132: Mapped/native candidate stalls on a second host-channel command after restart
+- **Symptom:** the complete native primary passes real management-SPI loading, UART/SPI concurrency and response backpressure, USER_RESET and STOP/restart, but stops advancing at 5,460,560 ns while the first second-transfer CH_WRITE completes. Omitting the second image load still reproduces it. Full reload reproduces at 10,712,400 ns.
+- **Controls:** generated RTL passes the entire sequence on Icarus 12 and the same Icarus 13 used for native cells. All 8,736 native configuration Q values are identical before/after same-image reload. Interactive scheduler stepping remains at the failing timestamp; shell-visible data=3, valid=1, ready=1, user reset released. The added second SPI payload has not yet been accepted at the failure point.
+- **Root cause:** open. These observations exclude changed configuration contents and a simulator-version difference alone; they do not identify the responsible mapped cell/path or prove a silicon defect. A bare-mapped full-shell control timed out during reload and is inconclusive.
+- **Coverage/status:** D117's mandatory full-shell/reload/second-transfer test retains this failure, with bounded wall time and partial artifacts. Restart-only is explicitly a diagnostic control and cannot satisfy the reload gate. No native full-shell completion or replacement is claimed. Next: minimize the first post-restart CH_WRITE and trace the nonconverging mapped event path; do not modify architecture or clock/reset policy on speculation.
+
+## 131: Diagnostic simulation provenance was hashed after execution
+- **Symptom:** an input edited while a long diagnostic simulation was running could be recorded with its later contents rather than the version actually used. Found during management-shell harness development; no frozen production result was promoted from such a run.
+- **Root cause:** `configured_smoke.py` assembled its input hash record only after the simulator returned.
+- **Fix/coverage:** capture all source/image/native-audit/adapter/test/host input hashes before building and executing, then refuse any changed input before producing a passing result. The final shell and direct-frame replays run with stable inputs under this guard. Strict XML remains mandatory; earlier development runs are not the final acceptance evidence.
+
 ## 122: Native import census omits materialized constant drivers
 - **Date:**2026-10-23.
 - **Symptom/check:**39989251719 successfully places all210reference signal pins and retains438latches, then strict cell equality rejects two extra cells.

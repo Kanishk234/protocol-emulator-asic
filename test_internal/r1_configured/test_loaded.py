@@ -36,6 +36,18 @@ async def get(d):
         await cycle(d)
     raise AssertionError('configured host-read handshake timeout')
 
+
+def capture_configuration(d,path):
+    tiles={}
+    for tile in d.fabric:
+        if not isinstance(tile,HierarchyObject) or not tile._name.startswith('Tile_'):
+            continue
+        values={cell._name:str(cell.Q.value) for cell in tile
+                if isinstance(cell,HierarchyObject) and cell._def_name=='sg13cmos5l_dlhq_1'}
+        tiles[tile._name]=dict(tile_type=tile._def_name,q=values)
+    Path(path).write_text(json.dumps(dict(tiles=tiles),indent=2,sort_keys=True)+'\n')
+    return tiles
+
 @cocotb.test()
 async def loaded_concurrent_uart_spi(d):
     div=int(os.environ['R1_DIV'])
@@ -54,14 +66,7 @@ async def loaded_concurrent_uart_spi(d):
     await cycle(d,10);d.rst_n.value=1;await cycle(d,10)
     d._log.info('Compiler image loaded through frame FSM; starting pin-level traffic')
     if os.environ.get('R1_CFG_SNAPSHOT'):
-        tiles={}
-        for tile in d.fabric:
-            if not isinstance(tile,HierarchyObject) or not tile._name.startswith('Tile_'):
-                continue
-            values={cell._name:str(cell.Q.value) for cell in tile
-                    if isinstance(cell,HierarchyObject) and cell._def_name=='sg13cmos5l_dlhq_1'}
-            tiles[tile._name]=dict(tile_type=tile._def_name,q=values)
-        Path(os.environ['R1_CFG_SNAPSHOT']).write_text(json.dumps(dict(tiles=tiles),indent=2,sort_keys=True)+'\n')
+        capture_configuration(d,os.environ['R1_CFG_SNAPSHOT'])
 
     activity={}
     async def uart_tx():

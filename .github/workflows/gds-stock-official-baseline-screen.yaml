@@ -46,6 +46,9 @@ jobs:
         assert config['RUN_POST_GRT_DESIGN_REPAIR'] is True
         assert config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == 600
         assert config['GRT_ADJUSTMENT'] == 0.16
+        assert config['RUN_POST_GRT_RESIZER_TIMING'] is True
+        assert config['GRT_RESIZER_SETUP_SLACK_MARGIN'] == 0
+        assert config['GRT_RESIZER_HOLD_SLACK_MARGIN'] == 0.125
         assert not any(k.startswith('TRIPWIRE_') for k in config)
         assert 'PNR_SDC_FILE' not in config and 'SIGNOFF_SDC_FILE' not in config
         assert 'ERROR_ON_MAGIC_DRC' not in config and 'ERROR_ON_ILLEGAL_OVERLAPS' not in config
@@ -106,6 +109,7 @@ jobs:
         from pathlib import Path
         sys.path.insert(0, 'scripts/ci')
         from postgrt_timing import CORNERS, screen
+        from native_stock_route import run_step
         root = Path('runs/stock-official-baseline')
         states = list(root.glob('*-openroad-stamidpnr-3/state_out.json'))
         assert len(states) == 1
@@ -120,6 +124,14 @@ jobs:
         # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
         # No resizer, repair, placement or routing step is invoked.
         screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source)
+        # Check antenna on the same final database; do not inherit pre-timing results.
+        run_step(json.loads(Path('src/config_merged.json').read_text()), source,
+                 output / 'fresh-antenna', ['OpenROAD.CheckAntennas'])
+        antenna_files = list((output / 'fresh-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))
+        assert len(antenna_files) == 1
+        antenna_metrics = json.loads(antenna_files[0].read_text())
+        antenna = {key: antenna_metrics[key] for key in ('antenna__violating__nets', 'antenna__violating__pins')}
+        assert all(isinstance(v, int) and v >= 0 for v in antenna.values())
         assert hashes() == before, 'Read-only audit modified source physical views'
         result = json.loads((output / 'comparison.json').read_text())
         rows = {}
@@ -134,7 +146,7 @@ jobs:
             rows[corner] = {key: metrics[key] for key in keys}
         (output / 'read_only_audit.json').write_text(json.dumps(dict(
             source_state=str(source), unchanged_physical_view_hashes=before,
-            fresh_corner_metrics=rows, physical_repairs_performed=False,
+            fresh_corner_metrics=rows, fresh_antenna_metrics=antenna, physical_repairs_performed=False,
             qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
         print(json.dumps(rows, indent=2))
         PYCODE

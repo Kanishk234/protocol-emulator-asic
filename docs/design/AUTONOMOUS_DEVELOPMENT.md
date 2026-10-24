@@ -1,5 +1,5 @@
 # Autonomous development in an active Codex session
-**October24 integration update:** BUG132 is repaired locally by D118 opt-in grounding of186unused padded GND mux outputs (593existing config bits), preserving all active features/hardware. All40native leaves now pass configured reset/secondSPI and full managementSPI/error/FIFO/USER_RESET/STOP/reload/secondSPI;8736Q remain defined and match across reload. Original-image failure is retained. Hosted repair replay pending; detailed routing/timing/runtime parity and replacement remain open. G1protected. See reports/r1_management_shell_20261024.md.
+**October24 integration update:** BUG132 is repaired locally by D118 opt-in grounding of186unused padded GND mux outputs (593existing config bits), preserving all active features/hardware. All40native leaves now pass configured reset/secondSPI and full managementSPI/error/FIFO/USER_RESET/STOP/reload/secondSPI;8736Q remain defined and match across reload. Original-image failure is retained. Hosted repair40109928699 atd5d9228 passes; root source/XML/50+55+64input/two-binary checks pass; detailed routing/timing/runtime parity and replacement remain open. G1protected. See reports/r1_management_shell_20261024.md.
 
 
 This is the operating procedure for a coordinator and specialist agents working

@@ -90,8 +90,13 @@ dictionaries match, and comparison with the original snapshot shows exactly
 593changed Q values. Derived snapshot SHA256:
 `0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7`.
 The complete local shell simulation takes121.134seconds in this run; this is
-test execution time, not hardening time or silicon performance. Hosted repair
-replay is the next evidence gate. A unique minimal feedback SCC and physical
+test execution time, not hardening time or silicon performance. Hosted repair40109928699 atd5d9228 passes. Root authentication checks the
+exact source/attempt,12guard cases, three strict functional cases,50original/
+55derived-direct/64shell input hashes and both Icarus13binary hashes per case.
+Hosted derived image and Q snapshot match local results; all8736Q are defined,
+reload dictionaries match and exactly593Q differ from the original control.
+The retained VPI diagnostic and finite/nonconverging fixtures are documented in
+`spikes/r1/DELTA_DEBUG.md`. Detailed routing and configured timing remain open. A unique minimal feedback SCC and physical
 oscillation are not claimed.
 
 No SDF or extracted parasitics are used; activity windows are logical

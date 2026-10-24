@@ -40,7 +40,7 @@ Read-only native configuration observation, when enabled, compares the complete
 first-load and reloaded tile Q dictionaries. It is separate from the traffic
 oracle and is not an independent expected-bit comparison.
 
-## Actual results and open failure
+## Original negative control and quiescence repair
 
 The preceding direct-frame native gate 40066466677 at `e192b67` passed. Root
 reauthentication checked all 48 inputs, both simulator binaries, one strict
@@ -51,7 +51,7 @@ The full management-shell sequence passes generated RTL locally on Icarus 12
 and 13 (`build/r1_shell_rtl_progress` and `build/r1_shell_rtl_icarus13`, one strict
 case each, 8,500 ns logical overlap). Native leaves pass the first concurrent
 traffic and response checks, but the new second-transfer test exposes BUG132.
-Native full-shell completion is **not passed**. The full variant stalls during
+Native full-shell completion with the original image is **not passed**. The full variant stalls during
 the first postreload CH_WRITE at 10,712,400 ns; the restart-only control reproduces
 without reloading at 5,460,560 ns. Both image observations contain the same
 8,736 native configuration values. Evidence directories:
@@ -60,8 +60,39 @@ are failures, not acceptance. A bare-mapped control timed out during the second
 load and does not yet distinguish bare mapping from native placement/buffering.
 Interactive scheduler inspection follows the upstream
 [Icarus debugger documentation](https://steveicarus.github.io/iverilog/usage/vvp_debug.html).
-The root cause and responsible event path remain open. The workflow requires
+The original observation did not identify the responsible event path. The workflow requires
 the complete sequence and never substitutes the restart-only diagnostic.
+
+The short direct-frame reproducer subsequently fails at212060ns with reset,
+passes without reset, and also reproduces on bare-mapped leaves. A read-only
+VPI diagnostic finds1001changes of X1Y2/W1BEG at a single timestamp, with
+circulation through X0Y2 routing and native LUT data. Grounding just one unused
+output is insufficient. D118 instead grounds every eligible *unrouted* mux
+output whose existing padded all-ones selector is explicitly wired to GND0.
+The original FASM must reproduce the original image before transformation;
+active feature bits cannot overlap a changed selector. No cell/netlist/pin,
+clock/reset policy, compiled routed PIP or LUT setting is changed.
+
+The derived primary grounds186outputs and changes593configuration bits in the
+same962word image. `tools/profiling/r1_quiesce.py` retains both image identities
+and an explicit selector/input hash record. Five policy tests exercise source
+mismatch, active-bit overlap, active outputs, full/non-GND selectors and pickle
+safety. Production G1 compilation is unchanged.
+
+**Actual local repair results:** `build/r1_original_restart_control` times out
+at the known failing timestamp using the committed restart-probe test path.
+`build/r1_quiescence_direct` passes one strict case including reset/secondSPI;
+`build/r1_quiescence_shell` passes one strict case including the entire real
+management-SPI/error/concurrency/FIFO/reset/STOP/reload/secondSPI sequence.
+Both use all40native leaves and observe8736defined configuration values.
+The shell's64input hashes and strict XML were rechecked; its first/reloaded Q
+dictionaries match, and comparison with the original snapshot shows exactly
+593changed Q values. Derived snapshot SHA256:
+`0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7`.
+The complete local shell simulation takes121.134seconds in this run; this is
+test execution time, not hardening time or silicon performance. Hosted repair
+replay is the next evidence gate. A unique minimal feedback SCC and physical
+oscillation are not claimed.
 
 No SDF or extracted parasitics are used; activity windows are logical
 simulation observations, not measured silicon performance.

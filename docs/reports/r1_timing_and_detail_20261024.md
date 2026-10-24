@@ -87,3 +87,21 @@ LVS/antenna/PG analysis, extracted timing or assembled-macro/chip qualification.
 
 G1, its configuration ABI and the sealed held-out set remain untouched. No
 phase box or full-chip hardening attempt is consumed by these probes.
+
+## Binary feedback-support follow-up (D121)
+
+The source-bound local diagnostic in `build/r1_boolean_support_v2` uses the
+same snapshot0491a427…, actual native LUT4x8_ha export and slow Liberty. All438
+configuration latch outputs in Tile_X2Y3 are bound. For each LA–LH output, it
+expands a cone to64levels/2048cells; sequential outputs, module inputs and
+recursion/boundaries become shared arbitrary binary values. Two copies differ
+only in that root's feedback cut value. All8difference miters are UNSAT.
+The positive equality control is UNSAT and the unequal negative control SAT.
+
+This establishes independence of each expanded binary function from its own
+feedback cut, under arbitrary shared boundaries. It does **not** establish
+whole-network acyclicity, absence of reconvergent glitches, bounded settling,
+physical timing or a waiver for the six endpoint differences. No original STA
+arc, case value, image or tolerance changes.97focused guards pass. Hosted replay
+is added to the existing configured-timing workflow ahead of its unchanged
+strict timing gate; its original timing sensitivity must remain visible.

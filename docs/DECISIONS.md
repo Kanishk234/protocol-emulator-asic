@@ -1,5 +1,11 @@
 # Decisions
 
+## D-121: Binary feedback-support proofs remain separate from delay qualification
+- **Date:** 2026-10-24. **Status:** accepted diagnostic; no timing waiver or hardware change.
+- **Decision:** investigate BUG133 with a bounded native-cell cone for each LA–LH output in Tile_X2Y3. Bind the same D118 snapshot, actual native export and slow Liberty as D119. Replace sequential, input, recursion and depth/size boundaries with arbitrary binary variables; compare two copies with only that root feedback bit changed. Preserve all shared boundary values. Require positive and counterexample-producing negative SAT controls.
+- **Evidence/limits:** local eight cofactor miters prove the expanded binary function independent of its own cut feedback value, with64levels/2048cell bounds; all438actual tile configuration Q values bound. This is a conservative diagnostic of stable binary function, not a proof of global acyclicity, glitch freedom, bounded settling, delay or all six affected endpoints. No set_case_analysis additions, disabled timing arcs, tolerance changes or compiler/image changes follow from this result. Keep the original timing guard red until a sound delay/hazard model or validated structural timing treatment resolves its sensitivity. Hosted replay required.
+- **Cost:** software-only analysis, six new admission guards and a bounded stage alongside the existing configured timing workflow; no area or protocol cost.
+
 ## D-120: Detail-route one frozen R1 primitive checkpoint before macro assembly
 - **Date:** 2026-10-24. **Status:** accepted bounded diagnostic; no physical acceptance yet.
 - **Decision:** resume exactly primitive1 from40030916359/source00216eac, ODB28dd8ebc… and guide661fa61c…. Keep placement, masters, pins, logical connectivity, power terminals and Metal2–Metal4 policy unchanged. Run32detailed-routing iterations with4threads and a1200-second hosted wall bound, without synthesis, CTS, repair, geometry/seed sweep or new hardware.

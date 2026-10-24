@@ -6,8 +6,8 @@ Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabri
 completes its detailed-route stage in1m49s elapsed/4m11s CPU in40119792058 at
 dcf59af, with zero OpenROAD router violations. BUG134 makes that workflow's
 wire postcheck fail despite a completed route; corrected local read-only replay
-confirms1557required routed nets and unchanged geometry/resources. Hosted checker
-replay remains pending. This is one leaf's route stage, not complete leaf GDS,
+confirms1557required routed nets and unchanged geometry/resources. Corrected hosted40126282580 at8d1ebea passes end to end, with source/script/ODB
+hashes,6guards and all1557wire/frozen-inventory checks authenticated. This is one leaf's route stage, not complete leaf GDS,
 foundry signoff, macro assembly or full-chip hardening; G1's timings below remain
 the applicable chip-flow baseline.
 

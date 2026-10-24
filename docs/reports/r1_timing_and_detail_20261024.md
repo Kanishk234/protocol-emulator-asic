@@ -38,6 +38,18 @@ The method follows OpenSTA's primary-source
 and [loop-handling variables](https://opensta.readthedocs.io/en/latest/Variables/).
 No configured setup/clock-rate acceptance follows from the optimistic reports.
 
+Hosted40119792005 atdcf59af reproduces the same qualification failure on the
+pinned OpenSTA2.7.0 environment: all8736case/gate checks,370classified registers
+and246endpoints are retained, with six loop-policy-sensitive endpoints. The
+program and native functional acceptance from40109928699 remain unchanged.
+Two grounding hypotheses were evaluated separately and are **not retained**:
+broad closure changed implicit register-enable defaults and broke UART, while
+a routing-wire-only closure passed a short native behavior/reset probe but left
+the six-endpoint sensitivity. Preserving explicit FASM fields alone does not
+justify changing implicit BEL defaults. A case-aware sequential observability
+check also finds the six endpoints can reach outputs, so they cannot simply be
+waived as dead storage. No new bitstream policy is promoted.
+
 ## Detailed-routing readiness
 
 D120 fixes one source: primitive1's global-route output from40030916359,
@@ -52,6 +64,16 @@ readiness and incomplete routing only, not final DRC or impossibility. The
 hosted pinned-tool workflow allows the declared complete run and saves
 per-iteration DRC reports, exit code, inventories, guides and final database
 when available. Timeout has its own failure classification.
+
+Hosted40119792058 atdcf59af **completes detailed routing with zero router
+violations**, with the route stage reporting1m49s elapsed. The workflow's
+postcheck fails because of BUG134's unsupported wire getter. A corrected
+read-only local replay of that exact hosted ODB, using the same OpenROADdcf36133
+backend, confirms all1557required signal nets have nonempty wire encodings,
+versus zero in the frozen unrouted source. Frozen resource, placement,
+connectivity and boundary-pin inventories are identical. This is an authenticated
+raw routing result plus local checker replay; the corrected hosted workflow is
+still to be authenticated. The failed original workflow is not relabeled green.
 
 The after-route audit requires identical cells/placements/orientations, logical
 terminal connectivity and boundary-pin geometry, including PG pins. It checks

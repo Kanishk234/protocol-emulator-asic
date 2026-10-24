@@ -2,6 +2,15 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**October24 R1 leaf-stage measurement:** frozen primitive1 from40030916359
+completes its detailed-route stage in1m49s elapsed/4m11s CPU in40119792058 at
+dcf59af, with zero OpenROAD router violations. BUG134 makes that workflow's
+wire postcheck fail despite a completed route; corrected local read-only replay
+confirms1557required routed nets and unchanged geometry/resources. Hosted checker
+replay remains pending. This is one leaf's route stage, not complete leaf GDS,
+foundry signoff, macro assembly or full-chip hardening; G1's timings below remain
+the applicable chip-flow baseline.
+
 **October19 current baseline refresh:** GDS39280550500 at0165bef succeeds
 in GDS/precheck/gl_test/viewer. Hosted job wall times:21m51s GDS,5m36s
 precheck,29m51s gl_test; end-to-end51m45s with overlapping jobs. Downloaded

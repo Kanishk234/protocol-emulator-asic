@@ -1,5 +1,11 @@
 # Bugs
 
+## 134: Detailed-route wire observer swallowed an unsupported OpenDB method
+- **Symptom:** hosted40119792058 atdcf59af completes primitive1 detailed routing with zero router violations, but the audit incorrectly labels all1557required signal nets unwired.
+- **Root cause:** `dbWire.getId` is not exposed by this OpenDB Tcl interface. A broad `catch` converted that API error into a missing-wire flag. Synthetic inventory tests did not exercise the real getter; the unrouted input alone could not expose a false negative.
+- **Fix/coverage:** explicitly distinguish a NULL wire, require its owning net to match, and query the supported positive opcode `count`. Unsupported methods now fail the observer instead of becoming a missing wire. A read-only replay on the authenticated hosted routed ODB reports all1557wires; the frozen original ODB reports zero. Cell/placement/pin/connectivity,1453cell/334latch/2906PG-terminal inventories match exactly. Tests also reject a false-positive unrouted control and mismatched net populations. Corrected hosted end-to-end replay is required before calling the workflow green.
+- **Scope:** this is a checker defect, not a hardware/routing change. The original run's overall failure stays recorded; zero router violations do not imply foundry DRC/LVS/extracted timing or full-macro acceptance.
+
 ## 133: Configured timing depends on automatic combinational-loop cuts
 - **Symptom:** the new configured native timing probe has complete clock/path classification, yet six endpoint results differ between static and dynamic OpenSTA loop handling. The same endpoint set is present in both views. A nonnegative worst setup report alone would conceal this model dependence.
 - **Root-cause status:** open timing-qualification issue, not a proven RTL or silicon defect. Reconfigurable mux networks contain structural loops; the selected configuration's inactive logic and loop cuts must be reconciled. Earlier ad-hoc source/read ordering did not expose the difference, so a reproducible, source-bound probe is necessary.

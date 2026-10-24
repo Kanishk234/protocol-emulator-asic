@@ -351,9 +351,10 @@
         "40066466677 ate192b67: all40native primary+8736definedQ+explicit8340ns logical overlapPASS; root48inputs/2binary/XML/source/snapshot auditPASS; RTLcontrols40066466659 all3PASS. D117 full managementSPI test passes generatedRTL on Icarus12/13 but native BUG132 second-transfer CH_WRITE stalls after restart, also without reload; all8736cfgvalues unchanged after reload.73focused guardsPASS; native full-shell gate not passed.",
         "D118 local repair: mapped direct-reset reproducer fails original at212060ns, no-reset passes; read-only VPI traces unused routing activity.186unused padded GND outputs/593bits preserve active features and fix native direct reset+secondSPI and full managementSPI/reset/reload/secondSPI. All40native,8736definedQ; reload equality and exactly593Q changes.64shell input hashes/XML checked;78focused testsPASS. Original failures retained; hosted repair pending.",
         "40109928699 atd5d9228 attempt1SUCCESS:12guards + original direct/derived restart/derived full-shell strictPASS. Root50/55/64inputs and2binaries/case/XML/derivedimage checked;8736definedQ, reload equality,593Q changed. RTLcontrols40109928725/core checksPASS; fabric inprogress whenchecked. Versioned delta observer finite/loop fixture controlsPASS.",
-        "D119 local configured probe:8736case/gate checks,370FF classified225timed/11constant/134inactive-unobservable;246endpoints both modes, six loop-sensitive (BUG133), guardFAILretained. D120 frozen primitive1 detailed route local180stimeout/incomplete; pinned hosted32iterations/1200swall prepared.90focused testsPASS; separate workflow/source closures retained."
+        "D119 local configured probe:8736case/gate checks,370FF classified225timed/11constant/134inactive-unobservable;246endpoints both modes, six loop-sensitive (BUG133), guardFAILretained. D120 frozen primitive1 detailed route local180stimeout/incomplete; pinned hosted32iterations/1200swall prepared.90focused testsPASS; separate workflow/source closures retained.",
+        "40119792005 atdcf59af reproduces timing BUG133:8736case/gate,370FF/246endpoints, six mode-sensitive.40119792058 completes frozen primitive detailed routing0routerviolations/1m49s, then checkerBUG134 false-negative getId. Corrected real-ODB replay:1557routed wires vs0source, identical1453cells/334latches/2906PGterms and frozen geometry/connectivity.91focused testsPASS; hosted checker fix replay pending."
       ],
-      "next_action": "Authenticate D119 timing and D120 frozen detailed-route hosted probes. Keep BUG133 loop-cut sensitivity failing until reconciled; do not add blanket false paths. Diagnose final DRT markers or distinguish wall timeout before hardware changes. Then full macro/fixed-shell physical assembly, extracted timing and retained-runtime parity. G1 protected; secondary I2C600s compiler route open.",
+      "next_action": "Authenticate corrected hosted detailed-route wire observer; retain401197 raw zero-violation route. Resolve active BUG133 loop sensitivity with selected-mux/functional-support evidence, no blanket false paths. Then remaining detailed contexts, macro/shell physical assembly/extracted timing and runtime parity. G1 protected; optional I2C compiler timeout open.",
       "acceptance": [
         "Original graph multiplicities and bit mappings match before any model experiments.",
         "Full-grid config storage/mux census includes border tiles.",
@@ -364,6 +365,11 @@
       ],
       "depends_on": [
         "R1-BASELINE"
+      ],
+      "rejected_hypotheses": [
+        "Broad unused-selector grounding closure breaks UART by disabling implicit default register enables; explicit FASM-field preservation is insufficient. Do not promote.",
+        "Routing-wire-only forward ground closure preserves implicit BEL selectors and passes short native behavior/reset but retains six loop-sensitive endpoints. No demonstrated timing-qualification benefit; do not replace accepted D118 image.",
+        "Classifying the six sensitive endpoints as dead storage is invalid: case-aware sequential fanout reaches outputs. No waiver."
       ]
     }
   ],

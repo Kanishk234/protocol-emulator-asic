@@ -29,3 +29,11 @@ def test_missing_or_duplicate_required_net_routes_fail():
     text=inventory()
     for rows in ['', 'REQUIRED_NET\tnet\t0\n', 'REQUIRED_NET\tnet\t1\n'*2]:
         with pytest.raises(ValueError):check_inventories(text,text+rows)
+
+
+def test_unrouted_control_must_not_false_positive_and_net_population_must_match():
+    text=inventory()
+    with pytest.raises(ValueError,match='unrouted control'):
+        check_inventories(text+'REQUIRED_NET\tnet\t1\n',text+'REQUIRED_NET\tnet\t1\n')
+    with pytest.raises(ValueError,match='population'):
+        check_inventories(text+'REQUIRED_NET\tnet\t0\n',text+'REQUIRED_NET\tother\t1\n')

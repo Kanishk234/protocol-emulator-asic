@@ -43,7 +43,11 @@ proc inventory {filename} {
  foreach net [$b getNets] {
   if {[$net getSigType] in {POWER GROUND}} {continue}
   if {[expr {[llength [$net getITerms]]+[llength [$net getBTerms]]}]<2} {continue}
-  set wire [$net getWire];set wired [expr {![catch {$wire getId}]}]
+  set wire [$net getWire];set wired 0
+  if {$wire ne "NULL" && $wire ne ""} {
+   if {[$wire getNet] ne $net} {error "route wire belongs to another net"}
+   if {[$wire count]>0} {set wired 1}
+  }
   puts $f "REQUIRED_NET	[$net getName]	$wired"
  }
  close $f
@@ -95,8 +99,12 @@ def check_inventories(before,after):
     if len(cells)!=1453 or sum('\tsg13cmos5l_dlhq_1\t' in line for line in cells)!=334 or 'PGTERMS\t2906' not in after.splitlines():
         raise ValueError('Detailed-route resource/power census differs')
     required=[line.split('\t') for line in after.splitlines() if line.startswith('REQUIRED_NET\t')]
+    original=[line.split('\t') for line in before.splitlines() if line.startswith('REQUIRED_NET\t')]
+    if not original or any(len(row)!=3 or row[2]!='0' for row in original):
+        raise ValueError('Frozen unrouted control incorrectly reports route wires')
     if not required or any(len(row)!=3 or row[2]!='1' for row in required):raise ValueError('Required signal net lacks a route wire')
     if len({row[1] for row in required})!=len(required):raise ValueError('Duplicate routed-net census')
+    if {row[1] for row in required}!={row[1] for row in original}:raise ValueError('Required route-net population changed')
     return dict(cells=1453,configuration_latches=334,power_terminals=2906,required_signal_nets_with_wires=len(required))
 
 

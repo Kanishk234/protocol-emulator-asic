@@ -31,3 +31,5 @@ Specialize the fabric one measured change at a time, compare every variant at eq
 
 ## One-line takeaway
 Three measured specializations could not beat G1 at equal area, so the chip freezes on G1: UART, SPI and I2C in a Tiny Tapeout-sized fabric, with the one protocol that does not fit (the I2C target) documented rather than hidden.
+
+October24 physical checkpoint: corrected hosted40126282580 at8d1ebea passes frozen primitive detailed routing with zero router violations and1557required wires, preserving1453cells/334configuration latches/2906PGterminals and geometry/connectivity. Source/script/final ODB and6guard cases authenticated. This covers one dense leaf only; BUG133 timing, remaining detailed contexts and macro/shell signoff remain open. G1 stays selected.

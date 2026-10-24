@@ -71,9 +71,12 @@ postcheck fails because of BUG134's unsupported wire getter. A corrected
 read-only local replay of that exact hosted ODB, using the same OpenROADdcf36133
 backend, confirms all1557required signal nets have nonempty wire encodings,
 versus zero in the frozen unrouted source. Frozen resource, placement,
-connectivity and boundary-pin inventories are identical. This is an authenticated
-raw routing result plus local checker replay; the corrected hosted workflow is
-still to be authenticated. The failed original workflow is not relabeled green.
+connectivity and boundary-pin inventories are identical. Corrected hosted [40126282580](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40126282580)
+at8d1ebea attempt1 succeeds end to end. Root authenticates all5prepared input
+hashes, script/final ODB hashes,6strict guard cases, completion/exit0/zero-router
+markers and the same1557wire/frozen-inventory checks. The final ODB hash is
+identical to the original route, confirming an observer-only correction. The
+failed original workflow is not relabeled green.
 
 The after-route audit requires identical cells/placements/orientations, logical
 terminal connectivity and boundary-pin geometry, including PG pins. It checks

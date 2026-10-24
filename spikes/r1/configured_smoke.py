@@ -94,12 +94,13 @@ def balanced_native_exports(root,baseline):
     return exports,records
 
 
-def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None,postphysical_complete=None,capture_configuration=False,management_shell=False,shell_restart_only=False):
+def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None,postphysical_complete=None,capture_configuration=False,management_shell=False,shell_restart_only=False,quiesce_unused=False,restart_probe=False):
     native_primitive=any(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))
     if native_primitive and mapped_bundle is None:raise ValueError('Postphysical overrides require all-mapped baseline')
     if sum(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))>1:raise ValueError('Choose one native export profile')
     if capture_configuration and postphysical_complete is None:raise ValueError('Configuration-state observation requires complete native profile')
     if shell_restart_only and not management_shell:raise ValueError('Restart diagnostic requires management shell')
+    if restart_probe and management_shell:raise ValueError('Direct restart probe is separate from full shell test')
     native_records=[]
     from cocotb_tools.runner import get_runner
     from compile.bitfile import BitFile
@@ -120,6 +121,10 @@ def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=N
     if hashlib.sha256(image.read_bytes()).hexdigest()!=report['provenance']['bitfile_sha256']:
         raise ValueError('Changed compiler image')
     out.mkdir(parents=True,exist_ok=False)
+    quiescence=None;quiescence_inputs=[]
+    if quiesce_unused:
+        from profiling.r1_quiesce import derive
+        image,quiescence,quiescence_inputs=derive(model,case,image,out)
     signals={'clk':'clk','rst_n':'rst_n','FAB_IN0':'rx_i','FAB_IN1':'miso_i',
              'FAB_OUT0':'tx_o','FAB_OUT1':'sck_o','FAB_OUT2':'mosi_o','FAB_OUT3':'cs_n_o'}
     names=('h_wdata','h_wlast','h_wvalid','h_rready','h_rdata','h_rvalid','h_wready','h_attention','h_status')
@@ -206,7 +211,9 @@ eFPGA fabric(
         os.environ['IVERILOG_VPI_MODULE_PATH']=str(icarus_root/'usr/lib/ivl')
         version=subprocess.run(['iverilog','-V'],capture_output=True,text=True,check=True).stdout
         if 'version 13.0' not in version:raise ValueError('Mapped PDK models require Icarus13')
-    provenance=[*sources,Path(__file__),ROOT/'test_internal/r1_configured/test_loaded.py',image,*native_records]
+    provenance=[*sources,Path(__file__),ROOT/'test_internal/r1_configured/test_loaded.py',image,
+                model/'resource-control.json',case/'report.json',*native_records,*quiescence_inputs]
+    if quiesce_unused:provenance.append(out/'quiescence.json')
     if management_shell:
         from profiling import r1_shell_adapter
         provenance += [Path(r1_shell_adapter.__file__),ROOT/'test_internal/r1_configured/test_shell.py',
@@ -217,6 +224,7 @@ eFPGA fabric(
     extra_env={'R1_IMAGE':str(image),'R1_DIV':str(params['DIV']),'R1_HALF':str(params['HALF'])}
     extra_env['R1_ACTIVITY']=str(out/'activity.json')
     extra_env['R1_SHELL_RESTART_ONLY']='1' if shell_restart_only else '0'
+    extra_env['R1_RESTART_PROBE']='1' if restart_probe else '0'
     if capture_configuration:extra_env['R1_CFG_SNAPSHOT']=str(out/'configuration-state.json')
     runner.test(hdl_toplevel='r1_tb',test_module='test_shell' if management_shell else 'test_loaded',test_dir=ROOT/'test_internal/r1_configured',
                 results_xml=str(out/'results.xml'),extra_env=extra_env,test_args=['-v'])
@@ -261,6 +269,7 @@ eFPGA fabric(
                 source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
                 physical_acceptance=False,timing_acceptance=False,management_spi_shell_tested=management_shell,
                 management_reload_tested=management_shell and not shell_restart_only,
+                quiescence=quiescence,user_restart_probe_tested=restart_probe,
                 driven_scalar_tile_inputs=len(driven_inputs),auxiliary_system_reset_driven=True,
                 configuration_snapshot=snapshot,
                 concurrent_activity=activity,
@@ -304,6 +313,8 @@ if __name__=='__main__':
     parser.add_argument('--capture-configuration',action='store_true')
     parser.add_argument('--management-shell',action='store_true')
     parser.add_argument('--shell-restart-only',action='store_true',help='Diagnostic control omitting second image load; does not pass the reload gate')
+    parser.add_argument('--quiesce-unused',action='store_true',help='Ground only unrouted outputs with an existing padded GND selection')
+    parser.add_argument('--restart-probe',action='store_true',help='Check configured user reset and a second SPI transfer in direct-frame mode')
     parser.add_argument('--icarus-root',type=Path)
     a=parser.parse_args()
     if a.mapped_lut is not None and a.mapped_bundle is not None:parser.error('Choose one mapped mode')
@@ -312,4 +323,4 @@ if __name__=='__main__':
     if a.postphysical_balanced is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None):parser.error('Balanced native profile requires all-mapped baseline and cannot mix native profiles')
     if a.postphysical_complete is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None or a.postphysical_balanced is not None):parser.error('Complete native profile requires all-mapped baseline and cannot mix native profiles')
     if a.capture_configuration and a.postphysical_complete is None:parser.error('Configuration observation requires complete native profile')
-    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced,a.postphysical_complete,a.capture_configuration,a.management_shell,a.shell_restart_only)
+    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced,a.postphysical_complete,a.capture_configuration,a.management_shell,a.shell_restart_only,a.quiesce_unused,a.restart_probe)

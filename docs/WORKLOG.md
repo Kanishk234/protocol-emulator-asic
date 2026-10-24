@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-10-24 (explicit concurrent activity gate)
+**Done:** Frozen-image RTL controls run 40041038710 passed all three profiles at 83bc46f; core docs/lint/unit/test also passed. Compiler run 40041038644 passed both full-routing profiles; reduced-profile compile step remains red, so no all-CI-green claim. Added explicit UART TX, UART RX and SPI activity windows and a positive three-way overlap assertion, with machine-readable output independently checked by the runner. Complete 40-native-tile local replay passed with 8,340 ns logical overlap, unchanged loaded primary image and configuration observation. Evidence: `build/r1_concurrent_native_recorded/{results.xml,activity.json,configured-smoke.json}`. This is logical simulation, not extracted timing or a protocol-rate measurement.
+**Boxes ticked:** none. G1 selection, production architecture and sealed held-out set unchanged.
+**Next:** Hosted overlap replay; RUN timing and detailed-route/macro/fixed-shell integration gates remain open. Preserve the secondary routing failure as evidence rather than relaxing its acceptance.
+
 
 ## 2026-10-23 (corrected native state gate authenticated; fast controls separated)
 **Actual:**40039667532at29e644e attempt1SUCCESS:5guard cases, all40native primary1strictPASS, all43scalarinputsdriven and8736defined Qstates across40observed tiles. Root48input/2binary/XML/source/snapshot auditPASS; snapshot484e7383…matches local before/afterresetfix. One artifact-transfer timeout recovered on bounded retry. All26globalleaf contexts/independent audit retained;71focused local testsPASS. Current corelint/docs/test/unit CIgreen; fabric/compiler controls stillinprogress when checked, no wholephase-green claim.

@@ -1,0 +1,100 @@
+name: R1 configured cell-delay and coverage probe
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/r1/run_timing.py'
+      - 'tools/profiling/tests/test_r1_run_timing.py'
+      - '.github/workflows/r1_run_timing.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-run-timing-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  configured_probe:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_timing/pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate and preserve the loaded native source closure
+        timeout-minutes: 20
+        run: |
+          scripts/setup_venv.sh
+          mkdir -p build/r1_timing
+          for pair in functional:40109928699 compiler:39696703659 mapped:40013513454 critical:40030916359 remaining:40033384495; do
+            kind=${pair%%:*}
+            id=${pair#*:}
+            gh api repos/$GITHUB_REPOSITORY/actions/runs/$id > build/r1_timing/provider-$kind.json
+          done
+          source .venv/bin/activate
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          expected={'functional':('d5d92282db7e2c113f893d005ab8c7547c2860b4','success'),
+                    'compiler':('9768c77325ca34b93d408f526c0d8c902b62ce4a',None),
+                    'mapped':('8d42ac1202864ac92c6488b75f34c0a63fcbaebf','success'),
+                    'critical':('00216eac8dcd14c03503afd17d303118a4d3440f','success'),
+                    'remaining':('c6eba0161edf611270b563a434a06a8731da2cb9','success')}
+          for name,(revision,conclusion) in expected.items():
+              d=json.loads((Path('build/r1_timing')/('provider-'+name+'.json')).read_text())
+              assert d['head_sha']==revision and d['run_attempt']==1 and d['status']=='completed'
+              if conclusion is not None:assert d['conclusion']==conclusion
+          PY
+          gh run download 40109928699 --name r1-postphysical-primary-40109928699 --dir build/r1_timing/functional
+          gh run download 39696703659 --name r1-model-qualification-39696703659-tracks4-radix8_2 --dir build/r1_timing/model
+          gh run download 40013513454 --name r1-interfaces-40013513454 --dir build/r1_timing/mapped
+          gh run download 40030916359 --dir build/r1_timing/leaves
+          gh run download 40033384495 --dir build/r1_timing/leaves
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Check guards and independently authenticate all native contexts
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_run_timing.py tools/autonomy/tests/test_r1_balanced_audit.py --junitxml=build/r1_timing/guards.xml
+          python -m tools.autonomy.check_xml build/r1_timing/guards.xml --minimum-cases 11
+          PYTHONPATH=tools python -m autonomy.r1_balanced_audit \
+            --baseline build/r1_timing/mapped/input --baseline-identity build/r1_timing/provider-mapped.json \
+            --critical build/r1_timing/leaves --critical-identity build/r1_timing/provider-critical.json \
+            --remaining build/r1_timing/leaves --remaining-identity build/r1_timing/provider-remaining.json \
+            --lef "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lef/sg13cmos5l_stdcell.lef" \
+            --out build/r1_timing/leaf-audit.json
+          PYTHONPATH=tools python spikes/r1/run_timing.py prepare \
+            --model build/r1_timing/model/resource --baseline build/r1_timing/mapped/input \
+            --native-audit build/r1_timing/leaf-audit.json --functional build/r1_timing/functional/quiescent \
+            --liberty "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib" \
+            --out build/r1_timing/analysis
+          mkdir -p build/r1_timing/pinned-pdk
+          cp "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib" build/r1_timing/pinned-pdk/
+          cp "$PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lef/sg13cmos5l_stdcell.lef" build/r1_timing/pinned-pdk/
+      - name: Run both loop policies in pinned EDA environment
+        timeout-minutes: 10
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            sh -c 'set -eu; yosys -V > build/r1_timing/analysis/yosys-version.txt; sta -version > build/r1_timing/analysis/sta-version.txt; yosys -Qq -s build/r1_timing/analysis/elaborate.ys; timeout 90s sta -no_init -no_splash -exit build/r1_timing/analysis/static.tcl > build/r1_timing/analysis/static.log 2>&1; timeout 90s sta -no_init -no_splash -exit build/r1_timing/analysis/dynamic.tcl > build/r1_timing/analysis/dynamic.log 2>&1' \
+            > build/r1_timing/analysis/tool.log 2>&1
+      - name: Refuse altered topology missing coverage or loop-sensitive timing
+        if: always()
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools python spikes/r1/run_timing.py audit --out build/r1_timing/analysis
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-configured-timing-${{ github.run_id }}
+          path: |
+            build/r1_timing/
+            !build/r1_timing/pdk/**
+            !build/r1_timing/**/.git/**
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

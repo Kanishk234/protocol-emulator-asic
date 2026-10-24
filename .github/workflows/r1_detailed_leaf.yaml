@@ -1,0 +1,63 @@
+name: R1 frozen primitive detailed-route probe
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths:
+      - 'spikes/r1/detailed_leaf.py'
+      - 'tools/profiling/tests/test_r1_detailed_leaf.py'
+      - '.github/workflows/r1_detailed_leaf.yaml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-detailed-leaf-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  frozen_primitive:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate one frozen zero-overflow checkpoint
+        timeout-minutes: 15
+        run: |
+          scripts/setup_venv.sh
+          mkdir -p build/r1_detailed
+          gh api repos/$GITHUB_REPOSITORY/actions/runs/40030916359 > build/r1_detailed/producer.json
+          gh run download 40030916359 --name r1-balanced-leaf-40030916359-primitive1 --dir build/r1_detailed/source
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_detailed_leaf.py --junitxml=build/r1_detailed/guards.xml
+          python -m tools.autonomy.check_xml build/r1_detailed/guards.xml --minimum-cases 5
+          python spikes/r1/detailed_leaf.py prepare --source build/r1_detailed/source/native \
+            --identity build/r1_detailed/producer.json --out build/r1_detailed/route
+      - name: Detailed route exact placement and guides without resynthesis
+        timeout-minutes: 25
+        run: |
+          set +e
+          timeout 1200s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            openroad -exit build/r1_detailed/route/route.tcl > build/r1_detailed/route/route.log 2>&1
+          route_status=$?
+          set -e
+          printf '%s\n' "$route_status" > build/r1_detailed/route/exit-code.txt
+          exit "$route_status"
+      - name: Require completed route zero router violations and frozen geometry
+        if: always()
+        run: |
+          source .venv/bin/activate
+          python spikes/r1/detailed_leaf.py audit --out build/r1_detailed/route
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-detailed-primitive-${{ github.run_id }}
+          path: build/r1_detailed/
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

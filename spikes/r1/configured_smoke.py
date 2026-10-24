@@ -1,6 +1,6 @@
 """Load an audited compiler image through WARP's frame FSM, then test fabric I/O.
 
-Diagnostic internal test; excludes management SPI shell and physical timing.
+Diagnostic internal test; optional management SPI shell, no physical timing.
 """
 import argparse
 import csv
@@ -51,6 +51,11 @@ def drive_auxiliary_inputs(fabric_text,connections):
     return sorted(ports)
 
 
+def verify_input_hashes(expected):
+    if any(hashlib.sha256(Path(p).read_bytes()).hexdigest()!=digest for p,digest in expected.items()):
+        raise ValueError('Simulation input changed during execution')
+
+
 def complete_native_exports(audit_path):
     data=json.loads(Path(audit_path).read_text())
     if (data.get('passed') is not True or data.get('leaf_contexts')!=26 or data.get('grid_instances')!=40 or
@@ -89,11 +94,12 @@ def balanced_native_exports(root,baseline):
     return exports,records
 
 
-def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None,postphysical_complete=None,capture_configuration=False):
+def run(model,case,out,mapped_lut=None,pdk=None,icarus_root=None,mapped_bundle=None,postphysical_primitive=None,postphysical_balanced=None,postphysical_complete=None,capture_configuration=False,management_shell=False,shell_restart_only=False):
     native_primitive=any(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))
     if native_primitive and mapped_bundle is None:raise ValueError('Postphysical overrides require all-mapped baseline')
     if sum(p is not None for p in (postphysical_primitive,postphysical_balanced,postphysical_complete))>1:raise ValueError('Choose one native export profile')
     if capture_configuration and postphysical_complete is None:raise ValueError('Configuration-state observation requires complete native profile')
+    if shell_restart_only and not management_shell:raise ValueError('Restart diagnostic requires management shell')
     native_records=[]
     from cocotb_tools.runner import get_runner
     from compile.bitfile import BitFile
@@ -143,12 +149,17 @@ eFPGA fabric(
     items=[f'.{p}({s})' for p,s in sorted(connection.items())]
     items+=['.FrameData(frame_data)','.FrameStrobe(frame_strobe)']
     source+=',\n'.join(items)+');\nendmodule\n'
+    if management_shell:
+        from profiling.r1_shell_adapter import shell_wrapper
+        source,driven_inputs=shell_wrapper(model)
     wrapper=out/'tb.v';wrapper.write_text(source)
     lib=model/'library'
     sources=[wrapper,model/'fabric.v',*sorted((model/'rtl').glob('*.v')),lib/'models_pack.v']
     sources += [lib/'primitives'/n/'fabulous'/(n+'.v') for n in ('FABULOUS_LC','IOBUF','GBUF','SYS_RESET')]
     sources += sorted((lib/'primitives/WARP/fabulous').glob('*.v'))
     sources += [ROOT/'src'/n for n in ('wp_fabric_cfg.v','wp_frame_select.v','fabric_gen/ConfigFSM.v','fabric_gen/Frame_Data_Reg.v')]
+    if management_shell:
+        sources += [ROOT/'src'/n for n in ('wp_shell.v','wp_sync.v','wp_spi_target.v','wp_crc32.v','wp_fifo.v')]
     mapped=mapped_lut is not None or mapped_bundle is not None
     if mapped:
         if mapped_lut is not None and mapped_bundle is not None:raise ValueError('Choose one mapped mode')
@@ -195,15 +206,23 @@ eFPGA fabric(
         os.environ['IVERILOG_VPI_MODULE_PATH']=str(icarus_root/'usr/lib/ivl')
         version=subprocess.run(['iverilog','-V'],capture_output=True,text=True,check=True).stdout
         if 'version 13.0' not in version:raise ValueError('Mapped PDK models require Icarus13')
+    provenance=[*sources,Path(__file__),ROOT/'test_internal/r1_configured/test_loaded.py',image,*native_records]
+    if management_shell:
+        from profiling import r1_shell_adapter
+        provenance += [Path(r1_shell_adapter.__file__),ROOT/'test_internal/r1_configured/test_shell.py',
+                       ROOT/'test/warp_host.py',ROOT/'tools/host/protocol.py']
+    input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in provenance}
     runner=get_runner('icarus')
     runner.build(sources=sources,hdl_toplevel='r1_tb',build_dir=out/'sim',build_args=['-g2012'],always=True)
     extra_env={'R1_IMAGE':str(image),'R1_DIV':str(params['DIV']),'R1_HALF':str(params['HALF'])}
     extra_env['R1_ACTIVITY']=str(out/'activity.json')
+    extra_env['R1_SHELL_RESTART_ONLY']='1' if shell_restart_only else '0'
     if capture_configuration:extra_env['R1_CFG_SNAPSHOT']=str(out/'configuration-state.json')
-    runner.test(hdl_toplevel='r1_tb',test_module='test_loaded',test_dir=ROOT/'test_internal/r1_configured',
-                results_xml=str(out/'results.xml'),extra_env=extra_env)
+    runner.test(hdl_toplevel='r1_tb',test_module='test_shell' if management_shell else 'test_loaded',test_dir=ROOT/'test_internal/r1_configured',
+                results_xml=str(out/'results.xml'),extra_env=extra_env,test_args=['-v'])
     from autonomy.check_xml import check_xml
     tests=check_xml(out/'results.xml',1)
+    verify_input_hashes(input_hashes)
     activity=json.loads((out/'activity.json').read_text())
     if set(activity['windows_ns'])!={'uart_tx','uart_rx','spi'}:
         raise ValueError('Incomplete concurrent activity observation')
@@ -232,16 +251,16 @@ eFPGA fabric(
     for name,digest in manifest['generated_sha256'].items():
         if hashlib.sha256((model/name).read_bytes()).hexdigest()!=digest:
             raise ValueError('Model changed during configured simulation')
-    provenance=[*sources,Path(__file__),ROOT/'test_internal/r1_configured/test_loaded.py',image,*native_records]
     result=dict(passed=True,strict_tests=len(tests),params=params,
-                input_sha256={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in provenance},
+                input_sha256=input_hashes,
                 model_manifest_sha256=hashlib.sha256((model/'resource-control.json').read_bytes()).hexdigest(),
                 simulator=subprocess.run(['iverilog','-V'],capture_output=True,text=True,check=True).stdout.splitlines()[0],
                 tool_binary_sha256=({name:hashlib.sha256((icarus_root/'usr/bin'/name).read_bytes()).hexdigest()
                                      for name in ('iverilog','vvp')} if mapped else {}),
                 run=os.environ.get('GITHUB_RUN_ID'),attempt=os.environ.get('GITHUB_RUN_ATTEMPT'),
                 source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
-                physical_acceptance=False,timing_acceptance=False,management_spi_shell_tested=False,
+                physical_acceptance=False,timing_acceptance=False,management_spi_shell_tested=management_shell,
+                management_reload_tested=management_shell and not shell_restart_only,
                 driven_scalar_tile_inputs=len(driven_inputs),auxiliary_system_reset_driven=True,
                 configuration_snapshot=snapshot,
                 concurrent_activity=activity,
@@ -265,6 +284,12 @@ eFPGA fabric(
                        'Configured fabric with mapped LUT tiles and RTL other tiles; no extracted timing, management SPI shell or whole-fabric gate-level acceptance.'
                        if mapped_lut is not None else
                        'Configured generated RTL UART TX/RX plus SPI mode0 and response backpressure, loading through WARP frame FSM. No management SPI shell or physical timing test.'))
+    if management_shell:
+        implementation=('Native leaf exports with RTL interconnect' if postphysical_complete is not None else
+                        'Bare mapped leaf exports with RTL interconnect' if mapped_bundle is not None else
+                        'Mixed mapped/generated RTL fabric' if mapped else 'Generated RTL fabric')
+        result['scope']='Diagnostic management SPI load/CRC/architecture rejection, RUN/STOP/reload, synchronized inputs and registered/parked outputs with the primary UART/SPI image. '+implementation+' and production RTL shell. No detailed route, SDF, extracted timing or assembled physical macro acceptance.'
+        if shell_restart_only:result['scope']='Restart-only diagnostic: '+result['scope'].replace('RUN/STOP/reload','RUN/STOP/restart without second image load')
     (out/'configured-smoke.json').write_text(json.dumps(result,indent=2,sort_keys=True)+'\n')
 
 
@@ -277,6 +302,8 @@ if __name__=='__main__':
     parser.add_argument('--postphysical-balanced',type=Path)
     parser.add_argument('--postphysical-complete',type=Path)
     parser.add_argument('--capture-configuration',action='store_true')
+    parser.add_argument('--management-shell',action='store_true')
+    parser.add_argument('--shell-restart-only',action='store_true',help='Diagnostic control omitting second image load; does not pass the reload gate')
     parser.add_argument('--icarus-root',type=Path)
     a=parser.parse_args()
     if a.mapped_lut is not None and a.mapped_bundle is not None:parser.error('Choose one mapped mode')
@@ -285,4 +312,4 @@ if __name__=='__main__':
     if a.postphysical_balanced is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None):parser.error('Balanced native profile requires all-mapped baseline and cannot mix native profiles')
     if a.postphysical_complete is not None and (a.mapped_bundle is None or a.postphysical_primitive is not None or a.postphysical_balanced is not None):parser.error('Complete native profile requires all-mapped baseline and cannot mix native profiles')
     if a.capture_configuration and a.postphysical_complete is None:parser.error('Configuration observation requires complete native profile')
-    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced,a.postphysical_complete,a.capture_configuration)
+    run(a.model,a.case,a.out,a.mapped_lut,a.pdk,a.icarus_root,a.mapped_bundle,a.postphysical_primitive,a.postphysical_balanced,a.postphysical_complete,a.capture_configuration,a.management_shell,a.shell_restart_only)

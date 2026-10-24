@@ -2,7 +2,8 @@ from pathlib import Path
 import sys
 import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from configured_smoke import drive_auxiliary_inputs
+from configured_smoke import drive_auxiliary_inputs, verify_input_hashes
+import hashlib
 
 
 def test_every_external_input_is_driven_and_aux_reset_has_correct_polarity():
@@ -15,3 +16,11 @@ def test_every_external_input_is_driven_and_aux_reset_has_correct_polarity():
     assert connections['Tile_unused']=="1'b0" and 'Tile_result' not in connections
     with pytest.raises(ValueError):drive_auxiliary_inputs('input Tile_other;',{})
     with pytest.raises(ValueError):drive_auxiliary_inputs(text,{'Tile_unused':''})
+
+
+def test_simulation_refuses_input_edited_during_execution(tmp_path):
+    source=tmp_path/'input.v';source.write_text('original')
+    expected={str(source):hashlib.sha256(source.read_bytes()).hexdigest()}
+    verify_input_hashes(expected)
+    source.write_text('edited while simulator was running')
+    with pytest.raises(ValueError,match='changed during execution'):verify_input_hashes(expected)

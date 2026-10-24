@@ -105,3 +105,13 @@ physical timing or a waiver for the six endpoint differences. No original STA
 arc, case value, image or tolerance changes.97focused guards pass. Hosted replay
 is added to the existing configured-timing workflow ahead of its unchanged
 strict timing gate; its original timing sensitivity must remain visible.
+
+The stronger local `build/r1_boolean_support_v3` compares all recursively
+encountered feedback cuts fixed0 against independent arbitrary values. Six
+outputs prove independent; LE and LG produce counterexamples. Individual-cut
+scratch probes isolate `_0327_` (LE_I2 via `_0762_`) and `_0280_` (LG_I2 via
+`_0715_`). These are expanded-cone counterexamples, potentially introduced by
+boundary abstraction, not physical defect witnesses. They demonstrate why the
+own-feedback result cannot clear BUG133. The reproducible tool now retains all
+16cofactor cases and both polarity controls.98focused tests pass; the initial
+hosted own-feedback run40128629795 atbc13e60 keeps its original scope.

@@ -31,3 +31,27 @@ The existing reader carries a legacy GRT_ADJUSTMENT0.16 config value; STA does n
 Checks before publication: actual official TT --create-user-config passes; exact one-setting/source/workflow identities checked; pinned CTS schema accepts the field; pinned STAMidPNR declares no physical output views. Workflow shell/Python syntax passes. Executed read-only guard controls accept a complete repeatable fixture and reject source mutation, missing metrics and nonrepeatability; these are guard tests, not physical timing evidence.
 
 Next results must show the effect on all actual counts and fresh corner timing. Congestion, signal fanout and SRAM electrical repair still need resolution even if clock clustering helps. Do not route because the diagnostic job is green.
+
+## Clock8 run40110884653: actual three-corner results
+
+[40110884653](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40110884653), head9be6a644ba128839aa34b65440ee51587c74bb8a, completed in71m01s. Actual repeated read-only STA passed physical-file hash immutability and supplied fresh metrics at each corner. Independently matched the receipt against all6raw or_metrics files; no inherited-corner values used.
+
+| Corner | Setup WS ns | Hold WS ns | Slew | Cap | Signal fanout |
+|---|---:|---:|---:|---:|---:|
+| Fast |0|+0.0430439|0|2|14|
+| Typical |0|+0.218061|5|2|14|
+| Slow |-1.31005|+0.528453|50|1|14|
+
+All169clock fanout failures are gone; remaining14rows are signal drivers. This is a useful measured improvement, not qualification. Fast hold misses50ps by6.9561ps. Slow setup fails by1.31005ns; the sampled failing path starts at unit0configuration word0bit2latch and ends at a rising-edge flop. SRAM A_DOUT[2] cap reaches0.115597pF at fast corner against0.064pF. Shared30381driver slew reaches5.661924ns at slow vs2.5074ns limit. Stage39global overflow3979precedes antenna repair; final nested antenna check is0nets/0pins after91diodes. No DRT is authorized.
+
+## Next native electrical-repair recipe (D-112)
+
+Test three explicit project options together:
+
+- RUN_POST_GRT_DESIGN_REPAIR=true (currently false): execute the existing native Classic electrical-repair step.
+- GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=600um (currently0): permit native buffering. The pinned schema explicitly says0inserts no buffers; this is needed when the overloaded driver is an unresizable SRAM macro.
+- GRT_ADJUSTMENT=0.16 (currently0.3): expose the previously tested routing capacity while addressing measured Metal3congestion.
+
+This is a coherent recipe test, not a single-variable attribution claim. No hardware/source/ISA/latency, clock20ns/uncertainty0.25ns, native scripts/order/image, checker or official-workflow changes. Keep clock8,spacingnone,setup extra margin0and default10%native electrical margins. Post-GRT timing repair remains disabled; that is not silently bundled in. Default resizer RSZ_CORNERS=None already inherits all3STA_CORNERS in pinned ResizerStep; changing that field alone would be a no-op. Mid-PNR reports default to typical, which is why the separate fresh audit remains necessary.
+
+Cost/risk: buffering/sizing and rerouting may increase area, worsen hold or alter setup. Both global overflow and all fresh corner metrics must be measured again. Main adoption outside the config whitelist remains separately reviewed. Actual TT config generation, pinned-variable compilation and Classic step gating checks pass; exact3-key/source/template and shell/Python audits pass. No new physical result yet and no routing continuation.

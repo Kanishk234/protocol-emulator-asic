@@ -2,12 +2,25 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-24 — Verify clock-fanout closure; prepare native electrical-repair recipe
+
+-40110884653completes in71m01s. Retrieved17critical reports from189.7MBartifact12568612065using bounded ZIP ranges. Independently matched read-only receipt against all6fresh metric files; source physical hashes unchanged. Clock fanout169→0. Fresh fast/typ/slow setup0/0/−1.31005ns;hold+0.0430439/+0.218061/+0.528453ns. Signal fanout14eachcorner; slow slew50and SRAM cap overload remain. Pre-antenna GRT overflow3979;final antenna0/0after91diodes. No DRT/phase qualification.
+- D-112prepares exactly3diagnostic project fields: enable existing post-GRT design repair,buffering length600um,route adjustment0.16. Native schema says0length disables buffer insertion. Default ResizerStep already inherits all STA corners; an explicit corner-list-only change would not fix this. Native scripts/order,image,fullRTL/resources,20ns,0.25ns uncertainty,checker gates and main official workflow unchanged.
+- Actual TT --create-user-config,pinned-variable compilation and Classic gating checks pass; exact3-key/source/template/workflow syntax audits pass. Repeated audit independently checked fresh before/after values against receipt. No main src/config changes or authority to adopt outside-whitelist settings. Paired recipe cost/risk recorded: buffering area,changed hold/setup/congestion; not single-variable attribution.
+- Next publish scoped inputs/CI/evidence and launch stock repair screen plus fresh corner audit. No routing until all required gates pass. Preserve unrelated dirty reports/local tools/FIPE note; watcher stopped. Prior read-only API review timed out once; retry succeeded. User interruption did not lose work; local config validation completed successfully.
+
+## 2026-10-24 — Brainstorm closure options against actual stock failures
+
+- Read completed stock electrical reports and traced problematic cells:30381is a shared nor4_1lane/control driver behind five slew rows; SRAM A_DOUT[15] drives0.071501pF vs0.064pF. SRAM rdata broadcasts to host and both lanes. Remaining signal fanout includes lane0ot[1]/ot[13]. Current clock8screen unchanged.
+- Ranked follow-ups for chat: clock fanout/spacing construction; stock post-GRT electrical repair (currently disabled); measured congestion policy adjustment0.3toward0.16; all-corner optimization if fresh audit shows misses; general SRAM output load isolation if native buffering cannot contain loads; localized control/data distribution; reducing clock-skew-driven hold-buffer demand. Current timing repair buffers occupy78001µm²of568873µm²pre-antenna instance area, about13.7%, so avoiding excessive repair is a material area/routing objective.
+- Consulted primary OpenROAD CTS/resizer documentation and pinned schema before proposing supported stock settings. Recommendations remain hypotheses; no new RTL, configuration, publication, workflow launch or phase tick from brainstorming. Main official workflow remains unchanged. Next use running clock8/all-corner evidence to choose one focused follow-up; no DRT until required gates pass.
+
 ## 2026-10-24 — Audit completed stock screen and prepare clock-fanout control
 
 -40042584523succeeds in68m16s. Downloaded artifact12541169754under/tmp. Fresh final typical setup0ns/hold+0.246254ns;5slew/1cap/180fanout errors remain.169fanout rows are clock buffers,11signal. Stage39overflow3738is pre-antenna; final nested antenna check0nets/0pins after102diodes. No DRT or fresh all-corner pass. PHASE2_STOCK_BASELINE_RESULTS.md records actual sources/counts.
 - D-111prepares one physical setting CTS_SINK_CLUSTERING_SIZE=8to target clock loads exceeding8. Full hardware/20ns/stock0.25ns/native engine/order/checkers and main source/template unchanged. Actual TT --create-user-config,single-key diff,schema/source/workflow audits pass.
 - Added existing read-only STA helper after stock screen: identical checkpoint twice at all3corners, no extra Tcl/repair/routing. Original physical-view/state hashes immutable; fresh finite/repeatable metrics required. Helper's legacy GRT0.16field is inert for STA; physical adjustment stays0.3. Guard execution controls accept clean fixture and reject mutated source/missing metrics/nonrepeatability. Shell/Python syntax passes. No timing claim from those synthetic controls.
-- Next publish scoped inputs/CI/docs and launch stock clock8screen plus corner audit. DRT remains blocked; actual slew/cap/signal fanout/congestion and all-corner timing require closure. No phase boxes ticked. Main adoption of outside-whitelist project knobs remains separate review; watcher stopped.
+- Published inputsf1ec760,CI4a1c05a,evidence9be6a64; verified remote main9be6a644ba128839aa34b65440ee51587c74bb8a. Launched [40110884653](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40110884653) at that head; verified in_progress. No outgoing src/info/macro/official-workflow history. Next inspect stock clock8screen plus corner audit; launch receipt stays local until next evidence publication. DRT remains blocked; actual slew/cap/signal fanout/congestion and all-corner timing require closure. No phase boxes ticked. Main adoption of outside-whitelist project knobs remains separate review; watcher stopped.
 
 ## 2026-10-23 — Diagnose next stock timeout in clock routing
 

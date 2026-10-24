@@ -62,7 +62,7 @@ jobs:
         run: |
           source .venv/bin/activate
           python -m pytest -q tools/profiling/tests/test_r1_run_timing.py tools/profiling/tests/test_r1_boolean_support.py tools/autonomy/tests/test_r1_balanced_audit.py --junitxml=build/r1_timing/guards.xml
-          python -m tools.autonomy.check_xml build/r1_timing/guards.xml --minimum-cases 17
+          python -m tools.autonomy.check_xml build/r1_timing/guards.xml --minimum-cases 18
           PYTHONPATH=tools python -m autonomy.r1_balanced_audit \
             --baseline build/r1_timing/mapped/input --baseline-identity build/r1_timing/provider-mapped.json \
             --critical build/r1_timing/leaves --critical-identity build/r1_timing/provider-critical.json \

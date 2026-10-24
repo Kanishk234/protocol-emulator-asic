@@ -42,6 +42,7 @@ jobs:
         assert config['PL_TARGET_DENSITY_PCT'] == 56
         assert config['PL_RESIZER_SETUP_SLACK_MARGIN'] == 0
         assert config['CTS_APPLY_NDR'] == 'none'
+        assert config['CTS_SINK_CLUSTERING_SIZE'] == 8
         assert not any(k.startswith('TRIPWIRE_') for k in config)
         assert 'PNR_SDC_FILE' not in config and 'SIGNOFF_SDC_FILE' not in config
         assert 'ERROR_ON_MAGIC_DRC' not in config and 'ERROR_ON_ILLEGAL_OVERLAPS' not in config
@@ -92,6 +93,48 @@ jobs:
         assert not list(root.glob('*-openroad-detailedrouting')), 'Unexpected detailed routing'
         assert len(list(root.glob('*-openroad-stamidpnr-3/state_out.json'))) == 1, 'Missing final stock pre-routing STA'
         PYCODE
+    - name: Read-only all-corner STA on the final stock checkpoint
+      timeout-minutes: 20
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python - <<'PYCODE'
+        import hashlib, json, math, os, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from postgrt_timing import CORNERS, screen
+        root = Path('runs/stock-official-baseline')
+        states = list(root.glob('*-openroad-stamidpnr-3/state_out.json'))
+        assert len(states) == 1
+        source = states[0]
+        state = json.loads(source.read_text())
+        paths = [source] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
+        assert all(p.is_file() for p in paths)
+        def hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        before = hashes()
+        output = Path('runs/stock-corner-audit')
+        # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
+        # No resizer, repair, placement or routing step is invoked.
+        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source)
+        assert hashes() == before, 'Read-only audit modified source physical views'
+        result = json.loads((output / 'comparison.json').read_text())
+        rows = {}
+        for corner in CORNERS:
+            metrics = result['corners'][corner]['before']
+            repeated = result['corners'][corner]['after']
+            keys = [f'timing__{kind}__ws__corner:{corner}' for kind in ('setup', 'hold')]
+            keys += [f'design__max_{kind}_violation__count__corner:{corner}' for kind in ('slew', 'cap', 'fanout')]
+            for key in keys:
+                assert key in metrics and key in repeated, key
+                assert math.isfinite(metrics[key]) and abs(metrics[key] - repeated[key]) <= 1e-9, key
+            rows[corner] = {key: metrics[key] for key in keys}
+        (output / 'read_only_audit.json').write_text(json.dumps(dict(
+            source_state=str(source), unchanged_physical_view_hashes=before,
+            fresh_corner_metrics=rows, physical_repairs_performed=False,
+            qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
+        print(json.dumps(rows, indent=2))
+        PYCODE
     - name: Upload complete stock baseline measurements
       if: always()
       uses: actions/upload-artifact@v7
@@ -99,6 +142,7 @@ jobs:
         name: stock-official-baseline-${{ github.run_id }}
         path: |-
           runs/stock-official-baseline/**
+          runs/stock-corner-audit/**
           src/**
           info.yaml
           macro/**

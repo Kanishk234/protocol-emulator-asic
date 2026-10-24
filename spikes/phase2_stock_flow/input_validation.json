@@ -6,11 +6,11 @@
   "canonical_generation_passed": true,
   "stock_stop_point_verified": "OpenROAD.STAMidPNR-3 immediately before OpenROAD.DetailedRouting",
   "official_workflow_unchanged": true,
-  "project_config_sha256": "b20d64f321f4572064266d47d2ede227656e6ff2a2a677a696106940731b6077",
+  "project_config_sha256": "e7d83b3c46607149872b8c4f26483fa4fdea5f926bfb0e13f2a284732c65ec10",
   "stock_constraints": "Default base.sdc; no latch false paths or explicit uncertainty reduction",
   "checker_waivers_added": false,
   "physical_run_started": false,
-  "baseline_run": 40042584523,
-  "baseline_result": "stock screen completed; actual electrical violations and congestion remain",
-  "followup": "Only physical setting changed: CTS_SINK_CLUSTERING_SIZE=8; add read-only all-corner STA with physical-view immutability and repeated-metric checks"
+  "baseline_run": 40110884653,
+  "baseline_result": "clock fanout eliminated; fresh slow setup -1.31005 ns and fast hold 0.0430439 ns; electrical errors/congestion remain",
+  "followup": "Coherent native electrical-repair recipe: enable stock post-GRT design repair, buffering length 600 um and routing adjustment 0.16. No RTL or stock engine changes."
 }

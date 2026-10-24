@@ -86,5 +86,17 @@
   "CTS_SINK_CLUSTERING_SIZE": {
     "main": null,
     "proposed": 8
+  },
+  "RUN_POST_GRT_DESIGN_REPAIR": {
+    "main": null,
+    "proposed": true
+  },
+  "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": {
+    "main": null,
+    "proposed": 600
+  },
+  "GRT_ADJUSTMENT": {
+    "main": null,
+    "proposed": 0.16
   }
 }

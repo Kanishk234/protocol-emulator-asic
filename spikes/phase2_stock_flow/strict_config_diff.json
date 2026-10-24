@@ -3,6 +3,10 @@
     "main": 60,
     "proposed": 56
   },
+  "GRT_RESIZER_HOLD_SLACK_MARGIN": {
+    "main": 0.05,
+    "proposed": 0.125
+  },
   "FP_PDN_VPITCH": {
     "main": 50.0,
     "proposed": 67.44
@@ -98,5 +102,13 @@
   "GRT_ADJUSTMENT": {
     "main": null,
     "proposed": 0.16
+  },
+  "RUN_POST_GRT_RESIZER_TIMING": {
+    "main": null,
+    "proposed": true
+  },
+  "GRT_RESIZER_SETUP_SLACK_MARGIN": {
+    "main": null,
+    "proposed": 0
   }
 }

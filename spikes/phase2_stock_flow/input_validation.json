@@ -6,11 +6,11 @@
   "canonical_generation_passed": true,
   "stock_stop_point_verified": "OpenROAD.STAMidPNR-3 immediately before OpenROAD.DetailedRouting",
   "official_workflow_unchanged": true,
-  "project_config_sha256": "e7d83b3c46607149872b8c4f26483fa4fdea5f926bfb0e13f2a284732c65ec10",
+  "project_config_sha256": "c50d1bb51ed5ad87362ddfb0c8bc710370a138125e3ff24db69bed47512ae4fd",
   "stock_constraints": "Default base.sdc; no latch false paths or explicit uncertainty reduction",
   "checker_waivers_added": false,
   "physical_run_started": false,
-  "baseline_run": 40110884653,
-  "baseline_result": "clock fanout eliminated; fresh slow setup -1.31005 ns and fast hold 0.0430439 ns; electrical errors/congestion remain",
-  "followup": "Coherent native electrical-repair recipe: enable stock post-GRT design repair, buffering length 600 um and routing adjustment 0.16. No RTL or stock engine changes."
+  "baseline_run": 40120999838,
+  "baseline_result": "All-corner electrical counts zero, saved routing overflow zero, antenna zero; slow setup -0.447463 ns, fast hold 0.015865 ns",
+  "followup": "Enable stock post-GRT timing repair with zero extra setup margin and 125 ps hold target; add fresh read-only final antenna check"
 }

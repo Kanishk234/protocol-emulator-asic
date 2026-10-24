@@ -71,5 +71,6 @@
     "RM_IHPSG13_.*"
   ],
   "PL_RESIZER_SETUP_SLACK_MARGIN": 0,
-  "CTS_APPLY_NDR": "none"
+  "CTS_APPLY_NDR": "none",
+  "CTS_SINK_CLUSTERING_SIZE": 8
 }

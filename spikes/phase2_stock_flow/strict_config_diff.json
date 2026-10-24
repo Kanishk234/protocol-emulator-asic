@@ -82,5 +82,9 @@
   "CTS_APPLY_NDR": {
     "main": null,
     "proposed": "none"
+  },
+  "CTS_SINK_CLUSTERING_SIZE": {
+    "main": null,
+    "proposed": 8
   }
 }

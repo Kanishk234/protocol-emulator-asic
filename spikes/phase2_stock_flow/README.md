@@ -31,3 +31,5 @@ The normal official gds workflow will be used for final acceptance once actual s
 Follow-up diagnosis and exact fresh metrics: docs/reports/PHASE2_STOCK_BASELINE_TIMEOUT.md. Do not interpret diagnostic-job success as timing qualification.
 
 After40026122208completed repair but timed out relaxing clock NDR, D-110adds only CTS_APPLY_NDR=none to this diagnostic configuration. This restores the normal-spacing project policy already documented in D-043, without stock-flow or checker changes. Fresh typical hold+0.273668ns is progress, not routed/all-corner qualification;169fanout violations remain.
+
+Completed40042584523is measurement-only: typical setup0/hold+0.246254ns,5slew/1cap/180fanout errors and3738pre-antenna overflow. D-111next sets only CTS_SINK_CLUSTERING_SIZE=8and adds stock read-only repeated all-corner STA after the physical screen. Source-view hashes enforce no physical modifications by the audit. See docs/reports/PHASE2_STOCK_BASELINE_RESULTS.md. No routing qualification follows from job success.

@@ -6,11 +6,11 @@
   "canonical_generation_passed": true,
   "stock_stop_point_verified": "OpenROAD.STAMidPNR-3 immediately before OpenROAD.DetailedRouting",
   "official_workflow_unchanged": true,
-  "project_config_sha256": "9acaa9c40870d0078fe863276938f550d4e6ef24645811a87eb3e8cbb558d720",
+  "project_config_sha256": "b20d64f321f4572064266d47d2ede227656e6ff2a2a677a696106940731b6077",
   "stock_constraints": "Default base.sdc; no latch false paths or explicit uncertainty reduction",
   "checker_waivers_added": false,
   "physical_run_started": false,
-  "baseline_run": 40026122208,
-  "baseline_result": "setup/hold repair completed; global routing timed out repeatedly disabling clock NDR",
-  "followup": "One further project setting: CTS_APPLY_NDR=none; unchanged stock engine, ordering, constraints and checker gates"
+  "baseline_run": 40042584523,
+  "baseline_result": "stock screen completed; actual electrical violations and congestion remain",
+  "followup": "Only physical setting changed: CTS_SINK_CLUSTERING_SIZE=8; add read-only all-corner STA with physical-view immutability and repeated-metric checks"
 }

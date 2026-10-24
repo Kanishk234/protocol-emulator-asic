@@ -2,12 +2,19 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-24 — Audit completed stock screen and prepare clock-fanout control
+
+-40042584523succeeds in68m16s. Downloaded artifact12541169754under/tmp. Fresh final typical setup0ns/hold+0.246254ns;5slew/1cap/180fanout errors remain.169fanout rows are clock buffers,11signal. Stage39overflow3738is pre-antenna; final nested antenna check0nets/0pins after102diodes. No DRT or fresh all-corner pass. PHASE2_STOCK_BASELINE_RESULTS.md records actual sources/counts.
+- D-111prepares one physical setting CTS_SINK_CLUSTERING_SIZE=8to target clock loads exceeding8. Full hardware/20ns/stock0.25ns/native engine/order/checkers and main source/template unchanged. Actual TT --create-user-config,single-key diff,schema/source/workflow audits pass.
+- Added existing read-only STA helper after stock screen: identical checkpoint twice at all3corners, no extra Tcl/repair/routing. Original physical-view/state hashes immutable; fresh finite/repeatable metrics required. Helper's legacy GRT0.16field is inert for STA; physical adjustment stays0.3. Guard execution controls accept clean fixture and reject mutated source/missing metrics/nonrepeatability. Shell/Python syntax passes. No timing claim from those synthetic controls.
+- Next publish scoped inputs/CI/docs and launch stock clock8screen plus corner audit. DRT remains blocked; actual slew/cap/signal fanout/congestion and all-corner timing require closure. No phase boxes ticked. Main adoption of outside-whitelist project knobs remains separate review; watcher stopped.
+
 ## 2026-10-23 — Diagnose next stock timeout in clock routing
 
 - Inspected40026122208direct job log/artifact12539217630. Setup-margin0control works: native setup repair completes; hold repair completes with3408buffers. Fresh stage38typical setupWS0ns,holdWS+0.273668ns,slew0/cap0/fanout169. No fresh all-corner or extracted pass claimed.
 - Failure moved to GlobalRouting: default CTS_APPLY_NDR=half causes50extra rounds then one clock-net NDR removal;13GRT-0273warnings before145minute timeout. This is the D-043known issue omitted from stripped baseline, not a repeated setup stall. BUG141and report record exact stages/evidence.
 - Prepared D-110diagnostic-only CTS_APPLY_NDR=none, restoring normal clock spacing with no other physical-setting change. Main src/config/official workflow,RTL,image/scripts,20ns,0.25ns uncertainty and checker gates unchanged. Real pinned CTS schema, unchanged TT --create-user-config, exact one-key diff,21source hashes,official workflow identity and shell/Python checks pass. Main adoption outside whitelist remains separate owner review.
-- Next publish scoped input/CI/evidence and launch stock pre-DRT control; no route continuation or phase boxes. Need fresh corners and zero electrical/antenna failures before routing. Watcher remains stopped.
+- Published inputsb7d895a,CIe209afa,evidence04e9560; verified remote main04e9560b6a71f5ad2a750d8153635d2d04049886. Launched [40042584523](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40042584523) at that head, verified in_progress. No outgoing main src/info/macro/official-workflow history. Next inspect stock pre-DRT control; launch receipt remains local until next evidence publication; no route continuation or phase boxes. Need fresh corners and zero electrical/antenna failures before routing. Watcher remains stopped.
 
 ## 2026-10-23 — Diagnose stock repair stall and prepare setting-only follow-up
 

@@ -1285,6 +1285,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Diagnostic-only single setting CTS_APPLY_NDR=none, preserving prior setup-margin0and every other project setting. Stock engine/scripts/order/image,20ns,0.25ns uncertainty, source/resources and all gates stay fixed. Cost/risk: normal clock spacing can alter coupling/skew/hold and routing; all fresh/extracted corners still require measurement. PDK minimum spacing and actual DRC checks remain enforced.
 - No main src/config/template edit or authority to adopt fields beyond the main whitelist. Schema/official TT config and exact one-key/source/workflow audits pass. PHASE2_STOCK_BASELINE_TIMEOUT.md records fresh typical setup0/hold+0.273668ns/fanout169; not all-corner or routed closure. Physical control pending.
 
+## D-111 (2026-10-24): stock eight-sink clock clusters and read-only corner audit
+
+- General need: completed40042584523stock screen still has180fanout errors,169on clock buffers, plus5slew/1cap error and3738overflow before antenna repair. Match clock clustering to the observed8load limit, without protocol-shaped logic or hidden exceptions.
+- Diagnostic-only physical delta CTS_SINK_CLUSTERING_SIZE=8. No other physical policy/constraint/source change. Cost/risk: buffer count, area, skew and congestion may increase; results must be measured. Main adoption beyond whitelist remains separate owner review.
+- Add read-only all-corner STA on identical final saved checkpoint twice, no resizer/routing/placement or extra Tcl. Physical-view hashes must remain identical; fresh finite/repeatable metrics required. Reader's legacy GRT value is inert for STA and does not alter physical adjustment. No automatic route or qualification; official workflow unchanged.
+- PHASE2_STOCK_BASELINE_RESULTS.md records fresh typical setup0/hold+0.246254ns and remaining errors. Actual TT config, single-key/schema/hash/syntax checks and four guard controls pass. New physical/corner evidence pending.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

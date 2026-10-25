@@ -1320,6 +1320,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Module equivalenceN1..16(100..115points,induction cap4),two semantic negative controls,strict lint,7channel/model+4topRTLcases pass. LocalN5event depth7→4; actual criticalN7typical ideal-wire gate delay1.249745→0.720858ns,area+130.032um². These are module/local diagnostics,not full-chip timing or signoff. Public readback now needs its own timing check.
 - Matched stock candidate changes only this RTL file after hash-bound predecessor; physical config identical to40162935683. Official template,image/scripts/order,20ns/0.25ns,resources and gates unchanged. Main src/config untouched; any future promotion/config adoption remains separately reviewed. Exact clean CI preparation,real TT configuration and syntax pass. Physical result pending; no DRT from green measurement job.
 
+## D-116 (2026-10-25): cache a configuration-derived mode predicate
+
+- General need: current stock critical path begins in mode configuration, traverses combinational pad feedback and selection, then reaches receive-token storage. Move a repeatedly used static configuration predicate out of that live path; preserve all modes and same-cycle behavior.
+- Diagnostic prototype stores the existing joint TX/RX mode predicate beside word0 with its existing high-phase visibility. One staging FF and one configuration latch per full unit, plus an equivalent word0 gate; lean units add no state. Binary fields remain unchanged. No dedicated protocol controller, ISA change, new observable cycle or resource reduction.
+- Four configuration-property temporal-induction proofs, a rejected wrong-mode mutant, exhaustive word0/both-phase simulations, 120 pin-unit and four top RTL cases, strict full-chip lint, and exact CI preparation pass. Details and assumptions are in PHASE2_STOCK_BASELINE_RESULTS.md and mode_predicate_evidence.json. This is not whole-chip formal or physical closure.
+- Match run40179640229 physical settings and change only these three RTL files in ephemeral diagnostic CI. Stock scripts/order/image, official template and all acceptance gates remain unchanged. Cost/risk: added derived state/gate load, changed placement and hold paths; full-chip area/congestion/timing must be measured before promotion. No DRT until all screen gates pass. Main hardware/config remain untouched; publication follows AGENTS.md Git rule.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

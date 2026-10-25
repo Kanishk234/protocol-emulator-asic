@@ -41,3 +41,15 @@ Run40120999838clears electrical counts at all3corners,saved routing overflow and
 Run40127505533meets fast hold50.6384ps/electrical0but regresses slow setup−0.750799ns/final antenna55nets. Current D-114candidate applies hash-bound late_drop_select.patch after the verified base source bundle. AllN1..16channel equivalence,7channel/4topRTLtests and representative mapping checks pass. Use DELAY0/150psearly hold/optional late timing off, retaining stock ordering/checkers and final fresh audits. This is not the old unchanged-RTL baseline; the variant hash and scope are in late_drop_select_evidence.json. No main source/template changes or DRT qualification.
 
 Current D-115test applies forwarded_drop.patch after the prior late-select source. The2pending event bits preserve exact cycle-visible count by forwarding F(base,pending); allN1..16equivalence and7channel/4topRTLcases pass. Physical config is identical to40162935683to isolate the RTL effect. Source hashes/proof and local ideal-wire diagnostics are in forwarded_drop_evidence.json; those are not whole-chip timing. Exact CI prepare/real TT config checks pass; physical results pending.
+
+
+Run40179640229 completed with slow setup -0.780544ns, fast hold -0.0124152ns, three fanout failures, and post-repair overflow36. It does not qualify for DRT. D-116 adds mode_predicate.patch after the existing counter patches, caching the existing joint mode condition with unchanged word0 visibility. Physical config is unchanged. Source hashes, proof scope and test counts are in mode_predicate_evidence.json; the separate mode_predicate_harness.patch connects the cache in pin-unit tests. No main source/config or official-template edit.
+
+Replay the source-bound property proofs, negative control and exhaustive configuration tests with the project venv:
+
+```sh
+source .venv/bin/activate
+python spikes/phase2_stock_flow/mode_predicate_checks/check.py BASELINE NEW_WORK_DIRECTORY
+```
+
+BASELINE contains the prepared full-design src directory before mode_predicate.patch (for example build/stock-official-20261023). The helper copies sources and applies only the guarded patch into a new directory. It never edits BASELINE. Physical benefits remain unmeasured; no DRT follows from functional proof or green measurement-job status.

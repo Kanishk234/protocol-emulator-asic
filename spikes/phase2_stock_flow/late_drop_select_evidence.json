@@ -1,0 +1,93 @@
+{
+  "proofs": [
+    {
+      "sources": 1,
+      "equivalence_points": 109
+    },
+    {
+      "sources": 2,
+      "equivalence_points": 110
+    },
+    {
+      "sources": 3,
+      "equivalence_points": 111
+    },
+    {
+      "sources": 4,
+      "equivalence_points": 112
+    },
+    {
+      "sources": 5,
+      "equivalence_points": 113
+    },
+    {
+      "sources": 6,
+      "equivalence_points": 114
+    },
+    {
+      "sources": 7,
+      "equivalence_points": 115
+    },
+    {
+      "sources": 8,
+      "equivalence_points": 116
+    },
+    {
+      "sources": 9,
+      "equivalence_points": 117
+    },
+    {
+      "sources": 10,
+      "equivalence_points": 118
+    },
+    {
+      "sources": 11,
+      "equivalence_points": 119
+    },
+    {
+      "sources": 12,
+      "equivalence_points": 120
+    },
+    {
+      "sources": 13,
+      "equivalence_points": 121
+    },
+    {
+      "sources": 14,
+      "equivalence_points": 122
+    },
+    {
+      "sources": 15,
+      "equivalence_points": 123
+    },
+    {
+      "sources": 16,
+      "equivalence_points": 124
+    }
+  ],
+  "new_state_bits": 0,
+  "physical_timing_proven": false,
+  "baseline_sha256": "16744944aba3d689112be8871a6defb228ded9c6c867442b646f25f7d87da657",
+  "candidate_sha256": "f0cf047074c61564c71be00019bee2af8270869be7a3597d9e0624ba91e90106",
+  "patch_sha256": "232eb3cd85013eae566401569ee29c1f91a554524b20c1ca8d177b9099ff05fb",
+  "induction_sequence_cap": 4,
+  "negative_control": "Ignoring clear in N=5 is rejected with unproven equivalence cells",
+  "channel_tests": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "top_level_rtl_tests": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "representative_mapping": {
+    "sources": 5,
+    "baseline_area_um2": 2912.3766,
+    "candidate_area_um2": 2966.8086,
+    "baseline_max_load_to_counter_logic_levels": 8,
+    "candidate_max_load_to_counter_logic_levels": 7,
+    "physical_timing_proven": false
+  }
+}

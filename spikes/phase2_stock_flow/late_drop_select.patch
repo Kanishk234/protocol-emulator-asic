@@ -1,0 +1,21 @@
+--- a/src/trw_chan_port.v
++++ b/src/trw_chan_port.v
+@@ -114,7 +114,6 @@
+ 
+     wire drop_inc = drop && !cfg_we;
+     wire drop_room = !(&dropped);
+-    wire drop_keep = !clr_dropped || drop_inc;
+     genvar db;
+     generate for (db = 0; db < 8; db = db + 1) begin: g_drop_bit
+         wire toggle;
+@@ -127,7 +126,9 @@
+             if (!rst_n)
+                 dropped[db] <= 1'b0;
+             else
+-                dropped[db] <= (dropped[db] ^ (drop_inc && toggle)) && drop_keep;
++                // Keep the late drop signal on the final select, after increment logic.
++                dropped[db] <= drop_inc ? (dropped[db] ^ toggle)
++                                       : (dropped[db] && !clr_dropped);
+         end
+     end endgenerate
+     `TRW_ASSERT(!(avail && !en), "a disabled port shows a token (F1)")

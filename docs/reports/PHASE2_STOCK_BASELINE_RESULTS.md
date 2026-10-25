@@ -77,3 +77,32 @@ The existing native post-GRT timing-repair step remains disabled. Enable RUN_POS
 Cost/risk: late timing repair can disturb electrical loading, antenna, routing and area. Do not assume the newly clean counts survive. Add stock CheckAntennas as a read-only measurement on the final timing-repaired checkpoint, alongside repeated3corner STA. Use only fresh raw antenna metrics and enforce source state/ODB/DEF/NL/PNL/SDC hash immutability after every audit. Do not move or insert physical repair steps in the stock flow. All physical changes remain native Classic behavior.
 
 Actual TT configuration generation, pinned schema variable compilation/step gating, exact3-key/source/template/syntax checks pass. Audit guard controls cover clean data, missing/nonrepeatable corner metrics, physical mutations by either measurement and missing antenna metrics. These controls are synthetic guard checks, not timing evidence. Final source antenna readback must replace inherited pre-timing antenna counts before any routing decision. No automatic routing continuation.
+
+## Final-timing run40127505533: hold reserve passes, setup/antenna regress
+
+[40127505533](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40127505533), head8b509d918009de11af2bc8f32d6069a60e8b8731, completed in92m04s. Fresh raw metrics independently match all6corner reads and the final read-only antenna report:
+
+| Corner | Setup WS ns | Hold WS ns | Slew/Cap/Fanout |
+|---|---:|---:|---|
+| Fast |0|+0.0506384|0/0/0|
+| Typical |0|+0.219532|0/0/0|
+| Slow |-0.750799|+0.505617|0/0/0|
+
+Final fresh antenna has55nets/57pins. Do not inherit the earlier antenna0result. Native optimizer log reached setupWS0/hold0.125before its final full GRT, but fresh all-corner results after routing are the authority. Saved routing tables show0overflow, not absence of antenna errors. No DRT qualification.
+
+Source-bound current netlist identifies worst endpoint48894as u_chip.dropped[28]; the reported path launches from SRAM read data14through lane0and fabric logic into this dropped-token counter. This was verified in the current44-resizertimingpostgrt netlist, not assumed from an older instance ID. Late setup repair inserted5buffers/pin swaps; hold repair inserted92buffers; final native area587270.59um²before the audit. Full GRT then changed estimated delays/antenna. No claim of an upstream tool bug follows.
+
+## D-114: general late-select counter and earlier stock optimization
+
+Prototype changes only trw_chan_port.v: compute each incremented counter bit independently of late drop_inc, then select it against the clear/hold value. This preserves saturation, reset, configuration-write and simultaneous drop/clear priority. No new state, latency, protocol logic or ISA change.
+
+Verification:
+
+- Complete module equivalence for every N=1..16,109..124equivalence points each, using Yosys equiv_simple/equiv_induct with induction sequence cap4. A known-bad clear mutation atN5is semantically rejected. This is channel-module equivalence, not whole-chip formal verification.
+- Strict module lint passes.7/7fabric/channel tests, including independent-model random testing, and4/4top-level RTL tests pass with no skips on the actual variant. Independent XML readback checked counts.
+- Representative N5CMOS5L mapping reduces worst src_load-to-dropped-D logic depth8→7; module area2912.3766→2966.8086um²(+54.432). This is a local mapped logic/area diagnostic, not picosecond timing or a full-chip area result.
+- Exact CI prepare block replayed successfully from a clean main archive, including the base21file/macro checks followed by the single-file variant patch/hash guard. Actual TT project configuration accepts the prepared variant.
+
+The physical candidate uses stock SYNTH_STRATEGY=DELAY0and PL_RESIZER_HOLD_SLACK_MARGIN=0.15ns; optional RUN_POST_GRT_RESIZER_TIMING=false. Other native electrical/capacity settings stay fixed. This puts synthesis/hold optimization ahead of the existing stock antenna stage, without moving/inserting/changing any physical step or script. Inactive GRT timing-margin fields remain in the config but do not enable that stage. Fresh all-corner and final antenna audits remain required.
+
+This is a coherent source/early-optimization candidate, not attribution to a single knob. Costs: small local counter area increase plus possible DELAY0/early-hold buffering/area/congestion changes; mapped-stage improvements may not survive full-chip placement. All20ns/0.25ns constraints and acceptance gates remain fixed. The variant exists only in spike/ephemeral CI inputs, not main src. Main adoption beyond config whitelist still needs owner review. DRT remains blocked until measured requirements pass.

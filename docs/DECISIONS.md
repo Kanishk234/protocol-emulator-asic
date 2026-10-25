@@ -1306,6 +1306,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost/risk: late sizing/buffering/rerouting can reintroduce electrical/antenna errors or area pressure. Add only read-only stock CheckAntennas after final physical flow for fresh measurement, not another repair. Hash state/physical files before and after all audits; do not use inherited antenna metrics to qualify new timing state.
 - Actual TT configuration,pinned-variable/gating,exact3-key/source/template/syntax checks and6audit guard controls pass. PHASE2_STOCK_BASELINE_RESULTS.md records raw/receipt evidence. New physical result pending; DRT blocked.
 
+## D-114 (2026-10-24): late-select dropped counter with earlier stock optimization
+
+- General need: current source-bound worst path runs SRAM data→lane/fabric→dropped counter; native late repair reroutes into slow setup−0.750799ns/fresh antenna55nets, despite fast hold50.6384psand electrical0. Shorten the late event-to-counter path without changing token semantics or moving stock steps.
+- One RTL file only: precompute incremented counter value, use late drop_inc as final select against clear/hold. No new state/cycle/ISA/protocol-shaped block. Preserve saturation/config/reset/drop-clear priority. Proof allN1..16(109..124points,induction cap4), semantic bad-clear rejection, strict lint,7channel+4topRTLcases pass. RepresentativeN5mapped depth8→7at+54.432um²; full physical benefit unproven.
+- Diagnostic early recipe: DELAY0mapping,150psearly hold target,optional late post-GRT timing repair off. Keep native electrical repair/capacity/clock8 settings and all20ns/0.25ns/acceptance constraints. Native flow/image/scripts/order/official template unchanged; no tool patch or physical ECO. Main source untouched and outside-whitelist project adoption remains separate owner review.
+- Costs/risks: local counter logic, full-chip synthesis/hold buffer area and placement/skew effects; timing/antenna may still fail. Existing fresh all-corner/final antenna audits and immutable views retained; no DRT from green job. PHASE2_STOCK_BASELINE_RESULTS.md and hash-bound late_drop_select_evidence.json record scope/evidence. Exact CI prep and real TT config checks pass; physical result pending.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

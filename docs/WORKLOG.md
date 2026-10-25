@@ -2,13 +2,20 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-24 — Reject late-repair regression; verify a general counter prototype
+
+-40127505533completes in92m04s. Retrieved22critical reports plus3source-bound tracing files from218.2MBartifact12576641000by ranges. Fresh fast/typ/slow setup0/0/−0.750799ns;hold+0.0506384/+0.219532/+0.505617ns;electrical0allcorners. Fresh antenna55nets/57pins; saved overflow0. Optimizer's pre-reroute0setup/125pshold is not final qualification. All6raw metric files/fresh antenna independently matched to receipt. No DRT.
+- Verified current netlist endpoint48894=chip.dropped[28],path fromSRAM read14. Built D-114late-select increment prototype in/tmp,one RTL file,no newstate/latency/spec changes. AllN1..16module equivalence(109..124points,induction cap4) and semantic bad-clear negative control pass. Strict lint,7/7channel and4/4topRTLtests pass with independent XML validation. LocalN5CMOS5L mapping depth8→7,area2912.3766→2966.8086um²; no physical timing/full-chip area claim.
+- Prepared hash-bound variant patch/evidence and exact CI prep guards. Replayed actual preparation block from clean main archive successfully; only expectedsource hash changes. Native schema/real TT config/shell/Python checks pass. Earlier stock recipe uses DELAY0mapping,150psearly hold and disables optional late timing repair; stock engine/order/scripts/image/checkers,20ns/0.25ns and full2/4resources unchanged. Fresh corner/final antenna audit retained. Main src/official workflow unchanged; main project-field adoption remains separate owner review.
+- Next publish scoped RTL-prototype/evidence/tools/CI/docs and launch stock candidate. It is a combined candidate, not single-variable attribution; area/routing/hold/setup/antenna must all be measured before DRT. Preserve unrelated reports/tools/FIPE note; watcher stopped. No phase boxes ticked.
+
 ## 2026-10-24 — Verify electrical closure; prepare stock final timing repair
 
 -40120999838completes in74m31s. Retrieved19critical reports fromartifact12573407645by ZIP ranges. Independently matched all6fresh corner metrics to read-only receipt. All slew/cap/fanout counts0at every corner; saved GRT tables0overflow; final antenna0nets/0pins after37diodes. Pre-antenna native repair area582150.36um². No extracted/DRT result.
 - Fresh fast/typ/slow setup0/0/−0.447463ns;hold+0.015865/+0.150728/+0.383769ns. Slow setup improved but still fails; fast hold still below50ps. No route/phase qualification from job green.
 - D-113prepares exactly3diagnostic fields: enable native post-GRT timing repair,extra setup margin0,hold target125ps. All prior electrical/capacity settings,RTL/resources,20ns/0.25ns,native scripts/order/image/checkers and main src/config/official workflow unchanged. Main adoption beyond whitelist remains separate owner review.
 - Added fresh read-only stock CheckAntennas after final physical flow, before final source-hash validation. This avoids inherited pre-timing antenna credit. Existing repeated3corner STA retained. Actual TT configuration,pinned schema/gating,exact3-key/source/template/syntax checks pass;6synthetic audit controls cover clean case,source mutations,missing/nonrepeatable metrics and missing antenna data. No extra physical repair or custom Tcl/image.
-- Next publish scoped input/CI/evidence and launch stock timing-repair screen. Requalify actual electrical/antenna/overflow as well as timing after late repair; no DRT until required gates pass. Preserve unrelated dirty reports/tools/local-only FIPE; watcher stopped.
+- Published inputsaf4f9e8,CI4fca0f0,evidence8b509d9; verified remote main8b509d918009de11af2bc8f32d6069a60e8b8731. Launched [40127505533](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40127505533) at that head; verified in_progress. No outgoing src/info/macro/official-workflow history. Next inspect stock timing-repair screen; this launch receipt stays local until next evidence publication. Requalify actual electrical/antenna/overflow as well as timing after late repair; no DRT until required gates pass. Preserve unrelated dirty reports/tools/local-only FIPE; watcher stopped.
 
 ## 2026-10-24 — Verify clock-fanout closure; prepare native electrical-repair recipe
 

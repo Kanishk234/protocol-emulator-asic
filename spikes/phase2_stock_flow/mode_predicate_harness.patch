@@ -1,0 +1,30 @@
+--- a/test_internal/pin/tb_pin.v
++++ b/test_internal/pin/tb_pin.v
+@@ -50,6 +50,7 @@
+ 
+     wire [`TRW_PC_BITS-1:0] cfg;
+     wire restart;
++    wire bitsync_active;
+ `ifdef TRIPWIRE_CACHED_CARRIER
+     wire carrier_active;
+ `endif
+@@ -57,7 +58,7 @@
+     wire [24:0] sample_delta;
+ `endif
+     trw_pin_cfg #(.FULL (FULL)) u_cfg (
+-        .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg), .restart (restart)
++        .clk (clk), .rst_n (rst_n), .we (we), .waddr (waddr), .wdata (wdata), .cfg (cfg), .restart (restart), .bitsync_active(bitsync_active)
+ `ifdef TRIPWIRE_CACHED_CARRIER
+         , .carrier_active (carrier_active)
+ `endif
+@@ -103,8 +104,8 @@
+         end
+     end
+ 
+-    trw_pin_unit #(.FULL (FULL), .FRAC (FRAC)) u_unit (
+-        .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
++    trw_pin_unit #(.FULL (FULL), .FRAC (FRAC), .USE_BITSYNC_ACTIVE(1)) u_unit (
++        .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads), .bitsync_active(bitsync_active),
+ `ifdef TRIPWIRE_CACHED_CARRIER
+         .carrier_active (carrier_active),
+ `endif

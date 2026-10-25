@@ -1,0 +1,41 @@
+{
+  "baseline_run": 40179640229,
+  "description": "Cache existing joint TX/RX mode predicate with word0 visibility; no protocol, cycle, ISA or resource change",
+  "patch_sha256": "78fd32ae3145bd348685f24cf1eb1e726a46fdab9516f8ccb358b3fe4bb7742d",
+  "baseline_files": {
+    "src/trw_pin_cfg.v": "644bc463b1b3711611c665a91dc384eeec31b3d82f9b87c51a5e730f602841c0",
+    "src/trw_pin_unit.v": "f419dfafa4cb5b77618388c44670397896b6deb9a9621b230c4a8608b852e8f2",
+    "src/trw_chip.v": "d0a9b1ec97e6ba618ece628bfe12e9ac0861a6be618fe225461e65565898d765"
+  },
+  "candidate_files": {
+    "src/trw_pin_cfg.v": "2864b8eb495928d81d795827d1af84ab3b92d1cb6097b48384b8d3dcf8fa5c2f",
+    "src/trw_pin_unit.v": "e79409507fc9a9e29ebead7fea2d85e7a555c062815d1bf55fce6ca2067172fe",
+    "src/trw_chip.v": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd"
+  },
+  "formal_scope": "Derived mode predicate equals current configuration after first word0 write; full/lean and latch/flop; half-cycle input-stability assumptions; no whole-chip formal claim",
+  "formal": "Four temporal-induction proofs passed; cap20, initial seq4; wrong-mode mutant rejected by failed property",
+  "simulation": "All65536 word0 values plus10000 seeded random write/idle/reset cycles, sampled after both phases, all4 full/lean latch/flop cases; existing cfg/restart compared against predecessor",
+  "regressions": {
+    "pin-full0": {
+      "passed": 60,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "pin-full1": {
+      "passed": 60,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "top": {
+      "passed": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "physical_result": null,
+  "physical_config_unchanged": true,
+  "cost": "One staging FF and one configuration latch per FULL unit, plus equivalent word0 gate; lean units constant0. Existing binary modes retained. Synthesis may merge identical gate enables. Full-chip area/hold/congestion unmeasured."
+}

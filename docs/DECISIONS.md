@@ -1313,6 +1313,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Diagnostic early recipe: DELAY0mapping,150psearly hold target,optional late post-GRT timing repair off. Keep native electrical repair/capacity/clock8 settings and all20ns/0.25ns/acceptance constraints. Native flow/image/scripts/order/official template unchanged; no tool patch or physical ECO. Main source untouched and outside-whitelist project adoption remains separate owner review.
 - Costs/risks: local counter logic, full-chip synthesis/hold buffer area and placement/skew effects; timing/antenna may still fail. Existing fresh all-corner/final antenna audits and immutable views retained; no DRT from green job. PHASE2_STOCK_BASELINE_RESULTS.md and hash-bound late_drop_select_evidence.json record scope/evidence. Exact CI prep and real TT config checks pass; physical result pending.
 
+## D-115 (2026-10-25): forward event accounting out of the late token path
+
+- General need: tap/drop accounting places late token-load decisions through an8bitcounter update on the same path. Preserve the exact visible saturating count while shortening event capture; no protocol-specific logic, ISA change or added architectural cycle.
+- Represent count as8bitbase plus pending drop/clear flags. Expose F(base,pending) and accumulate that prior logical count at the next edge while capturing current flags. Recurrence exactly matches original F(count,current_event); cfg-write masking,reset,saturation and drop-over-clear priority retained. New internal state2bits per consumer,readback combinational logic added.
+- Module equivalenceN1..16(100..115points,induction cap4),two semantic negative controls,strict lint,7channel/model+4topRTLcases pass. LocalN5event depth7→4; actual criticalN7typical ideal-wire gate delay1.249745→0.720858ns,area+130.032um². These are module/local diagnostics,not full-chip timing or signoff. Public readback now needs its own timing check.
+- Matched stock candidate changes only this RTL file after hash-bound predecessor; physical config identical to40162935683. Official template,image/scripts/order,20ns/0.25ns,resources and gates unchanged. Main src/config untouched; any future promotion/config adoption remains separately reviewed. Exact clean CI preparation,real TT configuration and syntax pass. Physical result pending; no DRT from green measurement job.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

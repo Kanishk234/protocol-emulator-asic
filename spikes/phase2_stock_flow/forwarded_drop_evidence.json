@@ -1,0 +1,115 @@
+{
+  "proofs": [
+    {
+      "sources": 1,
+      "equivalence_points": 100
+    },
+    {
+      "sources": 2,
+      "equivalence_points": 101
+    },
+    {
+      "sources": 3,
+      "equivalence_points": 102
+    },
+    {
+      "sources": 4,
+      "equivalence_points": 103
+    },
+    {
+      "sources": 5,
+      "equivalence_points": 104
+    },
+    {
+      "sources": 6,
+      "equivalence_points": 105
+    },
+    {
+      "sources": 7,
+      "equivalence_points": 106
+    },
+    {
+      "sources": 8,
+      "equivalence_points": 107
+    },
+    {
+      "sources": 9,
+      "equivalence_points": 108
+    },
+    {
+      "sources": 10,
+      "equivalence_points": 109
+    },
+    {
+      "sources": 11,
+      "equivalence_points": 110
+    },
+    {
+      "sources": 12,
+      "equivalence_points": 111
+    },
+    {
+      "sources": 13,
+      "equivalence_points": 112
+    },
+    {
+      "sources": 14,
+      "equivalence_points": 113
+    },
+    {
+      "sources": 15,
+      "equivalence_points": 114
+    },
+    {
+      "sources": 16,
+      "equivalence_points": 115
+    }
+  ],
+  "induction_sequence_cap": 4,
+  "new_state_bits_per_port": 2,
+  "physical_timing_proven": false,
+  "baseline_sha256": "f0cf047074c61564c71be00019bee2af8270869be7a3597d9e0624ba91e90106",
+  "candidate_sha256": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb",
+  "patch_sha256": "da6a169eb5e02069079c85a0621f90ad7c71f7b0fd7df3e2bc88eec122c0f9bb",
+  "negative_controls": [
+    "N5 one-cycle-delayed visible count rejected",
+    "N5 clear-wins priority rejected"
+  ],
+  "channel_tests": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "top_level_rtl_tests": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "representative_mapping": {
+    "sources": 5,
+    "baseline_area_um2": 2966.8086,
+    "candidate_area_um2": 3178.98,
+    "baseline_late_event_to_register_levels": 7,
+    "candidate_late_event_to_register_levels": 4,
+    "baseline_register_to_public_count_levels": 0,
+    "candidate_register_to_public_count_levels": 6
+  },
+  "ideal_wire_typical_sta": {
+    "tool": "Local OpenSTA2.6.0 with actual CMOS5L typical Liberty; not pinned CI/extracted signoff",
+    "input_delay_ns": 4,
+    "output_load_pf": 0.006,
+    "baseline_late_event_path_delay_ns": 1.031928,
+    "candidate_late_event_path_delay_ns": 0.495255,
+    "physical_timing_proven": false
+  },
+  "critical_port_ideal_wire_typical_N7": {
+    "gold": {
+      "area_um2": 3449.061,
+      "late_event_path_delay_ns": 1.2497449999999999
+    },
+    "trial": {
+      "area_um2": 3579.093,
+      "late_event_path_delay_ns": 0.7208579999999998
+    }
+  }
+}

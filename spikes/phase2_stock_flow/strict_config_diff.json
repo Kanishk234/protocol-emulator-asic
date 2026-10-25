@@ -3,6 +3,10 @@
     "main": 60,
     "proposed": 56
   },
+  "PL_RESIZER_HOLD_SLACK_MARGIN": {
+    "main": 0.1,
+    "proposed": 0.15
+  },
   "GRT_RESIZER_HOLD_SLACK_MARGIN": {
     "main": 0.05,
     "proposed": 0.125
@@ -105,10 +109,14 @@
   },
   "RUN_POST_GRT_RESIZER_TIMING": {
     "main": null,
-    "proposed": true
+    "proposed": false
   },
   "GRT_RESIZER_SETUP_SLACK_MARGIN": {
     "main": null,
     "proposed": 0
+  },
+  "SYNTH_STRATEGY": {
+    "main": null,
+    "proposed": "DELAY 0"
   }
 }

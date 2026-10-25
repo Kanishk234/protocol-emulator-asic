@@ -74,6 +74,16 @@ jobs:
         subprocess.run(['git', 'apply', str(patch)], check=True)
         assert source_hashes() == {**before, 'src/trw_chan_port.v': evidence['candidate_sha256']}
         print('Verified forwarded-count channel variant:', evidence['candidate_sha256'])
+        evidence = json.loads(Path('spikes/phase2_stock_flow/mode_predicate_evidence.json').read_text())
+        patch = Path('spikes/phase2_stock_flow/mode_predicate.patch')
+        assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+        for name, sha in evidence['baseline_files'].items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+        before = source_hashes()
+        subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+        subprocess.run(['git', 'apply', str(patch)], check=True)
+        assert source_hashes() == {**before, **evidence['candidate_files']}
+        print('Verified configuration mode-predicate variant:', evidence['candidate_files'])
         PYCODE
     - name: Check out Tiny Tapeout tools
       uses: actions/checkout@v6
@@ -187,4 +197,6 @@ jobs:
           spikes/phase2_stock_flow/late_drop_select_evidence.json
           spikes/phase2_stock_flow/forwarded_drop.patch
           spikes/phase2_stock_flow/forwarded_drop_evidence.json
+            spikes/phase2_stock_flow/mode_predicate.patch
+            spikes/phase2_stock_flow/mode_predicate_evidence.json
         if-no-files-found: warn

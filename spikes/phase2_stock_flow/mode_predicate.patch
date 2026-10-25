@@ -1,0 +1,113 @@
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -30,7 +30,7 @@
+     input  wire [4:0]              waddr,
+     input  wire [15:0]             wdata,
+     output wire [`TRW_PC_BITS-1:0] cfg,
+-    output wire                    carrier_active,
++    output wire                    carrier_active, bitsync_active,
+     output wire [24:0]             sample_delta,
+     output reg                     restart
+ );
+@@ -216,6 +216,48 @@
+         end
+     endgenerate
+ 
++    // Decode the joint mode at configuration time, with the same visibility as word 0.
++    // This removes a late five-bit decode from the combinational pad-feedback path.
++    generate if (FULL != 0) begin : g_bitsync_active
++        wire mode_write = we && (waddr == 5'd0);
++        wire mode_value = (wdata[`TRW_PC_TXMODE_MSB:`TRW_PC_TXMODE_LSB] == `TRW_PCE_TXMODE_BITSYNC)
++                       && (wdata[`TRW_PC_RXMODE_MSB:`TRW_PC_RXMODE_LSB] == `TRW_PCE_RXMODE_BITSYNC);
++`ifdef TRW_PIN_CFG_FLOPS
++        reg mode_q;
++        always @(posedge clk) begin
++            if (!rst_n) mode_q <= 1'b0;
++            else if (mode_write) mode_q <= mode_value;
++        end
++`else
++        reg mode_stage;
++        always @(posedge clk) begin
++            if (!rst_n) mode_stage <= 1'b0;
++            else if (mode_write) mode_stage <= mode_value;
++        end
++        wire mode_gclk;
++`ifdef SYNTHESIS
++        sg13cmos5l_lgcp_1 u_icg_mode (.GCLK(mode_gclk), .CLK(clk), .GATE(mode_write));
++`else
++        reg mode_en_l;
++        /* verilator lint_off LATCH */
++        always @* begin
++            if (!clk) mode_en_l = mode_write;
++        end
++        /* verilator lint_on LATCH */
++        assign mode_gclk = clk & mode_en_l;
++`endif
++        reg mode_q;
++        /* verilator lint_off LATCH */
++        always @* begin
++            if (mode_gclk) mode_q = mode_stage;
++        end
++        /* verilator lint_on LATCH */
++`endif
++        assign bitsync_active = mode_q;
++    end else begin : g_no_bitsync_active
++        assign bitsync_active = 1'b0;
++    end endgenerate
++
+ `ifdef TRW_PIN_CFG_FLOPS
+     wire _unused = &{1'b0, wdata_q};
+ `endif
+--- a/src/trw_pin_unit.v
++++ b/src/trw_pin_unit.v
+@@ -23,6 +23,7 @@
+ module trw_pin_unit #(
+     parameter FULL = 0,
+     parameter USE_SAMPLE_DELTA = 0,
++    parameter USE_BITSYNC_ACTIVE = 0,
+     parameter FRAC = 8           // time fraction bits; 8 is the spec (16.8). FRAC < 8 is a measurement
+                                  // variant only: it uses the top FRAC bits of the fraction fields
+ ) (
+@@ -33,6 +34,7 @@
+     input  wire [`TRW_PC_BITS-1:0] cfg,
+     input  wire [24:0]             sample_delta,
+     input  wire                    carrier_active,
++    input  wire                    bitsync_active,
+     input  wire [23:0]             pads,
+     // consumer port head (TX half)
+     input  wire                    tx_avail,
+@@ -107,7 +109,8 @@
+     wire        nrzi       = cfg[`TRW_PC_NRZI_LSB];
+     wire        oe_auto    = cfg[`TRW_PC_OE_AUTO_LSB];
+     wire [1:0]  delim      = cfg[`TRW_PC_DELIM_MSB:`TRW_PC_DELIM_LSB];
+-    wire        bs_on      = (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
++    wire        bs_on      = USE_BITSYNC_ACTIVE ? bitsync_active
++                          : (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
+                                          && (rxmode == `TRW_PCE_RXMODE_BITSYNC);
+     // PIN_N only matters to the pad owner mux (trw_pins.v), which reads it from the same block.
+ 
+--- a/src/trw_chip.v
++++ b/src/trw_chip.v
+@@ -176,17 +176,18 @@
+             localparam FULL = (`TRW_PC_UNITS_PULSE >> u) & 1;               // D-040: U0-U1 full
+             wire [`TRW_PC_BITS-1:0] cfg;
+             wire        carrier_active;
++            wire        bitsync_active;
+             wire [24:0] sample_delta;
+             wire        restart, rx_load, rx_free;
+             wire [1:0]  rx_tag;
+             wire [15:0] rx_data;
+             trw_pin_cfg #(.FULL (FULL)) u_cfg (
+                 .clk (clk), .rst_n (rst_n), .we (pcfg_we[u]), .waddr (pcfg_waddr), .wdata (hwd),
+-                .cfg (cfg), .carrier_active (carrier_active), .sample_delta (sample_delta), .restart (restart)
+-            );
+-            trw_pin_unit #(.FULL (FULL), .USE_SAMPLE_DELTA(1)) u_unit (
++                .cfg (cfg), .carrier_active (carrier_active), .bitsync_active (bitsync_active), .sample_delta (sample_delta), .restart (restart)
++            );
++            trw_pin_unit #(.FULL (FULL), .USE_SAMPLE_DELTA(1), .USE_BITSYNC_ACTIVE(1)) u_unit (
+                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg),
+-                .carrier_active (carrier_active), .sample_delta (sample_delta), .pads (pads),
++                .carrier_active (carrier_active), .bitsync_active (bitsync_active), .sample_delta (sample_delta), .pads (pads),
+                 .tx_avail (avail[C_U+u]), .tx_tag (head[18*(C_U+u)+16 +: 2]), .tx_data (head[18*(C_U+u) +: 16]),
+                 .tx_take (take[C_U+u]),
+                 .rx_free (rx_free), .rx_load (rx_load), .rx_tag (rx_tag), .rx_data (rx_data),

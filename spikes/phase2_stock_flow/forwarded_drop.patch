@@ -1,0 +1,54 @@
+--- a/src/trw_chan_port.v
++++ b/src/trw_chan_port.v
+@@ -50,7 +50,7 @@
+     output reg  [3:0]      accept,
+     output wire            blocking,
+     output reg             last_seq,
+-    output reg  [7:0]      dropped
++    output wire [7:0]      dropped
+ );
+     reg [N-1:0] select_mask;
+     integer sm;
+@@ -113,23 +113,25 @@
+     end
+ 
+     wire drop_inc = drop && !cfg_we;
+-    wire drop_room = !(&dropped);
+-    genvar db;
+-    generate for (db = 0; db < 8; db = db + 1) begin: g_drop_bit
+-        wire toggle;
+-        if (db == 0) begin: g_first
+-            assign toggle = drop_room;
+-        end else begin: g_rest
+-            assign toggle = drop_room && (&dropped[db-1:0]);
++    // The public count includes the pending event in the same architectural cycle.
++    // Accumulation consumes the previous event; only the narrow event registers
++    // depend on the late producer/drop decision.
++    reg [7:0] count_base;
++    reg pending_drop;
++    reg pending_clear;
++    wire [7:0] count_incremented = (&count_base) ? count_base : count_base + 8'd1;
++    assign dropped = pending_drop ? count_incremented
++                   : pending_clear ? 8'd0 : count_base;
++    always @(posedge clk) begin
++        if (!rst_n) begin
++            count_base    <= 8'd0;
++            pending_drop  <= 1'b0;
++            pending_clear <= 1'b0;
++        end else begin
++            count_base    <= dropped;
++            pending_drop  <= drop_inc;
++            pending_clear <= clr_dropped;
+         end
+-        always @(posedge clk) begin
+-            if (!rst_n)
+-                dropped[db] <= 1'b0;
+-            else
+-                // Keep the late drop signal on the final select, after increment logic.
+-                dropped[db] <= drop_inc ? (dropped[db] ^ toggle)
+-                                       : (dropped[db] && !clr_dropped);
+-        end
+-    end endgenerate
++    end
+     `TRW_ASSERT(!(avail && !en), "a disabled port shows a token (F1)")
+ endmodule

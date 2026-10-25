@@ -26,7 +26,7 @@ jobs:
         cp spikes/phase2_stock_flow/strict_project_config.json src/config.json
         spikes/r3_sram/fetch_macro.sh macro/RM_IHPSG13_1P_512x16_c2_bm_bist
         python - <<'PYCODE'
-        import hashlib, json
+        import hashlib, json, subprocess
         from pathlib import Path
         manifest = json.loads(Path('spikes/phase2_stock_flow/design_manifest.json').read_text())
         for name, sha in manifest['files'].items():
@@ -46,12 +46,25 @@ jobs:
         assert config['RUN_POST_GRT_DESIGN_REPAIR'] is True
         assert config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == 600
         assert config['GRT_ADJUSTMENT'] == 0.16
-        assert config['RUN_POST_GRT_RESIZER_TIMING'] is True
+        assert config['RUN_POST_GRT_RESIZER_TIMING'] is False
+        assert config['PL_RESIZER_HOLD_SLACK_MARGIN'] == 0.15
+        assert config['SYNTH_STRATEGY'] == 'DELAY 0'
         assert config['GRT_RESIZER_SETUP_SLACK_MARGIN'] == 0
         assert config['GRT_RESIZER_HOLD_SLACK_MARGIN'] == 0.125
         assert not any(k.startswith('TRIPWIRE_') for k in config)
         assert 'PNR_SDC_FILE' not in config and 'SIGNOFF_SDC_FILE' not in config
         assert 'ERROR_ON_MAGIC_DRC' not in config and 'ERROR_ON_ILLEGAL_OVERLAPS' not in config
+        evidence = json.loads(Path('spikes/phase2_stock_flow/late_drop_select_evidence.json').read_text())
+        patch = Path('spikes/phase2_stock_flow/late_drop_select.patch')
+        assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+        assert hashlib.sha256(Path('src/trw_chan_port.v').read_bytes()).hexdigest() == evidence['baseline_sha256']
+        def source_hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in Path('src').rglob('*') if p.is_file()}
+        before = source_hashes()
+        subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+        subprocess.run(['git', 'apply', str(patch)], check=True)
+        assert source_hashes() == {**before, 'src/trw_chan_port.v': evidence['candidate_sha256']}
+        print('Verified late-select channel variant:', evidence['candidate_sha256'])
         PYCODE
     - name: Check out Tiny Tapeout tools
       uses: actions/checkout@v6
@@ -161,4 +174,6 @@ jobs:
           src/**
           info.yaml
           macro/**
+          spikes/phase2_stock_flow/late_drop_select.patch
+          spikes/phase2_stock_flow/late_drop_select_evidence.json
         if-no-files-found: warn

@@ -10,8 +10,8 @@
   "stock_constraints": "Default base.sdc; no latch false paths or explicit uncertainty reduction",
   "checker_waivers_added": false,
   "physical_run_started": false,
-  "baseline_run": 40127505533,
-  "baseline_result": "fast hold50.6384ps/electrical0; slow setup-0.750799ns and fresh final antenna55nets/57pins",
-  "followup": "Late-select dropped counter, DELAY0 mapping and 150ps early hold target; optional late timing repair off",
-  "rtl_variant_sha256": "f0cf047074c61564c71be00019bee2af8270869be7a3597d9e0624ba91e90106"
+  "baseline_run": 40162935683,
+  "baseline_result": "slow setup-0.670662ns,fast hold-0.0147214ns,fanout1;antenna/slew/cap/overflow0",
+  "followup": "RTL-only forwarded dropped-count representation; every physical configuration field fixed to40162935683",
+  "rtl_variant_sha256": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb"
 }

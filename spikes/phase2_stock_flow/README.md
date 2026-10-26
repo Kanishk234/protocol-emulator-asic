@@ -68,3 +68,6 @@ python spikes/phase2_stock_flow/config_banks_checks/check.py PREPARED_MODE_CACHE
 ```
 
 The baseline must have the verified D-116 sources before config_banks.patch. The helper uses a new scratch directory, guards source hashes, checks full/lean latch/flop cases and rejects a wrong-bank mutant. It does not modify the baseline. Source hashes, regression counts and local mapping cost are recorded in config_banks_evidence.json; no whole-chip formal or physical qualification is implied.
+
+
+Banked run40378317785 reports setup0 at all corners and holdfast+35.18ps,with slew/cap/antenna0and last pre-antenna overflow0. Fast reserve is14.82psshort of50ps; four fanout branches still fail after antenna insertion. Actual pre-antenna area+9482um²vs40214888335. D-119now keeps hardware/mixed antenna fixed and tests wire-buffer length300um plus early hold target175ps. Exactly two diagnostic physical settings are hash-bound in wire300_hold175_evidence.json; baseline bank config remains recorded in config_banks_evidence.json. Constraints/checkers/template/main source stay unchanged. This is a measurement candidate, not DRT qualification.

@@ -203,3 +203,22 @@ Cost before optimization:16additional FF bits per unit (64for4units), write-enab
 Actual-RTL contract proofs cover written configuration words, restart and initialized carrier/sample-delta/mode outputs at settled falling edges, using alternating clock/stable-before-rising-edge input assumptions. All four full/lean/latch/flop temporal-induction proofs pass at seq4/cap16; a wrong-bank mutation fails. Simulation compares cfg/restart/carrier/sample-delta/mode against the predecessor after both phases, exhausts all65536word0values and applies10000seeded random writes/idle/reset cycles in all4variants. All120pin-unit+4topRTLcases pass, no skips/errors, and strict full-chip lint passes. The reproducible source-bound driver and fixtures are config_banks_checks/check.py; patch/hash evidence is config_banks_evidence.json. This is not whole-chip formal verification.
 
 Exact clean-archive CI preparation applies the bank patch after the verified mode-cache patch, allows only the expected cfg source hash change, and binds config bytes to40214888335. Main src/config and official gds.yaml remain unchanged. No raw logs committed and no phase boxes ticked. Fresh physical setup/hold/electrical/antenna/congestion must pass before DRT. New physical result pending.
+
+
+## 2026-10-26: banked staging preserves setup and makes hold nominally positive
+
+[40378317785](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40378317785) completed. Independently checked each receipt metric against both fresh raw corner reports and final antenna raw report.
+
+| Corner | Setup WS (ns) | Hold WS (ns) | Slew | Cap | Fanout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fast | 0 | +0.03518 | 0 | 0 | 4 |
+| Typical | 0 | +0.178185 | 0 | 0 | 4 |
+| Slow | 0 | +0.442697 | 0 | 0 | 4 |
+
+Final antenna0nets/0pins. Last pre-antenna post-GRT repair congestion table has0overflow; this is not a final extracted congestion claim. Pre-antenna area636056um²/count40968 versus626574/40375 for matched40214888335: actual+9482um²/+593instances, larger than the standalone mapping estimate because physical optimization changes too. All nominal setup/hold slacks are nonnegative, but reported setup0is not positive reserve and fast hold35.18ps misses the50psgate by14.82ps. Fanout4also blocks DRT.
+
+Final DEF identifies every extra physical antenna load: _30848_/Y drives six non-antenna pins plus ANTENNA_5..10 (12vs8); fanout3336/net3336 originates U0wdata_odd[5] with eight original loads plus ANTENNA_36..38 (11vs8); fanout3354/net3354 originates U0wdata_even[6] with eight original loads plus ANTENNA_40..42 (11vs8); fanout3350/net3350 originates U0wdata_even[9] with eight original loads plus ANTENNA_39 (9vs8). Further cfg banking alone cannot address the independent logic net _30848_. Current worst fast hold is lane0time_now[9] FF _51080_ to time_now[11] FF _51082_, on the same clock leaf. Do not reuse earlier host-path attribution.
+
+D-119 retains exact banked hardware and native mixed antenna repair. Change only GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH600→300um and PL_RESIZER_HOLD_SLACK_MARGIN150→175ps. The shorter native buffering target aims to reduce long exposed wire segments before antenna repair; the modest hold-target increment addresses the remaining14.82psfast deficit. This is a paired physical recipe, not single-setting causal attribution. It may still leave antenna/fanout failures and can increase area/congestion or regress setup/skew. The unsuccessful250ps/jumper-only result does not prove175pswill work.
+
+Pinned LibreLane3.1.0.dev3 schema compilation, exact clean-archive source/config preparation, shell syntax and unchanged hardware hashes pass. Actual unchanged TT config generation also passes. No RTL retest is needed for unchanged hardware; prior bank proofs/124regression cases remain applicable. wire300_hold175_evidence.json binds the baseline/candidate config hashes and exactly two fields. Stock20ns/0.25ns,fanout8,fast hold50ps and all final electrical/antenna gates remain fixed; official workflow/main src/config untouched. No DRT or phase completion claim. New physical result pending.

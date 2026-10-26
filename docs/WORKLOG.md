@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-26 — Inspect positive-hold banked screen and prepare wire-length control
+
+- Completed40378317785 measurement independently checked against repeated fresh3corner/raw antenna reports. Setup0allcorners; holdfast+0.03518,typ+0.178185,slow+0.442697ns. Slew/cap/antenna0,fanout4allcorners. Last pre-antenna congestion table0overflow,not final extracted closure. Area636056/count40968,actual+9482um²vs40214888335. Fast14.82psshort of50psgate; no positive setup-reserve claim or DRT.
+- Final DEF confirms antenna loads on every failed branch: six added to six original at_30848_,three each on U0odd[5]/even[6]eight-load branches,one on U0even[9]eight-load branch. One non-cfg logic branch makes further banking alone insufficient. Current worst hold lane0time_now[9]→time_now[11],not prior host endpoints.
+- D-119same-hardware native physical control: buffer max wire length600→300um and early hold150→175ps. Exactly two settings hash-bound; preserve mixed antenna repair,all constraints/checkers,stock scripts/order/image and official workflow. More buffers may harm area/congestion/setup; no guarantee. Pinned schema,exact clean-archive prep/shell/source/config checks pass; actual TT config generation confirmed. No new RTL simulation needed on byte-identical hardware.
+- Read-only GitHub review initially timed out; allowed single retry succeeded. User standing publication authorization retained; prepare reviewed tools/config,CI and docs groups only,excluding unrelated files/FIPE. Remote main58eaaedverified,no active main workflow. Next publish/launch one matched pre-DRT control then inspect real gates. No phase boxes ticked; no watcher. Publication/run receipt follows.
+
 ## 2026-10-26 — Reject jumper-only and verify two-bank configuration staging
+
+- Published five reviewed groups c7d7650/34d6d58/b427aed/dbde367/58eaaed; actual push succeeded and GitHub API/local HEAD match58eaaedf7b59fa309b895125cd7adf42e9f064d4. Main src/info/macro/official-workflow outgoing diff empty. Dispatched [40378317785](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40378317785), verified in_progress on exact SHA. One additional hardware file versus40214888335, whose physical config is byte-identical; no detailed routing, watcher or unrelated-file publication. Post-launch receipt remains local until next evidence update.
 
 - Inspected completed40353011505; raw repeated all-corner/antenna reports match receipt. Setupfast/typ0,slow-0.412522ns; holdfast-0.00505285,typ+0.228556,slow+0.559065ns. Fanout/cap0,slow slew12,final antenna45nets/50pins. Last pre-antenna congestion report50overflow; no final/extracted closure claim. No DRT.
 - Native log proves jumper plateau:69→45violations after29jumpers,then0newjumpers on both later passes. Do not increase iterations or adopt jumper-only. Current source-bound setup SRAMread→channel2last_seq; hold lane0host_sel[2]→state[2],not old data endpoints.

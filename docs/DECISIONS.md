@@ -1340,6 +1340,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost: up to16extra FF bits per unit before optimization, enables, host-data load and clock sinks. Standalone mapping estimates+4458.0942um²across1full/3leanunits and roughly halves the observed staging-bit load; full-chip routing,area,hold and antenna effects remain unmeasured. This does not promise all fabric-token fanout errors disappear.
 - Physical settings restored byte-for-byte to40214888335(150psearly hold,mixed native antenna repair), isolating this RTL file against the setup-clean baseline. Four module-contract induction proofs, negative control, exhaustive/random phase simulations,124RTLcases,strict lint and exact CI preparation pass. Stock flow/order/image/official template and all acceptance gates remain fixed. Main source/config untouched; DRT blocked until actual gates pass.
 
+## D-119 (2026-10-26): shorter native wire buffering and modest hold reserve
+
+- General need: banked40378317785retains all-corner setupWS0, gives positive actual hold and clean slew/cap/antenna, but fast35.18psmisses50psgate and four branches exceed fanout after antenna cells. One failing branch is unrelated to cfg staging, so another bank expansion alone is insufficient.
+- Diagnostic-only paired physical delta on identical hardware: GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH600→300um and PL_RESIZER_HOLD_SLACK_MARGIN150→175ps. Reduce long exposed segments before mixed antenna repair, with a modest earlier hold target. Exactly two settings, no single-setting attribution. No new RTL/cycle/resource/ISA/tool/SDC/ordering changes.
+- Costs/risks: more buffers,area/load,routing pressure and skew; setup/hold/antenna/fanout may regress or remain failing. Stock20ns/0.25ns/fanout8/50psfast hold and final checker gates remain fixed. Schema,actual TT config,exact CI prep/syntax/source identity pass. Evidence is wire300_hold175_evidence.json. Main source/config and official workflow unchanged; no DRT until actual gates pass. Future main config adoption beyond the whitelist remains owner-reviewed.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

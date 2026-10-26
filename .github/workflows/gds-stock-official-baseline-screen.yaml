@@ -44,13 +44,15 @@ jobs:
         assert config['CTS_APPLY_NDR'] == 'none'
         assert config['CTS_SINK_CLUSTERING_SIZE'] == 8
         assert config['RUN_POST_GRT_DESIGN_REPAIR'] is True
-        assert config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == 600
+        assert config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == 300
         assert config['GRT_ADJUSTMENT'] == 0.16
         assert config['RUN_POST_GRT_RESIZER_TIMING'] is False
-        assert config['PL_RESIZER_HOLD_SLACK_MARGIN'] == 0.15
+        assert config['PL_RESIZER_HOLD_SLACK_MARGIN'] == 0.175
         assert 'GRT_ANTENNA_REPAIR_JUMPER_ONLY' not in config
         policy = json.loads(Path('spikes/phase2_stock_flow/config_banks_evidence.json').read_text())
-        assert hashlib.sha256(Path('src/config.json').read_bytes()).hexdigest() == policy['project_config_sha256']
+        physical = json.loads(Path('spikes/phase2_stock_flow/wire300_hold175_evidence.json').read_text())
+        assert policy['project_config_sha256'] == physical['baseline_project_config_sha256']
+        assert hashlib.sha256(Path('src/config.json').read_bytes()).hexdigest() == physical['candidate_project_config_sha256']
         assert config['SYNTH_STRATEGY'] == 'DELAY 0'
         assert config['GRT_RESIZER_SETUP_SLACK_MARGIN'] == 0
         assert config['GRT_RESIZER_HOLD_SLACK_MARGIN'] == 0.125
@@ -213,4 +215,5 @@ jobs:
             spikes/phase2_stock_flow/mode_predicate_evidence.json
             spikes/phase2_stock_flow/config_banks.patch
             spikes/phase2_stock_flow/config_banks_evidence.json
+            spikes/phase2_stock_flow/wire300_hold175_evidence.json
         if-no-files-found: warn

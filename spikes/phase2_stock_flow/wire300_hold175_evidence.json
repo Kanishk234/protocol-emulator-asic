@@ -1,0 +1,20 @@
+{
+  "baseline_run": 40378317785,
+  "baseline_project_config_sha256": "aaf710a9d12511112fcdb20564d87b4a3caf81ae1986bbefea77147f42ba2f29",
+  "candidate_project_config_sha256": "83822a5db5e67944fcda43cf51025d881c11c16d7c69a4a5599077e574498cfc",
+  "changes": {
+    "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": {
+      "before": 600,
+      "after": 300
+    },
+    "PL_RESIZER_HOLD_SLACK_MARGIN": {
+      "before": 0.15,
+      "after": 0.175
+    }
+  },
+  "hardware_unchanged": true,
+  "description": "Paired native physical repair control: shorter buffered wire segments and modest earlier hold reserve; no single-setting causal attribution",
+  "acceptance_unchanged": "20ns clock,0.25ns uncertainty,fanout8,fast hold50ps,zero final electrical/antenna checks; no custom SDC/tool scripts/order",
+  "risk": "Extra buffers/load/rerouting can increase area,skew,congestion or regress setup; antennas and fanout may remain",
+  "physical_result": null
+}

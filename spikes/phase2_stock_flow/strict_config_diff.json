@@ -29,7 +29,7 @@
   },
   "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": {
     "main": null,
-    "proposed": 600
+    "proposed": 300
   },
   "GRT_RESIZER_HOLD_SLACK_MARGIN": {
     "main": 0.05,
@@ -101,7 +101,7 @@
   },
   "PL_RESIZER_HOLD_SLACK_MARGIN": {
     "main": 0.1,
-    "proposed": 0.15
+    "proposed": 0.175
   },
   "PL_RESIZER_SETUP_SLACK_MARGIN": {
     "main": null,

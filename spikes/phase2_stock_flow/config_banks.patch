@@ -1,0 +1,55 @@
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -48,8 +48,8 @@
+             wire carrier_write = (we && ((waddr == CARRIER_WORD0[4:0]) || (waddr == CARRIER_WORD1[4:0])));
+ `ifndef TRW_PIN_CFG_FLOPS
+             wire carrier_active_next = (waddr == CARRIER_WORD0[4:0])
+-                                     ? ((|wdata_q[15:9]) | (|cfg[`TRW_PC_CARRIER_MSB:`TRW_PC_CARRIER_LSB+16]))
+-                                     : ((|cfg[`TRW_PC_CARRIER_LSB+15:`TRW_PC_CARRIER_LSB+9]) | (|wdata_q[7:0]));
++                                     ? ((|(((CARRIER_WORD0 % 2) != 0) ? wdata_odd[15:9] : wdata_even[15:9])) | (|cfg[`TRW_PC_CARRIER_MSB:`TRW_PC_CARRIER_LSB+16]))
++                                     : ((|cfg[`TRW_PC_CARRIER_LSB+15:`TRW_PC_CARRIER_LSB+9]) | (|(((CARRIER_WORD1 % 2) != 0) ? wdata_odd[7:0] : wdata_even[7:0])));
+ `endif
+ `ifdef TRW_PIN_CFG_FLOPS
+             reg active_q;
+@@ -153,14 +153,17 @@
+             restart <= we && (waddr < NW);
+     end
+ 
+-    // Unit-local write staging: inactive units hold their bank so synthesis cannot
+-    // merge every configuration and slot write-data register into one broadcast.
+-    reg [15:0] wdata_q;
++    // Two independently enabled word-parity banks reduce the physical spread and
++    // load of each staged write-data bit without changing a word's write edge.
++    reg [15:0] wdata_even, wdata_odd;
+     always @(posedge clk) begin
+-        if (!rst_n)
+-            wdata_q <= 16'h0000;
+-        else if (we)
+-            wdata_q <= wdata;
++        if (!rst_n) begin
++            wdata_even <= 16'h0000;
++            wdata_odd <= 16'h0000;
++        end else if (we) begin
++            if (waddr[0]) wdata_odd <= wdata;
++            else wdata_even <= wdata;
++        end
+     end
+ 
+     genvar w, b;
+@@ -201,7 +204,7 @@
+                         reg q;
+                         always @* begin
+                             if (gclk)
+-                                q = wdata_q[b];
++                                q = ((w % 2) != 0) ? wdata_odd[b] : wdata_even[b];
+                         end
+                         assign cfg[16*w + b] = q;
+                     end else begin : g_none
+@@ -259,6 +262,6 @@
+     end endgenerate
+ 
+ `ifdef TRW_PIN_CFG_FLOPS
+-    wire _unused = &{1'b0, wdata_q};
++    wire _unused = &{1'b0, wdata_even, wdata_odd};
+ `endif
+ endmodule

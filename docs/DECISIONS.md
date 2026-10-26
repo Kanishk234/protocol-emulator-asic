@@ -1346,6 +1346,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Diagnostic-only paired physical delta on identical hardware: GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH600→300um and PL_RESIZER_HOLD_SLACK_MARGIN150→175ps. Reduce long exposed segments before mixed antenna repair, with a modest earlier hold target. Exactly two settings, no single-setting attribution. No new RTL/cycle/resource/ISA/tool/SDC/ordering changes.
 - Costs/risks: more buffers,area/load,routing pressure and skew; setup/hold/antenna/fanout may regress or remain failing. Stock20ns/0.25ns/fanout8/50psfast hold and final checker gates remain fixed. Schema,actual TT config,exact CI prep/syntax/source identity pass. Evidence is wire300_hold175_evidence.json. Main source/config and official workflow unchanged; no DRT until actual gates pass. Future main config adoption beyond the whitelist remains owner-reviewed.
 
+## D-120 (2026-10-26): hold-only reserve control on electrically clean wire300
+
+- General need:40399598426clears reported setup/electrical/antenna with last pre-antenna overflow0, but fast hold-3.75733psmisses50psby53.75733ps. Actual post-CTS log loads all3corners, inserts4670buffers and reaches175pstarget; later physical state still fails hold. No evidence of a buffer-cap/corner omission.
+- One-setting diagnostic control: PL_RESIZER_HOLD_SLACK_MARGIN175→250ps. Preserve wire300,mixed antenna,all hardware and other physical settings. This is optimization reserve,not a relaxed acceptance threshold. Prior250psrecipe changed other factors and is not a matched control.
+- Costs/risks: additional buffers/area/load/placement/rerouting may regress setup/congestion/electrical/antenna or fail to improve hold. All gates and final audits remain; no DRT until they pass. Exact config/source/CI/schema/actual TT checks pass. Evidence is wire300_hold250_evidence.json. Main source/config and official template unchanged; future beyond-whitelist main adoption stays owner-reviewed.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

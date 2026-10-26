@@ -222,3 +222,22 @@ Final DEF identifies every extra physical antenna load: _30848_/Y drives six non
 D-119 retains exact banked hardware and native mixed antenna repair. Change only GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH600→300um and PL_RESIZER_HOLD_SLACK_MARGIN150→175ps. The shorter native buffering target aims to reduce long exposed wire segments before antenna repair; the modest hold-target increment addresses the remaining14.82psfast deficit. This is a paired physical recipe, not single-setting causal attribution. It may still leave antenna/fanout failures and can increase area/congestion or regress setup/skew. The unsuccessful250ps/jumper-only result does not prove175pswill work.
 
 Pinned LibreLane3.1.0.dev3 schema compilation, exact clean-archive source/config preparation, shell syntax and unchanged hardware hashes pass. Actual unchanged TT config generation also passes. No RTL retest is needed for unchanged hardware; prior bank proofs/124regression cases remain applicable. wire300_hold175_evidence.json binds the baseline/candidate config hashes and exactly two fields. Stock20ns/0.25ns,fanout8,fast hold50ps and all final electrical/antenna gates remain fixed; official workflow/main src/config untouched. No DRT or phase completion claim. New physical result pending.
+
+
+## 2026-10-26: wire300 clears final electrical/antenna; hold-only control
+
+[40399598426](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40399598426) completed. Every receipt metric was independently matched to both fresh raw corner reports and fresh final antenna raw metrics.
+
+| Corner | Setup WS (ns) | Hold WS (ns) | Slew | Cap | Fanout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fast | 0 | -0.00375733 | 0 | 0 | 0 |
+| Typical | 0 | +0.124138 | 0 | 0 | 0 |
+| Slow | 0 | +0.355552 | 0 | 0 | 0 |
+
+Final antenna0nets/0pins; last pre-antenna electrical-repair congestion report0overflow. Reported setup is nonnegative, not positive reserve. Fast hold misses the50psgate by53.75733ps; detailed routing remains blocked. Post-route/physical signoff has not been performed.
+
+Current worst fast path: lane0host_wdata[11] FF _51576_ to h_wd[11] FF _51490_. Native post-CTS repair explicitly loads all3corners, repairs with hold_margin0.175/max_buffer_percent50, inserts4670hold buffers and finishes at0.175nsWNS before subsequent placement/routing/electrical/antenna work. It does not hit its buffer limit. Final worst endpoints differ, so do not claim the entire slack difference is one path's loss. Increasing buffer-count limits or changing corner lists is unsupported by this evidence.
+
+D-120 changes exactly one diagnostic setting versus40399598426: early hold target175→250ps. Keep wire300,banked/mode-cache RTL,native mixed antenna repair and all other settings byte-identical. The additional75psearly target is intended to cover the remaining53.75733psfinal deficit; no guaranteed linear gain. Earlier250psresults used different hardware/wire/antenna policy and do not answer this matched control. Added buffers can still regress setup,area,congestion,electrical or antenna closure.
+
+Pinned schema,exact clean-archive CI preparation,source hashes,shell syntax and actual TT config pass. No RTL simulation rerun is needed on identical hardware. wire300_hold250_evidence.json links the baseline/candidate hashes to the preceding wire300control. Main hardware/config,official GDS workflow,20ns/0.25ns/fanout8/50psfast hold gates,stock scripts/order/image and final audits remain unchanged. No DRT or phase completion claim; new physical result pending.

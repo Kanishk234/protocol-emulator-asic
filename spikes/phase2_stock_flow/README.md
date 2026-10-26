@@ -71,3 +71,6 @@ The baseline must have the verified D-116 sources before config_banks.patch. The
 
 
 Banked run40378317785 reports setup0 at all corners and holdfast+35.18ps,with slew/cap/antenna0and last pre-antenna overflow0. Fast reserve is14.82psshort of50ps; four fanout branches still fail after antenna insertion. Actual pre-antenna area+9482um²vs40214888335. D-119now keeps hardware/mixed antenna fixed and tests wire-buffer length300um plus early hold target175ps. Exactly two diagnostic physical settings are hash-bound in wire300_hold175_evidence.json; baseline bank config remains recorded in config_banks_evidence.json. Constraints/checkers/template/main source stay unchanged. This is a measurement candidate, not DRT qualification.
+
+
+Wire300/hold175 run40399598426reports setup0allcorners,electrical/antenna0and last pre-antenna overflow0. Only reported timing/electrical/antenna screen failure is fast hold-3.75733ps(53.75733psshort of50psgate); physical signoff/DRT remain unperformed. D-120changes only early hold target175→250ps. wire300_hold250_evidence.json binds the matched control to the prior config hash. Hardware/other policies/template/acceptance unchanged. More buffers can regress any physical gate; final fresh audits remain required.

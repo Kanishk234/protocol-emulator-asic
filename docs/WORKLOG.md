@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-26 — Wire300 clears electrical/antenna; prepare hold-only reserve
+
+- Completed40399598426 measurement checked against repeated fresh raw reports: setup0allcorners,holdfast-0.00375733/typ+0.124138/slow+0.355552ns. Slew/cap/fanout0allcorners,final antenna0,last pre-antenna congestion0overflow. Fast53.75733psshort of50psgate; no DRT or positive setup-reserve/phase completion claim.
+- Current source-bound hold lane0host_wdata[11] FF_51576_→h_wd[11] FF_51490_. Native CTS repair explicitly loads all3corners, inserts4670buffers and reaches175ps before later physical work; no buffer-limit warning. Do not change corner list/buffer cap based on speculation.
+- D-120same-hardware/same-wire300 single-setting control increases early hold175→250ps. Extra75pstarget is not guaranteed final gain; prior250psdifferent recipe is not matched evidence. No tool/SDC/stock-order/official-template or gate changes. Exact delta/hash guards,pinned schema,clean CI prep/shell/source and actual TT checks pass. No new RTL tests needed for byte-identical hardware.
+- Standing publication approval retained. Publish reviewed policy/evidence,CI and docs groups only; exclude unrelated files/FIPE. Next launch one matched pre-DRT hold control,inspect actual final gates and then decide routing. No phase boxes ticked,no watcher. Publication/run receipt follows.
+
 ## 2026-10-26 — Inspect positive-hold banked screen and prepare wire-length control
+
+- Published reviewed42eaedd(policy/evidence),ed85f4c(CI),261f8f5(docs); push succeeded and remote/local SHA verified261f8f5cb5a476b258da814163832493ab81fbf7. Outgoing main source/info/macro/official-workflow diff empty. Dispatched [40399598426](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40399598426),verified exact SHA and initially queued; subsequent check verified in_progress at pinned IHP installer checkout. No DRT/watcher/unrelated-file publication. Post-launch receipt stays local until next evidence update.
 
 - Completed40378317785 measurement independently checked against repeated fresh3corner/raw antenna reports. Setup0allcorners; holdfast+0.03518,typ+0.178185,slow+0.442697ns. Slew/cap/antenna0,fanout4allcorners. Last pre-antenna congestion table0overflow,not final extracted closure. Area636056/count40968,actual+9482um²vs40214888335. Fast14.82psshort of50psgate; no positive setup-reserve claim or DRT.
 - Final DEF confirms antenna loads on every failed branch: six added to six original at_30848_,three each on U0odd[5]/even[6]eight-load branches,one on U0even[9]eight-load branch. One non-cfg logic branch makes further banking alone insufficient. Current worst hold lane0time_now[9]→time_now[11],not prior host endpoints.

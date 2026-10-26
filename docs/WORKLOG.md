@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-26 — Reject jumper-only and verify two-bank configuration staging
+
+- Inspected completed40353011505; raw repeated all-corner/antenna reports match receipt. Setupfast/typ0,slow-0.412522ns; holdfast-0.00505285,typ+0.228556,slow+0.559065ns. Fanout/cap0,slow slew12,final antenna45nets/50pins. Last pre-antenna congestion report50overflow; no final/extracted closure claim. No DRT.
+- Native log proves jumper plateau:69→45violations after29jumpers,then0newjumpers on both later passes. Do not increase iterations or adopt jumper-only. Current source-bound setup SRAMread→channel2last_seq; hold lane0host_sel[2]→state[2],not old data endpoints.
+- Prepared D-118one-file banked config staging to reduce long write-data broadcast load. Restored exact40214888335physical config (150psearly hold,mixed antenna),rather than adding a new physical recipe. One extra16bitbank per unit beforeoptimization; local representative area+4458.0942um²across4units and bit5loads full24→13/12,lean10→6/5. Actual physical benefit/hold/area/congestion unknown; fabric-token branch may still need work.
+- Four actual configuration-contract induction proofs, wrong-bank negative control, four exhaustive/random both-phase simulation variants,120pin+4topRTLcases and strict lint pass. Packaged replay adapter corrected to read predecessor module (BUG148); fresh packaged replay passes all4cases and its wrong-bank control; actual unchanged TT config generation also passes. Exact clean-archive CI preparation/shell syntax/source-hash/config-byte checks pass. No main hardware/config/official-template changes, raw logs or phase ticks. Preserve unrelated files/FIPE; no watcher. Next publish reviewed groups and launch one matched pre-DRT bank screen only after final checks pass.
+
 ## 2026-10-26 — Resume stock closure after mode-cache screen
+
+- Publication completed: f4c2806 (policy/evidence), 7fadcab (diagnostic CI), f9932e8 (docs). Remote main and local HEAD verified f9932e80fc67db795874bcc699811b2c6360154d; outgoing main hardware/config/official-template diff empty. Dispatched [40353011505](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40353011505), verified exact SHA and initially queued; follow-up verified in_progress at Set up Python. It tests native jumper-only antenna repair plus250psearly hold on unchanged D-116hardware. Actual gates fixed; no DRT or watcher. This post-launch receipt remains local until next evidence publication.
 
 - Recovered run40214888335: measurement job success, fresh repeated/raw audit independently matches. SetupWS0 at all3corners, slow improved from-0.780544ns; not positive setup reserve. Hold fast/typ/slow -0.0333446/+0.0781532/+0.278575ns; electrical slew/cap0, fanout3, final antenna0. Area626574um²/count40375 versus630609/40818. Last pre-antenna congestion table54overflow; no final/routed closure claim.
 - Source-bound slow path now lane0host_sel[2]→U0carrier_active latch; fast hold lane0host_wdata[15]→h_wd[15]. Final DEF identifies6/3/1antenna cells on7/8/8original loads, producing13/11/9fanout vs8. Native antenna logs already use jumpers plus diodes. Both old main runs37655518919/37655518925still queued; no active main workflow on resumption. No cancellation or watcher.

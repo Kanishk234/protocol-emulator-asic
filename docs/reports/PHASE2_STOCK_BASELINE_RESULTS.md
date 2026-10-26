@@ -180,3 +180,26 @@ Final DEF proves the current fanout roots: U0 cfg.wdata_q[5] branch fanout3295/n
 D-117 tests exactly two diagnostic settings on unchanged D-116 hardware: PL_RESIZER_HOLD_SLACK_MARGIN150→250ps and GRT_ANTENNA_REPAIR_JUMPER_ONLY=true. The latter is a documented variable in pinned LibreLane3.1.0.dev3, forwarded by unchanged antenna_repair.tcl as -jumper_only. This chooses a native repair mechanism; it neither disables antenna checks nor removes existing antenna cells. New runs start from clean synthesis. The hold setting is an optimization target; the actual acceptance gate stays50psfast hold. Stock fanout8,20ns,uncertainty0.25ns,all electrical/antenna gates,image/scripts/order and official template remain fixed.
 
 This is a paired physical-policy test, not single-knob attribution. Risks: jumpers may leave antenna violations unresolved or consume routing resources; extra hold buffers may increase area/congestion or harm setup. Schema compilation of both exact settings, clean-archive workflow preparation, source-hash identity, actual unchanged TT --create-user-config and shell syntax pass. native_antenna_hold_evidence.json binds the two-field delta and hardware hashes to40214888335. No new RTL simulation is needed for byte-identical hardware. Main src/config and official gds.yaml remain unchanged. Do not start DRT unless fresh final gates pass; physical result pending.
+
+
+## 2026-10-26: jumper-only stalls; return to setup-clean baseline with banked staging
+
+[40353011505](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40353011505) completed as a measurement job. Receipt metrics independently match both fresh raw corner reports and the fresh antenna raw report.
+
+| Corner | Setup WS (ns) | Hold WS (ns) | Slew | Cap | Fanout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fast | 0 | -0.00505285 | 0 | 0 | 0 |
+| Typical | 0 | +0.228556 | 0 | 0 | 0 |
+| Slow | -0.412522 | +0.559065 | 12 | 0 | 0 |
+
+Final antenna45nets/50pins fails. Fast hold is55.05285ps below the50psgate. Last pre-antenna repair congestion table reports50overflow; no final/routed congestion claim. Native log: initial69antenna violations,29jumpers on25nets, then45violations; both later iterations add0jumpers and leave the same45violations. Extra iterations are not justified by this plateau. Jumper-only is not a qualified replacement for mixed repair. As this test paired two settings, do not attribute setup/hold changes to either one alone. No DRT.
+
+Current slow path is SRAM read to channel2 last_seq FF _50704_. Current worst hold is lane0host_sel[2] FF _50977_ to lane0state[2] FF _49090_; it is not the previous host-write-data endpoint. Cell IDs are run-specific.
+
+D-118 returns the diagnostic physical config byte-for-byte to the last all-corner setup-clean run40214888335: early hold150ps and ordinary native mixed antenna repair. Then change only trw_pin_cfg.v: split unit-local staged write data into independently enabled even/odd-word banks and feed each stored word directly from its static bank. Carrier words use their own constant-selected bank; sample-delta/mode caches and visible timing are unchanged. Separate enables prevent synthesis from merging the two staging registers. This general storage optimization targets configuration-net load/spread while retaining normal antenna repair. It does not guarantee that every producer-token fanout branch or hold path will close.
+
+Cost before optimization:16additional FF bits per unit (64for4units), write-enable logic and extra host-data input load. Representative standalone typical-Liberty mapping: lean area6626.1888→7734.7872um², full14513.1966→15645.4956um²; one full/three lean estimated delta4458.0942um². Staging-bit5 input loads: lean10→6/5, full24→13/12. These module comparisons exclude placement/routing and do not predict actual die area, timing or antenna closure. Extra load and clock sinks can worsen hold/setup/congestion.
+
+Actual-RTL contract proofs cover written configuration words, restart and initialized carrier/sample-delta/mode outputs at settled falling edges, using alternating clock/stable-before-rising-edge input assumptions. All four full/lean/latch/flop temporal-induction proofs pass at seq4/cap16; a wrong-bank mutation fails. Simulation compares cfg/restart/carrier/sample-delta/mode against the predecessor after both phases, exhausts all65536word0values and applies10000seeded random writes/idle/reset cycles in all4variants. All120pin-unit+4topRTLcases pass, no skips/errors, and strict full-chip lint passes. The reproducible source-bound driver and fixtures are config_banks_checks/check.py; patch/hash evidence is config_banks_evidence.json. This is not whole-chip formal verification.
+
+Exact clean-archive CI preparation applies the bank patch after the verified mode-cache patch, allows only the expected cfg source hash change, and binds config bytes to40214888335. Main src/config and official gds.yaml remain unchanged. No raw logs committed and no phase boxes ticked. Fresh physical setup/hold/electrical/antenna/congestion must pass before DRT. New physical result pending.

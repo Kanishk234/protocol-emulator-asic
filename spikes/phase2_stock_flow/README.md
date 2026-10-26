@@ -56,3 +56,15 @@ BASELINE contains the prepared full-design src directory before mode_predicate.p
 
 
 D-116 run40214888335 reaches reported setupWS0 at all three corners, with fast hold -33.3446ps and three actual fanout failures. D-117 now keeps hardware fixed and tests exactly two physical settings: early hold target250ps and native jumper-only antenna repair. Final DEF confirms antenna-cell loads cause all three current fanout failures. native_antenna_hold_evidence.json binds the prior/candidate config hashes and unchanged hardware. Stock timing/fanout/antenna acceptance remains fixed; jumper-only can still fail final antenna and extra hold repair can harm setup/area. No DRT from measurement-job success. Main source/config and official template remain untouched.
+
+
+D-117run40353011505fails slow setup(-0.412522ns),fast hold(-0.00505285ns),12slow slew checks and45antenna nets,despite fanout0. Jumper repair adds0jumpers on its last two passes, so do not just increase iterations. D-118restores the exact40214888335physical settings and applies one additional source-only config_banks.patch. Two independently enabled parity banks reduce per-bit distribution while retaining ordinary antenna diodes/checks. This may still leave producer-token fanout/hold failures; physical benefit unmeasured. Main source/config and official workflow unchanged.
+
+Replay written-word/derived-output contract proofs and both-phase configuration simulations:
+
+```sh
+source .venv/bin/activate
+python spikes/phase2_stock_flow/config_banks_checks/check.py PREPARED_MODE_CACHE_BASELINE NEW_WORK_DIRECTORY
+```
+
+The baseline must have the verified D-116 sources before config_banks.patch. The helper uses a new scratch directory, guards source hashes, checks full/lean latch/flop cases and rejects a wrong-bank mutant. It does not modify the baseline. Source hashes, regression counts and local mapping cost are recorded in config_banks_evidence.json; no whole-chip formal or physical qualification is implied.

@@ -1333,6 +1333,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Diagnostic-only paired recipe: native GRT_ANTENNA_REPAIR_JUMPER_ONLY=true and PL_RESIZER_HOLD_SLACK_MARGIN=0.25ns. Clean synthesis, same source hashes, no injected Tcl or reordered steps. Pinned stock variable/compiler/script support and real TT config verified. Evidence binds exactly two physical settings; no attribution to an individual setting.
 - Cost/risk: jumpers consume routing resources and may fail to repair every antenna; earlier hold repair adds buffers/area and can regress setup/skew/congestion. Fresh final antenna/electrical/hold/setup and congestion audits remain mandatory; no DRT on green measurement alone. Actual fanout8/50psfast hold/20ns/0.25ns constraints and checker policy unchanged. Main source/config and official workflow untouched; future adoption beyond main config whitelist remains separate review.
 
+## D-118 (2026-10-26): split staged configuration data into static word banks
+
+- General need: native antenna repair adds loads to long configuration write-data branches, breaking fanout. D-117jumper-only clears fanout but stalls with45antenna nets; it also loses setup and leaves hold failing. Preserve ordinary antenna repair and reduce the underlying broadcast distribution.
+- One-file diagnostic prototype gives each unit independent even/odd-word data staging, enabled only for writes to that bank. Word latches consume their own static bank; carrier-derived predicate selects the appropriate bank for each carrier word. Same write edge, restart/reset, configuration visibility and protocol/ISA/resources. No new protocol block or cycle.
+- Cost: up to16extra FF bits per unit before optimization, enables, host-data load and clock sinks. Standalone mapping estimates+4458.0942um²across1full/3leanunits and roughly halves the observed staging-bit load; full-chip routing,area,hold and antenna effects remain unmeasured. This does not promise all fabric-token fanout errors disappear.
+- Physical settings restored byte-for-byte to40214888335(150psearly hold,mixed native antenna repair), isolating this RTL file against the setup-clean baseline. Four module-contract induction proofs, negative control, exhaustive/random phase simulations,124RTLcases,strict lint and exact CI preparation pass. Stock flow/order/image/official template and all acceptance gates remain fixed. Main source/config untouched; DRT blocked until actual gates pass.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

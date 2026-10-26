@@ -47,7 +47,10 @@ jobs:
         assert config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == 600
         assert config['GRT_ADJUSTMENT'] == 0.16
         assert config['RUN_POST_GRT_RESIZER_TIMING'] is False
-        assert config['PL_RESIZER_HOLD_SLACK_MARGIN'] == 0.15
+        assert config['PL_RESIZER_HOLD_SLACK_MARGIN'] == 0.25
+        assert config['GRT_ANTENNA_REPAIR_JUMPER_ONLY'] is True
+        policy = json.loads(Path('spikes/phase2_stock_flow/native_antenna_hold_evidence.json').read_text())
+        assert hashlib.sha256(Path('src/config.json').read_bytes()).hexdigest() == policy['candidate_project_config_sha256']
         assert config['SYNTH_STRATEGY'] == 'DELAY 0'
         assert config['GRT_RESIZER_SETUP_SLACK_MARGIN'] == 0
         assert config['GRT_RESIZER_HOLD_SLACK_MARGIN'] == 0.125
@@ -84,6 +87,8 @@ jobs:
         subprocess.run(['git', 'apply', str(patch)], check=True)
         assert source_hashes() == {**before, **evidence['candidate_files']}
         print('Verified configuration mode-predicate variant:', evidence['candidate_files'])
+        for name, sha in policy['unchanged_hardware_files'].items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
         PYCODE
     - name: Check out Tiny Tapeout tools
       uses: actions/checkout@v6
@@ -199,4 +204,5 @@ jobs:
           spikes/phase2_stock_flow/forwarded_drop_evidence.json
             spikes/phase2_stock_flow/mode_predicate.patch
             spikes/phase2_stock_flow/mode_predicate_evidence.json
+            spikes/phase2_stock_flow/native_antenna_hold_evidence.json
         if-no-files-found: warn

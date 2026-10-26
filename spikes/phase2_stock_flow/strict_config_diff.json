@@ -1,19 +1,47 @@
 {
-  "PL_TARGET_DENSITY_PCT": {
-    "main": 60,
-    "proposed": 56
+  "//": {
+    "main": "Only export pin area in LEF (without any connected nets)",
+    "proposed": null
   },
-  "PL_RESIZER_HOLD_SLACK_MARGIN": {
-    "main": 0.1,
-    "proposed": 0.15
+  "CTS_APPLY_NDR": {
+    "main": null,
+    "proposed": "none"
+  },
+  "CTS_SINK_CLUSTERING_SIZE": {
+    "main": null,
+    "proposed": 8
+  },
+  "FP_PDN_VOFFSET": {
+    "main": null,
+    "proposed": 26.36
+  },
+  "FP_PDN_VPITCH": {
+    "main": 50.0,
+    "proposed": 67.44
+  },
+  "FP_PDN_VSPACING": {
+    "main": null,
+    "proposed": 3.52
+  },
+  "GRT_ADJUSTMENT": {
+    "main": null,
+    "proposed": 0.16
+  },
+  "GRT_ANTENNA_REPAIR_JUMPER_ONLY": {
+    "main": null,
+    "proposed": true
+  },
+  "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": {
+    "main": null,
+    "proposed": 600
   },
   "GRT_RESIZER_HOLD_SLACK_MARGIN": {
     "main": 0.05,
     "proposed": 0.125
   },
-  "FP_PDN_VPITCH": {
-    "main": 50.0,
-    "proposed": 67.44
+  "GRT_RESIZER_SETUP_SLACK_MARGIN": {
+    "main": null,
+    "proposed": 0
   },
   "MACROS": {
     "main": null,
@@ -54,6 +82,20 @@
       }
     }
   },
+  "MAGIC_EXT_ABSTRACT_CELLS": {
+    "main": null,
+    "proposed": [
+      "RM_IHPSG13_.*"
+    ]
+  },
+  "MAGIC_MACRO_STD_CELL_SOURCE": {
+    "main": null,
+    "proposed": "PDK"
+  },
+  "PDN_CFG": {
+    "main": null,
+    "proposed": "dir::pdn_cfg.tcl"
+  },
   "PDN_MACRO_CONNECTIONS": {
     "main": null,
     "proposed": [
@@ -61,59 +103,25 @@
       "u_chip.u_sram.sram VPWR VGND VDDARRAY! VSS!"
     ]
   },
-  "PDN_CFG": {
-    "main": null,
-    "proposed": "dir::pdn_cfg.tcl"
-  },
-  "FP_PDN_VSPACING": {
-    "main": null,
-    "proposed": 3.52
-  },
-  "FP_PDN_VOFFSET": {
-    "main": null,
-    "proposed": 26.36
-  },
-  "MAGIC_MACRO_STD_CELL_SOURCE": {
-    "main": null,
-    "proposed": "PDK"
-  },
-  "MAGIC_EXT_ABSTRACT_CELLS": {
-    "main": null,
-    "proposed": [
-      "RM_IHPSG13_.*"
-    ]
+  "PL_RESIZER_HOLD_SLACK_MARGIN": {
+    "main": 0.1,
+    "proposed": 0.25
   },
   "PL_RESIZER_SETUP_SLACK_MARGIN": {
     "main": null,
     "proposed": 0
   },
-  "CTS_APPLY_NDR": {
-    "main": null,
-    "proposed": "none"
-  },
-  "CTS_SINK_CLUSTERING_SIZE": {
-    "main": null,
-    "proposed": 8
+  "PL_TARGET_DENSITY_PCT": {
+    "main": 60,
+    "proposed": 56
   },
   "RUN_POST_GRT_DESIGN_REPAIR": {
     "main": null,
     "proposed": true
   },
-  "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": {
-    "main": null,
-    "proposed": 600
-  },
-  "GRT_ADJUSTMENT": {
-    "main": null,
-    "proposed": 0.16
-  },
   "RUN_POST_GRT_RESIZER_TIMING": {
     "main": null,
     "proposed": false
-  },
-  "GRT_RESIZER_SETUP_SLACK_MARGIN": {
-    "main": null,
-    "proposed": 0
   },
   "SYNTH_STRATEGY": {
     "main": null,

@@ -1,0 +1,38 @@
+{
+  "baseline_run": 40214888335,
+  "baseline_head": "5b8219918198bde0e3ed2b5294c6b04f70453d8b",
+  "baseline_project_config_sha256": "aaf710a9d12511112fcdb20564d87b4a3caf81ae1986bbefea77147f42ba2f29",
+  "candidate_project_config_sha256": "1a57dd8d47cfe26854e8f2163035a2d34e445a17b264ac7169145234082fdd04",
+  "changes": {
+    "PL_RESIZER_HOLD_SLACK_MARGIN": {
+      "before": 0.15,
+      "after": 0.25
+    },
+    "GRT_ANTENNA_REPAIR_JUMPER_ONLY": {
+      "before": null,
+      "after": true
+    }
+  },
+  "unchanged_hardware_files": {
+    "src/RM_IHPSG13_1P_512x16_c2_bm_bist.v": "4a03d7cd63892f1986493339803d6f323b497ae332b2207c2cfd48e3053eb602",
+    "src/pdn_cfg.tcl": "0614d6d24202f2e8106d39f08b975443797d36effb5060d03b5736e538d484db",
+    "src/signoff.sdc": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa",
+    "src/trw_chan_port.v": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb",
+    "src/trw_chip.v": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd",
+    "src/trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "src/trw_fabric.v": "f6f5af0e6c9b561bd68fabea949410b15b2b5a1b647d2d291909ef67632aed7f",
+    "src/trw_lane.v": "5a2905a6c59ac4eb6efb621e95d5bd18d1b9f2dc1ad599f5c7690573760ffd06",
+    "src/trw_pin_bs.v": "83f82e436b67d79efddae6dc60bdfa4902cf5b250b1cd587ffe2a4c9c1e08340",
+    "src/trw_pin_cfg.v": "2864b8eb495928d81d795827d1af84ab3b92d1cb6097b48384b8d3dcf8fa5c2f",
+    "src/trw_pin_tx.v": "29bdf26b9cf3d1939d8b8efe7833ac7d6ca1042c71e33c7065462f10e3c7951f",
+    "src/trw_pin_unit.v": "e79409507fc9a9e29ebead7fea2d85e7a555c062815d1bf55fce6ca2067172fe",
+    "src/tt_um_tripwire.v": "f92ba2a7fef45ebb3fb26c01fcb1c3598bb66ef9938c1641b5414ab0bc9c0de9"
+  },
+  "acceptance": "Unchanged stock20ns,0.25ns uncertainty,fanout8,nonnegative setup/hold with50psfast hold; final electrical/antenna and routing gates retained",
+  "interpretation": "Paired native physical repair recipe; do not attribute outcome to a single setting",
+  "risks": [
+    "Jumpers can consume routing resources or leave antenna violations unrepaired",
+    "Earlier250pshold target adds buffers/area and may alter setup,clock skew and congestion"
+  ],
+  "physical_result": null
+}

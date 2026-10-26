@@ -1,0 +1,38 @@
+{
+  "baseline_run": 40214888335,
+  "patch_sha256": "f102266c0eaa269e5928826da0584b77d9f2f2b9465dfffef231c095d3a0c05c",
+  "baseline_files": {
+    "src/trw_pin_cfg.v": "2864b8eb495928d81d795827d1af84ab3b92d1cb6097b48384b8d3dcf8fa5c2f"
+  },
+  "candidate_files": {
+    "src/trw_pin_cfg.v": "a3f4ab08216def6cef7c4c5373ee83acd5f885c7f6de2529678bd68d0edb0452"
+  },
+  "formal_scope": "Written config words, restart, initialized joint-mode/carrier/sample-delta caches equivalent at settled falling-edge observations, alternating clock and stable-before-rising-edge inputs. Full/lean, latch/flop. Not whole-chip formal.",
+  "formal": "Four temporal-induction module-contract proofs pass at seq4/cap16; wrong-bank mutant rejected by assertion failure.",
+  "simulation": "65536 word0 values and10000 seeded random write/idle/reset cycles; both phases; cfg/restart/carrier/sample-delta/mode compared against predecessor; four full/lean latch/flop variants pass.",
+  "regressions": {
+    "pin-full0": 60,
+    "pin-full1": 60,
+    "top": 4
+  },
+  "physical_recipe": "Restore40214888335settings: early hold150ps, native mixed antenna repair. One additional RTL file only.",
+  "cost": "One extra16bit staging bank per unit before optimization; total64extra FF bits for4units, plus write enables. Could add host-data load, skew or area; native physical effects unmeasured.",
+  "physical_result": null,
+  "project_config_sha256": "aaf710a9d12511112fcdb20564d87b4a3caf81ae1986bbefea77147f42ba2f29",
+  "local_mapping": {
+    "method": "Standalone module CMOS5L typical Liberty/Yosys mapping, no physical placement or routing",
+    "lean_area_before_um2": 6626.1888,
+    "lean_area_after_um2": 7734.7872,
+    "full_area_before_um2": 14513.1966,
+    "full_area_after_um2": 15645.4956,
+    "four_unit_area_delta_um2": 4458.0942,
+    "bit5_input_loads": {
+      "lean_before": 10,
+      "lean_even": 6,
+      "lean_odd": 5,
+      "full_before": 24,
+      "full_even": 13,
+      "full_odd": 12
+    }
+  }
+}

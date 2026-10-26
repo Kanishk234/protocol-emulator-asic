@@ -1327,6 +1327,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Four configuration-property temporal-induction proofs, a rejected wrong-mode mutant, exhaustive word0/both-phase simulations, 120 pin-unit and four top RTL cases, strict full-chip lint, and exact CI preparation pass. Details and assumptions are in PHASE2_STOCK_BASELINE_RESULTS.md and mode_predicate_evidence.json. This is not whole-chip formal or physical closure.
 - Match run40179640229 physical settings and change only these three RTL files in ephemeral diagnostic CI. Stock scripts/order/image, official template and all acceptance gates remain unchanged. Cost/risk: added derived state/gate load, changed placement and hold paths; full-chip area/congestion/timing must be measured before promotion. No DRT until all screen gates pass. Main hardware/config remain untouched; publication follows AGENTS.md Git rule.
 
+## D-117 (2026-10-26): native jumper-only antenna repair and earlier hold reserve
+
+- General need: D-116 run40214888335 reaches reported setupWS0 at all corners, but fast hold -33.3446ps misses the50psgate and native antenna diodes push three branches beyond fanout8. Preserve the working hardware and address the actual physical mechanisms.
+- Diagnostic-only paired recipe: native GRT_ANTENNA_REPAIR_JUMPER_ONLY=true and PL_RESIZER_HOLD_SLACK_MARGIN=0.25ns. Clean synthesis, same source hashes, no injected Tcl or reordered steps. Pinned stock variable/compiler/script support and real TT config verified. Evidence binds exactly two physical settings; no attribution to an individual setting.
+- Cost/risk: jumpers consume routing resources and may fail to repair every antenna; earlier hold repair adds buffers/area and can regress setup/skew/congestion. Fresh final antenna/electrical/hold/setup and congestion audits remain mandatory; no DRT on green measurement alone. Actual fanout8/50psfast hold/20ns/0.25ns constraints and checker policy unchanged. Main source/config and official workflow untouched; future adoption beyond main config whitelist remains separate review.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

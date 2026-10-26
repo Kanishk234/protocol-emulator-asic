@@ -159,3 +159,24 @@ D-116 instead caches the existing joint TX/RX mode predicate when word0 is writt
 Local evidence binds the three-file patch and baseline/candidate source hashes in `spikes/phase2_stock_flow/mode_predicate_evidence.json`. Four actual-RTL temporal-induction proofs pass (full/lean, latch/flop), with alternating-clock and stable-before-rising-edge input assumptions and comparison after the first word0 write. A wrong-mode mutation fails the property. Four simulation cases compare existing cfg/restart against the predecessor, exhaust all 65,536 word0 values, and apply 10,000 seeded random write/idle/reset cycles, checking both settled phases. These are configuration-property proofs, not whole-chip formal verification. All 120 pin-unit and four top-level RTL cases pass without skips/errors; full-chip strict lint passes with unchanged existing narrow annotations.
 
 The separate diagnostic workflow prepares this patch after the forwarded-counter baseline, with exactly three allowed source-hash changes. Physical config, stock flow/image/scripts/order, official workflow, clock/uncertainty and acceptance gates remain fixed. Exact preparation from a clean archive and shell syntax pass. The repeatable proof/simulation helper is `mode_predicate_checks/check.py BASELINE WORK`, run in the project venv; WORK must be new. The pin harness adapter is a separate test patch. No main source/config edit or DRT launch. Full-chip timing, hold, fanout, area and congestion benefits remain unmeasured; publication and physical screen are the next step under the repository's Git rule.
+
+
+## 2026-10-26: mode cache clears reported setup; native antenna/hold follow-up
+
+[40214888335](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40214888335) completed. Independently verified the receipt against both fresh raw corner reports and fresh antenna metrics. Setup WS is 0 ns at fast, typical and slow: slow improves from -0.780544 ns. This is nonnegative reported setup, not positive setup reserve on borrowing latches.
+
+| Corner | Setup WS (ns) | Hold WS (ns) | Slew | Cap | Fanout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fast | 0 | -0.0333446 | 0 | 0 | 3 |
+| Typical | 0 | +0.0781532 | 0 | 0 | 3 |
+| Slow | 0 | +0.278575 | 0 | 0 | 3 |
+
+Final antenna nets/pins remain zero. Pre-antenna instance area is 626574 um² versus 630609 previously; count 40375 versus 40818. Last reported post-GRT electrical-repair congestion table has overflow54; this precedes antenna repair and is not a final extracted congestion result. No DRT qualification. Fast hold misses the 50 ps project gate by83.3446 ps.
+
+Current worst reported slow path is lane0 host_sel[2] FF _50977_ to U0 carrier_active latch _51616_; the old mode-to-token failure is no longer the reported worst path. Current worst fast hold remains lane0 host_wdata[15] FF _51006_ to staged host memory write h_wd[15] FF _50920_. Bind these IDs only to this run.
+
+Final DEF proves the current fanout roots: U0 cfg.wdata_q[5] branch fanout3295/net3295 has seven non-antenna loads plus six antenna cells ANTENNA_26..31 (13 vs8); U1 cfg.wdata_q[8] branch fanout3142/net3142 has eight non-antenna loads plus ANTENNA_63..65 (11 vs8); producer-token branch fanout2796/net2796 has eight non-antenna loads plus ANTENNA_25 (9 vs8). The stock antenna log reports26jumpers/62diodes in its first pass and19jumpers/3diodes in its second, so jumper capability already exists in the current native engine. Physical antenna cells are absent from exported logical/powered netlists; use DEF for load accounting.
+
+D-117 tests exactly two diagnostic settings on unchanged D-116 hardware: PL_RESIZER_HOLD_SLACK_MARGIN150→250ps and GRT_ANTENNA_REPAIR_JUMPER_ONLY=true. The latter is a documented variable in pinned LibreLane3.1.0.dev3, forwarded by unchanged antenna_repair.tcl as -jumper_only. This chooses a native repair mechanism; it neither disables antenna checks nor removes existing antenna cells. New runs start from clean synthesis. The hold setting is an optimization target; the actual acceptance gate stays50psfast hold. Stock fanout8,20ns,uncertainty0.25ns,all electrical/antenna gates,image/scripts/order and official template remain fixed.
+
+This is a paired physical-policy test, not single-knob attribution. Risks: jumpers may leave antenna violations unresolved or consume routing resources; extra hold buffers may increase area/congestion or harm setup. Schema compilation of both exact settings, clean-archive workflow preparation, source-hash identity, actual unchanged TT --create-user-config and shell syntax pass. native_antenna_hold_evidence.json binds the two-field delta and hardware hashes to40214888335. No new RTL simulation is needed for byte-identical hardware. Main src/config and official gds.yaml remain unchanged. Do not start DRT unless fresh final gates pass; physical result pending.

@@ -53,3 +53,6 @@ python spikes/phase2_stock_flow/mode_predicate_checks/check.py BASELINE NEW_WORK
 ```
 
 BASELINE contains the prepared full-design src directory before mode_predicate.patch (for example build/stock-official-20261023). The helper copies sources and applies only the guarded patch into a new directory. It never edits BASELINE. Physical benefits remain unmeasured; no DRT follows from functional proof or green measurement-job status.
+
+
+D-116 run40214888335 reaches reported setupWS0 at all three corners, with fast hold -33.3446ps and three actual fanout failures. D-117 now keeps hardware fixed and tests exactly two physical settings: early hold target250ps and native jumper-only antenna repair. Final DEF confirms antenna-cell loads cause all three current fanout failures. native_antenna_hold_evidence.json binds the prior/candidate config hashes and unchanged hardware. Stock timing/fanout/antenna acceptance remains fixed; jumper-only can still fail final antenna and extra hold repair can harm setup/area. No DRT from measurement-job success. Main source/config and official template remain untouched.

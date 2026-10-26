@@ -2,7 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-26 — Resume stock closure after mode-cache screen
+
+- Recovered run40214888335: measurement job success, fresh repeated/raw audit independently matches. SetupWS0 at all3corners, slow improved from-0.780544ns; not positive setup reserve. Hold fast/typ/slow -0.0333446/+0.0781532/+0.278575ns; electrical slew/cap0, fanout3, final antenna0. Area626574um²/count40375 versus630609/40818. Last pre-antenna congestion table54overflow; no final/routed closure claim.
+- Source-bound slow path now lane0host_sel[2]→U0carrier_active latch; fast hold lane0host_wdata[15]→h_wd[15]. Final DEF identifies6/3/1antenna cells on7/8/8original loads, producing13/11/9fanout vs8. Native antenna logs already use jumpers plus diodes. Both old main runs37655518919/37655518925still queued; no active main workflow on resumption. No cancellation or watcher.
+- Prepared D-117 unchanged-hardware paired physical control: native jumper-only antenna repair and early hold target250ps. Pinned3.1.0.dev3 variable compile, stock -jumper_only script path, exact clean-archive prep, actual TT config, source hashes and shell syntax pass. Two settings only, not a single-knob attribution. No checker/constraint relaxation, main hardware/config or official workflow edits. BUG147 records antenna-induced fanout; full physical risk remains.
+- User's instruction to proceed without repeated publication questions is retained for this timing-closure work. Prepare/publish only reviewed policy/evidence, separate CI, and docs groups; exclude unrelated files/FIPE. Next launch one clean matched pre-DRT screen and inspect actual final gates. No phase boxes ticked, no DRT. Publication/run receipts follow once verified.
+
 ## 2026-10-25 — Publish approved mode-predicate screen
+
+- Publication completed in four groups: b53ae25 (prototype), ff4a871 (verification), d79ef7e (diagnostic CI), 5b82199 (docs). Push to origin/main succeeded; GitHub API and local HEAD both verified 5b8219918198bde0e3ed2b5294c6b04f70453d8b. Outgoing src/info/macro/official-workflow history/diff empty.
+- Dispatched [40214888335](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40214888335) and verified in_progress on that exact SHA. This is the matched D-116 configuration-predicate pre-DRT measurement, not official GDS qualification. Two older main runs 37655518919 and37655518925 remain queued; no cancellation requested or performed. No watcher started. This post-launch receipt stays local until the next evidence update.
 
 - User explicitly approved the prepared D-116 publication and launch, overriding the supplied Git rule for this change. Prepare separate RTL-prototype, verification, diagnostic-CI and documentation commits; exclude unrelated dirty reports/tools and the local-only FIPE note.
 - Final source-bound proof receipt, 124 passing regression cases, strict lint, exact clean-archive preparation and diff checks already pass. Physical configuration and main hardware/config/official GDS workflow remain unchanged. No phase boxes ticked; no DRT. Next push the reviewed groups to remote main, verify exact remote SHA, dispatch one matched stock screen and record its run ID. Physical result pending.

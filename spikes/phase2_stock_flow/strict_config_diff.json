@@ -27,10 +27,6 @@
     "main": null,
     "proposed": 0.16
   },
-  "GRT_ANTENNA_REPAIR_JUMPER_ONLY": {
-    "main": null,
-    "proposed": true
-  },
   "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": {
     "main": null,
     "proposed": 600
@@ -105,7 +101,7 @@
   },
   "PL_RESIZER_HOLD_SLACK_MARGIN": {
     "main": 0.1,
-    "proposed": 0.25
+    "proposed": 0.15
   },
   "PL_RESIZER_SETUP_SLACK_MARGIN": {
     "main": null,

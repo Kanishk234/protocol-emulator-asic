@@ -1,0 +1,16 @@
+{
+  "baseline_run": 40399598426,
+  "baseline_project_config_sha256": "83822a5db5e67944fcda43cf51025d881c11c16d7c69a4a5599077e574498cfc",
+  "candidate_project_config_sha256": "604fca7a412c8411aa46a13998cb9e8d3d567a13f0e600b7e8c806f710d98522",
+  "changes": {
+    "PL_RESIZER_HOLD_SLACK_MARGIN": {
+      "before": 0.175,
+      "after": 0.25
+    }
+  },
+  "hardware_unchanged": true,
+  "rationale": "Baseline clears reported setup/electrical/antenna gates but fast hold is-3.75733ps,53.75733psshort of50psgate. Early native repair meets175psbefore subsequent physical stages; test additional75psearly reserve on same wire300/mixed-antenna settings.",
+  "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,fast hold50ps,zero final electrical/antenna; no stock script/order/official template changes",
+  "risks": "More buffers/area/load/rerouting can regress setup,electrical,antenna,congestion or hold; no guarantee of75psfinal gain",
+  "physical_result": null
+}

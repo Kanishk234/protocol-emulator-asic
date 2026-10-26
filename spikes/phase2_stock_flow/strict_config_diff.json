@@ -101,7 +101,7 @@
   },
   "PL_RESIZER_HOLD_SLACK_MARGIN": {
     "main": 0.1,
-    "proposed": 0.175
+    "proposed": 0.25
   },
   "PL_RESIZER_SETUP_SLACK_MARGIN": {
     "main": null,

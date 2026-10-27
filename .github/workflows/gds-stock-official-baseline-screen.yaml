@@ -5,9 +5,9 @@ run-name: stock screen (${{ inputs.profile }})
   workflow_dispatch:
     inputs:
       profile:
-        description: One-setting control against the recovered hold275 baseline
+        description: Native physical control against the recovered hold275 baseline
         type: choice
-        options: [baseline, hold300, density54]
+        options: [baseline, wire400, late75]
         default: baseline
         required: true
 permissions:
@@ -18,7 +18,7 @@ concurrency:
 jobs:
   screen:
     runs-on: ubuntu-24.04
-    timeout-minutes: 240
+    timeout-minutes: 300
     env:
       PDK_ROOT: /home/runner/pdk
       STOCK_PROFILE: ${{ inputs.profile }}
@@ -158,9 +158,19 @@ jobs:
     - name: Install pinned LibreLane
       run: pip install librelane==3.1.0.dev3
     - name: Generate project configuration with unchanged TT tools
-      run: python tt/tt_tool.py --create-user-config --ihp
+      run: |-
+        set -euo pipefail
+        python tt/tt_tool.py --create-user-config --ihp
+        python - <<'PYCODE'
+        import json
+        from pathlib import Path
+        selected = json.loads(Path('spikes/phase2_stock_flow/selected_profile.json').read_text())
+        merged = json.loads(Path('src/config_merged.json').read_text())
+        for key, value in selected['changes'].items():
+            assert merged.get(key) == value, 'TT merged config changed selected profile: ' + key
+        PYCODE
     - name: Run stock Classic through the final pre-routing STA
-      timeout-minutes: 190
+      timeout-minutes: ${{ inputs.profile == 'late75' && 240 || 190 }}
       run: |-
         set -euo pipefail
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
@@ -173,6 +183,13 @@ jobs:
         root = Path('runs/stock-official-baseline')
         assert not list(root.glob('*-openroad-detailedrouting')), 'Unexpected detailed routing'
         assert len(list(root.glob('*-openroad-stamidpnr-3/state_out.json'))) == 1, 'Missing final stock pre-routing STA'
+        import json, sys
+        sys.path.insert(0, 'scripts/ci')
+        from stock_profile_effective import validate
+        selected = json.loads(Path('spikes/phase2_stock_flow/selected_profile.json').read_text())
+        result = validate(root, selected)
+        (root / 'effective_profile.json').write_text(json.dumps(result, indent=2) + '\n')
+        print('Verified effective native profile:', result)
         PYCODE
     - name: Read-only all-corner STA on the final stock checkpoint
       timeout-minutes: 30

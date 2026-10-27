@@ -1,0 +1,31 @@
+{
+  "baseline_physical_run": 40427663913,
+  "baseline_audit_run": 40445418882,
+  "baseline_project_config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542",
+  "profiles": {
+    "baseline": {
+      "changes": {},
+      "config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542"
+    },
+    "hold300": {
+      "changes": {
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.3
+      },
+      "config_sha256": "39cde0a33b59cb5c19899995f20d52e2bf16d347f90ffdca661230f06451aef9"
+    },
+    "density54": {
+      "changes": {
+        "PL_TARGET_DENSITY_PCT": 54
+      },
+      "config_sha256": "a892643c584a08014db1a8c7caf598c3cdcbe46a52b9a2dcabce167495354f0d"
+    }
+  },
+  "hardware_unchanged": true,
+  "purpose": "Two separate one-setting controls against the same recovered baseline. Hold300tests reserve; density54tests placement/routing pressure. No combined case or per-case attribution beyond its own single change.",
+  "risks": [
+    "Larger hold target can add area/congestion or regress other timing",
+    "Lower density can lengthen wires,change skew and regress setup/antenna/hold"
+  ],
+  "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
+  "physical_results": null
+}

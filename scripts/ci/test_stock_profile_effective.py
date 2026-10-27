@@ -5,10 +5,12 @@ import pytest
 from stock_profile_effective import validate
 
 
-def fixture(root, changes, *, density=61, wire=400, late=None, reroute=True):
+def fixture(root, changes, *, density=61, wire=400, late=None, reroute=True, diode=False, adjustment=16):
     config = dict(PL_TARGET_DENSITY_PCT=56, GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=wire,
                   RUN_POST_GRT_RESIZER_TIMING=False, GRT_RESIZER_HOLD_SLACK_MARGIN=0.125,
-                  GRT_RESIZER_RUN_GRT=reroute)
+                  GRT_RESIZER_RUN_GRT=reroute, GRT_ADJUSTMENT=0.16,
+                  GRT_LAYER_ADJUSTMENTS=[0, 0, 0, 0, 0],
+                  GRT_ANTENNA_REPAIR_DIODE_ONLY=False)
     config.update(changes)
     (root / 'resolved.json').write_text(json.dumps(config))
     gpl = root / '28-openroad-globalplacement'
@@ -21,7 +23,10 @@ def fixture(root, changes, *, density=61, wire=400, late=None, reroute=True):
         repair = root / '44-openroad-resizertimingpostgrt'
         repair.mkdir()
         (repair / 'state_out.json').write_text('{}')
-        (repair / 'openroad-resizertimingpostgrt.log').write_text(f'+ repair_timing -verbose -hold -setup_margin 0 -hold_margin {late} -max_buffer_percent 50\n')
+        (repair / 'openroad-resizertimingpostgrt.log').write_text(f'[INFO GRT-0022] Global adjustment: {adjustment}%\n+ repair_timing -verbose -hold -setup_margin 0 -hold_margin {late} -max_buffer_percent 50\n')
+    repair = root / '43-openroad-repairantennas/1-openroad-diodeinsertion'
+    repair.mkdir(parents=True)
+    (repair / 'openroad-diodeinsertion.log').write_text('+ repair_antennas cell -iterations 3 -ratio_margin 10' + (' -diode_only' if diode else '') + '\n')
     return dict(profile='test', changes=changes)
 
 
@@ -73,4 +78,30 @@ def test_late_reroute_cannot_be_disabled(tmp_path):
     selected = fixture(tmp_path, dict(RUN_POST_GRT_RESIZER_TIMING=True,
                                     GRT_RESIZER_HOLD_SLACK_MARGIN=0.075), late=0.075, reroute=False)
     with pytest.raises(ValueError, match='rerouting must remain enabled'):
+        validate(tmp_path, selected)
+
+
+def test_diode_mode_command_verified(tmp_path):
+    selected = fixture(tmp_path, dict(GRT_ANTENNA_REPAIR_DIODE_ONLY=True), diode=True)
+    assert validate(tmp_path, selected)['native_antenna_mode'] == 'diode_only'
+
+
+def test_diode_mode_noop_rejected(tmp_path):
+    selected = fixture(tmp_path, dict(GRT_ANTENNA_REPAIR_DIODE_ONLY=True))
+    with pytest.raises(ValueError, match='not exercised'):
+        validate(tmp_path, selected)
+
+
+def test_routing_reserve_command_verified(tmp_path):
+    selected = fixture(tmp_path, dict(RUN_POST_GRT_RESIZER_TIMING=True,
+                                    GRT_RESIZER_HOLD_SLACK_MARGIN=0.075,
+                                    GRT_ADJUSTMENT=0.15), late=0.075, adjustment=15)
+    assert validate(tmp_path, selected)['native_global_adjustment'] == 0.15
+
+
+def test_routing_reserve_noop_rejected(tmp_path):
+    selected = fixture(tmp_path, dict(RUN_POST_GRT_RESIZER_TIMING=True,
+                                    GRT_RESIZER_HOLD_SLACK_MARGIN=0.075,
+                                    GRT_ADJUSTMENT=0.15), late=0.075)
+    with pytest.raises(ValueError, match='not exercised'):
         validate(tmp_path, selected)

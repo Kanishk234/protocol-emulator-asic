@@ -7,25 +7,31 @@
       "changes": {},
       "config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542"
     },
-    "hold300": {
+    "wire400": {
       "changes": {
-        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.3
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 400
       },
-      "config_sha256": "39cde0a33b59cb5c19899995f20d52e2bf16d347f90ffdca661230f06451aef9"
+      "config_sha256": "438356fbecf25021448f851159a262d95573627339f2e8e1815c8a92c0c96e3f"
     },
-    "density54": {
+    "late75": {
       "changes": {
-        "PL_TARGET_DENSITY_PCT": 54
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075
       },
-      "config_sha256": "a892643c584a08014db1a8c7caf598c3cdcbe46a52b9a2dcabce167495354f0d"
+      "config_sha256": "39d4f42150c1133233513166bbbbb9a3369b0059a5de19fff45deffc8d6fcc8e"
     }
   },
   "hardware_unchanged": true,
-  "purpose": "Two separate one-setting controls against the same recovered baseline. Hold300tests reserve; density54tests placement/routing pressure. No combined case or per-case attribution beyond its own single change.",
+  "purpose": "Independent controls against unchanged recovered baseline: wire400tests reduced repeat-buffer pressure; late75tests native routed-parasitic timing repair. No combined case.",
   "risks": [
-    "Larger hold target can add area/congestion or regress other timing",
-    "Lower density can lengthen wires,change skew and regress setup/antenna/hold"
+    "Longer segments may regress electrical/antenna/setup/hold",
+    "Native late repair includes full rerouting after antenna repair; prior different recipes reintroduced antenna failures; fresh final audit mandatory",
+    "Additional late routing may need more diagnostic runtime"
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
-  "physical_results": null
+  "physical_results": null,
+  "superseded_controls": {
+    "hold300": "Fast31.7554psandlastpreantennaoverflow106,worse than baseline",
+    "density54": "NativeGPLclamps54%and56%baseline to61%minimum; ODB,DEF,NL,PNL,SDC hashes and all measured results are identical"
+  }
 }

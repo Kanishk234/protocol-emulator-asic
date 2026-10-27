@@ -1,11 +1,19 @@
 # Separate measurement workflow; official gds.yaml and stock flow are unchanged.
 name: gds-stock-official-baseline-screen
+run-name: stock screen (${{ inputs.profile }})
 'on':
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: One-setting control against the recovered hold275 baseline
+        type: choice
+        options: [baseline, hold300, density54]
+        default: baseline
+        required: true
 permissions:
   contents: read
 concurrency:
-  group: gds-stock-official-baseline-screen
+  group: gds-stock-official-baseline-screen-${{ inputs.profile }}
   cancel-in-progress: false
 jobs:
   screen:
@@ -13,6 +21,7 @@ jobs:
     timeout-minutes: 240
     env:
       PDK_ROOT: /home/runner/pdk
+      STOCK_PROFILE: ${{ inputs.profile }}
     steps:
     - name: Check out project
       uses: actions/checkout@v6
@@ -103,6 +112,21 @@ jobs:
         subprocess.run(['git', 'apply', str(patch)], check=True)
         assert source_hashes() == {**before, **policy['candidate_files']}
         print('Verified parity-banked configuration variant:', policy['candidate_files'])
+        import os
+        profiles = json.loads(Path('spikes/phase2_stock_flow/stock_control_profiles.json').read_text())
+        profile = os.environ['STOCK_PROFILE']
+        assert profile in profiles['profiles'], 'Unknown physical control profile'
+        assert hashlib.sha256(Path('src/config.json').read_bytes()).hexdigest() == profiles['baseline_project_config_sha256']
+        selected = profiles['profiles'][profile]
+        config.update(selected['changes'])
+        blob = json.dumps(config, indent=2) + '\n'
+        assert hashlib.sha256(blob.encode()).hexdigest() == selected['config_sha256']
+        Path('src/config.json').write_text(blob)
+        Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
+            profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
+            baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
+            hardware_unchanged=True), indent=2) + '\n')
+        print('Selected isolated physical control:', profile, selected['changes'])
         PYCODE
     - name: Check out Tiny Tapeout tools
       uses: actions/checkout@v6
@@ -216,11 +240,13 @@ jobs:
           spikes/phase2_stock_flow/late_drop_select_evidence.json
           spikes/phase2_stock_flow/forwarded_drop.patch
           spikes/phase2_stock_flow/forwarded_drop_evidence.json
-            spikes/phase2_stock_flow/mode_predicate.patch
-            spikes/phase2_stock_flow/mode_predicate_evidence.json
-            spikes/phase2_stock_flow/config_banks.patch
-            spikes/phase2_stock_flow/config_banks_evidence.json
-            spikes/phase2_stock_flow/wire300_hold175_evidence.json
-            spikes/phase2_stock_flow/wire300_hold250_evidence.json
-            spikes/phase2_stock_flow/wire300_hold275_iter100_evidence.json
+          spikes/phase2_stock_flow/mode_predicate.patch
+          spikes/phase2_stock_flow/mode_predicate_evidence.json
+          spikes/phase2_stock_flow/config_banks.patch
+          spikes/phase2_stock_flow/config_banks_evidence.json
+          spikes/phase2_stock_flow/wire300_hold175_evidence.json
+          spikes/phase2_stock_flow/wire300_hold250_evidence.json
+          spikes/phase2_stock_flow/wire300_hold275_iter100_evidence.json
+          spikes/phase2_stock_flow/stock_control_profiles.json
+          spikes/phase2_stock_flow/selected_profile.json
         if-no-files-found: warn

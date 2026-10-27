@@ -108,6 +108,8 @@ def test_routing_reserve_noop_rejected(tmp_path):
 
 
 @pytest.mark.parametrize('key,command,flag,step,filename,value', [
+    ('GRT_DESIGN_REPAIR_MAX_SLEW_PCT', 'repair_design', '-slew_margin',
+     '41-openroad-repairdesignpostgrt', 'openroad-repairdesignpostgrt.log', 30),
     ('GRT_ANTENNA_REPAIR_MARGIN', 'repair_antennas', '-ratio_margin',
      '43-openroad-repairantennas/1-openroad-diodeinsertion', 'openroad-diodeinsertion.log', 50),
     ('PL_RESIZER_HOLD_SLACK_MARGIN', 'repair_timing', '-hold_margin',

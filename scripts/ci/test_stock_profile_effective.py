@@ -105,3 +105,23 @@ def test_routing_reserve_noop_rejected(tmp_path):
                                     GRT_ADJUSTMENT=0.15), late=0.075)
     with pytest.raises(ValueError, match='not exercised'):
         validate(tmp_path, selected)
+
+
+@pytest.mark.parametrize('key,command,flag,step,filename,value', [
+    ('GRT_ANTENNA_REPAIR_MARGIN', 'repair_antennas', '-ratio_margin',
+     '43-openroad-repairantennas/1-openroad-diodeinsertion', 'openroad-diodeinsertion.log', 50),
+    ('PL_RESIZER_HOLD_SLACK_MARGIN', 'repair_timing', '-hold_margin',
+     '37-openroad-resizertimingpostcts', 'openroad-resizertimingpostcts.log', 0.175),
+])
+@pytest.mark.parametrize('matches', [True, False])
+def test_native_repair_target_verified(tmp_path, key, command, flag, step, filename, value, matches):
+    selected = fixture(tmp_path, {key: value})
+    path = tmp_path / step / filename
+    path.parent.mkdir(parents=True, exist_ok=True)
+    actual = value if matches else value + 1
+    path.write_text(f'+ {command} {flag} {actual}\n')
+    if matches:
+        validate(tmp_path, selected)
+    else:
+        with pytest.raises(ValueError, match='not exercised'):
+            validate(tmp_path, selected)

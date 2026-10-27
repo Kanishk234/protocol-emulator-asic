@@ -1370,6 +1370,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Two separate one-setting controls against physical40427663913: hold300(early275→300ps) and density54(placement56→54%,hold275fixed). Base project config/hardware unchanged; no combined case. Choice input,exact per-case config hashes/deltas and selected-profile artifact identify each measurement; per-profile concurrency allows both independently. No baseline physical rerun.
 - Risks: larger hold target adds area/congestion; lower density can lengthen wires/change skew and regress setup/hold/antenna. Schema,actual TT config for both cases,clean exact preparation/source/delta guards and invalid-profile rejection pass. No predicted physical gain or timing/DRT/phase completion. Stock constraints/checkers/image/scripts/order and official template unchanged. Main source/config untouched; future main adoption beyond whitelist remains owner-reviewed.
 
+## D-124 (2026-10-27): check effective controls; test wire buffering versus native late repair
+
+- General need: hold300 worsens reserve/congestion; density54 is clamped to61%and all five physical-view hashes match baseline. More early margin or below-minimum density requests are not supported by these results. Preserve the closest electrically/antenna-clean baseline.
+- Independent native controls: wire400 changes one buffer-length setting; late75 enables stock post-GRT timing repair with75psactive hold target,275psearly target and0extra setup margin. No combination or hardware/resource/ISA change. Native rerouting remains enabled; stock step order unchanged.
+- Costs/risks: longer segments can regress electrical/antenna/timing; late repair adds buffers/runtime and can reintroduce antenna after full rerouting,as D-113showed. Fresh final gates remain mandatory. Own diagnostic job300min/latephysical240min supports that work; otherphysical190/audit30 and official template unchanged.
+- Validate actual native control commands/late-step execution,not just accepted config; record effective GPL density and reject clamped density controls. Eight guard checks plus actual native log/clamp replay,exact profile preparations/schema/source hashes/TTmerged values and syntax pass. Base project config/main hardware remain untouched; no DRT/phase claim. Evidence remains in stock_control_profiles.json; prior controls retained in Git history/results.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

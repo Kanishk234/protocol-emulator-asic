@@ -292,3 +292,25 @@ Final antenna0nets/0pins. Fast48.4025psmisses50psgate by1.5975ps; do not round i
 D-123keeps this baseline hardware/config intact and adds two independent one-setting controls through a choice input on our existing diagnostic workflow. hold300changes only early hold275→300ps. density54changes only placement density56→54percent,retaining275pshold. They run separately from the same baseline; there is no combined case and no rerun of the unchanged baseline. Per-profile concurrency permits both controls to progress independently. stock_control_profiles.json binds each exact config hash/delta to physical40427663913/audit40445418882; each run emits selected_profile.json. No RTL/macro/clock/SDC/gate or official workflow changes.
 
 The hold case can add area/routing pressure and regress other gates; the density case can lengthen wires/change skew and regress timing/antenna. Neither guarantees closure. Pinned schema compilation,baseline+bothcase clean-archive preparation/exact delta/source hashes,unknown-profile rejection,shell/Python syntax and actual TT config generation for both variants pass. No RTL test rerun on byte-identical sources. Physical results pending. Diagnostic190/30/240minute budgets retained; all final gates and DRT guard remain fixed.
+
+
+## 2026-10-27: independent controls finish; density54 is a proven no-op
+
+Both measurement jobs completed. Each receipt independently matches both fresh raw corner reports and fresh final antenna metrics.
+
+| Control/run | Fast hold (ps) | Typical hold (ns) | Slow hold (ns) | Setup all corners | Electrical/antenna | Last pre-antenna overflow |
+| --- | ---: | ---: | ---: | --- | --- | ---: |
+| Recovered baseline40445418882/source40427663913 | 48.4025 | 0.209688 | 0.491882 | 0ns | 0 | 61 |
+| hold30040447369799 | 31.7554 | 0.184833 | 0.458112 | 0ns | 0 | 106 |
+| density5440447377789 | 48.4025 | 0.209688 | 0.491882 | 0ns | 0 | 61 |
+
+hold300 worsens fast hold16.6471ps and increases pre-antenna area from691292um²/45161instances to698793/45649(+7501um²/+488instances). More early hold margin is not monotonic improvement. No DRT qualification; setup0is nonnegative reported slack,not positive reserve.
+
+Density root cause is explicit native GPL-0302: the real command requests-density0.54,but cell/free-area constraints force uniform minimum0.6100. Requested56%baseline is also below that minimum. NativeGPLreports515394.112um²movable adjusted area/847190.5344um²free area(~60.836%),rounding minimum to61%. Actual density54 ODB/DEF/NL/PNL/SDC hashes are all byte-identical to the frozen baseline,not just equal rounded slack. Do not interpret this as a real physical perturbation or launch more lower-density requests. Source config/resolved values alone were insufficient to prove effect (BUG150).
+
+D-124 retires these two choices and prepares two independent native alternatives against the same unchanged baseline:
+
+- wire400: only GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH300→400um. Test fewer maximum-length repeaters/lower buffer pressure,with possible electrical/antenna/setup/hold regressions on longer segments.
+- late75: enable RUN_POST_GRT_RESIZER_TIMING and set GRT_RESIZER_HOLD_SLACK_MARGIN125inactive→75psactive. Early hold remains275ps; native setup margin remains0 and both native full-routing calls remain enabled. This targets actual routed parasitics rather than continuing global early reserve increases. Stock ordering places this repair after antenna repair; D-113previously reintroduced antenna errors. That risk remains explicit,with fresh final antenna/electrical/timing audits mandatory. No tool/script/order/SDC/checker changes or rerouting disablement.
+
+The shared job budget becomes300minutes; only late75gets240minutesphysical,otherprofiles190; read-only audit30minutes. Official job budgets remain untouched. Profiles/config/source hashes remain guarded and both actual TT merged configs retain selected values. New stock_profile_effective validator checks resolved settings,native wire-length command,late-step existence/hold command and enabled rerouting; it records actual GPL density and rejects clamped density-control requests. Eight guard tests pass; it accepts the real existing300um command and rejects the actual density54log. Baseline+bothcandidate exact preparation,schema/shell/Python syntax,unknown-profile rejection and actual TT configs pass. No RTL tests repeated for byte-identical hardware. Results unmeasured; no DRT or phase boxes ticked.

@@ -275,3 +275,20 @@ D-122adds a separate read-only recovery workflow. It validates actual GitHub pro
 Recovery pins actual source-run TT tools d66cf179e7bc4d296362ab7e2e3b344dc3c4f665,installer3412659307918422f3f0727917cf9b499aaca588,and unmodified stock image digest sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a with LibreLane3.1.0.dev3. Docker pulls the ordinary stock tag and verifies its digest; no replacement image. Actual GitHub metadata/48file hashes pass locally;12validator tests reject stale provenance,expired/changed artifacts,missing/changed/unbound views,unsafe paths,wrong runner/recipe and unexpected DRT. Both workflows' shell and embedded Python parse. Full stock physical measurement remains CI-only because this local environment has no Docker/full PDK.
 
 Our diagnostic screen budget is corrected independently: physical step145→190minutes,read-only audit20→30minutes,total job170→240minutes. All physical settings/gates remain unchanged and official gds.yaml untouched. Do not repeat the expensive physical run merely to collect missing read-only measurements. Fresh recovered results pending; no phase boxes ticked and no DRT.
+
+
+## 2026-10-26: recovered frozen checkpoint reports48.4025psfast hold
+
+[Audit40445418882](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40445418882) successfully measured the exact final physical checkpoint from failed/timed-out40427663913. Independently matched every receipt metric to both fresh raw corner reports and fresh final antenna metrics. Receipt physical-view hashes match recovery_40427663913.json; CI also revalidates all48frozen inputs after audit. No physical repair/state rewrite occurred. The source screen remains failed; audit success is measurement completion only.
+
+| Corner | Setup WS (ns) | Hold WS (ns) | Slew | Cap | Fanout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fast | 0 | +0.0484025 | 0 | 0 | 0 |
+| Typical | 0 | +0.209688 | 0 | 0 | 0 |
+| Slow | 0 | +0.491882 | 0 | 0 | 0 |
+
+Final antenna0nets/0pins. Fast48.4025psmisses50psgate by1.5975ps; do not round it into a pass. Setup0is not positive reserve. Known last pre-antenna routing report61overflow remains unresolved,not a final extracted congestion measure or clean-routing claim. No DRT/official qualification.
+
+D-123keeps this baseline hardware/config intact and adds two independent one-setting controls through a choice input on our existing diagnostic workflow. hold300changes only early hold275→300ps. density54changes only placement density56→54percent,retaining275pshold. They run separately from the same baseline; there is no combined case and no rerun of the unchanged baseline. Per-profile concurrency permits both controls to progress independently. stock_control_profiles.json binds each exact config hash/delta to physical40427663913/audit40445418882; each run emits selected_profile.json. No RTL/macro/clock/SDC/gate or official workflow changes.
+
+The hold case can add area/routing pressure and regress other gates; the density case can lengthen wires/change skew and regress timing/antenna. Neither guarantees closure. Pinned schema compilation,baseline+bothcase clean-archive preparation/exact delta/source hashes,unknown-profile rejection,shell/Python syntax and actual TT config generation for both variants pass. No RTL test rerun on byte-identical sources. Physical results pending. Diagnostic190/30/240minute budgets retained; all final gates and DRT guard remain fixed.

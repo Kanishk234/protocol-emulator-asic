@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-26 — Verify recovered measurements and isolate two physical controls
+
+- Audit40445418882successfully measures exact frozen source40427663913. Repeated fresh/raw corner+antenna metrics independently match; physical-view hashes match frozen manifest,and CI's end-validation protects all48inputs. Setup0allcorners; holdfast+0.0484025,typ+0.209688,slow+0.491882ns; electrical/antenna0. Fast1.5975psbelow50ps,not rounding-pass. Last pre-antenna overflow61still unresolved. Original source screen remainsfailed; no DRT/phase ticks or positive setup-reserve claim.
+- D-123prepares two separate same-baseline one-setting controls: hold300(275→300ps) and density54(56→54%,hold275fixed). Existing diagnostic workflow gets choice input/per-profile concurrency,exact config hash guards and selected-profile artifact; no combined case or unchanged-baseline rerun. Base hardware/config,main source/macro/officialtemplate/clock/SDC/gates unchanged. Risks include area/congestion and wirelength/skew/timing/antenna regression.
+- Baseline+bothcandidate exact clean-archive preparation/source/config delta checks,unknown-profile rejection,shell/embeddedPython syntax,pinned variable schema and actual TT config generation for both candidates pass. No new RTL tests needed for unchanged sources. Standing publication authorization retained; publish only reviewed profile fixture/CI/docs,exclude unrelatedfiles/FIPE. Next launch both separately,then inspect actual final gates. No watcher. Publication/run receipts follow.
+
 ## 2026-10-26 — Diagnose diagnostic timeout and recover saved measurement inputs
+
+- Published reviewedb277dbe(tools/frozen hashes),370de51(tests),5d69bbc(CI/budgets),b199735(docs); push succeeded and remote/local SHA verifiedb1997352bed98a2fc4d903905333334e19c9c80c. Outgoing main hardware/info/macro/official-workflow/physical-config diff empty. Dispatched only [40445418882](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40445418882),verified in_progress on exact SHA. Follow-up verifies restore/provenance and setup steps passed; stock-engine digest verification running,no failed steps. It recovers fresh audits of source40427663913without physical continuation; no original-flow rerun,DRT,watcher or unrelated-file publication. Receipt stays local until next evidence update.
 
 - Failed40427663913/job121937383011is our145min step timeout,not a proven engine crash/timing-gate error. Physical diode insertion saves checkpoint03:04:22UTC,CheckAntennasstarts03:04:23,timeout03:04:27. Antenna repairlogreports0after17diodes/27jumpers,but fresh final audits absent. Last pre-antenna routing61overflow; do not claim routing/timing closure or use inherited metrics. Last fully audited fast43.7279psremains prior40410841468.
 - Downloaded actual99767800byte artifact12706452587; verified complete48source/config/macro/state/view files and real GitHub run/head/artifact metadata. Frozen final physical source43/1diodeinsertion preserved. Bound actualTTtools/installer/stock image digest. No physical rerun or DRT.

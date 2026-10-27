@@ -1364,6 +1364,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - New separate audit-only workflow binds the exact failed run/head/artifact and48input/state/view hashes,restores original runner paths without editing saved state,and repeats stock3corner STA/fresh antenna checks. Check original physical hashes and all frozen inputs after measurement. Pin actual TT tools/installer/stock engine digest. No repair,routing,custom backend/SDC/constraints/checker waiver or official-template modification. Original job stays failed; results remain measurement-only.
 - Correct only our diagnostic timeout allocation to190minute physical/30minute audit/240minute total. No hardware or physical policy change. Twelve provenance/integrity negative-control tests,actual downloaded artifact validation and workflow shell/Python syntax pass. Physical audit itself needs CI. Last pre-antenna overflow61still prevents a clean-routing claim; no phase/DRT qualification from recovery alone.
 
+## D-123 (2026-10-26): isolate hold reserve from placement-density control
+
+- General need: recovered40445418882proves fast48.4025ps/electrical0/antenna0/setupWS0,still1.5975psshort of50ps; known pre-antenna overflow61persists. Address reserve and placement/routing pressure without further paired attribution.
+- Two separate one-setting controls against physical40427663913: hold300(early275→300ps) and density54(placement56→54%,hold275fixed). Base project config/hardware unchanged; no combined case. Choice input,exact per-case config hashes/deltas and selected-profile artifact identify each measurement; per-profile concurrency allows both independently. No baseline physical rerun.
+- Risks: larger hold target adds area/congestion; lower density can lengthen wires/change skew and regress setup/hold/antenna. Schema,actual TT config for both cases,clean exact preparation/source/delta guards and invalid-profile rejection pass. No predicted physical gain or timing/DRT/phase completion. Stock constraints/checkers/image/scripts/order and official template unchanged. Main source/config untouched; future main adoption beyond whitelist remains owner-reviewed.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

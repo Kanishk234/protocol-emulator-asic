@@ -1377,6 +1377,13 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Costs/risks: longer segments can regress electrical/antenna/timing; late repair adds buffers/runtime and can reintroduce antenna after full rerouting,as D-113showed. Fresh final gates remain mandatory. Own diagnostic job300min/latephysical240min supports that work; otherphysical190/audit30 and official template unchanged.
 - Validate actual native control commands/late-step execution,not just accepted config; record effective GPL density and reject clamped density controls. Eight guard checks plus actual native log/clamp replay,exact profile preparations/schema/source hashes/TTmerged values and syntax pass. Base project config/main hardware remain untouched; no DRT/phase claim. Evidence remains in stock_control_profiles.json; prior controls retained in Git history/results.
 
+## D-125 (2026-10-27): persistent antenna protection versus routing reservation on timing-passing late75
+
+- General need: late7540459607737demonstrates setupWS0/fast84.0735ps/electrical0but31antenna nets and finalreportedoverflow68. All31failing net/pin pairs/sink types existed unchanged before late repair; earlier27jumpers can be replaced by full rerouting,while physical diodes persist. Wire400doesnotqualify.
+- Independent controls each add one setting to measuredlate75: native diode-only antenna repair; or global routing reservation16→15%. Same75pslate/275psearly,wire300/iteration100 and unchanged hardware. No combination,customTcl,rerouting disablement,step reordering,SDC/checker or official-template change. Reduction in modeled reserve is explicit and does not establish physical DRC success.
+- Risks: diode loads can break fanout/cap/setup; reservation reduction can yield optimistic routing and alter geometry/timing/antenna. All original final gates stay mandatory. Native command/effective resource checks and source/config hashes identify actual controls. Same-state STA-only source adjustment override is guarded; legacy helper behavior preserved.
+- Twenty-two focused guards,actual source-log validation,exact profile/schema/preparation/TTmerged/syntax checks pass. Evidence in stock_control_profiles.json and late75_antenna_evidence.json. Main hardware/config unchanged; no DRT/phase claim. Future main settings beyond whitelist remain owner-reviewed.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

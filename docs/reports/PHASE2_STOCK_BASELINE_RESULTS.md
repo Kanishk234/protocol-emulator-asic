@@ -314,3 +314,26 @@ D-124 retires these two choices and prepares two independent native alternatives
 - late75: enable RUN_POST_GRT_RESIZER_TIMING and set GRT_RESIZER_HOLD_SLACK_MARGIN125inactive→75psactive. Early hold remains275ps; native setup margin remains0 and both native full-routing calls remain enabled. This targets actual routed parasitics rather than continuing global early reserve increases. Stock ordering places this repair after antenna repair; D-113previously reintroduced antenna errors. That risk remains explicit,with fresh final antenna/electrical/timing audits mandatory. No tool/script/order/SDC/checker changes or rerouting disablement.
 
 The shared job budget becomes300minutes; only late75gets240minutesphysical,otherprofiles190; read-only audit30minutes. Official job budgets remain untouched. Profiles/config/source hashes remain guarded and both actual TT merged configs retain selected values. New stock_profile_effective validator checks resolved settings,native wire-length command,late-step existence/hold command and enabled rerouting; it records actual GPL density and rejects clamped density-control requests. Eight guard tests pass; it accepts the real existing300um command and rejects the actual density54log. Baseline+bothcandidate exact preparation,schema/shell/Python syntax,unknown-profile rejection and actual TT configs pass. No RTL tests repeated for byte-identical hardware. Results unmeasured; no DRT or phase boxes ticked.
+
+
+## 2026-10-27: native late75 passes timing/electrical; antenna and congestion remain
+
+Both wire40040459596311andlate7540459607737measurement jobs complete. Each receipt independently matches both fresh raw corner reports and fresh final antenna raw metrics.
+
+| Control | Fast hold (ps) | Typical hold (ns) | Slow hold (ns) | Setup all corners | Electrical | Antenna nets/pins | Last reported overflow |
+| --- | ---: | ---: | ---: | --- | --- | --- | ---: |
+| wire400 | 36.7189 | 0.188058 | 0.457483 | 0ns | one fanout,other counts0 | 0/0 | 48(before antenna) |
+| late75 | 84.0735 | 0.265309 | 0.581982 | 0ns | all0 | 31/31 | 68(after late reroute) |
+
+Late75clears all reported timing/electrical gates,including50psfast hold,but still fails antenna and routing readiness. Setup0does not establish positive reserve. No DRT. The late resizer upsizes one cell and adds only18hold buffers,versus blanket early-repair growth. Effective-profile evidence verifies the75psnative command and the enabled stock step/rerouting.
+
+Antenna analysis is source-bound in late75_antenna_evidence.json:32summary rows cover31unique net/pin pairs. Every failing pair existed before late repair,with unchanged sink type and connection. Earlier repair used27routing jumpers and17physical diodes. Late full routing can replace jumper routes; physical diodes remain instantiated. This supports testing persistent protection,not a guarantee of closure or proof that only one reroute operation caused each marker. Prior BUG144's antenna-after-reroute risk has recurred.
+
+D-125compares two independent single-additional-setting controls against measuredlate75(configSHAverified against the actual selected-profile artifact):
+
+- late_diodes adds GRT_ANTENNA_REPAIR_DIODE_ONLY=true. Keep75pslate/275psearly,mixed-mode alternative disabled,wire300/iteration100/reserve16%unchanged. Native diode-only protection can survive rerouting but extra loads may reintroduce fanout/cap/setup failures or leave antenna errors.
+- late_grt15 changes GRT_ADJUSTMENT0.16→0.15 with original mixed antenna repair and same late75timing policy. This reduces global-router capacity reservation by one percentage point; it is an optimization-model change,not a physical spacing/DRC waiver. More optimistic routing capacity does not prove detailed routability. Current per-layer overrides are all0; original/derated resources and native reported adjustment are captured for review. Historical native0.30/0.16resource tables and primary OpenROAD source support the global fallback behavior; no further ineffective-density experiment.
+
+No combined case or baseline rerun. Existing native full rerouting/order,image,20ns/0.25ns/fanout8/50psfast hold and all acceptance checks remain. Exact source/config preparation,baseline/reference/bothcase hashes/deltas,unknown-profile rejection,pinned schema,actual TTmerged values and shell/Python syntax pass. Twelve effective-control tests plus ten audit-adjustment guards pass; actual native late75/16%resource logs validate. Actual mixed-mode source correctly rejects a diode-only claim.
+
+The shared STA helper now optionally preserves an explicit source GRTvalue only for same-checkpoint read-only audits. Legacy callers retain0.16exactly; physical-repair/different-checkpoint overrides reject. This keeps routing metadata faithful for the15%case without invoking any routing or changing saved views. Normal fresh3corner/repeatability/antenna/source-hash safeguards remain. No RTL retest on identical hardware; main source/config and official gds.yaml untouched. New physical results pending; no phase boxes ticked.

@@ -27,15 +27,25 @@ def fresh_metrics(root, step, corner):
     return metrics
 
 
-def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None, repair_corners=None, hold_margin=None, extra_tcl=None):
+def audit_grt_adjustment(before, repaired, override):
+    if override is None:
+        return 0.16  # Preserve legacy callers whose source CLI overrode config.
+    if repaired is None or Path(before).resolve() != Path(repaired).resolve():
+        raise ValueError('Explicit audit routing value requires the same read-only checkpoint')
+    if type(override) not in (int, float) or not 0 <= override < 1:
+        raise ValueError('Invalid read-only audit routing adjustment')
+    return float(override)
+
+
+def screen(config_path, before, output, pdk_root, repaired=None, sdc=None, setup_margin=None, repair_corners=None, hold_margin=None, extra_tcl=None, sta_grt_adjustment=None):
     if repair_corners is not None and tuple(repair_corners) != CORNERS:
         raise ValueError("Repair corners must be the complete pinned corner set")
     base = json.loads(config_path.read_text())
     if float(base["CLOCK_PERIOD"]) != 20:
         raise ValueError("Screen requires the 20 ns candidate")
-    # Source-run CLI overrides may not be present in config_merged.json.
-    # The workflow validates 0.16 in the actual GlobalRouting step config.
-    base["GRT_ADJUSTMENT"] = 0.16
+    # Legacy source CLI overrides may be absent from config_merged.json.
+    # A same-checkpoint STA-only caller can explicitly preserve its actual value.
+    base["GRT_ADJUSTMENT"] = audit_grt_adjustment(before, repaired, sta_grt_adjustment)
     if extra_tcl is not None:
         base['STA_EXTRA_CORNER_TCL_FILE'] = str(extra_tcl.resolve())
     if sdc is not None:

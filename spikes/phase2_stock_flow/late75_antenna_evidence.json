@@ -1,0 +1,271 @@
+{
+  "source_run": 40459607737,
+  "source_profile": "late75",
+  "artifact_id": 12721756847,
+  "report_rows": 32,
+  "unique_violating_nets": 31,
+  "unique_net_pin_pairs": 31,
+  "all_pairs_and_sink_types_present_before_late_repair": true,
+  "native_late_hold_buffers_added": 18,
+  "earlier_antenna_repair_jumpers": 27,
+  "earlier_antenna_repair_diodes": 17,
+  "source_file_sha256": {
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.nl.v": "b69ad38701da3c9e70859cbda2f3dafd38b722d0e21626bbbd0311d72f2257fe",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "2b58aab389a0926c0340aedc3408b0f8add52e4a7fd9c8ac955662f660eb9725",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna_summary.rpt": "f8bdcd8a399fb90adc6cb249bebca0ec296ca02c3508242b9d3459c96cc130eb",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log": "403be3bc4e0390657124a9da4552e852cc01bc4eb8b9033df5c2abea16f86f9d",
+    "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log": "55e2c95f4f5ce6b256c3b512abc741a892db260d1fa916cf6a478eedda33f19f"
+  },
+  "pairs": [
+    {
+      "net": "u_chip.g_lane[0].ot[11]",
+      "pin": "hold12633/A",
+      "sink_type": "sg13cmos5l_dlygate4sd3_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net13211",
+      "pin": "_51347_/D",
+      "sink_type": "sg13cmos5l_dfrbpq_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net3832",
+      "pin": "_52598_/D",
+      "sink_type": "sg13cmos5l_dlhq_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net13243",
+      "pin": "_51399_/D",
+      "sink_type": "sg13cmos5l_dfrbpq_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net11601",
+      "pin": "wire14736/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "_13338_",
+      "pin": "fanout174/A",
+      "sink_type": "sg13cmos5l_buf_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net14685",
+      "pin": "_37812_/A2",
+      "sink_type": "sg13cmos5l_mux4_1",
+      "layers": [
+        "Metal2",
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13121",
+      "pin": "_37133_/A1",
+      "sink_type": "sg13cmos5l_a22oi_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13526",
+      "pin": "wire13526/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net15538",
+      "pin": "fanout4048/A",
+      "sink_type": "sg13cmos5l_buf_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net13441",
+      "pin": "wire13441/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13507",
+      "pin": "wire13507/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net15160",
+      "pin": "wire15160/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net15088",
+      "pin": "fanout3969/A",
+      "sink_type": "sg13cmos5l_buf_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net13362",
+      "pin": "wire13362/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13798",
+      "pin": "wire13798/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net14845",
+      "pin": "_52703_/D",
+      "sink_type": "sg13cmos5l_dlhq_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net3357",
+      "pin": "_52230_/D",
+      "sink_type": "sg13cmos5l_dlhq_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13435",
+      "pin": "_48799_/B",
+      "sink_type": "sg13cmos5l_or3_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "clknet_1_0__leaf_u_chip.g_unit[0].u_cfg.g_word[3].g_stored.gclk",
+      "pin": "_52133_/GATE",
+      "sink_type": "sg13cmos5l_dlhq_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13895",
+      "pin": "wire13895/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net15307",
+      "pin": "wire15307/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13523",
+      "pin": "_39201_/B",
+      "sink_type": "sg13cmos5l_nor2_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net14009",
+      "pin": "fanout2208/A",
+      "sink_type": "sg13cmos5l_buf_1",
+      "layers": [
+        "Metal2"
+      ]
+    },
+    {
+      "net": "net15097",
+      "pin": "fanout2614/A",
+      "sink_type": "sg13cmos5l_buf_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "u_chip.g_lane[0].u_lane.a_lat[7]",
+      "pin": "fanout3546/A",
+      "sink_type": "sg13cmos5l_buf_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13597",
+      "pin": "wire13597/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net15521",
+      "pin": "wire15521/A",
+      "sink_type": "sg13cmos5l_buf_2",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "_08966_",
+      "pin": "_35786_/B",
+      "sink_type": "sg13cmos5l_or3_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net13197",
+      "pin": "_51425_/D",
+      "sink_type": "sg13cmos5l_dfrbpq_1",
+      "layers": [
+        "Metal3"
+      ]
+    },
+    {
+      "net": "net11934",
+      "pin": "_34690_/A2",
+      "sink_type": "sg13cmos5l_mux4_1",
+      "layers": [
+        "Metal3"
+      ]
+    }
+  ],
+  "interpretation": "Existing-net antenna regressions after native late full rerouting,not new failing sink cells. Test persistent native diode protection; not proof that this alone clears antennas/electrical/congestion."
+}

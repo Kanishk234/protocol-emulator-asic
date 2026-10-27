@@ -2,7 +2,27 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-27 — Trace zero-overflow residuals and prepare native wire/slew controls
+
+- Derived evidence from40570933800ties both slow slew violations to one _08808_NOR4_1→BUF1connection; final cell origins span236.94um. All24antenna entries/23nets existed before late repair;23entries lack a diode,20entrieshave net-origin spans>200um. These are approximate cell-origin indicators,not routed lengths or guaranteed coverage. Saved input hashes and derived data only.
+- D-127 independently tests wire target300→200um or slew repair margin10→30% against measured zero-overflow early175/late75 diode-only. No antenna50combination. Considered native broad diode heuristic but default90umthreshold'sapprox7412nets/37484terminals suggests excessive diode pressure; did not enable it or alter engine/template. All fresh final gates/native rerouting remain.
+- Twenty-eight effective-command/read-only guard tests pass. Pinned schema, exact clean workflow preparation/source/hash/one-setting deltas, actualTTmerge and shell/embedded Python syntax pass. No RTL retest on unchanged hardware. Next publish reviewed tools/tests/CI/docs with standing user approval and launch only these controls; preserve unrelated files/FIPE. No DRT,phase ticks,watcher or official-template/main-hardware change. Publication/run receipts follow.
+
+## 2026-10-27 — Confirm antenna-margin control is physically unchanged
+
+- late_ant5040570929866completed successfully as a measurement job. Artifact12778805602,258288020bytes,c881dfd. Independently matched repeated fresh raw three-corner metrics and raw final antenna counts to receipt. Native ratio_margin50command confirmed.
+- Setup0allcorners; holdF/T/S0.0726524/0.244946/0.536568ns,electrical0,antenna23nets/23pins,finaloverflow71. FinalODB/DEF/NL/PNL/SDC and source state hashes are exactly identical to diode-only10%reference40538578732. Thus no physical improvement despite command effect; root internal mechanism remains unproven. BUG150follow-up records measurement-versus-effective-result distinction.
+- Retain lower-early-hold direction40570933800with0overflow/fast61.944ps; still two slow slew and23antenna nets/24pins. Do not combine ineffective margin control. Next trace its electrical and antenna residuals before another physical candidate. No new launch,DRT,phase ticks,official-template/main-hardware change or watcher. Unrelated files/FIPE preserved; evidence updates remain local pending next publication.
+
+## 2026-10-27 — Verify lower early hold screen and zero global overflow
+
+- late_early17540570933800completed; downloaded bounded reports from artifact12773650518and independently verified repeated fresh raw3corner/antenna metrics. Effective native early175/late75/diode-only control confirmed.
+- Setup0allcorners; hold F/T/S0.061944/0.227600/0.522836ns. Two slow slew violations fanout1194/A (2.941708ns) and _35613_/Y (2.937792ns),limit2.507400ns; cap/fanout0. Antenna23nets/24pins. Final late global routing0overflowalllayers,downfrom71. Area658184.60um²/43043instances,33401.29um²and2166instancesbelowdiode-onlyreference. Final timing-repairbuffers10899; late19holdbuffers. Real congestion improvement,not DRT/extracted signoff.
+- Antenna-margin50screen40570929866stillin_progress,physicalstep at check. No new dispatch or combinedcontrol before its result. Next classify residual slew/antenna on lower-pressure candidate and compare margin control. No phase ticks,DRT,watcher,official-template/hardware change; unrelated files/FIPE untouched. Results/report and this receipt remain local pending next reviewed publication.
+
 ## 2026-10-27 — Trace residual diode protection and prepare focused native controls
+
+- Publication receipt: cdfa4e3 tools/evidence, 48ea491 tests, 4a56144 CI, c881dfd docs pushed; remote main verified c881dfd67a3c546648ed2d6ce7b5849f720bf6d3. Launched [late_ant50 40570929866](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40570929866), verified in_progress, and [late_early175 40570933800](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40570933800), initially queued, both exact SHA. No reference rerun, DRT, official-template/main-hardware change, watcher or unrelated-file publication. Next inspect fresh final gates and native command receipts for both controls. This receipt remains local until the next evidence update.
 
 - Exact pre/post-late DEF checks prove all 45 diode instance/net connections persist. All 23 failing connections existed before late repair; 22 have no diode. The protected lane0 output net violates Metal2 while diode allowance appears at Metal3. Earlier antenna checkpoint retains one failure. Recorded derived evidence and source hashes, not raw logs. BUG144 follow-up distinguishes incomplete layer/branch protection from diode loss.
 - Final overflow is Metal3=70, Metal4=1; no spatial map exists in saved artifact, so no unsupported location claim. Reduced global reserve worsened results. D-126 independently tests native antenna repair margin 10→50% or early hold target 275→175 ps against measured diode-only late75. Lower early pressure may reduce 13,062 repair buffers; native late 75 ps repair and all final gates remain. Extra diode load/late repair and runtime can regress results.

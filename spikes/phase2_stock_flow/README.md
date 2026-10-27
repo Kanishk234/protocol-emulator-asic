@@ -92,3 +92,6 @@ Late7540459607737clears timing/electrical(fast84.0735ps)butfails31antenna nets/f
 
 
 2026-10-27 follow-up: late_diodes 40538578732 passes timing/electrical but retains 23 antenna / 71 overflow; late_grt15 40538583444 has two slow slew, 28 antenna / 83 overflow. See late_diodes_residual_evidence.json for unchanged 45 diode connections and residual classification. Active independent controls late_ant50 and late_early175 each change one setting from measured late_diodes. Native commands and exact config hashes are checked. Main hardware and official workflow remain unchanged; no candidate qualifies for detailed routing yet.
+
+
+2026-10-27 D-127: antenna50is byte-identical to the10%reference and is retired. early175/late75diode-only40570933800has0finaloverflow,fast61.944psbut2slow slew and23antenna nets/24pins. early175_residual_evidence.json traces the single slew connection and existing antenna pairs. Active independent controls late_wire200 and late_slew30 change one native setting from that zero-overflow reference. All final gates and official GDS workflow stay unchanged.

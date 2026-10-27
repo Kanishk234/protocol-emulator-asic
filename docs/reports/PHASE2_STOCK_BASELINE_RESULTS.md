@@ -362,3 +362,30 @@ Final congestion is 70 overflow on Metal3 and one on Metal4. No spatial congesti
 D-126 prepares late_ant50 (native antenna-repair margin 10→50%) and late_early175 (early hold target 275→175 ps), independently against measured diode-only late75. The latter keeps the late 75 ps repair target and every final timing requirement. The former changes a native optimization margin, not the checker rule. More margin is not guaranteed to cover newly exposed geometry; lower early margin can increase late work or regress slack. No combined case or DRT launch.
 
 Pinned LibreLane variable definitions and scripts support both controls. OpenROAD describes ratio_margin as added antenna repair margin and placement-estimated repair margins as compensation for parasitic estimation: [global routing](https://openroad.readthedocs.io/en/latest/main/src/grt/README.html), [resizer](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html). Current public documentation is explanatory; the pinned native engine remains authoritative. Twenty-six guard tests pass; actual native values are audited in CI.
+
+
+## 2026-10-27: lower early hold target clears global-routing overflow
+
+[late_early175 40570933800](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40570933800) completed successfully as a measurement job on c881dfd. Artifact12773650518, size249040508bytes. Independently matched repeated before/after raw STA metrics for all three corners and raw fresh antenna metrics to receipt. Effective control confirms native early175ps, late75ps and diode-only repair.
+
+Setup WS remains0nsallcorners. Hold fast/typ/slow is0.061944/0.227600/0.522836ns, clearing50psfastgate. Cap/fanout0allcorners; slow corner has two slew violations: fanout1194/A 2.941708ns and _35613_/Y 2.937792ns versus2.507400nslimit. Antenna23nets/24pins. Final late full GRT reports0overflow on every layer (previous diode-only71). Final area658184.60um²/43043instances versus691585.89/45209: reduction33401.29um²and2166instances (~4.83%area). Final timing-repair buffers10899; last native late repair inserts19holdbuffers. This supports lower early buffer pressure, not final physical signoff.
+
+This candidate still fails electrical/antenna gates; no DRT. Setup0does not establish positive reserve. Antenna-margin50screen40570929866remainsrunning at check. Next inspect that result and classify lower-pressure candidate's residual antenna/slew sources before selecting any combined or further setting. Official workflow/main hardware unchanged.
+
+
+## 2026-10-27: antenna margin50 is physically ineffective on the measured reference
+
+[late_ant50 40570929866](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40570929866) completed as a successful measurement job. Artifact12778805602 (258288020bytes), source c881dfd. Repeated fresh before/after raw three-corner metrics and fresh raw antenna metrics independently match the receipt. Effective command audit confirms native ratio_margin50.
+
+Setup0nsallcorners; hold F/T/S0.0726524/0.244946/0.536568ns; electrical0; antenna23nets/23pins; final late overflow71. All five final physical-view hashes (ODB,DEF,NL,PNL,SDC) and source state hash equal measured diode-only reference40538578732 exactly. The parameter was exercised but did not change the saved physical result. Do not claim increased protection or combine this control expecting an improvement. The engine-level reason for the no-op remains unproven; no upstream defect claim.
+
+The lower-early-hold candidate40570933800 remains the useful physical direction: setup0,fast61.944ps,finaloverflow0,area658184.60um²,with two slow slew violations and23antenna nets/24pins. Next diagnose the two slew pins and residual antenna topology on that candidate, then choose a control with demonstrated effect. No detailed routing or new workflow dispatched for this result; main hardware/official GDS unchanged.
+
+
+### Zero-overflow residuals and D-127 controls
+
+On40570933800, the two slow slew pins belong to the same net _08808_: sg13cmos5l_nor4_1 _35613_/Y drives sg13cmos5l_buf_1 fanout1194/A. Their final DEF cell origins differ by236.94um Manhattan distance. Slews2.937792/2.941708ns exceed2.507400ns. All24antenna entries (23nets) existed unchanged before late repair;23entries have no diode. Twenty entries are on nets whose cell-origin bounding-box Manhattan span exceeds200um. Source hashes and derived rows are in early175_residual_evidence.json. These spans do not measure routed wirelength, pin geometry or antenna ratios, and do not guarantee repair coverage.
+
+D-127 tests late_wire200 (post-GRT maximum wire-length target300→200um) and late_slew30 (native slew repair margin10→30%), independently against measured early175/late75 diode-only. Both retain all timing/electrical/antenna/congestion gates. The pinned repair script forwards these exact values to repair_design; [OpenROAD resizer documentation](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html) explains long-wire buffering and slew repair. No newer commands are backported. Added buffers/drive strength may cost area/congestion or regress hold/antenna; final physical results are needed.
+
+Do not combine the ineffective antenna50control. Broad heuristic diode insertion was evaluated but not launched: default90umthreshold gives an approximate7412longnets/37484terminals by cell origins, potentially~204030um²in diodes before native skips/actual pin geometry. This rough upper-pressure estimate argues against indiscriminate insertion on an area-constrained candidate; it is not a validated diode count. No custom post-route edits or official workflow changes. Twenty-eight focused guards and exact clean preparations/source/hash/delta/TTmerge/syntax checks pass. New physical results pending.

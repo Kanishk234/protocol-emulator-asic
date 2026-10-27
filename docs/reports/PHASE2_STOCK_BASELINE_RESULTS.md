@@ -337,3 +337,28 @@ D-125compares two independent single-additional-setting controls against measure
 No combined case or baseline rerun. Existing native full rerouting/order,image,20ns/0.25ns/fanout8/50psfast hold and all acceptance checks remain. Exact source/config preparation,baseline/reference/bothcase hashes/deltas,unknown-profile rejection,pinned schema,actual TTmerged values and shell/Python syntax pass. Twelve effective-control tests plus ten audit-adjustment guards pass; actual native late75/16%resource logs validate. Actual mixed-mode source correctly rejects a diode-only claim.
 
 The shared STA helper now optionally preserves an explicit source GRTvalue only for same-checkpoint read-only audits. Legacy callers retain0.16exactly; physical-repair/different-checkpoint overrides reject. This keeps routing metadata faithful for the15%case without invoking any routing or changing saved views. Normal fresh3corner/repeatability/antenna/source-hash safeguards remain. No RTL retest on identical hardware; main source/config and official gds.yaml untouched. New physical results pending; no phase boxes ticked.
+
+
+## 2026-10-27: independent late diode and routing-reserve controls
+
+Both measurement jobs completed successfully on aabca3379b9f28431a4da6128211a1fe2b19bbcc. Independently matched every reported corner metric to both before/after raw STA metrics and fresh antenna counts to raw antenna metrics. Effective-control receipts confirm native diode-only mode and actual 15% routing adjustment respectively.
+
+| Run/control | Setup F/T/S (ns) | Hold F/T/S (ns) | Electrical | Antenna nets/pins | Final late-routing overflow |
+| --- | --- | --- | --- | --- | ---: |
+| [40538578732 late_diodes](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40538578732) | 0/0/0 | 0.0726524 / 0.244946 / 0.536568 | all zero | 23/23 | 71 |
+| [40538583444 late_grt15](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40538583444) | 0/0/0 | 0.099026 / 0.288230 / 0.625223 | two slow-corner slew violations; others zero | 28/28 | 83 |
+
+Compared with late75 (31 antenna / 68 overflow / fast 84.0735 ps), diode-only reduces antenna count but does not eliminate it; congestion and hold reserve worsen slightly. The 15% routing reservation increases actual derated resources by only 529 tracks (258 Metal2, 34 Metal3, 237 Metal4); capacity is discrete. It improves hold but worsens measured overflow and introduces two slew violations. Neither qualifies for DRT. Setup zero remains nonnegative reported slack without demonstrated positive reserve. Job success means measurement completion only.
+
+Do not combine these settings or launch routing based on green workflow badges. Next inspect residual antenna net/pin identities and pre/post-late diode connectivity, plus spatial overflow attribution. Establish whether violations concern protected existing nets or newly exposed nets before selecting another repair/placement control. Main hardware/config and official GDS workflow remain unchanged; no phase checklist boxes ticked.
+
+
+### Residual analysis and next controls
+
+Exact pre/post-late DEF connectivity proves all 45 diode instances remain on their original nets. All 23 final failing net/pin pairs existed before late repair; 22 have no diode. For the remaining net, u_chip.g_lane[0].ot[11], the detailed report violates the Metal2 cumulative ratio (349.70 against 200), while Metal3 has a much larger diode-dependent allowance. A diode somewhere on a net does not establish protection at every lower-layer branch. Earlier stage43 also retains one failure (_03256_, wire13975/A). Derived evidence with input hashes is late_diodes_residual_evidence.json.
+
+Final congestion is 70 overflow on Metal3 and one on Metal4. No spatial congestion map is saved in this artifact, so a location-specific hotspot conclusion is not yet supported. Thirteen thousand and sixty-two timing-repair buffers appear before late repair, motivating a reduction in early repair pressure rather than another global capacity-reservation reduction.
+
+D-126 prepares late_ant50 (native antenna-repair margin 10→50%) and late_early175 (early hold target 275→175 ps), independently against measured diode-only late75. The latter keeps the late 75 ps repair target and every final timing requirement. The former changes a native optimization margin, not the checker rule. More margin is not guaranteed to cover newly exposed geometry; lower early margin can increase late work or regress slack. No combined case or DRT launch.
+
+Pinned LibreLane variable definitions and scripts support both controls. OpenROAD describes ratio_margin as added antenna repair margin and placement-estimated repair margins as compensation for parasitic estimation: [global routing](https://openroad.readthedocs.io/en/latest/main/src/grt/README.html), [resizer](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html). Current public documentation is explanatory; the pinned native engine remains authoritative. Twenty-six guard tests pass; actual native values are audited in CI.

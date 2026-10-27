@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Native physical control against the recovered hold275 baseline
         type: choice
-        options: [baseline, wire400, late75]
+        options: [baseline, late75, late_diodes, late_grt15]
         default: baseline
         required: true
 permissions:
@@ -125,6 +125,8 @@ jobs:
         Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
             profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
             baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
+            comparison_reference_run=profiles.get('comparison_reference_run'),
+            additional_changes_from_reference=selected.get('additional_changes_from_reference'),
             hardware_unchanged=True), indent=2) + '\n')
         print('Selected isolated physical control:', profile, selected['changes'])
         PYCODE
@@ -170,7 +172,7 @@ jobs:
             assert merged.get(key) == value, 'TT merged config changed selected profile: ' + key
         PYCODE
     - name: Run stock Classic through the final pre-routing STA
-      timeout-minutes: ${{ inputs.profile == 'late75' && 240 || 190 }}
+      timeout-minutes: ${{ startsWith(inputs.profile, 'late') && 240 || 190 }}
       run: |-
         set -euo pipefail
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
@@ -215,7 +217,8 @@ jobs:
         output = Path('runs/stock-corner-audit')
         # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
         # No resizer, repair, placement or routing step is invoked.
-        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source)
+        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,
+               sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
         # Check antenna on the same final database; do not inherit pre-timing results.
         run_step(json.loads(Path('src/config_merged.json').read_text()), source,
                  output / 'fresh-antenna', ['OpenROAD.CheckAntennas'])

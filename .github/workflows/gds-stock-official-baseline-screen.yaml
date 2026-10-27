@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Native physical control against the recovered hold275 baseline
         type: choice
-        options: [baseline, late_diodes, late_ant50, late_early175]
+        options: [baseline, late_early175, late_wire200, late_slew30]
         default: baseline
         required: true
 permissions:

@@ -241,3 +241,22 @@ Current worst fast path: lane0host_wdata[11] FF _51576_ to h_wd[11] FF _51490_. 
 D-120 changes exactly one diagnostic setting versus40399598426: early hold target175→250ps. Keep wire300,banked/mode-cache RTL,native mixed antenna repair and all other settings byte-identical. The additional75psearly target is intended to cover the remaining53.75733psfinal deficit; no guaranteed linear gain. Earlier250psresults used different hardware/wire/antenna policy and do not answer this matched control. Added buffers can still regress setup,area,congestion,electrical or antenna closure.
 
 Pinned schema,exact clean-archive CI preparation,source hashes,shell syntax and actual TT config pass. No RTL simulation rerun is needed on identical hardware. wire300_hold250_evidence.json links the baseline/candidate hashes to the preceding wire300control. Main hardware/config,official GDS workflow,20ns/0.25ns/fanout8/50psfast hold gates,stock scripts/order/image and final audits remain unchanged. No DRT or phase completion claim; new physical result pending.
+
+
+## 2026-10-26: hold250 yields43.7279ps; preserve clean electrical/antenna
+
+[40410841468](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40410841468) completed. Independent inspection matches the receipt to both fresh raw corner reports and fresh final antenna metrics.
+
+| Corner | Setup WS (ns) | Hold WS (ns) | Slew | Cap | Fanout |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Fast | 0 | +0.0437279 | 0 | 0 | 0 |
+| Typical | 0 | +0.200147 | 0 | 0 | 0 |
+| Slow | 0 | +0.469578 | 0 | 0 | 0 |
+
+Final antenna0nets/0pins. All nominal timing slacks nonnegative, but setup0is not positive reserve and fast hold43.7279psstill misses50psby6.2721ps. Initial GRT final report9overflow; last post-GRT electrical-repair/pre-antenna report44overflow,concentrated43onMetal3and1onMetal4. This is not a final extracted congestion measure, nor evidence for clean DRT. No DRT qualification.
+
+Pre-antenna area683548um²/count44654 versus656895/42934 at175psearly hold: +26653um²/+1720instances. Hold improves47.48523psfor75psadditional early target, but the response is not guaranteed linear. Global routing explicitly exhausts extra iterations50/50 in both stages. This justifies testing more routing effort, not claiming a larger budget will solve local capacity pressure.
+
+D-121changes exactly two diagnostic settings versus this run: PL_RESIZER_HOLD_SLACK_MARGIN250→275ps and GRT_OVERFLOW_ITERS default/resolved50→explicit100. Preserve wire300,all banked/mode-cache hardware,mixed antenna repair and other policies. The modest25psincrement targets the remaining6.2721psreserve gap; extra native routing effort targets observed overflow. This is a paired physical control,not single-setting attribution. Risks: further area/buffers/routing pressure,setup/hold/antenna/electrical regression and additional runtime. Acceptance limits,congestion allowance,clock/uncertainty,stock scripts/order/image and official workflow are unchanged.
+
+Pinned variable compilation,exact clean-archive preparation/source hashes,shell syntax and actual TT config generation pass. No RTL test rerun for byte-identical hardware. wire300_hold275_iter100_evidence.json binds baseline/candidate config hashes and exact two-field delta. Main source/config and official GDS workflow untouched; all final physical gates still require measurement. New result pending; no phase boxes ticked.

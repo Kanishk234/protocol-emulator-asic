@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-26 — Verify hold250 and prepare small reserve/routing-effort control
+
+- Completed40410841468measurement receipt independently matches fresh repeated3corner/raw antenna metrics: setup0allcorners; holdfast+0.0437279,typ+0.200147,slow+0.469578ns. Slew/cap/fanout/antenna0. Fast6.2721psshort of50psgate; setup0notpositive reserve. No DRT or phase ticks.
+- Initial GRT9overflow,last post-GRT repair/pre-antenna44(43Metal3/1Metal4); both exhaust50extra iterations. Do not call this final/extracted overflow or clean routing. Area683548/count44654vs656895/42934at175psearly hold (+26653um²/+1720instances). Larger target improvedfast47.48523ps,not a guaranteed linear response.
+- Prepared D-121same-hardware paired physical control: hold250→275ps and native overflow effort50→100. No extra congestion allowance,hardware/constraints/checkers/template/stock-script changes. Smaller reserve step addresses6.27psgap; extra effort may still fail local routing pressure. Pinned schema/exact CI prep/source/shell and actual TT config checks pass. No new RTL tests on unchanged sources.
+- Remote main7f73b10verified,no active main job. Standing publication authorization retained; publish only reviewed policy/evidence,CI and docs,exclude unrelated files/FIPE. Next launch matched pre-DRT control and inspect actual timing/electrical/antenna/congestion. No watcher. Publication/run receipt follows.
+
 ## 2026-10-26 — Wire300 clears electrical/antenna; prepare hold-only reserve
+
+- Published reviewed17fb873(policy/evidence),0161684(CI),7f73b10(docs); push succeeded,GitHub API/local SHA match7f73b103287f5c1b8053aedaf63596b2d8fbcc0f. Outgoing main source/info/macro/official-template diff empty. Dispatched [40410841468](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40410841468),verified in_progress on exact SHA. One early hold target setting only; no DRT/watcher/unrelated-file publication. Receipt stays local until next evidence update.
 
 - Completed40399598426 measurement checked against repeated fresh raw reports: setup0allcorners,holdfast-0.00375733/typ+0.124138/slow+0.355552ns. Slew/cap/fanout0allcorners,final antenna0,last pre-antenna congestion0overflow. Fast53.75733psshort of50psgate; no DRT or positive setup-reserve/phase completion claim.
 - Current source-bound hold lane0host_wdata[11] FF_51576_→h_wd[11] FF_51490_. Native CTS repair explicitly loads all3corners, inserts4670buffers and reaches175ps before later physical work; no buffer-limit warning. Do not change corner list/buffer cap based on speculation.

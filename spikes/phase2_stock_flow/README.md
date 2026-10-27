@@ -74,3 +74,6 @@ Banked run40378317785 reports setup0 at all corners and holdfast+35.18ps,with sl
 
 
 Wire300/hold175 run40399598426reports setup0allcorners,electrical/antenna0and last pre-antenna overflow0. Only reported timing/electrical/antenna screen failure is fast hold-3.75733ps(53.75733psshort of50psgate); physical signoff/DRT remain unperformed. D-120changes only early hold target175→250ps. wire300_hold250_evidence.json binds the matched control to the prior config hash. Hardware/other policies/template/acceptance unchanged. More buffers can regress any physical gate; final fresh audits remain required.
+
+
+Hold250 run40410841468reports setup0allcorners,fast hold+43.7279ps,electrical/antenna0. It misses50psreserve by6.2721ps; last pre-antenna overflow44also prevents a clean-routing claim. Area+26653um²vs175psearly hold. D-121tests smaller250→275pshold increment and native overflow iterations50→100,with wire300/hardware/otherpolicies fixed. Evidence is wire300_hold275_iter100_evidence.json. More iterations may not resolve local pressure and timing may regress; no DRT/official-green claim.

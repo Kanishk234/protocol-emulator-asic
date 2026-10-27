@@ -1352,6 +1352,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - One-setting diagnostic control: PL_RESIZER_HOLD_SLACK_MARGIN175→250ps. Preserve wire300,mixed antenna,all hardware and other physical settings. This is optimization reserve,not a relaxed acceptance threshold. Prior250psrecipe changed other factors and is not a matched control.
 - Costs/risks: additional buffers/area/load/placement/rerouting may regress setup/congestion/electrical/antenna or fail to improve hold. All gates and final audits remain; no DRT until they pass. Exact config/source/CI/schema/actual TT checks pass. Evidence is wire300_hold250_evidence.json. Main source/config and official template unchanged; future beyond-whitelist main adoption stays owner-reviewed.
 
+## D-121 (2026-10-26): modest hold reserve and more native overflow effort
+
+- General need:40410841468retains setupWS0/electrical0/antenna0 and positive fast43.7279ps,only6.2721psshort of50psreserve, but GRT ends at9/44overflow after exhausting50iterations. Additional75psearly target added26653um²,so avoid another large hold step.
+- Diagnostic paired control: early hold250→275ps and native GRT_OVERFLOW_ITERS50→100 on unchanged banked wire300 hardware/policy. More routing effort,not a new congestion allowance; actual constraints and checker gates stay fixed. No single-setting attribution or predicted linear gain.
+- Risks: added buffers/area/congestion,regressed timing/electrical/antenna and longer runtime; more iterations may not resolve capacity. Schema/real TT config/exact preparation/source/shell checks pass. Evidence is wire300_hold275_iter100_evidence.json. Main source/config and official template unchanged; no DRT/phase completion until evidence supports it. Future beyond-whitelist main adoption remains owner-reviewed.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

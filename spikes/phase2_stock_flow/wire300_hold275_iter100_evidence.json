@@ -1,0 +1,21 @@
+{
+  "baseline_run": 40410841468,
+  "baseline_project_config_sha256": "604fca7a412c8411aa46a13998cb9e8d3d567a13f0e600b7e8c806f710d98522",
+  "candidate_project_config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542",
+  "changes": {
+    "PL_RESIZER_HOLD_SLACK_MARGIN": {
+      "before": 0.25,
+      "after": 0.275
+    },
+    "GRT_OVERFLOW_ITERS": {
+      "before_project_value": null,
+      "before_resolved_value": 50,
+      "after": 100
+    }
+  },
+  "hardware_unchanged": true,
+  "description": "Paired native physical control: modest25psadditional early hold reserve and doubled global-routing overflow effort. No single-setting outcome attribution.",
+  "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,fast hold50ps,zero electrical/antenna; no new congestion allowance or script/order/official-template change",
+  "risks": "Extra buffers can increase area/congestion or regress setup/electrical/antenna; additional iterations cost runtime and may not resolve capacity pressure",
+  "physical_result": null
+}

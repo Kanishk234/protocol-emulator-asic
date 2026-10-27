@@ -1,0 +1,161 @@
+# Read-only recovery of a timed-out diagnostic; no physical continuation or DRT.
+name: gds-stock-checkpoint-audit
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-stock-checkpoint-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      PDK_ROOT: /home/runner/pdk
+    steps:
+    - name: Check out project
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Restore and hash-verify the frozen physical checkpoint
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |-
+        set -euo pipefail
+        gh api repos/${{ github.repository }}/actions/runs/40427663913 > recovery-source-run.json
+        gh api repos/${{ github.repository }}/actions/artifacts/12706452587 > recovery-source-artifact.json
+        gh run download 40427663913 --name stock-official-baseline-40427663913 --dir frozen-artifact
+        python - <<'PYCODE'
+        import hashlib, json, shutil, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from stock_checkpoint_recovery import validate
+        manifest = json.loads(Path('spikes/phase2_stock_flow/recovery_40427663913.json').read_text())
+        run = json.loads(Path('recovery-source-run.json').read_text())
+        artifact = json.loads(Path('recovery-source-artifact.json').read_text())
+        # Verify all frozen inputs before copying to their original runner paths.
+        validate(Path('frozen-artifact'), manifest, run, artifact)
+        assert not Path('runs').exists(), 'Unexpected existing physical output'
+        for folder in ('runs', 'src', 'macro'):
+            shutil.copytree(Path('frozen-artifact') / folder, Path(folder), dirs_exist_ok=True)
+        shutil.copy2('frozen-artifact/info.yaml', 'info.yaml')
+        source = validate(Path('.'), manifest, run, artifact, require_runner_root=True)
+        Path('runs/stock-recovery-validation.json').write_text(json.dumps(dict(
+            source_run=run['id'], source_sha=run['head_sha'], artifact_id=artifact['id'],
+            source_state=str(source), frozen_file_hashes=manifest['files'],
+            physical_repairs_performed=False, saved_state_rewritten=False), indent=2) + '\n')
+        print('Verified exact frozen post-antenna checkpoint:', source)
+        PYCODE
+    - name: Check out Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+        path: tt
+    - name: Check out the pinned IHP installer
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-gds-action
+        ref: 3412659307918422f3f0727917cf9b499aaca588
+        path: .tt-gds-action
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install Tiny Tapeout prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install flow dependencies
+      run: pip install -r tt/requirements.txt
+    - name: Install IHP PDK
+      run: ./.tt-gds-action/install_sg13cmos5l.sh
+    - name: Install pinned LibreLane
+      run: pip install librelane==3.1.0.dev3
+    - name: Verify the original stock engine image
+      run: |-
+        set -euo pipefail
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev3
+        python - <<'PYCODE'
+        import json, subprocess
+        from pathlib import Path
+        m = json.loads(Path('spikes/phase2_stock_flow/recovery_40427663913.json').read_text())['toolchain']
+        image = m['stock_image']
+        digests = json.loads(subprocess.check_output(['docker', 'image', 'inspect', image, '--format', '{{json .RepoDigests}}'], text=True))
+        assert image.rsplit(':', 1)[0] + '@' + m['stock_digest'] in digests, 'Stock engine digest differs from source run'
+        print('Verified original unmodified stock image digest')
+        PYCODE
+    - name: Recover fresh read-only corner and antenna measurements
+      timeout-minutes: 30
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python - <<'PYCODE'
+        import hashlib, json, math, os, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from postgrt_timing import CORNERS, screen
+        from native_stock_route import run_step
+        root = Path('runs/stock-official-baseline')
+        states = list(root.glob('*-openroad-repairantennas/1-openroad-diodeinsertion/state_out.json'))
+        assert len(states) == 1
+        source = states[0]
+        state = json.loads(source.read_text())
+        paths = [source] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
+        assert all(p.is_file() for p in paths)
+        def hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        before = hashes()
+        output = Path('runs/stock-corner-audit')
+        # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
+        # No resizer, repair, placement or routing step is invoked.
+        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source)
+        # Check antenna on the same final database; do not inherit pre-timing results.
+        run_step(json.loads(Path('src/config_merged.json').read_text()), source,
+                 output / 'fresh-antenna', ['OpenROAD.CheckAntennas'])
+        antenna_files = list((output / 'fresh-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))
+        assert len(antenna_files) == 1
+        antenna_metrics = json.loads(antenna_files[0].read_text())
+        antenna = {key: antenna_metrics[key] for key in ('antenna__violating__nets', 'antenna__violating__pins')}
+        assert all(isinstance(v, int) and v >= 0 for v in antenna.values())
+        assert hashes() == before, 'Read-only audit modified source physical views'
+        result = json.loads((output / 'comparison.json').read_text())
+        rows = {}
+        for corner in CORNERS:
+            metrics = result['corners'][corner]['before']
+            repeated = result['corners'][corner]['after']
+            keys = [f'timing__{kind}__ws__corner:{corner}' for kind in ('setup', 'hold')]
+            keys += [f'design__max_{kind}_violation__count__corner:{corner}' for kind in ('slew', 'cap', 'fanout')]
+            for key in keys:
+                assert key in metrics and key in repeated, key
+                assert math.isfinite(metrics[key]) and abs(metrics[key] - repeated[key]) <= 1e-9, key
+            rows[corner] = {key: metrics[key] for key in keys}
+        (output / 'read_only_audit.json').write_text(json.dumps(dict(
+            source_state=str(source), source_run=40427663913, recovered_after_timeout=True,
+            unchanged_physical_view_hashes=before,
+            fresh_corner_metrics=rows, fresh_antenna_metrics=antenna, physical_repairs_performed=False,
+            qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
+        from stock_checkpoint_recovery import validate
+        validate(Path('.'),
+                 json.loads(Path('spikes/phase2_stock_flow/recovery_40427663913.json').read_text()),
+                 json.loads(Path('recovery-source-run.json').read_text()),
+                 json.loads(Path('recovery-source-artifact.json').read_text()), require_runner_root=True)
+        print(json.dumps(rows, indent=2))
+        PYCODE
+    - name: Upload recovered measurement evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: stock-checkpoint-audit-${{ github.run_id }}
+        path: |-
+          runs/stock-corner-audit/**
+          runs/stock-recovery-validation.json
+          recovery-source-run.json
+          recovery-source-artifact.json
+          spikes/phase2_stock_flow/recovery_40427663913.json
+        if-no-files-found: warn

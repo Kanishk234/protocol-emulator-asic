@@ -49,6 +49,12 @@ def validate(root, selected):
         if not math.isclose(value, selected['changes']['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'], abs_tol=1e-9):
             raise ValueError('Wire-length control was not exercised')
         result['native_max_wire_length_um'] = value
+    if 'GRT_DESIGN_REPAIR_MAX_SLEW_PCT' in selected['changes']:
+        text = one(root, '*-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log').read_text()
+        value = number(text, 'repair_design', '-slew_margin')
+        if not math.isclose(value, selected['changes']['GRT_DESIGN_REPAIR_MAX_SLEW_PCT'], abs_tol=1e-9):
+            raise ValueError('Slew repair margin was not exercised')
+        result['native_slew_repair_margin_pct'] = value
     if selected['changes'].get('RUN_POST_GRT_RESIZER_TIMING') is True:
         one(root, '*-openroad-resizertimingpostgrt/state_out.json')
         text = one(root, '*-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log').read_text()

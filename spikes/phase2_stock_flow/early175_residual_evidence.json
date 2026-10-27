@@ -1,0 +1,225 @@
+{
+  "source_run": 40570933800,
+  "artifact_id": 12773650518,
+  "source_sha256": {
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.nl.v": "f028c2b95cb705b09e912a77c1c0d5dad966acf4391a46e1f9852f817b72bb69",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "71eb88d3562db66b34a4d1089bd38130b9cb4a382c42ffed6e7177bed0ea38d6",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "8e0f41b15b368f1ec4422df500581fc6457aa581b2f0dafe81827e008c00028a",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/checks.rpt": "8a39eabd811bbf976a84fcfc33ddf5210c4a9330301269a2d8cece3ebf39d5f2"
+  },
+  "residual_antenna": [
+    {
+      "net": "net11457",
+      "pin": "hold10805/A",
+      "layer": "Metal2",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 172.26
+    },
+    {
+      "net": "net11651",
+      "pin": "wire11651/A",
+      "layer": "Metal2",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 296.94
+    },
+    {
+      "net": "_05431_",
+      "pin": "fanout1603/A",
+      "layer": "Metal2",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 242.1
+    },
+    {
+      "net": "net11852",
+      "pin": "fanout1614/A",
+      "layer": "Metal2",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 304.44
+    },
+    {
+      "net": "_01972_",
+      "pin": "wire11295/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 279.84
+    },
+    {
+      "net": "net11986",
+      "pin": "fanout2198/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 235.98
+    },
+    {
+      "net": "net11855",
+      "pin": "_31785_/B",
+      "layer": "Metal2",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 270.42
+    },
+    {
+      "net": "net12286",
+      "pin": "wire12286/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 301.74
+    },
+    {
+      "net": "net12579",
+      "pin": "fanout3826/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 198.48
+    },
+    {
+      "net": "u_chip.g_lane[0].ot[11]",
+      "pin": "hold11047/A",
+      "layer": "Metal2",
+      "existing_pair": true,
+      "diode": true,
+      "approx_origin_span_um": 179.16
+    },
+    {
+      "net": "net11699",
+      "pin": "wire11699/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 295.8
+    },
+    {
+      "net": "net12270",
+      "pin": "fanout2287/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 203.28
+    },
+    {
+      "net": "net11678",
+      "pin": "wire11678/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 290.1
+    },
+    {
+      "net": "net11479",
+      "pin": "wire11479/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 288.6
+    },
+    {
+      "net": "net11776",
+      "pin": "fanout1208/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 298.44
+    },
+    {
+      "net": "net11696",
+      "pin": "wire11696/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 273.66
+    },
+    {
+      "net": "_08245_",
+      "pin": "_35021_/A2",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 244.62
+    },
+    {
+      "net": "net12469",
+      "pin": "wire12469/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 278.82
+    },
+    {
+      "net": "net11683",
+      "pin": "fanout1072/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 272.76
+    },
+    {
+      "net": "net11848",
+      "pin": "_33381_/D",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 298.38
+    },
+    {
+      "net": "net11668",
+      "pin": "_33386_/A",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 300.78
+    },
+    {
+      "net": "net13224",
+      "pin": "_35188_/A1",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 272.4
+    },
+    {
+      "net": "net13224",
+      "pin": "_36168_/A1",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 272.4
+    },
+    {
+      "net": "net11826",
+      "pin": "_48808_/B",
+      "layer": "Metal3",
+      "existing_pair": true,
+      "diode": false,
+      "approx_origin_span_um": 194.7
+    }
+  ],
+  "slew_connection": {
+    "net": "_08808_",
+    "driver": "_35613_/Y",
+    "driver_type": "sg13cmos5l_nor4_1",
+    "sink": "fanout1194/A",
+    "sink_type": "sg13cmos5l_buf_1",
+    "driver_origin_um": [
+      515.52,
+      245.7
+    ],
+    "sink_origin_um": [
+      710.88,
+      204.12
+    ],
+    "origin_manhattan_um": 236.94,
+    "driver_slew_ns": 2.937792,
+    "sink_slew_ns": 2.941708,
+    "limit_ns": 2.5074
+  },
+  "geometry_caveat": "Cell-origin spans only; not actual pin distances, routed wirelengths or antenna ratios.",
+  "final_global_overflow": 0
+}

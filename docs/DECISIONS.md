@@ -1358,6 +1358,12 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Diagnostic paired control: early hold250→275ps and native GRT_OVERFLOW_ITERS50→100 on unchanged banked wire300 hardware/policy. More routing effort,not a new congestion allowance; actual constraints and checker gates stay fixed. No single-setting attribution or predicted linear gain.
 - Risks: added buffers/area/congestion,regressed timing/electrical/antenna and longer runtime; more iterations may not resolve capacity. Schema/real TT config/exact preparation/source/shell checks pass. Evidence is wire300_hold275_iter100_evidence.json. Main source/config and official template unchanged; no DRT/phase completion until evidence supports it. Future beyond-whitelist main adoption remains owner-reviewed.
 
+## D-122 (2026-10-26): recover read-only evidence from a completed frozen checkpoint
+
+- General need:40427663913reaches our145minute diagnostic deadline immediately after saving final antenna-repaired physical state,before fresh final measurements. Repeating physical design wastes a valid checkpoint; skipping measurements would be dishonest.
+- New separate audit-only workflow binds the exact failed run/head/artifact and48input/state/view hashes,restores original runner paths without editing saved state,and repeats stock3corner STA/fresh antenna checks. Check original physical hashes and all frozen inputs after measurement. Pin actual TT tools/installer/stock engine digest. No repair,routing,custom backend/SDC/constraints/checker waiver or official-template modification. Original job stays failed; results remain measurement-only.
+- Correct only our diagnostic timeout allocation to190minute physical/30minute audit/240minute total. No hardware or physical policy change. Twelve provenance/integrity negative-control tests,actual downloaded artifact validation and workflow shell/Python syntax pass. Physical audit itself needs CI. Last pre-antenna overflow61still prevents a clean-routing claim; no phase/DRT qualification from recovery alone.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

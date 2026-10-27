@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-26 — Diagnose diagnostic timeout and recover saved measurement inputs
+
+- Failed40427663913/job121937383011is our145min step timeout,not a proven engine crash/timing-gate error. Physical diode insertion saves checkpoint03:04:22UTC,CheckAntennasstarts03:04:23,timeout03:04:27. Antenna repairlogreports0after17diodes/27jumpers,but fresh final audits absent. Last pre-antenna routing61overflow; do not claim routing/timing closure or use inherited metrics. Last fully audited fast43.7279psremains prior40410841468.
+- Downloaded actual99767800byte artifact12706452587; verified complete48source/config/macro/state/view files and real GitHub run/head/artifact metadata. Frozen final physical source43/1diodeinsertion preserved. Bound actualTTtools/installer/stock image digest. No physical rerun or DRT.
+- Prepared D-122separate read-only recovery workflow,provenance/hash validator and12negative/control tests. Restore exact original runner paths without state edits,repeat existing stock3cornerSTA/freshantenna,check physical and all48input hashes afterward. No repair,custom tool,image override,SDC/checker/acceptance/template changes. Original failedrunremainsfailed. Bothworkflow shell/embeddedPython syntax and realartifactvalidation pass; actualauditstillneedsCI.
+- Increase only diagnostic budgets145→190physical,20→30audit,170→240total. Mainhardware/config and officialgds.yaml untouched; physical recipeunchanged. Standing publication authorization retained for reviewedtools/tests/CI/docs groups,exclude unrelateddirtyfiles/FIPE. Next publish/launch only audit recovery,not expensive physical rerun. No phaseboxes ticked or watcher. Publication/run receipt follows.
+
 ## 2026-10-26 — Verify hold250 and prepare small reserve/routing-effort control
+
+- Published reviewed4220248(policy/evidence),9f79f9d(CI),75fbb68(docs); push succeeded,remote/local SHA verified75fbb68fe67e35c23f294be8685cd6cc29b1c8d1. Outgoing main source/info/macro/official-workflow diff empty. Dispatched [40427663913](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40427663913),verified in_progress on exact SHA. No DRT/watcher/unrelated-file publication; post-launch receipt remains local until next evidence update.
 
 - Completed40410841468measurement receipt independently matches fresh repeated3corner/raw antenna metrics: setup0allcorners; holdfast+0.0437279,typ+0.200147,slow+0.469578ns. Slew/cap/fanout/antenna0. Fast6.2721psshort of50psgate; setup0notpositive reserve. No DRT or phase ticks.
 - Initial GRT9overflow,last post-GRT repair/pre-antenna44(43Metal3/1Metal4); both exhaust50extra iterations. Do not call this final/extracted overflow or clean routing. Area683548/count44654vs656895/42934at175psearly hold (+26653um²/+1720instances). Larger target improvedfast47.48523ps,not a guaranteed linear response.

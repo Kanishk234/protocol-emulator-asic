@@ -77,3 +77,6 @@ Wire300/hold175 run40399598426reports setup0allcorners,electrical/antenna0and la
 
 
 Hold250 run40410841468reports setup0allcorners,fast hold+43.7279ps,electrical/antenna0. It misses50psreserve by6.2721ps; last pre-antenna overflow44also prevents a clean-routing claim. Area+26653um²vs175psearly hold. D-121tests smaller250→275pshold increment and native overflow iterations50→100,with wire300/hardware/otherpolicies fixed. Evidence is wire300_hold275_iter100_evidence.json. More iterations may not resolve local pressure and timing may regress; no DRT/official-green claim.
+
+
+Run40427663913times out at our145min diagnostic limit just after saving final antenna-insertion ODB/DEF/state; it does not provide fresh final timing. Last pre-antenna overflow61is not clean-routing evidence. recovery_40427663913.json binds48frozen inputs and exact source/tool provenance. Separate gds-stock-checkpoint-audit restores the same checkpoint and performs only repeated stock STA/fresh antenna checks; no repair/state rewrite/DRT/qualification. Twelve validator checks and actual artifact validation pass. The original failed job remains failed. Diagnostic budgets become190minphysical/30minaudit/240mintotal; official workflow/hardware/settings/gates unchanged. Recovery measurements pending.

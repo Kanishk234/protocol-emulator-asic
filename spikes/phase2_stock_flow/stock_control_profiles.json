@@ -7,13 +7,6 @@
       "changes": {},
       "config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542"
     },
-    "late75": {
-      "changes": {
-        "RUN_POST_GRT_RESIZER_TIMING": true,
-        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075
-      },
-      "config_sha256": "39d4f42150c1133233513166bbbbb9a3369b0059a5de19fff45deffc8d6fcc8e"
-    },
     "late_diodes": {
       "changes": {
         "RUN_POST_GRT_RESIZER_TIMING": true,
@@ -25,35 +18,49 @@
         "GRT_ANTENNA_REPAIR_DIODE_ONLY": true
       }
     },
-    "late_grt15": {
+    "late_ant50": {
       "changes": {
         "RUN_POST_GRT_RESIZER_TIMING": true,
         "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
-        "GRT_ADJUSTMENT": 0.15
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "GRT_ANTENNA_REPAIR_MARGIN": 50
       },
-      "config_sha256": "22eeebd753e22c27876f8c524936cc5709fc2595db64824a4bff712cc42c26af",
+      "config_sha256": "a8e96b66ff6373b31db80c1962dcbce7e00e9713f673fbe027472a1aab6edc6d",
       "additional_changes_from_reference": {
-        "GRT_ADJUSTMENT": 0.15
+        "GRT_ANTENNA_REPAIR_MARGIN": 50
+      }
+    },
+    "late_early175": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175
+      },
+      "config_sha256": "e976af97c3837297acd8ba852572abab7c99fbbe201e895962935c7c52e94dcf",
+      "additional_changes_from_reference": {
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175
       }
     }
   },
   "hardware_unchanged": true,
-  "purpose": "Two independent single-additional-setting controls against timing-passing late75. Late_diodes preserves physical antenna protection across rerouting; late_grt15tests a1percentage-point routing-reserve reduction. No combined case.",
+  "purpose": "Independent antenna-margin and early-hold buffer-pressure controls against measured native diode-only late75; no combined case.",
   "risks": [
-    "Diode-only repair adds cell loads and may reintroduce fanout/cap/setup errors or leave antennas",
-    "Reduced routing reservation can yield optimistic global routing; actual detailed-route DRC remains mandatory",
-    "Both retain native late full rerouting and require fresh final timing/electrical/antenna audits"
+    "Greater repair margin can add diode load, area and congestion or fail to cover newly exposed nets",
+    "Lower early hold target can reduce buffers but increase late repair work or regress timing/electrical/antenna",
+    "Native order and full rerouting remain; final fresh gates unchanged"
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
   "physical_results": null,
   "superseded_controls": {
     "hold300": "Fast31.7554psandlastpreantennaoverflow106,worse than baseline",
     "density54": "NativeGPLclamps54%and56%baseline to61%minimum; ODB,DEF,NL,PNL,SDC hashes and all measured results are identical",
-    "wire400": "Fast36.7189ps,one fanout failure,lastpreantennaoverflow48; does not qualify"
+    "wire400": "Fast36.7189ps,one fanout failure,lastpreantennaoverflow48; does not qualify",
+    "late_grt15": "Fast99.026psbut2slow slew,antenna28,finaloverflow83; worse congestion than reference"
   },
-  "comparison_reference_run": 40459607737,
-  "comparison_reference_profile": "late75",
-  "comparison_reference_config_sha256": "39d4f42150c1133233513166bbbbb9a3369b0059a5de19fff45deffc8d6fcc8e",
+  "comparison_reference_run": 40538578732,
+  "comparison_reference_profile": "late_diodes",
+  "comparison_reference_config_sha256": "597e0eed621f6984f1e836b3c87b4b819d1f6014617c90c123565837fb19074c",
   "comparison_reference_routing_resources": {
     "Metal1": {
       "original": 0,

@@ -1,0 +1,233 @@
+{
+  "source_run": 40538578732,
+  "artifact_id": 12760531528,
+  "source_sha256": {
+    "stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.nl.v": "b69ad38701da3c9e70859cbda2f3dafd38b722d0e21626bbbd0311d72f2257fe",
+    "stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "00de05dce0277720c5eb855a9063d9ebbb4cbb4744ed944475a0166e422e5fb7",
+    "stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.def": "c70764b867f06dc0cb43b5f1629433ba6fb4e02db8343168114dc12c0b2e8ff3",
+    "stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "34d6dbb678d11b73beea06d17583259f954bc1a7a94538c371741c6362357f99",
+    "stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log": "2df1dddd1e7e4ddbe1132250a81cf6192ed974dd9893ed54cfb723e6f2b38a26",
+    "stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna.rpt": "cad4becb930d2089e58745a027020fdb7e907f78f42c294117968f39e9f3fa6c"
+  },
+  "persisting_diodes": 45,
+  "pre_late_antenna_pairs": 1,
+  "post_late_antenna_pairs": 23,
+  "residual_connections": [
+    {
+      "net": "u_chip.g_lane[0].ot[11]",
+      "pin": "hold12633/A",
+      "layer": "Metal2",
+      "ratio": 1.75,
+      "type": "sg13cmos5l_dlygate4sd3_1",
+      "existing_pair": true,
+      "diodes": [
+        "ANTENNA_5"
+      ]
+    },
+    {
+      "net": "net15235",
+      "pin": "wire15235/A",
+      "layer": "Metal3",
+      "ratio": 1.22,
+      "type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13526",
+      "pin": "wire13526/A",
+      "layer": "Metal3",
+      "ratio": 1.19,
+      "type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13914",
+      "pin": "_48909_/C1",
+      "layer": "Metal2",
+      "ratio": 1.12,
+      "type": "sg13cmos5l_a221oi_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13380",
+      "pin": "wire13380/A",
+      "layer": "Metal3",
+      "ratio": 1.09,
+      "type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net3361",
+      "pin": "_52226_/D",
+      "layer": "Metal3",
+      "ratio": 1.09,
+      "type": "sg13cmos5l_dlhq_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13907",
+      "pin": "fanout1622/A",
+      "layer": "Metal3",
+      "ratio": 1.08,
+      "type": "sg13cmos5l_buf_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13715",
+      "pin": "_48808_/B",
+      "layer": "Metal2",
+      "ratio": 1.06,
+      "type": "sg13cmos5l_nand2_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "_01972_",
+      "pin": "wire13199/A",
+      "layer": "Metal3",
+      "ratio": 1.05,
+      "type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net642",
+      "pin": "_38892_/B",
+      "layer": "Metal2",
+      "ratio": 1.04,
+      "type": "sg13cmos5l_and4_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net15315",
+      "pin": "fanout3507/A",
+      "layer": "Metal3",
+      "ratio": 1.04,
+      "type": "sg13cmos5l_buf_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13595",
+      "pin": "wire13595/A",
+      "layer": "Metal2",
+      "ratio": 1.04,
+      "type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net14630",
+      "pin": "wire14630/A",
+      "layer": "Metal3",
+      "ratio": 1.02,
+      "type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13447",
+      "pin": "_39198_/B",
+      "layer": "Metal2",
+      "ratio": 1.02,
+      "type": "sg13cmos5l_nor2_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13211",
+      "pin": "_51347_/D",
+      "layer": "Metal2",
+      "ratio": 1.02,
+      "type": "sg13cmos5l_dfrbpq_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "u_chip.g_lane[0].ot[4]",
+      "pin": "hold12699/A",
+      "layer": "Metal2",
+      "ratio": 1.0,
+      "type": "sg13cmos5l_dlygate4sd3_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net14085",
+      "pin": "wire14085/A",
+      "layer": "Metal3",
+      "ratio": 1.0,
+      "type": "sg13cmos5l_buf_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net14856",
+      "pin": "fanout3723/A",
+      "layer": "Metal3",
+      "ratio": 1.0,
+      "type": "sg13cmos5l_buf_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "_10553_",
+      "pin": "_37567_/A2",
+      "layer": "Metal3",
+      "ratio": 0.9,
+      "type": "sg13cmos5l_a221oi_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net1894",
+      "pin": "wire13878/A",
+      "layer": "Metal3",
+      "ratio": 0.86,
+      "type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net13481",
+      "pin": "_48909_/B1",
+      "layer": "Metal3",
+      "ratio": 0.42,
+      "type": "sg13cmos5l_a221oi_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net14113",
+      "pin": "fanout1888/A",
+      "layer": "Metal3",
+      "ratio": 0.4,
+      "type": "sg13cmos5l_buf_1",
+      "existing_pair": true,
+      "diodes": []
+    },
+    {
+      "net": "net14235",
+      "pin": "_38954_/A1",
+      "layer": "Metal3",
+      "ratio": 0.14,
+      "type": "sg13cmos5l_mux2_1",
+      "existing_pair": true,
+      "diodes": []
+    }
+  ],
+  "final_overflow_by_layer": {
+    "Metal1": 0,
+    "Metal2": 0,
+    "Metal3": 70,
+    "Metal4": 1
+  },
+  "spatial_overflow_map_available": false
+}

@@ -66,6 +66,18 @@ def validate(root, selected):
         if config.get('GRT_ANTENNA_REPAIR_JUMPER_ONLY') is True:
             raise ValueError('Conflicting native antenna modes')
         result['native_antenna_mode'] = 'diode_only'
+    if 'GRT_ANTENNA_REPAIR_MARGIN' in selected['changes']:
+        text = one(root, '*-openroad-repairantennas/*-openroad-diodeinsertion/openroad-diodeinsertion.log').read_text()
+        value = number(text, 'repair_antennas', '-ratio_margin')
+        if value != selected['changes']['GRT_ANTENNA_REPAIR_MARGIN']:
+            raise ValueError('Antenna repair margin was not exercised')
+        result['native_antenna_repair_margin_pct'] = value
+    if 'PL_RESIZER_HOLD_SLACK_MARGIN' in selected['changes']:
+        text = one(root, '*-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log').read_text()
+        value = number(text, 'repair_timing', '-hold_margin')
+        if not math.isclose(value, selected['changes']['PL_RESIZER_HOLD_SLACK_MARGIN'], abs_tol=1e-9):
+            raise ValueError('Early hold target was not exercised')
+        result['native_early_hold_target_ns'] = value
     if 'GRT_ADJUSTMENT' in selected['changes']:
         if any(config.get('GRT_LAYER_ADJUSTMENTS', [])):
             raise ValueError('Layer overrides make the global reserve control ambiguous')

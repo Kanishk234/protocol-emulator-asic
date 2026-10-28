@@ -187,3 +187,26 @@ def test_clock_cluster_diameter_mode_guard(tmp_path, enabled, size):
     path.write_text(json.dumps(config))
     with pytest.raises(ValueError, match='eight-sink'):
         validate(tmp_path, selected)
+
+
+@pytest.mark.parametrize('bad_stage', [None, 'detailedplacement', 'resizertimingpostcts', 'resizertimingpostgrt'])
+def test_disabled_mirroring_checks_all_legalization_logs(tmp_path, bad_stage):
+    selected = fixture(tmp_path, {'PL_OPTIMIZE_MIRRORING': False})
+    for index, stage in enumerate(('detailedplacement', 'resizertimingpostcts', 'resizertimingpostgrt')):
+        path = tmp_path / f'{34 + index}-openroad-{stage}' / f'openroad-{stage}.log'
+        path.parent.mkdir()
+        text = '+ detailed_placement -max_displacement 500 100\n'
+        if stage == bad_stage:
+            text += '[INFO DPL-0020] Mirrored 12 instances\n'
+        path.write_text(text)
+    if bad_stage is None:
+        assert len(validate(tmp_path, selected)['native_mirroring_disabled_logs']) == 3
+    else:
+        with pytest.raises(ValueError, match='mirroring remains active'):
+            validate(tmp_path, selected)
+
+
+def test_disabled_mirroring_requires_late_legalization_log(tmp_path):
+    selected = fixture(tmp_path, {'PL_OPTIMIZE_MIRRORING': False})
+    with pytest.raises(ValueError, match='Expected one'):
+        validate(tmp_path, selected)

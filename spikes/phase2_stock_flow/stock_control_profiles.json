@@ -7,15 +7,6 @@
       "changes": {},
       "config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542"
     },
-    "late_early175": {
-      "changes": {
-        "RUN_POST_GRT_RESIZER_TIMING": true,
-        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
-        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
-        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175
-      },
-      "config_sha256": "e976af97c3837297acd8ba852572abab7c99fbbe201e895962935c7c52e94dcf"
-    },
     "late_wire200": {
       "changes": {
         "RUN_POST_GRT_RESIZER_TIMING": true,
@@ -24,31 +15,41 @@
         "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
         "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200
       },
-      "config_sha256": "b0bf85a1ac4222cd8dbab607c41cf5f4aad7b48858986c1987811b393684d37e",
-      "additional_changes_from_reference": {
+      "config_sha256": "b0bf85a1ac4222cd8dbab607c41cf5f4aad7b48858986c1987811b393684d37e"
+    },
+    "late_hold175": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
         "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200
+      },
+      "config_sha256": "10731f360e38710d16dfcb6a14cc7c4e49fe83c44ee75538e251be95d3660914",
+      "additional_changes_from_reference": {
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175
       }
     },
-    "late_slew30": {
+    "late_wire150": {
       "changes": {
         "RUN_POST_GRT_RESIZER_TIMING": true,
         "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
         "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
         "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
-        "GRT_DESIGN_REPAIR_MAX_SLEW_PCT": 30
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 150
       },
-      "config_sha256": "9c5fdc8d08e2e8843e1efabd53d06dc230596c2d0dd4e9d8c7da2790f7c748e5",
+      "config_sha256": "75ce01d51844e05af046c6e6752e223d8fe3823dd0c4e9ba3bc42d9f9e2b3fba",
       "additional_changes_from_reference": {
-        "GRT_DESIGN_REPAIR_MAX_SLEW_PCT": 30
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 150
       }
     }
   },
   "hardware_unchanged": true,
-  "purpose": "Independent shorter-wire and greater slew-repair margin controls against measured zero-overflow early175/late75 diode-only reference.",
+  "purpose": "Independent late hold-reserve and shorter-wire controls against electrically clean zero-overflow wire200 with seven antenna nets.",
   "risks": [
-    "Shorter wire target can add buffers, area and congestion or regress hold/setup/antenna",
-    "Greater slew-repair margin can add or upsize cells and shift routing/timing",
-    "Native full rerouting and all fresh final acceptance checks remain mandatory"
+    "Greater late hold target adds buffers and can regress setup/electrical/antenna/congestion or runtime",
+    "Shorter wire target can add buffers and further regress hold or congestion",
+    "Full native rerouting retained; final raw all-corner and antenna gates unchanged"
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
   "physical_results": null,
@@ -57,11 +58,12 @@
     "density54": "NativeGPLclamps54%and56%baseline to61%minimum; ODB,DEF,NL,PNL,SDC hashes and all measured results are identical",
     "wire400": "Fast36.7189ps,one fanout failure,lastpreantennaoverflow48; does not qualify",
     "late_grt15": "Fast99.026psbut2slow slew,antenna28,finaloverflow83; worse congestion than reference",
-    "late_ant50": "Native ratio_margin50 executed but all final physical-view hashes equal10%reference; no physical improvement"
+    "late_ant50": "Native ratio_margin50 executed but all final physical-view hashes equal10%reference; no physical improvement",
+    "late_slew30": "Native30%margin executed but final physical-view hashes equal reference40570933800; no physical effect"
   },
-  "comparison_reference_run": 40570933800,
-  "comparison_reference_profile": "late_early175",
-  "comparison_reference_config_sha256": "e976af97c3837297acd8ba852572abab7c99fbbe201e895962935c7c52e94dcf",
+  "comparison_reference_run": 40602600864,
+  "comparison_reference_profile": "late_wire200",
+  "comparison_reference_config_sha256": "b0bf85a1ac4222cd8dbab607c41cf5f4aad7b48858986c1987811b393684d37e",
   "comparison_reference_routing_resources": {
     "Metal1": {
       "original": 0,

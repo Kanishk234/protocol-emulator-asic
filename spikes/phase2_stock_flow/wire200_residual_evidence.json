@@ -1,0 +1,90 @@
+{
+  "source_run": 40602600864,
+  "artifact_id": 12786347392,
+  "input_sha256": {
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.nl.v": "370b7b561fb1bd977dbfe09bd121f11bda59024d0fdee1a2e58d23c7bec78f3d",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "55748b37f10a5d2d8bcafa2a18b63688af01465dc3ac3b24a27e7d5d000360e6",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/min.rpt": "a279ba0c961a55ee2727b594ed9c2d54283ff9b45bd739a9a68c932346200bbb",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna_summary.rpt": "ae5912c8ef5f10e2bc7baef1ce16bcacda40899f49099f17c373854834fc2da1"
+  },
+  "antenna_rows": [
+    {
+      "net": "u_chip.g_lane[0].ot[10]",
+      "pin": "hold11032/A",
+      "layer": "Metal2",
+      "sink_type": "sg13cmos5l_dlygate4sd3_1",
+      "existing_pair": true,
+      "diode_on_net": true
+    },
+    {
+      "net": "net2838",
+      "pin": "_47396_/A",
+      "layer": "Metal2",
+      "sink_type": "sg13cmos5l_nand4_1",
+      "existing_pair": true,
+      "diode_on_net": false
+    },
+    {
+      "net": "u_chip.g_unit[3].u_cfg.wdata_odd[2]",
+      "pin": "hold9026/A",
+      "layer": "Metal2",
+      "sink_type": "sg13cmos5l_dlygate4sd3_1",
+      "existing_pair": true,
+      "diode_on_net": false
+    },
+    {
+      "net": "u_chip.g_unit[3].u_prod.tok[12]",
+      "pin": "hold9454/A",
+      "layer": "Metal2",
+      "sink_type": "sg13cmos5l_dlygate4sd3_1",
+      "existing_pair": true,
+      "diode_on_net": false
+    },
+    {
+      "net": "net14151",
+      "pin": "hold8488/A",
+      "layer": "Metal2",
+      "sink_type": "sg13cmos5l_dlygate4sd3_1",
+      "existing_pair": true,
+      "diode_on_net": false
+    },
+    {
+      "net": "net10021",
+      "pin": "fanout3415/A",
+      "layer": "Metal3",
+      "sink_type": "sg13cmos5l_buf_1",
+      "existing_pair": true,
+      "diode_on_net": false
+    },
+    {
+      "net": "net13162",
+      "pin": "wire13162/A",
+      "layer": "Metal3",
+      "sink_type": "sg13cmos5l_buf_2",
+      "existing_pair": true,
+      "diode_on_net": false
+    },
+    {
+      "net": "net2838",
+      "pin": "_47396_/A",
+      "layer": "Metal3",
+      "sink_type": "sg13cmos5l_nand4_1",
+      "existing_pair": true,
+      "diode_on_net": false
+    }
+  ],
+  "hold": {
+    "start": "_53493_/Q",
+    "end": "_49585_/D",
+    "launch_clock_arrival_ns": 0.520143,
+    "capture_clock_arrival_ns": 0.895424,
+    "data_arrival_ns": 1.095739,
+    "data_required_ns": 1.121309,
+    "final_slack_ns": -0.0255704,
+    "acceptance_gap_ns": 0.0755704,
+    "native_late_target_ns": 0.075,
+    "native_pre_reroute_reported_worst_ns": 0.075,
+    "same_path_drift_proved": false
+  },
+  "hardware_unchanged": true
+}

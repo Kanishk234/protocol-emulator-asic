@@ -5,10 +5,10 @@ run-name: stock screen (${{ inputs.profile }})
   workflow_dispatch:
     inputs:
       profile:
-        description: Independent native physical control on the full Phase 2 design
+        description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [baseline, late_wire200, root_balance, root_fine_delay]
-        default: baseline
+        options: [baseline, rtl_preselect]
+        default: rtl_preselect
         required: true
 permissions:
   contents: read
@@ -122,12 +122,24 @@ jobs:
         blob = json.dumps(config, indent=2) + '\n'
         assert hashlib.sha256(blob.encode()).hexdigest() == selected['config_sha256']
         Path('src/config.json').write_text(blob)
+        if selected.get('rtl_patch'):
+            assert selected['rtl_patch'] == 'late_arbitration'
+            evidence = json.loads(Path('spikes/phase2_stock_flow/late_arbitration_evidence.json').read_text())
+            patch = Path('spikes/phase2_stock_flow/late_arbitration.patch')
+            assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+            assert hashlib.sha256(Path('src/trw_lane.v').read_bytes()).hexdigest() == evidence['baseline_sha256']
+            before = source_hashes()
+            subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+            subprocess.run(['git', 'apply', str(patch)], check=True)
+            assert source_hashes() == {**before, 'src/trw_lane.v': evidence['candidate_sha256']}
+            print('Verified equivalent late arbitration preselection:', evidence['candidate_sha256'])
         Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
             profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
             baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
             comparison_reference_run=profiles.get('comparison_reference_run'),
             additional_changes_from_reference=selected.get('additional_changes_from_reference'),
-            hardware_unchanged=True), indent=2) + '\n')
+            hardware_unchanged=selected.get('hardware_unchanged', True),
+            rtl_patch=selected.get('rtl_patch')), indent=2) + '\n')
         print('Selected isolated physical control:', profile, selected['changes'])
         PYCODE
     - name: Check out Tiny Tapeout tools
@@ -270,6 +282,9 @@ jobs:
           spikes/phase2_stock_flow/wire300_hold175_evidence.json
           spikes/phase2_stock_flow/wire300_hold250_evidence.json
           spikes/phase2_stock_flow/wire300_hold275_iter100_evidence.json
+          spikes/phase2_stock_flow/late_arbitration.patch
+          spikes/phase2_stock_flow/late_arbitration_evidence.json
+          spikes/phase2_stock_flow/late_arbitration_checks/**
           spikes/phase2_stock_flow/stock_control_profiles.json
           spikes/phase2_stock_flow/selected_profile.json
         if-no-files-found: warn

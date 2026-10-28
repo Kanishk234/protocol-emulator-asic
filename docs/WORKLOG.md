@@ -2,7 +2,20 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-28 — Verify improved shared-priority screen and trace a long clock leaf
+
+- Follow-up failure check: run 40762963258 is completed; no new screen is running. Final qualification explicitly lists fast hold 0.0032 ns versus 0.05 ns and six antenna nets/pins. Re-ran focused checks: 54 passed; diff whitespace clean. Prepared TT merged config confirms 100 µm CTS diameter, eight-sink clustering and unchanged verified lane hash 763d231d. No main hardware or official workflow diff. The newest user-supplied AGENTS.md reserves commits/pushes for the user; no commit, push or dispatch was performed in this follow-up. Next: publish the reviewed file groups, then dispatch rtl_shared_cluster100.
+
+- Shared40762963258completes flow/audits; only finalgatesfail. Artifact12854346751,repeated raw3corner/freshantenna independentlymatch. Setup0all;holdF/T/S0.0032/0.219866/0.542820ns,electrical0,antenna6/6,finaloverflow0,area676087.29um²/45150instances. Nonnegative actualhold but46.8psshort of50psreserve. No screen pass.
+- LocalsharedRTLprotocolreplaycompletes22/22PASS,0failures/0skips,1534.87s. XMLand sourcehash verified;2169moduleequiv/coretests/lint evidence retained. Local session16587closed;no local simulations/watchers running.
+- One antenna is six-latch gatedclockleaf with419.82umcell-originspan. Five latches nearx602–615um,one at1010.4um. Automated coordinatecomparison across35CTS/41designrepair/43antenna/44timingconfirms reviewedlatches/holdFFpositions unchanged;this separationpredateslaterrepair. Worstholdlane1regs[18]→OT[20],launch/captureclock0.516511/0.742330ns. Root-wire repair knob rejected as irrelevant to internalleafbasedon native/API docs.
+- D-132singleCTS_SINK_CLUSTERING_MAX_DIAMETER100umcontrol on identicalverifiedRTL,retaining enabled8sinkclustering/earlylate175/wire200/20ns/SDC/allgates. Clockgrouping can addarea/moveskew/regresschecks;5datanetantennasalso remain,no guaranteedpass.54focusedguards/schema pass;exactsource/one-settingdelta/actualTTmerge/syntaxchecks pass. Next publishownedtools/tests/CI/evidenceand launchonecontrolunderstandingapproval. Mainhardware/config/officialjobs unchanged,unrelatedfiles/FIPEpreserved. No DRT/phase tick/watchers;receiptsfollow.
+
 ## 2026-10-28 — Analyze failed arbitration route and prepare the shared-data variant
+
+- Final status check:40762963258is running stock physical flow with all source/config/install preparation steps successful and no failed step. Fresh local shared-priority protocol replay remains active in session16587 (six completed cases passed; current PWMcase),so do not claim22/22yet. No other simulation or watcher was started for this variant. Both required physical qualification and remaining protocol evidence are pending;no phase/DRT/officialGDScredit.
+
+- Publication receipt:903f8b9sharedRTLpatch,5e5ea01proof/evidence,6295b9eownCI,75abeee docs pushed; remote main verified75abeee35e3ff23daa04dbd2b7614220619bf43c. Launched only [rtl_shared_priority40762963258](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40762963258),verifiedin_progressonexactSHA. Same measuredhold175config;strictfinalgateandnativeflowunchanged. Freshlocal22caseprotocolreplaycontinues in session16587; no full pass claimed yet. No DRT/watchers/official-template/main-hardware changes;unrelatedfiles/FIPEpreserved. Receipt stays local until next evidence update.
 
 - Native40723256006completes flow/audits,then correctly fails final design gate. Artifact12845070147verifiedagainst repeated raw3corner/freshantenna. Slowsetup−0.612733ns,fasthold−0.0871405ns,twoslow slew,antenna11/11,finaloverflow311(310M3/1M4),area694915.32um²/47115instances. Full-width implementation is not qualifying; originalfunctional22/22proofscope stays valid,not physical.
 - ActualworstsetupstartsU0word0IDLEbit7latch,notSRAM; bounded1000maxpathscontainnoSRAMstartpoints,notproof of its exact slack. FastworstisFF_52025_→FF_52030_. Do not blindly adjust gates/margins or claimfullpreselectionclosedtiming.

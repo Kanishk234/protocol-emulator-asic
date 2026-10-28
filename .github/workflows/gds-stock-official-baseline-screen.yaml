@@ -7,8 +7,8 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [baseline, rtl_shared_priority]
-        default: rtl_shared_priority
+        options: [rtl_shared_priority, rtl_shared_cluster100]
+        default: rtl_shared_cluster100
         required: true
 permissions:
   contents: read

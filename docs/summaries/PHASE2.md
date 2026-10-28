@@ -123,3 +123,5 @@ Fanout/slew screen38676308492 passes everyestimated-routinggate with72.176psfast
 
 
 2026-10-28: We are still closing the clean stock-flow design. Global clock balancing made no physical change, and replacing the largest delay cell worsened the result. We found that a late SRAM decision goes through the reflex priority and selection logic. A new equivalent lane prototype makes both possible selections early and chooses between them late, without adding a clock cycle or state. Module equivalence, core simulation and lint pass; local mapping shows a shorter logic cone at an area cost. This is not yet a passing physical screen or official GDS result. The next evidence is the strict stock-flow screen of this one hardware change and the full existing protocol regression.
+
+The late arbitration prototype now also passes all22existing RTL protocol cases,with no failures or skips and independent offline decoding enabled. Its single stock-flow physical screen is running. Functional regression success does not establish timing closure.

@@ -7,55 +7,26 @@
       "changes": {},
       "config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542"
     },
-    "late_wire200": {
+    "rtl_preselect": {
       "changes": {
         "RUN_POST_GRT_RESIZER_TIMING": true,
-        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
         "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
         "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
         "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200
       },
-      "config_sha256": "b0bf85a1ac4222cd8dbab607c41cf5f4aad7b48858986c1987811b393684d37e"
-    },
-    "root_balance": {
-      "changes": {
-        "RUN_POST_GRT_RESIZER_TIMING": true,
-        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
-        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
-        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
-        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
-        "CTS_BALANCE_LEVELS": true
-      },
-      "config_sha256": "0149955b239e156099daba8c3fc83dbfd79b6833ab3a3aa0e71501cf40935440",
-      "additional_changes_from_reference": {
-        "CTS_BALANCE_LEVELS": true
-      }
-    },
-    "root_fine_delay": {
-      "changes": {
-        "RUN_POST_GRT_RESIZER_TIMING": true,
-        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
-        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
-        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
-        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
-        "EXTRA_EXCLUDED_CELLS": [
-          "sg13cmos5l_dlygate4sd3_1"
-        ]
-      },
-      "config_sha256": "d40c96dd3de28fed8e6df374dead48a6ccb341ad080153ef41df72434fdb0764",
-      "additional_changes_from_reference": {
-        "EXTRA_EXCLUDED_CELLS": [
-          "sg13cmos5l_dlygate4sd3_1"
-        ]
-      }
+      "config_sha256": "10731f360e38710d16dfcb6a14cc7c4e49fe83c44ee75538e251be95d3660914",
+      "additional_changes_from_reference": {},
+      "rtl_patch": "late_arbitration",
+      "hardware_unchanged": false
     }
   },
-  "hardware_unchanged": true,
-  "purpose": "Root-cause controls: clock-level balancing or finer repair-cell selection against electrically clean zero-overflow wire200. Full final qualification is enforced.",
+  "hardware_unchanged": false,
+  "purpose": "One equivalent RTL arbitration preselection change against measured hold175 source/config; no new physical parameter change.",
   "risks": [
-    "Clock-level balance can alter latency/skew, add cells or be physically ineffective",
-    "Excluding coarsest delay cell globally affects synthesis and PnR; fallback cells can increase count/area or fail timing",
-    "Neither is a guaranteed closure; all original final gates, source hashes and full native rerouting remain"
+    "Duplicated combinational selection adds cells/area and can alter placement/congestion",
+    "Gate-level depth reduction is not routed timing proof; all original final gates must pass",
+    "Antenna and hold can move to other paths; no automatic detailed routing"
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
   "physical_results": null,
@@ -67,11 +38,13 @@
     "late_ant50": "Native ratio_margin50 executed but all final physical-view hashes equal10%reference; no physical improvement",
     "late_slew30": "Native30%margin executed but final physical-view hashes equal reference40570933800; no physical effect",
     "late_hold175": "Fast102.52psbutslowsetup-0.583896ns,11antenna netsand5overflow; newlateholdcells lie on failingSRAMsetup",
-    "late_wire150": "Fast-164.69ps,5antenna netsand9overflow; shortening alone doesnotclosehold"
+    "late_wire150": "Fast-164.69ps,5antenna netsand9overflow; shortening alone doesnotclosehold",
+    "root_balance": "Native flag executes but final five physical views match wire200; no physical improvement",
+    "root_fine_delay": "Excluded cell actually absent but fast-146.046ps,2slow slew,8antenna/6overflow"
   },
-  "comparison_reference_run": 40602600864,
-  "comparison_reference_profile": "late_wire200",
-  "comparison_reference_config_sha256": "b0bf85a1ac4222cd8dbab607c41cf5f4aad7b48858986c1987811b393684d37e",
+  "comparison_reference_run": 40621704922,
+  "comparison_reference_profile": "late_hold175",
+  "comparison_reference_config_sha256": "10731f360e38710d16dfcb6a14cc7c4e49fe83c44ee75538e251be95d3660914",
   "comparison_reference_routing_resources": {
     "Metal1": {
       "original": 0,
@@ -89,5 +62,6 @@
       "original": 228835,
       "derated": 182846
     }
-  }
+  },
+  "architecture_unchanged": true
 }

@@ -1,0 +1,64 @@
+{
+  "baseline_sha256": "5a2905a6c59ac4eb6efb621e95d5bd18d1b9f2dc1ad599f5c7690573760ffd06",
+  "candidate_sha256": "f011e364a216397c01f9633e4c38e2df412258861343c262f8d6d5e09e6b93c5",
+  "patch_sha256": "81f015ac5209efdb534cc51050952baad814a6ad2a2fee7869a837c1c615c507",
+  "architectural_change": false,
+  "latency_cycles_added": 0,
+  "comparison_reference_run": 40621704922,
+  "comparison_reference_profile": "late_hold175",
+  "general_need": "Move late routine eligibility behind two equivalent preselected priority winners instead of through the priority encoder and slot-data reduction.",
+  "cost": "Duplicated combinational selection; no added state. Full physical cost is unmeasured.",
+  "local_mapping": {
+    "library": "cached CMOS5L typical; comparative only",
+    "gold_lane_area_um2": 44610.804,
+    "trial_lane_area_um2": 48823.992,
+    "extra_lane_area_um2": 4213.188,
+    "extra_lane_cells": 455,
+    "unchanged_sequential_area_um2": 11855.2896
+  },
+  "equivalence": {
+    "method": "whole flattened lane sequential equivalence including ALU",
+    "proven_points": 2157,
+    "induction_sequence_cap": 2,
+    "negative_control": "one-step combinational winner contract rejects wrong urgent winner; whole-lane positive proof2157points"
+  },
+  "physical_qualification": false,
+  "validation": {
+    "lane_tests": 6,
+    "top_level_tests": 4,
+    "chip_level_tests": 5,
+    "strict_full_design_lint_exit": 0,
+    "local_mapping_gate_levels": {
+      "mem11_to_a_lat4_before": 25,
+      "mem11_to_a_lat4_after": 14,
+      "maximum_mem11_to_flopD_before": 26,
+      "maximum_mem11_to_flopD_after": 15
+    },
+    "gate_level_caveat": "Unweighted mapped combinational gate counts, not STA delay or routed timing.",
+    "protocol_suite": {
+      "cases": 22,
+      "status": "running with host-permitted offline sigrok; no skips claimed"
+    }
+  },
+  "comparative_mapping_replay": {
+    "library_sha256": "34163f3e7de9f854afac57332ba06f1739b78e7ac35660a8a5ddd39c570124ad",
+    "cases": {
+      "gold": {
+        "area_um2": 44610.804,
+        "cells": 3340,
+        "sequential_area_um2": 11855.2896,
+        "mem11_to_a_lat4_gate_levels": 25,
+        "max_mem11_to_flopD_gate_levels": 26
+      },
+      "trial": {
+        "area_um2": 48823.992,
+        "cells": 3795,
+        "sequential_area_um2": 11855.2896,
+        "mem11_to_a_lat4_gate_levels": 14,
+        "max_mem11_to_flopD_gate_levels": 15
+      }
+    },
+    "routed_timing_proven": false,
+    "metric": "unweighted combinational gate count, not STA"
+  }
+}

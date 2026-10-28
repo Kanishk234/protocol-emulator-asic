@@ -27,6 +27,10 @@ def validate(root, selected):
         actual = config.get(key)
         if isinstance(expected, bool):
             matched = actual is expected
+        elif isinstance(expected, list):
+            if key != 'EXTRA_EXCLUDED_CELLS' or expected != ['sg13cmos5l_dlygate4sd3_1']:
+                raise ValueError('Unreviewed cell exclusion')
+            matched = actual == expected
         else:
             matched = (isinstance(actual, (int, float)) and math.isfinite(actual)
                        and math.isclose(actual, expected, rel_tol=0, abs_tol=1e-9))
@@ -43,6 +47,22 @@ def validate(root, selected):
     result = dict(profile=selected['profile'], changes=selected['changes'],
                   requested_density_pct=config['PL_TARGET_DENSITY_PCT'],
                   initial_effective_density_pct=density)
+    if selected['changes'].get('CTS_BALANCE_LEVELS') is True:
+        text = one(root, '*-openroad-cts/openroad-cts.log').read_text()
+        commands = re.findall(r'(?m)^\+ clock_tree_synthesis\b[^\n]*', text)
+        if not commands or '-balance_levels' not in commands[-1].split():
+            raise ValueError('Clock-level balancing was not exercised')
+        result['native_clock_balance_levels'] = True
+    if 'EXTRA_EXCLUDED_CELLS' in selected['changes']:
+        text = one(root, '*-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v').read_text()
+        if re.search(r'\bsg13cmos5l_dlygate4sd3_1\s+\S+\s*\(', text):
+            raise ValueError('Excluded coarse delay cell remains in final netlist')
+        counts = {master: len(re.findall(r'\b' + master + r'\s+\S+\s*\(', text))
+                  for master in ('sg13cmos5l_dlygate4sd1_1', 'sg13cmos5l_dlygate4sd2_1', 'sg13cmos5l_buf_1')}
+        if not any(counts.values()):
+            raise ValueError('Missing mapped replacement cells')
+        result['excluded_coarse_delay_cells'] = 0
+        result['replacement_cell_counts'] = counts
     if 'GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH' in selected['changes']:
         text = one(root, '*-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log').read_text()
         value = number(text, 'repair_design', '-max_wire_length')

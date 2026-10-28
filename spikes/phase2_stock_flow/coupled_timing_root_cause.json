@@ -1,0 +1,52 @@
+{
+  "source_run": 40621704922,
+  "artifact_id": 12792081917,
+  "input_sha256": {
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.nl.v": "370b7b561fb1bd977dbfe09bd121f11bda59024d0fdee1a2e58d23c7bec78f3d",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "ec19952015a5666cef67bd03e116f651a6dbc47be65c6348e696fe33b13f3fc5",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/max.rpt": "b034654ec952ed49124e4ba05aeeff47522d57774fd3f836425b91668a58e1bc"
+  },
+  "failing_setup": {
+    "start": "u_chip.u_sram.sram/A_DOUT[11]",
+    "end": "_49700_/D",
+    "slack_ns": -0.583896,
+    "new_delay_cells": [
+      {
+        "instance": "hold15671",
+        "master": "sg13cmos5l_dlygate4sd3_1",
+        "slow_arc_ns": 0.737336,
+        "inserted_during_late_repair": true
+      },
+      {
+        "instance": "hold15800",
+        "master": "sg13cmos5l_dlygate4sd3_1",
+        "slow_arc_ns": 0.660899,
+        "inserted_during_late_repair": true
+      },
+      {
+        "instance": "hold15681",
+        "master": "sg13cmos5l_dlygate4sd3_1",
+        "slow_arc_ns": 0.644429,
+        "inserted_during_late_repair": true
+      },
+      {
+        "instance": "hold15682",
+        "master": "sg13cmos5l_dlygate4sd3_1",
+        "slow_arc_ns": 0.651298,
+        "inserted_during_late_repair": true
+      },
+      {
+        "instance": "hold15683",
+        "master": "sg13cmos5l_dlygate4sd3_1",
+        "slow_arc_ns": 0.65916,
+        "inserted_during_late_repair": true
+      }
+    ],
+    "new_slow_cell_arc_sum_ns": 3.353122
+  },
+  "all_repair_corners_loaded": true,
+  "limitations": [
+    "Sum is contribution of new cells on final path, not total before/after path delta",
+    "Clock balancing and cell exclusions are proposed mechanisms, not proven fixes"
+  ]
+}

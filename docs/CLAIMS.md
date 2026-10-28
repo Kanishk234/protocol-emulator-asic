@@ -35,6 +35,8 @@ Never claim: zero latency, sub-ns timing, USB/Ethernet support, real-hardware te
 
 The candidate in claim16 was subsequently reproduced end-to-end from fresh RTL without downloaded physical checkpoints in [39907035580](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39907035580). Fresh extracted results reproduce setupWS0/fast hold+107.281ps, electrical0; GDS/LVS pass and unchanged TT precheck XML9/9 passes with0CMOS5L DRC items. This remains separate orchestration, not the main official GDS workflow. See PHASE2_PASSING_ROUTE_INTEGRATION.md for artifact hashes and the main-integration gap.
 
+| 17 | Isolated lane arbitration preselection preserves the checked default-AW9 lane behavior and shortens one local mapped SRAM-input cone without new state | 2157whole-lane/ALU equivalence points, induction sequence cap2; one-step winner contract and wrong-urgent mutant rejection;6lane/4top/5chip tests and full-design lint; late_arbitration_evidence.json and replay helper | tested | Named module equivalence, not whole-chip formal, four-state pre-reset behavior or routed timing. Gate levels25→14are unweighted local mapped counts, not slack; area adds4213.188um²per lane in that mapping. Full protocol replay/physical qualification pending; no Phase2/official GDS claim |
+
 ## Known limits (state them wherever the related claim appears)
 
 

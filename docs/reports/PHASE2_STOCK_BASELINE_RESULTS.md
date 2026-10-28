@@ -441,3 +441,32 @@ D-129 independently tests native clock-level balancing and a single-cell exclusi
 The workflow now runs stock_screen_gate.py after fresh audits. Green requires all existing final gates simultaneously, not measurement completion alone. The gate checks final source/view hashes, both repeated raw all-corner metrics, raw final antenna counts and the last global-routing overflow total bound to the actual final physical checkpoint. It rejects missing/invalid/stale data and never rounds fast hold up to50ps. Always-upload remains active after gate failure. screen_qualification.json explicitly distinguishes pre-DRT qualification from official GDS signoff. No automatic detailed routing.
 
 Fifty focused tests pass. Both exact clean preparations/source hashes/single-setting config deltas, pinned schema, actual TT merged values and workflow shell/embedded Python syntax pass. The newly added strict gate is a project diagnostic step; template gds.yaml and main src/config remain unchanged. Raw data stays in artifacts/local build directories; derived identities and hashes are in coupled_timing_root_cause.json. Physical controls pending.
+
+
+## 2026-10-28: both root controls fail the genuine screen gate
+
+Both native physical flows and read-only audits complete successfully on758768d. Both fail only Require all final screening gates; evidence upload succeeds. Retrieved artifacts12801548799 (balance,255032042bytes) and12803669470 (fine delay,259582869bytes). A transient artifact egress503 required one bounded missing-report retry; both critical report sets are now complete. Independently matched every fresh corner metric to both repeated raw STA reports and antenna counts to raw fresh metrics. Qualification failures are real threshold failures, not source/provenance errors or tool crashes.
+
+| Run/control | Setup F/T/S (ns) | Hold F/T/S (ns) | Electrical | Antenna nets/pins | Final global overflow |
+| --- | --- | --- | --- | --- | ---: |
+| [40642215343 root_balance](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40642215343) | 0/0/0 | -0.0255704 / 0.206156 / 0.535035 | all0 | 7/7 | 0 |
+| [40642218333 root_fine_delay](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40642218333) | 0/0/0 | -0.146046 / 0.0133134 / 0.298826 | two slow slew | 8/8 | 6 |
+
+Native clock_tree_synthesis executes balance_levels, but final ODB/DEF/NL/PNL/SDC hashes equal wire20040602600864exactly. The source state JSON hash differs; do not claim every artifact is identical. The control does not change the measured physical implementation or improve skew. Level balancing alone is not an effective fix here.
+
+The coarse delay cell is actually absent in root_fine_delay; native effect receipt counts6356dlygate4sd2cells and5141buf1cells. Final area689051.17um²/46767instances. It worsens fast hold, introduces slow slew, adds one antenna net and restores congestion. This falsifies the proposed global cell-exclusion fix on this recipe, despite the earlier demonstrated new delay-cell contribution on the hold175setup path. Do not confuse a local contribution with proof that globally excluding the cell solves the coupled design.
+
+Neither should be combined or promoted. Keep wire200 as the electrically clean zero-overflow reference, still unqualified because fast hold and seven antenna nets fail. Further work should localize clock-wire delay and isolate short latch branches from shared SRAM setup paths; another global hold/cell/wire sweep is not supported. No new dispatch or DRT in this review. Final qualification remains strict and official gds.yaml/main hardware unchanged.
+
+
+## 2026-10-28: equivalent RTL late arbitration preselection
+
+The SRAM OUT port bit influences rt_ok. In the reference that signal gates the12ready candidates before a priority encoder and53-bit slot selection. Preselecting both the ordinary ready winner and urgent-ready winner moves this late decision after those networks. The chosen slot, fire, routine take and all lane state updates remain equivalent; no cycle or stored state is added.
+
+Packaged default-AW9 whole-lane/ALU sequential equivalence proves2157points, with induction sequence cap2. An independent combinational winner contract proves every ready/urgent/rt_ok/slot-word combination and rejects the wrong urgent winner. Replay rejects unknown baseline bytes before applying the patch. Six lane, four top-level and five chip tests pass. Full-design -Wall lint passes with existing promoted annotations. Broader22-case protocol replay remains in progress at preparation time; simulated cases are not exhaustive protocol conformance.
+
+Paired local mapping with the same typical library measures44610.804→48823.992um²per lane (+4213.188),3340→3795cells (+455),same sequential area11855.2896um². Parsed unweighted gate depth mem_rdata[11]→a_lat[4] is25→14,and maximum reachable flop-D depth26→15. These are structural comparative diagnostics, not STA or routed slack. The optional --map-library packaged replay records the library hash, both mapped stats and depths. Full physical congestion and timing remain unmeasured.
+
+Use the exact measured hold17540621704922project config, not another physical sweep: only the new lane patch changes hardware. One hash-guarded rtl_preselect profile applies the patch after the existing five source patches; metadata explicitly says hardware changed. All20ns/uncertainty/hold/electrical/antenna/overflow gates stay fixed, and no detailed routing starts automatically. Main hardware and official GDS template remain unchanged. Baseline and candidate lane hashes plus patch hash are in late_arbitration_evidence.json; raw logs/mapped files stay in ignored build directories.
+
+Verification environment notes: the first chip invocation imported main's older generated tables; the matching full checkout passes all five tests. Sandboxed sigrok returned empty decoder text with a libusb initialization error even on VCD input; host-permitted decoding of the same saved WS2812waveform produces the expected three colors. The full protocol replay uses host permissions for offline decoding rather than skipping sigrok. Neither issue was accepted as an RTL regression or a passing check.

@@ -38,9 +38,32 @@
   "comparison_reference_profile": "late_hold175",
   "validation": {
     "strict_full_design_lint": "pass",
-    "protocol_suite": "in progress; no full-suite pass claimed",
+    "protocol_suite": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "simulator": "Icarus RTL with offline sigrok",
+      "elapsed_seconds": 1534.87,
+      "simulation_ns": 122863560.02,
+      "xml_sha256": "c8439cde30f6b5229f1a70eaa4c386777d580c8f08f577219a5c89330d18d778"
+    },
     "lane_tests": 6,
     "top_level_tests": 4,
     "chip_level_tests": 5
+  },
+  "physical_results": {
+    "run": 40762963258,
+    "artifact_id": 12854346751,
+    "qualified": false,
+    "setup_all_corners_ns": 0,
+    "fast_hold_ns": 0.0032,
+    "typical_hold_ns": 0.219866,
+    "slow_hold_ns": 0.54282,
+    "electrical_violations": 0,
+    "antenna_nets": 6,
+    "antenna_pins": 6,
+    "final_global_overflow": 0,
+    "area_um2": 676087.29,
+    "instances": 45150
   }
 }

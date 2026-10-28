@@ -47,6 +47,15 @@ def validate(root, selected):
     result = dict(profile=selected['profile'], changes=selected['changes'],
                   requested_density_pct=config['PL_TARGET_DENSITY_PCT'],
                   initial_effective_density_pct=density)
+    if 'CTS_SINK_CLUSTERING_MAX_DIAMETER' in selected['changes']:
+        if config.get('CTS_SINK_CLUSTERING_ENABLE') is not True or config.get('CTS_SINK_CLUSTERING_SIZE') != 8:
+            raise ValueError('Clock diameter control requires enabled eight-sink clustering')
+        text = one(root, '*-openroad-cts/openroad-cts.log').read_text()
+        value = number(text, 'clock_tree_synthesis', '-sink_clustering_max_diameter')
+        if not math.isclose(value, selected['changes']['CTS_SINK_CLUSTERING_MAX_DIAMETER'], abs_tol=1e-9):
+            raise ValueError('Clock sink diameter control was not exercised')
+        result['native_clock_cluster_max_diameter_um'] = value
+        result['native_clock_cluster_size'] = 8
     if selected['changes'].get('CTS_BALANCE_LEVELS') is True:
         text = one(root, '*-openroad-cts/openroad-cts.log').read_text()
         commands = re.findall(r'(?m)^\+ clock_tree_synthesis\b[^\n]*', text)

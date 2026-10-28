@@ -1,0 +1,73 @@
+{
+  "source_run": 40762963258,
+  "artifact_id": 12854346751,
+  "input_sha256": {
+    "runs/stock-official-baseline/35-openroad-cts/tt_um_tripwire.def": "988638d4b67fac959c7fb8a459f9d8e6d267ebe4b6efca35c24e55679c4d5760",
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.def": "a90a6928636d3097f4911630f7fd92436d41d6ee8272db3c6a58e464f894ac42",
+    "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.def": "502a38106789e6889d1278207678ee60540ef2f08c1b4a2f00bdda26f43bf012",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "8c29f84e9851b1647d1a32e155e34ac5fcd03b0a02d2913bff4d7874204350b3",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/min.rpt": "203e1c5fb2bd67a51b2ffdd91c60f1e5d2663ad38f0b0741566dd10d3f653afa",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna_summary.rpt": "974f137ccee5089e8ea0a57227341c0243c33ac1ae37484ecefd0e9f93073e22"
+  },
+  "clock_antenna": {
+    "net": "clknet_1_0__leaf_u_chip.g_unit[0].u_cfg.g_word[3].g_stored.gclk",
+    "sink": "_52119_/GATE",
+    "six_sink_instances": [
+      "_52100_",
+      "_52108_",
+      "_52119_",
+      "_52149_",
+      "_52153_",
+      "_52173_"
+    ],
+    "outlier_origin_um": [
+      1010.4,
+      510.3
+    ],
+    "other_origins_um": [
+      [
+        605.76,
+        510.3
+      ],
+      [
+        604.8,
+        514.08
+      ],
+      [
+        614.88,
+        510.3
+      ],
+      [
+        601.92,
+        517.86
+      ],
+      [
+        601.92,
+        521.64
+      ]
+    ],
+    "driver_origin_um": [
+      724.8,
+      517.86
+    ],
+    "final_origin_span_um": 419.82,
+    "reviewed_sink_positions_unchanged_from_cts": true
+  },
+  "hold": {
+    "start": "_49774_/Q (lane1 regs[18])",
+    "end": "_49740_/D (lane1 out token[20])",
+    "launch_clock_ns": 0.516511,
+    "capture_clock_ns": 0.74233,
+    "slack_ns": 0.0032,
+    "fast_reserve_gap_ns": 0.0468
+  },
+  "control": {
+    "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100
+  },
+  "unchanged_sink_cluster_size": 8,
+  "limitations": [
+    "Cell-origin spans,not actual pin distances or routed lengths",
+    "Clustering target does not guarantee final placement bounds or signoff",
+    "repair_clock_nets affects input-to-root wiring,not the reviewed clock leaf"
+  ]
+}

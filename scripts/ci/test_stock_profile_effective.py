@@ -127,3 +127,38 @@ def test_native_repair_target_verified(tmp_path, key, command, flag, step, filen
     else:
         with pytest.raises(ValueError, match='not exercised'):
             validate(tmp_path, selected)
+
+
+@pytest.mark.parametrize('enabled', [True, False])
+def test_clock_level_balance_command(tmp_path, enabled):
+    selected = fixture(tmp_path, {'CTS_BALANCE_LEVELS': True})
+    path = tmp_path / '35-openroad-cts/openroad-cts.log'
+    path.parent.mkdir()
+    path.write_text('+ clock_tree_synthesis -buf_list buf' + (' -balance_levels' if enabled else '') + '\n')
+    if enabled:
+        assert validate(tmp_path, selected)['native_clock_balance_levels']
+    else:
+        with pytest.raises(ValueError, match='not exercised'):
+            validate(tmp_path, selected)
+
+
+@pytest.mark.parametrize('excluded_remains', [True, False])
+def test_coarse_delay_exclusion_final_netlist(tmp_path, excluded_remains):
+    selected = fixture(tmp_path, {'EXTRA_EXCLUDED_CELLS': ['sg13cmos5l_dlygate4sd3_1']})
+    path = tmp_path / '44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v'
+    path.parent.mkdir()
+    text = 'sg13cmos5l_buf_1 b (.A(a), .X(x));\n'
+    if excluded_remains:
+        text += 'sg13cmos5l_dlygate4sd3_1 h (.A(x), .X(y));\n'
+    path.write_text(text)
+    if excluded_remains:
+        with pytest.raises(ValueError, match='remains'):
+            validate(tmp_path, selected)
+    else:
+        assert validate(tmp_path, selected)['excluded_coarse_delay_cells'] == 0
+
+
+def test_unreviewed_cell_exclusion_rejected(tmp_path):
+    selected = fixture(tmp_path, {'EXTRA_EXCLUDED_CELLS': ['*']})
+    with pytest.raises(ValueError, match='Unreviewed'):
+        validate(tmp_path, selected)

@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Independent native physical control on the full Phase 2 design
         type: choice
-        options: [baseline, late_wire200, late_hold175, late_wire150]
+        options: [baseline, late_wire200, root_balance, root_fine_delay]
         default: baseline
         required: true
 permissions:
@@ -172,7 +172,7 @@ jobs:
             assert merged.get(key) == value, 'TT merged config changed selected profile: ' + key
         PYCODE
     - name: Run stock Classic through the final pre-routing STA
-      timeout-minutes: ${{ startsWith(inputs.profile, 'late') && 240 || 190 }}
+      timeout-minutes: ${{ inputs.profile != 'baseline' && 240 || 190 }}
       run: |-
         set -euo pipefail
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
@@ -245,6 +245,9 @@ jobs:
             qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
         print(json.dumps(rows, indent=2))
         PYCODE
+    - name: Require all final screening gates
+      run: |-
+        python scripts/ci/stock_screen_gate.py --physical runs/stock-official-baseline --audit runs/stock-corner-audit
     - name: Upload complete stock baseline measurements
       if: always()
       uses: actions/upload-artifact@v7

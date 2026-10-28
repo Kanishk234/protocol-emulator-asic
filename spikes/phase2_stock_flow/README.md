@@ -95,3 +95,6 @@ Late7540459607737clears timing/electrical(fast84.0735ps)butfails31antenna nets/f
 
 
 2026-10-27 D-127: antenna50is byte-identical to the10%reference and is retired. early175/late75diode-only40570933800has0finaloverflow,fast61.944psbut2slow slew and23antenna nets/24pins. early175_residual_evidence.json traces the single slew connection and existing antenna pairs. Active independent controls late_wire200 and late_slew30 change one native setting from that zero-overflow reference. All final gates and official GDS workflow stay unchanged.
+
+
+D-128 (2026-10-27): wire20040602600864is electrically clean/zerooverflowwith7antenna nets butfast−25.5704ps. slew30is byte-identical to its reference and retired. Current controls late_hold175 and late_wire150 separately test late hold reserve and further wire shortening against measured wire200. See wire200_residual_evidence.json. No combined run or DRT; main hardware/official GDS unchanged.

@@ -2,7 +2,22 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-27 — Diagnose wire200 residuals and prepare hold/wire controls
+
+- Bound40602600864residual evidence to actual pre/post-late netlists and fast min report. Seven existing antenna sink pairs/eight layer rows; six nets lack diode, four sinks are delay-cell inputs. Worst hold slot latch_53493_→FF_49585_has launch/capture clock0.520143/0.895424ns,dataarrival1.095739vsrequired1.121309ns. No same-path drift or checker-corner shortcut claim.
+- D-128independently tests native late hold75→175ps or wire target200→150um against measured wire200; early175/diode-only,fullnative rerouting and final gates stay fixed. No ineffective slew30/antenna50combination,clock/SDC/official-template or mainhardware change. More target is not guaranteed linear final gain; area/congestion/antenna/runtime risks remain.
+- Existing28focused guard tests pass. Pinned schema and measured reference hash validate; exact clean source/config/delta/TTmerge/syntax checks pass for both controls. Next publish reviewed evidence/CI/docs under standing user approval and launch both independent controls. No DRT,phase ticks or watcher; unrelatedfiles/FIPEpreserved. Receipts follow.
+
+## 2026-10-27 — Verify wire200 improvement and slew30 no-op
+
+- Both completed measurement jobs on24e996d. Bounded artifacts12786347392/12783710710retrieved; repeated fresh raw three-corner metrics and raw final antenna counts independently match receipts. Native200um/30%commands verified.
+- Wire20040602600864: setup0all; hold F/T/S-0.0255704/0.206156/0.535035ns; electrical0; antenna7nets/7pins; finalglobaloverflow0. Finalarea678201.06um²/45398instances (+20016.46um²/+2355vsreference). Antenna/electrical improved but fast75.5704psshortof50psgate. Native late70holdbuffers reports75psbefore subsequentplacement/reroute; final worst latch_53493_→FF_49585_. No same-path drift attribution without further evidence.
+- Slew3040602604357: same61.944psfast/two slow slew/23antenna nets24pins/overflow0asreference; all five final physical-view hashes and source state exactly equal40570933800. Executed setting but no physical effect; BUG150follow-up. Do not combine this as a fix.
+- Next inspect wire200's negative fast path and seven remaining antenna connections, keeping zero electrical/overflow. No new dispatch,DRT,phase ticks,watcher,main-hardware or official-template changes; unrelatedfiles/FIPEpreserved. Results/report updates remain local pending next reviewed publication.
+
 ## 2026-10-27 — Trace zero-overflow residuals and prepare native wire/slew controls
+
+- Publication receipt: 941be7f tools/evidence, 5ebc576 tests, f922374 CI, 24e996d docs pushed; remote main verified24e996d819a2fb616ba3859d3381d55ff06fff80. Launched [late_wire200 40602600864](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40602600864),verifiedin_progress,and [late_slew30 40602604357](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40602604357),initiallyqueued,both exactSHA. No reference rerun,DRT,watcher,official-template/main-hardware change or unrelated-file publication. Next inspect native command receipts, actual physical effect and fresh final gates. This launch receipt remains local until next evidence update.
 
 - Derived evidence from40570933800ties both slow slew violations to one _08808_NOR4_1→BUF1connection; final cell origins span236.94um. All24antenna entries/23nets existed before late repair;23entries lack a diode,20entrieshave net-origin spans>200um. These are approximate cell-origin indicators,not routed lengths or guaranteed coverage. Saved input hashes and derived data only.
 - D-127 independently tests wire target300→200um or slew repair margin10→30% against measured zero-overflow early175/late75 diode-only. No antenna50combination. Considered native broad diode heuristic but default90umthreshold'sapprox7412nets/37484terminals suggests excessive diode pressure; did not enable it or alter engine/template. All fresh final gates/native rerouting remain.

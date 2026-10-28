@@ -389,3 +389,30 @@ On40570933800, the two slow slew pins belong to the same net _08808_: sg13cmos5l
 D-127 tests late_wire200 (post-GRT maximum wire-length target300→200um) and late_slew30 (native slew repair margin10→30%), independently against measured early175/late75 diode-only. Both retain all timing/electrical/antenna/congestion gates. The pinned repair script forwards these exact values to repair_design; [OpenROAD resizer documentation](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html) explains long-wire buffering and slew repair. No newer commands are backported. Added buffers/drive strength may cost area/congestion or regress hold/antenna; final physical results are needed.
 
 Do not combine the ineffective antenna50control. Broad heuristic diode insertion was evaluated but not launched: default90umthreshold gives an approximate7412longnets/37484terminals by cell origins, potentially~204030um²in diodes before native skips/actual pin geometry. This rough upper-pressure estimate argues against indiscriminate insertion on an area-constrained candidate; it is not a validated diode count. No custom post-route edits or official workflow changes. Twenty-eight focused guards and exact clean preparations/source/hash/delta/TTmerge/syntax checks pass. New physical results pending.
+
+
+## 2026-10-27: wire200 reduces antenna and electrical failures; slew30 is unchanged
+
+Both measurement jobs completed on24e996d. Retrieved bounded artifacts12786347392 (wire200,255030752bytes) and12783710710 (slew30,249040635bytes). Independently matched every corner metric against both repeated raw STA reports and final antenna counts against raw fresh antenna metrics. Native command receipts confirm200umwire target and30%slew margin.
+
+| Run/control | Setup F/T/S (ns) | Hold F/T/S (ns) | Electrical | Antenna nets/pins | Final global overflow |
+| --- | --- | --- | --- | --- | ---: |
+| [40602600864 wire200](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40602600864) | 0/0/0 | -0.0255704 / 0.206156 / 0.535035 | all0 | 7/7 | 0 |
+| [40602604357 slew30](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40602604357) | 0/0/0 | 0.061944 / 0.227600 / 0.522836 | two slow slew | 23/24 | 0 |
+
+Wire200 is a real physical improvement for antenna (23→7nets) and electrical (2→0), preserving zero global overflow. It costs20,016.46um²and2355instances against early175reference (final678201.06um²/45398instances). Fast hold is25.5704psnegative and75.5704psshort of50psgate. Native late repair inserts70holdbuffers and reports final75psbefore its subsequent placement/rerouting; fresh final audit regresses. These are stage-level worst-slack measurements, not a proven same-path100.5704psdelay change. Fresh worst path starts latch_53493_andendsFF_49585_. No DRT.
+
+Remaining antenna net/pin/layer entries: u_chip.g_lane[0\].ot[10\]/hold11032/A/Metal2; net2838/_47396_/A/Metal2; u_chip.g_unit[3\].u_cfg.wdata_odd[2\]/hold9026/A/Metal2; u_chip.g_unit[3\].u_prod.tok[12\]/hold9454/A/Metal2; net14151/hold8488/A/Metal2; net10021/fanout3415/A/Metal3; net13162/wire13162/A/Metal3; net2838/_47396_/A/Metal3. These identities must be source-bound before any targeted edit. No claim that a shorter target is a hard routed-length bound or that further shortening guarantees repair.
+
+Slew30 executes the30%native margin but finalODB/DEF/NL/PNL/SDCand source state hashes equal early175reference40570933800exactly. Retire this physically ineffective setting; do not combine it as a fix. Root internal reason is unproven.
+
+Next focus on wire200's newly failing fast-hold path and seven antenna connections, preserving zero electrical/overflow. All existing acceptance gates/main hardware/official GDS remain unchanged; no new workflow or detailed routing dispatched for this result. Setup0is not positive reserve.
+
+
+### D-128: final hold versus residual antenna exposure
+
+All seven antenna connections on wire200 existed before late repair. Six nets have no diode; the lane0output net has a diode but still violates Metal2. Four failing sinks are delay-cell inputs. The repeated net2838row covers the same sink on two layers, so eight report rows are seven unique net/pin pairs, not eight failing pins. Source hashes and identities are recorded in wire200_residual_evidence.json.
+
+Worst fast hold path: slot latch_53493_/Q→register_49585_/D. Launch clock0.520143ns, capture clock0.895424ns (375.281psdifference), data arrival1.095739ns, data required1.121309ns. Fixed250psuncertainty and library hold apply normally. The path has several logic gates, not merely a direct short feedthrough. Native late stage reports75psbefore final placement/rerouting; exact same-path before/after drift has not been proved.
+
+Prepare two independent one-setting controls: late_hold175 raises late native hold target75→175ps on wire200, while late_wire150 lowers the native wire target200→150um with late75psunchanged. Neither combines the ineffective slew30orantenna50settings. A100pstarget increment is not a guaranteed final100psgain. Every fresh final gate remains mandatory, including electrical0,antenna0,fast≥50psand congestion readiness. Costs are additional delay/long-wire buffers, area/congestion and possible setup/hold/antenna regressions. No detailed routing or official-flow change.

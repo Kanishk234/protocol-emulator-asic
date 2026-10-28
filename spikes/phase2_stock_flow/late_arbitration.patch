@@ -1,0 +1,36 @@
+--- a/src/trw_lane.v
++++ b/src/trw_lane.v
+@@ -165,19 +165,25 @@
+     // R5: a waiting OUT whose output is not free is not a candidate.
+     wire        rt_ok  = eval_en && st_v && (!st_out || ofree[st_prt]);
+ 
+-    // §4.3: with a step waiting only urgent slots can beat it; one lowest-index encoder either way.
+-    wire [11:0] cand   = ready & (rt_ok ? urgent : 12'hFFF);
+-    wire [11:0] onehot = cand & (~cand + 12'd1);
+-    wire        fire   = |cand;
++    // Select the ready and urgent winners before the late SRAM OUT-eligibility decision.
++    // The lowest-index candidate is unchanged in either case (§4.3, L2).
++    wire [11:0] urgent_ready = ready & urgent;
++    wire [11:0] first_ready  = ready & (~ready + 12'd1);
++    wire [11:0] first_urgent = urgent_ready & (~urgent_ready + 12'd1);
++    wire        fire = rt_ok ? (|urgent_ready) : (|ready);
+     wire        rt_take = rt_ok && !fire;
+ 
+-    reg [SB-1:0] ss;        // the selected slot
++    reg [SB-1:0] ss_ready, ss_urgent;
+     integer j;
+     always @* begin
+-        ss = {SB{1'b0}};
+-        for (j = 0; j < 12; j = j + 1)
+-            ss = ss | ({SB{onehot[j]}} & slots[j*SB +: SB]);
++        ss_ready = {SB{1'b0}};
++        ss_urgent = {SB{1'b0}};
++        for (j = 0; j < 12; j = j + 1) begin
++            ss_ready = ss_ready | ({SB{first_ready[j]}} & slots[j*SB +: SB]);
++            ss_urgent = ss_urgent | ({SB{first_urgent[j]}} & slots[j*SB +: SB]);
++        end
+     end
++    wire [SB-1:0] ss = rt_ok ? ss_urgent : ss_ready;
+ 
+     wire [3:0] s_op   = ss[`TRW_SLOT_OP_MSB:`TRW_SLOT_OP_LSB];
+     wire [2:0] s_dst  = ss[`TRW_SLOT_DST_MSB:`TRW_SLOT_DST_LSB];

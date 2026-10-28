@@ -1438,6 +1438,14 @@ Applying D-012 to the I2C read direction. A full I2C target needed 14–18 slots
 - Cost/risk: grouping can add clock buffers/area,move skew or leave final geometry unchanged. The optimization target is not a hard post-route bound. Five data-net antennas also remain,so no guaranteed closure. Record actual native command; reject a missing diameter or changed eight-sink/enabled mode. Strict final gate remains the only pre-DRT qualification.
 - Shared RTL has2169equivalencepoints,core tests/lint and22/22Icarus protocol cases with0skips. No RTL changed for this control. Fifty-four focused guards,pinned schema,clean exact source/config-delta/actualTTmerge/syntax checks pass. Evidence: shared_clock_cluster_evidence.json. No official-template/main-config/source changes or DRT/phase claim; future main config adoption beyond whitelist remains owner-reviewed.
 
+## D-133 (2026-10-28): prepare a native no-mirroring control after tracing repair regression
+
+The general need is stable physical repair through the final stock legalization and rerouting. Shared-priority 40762963258 reaches zero antenna violations and its internal 175 ps hold target before later operations; final independent qualification fails. Five residual nets retain their connections, while all six have reoriented common instances after legalization. Cell-origin equality therefore does not establish unchanged pin geometry. These observations motivate a control, not a conclusion that mirroring alone caused the failures.
+
+Prepare only PL_OPTIMIZE_MIRRORING=false on the exact measured shared-priority source/config, separately from the running diameter control. Native scripts, full rerouting, stage order and final gates remain unchanged. This affects earlier legalizations as well, can worsen wirelength/congestion/timing, and provides no guaranteed closure. There is no functional RTL change or new primitive. The configuration change is diagnostic only; future main adoption beyond the existing config whitelist still requires owner review.
+
+Initially held this fallback out of dispatch choices. The user subsequently authorized launching it independently alongside the clock screen; expose only the separate no-mirroring profile, without combining controls. Require resolved false plus native legalization logs without mirroring in initial DPL, post-CTS repair and post-GRT repair. Fifty-nine focused guards and clean exact preparation/source/config/actual TT merge checks pass. Evidence: shared_residual_history_evidence.json. No additional physical run, official job edit, DRT or phase completion claim.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

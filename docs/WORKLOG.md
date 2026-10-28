@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-28 — Analyze failed arbitration route and prepare the shared-data variant
+
+- Native40723256006completes flow/audits,then correctly fails final design gate. Artifact12845070147verifiedagainst repeated raw3corner/freshantenna. Slowsetup−0.612733ns,fasthold−0.0871405ns,twoslow slew,antenna11/11,finaloverflow311(310M3/1M4),area694915.32um²/47115instances. Full-width implementation is not qualifying; originalfunctional22/22proofscope stays valid,not physical.
+- ActualworstsetupstartsU0word0IDLEbit7latch,notSRAM; bounded1000maxpathscontainnoSRAMstartpoints,notproof of its exact slack. FastworstisFF_52025_→FF_52030_. Do not blindly adjust gates/margins or claimfullpreselectionclosedtiming.
+- D-131shared-priority prototype: two12bitwinner masks,one shared53bitdata reduction,late rt_okmaskchoice. One RTL delta; no new state/cycle/spec/protocolblock. Packaged whole-lane2169equivalencepoints and mutant-sensitive one-stepwinnercontract pass. Same localtypical mapping+16cells/+206.766um²perlane,samesequentialarea,mem11→a_lat4depth25→18,maxD26→18. MappingdoesnotproveSTA/physicalclosure.
+- Strictfulldesignlint,6lane/4top/5chip simulations pass. Fresh22caseprotocol replay running with matched encodings and offline sigrok,not yet claimedpassing. ExactcleanCI/source/patch/config/TTmerge/syntaxpass; same measuredhold175configuration,onehardwarechange. Next publishreviewedprototype/checker/CI/docs,launchonestrictscreen,andfinishprotocolreplay. Mainhardware/officialGDS/gatesunchanged;unrelatedfiles/FIPEpreserved. No DRT/phase tick/watcher;receiptsfollow.
+
 ## 2026-10-28 — Shorten late SRAM arbitration with a proved RTL prototype
+
+- Completed-verification publication: 700d5d2 evidence and5ad2d3b docs pushed; remote main verified5ad2d3bed1dd385e032c742d2a5051fb8477c34d. Changes since the active run affect only verification metadata/docs; RTL patch/main source/config/official workflow unchanged. Physical40723256006continuesin_progress,pre-routing stock flow,with all preparation steps successful and no failed steps at check. Complete local Icarus22case replay is done; duplicate/invalid local runs stopped and tool sessions closed. No background watcher. Next required evidence is final strict physical qualification,then only a passing screen can authorize DRT. This final receipt remains local until next results publication.
 
 - Full existing RTL protocol replay now complete: Icarus22/22PASS,0failures,0skips,122863560.02nssimulatedin920.96s. Offline sigrok assertions enabled and host permissions used only to avoid sandbox libusb initialization failure. XML and candidate source hashes recorded in evidence; candidate f011e364... unchanged. Generated files match spec (--check). Includes exercised UART/SPI/I2C and existing stretch-program cases,not exhaustive conformance/SDF/silicon. Verilator duplicate run was stopped after six passing cases to avoid redundant CPU work; the complete22case receipt is Icarus. No local simulations/watchers remain running. Physical40723256006stillpending; do not claim screen pass.
 

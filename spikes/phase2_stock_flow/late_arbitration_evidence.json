@@ -69,5 +69,20 @@
     },
     "routed_timing_proven": false,
     "metric": "unweighted combinational gate count, not STA"
+  },
+  "physical_results": {
+    "run": 40723256006,
+    "artifact_id": 12845070147,
+    "qualified": false,
+    "slow_setup_ns": -0.612733,
+    "fast_hold_ns": -0.0871405,
+    "slow_slew_violations": 2,
+    "antenna_nets": 11,
+    "antenna_pins": 11,
+    "final_global_overflow": 311,
+    "final_area_um2": 694915.32,
+    "final_instances": 47115,
+    "worst_setup": "U0 config word0 IDLE bit7 latch to mappedFF_52461_",
+    "sram_report_limit": "No SRAM startpoints in1000reported worst paths; exact SRAM slack not established"
   }
 }

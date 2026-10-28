@@ -18,12 +18,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('baseline', type=Path, help='Prepared full stock reference checkout')
     parser.add_argument('work', type=Path)
+    parser.add_argument('--variant', choices=('full', 'shared'), default='full')
     parser.add_argument('--map-library', type=Path, help='Optional comparative mapping library; not signoff')
     args = parser.parse_args()
     package = Path(__file__).resolve().parents[1]
-    evidence = json.loads((package / 'late_arbitration_evidence.json').read_text())
+    stem = 'shared_priority' if args.variant == 'shared' else 'late_arbitration'
+    evidence = json.loads((package / (stem + '_evidence.json')).read_text())
     baseline, work = args.baseline.resolve(), args.work.resolve()
-    patch = package / 'late_arbitration.patch'
+    patch = package / (stem + '.patch')
     if sha(patch) != evidence['patch_sha256'] or sha(baseline / 'src/trw_lane.v') != evidence['baseline_sha256']:
         raise ValueError('Wrong patch or arbitration baseline')
     work.mkdir(parents=True, exist_ok=False)

@@ -7,7 +7,7 @@
       "changes": {},
       "config_sha256": "2c43f63561ab974aa6fc6afa4df074fd0c157320e1409688bca2881f9bac2542"
     },
-    "rtl_preselect": {
+    "rtl_shared_priority": {
       "changes": {
         "RUN_POST_GRT_RESIZER_TIMING": true,
         "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
@@ -17,16 +17,16 @@
       },
       "config_sha256": "10731f360e38710d16dfcb6a14cc7c4e49fe83c44ee75538e251be95d3660914",
       "additional_changes_from_reference": {},
-      "rtl_patch": "late_arbitration",
+      "rtl_patch": "shared_priority",
       "hardware_unchanged": false
     }
   },
   "hardware_unchanged": false,
-  "purpose": "One equivalent RTL arbitration preselection change against measured hold175 source/config; no new physical parameter change.",
+  "purpose": "One equivalent shared-data priority-preselection RTL change against measured hold175; same config, strict final qualification.",
   "risks": [
-    "Duplicated combinational selection adds cells/area and can alter placement/congestion",
-    "Gate-level depth reduction is not routed timing proof; all original final gates must pass",
-    "Antenna and hold can move to other paths; no automatic detailed routing"
+    "Local mapping saves seven SRAM-input gate levels at16extra cells/lane; native routed results can differ",
+    "Priority mask preselection still alters physical implementation; all strict final gates remain mandatory",
+    "No clock/SDC/checker/official-template change or automatic detailed routing"
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
   "physical_results": null,
@@ -40,7 +40,8 @@
     "late_hold175": "Fast102.52psbutslowsetup-0.583896ns,11antenna netsand5overflow; newlateholdcells lie on failingSRAMsetup",
     "late_wire150": "Fast-164.69ps,5antenna netsand9overflow; shortening alone doesnotclosehold",
     "root_balance": "Native flag executes but final five physical views match wire200; no physical improvement",
-    "root_fine_delay": "Excluded cell actually absent but fast-146.046ps,2slow slew,8antenna/6overflow"
+    "root_fine_delay": "Excluded cell actually absent but fast-146.046ps,2slow slew,8antenna/6overflow",
+    "rtl_preselect": "RTL equivalent and22protocolcasespass,butphysical40723256006fails:slowsetup-0.612733ns,fasthold-87.1405ps,2slew,11antenna,311overflow"
   },
   "comparison_reference_run": 40621704922,
   "comparison_reference_profile": "late_hold175",

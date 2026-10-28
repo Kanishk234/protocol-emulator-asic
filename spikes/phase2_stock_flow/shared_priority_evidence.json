@@ -1,0 +1,46 @@
+{
+  "baseline_sha256": "5a2905a6c59ac4eb6efb621e95d5bd18d1b9f2dc1ad599f5c7690573760ffd06",
+  "candidate_sha256": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+  "patch_sha256": "1c6854ca4fa28eaf54aa7109d1bb0b92f1161177e7ba8140bddaac6cf0135b7e",
+  "architectural_change": false,
+  "latency_cycles_added": 0,
+  "general_need": "Preselect priority masks before late routine eligibility while sharing the wide slot-data reduction.",
+  "physical_qualification": false,
+  "proof": {
+    "proven_equivalence_points": 2169,
+    "induction_sequence_cap": 2,
+    "negative_control": "wrong urgent winner rejected",
+    "candidate_sha256": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+    "physical_qualification": false,
+    "comparative_mapping": {
+      "library_sha256": "34163f3e7de9f854afac57332ba06f1739b78e7ac35660a8a5ddd39c570124ad",
+      "cases": {
+        "gold": {
+          "area_um2": 44610.804,
+          "cells": 3340,
+          "sequential_area_um2": 11855.2896,
+          "mem11_to_a_lat4_gate_levels": 25,
+          "max_mem11_to_flopD_gate_levels": 26
+        },
+        "trial": {
+          "area_um2": 44817.57,
+          "cells": 3356,
+          "sequential_area_um2": 11855.2896,
+          "mem11_to_a_lat4_gate_levels": 18,
+          "max_mem11_to_flopD_gate_levels": 18
+        }
+      },
+      "routed_timing_proven": false,
+      "metric": "unweighted combinational gate count, not STA"
+    }
+  },
+  "comparison_reference_run": 40621704922,
+  "comparison_reference_profile": "late_hold175",
+  "validation": {
+    "strict_full_design_lint": "pass",
+    "protocol_suite": "in progress; no full-suite pass claimed",
+    "lane_tests": 6,
+    "top_level_tests": 4,
+    "chip_level_tests": 5
+  }
+}

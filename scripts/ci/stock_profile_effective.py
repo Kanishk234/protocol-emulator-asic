@@ -47,6 +47,17 @@ def validate(root, selected):
     result = dict(profile=selected['profile'], changes=selected['changes'],
                   requested_density_pct=config['PL_TARGET_DENSITY_PCT'],
                   initial_effective_density_pct=density)
+    if selected['changes'].get('PL_OPTIMIZE_MIRRORING') is False:
+        reviewed = []
+        for stage in ('detailedplacement', 'resizertimingpostcts', 'resizertimingpostgrt'):
+            path = one(root, f'*-openroad-{stage}/openroad-{stage}.log')
+            text = path.read_text()
+            if not re.search(r'(?m)^\+ detailed_placement\b', text):
+                raise ValueError(f'Missing native legalization in {stage}')
+            if re.search(r'(?m)^\+ optimize_mirroring\b|\[INFO DPL-0020\] Mirrored', text):
+                raise ValueError(f'Placement mirroring remains active in {stage}')
+            reviewed.append(str(path.relative_to(root)))
+        result['native_mirroring_disabled_logs'] = reviewed
     if 'CTS_SINK_CLUSTERING_MAX_DIAMETER' in selected['changes']:
         if config.get('CTS_SINK_CLUSTERING_ENABLE') is not True or config.get('CTS_SINK_CLUSTERING_SIZE') != 8:
             raise ValueError('Clock diameter control requires enabled eight-sink clustering')

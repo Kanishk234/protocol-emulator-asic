@@ -35,6 +35,22 @@
       },
       "rtl_patch": "shared_priority",
       "hardware_unchanged": true
+    },
+    "rtl_shared_no_mirror": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+        "PL_OPTIMIZE_MIRRORING": false
+      },
+      "config_sha256": "ff8ba9b8ebe34bccb4581e3a91924dad45320575b372966d1c6066d83069b6cf",
+      "additional_changes_from_reference": {
+        "PL_OPTIMIZE_MIRRORING": false
+      },
+      "rtl_patch": "shared_priority",
+      "hardware_unchanged": true
     }
   },
   "hardware_unchanged": true,

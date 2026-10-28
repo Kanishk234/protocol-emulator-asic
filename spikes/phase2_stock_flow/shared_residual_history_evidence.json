@@ -1,0 +1,924 @@
+{
+  "source_run": 40762963258,
+  "artifact_id": 12854346751,
+  "input_sha256": {
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.def": "a90a6928636d3097f4911630f7fd92436d41d6ee8272db3c6a58e464f894ac42",
+    "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.def": "502a38106789e6889d1278207678ee60540ef2f08c1b4a2f00bdda26f43bf012",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "8c29f84e9851b1647d1a32e155e34ac5fcd03b0a02d2913bff4d7874204350b3",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna_summary.rpt": "974f137ccee5089e8ea0a57227341c0243c33ac1ae37484ecefd0e9f93073e22",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log": "d7bd40c8184772106c8876c8837935ce2dfa65d1086ed23f367498a976f53afe",
+    "runs/stock-official-baseline/43-openroad-repairantennas/2-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/or_metrics_out.json": "eec3b2a55fde0fa93bf82ce83a7c83a18925b67c642242d320b3c99723af767a",
+    "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log": "62a3c8d587bad093a95fec12fcb59162a0ce4e8f59bc43ed216fdb8e22a2e247",
+    "runs/stock-corner-audit/screen_qualification.json": "4704e906a24460f69fe99f70c69304199a09d514be7a0571f5c387f6ab1dbfb3",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "b74f41eff27bb6a513eb663463869f4b1b43c433f35bb5d543369f3f405b5f49",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna.rpt": "24a03cd7d42a2d0a2b30602cb8c6b734919fcd02cd7450bf8875e23f9ce26a60"
+  },
+  "post_antenna_counts": {
+    "antenna__violating__nets": 0,
+    "antenna__violating__pins": 0
+  },
+  "final_antenna_counts": {
+    "antenna__violating__nets": 6,
+    "antenna__violating__pins": 6
+  },
+  "hold": {
+    "requested_internal_margin_ns": 0.175,
+    "optimizer_reported_final_wns_ns": 0.175,
+    "legalization_and_global_reroute_follow_optimizer": true,
+    "independent_final_fast_hold_ns": 0.0032,
+    "final_qualification": {
+      "qualified": false,
+      "failures": [
+        "nom_fast_1p32V_m40C hold: 0.0032 ns < 0.05 ns",
+        "antenna__violating__nets: 6",
+        "antenna__violating__pins: 6"
+      ],
+      "final_global_overflow": 0,
+      "source_state": "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json",
+      "minimum_fast_hold_ns": 0.05,
+      "detailed_routing_performed": false,
+      "official_gds_signoff": false
+    }
+  },
+  "residuals": [
+    {
+      "net": "_06952_",
+      "final_violating_pin": "_33570_/B",
+      "reported_layers": [
+        "Metal2",
+        "Metal3"
+      ],
+      "stages": {
+        "pre_antenna": {
+          "connections": [
+            {
+              "instance": "_33570_",
+              "pin": "B",
+              "cell": "sg13cmos5l_nand3_1",
+              "origin_um": [
+                460.32,
+                226.8
+              ],
+              "orientation": "S"
+            },
+            {
+              "instance": "_33568_",
+              "pin": "Y",
+              "cell": "sg13cmos5l_nand3_1",
+              "origin_um": [
+                582.24,
+                226.8
+              ],
+              "orientation": "S"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "post_antenna": {
+          "connections": [
+            {
+              "instance": "_33570_",
+              "pin": "B",
+              "cell": "sg13cmos5l_nand3_1",
+              "origin_um": [
+                460.32,
+                226.8
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "_33568_",
+              "pin": "Y",
+              "cell": "sg13cmos5l_nand3_1",
+              "origin_um": [
+                582.24,
+                226.8
+              ],
+              "orientation": "FS"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "final": {
+          "connections": [
+            {
+              "instance": "_33570_",
+              "pin": "B",
+              "cell": "sg13cmos5l_nand3_1",
+              "origin_um": [
+                460.32,
+                226.8
+              ],
+              "orientation": "S"
+            },
+            {
+              "instance": "_33568_",
+              "pin": "Y",
+              "cell": "sg13cmos5l_nand3_1",
+              "origin_um": [
+                582.24,
+                226.8
+              ],
+              "orientation": "S"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        }
+      },
+      "connections_unchanged_after_antenna": true,
+      "common_instances_moved_after_antenna": [],
+      "common_instances_reoriented_after_antenna": [
+        "_33570_",
+        "_33568_"
+      ]
+    },
+    {
+      "net": "clknet_1_0__leaf_u_chip.g_unit[0].u_cfg.g_word[3].g_stored.gclk",
+      "final_violating_pin": "_52119_/GATE",
+      "reported_layers": [
+        "Metal3"
+      ],
+      "stages": {
+        "pre_antenna": {
+          "connections": [
+            {
+              "instance": "_52100_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                605.76,
+                510.3
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52108_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                604.8,
+                514.08
+              ],
+              "orientation": "S"
+            },
+            {
+              "instance": "_52119_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                1010.4,
+                510.3
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "_52149_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                614.88,
+                510.3
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "_52153_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                601.92,
+                517.86
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52173_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                601.92,
+                521.64
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "clkbuf_1_0__f_u_chip.g_unit\\[0\\].u_cfg.g_word\\[3\\].g_stored.gclk",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_8",
+              "origin_um": [
+                724.8,
+                517.86
+              ],
+              "orientation": "FN"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "post_antenna": {
+          "connections": [
+            {
+              "instance": "_52100_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                605.76,
+                510.3
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52108_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                604.8,
+                514.08
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "_52119_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                1010.4,
+                510.3
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52149_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                614.88,
+                510.3
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52153_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                601.92,
+                517.86
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52173_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                601.92,
+                521.64
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "clkbuf_1_0__f_u_chip.g_unit\\[0\\].u_cfg.g_word\\[3\\].g_stored.gclk",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_8",
+              "origin_um": [
+                724.8,
+                517.86
+              ],
+              "orientation": "N"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "final": {
+          "connections": [
+            {
+              "instance": "_52100_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                605.76,
+                510.3
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52108_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                604.8,
+                514.08
+              ],
+              "orientation": "S"
+            },
+            {
+              "instance": "_52119_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                1010.4,
+                510.3
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "_52149_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                614.88,
+                510.3
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "_52153_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                601.92,
+                517.86
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_52173_",
+              "pin": "GATE",
+              "cell": "sg13cmos5l_dlhq_1",
+              "origin_um": [
+                601.92,
+                521.64
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "clkbuf_1_0__f_u_chip.g_unit\\[0\\].u_cfg.g_word\\[3\\].g_stored.gclk",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_8",
+              "origin_um": [
+                724.8,
+                517.86
+              ],
+              "orientation": "FN"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        }
+      },
+      "connections_unchanged_after_antenna": true,
+      "common_instances_moved_after_antenna": [],
+      "common_instances_reoriented_after_antenna": [
+        "_52108_",
+        "_52119_",
+        "_52149_",
+        "clkbuf_1_0__f_u_chip.g_unit\\[0\\].u_cfg.g_word\\[3\\].g_stored.gclk"
+      ]
+    },
+    {
+      "net": "_08608_",
+      "final_violating_pin": "hold15407/A",
+      "reported_layers": [
+        "Metal2"
+      ],
+      "stages": {
+        "pre_antenna": {
+          "connections": [
+            {
+              "instance": "wire12133",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_2",
+              "origin_um": [
+                1111.68,
+                283.5
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "_35664_",
+              "pin": "B2",
+              "cell": "sg13cmos5l_a22oi_1",
+              "origin_um": [
+                1031.52,
+                283.5
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "_35406_",
+              "pin": "B2",
+              "cell": "sg13cmos5l_a22oi_1",
+              "origin_um": [
+                1028.64,
+                283.5
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_35374_",
+              "pin": "X",
+              "cell": "sg13cmos5l_mux4_1",
+              "origin_um": [
+                1035.36,
+                154.98
+              ],
+              "orientation": "N"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": false
+        },
+        "post_antenna": {
+          "connections": [
+            {
+              "instance": "wire12133",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_2",
+              "origin_um": [
+                1111.68,
+                283.5
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_35664_",
+              "pin": "B2",
+              "cell": "sg13cmos5l_a22oi_1",
+              "origin_um": [
+                1031.52,
+                283.5
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_35406_",
+              "pin": "B2",
+              "cell": "sg13cmos5l_a22oi_1",
+              "origin_um": [
+                1028.64,
+                283.5
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_35374_",
+              "pin": "X",
+              "cell": "sg13cmos5l_mux4_1",
+              "origin_um": [
+                1035.36,
+                154.98
+              ],
+              "orientation": "N"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": false
+        },
+        "final": {
+          "connections": [
+            {
+              "instance": "hold15407",
+              "pin": "A",
+              "cell": "sg13cmos5l_dlygate4sd3_1",
+              "origin_um": [
+                1039.2,
+                223.02
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "wire12133",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_2",
+              "origin_um": [
+                1111.68,
+                283.5
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "_35406_",
+              "pin": "B2",
+              "cell": "sg13cmos5l_a22oi_1",
+              "origin_um": [
+                1028.64,
+                283.5
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "_35374_",
+              "pin": "X",
+              "cell": "sg13cmos5l_mux4_1",
+              "origin_um": [
+                1035.36,
+                154.98
+              ],
+              "orientation": "N"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        }
+      },
+      "connections_unchanged_after_antenna": false,
+      "common_instances_moved_after_antenna": [],
+      "common_instances_reoriented_after_antenna": [
+        "wire12133"
+      ]
+    },
+    {
+      "net": "net15103",
+      "final_violating_pin": "hold11277/A",
+      "reported_layers": [
+        "Metal3"
+      ],
+      "stages": {
+        "pre_antenna": {
+          "connections": [
+            {
+              "instance": "hold11277",
+              "pin": "A",
+              "cell": "sg13cmos5l_dlygate4sd3_1",
+              "origin_um": [
+                720.96,
+                230.58
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "wire15104",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                874.08,
+                238.14
+              ],
+              "orientation": "FN"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "post_antenna": {
+          "connections": [
+            {
+              "instance": "hold11277",
+              "pin": "A",
+              "cell": "sg13cmos5l_dlygate4sd3_1",
+              "origin_um": [
+                720.96,
+                230.58
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "wire15104",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                874.08,
+                238.14
+              ],
+              "orientation": "N"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "final": {
+          "connections": [
+            {
+              "instance": "hold11277",
+              "pin": "A",
+              "cell": "sg13cmos5l_dlygate4sd3_1",
+              "origin_um": [
+                720.96,
+                230.58
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "wire15104",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                876.96,
+                241.92
+              ],
+              "orientation": "S"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        }
+      },
+      "connections_unchanged_after_antenna": true,
+      "common_instances_moved_after_antenna": [
+        "wire15104"
+      ],
+      "common_instances_reoriented_after_antenna": [
+        "hold11277",
+        "wire15104"
+      ]
+    },
+    {
+      "net": "net10748",
+      "final_violating_pin": "fanout3532/A",
+      "reported_layers": [
+        "Metal3"
+      ],
+      "stages": {
+        "pre_antenna": {
+          "connections": [
+            {
+              "instance": "fanout3532",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                1041.6,
+                245.7
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "fanout3531",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                861.12,
+                245.7
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "hold10749",
+              "pin": "X",
+              "cell": "sg13cmos5l_dlygate4sd3_1",
+              "origin_um": [
+                869.76,
+                238.14
+              ],
+              "orientation": "FN"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "post_antenna": {
+          "connections": [
+            {
+              "instance": "fanout3532",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                1041.6,
+                245.7
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "fanout3531",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                861.12,
+                245.7
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "hold10749",
+              "pin": "X",
+              "cell": "sg13cmos5l_dlygate4sd3_1",
+              "origin_um": [
+                869.76,
+                238.14
+              ],
+              "orientation": "N"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "final": {
+          "connections": [
+            {
+              "instance": "fanout3532",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                1041.6,
+                245.7
+              ],
+              "orientation": "N"
+            },
+            {
+              "instance": "fanout3531",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                861.12,
+                245.7
+              ],
+              "orientation": "FN"
+            },
+            {
+              "instance": "hold10749",
+              "pin": "X",
+              "cell": "sg13cmos5l_dlygate4sd3_1",
+              "origin_um": [
+                869.76,
+                238.14
+              ],
+              "orientation": "FN"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        }
+      },
+      "connections_unchanged_after_antenna": true,
+      "common_instances_moved_after_antenna": [],
+      "common_instances_reoriented_after_antenna": [
+        "fanout3531",
+        "hold10749"
+      ]
+    },
+    {
+      "net": "net13566",
+      "final_violating_pin": "wire13566/A",
+      "reported_layers": [
+        "Metal3"
+      ],
+      "stages": {
+        "pre_antenna": {
+          "connections": [
+            {
+              "instance": "wire13566",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                583.68,
+                521.64
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "wire13567",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_2",
+              "origin_um": [
+                443.04,
+                464.94
+              ],
+              "orientation": "FN"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "post_antenna": {
+          "connections": [
+            {
+              "instance": "wire13566",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                583.68,
+                521.64
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "wire13567",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_2",
+              "origin_um": [
+                443.04,
+                464.94
+              ],
+              "orientation": "N"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        },
+        "final": {
+          "connections": [
+            {
+              "instance": "wire13566",
+              "pin": "A",
+              "cell": "sg13cmos5l_buf_1",
+              "origin_um": [
+                583.68,
+                521.64
+              ],
+              "orientation": "FS"
+            },
+            {
+              "instance": "wire13567",
+              "pin": "X",
+              "cell": "sg13cmos5l_buf_2",
+              "origin_um": [
+                443.04,
+                464.94
+              ],
+              "orientation": "FN"
+            }
+          ],
+          "directly_connected_diodes": [],
+          "final_violating_pin_present": true
+        }
+      },
+      "connections_unchanged_after_antenna": true,
+      "common_instances_moved_after_antenna": [],
+      "common_instances_reoriented_after_antenna": [
+        "wire13567"
+      ]
+    }
+  ],
+  "limitations": [
+    "Optimizer WNS is not independent final corner STA or same-path delta.",
+    "DEF origin positions and connectivity do not establish exact wire shapes or layer-specific diffusion protection.",
+    "No directly connected antenna-cell instance found on these nets; this does not diagnose all process antenna rules.",
+    "Post-antenna checkpoint still needs independent all-corner timing and final-overflow qualification before any alternate native recipe can be judged.",
+    "No source, checkpoint, official workflow or acceptance requirement changed.",
+    "All six residual nets have at least one reoriented common endpoint; unchanged cell origins do not prove unchanged pin geometry. Disabling mirroring changes earlier placements too and is not an isolated late-stage switch."
+  ],
+  "raw_violated_antenna_rules": [
+    {
+      "net": "_06952_",
+      "pin": "_33570_/B",
+      "layer": "Metal2",
+      "ratio_kind": "Cumulative area",
+      "actual_ratio": 347.98,
+      "required_ratio": 200.0
+    },
+    {
+      "net": "_06952_",
+      "pin": "_33570_/B",
+      "layer": "Metal3",
+      "ratio_kind": "Cumulative area",
+      "actual_ratio": 444.95,
+      "required_ratio": 200.0
+    },
+    {
+      "net": "_08608_",
+      "pin": "hold15407/A",
+      "layer": "Metal2",
+      "ratio_kind": "Cumulative area",
+      "actual_ratio": 242.88,
+      "required_ratio": 200.0
+    },
+    {
+      "net": "clknet_1_0__leaf_u_chip.g_unit[0].u_cfg.g_word[3].g_stored.gclk",
+      "pin": "_52119_/GATE",
+      "layer": "Metal3",
+      "ratio_kind": "Cumulative area",
+      "actual_ratio": 319.59,
+      "required_ratio": 200.0
+    },
+    {
+      "net": "net10748",
+      "pin": "fanout3532/A",
+      "layer": "Metal3",
+      "ratio_kind": "Cumulative area",
+      "actual_ratio": 203.18,
+      "required_ratio": 200.0
+    },
+    {
+      "net": "net13566",
+      "pin": "wire13566/A",
+      "layer": "Metal3",
+      "ratio_kind": "Cumulative area",
+      "actual_ratio": 203.24,
+      "required_ratio": 200.0
+    },
+    {
+      "net": "net15103",
+      "pin": "hold11277/A",
+      "layer": "Metal3",
+      "ratio_kind": "Cumulative area",
+      "actual_ratio": 244.76,
+      "required_ratio": 200.0
+    }
+  ],
+  "prepared_control": {
+    "profile": "rtl_shared_no_mirror",
+    "changes_from_reference": {
+      "PL_OPTIMIZE_MIRRORING": false
+    },
+    "reference_run": 40762963258,
+    "published": false,
+    "launched": false,
+    "not_combined_with_clock_diameter": true,
+    "launch_authorized": true
+  }
+}

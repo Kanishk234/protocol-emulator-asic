@@ -98,3 +98,6 @@ Late7540459607737clears timing/electrical(fast84.0735ps)butfails31antenna nets/f
 
 
 D-128 (2026-10-27): wire20040602600864is electrically clean/zerooverflowwith7antenna nets butfast−25.5704ps. slew30is byte-identical to its reference and retired. Current controls late_hold175 and late_wire150 separately test late hold reserve and further wire shortening against measured wire200. See wire200_residual_evidence.json. No combined run or DRT; main hardware/official GDS unchanged.
+
+
+D-129 (2026-10-28): replace margin sweeps with independent root_balance (native gated-tree level balancing) and root_fine_delay (exclude coarsest delay cell globally from synthesis/PnR). Source-bound coupled_timing_root_cause.json proves five new delay cells contribute3.353122nson failed SRAM setup path. Both controls use measured wire200reference and preserve early175/late75/wire200. New final qualification gate makes this diagnostic green only when all existing screen gates pass; artifacts upload even after a valid gate failure. No automatic DRT or official-template changes.

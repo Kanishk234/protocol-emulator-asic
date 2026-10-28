@@ -2,7 +2,23 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-10-28 — Diagnose coupled timing and enforce a genuinely passing screen
+
+- User requested a fully passing screen instead of more tradeoff sweeps. Read actual slow max/min paths and source-stage netlists. Hold175adds five dlygate4sd3instances to SRAM DOUT[11]→FF_49700_path; final slow arcs sum3.353122ns. Exact instances absent before late repair. This proves contribution,not total same-path delta or exclusive causation. All repair corners already loaded; do not falsely fix missing corners. Recorded source hashes/derived evidence and BUG151.
+- D-129root controls on measured wire200: native CTS_BALANCE_LEVELS=true; or EXTRA_EXCLUDED_CELLS=[sg13cmos5l_dlygate4sd3_1]. Separate changes,not another margin increment. Global exclusion can add smaller cells/area; clock balance can add clock cells or be ineffective. Same RTL/resources,early175/late75/wire200,native image/order/rerouting and fixed20ns/SDC/all final gates.
+- Added strict final qualification to own diagnostic workflow: raw repeated3corner metrics,50psfast hold,zero electrical/antenna/finaloverflow,unchanged final source-view hashes. Missing/stale/invalid results fail closed; CLI exit status matches qualification. Always upload evidence after failure; officialgds.yaml untouched. Green will mean all screen gates passed,not merely collected measurements; still not DRT/extracted/official signoff.
+- Fifty focused tests pass. Both exact clean source/hash/one-setting deltas,pinned schema,actualTTmerges and shell/Python syntax pass. Native effect guard verifies balance flag and absence of excluded coarse cells with replacement counts. Next publish reviewed tools/tests/CI/docs under standing user approval and launch both root controls. Preserve unrelated files/FIPE. No DRT,phase ticks or watcher; receipts follow.
+
+## 2026-10-28 — Verify completed late-hold and wire150 controls
+
+- Both measurement jobs completed on e78b862. Retrieved bounded artifacts12792081917/12793966701 and independently matched repeated raw3corner/fresh antenna metrics to receipts; effective native targets confirmed.
+- late_hold17540621704922: setup F/T/S0/0/-0.583896ns; hold0.102520/0.337720/0.737308ns; electrical0; antenna11nets/12pins; finaloverflow5; area685386.09um²/45838instances. Fast hold improves but slow setup/antenna/congestion regress.
+- late_wire15040621707923: setup0all; hold-0.164690/0.027338/0.386555ns; electrical0; antenna5nets/5pins; finaloverflow9; area690335.77um²/47694instances. Fewer antenna nets but much worse fast hold and overflow returns. Neither qualifies; no blind combination or further margin increment.
+- Retain wire200 as the electrically clean zero-overflow reference, not as a qualifying design. Next inspect new hold175slow setup path and wire150fast clock/data paths against that reference before another experiment. No new dispatch,DRT,phase ticks,watcher,hardware/constraint/official-workflow change. Unrelated files/FIPE preserved; results/report receipt remains local pending next reviewed publication.
+
 ## 2026-10-27 — Diagnose wire200 residuals and prepare hold/wire controls
+
+- Publication receipt: 5411caf evidence/profiles, fd607f3 CI, e78b862 docs pushed; remote main verified e78b862c35c0131bb5299b23ac543fb5d32c82a6. Launched [late_hold175 40621704922](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40621704922), verified in_progress, and [late_wire150 40621707923](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40621707923), initially queued, both exact SHA. No reference rerun, DRT, watcher, official-template/main-hardware change or unrelated-file publication. Next inspect native command receipts, physical effect and fresh final gates for each. This launch receipt remains local until next evidence update.
 
 - Bound40602600864residual evidence to actual pre/post-late netlists and fast min report. Seven existing antenna sink pairs/eight layer rows; six nets lack diode, four sinks are delay-cell inputs. Worst hold slot latch_53493_→FF_49585_has launch/capture clock0.520143/0.895424ns,dataarrival1.095739vsrequired1.121309ns. No same-path drift or checker-corner shortcut claim.
 - D-128independently tests native late hold75→175ps or wire target200→150um against measured wire200; early175/diode-only,fullnative rerouting and final gates stay fixed. No ineffective slew30/antenna50combination,clock/SDC/official-template or mainhardware change. More target is not guaranteed linear final gain; area/congestion/antenna/runtime risks remain.

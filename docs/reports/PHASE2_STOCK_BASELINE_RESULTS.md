@@ -416,3 +416,28 @@ All seven antenna connections on wire200 existed before late repair. Six nets ha
 Worst fast hold path: slot latch_53493_/Q→register_49585_/D. Launch clock0.520143ns, capture clock0.895424ns (375.281psdifference), data arrival1.095739ns, data required1.121309ns. Fixed250psuncertainty and library hold apply normally. The path has several logic gates, not merely a direct short feedthrough. Native late stage reports75psbefore final placement/rerouting; exact same-path before/after drift has not been proved.
 
 Prepare two independent one-setting controls: late_hold175 raises late native hold target75→175ps on wire200, while late_wire150 lowers the native wire target200→150um with late75psunchanged. Neither combines the ineffective slew30orantenna50settings. A100pstarget increment is not a guaranteed final100psgain. Every fresh final gate remains mandatory, including electrical0,antenna0,fast≥50psand congestion readiness. Costs are additional delay/long-wire buffers, area/congestion and possible setup/hold/antenna regressions. No detailed routing or official-flow change.
+
+
+## 2026-10-28: extra late hold reserve and wire150 do not close the screen
+
+Both jobs complete as successful measurement runs on e78b862. Bounded artifacts12792081917 (hold175,255025981bytes) and12793966701 (wire150,261167331bytes) retrieved. Independently matched all three-corner receipt metrics against both repeated raw STA reports and antenna counts against fresh raw metrics. Native command receipts confirm the selected controls.
+
+| Run/control | Setup F/T/S (ns) | Hold F/T/S (ns) | Electrical | Antenna nets/pins | Final global overflow |
+| --- | --- | --- | --- | --- | ---: |
+| [40621704922 late_hold175](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40621704922) | 0/0/-0.583896 | 0.102520 / 0.337720 / 0.737308 | all0 | 11/12 | 5 |
+| [40621707923 late_wire150](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40621707923) | 0/0/0 | -0.164690 / 0.027338 / 0.386555 | all0 | 5/5 | 9 |
+
+Hold175 improves fast hold by128.0904ps relative to wire200, but loses slow setup and worsens antenna/congestion. Final area685386.09um²/45838instances, +7185.03um²/+440instances against wire200. Wire150 reduces antenna7→5nets but fast hold worsens139.1196ps and overflow returns. Final area690335.77um²/47694instances, +12134.71um²/+2296instances against wire200. Neither is a qualified replacement for wire200, and combining them is not supported by the data.
+
+The best reference for further residual analysis remains wire20040602600864: electrical0/overflow0/seven antenna nets, but negative fast hold. It also does not qualify. Next inspect new slow setup paths from hold175 and fast launch/capture paths from wire150 alongside wire200 before selecting another physical experiment; do not assume another margin increment is sufficient. Main hardware/clock/constraints/official workflow unchanged. No DRT, phase checklist tick or new run dispatched in this result review.
+
+
+## 2026-10-28: coupled-path diagnosis and strict qualification
+
+The failed slow setup path in hold175run40621704922 launches from SRAM A_DOUT[11] and ends at_49700_/D. New hold15671,hold15800,hold15681,hold15682andhold15683instances are absent before late repair and present afterward. Their final slow cell arcs are0.737336,0.660899,0.644429,0.651298and0.659160ns (sum3.353122ns). They are significant delay on the setup-critical path. This does not prove the entire before/after change is that sum: routing, other cells and clock paths also change. ResizerStep's default RSZ_CORNERS=None loads all STA_CORNERS, confirmed by native logs; setting a missing corner list is not the supported fix.
+
+D-129 independently tests native clock-level balancing and a single-cell exclusion against wire200. [OpenROAD CTS documentation](https://openroad.readthedocs.io/en/latest/main/src/cts/README.html) describes balance_levels as attempting similar depth across non-register cells such as clock gates. Pinned LibreLane forwards CTS_BALANCE_LEVELS directly. EXTRA_EXCLUDED_CELLS is supported by pinned synthesis and PnR code and applies globally, not only to late hold repair. Exclude only sg13cmos5l_dlygate4sd3_1; smaller delay/buffer choices remain. Both mechanisms have area/congestion/timing risks and neither is claimed to close the screen. Main RTL/resources/protocol behavior, native tool/order/full rerouting and every timing constraint remain fixed.
+
+The workflow now runs stock_screen_gate.py after fresh audits. Green requires all existing final gates simultaneously, not measurement completion alone. The gate checks final source/view hashes, both repeated raw all-corner metrics, raw final antenna counts and the last global-routing overflow total bound to the actual final physical checkpoint. It rejects missing/invalid/stale data and never rounds fast hold up to50ps. Always-upload remains active after gate failure. screen_qualification.json explicitly distinguishes pre-DRT qualification from official GDS signoff. No automatic detailed routing.
+
+Fifty focused tests pass. Both exact clean preparations/source hashes/single-setting config deltas, pinned schema, actual TT merged values and workflow shell/embedded Python syntax pass. The newly added strict gate is a project diagnostic step; template gds.yaml and main src/config remain unchanged. Raw data stays in artifacts/local build directories; derived identities and hashes are in coupled_timing_root_cause.json. Physical controls pending.

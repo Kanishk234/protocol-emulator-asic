@@ -37,7 +37,16 @@
     "gate_level_caveat": "Unweighted mapped combinational gate counts, not STA delay or routed timing.",
     "protocol_suite": {
       "cases": 22,
-      "status": "running with host-permitted offline sigrok; no skips claimed"
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "simulator": "Icarus RTL with host-permitted offline sigrok decoding",
+      "simulation_ns": 122863560.02,
+      "elapsed_seconds": 920.96,
+      "xml_sha256": "7f3299c0233ca94c4d633cde59b219b301e606cfc709be5f49d80755b7616005",
+      "source_sha256": "f011e364a216397c01f9633e4c38e2df412258861343c262f8d6d5e09e6b93c5",
+      "scope": "Existing exercised firmware/reference-model cases, not exhaustive conformance, SDF or silicon",
+      "local_waveform_output_disabled": true
     }
   },
   "comparative_mapping_replay": {

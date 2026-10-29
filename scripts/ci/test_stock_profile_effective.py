@@ -210,3 +210,32 @@ def test_disabled_mirroring_requires_late_legalization_log(tmp_path):
     selected = fixture(tmp_path, {'PL_OPTIMIZE_MIRRORING': False})
     with pytest.raises(ValueError, match='Expected one'):
         validate(tmp_path, selected)
+
+
+@pytest.mark.parametrize('early,late,valid', [(0.275, 0.075, True),
+                                           (0.175, 0.075, False),
+                                           (0.275, 0.175, False)])
+def test_earlier_repair_schedule_verifies_both_native_targets(tmp_path, early, late, valid):
+    changes = dict(RUN_POST_GRT_RESIZER_TIMING=True,
+                   PL_RESIZER_HOLD_SLACK_MARGIN=0.275,
+                   GRT_RESIZER_HOLD_SLACK_MARGIN=0.075,
+                   GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=200,
+                   GRT_ANTENNA_REPAIR_DIODE_ONLY=True,
+                   CTS_SINK_CLUSTERING_MAX_DIAMETER=100)
+    selected = fixture(tmp_path, changes, wire=200, late=late, diode=True)
+    for stage, filename, text in [
+        ('35-openroad-cts', 'openroad-cts.log',
+         '+ clock_tree_synthesis -sink_clustering_size 8 -sink_clustering_max_diameter 100\n'),
+        ('37-openroad-resizertimingpostcts', 'openroad-resizertimingpostcts.log',
+         f'+ repair_timing -hold -hold_margin {early}\n'),
+    ]:
+        path = tmp_path / stage / filename
+        path.parent.mkdir()
+        path.write_text(text)
+    if valid:
+        result = validate(tmp_path, selected)
+        assert result['native_early_hold_target_ns'] == 0.275
+        assert result['native_late_hold_target_ns'] == 0.075
+    else:
+        with pytest.raises(ValueError, match='not exercised'):
+            validate(tmp_path, selected)

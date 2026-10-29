@@ -48,11 +48,24 @@ def validate(root, manifest, run, artifact, *, require_runner_root=False):
         if name not in files or not local(name).is_file():
             raise ValueError(f'Unbound physical view: {key}')
     config = json.loads(local('src/config.json').read_text())
-    if (config['CLOCK_PERIOD'] != 20
-            or config['PL_RESIZER_HOLD_SLACK_MARGIN'] != 0.275
-            or config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] != 300
-            or config['GRT_OVERFLOW_ITERS'] != 100
-            or config['RUN_POST_GRT_RESIZER_TIMING'] is not False
+    recipes = {
+        'recovered_hold275': dict(CLOCK_PERIOD=20, PL_RESIZER_HOLD_SLACK_MARGIN=0.275,
+                                 GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=300,
+                                 GRT_OVERFLOW_ITERS=100, RUN_POST_GRT_RESIZER_TIMING=False),
+        'shared_cluster100': dict(CLOCK_PERIOD=20, PL_RESIZER_HOLD_SLACK_MARGIN=0.175,
+                                 GRT_RESIZER_HOLD_SLACK_MARGIN=0.175,
+                                 GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=200,
+                                 GRT_OVERFLOW_ITERS=100, RUN_POST_GRT_RESIZER_TIMING=True,
+                                 CTS_SINK_CLUSTERING_MAX_DIAMETER=100,
+                                 GRT_ANTENNA_REPAIR_DIODE_ONLY=True),
+    }
+    recipe = manifest.get('recipe', 'recovered_hold275')
+    if recipe not in recipes:
+        raise ValueError('Unknown recovered physical recipe')
+    expected = recipes[recipe]
+    if (any((config.get(key) is not value) if isinstance(value, bool)
+            else (type(config.get(key)) not in (int, float) or config[key] != value)
+            for key, value in expected.items())
             or 'PNR_SDC_FILE' in config or 'SIGNOFF_SDC_FILE' in config):
         raise ValueError('Wrong recovered physical recipe')
     return source

@@ -1,0 +1,314 @@
+{
+  "source_run": 40779354529,
+  "artifact_id": 12861176866,
+  "branches": {
+    "_22096_": {
+      "origin_manhattan_span_um": 202.2,
+      "direct_diodes": [],
+      "pre_antenna_connections": [
+        {
+          "instance": "wire12360",
+          "pin": "A",
+          "master": "sg13cmos5l_buf_1"
+        },
+        {
+          "instance": "_27490_",
+          "pin": "Y",
+          "master": "sg13cmos5l_nor4_1"
+        }
+      ],
+      "root_cell_pins": {
+        "A": "net12410",
+        "B": "net1897",
+        "C": "_22090_",
+        "D": "_22094_",
+        "Y": "_22096_"
+      },
+      "upstream_buffer_delay_chain": [
+        {
+          "net": "_22096_",
+          "instance": "_27490_",
+          "master": "sg13cmos5l_nor4_1",
+          "output": "Y"
+        }
+      ]
+    },
+    "net12867": {
+      "origin_manhattan_span_um": 198.54,
+      "direct_diodes": [],
+      "pre_antenna_connections": [
+        {
+          "instance": "wire12867",
+          "pin": "A",
+          "master": "sg13cmos5l_buf_1"
+        },
+        {
+          "instance": "_31912_",
+          "pin": "D",
+          "master": "sg13cmos5l_nor4_1"
+        },
+        {
+          "instance": "wire12868",
+          "pin": "X",
+          "master": "sg13cmos5l_buf_2"
+        }
+      ],
+      "root_cell_pins": {
+        "Y": "_05498_",
+        "B": "net2816",
+        "A_N": "net2840"
+      },
+      "upstream_buffer_delay_chain": [
+        {
+          "net": "net12867",
+          "instance": "wire12868",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net12868",
+          "instance": "wire12869",
+          "master": "sg13cmos5l_buf_1",
+          "output": "X"
+        },
+        {
+          "net": "net12869",
+          "instance": "wire12870",
+          "master": "sg13cmos5l_buf_1",
+          "output": "X"
+        },
+        {
+          "net": "net12870",
+          "instance": "wire12871",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net2339",
+          "instance": "fanout2339",
+          "master": "sg13cmos5l_buf_1",
+          "output": "X"
+        },
+        {
+          "net": "_05498_",
+          "instance": "_31909_",
+          "master": "sg13cmos5l_nand2b_1",
+          "output": "Y"
+        }
+      ]
+    },
+    "net13931": {
+      "origin_manhattan_span_um": 198.78,
+      "direct_diodes": [],
+      "pre_antenna_connections": [
+        {
+          "instance": "wire13931",
+          "pin": "A",
+          "master": "sg13cmos5l_buf_1"
+        },
+        {
+          "instance": "wire13932",
+          "pin": "X",
+          "master": "sg13cmos5l_buf_2"
+        }
+      ],
+      "root_cell_pins": {
+        "RESET_B": "net4882",
+        "D": "_00533_",
+        "Q": "u_chip.g_lane[1].regs[60]",
+        "CLK": "clknet_leaf_256_clk_regs"
+      },
+      "upstream_buffer_delay_chain": [
+        {
+          "net": "net13931",
+          "instance": "wire13932",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net10730",
+          "instance": "hold10731",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "output": "X"
+        },
+        {
+          "net": "u_chip.g_lane[1].regs[60]",
+          "instance": "_49816_",
+          "master": "sg13cmos5l_dfrbpq_1",
+          "output": "Q"
+        }
+      ]
+    },
+    "net14359": {
+      "origin_manhattan_span_um": 210.72,
+      "direct_diodes": [],
+      "pre_antenna_connections": [
+        {
+          "instance": "wire14359",
+          "pin": "A",
+          "master": "sg13cmos5l_buf_1"
+        },
+        {
+          "instance": "_31978_",
+          "pin": "A",
+          "master": "sg13cmos5l_nor4_1"
+        },
+        {
+          "instance": "wire14360",
+          "pin": "X",
+          "master": "sg13cmos5l_buf_2"
+        }
+      ],
+      "root_cell_pins": {
+        "RESET_B": "net5202",
+        "D": "_02231_",
+        "Q": "u_chip.g_unit[0].u_cfg.waddr[3]",
+        "CLK": "clknet_leaf_26_clk_regs"
+      },
+      "upstream_buffer_delay_chain": [
+        {
+          "net": "net14359",
+          "instance": "wire14360",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net14360",
+          "instance": "wire14361",
+          "master": "sg13cmos5l_buf_1",
+          "output": "X"
+        },
+        {
+          "net": "net14363",
+          "instance": "wire14364",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net14364",
+          "instance": "wire14365",
+          "master": "sg13cmos5l_buf_1",
+          "output": "X"
+        },
+        {
+          "net": "net14365",
+          "instance": "wire14366",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net14366",
+          "instance": "wire14367",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net14367",
+          "instance": "wire14368",
+          "master": "sg13cmos5l_buf_2",
+          "output": "X"
+        },
+        {
+          "net": "net15546",
+          "instance": "hold15547",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "output": "X"
+        },
+        {
+          "net": "net2798",
+          "instance": "fanout2798",
+          "master": "sg13cmos5l_buf_1",
+          "output": "X"
+        },
+        {
+          "net": "u_chip.g_unit[0].u_cfg.waddr[3]",
+          "instance": "_51538_",
+          "master": "sg13cmos5l_dfrbpq_1",
+          "output": "Q"
+        }
+      ]
+    },
+    "u_chip.g_lane[1].ot[27]": {
+      "origin_manhattan_span_um": 151.92,
+      "direct_diodes": [],
+      "pre_antenna_connections": [
+        {
+          "instance": "hold11171",
+          "pin": "A",
+          "master": "sg13cmos5l_dlygate4sd3_1"
+        },
+        {
+          "instance": "_49747_",
+          "pin": "Q",
+          "master": "sg13cmos5l_dfrbpq_1"
+        },
+        {
+          "instance": "_48983_",
+          "pin": "B1",
+          "master": "sg13cmos5l_a22oi_1"
+        }
+      ],
+      "root_cell_pins": {
+        "RESET_B": "net4975",
+        "D": "_00464_",
+        "Q": "u_chip.g_lane[1].ot[27]",
+        "CLK": "clknet_leaf_297_clk_regs"
+      },
+      "upstream_buffer_delay_chain": [
+        {
+          "net": "u_chip.g_lane[1].ot[27]",
+          "instance": "_49747_",
+          "master": "sg13cmos5l_dfrbpq_1",
+          "output": "Q"
+        }
+      ]
+    }
+  },
+  "native_heuristic_threshold_proxy": {
+    "90": {
+      "nets": 8900,
+      "terminals": 40136,
+      "diode_area_proxy_um2": 218468.28
+    },
+    "130": {
+      "nets": 6091,
+      "terminals": 25891,
+      "diode_area_proxy_um2": 140929.89
+    },
+    "150": {
+      "nets": 4774,
+      "terminals": 19681,
+      "diode_area_proxy_um2": 107127.62
+    },
+    "160": {
+      "nets": 4158,
+      "terminals": 16874,
+      "diode_area_proxy_um2": 91848.56
+    },
+    "200": {
+      "nets": 1173,
+      "terminals": 5024,
+      "diode_area_proxy_um2": 27346.64
+    }
+  },
+  "diode_library_area_um2": 5.4432,
+  "input_sha256": {
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.def": "d1ef58c4d05a4c1e67c2fd8b9f04d76947e37a409c2c060d7dfb7d2a230a71b3",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "62037319124723a87c0fb10e155c715f316a82a16e806088b37c907c1ca47cea"
+  },
+  "library_sha256": "34163f3e7de9f854afac57332ba06f1739b78e7ac35660a8a5ddd39c570124ad",
+  "native_controls": {
+    "RUN_HEURISTIC_DIODE_INSERTION": false,
+    "HEURISTIC_ANTENNA_THRESHOLD": 90,
+    "GPL_CELL_PADDING": 0,
+    "DPL_CELL_PADDING": 0
+  },
+  "decision": "Do not blindly enable broad native heuristic insertion: investigate its large area/capacitance cost and zero-padding placement risk first. No heuristic experiment launched.",
+  "limitations": [
+    "Counts use DEF cell origins,not exact pin positions/ODB; they are screening estimates,not exact inserter predictions.",
+    "Native inserter uses ITerm average pin coordinates,skips special/protected/port nets,and inserts on each terminal of selected internal nets. No clock-net exclusion is present in the reviewed native code.",
+    "No estimate includes legalization,extra routing,added buffer cost or timing effects.",
+    "An ECO diode step exists in the library but is absent from stock Classic; do not append it to the official flow.",
+    "Earlier post-antenna timing is unmeasured; a separate read-only audit is prepared to test whether optional native late repair is necessary."
+  ]
+}

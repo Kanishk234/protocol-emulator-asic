@@ -1,0 +1,147 @@
+{
+  "source_run": 40779354529,
+  "head_sha": "ee9eed451c8b4ac2cc051fefd7b25084e237b51c",
+  "artifact_id": 12861176866,
+  "artifact_size": 253260280,
+  "raw_reports_match_repeated_audit": true,
+  "qualification": {
+    "qualified": false,
+    "failures": [
+      "antenna__violating__nets: 5",
+      "antenna__violating__pins: 5"
+    ],
+    "final_global_overflow": 0,
+    "source_state": "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json",
+    "minimum_fast_hold_ns": 0.05,
+    "detailed_routing_performed": false,
+    "official_gds_signoff": false
+  },
+  "fresh_corner_metrics": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0935213,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.739804,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.340985,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "fresh_antenna_metrics": {
+    "antenna__violating__nets": 5,
+    "antenna__violating__pins": 5
+  },
+  "final_overflow_row": "Total           601423        308600           51.31%             0 /  0 /  0",
+  "violated_rules": [
+    {
+      "net": "_22096_",
+      "pin": "wire12360/A",
+      "layer": "Metal3",
+      "kind": "Cumulative area",
+      "ratio": 202.98,
+      "limit": 200.0
+    },
+    {
+      "net": "u_chip.g_lane[1].ot[27]",
+      "pin": "hold11171/A",
+      "layer": "Metal2",
+      "kind": "Cumulative area",
+      "ratio": 244.2,
+      "limit": 200.0
+    },
+    {
+      "net": "net12867",
+      "pin": "wire12867/A",
+      "layer": "Metal2",
+      "kind": "Cumulative area",
+      "ratio": 210.02,
+      "limit": 200.0
+    },
+    {
+      "net": "net13931",
+      "pin": "wire13931/A",
+      "layer": "Metal3",
+      "kind": "Cumulative area",
+      "ratio": 218.71,
+      "limit": 200.0
+    },
+    {
+      "net": "net14359",
+      "pin": "wire14359/A",
+      "layer": "Metal2",
+      "kind": "Cumulative area",
+      "ratio": 201.1,
+      "limit": 200.0
+    }
+  ],
+  "effective_profile": {
+    "profile": "rtl_shared_cluster100",
+    "changes": {
+      "RUN_POST_GRT_RESIZER_TIMING": true,
+      "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+      "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+      "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+      "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+      "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100
+    },
+    "requested_density_pct": 56,
+    "initial_effective_density_pct": 61.0,
+    "native_clock_cluster_max_diameter_um": 100.0,
+    "native_clock_cluster_size": 8,
+    "native_max_wire_length_um": 200.0,
+    "native_late_hold_target_ns": 0.175,
+    "native_antenna_mode": "diode_only",
+    "native_early_hold_target_ns": 0.175
+  },
+  "input_sha256": {
+    "runs/stock-corner-audit/screen_qualification.json": "00a9c27751d2409f0da88de9e5263b45e64b528cbf9fa16e665f6ecead0b21e5",
+    "runs/stock-corner-audit/comparison.json": "7c480d8f1f1f70e217314a750e36534b3b36d2e5e07c45393a176ca624b5b48e",
+    "runs/stock-corner-audit/read_only_audit.json": "2c3b20f56fd490d6965d8cd50437d75bc3150cd9e8d2d8d16b5e3c3c6f982d58",
+    "runs/stock-official-baseline/effective_profile.json": "78408749d0c5b1e068d7cb0e956e66dce47c69c330c01150649c581627f99cdf",
+    "runs/stock-official-baseline/resolved.json": "71c1d1bd75ea6c624cafb39d5454d19231aa9702c0a249c789b819efd4b26eee",
+    "runs/stock-corner-audit/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "9bdc0ca0c72d210918198e97eba4655403d0ca3ff483e2ef344a82f824f8af6c",
+    "runs/stock-corner-audit/after-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "a126337543569d810194b8c902187e380878a8e7d46c0235e9f4bec7c67b6173",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/checks.rpt": "500725dfd150debfb7190ac9c7687e3041c8fad3a293a5b10c1878698797e8f4",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "e22add2214581134ac403d4ff4ee1b5168e57fc4d59dd4a3600eccdbf4c05af3",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/checks.rpt": "a31b9b89c4853c2bd6b94b367e6d74919dcd83e18c7d3207b043649beeb9479a",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "a126337543569d810194b8c902187e380878a8e7d46c0235e9f4bec7c67b6173",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/or_metrics_out.json": "15974a0489fc8ac2f2b502ab82033bc04be4486b6bec7fe15dd9463b7c953107",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna_summary.rpt": "285720a73e1c24f89c5c6654a008d2302835ad4736162f5760c4348cdd6c8ac0",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna.rpt": "6f3e8945ec534396ec2982a5e1d90adc8370c46d4dfc82c87d0b9bf66005e93b",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/checks.rpt": "cac99ea05e42b149ef1c7b8452718a427426ad590040e7eff674d90aec9a0df2",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "9bdc0ca0c72d210918198e97eba4655403d0ca3ff483e2ef344a82f824f8af6c",
+    "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "e22add2214581134ac403d4ff4ee1b5168e57fc4d59dd4a3600eccdbf4c05af3",
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log": "e4422cd2fc32e15df1ca3ad9109cd5c973cba5a1a7ec284f796e09720f05107d",
+    "runs/stock-official-baseline/41-openroad-repairdesignpostgrt/or_metrics_out.json": "fd3dca8eabcfcd867fa11b06eb0f7580a633e2c8a514611cae2bafea02b87c5a",
+    "runs/stock-official-baseline/35-openroad-cts/openroad-cts.log": "0fc511d9ffdf1ce76e641fb047d94b8ecc5bdc4579158b571f7f0a781d535cce",
+    "runs/stock-official-baseline/39-openroad-globalrouting/openroad-globalrouting.log": "d513deffbb4814709cbd78063140bea3a7555328555aabf3ded7450c44b5682b",
+    "runs/stock-official-baseline/45-openroad-stamidpnr-3/checks.rpt": "a31b9b89c4853c2bd6b94b367e6d74919dcd83e18c7d3207b043649beeb9479a",
+    "runs/stock-official-baseline/45-openroad-stamidpnr-3/or_metrics_out.json": "32fdad221ca47cef39e5b6f66aa72c44da995d0811b09d5f5c15ac66e57fec50",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log": "e0806d8e933690ee664c3f6843e0f3707edf5fe0aba8eaa52ef2d7df143539d1",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/or_metrics_out.json": "84dfb5872384af137b4931dcdd97291d66cbbdab781f1aed73945609ed49e474",
+    "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/openroad-diodeinsertion.log": "f1ae56431749b640f0f0976066b28df15860c79bbbe1501bc130a4694eb10f97",
+    "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/or_metrics_out.json": "2f1a92ce884d8fec74fee95d32fac24b4914a5af923f552344e79d7e0469564d",
+    "runs/stock-official-baseline/43-openroad-repairantennas/2-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+    "runs/stock-official-baseline/43-openroad-repairantennas/2-openroad-checkantennas/reports/antenna_summary.rpt": "bd4c6489f063ba0e337ce9356da7a70bf063e08c5713b64eac28b6f9cd496d6a",
+    "runs/stock-official-baseline/43-openroad-repairantennas/2-openroad-checkantennas/reports/antenna.rpt": "88ceef0b63031420e468a911f7c57fd68d4c409b45a681c14667323216ceb4fb",
+    "spikes/phase2_stock_flow/selected_profile.json": "aad93b3400bc71e955a0bf7f1088f76cac3df73a7de7bfebf895f56fc83e7da3"
+  },
+  "limitations": [
+    "No detailed routing/extraction or official GDS signoff.",
+    "Zero reported setup slack does not establish positive reserve.",
+    "Changed physical topology means not all failing nets correspond directly to previous residuals.",
+    "Keep this improved reference; no combination or extra screen dispatched."
+  ]
+}

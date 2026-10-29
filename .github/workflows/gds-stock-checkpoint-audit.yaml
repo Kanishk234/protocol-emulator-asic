@@ -1,7 +1,14 @@
-# Read-only recovery of a timed-out diagnostic; no physical continuation or DRT.
+# Read-only frozen-checkpoint measurements; no physical continuation or DRT.
 name: gds-stock-checkpoint-audit
 'on':
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      checkpoint:
+        description: Frozen source for read-only repeated corner STA and antenna checks
+        type: choice
+        options: [recovered_hold275, shared_cluster100_postant]
+        default: shared_cluster100_postant
+        required: true
 permissions:
   contents: read
   actions: read
@@ -14,31 +21,53 @@ jobs:
     timeout-minutes: 90
     env:
       PDK_ROOT: /home/runner/pdk
+      CHECKPOINT: ${{ inputs.checkpoint }}
     steps:
     - name: Check out project
       uses: actions/checkout@v6
       with:
         submodules: recursive
+    - name: Select the reviewed frozen source
+      run: |-
+        python - <<'PYCODE'
+        import json, os
+        from pathlib import Path
+        manifests = {
+            'recovered_hold275': 'spikes/phase2_stock_flow/recovery_40427663913.json',
+            'shared_cluster100_postant': 'spikes/phase2_stock_flow/shared_cluster100_postant_checkpoint.json',
+        }
+        path = manifests[os.environ['CHECKPOINT']]
+        manifest = json.loads(Path(path).read_text())
+        values = dict(SOURCE_MANIFEST=path, SOURCE_RUN=manifest['run']['id'],
+                      SOURCE_ARTIFACT=manifest['artifact']['id'],
+                      SOURCE_ARTIFACT_NAME=manifest['artifact']['name'])
+        with open(os.environ['GITHUB_ENV'], 'a') as output:
+            for key, value in values.items():
+                output.write(f'{key}={value}\n')
+        PYCODE
     - name: Restore and hash-verify the frozen physical checkpoint
       env:
         GH_TOKEN: ${{ github.token }}
       run: |-
         set -euo pipefail
-        gh api repos/${{ github.repository }}/actions/runs/40427663913 > recovery-source-run.json
-        gh api repos/${{ github.repository }}/actions/artifacts/12706452587 > recovery-source-artifact.json
-        gh run download 40427663913 --name stock-official-baseline-40427663913 --dir frozen-artifact
+        gh api repos/${{ github.repository }}/actions/runs/$SOURCE_RUN > recovery-source-run.json
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT > recovery-source-artifact.json
+        gh run download "$SOURCE_RUN" --name "$SOURCE_ARTIFACT_NAME" --dir frozen-artifact
         python - <<'PYCODE'
-        import hashlib, json, shutil, sys
+        import hashlib, json, os, shutil, sys
         from pathlib import Path
         sys.path.insert(0, 'scripts/ci')
         from stock_checkpoint_recovery import validate
-        manifest = json.loads(Path('spikes/phase2_stock_flow/recovery_40427663913.json').read_text())
+        manifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
         run = json.loads(Path('recovery-source-run.json').read_text())
         artifact = json.loads(Path('recovery-source-artifact.json').read_text())
         # Verify all frozen inputs before copying to their original runner paths.
         validate(Path('frozen-artifact'), manifest, run, artifact)
         assert not Path('runs').exists(), 'Unexpected existing physical output'
-        for folder in ('runs', 'src', 'macro'):
+        # Do not restore the source run's completed corner audit into our fresh output path.
+        shutil.copytree(Path('frozen-artifact/runs/stock-official-baseline'),
+                        Path('runs/stock-official-baseline'))
+        for folder in ('src', 'macro'):
             shutil.copytree(Path('frozen-artifact') / folder, Path(folder), dirs_exist_ok=True)
         shutil.copy2('frozen-artifact/info.yaml', 'info.yaml')
         source = validate(Path('.'), manifest, run, artifact, require_runner_root=True)
@@ -82,9 +111,9 @@ jobs:
         set -euo pipefail
         docker pull ghcr.io/librelane/librelane:3.1.0.dev3
         python - <<'PYCODE'
-        import json, subprocess
+        import json, os, subprocess
         from pathlib import Path
-        m = json.loads(Path('spikes/phase2_stock_flow/recovery_40427663913.json').read_text())['toolchain']
+        m = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())['toolchain']
         image = m['stock_image']
         digests = json.loads(subprocess.check_output(['docker', 'image', 'inspect', image, '--format', '{{json .RepoDigests}}'], text=True))
         assert image.rsplit(':', 1)[0] + '@' + m['stock_digest'] in digests, 'Stock engine digest differs from source run'
@@ -96,7 +125,7 @@ jobs:
         set -euo pipefail
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
         python - <<'PYCODE'
-        import hashlib, json, math, os, sys
+        import hashlib, json, math, os, shutil, sys
         from pathlib import Path
         sys.path.insert(0, 'scripts/ci')
         from postgrt_timing import CORNERS, screen
@@ -112,13 +141,18 @@ jobs:
             return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
         before = hashes()
         output = Path('runs/stock-corner-audit')
+        assert not output.exists(), 'Refusing inherited audit output'
+        # The source artifact includes generated config_timing files. Keep every
+        # bound source file untouched; a sibling retains dir::../macro semantics.
+        shutil.copytree('src', 'audit-src')
         # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
         # No resizer, repair, placement or routing step is invoked.
-        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source)
+        screen(Path('audit-src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,
+               sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
         # Check antenna on the same final database; do not inherit pre-timing results.
         run_step(json.loads(Path('src/config_merged.json').read_text()), source,
-                 output / 'fresh-antenna', ['OpenROAD.CheckAntennas'])
-        antenna_files = list((output / 'fresh-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))
+                 output / 'fresh-checkpoint-antenna', ['OpenROAD.CheckAntennas'])
+        antenna_files = list((output / 'fresh-checkpoint-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))
         assert len(antenna_files) == 1
         antenna_metrics = json.loads(antenna_files[0].read_text())
         antenna = {key: antenna_metrics[key] for key in ('antenna__violating__nets', 'antenna__violating__pins')}
@@ -136,13 +170,14 @@ jobs:
                 assert math.isfinite(metrics[key]) and abs(metrics[key] - repeated[key]) <= 1e-9, key
             rows[corner] = {key: metrics[key] for key in keys}
         (output / 'read_only_audit.json').write_text(json.dumps(dict(
-            source_state=str(source), source_run=40427663913, recovered_after_timeout=True,
+            source_state=str(source), source_run=json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())['run']['id'],
+            checkpoint_profile=os.environ['CHECKPOINT'],
             unchanged_physical_view_hashes=before,
             fresh_corner_metrics=rows, fresh_antenna_metrics=antenna, physical_repairs_performed=False,
             qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
         from stock_checkpoint_recovery import validate
         validate(Path('.'),
-                 json.loads(Path('spikes/phase2_stock_flow/recovery_40427663913.json').read_text()),
+                 json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text()),
                  json.loads(Path('recovery-source-run.json').read_text()),
                  json.loads(Path('recovery-source-artifact.json').read_text()), require_runner_root=True)
         print(json.dumps(rows, indent=2))
@@ -157,5 +192,5 @@ jobs:
           runs/stock-recovery-validation.json
           recovery-source-run.json
           recovery-source-artifact.json
-          spikes/phase2_stock_flow/recovery_40427663913.json
+          ${{ env.SOURCE_MANIFEST }}
         if-no-files-found: warn

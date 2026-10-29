@@ -7,8 +7,8 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_priority, rtl_shared_cluster100, rtl_shared_no_mirror]
-        default: rtl_shared_cluster100
+        options: [rtl_shared_cluster100, rtl_shared_early275_late75]
+        default: rtl_shared_early275_late75
         required: true
 permissions:
   contents: read
@@ -137,7 +137,8 @@ jobs:
         Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
             profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
             baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
-            comparison_reference_run=profiles.get('comparison_reference_run'),
+            comparison_reference_run=selected.get('comparison_reference_run', profiles.get('comparison_reference_run')),
+            comparison_reference_config_sha256=selected.get('comparison_reference_config_sha256', profiles.get('comparison_reference_config_sha256')),
             additional_changes_from_reference=selected.get('additional_changes_from_reference'),
             hardware_unchanged=selected.get('hardware_unchanged', True),
             rtl_patch=selected.get('rtl_patch')), indent=2) + '\n')

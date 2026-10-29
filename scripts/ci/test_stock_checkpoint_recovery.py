@@ -112,3 +112,35 @@ def test_wrong_recipe_even_with_matching_file_hash(checkpoint):
     manifest['files']['src/config.json'] = hashlib.sha256(config.read_bytes()).hexdigest()
     with pytest.raises(ValueError, match='Wrong recovered physical recipe'):
         validate(root, manifest, run, artifact)
+
+
+@pytest.mark.parametrize('override', [None, ('CLOCK_PERIOD', 40),
+                                    ('CTS_SINK_CLUSTERING_MAX_DIAMETER', 200),
+                                    ('RUN_POST_GRT_RESIZER_TIMING', False),
+                                    ('GRT_ANTENNA_REPAIR_DIODE_ONLY', 1)])
+def test_shared_checkpoint_recipe(checkpoint, override):
+    root, manifest, run, artifact = checkpoint
+    manifest['recipe'] = 'shared_cluster100'
+    config = root / 'src/config.json'
+    values = dict(CLOCK_PERIOD=20, PL_RESIZER_HOLD_SLACK_MARGIN=0.175,
+                  GRT_RESIZER_HOLD_SLACK_MARGIN=0.175,
+                  GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=200, GRT_OVERFLOW_ITERS=100,
+                  RUN_POST_GRT_RESIZER_TIMING=True,
+                  CTS_SINK_CLUSTERING_MAX_DIAMETER=100,
+                  GRT_ANTENNA_REPAIR_DIODE_ONLY=True)
+    if override:
+        values[override[0]] = override[1]
+    config.write_text(json.dumps(values))
+    manifest['files']['src/config.json'] = hashlib.sha256(config.read_bytes()).hexdigest()
+    if override:
+        with pytest.raises(ValueError, match='Wrong recovered physical recipe'):
+            validate(root, manifest, run, artifact)
+    else:
+        assert validate(root, manifest, run, artifact).is_file()
+
+
+def test_unknown_recipe_rejected(checkpoint):
+    root, manifest, run, artifact = checkpoint
+    manifest['recipe'] = 'unreviewed'
+    with pytest.raises(ValueError, match='Unknown recovered physical recipe'):
+        validate(root, manifest, run, artifact)

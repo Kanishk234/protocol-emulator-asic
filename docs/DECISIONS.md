@@ -1454,6 +1454,16 @@ Instead extend the existing separate read-only checkpoint-audit workflow with an
 
 This measures whether the current source's earlier zero-antenna checkpoint has enough hold reserve without optional late native timing repair. It does not change that source recipe, bypass final qualification, disable rerouting, append repair steps or authorize DRT. If the audit is promising, a separate native conditional configuration screen is still required; main config adoption remains owner-reviewed. If timing fails, the measurement identifies the need for late repair and avoids a full synthesis/place rerun. Seventy-seven focused tests, actual 55-file/provenance validation, source selection and embedded syntax checks pass. No hardware, official workflow, SDC or gate changes.
 
+## D-135 (2026-10-28): shift native hold targets earlier while retaining final repair and routing evidence
+
+Use measured clock10040779354529as the reference: setup0allcorners,fast93.5213ps,electrical/overflow0but5data antennas. Read-only audit40793477453proves the earlier antenna-clean snapshot has−6.51512psfast hold, so omitting late repair alone is not supported. No-mirroring40781730206worsens setup/overflow and does not solve antennas; do not combine it blindly with clock100.
+
+Test one paired repair schedule on byte-identical verified full RTL: PL_RESIZER_HOLD_SLACK_MARGIN0.175→0.275ns and GRT_RESIZER_HOLD_SLACK_MARGIN0.175→0.075ns. Keep clock diameter100µm,size8,wire200,diode-only repair,mirroring/defaults,20ns/SDC and native scripts/image/order. Keep RUN_POST_GRT_RESIZER_TIMING=true and full late rerouting. The strategy moves nominal optimizer effort earlier, before antenna repair; the targets are not additive delay budgets. Two controls change together, so individual contributions are not isolated.
+
+Cost/risk: earlier hold buffers can worsen slow setup, area and congestion; the lower late target can leave inadequate post-route hold reserve. Later legalization/rerouting can still re-expose antennas even when no late buffers are inserted. This is a measured test, not a promised fix. The final acceptance gate remains50psfast hold and zero other violations. Keep the existing final-ODB-bound overflow check unchanged: removing the late stage would otherwise remove its evidence source, and an earlier inherited zero is not acceptable.
+
+Eighty focused guard tests pass, including wrong early/late target rejection; clean exact preparation, full RTL/SDC/Tcl hash equality, only-two-config-target delta, measured reference binding, actual TT merge and syntax pass. Main hardware/config/official GDS and screen-gate implementation remain unchanged. Evidence: early_repair_schedule_evidence.json. No new functional proof is needed for identical source; previously recorded22/22RTL replay and named equivalence scope apply. No DRT or phase-completion claim.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

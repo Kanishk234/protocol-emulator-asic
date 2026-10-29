@@ -550,3 +550,39 @@ A deliberately approximate DEF-origin proxy at the default90µm threshold counts
 The more focused independent task is a repeated all-corner read-only audit of the frozen post-antenna checkpoint from40779354529. Its raw antenna count is zero, but timing at that exact checkpoint has not yet been established. The existing separate checkpoint-audit workflow now supports an explicit shared_cluster100_postant choice, with55hash-bound input files and matching source/artifact/toolchain metadata. Only physical-run files are restored under runs; the source's completed corner audit is excluded to prevent stale output reuse. Original stock image digest and source-view hash stability remain mandatory.
 
 The new audit invokes no synthesis, placement, repair or routing and performs no qualification. Its purpose is to determine whether optional native late timing repair is necessary on the improved source. Any promising result still requires a full strict native screen before DRT; a failure usefully identifies needed repair without another physical rerun. Seventy-seven focused guards/tests, actual GitHub provenance and55-file validation, selector execution, YAML/shell/embedded-Python checks pass. Main source/config, official GDS jobs and all gates remain untouched.
+
+
+## 2026-10-28: read-only pre-late audit confirms late repair cannot simply be omitted
+
+[Checkpoint audit40793477453](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40793477453) completes successfully in about7minutes. Its success means valid measurements, not a qualifying design. Actual frozen source/image validation and source-view hashes remain intact. Artifact12863176502(122795880bytes) contains repeated raw measurements; all before/after corner metrics and fresh antenna metrics independently match the receipt.
+
+| Measurement | Saved post-antenna, before late repair | After late repair and rerouting |
+|---|---:|---:|
+| Setup WS fast/typ/slow (ns) | 0 / 0 / 0 | 0 / 0 / 0 |
+| Fast hold (ns) | **−0.00651512** | **0.0935213** |
+| Typical hold (ns) | 0.121036 | 0.340985 |
+| Slow hold (ns) | 0.349841 | 0.739804 |
+| Electrical violations, all corners | 0 | 0 |
+| Antenna nets/pins | **0 / 0** | **5 / 5** |
+
+The earlier checkpoint misses the50psfast reserve by56.51512psand also has negative actual hold. Thus disabling optional late native timing repair alone is ruled out for this exact source/recipe. The final checkpoint gains about100psin the worst fast-hold summary, but the endpoints may differ: this is not a same-path causal delta. Zero antennas before late operations cannot substitute for final qualification.
+
+No new physical run, gate waiver or DRT is justified by this audit. Continue to evaluate the separate no-mirroring result. If it does not preserve the repairs, a further native strategy would move sufficient hold repair earlier, before antenna repair, followed by a complete strict screen. That strategy is untested on the clock100 source; earlier-source margin sweeps were not conclusive closure and must not be claimed as proof. Exact audit data/provenance are in shared_cluster100_postant_result.json.
+
+
+## 2026-10-28: disabling mirroring does not qualify
+
+[40781730206](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40781730206) finishes in about3h40. Native flow and audit complete; final qualification correctly fails. All three legalization logs pass the no-mirroring effect guard. Artifact12868231790(254252499bytes) was read selectively; repeated raw corner/electrical and fresh antenna metrics independently match the receipt.
+
+Setup WS F/T/S0/0/−0.128148ns; hold F/T/S0.0710488/0.31385/0.731379ns. Slew/cap/fanout violations are0throughout, but antennas remain6nets/6pins and final late-GRT overflow is48. Last raw Total row independently confirms48. Area approximately683964µm²/45788instances. Against shared-priority reference, fast reserve passes but setup/overflow worsen; the control does not solve antenna reappearance. Against clock100 it has more failures and higher area. Do not promote this control or assume combining it with clock100 fixes the design.
+
+Keep clock10040779354529as the stronger measured reference: setup0all,fast93.5213ps,electrical0,overflow0,antenna5. The read-only checkpoint audit rules out simply omitting late repair on that source. Next investigate sufficient earlier hold repair before antenna repair, with a full strict native screen required to qualify any changed recipe. No official-flow edits or acceptance relaxation. At the final status check no main-branch workflow is running; GitHub still lists two stale queued diagnostics created2026-10-07,not active new experiments. Exact failed-control data/provenance are in shared_no_mirror_result.json.
+
+
+## 2026-10-28: prepare early275/late75 on the clock100 reference
+
+The next diagnostic keeps the final native repair/reroute stage and its final-ODB-bound overflow evidence. It changes only two optimizer targets against measured40779354529: post-CTS hold target175→275ps, post-GRT target175→75ps. All source,100µmclock clustering,eight-sink mode,wire200,diode-only repair,mirroring/native defaults and20ns/SDCremain fixed. This paired strategy tests whether more repair before antenna insertion and less afterward can preserve antenna cleanliness. It does not assume a linear target-to-slack response or isolate each target independently.
+
+The earlier proposed late-stage omission is not used: the exact earlier snapshot fails hold, and the existing gate correctly requires congestion evidence from the actual final physical checkpoint. No fallback to earlier zero-overflow tables or change to the gate implementation is introduced. Both native commands and resolved values must match the new targets; full late rerouting remains mandatory. A75psoptimizer target does not lower the50psindependent final acceptance requirement.
+
+Earlier repair may add area or damage slow setup/routability, and final mirroring/rerouting may still expose antennas. Keeping the native pipeline intact makes every final gate directly comparable with the clock100reference. Eighty focused guards pass. A clean archived checkout with exact CI preparation reproduces the same complete RTL/SDC/Tcl hashes and only the two selected configuration changes; actual TT merge, per-profile reference/config-hash binding and embedded syntax checks pass. The RTL is unchanged from the22/22protocol replay; no new simulation pass or physical result is claimed. Evidence is early_repair_schedule_evidence.json. Only one new physical screen is planned; no broad sweep, main promotion or official workflow edit.

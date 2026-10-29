@@ -1,0 +1,47 @@
+{
+  "comparison_reference_run": 40779354529,
+  "reference_config_sha256": "6143adc22f3f5066701ae4a9e37680984291f83733eade0c16f50f96dcbc519d",
+  "candidate_config_sha256": "faf391c9475972348c74c30a600f47fed90e6320b7641c62aac5a94ff60d73a9",
+  "changes_from_reference": {
+    "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.075,
+    "PL_RESIZER_HOLD_SLACK_MARGIN": 0.275
+  },
+  "source_hardware_constraints_hashes": {
+    "trw_pin_io.v": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+    "trw_alu.v": "b80e1e36b21217b624277579dacbec34c74ea264671ed8ee751242309027219f",
+    "trw_pin_cfg.v": "a3f4ab08216def6cef7c4c5373ee83acd5f885c7f6de2529678bd68d0edb0452",
+    "trw_lane.v": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+    "trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9",
+    "trw_chip.v": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd",
+    "signoff.sdc": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa",
+    "tt_um_tripwire.v": "f92ba2a7fef45ebb3fb26c01fcb1c3598bb66ef9938c1641b5414ab0bc9c0de9",
+    "trw_chan_port.v": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb",
+    "pdn_cfg.tcl": "0614d6d24202f2e8106d39f08b975443797d36effb5060d03b5736e538d484db",
+    "trw_fabric.v": "f6f5af0e6c9b561bd68fabea949410b15b2b5a1b647d2d291909ef67632aed7f",
+    "trw_spi.v": "ef2203d7c298301d7dd8879f8536df6f55a8cb103f4de080a7fd90e45af646ec",
+    "trw_sram.v": "176405635df07e175a800c13ea29ddf065ca078c1da733d1f681adc833ab53ac",
+    "trw_host.v": "aed5401613c7f7403ee5750f4830b10828d3e9abafe8a25ee698d492cfd6d758",
+    "trw_sync.v": "815ed75caac39b4b9ce951cdf95f95d2a6631e7070b2bd3659fe21fc5a895bb7",
+    "trw_pin_bs.v": "83f82e436b67d79efddae6dc60bdfa4902cf5b250b1cd587ffe2a4c9c1e08340",
+    "trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+    "trw_pin_tx.v": "29bdf26b9cf3d1939d8b8efe7833ac7d6ca1042c71e33c7065462f10e3c7951f",
+    "trw_slots.v": "255aaeeb40fd53477eda811f5781d3d9c75e701510600033799be7465b6151e0",
+    "trw_pin_unit.v": "e79409507fc9a9e29ebead7fea2d85e7a555c062815d1bf55fce6ca2067172fe",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.v": "4a03d7cd63892f1986493339803d6f323b497ae332b2207c2cfd48e3053eb602",
+    "trw_chan_prod.v": "6b41d58996b41970ab958ab0d7d71f1839ddae264856748f7c2d0aa08ecf56e6",
+    "trw_pins.v": "0340599a644ae8315ddce575ddbd76cf5683cc14323668c138e66b94aeb16572"
+  },
+  "exact_ci_preparation_passed": true,
+  "actual_tt_merge_passed": true,
+  "syntax_passed": true,
+  "late_repair_enabled": true,
+  "acceptance_unchanged": true,
+  "physical_result": null,
+  "limitations": [
+    "Paired optimizer target schedule; neither individual contribution is isolated.",
+    "Targets are not additive delay budgets or guaranteed final slack.",
+    "Early repair can increase slow delay, area and congestion; final rerouting can still produce antennas.",
+    "Same verified RTL; no new functional or physical pass claimed."
+  ]
+}

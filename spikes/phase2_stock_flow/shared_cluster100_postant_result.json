@@ -1,0 +1,65 @@
+{
+  "audit_run": 40793477453,
+  "artifact_id": 12863176502,
+  "artifact_size": 122795880,
+  "source_physical_run": 40779354529,
+  "source_state": "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/state_out.json",
+  "fresh_corner_metrics": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": -0.00651512,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.349841,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.121036,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "fresh_antenna_metrics": {
+    "antenna__violating__nets": 0,
+    "antenna__violating__pins": 0
+  },
+  "raw_repeated_metrics_independently_matched": true,
+  "physical_views_unchanged": {
+    "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/state_out.json": "5d0f7b0d19edac34dc1b3695535d6aae7fc7906695aaae9f9a2603b9c8b1644b",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.odb": "3976373a73ecb1606140d75ca9f72c64fa816b78d8ea8d179bc1bd53c730f563",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.def": "1ec4a782969d236f669e38175e3eb9d968d3712f85ba46974d2056d0d367001a",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.nl.v": "8250ac870bc41828f91a9d12b210f979c0361834aba82c01da49fc47e98095bf",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.pnl.v": "ae2a7f8a86ac0570ae0e8d8747e8e2b814d84f1de7c896942229715095bed920",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/41-openroad-repairdesignpostgrt/tt_um_tripwire.sdc": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba"
+  },
+  "physical_repairs_performed": false,
+  "qualification_performed": false,
+  "conclusion": "Clean-antenna checkpoint fails fast hold. Do not disable late repair alone or proceed to DRT.",
+  "fast_hold_reserve_ns": 0.05,
+  "fast_hold_shortfall_ns": 0.05651512,
+  "input_sha256": {
+    "recovery-source-run.json": "2b0de615e5cc22e6760a5776400240daff74fb9ea917bed77cd2a6f70219db95",
+    "recovery-source-artifact.json": "65aad2975447d1620c487523c6594e0b4508fa4c0921a1cad697a0d15d57e206",
+    "runs/stock-recovery-validation.json": "688b113eeb8428dd025e3eceab2886ae713bdc2ce5bafbd0a590d37935ec2c24",
+    "runs/stock-corner-audit/comparison.json": "928fafa809ddff0cbdaa75dc9bafe823d15d7040918b8618a15846ec9d527762",
+    "runs/stock-corner-audit/read_only_audit.json": "a5410f162cab8007787a6f0de993a76d5eaa1f333818f24551a4a598f01347d2",
+    "runs/stock-corner-audit/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "a2f2cf171feb3e622dcdfa73b10f43095bf65bfd8e311f27e7ef9b7fbc2ed0a7",
+    "runs/stock-corner-audit/after-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "5bfa45035cd3f14138d543cdf7bf9a70da730118612dcc96d18190cdf57fc7c3",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/checks.rpt": "8871b72cf15921765006afc88bd83fdd621dfae685f5650736f6be273dd0f306",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "3804071659e6753d7af4e36b4d7413d82163d9306c6d7a528d6f78d928d35d62",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/checks.rpt": "f59053aea252ba2226bf406d280207f7e532ee175703399d5cde5b713516184f",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "5bfa45035cd3f14138d543cdf7bf9a70da730118612dcc96d18190cdf57fc7c3",
+    "runs/stock-corner-audit/fresh-checkpoint-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/checks.rpt": "f97898269ae7c6056e3314d428182972c1cd85bb8013add50afb4b2e4f65984f",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "a2f2cf171feb3e622dcdfa73b10f43095bf65bfd8e311f27e7ef9b7fbc2ed0a7",
+    "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "3804071659e6753d7af4e36b4d7413d82163d9306c6d7a528d6f78d928d35d62"
+  }
+}

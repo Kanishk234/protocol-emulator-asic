@@ -1446,6 +1446,14 @@ Prepare only PL_OPTIMIZE_MIRRORING=false on the exact measured shared-priority s
 
 Initially held this fallback out of dispatch choices. The user subsequently authorized launching it independently alongside the clock screen; expose only the separate no-mirroring profile, without combining controls. Require resolved false plus native legalization logs without mirroring in initial DPL, post-CTS repair and post-GRT repair. Fifty-nine focused guards and clean exact preparation/source/config/actual TT merge checks pass. Evidence: shared_residual_history_evidence.json. No additional physical run, official job edit, DRT or phase completion claim.
 
+## D-134 (2026-10-28): audit the clean-antenna clock100 checkpoint before another physical change
+
+The remaining five antenna branches in 40779354529 already exist before native antenna repair. Native broad heuristic diode insertion runs at this point in stock Classic, but an origin-based cost screen suggests roughly 40,136 selected terminals / 218,468 µm² of diode cells at its default 90 µm threshold. This is not an exact ODB insertion prediction; it is enough to reject an unreviewed broad enabling experiment with zero placement padding. Inserting a targeted ECO-diode step would alter stock stage order and is not an official-flow solution.
+
+Instead extend the existing separate read-only checkpoint-audit workflow with an explicit frozen shared_cluster100_postant selection. Bind all 55 source/macro/state/view files, run metadata, artifact digest and original image digest. Run only repeated three-corner STA and an antenna check; preserve source-view hashes before/after and isolate fresh audit outputs from the source run's completed audit. Keep the original recovery selection supported with its unchanged recipe contract.
+
+This measures whether the current source's earlier zero-antenna checkpoint has enough hold reserve without optional late native timing repair. It does not change that source recipe, bypass final qualification, disable rerouting, append repair steps or authorize DRT. If the audit is promising, a separate native conditional configuration screen is still required; main config adoption remains owner-reviewed. If timing fails, the measurement identifies the need for late repair and avoids a full synthesis/place rerun. Seventy-seven focused tests, actual 55-file/provenance validation, source selection and embedded syntax checks pass. No hardware, official workflow, SDC or gate changes.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

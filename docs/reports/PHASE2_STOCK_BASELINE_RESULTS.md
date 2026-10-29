@@ -516,3 +516,37 @@ A prepared, unlaunched fallback `rtl_shared_no_mirror` changes only native **PL_
 Fifty-nine focused guard tests pass, including rejection of mirroring in any of the three reviewed legalization logs. Exact clean preparation, unchanged source hash, single-setting config delta and actual Tiny Tapeout config merge pass. Merged project config leaves rerouting at its native `true` default, enforced by the existing resolved-config guard. The fallback was initially held out of dispatch choices. The user subsequently authorized an independent parallel launch; the diagnostic workflow now exposes it separately, retaining the clock-control default and without combining changes.
 
 Source-bound connectivity, origins, orientations, raw violated rules and report hashes are recorded in `spikes/phase2_stock_flow/shared_residual_history_evidence.json`. This is diagnosis, not a qualifying screen. A read-only all-corner audit would be required to judge the earlier post-antenna checkpoint; its zero antenna count alone does not justify skipping required final qualification.
+
+
+## 2026-10-28: clock diameter control clears hold reserve; only antenna gate remains
+
+[40779354529](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/40779354529), source ee9eed451c8b4ac2cc051fefd7b25084e237b51c, completes physical flow and independent audits; only final qualification fails. Artifact 12861176866 (253260280 bytes) was read selectively. Each corner's before/after raw metrics independently matches the receipt, as do fresh antenna metrics. Native command auditing confirms 100 µm cluster diameter, enabled eight-sink clustering and unchanged other controls.
+
+| Check | Shared reference 40762963258 | Clock100 40779354529 |
+|---|---:|---:|
+| Setup WS fast/typ/slow (ns) | 0 / 0 / 0 | 0 / 0 / 0 |
+| Fast hold (ns) | 0.003200 | **0.0935213** |
+| Typical hold (ns) | 0.219866 | 0.340985 |
+| Slow hold (ns) | 0.542820 | 0.739804 |
+| Slew/cap/fanout violations, all corners | 0 | 0 |
+| Final GRT overflow | 0 | 0 |
+| Final antenna nets/pins | 6 / 6 | **5 / 5** |
+
+The 50 ps fast-hold gate now passes with 43.5213 ps above that threshold. Setup remains nonnegative without demonstrated positive reserve. Final raw area is approximately 674347 µm² with 45015 instances; this improvement does not add area against the measured reference. The saved final late-route table independently reports zero overflow.
+
+All five residual antenna endpoints are hold/wire buffer inputs; no clock net appears in the final violation list. Their violated cumulative-area ratios versus 200 are: lane1 ot[27]→hold11171/A **244.20**, net12867→wire12867/A **210.02**, net14359→wire14359/A **201.10**, _22096_→wire12360/A **202.98**, net13931→wire13931/A **218.71**. Ratios below 200 in a partial-ratio summary are not rule passes. The native post-antenna checker again reports zero before the later final physical operations expose these failures.
+
+Keep this as the improved timing/electrical/overflow reference, not a qualifying screen. No additional full rerun or gate change is justified by a legitimate failure. The independent no-mirroring control 40781730206 is still running at this check. Evaluate its native-effect guard and complete final metrics before choosing a combined control or any further change. Raw report hashes, exact corner data and rule details are in shared_cluster100_result.json. No DRT/extracted/official GDS or Phase 2 completion claim.
+
+
+## 2026-10-28: branch tracing and low-cost checkpoint audit
+
+All five final clock100 data-net branches are already present before antenna repair; they are not five new nets introduced afterward. Tracing through native buffer/delay chains identifies lane1 output-token bit27, lane1 register bit60 and U0 configuration write-address bit3, plus two combinational decode cones. Their pre-antenna cell-origin spans are approximately152,199,211,202 and199 µm, depending on the branch. These observations motivate geometry/protection work, not protocol-specific hardware or a functional rewrite.
+
+Reviewed the pinned native heuristic inserter and stock Classic order. The optional heuristic step is already present after post-GRT design repair and before native antenna repair. It uses pin-coordinate spans, skips existing protected/port/special nets, and adds a diode at each terminal of selected internal nets. No separate clock-net exclusion appears in this code. Both placement paddings are currently zero, while the native documentation warns that this option needs placement room.
+
+A deliberately approximate DEF-origin proxy at the default90µm threshold counts8,900nets/40,136terminals. With the pinned antenna-cell library area5.4432µm², that is218,468µm² of diode area alone, about32%of the current reported instance area. At150µm the proxy still counts19,681terminals/about107,128µm²; higher thresholds begin missing reviewed short branches. This is not a measured insertion count or an exact pin-coordinate model. It rejects blindly enabling this broad option without area/capacitance assessment; no heuristic physical experiment is launched. Source hashes, upstream traces and threshold estimates are in shared_cluster100_protection_plan.json.
+
+The more focused independent task is a repeated all-corner read-only audit of the frozen post-antenna checkpoint from40779354529. Its raw antenna count is zero, but timing at that exact checkpoint has not yet been established. The existing separate checkpoint-audit workflow now supports an explicit shared_cluster100_postant choice, with55hash-bound input files and matching source/artifact/toolchain metadata. Only physical-run files are restored under runs; the source's completed corner audit is excluded to prevent stale output reuse. Original stock image digest and source-view hash stability remain mandatory.
+
+The new audit invokes no synthesis, placement, repair or routing and performs no qualification. Its purpose is to determine whether optional native late timing repair is necessary on the improved source. Any promising result still requires a full strict native screen before DRT; a failure usefully identifies needed repair without another physical rerun. Seventy-seven focused guards/tests, actual GitHub provenance and55-file validation, selector execution, YAML/shell/embedded-Python checks pass. Main source/config, official GDS jobs and all gates remain untouched.

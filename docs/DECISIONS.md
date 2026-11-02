@@ -1476,6 +1476,14 @@ Proof scope: SPI139equivalence points and host924(2/4)or942(3/6)points, inductio
 
 Test exactly one hardware change against measured clock10040779354529with byte-identical physical configuration6143adc2...,20ns/SDC/all strict gates. Own diagnostic tool/install refs are pinned to the recorded source commits; the unmodified stock image digest was independently verified current and is checked before the flow. Main hardware/config/official GDS are unchanged. This can alter placement, skew and other gates or leave antennas; no promised fix. Official recipe adoption beyond the existing configuration whitelist remains a separate review; the RTL prototype itself requires no new physical control. Evidence: config_word_select.patch/config_word_select_evidence.json and replay helpers.
 
+## D-137 (2026-11-02): test native clock trunk buffer spacing on the verified predecode source
+
+General need: predecode41506944920reduces final antennas to3but fails fast hold−22.3809psand has7overflow. Its worst path is existing U2tok9→lane0a_lat9,not a new metadata FF. Source-bound report shows312.471pslaunch/capture arrival difference. The reviewed upper clock branches are already roughly400µmbetween buffer origins at CTS and remain at those origins through final repair. Capture/launch wire delays differ greatly despite similar origin distances; do not infer routed length or sole causation from placement alone.
+
+Test only CTS_DISTANCE_BETWEEN_BUFFERS=200µmagainst41506944920. Keep the exact proved/22-case-tested RTL,100µmsink clustering,size8,early/late175ps,wire200,diode-only/native mirroring and20ns/SDC/gates. This is trunk segmentation,not the root-input-only repair_clock_nets limit. The pinned native CTS script already exposes this option. Current OpenROAD docs note that explicit spacing simplifies CTS characterization/search; it is not a hard final route bound. Extra clock buffers may increase area/congestion or worsen skew/setup; three data antennas can remain or move.
+
+Eighty-three focused guards pass,including missing/wrong native spacing rejection. Exact clean CI/source/config checks,one-setting delta,reference metadata,actual TTmerge and syntax pass. Main/official jobs and final gate implementation are unchanged. No RTL change means existing named proofs and protocol evidence retain their scope,not physical validity. Check actual command/effect and every final gate; no DRT or phase claim. This remains a diagnostic setting requiring review before any main config adoption. Evidence: wordsel_clock_spacing_evidence.json.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

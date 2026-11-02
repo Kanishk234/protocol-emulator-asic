@@ -2,7 +2,23 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-02 — Prepare clock trunk spacing control on unchanged predecode RTL
+
+- User requested continuation. No active physical runs. Retrieved source41506944920CTS/final DEFs and CTSlog. Reviewed clock origins are unchanged: root-to-launch/capture407.88/393.42µm,next305.28/192.36µm. Reported wire delays38.476/150.708psand26.111/91.826psshow topology/load sensitivity; origin distance alone is not routed geometry or cause. Worst existing U2tok9→lane0a_lat9misses50psreserve by72.3809ps.
+- D-137tests only native CTS_DISTANCE_BETWEEN_BUFFERS200µmagainst the same source/config41506944920. Keep sink diameter100,size8,early/late175,wire200andall native stages/SDC/gates. This targets trunk segmentation,not the irrelevant root-input-only wire knob. Native script/schema and primary docs support the flag; explicit spacing simplifies search and can regress clock skew/area/congestion. Data antennas are not guaranteed fixed.
+- 83focused tests pass,including missing/wrong native argument rejection. Exact clean preparation,identical verified RTL/SDC/Tcl,one-setting delta,actualTTmerge,reference binding and syntax pass. Reused source proofs/22protocolcases only in their original scope; no new functional or physical pass claimed.
+- Updated prior failed-result evidence/report/claim plus current control evidence. Publish owned tools/tests/data,ownCI and docs under standing user authorization,then launch one screen. No main hardware/config/official jobs or final-gate changes; no DRT/phase tick/watcher. Preserve unrelated files/FIPE. Launch receipt follows.
+
+## 2026-11-02 — Verify physical failure of write-address prototype
+
+- User reported failure.41506944920completes native flow/reference checks/audits/upload; only final qualification fails. No main workflows remain in progress. First read-only approval review timed out; allowed single retry succeeded. No permission question or new run issued.
+- Retrieved bounded artifact13178668710(254699470bytes),independently matched repeated raw corners/electrical/fresh antenna; last raw overflow7. Setup0all; holdF/T/S−0.0223809/0.173173/0.532587ns; electrical0; antennas3/3; area677435µm²/45370instances. Antennas5→3,butfast reserve misses50psby72.3809psandcongestionregresses0→7. Do not promote; clock100 remains stronger timing/electrical/overflow reference.
+- Actual worst fast path is U2producer tok9→lane0a_lat9,not a new selector FF. Reported launch/capture arrival difference312.471ps(0.528275→0.840746ns); not same-path reference delta or sole-cause proof. Native internal175pshold is lost after later physical operations. Recorded minreport/netlist/antenna source hashes in config_word_select_result.json; updated report/claim scope. Functional proofs and22RTL cases do not imply physical closure.
+- Next review actual clock-branch delay contributions and remaining data-gate/layer protection before another change. No hardware/officialflow/gate changes,commit/push,new experiment,DRT,phase tick or watcher. Preserve unrelated files/FIPE; results/docs stay local.
+
 ## 2026-11-02 — Prove a configuration-address locality change and prepare one screen
+
+- Publication/launch receipt:9ebe325 RTL prototype,b937be0 proof/tools/evidence,e0c521f tests,b65629c ownCI,8123e0c docs pushed; remote main verified8123e0c03146b50660fdc6cf3546091f0d77cbe9. Launched only [write-select screen41506944920](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41506944920),confirmed queued on that SHA. Same measured clock100config; one proved RTL locality change. All owned local simulations/proof/mapping sessions finished. No mainhardware/config/officialworkflow/gate changes,DRT,phase tick or watcher; unrelated files/FIPEpreserved. Next inspect preflight/native-effect evidence and full final qualification. This receipt remains local.
 
 - User requested continuation and reiterated workflow push/launch authorization. Investigated native repair options and one identified configuration-address branch. Broad cell/diode exclusions are not a targeted guaranteed cure; no additional repair step or gate override was introduced.
 - D-136prototype registers generic coarse write-address metadata at the same SPI word-bus edge; the host combines it with unchanged low bits and the config array uses optional shared word enables. Four RTL files only,packaged as a guarded patch; no main source edited. Public frames/ISA/top pins/write phase stay fixed. Added sized local word constants to avoid lint ambiguity,covered by original-module comparisons.

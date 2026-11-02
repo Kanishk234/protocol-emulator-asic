@@ -116,3 +116,6 @@ D-135 (2026-10-28): rtl_shared_early275_late75 changes only the two native hold 
 
 
 D-136(2026-11-02): rtl_config_word_select applies the hash-bound four-file config_word_select.patch after shared priority,using the identical measured clock100recipe. It registers coarse generic host address metadata and preserves public write timing. Replay with the project venv: `python spikes/phase2_stock_flow/config_word_select_checks/check.py <prepared-clock100-checkout> <new-work-directory>`. Then optionally run `map.py <prepared-clock100-checkout> <proved-work-directory> <typical-library.lib>`. Raw proof/mapping outputs stay in the scratch directory. Proof and RTL-test evidence is config_word_select_evidence.json. No local or functional test proves physical closure. Main hardware/config and official GDS jobs remain unpromoted/unchanged.
+
+
+D-137(2026-11-02): rtl_wordsel_clock200 changes only native CTS_DISTANCE_BETWEEN_BUFFERS=200µmon the identical predecode41506944920source. Keep sink diameter100µm,size8and every final gate. Wordsel_clock_spacing_evidence.json binds observed clock geometry and clean preparation. Explicit spacing can regress area/skew/routing; no physical pass claimed. Clock100remains the fallback; no main or official template changes.

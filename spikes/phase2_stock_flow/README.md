@@ -113,3 +113,6 @@ D-132: shared40762963258has setup0allcorners,holdF/T/S3.2/219.866/542.82ps,elect
 
 
 D-135 (2026-10-28): rtl_shared_early275_late75 changes only the two native hold optimizer targets against measured clock10040779354529. Keep the late repair/reroute enabled and all strict gates. The earlier clean-antenna checkpoint fails fast hold; no-mirroring is not qualifying. early_repair_schedule_evidence.json binds exact configuration/source and preparation checks. This is a paired strategy, not a target sum or promised closure. No main hardware/official GDS or screen-gate implementation changes.
+
+
+D-136(2026-11-02): rtl_config_word_select applies the hash-bound four-file config_word_select.patch after shared priority,using the identical measured clock100recipe. It registers coarse generic host address metadata and preserves public write timing. Replay with the project venv: `python spikes/phase2_stock_flow/config_word_select_checks/check.py <prepared-clock100-checkout> <new-work-directory>`. Then optionally run `map.py <prepared-clock100-checkout> <proved-work-directory> <typical-library.lib>`. Raw proof/mapping outputs stay in the scratch directory. Proof and RTL-test evidence is config_word_select_evidence.json. No local or functional test proves physical closure. Main hardware/config and official GDS jobs remain unpromoted/unchanged.

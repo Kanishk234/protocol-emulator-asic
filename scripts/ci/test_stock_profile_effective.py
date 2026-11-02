@@ -212,6 +212,22 @@ def test_disabled_mirroring_requires_late_legalization_log(tmp_path):
         validate(tmp_path, selected)
 
 
+@pytest.mark.parametrize('spacing', [200, 400, None])
+def test_clock_buffer_spacing_native_command(tmp_path, spacing):
+    selected = fixture(tmp_path, {'CTS_DISTANCE_BETWEEN_BUFFERS': 200})
+    path = tmp_path / '35-openroad-cts/openroad-cts.log'
+    path.parent.mkdir()
+    command = '+ clock_tree_synthesis -sink_clustering_size 8'
+    if spacing is not None:
+        command += f' -distance_between_buffers {spacing}'
+    path.write_text(command + '\n')
+    if spacing == 200:
+        assert validate(tmp_path, selected)['native_clock_buffer_spacing_um'] == 200
+    else:
+        with pytest.raises(ValueError, match='not exercised|Missing native'):
+            validate(tmp_path, selected)
+
+
 @pytest.mark.parametrize('early,late,valid', [(0.275, 0.075, True),
                                            (0.175, 0.075, False),
                                            (0.275, 0.175, False)])

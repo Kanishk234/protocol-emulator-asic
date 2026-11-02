@@ -87,14 +87,34 @@
       "rtl_patch": "shared_priority",
       "config_word_select": true,
       "hardware_unchanged": false
+    },
+    "rtl_wordsel_clock200": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+        "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100,
+        "CTS_DISTANCE_BETWEEN_BUFFERS": 200
+      },
+      "config_sha256": "aafbc1a66826d9f488e1d7fee433608b2a818443474e1b8b00aa0f0134c2134d",
+      "comparison_reference_run": 41506944920,
+      "comparison_reference_config_sha256": "6143adc22f3f5066701ae4a9e37680984291f83733eade0c16f50f96dcbc519d",
+      "additional_changes_from_reference": {
+        "CTS_DISTANCE_BETWEEN_BUFFERS": 200
+      },
+      "rtl_patch": "shared_priority",
+      "config_word_select": true,
+      "hardware_unchanged": true
     }
   },
   "hardware_unchanged": true,
-  "purpose": "One proved host configuration-address predecode change against measured clock100; identical physical recipe and fixed final gates.",
+  "purpose": "One native clock-buffer spacing control against measured predecode41506944920; exact same RTL and fixed gates.",
   "risks": [
-    "Local mapping and named functional proofs do not establish routed timing or antenna closure.",
-    "Registered coarse selectors target one identified address branch; other antennas may remain or move.",
-    "Six additional mapped flip-flops and changed placement can alter skew,area and routing."
+    "Explicit spacing uses a simplified CTS segment search; it is not a guaranteed bound on final routed wires.",
+    "Added clock buffers may worsen skew,slow setup,area or congestion.",
+    "Data antenna violations may remain or move; all final gates are mandatory."
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
   "physical_results": null,

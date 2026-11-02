@@ -67,6 +67,12 @@ def validate(root, selected):
             raise ValueError('Clock sink diameter control was not exercised')
         result['native_clock_cluster_max_diameter_um'] = value
         result['native_clock_cluster_size'] = 8
+    if 'CTS_DISTANCE_BETWEEN_BUFFERS' in selected['changes']:
+        text = one(root, '*-openroad-cts/openroad-cts.log').read_text()
+        value = number(text, 'clock_tree_synthesis', '-distance_between_buffers')
+        if not math.isclose(value, selected['changes']['CTS_DISTANCE_BETWEEN_BUFFERS'], abs_tol=1e-9):
+            raise ValueError('Clock buffer spacing control was not exercised')
+        result['native_clock_buffer_spacing_um'] = value
     if selected['changes'].get('CTS_BALANCE_LEVELS') is True:
         text = one(root, '*-openroad-cts/openroad-cts.log').read_text()
         commands = re.findall(r'(?m)^\+ clock_tree_synthesis\b[^\n]*', text)

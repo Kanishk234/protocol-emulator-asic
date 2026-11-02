@@ -1,0 +1,94 @@
+{
+  "comparison_reference_run": 40779354529,
+  "reference_config_sha256": "6143adc22f3f5066701ae4a9e37680984291f83733eade0c16f50f96dcbc519d",
+  "patch_sha256": "bf2ad8c7b3d3e009efedcd820b48c1ea10dbb866415204a727ef15e50f92c694",
+  "baseline_files": {
+    "src/trw_spi.v": "ef2203d7c298301d7dd8879f8536df6f55a8cb103f4de080a7fd90e45af646ec",
+    "src/trw_host.v": "aed5401613c7f7403ee5750f4830b10828d3e9abafe8a25ee698d492cfd6d758",
+    "src/trw_pin_cfg.v": "a3f4ab08216def6cef7c4c5373ee83acd5f885c7f6de2529678bd68d0edb0452",
+    "src/trw_chip.v": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd"
+  },
+  "candidate_files": {
+    "src/trw_spi.v": "62f7da763d640336b6bd25ed3bd6abf1c42a3be497f668fc9cf0565e7be550ee",
+    "src/trw_host.v": "ba733e2ae7a966b63ff62838b75176219c030de8ab693ca5f02c9a3c48095eee",
+    "src/trw_pin_cfg.v": "13c1b53b42d4f644267d0a5529ee930e64f61cd9f94b0d3330990418aa56c3f6",
+    "src/trw_chip.v": "a3050ae2952bb7b171fa5eabdebf485ca884a4fa438ee62dc75902eef1d0ff7d"
+  },
+  "defines_sha256": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+  "physical_qualification": false,
+  "validation": {
+    "strict_lint": "pass",
+    "host_tests": 7,
+    "chip_tests": 5,
+    "protocol_suite": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "simulator": "Verilator RTL, original offline sigrok assertions enabled",
+      "xml_sha256": "3dd23cd5f3c53226c79f91c879408295799cbd810617a4aed8970bcc32cc3068",
+      "elapsed_seconds": 320.49173641204834
+    },
+    "top_level_tests": 4,
+    "exact_ci_preparation": "pass",
+    "actual_tt_merge": "pass",
+    "config_byte_identical_to_reference": true,
+    "syntax": "pass",
+    "wrong_baseline_rejected_before_mutation": true
+  },
+  "local_mapping": {
+    "reference_area_um2": 408645.4806,
+    "candidate_area_um2": 407493.261,
+    "reference_cells": 27363,
+    "candidate_cells": 27189,
+    "reference_sequential_area_um2": 118356.9408,
+    "candidate_sequential_area_um2": 118650.8736,
+    "added_dffs": 6,
+    "library_sha256": "34163f3e7de9f854afac57332ba06f1739b78e7ac35660a8a5ddd39c570124ad",
+    "scope": "Comparative mapped cells; blackbox macro area and physical buffers/routes are excluded",
+    "encoded_write_bit3_cone": {
+      "reference": {
+        "direct_cell_inputs": 15,
+        "reachable_icg_gate_nets": 155,
+        "scope": "One local sorted-order mapping; not physical fanout or delay"
+      },
+      "trial": {
+        "direct_cell_inputs": 13,
+        "reachable_icg_gate_nets": 107,
+        "scope": "One local sorted-order mapping; not physical fanout or delay"
+      }
+    }
+  },
+  "limitations": [
+    "Targets encoded configuration-address distribution; no proof all five antennas disappear.",
+    "Additional state is derived metadata,not extra visible latency; named equivalence/phase proofs do not establish whole-chip formal verification.",
+    "Main hardware/config/official jobs and final gates remain unchanged."
+  ],
+  "proofs": {
+    "equivalence_points": {
+      "spi": 139,
+      "host_2_4": 924,
+      "host_3_6": 942
+    },
+    "induction_sequence_cap": 2,
+    "phase_cases": [
+      "cfg_latch_0",
+      "cfg_latch_1",
+      "cfg_flop_0",
+      "cfg_flop_1"
+    ],
+    "negative_controls": [
+      "wrong SPI group",
+      "wrong config word"
+    ]
+  },
+  "mapping_sensitivity": {
+    "filesystem_order": {
+      "reference_area_um2": 406702.8252,
+      "candidate_area_um2": 408041.8146,
+      "reference_cells": 27022,
+      "candidate_cells": 27033
+    },
+    "sorted_order": "local_mapping above; both sides use the same order",
+    "interpretation": "ABC mapping depends on read order; neither local result predicts physical area or timing. Across both orderings area difference is about -0.28% to +0.33%."
+  }
+}

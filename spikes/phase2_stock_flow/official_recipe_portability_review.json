@@ -1,0 +1,188 @@
+{
+  "reference_run": 40779354529,
+  "official_jobs_unchanged": true,
+  "source_promoted": false,
+  "rule": "AGENTS.md limits src/config.json edits to clock,density and SRAM macro block; no override inferred for other physical settings.",
+  "changes": [
+    {
+      "key": "PL_TARGET_DENSITY_PCT",
+      "template_value": 60,
+      "candidate_value": 56,
+      "classification": "explicit whitelist"
+    },
+    {
+      "key": "PL_RESIZER_HOLD_SLACK_MARGIN",
+      "template_value": 0.1,
+      "candidate_value": 0.175,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "GRT_RESIZER_HOLD_SLACK_MARGIN",
+      "template_value": 0.05,
+      "candidate_value": 0.175,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "FP_PDN_VPITCH",
+      "template_value": 50.0,
+      "candidate_value": 67.44,
+      "classification": "SRAM integration: review scope"
+    },
+    {
+      "key": "MACROS",
+      "template_value": null,
+      "candidate_value": {
+        "RM_IHPSG13_1P_512x16_c2_bm_bist": {
+          "instances": {
+            "u_chip.u_sram.sram": {
+              "location": [
+                12,
+                40
+              ],
+              "orientation": "FS"
+            }
+          },
+          "gds": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.gds"
+          ],
+          "lef": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.lef"
+          ],
+          "lib": {
+            "*_typ_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib"
+            ],
+            "*_fast_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib"
+            ],
+            "*_slow_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib"
+            ]
+          },
+          "nl": [
+            "dir::./RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+          ],
+          "spice": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl"
+          ]
+        }
+      },
+      "classification": "explicit whitelist"
+    },
+    {
+      "key": "PDN_MACRO_CONNECTIONS",
+      "template_value": null,
+      "candidate_value": [
+        "u_chip.u_sram.sram VPWR VGND VDD! VSS!",
+        "u_chip.u_sram.sram VPWR VGND VDDARRAY! VSS!"
+      ],
+      "classification": "SRAM integration: review scope"
+    },
+    {
+      "key": "PDN_CFG",
+      "template_value": null,
+      "candidate_value": "dir::pdn_cfg.tcl",
+      "classification": "SRAM integration: review scope"
+    },
+    {
+      "key": "FP_PDN_VSPACING",
+      "template_value": null,
+      "candidate_value": 3.52,
+      "classification": "SRAM integration: review scope"
+    },
+    {
+      "key": "FP_PDN_VOFFSET",
+      "template_value": null,
+      "candidate_value": 26.36,
+      "classification": "SRAM integration: review scope"
+    },
+    {
+      "key": "MAGIC_MACRO_STD_CELL_SOURCE",
+      "template_value": null,
+      "candidate_value": "PDK",
+      "classification": "SRAM integration: review scope"
+    },
+    {
+      "key": "MAGIC_EXT_ABSTRACT_CELLS",
+      "template_value": null,
+      "candidate_value": [
+        "RM_IHPSG13_.*"
+      ],
+      "classification": "SRAM integration: review scope"
+    },
+    {
+      "key": "PL_RESIZER_SETUP_SLACK_MARGIN",
+      "template_value": null,
+      "candidate_value": 0,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "CTS_APPLY_NDR",
+      "template_value": null,
+      "candidate_value": "none",
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "CTS_SINK_CLUSTERING_SIZE",
+      "template_value": null,
+      "candidate_value": 8,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "RUN_POST_GRT_DESIGN_REPAIR",
+      "template_value": null,
+      "candidate_value": true,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH",
+      "template_value": null,
+      "candidate_value": 200,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "GRT_ADJUSTMENT",
+      "template_value": null,
+      "candidate_value": 0.16,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "RUN_POST_GRT_RESIZER_TIMING",
+      "template_value": null,
+      "candidate_value": true,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "GRT_RESIZER_SETUP_SLACK_MARGIN",
+      "template_value": null,
+      "candidate_value": 0,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "SYNTH_STRATEGY",
+      "template_value": null,
+      "candidate_value": "DELAY 0",
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "GRT_OVERFLOW_ITERS",
+      "template_value": null,
+      "candidate_value": 100,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "GRT_ANTENNA_REPAIR_DIODE_ONLY",
+      "template_value": null,
+      "candidate_value": true,
+      "classification": "experimental setting: owner review before adoption"
+    },
+    {
+      "key": "CTS_SINK_CLUSTERING_MAX_DIAMETER",
+      "template_value": null,
+      "candidate_value": 100,
+      "classification": "experimental setting: owner review before adoption"
+    }
+  ],
+  "main_config_sha256": "4b192dffa877dcefa4ab969af9dedf105375921aa179c677524fa88ac94bb510",
+  "reference_config_sha256": "6143adc22f3f5066701ae4a9e37680984291f83733eade0c16f50f96dcbc519d"
+}

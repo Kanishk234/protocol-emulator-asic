@@ -1,0 +1,137 @@
+{
+  "run": 41684924544,
+  "cases": {
+    "false": {
+      "result": {
+        "protected": false,
+        "connectivity_preserved": false,
+        "native_protection_logs": [],
+        "full_design_qualification": false,
+        "all_repair_stages_exercised_protection": false,
+        "final_native_metrics": {
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.35609,
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 11.389,
+          "timing__hold__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_r2r__ws__corner:nom_typ_1p20V_25C": 0.35609,
+          "timing__hold_r2r_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_r2r__ws__corner:nom_typ_1p20V_25C": 1e+30,
+          "timing__setup_r2r_vio__count__corner:nom_typ_1p20V_25C": 0
+        },
+        "extracted_timing_performed": false,
+        "scope": "Tiny stock Classic probe; metrics are measurements, not design acceptance"
+      },
+      "fresh_antenna": {
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0
+      },
+      "native_repair_command": "+ repair_design -verbose -max_wire_length 20.0 -slew_margin 10.0 -cap_margin 10.0",
+      "input_sha256": {
+        "runs/protected-probe/probe_result.json": "7a6df1eae68c1013d0bac01b71f8efb8f27af87340b05dcbece2e26de64d31e4",
+        "runs/protected-probe/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "07b64dc29df2aa41355de7e358c277813a7eece7dfbe5a19ba82270699c69f38",
+        "runs/protected-probe/45-openroad-stamidpnr-3/or_metrics_out.json": "23665fef572f781a396dce62b78b59d415d51e5a7048dfc313b1f942813e47a7",
+        "runs/probe-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+        "runs/protected-probe/41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log": "184d6b184c1738d65268c512df7f611fdaaa2b66ea26379f0c1e6169848cf76f"
+      },
+      "relay_cells": {
+        "trw_ap_driver": [
+          "sg13cmos5l_buf_2",
+          {
+            "A": "ui_in[1]",
+            "X": "trw_ap_node"
+          }
+        ],
+        "trw_ap_sink": [
+          "sg13cmos5l_buf_2",
+          {
+            "A": "net66",
+            "X": "relay"
+          }
+        ],
+        "trw_ap_diode": [
+          "sg13cmos5l_antennanp",
+          {
+            "A": "net67"
+          }
+        ]
+      }
+    },
+    "true": {
+      "result": {
+        "protected": true,
+        "connectivity_preserved": true,
+        "native_protection_logs": [
+          "32-openroad-repairdesignpostgpl/openroad-repairdesignpostgpl.log",
+          "37-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log",
+          "41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log",
+          "28-openroad-globalplacement/openroad-globalplacement.log",
+          "44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log"
+        ],
+        "full_design_qualification": false,
+        "all_repair_stages_exercised_protection": true,
+        "final_native_metrics": {
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.35609,
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 11.5233,
+          "timing__hold__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_r2r__ws__corner:nom_typ_1p20V_25C": 0.35609,
+          "timing__hold_r2r_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_r2r__ws__corner:nom_typ_1p20V_25C": 1e+30,
+          "timing__setup_r2r_vio__count__corner:nom_typ_1p20V_25C": 0
+        },
+        "extracted_timing_performed": false,
+        "scope": "Tiny stock Classic probe; metrics are measurements, not design acceptance"
+      },
+      "fresh_antenna": {
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0
+      },
+      "native_repair_command": "+ repair_design -verbose -max_wire_length 20.0 -slew_margin 10.0 -cap_margin 10.0",
+      "input_sha256": {
+        "runs/protected-probe/probe_result.json": "a5e0fdab21218e1d1ef5a89e6df6f0044b02d8f1a1cfba2fa85514e3c6811a57",
+        "runs/protected-probe/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "5e84eac050f18202f63136411e58f6842aa69bc1c0b3365a5303a6e81cb230d7",
+        "runs/protected-probe/45-openroad-stamidpnr-3/or_metrics_out.json": "33b174e008ffb9cd3dbd49f4d76f6e13320b4399e08b0267e0f1a18a32f0354e",
+        "runs/probe-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+        "runs/protected-probe/41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log": "6698e9477ae865d09cb65f59622ffc8df39b375d8f2efe6a0fa37ab1aecf000b"
+      },
+      "relay_cells": {
+        "trw_ap_driver": [
+          "sg13cmos5l_buf_2",
+          {
+            "A": "ui_in[1]",
+            "X": "trw_ap_node"
+          }
+        ],
+        "trw_ap_sink": [
+          "sg13cmos5l_buf_2",
+          {
+            "A": "trw_ap_node",
+            "X": "relay"
+          }
+        ],
+        "trw_ap_diode": [
+          "sg13cmos5l_antennanp",
+          {
+            "A": "trw_ap_node"
+          }
+        ]
+      }
+    }
+  },
+  "full_design_qualification": false,
+  "conclusion": "Native20um wire repair splits unprotected relay connectivity; protected relay retains common driver/diode/sink node. Both are typical-electrical/antenna clean. Demonstrates protection preservation under repair,not antenna-prevention efficacy or full-design closure."
+}

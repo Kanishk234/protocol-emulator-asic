@@ -27,8 +27,13 @@ def validate(root, selected):
         actual = config.get(key)
         if isinstance(expected, bool):
             matched = actual is expected
+        elif isinstance(expected, str):
+            if key != 'SYNTH_BUFFER_CELL' or expected != 'sg13cmos5l_buf_2/A/X':
+                raise ValueError('Unreviewed string control')
+            matched = actual == expected
         elif isinstance(expected, list):
-            if key != 'EXTRA_EXCLUDED_CELLS' or expected != ['sg13cmos5l_dlygate4sd3_1']:
+            if key != 'EXTRA_EXCLUDED_CELLS' or expected not in (
+                    ['sg13cmos5l_dlygate4sd3_1'], ['sg13cmos5l_buf_1']):
                 raise ValueError('Unreviewed cell exclusion')
             matched = actual == expected
         else:
@@ -81,13 +86,23 @@ def validate(root, selected):
         result['native_clock_balance_levels'] = True
     if 'EXTRA_EXCLUDED_CELLS' in selected['changes']:
         text = one(root, '*-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v').read_text()
-        if re.search(r'\bsg13cmos5l_dlygate4sd3_1\s+\S+\s*\(', text):
-            raise ValueError('Excluded coarse delay cell remains in final netlist')
+        excluded = selected['changes']['EXTRA_EXCLUDED_CELLS'][0]
+        if re.search(r'\b' + re.escape(excluded) + r'\s+\S+\s*\(', text):
+            raise ValueError('Excluded cell remains in final netlist: ' + excluded)
         counts = {master: len(re.findall(r'\b' + master + r'\s+\S+\s*\(', text))
-                  for master in ('sg13cmos5l_dlygate4sd1_1', 'sg13cmos5l_dlygate4sd2_1', 'sg13cmos5l_buf_1')}
+                  for master in ('sg13cmos5l_dlygate4sd1_1', 'sg13cmos5l_dlygate4sd2_1',
+                                 'sg13cmos5l_buf_1', 'sg13cmos5l_buf_2',
+                                 'sg13cmos5l_buf_4', 'sg13cmos5l_buf_8', 'sg13cmos5l_buf_16')}
         if not any(counts.values()):
             raise ValueError('Missing mapped replacement cells')
-        result['excluded_coarse_delay_cells'] = 0
+        if excluded == 'sg13cmos5l_dlygate4sd3_1':
+            result['excluded_coarse_delay_cells'] = 0
+        else:
+            if config.get('SYNTH_BUFFER_CELL') != 'sg13cmos5l_buf_2/A/X':
+                raise ValueError('Small-buffer exclusion requires matching explicit buffer cell')
+            if not re.search(r'\bsg13cmos5l_buf_(?:2|4|8|16)\s+\S+\s*\(', text):
+                raise ValueError('Missing stronger replacement buffers')
+            result['excluded_small_buffer_cells'] = 0
         result['replacement_cell_counts'] = counts
     if 'GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH' in selected['changes']:
         text = one(root, '*-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log').read_text()

@@ -107,14 +107,40 @@
       "rtl_patch": "shared_priority",
       "config_word_select": true,
       "hardware_unchanged": true
+    },
+    "rtl_shared_minbuf2": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+        "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100,
+        "EXTRA_EXCLUDED_CELLS": [
+          "sg13cmos5l_buf_1"
+        ],
+        "SYNTH_BUFFER_CELL": "sg13cmos5l_buf_2/A/X"
+      },
+      "config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567",
+      "additional_changes_from_reference": {
+        "EXTRA_EXCLUDED_CELLS": [
+          "sg13cmos5l_buf_1"
+        ],
+        "SYNTH_BUFFER_CELL": "sg13cmos5l_buf_2/A/X"
+      },
+      "rtl_patch": "shared_priority",
+      "hardware_unchanged": true,
+      "comparison_reference_run": 40779354529,
+      "comparison_reference_config_sha256": "6143adc22f3f5066701ae4a9e37680984291f83733eade0c16f50f96dcbc519d"
     }
   },
   "hardware_unchanged": true,
-  "purpose": "One native clock-buffer spacing control against measured predecode41506944920; exact same RTL and fixed gates.",
+  "purpose": "Exclude only the smallest buffer on the strongest clock100 reference to test antenna input-area sensitivity; fixed source, timing and final gates.",
   "risks": [
-    "Explicit spacing uses a simplified CTS segment search; it is not a guaranteed bound on final routed wires.",
-    "Added clock buffers may worsen skew,slow setup,area or congestion.",
-    "Data antenna violations may remain or move; all final gates are mandatory."
+    "Stronger buffer inputs increase capacitance and can change synthesis, clock characterization, hold delay, placement and routing.",
+    "Four of five reference antenna endpoints use buf_1; the delay-cell endpoint is not directly addressed.",
+    "Same-geometry ratio and area estimates are not physical predictions.",
+    "Final all-corner electrical, timing, antenna and last-route overflow qualification remain mandatory."
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
   "physical_results": null,
@@ -131,7 +157,8 @@
     "root_fine_delay": "Excluded cell actually absent but fast-146.046ps,2slow slew,8antenna/6overflow",
     "rtl_preselect": "RTL equivalent and22protocolcasespass,butphysical40723256006fails:slowsetup-0.612733ns,fasthold-87.1405ps,2slew,11antenna,311overflow",
     "rtl_shared_no_mirror": "Native mirroring disabled as intended; measured40781730206has slowsetup-0.128148ns,fast71.0488ps,6antennasand48overflow; worse than clock100.",
-    "rtl_shared_early275_late75": "Measured40808367962passes timing but adds33387um2,one fanout violation,10antennasand174overflow; not selected."
+    "rtl_shared_early275_late75": "Measured40808367962passes timing but adds33387um2,one fanout violation,10antennasand174overflow; not selected.",
+    "rtl_wordsel_clock200": "41532160370 times out at240minutes during late repair/rerouting; no final qualification. Native spacing executes; last intermediate overflow47."
   },
   "comparison_reference_run": 40762963258,
   "comparison_reference_profile": "rtl_shared_priority",

@@ -1,0 +1,72 @@
+{
+  "source_run": 41532160370,
+  "profile": "rtl_wordsel_clock200",
+  "conclusion": "Physical step timed out after 240 minutes; no final qualification available",
+  "native_distance_between_buffers_um": 200,
+  "post_cts_hold_buffers_inserted": 3033,
+  "post_cts_repair_started_utc": "2026-11-02T21:59:29Z",
+  "next_stage_started_utc": "2026-11-02T23:43:25Z",
+  "post_grt_design_buffers_inserted": 4347,
+  "post_grt_design_nets_repaired": 2036,
+  "last_completed_intermediate_overflow": 47,
+  "last_completed_intermediate_route_utc": "2026-11-03T01:36:31Z",
+  "last_observed_extra_route_iteration": 12,
+  "final_sta_performed": false,
+  "final_qualification_performed": false,
+  "artifact_upload_succeeded": true,
+  "limitations": [
+    "Completed GitHub job log and saved native stage resource reports inspected; no final physical checkpoint or qualification exists.",
+    "Overflow47 is intermediate, not final; no final slack or antenna result is available.",
+    "Buffer insertion counts are separate operation reports, not a final net instance increase.",
+    "The tool continued making progress until timeout; this does not demonstrate a deadlock or memory exhaustion."
+  ],
+  "next_step": "Inspect saved stage artifacts before selecting another control; do not blindly rerun or promote this profile.",
+  "artifact_id": 13198221299,
+  "artifact_size_in_bytes": 101358074,
+  "saved_process_stats": {
+    "37-openroad-resizertimingpostcts": {
+      "time": {
+        "cpu_time_user": "01:43:54.939",
+        "cpu_time_system": "00:00:00.900",
+        "runtime": "01:43:56.369",
+        "cpu_time_iowait": "00:00:00.000"
+      },
+      "peak_resources": {
+        "cpu_percent": 109.6,
+        "memory_rss": "1GiB",
+        "memory_vms": "1GiB",
+        "threads": 1
+      },
+      "avg_resources": {
+        "cpu_percent": 99.98719779512282,
+        "memory_rss": "1GiB",
+        "memory_vms": "1GiB",
+        "threads": 0.9999838824060344
+      }
+    },
+    "41-openroad-repairdesignpostgrt": {
+      "time": {
+        "cpu_time_user": "01:09:37.699",
+        "cpu_time_system": "00:02:23.340",
+        "runtime": "01:12:01.486",
+        "cpu_time_iowait": "00:00:00.000"
+      },
+      "peak_resources": {
+        "cpu_percent": 109.8,
+        "memory_rss": "1GiB",
+        "memory_vms": "2GiB",
+        "threads": 1
+      },
+      "avg_resources": {
+        "cpu_percent": 99.9838178519864,
+        "memory_rss": "1GiB",
+        "memory_vms": "1GiB",
+        "threads": 0.9999767431043304
+      }
+    }
+  },
+  "input_sha256": {
+    "37-openroad-resizertimingpostcts/openroad-resizertimingpostcts.process_stats.json": "6e1fa3d07a7fa39f56a25ee69434d3b667e1cafe3eb7c226d3415c2df91b5041",
+    "41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.process_stats.json": "96bf6f1e70c2fac4c92fef7e0dcbc7c51047620d3d31308de57891f3340123e5"
+  }
+}

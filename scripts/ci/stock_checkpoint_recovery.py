@@ -59,13 +59,22 @@ def validate(root, manifest, run, artifact, *, require_runner_root=False):
                                  CTS_SINK_CLUSTERING_MAX_DIAMETER=100,
                                  GRT_ANTENNA_REPAIR_DIODE_ONLY=True),
     }
+    recipes['shared_minbuf2'] = dict(
+        recipes['shared_cluster100'], EXTRA_EXCLUDED_CELLS=['sg13cmos5l_buf_1'],
+        SYNTH_BUFFER_CELL='sg13cmos5l_buf_2/A/X')
     recipe = manifest.get('recipe', 'recovered_hold275')
     if recipe not in recipes:
         raise ValueError('Unknown recovered physical recipe')
     expected = recipes[recipe]
-    if (any((config.get(key) is not value) if isinstance(value, bool)
-            else (type(config.get(key)) not in (int, float) or config[key] != value)
-            for key, value in expected.items())
+    def matches(key, value):
+        actual = config.get(key)
+        if isinstance(value, bool):
+            return actual is value
+        if isinstance(value, (str, list)):
+            return type(actual) is type(value) and actual == value
+        return type(actual) in (int, float) and actual == value
+
+    if (any(not matches(key, value) for key, value in expected.items())
             or 'PNR_SDC_FILE' in config or 'SIGNOFF_SDC_FILE' in config):
         raise ValueError('Wrong recovered physical recipe')
     return source

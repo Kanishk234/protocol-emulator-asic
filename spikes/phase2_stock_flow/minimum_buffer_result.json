@@ -1,0 +1,128 @@
+{
+  "source_run": 41569397169,
+  "artifact_id": 13205992797,
+  "artifact_size_in_bytes": 254093403,
+  "raw_repeated_metrics_independently_matched": true,
+  "qualification": {
+    "qualified": false,
+    "failures": [
+      "antenna__violating__nets: 4",
+      "antenna__violating__pins: 4"
+    ],
+    "final_global_overflow": 0,
+    "source_state": "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json",
+    "minimum_fast_hold_ns": 0.05,
+    "detailed_routing_performed": false,
+    "official_gds_signoff": false
+  },
+  "fresh_corner_metrics": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.144394,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.738651,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.355043,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "fresh_antenna_metrics": {
+    "antenna__violating__nets": 4,
+    "antenna__violating__pins": 4
+  },
+  "final_overflow_row": "Total           601423        309862           51.52%             0 /  0 /  0",
+  "area": {
+    "design__instance__count": 45099,
+    "design__instance__area": 688086
+  },
+  "excluded_small_buffer_count": 0,
+  "input_sha256": {
+    "runs/stock-corner-audit/screen_qualification.json": "97d44814d883eb06ba3d642460b4209c666748662d2cac6ee0120dcf95623a1f",
+    "runs/stock-corner-audit/comparison.json": "d491d9b1ef0977133f8cf1f7c31f773e95b9741e8b2425bf1478a7bbe8747f06",
+    "runs/stock-corner-audit/read_only_audit.json": "82bfe3fa3f90afe1081b2b15da4892b1627c5c85cee2510514dd836b9147e5c8",
+    "runs/stock-official-baseline/effective_profile.json": "f1ab35cbf2811e6bc8d6086518a5aec8be68c158f65a4a10aa28c13ce5f4ac3f",
+    "runs/stock-corner-audit/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "041826576996feb721b8729d1e61d1cc6b212ad4710db5b1be2b6f5e24a01770",
+    "runs/stock-corner-audit/after-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "2ad74e297b0773967a5cef1605f8d56fffef652ac3a3fe6cff9885a3cb1b8dc0",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "cca4bffb05b36e54137e7e562e02e5234a1fc18f6c17174047a12eafd1ebb851",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "2ad74e297b0773967a5cef1605f8d56fffef652ac3a3fe6cff9885a3cb1b8dc0",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/or_metrics_out.json": "37afac6437a38c27d76dec409a688e400ee05a3f6e3d1b2588e4f5af62b5cdbc",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna_summary.rpt": "5fed345c76e03f90a82c5591b22e44d28455313299574177452ade05103f9360",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna.rpt": "d87773f567a80a791831b0fc57568bcd637b6ff603f432a6b639a7d359bb4869",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "041826576996feb721b8729d1e61d1cc6b212ad4710db5b1be2b6f5e24a01770",
+    "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "cca4bffb05b36e54137e7e562e02e5234a1fc18f6c17174047a12eafd1ebb851",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log": "780c2141660c9cdd887170f17bb23b85850af4c7047fecd141cbe95bcfaa3dcf",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/or_metrics_out.json": "69f961107e7a05dd412a40fd0ab86d29b8f6e8abdfe0d7f08161c32786d8ccda",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "e04d7c388e474d035435a41ce9fc0c6e17b66ccc601521d814085e1139a59544",
+    "spikes/phase2_stock_flow/selected_profile.json": "a1304844c206bde10dc57b46a853144e335da3907080f93fcd6da7636197eb95"
+  },
+  "conclusion": "Timing/electrical/overflow pass; four cumulative antenna failures remain. No DRT or official qualification.",
+  "residual_antennas": [
+    {
+      "net": "_10511_",
+      "sink": "hold7969/A",
+      "master": "sg13cmos5l_dlygate4sd3_1",
+      "violating_cumulative_ratios": [
+        {
+          "actual": 229.28,
+          "required": 200.0
+        }
+      ]
+    },
+    {
+      "net": "_19518_",
+      "sink": "wire13568/A",
+      "master": "sg13cmos5l_buf_2",
+      "violating_cumulative_ratios": [
+        {
+          "actual": 239.72,
+          "required": 200.0
+        },
+        {
+          "actual": 315.66,
+          "required": 200.0
+        }
+      ]
+    },
+    {
+      "net": "net11878",
+      "sink": "_38673_/A",
+      "master": "sg13cmos5l_nand2_1",
+      "violating_cumulative_ratios": [
+        {
+          "actual": 215.81,
+          "required": 200.0
+        }
+      ]
+    },
+    {
+      "net": "net12579",
+      "sink": "wire12579/A",
+      "master": "sg13cmos5l_buf_2",
+      "violating_cumulative_ratios": [
+        {
+          "actual": 214.77,
+          "required": 200.0
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "reference_run": 40779354529,
+    "fast_hold_improvement_ns": 0.05087269999999999,
+    "antenna_net_change": -1,
+    "area_increase_um2": 13739,
+    "note": "Area delta uses rounded native reported areas; no same-path timing attribution."
+  }
+}

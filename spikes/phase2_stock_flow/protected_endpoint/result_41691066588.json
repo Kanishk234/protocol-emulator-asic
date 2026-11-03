@@ -1,0 +1,142 @@
+{
+  "run": 41691066588,
+  "cases": {
+    "false": {
+      "measurement": {
+        "diode_present": false,
+        "source_sink_origin_separation_um": 600.96,
+        "relay_sink_antenna_violation": false,
+        "expected_response_observed": false,
+        "fresh_antenna": {
+          "antenna__violating__nets": 0,
+          "antenna__violating__pins": 0
+        },
+        "full_design_qualification": false,
+        "scope": "Toy response measurement; pair comparison required to establish efficacy"
+      },
+      "probe_result": {
+        "protected": true,
+        "connectivity_preserved": true,
+        "diode_present": false,
+        "equivalent_driver_sizing_allowed": true,
+        "native_protection_logs": [
+          "32-openroad-repairdesignpostgpl/openroad-repairdesignpostgpl.log",
+          "37-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log",
+          "43-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log",
+          "41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log",
+          "28-openroad-globalplacement/openroad-globalplacement.log"
+        ],
+        "full_design_qualification": false,
+        "all_repair_stages_exercised_protection": true,
+        "final_native_metrics": {
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.36149,
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 5.74133,
+          "timing__hold__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_r2r__ws__corner:nom_typ_1p20V_25C": 0.36149,
+          "timing__hold_r2r_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_r2r__ws__corner:nom_typ_1p20V_25C": 1e+30,
+          "timing__setup_r2r_vio__count__corner:nom_typ_1p20V_25C": 0
+        },
+        "extracted_timing_performed": false,
+        "scope": "Tiny stock Classic probe; metrics are measurements, not design acceptance"
+      },
+      "guide_rectangles_by_layer": {
+        "Metal1": 2,
+        "Metal2": 2,
+        "Metal3": 1
+      },
+      "input_sha256": {
+        "runs/protected-probe/43-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "13fe99f7807d6ed0768bfcf0b8f3ee529e7a5cadf33960f10f0f7101ca9ade89",
+        "runs/protected-probe/43-openroad-resizertimingpostgrt/tt_um_tripwire.def": "1ce220f13c26d39da52a5d755eb67109fd4e39ee8fab00f804fa5d07d8f37367",
+        "runs/protected-probe/44-openroad-stamidpnr-3/or_metrics_out.json": "989a69b57ca0fb05c619af32e29b9c6e1f591fe0b69634d0119937c028eba2db",
+        "runs/probe-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+        "runs/probe-antenna/1-openroad-checkantennas/reports/antenna.rpt": "88ceef0b63031420e468a911f7c57fd68d4c409b45a681c14667323216ceb4fb",
+        "runs/protected-probe/43-openroad-resizertimingpostgrt/after_grt.guide": "45dc69716e9a026830c0b6b47e92e04213ea43f2c2e7bab606390777921845ec"
+      }
+    },
+    "true": {
+      "measurement": {
+        "diode_present": true,
+        "source_sink_origin_separation_um": 600.96,
+        "relay_sink_antenna_violation": false,
+        "expected_response_observed": true,
+        "fresh_antenna": {
+          "antenna__violating__nets": 0,
+          "antenna__violating__pins": 0
+        },
+        "full_design_qualification": false,
+        "scope": "Toy response measurement; pair comparison required to establish efficacy"
+      },
+      "probe_result": {
+        "protected": true,
+        "connectivity_preserved": true,
+        "diode_present": true,
+        "equivalent_driver_sizing_allowed": true,
+        "native_protection_logs": [
+          "32-openroad-repairdesignpostgpl/openroad-repairdesignpostgpl.log",
+          "37-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log",
+          "43-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log",
+          "41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log",
+          "28-openroad-globalplacement/openroad-globalplacement.log"
+        ],
+        "full_design_qualification": false,
+        "all_repair_stages_exercised_protection": true,
+        "final_native_metrics": {
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.35223,
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 5.73681,
+          "timing__hold__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_r2r__ws__corner:nom_typ_1p20V_25C": 0.35223,
+          "timing__hold_r2r_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_r2r__ws__corner:nom_typ_1p20V_25C": 1e+30,
+          "timing__setup_r2r_vio__count__corner:nom_typ_1p20V_25C": 0
+        },
+        "extracted_timing_performed": false,
+        "scope": "Tiny stock Classic probe; metrics are measurements, not design acceptance"
+      },
+      "guide_rectangles_by_layer": {
+        "Metal1": 2,
+        "Metal2": 2,
+        "Metal3": 1
+      },
+      "input_sha256": {
+        "runs/protected-probe/43-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "6effbc76564b5f238929521b2a7f8c65418f7dbc86366b7889be4ad4d0e1acc8",
+        "runs/protected-probe/43-openroad-resizertimingpostgrt/tt_um_tripwire.def": "03b9ae8fd69c946aee4def1d5ff6fd04dcc262946a287d73073da4806697e616",
+        "runs/protected-probe/44-openroad-stamidpnr-3/or_metrics_out.json": "4f256527aac880123ded932f950a18b15b1115e66386684899a0898ed8c16d81",
+        "runs/probe-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+        "runs/probe-antenna/1-openroad-checkantennas/reports/antenna.rpt": "88ceef0b63031420e468a911f7c57fd68d4c409b45a681c14667323216ceb4fb",
+        "runs/protected-probe/43-openroad-resizertimingpostgrt/after_grt.guide": "034e23e1e1e91e4c1a74f573d3ec0a756fd23277d271d3b07513cde796326d98"
+      }
+    }
+  },
+  "paired_diode_efficacy_established": false,
+  "full_design_qualification": false,
+  "conclusion": "Inconclusive efficacy: diode-absent control also antenna-clean. Both relay nodes survive and remain600.96umapart;typical electrical clean. Stop distance-only toy sweeps and inspect actual failing topology.",
+  "guide_limitations": "Global guide rectangles are not detailed routed wires or exact antenna metal area.",
+  "actual_failing_reference": {
+    "run": 41569397169,
+    "net": "_19518_",
+    "guide_sha256": "7662f071cd554a95b2dd8a5e72046f93223c7f3b65c56f9ee8ae4afce47512a5",
+    "guide_rectangles_by_layer": {
+      "Metal1": 2,
+      "Metal2": 18,
+      "Metal3": 9,
+      "Metal4": 1
+    }
+  }
+}

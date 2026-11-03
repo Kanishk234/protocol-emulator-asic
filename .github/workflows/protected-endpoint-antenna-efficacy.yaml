@@ -1,0 +1,126 @@
+# Controlled toy experiment; antenna repair deliberately disabled in both cases.
+name: protected-endpoint-antenna-efficacy
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        diode:
+        - 'false'
+        - 'true'
+    env:
+      PDK_ROOT: /home/runner/pdk
+      PROBE_PROTECTED: 'true'
+      PROBE_DIODE_PRESENT: ${{ matrix.diode }}
+    steps:
+    - name: Check out project
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Prepare isolated probe in ephemeral checkout
+      run: |-
+        set -euo pipefail
+        cp spikes/phase2_stock_flow/protected_endpoint/probe.v src/tt_um_tripwire.v
+        python - <<'PYCODE'
+        import json, os
+        from pathlib import Path
+        p=Path('src/config.json'); d=json.loads(p.read_text())
+        d.update(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=30, LINTER_INCLUDE_PDK_MODELS=True,
+         RUN_POST_GRT_DESIGN_REPAIR=True, RUN_POST_GRT_RESIZER_TIMING=True,
+         SYNTH_BUFFER_CELL='sg13cmos5l_buf_2/A/X', GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=20,
+         RSZ_DONT_TOUCH_RX=r'(^|[./])trw_ap_(node|driver|sink|diode)$' if os.environ['PROBE_PROTECTED']=='true' else '$^')
+        d.update(RUN_ANTENNA_REPAIR=False, RUN_HEURISTIC_DIODE_INSERTION=False, DIODE_ON_PORTS="none",
+         MANUAL_GLOBAL_PLACEMENTS={
+         'trw_ap_driver': {'location':[299.52,351.54],'orientation':'N'},
+         'trw_ap_sink': {'location':[900.48,351.54],'orientation':'N'}})
+        if os.environ['PROBE_DIODE_PRESENT']=='true':
+         d['MANUAL_GLOBAL_PLACEMENTS']['trw_ap_diode']={'location':[904.32,351.54],'orientation':'N'}
+        else:
+         q=Path('src/tt_um_tripwire.v'); text=q.read_text()
+         line='  (* keep = 1 *) sg13cmos5l_antennanp trw_ap_diode (.A(trw_ap_node));'
+         assert text.count(line)==1
+         q.write_text(text.replace(line,''))
+        p.write_text(json.dumps(d,indent=2)+'\n')
+        PYCODE
+    - name: Check out Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+        path: tt
+    - name: Check out the pinned IHP installer
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-gds-action
+        ref: 3412659307918422f3f0727917cf9b499aaca588
+        path: .tt-gds-action
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install Tiny Tapeout prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install flow dependencies
+      run: pip install -r tt/requirements.txt
+    - name: Install IHP PDK
+      run: ./.tt-gds-action/install_sg13cmos5l.sh
+    - name: Install pinned LibreLane
+      run: pip install librelane==3.1.0.dev3
+    - name: Verify the reference stock engine image
+      run: |-
+        set -euo pipefail
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev3
+        python - <<'PYCODE'
+        import json, subprocess
+        from pathlib import Path
+        source = json.loads(Path('spikes/phase2_stock_flow/shared_cluster100_postant_checkpoint.json').read_text())
+        engine = source['toolchain']
+        image = engine['stock_image']
+        digests = json.loads(subprocess.check_output(['docker', 'image', 'inspect', image,
+                            '--format', '{{json .RepoDigests}}'], text=True))
+        assert image.rsplit(':', 1)[0] + '@' + engine['stock_digest'] in digests, 'Reference engine drift'
+        Path('spikes/phase2_stock_flow/toolchain_preflight.json').write_text(json.dumps(engine, indent=2) + '\n')
+        print('Verified reference unmodified stock engine digest')
+        PYCODE
+    - name: Generate stock TT project configuration
+      run: python tt/tt_tool.py --create-user-config --ihp
+    - name: Measure stock physical optimization and connectivity
+      timeout-minutes: 30
+      run: |
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        mkdir -p runs
+        mkdir runs/protected-probe
+        python -m librelane --docker-no-tty --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --manual-pdk --run-tag protected-probe --force-run-dir runs/protected-probe --hide-progress-bar --to OpenROAD.STAMidPNR-3 src/config_merged.json
+        python scripts/ci/protected_endpoint_probe.py runs/protected-probe --protected "$PROBE_PROTECTED" --diode-present "$PROBE_DIODE_PRESENT"
+        python - <<'PYCODE'
+        import json,sys
+        from pathlib import Path
+        sys.path.insert(0,'scripts/ci')
+        from native_stock_route import run_step
+        state=list(Path('runs/protected-probe').glob('*-openroad-stamidpnr-3/state_out.json'))
+        assert len(state)==1
+        run_step(json.loads(Path('src/config_merged.json').read_text()),state[0],Path('runs/probe-antenna'),['OpenROAD.CheckAntennas'])
+        PYCODE
+        python scripts/ci/antenna_efficacy_probe.py runs/protected-probe runs/probe-antenna --diode-present "$PROBE_DIODE_PRESENT"
+    - name: Upload probe evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: antenna-efficacy-${{ matrix.diode }}-${{ github.run_id }}
+        path: |-
+          runs/**
+          src/config*.json
+          src/tt_um_tripwire.v
+        if-no-files-found: warn

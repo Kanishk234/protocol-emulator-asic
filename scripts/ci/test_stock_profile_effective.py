@@ -165,6 +165,26 @@ def test_unreviewed_cell_exclusion_rejected(tmp_path):
         validate(tmp_path, selected)
 
 
+@pytest.mark.parametrize('case', ['valid', 'noop', 'other_layer', 'wrong_original', 'missing_layer', 'global'])
+def test_metal3_resource_control(tmp_path, case):
+    selected = fixture(tmp_path, {'GRT_LAYER_ADJUSTMENTS': [0, 0, 0.08, 0, 0]}, late=0.175)
+    path = tmp_path / '44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log'
+    text = '[INFO GRT-0022] Global adjustment: 16%\n'
+    rows = [('Metal2', 232949, 186595), ('Metal3', 281986, 255000), ('Metal4', 228835, 182846)]
+    if case == 'noop': rows[1] = ('Metal3', 281986, 231982)
+    if case == 'other_layer': rows[0] = ('Metal2', 232949, 190000)
+    if case == 'wrong_original': rows[1] = ('Metal3', 290000, 255000)
+    if case == 'missing_layer': rows.pop()
+    if case == 'global': text = text.replace('16%', '15%')
+    text += ''.join(f'{name} Horizontal {a} {b} 10.0%\n' for name, a, b in rows)
+    path.write_text(text)
+    if case == 'valid':
+        assert validate(tmp_path, selected)['routing_resources']['Metal3']['derated'] == 255000
+    else:
+        with pytest.raises(ValueError, match='resource|reserve'):
+            validate(tmp_path, selected)
+
+
 @pytest.mark.parametrize('replacement', ['sg13cmos5l_buf_2', 'sg13cmos5l_buf_4'])
 @pytest.mark.parametrize('excluded_remains', [True, False])
 def test_small_buffer_exclusion_final_netlist(tmp_path, replacement, excluded_remains):

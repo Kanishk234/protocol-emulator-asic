@@ -1,0 +1,52 @@
+{
+  "baseline_sha256": "aed5401613c7f7403ee5750f4830b10828d3e9abafe8a25ee698d492cfd6d758",
+  "candidate_sha256": "7858e874dc49c4787daeb39ace4a1556c4e36cb063045f4e921e047a662328ef",
+  "patch_sha256": "8b8d8b3c769c7c53fd7b01fa68e4f5664b4327140c82310d2f598f3332e03e92",
+  "comparison_reference_run": 41569397169,
+  "scope": "Equivalent host debug word selection before lane selection; no new state or cycles",
+  "proofs": {
+    "actual_combinational_block_NL2_NL3": "SAT equivalent with original invalid-address guard",
+    "wrong_rpc_slice_mutant": "rejected"
+  },
+  "rtl_protocol_replay": {
+    "passed": 22,
+    "failed": 0,
+    "simulator": "Verilator",
+    "optional_sigrok_skipped": true,
+    "results_sha256": "beb260c1e5f0255a66ebbd07030696b958e994cd8ba39a121790d341698286bd",
+    "log_sha256": "7efae83a3c7cf7a835ed7816510844c33c37c6b1afb602b4baccc4a808c0ab14"
+  },
+  "independent_uart_trace_decode": {
+    "scope": "Independent decode of final saved UART TX trace only, 9600 baud",
+    "decoded_hex": "54a5",
+    "vcd_sha256": "236cacb4f2bc9330632443a3844735b140a49a5ca3cb1f1c93c2b32ed7ff649f",
+    "sandbox_usb_init_prevented_decoder": true
+  },
+  "local_mapping": {
+    "2": {
+      "valid_and_invalid_lane_addresses": "SAT equivalence passes with existing read-address guard",
+      "source_sha256": "aed5401613c7f7403ee5750f4830b10828d3e9abafe8a25ee698d492cfd6d758",
+      "trial_sha256": "7858e874dc49c4787daeb39ace4a1556c4e36cb063045f4e921e047a662328ef"
+    },
+    "3": {
+      "valid_and_invalid_lane_addresses": "SAT equivalence passes with existing read-address guard",
+      "source_sha256": "aed5401613c7f7403ee5750f4830b10828d3e9abafe8a25ee698d492cfd6d758",
+      "trial_sha256": "7858e874dc49c4787daeb39ace4a1556c4e36cb063045f4e921e047a662328ef"
+    },
+    "full_mapping_reference": {
+      "num_cells": 47919,
+      "area": 595129.5126,
+      "sequential_area": 118356.9408,
+      "rpc0_lane_pair_mux_count_after_buffer_tracing": 1
+    },
+    "full_mapping_trial": {
+      "num_cells": 47868,
+      "area": 595240.947,
+      "sequential_area": 118356.9408,
+      "rpc0_lane_pair_mux_count_after_buffer_tracing": 0
+    },
+    "scope": "Local mapped area, no native physical timing/antenna qualification"
+  },
+  "physical_qualification": false,
+  "official_gds_signoff": false
+}

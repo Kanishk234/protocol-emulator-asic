@@ -1,0 +1,56 @@
+--- a/src/trw_host.v
++++ b/src/trw_host.v
+@@ -231,29 +231,35 @@
+ 
+     // the addressed lane's debug fields
+     wire [1:0]     lk  = r_ln[6:5];
+-    wire [LDW-1:0] ld  = lane_dbg[LDW*lk +: LDW];
+-    reg  [15:0]    lane_word;
++    wire [16*NL-1:0] lane_words;
++    genvar dbg_lane;
++    generate for (dbg_lane = 0; dbg_lane < NL; dbg_lane = dbg_lane + 1) begin : g_debug_word
++        wire [LDW-1:0] ld = lane_dbg[LDW*dbg_lane +: LDW];
++        reg [15:0] word_value;
+     always @* begin
+         case (r_ln[4:0])
+             `TRW_HL_R0, `TRW_HL_R1, `TRW_HL_R2, `TRW_HL_R3:
+-                                  lane_word = ld[16*r_ln[1:0] +: 16];
+-            `TRW_HL_STATE:        lane_word = {12'd0, ld[67:64]};
+-            `TRW_HL_FLAGS:        lane_word = {9'd0, ld[74:72], ld[71:68]};
+-            `TRW_HL_RPC:          lane_word = {7'd0, ld[83:75]};
+-            `TRW_HL_RIR_STATUS:   lane_word = {ld[84], ld[101], 14'd0};
+-            `TRW_HL_RIR:          lane_word = ld[100:85];
+-            `TRW_HL_CHANNELS:     lane_word = {10'd0, ld[103], ld[105], ld[102], ld[104], ld[143:142]};
+-            `TRW_HL_I0_TAG:       lane_word = {14'd0, ld[161:160]};
+-            `TRW_HL_I0_DATA:      lane_word = ld[159:144];
+-            `TRW_HL_I1_TAG:       lane_word = {14'd0, ld[179:178]};
+-            `TRW_HL_I1_DATA:      lane_word = ld[177:162];
+-            `TRW_HL_O0_TAG:       lane_word = {14'd0, ld[123:122]};
+-            `TRW_HL_O0_DATA:      lane_word = ld[121:106];
+-            `TRW_HL_O1_TAG:       lane_word = {14'd0, ld[141:140]};
+-            `TRW_HL_O1_DATA:      lane_word = ld[139:124];
+-            default:              lane_word = 16'd0;
++                                  word_value = ld[16*r_ln[1:0] +: 16];
++            `TRW_HL_STATE:        word_value = {12'd0, ld[67:64]};
++            `TRW_HL_FLAGS:        word_value = {9'd0, ld[74:72], ld[71:68]};
++            `TRW_HL_RPC:          word_value = {7'd0, ld[83:75]};
++            `TRW_HL_RIR_STATUS:   word_value = {ld[84], ld[101], 14'd0};
++            `TRW_HL_RIR:          word_value = ld[100:85];
++            `TRW_HL_CHANNELS:     word_value = {10'd0, ld[103], ld[105], ld[102], ld[104], ld[143:142]};
++            `TRW_HL_I0_TAG:       word_value = {14'd0, ld[161:160]};
++            `TRW_HL_I0_DATA:      word_value = ld[159:144];
++            `TRW_HL_I1_TAG:       word_value = {14'd0, ld[179:178]};
++            `TRW_HL_I1_DATA:      word_value = ld[177:162];
++            `TRW_HL_O0_TAG:       word_value = {14'd0, ld[123:122]};
++            `TRW_HL_O0_DATA:      word_value = ld[121:106];
++            `TRW_HL_O1_TAG:       word_value = {14'd0, ld[141:140]};
++            `TRW_HL_O1_DATA:      word_value = ld[139:124];
++            default:              word_value = 16'd0;
+         endcase
+     end
++        assign lane_words[16*dbg_lane +: 16] = word_value;
++    end endgenerate
++    wire [15:0] lane_word = lane_words[16*lk +: 16];
+ 
+     reg     uf_late, uf_ovr;                   // unit_flags word r_uf (any unit count)
+     integer ku;

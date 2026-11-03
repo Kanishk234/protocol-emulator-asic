@@ -1,0 +1,14 @@
+{
+  "profile": "rtl_shared_minbuf2_host_words",
+  "archived_ci_preparation": "pass",
+  "pinned_tt_merge": "pass",
+  "merged_config_delta": {},
+  "source_delta": [
+    "src/trw_host.v"
+  ],
+  "focused_tests_passed": 201,
+  "all_embedded_shell_syntax": "pass",
+  "physical_run_launched": false,
+  "project_config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567",
+  "merged_config_sha256": "64f9bdf23c23f3883a4c4fdc84fc1b377b7fb41db2c2a64e2f896ad8aca83788"
+}

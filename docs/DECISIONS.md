@@ -1514,6 +1514,14 @@ Use a tiny standalone TT probe with a counter for clocked load and two otherwise
 
 Nominal relay area23.5872µm² excludes routing/repair cost; two buffer propagation delays remain. Protection applies to its own buffer input,not arbitrary original NAND/delay sinks. A successful toy may have insufficient stress or fail electrical/antenna limits; full-design integration and configuration adoption remain unproved.184focused checks,ephemeral preparation,pinned TT merge and shell syntax pass. No native physical result yet. Source and scope:spikes/phase2_stock_flow/protected_endpoint/README.md.
 
+## D-141 (2026-11-03): isolate diode efficacy with controlled antenna geometry
+
+The20µmwire-repair probe shows native protection preserves connectivity while the unprotected control splits. Both remain antenna-clean,so this does not establish diode efficacy. Next use the same tiny relay with protected connectivity in both cases and one diode-present/absent source difference. Native manual initial placement separates driver/sink600.96µm;require at least400µmactual final origin separation. No fixed-placement or routed-length claim.
+
+Disable native automatic antenna repair,heuristic insertion and port diodes only for this isolated control,so the absent case cannot be silently repaired. Leave the full-design recipe,acceptance gates and official jobs unchanged. Use stock tools/stages/config controls,with no custom physical ECO. Record target-sink antenna response and typical electrical/timing measurements. A green measurement job may be inconclusive;only the paired contrast establishes efficacy in this toy. No full-design/source integration follows automatically.
+
+187focused checks,exact source/config delta assertions,both ephemeral preparations,pinned TT merges and shell syntax pass. Native placement/resizer/antenna behavior is still pending. Source/control hashes and scope:protected_endpoint/antenna_efficacy_preflight.json. Nominal diode cost5.4432µm²plus routing;two relay buffer delays and original-sink coverage limits remain.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

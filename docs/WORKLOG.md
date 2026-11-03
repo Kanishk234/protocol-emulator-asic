@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Prepare controlled antenna-efficacy pair
+
+- User requested continued work. D-141prepares own tiny diode-present/absent workflow:both protected,manual native driver/sink placement600.96µmapart,actual final distance≥400µmrequired. Exact source difference is one no-output diode;config differs only by diode placement. Native auto antenna repair/heuristic/port diodes disabled only in toy to preserve absent control;main recipe/gates/official jobs untouched.
+- Generalized existing connectivity checker to allow an explicitly absent diode,retaining default behavior. New measurement checks target-sink antenna response,actual geometry and disabled auto-repair controls;records expected_response_observed,not full-design qualification. A measurement can be inconclusive;needs paired failing-absent/clean-present contrast. No source/primitive adoption claim.
+-187focused tests pass;wrong/missing sink,target-net confusion and geometry/missing-instance controls included. Both exact ephemeral preparations,source/config delta assertions,pinned TT merges and shell syntax pass. Publish owned checker/tests/control/evidence/ownworkflow/docs under standing authorization,then launch one pair. No main hardware/config/official job/gate change,DRT/phase tick/watcher;unrelated files preserved. Receipt follows.
+
 ## 2026-11-03 — Native repair control differentiates protected/unprotected relay
+
+- Publication receipt:091f33e measured result and5157a48 bounded claims/scope/docs pushed; remote main verified5157a48df028eec29f41fc2afa6f8f3a350541f7. No new physical run launched. All owned local commands finished,no watcher; main hardware/config/official gates unchanged. Next establish antenna efficacy under controlled failing geometry before integration. This receipt remains local.
 
 -41684924544completes both cases. Retrieved artifacts and independently checked final netlist connectivity,rawSTAmetrics/fresh antenna and actual native20µmrepair command. Disabled connectivityFalse;enabledTrue,with four-stage protection evidence. Repair adds37buffers/19netsdisabled versus35/18enabled. Both typical electrical0,antenna0,hold0.35609ns;setup11.389/11.5233ns. This is useful native preservation evidence,not full-design/fast-slow/extracted qualification.
 - Recorded paired raw-source hashes and relay-cell connectivity in result_41684924544.json. Both cases are antenna-clean,so this doesnotyet establish diode efficacy on a failing antenna. Next needs antenna-stressed diode-present/absent control protecting the actual sink gate before integrating a general primitive. No new physical run/main hardware/config/official job/gate/phase tick/watcher. Publish owned result/scope/worklog under standing authorization; unrelated files preserved. Receipt follows.

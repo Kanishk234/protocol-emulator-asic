@@ -32,8 +32,10 @@ def validate(root, selected):
                 raise ValueError('Unreviewed string control')
             matched = actual == expected
         elif isinstance(expected, list):
-            if key != 'EXTRA_EXCLUDED_CELLS' or expected not in (
-                    ['sg13cmos5l_dlygate4sd3_1'], ['sg13cmos5l_buf_1']):
+            allowed = ((key == 'EXTRA_EXCLUDED_CELLS' and expected in (
+                ['sg13cmos5l_dlygate4sd3_1'], ['sg13cmos5l_buf_1']))
+                or (key == 'GRT_LAYER_ADJUSTMENTS' and expected == [0, 0, 0.08, 0, 0]))
+            if not allowed:
                 raise ValueError('Unreviewed cell exclusion')
             matched = actual == expected
         else:
@@ -161,4 +163,22 @@ def validate(root, selected):
             for layer, original, derated in re.findall(
                 r'(?m)^\s*(\w+)\s+(?:Horizontal|Vertical)\s+(\d+)\s+(\d+)\s+[0-9.]+%', text)
         }
+    if 'GRT_LAYER_ADJUSTMENTS' in selected['changes']:
+        if config.get('GRT_ADJUSTMENT') != 0.16:
+            raise ValueError('Metal3 control requires fixed global reserve')
+        text = one(root, '*-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log').read_text()
+        values = re.findall(r'Global adjustment:\s+([0-9.]+)%', text)
+        if not values or any(float(v) != 16 for v in values):
+            raise ValueError('Global reserve changed during Metal3 control')
+        rows = re.findall(r'(?m)^\s*(Metal[234])\s+(?:Horizontal|Vertical)\s+(\d+)\s+(\d+)\s+[0-9.]+%', text)
+        reference = {'Metal2': (232949, 186595), 'Metal3': (281986, 231982),
+                     'Metal4': (228835, 182846)}
+        for layer, (original, derated) in reference.items():
+            found = [(int(a), int(b)) for name, a, b in rows if name == layer]
+            if not found:
+                raise ValueError('Missing layer resource evidence: ' + layer)
+            for a, b in found:
+                if a != original or (not derated < b < original if layer == 'Metal3' else b != derated):
+                    raise ValueError('Wrong or ineffective Metal3 resource control: ' + layer)
+        result['routing_resources'] = {name: dict(original=int(a), derated=int(b)) for name, a, b in rows}
     return result

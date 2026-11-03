@@ -155,10 +155,45 @@
       "hardware_unchanged": true,
       "comparison_reference_run": 41569397169,
       "comparison_reference_config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567"
+    },
+    "rtl_minbuf2_m3reserve8": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+        "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100,
+        "EXTRA_EXCLUDED_CELLS": [
+          "sg13cmos5l_buf_1"
+        ],
+        "SYNTH_BUFFER_CELL": "sg13cmos5l_buf_2/A/X",
+        "GRT_LAYER_ADJUSTMENTS": [
+          0,
+          0,
+          0.08,
+          0,
+          0
+        ]
+      },
+      "config_sha256": "85a539dd69fdf6749fc49937097c5e010723c03b5e462131944ab6dac7677052",
+      "additional_changes_from_reference": {
+        "GRT_LAYER_ADJUSTMENTS": [
+          0,
+          0,
+          0.08,
+          0,
+          0
+        ]
+      },
+      "rtl_patch": "shared_priority",
+      "hardware_unchanged": true,
+      "comparison_reference_run": 41569397169,
+      "comparison_reference_config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567"
     }
   },
   "hardware_unchanged": true,
-  "purpose": "Measured minimum-buffer41569397169 remains the timing/electrical/overflow reference; no-mirroring41584011383 regresses and is retired. No new physical experiment selected.",
+  "purpose": "One native Metal3 capacity-reserve control against measured minbuf2 reference41569397169; fixed source and final gates.",
   "risks": [
     "This flag affects all native detailed-placement stages,not only the late stage; early placement/clock/timing can change.",
     "An older shared-priority no-mirroring experiment failed setup and congestion; this combination is unproved.",

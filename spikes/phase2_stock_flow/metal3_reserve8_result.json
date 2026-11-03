@@ -1,0 +1,154 @@
+{
+  "source_run": 41694955675,
+  "artifact_id": 13266837285,
+  "artifact_size_in_bytes": 250525090,
+  "raw_repeated_metrics_independently_matched": true,
+  "qualification": {
+    "qualified": false,
+    "failures": [
+      "antenna__violating__nets: 7",
+      "antenna__violating__pins: 7"
+    ],
+    "final_global_overflow": 0,
+    "source_state": "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json",
+    "minimum_fast_hold_ns": 0.05,
+    "detailed_routing_performed": false,
+    "official_gds_signoff": false
+  },
+  "fresh_corner_metrics": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.130236,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.68037,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.329656,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "fresh_antenna_metrics": {
+    "antenna__violating__nets": 7,
+    "antenna__violating__pins": 7
+  },
+  "final_overflow_row": "Total           618162        295218           47.76%             0 /  0 /  0",
+  "area": {
+    "design__instance__count": 44607,
+    "design__instance__area": 682115
+  },
+  "effective_profile": {
+    "profile": "rtl_minbuf2_m3reserve8",
+    "changes": {
+      "RUN_POST_GRT_RESIZER_TIMING": true,
+      "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+      "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+      "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+      "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+      "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100,
+      "EXTRA_EXCLUDED_CELLS": [
+        "sg13cmos5l_buf_1"
+      ],
+      "SYNTH_BUFFER_CELL": "sg13cmos5l_buf_2/A/X",
+      "GRT_LAYER_ADJUSTMENTS": [
+        0,
+        0,
+        0.08,
+        0,
+        0
+      ]
+    },
+    "requested_density_pct": 56,
+    "initial_effective_density_pct": 61.0,
+    "native_clock_cluster_max_diameter_um": 100.0,
+    "native_clock_cluster_size": 8,
+    "excluded_small_buffer_cells": 0,
+    "replacement_cell_counts": {
+      "sg13cmos5l_dlygate4sd1_1": 0,
+      "sg13cmos5l_dlygate4sd2_1": 0,
+      "sg13cmos5l_buf_1": 0,
+      "sg13cmos5l_buf_2": 7109,
+      "sg13cmos5l_buf_4": 647,
+      "sg13cmos5l_buf_8": 1133,
+      "sg13cmos5l_buf_16": 0
+    },
+    "native_max_wire_length_um": 200.0,
+    "native_late_hold_target_ns": 0.175,
+    "native_antenna_mode": "diode_only",
+    "native_early_hold_target_ns": 0.175,
+    "routing_resources": {
+      "Metal2": {
+        "original": 232949,
+        "derated": 186595
+      },
+      "Metal3": {
+        "original": 281986,
+        "derated": 248721
+      },
+      "Metal4": {
+        "original": 228835,
+        "derated": 182846
+      }
+    }
+  },
+  "residual_antennas": [
+    {
+      "net": "_08969_",
+      "sink": "Pin:   _35766_/B (sg13cmos5l_nor3_1)"
+    },
+    {
+      "net": "_10511_",
+      "sink": "Pin:   hold8669/A (sg13cmos5l_dlygate4sd3_1)"
+    },
+    {
+      "net": "u_chip.g_lane\\[1\\].ot\\[1\\]",
+      "sink": "Pin:   hold11440/A (sg13cmos5l_dlygate4sd3_1)"
+    },
+    {
+      "net": "u_chip.g_lane\\[1\\].ot\\[7\\]",
+      "sink": "Pin:   hold11374/A (sg13cmos5l_dlygate4sd3_1)"
+    },
+    {
+      "net": "u_chip.g_unit\\[0\\].u_cfg.g_word\\[2\\].g_stored.g_bit\\[8\\].g_latch.q",
+      "sink": "Pin:   wire14529/A (sg13cmos5l_buf_2)"
+    },
+    {
+      "net": "net13765",
+      "sink": "Pin:   wire13765/A (sg13cmos5l_buf_2)"
+    },
+    {
+      "net": "net14250",
+      "sink": "Pin:   wire14250/A (sg13cmos5l_buf_2)"
+    }
+  ],
+  "input_sha256": {
+    "runs/stock-corner-audit/screen_qualification.json": "a57f4e2ee3cea19506d42ae02654d840bc798a216dbb21185cc48924127bf9e1",
+    "runs/stock-corner-audit/comparison.json": "299c62493e70359dd99416d47221844c3d6f78d8b4e807c8bebe830ceacd0242",
+    "runs/stock-corner-audit/read_only_audit.json": "7de28c3dc8a92c2d3e220a1521b413ae2bf7c1aa899269552d0f63189541d12f",
+    "runs/stock-official-baseline/effective_profile.json": "093b0982afa2aed757aab6ffae2f63a306e071e9056085eaca486be2f0368f23",
+    "runs/stock-corner-audit/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "72597b8493f5bb4b435e0ed5da78460e880d3a204f55f9e7c7997fb3ff662857",
+    "runs/stock-corner-audit/after-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "5ba799b8f58fc01ee7d00d36b5fdd9a692db5d3d756230c61dfba462fa86e0fc",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "9b0cd957adc1b0cfa4745d6c7808a9a932b949415d6ba867e2ac3ada1c4fe507",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "5ba799b8f58fc01ee7d00d36b5fdd9a692db5d3d756230c61dfba462fa86e0fc",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/or_metrics_out.json": "d5478b810050b707c0571be57e65c93a3fa49f8b0547a9caff97154b0a06f2a7",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna_summary.rpt": "9139c699d376d3393ceb0d2816d848f40af1f75506fda8ba27a449507d3f7478",
+    "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna.rpt": "a080eb8fc957c4daf0696b46506d7ad673757d09f1fb6110aa8744959cb97e16",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "72597b8493f5bb4b435e0ed5da78460e880d3a204f55f9e7c7997fb3ff662857",
+    "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "9b0cd957adc1b0cfa4745d6c7808a9a932b949415d6ba867e2ac3ada1c4fe507",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log": "5ce4fd192f8344f236171d5ed078a7ede5d759fee33ab984c17b0d2d54e5d393",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/or_metrics_out.json": "504b49bdc3f5180fbc887776fdc8c5f559f4edc37fdbdff18ec5704ec56be295",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "1b70bc0ca6682942678ca928a05725edf8cc843031fb054de681bb3fddbd7499",
+    "spikes/phase2_stock_flow/selected_profile.json": "1ea853ae0751df2335ed8c5c0e3a091bf17e37323210bf34874463d5f42e7c9d"
+  },
+  "conclusion": "Control effective but unqualified:seven antennas,all timing/electrical/overflow gates pass. Retain minimum-buffer reference with four antennas."
+}

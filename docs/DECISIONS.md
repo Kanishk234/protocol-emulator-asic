@@ -1532,6 +1532,14 @@ Metal3is the heavily used horizontal signal layer in these reports,while Metal2/
 
 194focused checks,exact clean source/SDC/Tcl equality,one-field delta,pinned TT merge and shell syntax pass. New guards reject no-op,wrong-layer,missing or changed resource evidence. No physical result or DRT authorization yet. Evidence:metal3_reserve8_evidence.json.
 
+## D-143 (2026-11-03): diagnose diodes at real frozen failing endpoints
+
+Long-distance toy controls remain antenna-clean without diodes;another distance sweep does not establish efficacy on the real failure. Use the final minbuf2checkpoint with four known failing sinks and compare native experimental Odb.InsertECODiodes with empty-list versus four local diodes. Existing source is immutable;check original masters,placements and signal connections plus exact target/diode connections. Fresh before/after antenna and three-corner STA use the same frozen SDC.
+
+This extra native step is diagnostic only,outside stock Classic. Never promote its checkpoint/recipe to official GDS or weaken screen gates. The inherited NL is not an export of the edited ODB;no GL/LVS or source-based closure follows. Positive evidence would guide a general source-level implementation,with nominal four-diode area21.7728µm²excluding routing/load effects. Empty control distinguishes rerouting effects;existing-source/cell/constraint guards prevent a hidden broad redesign.
+
+Runtime checks must confirm the experimental API/diode interface in the pinned image.201focused checks,actual61file/DEF/target/source-antenna validation,shell selection rehearsal and syntax pass. No native result yet. Scope:PHASE2_ACTUAL_ENDPOINT_DIAGNOSTIC.md;preflight:actual_endpoint_preflight.json.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

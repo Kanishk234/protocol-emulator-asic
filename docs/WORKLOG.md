@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Prepare real-endpoint diode diagnostic with empty control
+
+- User requested continuation. Prepared frozen final minbuf2manifest61bound files,validated against actual source. Native experimental Odb.InsertECODiodes diagnostic compares empty list/four reviewed sinks on copied source. No modified tool scripts or official jobs. Runtime image inspection validates API and diode-cell interface before editing;unknown interfaces fail.
+- Guards require source antenna exactlyfourreviewedpins,original source hashes/masters/placements/signal connections unchanged,and exactzero/four added diodes attached to target nets. Fresh before/after antenna plus paired3cornerSTA explicitly reuse frozen SDC. Inherited NL is NOTan updated edited-design netlist;reportnonpromotable,no GL/LVS/qualification/DRT. Empty control accounts for routing-refresh effects.
+-201focused tests pass,including wrongposition/master/diode/sink edits and reportpin parsing. Actual61files/DEF/targets/sourceantenna matched;source-selection shell emits correct fourenvlines;Python/shell syntax pass. Native engine not local;execution pending. Publish owned scripts/tests/manifest/preflight,ownworkflow/docs and launch pair under standing authorization. Main hardware/config/official jobs/gates/phase ticks unchanged;no watcher. Unrelated files preserved;receipt follows.
+
 ## 2026-11-03 — Retire effective Metal3 control after antenna regression
+
+- Publication receipt:4f86c67result/profile,93cb976own CI default and6cfeb6fdocs pushed;remote main verified6cfeb6f3dcf74a90a1849b02cca8e1850c16c839. No new physicalrun launched;allowned local commands finished,no watcher. Main hardware/config/officialjobs/gatesunchanged;unrelated files preserved. This receipt remains local.
 
 - User reported failure.41694955675completes1h34m38;physical/effective control/fresh STApass,final gate onlyantenna7/7. Retrieved17bounded raw reports from artifact13266837285;independently matched repeated3corner/electrical/fresh antenna and last Total overflow0.
 - Setup0all;holdF/T/S0.130236/0.329656/0.68037ns;electrical0;overflow0. Metal3capacity231982→248721whileMetal2/4fixed,so control actually takes effect. Area682115µm²/count44607vs688086/45099reference;antennas4→7andfastholddecreases. Newfailures span NOR,delay cells,wirebuffers andconfiguration latch. Recordmetal3_reserve8_result.json;retire control/default rather than more reserve sweeps.

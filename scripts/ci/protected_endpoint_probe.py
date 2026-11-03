@@ -5,29 +5,33 @@ from pathlib import Path
 import re
 
 
-def connectivity(text):
+def connectivity(text, diode_present=True):
     cells = {name: (master, dict(re.findall(r'\.(\w+)\s*\(\s*([^)]*?)\s*\)', body)))
              for master, name, body in re.findall(
                  r'\b(sg13cmos5l_\w+)\s+(\S+)\s*\((.*?)\);', text, re.S)}
     expected = {'trw_ap_driver': 'sg13cmos5l_buf_2',
-                'trw_ap_sink': 'sg13cmos5l_buf_2',
-                'trw_ap_diode': 'sg13cmos5l_antennanp'}
+                'trw_ap_sink': 'sg13cmos5l_buf_2'}
+    if diode_present:
+        expected['trw_ap_diode'] = 'sg13cmos5l_antennanp'
+    elif any(master == 'sg13cmos5l_antennanp' for master, pins in cells.values()):
+        return False
     if any(name not in cells or cells[name][0] != master for name, master in expected.items()):
         return False
     node = cells['trw_ap_driver'][1].get('X')
     return bool(node and node == cells['trw_ap_sink'][1].get('A')
-                == cells['trw_ap_diode'][1].get('A'))
+                and (not diode_present or node == cells['trw_ap_diode'][1].get('A')))
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('root', type=Path)
     parser.add_argument('--protected', choices=['true', 'false'], required=True)
+    parser.add_argument('--diode-present', choices=['true', 'false'], default='true')
     args = parser.parse_args()
     paths = list(args.root.glob('*-openroad-resizertimingpostgrt/*.nl.v'))
     if len(paths) != 1:
         raise ValueError('Missing unique final native netlist')
-    intact = connectivity(paths[0].read_text())
+    intact = connectivity(paths[0].read_text(), args.diode_present == 'true')
     logs = list(args.root.glob('*-openroad-*/openroad-*.log'))
     matches = [str(p.relative_to(args.root)) for p in logs
                if "matched don't touch regular expression" in p.read_text()]
@@ -43,6 +47,7 @@ def main():
     if not any(k.startswith('timing__setup__ws__corner:') for k in raw):
         raise ValueError('Missing fresh native setup measurement')
     result = dict(protected=protected, connectivity_preserved=intact,
+                  diode_present=args.diode_present == 'true',
                   native_protection_logs=matches, full_design_qualification=False,
                   all_repair_stages_exercised_protection=covered,
                   final_native_metrics={k: v for k, v in raw.items()

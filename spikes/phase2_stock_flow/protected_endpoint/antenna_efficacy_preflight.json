@@ -1,0 +1,21 @@
+{
+  "purpose": "Controlled tiny diode efficacy measurement,not TRIPWIRE screen",
+  "source_sha256": {
+    "absent": "c37ed0d7554c7ba1b5592b5100e86bf494b5f0280354e52168283915b0092d1e",
+    "present": "b246f430ae4bff21957f0eaf60bf9a63a533bd07efe0eaf9eb4dfcd7a22b6c77"
+  },
+  "only_source_delta": "one no-output diode instance",
+  "only_configuration_delta": "diode placement entry",
+  "source_sink_requested_separation_um": 600.96,
+  "minimum_actual_separation_um": 400,
+  "native_antenna_repair_enabled": false,
+  "native_heuristic_diodes_enabled": false,
+  "native_port_diodes": "none",
+  "native_net_protection_enabled": true,
+  "focused_checks": 187,
+  "exact_ephemeral_preparation": true,
+  "pinned_tt_merge_both_cases": true,
+  "shell_syntax": true,
+  "physical_result": null,
+  "full_design_qualification": false
+}

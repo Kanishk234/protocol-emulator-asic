@@ -2,7 +2,14 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Native repair control differentiates protected/unprotected relay
+
+-41684924544completes both cases. Retrieved artifacts and independently checked final netlist connectivity,rawSTAmetrics/fresh antenna and actual native20µmrepair command. Disabled connectivityFalse;enabledTrue,with four-stage protection evidence. Repair adds37buffers/19netsdisabled versus35/18enabled. Both typical electrical0,antenna0,hold0.35609ns;setup11.389/11.5233ns. This is useful native preservation evidence,not full-design/fast-slow/extracted qualification.
+- Recorded paired raw-source hashes and relay-cell connectivity in result_41684924544.json. Both cases are antenna-clean,so this doesnotyet establish diode efficacy on a failing antenna. Next needs antenna-stressed diode-present/absent control protecting the actual sink gate before integrating a general primitive. No new physical run/main hardware/config/official job/gate/phase tick/watcher. Publish owned result/scope/worklog under standing authorization; unrelated files preserved. Receipt follows.
+
 ## 2026-11-03 — Verify feasibility pair and strengthen repair pressure
+
+- Publication receipt:d4ff6af measured result,2fb1aa4 own CI and14cbc1c docs pushed; remote main verified14cbc1c3a786e59317b3e447ffb43de454bf6769. Launched [20umfeasibility41684924544](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41684924544),confirmed in progress on that SHA. No full-design physical screen/official-job change; all owned local sessions finished,no watcher. This receipt remains local.
 
 -41680124723succeeds both cases. Downloaded two~4.7MBartifacts,independently matched final native metrics and netlist connectivity. Typical setup11.5233ns,hold0.40571ns,electrical0,fresh antenna0both. Enabled matches four repair stages; disabled also preserves relay. No full-design/extracted/all-corner qualification or demonstrated necessity of protection.
 - Relay driver/sink origins42.72µmapart and identical in both cases; native flow adds12hold buffers/1post-GRTbuffer,but direct node splitting under80µmtarget not established. Record paired results/hashes in protected_endpoint/result_41680124723.json.

@@ -43,6 +43,8 @@ The candidate in claim16 was subsequently reproduced end-to-end from fresh RTL w
 
 D-138 is a prepared physical diagnostic, not a new passing-design claim. Its source matches claim18/reference40779354529. Native minimum-buffer settings and170 guard checks do not establish timing or antenna closure; see minimum_buffer_evidence.json. Clock-spacing41532160370 timed out before final qualification. Minimum-buffer41569397169 completes with setupWS0all corners,fast hold144.394ps,electrical0,overflow0,but four antenna failures; see minimum_buffer_result.json. No qualifying screen or extracted/official result follows from this.
 
+| 20 | Native net/instance protection preserves the tested tiny relay connection under20µmwire repair that splits the unprotected control |41684924544;protected_endpoint/result_41684924544.json;independent final-netlist/raw-metric checks | tested | Tiny stock-flow feasibility only. Both cases antenna-clean;does not establish diode efficacy on failing antennas,all-corner/extracted timing,full-design screen or official GDS closure |
+
 ## Known limits (state them wherever the related claim appears)
 
 

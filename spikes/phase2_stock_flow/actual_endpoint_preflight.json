@@ -1,0 +1,26 @@
+{
+  "source_run": 41569397169,
+  "manifest_sha256": "6c0393e9a5dee24eaa69b36157013e048d375f41fb091c5f9d46a9d1e4e2b3ab",
+  "frozen_files": 61,
+  "targets": {
+    "hold7969/A": "_10511_",
+    "wire13568/A": "_19518_",
+    "_38673_/A": "net11878",
+    "wire12579/A": "net12579"
+  },
+  "insert_cases": [
+    false,
+    true
+  ],
+  "native_step": "Odb.InsertECODiodes",
+  "experimental_native_step": true,
+  "runtime_interface_check_required": true,
+  "focused_checks": 201,
+  "actual_def_control_validation": true,
+  "actual_source_antenna_identities_checked": true,
+  "workflow_shell_syntax": true,
+  "source_selection_shell_executed": true,
+  "full_design_qualification": false,
+  "promotable_stock_recipe": false,
+  "post_edit_gate_level_netlist_exported": false
+}

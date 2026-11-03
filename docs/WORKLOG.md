@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Retire effective Metal3 control after antenna regression
+
+- User reported failure.41694955675completes1h34m38;physical/effective control/fresh STApass,final gate onlyantenna7/7. Retrieved17bounded raw reports from artifact13266837285;independently matched repeated3corner/electrical/fresh antenna and last Total overflow0.
+- Setup0all;holdF/T/S0.130236/0.329656/0.68037ns;electrical0;overflow0. Metal3capacity231982→248721whileMetal2/4fixed,so control actually takes effect. Area682115µm²/count44607vs688086/45099reference;antennas4→7andfastholddecreases. Newfailures span NOR,delay cells,wirebuffers andconfiguration latch. Recordmetal3_reserve8_result.json;retire control/default rather than more reserve sweeps.
+- Retain minbuf2reference41569397169with4antenna failures. Next actual-endpoint protection diagnostic needs frozen real geometry;diagnostic ECO must neverbe promotedasstockrecipe. No new physicalrun/DRT/mainhardware/config/officialjob/gatechange,phase tick orwatcher. JSON/YAML/embeddedshellsyntaxpass;no helper/RTLchange requiringrepeatedsimulations. Publishownresult/profile,ownCIretirement anddocs understandingauthorization;unrelatedfiles preserved. Receipt follows.
+
 ## 2026-11-03 — Prepare measured Metal3 detour control on full reference
+
+- Publication receipt:0667d62 tools/evidence,a4a866d tests,124fadb own CI and0a12e14 docs pushed;remote main verified0a12e14b94ff6f6e19ccafb30ed8322986919206. Launched [full Metal3 screen41694955675](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41694955675),confirmed in progress on that SHA.194focused checks/clean prep pass. All owned local sessions finished,no watcher. Main hardware/config/official jobs/final gates unchanged;unrelated files preserved. Next inspect actual per-layer resource effect and all final gates. This receipt remains local.
 
 - Continued actual failing-guide investigation. Stage41pre-antenna→44final envelopes:net12579_129.6→381.6µm,_10511_144→158.4,_19518_561.6→424.8,net11878_374.4unchanged. Guide bounds are not detailed metal length/area,and stage41is not exact post-antenna43. Mixed topology changes discourage simple wire-distance fixes.
 - Read primary OpenROAD26Q2capacity source:zero per-layer values inherit global reserve,nonzero replaces it. D-142sets only GRT_LAYER_ADJUSTMENTS=[0,0,0.08,0,0]against measured minbuf2source41569397169;all RTL/SDC/clock/repair/gates unchanged. Actual resource guard requires increased Metal3capacity and fixed Metal2/4resource tables/global16%;rejects ineffective/wrong-layer/missing evidence.

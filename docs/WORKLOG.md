@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Pre-late audit rules out skipping repair; prepare geometry control
+
+- User reported completion.41582335231succeeds5m50. Retrieved artifact13205994788(123370662bytes); independently matched repeated raw3corner metrics and fresh antenna. Setup0all; holdF/T/S−0.0163279/0.106528/0.323963ns;electrical0;antenna0. Source-view immutability/source55file checks pass. Measurement job green is not design qualification: fast reserve misses50psby66.3279ps. Do not disable late repair.
+- Compared exact pre/final NL/DEF. All four residual sink cell connections unchanged; late repair adds only7hold buffers,legalization reports20500mirrored instances. Two sink orientations flip at fixed origins,one shifts1.92µm,one stays fixed. No sole-cause claim. A smaller late hold target alone has no established direct protection mechanism here.
+- D-139 prepares one native PL_OPTIMIZE_MIRRORING=falsecontrol against minimum-buffer41569397169. Retain clocks/early-late175/wire200/minbuf2/diode-only/native stage order/gates/source. It affects all legalization stages and can regress CTS/setup/hold/congestion; prior no-mirroring failure on older recipe remains relevant risk,not a prediction.176focused tests,exact clean prep/source equality/one-field delta,pinned TT merge and shell syntax pass.
+- Publish owned profiles/evidence,own workflow and docs under standing authorization; launch one full screen. No main hardware/config/official job/gate change,DRT/phase tick/watcher. Preserve unrelated dirty docs,diagnostics/FIPE. Receipt follows.
+
 ## 2026-11-03 — Verify minimum-buffer result and isolate pre-late timing
+
+- Publication receipt:75bc747 tools/result/manifest,2ce0b95 tests,590e1d2 own audit CI and933bc8f docs pushed; remote main verified933bc8fc57dbefec6d7e089227d63ffe22e9ce14. Launched only [read-only pre-late audit41582335231](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41582335231),confirmed in progress on that SHA. Standard test/lint/docs/unit also triggered. No full physical rerun,DRT,official-job change or external watcher; all owned local sessions finished. Next inspect repeated pre-late fast hold/electrical/fresh antenna before selecting a supported physical change. This receipt remains local.
 
 - User reported failure.41569397169 completes2h05m30; physical/effective-control/all-corner audit pass,only strict antenna gate fails. Retrieved bounded raw reports and full saved artifact13205992797(254093403bytes); repeated raw corners/electrical/fresh antennas independently match receipt and final raw Total row confirms0overflow.
 - SetupF/T/S0,holdF/T/S0.144394/0.355043/0.738651ns,electrical0,antennas4/4; area688086µm²/count45099. Buf_1 absent. Compared with clock100: fast+50.8727ps,antennas5→4,area~+13739µm²(~2%). No positive setup reserve or extracted/official pass claim. Remaining sinks: two buf_2,one dlygate4sd3,one nand2_1. Do not blindly upsize buffers further.

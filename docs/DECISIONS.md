@@ -1496,6 +1496,16 @@ An antenna margin-only proposal was rejected after inspecting the stock dependen
 
 170focused guards pass. Exact clean CI preparation matches clock100 RTL/SDC/Tcl and differs only in the two policy fields; pinned TT merge and embedded shell syntax pass. The effective-profile check rejects any remaining buf_1,missing stronger replacements or an inconsistent explicit buffer setting. Native final timing/electrical/antenna/overflow gates remain unchanged. Add stage/CPU/memory heartbeat only to our own diagnostic step; no external watcher. Physical closure is unproved. Evidence: spikes/phase2_stock_flow/minimum_buffer_evidence.json.
 
+## D-139 (2026-11-03): test native mirroring disabled on the measured minimum-buffer reference
+
+General need: preserve antenna protection through the native timing/placement/rerouting sequence without changing protocol behavior or adding physical stages. Read-only audit41582335231 independently repeats setup0,fast hold−16.3279ps and antennas0 before late repair. Final41569397169 has fast144.394ps and four antennas. Skipping late repair is ruled out: the earlier snapshot misses the50psreserve by66.3279ps.
+
+All four final sink cells already exist with identical cell connections before late repair. Only seven hold buffers are added; native legalization reports20500mirrored instances. Two residual sinks change orientation at fixed origins,one moves1.92µm,and the NAND sink has unchanged origin/orientation. This is evidence of a later physical-geometry problem,not proof that mirroring alone causes all four failures. A smaller hold target has no demonstrated direct mechanism to protect these unchanged branches.
+
+Test only PL_OPTIMIZE_MIRRORING=false against41569397169. Keep the minimum-buffer policy,100µmclock clustering,size8,early/late175ps,wire200,diode-only,20ns/SDC,all native stages and every final gate. The flag affects all three native legalization stages,so early placement,CTS,hold,setup and congestion can change; it is not a late-only toggle. Earlier no-mirroring40781730206failed setup/overflow on a different recipe,so neither success nor failure transfers to this combination. There is no new state/latency/protocol logic; physical cost/benefit is unproved. Main adoption remains separately reviewed.
+
+176focused checks,exact clean preparation,identical source/SDC/Tcl,one-field delta,pinned TT merge and shell syntax pass. Existing native-effect guards require legalization and absence of mirroring in all three stage logs. Do not claim a passing screen or proceed to DRT until all final gates pass. Evidence: minbuf2_postant_result.json and minbuf2_no_mirror_evidence.json.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

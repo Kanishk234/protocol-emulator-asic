@@ -661,3 +661,12 @@ Smallest buffer cells are absent as intended. Relative to clock100: fast hold im
 | net12579 | wire12579/A,buf_2 |214.77/200 |
 
 The saved native post-antenna check reports0before late repair. Its fast hold has not yet been independently measured; do not assume it passes because the final repaired checkpoint does. Prepared a read-only repeated three-corner and fresh antenna audit of the exact saved diode checkpoint. Hash-bound55files,source43physical views,source run/artifact/digest and original engine are verified.176focused tests and embedded YAML/shell syntax pass. This audit does not run repair/rerouting,change saved state or qualify for DRT; it determines whether reducing late repair effort is plausible. Evidence: minimum_buffer_result.json and shared_minbuf2_postant_checkpoint.json. Official jobs and all acceptance gates remain unchanged.
+
+
+## 2026-11-03: pre-late audit succeeds but source fast hold fails
+
+Read-only audit [41582335231](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41582335231) completes in5m50s. Fresh repeated raw corners independently match receipt: setup0all,holdF/T/S−0.0163279/0.106528/0.323963ns,electrical0,fresh antennas0. Source files remain frozen; this job success means measurement completion,not design qualification. The source misses the50psfast reserve by66.3279ps. Disabling late repair is ruled out.
+
+Further source-bound comparison shows only seven added hold buffers and all four residual sinks already present with unchanged cell connections. Native final legalization reports20500mirrored instances. hold7969 changes N→FN;wire13568 FS→S,origins unchanged. wire12579 shifts1.92µm horizontally with FS unchanged. NAND_38673_ keeps origin/orientation. Reorientation and routing geometry remain plausible contributors,but neither explains every failure alone.
+
+D-139 therefore tests one native mirroring-off control on the measured minimum-buffer source,not a new hold-margin sweep. Earlier no-mirroring on the weaker shared-priority recipe regressed setup/overflow; this is a new controlled comparison,not a guaranteed combination. Keep full late175psrepair/reroute and all gates.176guards,exact clean source/config delta,pinned TT merge and syntax pass. Main/official inputs unchanged; no DRT/phase tick/physical pass. Evidence: minbuf2_postant_result.json and minbuf2_no_mirror_evidence.json.

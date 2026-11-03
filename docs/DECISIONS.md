@@ -1538,7 +1538,15 @@ Long-distance toy controls remain antenna-clean without diodes;another distance 
 
 This extra native step is diagnostic only,outside stock Classic. Never promote its checkpoint/recipe to official GDS or weaken screen gates. The inherited NL is not an export of the edited ODB;no GL/LVS or source-based closure follows. Positive evidence would guide a general source-level implementation,with nominal four-diode area21.7728µm²excluding routing/load effects. Empty control distinguishes rerouting effects;existing-source/cell/constraint guards prevent a hidden broad redesign.
 
-Runtime checks must confirm the experimental API/diode interface in the pinned image.201focused checks,actual61file/DEF/target/source-antenna validation,shell selection rehearsal and syntax pass. No native result yet. Scope:PHASE2_ACTUAL_ENDPOINT_DIAGNOSTIC.md;preflight:actual_endpoint_preflight.json.
+Runtime checks must confirm the experimental API/diode interface in the pinned image.201focused checks,actual61file/DEF/target/source-antenna validation,shell selection rehearsal and syntax pass. Completed41714141900:control4antenna failures/intervention0;timing/electrical summaries unchanged. This supports diodes plus affected-net rerouting,not device-only isolation or stock qualification. Scope:PHASE2_ACTUAL_ENDPOINT_DIAGNOSTIC.md;preflight:actual_endpoint_preflight.json.
+
+## D-144 (2026-11-03): screen equivalent host word selection before lane selection
+
+General need: narrow general host observation wiring without changing protocol engines,ISA,state or read timing. Corrected real final connectivity identifies the failing RPC mux as host debug selection,not SRAM arbitration. Decode the16-bit read word within each lane before selecting the lane,instead of first selecting its full180-bit debug bus. All fields/defaults and the existing invalid-lane address guard remain equivalent.
+
+Actual-block SAT passes NL2/NL3;wrong RPC-slice mutant rejects. Full2/4RTL replay passes22/22protocol-model cases under Verilator (optional sigrok skipped because sandbox USB initialization prevents decoding);the saved final9600baudUART trace independently decodes54a5outside sandbox. This is not all-protocol external decoding or final GL. Full local mapping47919→47868cells;area595129.5126→595240.947µm² (+0.019%);sequential area unchanged. Implicated direct RPC0lane-pair mux1→0afterbuffertracing. Physical timing/antenna benefit and native reproduction remain unproved.
+
+Prepare optional rtl_shared_minbuf2_host_words in our separate stock screen workflow. Exact same minbuf2physical config/20ns/SDC/native scripts/image/stage order/all gates;only the hash-bound host source patch changes. Existing workflow default unchanged. Actual archived CI preparation and pinned TTmerge pass;merged config byte content equivalent and only trw_host.vdiffers among matched source files.201focused checks and shell syntax pass. No launch,source promotion or official workflow edit. Other three antenna sources may remain;hold/route/area may regress. No DRT until all final screening gates pass together.
 
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**

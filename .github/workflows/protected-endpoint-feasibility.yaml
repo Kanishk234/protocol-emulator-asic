@@ -88,6 +88,8 @@ jobs:
       run: |-
         set -euo pipefail
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        mkdir -p runs
+        mkdir runs/protected-probe
         python -m librelane --docker-no-tty --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --manual-pdk --run-tag protected-probe --force-run-dir runs/protected-probe --hide-progress-bar --to OpenROAD.STAMidPNR-3 src/config_merged.json
         python scripts/ci/protected_endpoint_probe.py runs/protected-probe --protected "$PROBE_PROTECTED"
         python - <<'PYCODE'

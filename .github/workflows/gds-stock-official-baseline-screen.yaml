@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_cluster100, rtl_shared_minbuf2]
+        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_host_words]
         default: rtl_shared_minbuf2
         required: true
 permissions:
@@ -146,6 +146,16 @@ jobs:
             subprocess.run(['git', 'apply', str(patch)], check=True)
             assert source_hashes() == {**before, **evidence['candidate_files']}
             print('Verified configuration-word predecode source delta')
+        if selected.get('host_word_select'):
+            evidence = json.loads(Path('spikes/phase2_stock_flow/host_word_select_evidence.json').read_text())
+            patch = Path('spikes/phase2_stock_flow/host_word_select.patch')
+            assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+            assert hashlib.sha256(Path('src/trw_host.v').read_bytes()).hexdigest() == evidence['baseline_sha256']
+            before = source_hashes()
+            subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+            subprocess.run(['git', 'apply', str(patch)], check=True)
+            assert source_hashes() == {**before, 'src/trw_host.v': evidence['candidate_sha256']}
+            print('Verified equivalent host word-before-lane selection:', evidence['candidate_sha256'])
         Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
             profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
             baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
@@ -153,7 +163,8 @@ jobs:
             comparison_reference_config_sha256=selected.get('comparison_reference_config_sha256', profiles.get('comparison_reference_config_sha256')),
             additional_changes_from_reference=selected.get('additional_changes_from_reference'),
             hardware_unchanged=selected.get('hardware_unchanged', True),
-            rtl_patch=selected.get('rtl_patch'), config_word_select=selected.get('config_word_select', False)), indent=2) + '\n')
+            rtl_patch=selected.get('rtl_patch'), config_word_select=selected.get('config_word_select', False),
+            host_word_select=selected.get('host_word_select', False)), indent=2) + '\n')
         print('Selected isolated physical control:', profile, selected['changes'])
         PYCODE
     - name: Check out Tiny Tapeout tools
@@ -330,5 +341,7 @@ jobs:
           spikes/phase2_stock_flow/shared_priority.patch
           spikes/phase2_stock_flow/shared_priority_evidence.json
           spikes/phase2_stock_flow/stock_control_profiles.json
+          spikes/phase2_stock_flow/host_word_select.patch
+          spikes/phase2_stock_flow/host_word_select_evidence.json
           spikes/phase2_stock_flow/selected_profile.json
         if-no-files-found: warn

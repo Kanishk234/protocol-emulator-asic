@@ -21,3 +21,6 @@ The experiment measures the specific protected sink's antenna response,not merel
 
 
 Antenna-efficacy41687882723fails before response measurement:whole-driver dont-touch prevents required buffering on external ui_in[1]and triggers RSZ-3006. Revised control protects only shared node/sink/diode,leaving the upstream driver input repairable. Equivalent upstream buffer strengths may change;the exact sink/diode node must remain intact. This is a probe correction,not a successful efficacy result.188checks,both exact preparations/pinned TT merges and shell syntax pass.
+
+
+Corrected comparison41691066588completes both cases. Actual origin separation600.96µm,connectivity preserved,typical electrical0,fresh antennas0both. Diode-absent expected_response_observed=false,so efficacy is inconclusive despite green measurement jobs. Its guide is a straight Metal3connection with short Metal1/2endpoint accesses. Actual failing _19518_uses a multi-segment topology across Metal2/3/4,including substantial detours despite120.60µmorigin span. Guide rectangles are not exact routed metal area. Do not extrapolate clean toy results or continue distance-only sweeps as proof of closure. Next diagnosis should use actual failing branch topology.

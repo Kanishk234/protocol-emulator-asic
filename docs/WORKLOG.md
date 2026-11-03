@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Antenna-efficacy control remains clean without diode
+
+-41691066588completes both cases. Downloaded raw artifacts and independently checked final connectivity,actual600.96µmseparation,native timing/electrical metrics and fresh antennas. Both electrical0/antenna0;typical setup5.74133nsabsent/5.73681present,hold0.36149/0.35223ns. Diode-absent expected_response_observed=false;paired efficacy NOTestablished. Green jobs are measurement completion,not green full-design screens.
+- Compared guide topology:toy node has2Metal1/2Metal2/1Metal3rectangles and a straight horizontal guide;actual failing _19518_has2Metal1/18Metal2/9Metal3/1Metal4and large detours despite120.60µmorigin span. Guide rectangles are not detailed wires or exact antenna area;topology difference is observed,not exclusive-cause proof.
+- Record result_41691066588.json with raw hashes;update scope. No more distance-only toy sweep justified. Next investigate actual failing topology and a targeted mechanism compatible with stock full flow. No new physical run/RTL/official job/gate/phase change or watcher. Publish owned result/docs under standing authorization;unrelated files preserved. Receipt follows.
+
 ## 2026-11-03 — Narrow antenna-efficacy protection after native repair failure
+
+- Publication receipt:c306b8dtools/preflight,1447948tests,0430b51own CI and6a89654docs pushed;remote main verified6a89654b9abc3908faa960d60d759503f601f15f. Launched [corrected efficacy41691066588](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41691066588),confirmed queued on that SHA. All owned local sessions finished,no watcher. No main hardware/config/official-job/gate change. This receipt remains local.
 
 - User reported failure/returned. First read-only status approval review times out;single permitted retry succeeds.41687882723both cases fail in post-GRTrepair:RSZ-3006onui_in[1],loadtrw_ap_driver/Ais dont_touch. Whole upstream driver protection blocks required input buffering. No completed diode-efficacy result.
 - Narrow only this own probe's regex to shared node/sink/diode. Upstream input remains repairable;checker optionally allows equivalent buffer-strength sizing there,while sink/diode connectivity stays mandatory. Earlier feasibility workflow/default checker behavior unchanged. Wrong driver function,wrong node and unintended diode controls reject.

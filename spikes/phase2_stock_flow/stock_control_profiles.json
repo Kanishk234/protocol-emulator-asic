@@ -158,7 +158,7 @@
     }
   },
   "hardware_unchanged": true,
-  "purpose": "Test native mirroring disabled on measured minimum-buffer reference41569397169, with full late repair and final gates unchanged.",
+  "purpose": "Measured minimum-buffer41569397169 remains the timing/electrical/overflow reference; no-mirroring41584011383 regresses and is retired. No new physical experiment selected.",
   "risks": [
     "This flag affects all native detailed-placement stages,not only the late stage; early placement/clock/timing can change.",
     "An older shared-priority no-mirroring experiment failed setup and congestion; this combination is unproved.",
@@ -180,7 +180,8 @@
     "rtl_preselect": "RTL equivalent and22protocolcasespass,butphysical40723256006fails:slowsetup-0.612733ns,fasthold-87.1405ps,2slew,11antenna,311overflow",
     "rtl_shared_no_mirror": "Native mirroring disabled as intended; measured40781730206has slowsetup-0.128148ns,fast71.0488ps,6antennasand48overflow; worse than clock100.",
     "rtl_shared_early275_late75": "Measured40808367962passes timing but adds33387um2,one fanout violation,10antennasand174overflow; not selected.",
-    "rtl_wordsel_clock200": "41532160370 times out at240minutes during late repair/rerouting; no final qualification. Native spacing executes; last intermediate overflow47."
+    "rtl_wordsel_clock200": "41532160370 times out at240minutes during late repair/rerouting; no final qualification. Native spacing executes; last intermediate overflow47.",
+    "rtl_minbuf2_no_mirror": "Retire: timing passes but seven slow slew,eleven antennas and35overflow regress from the minimum-buffer reference. No DRT or official qualification."
   },
   "comparison_reference_run": 40762963258,
   "comparison_reference_profile": "rtl_shared_priority",

@@ -2,7 +2,14 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Fix missing feasibility run directory
+
+- User reported failure.41675925791both cases fail before native flow startup: --force-run-dir path must exist. Prep/dependencies/image/TT merge pass; no physical feasibility result. Root cause is new launcher omission of mkdir,not protection failure.
+- Added fresh run directory creation to own workflow. Executed exact physical shell block with controlled CLI shim:directory exists at invocation and deliberate exit77propagates. Embedded shell syntax passes. No product/RTL/gate changes or unnecessary simulation rerun. Publish workflow fix and bug/worklog,then rerun pair under standing explicit authorization. Preserve unrelated files; receipt follows.
+
 ## 2026-11-03 — Prepare native protected-endpoint feasibility pair
+
+- Publication receipt:0225e49 probe/scope,ee21626 checker,92d6fa4 tests,73140ea own CI and5665cd3 docs pushed; remote main verified5665cd379af8fe97e61c7c48dde2f13ef925348f. Launched only [protected-endpoint feasibility41675925791](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41675925791),confirmed in progress on that SHA,two native protection cases. Standard test/lint/unit/docs also in progress.184focused checks pass; all owned local sessions finished. Main hardware/config/official jobs/gates unchanged; unrelated files/FIPE preserved. No full-design screen or watcher. Next examine both cases'actual repair pressure,connectivity and fresh antenna/electrical measurements. This receipt remains local.
 
 - User requested continued work and explicitly authorized pushes. D-140adds isolated toy RTL under spikes,connectivity/result checker and own manual two-case workflow. Ephemeral CI checkout only; main source/config/official jobs unchanged. Disabled/enabled native protection cases run identical relay+counter in stock Classic through STA3,fresh read-only antenna measurement. No custom native scripts/stage reorder or full-design qualification.
 - Enabled case requires exact protected connectivity and protection evidence in four native repair stages. Wrong diode node,missing/wrong sink and missing repair-stage evidence reject; disabled control records connectivity without assuming removal. Native timing/electrical metrics uploaded and explicitly not acceptance. No DRT/extraction or protocol pass claimed.

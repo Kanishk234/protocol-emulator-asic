@@ -281,3 +281,6 @@ Follow-up to BUG144 (2026-10-28): shared-priority40762963258has six residual ant
 
 
 2026-11-03 follow-up to BUG144/D-139: no-mirroring41584011383 executes as intended but regresses to11antennas,7slow slew and35overflow while timing passes. Retire this global control on the minimum-buffer recipe. Endpoint orientation changes were an observation,not proof of the exclusive cause or a sufficient fix. The final strict gate correctly rejects it; no gate/tool change is justified. Raw repeated evidence is minbuf2_no_mirror_result.json.
+
+
+2026-11-03 protected-endpoint feasibility launcher bug:41675925791fails both cases before flow startup because the native CLI requires --force-run-dir to name an existing directory. The new workflow omitted mkdir,unlike the established screen launcher. Fixed own workflow to create the fresh run directory first. Exact shell-block rehearsal with a CLI shim verifies the directory exists at invocation and propagates a deliberate nonzero status. No endpoint/physical result or gate change follows from this launcher failure.

@@ -6,8 +6,8 @@ name: gds-stock-checkpoint-audit
       checkpoint:
         description: Frozen source for read-only repeated corner STA and antenna checks
         type: choice
-        options: [recovered_hold275, shared_cluster100_postant]
-        default: shared_cluster100_postant
+        options: [recovered_hold275, shared_cluster100_postant, shared_minbuf2_postant]
+        default: shared_minbuf2_postant
         required: true
 permissions:
   contents: read
@@ -35,6 +35,7 @@ jobs:
         manifests = {
             'recovered_hold275': 'spikes/phase2_stock_flow/recovery_40427663913.json',
             'shared_cluster100_postant': 'spikes/phase2_stock_flow/shared_cluster100_postant_checkpoint.json',
+            'shared_minbuf2_postant': 'spikes/phase2_stock_flow/shared_minbuf2_postant_checkpoint.json',
         }
         path = manifests[os.environ['CHECKPOINT']]
         manifest = json.loads(Path(path).read_text())

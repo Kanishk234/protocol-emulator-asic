@@ -1484,6 +1484,18 @@ Test only CTS_DISTANCE_BETWEEN_BUFFERS=200µmagainst41506944920. Keep the exact 
 
 Eighty-three focused guards pass,including missing/wrong native spacing rejection. Exact clean CI/source/config checks,one-setting delta,reference metadata,actual TTmerge and syntax pass. Main/official jobs and final gate implementation are unchanged. No RTL change means existing named proofs and protocol evidence retain their scope,not physical validity. Check actual command/effect and every final gate; no DRT or phase claim. This remains a diagnostic setting requiring review before any main config adoption. Evidence: wordsel_clock_spacing_evidence.json.
 
+## D-138 (2026-11-03): test a larger minimum buffer input on the strongest stock reference
+
+General need: eliminate residual antenna failures without adding protocol logic, pipeline latency or a custom physical stage. Clock100 run40779354529 has setup WS0all corners, fast hold93.5213ps, electrical0 and final overflow0; only five antenna nets fail. Four violating sinks are sg13cmos5l_buf_1/A, the fifth a delay-cell input. Retire the predecode clock-spacing200 control:41532160370 times out during active repair/rerouting, with no final qualification.
+
+Test one coherent minimum-buffer policy on the exact clock100 RTL: EXTRA_EXCLUDED_CELLS=[sg13cmos5l_buf_1] and SYNTH_BUFFER_CELL=sg13cmos5l_buf_2/A/X. Both fields are necessary: native synthesis insbuf and design-repair buffer_ports explicitly name SYNTH_BUFFER_CELL, bypassing the exclusion list. Do not change CTS spacing/diameter/size, repair targets, SDC, tools, native stage order, official jobs or acceptance. This is a diagnostic config requiring review before main adoption.
+
+Pinned LEF input gate area increases0.1807→0.2132µm²; cell area7.2576→9.072µm². Reference final netlist has5129buf_1instances; a one-for-one replacement costs9306.0576µm²,about1.4%of reported reference cell area. This is a proxy,not an implementation prediction: mapping, load, hold delay, placement and routing can change. The fifth delay-cell endpoint is not directly addressed. Reference CTS uses buf_8and dummy buf_2,not buf_1; characterization may nevertheless change under exclusion.
+
+An antenna margin-only proposal was rejected after inspecting the stock dependency source: OpenROAD26Q2 checkCAR/checkCSR omit ratio_margin,whereas PAR/PSR use it. The dependency attribution is recorded,not a newly measured binary version. This explains why larger partial-rule margins are not a direct preventive remedy for the cumulative failures; no tool patch is introduced.
+
+170focused guards pass. Exact clean CI preparation matches clock100 RTL/SDC/Tcl and differs only in the two policy fields; pinned TT merge and embedded shell syntax pass. The effective-profile check rejects any remaining buf_1,missing stronger replacements or an inconsistent explicit buffer setting. Native final timing/electrical/antenna/overflow gates remain unchanged. Add stage/CPU/memory heartbeat only to our own diagnostic step; no external watcher. Physical closure is unproved. Evidence: spikes/phase2_stock_flow/minimum_buffer_evidence.json.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

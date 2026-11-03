@@ -275,3 +275,6 @@ Follow-up to BUG144 (2026-10-28): shared-priority40762963258has six residual ant
 
 
 2026-11-02 follow-up to BUG144: clock100's remaining configuration-address branch motivates D-136coarse write-address predecode. Host/SPI comparisons and full/lean phase contracts pass; deliberate wrong selectors are detected. The first draft proof harness omitted its explicit selector wire and failed,as intended for an undriven selector; the corrected source-bound harness and negative controls now pass/reject appropriately. This was a local verification draft issue,not evidence of a shipped RTL bug. The source/patch hashes prevent applying the prototype to a different checkpoint. Physical antenna closure is still unproved; no rule or timing gate is waived.
+
+
+2026-11-03 follow-up to BUG144: source investigation for D-138 finds OpenROAD26Q2 applies ratio_margin to PAR/PSR but not CAR/CSR. All five clock100 residuals fail cumulative-area rules,so an increased margin alone is not a direct remedy. Dependency-source attribution and checker hash are recorded in minimum_buffer_evidence.json; no upstream tool/checker patch or relaxed gate. Four failing inputs are the smallest buffers; a native minimum-buffer policy is prepared with a final absence guard and consistent explicit buffer setting. Physical fix remains unproved.

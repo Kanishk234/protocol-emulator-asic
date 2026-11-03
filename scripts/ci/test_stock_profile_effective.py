@@ -165,6 +165,49 @@ def test_unreviewed_cell_exclusion_rejected(tmp_path):
         validate(tmp_path, selected)
 
 
+@pytest.mark.parametrize('replacement', ['sg13cmos5l_buf_2', 'sg13cmos5l_buf_4'])
+@pytest.mark.parametrize('excluded_remains', [True, False])
+def test_small_buffer_exclusion_final_netlist(tmp_path, replacement, excluded_remains):
+    selected = fixture(tmp_path, {'EXTRA_EXCLUDED_CELLS': ['sg13cmos5l_buf_1'],
+                                  'SYNTH_BUFFER_CELL': 'sg13cmos5l_buf_2/A/X'})
+    path = tmp_path / '44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v'
+    path.parent.mkdir()
+    text = replacement + ' b (.A(a), .X(x));\n'
+    if excluded_remains:
+        text += 'sg13cmos5l_buf_1 h (.A(x), .X(y));\n'
+    path.write_text(text)
+    if excluded_remains:
+        with pytest.raises(ValueError, match='remains'):
+            validate(tmp_path, selected)
+    else:
+        assert validate(tmp_path, selected)['excluded_small_buffer_cells'] == 0
+
+
+def test_small_buffer_exclusion_requires_real_replacement(tmp_path):
+    selected = fixture(tmp_path, {'EXTRA_EXCLUDED_CELLS': ['sg13cmos5l_buf_1'],
+                                  'SYNTH_BUFFER_CELL': 'sg13cmos5l_buf_2/A/X'})
+    path = tmp_path / '44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v'
+    path.parent.mkdir()
+    path.write_text('sg13cmos5l_dlygate4sd2_1 h (.A(a), .X(y));\n')
+    with pytest.raises(ValueError, match='Missing stronger'):
+        validate(tmp_path, selected)
+
+
+def test_small_buffer_exclusion_requires_matching_explicit_buffer(tmp_path):
+    selected = fixture(tmp_path, {'EXTRA_EXCLUDED_CELLS': ['sg13cmos5l_buf_1']})
+    path = tmp_path / '44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v'
+    path.parent.mkdir()
+    path.write_text('sg13cmos5l_buf_2 h (.A(a), .X(y));\n')
+    with pytest.raises(ValueError, match='matching explicit buffer'):
+        validate(tmp_path, selected)
+
+
+def test_unreviewed_string_control_rejected(tmp_path):
+    selected = fixture(tmp_path, {'SYNTH_BUFFER_CELL': 'unknown/A/X'})
+    with pytest.raises(ValueError, match='Unreviewed string'):
+        validate(tmp_path, selected)
+
+
 @pytest.mark.parametrize('diameter', [100, 200])
 def test_clock_cluster_diameter_command_verified(tmp_path, diameter):
     selected = fixture(tmp_path, {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 100})

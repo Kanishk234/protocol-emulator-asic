@@ -1506,6 +1506,14 @@ Test only PL_OPTIMIZE_MIRRORING=false against41569397169. Keep the minimum-buffe
 
 176focused checks,exact clean preparation,identical source/SDC/Tcl,one-field delta,pinned TT merge and shell syntax pass. Existing native-effect guards require legalization and absence of mirroring in all three stage logs. Do not claim a passing screen or proceed to DRT until all final gates pass. Evidence: minbuf2_postant_result.json and minbuf2_no_mirror_evidence.json.
 
+## D-140 (2026-11-03): isolate protected-endpoint physical feasibility before integration
+
+General need: test whether a general buffer–diode relay can preserve gate protection through native repair without adding clocked latency or protocol-specific logic. Local synthesis preserves a kept buffer–diode–buffer structure; that does not establish physical resizer preservation or fix the four full-design failures.
+
+Use a tiny standalone TT probe with a counter for clocked load and two otherwise identical disabled/enabled RSZ_DONT_TOUCH_RX cases. Run the pinned stock Classic flow through final pre-routing STA and a fresh read-only antenna check. Require enabled protection to be exercised in all four repair stages and final exact diode-to-sink connectivity. Disabled control records survival without assuming removal. Report native timing/electrical/antenna results without design qualification. No custom tool scripts,stage reorder,official job change or full-design gate relaxation.
+
+Nominal relay area23.5872µm² excludes routing/repair cost; two buffer propagation delays remain. Protection applies to its own buffer input,not arbitrary original NAND/delay sinks. A successful toy may have insufficient stress or fail electrical/antenna limits; full-design integration and configuration adoption remain unproved.184focused checks,ephemeral preparation,pinned TT merge and shell syntax pass. No native physical result yet. Source and scope:spikes/phase2_stock_flow/protected_endpoint/README.md.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

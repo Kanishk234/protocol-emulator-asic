@@ -2,7 +2,45 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Prepare native protected-endpoint feasibility pair
+
+- User requested continued work and explicitly authorized pushes. D-140adds isolated toy RTL under spikes,connectivity/result checker and own manual two-case workflow. Ephemeral CI checkout only; main source/config/official jobs unchanged. Disabled/enabled native protection cases run identical relay+counter in stock Classic through STA3,fresh read-only antenna measurement. No custom native scripts/stage reorder or full-design qualification.
+- Enabled case requires exact protected connectivity and protection evidence in four native repair stages. Wrong diode node,missing/wrong sink and missing repair-stage evidence reject; disabled control records connectivity without assuming removal. Native timing/electrical metrics uploaded and explicitly not acceptance. No DRT/extraction or protocol pass claimed.
+-184focused tests pass. Actual ephemeral probe preparation,JSON parsing,pinned TT config merge,selected protection setting and embedded shell syntax pass. Retained counter load and existing PDK models; local native physical engine unavailable. Publish owned probe/helpers/tests/own workflow and docs under fresh authorization,then launch only feasibility pair. No main hardware-path commits or watcher; unrelated files/FIPE preserved. Receipt follows.
+
+## 2026-11-03 — Test protected-relay synthesis feasibility
+
+- Created ignored scratch buffer–diode–buffer probe using pinned library cells and keep attributes. Local Yosys synthesis/flatten/clean retains three cells and shared named input node. JSON connectivity check passes; wrong-node diode mutant rejects. Nominal cell area23.5872µm²before physical overhead; no clocked state,but two real propagation delays.
+- Read exact stock resizer protection implementation:regex selects nets/instances during repair and later unsets protection. This does not prove actual resizer/placement/routing preservation. Native physical engine unavailable locally; no physical stress or antenna pass claimed. Relay protects its own buffer input,not automatically the original NAND/delay endpoints.
+- Updated source-locality report. No design/source/config/official job/gate change,publication,screen,phase tick or watcher. Next pinned-engine feasibility test must cover net splitting,diode attachment and electrical/timing side effects before integration. Preserve unrelated files.
+
+## 2026-11-03 — Verify and reject the first address-locality draft for physical testing
+
+- Continued actual-source validation. Extracted complete edited SRAM selection block,proved all four outputs for NL2/NL3 by SAT,and checked source outside block byte-identical. Not whole-chip sequential formal. Proof/paired mapping receipts saved under ignored build/address-selection-prototype.
+- Paired local mapping: area595129.5126→592800.201µm²,cells47919→47544,sequential area unchanged118356.9408. This local mapping is not stock native synthesis or physical area. Target SRAM address cone grows55→58cells;unweighted depth stays5on all9bits. Total area reduction alone does not support the proposed antenna-locality mechanism. No physical candidate publication or screen launch justified for this draft.
+- Updated source-locality report with negative result. Next investigate preservation/connectivity of a general protected endpoint before another physical experiment. Main source/config/official jobs/gates unchanged; no phase tick,watcher or new workflow. Unrelated local files preserved.
+
+## 2026-11-03 — Prototype parallel SRAM address selection
+
+- Followed lane address mux through chip rotation selection. Prepared ignored isolated trw_chip address-only prototype using OR of masked mutually exclusive slot grants; host fallback retained for every non-lane slot,including unused slot2inNL2. No state,enable/write-data/arbitration/cycle changes. Main source untouched.
+- Combinational Yosys SAT equivalence of address-selection expressions passes NL2/NL3 for all addresses/slot values; deliberately wrong host-only-slot3mutant fails NL2. This is a selection-expression proof,not full-chip equivalence or physical benefit. Prototype and proof logs remain in build/address-selection-prototype.
+- Next verify the complete edited module and compare mapped address cones before packaging or running any physical screen. No publication,dispatch,phase tick or official-flow/gate change.
+
+## 2026-11-03 — Trace antenna sources before an RTL prototype
+
+- Continued source-level investigation without launching another global-control screen. Parsed reference final netlist, followed buffer/delay chains for all four failing sinks, and saved ignored raw trace. Worst315.66ratio branch is a lane1 routine/data SRAM address mux; another branch traces to shared port_state[30]decode. Remaining two stop at NAND/AND cones requiring deeper source correspondence.
+- Reviewed actual candidate mem_addr assignment and pinned antenna-cell simulation model. Identified SRAM address/arbitration factoring as a specific locality prototype direction,with enabled-address/priority/cycle equivalence and added-wire cost to check. A generic RTL diode does not guarantee diode-to-gate connectivity through native resizer net splitting; protected-endpoint preservation remains unproved.
+- Added PHASE2_ANTENNA_SOURCE_LOCALITY.md. No RTL/config/official job/gate change,new physical run,phase tick or watcher. Next complete source-cone correspondence and formulate an equivalence-checked address-selection prototype before physical testing. No simulation rerun for this read-only investigation; unrelated files preserved.
+
+## 2026-11-03 — Brainstorm antenna closure before selecting another screen
+
+- User explicitly requested brainstorming first. Reviewed current four residual cumulative ratios, native protection/resizer options and primary OpenROAD docs. No new physical run or implementation selected.
+- Fresh source41 DEF/NL origin proxy: residual spans139.74,120.60,356.76,107.82µm. The315.66/200failure is on the120.60µmspan branch; origin span is not routed length or metal area. A generic long-net threshold is a poor discriminator. At100µm proxy35214terminals/~191677µm²diodes; at200µm4922/~26791µm²but misses three residual branch spans. Counts omit exact pin coordinates and native skip rules; not exact insertions or implementation costs.
+- Rank source-level locality/fanout restructuring and general technology-aware protected endpoints as mechanisms to investigate,with equivalence/area/stock-flow compatibility required. Native antenna repair-mode/route-resource alternatives are bounded secondary experiments,not guarantees; global hold/clock/mirroring/strength sweeps and broad heuristic diodes are poor defaults. No gates/official source/workflows changed,no phase tick/watcher. Keep measured minbuf2reference and its negative pre-late hold limitation explicit.
+
 ## 2026-11-03 — Reject no-mirroring regression and retain measured reference
+
+- Publication receipt:2618d87 result/profile,4feaca7 own CI default and0ccb8de docs pushed; remote main verified0ccb8de25b7c4a0e0c3ea8721d7e7a21de447648. Main in-progress list was empty before publication. No new physical run dispatched; only standard push CI may start. All owned local commands finished; no watcher. Official/hardware paths unchanged; unrelated files preserved. This receipt remains local.
 
 - User reported possible failure.41584011383completes3h56m51; native physical/effective-control/all-corner audit pass,strict final gate fails. GitHub completed logs return empty,so retrieved bounded17raw reports directly from artifact13219416215(254332987bytes). Independently matched repeated3corner/electrical/fresh antenna and last raw route table.
 - Setup0all;holdF/T/S0.16367/0.390657/0.787359ns. Seven slow slew,11antenna nets/pins,35overflow fail. Area699206µm²/count45830. Three-stage no-mirroring guard passes and raw final log has no mirroring; buf_1 absent. This is a design regression,not a timeout/tool failure. Record minbuf2_no_mirror_result.json and retire control/default.

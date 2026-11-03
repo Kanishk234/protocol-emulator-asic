@@ -132,15 +132,37 @@
       "hardware_unchanged": true,
       "comparison_reference_run": 40779354529,
       "comparison_reference_config_sha256": "6143adc22f3f5066701ae4a9e37680984291f83733eade0c16f50f96dcbc519d"
+    },
+    "rtl_minbuf2_no_mirror": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+        "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100,
+        "EXTRA_EXCLUDED_CELLS": [
+          "sg13cmos5l_buf_1"
+        ],
+        "SYNTH_BUFFER_CELL": "sg13cmos5l_buf_2/A/X",
+        "PL_OPTIMIZE_MIRRORING": false
+      },
+      "config_sha256": "e9d19d59bb2a4cc6c0faab18dd45fc7f66afe3fcc5c04cfc90a94c430defd521",
+      "additional_changes_from_reference": {
+        "PL_OPTIMIZE_MIRRORING": false
+      },
+      "rtl_patch": "shared_priority",
+      "hardware_unchanged": true,
+      "comparison_reference_run": 41569397169,
+      "comparison_reference_config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567"
     }
   },
   "hardware_unchanged": true,
-  "purpose": "Exclude only the smallest buffer on the strongest clock100 reference to test antenna input-area sensitivity; fixed source, timing and final gates.",
+  "purpose": "Test native mirroring disabled on measured minimum-buffer reference41569397169, with full late repair and final gates unchanged.",
   "risks": [
-    "Stronger buffer inputs increase capacitance and can change synthesis, clock characterization, hold delay, placement and routing.",
-    "Four of five reference antenna endpoints use buf_1; the delay-cell endpoint is not directly addressed.",
-    "Same-geometry ratio and area estimates are not physical predictions.",
-    "Final all-corner electrical, timing, antenna and last-route overflow qualification remain mandatory."
+    "This flag affects all native detailed-placement stages,not only the late stage; early placement/clock/timing can change.",
+    "An older shared-priority no-mirroring experiment failed setup and congestion; this combination is unproved.",
+    "One residual sink does not move or mirror,so disabling mirroring is not a complete causal explanation or guaranteed antenna cure."
   ],
   "acceptance_unchanged": "20ns,0.25nsuncertainty,fanout8,50psfast hold; zero final electrical/antenna; stock scripts/order/image/official workflow unchanged",
   "physical_results": null,

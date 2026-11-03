@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Narrow antenna-efficacy protection after native repair failure
+
+- User reported failure/returned. First read-only status approval review times out;single permitted retry succeeds.41687882723both cases fail in post-GRTrepair:RSZ-3006onui_in[1],loadtrw_ap_driver/Ais dont_touch. Whole upstream driver protection blocks required input buffering. No completed diode-efficacy result.
+- Narrow only this own probe's regex to shared node/sink/diode. Upstream input remains repairable;checker optionally allows equivalent buffer-strength sizing there,while sink/diode connectivity stays mandatory. Earlier feasibility workflow/default checker behavior unchanged. Wrong driver function,wrong node and unintended diode controls reject.
+-188focused tests,both exact ephemeral preparations/pinned TT merges,scope assertions excluding driver and including node/sink/diode,and shell syntax pass. Publish owned tools/preflight/tests/ownworkflow/docs and relaunch pair under standing authorization. Main hardware/config/official jobs/full-design gates unchanged;no phase tick/watcher;unrelated files preserved. Receipt follows.
+
 ## 2026-11-03 — Prepare controlled antenna-efficacy pair
+
+- Publication receipt:90a3152 tools/preflight,bbd35f1 tests,296c768 own CI anda09c1ec docs pushed; remote main verifieda09c1ec879311f2d626c5db3da2933a5e520eca5. Launched [antenna-efficacy41687882723](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41687882723),confirmed in progress on that SHA. No full-design screen/official-job change; all owned local commands finished,no watcher. Next require meaningful paired target-sink contrast and actual stress geometry before interpreting efficacy. This receipt remains local.
 
 - User requested continued work. D-141prepares own tiny diode-present/absent workflow:both protected,manual native driver/sink placement600.96µmapart,actual final distance≥400µmrequired. Exact source difference is one no-output diode;config differs only by diode placement. Native auto antenna repair/heuristic/port diodes disabled only in toy to preserve absent control;main recipe/gates/official jobs untouched.
 - Generalized existing connectivity checker to allow an explicitly absent diode,retaining default behavior. New measurement checks target-sink antenna response,actual geometry and disabled auto-repair controls;records expected_response_observed,not full-design qualification. A measurement can be inconclusive;needs paired failing-absent/clean-present contrast. No source/primitive adoption claim.

@@ -284,3 +284,6 @@ Follow-up to BUG144 (2026-10-28): shared-priority40762963258has six residual ant
 
 
 2026-11-03 protected-endpoint feasibility launcher bug:41675925791fails both cases before flow startup because the native CLI requires --force-run-dir to name an existing directory. The new workflow omitted mkdir,unlike the established screen launcher. Fixed own workflow to create the fresh run directory first. Exact shell-block rehearsal with a CLI shim verifies the directory exists at invocation and propagates a deliberate nonzero status. No endpoint/physical result or gate change follows from this launcher failure.
+
+
+2026-11-03 controlled antenna-efficacy protection scope:41687882723fails both cases in native post-GRTdesign repair with RSZ-3006. Freezing trw_ap_driveralso freezes its input pin,so the long external ui_in[1]wire cannot receive a required buffer. This is an overconstrained probe,not a diode-efficacy result or an upstream tool bug. Narrow protection to shared node/sink/diode and leave upstream driver repairable. Checker optionally accepts equivalent buffer drive sizing while still enforcing sink/diode common-node connectivity;default earlier-probe behavior remains strict.188checks and both exact TT merges pass;native correction pending.

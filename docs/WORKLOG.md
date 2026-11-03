@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Verify feasibility pair and strengthen repair pressure
+
+-41680124723succeeds both cases. Downloaded two~4.7MBartifacts,independently matched final native metrics and netlist connectivity. Typical setup11.5233ns,hold0.40571ns,electrical0,fresh antenna0both. Enabled matches four repair stages; disabled also preserves relay. No full-design/extracted/all-corner qualification or demonstrated necessity of protection.
+- Relay driver/sink origins42.72µmapart and identical in both cases; native flow adds12hold buffers/1post-GRTbuffer,but direct node splitting under80µmtarget not established. Record paired results/hashes in protected_endpoint/result_41680124723.json.
+- Follow-up changes only tiny-probe native post-GRTwire target80→20µm,RTL/protection pair/stock tools unchanged. Exact ephemeral prep,pinned TTmerge and shell syntax pass; no redundant functional tests for numeric probe setting. Publish owned result,own CI and docs,then launch pair under standing authorization. No mainhardware/config/official jobs/gates/phase tick/watcher. Receipt follows.
+
 ## 2026-11-03 — Fix missing feasibility run directory
+
+- Publication receipt:b3b86ba own workflow and027cf6a docs pushed; remote main verified027cf6a2a83df565aadb8795acea4ce6442cd662. Relaunched [feasibility41680124723](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41680124723),confirmed in progress on that SHA. Standard CI also triggered. No main hardware/config/official workflow/gate change; all owned local sessions finished,no watcher. This receipt stays local.
 
 - User reported failure.41675925791both cases fail before native flow startup: --force-run-dir path must exist. Prep/dependencies/image/TT merge pass; no physical feasibility result. Root cause is new launcher omission of mkdir,not protection failure.
 - Added fresh run directory creation to own workflow. Executed exact physical shell block with controlled CLI shim:directory exists at invocation and deliberate exit77propagates. Embedded shell syntax passes. No product/RTL/gate changes or unnecessary simulation rerun. Publish workflow fix and bug/worklog,then rerun pair under standing explicit authorization. Preserve unrelated files; receipt follows.

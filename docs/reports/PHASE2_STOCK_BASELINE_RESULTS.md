@@ -636,3 +636,28 @@ D-138 tests a coherent minimum-buffer policy: exclude buf_1 and set explicit SYN
 A margin-only antenna experiment was rejected after inspecting [OpenROAD26Q2's checker](https://github.com/The-OpenROAD-Project/OpenROAD/blob/26Q2/src/ant/src/AntennaChecker.cc): PAR/PSR use ratio_margin, while CAR/CSR do not. The recorded stock dependency source leads to26Q2; this is source attribution rather than new binary version output. Increasing that margin is not a direct preventive remedy for these cumulative violations. No upstream tool patch or extra physical stage is proposed.
 
 170 focused checks pass, including remaining-excluded-cell and inconsistent-explicit-buffer rejection. Exact clean CI preparation, byte-identical reference RTL/SDC/Tcl, two-field policy delta, pinned TT merge and shell syntax pass. Our diagnostic step gains a minute-by-minute stage/CPU/RSS heartbeat, cleaned up on exit; no external watcher or official-job change. All final strict gates remain fixed. Physical results are pending; no DRT, promotion or phase completion. Evidence: minimum_buffer_evidence.json.
+
+
+## 2026-11-03: minimum-buffer screen completes; only four antennas fail
+
+[41569397169](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41569397169) completes in2h05m30s. Native physical flow, effective-control checks and fresh repeated all-corner STA pass; strict qualification fails only four antenna nets/pins. Raw repeated metrics independently match the comparison receipt, and the last native late-route Total row independently confirms zero overflow. This is a completed physical experiment, not a timeout or CI implementation error.
+
+| Metric | Measured result |
+|---|---|
+| Setup WS, fast/typical/slow |0/0/0ns; positive setup reserve not established |
+| Hold WS, fast/typical/slow |0.144394/0.355043/0.738651ns |
+| Slew/cap/fanout violations |0 at every audited corner |
+| Final native GRT overflow |0 |
+| Fresh final antenna violations |4nets/4pins |
+| Reported cell area / instances |688086µm² /45099 |
+
+Smallest buffer cells are absent as intended. Relative to clock100: fast hold improves50.8727ps, antennas5→4, area increases about13739µm²(~2.0%,using rounded native areas), count+84. This is not a same-path slack attribution or a guarantee of extracted timing. Do not blindly increase buffer size again: the residual endpoints include two buf_2 inputs, one delay-cell input and one NAND input.
+
+| Residual net | Violating sink | Cumulative ratio / required |
+|---|---|---|
+| _10511_ | hold7969/A,dlygate4sd3 |229.28/200 |
+| _19518_ | wire13568/A,buf_2 |239.72/200 and315.66/200 |
+| net11878 | _38673_/A,nand2_1 |215.81/200 |
+| net12579 | wire12579/A,buf_2 |214.77/200 |
+
+The saved native post-antenna check reports0before late repair. Its fast hold has not yet been independently measured; do not assume it passes because the final repaired checkpoint does. Prepared a read-only repeated three-corner and fresh antenna audit of the exact saved diode checkpoint. Hash-bound55files,source43physical views,source run/artifact/digest and original engine are verified.176focused tests and embedded YAML/shell syntax pass. This audit does not run repair/rerouting,change saved state or qualify for DRT; it determines whether reducing late repair effort is plausible. Evidence: minimum_buffer_result.json and shared_minbuf2_postant_checkpoint.json. Official jobs and all acceptance gates remain unchanged.

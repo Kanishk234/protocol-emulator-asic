@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Verify minimum-buffer result and isolate pre-late timing
+
+- User reported failure.41569397169 completes2h05m30; physical/effective-control/all-corner audit pass,only strict antenna gate fails. Retrieved bounded raw reports and full saved artifact13205992797(254093403bytes); repeated raw corners/electrical/fresh antennas independently match receipt and final raw Total row confirms0overflow.
+- SetupF/T/S0,holdF/T/S0.144394/0.355043/0.738651ns,electrical0,antennas4/4; area688086µm²/count45099. Buf_1 absent. Compared with clock100: fast+50.8727ps,antennas5→4,area~+13739µm²(~2%). No positive setup reserve or extracted/official pass claim. Remaining sinks: two buf_2,one dlygate4sd3,one nand2_1. Do not blindly upsize buffers further.
+- Native post-antenna checkpoint reports0before late repair,while final fresh audit has4. Prepare read-only audit of that exact source43snapshot to measure pre-late margin before another physical recipe change. Manifest binds55files/run/SHA/artifact/digest/engine; all physical source views verified locally. Recovery helper adds exact minbuf2 recipe with matching list/string policy validation.176focused tests and embedded YAML/shell syntax pass. This remains measurement,notqualification or a decision to omit late repair.
+- Publish owned result/manifest/helper,tests,own audit workflow and docs under standing authorization; launch only the short checkpoint audit. Main hardware/config,official jobs and final screen gates unchanged. No DRT/phase tick/external watcher; unrelated local docs/diagnostics/FIPE preserved. Launch receipt follows.
+
 ## 2026-11-03 — Prepare antenna input-area policy on the stronger reference
+
+- Publication receipt: b13b2f1 tools/evidence, 7f2eea0 tests, 31ab9d2 own CI and f9d02ad docs pushed to remote main, verified f9d02ad5014b93f672c478e37c88040032aa7e01. Launched only [minimum-buffer screen41569397169](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41569397169), confirmed in progress on that SHA. No hardware-path commits or official-job changes. All owned local tool sessions finished; no external watcher. Next inspect effective buffer exclusion and every final same-checkpoint gate; the fifth delay-cell antenna remains a risk. This receipt stays local until the next evidence publication.
 
 - User requested concrete progress toward a passing screen. Main active workflows are finished; test/lint/unit/docs on270ae03 passed. Downloaded failed clock200 artifact13198221299 and inspected native resource reports: post-CTS repair CPU~100%/RSS~1GiB for1h44; post-GRT design repair similarly CPU-bound. Recorded exact hashes/data; no evidence of deadlock or memory exhaustion. No final qualification from that timed-out run.
 - Investigated stock dependency sources and pinned LEF. OpenROAD26Q2 CAR/CSR checks omit ratio_margin, unlike PAR/PSR; reject another margin-only attempt at cumulative failures. Source-attribution scope recorded, no stock tool patch. Four of five clock100 failures are buf_1 inputs; buf_2 input gate area increases0.1807→0.2132µm². One-for-one replacement proxy5129cells costs9306.0576µm²(~1.4%); not a routed prediction, and fifth delay-cell endpoint remains unaddressed directly.

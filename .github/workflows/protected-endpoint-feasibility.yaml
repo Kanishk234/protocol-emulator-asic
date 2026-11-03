@@ -32,7 +32,7 @@ jobs:
         p=Path('src/config.json'); d=json.loads(p.read_text())
         d.update(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=30, LINTER_INCLUDE_PDK_MODELS=True,
          RUN_POST_GRT_DESIGN_REPAIR=True, RUN_POST_GRT_RESIZER_TIMING=True,
-         SYNTH_BUFFER_CELL='sg13cmos5l_buf_2/A/X', GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=80,
+         SYNTH_BUFFER_CELL='sg13cmos5l_buf_2/A/X', GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=20,
          RSZ_DONT_TOUCH_RX=r'(^|[./])trw_ap_(node|driver|sink|diode)$' if os.environ['PROBE_PROTECTED']=='true' else '$^')
         p.write_text(json.dumps(d,indent=2)+'\n')
         PYCODE

@@ -7,8 +7,8 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_cluster100, rtl_wordsel_clock200]
-        default: rtl_wordsel_clock200
+        options: [rtl_shared_cluster100, rtl_shared_minbuf2]
+        default: rtl_shared_minbuf2
         required: true
 permissions:
   contents: read
@@ -220,6 +220,16 @@ jobs:
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
         mkdir -p runs
         mkdir runs/stock-official-baseline
+        # Diagnostic visibility only; the native flow command and timeout stay fixed.
+        (
+          while sleep 60; do
+            date -u '+Physical-flow heartbeat %Y-%m-%dT%H:%M:%SZ'
+            ls -td runs/stock-official-baseline/*-openroad-* 2>/dev/null | head -n 1 || true
+            ps -eo pid,pcpu,rss,etime,comm | awk '$NF == "openroad" {print "OpenROAD PID/CPU%/RSS-KiB/elapsed/name:", $0}'
+          done
+        ) &
+        progress_pid=$!
+        trap 'pkill -P "$progress_pid" 2>/dev/null || true; kill "$progress_pid" 2>/dev/null || true; wait "$progress_pid" 2>/dev/null || true' EXIT
         python -m librelane --docker-no-tty --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --manual-pdk --run-tag stock-official-baseline --force-run-dir runs/stock-official-baseline --hide-progress-bar --to OpenROAD.STAMidPNR-3 src/config_merged.json
         # This is measurement only. No detailed routing or qualification claim.
         python - <<'PYCODE'

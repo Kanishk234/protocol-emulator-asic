@@ -2,7 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Reject no-mirroring regression and retain measured reference
+
+- User reported possible failure.41584011383completes3h56m51; native physical/effective-control/all-corner audit pass,strict final gate fails. GitHub completed logs return empty,so retrieved bounded17raw reports directly from artifact13219416215(254332987bytes). Independently matched repeated3corner/electrical/fresh antenna and last raw route table.
+- Setup0all;holdF/T/S0.16367/0.390657/0.787359ns. Seven slow slew,11antenna nets/pins,35overflow fail. Area699206µm²/count45830. Three-stage no-mirroring guard passes and raw final log has no mirroring; buf_1 absent. This is a design regression,not a timeout/tool failure. Record minbuf2_no_mirror_result.json and retire control/default.
+- Retain41569397169:fast144.394ps,electrical0,overflow0,four antenna failures. Its pre-late fast−16.3279psstillrules out skipping required repair. Orientation observations were not proof of a sufficient fix. No next speculative full run chosen; next change needs an actual branch/protection mechanism compatible with stock flow.
+- Reviewed JSON/YAML selection and shell syntax; helper/RTL/gates unchanged,no redundant simulation rerun. Publish owned result/profile,own CI selection and docs under standing authorization. No main hardware/config/official-job/gate change,DRT/phase tick/watcher; unrelated docs/diagnostics/FIPE preserved. Receipt follows.
+
 ## 2026-11-03 — Pre-late audit rules out skipping repair; prepare geometry control
+
+- Publication receipt:70b5596 tools/evidence,1e85b27 own CI and93ec58b docs pushed; remote main verified93ec58b57e12d0c9e21525c6e0203e102ad1112b. Launched only [minimum-buffer no-mirroring screen41584011383](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41584011383),confirmed in progress on that SHA. Standard CI also triggered; prior unit remains active at this check. All owned local commands finished; no external watcher. Main hardware/config/official jobs/final gates unchanged; unrelated files/FIPE preserved. Next check actual no-mirroring effect and all final gates. This receipt remains local.
 
 - User reported completion.41582335231succeeds5m50. Retrieved artifact13205994788(123370662bytes); independently matched repeated raw3corner metrics and fresh antenna. Setup0all; holdF/T/S−0.0163279/0.106528/0.323963ns;electrical0;antenna0. Source-view immutability/source55file checks pass. Measurement job green is not design qualification: fast reserve misses50psby66.3279ps. Do not disable late repair.
 - Compared exact pre/final NL/DEF. All four residual sink cell connections unchanged; late repair adds only7hold buffers,legalization reports20500mirrored instances. Two sink orientations flip at fixed origins,one shifts1.92µm,one stays fixed. No sole-cause claim. A smaller late hold target alone has no established direct protection mechanism here.

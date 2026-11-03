@@ -278,3 +278,6 @@ Follow-up to BUG144 (2026-10-28): shared-priority40762963258has six residual ant
 
 
 2026-11-03 follow-up to BUG144: source investigation for D-138 finds OpenROAD26Q2 applies ratio_margin to PAR/PSR but not CAR/CSR. All five clock100 residuals fail cumulative-area rules,so an increased margin alone is not a direct remedy. Dependency-source attribution and checker hash are recorded in minimum_buffer_evidence.json; no upstream tool/checker patch or relaxed gate. Four failing inputs are the smallest buffers; a native minimum-buffer policy is prepared with a final absence guard and consistent explicit buffer setting. Physical fix remains unproved.
+
+
+2026-11-03 follow-up to BUG144/D-139: no-mirroring41584011383 executes as intended but regresses to11antennas,7slow slew and35overflow while timing passes. Retire this global control on the minimum-buffer recipe. Endpoint orientation changes were an observation,not proof of the exclusive cause or a sufficient fix. The final strict gate correctly rejects it; no gate/tool change is justified. Raw repeated evidence is minbuf2_no_mirror_result.json.

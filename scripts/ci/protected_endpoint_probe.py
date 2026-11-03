@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 
 
-def connectivity(text, diode_present=True):
+def connectivity(text, diode_present=True, allow_driver_sizing=False):
     cells = {name: (master, dict(re.findall(r'\.(\w+)\s*\(\s*([^)]*?)\s*\)', body)))
              for master, name, body in re.findall(
                  r'\b(sg13cmos5l_\w+)\s+(\S+)\s*\((.*?)\);', text, re.S)}
@@ -15,6 +15,11 @@ def connectivity(text, diode_present=True):
         expected['trw_ap_diode'] = 'sg13cmos5l_antennanp'
     elif any(master == 'sg13cmos5l_antennanp' for master, pins in cells.values()):
         return False
+    if allow_driver_sizing and 'trw_ap_driver' in cells:
+        master = cells['trw_ap_driver'][0]
+        if not re.fullmatch(r'sg13cmos5l_buf_(?:1|2|4|8|16)', master):
+            return False
+        expected['trw_ap_driver'] = master
     if any(name not in cells or cells[name][0] != master for name, master in expected.items()):
         return False
     node = cells['trw_ap_driver'][1].get('X')
@@ -27,11 +32,12 @@ def main():
     parser.add_argument('root', type=Path)
     parser.add_argument('--protected', choices=['true', 'false'], required=True)
     parser.add_argument('--diode-present', choices=['true', 'false'], default='true')
+    parser.add_argument('--allow-driver-sizing', action='store_true')
     args = parser.parse_args()
     paths = list(args.root.glob('*-openroad-resizertimingpostgrt/*.nl.v'))
     if len(paths) != 1:
         raise ValueError('Missing unique final native netlist')
-    intact = connectivity(paths[0].read_text(), args.diode_present == 'true')
+    intact = connectivity(paths[0].read_text(), args.diode_present == 'true', args.allow_driver_sizing)
     logs = list(args.root.glob('*-openroad-*/openroad-*.log'))
     matches = [str(p.relative_to(args.root)) for p in logs
                if "matched don't touch regular expression" in p.read_text()]
@@ -48,6 +54,7 @@ def main():
         raise ValueError('Missing fresh native setup measurement')
     result = dict(protected=protected, connectivity_preserved=intact,
                   diode_present=args.diode_present == 'true',
+                  equivalent_driver_sizing_allowed=args.allow_driver_sizing,
                   native_protection_logs=matches, full_design_qualification=False,
                   all_repair_stages_exercised_protection=covered,
                   final_native_metrics={k: v for k, v in raw.items()

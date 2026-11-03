@@ -28,3 +28,10 @@ Paired local mapping with identical sorted sources/library and buf_1 ABC exclusi
 An ignored scratch design instantiates two kept buf_2 cells with a kept antenna diode on their shared internal node. Local Yosys synthesis/flatten/clean retains all three cells and the named node; JSON connectivity checks pass and a deliberately wrong-node diode connection is rejected. Nominal library cell area23.5872µm²,excluding physical overhead. No registers are added,but two buffer propagation delays are real.
 
 This only proves local synthesis preservation. Native resizer stress,post-route diode effectiveness and timing/electrical effects remain untested. The relay protects its own buffer input; it is not a demonstrated solution for the original NAND/delay-cell endpoints. Stock RSZ_DONT_TOUCH_RX can select named nets/instances during repair,but those protections are later unset and do not establish fixed placement or antenna-repair behavior. Do not adopt or launch a full-design candidate from this probe. Raw design/netlist/receipt:build/protected-endpoint-probe. Next feasibility check requires the pinned native physical engine,which is not installed locally.
+
+
+## Actual routing topology and targeted capacity experiment
+
+The reference's stage41pre-antenna and stage44final guide comparison shows net12579envelope129.6→381.6µm;_10511_144→158.4;_19518_561.6→424.8;net11878_374.4unchanged. These are global-guide bounding spans,not detailed wire lengths or antenna areas. Stage41is before antenna repair,not the independently audited stage43post-antenna source. All four final sink cell connections remain unchanged across the audited late interval. The mixed changes argue against a single distance threshold.
+
+D-142tests Metal3reserve8%with other signal layers retaining global16%on identical minbuf2RTL. Pinned router source verifies nonzero layer overrides;actual per-layer resource checks are mandatory.194focused checks and exact clean preparation/pinned TT merge pass. This targets detour opportunity,but reducing modeled reserve can hurt DRT and all final gates remain required. No more toy distance-only sweep;no hardware or official-flow change.

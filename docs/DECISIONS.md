@@ -1522,6 +1522,16 @@ Disable native automatic antenna repair,heuristic insertion and port diodes only
 
 187focused checks,exact source/config delta assertions,both ephemeral preparations,pinned TT merges and shell syntax pass. Native placement/resizer/antenna behavior is still pending. Source/control hashes and scope:protected_endpoint/antenna_efficacy_preflight.json. Nominal diode cost5.4432µm²plus routing;two relay buffer delays and original-sink coverage limits remain.
 
+## D-142 (2026-11-03): test a Metal3-only routing reserve against measured minimum-buffer source
+
+General need: reduce avoidable lower-layer detours without more state,protocol-shaped logic or global buffer changes. Actual failing net12579guide envelope expands129.6→381.6µmfrom pre-antenna stage41to final44. Actual_19518_has18Metal2/9Metal3/1Metal4rectangles and large detours despite120.6µmorigin span;clean toy has a direct Metal3guide. These observations do not quantify exact antenna area or establish a sole cause. The pre-antenna guide is not the independently audited post-antenna checkpoint.
+
+Test only GRT_LAYER_ADJUSTMENTS=[0,0,0.08,0,0]against minbuf2run41569397169. Keep global reserve0.16,RTL/SDC/20ns/repair targets/minimum buffers/diode-only/native stages and final gates. Pinned dependency source OpenROAD26Q2 fills zero layer adjustments from the global value and preserves nonzero overrides. Thus Metal3uses8%,other signal layers retain16%. Verify actual resource tables,not only config:Metal3capacity must rise from231982with original281986;Metal2/4original and derated values must match reference. No ineffective control accepted.
+
+Metal3is the heavily used horizontal signal layer in these reports,while Metal2/4have more aggregate headroom. Extra modeled capacity may reduce detours,but also consumes reserve for DRT and can cause congestion/hold/electrical regressions. Placement and repair may change;no physical prefix identity,area saving or slack gain assumed. This remains diagnostic configuration outside main adoption,not an official-job or constraint change.
+
+194focused checks,exact clean source/SDC/Tcl equality,one-field delta,pinned TT merge and shell syntax pass. New guards reject no-op,wrong-layer,missing or changed resource evidence. No physical result or DRT authorization yet. Evidence:metal3_reserve8_evidence.json.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

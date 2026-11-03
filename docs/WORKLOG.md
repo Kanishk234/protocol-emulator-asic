@@ -2,7 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Prepare measured Metal3 detour control on full reference
+
+- Continued actual failing-guide investigation. Stage41pre-antenna→44final envelopes:net12579_129.6→381.6µm,_10511_144→158.4,_19518_561.6→424.8,net11878_374.4unchanged. Guide bounds are not detailed metal length/area,and stage41is not exact post-antenna43. Mixed topology changes discourage simple wire-distance fixes.
+- Read primary OpenROAD26Q2capacity source:zero per-layer values inherit global reserve,nonzero replaces it. D-142sets only GRT_LAYER_ADJUSTMENTS=[0,0,0.08,0,0]against measured minbuf2source41569397169;all RTL/SDC/clock/repair/gates unchanged. Actual resource guard requires increased Metal3capacity and fixed Metal2/4resource tables/global16%;rejects ineffective/wrong-layer/missing evidence.
+-194focused tests,exact archived CI prep,source/SDC/Tcl byte equality,one-field delta,pinned TTmerge and shell syntax pass. Capacity headroom might reduce detours but DRT reserve/hold/electrical/area can regress;no guarantee or main config adoption. Publish owned helper/profile/evidence,tests,ownworkflow/docs,then launch one full screen under standing authorization. No main hardware/config/official-job/gate change,phase tick or watcher. Unrelated files preserved;receipt follows.
+
 ## 2026-11-03 — Antenna-efficacy control remains clean without diode
+
+- Publication receipt:deeff9f paired result and42e2794 scope/worklog pushed;remote main verified42e2794da6d94fd06d51499bd528ac0dc184e28e. No new physical run dispatched;all owned local commands finished,no watcher. Main hardware/config/official jobs/gates unchanged;unrelated files preserved. This receipt remains local.
 
 -41691066588completes both cases. Downloaded raw artifacts and independently checked final connectivity,actual600.96µmseparation,native timing/electrical metrics and fresh antennas. Both electrical0/antenna0;typical setup5.74133nsabsent/5.73681present,hold0.36149/0.35223ns. Diode-absent expected_response_observed=false;paired efficacy NOTestablished. Green jobs are measurement completion,not green full-design screens.
 - Compared guide topology:toy node has2Metal1/2Metal2/1Metal3rectangles and a straight horizontal guide;actual failing _19518_has2Metal1/18Metal2/9Metal3/1Metal4and large detours despite120.60µmorigin span. Guide rectangles are not detailed wires or exact antenna area;topology difference is observed,not exclusive-cause proof.

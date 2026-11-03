@@ -144,3 +144,32 @@ def test_unknown_recipe_rejected(checkpoint):
     manifest['recipe'] = 'unreviewed'
     with pytest.raises(ValueError, match='Unknown recovered physical recipe'):
         validate(root, manifest, run, artifact)
+
+
+@pytest.mark.parametrize('override', [None,
+                                    ('EXTRA_EXCLUDED_CELLS', []),
+                                    ('EXTRA_EXCLUDED_CELLS', 'sg13cmos5l_buf_1'),
+                                    ('SYNTH_BUFFER_CELL', 'sg13cmos5l_buf_1/A/X'),
+                                    ('RUN_POST_GRT_RESIZER_TIMING', False),
+                                    ('CLOCK_PERIOD', 40)])
+def test_minimum_buffer_checkpoint_recipe(checkpoint, override):
+    root, manifest, run, artifact = checkpoint
+    manifest['recipe'] = 'shared_minbuf2'
+    config = root / 'src/config.json'
+    values = dict(CLOCK_PERIOD=20, PL_RESIZER_HOLD_SLACK_MARGIN=0.175,
+                  GRT_RESIZER_HOLD_SLACK_MARGIN=0.175,
+                  GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=200, GRT_OVERFLOW_ITERS=100,
+                  RUN_POST_GRT_RESIZER_TIMING=True,
+                  CTS_SINK_CLUSTERING_MAX_DIAMETER=100,
+                  GRT_ANTENNA_REPAIR_DIODE_ONLY=True,
+                  EXTRA_EXCLUDED_CELLS=['sg13cmos5l_buf_1'],
+                  SYNTH_BUFFER_CELL='sg13cmos5l_buf_2/A/X')
+    if override:
+        values[override[0]] = override[1]
+    config.write_text(json.dumps(values))
+    manifest['files']['src/config.json'] = hashlib.sha256(config.read_bytes()).hexdigest()
+    if override:
+        with pytest.raises(ValueError, match='Wrong recovered physical recipe'):
+            validate(root, manifest, run, artifact)
+    else:
+        assert validate(root, manifest, run, artifact).is_file()

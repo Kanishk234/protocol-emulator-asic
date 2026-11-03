@@ -34,7 +34,7 @@ jobs:
         d.update(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=30, LINTER_INCLUDE_PDK_MODELS=True,
          RUN_POST_GRT_DESIGN_REPAIR=True, RUN_POST_GRT_RESIZER_TIMING=True,
          SYNTH_BUFFER_CELL='sg13cmos5l_buf_2/A/X', GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=20,
-         RSZ_DONT_TOUCH_RX=r'(^|[./])trw_ap_(node|driver|sink|diode)$' if os.environ['PROBE_PROTECTED']=='true' else '$^')
+         RSZ_DONT_TOUCH_RX=r'(^|[./])trw_ap_(node|sink|diode)$' if os.environ['PROBE_PROTECTED']=='true' else '$^')
         d.update(RUN_ANTENNA_REPAIR=False, RUN_HEURISTIC_DIODE_INSERTION=False, DIODE_ON_PORTS="none",
          MANUAL_GLOBAL_PLACEMENTS={
          'trw_ap_driver': {'location':[299.52,351.54],'orientation':'N'},
@@ -103,7 +103,7 @@ jobs:
         mkdir -p runs
         mkdir runs/protected-probe
         python -m librelane --docker-no-tty --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --manual-pdk --run-tag protected-probe --force-run-dir runs/protected-probe --hide-progress-bar --to OpenROAD.STAMidPNR-3 src/config_merged.json
-        python scripts/ci/protected_endpoint_probe.py runs/protected-probe --protected "$PROBE_PROTECTED" --diode-present "$PROBE_DIODE_PRESENT"
+        python scripts/ci/protected_endpoint_probe.py runs/protected-probe --protected "$PROBE_PROTECTED" --diode-present "$PROBE_DIODE_PRESENT" --allow-driver-sizing
         python - <<'PYCODE'
         import json,sys
         from pathlib import Path

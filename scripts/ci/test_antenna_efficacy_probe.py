@@ -26,3 +26,11 @@ def test_absent_diode_control():
     assert connectivity(text, False)
     assert not connectivity(text, True)
     assert not connectivity(text + '\nsg13cmos5l_antennanp unexpected (.A(n));', False)
+
+
+def test_repairable_driver_still_requires_buffer_and_same_node():
+    text = 'sg13cmos5l_buf_4 trw_ap_driver (.A(a),.X(n));\nsg13cmos5l_buf_2 trw_ap_sink (.A(n),.X(y));'
+    assert not connectivity(text, False)
+    assert connectivity(text, False, True)
+    assert not connectivity(text.replace('sg13cmos5l_buf_4', 'sg13cmos5l_nand2_1'), False, True)
+    assert not connectivity(text.replace('.A(n)', '.A(other)'), False, True)

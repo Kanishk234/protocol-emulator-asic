@@ -17,6 +17,7 @@ jobs:
       CHECKPOINT: shared_minbuf2_postant
       LATE_HOLD: ${{ matrix.late_hold }}
       ANTENNA_MODE: ${{ matrix.antenna_mode }}
+      ANTENNA_MARGIN: '50'
     steps:
     - name: Check out project
       uses: actions/checkout@v6
@@ -147,6 +148,9 @@ jobs:
         mode = os.environ['ANTENNA_MODE']
         assert mode in ('diode', 'mixed')
         config['GRT_ANTENNA_REPAIR_DIODE_ONLY'] = mode == 'diode'
+        margin = int(os.environ['ANTENNA_MARGIN'])
+        assert margin == 50 and config.get('GRT_ANTENNA_REPAIR_MARGIN', 10) == 10
+        config['GRT_ANTENNA_REPAIR_MARGIN'] = margin
         assert config.get('PL_OPTIMIZE_MIRRORING', True) is True
         antenna_output = Path('runs/native-antenna-replay')
         run_step(config, source, antenna_output, ['OpenROAD.RepairAntennas'])
@@ -157,6 +161,8 @@ jobs:
         commands = [line for line in antenna_log.splitlines() if line.startswith('+ repair_antennas ')]
         assert commands and ('-diode_only' in commands[-1].split()) == (mode == 'diode')
         assert '-jumper_only' not in commands[-1].split()
+        from stock_profile_effective import number
+        assert number(antenna_log, 'repair_antennas', '-ratio_margin') == margin
         tail = Path('runs/native-late-tail')
         run_step(config, source, tail, ['OpenROAD.ResizerTimingPostGRT'])
         states = list(tail.glob('*-openroad-resizertimingpostgrt/state_out.json'))
@@ -236,7 +242,7 @@ jobs:
         assert values, 'Missing final-source routing evidence'
         assert all(hashlib.sha256(p.read_bytes()).hexdigest() == frozen_hashes[str(p)] for p in frozen_paths)
         (output / 'native_tail_result.json').write_text(json.dumps(dict(
-            late_hold_target_ns=target, late_mirroring=True, antenna_mode=mode, final_overflow=int(values[-1]),
+            late_hold_target_ns=target, late_mirroring=True, antenna_mode=mode, antenna_margin_pct=margin, final_overflow=int(values[-1]),
             source_state=str(source), final_corner_metrics=rows, fresh_antenna_metrics=antenna,
             source_checkpoint_unchanged=True, physical_repairs_performed=True, qualification_performed=False,
             official_signoff=False, detailed_routing_performed=False), indent=2) + '\n')
@@ -261,4 +267,4 @@ jobs:
       matrix:
         late_hold:
         - '0.175'
-        antenna_mode: [diode, mixed]
+        antenna_mode: [diode]

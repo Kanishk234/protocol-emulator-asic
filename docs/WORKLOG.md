@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Isolate late mirroring on frozen reference
+
+- Prepare native-tail replay at175pshold with PL_OPTIMIZE_MIRRORING=false only during the resumed late step. Earlier physical layout is the unchanged hash-bound reference. This differs from the previously failed whole-flow mirroring-off experiment. Native legalization/rerouting remain active; require legalization command and absence of native mirroring in actual log. Fresh repeated3corner/electrical/antenna/final-source overflow measurements retained.
+- actionlint, shell/embedded Python syntax and diff checks pass. Diagnostic only: a late-only flag is not automatically expressible as a permitted clean-build recipe; no promotion/qualification/DRT claim. Publish/launch via narrow workflow push trigger under standing approval. No source/config/official-job changes; unrelated files preserved.
+
+## 2026-11-04 — Verify125ps replay: still unqualified
+
+-41888820039measurement job passes in57m03s; all main standardCIgreen. Downloaded artifact and independently matched repeated raw corner/electrical metrics, fresh antenna metrics and final routing table. Setup0all; holdF/T/S0.0181682/0.218392/0.575279ns; electrical0; antennas3; overflow0. Fast reserve shortfall31.8318ps. Save late_hold125_result_41888820039.json.
+- Target tradeoff now75ps:−7.735ps/2ant,125ps:+18.168ps/3ant,175ps:+144.394ps/4ant,alloverflow0. None qualifies. Recommend causal study of late-stage antenna creation rather than treating intermediate target as a solution. No new launch, DRT or phase tick; unrelated files and official jobs untouched.
+
 ## 2026-11-04 — Prepare intermediate125ps native replay
 
 - Calibrated175pscontrol reproduces reference;75psfails fast reserve with2antenna/0overflow. Prepare single125psmatrix job, retaining runtime target verification, source hash binding, native repair/rerouting and all fresh measurements. actionlint/embedded Python/shell syntax pass. Existing50psacceptance requirement remains fixed; no qualification or DRT claim.
@@ -6528,3 +6538,5 @@ Next:
 - Monitor runs 36952644578 and 36951141285. If the gate-level L3 suite passes, record the evidence and tick only box 6. For the DRT continuation, inspect final route DRC/runtime and continue downstream signoff before treating it as a passing hardening. Preserve the 20 ns target, all protocols, and D-066 behavior.
 
 Publication receipt: remote main4983db4verified. Push registered replay41864608197, queued. Subsequent manual retry also succeeded, creating redundant41864627053; requested its cancellation, retaining41864608197. Native175/75jobs not yet confirmed running. No local watcher.
+
+Publication receipt:0672827CI/0e15630evidence pushed; remote main0e15630verified.125psreplay41888820039pending. Old duplicate41864627053was unexpectedly active despite previous cancel responses; force-cancel API accepted to release concurrency. No125psmeasurements yet; no local watcher.

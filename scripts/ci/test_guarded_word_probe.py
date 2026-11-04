@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from guarded_word_probe import PROTECTION_RX, connectivity, main
+from guarded_word_probe import PROTECTION_RX, connectivity, logged_objects, main
 
 
 def netlist():
@@ -52,7 +52,8 @@ def test_data_paths_remain_repairable():
 
 
 @pytest.mark.parametrize('missing_object', [False, True])
-def test_every_protected_object_must_be_logged(tmp_path, monkeypatch, missing_object):
+@pytest.mark.parametrize('escaped', [False, True])
+def test_every_protected_object_must_be_logged(tmp_path, monkeypatch, missing_object, escaped):
     p = tmp_path / '4-openroad-resizertimingpostgrt'
     p.mkdir()
     text = netlist()
@@ -63,15 +64,29 @@ def test_every_protected_object_must_be_logged(tmp_path, monkeypatch, missing_ob
         path = tmp_path / f'{i}-openroad-{stage}'
         path.mkdir(exist_ok=True)
         names = objects[:-1] if missing_object and i == 0 else objects
-        (path / f'openroad-{stage}.log').write_text('\n'.join(
-            f"Net '{name}' matched don't touch regular expression" for name in names))
+        messages = []
+        for name in names:
+            kind = 'Net' if name.endswith('_node') else 'Instance'
+            printed = name.replace('[', r'\[').replace(']', r'\]') if escaped else name
+            messages.append(f"[INFO] {kind} '{printed}' matched don't touch regular expression, "
+                            "setting as don't touch…")
+        (path / f'openroad-{stage}.log').write_text('\n'.join(messages))
     (tmp_path / 'resolved.json').write_text(json.dumps({'RSZ_DONT_TOUCH_RX': PROTECTION_RX}))
     p = tmp_path / '5-openroad-stamidpnr-3'
     p.mkdir()
     (p / 'or_metrics_out.json').write_text(json.dumps({'timing__setup__ws__corner:typ': 1}))
     monkeypatch.setattr('sys.argv', ['probe', str(tmp_path), '--protected', 'true'])
     if missing_object:
-        with pytest.raises(ValueError, match='not preserved'):
+        with pytest.raises(ValueError, match='Missing complete native protection log evidence'):
             main()
     else:
         main()
+
+
+def test_note_is_not_native_protection_evidence():
+    assert not logged_objects("Note 'u.trw_guard_mask0_node' matched don't touch regular expression")
+
+
+def test_object_kind_is_preserved():
+    text = "[INFO] Instance 'u.trw_guard_mask0_node' matched don't touch regular expression, setting as don't touch…"
+    assert ('Net', 'u.trw_guard_mask0_node') not in logged_objects(text)

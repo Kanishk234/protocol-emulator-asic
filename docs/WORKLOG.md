@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Verify hold-frontier result and prepare early250 screen
+
+- Audit41786909156 passed in7m26s on94d1395. Downloaded artifact13302270934 and independently matched all six raw corner reads/frontier summaries, fresh antenna metrics and direct readback hashes. Eight reported fast FF paths below50ps, two negative; none reported in other corners. Setup0all; holdF/T/S−0.0163279/0.106528/0.323963ns; electrical0/fresh antenna0. Bounded report, not endpoint-exhaustiveness proof; checkpoint remains unqualified for hold/congestion.
+- Direct ODB readback preserves44933parsed non-fill/non-decap instances/connections from inherited stage41NL and adds exactly10antenna diodes. Same readback hashes all3corners. Record minbuf2_hold_frontier_result.json and update hold plan.
+- D-148: prepare rtl_shared_minbuf2_early250, changing only early hold target175→250ps on unchanged minimum-buffer/shared-priority hardware. Keep late175ps, native rerouting/stage order and every strict final gate. Exact archived CI preparation, all source/macro hardening views and pinned TTmerge pass; project/merged settings differ only at early hold.102focused tests and workflow syntax pass. Remove rejected inline guard from launch choices but retain archived profile/evidence. No DRT or phase tick; main hardware/config/officialjobs/unrelated files unchanged. Publication/launch receipt follows if executed.
+
+## 2026-11-04 — Publish approved hold-frontier audit and launch
+
+- User explicitly approved execution of the reviewed publication/dispatch commands, overriding the Git restriction for this group. Published tools f56e188, tests8411f4b, own CI fad87e5 and evidence/docs94d1395. Verified remote main exactly94d1395b5a38f4a59438e311b14cf5895eba998c.
+- Launched [checkpoint audit41786909156](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41786909156), confirmed in progress on that exact SHA. Reads frozen shared_minbuf2_postant; no physical repair, full build or DRT. Push-triggered lint/test/docs active and unit queued at verification. No result claimed; next inspect fresh hold-frontier/readback and repeated corner/antenna receipts.
+- Main hardware/config/official jobs untouched; unrelated files preserved. No phase ticks or watcher. Publication command finished; this receipt remains local.
+
 ## 2026-11-04 — Prepare bounded hold-frontier checkpoint audit
 
 - Latest main lint/test/unit/docs are green;41759551888is the physical blocker. Investigated pinned native source before implementing congestion readback. Rejected read_guides as trusted congestion evidence:its grid-pattern rebuild reinitializes edge usage after loading it. Persisted post-antenna DB maps also need freshness proof; no zero-overflow claim or gate bypass.

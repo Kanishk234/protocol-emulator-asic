@@ -1,0 +1,154 @@
+{
+  "audit_run": 41786909156,
+  "source_run": 41569397169,
+  "audit_source_sha": "94d1395b5a38f4a59438e311b14cf5895eba998c",
+  "artifact_id": 13302270934,
+  "raw_repeated_corner_metrics_independently_matched": true,
+  "raw_report_summaries_independently_matched": true,
+  "raw_antenna_metrics_independently_matched": true,
+  "readback_hashes_independently_matched": true,
+  "fresh_corner_metrics": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": -0.0163279,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.323963,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.106528,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "fresh_antenna_metrics": {
+    "antenna__violating__nets": 0,
+    "antenna__violating__pins": 0
+  },
+  "hold_frontier": {
+    "nom_fast_1p32V_m40C": {
+      "reported_paths": 8,
+      "reported_endpoints": 8,
+      "reported_negative_paths": 2,
+      "reported_below_reserve": 8
+    },
+    "nom_slow_1p08V_125C": {
+      "reported_paths": 0,
+      "reported_endpoints": 0,
+      "reported_negative_paths": 0,
+      "reported_below_reserve": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "reported_paths": 0,
+      "reported_endpoints": 0,
+      "reported_negative_paths": 0,
+      "reported_below_reserve": 0
+    }
+  },
+  "fast_endpoints": {
+    "_51476_": {
+      "slack_ns": -0.016328,
+      "pins": {
+        "CLK": "clknet_leaf_0_clk_regs",
+        "D": "_02169_",
+        "Q": "\\u_chip.h_wd[11] ",
+        "RESET_B": "net6278"
+      }
+    },
+    "_51479_": {
+      "slack_ns": -0.012652,
+      "pins": {
+        "CLK": "clknet_leaf_0_clk_regs",
+        "D": "_02172_",
+        "Q": "\\u_chip.h_wd[14] ",
+        "RESET_B": "net6254"
+      }
+    },
+    "_51477_": {
+      "slack_ns": 0.007611,
+      "pins": {
+        "CLK": "clknet_leaf_6_clk_regs",
+        "D": "_02170_",
+        "Q": "\\u_chip.h_wd[12] ",
+        "RESET_B": "net6270"
+      }
+    },
+    "_51558_": {
+      "slack_ns": 0.014586,
+      "pins": {
+        "CLK": "clknet_leaf_5_clk_regs",
+        "D": "_02251_",
+        "Q": "\\u_chip.g_lane[0].u_lane.host_wdata[7] ",
+        "RESET_B": "net4419"
+      }
+    },
+    "_51471_": {
+      "slack_ns": 0.02715,
+      "pins": {
+        "CLK": "clknet_leaf_1_clk_regs",
+        "D": "_02164_",
+        "Q": "\\u_chip.h_wd[6] ",
+        "RESET_B": "net6390"
+      }
+    },
+    "_51564_": {
+      "slack_ns": 0.027218,
+      "pins": {
+        "CLK": "clknet_leaf_1_clk_regs",
+        "D": "_02257_",
+        "Q": "\\u_chip.g_lane[0].u_lane.host_wdata[13] ",
+        "RESET_B": "net4292"
+      }
+    },
+    "_51514_": {
+      "slack_ns": 0.044804,
+      "pins": {
+        "CLK": "clknet_leaf_31_clk_regs",
+        "D": "_02207_",
+        "Q": "\\u_chip.g_unit[0].u_unit.pads[11] ",
+        "RESET_B": "net5803"
+      }
+    },
+    "_51536_": {
+      "slack_ns": 0.048784,
+      "pins": {
+        "CLK": "clknet_leaf_4_clk_regs",
+        "D": "_02229_",
+        "Q": "\\u_chip.g_lane[0].u_lane.host_sel[1] ",
+        "RESET_B": "net5412"
+      }
+    }
+  },
+  "readback_added_diodes": 10,
+  "readback_removed_cells": 0,
+  "readback_changed_existing_cells": 0,
+  "congestion_qualified": false,
+  "full_screen_qualified": false,
+  "detailed_routing_performed": false,
+  "files_sha256": {
+    "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/hold_frontier.rpt": "854b45d5acee88a64bed969b74fb33700984ab0ec5b8d1464fc2468bef3a8464",
+    "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "519bc61e046356fc0541e6bf5fcc98eaf53a5010b282831082eedd2e6ff02333",
+    "runs/stock-corner-audit/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/hold_frontier.rpt": "56633e390cd51454abc01049abb38308834b8ad0b6d72f7b8d0aa36c867e60e7",
+    "runs/stock-corner-audit/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "0c77b97296b2856c08afc2765e25f05ec7a184ac24b565fd5b2fff002babf5cb",
+    "runs/stock-corner-audit/after-nom_typ_1p20V_25C/1-openroad-stamidpnr/hold_frontier.rpt": "3590f5919e7a0ce02403df5c238d73904764f9812fd628504cd3efc0df95a6dd",
+    "runs/stock-corner-audit/after-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "7d91a2650c9529dde60d57be5b08a39d988678863bd87af3d5063de54888ef10",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/hold_frontier.rpt": "854b45d5acee88a64bed969b74fb33700984ab0ec5b8d1464fc2468bef3a8464",
+    "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "519bc61e046356fc0541e6bf5fcc98eaf53a5010b282831082eedd2e6ff02333",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/hold_frontier.rpt": "56633e390cd51454abc01049abb38308834b8ad0b6d72f7b8d0aa36c867e60e7",
+    "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "0c77b97296b2856c08afc2765e25f05ec7a184ac24b565fd5b2fff002babf5cb",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/hold_frontier.rpt": "3590f5919e7a0ce02403df5c238d73904764f9812fd628504cd3efc0df95a6dd",
+    "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "7d91a2650c9529dde60d57be5b08a39d988678863bd87af3d5063de54888ef10",
+    "runs/stock-corner-audit/fresh-checkpoint-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504",
+    "runs/stock-corner-audit/hold_frontier.json": "086bb502e42428740edf743c66ccbac7f328b0fe2edb6c105f71bdfe018f956f",
+    "runs/stock-corner-audit/read_only_audit.json": "5a3c772c1f6d5d31fb15f7a0c163a033a0bb903a4c41ee1940e519497d282d23"
+  }
+}

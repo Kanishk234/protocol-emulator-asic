@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Prepare paired native late-hold replay
+
+- Added separate gds-stock-late-hold-replay diagnostic: restores hash-bound reference post-antenna source and compares native late175ps control versus75ps with independent jobs. Each performs native late repair, repeated3corner STA, fresh antenna checks, direct circuit readbacks and final-source routing-table extraction. Frozen source hashes remain checked; no DRT, qualification or official-job edits. Embedded Python/shell syntax pass; native execution pending.
+
+## 2026-11-04 — Rank next timing/physical closure ideas
+
+- Reviewed reference, failed early250/inline guards and verified post-antenna hold audit; consulted primary OpenROAD/LibreLane documentation. Recommended same-checkpoint native-tail control and lower late hold target first, followed by causal isolation of late mirroring/rerouting, antenna protection mode/reserve, and source locality/repair-cell reduction if physical-only options fail. Diagnostic-only changes require a reproducible permitted clean-build recipe before promotion; official template jobs remain fixed.
+- Roadmap: qualified final screen, detailed route/extracted multi-corner checks, final-netlist protocol replay, clean official-flow reproduction and all phase exit evidence. No new experiment, publication or phase tick in this brainstorming session.
+
+## 2026-11-04 — Diagnose and reject early250 regression
+
+-41788634487finished physical/audit steps, then correctly failed strict final gate after~4h02m. Retrieved selected ZIP entries with range/CRC checks (whole ZIP digest not independently verified). Independently matched raw repeated corner metrics, final GRT overflow and antenna report violating pins to receipts. Setup0all; holdF/T/S0.121930/0.331854/0.707296ns; electrical0; antennas11/11; overflow179(M2:1,M3:176,M4:2).
+- Effective control confirms early250ps. Final47142cells/717376µm² versus reference45099/688086: +2043/+29290. Late native repair89endpoints/14buffers versus reference170/7. Broad earlier hold target regresses area/congestion/antenna despite fewer late endpoints; reject and retain41569397169. Save minbuf2_early250_result.json and update hold plan.
+- Next prepare a bounded saved-reference native-tail diagnostic with smaller late target (candidate75ps versus175ps), retaining native rerouting/mirroring, fresh all-corner/antenna checks and final-source congestion evidence. No gate reduction, source promotion, phase tick, DRT, new full-build/tail launch or watcher. Main hardware/config/official jobs and unrelated files preserved.
+
+## 2026-11-04 — Publish and launch early250 native screen
+
+- Under the user's command/publication approval, published065e5b4profile/preflight,e504547test,a8e091fownCIandde773d9evidence/docs. Verified remote main exactlyde773d97deb655dcf1f378660b386f4943113d8d. No pending hardware-input commits before push.
+- Launched [stock early250 screen41788634487](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41788634487), confirmed in progress on that exact SHA. It tests only earlier native hold target250ps versus175ps, retaining late repair/reroute/native order/all strict gates. No result or phase completion claimed. Standard CI also active; preceding94d1395unit still active at verification.
+- All owned local commands finished. No main hardware/config/official-job change, DRT, watcher or unrelated-file publication. Next inspect final qualification and native early/late repair work, retaining41569397169if this candidate regresses. This receipt remains local.
+
 ## 2026-11-04 — Verify hold-frontier result and prepare early250 screen
 
 - Audit41786909156 passed in7m26s on94d1395. Downloaded artifact13302270934 and independently matched all six raw corner reads/frontier summaries, fresh antenna metrics and direct readback hashes. Eight reported fast FF paths below50ps, two negative; none reported in other corners. Setup0all; holdF/T/S−0.0163279/0.106528/0.323963ns; electrical0/fresh antenna0. Bounded report, not endpoint-exhaustiveness proof; checkpoint remains unqualified for hold/congestion.

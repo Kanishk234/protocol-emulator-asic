@@ -8,6 +8,14 @@ import re
 PROTECTION_RX = r'(^|[./])trw_guard_mask[01]_(node|diode)$'
 
 
+def logged_objects(text):
+    """Normalize only Tcl's bracket escapes in actual native protection messages."""
+    return {(kind, re.sub(r'\\([\[\]])', r'\1', name))
+            for kind, name in re.findall(
+                r"(?m)^\[INFO\] (Net|Instance) '([^'\n]+)' matched don't touch "
+                r"regular expression, setting as don't touch", text)}
+
+
 def connectivity(text, width=7, group=6):
     """Check the two-row probe's diode, driver and A22OI mask terminals."""
     cells = {}
@@ -76,10 +84,10 @@ def main():
         if re.search(PROTECTION_RX, 'u.' + leaf):
             raise ValueError('Protection freezes an upstream driver or data sink')
     logs = list(root.glob('*-openroad-*/openroad-*.log'))
+    required = {('Net' if name.endswith('_node') else 'Instance', name)
+                for name in result['protected_objects']}
     matched = [str(p.relative_to(root)) for p in logs
-               if "matched don't touch regular expression" in p.read_text()
-               and all("'" + name + "'" in p.read_text()
-                       for name in result['protected_objects'])]
+               if required and required <= logged_objects(p.read_text())]
     covered = all(any('-openroad-' + stage + '/' in path for path in matched)
                   for stage in ['repairdesignpostgpl', 'resizertimingpostcts',
                                 'repairdesignpostgrt', 'resizertimingpostgrt'])
@@ -97,8 +105,10 @@ def main():
                   scope='Two-row selector mask connectivity only; data/reduction inputs unprotected')
     (root / 'guarded_word_result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
-    if protected and (not result['connectivity_preserved'] or not covered):
-        raise ValueError('Guarded mask inputs were not preserved through native repair')
+    if protected and not result['connectivity_preserved']:
+        raise ValueError('Guarded mask connections were not preserved through native repair')
+    if protected and not covered:
+        raise ValueError('Missing complete native protection log evidence')
 
 
 if __name__ == '__main__':

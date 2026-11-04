@@ -3,7 +3,7 @@ import re
 
 import pytest
 
-from guarded_word_probe import PROTECTION_RX, connectivity, logged_objects, main
+from guarded_word_probe import MASK_PROTECTION_RX, PROTECTION_RX, connectivity, logged_objects, main
 
 
 def netlist():
@@ -53,12 +53,13 @@ def test_data_paths_remain_repairable():
 
 @pytest.mark.parametrize('missing_object', [False, True])
 @pytest.mark.parametrize('escaped', [False, True])
-def test_every_protected_object_must_be_logged(tmp_path, monkeypatch, missing_object, escaped):
+@pytest.mark.parametrize('kind', ['paired', 'mask'])
+def test_every_protected_object_must_be_logged(tmp_path, monkeypatch, missing_object, escaped, kind):
     p = tmp_path / '4-openroad-resizertimingpostgrt'
     p.mkdir()
-    text = netlist()
+    text = netlist() if kind == 'paired' else mask_netlist()
     (p / 'probe.nl.v').write_text(text)
-    objects = connectivity(text)['protected_objects']
+    objects = connectivity(text, kind=kind)['protected_objects']
     for i, stage in enumerate(['repairdesignpostgpl', 'resizertimingpostcts',
                                'repairdesignpostgrt', 'resizertimingpostgrt']):
         path = tmp_path / f'{i}-openroad-{stage}'
@@ -66,16 +67,17 @@ def test_every_protected_object_must_be_logged(tmp_path, monkeypatch, missing_ob
         names = objects[:-1] if missing_object and i == 0 else objects
         messages = []
         for name in names:
-            kind = 'Net' if name.endswith('_node') else 'Instance'
+            object_kind = 'Net' if name.endswith('_node') else 'Instance'
             printed = name.replace('[', r'\[').replace(']', r'\]') if escaped else name
-            messages.append(f"[INFO] {kind} '{printed}' matched don't touch regular expression, "
+            messages.append(f"[INFO] {object_kind} '{printed}' matched don't touch regular expression, "
                             "setting as don't touch…")
         (path / f'openroad-{stage}.log').write_text('\n'.join(messages))
-    (tmp_path / 'resolved.json').write_text(json.dumps({'RSZ_DONT_TOUCH_RX': PROTECTION_RX}))
+    rx = PROTECTION_RX if kind == 'paired' else MASK_PROTECTION_RX
+    (tmp_path / 'resolved.json').write_text(json.dumps({'RSZ_DONT_TOUCH_RX': rx}))
     p = tmp_path / '5-openroad-stamidpnr-3'
     p.mkdir()
     (p / 'or_metrics_out.json').write_text(json.dumps({'timing__setup__ws__corner:typ': 1}))
-    monkeypatch.setattr('sys.argv', ['probe', str(tmp_path), '--protected', 'true'])
+    monkeypatch.setattr('sys.argv', ['probe', str(tmp_path), '--protected', 'true', '--kind', kind])
     if missing_object:
         with pytest.raises(ValueError, match='Missing complete native protection log evidence'):
             main()
@@ -90,3 +92,51 @@ def test_note_is_not_native_protection_evidence():
 def test_object_kind_is_preserved():
     text = "[INFO] Instance 'u.trw_guard_mask0_node' matched don't touch regular expression, setting as don't touch…"
     assert ('Net', 'u.trw_guard_mask0_node') not in logged_objects(text)
+
+
+def mask_netlist(width=7, copies=1):
+    cells = []
+    for copy in range(copies):
+        for group in range((width + 5) // 6):
+            base = f'u{copy}.g_enabled.g_group[{group}]'
+            node = base + '.trw_guard_mask_node'
+            cells.append(f'sg13cmos5l_buf_2 \\{base}.mask_driver (.A(src),.X(\\{node} ));')
+            cells.append(f'sg13cmos5l_antennanp \\{base}.trw_guard_mask_diode (.A(\\{node} ));')
+            for bit in range(min(6, width - group * 6)):
+                cells.append(f'sg13cmos5l_nand2_1 \\{base}.g_bit[{bit}].g_used.trw_guard_sink '
+                             f'(.A(\\{node} ),.B(data),.Y(y{copy}_{group}_{bit}));')
+    return '\n'.join(cells)
+
+
+@pytest.mark.parametrize('width,copies', [(7, 1), (32, 2)])
+def test_inline_mask_inventory(width, copies):
+    result = connectivity(mask_netlist(width, copies), width=width, copies=copies, kind='mask')
+    assert result['connectivity_preserved']
+    assert result['guarded_gate_count'] == width * copies
+    assert result['protected_node_count'] == copies * ((width + 5) // 6)
+
+
+@pytest.mark.parametrize('change', ['split', 'diode', 'inverted_function', 'missing', 'allowed_size'])
+def test_inline_mask_gate_connections(change):
+    text = mask_netlist()
+    if change == 'split':
+        text = text.replace('.A(\\u0.g_enabled.g_group[0].trw_guard_mask_node )', '.A(split)', 3)
+    elif change == 'diode':
+        text = text.replace('sg13cmos5l_antennanp', 'sg13cmos5l_buf_2', 1)
+    elif change == 'inverted_function':
+        text = text.replace('sg13cmos5l_nand2_1', 'sg13cmos5l_nand2b_1', 1)
+    elif change == 'missing':
+        text = text.replace('trw_guard_sink', 'missing', 1)
+    else:
+        text = text.replace('sg13cmos5l_nand2_1', 'sg13cmos5l_nand2_2')
+    assert connectivity(text, kind='mask')['connectivity_preserved'] == (change == 'allowed_size')
+
+
+def test_inline_regex_keeps_data_inputs_repairable():
+    assert re.search(MASK_PROTECTION_RX, 'u.trw_guard_mask_node')
+    assert not re.search(MASK_PROTECTION_RX, 'u.trw_guard_sink')
+    assert not re.search(MASK_PROTECTION_RX, 'u.mask_driver')
+
+
+def test_inline_wrong_inventory_rejected():
+    assert not connectivity(mask_netlist(), width=32, copies=2, kind='mask')['connectivity_preserved']

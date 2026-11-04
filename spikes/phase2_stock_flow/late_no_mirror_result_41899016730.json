@@ -1,0 +1,44 @@
+{
+  "run_id": 41899016730,
+  "raw_measurements_independently_matched": true,
+  "qualified": false,
+  "decision": "Reject late mirroring-off; retain calibrated reference.",
+  "result": {
+    "late_hold_target_ns": 0.175,
+    "late_mirroring": false,
+    "final_overflow": 15,
+    "source_state": "runs/native-late-tail/1-openroad-resizertimingpostgrt/state_out.json",
+    "final_corner_metrics": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": -0.109099,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.425742,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.0724305,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "fresh_antenna_metrics": {
+      "antenna__violating__nets": 7,
+      "antenna__violating__pins": 7
+    },
+    "source_checkpoint_unchanged": true,
+    "physical_repairs_performed": true,
+    "qualification_performed": false,
+    "official_signoff": false,
+    "detailed_routing_performed": false
+  }
+}

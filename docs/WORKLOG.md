@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Prepare native antenna mode comparison
+
+- Final calibrated reference has no directly attached diode on any of its four failing antenna nets. Prepare native diode-only versus mixed jumper/diode repair from hash-bound stage41before antenna repair, followed by mirrored175psnative late tail. Added pre-antenna source manifest; validates against downloaded artifact. Frozen source immutability and final-source fresh measurements retained. Runtime log verifies antenna mode and active late mirroring.
+- actionlint/embedded Python/shell and source hash validation pass. Causal diagnostic only; repeated diode arm controls replay of earlier antenna step. No promotion/DRT/phase claim. Standing publication authorization applies; unrelated files and official jobs unchanged.
+
+## 2026-11-04 — Late-only mirroring disable regresses all physical blockers
+
+-41899016730measurement job succeeds in92m24s; main lint/test/unit/docs green. Independently matched raw repeated corner metrics, fresh antenna and final routing table. Native mirroring absent, legalization retained. Setup0all/electrical0; holdF/T/S−0.109099/0.0724305/0.425742ns; antennas7/overflow15. Same170late hold endpoints/7inserted buffers as calibrated mirrored reference, which has fast+0.144394ns/4ant/0overflow.
+- Reject disabling late mirroring; do not infer it alone causes reference antennas. Save late_no_mirror_result_41899016730.json. Next prioritize tracking reference antenna protection/route changes and a bounded native antenna-repair reserve/mode test before late repair, with mirrored175pstail retained. No new launch, DRT, source/config/official-job change or phase tick; unrelated files preserved.
+
 ## 2026-11-04 — Isolate late mirroring on frozen reference
 
 - Prepare native-tail replay at175pshold with PL_OPTIMIZE_MIRRORING=false only during the resumed late step. Earlier physical layout is the unchanged hash-bound reference. This differs from the previously failed whole-flow mirroring-off experiment. Native legalization/rerouting remain active; require legalization command and absence of native mirroring in actual log. Fresh repeated3corner/electrical/antenna/final-source overflow measurements retained.
@@ -6540,3 +6550,5 @@ Next:
 Publication receipt: remote main4983db4verified. Push registered replay41864608197, queued. Subsequent manual retry also succeeded, creating redundant41864627053; requested its cancellation, retaining41864608197. Native175/75jobs not yet confirmed running. No local watcher.
 
 Publication receipt:0672827CI/0e15630evidence pushed; remote main0e15630verified.125psreplay41888820039pending. Old duplicate41864627053was unexpectedly active despite previous cancel responses; force-cancel API accepted to release concurrency. No125psmeasurements yet; no local watcher.
+
+Publication receipt:30a5cdfCI/ec418fdevidence pushed; remote main ec418fd42c1f678e59766906f1392945275814a6verified. Late-mirroring diagnostic41899016730confirmed in progress on exact SHA. No measurement yet, local watcher or DRT. Next compare final antennas, hold, overflow and native repair/placement logs with calibrated control.

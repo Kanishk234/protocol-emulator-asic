@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Recover antenna-mode reports; fix mirroring audit
+
+- Both41915437265physical flows/fresh measurements completed but audit wrongly required echoed optimize_mirroring. Pinned native Tcl calls it without log_cmd; both actual logs report20500mirrored instances. Implement completion-message parser;5regressions/actionlintpass. Recover raw repeated corner/electrical, fresh antenna and final overflow from uploaded artifacts without rerun; original CI remains failed. Results in antenna_mode_recovered_41915437265.json.
+- Remove temporary workflow-file push trigger now registration works, preventing audit-fix publication from restarting physical jobs. No gate relaxation, official-job/source/config change, DRT or phase tick.
+
 ## 2026-11-04 — Prepare native antenna mode comparison
 
 - Final calibrated reference has no directly attached diode on any of its four failing antenna nets. Prepare native diode-only versus mixed jumper/diode repair from hash-bound stage41before antenna repair, followed by mirrored175psnative late tail. Added pre-antenna source manifest; validates against downloaded artifact. Frozen source immutability and final-source fresh measurements retained. Runtime log verifies antenna mode and active late mirroring.
@@ -6552,3 +6557,5 @@ Publication receipt: remote main4983db4verified. Push registered replay418646081
 Publication receipt:0672827CI/0e15630evidence pushed; remote main0e15630verified.125psreplay41888820039pending. Old duplicate41864627053was unexpectedly active despite previous cancel responses; force-cancel API accepted to release concurrency. No125psmeasurements yet; no local watcher.
 
 Publication receipt:30a5cdfCI/ec418fdevidence pushed; remote main ec418fd42c1f678e59766906f1392945275814a6verified. Late-mirroring diagnostic41899016730confirmed in progress on exact SHA. No measurement yet, local watcher or DRT. Next compare final antennas, hold, overflow and native repair/placement logs with calibrated control.
+
+Publication receipt:8a37b2fmanifest/84faa95CI/725712fevidence pushed; remote main725712f3ce6deeb5e0345f8499c86034b167fc29verified. Native antenna-mode comparison41915437265confirmed in progress. No result, DRT or watcher.

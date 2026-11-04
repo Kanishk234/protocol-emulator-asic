@@ -36,6 +36,17 @@ def test_wire_control_exercised(tmp_path):
     assert validate(tmp_path, selected)['native_max_wire_length_um'] == 400
 
 
+def test_exact_guard_regex_control(tmp_path):
+    selected = fixture(tmp_path, dict(RSZ_DONT_TOUCH_RX=r'(^|[./])trw_guard_mask_(node|diode)$'))
+    assert validate(tmp_path, selected)['profile'] == 'test'
+
+
+def test_unreviewed_guard_regex_rejected(tmp_path):
+    selected = fixture(tmp_path, dict(RSZ_DONT_TOUCH_RX='.*'))
+    with pytest.raises(ValueError, match='Unreviewed string control'):
+        validate(tmp_path, selected)
+
+
 def test_density_clamp_rejected(tmp_path):
     selected = fixture(tmp_path, dict(PL_TARGET_DENSITY_PCT=54))
     with pytest.raises(ValueError, match='clamped'):

@@ -2,6 +2,29 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Prepare bounded hold-frontier checkpoint audit
+
+- Latest main lint/test/unit/docs are green;41759551888is the physical blocker. Investigated pinned native source before implementing congestion readback. Rejected read_guides as trusted congestion evidence:its grid-pattern rebuild reinitializes edge usage after loading it. Persisted post-antenna DB maps also need freshness proof; no zero-overflow claim or gate bypass.
+- Prepared read-only native_hold_frontier_audit.tcl and strict summary parser, plus own gds-stock-checkpoint-audit hook: bounded FF min reports below50ps and NL/PNL exported directly from loaded ODB; hash readbacks separately while preserving every source view. Existing repeated3cornerSTA/fresh antenna gates unchanged.31focused tests and actual archived8path parser replay pass;largest observed gap66.328ps,2negative; YAML/embedded Python/shell syntax pass. Native hook execution pending; no complete endpoint enumeration claim.
+- Added PHASE2_PREANTENNA_HOLD_PLAN.md with evidence, pitfalls and conditional next experiment. No phase ticks, new CI run, source/config/official-job changes or watcher. Current supplied AGENTS.md reserves git history/remote changes for the user; prepare exact grouped publication/dispatch commands rather than executing them. Unrelated modified/untracked files, including local-only FIPE, preserved.
+
+## 2026-11-04 — Diagnose failed full inline guard; reject regression
+
+- Full screen [41759551888](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41759551888), source680e9eb, finished in3h39m. Final qualification correctly fails6antenna nets/pins and40Metal3overflow. Independently matched selected raw corner reports, fresh antenna report and final routing table to receipts. Setup0all3; holdF/T/S0.138072/0.342849/0.716303ns; electrical0. Native guard audit passes64gates/12nodes/all4stage logs. No DRT.
+- Six failures lie outside guarded mask nets, including a latch-clock pin and configuration/input data. Record raw hashes and decision in inline_guard/result_41759551888.json and README. Selected entries were range-downloaded with CRC checks; whole artifact SHA was not independently verified. Reject candidate and retain41569397169(4antenna/0overflow); no further source guard expansion or blind full rebuild.
+- Inspected reference pre-late checkpoint41582335231: fresh antenna/electrical/setup pass, fast hold−0.0163279ns. Eight of1000reported worst paths below50ps, largest gap66.3279ps; this is bounded path evidence, not exhaustive endpoint enumeration. Next investigate earlier hold closure before antenna cleanup. Native incremental antenna loop reporting0does not prove fresh global0. Native source also shows successful incremental antenna routing need not refresh persisted DB congestion; earlier zerooverflow cannot qualify a later checkpoint. Require fresh same-state congestion and consistent netlist/ODB evidence before testing an altered native flow tail.
+- No phase boxes ticked, new workflows launched, publication performed, main hardware/config/official jobs changed or watcher started. Unrelated files preserved.
+
+## 2026-11-03 — Explain active full-screen experiment and failure decisions
+
+-41759551888remains in progress in stock Classic through final pre-routing STA;no final result yet. Explained full2/4/U0full/SRAM/6x4/20ns scope,inline last-slot mask protection,all-corner timing/50psfast-hold/electrical/antenna/overflow gates and64gate/12node preservation checks.
+- Next action depends on raw failed gates:verify actual connections/layer antenna ratios for antenna failures,critical paths/repair limits for timing,extra repair cells/congestion regions for overflow,and reproduce audit/tool errors before hardware changes. Retain41569397169if this candidate regresses;no blind identical rerun,no gate relaxation or DRT before full screen qualification. No new runs,publication,hardware/config/official-job changes or watcher.
+
+## 2026-11-03 — Publish and launch full inline-guard stock screen
+
+- Published8d6be70integration,674e33atools/evidence,e1aef0atests,1b71c32ownCIand680e9ebdocs under standing command authorization. Verified remote main680e9eb58e7f4605ed1c676c919bf0af7c0aadd9. Launched [full inline-guard screen41759551888](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41759551888),confirmed in progress on that exactSHA/profile.
+- Native prerequisite41758305742is green and raw-verified;229focusedchecks,actual source-field proof,22/22RTLprotocolcases with optional decoders enabled,and exact full preparation/pinnedTTmerge pass. Full candidate remains unqualified pending all final corner/electrical/antenna/overflow/preservation gates;no DRT or phase tick. Main hardware/config/officialjobs unchanged,unrelated files preserved. All owned local commands finished;no watcher. Next read full screen results. This publication receipt remains local.
+
 ## 2026-11-03 — Exact NAND probe green; prepare full inline-guard screen
 
 - Published925a1c2/0d8e20e/ecd958f/dc3d61e/948ff78and launched41758305742under standing authorization. Both jobs pass. Downloaded raw artifacts;enabled keeps7/7connections,disabled loses4/7;all required objects in4logs,typicalsetup11.1257/hold0.436704,electrical0/freshantenna0both. Sourceprimitive bytes match the full candidate;actualpair config differs onlyRX. Record result JSON. This is preservation,not full-design efficacy.

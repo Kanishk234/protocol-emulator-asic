@@ -1,0 +1,90 @@
+{
+  "run_id": 41759551888,
+  "source_commit": "680e9eb58e7f4605ed1c676c919bf0af7c0aadd9",
+  "qualified": false,
+  "decision": "Reject full inline guard candidate; retain reference 41569397169.",
+  "setup_ws_ns": {
+    "fast": 0,
+    "typical": 0,
+    "slow": 0
+  },
+  "hold_ws_ns": {
+    "fast": 0.138072,
+    "typical": 0.342849,
+    "slow": 0.716303
+  },
+  "electrical_violations": 0,
+  "antenna_violating_nets": 6,
+  "antenna_violating_pins": 6,
+  "global_route_overflow": 40,
+  "overflow_layer": "Metal3",
+  "preserved_guard_gates": 64,
+  "preserved_guard_nodes": 12,
+  "cells": 45583,
+  "area_um2": 692522.12,
+  "antenna_failures": [
+    {
+      "net": "_06503_",
+      "sink": "_33071_/A2",
+      "master": "sg13cmos5l_o21ai_1"
+    },
+    {
+      "net": "_06640_",
+      "sink": "wire13650/A",
+      "master": "sg13cmos5l_buf_2"
+    },
+    {
+      "net": "_22434_",
+      "sink": "_32571_/A1",
+      "master": "sg13cmos5l_a21oi_1"
+    },
+    {
+      "net": "u_chip.g_unit\\[0\\].u_cfg.g_sample_delta.delta_data\\[4\\]",
+      "sink": "_49468_/D",
+      "master": "sg13cmos5l_dfrbpq_1"
+    },
+    {
+      "net": "clknet_1_0__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[3\\].g_stored.gclk",
+      "sink": "_52119_/GATE",
+      "master": "sg13cmos5l_dlhq_1"
+    },
+    {
+      "net": "net11932",
+      "sink": "_51723_/D",
+      "master": "sg13cmos5l_dfrbpq_1"
+    }
+  ],
+  "verification": {
+    "download": "Selected ZIP entries downloaded using checked HTTP ranges and ZIP entry CRCs; full archive SHA256 not independently verified.",
+    "raw_file_sha256": {
+      "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "4fe635c36c587ecc3243ff31b3d5547a5bd61b1486e3740553992a2ce5d14a71",
+      "runs/stock-corner-audit/after-nom_fast_1p32V_m40C/resolved.json": "486805509237fb04a0efe1c1a8be5bd5080d6413bb249b108367abbb35e63730",
+      "runs/stock-corner-audit/after-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "f5f2d1eaf24b1c01d8827ad763633ece22fd339075628bb956871975dea59705",
+      "runs/stock-corner-audit/after-nom_slow_1p08V_125C/resolved.json": "f290aed1b5670bc18258ecd0fd3ad2a6084031256cee05bf2b64225b19e342e3",
+      "runs/stock-corner-audit/after-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "88cf679a911c615e311de78822fe725304f73d9284db57755cf572192ad1eba6",
+      "runs/stock-corner-audit/after-nom_typ_1p20V_25C/resolved.json": "4e19797b3d63e0c728b4908c2ff13df3237369972b87d414d375e666b12ed552",
+      "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/1-openroad-stamidpnr/or_metrics_out.json": "4fe635c36c587ecc3243ff31b3d5547a5bd61b1486e3740553992a2ce5d14a71",
+      "runs/stock-corner-audit/before-nom_fast_1p32V_m40C/resolved.json": "486805509237fb04a0efe1c1a8be5bd5080d6413bb249b108367abbb35e63730",
+      "runs/stock-corner-audit/before-nom_slow_1p08V_125C/1-openroad-stamidpnr/or_metrics_out.json": "f5f2d1eaf24b1c01d8827ad763633ece22fd339075628bb956871975dea59705",
+      "runs/stock-corner-audit/before-nom_slow_1p08V_125C/resolved.json": "f290aed1b5670bc18258ecd0fd3ad2a6084031256cee05bf2b64225b19e342e3",
+      "runs/stock-corner-audit/before-nom_typ_1p20V_25C/1-openroad-stamidpnr/or_metrics_out.json": "88cf679a911c615e311de78822fe725304f73d9284db57755cf572192ad1eba6",
+      "runs/stock-corner-audit/before-nom_typ_1p20V_25C/resolved.json": "4e19797b3d63e0c728b4908c2ff13df3237369972b87d414d375e666b12ed552",
+      "runs/stock-corner-audit/comparison.json": "3e3c6178623bfe1e467e389a71e4822a83cd348b28981e85aad8b925f89ad1f5",
+      "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/or_metrics_out.json": "eec3b2a55fde0fa93bf82ce83a7c83a18925b67c642242d320b3c99723af767a",
+      "runs/stock-corner-audit/fresh-antenna/1-openroad-checkantennas/reports/antenna.rpt": "ef27ddd7411faf10b92552d7efbf17ca743ec2f18fdad81e733d821ff33b3e83",
+      "runs/stock-corner-audit/fresh-antenna/resolved.json": "5bbaa753085bd37226c3d0185ec09a5965143c2e40bba2f597a8c9dfd2a40d05",
+      "runs/stock-corner-audit/read_only_audit.json": "90e622ae9e3c9f1787d67dcba5af6c3429a6b5e6f01021f0ba7e702b6e4d7b9e",
+      "runs/stock-corner-audit/screen_qualification.json": "6f27167fc71d9fc7802c6aad62851039c213ac200b60dcd736932bd6079fdf14",
+      "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/or_metrics_out.json": "9536260fb602586f845ff417d72ed76563dc6d3dbd6a3e985168aa0981407e10",
+      "runs/stock-official-baseline/45-openroad-stamidpnr-3/or_metrics_out.json": "e5288c05e0b56bdcbf0482098a7c30afc35d30bfe14128a9a9363651f42b20f3",
+      "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json": "d5bfe66cba7a8ea290ed0774aa267fcd7406c1a18179aee25eea4563e2727063",
+      "runs/stock-official-baseline/effective_profile.json": "dd7ae91462ef3fc72e493a0419d13e44a95c2253a680a4554b582b379d7f4bcc",
+      "runs/stock-official-baseline/guarded_word_result.json": "a01f5103392a4a250e43ab3753d4c21d1ce2679b42293cbc2f393f03964aceae",
+      "runs/stock-official-baseline/resolved.json": "d89469363ffe711d6b0aece8cd2afcd4e4a40fe74fb331c837d58530ae07b790",
+      "spikes/phase2_stock_flow/selected_profile.json": "81c9556fc21d3d6960895c4a1eecf22ec25b6fb80716e2e6e7c71ad9009490aa",
+      "src/config.json": "b240769217a17dea7d5b2df93f60f01af9d58623e7e5507a4a7609f1c7fa9680"
+    }
+  },
+  "detailed_routing_performed": false,
+  "official_gds_signoff": false
+}

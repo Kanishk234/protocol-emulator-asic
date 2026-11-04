@@ -1,0 +1,21 @@
+{
+  "profile": "rtl_shared_minbuf2_early250",
+  "reference_run": 41569397169,
+  "exact_archived_ci_preparation_passed": true,
+  "pinned_tt_merge_passed": true,
+  "changed_project_settings": {
+    "PL_RESIZER_HOLD_SLACK_MARGIN": [
+      0.175,
+      0.25
+    ]
+  },
+  "changed_merged_settings": {
+    "PL_RESIZER_HOLD_SLACK_MARGIN": [
+      0.175,
+      0.25
+    ]
+  },
+  "hardware_views_unchanged": true,
+  "official_workflow_unchanged": true,
+  "project_config_sha256": "a0b35552b01d0a0e64d934f28a0fcb0929afb6e0841613b7e49b8fe6a2fd9871"
+}

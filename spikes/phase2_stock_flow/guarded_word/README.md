@@ -39,3 +39,18 @@ Run41752009661completes the native physical flow in both cases. Enabled protecti
 Original protected CI job is **failed**,because the checker incorrectly compared Tcl-escaped hierarchical names with unescaped Verilog names. Raw logs contain every required net/diode in all four repair stages. The corrected typed-message parser normalizes only bracket escapes and keeps all checks;read-only replay of both original artifacts succeeds with the expected protected/unprotected contrast. Source hashes and raw timing metrics were independently matched. No physical recipe or hardware changed. The protected job did not reach the separate fresh final antenna check because the audit failed first,so no such result is inferred. result_41752009661.json records both original receipts and corrected replay. A clean native retry is needed before calling this workflow green.
 
 Separate ignored cost controls guard only row11:paired-A22OI version still costs about2.53%full local area with12diodes/66gates;NAND-leaf alternative about2.60%. Action-field proofs pass,but native preservation/efficacy and complete source-to-mapped coefficient identity remain unproved for those alternatives. Lower diode count alone does not recover original global logic factoring or establish a cheap physical solution. None is selected for a full screen.
+
+## Corrected native workflow completed
+
+[Retry41753442797](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41753442797) passes both jobs on9d388854db5efc406a50c5d0d6aab8f8c91769ca. Independently checked raw final connections,all intended objects in each of four repair logs,native timing/electrical metrics and fresh antenna metrics. Both cases use byte-identical RTL;actual resolved config differs only inRSZ_DONT_TOUCH_RX.
+
+| Tiny-probe measurement | Disabled | Enabled |
+|---|---:|---:|
+| Gates retaining intended mask-diode connections | 1of7 | 7of7 |
+| Protected mask nodes retained | 2of4 | 4of4 |
+| Typical setup WS | 10.9396ns | 10.9958ns |
+| Typical hold WS | 0.386972ns | 0.386972ns |
+| Typical electrical violations | 0 | 0 |
+| Fresh antenna nets/pins | 0/0 | 0/0 |
+
+This establishes native preservation under real repair pressure for this source primitive. Both cases are antenna-clean,so this experiment alone doesnotdemonstrate diode efficacy on a failing antenna. It doesnotqualify the full2/4design,its slow/fast corners,area/overflow,DRT,GL or officialGDS. The larger masked-selector implementation still has significant mapped-area overhead;it remains unselected. Raw-source hashes and measurements:result_41753442797.json.

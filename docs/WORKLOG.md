@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Guarded mask preservation retry is green
+
+-41753442797completes both jobs successfully on9d38885. Downloaded both small artifacts;independently matched final connections,all required objects in all4repair-stage logs,raw typical STA/electrical and fresh antenna metrics. SourceRTLidenticalbetween cases;actual resolved config differs onlyRSZ_DONT_TOUCH_RX.
+- Enabled preserves7/7gate connections and4/4mask nodes;disabled retains1/7and2/4. Typicalsetup10.9958nsenabled/10.9396disabled;hold0.386972both;electrical0andfreshantennas0both. Record result_41753442797.json/README with raw hashes. This validates small-probe preservation,not antenna efficacy/full2/4timing/area/overflow/DRT/GL/GDS. Significant full-source mapped-area overhead remains unresolved;no fullscreen selected or phase box ticked.
+- No hardware/config/officialjob/gate changes or new physical run. Unrelated files preserved. Next work:find a lower-cost guarded boundary consistent with actual baseline selector factoring,then require exact full-design functional and screening evidence. Publication receipt follows if published;no watcher.
+
+## 2026-11-03 — Publish log-audit fix and launch unchanged preservation retry
+
+- Published39cdeb4parser,7914ed5regressions,9d38885evidence/docs under standing command authorization;verified remote main9d388854db5efc406a50c5d0d6aab8f8c91769ca. Launched [guarded-word retry41753442797](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41753442797),confirmed in progress on that exact SHA. This repeats unchanged small RTL/physical configuration;only audit parsing/tests/evidence changed.
+-214focused checks and actual artifact replay establish protected7gates/4nodes/all4repairlogs versus disabled6gateslosingconnections. Original41752009661remains a failed CI run,not silently reclassified;fresh final protected antenna check awaits retry. All owned local mapping/proof/replay commands finished;no local watcher. Main hardware/config/officialjobs/gates unchanged,unrelated files preserved,no phase tick. Next inspect retry/antenna evidence before any full-source choice;area cost remains unresolved. This publication receipt remains local.
+
 ## 2026-11-03 — Guarded-word physical contrast works; correct hierarchical log audit
 
 - Published4310308prototype,8b16e18tools/evidence,e3c180dtests,7f60e62ownCI,88ae179docs under user command authorization;remote main verified88ae1796cda9a12d985a3f11419133da30ddb64d. Launched41752009661. Both physical flows complete;disabled job succeeds,protected job fails only audit logging despite intact7gates/4mask nodes. Downloaded both artifacts and inspected raw stage logs/source/STA.

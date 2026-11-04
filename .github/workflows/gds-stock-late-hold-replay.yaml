@@ -2,9 +2,6 @@
 name: gds-stock-late-hold-replay
 'on':
   workflow_dispatch: {}
-  push:
-    branches: [main]
-    paths: [.github/workflows/gds-stock-late-hold-replay.yaml]
 permissions:
   contents: read
   actions: read
@@ -231,7 +228,8 @@ jobs:
         assert len(log) == 1 and Path(state['odb']).resolve().parent == log[0].resolve().parent
         text = log[0].read_text()
         assert re.search(r'(?m)^\+ detailed_placement\b', text), 'Missing native legalization'
-        assert re.search(r'(?m)^\+ optimize_mirroring\b', text), 'Late mirroring missing'
+        from native_mirroring_audit import require_mirroring
+        mirrored_instances = require_mirroring(text)
         from stock_profile_effective import number
         assert math.isclose(number(text, 'repair_timing', '-hold_margin'), target, abs_tol=1e-9), 'Native target was not exercised'
         values = re.findall(r'(?m)^Total\s+\d+\s+\d+\s+[0-9.]+%\s+\d+\s*/\s*\d+\s*/\s*(\d+)\s*$', text)

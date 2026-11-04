@@ -1,8 +1,22 @@
 import json
+from pathlib import Path
 
 import pytest
 
 from stock_profile_effective import validate
+
+
+def test_minbuf2_early250_changes_only_early_hold_target():
+    root = Path(__file__).resolve().parents[2]
+    profiles = json.loads((root / 'spikes/phase2_stock_flow/stock_control_profiles.json').read_text())['profiles']
+    reference, trial = profiles['rtl_shared_minbuf2'], profiles['rtl_shared_minbuf2_early250']
+    assert trial['changes'] == {**reference['changes'], 'PL_RESIZER_HOLD_SLACK_MARGIN': 0.25}
+    assert trial['rtl_patch'] == reference['rtl_patch'] == 'shared_priority'
+    assert trial['hardware_unchanged'] is True
+    assert trial['comparison_reference_run'] == 41569397169
+    assert trial['comparison_reference_config_sha256'] == reference['config_sha256']
+    assert trial['additional_changes_from_reference'] == {'PL_RESIZER_HOLD_SLACK_MARGIN': 0.25}
+    assert not any(trial.get(k) for k in ('inline_guard', 'host_word_select', 'config_word_select'))
 
 
 def fixture(root, changes, *, density=61, wire=400, late=None, reroute=True, diode=False, adjustment=16):

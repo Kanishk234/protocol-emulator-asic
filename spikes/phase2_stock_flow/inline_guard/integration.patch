@@ -1,0 +1,52 @@
+--- a/src/trw_lane.v
++++ b/src/trw_lane.v
+@@ -175,11 +175,15 @@
+     wire rt_take = rt_ok && !fire;
+ 
+     reg [SB-1:0] ss;
+-    integer j;
++    wire [SB-1:0] guarded_last;
++    trw_guarded_mask #(.WIDTH(SB),.FIRST(`TRW_SLOT_OP_LSB),.LAST(`TRW_SLOT_KT_LSB),.ENABLE(1)) u_guard_last (
++        .mask(onehot[11]),.data(slots[11*SB +: SB]),.value(guarded_last));
++    integer guard_j;
+     always @* begin
+         ss = {SB{1'b0}};
+-        for (j = 0; j < 12; j = j + 1)
+-            ss = ss | ({SB{onehot[j]}} & slots[j*SB +: SB]);
++        for (guard_j = 0; guard_j < 12; guard_j = guard_j + 1)
++            if (guard_j == 11) ss = ss | guarded_last;
++            else ss = ss | ({SB{onehot[guard_j]}} & slots[guard_j*SB +: SB]);
+     end
+ 
+     wire [3:0] s_op   = ss[`TRW_SLOT_OP_MSB:`TRW_SLOT_OP_LSB];
+--- a/info.yaml
++++ b/info.yaml
+@@ -38,6 +38,7 @@
+     - "trw_pin_bs.v"
+     - "trw_pin_unit.v"
+     - "trw_pins.v"
++    - "trw_guarded_mask.v"
+ 
+ # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
+ # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
+--- a/test/Makefile
++++ b/test/Makefile
+@@ -9,7 +9,7 @@
+ FST ?= -fst # Use more efficient FST format
+ TOPLEVEL_LANG ?= verilog
+ SRC_DIR ?= $(PWD)/../src
+-PROJECT_SOURCES = tt_um_tripwire.v trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v trw_host.v trw_spi.v trw_lane.v trw_alu.v trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v trw_pins.v
++PROJECT_SOURCES = tt_um_tripwire.v trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v trw_host.v trw_spi.v trw_lane.v trw_alu.v trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v trw_pins.v trw_guarded_mask.v
+ 
+ # The macro's behavioural model, in RTL and gate-level runs alike (the blackbox in src/ is for synthesis).
+ MACRO_DIR ?= $(PWD)/../macro/RM_IHPSG13_1P_512x16_c2_bm_bist
+--- a/test_internal/chip/Makefile
++++ b/test_internal/chip/Makefile
+@@ -10,6 +10,7 @@
+ CHIP_SOURCES = trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v trw_host.v trw_spi.v \
+                trw_lane.v trw_alu.v trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v \
+                trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v trw_pins.v
++CHIP_SOURCES += trw_guarded_mask.v
+ MACRO_MODELS = $(MACRO_DIR)/RM_IHPSG13_1P_core_behavioral_bm_bist.v $(MACRO_DIR)/RM_IHPSG13_1P_512x16_c2_bm_bist.v
+ ifneq ($(GATES),yes)
+ # RTL

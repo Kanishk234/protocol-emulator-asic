@@ -1,0 +1,19 @@
+{
+  "profile": "rtl_shared_minbuf2_inline_guard",
+  "native_preservation_prerequisite": 41758305742,
+  "physical_preparation": "exact archived CI step passes",
+  "pinned_tt_merge": "pass",
+  "merged_configuration_deltas": [
+    "RSZ_DONT_TOUCH_RX",
+    "VERILOG_FILES"
+  ],
+  "guarded_gates": 64,
+  "guarded_nodes": 12,
+  "focused_checks_passed": 229,
+  "rtl_protocol_cases_passed": 22,
+  "sigrok_checks_enabled": true,
+  "source_proof": "actual action-field SAT with pinned PDK functions",
+  "official_jobs_modified": false,
+  "main_hardware_promoted": false,
+  "full_screen_launched": false
+}

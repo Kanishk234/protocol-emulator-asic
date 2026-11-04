@@ -1,0 +1,26 @@
+{
+  "patch_sha256": "9a9c21ab822b9f26b01dcce957a9ca64894b4a5bca4d6f9e53301ae5a77384e7",
+  "before": {
+    "src/trw_lane.v": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+    "info.yaml": "e1174bea945602666287d058b4e116fb1ac0878225e1627d0e999858020fba07",
+    "test/Makefile": "ea082406f323cab7d4055c54d819c87edd1103204e785b1cd7c1db0a605f2858",
+    "test_internal/chip/Makefile": "7a17e1295a60c193a8f59f61320074c61ff12b1ed20f6fc679440f628b2d3bb1"
+  },
+  "after": {
+    "src/trw_lane.v": "719de9e40723a331803da5137fde18a5c7c19f0455ce7b56b4b2e10556905fd5",
+    "info.yaml": "bae5c5febdb6452a6e2307cc6e4c1765d5ca2e1415ce2d76238aaf44fd314844",
+    "test/Makefile": "e62f35c2dfda254b8587d0013bc3322ea65499c2265da8186affbcf0c9fe4a79",
+    "test_internal/chip/Makefile": "997b31999aedc59cbc06a3d2d794e61882b2e3f684c1ce5ef4d09d4b937533ab"
+  },
+  "added_source": "src/trw_guarded_mask.v",
+  "added_source_sha256": "ba1f26d6bcc28d83f6816df04203fac69c8fcea980f47d4dda8e52cb9c452bc0",
+  "guarded_gates": 64,
+  "guarded_nodes": 12,
+  "protected_copies": 2,
+  "guarded_bits_per_copy": 32,
+  "native_preservation_prerequisite": {
+    "run": 41758305742,
+    "conclusion": "success",
+    "raw_connections_logs_metrics_independently_matched": true
+  }
+}

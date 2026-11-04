@@ -59,7 +59,12 @@
   ],
   "guarded_lanes": 2,
   "guarded_slot_row": 11,
-  "native_primitive_preservation": "pending NAND variant; prior41753442797tested paired A22OI",
+  "native_primitive_preservation": {
+    "run": 41758305742,
+    "protected_gate_connections": "7/7",
+    "unprotected_gate_connections": "3/7",
+    "scope": "Small NAND probe only"
+  },
   "full_design_qualification": false,
   "official_gds_signoff": false,
   "focused_checks_passed": 227,

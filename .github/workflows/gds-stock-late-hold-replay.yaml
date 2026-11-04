@@ -143,7 +143,7 @@ jobs:
         original_config = json.loads(Path('src/config_merged.json').read_text())
         config = dict(original_config)
         target = float(os.environ['LATE_HOLD'])
-        assert target in (0.175, 0.075)
+        assert target in (0.175, 0.125, 0.075)
         assert config['GRT_RESIZER_HOLD_SLACK_MARGIN'] == 0.175
         config['GRT_RESIZER_HOLD_SLACK_MARGIN'] = target
         tail = Path('runs/native-late-tail')
@@ -245,5 +245,4 @@ jobs:
       fail-fast: false
       matrix:
         late_hold:
-        - '0.175'
-        - '0.075'
+        - '0.125'

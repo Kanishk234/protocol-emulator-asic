@@ -6,6 +6,7 @@ import re
 
 
 PROTECTION_RX = r'(^|[./])trw_guard_mask[01]_(node|diode)$'
+MASK_PROTECTION_RX = r'(^|[./])trw_guard_mask_(node|diode)$'
 
 
 def logged_objects(text):
@@ -16,8 +17,13 @@ def logged_objects(text):
                 r"regular expression, setting as don't touch", text)}
 
 
-def connectivity(text, width=7, group=6):
-    """Check the two-row probe's diode, driver and A22OI mask terminals."""
+def connectivity(text, width=7, group=6, copies=1, kind='paired'):
+    """Check paired A22OI or inline NAND mask gates without freezing data paths."""
+    if kind not in ('paired', 'mask'):
+        raise ValueError('Unknown guarded primitive')
+    if min(width, group, copies) < 1:
+        raise ValueError('Guard dimensions must be positive')
+    protection_rx = PROTECTION_RX if kind == 'paired' else MASK_PROTECTION_RX
     cells = {}
     for master, name, body in re.findall(
             r'\b(sg13cmos5l_\w+)\s+(\S+)\s*\((.*?)\);', text, re.S):
@@ -30,21 +36,24 @@ def connectivity(text, width=7, group=6):
     failures = []
     nodes = set()
     diode_names = set()
-    if len(sinks) != width:
+    if len(sinks) != width * copies:
         failures.append('Wrong guarded sink count')
     for name, (master, pins) in sinks.items():
-        if master != 'sg13cmos5l_a22oi_1':
+        valid = (master == 'sg13cmos5l_a22oi_1' if kind == 'paired'
+                 else master in ('sg13cmos5l_nand2_1', 'sg13cmos5l_nand2_2'))
+        if not valid:
             failures.append('Wrong guarded gate function: ' + name)
         if '.g_bit[' not in name:
             failures.append('Missing group identity: ' + name)
             continue
         prefix = name.split('.g_bit[', 1)[0]
-        for index, pin in [(0, 'A1'), (1, 'B1')]:
-            stem = prefix + ('.g_second' if index else '')
+        sides = [(0, 'A1'), (1, 'B1')] if kind == 'paired' else [('', 'A')]
+        for index, pin in sides:
+            stem = prefix + ('.g_second' if index == 1 else '')
             diode = cells.get(stem + f'.trw_guard_mask{index}_diode')
             driver = cells.get(stem + f'.mask{index}_driver')
             node = pins.get(pin)
-            if (not node or not re.search(PROTECTION_RX, node)
+            if (not node or not re.search(protection_rx, node)
                     or not node.endswith(f'trw_guard_mask{index}_node')
                     or diode is None or diode[0] != 'sg13cmos5l_antennanp'
                     or diode[1].get('A') != node
@@ -55,7 +64,7 @@ def connectivity(text, width=7, group=6):
             else:
                 nodes.add(node)
                 diode_names.add(stem + f'.trw_guard_mask{index}_diode')
-    expected_nodes = 2 * ((width + group - 1) // group)
+    expected_nodes = (2 if kind == 'paired' else 1) * copies * ((width + group - 1) // group)
     if len(nodes) != expected_nodes:
         failures.append('Wrong protected mask-node count')
     return dict(connectivity_preserved=not failures, failures=failures,
@@ -67,21 +76,25 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('physical', type=Path)
     parser.add_argument('--protected', choices=['true', 'false'], required=True)
+    parser.add_argument('--kind', choices=['paired', 'mask'], default='paired')
+    parser.add_argument('--width', type=int, default=7)
+    parser.add_argument('--copies', type=int, default=1)
     args = parser.parse_args()
     root = args.physical
     paths = list(root.glob('*-openroad-resizertimingpostgrt/*.nl.v'))
     if len(paths) != 1:
         raise ValueError('Missing unique final native netlist')
-    result = connectivity(paths[0].read_text())
+    result = connectivity(paths[0].read_text(), width=args.width, copies=args.copies, kind=args.kind)
     protected = args.protected == 'true'
     config = json.loads((root / 'resolved.json').read_text())
-    expected = PROTECTION_RX if protected else '$^'
+    protection_rx = PROTECTION_RX if args.kind == 'paired' else MASK_PROTECTION_RX
+    expected = protection_rx if protected else '$^'
     if config['RSZ_DONT_TOUCH_RX'] != expected:
         raise ValueError('Wrong native protection configuration')
     # Freezing a sink gate would also freeze its data inputs. Protect only mask
     # nodes/diodes so native repair remains free to buffer the data paths.
     for leaf in ['trw_guard_sink', 'mask0_driver', 'mask1_driver']:
-        if re.search(PROTECTION_RX, 'u.' + leaf):
+        if re.search(protection_rx, 'u.' + leaf):
             raise ValueError('Protection freezes an upstream driver or data sink')
     logs = list(root.glob('*-openroad-*/openroad-*.log'))
     required = {('Net' if name.endswith('_node') else 'Instance', name)
@@ -97,12 +110,12 @@ def main():
     raw = json.loads(metrics[0].read_text())
     if not any(k.startswith('timing__setup__ws__corner:') for k in raw):
         raise ValueError('Missing native setup measurement')
-    result.update(protected=protected, native_protection_logs=matched,
+    result.update(protected=protected, primitive_kind=args.kind, native_protection_logs=matched,
                   all_repair_stages_exercised_protection=covered,
                   native_metrics={k: v for k, v in raw.items()
                                   if k.startswith(('timing__', 'design__max_'))},
                   full_design_qualification=False, detailed_routing_performed=False,
-                  scope='Two-row selector mask connectivity only; data/reduction inputs unprotected')
+                  scope='Guarded mask connectivity only; data/reduction inputs unprotected')
     (root / 'guarded_word_result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
     if protected and not result['connectivity_preserved']:

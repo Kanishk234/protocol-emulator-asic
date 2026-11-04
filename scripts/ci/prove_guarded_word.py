@@ -23,7 +23,9 @@ def main():
         end = text.index('    wire [3:0] s_op', start)
         return text[:start], text[start:end], text[end:]
     before, original, after = split(reference, '    reg [SB-1:0] ss;')
-    before_trial, replacement, after_trial = split(trial, '    wire [SB-1:0] ss;')
+    declaration = ('    wire [SB-1:0] ss;' if '    wire [SB-1:0] ss;' in trial
+                   else '    reg [SB-1:0] ss;')
+    before_trial, replacement, after_trial = split(trial, declaration)
     if before != before_trial or after != after_trial:
         raise ValueError('Trial changed source outside the reviewed selector block')
     output = args.output.resolve()
@@ -44,7 +46,8 @@ endmodule
     (output / 'miter.v').write_text(miter)
     pdk = args.pdk_cells.read_text()
     models = []
-    for name in ['sg13cmos5l_buf_2', 'sg13cmos5l_a22oi_1', 'sg13cmos5l_antennanp']:
+    for name in ['sg13cmos5l_buf_2', 'sg13cmos5l_a22oi_1',
+                 'sg13cmos5l_nand2_1', 'sg13cmos5l_antennanp']:
         matches = re.findall(r'(?m)^module ' + name + r'\b.*?endmodule', pdk, re.S)
         if len(matches) != 1:
             raise ValueError('Missing unique PDK model: ' + name)

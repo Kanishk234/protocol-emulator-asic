@@ -28,7 +28,10 @@ def validate(root, selected):
         if isinstance(expected, bool):
             matched = actual is expected
         elif isinstance(expected, str):
-            if key != 'SYNTH_BUFFER_CELL' or expected != 'sg13cmos5l_buf_2/A/X':
+            allowed = ((key == 'SYNTH_BUFFER_CELL' and expected == 'sg13cmos5l_buf_2/A/X')
+                       or (key == 'RSZ_DONT_TOUCH_RX'
+                           and expected == r'(^|[./])trw_guard_mask_(node|diode)$'))
+            if not allowed:
                 raise ValueError('Unreviewed string control')
             matched = actual == expected
         elif isinstance(expected, list):

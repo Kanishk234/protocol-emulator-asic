@@ -1,0 +1,147 @@
+{
+  "run": 41758305742,
+  "ci_conclusion": "success",
+  "scope": "Small NAND guard preservation only; not full design or antenna efficacy",
+  "full_design_qualification": false,
+  "cases": {
+    "false": {
+      "result": {
+        "connectivity_preserved": false,
+        "failures": [
+          "Mask diode/driver/gate connection lost: u_guard.g_enabled.g_group[0].g_bit[2].g_used.trw_guard_sink/A",
+          "Mask diode/driver/gate connection lost: u_guard.g_enabled.g_group[0].g_bit[3].g_used.trw_guard_sink/A",
+          "Mask diode/driver/gate connection lost: u_guard.g_enabled.g_group[0].g_bit[4].g_used.trw_guard_sink/A",
+          "Mask diode/driver/gate connection lost: u_guard.g_enabled.g_group[0].g_bit[5].g_used.trw_guard_sink/A"
+        ],
+        "guarded_gate_count": 7,
+        "protected_node_count": 2,
+        "protected_objects": [
+          "u_guard.g_enabled.g_group[0].trw_guard_mask_diode",
+          "u_guard.g_enabled.g_group[0].trw_guard_mask_node",
+          "u_guard.g_enabled.g_group[1].trw_guard_mask_diode",
+          "u_guard.g_enabled.g_group[1].trw_guard_mask_node"
+        ],
+        "protected": false,
+        "primitive_kind": "mask",
+        "native_protection_logs": [],
+        "all_repair_stages_exercised_protection": false,
+        "native_metrics": {
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.436704,
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 11.1257,
+          "timing__hold__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_r2r__ws__corner:nom_typ_1p20V_25C": 0.436704,
+          "timing__hold_r2r_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_r2r__ws__corner:nom_typ_1p20V_25C": 1e+30,
+          "timing__setup_r2r_vio__count__corner:nom_typ_1p20V_25C": 0
+        },
+        "full_design_qualification": false,
+        "detailed_routing_performed": false,
+        "scope": "Guarded mask connectivity only; data/reduction inputs unprotected"
+      },
+      "fresh_antenna": {
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0
+      },
+      "raw_sha256": {
+        "runs/protected-probe/13-openroad-floorplan/openroad-floorplan.log": "15da8d89f42f0d5eedc49dcd659e2d0462db9a3830923b0892c8c0670c06dc8a",
+        "runs/protected-probe/41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log": "078c155f3a42a53cf0c52252e14e394f1375dd6190c7a160c7246f99f94f2473",
+        "runs/protected-probe/18-openroad-cutrows/openroad-cutrows.log": "9ec2e21896c060ea04750a6c2f81320939518017291269527b27f388aec447ed",
+        "runs/protected-probe/32-openroad-repairdesignpostgpl/openroad-repairdesignpostgpl.log": "6f89c2c4c13bf230a4ccac57d87d7e1cc6449ebdb02bf9ff4c8fee7646ad43a0",
+        "runs/protected-probe/21-openroad-generatepdn/openroad-generatepdn.log": "940eaa9a44708ab24ec816adc8461f9392dd5accf901b6628ed0345fea6367b6",
+        "runs/protected-probe/38-openroad-stamidpnr-2/openroad-stamidpnr-2.log": "1cada223e9e3a6fff75eda16f4e4d799d8a83d9f3a58c861876f64d73cc597b4",
+        "runs/protected-probe/19-openroad-tapendcapinsertion/openroad-tapendcapinsertion.log": "cd491cd0d9e56f41afa6d746d410814794d4317bbea1851fd87634da24cdd80a",
+        "runs/protected-probe/36-openroad-stamidpnr-1/openroad-stamidpnr-1.log": "de64eb96c632462bea9154d2759640c86e8c4653ec542a89ac239f28ec9e81bc",
+        "runs/protected-probe/14-openroad-dumprcvalues/openroad-dumprcvalues.log": "4592e20301b06be8704e3c2a8b860e4fc9c49138914f17c25e751ac11d62f811",
+        "runs/protected-probe/34-openroad-detailedplacement/openroad-detailedplacement.log": "363869d622834597fd609b1cc195e190d19ba78dee694613357a85c7df8f6d08",
+        "runs/protected-probe/35-openroad-cts/openroad-cts.log": "33ba9b701a29f8025332d403e776b522a1f929501295da1ef015f94040fb3870",
+        "runs/protected-probe/31-openroad-stamidpnr/openroad-stamidpnr.log": "a2b9d20af4b9549ad1ac6f27108344fab05604e7a14e3e629c88d6b7da6a1b8a",
+        "runs/protected-probe/37-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log": "f1e5f02807f7703f18505ef3f8739484c9896af1dad562ca8f578a9e27935270",
+        "runs/protected-probe/28-openroad-globalplacement/openroad-globalplacement.log": "4dbda167892af3bde1649411025141dd4389775bad82389b8ae855be6f1d4eae",
+        "runs/protected-probe/39-openroad-globalrouting/openroad-globalrouting.log": "980028f060e37d6f27eb6a5acde5c34c37356fa9c56adacd70724791aa85051b",
+        "runs/protected-probe/45-openroad-stamidpnr-3/openroad-stamidpnr-3.log": "088b7a77dfce585c8ab43aa9b1281af2f9934f60851e72661589db7436e5cb16",
+        "runs/protected-probe/40-openroad-checkantennas/openroad-checkantennas.log": "26bf81c6960e5eecc8ca05ad38d0907bbaba795e5af18d543534df2cda4b22b4",
+        "runs/protected-probe/44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log": "bf56d3139e28c8fbac73327910f97de296a686f3ae62db1215b71de4114dbe0b",
+        "runs/protected-probe/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "cff21844716cac501fee0adce310bf61d6610edfb068cc89a7baa061dbf15795",
+        "runs/probe-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504"
+      }
+    },
+    "true": {
+      "result": {
+        "connectivity_preserved": true,
+        "failures": [],
+        "guarded_gate_count": 7,
+        "protected_node_count": 2,
+        "protected_objects": [
+          "u_guard.g_enabled.g_group[0].trw_guard_mask_diode",
+          "u_guard.g_enabled.g_group[0].trw_guard_mask_node",
+          "u_guard.g_enabled.g_group[1].trw_guard_mask_diode",
+          "u_guard.g_enabled.g_group[1].trw_guard_mask_node"
+        ],
+        "protected": true,
+        "primitive_kind": "mask",
+        "native_protection_logs": [
+          "32-openroad-repairdesignpostgpl/openroad-repairdesignpostgpl.log",
+          "37-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log",
+          "41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log",
+          "28-openroad-globalplacement/openroad-globalplacement.log",
+          "44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log"
+        ],
+        "all_repair_stages_exercised_protection": true,
+        "native_metrics": {
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.436704,
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 11.1257,
+          "timing__hold__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__tns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup__wns__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold_r2r__ws__corner:nom_typ_1p20V_25C": 0.436704,
+          "timing__hold_r2r_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_vio__count__corner:nom_typ_1p20V_25C": 0,
+          "timing__setup_r2r__ws__corner:nom_typ_1p20V_25C": 1e+30,
+          "timing__setup_r2r_vio__count__corner:nom_typ_1p20V_25C": 0
+        },
+        "full_design_qualification": false,
+        "detailed_routing_performed": false,
+        "scope": "Guarded mask connectivity only; data/reduction inputs unprotected"
+      },
+      "fresh_antenna": {
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0
+      },
+      "raw_sha256": {
+        "runs/protected-probe/13-openroad-floorplan/openroad-floorplan.log": "15da8d89f42f0d5eedc49dcd659e2d0462db9a3830923b0892c8c0670c06dc8a",
+        "runs/protected-probe/41-openroad-repairdesignpostgrt/openroad-repairdesignpostgrt.log": "d31c619e0c933f5bbb09ad6cba16d1a601bb854c8194d7971124118a399cb2fd",
+        "runs/protected-probe/18-openroad-cutrows/openroad-cutrows.log": "9ec2e21896c060ea04750a6c2f81320939518017291269527b27f388aec447ed",
+        "runs/protected-probe/32-openroad-repairdesignpostgpl/openroad-repairdesignpostgpl.log": "e5402ad93055a45cf08498bc1f7c15ff536d194fef30429a0447a1e43e8a55b0",
+        "runs/protected-probe/21-openroad-generatepdn/openroad-generatepdn.log": "940eaa9a44708ab24ec816adc8461f9392dd5accf901b6628ed0345fea6367b6",
+        "runs/protected-probe/38-openroad-stamidpnr-2/openroad-stamidpnr-2.log": "1cada223e9e3a6fff75eda16f4e4d799d8a83d9f3a58c861876f64d73cc597b4",
+        "runs/protected-probe/19-openroad-tapendcapinsertion/openroad-tapendcapinsertion.log": "cd491cd0d9e56f41afa6d746d410814794d4317bbea1851fd87634da24cdd80a",
+        "runs/protected-probe/36-openroad-stamidpnr-1/openroad-stamidpnr-1.log": "de64eb96c632462bea9154d2759640c86e8c4653ec542a89ac239f28ec9e81bc",
+        "runs/protected-probe/14-openroad-dumprcvalues/openroad-dumprcvalues.log": "4592e20301b06be8704e3c2a8b860e4fc9c49138914f17c25e751ac11d62f811",
+        "runs/protected-probe/34-openroad-detailedplacement/openroad-detailedplacement.log": "363869d622834597fd609b1cc195e190d19ba78dee694613357a85c7df8f6d08",
+        "runs/protected-probe/35-openroad-cts/openroad-cts.log": "33ba9b701a29f8025332d403e776b522a1f929501295da1ef015f94040fb3870",
+        "runs/protected-probe/31-openroad-stamidpnr/openroad-stamidpnr.log": "a2b9d20af4b9549ad1ac6f27108344fab05604e7a14e3e629c88d6b7da6a1b8a",
+        "runs/protected-probe/37-openroad-resizertimingpostcts/openroad-resizertimingpostcts.log": "ec2ed5f968060c1c1a64038f3acaadcca7711fcd6c89a2f9f35181edef621dbf",
+        "runs/protected-probe/28-openroad-globalplacement/openroad-globalplacement.log": "57d28d73f2de764eca7bbc79a61a08f3634f78f8a131149c4e78b6b57b19196f",
+        "runs/protected-probe/39-openroad-globalrouting/openroad-globalrouting.log": "980028f060e37d6f27eb6a5acde5c34c37356fa9c56adacd70724791aa85051b",
+        "runs/protected-probe/45-openroad-stamidpnr-3/openroad-stamidpnr-3.log": "1a109174cbe8b7849e41a4431904ba417fbf59a11c847d08aa60f7c94f830ba4",
+        "runs/protected-probe/40-openroad-checkantennas/openroad-checkantennas.log": "26bf81c6960e5eecc8ca05ad38d0907bbaba795e5af18d543534df2cda4b22b4",
+        "runs/protected-probe/44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log": "b3ceda539967f5c2a3ab9a719dbbbcf90b645d319e9c9d8087c43d63cd95c5d1",
+        "runs/protected-probe/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "16e087d3f78c915f25132fdc9d9304a5db8599ab1abc92eb72a8d635e2cc8531",
+        "runs/probe-antenna/1-openroad-checkantennas/or_metrics_out.json": "8bf59ee02ca708c4d1a2e47d0a7ec04bf895a8b9a70ce1179fb49d1c73a50504"
+      }
+    }
+  }
+}

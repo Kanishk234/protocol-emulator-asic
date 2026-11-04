@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Inline guard reduces local overhead; full RTL replay passes
+
+- Matched zero-guard/unused-module controls isolate restructuring cost:unused module exactly reproduces595129.5126µm²reference,old refactored zero-guard607474.728. Preserve original selector loop and guard only row11term. Inline disabled594473.9094µm²/47705cells;enabled597273.0372/48124(+0.36%vsreference),sequentialarea unchanged.12diodes/direct connections to64NANDmask gates verified in actual local mapped export. Other original antenna families remain unproved.
+- Actual source action-field SAT passes arbitrary masks/data using pinned PDK functions;wrong physical mask input rejects. Full2/4/U0fullRTL replay22/22passes in210seconds with optional sigrok checks enabled outside sandbox. Package source patch/primitive/probe/evidence under inline_guard;no main hardware promotion. D-146records general need/cost/scope.
+- Extend existing small preservation workflow with explicit NAND mask variant;paired default/config unchanged. Audit supports exact NAND counts/strength1or2and complete object/stage logs;data paths/upstream drivers remain repairable.227focused checks,all four exact paired/mask CIpreparations/pinnedTTmerges and shell syntax pass;each pair differs onlyprotectionRX. Native NANDpreservation pending before full screen. Unrelatedfiles preserved,no phase ticks/officialjob/gatechange/watcher. Publish reviewed groups and launch small mask pair under standing authorization;receipt follows.
+
+## 2026-11-03 — Publish successful preservation measurements
+
+- Published66c5149measured result anda411d79scope/docs under standing command authorization;remote main verification performed after push. No new physical workflow launched. Completed41753442797remains the small-probe preservation evidence,not full-design qualification. All owned local commands finished;no watcher. Main hardware/config/officialjobs/gates unchanged;unrelated files preserved. Next:lower-cost source boundary before a full screen. This receipt remains local.
+
 ## 2026-11-03 — Guarded mask preservation retry is green
 
 -41753442797completes both jobs successfully on9d38885. Downloaded both small artifacts;independently matched final connections,all required objects in all4repair-stage logs,raw typical STA/electrical and fresh antenna metrics. SourceRTLidenticalbetween cases;actual resolved config differs onlyRSZ_DONT_TOUCH_RX.

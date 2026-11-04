@@ -1558,6 +1558,14 @@ First measure only native preservation on a tiny7-bit/two-row probe. Compare ide
 
 210focused checks,both exact CI preparations/pinned TTmerges,actual local mapped-probe audit and shell syntax pass. Source/mainconfig/official jobs/gates unchanged. Main adoption of this extra native option would require a separate configuration-policy review;this experiment grants none. Scope/cost/proof reproduction:spikes/phase2_stock_flow/guarded_word/README.md.
 
+## D-146 (2026-11-03): preserve the selector loop and guard one general mask term
+
+General need:implement diode-to-gate protection without the large cost of reorganizing the full selector. New matched controls show the earlier zero-guard refactoring itself costs about2.07%local mapped area;an unused-module control exactly matches reference. Preserve the original53-bit reduction loop and substitute only its last-row masked term,with a general stateless guarded-AND primitive. Guard action bits using generated OP/KT bounds;no new state/cycles/ISA/protocol block. Propagation delays still need physical measurement.
+
+Local full mapping:reference595129.5126µm²/47919cells;inline disabled594473.9094/47705;inline enabled597273.0372/48124(+0.36%vsreference). Sequential area unchanged.12mask diodes directly protect64NAND input gates in the mapped candidate. Actual action-field SAT passes arbitrary masks/data with pinned PDK functions;wrong mask input rejects. Full2/4/U0fullRTL replay22/22passes with optional independent decoders enabled. No routed area/timing/antenna guarantee,whole-chip sequential proof or finalGLclaim.
+
+Before a full screen,extend the existing small preservation workflow with a NAND mask variant. Keep paired default/config unchanged;NANDpair uses the full-target minimum-buffer policy and only its native protection regex differs between disabled/enabled cases. Require exact connection inventories and all objects in four repair logs;allow equivalent NAND2strength1/2 only.227focused checks and all four exact paired/mask preparations/pinned TTmerges pass. Mainhardware/config/officialjobs/gates unchanged;native extra-option adoption still needs separate policy review. Source and limits:spikes/phase2_stock_flow/inline_guard/README.md.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

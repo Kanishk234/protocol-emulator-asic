@@ -19,7 +19,7 @@ jobs:
       PDK_ROOT: /home/runner/pdk
       CHECKPOINT: shared_minbuf2_postant
       LATE_HOLD: ${{ matrix.late_hold }}
-      LATE_MIRROR: 'false'
+      ANTENNA_MODE: ${{ matrix.antenna_mode }}
     steps:
     - name: Check out project
       uses: actions/checkout@v6
@@ -33,7 +33,7 @@ jobs:
         manifests = {
             'recovered_hold275': 'spikes/phase2_stock_flow/recovery_40427663913.json',
             'shared_cluster100_postant': 'spikes/phase2_stock_flow/shared_cluster100_postant_checkpoint.json',
-            'shared_minbuf2_postant': 'spikes/phase2_stock_flow/shared_minbuf2_postant_checkpoint.json',
+            'shared_minbuf2_postant': 'spikes/phase2_stock_flow/shared_minbuf2_preant_checkpoint.json',
         }
         path = manifests[os.environ['CHECKPOINT']]
         manifest = json.loads(Path(path).read_text())
@@ -130,7 +130,7 @@ jobs:
         from postgrt_timing import CORNERS, screen
         from native_stock_route import run_step
         root = Path('runs/stock-official-baseline')
-        states = list(root.glob('*-openroad-repairantennas/1-openroad-diodeinsertion/state_out.json'))
+        states = list(root.glob('*-openroad-repairdesignpostgrt/state_out.json'))
         assert len(states) == 1
         source = states[0]
         state = json.loads(source.read_text())
@@ -147,9 +147,19 @@ jobs:
         assert target in (0.175, 0.125, 0.075)
         assert config['GRT_RESIZER_HOLD_SLACK_MARGIN'] == 0.175
         config['GRT_RESIZER_HOLD_SLACK_MARGIN'] = target
-        assert os.environ['LATE_MIRROR'] == 'false'
+        mode = os.environ['ANTENNA_MODE']
+        assert mode in ('diode', 'mixed')
+        config['GRT_ANTENNA_REPAIR_DIODE_ONLY'] = mode == 'diode'
         assert config.get('PL_OPTIMIZE_MIRRORING', True) is True
-        config['PL_OPTIMIZE_MIRRORING'] = False
+        antenna_output = Path('runs/native-antenna-replay')
+        run_step(config, source, antenna_output, ['OpenROAD.RepairAntennas'])
+        antenna_states = list(antenna_output.glob('*-openroad-repairantennas/1-openroad-diodeinsertion/state_out.json'))
+        assert len(antenna_states) == 1
+        source = antenna_states[0]
+        antenna_log = source.with_name('openroad-diodeinsertion.log').read_text()
+        commands = [line for line in antenna_log.splitlines() if line.startswith('+ repair_antennas ')]
+        assert commands and ('-diode_only' in commands[-1].split()) == (mode == 'diode')
+        assert '-jumper_only' not in commands[-1].split()
         tail = Path('runs/native-late-tail')
         run_step(config, source, tail, ['OpenROAD.ResizerTimingPostGRT'])
         states = list(tail.glob('*-openroad-resizertimingpostgrt/state_out.json'))
@@ -221,14 +231,14 @@ jobs:
         assert len(log) == 1 and Path(state['odb']).resolve().parent == log[0].resolve().parent
         text = log[0].read_text()
         assert re.search(r'(?m)^\+ detailed_placement\b', text), 'Missing native legalization'
-        assert not re.search(r'(?m)^\+ optimize_mirroring\b|\[INFO DPL-0020\] Mirrored', text), 'Late mirroring still active'
+        assert re.search(r'(?m)^\+ optimize_mirroring\b', text), 'Late mirroring missing'
         from stock_profile_effective import number
         assert math.isclose(number(text, 'repair_timing', '-hold_margin'), target, abs_tol=1e-9), 'Native target was not exercised'
         values = re.findall(r'(?m)^Total\s+\d+\s+\d+\s+[0-9.]+%\s+\d+\s*/\s*\d+\s*/\s*(\d+)\s*$', text)
         assert values, 'Missing final-source routing evidence'
         assert all(hashlib.sha256(p.read_bytes()).hexdigest() == frozen_hashes[str(p)] for p in frozen_paths)
         (output / 'native_tail_result.json').write_text(json.dumps(dict(
-            late_hold_target_ns=target, late_mirroring=False, final_overflow=int(values[-1]),
+            late_hold_target_ns=target, late_mirroring=True, antenna_mode=mode, final_overflow=int(values[-1]),
             source_state=str(source), final_corner_metrics=rows, fresh_antenna_metrics=antenna,
             source_checkpoint_unchanged=True, physical_repairs_performed=True, qualification_performed=False,
             official_signoff=False, detailed_routing_performed=False), indent=2) + '\n')
@@ -238,7 +248,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: stock-late-hold-${{ matrix.late_hold }}-${{ github.run_id }}
+        name: stock-antenna-${{ matrix.antenna_mode }}-${{ github.run_id }}
         path: |-
           runs/stock-corner-audit/**
           runs/stock-recovery-validation.json
@@ -246,9 +256,11 @@ jobs:
           recovery-source-artifact.json
           ${{ env.SOURCE_MANIFEST }}
           runs/native-late-tail/**
+          runs/native-antenna-replay/**
         if-no-files-found: warn
     strategy:
       fail-fast: false
       matrix:
         late_hold:
         - '0.175'
+        antenna_mode: [diode, mixed]

@@ -1566,6 +1566,14 @@ Local full mapping:reference595129.5126µm²/47919cells;inline disabled594473.90
 
 Before a full screen,extend the existing small preservation workflow with a NAND mask variant. Keep paired default/config unchanged;NANDpair uses the full-target minimum-buffer policy and only its native protection regex differs between disabled/enabled cases. Require exact connection inventories and all objects in four repair logs;allow equivalent NAND2strength1/2 only.227focused checks and all four exact paired/mask preparations/pinned TTmerges pass. Mainhardware/config/officialjobs/gates unchanged;native extra-option adoption still needs separate policy review. Source and limits:spikes/phase2_stock_flow/inline_guard/README.md.
 
+## D-147 (2026-11-03): screen the verified inline guard on the full minimum-buffer reference
+
+The exact NAND small-probe41758305742passes both jobs:protected retains7/7connections,control loses4/7;raw stage logs/config/source/STA/antenna evidence matched. Both tiny layouts are antenna-clean,so this is native preservation evidence,not full-layout efficacy. D-146candidate actual action-field proof and22/22protocol replay pass;local mapped overhead0.36%vsreference,sequential area unchanged.
+
+Test one feature on full2/4/U0full/6x4:retain minimum-buffer reference41569397169and add the inline last-slot action-mask guard plus its exact native RSZ_DONT_TOUCH_RX. Keep20ns/SDC,every other physical setting and stock Classic tools/scripts/order. File-group integration adds the primitive and updates both simulation source lists with hashes;only lane RTL and the new source differ. Require final64guard-gate/12node preservation and all source objects in four repair stages in addition to unchanged all-corner timing/electrical/antenna/overflow gates. No DRT until all gates pass.
+
+229focused checks,exact archived preparation/pinned TTmerge and shell syntax pass. Other original antenna families may persist or move;placement,hold,setup and routing can regress. This is an own-workflow experiment;main source/config and official jobs remain unchanged. Main adoption of the new native protection option remains separately reviewed under the config whitelist. Scope/evidence:spikes/phase2_stock_flow/inline_guard/full_screen_preflight.json.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

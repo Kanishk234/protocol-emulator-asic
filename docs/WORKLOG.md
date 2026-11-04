@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Exact NAND probe green; prepare full inline-guard screen
+
+- Published925a1c2/0d8e20e/ecd958f/dc3d61e/948ff78and launched41758305742under standing authorization. Both jobs pass. Downloaded raw artifacts;enabled keeps7/7connections,disabled loses4/7;all required objects in4logs,typicalsetup11.1257/hold0.436704,electrical0/freshantenna0both. Sourceprimitive bytes match the full candidate;actualpair config differs onlyRX. Record result JSON. This is preservation,not full-design efficacy.
+- Full integration prepared:sourcepatch/primitive plusinfo.yaml/testandinternalchip source lists hash-bound. Existing full stock workflow adds optional inline_guardprofile;main hardware/config/official jobs remain untouched. Onlynewphysicaloption is exactnativeRX;all20ns/SDC/otherphysicalsettings/gatesfixed. Additional final64gate/12node/all4stagelogpreservationaudit enabled.229focused checks,exactarchivedpreparation/pinnedTTmerge andshellsyntaxpass;mergedcfgdiff onlyRX/sourcefile. D-147records scope/risk;no DRT/phase ticks or watcher.
+- Publish reviewed integration/tools/tests/ownCI/docs and launch full stock screen under standing command authorization. Source guard addresses selector family;other original antenna failures may persist/move. Unrelated dirty/untracked files preserved. Receipt follows.
+
 ## 2026-11-03 — Inline guard reduces local overhead; full RTL replay passes
 
 - Matched zero-guard/unused-module controls isolate restructuring cost:unused module exactly reproduces595129.5126µm²reference,old refactored zero-guard607474.728. Preserve original selector loop and guard only row11term. Inline disabled594473.9094µm²/47705cells;enabled597273.0372/48124(+0.36%vsreference),sequentialarea unchanged.12diodes/direct connections to64NANDmask gates verified in actual local mapped export. Other original antenna families remain unproved.

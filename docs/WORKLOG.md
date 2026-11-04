@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Validate replay and add narrow launch trigger
+
+- Standard actionlint semantic validation passes. GitHub still does not list new replay workflow across all290registered workflows; dispatch returns404. Prior push-triggered standardCI remains queued. Repository defaultbranch/main remote SHA verified. Actions-policy read endpoint returns403; no policy change attempted or cause inferred.
+- Add push trigger restricted to main and the diagnostic workflow file itself to request registration/launch via push. Existing manual trigger retained, official workflow untouched. Outcome pending publication verification.
+
+## 2026-11-04 — Publish paired native replay; dispatch pending registration
+
+- Under explicit user approval published9d7ec21workflow and4da2125evidence/docs; verified remote main SHA and workflow contents via GitHub API.85focused tests and embedded Python/shell syntax pass. Added runtime verification of actual native hold target and explicit physical-repair receipt.
+- Dispatch retries returned HTTP404 for the new workflow despite contents being present on main. No replay run confirmed; do not claim running. Push-triggered test/lint/unit/docs queued. Next inspect workflow registration/semantic validation and dispatch paired175/75ps native-tail jobs. Main hardware/config/officialjobs unchanged; unrelated files preserved. No watcher or DRT.
+
 ## 2026-11-04 — Prepare paired native late-hold replay
 
 - Added separate gds-stock-late-hold-replay diagnostic: restores hash-bound reference post-antenna source and compares native late175ps control versus75ps with independent jobs. Each performs native late repair, repeated3corner STA, fresh antenna checks, direct circuit readbacks and final-source routing-table extraction. Frozen source hashes remain checked; no DRT, qualification or official-job edits. Embedded Python/shell syntax pass; native execution pending.

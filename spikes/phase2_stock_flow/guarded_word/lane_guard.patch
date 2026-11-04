@@ -1,0 +1,26 @@
+--- a/src/trw_lane.v
++++ b/src/trw_lane.v
+@@ -174,13 +174,16 @@
+     wire fire = rt_ok ? (|urgent_ready) : (|ready);
+     wire rt_take = rt_ok && !fire;
+ 
+-    reg [SB-1:0] ss;
+-    integer j;
+-    always @* begin
+-        ss = {SB{1'b0}};
+-        for (j = 0; j < 12; j = j + 1)
+-            ss = ss | ({SB{onehot[j]}} & slots[j*SB +: SB]);
+-    end
++    wire [SB-1:0] ss;
++    wire [12*(SB-20)-1:0] action_rows;
++    genvar action_row;
++    generate for (action_row=0; action_row<12; action_row=action_row+1) begin : g_action_rows
++        assign action_rows[(SB-20)*action_row +: SB-20] = slots[SB*action_row+20 +: SB-20];
++    end endgenerate
++    trw_guarded_reduce #(.WIDTH(SB-20), .ROWS(12)) u_action_select (
++        .mask(onehot), .words(action_rows), .value(ss[SB-1:20]));
++    // Lower condition fields do not feed any selected action output.
++    assign ss[19:0] = 20'd0;
+ 
+     wire [3:0] s_op   = ss[`TRW_SLOT_OP_MSB:`TRW_SLOT_OP_LSB];
+     wire [2:0] s_dst  = ss[`TRW_SLOT_DST_MSB:`TRW_SLOT_DST_LSB];

@@ -1,0 +1,67 @@
+{
+  "source_sha256": {
+    "spikes/phase2_stock_flow/guarded_word/probe.v": "517b04c42936fe3643cf1d7fd2c246b6d3872b4a4f4f12301138204441d08ae0",
+    "spikes/phase2_stock_flow/guarded_word/trw_guarded_reduce.v": "2f1408ccf3e5387a3d7bb63d297e20186a639f5276a12d061c6ad884689c022b",
+    "spikes/phase2_stock_flow/guarded_word/lane_guard.patch": "98fd961179e97c150557817dd0e9c0281fc3cb6bc5ec084633670ee540605d9e"
+  },
+  "proof_scope": "Actual selected action bits52:20; arbitrary masks/data; pinned PDK BUF2/A22OI functions, passive no-output diodes omitted from SAT",
+  "actual_block_proof": "pass",
+  "odd_and_small_dimension_proofs": [
+    [
+      1,
+      1
+    ],
+    [
+      7,
+      3
+    ],
+    [
+      7,
+      2
+    ]
+  ],
+  "wrong_mask_input_mutant": "rejected",
+  "full_design_local_mapping": {
+    "reference": {
+      "num_cells": 47919,
+      "area": 595129.5126,
+      "sequential_area": 118356.9408
+    },
+    "guarded": {
+      "num_cells": 49846,
+      "area": 613237.7916,
+      "sequential_area": 118356.9408
+    }
+  },
+  "mapped_full_design_mask_diodes": 144,
+  "mapped_full_design_guarded_gates": 396,
+  "max_mask_node_input_fanout_including_diode": 7,
+  "local_probe_connectivity": "7 gates / 4 protected mask nodes, pass",
+  "native_physical_preservation": "pending",
+  "full_design_qualification": false,
+  "detailed_routing_performed": false,
+  "proof_file_sha256": {
+    "build/guarded-word-prototype/proof_pdk.log": "0338066e23f41a9334f16c066bc25693a796c8e0572f7fbab8f457bd57cc92f5",
+    "build/guarded-word-prototype/mutant.log": "ee758909bc7b5b9a577011d8a036f08132ad02ec328ff2dc3dfb48d601e1a2f9",
+    "build/guarded-word-prototype/pdk_models.v": "09ab89c6174f846eeb2ba850616e3b707e0c4facf5b5a39065d1a6972cb196d1",
+    "build/guarded-word-prototype/proof.v": "405a9cf523153088a905110d36bacf2a39b6504126dd099d0d0e3556ee5b38b5"
+  },
+  "reproducible_proof_receipt": {
+    "scope": "Actual action fields only, arbitrary masks/data, PDK gate functions; no physical preservation or full-chip sequential proof",
+    "passed": true,
+    "passive_diodes_omitted_from_sat": true,
+    "reference_lane_sha256": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+    "trial_lane_sha256": "057f7e64d8f607ecf248286797e1e19c88accd7604526412e07c5851d87c0397",
+    "primitive_sha256": "2f1408ccf3e5387a3d7bb63d297e20186a639f5276a12d061c6ad884689c022b",
+    "pdk_cells_sha256": "b0adbc84c8f78feb01c3d8d9d55e9818ee6502347d336f3a1f846e6a5d64e0a2",
+    "defines_sha256": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "miter_sha256": "4bad8caefc39e6c166f41347c55fd65a4cb1ecc60afb09c740699cfacfbd3c37",
+    "log_sha256": "46c2fecd65250fc4be99e8b0d0dc0b8f8576f5f1dea66a8f338952583e879892"
+  },
+  "reproducible_wrong_gate_mutant": "rejected",
+  "outside_selector_edit": "rejected",
+  "focused_tests_passed": 210,
+  "both_exact_ci_preparations_and_pinned_tt_merge": "pass",
+  "only_pair_config_difference": "RSZ_DONT_TOUCH_RX",
+  "all_embedded_shell_syntax": "pass"
+}

@@ -1599,3 +1599,9 @@ Keep the existing 0.175 ns late hold repair, native late rerouting and stage ord
 The calibrated late175ps replay reproduces reference timing, four antennas and zero overflow. Late75/125ps reduce antennas but fail the fixed50pshold reserve. Diagnose the late stage at175ps with mirroring disabled only for its resumed native execution. The saved earlier layout, legalization, timing repair, rerouting and fresh final checks remain fixed. Runtime log checks require legalization and reject any mirroring.
 
 General need: determine whether late cell orientation changes contribute to antenna damage. No RTL, state, ISA or protocol change; physical cost and timing effects are unmeasured. This is a causal diagnostic, not a promotable clean-build recipe. Any successful result still requires a permitted way to reproduce it with unchanged official GDS jobs; disabling mirroring throughout the flow already regressed. No gate reduction or DRT authorization.
+
+## D-150 (2026-11-04): measure antenna repair reserve on the calibrated native replay
+
+Mixed repair leaves four antennas and reduces fast hold below the50psreserve; reject it. Test diode-only native antenna ratio margin50instead of10on the exact pre-antenna reference, followed by unchanged mirrored175pslate timing repair and rerouting. General need: protection reserve before later physical changes. No protocol-specific hardware, RTL, state or latency change. Potential cost is extra diodes/capacitance, area and routing demand; later newly exposed gates may still fail.
+
+This is one isolated diagnostic control compared with the reproduced diode arm41915437265. Require actual ratio_margin in native log and fresh all-corner/electrical/antenna/final-source overflow evidence. No acceptance-gate change, official-job modification or clean-build promotion claim; any winner needs a permitted reproducible project recipe.

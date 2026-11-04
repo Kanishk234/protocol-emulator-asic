@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Prepare bounded antenna margin50 replay
+
+- Calibrated diode-only margin10native replay reproduces reference. Prepare one native margin50diode-only replay from same pre-antenna source, retaining175pslate hold, mirroring/rerouting and all fresh final measurements. Only physical change relative to reproduced diode control is GRT_ANTENNA_REPAIR_MARGIN10→50. Runtime validates exact native ratio_margin; target and mirroring audits retained.
+- actionlint/embedded Python/shell pass;59focused tests pass. Risk: added diode load/area/routing and later newly exposed unprotected gates. No clean-build promotion, qualification, DRT or phase tick. Publish and manually dispatch under standing user approval; no push-triggered physical rerun. Main source/config/official jobs/unrelated files unchanged.
+
 ## 2026-11-04 — Recover antenna-mode reports; fix mirroring audit
 
 - Both41915437265physical flows/fresh measurements completed but audit wrongly required echoed optimize_mirroring. Pinned native Tcl calls it without log_cmd; both actual logs report20500mirrored instances. Implement completion-message parser;5regressions/actionlintpass. Recover raw repeated corner/electrical, fresh antenna and final overflow from uploaded artifacts without rerun; original CI remains failed. Results in antenna_mode_recovered_41915437265.json.
@@ -6559,3 +6564,5 @@ Publication receipt:0672827CI/0e15630evidence pushed; remote main0e15630verified
 Publication receipt:30a5cdfCI/ec418fdevidence pushed; remote main ec418fd42c1f678e59766906f1392945275814a6verified. Late-mirroring diagnostic41899016730confirmed in progress on exact SHA. No measurement yet, local watcher or DRT. Next compare final antennas, hold, overflow and native repair/placement logs with calibrated control.
 
 Publication receipt:8a37b2fmanifest/84faa95CI/725712fevidence pushed; remote main725712f3ce6deeb5e0345f8499c86034b167fc29verified. Native antenna-mode comparison41915437265confirmed in progress. No result, DRT or watcher.
+
+Publication receipt:5c08df0/5da1fc3/4aaeb24/dca764bpushed; remote verified after push. Recovered diode control fast144.394ps/4ant/0overflow; mixed25.3043ps/4ant/0overflow. Mixed rejected. No new physical dispatch or watcher.

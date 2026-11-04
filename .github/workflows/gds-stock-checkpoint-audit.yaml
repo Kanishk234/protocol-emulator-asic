@@ -149,7 +149,20 @@ jobs:
         # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
         # No resizer, repair, placement or routing step is invoked.
         screen(Path('audit-src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,
+               extra_tcl=Path('scripts/ci/native_hold_frontier_audit.tcl'),
                sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
+        from hold_frontier_report import summarize
+        frontier = {}
+        readbacks = {}
+        for corner in CORNERS:
+            reports = list((output / f'after-{corner}').glob('*-openroad-stamidpnr/hold_frontier.rpt'))
+            assert len(reports) == 1, 'Missing fresh hold-frontier report'
+            frontier[corner] = summarize(reports[0], corner)
+            for suffix in ('nl.v', 'pnl.v'):
+                view = reports[0].with_name(f'checkpoint_readback.{suffix}')
+                assert view.is_file() and view.stat().st_size > 0, 'Missing ODB netlist readback'
+                readbacks[str(view)] = hashlib.sha256(view.read_bytes()).hexdigest()
+        (output / 'hold_frontier.json').write_text(json.dumps(frontier, indent=2) + '\n')
         # Check antenna on the same final database; do not inherit pre-timing results.
         run_step(json.loads(Path('src/config_merged.json').read_text()), source,
                  output / 'fresh-checkpoint-antenna', ['OpenROAD.CheckAntennas'])
@@ -174,6 +187,7 @@ jobs:
             source_state=str(source), source_run=json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())['run']['id'],
             checkpoint_profile=os.environ['CHECKPOINT'],
             unchanged_physical_view_hashes=before,
+            fresh_odb_readback_view_hashes=readbacks,
             fresh_corner_metrics=rows, fresh_antenna_metrics=antenna, physical_repairs_performed=False,
             qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
         from stock_checkpoint_recovery import validate

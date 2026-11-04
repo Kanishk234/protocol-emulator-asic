@@ -1,7 +1,15 @@
 # Mask-input connectivity probe only; not full-design qualification.
 name: guarded-word-preservation
+run-name: guarded preservation (${{ inputs.primitive || 'paired' }})
 'on':
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      primitive:
+        description: Small primitive to measure; neither case qualifies the full design
+        type: choice
+        options: [paired, mask]
+        default: paired
+        required: true
 permissions:
   contents: read
 jobs:
@@ -17,6 +25,7 @@ jobs:
     env:
       PDK_ROOT: /home/runner/pdk
       PROBE_PROTECTED: ${{ matrix.protected }}
+      PROBE_KIND: ${{ inputs.primitive || 'paired' }}
     steps:
     - name: Check out project
       uses: actions/checkout@v6
@@ -25,22 +34,28 @@ jobs:
     - name: Prepare isolated guarded-word probe in ephemeral checkout
       run: |-
         set -euo pipefail
-        cp spikes/phase2_stock_flow/guarded_word/probe.v src/tt_um_tripwire.v
-        cp spikes/phase2_stock_flow/guarded_word/trw_guarded_reduce.v src/trw_guarded_reduce.v
         python - <<'PYCODE'
-        import hashlib, json, os, sys
+        import hashlib, json, os, shutil, sys
         from pathlib import Path
         sys.path.insert(0, 'scripts/ci')
-        from guarded_word_probe import PROTECTION_RX
-        evidence=json.loads(Path('spikes/phase2_stock_flow/guarded_word/preflight.json').read_text())
-        for source, target in [('probe.v','tt_um_tripwire.v'),('trw_guarded_reduce.v','trw_guarded_reduce.v')]:
-            key='spikes/phase2_stock_flow/guarded_word/'+source
+        from guarded_word_probe import PROTECTION_RX, MASK_PROTECTION_RX
+        kind=os.environ['PROBE_KIND']
+        assert kind in ('paired','mask')
+        folder='guarded_word' if kind=='paired' else 'inline_guard'
+        module='trw_guarded_reduce.v' if kind=='paired' else 'trw_guarded_mask.v'
+        root=Path('spikes/phase2_stock_flow')/folder
+        evidence=json.loads((root/'preflight.json').read_text())
+        for source, target in [('probe.v','tt_um_tripwire.v'),(module,module)]:
+            shutil.copy2(root/source, Path('src')/target)
+            key=str(root/source)
             assert hashlib.sha256(Path('src',target).read_bytes()).hexdigest()==evidence['source_sha256'][key]
         p=Path('src/config.json'); d=json.loads(p.read_text())
+        rx=PROTECTION_RX if kind=='paired' else MASK_PROTECTION_RX
         d.update(CLOCK_PERIOD=20, PL_TARGET_DENSITY_PCT=30, LINTER_INCLUDE_PDK_MODELS=True,
          RUN_POST_GRT_DESIGN_REPAIR=True, RUN_POST_GRT_RESIZER_TIMING=True,
          SYNTH_BUFFER_CELL='sg13cmos5l_buf_2/A/X', GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH=20,
-         RSZ_DONT_TOUCH_RX=PROTECTION_RX if os.environ['PROBE_PROTECTED']=='true' else '$^')
+         RSZ_DONT_TOUCH_RX=rx if os.environ['PROBE_PROTECTED']=='true' else '$^')
+        if kind=='mask': d['EXTRA_EXCLUDED_CELLS']=['sg13cmos5l_buf_1']
         p.write_text(json.dumps(d,indent=2)+'\n')
         PYCODE
     - name: Check out Tiny Tapeout tools
@@ -92,15 +107,17 @@ jobs:
       run: |-
         python - <<'PYCODE'
         from pathlib import Path
+        import os
         import yaml
+        module='trw_guarded_reduce.v' if os.environ['PROBE_KIND']=='paired' else 'trw_guarded_mask.v'
         p=Path('info.yaml'); d=yaml.safe_load(p.read_text())
         assert d['project']['source_files'] == ['tt_um_tripwire.v']
-        d['project']['source_files'].append('trw_guarded_reduce.v')
+        d['project']['source_files'].append(module)
         p.write_text(yaml.safe_dump(d,sort_keys=False))
         p=Path('test/Makefile'); text=p.read_text()
         assert text.count('PROJECT_SOURCES = tt_um_tripwire.v')==1
         p.write_text(text.replace('PROJECT_SOURCES = tt_um_tripwire.v',
-                                 'PROJECT_SOURCES = tt_um_tripwire.v trw_guarded_reduce.v'))
+                                 'PROJECT_SOURCES = tt_um_tripwire.v '+module))
         PYCODE
         python tt/tt_tool.py --create-user-config --ihp
     - name: Measure stock physical optimization and connectivity
@@ -111,7 +128,7 @@ jobs:
         mkdir -p runs
         mkdir runs/protected-probe
         python -m librelane --docker-no-tty --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --manual-pdk --run-tag protected-probe --force-run-dir runs/protected-probe --hide-progress-bar --to OpenROAD.STAMidPNR-3 src/config_merged.json
-        python scripts/ci/guarded_word_probe.py runs/protected-probe --protected "$PROBE_PROTECTED"
+        python scripts/ci/guarded_word_probe.py runs/protected-probe --protected "$PROBE_PROTECTED" --kind "$PROBE_KIND"
         python - <<'PYCODE'
         import json,sys
         from pathlib import Path
@@ -125,13 +142,15 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: guarded-word-${{ matrix.protected }}-${{ github.run_id }}
+        name: guarded-${{ inputs.primitive || 'paired' }}-${{ matrix.protected }}-${{ github.run_id }}
         path: |-
           runs/**
           src/config*.json
           src/tt_um_tripwire.v
           src/trw_guarded_reduce.v
+          src/trw_guarded_mask.v
           info.yaml
           test/Makefile
           spikes/phase2_stock_flow/guarded_word/preflight.json
+          spikes/phase2_stock_flow/inline_guard/preflight.json
         if-no-files-found: warn

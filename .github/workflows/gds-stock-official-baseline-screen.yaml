@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_host_words]
+        options: [rtl_shared_cluster100, rtl_shared_minbuf2]
         default: rtl_shared_minbuf2
         required: true
 permissions:

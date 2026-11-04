@@ -37,7 +37,7 @@
   "mapped_full_design_guarded_gates": 396,
   "max_mask_node_input_fanout_including_diode": 7,
   "local_probe_connectivity": "7 gates / 4 protected mask nodes, pass",
-  "native_physical_preservation": "pending",
+  "native_physical_preservation": "41752009661: protected connections pass and all repair logs confirmed by corrected read-only replay; original CI audit failed on Tcl bracket escaping",
   "full_design_qualification": false,
   "detailed_routing_performed": false,
   "proof_file_sha256": {
@@ -60,7 +60,7 @@
   },
   "reproducible_wrong_gate_mutant": "rejected",
   "outside_selector_edit": "rejected",
-  "focused_tests_passed": 210,
+  "focused_tests_passed": 214,
   "both_exact_ci_preparations_and_pinned_tt_merge": "pass",
   "only_pair_config_difference": "RSZ_DONT_TOUCH_RX",
   "all_embedded_shell_syntax": "pass"

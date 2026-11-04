@@ -30,4 +30,12 @@ Protection is temporary during repair and does not fix placement. The final audi
 
 RSZ_DONT_TOUCH_RX is a stock option but is outside the current main-config whitelist. This isolated experiment does not approve main adoption or alter official jobs. Even successful preservation does not establish antenna efficacy on the full layout,closure of its other three original failures,or sufficient area/timing reserve. The completed real-endpoint diode intervention41714141900supplies separate actual-checkpoint mechanism evidence,not proof that this new layout reproduces it.
 
-210focused checks,actual local mapped-probe connectivity,both exact ephemeral CI preparations,pinned TT merges and embedded shell syntax pass. Native physical result is pending.
+214focused checks,actual local mapped-probe connectivity,both exact ephemeral CI preparations,pinned TT merges and embedded shell syntax pass. First native result and correction follow.
+
+## First physical run and audit correction
+
+Run41752009661completes the native physical flow in both cases. Enabled protection preserves all seven gates/four shared mask nodes;disabled protection loses shared diode connections at six gates. Typical hold0.386972nsboth;setup10.9958nsenabled/10.9396nsdisabled;electrical0both. This is preservation under native repair pressure,not full-design timing/antenna efficacy.
+
+Original protected CI job is **failed**,because the checker incorrectly compared Tcl-escaped hierarchical names with unescaped Verilog names. Raw logs contain every required net/diode in all four repair stages. The corrected typed-message parser normalizes only bracket escapes and keeps all checks;read-only replay of both original artifacts succeeds with the expected protected/unprotected contrast. Source hashes and raw timing metrics were independently matched. No physical recipe or hardware changed. The protected job did not reach the separate fresh final antenna check because the audit failed first,so no such result is inferred. result_41752009661.json records both original receipts and corrected replay. A clean native retry is needed before calling this workflow green.
+
+Separate ignored cost controls guard only row11:paired-A22OI version still costs about2.53%full local area with12diodes/66gates;NAND-leaf alternative about2.60%. Action-field proofs pass,but native preservation/efficacy and complete source-to-mapped coefficient identity remain unproved for those alternatives. Lower diode count alone does not recover original global logic factoring or establish a cheap physical solution. None is selected for a full screen.

@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Guarded-word physical contrast works; correct hierarchical log audit
+
+- Published4310308prototype,8b16e18tools/evidence,e3c180dtests,7f60e62ownCI,88ae179docs under user command authorization;remote main verified88ae1796cda9a12d985a3f11419133da30ddb64d. Launched41752009661. Both physical flows complete;disabled job succeeds,protected job fails only audit logging despite intact7gates/4mask nodes. Downloaded both artifacts and inspected raw stage logs/source/STA.
+- Root cause:raw Tcl names escape array brackets while final Verilog names do not. Every intended object is present in all four native repair stages. Correct parser reads typed native Net/Instance messages and normalizes bracket escapes only;retain complete object/stage and connection gates.214focused checks plus corrected read-only replay of both actual artifacts pass;disabled control still loses six guarded gate connections. Typical hold0.386972nsboth;setup10.9958enabled/10.9396disabled;electrical0both. No protected fresh-final-antenna result yet because failed audit prevented that step. BUGS/README/result JSON preserve original failed CI status and correction scope.
+- Independent ignored selective-row controls pass action-field proofs but still cost +2.53%paired/+2.60%NAND local full area,with12maskdiodes/66gates;not selected or launched. All variants lack full-design physical qualification. Main hardware/config/officialjobs/gates unchanged. Publish reviewed parser/test/docs/evidence correction and rerun small pair;no full screen/DRT/phase tick or watcher. Unrelated files preserved. Receipt follows.
+
 ## 2026-11-03 — Prepare actual guarded-mask source primitive and small native preservation pair
 
 - Continued from stronger41569397169reference. Implemented isolated general masked-word selector with explicit paired A22OI gates/local mask diodes;no new state/clock cycles/ISA/protocol block. Actual action-field SAT using pinned PDK functions passes arbitrary masks/data;small/odd shapes pass;wrong-mask and outside-block mutants reject. Added reproducible proof helper. Full local mapping area595129.5126→613237.7916µm²(+3.04%),cells47919→49846,sequential area unchanged.144mask diodes directly cover396gate instances,fanout≤7including diode. Broader all-input version(+5.15%)rejected locally;data/reduction gates not claimed protected.

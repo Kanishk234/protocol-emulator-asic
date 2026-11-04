@@ -1,0 +1,21 @@
+--- a/src/trw_lane.v
++++ b/src/trw_lane.v
+@@ -175,11 +175,15 @@
+     wire rt_take = rt_ok && !fire;
+ 
+     reg [SB-1:0] ss;
+-    integer j;
++    wire [SB-1:0] guarded_last;
++    trw_guarded_mask #(.WIDTH(SB),.FIRST(`TRW_SLOT_OP_LSB),.LAST(`TRW_SLOT_KT_LSB),.ENABLE(1)) u_guard_last (
++        .mask(onehot[11]),.data(slots[11*SB +: SB]),.value(guarded_last));
++    integer guard_j;
+     always @* begin
+         ss = {SB{1'b0}};
+-        for (j = 0; j < 12; j = j + 1)
+-            ss = ss | ({SB{onehot[j]}} & slots[j*SB +: SB]);
++        for (guard_j = 0; guard_j < 12; guard_j = guard_j + 1)
++            if (guard_j == 11) ss = ss | guarded_last;
++            else ss = ss | ({SB{onehot[guard_j]}} & slots[guard_j*SB +: SB]);
+     end
+ 
+     wire [3:0] s_op   = ss[`TRW_SLOT_OP_MSB:`TRW_SLOT_OP_LSB];

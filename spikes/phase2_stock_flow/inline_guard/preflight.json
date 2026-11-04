@@ -1,0 +1,71 @@
+{
+  "source_sha256": {
+    "spikes/phase2_stock_flow/inline_guard/probe.v": "501266edef060cb8f5b34ebc3b571773832d6abf88f406e12dedd23434665eb2",
+    "spikes/phase2_stock_flow/inline_guard/trw_guarded_mask.v": "ba1f26d6bcc28d83f6816df04203fac69c8fcea980f47d4dda8e52cb9c452bc0",
+    "spikes/phase2_stock_flow/inline_guard/lane_guard.patch": "48e8b56f9d24230f3f5f7f51bfc4e6b080a6557483c762ecfc32eed208774c47"
+  },
+  "baseline_lane_sha256": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+  "candidate_lane_sha256": "719de9e40723a331803da5137fde18a5c7c19f0455ce7b56b4b2e10556905fd5",
+  "proof": {
+    "scope": "Actual action fields only, arbitrary masks/data, PDK gate functions; no physical preservation or full-chip sequential proof",
+    "passed": true,
+    "passive_diodes_omitted_from_sat": true,
+    "reference_lane_sha256": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+    "trial_lane_sha256": "719de9e40723a331803da5137fde18a5c7c19f0455ce7b56b4b2e10556905fd5",
+    "primitive_sha256": "ba1f26d6bcc28d83f6816df04203fac69c8fcea980f47d4dda8e52cb9c452bc0",
+    "pdk_cells_sha256": "b0adbc84c8f78feb01c3d8d9d55e9818ee6502347d336f3a1f846e6a5d64e0a2",
+    "defines_sha256": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "miter_sha256": "214301f759cd8b79e1f17845ff9b842c24651c3f01642ebeefa9b2f0960b32bd",
+    "log_sha256": "690239a33d303da7e52649ec1124b04e60d777f63e337c26137ab77cfb4a82a0"
+  },
+  "local_mapping_controls": {
+    "reference": {
+      "num_cells": 47919,
+      "area": 595129.5126,
+      "sequential_area": 118356.9408
+    },
+    "unchanged_plus_unused_module": {
+      "num_cells": 47919,
+      "area": 595129.5126,
+      "sequential_area": 118356.9408
+    },
+    "refactored_without_guards": {
+      "num_cells": 49124,
+      "area": 607474.728,
+      "sequential_area": 118356.9408
+    },
+    "inline_without_guards": {
+      "num_cells": 47705,
+      "area": 594473.9094,
+      "sequential_area": 118356.9408
+    },
+    "inline_guarded": {
+      "num_cells": 48124,
+      "area": 597273.0372,
+      "sequential_area": 118356.9408
+    }
+  },
+  "rtl_protocol_replay": {
+    "passed": 22,
+    "failed": 0,
+    "optional_sigrok_skipped": false,
+    "simulator": "Verilator",
+    "results_sha256": "9e53a8b1d053fe5cfc80cc98f7744bbb181e5564c550db9ff4974bf797e4f1fb",
+    "log_sha256": "1fcf91dc1bee226fa0a50876d04c3b1b90a2769e0925bf1c78047188a3a3d1d7"
+  },
+  "full_guarded_action_fields": [
+    20,
+    51
+  ],
+  "guarded_lanes": 2,
+  "guarded_slot_row": 11,
+  "native_primitive_preservation": "pending NAND variant; prior41753442797tested paired A22OI",
+  "full_design_qualification": false,
+  "official_gds_signoff": false,
+  "focused_checks_passed": 227,
+  "both_kinds_exact_ci_preparation_and_pinned_tt_merge": "pass",
+  "only_pair_config_difference": "RSZ_DONT_TOUCH_RX",
+  "local_mapped_probe": "7NAND gates/2protected nodes intact",
+  "local_mapped_full_source": "64NAND gates/12protected nodes intact",
+  "wrong_physical_mask_input_mutant": "rejected"
+}

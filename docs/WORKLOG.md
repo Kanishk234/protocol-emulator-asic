@@ -2,6 +2,29 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-03 — Prepare actual guarded-mask source primitive and small native preservation pair
+
+- Continued from stronger41569397169reference. Implemented isolated general masked-word selector with explicit paired A22OI gates/local mask diodes;no new state/clock cycles/ISA/protocol block. Actual action-field SAT using pinned PDK functions passes arbitrary masks/data;small/odd shapes pass;wrong-mask and outside-block mutants reject. Added reproducible proof helper. Full local mapping area595129.5126→613237.7916µm²(+3.04%),cells47919→49846,sequential area unchanged.144mask diodes directly cover396gate instances,fanout≤7including diode. Broader all-input version(+5.15%)rejected locally;data/reduction gates not claimed protected.
+- Prepared small seven-bit/two-row native preservation workflow,pair differing only in RSZ_DONT_TOUCH_RX. Protect mask nodes/diodes while allowing upstream/gate data repair,avoiding earlier frozen-input failure. New audit requires all direct diode/driver/gate connections and every protected object in all four repair logs.210focused checks,local actual mapped-probe connectivity,both exact ephemeral preparations/pinned TTmerges and shell syntax pass. Full source primitive remains unselected pending physical preservation/efficacy/area evidence;no full-design screen or DRT yet.
+- D-145/guarded_wordREADME/preflight/source-locality report record scope and costs. Retire failed host-word profile from normal screen choices;retain its evidence. Prepared publication groups for prototype/tools,tests,ownCI/docs under user's command authorization;mainhardware/config/official jobs/gates unchanged. Main config adoption of extra native protection still requires separate policy review. No phase tick/watcher;unrelated files preserved. Publication/launch receipt will follow if executed.
+
+## 2026-11-03 — Host-word screen fails reserve/antenna/overflow; reject variant
+
+- Completed41722315616on6ea39dcafter3h06m43s. Physical/audit/upload steps pass;final gate fails fast hold0.0118405ns<0.05ns,antenna3/3,overflow108. SetupWS0all;electrical0all;typical/slowhold0.227477/0.607375ns. Main test/lint/unit/docs all complete successfully.
+- Downloaded artifact13283184814,verified published ZIPdigest,extracted24bounded reports/views;independently matched raw repeated corner metrics,antenna reports and final Totaloverflow108. Artifact source differs only byhost RTL;physicalconfigbyte-identical. Final cells45557,logarea693298.68µm²;latehold356endpoints versus170reference and explicit target-margin warning. Three changed-synthesis sinknames recorded in host_word_select_result.json;do not infer identity with original failures from names/counts.
+- Reject host-word physical variant despite valid equivalence/22caseRTL results. Stronger stock reference remains41569397169(fast144.394ps/electrical0/overflow0/antenna4). Updated source-locality report;no DRT/newrun/mainhardware/config/officialjob/gatechange or phase tick. Evidence changes remain local;unrelated files preserved,no watcher. Next:general source protection guided by real-endpoint diode evidence rather than promote this wider topology rewrite.
+
+## 2026-11-03 — Host-word screen ETA check
+
+- At23:29UTC,41722315616has elapsed about2hours since21:29UTC launch. Setup/preparation/pinned image/TTmerge pass;stock Classic step remains in progress,with final all-corner audit/gates/upload pending. Job-log API currently yields only early synthesis output ending21:33UTC,so it cannot establish the live internal physical stage or a stall. Do not present that old log tail as current synthesis progress.
+- Estimate roughly30–90minutes remaining with low confidence,using comparable full stock screens rather than an exact stage percentage. Physical step has240minute timeout;final audit30minute timeout,wholejob300minutes. No source/config/workflow/run changes or new watcher. Next inspect final measurements when available.
+
+## 2026-11-03 — Publish and launch verified host-word stock screen
+
+- User explicitly authorized running the prepared publication/launch commands, overriding the supplied AGENTS Git rule for these reviewed groups. Published da186fb (prototype/evidence), e6b0177 (own CI) and 6ea39dc (docs). Verified remote main at 6ea39dc04dd14b832e2ca0bf1a861d7fa299614b.
+- Launched [stock host-word screen 41722315616](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41722315616); confirmed in progress on that exact SHA/profile rtl_shared_minbuf2_host_words. This is a full stock screening measurement, not official GDS or detailed routing. Existing gates, main hardware/config and official jobs unchanged; unrelated dirty/untracked files excluded.
+- Publication command finished; no local watcher. Next inspect final timing/electrical/antenna/overflow together before considering DRT. No phase checklist ticked. This launch receipt remains local.
+
 ## 2026-11-03 — Host prototype passes full RTL replay; stock screen ready locally
 
 - The isolated host word-before-lane prototype completed all 22 protocol-model RTL cases under Verilator: 22 passed, zero failed, about 411 seconds. Optional sigrok was skipped. Outside the sandbox, the saved final UART trace independently decodes the expected 54a5 at 9600 baud. Reproduced the empty sandbox decoder result as libusb initialization failure; documented the environment issue in BUGS. No all-protocol sigrok, final GL or physical qualification claim.

@@ -1548,6 +1548,16 @@ Actual-block SAT passes NL2/NL3;wrong RPC-slice mutant rejects. Full2/4RTL repla
 
 Prepare optional rtl_shared_minbuf2_host_words in our separate stock screen workflow. Exact same minbuf2physical config/20ns/SDC/native scripts/image/stage order/all gates;only the hash-bound host source patch changes. Existing workflow default unchanged. Actual archived CI preparation and pinned TTmerge pass;merged config byte content equivalent and only trw_host.vdiffers among matched source files.201focused checks and shell syntax pass. No launch,source promotion or official workflow edit. Other three antenna sources may remain;hold/route/area may regress. No DRT until all final screening gates pass together.
 
+## D-145 (2026-11-03): isolate source-level guarded-mask preservation before full-design screening
+
+General need: retain a real diode-to-gate connection through native repair,without a protocol block,new state or custom official-flow step. D-144host rewrite fails physical41722315616(reserve/antenna/overflow),so reject it as a physical candidate and retain41569397169. The real endpoint intervention41714141900shows a useful repair mechanism,but its added ECO step cannot be promoted.
+
+Prototype a general masked-word OR reduction using paired A22OI gates and local mask buffer/diode groups. Actual action-selector combinational SAT passes arbitrary masks/data using pinned PDK functions;small/odd shapes pass;wrong-gate and outside-block mutants reject. Local full-design area +3.04%,cells +1927,sequential area unchanged;144diodes/direct mask connections to396gates,fanout≤7including diode. The broader all-input protection version costs +5.15% and is rejected locally. No full-design physical benefit or protocol replay claimed for the guarded prototype.
+
+First measure only native preservation on a tiny7-bit/two-row probe. Compare identical RTL with native RSZ_DONT_TOUCH_RX disabled/enabled and20µmwire repair. Protect mask nodes/diodes only;leave upstream drivers and gate instances/data paths repairable to avoid freezing required repairs. Require direct diode/gate/driver connections and every protected object in all four repair-stage logs. All raw typical timing/electrical and fresh antenna reports remain visible. Green means preservation measurement,not full-design qualification,efficacy or DRT readiness.
+
+210focused checks,both exact CI preparations/pinned TTmerges,actual local mapped-probe audit and shell syntax pass. Source/mainconfig/official jobs/gates unchanged. Main adoption of this extra native option would require a separate configuration-policy review;this experiment grants none. Scope/cost/proof reproduction:spikes/phase2_stock_flow/guarded_word/README.md.
+
 ## Open questions for the phase 1 spec freeze
 Q1–Q6 below have **proposed resolutions** in `design/ISA.md` §8 (D-007). They close at the spec freeze once the model confirms them. **All of Q1–Q7 are closed by D-029.**
 

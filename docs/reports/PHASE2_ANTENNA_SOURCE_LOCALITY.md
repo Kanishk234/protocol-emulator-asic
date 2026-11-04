@@ -63,3 +63,30 @@ Host replay update: the model-only Icarus attempt passed UART TX/RX then was int
 Verilator full2/4RTL replay completes22/22cases,0failures,about411seconds;optional sigrok was skipped. Outside the sandbox,the saved finalUART trace independently decodes54a5at9600baud,matching its testcase. Empty decoder output inside the sandbox is reproduced by --version/libusb initialization;it is an environment limitation,not evidence of an RTL defect. No all-protocol independent-decoder or finalGLclaim.
 
 Packaged host_word_select.patch/evidence.json and optional rtl_shared_minbuf2_host_words profile in our existing diagnostic workflow. D-144records scope/cost. Exact archived CI preparation passes all source/patch hashes;only trw_host.vdiffers from the matched prepared reference. Pinned TTmerge yields identical merged config;201focused tests and embedded shell syntax pass. Existing default and official gds.yaml remain unchanged. Ready for user publication under AGENTS Git rule;not launched. Fresh stock screening must still pass all timing/electrical/antenna/overflow gates before DRT.
+
+## Physical result: reject host-word variant
+
+[Screen41722315616](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/41722315616) completes after3h06m43s. Physical flow and fresh read-only audit pass;strict qualification fails. Downloaded artifact13283184814matches published SHA256123340b1765f766c60fcd8c72a52ebea3552aaf86fdcdc88a788cddd7912306b. Independently matched raw three-corner metrics to repeated audit,antenna metrics and final native overflow row. Artifact RTL differs from matched reference only in trw_host.v;physical project config is byte-identical.
+
+| Measurement | Reference41569397169 | Host-word41722315616 |
+|---|---:|---:|
+| Setup WS,all corners | 0 ns | 0 ns |
+| Fast hold WS | 0.144394 ns | 0.0118405 ns |
+| Typical hold WS | 0.355043 ns | 0.227477 ns |
+| Slow hold WS | 0.738651 ns | 0.607375 ns |
+| Electrical violations,all corners | 0 | 0 |
+| Antenna nets/pins | 4/4 | 3/3 |
+| Final global-routing overflow | 0 | 108 |
+| Final cell count | 45099 | 45557 |
+
+The three failing pins are _35820_/B2(a22oi1)on_08877_,wire14471/A(buf2)onnet14471,and_29094_/B(or2)onnet15153;all cumulative-area failures. Different synthesis topology means changed instance names cannot establish which original endpoint was repaired. Do not describe this as fixing one particular original antenna solely from4→3counts.
+
+Native late repair starts with356hold endpoints versus170in the reference,then reports inability to repair all hold checks within margin. The final log reports45557cells/693298.68µm². This supports a placement/repair/routing regression despite small local mapped-area change;it does not isolate one exclusive physical cause. Positive fast hold11.8405psstill misses the fixed50psreserve by38.1595ps. No gate is relaxed.
+
+Reject this variant as the selected physical candidate. Retain41569397169as the stronger stock reference;do not continue this checkpoint toDRT. The separate real-endpoint diode intervention remains useful mechanism evidence,requiring a stock-compatible source protection implementation. No new physical run or official workflow/source promotion follows. Full result/hashes:host_word_select_result.json.
+
+## Guarded-mask implementation: preservation first
+
+D-145prepares an actual source primitive protecting selector-mask gate inputs,not merely a nearby relay. Paired A22OI gates/local mask buffer-diode groups reduce its full local mapping cost to +3.04%versus +5.15%for the broader all-input version. This remains a significant congestion risk,so no full-design screen is launched. Pinned-PDK actual action-field SAT passes arbitrary masks/data,small/odd shapes pass,and wrong hardware/outside-block mutants reject. Local mapped connectivity verifies144mask diodes directly attached to396gates;fanout≤7including diode. Data/reduction inputs remain unprotected.
+
+The next physical measurement is a tiny seven-bit/two-row preservation pair,with native net/diode protection disabled/enabled. Gate instances and upstream drivers are deliberately repairable;freezing gate instances would also block data input repairs. Require every intended object in all four repair-stage logs and final direct connections.210focused checks,both exact source preparations/pinned TTmerges,local mapped-probe audit and all shell syntax pass. Main hardware/config/official jobs/gates unchanged. The rejected host-word profile is removed from the normal screen choice list while archived evidence remains. See guarded_word/README.md and preflight.json;no native preservation/full-design benefit claim yet.

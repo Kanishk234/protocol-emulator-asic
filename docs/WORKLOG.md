@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Prepare intermediate125ps native replay
+
+- Calibrated175pscontrol reproduces reference;75psfails fast reserve with2antenna/0overflow. Prepare single125psmatrix job, retaining runtime target verification, source hash binding, native repair/rerouting and all fresh measurements. actionlint/embedded Python/shell syntax pass. Existing50psacceptance requirement remains fixed; no qualification or DRT claim.
+- Antenna report comparison:175psfails hold7969/A,wire13568/A,_38673_/A,wire12579/A;75psfails wire11837/A,fanout1052/A. Changed mapped names are not cross-build equivalence proof. Publish result evidence and launch via narrow workflow-file push trigger under standing user approval; receipt follows.
+
+## 2026-11-04 — Native replay control reproduces reference;75psfails
+
+- Both41864608197jobs passed measurement collection; neither qualifies physical closure. Downloaded artifacts and independently matched all repeated raw corner metrics, fresh antenna metrics and final routing tables.175pscontrol exactly reproduces reference holdF/T/S0.144394/0.355043/0.738651ns,antenna4,overflow0.75psholdF/T/S−0.00773481/0.202126/0.520530ns,antenna2,overflow0. Setup0all/electrical0both. Save late_hold_replay_result_41864608197.json.
+- Reduced target improves antenna count but fails fast hold,57.735psshort of50psreserve. Saved-tail control is now calibrated; next consider one bounded intermediate125pstarget and compare failing nets/paths before selecting further causal tests. No DRT or phase tick; standardCIgreen. Duplicate cancellation retry reported alreadycompleted; no new experiment launched this session.
+
 ## 2026-11-04 — Validate replay and add narrow launch trigger
 
 - Standard actionlint semantic validation passes. GitHub still does not list new replay workflow across all290registered workflows; dispatch returns404. Prior push-triggered standardCI remains queued. Repository defaultbranch/main remote SHA verified. Actions-policy read endpoint returns403; no policy change attempted or cause inferred.
@@ -6516,3 +6526,5 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Monitor runs 36952644578 and 36951141285. If the gate-level L3 suite passes, record the evidence and tick only box 6. For the DRT continuation, inspect final route DRC/runtime and continue downstream signoff before treating it as a passing hardening. Preserve the 20 ns target, all protocols, and D-066 behavior.
+
+Publication receipt: remote main4983db4verified. Push registered replay41864608197, queued. Subsequent manual retry also succeeded, creating redundant41864627053; requested its cancellation, retaining41864608197. Native175/75jobs not yet confirmed running. No local watcher.

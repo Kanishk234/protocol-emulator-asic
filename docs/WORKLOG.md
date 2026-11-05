@@ -2,6 +2,41 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Publish approved C-selector screen preparation
+
+- User explicitly authorizes Codex to perform the prepared publication/launch, overriding the latest Git reservation for these groups. Recheck remote main matches 618c1a1 and all previous main runs complete; standard test/lint/docs/unit/nightly pass. No unpublished main hardware/config changes in the history check.
+- Re-run 58 source-binding/profile regressions, actionlint and diff checks before publication. Publish tools, bound source prototype/evidence, separate diagnostic workflow/profile, and docs in scoped groups; retain unrelated dirty files and local-only FIPE document.
+- Launch `gds-stock-official-baseline-screen` once with `rtl_shared_minbuf2_cselect`. This is a measurement of one equivalent C-selector source change under the unchanged reference physical recipe, plus read-only signoff-SDC estimates. No main source/config or official GDS job edit. Physical results remain pending; no phase gate ticked. Next review the run's actual timing/electrical/antenna/overflow and paths before deciding on DRT.
+
+## 2026-11-05 — Prepare full-design C-selector diagnostic screen
+
+- Added `rtl_shared_minbuf2_cselect` to the separate diagnostic screen. Same full 2-lane/4-unit source and physical config as reference 41569397169; exactly one bound source patch. Hash checks guard original/candidate/patch and all unrelated source files. Main source/config and official GDS jobs unchanged.
+- Added candidate-only read-only estimated-routing checks under unchanged signoff SDC before the existing strict qualification gate. All three setup/hold corners, 50 ps fast hold reserve, electrical zero, antenna zero and same-source overflow gates remain mandatory. This cannot guarantee extracted timing. No DRT starts in this screen.
+- 58 source-binding/profile regressions pass, including rejection of corrupt patches/wrong source/reapplication. actionlint, embedded Python syntax and diff checks pass. Isolated full source passes all five cached full-chip smoke tests in 57.64 s; save `full_chip_smoke.json`. This is not the full protocol suite or gate-level evidence.
+- D-152/report document local evidence, remaining physical/source portability gaps and unchanged acceptance. Main test/lint/docs green at remote check; latest extraction failed and duplicate cancelled. No new run, commit or push. Current supplied AGENTS.md reserves those publication steps for the user; prepare exact grouped commands. Next publish/launch the prepared profile, inspect all gates and actual paths before considering detailed routing. No phase box ticked.
+
+## 2026-11-05 — Compare proved selector candidates with pinned Liberty
+
+- Added reproducible local selectors/owner-mux proof and mapping tools in `spikes/phase2_stock_flow/pin_input_decode/`. Downloaded exact PDK commit 2bbec755 Liberty (typical/slow) and synthesis exclusions; hashes retained in the summarized comparison. Raw logs/netlists remain under ignored build/.
+- Proved five C-only rewrites equivalent for arbitrary binary pad/index/default inputs. Sequential logic unchanged. With BUF2 drivers, slow Liberty and 6/26.7/50 fF equal output loads, the leading small unclamped/direct-select rewrite estimates 1107.67/1254.77/1284.40 ps versus reference 1577.58/1768.30/1833.40 ps, with lower mapped area at each load. Preserve `c_select_unclamped.patch` and source hashes. No claim of routed WNS improvement: these are isolated cone estimates and are not a specific extracted arc comparison.
+- C-only parallel decode also lowers estimated delay/area (slow 6 fF: 1015.68 ps / 417.1608 um2 versus 1577.58 ps / 435.4182 um2). Its ordering changes with load; prefer the smaller unclamped source rewrite for the next full-design assessment.
+- Proved NU=4 pad-owner OR factoring for arbitrary owner/data/config state. Mapping gives 1189.90 ps / 7317.4752 um2 versus 1258.59 ps / 7023.3534 um2. Reject for now: small speed gain costs area. No register or architecture change needed for either prototype.
+- Main status: extraction failure and duplicate cancellation confirmed; test/lint/docs green; unit running. No new workflow launched or official workflow/main RTL/config edited. No phase box ticked. Next prepare a full-design source-level comparison of the small selector rewrite, keeping acceptance gates fixed; continue constraint/path comparison before blaming all setup loss on RC.
+
+## 2026-11-05 — Prove pin-input decode prototype and reject premature physical launch
+
+- Continued diagnosis of extracted run 42069613808: worst path traverses unit0 live mode, output-pad feedback, pin selection `sel`, and fabric drop logic. Slow report contains 203 reported negative paths with distinct endpoints; a drop-counter-only fix is too narrow.
+- Added isolated `pin_input_decode` patch against the frozen full reference. Yosys SAT proves combinational inputs/selection equivalent for arbitrary pad/index/default values; sequential delay block stays identical. No main RTL or official workflow changes.
+- Generic ABC comparison is mixed: total cells 176 -> 247, pad-to-select depth 11 -> 9, but other paths worsen or stay unchanged. These are generic unit-delay counts, not physical timing/area. Preserve receipts; do not spend a full physical run on the broad rewrite yet. Next isolate the c/selection cone and measure with pinned Liberty before a full-design screen.
+- Constraint inspection finds screened exported SDC uses 250 ps hold uncertainty; extracted signoff explicitly uses 100 ps. Both inspected setup settings use 20 ns and 250 ps uncertainty. Full constraint equivalence remains unproved; do not attribute the whole setup delta solely to extracted RC.
+- Remote check: extraction failed, its duplicate is cancelled, standard test/lint/docs pass, unit still running. No new workflow launched, no publication, no phase box ticked. Latest supplied AGENTS.md reserves publication for the user.
+
+## 2026-11-05 — Extracted setup fails; identify live-mode to fabric-drop path
+
+-42069613808completesfinalization/RCX/allcornerSTA/readback/freshantenna,thenlegitimatelyfailsgate:slowsetup−2.66890162ns. Rawsummary/stateandcornerwsreportsindependentlymatch. HoldF/T/S239.808/430.548/784.484ps;electrical0all;finalantenna0. Save local_extracted_result_42069613808.json.
+- Exactworstslowpath:_52388_(unit0bitsync_activeconfigurationlatch)→pinunitpads/control→_51197_(fabricchannel0pending_dropFF). Arrival23.496197ns,required20.827293ns. No claimthatglobalWS0screensprovidedpositivesetupheadroom. Next compareconstraint/path/RCdetailsandoptimizethisgeneralcontrol-to-fabriccone;preserveD-066liveconfigurationsemantics.
+- Delayedpushtriggercreatedduplicate42069839774sameSHAwhilemanualruncompleted;cancelrequestedbeforeextraction. Standardtest/lintgreen,docs/unitactiveatcheck. No newexperiment,gateweakening,mainpromotion,officialjobedit,DRTredo orphaseclaim.
+
 ## 2026-11-05 — Prepare routed finalization and extracted signoff diagnostic
 
 - Bindexact41981158960DRTstate/ODB/DEF/NL/PNL/SDC/rawmetricsbyhash. Separateworkflowrestoresoriginalsource/PDKdependenciesandcompletedroute,thenexistingRemoveObstructions/antenna/TrDRC/disconnectedpins/wirelength/fill/RCX/STAPostPNRsequence. All3cornersandoriginalsignoffSDCidentityretained.
@@ -6738,3 +6773,5 @@ Publication receipt:9dfed6ctools/4b26c73tests/2c37ec1CI/f1f82fcdocs pushed;remot
 Publication receipt:8bd6d47tools/36e69a3tests/6e5da2edocs pushed; remoteverified. Matchedcontrol/editedretry41979402848in progress on6e5da2e29971b780e6d10c8f151efa6642312a68. Noresult/watcher/DRT.
 
 Publication receipt:f241555tools/4a66313CI/b43c714docs pushed;remote mainb43c714279ce3c20a165d34ba40e2a69f505bf0dverified. Detailed-routing continuation41981158960in progress atworkflowlevel;freshpregatesprecedeDRT. No DRTcompletion/extracted/officialclaimorwatcher.
+
+Publication receipt:1fced6btools/55a51a6CI/618c1a1docs pushed;remote main618c1a10476d6c882824b743e3004cd6b5726afdverified. Workflowregistered408407898butpushrunabsent;firstmanualdispatchHTTP500/transientnetworkfailurecreatednorun. Verifiedemptyrunlistthenretryaccepted:extraction42069613808queuedonexactSHA. No resultyet,duplicateorwatcher.

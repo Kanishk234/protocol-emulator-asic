@@ -1611,3 +1611,10 @@ This is one isolated diagnostic control compared with the reproduced diode arm41
 General need: bound exposed antenna ratio at actual endangered receivers with minimal area increase, rather than broad buffer/diode insertion. Pinned PDK gates support three Boolean-equivalent upsizes, estimated footprint +23.5872um²; the delay receiver needs local protection. Prepare diagnostic three master changes plus one diode at hold7969/A, native legalization/rerouting and fresh all-corner/electrical/antenna checks, paired with unchanged rerouted control.
 
 First-order ratios do not predict changes after rerouting or capture upstream loading. Exact connectivity checks and source hashes are mandatory. This uses extra diagnostic steps and is not a promotable official-flow recipe. No RTL/state/ISA change, acceptance relaxation, main config or official-job edits. A clean outcome must still be translated to a permitted source/config implementation and reproduced before any phase claim.
+
+
+## D-152 (2026-11-05): isolate equivalent C-selector source simplification
+
+General need: reduce combinational selection delay on arbitrary pin feedback without adding protocol-specific hardware, state or cycles. Prepare a diagnostic source rewrite that removes C's redundant clamped index and derives selection directly from the selected pad and attachment flag. SAT proves the combinational contract for all binary inputs/indices; A/B and the sequential delay block are unchanged. No architecture or ISA change is proposed.
+
+Pinned slow-Liberty local estimates improve by 0.43–0.55 ns with lower mapped cone area across measured loads, but full-design area, congestion and extracted timing are unmeasured. Do not add isolated gains to WNS. Preserve the reference physical recipe and all gates. Add a read-only pre-DRT audit under unchanged signoff constraints; no stock flow or official job edits. Main source/config remain unpromoted. Status: local experiment prepared; physical validation pending. See `reports/PHASE2_C_SELECTOR_SCREEN.md`.

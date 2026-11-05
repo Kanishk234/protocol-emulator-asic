@@ -13,6 +13,13 @@ def canonical(name):
 
 
 def diode_seed(anchor, item, units, bound):
+    if 'locked_site_dbu' in item:
+        site = item['locked_site_dbu']
+        if len(site) != 2 or any(type(v) is not int for v in site):
+            raise ValueError('Invalid locked diode site')
+        if any(abs(a-b) > bound * units for a,b in zip(site,anchor)):
+            raise ValueError('Locked diode site exceeds reviewed displacement')
+        return tuple(site)
     offset = item.get('seed_offset_um', [0, 0])
     if len(offset) != 2 or any(type(v) not in (int, float) or not math.isfinite(v)
                               or abs(v) > bound for v in offset):
@@ -40,12 +47,19 @@ def audit_snapshot(before, after, plan, units):
         current = after[name]
         assert current['master'] == 'sg13cmos5l_antennanp'
         assert canonical(current['pins']['A']) == diode['net'], 'Wrong diode net'
+        for power in ('VDD', 'VSS'):
+            expected = before[diode['anchor']]['pins'][power]
+            assert expected and current['pins'][power] == expected, 'Wrong diode supply'
         anchor = before[diode['anchor']]['location']
         assert all(abs(a-b) <= distance for a, b in zip(current['location'], anchor)), 'Diode moved too far'
         if 'required_displacement_y_um' in diode:
             low, high = diode['required_displacement_y_um']
             dy = (current['location'][1] - anchor[1]) / units
             assert low <= dy <= high, 'Clock diode left reviewed corridor'
+        if 'locked_site_dbu' in diode:
+            assert tuple(current['location']) == tuple(diode['locked_site_dbu']), 'Clock diode left reviewed site'
+            assert current['orientation'] == diode['locked_orientation']
+            assert current['status'] == 'LOCKED'
 
 
 def apply(design, router, database):
@@ -70,6 +84,14 @@ def apply(design, router, database):
         term = anchor.findITerm(item['pin'])
         assert term is not None and term.getNet() is not None
         assert canonical(term.getNet().getName()) == item['net']
+        for power in ('VDD', 'VSS'):
+            supply = anchor.findITerm(power)
+            assert supply is not None and supply.getNet() is not None, 'Missing anchor supply'
+            assert supply.getNet().isSpecial(), 'Anchor supply is not a special net'
+        for guard in item.get('site_guards', []):
+            original = before[guard['instance']]
+            assert original['master'] == guard['master']
+            assert list(original['location']) == guard['location_dbu'], 'Reviewed gap neighbors changed'
         seeds[item['name']] = diode_seed(anchor.getLocation(), item, units,
                                          plan['maximum_displacement_um'])
     locked = []
@@ -85,10 +107,12 @@ def apply(design, router, database):
             anchor = block.findInst(item['anchor'])
             net = anchor.findITerm(item['pin']).getNet()
             diode = odb.dbInst.create(block, diode_master, item['name'])
-            diode.setOrient(anchor.getOrient())
+            diode.setOrient(item.get('locked_orientation', anchor.getOrient()))
             diode.setLocation(*seeds[item['name']])
-            diode.setPlacementStatus('PLACED')
+            diode.setPlacementStatus('LOCKED' if 'locked_site_dbu' in item else 'PLACED')
             diode.findITerm('A').connect(net)
+            for power in ('VDD', 'VSS'):
+                diode.findITerm(power).connect(anchor.findITerm(power).getNet())
             router.addDirtyNet(net)
         distance = plan['maximum_displacement_um']
         checked(design, placement_command(distance))

@@ -67,6 +67,7 @@ if edited:
     intervention = helper.apply(design, router, tech.getDB())
 router.endIncremental(True)
 router.writeSegments(str(output / 'after.segments'))
+router.writePinLocations(str(output / 'pin_locations.txt'))
 result = compare((output / 'before.segments').read_text(), (output / 'after.segments').read_text())
 (output / 'geometry_result.json').write_text(json.dumps(result, indent=2) + '\n')
 if edited:

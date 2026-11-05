@@ -1,0 +1,49 @@
+{
+  "run_id": 42069613808,
+  "artifact_id": 13436955605,
+  "extracted_passed": false,
+  "raw_metrics_and_reports_independently_matched": true,
+  "timing": {
+    "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+    "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.23980840214588353,
+    "timing__setup__ws__corner:nom_slow_1p08V_125C": -2.6689016196933144,
+    "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.7844838334314586,
+    "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+    "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.4305478317954339
+  },
+  "electrical_counts": {
+    "nom_fast_1p32V_m40C": {
+      "slew": 0,
+      "fanout": 0,
+      "capacitance": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "slew": 0,
+      "fanout": 0,
+      "capacitance": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "slew": 0,
+      "fanout": 0,
+      "capacitance": 0
+    }
+  },
+  "antenna_nets": 0,
+  "antenna_pins": 0,
+  "worst_path": {
+    "startpoint": "_52388_",
+    "source_signal": "u_chip.g_unit[0].bitsync_active",
+    "endpoint": "_51197_",
+    "capture_signal": "u_chip.u_fab.u_c0.pending_drop",
+    "arrival_ns": 23.496197,
+    "required_ns": 20.827293,
+    "slack_ns": -2.6689016196933144
+  },
+  "signoff_constraint_identity": {
+    "sta_constraint_file": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/extracted-timing/effective-signoff.sdc",
+    "source_constraint_file": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/src/signoff.sdc",
+    "sha256": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa",
+    "inherited_state_sdc_is_signoff_evidence": false
+  },
+  "official_gds_qualified": false
+}

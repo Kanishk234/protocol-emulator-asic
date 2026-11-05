@@ -1,0 +1,7 @@
+{
+  "reference_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+  "candidate_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+  "patch_sha256": "d23619489f756037c739dec812fad96210e5373d556dc3929986a8c368799dd0",
+  "equivalence": "Combinational a_in,b_in,c_in,sel for arbitrary binary inputs, all 32 pin indices; unchanged sequential block",
+  "status": "Local prototype only; no full-design physical qualification"
+}

@@ -1,0 +1,274 @@
+{
+  "pin-select-slow": {
+    "scope": "C-pin combinational cone only; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+    "output_load_ff": 6.0,
+    "reference_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+    "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+    "excluded_cells": [
+      "sg13cmos5l_buf_1",
+      "sg13cmos5l_lgcp_1",
+      "sg13cmos5l_sighold",
+      "sg13cmos5l_slgcp_1",
+      "sg13cmos5l_sdfbbp_1",
+      "sg13cmos5l_dfrbp_2"
+    ],
+    "results": {
+      "reference": {
+        "equivalent": true,
+        "source_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+        "mapped_area_um2": 435.4182,
+        "mapped_gates": 33,
+        "abc_delay_ps": 1577.58
+      },
+      "unclamped": {
+        "equivalent": true,
+        "source_sha256": "2e4cb6e0149795e9087731b8b3c78614f7f26b6a3344b04b9230a545a5bce48a",
+        "mapped_area_um2": 429.975,
+        "mapped_gates": 29,
+        "abc_delay_ps": 1144.61
+      },
+      "banked": {
+        "equivalent": true,
+        "source_sha256": "2d6a5ae7d199268fca62b87c6910d92da96cef65232d2caf44145f1a055e0d38",
+        "mapped_area_um2": 428.1984,
+        "mapped_gates": 27,
+        "abc_delay_ps": 1152.57
+      },
+      "decoded": {
+        "equivalent": true,
+        "source_sha256": "b7b9d023cd9f40843e4e6742d392fce49c2d50eace641a481bd7bec7e36fffe7",
+        "mapped_area_um2": 417.1608,
+        "mapped_gates": 43,
+        "abc_delay_ps": 1015.68
+      },
+      "unclamped_direct_select": {
+        "equivalent": true,
+        "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+        "mapped_area_um2": 422.7174,
+        "mapped_gates": 26,
+        "abc_delay_ps": 1107.67
+      },
+      "decoded_direct_select": {
+        "equivalent": true,
+        "source_sha256": "e0b1eddc4d9f52a46f95dfaac7c584e3304122b7f2c3dc3add6583b9b88dc532",
+        "mapped_area_um2": 437.1948,
+        "mapped_gates": 43,
+        "abc_delay_ps": 1293.66
+      }
+    }
+  },
+  "pin-select-typ": {
+    "scope": "C-pin combinational cone only; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+    "output_load_ff": 6.0,
+    "reference_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+    "liberty_sha256": "34163f3e7de9f854afac57332ba06f1739b78e7ac35660a8a5ddd39c570124ad",
+    "excluded_cells": [
+      "sg13cmos5l_buf_1",
+      "sg13cmos5l_lgcp_1",
+      "sg13cmos5l_sighold",
+      "sg13cmos5l_slgcp_1",
+      "sg13cmos5l_sdfbbp_1",
+      "sg13cmos5l_dfrbp_2"
+    ],
+    "results": {
+      "reference": {
+        "equivalent": true,
+        "source_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+        "mapped_area_um2": 435.4182,
+        "mapped_gates": 33,
+        "abc_delay_ps": 992.28
+      },
+      "unclamped": {
+        "equivalent": true,
+        "source_sha256": "2e4cb6e0149795e9087731b8b3c78614f7f26b6a3344b04b9230a545a5bce48a",
+        "mapped_area_um2": 429.975,
+        "mapped_gates": 29,
+        "abc_delay_ps": 713.98
+      },
+      "banked": {
+        "equivalent": true,
+        "source_sha256": "2d6a5ae7d199268fca62b87c6910d92da96cef65232d2caf44145f1a055e0d38",
+        "mapped_area_um2": 419.1264,
+        "mapped_gates": 27,
+        "abc_delay_ps": 723.47
+      },
+      "decoded": {
+        "equivalent": true,
+        "source_sha256": "b7b9d023cd9f40843e4e6742d392fce49c2d50eace641a481bd7bec7e36fffe7",
+        "mapped_area_um2": 417.1608,
+        "mapped_gates": 43,
+        "abc_delay_ps": 642.82
+      },
+      "unclamped_direct_select": {
+        "equivalent": true,
+        "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+        "mapped_area_um2": 422.7174,
+        "mapped_gates": 26,
+        "abc_delay_ps": 695.09
+      },
+      "decoded_direct_select": {
+        "equivalent": true,
+        "source_sha256": "e0b1eddc4d9f52a46f95dfaac7c584e3304122b7f2c3dc3add6583b9b88dc532",
+        "mapped_area_um2": 444.4524,
+        "mapped_gates": 43,
+        "abc_delay_ps": 811.4
+      }
+    }
+  },
+  "pin-select-slow-load26": {
+    "scope": "C-pin combinational cone only; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+    "output_load_ff": 26.7,
+    "reference_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+    "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+    "excluded_cells": [
+      "sg13cmos5l_buf_1",
+      "sg13cmos5l_lgcp_1",
+      "sg13cmos5l_sighold",
+      "sg13cmos5l_slgcp_1",
+      "sg13cmos5l_sdfbbp_1",
+      "sg13cmos5l_dfrbp_2"
+    ],
+    "results": {
+      "reference": {
+        "equivalent": true,
+        "source_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+        "mapped_area_um2": 464.4486,
+        "mapped_gates": 35,
+        "abc_delay_ps": 1768.3
+      },
+      "unclamped": {
+        "equivalent": true,
+        "source_sha256": "2e4cb6e0149795e9087731b8b3c78614f7f26b6a3344b04b9230a545a5bce48a",
+        "mapped_area_um2": 415.4598,
+        "mapped_gates": 29,
+        "abc_delay_ps": 1301.76
+      },
+      "banked": {
+        "equivalent": true,
+        "source_sha256": "2d6a5ae7d199268fca62b87c6910d92da96cef65232d2caf44145f1a055e0d38",
+        "mapped_area_um2": 428.1984,
+        "mapped_gates": 27,
+        "abc_delay_ps": 1436.47
+      },
+      "decoded": {
+        "equivalent": true,
+        "source_sha256": "b7b9d023cd9f40843e4e6742d392fce49c2d50eace641a481bd7bec7e36fffe7",
+        "mapped_area_um2": 431.676,
+        "mapped_gates": 44,
+        "abc_delay_ps": 1265.07
+      },
+      "unclamped_direct_select": {
+        "equivalent": true,
+        "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+        "mapped_area_um2": 437.2326,
+        "mapped_gates": 27,
+        "abc_delay_ps": 1254.77
+      },
+      "decoded_direct_select": {
+        "equivalent": true,
+        "source_sha256": "e0b1eddc4d9f52a46f95dfaac7c584e3304122b7f2c3dc3add6583b9b88dc532",
+        "mapped_area_um2": 455.3388,
+        "mapped_gates": 44,
+        "abc_delay_ps": 1427.46
+      }
+    }
+  },
+  "pin-select-slow-load50": {
+    "scope": "C-pin combinational cone only; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+    "output_load_ff": 50.0,
+    "reference_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+    "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+    "excluded_cells": [
+      "sg13cmos5l_buf_1",
+      "sg13cmos5l_lgcp_1",
+      "sg13cmos5l_sighold",
+      "sg13cmos5l_slgcp_1",
+      "sg13cmos5l_sdfbbp_1",
+      "sg13cmos5l_dfrbp_2"
+    ],
+    "results": {
+      "reference": {
+        "equivalent": true,
+        "source_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+        "mapped_area_um2": 464.4486,
+        "mapped_gates": 35,
+        "abc_delay_ps": 1833.4
+      },
+      "unclamped": {
+        "equivalent": true,
+        "source_sha256": "2e4cb6e0149795e9087731b8b3c78614f7f26b6a3344b04b9230a545a5bce48a",
+        "mapped_area_um2": 424.5318,
+        "mapped_gates": 30,
+        "abc_delay_ps": 1349.69
+      },
+      "banked": {
+        "equivalent": true,
+        "source_sha256": "2d6a5ae7d199268fca62b87c6910d92da96cef65232d2caf44145f1a055e0d38",
+        "mapped_area_um2": 466.3008,
+        "mapped_gates": 29,
+        "abc_delay_ps": 1429.62
+      },
+      "decoded": {
+        "equivalent": true,
+        "source_sha256": "b7b9d023cd9f40843e4e6742d392fce49c2d50eace641a481bd7bec7e36fffe7",
+        "mapped_area_um2": 455.2632,
+        "mapped_gates": 45,
+        "abc_delay_ps": 1328.62
+      },
+      "unclamped_direct_select": {
+        "equivalent": true,
+        "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+        "mapped_area_um2": 446.3046,
+        "mapped_gates": 28,
+        "abc_delay_ps": 1284.4
+      },
+      "decoded_direct_select": {
+        "equivalent": true,
+        "source_sha256": "e0b1eddc4d9f52a46f95dfaac7c584e3304122b7f2c3dc3add6583b9b88dc532",
+        "mapped_area_um2": 460.782,
+        "mapped_gates": 45,
+        "abc_delay_ps": 1453.58
+      }
+    }
+  },
+  "pad-owner-slow": {
+    "scope": "NU=4 combinational pad output/OE cone; arbitrary owners and unit data/config; state logic unchanged; BUF2 driver/6 fF output load; no routing or full-chip proof",
+    "equivalent": true,
+    "source_sha256": "0340599a644ae8315ddce575ddbd76cf5683cc14323668c138e66b94aeb16572",
+    "candidate_sha256": "308f05636d3c2071fbce4d5edbd4221ce751ade0e698eaedc76e959f7687a9de",
+    "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+    "excluded_cells": [
+      "sg13cmos5l_buf_1",
+      "sg13cmos5l_lgcp_1",
+      "sg13cmos5l_sighold",
+      "sg13cmos5l_slgcp_1",
+      "sg13cmos5l_sdfbbp_1",
+      "sg13cmos5l_dfrbp_2"
+    ],
+    "results": {
+      "reference": {
+        "mapped_gates": 734,
+        "abc_delay_ps": 1258.59,
+        "mapped_area_um2": 7023.3534
+      },
+      "trial": {
+        "mapped_gates": 786,
+        "abc_delay_ps": 1189.9,
+        "mapped_area_um2": 7317.4752
+      }
+    }
+  },
+  "decision": {
+    "leading_candidate": "unclamped_direct_select",
+    "scope": "C-only source rewrite; do not change a/b inputs or sequential state",
+    "reason": "Small source change, lower mapped delay and area at all measured slow loads; decoded alternative also promising but load-sensitive",
+    "pad_owner_rewrite": "Rejected for now: +294.1218 um2 for only 68.69 ps reduction in isolated mapped cone",
+    "limits": [
+      "Not extracted full-design timing",
+      "Isolated longest-path delay does not isolate the actual routed pad-to-sel arc",
+      "ABC mapping/load assumptions differ from native full-design synthesis and physical repair",
+      "Cannot add these savings directly to WNS",
+      "No source/config reproduction of existing physical ECO established"
+    ]
+  }
+}

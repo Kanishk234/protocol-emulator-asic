@@ -1,0 +1,14 @@
+{
+  "scope": "Five full-chip RTL smoke tests on isolated full 2-lane/4-unit source; not full protocol suite or gate-level replay",
+  "passed": 5,
+  "tests": [
+    "test_identity_time_sram",
+    "test_lane_forwards_host_in_to_host_out",
+    "test_pin_units_uart_tx_lean_and_full",
+    "test_routine_on_the_rotation",
+    "test_uart_program_loopback"
+  ],
+  "results_xml_sha256": "047b0a8e2a9f51fdb8dde5d56626df4fb953148c3cadd5c9e7081bd6e5ae4738",
+  "source_preparation_sha256": "9ac4fc44bf2ca60be1683e3439d7158d2bb14981753c8b046063e9194a0c3f4c",
+  "candidate_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4"
+}

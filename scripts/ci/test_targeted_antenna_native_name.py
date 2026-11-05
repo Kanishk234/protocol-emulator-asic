@@ -5,7 +5,8 @@ import subprocess
 
 def test_target_list_matches_raw_native_name(tmp_path):
     source = Path(__file__).with_name('targeted_antenna_size.tcl').read_text()
-    targets = source[source.index('set trw_targets'):source.index('tripwire_size_native_hold100 $trw_targets')]
+    start = source.index('set trw_targets')
+    targets = source[start:source.index('\n}\n', start) + 3]
     script = tmp_path / 'names.tcl'
     script.write_text(targets + '\nputs "NATIVE_NET_HEX [binary encode hex [dict get [lindex [lindex $trw_targets 2] 3] B]]"\n')
     result = subprocess.run(['yosys', '-Q', '-T', '-c', str(script)], capture_output=True, text=True)

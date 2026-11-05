@@ -1,0 +1,300 @@
+{
+  "source_run": 41569397169,
+  "postant_audit": 41786909156,
+  "final_replay": 41864608197,
+  "scope": "Existing gate connectivity and DEF placement comparison; per-layer route geometry not yet reconstructed",
+  "nets": [
+    {
+      "sink": "hold7969/A",
+      "before": [
+        "sg13cmos5l_dlygate4sd3_1",
+        {
+          "A": "_10511_",
+          "X": "net7968"
+        }
+      ],
+      "after": [
+        "sg13cmos5l_dlygate4sd3_1",
+        {
+          "A": "_10511_",
+          "X": "net7968"
+        }
+      ],
+      "before_net_attachments": [
+        {
+          "instance": "_37504_",
+          "master": "sg13cmos5l_and2_1",
+          "pin": "X"
+        },
+        {
+          "instance": "_38359_",
+          "master": "sg13cmos5l_o21ai_1",
+          "pin": "A1"
+        },
+        {
+          "instance": "hold7969",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "pin": "A"
+        }
+      ],
+      "after_net_attachments": [
+        {
+          "instance": "_37504_",
+          "master": "sg13cmos5l_and2_1",
+          "pin": "X"
+        },
+        {
+          "instance": "_38359_",
+          "master": "sg13cmos5l_o21ai_1",
+          "pin": "A1"
+        },
+        {
+          "instance": "hold7969",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "pin": "A"
+        }
+      ],
+      "physical_cells": {
+        "_37504_": {
+          "before": [
+            "549120",
+            "151200",
+            "FS"
+          ],
+          "after": [
+            "549120",
+            "151200",
+            "S"
+          ]
+        },
+        "_38359_": {
+          "before": [
+            "550560",
+            "173880",
+            "FS"
+          ],
+          "after": [
+            "550560",
+            "173880",
+            "FS"
+          ]
+        },
+        "hold7969": {
+          "before": [
+            "437280",
+            "177660",
+            "N"
+          ],
+          "after": [
+            "437280",
+            "177660",
+            "FN"
+          ]
+        }
+      }
+    },
+    {
+      "sink": "wire13568/A",
+      "before": [
+        "sg13cmos5l_buf_2",
+        {
+          "A": "_19518_",
+          "X": "net13567"
+        }
+      ],
+      "after": [
+        "sg13cmos5l_buf_2",
+        {
+          "A": "_19518_",
+          "X": "net13567"
+        }
+      ],
+      "before_net_attachments": [
+        {
+          "instance": "_48371_",
+          "master": "sg13cmos5l_mux2_1",
+          "pin": "X"
+        },
+        {
+          "instance": "wire13568",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "A"
+        }
+      ],
+      "after_net_attachments": [
+        {
+          "instance": "_48371_",
+          "master": "sg13cmos5l_mux2_1",
+          "pin": "X"
+        },
+        {
+          "instance": "wire13568",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "A"
+        }
+      ],
+      "physical_cells": {
+        "wire13568": {
+          "before": [
+            "626400",
+            "249480",
+            "FS"
+          ],
+          "after": [
+            "626400",
+            "249480",
+            "S"
+          ]
+        },
+        "_48371_": {
+          "before": [
+            "528480",
+            "226800",
+            "FS"
+          ],
+          "after": [
+            "528480",
+            "226800",
+            "FS"
+          ]
+        }
+      }
+    },
+    {
+      "sink": "_38673_/A",
+      "before": [
+        "sg13cmos5l_nand2_1",
+        {
+          "Y": "_11579_",
+          "A": "net11878",
+          "B": "u_chip.g_lane[1].slots[626]"
+        }
+      ],
+      "after": [
+        "sg13cmos5l_nand2_1",
+        {
+          "Y": "_11579_",
+          "A": "net11878",
+          "B": "u_chip.g_lane[1].slots[626]"
+        }
+      ],
+      "before_net_attachments": [
+        {
+          "instance": "_38673_",
+          "master": "sg13cmos5l_nand2_1",
+          "pin": "A"
+        },
+        {
+          "instance": "wire11879",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "X"
+        }
+      ],
+      "after_net_attachments": [
+        {
+          "instance": "_38673_",
+          "master": "sg13cmos5l_nand2_1",
+          "pin": "A"
+        },
+        {
+          "instance": "wire11879",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "X"
+        }
+      ],
+      "physical_cells": {
+        "_38673_": {
+          "before": [
+            "15840",
+            "11340",
+            "N"
+          ],
+          "after": [
+            "15840",
+            "11340",
+            "N"
+          ]
+        },
+        "wire11879": {
+          "before": [
+            "259200",
+            "124740",
+            "N"
+          ],
+          "after": [
+            "259200",
+            "124740",
+            "FN"
+          ]
+        }
+      }
+    },
+    {
+      "sink": "wire12579/A",
+      "before": [
+        "sg13cmos5l_buf_2",
+        {
+          "A": "net12579",
+          "X": "net12578"
+        }
+      ],
+      "after": [
+        "sg13cmos5l_buf_2",
+        {
+          "A": "net12579",
+          "X": "net12578"
+        }
+      ],
+      "before_net_attachments": [
+        {
+          "instance": "wire12579",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "A"
+        },
+        {
+          "instance": "wire12580",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "X"
+        }
+      ],
+      "after_net_attachments": [
+        {
+          "instance": "wire12579",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "A"
+        },
+        {
+          "instance": "wire12580",
+          "master": "sg13cmos5l_buf_2",
+          "pin": "X"
+        }
+      ],
+      "physical_cells": {
+        "wire12579": {
+          "before": [
+            "530400",
+            "423360",
+            "FS"
+          ],
+          "after": [
+            "528480",
+            "423360",
+            "FS"
+          ]
+        },
+        "wire12580": {
+          "before": [
+            "626880",
+            "412020",
+            "N"
+          ],
+          "after": [
+            "626880",
+            "412020",
+            "N"
+          ]
+        }
+      }
+    }
+  ]
+}

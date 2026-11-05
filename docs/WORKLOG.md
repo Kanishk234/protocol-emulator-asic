@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Prepare read-only before/after antenna geometry audit
+
+- Existing antenna-clean report omits clean-net ratio detail. Add separate two-checkpoint read-only audit: exact stage43versus44ofreference41569397169, native route segment export and four per-net antenna reports, plus existing repeated corner/whole-design antenna and circuit-readback checks. No repair/placement/routing invoked. Final checkpoint manifest validates against cached artifact. Pinned native Tcl confirms per-net/report_file support.
+- actionlint/embedded Python/shell/source hash checks pass. Exported global routes are native readbacks, not detailed routing or congestion proof. Goal is measured per-layer ratio/route deltas, not another physical parameter sweep. Standing publication approval; unrelated files/official jobs unchanged.
+
+## 2026-11-04 — Margin50 measurement and reference causal trace
+
+-41928478235completed; raw repeated corner/antenna metrics and final overflow independently matched. Save antenna_margin50_result_41928478235.json. Main standardCIgreen. No new parameter experiment launched.
+- Direct reference stage43ODB netlist readback versus calibrated final replay: all four failing sink masters/input nets and every attached parsed standard-cell terminal are identical; no directly attached diode before or after. DEF trace shows hold7969 and its driver change orientation, wire13568changes orientation, wire11879(driver of NAND branch)changes orientation, wire12579moves horizontally. Therefore not newly inserted gates or disconnected existing diodes on these four branches; physical geometry/routing is the unresolved failure mechanism. Save reference_antenna_stage_trace.json. Exact per-layer route/CAR delta still needs reconstruction; do not claim all caused solely by mirroring.
+- Stop parameter sweep; next analyze per-net guide/route and antenna-ratio changes on exact before/after layouts. No DRT, source/config/official-job changes, phase tick or watcher.
+
 ## 2026-11-04 — Prepare bounded antenna margin50 replay
 
 - Calibrated diode-only margin10native replay reproduces reference. Prepare one native margin50diode-only replay from same pre-antenna source, retaining175pslate hold, mirroring/rerouting and all fresh final measurements. Only physical change relative to reproduced diode control is GRT_ANTENNA_REPAIR_MARGIN10→50. Runtime validates exact native ratio_margin; target and mirroring audits retained.
@@ -6566,3 +6577,5 @@ Publication receipt:30a5cdfCI/ec418fdevidence pushed; remote main ec418fd42c1f67
 Publication receipt:8a37b2fmanifest/84faa95CI/725712fevidence pushed; remote main725712f3ce6deeb5e0345f8499c86034b167fc29verified. Native antenna-mode comparison41915437265confirmed in progress. No result, DRT or watcher.
 
 Publication receipt:5c08df0/5da1fc3/4aaeb24/dca764bpushed; remote verified after push. Recovered diode control fast144.394ps/4ant/0overflow; mixed25.3043ps/4ant/0overflow. Mixed rejected. No new physical dispatch or watcher.
+
+Publication receipt:9267f6fCI/ce42456docs pushed; remote maince42456c28903a40ae613290879c1302ba00fcedverified. Native antenna margin50replay41928478235queued on exact SHA. No result/DRT/watcher; all owned local commands finished.

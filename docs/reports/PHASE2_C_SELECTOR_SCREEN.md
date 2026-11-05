@@ -103,3 +103,11 @@ Native receiver protection remains a diagnostic until a permitted source/config
 recipe reproduces the result under unchanged official GDS jobs.
 
 Audit [42110354960](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42110354960) was launched on commit `7907fa47464e933210847dd3d6c510e0d49ac255`; results are pending.
+
+
+Pinned LEF inspection rejects DFRBPQ1→2 as an antenna fix: both D pins have
+0.1092 µm² gate area. BUF2→4 grows A gate area from0.2132 to0.3146 µm², giving
+a first-order ratio estimate226.65→153.60 if geometry stayed fixed. Actual
+upstream loading and rerouting still require measurement. The delay and latch
+clock receivers have no larger equivalent input cell. See
+`c_select_receiver_feasibility.json` for the pinned geometry receipt.

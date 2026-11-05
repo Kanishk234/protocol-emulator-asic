@@ -120,3 +120,31 @@ passes actual database names to the antenna checker.29 Tcl/checkpoint tests pass
 including escaped names and ambiguity rejection. Corrected audit
 [42116068868](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42116068868)
 was launched on `3296e751f35c6886ad6b0f048932cc91e9608a5c`.
+
+
+## Successful audit and bounded receiver experiment
+
+Corrected audit42116068868 passed in6m17s. Its repeated signoff-SDC corner
+measurements, original physical views and fresh ODB netlist readback reproduce
+the source. Antenna count remains4. The tracked live-configuration→channel0
+pending-drop pair has estimated slow slack+4.796553ns. This is one selected path,
+not whole-design or extracted setup evidence. The affected latch's reported
+slow outgoing paths have minimum slack+5.325843ns; its reported fast incoming
+hold path has slack+10.194736ns. Clock protection still needs actual remeasurement.
+
+D-153 prepares paired native reopening/control and edited jobs in the manual
+`gds-c-select-local-repair` workflow. The edited job adds three local passive
+diodes and upsizes wire14386 fromBUF2 toBUF4. All unrelated original placements,
+orientations, masters and connections must remain identical; movement is bounded
+to20µm per axis, with only five allowed nets changing route geometry. Fresh
+NL/PNL exports follow the actual edited database. Estimated added cell footprint
+is21.7728µm²; this does not predict routing or clock effects.
+
+Both original and signoff-SDC all-corner audits are required. Original fast
+hold reserve≥50ps, electrical0, antenna0 and final live overflow0 remain fixed.
+The no-edit arm must reproduce the frozen source; the edited arm must pass
+all gates.61 local audit/library/route/checkpoint regressions and workflow syntax
+checks pass. Native execution is pending. This diagnostic does not reproduce
+the repair through permitted main source/config inputs or qualify official GDS.
+
+Paired diagnostic [42119036887](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42119036887) was launched on `d1207c571587d1b6269ce4669a2067bd5f918da3`; control and edited results are pending.

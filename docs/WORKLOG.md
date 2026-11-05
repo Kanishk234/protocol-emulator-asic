@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Read-only C-selector audit succeeds; prepare bounded protection
+
+- Corrected audit42116068868 succeeds in6m17s. Independently inspect receipt/net/path reports: original source views and all fresh NL/PNL hashes reproduce; corner values match source signoff estimates; antenna4. Save c_select_geometry_result_42116068868.json. Slow tracked bitsync_active→channel0 pending_drop estimated slack+4.796553ns; affected latch slow outgoing minimum among20 reported paths+5.325843ns, fast incoming hold+10.194736ns. These are selected estimated paths, not extracted closure.
+- Geometry shows the failing latch about285um from its leaf-clock BUF8; clock net feeds four latches. Prepare D-153 paired control/edited native reopening: three local diodes plus wire14386 BUF2→4, estimated footprint+21.7728um2. All original cells except this buffer locked; original connections/masters/status preserved; ≤20um per-axis move bound and five allowed route nets. Export fresh actual NL/PNL. Require original and signoff all-corner timing/electrical,50ps fast hold, antenna0 and live overflow0; no-edit exact geometry/timing reproduction mandatory.
+- 61 locality/library/route/Tcl/checkpoint regressions pass; actionlint, embedded-Python/native-helper syntax and diff checks pass. No main RTL/config or official GDS job changes. Native edited behavior remains unproved; source/config official reproduction remains open.
+- Published tools/evidence/workflow throughd1207c571587d1b6269ce4669a2067bd5f918da3 and launched one paired diagnostic under standing approval: [42119036887](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42119036887), confirmed in progress on that SHA. No DRT or phase tick. Next compare unchanged control and bounded edit results; reject any timing/locality/antenna/overflow regression before considering extraction.
+
 ## 2026-11-05 — Correct escaped OpenDB names in read-only geometry probe
 
 - Audit42110354960 fails in diagnostic lookup after successful43-file restore/toolchain/PDK checks. Exact error is missing logical lane1 ot26 net; native route export uses escaped bracket names. This is our probe bug; no new physical qualification result follows. Save cause/fix in BUGS.

@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Replace rejected clock seed with a verified legal site
+
+-42125394009 control passes; edited arm stops before routing because native legalization leaves the reviewed clock-seed window. No new timing/congestion result. Inspect actual fixed-row occupancy: row514080 is full nearby. Adjacent row510300 has exact three-site gap643680..645120 between hold7746 and _33545_;1.44x3.78um antenna cell fits CoreSite grid with12.96um X/11.34um Y anchor displacement. Save c_select_clock_site_feasibility.json with DEF/LEF hashes/guards; native placement checks remain mandatory.
+- Place/lock only the added clock diode at that explicit R0 site; keep original20um bounds, other diodes, buffer and all original-cell locks. Replace the ineffective seed-window guard with an exact reviewed-site guard; original timing/antenna/electrical/overflow acceptance remains unchanged. Export global-router pin locations.
+- Actual earlier DEF also reveals added diode VDD/VSS pins unconnected; fix insertion to copy each anchor supply and verify after routing. Record diagnostic bug and reject bad supplies in tests. Previous result never qualified LVS/precheck.78 related regression checks pass plus actionlint/diff checks. No main RTL/config or official job edits, DRT or phase tick.
+- Published tools/plan througha277802e7b698d7575fe55d872f4e750c5e0ec56 and launched one paired explicit-site diagnostic under standing approval: [42128655779](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42128655779), confirmed in progress on that SHA. Next verify native legal placement, supply connections, actual clock access point and all original/signoff gates. The last valid edited measurement still has17 overflow; closure remains unproved.
+
 ## 2026-11-05 — Legal C-selector repair leaves17 Metal3 overflow; target clock corridor
 
 - Corrected42122049674 control passes. Edited arm now passes native legalization and both placement checks, with no ERROR log entries. Original/signoff timing and electrical checks pass; antenna0; unrelated original cells/routes preserved. Strict final gate correctly fails only overflow17 (Metal3 horizontal,max1/edge). Save c_select_repair_result_42122049674.json. No DRT/extraction/official claim.

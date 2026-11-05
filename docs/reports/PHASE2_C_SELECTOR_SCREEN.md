@@ -195,3 +195,23 @@ Placement metadata is exported for interpretation.76 related regressions pass.
 The test is unmeasured and does not guarantee zero overflow or official closure.
 
 Clock-corridor placement test [42125394009](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42125394009) was launched on `8434831bc07f7c47916089c3afb1078974fdaa1e`; results pending.
+
+
+## Clock seed rejected; select an explicit legal gap
+
+Run42125394009's control passes, but the edited arm stops before routing when
+legalization moves the clock diode outside its reviewed seed corridor. It
+provides no new timing or congestion result. The seed row514080 has no three-site
+gap within the permitted X range. The adjacent row510300 has an exact1.44µm gap
+atX643680 between hold7746 and _33545_, within the original20µm displacement
+bound. DEF/LEF inspection confirms grid alignment and no stdcell overlap; the
+SRAM macro is outside this region. Native placement checks remain authoritative.
+
+The revised experiment locks only the added clock diode at that reviewed site,
+retains the two other diode placements and buffer sizing, and adds explicit
+anchor-matched diode VDD/VSS connections (missing in the earlier insertion).
+Wrong supply connections and movement away from the exact site are rejected.
+Pin locations and final placements are exported.78 related checks pass; no
+congestion/timing success is predicted. All original acceptance gates stay fixed.
+
+Explicit-site test [42128655779](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42128655779) was launched on `a277802e7b698d7575fe55d872f4e750c5e0ec56`; native results pending.

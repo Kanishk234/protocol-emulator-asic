@@ -1,0 +1,107 @@
+{
+  "run_id": 42078913664,
+  "source_sha": "c321f2b2f1b01a91d18e96a0876d109b02484189",
+  "workflow_conclusion": "failure",
+  "failed_gates": [
+    "antenna__violating__nets: 4",
+    "antenna__violating__pins: 4"
+  ],
+  "final_overflow": 0,
+  "estimated_timing": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    }
+  },
+  "signoff_constraint_estimated_timing": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.236764,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.462564,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.845068,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    }
+  },
+  "signoff_estimate_qualified": true,
+  "raw_corner_metrics_independently_matched": true,
+  "final_netlist_hash_matches_receipt": true,
+  "final_netlist_sha256": "2cb7df7f3668bffe8035b94d9268abd7b17088a82cf4147ae489b2535e7e266a",
+  "antenna_failures": [
+    {
+      "net": "_02001_",
+      "pin": "_50780_/D",
+      "cell": "sg13cmos5l_dfrbpq_1",
+      "layer": "Metal3",
+      "ratio": 239.71,
+      "limit": 200.0
+    },
+    {
+      "net": "u_chip.g_lane\\[1\\].ot\\[26\\]",
+      "pin": "hold11285/A",
+      "cell": "sg13cmos5l_dlygate4sd3_1",
+      "layer": "Metal2",
+      "ratio": 216.51,
+      "limit": 200.0
+    },
+    {
+      "net": "clknet_2_0__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[0\\].g_stored.gclk",
+      "pin": "_51789_/GATE",
+      "cell": "sg13cmos5l_dlhq_1",
+      "layer": "Metal3",
+      "ratio": 236.92,
+      "limit": 200.0
+    },
+    {
+      "net": "net14386",
+      "pin": "wire14386/A",
+      "cell": "sg13cmos5l_buf_2",
+      "layer": "Metal3",
+      "ratio": 226.65,
+      "limit": 200.0
+    }
+  ],
+  "final_instance_count": 44837,
+  "final_instance_area_um2": 684795,
+  "reference_instance_count": 45099,
+  "reference_instance_area_um2": 688086,
+  "extracted_timing_not_performed": true,
+  "official_flow_qualified": false,
+  "artifact": {
+    "id": 13451715846,
+    "size_in_bytes": 362406083,
+    "selected_entry_crc_verified": true,
+    "whole_archive_digest_independently_verified": false
+  },
+  "next_step": "Inspect geometry/clock loading for these new four antenna failures; do not reuse the previous four-target ECO or start DRT before the strict screen passes"
+}

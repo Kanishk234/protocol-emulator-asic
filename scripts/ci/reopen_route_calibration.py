@@ -48,22 +48,28 @@ router.initFastRoute(minimum, maximum)
 router.loadGuidesFromDB()
 assert router.haveRoutes(), 'Missing restored routes'
 router.writeSegments(str(output / 'before.segments'))
-reference = json.loads(Path('spikes/phase2_stock_flow/route_reopen_reference.json').read_text())
+reference_path = os.environ.get('ROUTE_REOPEN_REFERENCE', 'spikes/phase2_stock_flow/route_reopen_reference.json')
+assert reference_path in ('spikes/phase2_stock_flow/route_reopen_reference.json',
+                          'spikes/phase2_stock_flow/c_select_route_reference.json')
+reference = json.loads(Path(reference_path).read_text())
+assert reference['source_run'] == manifest['run']['id'], 'Geometry reference belongs to another source'
 canonical = json.dumps(parse((output / 'before.segments').read_text()), sort_keys=True, separators=(',', ':'))
 assert hashlib.sha256(canonical.encode()).hexdigest() == reference['canonical_route_sha256'], 'Loaded geometry differs from frozen reference'
 router.startIncremental()
 edited = os.environ.get('LOCAL_ANTENNA_EDIT', 'false') == 'true'
 intervention = None
 if edited:
-    from local_antenna_repair import apply
-    intervention = apply(design, router, tech.getDB())
+    from importlib import import_module
+    helper_name = os.environ.get('LOCAL_ANTENNA_HELPER', 'local_antenna_repair')
+    assert helper_name in ('local_antenna_repair', 'local_c_select_repair')
+    helper = import_module(helper_name)
+    intervention = helper.apply(design, router, tech.getDB())
 router.endIncremental(True)
 router.writeSegments(str(output / 'after.segments'))
 result = compare((output / 'before.segments').read_text(), (output / 'after.segments').read_text())
 (output / 'geometry_result.json').write_text(json.dumps(result, indent=2) + '\n')
 if edited:
-    from local_antenna_repair import verify_after_router
-    verify_after_router(tech.getDB(), intervention)
+    helper.verify_after_router(tech.getDB(), intervention)
     def canonical_net(name):
         return name.replace('\\[', '[').replace('\\]', ']')
     allowed = set(intervention['allowed'])
@@ -79,5 +85,10 @@ design.writeDb(str(output / 'calibrated.odb'))
 design.writeDef(str(output / 'calibrated.def'))
 state['odb'] = str((output / 'calibrated.odb').resolve())
 state['def'] = str((output / 'calibrated.def').resolve())
+for key, suffix, option in [('nl', 'nl.v', ''), ('pnl', 'pnl.v', '-include_pwr_gnd ')]:
+    path = (output / ('calibrated.' + suffix)).resolve()
+    design.evalTclString('write_verilog ' + option + '{' + str(path) + '}')
+    assert path.is_file() and path.stat().st_size > 0
+    state[key] = str(path)
 state['metrics'] = {}
 (output / 'state_out.json').write_text(json.dumps(state, indent=2) + '\n')

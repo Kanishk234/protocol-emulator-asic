@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Recover completed targeted edits with fresh ODB readback
+
+-41969199853passesactual3sizes/legalization/diode/GRTbutfailsadded-cell audit on inheritedpre-diodeNL. Raw states confirmODB/DEFupdatedwhileNLpointsatsizingsnapshot. AddfreshSTA-onlyNLexportbeforeaudit. BinddownloadedpartialartifactfilesbySHA256andresumefromitsfinalroutingstatewithoutrepeatingphysicalwork. NativeGRTreportedcongestion;finaltiming/antennastillpending.
+- Resume regression confirmsfirstoperationread-onlyexport,notedit/reroute. actionlint/runnercompile/diffpass. Publish recoverytools/test/ownCI/evidenceunderstandingapproval. No official-flow/phasequalificationclaim.
+
 ## 2026-11-05 — Correct complete native bus-name escaping from raw artifact
 
 -41968668727stopped before mutation on _38673_/B. Downloaded20KBartifact; raw log reveals native escapes opening and closing brackets, whereas prior wrapped display obscured opening escapes. Previous correction was incomplete. Exact Tcl literal now contains all four native backslashes; strict comparisons unchanged.
@@ -6657,3 +6662,5 @@ Publication receipt:fa0cdd9prototype/f9b8e6etools/bfa27afCI/b619ca9docs pushed; 
 Publication receipt:6169cd5tools/06e52bdCI/ea9e3f0docs pushed; remote mainea9e3f00479c6a979bda9bd7510bb130b4b3f27averified. Paired targeted diagnostic41966771228queued on exactSHA. No physical results yet, DRT or watcher.
 
 Publication receipt:2b383f3tools/06ef9faCI/ca36141docs pushed; remote mainca36141f45df693b7f2de2134f4ed768cd8ebc0dverified. Edited-only retry41968668727in progress. No physical result yet; no watcher/DRT.
+
+Publication receipt:af0bb80tools/604106btest/025e96ddocs pushed;remote main verified. Edited-only retry41969199853in progress on025e96d0321a946d355c03cd43ee4091de6763e5. No physical result or watcher.

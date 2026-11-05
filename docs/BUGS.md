@@ -301,3 +301,7 @@ Symptom: both antenna-mode replay jobs41915437265failed after completed physical
 41966771228edited arm stopped before mutation at _38673_/B: expected u_chip.g_lane[1].slots[626], native getName returns escaped closing brackets. Correct exact expected Tcl literal to native spelling; no normalization or gate relaxation. Actual Tcl target-list evaluation now retains native escapes; seven helper preflight/mutation regressions pass via Yosys Tcl. Control arm completed. Retry edited arm only; no physical repair result claimed from original failed arm.
 
 Follow-up41968668727: first spelling correction was incomplete because wrapped logs hid backslashes before opening brackets. Raw artifact log shows OpenDB escapes both opening and closing brackets. Correct all four, retain exact identity comparison, and add test_targeted_antenna_native_name.py evaluating the actual Tcl target list against raw captured spelling in hex. One new regression plus seven existing helper checks pass. Both failed edited runs stopped during preflight before mutation.
+
+### 2026-11-05 — Targeted diode audit read an inherited netlist
+
+41969199853completes sizing/legalization/diode/rerouting, then added-cell assertion fails because native insertion/GRT states inherit pre-diode NL while updated ODB/DEFcontainsdiode. Fix exports fresh NL fromfinalODBbeforeconnectivityaudit. Recover hash-bound existing physical outputs; resume regression verifies first operation is read-only export, not repeated edits/routing. Original failed CI remainsfailed and no timingclosureclaim.

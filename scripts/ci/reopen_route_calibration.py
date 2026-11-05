@@ -16,8 +16,16 @@ output.mkdir(exist_ok=False)
 config = Path('runs/stock-official-baseline/resolved.json')
 settings = json.loads(config.read_text())
 tech = Tech()
+from route_reopen_libraries import select
+liberties = select(settings)
+for liberty in liberties:
+    assert Path(liberty).is_file(), 'Missing pinned Liberty: ' + liberty
+    tech.readLiberty(liberty)
 design = Design(tech)
 design.readDb(state['odb'])
+for cell in ('sg13cmos5l_buf_2', 'sg13cmos5l_buf_4', 'sg13cmos5l_buf_8', 'sg13cmos5l_nand2_1', 'sg13cmos5l_nand2_2'):
+    count = design.evalTclString('llength [get_lib_cells -quiet */' + cell + ']')
+    assert int(count) > 0, 'Required Liberty cell missing: ' + cell
 router = design.getGlobalRouter()
 # Initialize capacities first. Loading saved guides then restores their usage.
 # Same routing setup as the pinned OdbReader, without importing its host packages.

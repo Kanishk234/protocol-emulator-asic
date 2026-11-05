@@ -1,5 +1,6 @@
 """Bounded three-diode/one-buffer diagnostic for the frozen C-selector source."""
 import json
+import math
 import os
 from pathlib import Path
 
@@ -9,6 +10,14 @@ from checked_openroad_tcl import checked, placement_command
 
 def canonical(name):
     return name.replace('\\[', '[').replace('\\]', ']')
+
+
+def diode_seed(anchor, item, units, bound):
+    offset = item.get('seed_offset_um', [0, 0])
+    if len(offset) != 2 or any(type(v) not in (int, float) or not math.isfinite(v)
+                              or abs(v) > bound for v in offset):
+        raise ValueError('Invalid bounded diode seed offset')
+    return tuple(value + round(delta * units) for value, delta in zip(anchor, offset))
 
 
 def audit_snapshot(before, after, plan, units):
@@ -33,6 +42,10 @@ def audit_snapshot(before, after, plan, units):
         assert canonical(current['pins']['A']) == diode['net'], 'Wrong diode net'
         anchor = before[diode['anchor']]['location']
         assert all(abs(a-b) <= distance for a, b in zip(current['location'], anchor)), 'Diode moved too far'
+        if 'required_displacement_y_um' in diode:
+            low, high = diode['required_displacement_y_um']
+            dy = (current['location'][1] - anchor[1]) / units
+            assert low <= dy <= high, 'Clock diode left reviewed corridor'
 
 
 def apply(design, router, database):
@@ -43,6 +56,7 @@ def apply(design, router, database):
     block = database.getChip().getBlock()
     units = block.getDbUnitsPerMicron()
     before = snapshot(block)
+    seeds = {}
     allowed = {item['instance'] for item in plan['sizing']}
     diode_master = database.findMaster('sg13cmos5l_antennanp')
     assert diode_master is not None
@@ -56,6 +70,8 @@ def apply(design, router, database):
         term = anchor.findITerm(item['pin'])
         assert term is not None and term.getNet() is not None
         assert canonical(term.getNet().getName()) == item['net']
+        seeds[item['name']] = diode_seed(anchor.getLocation(), item, units,
+                                         plan['maximum_displacement_um'])
     locked = []
     try:
         for inst in block.getInsts():
@@ -70,7 +86,7 @@ def apply(design, router, database):
             net = anchor.findITerm(item['pin']).getNet()
             diode = odb.dbInst.create(block, diode_master, item['name'])
             diode.setOrient(anchor.getOrient())
-            diode.setLocation(*anchor.getLocation())
+            diode.setLocation(*seeds[item['name']])
             diode.setPlacementStatus('PLACED')
             diode.findITerm('A').connect(net)
             router.addDirtyNet(net)
@@ -97,5 +113,13 @@ def verify_after_router(database, intervention):
     before = intervention.pop('_before')
     plan = intervention.pop('_plan')
     units = intervention.pop('_units')
-    audit_snapshot(before, snapshot(database.getChip().getBlock()), plan, units)
+    after = snapshot(database.getChip().getBlock())
+    audit_snapshot(before, after, plan, units)
+    intervention['diode_placements'] = {
+        item['name']: dict(location_dbu=after[item['name']]['location'],
+                           orientation=after[item['name']]['orientation'],
+                           anchor=item['anchor'], displacement_um=[
+                               (a-b)/units for a,b in zip(after[item['name']]['location'],
+                                                         before[item['anchor']]['location'])])
+        for item in plan['diodes']}
     intervention['post_router_placement_and_connections_verified'] = True

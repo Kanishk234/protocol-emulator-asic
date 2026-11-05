@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from local_c_select_repair import audit_snapshot
+from local_c_select_repair import audit_snapshot, diode_seed
 
 
 def fixture():
@@ -25,6 +25,8 @@ def fixture():
     for item in plan['diodes']:
         after[item['name']] = cell('sg13cmos5l_antennanp')
         after[item['name']]['pins'] = {'A': item['net'].replace('[', '\\[').replace(']', '\\]')}
+        after[item['name']]['location'] = diode_seed(
+            before[item['anchor']]['location'], item, 1000, plan['maximum_displacement_um'])
     return before, after, plan
 
 
@@ -40,6 +42,22 @@ def test_unrelated_mutation_rejects(field, value):
     after['untouched'][field] = value
     with pytest.raises(AssertionError):
         audit_snapshot(before, after, plan, 1000)
+
+
+def test_clock_seed_uses_reviewed_upper_corridor():
+    before, after, plan = fixture()
+    clock = plan['diodes'][2]
+    assert clock['seed_offset_um'] == [0, 15.12]
+    assert after[clock['name']]['location'] == (100000, 115120)
+    after[clock['name']]['location'] = before[clock['anchor']]['location']
+    with pytest.raises(AssertionError, match='reviewed corridor'):
+        audit_snapshot(before, after, plan, 1000)
+
+
+@pytest.mark.parametrize('offset', [[0, 21], [1], [True, 0], [0, float('nan')]])
+def test_bad_seed_rejects(offset):
+    with pytest.raises(ValueError):
+        diode_seed((0, 0), {'seed_offset_um': offset}, 1000, 20)
 
 
 @pytest.mark.parametrize('fault', ['wrong_diode_net', 'missing_diode', 'extra_cell',

@@ -67,7 +67,11 @@ if edited:
     def canonical_net(name):
         return name.replace('\\[', '[').replace('\\]', ']')
     allowed = set(intervention['allowed'])
-    assert all(canonical_net(n) in allowed for n in result['changed_nets']), 'Unrelated route changed'
+    unexpected = [n for n in result['changed_nets'] if canonical_net(n) not in allowed]
+    assert not unexpected, 'Unrelated route changed'
+    result['unexpected_changed_nets'] = unexpected
+    result['unchanged_routes_preserved'] = True
+    (output / 'geometry_result.json').write_text(json.dumps(result, indent=2) + '\n')
     (output / 'intervention.json').write_text(json.dumps(intervention, indent=2) + '\n')
 else:
     assert result['exact_roundtrip'], 'No-edit incremental operation changed routes'

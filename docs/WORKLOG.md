@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Correct complete native bus-name escaping from raw artifact
+
+-41968668727stopped before mutation on _38673_/B. Downloaded20KBartifact; raw log reveals native escapes opening and closing brackets, whereas prior wrapped display obscured opening escapes. Previous correction was incomplete. Exact Tcl literal now contains all four native backslashes; strict comparisons unchanged.
+- Added regression evaluating actual Tcl target list viaYosysTcl and comparing captured OpenDB name inhex;passes. Seven existing helper preflight/mutation checks also pass. Publish tool/test/docs groups and dispatch edited-only retry under standing approval. No physical result/promotion/DRTclaim; official jobs/main source/config unchanged.
+
 ## 2026-11-05 — Fix exact native net identity before targeted edits
 
 -41966771228control completes;edited arm stops before anymutation because expected _38673_/B used Verilog bus spelling instead of exact native OpenDB name with escaped closing brackets. Fix only Tcl expected literal, retaining every strict master/pin/net preflight. Actual Tcl list evaluation and7helper regressions pass; actionlint/diff checks pass.
@@ -6650,3 +6655,5 @@ Publication receipt: automatic review initially timed out before execution; perm
 Publication receipt:fa0cdd9prototype/f9b8e6etools/bfa27afCI/b619ca9docs pushed; remote mainb619ca960a6d8ef9943db77e5a6e94d2b282bf69verified. Small receiver preservation41946993488in progress. All owned local commands complete; no watcher/mainhardwareintegration/DRT.
 
 Publication receipt:6169cd5tools/06e52bdCI/ea9e3f0docs pushed; remote mainea9e3f00479c6a979bda9bd7510bb130b4b3f27averified. Paired targeted diagnostic41966771228queued on exactSHA. No physical results yet, DRT or watcher.
+
+Publication receipt:2b383f3tools/06ef9faCI/ca36141docs pushed; remote mainca36141f45df693b7f2de2134f4ed768cd8ebc0dverified. Edited-only retry41968668727in progress. No physical result yet; no watcher/DRT.

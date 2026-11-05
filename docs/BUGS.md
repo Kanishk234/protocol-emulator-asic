@@ -305,3 +305,7 @@ Follow-up41968668727: first spelling correction was incomplete because wrapped l
 ### 2026-11-05 — Targeted diode audit read an inherited netlist
 
 41969199853completes sizing/legalization/diode/rerouting, then added-cell assertion fails because native insertion/GRT states inherit pre-diode NL while updated ODB/DEFcontainsdiode. Fix exports fresh NL fromfinalODBbeforeconnectivityaudit. Recover hash-bound existing physical outputs; resume regression verifies first operation is read-only export, not repeated edits/routing. Original failed CI remainsfailed and no timingclosureclaim.
+
+### 2026-11-05 — OpenROAD embedded Python lacks host LibreLane package
+
+Calibration41975191740fails before design load: embedded Python importlibrelane raisesModuleNotFoundError, although container python3hasthatpackage. Remove package import/OdbReaderdependency; use native openroadTech/Design and the same routing-setup calls from pinned helper. No sys.path injection of incompatible external packages. Scriptcompile/actionlint and17routeaudit regressionspass; native runtime stillpending. No route-preservation result from failedjob.

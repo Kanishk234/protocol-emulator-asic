@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Remove host-package dependency from native calibration
+
+-41975191740fails beforedesignload withembeddedPythonModuleNotFoundError:librelane. Downloadedraw9KBartifact confirms startupfailure,nogeometry/timingresult. ReplaceOdbReaderimportwithnativeTech/Designandverbatimequivalentpinnedroutinginitializationcalls. Standardlibrary/OpenROADonly; allhash/roundtrip/live-demand/timing/antenna gatesretained.
+-17routeauditregressions,scriptcompile/actionlintpass. Publishanddispatchcorrectednoeditcalibrationunderstandingapproval;noofficialjobs/mainhardwarechanges/DRT/phaseclaim.
+
 ## 2026-11-05 — Prepare no-edit native Python reopen calibration
 
 - Separate calibration uses pinned native OdbReader/_grt_setup to initialize FastRoute capacity before loading saved ODBguides, then no-edit incrementalstart/end. Must match canonical hash of actual41940634866finalrouteexport beforeincremental and exact segmentroundtrip afterward. Saves copiedODB/DEFonly; no original mutation.
@@ -6684,3 +6689,5 @@ Publication receipt:af0bb80tools/604106btest/025e96ddocs pushed;remote main veri
 Publication receipt:1abfce4tools/45b36e9test/c5355fbCI/eba1cf0docs pushed; remote verified. Recovery41971200720in progress on eba1cf0090f16d3b6f74222e40a6834a8a60c46a. No repeated physical edits or rerouting; no result yet.
 
 Movement breakdown: 28originalinstances changedXY;20506changedorientation. Unrestricted detailed placement did not preserve the surrounding placed layout; future diagnostic must constrain untouched cells and avoid blanket global rerouting if testing a local fix. This is an engineering limitation of this diagnostic, not evidence that small edits inherently require20kchanges.
+
+Publication receipt:b077f2ftools/a443dd5tests/d913f7bCI/3b6287bdocs pushed;remote main3b6287bae9b3abdbcf8b35dc7add6d848199cb9dverified. No-edit calibration41975191740in progress. No design edit inthisrun; no watcher or DRT.

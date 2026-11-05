@@ -44,11 +44,25 @@ reference = json.loads(Path('spikes/phase2_stock_flow/route_reopen_reference.jso
 canonical = json.dumps(parse((output / 'before.segments').read_text()), sort_keys=True, separators=(',', ':'))
 assert hashlib.sha256(canonical.encode()).hexdigest() == reference['canonical_route_sha256'], 'Loaded geometry differs from frozen reference'
 router.startIncremental()
+edited = os.environ.get('LOCAL_ANTENNA_EDIT', 'false') == 'true'
+intervention = None
+if edited:
+    from local_antenna_repair import apply
+    intervention = apply(design, router, tech.getDB())
 router.endIncremental(True)
 router.writeSegments(str(output / 'after.segments'))
 result = compare((output / 'before.segments').read_text(), (output / 'after.segments').read_text())
 (output / 'geometry_result.json').write_text(json.dumps(result, indent=2) + '\n')
-assert result['exact_roundtrip'], 'No-edit incremental operation changed routes'
+if edited:
+    from local_antenna_repair import verify_after_router
+    verify_after_router(tech.getDB(), intervention)
+    def canonical_net(name):
+        return name.replace('\\[', '[').replace('\\]', ']')
+    allowed = set(intervention['allowed'])
+    assert all(canonical_net(n) in allowed for n in result['changed_nets']), 'Unrelated route changed'
+    (output / 'intervention.json').write_text(json.dumps(intervention, indent=2) + '\n')
+else:
+    assert result['exact_roundtrip'], 'No-edit incremental operation changed routes'
 design.writeDb(str(output / 'calibrated.odb'))
 design.writeDef(str(output / 'calibrated.def'))
 state['odb'] = str((output / 'calibrated.odb').resolve())

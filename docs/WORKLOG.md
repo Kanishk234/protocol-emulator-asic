@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Prepare exact passing-checkpoint detailed routing
+
+- Hash-bind10editedartifactfilesfrom41979402848includingODB/DEF/freshNL/PNL/passreceipt/routegeometry/log. Separateworkflowrestoresoriginalsource/PDKconfigurationandpassededitedviews,constructs explicit diagnostic handoff with coherentfreshnetlists,then repeats3corner/antenna/electricalgatechecks beforeone nativeDetailedRoutingstep. Requireboundoverflow0. DRTlimit330min/job360min;4threads.
+- actionlint/embeddedPython/shell/sourcebindingchecks pass. DetailedRoutingcompletionisnotzeroDRC/extractedtiming/officialqualification; downstreammetricsneedreview. Officialjobs/mainhardware/configunchanged. Source/configportabilityworkremainsseparate. Publish/launchunderstandingapproval;no phaseexitcheckboxchanges.
+
+## 2026-11-05 — Verified passing full-design local physical screen
+
+-41979402848bothjobs pass. Independently verified editedraw6cornerreads/freshantenna/congestion,exactfreshnetlist3sizes+1diode,unrelatedDEFplacementandallunaffectedroutes. Setup0all,holdF/T/S144.394/355.043/738.651ps,electrical0all,antenna0,overflow0/live demand309924. Only2allowedoriginalplacementsand3allowedrouteschange. Save local_antenna_pass_41979402848.json/reportPHASE2_LOCAL_ANTENNA_PASS.md.
+- Clarify geometryreceipt:originalcomparecalledwithoutallowednetssoJSONlabels3permittedchangesunexpected;runtimeexplicitallowed-setgateandindependentpropercomparepass. FixfutureJSONformattingonly;nogaterelaxation.
+- Major milestone:localdiagnosticscreenpassesallgatesonfulldesign,butnotcleanofficialflowreproduction. Next bindactualeditedviewsforDRT/extractionandassesssource/configportabilityseparately. No officialjobedit,mainpromotion,phasechecklisttick,DRTlaunchorwatcherthisturn.
+
 ## 2026-11-05 — Diagnose master-swap crash and load pinned timing models
 
 -41978310217controlpasses;editedarmcrashesSIGSEGVduringnative dbInst::swapMaster timingcallbackbeforeDPL/finalgates. Downloaded1.6MBartifact;rawstackequivCellPorts/portCountandmissing-librarywarningpointtoabsentLiberty. No locality/closuremeasurementfromeditedarm.
@@ -6712,3 +6723,5 @@ Publication receipt:b077f2ftools/a443dd5tests/d913f7bCI/3b6287bdocs pushed;remot
 Publication receipt:f51c2f8tools/40d194fdocs pushed;remote main verified. Corrected no-edit calibration41976627893in progress on40d194f87c1fe27c13fa975189dc1f4257dd7ae1. No physical edit/result/watcher.
 
 Publication receipt:9dfed6ctools/4b26c73tests/2c37ec1CI/f1f82fcdocs pushed;remote mainf1f82fc7ed15386b64ea63c6c7444679cb3cc268verified. Constrainedlocalrepair41978310217in progress. No resultyet,mainhardwarepromotion,DRTorwatcher.
+
+Publication receipt:8bd6d47tools/36e69a3tests/6e5da2edocs pushed; remoteverified. Matchedcontrol/editedretry41979402848in progress on6e5da2e29971b780e6d10c8f151efa6642312a68. Noresult/watcher/DRT.

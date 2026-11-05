@@ -1,0 +1,82 @@
+{
+  "run_id": 41979402848,
+  "source_sha": "6e5da2e29971b780e6d10c8f151efa6642312a68",
+  "local_screen_passed": true,
+  "official_flow_qualified": false,
+  "raw_corner_antenna_congestion_independently_matched": true,
+  "fresh_netlist_exact_three_sizes_plus_one_diode": true,
+  "unrelated_placement_independently_preserved": true,
+  "unrelated_routes_independently_preserved": true,
+  "route_audit": {
+    "old_routed_nets": 45057,
+    "new_routed_nets": 45057,
+    "changed_nets": [
+      "_07219_",
+      "_10511_",
+      "net295"
+    ],
+    "unexpected_changed_nets": [],
+    "unchanged_routes_preserved": true,
+    "exact_roundtrip": false,
+    "physical_timing_measured": false,
+    "official_signoff": false
+  },
+  "live_route_demand": 309924,
+  "gates": {
+    "edited": true,
+    "failures": [],
+    "diagnostic_gates_passed": true,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.144394,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.738651,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.355043,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 0,
+      "antenna__violating__pins": 0
+    },
+    "overflow": 0
+  },
+  "intervention": {
+    "allowed": [
+      "_07219_",
+      "_10511_",
+      "_11579_",
+      "_19518_",
+      "net11878",
+      "net12578",
+      "net12579",
+      "net13567",
+      "net295",
+      "u_chip.g_lane[1].slots[626]"
+    ],
+    "changed_original_placements": [
+      "fanout295",
+      "wire13568"
+    ],
+    "original_connections_preserved": true,
+    "added_diodes": 1,
+    "diagnostic_only": true,
+    "post_router_placement_and_connections_verified": true
+  },
+  "detailed_routing_performed": false
+}

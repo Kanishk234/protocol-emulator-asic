@@ -18,7 +18,7 @@ def one(root, pattern):
     return paths[0]
 
 
-def main(edit):
+def main(edit, resume=False):
     manifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
     source = Path(manifest['source_state'])
     state = json.loads(source.read_text())
@@ -30,37 +30,51 @@ def main(edit):
     for item in plan['cases']:
         assert original[item['instance']][0] == item['original_master']
     output = Path('runs/targeted-diagnostic')
-    output.mkdir()
-    hook = Path('scripts/ci/targeted_antenna_size.tcl').resolve()
-    if not edit:
-        hook = (output / 'control_snapshot.tcl').resolve()
-        hook.write_text('set base [file join $::env(STEP_DIR) targeted_sizing]\nwrite_db ${base}.odb\nwrite_def ${base}.def\nwrite_verilog ${base}.nl.v\nwrite_verilog -include_pwr_gnd ${base}.pnl.v\n')
-    sizing = dict(config, STA_EXTRA_CORNER_TCL_FILE=str(hook))
-    run_step(sizing, source, output / 'sizing', ['OpenROAD.STAMidPNR'])
-    snapshot = one(output / 'sizing', '*-openroad-stamidpnr/targeted_sizing.odb').with_suffix('')
-    changed = dict(state)
-    for key, suffix in [('odb', '.odb'), ('def', '.def'), ('nl', '.nl.v'), ('pnl', '.pnl.v')]:
-        path = Path(str(snapshot) + suffix)
-        assert path.is_file()
-        changed[key] = str(path.resolve())
-    changed['metrics'] = {}
-    handoff = output / 'sized_state.json'
-    handoff.write_text(json.dumps(changed, indent=2) + '\n')
+    output.mkdir(exist_ok=resume)
+    if not resume:
+        hook = Path('scripts/ci/targeted_antenna_size.tcl').resolve()
+        if not edit:
+            hook = (output / 'control_snapshot.tcl').resolve()
+            hook.write_text('set base [file join $::env(STEP_DIR) targeted_sizing]\nwrite_db ${base}.odb\nwrite_def ${base}.def\nwrite_verilog ${base}.nl.v\nwrite_verilog -include_pwr_gnd ${base}.pnl.v\n')
+        sizing = dict(config, STA_EXTRA_CORNER_TCL_FILE=str(hook))
+        run_step(sizing, source, output / 'sizing', ['OpenROAD.STAMidPNR'])
+        snapshot = one(output / 'sizing', '*-openroad-stamidpnr/targeted_sizing.odb').with_suffix('')
+        changed = dict(state)
+        for key, suffix in [('odb', '.odb'), ('def', '.def'), ('nl', '.nl.v'), ('pnl', '.pnl.v')]:
+            path = Path(str(snapshot) + suffix)
+            assert path.is_file()
+            changed[key] = str(path.resolve())
+        changed['metrics'] = {}
+        handoff = output / 'sized_state.json'
+        handoff.write_text(json.dumps(changed, indent=2) + '\n')
+        expected = dict(original)
+        if edit:
+            for item in plan['cases']:
+                name = item['instance']
+                expected[name] = (item['candidate_master'], original[name][1])
+        assert logical_cells(Path(changed['nl']).read_text()) == expected, 'Unexpected sizing connectivity change'
+        interface = json.loads(Path('runs/native-endpoint-interface.json').read_text())
+        diode_config = dict(config, **interface['diode_config'])
+        diode_config['INSERT_ECO_DIODES'] = [dict(target='hold7969/A', placement=None)] if edit else []
+        run_step(diode_config, handoff, output / 'diode', ['Odb.InsertECODiodes'])
+        diode_state = one(output / 'diode', '*/state_out.json')
+        run_step(config, diode_state, output / 'routing', ['OpenROAD.GlobalRouting'])
+        final = one(output / 'routing', '*-openroad-globalrouting/state_out.json')
+        final_state = json.loads(final.read_text())
+    else:
+        final = one(output / 'routing', '*-openroad-globalrouting/state_out.json')
+        final_state = json.loads(final.read_text())
     expected = dict(original)
     if edit:
         for item in plan['cases']:
             name = item['instance']
             expected[name] = (item['candidate_master'], original[name][1])
-    assert logical_cells(Path(changed['nl']).read_text()) == expected, 'Unexpected sizing connectivity change'
-    interface = json.loads(Path('runs/native-endpoint-interface.json').read_text())
-    diode_config = dict(config, **interface['diode_config'])
-    diode_config['INSERT_ECO_DIODES'] = [dict(target='hold7969/A', placement=None)] if edit else []
-    run_step(diode_config, handoff, output / 'diode', ['Odb.InsertECODiodes'])
-    diode_state = one(output / 'diode', '*/state_out.json')
-    run_step(config, diode_state, output / 'routing', ['OpenROAD.GlobalRouting'])
-    final = one(output / 'routing', '*-openroad-globalrouting/state_out.json')
-    final_state = json.loads(final.read_text())
-    actual = logical_cells(Path(final_state['nl']).read_text())
+    readback_hook = (output / 'readback.tcl').resolve()
+    readback_hook.write_text('write_verilog [file join $::env(STEP_DIR) fresh.nl.v]\n')
+    run_step(dict(config, STA_EXTRA_CORNER_TCL_FILE=str(readback_hook)), final,
+             output / 'readback', ['OpenROAD.STAMidPNR'])
+    readback = one(output / 'readback', '*-openroad-stamidpnr/fresh.nl.v')
+    actual = logical_cells(readback.read_text())
     assert all(actual.get(n) == c for n, c in expected.items()), 'Original logical cell/connection changed'
     added = set(actual) - set(expected)
     assert len(added) == (1 if edit else 0)
@@ -87,4 +101,6 @@ def main(edit):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--insert', choices=['true', 'false'], required=True)
-    main(parser.parse_args().insert == 'true')
+    parser.add_argument('--resume', action='store_true')
+    args = parser.parse_args()
+    main(args.insert == 'true', args.resume)

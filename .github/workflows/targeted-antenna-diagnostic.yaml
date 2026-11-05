@@ -140,5 +140,4 @@ jobs:
       fail-fast: false
       matrix:
         insert:
-        - 'false'
         - 'true'

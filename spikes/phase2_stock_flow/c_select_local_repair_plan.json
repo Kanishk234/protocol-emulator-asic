@@ -28,7 +28,15 @@
       "anchor": "_51789_",
       "anchor_master": "sg13cmos5l_dlhq_1",
       "pin": "GATE",
-      "net": "clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk"
+      "net": "clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk",
+      "seed_offset_um": [
+        0,
+        15.12
+      ],
+      "required_displacement_y_um": [
+        13,
+        17
+      ]
     }
   ],
   "allowed_signal_nets_to_reroute": [
@@ -38,5 +46,6 @@
     "net14386",
     "net14385"
   ],
-  "scope": "Bounded diagnostic only; clock load changes must pass timing; no official source/config integration claim"
+  "scope": "Bounded diagnostic only; clock load changes must pass timing; no official source/config integration claim",
+  "placement_rationale": "Seed clock diode on original nearby Metal3 clock corridor (route Y514800 DBU) instead of congested rerouted row Y500400; no change to cells, nets, source or acceptance gates."
 }

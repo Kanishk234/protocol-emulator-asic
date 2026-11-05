@@ -1,0 +1,43 @@
+{
+  "source_run": 42078913664,
+  "repair_run": 42122049674,
+  "grid_step_dbu": 7200,
+  "changed_nets": {
+    "_02001_": {
+      "added_horizontal_edges_by_layer": {
+        "Metal3": 5
+      },
+      "removed_horizontal_edges_by_layer": {
+        "Metal3": 5
+      }
+    },
+    "u_chip.g_lane\\[1\\].ot\\[26\\]": {
+      "added_horizontal_edges_by_layer": {
+        "Metal3": 4
+      },
+      "removed_horizontal_edges_by_layer": {
+        "Metal3": 4
+      }
+    },
+    "clknet_2_0__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[0\\].g_stored.gclk": {
+      "added_horizontal_edges_by_layer": {
+        "Metal3": 34
+      },
+      "removed_horizontal_edges_by_layer": {
+        "Metal3": 34
+      }
+    }
+  },
+  "observed_overflow": {
+    "layer": "Metal3",
+    "direction": "H",
+    "maximum_per_edge": 1,
+    "total": 17
+  },
+  "clock_original_right_side_corridor_y_dbu": 514800,
+  "clock_rerouted_long_trunk_y_dbu": 500400,
+  "clock_rerouted_long_trunk_length_um": 288,
+  "interpretation": "Clock net adds34 Metal3 horizontal edges, data nets add9. This implicates the clock reroute but does not prove every overflowing edge belongs to it.",
+  "next_experiment": "Seed clock diode15.12um above anchor near original right-side clock corridor; enforce final Y displacement13..17um and original20um per-axis bound. Native routing and all gates remain fixed.",
+  "scope": "Geometry-derived placement hypothesis; no guaranteed capacity/closure prediction"
+}

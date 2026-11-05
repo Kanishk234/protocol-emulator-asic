@@ -1,0 +1,17 @@
+{
+  "scope": "Combinational identity with cached pinned PDK gate functions; passive diode omitted from SAT; no physical preservation or whole-design claim",
+  "widths": {
+    "1": true,
+    "7": true,
+    "16": true
+  },
+  "primitive_sha256": "c0affbce582dfeda4e5d35886e5c8db714335547468689ad96b5349943a70463",
+  "pdk_models_sha256": "45e93969da7b43b0ef4b55404c9a6eac400621072d73847fc9708aa580d0fdfc",
+  "added_cells_per_bit": {
+    "buf_2": 2,
+    "antennanp": 1
+  },
+  "physical_status": "unmeasured",
+  "mapped_direct_connection_audit_passed": true,
+  "native_repair_preservation_proven": false
+}

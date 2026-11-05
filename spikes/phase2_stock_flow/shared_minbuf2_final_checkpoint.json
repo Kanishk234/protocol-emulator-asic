@@ -14,7 +14,7 @@
     "digest": "sha256:fa11d3323dc0b56a15fe61958766f80d2c823ddec2e6d0da3a5c2b9ac477af6f"
   },
   "runner_root": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic",
-  "source_state": "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json",
+  "source_state": "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/state_out.json",
   "files": {
     "info.yaml": "e1174bea945602666287d058b4e116fb1ac0878225e1627d0e999858020fba07",
     "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl": "030a8907bb0ad7896a4a80a2c21e46d7088f9d7dc3e1de18269d316759afc30d",
@@ -36,12 +36,6 @@
     "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/state_out.json": "f95798f9c6c36b782097f55bbc3626688524709990dd5fb538a92c44b2be7e86",
     "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.def": "fa54a9e0a56465ee8e96b1e6163e51658ef178f0a8bd769b252acd2771a2128b",
     "runs/stock-official-baseline/43-openroad-repairantennas/1-openroad-diodeinsertion/tt_um_tripwire.odb": "fa5aec55e788e7b844cc2c9ed540c47f571969d3a357fa895a48ca7557a0e57d",
-    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "59af1eea759b9e279d87570b0c1c148128fde84f99b89b3a82eb1c5fc996c189",
-    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "e04d7c388e474d035435a41ce9fc0c6e17b66ccc601521d814085e1139a59544",
-    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.odb": "b5b219c40b9544d621789bc2b5dcc41574f7a5c092717da2dffbdd997b9f0564",
-    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.pnl.v": "439eb4049475dfc65423f19f337072d875c75e637a6204b5272f17b92b9ebe94",
-    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.sdc": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba",
-    "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json": "2434ce4faaa220e21d0c72cb6ab7121add36a36ddfaaa9691694e598753c3c17",
     "runs/stock-official-baseline/resolved.json": "3aa15ff44413f2e7e3e3ca05ef29d947aed932fc651e2b64b0a1704e44c343f1",
     "src/RM_IHPSG13_1P_512x16_c2_bm_bist.v": "4a03d7cd63892f1986493339803d6f323b497ae332b2207c2cfd48e3053eb602",
     "src/config.json": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567",
@@ -76,7 +70,13 @@
     "src/trw_sram.v": "176405635df07e175a800c13ea29ddf065ca078c1da733d1f681adc833ab53ac",
     "src/trw_sync.v": "815ed75caac39b4b9ce951cdf95f95d2a6631e7070b2bd3659fe21fc5a895bb7",
     "src/tt_um_tripwire.v": "f92ba2a7fef45ebb3fb26c01fcb1c3598bb66ef9938c1641b5414ab0bc9c0de9",
-    "src/user_config.json": "fcf514ca52643f2f6925a8e348379fd070745e503eed44a3aa0b2846a06f463e"
+    "src/user_config.json": "fcf514ca52643f2f6925a8e348379fd070745e503eed44a3aa0b2846a06f463e",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/state_out.json": "5b6fb8d654dfa32f154bb51ed152e30a02ef5761b23fe974def91c9499ef49bc",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.odb": "b5b219c40b9544d621789bc2b5dcc41574f7a5c092717da2dffbdd997b9f0564",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "59af1eea759b9e279d87570b0c1c148128fde84f99b89b3a82eb1c5fc996c189",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "e04d7c388e474d035435a41ce9fc0c6e17b66ccc601521d814085e1139a59544",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.pnl.v": "439eb4049475dfc65423f19f337072d875c75e637a6204b5272f17b92b9ebe94",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.sdc": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba"
   },
   "recipe": "shared_minbuf2",
   "toolchain": {
@@ -86,6 +86,6 @@
     "stock_image": "ghcr.io/librelane/librelane:3.1.0.dev3",
     "stock_digest": "sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a"
   },
-  "purpose": "Frozen final minbuf2 source for diagnostic-only native endpoint diode insertion/control. No promotable recipe or qualification.",
+  "purpose": "Read-only repeated all-corner STA and fresh antenna audit before late repair on the measured minbuf2 source. No physical repair, rerouting, saved-state rewrite, qualification or DRT.",
   "known_congestion": "Earlier stage overflow must be independently reviewed before any changed native recipe is qualified; this read-only audit does not authorize DRT."
 }

@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Correct escaped OpenDB names in read-only geometry probe
+
+- Audit42110354960 fails in diagnostic lookup after successful43-file restore/toolchain/PDK checks. Exact error is missing logical lane1 ot26 net; native route export uses escaped bracket names. This is our probe bug; no new physical qualification result follows. Save cause/fix in BUGS.
+- Resolve only a unique exact logical/escaped net spelling; reject collisions. Pass actual database net name to native antenna checker and use the same resolver for tracked functional Q nets. Expand real-Tcl regressions for escaped names and ambiguous spellings:29 probe/checkpoint recovery tests pass; actionlint and diff checks pass. No source/config/gate or official job change.
+- Recover useful completed geometry export:44792 routed nets, canonical geometry SHA cd7e2eb16f97336c46affa835823fb35a4b810ffea5d2d070e928b0f6ba68c79. Save c_select_route_reference.json for future no-edit calibration; this is not a successful router reopen or completed timing/antenna audit. Full3.11MB diagnostic artifact recovered with per-entry CRC.
+- Published the scoped fix/reference through3296e751f35c6886ad6b0f048932cc91e9608a5c and launched the same read-only audit once under standing approval: [42116068868](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42116068868), confirmed in progress on that SHA. Next verify complete geometry/clock/path readback before receiver repair. No DRT, phase tick or extracted timing claim.
+
 ## 2026-11-05 — Bind C-selector geometry and clock-load diagnostic
 
 - Trace the four actual failed receivers to fabric channel4 pending_clear D, lane1 ot26 delay input, unit0 configuration word0 bit6 latch GATE, and a native routing-buffer input. Larger equivalent cells exist for DFRBPQ/BUF2; not for DLHQ1 or DLYGATE4SD3. Do not reuse the old receiver list or add clock load without measuring paths/skew.

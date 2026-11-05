@@ -111,3 +111,12 @@ a first-order ratio estimate226.65→153.60 if geometry stayed fixed. Actual
 upstream loading and rerouting still require measurement. The delay and latch
 clock receivers have no larger equivalent input cell. See
 `c_select_receiver_feasibility.json` for the pinned geometry receipt.
+
+
+Audit42110354960 stopped after route export because the diagnostic looked up an
+unescaped hierarchical net name. No completed clock/path audit is available from
+that run. The fix resolves only a unique exact logical/escaped spelling and
+passes actual database names to the antenna checker.29 Tcl/checkpoint tests pass,
+including escaped names and ambiguity rejection. Corrected audit
+[42116068868](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42116068868)
+was launched on `3296e751f35c6886ad6b0f048932cc91e9608a5c`.

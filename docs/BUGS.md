@@ -313,3 +313,6 @@ Calibration41975191740fails before design load: embedded Python importlibrelane 
 ### 2026-11-05 — Native master swap crashes without loaded Liberty
 
 41978310217editedarmSIGSEGVinside sta::equivCellPorts/dbStaCbk::inDbInstSwapMasterBefore during dbInst::swapMaster;noeditcontrolpasses. Geometric database had no timinglibraries loaded (GRT-0300warning), so swap callback lacks cell data. Load exact resolved default-corner standard/I/O/macroLibertybeforeDBread and verify each original/replacementlibrarycell exists beforeedits. Newselectiontestsrejectmissing/ambiguous/unresolvedmodels. Nativecorrectedruntimepending;no newphysicalresultclaimed.
+
+
+2026-11-05 C-selector geometry audit net lookup: run42110354960 restores all43 bound files and exports geometry/readback, then fails at logical `u_chip.g_lane[1].ot[26]`. Root cause: the new diagnostic assumed Verilog's logical bracket spelling was identical to OpenDB's escaped name. Fix the diagnostic to resolve a unique exact logical/escaped spelling, pass the database's actual name to the antenna checker, and reject ambiguity. Regressions execute Tcl for logical and escaped names plus missing clock, ambiguous spelling and ambiguous driver cases.29 probe/checkpoint tests pass; native rerun pending. No physical/timing fix or acceptance change is claimed.

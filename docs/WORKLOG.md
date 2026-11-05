@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Diagnose master-swap crash and load pinned timing models
+
+-41978310217controlpasses;editedarmcrashesSIGSEGVduringnative dbInst::swapMaster timingcallbackbeforeDPL/finalgates. Downloaded1.6MBartifact;rawstackequivCellPorts/portCountandmissing-librarywarningpointtoabsentLiberty. No locality/closuremeasurementfromeditedarm.
+- Adddefault-cornerresolvedLibertyselection:2standard/IOfiles+1SRAMfilefromexactsourceconfig. LoadbeforeDBread;verifyallrequiredoriginal/replacementcellsexistbeforeedits. Noenginepatch/constraintchanges.20library/locality/routeauditregressionspass;actualrecipe3file selectionpasses.
+- Rerunbothcontrolandeditedwithsame loadedlibraries tocalibrateanyenvironmentdifference. Standingpublicationapproval;noDRT/mainhardware/officialworkflowchangeorphaseclaim.
+
 ## 2026-11-05 — Prepare constrained incremental three-size/one-diode test
 
 - Extend calibrated native reopen path with optional bounded intervention. Only3sizingtargets+fanout295neighbor may move;allotheroriginalinstances lockedduringnativeDPLandchecked for exactlocation/orientation/status beforeandafterincrementalrouter. Originalsignalconnections/mastersconservedexcept3approvedstrengths;exact1diodeatdelayinput. Routerdirtynetlistlimitedtoincidentnets;exportedauditrejects anyroutechangeoutsidepredeclaredset.
@@ -6704,3 +6710,5 @@ Movement breakdown: 28originalinstances changedXY;20506changedorientation. Unres
 Publication receipt:b077f2ftools/a443dd5tests/d913f7bCI/3b6287bdocs pushed;remote main3b6287bae9b3abdbcf8b35dc7add6d848199cb9dverified. No-edit calibration41975191740in progress. No design edit inthisrun; no watcher or DRT.
 
 Publication receipt:f51c2f8tools/40d194fdocs pushed;remote main verified. Corrected no-edit calibration41976627893in progress on40d194f87c1fe27c13fa975189dc1f4257dd7ae1. No physical edit/result/watcher.
+
+Publication receipt:9dfed6ctools/4b26c73tests/2c37ec1CI/f1f82fcdocs pushed;remote mainf1f82fc7ed15386b64ea63c6c7444679cb3cc268verified. Constrainedlocalrepair41978310217in progress. No resultyet,mainhardwarepromotion,DRTorwatcher.

@@ -309,3 +309,7 @@ Follow-up41968668727: first spelling correction was incomplete because wrapped l
 ### 2026-11-05 — OpenROAD embedded Python lacks host LibreLane package
 
 Calibration41975191740fails before design load: embedded Python importlibrelane raisesModuleNotFoundError, although container python3hasthatpackage. Remove package import/OdbReaderdependency; use native openroadTech/Design and the same routing-setup calls from pinned helper. No sys.path injection of incompatible external packages. Scriptcompile/actionlint and17routeaudit regressionspass; native runtime stillpending. No route-preservation result from failedjob.
+
+### 2026-11-05 — Native master swap crashes without loaded Liberty
+
+41978310217editedarmSIGSEGVinside sta::equivCellPorts/dbStaCbk::inDbInstSwapMasterBefore during dbInst::swapMaster;noeditcontrolpasses. Geometric database had no timinglibraries loaded (GRT-0300warning), so swap callback lacks cell data. Load exact resolved default-corner standard/I/O/macroLibertybeforeDBread and verify each original/replacementlibrarycell exists beforeedits. Newselectiontestsrejectmissing/ambiguous/unresolvedmodels. Nativecorrectedruntimepending;no newphysicalresultclaimed.

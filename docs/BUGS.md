@@ -295,3 +295,7 @@ Follow-up to BUG144 (2026-10-28): shared-priority40762963258has six residual ant
 ### 2026-11-04 — Native mirroring audit expected an unlogged command
 
 Symptom: both antenna-mode replay jobs41915437265failed after completed physical measurements with “Late mirroring missing”. Root cause: native dpl.tcl invokes optimize_mirroring without log_cmd, so the expected echoed command is absent. Actual DPL-0020 completion messages confirm20500instances mirrored. Caught by replay audit. Fix requires the anchored native completion message, including valid zero count; test_native_mirroring_audit.py rejects absent completion, comment text and command-only logs. Five regression checks pass. Original failed CI is not reclassified; recovered measurements remain diagnostic.
+
+### 2026-11-05 — Targeted sizing preflight used Verilog rather than OpenDB bus spelling
+
+41966771228edited arm stopped before mutation at _38673_/B: expected u_chip.g_lane[1].slots[626], native getName returns escaped closing brackets. Correct exact expected Tcl literal to native spelling; no normalization or gate relaxation. Actual Tcl target-list evaluation now retains native escapes; seven helper preflight/mutation regressions pass via Yosys Tcl. Control arm completed. Retry edited arm only; no physical repair result claimed from original failed arm.

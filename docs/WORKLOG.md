@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Fix exact native net identity before targeted edits
+
+-41966771228control completes;edited arm stops before anymutation because expected _38673_/B used Verilog bus spelling instead of exact native OpenDB name with escaped closing brackets. Fix only Tcl expected literal, retaining every strict master/pin/net preflight. Actual Tcl list evaluation and7helper regressions pass; actionlint/diff checks pass.
+- Retry only edited matrix arm, retaining completed control41966771228. Publication/dispatch under standing approval; no main hardware/config/official jobs or signoff gate changes. No passing repair claim yet.
+
 ## 2026-11-04 — Finish targeted three-size/one-diode diagnostic runner
 
 - Add targeted_antenna_diagnostic.py and separate paired workflow restoring exact frozen final reference. Edited arm: preflight3masters/pins→replace3cells→native detailed placement/checkplacement→explicit ODB/DEF/NL/PNLsnapshot→native one-diode hold7969/A insertion→native GlobalRouting→fresh repeated3cornerSTA/antenna. Empty control snapshots/reroutes same source without edits.
@@ -6643,3 +6648,5 @@ Publication receipt:9267f6fCI/ce42456docs pushed; remote maince42456c28903a40ae6
 Publication receipt: automatic review initially timed out before execution; permitted single retry succeeded. Published2c53645tools/0cd1804CI/ac6392devidence; remote mainac6392d1ca8913a2dd6ccaed3b5cdb0f9770e211verified. Read-only geometry audit41940634866confirmed in progress. No new physical repair experiment, DRT or watcher.
 
 Publication receipt:fa0cdd9prototype/f9b8e6etools/bfa27afCI/b619ca9docs pushed; remote mainb619ca960a6d8ef9943db77e5a6e94d2b282bf69verified. Small receiver preservation41946993488in progress. All owned local commands complete; no watcher/mainhardwareintegration/DRT.
+
+Publication receipt:6169cd5tools/06e52bdCI/ea9e3f0docs pushed; remote mainea9e3f00479c6a979bda9bd7510bb130b4b3f27averified. Paired targeted diagnostic41966771228queued on exactSHA. No physical results yet, DRT or watcher.

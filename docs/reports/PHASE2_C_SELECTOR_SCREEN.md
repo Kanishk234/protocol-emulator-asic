@@ -170,3 +170,28 @@ was checked at OpenROAD commitdcf36133a369abc8f3c5e5738cd4d82e4903c0e0
 never resume the invalid edited checkpoint. No acceptance threshold changes.
 
 Corrected paired run [42122049674](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42122049674) was launched on `d54b84d9dba1904702102588ecd629e7d82f81a3`; results pending.
+
+
+## Legal repair result and clock-corridor placement test
+
+Corrected run42122049674's control passes. The edited arm passes native
+legalization and pre/post-router placement checks with no native ERROR entries.
+All estimated timing/electrical checks pass, antennas are0, and unrelated
+original cells/routes are preserved. It still fails live global overflow:
+**17 horizontal Metal3 overflow units**. This is a genuine remaining routing
+failure, unlike the earlier invalid-placement run.
+
+Only three diode-connected nets change routes. The clock reroute adds34 Metal3
+horizontal grid edges; the two data nets add9. Its new long trunk runs288µm at
+Y500400DBU, crossing a heavily used row. The previous clock route uses a detour
+and has an existing right-side corridor atY514800. These observations implicate
+the clock reroute without proving every overloaded edge belongs to it.
+
+The next bounded placement test seeds only the clock diode15.12µm above its
+anchor and requires final Y displacement13..17µm, keeping the original20µm
+per-axis limit. It aims to extend that upper corridor. Same diodes/buffer,
+footprint, source, timing constraints, native routing and all acceptance gates.
+Placement metadata is exported for interpretation.76 related regressions pass.
+The test is unmeasured and does not guarantee zero overflow or official closure.
+
+Clock-corridor placement test [42125394009](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42125394009) was launched on `8434831bc07f7c47916089c3afb1078974fdaa1e`; results pending.

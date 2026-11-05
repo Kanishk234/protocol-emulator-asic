@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Legal C-selector repair leaves17 Metal3 overflow; target clock corridor
+
+- Corrected42122049674 control passes. Edited arm now passes native legalization and both placement checks, with no ERROR log entries. Original/signoff timing and electrical checks pass; antenna0; unrelated original cells/routes preserved. Strict final gate correctly fails only overflow17 (Metal3 horizontal,max1/edge). Save c_select_repair_result_42122049674.json. No DRT/extraction/official claim.
+- Independently compare bound before/after geometry: only three diode-connected nets differ. Clock adds34 horizontal M3 edges, data nets add9; new clock trunk288um atY500400 replaces the previous detour. Existing right-side clock corridorY514800 motivates one placement test, not an exclusive-cause proof. Save c_select_clock_corridor_analysis.json.
+- Same source/three diodes/BUF4/21.7728um2 footprint and native routing settings. Seed clock diode+15.12um Y, require final Y offset13..17um and original20um per-axis bound. All unrelated original cells locked and only five incident nets allowed to reroute. Export final diode placements. Do not relax zero-overflow or timing gates.76 locality/Tcl/library/route/checkpoint regressions pass.
+- Published tools/evidence through8434831bc07f7c47916089c3afb1078974fdaa1e and launched one paired placement diagnostic under standing approval: [42125394009](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42125394009), confirmed in progress on that SHA. Official jobs/main RTL/config unchanged; no phase tick. Next inspect legal placement, control reproduction and all edited gates before considering DRT.
+
 ## 2026-11-05 — Reject illegal placement in first C-selector repair and correct launcher
 
 - Run42119036887 control passes exact geometry/timing reproduction. Edited gate reports antenna0/electrical0 and original worst slacks unchanged, but overflow17. Native-log inspection reveals a more fundamental invalid placement: STA-0564 rejects extra positional argument in our displacement command; DPL-0033 shows all three diodes overlap anchors. Python evalTclString silently returned after Tcl errors. Withdraw edited physical qualification; save c_select_repair_result_42119036887.json. Do not treat its apparent antenna pass as a valid solution or reuse its checkpoint.

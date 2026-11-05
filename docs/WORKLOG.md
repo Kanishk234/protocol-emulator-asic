@@ -2,6 +2,33 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Prepare small protected receiver native test
+
+- Add separate protected-receiver-preservation workflow: identical7bitprobe/protectedRXenabled versusdisabled, stocknativeflowthroughfinalSTA. Require7directdiode/receiverconnections and complete21objectcoverage in all4native repairlogs for protected arm. Record geometry via read-only route export/per-netantenna reports and fresh whole-probe antenna checks. No full-design closure claim; lower-layer efficacy must be assessed from reports.
+- Local PDKidentitySAT1/7/16already passes; actual mapped7bit connectivity parser accepts source and rejects all disconnected-diode mutants. actionlint/embedded Python/shell validation passes. Cost2BUF2+1diode perbit; data/latency unchanged. Publish isolated prototype/tools/ownCI/docs under standing approval; no main integration, DRT or phase tick.
+
+## 2026-11-04 — Prototype general protected receiver locally
+
+- Added isolated trw_protected_receiver primitive under spikes: perbit driverBUF2→namednet withdiode→receiverBUF2, functional identity/no state or ISA change. PDK-model SAT proofs1/7/16bits pass; library-cell synthesis JSON audit confirms each diode directly shares exactly one driver output/one receiver input. Cost2BUF2+1diode perbit, timing/area/layout efficacy unmeasured.
+- This is not a fix for arbitrary downstream gates inserted by repair. Next require small native physical test of lower-layer diode-to-receiver connection and preservation, then determine source integration boundaries for all four functions. No main source/config integration, physical workflow launch, publication or phase tick; official jobs/unrelated files preserved. Local proof receipt explicitly limits claims; no new global parameter sweep.
+
+## 2026-11-04 — Map exposed branches to functions and assess source protection
+
+- Saved bounded mapped-cone/function trace in reference_antenna_function_trace.json. _10511_upstream reaches lane1register-read bits; _19518_is direct lane0/lane1rpc0mux selected by hostlk0. net11878traces through native buffers to NAND_31775_ and failing NANDalso consumes lane1slots626; exact source selector proof pending. net12579native buffer tree roots atAND4_31257_includingport_state30and feeds configuration muxes.
+- These are multiple general functions, not one selector family. Buffers introduced downstream of source signals mean upstream diode protection alone is insufficient. Required next implementation assessment: sink-local protection or lower-layer continuity surviving native buffer insertion; cannot claim a source-only guard solves repair-generated gates. No new parameter run, source promotion or official-job edit. Existing inferred source labels explicitly bounded, not equivalence proofs.
+
+## 2026-11-04 — Trace fabrication-layer protection mechanism
+
+- Pinned26Q2AntennaChecker.cc calculateAreas accumulates diffusion only on the current connected component; checkCAR selects diffusion-based allowance when diffusion is present, ordinary CARotherwise. This explains computed allowance14136→200without constraint edits.
+- Reconstructed exported global-route grid connectivity at7200DBU: _10511_,net11878,net12579have one Metal1-access component at ceilingMetal3before, but3/2/2components after, becoming connected only atMetal4. _19518_requiresMetal4bothstages; preMetal2CAR116.74→239.72final, crossing200. Save antenna_route_layer_connectivity.json; graph is guide-derived, not full pin-resolved checker polygons.
+- Fix requirements now specific: preserve lower-layer driver-diffusion connection for first three branches, or add local gate-side protection; reduce exposed lower-layer metal/local protection for fourth. Neither global margin nor disabling mirroring addresses these requirements. Next map these repair-generated branches back to general source primitives and evaluate permitted official-flow-compatible protection/locality implementation; no new blind physical experiment. Main source/config/officialjobs unchanged; no DRT, publication or phase tick this turn.
+
+## 2026-11-04 — Geometry audit reveals layer-dependent antenna protection change
+
+- Both41940634866read-only jobs pass (~8min). Selected report/segment ZIP entries recovered with CRC checks. Parsed exact native route segments and per-pin/layer CAR/limits for four branches. Save antenna_geometry_result_41940634866.json; no repair or rerouting run.
+- net11878NAND input: pre-lateMetal3CAR221.99/limit14136(clean),final215.81/200(fail),while global route gainsMetal4. Thus failure is not increased wire area alone: reported protection/allowance at a fabrication layer changes with routing. Limits are PDK-calculated effective allowances, not edited constraints. Precise diffusion/component attribution still needs checker connectivity analysis.
+- Other branches also reroute acrosslayers: net12579Metal2length28800→432000DBU; _19518_Metal4length439200→144000; _10511_gainsMetal4. Existing gates/connections preserved per prior trace. Next target route-layer/protection continuity for these fourbranches; do not repeat global margin sweep. No physical experiment, DRT, phase tick or official-job/source/config change this turn.
+
 ## 2026-11-04 — Prepare read-only before/after antenna geometry audit
 
 - Existing antenna-clean report omits clean-net ratio detail. Add separate two-checkpoint read-only audit: exact stage43versus44ofreference41569397169, native route segment export and four per-net antenna reports, plus existing repeated corner/whole-design antenna and circuit-readback checks. No repair/placement/routing invoked. Final checkpoint manifest validates against cached artifact. Pinned native Tcl confirms per-net/report_file support.
@@ -6579,3 +6606,5 @@ Publication receipt:8a37b2fmanifest/84faa95CI/725712fevidence pushed; remote mai
 Publication receipt:5c08df0/5da1fc3/4aaeb24/dca764bpushed; remote verified after push. Recovered diode control fast144.394ps/4ant/0overflow; mixed25.3043ps/4ant/0overflow. Mixed rejected. No new physical dispatch or watcher.
 
 Publication receipt:9267f6fCI/ce42456docs pushed; remote maince42456c28903a40ae613290879c1302ba00fcedverified. Native antenna margin50replay41928478235queued on exact SHA. No result/DRT/watcher; all owned local commands finished.
+
+Publication receipt: automatic review initially timed out before execution; permitted single retry succeeded. Published2c53645tools/0cd1804CI/ac6392devidence; remote mainac6392d1ca8913a2dd6ccaed3b5cdb0f9770e211verified. Read-only geometry audit41940634866confirmed in progress. No new physical repair experiment, DRT or watcher.

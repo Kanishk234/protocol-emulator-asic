@@ -1,0 +1,526 @@
+{
+  "scope": "Bounded mapped cone and buffer-collapsed sinks; not full source equivalence proof",
+  "nets": {
+    "_10511_": {
+      "upstream_cells": [
+        {
+          "instance": "_37504_",
+          "master": "sg13cmos5l_and2_1",
+          "output_net": "_10511_",
+          "depth": 0
+        },
+        {
+          "instance": "_37503_",
+          "master": "sg13cmos5l_a22oi_1",
+          "output_net": "_10510_",
+          "depth": 1
+        },
+        {
+          "instance": "wire15194",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net15193",
+          "depth": 2
+        },
+        {
+          "instance": "_37320_",
+          "master": "sg13cmos5l_and2_1",
+          "output_net": "_10327_",
+          "depth": 2
+        },
+        {
+          "instance": "fanout1524",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net1524",
+          "depth": 3
+        },
+        {
+          "instance": "fanout1525",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net1525",
+          "depth": 4
+        },
+        {
+          "instance": "fanout1526",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net1526",
+          "depth": 3
+        },
+        {
+          "instance": "fanout1527",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net1527",
+          "depth": 4
+        },
+        {
+          "instance": "wire15141",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net15140",
+          "depth": 2
+        },
+        {
+          "instance": "_37322_",
+          "master": "sg13cmos5l_nor2_1",
+          "output_net": "_10329_",
+          "depth": 2
+        },
+        {
+          "instance": "hold7968",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "output_net": "net7967",
+          "depth": 1
+        },
+        {
+          "instance": "_37502_",
+          "master": "sg13cmos5l_a22oi_1",
+          "output_net": "_10509_",
+          "depth": 2
+        },
+        {
+          "instance": "wire15154",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net15153",
+          "depth": 3
+        },
+        {
+          "instance": "_37319_",
+          "master": "sg13cmos5l_nor2b_1",
+          "output_net": "_10326_",
+          "depth": 3
+        },
+        {
+          "instance": "wire14340",
+          "master": "sg13cmos5l_buf_8",
+          "output_net": "net14339",
+          "depth": 3
+        },
+        {
+          "instance": "hold7967",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "output_net": "net7966",
+          "depth": 4
+        },
+        {
+          "instance": "_37321_",
+          "master": "sg13cmos5l_nor2b_1",
+          "output_net": "_10328_",
+          "depth": 3
+        }
+      ],
+      "named_or_bounded_boundaries": [
+        "_10321_",
+        "_10325_",
+        "net15173",
+        "u_chip.g_lane[1].regs[39]",
+        "u_chip.g_lane[1].regs[55]",
+        "u_chip.g_lane[1].regs[7]"
+      ],
+      "downstream_logic": [
+        {
+          "instance": "_38359_",
+          "master": "sg13cmos5l_o21ai_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_11323_"
+          ]
+        },
+        {
+          "instance": "_39304_",
+          "master": "sg13cmos5l_a21oi_1",
+          "input_pin": "A2",
+          "output_names": [
+            "_00595_"
+          ]
+        }
+      ]
+    },
+    "_19518_": {
+      "upstream_cells": [
+        {
+          "instance": "_48371_",
+          "master": "sg13cmos5l_mux2_1",
+          "output_net": "_19518_",
+          "depth": 0
+        },
+        {
+          "instance": "fanout2635",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net2635",
+          "depth": 1
+        },
+        {
+          "instance": "wire14276",
+          "master": "sg13cmos5l_buf_4",
+          "output_net": "net14275",
+          "depth": 2
+        },
+        {
+          "instance": "fanout2639",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net2639",
+          "depth": 3
+        },
+        {
+          "instance": "fanout2660",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net2660",
+          "depth": 4
+        },
+        {
+          "instance": "wire13960",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net13959",
+          "depth": 1
+        },
+        {
+          "instance": "wire13961",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net13960",
+          "depth": 2
+        },
+        {
+          "instance": "fanout3602",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net3602",
+          "depth": 3
+        },
+        {
+          "instance": "hold10755",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "output_net": "net10754",
+          "depth": 4
+        }
+      ],
+      "named_or_bounded_boundaries": [
+        "u_chip.g_lane[0].rpc[0]",
+        "u_chip.g_lane[1].rpc[0]",
+        "u_chip.u_host.lk[0]"
+      ],
+      "downstream_logic": [
+        {
+          "instance": "_48374_",
+          "master": "sg13cmos5l_a22oi_1",
+          "input_pin": "A2",
+          "output_names": [
+            "_19521_"
+          ]
+        }
+      ]
+    },
+    "net11878": {
+      "upstream_cells": [
+        {
+          "instance": "wire11879",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net11878",
+          "depth": 0
+        },
+        {
+          "instance": "wire11880",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net11879",
+          "depth": 1
+        },
+        {
+          "instance": "wire11881",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net11880",
+          "depth": 2
+        },
+        {
+          "instance": "wire11882",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net11881",
+          "depth": 3
+        },
+        {
+          "instance": "wire11883",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net11882",
+          "depth": 4
+        }
+      ],
+      "named_or_bounded_boundaries": [
+        "net11883"
+      ],
+      "downstream_logic": [
+        {
+          "instance": "_38673_",
+          "master": "sg13cmos5l_nand2_1",
+          "input_pin": "A",
+          "output_names": [
+            "_11579_"
+          ]
+        }
+      ],
+      "collapsed_upstream_chain": [
+        {
+          "instance": "wire11879",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net11879",
+            "X": "net11878"
+          }
+        },
+        {
+          "instance": "wire11880",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net11880",
+            "X": "net11879"
+          }
+        },
+        {
+          "instance": "wire11881",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net11881",
+            "X": "net11880"
+          }
+        },
+        {
+          "instance": "wire11882",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net11882",
+            "X": "net11881"
+          }
+        },
+        {
+          "instance": "wire11883",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net11883",
+            "X": "net11882"
+          }
+        },
+        {
+          "instance": "wire11884",
+          "master": "sg13cmos5l_buf_4",
+          "pins": {
+            "X": "net11883",
+            "A": "net402"
+          }
+        },
+        {
+          "instance": "fanout402",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "_05381_",
+            "X": "net402"
+          }
+        },
+        {
+          "instance": "_31775_",
+          "master": "sg13cmos5l_nand2_1",
+          "pins": {
+            "Y": "_05381_",
+            "A": "_05379_",
+            "B": "_05380_"
+          }
+        }
+      ]
+    },
+    "net12579": {
+      "upstream_cells": [
+        {
+          "instance": "wire12580",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net12579",
+          "depth": 0
+        },
+        {
+          "instance": "wire12581",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net12580",
+          "depth": 1
+        },
+        {
+          "instance": "wire12582",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net12581",
+          "depth": 2
+        },
+        {
+          "instance": "wire12583",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net12582",
+          "depth": 3
+        },
+        {
+          "instance": "wire12584",
+          "master": "sg13cmos5l_buf_2",
+          "output_net": "net12583",
+          "depth": 4
+        }
+      ],
+      "named_or_bounded_boundaries": [
+        "net1319"
+      ],
+      "downstream_logic": [
+        {
+          "instance": "_31347_",
+          "master": "sg13cmos5l_mux2_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_04953_"
+          ]
+        },
+        {
+          "instance": "_31605_",
+          "master": "sg13cmos5l_mux2_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_05211_"
+          ]
+        },
+        {
+          "instance": "_31677_",
+          "master": "sg13cmos5l_mux2_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_05283_"
+          ]
+        },
+        {
+          "instance": "_31715_",
+          "master": "sg13cmos5l_mux2_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_05321_"
+          ]
+        },
+        {
+          "instance": "_31258_",
+          "master": "sg13cmos5l_mux2_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_04864_"
+          ]
+        },
+        {
+          "instance": "_31384_",
+          "master": "sg13cmos5l_a21oi_1",
+          "input_pin": "A2",
+          "output_names": [
+            "_04990_"
+          ]
+        },
+        {
+          "instance": "_31443_",
+          "master": "sg13cmos5l_a21oi_1",
+          "input_pin": "A2",
+          "output_names": [
+            "_05049_"
+          ]
+        },
+        {
+          "instance": "_31455_",
+          "master": "sg13cmos5l_mux2_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_05061_"
+          ]
+        },
+        {
+          "instance": "_31517_",
+          "master": "sg13cmos5l_a21oi_1",
+          "input_pin": "A2",
+          "output_names": [
+            "_05123_"
+          ]
+        },
+        {
+          "instance": "_31553_",
+          "master": "sg13cmos5l_a21oi_1",
+          "input_pin": "A2",
+          "output_names": [
+            "_05159_"
+          ]
+        },
+        {
+          "instance": "_31567_",
+          "master": "sg13cmos5l_a21oi_1",
+          "input_pin": "A2",
+          "output_names": [
+            "_05173_"
+          ]
+        },
+        {
+          "instance": "_31664_",
+          "master": "sg13cmos5l_mux2_1",
+          "input_pin": "A1",
+          "output_names": [
+            "_05270_"
+          ]
+        }
+      ],
+      "collapsed_upstream_chain": [
+        {
+          "instance": "wire12580",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net12580",
+            "X": "net12579"
+          }
+        },
+        {
+          "instance": "wire12581",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net12581",
+            "X": "net12580"
+          }
+        },
+        {
+          "instance": "wire12582",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net12582",
+            "X": "net12581"
+          }
+        },
+        {
+          "instance": "wire12583",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net12583",
+            "X": "net12582"
+          }
+        },
+        {
+          "instance": "wire12584",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "net1319",
+            "X": "net12583"
+          }
+        },
+        {
+          "instance": "fanout1319",
+          "master": "sg13cmos5l_buf_2",
+          "pins": {
+            "A": "_04863_",
+            "X": "net1319"
+          }
+        },
+        {
+          "instance": "_31257_",
+          "master": "sg13cmos5l_and4_1",
+          "pins": {
+            "A": "u_chip.port_state[30]",
+            "B": "_04862_",
+            "C": "_04854_",
+            "D": "_04860_",
+            "X": "_04863_"
+          }
+        }
+      ]
+    }
+  },
+  "interpretation": {
+    "_10511_": "Bounded upstream cone includes lane1 register read bits; exact source expression not proven.",
+    "_19518_": "Direct upstream mux chooses lane0/lane1 rpc[0] using host lk[0]; host routine-PC readback.",
+    "net11878": "Repair buffer tree driven by mapped NAND _31775_; failing NAND also consumes lane1 slots[626]. Source selector equivalence not proven.",
+    "net12579": "Repair buffer tree rooted at AND4 _31257_, including port_state[30], feeding configuration mux inputs."
+  }
+}

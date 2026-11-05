@@ -1,0 +1,122 @@
+{
+  "scope": "Global-route grid connectivity of Metal1 access points at layer ceilings; not pin-resolved checker polygons",
+  "grid_step_dbu": 7200,
+  "results": {
+    "before": {
+      "_10511_": {
+        "2": {
+          "metal1_access_points": 3,
+          "components_containing_metal1_access": 2
+        },
+        "3": {
+          "metal1_access_points": 3,
+          "components_containing_metal1_access": 1
+        },
+        "4": {
+          "metal1_access_points": 3,
+          "components_containing_metal1_access": 1
+        }
+      },
+      "_19518_": {
+        "2": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "3": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "4": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        }
+      },
+      "net11878": {
+        "2": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "3": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        },
+        "4": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        }
+      },
+      "net12579": {
+        "2": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "3": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        },
+        "4": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        }
+      }
+    },
+    "after": {
+      "_10511_": {
+        "2": {
+          "metal1_access_points": 3,
+          "components_containing_metal1_access": 3
+        },
+        "3": {
+          "metal1_access_points": 3,
+          "components_containing_metal1_access": 3
+        },
+        "4": {
+          "metal1_access_points": 3,
+          "components_containing_metal1_access": 1
+        }
+      },
+      "_19518_": {
+        "2": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "3": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "4": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        }
+      },
+      "net11878": {
+        "2": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "3": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "4": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        }
+      },
+      "net12579": {
+        "2": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "3": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 2
+        },
+        "4": {
+          "metal1_access_points": 2,
+          "components_containing_metal1_access": 1
+        }
+      }
+    }
+  }
+}

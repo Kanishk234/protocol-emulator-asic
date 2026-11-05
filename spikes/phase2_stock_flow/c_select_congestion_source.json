@@ -1,0 +1,24 @@
+{
+  "run": {
+    "id": 42128655779,
+    "head_sha": "a277802e7b698d7575fe55d872f4e750c5e0ec56",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-c-select-local-repair.yaml",
+    "conclusion": "failure"
+  },
+  "artifact": {
+    "id": 13461739412,
+    "name": "c-select-local-true-42128655779",
+    "size_in_bytes": 258913554,
+    "expired": false,
+    "digest": "sha256:339eabfa32f244ee3855a79664b99f1472b899f834bc547096fb9380fe429917"
+  },
+  "odb": {
+    "path": "runs/route-reopen-calibration/calibrated.odb",
+    "sha256": "64a2d0f18392a3fdd697979ce87c8663ce1b45f43cc2d0e58e764de5a5dc6b36"
+  },
+  "segments": "runs/route-reopen-calibration/after.segments",
+  "expected_overflow": 15,
+  "image": "ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a",
+  "scope": "Read-only diagnosis of an unqualified repaired checkpoint; no timing/physical repair"
+}

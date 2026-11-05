@@ -1,0 +1,114 @@
+{
+  "run_id": 42128655779,
+  "workflow_conclusion": "failure",
+  "control_conclusion": "success",
+  "native_placement_and_supply_assertions_passed": true,
+  "edited_gates": {
+    "edited": true,
+    "failures": [
+      "overflow 15"
+    ],
+    "diagnostic_gates_passed": false,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 0,
+      "antenna__violating__pins": 0
+    },
+    "overflow": 15
+  },
+  "intervention": {
+    "allowed": [
+      "_02001_",
+      "u_chip.g_lane[1].ot[26]",
+      "clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk",
+      "net14386",
+      "net14385"
+    ],
+    "added_diodes": 3,
+    "diagnostic_only": true,
+    "placement_checked": true,
+    "clock_net_changed": true,
+    "clock_timing_must_be_remeasured": true,
+    "diode_placements": {
+      "tripwire_cselect_clear_diode": {
+        "location_dbu": [
+          938880,
+          313740
+        ],
+        "orientation": "R0",
+        "anchor": "_50780_",
+        "displacement_um": [
+          0.0,
+          -3.78
+        ]
+      },
+      "tripwire_cselect_lane_diode": {
+        "location_dbu": [
+          578880,
+          211680
+        ],
+        "orientation": "MX",
+        "anchor": "hold11285",
+        "displacement_um": [
+          -6.72,
+          0.0
+        ]
+      },
+      "tripwire_cselect_clock_diode": {
+        "location_dbu": [
+          643680,
+          510300
+        ],
+        "orientation": "R0",
+        "anchor": "_51789_",
+        "displacement_um": [
+          12.96,
+          11.34
+        ]
+      }
+    },
+    "post_router_placement_and_connections_verified": true,
+    "post_router_placement_checked": true
+  },
+  "geometry": {
+    "old_routed_nets": 44792,
+    "new_routed_nets": 44792,
+    "changed_nets": [
+      "_02001_",
+      "clknet_2_0__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[0\\].g_stored.gclk",
+      "u_chip.g_lane\\[1\\].ot\\[26\\]"
+    ],
+    "unexpected_changed_nets": [],
+    "unchanged_routes_preserved": true,
+    "exact_roundtrip": false,
+    "physical_timing_measured": false,
+    "official_signoff": false
+  },
+  "previous_valid_overflow": 17,
+  "remaining_overflow": 15,
+  "qualified": false,
+  "scope": "Legally placed fixed-site repair with connected diode supplies; timing/antenna/electrical estimates pass, live overflow fails. No DRT/extraction/official qualification."
+}

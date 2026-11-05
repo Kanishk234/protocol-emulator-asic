@@ -1,0 +1,98 @@
+{
+  "run_id": 42119036887,
+  "conclusion": "failure",
+  "control_reproduced": true,
+  "edited_physical_result_valid": false,
+  "reason": "Malformed native detailed_placement arguments; Python Tcl-eval errors were not propagated; three diodes overlapped anchors. Timing/antenna results cannot qualify the illegal placement.",
+  "reported_edited_gates": {
+    "edited": true,
+    "failures": [
+      "overflow 17"
+    ],
+    "diagnostic_gates_passed": false,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 0,
+      "antenna__violating__pins": 0
+    },
+    "overflow": 17
+  },
+  "control_gates": {
+    "edited": false,
+    "failures": [],
+    "diagnostic_gates_passed": true,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 4,
+      "antenna__violating__pins": 4
+    },
+    "overflow": 0
+  },
+  "geometry_audit": {
+    "old_routed_nets": 44792,
+    "new_routed_nets": 44792,
+    "changed_nets": [
+      "_02001_",
+      "clknet_2_0__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[0\\].g_stored.gclk",
+      "u_chip.g_lane\\[1\\].ot\\[26\\]"
+    ],
+    "unexpected_changed_nets": [],
+    "unchanged_routes_preserved": true,
+    "exact_roundtrip": false,
+    "physical_timing_measured": false,
+    "official_signoff": false
+  },
+  "native_log_sha256": "de83e2a8a37be76b2f3f04dac9298b784c5f4ee4e7705ff7e8e81c1ac5c846eb",
+  "native_errors": [
+    "STA-0564 detailed_placement positional arguments not supported",
+    "DPL-0033 detailed placement checks failed"
+  ],
+  "fix": "Use -max_displacement {20 20}; wrap native Tcl errors in checked status; require pre/post placement checks and reject native error log entries",
+  "official_flow_qualified": false
+}

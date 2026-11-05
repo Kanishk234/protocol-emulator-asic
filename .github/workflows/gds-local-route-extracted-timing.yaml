@@ -1,0 +1,195 @@
+name: gds-local-route-extracted-timing
+'on':
+  workflow_dispatch: {}
+  push:
+    branches:
+    - main
+    paths:
+    - .github/workflows/gds-local-route-extracted-timing.yaml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-local-route-extracted-timing
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CHECKPOINT: shared_minbuf2_final
+    steps:
+    - name: Check out project
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Select the reviewed frozen source
+      run: |-
+        python - <<'PYCODE'
+        import json, os
+        from pathlib import Path
+        manifests = {
+            'recovered_hold275': 'spikes/phase2_stock_flow/recovery_40427663913.json',
+            'shared_cluster100_postant': 'spikes/phase2_stock_flow/shared_cluster100_postant_checkpoint.json',
+            'shared_minbuf2_postant': 'spikes/phase2_stock_flow/shared_minbuf2_postant_checkpoint.json',
+            'shared_minbuf2_final': 'spikes/phase2_stock_flow/shared_minbuf2_final_checkpoint.json',
+        }
+        path = manifests[os.environ['CHECKPOINT']]
+        manifest = json.loads(Path(path).read_text())
+        values = dict(SOURCE_MANIFEST=path, SOURCE_RUN=manifest['run']['id'],
+                      SOURCE_ARTIFACT=manifest['artifact']['id'],
+                      SOURCE_ARTIFACT_NAME=manifest['artifact']['name'])
+        with open(os.environ['GITHUB_ENV'], 'a') as output:
+            for key, value in values.items():
+                output.write(f'{key}={value}\n')
+        PYCODE
+    - name: Restore and hash-verify the frozen physical checkpoint
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |-
+        set -euo pipefail
+        gh api repos/${{ github.repository }}/actions/runs/$SOURCE_RUN > recovery-source-run.json
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT > recovery-source-artifact.json
+        gh run download "$SOURCE_RUN" --name "$SOURCE_ARTIFACT_NAME" --dir frozen-artifact
+        python - <<'PYCODE'
+        import hashlib, json, os, shutil, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from stock_checkpoint_recovery import validate
+        manifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
+        run = json.loads(Path('recovery-source-run.json').read_text())
+        artifact = json.loads(Path('recovery-source-artifact.json').read_text())
+        # Verify all frozen inputs before copying to their original runner paths.
+        validate(Path('frozen-artifact'), manifest, run, artifact)
+        assert not Path('runs').exists(), 'Unexpected existing physical output'
+        # Do not restore the source run's completed corner audit into our fresh output path.
+        shutil.copytree(Path('frozen-artifact/runs/stock-official-baseline'),
+                        Path('runs/stock-official-baseline'))
+        for folder in ('src', 'macro'):
+            shutil.copytree(Path('frozen-artifact') / folder, Path(folder), dirs_exist_ok=True)
+        shutil.copy2('frozen-artifact/info.yaml', 'info.yaml')
+        source = validate(Path('.'), manifest, run, artifact, require_runner_root=True)
+        Path('runs/stock-recovery-validation.json').write_text(json.dumps(dict(
+            source_run=run['id'], source_sha=run['head_sha'], artifact_id=artifact['id'],
+            source_state=str(source), frozen_file_hashes=manifest['files'],
+            physical_repairs_performed=False, saved_state_rewritten=False), indent=2) + '\n')
+        print('Verified exact frozen post-antenna checkpoint:', source)
+        PYCODE
+    - name: Check out Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+        path: tt
+    - name: Check out the pinned IHP installer
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-gds-action
+        ref: 3412659307918422f3f0727917cf9b499aaca588
+        path: .tt-gds-action
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install Tiny Tapeout prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install flow dependencies
+      run: pip install -r tt/requirements.txt
+    - name: Install IHP PDK
+      run: ./.tt-gds-action/install_sg13cmos5l.sh
+    - name: Install pinned LibreLane
+      run: pip install librelane==3.1.0.dev3
+    - name: Verify the original stock engine image
+      run: |-
+        set -euo pipefail
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev3
+        python - <<'PYCODE'
+        import json, os, subprocess
+        from pathlib import Path
+        m = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())['toolchain']
+        image = m['stock_image']
+        digests = json.loads(subprocess.check_output(['docker', 'image', 'inspect', image, '--format', '{{json .RepoDigests}}'], text=True))
+        assert image.rsplit(':', 1)[0] + '@' + m['stock_digest'] in digests, 'Stock engine digest differs from source run'
+        print('Verified original unmodified stock image digest')
+        PYCODE
+    - name: Restore and verify completed detailed route
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |-
+        set -euo pipefail
+        gh api repos/${{ github.repository }}/actions/runs/41981158960 > drt-source-run.json
+        gh run download 41981158960 --repo "${{ github.repository }}" --name local-pass-detailed-route-41981158960 --dir routed-artifact
+        python - <<'PYCODE'
+        import hashlib,json,shutil
+        from pathlib import Path
+        m=json.loads(Path('spikes/phase2_stock_flow/local_drt_extraction_source.json').read_text())
+        r=json.loads(Path('drt-source-run.json').read_text())
+        assert r['id']==m['run_id'] and r['head_sha']==m['source_sha'] and r['conclusion']=='success'
+        for name,digest in m['files'].items():assert hashlib.sha256((Path('routed-artifact')/name).read_bytes()).hexdigest()==digest,name
+        state=json.loads((Path('routed-artifact')/m['source_state']).read_text())
+        assert state['metrics']['route__drc_errors']==0
+        shutil.copytree('routed-artifact/runs/local-pass-route','runs/local-pass-route')
+        PYCODE
+    - name: Finalize extract and measure all corners
+      timeout-minutes: 150
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python scripts/ci/extracted_timing.py --route-root runs/local-pass-route
+        python - <<'PYCODE'
+        import json,sys
+        from pathlib import Path
+        sys.path.insert(0,'scripts/ci')
+        from native_stock_route import run_step
+        states=list(Path('runs/extracted-timing').glob('*-openroad-stapostpnr/state_out.json'))
+        assert len(states)==1
+        config=json.loads(Path('src/config_extracted_timing.json').read_text())
+        config['STA_EXTRA_CORNER_TCL_FILE']=str(Path('scripts/ci/final_routed_netlist.tcl').resolve())
+        run_step(config,states[0],Path('runs/final-route-readback'),['OpenROAD.STAMidPNR'])
+        run_step(config,states[0],Path('runs/final-route-antenna'),['OpenROAD.CheckAntennas'])
+        PYCODE
+    - name: Require extracted timing electrical and antenna gates
+      run: |-
+        python - <<'PYCODE'
+        import json,math
+        from pathlib import Path
+        summary=json.loads(Path('runs/extracted-timing/corner_summary.json').read_text())
+        electrical=json.loads(Path('runs/extracted-timing/electrical_summary.json').read_text())
+        failures=[]
+        for key,value in summary.items():
+            minimum=0.05 if 'hold' in key and key.endswith('nom_fast_1p32V_m40C') else 0
+            if not math.isfinite(value) or value<minimum:failures.append(f'{key}: {value}')
+        for corner,row in electrical.items():
+            if not row['no_reported_electrical_violations']:failures.append(f'electrical {corner}')
+        files=list(Path('runs/final-route-antenna').glob('*/or_metrics_out.json'));assert len(files)==1
+        metrics=json.loads(files[0].read_text())
+        antenna={k:metrics[k] for k in ('antenna__violating__nets','antenna__violating__pins')}
+        if any(antenna.values()):failures.append(f'antenna {antenna}')
+        Path('runs/extracted-timing/final_gates.json').write_text(json.dumps(dict(failures=failures,extracted_gates_passed=not failures,official_gds_qualified=False,timing=summary,antenna=antenna),indent=2)+'\n')
+        assert not failures,failures
+        PYCODE
+    - name: Upload recovered measurement evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: local-route-extracted-${{ github.run_id }}
+        path: |-
+          runs/stock-corner-audit/**
+          runs/stock-recovery-validation.json
+          recovery-source-run.json
+          recovery-source-artifact.json
+          ${{ env.SOURCE_MANIFEST }}
+          runs/local-pass-route-source.json
+          runs/local-pass-route/**
+          spikes/phase2_stock_flow/local_pass_route_source.json
+          runs/extracted-timing/**
+          runs/final-route-readback/**
+          runs/final-route-antenna/**
+          spikes/phase2_stock_flow/local_drt_extraction_source.json
+        if-no-files-found: warn

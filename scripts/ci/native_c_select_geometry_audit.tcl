@@ -2,13 +2,27 @@
 source [file join [file dirname [info script]] native_hold_frontier_audit.tcl]
 write_global_route_segments [file join $::env(STEP_DIR) checkpoint_segments.txt]
 set trw_block [ord::get_db_block]
+# OpenDB stores some hierarchical names with escaped bus brackets, whereas
+# Verilog readback prints the logical spelling. Accept only a unique exact
+# match among those two spellings; never use wildcard lookup.
+proc trw_find_net {block name} {
+    set escaped [string map [list {[} {\[} {]} {\]}] $name]
+    set matches {}
+    foreach spelling [lsort -unique [list $name $escaped]] {
+        set net [$block findNet $spelling]
+        if {$net != "NULL"} {lappend matches $net}
+    }
+    set matches [lsort -unique $matches]
+    if {[llength $matches] == 0} {error "Missing reviewed antenna net: $name"}
+    if {[llength $matches] != 1} {error "Ambiguous reviewed net spelling: $name"}
+    return [lindex $matches 0]
+}
 set trw_targets [list _02001_ {u_chip.g_lane[1].ot[26]} \
     {clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk} net14386]
 puts "%OL_CREATE_REPORT antenna_target_connections.rpt"
 set trw_index 0
 foreach trw_name $trw_targets {
-    set trw_net [$trw_block findNet $trw_name]
-    if {$trw_net == "NULL"} {error "Missing reviewed antenna net: $trw_name"}
+    set trw_net [trw_find_net $trw_block $trw_name]
     puts "NET $trw_name TYPE [$trw_net getSigType]"
     foreach trw_term [$trw_net getITerms] {
         set trw_inst [$trw_term getInst]
@@ -18,7 +32,8 @@ foreach trw_name $trw_targets {
 }
 puts "%OL_END_REPORT"
 foreach trw_name $trw_targets {
-    check_antennas -net $trw_name -verbose -report_file \
+    set trw_actual_name [[trw_find_net $trw_block $trw_name] getName]
+    check_antennas -net $trw_actual_name -verbose -report_file \
         [file join $::env(STEP_DIR) antenna_target_${trw_index}.rpt]
     incr trw_index
 }
@@ -36,8 +51,7 @@ puts "%OL_END_REPORT"
 # Track the functional source/endpoint of the previous extracted setup failure.
 # Resolve cells by named Q nets rather than reusing old synthesized cell IDs.
 proc trw_output_term {block name} {
-    set net [$block findNet $name]
-    if {$net == "NULL"} {error "Missing tracked Q net: $name"}
+    set net [trw_find_net $block $name]
     set drivers {}
     foreach term [$net getITerms] {
         if {[[$term getMTerm] getIoType] == "OUTPUT"} {lappend drivers $term}
@@ -47,7 +61,7 @@ proc trw_output_term {block name} {
 }
 set trw_launch [trw_output_term $trw_block {u_chip.g_unit[0].bitsync_active}]
 set trw_capture [trw_output_term $trw_block {u_chip.u_fab.u_c0.pending_drop}]
-set trw_launch_pin [[ $trw_launch getInst] getName]/[[$trw_launch getMTerm] getName]
+set trw_launch_pin [[$trw_launch getInst] getName]/[[$trw_launch getMTerm] getName]
 set trw_capture_inst [$trw_capture getInst]
 if {[$trw_capture_inst findITerm D] == "NULL"} {error "Tracked capture has no D pin"}
 set trw_capture_pin [$trw_capture_inst getName]/D

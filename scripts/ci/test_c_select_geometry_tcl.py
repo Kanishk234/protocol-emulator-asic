@@ -6,7 +6,7 @@ import subprocess
 import pytest
 
 
-@pytest.mark.parametrize('fault', ['none', 'missing_clock', 'ambiguous_driver'])
+@pytest.mark.parametrize('fault', ['none', 'escaped', 'missing_clock', 'ambiguous_driver', 'ambiguous_spelling'])
 def test_read_only_c_select_probe(tmp_path, fault):
     helper = Path(__file__).with_name('native_c_select_geometry_audit.tcl').resolve()
     script = r'''
@@ -21,13 +21,24 @@ set names [list _02001_ {u_chip.g_lane[1].ot[26]} \
     {u_chip.g_unit[0].bitsync_active} {u_chip.u_fab.u_c0.pending_drop}]
 proc block {method name} {
     if {$method ne "findNet"} {error "Unexpected block mutation/API: $method"}
-    set index [lsearch -exact $::names $name]
+    set stored $::names
+    if {$::fault in {escaped missing_clock}} {
+        set stored {}
+        foreach n $::names {lappend stored [string map [list {[} {\[} {]} {\]}] $n]}
+    }
+    set index [lsearch -exact $stored $name]
+    if {$::fault eq "ambiguous_spelling" && $name eq {u_chip.g_lane\[1\].ot\[26\]}} {return alternate_net}
     if {$::fault eq "missing_clock" && $index == 2} {return NULL}
     if {$index < 0} {return NULL}
     return net$index
 }
 proc net {index method args} {
     switch $method {
+        getName {
+            set name [lindex $::names $index]
+            if {$::fault eq "escaped"} {return [string map [list {[} {\[} {]} {\]}] $name]}
+            return $name
+        }
         getSigType {return [expr {$index == 2 ? "CLOCK" : "SIGNAL"}]}
         getITerms {
             if {$::fault eq "ambiguous_driver" && $index == 4} {return {term4 term5}}
@@ -75,7 +86,7 @@ proc check_antennas {args} {puts "ANTENNA $args"}
     path.write_text(script)
     result = subprocess.run([os.environ.get('TRIPWIRE_TCLSH', 'tclsh'), str(path)],
                             text=True, capture_output=True)
-    if fault == 'none':
+    if fault in ('none', 'escaped'):
         assert result.returncode == 0, result.stderr
         assert result.stdout.count('ANTENNA -net') == 4
         assert 'TRACKED_FROM _52357_/Q TRACKED_TO _51130_/D' in result.stdout
@@ -83,5 +94,7 @@ proc check_antennas {args} {puts "ANTENNA $args"}
         assert 'TYPE CLOCK' in result.stdout
     else:
         assert result.returncode != 0
-        assert ('Missing reviewed antenna net' if fault == 'missing_clock'
-                else 'Expected one driver') in result.stderr
+        expected = {'missing_clock': 'Missing reviewed antenna net',
+                    'ambiguous_driver': 'Expected one driver',
+                    'ambiguous_spelling': 'Ambiguous reviewed net spelling'}
+        assert expected[fault] in result.stderr

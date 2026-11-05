@@ -1,9 +1,20 @@
 {
   "source_run": 42078913664,
   "measurement_run": 42110354960,
-  "scope": "Geometry export completed before diagnostic lookup failure; no timing/antenna audit completion claim",
+  "scope": "Frozen C-selector geometry with successful read-only all-corner audit; native router reopening still uncalibrated",
   "canonical_route_sha256": "cd7e2eb16f97336c46affa835823fb35a4b810ffea5d2d070e928b0f6ba68c79",
   "routed_nets": 44792,
   "raw_segments_sha256": "527447d471d782d0220a1f9c9d20e0710a24334380523593e6a114ff878607ec",
-  "native_reopen_calibrated": false
+  "native_reopen_calibrated": false,
+  "geometry_audit_run": 42116068868,
+  "hold_ns": {
+    "nom_fast_1p32V_m40C": 0.0867642,
+    "nom_typ_1p20V_25C": 0.312564,
+    "nom_slow_1p08V_125C": 0.695068
+  },
+  "signoff_hold_ns": {
+    "nom_fast_1p32V_m40C": 0.236764,
+    "nom_typ_1p20V_25C": 0.462564,
+    "nom_slow_1p08V_125C": 0.845068
+  }
 }

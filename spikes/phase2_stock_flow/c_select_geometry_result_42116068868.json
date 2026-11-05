@@ -1,0 +1,69 @@
+{
+  "run_id": 42116068868,
+  "conclusion": "success",
+  "source_run": 42078913664,
+  "source_views_unchanged": true,
+  "receipt_corner_values_match_source": true,
+  "fresh_odb_netlist_hashes_match_source": true,
+  "corners": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.236764,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.845068,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.462564,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "antenna": {
+    "antenna__violating__nets": 4,
+    "antenna__violating__pins": 4
+  },
+  "tracked_estimated_paths": {
+    "after-nom_slow_1p08V_125C/tracked_config_to_drop.rpt": {
+      "reported_paths": 1,
+      "worst_reported_slack_ns": 4.796553,
+      "report_sha256": "a2f24cd3007e53d6a331e94ec8925540511c018db5207604c5d30551171c73d4"
+    },
+    "after-nom_slow_1p08V_125C/affected_latch_max.rpt": {
+      "reported_paths": 20,
+      "worst_reported_slack_ns": 5.325843,
+      "report_sha256": "7fb102b34cc956fea79887f985d7cc3eaedca250ecb8a4ef486b2c07f1b473f7"
+    },
+    "after-nom_slow_1p08V_125C/affected_latch_min.rpt": {
+      "reported_paths": 1,
+      "worst_reported_slack_ns": 10.546226,
+      "report_sha256": "dc4cdf1504909c7d60810a4ce7aeb5ae52a7794c747c5ffa0128c5ae7c95e8a2"
+    },
+    "after-nom_fast_1p32V_m40C/tracked_config_to_drop.rpt": {
+      "reported_paths": 1,
+      "worst_reported_slack_ns": 13.594278,
+      "report_sha256": "d4accaf1d639d7ea347dc4160cd669d52d80f3d6dc99650db9353b95725bf2c5"
+    },
+    "after-nom_fast_1p32V_m40C/affected_latch_min.rpt": {
+      "reported_paths": 1,
+      "worst_reported_slack_ns": 10.194736,
+      "report_sha256": "726369d264d6512cb8a5b85d6c35c13beee14a59d0deaf37b5868b89935abd90"
+    }
+  },
+  "scope": "Successful read-only estimated timing/geometry audit; not extracted timing or design qualification",
+  "artifact": {
+    "id": 13456986712,
+    "size_in_bytes": 144001966,
+    "selected_entry_crc_verified": true,
+    "whole_archive_digest_independently_verified": false
+  }
+}

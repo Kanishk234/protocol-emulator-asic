@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 from local_antenna_repair import snapshot
+from checked_openroad_tcl import checked, placement_command
 
 
 def canonical(name):
@@ -74,8 +75,8 @@ def apply(design, router, database):
             diode.findITerm('A').connect(net)
             router.addDirtyNet(net)
         distance = plan['maximum_displacement_um']
-        design.evalTclString(f'detailed_placement -max_displacement {distance} {distance}')
-        design.evalTclString('check_placement -verbose')
+        checked(design, placement_command(distance))
+        checked(design, 'check_placement -verbose')
         for name in allowed:
             for term in block.findInst(name).getITerms():
                 net = term.getNet()
@@ -88,6 +89,7 @@ def apply(design, router, database):
     return dict(_before=before, _plan=plan, _units=units,
                 allowed=plan['allowed_signal_nets_to_reroute'],
                 added_diodes=len(plan['diodes']), diagnostic_only=True,
+                placement_checked=True,
                 clock_net_changed=True, clock_timing_must_be_remeasured=True)
 
 

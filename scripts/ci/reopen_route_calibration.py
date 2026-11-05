@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, str(Path.cwd() / 'scripts/ci'))
 from openroad import Tech, Design
 from route_segment_audit import compare, parse
+from checked_openroad_tcl import checked
 
 manifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
 source = Path(manifest['source_state'])
@@ -70,6 +71,8 @@ result = compare((output / 'before.segments').read_text(), (output / 'after.segm
 (output / 'geometry_result.json').write_text(json.dumps(result, indent=2) + '\n')
 if edited:
     helper.verify_after_router(tech.getDB(), intervention)
+    checked(design, 'check_placement -verbose')
+    intervention['post_router_placement_checked'] = True
     def canonical_net(name):
         return name.replace('\\[', '[').replace('\\]', ']')
     allowed = set(intervention['allowed'])
@@ -87,7 +90,7 @@ state['odb'] = str((output / 'calibrated.odb').resolve())
 state['def'] = str((output / 'calibrated.def').resolve())
 for key, suffix, option in [('nl', 'nl.v', ''), ('pnl', 'pnl.v', '-include_pwr_gnd ')]:
     path = (output / ('calibrated.' + suffix)).resolve()
-    design.evalTclString('write_verilog ' + option + '{' + str(path) + '}')
+    checked(design, 'write_verilog ' + option + '{' + str(path) + '}')
     assert path.is_file() and path.stat().st_size > 0
     state[key] = str(path)
 state['metrics'] = {}

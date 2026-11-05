@@ -116,12 +116,26 @@ jobs:
       run: |-
         set -euo pipefail
         docker run --rm --network none --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -w "$PWD" ghcr.io/librelane/librelane:3.1.0.dev3 python3 scripts/ci/native_endpoint_interface.py
+    - name: Restore reviewed completed physical edits
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |-
+        set -euo pipefail
+        gh run download 41969199853 --repo "${{ github.repository }}" --name targeted-antenna-true-41969199853 --dir recovered-targeted
+        python - <<'PYCODE'
+        import json, hashlib, shutil
+        from pathlib import Path
+        m=json.loads(Path('spikes/phase2_stock_flow/targeted_partial_41969199853.json').read_text())
+        for name, digest in m['files'].items():
+            assert hashlib.sha256((Path('recovered-targeted')/name).read_bytes()).hexdigest()==digest, name
+        shutil.copytree('recovered-targeted/runs/targeted-diagnostic','runs/targeted-diagnostic')
+        PYCODE
     - name: Measure native endpoint insertion or empty control
       timeout-minutes: 120
       run: |-
         set -euo pipefail
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
-        python scripts/ci/targeted_antenna_diagnostic.py --insert "$INSERT_ENDPOINT_DIODES"
+        python scripts/ci/targeted_antenna_diagnostic.py --insert "$INSERT_ENDPOINT_DIODES" --resume
     - name: Upload recovered measurement evidence
       if: always()
       uses: actions/upload-artifact@v7

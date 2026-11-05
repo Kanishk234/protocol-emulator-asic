@@ -1,0 +1,11 @@
+{
+  "source_run": 41569397169,
+  "geometry_audit_run": 41940634866,
+  "canonical_route_sha256": "f5733886cbf2ac1aac448021c6dbd4034393c598baf97e85152b3ba6aa473925",
+  "routed_nets": 45057,
+  "hold_ns": {
+    "nom_fast_1p32V_m40C": 0.144394,
+    "nom_typ_1p20V_25C": 0.355043,
+    "nom_slow_1p08V_125C": 0.738651
+  }
+}

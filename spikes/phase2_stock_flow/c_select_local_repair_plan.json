@@ -29,13 +29,28 @@
       "anchor_master": "sg13cmos5l_dlhq_1",
       "pin": "GATE",
       "net": "clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk",
-      "seed_offset_um": [
-        0,
-        15.12
+      "locked_site_dbu": [
+        643680,
+        510300
       ],
-      "required_displacement_y_um": [
-        13,
-        17
+      "locked_orientation": "R0",
+      "site_guards": [
+        {
+          "instance": "hold7746",
+          "master": "sg13cmos5l_dlygate4sd3_1",
+          "location_dbu": [
+            639360,
+            510300
+          ]
+        },
+        {
+          "instance": "_33545_",
+          "master": "sg13cmos5l_a21oi_1",
+          "location_dbu": [
+            645120,
+            510300
+          ]
+        }
       ]
     }
   ],
@@ -47,5 +62,5 @@
     "net14385"
   ],
   "scope": "Bounded diagnostic only; clock load changes must pass timing; no official source/config integration claim",
-  "placement_rationale": "Seed clock diode on original nearby Metal3 clock corridor (route Y514800 DBU) instead of congested rerouted row Y500400; no change to cells, nets, source or acceptance gates."
+  "placement_rationale": "Upper seed row514080 is fully occupied nearby. Use reviewed adjacent CoreSite row510300 gap between hold7746 and _33545_; lock only added clock diode at643680,510300 (12.96um X/11.34um Y displacement). Original20um bounds and all gates remain fixed."
 }

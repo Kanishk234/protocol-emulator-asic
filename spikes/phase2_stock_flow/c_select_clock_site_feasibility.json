@@ -1,0 +1,51 @@
+{
+  "failed_run": 42125394009,
+  "reason": "Native legalizer moved clock diode outside reviewed seed corridor; no routing/timing outcome",
+  "placement_source_run": 42122049674,
+  "placement_source_sha256": "83ce458668dd12a5f92f207ce864d1ebff1fc6627f3b22477894436e826cdac0",
+  "stdcell_lef_sha256": "c47c436758ae87288324aa1f5a84fcc8faf813bf19df1a400b32258fff4e1219",
+  "row": {
+    "name": "ROW_134",
+    "y_dbu": 510300,
+    "orientation": "N",
+    "site_width_dbu": 480
+  },
+  "selected_site_dbu": [
+    643680,
+    510300
+  ],
+  "cell_size_dbu": [
+    1440,
+    3780
+  ],
+  "anchor_dbu": [
+    630720,
+    498960
+  ],
+  "displacement_um": [
+    12.96,
+    11.34
+  ],
+  "neighbors": [
+    {
+      "instance": "hold7746",
+      "right_edge_dbu": 643680
+    },
+    {
+      "instance": "_33545_",
+      "left_edge_dbu": 645120
+    }
+  ],
+  "no_stdcell_overlap_in_cached_def": true,
+  "macro_outside_region": {
+    "origin_dbu": [
+      12000,
+      40000
+    ],
+    "size_um": [
+      236.8,
+      191.34
+    ]
+  },
+  "scope": "Independent DEF/LEF site assessment; native placement checks remain authoritative; no congestion guarantee"
+}

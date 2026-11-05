@@ -1,0 +1,15 @@
+{
+  "run_id": 41981158960,
+  "source_sha": "b43c714279ce3c20a165d34ba40e2a69f505bf0d",
+  "artifact_name": "local-pass-detailed-route-41981158960",
+  "source_state": "runs/local-pass-route/1-openroad-detailedrouting/state_out.json",
+  "files": {
+    "runs/local-pass-route/1-openroad-detailedrouting/state_out.json": "b2ab37cc640db67e55dead143987b13102b6843024393cea7874990df4da22b4",
+    "runs/local-pass-route/1-openroad-detailedrouting/or_metrics_out.json": "57bb1df380335b05d2051fc607bc4b46c376adb469a2ee17803bef9c89ca6427",
+    "runs/local-pass-route/1-openroad-detailedrouting/tt_um_tripwire.odb": "ac84b8c37700595bbe87b77e29d418819689992165e9ad5e859dd5610eb3eb5f",
+    "runs/local-pass-route/1-openroad-detailedrouting/tt_um_tripwire.def": "64ede07bd9f326dba6c386d6ae069e15c15dd0ec19445a3f59cf6f99a75fc5c9",
+    "runs/local-pass-route/1-openroad-detailedrouting/tt_um_tripwire.nl.v": "49345f998dc45873482288d10a36c3b5378d186949f14b602f46bc341481a2ef",
+    "runs/local-pass-route/1-openroad-detailedrouting/tt_um_tripwire.pnl.v": "c0deb861de5537777becdf0f729b59665ab563d281106df1ad51a40778f62cf6",
+    "runs/local-pass-route/1-openroad-detailedrouting/tt_um_tripwire.sdc": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba"
+  }
+}

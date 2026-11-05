@@ -2,6 +2,21 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Bind C-selector geometry and clock-load diagnostic
+
+- Trace the four actual failed receivers to fabric channel4 pending_clear D, lane1 ot26 delay input, unit0 configuration word0 bit6 latch GATE, and a native routing-buffer input. Larger equivalent cells exist for DFRBPQ/BUF2; not for DLHQ1 or DLYGATE4SD3. Do not reuse the old receiver list or add clock load without measuring paths/skew.
+- Prepare independent manual read-only workflow `gds-c-select-geometry-audit`: exact source42078913664/artifact13451715846, 43 bound files, original stock image digest and full restore validation. Independently match eight locally downloaded bound files; ODB/DEF hashes come from source receipts and must match restored bytes in CI. Whole ZIP not independently hashed locally. Preserve source state/SDC and every bound input.
+- Native hook exports four net reports/connections/placements/route segments, affected latch timing paths and the functional bitsync_active to channel0 pending_drop pair. All-corner signoff-SDC readback must reproduce current reference within1e-6ns and retain electrical0/antenna4. No native repair, placement, rerouting, gate weakening or DRT.
+- 27 real-Tcl-mock/checkpoint recovery regressions pass, including bracketed-net lookup, missing clock net and ambiguous source-driver rejection. actionlint, embedded Python and diff checks pass. D-152 remains the source experiment; this read-only measurement adds no hardware or architecture.
+- Published tools/evidence/CI through7907fa47464e933210847dd3d6c510e0d49ac255 and launched exactly one manual read-only audit [42110354960](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42110354960), confirmed in progress on that SHA, under standing approval. No phase box ticked; current source remains unqualified and extracted timing unknown. Next inspect the returned geometry and clock paths, then prepare bounded receiver protection with original and signoff timing gates held fixed.
+
+## 2026-11-05 — C-selector screen fails only four new antenna receivers
+
+- Run 42078913664 completes stock Classic plus repeated three-corner PNR/signoff-SDC estimates, then correctly fails final antenna gate: 4 nets/4 pins. Independently match small raw artifact corner metrics/receipts and final NL hash. Setup WS0 all (not positive extracted headroom); PNR hold F/T/S 86.764/312.564/695.068 ps, signoff estimate 236.764/462.564/845.068 ps. Electrical0 all, final overflow0. No extracted timing/DRT performed.
+- Physical result differs: 44837 cells /684795 um2 versus reference45099/688086. Four different failures: _50780_/D fabric channel4 pending_clear (M3 CAR239.71/200), hold11285/A lane1 ot26 (M2 216.51/200), _51789_/GATE config word0 bit6 latch clock (M3 236.92/200), wire14386/A (M3 226.65/200). Do not reuse the old source's three-size/one-diode target list.
+- The clock-pin failure needs a clock-load/skew-aware remedy, not an unmeasured diode addition. PNR hold reserve above the fixed50ps gate is now36.764ps. Next inspect exact geometry and protect these receivers while preserving final timing/overflow, then consider extraction only after a strict green screen. Existing extracted baseline remains slow setup−2.66890162ns; no claim that the new selector improves routed WNS yet.
+- Initial large artifact ranges hit503 egress-limit; bounded64KiB range downloads recovered needed summaries/raw metrics/NL (entry CRC checked; whole ZIP digest not independently verified). Save c_select_screen_result_42078913664.json. No new experiment or gate relaxation, official job/main RTL change or phase tick this turn.
+
 ## 2026-11-05 — Publish approved C-selector screen preparation
 
 - User explicitly authorizes Codex to perform the prepared publication/launch, overriding the latest Git reservation for these groups. Recheck remote main matches 618c1a1 and all previous main runs complete; standard test/lint/docs/unit/nightly pass. No unpublished main hardware/config changes in the history check.

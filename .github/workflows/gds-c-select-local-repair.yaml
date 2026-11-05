@@ -260,7 +260,12 @@ jobs:
         antenna=r['fresh_antenna_metrics']
         if edit and any(antenna.values()):failures.append(f'antenna {antenna}')
         if not edit:assert set(antenna.values())=={4}
+        if edit:
+            intervention=json.loads(Path('runs/route-reopen-calibration/intervention.json').read_text())
+            assert intervention.get('placement_checked') is True
+            assert intervention.get('post_router_placement_checked') is True
         log=Path('runs/route-reopen.log').read_text()
+        if re.search(r'(?m)^\[ERROR\b',log):failures.append('Native OpenROAD log contains errors')
         rows=re.findall(r'(?m)^Total\s+\d+\s+(\d+)\s+[0-9.]+%\s+\d+\s*/\s*\d+\s*/\s*(\d+)\s*$',log)
         assert rows and int(rows[-1][0])>0, 'Missing live routing demand'
         if int(rows[-1][1]):failures.append(f'overflow {rows[-1][1]}')

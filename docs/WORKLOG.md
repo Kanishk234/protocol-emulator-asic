@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Prepare routed finalization and extracted signoff diagnostic
+
+- Bindexact41981158960DRTstate/ODB/DEF/NL/PNL/SDC/rawmetricsbyhash. Separateworkflowrestoresoriginalsource/PDKdependenciesandcompletedroute,thenexistingRemoveObstructions/antenna/TrDRC/disconnectedpins/wirelength/fill/RCX/STAPostPNRsequence. All3cornersandoriginalsignoffSDCidentityretained.
+- Read-onlyfinalODBnetlistexportandfreshfinalantennacheckfollowextraction;postgatewritesexplicitfailuresfornegative setup/hold,fastreserve<50ps,electricalviolationsorantenna. NoofficialGDS/GLclaim.12extraction/reportregressionsandactionlint/embeddedsyntaxpass.
+- Publish/launchunderstandingapproval;officialjobs/mainhardware/configunchanged. ExactnativeDRTzero/antenna0receiptincluded. Source/configcleanbuildportabilityandfinalprotocolreplayremainopen.
+
+## 2026-11-05 — Detailed routing completes with zero native DRC/antenna
+
+-41981158960passesworkflowin2h09m38s; main test/lint/unit/docs/nightlygreen. Independently downloaded selectedrawDRTmetrics/reports/log: route__drc_errors0, nativeantenna0nets/0pins,all3uploaded.drcfilesempty. NativepostDRTrepairreports4addeddiodes(totalantenna-cellcount15). Save local_pass_drt_result_41981158960.json. Intermediateiterations includeviolations;finalmetrics/reportsclean.
+- This is nativeDRTsuccess,notMagic/KLayoutDRC/LVS/precheck/extractedtiming/officialGDS. NativefinalNLmayinheritpreDRTviewswhileODBaddsdiodes;requirefreshfinalODBnetlistreadbackbeforeGLorLVSclaims. Nextcontinuefinalization/RCX/allcornerextractedSTA/freshantennaandfinal-netlistprotocolreplay. No phaseexitboxticked,officialjobedit,mainpromotion,newrunorwatcherthisturn.
+
 ## 2026-11-05 — Prepare exact passing-checkpoint detailed routing
 
 - Hash-bind10editedartifactfilesfrom41979402848includingODB/DEF/freshNL/PNL/passreceipt/routegeometry/log. Separateworkflowrestoresoriginalsource/PDKconfigurationandpassededitedviews,constructs explicit diagnostic handoff with coherentfreshnetlists,then repeats3corner/antenna/electricalgatechecks beforeone nativeDetailedRoutingstep. Requireboundoverflow0. DRTlimit330min/job360min;4threads.
@@ -6725,3 +6736,5 @@ Publication receipt:f51c2f8tools/40d194fdocs pushed;remote main verified. Correc
 Publication receipt:9dfed6ctools/4b26c73tests/2c37ec1CI/f1f82fcdocs pushed;remote mainf1f82fc7ed15386b64ea63c6c7444679cb3cc268verified. Constrainedlocalrepair41978310217in progress. No resultyet,mainhardwarepromotion,DRTorwatcher.
 
 Publication receipt:8bd6d47tools/36e69a3tests/6e5da2edocs pushed; remoteverified. Matchedcontrol/editedretry41979402848in progress on6e5da2e29971b780e6d10c8f151efa6642312a68. Noresult/watcher/DRT.
+
+Publication receipt:f241555tools/4a66313CI/b43c714docs pushed;remote mainb43c714279ce3c20a165d34ba40e2a69f505bf0dverified. Detailed-routing continuation41981158960in progress atworkflowlevel;freshpregatesprecedeDRT. No DRTcompletion/extracted/officialclaimorwatcher.

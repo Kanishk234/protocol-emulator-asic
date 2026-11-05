@@ -1,0 +1,14 @@
+{
+  "run_id": 41981158960,
+  "source_sha": "b43c714279ce3c20a165d34ba40e2a69f505bf0d",
+  "artifact_id": 13400059225,
+  "detailed_routing_completed": true,
+  "raw_drt_errors": 0,
+  "raw_native_antenna_nets": 0,
+  "raw_native_antenna_pins": 0,
+  "empty_uploaded_drc_reports": 3,
+  "native_route_added_diodes": 4,
+  "extracted_timing_performed": false,
+  "official_gds_qualified": false,
+  "raw_metrics_sha256": "57bb1df380335b05d2051fc607bc4b46c376adb469a2ee17803bef9c89ca6427"
+}

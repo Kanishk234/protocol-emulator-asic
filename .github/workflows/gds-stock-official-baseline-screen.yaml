@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250]
+        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250, rtl_shared_minbuf2_cselect]
         default: rtl_shared_minbuf2
         required: true
 permissions:
@@ -176,6 +176,13 @@ jobs:
                 'src/trw_lane.v': evidence['after']['src/trw_lane.v'],
                 evidence['added_source']: evidence['added_source_sha256']}
             print('Verified inline guarded-mask source integration')
+        if selected.get('c_select'):
+            import sys
+            sys.path.insert(0, 'scripts/ci')
+            from apply_c_select import apply
+            receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/pin_input_decode'))
+            Path('spikes/phase2_stock_flow/pin_input_decode/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
+            print('Verified one-file C-selector source optimization')
         Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
             profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
             baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
@@ -185,7 +192,8 @@ jobs:
             hardware_unchanged=selected.get('hardware_unchanged', True),
             rtl_patch=selected.get('rtl_patch'), config_word_select=selected.get('config_word_select', False),
             host_word_select=selected.get('host_word_select', False),
-            inline_guard=selected.get('inline_guard', False)), indent=2) + '\n')
+            inline_guard=selected.get('inline_guard', False),
+            c_select=selected.get('c_select', False)), indent=2) + '\n')
         print('Selected isolated physical control:', profile, selected['changes'])
         PYCODE
     - name: Check out Tiny Tapeout tools
@@ -333,6 +341,53 @@ jobs:
             qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
         print(json.dumps(rows, indent=2))
         PYCODE
+    - name: Check unchanged signoff constraints on estimated routing
+      if: inputs.profile == 'rtl_shared_minbuf2_cselect'
+      timeout-minutes: 30
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python - <<'PYCODE'
+        import hashlib, json, math, os, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from postgrt_timing import CORNERS, screen
+        physical = Path('runs/stock-official-baseline')
+        sources = list(physical.glob('*-openroad-stamidpnr-3/state_out.json'))
+        assert len(sources) == 1
+        source = sources[0]
+        state = json.loads(source.read_text())
+        paths = [source, Path('src/signoff.sdc')] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
+        def hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        before = hashes()
+        output = Path('runs/stock-signoff-estimate')
+        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,
+               sdc=Path('src/signoff.sdc'),
+               sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
+        assert hashes() == before, 'Signoff estimate modified source views or constraints'
+        result = json.loads((output / 'comparison.json').read_text())
+        failures = []
+        for corner in CORNERS:
+            for stage in ('before', 'after'):
+                metrics = result['corners'][corner][stage]
+                for kind in ('setup', 'hold'):
+                    value = metrics[f'timing__{kind}__ws__corner:{corner}']
+                    minimum = 0.05 if kind == 'hold' and corner == CORNERS[0] else 0
+                    assert type(value) in (int, float) and math.isfinite(value)
+                    if value < minimum:
+                        failures.append(f'{corner} {stage} {kind}: {value} < {minimum}')
+                for kind in ('slew', 'cap', 'fanout'):
+                    value = metrics[f'design__max_{kind}_violation__count__corner:{corner}']
+                    assert type(value) is int and value >= 0
+                    if value:
+                        failures.append(f'{corner} {stage} {kind}: {value}')
+        (output / 'qualification.json').write_text(json.dumps(dict(
+            qualified=not failures, failures=failures, unchanged_source_hashes=before,
+            scope='Read-only estimated routing with unchanged signoff SDC; not extracted timing'), indent=2) + '\n')
+        if failures:
+            raise ValueError('Signoff estimate fails: ' + '; '.join(failures))
+        PYCODE
     - name: Require all final screening gates
       run: |-
         python scripts/ci/stock_screen_gate.py --physical runs/stock-official-baseline --audit runs/stock-corner-audit
@@ -346,6 +401,7 @@ jobs:
           spikes/phase2_stock_flow/config_word_select_evidence.json
           runs/stock-official-baseline/**
           runs/stock-corner-audit/**
+          runs/stock-signoff-estimate/**
           src/**
           info.yaml
           macro/**
@@ -369,6 +425,7 @@ jobs:
           spikes/phase2_stock_flow/host_word_select.patch
           spikes/phase2_stock_flow/host_word_select_evidence.json
           spikes/phase2_stock_flow/inline_guard/**
+          spikes/phase2_stock_flow/pin_input_decode/**
           test/Makefile
           test_internal/chip/Makefile
           spikes/phase2_stock_flow/selected_profile.json

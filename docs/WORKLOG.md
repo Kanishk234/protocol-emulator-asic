@@ -2,6 +2,22 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Prepare no-edit native Python reopen calibration
+
+- Separate calibration uses pinned native OdbReader/_grt_setup to initialize FastRoute capacity before loading saved ODBguides, then no-edit incrementalstart/end. Must match canonical hash of actual41940634866finalrouteexport beforeincremental and exact segmentroundtrip afterward. Saves copiedODB/DEFonly; no original mutation.
+- Fresh repeated3cornerSTA/freshantenna must reproduce frozen reference hold/timing/electrical and4antennas, with native logshowing nonzero routing demand/zerooverflow. This is calibration,notclosure. Source API/runtime is untested untilCI; checks failclosed.20local route/placement audits pass, actionlint/embedded Python/shellpass. Publish/launchunderstandingapproval; no mainhardware/config/officialjobs/DRTchanges.
+
+## 2026-11-05 — Constrain local placement; identify incremental reopen hazard
+
+- Prepared targeted_placement_lock.tcl: lock every original instance except3upsizetargets+fanout295neighbor; verify unchanged XY/orient for all locked instances and restore statuses. Wire sizing hook now uses this boundary. Three mockTclchecks cover allowed/unrelated lockstatus, XY/orient violation detection and restoration; combined5targeted regressionspass. Locality manifest lists bounded movablecells and incidentnets; no physical launch.
+- PinnedGlobalRouter startIncremental calls initFastRoutewhen reopened/uninitialized;initFastRouteclearsFastRoutecapacity/usage before initializing. Therefore existingODBguidepresence alone does not establish preserved live demand. Require no-edit route/timing/live-demand calibration before this localintervention. Do not repeat fullglobalreroute or assume incrementalcommandpreserves unaffectedroutes.
+- Next implement/calibrate reopening path with exact segment roundtrip and frozen-reference timing; originalrecipeprotectiongates unchanged. Main source/config/officialjobs/unrelatedfilespreserved;noDRT/publication/phasetick.
+
+## 2026-11-05 — Targeted edits clear original sinks but regress full layout
+
+- Recovery41971200720succeeds; independently matched repeatedrawSTA/electrical,freshantenna,finaloverflow against editedartifact and control41966771228. Edited fast−0.083053ns,11antenna nets/12pins,overflow15,electrical0/setup0. Control reroute fast0.0234296ns,2antenna/0overflow; fails50psreserve itself. None of original4sinks appear in editedviolationlist;12newfailuresappear.
+- Sizing/legalization moved or reoriented20518originalinstances. Additionalglobalreroute changes timing/antenna even without edits, so do not attribute all differences solely to gate area. Save targeted_antenna_result_41971200720.json;rejectcandidate. Next requires preserving surrounding placement/routes or clean source integration; no further broad reroute/parameter experiment launched. No officialflow/phase/DRTclaim;unrelatedfilespreserved.
+
 ## 2026-11-05 — Recover completed targeted edits with fresh ODB readback
 
 -41969199853passesactual3sizes/legalization/diode/GRTbutfailsadded-cell audit on inheritedpre-diodeNL. Raw states confirmODB/DEFupdatedwhileNLpointsatsizingsnapshot. AddfreshSTA-onlyNLexportbeforeaudit. BinddownloadedpartialartifactfilesbySHA256andresumefromitsfinalroutingstatewithoutrepeatingphysicalwork. NativeGRTreportedcongestion;finaltiming/antennastillpending.
@@ -6664,3 +6680,7 @@ Publication receipt:6169cd5tools/06e52bdCI/ea9e3f0docs pushed; remote mainea9e3f
 Publication receipt:2b383f3tools/06ef9faCI/ca36141docs pushed; remote mainca36141f45df693b7f2de2134f4ed768cd8ebc0dverified. Edited-only retry41968668727in progress. No physical result yet; no watcher/DRT.
 
 Publication receipt:af0bb80tools/604106btest/025e96ddocs pushed;remote main verified. Edited-only retry41969199853in progress on025e96d0321a946d355c03cd43ee4091de6763e5. No physical result or watcher.
+
+Publication receipt:1abfce4tools/45b36e9test/c5355fbCI/eba1cf0docs pushed; remote verified. Recovery41971200720in progress on eba1cf0090f16d3b6f74222e40a6834a8a60c46a. No repeated physical edits or rerouting; no result yet.
+
+Movement breakdown: 28originalinstances changedXY;20506changedorientation. Unrestricted detailed placement did not preserve the surrounding placed layout; future diagnostic must constrain untouched cells and avoid blanket global rerouting if testing a local fix. This is an engineering limitation of this diagnostic, not evidence that small edits inherently require20kchanges.

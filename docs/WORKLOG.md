@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Reject illegal placement in first C-selector repair and correct launcher
+
+- Run42119036887 control passes exact geometry/timing reproduction. Edited gate reports antenna0/electrical0 and original worst slacks unchanged, but overflow17. Native-log inspection reveals a more fundamental invalid placement: STA-0564 rejects extra positional argument in our displacement command; DPL-0033 shows all three diodes overlap anchors. Python evalTclString silently returned after Tcl errors. Withdraw edited physical qualification; save c_select_repair_result_42119036887.json. Do not treat its apparent antenna pass as a valid solution or reuse its checkpoint.
+- Fetch exact binary commitdcf36133 Opendp.tcl and verify argument contract. Correct20/20 to one Tcl list; add checked catch/success-marker wrapper for native placement/check/export, require pre/post-router placement-check receipts, reject native ERROR log entries. Keep all physical targets, source, original/signoff constraints, locality and zero-overflow gates fixed.
+- 71 related regressions pass, including real Tcl list parsing, deliberate placement errors and non-success API results; actionlint passes. Log bug in BUGS and report. Retry original frozen source, not illegal edited output. No main hardware/config or official job change, DRT or phase tick. Native legalized repair still unproved.
+- Published the scoped correction throughd54b84d9dba1904702102588ecd629e7d82f81a3 and launched the same paired diagnostic once under standing approval: [42122049674](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42122049674), confirmed in progress on that SHA. Next inspect native placement success before interpreting antenna/timing/congestion outcomes.
+
 ## 2026-11-05 — Read-only C-selector audit succeeds; prepare bounded protection
 
 - Corrected audit42116068868 succeeds in6m17s. Independently inspect receipt/net/path reports: original source views and all fresh NL/PNL hashes reproduce; corner values match source signoff estimates; antenna4. Save c_select_geometry_result_42116068868.json. Slow tracked bitsync_active→channel0 pending_drop estimated slack+4.796553ns; affected latch slow outgoing minimum among20 reported paths+5.325843ns, fast incoming hold+10.194736ns. These are selected estimated paths, not extracted closure.

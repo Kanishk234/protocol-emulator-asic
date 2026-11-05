@@ -148,3 +148,25 @@ checks pass. Native execution is pending. This diagnostic does not reproduce
 the repair through permitted main source/config inputs or qualify official GDS.
 
 Paired diagnostic [42119036887](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42119036887) was launched on `d1207c571587d1b6269ce4669a2067bd5f918da3`; control and edited results are pending.
+
+
+## First receiver test: invalid edited placement, corrected before retry
+
+Run42119036887's control passes exact geometry and timing reproduction. Its
+edited arm reports zero antennas/electrical counts, unchanged reported worst
+slacks and17 overflow. Those edited results cannot qualify the design: native
+STA-0564 shows the placement invocation had an extra positional argument, and
+DPL-0033 identifies three overlapping diodes. The Python Tcl-eval boundary did
+not throw, and our earlier gate missed these errors. This is a tool-launcher
+bug in our code, not valid evidence of a physically legal antenna solution.
+
+The corrected command passes the displacement pair as one Tcl list. A checked
+Tcl wrapper now requires an explicit success marker for placement, placement
+checks and Verilog exports. Pre/post-router placement checks and native-error
+log rejection are mandatory.71 relevant checks pass, including the malformed
+command and swallowed-error regressions. The exact upstream command contract
+was checked at OpenROAD commitdcf36133a369abc8f3c5e5738cd4d82e4903c0e0
+(`src/dpl/src/Opendp.tcl`). Retest the same plan from original source42078913664;
+never resume the invalid edited checkpoint. No acceptance threshold changes.
+
+Corrected paired run [42122049674](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42122049674) was launched on `d54b84d9dba1904702102588ecd629e7d82f81a3`; results pending.

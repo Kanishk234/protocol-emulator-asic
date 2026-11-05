@@ -1605,3 +1605,9 @@ General need: determine whether late cell orientation changes contribute to ante
 Mixed repair leaves four antennas and reduces fast hold below the50psreserve; reject it. Test diode-only native antenna ratio margin50instead of10on the exact pre-antenna reference, followed by unchanged mirrored175pslate timing repair and rerouting. General need: protection reserve before later physical changes. No protocol-specific hardware, RTL, state or latency change. Potential cost is extra diodes/capacitance, area and routing demand; later newly exposed gates may still fail.
 
 This is one isolated diagnostic control compared with the reproduced diode arm41915437265. Require actual ratio_margin in native log and fresh all-corner/electrical/antenna/final-source overflow evidence. No acceptance-gate change, official-job modification or clean-build promotion claim; any winner needs a permitted reproducible project recipe.
+
+## D-151 (2026-11-04): test exact gate-area repair on a frozen physical copy
+
+General need: bound exposed antenna ratio at actual endangered receivers with minimal area increase, rather than broad buffer/diode insertion. Pinned PDK gates support three Boolean-equivalent upsizes, estimated footprint +23.5872um²; the delay receiver needs local protection. Prepare diagnostic three master changes plus one diode at hold7969/A, native legalization/rerouting and fresh all-corner/electrical/antenna checks, paired with unchanged rerouted control.
+
+First-order ratios do not predict changes after rerouting or capture upstream loading. Exact connectivity checks and source hashes are mandatory. This uses extra diagnostic steps and is not a promotable official-flow recipe. No RTL/state/ISA change, acceptance relaxation, main config or official-job edits. A clean outcome must still be translated to a permitted source/config implementation and reproduced before any phase claim.

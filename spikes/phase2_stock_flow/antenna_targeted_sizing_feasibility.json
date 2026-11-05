@@ -1,0 +1,49 @@
+{
+  "pdk_revision": "2bbec755dc67ca3db0261c3d6163e15735d66710",
+  "lef_sha256": "c47c436758ae87288324aa1f5a84fcc8faf813bf19df1a400b32258fff4e1219",
+  "scope": "First-order screening with fixed exposed wire area and effective gate component; not native antenna or timing proof",
+  "cases": [
+    {
+      "instance": "wire13568",
+      "input_pin": "A",
+      "original_master": "sg13cmos5l_buf_2",
+      "candidate_master": "sg13cmos5l_buf_8",
+      "original_gate_area_um2": 0.2132,
+      "candidate_gate_area_um2": 0.7254,
+      "original_ratio": 315.66,
+      "ratio_if_geometry_and_exposed_component_unchanged": 92.77462365591398,
+      "cell_area_increase_um2": 14.5152
+    },
+    {
+      "instance": "wire12579",
+      "input_pin": "A",
+      "original_master": "sg13cmos5l_buf_2",
+      "candidate_master": "sg13cmos5l_buf_4",
+      "original_gate_area_um2": 0.2132,
+      "candidate_gate_area_um2": 0.3146,
+      "original_ratio": 214.77,
+      "ratio_if_geometry_and_exposed_component_unchanged": 145.54661157024793,
+      "cell_area_increase_um2": 5.443199999999999
+    },
+    {
+      "instance": "_38673_",
+      "input_pin": "A",
+      "original_master": "sg13cmos5l_nand2_1",
+      "candidate_master": "sg13cmos5l_nand2_2",
+      "original_gate_area_um2": 0.2418,
+      "candidate_gate_area_um2": 0.4784,
+      "original_ratio": 215.81,
+      "ratio_if_geometry_and_exposed_component_unchanged": 109.0778804347826,
+      "cell_area_increase_um2": 3.628799999999999
+    }
+  ],
+  "remaining_delay_sink": {
+    "instance": "hold7969",
+    "master": "sg13cmos5l_dlygate4sd3_1",
+    "gate_area_um2": 0.1092,
+    "larger_same_function_variant_available": false,
+    "needs": "Local protection or lower-layer route continuity"
+  },
+  "physical_test_performed": false,
+  "official_flow_source_integration_verified": false
+}

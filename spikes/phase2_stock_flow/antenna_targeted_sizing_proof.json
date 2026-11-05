@@ -1,0 +1,26 @@
+{
+  "pdk_revision": "2bbec755dc67ca3db0261c3d6163e15735d66710",
+  "gate_function_proofs": [
+    {
+      "original": "sg13cmos5l_buf_2",
+      "candidate": "sg13cmos5l_buf_8",
+      "passed": true
+    },
+    {
+      "original": "sg13cmos5l_buf_2",
+      "candidate": "sg13cmos5l_buf_4",
+      "passed": true
+    },
+    {
+      "original": "sg13cmos5l_nand2_1",
+      "candidate": "sg13cmos5l_nand2_2",
+      "passed": true
+    }
+  ],
+  "exact_three_cell_netlist_change_audited": true,
+  "signal_connections_preserved": true,
+  "original_netlist_sha256": "e04d7c388e474d035435a41ce9fc0c6e17b66ccc601521d814085e1139a59544",
+  "physical_placement_legalized": false,
+  "physical_timing_or_antenna_proven": false,
+  "main_source_implementation_available": false
+}

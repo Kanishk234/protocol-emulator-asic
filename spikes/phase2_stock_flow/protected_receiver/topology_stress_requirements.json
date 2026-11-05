@@ -1,0 +1,255 @@
+{
+  "reference_geometry_run": 41940634866,
+  "prior_distance_test": 41691066588,
+  "prior_distance_test_efficacy": false,
+  "receiver_preservation_run": 41946993488,
+  "receiver_full_design_efficacy_proven": false,
+  "do_not_repeat_distance_only_probe": true,
+  "cases": [
+    {
+      "net": "_10511_",
+      "before_lengths_dbu": {
+        "Metal3": 115200,
+        "Metal2": 21600
+      },
+      "after_lengths_dbu": {
+        "Metal2": 14400,
+        "Metal3": 108000,
+        "Metal4": 36000
+      },
+      "required_failure_evidence": {
+        "_38359_/A1": {
+          "Via1": {
+            "cumulative_area_ratio": 0.13,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal2": {
+            "cumulative_area_ratio": 0.74,
+            "reported_limit": 200.0,
+            "violated": false
+          },
+          "Via2": {
+            "cumulative_area_ratio": 0.39,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal3": {
+            "cumulative_area_ratio": 1.17,
+            "reported_limit": 200.0,
+            "violated": false
+          },
+          "Via3": {
+            "cumulative_area_ratio": 0.52,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal4": {
+            "cumulative_area_ratio": 19.96,
+            "reported_limit": 12648.0,
+            "violated": false
+          }
+        },
+        "hold7969/A": {
+          "Via1": {
+            "cumulative_area_ratio": 0.33,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal2": {
+            "cumulative_area_ratio": 30.39,
+            "reported_limit": 200.0,
+            "violated": false
+          },
+          "Via2": {
+            "cumulative_area_ratio": 0.99,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal3": {
+            "cumulative_area_ratio": 229.28,
+            "reported_limit": 200.0,
+            "violated": true
+          },
+          "Via3": {
+            "cumulative_area_ratio": 1.32,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal4": {
+            "cumulative_area_ratio": 248.07,
+            "reported_limit": 12648.0,
+            "violated": false
+          }
+        }
+      },
+      "acceptance_requirements": [
+        "Reproduce actual named sink and layer-specific antenna violation in diode-absent control",
+        "Preserve original route topology outside local intervention",
+        "Verify local diode is connected to endangered gate before the violating fabrication layer",
+        "Reject a clean absent-diode control as inconclusive",
+        "Retain all original timing/electrical/overflow checks on full-design candidate"
+      ]
+    },
+    {
+      "net": "_19518_",
+      "before_lengths_dbu": {
+        "Metal2": 446400,
+        "Metal3": 108000,
+        "Metal4": 439200
+      },
+      "after_lengths_dbu": {
+        "Metal3": 93600,
+        "Metal2": 468000,
+        "Metal4": 144000
+      },
+      "required_failure_evidence": {
+        "wire13568/A": {
+          "Via1": {
+            "cumulative_area_ratio": 0.17,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal2": {
+            "cumulative_area_ratio": 239.72,
+            "reported_limit": 200.0,
+            "violated": true
+          },
+          "Via2": {
+            "cumulative_area_ratio": 0.51,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal3": {
+            "cumulative_area_ratio": 315.66,
+            "reported_limit": 200.0,
+            "violated": true
+          },
+          "Via3": {
+            "cumulative_area_ratio": 0.68,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal4": {
+            "cumulative_area_ratio": 451.1,
+            "reported_limit": 20162.0,
+            "violated": false
+          }
+        }
+      },
+      "acceptance_requirements": [
+        "Reproduce actual named sink and layer-specific antenna violation in diode-absent control",
+        "Preserve original route topology outside local intervention",
+        "Verify local diode is connected to endangered gate before the violating fabrication layer",
+        "Reject a clean absent-diode control as inconclusive",
+        "Retain all original timing/electrical/overflow checks on full-design candidate"
+      ]
+    },
+    {
+      "net": "net11878",
+      "before_lengths_dbu": {
+        "Metal2": 115200,
+        "Metal3": 244800
+      },
+      "after_lengths_dbu": {
+        "Metal2": 21600,
+        "Metal3": 244800,
+        "Metal4": 93600
+      },
+      "required_failure_evidence": {
+        "_38673_/A": {
+          "Via1": {
+            "cumulative_area_ratio": 0.15,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal2": {
+            "cumulative_area_ratio": 18.79,
+            "reported_limit": 200.0,
+            "violated": false
+          },
+          "Via2": {
+            "cumulative_area_ratio": 0.45,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal3": {
+            "cumulative_area_ratio": 215.81,
+            "reported_limit": 200.0,
+            "violated": true
+          },
+          "Via3": {
+            "cumulative_area_ratio": 0.6,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal4": {
+            "cumulative_area_ratio": 293.54,
+            "reported_limit": 14136.0,
+            "violated": false
+          }
+        }
+      },
+      "acceptance_requirements": [
+        "Reproduce actual named sink and layer-specific antenna violation in diode-absent control",
+        "Preserve original route topology outside local intervention",
+        "Verify local diode is connected to endangered gate before the violating fabrication layer",
+        "Reject a clean absent-diode control as inconclusive",
+        "Retain all original timing/electrical/overflow checks on full-design candidate"
+      ]
+    },
+    {
+      "net": "net12579",
+      "before_lengths_dbu": {
+        "Metal2": 28800,
+        "Metal3": 100800
+      },
+      "after_lengths_dbu": {
+        "Metal2": 432000,
+        "Metal3": 100800,
+        "Metal4": 86400
+      },
+      "required_failure_evidence": {
+        "wire12579/A": {
+          "Via1": {
+            "cumulative_area_ratio": 0.17,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal2": {
+            "cumulative_area_ratio": 179.89,
+            "reported_limit": 200.0,
+            "violated": false
+          },
+          "Via2": {
+            "cumulative_area_ratio": 0.51,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal3": {
+            "cumulative_area_ratio": 214.77,
+            "reported_limit": 200.0,
+            "violated": true
+          },
+          "Via3": {
+            "cumulative_area_ratio": 0.68,
+            "reported_limit": 0.0,
+            "violated": false
+          },
+          "Metal4": {
+            "cumulative_area_ratio": 296.53,
+            "reported_limit": 14136.0,
+            "violated": false
+          }
+        }
+      },
+      "acceptance_requirements": [
+        "Reproduce actual named sink and layer-specific antenna violation in diode-absent control",
+        "Preserve original route topology outside local intervention",
+        "Verify local diode is connected to endangered gate before the violating fabrication layer",
+        "Reject a clean absent-diode control as inconclusive",
+        "Retain all original timing/electrical/overflow checks on full-design candidate"
+      ]
+    }
+  ]
+}

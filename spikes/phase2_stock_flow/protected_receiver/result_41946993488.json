@@ -1,0 +1,273 @@
+{
+  "run_id": 41946993488,
+  "scope": "Small native probe; preservation passes, full-design efficacy unproven",
+  "raw_connectivity_independently_matched": true,
+  "variants": {
+    "true": {
+      "preservation": {
+        "protected": "true",
+        "direct_receiver_connections": 7,
+        "native_protection_stages": [
+          "repairdesignpostgpl",
+          "resizertimingpostcts",
+          "repairdesignpostgrt",
+          "resizertimingpostgrt"
+        ],
+        "full_design_qualified": false,
+        "lower_layer_protection_proven": false
+      },
+      "antenna": {
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "flow__warnings__count": 1,
+        "flow__errors__count": 0,
+        "flow__warnings__count:ORD-0032": 1,
+        "flow__warnings__type_count": 1
+      },
+      "typical_setup_ns": 11.3885,
+      "typical_hold_ns": 0.383455,
+      "per_receiver_layer_metrics": {
+        "receiver_755f67756172642e675f6269745c5b305c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 3.78,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 38.64,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b335c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 1.53,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 16.13,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b365c5d2e7472775f72656365697665725f73696e6b.rpt": {},
+        "receiver_755f67756172642e675f6269745c5b325c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 3.78,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 45.4,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b355c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 5.42,
+            "limit": 40308.0
+          },
+          "Via2": {
+            "ratio": 0.68,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 13.27,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b315c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 1.53,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 36.39,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b345c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 5.42,
+            "limit": 40308.0
+          },
+          "Via2": {
+            "ratio": 0.68,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 13.27,
+            "limit": 54444.0
+          }
+        }
+      }
+    },
+    "false": {
+      "preservation": {
+        "protected": "false",
+        "direct_receiver_connections": 6,
+        "native_protection_stages": [],
+        "full_design_qualified": false,
+        "lower_layer_protection_proven": false
+      },
+      "antenna": {
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "flow__warnings__count": 1,
+        "flow__errors__count": 0,
+        "flow__warnings__count:ORD-0032": 1,
+        "flow__warnings__type_count": 1
+      },
+      "typical_setup_ns": 11.3877,
+      "typical_hold_ns": 0.383455,
+      "per_receiver_layer_metrics": {
+        "receiver_755f67756172642e675f6269745c5b305c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 3.78,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 24.86,
+            "limit": 14136.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b335c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 1.53,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 16.13,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b365c5d2e7472775f72656365697665725f73696e6b.rpt": {},
+        "receiver_755f67756172642e675f6269745c5b325c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 3.78,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 18.38,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b355c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 5.42,
+            "limit": 40308.0
+          },
+          "Via2": {
+            "ratio": 0.68,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 13.27,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b315c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 1.53,
+            "limit": 200.0
+          },
+          "Via2": {
+            "ratio": 0.51,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 22.88,
+            "limit": 54444.0
+          }
+        },
+        "receiver_755f67756172642e675f6269745c5b345c5d2e7472775f72656365697665725f73696e6b.rpt": {
+          "Via1": {
+            "ratio": 0.17,
+            "limit": 0.0
+          },
+          "Metal2": {
+            "ratio": 5.42,
+            "limit": 40308.0
+          },
+          "Via2": {
+            "ratio": 0.68,
+            "limit": 0.0
+          },
+          "Metal3": {
+            "ratio": 13.27,
+            "limit": 54444.0
+          }
+        }
+      }
+    }
+  },
+  "full_design_qualified": false
+}

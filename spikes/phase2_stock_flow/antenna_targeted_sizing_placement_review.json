@@ -1,0 +1,25 @@
+{
+  "scope": "DEF same-row bounding-box screen only; not OpenDB legalization or full geometry proof",
+  "targets": [
+    {
+      "instance": "wire13568",
+      "orientation": "S",
+      "conservative_same_row_bbox_overlap_candidates": [],
+      "native_odb_legality_check_required": true
+    },
+    {
+      "instance": "wire12579",
+      "orientation": "FS",
+      "conservative_same_row_bbox_overlap_candidates": [
+        "fanout295"
+      ],
+      "native_odb_legality_check_required": true
+    },
+    {
+      "instance": "_38673_",
+      "orientation": "N",
+      "conservative_same_row_bbox_overlap_candidates": [],
+      "native_odb_legality_check_required": true
+    }
+  ]
+}

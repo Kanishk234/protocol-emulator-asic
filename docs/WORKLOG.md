@@ -2,6 +2,39 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-04 — Finish targeted three-size/one-diode diagnostic runner
+
+- Add targeted_antenna_diagnostic.py and separate paired workflow restoring exact frozen final reference. Edited arm: preflight3masters/pins→replace3cells→native detailed placement/checkplacement→explicit ODB/DEF/NL/PNLsnapshot→native one-diode hold7969/A insertion→native GlobalRouting→fresh repeated3cornerSTA/antenna. Empty control snapshots/reroutes same source without edits.
+- Audit exact3master changes/all original logical pin connections and exactly1added diode; frozen source hashes retained. New physical snapshots are explicit diagnostic handoffs with inherited metrics cleared, not promoted stock checkpoints. Local PDKproofs/editednetlistaudits and7Tclhelperchecks pass; runner/workflow embedded syntax andactionlintpass. Native physical validation still pending.
+- Diagnostic-only/qualificationfalse/no DRT; final raw measurements decide effects. Official-flow source integration remains unresolved; do not claim this extra-step experiment can be adopted directly. Publish/launch under standing approval; unrelated files/main source/config/officialjobs preserved.
+
+## 2026-11-04 — Prepare native exact-target sizing/legalization script
+
+- Interruption left no local gh/Yosys/OpenROADprocess active. Generated targeted_antenna_size.tcl with actual source masters/fullsignalpinchecks for three candidates, using existing helper to preflight all targets before mutation, verify post-replacement connectivity, then detailed_placement/check_placementand explicit diagnosticODB/DEF/NL/PNLexports. LargerBUF4overlap requires legalization; no assumption that footprint fits.
+- Helper regression initial run could not start because standalone tclshmissing. Re-ran via local Yosys Tclinterpreter using ignoredTRIPWIRE_TCLSHwrapper:7/7pass, covering missing/wrongmaster/pins/nets/power/preflight-before-mutation/postedit failures. This validates helperbehavior, not the new actual physical targets in OpenROAD.
+- Fourthgate diode and source-bound diagnostic runner/fresh reroute/timing/antenna checks still need integration before launch. No physical run, publication, main source/config/official-job change, DRT or phase tick. No local watcher.
+
+## 2026-11-04 — Prove three sizing substitutions and inspect placement feasibility
+
+- Actual pinned PDK Boolean SAT proofs pass BUF2→BUF8,BUF2→BUF4,NAND2_1→NAND2_2. Edit ignored copy of real final netlist and independently audit exact three master substitutions/all original port connections conserved. Save antenna_targeted_sizing_proof.json; no physical efficacy or official-source claim.
+- Conservative DEF same-row bbox review saved antenna_targeted_sizing_placement_review.json; native ODB legalization still required, including orientations and all overlaps. This prevents assuming23.6um²extra footprint fits at current sites. Fourthdelayinput still needslocalprotection. No physical workflow, source/config edit, DRT, publication or phase tick.
+
+## 2026-11-04 — Quantify selective gate-area alternative
+
+- Retrieved exact pinned standard-cell LEF using pinned installer PDKrevision2bbec755. Gate areas:BUF2.2132,BUF4.3146,BUF8.7254,NAND2_1.2418,NAND2_2.4784um². Fixed-geometry first-order ratios: wire13568BUF8~92.77(BUF4~213.92stillfails),wire12579BUF4~145.55,NAND_38673_strength2~109.08. Three cell footprint increase23.5872um². Not native timing/antenna proof; changes can reroute/loadpreviousstages.
+- hold7969delay input.1092um²has no larger samefunctionvariant; requires local protection/route continuity. Save antenna_targeted_sizing_feasibility.json. This narrows a possible diagnostic to3sizes+1localprotection instead of guardingwholebuses; exact mapped ECO would not by itself be an official-compatible source solution. No physical experiment or sourcepromotion launched.
+
+## 2026-11-04 — Reject duplicate long-distance receiver experiment
+
+- Before launching, checked historical protected_endpoint41691066588:601umdriver/sink separation but clean no-diodecontrol, straightMetal3route; antenna efficacy explicitly inconclusive. Proposed distance-only stress would duplicate that uninformative test. Correct plan to actual failing multi-layer topology, not longer span. No physical experiment launched.
+- Prepared protected_receiver/topology_stress_requirements.json from exact41940634866per-net route lengths and antenna metrics, with negative-control violation and lower-layer diode-connectivity requirements. Receiver41946993488proves preservation only. Existing41714141900nativeECOintervention already demonstrates actual endpoint diode benefit but is not an allowed official-flow integration; do not repeat it as a source solution.
+- Remaining engineering gap is general source integration that protects endangered physical gates through native buffer insertion. No supported implementation is yet verified. No source/config/official-job edit, publication, DRT or phase tick.
+
+## 2026-11-04 — Small receiver preservation passes; efficacy still unproved
+
+-41946993488bothnative jobs pass (~3min);main standardCIgreen. Downloaded artifacts and independently matched direct connections: protected7/7,disabled6/7. Protected receipt coversall4native repair stages. Fresh whole-probe antenna0/electrical0both;typ setup11.3885/11.3877ns,hold0.383455nsboth. Save protected_receiver/result_41946993488.json.
+- Native per-receiver reports show ordinary Metal2allowance200and diffusion-protected allowanceatMetal3(example54444). Thus directnet/diode preservation is proven on this probe, but robust lower-layer protection/full-design efficacy is not. Both controls antenna-clean, so no demonstrated violation removal. Do not integrate acrossfullsourceorlaunchlargebuildonthisevidencealone. Next stress representative long exposed gate-side routes and assess physical diode placement/layer attachment; keep official-flow portability requirement. No new launch/promotion/DRT/phase tick this turn.
+
 ## 2026-11-04 — Prepare small protected receiver native test
 
 - Add separate protected-receiver-preservation workflow: identical7bitprobe/protectedRXenabled versusdisabled, stocknativeflowthroughfinalSTA. Require7directdiode/receiverconnections and complete21objectcoverage in all4native repairlogs for protected arm. Record geometry via read-only route export/per-netantenna reports and fresh whole-probe antenna checks. No full-design closure claim; lower-layer efficacy must be assessed from reports.
@@ -6608,3 +6641,5 @@ Publication receipt:5c08df0/5da1fc3/4aaeb24/dca764bpushed; remote verified after
 Publication receipt:9267f6fCI/ce42456docs pushed; remote maince42456c28903a40ae613290879c1302ba00fcedverified. Native antenna margin50replay41928478235queued on exact SHA. No result/DRT/watcher; all owned local commands finished.
 
 Publication receipt: automatic review initially timed out before execution; permitted single retry succeeded. Published2c53645tools/0cd1804CI/ac6392devidence; remote mainac6392d1ca8913a2dd6ccaed3b5cdb0f9770e211verified. Read-only geometry audit41940634866confirmed in progress. No new physical repair experiment, DRT or watcher.
+
+Publication receipt:fa0cdd9prototype/f9b8e6etools/bfa27afCI/b619ca9docs pushed; remote mainb619ca960a6d8ef9943db77e5a6e94d2b282bf69verified. Small receiver preservation41946993488in progress. All owned local commands complete; no watcher/mainhardwareintegration/DRT.

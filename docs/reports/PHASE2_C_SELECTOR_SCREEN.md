@@ -215,3 +215,23 @@ Pin locations and final placements are exported.78 related checks pass; no
 congestion/timing success is predicted. All original acceptance gates stay fixed.
 
 Explicit-site test [42128655779](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42128655779) was launched on `a277802e7b698d7575fe55d872f4e750c5e0ec56`; native results pending.
+
+
+## Fixed-site result and exact congestion diagnosis
+
+Run42128655779's control passes. The edited clock diode remains at its reviewed
+site, its supplies and native placement checks pass, and all original/signoff
+estimated timing/electrical checks pass. Antennas are0. Overflow improves17→15,
+so the screen remains unqualified. No detailed routing or extraction starts.
+
+The next manual `gds-c-select-congestion-readback` is read-only. It loads the exact
+saved edited ODB in the immutable stock image, reads actual layer grid capacities
+and usage, requires the overflow sum to match15, and reports every exported
+route crossing each overloaded edge. Whole artifact ZIP and ODB hashes are
+verified before inspection; input bytes must stay unchanged. No PDK setup,
+synthesis, placement, routing or timing rerun is needed.7 grid/route regression
+cases cover coordinate mapping, H/V edges, invalid values and missing coverage.
+This measurement will guide a bounded routing-neighborhood decision rather than
+another placement guess. A green readback job is not a green physical screen.
+
+Read-only edge inspection [42131917635](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42131917635) was launched on `28727e44348eaebbfb887314dd4a16872a2d7c5b`; results pending.

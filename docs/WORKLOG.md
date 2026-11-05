@@ -2,12 +2,21 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Fixed-site repair leaves15 overflow; inspect exact overloaded edges
+
+-42128655779 control passes. Edited exact-site/supply/placement assertions pass; clock diode remains643680,510300 R0. Both original/signoff timing and electrical checks pass, antenna0, unrelated routes/cells preserved. Live overflow drops17→15, so final gate still correctly fails. Save c_select_repair_result_42128655779.json. No new extracted timing or DRT result.
+- Stop varying placement by inference. Prepare read-only congestion inspection of this exact saved edited ODB: native getGridX/Y and getCapacity/getUsage read layer cells, overflow sum must equal the live15 gate, and each overloaded grid edge must match exported route segments. Report all crossing nets for a targeted neighborhood repair decision. Exact Python grid bindings/indexing checked against binary commitdcf36133 sources.
+- Separate manual workflow needs only the immutable stock image, ODB and after.segments; no PDK install, synthesis, legalization, routing or STA. Bind source run/artifact/ODB SHA and whole ZIP digest; verify them before readback and assert input ODB unchanged. Successful inspection is not design qualification.7 grid/geometry regressions and actionlint/embedded syntax checks pass.
+- The earlier docs push succeeded on normal retry; remote main confirmedf62e971. Keep unrelated files/FIPE local. Published inspector/evidence/workflow through28727e44348eaebbfb887314dd4a16872a2d7c5b and launched one scoped read-only inspection under standing approval: [42131917635](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42131917635), confirmed in progress on that SHA. All hardware/config/official jobs and acceptance gates unchanged; no phase tick. Next identify actual saturated edges/nets before modifying routing scope.
+
 ## 2026-11-05 — Replace rejected clock seed with a verified legal site
 
 -42125394009 control passes; edited arm stops before routing because native legalization leaves the reviewed clock-seed window. No new timing/congestion result. Inspect actual fixed-row occupancy: row514080 is full nearby. Adjacent row510300 has exact three-site gap643680..645120 between hold7746 and _33545_;1.44x3.78um antenna cell fits CoreSite grid with12.96um X/11.34um Y anchor displacement. Save c_select_clock_site_feasibility.json with DEF/LEF hashes/guards; native placement checks remain mandatory.
 - Place/lock only the added clock diode at that explicit R0 site; keep original20um bounds, other diodes, buffer and all original-cell locks. Replace the ineffective seed-window guard with an exact reviewed-site guard; original timing/antenna/electrical/overflow acceptance remains unchanged. Export global-router pin locations.
 - Actual earlier DEF also reveals added diode VDD/VSS pins unconnected; fix insertion to copy each anchor supply and verify after routing. Record diagnostic bug and reject bad supplies in tests. Previous result never qualified LVS/precheck.78 related regression checks pass plus actionlint/diff checks. No main RTL/config or official job edits, DRT or phase tick.
 - Published tools/plan througha277802e7b698d7575fe55d872f4e750c5e0ec56 and launched one paired explicit-site diagnostic under standing approval: [42128655779](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42128655779), confirmed in progress on that SHA. Next verify native legal placement, supply connections, actual clock access point and all original/signoff gates. The last valid edited measurement still has17 overflow; closure remains unproved.
+- Documentation commitf62e971 remains local: two normal pushes were rejected by GitHub with `fatal error in commit_refs`; remote main was confirmed at the expected parenta277802 after the first rejection. No force/history rewrite attempted. The published tools/plan and running diagnostic are unaffected.
+- Latest run check: both control and edited native-intervention steps passed; edited exact-site/supply/placement assertions and exports therefore completed. Both jobs are taking fresh corner/antenna measurements; final gates remain pending.
 
 ## 2026-11-05 — Legal C-selector repair leaves17 Metal3 overflow; target clock corridor
 

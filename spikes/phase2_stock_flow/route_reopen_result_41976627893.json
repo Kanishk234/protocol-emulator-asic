@@ -1,0 +1,47 @@
+{
+  "run_id": 41976627893,
+  "raw_reports_independently_matched": true,
+  "canonical_frozen_routes_matched": true,
+  "no_edit_route_roundtrip": {
+    "old_routed_nets": 45057,
+    "new_routed_nets": 45057,
+    "changed_nets": [],
+    "unexpected_changed_nets": [],
+    "unchanged_routes_preserved": true,
+    "exact_roundtrip": true,
+    "physical_timing_measured": false,
+    "official_signoff": false
+  },
+  "routing_demand": 309862,
+  "overflow": 0,
+  "fresh_corner_metrics": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.144394,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.738651,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.355043,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "fresh_antenna": {
+    "antenna__violating__nets": 4,
+    "antenna__violating__pins": 4
+  },
+  "calibration_passed": true,
+  "design_qualified": false,
+  "scope": "No-edit reopening only; does not establish route preservation after real edits"
+}

@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Prepare constrained incremental three-size/one-diode test
+
+- Extend calibrated native reopen path with optional bounded intervention. Only3sizingtargets+fanout295neighbor may move;allotheroriginalinstances lockedduringnativeDPLandchecked for exactlocation/orientation/status beforeandafterincrementalrouter. Originalsignalconnections/mastersconservedexcept3approvedstrengths;exact1diodeatdelayinput. Routerdirtynetlistlimitedtoincidentnets;exportedauditrejects anyroutechangeoutsidepredeclaredset.
+- Separate pairedworkflowrequiresunchangedcontrolreproduction;editedarmmustpassall3corner setup/hold,50psfastreserve,electrical0,antenna0,livepositive demand/zerooverflow.27local auditregressionsandsemantic/embeddedsyntaxpass. NativeeditAPIsnotyetexecuted;anylocality/API/physicalgatefailureisdiagnostic,notpromotion.
+- Publishlaunchunderstandingapproval; no main source/config/officialjobs/DRTchanges. Clean source integration remains separate even iflocaldiagnosticpasses.
+
+## 2026-11-05 — Native no-edit route reopen calibration passes
+
+-41976627893passes in7m34s. Downloaded artifact and independently matched canonical originalroutehash,exactbefore/aftersegmentroundtrip,all repeated rawcorner metrics,freshantenna4andpositive live demand/zerooverflow. Save route_reopen_result_41976627893.json. Native initialcapacity→loadguides→incrementalnoedit now demonstrably preserves this reference.
+- ReferenceholdF/T/S144.394/355.043/738.651psandsetup0/electrical0retained. Calibration passes; design stillhas4antennas. Next integrate constrained3sizes+1diode inside same initialized incrementalrouter; require all unrelatedXY/orient/routes unchanged and freshallgates. Real-editroutepreservationnotyetproven. No newphysicaleditrun/DRT/phaseclaim thisturn;officialjobs/unrelatedfilesunchanged.
+
 ## 2026-11-05 — Remove host-package dependency from native calibration
 
 -41975191740fails beforedesignload withembeddedPythonModuleNotFoundError:librelane. Downloadedraw9KBartifact confirms startupfailure,nogeometry/timingresult. ReplaceOdbReaderimportwithnativeTech/Designandverbatimequivalentpinnedroutinginitializationcalls. Standardlibrary/OpenROADonly; allhash/roundtrip/live-demand/timing/antenna gatesretained.
@@ -6691,3 +6702,5 @@ Publication receipt:1abfce4tools/45b36e9test/c5355fbCI/eba1cf0docs pushed; remot
 Movement breakdown: 28originalinstances changedXY;20506changedorientation. Unrestricted detailed placement did not preserve the surrounding placed layout; future diagnostic must constrain untouched cells and avoid blanket global rerouting if testing a local fix. This is an engineering limitation of this diagnostic, not evidence that small edits inherently require20kchanges.
 
 Publication receipt:b077f2ftools/a443dd5tests/d913f7bCI/3b6287bdocs pushed;remote main3b6287bae9b3abdbcf8b35dc7add6d848199cb9dverified. No-edit calibration41975191740in progress. No design edit inthisrun; no watcher or DRT.
+
+Publication receipt:f51c2f8tools/40d194fdocs pushed;remote main verified. Corrected no-edit calibration41976627893in progress on40d194f87c1fe27c13fa975189dc1f4257dd7ae1. No physical edit/result/watcher.

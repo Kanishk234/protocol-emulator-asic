@@ -47,3 +47,14 @@ def test_profile_keeps_exact_cselector_physical_recipe():
     old,new=p['rtl_shared_minbuf2_cselect'],p['rtl_shared_minbuf2_host_align']
     assert old['changes']==new['changes'] and old['config_sha256']==new['config_sha256']
     assert new['rtl_patch']==old['rtl_patch'] and new['c_select'] is True and new['host_port_align'] is True
+
+
+def test_combined_profile_adds_only_idle_storage_to_measured_host_source():
+    root=Path(__file__).resolve().parents[2]
+    p=json.loads((root/'spikes/phase2_stock_flow/stock_control_profiles.json').read_text())['profiles']
+    old,new=p['rtl_shared_minbuf2_host_align'],p['rtl_shared_minbuf2_host_idle_ff']
+    assert old['changes']==new['changes'] and old['config_sha256']==new['config_sha256']
+    assert new['comparison_reference_run']==42262602008
+    assert new['c_select'] is True and new['host_port_align'] is True and new['idle_ff'] is True
+    allowed={'idle_ff','comparison_reference_run','comparison_reference_config_sha256'}
+    assert {k:v for k,v in new.items() if k not in allowed} == {k:v for k,v in old.items() if k not in allowed}

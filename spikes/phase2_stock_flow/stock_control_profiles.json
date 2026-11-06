@@ -330,6 +330,32 @@
       "comparison_reference_config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567",
       "c_select": true,
       "host_port_align": true
+    },
+    "rtl_shared_minbuf2_host_idle_ff": {
+      "changes": {
+        "RUN_POST_GRT_RESIZER_TIMING": true,
+        "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_ANTENNA_REPAIR_DIODE_ONLY": true,
+        "PL_RESIZER_HOLD_SLACK_MARGIN": 0.175,
+        "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": 200,
+        "CTS_SINK_CLUSTERING_MAX_DIAMETER": 100,
+        "EXTRA_EXCLUDED_CELLS": [
+          "sg13cmos5l_buf_1"
+        ],
+        "SYNTH_BUFFER_CELL": "sg13cmos5l_buf_2/A/X"
+      },
+      "config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567",
+      "additional_changes_from_reference": {
+        "source_patch": "host_port_align/host_port_align.patch",
+        "reference_profile": "rtl_shared_minbuf2_cselect"
+      },
+      "rtl_patch": "shared_priority",
+      "hardware_unchanged": false,
+      "comparison_reference_run": 42262602008,
+      "comparison_reference_config_sha256": "920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567",
+      "c_select": true,
+      "host_port_align": true,
+      "idle_ff": true
     }
   },
   "hardware_unchanged": true,

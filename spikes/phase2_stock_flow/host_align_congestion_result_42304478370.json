@@ -1,0 +1,33 @@
+{
+  "run": 42304478370,
+  "source_run": 42262602008,
+  "source_odb_sha256": "cad76cd4937580500a6d0640596c9ae7cba9765abae5eed3a7e4c5e24f044055",
+  "source_odb_unchanged": true,
+  "overflow": 70.0,
+  "edge_count": 69,
+  "layer_totals": {
+    "Metal2": {
+      "capacity": 263130.0,
+      "usage": 195229.0,
+      "overflow": 0.0
+    },
+    "Metal3": {
+      "capacity": 302689.0,
+      "usage": 252461.0,
+      "overflow": 70.0
+    },
+    "Metal4": {
+      "capacity": 263130.0,
+      "usage": 111492.0,
+      "overflow": 0.0
+    }
+  },
+  "bounds_dbu": {
+    "x_min": 565200,
+    "x_max": 781200,
+    "y_min": 3600,
+    "y_max": 694800
+  },
+  "scope": "Read-only saved congestion validated against final live routing gate; guide-overlap candidates only, not exact crossings or connectivity; no placement, repair, rerouting, STA or closure claim",
+  "design_qualified": false
+}

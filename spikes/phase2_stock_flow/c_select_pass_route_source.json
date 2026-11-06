@@ -1,0 +1,31 @@
+{
+  "run": {
+    "id": 42156980762,
+    "head_sha": "fe672fc0dfbb73c6e195aa4f8bfeca6c7424d8e8",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-c-select-covered-clock.yaml",
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 13475875765,
+    "name": "c-select-covered-true-42156980762",
+    "size_in_bytes": 260507156,
+    "expired": false,
+    "digest": "sha256:8169d035000b6e287f4180e6763e811112fa453ec452b31691fb2104058fe451"
+  },
+  "files": {
+    "runs/route-reopen-calibration/state_out.json": "2df48d83e74daeab98a0a17823d3cb8e813965cc4d7d4e1a363cb7117719fa3e",
+    "runs/route-reopen-calibration/calibrated.odb": "15d55a9aeb3174a507c6cc3c93c83ee5199b24a25a36e0b97d288b0924ac8718",
+    "runs/route-reopen-calibration/calibrated.def": "2337bc7072a7662c7f5fb376bed1318692fcbe7de14397d36835196e01f9ef86",
+    "runs/route-reopen-calibration/calibrated.nl.v": "ae490430936e51f85ded55e4b7d29e7ecf813e8cd9c0e1b1837cee15d2ceb5f5",
+    "runs/route-reopen-calibration/calibrated.pnl.v": "c41b7e6b1ca6c79b119b1e3caf10ab3958f18d906e5a88ff521f28400b334f62",
+    "runs/route-reopen-calibration/final_gates.json": "074b9e0bd962bbfb7b36092dd3152ce0cca1738d9689978ecefd6c5b9d7d4aee",
+    "runs/route-reopen-calibration/intervention.json": "288325a6fdd2038596075eb240cd134b06a3582f0bcee464712968c46410c1a5",
+    "runs/route-reopen-calibration/geometry_result.json": "a34cdac303265e51df8595842110965d5d009d35edc5cc2a31c03afc072ef322",
+    "runs/stock-corner-audit/read_only_audit.json": "de6a0856eb7b20ae1499634e0100f547d06e20f7af636f69e8c31e9211ea8a19",
+    "runs/c-select-signoff-audit/qualification.json": "355c767943cc078b2815d44e585870b4a326e5fc5addb142cb3ad530322a4f3c"
+  },
+  "sdc_sha256": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba",
+  "frozen_source_run": 42078913664,
+  "scope": "Exact green experimental checkpoint continuation to DRT only. No repairs repeated or official-flow qualification."
+}

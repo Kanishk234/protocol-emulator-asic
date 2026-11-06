@@ -1,0 +1,53 @@
+{
+  "run_id": 42156980762,
+  "conclusion": "success",
+  "control_conclusion": "success",
+  "edited_gates": {
+    "edited": true,
+    "failures": [],
+    "diagnostic_gates_passed": true,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 0,
+      "antenna__violating__pins": 0
+    },
+    "overflow": 0
+  },
+  "geometry": {
+    "old_routed_nets": 44792,
+    "new_routed_nets": 44792,
+    "changed_nets": [],
+    "unexpected_changed_nets": [],
+    "unchanged_routes_preserved": true,
+    "exact_roundtrip": true,
+    "physical_timing_measured": false,
+    "official_signoff": false
+  },
+  "independent_native_all_pin_coverage_passed": true,
+  "original_and_signoff_estimated_timing_passed": true,
+  "decision": "All strict pre-DRT gates pass together. Continue exact checkpoint to DRT, then extraction if route DRC/antenna/connectivity pass. Official source/config reproduction remains open.",
+  "official_flow_qualified": false
+}

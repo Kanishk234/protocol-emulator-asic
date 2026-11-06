@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-06 — Saved-grid diagnosis completes; verify controlled source composition
+
+-42304478370 succeeds, source/artifact/ODB/guide hashes verified; saved overflow70 matches final live gate. All on69Metal3horizontal edges,68with excess1 and1with excess2, spanningX565.2..781.2um andY3.6..694.8um. Metal2/4overflow0. Guide candidates include847nets, none of the6antenna-failing nets. This is broad residual horizontal pressure, not a single offending clock/antenna route. Earlier final routing already had67overflow before the last timing repair; that stage did not create the entire congestion problem. Save host_align_congestion_result_42304478370.json.
+- D-159 prepares rtl_shared_minbuf2_host_idle_ff: one source delta(cfgIDLEstorage) from measured host42262602008, exact same physical config. Preserve word-alignment electrical gain while testing the shared old setup startpoint remedy. This is not claimed to solve antenna/congestion; strict screens still gate routing. Hash-guarded exact CI prep passes and matches combined local RTL; both candidate hashes match independent module-proof evidence.68focused helper/profile/effective-control tests, actionlint/diff checks pass. Full22matched RTL suite runs locally with real offline sigrok; no combined full-suite pass claimed yet.
+- Main hardware/config/official jobs untouched; unrelated local files preserved; no phase tick or DRT. Next inspect combined regression and source screen, requiring every strict gate before proceeding.
+
 ## 2026-11-06 — Diagnose host alignment antenna layers; prepare saved-grid readback
 
 - Parse full fresh antenna report from42262602008:6nets/7pins fail,9layer-specific violation rows. Affected nets are lane0 time_now[0], lane1 regs[35], p_tok[147], net12183(SRAM A_ADDR[7]), net14794 and net15390. Summary partial ratios below200 on some rows do not mean pass: the full cumulative area check still fails. Save host_align_antenna_42262602008.json.

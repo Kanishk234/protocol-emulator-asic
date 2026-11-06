@@ -1,4 +1,4 @@
-"""Bounded three-diode/one-buffer diagnostic for the frozen C-selector source."""
+"""Bounded receiver and clock-branch diagnostics for the frozen C-selector source."""
 import json
 import math
 import os
@@ -35,9 +35,15 @@ def audit_snapshot(before, after, plan, units):
     distance = plan['maximum_displacement_um'] * units
     for name, original in before.items():
         current = after[name]
-        assert current['pins'] == original['pins'], 'Original connection changed: ' + name
+        expected_pins = dict(original['pins'])
+        reparent = plan.get('clock_reparent')
+        if reparent and name == reparent['instance']:
+            assert canonical(original['pins'][reparent['pin']]) == reparent['before_net']
+            assert canonical(current['pins'][reparent['pin']]) == reparent['after_net'], 'Wrong parent clock'
+            expected_pins[reparent['pin']] = current['pins'][reparent['pin']]
+        assert current['pins'] == expected_pins, 'Original connection changed: ' + name
         if name not in movable:
-            assert current == original, 'Unrelated cell changed: ' + name
+            assert current == {**original, 'pins': expected_pins}, 'Unrelated cell changed: ' + name
         else:
             assert original['master'] == movable[name]['original_master']
             assert current['master'] == movable[name]['candidate_master']
@@ -64,12 +70,35 @@ def audit_snapshot(before, after, plan, units):
 
 def apply(design, router, database):
     import odb
-    plan = json.loads(Path('spikes/phase2_stock_flow/c_select_local_repair_plan.json').read_text())
+    path = os.environ.get('C_SELECT_REPAIR_PLAN', 'spikes/phase2_stock_flow/c_select_local_repair_plan.json')
+    assert path in ('spikes/phase2_stock_flow/c_select_local_repair_plan.json',
+                    'spikes/phase2_stock_flow/c_select_clock_reparent_plan.json')
+    plan = json.loads(Path(path).read_text())
     manifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
     assert manifest['run']['id'] == plan['source_run'], 'Repair plan belongs to another source'
     block = database.getChip().getBlock()
     units = block.getDbUnitsPerMicron()
     before = snapshot(block)
+    reparent = plan.get('clock_reparent')
+    reparent_objects = None
+    if reparent:
+        target = block.findInst(reparent['instance'])
+        assert target.getMaster().getName() == 'sg13cmos5l_dlhq_1'
+        term = target.findITerm(reparent['pin'])
+        old_clock = term.getNet()
+        assert canonical(old_clock.getName()) == reparent['before_net']
+        drivers = [t for t in old_clock.getITerms() if str(t.getMTerm().getIoType()) == 'OUTPUT']
+        assert len(drivers) == 1 and drivers[0].getMTerm().getName() == 'X'
+        leaf = drivers[0].getInst()
+        assert leaf.getMaster().getName() == 'sg13cmos5l_buf_8'
+        parent_clock = leaf.findITerm('A').getNet()
+        assert canonical(parent_clock.getName()) == reparent['after_net']
+        assert str(old_clock.getSigType()) == str(parent_clock.getSigType()) == 'CLOCK'
+        parent_drivers = [t for t in parent_clock.getITerms() if str(t.getMTerm().getIoType()) == 'OUTPUT']
+        assert len(parent_drivers) == 1
+        assert parent_drivers[0].getMTerm().getName() == 'X'
+        assert parent_drivers[0].getInst().getMaster().getName() == 'sg13cmos5l_buf_8'
+        reparent_objects = term, old_clock, parent_clock
     seeds = {}
     allowed = {item['instance'] for item in plan['sizing']}
     diode_master = database.findMaster('sg13cmos5l_antennanp')
@@ -114,6 +143,12 @@ def apply(design, router, database):
             for power in ('VDD', 'VSS'):
                 diode.findITerm(power).connect(anchor.findITerm(power).getNet())
             router.addDirtyNet(net)
+        if reparent_objects:
+            term, old_clock, parent_clock = reparent_objects
+            term.disconnect()
+            term.connect(parent_clock)
+            router.addDirtyNet(old_clock)
+            router.addDirtyNet(parent_clock)
         distance = plan['maximum_displacement_um']
         checked(design, placement_command(distance))
         checked(design, 'check_placement -verbose')
@@ -129,6 +164,8 @@ def apply(design, router, database):
     return dict(_before=before, _plan=plan, _units=units,
                 allowed=plan['allowed_signal_nets_to_reroute'],
                 added_diodes=len(plan['diodes']), diagnostic_only=True,
+                clock_reparent=reparent,
+                clock_reparent_identity_checked=bool(reparent_objects),
                 placement_checked=True,
                 clock_net_changed=True, clock_timing_must_be_remeasured=True)
 

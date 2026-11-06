@@ -88,3 +88,22 @@ def test_intervention_drift_rejects(fault):
 def test_out_of_bound_locked_site_rejects():
     with pytest.raises(ValueError, match='exceeds reviewed displacement'):
         diode_seed((0, 0), {'locked_site_dbu': [30000, 0]}, 1000, 20)
+
+
+@pytest.mark.parametrize('fault', ['none', 'wrong_clock', 'data_changed', 'latch_moved'])
+def test_reparent_allows_only_reviewed_clock_pin(fault):
+    before, after, plan = fixture()
+    clock = plan['diodes'].pop()
+    del after[clock['name']]
+    target = clock['anchor']
+    root = Path(__file__).resolve().parents[2]
+    reviewed = json.loads((root / 'spikes/phase2_stock_flow/c_select_clock_reparent_plan.json').read_text())
+    plan['clock_reparent'] = reviewed['clock_reparent']
+    before[target]['pins'].update(GATE=plan['clock_reparent']['before_net'], D='config_data')
+    after[target]['pins'].update(GATE=plan['clock_reparent']['after_net'], D='config_data')
+    if fault == 'wrong_clock': after[target]['pins']['GATE'] = 'unrelated_clock'
+    if fault == 'data_changed': after[target]['pins']['D'] = 'wrong_data'
+    if fault == 'latch_moved': after[target]['location'] = (0,0)
+    if fault == 'none': audit_snapshot(before, after, plan, 1000)
+    else:
+        with pytest.raises(AssertionError): audit_snapshot(before, after, plan, 1000)

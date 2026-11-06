@@ -1,0 +1,23 @@
+{
+  "run_id": 42158728020,
+  "conclusion": "success",
+  "route_drc_errors": 0,
+  "antenna_violating_nets": 0,
+  "critical_disconnected_pins": 0,
+  "noncritical_disconnected_pins": 1,
+  "completion": {
+    "source_run": 42156980762,
+    "detailed_routing_completed": true,
+    "route_drc_errors": 0,
+    "antenna_violating_nets": 0,
+    "disconnected_pin_checker_passed": true,
+    "state": "runs/c-select-pass-route/1-openroad-detailedrouting/state_out.json",
+    "extracted_timing_performed": false,
+    "official_gds_qualified": false
+  },
+  "extracted_timing_performed": false,
+  "official_gds_qualified": false,
+  "next": "Extract exact routed checkpoint; stock full table identifies only noncritical top-level ena input, no critical disconnect.",
+  "workflow_elapsed_minutes_approx": 225.5,
+  "noncritical_disconnected_pin": "tt_um_tripwire/ena"
+}

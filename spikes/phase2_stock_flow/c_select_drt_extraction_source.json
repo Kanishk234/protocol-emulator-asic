@@ -1,0 +1,34 @@
+{
+  "run": {
+    "id": 42158728020,
+    "head_sha": "544ec54ef4253b6196b92ad7ae05c88516c47992",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-c-select-pass-detailed-route.yaml",
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 13485790976,
+    "name": "c-select-pass-route-42158728020",
+    "size_in_bytes": 380305107,
+    "expired": false,
+    "digest": "sha256:c3b8c77d1286d6fb3d09414d3a3e5391a8723b0f8476778e07883ccd747daedb"
+  },
+  "files": {
+    "runs/c-select-pass-route/completion.json": "0afd3ff6af0894db4832c8bae1e6e5635453b8c4fb83e02e11e812bda2ffd71e",
+    "runs/c-select-pass-route/1-openroad-detailedrouting/state_out.json": "712c36005386981ab5afe8cfaf6cc44c186959a4226e4b352c38529e1e1df8b1",
+    "runs/c-select-pass-route/1-openroad-detailedrouting/or_metrics_out.json": "a1dfdc8725c36d39463e7114ca863ab8250ea4ff8690bbcd07a340a848195ba1",
+    "runs/c-select-route-antenna/1-openroad-checkantennas/state_out.json": "c8efff2ddeb635d62e3c96fe789125554bacf3c09126e420835dc3d078a4734f",
+    "runs/c-select-route-antenna/1-openroad-checkantennas/or_metrics_out.json": "3d4b227e662278a621fda0131aaefd786fd7ebe30a4d00f1bf707a88b019818d",
+    "runs/c-select-route-antenna/2-checker-trdrc/state_out.json": "c8efff2ddeb635d62e3c96fe789125554bacf3c09126e420835dc3d078a4734f",
+    "runs/c-select-route-antenna/4-checker-disconnectedpins/state_out.json": "47cb3ea04a44689fce98f1fbd4afe7ac43b101371a049b3004163e20225e1284",
+    "runs/c-select-route-antenna/3-odb-reportdisconnectedpins/state_out.json": "47cb3ea04a44689fce98f1fbd4afe7ac43b101371a049b3004163e20225e1284",
+    "runs/c-select-route-antenna/3-odb-reportdisconnectedpins/or_metrics_out.json": "ba622661ce367780ad1798e6603fc4e40350f46453cb6df08c7e0436de22cad6",
+    "runs/c-select-route-antenna/3-odb-reportdisconnectedpins/full_disconnected_pins_table.txt": "1cae171d14caee73aaeb252799d75af3567aca026b7cd64dc2649190d7136e49"
+  },
+  "source_state": "runs/c-select-pass-route/1-openroad-detailedrouting/state_out.json",
+  "antenna_metrics": "runs/c-select-route-antenna/1-openroad-checkantennas/or_metrics_out.json",
+  "disconnected_metrics": "runs/c-select-route-antenna/3-odb-reportdisconnectedpins/or_metrics_out.json",
+  "noncritical_disconnected_pins": 1,
+  "scope": "Completed clean experimental route extraction; not official GDS/source reproduction. Stock checker reports only noncritical top-level ena input.",
+  "noncritical_disconnected_pin": "tt_um_tripwire/ena"
+}

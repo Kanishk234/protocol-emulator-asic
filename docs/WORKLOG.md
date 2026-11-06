@@ -2,6 +2,19 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-06 — Diagnose host alignment antenna layers; prepare saved-grid readback
+
+- Parse full fresh antenna report from42262602008:6nets/7pins fail,9layer-specific violation rows. Affected nets are lane0 time_now[0], lane1 regs[35], p_tok[147], net12183(SRAM A_ADDR[7]), net14794 and net15390. Summary partial ratios below200 on some rows do not mean pass: the full cumulative area check still fails. Save host_align_antenna_42262602008.json.
+- Preserve original checkpoint; prepare separate gds-host-align-congestion-readback with whole artifact digest/provenance, exact final ODB SHA and guide SHA binding. Reuse tested saved-grid capacity/usage extraction without router initialization, placement, repairs or rerouting. Match guide rectangles to overloaded edges as candidates only; do not claim exact routed crossings/connectivity. Require saved overflow70 equals completed final live log. Original congestion workflows/manifest and official GDS unchanged.
+-12 focused regressions and actionlint/diff checks pass; real final guide file parses successfully. Next launch read-only inspection, then use exact layer/edge locations to select a native repair and retain all strict timing/electrical/antenna/overflow gates. No detailed route or phase tick.
+
+## 2026-11-06 — Both independent source screens finish; neither qualifies for routing
+
+- Inspect completed job logs and source-bound read_only_audit.json from 42259881584 and 42262602008; download small artifact entries with ZIP CRC verification (not independent whole-archive digest verification). Save source_screen_results_20261106.json. Both stock physical flows/all-corner audits complete; failures are measured gates, not infrastructure errors.
+- IDLE enabled-FF 42259881584: setup summaries0 at all corners; original fast/typical/slow hold0.047219/0.232691/0.595018ns. Fast hold misses50ps gate by2.781ps. Two slow slew rows remain, fresh antenna3nets/3pins, final global overflow15. Signoff-constraint audit fails on slow slew; final combined gate skipped. Do not misinterpret skipped gate as passing other checks.
+- Host word alignment 42262602008: original setup summaries0; fast/typical/slow hold0.088771/0.329491/0.712422ns; all electrical counts0 at all corners. Unchanged-signoff estimated audit passes. Strict final gate fails antenna6nets/7pins and final global overflow70. This is useful electrical closure in this source screen, not extracted setup closure or official qualification.
+- Neither source screen is ready for detailed routing; no phase tick, main source/config or official job changes. Previous extracted setup-2.9278127418ns remains the measured physical reference. Next diagnose the host candidate's six antenna nets and70 overflow edges, and compare actual setup-path headroom before selecting physical repair or combining separately proved source changes. Do not blindly rerun or route a failing screen.
+
 ## 2026-11-06 — Follow extracted evidence to two proved source repairs; both physical screens running
 
 -42254731067 succeeds and reproduces exact extracted baseline. Six fixed-SPEF cases show best NOR4 pair+hold11557 delay2 gives slow setup-2.2601174905ns versus-2.9278127418ns baseline; fast hold stays0.1797761990ns and two slow slew rows remain. Save c_select_sensitivity_result_42254731067.json. Do not route these insufficient changes alone. All20 worst reported baseline setup paths start at _51861_ IDLE; all fixed-RC sizing cases remain physically unqualified.

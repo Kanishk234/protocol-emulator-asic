@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "scope": "PDK BUF8 combinational identity only, arbitrary clock value; no skew/sequential/full-chip timing proof",
+  "pdk_cells_sha256": "b0adbc84c8f78feb01c3d8d9d55e9818ee6502347d336f3a1f846e6a5d64e0a2",
+  "model_sha256": "381ce856e838c95219f9d26711ea09bd9e1750097ab88a5972e37f91e320fe0a",
+  "proof_log_sha256": "e450c62187406232b4e1de11d33af47479a289328ff7689660b867d550653636",
+  "runtime_prerequisite": "Exact latch old clock has unique BUF8 X driver; new clock is that same buffer A, itself driven by a unique BUF8; native guards must pass"
+}

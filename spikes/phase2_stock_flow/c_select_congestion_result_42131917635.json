@@ -1,0 +1,18 @@
+{
+  "readback_run": 42131917635,
+  "source_run": 42128655779,
+  "source_whole_zip_sha256_verified_in_ci": true,
+  "source_odb_unchanged": true,
+  "source_odb_sha256": "64a2d0f18392a3fdd697979ce87c8663ce1b45f43cc2d0e58e764de5a5dc6b36",
+  "edge_report_sha256": "d176f179fc69042b5a17b63d407765b3877ceaf72d3c1fa571a43870addb6877",
+  "overloaded_edges": 15,
+  "overflow_per_edge": 1,
+  "clock_route": "clknet_2_0__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[0\\].g_stored.gclk",
+  "clock_crossings": 15,
+  "edited_data_crossings": 0,
+  "overloaded_rows_dbu": {
+    "500400": 1,
+    "514800": 14
+  },
+  "scope": "Exact native saved-grid overflow matches live15; identifies clock branch as sole edited route on overloaded edges. No closure or timing result."
+}

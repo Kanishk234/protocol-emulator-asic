@@ -1,0 +1,43 @@
+{
+  "source_run": 42078913664,
+  "maximum_displacement_um": 20,
+  "sizing": [
+    {
+      "instance": "wire14386",
+      "original_master": "sg13cmos5l_buf_2",
+      "candidate_master": "sg13cmos5l_buf_4"
+    }
+  ],
+  "diodes": [
+    {
+      "name": "tripwire_cselect_clear_diode",
+      "anchor": "_50780_",
+      "anchor_master": "sg13cmos5l_dfrbpq_1",
+      "pin": "D",
+      "net": "_02001_"
+    },
+    {
+      "name": "tripwire_cselect_lane_diode",
+      "anchor": "hold11285",
+      "anchor_master": "sg13cmos5l_dlygate4sd3_1",
+      "pin": "A",
+      "net": "u_chip.g_lane[1].ot[26]"
+    }
+  ],
+  "allowed_signal_nets_to_reroute": [
+    "_02001_",
+    "u_chip.g_lane[1].ot[26]",
+    "clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk",
+    "net14386",
+    "net14385",
+    "clknet_0_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk"
+  ],
+  "scope": "Bounded diagnostic only; clock load changes must pass timing; no official source/config integration claim",
+  "placement_rationale": "Reconnect only far config latch GATE from leaf BUF8 output to the same BUF8 input driven by parent BUF8; remove clock diode. Same ideal gated-clock signal; changed clock latency requires unchanged timing gates.",
+  "clock_reparent": {
+    "instance": "_51789_",
+    "pin": "GATE",
+    "before_net": "clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk",
+    "after_net": "clknet_0_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk"
+  }
+}

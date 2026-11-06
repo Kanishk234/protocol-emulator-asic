@@ -1,0 +1,73 @@
+name: gds-host-align-congestion-readback
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-host-align-congestion-readback
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+    - name: Select the exact failed repair artifact
+      run: |
+        python -m venv .venv
+        .venv/bin/python - <<'PY'
+        import json, os
+        from pathlib import Path
+        m=json.loads(Path('spikes/phase2_stock_flow/host_align_congestion_source.json').read_text())
+        with open(os.environ['GITHUB_ENV'],'a') as f:
+            f.write(f"SOURCE_RUN={m['run']['id']}\nSOURCE_ARTIFACT={m['artifact']['id']}\nIMAGE={m['image']}\n")
+        PY
+    - name: Verify source and extract only readback inputs
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p runs/congestion-readback
+        gh api repos/${{ github.repository }}/actions/runs/$SOURCE_RUN > runs/congestion-readback/source-run.json
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT > runs/congestion-readback/source-artifact.json
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT/zip > frozen.zip
+        .venv/bin/python - <<'PY'
+        import hashlib, json, shutil, zipfile
+        from pathlib import Path, PurePosixPath
+        m=json.loads(Path('spikes/phase2_stock_flow/host_align_congestion_source.json').read_text())
+        for kind in ('run','artifact'):
+            actual=json.loads(Path(f'runs/congestion-readback/source-{kind}.json').read_text())
+            assert all(actual.get(k)==v for k,v in m[kind].items()), 'Wrong source provenance'
+        digest=hashlib.sha256()
+        with open('frozen.zip','rb') as f:
+            for chunk in iter(lambda:f.read(8*1024*1024),b''):digest.update(chunk)
+        assert 'sha256:'+digest.hexdigest()==m['artifact']['digest'], 'Whole archive digest mismatch'
+        with zipfile.ZipFile('frozen.zip') as archive:
+            for name in (m['odb']['path'],m['segments']):
+                p=PurePosixPath(name)
+                assert not p.is_absolute() and '..' not in p.parts
+                target=Path('frozen-artifact')/name
+                target.parent.mkdir(parents=True,exist_ok=True)
+                with archive.open(name) as src,open(target,'wb') as dst:shutil.copyfileobj(src,dst)
+        assert hashlib.sha256((Path('frozen-artifact')/m['odb']['path']).read_bytes()).hexdigest()==m['odb']['sha256']
+        Path('runs/congestion-readback/input-verification.json').write_text(json.dumps(dict(
+            source_run=m['run']['id'],whole_archive_sha256=digest.hexdigest(),
+            odb_sha256=m['odb']['sha256'],physical_changes_performed=False),indent=2)+'\n')
+        PY
+    - name: Read saved native grid capacities and crossing nets
+      run: |
+        set -euo pipefail
+        docker pull "$IMAGE"
+        docker run --rm --network none --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -w "$PWD" "$IMAGE" openroad -exit -python scripts/ci/host_align_congestion_readback.py > runs/congestion-readback/native.log 2>&1
+    - name: Upload read-only congestion diagnosis
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: host-align-congestion-${{ github.run_id }}
+        path: |
+          runs/congestion-readback/**
+          spikes/phase2_stock_flow/host_align_congestion_source.json

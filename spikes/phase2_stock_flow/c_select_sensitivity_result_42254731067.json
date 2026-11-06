@@ -35,5 +35,24 @@
     }
   },
   "physical_qualified": false,
-  "decision": "Best fixed-RC case improves setup0.667695ns but still-2.260117ns; do not spend DRT on these changes alone. All20 worst baseline paths share the IDLE latch. Prioritize sparse equivalent storage conversion; slew repair remains separate."
+  "decision": "Best fixed-RC case improves setup0.667695ns but still-2.260117ns; do not spend DRT on these changes alone. All20 worst baseline paths share the IDLE latch. Prioritize sparse equivalent storage conversion; slew repair remains separate.",
+  "slew_investigation": {
+    "connection": "_48011_/Y -> wire12345/A",
+    "reported_capacitance_pf": 0.131932,
+    "driver_input_path_source": "_51039_",
+    "path_endpoint": "_51077_",
+    "source_placement_run": 42122049674,
+    "driver_location_dbu": [
+      808800,
+      347760
+    ],
+    "buffer_location_dbu": [
+      698880,
+      423360
+    ],
+    "manhattan_distance_um": 185.52,
+    "antenna_cell_input_capacitance_pf": 0.00111883,
+    "limits": "Placement is pre-DRT source geometry; new source profile will change IDs/placement. Capacitance is mostly wire/loading rather than a single antenna cell; do not claim post-DRT locations verified.",
+    "next": "If the new source still shows this slew failure, identify its actual new driver/net and test a buffer close to the weak source instead of blindly increasing far-end input capacitance."
+  }
 }

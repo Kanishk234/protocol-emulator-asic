@@ -1,0 +1,9 @@
+{
+  "reference_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+  "candidate_sha256": "e248c743ae06401e3376cf4b0a4b70f8265703f2a2940a0b2c6ff9efa73c27de",
+  "patch_sha256": "86bfbcf6db4e5f2a33670df7547bdf9f6a5f2188b36e329243a911049d44b27d",
+  "status": "Unpromoted prototype; apply only after verified C-selector source",
+  "changes": "Select attached S pad and A pad in parallel before priority mux. No new state or protocol-specific logic.",
+  "cost": "About243um2 additional isolated mapped A/B cone area at slow6fF; full-design physical area/routing impact unmeasured.",
+  "proof": "Combinational a_in,b_in,c_in,sel equality for arbitrary binary inputs/all32 pin indices; sequential block unchanged, not full-chip formal proof."
+}

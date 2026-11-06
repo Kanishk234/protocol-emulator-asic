@@ -1,0 +1,121 @@
+{
+  "reference_sha256": "a3f4ab08216def6cef7c4c5373ee83acd5f885c7f6de2529678bd68d0edb0452",
+  "candidate_sha256": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+  "patch_sha256": "1de6d1bbd58dde4d0c459b15daf0dbdd9a2275eebd84c42201a2464e39e0f389",
+  "proofs": [
+    {
+      "full": 0,
+      "equivalence_points": 461,
+      "induction_sequence_cap": 6,
+      "scope": "Sequential configuration-module equivalence with clocked host writes; all outputs, no blacklisted correspondence points",
+      "phase_cycles": 2080,
+      "phase_checks": 10400
+    },
+    {
+      "full": 1,
+      "equivalence_points": 560,
+      "induction_sequence_cap": 6,
+      "scope": "Sequential configuration-module equivalence with clocked host writes; all outputs, no blacklisted correspondence points",
+      "phase_cycles": 2080,
+      "phase_checks": 10400
+    }
+  ],
+  "scope": "One existing configuration storage bit per unit uses an edge-triggered flop rather than a gated latch; bit count and observable phase behavior unchanged. No physical timing claim.",
+  "chip_smoke_status": "passed",
+  "chip_smoke": {
+    "passed": 5,
+    "tests": [
+      "test_identity_time_sram",
+      "test_lane_forwards_host_in_to_host_out",
+      "test_pin_units_uart_tx_lean_and_full",
+      "test_routine_on_the_rotation",
+      "test_uart_program_loopback"
+    ],
+    "results_xml_sha256": "6a2d3bf1846930431e08ed1e7e8c20c3b1b9adfdbe6b7a28bf19c2379a746682",
+    "scope": "Five full-chip RTL smoke tests on matched2/4 source/software; not full suite/GL"
+  },
+  "generic_cost": {
+    "scope": "Generic synthesis cell-count delta only, not mapped/placed area",
+    "results": {
+      "0": {
+        "gold": {
+          "$dlatch": 119,
+          "$eq": 8,
+          "$logic_and": 10,
+          "$logic_not": 1,
+          "$lt": 1,
+          "$not": 1,
+          "$reduce_and": 2,
+          "$sdff": 1,
+          "$sdffe": 2,
+          "$sub": 1,
+          "sg13cmos5l_lgcp_1": 9
+        },
+        "gate": {
+          "$dlatch": 118,
+          "$eq": 8,
+          "$logic_and": 10,
+          "$logic_not": 1,
+          "$lt": 1,
+          "$not": 1,
+          "$reduce_and": 2,
+          "$sdff": 1,
+          "$sdffce": 1,
+          "$sdffe": 2,
+          "$sub": 1,
+          "sg13cmos5l_lgcp_1": 9
+        }
+      },
+      "1": {
+        "gold": {
+          "$dffe": 1,
+          "$dlatch": 310,
+          "$eq": 23,
+          "$ge": 1,
+          "$le": 1,
+          "$logic_and": 27,
+          "$logic_not": 1,
+          "$logic_or": 1,
+          "$lt": 1,
+          "$mux": 9,
+          "$ne": 1,
+          "$not": 1,
+          "$or": 2,
+          "$reduce_and": 2,
+          "$reduce_or": 4,
+          "$sdff": 1,
+          "$sdffe": 3,
+          "$sub": 2,
+          "sg13cmos5l_lgcp_1": 25
+        },
+        "gate": {
+          "$dffe": 1,
+          "$dlatch": 309,
+          "$eq": 23,
+          "$ge": 1,
+          "$le": 1,
+          "$logic_and": 27,
+          "$logic_not": 1,
+          "$logic_or": 1,
+          "$lt": 1,
+          "$mux": 9,
+          "$ne": 1,
+          "$not": 1,
+          "$or": 2,
+          "$reduce_and": 2,
+          "$reduce_or": 4,
+          "$sdff": 1,
+          "$sdffce": 1,
+          "$sdffe": 3,
+          "$sub": 2,
+          "sg13cmos5l_lgcp_1": 25
+        }
+      }
+    }
+  },
+  "protocol_suite_status": "22-case RTL suite running with real offline sigrok decoders; not yet claimed passing",
+  "ci_preparation": {
+    "passed": true,
+    "scope": "Exact new profile preparation on isolated archived main; only bound cfg source changes; same physical configuration as C-selector reference"
+  }
+}

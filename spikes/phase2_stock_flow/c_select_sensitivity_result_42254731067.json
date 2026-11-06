@@ -1,0 +1,39 @@
+{
+  "run_id": 42254731067,
+  "conclusion": "success",
+  "baseline_reproduced": true,
+  "cases": {
+    "baseline": {
+      "slow_setup_ns": -2.927812741785765,
+      "fast_hold_ns": 0.17977619901592048,
+      "slow_slew_violations": 2
+    },
+    "nor4_first": {
+      "slow_setup_ns": -2.8862495432819903,
+      "fast_hold_ns": 0.17977619901592048,
+      "slow_slew_violations": 2
+    },
+    "nor4_last": {
+      "slow_setup_ns": -2.6312357482054076,
+      "fast_hold_ns": 0.17977619901592048,
+      "slow_slew_violations": 2
+    },
+    "nor4_both": {
+      "slow_setup_ns": -2.5896725497016333,
+      "fast_hold_ns": 0.17977619901592048,
+      "slow_slew_violations": 2
+    },
+    "delay2": {
+      "slow_setup_ns": -2.5982576825492587,
+      "fast_hold_ns": 0.17977619901592048,
+      "slow_slew_violations": 2
+    },
+    "nor4_both_delay2": {
+      "slow_setup_ns": -2.260117490465127,
+      "fast_hold_ns": 0.17977619901592048,
+      "slow_slew_violations": 2
+    }
+  },
+  "physical_qualified": false,
+  "decision": "Best fixed-RC case improves setup0.667695ns but still-2.260117ns; do not spend DRT on these changes alone. All20 worst baseline paths share the IDLE latch. Prioritize sparse equivalent storage conversion; slew repair remains separate."
+}

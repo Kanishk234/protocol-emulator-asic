@@ -1,0 +1,257 @@
+{
+  "scope": "Isolated A/B cone on verified C-selector baseline; binary combinational SAT equivalence; sequential block unchanged. No extracted or full-chip timing claim.",
+  "comparisons": {
+    "slow": {
+      "scope": "A/B-pin combinational cone only, reference includes verified C rewrite; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+      "output_load_ff": 6,
+      "reference_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+      "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+      "excluded_cells": [
+        "sg13cmos5l_buf_1",
+        "sg13cmos5l_lgcp_1",
+        "sg13cmos5l_sighold",
+        "sg13cmos5l_slgcp_1",
+        "sg13cmos5l_sdfbbp_1",
+        "sg13cmos5l_dfrbp_2"
+      ],
+      "results": {
+        "reference": {
+          "equivalent": true,
+          "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+          "mapped_area_um2": 861.84,
+          "mapped_gates": 50,
+          "abc_delay_ps": 1340.79
+        },
+        "a_unclamped": {
+          "equivalent": true,
+          "source_sha256": "17ac9921f3b44306b3d39031506e94630d4b7c37d39fffaf081e7fcda9b02c38",
+          "mapped_area_um2": 867.2076,
+          "mapped_gates": 59,
+          "abc_delay_ps": 1367.64
+        },
+        "ab_unclamped": {
+          "equivalent": true,
+          "source_sha256": "49f0ef347b46ba6b6aba6fb19cdd910fcc832aaf5dcc12ce8d52901d76f64c72",
+          "mapped_area_um2": 854.5446,
+          "mapped_gates": 57,
+          "abc_delay_ps": 1359.05
+        },
+        "a_banked": {
+          "equivalent": true,
+          "source_sha256": "2f3bb8bb8f2e45f14bb05ba1353c7eef0f1bfe0cd203b87d935340602910209b",
+          "mapped_area_um2": 867.2454,
+          "mapped_gates": 54,
+          "abc_delay_ps": 1384.36
+        },
+        "a_parallel_priority": {
+          "equivalent": true,
+          "source_sha256": "e248c743ae06401e3376cf4b0a4b70f8265703f2a2940a0b2c6ff9efa73c27de",
+          "mapped_area_um2": 1104.9696,
+          "mapped_gates": 54,
+          "abc_delay_ps": 1125.02
+        },
+        "a_decoded": {
+          "equivalent": true,
+          "source_sha256": "0c718e121c2009f487880985db8e291680913f15ba98b97c7fd39579c5e97fa3",
+          "mapped_area_um2": 1034.019,
+          "mapped_gates": 88,
+          "abc_delay_ps": 1404.41
+        }
+      }
+    },
+    "typ": {
+      "scope": "A/B-pin combinational cone only, reference includes verified C rewrite; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+      "output_load_ff": 6,
+      "reference_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+      "liberty_sha256": "34163f3e7de9f854afac57332ba06f1739b78e7ac35660a8a5ddd39c570124ad",
+      "excluded_cells": [
+        "sg13cmos5l_buf_1",
+        "sg13cmos5l_lgcp_1",
+        "sg13cmos5l_sighold",
+        "sg13cmos5l_slgcp_1",
+        "sg13cmos5l_sdfbbp_1",
+        "sg13cmos5l_dfrbp_2"
+      ],
+      "results": {
+        "reference": {
+          "equivalent": true,
+          "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+          "mapped_area_um2": 860.0256,
+          "mapped_gates": 50,
+          "abc_delay_ps": 841.46
+        },
+        "a_unclamped": {
+          "equivalent": true,
+          "source_sha256": "17ac9921f3b44306b3d39031506e94630d4b7c37d39fffaf081e7fcda9b02c38",
+          "mapped_area_um2": 867.2076,
+          "mapped_gates": 59,
+          "abc_delay_ps": 859.73
+        },
+        "ab_unclamped": {
+          "equivalent": true,
+          "source_sha256": "49f0ef347b46ba6b6aba6fb19cdd910fcc832aaf5dcc12ce8d52901d76f64c72",
+          "mapped_area_um2": 854.5446,
+          "mapped_gates": 57,
+          "abc_delay_ps": 855.97
+        },
+        "a_banked": {
+          "equivalent": true,
+          "source_sha256": "2f3bb8bb8f2e45f14bb05ba1353c7eef0f1bfe0cd203b87d935340602910209b",
+          "mapped_area_um2": 867.2454,
+          "mapped_gates": 54,
+          "abc_delay_ps": 868.78
+        },
+        "a_parallel_priority": {
+          "equivalent": true,
+          "source_sha256": "e248c743ae06401e3376cf4b0a4b70f8265703f2a2940a0b2c6ff9efa73c27de",
+          "mapped_area_um2": 1110.4128,
+          "mapped_gates": 54,
+          "abc_delay_ps": 707.51
+        },
+        "a_decoded": {
+          "equivalent": true,
+          "source_sha256": "0c718e121c2009f487880985db8e291680913f15ba98b97c7fd39579c5e97fa3",
+          "mapped_area_um2": 1034.019,
+          "mapped_gates": 88,
+          "abc_delay_ps": 889.21
+        }
+      }
+    },
+    "slow26": {
+      "scope": "A/B-pin combinational cone only, reference includes verified C rewrite; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+      "output_load_ff": 26.0,
+      "reference_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+      "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+      "excluded_cells": [
+        "sg13cmos5l_buf_1",
+        "sg13cmos5l_lgcp_1",
+        "sg13cmos5l_sighold",
+        "sg13cmos5l_slgcp_1",
+        "sg13cmos5l_sdfbbp_1",
+        "sg13cmos5l_dfrbp_2"
+      ],
+      "results": {
+        "reference": {
+          "equivalent": true,
+          "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+          "mapped_area_um2": 876.3552,
+          "mapped_gates": 51,
+          "abc_delay_ps": 1486.92
+        },
+        "a_unclamped": {
+          "equivalent": true,
+          "source_sha256": "17ac9921f3b44306b3d39031506e94630d4b7c37d39fffaf081e7fcda9b02c38",
+          "mapped_area_um2": 867.2076,
+          "mapped_gates": 59,
+          "abc_delay_ps": 1476.95
+        },
+        "ab_unclamped": {
+          "equivalent": true,
+          "source_sha256": "49f0ef347b46ba6b6aba6fb19cdd910fcc832aaf5dcc12ce8d52901d76f64c72",
+          "mapped_area_um2": 854.5446,
+          "mapped_gates": 57,
+          "abc_delay_ps": 1470.27
+        },
+        "a_banked": {
+          "equivalent": true,
+          "source_sha256": "2f3bb8bb8f2e45f14bb05ba1353c7eef0f1bfe0cd203b87d935340602910209b",
+          "mapped_area_um2": 876.3174,
+          "mapped_gates": 55,
+          "abc_delay_ps": 1495.48
+        },
+        "a_parallel_priority": {
+          "equivalent": true,
+          "source_sha256": "e248c743ae06401e3376cf4b0a4b70f8265703f2a2940a0b2c6ff9efa73c27de",
+          "mapped_area_um2": 1104.9696,
+          "mapped_gates": 54,
+          "abc_delay_ps": 1284.07
+        },
+        "a_decoded": {
+          "equivalent": true,
+          "source_sha256": "0c718e121c2009f487880985db8e291680913f15ba98b97c7fd39579c5e97fa3",
+          "mapped_area_um2": 1048.5342,
+          "mapped_gates": 89,
+          "abc_delay_ps": 1550.62
+        }
+      }
+    },
+    "slow50": {
+      "scope": "A/B-pin combinational cone only, reference includes verified C rewrite; BUF2 input driver; ABC Liberty estimates, no extracted wires or full-design physical proof",
+      "output_load_ff": 50.0,
+      "reference_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+      "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+      "excluded_cells": [
+        "sg13cmos5l_buf_1",
+        "sg13cmos5l_lgcp_1",
+        "sg13cmos5l_sighold",
+        "sg13cmos5l_slgcp_1",
+        "sg13cmos5l_sdfbbp_1",
+        "sg13cmos5l_dfrbp_2"
+      ],
+      "results": {
+        "reference": {
+          "equivalent": true,
+          "source_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+          "mapped_area_um2": 894.4992,
+          "mapped_gates": 52,
+          "abc_delay_ps": 1496.75
+        },
+        "a_unclamped": {
+          "equivalent": true,
+          "source_sha256": "17ac9921f3b44306b3d39031506e94630d4b7c37d39fffaf081e7fcda9b02c38",
+          "mapped_area_um2": 890.7948,
+          "mapped_gates": 61,
+          "abc_delay_ps": 1522.6
+        },
+        "ab_unclamped": {
+          "equivalent": true,
+          "source_sha256": "49f0ef347b46ba6b6aba6fb19cdd910fcc832aaf5dcc12ce8d52901d76f64c72",
+          "mapped_area_um2": 878.1318,
+          "mapped_gates": 59,
+          "abc_delay_ps": 1513.73
+        },
+        "a_banked": {
+          "equivalent": true,
+          "source_sha256": "2f3bb8bb8f2e45f14bb05ba1353c7eef0f1bfe0cd203b87d935340602910209b",
+          "mapped_area_um2": 890.8326,
+          "mapped_gates": 56,
+          "abc_delay_ps": 1539.06
+        },
+        "a_parallel_priority": {
+          "equivalent": true,
+          "source_sha256": "e248c743ae06401e3376cf4b0a4b70f8265703f2a2940a0b2c6ff9efa73c27de",
+          "mapped_area_um2": 1139.4432,
+          "mapped_gates": 56,
+          "abc_delay_ps": 1279.83
+        },
+        "a_decoded": {
+          "equivalent": true,
+          "source_sha256": "0c718e121c2009f487880985db8e291680913f15ba98b97c7fd39579c5e97fa3",
+          "mapped_area_um2": 1066.6782,
+          "mapped_gates": 90,
+          "abc_delay_ps": 1560.45
+        }
+      }
+    }
+  },
+  "leading_candidate": "a_parallel_priority",
+  "rejected": "Unclamping, banking and decoded-A forms were slower in the isolated slow6fF measurement.",
+  "full_chip_smoke_status": "5 passed with matching generated2/4 software map",
+  "decision": "Keep as small general source candidate; wait for fixed-SPEF/endpoint measurements before any full physical screen. Do not add isolated savings directly to WNS.",
+  "full_chip_smoke": {
+    "passed": 5,
+    "tests": [
+      "test_identity_time_sram",
+      "test_lane_forwards_host_in_to_host_out",
+      "test_pin_units_uart_tx_lean_and_full",
+      "test_routine_on_the_rotation",
+      "test_uart_program_loopback"
+    ],
+    "results_xml_sha256": "1b8b7bc037efba404eee1f2b5c26602e4adbce29946ce98f5bb5f4562c5e075c",
+    "rtl_source_sha256": "e248c743ae06401e3376cf4b0a4b70f8265703f2a2940a0b2c6ff9efa73c27de",
+    "generated_software_sha256": "c4639854483651afcd78f49f1cfa4a31166483ac4e8a0bb9a332f1556b9a0669",
+    "units": 4,
+    "consumers": 9,
+    "full_protocol_suite_performed": false
+  }
+}

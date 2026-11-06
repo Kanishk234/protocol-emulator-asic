@@ -1,0 +1,22 @@
+--- a/src/trw_pin_io.v
++++ b/src/trw_pin_io.v
+@@ -32,17 +32,14 @@
+     output wire        sel_fall
+ );
+     wire       s_on  = (pin_s < 5'd24);
+-    wire [4:0] a_idx = s_on ? pin_s : pin_a;
+-    wire       a_on  = (a_idx < 5'd24);
+     wire       b_on  = (pin_b < 5'd24);
+     wire       c_on  = (pin_c < 5'd24);
+ 
+-    // A/B retain bounded indexing. C defaults mask any unattached index.
+-    wire       a_pad = pads[a_on ? a_idx : 5'd0];
++    // A selects S/A in parallel; B retains bounded indexing; unattached C is masked.
+     wire       b_pad = pads[b_on ? pin_b : 5'd0];
+     wire c_pad = pads[pin_c];
+ 
+-    assign a_in = a_on ? a_pad : idle;
++    assign a_in = s_on ? pads[pin_s] : ((pin_a < 5'd24) ? pads[pin_a] : idle);
+     assign b_in = b_on && b_pad;
+     assign c_in = c_on ? c_pad : c_active;
+     assign sel = !c_on || (c_pad == c_active);

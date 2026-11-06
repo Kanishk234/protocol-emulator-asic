@@ -168,3 +168,14 @@ The worst setup path runs from the unit0 IDLE setting through pad feedback to a
 fabric pending-drop register. The next repair targets this exact logic path and
 that slew connection. The passing screen and clean detailed route do not yet
 establish extracted or official timing closure. Phase2remains open.
+
+
+The extracted failure now points to two source-level repairs. A tiny storage
+change removes the gated-latch launch path from one shared configuration bit;
+it passes module equivalence, five chip smoke tests and all22RTL protocol cases,
+including offline decoders. A separate host read-mux cleanup passes complete
+host-module equivalence and five smoke tests, with substantially lower isolated
+logic area/delay. Each is being screened independently with the same physical
+recipe in42259881584and42262602008. Neither has a measured physical gain yet;
+actual extracted slow setup remains-2.928ns. All local tests are finished; the
+next decision needs those physical results. Official GDS and Phase2remain open.

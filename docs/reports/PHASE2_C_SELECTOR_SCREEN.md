@@ -436,3 +436,54 @@ Next measure small NOR4 sizing changes against a reproducible fixed-SPEF
 baseline and assess equivalent IDLE/pad-feedback source factoring. No repeated
 screen/routing run is launched without a measured remedy. Clean DRT remains
 valid; extracted closure and official-flow reproduction remain unproved.
+
+
+## Measured repair limits and shared-launch source experiment
+
+Fixed-SPEF [42254731067](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42254731067)
+reproduces baseline and tests six cases. Best NOR4 pair+delay2 improves slow
+setup-2.927813→-2.260117ns, retains179.776psfast hold and leaves both slew rows.
+These changes alone do not justify another detailed route. All20 reported
+worst baseline paths share the IDLE configuration latch.
+
+D-157 replaces that one stored bit per unit with a root-clock enabled flop,
+with equivalent write-gated reset and phase visibility.461lean/560full module
+equivalence points pass with induction cap6/no blacklist;2080cycle/10400phase
+checks pass per variant. Five chip smoke tests pass. Generic cell counts swap
+one latch for one enabled flop per unit, no extra bits. Native physical cost
+and timing are unmeasured. Reproduction is in verify_idle_ff.py.
+
+[42259881584](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42259881584)
+runs this single source change on the exact C-selector physical recipe. A
+separate22case RTL suite is running locally with matched2/4 software and actual
+offline sigrok decoders; no full-suite pass is claimed yet. The alternate
+parallel S/A selector has binary combinational proof, five smoke passes and
+~0.20–0.22nsisolated slow-cone improvement, but remains separate and unpromoted.
+No actual WNS gain or official closure is claimed from these local studies.
+
+
+## Two independent source repairs now under physical measurement
+
+The D-157 critical-configuration storage prototype passes all22existing RTL
+protocol cases with real offline sigrok checks, plus five chip smoke tests and
+461lean/560full module equivalence points. Its exact source is being measured in
+[42259881584](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42259881584).
+The alternate parallel S/A selector is proved and locally promising but remains
+separate/unpromoted.
+
+D-158 fixes the host status-mux structure by padding10-bit records into16-bit
+words before indexing. This removes runtime multiply-by-ten/unaligned shifting
+without stored bits, host-interface changes or extra cycles. Host/SPI module
+proofs902/920points at stated parameters and five chip smoke tests pass. Isolated
+NC9 slow6fF mapping improves5017.7988→1520.4672um2 and2035.03→977.29ps; these
+are not physical gains. Exact preparation is source/hash guarded and matches
+tested RTL. Independent physical source screen
+[42262602008](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42262602008)
+is running with the identical reference native recipe.
+
+Both screens retain2/4,20ns, fast50ps and every zero-violation/overflow gate;
+main hardware/config and official jobs are untouched. No experiment combines
+both hardware changes. All local simulators have finished. Further physical
+repair decisions depend on these source-screen measurements. Current actual
+extracted setup remains-2.9278127418ns; the-2.260117nsfixed-RC sensitivity case
+is unqualified and is not substituted for measured physical timing.

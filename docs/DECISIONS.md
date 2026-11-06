@@ -1670,3 +1670,34 @@ Bound loaded geometry by the original44792-net route hash normalized into atomic
 
 
 2026-11-06 D-155 route milestone:42158728020 passes completed detailed routing with route DRC0, antenna0 and0 critical disconnected pins; one noncritical top-level ena input is named by the stock table. Continue the exact immutable routed artifact to existing stock finalization/RCX/all-corner timing in42252231999. No new hardware/guide change or official/source promotion is authorized by DRT alone; extracted timing/electrical and final official reproduction remain mandatory.
+
+
+## D-156 (2026-11-06): prototype parallel S/A pad selection without new state
+
+General need: shorten arbitrary programmable pad feedback, not add a protocol block. The existing A input chooses a five-bit S/A index before reading the pad vector; the prototype reads S and A in parallel and gives attached S priority afterward. Unattached A still returns IDLE. B/C behavior and all sequential logic stay unchanged. The patch applies only after the bound C-selector source; main hardware is untouched.
+
+Binary combinational SAT proves a_in/b_in/c_in/sel equivalence for arbitrary24pad bits/all32pin indices. Isolated pinned-Liberty mapping at slow6/26/50fF improves longest A/B cone delay by215.77/202.85/216.92ps; typical6fF improves133.95ps. Added isolated slow6fF cone area243.1296um2; no new state. Full-design area/routing impact and actual pad-to-fabric setup gain remain unmeasured. Never add these isolated gains directly to WNS. Unclamped, banked and decoded alternatives were slower in the isolated slow6fF comparison and are not promoted.
+
+Five full-chip RTL smoke tests pass on matched2lane/4unit source/software, including UART loopback. This is not a full protocol suite, routed GL or full-chip formal proof. Keep as an unpromoted source option while fixed-SPEF sensitivity42254731067 measures exact setup/hold effects of smaller physical changes. Promotion requires full regression and a stock physical screen with every existing gate unchanged.
+
+
+## D-157 (2026-11-06): sparse edge-triggered storage for a shared critical configuration bit
+
+General need: remove gated-latch launch delay from a programmable control bit that drives many long feedback cones, without adding a pipeline stage or a protocol block. All20 reported worst slow setup paths in42254731067 start at unit0 word0 bit7(IDLE). Small NOR4/delay changes only improve-2.927813→-2.260117ns on fixed extracted RC and do not solve the one slew connection; do not reroute these alone.
+
+Prototype only: one selected configuration bit per unit uses a posedge enabled flip-flop on the root clock; all other stored bits remain latches. Preserve the original write-gated reset semantics: capture rst_n?wdata[b]:0 only when the word's dec is active, retaining the stored value otherwise. Clearing this bit unconditionally on reset would change the existing latch contract. No additional storage bits or external latency. Generic synthesis replaces one dlatch by one sdffce per full/lean unit; mapped area, CTS and physical timing effects remain unmeasured.
+
+Lean/full configuration-module sequential equivalence proves461/560points respectively with clocked-host wrappers, clk2fflogic and induction cap6, no blacklisted correspondence. Both-phase differential simulation checks2080cycles/10400phase observations per variant, including back-to-back writes, idle-bus motion, invalid addresses and reset/write combinations. Five matched2/4 chip RTL smoke tests pass. Reproduction is scripted in scripts/ci/verify_idle_ff.py. The full22protocol RTL suite is running with real offline sigrok decoders; no full-suite pass is claimed yet.
+
+Test only this storage change on the verified C-selector source with the exact same native recipe in rtl_shared_minbuf2_idle_ff. Hash-bound one-file application and the exact CI preparation dry run pass; source2/4,20ns, all acceptance gates, stock engine/order and official jobs remain unchanged. The parallel S/A selector is kept separate to preserve one hardware change per hardening. No source promotion, positive physical WNS or official GDS claim follows from local equivalence.
+
+
+2026-11-06 D-157 validation update: the matched2/4 full22protocol RTL suite now passes all22cases with real offline sigrok decoding enabled, zero skips/failures/errors. Tested RTL inventory exactly matches the isolated CI preparation inventory. Physical source screen42259881584 is running on ef36fc6; actual setup/hold/area/antenna/congestion effects remain unmeasured.
+
+## D-158 (2026-11-06): align host port-status records before dynamic word selection
+
+General need: read packed programmable status efficiently without a runtime multiply-by-ten and unaligned barrel shift. Existing16-bit host data contains a10-bit port record padded with six zeros. Build constant16-bit padded wires per port, then select the host word by index. No new stored bits, ISA/register-map changes or read latency; invalid-address guards retain their original priority and behavior. This is a general word-selection primitive, not protocol-specific logic.
+
+Complete host/SPI module sequential equivalence proves902points at2/4(NC9) and920at the existing default3/6parameters(NC13), induction cap2/no blacklists; this is parameter verification, not a3/6physical design migration or whole-chip formal. Five matched2/4 chip smoke tests pass. Reproduction is scripted in verify_host_port_align.py. Isolated NC9 slow6fF mapping changes345→82gates,5017.7988→1520.4672um2 and2035.03→977.29ps; at130fF delay2244.46→1270.26ps. These isolated results cannot establish full-design area, extracted slew or WNS gains.
+
+Test this as the only source delta from the verified C-selector reference in rtl_shared_minbuf2_host_align, independently of the critical configuration flop experiment. Exact hash-bound CI preparation passes and matches tested RTL; physical configuration is byte-identical to the reference. Main hardware/config and official GDS jobs stay untouched. Native source screen42262602008 is running on2094fa0. All existing20ns/fast50ps/zero-electrical/antenna/overflow gates remain mandatory. Combine candidates only after individual results justify another controlled experiment.

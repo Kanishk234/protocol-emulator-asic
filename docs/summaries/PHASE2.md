@@ -159,3 +159,12 @@ disconnected pins. The stock report lists one noncritical pin, the top-level
 ena input. Extraction and timing measurement are now running in42252231999.
 This will tell us whether the passing estimated timing survives actual routed
 parasitics. Official-flow reproduction and Phase2completion are still open.
+
+
+Extraction42252231999 finished and exposed the remaining timing gap: slow setup
+is-2.928ns. Hold passes at all corners, with179.8psfast hold; antenna checks stay
+clean. Two slow slew violations belong to one driver-to-buffer connection.
+The worst setup path runs from the unit0 IDLE setting through pad feedback to a
+fabric pending-drop register. The next repair targets this exact logic path and
+that slew connection. The passing screen and clean detailed route do not yet
+establish extracted or official timing closure. Phase2remains open.

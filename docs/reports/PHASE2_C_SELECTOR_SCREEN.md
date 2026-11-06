@@ -415,3 +415,24 @@ and electrical reports under unchanged signoff constraints. Require six timing
 values, all three electrical reports, fast hold>=50ps, all setup/hold>=0 and
 antenna0.60 focused checks/actionlint/syntax pass. No synthesis/rerouting/repair
 is repeated. Source/config reproduction, official GDS and Phase2exit remain open.
+
+
+## Extraction result: setup and one slew connection still fail
+
+[42252231999](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42252231999)
+completes extraction but fails strict gates. Slow setup is-2.9278127418ns;
+fast/typical setup summaries are0. Extracted fast/typical/slow hold is
+0.1797761990/0.4099084521/0.8159451123ns. Antenna, fanout and capacitance checks
+pass. Slow has two slew rows on one connection: _48011_/Y(A221OI1) and
+wire12345/A(BUF2),2.581115/2.583109ns against2.507400ns. Other corners are
+electrically clean.
+
+The actual worst path is unit0 IDLE configuration latch _51861_ through pad13
+selection/feedback logic to channel1 pending_drop _50696_/D. Arrival24.242085ns
+versus required21.314272ns. Among58 reported output stages, NOR4 _27522_,
+NAND3 _27530_ and NOR4 _46365_ contribute1.474222,1.134735 and1.002023ns.
+The previous C-selector/bitsync path is not the controlling endpoint now.
+Next measure small NOR4 sizing changes against a reproducible fixed-SPEF
+baseline and assess equivalent IDLE/pad-feedback source factoring. No repeated
+screen/routing run is launched without a measured remedy. Clean DRT remains
+valid; extracted closure and official-flow reproduction remain unproved.

@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-06 — Extraction completes; isolate IDLE feedback setup path and one slew connection
+
+-42252231999 completes stock finalization/RCX/all-corner timing, then correctly fails strict final gates: slow setup-2.9278127418ns and slow electrical violations. Fast/typical setup summaries0; hold fast0.1797761990ns, typical0.4099084521ns, slow0.8159451123ns. Fresh antenna0; all fanout/capacitance counts0. Slow has2 slew rows only, on one connection _48011_/Y(a221oi_1)->wire12345/A(BUF2),2.581115/2.583109ns against2.507400ns. Save c_select_extracted_result_42252231999.json. No official or phase closure.
+- Actual worst slow path starts _51861_ configuration word0 bit7(IDLE, confirmed generated TRW_PC_IDLE_LSB7), traverses unit0 pads[13] selection/feedback and ends _50696_/D at fabric channel1 pending_drop. Arrival24.242085ns, required21.314272ns.58 reported cell-output stages; largest _27522_ NOR4_1 delay1.474222ns, _27530_ NAND3_1 delay1.134735ns and _46365_ NOR4_1 delay1.002023ns. This is a different controlling path from the earlier bitsync_active-to-channel0 reference; do not transfer old estimated path gains or assume C-selector rewrite fixed every path.
+- Next prepare a bounded, baseline-reproducing fixed-extracted-RC sensitivity test for the two slow NOR4 cells (NOR4_2 exists in pinned LEF), plus assess equivalent source factoring of the general IDLE/pad-feedback cone. Sizing is diagnostic and cannot qualify new physical timing. The slew driver's A221OI has no larger equivalent cell in the pinned LEF; simply increasing its receiving buffer can increase input load, so do not apply that blindly. Preserve clock/antenna/hold repairs,20ns and all gates; reroute only after selecting a measured remedy.
+- Independently inspect all corner summaries/electrical rows/worst-path report and map source/endpoint through frozen source NL. No new physical workflow launched or hardware/config/official-job changes. Detailed-route DRC/antenna success stands, but extracted setup/electrical closure and official source/config reproduction remain open. No phase ticks.
+
 ## 2026-11-06 — Detailed route passes; launch exact-route extraction
 
 -42158728020 succeeds after about225.5min total job time. All fresh preflight gates reproduce; completed stock DetailedRouting reports route DRC0 and fresh antenna0. Logic audit and stock disconnected-pin checker pass. Independently inspect state/completion/metric receipts. ReportDisconnectedPins counts1 noncritical/0critical; its full table identifies only top-level ena. Do not claim zero total disconnected pins. Save c_select_drt_result_42158728020.json.

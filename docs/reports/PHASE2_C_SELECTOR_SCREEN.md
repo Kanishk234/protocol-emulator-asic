@@ -261,3 +261,40 @@ workflow syntax pass. No native success is predicted; official-flow source/confi
 reproduction and extracted timing remain open.
 
 Parent-clock experiment [42135330053](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42135330053) was launched on `c3bc97b74c04e95f559455e06b9ef5c39e405065`; native results pending.
+
+
+## Parent-clock result: retire this variant
+
+[42135330053](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42135330053)
+finishes with a passing control and failing edited gate: antenna1, overflow17.
+Original-constraint fast/typical/slow hold remains0.0867642/0.312564/0.695068ns;
+setup summaries are0 and electrical counts0. These are estimated results, not
+positive extracted setup margin. The remaining antenna is _51789_/GATE on the
+parent clock. Reassignment did not solve the issue and regresses the legal
+antenna0/overflow15 reference42128655779. Retire it; do not launch DRT.
+
+Exact pinned OpenROAD commitdcf36133a369abc8f3c5e5738cd4d82e4903c0e0 lacks
+the guide-restoration callback/API present in newer cached source. A possible
+next mechanism is inserting a legally placed clock diode already covered by
+the original guides before fresh guide initialization. This is unimplemented
+and requires explicit native coverage/connectivity plus fresh original-model
+capacity/usage validation; saved zero congestion is insufficient. Every existing
+strict timing/electrical/antenna/placement gate remains mandatory.
+
+
+## Covered-clock protection diagnostic (D-155)
+
+The next paired screen tests inserting the passive clock diode before loading
+original guides. The site626880,498960 MX was legalized in42122049674; native
+placement and supply checks remain mandatory. It retains the original clock
+wiring and requires exact original clock route geometry. Normal incremental
+routing handles two data diodes and wire14386 BUF4. Same21.7728um2 footprint.
+
+An independent native process loads final ODB/segments through exact pinned
+readSegments, which checks route connectivity and every pin's actual-layer
+coverage. Require exact44792-net geometry readback and no errors before fresh
+STA/antenna audits. endIncremental calls native finishGlobalRouting, which
+refreshes saved congestion and prints live demand/overflow. Accept only live
+overflow0, all original/signoff timing gates, fast hold>=50ps, electrical0 and
+antenna0.89 focused regressions/actionlint/syntax checks pass. No native passing
+result, DRT or official-flow reproduction is claimed.

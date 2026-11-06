@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Prepare covered-clock protection with independent native connectivity gate
+
+- Implement D-155 separate paired gds-c-select-covered-clock diagnostic. Insert only passive clock diode before router/guide initialization at legal prior626880,498960 MX site; protect supplies and all original cells, preserve topology and exact original clock route. Normal incremental routing handles only remaining data repairs. Full inventory audits span both stages; same21.7728um2 added footprint and20um displacement bound.
+- Add separate-process final ODB/segment validation with exact pinned readSegments, which checks every routed net's connectivity and actual-layer pin coverage. Require exact44792-net route roundtrip and no native errors before fresh original/signoff timing/antenna checks. Verify exact native endIncremental already refreshes live congestion; do not call private updateDbCongestion or side-effecting haveRoutes in validator.
+-89 focused regressions pass; actionlint, embedded Python/helper syntax and diff checks pass. Main RTL/config and official jobs untouched. No phase ticks or DRT. Native behavior remains unproved; next publish isolated tools/workflow/evidence and launch paired control/edited diagnostic under standing user authorization.
+
+## 2026-11-05 — Retire failed parent-clock repair; verify exact router API
+
+- Completed42135330053: unchanged control passes; edited placement/supply/locality and estimated original/signoff timing/electrical checks pass, but antenna1 and live overflow17 fail. Remaining antenna receiver is _51789_/GATE on the parent clock. Save c_select_reparent_result_42135330053.json. Retire this variant; best legal antenna-clean reference remains42128655779 with15 overflow, not a passing screen.
+- Check exact binary commitdcf36133a369abc8f3c5e5738cd4d82e4903c0e0 GlobalRouter.cpp and odb/db.h. Newer cached source's restoreRouteFromGuides/loadRoutingFromDBGuides path is absent in this version; do not implement against it. Exact updateDirtyNets reroutes changed pin-position multisets. Exact loadGuidesFromDB restores existing guides and resources, with pin-position adjustment; this alone is not a connectivity or closure guarantee.
+- Next investigate insertion before fresh guide initialization at a legal diode site covered by the original clock route, requiring explicit native pin coverage/connectivity and newly recomputed usage under the original capacity model. Do not trust stale saved congestion or bypass zero-overflow gates. No implementation/launch yet: API/coverage feasibility must be resolved first. Official jobs, main hardware/config and phase boxes untouched; no DRT/extraction claim.
+
 ## 2026-11-05 — Exact overflow readback identifies clock; prepare parent-sink reassignment
 
 - Readback42131917635 succeeds while this session is active. Whole source ZIP digest/ODB hash verified; input unchanged; native grid reproduces15 live overflow. All15 edges contain the changed clock net, neither edited data net crosses any.14 edges atY514800,1 atY500400. Save c_select_congestion_result_42131917635.json; inspection does not qualify the design.

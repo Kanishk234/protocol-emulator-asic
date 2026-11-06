@@ -74,6 +74,12 @@ def apply(design, router, database):
     assert path in ('spikes/phase2_stock_flow/c_select_local_repair_plan.json',
                     'spikes/phase2_stock_flow/c_select_clock_reparent_plan.json')
     plan = json.loads(Path(path).read_text())
+    return apply_plan(design, router, database, plan)
+
+
+def apply_plan(design, router, database, plan):
+    """Apply a reviewed plan; callers retain full before/after inventory audits."""
+    import odb
     manifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
     assert manifest['run']['id'] == plan['source_run'], 'Repair plan belongs to another source'
     block = database.getChip().getBlock()

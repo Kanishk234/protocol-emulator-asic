@@ -1,0 +1,47 @@
+{
+  "run_id": 42135330053,
+  "workflow_conclusion": "failure",
+  "control_conclusion": "success",
+  "edited_gates": {
+    "edited": true,
+    "failures": [
+      "antenna {'antenna__violating__nets': 1, 'antenna__violating__pins': 1}",
+      "overflow 17"
+    ],
+    "diagnostic_gates_passed": false,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 1,
+      "antenna__violating__pins": 1
+    },
+    "overflow": 17
+  },
+  "decision": "Retire parent-clock reassignment: antenna1 and overflow17 regress from antenna0/overflow15 reference42128655779.",
+  "next_investigation": "Covered-guide reopening with a local clock diode, subject to native connectivity, fresh capacity usage, placement, supply and unchanged timing gates. Not implemented or qualified.",
+  "exact_openroad_commit": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+  "api_finding": "Exact GlobalRouter.cpp updateDirtyNets has no loadRoutingFromDBGuides/restoreRouteFromGuides path. That API exists in newer cached source and cannot be used for this pinned image.",
+  "official_flow_qualified": false
+}

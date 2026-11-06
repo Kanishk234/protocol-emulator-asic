@@ -1,0 +1,24 @@
+{
+  "run": {
+    "id": 42252231999,
+    "head_sha": "1299efb737147f19fb6662fe08daf3fd42b41ec6",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-c-select-route-extracted-timing.yaml",
+    "conclusion": "failure"
+  },
+  "artifact": {
+    "id": 13520234147,
+    "name": "c-select-route-extracted-42252231999",
+    "size_in_bytes": 307853690,
+    "expired": false,
+    "digest": "sha256:79d64df4ba04bff9ed20144ea4aadee9a73d82f3931d6cc7d58b357f944569c5"
+  },
+  "files": {
+    "runs/extracted-timing/11-openroad-stapostpnr/state_out.json": "827c07983967500ec50e4db2375017e6d95d090c9d4697908d5773a5adee1fd9",
+    "runs/extracted-timing/corner_summary.json": "eb34e32141b7a8a2957b0ca1b443f4e87bf3ac3fce89615d5d986e78a222ef93",
+    "runs/extracted-timing/electrical_summary.json": "a3a87b1de43dc5bda8271f37274cec440145c73394a7e1d0be82cd5785c5fa77",
+    "runs/extracted-timing/final_gates.json": "f983fa22824c2f7eb5727c79ec612b5b234eb7a4221dc989cee32c42835292db",
+    "runs/extracted-timing/constraint_identity.json": "22566538675221198201ecff696feaf3e585ea0cbf5dcaef2b193496bc6726c8"
+  },
+  "scope": "Fixed extracted-RC sensitivity only; baseline must reproduce; no physical qualification"
+}

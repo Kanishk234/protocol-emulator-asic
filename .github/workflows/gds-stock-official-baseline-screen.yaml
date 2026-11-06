@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250, rtl_shared_minbuf2_cselect]
+        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250, rtl_shared_minbuf2_cselect, rtl_shared_minbuf2_idle_ff]
         default: rtl_shared_minbuf2
         required: true
 permissions:
@@ -183,6 +183,13 @@ jobs:
             receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/pin_input_decode'))
             Path('spikes/phase2_stock_flow/pin_input_decode/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
             print('Verified one-file C-selector source optimization')
+        if selected.get('idle_ff'):
+            import sys
+            sys.path.insert(0, 'scripts/ci')
+            from apply_idle_ff import apply
+            receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/idle_ff'))
+            Path('spikes/phase2_stock_flow/idle_ff/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
+            print('Verified phase-equivalent critical configuration storage change')
         Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
             profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
             baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
@@ -193,7 +200,7 @@ jobs:
             rtl_patch=selected.get('rtl_patch'), config_word_select=selected.get('config_word_select', False),
             host_word_select=selected.get('host_word_select', False),
             inline_guard=selected.get('inline_guard', False),
-            c_select=selected.get('c_select', False)), indent=2) + '\n')
+            c_select=selected.get('c_select', False), idle_ff=selected.get('idle_ff', False)), indent=2) + '\n')
         print('Selected isolated physical control:', profile, selected['changes'])
         PYCODE
     - name: Check out Tiny Tapeout tools
@@ -342,7 +349,7 @@ jobs:
         print(json.dumps(rows, indent=2))
         PYCODE
     - name: Check unchanged signoff constraints on estimated routing
-      if: inputs.profile == 'rtl_shared_minbuf2_cselect'
+      if: inputs.profile == 'rtl_shared_minbuf2_cselect' || inputs.profile == 'rtl_shared_minbuf2_idle_ff'
       timeout-minutes: 30
       run: |-
         set -euo pipefail
@@ -426,6 +433,7 @@ jobs:
           spikes/phase2_stock_flow/host_word_select_evidence.json
           spikes/phase2_stock_flow/inline_guard/**
           spikes/phase2_stock_flow/pin_input_decode/**
+          spikes/phase2_stock_flow/idle_ff/**
           test/Makefile
           test_internal/chip/Makefile
           spikes/phase2_stock_flow/selected_profile.json

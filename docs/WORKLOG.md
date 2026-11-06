@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Five-edge diagnosis isolates clear net; launch route-preserving protection
+
+- Read-only42142331582 succeeds, verifies whole artifact digest/ODB identity and unchanged input, reproduces5 saved/live overflow. All five Metal3 horizontal edges atY320400 cross _02001_; lane repair crosses none. Save c_select_congestion_result_42142331582.json. This successful inspection is not a physical qualification.
+- Original clear route detours viaY298800; incremental repair replaces it with the saturatedY320400 trunk. Receiver-side diode cannot share its original Metal1 grid point at the existing legal site. Find driver-side legal gap: wire13979 ends828480, NOR4 _46674_ starts831840 on row317520 FS. Added diode830400..831840 MX fits; transformed A-port lies entirely in original driver grid cell831600,320400. Save geometry feasibility/hashes; native placement/coverage mandatory.
+- Extend covered preparation to clock plus clear diode before guide loading, preserve both exact original routes, retain only lane diode/buffer incident nets in later routing scope. Same hardware footprint and strict gates; independent native all-pin coverage remains required.93 focused regressions, actionlint, embedded syntax and diff checks pass. Publish tools/CI through4273bc1695391eaf55720cb46b4f7ad6942aa8e8 and confirm paired [42144728640](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42144728640) in progress on that SHA under standing authorization.
+- No official-job/main hardware/config changes, DRT or phase ticks. Next require unchanged-control reproduction, native legal placement/all-pin coverage, exact clock+clear route preservation, all estimated timing/electrical/antenna gates and live overflow0. If successful, prepare a bound continuation to DRT/extraction; official source/config reproduction remains open.
+
 ## 2026-11-05 — Covered clock repair reduces overflow15→5; inspect residual data congestion
 
 -42140616934 control succeeds. Edited native placement/supply/full inventory checks pass; original clock topology and geometry stay exact. Independent native coverage/connectivity validation succeeds for all44792 routed nets. Original/signoff estimated timing and electrical checks pass; antenna0. Fast original hold0.0867642ns, typical0.312564ns, slow0.695068ns; setup summaries0, not positive extracted margin. Strict final gate fails only live overflow5, down from best prior15. Save c_select_covered_result_42140616934.json.

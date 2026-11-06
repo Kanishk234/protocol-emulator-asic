@@ -316,3 +316,23 @@ Existing read-only inspection [42142331582](https://github.com/Kanishk234/protoc
 is bound to exact latest artifact/ODB and expected overflow5. No placement,
 routing, timing or capacity change occurs during inspection. No official-flow
 or extracted closure claim follows.
+
+
+## Residual diagnosis and driver-side clear protection
+
+Read-only [42142331582](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42142331582)
+succeeds and verifies the exact artifact/ODB, unchanged input and all5 overflow
+units. Every overloaded Metal3 horizontal edge atY320400 crosses _02001_;
+the lane repair crosses none. This isolates the next changed route to preserve.
+
+The driver-side row317520 gap between wire13979 and _46674_ admits a1.44um
+antenna diode at830400,317520 MX. Its transformed A-port lies in the original
+driver grid cell831600,320400. Native placement and coverage must prove this
+geometric hypothesis. Insert it before guide initialization with the clock
+diode; require both original routes exact. Same3 diodes/BUF4, footprint and gates.
+93 focused regressions/actionlint/syntax checks pass.
+
+Paired [42144728640](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42144728640)
+is running on4273bc1695391eaf55720cb46b4f7ad6942aa8e8. No passing native result
+or DRT/extracted/official qualification is claimed. Do not relax the final
+zero-overflow gate if the local protection does not reproduce its hypothesis.

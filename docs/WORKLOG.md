@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Attach receiver diodes through two local Via1 guides; preserve original routes
+
+- Read-only42146325916 succeeds with full input identity checks and unchanged ODB; both residual overflow edges cross lane ot26. Save c_select_congestion_result_42146325916.json. No timing/physical qualification follows from the inspector.
+- Prepare D-155 two-via mechanism: return clear diode to proven receiver-side938880,313740 R0 site; place lane diode586080,223020 R0 in reviewed row gap within20um of hold11285. Insert all3 diodes before guide loading and add exactly Via1 points939600,313200 and586800,226800, each on an existing receiver-side Metal2 branch. No added planar route length, clock topology change, extra cells or capacity adjustment. Save source DEF/LEF feasibility receipt; native legality/coverage/antenna still unproved.
+- Native mergeSegments may split a long original segment at a new via. Bind every original route edge and its multiplicity with an atomic7200-DBU reference, derived only after confirming the existing frozen canonical SHA. Remove exactly the two reviewed vias for source comparison; reject missing/extra/moved/duplicate edges or missing Metal2 parent. Both protected data routes and the clock must then remain exact through native incremental processing. Independent all-net coverage, placement/supplies, original/signoff timing, fast50ps, electrical0, antenna0 and live overflow0 gates retained.
+-101 targeted regressions pass, including wrong/missing/duplicate/disconnected attachment rejection; full frozen44792-net attachment audit passes locally, plus actionlint/syntax/diff checks. Published tools/CI throughfe672fc0dfbb73c6e195aa4f8bfeca6c7424d8e8 and confirmed paired [42156980762](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42156980762) in progress on that SHA under standing authorization. Server interruption occurred before publication; recovery confirmed no duplicate dispatch before continuing.
+- No main hardware/config/official-job changes, DRT or phase tick. This explicit guide ECO is diagnostic, not an official source/config reproduction recipe. Next require control reproducibility and every edited gate before considering detailed routing/extraction; retain antenna-clean5-overflow42140616934 as the last best antenna-clean measured reference.
+
 ## 2026-11-05 — Driver-side diode is too late for Metal3; reject antenna tradeoff
 
 -42144728640 control succeeds. Edited placement/supplies/original clock+clear geometry/native coverage pass; only lane ot26 route changes. Original/signoff estimated timing/electrical pass, fast original hold0.0867642ns. Live overflow falls5→2 but antenna becomes1, so strict gate correctly fails. Save c_select_covered_result_42144728640.json; no DRT or phase tick.

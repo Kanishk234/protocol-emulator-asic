@@ -355,3 +355,25 @@ Read-only [42146325916](https://github.com/Kanishk234/protocol-emulator-asic/act
 is bound to the exact latest artifact/ODB and overflow2. Next resolve those edges
 and receiver-local protection connected by Metal3 or below; do not repeat the
 same driver-side diode or trade antenna clearance for congestion clearance.
+
+
+## Two receiver-side Via1 attachment diagnostic
+
+Inspection42146325916 succeeds and confirms both residual edges cross lane ot26.
+The next paired screen retains the original routes and attaches the receiver
+side diodes at existing Metal2 points: clear939600,313200 and lane586800,226800.
+Only these two Via1 guides may be added. Clear diode returns to proven receiver
+site938880,313740 R0; lane diode586080,223020 R0 occupies a reviewed row gap.
+Native placement and antenna efficacy remain unproved.
+
+Every original atomic routing-grid edge and its multiplicity must match the
+frozen source after removing only the two new vias. This accommodates native
+segment splitting at a new branch without permitting a different physical path.
+Independent native connectivity/pin coverage and all existing timing, electrical,
+antenna and live overflow gates remain mandatory.101 focused regressions and a
+full44792-net local attachment audit pass, with actionlint and syntax checks.
+
+[42156980762](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42156980762)
+is running onfe672fc0dfbb73c6e195aa4f8bfeca6c7424d8e8. Main hardware/config
+and official GDS jobs stay unchanged. This guide ECO is not a source/config
+reproduction recipe; no DRT, extracted closure or phase completion is claimed.

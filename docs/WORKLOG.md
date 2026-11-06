@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Covered clock repair reduces overflow15→5; inspect residual data congestion
+
+-42140616934 control succeeds. Edited native placement/supply/full inventory checks pass; original clock topology and geometry stay exact. Independent native coverage/connectivity validation succeeds for all44792 routed nets. Original/signoff estimated timing and electrical checks pass; antenna0. Fast original hold0.0867642ns, typical0.312564ns, slow0.695068ns; setup summaries0, not positive extracted margin. Strict final gate fails only live overflow5, down from best prior15. Save c_select_covered_result_42140616934.json.
+- Only _02001_ and lane1 ot26 geometries change. Preserve the successful clock mechanism; do not start DRT or vary clock placement again. Rebind the existing read-only congestion inspector to exact covered artifact13467519500, full ZIP digest and ODB SHA c627b68cce7b2889a55433f8c0b4d19a27f91dd74bfb0385ac60bfd4d22ee0f9; require fresh saved-grid overflow5 matching the live gate and crossing-net coverage of every edge.
+-7 inspector regressions/actionlint/diff checks pass. Published binding/evidence50114b29c44ef6aa49b3b246d10488d3ea6375ce under standing authorization and confirmed read-only [42142331582](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42142331582) in progress on that SHA. No hardware/config/official-job changes or phase ticks. Next use exact five-edge diagnosis to select a bounded data repair; all timing/electrical/antenna/coverage/zero-overflow gates remain fixed.
+
 ## 2026-11-05 — Prepare covered-clock protection with independent native connectivity gate
 
 - Implement D-155 separate paired gds-c-select-covered-clock diagnostic. Insert only passive clock diode before router/guide initialization at legal prior626880,498960 MX site; protect supplies and all original cells, preserve topology and exact original clock route. Normal incremental routing handles only remaining data repairs. Full inventory audits span both stages; same21.7728um2 added footprint and20um displacement bound.

@@ -298,3 +298,21 @@ refreshes saved congestion and prints live demand/overflow. Accept only live
 overflow0, all original/signoff timing gates, fast hold>=50ps, electrical0 and
 antenna0.89 focused regressions/actionlint/syntax checks pass. No native passing
 result, DRT or official-flow reproduction is claimed.
+
+
+## Covered-clock result: five residual overflow units
+
+[42140616934](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42140616934)
+control passes. Edited placement/supply/full inventory checks pass, original clock
+route and topology stay exact, and independent native segment/pin validation
+passes for44792 routed nets. Original/signoff estimated timing and electrical
+checks pass; antenna0. Original fast/typical/slow hold remains
+0.0867642/0.312564/0.695068ns. Setup summary0 is not extracted positive margin.
+
+Only two data routes change: _02001_ and lane1 ot26. Live overflow improves15→5,
+so the strict screen still fails and DRT remains blocked. Preserve the covered
+clock mechanism; inspect actual residual edges before choosing a data repair.
+Existing read-only inspection [42142331582](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42142331582)
+is bound to exact latest artifact/ODB and expected overflow5. No placement,
+routing, timing or capacity change occurs during inspection. No official-flow
+or extracted closure claim follows.

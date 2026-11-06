@@ -11,10 +11,33 @@
   "diodes": [
     {
       "name": "tripwire_cselect_clear_diode",
-      "anchor": "_50780_",
-      "anchor_master": "sg13cmos5l_dfrbpq_1",
-      "pin": "D",
-      "net": "_02001_"
+      "anchor": "_46674_",
+      "anchor_master": "sg13cmos5l_nor4_1",
+      "pin": "Y",
+      "net": "_02001_",
+      "locked_site_dbu": [
+        830400,
+        317520
+      ],
+      "locked_orientation": "MX",
+      "site_guards": [
+        {
+          "instance": "wire13979",
+          "master": "sg13cmos5l_buf_4",
+          "location_dbu": [
+            824640,
+            317520
+          ]
+        },
+        {
+          "instance": "_46674_",
+          "master": "sg13cmos5l_nor4_1",
+          "location_dbu": [
+            831840,
+            317520
+          ]
+        }
+      ]
     },
     {
       "name": "tripwire_cselect_lane_diode",
@@ -44,5 +67,8 @@
     "net14385"
   ],
   "scope": "Bounded diagnostic only; clock load changes must pass timing; no official source/config integration claim",
-  "placement_rationale": "Clock diode site reproduced by legal native placement in42122049674. Load original guides after clock insertion; require exact original clock route and independent native connectivity/pin coverage. Supply connections and all original strict gates mandatory."
+  "placement_rationale": "Preserve clock mechanism verified42140616934. All five residual overloaded edges cross _02001_. Insert clear diode before guide initialization at legal CoreSite gap830400..831840 on row317520 FS, beside original NOR4 driver; A geometry projects onto original831600,320400 grid point. Native placement, original route hash and independent pin coverage remain mandatory.",
+  "covered_data_nets": [
+    "_02001_"
+  ]
 }

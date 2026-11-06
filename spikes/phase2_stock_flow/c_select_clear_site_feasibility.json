@@ -1,0 +1,61 @@
+{
+  "source_def_sha256": "83ce458668dd12a5f92f207ce864d1ebff1fc6627f3b22477894436e826cdac0",
+  "source_def_run": 42122049674,
+  "pinned_lef_sha256": "c47c436758ae87288324aa1f5a84fcc8faf813bf19df1a400b32258fff4e1219",
+  "original_cells_preserved_in_source": true,
+  "row": {
+    "y": 317520,
+    "orientation": "FS",
+    "origin_x": 2880,
+    "site_pitch": 480
+  },
+  "free_gap_dbu": [
+    828480,
+    831840
+  ],
+  "neighbors": [
+    {
+      "instance": "wire13979",
+      "master": "sg13cmos5l_buf_4",
+      "x": 824640,
+      "width": 3840
+    },
+    {
+      "instance": "_46674_",
+      "master": "sg13cmos5l_nor4_1",
+      "x": 831840,
+      "width": 2880
+    }
+  ],
+  "candidate": {
+    "location_dbu": [
+      830400,
+      317520
+    ],
+    "orientation": "MX",
+    "width_dbu": 1440,
+    "height_dbu": 3780,
+    "anchor": "_46674_",
+    "anchor_pin": "Y",
+    "net": "_02001_",
+    "maximum_anchor_displacement_um": 1.44
+  },
+  "signal_port_bbox_dbu": [
+    830780,
+    318620,
+    831450,
+    320730
+  ],
+  "original_route_grid_point": [
+    831600,
+    320400
+  ],
+  "grid_cell_bounds_dbu": [
+    828000,
+    316800,
+    835200,
+    324000
+  ],
+  "native_placement_and_coverage_proved": false,
+  "scope": "Geometry feasibility only; actual native placement, original route hash, independent native pin coverage, antenna and all timing/overflow gates remain mandatory."
+}

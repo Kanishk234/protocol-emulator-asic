@@ -17,10 +17,26 @@ def test_split_preserves_full_plan_and_excludes_clock_from_later_edit():
     original = copy.deepcopy(source)
     first, second = split_plan(source)
     assert source == original
-    assert first['sizing'] == [] and len(first['diodes']) == 1
-    assert len(second['diodes']) == 2 and second['sizing'] == source['sizing']
+    assert first['sizing'] == [] and len(first['diodes']) == 2
+    assert len(second['diodes']) == 1 and second['sizing'] == source['sizing']
     assert first['diodes'][0]['net'] not in second['allowed_signal_nets_to_reroute']
-    assert len(second['allowed_signal_nets_to_reroute']) == 4
+    assert len(second['allowed_signal_nets_to_reroute']) == 3
+    assert '_02001_' not in second['allowed_signal_nets_to_reroute']
+
+
+@pytest.mark.parametrize('fault', ['net', 'anchor', 'site', 'orientation'])
+def test_unreviewed_data_protection_rejected(fault):
+    source = plan()
+    if fault == 'net':
+        source['covered_data_nets'] = ['another']
+    elif fault == 'anchor':
+        source['diodes'][0]['anchor'] = 'another'
+    elif fault == 'site':
+        source['diodes'][0]['locked_site_dbu'][0] += 480
+    else:
+        source['diodes'][0]['locked_orientation'] = 'R0'
+    with pytest.raises(AssertionError):
+        split_plan(source)
 
 
 @pytest.mark.parametrize('fault', ['reparent', 'missing', 'extra', 'location', 'orientation', 'anchor'])

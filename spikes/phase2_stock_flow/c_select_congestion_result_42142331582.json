@@ -1,0 +1,200 @@
+{
+  "run_id": 42142331582,
+  "conclusion": "success",
+  "inspection": {
+    "source_run": 42140616934,
+    "source_odb_sha256": "c627b68cce7b2889a55433f8c0b4d19a27f91dd74bfb0385ac60bfd4d22ee0f9",
+    "source_odb_unchanged": true,
+    "expected_overflow": 5,
+    "layer_totals": {
+      "Metal2": {
+        "capacity": 263187.0,
+        "usage": 184933.0,
+        "overflow": 0.0
+      },
+      "Metal3": {
+        "capacity": 302689.0,
+        "usage": 244984.0,
+        "overflow": 5.0
+      },
+      "Metal4": {
+        "capacity": 263130.0,
+        "usage": 102552.0,
+        "overflow": 0.0
+      }
+    },
+    "overloaded_edges": [
+      {
+        "layer": "Metal3",
+        "direction": "HORIZONTAL",
+        "x_index": 115,
+        "y_index": 44,
+        "start_dbu": [
+          831600,
+          320400
+        ],
+        "end_dbu": [
+          838800,
+          320400
+        ],
+        "capacity": 17.0,
+        "usage": 18.0,
+        "overflow": 1.0,
+        "crossing_route_names": [
+          "_02001_",
+          "_04713_",
+          "_18730_",
+          "net13623",
+          "net13970",
+          "net15028",
+          "net15035",
+          "net15037",
+          "net2502",
+          "net2997",
+          "net3046",
+          "net3053",
+          "net3057",
+          "net3061",
+          "net3085"
+        ]
+      },
+      {
+        "layer": "Metal3",
+        "direction": "HORIZONTAL",
+        "x_index": 116,
+        "y_index": 44,
+        "start_dbu": [
+          838800,
+          320400
+        ],
+        "end_dbu": [
+          846000,
+          320400
+        ],
+        "capacity": 17.0,
+        "usage": 18.0,
+        "overflow": 1.0,
+        "crossing_route_names": [
+          "_02001_",
+          "_04713_",
+          "_18730_",
+          "net13623",
+          "net13970",
+          "net15028",
+          "net15035",
+          "net15037",
+          "net2503",
+          "net2997",
+          "net3046",
+          "net3053",
+          "net3057",
+          "net3061"
+        ]
+      },
+      {
+        "layer": "Metal3",
+        "direction": "HORIZONTAL",
+        "x_index": 117,
+        "y_index": 44,
+        "start_dbu": [
+          846000,
+          320400
+        ],
+        "end_dbu": [
+          853200,
+          320400
+        ],
+        "capacity": 17.0,
+        "usage": 18.0,
+        "overflow": 1.0,
+        "crossing_route_names": [
+          "_02001_",
+          "_04713_",
+          "_18730_",
+          "net13623",
+          "net13969",
+          "net13970",
+          "net15028",
+          "net15035",
+          "net15038",
+          "net2503",
+          "net2997",
+          "net3046",
+          "net3053",
+          "net3057"
+        ]
+      },
+      {
+        "layer": "Metal3",
+        "direction": "HORIZONTAL",
+        "x_index": 119,
+        "y_index": 44,
+        "start_dbu": [
+          860400,
+          320400
+        ],
+        "end_dbu": [
+          867600,
+          320400
+        ],
+        "capacity": 17.0,
+        "usage": 18.0,
+        "overflow": 1.0,
+        "crossing_route_names": [
+          "_02001_",
+          "clknet_6_39__leaf_clk_regs",
+          "net12898",
+          "net13320",
+          "net13886",
+          "net13966",
+          "net13968",
+          "net13969",
+          "net13970",
+          "net15029",
+          "net15035",
+          "net15038",
+          "net2503",
+          "net2997",
+          "net3046"
+        ]
+      },
+      {
+        "layer": "Metal3",
+        "direction": "HORIZONTAL",
+        "x_index": 126,
+        "y_index": 44,
+        "start_dbu": [
+          910800,
+          320400
+        ],
+        "end_dbu": [
+          918000,
+          320400
+        ],
+        "capacity": 17.0,
+        "usage": 18.0,
+        "overflow": 1.0,
+        "crossing_route_names": [
+          "_02001_",
+          "_04730_",
+          "_18306_",
+          "net12898",
+          "net13320",
+          "net1358",
+          "net15029",
+          "net15038",
+          "net1505",
+          "net1506",
+          "net1816",
+          "net1848",
+          "net2503",
+          "net7724"
+        ]
+      }
+    ],
+    "design_qualified": false,
+    "scope": "Read-only saved congestion validated against final live routing gate; no placement, repair, rerouting, STA or closure claim"
+  },
+  "diagnostic_only": true,
+  "decision": "All five edges cross clear net _02001_; preserve its original route while adding passive driver-side protection. No timing or design qualification from inspection."
+}

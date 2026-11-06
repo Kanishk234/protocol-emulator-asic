@@ -19,31 +19,43 @@ def split_plan(plan):
     assert clock['anchor'] == '_51789_' and clock['anchor_master'] == 'sg13cmos5l_dlhq_1'
     assert clock['locked_site_dbu'] == [626880, 498960]
     assert clock['locked_orientation'] == 'MX'
+    covered_data = plan.get('covered_data_nets', [])
+    assert covered_data in ([], ['_02001_']), 'Unreviewed covered data net'
+    data = [d for d in plan['diodes'] if d['net'] in covered_data]
+    assert len(data) == len(covered_data)
+    if data:
+        clear = data[0]
+        assert (clear['anchor'], clear['anchor_master'], clear['pin']) == (
+            '_46674_', 'sg13cmos5l_nor4_1', 'Y')
+        assert clear['locked_site_dbu'] == [830400, 317520]
+        assert clear['locked_orientation'] == 'MX'
+    preserved = [clock['net']] + covered_data
     first = copy.deepcopy(plan)
     first['sizing'] = []
-    first['diodes'] = [clock]
-    first['allowed_signal_nets_to_reroute'] = [clock['net']]
+    first['diodes'] = [clock] + data
+    first['allowed_signal_nets_to_reroute'] = preserved
     second = copy.deepcopy(plan)
-    second['diodes'] = [d for d in plan['diodes'] if d['pin'] != 'GATE']
+    second['diodes'] = [d for d in plan['diodes'] if d['net'] not in preserved]
     second['allowed_signal_nets_to_reroute'] = [n for n in plan['allowed_signal_nets_to_reroute']
-                                               if n != clock['net']]
+                                               if n not in preserved]
     return first, second
 
 
 class DeferredClock:
     """No live router exists yet; reject any unexpected attempted net edit."""
     def __init__(self, net):
-        self.net = net
+        self.nets = {net} if isinstance(net, str) else set(net)
+        assert self.nets and not self.nets.intersection({'VDD', 'VSS'})
 
     def addDirtyNet(self, net):
-        assert canonical(net.getName()) == self.net, 'Unexpected deferred net'
+        assert canonical(net.getName()) in self.nets, 'Unexpected deferred net'
 
 
 def prepare(design, database):
     plan = json.loads(PLAN.read_text())
     first, second = split_plan(plan)
     before = snapshot(database.getChip().getBlock())
-    receipt = apply_plan(design, DeferredClock(first['diodes'][0]['net']), database, first)
+    receipt = apply_plan(design, DeferredClock(first['allowed_signal_nets_to_reroute']), database, first)
     verify_after_router(database, receipt)
     return dict(plan=plan, remaining=second, before=before, clock_receipt=receipt,
                 units=database.getChip().getBlock().getDbUnitsPerMicron())
@@ -66,6 +78,9 @@ def finish(database, prepared, intervention, before_text, after_text):
                    prepared['plan'], prepared['units'])
     clock = prepared['plan']['diodes'][2]
     require_clock_preserved(before_text, after_text, clock['net'])
+    for net in prepared['plan'].get('covered_data_nets', []):
+        require_clock_preserved(before_text, after_text, net)
+    intervention['original_data_routes_preserved'] = prepared['plan'].get('covered_data_nets', [])
     intervention['clock_prepared_before_router_initialization'] = True
     intervention['original_clock_route_preserved'] = True
     intervention['added_diodes'] = 3

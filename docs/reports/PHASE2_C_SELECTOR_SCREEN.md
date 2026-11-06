@@ -397,3 +397,21 @@ DetailedRouting without repeating repairs. Require route DRC0, antenna0,
 preserved logical connections and passing disconnected-pin checks.66 focused
 checks, actionlint and embedded syntax checks pass. No extracted closure,
 official GDS or source/config reproduction claim follows from launch.
+
+
+## Detailed route succeeds; extracted timing measurement launched
+
+[42158728020](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42158728020)
+succeeds: fresh preflight gates, completed detailed route DRC0, antenna0 and
+logical-cell conservation pass. The stock pin checker reports0 critical and1
+noncritical disconnected pin; its full table identifies top-level ena. This is
+not a claim of zero total disconnected pins. Whole routed artifact digest and
+state/metric/table hashes bind the next measurement to this exact result.
+
+[42252231999](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42252231999)
+is running on1299efb737147f19fb6662fe08daf3fd42b41ec6. It restores the exact
+route, finalizes/extracts parasitics and measures all fast/slow/typical setup/hold
+and electrical reports under unchanged signoff constraints. Require six timing
+values, all three electrical reports, fast hold>=50ps, all setup/hold>=0 and
+antenna0.60 focused checks/actionlint/syntax pass. No synthesis/rerouting/repair
+is repeated. Source/config reproduction, official GDS and Phase2exit remain open.

@@ -150,3 +150,12 @@ extracted timing or official-flow closure. The exact saved checkpoint is now
 being detailed-routed in42158728020; extraction follows only after a clean route.
 Reproducing the repair through supported source/config changes and the unchanged
 official GDS flow remains necessary. Phase2is still open.
+
+
+The exact C-selector checkpoint also passes detailed routing
+([42158728020](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42158728020)):
+zero route DRC and antenna violations, preserved logic, and no critical
+disconnected pins. The stock report lists one noncritical pin, the top-level
+ena input. Extraction and timing measurement are now running in42252231999.
+This will tell us whether the passing estimated timing survives actual routed
+parasitics. Official-flow reproduction and Phase2completion are still open.

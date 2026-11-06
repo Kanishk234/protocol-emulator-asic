@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-06 — Detailed route passes; launch exact-route extraction
+
+-42158728020 succeeds after about225.5min total job time. All fresh preflight gates reproduce; completed stock DetailedRouting reports route DRC0 and fresh antenna0. Logic audit and stock disconnected-pin checker pass. Independently inspect state/completion/metric receipts. ReportDisconnectedPins counts1 noncritical/0critical; its full table identifies only top-level ena. Do not claim zero total disconnected pins. Save c_select_drt_result_42158728020.json.
+- Bind exact routed artifact13485790976, whole ZIP digest c3b8c77d1286d6fb3d09414d3a3e5391a8723b0f8476778e07883ccd747daedb and ten state/metric/table hashes. New extraction source guard rejects wrong provenance/bytes/state pointers, missing route views, unfinished/dirty route or critical disconnect. Preserve original43-file source/config/engine/PDK recovery and copy exact routed views without synthesis, repair or rerouting.
+- Separate manual gds-c-select-route-extracted-timing uses existing stock finalization/RCX/all-corner STA diagnostic, exact signoff constraints, fresh route netlist/antenna readback and strict setup/hold/electrical/antenna gates. Require all six timing values/all three electrical reports, setup/hold>=0 and fast hold>=50ps; never accept missing evidence.60 focused completion/restoration/extraction/recovery regressions, actionlint, embedded syntax and diff checks pass.
+- Published tools/CI through1299efb737147f19fb6662fe08daf3fd42b41ec6 and confirmed [42252231999](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42252231999) in progress on that SHA under standing authorization. No main hardware/config/official-job changes or phase ticks. Next inspect extracted gates and worst paths before source/config promotion or official GDS; estimated screen success is not extracted timing closure.
+
 ## 2026-11-05 — Strict C-selector screen is green; launch exact-checkpoint detailed routing
 
 -42156980762 succeeds in both control and edited arms. Independently inspect edited gate receipt: all original/signoff estimated timing/electrical gates pass, antenna0, live overflow0, independent native44792-net pin coverage/connectivity and placement/supply/full-inventory guards pass. Fast/typical/slow original hold0.0867642/0.312564/0.695068ns; setup summaries0 are not positive extracted margin. Only two local Via1 attachments augment original frozen planar routes; no subsequent geometry changes. Save c_select_covered_result_42156980762.json. This is a green experimental screen, not official GDS or phase completion.

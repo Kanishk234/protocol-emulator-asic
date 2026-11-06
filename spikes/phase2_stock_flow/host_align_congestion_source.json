@@ -1,0 +1,25 @@
+{
+  "run": {
+    "id": 42262602008,
+    "head_sha": "2094fa0477ca0a5ee12e8335b6b9dd1e09a3acc0",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-stock-official-baseline-screen.yaml",
+    "conclusion": "failure"
+  },
+  "artifact": {
+    "id": 13541760044,
+    "name": "stock-official-baseline-42262602008",
+    "size_in_bytes": 368211310,
+    "expired": false,
+    "digest": "sha256:403381fe2ae07165fc9ed097824e45e5bf38e1ff3e525077fe2b15cdec7a9acd"
+  },
+  "odb": {
+    "path": "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.odb",
+    "sha256": "cad76cd4937580500a6d0640596c9ae7cba9765abae5eed3a7e4c5e24f044055"
+  },
+  "segments": "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/after_grt.guide",
+  "guide_sha256": "79daaf1e9db2ee6181d0084eefec8df8f95336d700bf12448a78df4828960318",
+  "expected_overflow": 70,
+  "image": "ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a",
+  "scope": "Read-only saved congestion and guide-overlap candidates; guide overlap is not proof of exact routed crossing or connectivity."
+}

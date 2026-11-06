@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Exact overflow readback identifies clock; prepare parent-sink reassignment
+
+- Readback42131917635 succeeds while this session is active. Whole source ZIP digest/ODB hash verified; input unchanged; native grid reproduces15 live overflow. All15 edges contain the changed clock net, neither edited data net crosses any.14 edges atY514800,1 atY500400. Save c_select_congestion_result_42131917635.json; inspection does not qualify the design.
+- Check local BUF4/BUF8/inverter placement feasibility: no spare site preserving the original clock pin's routing-grid point with every original cell fixed. Prefer simpler existing-tree repair: D-154 reconnects only _51789_/GATE from leafBUF8 X to that exact buffer A net driven by parentBUF8. Pinned PDK BUF8 combinational identity proof passes; clock latency effects remain unmeasured and all original/signoff timing gates mandatory.
+- New separate paired workflow retains two data diodes/connected supplies and wire14386 BUF4, removes clock diode, and bounds routing to six nets. Original latch location/master/data/power and every other original connection remain exact; only reviewed GATE reparent exception. Runtime unique-driver/master/name checks reject wrong clock. Added footprint estimate16.3296um2 versus21.7728.89 regressions/actionlint/embedded syntax pass.
+- Published tools/proof/workflow throughc3bc97b74c04e95f559455e06b9ef5c39e405065 and launched one parent-clock diagnostic under standing approval: [42135330053](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42135330053), confirmed in progress on that SHA. Official jobs/main hardware/config untouched; no DRT, extracted claim or phase tick. Next require control reproduction and strict edited gates, especially hold after bypassing one buffer stage.
+
 ## 2026-11-05 — Fixed-site repair leaves15 overflow; inspect exact overloaded edges
 
 -42128655779 control passes. Edited exact-site/supply/placement assertions pass; clock diode remains643680,510300 R0. Both original/signoff timing and electrical checks pass, antenna0, unrelated routes/cells preserved. Live overflow drops17→15, so final gate still correctly fails. Save c_select_repair_result_42128655779.json. No new extracted timing or DRT result.

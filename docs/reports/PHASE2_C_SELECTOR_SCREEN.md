@@ -235,3 +235,29 @@ This measurement will guide a bounded routing-neighborhood decision rather than
 another placement guess. A green readback job is not a green physical screen.
 
 Read-only edge inspection [42131917635](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42131917635) was launched on `28727e44348eaebbfb887314dd4a16872a2d7c5b`; results pending.
+
+
+## Exact congestion diagnosis and parent-clock experiment
+
+Readback42131917635 succeeds: complete source artifact ZIP digest and ODB hash
+verified, input unchanged, saved grid overflow equals live15. All15 overloaded
+Metal3 edges are crossed by the changed word0 clock branch; neither edited data
+net crosses them. Fourteen lie onY514800 and one onY500400. These native stored
+capacity/usage differences identify the branch to repair; they are not a new
+STA or closure measurement.
+
+A local-buffer feasibility check found no spare site in the required input-grid
+point with all original cells fixed. D-154 instead tests one clock-sink
+reassignment to the already existing parent buffer. Runtime checks prove the
+new clock is the leaf BUF8 input and old clock its output, with a BUF8 parent;
+the pinned PDK cell's combinational identity proof passes. Only the latch GATE
+connection changes. Its location, master, data and supply pins remain exact.
+Clock latency changes, so all original/signoff timing gates stay mandatory.
+
+This removes the clock diode, retains two data diodes plus wire14386 BUF4, and
+reduces estimated added footprint to16.3296µm². Six allowed nets bound rerouting.
+89 related regressions, actual PDK identity proof, actionlint and embedded
+workflow syntax pass. No native success is predicted; official-flow source/config
+reproduction and extracted timing remain open.
+
+Parent-clock experiment [42135330053](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42135330053) was launched on `c3bc97b74c04e95f559455e06b9ef5c39e405065`; native results pending.

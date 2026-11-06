@@ -1633,3 +1633,12 @@ This is a diagnostic physical intervention, not an official-flow recipe or archi
 
 
 2026-11-05 D-153 clock-site follow-up:42125394009 stops before routing because the legalizer cannot retain the clock diode in the requested row. DEF/LEF assessment finds the seed row514080 full nearby and an exact three-site gap on adjacent CoreSite row510300, between hold7746 and _33545_. Place only the new clock diode at643680,510300 DBU,R0 and lock it; offset12.96um X/11.34um Y retains the original20um displacement limit. Bind the neighboring original cells; all original cells stay fixed except the previously allowed buffer. Native legalization/checks remain mandatory. Correct missing added-diode supply connections by copying anchor VDD/VSS; no original connection or timing/overflow gate changes. This explicitly reviewed site replaces the ineffective seed window; no guarantee of zero overflow follows.
+
+
+## D-154 (2026-11-05): test one configuration-clock sink on its existing parent buffer
+
+Exact readback42131917635 verifies all15 overloaded edges are crossed by the changed config clock branch; neither edited data net crosses any. Nearby placement changes did not close congestion, and there is no spare local-buffer site at the original clock grid point without moving logic. General need: shorten a pathological gated-clock branch created by CTS/placement without protocol-specific logic or added state.
+
+Prepare a paired diagnostic reconnecting only _51789_/GATE from leaf BUF8 X to that same BUF8 A net, itself driven by its parent BUF8. The ideal gated-clock waveform is identical; bypassing one clock buffer changes latency and must pass both original/signoff all-corner timing/hold gates. Runtime guards require the exact reviewed old/new clock names, unique BUF8 X driver, BUF8 parent driver and unchanged latch location/master/all other pins. A PDK BUF8 combinational identity proof passes; it is not a clock-skew or sequential timing proof.
+
+Remove the clock diode; retain two data diodes, original supply fixes and wire14386 BUF4. Estimated added cell footprint falls21.7728→16.3296um2. Only six reviewed incident nets may change routing; all original positions stay fixed except the already allowed buffer. No original signal connection changes except the named clock pin. All zero-violation/overflow and fast50ps gates remain mandatory; no DRT authorization follows before passing. This remains a diagnostic physical topology change requiring source/config reproduction under unchanged official jobs before promotion. Native effects unmeasured.

@@ -1,0 +1,143 @@
+{
+  "run_id": 42140616934,
+  "workflow_conclusion": "failure",
+  "control_conclusion": "success",
+  "edited_gates": {
+    "edited": true,
+    "failures": [
+      "overflow 5"
+    ],
+    "diagnostic_gates_passed": false,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 0,
+      "antenna__violating__pins": 0
+    },
+    "overflow": 5
+  },
+  "geometry": {
+    "old_routed_nets": 44792,
+    "new_routed_nets": 44792,
+    "changed_nets": [
+      "_02001_",
+      "u_chip.g_lane\\[1\\].ot\\[26\\]"
+    ],
+    "unexpected_changed_nets": [],
+    "unchanged_routes_preserved": true,
+    "exact_roundtrip": false,
+    "physical_timing_measured": false,
+    "official_signoff": false
+  },
+  "intervention": {
+    "allowed": [
+      "_02001_",
+      "u_chip.g_lane[1].ot[26]",
+      "net14386",
+      "net14385"
+    ],
+    "added_diodes": 3,
+    "diagnostic_only": true,
+    "clock_reparent": null,
+    "clock_reparent_identity_checked": false,
+    "placement_checked": true,
+    "clock_net_changed": true,
+    "clock_timing_must_be_remeasured": true,
+    "diode_placements": {
+      "tripwire_cselect_clear_diode": {
+        "location_dbu": [
+          938880,
+          313740
+        ],
+        "orientation": "R0",
+        "anchor": "_50780_",
+        "displacement_um": [
+          0.0,
+          -3.78
+        ]
+      },
+      "tripwire_cselect_lane_diode": {
+        "location_dbu": [
+          578880,
+          211680
+        ],
+        "orientation": "MX",
+        "anchor": "hold11285",
+        "displacement_um": [
+          -6.72,
+          0.0
+        ]
+      },
+      "tripwire_cselect_clock_diode": {
+        "location_dbu": [
+          626880,
+          498960
+        ],
+        "orientation": "MX",
+        "anchor": "_51789_",
+        "displacement_um": [
+          -3.84,
+          0.0
+        ]
+      }
+    },
+    "post_router_placement_and_connections_verified": true,
+    "clock_prepared_before_router_initialization": true,
+    "original_clock_route_preserved": true,
+    "clock_preparation": {
+      "allowed": [
+        "clknet_2_0__leaf_u_chip.g_unit[0].u_cfg.g_word[0].g_stored.gclk"
+      ],
+      "added_diodes": 1,
+      "diagnostic_only": true,
+      "clock_reparent": null,
+      "clock_reparent_identity_checked": false,
+      "placement_checked": true,
+      "clock_net_changed": true,
+      "clock_timing_must_be_remeasured": true,
+      "diode_placements": {
+        "tripwire_cselect_clock_diode": {
+          "location_dbu": [
+            626880,
+            498960
+          ],
+          "orientation": "MX",
+          "anchor": "_51789_",
+          "displacement_um": [
+            -3.84,
+            0.0
+          ]
+        }
+      },
+      "post_router_placement_and_connections_verified": true
+    },
+    "post_router_placement_checked": true
+  },
+  "independent_native_coverage_step": "success (GitHub job127639733383 step14)",
+  "previous_best_antenna_clean_overflow": 15,
+  "remaining_overflow": 5,
+  "qualified": false,
+  "decision": "Preserve covered clock repair; inspect exact five remaining overloaded edges before another physical change. No DRT/extraction/official qualification."
+}

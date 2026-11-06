@@ -1,0 +1,146 @@
+{
+  "run_id": 42252231999,
+  "conclusion": "failure",
+  "extraction_completed": true,
+  "timing": {
+    "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+    "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.17977619901592048,
+    "timing__setup__ws__corner:nom_slow_1p08V_125C": -2.927812741785765,
+    "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.815945112348467,
+    "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+    "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.40990845211702326
+  },
+  "electrical": {
+    "nom_fast_1p32V_m40C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    },
+    "nom_slow_1p08V_125C": {
+      "counts": {
+        "slew": 2,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [
+          "wire12345/A                             2.507400    2.583109   -0.075709 (VIOLATED)",
+          "_48011_/Y                               2.507400    2.581115   -0.073715 (VIOLATED)"
+        ],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": false,
+      "official_signoff": false
+    },
+    "nom_typ_1p20V_25C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    }
+  },
+  "antenna_violating_nets": 0,
+  "antenna_violating_pins": 0,
+  "setup_path": {
+    "start": "_51861_",
+    "end": "_50696_",
+    "start_signal": "unit0 configuration word0 bit7: IDLE",
+    "end_signal": "u_chip.u_fab.u_c1.pending_drop",
+    "arrival_ns": 24.242085,
+    "required_ns": 21.314272,
+    "slack_ns": -2.927812741785765,
+    "route_observation": "Path traverses unit0 pads[13] selection/feedback logic before fabric pending_drop.",
+    "reported_output_cell_count": 58,
+    "ten_largest_reported_cell_delays": [
+      {
+        "pin": "_27522_/Y",
+        "master": "sg13cmos5l_nor4_1",
+        "delay_ns": 1.474222,
+        "arrival_ns": 15.358002
+      },
+      {
+        "pin": "_27530_/Y",
+        "master": "sg13cmos5l_nand3_1",
+        "delay_ns": 1.134735,
+        "arrival_ns": 16.500771
+      },
+      {
+        "pin": "_46365_/Y",
+        "master": "sg13cmos5l_nor4_1",
+        "delay_ns": 1.002023,
+        "arrival_ns": 23.582258
+      },
+      {
+        "pin": "hold11557/X",
+        "master": "sg13cmos5l_dlygate4sd3_1",
+        "delay_ns": 0.814025,
+        "arrival_ns": 4.001334
+      },
+      {
+        "pin": "_25942_/Y",
+        "master": "sg13cmos5l_o21ai_1",
+        "delay_ns": 0.595679,
+        "arrival_ns": 7.599518
+      },
+      {
+        "pin": "_27423_/Y",
+        "master": "sg13cmos5l_nand4_1",
+        "delay_ns": 0.585858,
+        "arrival_ns": 12.659776
+      },
+      {
+        "pin": "_39481_/Y",
+        "master": "sg13cmos5l_a21oi_1",
+        "delay_ns": 0.571886,
+        "arrival_ns": 20.261042
+      },
+      {
+        "pin": "_25828_/Y",
+        "master": "sg13cmos5l_a221oi_1",
+        "delay_ns": 0.52678,
+        "arrival_ns": 6.361686
+      },
+      {
+        "pin": "fanout500/X",
+        "master": "sg13cmos5l_buf_2",
+        "delay_ns": 0.522247,
+        "arrival_ns": 17.029417
+      },
+      {
+        "pin": "_40072_/Y",
+        "master": "sg13cmos5l_a21oi_1",
+        "delay_ns": 0.512618,
+        "arrival_ns": 21.294004
+      }
+    ]
+  },
+  "slew_connection": {
+    "driver": "_48011_/Y",
+    "driver_master": "sg13cmos5l_a221oi_1",
+    "sink": "wire12345/A",
+    "sink_master": "sg13cmos5l_buf_2",
+    "required_slew_ns": 2.5074,
+    "driver_slew_ns": 2.581115,
+    "sink_slew_ns": 2.583109
+  },
+  "next": "Target IDLE-to-pad-feedback-to-channel1 setup cone and the one slow slew connection. Do not repeat passing screen or route without a measured remedy. Official source/config reproduction remains open.",
+  "official_gds_qualified": false
+}

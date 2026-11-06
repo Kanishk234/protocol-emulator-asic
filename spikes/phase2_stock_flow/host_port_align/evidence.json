@@ -1,0 +1,117 @@
+{
+  "reference_sha256": "aed5401613c7f7403ee5750f4830b10828d3e9abafe8a25ee698d492cfd6d758",
+  "candidate_sha256": "0e5584c920c1491b1996d7d8ece5972f999b5f1ff52e19e8782f0f8afdda66e1",
+  "patch_sha256": "bd70f3491af254d7b3458bcae83ff83f12951400ddbfea997074469a2cc8cba6",
+  "proofs": [
+    {
+      "nl": 2,
+      "nu": 4,
+      "points": 902,
+      "induction_sequence_cap": 2,
+      "scope": "Complete host/SPI module equivalence with explicit resource parameters; not full-chip formal"
+    },
+    {
+      "nl": 3,
+      "nu": 6,
+      "points": 920,
+      "induction_sequence_cap": 2,
+      "scope": "Complete host/SPI module equivalence with explicit resource parameters; not full-chip formal"
+    }
+  ],
+  "isolated_mapping": {
+    "scope": "Isolated port-status mux ABC comparison, not extracted timing or guaranteed slew fix",
+    "results": {
+      "nc9-slow-6": {
+        "gold": {
+          "gates": 345,
+          "delay_ps": 2035.03,
+          "area_um2": 5017.7988
+        },
+        "gate": {
+          "gates": 82,
+          "delay_ps": 977.29,
+          "area_um2": 1520.4672
+        }
+      },
+      "nc9-typ-6": {
+        "gold": {
+          "gates": 345,
+          "delay_ps": 1279.18,
+          "area_um2": 5023.242
+        },
+        "gate": {
+          "gates": 82,
+          "delay_ps": 617.49,
+          "area_um2": 1505.952
+        }
+      },
+      "nc9-slow-130": {
+        "gold": {
+          "gates": 355,
+          "delay_ps": 2244.46,
+          "area_um2": 5221.0116
+        },
+        "gate": {
+          "gates": 92,
+          "delay_ps": 1270.26,
+          "area_um2": 1647.4752
+        }
+      },
+      "nc13-slow-6": {
+        "gold": {
+          "gates": 403,
+          "delay_ps": 1789.79,
+          "area_um2": 6903.603
+        },
+        "gate": {
+          "gates": 126,
+          "delay_ps": 1060.62,
+          "area_um2": 2265.9588
+        }
+      },
+      "nc13-typ-6": {
+        "gold": {
+          "gates": 403,
+          "delay_ps": 1137.24,
+          "area_um2": 6903.603
+        },
+        "gate": {
+          "gates": 126,
+          "delay_ps": 668.0,
+          "area_um2": 2200.6404
+        }
+      },
+      "nc13-slow-130": {
+        "gold": {
+          "gates": 413,
+          "delay_ps": 2031.25,
+          "area_um2": 7192.0926
+        },
+        "gate": {
+          "gates": 136,
+          "delay_ps": 1296.46,
+          "area_um2": 2418.3684
+        }
+      }
+    }
+  },
+  "scope": "Static wire padding to16bit words before indexing10bit port records. No new state, ISA or host latency; isolated gains are not actual routed timing.",
+  "chip_smoke_status": "passed",
+  "chip_smoke": {
+    "passed": 5,
+    "tests": [
+      "test_identity_time_sram",
+      "test_lane_forwards_host_in_to_host_out",
+      "test_pin_units_uart_tx_lean_and_full",
+      "test_routine_on_the_rotation",
+      "test_uart_program_loopback"
+    ],
+    "results_xml_sha256": "3a2d1e0fa6c46ebd199584b7d5fb1d3d31fb36bbb12efac1650a7336ef11def1"
+  },
+  "ci_preparation": {
+    "passed": true,
+    "source_inventory_matches_tested_rtl": true,
+    "physical_recipe_unchanged": true
+  },
+  "reproduction_script": "scripts/ci/verify_host_port_align.py"
+}

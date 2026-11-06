@@ -1,0 +1,27 @@
+--- a/src/trw_host.v
++++ b/src/trw_host.v
+@@ -255,6 +255,15 @@
+         endcase
+     end
+ 
++    // Align each 10-bit port-status record to a host word before indexing.
++    // Constant padding avoids a runtime multiply-by-ten/unaligned shift.
++    wire [16*NC-1:0] port_status_words;
++    genvar status_port;
++    generate for (status_port=0; status_port<NC; status_port=status_port+1) begin : g_port_status_word
++        assign port_status_words[16*status_port +: 16] = {6'd0, port_state[10*status_port +: 10]};
++    end endgenerate
++    wire [15:0] port_status_word = port_status_words[16*r_pt[3:0] +: 16];
++
+     reg     uf_late, uf_ovr;                   // unit_flags word r_uf (any unit count)
+     integer ku;
+     always @* begin
+@@ -275,7 +284,7 @@
+         else if (r_uf < NU)                         rd_data = {14'd0, uf_late, uf_ovr};
+         else if (ra == `TRW_HA_VERSION)             rd_data = `TRW_SPEC_VERSION;
+         else if (ra == `TRW_HA_ID)                  rd_data = `TRW_HOST_ID;
+-        else if (r_pt < NC)                         rd_data = {6'd0, port_state[10*r_pt[3:0] +: 10]};
++        else if (r_pt < NC)                         rd_data = port_status_word;
+         else if (r_dr < NC)                         rd_data = {8'd0, dropped[8*r_dr[3:0] +: 8]};
+         else if (r_ow < `TRW_HA_OWNERS_N)           rd_data = {13'd0, own_q};
+         else if (r_ln < NL * `TRW_HA_LANE_STRIDE)   rd_data = lane_word;

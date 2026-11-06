@@ -1,24 +1,24 @@
 {
   "run": {
-    "id": 42140616934,
-    "head_sha": "38abbe8546bdb865a3bc955735655e7a040bf09d",
+    "id": 42144728640,
+    "head_sha": "4273bc1695391eaf55720cb46b4f7ad6942aa8e8",
     "head_branch": "main",
     "path": ".github/workflows/gds-c-select-covered-clock.yaml",
     "conclusion": "failure"
   },
   "artifact": {
-    "id": 13467519500,
-    "name": "c-select-covered-true-42140616934",
-    "size_in_bytes": 260502469,
+    "id": 13470241153,
+    "name": "c-select-covered-true-42144728640",
+    "size_in_bytes": 260502400,
     "expired": false,
-    "digest": "sha256:5a2d94ae54e4f089e18f26bfce410b13ea05c456dc79a5eabf029669b97eee3c"
+    "digest": "sha256:ef214ef84ffbadcac98b6ee4464f96a3f76f435162de356f13a1cca3c6e3f804"
   },
   "odb": {
     "path": "runs/route-reopen-calibration/calibrated.odb",
-    "sha256": "c627b68cce7b2889a55433f8c0b4d19a27f91dd74bfb0385ac60bfd4d22ee0f9"
+    "sha256": "bc2c634a214a4960c9800c3704f9024f2ddf355767af82960e5353beb4f361ca"
   },
   "segments": "runs/route-reopen-calibration/after.segments",
-  "expected_overflow": 5,
+  "expected_overflow": 2,
   "image": "ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a",
   "scope": "Read-only diagnosis of an unqualified repaired checkpoint; no timing/physical repair"
 }

@@ -1,0 +1,63 @@
+{
+  "run_id": 42144728640,
+  "conclusion": "failure",
+  "control_conclusion": "success",
+  "gates": {
+    "edited": true,
+    "failures": [
+      "antenna {'antenna__violating__nets': 1, 'antenna__violating__pins': 1}",
+      "overflow 2"
+    ],
+    "diagnostic_gates_passed": false,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0867642,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.695068,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.312564,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 1,
+      "antenna__violating__pins": 1
+    },
+    "overflow": 2
+  },
+  "geometry": {
+    "old_routed_nets": 44792,
+    "new_routed_nets": 44792,
+    "changed_nets": [
+      "u_chip.g_lane\\[1\\].ot\\[26\\]"
+    ],
+    "unexpected_changed_nets": [],
+    "unchanged_routes_preserved": true,
+    "exact_roundtrip": false,
+    "physical_timing_measured": false,
+    "official_signoff": false
+  },
+  "independent_native_coverage_passed": true,
+  "antenna_receiver": "_50780_/D",
+  "antenna_net": "_02001_",
+  "failed_layer": "Metal3",
+  "cumulative_area_ratio": 239.71,
+  "required_ratio": 200,
+  "diode_effective_only_at_layer": "Metal4",
+  "decision": "Reject driver-side diode as a Metal3 receiver protection solution. Inspect two remaining overflow edges; receiver-local protection or a legal jumper still required. No DRT/qualification.",
+  "official_flow_qualified": false
+}

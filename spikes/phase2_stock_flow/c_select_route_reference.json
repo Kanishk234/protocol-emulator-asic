@@ -17,5 +17,6 @@
     "nom_typ_1p20V_25C": 0.462564,
     "nom_slow_1p08V_125C": 0.845068
   },
-  "native_reopen_control_run": 42122049674
+  "native_reopen_control_run": 42122049674,
+  "atomic_route_sha256": "3f5183f4fa7a3a563dba0829b34f51f17ab05c409addc246c4ff6ce57f79cd7a"
 }

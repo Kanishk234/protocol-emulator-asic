@@ -1,0 +1,97 @@
+{
+  "run_id": 42146325916,
+  "conclusion": "success",
+  "inspection": {
+    "source_run": 42144728640,
+    "source_odb_sha256": "bc2c634a214a4960c9800c3704f9024f2ddf355767af82960e5353beb4f361ca",
+    "source_odb_unchanged": true,
+    "expected_overflow": 2,
+    "layer_totals": {
+      "Metal2": {
+        "capacity": 263187.0,
+        "usage": 184928.0,
+        "overflow": 0.0
+      },
+      "Metal3": {
+        "capacity": 302689.0,
+        "usage": 244969.0,
+        "overflow": 2.0
+      },
+      "Metal4": {
+        "capacity": 263130.0,
+        "usage": 102552.0,
+        "overflow": 0.0
+      }
+    },
+    "overloaded_edges": [
+      {
+        "layer": "Metal3",
+        "direction": "HORIZONTAL",
+        "x_index": 79,
+        "y_index": 45,
+        "start_dbu": [
+          572400,
+          327600
+        ],
+        "end_dbu": [
+          579600,
+          327600
+        ],
+        "capacity": 17.0,
+        "usage": 18.0,
+        "overflow": 1.0,
+        "crossing_route_names": [
+          "_04376_",
+          "net12780",
+          "net14403",
+          "net14995",
+          "net15172",
+          "net15214",
+          "net15470",
+          "net15506",
+          "net15593",
+          "net2879",
+          "u_chip.g_lane\\[1\\].ot\\[26\\]",
+          "u_chip.g_unit\\[1\\].u_prod.tok\\[1\\]",
+          "u_chip.g_unit\\[2\\].u_prod.tok\\[8\\]"
+        ]
+      },
+      {
+        "layer": "Metal3",
+        "direction": "HORIZONTAL",
+        "x_index": 81,
+        "y_index": 29,
+        "start_dbu": [
+          586800,
+          212400
+        ],
+        "end_dbu": [
+          594000,
+          212400
+        ],
+        "capacity": 17.0,
+        "usage": 18.0,
+        "overflow": 1.0,
+        "crossing_route_names": [
+          "_05005_",
+          "net12124",
+          "net12459",
+          "net12605",
+          "net1266",
+          "net12724",
+          "net13828",
+          "net15138",
+          "net1568",
+          "net1569",
+          "net1571",
+          "net4847",
+          "u_chip.g_lane\\[1\\].ot\\[26\\]",
+          "u_chip.g_lane\\[1\\].u_lane.ex_rt"
+        ]
+      }
+    ],
+    "design_qualified": false,
+    "scope": "Read-only saved congestion validated against final live routing gate; no placement, repair, rerouting, STA or closure claim"
+  },
+  "decision": "Both residual edges cross lane ot26. Retain all original routes and test two receiver-side Via1 attachments; inspection itself is not physical qualification."
+}

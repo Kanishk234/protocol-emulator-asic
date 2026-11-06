@@ -1,0 +1,53 @@
+{
+  "frozen_source_run": 42078913664,
+  "geometry_def_run": 42122049674,
+  "def_sha256": "83ce458668dd12a5f92f207ce864d1ebff1fc6627f3b22477894436e826cdac0",
+  "lef_sha256": "c47c436758ae87288324aa1f5a84fcc8faf813bf19df1a400b32258fff4e1219",
+  "clear": {
+    "site_dbu": [
+      938880,
+      313740
+    ],
+    "orientation": "R0",
+    "original_metal2_x": 939600,
+    "original_metal2_y_range": [
+      298800,
+      320400
+    ],
+    "via_point_dbu": [
+      939600,
+      313200
+    ],
+    "previous_native_legal_site_run": 42140616934
+  },
+  "lane": {
+    "site_dbu": [
+      586080,
+      223020
+    ],
+    "orientation": "R0",
+    "gap_x_dbu": [
+      585600,
+      588480
+    ],
+    "neighbors": [
+      "_51154__6554",
+      "_49315__4848"
+    ],
+    "original_metal2_x": 586800,
+    "original_metal2_y_range": [
+      212400,
+      327600
+    ],
+    "via_point_dbu": [
+      586800,
+      226800
+    ],
+    "anchor_displacement_dbu": [
+      480,
+      11340
+    ]
+  },
+  "new_guides": "Two Metal1-to-Metal2 vias only; no added planar route edges or changed capacities",
+  "native_placement_coverage_antenna_success_proved": false
+}

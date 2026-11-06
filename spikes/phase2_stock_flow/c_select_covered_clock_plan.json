@@ -11,40 +11,45 @@
   "diodes": [
     {
       "name": "tripwire_cselect_clear_diode",
-      "anchor": "_46674_",
-      "anchor_master": "sg13cmos5l_nor4_1",
-      "pin": "Y",
+      "anchor": "_50780_",
+      "anchor_master": "sg13cmos5l_dfrbpq_1",
+      "pin": "D",
       "net": "_02001_",
       "locked_site_dbu": [
-        830400,
-        317520
+        938880,
+        313740
       ],
-      "locked_orientation": "MX",
-      "site_guards": [
-        {
-          "instance": "wire13979",
-          "master": "sg13cmos5l_buf_4",
-          "location_dbu": [
-            824640,
-            317520
-          ]
-        },
-        {
-          "instance": "_46674_",
-          "master": "sg13cmos5l_nor4_1",
-          "location_dbu": [
-            831840,
-            317520
-          ]
-        }
-      ]
+      "locked_orientation": "R0"
     },
     {
       "name": "tripwire_cselect_lane_diode",
       "anchor": "hold11285",
       "anchor_master": "sg13cmos5l_dlygate4sd3_1",
       "pin": "A",
-      "net": "u_chip.g_lane[1].ot[26]"
+      "net": "u_chip.g_lane[1].ot[26]",
+      "locked_site_dbu": [
+        586080,
+        223020
+      ],
+      "locked_orientation": "R0",
+      "site_guards": [
+        {
+          "instance": "_51154__6554",
+          "master": "sg13cmos5l_tiehi",
+          "location_dbu": [
+            583680,
+            223020
+          ]
+        },
+        {
+          "instance": "_49315__4848",
+          "master": "sg13cmos5l_tiehi",
+          "location_dbu": [
+            588480,
+            223020
+          ]
+        }
+      ]
     },
     {
       "name": "tripwire_cselect_clock_diode",
@@ -67,8 +72,25 @@
     "net14385"
   ],
   "scope": "Bounded diagnostic only; clock load changes must pass timing; no official source/config integration claim",
-  "placement_rationale": "Preserve clock mechanism verified42140616934. All five residual overloaded edges cross _02001_. Insert clear diode before guide initialization at legal CoreSite gap830400..831840 on row317520 FS, beside original NOR4 driver; A geometry projects onto original831600,320400 grid point. Native placement, original route hash and independent pin coverage remain mandatory.",
+  "placement_rationale": "Exact two-edge inspection42146325916 isolates lane reroute. Attach receiver-side clear diode and lane diode to existing Metal2 branches using only two local Metal1/Metal2 vias. Preserve all original planar routes; require exact source hash after subtracting only the reviewed vias, native placement/coverage/antenna/timing/live overflow gates. No original clock change, extra cell or capacity adjustment.",
   "covered_data_nets": [
-    "_02001_"
+    "_02001_",
+    "u_chip.g_lane[1].ot[26]"
+  ],
+  "receiver_via_attachments": [
+    {
+      "net": "_02001_",
+      "point_dbu": [
+        939600,
+        313200
+      ]
+    },
+    {
+      "net": "u_chip.g_lane[1].ot[26]",
+      "point_dbu": [
+        586800,
+        226800
+      ]
+    }
   ]
 }

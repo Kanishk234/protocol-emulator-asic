@@ -17,10 +17,10 @@ def test_split_preserves_full_plan_and_excludes_clock_from_later_edit():
     original = copy.deepcopy(source)
     first, second = split_plan(source)
     assert source == original
-    assert first['sizing'] == [] and len(first['diodes']) == 2
-    assert len(second['diodes']) == 1 and second['sizing'] == source['sizing']
+    assert first['sizing'] == [] and len(first['diodes']) == 3
+    assert len(second['diodes']) == 0 and second['sizing'] == source['sizing']
     assert first['diodes'][0]['net'] not in second['allowed_signal_nets_to_reroute']
-    assert len(second['allowed_signal_nets_to_reroute']) == 3
+    assert len(second['allowed_signal_nets_to_reroute']) == 2
     assert '_02001_' not in second['allowed_signal_nets_to_reroute']
 
 
@@ -34,7 +34,7 @@ def test_unreviewed_data_protection_rejected(fault):
     elif fault == 'site':
         source['diodes'][0]['locked_site_dbu'][0] += 480
     else:
-        source['diodes'][0]['locked_orientation'] = 'R0'
+        source['diodes'][0]['locked_orientation'] = 'MX'
     with pytest.raises(AssertionError):
         split_plan(source)
 

@@ -64,7 +64,12 @@ assert reference_path in ('spikes/phase2_stock_flow/route_reopen_reference.json'
 reference = json.loads(Path(reference_path).read_text())
 assert reference['source_run'] == manifest['run']['id'], 'Geometry reference belongs to another source'
 canonical = json.dumps(parse((output / 'before.segments').read_text()), sort_keys=True, separators=(',', ':'))
-assert hashlib.sha256(canonical.encode()).hexdigest() == reference['canonical_route_sha256'], 'Loaded geometry differs from frozen reference'
+if prepared and prepared['plan'].get('receiver_via_attachments'):
+    from route_attachment_audit import verify_loaded
+    verify_loaded((output / 'before.segments').read_text(), reference,
+                  prepared['plan']['receiver_via_attachments'])
+else:
+    assert hashlib.sha256(canonical.encode()).hexdigest() == reference['canonical_route_sha256'], 'Loaded geometry differs from frozen reference'
 router.startIncremental()
 intervention = None
 if edited:

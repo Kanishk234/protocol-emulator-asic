@@ -20,10 +20,20 @@ def split_plan(plan):
     assert clock['locked_site_dbu'] == [626880, 498960]
     assert clock['locked_orientation'] == 'MX'
     covered_data = plan.get('covered_data_nets', [])
-    assert covered_data in ([], ['_02001_']), 'Unreviewed covered data net'
+    assert covered_data in ([], ['_02001_'], ['_02001_', 'u_chip.g_lane[1].ot[26]']), 'Unreviewed covered data net'
     data = [d for d in plan['diodes'] if d['net'] in covered_data]
     assert len(data) == len(covered_data)
-    if data:
+    attachments = plan.get('receiver_via_attachments', [])
+    if attachments:
+        from route_attachment_audit import validate_plan
+        validate_plan(attachments)
+        assert covered_data == ['_02001_', 'u_chip.g_lane[1].ot[26]']
+        expected = [('_50780_', 'sg13cmos5l_dfrbpq_1', 'D', [938880, 313740]),
+                    ('hold11285', 'sg13cmos5l_dlygate4sd3_1', 'A', [586080, 223020])]
+        for diode, (anchor, master, pin, site) in zip(data, expected):
+            assert (diode['anchor'], diode['anchor_master'], diode['pin']) == (anchor, master, pin)
+            assert diode['locked_site_dbu'] == site and diode['locked_orientation'] == 'R0'
+    elif data:
         clear = data[0]
         assert (clear['anchor'], clear['anchor_master'], clear['pin']) == (
             '_46674_', 'sg13cmos5l_nor4_1', 'Y')
@@ -57,6 +67,9 @@ def prepare(design, database):
     before = snapshot(database.getChip().getBlock())
     receipt = apply_plan(design, DeferredClock(first['allowed_signal_nets_to_reroute']), database, first)
     verify_after_router(database, receipt)
+    if plan.get('receiver_via_attachments'):
+        from route_attachment_audit import add_guides
+        add_guides(database, plan['receiver_via_attachments'])
     return dict(plan=plan, remaining=second, before=before, clock_receipt=receipt,
                 units=database.getChip().getBlock().getDbUnitsPerMicron())
 
@@ -84,5 +97,6 @@ def finish(database, prepared, intervention, before_text, after_text):
     intervention['clock_prepared_before_router_initialization'] = True
     intervention['original_clock_route_preserved'] = True
     intervention['added_diodes'] = 3
+    intervention['reviewed_via_attachments'] = prepared['plan'].get('receiver_via_attachments', [])
     intervention['clock_preparation'] = prepared['clock_receipt']
     intervention['diode_placements'].update(prepared['clock_receipt']['diode_placements'])

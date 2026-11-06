@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250, rtl_shared_minbuf2_cselect, rtl_shared_minbuf2_idle_ff]
+        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250, rtl_shared_minbuf2_cselect, rtl_shared_minbuf2_idle_ff, rtl_shared_minbuf2_host_align]
         default: rtl_shared_minbuf2
         required: true
 permissions:
@@ -190,6 +190,13 @@ jobs:
             receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/idle_ff'))
             Path('spikes/phase2_stock_flow/idle_ff/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
             print('Verified phase-equivalent critical configuration storage change')
+        if selected.get('host_port_align'):
+            import sys
+            sys.path.insert(0, 'scripts/ci')
+            from apply_host_port_align import apply
+            receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/host_port_align'))
+            Path('spikes/phase2_stock_flow/host_port_align/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
+            print('Verified equivalent aligned host port-status word source change')
         Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
             profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
             baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
@@ -200,7 +207,8 @@ jobs:
             rtl_patch=selected.get('rtl_patch'), config_word_select=selected.get('config_word_select', False),
             host_word_select=selected.get('host_word_select', False),
             inline_guard=selected.get('inline_guard', False),
-            c_select=selected.get('c_select', False), idle_ff=selected.get('idle_ff', False)), indent=2) + '\n')
+            c_select=selected.get('c_select', False), idle_ff=selected.get('idle_ff', False),
+            host_port_align=selected.get('host_port_align', False)), indent=2) + '\n')
         print('Selected isolated physical control:', profile, selected['changes'])
         PYCODE
     - name: Check out Tiny Tapeout tools
@@ -349,7 +357,7 @@ jobs:
         print(json.dumps(rows, indent=2))
         PYCODE
     - name: Check unchanged signoff constraints on estimated routing
-      if: inputs.profile == 'rtl_shared_minbuf2_cselect' || inputs.profile == 'rtl_shared_minbuf2_idle_ff'
+      if: inputs.profile == 'rtl_shared_minbuf2_cselect' || inputs.profile == 'rtl_shared_minbuf2_idle_ff' || inputs.profile == 'rtl_shared_minbuf2_host_align'
       timeout-minutes: 30
       run: |-
         set -euo pipefail
@@ -434,6 +442,7 @@ jobs:
           spikes/phase2_stock_flow/inline_guard/**
           spikes/phase2_stock_flow/pin_input_decode/**
           spikes/phase2_stock_flow/idle_ff/**
+          spikes/phase2_stock_flow/host_port_align/**
           test/Makefile
           test_internal/chip/Makefile
           spikes/phase2_stock_flow/selected_profile.json

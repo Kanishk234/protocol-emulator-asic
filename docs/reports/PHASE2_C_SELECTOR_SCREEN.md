@@ -377,3 +377,23 @@ full44792-net local attachment audit pass, with actionlint and syntax checks.
 is running onfe672fc0dfbb73c6e195aa4f8bfeca6c7424d8e8. Main hardware/config
 and official GDS jobs stay unchanged. This guide ECO is not a source/config
 reproduction recipe; no DRT, extracted closure or phase completion is claimed.
+
+
+## Strict screen passes; detailed routing begins
+
+[42156980762](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42156980762)
+succeeds in both arms. Edited original/signoff estimated timing and electrical
+checks pass, fast original hold0.0867642ns, antenna0 and live overflow0. Native
+placement/supply/inventory checks and independent44792-net pin coverage pass.
+The two reviewed Via1 attachments preserve every original planar route edge;
+no further route geometry changes occur. Setup summary0 is not positive
+extracted timing evidence. This is experimental screen qualification only.
+
+[42158728020](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42158728020)
+is running on544ec54ef4253b6196b92ad7ae05c88516c47992. It restores the exact
+passing artifact with whole-archive digest/provenance and measured-view hashes,
+rechecks fresh original/signoff timing/antenna/native coverage, then runs stock
+DetailedRouting without repeating repairs. Require route DRC0, antenna0,
+preserved logical connections and passing disconnected-pin checks.66 focused
+checks, actionlint and embedded syntax checks pass. No extracted closure,
+official GDS or source/config reproduction claim follows from launch.

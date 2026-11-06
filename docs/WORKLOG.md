@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Strict C-selector screen is green; launch exact-checkpoint detailed routing
+
+-42156980762 succeeds in both control and edited arms. Independently inspect edited gate receipt: all original/signoff estimated timing/electrical gates pass, antenna0, live overflow0, independent native44792-net pin coverage/connectivity and placement/supply/full-inventory guards pass. Fast/typical/slow original hold0.0867642/0.312564/0.695068ns; setup summaries0 are not positive extracted margin. Only two local Via1 attachments augment original frozen planar routes; no subsequent geometry changes. Save c_select_covered_result_42156980762.json. This is a green experimental screen, not official GDS or phase completion.
+- Bind exact passing artifact13475875765, whole ZIP digest, source SHAfe672fc and ten key source/receipt hashes. New restoration helper refuses partial gates, wrong provenance/bytes/views/constraints, missing coverage or nonzero live overflow; copy measured views without repeating repairs and discard inherited coverage receipt so it is checked afresh. Restore original43-file source/PDK/engine first, then the exact edited views; fresh all-corner original/signoff timing/antenna/coverage gates precede DRT.
+- Separate manual gds-c-select-pass-detailed-route uses stock DetailedRouting, four threads and330min routing budget inside360min job. Require completed route DRC0, unchanged logic except passive antenna additions, fresh antenna0 and passing native disconnected-pin checks. Extraction is a separate next step after clean DRT; source/config reproduction under unchanged official jobs remains open.66 focused gate/restoration/geometry/recovery regressions, actionlint, embedded syntax and diff checks pass.
+- Published tools/CI through544ec54ef4253b6196b92ad7ae05c88516c47992 and confirmed [42158728020](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42158728020) in progress on that SHA under standing authorization. No main hardware/config/official-job changes or phase ticks. Next inspect exact fresh preflight/DRT outcome, then run bound extraction if route checks pass. Update in-progress Phase2 summary for this milestone.
+
 ## 2026-11-05 — Attach receiver diodes through two local Via1 guides; preserve original routes
 
 - Read-only42146325916 succeeds with full input identity checks and unchanged ODB; both residual overflow edges cross lane ot26. Save c_select_congestion_result_42146325916.json. No timing/physical qualification follows from the inspector.

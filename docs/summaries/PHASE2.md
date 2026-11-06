@@ -137,3 +137,16 @@ The late arbitration prototype now also passes all22existing RTL protocol cases,
 The full-width arbitration version failed physical screening: its extra area came with severe routing congestion and the worst setup path moved to pin-unit configuration. A smaller equivalent version now preselects priority masks while sharing the slot-data mux. It keeps a local logic-depth reduction at16extra cells perlane instead of455. Module proof,core simulation and lint pass; full protocol replay and physical closure remain to be verified for this smaller version.
 
 The smaller shared-priority version passes all22existing protocol cases and now has nonnegative setup at all corners,zero electrical violations and zero routing overflow. It still fails screening: fast hold is3.2psagainst our50psreserve,and six antenna nets remain. One is an unusually long clock leaf already present at CTS. The next controlled test limits clock sink-cluster diameter while retaining the verified RTL and all acceptance requirements. Phase2and official GDS remain open.
+
+
+The C-selector experiment now has a fully passing routing screen
+([42156980762](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42156980762)).
+Estimated setup and hold meet the checks, fast hold has86.8ps reserve, and
+antenna, electrical and routing-overflow counts are all zero together. Three
+passive protection cells, one buffer resize and two short via connections keep
+the original long routes intact. Native checks confirm legal placement and
+coverage of every routed pin. This is a useful milestone, but it does not prove
+extracted timing or official-flow closure. The exact saved checkpoint is now
+being detailed-routed in42158728020; extraction follows only after a clean route.
+Reproducing the repair through supported source/config changes and the unchanged
+official GDS flow remains necessary. Phase2is still open.

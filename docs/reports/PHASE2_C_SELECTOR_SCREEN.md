@@ -487,3 +487,42 @@ both hardware changes. All local simulators have finished. Further physical
 repair decisions depend on these source-screen measurements. Current actual
 extracted setup remains-2.9278127418ns; the-2.260117nsfixed-RC sensitivity case
 is unqualified and is not substituted for measured physical timing.
+
+## Independent source screens completed — 2026-11-06
+
+Neither candidate qualifies for detailed routing. Source-bound receipts are in
+`spikes/phase2_stock_flow/source_screen_results_20261106.json`.
+
+| Original estimated checkpoint | IDLE storage 42259881584 | Host alignment 42262602008 |
+|---|---:|---:|
+| Setup summary, all corners | 0 ns | 0 ns |
+| Fast hold | 0.047219 ns | 0.088771 ns |
+| Typical hold | 0.232691 ns | 0.329491 ns |
+| Slow hold | 0.595018 ns | 0.712422 ns |
+| Electrical rows | 2 slow slew | 0 |
+| Antenna nets / pins | 3 / 3 | 6 / 7 |
+| Final live global overflow | 15 | 70 |
+
+The IDLE candidate misses the independent 50 ps fast-hold target by 2.781 ps;
+its signoff-constraint audit also fails on slow slew. The final combined gate is
+skipped, so other failures must be read from the independent receipts/log.
+The host candidate passes original and unchanged-signoff estimated timing and
+electrical checks, but fails the antenna and overflow gates. Setup summaries
+at zero do not establish positive setup headroom or extracted closure.
+
+The host run's stock antenna repair reports zero violations at 19:57:42 UTC.
+The following post-global-route timing repair starts at 19:58:12 UTC; the fresh
+final audit then reports six antenna nets/seven pins. This localizes the
+regression to changes after the antenna-repair checkpoint. Existing diode
+protection on some nets becomes effective only at a higher metal layer than
+the failing cumulative-area check; the complete layer report, rather than its
+partial-ratio summary, controls the diagnosis. Exact net/pin/layer rows are
+recorded in `host_align_antenna_42262602008.json`.
+
+Read-only [42304478370](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42304478370)
+is bound to the exact host artifact, whole ZIP digest, ODB and guide hashes. It
+reads saved grid capacity/usage without initializing the router and requires
+saved overflow to equal the final live value of 70. Guide-overlap candidates
+are regional clues, not proof of exact wire crossings or connectivity. Use
+those measurements to select a repair; do not blindly replay or route these
+failing candidates. Main RTL/config and official GDS jobs remain unchanged.

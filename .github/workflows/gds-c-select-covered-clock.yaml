@@ -277,7 +277,8 @@ jobs:
         if edit:
             intervention=json.loads(Path('runs/route-reopen-calibration/intervention.json').read_text())
             assert intervention.get('original_clock_route_preserved') is True
-            assert intervention.get('original_data_routes_preserved') == ['_02001_']
+            assert intervention.get('original_data_routes_preserved') == ['_02001_', 'u_chip.g_lane[1].ot[26]']
+            assert len(intervention.get('reviewed_via_attachments', [])) == 2
             assert intervention.get('clock_prepared_before_router_initialization') is True
             assert intervention.get('placement_checked') is True
             assert intervention.get('post_router_placement_checked') is True

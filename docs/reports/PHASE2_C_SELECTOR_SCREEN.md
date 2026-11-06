@@ -336,3 +336,22 @@ Paired [42144728640](https://github.com/Kanishk234/protocol-emulator-asic/action
 is running on4273bc1695391eaf55720cb46b4f7ad6942aa8e8. No passing native result
 or DRT/extracted/official qualification is claimed. Do not relax the final
 zero-overflow gate if the local protection does not reproduce its hypothesis.
+
+
+## Driver-side result: lower overflow but ineffective Metal3 protection
+
+[42144728640](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42144728640)
+control passes; edited placement, supplies, original clock/clear geometry,
+independent native coverage and original/signoff estimated timing/electrical
+checks pass. Only lane ot26 geometry changes. Live overflow falls5→2, but antenna1
+returns at _50780_/D on _02001_. Metal3 CAR remains239.71 against200. The diode
+is only connected through the original Metal4 bridge, where the allowed ratio
+rises to60292; it cannot protect the receiver at the failing Metal3 stage.
+Reject this placement as a complete antenna solution. Best antenna-clean
+reference remains42140616934 with5 overflow. No DRT/extraction is authorized by
+this failing result.
+
+Read-only [42146325916](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42146325916)
+is bound to the exact latest artifact/ODB and overflow2. Next resolve those edges
+and receiver-local protection connected by Metal3 or below; do not repeat the
+same driver-side diode or trade antenna clearance for congestion clearance.

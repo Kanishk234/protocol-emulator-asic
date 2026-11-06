@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-05 — Driver-side diode is too late for Metal3; reject antenna tradeoff
+
+-42144728640 control succeeds. Edited placement/supplies/original clock+clear geometry/native coverage pass; only lane ot26 route changes. Original/signoff estimated timing/electrical pass, fast original hold0.0867642ns. Live overflow falls5→2 but antenna becomes1, so strict gate correctly fails. Save c_select_covered_result_42144728640.json; no DRT or phase tick.
+- Exact fresh antenna report shows _02001_ receiver _50780_/D still at Metal3 CAR239.71/200. Driver-side diode raises the allowable ratio only at Metal4 (60292), when the route's two branches finally connect. Same logical net is insufficient for earlier fabrication-layer protection. Reject this driver-side placement as a solution; do not claim progress on antenna or relax gates. Best antenna-clean reference remains42140616934, overflow5.
+- Bind read-only inspector to exact latest artifact13470241153/full ZIP digest/ODB hash and expected overflow2.7 inspector regressions/diff checks pass. Publishaa04a3e869da4f21f68cf3dece474258c4a726b1 and confirm [42146325916](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42146325916) in progress on that SHA under standing authorization. No hardware/config/official-job changes.
+- Next identify actual two residual edges and retain original clock fix. Clear receiver needs a diode connected by Metal3 or below, or a legal antenna jumper/buffer repair. Current receiver-local same-grid sites are occupied; any cell relocation or changed route must be explicitly bounded and requalify placement, coverage, original/signoff timing/electrical, antenna0 and live overflow0. No new physical screen launched before resolving that mechanism.
+
 ## 2026-11-05 — Five-edge diagnosis isolates clear net; launch route-preserving protection
 
 - Read-only42142331582 succeeds, verifies whole artifact digest/ODB identity and unchanged input, reproduces5 saved/live overflow. All five Metal3 horizontal edges atY320400 cross _02001_; lane repair crosses none. Save c_select_congestion_result_42142331582.json. This successful inspection is not a physical qualification.

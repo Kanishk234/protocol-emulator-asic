@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-07 — Isolate the net15518 maze crash without repeating full STA screens
+
+- Read exact pinned OpenROADdcf36133 fastroute/maze3D.cpp: GRT-0183 is raised when the source frontier becomes empty during3Dsearch; moves require available layer/edge capacity. This identifies the local search exhaustion condition, not proof that the complete design is unroutable or a demonstrated library bug. Original net15518 has a long multi-layer route; new diode is near its receiver but on an adjacent grid cell.
+- Add independent gds-host-idle-maze-isolation diagnostic: two fresh identical-source arms, net15518diode alone versus the other7diodes. Same original43-file/whole-ZIP hash verification, native placement/inventory/supply/route-scope guards and independent45192-net coverage if routing finishes. No timing/antenna gates skipped in the actual residual screen; this separate workflow never claims physical qualification even if successful. New scope helper rejects unknown modes and leaves source plan immutable; full repair remains default.
+- Save pre_route.odb/def/pin export immediately after legal placement and before maze routing so a native crash retains the failing geometry.77focused regressions, actionlint for both workflows, shell syntax/all6isolation Python blocks and AST/diff checks pass. No mainhardware/config/official jobs or gates changed. Next use the two results to distinguish a single-net attachment/resource failure from interaction with the other edits before selecting another physical repair.
+
+## 2026-11-07 — Corrected residual control passes; router crashes on net15518
+
+-42352026821 completes: unchanged arm passes all reproducibility/coverage/original+signoff checks again. Edited arm passes exact restoration, canonical OpenDB orientations and native detailed placement (0total/max displacement), then reports rerouting8nets and aborts GRT-0183 on net15518:heap underflow during3Dmaze routing. Save host_idle_residual_result_42352026821.json. No edited checkpoint/fresh timing/electrical/antenna results or DRT qualification; discard partial state.
+- Orientation correction is exercised successfully. Failure now lies in native incremental routing, not a measured slack gate. Exact underlying route/engine mechanism is not yet established. Next isolate net15518's added diode attachment and native route frontier, comparing bounded individual routing versus batch only as diagnosis; do not blindly launch another full repair screen or change signoff constraints. Combined42305323874 remains the best measured unqualified source reference (overflow2,antenna6,electrical0); official closure remains open.
+
 ## 2026-11-07 — Correct residual-plan OpenDB orientation before relaunch
 
 -42351292687 edited arm restores/hash-verifies frozen source but fails before routing at diode.setOrient:Unknown orientation. Root cause: new plan used DEF N/FS instead of native OpenDB R0/MX. Control native route reopening and independent45192-net connectivity succeed; original/signoff audits are still progressing. Do not interpret edited failure as a timing result or reuse its incomplete state.

@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-07 — Build capacity-aware local attachments and two atomic detours
+
+- D-162 replaces unstable whole-net maze repair with a separate paired route-preserving screen. Bind original45192-net atomic geometry hash; native probe exports exact original pin positions/capacity, fresh preparation adds6passive receiver diodes before initialization. Planner replaces only2actual overloaded atomic edges and adds short branches connected below each failing antenna layer; original source trees otherwise remain exact. No2extra trigger diodes, sizing, clock/state/ISA/source changes, capacity/SDC relaxation or maze routing.
+- Capacity ledger refuses occupied/out-of-grid paths and unresolved overflow; local search stays within4gridcells and bounded cost. Per-net errors plus complete planning_inputs/probe_grid/prepared_pins allow local replay without new native runs. Native guide readback must exactly match planned atomic geometry; native finish must preserve it and independently refresh live congestion; independent all45192-net connectivity/actual-layer pin coverage and all prior strict timing/electrical/antenna/placement/supply gates remain mandatory.
+-96focused geometry/capacity/early-layer/source/selection/inventory/Tcl/coverage tests pass, plus actionlint/shell/8embedded Python blocks/AST/diff checks. Check exact engine initFastRoute initializes native pins before guide loading; exact dbGuide create/destroy/same-layer and via encoding APIs match the adapter. Offline verify all6receiver components exist at their native source Metal1 grid points and bind the original full atomic hash. Main hardware/config/officialjobs untouched; no DRT or phase tick. Next launch this paired native screen and inspect all gates; official source/config reproduction and extracted closure remain open.
+
+## 2026-11-07 — Single net15518 routes; omitted batch crashes on net12232
+
+-42353123268 completes: net15518-only arm succeeds native routing, unchanged-original inventory/placement and independent45192-net coverage with1passive diode. Its live overflow is13, worse than frozen reference2; no timing/antenna measurements or qualification. Other7diodes arm fails GRT-0183 on net12232. Save host_idle_maze_isolation_result_42353123268.json; retain both pre-route DB/DEF/pin exports in CI artifacts.
+- The crash is not uniquely tied to net15518. Results support investigating shared routing resource/order interactions but do not prove a specific engine defect. Blindly changing the single reported failing receiver is insufficient; full-net rerouting itself worsens congestion even when it completes. Next assess local route-preserving diode attachments and bounded congestion detours using retained geometry, rather than another eight-net full reroute or margin sweep. Original combined42305323874 remains measured reference; no DRT or phase tick.
+
 ## 2026-11-07 — Isolate the net15518 maze crash without repeating full STA screens
 
 - Read exact pinned OpenROADdcf36133 fastroute/maze3D.cpp: GRT-0183 is raised when the source frontier becomes empty during3Dsearch; moves require available layer/edge capacity. This identifies the local search exhaustion condition, not proof that the complete design is unroutable or a demonstrated library bug. Original net15518 has a long multi-layer route; new diode is near its receiver but on an adjacent grid cell.

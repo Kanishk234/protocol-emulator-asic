@@ -7,7 +7,7 @@ run-name: stock screen (${{ inputs.profile }})
       profile:
         description: Full Phase 2 source variant with strict final qualification
         type: choice
-        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250, rtl_shared_minbuf2_cselect, rtl_shared_minbuf2_idle_ff, rtl_shared_minbuf2_host_align, rtl_shared_minbuf2_host_idle_ff]
+        options: [rtl_shared_cluster100, rtl_shared_minbuf2, rtl_shared_minbuf2_early250, rtl_shared_minbuf2_cselect, rtl_shared_minbuf2_idle_ff, rtl_shared_minbuf2_host_align, rtl_shared_minbuf2_host_idle_ff, rtl_host_idle_early250]
         default: rtl_shared_minbuf2
         required: true
 permissions:
@@ -357,7 +357,7 @@ jobs:
         print(json.dumps(rows, indent=2))
         PYCODE
     - name: Check unchanged signoff constraints on estimated routing
-      if: inputs.profile == 'rtl_shared_minbuf2_cselect' || inputs.profile == 'rtl_shared_minbuf2_idle_ff' || inputs.profile == 'rtl_shared_minbuf2_host_align' || inputs.profile == 'rtl_shared_minbuf2_host_idle_ff'
+      if: inputs.profile == 'rtl_shared_minbuf2_cselect' || inputs.profile == 'rtl_shared_minbuf2_idle_ff' || inputs.profile == 'rtl_shared_minbuf2_host_align' || inputs.profile == 'rtl_shared_minbuf2_host_idle_ff' || inputs.profile == 'rtl_host_idle_early250'
       timeout-minutes: 30
       run: |-
         set -euo pipefail

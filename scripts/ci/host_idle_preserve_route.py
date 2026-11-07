@@ -133,7 +133,8 @@ router.startIncremental();router.endIncremental(True)
 router.writeSegments(str(root/'after.segments'));router.writePinLocations(str(root/'pin_locations.txt'))
 final=atomic_routes(parse((root/'after.segments').read_text()))
 assert final==loaded, 'Native finish altered planned geometry'
-result=compare((root/'before.segments').read_text(),(root/'after.segments').read_text())
+result=compare((root/'before.segments').read_text(),(root/'after.segments').read_text(),
+               allowed=tuple(changed))
 if edited:
     verify_after_router(db,intervention);checked(design,'check_placement -verbose')
     intervention.update(added_diodes=6,post_router_placement_checked=True,

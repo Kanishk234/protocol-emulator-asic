@@ -1,0 +1,52 @@
+{
+  "run": 42394957445,
+  "qualification": {
+    "edited": true,
+    "failures": [],
+    "diagnostic_gates_passed": true,
+    "official_flow_qualified": false,
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.138366,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.736254,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.35542,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "antenna": {
+      "antenna__violating__nets": 0,
+      "antenna__violating__pins": 0
+    },
+    "overflow": 0
+  },
+  "independent_route_scope_audit": {
+    "route_scope_revalidated": true,
+    "routed_nets": 45192,
+    "changed_nets": [
+      "_10185_",
+      "_19607_",
+      "net1380",
+      "net14221",
+      "net15518",
+      "net1643",
+      "u_chip.g_lane\\[1\\].ot\\[9\\]"
+    ]
+  },
+  "extracted_timing_performed": false,
+  "official_gds_qualified": false
+}

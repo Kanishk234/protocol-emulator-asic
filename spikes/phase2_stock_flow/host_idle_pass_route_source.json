@@ -1,0 +1,38 @@
+{
+  "run": {
+    "id": 42394957445,
+    "head_sha": "81603d1de7ca82e8d8cb75032b2cbe088f36350d",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-host-idle-local-route-screen.yaml",
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 13582704901,
+    "name": "host-idle-local-route-true-42394957445",
+    "size_in_bytes": 270139718,
+    "expired": false,
+    "digest": "sha256:218c380ce6320986d3c1ca25b555aac2f60fb8db84e7945b0dc801b1104586d8"
+  },
+  "files": {
+    "runs/route-reopen.log": "b2a65b33870adbb49efbec13f44e1e170dcb0781f20b0bf5d2b75ca4a4c0aecc",
+    "runs/stock-corner-audit/read_only_audit.json": "fcc47e2978adebef6fd4d97a7310a66461b227981d1d04903ee98f296b3548d1",
+    "runs/host-idle-signoff-audit/qualification.json": "355c767943cc078b2815d44e585870b4a326e5fc5addb142cb3ad530322a4f3c",
+    "runs/route-reopen-calibration/state_out.json": "2df48d83e74daeab98a0a17823d3cb8e813965cc4d7d4e1a363cb7117719fa3e",
+    "runs/route-reopen-calibration/before.segments": "3eadc651b078e5b652dc6b17f9d380bca9bc934b527c7097937f0314a2bff7a8",
+    "runs/route-reopen-calibration/native_coverage.json": "de667919a8029fc94facd80ecc5fcafaaa405c15bbb640287933205af42d26ff",
+    "runs/route-reopen-calibration/after.segments": "efdfb2697e808e07986d48328a8c1813e3ac0ce58e466d7f1406eee37bd51ac3",
+    "runs/route-reopen-calibration/intervention.json": "6e1f9d9554dc5f54eb117c93d76af133bc774039ea4fdec28a7c8741b9a072c9",
+    "runs/route-reopen-calibration/local_patch_plan.json": "1756c0b11ed9b3b47ff17ac8023bb03340a01a1c39e41fd1e0c9cc1756920d35",
+    "runs/route-reopen-calibration/final_gates.json": "66b8be2b5ea0cebd030b5dceaf60bef08ddc33f6861bc1ff10ae08e9977f69c8",
+    "runs/route-reopen-calibration/geometry_result.json": "bd0425105a97c7b2065c0002815742bab446c7c9c0a20ea4a65b7ac99a9e4f91",
+    "runs/route-reopen-calibration/calibrated.odb": "1ea4129f0c2861b719d619ec9badc72ad3d5480946e94925c2c1b0ec8da7a1f7",
+    "runs/route-reopen-calibration/calibrated.def": "5c241fdf35537c682895438243114fc1c3667c4e678392154e93fb679f9b1a23",
+    "runs/route-reopen-calibration/calibrated.nl.v": "403dfaad2547d35de5515c8e9648ca61e13573f995780a2f09333ba98c77bdf3",
+    "runs/route-reopen-calibration/calibrated.pnl.v": "8264be3dfdc31412bf33e07bb8d12d244790743831de3fca345f813164eba8c4"
+  },
+  "sdc_sha256": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba",
+  "signoff_sdc_sha256": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa",
+  "base_source_run": 42305323874,
+  "scope": "Exact green experimental local-route checkpoint; repairs must not be repeated; not official GDS",
+  "binding_provenance": "Small entry CRC verification locally, physical hashes from fresh source-bound audit; whole ZIP digest and every bound file checked again in CI"
+}

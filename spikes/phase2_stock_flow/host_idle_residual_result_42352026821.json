@@ -1,0 +1,15 @@
+{
+  "run": 42352026821,
+  "control": "success",
+  "edited": "failure",
+  "stage": "native incremental routing",
+  "placement": {
+    "total_displacement_um": 0,
+    "max_displacement_um": 0
+  },
+  "native_rerouted_nets": 8,
+  "error": "GRT-0183: Net net15518: heap underflow during 3D maze routing",
+  "new_timing_measurements_available": false,
+  "physical_qualified": false,
+  "reuse_failed_state": false
+}

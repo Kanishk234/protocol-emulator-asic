@@ -9,6 +9,21 @@ def validate_orientations(plan):
             raise ValueError('Expected native OpenDB orientation, not DEF orientation')
 
 
+def scoped_plan(plan, scope):
+    if scope not in ('full', 'net15518_only', 'omit_net15518'):
+        raise ValueError('Unreviewed routing isolation scope')
+    result = deepcopy(plan)
+    if scope != 'full':
+        keep_target = scope == 'net15518_only'
+        result['diodes'] = [d for d in result['diodes'] if (d['net']=='net15518') == keep_target]
+        result['allowed_signal_nets_to_reroute'] = [d['net'] for d in result['diodes']]
+        if keep_target:
+            result['congestion_signal_nets'] = []
+            result['residual_edges'] = []
+    result['isolation_scope'] = scope
+    return result
+
+
 def select(routes, edges, eligible):
     selected = []
     for edge in crossing_nets(routes, deepcopy(edges)):

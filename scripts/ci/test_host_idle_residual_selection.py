@@ -1,5 +1,21 @@
 import pytest
-from host_idle_residual_selection import select, validate_orientations
+from host_idle_residual_selection import select, validate_orientations, scoped_plan
+
+
+def test_isolation_keeps_full_plan_immutable_and_bounds_edits():
+    plan=dict(diodes=[dict(net='net15518'),dict(net='other')],
+              allowed_signal_nets_to_reroute=['net15518','other'],
+              congestion_signal_nets=['other'],residual_edges=[{'edge':1}])
+    only=scoped_plan(plan,'net15518_only')
+    assert only['diodes']==[dict(net='net15518')]
+    assert only['congestion_signal_nets']==only['residual_edges']==[]
+    omitted=scoped_plan(plan,'omit_net15518')
+    assert omitted['allowed_signal_nets_to_reroute']==['other']
+    assert omitted['residual_edges']==[{'edge':1}]
+    assert len(plan['diodes'])==2 and 'isolation_scope' not in plan
+    assert scoped_plan(plan,'full')['diodes']==plan['diodes']
+    with pytest.raises(ValueError,match='Unreviewed'):
+        scoped_plan(plan,'unknown')
 
 
 @pytest.mark.parametrize('orient',['R0','MX','MY','R180'])

@@ -51,8 +51,9 @@ router.writeSegments(str(output / 'before.segments'))
 from local_antenna_repair import snapshot
 from local_c_select_repair import apply_plan, verify_after_router, canonical
 from host_idle_residual_selection import select as choose
-from host_idle_residual_selection import validate_orientations
+from host_idle_residual_selection import validate_orientations, scoped_plan
 plan = json.loads(Path('spikes/phase2_stock_flow/host_idle_residual_plan.json').read_text())
+plan = scoped_plan(plan, os.environ.get('RESIDUAL_SCOPE', 'full'))
 validate_orientations(plan)
 reference = json.loads(Path('spikes/phase2_stock_flow/host_idle_residual_reference.json').read_text())
 assert manifest['run']['id'] == plan['source_run'] == reference['source_run']
@@ -84,6 +85,10 @@ if edited:
         net = block.findNet(name)
         assert str(net.getSigType()) == 'SIGNAL'
         router.addDirtyNet(net)
+    # Preserve legal post-placement geometry even if the maze router aborts.
+    design.writeDb(str(output / 'pre_route.odb'))
+    design.writeDef(str(output / 'pre_route.def'))
+    router.writePinLocations(str(output / 'pre_route_pins.txt'))
 router.endIncremental(True)
 router.writeSegments(str(output / 'after.segments'))
 router.writePinLocations(str(output / 'pin_locations.txt'))
@@ -96,7 +101,8 @@ if edited:
     intervention.update(post_router_placement_checked=True, clock_net_changed=False,
                         clock_timing_must_be_remeasured=True,
                         selected_actual_crossing_nets=selected,
-                        added_diodes=8)
+                        added_diodes=len(plan['diodes']),
+                        isolation_scope=plan['isolation_scope'])
     (output / 'intervention.json').write_text(json.dumps(intervention, indent=2)+'\n')
 else:
     assert snapshot(block) == initial, 'Control cell inventory changed'

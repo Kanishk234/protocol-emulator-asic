@@ -337,3 +337,6 @@ Calibration41975191740fails before design load: embedded Python importlibrelane 
 
 
 2026-11-07 residual native maze failure: corrected42352026821 passes orientation and native placement, then pinned OpenROADdcf36133 aborts GRT-0183 on net15518 while rerouting8nets. Unchanged control succeeds. Underlying engine/attachment cause unproved; no claim of a corrected physical repair or new timing result. Preserve exact source, plan, before.segments and native log for isolation. Existing strict workflow fails on native exception and skips downstream qualification, preventing invalid closure evidence.
+
+
+2026-11-07 local-route compare receipt labels: green42394957445's generic geometry_result lists the seven authorized changed nets as "unexpected" and unchanged_routes_preserved=false because compare() was called without its allowed set. The native adapter separately proved complete loaded geometry equals the frozen explicit edit ledger, and all physical gates passed; this metadata is not the scope proof. Correct future calls to supply the reviewed changed-net set. Before DRT, independently re-audit the complete45192-net before/after atomic maps against the frozen original and ledger hashes, and retain the historical file unchanged. New restoration tests cover scope tampering; do not accept a boolean override without the full graph audit.

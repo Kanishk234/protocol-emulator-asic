@@ -1,0 +1,11 @@
+{
+  "run": 42354846587,
+  "control": "success",
+  "edited": "failure",
+  "stage": "capacity-aware planner before guide edits",
+  "error": "Detour net12232: No bounded path with spare planar capacity",
+  "new_timing_measured": false,
+  "physical_qualified": false,
+  "source_run": 42305323874,
+  "first_column_nearest_spare_distance_um": 302.4
+}

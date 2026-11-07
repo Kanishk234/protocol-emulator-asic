@@ -1,0 +1,129 @@
+{
+  "source_run": 42305323874,
+  "probe_grid_sha256": "dd74d66b151edb5d5a3fb2c23d3a0ef51465bd5ec919b0c85c52972a700dfe3e",
+  "detours": [
+    {
+      "net": "net1380",
+      "edge": [
+        [
+          500400,
+          205200,
+          3
+        ],
+        [
+          507600,
+          205200,
+          3
+        ]
+      ],
+      "radius": 64,
+      "maximum_cost": 1600
+    },
+    {
+      "net": "_19607_",
+      "edge": [
+        [
+          702000,
+          219600,
+          3
+        ],
+        [
+          709200,
+          219600,
+          3
+        ]
+      ],
+      "radius": 64,
+      "maximum_cost": 1600
+    }
+  ],
+  "attachments": [
+    {
+      "net": "_10185_",
+      "receiver": [
+        824400,
+        262800,
+        1
+      ],
+      "diode": [
+        824400,
+        270000,
+        1
+      ],
+      "maximum_layer": 3
+    },
+    {
+      "net": "u_chip.g_lane\\[1\\].ot\\[9\\]",
+      "receiver": [
+        522000,
+        212400,
+        1
+      ],
+      "diode": [
+        522000,
+        205200,
+        1
+      ],
+      "maximum_layer": 2
+    },
+    {
+      "net": "net1643",
+      "receiver": [
+        399600,
+        54000,
+        1
+      ],
+      "diode": [
+        399600,
+        61200,
+        1
+      ],
+      "maximum_layer": 3
+    },
+    {
+      "net": "net11819",
+      "receiver": [
+        392400,
+        68400,
+        1
+      ],
+      "diode": [
+        392400,
+        68400,
+        1
+      ],
+      "maximum_layer": 3
+    },
+    {
+      "net": "net14221",
+      "receiver": [
+        738000,
+        428400,
+        1
+      ],
+      "diode": [
+        738000,
+        421200,
+        1
+      ],
+      "maximum_layer": 3
+    },
+    {
+      "net": "net15518",
+      "receiver": [
+        810000,
+        298800,
+        1
+      ],
+      "diode": [
+        817200,
+        298800,
+        1
+      ],
+      "maximum_layer": 3
+    }
+  ],
+  "ledger_sha256": "212f083194d2712100801ac4b9b1411252ef6276e7db48817e1d2677e51dca13",
+  "expected_predicted_overflow": 0,
+  "scope": "Native-snapshot-bound wider detours only; four-cell diode attachment bound and all physical gates retained"
+}

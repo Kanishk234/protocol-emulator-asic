@@ -17,14 +17,15 @@ def edge(a, b):
     return tuple(sorted((tuple(a), tuple(b))))
 
 
-def component(edges, start, maximum_layer):
+def component(edges, start, maximum_layer, require_covered=True):
     graph = {}
     for a,b in edges:
         if max(a[2],b[2]) <= maximum_layer:
             graph.setdefault(a,set()).add(b)
             graph.setdefault(b,set()).add(a)
-    if start not in graph:
+    if start not in graph and require_covered:
         raise ValueError('Receiver is not covered on its native Metal1 grid point')
+    graph.setdefault(start,set())
     found={start}; todo=deque([start])
     while todo:
         for node in graph[todo.popleft()]-found:
@@ -32,18 +33,24 @@ def component(edges, start, maximum_layer):
     return found
 
 
-def path(start, goals, free, occupied, maximum_layer=4, radius=4, banned=()):
+def path(start, goals, free, occupied, maximum_layer=4, radius=4, banned=(), extra_starts=(), maximum_cost=160):
     """Shortest bounded preferred-direction path; never use occupied planar capacity."""
+    if (type(radius) is not int or not 1<=radius<=64 or type(maximum_cost) is not int
+            or not 1<=maximum_cost<=1600 or maximum_layer not in (2,3,4)):
+        raise ValueError('Invalid bounded route-search limits')
     start=tuple(start);goals=set(goals);banned=set(banned)
     goals={p for p in goals if max(abs(p[0]-start[0]),abs(p[1]-start[1]))<=radius*PITCH}
     if not goals:raise ValueError('No local receiver-component attachment')
     valid_xy={p[:2] for e in free for p in e}
-    todo=[(0,start)];cost={start:0};previous={};end=None
+    roots={start}|{p for p in extra_starts if max(abs(p[0]-start[0]),abs(p[1]-start[1]))<=radius*PITCH}
+    todo=[]
+    for p in sorted(roots):heappush(todo,(0,p))
+    cost={p:0 for p in roots};previous={};end=None
     while todo:
         value,a=heappop(todo)
         if value!=cost[a]:continue
         if a in goals:end=a;break
-        if value>160:continue
+        if value>maximum_cost:continue
         x,y,z=a
         neighbors=[(x,y,k) for k in (z-1,z+1) if 1<=k<=maximum_layer]
         if z>=2:
@@ -59,12 +66,12 @@ def path(start, goals, free, occupied, maximum_layer=4, radius=4, banned=()):
             planar=z==b[2]
             if planar and free.get(e,0)<1:continue
             new=value+(10 if planar else 1)
-            if new>160:continue
+            if new>maximum_cost:continue
             if new<cost.get(b,10**9):
                 cost[b]=new;previous[b]=a;heappush(todo,(new,b))
     if end is None:raise ValueError('No bounded path with spare planar capacity')
     result=[]
-    while end!=start:
+    while end not in roots:
         a=previous[end];result.append(edge(a,end));end=a
     return list(reversed(result))
 
@@ -78,20 +85,50 @@ def consume(free, edges, change=-1):
             if change<0 and free[e]<0:raise ValueError('Plan exceeds available capacity')
 
 
+def detour_one(rows, free, item):
+    """Repair one edge without claiming that other overflow has been cleared."""
+    free=dict(free);name=item['net'];old=[edge(a,b) for a,b in rows]
+    e=edge(*item['edge'])
+    if old.count(e)!=1:raise ValueError('Detour must replace one actual atomic edge')
+    old.remove(e);consume(free,[e],1)
+    occupied={p for segment in old for p in segment}
+    left=component(old,e[0],4,require_covered=False)
+    right=component(old,e[1],4,require_covered=False)
+    try:
+        additions=[] if e[1] in left else path(e[0],{p for p in right if p[2]>=2},
+            free,occupied,banned=[e],extra_starts={p for p in left if p[2]>=2},
+                radius=item.get('radius',4),maximum_cost=item.get('maximum_cost',160))
+    except ValueError as exc:raise ValueError('Detour '+name+': '+str(exc)) from exc
+    consume(free,additions)
+    return sorted(old+additions),dict(net=name,kind='detour',removed=[e],added=additions),free
+
+
+def select_detours(routes, free, edges, eligible, *, radius=4, maximum_cost=160):
+    """Choose distinct actual data crossings by bounded added-wire cost."""
+    free=dict(free);selected=[];trials=[]
+    for e in edges:
+        e=edge(*e);choices=[]
+        for name in sorted(set(eligible)-{d['net'] for d in selected}):
+            if e not in routes[name]:continue
+            item=dict(net=name,edge=e,radius=radius,maximum_cost=maximum_cost)
+            try:
+                rows,record,remaining=detour_one(routes[name],free,item)
+            except ValueError as exc:
+                trials.append(dict(net=name,error=str(exc)));continue
+            score=sum(10 if a[2]==b[2] else 1 for a,b in record['added'])
+            choices.append((score,len(record['added']),len(routes[name]),name,item,remaining))
+        if not choices:raise ValueError('No capacity-feasible data crossing for '+str(e))
+        best=min(choices,key=lambda x:x[:4]);selected.append(best[4]);free=best[5]
+    return selected,trials
+
+
 def patch(routes, free, detours, attachments):
     """Return only reviewed changed nets plus an explicit added/removed ledger."""
     free=dict(free);changed={};ledger=[]
     for item in detours:
-        name=item['net'];old=list(changed.get(name,[edge(a,b) for a,b in routes[name]]))
-        e=edge(*item['edge'])
-        if old.count(e)!=1:raise ValueError('Detour must replace one actual atomic edge')
-        old.remove(e);consume(free,[e],1)
-        occupied={p for segment in old for p in segment}
-        try:additions=path(e[0],{e[1]},free,occupied,banned=[e])
-        except ValueError as exc:raise ValueError('Detour '+name+': '+str(exc)) from exc
-        consume(free,additions)
-        changed[name]=sorted(old+additions)
-        ledger.append(dict(net=name,kind='detour',removed=[e],added=additions))
+        name=item['net']
+        changed[name],record,free=detour_one(changed.get(name,routes[name]),free,item)
+        ledger.append(record)
     for item in attachments:
         name=item['net'];old=changed.get(name,[edge(a,b) for a,b in routes[name]])
         if len(set(old))!=len(old):raise ValueError('Ambiguous repeated source edges')

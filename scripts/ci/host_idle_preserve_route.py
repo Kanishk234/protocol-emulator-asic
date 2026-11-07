@@ -84,10 +84,10 @@ router.writePinLocations(str(root/'prepared_pins.txt'))
 prepared=pins((root/'prepared_pins.txt').read_text())
 ledger=[];changed={}
 if edited:
-    detours=[]
-    for net,item in zip(plan['congestion_signal_nets'],plan['residual_edges']):
-        a,b=item['start_dbu'],item['end_dbu'];z=3
-        detours.append(dict(net=bycanonical[net],edge=[a+[z],b+[z]]))
+    policy=json.loads(Path('spikes/phase2_stock_flow/host_idle_wide_detour_policy.json').read_text())
+    assert policy['source_run']==manifest['run']['id']
+    assert hashlib.sha256((root/'probe_grid.json').read_bytes()).hexdigest()==policy['probe_grid_sha256'], 'Native capacity snapshot changed'
+    detours=policy['detours']
     attachments=[]
     source_pins=pins((root/'probe_pins.txt').read_text())
     antenna=json.loads(Path('spikes/phase2_stock_flow/host_idle_antenna_42305323874.json').read_text())['rows']
@@ -101,11 +101,14 @@ if edited:
         attachments.append(dict(net=name,receiver=source_pins[name][receiver]+(1,),
                                 diode=prepared[name][diode['name']+'/A']+(1,),
                                 maximum_layer=int(row['layer'][5:])))
+    assert json.loads(json.dumps(attachments))==policy['attachments'], 'Native pin attachments changed'
+    plan['allowed_signal_nets_to_reroute'] += [canonical(d['net']) for d in detours]
     free={edge(a,b):c-u for a,b,c,u in json.loads((root/'probe_grid.json').read_text())}
     relevant={n:numeric(original[n]) for n in {x['net'] for x in detours+attachments}}
     (root/'planning_inputs.json').write_text(json.dumps(dict(routes=relevant,
         detours=detours,attachments=attachments,capacity_input='probe_grid.json'),indent=2)+'\n')
     changed,ledger,remaining=patch(relevant,free,detours,attachments)
+    assert hashlib.sha256(json.dumps(ledger,sort_keys=True,separators=(',',':')).encode()).hexdigest()==policy['ledger_sha256'], 'Reviewed route ledger changed'
     (root/'local_patch_plan.json').write_text(json.dumps(dict(ledger=ledger,attachments=attachments,
         detours=detours,maximum_predicted_overflow=max(0,-min(remaining.values())),
         diagnostic_only=True),indent=2)+'\n')
@@ -134,7 +137,8 @@ result=compare((root/'before.segments').read_text(),(root/'after.segments').read
 if edited:
     verify_after_router(db,intervention);checked(design,'check_placement -verbose')
     intervention.update(added_diodes=6,post_router_placement_checked=True,
-                        selected_actual_crossing_nets=plan['congestion_signal_nets'],
+                        selected_actual_crossing_nets=[d['net'] for d in detours],
+                        clock_net_changed=False,clock_timing_must_be_remeasured=True,
                         exact_original_edges_preserved_except_two_detours=True,
                         local_patch_ledger=ledger)
     (root/'intervention.json').write_text(json.dumps(intervention,indent=2)+'\n')

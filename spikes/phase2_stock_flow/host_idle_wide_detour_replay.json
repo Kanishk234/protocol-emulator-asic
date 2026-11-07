@@ -1,0 +1,79 @@
+{
+  "source_run": 42305323874,
+  "native_input_run": 42354846587,
+  "source_grid_sha256": "dd74d66b151edb5d5a3fb2c23d3a0ef51465bd5ec919b0c85c52972a700dfe3e",
+  "source_planning_input_sha256": "cab1ca469485710e3cede96457b3bd647da20732a0847326479382e122c3fc46",
+  "all_edit_ledger_checks_passed": true,
+  "predicted_max_overflow": 0,
+  "changes": [
+    {
+      "net": "net1380",
+      "kind": "detour",
+      "added_planar_edges": 80,
+      "removed_planar_edges": 1,
+      "extra_wire_um": 568.8,
+      "added_vias": 5
+    },
+    {
+      "net": "_19607_",
+      "kind": "detour",
+      "added_planar_edges": 3,
+      "removed_planar_edges": 1,
+      "extra_wire_um": 14.4,
+      "added_vias": 2
+    },
+    {
+      "net": "_10185_",
+      "kind": "attachment",
+      "added_planar_edges": 1,
+      "removed_planar_edges": 0,
+      "extra_wire_um": 7.2,
+      "added_vias": 1
+    },
+    {
+      "net": "u_chip.g_lane\\[1\\].ot\\[9\\]",
+      "kind": "attachment",
+      "added_planar_edges": 1,
+      "removed_planar_edges": 0,
+      "extra_wire_um": 7.2,
+      "added_vias": 1
+    },
+    {
+      "net": "net1643",
+      "kind": "attachment",
+      "added_planar_edges": 0,
+      "removed_planar_edges": 0,
+      "extra_wire_um": 0.0,
+      "added_vias": 1
+    },
+    {
+      "net": "net11819",
+      "kind": "attachment",
+      "added_planar_edges": 0,
+      "removed_planar_edges": 0,
+      "extra_wire_um": 0.0,
+      "added_vias": 0
+    },
+    {
+      "net": "net14221",
+      "kind": "attachment",
+      "added_planar_edges": 1,
+      "removed_planar_edges": 0,
+      "extra_wire_um": 7.2,
+      "added_vias": 1
+    },
+    {
+      "net": "net15518",
+      "kind": "attachment",
+      "added_planar_edges": 0,
+      "removed_planar_edges": 0,
+      "extra_wire_um": 0.0,
+      "added_vias": 1
+    }
+  ],
+  "extra_wire_um": 604.8,
+  "physical_qualified": false,
+  "timing_measured": false,
+  "antenna_measured": false,
+  "native_validation_pending": true
+}

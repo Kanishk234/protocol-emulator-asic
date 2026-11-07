@@ -1,9 +1,18 @@
 """Read saved host-screen congestion without initializing or modifying routing."""
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 from c_select_congestion_readback import overloaded_edges
+
+
+def source_manifest():
+    selected = os.environ.get('SOURCE_MANIFEST', 'spikes/phase2_stock_flow/host_align_congestion_source.json')
+    if selected not in ('spikes/phase2_stock_flow/host_align_congestion_source.json',
+                        'spikes/phase2_stock_flow/host_idle_congestion_source.json'):
+        raise ValueError('Unreviewed congestion source manifest')
+    return Path(selected)
 
 
 def parse_guides(text):
@@ -47,7 +56,7 @@ def match_guides(guides, edges):
 def main():
     from openroad import Tech, Design
     sys.path.insert(0, str(Path('scripts/ci').resolve()))
-    manifest = json.loads(Path('spikes/phase2_stock_flow/host_align_congestion_source.json').read_text())
+    manifest = json.loads(source_manifest().read_text())
     root = Path('frozen-artifact')
     odb = root / manifest['odb']['path']
     digest = hashlib.sha256(odb.read_bytes()).hexdigest()

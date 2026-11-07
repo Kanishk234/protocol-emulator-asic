@@ -1,6 +1,16 @@
 import pytest
 
-from host_align_congestion_readback import parse_guides, match_guides
+from host_align_congestion_readback import parse_guides, match_guides, source_manifest
+
+
+def test_only_reviewed_source_manifests(monkeypatch):
+    monkeypatch.delenv('SOURCE_MANIFEST', raising=False)
+    assert source_manifest().name == 'host_align_congestion_source.json'
+    monkeypatch.setenv('SOURCE_MANIFEST','spikes/phase2_stock_flow/host_idle_congestion_source.json')
+    assert source_manifest().name == 'host_idle_congestion_source.json'
+    monkeypatch.setenv('SOURCE_MANIFEST','/tmp/unreviewed.json')
+    with pytest.raises(ValueError,match='Unreviewed'):
+        source_manifest()
 
 
 def test_guides_match_only_same_layer_and_whole_edge():

@@ -1,0 +1,41 @@
+{
+  "run": 42305323874,
+  "rows": [
+    {
+      "net": "_10185_",
+      "pin": "_37254_/B1 (sg13cmos5l_a21oi_1)",
+      "layer": "Metal3",
+      "violation": "Required ratio:  200.00 (Cumulative area) (VIOLATED)"
+    },
+    {
+      "net": "u_chip.g_lane\\[1\\].ot\\[9\\]",
+      "pin": "hold11497/A (sg13cmos5l_dlygate4sd3_1)",
+      "layer": "Metal2",
+      "violation": "Required ratio:  200.00 (Cumulative area) (VIOLATED)"
+    },
+    {
+      "net": "net1643",
+      "pin": "fanout1640/A (sg13cmos5l_buf_2)",
+      "layer": "Metal3",
+      "violation": "Required ratio:  200.00 (Cumulative area) (VIOLATED)"
+    },
+    {
+      "net": "net11819",
+      "pin": "hold8876/A (sg13cmos5l_dlygate4sd3_1)",
+      "layer": "Metal3",
+      "violation": "Required ratio:  200.00 (Cumulative area) (VIOLATED)"
+    },
+    {
+      "net": "net14221",
+      "pin": "wire14221/A (sg13cmos5l_buf_2)",
+      "layer": "Metal3",
+      "violation": "Required ratio:  200.00 (Cumulative area) (VIOLATED)"
+    },
+    {
+      "net": "net15518",
+      "pin": "_37307_/A2 (sg13cmos5l_a22oi_1)",
+      "layer": "Metal3",
+      "violation": "Required ratio:  200.00 (Cumulative area) (VIOLATED)"
+    }
+  ]
+}

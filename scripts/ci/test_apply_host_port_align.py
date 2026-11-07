@@ -58,3 +58,15 @@ def test_combined_profile_adds_only_idle_storage_to_measured_host_source():
     assert new['c_select'] is True and new['host_port_align'] is True and new['idle_ff'] is True
     allowed={'idle_ff','comparison_reference_run','comparison_reference_config_sha256'}
     assert {k:v for k,v in new.items() if k not in allowed} == {k:v for k,v in old.items() if k not in allowed}
+
+
+def test_combined_early_hold_control_is_one_native_target_only():
+    root=Path(__file__).resolve().parents[2]
+    p=json.loads((root/'spikes/phase2_stock_flow/stock_control_profiles.json').read_text())['profiles']
+    old,new=p['rtl_shared_minbuf2_host_idle_ff'],p['rtl_host_idle_early250']
+    assert {k:v for k,v in new['changes'].items() if old['changes'].get(k)!=v} == {'PL_RESIZER_HOLD_SLACK_MARGIN':0.25}
+    assert set(new['changes']) == set(old['changes'])
+    assert new['comparison_reference_run']==42305323874
+    assert new['hardware_unchanged'] is True
+    assert all(new[k]==old[k] for k in ('rtl_patch','c_select','host_port_align','idle_ff'))
+    assert new['changes']['GRT_RESIZER_HOLD_SLACK_MARGIN']==0.175

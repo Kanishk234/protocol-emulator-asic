@@ -1,0 +1,186 @@
+{
+  "source_run": 42305323874,
+  "def_sha256": "805467de00027cb590004924aebbef49fb5b07dda14957d508c67f44faf1852d",
+  "lef_sha256": "c47c436758ae87288324aa1f5a84fcc8faf813bf19df1a400b32258fff4e1219",
+  "method": "Pinned LEF first-rectangle center transformed by DEF N/FN/FS/S; exact source pin-net membership; existing legal-row gap allocator with full occupied footprints and conservative SRAM halo",
+  "proposals": [
+    {
+      "instance": "tripwire_combined_ant_0",
+      "target": "_37254_/B1",
+      "net": "_10185_",
+      "failing_layer": "Metal3",
+      "receiver_center_dbu": [
+        825102,
+        262432
+      ],
+      "diode_location": [
+        824640,
+        264600,
+        "FS"
+      ],
+      "diode_center_dbu": [
+        825368,
+        267515
+      ],
+      "receiver_grid": [
+        114,
+        36
+      ],
+      "diode_grid": [
+        114,
+        37
+      ],
+      "same_grid": false,
+      "center_manhattan_dbu": 5349
+    },
+    {
+      "instance": "tripwire_combined_ant_1",
+      "target": "hold11497/A",
+      "net": "u_chip.g_lane\\[1\\].ot\\[9\\]",
+      "failing_layer": "Metal2",
+      "receiver_center_dbu": [
+        520680,
+        209645
+      ],
+      "diode_location": [
+        520800,
+        204120,
+        "FS"
+      ],
+      "diode_center_dbu": [
+        521528,
+        207035
+      ],
+      "receiver_grid": [
+        72,
+        29
+      ],
+      "diode_grid": [
+        72,
+        28
+      ],
+      "same_grid": false,
+      "center_manhattan_dbu": 3458
+    },
+    {
+      "instance": "tripwire_combined_ant_2",
+      "target": "fanout1640/A",
+      "net": "net1643",
+      "failing_layer": "Metal3",
+      "receiver_center_dbu": [
+        402268,
+        55020
+      ],
+      "diode_location": [
+        402240,
+        56700,
+        "N"
+      ],
+      "diode_center_dbu": [
+        402968,
+        57565
+      ],
+      "receiver_grid": [
+        55,
+        7
+      ],
+      "diode_grid": [
+        55,
+        7
+      ],
+      "same_grid": true,
+      "center_manhattan_dbu": 3245
+    },
+    {
+      "instance": "tripwire_combined_ant_3",
+      "target": "hold8876/A",
+      "net": "net11819",
+      "failing_layer": "Metal3",
+      "receiver_center_dbu": [
+        393240,
+        66005
+      ],
+      "diode_location": [
+        391680,
+        68040,
+        "FS"
+      ],
+      "diode_center_dbu": [
+        392408,
+        70955
+      ],
+      "receiver_grid": [
+        54,
+        9
+      ],
+      "diode_grid": [
+        54,
+        9
+      ],
+      "same_grid": true,
+      "center_manhattan_dbu": 5782
+    },
+    {
+      "instance": "tripwire_combined_ant_4",
+      "target": "wire14221/A",
+      "net": "net14221",
+      "failing_layer": "Metal3",
+      "receiver_center_dbu": [
+        741572,
+        428820
+      ],
+      "diode_location": [
+        740640,
+        415800,
+        "FS"
+      ],
+      "diode_center_dbu": [
+        741368,
+        418715
+      ],
+      "receiver_grid": [
+        102,
+        59
+      ],
+      "diode_grid": [
+        102,
+        58
+      ],
+      "same_grid": false,
+      "center_manhattan_dbu": 10309
+    },
+    {
+      "instance": "tripwire_combined_ant_5",
+      "target": "_37307_/A2",
+      "net": "net15518",
+      "failing_layer": "Metal3",
+      "receiver_center_dbu": [
+        812735,
+        296920
+      ],
+      "diode_location": [
+        815520,
+        294840,
+        "FS"
+      ],
+      "diode_center_dbu": [
+        816248,
+        297755
+      ],
+      "receiver_grid": [
+        112,
+        41
+      ],
+      "diode_grid": [
+        113,
+        41
+      ],
+      "same_grid": false,
+      "center_manhattan_dbu": 4348
+    }
+  ],
+  "footprint_overlap_count": 0,
+  "native_placement_checked": false,
+  "route_connectivity_checked": false,
+  "antenna_repair_proved": false
+}

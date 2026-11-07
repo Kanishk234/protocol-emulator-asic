@@ -1,0 +1,95 @@
+{
+  "run": 42337691489,
+  "source_run": 42305323874,
+  "source_odb_sha256": "2d458898c66b6714431704a59ee3c97e18e20478594c2723f41613b120cce1d0",
+  "source_odb_unchanged": true,
+  "expected_overflow": 2,
+  "layer_totals": {
+    "Metal2": {
+      "capacity": 263130.0,
+      "usage": 190113.0,
+      "overflow": 0.0
+    },
+    "Metal3": {
+      "capacity": 302689.0,
+      "usage": 245698.0,
+      "overflow": 2.0
+    },
+    "Metal4": {
+      "capacity": 263130.0,
+      "usage": 105262.0,
+      "overflow": 0.0
+    }
+  },
+  "overloaded_edges": [
+    {
+      "layer": "Metal3",
+      "direction": "HORIZONTAL",
+      "x_index": 69,
+      "y_index": 28,
+      "start_dbu": [
+        500400,
+        205200
+      ],
+      "end_dbu": [
+        507600,
+        205200
+      ],
+      "capacity": 18.0,
+      "usage": 19.0,
+      "overflow": 1.0,
+      "guide_overlap_candidates": [
+        "_11000_",
+        "_11232_",
+        "_11284_",
+        "_19891_",
+        "net1003",
+        "net11787",
+        "net12232",
+        "net12403",
+        "net12729",
+        "net12795",
+        "net1291",
+        "net1380",
+        "net1582",
+        "net1781",
+        "net4046"
+      ]
+    },
+    {
+      "layer": "Metal3",
+      "direction": "HORIZONTAL",
+      "x_index": 97,
+      "y_index": 30,
+      "start_dbu": [
+        702000,
+        219600
+      ],
+      "end_dbu": [
+        709200,
+        219600
+      ],
+      "capacity": 17.0,
+      "usage": 18.0,
+      "overflow": 1.0,
+      "guide_overlap_candidates": [
+        "_19598_",
+        "_19607_",
+        "_19619_",
+        "clknet_6_36__leaf_clk_regs",
+        "clknet_leaf_261_clk_regs",
+        "net11788",
+        "net12029",
+        "net12772",
+        "net12856",
+        "net13408",
+        "net13682",
+        "net13868",
+        "net405",
+        "net468"
+      ]
+    }
+  ],
+  "design_qualified": false,
+  "scope": "Read-only saved congestion validated against final live routing gate; guide-overlap candidates only, not exact crossings or connectivity; no placement, repair, rerouting, STA or closure claim"
+}

@@ -526,3 +526,22 @@ saved overflow to equal the final live value of 70. Guide-overlap candidates
 are regional clues, not proof of exact wire crossings or connectivity. Use
 those measurements to select a repair; do not blindly replay or route these
 failing candidates. Main RTL/config and official GDS jobs remain unchanged.
+
+
+## Wider measured-capacity replay — 2026-11-07
+
+The combined source42305323874 remains the reference: estimated timing and
+electrical pass, fast hold138.366ps, antenna6nets and overflow2. Full-net
+incremental repairs were unstable; the first local-route screen42354846587
+correctly refused a short detour before timing. Its saved grid shows the
+nearest spare crossing on the first congested column302.4umaway.
+
+A new frozen policy uses net1380 and _19607_ as the two data crossings,
+retains all source edges except the two overloaded atoms, and attaches six
+passive diodes to the original receiver components below the failing layers.
+Native-snapshot replay predicts0overflow with unchanged capacity values, but
+adds604.8umwire(total),568.8umon the first detour. Actual setup/slew and antenna
+closure remain unmeasured. The CI adapter verifies exact grid/pin/ledger
+identity before applying guides; every existing physical gate remains active.
+See host_idle_wide_detour_policy.json and host_idle_wide_detour_replay.json.
+No official source/config promotion or qualification follows from offline replay.

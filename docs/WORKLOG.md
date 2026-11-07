@@ -2,6 +2,16 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-06 — Bind combined residual readback and exact antenna receivers
+
+- Fresh combined antenna report42305323874 identifies _37254_/B1,fanout1640/A,hold8876/A,wire14221/A,_37307_/A2 atMetal3 and hold11497/A atMetal2. Save host_idle_antenna_42305323874.json; prior source cell/diode sites are not reused.
+- Extend existing own read-only workflow with explicit host_align/host_idle checkpoint selection, retaining original source manifest as default for direct script invocation. New combined binding fixes source run/artifact whole digest/ODB/guideSHA and requires saved overflow2.13focused tests,actionlint/diff checks pass. Next inspect exact residual edges and receiver geometry; all gates/mainhardware/officialjobs unchanged.
+
+## 2026-11-06 — Combined source screen reduces overflow70to2; antenna remains open
+
+-42305323874 completes physical flow and both original/unchanged-signoff estimated audits, then correctly fails final gates. Independently inspect completed log and source-bound artifact receipts: original setup summaries0(allcorners),fast/typical/slow hold0.138366/0.355420/0.736254ns, electrical0(allcorners), antenna6nets/6pins, final live overflow2. Save host_idle_combined_result_42305323874.json; local partial ZIP extraction verifies selected entry CRCs, not whole archive digest.
+- Versus host-only42262602008, overflow70→2 and fast hold0.088771→0.138366ns; antenna6nets persists(pins7→6). This is a measured combination result, not attribution to a single timing mechanism or a guarantee of positive extracted setup. No DRT or phase tick; official jobs/mainhardware unchanged. Next inspect the two residual overflow units and six exact antenna net/layer failures on this new checkpoint; do not reuse prior candidate cell/guide coordinates blindly.
+
 ## 2026-11-06 — Combined source protocol regression passes all22cases
 
 - Independently inspect completed cocotb log and XML for /tmp/tripwire-host-idle-combined:22tests,22passes,0failures/errors/skips,2093.99seconds(~34.9min), real offline sigrok enabled. This is the exact combined2/4 RTL inventory matched to CI preparation, not routed gate-level or physical timing proof. Save XML digest/test names in host_idle_combined_evidence.json; do not commit raw build output.

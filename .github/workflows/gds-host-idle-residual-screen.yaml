@@ -1,0 +1,328 @@
+name: gds-host-idle-residual-screen
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-host-idle-residual-screen
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CHECKPOINT: host_idle_final
+      LOCAL_ANTENNA_EDIT: ${{ matrix.edit }}
+    steps:
+    - name: Check out project
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Select the reviewed frozen source
+      run: |-
+        python - <<'PYCODE'
+        import json, os
+        from pathlib import Path
+        manifests = {'host_idle_final': 'spikes/phase2_stock_flow/host_idle_final_checkpoint.json'}
+        path = manifests[os.environ['CHECKPOINT']]
+        manifest = json.loads(Path(path).read_text())
+        values = dict(SOURCE_MANIFEST=path, SOURCE_RUN=manifest['run']['id'],
+                      SOURCE_ARTIFACT=manifest['artifact']['id'],
+                      SOURCE_ARTIFACT_NAME=manifest['artifact']['name'])
+        with open(os.environ['GITHUB_ENV'], 'a') as output:
+            for key, value in values.items():
+                output.write(f'{key}={value}\n')
+        PYCODE
+    - name: Restore and hash-verify the frozen physical checkpoint
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |-
+        set -euo pipefail
+        gh api repos/${{ github.repository }}/actions/runs/$SOURCE_RUN > recovery-source-run.json
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT > recovery-source-artifact.json
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT/zip > frozen.zip
+        python - <<'PY'
+        import hashlib, json, os, zipfile
+        from pathlib import Path, PurePosixPath
+        m=json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
+        digest=hashlib.sha256()
+        with open('frozen.zip','rb') as src:
+            for chunk in iter(lambda:src.read(8*1024*1024),b''):digest.update(chunk)
+        assert 'sha256:'+digest.hexdigest()==m['artifact']['digest']
+        with zipfile.ZipFile('frozen.zip') as z:
+            for info in z.infolist():
+                p=PurePosixPath(info.filename)
+                assert not p.is_absolute() and '..' not in p.parts
+            z.extractall('frozen-artifact')
+        PY
+        python - <<'PYCODE'
+        import hashlib, json, os, shutil, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from stock_checkpoint_recovery import validate
+        manifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
+        run = json.loads(Path('recovery-source-run.json').read_text())
+        artifact = json.loads(Path('recovery-source-artifact.json').read_text())
+        # Verify all frozen inputs before copying to their original runner paths.
+        validate(Path('frozen-artifact'), manifest, run, artifact)
+        assert not Path('runs').exists(), 'Unexpected existing physical output'
+        # Do not restore the source run's completed corner audit into our fresh output path.
+        shutil.copytree(Path('frozen-artifact/runs/stock-official-baseline'),
+                        Path('runs/stock-official-baseline'))
+        for folder in ('src', 'macro'):
+            shutil.copytree(Path('frozen-artifact') / folder, Path(folder), dirs_exist_ok=True)
+        shutil.copy2('frozen-artifact/info.yaml', 'info.yaml')
+        source = validate(Path('.'), manifest, run, artifact, require_runner_root=True)
+        Path('runs/stock-recovery-validation.json').write_text(json.dumps(dict(
+            source_run=run['id'], source_sha=run['head_sha'], artifact_id=artifact['id'],
+            source_state=str(source), frozen_file_hashes=manifest['files'],
+            physical_repairs_performed=False, saved_state_rewritten=False), indent=2) + '\n')
+        print('Verified exact frozen post-antenna checkpoint:', source)
+        PYCODE
+    - name: Check out Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+        path: tt
+    - name: Check out the pinned IHP installer
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-gds-action
+        ref: 3412659307918422f3f0727917cf9b499aaca588
+        path: .tt-gds-action
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install Tiny Tapeout prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install flow dependencies
+      run: pip install -r tt/requirements.txt
+    - name: Install IHP PDK
+      run: ./.tt-gds-action/install_sg13cmos5l.sh
+    - name: Install pinned LibreLane
+      run: pip install librelane==3.1.0.dev3
+    - name: Verify the original stock engine image
+      run: |-
+        set -euo pipefail
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev3
+        python - <<'PYCODE'
+        import json, os, subprocess
+        from pathlib import Path
+        m = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())['toolchain']
+        image = m['stock_image']
+        digests = json.loads(subprocess.check_output(['docker', 'image', 'inspect', image, '--format', '{{json .RepoDigests}}'], text=True))
+        assert image.rsplit(':', 1)[0] + '@' + m['stock_digest'] in digests, 'Stock engine digest differs from source run'
+        print('Verified original unmodified stock image digest')
+        PYCODE
+    - name: Run bounded native incremental intervention or unchanged control
+      run: |
+        set -euo pipefail
+        docker run --rm --network none --user "$(id -u):$(id -g)" -e LOCAL_ANTENNA_EDIT="$LOCAL_ANTENNA_EDIT" -e SOURCE_MANIFEST="$SOURCE_MANIFEST" -v "$PWD:$PWD" -v "$PDK_ROOT:$PDK_ROOT:ro" -w "$PWD" ghcr.io/librelane/librelane:3.1.0.dev3 openroad -exit -python scripts/ci/host_idle_residual_repair.py > runs/route-reopen.log 2>&1
+    - name: Independently validate every routed net and pin in the exported database
+      run: |-
+        set -euo pipefail
+        docker run --rm --network none --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -v "$PDK_ROOT:$PDK_ROOT:ro" -w "$PWD" ghcr.io/librelane/librelane:3.1.0.dev3 openroad -exit -python scripts/ci/validate_route_coverage.py > runs/route-coverage.log 2>&1
+        python - <<'PYCODE'
+        import json, re
+        from pathlib import Path
+        log = Path('runs/route-coverage.log').read_text()
+        assert not re.search(r'(?m)^\[ERROR\b', log), 'Native coverage validator logged errors'
+        receipt = json.loads(Path('runs/route-reopen-calibration/native_coverage.json').read_text())
+        assert receipt['all_routed_nets_connected_and_pins_covered'] is True
+        assert receipt['independent_process'] is True and receipt['routed_nets'] == 45192
+        PYCODE
+    - name: Recover fresh read-only corner and antenna measurements
+      timeout-minutes: 30
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python - <<'PYCODE'
+        import hashlib, json, math, os, shutil, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from postgrt_timing import CORNERS, screen
+        from native_stock_route import run_step
+        root = Path('runs/stock-official-baseline')
+        source = Path('runs/route-reopen-calibration/state_out.json')
+        state = json.loads(source.read_text())
+        paths = [source] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
+        assert all(p.is_file() for p in paths)
+        def hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        before = hashes()
+        output = Path('runs/stock-corner-audit')
+        assert not output.exists(), 'Refusing inherited audit output'
+        # The source artifact includes generated config_timing files. Keep every
+        # bound source file untouched; a sibling retains dir::../macro semantics.
+        shutil.copytree('src', 'audit-src')
+        # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
+        # No resizer, repair, placement or routing step is invoked.
+        screen(Path('audit-src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,
+               extra_tcl=Path('scripts/ci/native_hold_frontier_audit.tcl'),
+               sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
+        from hold_frontier_report import summarize
+        frontier = {}
+        readbacks = {}
+        for corner in CORNERS:
+            reports = list((output / f'after-{corner}').glob('*-openroad-stamidpnr/hold_frontier.rpt'))
+            assert len(reports) == 1, 'Missing fresh hold-frontier report'
+            frontier[corner] = summarize(reports[0], corner)
+            for suffix in ('nl.v', 'pnl.v'):
+                view = reports[0].with_name(f'checkpoint_readback.{suffix}')
+                assert view.is_file() and view.stat().st_size > 0, 'Missing ODB netlist readback'
+                readbacks[str(view)] = hashlib.sha256(view.read_bytes()).hexdigest()
+        (output / 'hold_frontier.json').write_text(json.dumps(frontier, indent=2) + '\n')
+        # Check antenna on the same final database; do not inherit pre-timing results.
+        run_step(json.loads(Path('src/config_merged.json').read_text()), source,
+                 output / 'fresh-checkpoint-antenna', ['OpenROAD.CheckAntennas'])
+        antenna_files = list((output / 'fresh-checkpoint-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))
+        assert len(antenna_files) == 1
+        antenna_metrics = json.loads(antenna_files[0].read_text())
+        antenna = {key: antenna_metrics[key] for key in ('antenna__violating__nets', 'antenna__violating__pins')}
+        assert all(isinstance(v, int) and v >= 0 for v in antenna.values())
+        assert hashes() == before, 'Read-only audit modified source physical views'
+        result = json.loads((output / 'comparison.json').read_text())
+        rows = {}
+        for corner in CORNERS:
+            metrics = result['corners'][corner]['before']
+            repeated = result['corners'][corner]['after']
+            keys = [f'timing__{kind}__ws__corner:{corner}' for kind in ('setup', 'hold')]
+            keys += [f'design__max_{kind}_violation__count__corner:{corner}' for kind in ('slew', 'cap', 'fanout')]
+            for key in keys:
+                assert key in metrics and key in repeated, key
+                assert math.isfinite(metrics[key]) and abs(metrics[key] - repeated[key]) <= 1e-9, key
+            rows[corner] = {key: metrics[key] for key in keys}
+        (output / 'read_only_audit.json').write_text(json.dumps(dict(
+            source_state=str(source), source_run=json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())['run']['id'],
+            checkpoint_profile=os.environ['CHECKPOINT'],
+            unchanged_physical_view_hashes=before,
+            fresh_odb_readback_view_hashes=readbacks,
+            fresh_corner_metrics=rows, fresh_antenna_metrics=antenna, physical_repairs_performed=False,
+            qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
+        from stock_checkpoint_recovery import validate
+        validate(Path('.'),
+                 json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text()),
+                 json.loads(Path('recovery-source-run.json').read_text()),
+                 json.loads(Path('recovery-source-artifact.json').read_text()), require_runner_root=True)
+        print(json.dumps(rows, indent=2))
+        PYCODE
+    - name: Check unchanged signoff constraints after native reopening
+      timeout-minutes: 30
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python - <<'PYCODE'
+        import hashlib, json, math, os, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from postgrt_timing import CORNERS, screen
+        source = Path('runs/route-reopen-calibration/state_out.json')
+        receipt = json.loads(Path('runs/stock-corner-audit/read_only_audit.json').read_text())
+        def verify_source():
+            for name, digest in receipt['unchanged_physical_view_hashes'].items():
+                assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == digest, 'Physical source drift'
+        verify_source()
+        output = Path('runs/host-idle-signoff-audit')
+        screen(Path('audit-src/config_merged.json'), source, output, os.environ['PDK_ROOT'],
+               repaired=source, sdc=Path('src/signoff.sdc'),
+               sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
+        verify_source()
+        result = json.loads((output / 'comparison.json').read_text())
+        reference = json.loads(Path('spikes/phase2_stock_flow/host_idle_residual_reference.json').read_text())
+        edit = os.environ['LOCAL_ANTENNA_EDIT'] == 'true'
+        failures = []
+        for corner in CORNERS:
+            for stage in ('before', 'after'):
+                row = result['corners'][corner][stage]
+                for kind in ('setup', 'hold'):
+                    value = row[f'timing__{kind}__ws__corner:{corner}']
+                    assert type(value) in (int, float) and math.isfinite(value)
+                    minimum = 0.05 if kind == 'hold' and corner == CORNERS[0] else 0
+                    if value < minimum:
+                        failures.append(f'{corner} {stage} {kind}: {value}')
+                    if not edit:
+                        expected = reference['signoff_hold_ns'][corner] if kind == 'hold' else 0
+                        assert abs(value - expected) < 1e-6, 'Signoff control timing drift'
+                for kind in ('slew', 'cap', 'fanout'):
+                    value = row[f'design__max_{kind}_violation__count__corner:{corner}']
+                    assert type(value) is int and value >= 0
+                    if value:
+                        failures.append(f'{corner} {stage} {kind}: {value}')
+        (output / 'qualification.json').write_text(json.dumps(dict(
+            qualified=not failures, failures=failures, edited=edit,
+            extracted_timing_performed=False, official_flow_qualified=False), indent=2) + '\n')
+        assert not failures, failures
+        PYCODE
+    - name: Require control reproducibility or strict edited gates
+      run: |-
+        python - <<'PYCODE'
+        import json, os, re
+        from pathlib import Path
+        reference=json.loads(Path('spikes/phase2_stock_flow/host_idle_residual_reference.json').read_text())
+        r=json.loads(Path('runs/stock-corner-audit/read_only_audit.json').read_text())
+        edit=os.environ['LOCAL_ANTENNA_EDIT']=='true'
+        failures=[]
+        for corner, hold in reference['hold_ns'].items():
+            row=r['fresh_corner_metrics'][corner]
+            for kind in ('setup','hold'):
+                actual=row[f'timing__{kind}__ws__corner:{corner}']
+                minimum=0.05 if kind=='hold' and corner=='nom_fast_1p32V_m40C' else 0
+                if edit and actual<minimum:failures.append(f'{corner} {kind}: {actual}')
+            if not edit:
+                assert row[f'timing__setup__ws__corner:{corner}']==0
+                assert abs(row[f'timing__hold__ws__corner:{corner}']-hold)<1e-6
+            for kind in ('slew','cap','fanout'):
+                if row[f'design__max_{kind}_violation__count__corner:{corner}']!=0:failures.append(f'{corner} {kind}')
+        antenna=r['fresh_antenna_metrics']
+        if edit and any(antenna.values()):failures.append(f'antenna {antenna}')
+        if not edit:assert set(antenna.values())=={6}
+        if edit:
+            intervention=json.loads(Path('runs/route-reopen-calibration/intervention.json').read_text())
+            assert intervention.get('added_diodes') == 6
+            assert len(intervention.get('selected_actual_crossing_nets', [])) == 2
+            assert intervention.get('post_router_placement_and_connections_verified') is True
+            assert intervention.get('placement_checked') is True
+            assert intervention.get('post_router_placement_checked') is True
+        log=Path('runs/route-reopen.log').read_text()
+        if re.search(r'(?m)^\[ERROR\b',log):failures.append('Native OpenROAD log contains errors')
+        rows=re.findall(r'(?m)^Total\s+\d+\s+(\d+)\s+[0-9.]+%\s+\d+\s*/\s*\d+\s*/\s*(\d+)\s*$',log)
+        assert rows and int(rows[-1][0])>0, 'Missing live routing demand'
+        if edit and int(rows[-1][1]):failures.append(f'overflow {rows[-1][1]}')
+        if not edit:assert int(rows[-1][1])==reference['overflow']
+        result=dict(edited=edit, failures=failures, diagnostic_gates_passed=not failures, official_flow_qualified=False,
+                    corners=r['fresh_corner_metrics'],antenna=antenna,overflow=int(rows[-1][1]))
+        Path('runs/route-reopen-calibration/final_gates.json').write_text(json.dumps(result,indent=2)+'\n')
+        assert not failures, failures
+        PYCODE
+    - name: Upload recovered measurement evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: host-idle-residual-${{ matrix.edit }}-${{ github.run_id }}
+        path: |-
+          runs/stock-corner-audit/**
+          runs/stock-recovery-validation.json
+          recovery-source-run.json
+          recovery-source-artifact.json
+          ${{ env.SOURCE_MANIFEST }}
+          runs/route-reopen-calibration/**
+          runs/route-reopen.log
+          runs/route-coverage.log
+          runs/host-idle-signoff-audit/**
+          spikes/phase2_stock_flow/host_idle_residual_plan.json
+        if-no-files-found: warn
+    strategy:
+      fail-fast: false
+      matrix:
+        edit:
+        - 'false'
+        - 'true'

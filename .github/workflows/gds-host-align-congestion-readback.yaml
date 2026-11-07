@@ -1,6 +1,12 @@
 name: gds-host-align-congestion-readback
 'on':
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      source_profile:
+        type: choice
+        default: host_idle
+        options: [host_align, host_idle]
+        description: Exact measured source checkpoint
 permissions:
   contents: read
   actions: read
@@ -17,14 +23,18 @@ jobs:
       with:
         python-version: '3.11'
     - name: Select the exact failed repair artifact
+      env:
+        SOURCE_PROFILE: ${{ inputs.source_profile }}
       run: |
         python -m venv .venv
         .venv/bin/python - <<'PY'
         import json, os
         from pathlib import Path
-        m=json.loads(Path('spikes/phase2_stock_flow/host_align_congestion_source.json').read_text())
+        source = {'host_align': 'host_align_congestion_source.json', 'host_idle': 'host_idle_congestion_source.json'}[os.environ['SOURCE_PROFILE']]
+        manifest = 'spikes/phase2_stock_flow/' + source
+        m=json.loads(Path(manifest).read_text())
         with open(os.environ['GITHUB_ENV'],'a') as f:
-            f.write(f"SOURCE_RUN={m['run']['id']}\nSOURCE_ARTIFACT={m['artifact']['id']}\nIMAGE={m['image']}\n")
+            f.write(f"SOURCE_MANIFEST={manifest}\nSOURCE_RUN={m['run']['id']}\nSOURCE_ARTIFACT={m['artifact']['id']}\nIMAGE={m['image']}\n")
         PY
     - name: Verify source and extract only readback inputs
       env:
@@ -36,9 +46,9 @@ jobs:
         gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT > runs/congestion-readback/source-artifact.json
         gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT/zip > frozen.zip
         .venv/bin/python - <<'PY'
-        import hashlib, json, shutil, zipfile
+        import hashlib, json, os, shutil, zipfile
         from pathlib import Path, PurePosixPath
-        m=json.loads(Path('spikes/phase2_stock_flow/host_align_congestion_source.json').read_text())
+        m=json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())
         for kind in ('run','artifact'):
             actual=json.loads(Path(f'runs/congestion-readback/source-{kind}.json').read_text())
             assert all(actual.get(k)==v for k,v in m[kind].items()), 'Wrong source provenance'
@@ -62,7 +72,7 @@ jobs:
       run: |
         set -euo pipefail
         docker pull "$IMAGE"
-        docker run --rm --network none --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -w "$PWD" "$IMAGE" openroad -exit -python scripts/ci/host_align_congestion_readback.py > runs/congestion-readback/native.log 2>&1
+        docker run --rm --network none -e SOURCE_MANIFEST --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -w "$PWD" "$IMAGE" openroad -exit -python scripts/ci/host_align_congestion_readback.py > runs/congestion-readback/native.log 2>&1
     - name: Upload read-only congestion diagnosis
       if: always()
       uses: actions/upload-artifact@v7
@@ -70,4 +80,4 @@ jobs:
         name: host-align-congestion-${{ github.run_id }}
         path: |
           runs/congestion-readback/**
-          spikes/phase2_stock_flow/host_align_congestion_source.json
+          ${{ env.SOURCE_MANIFEST }}

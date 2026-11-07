@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-07 — Correct residual-plan OpenDB orientation before relaunch
+
+-42351292687 edited arm restores/hash-verifies frozen source but fails before routing at diode.setOrient:Unknown orientation. Root cause: new plan used DEF N/FS instead of native OpenDB R0/MX. Control native route reopening and independent45192-net connectivity succeed; original/signoff audits are still progressing. Do not interpret edited failure as a timing result or reuse its incomplete state.
+- Convert8plan orientations(N→R0,FS→MX,FN→MY,S→R180), preserving exact locations/footprints/signals/supplies/20ns/gates. Pre-edit allowlist rejects DEF/invalid spellings before mutation; static source-row conversion and10orientation cases cover the bug.76focused plan/selection/source/inventory/Tcl/coverage regressions,actionlint/diff checks pass. Log BUGS. Next publish correction and dispatch paired screen again from original combined42305323874, retaining the first control's independent evidence; no phase tick or DRT.
+
 ## 2026-11-07 — Prepare paired bounded residual repair on combined175ps checkpoint
 
 - D-161 binds combined42305323874/artifact13556115899/full ZIPdigest,43source/config/state/view hashes;42locally available files independently match, ODB bound to source audit must match on CI recovery. Do not rerun synthesis or use early250's congested descendant.

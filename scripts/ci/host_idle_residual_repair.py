@@ -51,7 +51,9 @@ router.writeSegments(str(output / 'before.segments'))
 from local_antenna_repair import snapshot
 from local_c_select_repair import apply_plan, verify_after_router, canonical
 from host_idle_residual_selection import select as choose
+from host_idle_residual_selection import validate_orientations
 plan = json.loads(Path('spikes/phase2_stock_flow/host_idle_residual_plan.json').read_text())
+validate_orientations(plan)
 reference = json.loads(Path('spikes/phase2_stock_flow/host_idle_residual_reference.json').read_text())
 assert manifest['run']['id'] == plan['source_run'] == reference['source_run']
 assert hashlib.sha256(Path(state['odb']).read_bytes()).hexdigest() == manifest['files'][str(Path(state['odb']).relative_to(Path.cwd()))]

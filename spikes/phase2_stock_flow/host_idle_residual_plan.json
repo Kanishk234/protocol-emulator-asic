@@ -13,7 +13,7 @@
         824640,
         264600
       ],
-      "locked_orientation": "FS"
+      "locked_orientation": "MX"
     },
     {
       "name": "tripwire_combined_ant_1",
@@ -25,7 +25,7 @@
         520800,
         204120
       ],
-      "locked_orientation": "FS"
+      "locked_orientation": "MX"
     },
     {
       "name": "tripwire_combined_ant_2",
@@ -37,7 +37,7 @@
         402240,
         56700
       ],
-      "locked_orientation": "N"
+      "locked_orientation": "R0"
     },
     {
       "name": "tripwire_combined_ant_3",
@@ -49,7 +49,7 @@
         391680,
         68040
       ],
-      "locked_orientation": "FS"
+      "locked_orientation": "MX"
     },
     {
       "name": "tripwire_combined_ant_4",
@@ -61,7 +61,7 @@
         740640,
         415800
       ],
-      "locked_orientation": "FS"
+      "locked_orientation": "MX"
     },
     {
       "name": "tripwire_combined_ant_5",
@@ -73,7 +73,7 @@
         815520,
         294840
       ],
-      "locked_orientation": "FS"
+      "locked_orientation": "MX"
     },
     {
       "name": "tripwire_combined_reroute_0",
@@ -85,7 +85,7 @@
         501600,
         204120
       ],
-      "locked_orientation": "FS",
+      "locked_orientation": "MX",
       "purpose": "Force a genuine pin-pattern change on one bounded congestion crossing"
     },
     {
@@ -98,7 +98,7 @@
         677760,
         245700
       ],
-      "locked_orientation": "N",
+      "locked_orientation": "R0",
       "purpose": "Force a genuine pin-pattern change on one bounded congestion crossing"
     }
   ],

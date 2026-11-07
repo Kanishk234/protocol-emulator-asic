@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-07 — Prepare paired bounded residual repair on combined175ps checkpoint
+
+- D-161 binds combined42305323874/artifact13556115899/full ZIPdigest,43source/config/state/view hashes;42locally available files independently match, ODB bound to source audit must match on CI recovery. Do not rerun synthesis or use early250's congested descendant.
+- New separate gds-host-idle-residual-screen runs unchanged control plus6passive receiver-local diodes and at most2data-net reroutes selected from actual native segment crossings of the measured edges. No clock/topology/state/ISA changes or resizing;32.6592um2extra passive footprint. Preserve all original cells/pins/status and unrelated routes; retain checked Tcl/native placement and independent45192-net pin/connectivity validation. Fresh original/signoff estimates/electrical/antenna and live positive-demand overflow gates remain mandatory. Explicit diagnostic repair is not official source/config reproduction or extracted closure.
+- Reuse tested native library/router initialization/placement/source recovery/audit code, new selection rejects wrong-layer/missing/clock-ineligible/distinct-net failures. 65focused source/plan/selection/recovery/inventory/placement/coverage regressions pass, plus actionlint, shell syntax and all8embedded Python blocks. Initial real-Tcl tests lacked systemtclsh; rerun with existing reviewed build/targeted-sizing/tclsh-yosys. New plan test corrected to compare frozen signoff identity (main template does not contain overlay signoff.sdc). No requirements weakened. Next run paired native calibration/repair and inspect every gate before DRT; no phase tick.
+
+## 2026-11-07 — Early250 reduces antenna count but regresses congestion; reject control
+
+-42338038168 completes stock physical flow and both original/signoff estimated audits, then fails strict final gates. Source-bound receipts and completed log confirm original setup summaries0(allcorners), holdfast0.174550/typical0.392790/slow0.772290ns, electrical0(allcorners), antenna3nets/3pins, final live overflow237. Save host_idle_early250_result_42338038168.json. Selected local ZIP entries CRC-verified, not independent whole ZIP digest verification.
+- Against combined42305323874, fast hold improves0.138366→0.174550ns and antenna6→3nets, but overflow2→237. Reject early250 as the closure candidate; retain combined175ps checkpoint as the better routing reference. The hypothesis does not solve closure and is not evidence to keep increasing margins. Next use the exact combined checkpoint's two known Metal3 residuals and six unprotected receivers for a bounded native repair with independent placement/connectivity/original-signoff timing/electrical/antenna/live-overflow validation. Official source/config reproduction and extracted setup remain open; no DRT or phase tick.
+
 ## 2026-11-06 — Locate both residual edges; prepare one native early-repair control
 
 -42337691489 succeeds on combined42305323874 source; exact saved/live overflow2 is two horizontalMetal3edges, each excess1:500400..507600,Y205200 and702000..709200,Y219600DBU. Persist source-bound readback receipt. These are guide candidates, not exact crossing proofs.

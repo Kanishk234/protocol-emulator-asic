@@ -74,6 +74,32 @@
         294840
       ],
       "locked_orientation": "FS"
+    },
+    {
+      "name": "tripwire_combined_reroute_0",
+      "anchor": "wire12232",
+      "anchor_master": "sg13cmos5l_buf_4",
+      "pin": "A",
+      "net": "net12232",
+      "locked_site_dbu": [
+        501600,
+        204120
+      ],
+      "locked_orientation": "FS",
+      "purpose": "Force a genuine pin-pattern change on one bounded congestion crossing"
+    },
+    {
+      "name": "tripwire_combined_reroute_1",
+      "anchor": "wire13408",
+      "anchor_master": "sg13cmos5l_buf_2",
+      "pin": "A",
+      "net": "net13408",
+      "locked_site_dbu": [
+        677760,
+        245700
+      ],
+      "locked_orientation": "N",
+      "purpose": "Force a genuine pin-pattern change on one bounded congestion crossing"
     }
   ],
   "allowed_signal_nets_to_reroute": [
@@ -82,9 +108,11 @@
     "net1643",
     "net11819",
     "net14221",
-    "net15518"
+    "net15518",
+    "net12232",
+    "net13408"
   ],
-  "scope": "Six passive receiver-local diodes plus native reroute of one actual signal crossing per residual edge; diagnostics only",
+  "scope": "Six passive receiver-protection diodes plus two passive diodes forcing genuine pin-pattern changes on exact native-verified data crossings; diagnostic only",
   "residual_edges": [
     {
       "layer": "Metal3",
@@ -153,5 +181,9 @@
         "net468"
       ]
     }
+  ],
+  "congestion_signal_nets": [
+    "net12232",
+    "net13408"
   ]
 }

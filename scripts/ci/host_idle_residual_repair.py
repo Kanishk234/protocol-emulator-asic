@@ -62,7 +62,7 @@ initial = snapshot(block)
 eligible = {}
 for net in block.getNets():
     name = net.getName()
-    if str(net.getSigType()) != 'SIGNAL' or name not in routes:
+    if str(net.getSigType()) != 'SIGNAL' or name not in routes or name not in plan['congestion_signal_nets']:
         continue
     terms = list(net.getITerms())
     if len(terms) < 2 or len(terms) > 16:
@@ -72,7 +72,7 @@ for net in block.getNets():
         continue
     eligible[name] = len(terms)
 selected = choose(routes, plan['residual_edges'], eligible)
-plan['allowed_signal_nets_to_reroute'] += [canonical(n) for n in selected]
+assert set(selected) == set(plan['congestion_signal_nets']), 'Wrong congestion crossings'
 (output / 'selected_plan.json').write_text(json.dumps(dict(plan=plan, actual_selected_crossings=selected), indent=2)+'\n')
 router.startIncremental()
 intervention = None
@@ -94,7 +94,7 @@ if edited:
     intervention.update(post_router_placement_checked=True, clock_net_changed=False,
                         clock_timing_must_be_remeasured=True,
                         selected_actual_crossing_nets=selected,
-                        added_diodes=6)
+                        added_diodes=8)
     (output / 'intervention.json').write_text(json.dumps(intervention, indent=2)+'\n')
 else:
     assert snapshot(block) == initial, 'Control cell inventory changed'

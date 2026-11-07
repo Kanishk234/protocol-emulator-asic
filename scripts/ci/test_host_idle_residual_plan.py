@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from host_idle_residual_selection import validate_orientations
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -10,6 +11,7 @@ def read(name):
 
 def test_exact_source_and_two_recorded_edges():
     plan=read('host_idle_residual_plan.json')
+    validate_orientations(plan)
     source=read('host_idle_final_checkpoint.json')
     ref=read('host_idle_residual_reference.json')
     assert plan['source_run']==source['run']['id']==ref['source_run']==42305323874
@@ -27,7 +29,7 @@ def test_eight_passive_diodes_and_no_logic_sizing_or_clock_edit():
     assert len({d['name'] for d in plan['diodes']})==8
     for d,s in zip(plan['diodes'][:6],sites['proposals']):
         assert d['locked_site_dbu']==s['diode_location'][:2]
-        assert d['locked_orientation']==s['diode_location'][2]
+        assert d['locked_orientation']=={'N':'R0','FS':'MX','FN':'MY','S':'R180'}[s['diode_location'][2]]
         assert d['anchor']+'/'+d['pin']==s['target']
         assert d['net'] in plan['allowed_signal_nets_to_reroute']
     assert sites['native_placement_checked'] is False

@@ -1,5 +1,16 @@
 import pytest
-from host_idle_residual_selection import select
+from host_idle_residual_selection import select, validate_orientations
+
+
+@pytest.mark.parametrize('orient',['R0','MX','MY','R180'])
+def test_accepts_native_orientation_names(orient):
+    validate_orientations({'diodes':[{'locked_orientation':orient}]})
+
+
+@pytest.mark.parametrize('orient',['N','FS','FN','S',None,'bad'])
+def test_rejects_def_and_invalid_orientations_before_edit(orient):
+    with pytest.raises(ValueError,match='native OpenDB'):
+        validate_orientations({'diodes':[{'locked_orientation':orient}]})
 
 
 def test_selects_actual_crossing_and_eligible_data_only():

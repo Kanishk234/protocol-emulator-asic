@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-06 — Locate both residual edges; prepare one native early-repair control
+
+-42337691489 succeeds on combined42305323874 source; exact saved/live overflow2 is two horizontalMetal3edges, each excess1:500400..507600,Y205200 and702000..709200,Y219600DBU. Persist source-bound readback receipt. These are guide candidates, not exact crossing proofs.
+- Exact final DEF/net connectivity finds no antenna diode on any of6failing nets. Offline pinned-LEF/DEF gap search finds6nearby nonoverlapping diode footprints; only2share the first-receiver-rectangle gridcell. Save explicitly unqualified receiver-site feasibility, not a repair proof; native placement/low-layer attachment/timing remain unmeasured. Do not blindly place6diodes or reuse old sites.
+- D-160 prepares rtl_host_idle_early250 with one native optimizer target change:earlyhold175→250ps,late175fixed; same source/native order/20ns/allgates. Hypothesis: shift repair effort before cleanup to reduce later unprotected branches, not guaranteed closure. Exact CI prep passes, only one project-config field changes, RTL inventory equals the22-case-passing combined source.70focused source/profile/native-effective/readback checks,actionlint/diff checks pass. Main hardware/config/official jobs untouched; no DRT or phase tick. Next inspect this controlled screen's measured gates and repair counts.
+
 ## 2026-11-06 — Bind combined residual readback and exact antenna receivers
 
 - Fresh combined antenna report42305323874 identifies _37254_/B1,fanout1640/A,hold8876/A,wire14221/A,_37307_/A2 atMetal3 and hold11497/A atMetal2. Save host_idle_antenna_42305323874.json; prior source cell/diode sites are not reused.

@@ -34,7 +34,42 @@
     "idle_ff/evidence.json",
     "host_port_align/evidence.json"
   ],
-  "combined_protocol_regression": "running; no pass claimed",
+  "combined_protocol_regression": "passed",
   "protocol_test_count": 22,
-  "scope": "Controlled source composition, not a proved antenna/congestion fix or physical qualification"
+  "scope": "Controlled source composition, not a proved antenna/congestion fix or physical qualification",
+  "combined_protocol_result": {
+    "tests": 22,
+    "passed": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "offline_sigrok_enabled": true,
+    "wall_seconds": 2093.99,
+    "result_xml_sha256": "6ede66a5e7f0ffa8bb25a98f3682c4c79df0f6b5489aaaaeca3bdb3f1bb30428",
+    "test_names": [
+      "test_l3_uart_tx",
+      "test_l3_uart_rx_framing",
+      "test_l3_midi_tx",
+      "test_l3_dmx_tx",
+      "test_l3_ws2812_tx",
+      "test_l3_dshot_tx",
+      "test_l3_servo_pwm",
+      "test_l3_i2s",
+      "test_l3_spi_controller",
+      "test_l3_i2c_controller",
+      "test_l3_spi_target",
+      "test_l3_i2c_target",
+      "test_l3_ps2_device_to_host",
+      "test_l3_ps2_host_to_device",
+      "test_l3_onewire_read_rom",
+      "test_l3_jtag_idcode",
+      "test_l3_smbus_word_pec",
+      "test_l3_swd_dpidr_read_with_wait_retry",
+      "test_l3_hdlc_tx_loopback",
+      "test_l3_lin_commander_publish_response",
+      "test_l3_can_standard_frame_and_ack",
+      "test_l3_ir_nec_repeat_rx"
+    ],
+    "scope": "Matched 2/4 RTL simulation; not routed gate-level or physical signoff"
+  }
 }

@@ -1,0 +1,157 @@
+{
+  "source_run": 42305323874,
+  "maximum_displacement_um": 20,
+  "sizing": [],
+  "diodes": [
+    {
+      "name": "tripwire_combined_ant_0",
+      "anchor": "_37254_",
+      "anchor_master": "sg13cmos5l_a21oi_1",
+      "pin": "B1",
+      "net": "_10185_",
+      "locked_site_dbu": [
+        824640,
+        264600
+      ],
+      "locked_orientation": "FS"
+    },
+    {
+      "name": "tripwire_combined_ant_1",
+      "anchor": "hold11497",
+      "anchor_master": "sg13cmos5l_dlygate4sd3_1",
+      "pin": "A",
+      "net": "u_chip.g_lane[1].ot[9]",
+      "locked_site_dbu": [
+        520800,
+        204120
+      ],
+      "locked_orientation": "FS"
+    },
+    {
+      "name": "tripwire_combined_ant_2",
+      "anchor": "fanout1640",
+      "anchor_master": "sg13cmos5l_buf_2",
+      "pin": "A",
+      "net": "net1643",
+      "locked_site_dbu": [
+        402240,
+        56700
+      ],
+      "locked_orientation": "N"
+    },
+    {
+      "name": "tripwire_combined_ant_3",
+      "anchor": "hold8876",
+      "anchor_master": "sg13cmos5l_dlygate4sd3_1",
+      "pin": "A",
+      "net": "net11819",
+      "locked_site_dbu": [
+        391680,
+        68040
+      ],
+      "locked_orientation": "FS"
+    },
+    {
+      "name": "tripwire_combined_ant_4",
+      "anchor": "wire14221",
+      "anchor_master": "sg13cmos5l_buf_2",
+      "pin": "A",
+      "net": "net14221",
+      "locked_site_dbu": [
+        740640,
+        415800
+      ],
+      "locked_orientation": "FS"
+    },
+    {
+      "name": "tripwire_combined_ant_5",
+      "anchor": "_37307_",
+      "anchor_master": "sg13cmos5l_a22oi_1",
+      "pin": "A2",
+      "net": "net15518",
+      "locked_site_dbu": [
+        815520,
+        294840
+      ],
+      "locked_orientation": "FS"
+    }
+  ],
+  "allowed_signal_nets_to_reroute": [
+    "_10185_",
+    "u_chip.g_lane[1].ot[9]",
+    "net1643",
+    "net11819",
+    "net14221",
+    "net15518"
+  ],
+  "scope": "Six passive receiver-local diodes plus native reroute of one actual signal crossing per residual edge; diagnostics only",
+  "residual_edges": [
+    {
+      "layer": "Metal3",
+      "direction": "HORIZONTAL",
+      "x_index": 69,
+      "y_index": 28,
+      "start_dbu": [
+        500400,
+        205200
+      ],
+      "end_dbu": [
+        507600,
+        205200
+      ],
+      "capacity": 18.0,
+      "usage": 19.0,
+      "overflow": 1.0,
+      "guide_overlap_candidates": [
+        "_11000_",
+        "_11232_",
+        "_11284_",
+        "_19891_",
+        "net1003",
+        "net11787",
+        "net12232",
+        "net12403",
+        "net12729",
+        "net12795",
+        "net1291",
+        "net1380",
+        "net1582",
+        "net1781",
+        "net4046"
+      ]
+    },
+    {
+      "layer": "Metal3",
+      "direction": "HORIZONTAL",
+      "x_index": 97,
+      "y_index": 30,
+      "start_dbu": [
+        702000,
+        219600
+      ],
+      "end_dbu": [
+        709200,
+        219600
+      ],
+      "capacity": 17.0,
+      "usage": 18.0,
+      "overflow": 1.0,
+      "guide_overlap_candidates": [
+        "_19598_",
+        "_19607_",
+        "_19619_",
+        "clknet_6_36__leaf_clk_regs",
+        "clknet_leaf_261_clk_regs",
+        "net11788",
+        "net12029",
+        "net12772",
+        "net12856",
+        "net13408",
+        "net13682",
+        "net13868",
+        "net405",
+        "net468"
+      ]
+    }
+  ]
+}

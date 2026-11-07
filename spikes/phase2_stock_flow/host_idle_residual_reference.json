@@ -1,0 +1,16 @@
+{
+  "source_run": 42305323874,
+  "routed_nets": 45192,
+  "hold_ns": {
+    "nom_fast_1p32V_m40C": 0.138366,
+    "nom_slow_1p08V_125C": 0.736254,
+    "nom_typ_1p20V_25C": 0.35542
+  },
+  "signoff_hold_ns": {
+    "nom_fast_1p32V_m40C": 0.288366,
+    "nom_slow_1p08V_125C": 0.886254,
+    "nom_typ_1p20V_25C": 0.50542
+  },
+  "overflow": 2,
+  "antenna_nets": 6
+}

@@ -1,0 +1,20 @@
+{
+  "run": 42353123268,
+  "net15518_only": {
+    "routing": "success",
+    "independent_routed_net_coverage": 45192,
+    "added_diodes": 1,
+    "live_overflow": 13,
+    "timing_measured": false,
+    "antenna_measured": false,
+    "physical_qualified": false
+  },
+  "omit_net15518": {
+    "routing": "failure",
+    "added_diodes": 7,
+    "error": "GRT-0183: net12232 heap underflow during 3D maze routing",
+    "timing_measured": false,
+    "physical_qualified": false
+  },
+  "conclusion": "Failure does not uniquely follow net15518; batch routing order/resource interaction remains plausible, not proved. Full-net rerouting also increases congestion in successful isolated case."
+}

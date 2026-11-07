@@ -1,0 +1,17 @@
+{
+  "source_run": 42305323874,
+  "routed_nets": 45192,
+  "original_atomic_sha256": "5173d5f3aaf569b2961402ed279847cda932998dccd57313d88b6a669041739b",
+  "receiver_component_node_counts": {
+    "_10185_": 67,
+    "u_chip.g_lane[1].ot[9]": 17,
+    "net1643": 121,
+    "net11819": 25,
+    "net14221": 42,
+    "net15518": 84
+  },
+  "added_diodes": 6,
+  "passive_footprint_um2": 32.6592,
+  "maximum_local_radius_grid_cells": 4,
+  "scope": "All original route edges preserved except two actual overloaded atomic edges; local capacity-aware attachments; native physical qualification still required"
+}

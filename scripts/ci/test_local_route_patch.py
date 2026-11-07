@@ -1,5 +1,5 @@
 import pytest
-from local_route_patch import PITCH, edge, path, patch, audit, pins, component
+from local_route_patch import PITCH, edge, path, patch, audit, pins, component, detour_one, select_detours
 
 
 def grid():
@@ -82,3 +82,53 @@ def test_pin_inventory_parser_rejects_missing_or_duplicate_rows():
     assert pins('n 1\na/A 3600 10800\n')=={'n':{'a/A':(3600,10800)}}
     for text in ('n 2\na/A 3600 10800\n','n 2\na/A 3600 10800\na/A 3600 10800\n','n 0\n'):
         with pytest.raises(ValueError):pins(text)
+
+
+def test_detour_can_start_on_nearby_existing_tree_component():
+    a=(3600,3600,3);b=(10800,3600,3);e=edge(a,b)
+    branch=[edge(a,(3600,3600,2)),edge((3600,3600,2),(3600,10800,2)),
+            edge((3600,10800,2),(3600,10800,3))]
+    free={k:0 for k in grid()};free[e]=-1
+    free[edge((3600,10800,3),(10800,10800,3))]=1
+    free[edge((10800,3600,2),(10800,10800,2))]=1
+    old=branch+[e,edge((10800,3600,2),b)]
+    changed,record,left=detour_one(old,free,dict(net='n',edge=e))
+    assert set(branch)<=set(changed) and e not in changed and left[e]==0
+    audit({'n':old},{'n':changed},[record])
+
+
+def test_selection_prefers_removing_redundant_crossing_over_new_wire():
+    a=(3600,3600,3);b=(10800,3600,3);e=edge(a,b)
+    loop=[a,(3600,3600,4),(3600,10800,4),(3600,10800,3),
+          (10800,10800,3),(10800,10800,4),(10800,3600,4),b]
+    cycle=[e]+[edge(x,y) for x,y in zip(loop,loop[1:])]
+    free={k:0 for k in grid()};free[e]=-1
+    chosen,_=select_detours({'a':[e],'b':cycle},free,[e],{'a','b'})
+    assert chosen[0]['net']=='b'
+    changed,ledger,_=patch({'a':[e],'b':cycle},free,chosen,[])
+    assert ledger[0]['added']==[]
+    audit({'a':[e],'b':cycle},{'a':[e],**changed},ledger)
+
+
+@pytest.mark.parametrize('kwargs',[{'radius':0},{'radius':65},{'maximum_cost':1601},{'radius':True}])
+def test_unbounded_or_invalid_search_limits_reject(kwargs):
+    with pytest.raises(ValueError,match='limits'):
+        path((3600,3600,3),{(10800,3600,3)},grid(),set(),**kwargs)
+
+
+def test_wider_search_reaches_real_spare_capacity_without_changing_capacity():
+    free={}
+    for x in range(-1,3):
+        for y in range(8):
+            for z in (2,3,4):
+                a=(3600+x*PITCH,3600+y*PITCH,z)
+                b=(a[0]+(PITCH if z==3 else 0),a[1]+(0 if z==3 else PITCH),z)
+                free[edge(a,b)]=0 if z==3 and x==0 and y!=6 else 1
+    a=(3600,3600,3);b=(10800,3600,3);e=edge(a,b);free[e]=-1
+    before=free.copy()
+    with pytest.raises(ValueError,match='bounded path'):
+        detour_one([e],free,dict(net='n',edge=e))
+    new,record,left=detour_one([e],free,dict(net='n',edge=e,radius=6))
+    assert free==before and left[e]==0 and min(left.values())>=0
+    assert any(x[1]==3600+6*PITCH and y[1]==x[1] and x[2]==y[2]==3 for x,y in record['added'])
+    audit({'n':[e]},{'n':new},[record])

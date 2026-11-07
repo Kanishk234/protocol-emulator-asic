@@ -287,7 +287,7 @@ jobs:
         if not edit:assert set(antenna.values())=={6}
         if edit:
             intervention=json.loads(Path('runs/route-reopen-calibration/intervention.json').read_text())
-            assert intervention.get('added_diodes') == 6
+            assert intervention.get('added_diodes') == 8
             assert len(intervention.get('selected_actual_crossing_nets', [])) == 2
             assert intervention.get('post_router_placement_and_connections_verified') is True
             assert intervention.get('placement_checked') is True

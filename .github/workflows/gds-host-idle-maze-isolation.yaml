@@ -1,0 +1,168 @@
+name: gds-host-idle-maze-isolation
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-host-idle-maze-isolation
+  cancel-in-progress: false
+jobs:
+  isolate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      PDK_ROOT: /home/runner/pdk
+      CHECKPOINT: host_idle_final
+      LOCAL_ANTENNA_EDIT: 'true'
+      RESIDUAL_SCOPE: ${{ matrix.scope }}
+    steps:
+    - name: Check out project
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Select the reviewed frozen source
+      run: "python - <<'PYCODE'\nimport json, os\nfrom pathlib import Path\nmanifests = {'host_idle_final': 'spikes/phase2_stock_flow/host_idle_final_checkpoint.json'}\n\
+        path = manifests[os.environ['CHECKPOINT']]\nmanifest = json.loads(Path(path).read_text())\nvalues = dict(SOURCE_MANIFEST=path,\
+        \ SOURCE_RUN=manifest['run']['id'],\n              SOURCE_ARTIFACT=manifest['artifact']['id'],\n       \
+        \       SOURCE_ARTIFACT_NAME=manifest['artifact']['name'])\nwith open(os.environ['GITHUB_ENV'], 'a') as\
+        \ output:\n    for key, value in values.items():\n        output.write(f'{key}={value}\\n')\nPYCODE"
+    - name: Restore and hash-verify the frozen physical checkpoint
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: "set -euo pipefail\ngh api repos/${{ github.repository }}/actions/runs/$SOURCE_RUN > recovery-source-run.json\n\
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT > recovery-source-artifact.json\n\
+        gh api repos/${{ github.repository }}/actions/artifacts/$SOURCE_ARTIFACT/zip > frozen.zip\npython - <<'PY'\n\
+        import hashlib, json, os, zipfile\nfrom pathlib import Path, PurePosixPath\nm=json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())\n\
+        digest=hashlib.sha256()\nwith open('frozen.zip','rb') as src:\n    for chunk in iter(lambda:src.read(8*1024*1024),b''):digest.update(chunk)\n\
+        assert 'sha256:'+digest.hexdigest()==m['artifact']['digest']\nwith zipfile.ZipFile('frozen.zip') as z:\n\
+        \    for info in z.infolist():\n        p=PurePosixPath(info.filename)\n        assert not p.is_absolute()\
+        \ and '..' not in p.parts\n    z.extractall('frozen-artifact')\nPY\npython - <<'PYCODE'\nimport hashlib,\
+        \ json, os, shutil, sys\nfrom pathlib import Path\nsys.path.insert(0, 'scripts/ci')\nfrom stock_checkpoint_recovery\
+        \ import validate\nmanifest = json.loads(Path(os.environ['SOURCE_MANIFEST']).read_text())\nrun = json.loads(Path('recovery-source-run.json').read_text())\n\
+        artifact = json.loads(Path('recovery-source-artifact.json').read_text())\n# Verify all frozen inputs before\
+        \ copying to their original runner paths.\nvalidate(Path('frozen-artifact'), manifest, run, artifact)\n\
+        assert not Path('runs').exists(), 'Unexpected existing physical output'\n# Do not restore the source run's\
+        \ completed corner audit into our fresh output path.\nshutil.copytree(Path('frozen-artifact/runs/stock-official-baseline'),\n\
+        \                Path('runs/stock-official-baseline'))\nfor folder in ('src', 'macro'):\n    shutil.copytree(Path('frozen-artifact')\
+        \ / folder, Path(folder), dirs_exist_ok=True)\nshutil.copy2('frozen-artifact/info.yaml', 'info.yaml')\n\
+        source = validate(Path('.'), manifest, run, artifact, require_runner_root=True)\nPath('runs/stock-recovery-validation.json').write_text(json.dumps(dict(\n\
+        \    source_run=run['id'], source_sha=run['head_sha'], artifact_id=artifact['id'],\n    source_state=str(source),\
+        \ frozen_file_hashes=manifest['files'],\n    physical_repairs_performed=False, saved_state_rewritten=False),\
+        \ indent=2) + '\\n')\nprint('Verified exact frozen post-antenna checkpoint:', source)\nPYCODE"
+    - name: Check out Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+        path: tt
+    - name: Check out the pinned IHP installer
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-gds-action
+        ref: 3412659307918422f3f0727917cf9b499aaca588
+        path: .tt-gds-action
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install Tiny Tapeout prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install flow dependencies
+      run: pip install -r tt/requirements.txt
+    - name: Install IHP PDK
+      run: ./.tt-gds-action/install_sg13cmos5l.sh
+    - name: Install pinned LibreLane
+      run: pip install librelane==3.1.0.dev3
+    - name: Verify the original stock engine image
+      run: 'set -euo pipefail
+
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev3
+
+        python - <<''PYCODE''
+
+        import json, os, subprocess
+
+        from pathlib import Path
+
+        m = json.loads(Path(os.environ[''SOURCE_MANIFEST'']).read_text())[''toolchain'']
+
+        image = m[''stock_image'']
+
+        digests = json.loads(subprocess.check_output([''docker'', ''image'', ''inspect'', image, ''--format'', ''{{json
+        .RepoDigests}}''], text=True))
+
+        assert image.rsplit('':'', 1)[0] + ''@'' + m[''stock_digest''] in digests, ''Stock engine digest differs
+        from source run''
+
+        print(''Verified original unmodified stock image digest'')
+
+        PYCODE'
+    - name: Run bounded maze isolation without timing or qualification
+      run: 'set -euo pipefail
+
+        docker run --rm --network none --user "$(id -u):$(id -g)" -e RESIDUAL_SCOPE="$RESIDUAL_SCOPE" -e LOCAL_ANTENNA_EDIT="$LOCAL_ANTENNA_EDIT"
+        -e SOURCE_MANIFEST="$SOURCE_MANIFEST" -v "$PWD:$PWD" -v "$PDK_ROOT:$PDK_ROOT:ro" -w "$PWD" ghcr.io/librelane/librelane:3.1.0.dev3
+        openroad -exit -python scripts/ci/host_idle_residual_repair.py > runs/route-reopen.log 2>&1
+
+        '
+    - name: Independently validate every routed net and pin in the exported database
+      run: 'set -euo pipefail
+
+        docker run --rm --network none --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -v "$PDK_ROOT:$PDK_ROOT:ro" -w
+        "$PWD" ghcr.io/librelane/librelane:3.1.0.dev3 openroad -exit -python scripts/ci/validate_route_coverage.py
+        > runs/route-coverage.log 2>&1
+
+        python - <<''PYCODE''
+
+        import json, re
+
+        from pathlib import Path
+
+        log = Path(''runs/route-coverage.log'').read_text()
+
+        assert not re.search(r''(?m)^\[ERROR\b'', log), ''Native coverage validator logged errors''
+
+        receipt = json.loads(Path(''runs/route-reopen-calibration/native_coverage.json'').read_text())
+
+        assert receipt[''all_routed_nets_connected_and_pins_covered''] is True
+
+        assert receipt[''independent_process''] is True and receipt[''routed_nets''] == 45192
+
+        PYCODE'
+    - name: Mark successful isolation as diagnostic only
+      run: "python - <<'PY'\nimport json, os\nfrom pathlib import Path\nroot=Path('runs/route-reopen-calibration')\n\
+        r=json.loads((root/'intervention.json').read_text())\nexpected={'net15518_only':1,'omit_net15518':7}[os.environ['RESIDUAL_SCOPE']]\n\
+        assert r['added_diodes']==expected and r['isolation_scope']==os.environ['RESIDUAL_SCOPE']\n(root/'isolation_result.json').write_text(json.dumps(dict(\n\
+        \    scope=os.environ['RESIDUAL_SCOPE'],native_routing_completed=True,\n    added_diodes=expected,physical_qualified=False,timing_measured=False,\n\
+        \    antenna_measured=False,diagnostic_only=True),indent=2)+'\\n')\nPY"
+    - name: Upload pre-route geometry and isolation evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: host-idle-maze-${{ matrix.scope }}-${{ github.run_id }}
+        path: 'runs/route-reopen-calibration/**
+
+          runs/route-reopen.log
+
+          runs/route-coverage.log
+
+          runs/stock-recovery-validation.json
+
+          recovery-source-run.json
+
+          recovery-source-artifact.json
+
+          spikes/phase2_stock_flow/host_idle_residual_plan.json'
+        if-no-files-found: warn
+    strategy:
+      fail-fast: false
+      matrix:
+        scope:
+        - net15518_only
+        - omit_net15518

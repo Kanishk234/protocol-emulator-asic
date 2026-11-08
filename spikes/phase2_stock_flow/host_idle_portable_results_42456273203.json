@@ -1,0 +1,206 @@
+{
+  "source_run": 42456273203,
+  "all_trials_qualified": false,
+  "results": [
+    {
+      "variant": "debug_align",
+      "setup_summary_ns": {
+        "nom_fast_1p32V_m40C": 0,
+        "nom_slow_1p08V_125C": 0,
+        "nom_typ_1p20V_25C": 0
+      },
+      "original_fast_hold_ns": 0.08394,
+      "slow_slew": 0,
+      "fanout": 0,
+      "antenna": {
+        "antenna__violating__nets": 5,
+        "antenna__violating__pins": 5
+      },
+      "overflow": 3,
+      "area_um2": 692996,
+      "electrical": {
+        "nom_fast_1p32V_m40C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_slow_1p08V_125C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_typ_1p20V_25C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        }
+      }
+    },
+    {
+      "variant": "clock75",
+      "setup_summary_ns": {
+        "nom_fast_1p32V_m40C": 0,
+        "nom_slow_1p08V_125C": 0,
+        "nom_typ_1p20V_25C": 0
+      },
+      "original_fast_hold_ns": 0.0701547,
+      "slow_slew": 2,
+      "fanout": 0,
+      "antenna": {
+        "antenna__violating__nets": 1,
+        "antenna__violating__pins": 1
+      },
+      "overflow": 1,
+      "area_um2": 687647,
+      "electrical": {
+        "nom_fast_1p32V_m40C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_slow_1p08V_125C": {
+          "slew": 2,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_typ_1p20V_25C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        }
+      }
+    },
+    {
+      "variant": "density64",
+      "setup_summary_ns": {
+        "nom_fast_1p32V_m40C": 0,
+        "nom_slow_1p08V_125C": 0,
+        "nom_typ_1p20V_25C": 0
+      },
+      "original_fast_hold_ns": 0.135747,
+      "slow_slew": 4,
+      "fanout": 0,
+      "antenna": {
+        "antenna__violating__nets": 3,
+        "antenna__violating__pins": 3
+      },
+      "overflow": 69,
+      "area_um2": 689160,
+      "electrical": {
+        "nom_fast_1p32V_m40C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_slow_1p08V_125C": {
+          "slew": 4,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_typ_1p20V_25C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        }
+      }
+    },
+    {
+      "variant": "late125",
+      "setup_summary_ns": {
+        "nom_fast_1p32V_m40C": 0,
+        "nom_slow_1p08V_125C": 0,
+        "nom_typ_1p20V_25C": 0
+      },
+      "original_fast_hold_ns": 0.076638,
+      "slow_slew": 6,
+      "fanout": 0,
+      "antenna": {
+        "antenna__violating__nets": 9,
+        "antenna__violating__pins": 9
+      },
+      "overflow": 46,
+      "area_um2": 686658,
+      "electrical": {
+        "nom_fast_1p32V_m40C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_slow_1p08V_125C": {
+          "slew": 6,
+          "cap": 0,
+          "fanout": 0
+        },
+        "nom_typ_1p20V_25C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 0
+        }
+      }
+    },
+    {
+      "variant": "mode_ff",
+      "setup_summary_ns": {
+        "nom_fast_1p32V_m40C": 0,
+        "nom_slow_1p08V_125C": 0,
+        "nom_typ_1p20V_25C": 0
+      },
+      "original_fast_hold_ns": -0.218153,
+      "slow_slew": 0,
+      "fanout": 1,
+      "antenna": {
+        "antenna__violating__nets": 5,
+        "antenna__violating__pins": 5
+      },
+      "overflow": 301,
+      "area_um2": 694128,
+      "electrical": {
+        "nom_fast_1p32V_m40C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 1
+        },
+        "nom_slow_1p08V_125C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 1
+        },
+        "nom_typ_1p20V_25C": {
+          "slew": 0,
+          "cap": 0,
+          "fanout": 1
+        }
+      }
+    }
+  ],
+  "evidence_scope": "Fresh estimated original/signoff timing and final antenna/global routing; not extracted timing or detailed-route closure",
+  "artifact_entries_crc_verified": true,
+  "whole_archive_digest_independently_verified": false,
+  "strongest_next_diagnostic_source": "clock75",
+  "official_gds_qualified": false,
+  "repair": {
+    "run": 42455208235,
+    "conclusion": "120-minute step timeout",
+    "last_completed_iteration": 5,
+    "last_completed_drc_markers": 92,
+    "last_partial_iteration": 6,
+    "completed_routed_state": false
+  },
+  "clock75_residual": {
+    "slew_pins": [
+      "u_chip.g_lane[1].u_slots.g_word[51].u_icg/GATE",
+      "_32278_/Y"
+    ],
+    "slow_slew_ns": [
+      3.206171,
+      3.20379
+    ],
+    "limit_ns": 2.5074,
+    "antenna_net": "net12708",
+    "antenna_pin": "wire12708/A",
+    "antenna_layer": "Metal3",
+    "cumulative_ratio": 316.21,
+    "required_ratio": 200,
+    "overflow": 1
+  }
+}

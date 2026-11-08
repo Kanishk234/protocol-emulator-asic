@@ -7,12 +7,17 @@ from pathlib import Path
 BASE_PROFILE = 'rtl_shared_minbuf2_host_idle_ff'
 BASE_RUN = 42305323874
 BASE_CONFIG_SHA256 = '920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567'
+CLOCK75_CONFIG_SHA256 = '35bacb325c12276dd63f7e33b99f94b5e0d4940f7b3a22a6bd1e63424bc4c97a'
 VARIANTS = {
     'density64': {'PL_TARGET_DENSITY_PCT': 64},
     'clock75': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
     'late125': {'GRT_RESIZER_HOLD_SLACK_MARGIN': 0.125},
     'mode_ff': {},
     'debug_align': {},
+    'clock75_wire180': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75,
+                        'GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH': 180},
+    'clock75_slew25': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75,
+                       'GRT_DESIGN_REPAIR_MAX_SLEW_PCT': 25},
 }
 
 
@@ -50,6 +55,19 @@ def select(config, selected, variant):
         receipt['additional_changes_from_reference'] = {'source_patch': 'mode_ff/mode_ff_storage.patch'}
     if variant == 'debug_align':
         receipt['additional_changes_from_reference'] = {'source_patch': 'host_debug_align/host_debug_align.patch'}
+    if variant.startswith('clock75_'):
+        reference = deepcopy(config)
+        reference.update(VARIANTS['clock75'])
+        reference_sha = hashlib.sha256((json.dumps(reference, indent=2) + '\n').encode()).hexdigest()
+        if reference_sha != CLOCK75_CONFIG_SHA256:
+            raise ValueError('Clock75 comparison configuration drift')
+        delta = {k: v for k, v in result.items() if reference.get(k) != v}
+        if len(delta) != 1:
+            raise ValueError('Residual trial must change one field from clock75')
+        receipt.update(comparison_reference_run=42456273203,
+                       comparison_reference_artifact_id=13611529602,
+                       comparison_reference_config_sha256=reference_sha,
+                       additional_changes_from_reference=delta)
     return result, receipt
 
 

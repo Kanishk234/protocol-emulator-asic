@@ -25,8 +25,8 @@ def test_exact_source_one_variable_and_fixed_acceptance_inputs(variant):
     assert result['CLOCK_PERIOD']==20
     assert result['MACROS']==config['MACROS'] and result['MACROS'] is not config['MACROS']
     assert (config,selected)==original
-    assert receipt['comparison_reference_run']==42305323874
-    assert receipt['comparison_reference_config_sha256']==BASE_CONFIG_SHA256
+    assert receipt['comparison_reference_run']==(42456273203 if variant.startswith('clock75_') else 42305323874)
+    if not variant.startswith('clock75_'):assert receipt['comparison_reference_config_sha256']==BASE_CONFIG_SHA256
     assert receipt['manual_checkpoint_repairs'] is False and receipt['official_gds_signoff'] is False
     assert receipt['hardware_unchanged']==(variant not in ('mode_ff','debug_align'))
     assert all(receipt[k] for k in ('c_select','idle_ff','host_port_align'))
@@ -69,3 +69,16 @@ def test_source_trials_reject_failed_pending_or_skipped_smokes(status,counts):
     passed,failed,skipped=counts
     with pytest.raises(ValueError,match='smoke'):
         require_smoke(dict(chip_smoke_status=status,chip_smoke=dict(passed=passed,failed=failed,skipped=skipped)))
+
+
+@pytest.mark.parametrize('variant,key,value',[
+    ('clock75_wire180','GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH',180),
+    ('clock75_slew25','GRT_DESIGN_REPAIR_MAX_SLEW_PCT',25)])
+def test_residual_trials_are_independent_single_deltas_from_measured_clock75(variant,key,value):
+    from host_idle_portable_trials import CLOCK75_CONFIG_SHA256
+    config,selected=reference();result,receipt=select(config,selected,variant)
+    assert result['CTS_SINK_CLUSTERING_MAX_DIAMETER']==75
+    assert receipt['additional_changes_from_reference']=={key:value}
+    assert receipt['comparison_reference_config_sha256']==CLOCK75_CONFIG_SHA256
+    assert receipt['comparison_reference_artifact_id']==13611529602
+    assert result['GRT_RESIZER_HOLD_SLACK_MARGIN']==.175

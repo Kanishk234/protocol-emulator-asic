@@ -1,0 +1,75 @@
+{
+  "reference_sha256": "0e5584c920c1491b1996d7d8ece5972f999b5f1ff52e19e8782f0f8afdda66e1",
+  "candidate_sha256": "8f30bfa994ab5c315b34530c3d5ef5d088f303cf518cb8716d82ef059f826e72",
+  "patch_sha256": "39404b5c08ccdd163a71f5758c6551fc771fa79a21a934857a133ff10ab40bcd",
+  "proofs": [
+    {
+      "nl": 2,
+      "nu": 4,
+      "points": 1062,
+      "induction_sequence_cap": 2
+    },
+    {
+      "nl": 3,
+      "nu": 6,
+      "points": 1144,
+      "induction_sequence_cap": 2
+    }
+  ],
+  "isolated_mapping": {
+    "2": {
+      "gold": {
+        "gates": 742,
+        "delay_ps": 1467.61,
+        "area_um2": 7621.803
+      },
+      "gate": {
+        "gates": 412,
+        "delay_ps": 1321.73,
+        "area_um2": 4622.2974
+      }
+    },
+    "3": {
+      "gold": {
+        "gates": 1170,
+        "delay_ps": 1581.25,
+        "area_um2": 12090.33
+      },
+      "gate": {
+        "gates": 601,
+        "delay_ps": 1593.73,
+        "area_um2": 6515.4348
+      }
+    }
+  },
+  "scope": "Only host lane-debug record alignment; no added state,cycles or ABI change. Complete host/SPI equivalence at stated counts; mapped numbers are isolated guarded debug-word cone, not whole-host/full-chip area or extracted timing.",
+  "chip_smoke_status": "passed",
+  "protocol_suite_status": "running; full22case Verilator replay with real sigrok enabled, no pass claimed",
+  "physical_qualified": false,
+  "wrong_stride_mutant_rejected": true,
+  "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+  "verification_command": "source .venv/bin/activate; python scripts/ci/verify_host_debug_align.py --reference /tmp/tripwire-host-idle-combined/src/trw_host.v --includes /tmp/tripwire-host-idle-combined/src --output /tmp/tripwire-host-debug-align-reproduction --liberty /tmp/tripwire-pinned-stdcell-slow.lib",
+  "chip_smoke": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "tests": [
+      "test_identity_time_sram",
+      "test_lane_forwards_host_in_to_host_out",
+      "test_pin_units_uart_tx_lean_and_full",
+      "test_routine_on_the_rotation",
+      "test_uart_program_loopback"
+    ],
+    "results_xml_sha256": "b94d224adac0d07575a425657d62b55a3b3a893733e567d9110683854f7977e4",
+    "scope": "Matched2/4 source/software RTL chip smoke; not full suite or GL"
+  },
+  "protocol_suite_run": {
+    "log": "/tmp/tripwire-host-debug-align-chip/l3.log",
+    "results_xml": "/tmp/tripwire-host-debug-align-chip/l3_results.xml",
+    "simulator": "verilator",
+    "sigrok_enabled": true,
+    "sigrok_version": "0.7.2",
+    "spec_file": "/tmp/tripwire-host-debug-align-chip/tools/tripwire_spec.py",
+    "consumer_count": 9
+  }
+}

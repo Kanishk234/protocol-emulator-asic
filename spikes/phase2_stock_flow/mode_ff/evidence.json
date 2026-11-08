@@ -1,0 +1,149 @@
+{
+  "reference_sha256": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+  "candidate_sha256": "4280e4a3f05159708fd09a51fe37cc7d85cd3273eadb30d7cfe134d0c81a3820",
+  "patch_sha256": "999d86ec8ce3ffefbad22f917ace3af4a4922234cd213baf24f85ea12a1eec51",
+  "scope": "Add five root-clock enabled-flop configuration bits per unit (TXMODE[2:0], RXMODE[1:0]) to existing IDLE-flop source; fixed observable timing/reset; no physical qualification",
+  "proofs": [
+    {
+      "full": 0,
+      "equivalence_points": 461,
+      "induction_sequence_cap": 6,
+      "phase_cycles": 2080,
+      "phase_checks": 10400
+    },
+    {
+      "full": 1,
+      "equivalence_points": 560,
+      "induction_sequence_cap": 6,
+      "phase_cycles": 2080,
+      "phase_checks": 10400
+    }
+  ],
+  "exhaustive": {
+    "results": [
+      {
+        "full": 0,
+        "cycles": 133152,
+        "phase_checks": 665760,
+        "all_word0_values_per_reset_polarity": 65536,
+        "all_module_outputs_compared": true
+      },
+      {
+        "full": 1,
+        "cycles": 133152,
+        "phase_checks": 665760,
+        "all_word0_values_per_reset_polarity": 65536,
+        "all_module_outputs_compared": true
+      }
+    ],
+    "wrong_reset_mutant_rejected": true,
+    "wrong_reset_mutant_scope": "Only newly converted TXMODE/RXMODE flops get the wrong unconditional reset; existing IDLE branch remains correct. Rejected atcycle173."
+  },
+  "verification_command": "source .venv/bin/activate; python scripts/ci/verify_mode_ff.py --reference /tmp/tripwire-host-idle-combined/src/trw_pin_cfg.v --includes /tmp/tripwire-host-idle-combined/src --output /tmp/tripwire-mode-ff-reproduction",
+  "chip_smoke_status": "passed",
+  "protocol_suite_status": "running; full22case Verilator replay with real sigrok enabled, no pass claimed",
+  "generic_cost": {
+    "scope": "Generic cell-count delta only; not mapped or physical area",
+    "results": {
+      "0": {
+        "gold": {
+          "$dlatch": 118,
+          "$eq": 8,
+          "$logic_and": 10,
+          "$logic_not": 1,
+          "$lt": 1,
+          "$not": 1,
+          "$reduce_and": 2,
+          "$sdff": 1,
+          "$sdffce": 1,
+          "$sdffe": 2,
+          "$sub": 1,
+          "sg13cmos5l_lgcp_1": 9
+        },
+        "gate": {
+          "$dlatch": 113,
+          "$eq": 8,
+          "$logic_and": 10,
+          "$logic_not": 1,
+          "$lt": 1,
+          "$not": 1,
+          "$reduce_and": 2,
+          "$sdff": 1,
+          "$sdffce": 6,
+          "$sdffe": 2,
+          "$sub": 1,
+          "sg13cmos5l_lgcp_1": 9
+        }
+      },
+      "1": {
+        "gold": {
+          "$dffe": 1,
+          "$dlatch": 309,
+          "$eq": 23,
+          "$ge": 1,
+          "$le": 1,
+          "$logic_and": 27,
+          "$logic_not": 1,
+          "$logic_or": 1,
+          "$lt": 1,
+          "$mux": 9,
+          "$ne": 1,
+          "$not": 1,
+          "$or": 2,
+          "$reduce_and": 2,
+          "$reduce_or": 4,
+          "$sdff": 1,
+          "$sdffce": 1,
+          "$sdffe": 3,
+          "$sub": 2,
+          "sg13cmos5l_lgcp_1": 25
+        },
+        "gate": {
+          "$dffe": 1,
+          "$dlatch": 304,
+          "$eq": 23,
+          "$ge": 1,
+          "$le": 1,
+          "$logic_and": 27,
+          "$logic_not": 1,
+          "$logic_or": 1,
+          "$lt": 1,
+          "$mux": 9,
+          "$ne": 1,
+          "$not": 1,
+          "$or": 2,
+          "$reduce_and": 2,
+          "$reduce_or": 4,
+          "$sdff": 1,
+          "$sdffce": 6,
+          "$sdffe": 3,
+          "$sub": 2,
+          "sg13cmos5l_lgcp_1": 25
+        }
+      }
+    }
+  },
+  "chip_smoke": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "tests": [
+      "test_identity_time_sram",
+      "test_lane_forwards_host_in_to_host_out",
+      "test_pin_units_uart_tx_lean_and_full",
+      "test_routine_on_the_rotation",
+      "test_uart_program_loopback"
+    ],
+    "results_xml_sha256": "c246d6cc9983603d0deee3364d49a3064c85668991b988023781ccd284f3406f",
+    "scope": "Matched2/4 source/software; RTL chip smoke only, not full suite/GL"
+  },
+  "protocol_suite_run": {
+    "log": "/tmp/tripwire-mode-ff-chip/l3.log",
+    "results_xml": "/tmp/tripwire-mode-ff-chip/l3_results.xml",
+    "simulator": "verilator",
+    "sigrok_enabled": true,
+    "sigrok_version": "0.7.2",
+    "spec_file": "/home/younix/protocol-emulator-asic/build/stock-minbuf2-ci-prep-20261103-final/tools/tripwire_spec.py",
+    "consumer_count": 9
+  }
+}

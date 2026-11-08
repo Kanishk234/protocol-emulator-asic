@@ -1,0 +1,13 @@
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -202,7 +202,9 @@
+                     if (STORE[16*w + b]) begin : g_latch
+                         // Transparent while the gated clock is high (intentional latch).
+                         reg q;
+-                        if ((16*w + b) == `TRW_PC_IDLE_LSB) begin : g_timing_ff
++                        if (((16*w + b) == `TRW_PC_IDLE_LSB)
++                            || (((16*w + b) >= `TRW_PC_TXMODE_LSB) && ((16*w + b) <= `TRW_PC_TXMODE_MSB))
++                            || (((16*w + b) >= `TRW_PC_RXMODE_LSB) && ((16*w + b) <= `TRW_PC_RXMODE_MSB))) begin : g_timing_ff
+                             // Same write edge/visibility as the staged latch. Reset
+                             // clears this stored bit only when its word is written.
+                             always @(posedge clk) begin

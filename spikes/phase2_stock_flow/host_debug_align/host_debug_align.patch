@@ -1,0 +1,21 @@
+--- a/src/trw_host.v
++++ b/src/trw_host.v
+@@ -231,7 +231,17 @@
+ 
+     // the addressed lane's debug fields
+     wire [1:0]     lk  = r_ln[6:5];
+-    wire [LDW-1:0] ld  = lane_dbg[LDW*lk +: LDW];
++    wire [LDW-1:0] ld;
++    generate if (LDW <= 256) begin : g_aligned_debug
++        wire [256*NL-1:0] words;
++        genvar debug_lane;
++        for (debug_lane=0; debug_lane<NL; debug_lane=debug_lane+1) begin : g_word
++            assign words[256*debug_lane +: 256] = {{(256-LDW){1'b0}}, lane_dbg[LDW*debug_lane +: LDW]};
++        end
++        assign ld = words[256*lk +: LDW];
++    end else begin : g_direct_debug
++        assign ld = lane_dbg[LDW*lk +: LDW];
++    end endgenerate
+     reg  [15:0]    lane_word;
+     always @* begin
+         case (r_ln[4:0])

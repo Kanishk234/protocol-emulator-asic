@@ -1,0 +1,140 @@
+{
+  "reference_sha256": "255aaeeb40fd53477eda811f5781d3d9c75e701510600033799be7465b6151e0",
+  "reference_physical_run": 42456273203,
+  "reference_profile": "clock75",
+  "buffer_master": "sg13cmos5l_buf_4",
+  "buffer_area_um2": 14.5152,
+  "variants": {
+    "constants": {
+      "candidate_sha256": "e9f284d178afac74695a0063e981100480302b4a88a94683e0eb56d10faaf708",
+      "patch_sha256": "9d516d80cdf595c51864c009ab3f5aacd3e02862935c90ec195ee592305c632a",
+      "source_added_buffers_at_2x4": 8,
+      "source_buffer_area_um2": 116.1216,
+      "proofs": [
+        {
+          "mode": "asic",
+          "equivalence_points": 872,
+          "induction_sequence_cap": 6
+        },
+        {
+          "mode": "flops",
+          "equivalence_points": 752,
+          "induction_sequence_cap": 6
+        }
+      ],
+      "chip_smoke_status": "passed",
+      "physical_qualified": false,
+      "foundry_phase_cycles": 3125,
+      "foundry_phase_checks": 12288,
+      "wrong_enable_mutant_rejected": true,
+      "post_abc_source_buffer_count_per_lane": 4,
+      "chip_smoke": {
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "tests": [
+          "test_identity_time_sram",
+          "test_lane_forwards_host_in_to_host_out",
+          "test_pin_units_uart_tx_lean_and_full",
+          "test_routine_on_the_rotation",
+          "test_uart_program_loopback"
+        ],
+        "results_xml_sha256": "8aa306740c49583155e1348dff4db23f369d851bfeb717404e1d2c42c7179a35",
+        "synthesis_path_enabled": false,
+        "real_foundry_cells": false,
+        "rtl_sha256": {
+          "trw_pin_io.v": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+          "trw_alu.v": "b80e1e36b21217b624277579dacbec34c74ea264671ed8ee751242309027219f",
+          "trw_pin_cfg.v": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+          "trw_lane.v": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+          "trw_chip.v": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd",
+          "tt_um_tripwire.v": "f92ba2a7fef45ebb3fb26c01fcb1c3598bb66ef9938c1641b5414ab0bc9c0de9",
+          "trw_chan_port.v": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb",
+          "trw_fabric.v": "f6f5af0e6c9b561bd68fabea949410b15b2b5a1b647d2d291909ef67632aed7f",
+          "trw_spi.v": "ef2203d7c298301d7dd8879f8536df6f55a8cb103f4de080a7fd90e45af646ec",
+          "trw_sram.v": "176405635df07e175a800c13ea29ddf065ca078c1da733d1f681adc833ab53ac",
+          "trw_host.v": "0e5584c920c1491b1996d7d8ece5972f999b5f1ff52e19e8782f0f8afdda66e1",
+          "trw_sync.v": "815ed75caac39b4b9ce951cdf95f95d2a6631e7070b2bd3659fe21fc5a895bb7",
+          "trw_pin_bs.v": "83f82e436b67d79efddae6dc60bdfa4902cf5b250b1cd587ffe2a4c9c1e08340",
+          "trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+          "trw_pin_tx.v": "29bdf26b9cf3d1939d8b8efe7833ac7d6ca1042c71e33c7065462f10e3c7951f",
+          "trw_slots.v": "e9f284d178afac74695a0063e981100480302b4a88a94683e0eb56d10faaf708",
+          "trw_pin_unit.v": "e79409507fc9a9e29ebead7fea2d85e7a555c062815d1bf55fce6ca2067172fe",
+          "RM_IHPSG13_1P_512x16_c2_bm_bist.v": "4a03d7cd63892f1986493339803d6f323b497ae332b2207c2cfd48e3053eb602",
+          "trw_chan_prod.v": "6b41d58996b41970ab958ab0d7d71f1839ddae264856748f7c2d0aa08ecf56e6",
+          "trw_pins.v": "0340599a644ae8315ddce575ddbd76cf5683cc14323668c138e66b94aeb16572"
+        },
+        "scope": "Normal matched2/4 RTL chip smokes. Actual enable buffers independently exercised in real-cell slot-module replay, not in these RTL smokes."
+      },
+      "protocol_suite_status": "running normal RTL with real sigrok; synthesized slot path separately proved and real-cell tested"
+    },
+    "all_words": {
+      "candidate_sha256": "348cc8b36b5338b90701b0d6de3098d1b2f672f0ae5e7a50a4c8808ee4b4cbdf",
+      "patch_sha256": "2e6704af63cb2623496815fb22c39736c461833e542abc209383f99051ba4f09",
+      "source_added_buffers_at_2x4": 104,
+      "source_buffer_area_um2": 1509.5808,
+      "proofs": [
+        {
+          "mode": "asic",
+          "equivalence_points": 872,
+          "induction_sequence_cap": 6
+        },
+        {
+          "mode": "flops",
+          "equivalence_points": 752,
+          "induction_sequence_cap": 6
+        }
+      ],
+      "chip_smoke_status": "passed",
+      "physical_qualified": false,
+      "foundry_phase_cycles": 3125,
+      "foundry_phase_checks": 12288,
+      "wrong_enable_mutant_rejected": true,
+      "post_abc_source_buffer_count_per_lane": 52,
+      "chip_smoke": {
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "tests": [
+          "test_identity_time_sram",
+          "test_lane_forwards_host_in_to_host_out",
+          "test_pin_units_uart_tx_lean_and_full",
+          "test_routine_on_the_rotation",
+          "test_uart_program_loopback"
+        ],
+        "results_xml_sha256": "ac8bb1fae5196ba0a4dc0e72777b87ff949f7dc6c073e410e7cfd2e555eb2c56",
+        "synthesis_path_enabled": false,
+        "real_foundry_cells": false,
+        "rtl_sha256": {
+          "trw_pin_io.v": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+          "trw_alu.v": "b80e1e36b21217b624277579dacbec34c74ea264671ed8ee751242309027219f",
+          "trw_pin_cfg.v": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+          "trw_lane.v": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+          "trw_chip.v": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd",
+          "tt_um_tripwire.v": "f92ba2a7fef45ebb3fb26c01fcb1c3598bb66ef9938c1641b5414ab0bc9c0de9",
+          "trw_chan_port.v": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb",
+          "trw_fabric.v": "f6f5af0e6c9b561bd68fabea949410b15b2b5a1b647d2d291909ef67632aed7f",
+          "trw_spi.v": "ef2203d7c298301d7dd8879f8536df6f55a8cb103f4de080a7fd90e45af646ec",
+          "trw_sram.v": "176405635df07e175a800c13ea29ddf065ca078c1da733d1f681adc833ab53ac",
+          "trw_host.v": "0e5584c920c1491b1996d7d8ece5972f999b5f1ff52e19e8782f0f8afdda66e1",
+          "trw_sync.v": "815ed75caac39b4b9ce951cdf95f95d2a6631e7070b2bd3659fe21fc5a895bb7",
+          "trw_pin_bs.v": "83f82e436b67d79efddae6dc60bdfa4902cf5b250b1cd587ffe2a4c9c1e08340",
+          "trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+          "trw_pin_tx.v": "29bdf26b9cf3d1939d8b8efe7833ac7d6ca1042c71e33c7065462f10e3c7951f",
+          "trw_slots.v": "348cc8b36b5338b90701b0d6de3098d1b2f672f0ae5e7a50a4c8808ee4b4cbdf",
+          "trw_pin_unit.v": "e79409507fc9a9e29ebead7fea2d85e7a555c062815d1bf55fce6ca2067172fe",
+          "RM_IHPSG13_1P_512x16_c2_bm_bist.v": "4a03d7cd63892f1986493339803d6f323b497ae332b2207c2cfd48e3053eb602",
+          "trw_chan_prod.v": "6b41d58996b41970ab958ab0d7d71f1839ddae264856748f7c2d0aa08ecf56e6",
+          "trw_pins.v": "0340599a644ae8315ddce575ddbd76cf5683cc14323668c138e66b94aeb16572"
+        },
+        "scope": "Normal matched2/4 RTL chip smokes. Actual enable buffers independently exercised in real-cell slot-module replay, not in these RTL smokes."
+      },
+      "protocol_suite_status": "running normal RTL with real sigrok; synthesized slot path separately proved and real-cell tested"
+    }
+  },
+  "scope": "General write-enable drive; source buffer area only, no mapped whole-design/physical timing claim",
+  "liberty_sha256": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c",
+  "cells_sha256": "b0adbc84c8f78feb01c3d8d9d55e9818ee6502347d336f3a1f846e6a5d64e0a2",
+  "udp_sha256": "5491a3edf7468792b5222e7abe057e0583a407c01b2086d4fd44a55b6cf88055",
+  "verification_command": "source .venv/bin/activate; python scripts/ci/verify_slot_enable_drive.py --reference /tmp/tripwire-host-idle-combined/src/trw_slots.v --includes /tmp/tripwire-host-idle-combined/src --output /tmp/new-slot-enable-proof --liberty /tmp/tripwire-pinned-stdcell-slow.lib --cells <pinned-pdk>/verilog/sg13cmos5l_stdcell.v --udp <pinned-pdk>/verilog/sg13cmos5l_udp.v --ivl-root ~/.cache/tripwire/iverilog-13"
+}

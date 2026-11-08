@@ -1,0 +1,20 @@
+--- a/src/trw_slots.v
++++ b/src/trw_slots.v
+@@ -60,8 +60,15 @@
+             wire gclk;
+             /* verilator lint_off LATCH */
+ `ifdef SYNTHESIS
+-            // Synthesis (Yosys, LibreLane): the library's integrated clock gate.
+-            sg13cmos5l_lgcp_1 u_icg (.GCLK (gclk), .CLK (clk), .GATE (dec));
++            // Drive the local word-enable wire separately from address decoding.
++            // This adds no state or programming latency; the clock gate is unchanged.
++            wire enable_drive;
++            if (1) begin : g_enable_drive
++                (* keep *) sg13cmos5l_buf_4 u_buf (.A (dec), .X (enable_drive));
++            end else begin : g_direct_enable
++                assign enable_drive = dec;
++            end
++            sg13cmos5l_lgcp_1 u_icg (.GCLK (gclk), .CLK (clk), .GATE (enable_drive));
+ `else
+             // Simulation and lint: the same function, an enable latch transparent while clk is low,
+             // ANDed with clk (intentional latch).

@@ -2,6 +2,15 @@
 
 Newest entry at the top. One entry per work session.
 
+
+## 2026-11-07 — Detailed-route timeout; prepare bounded spatial DRC diagnostic
+
+- Run [42401125214](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42401125214) passes exact green-checkpoint restoration, independent full-net coverage and fresh original/signoff pre-routing gates, then reaches its 330-minute detailed-routing step timeout. Iteration42 ends with96 markers (Metal2 spacing24; shorts Metal2 57/Metal3 11/Metal4 4). Partial iteration43 reaches90% and39 markers before cancellation;39 is not a final DRC result. No completed routed state, extracted timing or post-route antenna qualification exists.
+- Artifact13596501431 retains native logs/config/input but no spatial DRC reports or intermediate routed database. The original config disabled report iterations and snapshots. This prevented identification of the remaining locations after timeout; it does not invalidate the earlier estimated green screen42394957445.
+- Prepare separate gds-host-idle-drt-diagnostic workflow from the same exact green checkpoint, retaining all restoration and fresh pre-routing gates. Cap native DRT at42 (pinned engine stops before43), save DRC reports every iteration, and disable subsequent antenna-repair loops only in this explicitly nonqualifying diagnostic. Normal completion saves a diagnostic routed checkpoint. No source/clock/signoff acceptance or official workflow edits. Add per-iteration reporting to our full continuation without changing its64-iteration/antenna/gate settings.
+- Validation:34 focused tests pass; actionlint passes for both own workflows; all shell blocks and18 embedded Python programs parse; git diff --check passes. No phase boxes ticked. User subsequently explicitly approved the listed grouped commits, push and diagnostic launch, overriding the Git reservation for this scope. Tools06685fd and CIab6a51f committed; publication and dispatch receipt follows after verification.
+- Next: publish grouped tools/tests, own CI and this evidence; launch gds-host-idle-drt-diagnostic. Use spatial DRC reports/checkpoint to identify repair scope before another qualifying route. Extracted timing, routed protocol suite, reproducible main-source integration and unchanged official GDS/precheck remain pending.
+
 ## 2026-11-07 — Strict local-route screen green; bind exact detailed-route continuation
 
 -42394957445 succeeds in both control and edited arms. Independently retrieve/hash source-bound receipts: edited original setup summaries0(allcorners), fast/typical/slow hold0.138366/0.355420/0.736254ns, electrical0(allcorners), antenna0nets/0pins, live overflow0; unchanged-signoff audit passes and independent45192-net native connectivity/actual-layer pin coverage passes. Save host_idle_green_result_42394957445.json. This is experimental estimated screening, not positive extracted margin, official GDS or Phase2completion.

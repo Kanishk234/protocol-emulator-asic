@@ -3,6 +3,22 @@
 Newest entry at the top. One entry per work session.
 
 
+
+
+## 2026-11-08 — Map persistent DRC pairs and prepare repair from existing detailed wires
+
+- CRC-verified diagnostic DEF/netlist/SDC retrieval permits actual placement/net mapping.96markers represent46unique source-net pairs, persistent unchanged at iterations40–42; neither manually detoured net appears. Cell footprint density varies substantially within/around the band; no demonstrated uniform density shortage, SRAM-origin collision or specific root cause. Save compact marker/history/source binding and PHASE2_HOST_IDLE_DRT_HOTSPOT.md; raw maps remain/tmp/artifacts.
+- Inspect exact pinned OpenROAD io.cpp/FlexDR.cpp/FlexDR_init.cpp: imported detailed wires set hasInitialRouting; initial passes use incremental mode before normal DRC repair. Prepare separate gds-host-idle-drt-repair to restore exact completed diagnostic42433571153 and test through iteration12 with120-minute cap, retaining existing detailed wires. This restarts the native strategy, not internal iteration43. All original/green source checks and fresh pre-routing gates retained. Require unchanged placement/logic before and after; clear inherited timing views; preserve fixed20ns and source/signoff constraints. Diagnostic antenna loops remain disabled and no signoff qualification is claimed.
+-48focused tests, actionlint, shell and10embedded Python checks pass; diff clean. No mainhardware/config/official workflow modification or phase ticks. Publication/launch receipt follows after verification.
+- Next inspect the bounded repair's actual marker trajectory/checkpoint. If clean, continue antenna/connectivity/extracted timing/electrical before routed full-suite replay. If plateau remains, investigate targeted pin-access/placement relief with fresh strict screening; do not repeat full42iteration initialization blindly.
+
+## 2026-11-08 — Bounded DRT diagnostic completes and retains spatial evidence
+
+- [42433571153](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42433571153) succeeds in3h49m total; native DRT elapsed3h36m. All exact-source restoration, independent connectivity and fresh pre-routing original/signoff gates pass. Diagnostic stops after42 and saves a completed diagnostic ODB/DEF/netlist/state plus per-iteration DRC reports. This is evidence capture success, not clean-route/signoff qualification; antenna repair deliberately disabled only in this diagnostic.
+- Result96 markers: Metal2 shorts57, Metal3 shorts11, Metal4 shorts4, Metal2 spacing24. Report contains46 unique source-net pairs; all marker boxes lie within x512.06–718.18um,y311.915–377.26um. This spatial concentration is evidence for investigating a local congestion/pin-access cause, not proof of a specific root cause. The earlier39 count was partial iteration43, which this bounded run intentionally does not enter; no regression comparison is justified.
+- Retrieve56 diagnostic JSON/log/report entries from artifact13605087039 (336453219bytes) using exact ranged reads and per-entry ZIP CRC checks;2.48MB fetched, no independent whole-archive digest claim. Local evidence /tmp/host-idle-drt-diagnostic-42433571153. gh run view --log returns empty despite successful run metadata; use saved native artifact logs instead.
+- No boxes ticked, no new extracted timing or official GDS claim. Next map the96 markers and46 net pairs to placed cells/macro boundaries and iteration history, then choose a controlled local routing/pin-access remedy. Do not repeat the full timed-out route without a diagnosis.
+
 ## 2026-11-07 — Detailed-route timeout; prepare bounded spatial DRC diagnostic
 
 - Run [42401125214](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42401125214) passes exact green-checkpoint restoration, independent full-net coverage and fresh original/signoff pre-routing gates, then reaches its 330-minute detailed-routing step timeout. Iteration42 ends with96 markers (Metal2 spacing24; shorts Metal2 57/Metal3 11/Metal4 4). Partial iteration43 reaches90% and39 markers before cancellation;39 is not a final DRC result. No completed routed state, extracted timing or post-route antenna qualification exists.

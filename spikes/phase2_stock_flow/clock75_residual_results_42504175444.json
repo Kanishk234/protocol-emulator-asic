@@ -1,0 +1,79 @@
+{
+  "source_run": 42504175444,
+  "reference_run": 42456273203,
+  "reference_variant": "clock75",
+  "results": [
+    {
+      "variant": "clock75_wire180",
+      "corners": {
+        "nom_fast_1p32V_m40C": {
+          "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+          "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.098173,
+          "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+          "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+          "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 1
+        },
+        "nom_slow_1p08V_125C": {
+          "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+          "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.626159,
+          "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+          "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+          "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 1
+        },
+        "nom_typ_1p20V_25C": {
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.293697,
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 1
+        }
+      },
+      "antenna": {
+        "antenna__violating__nets": 8,
+        "antenna__violating__pins": 8
+      },
+      "overflow": 15,
+      "area_um2": 693190,
+      "qualified": false
+    },
+    {
+      "variant": "clock75_slew25",
+      "corners": {
+        "nom_fast_1p32V_m40C": {
+          "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+          "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0701547,
+          "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+          "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+          "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+        },
+        "nom_slow_1p08V_125C": {
+          "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+          "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.652988,
+          "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 2,
+          "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+          "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+        },
+        "nom_typ_1p20V_25C": {
+          "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+          "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.28458,
+          "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+          "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+        }
+      },
+      "antenna": {
+        "antenna__violating__nets": 1,
+        "antenna__violating__pins": 1
+      },
+      "overflow": 1,
+      "area_um2": 687647,
+      "qualified": false
+    }
+  ],
+  "stronger_slew_final_state_and_all_physical_views_byte_identical": true,
+  "strict_gates_unchanged": true,
+  "artifact_entries_crc_verified": true,
+  "whole_archive_digest_independently_verified": false,
+  "official_gds_qualified": false,
+  "selection": "Retain original clock75 for targeted diagnosis; neither trial qualifies"
+}

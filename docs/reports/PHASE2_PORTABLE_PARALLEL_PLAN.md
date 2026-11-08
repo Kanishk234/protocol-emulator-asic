@@ -21,6 +21,15 @@ Separate repair42455208235timesoutafter120min atpartialiteration6,92markers afte
 
 
 
+
+## Source-level enable drive
+
+After both native repair targets fail, test a generalRTLdrive boundary: insertBUF4 between eachselectedworddecode and its existingICGGATE. Independently buffer thefourconstant-register words perlane(eightcells,116.1216µm²sourcefootprint) or all52words perlane(104cells,1509.5808µm²). Keep clock75's exactnativeconfig, allsource/state/programming contracts and every acceptancegate. No addedstate/latency, manualplacement, toolwrapper or clock/timing exception. Nativeoptimization mayresize/removebuffers; synthesispreservation andfinalretention areexplicitlyaudited.
+
+Both sourcepolicies pass complete actualSYNTHESISslot-moduleequivalence(872points,ASIC;752FPGAfallback;inductioncap6), actualIHP-cell/Icarus13phase/reset/64addressreplay(3125cycles/12288phasechecks) andinverted-enablemutant rejection. LocalABCretains4/52buffersperlane; five normalRTLchip smokespass each. Real-cellmoduleevidence andnormalRTLchip evidence areseparatelayers: no whole-chipfoundry/routedGLpassisclaimed. Full22normalRTLprotocolreplays withrealdecoders remainpending. Icarus13whole-chipRTLcompilealsofindsexistingbaselineforward-referenceerrors; keepthiscompatibilitycleanup separatefrom thetrial, withcontrol/evidence in BUGS.md.
+
+Separate gds-slot-enable-drive-screen runs the two sourcepolicies after the unchanged-source read-onlynativegeometrypreflight; physicaljobs start fromRTL with stockTT/Classic. ActualGATEinputnets andsavedoverflow areexported forlater diagnosis. Main source/config and officialworkflowjobs stayunchanged.113focusedtests andworkflowchecks pass; nativeoutcomes remainunmeasured untilthejobfinishes.
+
 ## Follow-up results:42504175444
 
 Both targeted policies fail strict screening. Wire180 clears all slew/cap failures and has fast hold+98.173ps, but creates onefanout violation eachcorner and worsens antenna1→8,overflow1→15,area687647→693190um². Slew25 has exactly the originalclock75measurements and byte-identical finalstate/ODB/DEF/NL/PNL/SDC, despite the changed native optimizer target. Retire both policies and retain clock75 as an unqualified diagnostic reference.

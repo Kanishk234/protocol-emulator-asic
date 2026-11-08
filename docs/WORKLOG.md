@@ -9,6 +9,15 @@ Newest entry at the top. One entry per work session.
 
 
 
+
+## 2026-11-08 — Prove source-level write-enable drive without changing stock hardening
+
+- Implement two isolated trw_slots.v source policies on the combined clock75reference: explicitIHPBUF4 drives existingICG GATE after decode, on allfourconstant-bankwords perlane or all52words. Interface/state/reset/phase/writebehavior, FPGAfallback andprogramming/protocolcontract unchanged. Costeight/104sourcecells at116.1216/1509.5808um², notwholephysicalarea. Main source unchanged. No targeted synthesizedIDs, toolwrapper/manualrepair, addedpipeline orfalsepath.
+- Reproducible actualSYNTHESISpath slot-module equivalence passes872points; FPGAfallback752, inductioncap6, bothvariants. Models checkedagainstpinnedLibertybufferfunction andICGstatetable. RealIHPcells/Icarus13 replay3125cycles/12288phasechecks each, coveringall64addresses,reset/write/data patterns/randomtraffic afterlegal52wordinitialization; wrong-enablemutants rejected. SourceBUF4instances preserved afterlocalABC:4/52perlane. Five matchednormalRTLchip smokes pass each. NormalRTL bypasses librarycells; whole-chip actual-cellpass isnotclaimed. Exactbyteboundpatches/proofs/cellhashes in slot_enable_drive/evidence.json.
+- Whole-chipIcarus13SYNTHESIScompilefails at three existing forwarddeclarations; unchangedreference reproduces exactly. Logcompatibilityissue rather than changeunrelatedsources. Full22normalRTLVerilator/sigrok replay firsthit localCOMPILE_ARGS override setup(errorVtop.mk); fixrunnerpreservingcocotbflags, rerunrealdecoderpreflight. Currentlocalsessions75470(constants),90451(allwords), logs/XML /tmp/tripwire-slot-enable-{constants,all_words}-chip/l3*; nofullsuitepassyet.
+- New gds-slot-enable-drive-screen retains exactclock75config(hash35bacb325...), normalTT/stockClassic/image/order and all strictoriginal/signoff3corner/fast>=50ps/electrical0/antenna0/overflow0gates. OneRTLfiledelta perarm. Audit expectednative sourcebufferpresence afterYosyssynthesis, reportactualfinalretention/masters(noforceddonttouchpolicy). Reuse read-onlyexactsourcegeometrypreflight, addactualICGGATEinputnettosavedtargetconnections. NoDRT beforequalification.113focused tests, actionlint, shell/ninePythonblocks and actualsourcepreparation pass. D167records need/cost/risks. No phase ticks. Publication/launch receipt follows.
+- Next inspect nativepreflight and both freshsourcephysicaloutcomes; finishfullprotocolreplays, then ifallgatespass route/extract/replayfinalnetlist and reviewofficialsource/configintegration. Never substitute functional/module proof for physicalclosure.
+
 ## 2026-11-08 — Targeted stock repair trials finish; retain clock75 reference
 
 - Run42504175444 finishes: read-only source geometry preflight passes, and both clean-source arms execute native Classic plus fresh original/signoff measurements. Both fail actual electrical gates, with no source-preparation/runtime infrastructure failure. Geometry capture after qualification attempts remains available in artifacts. No DRT is launched.

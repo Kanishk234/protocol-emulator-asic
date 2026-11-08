@@ -8,6 +8,15 @@ Newest entry at the top. One entry per work session.
 
 
 
+
+## 2026-11-08 — Targeted stock repair trials finish; retain clock75 reference
+
+- Run42504175444 finishes: read-only source geometry preflight passes, and both clean-source arms execute native Classic plus fresh original/signoff measurements. Both fail actual electrical gates, with no source-preparation/runtime infrastructure failure. Geometry capture after qualification attempts remains available in artifacts. No DRT is launched.
+- clock75_wire180: setup summaries0 in all corners; original fast hold98.173ps. Slew/cap violations0, but one fanout violation in eachcorner,8antenna nets/pins and15overflow; area693190um². It fixes the observed slew but worsens the other physical gates relative to clock75(1antenna/1overflow,area687647um²); reject this global shortening policy.
+- clock75_slew25: originalfast hold70.1547ps,2slow slew,1antenna and1overflow,area687647um². Independently compare fresh hash receipts: finalstate/ODB/DEF/NL/PNL/SDC are all byte-identical to measuredclock75. Native stronger margin is ineffective on this source; retire this direction rather than rerun it. Zero setup summaries do not demonstrate positive extracted reserve.
+- Retrieve selected measurement receipts with per-entry ZIPCRC verification from artifacts13633341902(wire180) and13632672510(slew25); no independent wholeZIPdigest claim. Save compact fullcorner results and identical-view finding in clock75_residual_results_42504175444.json. Raw artifacts/joblogs stay/tmp/CI.
+- Best clean-source reference remains clock75, still unqualified: one shared NOR4→word51ICG-enable slew network, one Metal3antenna branch and one18routes/17tracks edge. Next prioritize a proved general source-level write-enable distribution/buffering change, preserving programming/reset/phase semantics, instead of more broad repair-target sweeps. Use a new clean stock screen and all existing gates; no manual checkpoint fix, gate relaxation, officialjob or mainhardware/config change. No phase boxes ticked.
+
 ## 2026-11-08 — Trace clock75 residuals and prepare two targeted native repair policies
 
 - Download CRC-verified exact final44DEF/NL/state from clock75artifact13611529602. Bothslew pins share u_chip.g_lane[1].u_slots.g_word[51].dec: NOR4_1_32278_/Yat609.60/102.06um drivesonlyslot51ICG GATEat448.80/124.74um, originManhattan183.48um. Antenna net12708 iswire12709/BUF2X762.24/476.28→wire12708/BUF2A929.28/438.48um, origin-distance204.84um. Distancesarenotactualpin/routed lengths. Saveexactsourcehash/connectivityreceipt; no physicaledit.

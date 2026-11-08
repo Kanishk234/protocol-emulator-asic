@@ -20,6 +20,13 @@ Mode_ff additionally has one fanout violation in eachcorner. Clock75 is the most
 Separate repair42455208235timesoutafter120min atpartialiteration6,92markers aftercompleted5; no finalroute or extracted result. A restart reduced96→92butdidnotclosepractically. Both source-only prototypes nowpass22/22RTLprotocolreplayswithrealdecoders; functional success does notsupersedephysicalfailures. See compact measured receipt host_idle_portable_results_42456273203.json. Historical plan below describes hypotheses, not successful outcomes.
 
 
+
+## Follow-up results:42504175444
+
+Both targeted policies fail strict screening. Wire180 clears all slew/cap failures and has fast hold+98.173ps, but creates onefanout violation eachcorner and worsens antenna1→8,overflow1→15,area687647→693190um². Slew25 has exactly the originalclock75measurements and byte-identical finalstate/ODB/DEF/NL/PNL/SDC, despite the changed native optimizer target. Retire both policies and retain clock75 as an unqualified diagnostic reference.
+
+The next useful change should address the source-level general write-enable network, with functional/phase equivalence and a clean-source physical test. The remaining antenna branch and overfull edge are still real independent gates. No repeated broad target sweep or unqualified DRT is selected. Detailed results are clock75_residual_results_42504175444.json; historical trial hypotheses follow.
+
 ## Targeted clock75 follow-up
 
 The exact final DEF and mapped netlist prove the two slow slew report pins share a single net: lane1slot-storeword51dec. Driver_32278_isNOR4_1 at(609.60,102.06)µm; the only load is the word51ICG GATE at(448.80,124.74)µm. Their component-origin Manhattan distance is183.48µm. The antenna net12708 is a BUF2→BUF2segment fromwire12709at(762.24,476.28)to wire12708at(929.28,438.48), origin-distance204.84µm. These distances are not actual pin coordinates or routed lengths; the existing200µm repair target is not a hard geometric bound.

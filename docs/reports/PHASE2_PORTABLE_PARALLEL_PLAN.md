@@ -2,6 +2,23 @@
 
 The target remains full2lanes/4pin units/U0full/SRAM/6x4 at20ns, nonnegative all-corner setup, fast hold at least50ps, zero electrical/antenna/route violations and a green unchanged official GDS/precheck. No phase boxes are ticked by these experiments.
 
+
+## Completed results:42456273203
+
+Allfivearms reached fresh measured screening and failed strict qualification. None proceeds to detailed routing. Original estimated setup summaries are0allcorners; these are not extracted positive-margin results.
+
+| Variant | Original fast hold(ps) | Slow slew | Antenna nets | Overflow |
+|---|---:|---:|---:|---:|
+| clock75 | +70.155 | 2 | 1 | 1 |
+| debug_align | +83.940 | 0 | 5 | 3 |
+| density64 | +135.747 | 4 | 3 | 69 |
+| late125 | +76.638 | 6 | 9 | 46 |
+| mode_ff | −218.153 | 0 | 5 | 301 |
+
+Mode_ff additionally has one fanout violation in eachcorner. Clock75 is the most focused next diagnostic source, not a qualified replacement. Its2slewviolations name the lane1word51clock-gate enable and_32278_/Y; verify actualDEFconnectivity before assumingonecommonnet. Antenna net12708/wire12708/A fails Metal3cumulative316.21against200. The final unitof overflow needs spatial investigation. Retire the failed density64/late125/mode_ff directions rather than combine them blindly.
+
+Separate repair42455208235timesoutafter120min atpartialiteration6,92markers aftercompleted5; no finalroute or extracted result. A restart reduced96→92butdidnotclosepractically. Both source-only prototypes nowpass22/22RTLprotocolreplayswithrealdecoders; functional success does notsupersedephysicalfailures. See compact measured receipt host_idle_portable_results_42456273203.json. Historical plan below describes hypotheses, not successful outcomes.
+
 ## What is portable now
 
 The current combined baseline42305323874 already starts from RTL using TT config generation and stock LibreLane Classic, image, scripts and stage order. Historical custom Metal2-region wrappers are not in this lineage. Its native project controls are technically supported by the official flow, although adoption of config keys beyond AGENTS' main-file whitelist still needs an explicit reviewed exception.
@@ -22,7 +39,7 @@ All five arms prepare the exact verified combined baseline, generate configurati
 
 The clock and hold optimizer mechanisms are described in OpenROAD's [CTS](https://openroad.readthedocs.io/en/latest/main/src/cts/README.html) and LibreLane's [timing closure guide](https://librelane.readthedocs.io/en/stable/usage/timing_closure/index.html). Our installed/pinned code and existing native-command validators, not newer advertised features, determine supported behavior.
 
-The mode-storage candidate passes full-module lean/full equivalence (461/560 points, induction cap6),2080cycle/10400phase checks each, exhaustive all65536mode-word values under both reset polarities, and a reset-gating negative control. Five matched chip smoke cases pass. Generic counts show exactly five latches replaced by five enabled flops per unit, all other counts unchanged; this is not mapped area. Both source candidates pass five matched chip smokes. Mode_ff now passes all22protocol cases with zero failures/errors/skips and real sigrok0.7.2 enabled; the result XML hash is e5fa1adf4f2f819456f5e293ee7b35435a7dc3ce70c91dbcadc798ce197a26c2 and the tested RTL inventory matches the prepared physical-screen source. Debug_align full22 replay remains running with matching2/4 software and real decoders. These are RTL results, not whole-chip formal, routed gate-level or physical closure evidence.
+The mode-storage candidate passes full-module lean/full equivalence (461/560 points, induction cap6),2080cycle/10400phase checks each, exhaustive all65536mode-word values under both reset polarities, and a reset-gating negative control. Five matched chip smoke cases pass. Generic counts show exactly five latches replaced by five enabled flops per unit, all other counts unchanged; this is not mapped area. Both source candidates pass five matched chip smokes. Mode_ff now passes all22protocol cases with zero failures/errors/skips and real sigrok0.7.2 enabled; the result XML hash is e5fa1adf4f2f819456f5e293ee7b35435a7dc3ce70c91dbcadc798ce197a26c2 and the tested RTL inventory matches the prepared physical-screen source. Debug_align also passes22/22 with zero failures/errors/skips and real decoders, XMLSHA2eeaa315fafbe4ba29b5f11e7bd32f00979e762c766de60772a4acf236cb655d; its tested RTL inventory matches the independent debug-only preparation. These are RTL results, not whole-chip formal, routed gate-level or physical closure evidence.
 
 Actual source preparations are replayed locally: configuration arms alter only src/config.json; the mode_ff/debug_align arms respectively change only src/trw_pin_cfg.v/src/trw_host.v and keep baseline config byte-identical. Existing stock_profile_effective validates real density (rejecting clamping), CTS command arguments and late hold target/reroute execution. The signoff audit is unconditional. Main RTL/config and official jobs stay untouched until a candidate is selected and reviewed.
 

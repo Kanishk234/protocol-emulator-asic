@@ -1,0 +1,29 @@
+{
+  "run": {
+    "id": 42433571153,
+    "head_sha": "d8178c348a67358871027f119b5a46fff0780fe7",
+    "head_branch": "main",
+    "path": ".github/workflows/gds-host-idle-drt-diagnostic.yaml",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "artifact": {
+    "id": 13605087039,
+    "name": "host-idle-drt-diagnostic-42433571153",
+    "size_in_bytes": 336453219,
+    "digest": "sha256:b22d007b0e9976361e5812d1c067cb34098380c5cd335b30d2e48160ff622dfc",
+    "expired": false
+  },
+  "files": {
+    "runs/host-idle-drt-diagnostic/diagnostic_result.json": "cf72646e9e849ad258e02090f358d6fa9e462f42e5b4da1eb969ce316b92bd04",
+    "runs/host-idle-drt-diagnostic/1-openroad-detailedrouting/state_out.json": "d62a272650ff4c268ecae9998587408240a5153eed351b8751cbc5b1c797d38c",
+    "runs/host-idle-drt-diagnostic/1-openroad-detailedrouting/config.json": "22038e344e640a6aab56523701d2f57daddeebced810628ce70a28bf2e3db8bc",
+    "runs/host-idle-drt-diagnostic/1-openroad-detailedrouting/drt-run-0/tt_um_tripwire.drc-42.rpt": "a8e9accb80f6aa378e4623bdff2d192b168f9fa4e3b7f004bc10478b568abaa1",
+    "runs/host-idle-drt-diagnostic/1-openroad-detailedrouting/tt_um_tripwire.def": "8a6c68b3b7e38d392110071f58ebee7149d2440e49ff451f8c65f3a49bc653b6",
+    "runs/host-idle-drt-diagnostic/1-openroad-detailedrouting/tt_um_tripwire.nl.v": "403dfaad2547d35de5515c8e9648ca61e13573f995780a2f09333ba98c77bdf3",
+    "runs/host-idle-drt-diagnostic/1-openroad-detailedrouting/tt_um_tripwire.sdc": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba"
+  },
+  "source_green_run": 42394957445,
+  "expected_drc_errors": 96,
+  "official_gds_qualified": false
+}

@@ -1,0 +1,139 @@
+{
+  "source_run": 42433571153,
+  "artifact_id": 13605087039,
+  "markers": 96,
+  "types": {
+    "Short": 72,
+    "Metal Spacing": 24
+  },
+  "layers": {
+    "Metal2": 81,
+    "Metal4": 4,
+    "Metal3": 11
+  },
+  "marker_bounds_um": [
+    512.06,
+    311.915,
+    718.18,
+    377.26
+  ],
+  "unique_source_pairs": 46,
+  "history": [
+    {
+      "iteration": 1,
+      "marker_records": 17548,
+      "unique_source_pairs": 9277,
+      "final_pairs_present": 3
+    },
+    {
+      "iteration": 10,
+      "marker_records": 1029,
+      "unique_source_pairs": 408,
+      "final_pairs_present": 3
+    },
+    {
+      "iteration": 20,
+      "marker_records": 304,
+      "unique_source_pairs": 138,
+      "final_pairs_present": 22
+    },
+    {
+      "iteration": 30,
+      "marker_records": 153,
+      "unique_source_pairs": 59,
+      "final_pairs_present": 27
+    },
+    {
+      "iteration": 35,
+      "marker_records": 124,
+      "unique_source_pairs": 56,
+      "final_pairs_present": 40
+    },
+    {
+      "iteration": 38,
+      "marker_records": 104,
+      "unique_source_pairs": 50,
+      "final_pairs_present": 45
+    },
+    {
+      "iteration": 39,
+      "marker_records": 100,
+      "unique_source_pairs": 48,
+      "final_pairs_present": 45
+    },
+    {
+      "iteration": 40,
+      "marker_records": 96,
+      "unique_source_pairs": 46,
+      "final_pairs_present": 46
+    },
+    {
+      "iteration": 41,
+      "marker_records": 96,
+      "unique_source_pairs": 46,
+      "final_pairs_present": 46
+    },
+    {
+      "iteration": 42,
+      "marker_records": 96,
+      "unique_source_pairs": 46,
+      "final_pairs_present": 46
+    }
+  ],
+  "top_nets": [
+    {
+      "name": "net12641",
+      "marker_records": 9,
+      "placed_connection_count": 2
+    },
+    {
+      "name": "net1283",
+      "marker_records": 9,
+      "placed_connection_count": 8
+    },
+    {
+      "name": "net3501",
+      "marker_records": 7,
+      "placed_connection_count": 6
+    },
+    {
+      "name": "net4049",
+      "marker_records": 7,
+      "placed_connection_count": 9
+    },
+    {
+      "name": "u_chip.g_lane\\[1\\].ot\\[13\\]",
+      "marker_records": 7,
+      "placed_connection_count": 5
+    },
+    {
+      "name": "_03295_",
+      "marker_records": 6,
+      "placed_connection_count": 2
+    },
+    {
+      "name": "_23068_",
+      "marker_records": 6,
+      "placed_connection_count": 3
+    },
+    {
+      "name": "_02129_",
+      "marker_records": 5,
+      "placed_connection_count": 2
+    },
+    {
+      "name": "_18977_",
+      "marker_records": 5,
+      "placed_connection_count": 2
+    },
+    {
+      "name": "_18978_",
+      "marker_records": 5,
+      "placed_connection_count": 2
+    }
+  ],
+  "direct_overlap_with_two_manual_detour_nets": [],
+  "interpretation": "Intermediate bounded route; markers may overlap. No extracted timing, antenna or signoff qualification.",
+  "root_cause_proven": false,
+  "official_gds_qualified": false
+}

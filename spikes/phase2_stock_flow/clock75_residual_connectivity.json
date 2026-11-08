@@ -1,0 +1,68 @@
+{
+  "source_run": 42456273203,
+  "source_artifact_id": 13611529602,
+  "source_files": {
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/state_out.json": "efa0761d1c822cba544e75d46f420e9e15ae6523f5f870bb49aa7adb77e3755b",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "1b8fb290f920c224a7a2e59c5e1b39e83569d4deafff4fdd2c7c4055593e07e1",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "4bc1ce42919ff694dfee25306d31d6bf8d413d6772d9eae88f0ac2d16b0365dc"
+  },
+  "slew": {
+    "net": "u_chip.g_lane[1].u_slots.g_word[51].dec",
+    "driver": {
+      "instance": "_32278_",
+      "pin": "Y",
+      "master": "sg13cmos5l_nor4_1",
+      "origin_um": [
+        609.6,
+        102.06
+      ]
+    },
+    "sink": {
+      "instance": "u_chip.g_lane[1].u_slots.g_word[51].u_icg",
+      "pin": "GATE",
+      "master": "sg13cmos5l_lgcp_1",
+      "origin_um": [
+        448.8,
+        124.74
+      ]
+    },
+    "manhattan_origin_distance_um": 183.48,
+    "actual_routed_length_measured": false,
+    "limits_ns": 2.5074,
+    "observed_slew_ns": [
+      3.20379,
+      3.206171
+    ]
+  },
+  "antenna": {
+    "net": "net12708",
+    "driver": {
+      "instance": "wire12709",
+      "pin": "X",
+      "master": "sg13cmos5l_buf_2",
+      "origin_um": [
+        762.24,
+        476.28
+      ]
+    },
+    "sink": {
+      "instance": "wire12708",
+      "pin": "A",
+      "master": "sg13cmos5l_buf_2",
+      "origin_um": [
+        929.28,
+        438.48
+      ]
+    },
+    "manhattan_origin_distance_um": 204.84,
+    "actual_routed_length_measured": false,
+    "layer": "Metal3",
+    "cumulative_ratio": 316.21,
+    "required_ratio": 200
+  },
+  "original_wire_repair_target_um": 200,
+  "overflow_spatial_location_pending": true,
+  "interpretation": "Exact final DEF/NL source-bound connectivity and component origins. These distances are not pin coordinates or route length; optimizer targets are not hard bounds.",
+  "physical_qualified": false,
+  "official_gds_qualified": false
+}

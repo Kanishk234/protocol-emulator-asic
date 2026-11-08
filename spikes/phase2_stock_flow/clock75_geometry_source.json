@@ -1,0 +1,19 @@
+{
+  "artifact": {
+    "id": 13611529602,
+    "name": "host-idle-portable-clock75-42456273203",
+    "size_in_bytes": 367450418,
+    "digest": "sha256:1c9b8934af59358255aad4e1637681ac213ca6b9c032e31a6aa36e7d9cbcf34c",
+    "expired": false
+  },
+  "run_id": 42456273203,
+  "source_sha": "5dac93cbab426c1d792651d2328917a9a6f82be7",
+  "files": {
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/state_out.json": "efa0761d1c822cba544e75d46f420e9e15ae6523f5f870bb49aa7adb77e3755b",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "1b8fb290f920c224a7a2e59c5e1b39e83569d4deafff4fdd2c7c4055593e07e1",
+    "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "4bc1ce42919ff694dfee25306d31d6bf8d413d6772d9eae88f0ac2d16b0365dc"
+  },
+  "expected_final_overflow": 1,
+  "diagnostic_only": true,
+  "physical_qualified": false
+}

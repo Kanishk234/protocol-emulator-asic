@@ -28,7 +28,7 @@ def test_exact_source_one_variable_and_fixed_acceptance_inputs(variant):
     assert receipt['comparison_reference_run']==(42456273203 if variant.startswith('clock75_') else 42305323874)
     if not variant.startswith('clock75_'):assert receipt['comparison_reference_config_sha256']==BASE_CONFIG_SHA256
     assert receipt['manual_checkpoint_repairs'] is False and receipt['official_gds_signoff'] is False
-    assert receipt['hardware_unchanged']==(variant not in ('mode_ff','debug_align'))
+    assert receipt['hardware_unchanged']==(variant not in ('mode_ff','debug_align','clock75_constants_drive','clock75_all_drive'))
     assert all(receipt[k] for k in ('c_select','idle_ff','host_port_align'))
 
 
@@ -82,3 +82,15 @@ def test_residual_trials_are_independent_single_deltas_from_measured_clock75(var
     assert receipt['comparison_reference_config_sha256']==CLOCK75_CONFIG_SHA256
     assert receipt['comparison_reference_artifact_id']==13611529602
     assert result['GRT_RESIZER_HOLD_SLACK_MARGIN']==.175
+
+
+@pytest.mark.parametrize('variant,source_variant', [('clock75_constants_drive','constants'),('clock75_all_drive','all_words')])
+def test_enable_drive_trials_keep_measured_clock_configuration(variant,source_variant):
+    from host_idle_portable_trials import CLOCK75_CONFIG_SHA256
+    config,selected=reference();result,receipt=select(config,selected,variant)
+    assert receipt['config_sha256']==CLOCK75_CONFIG_SHA256
+    assert receipt['slot_enable_drive']==source_variant
+    assert receipt['hardware_unchanged'] is False
+    assert receipt['additional_changes_from_reference']=={'source_patch':'slot_enable_drive/'+source_variant+'.patch'}
+    assert result['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH']==200
+    assert 'GRT_DESIGN_REPAIR_MAX_SLEW_PCT' not in result

@@ -18,6 +18,8 @@ VARIANTS = {
                         'GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH': 180},
     'clock75_slew25': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75,
                        'GRT_DESIGN_REPAIR_MAX_SLEW_PCT': 25},
+    'clock75_constants_drive': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
+    'clock75_all_drive': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
 }
 
 
@@ -45,7 +47,7 @@ def select(config, selected, variant):
                    comparison_reference_run=BASE_RUN,
                    comparison_reference_config_sha256=BASE_CONFIG_SHA256,
                    additional_changes_from_reference=deepcopy(VARIANTS[variant]),
-                   hardware_unchanged=variant not in ('mode_ff', 'debug_align'),
+                   hardware_unchanged=variant not in ('mode_ff', 'debug_align', 'clock75_constants_drive', 'clock75_all_drive'),
                    mode_ff=variant == 'mode_ff', host_debug_align=variant == 'debug_align',
                    clean_from_rtl=True, manual_checkpoint_repairs=False,
                    official_gds_signoff=False)
@@ -62,7 +64,13 @@ def select(config, selected, variant):
         if reference_sha != CLOCK75_CONFIG_SHA256:
             raise ValueError('Clock75 comparison configuration drift')
         delta = {k: v for k, v in result.items() if reference.get(k) != v}
-        if len(delta) != 1:
+        source_variant = {'clock75_constants_drive': 'constants', 'clock75_all_drive': 'all_words'}.get(variant)
+        if source_variant:
+            if delta:
+                raise ValueError('Source enable-drive trial must retain clock75 configuration')
+            delta = {'source_patch': 'slot_enable_drive/' + source_variant + '.patch'}
+            receipt['slot_enable_drive'] = source_variant
+        elif len(delta) != 1:
             raise ValueError('Residual trial must change one field from clock75')
         receipt.update(comparison_reference_run=42456273203,
                        comparison_reference_artifact_id=13611529602,
@@ -98,6 +106,19 @@ def prepare(root, variant):
             raise ValueError('Missing complete host debug alignment equivalence evidence')
         require_smoke(evidence)
         receipt['source_application'] = apply(root, evidence_dir)
+    if receipt.get('slot_enable_drive'):
+        from apply_slot_enable_drive import apply
+        evidence_dir = root / 'spikes/phase2_stock_flow/slot_enable_drive'
+        source_variant = receipt['slot_enable_drive']
+        evidence = json.loads((evidence_dir / 'evidence.json').read_text())['variants'][source_variant]
+        if {(p['mode'], p['equivalence_points']) for p in evidence.get('proofs', [])} != {('asic', 872), ('flops', 752)}:
+            raise ValueError('Missing actual synthesis-path module equivalence evidence')
+        if (evidence.get('foundry_phase_cycles', 0) < 3125
+                or evidence.get('foundry_phase_checks', 0) < 12288
+                or evidence.get('wrong_enable_mutant_rejected') is not True):
+            raise ValueError('Missing real foundry-cell phase/reset/negative-control evidence')
+        require_smoke(evidence)
+        receipt['source_application'] = apply(root, evidence_dir, source_variant)
     config_path.write_text(json.dumps(config, indent=2) + '\n')
     selected_path.write_text(json.dumps(receipt, indent=2) + '\n')
     return receipt

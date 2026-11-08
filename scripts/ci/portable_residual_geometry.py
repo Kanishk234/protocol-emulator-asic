@@ -83,9 +83,24 @@ def main():
     if len(names) != len(set(names)):
         raise ValueError('Duplicate antenna target')
     targets = ['u_chip.g_lane[1].u_slots.g_word[51].dec'] + names
+    # The source drive experiment can place a buffer between dec and GATE.
+    # Resolve the actual gate input as well, rather than assuming direct wiring.
+    icg_name = 'u_chip.g_lane[1].u_slots.g_word[51].u_icg'
+    instances = [inst for inst in block.getInsts()
+                 if inst.getName().replace(r'\[', '[').replace(r'\]', ']') == icg_name]
+    if len(instances) != 1:
+        raise ValueError('Missing unique tracked word-enable gate')
+    term = instances[0].findITerm('GATE')
+    if term is None or term.getNet() is None:
+        raise ValueError('Missing tracked gate input net')
+    targets.append(term.getNet().getName())
     nets = []
+    seen = set()
     for name in dict.fromkeys(targets):
         net = find_net(block, name)
+        if net.getName() in seen:
+            continue
+        seen.add(net.getName())
         pins = []
         for term in net.getITerms():
             inst, port = term.getInst(), term.getMTerm()

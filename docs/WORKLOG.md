@@ -7,6 +7,15 @@ Newest entry at the top. One entry per work session.
 
 
 
+
+## 2026-11-08 — Trace clock75 residuals and prepare two targeted native repair policies
+
+- Download CRC-verified exact final44DEF/NL/state from clock75artifact13611529602. Bothslew pins share u_chip.g_lane[1].u_slots.g_word[51].dec: NOR4_1_32278_/Yat609.60/102.06um drivesonlyslot51ICG GATEat448.80/124.74um, originManhattan183.48um. Antenna net12708 iswire12709/BUF2X762.24/476.28→wire12708/BUF2A929.28/438.48um, origin-distance204.84um. Distancesarenotactualpin/routed lengths. Saveexactsourcehash/connectivityreceipt; no physicaledit.
+- Prepare clock75_wire180 and clock75_slew25, eachone additionalnativeprojectcontrol from measuredclock75(hash35bacb325...). Firstmaxwire200→180um; secondslewrepairmargin10→25%, independent. AllRTL/sources unchanged; early/latehold175ps,20ns, original+signoff3corner/electrical0/antenna0/overflow0/fast>=50ps remainfixed. No replays of failedmode_ff/density64/late125 or blindfullDRT.
+- New gds-clock75-residual-screen includes read-onlysourcegeometrypreflight before the two clean-source jobs. Exactclock75ZIPdigest1c9b8934...+metadata/selectedhashes bound. NativeTech/DesignreadsODB savedgrid/targetnets without routerinitialization, sourcehashesbefore/after; require savedoverflow sum matches final live1. No savedstatefeeds the physicalscreens; normal stockClassic/TTgeneration fromRTL remains unchanged. Each arm also captures its own savedgeometryafterqualificationattempt to retain evidence. No actualgate skip/relaxation or officialjob/mainhardware/config change.
+-99focused regressions, actionlint, shell/nineembeddedPython blocks and actualconfiguration-only sourceprep pass. Read-onlyprobe API comes from previously exercised pinnednative adapters; actualcurrentpreflight and two physicalresults stillpending. Record D166 and targetedplan. No phase tick. Publication/launch receipt follows.
+- Next inspect nativepreflightoverfull-edge location while the two clean synthesis trials run; use their fresh measured outcomes to choose the next reproducible action. If any gate remains red, no DRT launch.
+
 ## 2026-11-08 — Parallel source screens reject all five; clock75 narrows clean-source residuals
 
 - Both requested physical workflows are complete. Matrix42456273203fails strict measured gates in allfivearms; no source-preparation/native-execution infrastructure failure. Original estimated setup summaries0allcorners for allfive, notpositive extracted reserve. Clock75fast70.1547ps,2slow slew/1antenna/1overflow; debug_alignfast83.94ps,electrical0/5antenna/3overflow; density64fast135.747ps,4slow slew/3antenna/69overflow; late125fast76.638ps,6slow slew/9antenna/46overflow; mode_fffast−218.153ps,fanout1eachcorner/5antenna/301overflow. Reject mode_ff/density64/late125; retain originalcombinedreference and prioritize clock75's smaller residual for diagnosis, not promotion. Save completecompact originalcorner/electrical/area results in host_idle_portable_results_42456273203.json.

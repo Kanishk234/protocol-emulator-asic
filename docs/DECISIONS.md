@@ -1762,3 +1762,12 @@ General need: efficiently index fixed-width packed debug/status records without 
 Full host/SPI sequential equivalence passes1062points at2/4 and1144at3/6, induction cap2; this is module/parameter evidence, not whole-chip formal. Isolated actual guarded debug-word mapping at2/4 slow6fF changes742→412gates,7621.803→4622.2974um²,1467.61→1321.73ps. At3/6area12090.33→6515.4348um²butdelay1581.25→1593.73psregresses slightly. Do not infer whole-design area/timing or a3/6upgrade from these results.
 
 Apply only to the same combined baseline as a fifth independent clean-from-RTL stock screen; no mode_ff or other config trial is combined. Require hash-bound source, module proofs and matched chip smokes before launch; full-suite/routed/extracted/official evidence remains a later gate. Main source/config and official workflow jobs unchanged.
+
+
+## D-166 (2026-11-08): repair the measured clock75 write-enable/antenna residual through native inputs
+
+General physical need: meet library transition/antenna rules on ordinary programmable write-control and buffered data nets while remaining reproducible in normal stock hardening. Exact clock75DEF/NL confirms both reported slew pins share the NOR4_1→singleICG GATE slot-word51enable network,183.48um component-origin Manhattan distance. Antenna net12708 is a BUF2→BUF2segment,204.84um origin-distance; Metal3cumulative316.21exceeds200. Neither distance is actual routed length; native200umtarget is not a hard guarantee.
+
+Run two independent one-field trials against measuredclock75: nativepostGRTmaxwire200→180um, or nativepostGRTslewreserve10→25%. Keep175ps early/latehold,20ns,75umclockgroups, sourceRTL and all acceptance fixed. Buffer/resize area and congestion/hold changes are risks requiring fresh measurement, not assumed benefits. Do not combine the settings without individual results. Sourceinput/configpreparation is byte-bound and each differs by one field fromclock75, not from an unrelated reference.
+
+Separate read-only geometry preflight uses originalclock75artifact bytes to read persisted congestion/targetconnections only, and demands agreement with final liveoverflow1. It cannot qualify or repair the source. New physicalscreens start independently fromRTL in unchangedTT/stockClassic/image/order; nocheckpoint, manualdiodes/guide edit or toolwrapper. Mainhardware/config/templatejobs remain unchanged. Additional mainconfig adoption beyond whitelist remains a reviewedintegration step.

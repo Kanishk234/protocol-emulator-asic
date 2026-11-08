@@ -19,6 +19,24 @@ Mode_ff additionally has one fanout violation in eachcorner. Clock75 is the most
 
 Separate repair42455208235timesoutafter120min atpartialiteration6,92markers aftercompleted5; no finalroute or extracted result. A restart reduced96→92butdidnotclosepractically. Both source-only prototypes nowpass22/22RTLprotocolreplayswithrealdecoders; functional success does notsupersedephysicalfailures. See compact measured receipt host_idle_portable_results_42456273203.json. Historical plan below describes hypotheses, not successful outcomes.
 
+
+## Targeted clock75 follow-up
+
+The exact final DEF and mapped netlist prove the two slow slew report pins share a single net: lane1slot-storeword51dec. Driver_32278_isNOR4_1 at(609.60,102.06)µm; the only load is the word51ICG GATE at(448.80,124.74)µm. Their component-origin Manhattan distance is183.48µm. The antenna net12708 is a BUF2→BUF2segment fromwire12709at(762.24,476.28)to wire12708at(929.28,438.48), origin-distance204.84µm. These distances are not actual pin coordinates or routed lengths; the existing200µm repair target is not a hard geometric bound.
+
+Two independent clean-source trials retain measured clock75 as reference:
+
+| Trial | Only additional setting | What it tests |
+|---|---|---|
+| clock75_wire180 | GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH200→180µm | Earlier native segmentation may improve the long NOR4enable branch and exposed antenna segment |
+| clock75_slew25 | GRT_DESIGN_REPAIR_MAX_SLEW_PCT10→25% | Stronger native transition-repair reserve may prevent the final enable-slew regression |
+
+Both retain175ps early/latehold targets,20ns, clock75, buffer choices, wire/other settings except the single named control and every original/signoff/antenna/electrical/overflow gate. Extra buffering/resizing can add area or regress another gate. No newly selected margin is an acceptance relaxation or guarantee of repair.
+
+Separate gds-clock75-residual-screen first runs a short read-only preflight on the exact archived clock75ODB. It checks fullZIP/selectedfile hashes, then reads persisted native congestion without initializing a router; summed saved overflow must match the final live log. It exports target driver/load placement and overfull grid edges, changing no physical bytes. Only after that API/evidence check do two separate fresh RTL/TT/stockClassic jobs start. Neither consumes the old database. Each also retains an independent read-only geometry export after measured gates, including failed gates, to avoid losing spatial evidence. Preflight/source checks and all actual qualification gates remain mandatory.
+
+99focused tests, actionlint, shell/nineembeddedPython blocks and actual config-only source preparations pass. Mainhardware/config and officialworkflowjobs unchanged. Source-bound connectivity is in clock75_residual_connectivity.json; wholeartifact-binding metadata in clock75_geometry_source.json. Native probe execution and both physical outcomes remain pending until their run receipts exist.
+
 ## What is portable now
 
 The current combined baseline42305323874 already starts from RTL using TT config generation and stock LibreLane Classic, image, scripts and stage order. Historical custom Metal2-region wrappers are not in this lineage. Its native project controls are technically supported by the official flow, although adoption of config keys beyond AGENTS' main-file whitelist still needs an explicit reviewed exception.

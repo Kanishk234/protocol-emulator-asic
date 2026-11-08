@@ -355,6 +355,7 @@ jobs:
         config=json.loads(Path('src/config_merged.json').read_text())
         assert config['CLOCK_PERIOD']==20
         config['OPENROAD_THREADS']=4
+        config['DRT_SAVE_DRC_REPORT_ITERS']=1
         output=Path('runs/host-idle-pass-route')
         run_step(config,source,output,['OpenROAD.DetailedRouting'])
         states=list(output.glob('*-openroad-detailedrouting/state_out.json'))

@@ -130,9 +130,9 @@ without another manual dispatch.
 | Gate | Current evidence/status |
 |---|---|
 | Current full-core RTL regression | PASS, 42690695832; [exact case matrix](CLOSURE_PROTOCOL_MATRIX_20261109.md) |
-| Current dev4 8x4 physical screen | Pending, 42681697462 on main |
-| Exact route restoration/guards | 54 cloud controls pass, 42692486237; actual source restoration awaits artifact |
-| Detailed route and extracted timing | Continuation waiting; no acceptance yet |
+| Current dev4 8x4 physical screen | PASS, authenticated 42681697462; [measurements](CLOSURE_SCREEN_20261109.md) |
+| Exact route restoration/guards | Initial observer fails on mixed relative/absolute paths before physical execution; 55 corrected local controls pass |
+| Detailed route and extracted timing | Corrected continuation pending; no acceptance yet |
 | Matching final-netlist protocol replay | Pending a qualified final netlist |
 | Current qualified GDS/precheck and production integration | Pending |
 

@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Authenticate passing 8x4 screen and fix mixed-path restoration observer
+
+- Source42681697462 at5407d4c attempt1SUCCESS. Full347,368,324-byte artifact13708390816 SHA256 matches API; state/nativeview/constraint hashes, original/repeated rawcorner metrics, signoff gates, final antenna0/0 and globaloverflow0 independently checked.32hardware/macro files plus config/info match prepared candidate. Original fast/typ/slow hold0.127092/0.333103/0.697614ns; setupWS0/electrical0 allcorners. Estimated routing only, no DRT/extracted/GDS acceptance. Compact receipt/report committed in reports/closure_screen_42681697462.json and CLOSURE_SCREEN_20261109.md.
+- Continuation42692486237 source-gatePASS then restorationFAIL before tools/physical execution: observer assumed absolute receipt filenames, while real producer uses relative state/signoff names and absolute native views. Fix read-only path interpretation/coverage hashing, preserve original checker path spelling/cwd and all saved bytes. Added real mixed-format regression;55focused guardsPASS. Original failed run retained in BUGS. No source/hardware/timing-gate change.
+- Next publish observer correction and inspect corrected cloud restoration/fresh timing before DRT. No phase boxes ticked; no new acceptance inferred from passing guard tests.
+
 ## 2026-11-09 — Authenticate full-core cloud regression and prepare qualified route continuation
 
 - Candidate42690695832 at e248408 SUCCESS. Downloaded artifact independently verifies335model/compiler,4actualTTtop and22protocolXML cases,0failures/errors/skips. All170input hashes reconcile (141Git/29independently prepared);34available physical/metadata artifact files checked. Underlying main5407d4c source/model/spec/firmware/tests/patches unchanged. Added scoped claims/evidence with XML/receipt hashes; no routed/physical acceptance implied.

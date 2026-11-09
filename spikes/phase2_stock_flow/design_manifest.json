@@ -31,5 +31,7 @@
     "runtime/container overrides",
     "physical ECOs"
   ],
-  "official_workflow_sha256": "fceb55e489ce5217dce0b59833ffce95af478da739cd2318fe476edff408b5c2"
+  "official_workflow_sha256": "b0f8ddf2e0f5a4fdaf824f662afdfc6ce84da791d127c299884481d099b1aa4e",
+  "previous_official_workflow_sha256": "fceb55e489ce5217dce0b59833ffce95af478da739cd2318fe476edff408b5c2",
+  "official_template_revision": "4b1204ab387b5ab94db1d57067051d8d89a2f83c"
 }

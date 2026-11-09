@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Target the measured bitsync cache timing path
+
+- Published fixed-route clock diagnostic in fcb1346/2d39306/79402ae;
+  run [42723848954](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42723848954)
+  authenticates the full failed-route artifact and recovers the exact source;
+  original dev4 identity passes, but initialization fails because recovery omitted
+  two inherited header views. Restore both without altering the saved state;
+  14 clock diagnostic guards now pass. No new timing result yet.
+- D-173 prepares a separate one-file cache-storage trial, preserving write-only
+  reset visibility and D-066 live writes. Local exhaustive comparisons pass
+  665,770 phase checks per full/lean variant, including directed reset without a write. Yosys 0.66+179 e74db6dea proves
+  all 461 lean and 559 full correspondence points using induction sequence
+  cap 6 with registered host writes; no blacklisted correspondences.
+  Raw evidence remains in /tmp/tripwire-bitsync-cache-ff-proof-v2, not Git.
+- Added a separate cloud regression requiring fresh module proof, intentional
+  wrong-reset fault detection, model/compiler, actual-top and 22 protocol
+  cases, then verification that exactly the bound configuration file changed.
+  Wrong-reset mutant is rejected by the added directed case; the older random
+  bench alone missed this fault. Workflow actionlint passes. No physical improvement or full-chip formal
+  claim. No phase boxes ticked. Next inspect cloud results, then prepare one
+  same-clock physical screen if all functional checks pass.
+
 ## 2026-11-09 — Native protocols pass; clean route exposes slow setup failure
 
 - Native42694710310 at7f89a05SUCCESS: downloaded whole743,336-byte artifact13714003704 digestd5924a05… verified; actual22caseXML has0failures/errors/skips and NLd235214b… matches exact pre-DRTsource. Receipt in reports/closure_native_42694710310.json. Functional native-cell replay withoutSDF; not finalroute or timing qualification.

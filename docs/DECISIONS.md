@@ -1838,3 +1838,22 @@ not adopt a clock target, change the architecture/firmware, qualify a release,
 or turn the failed20 ns run green. A later operating-target change must cover
 the software/tests/spec and production integration. Cost is several fresh
 three-corner STA executions; physical area and hardware behavior are unchanged.
+
+## D-173 (2026-11-09): isolated bitsync mode-cache storage trial
+
+The measured slow setup failure in route 42693952530 starts at U0's
+`bitsync_active` configuration cache latch. Prepare one separately bound RTL
+trial replacing only that staged/gated cache with a root-clock flip-flop
+enabled by the same word-0 write. On a write, store zero during reset and
+the decoded mode otherwise. A reset without a write must leave this cache
+unchanged. The FPGA implementation and all raw configuration bits stay as
+before. This preserves D-066 live reconfiguration and adds no timing exception.
+
+The hypothesis is that removing the high-phase configuration latch restores
+a full-cycle launch relationship. It is not a measured improvement. The trial
+must pass module phase/equivalence checks, complete top/protocol regression,
+and a separate same-20-ns physical screen before selection. Original reference
+and candidate hashes are in `spikes/phase2_stock_flow/bitsync_cache_ff/identity.json`.
+No production source/config, clock target, protocol contract or official
+workflow job changes. Do not combine it with the older mode_ff experiment,
+which changes raw TXMODE/RXMODE storage rather than this decoded cache.

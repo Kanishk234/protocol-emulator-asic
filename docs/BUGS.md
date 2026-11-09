@@ -358,3 +358,21 @@ Calibration41975191740fails before design load: embedded Python importlibrelane 
 2026-11-09 current-candidate L2 injection compatibility: source inspection finds the legacy priority-fault runner only anchors the original onehot/cand expression; the reviewed shared-priority lane uses first_ready/ready. The old runner would refuse that candidate, not produce valid mutation evidence. Add an exact two-form selector that rejects ambiguity/duplicates, verify all4095nonzero masks reverse priority, and preserve clean control/failing mutant XML/logs. Strict XML now requires exactly one executed case and the expected pass/failure outcome, with no skips/errors. Subsequent hosted42697037494 passes both controls and detects priority/cursor faults at99/326clocks; downloaded XML/logs and both single-edit mutant trees checked. Selection tests alone are not mutation evidence.
 
 2026-11-09 current dev4 extracted setup failure: strict route continuation42693952530 completes zero-DRC/antenna-clean routing and extraction, then rejects slow setupWS-1.982448040ns. Top examined path launches from U0bitsync_activeconfiguration latch49313 to producer token14flop46985 through buffered pad/receive control. Physical cause/refinement remains open; a passing estimated screen did not establish post-route setup. D066forbids hiding live configuration paths. Existing strict timing_gate catches the failure and success-only final replay refuses it. Retain rawreports/failure; run a baseline-reproduced fixed-RC period diagnostic before another physical experiment. No timing waiver or fix claimed.
+
+### 2026-11-09: clock diagnostic recovery omitted inherited headers
+
+Run 42723848954 authenticates the exact full archive and dev4 toolchain, then
+fails State.load before measurement because `json_h` points into the earlier
+Yosys header stage. The saved state also inherits a Verilog header. Recover
+both original stage directories without rewriting the checkpoint; a focused
+selection regression covers both and excludes large route snapshots. No
+period result was produced; original extracted setup failure stays unchanged.
+
+### 2026-11-09: random phase bench misses cache reset fault
+
+The new bitsync-cache trial's unconditional-reset mutant passes the reused
+random/exhaustive word-data bench: exhaustive data does not imply exhaustive
+state transitions. Add explicit cache activation followed by reset without a
+word-0 write. The original and proposed implementation pass all 665,770
+comparisons per variant; the faulty reset now fails the actual scoreboard.
+This is a coverage gap found during trial validation, not a production RTL bug.

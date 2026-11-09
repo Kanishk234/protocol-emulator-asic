@@ -1,0 +1,99 @@
+name: gds-official-dev4-hold125-route
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-official-dev4-hold125-route-42681697462
+  cancel-in-progress: false
+jobs:
+  route:
+    name: Exact 8x4 screen checkpoint, DRT and extracted STA
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+      SOURCE_RUN: '42681697462'
+      SOURCE_ARTIFACT: official-dev4-hold125-42681697462
+    steps:
+    - name: Check out route tools
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Verify and download the passing source screen
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > official-dev4-source-run.json
+        gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_ARTIFACT" --dir frozen-screen
+        python - <<'PY'
+        import json, shutil
+        from pathlib import Path
+        run = json.loads(Path('official-dev4-source-run.json').read_text())
+        assert run['id'] == 42681697462
+        assert run['head_sha'] == '5407d4c278353ec125018f3a3d49de2fd620d9ce'
+        assert run['head_branch'] == 'main' and run['conclusion'] == 'success'
+        assert run['path'] == '.github/workflows/gds-official-dev4-hold125-screen.yaml'
+        frozen = Path('frozen-screen')
+        for name in ('runs', 'src', 'macro'):
+            target = Path(name)
+            if target.exists(): shutil.rmtree(target)
+        for name in ('runs', 'src', 'macro'):
+            source = frozen / name
+            if source.exists(): shutil.copytree(source, Path(name))
+        shutil.copy2(frozen / 'info.yaml', 'info.yaml')
+        for name in ('compatibility-input.json', 'compatibility-generated.json',
+                     'compatibility-native.json', 'compatibility-image.json',
+                     'compatibility-openroad.txt'):
+            if (frozen / name).exists(): shutil.copy2(frozen / name, name)
+        PY
+    - name: Install exact dev4 support environment
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: 9d13ff3e3e6202090740110438c6a10c1d62ca0f
+        path: tt
+    - name: Install Python and stock LibreLane
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install stock tool dependencies
+      run: |
+        pip install -r tt/requirements.txt
+        pip install librelane==3.1.0.dev4
+    - name: Verify stock physical engine identity
+      run: |
+        set -euo pipefail
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev4
+        docker image inspect ghcr.io/librelane/librelane:3.1.0.dev4 > compatibility-image-route.json
+        docker run --rm ghcr.io/librelane/librelane:3.1.0.dev4 openroad -version > compatibility-openroad-route.txt
+        python - <<'PY'
+        import json
+        from pathlib import Path
+        image = json.loads(Path('compatibility-image-route.json').read_text())[0]
+        assert 'ghcr.io/librelane/librelane@sha256:af2405f5d48d8fe14d406ecce913811177a95e365e3b625859677307cace2469' in image['RepoDigests']
+        assert Path('compatibility-openroad-route.txt').read_text().strip() == 'dcf36133a369abc8f3c5e5738cd4d82e4903c0e0'
+        PY
+    - name: Require fresh gates, route exact checkpoint, and extract timing
+      timeout-minutes: 345
+      run: python scripts/ci/official_dev4_route.py
+    - name: Upload detailed-route and extracted evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: official-dev4-hold125-route-${{ github.run_id }}
+        path: |
+          runs/dev4-ciel-antenna/**
+          runs/dev4-pre-route-timing/**
+          runs/dev4-pre-route-gates.json
+          runs/dev4-hold125-route/**
+          runs/dev4-extracted-gates.json
+          runs/extracted-timing/**
+          official-dev4-source-run.json
+          compatibility-image-route.json
+          compatibility-openroad-route.txt
+        if-no-files-found: warn

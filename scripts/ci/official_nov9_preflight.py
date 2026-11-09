@@ -8,7 +8,8 @@ import yaml
 
 TOOLS = '9d13ff3e3e6202090740110438c6a10c1d62ca0f'
 PDK = '89d42ee6d2fd9b50b86a1aada6fee6673c3e6008'
-CONFIG = '35bacb325c12276dd63f7e33b99f94b5e0d4940f7b3a22a6bd1e63424bc4c97a'
+CONFIGS = {'35bacb325c12276dd63f7e33b99f94b5e0d4940f7b3a22a6bd1e63424bc4c97a',
+           '1af28559fda1c1ac611cf0fc4dbc0ed462e903c3d05e4ff0c76bb1039d00adcf'}
 SIZES = {'6x4': '0 0 1289.28 710.64', '8x4': '0 0 1724.16 710.64'}
 
 
@@ -25,14 +26,15 @@ def inventory(root):
 
 def prepare(root, tiles):
     assert tiles in SIZES, 'Unknown tile selection'
-    assert digest(root / 'src/config.json') == CONFIG, 'Wrong clock75 control'
+    config_sha = digest(root / 'src/config.json')
+    assert config_sha in CONFIGS, 'Wrong clock75/hold125 control'
     info = yaml.safe_load((root / 'info.yaml').read_text())
     assert info['project']['tiles'] == '6x4', 'Wrong source geometry'
     assert info['project']['clock_hz'] == 50000000
     assert info['project']['top_module'] == 'tt_um_tripwire'
     assert len(info['project']['source_files']) > 1, 'Placeholder source list'
     receipt = {'tiles': tiles, 'source_files': info['project']['source_files'],
-               'inputs': inventory(root), 'project_config_sha256': CONFIG,
+               'inputs': inventory(root), 'project_config_sha256': config_sha,
                'tools_sha': TOOLS, 'pdk_revision': PDK,
                'timing_qualified': False, 'official_gds_passed': False}
     info['project']['tiles'] = tiles
@@ -43,7 +45,7 @@ def prepare(root, tiles):
 def generated(root, tiles):
     receipt = json.loads((root / 'compatibility-input.json').read_text())
     assert inventory(root) == receipt['inputs'], 'Source/macro changed during generation'
-    assert digest(root / 'src/config.json') == CONFIG
+    assert digest(root / 'src/config.json') == receipt['project_config_sha256']
     cfg = json.loads((root / 'src/config_merged.json').read_text())
     project = json.loads((root / 'src/config.json').read_text())
     for key, value in project.items():

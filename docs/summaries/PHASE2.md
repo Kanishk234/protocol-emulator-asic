@@ -12,10 +12,15 @@ current pre-routing screen, not detailed routing or signoff.
 The prepared current core also passes a fresh cloud RTL regression:
 [42690695832](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42690695832),
 335 model/compiler tests, four actual-top tests and 22 protocol cases without
-skips. A corrected continuation has restored the exact physical checkpoint
-and is running fresh timing checks, routing and extraction. Native-cell
-protocol replay and a current million-clock lockstep refresh are separate
-cloud checks. Main's official top remains the placeholder, and Phase 2 remains
+skips. The exact-checkpoint continuation completes detailed routing with zero DRC
+and antenna violations, but extracted slow-corner setup fails by 1.982448 ns
+at the unchanged 20 ns target. Hold and electrical checks pass. The current
+directed million-clock lockstep and both fault controls pass in
+[42697037494](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42697037494),
+with downloaded XML/logs and mutant sources independently checked.
+The pre-routing native-cell replay also passes all 22 protocol cases in
+[42694710310](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42694710310).
+Final routed replay remains blocked by the failed timing gate. Main's official top remains the placeholder, and Phase 2 remains
 open until qualified physical results, final-netlist replay and production
 integration are complete. See the [current release frontier](../reports/CLOSURE_BRANCH_20261109.md)
 and [authenticated screen](../reports/CLOSURE_SCREEN_20261109.md). The dated

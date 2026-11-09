@@ -1,0 +1,21 @@
+{
+  "run_id": 42694710310,
+  "artifact_id": 13714003704,
+  "archive_sha256": "sha256:d5924a0536e22a5ef0e54ac64dc40221450213242ac28a6a64774687e1ecdf8d",
+  "result": {
+    "source_run": 42681697462,
+    "artifact_id": 13708390816,
+    "archive_sha256": "sha256:5bd617e3a926684728f8dd2a0e9dc1a54bbb6229449c2965b5eedfae6aa8a3fb",
+    "native_netlist": "runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v",
+    "netlist_sha256": "d235214bdfde0030f6791d476537ffddc147fd59bdf092d6081131cc7164f4e7",
+    "functional_simulation_only": true,
+    "detailed_routing_performed": false,
+    "sdf_annotated": false,
+    "official_gds_qualified": false,
+    "passed": 22,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "xml_sha256": "cf0068b97ca9821932c8fe5a1f1c993052f421f2ea6c570847e045bdbd383e7c"
+  }
+}

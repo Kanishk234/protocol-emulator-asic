@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Native protocols pass; clean route exposes slow setup failure
+
+- Native42694710310 at7f89a05SUCCESS: downloaded whole743,336-byte artifact13714003704 digestd5924a05… verified; actual22caseXML has0failures/errors/skips and NLd235214b… matches exact pre-DRTsource. Receipt in reports/closure_native_42694710310.json. Functional native-cell replay withoutSDF; not finalroute or timing qualification.
+- Route42693952530 at ebf817e completes detailedrouteDRC0, antenna0/0 and disconnect checks; extraction finishes but strictslow setup fails-1.982448040ns. Extracted fast/typ/slow hold0.283984733/0.501490197/0.867065555ns; electrical counts0. Finalsuccess-only replay42700728949stops on failedsource as intended. Read18ZIPentries/2,119,151bytes withCRC; no independent whole1.386GBarchive digest claim from partialread. Worst examined cfgbitsync_active→producer token14path stays timed underD066. Full report CLOSURE_ROUTE_20261109.md. Originalfailure retained.
+- D172prepares exact failed-route fixed-SPEF operating-period diagnostic: reproduce20ns control, measure21/22/24/25ns, preserveNL/ODB/SPEF/SDC and strictgatefailure, no routing/hardware/spec/productionclock changes. Source identity/archive digest/cleanroute/source equality gates precede cloudanalysis.13 diagnostic guards pass; all 76 closure-prefixed guard tests pass; workflow actionlint and git diff checks pass. Next publish and inspect actual probe before choosing a source refinement or clock-target proposal. Phase2open, no boxes ticked.
+
 ## 2026-11-09 — Authenticate current lockstep success and prepare exact final-netlist replay
 
 - Lockstep42697037494 atd654985SUCCESS. Downloaded one-million-clock case and both pristine controlsPASS, no skips/errors; priority fault fails scoreboard at99clocks and cursor fault at326directed clocks. Both actual mutant XML/logs inspected. All170inputs reconcile (141Git/29prepared); all25files per mutant tree checked for exactly one intended edit. Compact receipt/report in reports/closure_lockstep_42697037494.json and CLOSURE_LOCKSTEP_20261109.md. Directed regression only, no arbitrary-program/formal/physical claim. Baseline unit42692486070alsoSUCCESS.

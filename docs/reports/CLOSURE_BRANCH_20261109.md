@@ -130,19 +130,20 @@ without another manual dispatch.
 | Gate | Current evidence/status |
 |---|---|
 | Current full-core RTL regression | PASS, 42690695832; [exact case matrix](CLOSURE_PROTOCOL_MATRIX_20261109.md) |
+| Current directed million-clock lockstep and two fault controls | PASS, authenticated 42697037494; [scope and evidence](CLOSURE_LOCKSTEP_20261109.md) |
 | Current dev4 8x4 physical screen | PASS, authenticated 42681697462; [measurements](CLOSURE_SCREEN_20261109.md) |
 | Exact route restoration/guards | Corrected cloud 42693952530 passes actual restoration, 55 guards and engine/Ciel initialization |
-| Native pre-DRT protocol replay | Prepared separate exact-netlist cloud check; actual results pending |
-| Detailed route and extracted timing | 42693952530 fresh-check/route/extraction step running; no completed-route acceptance yet |
-| Matching final-netlist protocol replay | Pending a qualified final netlist |
+| Native pre-DRT protocol replay | PASS, authenticated 42694710310: all 22 cases, no skips, exact native NL |
+| Detailed route and extracted timing | Route DRC/antenna/disconnect checks pass; extracted slow setup fails -1.982448040 ns in 42693952530 |
+| Matching final-netlist protocol replay | 42700728949 refuses failed source; no final replay acceptance |
 | Current qualified GDS/precheck and production integration | Pending |
 
-Lint 42692486515, test 42692486236 and docs 42692486054 pass at `b13b439`;
-unit 42692486070 remains in progress when checked. Cancelled two redundant
+Lint 42692486515, test 42692486236, docs 42692486054 and baseline
+unit 42692486070 pass at `b13b439`. Cancelled two redundant
 older branch unit runs (42690695243 and 42690788229) after Git comparison
 confirmed identical consumed workflow/RTL/tool/model/spec/firmware/test inputs.
-The latest unit run and main physical run remain active. No all-CI-green or
-phase-completion claim is made.
+These baseline checks do not replace the candidate-specific or physical
+gates. No release-wide all-CI-green or phase-completion claim is made.
 
 Production core/config promotion remains conditional on reproducible physical
 closure and review of settings outside the standing configuration whitelist.
@@ -186,3 +187,8 @@ strict XML are retained; no SDF or official GDS qualification is claimed.
 Fourteen admission controls pass locally, but actual route artifacts and
 replay remain pending. This keeps the earlier pre-DRT native replay separate
 from the required final implementation test.
+
+The source route subsequently fails extracted slow setup. Final replay
+42700728949 correctly stops at its source gate. See
+[the measured route failure and next diagnostic](CLOSURE_ROUTE_20261109.md).
+No success-only gate has been weakened.

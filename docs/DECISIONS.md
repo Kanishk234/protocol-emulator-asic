@@ -1818,3 +1818,23 @@ The user-provided full-design8x4 stock screen artifact shows the native flow's a
 Test one native project-control change on the same8x4 RTL: GRT_RESIZER_HOLD_SLACK_MARGIN 0.175→0.125ns. This may reduce unnecessary late hold-delay insertion and its antenna burden, but can reduce fast hold. Keep the strict >=0.05ns final fast-hold gate, all other-corner timing/electrical/antenna/overflow gates,20ns and stock timing flow unchanged. Do not proceed to DRT without every gate passing. The previous8x4 screen measured +0.145657ns fast hold; predicted outcome of the lower target is unknown until the fresh screen.
 
 The uploaded artifact `official-dev4-screen-8x4-42656422355.zip` is user-local evidence and must never be staged or published. The original saved final physical views are frozen in that artifact. No manual diode, post-flow ECO, timing waiver or official-job edit is allowed.
+
+## D-172 (2026-11-09, closure branch): diagnose extracted operating periods without changing the clock contract
+
+Run42693952530 completes zero-DRC/antenna-clean routing but fails extracted
+slow setup at -1.982448040 ns. The worst examined path is U0's live
+`bitsync_active` configuration latch to producer token bit14. D-066 still
+applies: keep those paths timed; no static-configuration or false-path waiver.
+
+Measure the exact fixed netlist/ODB/SPEF using the original dev4/PDK/container.
+First reproduce all six 20 ns setup/hold metrics, then probe periods21/22/24/25
+with the same preserved signoff SDC and stock constraint equations. Changing
+the period also changes any stock period-derived constraints; document that
+scope. Hash every frozen input before/after. No placement, repair, rerouting,
+cell change or new synthesis is part of the diagnostic.
+
+This is a bounded diagnostic under the user's authorized closure work. It does
+not adopt a clock target, change the architecture/firmware, qualify a release,
+or turn the failed20 ns run green. A later operating-target change must cover
+the software/tests/spec and production integration. Cost is several fresh
+three-corner STA executions; physical area and hardware behavior are unchanged.

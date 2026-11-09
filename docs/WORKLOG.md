@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Fix hold125 screen setup and rerun only 8x4
+
+- Run42679601122 fails during setup before synthesis: compatibility guard only accepted clock75 hash and matrix accidentally retained6x4. Log diagnostic setup bug. Extend guard solely for reviewed125ps hash and record actual config hash; restrict target arm to8x4. No timing gate or physical result changed. Actionlint and diff check pass. ZIP remains untracked. Relaunch required.
+
+
 ## 2026-11-09 — Trace full-design8x4 antenna residuals and prepare targeted screen
 
 - Inspect the user-supplied8x4 artifact in place; do not stage/push the ZIP. Stock flow clears its initial76net/85pin antenna report to0/0. Fresh final-checkpoint read-only audit finds three late Metal2 cumulative antenna ratios above200: hold10770/A on lane0 ex_slot266.18; hold9900/A on unit1 tok[14]257.60; hold7884/A on unit3 b_in225.30. All are hold-delay cells inserted downstream of native antenna repair. This resolves why screen showed3 nets/3 pins while normal diode repair was green.

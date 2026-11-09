@@ -1,0 +1,180 @@
+name: TRIPWIRE qualified 8x4 route
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tripwire/closure-8x4]
+    paths:
+      - .github/workflows/tripwire-closure-route.yaml
+      - scripts/ci/closure_route.py
+      - scripts/ci/test_closure_route.py
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: tripwire-qualified-8x4-route
+  cancel-in-progress: false
+
+env:
+  SOURCE_RUN: '42681697462'
+
+jobs:
+  source-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 200
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Prepare project virtual environment
+        run: bash scripts/setup_venv.sh
+      - name: Check source, archive and timing rejection controls
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q scripts/ci/test_closure_route.py \
+            scripts/ci/test_stock_screen_gate.py scripts/ci/test_extracted_timing.py
+      - name: Wait for the exact existing screen to finish successfully
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source .venv/bin/activate
+          python - <<'PY'
+          import json, os, subprocess, sys, time
+          sys.path.insert(0, 'scripts/ci')
+          from closure_route import SOURCE_RUN, SOURCE_SHA
+          expected = dict(id=SOURCE_RUN, head_sha=SOURCE_SHA, head_branch='main',
+                          path='.github/workflows/gds-official-dev4-hold125-screen.yaml', run_attempt=1)
+          deadline = time.monotonic() + 180 * 60
+          while True:
+              run = json.loads(subprocess.check_output([
+                  'gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{SOURCE_RUN}'], text=True))
+              assert all(run.get(k) == v for k, v in expected.items()), 'Foreign source run'
+              print('Source screen:', run['status'], run['conclusion'], flush=True)
+              if run['status'] == 'completed':
+                  assert run['conclusion'] == 'success', 'Source failed; no routing allowed'
+                  break
+              assert time.monotonic() < deadline, 'Source wait expired; no routing allowed'
+              time.sleep(60)
+          PY
+
+  route:
+    needs: source-gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Prepare project virtual environment
+        run: bash scripts/setup_venv.sh
+      - name: Prepare trusted full-core source for independent artifact comparison
+        run: |
+          source .venv/bin/activate
+          python scripts/ci/prepare_closure_candidate.py export "$RUNNER_TEMP/closure-expected"
+          echo "CLOSURE_EXPECTED_SOURCE=$RUNNER_TEMP/closure-expected" >> "$GITHUB_ENV"
+      - name: Download and restore only the exact qualified source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > closure-source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN/artifacts" > closure-artifact-list.json
+          python - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/ci')
+          from closure_route import SOURCE_RUN, provenance
+          artifacts = json.loads(Path('closure-artifact-list.json').read_text())['artifacts']
+          matches = [a for a in artifacts if a['name'] == f'official-dev4-hold125-{SOURCE_RUN}']
+          assert len(matches) == 1, 'Missing unique source artifact'
+          artifact = matches[0]
+          provenance(json.loads(Path('closure-source-run.json').read_text()), artifact)
+          Path('closure-source-artifact.json').write_text(json.dumps(artifact, indent=2) + '\n')
+          with open('closure-source.zip', 'wb') as output:
+              subprocess.run(['gh', 'api', f'repos/{os.environ["GITHUB_REPOSITORY"]}/actions/artifacts/{artifact["id"]}/zip'],
+                             stdout=output, check=True)
+          PY
+          python scripts/ci/closure_route.py restore
+      - name: Check out exact current Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: 9d13ff3e3e6202090740110438c6a10c1d62ca0f
+          path: tt
+      - name: Install stock flow prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+      - name: Install and verify stock flow environment
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          python -m pip install -r tt/requirements.txt librelane==3.1.0.dev4
+          docker pull ghcr.io/librelane/librelane:3.1.0.dev4
+          docker image inspect ghcr.io/librelane/librelane:3.1.0.dev4 > closure-engine-image.json
+          docker run --rm ghcr.io/librelane/librelane:3.1.0.dev4 openroad -version > closure-openroad.txt
+          python - <<'PY'
+          import importlib.metadata, json, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/ci')
+          from closure_route import IMAGE, IMAGE_DIGEST, PDK, TOOLS
+          from librelane.common import get_ciel_pdk_hash
+          assert importlib.metadata.version('librelane') == '3.1.0.dev4'
+          assert get_ciel_pdk_hash('ihp-sg13cmos5l') == PDK
+          images = json.loads(Path('closure-engine-image.json').read_text())
+          assert len(images) == 1 and IMAGE.rsplit(':', 1)[0] + '@' + IMAGE_DIGEST in images[0]['RepoDigests']
+          assert Path('closure-openroad.txt').read_text().strip() == 'dcf36133a369abc8f3c5e5738cd4d82e4903c0e0'
+          PY
+      - name: Initialize normal Ciel PDK and independently check restored antennas
+        timeout-minutes: 30
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+          python - <<'PY'
+          import json, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/ci')
+          from stock_screen_gate import one
+          source = one(Path('runs/stock-official-baseline'), '*-openroad-stamidpnr-3/state_out.json')
+          cfg = json.loads(Path('src/config_merged.json').read_text())
+          cfg['meta'] = {'version': 1, 'flow': ['OpenROAD.CheckAntennas']}
+          path = Path('src/config_closure_initialize.json')
+          path.write_text(json.dumps(cfg, indent=2) + '\n')
+          output = Path('runs/closure-initialize'); output.mkdir()
+          subprocess.run([sys.executable, '-m', 'librelane', '--docker-no-tty', '--dockerized',
+                          '--pdk-root', '/home/runner/pdk', '--pdk', 'ihp-sg13cmos5l',
+                          '--run-tag', output.name, '--force-run-dir', str(output), '--hide-progress-bar',
+                          '--with-initial-state', str(source), str(path)], check=True)
+          PY
+      - name: Recheck timing then route and extract with the unchanged recipe
+        timeout-minutes: 300
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+          python scripts/ci/closure_route.py route
+      - name: Retain source binding, route diagnostics and extraction
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tripwire-qualified-route-${{ github.run_id }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            closure-source-run.json
+            closure-source-artifact.json
+            closure-engine-image.json
+            closure-openroad.txt
+            runs/
+            src/
+            macro/
+            info.yaml

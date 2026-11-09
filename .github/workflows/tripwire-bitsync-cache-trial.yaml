@@ -75,6 +75,9 @@ jobs:
         run: |
           set -euo pipefail
           source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
+          iverilog -V > build/closure-evidence/iverilog-version.txt 2>&1
+          yosys -V > build/closure-evidence/yosys-version.txt
           python scripts/ci/verify_bitsync_cache_ff.py \
             --reference "$RUNNER_TEMP/tripwire-candidate" \
             --output "$RUNNER_TEMP/bitsync-cache-proof" \

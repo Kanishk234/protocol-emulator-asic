@@ -19,8 +19,8 @@ Companions: `OVERVIEW_TRIPWIRE.md`, `ARCHITECTURE.md`, `VERIFICATION.md`.
 
 | Item | Value | Notes |
 |---|---|---|
-| Template | `TinyTapeout/ttihp-verilog-template`, branch **cmos5l** | Linked from the Jane Street post |
-| Build action | `TinyTapeout/tt-gds-action@ihp-cmos5l`, `pdk: ihp-sg13cmos5l` | Used by the template's `gds` workflow |
+| Template | `TinyTapeout/ttihp-verilog-template`, branch **main** | November9 upstream reference update; D-169 |
+| Build action | `TinyTapeout/tt-gds-action@ttihp27a`, `pdk: ihp-sg13cmos5l` | Jobs match upstream template4b1204a; no custom job behavior |
 | Tile size | **6x4** (1289.28 × 710.64 µm die; core ≈ 902K µm²) | Organizer email supplied2026-10-09: planned maximum8x4, template expected around mid-October; retain6x4 until released and evaluated |
 | Routing layers | Metal1–Metal4 for the project (TopMetal1 belongs to the Tiny Tapeout top level) | One fewer layer than SG13G2, so congestion matters more |
 | Clock | `CLOCK_PERIOD` 20 ns (50 MHz); `CLOCK_PORT` `clk` | Sign-off corner is typical; slow-corner results are reported honestly |

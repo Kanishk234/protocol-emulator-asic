@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Align official submission references with upstream now
+
+- User requests immediate upstream reference alignment to avoid closing against an obsolete flow. Update all four official GDS-related action references and docs action to ttihp27a. Parsed GDS and docs jobs match official template4b1204a exactly; preserve our trigger/concurrency block. No src/config/info/hardware or acceptance-gate change.
+- Rebind current design_manifest official workflow SHA, retain previous hash and template revision. Apply the complete verified design patch in an isolated archive and independently verify every manifest output hash plus new official-workflow hash. Actionlint passes. Existing test/Makefile already includes CMOS5L UDP models; preserve its project source list and proven full-design patch rather than replace it with template example sources. Record D169 and update current physical-design reference docs.
+- Official push will trigger GDS on the currently integrated placeholder top, not the full experimental protocol core; do not count any placeholder result as Phase2 completion. Current new-toolchain6x4/8x4 screens remain the primary physical target; old-engine constant-storage results require requalification on the new environment. Main8x4/full-design promotion remains a separate integration gate. No phase boxes ticked.
+
+
 ## 2026-11-09 — Updated toolchain compatibility passes both geometries
 
 - Published9063cbd evidence/839b84e CI/492a99c docs. [42656422355](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42656422355) confirmed queued on492a99c80f4d171c5dda42b0da59a4b51b35ee1f, one dispatch.97 relevant profile/gate tests pass, actionlint and all shell/embeddedPython checks pass. Local archive-download session completed; no local physical process or watcher. Storage screen42649693561 remains in_progress at this check. Timing results pending.

@@ -1793,3 +1793,12 @@ Complete slot-module equivalence passes 768 ASIC and 752 FPGA-fallback points, i
 Isolated mapped slot area per lane changes24548.832→26798.688um², an increase4499.712um² across two lanes. Root-clock load/power, native optimization and routed repair area remain unmeasured. The whole-store alternative also proves equivalent but costs46405.0944um² extra across two lanes, so it is parked and has no physical-screen profile.
 
 Test only the constant-bank candidate through clean RTL/TT configuration/stock Classic using byte-identical clock75 configuration and every existing gate. Audit actual synthesis storage and read-only final geometry; do not feed the prior checkpoint into hardening. Main hardware/config and official GDS jobs remain unchanged. No Phase2 or official qualification follows from local proofs.
+
+
+## D-169 (2026-11-09): align official action references with current upstream now
+
+The organizers moved the CMOS5L template to main and supplied ttihp27a official action references. Adopt those references now for GDS, precheck, GL, viewer and docs rather than leave the submission path on the older ihp-cmos5l action while optimizing a different environment. Parsed jobs match upstream template4b1204ab387b5ab94db1d57067051d8d89a2f83c exactly; only our permitted GDS triggers/concurrency remain project-specific. This is upstream synchronization explicitly requested by the user, not a custom template-job change. No hardware, architecture, timing exception or acceptance gate changes.
+
+Rebind design_manifest.json's official workflow hash to the reviewed updated jobs, retaining the previous hash as provenance; the verified full-design patch and all produced source hashes still pass. Preserve historical experiment receipts and older diagnostic workflows as historical evidence. Current official-dev4-tile-screen is the primary physical comparison; the older constant-storage screen is exploratory evidence, not new-toolchain qualification.
+
+Main still contains the placeholder top and6x4 metadata. A workflow-triggered official run after this update validates the new pipeline only on that integrated top; it cannot establish full2/4core timing/protocol closure. Keep current full-design8x4 source/config validation and antenna work on the new official toolchain, then promote the verified design/metadata together. Upstream's new Makefile supports optional UDP models; our existing CMOS5L Makefile already explicitly includes the required UDP file. No test-source-list replacement is required for this reference update.

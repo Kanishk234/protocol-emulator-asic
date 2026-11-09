@@ -1,0 +1,156 @@
+name: TRIPWIRE bitsync cache storage trial
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - tripwire/closure-8x4
+    paths:
+      - scripts/ci/verify_bitsync_cache_ff.py
+      - spikes/phase2_stock_flow/bitsync_cache_ff/**
+      - .github/workflows/tripwire-bitsync-cache-trial.yaml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tripwire-bitsync-cache-trial-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      OSS_CAD_SUITE_TAG: '2026-06-29'
+    steps:
+      - name: Check out closure branch
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install independent protocol decoders
+        run: sudo apt-get update && sudo apt-get install -y sigrok-cli
+
+      - name: Prepare project virtual environment
+        run: bash scripts/setup_venv.sh
+
+      - name: Cache pinned OSS CAD Suite
+        id: cad-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+
+      - name: Install pinned OSS CAD Suite
+        if: steps.cad-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          date_tag=${OSS_CAD_SUITE_TAG//-/}
+          curl --fail --location --output "$RUNNER_TEMP/oss-cad-suite.tgz" \
+            "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$date_tag.tgz"
+          tar -xzf "$RUNNER_TEMP/oss-cad-suite.tgz" -C "$HOME"
+
+      - name: Check preparation and existing acceptance guards
+        run: |
+          source .venv/bin/activate
+          python -m pytest -q scripts/ci/test_prepare_closure_candidate.py \
+            scripts/ci/test_host_idle_portable_trials.py scripts/ci/test_stock_screen_gate.py
+
+      - name: Prepare exact full-core 8x4 candidate
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          mkdir -p build/closure-evidence
+          python scripts/ci/prepare_closure_candidate.py export "$RUNNER_TEMP/tripwire-candidate" \
+            | tee build/closure-evidence/preparation.log
+          python -m pip freeze > build/closure-evidence/python-packages.txt
+          "$HOME/oss-cad-suite/bin/verilator" --version > build/closure-evidence/verilator-version.txt
+          sigrok-cli --version > build/closure-evidence/sigrok-version.txt
+
+      - name: Prove storage equivalence and apply exactly one file change
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          python scripts/ci/verify_bitsync_cache_ff.py \
+            --reference "$RUNNER_TEMP/tripwire-candidate" \
+            --output "$RUNNER_TEMP/bitsync-cache-proof" \
+            --yosys "$HOME/oss-cad-suite/bin/yosys"
+          cp "$RUNNER_TEMP/bitsync-cache-proof/src/trw_pin_cfg.v" "$RUNNER_TEMP/tripwire-candidate/src/trw_pin_cfg.v"
+
+      - name: Check model and compiler on candidate sources
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          cd "$RUNNER_TEMP/tripwire-candidate"
+          python -m pytest -q -n 4 -m 'not slow' --junitxml="$GITHUB_WORKSPACE/build/closure-evidence/tools.xml"
+
+      - name: Test real Tiny Tapeout top and full-core protocols
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          candidate="$RUNNER_TEMP/tripwire-candidate"
+          cd "$candidate/test"
+          make SIM=verilator VERILATOR_BIN_DIR="$HOME/oss-cad-suite/bin" \
+            EXTRA_ARGS='--timing -Wno-fatal' \
+            COCOTB_RESULTS_FILE="$GITHUB_WORKSPACE/build/closure-evidence/top.xml"
+          cd "$candidate/test_internal/chip"
+          make SIM=verilator VERILATOR_BIN_DIR="$HOME/oss-cad-suite/bin" \
+            SRC_DIR="$candidate/src" MACRO_DIR="$candidate/macro/RM_IHPSG13_1P_512x16_c2_bm_bist" \
+            COCOTB_TEST_MODULES=test_l3 \
+            COCOTB_RESULTS_FILE="$GITHUB_WORKSPACE/build/closure-evidence/protocols.xml"
+
+      - name: Verify unchanged candidate and executed test results
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/ci')
+          from prepare_closure_candidate import candidate_inputs, sha
+          root = Path(os.environ['RUNNER_TEMP']) / 'tripwire-candidate'
+          original = json.loads((root / 'closure-candidate.json').read_text())
+          identity = json.loads(Path('spikes/phase2_stock_flow/bitsync_cache_ff/identity.json').read_text())
+          assert original['inputs']['src/trw_pin_cfg.v'] == identity['reference_sha256']
+          expected = dict(original['inputs'], **{'src/trw_pin_cfg.v': identity['candidate_sha256']})
+          assert candidate_inputs(root) == expected
+          assert sha(root / original['workflow']) == original['workflow_sha256']
+          Path('build/closure-evidence/trial-inputs.json').write_text(json.dumps(expected, indent=2)+'\n')
+          PY
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = Path('build/closure-evidence')
+          result = {}
+          for name, expected in [('tools', None), ('top', 4), ('protocols', 22)]:
+              cases = list(ET.parse(root / (name + '.xml')).getroot().iter('testcase'))
+              assert cases and (expected is None or len(cases) == expected), (name, len(cases))
+              assert all(not any(c.find(tag) is not None for tag in ('failure', 'error', 'skipped'))
+                         for c in cases), name
+              result[name] = {'passed': len(cases), 'failures': 0, 'errors': 0, 'skips': 0}
+          result['scope'] = 'Candidate RTL simulation only; no routed netlist or physical timing acceptance'
+          (root / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
+          PY
+
+      - name: Retain candidate source and actual results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tripwire-bitsync-cache-${{ github.run_id }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            build/closure-evidence/
+            ${{ runner.temp }}/tripwire-candidate/closure-candidate.json
+            ${{ runner.temp }}/tripwire-candidate/compatibility-input.json
+            ${{ runner.temp }}/tripwire-candidate/info.yaml
+            ${{ runner.temp }}/tripwire-candidate/src/
+            ${{ runner.temp }}/tripwire-candidate/macro/
+            ${{ runner.temp }}/tripwire-candidate/spikes/phase2_stock_flow/selected_profile.json
+            ${{ runner.temp }}/bitsync-cache-proof/receipt.json
+            ${{ runner.temp }}/bitsync-cache-proof/*.log

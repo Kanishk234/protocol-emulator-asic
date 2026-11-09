@@ -33,7 +33,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install independent protocol decoders
-        run: sudo apt-get update && sudo apt-get install -y sigrok-cli
+        run: sudo apt-get update && sudo apt-get install -y sigrok-cli iverilog
 
       - name: Prepare project virtual environment
         run: bash scripts/setup_venv.sh
@@ -76,12 +76,13 @@ jobs:
           set -euo pipefail
           source .venv/bin/activate
           export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
-          iverilog -V > build/closure-evidence/iverilog-version.txt 2>&1
+          /usr/bin/iverilog -V > build/closure-evidence/iverilog-version.txt 2>&1
           yosys -V > build/closure-evidence/yosys-version.txt
           python scripts/ci/verify_bitsync_cache_ff.py \
             --reference "$RUNNER_TEMP/tripwire-candidate" \
             --output "$RUNNER_TEMP/bitsync-cache-proof" \
-            --yosys "$HOME/oss-cad-suite/bin/yosys"
+            --yosys "$HOME/oss-cad-suite/bin/yosys" \
+            --iverilog /usr/bin/iverilog --vvp /usr/bin/vvp
           cp "$RUNNER_TEMP/bitsync-cache-proof/src/trw_pin_cfg.v" "$RUNNER_TEMP/tripwire-candidate/src/trw_pin_cfg.v"
 
       - name: Check model and compiler on candidate sources

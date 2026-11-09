@@ -21,7 +21,7 @@ Companions: `OVERVIEW_TRIPWIRE.md`, `ARCHITECTURE.md`, `VERIFICATION.md`.
 |---|---|---|
 | Template | `TinyTapeout/ttihp-verilog-template`, branch **main** | November9 upstream reference update; D-169 |
 | Build action | `TinyTapeout/tt-gds-action@ttihp27a`, `pdk: ihp-sg13cmos5l` | Jobs match upstream template4b1204a; no custom job behavior |
-| Tile size | **6x4** (1289.28 × 710.64 µm die; core ≈ 902K µm²) | Organizer email supplied2026-10-09: planned maximum8x4, template expected around mid-October; retain6x4 until released and evaluated |
+| Tile size | **8x4** (1724.16 × 710.64 µm die) | Final allocation confirmed November9; D-170. Main info.yaml selects8x4. Historical and explicit diagnostic6x4 controls remain frozen; full protocol-core promotion/closure is still pending |
 | Routing layers | Metal1–Metal4 for the project (TopMetal1 belongs to the Tiny Tapeout top level) | One fewer layer than SG13G2, so congestion matters more |
 | Clock | `CLOCK_PERIOD` 20 ns (50 MHz); `CLOCK_PORT` `clk` | Sign-off corner is typical; slow-corner results are reported honestly |
 | Pads | CMOS5L has no characterized pad timing numbers yet | Organizer email supplied2026-10-09; Tiny Tapeout is investigating comparable SG13G2 data. Do not assert a66MHz pad specification or measured pin timing |

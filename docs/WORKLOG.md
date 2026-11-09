@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Select confirmed 8x4 in main metadata
+
+- User requests8x4 metadata now. Set info.yaml tiles8x4 and correct stale tile-size comment; retain50MHz, source list and placeholder RTL. Official tools choose final floorplan; no custom geometry override. Active official placeholder run42664671296 will be superseded by the hardware-metadata push. Full protocol-core integration/closure remains pending and no phase box is ticked.
+- Rebase only info.yaml hunk in verified_design_only.patch to preserve byte-identical frozen6x4 control before diagnostic matrix selection. Update manifest patch digest and retain previous digest. Isolated application/check passes and every full-design manifest output hash remains unchanged. Existing running diagnostic inputs are frozen at their launch SHAs. Record D170 and current physical-platform metadata.
+
+
 ## 2026-11-09 — Align official submission references with upstream now
 
 - User requests immediate upstream reference alignment to avoid closing against an obsolete flow. Update all four official GDS-related action references and docs action to ttihp27a. Parsed GDS and docs jobs match official template4b1204a exactly; preserve our trigger/concurrency block. No src/config/info/hardware or acceptance-gate change.

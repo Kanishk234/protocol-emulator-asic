@@ -1,0 +1,131 @@
+name: TRIPWIRE extracted clock-period diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tripwire/closure-8x4]
+    paths:
+      - .github/workflows/tripwire-closure-clock-probe.yaml
+      - scripts/ci/closure_clock_probe.py
+      - scripts/ci/test_closure_clock_probe.py
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: tripwire-closure-clock-probe
+  cancel-in-progress: false
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      PDK_ROOT: /home/runner/pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Prepare project venv, controls and expected source
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q scripts/ci/test_closure_clock_probe.py
+          python scripts/ci/prepare_closure_candidate.py export "$RUNNER_TEMP/probe-expected"
+          echo "CLOSURE_EXPECTED_SOURCE=$RUNNER_TEMP/probe-expected" >> "$GITHUB_ENV"
+      - name: Authenticate exact failed extraction and recover fixed timing inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/42693952530" > probe-source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/13716989088" > probe-source-artifact.json
+          python - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/ci')
+          from closure_clock_probe import context
+          context(json.loads(Path('probe-source-run.json').read_text()),
+                  json.loads(Path('probe-source-artifact.json').read_text()))
+          PY
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/13716989088/zip" > probe-source.zip
+          python scripts/ci/closure_clock_probe.py restore
+      - name: Check out exact current Tiny Tapeout tools
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: 9d13ff3e3e6202090740110438c6a10c1d62ca0f
+          path: tt
+      - name: Install stock flow prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+      - name: Install and verify original dev4 environment
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          python -m pip install -r tt/requirements.txt librelane==3.1.0.dev4
+          docker pull ghcr.io/librelane/librelane:3.1.0.dev4
+          docker image inspect ghcr.io/librelane/librelane:3.1.0.dev4 > probe-engine-image.json
+          docker run --rm ghcr.io/librelane/librelane:3.1.0.dev4 openroad -version > probe-openroad.txt
+          python - <<'PY'
+          import importlib.metadata, json, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/ci')
+          from closure_route import IMAGE, IMAGE_DIGEST, PDK
+          from librelane.common import get_ciel_pdk_hash
+          assert importlib.metadata.version('librelane') == '3.1.0.dev4'
+          assert get_ciel_pdk_hash('ihp-sg13cmos5l') == PDK
+          images = json.loads(Path('probe-engine-image.json').read_text())
+          assert len(images) == 1 and IMAGE.rsplit(':', 1)[0]+'@'+IMAGE_DIGEST in images[0]['RepoDigests']
+          assert Path('probe-openroad.txt').read_text().strip() == 'dcf36133a369abc8f3c5e5738cd4d82e4903c0e0'
+          PY
+      - name: Initialize original Ciel PDK with a read-only antenna check
+        timeout-minutes: 30
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+          python - <<'PY'
+          import json, subprocess, sys
+          from pathlib import Path
+          source = list(Path('runs/extracted-timing').glob('*-openroad-stapostpnr/state_out.json'))
+          assert len(source) == 1
+          config = json.loads(Path('src/config_extracted_timing.json').read_text())
+          config['meta'] = {'version': 1, 'flow': ['OpenROAD.CheckAntennas']}
+          path = Path('src/config_clock_probe_initialize.json')
+          path.write_text(json.dumps(config, indent=2)+'\n')
+          output = Path('runs/clock-probe-initialize'); output.mkdir()
+          subprocess.run([sys.executable, '-m', 'librelane', '--docker-no-tty', '--dockerized',
+              '--pdk-root', '/home/runner/pdk', '--pdk', 'ihp-sg13cmos5l', '--run-tag', output.name,
+              '--force-run-dir', str(output), '--hide-progress-bar', '--with-initial-state',
+              str(source[0]), str(path)], check=True)
+          PY
+      - name: Reproduce 20 ns control then measure fixed-route operating periods
+        timeout-minutes: 60
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+          python scripts/ci/closure_clock_probe.py measure
+      - name: Retain diagnostic measurements without promoting a clock target
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tripwire-clock-diagnostic-${{ github.run_id }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            probe-source-run.json
+            probe-source-artifact.json
+            probe-engine-image.json
+            probe-openroad.txt
+            runs/clock-probe-recovery.json
+            runs/clock-probe-initialize/
+            runs/closure-clock-probe/
+            runs/extracted-timing/corner_summary.json
+            runs/extracted-timing/constraint_identity.json

@@ -9,7 +9,7 @@ import yaml
 TOOLS = '9d13ff3e3e6202090740110438c6a10c1d62ca0f'
 PDK = '89d42ee6d2fd9b50b86a1aada6fee6673c3e6008'
 CONFIGS = {'35bacb325c12276dd63f7e33b99f94b5e0d4940f7b3a22a6bd1e63424bc4c97a',
-           '1af28559fda1c1ac611cf0fc4dbc0ed462e903c3d05e4ff0c76bb1039d00adcf'}
+           '4d71243f672fac34f004c43a8c8bfc46cffaae2b2929f7d3c788de1fac72a9f7'}
 SIZES = {'6x4': '0 0 1289.28 710.64', '8x4': '0 0 1724.16 710.64'}
 
 

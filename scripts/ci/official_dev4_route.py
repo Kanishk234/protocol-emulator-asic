@@ -97,6 +97,15 @@ def bootstrap_ciel_antenna(config, source, output_name='dev4-ciel-antenna'):
     return antenna
 
 
+def restore_resolved_pdk_root(receipt):
+    """Restore the exact versioned Ciel PDK path for a later process in this job."""
+    pdk_root = Path(receipt.get('resolved_pdk_root', '')).resolve()
+    if pdk_root.name != PDK or not (pdk_root / 'ihp-sg13cmos5l').is_dir():
+        raise ValueError('Missing or invalid exact resolved Ciel PDK root')
+    os.environ['PDK_ROOT'] = str(pdk_root)
+    return pdk_root
+
+
 def prepare():
     source, config = verify_source()
     antenna = bootstrap_ciel_antenna(config, source)
@@ -108,6 +117,7 @@ def prepare():
     pre_route_ready = qualified(comparison, antenna) and electrical_clean(comparison)
     receipt = dict(source_run=SOURCE_RUN, source_sha=SOURCE_SHA, source_state=str(source),
                    fresh_antenna=antenna, qualified=pre_route_ready,
+                   resolved_pdk_root=os.environ['PDK_ROOT'],
                    minimum_fast_hold_ns=.05, detailed_routing_performed=False,
                    official_gds_signoff=False)
     Path('runs/dev4-pre-route-gates.json').write_text(json.dumps(receipt, indent=2) + '\n')
@@ -122,6 +132,7 @@ def route():
             or receipt.get('qualified') is not True
             or Path(receipt.get('source_state', '')).resolve() != source.resolve()):
         raise ValueError('Missing or mismatched fresh pre-route qualification')
+    restore_resolved_pdk_root(receipt)
     route = Path('runs/dev4-hold125-route')
     run_step(config, source, route, ['OpenROAD.DetailedRouting'])
     route_state_path = unique(route, '*-openroad-detailedrouting/state_out.json')

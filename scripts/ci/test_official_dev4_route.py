@@ -17,6 +17,18 @@ def test_route_and_extraction_jobs_export_pdk_root():
         assert config['jobs'][job]['env']['PDK_ROOT'] == '/home/runner/pdk'
 
 
+def test_restore_resolved_pdk_root_uses_exact_versioned_directory(tmp_path, monkeypatch):
+    versioned = tmp_path / route.PDK
+    (versioned / 'ihp-sg13cmos5l').mkdir(parents=True)
+    assert route.restore_resolved_pdk_root({'resolved_pdk_root': str(versioned)}) == versioned
+    assert __import__('os').environ['PDK_ROOT'] == str(versioned)
+
+
+def test_restore_resolved_pdk_root_rejects_cache_root(tmp_path):
+    with pytest.raises(ValueError, match='exact resolved Ciel PDK root'):
+        route.restore_resolved_pdk_root({'resolved_pdk_root': str(tmp_path)})
+
+
 def make_source(tmp_path, monkeypatch, inventory_matches=True):
     monkeypatch.chdir(tmp_path)
     monkeypatch.setattr(route, 'RUNNER_ROOT', tmp_path.resolve())

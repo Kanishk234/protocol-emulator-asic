@@ -10,6 +10,14 @@ Newest entry at the top. One entry per work session.
 Next:
 - Inspect route run 42714224766. If DRT completes with zero route violations, inspect extracted setup/hold, electrical and antenna gates before final-netlist protocol replay; if it fails, diagnose the exact first failed step before changing anything.
 
+## 2026-11-09 — Carry the resolved dev4 PDK path into DRT
+
+- Run [42714224766](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42714224766) passed checkpoint restoration, engine identity and fresh source requalification. DRT still did not start: LibreLane rejected `/home/runner/pdk` because it is the Ciel cache root, while the prepare process had resolved the actual pinned PDK beneath its revision directory. The route process did not receive that exact resolved path; no routing or extracted timing result was produced.
+- Added the validated PDK path to the pre-route receipt and a route-stage guard that restores only a path whose directory matches the pinned revision and contains `ihp-sg13cmos5l`. Added tests for acceptance of the versioned root and rejection of the cache root; recorded BUG #156. This preserves the exact screen checkpoint and changes no design or flow gates.
+
+Next:
+- Run the focused tests and workflow lint, publish the PDK-path persistence fix, then retry the exact-checkpoint route. Verify the `Run stock detailed routing only` step actually enters OpenROAD before interpreting any subsequent failure as a routing result.
+
 ## 2026-11-09 — Prepare exact 8x4 dev4 screen continuation through extraction
 
 - User confirms the full 8x4 `gds-official-dev4-hold125-screen` run [42681697462](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42681697462) finished. Recorded screen evidence: all strict pre-route gates passed, global overflow0, antenna0, electrical violations0, fast hold+0.127092ns, slow hold+0.697614ns, typical hold+0.333103ns; setup WS summary0 at all corners. This is estimated pre-route timing, not extracted closure, detailed-route completion, or official GDS signoff.

@@ -58,6 +58,16 @@ template jobs and production hardware/configuration remain unchanged.
 
 ## Next gate
 
+Published tools2cb5c89, CI47e57e7 and docse248408 to
+[`tripwire/closure-8x4`](https://github.com/Kanishk234/protocol-emulator-asic/tree/tripwire/closure-8x4).
+[Candidate regression42690695832](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42690695832)
+is confirmed in progress at exact sourcee248408. Standard unit42690695243,
+test42690695257, lint42690695247 and docs42690694815 also queued/started.
+No success is claimed before actual job/artifact inspection. Existing main
+physical42681697462 is independently still in progress. This publication
+receipt changes documentation only and does not supersede the candidate run's
+source identity.
+
 Publish grouped tools/CI/docs commits and inspect the branch regression's
 actual artifact. Do not count default branch unit/test badges as evidence for
 the experimental core. Existing physical run42681697462 on main remains

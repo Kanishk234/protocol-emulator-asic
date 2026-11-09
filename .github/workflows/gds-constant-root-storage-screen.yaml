@@ -1,0 +1,540 @@
+# Clean from RTL with native project inputs only; no manual physical repairs.
+# Separate measurement workflow; official gds.yaml and stock flow are unchanged.
+name: gds-constant-root-storage-screen
+run-name: clock75 constant storage refinement
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: gds-constant-root-storage-screen
+  cancel-in-progress: false
+jobs:
+  source_geometry:
+    name: Read-only clock75 geometry preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+    - name: Check out reviewed diagnostic tools
+      uses: actions/checkout@v6
+    - name: Restore only the bound clock75 evidence for read-only diagnosis
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |-
+        set -euo pipefail
+        gh api repos/${{ github.repository }}/actions/artifacts/13611529602 > geometry-source-artifact.json
+        gh api repos/${{ github.repository }}/actions/artifacts/13611529602/zip > geometry-source.zip
+        python - <<'PYCODE'
+        import hashlib, json, shutil, zipfile
+        from pathlib import Path, PurePosixPath
+        manifest=json.loads(Path('spikes/phase2_stock_flow/clock75_geometry_source.json').read_text())
+        artifact=json.loads(Path('geometry-source-artifact.json').read_text())
+        assert all(artifact.get(k)==v for k,v in manifest['artifact'].items()),'Wrong geometry artifact'
+        assert artifact['workflow_run']['id']==manifest['run_id']
+        assert artifact['workflow_run']['head_sha']==manifest['source_sha']
+        digest=hashlib.sha256()
+        with open('geometry-source.zip','rb') as stream:
+            for chunk in iter(lambda:stream.read(8*1024*1024),b''):digest.update(chunk)
+        assert 'sha256:'+digest.hexdigest()==manifest['artifact']['digest'],'Wrong geometry archive digest'
+        prefixes=('runs/stock-official-baseline/44-openroad-resizertimingpostgrt/',
+                  'runs/stock-official-baseline/45-openroad-stamidpnr-3/',
+                  'runs/stock-corner-audit/fresh-antenna/')
+        with zipfile.ZipFile('geometry-source.zip') as archive:
+            names=archive.namelist();assert len(names)==len(set(names))
+            for name in names:
+                if not name.startswith(prefixes) or name.endswith('/'):continue
+                path=PurePosixPath(name);assert not path.is_absolute() and '..' not in path.parts
+                target=Path(name);target.parent.mkdir(parents=True,exist_ok=True)
+                with archive.open(name) as src,open(target,'wb') as dst:shutil.copyfileobj(src,dst)
+        for name,expected in manifest['files'].items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==expected,name
+        PYCODE
+    - name: Read saved grid and net connections with the immutable stock image
+      run: |-
+        set -euo pipefail
+        docker run --rm --network none --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -w "$PWD" ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a openroad -exit -python scripts/ci/portable_residual_geometry.py > geometry-preflight.log 2>&1
+        python - <<'PYCODE'
+        import json, re
+        from pathlib import Path
+        assert not re.search(r'(?m)^\[ERROR\b',Path('geometry-preflight.log').read_text())
+        receipt=json.loads(Path('runs/portable-geometry/saved_geometry.json').read_text())
+        assert receipt['final_live_overflow']==1
+        assert receipt['physical_changes_applied'] is False and receipt['router_initialized'] is False
+        PYCODE
+    - name: Upload read-only geometry preflight
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: constant-root-source-geometry-${{ github.run_id }}
+        path: |-
+          runs/portable-geometry/**
+          geometry-preflight.log
+          geometry-source-artifact.json
+          spikes/phase2_stock_flow/clock75_geometry_source.json
+  screen:
+    needs: source_geometry
+    name: Stock RTL screen (${{ matrix.variant }})
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        variant: [clock75_constants_ff]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+      STOCK_PROFILE: rtl_shared_minbuf2_host_idle_ff
+      PORTABLE_VARIANT: ${{ matrix.variant }}
+    steps:
+    - name: Check out project
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Prepare the full design with strict stock project inputs
+      run: |-
+        set -euo pipefail
+        git apply --check spikes/phase2_stock_flow/verified_design_only.patch
+        git apply spikes/phase2_stock_flow/verified_design_only.patch
+        cp spikes/phase2_stock_flow/strict_project_config.json src/config.json
+        spikes/r3_sram/fetch_macro.sh macro/RM_IHPSG13_1P_512x16_c2_bm_bist
+        python - <<'PYCODE'
+        import hashlib, json, subprocess
+        from pathlib import Path
+        manifest = json.loads(Path('spikes/phase2_stock_flow/design_manifest.json').read_text())
+        for name, sha in manifest['files'].items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+        assert hashlib.sha256(Path('.github/workflows/gds.yaml').read_bytes()).hexdigest() == manifest['official_workflow_sha256']
+        macros = json.loads(Path('scripts/ci/fixtures/wire600_selective/promoted_source.json').read_text())['macro_files']
+        for name, sha in macros.items():
+            path = Path('macro/RM_IHPSG13_1P_512x16_c2_bm_bist') / name
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == sha, name
+        config = json.loads(Path('src/config.json').read_text())
+        assert 'meta' not in config
+        assert config['CLOCK_PERIOD'] == 20
+        assert config['PL_TARGET_DENSITY_PCT'] == 56
+        assert config['PL_RESIZER_SETUP_SLACK_MARGIN'] == 0
+        assert config['CTS_APPLY_NDR'] == 'none'
+        assert config['CTS_SINK_CLUSTERING_SIZE'] == 8
+        assert config['RUN_POST_GRT_DESIGN_REPAIR'] is True
+        assert config['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH'] == 300
+        assert config['GRT_ADJUSTMENT'] == 0.16
+        assert config['RUN_POST_GRT_RESIZER_TIMING'] is False
+        assert config['PL_RESIZER_HOLD_SLACK_MARGIN'] == 0.275
+        assert config['GRT_OVERFLOW_ITERS'] == 100
+        assert 'GRT_ANTENNA_REPAIR_JUMPER_ONLY' not in config
+        policy = json.loads(Path('spikes/phase2_stock_flow/config_banks_evidence.json').read_text())
+        physical = json.loads(Path('spikes/phase2_stock_flow/wire300_hold175_evidence.json').read_text())
+        assert policy['project_config_sha256'] == physical['baseline_project_config_sha256']
+        hold_control = json.loads(Path('spikes/phase2_stock_flow/wire300_hold250_evidence.json').read_text())
+        assert physical['candidate_project_config_sha256'] == hold_control['baseline_project_config_sha256']
+        reserve = json.loads(Path('spikes/phase2_stock_flow/wire300_hold275_iter100_evidence.json').read_text())
+        assert hold_control['candidate_project_config_sha256'] == reserve['baseline_project_config_sha256']
+        assert hashlib.sha256(Path('src/config.json').read_bytes()).hexdigest() == reserve['candidate_project_config_sha256']
+        assert config['SYNTH_STRATEGY'] == 'DELAY 0'
+        assert config['GRT_RESIZER_SETUP_SLACK_MARGIN'] == 0
+        assert config['GRT_RESIZER_HOLD_SLACK_MARGIN'] == 0.125
+        assert not any(k.startswith('TRIPWIRE_') for k in config)
+        assert 'PNR_SDC_FILE' not in config and 'SIGNOFF_SDC_FILE' not in config
+        assert 'ERROR_ON_MAGIC_DRC' not in config and 'ERROR_ON_ILLEGAL_OVERLAPS' not in config
+        evidence = json.loads(Path('spikes/phase2_stock_flow/late_drop_select_evidence.json').read_text())
+        patch = Path('spikes/phase2_stock_flow/late_drop_select.patch')
+        assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+        assert hashlib.sha256(Path('src/trw_chan_port.v').read_bytes()).hexdigest() == evidence['baseline_sha256']
+        def source_hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in Path('src').rglob('*') if p.is_file()}
+        before = source_hashes()
+        subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+        subprocess.run(['git', 'apply', str(patch)], check=True)
+        assert source_hashes() == {**before, 'src/trw_chan_port.v': evidence['candidate_sha256']}
+        print('Verified late-select channel variant:', evidence['candidate_sha256'])
+        evidence = json.loads(Path('spikes/phase2_stock_flow/forwarded_drop_evidence.json').read_text())
+        patch = Path('spikes/phase2_stock_flow/forwarded_drop.patch')
+        assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+        assert hashlib.sha256(Path('src/trw_chan_port.v').read_bytes()).hexdigest() == evidence['baseline_sha256']
+        before = source_hashes()
+        subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+        subprocess.run(['git', 'apply', str(patch)], check=True)
+        assert source_hashes() == {**before, 'src/trw_chan_port.v': evidence['candidate_sha256']}
+        print('Verified forwarded-count channel variant:', evidence['candidate_sha256'])
+        evidence = json.loads(Path('spikes/phase2_stock_flow/mode_predicate_evidence.json').read_text())
+        patch = Path('spikes/phase2_stock_flow/mode_predicate.patch')
+        assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+        for name, sha in evidence['baseline_files'].items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+        before = source_hashes()
+        subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+        subprocess.run(['git', 'apply', str(patch)], check=True)
+        assert source_hashes() == {**before, **evidence['candidate_files']}
+        print('Verified configuration mode-predicate variant:', evidence['candidate_files'])
+        patch = Path('spikes/phase2_stock_flow/config_banks.patch')
+        assert hashlib.sha256(patch.read_bytes()).hexdigest() == policy['patch_sha256']
+        for name, sha in policy['baseline_files'].items():
+            assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+        before = source_hashes()
+        subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+        subprocess.run(['git', 'apply', str(patch)], check=True)
+        assert source_hashes() == {**before, **policy['candidate_files']}
+        print('Verified parity-banked configuration variant:', policy['candidate_files'])
+        import os
+        profiles = json.loads(Path('spikes/phase2_stock_flow/stock_control_profiles.json').read_text())
+        profile = os.environ['STOCK_PROFILE']
+        assert profile in profiles['profiles'], 'Unknown physical control profile'
+        assert hashlib.sha256(Path('src/config.json').read_bytes()).hexdigest() == profiles['baseline_project_config_sha256']
+        selected = profiles['profiles'][profile]
+        config.update(selected['changes'])
+        blob = json.dumps(config, indent=2) + '\n'
+        assert hashlib.sha256(blob.encode()).hexdigest() == selected['config_sha256']
+        Path('src/config.json').write_text(blob)
+        if selected.get('rtl_patch'):
+            variant = selected['rtl_patch']
+            assert variant in ('late_arbitration', 'shared_priority')
+            evidence = json.loads(Path(f'spikes/phase2_stock_flow/{variant}_evidence.json').read_text())
+            patch = Path(f'spikes/phase2_stock_flow/{variant}.patch')
+            assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+            assert hashlib.sha256(Path('src/trw_lane.v').read_bytes()).hexdigest() == evidence['baseline_sha256']
+            before = source_hashes()
+            subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+            subprocess.run(['git', 'apply', str(patch)], check=True)
+            assert source_hashes() == {**before, 'src/trw_lane.v': evidence['candidate_sha256']}
+            print('Verified equivalent priority preselection:', variant, evidence['candidate_sha256'])
+        if selected.get('config_word_select'):
+            evidence = json.loads(Path('spikes/phase2_stock_flow/config_word_select_evidence.json').read_text())
+            patch = Path('spikes/phase2_stock_flow/config_word_select.patch')
+            assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+            for name, sha in evidence['baseline_files'].items():
+                assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+            assert hashlib.sha256(Path('src/trw_defs.vh').read_bytes()).hexdigest() == evidence['defines_sha256']
+            before = source_hashes()
+            subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+            subprocess.run(['git', 'apply', str(patch)], check=True)
+            assert source_hashes() == {**before, **evidence['candidate_files']}
+            print('Verified configuration-word predecode source delta')
+        if selected.get('host_word_select'):
+            evidence = json.loads(Path('spikes/phase2_stock_flow/host_word_select_evidence.json').read_text())
+            patch = Path('spikes/phase2_stock_flow/host_word_select.patch')
+            assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+            assert hashlib.sha256(Path('src/trw_host.v').read_bytes()).hexdigest() == evidence['baseline_sha256']
+            before = source_hashes()
+            subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+            subprocess.run(['git', 'apply', str(patch)], check=True)
+            assert source_hashes() == {**before, 'src/trw_host.v': evidence['candidate_sha256']}
+            print('Verified equivalent host word-before-lane selection:', evidence['candidate_sha256'])
+        if selected.get('inline_guard'):
+            evidence = json.loads(Path('spikes/phase2_stock_flow/inline_guard/integration_evidence.json').read_text())
+            assert evidence['native_preservation_prerequisite']['conclusion'] == 'success'
+            patch = Path('spikes/phase2_stock_flow/inline_guard/integration.patch')
+            assert hashlib.sha256(patch.read_bytes()).hexdigest() == evidence['patch_sha256']
+            for name, sha in evidence['before'].items():
+                assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+            before = source_hashes()
+            assert evidence['added_source'] not in before
+            subprocess.run(['git', 'apply', '--check', str(patch)], check=True)
+            subprocess.run(['git', 'apply', str(patch)], check=True)
+            module = Path('spikes/phase2_stock_flow/inline_guard/trw_guarded_mask.v')
+            assert hashlib.sha256(module.read_bytes()).hexdigest() == evidence['added_source_sha256']
+            Path(evidence['added_source']).write_bytes(module.read_bytes())
+            for name, sha in evidence['after'].items():
+                assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == sha, name
+            assert source_hashes() == {**before,
+                'src/trw_lane.v': evidence['after']['src/trw_lane.v'],
+                evidence['added_source']: evidence['added_source_sha256']}
+            print('Verified inline guarded-mask source integration')
+        if selected.get('c_select'):
+            import sys
+            sys.path.insert(0, 'scripts/ci')
+            from apply_c_select import apply
+            receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/pin_input_decode'))
+            Path('spikes/phase2_stock_flow/pin_input_decode/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
+            print('Verified one-file C-selector source optimization')
+        if selected.get('idle_ff'):
+            import sys
+            sys.path.insert(0, 'scripts/ci')
+            from apply_idle_ff import apply
+            receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/idle_ff'))
+            Path('spikes/phase2_stock_flow/idle_ff/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
+            print('Verified phase-equivalent critical configuration storage change')
+        if selected.get('host_port_align'):
+            import sys
+            sys.path.insert(0, 'scripts/ci')
+            from apply_host_port_align import apply
+            receipt = apply(Path('.'), Path('spikes/phase2_stock_flow/host_port_align'))
+            Path('spikes/phase2_stock_flow/host_port_align/applied_source.json').write_text(json.dumps(receipt, indent=2) + '\n')
+            print('Verified equivalent aligned host port-status word source change')
+        Path('spikes/phase2_stock_flow/selected_profile.json').write_text(json.dumps(dict(
+            profile=profile, changes=selected['changes'], config_sha256=selected['config_sha256'],
+            baseline_physical_run=profiles['baseline_physical_run'], baseline_audit_run=profiles['baseline_audit_run'],
+            comparison_reference_run=selected.get('comparison_reference_run', profiles.get('comparison_reference_run')),
+            comparison_reference_config_sha256=selected.get('comparison_reference_config_sha256', profiles.get('comparison_reference_config_sha256')),
+            additional_changes_from_reference=selected.get('additional_changes_from_reference'),
+            hardware_unchanged=selected.get('hardware_unchanged', True),
+            rtl_patch=selected.get('rtl_patch'), config_word_select=selected.get('config_word_select', False),
+            host_word_select=selected.get('host_word_select', False),
+            inline_guard=selected.get('inline_guard', False),
+            c_select=selected.get('c_select', False), idle_ff=selected.get('idle_ff', False),
+            host_port_align=selected.get('host_port_align', False)), indent=2) + '\n')
+        print('Selected isolated physical control:', profile, selected['changes'])
+        import sys
+        sys.path.insert(0, 'scripts/ci')
+        from host_idle_portable_trials import prepare
+        trial = prepare(Path('.'), os.environ['PORTABLE_VARIANT'])
+        print('Prepared clean stock project-input trial:', trial['profile'], trial['additional_changes_from_reference'])
+        PYCODE
+    - name: Check out Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: d66cf179e7bc4d296362ab7e2e3b344dc3c4f665
+        path: tt
+    - name: Check out the pinned IHP installer
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-gds-action
+        ref: 3412659307918422f3f0727917cf9b499aaca588
+        path: .tt-gds-action
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install Tiny Tapeout prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install flow dependencies
+      run: pip install -r tt/requirements.txt
+    - name: Install IHP PDK
+      run: ./.tt-gds-action/install_sg13cmos5l.sh
+    - name: Install pinned LibreLane
+      run: pip install librelane==3.1.0.dev3
+    - name: Verify the reference stock engine image
+      run: |-
+        set -euo pipefail
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev3
+        python - <<'PYCODE'
+        import json, subprocess
+        from pathlib import Path
+        source = json.loads(Path('spikes/phase2_stock_flow/shared_cluster100_postant_checkpoint.json').read_text())
+        engine = source['toolchain']
+        image = engine['stock_image']
+        digests = json.loads(subprocess.check_output(['docker', 'image', 'inspect', image,
+                            '--format', '{{json .RepoDigests}}'], text=True))
+        assert image.rsplit(':', 1)[0] + '@' + engine['stock_digest'] in digests, 'Reference engine drift'
+        Path('spikes/phase2_stock_flow/toolchain_preflight.json').write_text(json.dumps(engine, indent=2) + '\n')
+        print('Verified reference unmodified stock engine digest')
+        PYCODE
+    - name: Generate project configuration with unchanged TT tools
+      run: |-
+        set -euo pipefail
+        python tt/tt_tool.py --create-user-config --ihp
+        python - <<'PYCODE'
+        import json
+        from pathlib import Path
+        selected = json.loads(Path('spikes/phase2_stock_flow/selected_profile.json').read_text())
+        merged = json.loads(Path('src/config_merged.json').read_text())
+        for key, value in selected['changes'].items():
+            assert merged.get(key) == value, 'TT merged config changed selected profile: ' + key
+        PYCODE
+    - name: Run stock Classic through the final pre-routing STA
+      id: physical
+      timeout-minutes: 240
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        mkdir -p runs
+        mkdir runs/stock-official-baseline
+        # Diagnostic visibility only; the native flow command and timeout stay fixed.
+        (
+          while sleep 60; do
+            date -u '+Physical-flow heartbeat %Y-%m-%dT%H:%M:%SZ'
+            ls -td runs/stock-official-baseline/*-openroad-* 2>/dev/null | head -n 1 || true
+            ps -eo pid,pcpu,rss,etime,comm | awk '$NF == "openroad" {print "OpenROAD PID/CPU%/RSS-KiB/elapsed/name:", $0}'
+          done
+        ) &
+        progress_pid=$!
+        trap 'pkill -P "$progress_pid" 2>/dev/null || true; kill "$progress_pid" 2>/dev/null || true; wait "$progress_pid" 2>/dev/null || true' EXIT
+        python -m librelane --docker-no-tty --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --manual-pdk --run-tag stock-official-baseline --force-run-dir runs/stock-official-baseline --hide-progress-bar --to OpenROAD.STAMidPNR-3 src/config_merged.json
+        # This is measurement only. No detailed routing or qualification claim.
+        python - <<'PYCODE'
+        from pathlib import Path
+        root = Path('runs/stock-official-baseline')
+        assert not list(root.glob('*-openroad-detailedrouting')), 'Unexpected detailed routing'
+        assert len(list(root.glob('*-openroad-stamidpnr-3/state_out.json'))) == 1, 'Missing final stock pre-routing STA'
+        import json, sys
+        sys.path.insert(0, 'scripts/ci')
+        from stock_profile_effective import validate
+        selected = json.loads(Path('spikes/phase2_stock_flow/selected_profile.json').read_text())
+        result = validate(root, selected)
+        assert selected.get('slot_root_storage') == 'constants'
+        from slot_root_storage_audit import audit
+        result['source_root_storage'] = audit(root)
+        (root / 'effective_profile.json').write_text(json.dumps(result, indent=2) + '\n')
+        print('Verified effective native profile:', result)
+        if selected.get('inline_guard'):
+            import subprocess
+            subprocess.run([sys.executable, 'scripts/ci/guarded_word_probe.py', str(root),
+                '--protected', 'true', '--kind', 'mask', '--width', '32', '--copies', '2'], check=True)
+        PYCODE
+    - name: Read-only all-corner STA on the final stock checkpoint
+      timeout-minutes: 30
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python - <<'PYCODE'
+        import hashlib, json, math, os, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from postgrt_timing import CORNERS, screen
+        from native_stock_route import run_step
+        root = Path('runs/stock-official-baseline')
+        states = list(root.glob('*-openroad-stamidpnr-3/state_out.json'))
+        assert len(states) == 1
+        source = states[0]
+        state = json.loads(source.read_text())
+        paths = [source] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
+        assert all(p.is_file() for p in paths)
+        def hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        before = hashes()
+        output = Path('runs/stock-corner-audit')
+        # Supplying the same checkpoint twice makes this a repeatability/read-only audit.
+        # No resizer, repair, placement or routing step is invoked.
+        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,
+               sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
+        # Check antenna on the same final database; do not inherit pre-timing results.
+        run_step(json.loads(Path('src/config_merged.json').read_text()), source,
+                 output / 'fresh-antenna', ['OpenROAD.CheckAntennas'])
+        antenna_files = list((output / 'fresh-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))
+        assert len(antenna_files) == 1
+        antenna_metrics = json.loads(antenna_files[0].read_text())
+        antenna = {key: antenna_metrics[key] for key in ('antenna__violating__nets', 'antenna__violating__pins')}
+        assert all(isinstance(v, int) and v >= 0 for v in antenna.values())
+        assert hashes() == before, 'Read-only audit modified source physical views'
+        result = json.loads((output / 'comparison.json').read_text())
+        rows = {}
+        for corner in CORNERS:
+            metrics = result['corners'][corner]['before']
+            repeated = result['corners'][corner]['after']
+            keys = [f'timing__{kind}__ws__corner:{corner}' for kind in ('setup', 'hold')]
+            keys += [f'design__max_{kind}_violation__count__corner:{corner}' for kind in ('slew', 'cap', 'fanout')]
+            for key in keys:
+                assert key in metrics and key in repeated, key
+                assert math.isfinite(metrics[key]) and abs(metrics[key] - repeated[key]) <= 1e-9, key
+            rows[corner] = {key: metrics[key] for key in keys}
+        (output / 'read_only_audit.json').write_text(json.dumps(dict(
+            source_state=str(source), unchanged_physical_view_hashes=before,
+            fresh_corner_metrics=rows, fresh_antenna_metrics=antenna, physical_repairs_performed=False,
+            qualification_performed=False, detailed_routing_performed=False), indent=2) + '\n')
+        print(json.dumps(rows, indent=2))
+        PYCODE
+    - name: Check unchanged signoff constraints on estimated routing
+      timeout-minutes: 30
+      run: |-
+        set -euo pipefail
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+        python - <<'PYCODE'
+        import hashlib, json, math, os, sys
+        from pathlib import Path
+        sys.path.insert(0, 'scripts/ci')
+        from postgrt_timing import CORNERS, screen
+        physical = Path('runs/stock-official-baseline')
+        sources = list(physical.glob('*-openroad-stamidpnr-3/state_out.json'))
+        assert len(sources) == 1
+        source = sources[0]
+        state = json.loads(source.read_text())
+        paths = [source, Path('src/signoff.sdc')] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
+        def hashes():
+            return {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+        before = hashes()
+        output = Path('runs/stock-signoff-estimate')
+        screen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,
+               sdc=Path('src/signoff.sdc'),
+               sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])
+        assert hashes() == before, 'Signoff estimate modified source views or constraints'
+        result = json.loads((output / 'comparison.json').read_text())
+        failures = []
+        for corner in CORNERS:
+            for stage in ('before', 'after'):
+                metrics = result['corners'][corner][stage]
+                for kind in ('setup', 'hold'):
+                    value = metrics[f'timing__{kind}__ws__corner:{corner}']
+                    minimum = 0.05 if kind == 'hold' and corner == CORNERS[0] else 0
+                    assert type(value) in (int, float) and math.isfinite(value)
+                    if value < minimum:
+                        failures.append(f'{corner} {stage} {kind}: {value} < {minimum}')
+                for kind in ('slew', 'cap', 'fanout'):
+                    value = metrics[f'design__max_{kind}_violation__count__corner:{corner}']
+                    assert type(value) is int and value >= 0
+                    if value:
+                        failures.append(f'{corner} {stage} {kind}: {value}')
+        (output / 'qualification.json').write_text(json.dumps(dict(
+            qualified=not failures, failures=failures, unchanged_source_hashes=before,
+            scope='Read-only estimated routing with unchanged signoff SDC; not extracted timing'), indent=2) + '\n')
+        if failures:
+            raise ValueError('Signoff estimate fails: ' + '; '.join(failures))
+        PYCODE
+    - name: Require all final screening gates
+      run: |-
+        python scripts/ci/stock_screen_gate.py --physical runs/stock-official-baseline --audit runs/stock-corner-audit
+    - name: Read saved native congestion and residual connections without repair
+      if: always() && steps.physical.outcome == 'success'
+      timeout-minutes: 10
+      run: |-
+        set -euo pipefail
+        docker run --rm --network none --user "$(id -u):$(id -g)" -v "$PWD:$PWD" -v "$PDK_ROOT:$PDK_ROOT:ro" -w "$PWD" ghcr.io/librelane/librelane:3.1.0.dev3 openroad -exit -python scripts/ci/portable_residual_geometry.py > runs/portable-geometry.log 2>&1
+        python - <<'PYCODE'
+        import json, re
+        from pathlib import Path
+        log=Path('runs/portable-geometry.log').read_text()
+        assert not re.search(r'(?m)^\[ERROR\b',log),'Native geometry probe logged an error'
+        receipt=json.loads(Path('runs/portable-geometry/saved_geometry.json').read_text())
+        assert receipt['physical_changes_applied'] is False
+        assert receipt['router_initialized'] is False and receipt['official_gds_qualified'] is False
+        PYCODE
+    - name: Upload complete stock baseline measurements
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: constant-root-${{ matrix.variant }}-${{ github.run_id }}
+        path: |-
+          spikes/phase2_stock_flow/toolchain_preflight.json
+          spikes/phase2_stock_flow/config_word_select_evidence.json
+          runs/stock-official-baseline/**
+          runs/stock-corner-audit/**
+          runs/stock-signoff-estimate/**
+          runs/portable-geometry/**
+          runs/portable-geometry.log
+          src/**
+          info.yaml
+          macro/**
+          spikes/phase2_stock_flow/late_drop_select.patch
+          spikes/phase2_stock_flow/late_drop_select_evidence.json
+          spikes/phase2_stock_flow/forwarded_drop.patch
+          spikes/phase2_stock_flow/forwarded_drop_evidence.json
+          spikes/phase2_stock_flow/mode_predicate.patch
+          spikes/phase2_stock_flow/mode_predicate_evidence.json
+          spikes/phase2_stock_flow/config_banks.patch
+          spikes/phase2_stock_flow/config_banks_evidence.json
+          spikes/phase2_stock_flow/wire300_hold175_evidence.json
+          spikes/phase2_stock_flow/wire300_hold250_evidence.json
+          spikes/phase2_stock_flow/wire300_hold275_iter100_evidence.json
+          spikes/phase2_stock_flow/late_arbitration.patch
+          spikes/phase2_stock_flow/late_arbitration_evidence.json
+          spikes/phase2_stock_flow/late_arbitration_checks/**
+          spikes/phase2_stock_flow/shared_priority.patch
+          spikes/phase2_stock_flow/shared_priority_evidence.json
+          spikes/phase2_stock_flow/stock_control_profiles.json
+          spikes/phase2_stock_flow/host_word_select.patch
+          spikes/phase2_stock_flow/host_word_select_evidence.json
+          spikes/phase2_stock_flow/inline_guard/**
+          spikes/phase2_stock_flow/pin_input_decode/**
+          spikes/phase2_stock_flow/idle_ff/**
+          spikes/phase2_stock_flow/host_port_align/**
+          test/Makefile
+          test_internal/chip/Makefile
+          spikes/phase2_stock_flow/selected_profile.json
+          spikes/phase2_stock_flow/mode_ff/**
+          spikes/phase2_stock_flow/host_debug_align/**
+          spikes/phase2_stock_flow/slot_root_storage/**
+        if-no-files-found: warn

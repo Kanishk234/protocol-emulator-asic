@@ -1,0 +1,110 @@
+name: TRIPWIRE current candidate lockstep
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tripwire/closure-8x4]
+    paths:
+      - .github/workflows/tripwire-closure-lockstep.yaml
+      - test_internal/l2/run_injections.py
+      - scripts/ci/test_closure_lockstep.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tripwire-closure-lockstep
+  cancel-in-progress: false
+
+jobs:
+  lockstep:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      OSS_CAD_SUITE_TAG: '2026-06-29'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Prepare project venv and injection guards
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q scripts/ci/test_closure_lockstep.py
+          python scripts/ci/prepare_closure_candidate.py export "$RUNNER_TEMP/lockstep-candidate"
+      - name: Cache pinned OSS CAD Suite
+        id: cad-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Install pinned OSS CAD Suite
+        if: steps.cad-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          date_tag=${OSS_CAD_SUITE_TAG//-/}
+          curl --fail --location --output "$RUNNER_TEMP/oss-cad-suite.tgz" \
+            "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$date_tag.tgz"
+          tar -xzf "$RUNNER_TEMP/oss-cad-suite.tgz" -C "$HOME"
+      - name: Compare one million clocks on the current candidate
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          mkdir -p build/closure-lockstep
+          "$HOME/oss-cad-suite/bin/verilator" --version > build/closure-lockstep/verilator-version.txt
+          export L2_CYCLES=1000000 L2_SCENARIO=rx
+          candidate="$RUNNER_TEMP/lockstep-candidate"
+          cd "$candidate/test_internal/l2"
+          make SIM=verilator VERILATOR_BIN_DIR="$HOME/oss-cad-suite/bin" \
+            RTL_DIR="$candidate/src" RTL_REV="$GITHUB_SHA" \
+            MACRO_DIR="$candidate/macro/RM_IHPSG13_1P_512x16_c2_bm_bist" \
+            COCOTB_RESULTS_FILE="$GITHUB_WORKSPACE/build/closure-lockstep/million.xml" \
+            | tee "$GITHUB_WORKSPACE/build/closure-lockstep/million.log"
+      - name: Require clean controls then detect both injected RTL faults
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          export VERILATOR_BIN_DIR="$HOME/oss-cad-suite/bin"
+          export RTL_DIR="$RUNNER_TEMP/lockstep-candidate/src" RTL_REV="$GITHUB_SHA"
+          export MACRO_DIR="$RUNNER_TEMP/lockstep-candidate/macro/RM_IHPSG13_1P_512x16_c2_bm_bist"
+          export L2_EVIDENCE_DIR="$GITHUB_WORKSPACE/build/closure-lockstep/injections"
+          cd "$RUNNER_TEMP/lockstep-candidate"
+          python test_internal/l2/run_injections.py | tee "$GITHUB_WORKSPACE/build/closure-lockstep/injections.log"
+      - name: Check actual outcomes and unchanged candidate
+        run: |
+          source .venv/bin/activate
+          python scripts/ci/prepare_closure_candidate.py verify "$RUNNER_TEMP/lockstep-candidate"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = Path('build/closure-lockstep')
+          cases = list(ET.parse(root / 'million.xml').getroot().iter('testcase'))
+          assert len(cases) == 1 and all(cases[0].find(t) is None for t in ('failure', 'error', 'skipped'))
+          assert 'compared 1000000 clocks, zero divergences' in (root / 'million.log').read_text()
+          text = (root / 'injections.log').read_text()
+          for name in ('priority-flip', 'cursor-off-by-one'):
+              assert f'L2-INJECT {name}: DETECTED' in text
+          for scenario in ('rx', 'cursor'):
+              assert f'L2-INJECT {scenario}: unmodified RTL baseline passed' in text
+          (root / 'result.json').write_text(json.dumps(dict(compared_clocks=1000000,
+              pristine_controls=2, injected_faults_detected=2, candidate_unchanged=True,
+              scope='Directed RTL/model lockstep; not arbitrary-program proof or physical timing'), indent=2) + '\n')
+          PY
+      - name: Retain actual lockstep and mutation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tripwire-lockstep-${{ github.run_id }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            build/closure-lockstep/*.xml
+            build/closure-lockstep/*.log
+            build/closure-lockstep/*.json
+            build/closure-lockstep/*version.txt
+            build/closure-lockstep/injections/**/results.xml
+            build/closure-lockstep/injections/**/output.log
+            build/closure-lockstep/injections/**/src/
+            ${{ runner.temp }}/lockstep-candidate/closure-candidate.json

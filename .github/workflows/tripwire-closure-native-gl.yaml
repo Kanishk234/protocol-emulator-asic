@@ -1,0 +1,120 @@
+name: TRIPWIRE native checkpoint protocol replay
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [tripwire/closure-8x4]
+    paths:
+      - .github/workflows/tripwire-closure-native-gl.yaml
+      - scripts/ci/closure_native_gl.py
+      - scripts/ci/test_closure_native_gl.py
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: tripwire-closure-native-gl
+  cancel-in-progress: false
+
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_REV: 89d42ee6d2fd9b50b86a1aada6fee6673c3e6008
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install independent protocol decoders
+        run: sudo apt-get update && sudo apt-get install -y sigrok-cli
+      - name: Prepare project virtual environment and guard checks
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q scripts/ci/test_closure_native_gl.py
+          python scripts/ci/prepare_closure_candidate.py export "$RUNNER_TEMP/native-expected"
+          echo "CLOSURE_EXPECTED_SOURCE=$RUNNER_TEMP/native-expected" >> "$GITHUB_ENV"
+      - name: Authenticate exact native source and export its netlist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/42681697462" > native-source-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/13708390816" > native-source-artifact.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/13708390816/zip" > native-source.zip
+          python scripts/ci/closure_native_gl.py
+      - name: Fetch exact new-PDK cell models and pinned Icarus 13
+        run: |
+          set -euo pipefail
+          mkdir -p build/closure-native-gl/cells "$RUNNER_TEMP/iverilog-13"
+          for name in sg13cmos5l_stdcell.v sg13cmos5l_udp.v; do
+            curl --fail --location --output "build/closure-native-gl/cells/$name" \
+              "https://raw.githubusercontent.com/IHP-GmbH/IHP-Open-PDK/$PDK_REV/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog/$name"
+          done
+          curl --fail --location --output "$RUNNER_TEMP/iverilog13.deb" \
+            https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb
+          dpkg-deb -x "$RUNNER_TEMP/iverilog13.deb" "$RUNNER_TEMP/iverilog-13"
+          "$RUNNER_TEMP/iverilog-13/usr/bin/iverilog" -B "$RUNNER_TEMP/iverilog-13/usr/lib/ivl" -V \
+            > build/closure-native-gl/iverilog-version.txt 2>&1
+          sha256sum "$RUNNER_TEMP/iverilog13.deb" build/closure-native-gl/cells/*.v \
+            > build/closure-native-gl/runtime-hashes.txt
+          sigrok-cli --version > build/closure-native-gl/sigrok-version.txt
+      - name: Run 22 protocol cases on the exact native cell netlist
+        timeout-minutes: 300
+        run: |
+          set -euo pipefail
+          source .venv/bin/activate
+          test "${TRIPWIRE_SKIP_SIGROK:-0}" != 1
+          export PATH="$RUNNER_TEMP/iverilog-13/usr/bin:$PATH"
+          export IVERILOG_VPI_MODULE_PATH="$RUNNER_TEMP/iverilog-13/usr/lib/ivl"
+          export COMPILE_ARGS="-B $RUNNER_TEMP/iverilog-13/usr/lib/ivl"
+          candidate="$CLOSURE_EXPECTED_SOURCE"
+          cells="$GITHUB_WORKSPACE/build/closure-native-gl/cells"
+          macro="$candidate/macro/RM_IHPSG13_1P_512x16_c2_bm_bist"
+          sources="$cells/sg13cmos5l_stdcell.v $cells/sg13cmos5l_udp.v"
+          sources="$sources $macro/RM_IHPSG13_1P_core_behavioral_bm_bist.v $macro/RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+          sources="$sources $GITHUB_WORKSPACE/build/closure-native-gl/netlist.v $candidate/test_internal/chip/tb_chip_gl.v"
+          export TRIPWIRE_SPEC_FILE="$candidate/tools/tripwire_spec.py"
+          cd "$candidate/test_internal/chip"
+          make SIM=icarus GATES=yes SIM_BUILD=sim_build/native-preflight \
+            TOPLEVEL=tb_chip TOPLEVEL_LANG=verilog COCOTB_TEST_MODULES=test_l3 \
+            COCOTB_RESULTS_FILE="$GITHUB_WORKSPACE/build/closure-native-gl/results.xml" \
+            VERILOG_SOURCES="$sources"
+      - name: Check actual XML and unchanged inputs
+        run: |
+          source .venv/bin/activate
+          python scripts/ci/prepare_closure_candidate.py verify "$CLOSURE_EXPECTED_SOURCE"
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          root = Path('build/closure-native-gl')
+          identity = json.loads((root / 'netlist.identity.json').read_text())
+          assert hashlib.sha256((root / 'netlist.v').read_bytes()).hexdigest() == identity['netlist_sha256']
+          cases = list(ET.parse(root / 'results.xml').getroot().iter('testcase'))
+          assert len(cases) == 22
+          assert all(not any(c.find(t) is not None for t in ('failure', 'error', 'skipped')) for c in cases)
+          identity.update(passed=22, failures=0, errors=0, skips=0,
+                          xml_sha256=hashlib.sha256((root / 'results.xml').read_bytes()).hexdigest())
+          (root / 'result.json').write_text(json.dumps(identity, indent=2) + '\n')
+          PY
+      - name: Retain native replay evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tripwire-native-gl-${{ github.run_id }}
+          retention-days: 90
+          if-no-files-found: warn
+          path: |
+            build/closure-native-gl/
+            native-source-run.json
+            native-source-artifact.json
+            ${{ runner.temp }}/native-expected/closure-candidate.json
+            ${{ runner.temp }}/native-expected/test_internal/chip/Makefile
+            ${{ runner.temp }}/native-expected/test_internal/chip/tb_chip_gl.v
+            ${{ runner.temp }}/native-expected/test_internal/chip/test_l3.py
+            ${{ runner.temp }}/native-expected/tools/tripwire_spec.py

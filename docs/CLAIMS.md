@@ -49,5 +49,18 @@ D-138 is a prepared physical diagnostic, not a new passing-design claim. Its sou
 
 ## Known limits (state them wherever the related claim appears)
 
+### Closure branch RTL refresh, November 9
+
+[42690695832](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42690695832)
+at `e248408232a9570ae4535c6e071b5304d0727056` prepares the same full-core
+`portable_clock75_hold125` 8x4 source candidate used by the current physical
+screen. Downloaded XML independently confirms335model/compiler,4actualTTtop
+and22full-core protocol cases passing, with0failures/errors/skips. All170
+recorded input hashes reconcile to committed source or the independently
+prepared candidate;34available physical/metadata artifact files match their
+receipt hashes. This is RTL simulation with real sigrok, not a routed-netlist,
+extracted timing, physical closure, exhaustive conformance or silicon claim.
+Details and XML/receipt hashes: `reports/CLOSURE_BRANCH_20261109.md`.
+
 
 - **Host link throughput.** At SCK = clk/8 (the §9 limit) one HOST_OUT read (status and data in one transaction) takes ~560 clocks, so the host drains at most ~89K tokens/s at 50 MHz. A program that turns every received byte into a HOST_OUT token overruns its pin unit (§4.5: the new token is dropped and OVERRUN set) when bytes arrive faster than that: continuous UART RX above ~460 kbaud (a byte every ~1,085 clocks). Found by L3 on the RTL, 2026-09-27. Faster streams need buffering in firmware (a lane or SRAM ring) or a faster host clock.

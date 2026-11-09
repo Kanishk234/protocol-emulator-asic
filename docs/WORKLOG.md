@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Authenticate full-core cloud regression and prepare qualified route continuation
+
+- Candidate42690695832 at e248408 SUCCESS. Downloaded artifact independently verifies335model/compiler,4actualTTtop and22protocolXML cases,0failures/errors/skips. All170input hashes reconcile (141Git/29independently prepared);34available physical/metadata artifact files checked. Underlying main5407d4c source/model/spec/firmware/tests/patches unchanged. Added scoped claims/evidence with XML/receipt hashes; no routed/physical acceptance implied.
+- Prepare exact42681697462/5407d4c/attempt1dependency-gated cloud routing. Source must finishSUCCESS; wholearchiveAPI digest, prepared-source equality, unchanged saved-state paths, rawscreen/signoff gates, exactdev4/PDK/container and fresh timing/antenna checks precede DRT. Retain periterationDRC/snapshots; require clean completedroute, topology/antenna/disconnect and extracted allcorner/50pshold/electrical gates. No productionhardware/config, source repair, templatejob or acceptance relaxation. OfficialGDS/precheck/routedprotocol replay remain later gates.
+- Local54recovery/source/timing/archive/extraction guard testsPASS; newworkflow actionlintPASS. Actual routing pending source success; main42681697462 stillin_progress at lastcheck. No phaseboxes ticked. Next publish continuation, verify dependency job, then inspect actual physical outcome and retain failures as evidence.
+
 ## 2026-11-09 — Start isolated TRIPWIRE closure branch and cloud candidate regression
 
 - User approves TRIPWIRE closure work and explicitly authorizes grouped commits/pushes this session, with normal concise messages and no attribution trailer. User requests substantial verification in GitHub Actions. Branch `tripwire/closure-8x4` starts from live main5407d4c; on user request this workspace now checks it out. WARP review edits preserved under/tmp/warp-review-preserved; other untracked user artifacts unchanged. No rebase needed or main history rewrite.

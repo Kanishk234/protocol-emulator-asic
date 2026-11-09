@@ -68,6 +68,55 @@ physical42681697462 is independently still in progress. This publication
 receipt changes documentation only and does not supersede the candidate run's
 source identity.
 
+## Authenticated cloud result
+
+Run42690695832 at e248408 is now SUCCESS. Downloaded artifact
+`tripwire-closure-42690695832` contains strict XML with335model/compiler,
+4actualTTtop and22protocol cases, all passing with0failures/errors/skips.
+All170input hashes reconcile:141directly against e248408Git objects and29
+against the independently prepared same candidate. Git comparison confirms no
+changes to the underlying source/model/firmware/spec/tests/patches/physical
+workflow from5407d4c to e248408. The34physical/metadata files actually present
+in the artifact independently match their receipt; full170-file artifact
+availability is not claimed. The hosted before/after check verifies candidate
+inputs remain unchanged during execution.
+
+| Evidence | SHA256 |
+|---|---|
+| tools.xml | `543c29844ba7856891f113008243aef6f98cc1c382f572d70ee1a6ba17f6a70b` |
+| top.xml | `ce81f0a46635eeddac5f30191b635c8d21f86e76ccce12a59b8abf5031d7dd20` |
+| protocols.xml | `a222767beee0df0b65b74f022600e424f292a26b646cbaed298b833493bdc1a2` |
+| closure-candidate.json | `bb0c735f777147aeeeeda40ffee18427f5f3451d7c93ab3bf358d89136214cce` |
+
+This refresh establishes the current candidate's RTL behavior, not extracted
+timing or hardened operation. Source screen42681697462 remains separate.
+
+## Qualified route continuation
+
+`closure_route.py` and `tripwire-closure-route.yaml` prepare a continuation of
+exact source screen42681697462,5407d4c,attempt1. A bounded cloud dependency
+job waits for that source run to complete successfully. Any source failure,
+foreign identity or180-minute dependency timeout stops the workflow before a
+route job starts. This is an automatic dependency gate, not permission to
+weaken screening.
+
+The route job binds the complete archive to the API digest, refuses unsafe ZIP
+entries and compares hardware/macros/config/metadata against fresh preparation.
+It restores the original runner paths without rewriting saved state, recomputes
+saved raw-screen qualification, checks signoff source hashes and metrics, and
+verifies the exact dev4 engine/PDK/tools. Fresh original/signoff timing and
+antenna checks precede DRT. Only thread count and per-iteration diagnostic
+capture change in routing configuration; no physical repair, recipe search or
+timing exception is introduced.
+
+A completed zero-DRC route must pass topology/antenna/disconnect checks before
+extraction. Extracted all-corner setup/electrical and>=50psfast-hold gates are
+then mandatory. DRC reports/snapshots and outputs are retained on failure or
+timeout, which are never treated as completion. Official GDS/precheck and
+routed protocol replay remain later gates. Preparation/control tests are not
+new physical evidence. Publication and actual execution status are recorded
+in the worklog.
+
 Publish grouped tools/CI/docs commits and inspect the branch regression's
 actual artifact. Do not count default branch unit/test badges as evidence for
 the experimental core. Existing physical run42681697462 on main remains

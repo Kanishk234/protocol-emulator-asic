@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Refresh current-candidate lockstep and retain real mutation controls
+
+- Current phase2 lockstep evidence predates the composed closure candidate. Add a cloud refresh for one million deterministic RTL/model comparison clocks on the exact prepared2/4core, plus cleanRX/cursor controls and priority/cursor injected faults. This is a directed regression, not proof over arbitrary programs or a physical measurement. Candidate hardware/spec/model unchanged.
+- Existing injection runner only recognizes the older lane's onehot/cand expression; current shared-priority implementation uses first_ready/ready. Add exact unambiguous selection of both reviewed mutation forms; exhaustive4095-mask guard verifies the new fault reverses priority. Refuse unknown/duplicate/ambiguous forms. Add optional retained evidence directories, raw stdout/XML, and strict one-case baseline/mutation XML checks; compilation errors/skips cannot count as detected faults.
+- Local10newlockstep guardsPASS; combined70closure/recovery/native/extraction guardsPASS; workflow actionlintPASS. Actual current-candidate anchors recognized. Heavy simulation stays in cloud. Native preflight42694710310 at7f89a05 passes artifact/source authentication, new-PDK cell-model fetch and Icarus13 setup, and is running actual22-case replay. Corrected physical42693952530 stillrunning. No new lockstep/native/route success or phasebox claimed before inspecting actual outcomes.
+- Next publish the lockstep refresh, inspect real raw XML/control logs and physical/native results. Source42681697462remains the authenticated green pre-DRTscreen; source and accepted timing gates unchanged.
+
 ## 2026-11-09 — Authenticate passing 8x4 screen and fix mixed-path restoration observer
 
 - Source42681697462 at5407d4c attempt1SUCCESS. Full347,368,324-byte artifact13708390816 SHA256 matches API; state/nativeview/constraint hashes, original/repeated rawcorner metrics, signoff gates, final antenna0/0 and globaloverflow0 independently checked.32hardware/macro files plus config/info match prepared candidate. Original fast/typ/slow hold0.127092/0.333103/0.697614ns; setupWS0/electrical0 allcorners. Estimated routing only, no DRT/extracted/GDS acceptance. Compact receipt/report committed in reports/closure_screen_42681697462.json and CLOSURE_SCREEN_20261109.md.

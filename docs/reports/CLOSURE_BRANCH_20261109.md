@@ -147,3 +147,22 @@ phase-completion claim is made.
 Production core/config promotion remains conditional on reproducible physical
 closure and review of settings outside the standing configuration whitelist.
 No merge into main is implied by this branch.
+
+## Current lockstep refresh
+
+The historical million-clock lockstep result is not silently reused for the
+composed closure candidate. `tripwire-closure-lockstep.yaml` prepares that exact
+candidate and runs the existing directed RTL/model comparison for one million
+clocks, followed by clean RX/cursor controls and both injected faults. The
+priority injection now recognizes the original and shared-priority lane forms
+unambiguously. Local exhaustive mask checks qualify the fault selector; only
+actual simulation mismatches can earn detection credit.
+
+The runner retains control and mutant XML/stdout when `L2_EVIDENCE_DIR` is set.
+The cloud job requires one executed case per run, no skip/error, a passing
+pristine control and a genuine failing mutation with a scoreboard divergence.
+All evidence and mutant source copies are retained, while compiled simulator
+binaries are excluded. The untouched candidate is hashed again after replay.
+Actual hosted results remain pending. This test covers the directed lane/
+channel/pin stimulus in the existing bench, rather than arbitrary firmware,
+exhaustive state exploration or physical timing.

@@ -21,6 +21,8 @@ VARIANTS = {
     'clock75_constants_drive': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
     'clock75_all_drive': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
     'clock75_constants_ff': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
+    'clock75_hold125': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75,
+                        'GRT_RESIZER_HOLD_SLACK_MARGIN': 0.125},
 }
 
 

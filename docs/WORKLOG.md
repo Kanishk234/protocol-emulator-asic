@@ -7231,3 +7231,10 @@ Publication receipt:8bd6d47tools/36e69a3tests/6e5da2edocs pushed; remoteverified
 Publication receipt:f241555tools/4a66313CI/b43c714docs pushed;remote mainb43c714279ce3c20a165d34ba40e2a69f505bf0dverified. Detailed-routing continuation41981158960in progress atworkflowlevel;freshpregatesprecedeDRT. No DRTcompletion/extracted/officialclaimorwatcher.
 
 Publication receipt:1fced6btools/55a51a6CI/618c1a1docs pushed;remote main618c1a10476d6c882824b743e3004cd6b5726afdverified. Workflowregistered408407898butpushrunabsent;firstmanualdispatchHTTP500/transientnetworkfailurecreatednorun. Verifiedemptyrunlistthenretryaccepted:extraction42069613808queuedonexactSHA. No resultyet,duplicateorwatcher.
+
+- Cache retry 42724571001 exposes cached-Icarus elaboration incompatibility
+  in unchanged gold forward declarations; select system Icarus 12 explicitly
+  for module comparisons (same as local), retaining pinned Yosys/Verilator
+  and Icarus 13 for the separate native-cell replay. Added a manual physical
+  screen draft that preserves every stock measurement/gate; do not dispatch
+  until its exact functional prerequisite is updated to a passing run.

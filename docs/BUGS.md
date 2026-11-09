@@ -384,3 +384,14 @@ caches the pinned CAD suite but the original regression only selected its
 Verilator through Make variables. Add the suite bin directory for the new
 module proof, retaining the project venv first on PATH. Capture both tool
 versions; no test result is inferred from this infrastructure failure.
+
+### 2026-11-09: cached Icarus rejects existing forward declarations
+
+Cache proof retry 42724571001 reaches the full-unit elaboration, where the
+cached Icarus build rejects the unchanged gold module's carrier expression
+referencing later `wdata_even/odd` declarations. Both gold and trial fail
+before comparison. Use Ubuntu's stable Icarus 12 explicitly for this purely
+behavioral configuration-module comparison, matching the passing local run;
+keep pinned Yosys for proof and pinned Verilator for chip protocols. Native
+PDK-cell replay still requires Icarus 13 under BUG 1. No source normalization
+or hidden reference edits are introduced.

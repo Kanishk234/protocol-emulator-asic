@@ -5,10 +5,10 @@ Newest entry at the top. One entry per work session.
 ## 2026-11-09 — Fix dev4 route continuation PDK environment
 
 - Inspected the failed exact-checkpoint continuation [42712707249](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42712707249). It passed frozen screen restoration, engine identity and independent checkpoint requalification. The DRT wrapper then failed before launching LibreLane/OpenROAD because `native_stock_route.run_step()` read `PDK_ROOT` from the environment, but that variable was set only inside the earlier `prepare` Python process and was not exported by either GitHub job. This is a workflow harness failure; it gives no DRT, route DRC, or extracted timing result.
-- Added `/home/runner/pdk` to the route and extraction job environments and a focused regression test that checks both jobs. Recorded root cause as BUG #155. The continuation still consumes the same immutable passing 8x4 screen checkpoint; no RTL, physical config, official workflow, or acceptance gate changed.
+- Added `/home/runner/pdk` to the route and extraction job environments and a focused regression test that checks both jobs. Focused tests pass 3/3; local `actionlint` is unavailable. Recorded root cause as BUG #155. Commit `953d9f6` was pushed, and corrected continuation [42714224766](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42714224766) is running against the same immutable passing 8x4 screen checkpoint. No RTL, physical config, official workflow, or acceptance gate changed.
 
 Next:
-- Run focused route-helper tests and workflow lint, then publish only the route workflow, its test and the two evidence ledgers. Relaunch the continuation against screen run 42681697462. If it completes DRT with zero route violations, inspect extracted setup/hold, electrical and antenna gates before final-netlist protocol replay.
+- Inspect route run 42714224766. If DRT completes with zero route violations, inspect extracted setup/hold, electrical and antenna gates before final-netlist protocol replay; if it fails, diagnose the exact first failed step before changing anything.
 
 ## 2026-11-09 — Prepare exact 8x4 dev4 screen continuation through extraction
 

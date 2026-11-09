@@ -17,7 +17,6 @@ from sram_bank_clean_route import unique
 SOURCE_RUN = 42681697462
 SOURCE_SHA = '5407d4c278353ec125018f3a3d49de2fd620d9ce'
 SOURCE_WORKFLOW = '.github/workflows/gds-official-dev4-hold125-screen.yaml'
-ARTIFACT = f'official-dev4-hold125-{SOURCE_RUN}'
 RUNNER_ROOT = Path('/home/runner/work/protocol-emulator-asic/protocol-emulator-asic')
 
 
@@ -29,7 +28,6 @@ def verify_source():
                     conclusion='success', path=SOURCE_WORKFLOW)
     if any(run.get(key) != value for key, value in expected.items()):
         raise ValueError('The downloaded screen run is not the exact passing source run')
-    root = Path('.')
     receipt = json.loads(Path('compatibility-input.json').read_text())
     if receipt.get('tiles') != '8x4' or receipt.get('tools_sha') != TOOLS:
         raise ValueError('Screen artifact is not bound to the reviewed 8x4/dev4 toolchain')
@@ -58,6 +56,11 @@ def verify_source():
             or qualification.get('detailed_routing_performed') is not False
             or qualification.get('official_gds_signoff') is not False):
         raise ValueError('Screen artifact does not contain the complete passing pre-route gate')
+    from stock_screen_gate import qualify as requalify_screen
+    repeated = requalify_screen(Path('runs/stock-official-baseline'),
+                                Path('runs/stock-corner-audit'))
+    if repeated.get('qualified') is not True:
+        raise ValueError('Independent source-artifact gate recheck failed: ' + str(repeated.get('failures')))
     source = unique(Path('runs/stock-official-baseline'), '*-openroad-stamidpnr-3/state_out.json')
     if Path(qualification.get('source_state', '')).resolve() != source.resolve():
         raise ValueError('Screen qualification is not bound to the final pre-route checkpoint')
@@ -69,9 +72,9 @@ def verify_source():
     return source, json.loads(Path('src/config_merged.json').read_text())
 
 
-def bootstrap_ciel_antenna(config, source):
+def bootstrap_ciel_antenna(config, source, output_name='dev4-ciel-antenna'):
     """Acquire the pinned Ciel PDK via the stock backend and get a fresh antenna check."""
-    output = Path('runs/dev4-ciel-antenna')
+    output = Path('runs') / output_name
     output.mkdir(parents=True, exist_ok=False)
     cfg = dict(config)
     cfg['meta'] = {'version': config.get('meta', {}).get('version', 1),
@@ -93,7 +96,7 @@ def bootstrap_ciel_antenna(config, source):
     return antenna
 
 
-def main():
+def prepare():
     source, config = verify_source()
     antenna = bootstrap_ciel_antenna(config, source)
     fresh = Path('runs/dev4-pre-route-timing')
@@ -110,6 +113,14 @@ def main():
     if not pre_route_ready:
         raise ValueError('Fresh all-corner timing/electrical/antenna gates fail; DRT refused')
 
+
+def route():
+    source, config = verify_source()
+    receipt = json.loads(Path('runs/dev4-pre-route-gates.json').read_text())
+    if (receipt.get('source_run') != SOURCE_RUN or receipt.get('source_sha') != SOURCE_SHA
+            or receipt.get('qualified') is not True
+            or Path(receipt.get('source_state', '')).resolve() != source.resolve()):
+        raise ValueError('Missing or mismatched fresh pre-route qualification')
     route = Path('runs/dev4-hold125-route')
     run_step(config, source, route, ['OpenROAD.DetailedRouting'])
     route_state_path = unique(route, '*-openroad-detailedrouting/state_out.json')
@@ -118,9 +129,24 @@ def main():
         raise ValueError('Completed DRT did not report zero route DRC errors')
     validate_final_route(source, route)
     (route / 'route_completion.json').write_text(json.dumps(dict(
-        completed=True, route_drc_errors=0, source_run=SOURCE_RUN,
+        completed=True, route_drc_errors=0, source_run=SOURCE_RUN, source_sha=SOURCE_SHA,
+        workflow_run_id=os.environ.get('GITHUB_RUN_ID'),
         extracted_timing_performed=False, official_gds_signoff=False), indent=2) + '\n')
 
+
+def extract():
+    source, config = verify_source()
+    route = Path('runs/dev4-hold125-route')
+    route_state_path = unique(route, '*-openroad-detailedrouting/state_out.json')
+    completion = json.loads((route / 'route_completion.json').read_text())
+    if (completion.get('completed') is not True or completion.get('route_drc_errors') != 0
+            or completion.get('source_run') != SOURCE_RUN
+            or completion.get('source_sha') != SOURCE_SHA
+            or completion.get('workflow_run_id') != os.environ.get('GITHUB_RUN_ID')):
+        raise ValueError('Detailed-route artifact is incomplete or from another workflow run')
+    # Reinitialize the exact Ciel revision in this new job and independently
+    # reconfirm the immutable screen checkpoint before extracted STA.
+    bootstrap_ciel_antenna(config, source, output_name='dev4-extract-ciel-antenna')
     # The extraction helper deliberately requires the final normal PDK path.
     Path('src/config_merged.json').write_text(json.dumps(config, indent=2) + '\n')
     from extracted_timing import main as extract
@@ -134,8 +160,11 @@ def main():
         for kind in ('setup', 'hold'):
             key = f'timing__{kind}__ws__corner:{corner}'
             minimum = .05 if kind == 'hold' and corner == CORNERS[0] else 0
-            if type(summary.get(key)) not in (int, float) or summary[key] < minimum:
-                failures.append(f'{corner} {kind}: {summary.get(key)} < {minimum} ns')
+            value = summary.get(key)
+            if (type(value) not in (int, float) or
+                    (value <= 0 if kind == 'setup' else value < minimum)):
+                threshold = '> 0 ns' if kind == 'setup' else f'>= {minimum} ns'
+                failures.append(f'{corner} {kind}: {value} must be {threshold}')
     if set(electrical) != set(CORNERS) or any(
             row.get('no_reported_electrical_violations') is not True for row in electrical.values()):
         failures.append('extracted electrical reports are incomplete or nonzero')
@@ -153,4 +182,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('stage', choices=('prepare', 'route', 'extract'))
+    globals()[parser.parse_args().stage]()

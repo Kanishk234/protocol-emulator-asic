@@ -2,6 +2,11 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Correct compatibility run-directory setup
+
+- Both jobs in42653943190 pass official source/config generation and engine capture, then fail before synthesis because --force-run-dir requires the target directory to exist. Add missing mkdir, matching official Project.harden() setup. This is a diagnostic harness mistake; no physical result or geometry comparison yet. Log the bug; validate extracted shell setup and actionlint before relaunch. Main source/config/info and official jobs unchanged. Independent storage screen42649693561 still running. No phase ticks.
+
+
 ## 2026-11-09 — Prepare bounded updated-stock compatibility comparison
 
 - Published7dbdd0c helper/4ba7dbf workflow/bfa6295 docs; remote main verified at bfa62950d9ac938e97e9f4ee726ca5479c65be7a. [42653943190](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42653943190) is confirmed on that exact SHA. Initial dispatch returned404 before workflow registration and created no run; subsequent dispatch succeeded once, without duplicates. Native compatibility results pending.

@@ -86,6 +86,31 @@ def timing_gate(comparison):
                     raise ValueError('Electrical gate fails: ' + corner + ' ' + kind)
 
 
+def bound_hashes(root, recorded, paths):
+    """Resolve receipt keys for reading; never rewrite the saved receipt/state."""
+    resolved = {name: (Path(name) if Path(name).is_absolute() else root / name).resolve()
+                for name in recorded}
+    if (len(recorded) != len(paths)
+            or set(resolved.values()) != {p.resolve() for p in paths}):
+        raise ValueError('Incomplete or foreign source-view hash receipt')
+    for name, path in resolved.items():
+        if not path.is_relative_to(root.resolve()) or digest(path) != recorded[name]:
+            raise ValueError('Source-view hash receipt changed')
+
+
+def saved_screen(root):
+    # The producer records a relative state filename and absolute native views.
+    # qualify() must see its original path spelling as well as the same cwd.
+    receipt = json.loads((root / 'runs/stock-corner-audit/read_only_audit.json').read_text())
+    physical = Path(receipt['source_state']).parent.parent
+    previous = Path.cwd()
+    try:
+        os.chdir(root)
+        return qualify(physical, Path('runs/stock-corner-audit'))
+    finally:
+        os.chdir(previous)
+
+
 def restore(root, frozen, expected):
     if inventory(frozen) != inventory(expected):
         raise ValueError('Artifact hardware/macro bytes differ from prepared source')
@@ -106,7 +131,10 @@ def restore(root, frozen, expected):
         raise ValueError('Restoration needs a fresh physical workspace')
     source = one(frozen / 'runs/stock-official-baseline', '*-openroad-stamidpnr-3/state_out.json')
     receipt = json.loads((frozen / 'runs/stock-corner-audit/read_only_audit.json').read_text())
-    if receipt['source_state'] != str(root / source.relative_to(frozen)):
+    recorded_source = Path(receipt['source_state'])
+    if not recorded_source.is_absolute():
+        recorded_source = root / recorded_source
+    if recorded_source.resolve() != (root / source.relative_to(frozen)).resolve():
         raise ValueError('Runner path differs; saved states must not be rewritten')
     cfg = json.loads((frozen / 'src/config_merged.json').read_text())
     if (cfg['DIE_AREA'] != SIZES['8x4'] or cfg['CLOCK_PERIOD'] != 20
@@ -116,7 +144,7 @@ def restore(root, frozen, expected):
         shutil.copytree(frozen / folder, root / folder, dirs_exist_ok=True)
     shutil.copy2(frozen / 'info.yaml', root / 'info.yaml')
     shutil.copytree(frozen / 'runs', root / 'runs')
-    result = qualify(physical, root / 'runs/stock-corner-audit')
+    result = saved_screen(root)
     if result['qualified'] is not True:
         raise ValueError('Saved native screen fails: ' + str(result['failures']))
     signoff = json.loads((root / 'runs/stock-signoff-estimate/qualification.json').read_text())
@@ -125,9 +153,7 @@ def restore(root, frozen, expected):
     source = one(physical, '*-openroad-stamidpnr-3/state_out.json')
     state = json.loads(source.read_text())
     paths = [source, root / 'src/signoff.sdc'] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
-    hashes = {str(p): digest(p) for p in paths}
-    if signoff['unchanged_source_hashes'] != hashes:
-        raise ValueError('Signoff estimate does not bind the restored source')
+    bound_hashes(root, signoff['unchanged_source_hashes'], paths)
     timing_gate(json.loads((root / 'runs/stock-signoff-estimate/comparison.json').read_text()))
     result.update(source_run=SOURCE_RUN, source_sha=SOURCE_SHA,
                   saved_state_rewritten=False, physical_repairs_performed=False)
@@ -173,7 +199,7 @@ def route(root):
         timing_gate(json.loads((output / 'comparison.json').read_text()))
     if before != {str(p): digest(p) for p in paths}:
         raise ValueError('Read-only checks changed source views')
-    saved = qualify(root / 'runs/stock-official-baseline', root / 'runs/stock-corner-audit')
+    saved = saved_screen(root)
     if saved['qualified'] is not True:
         raise ValueError('Restored source drifted before routing')
     route_cfg = dict(cfg, OPENROAD_THREADS=4, DRT_SAVE_DRC_REPORT_ITERS=1, DRT_SAVE_SNAPSHOTS=True)

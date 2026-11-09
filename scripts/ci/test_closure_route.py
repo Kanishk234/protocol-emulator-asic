@@ -140,6 +140,29 @@ def test_restores_exact_views_and_rechecks_raw_gates(tmp_path):
     assert receipt['qualified'] is True and receipt['saved_state_rewritten'] is False
 
 
+def test_real_mixed_relative_state_and_absolute_native_views(tmp_path):
+    root, frozen, expected = restored_fixture(tmp_path)
+    audit = frozen / 'runs/stock-corner-audit/read_only_audit.json'
+    data = json.loads(audit.read_text())
+    absolute_state = data['source_state']
+    relative_state = str(Path(absolute_state).relative_to(root))
+    data['source_state'] = relative_state
+    hashes = data['unchanged_physical_view_hashes']
+    hashes[relative_state] = hashes.pop(absolute_state)
+    audit.write_text(json.dumps(data))
+    signoff = frozen / 'runs/stock-signoff-estimate/qualification.json'
+    data = json.loads(signoff.read_text())
+    hashes = data['unchanged_source_hashes']
+    hashes[relative_state] = hashes.pop(absolute_state)
+    hashes['src/signoff.sdc'] = hashes.pop(str(root / 'src/signoff.sdc'))
+    signoff.write_text(json.dumps(data))
+    before = {str(p.relative_to(frozen)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in (frozen / 'runs').rglob('*') if p.is_file()}
+    restore(root, frozen, expected)
+    assert all(hashlib.sha256((root / name).read_bytes()).hexdigest() == sha
+               for name, sha in before.items())
+
+
 @pytest.mark.parametrize('mutation', ['hardware', 'metadata', 'runner', 'signoff', 'rawtiming', 'rawantenna'])
 def test_altered_source_or_saved_acceptance_rejected(tmp_path, mutation):
     root, frozen, expected = restored_fixture(tmp_path)

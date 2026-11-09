@@ -33,7 +33,7 @@ def verify_source():
         raise ValueError('Screen artifact is not bound to the reviewed 8x4/dev4 toolchain')
     if receipt.get('pdk_revision') != PDK:
         raise ValueError('Screen artifact uses a different PDK revision')
-    if inventory(root) != receipt.get('inputs'):
+    if inventory(Path('.')) != receipt.get('inputs'):
         raise ValueError('Source or macro inventory differs from the screened inputs')
     config = Path('src/config.json')
     if hashlib.sha256(config.read_bytes()).hexdigest() != receipt.get('project_config_sha256'):

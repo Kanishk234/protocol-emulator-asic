@@ -1,0 +1,6 @@
+{
+  "reference_sha256": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+  "candidate_sha256": "5335d94f004dee28bd554b5ecf16050a3a9ead81d7704941ee40d702aa196e77",
+  "patch_sha256": "f5bc6031d3e09fa6fddf8fb317396a071ab020a466e46ed6c5ab4a9d4125e959",
+  "scope": "Unqualified isolated configuration cache storage experiment"
+}

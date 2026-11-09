@@ -1,0 +1,37 @@
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -240,29 +240,12 @@
+             else if (mode_write) mode_q <= mode_value;
+         end
+ `else
+-        reg mode_stage;
++        // Preserve write-only visibility, including writes while reset is low.
++        // A reset without a word-0 write must leave the stored mode untouched.
++        reg mode_q;
+         always @(posedge clk) begin
+-            if (!rst_n) mode_stage <= 1'b0;
+-            else if (mode_write) mode_stage <= mode_value;
+-        end
+-        wire mode_gclk;
+-`ifdef SYNTHESIS
+-        sg13cmos5l_lgcp_1 u_icg_mode (.GCLK(mode_gclk), .CLK(clk), .GATE(mode_write));
+-`else
+-        reg mode_en_l;
+-        /* verilator lint_off LATCH */
+-        always @* begin
+-            if (!clk) mode_en_l = mode_write;
+-        end
+-        /* verilator lint_on LATCH */
+-        assign mode_gclk = clk & mode_en_l;
+-`endif
+-        reg mode_q;
+-        /* verilator lint_off LATCH */
+-        always @* begin
+-            if (mode_gclk) mode_q = mode_stage;
+-        end
+-        /* verilator lint_on LATCH */
++            if (mode_write) mode_q <= rst_n ? mode_value : 1'b0;
++        end
+ `endif
+         assign bitsync_active = mode_q;
+     end else begin : g_no_bitsync_active

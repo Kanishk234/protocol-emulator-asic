@@ -1,7 +1,7 @@
 {
   "status": "prepared-not-applied-not-stock-qualified",
   "experimental_run": 39907035580,
-  "patch_sha256": "96425c06e802ed9d9dd2bee7f818a34aff645d506d35b889fc2e007c13b14ea7",
+  "patch_sha256": "2761377301992b8df474949faf44e3b7c536646e89a7c0a49ccc28b6934f268f",
   "files": {
     "src/RM_IHPSG13_1P_512x16_c2_bm_bist.v": "4a03d7cd63892f1986493339803d6f323b497ae332b2207c2cfd48e3053eb602",
     "src/pdn_cfg.tcl": "0614d6d24202f2e8106d39f08b975443797d36effb5060d03b5736e538d484db",
@@ -33,5 +33,7 @@
   ],
   "official_workflow_sha256": "b0f8ddf2e0f5a4fdaf824f662afdfc6ce84da791d127c299884481d099b1aa4e",
   "previous_official_workflow_sha256": "fceb55e489ce5217dce0b59833ffce95af478da739cd2318fe476edff408b5c2",
-  "official_template_revision": "4b1204ab387b5ab94db1d57067051d8d89a2f83c"
+  "official_template_revision": "4b1204ab387b5ab94db1d57067051d8d89a2f83c",
+  "previous_patch_sha256": "96425c06e802ed9d9dd2bee7f818a34aff645d506d35b889fc2e007c13b14ea7",
+  "source_metadata_rebase": "Main allocation 8x4; frozen experimental source baseline remains byte-identical 6x4, explicitly selected by this patch before diagnostic geometry selection."
 }

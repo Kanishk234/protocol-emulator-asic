@@ -5,8 +5,16 @@ import sys
 import types
 
 import pytest
+import yaml
 
 import official_dev4_route as route
+
+
+def test_route_and_extraction_jobs_export_pdk_root():
+    workflow = Path(__file__).parents[2] / '.github/workflows/gds-official-dev4-hold125-route.yaml'
+    config = yaml.safe_load(workflow.read_text())
+    for job in ('route', 'extraction'):
+        assert config['jobs'][job]['env']['PDK_ROOT'] == '/home/runner/pdk'
 
 
 def make_source(tmp_path, monkeypatch, inventory_matches=True):

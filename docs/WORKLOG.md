@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Fix dev4 route continuation PDK environment
+
+- Inspected the failed exact-checkpoint continuation [42712707249](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42712707249). It passed frozen screen restoration, engine identity and independent checkpoint requalification. The DRT wrapper then failed before launching LibreLane/OpenROAD because `native_stock_route.run_step()` read `PDK_ROOT` from the environment, but that variable was set only inside the earlier `prepare` Python process and was not exported by either GitHub job. This is a workflow harness failure; it gives no DRT, route DRC, or extracted timing result.
+- Added `/home/runner/pdk` to the route and extraction job environments and a focused regression test that checks both jobs. Recorded root cause as BUG #155. The continuation still consumes the same immutable passing 8x4 screen checkpoint; no RTL, physical config, official workflow, or acceptance gate changed.
+
+Next:
+- Run focused route-helper tests and workflow lint, then publish only the route workflow, its test and the two evidence ledgers. Relaunch the continuation against screen run 42681697462. If it completes DRT with zero route violations, inspect extracted setup/hold, electrical and antenna gates before final-netlist protocol replay.
+
 ## 2026-11-09 — Prepare exact 8x4 dev4 screen continuation through extraction
 
 - User confirms the full 8x4 `gds-official-dev4-hold125-screen` run [42681697462](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42681697462) finished. Recorded screen evidence: all strict pre-route gates passed, global overflow0, antenna0, electrical violations0, fast hold+0.127092ns, slow hold+0.697614ns, typical hold+0.333103ns; setup WS summary0 at all corners. This is estimated pre-route timing, not extracted closure, detailed-route completion, or official GDS signoff.

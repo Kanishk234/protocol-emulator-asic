@@ -37,14 +37,14 @@ def prepare(reference, output):
     return identity
 
 
-def verify(output, yosys):
+def verify(output, yosys, iverilog='iverilog', vvp='vvp'):
     results = []
     for full in (0, 1):
         exe = output / f'phase{full}.vvp'
-        subprocess.run(['iverilog', '-g2005', '-Isrc', '-s', 'tb_mode_ff',
+        subprocess.run([iverilog, '-g2005', '-Isrc', '-s', 'tb_mode_ff',
             f'-Ptb_mode_ff.FULL={full}', '-o', str(exe), 'gold.v', 'gate.v',
             str(ROOT / 'spikes/phase2_stock_flow/bitsync_cache_ff/tb_cache_ff.v')], cwd=output, check=True)
-        log = subprocess.check_output(['vvp', str(exe)], cwd=output, text=True, timeout=90)
+        log = subprocess.check_output([vvp, str(exe)], cwd=output, text=True, timeout=90)
         (output / f'phase{full}.log').write_text(log)
         if f'PASS full={full} cycles=133152 phase_checks=665770' not in log:
             raise ValueError('Missing complete phase comparison')
@@ -84,10 +84,10 @@ equiv_status -assert
     (output / 'mutant.v').write_text(original.replace(anchor,
         "if (!rst_n) mode_q <= 1'b0; else if (mode_write) mode_q <= mode_value;"))
     exe = output / 'wrong_reset.vvp'
-    subprocess.run(['iverilog', '-g2005', '-Isrc', '-s', 'tb_mode_ff',
+    subprocess.run([iverilog, '-g2005', '-Isrc', '-s', 'tb_mode_ff',
         '-Ptb_mode_ff.FULL=1', '-o', str(exe), 'gold.v', 'mutant.v',
         str(ROOT / 'spikes/phase2_stock_flow/bitsync_cache_ff/tb_cache_ff.v')], cwd=output, check=True)
-    mutant = subprocess.run(['vvp', str(exe)], cwd=output, text=True,
+    mutant = subprocess.run([vvp, str(exe)], cwd=output, text=True,
                             capture_output=True, timeout=90)
     (output / 'wrong_reset.log').write_text(mutant.stdout + mutant.stderr)
     if not mutant.returncode or 'Configuration staging changes observable phase behavior' not in mutant.stdout:
@@ -100,9 +100,11 @@ if __name__ == '__main__':
     parser.add_argument('--reference', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--yosys', default='yosys')
+    parser.add_argument('--iverilog', default='iverilog')
+    parser.add_argument('--vvp', default='vvp')
     args = parser.parse_args()
     identity = prepare(args.reference, args.output)
-    result = dict(identity=identity, checks=verify(args.output.resolve(), args.yosys),
+    result = dict(identity=identity, checks=verify(args.output.resolve(), args.yosys, args.iverilog, args.vvp),
         scope='Configuration module with clocked host writes; no physical qualification')
     (args.output / 'receipt.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result))

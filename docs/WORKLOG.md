@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Start isolated TRIPWIRE closure branch and cloud candidate regression
+
+- User approves TRIPWIRE closure work and explicitly authorizes grouped commits/pushes this session, with normal concise messages and no attribution trailer. User requests substantial verification in GitHub Actions. Branch `tripwire/closure-8x4` starts from live main5407d4c; on user request this workspace now checks it out. WARP review edits preserved under/tmp/warp-review-preserved; other untracked user artifacts unchanged. No rebase needed or main history rewrite.
+- Add source-only candidate exporter using the existing hold125 workflow's exact preparation and8x4selection, with before/after input hashes and existing guards. Add separate branch/manual cloud workflow for model/compiler tests,4realTTtop cases and22full-core protocol cases with pinned tools, real sigrok, strict XML and retained source/environment evidence. Protected template jobs, hardware/config and acceptance gates unchanged.
+- Local50focused testsPASS. Exact candidate preparation/36physical-input verificationPASS; final exporter additionally binds firmware/model/test sources. Model/compiler335PASS after unsandboxed sigrok rerun; initial sandbox30decoder failures reproduce libusb initialization denial. SystemVerilator5.020 incompatible with cocotb2; use pinned suite. Partial full-core UARTTX/RX passes; local full suites stopped in favor of cloud, no22casepass claimed. Shell/embeddedPython parse; actionlint/diff checks before publication. No phase boxes ticked or physical launches; main42681697462left running. Details: reports/CLOSURE_BRANCH_20261109.md.
+- Next publish and inspect exact branch cloud results, then native8x4screen outcome before any routing/integration promotion. Session approval permits pushes, not an automatic merge into main.
+
 ## 2026-11-09 — Fix hold125 screen setup and rerun only 8x4
 
 - Run42679601122 fails during setup before synthesis: compatibility guard only accepted clock75 hash and matrix accidentally retained6x4. Log diagnostic setup bug. Extend guard solely for reviewed125ps hash and record actual config hash; restrict target arm to8x4. No timing gate or physical result changed. Actionlint and diff check pass. ZIP remains untracked. Relaunch required.

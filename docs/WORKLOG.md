@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Trace full-design8x4 antenna residuals and prepare targeted screen
+
+- Inspect the user-supplied8x4 artifact in place; do not stage/push the ZIP. Stock flow clears its initial76net/85pin antenna report to0/0. Fresh final-checkpoint read-only audit finds three late Metal2 cumulative antenna ratios above200: hold10770/A on lane0 ex_slot266.18; hold9900/A on unit1 tok[14]257.60; hold7884/A on unit3 b_in225.30. All are hold-delay cells inserted downstream of native antenna repair. This resolves why screen showed3 nets/3 pins while normal diode repair was green.
+- Fresh8x4 targeted screen lowers only GRT_RESIZER_HOLD_SLACK_MARGIN175ps→125ps to reduce late hold-delay insertion; preserve50ps fast-hold acceptance and all setup/electrical/antenna/overflow gates. 20ns, same RTL, dev4/Ciel PDK and stock flow. Local actionlint/diff check pass. No tests added/run, no DRT; measured outcome pending.
+- ZIP remains untracked user data and must not be committed. Next run native screen; if all strict gates pass then review route/extraction/full protocol gates. Otherwise use fresh measured hold/antenna net evidence to select next single control.
+
+
 ## 2026-11-09 — Select confirmed 8x4 in main metadata
 
 - User requests8x4 metadata now. Set info.yaml tiles8x4 and correct stale tile-size comment; retain50MHz, source list and placeholder RTL. Official tools choose final floorplan; no custom geometry override. Active official placeholder run42664671296 will be superseded by the hardware-metadata push. Full protocol-core integration/closure remains pending and no phase box is ticked.

@@ -31,6 +31,10 @@ An isolated full-source generator probe reached the official YoWASP port checker
 
 ## Recommended comparison
 
+Prepared `gds-official-nov9-preflight.yaml`: two independent jobs select 6x4/8x4 on the exact measured clock75 RTL, retain the same project configuration, fetch the same hash-verified SRAM views, and use the retrieved official support-tools snapshot plus LibreLane3.1.0.dev4/Ciel. No installer override or manual-PDK option. Capture actual container identity/OpenROAD version and verify the expected default PDK hash. The unchanged stock Classic sequence stops at OpenROAD.GeneratePDN, after native macro checks, pre-PNR STA, floorplan, manual SRAM placement and PDN generation. This is a bounded compatibility check, not a timing screen; timing/electrical/antenna/overflow qualification remains a subsequent step.
+
+Local validation: exact 187-line source preparation passes in an isolated archive; both geometry preparations pass and all declared RTL bytes match the measured clock75 control. Input inventories match between the two geometries, wrong starting geometry is rejected, 26 existing portable-profile tests pass, actionlint passes, and all workflow shell blocks/embedded Python parse. The new generated/native audits have not executed successfully locally because the official generator's WASI access issue remains; CI must exercise them before any compatibility claim. Main official jobs/source/config/info remain untouched.
+
 1. Prepare a separate CI diagnostic using the new stock action's tools, LibreLane and Ciel-managed PDK, without editing official jobs. Validate source ports, SRAM views, generated config, all corners, Metal4 cap and actual engine identity before spending hours on PNR.
 2. Keep the proven 2-lane/4-unit hardware and 20ns clock. Use a same-toolchain 6x4 control and an 8x4 arm differing only in tile selection; record final generated DEF/config and macro legality. Do not add 3/6 resources at the same time.
 3. Apply unchanged setup, >=50ps fast hold, zero electrical/antenna/overflow screening gates. Only a passing arm proceeds to completed DRT, extraction and final-netlist protocol replay.

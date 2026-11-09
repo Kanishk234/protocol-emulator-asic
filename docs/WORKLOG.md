@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Prepare bounded updated-stock compatibility comparison
+
+- Add separate gds-official-nov9-preflight workflow and official_nov9_preflight.py input/generated/native audit. Use exact clock75 source/project controls with independent6x4/8x4 selections, official support-tools9d13ff3, LibreLane3.1.0.dev4 and default Ciel-managed PDK89d42ee. Capture actual engine image/OpenROAD identity. No old installer/manual-PDK path, custom physical repair or changes to official jobs.
+- Stop unchanged stock Classic at GeneratePDN after SRAM checks/placement and native power-grid generation; this is compatibility only, not a green timing screen. Generated audit binds full source/macro inventory,20ns, unchanged project controls, Metal4 cap, real DEF bounds and source list. Native audit requires all three nominal corners, SRAM config and completed PDN boundary; no placement/routing/timing closure claim.
+- Exact existing source preparation passes in isolated archive; both tile preparations pass, match all declared clock75 RTL bytes and retain identical source/macro inventory. Wrong starting geometry rejected.26portable-profile tests, actionlint, shell/embeddedPython parsing and diff checks pass. Actual generated/native audit execution remains pending CI; no phase ticks. Existing constant-storage run42649693561 is independently still in its native stock physical step. Next inspect compatibility outcomes before any dev4 timing-screen launch.
+
 ## 2026-11-09 — Inspect updated official toolchain
 
 - Retrieved exact official template/action/support-tools revisions and LibreLane3.1.0.dev4 wheel; inspected action defaults, PDK selection/configs and final 8x4 DEF. Record findings and source links in docs/reports/PHASE2_OFFICIAL_TOOLCHAIN_NOV9.md. New default IHP hash89d42ee replaces manually pinned2bbec755; TT still limits project signals to Metal4 and uses the same three nominal timing corners.

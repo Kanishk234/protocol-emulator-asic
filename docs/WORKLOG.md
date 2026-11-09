@@ -10,6 +10,22 @@ Newest entry at the top. One entry per work session.
 
 
 
+
+## 2026-11-09 — Finish interrupted constant-bank storage trial
+
+- Completed source-only constant-bank refinement on the unchanged clock75 recipe. Only trw_slots.v changes; K0–K3 use write-enabled root-clock flops with the original write-gated reset semantics. All12reflex slots remain latch-based. No state capacity, ABI, programming phase, protocol logic or timing exception changes; main source and official jobs remain untouched.
+- Verified768ASIC/752FPGA module-equivalence points with inductioncap6, actual and mapped IHP-cell3125cycle/12288phase checks, wrong-reset mutant rejection,5chip smokes and22/22RTL protocol cases with real sigrok0.7.2. Independently parsed XML and verified all tested RTL hashes against actual physical-screen preparation; XMLSHA880b91a24b74fcdc4e9d160948338da8f1d5249c9895d58cde6b4d0e8e16db79. Local test process has finished.
+- Full-chip local synthesis confirms128direct root-clock constant FFbits and96remaining slot clock gates. Isolated mapped area increases4499.712um² across two lanes; physical clock/hold/area effects remain unmeasured. Park the equivalent whole-store conversion because its isolated increase is46405.0944um²; no full-store physical profile exists.
+-114focused tests, actionlint, shell/nineembeddedPython checks and real source preparation pass. Read actual reference resolved config: automatic clock-gating settings areNone, consistent with direct-root synthesis audit. Record D168 and a scoped claim with limitations. No phase boxes ticked. Publication/launch receipt follows.
+- Next inspect the read-only native preflight and the one fresh clean-source screen. All original/signoff corner/electrical/antenna/overflow/50psfast-hold gates remain mandatory before any DRT.
+
+## 2026-11-08 — Source buffer trials fail physical qualification; inspect storage refinement
+
+-42528312016finishes: read-onlypreflightpasses andbothsourcearms complete normalstockClassic/freshcorner/signoff measurements. All8/104sourcebufferinstances survive tofinalnative netlist, so sourcehardwarechanges wereexercised. No sourceprep/runtime/synthesis-preservation failure; strictphysicalgates rejectboth.
+- Constants-buffer policy: setup summaries0allcorners, originalfast hold54.5457ps, slew0/fanout0butcapacitance1eachcorner; antenna12nets/12pins, overflow92,area692796um². All-words policy: setup0,fast hold−10.7306ps,4slow slew,antenna10nets/11pins,overflow59,area692582um². Bothregress cleanclock75reference; retire bothbufferpolicies andkeep clock75unqualifiedreference(70.1547ps,2slew,1antenna,1overflow).
+- Retrieve CRC-verified selectedaudit/effective-profile/finalmetrics/log entries fromartifacts13642681593(constants)and13643672410(allwords),savecompactfullcorner results in slot_enable_drive/results_42528312016.json. NoindependentwholeZIPdigestclaim. Rawlogs stay/tmp/CI. Bothprototypes stillhave22/22functionalRTL/module/realcell evidence, whichdoesnotoverridephysicalfailures. NoDRT, officialjob/mainhardware/configchange orphase tick.
+- Investigate whether a phase-equivalent root-clock enabled-FF implementation of the constant-register bank can removethe failingclock-gate-enable path. Preserve no-unconditional-reset behavior andexactwritephase; thisis a prototypeonly, notan architecturecontractchange or approvedmain adoption. Requirefullmoduleequivalence/realcellphase/reset/negativecontrol and area evidence beforeanyphysicalscreen. No resultorimplementationvalidityclaimeduntilthosechecks pass.
+
 ## 2026-11-08 — Prove source-level write-enable drive without changing stock hardening
 
 - Implement two isolated trw_slots.v source policies on the combined clock75reference: explicitIHPBUF4 drives existingICG GATE after decode, on allfourconstant-bankwords perlane or all52words. Interface/state/reset/phase/writebehavior, FPGAfallback andprogramming/protocolcontract unchanged. Costeight/104sourcecells at116.1216/1509.5808um², notwholephysicalarea. Main source unchanged. No targeted synthesizedIDs, toolwrapper/manualrepair, addedpipeline orfalsepath.

@@ -45,6 +45,8 @@ D-138 is a prepared physical diagnostic, not a new passing-design claim. Its sou
 
 | 20 | Native net/instance protection preserves the tested tiny relay connection under20µmwire repair that splits the unprotected control |41684924544;protected_endpoint/result_41684924544.json;independent final-netlist/raw-metric checks | tested | Tiny stock-flow feasibility only. Both cases antenna-clean;does not establish diode efficacy on failing antennas,all-corner/extracted timing,full-design screen or official GDS closure |
 
+| 21 | The isolated constant-bank root-clock storage prototype preserves the checked slot-module behavior and passes the matched22-case RTL protocol suite | slot_root_storage/evidence.json; verify_slot_root_storage.py:768ASIC/752FPGA equivalence points, inductioncap6; mapped IHP-cell3125cycle/12288phase replay and wrong-reset negative control; XMLSHA880b91a24b74fcdc4e9d160948338da8f1d5249c9895d58cde6b4d0e8e16db79 | tested | Prototype only; no whole-chip formal, final routed GL, extracted timing, silicon or official GDS closure. Isolated mapped area is not final physical area. |
+
 ## Known limits (state them wherever the related claim appears)
 
 

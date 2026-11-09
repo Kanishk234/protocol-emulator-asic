@@ -22,6 +22,17 @@ Separate repair42455208235timesoutafter120min atpartialiteration6,92markers afte
 
 
 
+
+## Constant-bank storage refinement
+
+The next prototype replaces only K0–K3 storage with phase-equivalent enabled root-clock FFs, preserving write-gated reset and uninitialized-until-written behavior. Reflex slots and the firmware interface remain unchanged. The actual candidate passes768ASIC/752FPGA module-equivalence points, mapped IHP-cell phase/reset replay, an incorrect-reset negative control,5chip smokes and22/22RTL protocol cases with real decoders. Full-chip local synthesis confirms128root-clock constant FFbits and96reflex-word clock gates.
+
+The isolated mapped slot-module increase is4499.712µm² across two lanes; actual routed area/skew/hold and power remain unmeasured. A full-store version costs46405.0944µm² extra and is parked. Only the small constant-bank candidate has a physical profile. Separate gds-constant-root-storage-screen uses exactclock75nativeconfig and clean stock RTL hardening, with no checkpoint repair or gate changes. Local source/structural tests114pass; physical results are pending. Main adoption still requires full physical/routed/official evidence and review of the implementation description.
+
+## Source buffer results:42528312016
+
+Both policies fail measured qualification despite full source-buffer retention. Eight-bufferconstants:fast hold+54.5457ps,no slew/fanout failures,butonecapacitance failure eachcorner,12antenna nets/pins and92overflow.104-bufferallwords:fasthold−10.7306ps,4slow slew,10antenna nets/11pins and59overflow. Areas692796/692582µm²respectively. All estimatedsetup summaries remain0, not extractedpositive headroom. Retirethese policies; sourcebuffering hasnotproduced a qualified replacement forclock75. Functional/module/PDK-celltest success doesnotestablishphysicalclosure. Compact measuredreceipt is slot_enable_drive/results_42528312016.json.
+
 ## Source-level enable drive
 
 After both native repair targets fail, test a generalRTLdrive boundary: insertBUF4 between eachselectedworddecode and its existingICGGATE. Independently buffer thefourconstant-register words perlane(eightcells,116.1216µm²sourcefootprint) or all52words perlane(104cells,1509.5808µm²). Keep clock75's exactnativeconfig, allsource/state/programming contracts and every acceptancegate. No addedstate/latency, manualplacement, toolwrapper or clock/timing exception. Nativeoptimization mayresize/removebuffers; synthesispreservation andfinalretention areexplicitlyaudited.

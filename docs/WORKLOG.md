@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Authenticate current lockstep success and prepare exact final-netlist replay
+
+- Lockstep42697037494 atd654985SUCCESS. Downloaded one-million-clock case and both pristine controlsPASS, no skips/errors; priority fault fails scoreboard at99clocks and cursor fault at326directed clocks. Both actual mutant XML/logs inspected. All170inputs reconcile (141Git/29prepared); all25files per mutant tree checked for exactly one intended edit. Compact receipt/report in reports/closure_lockstep_42697037494.json and CLOSURE_LOCKSTEP_20261109.md. Directed regression only, no arbitrary-program/formal/physical claim. Baseline unit42692486070alsoSUCCESS.
+- Prepare dependency-gated exact final-netlist replay for reviewed route42693952530/ebf817e/attempt1. Require wholeworkflowSUCCESS, API archive digest, original frozen-view set/hashes, source/config/macro equality, completed zero-DRC state, all extraction gates, exact extracted-state NL selection and logical-cell/connectivity agreement with DRT. Accept a properly inherited DRT NL; reject unrelated source-stage views. Existing gate harness/Icarus13/new-PDK cells/real sigrok exercise22cases withoutSDF; strict XML and unchanged-candidate checks remain mandatory. No acceptance before actual artifact/replay.
+- Local14final-replay admission testsPASS; combined84closureguardsPASS; workflow actionlint/shell/Python parsePASS. Route42693952530and native preflight42694710310remain in_progress when checked. Next publish queued final replay, then inspect physical/native/final results; phase2/GDS/precheck/production integration remain open.
+
 ## 2026-11-09 — Refresh current-candidate lockstep and retain real mutation controls
 
 - Current phase2 lockstep evidence predates the composed closure candidate. Add a cloud refresh for one million deterministic RTL/model comparison clocks on the exact prepared2/4core, plus cleanRX/cursor controls and priority/cursor injected faults. This is a directed regression, not proof over arbitrary programs or a physical measurement. Candidate hardware/spec/model unchanged.

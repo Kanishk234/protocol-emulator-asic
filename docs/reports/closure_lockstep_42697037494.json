@@ -1,0 +1,37 @@
+{
+  "run_id": 42697037494,
+  "source_sha": "d65498520d9f99005469e76c2a082fdabc931851",
+  "compared_clocks": 1000000,
+  "cases": [
+    {
+      "path": "protocol-emulator-asic/protocol-emulator-asic/build/closure-lockstep/injections/baseline-cursor/results.xml",
+      "outcome": "pass",
+      "sha256": "c3f5854713654a6ee1d096b57b3bc9f8689042b0be3206a9a38974e6fcb09853"
+    },
+    {
+      "path": "protocol-emulator-asic/protocol-emulator-asic/build/closure-lockstep/injections/baseline-rx/results.xml",
+      "outcome": "pass",
+      "sha256": "3b81bcd643caa75e564206b5dd16c6265a1e39dc49d92d2b1edfb4acf14e10bc"
+    },
+    {
+      "path": "protocol-emulator-asic/protocol-emulator-asic/build/closure-lockstep/injections/cursor-off-by-one/results.xml",
+      "outcome": "expected failure",
+      "sha256": "7e21b92ecb49aa2b45e4b7e1af06cd44d1a6ace2bc2f6df214bd57e5a146b964"
+    },
+    {
+      "path": "protocol-emulator-asic/protocol-emulator-asic/build/closure-lockstep/injections/priority-flip/results.xml",
+      "outcome": "expected failure",
+      "sha256": "29a8783ea3d6292dad00762393c3a177b24cf89249adc2438d6cd491867fc9c5"
+    },
+    {
+      "path": "protocol-emulator-asic/protocol-emulator-asic/build/closure-lockstep/million.xml",
+      "outcome": "pass",
+      "sha256": "5d1e805ad28703a02a8a464eeb142d8e87724aeaf36a212fede2cf2056a02f8f"
+    }
+  ],
+  "all_recorded_inputs_reconciled": 170,
+  "scope": "Directed RTL/model lockstep and two controlled fault detections; no physical/formal claim",
+  "mutation_sources_audited": true,
+  "priority_fault_divergence_clock": 99,
+  "cursor_fault_directed_divergence_clock": 326
+}

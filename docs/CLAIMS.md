@@ -49,6 +49,17 @@ D-138 is a prepared physical diagnostic, not a new passing-design claim. Its sou
 
 ## Known limits (state them wherever the related claim appears)
 
+### Current-candidate lockstep refresh, November 9
+
+[42697037494](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42697037494)
+at `d654985` passes one million directed RTL/model comparison clocks and both
+pristine injection controls. Reversed priority and cursor increment faults
+each produce an actual failing scoreboard case. Downloaded XML/logs, all 170
+input hashes and both single-edit mutant trees were independently checked.
+This is directed regression and two controlled fault detections, not arbitrary
+firmware coverage, a broad mutation score, formal or physical verification.
+Details: `reports/CLOSURE_LOCKSTEP_20261109.md`.
+
 ### Closure branch RTL refresh, November 9
 
 [42690695832](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42690695832)

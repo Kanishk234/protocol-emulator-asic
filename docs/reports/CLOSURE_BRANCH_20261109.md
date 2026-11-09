@@ -163,6 +163,26 @@ The cloud job requires one executed case per run, no skip/error, a passing
 pristine control and a genuine failing mutation with a scoreboard divergence.
 All evidence and mutant source copies are retained, while compiled simulator
 binaries are excluded. The untouched candidate is hashed again after replay.
-Actual hosted results remain pending. This test covers the directed lane/
+Hosted result 42697037494 is now SUCCESS; the downloaded million-clock case,
+both clean controls and both intended assertion failures are authenticated in
+[the lockstep report](CLOSURE_LOCKSTEP_20261109.md). This test covers the directed lane/
 channel/pin stimulus in the existing bench, rather than arbitrary firmware,
 exhaustive state exploration or physical timing.
+
+## Exact final-netlist replay gate
+
+`tripwire-closure-final-gl.yaml` waits for the exact reviewed route run
+42693952530 at `ebf817e`, attempt 1, to finish successfully. It refuses a failed
+source, foreign run or bounded dependency timeout. The replay then authenticates
+the complete route archive, original frozen views, source/config/macros and
+all completed route/extraction gates. It selects the exact NL named by the
+extracted STA state, including a correctly inherited DRT NL, and checks its
+logical cell connectivity against the detailed-route export.
+
+Only that selected byte-identical netlist is replayed with Icarus 13, exact
+new-PDK cell models, the pinned SRAM behavioral model, real sigrok and the
+existing 22 protocol cases. The netlist, source bindings, runtime hashes and
+strict XML are retained; no SDF or official GDS qualification is claimed.
+Fourteen admission controls pass locally, but actual route artifacts and
+replay remain pending. This keeps the earlier pre-DRT native replay separate
+from the required final implementation test.

@@ -17,7 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         tiles:
-        - 6x4
         - 8x4
     env:
       PDK_ROOT: /home/runner/pdk

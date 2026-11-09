@@ -88,12 +88,18 @@ def main():
     icg_name = 'u_chip.g_lane[1].u_slots.g_word[51].u_icg'
     instances = [inst for inst in block.getInsts()
                  if inst.getName().replace(r'\[', '[').replace(r'\]', ']') == icg_name]
-    if len(instances) != 1:
-        raise ValueError('Missing unique tracked word-enable gate')
-    term = instances[0].findITerm('GATE')
-    if term is None or term.getNet() is None:
-        raise ValueError('Missing tracked gate input net')
-    targets.append(term.getNet().getName())
+    selection = Path('spikes/phase2_stock_flow/selected_profile.json')
+    root_storage = selection.is_file() and json.loads(selection.read_text()).get('slot_root_storage') == 'constants'
+    if root_storage:
+        if instances:
+            raise ValueError('Refined constant bank unexpectedly retains its old clock gate')
+    else:
+        if len(instances) != 1:
+            raise ValueError('Missing unique tracked word-enable gate')
+        term = instances[0].findITerm('GATE')
+        if term is None or term.getNet() is None:
+            raise ValueError('Missing tracked gate input net')
+        targets.append(term.getNet().getName())
     nets = []
     seen = set()
     for name in dict.fromkeys(targets):
@@ -116,6 +122,7 @@ def main():
         source_state=str(sources[0]), source_view_hashes=before,
         units_per_micron=block.getDbUnitsPerMicron(), overflow_edges=overflow,
         final_live_overflow=int(totals[-1]), target_nets=nets,
+        tracked_constant_storage='root_clock_flops' if root_storage else 'gated_latches',
         physical_changes_applied=False, router_initialized=False,
         official_gds_qualified=False), indent=2)+'\n')
 

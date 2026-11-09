@@ -28,7 +28,7 @@ def test_exact_source_one_variable_and_fixed_acceptance_inputs(variant):
     assert receipt['comparison_reference_run']==(42456273203 if variant.startswith('clock75_') else 42305323874)
     if not variant.startswith('clock75_'):assert receipt['comparison_reference_config_sha256']==BASE_CONFIG_SHA256
     assert receipt['manual_checkpoint_repairs'] is False and receipt['official_gds_signoff'] is False
-    assert receipt['hardware_unchanged']==(variant not in ('mode_ff','debug_align','clock75_constants_drive','clock75_all_drive'))
+    assert receipt['hardware_unchanged']==(variant not in ('mode_ff','debug_align','clock75_constants_drive','clock75_all_drive','clock75_constants_ff'))
     assert all(receipt[k] for k in ('c_select','idle_ff','host_port_align'))
 
 
@@ -94,3 +94,13 @@ def test_enable_drive_trials_keep_measured_clock_configuration(variant,source_va
     assert receipt['additional_changes_from_reference']=={'source_patch':'slot_enable_drive/'+source_variant+'.patch'}
     assert result['GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH']==200
     assert 'GRT_DESIGN_REPAIR_MAX_SLEW_PCT' not in result
+
+
+def test_root_constant_storage_has_no_native_config_change_and_no_all_store_profile():
+    from host_idle_portable_trials import CLOCK75_CONFIG_SHA256
+    config,selected=reference();result,receipt=select(config,selected,'clock75_constants_ff')
+    assert receipt['config_sha256']==CLOCK75_CONFIG_SHA256
+    assert receipt['slot_root_storage']=='constants'
+    assert receipt['hardware_unchanged'] is False
+    assert receipt['additional_changes_from_reference']=={'source_patch':'slot_root_storage/constants.patch'}
+    with pytest.raises(ValueError):select(config,selected,'clock75_all_ff')

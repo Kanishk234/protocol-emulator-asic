@@ -20,6 +20,7 @@ VARIANTS = {
                        'GRT_DESIGN_REPAIR_MAX_SLEW_PCT': 25},
     'clock75_constants_drive': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
     'clock75_all_drive': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
+    'clock75_constants_ff': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
 }
 
 
@@ -47,7 +48,7 @@ def select(config, selected, variant):
                    comparison_reference_run=BASE_RUN,
                    comparison_reference_config_sha256=BASE_CONFIG_SHA256,
                    additional_changes_from_reference=deepcopy(VARIANTS[variant]),
-                   hardware_unchanged=variant not in ('mode_ff', 'debug_align', 'clock75_constants_drive', 'clock75_all_drive'),
+                   hardware_unchanged=variant not in ('mode_ff', 'debug_align', 'clock75_constants_drive', 'clock75_all_drive', 'clock75_constants_ff'),
                    mode_ff=variant == 'mode_ff', host_debug_align=variant == 'debug_align',
                    clean_from_rtl=True, manual_checkpoint_repairs=False,
                    official_gds_signoff=False)
@@ -65,7 +66,12 @@ def select(config, selected, variant):
             raise ValueError('Clock75 comparison configuration drift')
         delta = {k: v for k, v in result.items() if reference.get(k) != v}
         source_variant = {'clock75_constants_drive': 'constants', 'clock75_all_drive': 'all_words'}.get(variant)
-        if source_variant:
+        if variant == 'clock75_constants_ff':
+            if delta:
+                raise ValueError('Root-storage trial must retain clock75 configuration')
+            delta = {'source_patch': 'slot_root_storage/constants.patch'}
+            receipt['slot_root_storage'] = 'constants'
+        elif source_variant:
             if delta:
                 raise ValueError('Source enable-drive trial must retain clock75 configuration')
             delta = {'source_patch': 'slot_enable_drive/' + source_variant + '.patch'}
@@ -119,6 +125,18 @@ def prepare(root, variant):
             raise ValueError('Missing real foundry-cell phase/reset/negative-control evidence')
         require_smoke(evidence)
         receipt['source_application'] = apply(root, evidence_dir, source_variant)
+    if receipt.get('slot_root_storage'):
+        from apply_slot_root_storage import apply
+        evidence_dir = root / 'spikes/phase2_stock_flow/slot_root_storage'
+        evidence = json.loads((evidence_dir/'evidence.json').read_text())['variants']['constants']
+        if {(p['mode'], p['equivalence_points']) for p in evidence.get('proofs', [])} != {('asic', 768), ('flops', 752)}:
+            raise ValueError('Missing root-storage module equivalence evidence')
+        if (evidence.get('mapped_foundry_phase_cycles', 0) < 3125
+                or evidence.get('mapped_foundry_phase_checks', 0) < 12288
+                or evidence.get('wrong_reset_mutant_rejected') is not True):
+            raise ValueError('Missing mapped-cell phase/reset and negative-control evidence')
+        require_smoke(evidence)
+        receipt['source_application'] = apply(root, evidence_dir, 'constants')
     config_path.write_text(json.dumps(config, indent=2) + '\n')
     selected_path.write_text(json.dumps(receipt, indent=2) + '\n')
     return receipt

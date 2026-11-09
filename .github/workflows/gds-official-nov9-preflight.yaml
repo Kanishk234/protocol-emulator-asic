@@ -202,6 +202,8 @@ jobs:
 
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
 
+        mkdir -p runs/official-nov9-preflight
+
         python -m librelane --docker-no-tty --dockerized --pdk-root "$PDK_ROOT" --pdk ihp-sg13cmos5l --run-tag official-nov9-preflight
         --force-run-dir runs/official-nov9-preflight --hide-progress-bar --to OpenROAD.GeneratePDN src/config_merged.json
 

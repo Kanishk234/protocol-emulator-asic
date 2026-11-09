@@ -2,13 +2,21 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Retry exact dev4 checkpoint with persisted PDK resolution
+
+- Run [42714224766](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42714224766) failed before OpenROAD because the route job received the Ciel cache root rather than the versioned PDK root discovered during preparation. Added validated PDK-root persistence and rejection tests; focused suite passes 5/5 and `py_compile`/`git diff --check` pass.
+- Pushed fix `ef283e6` and dispatched [42716036741](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42716036741) against the same immutable screen artifact. It is in progress restoring the source artifact; DRT has not started yet. Local unrelated changes remain untouched.
+
+Next:
+- Check run 42716036741 through source requalification and verify the exact resolved PDK path reaches LibreLane. Only once OpenROAD DRT starts can the outcome say anything about routeability; then require DRC0 and extracted all-corner gates.
+
 ## 2026-11-09 — Fix dev4 route continuation PDK environment
 
 - Inspected the failed exact-checkpoint continuation [42712707249](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42712707249). It passed frozen screen restoration, engine identity and independent checkpoint requalification. The DRT wrapper then failed before launching LibreLane/OpenROAD because `native_stock_route.run_step()` read `PDK_ROOT` from the environment, but that variable was set only inside the earlier `prepare` Python process and was not exported by either GitHub job. This is a workflow harness failure; it gives no DRT, route DRC, or extracted timing result.
 - Added `/home/runner/pdk` to the route and extraction job environments and a focused regression test that checks both jobs. Focused tests pass 3/3; local `actionlint` is unavailable. Recorded root cause as BUG #155. Commit `953d9f6` was pushed, and corrected continuation [42714224766](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42714224766) is running against the same immutable passing 8x4 screen checkpoint. No RTL, physical config, official workflow, or acceptance gate changed.
 
 Next:
-- Inspect route run 42714224766. If DRT completes with zero route violations, inspect extracted setup/hold, electrical and antenna gates before final-netlist protocol replay; if it fails, diagnose the exact first failed step before changing anything.
+- Run 42714224766 failed during tool PDK loading before DRT; its root cause and correction are recorded in the next entry below.
 
 ## 2026-11-09 — Carry the resolved dev4 PDK path into DRT
 
@@ -16,7 +24,7 @@ Next:
 - Added the validated PDK path to the pre-route receipt and a route-stage guard that restores only a path whose directory matches the pinned revision and contains `ihp-sg13cmos5l`. Added tests for acceptance of the versioned root and rejection of the cache root; recorded BUG #156. This preserves the exact screen checkpoint and changes no design or flow gates.
 
 Next:
-- Run the focused tests and workflow lint, publish the PDK-path persistence fix, then retry the exact-checkpoint route. Verify the `Run stock detailed routing only` step actually enters OpenROAD before interpreting any subsequent failure as a routing result.
+- Focused tests passed 5/5. Fix `ef283e6` has been pushed and retry 42716036741 is in progress; inspect the run as recorded in the newer entry above.
 
 ## 2026-11-09 — Prepare exact 8x4 dev4 screen continuation through extraction
 

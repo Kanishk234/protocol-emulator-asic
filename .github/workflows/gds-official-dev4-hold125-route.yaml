@@ -44,7 +44,7 @@ jobs:
             if source.exists(): shutil.copytree(source, Path(name))
         shutil.copy2(frozen / 'info.yaml', 'info.yaml')
         for name in ('compatibility-input.json', 'compatibility-generated.json',
-                     'compatibility-native.json', 'compatibility-image.json',
+                     'compatibility-engine.json', 'compatibility-image.json',
                      'compatibility-openroad.txt'):
             if (frozen / name).exists(): shutil.copy2(frozen / name, name)
         PY
@@ -134,7 +134,7 @@ jobs:
             if source.exists(): shutil.copytree(source, Path(name))
         shutil.copy2(frozen / 'info.yaml', 'info.yaml')
         for name in ('compatibility-input.json', 'compatibility-generated.json',
-                     'compatibility-native.json', 'compatibility-image.json',
+                     'compatibility-engine.json', 'compatibility-image.json',
                      'compatibility-openroad.txt'):
             if (frozen / name).exists(): shutil.copy2(frozen / name, name)
         PY

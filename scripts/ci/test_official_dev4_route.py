@@ -42,8 +42,8 @@ def make_source(tmp_path, monkeypatch, inventory_matches=True):
         inputs=inputs, project_config_sha256=config_sha)))
     (tmp_path / 'compatibility-generated.json').write_text(json.dumps(
         dict(generation_passed=True, tiles='8x4')))
-    (tmp_path / 'compatibility-native.json').write_text(json.dumps(
-        dict(native_through_pdn_passed=True, pdk_revision=route.PDK)))
+    (tmp_path / 'compatibility-engine.json').write_text(json.dumps(
+        dict(librelane='3.1.0.dev4', pdk_revision=route.PDK, tools_sha=route.TOOLS)))
     (tmp_path / 'runs/stock-corner-audit/screen_qualification.json').write_text(json.dumps(dict(
         qualified=True, final_global_overflow=0, minimum_fast_hold_ns=.05,
         detailed_routing_performed=False, official_gds_signoff=False,

@@ -43,12 +43,13 @@ def verify_source():
     if info['project']['tiles'] != '8x4':
         raise ValueError('Screen artifact does not describe the confirmed 8x4 project')
     generated = json.loads(Path('compatibility-generated.json').read_text())
-    native = json.loads(Path('compatibility-native.json').read_text())
+    engine = json.loads(Path('compatibility-engine.json').read_text())
     if (generated.get('generation_passed') is not True
             or generated.get('tiles') != '8x4'
-            or native.get('native_through_pdn_passed') is not True
-            or native.get('pdk_revision') != PDK):
-        raise ValueError('Official dev4 8x4 generation/native provenance is incomplete')
+            or engine.get('librelane') != '3.1.0.dev4'
+            or engine.get('pdk_revision') != PDK
+            or engine.get('tools_sha') != TOOLS):
+        raise ValueError('Official dev4 8x4 generation/engine provenance is incomplete')
     qualification = json.loads(Path('runs/stock-corner-audit/screen_qualification.json').read_text())
     if (qualification.get('qualified') is not True
             or qualification.get('final_global_overflow') != 0

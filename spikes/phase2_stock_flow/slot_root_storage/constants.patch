@@ -1,0 +1,24 @@
+--- a/src/trw_slots.v
++++ b/src/trw_slots.v
+@@ -57,6 +57,13 @@
+                     mem <= wdata[NB-1:0];
+             end
+ `else
++            // Preserve the gated-latch write phase and write-gated reset semantics.
++            if (w >= 48) begin : g_root_storage
++                always @(posedge clk) begin
++                    if (dec)
++                        mem <= rst_n ? wdata[NB-1:0] : {NB{1'b0}};
++                end
++            end else begin : g_latch_storage
+             wire gclk;
+             /* verilator lint_off LATCH */
+ `ifdef SYNTHESIS
+@@ -78,6 +85,7 @@
+                     mem = wdata_q[NB-1:0];
+             end
+             /* verilator lint_on LATCH */
++            end
+ `endif
+             if (NB == 16) begin : g_full
+                 assign words[16*w +: 16] = mem;

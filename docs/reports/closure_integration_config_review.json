@@ -1,0 +1,204 @@
+{
+  "template_revision": "4b1204ab387b5ab94db1d57067051d8d89a2f83c",
+  "template_config_sha256": "4b192dffa877dcefa4ab969af9dedf105375921aa179c677524fa88ac94bb510",
+  "candidate_config_sha256": "4d71243f672fac34f004c43a8c8bfc46cffaae2b2929f7d3c788de1fac72a9f7",
+  "source_run": 42681697462,
+  "source_artifact_id": 13708390816,
+  "changes": [
+    {
+      "key": "CTS_APPLY_NDR",
+      "template_value": null,
+      "candidate_value": "none",
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "CTS_SINK_CLUSTERING_MAX_DIAMETER",
+      "template_value": null,
+      "candidate_value": 75,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "CTS_SINK_CLUSTERING_SIZE",
+      "template_value": null,
+      "candidate_value": 8,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "EXTRA_EXCLUDED_CELLS",
+      "template_value": null,
+      "candidate_value": [
+        "sg13cmos5l_buf_1"
+      ],
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "FP_PDN_VOFFSET",
+      "template_value": null,
+      "candidate_value": 26.36,
+      "classification": "SRAM integration adoption review"
+    },
+    {
+      "key": "FP_PDN_VPITCH",
+      "template_value": 50.0,
+      "candidate_value": 67.44,
+      "classification": "SRAM integration adoption review"
+    },
+    {
+      "key": "FP_PDN_VSPACING",
+      "template_value": null,
+      "candidate_value": 3.52,
+      "classification": "SRAM integration adoption review"
+    },
+    {
+      "key": "GRT_ADJUSTMENT",
+      "template_value": null,
+      "candidate_value": 0.16,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "GRT_ANTENNA_REPAIR_DIODE_ONLY",
+      "template_value": null,
+      "candidate_value": true,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH",
+      "template_value": null,
+      "candidate_value": 200,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "GRT_OVERFLOW_ITERS",
+      "template_value": null,
+      "candidate_value": 100,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "GRT_RESIZER_HOLD_SLACK_MARGIN",
+      "template_value": 0.05,
+      "candidate_value": 0.125,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "GRT_RESIZER_SETUP_SLACK_MARGIN",
+      "template_value": null,
+      "candidate_value": 0,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "MACROS",
+      "template_value": null,
+      "candidate_value": {
+        "RM_IHPSG13_1P_512x16_c2_bm_bist": {
+          "instances": {
+            "u_chip.u_sram.sram": {
+              "location": [
+                12,
+                40
+              ],
+              "orientation": "FS"
+            }
+          },
+          "gds": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.gds"
+          ],
+          "lef": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.lef"
+          ],
+          "lib": {
+            "*_typ_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib"
+            ],
+            "*_fast_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib"
+            ],
+            "*_slow_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib"
+            ]
+          },
+          "nl": [
+            "dir::./RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+          ],
+          "spice": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl"
+          ]
+        }
+      },
+      "classification": "explicit existing whitelist"
+    },
+    {
+      "key": "MAGIC_EXT_ABSTRACT_CELLS",
+      "template_value": null,
+      "candidate_value": [
+        "RM_IHPSG13_.*"
+      ],
+      "classification": "SRAM integration adoption review"
+    },
+    {
+      "key": "MAGIC_MACRO_STD_CELL_SOURCE",
+      "template_value": null,
+      "candidate_value": "PDK",
+      "classification": "SRAM integration adoption review"
+    },
+    {
+      "key": "PDN_CFG",
+      "template_value": null,
+      "candidate_value": "dir::pdn_cfg.tcl",
+      "classification": "SRAM integration adoption review"
+    },
+    {
+      "key": "PDN_MACRO_CONNECTIONS",
+      "template_value": null,
+      "candidate_value": [
+        "u_chip.u_sram.sram VPWR VGND VDD! VSS!",
+        "u_chip.u_sram.sram VPWR VGND VDDARRAY! VSS!"
+      ],
+      "classification": "SRAM integration adoption review"
+    },
+    {
+      "key": "PL_RESIZER_HOLD_SLACK_MARGIN",
+      "template_value": 0.1,
+      "candidate_value": 0.175,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "PL_RESIZER_SETUP_SLACK_MARGIN",
+      "template_value": null,
+      "candidate_value": 0,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "PL_TARGET_DENSITY_PCT",
+      "template_value": 60,
+      "candidate_value": 56,
+      "classification": "explicit existing whitelist"
+    },
+    {
+      "key": "RUN_POST_GRT_DESIGN_REPAIR",
+      "template_value": null,
+      "candidate_value": true,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "RUN_POST_GRT_RESIZER_TIMING",
+      "template_value": null,
+      "candidate_value": true,
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "SYNTH_BUFFER_CELL",
+      "template_value": null,
+      "candidate_value": "sg13cmos5l_buf_2/A/X",
+      "classification": "native physical-control adoption review"
+    },
+    {
+      "key": "SYNTH_STRATEGY",
+      "template_value": null,
+      "candidate_value": "DELAY 0",
+      "classification": "native physical-control adoption review"
+    }
+  ],
+  "source_promoted": false,
+  "official_template_jobs_changed": false,
+  "physical_release_qualified": false
+}

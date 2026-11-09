@@ -1,5 +1,17 @@
 # TRIPWIRE: physical design and CI
 
+**Current closure checkpoint, November 9:** stock dev4 8x4 screen
+[42681697462](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42681697462)
+passes all original/signoff estimated timing, electrical, antenna and overflow
+gates. Actual archive and raw metrics are independently authenticated in
+[`CLOSURE_SCREEN_20261109.md`](../reports/CLOSURE_SCREEN_20261109.md).
+Corrected continuation
+[42693952530](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42693952530)
+passes actual restoration and stock engine/Ciel initialization; route/extracted
+acceptance is still pending. Native pre-DRT functional replay is separate and
+does not establish SDF or timing acceptance. Main's official top remains the
+placeholder; no phase exit or production promotion is claimed.
+
 A reference for everything between "the RTL simulates" and "every workflow is green and the GDS is submittable":
 - the Tiny Tapeout flow on IHP CMOS5L
 - the SRAM macro

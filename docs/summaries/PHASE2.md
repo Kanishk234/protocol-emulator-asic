@@ -1,5 +1,26 @@
 # Phase 2: building and fitting the chip
 
+**November 9 current status:** The unchanged two-lane/four-pin-unit candidate
+now passes a clean-source stock-flow **8x4** screen on the updated official
+toolchain. [Run 42681697462](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42681697462)
+passes original and signoff estimated timing, electrical checks, antenna and
+global-routing overflow. Its original fast-corner hold slack is 0.127092 ns;
+setup worst slack is 0 rather than evidence of positive reserve. The complete
+artifact and raw measurements were independently checked. This closes the
+current pre-routing screen, not detailed routing or signoff.
+
+The prepared current core also passes a fresh cloud RTL regression:
+[42690695832](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42690695832),
+335 model/compiler tests, four actual-top tests and 22 protocol cases without
+skips. A corrected continuation has restored the exact physical checkpoint
+and is running fresh timing checks, routing and extraction. Native-cell
+protocol replay and a current million-clock lockstep refresh are separate
+cloud checks. Main's official top remains the placeholder, and Phase 2 remains
+open until qualified physical results, final-netlist replay and production
+integration are complete. See the [current release frontier](../reports/CLOSURE_BRANCH_20261109.md)
+and [authenticated screen](../reports/CLOSURE_SCREEN_20261109.md). The dated
+entries below describe historical experiments, not the current release state.
+
 **2026-11-07 strict screen milestone:** The route-preserving experiment42394957445 is green in both arms. The edited full2/4design has no estimated setup failures, fast hold138.366ps, electrical0, antenna0 and global overflow0, with independent45192-net connectivity/pin coverage. Its exact checkpoint is being prepared for stock detailed routing. Extracted timing, routed protocol replay and official source/config reproduction are still open; main's official GDS workflow is unchanged and no Phase2completion is claimed.
 
 **2026-11-07 current status:** The combined host-word and critical-configuration-storage prototype passes all22local protocol cases and estimated timing/electrical checks, with138.366psfast hold. Its remaining screen failures are6antenna nets and2routing-overflow units. Stronger early hold repair regresses congestion; whole-net diode rerouting also regresses or exhausts the router search. A bounded local route-attachment experiment is prepared to preserve the long source trees. This is physical diagnosis, not an official green GDS result. The last measured extracted setup reference is still−2.9278ns on the earlier source; the new combined source has not passed detailed routing/extraction. Phase2,main integration and official source/config reproduction remain open. Historical successful custom-flow results below do not qualify this newer source or the unchanged official workflow.

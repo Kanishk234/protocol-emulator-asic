@@ -7,6 +7,14 @@ from closure_clock_probe import context, configure, reference_matches, PERIODS, 
 from test_closure_final_gl import context as route_context
 
 
+def test_inherited_headers_are_restored_without_giant_route_snapshots():
+    from closure_clock_probe import selected_member
+    for name in ('runs/stock-official-baseline/05-yosys-jsonheader/tt_um_tripwire.h.json',
+                 'runs/stock-official-baseline/29-odb-writeverilogheader/tt_um_tripwire.vh'):
+        assert selected_member(name)
+    assert not selected_member('runs/closure-route/01-openroad-detailedrouting/snapshots/large.odb')
+
+
 def test_only_exact_failed_route_is_a_diagnostic_source():
     run, artifact = route_context()
     run['conclusion'] = 'failure'; artifact.update(id=ARTIFACT_ID, digest=ARCHIVE_SHA)

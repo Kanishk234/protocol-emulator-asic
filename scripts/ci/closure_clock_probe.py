@@ -28,6 +28,16 @@ REFERENCE = {
 }
 
 
+def selected_member(name):
+    # State.load validates inherited header views even for a read-only ODB step.
+    return (name.startswith(('src/', 'macro/', 'runs/extracted-timing/',
+                'runs/closure-route-checks/',
+                'runs/stock-official-baseline/05-yosys-jsonheader/',
+                'runs/stock-official-baseline/29-odb-writeverilogheader/'))
+            or name == 'info.yaml'
+            or name.startswith('runs/closure-route/') and name.endswith('/state_out.json'))
+
+
 def context(run, artifact):
     source_context(run, artifact, completed=False)
     if (run.get('status') != 'completed' or run.get('conclusion') != 'failure'
@@ -66,10 +76,7 @@ def restore(root, archive, expected):
                     or str(p) in seen or stat.S_ISLNK(info.external_attr >> 16)):
                 raise ValueError('Unsafe route archive member')
             seen.add(str(p))
-            selected = (info.filename.startswith(('src/', 'macro/', 'runs/extracted-timing/',
-                        'runs/closure-route-checks/')) or info.filename == 'info.yaml'
-                        or info.filename.startswith('runs/closure-route/') and
-                        info.filename.endswith('/state_out.json'))
+            selected = selected_member(info.filename)
             if selected and not info.is_dir():
                 target = root / str(p)
                 target.parent.mkdir(parents=True, exist_ok=True)

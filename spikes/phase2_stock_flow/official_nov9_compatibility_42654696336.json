@@ -1,0 +1,52 @@
+{
+  "run_id": 42654696336,
+  "source_sha": "61ff819e1fbd4741ea52f20a99c8584e2b08ee6d",
+  "scope": "Stock Classic compatibility through GeneratePDN; no post-placement timing or routing qualification",
+  "identical_source_and_macro_inputs": true,
+  "generated_config_differences": [
+    "DIE_AREA",
+    "FP_DEF_TEMPLATE"
+  ],
+  "toolchain": {
+    "librelane": "3.1.0.dev4",
+    "ciel": "3.2.0",
+    "pdk_revision": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+    "tools_sha": "9d13ff3e3e6202090740110438c6a10c1d62ca0f"
+  },
+  "engine_digest": "sha256:af2405f5d48d8fe14d406ecce913811177a95e365e3b625859677307cace2469",
+  "openroad": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+  "arms": {
+    "6x4": {
+      "native_through_pdn_passed": true,
+      "sta_corners": [
+        "nom_fast_1p32V_m40C",
+        "nom_slow_1p08V_125C",
+        "nom_typ_1p20V_25C"
+      ],
+      "resolved_pdk_root": "/home/runner/pdk/ciel/ihp-sg13/versions/89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+      "native_final_state_sha256": "88925745f158d70cfb41a8249ad38492a04f3bf3c6bf2bad836e803605be1dc0",
+      "def_sha256": "b46d9a0ee8352160e48dbc8312f092f985629061df736c7f46d58686535a76f4",
+      "timing_qualified": false,
+      "official_gds_passed": false,
+      "artifact_id": 13692290363,
+      "native_receipt_sha256": "c58220aa7a64baf3a712adf5b236daef08296521c9764813ef469b4c7e356a3a",
+      "die_area": "0 0 1289.28 710.64"
+    },
+    "8x4": {
+      "native_through_pdn_passed": true,
+      "sta_corners": [
+        "nom_fast_1p32V_m40C",
+        "nom_slow_1p08V_125C",
+        "nom_typ_1p20V_25C"
+      ],
+      "resolved_pdk_root": "/home/runner/pdk/ciel/ihp-sg13/versions/89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+      "native_final_state_sha256": "9999ec09e94c2cfdcb0dbae0997ac2dbd45ae7d102181781b0964870af8be9e0",
+      "def_sha256": "64b52f2150f699edc7fb500c2f486a51eca66fd91d3efb7347200bd2cf83a2ee",
+      "timing_qualified": false,
+      "official_gds_passed": false,
+      "artifact_id": 13691965840,
+      "native_receipt_sha256": "c83b1a2da0f6cc75c787aaa3a9d9dcd3844eaf174b2e2e01d3c38a113c12dba4",
+      "die_area": "0 0 1724.16 710.64"
+    }
+  }
+}

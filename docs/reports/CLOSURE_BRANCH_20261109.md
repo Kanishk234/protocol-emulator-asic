@@ -117,11 +117,32 @@ routed protocol replay remain later gates. Preparation/control tests are not
 new physical evidence. Publication and actual execution status are recorded
 in the worklog.
 
-Publish grouped tools/CI/docs commits and inspect the branch regression's
-actual artifact. Do not count default branch unit/test badges as evidence for
-the experimental core. Existing physical run42681697462 on main remains
-untouched and was still in progress at the last check. Once its gates finish,
-inspect native results before choosing detailed routing or another measured
-one-variable correction. Production core/config promotion remains conditional
-on reproducible physical closure and review of settings outside the standing
-configuration whitelist; no main merge is implied by this branch.
+## Current release frontier
+
+Published tools `fcd8dc5`, CI `059478e` and evidence `b13b439`.
+[Qualified-route workflow 42692486237](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42692486237)
+is confirmed at exact source `b13b439`: its 54 guard tests pass in the cloud
+and its source dependency is waiting for run 42681697462. No route has started
+while that source screen is pending. A failed source or wait timeout will stop
+the continuation; a passing source allows fresh checks, routing and extraction
+without another manual dispatch.
+
+| Gate | Current evidence/status |
+|---|---|
+| Current full-core RTL regression | PASS, 42690695832; [exact case matrix](CLOSURE_PROTOCOL_MATRIX_20261109.md) |
+| Current dev4 8x4 physical screen | Pending, 42681697462 on main |
+| Exact route restoration/guards | 54 cloud controls pass, 42692486237; actual source restoration awaits artifact |
+| Detailed route and extracted timing | Continuation waiting; no acceptance yet |
+| Matching final-netlist protocol replay | Pending a qualified final netlist |
+| Current qualified GDS/precheck and production integration | Pending |
+
+Lint 42692486515, test 42692486236 and docs 42692486054 pass at `b13b439`;
+unit 42692486070 remains in progress when checked. Cancelled two redundant
+older branch unit runs (42690695243 and 42690788229) after Git comparison
+confirmed identical consumed workflow/RTL/tool/model/spec/firmware/test inputs.
+The latest unit run and main physical run remain active. No all-CI-green or
+phase-completion claim is made.
+
+Production core/config promotion remains conditional on reproducible physical
+closure and review of settings outside the standing configuration whitelist.
+No merge into main is implied by this branch.

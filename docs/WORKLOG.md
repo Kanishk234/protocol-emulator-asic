@@ -2,6 +2,12 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Updated toolchain compatibility passes both geometries
+
+- Corrected run42654696336 succeeds at6x4 and8x4 through native GeneratePDN, including synthesis, SRAM checks/placement and power-grid generation. Independently inspect both native receipts: source/macro inventories identical; generated configs differ only DIE_AREA and FP_DEF_TEMPLATE. Save compact provenance in spikes/phase2_stock_flow/official_nov9_compatibility_42654696336.json. No post-placement timing, routing or phase completion claim.
+- Actual toolchain: LibreLane3.1.0.dev4/Ciel3.2.0, PDK89d42ee, stock image digestaf2405f5..., OpenROADdcf36133 (same OpenROAD revision as older engine). Ciel selects /home/runner/pdk/ciel/ihp-sg13/versions/89d42ee6d2fd9b50b86a1aada6fee6673c3e6008. New configuration generation works in CI; earlier local WASI issue is not a CI/design failure.
+- Prepare separate gds-official-dev4-tile-screen: same verified clock75 RTL at6x4/8x4, same project controls and official tools/Ciel default. Fresh stock Classic to STAMidPNR-3; bind the passed stock container/OpenROAD identity. Reuse exact resolved Ciel PDK directory for read-only audit subprocesses, preserving original/signoff constraints, all corners, >=50psfast hold, electrical0/antenna0/overflow0 gates. No detailed routing, runtime tool override, main hardware/config/info or official workflow change. Existing constant-bank trial42649693561 still in native physical processing. Next inspect both fresh-screen outcomes before DRT.
+
 ## 2026-11-09 — Correct compatibility run-directory setup
 
 - Both jobs in42653943190 pass official source/config generation and engine capture, then fail before synthesis because --force-run-dir requires the target directory to exist. Add missing mkdir, matching official Project.harden() setup. This is a diagnostic harness mistake; no physical result or geometry comparison yet. Log the bug; validate extracted shell setup and actionlint before relaunch. Main source/config/info and official jobs unchanged. Independent storage screen42649693561 still running. No phase ticks.

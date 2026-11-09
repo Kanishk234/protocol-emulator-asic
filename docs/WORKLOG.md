@@ -23,6 +23,10 @@ Newest entry at the top. One entry per work session.
   bench alone missed this fault. Workflow actionlint passes. No physical improvement or full-chip formal
   claim. No phase boxes ticked. Next inspect cloud results, then prepare one
   same-clock physical screen if all functional checks pass.
+- Published trial 4d62445; run 42724400029 stops before module simulation
+  because Icarus is not on the runner PATH. Add the already pinned OSS CAD
+  Suite bin directory with project venv first and capture tool versions.
+  Corrected clock recovery is running as 42724400182.
 
 ## 2026-11-09 — Native protocols pass; clean route exposes slow setup failure
 

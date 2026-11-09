@@ -376,3 +376,11 @@ state transitions. Add explicit cache activation followed by reset without a
 word-0 write. The original and proposed implementation pass all 665,770
 comparisons per variant; the faulty reset now fails the actual scoreboard.
 This is a coverage gap found during trial validation, not a production RTL bug.
+
+### 2026-11-09: cache trial did not expose cached Icarus
+
+Run 42724400029 stops before simulation with missing `iverilog`. The runner
+caches the pinned CAD suite but the original regression only selected its
+Verilator through Make variables. Add the suite bin directory for the new
+module proof, retaining the project venv first on PATH. Capture both tool
+versions; no test result is inferred from this infrastructure failure.

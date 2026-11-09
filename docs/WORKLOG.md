@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Inspect updated official toolchain
+
+- Retrieved exact official template/action/support-tools revisions and LibreLane3.1.0.dev4 wheel; inspected action defaults, PDK selection/configs and final 8x4 DEF. Record findings and source links in docs/reports/PHASE2_OFFICIAL_TOOLCHAIN_NOV9.md. New default IHP hash89d42ee replaces manually pinned2bbec755; TT still limits project signals to Metal4 and uses the same three nominal timing corners.
+- 8x4 is1724.16x710.64um versus6x4 1289.28x710.64um (about33.7% more actual die area). Old tools already contained matching dimensions; new/old6x4DEF hashes match exactly. Larger usable placement capacity/timing improvement is unmeasured.
+- Isolated official generator probe is blocked by YoWASP failing to open existing absolute /tmp source paths, including an unsandboxed retry. No fresh generated-config/native validation success claimed; no Docker executable locally. Disposable downloads/dependencies stay/tmp and project venv packages are unchanged. No official jobs/main source/config/info changes or phase ticks.
+- Next build a new-stock-toolchain CI preflight, then compare the same2/4 hardware at20ns in6x4 and8x4, holding all acceptance gates fixed. Continue the already running constant-storage control independently; no new physical run launched in this inspection.
+
 
 
 

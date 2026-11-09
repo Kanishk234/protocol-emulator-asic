@@ -131,8 +131,9 @@ without another manual dispatch.
 |---|---|
 | Current full-core RTL regression | PASS, 42690695832; [exact case matrix](CLOSURE_PROTOCOL_MATRIX_20261109.md) |
 | Current dev4 8x4 physical screen | PASS, authenticated 42681697462; [measurements](CLOSURE_SCREEN_20261109.md) |
-| Exact route restoration/guards | Initial observer fails on mixed relative/absolute paths before physical execution; 55 corrected local controls pass |
-| Detailed route and extracted timing | Corrected continuation pending; no acceptance yet |
+| Exact route restoration/guards | Corrected cloud 42693952530 passes actual restoration, 55 guards and engine/Ciel initialization |
+| Native pre-DRT protocol replay | Prepared separate exact-netlist cloud check; actual results pending |
+| Detailed route and extracted timing | 42693952530 fresh-check/route/extraction step running; no completed-route acceptance yet |
 | Matching final-netlist protocol replay | Pending a qualified final netlist |
 | Current qualified GDS/precheck and production integration | Pending |
 

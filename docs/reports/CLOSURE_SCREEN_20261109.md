@@ -51,3 +51,18 @@ existing screen checker. No saved receipt, state, SDC or view is rewritten.
 A regression exercises the actual mixed-path format and checks all restored
 bytes remain unchanged. The failed run is preserved; corrected hosted replay
 is required before claiming actual restoration or routing.
+
+Corrected continuation [42693952530](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42693952530)
+at `ebf817e` now passes the actual restoration stage, stock engine checks and
+Ciel/antenna initialization. Its fresh timing/routing/extraction step is in
+progress when checked; no completed route is claimed.
+
+A separate `tripwire-closure-native-gl` workflow tests the exact native
+pre-DRT netlist in parallel. Its fixed netlist SHA256 is
+`d235214bdfde0030f6791d476537ffddc147fd59bdf092d6081131cc7164f4e7`.
+The entire source archive is authenticated before extracting that file and
+comparing source/macros/config/metadata with independent preparation. Replay
+uses new-PDK standard-cell models and Icarus 13, the existing gate-level TT
+harness, and all 22 protocol cases. The SRAM retains its pinned behavioral
+model. This is functional simulation without SDF and is not the later
+post-route replay or a timing result. Actual cloud results remain pending.

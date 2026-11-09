@@ -2,6 +2,17 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-09 — Prepare exact 8x4 dev4 screen continuation through extraction
+
+- User confirms the full 8x4 `gds-official-dev4-hold125-screen` run [42681697462](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42681697462) finished. Recorded screen evidence: all strict pre-route gates passed, global overflow0, antenna0, electrical violations0, fast hold+0.127092ns, slow hold+0.697614ns, typical hold+0.333103ns; setup WS summary0 at all corners. This is estimated pre-route timing, not extracted closure, detailed-route completion, or official GDS signoff.
+- Prepared a separate `gds-official-dev4-hold125-route` continuation and `official_dev4_route.py`. It binds the exact successful screen run/SHA/artifact,8x4 generated inputs, dev4 toolchain/PDK, and frozen pre-route checkpoint. It reruns fresh antenna/all-corner/electrical gates before DRT, then requires route DRC0 and extracts setup/hold/electrical/antenna evidence. The official Tiny Tapeout jobs and main hardware are untouched; no screen gate was weakened.
+- Deleted the user-supplied older ZIP on request; no ZIP artifact is present in the worktree. Existing unrelated modifications/untracked files were preserved.
+- Live GitHub API lookup failed with `gh: error connecting to api.github.com`; other workflow states could not be independently refreshed in this session. No local physical process is being run by this continuation, which is CI-only.
+- No phase checklist boxes ticked: the route workflow is prepared locally but not published or dispatched; extraction and final-netlist protocol replay remain unconfirmed. AGENTS.md prohibits Codex from committing or pushing, so publication/launch awaits user-run Git commands.
+
+Next:
+- Publish the two reviewed route files and this work-log entry (after the user verifies the branch and origin state), then dispatch the exact-checkpoint route continuation once. If fresh gates fail, stop before DRT and diagnose; if they pass, let DRT/extraction finish. Only then run the full protocol replay against the routed gate-level netlist and integrate the full design into main before an official 8x4 GDS run.
+
 ## 2026-11-09 — Fix hold125 screen setup and rerun only 8x4
 
 - Run42679601122 fails during setup before synthesis: compatibility guard only accepted clock75 hash and matrix accidentally retained6x4. Log diagnostic setup bug. Extend guard solely for reviewed125ps hash and record actual config hash; restrict target arm to8x4. No timing gate or physical result changed. Actionlint and diff check pass. ZIP remains untracked. Relaunch required.

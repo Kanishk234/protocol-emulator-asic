@@ -7203,3 +7203,43 @@ Publication receipt:8bd6d47tools/36e69a3tests/6e5da2edocs pushed; remoteverified
 Publication receipt:f241555tools/4a66313CI/b43c714docs pushed;remote mainb43c714279ce3c20a165d34ba40e2a69f505bf0dverified. Detailed-routing continuation41981158960in progress atworkflowlevel;freshpregatesprecedeDRT. No DRTcompletion/extracted/officialclaimorwatcher.
 
 Publication receipt:1fced6btools/55a51a6CI/618c1a1docs pushed;remote main618c1a10476d6c882824b743e3004cd6b5726afdverified. Workflowregistered408407898butpushrunabsent;firstmanualdispatchHTTP500/transientnetworkfailurecreatednorun. Verifiedemptyrunlistthenretryaccepted:extraction42069613808queuedonexactSHA. No resultyet,duplicateorwatcher.
+
+## 2026-11-10: Codex (phase 2: extracted setup-path review)
+
+Done:
+- Revisited the exact 8×4 screen source and extracted reports for route run 42716036741 (source SHA `5407d4c278353ec125018f3a3d49de2fd620d9ce`). The route itself completed with zero DRT violations; fresh extracted antenna and electrical audits were zero. Extracted slow setup remains −1.982448 ns, while fast/typ/slow hold is +0.283985/+0.501490/+0.867066 ns. Setup WS 0 at other corners is clamped and does not establish positive setup margin.
+- The slow setup path to `u_chip.g_unit[0].u_prod.tok[14]` includes `hold10098` (+0.732655 ns) and `hold10099` (+0.688846 ns). The reported worst fast min path to that endpoint includes `hold10099` (+0.244270 ns) but not `hold10098`. This makes a lower native hold-repair target a plausible isolated screen, with the existing ≥50 ps fast-hold requirement unchanged. It is not proof that one cell will be removed or that timing will close.
+- Updated `docs/reports/PHASE2_TIMING_CLOSURE_PLAN.md` with this run’s current evidence and the bounded hold-target experiment. No RTL, constraints, project config, official template jobs, or GDS flow were modified.
+- Could not query live GitHub Actions: local `gh` authentication reports an invalid token and API access fails. This gives no indication that workflows are running or finished.
+
+Checklist boxes ticked (evidence):
+- None. This extracted diagnostic fails slow-corner setup and is not an official GDS pass.
+
+Next:
+- Prepare one fresh stock 8×4 screening candidate changing only the native hold-repair target from 125 ps to 100 ps; keep the 20 ns period, signoff constraints, all corner checks, and ≥50 ps fast-hold floor fixed. Inspect post-repair timing and inserted hold cells before authorizing detailed routing. If setup still has no positive estimated margin or fast hold falls below 50 ps, do not route it; pivot to a setup-optimization-margin screen. Continue to require the unchanged official `gds` workflow on the integrated design for phase completion.
+
+## 2026-11-10: Codex (phase 2: workflow status after GitHub reauthentication)
+
+Done:
+- Verified `gh auth status` with network access: authenticated as `Krithik4`, with `repo` and `workflow` scopes.
+- Checked main-branch Actions. No workflows are currently running or queued. `lint` 42769844058, `docs` 42769844281, `test` 42769844297, and `unit` 42769844152 all passed on `07e67392d59d43823396f0be21297348dd91d615`.
+- Confirmed physical route run [42716036741](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42716036741) completed its exact 8×4 route checkpoint successfully but failed the extracted timing/electrical job gate due to slow-corner setup slack −1.982448 ns. No official GDS run or phase gate passed.
+
+Checklist boxes ticked (evidence):
+- None. The route run is not a timing pass; standard CI success does not close the phase 2 physical gate.
+
+Next:
+- Do not rerun the unchanged 125 ps profile. Prepare a distinct 100 ps hold-target screen on the same exact 8×4 source/config/toolchain and compare its repaired timing/cell list against run 42681697462. Preserve the 20 ns clock, signoff SDC, all-corner timing/electrical/antenna checks, and ≥50 ps fast-hold threshold. Route only if its fresh screening evidence justifies the runtime. GitHub auth is restored; Git publication remains user-operated under AGENTS.md.
+
+## 2026-11-10: Codex (phase 2: prepare 100 ps hold-target screen)
+
+Done:
+- Prepared a separate workflow `.github/workflows/gds-official-dev4-hold100-screen.yaml` by cloning the reviewed 8×4 dev4 125 ps stock screen. It retains the same design preparation, source profile, LibreLane dev4 toolchain, clock period, density, signoff constraints and all screening gates; only the profile's GRT hold target changes from 125 ps to 100 ps. The existing parameterized `test_host_idle_portable_trials.py` coverage will exercise the added `clock75_hold100` profile in CI.
+- Updated the timing closure report with the exact proposed comparison and hold-cell evidence. No RTL, SDC, `src/config.json`, or official template workflow changed.
+- Verified GitHub authentication and current workflow state: no main-branch workflow is queued or running. Standard CI passed on `07e67392`; physical run 42716036741 remains failed at extracted slow setup timing.
+
+Checklist boxes ticked (evidence):
+- None. The new screen has not run; no phase gate passes from workflow preparation.
+
+Next:
+- The user approved publishing these reviewed files and launching `gds-official-dev4-hold100-screen`; publish the helper/workflow and report/worklog in separate commits, then dispatch the screen. Review its timing and hold-cell list before deciding whether DRT is justified. Keep the 125 ps workflow intact for reproducibility.

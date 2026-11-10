@@ -7257,3 +7257,16 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Publish preflight fix `01a54d2` with a separate worklog update, then rerun `gds-official-dev4-hold100-screen`. Confirm it passes the tile-preflight stage and reaches the stock synthesis/placement screen before estimating runtime or making a timing judgment. Do not route unless the screen's strict gates pass.
+
+## 2026-11-10: Codex (phase 2: corrected hold100 screen rerun)
+
+Done:
+- Diagnosed screen run 42774363507: tile-preflight rejected the new configuration because `official_nov9_preflight.CONFIGS` did not include the 100 ps project-config digest. It failed before installing the PDK or starting physical design.
+- Published the allowlist correction `01a54d2` and worklog `b0d7818` to `main`; existing 125 ps config hashes were retained. No RTL, SDC, timing constraints or official template workflow changed.
+- Relaunched as [42774675629](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42774675629). It has passed strict project preparation, 8×4 tile selection, and official support-tools checkout. Python setup is in progress; synthesis and physical design have not started yet.
+
+Checklist boxes ticked (evidence):
+- None. Run 42774675629 is still in setup; no timing/physical gate result is available.
+
+Next:
+- Monitor run 42774675629 through stock generation and the pre-routing screen. If it reaches timing reports, inspect all-corner setup/hold and electrical/antenna gates plus final overflow before deciding on DRT. If any gate fails, diagnose the exact stage and stop before routing.

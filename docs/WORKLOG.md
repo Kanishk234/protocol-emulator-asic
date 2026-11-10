@@ -7248,3 +7248,10 @@ Publication receipt:1fced6btools/55a51a6CI/618c1a1docs pushed;remote main618c1a1
   unchanged, with only the bound one-file patch before input capture. All
   78 closure/physical-workflow guards and actionlint pass. No physical result
   or clock adoption is claimed.
+
+- Make the physical follow-up self-contained in cloud: wait up to 20 minutes
+  for exact cache regression 42724791204/a82fa83/attempt 1, then proceed only
+  on whole-workflow success. Any failed/cancelled/stale parent stops before
+  hardware preparation. Only this workflow file triggers the one trial;
+  original stock measurement/gate scripts remain byte-identical apart from
+  explicit venv activation. No local watcher or repeated hardening loop.

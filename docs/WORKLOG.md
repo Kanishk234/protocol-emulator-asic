@@ -7270,3 +7270,17 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Monitor run 42774675629 through stock generation and the pre-routing screen. If it reaches timing reports, inspect all-corner setup/hold and electrical/antenna gates plus final overflow before deciding on DRT. If any gate fails, diagnose the exact stage and stop before routing.
+
+## 2026-11-10: Codex (phase 2: hold100 screen result review)
+
+Done:
+- Checked main Actions after the user reported completion. No workflows are queued or running. `lint` 42774782303, `docs` 42774782159, `test` 42774782032 and `unit` 42774782084 passed on `b2c5e6861b8a0e34c97fdccdd9fd513a1e6b5008`; nightly 42845569131 also passed.
+- Downloaded and inspected the hold100 pre-route artifact from [42774675629](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42774675629). Stock generation, all-corner timing, and final global routing completed with zero overflow. The strict screen failed only because a fresh antenna audit found 3 violating nets/pins after post-GRT timing repair: net11584, net12017 and net13846. The screen stopped before DRT.
+- Compared with the passing hold125 screen artifact 42681697462. Hold100 changed hold-buffer count 41→23 and area 683501→683207 µm², left setup WNS at 0/clamped, reduced fast/typ/slow hold slack from +0.277092/+0.483103/+0.847614 ns to +0.225931/+0.442152/+0.780921 ns, and regressed antenna from 0 to 3. Reject hold100 for routing; the screen provides no evidence of setup improvement.
+- Updated the timing closure report with measurements and the next candidate. No hardware, SDC, official template job, or acceptance threshold changed.
+
+Checklist boxes ticked (evidence):
+- None. Hold100 is an unqualified pre-route screen; the prior hold125 extracted route still fails slow setup at −1.982448 ns.
+
+Next:
+- Prepare one new screen from the qualified hold125 config, changing only `GRT_RESIZER_SETUP_SLACK_MARGIN` to 2.5 ns. Keep hold125, 20 ns, SDC and all existing timing/electrical/antenna/overflow gates. Inspect real path slack, buffer/area growth and antenna results. Do not launch DRT unless the screen remains qualified; do not claim positive extracted setup until a routed/extracted result confirms it.

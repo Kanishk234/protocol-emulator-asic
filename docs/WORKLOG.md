@@ -7238,3 +7238,13 @@ Publication receipt:1fced6btools/55a51a6CI/618c1a1docs pushed;remote main618c1a1
   and Icarus 13 for the separate native-cell replay. Added a manual physical
   screen draft that preserves every stock measurement/gate; do not dispatch
   until its exact functional prerequisite is updated to a passing run.
+
+- Corrected clock run 42724400182 now passes restored state validation,
+  original dev4/Ciel identity and fresh antenna initialization; operating-period
+  measurements are running. Cache regression 42724791204 at a82fa83 is active.
+- Prepared a manual cache physical screen bound to that exact regression; it
+  refuses any non-success parent before preparing hardware. Structural guard
+  proves every original stock measurement/gate and physical environment stays
+  unchanged, with only the bound one-file patch before input capture. All
+  78 closure/physical-workflow guards and actionlint pass. No physical result
+  or clock adoption is claimed.

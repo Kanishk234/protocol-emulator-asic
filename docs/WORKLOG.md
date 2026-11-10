@@ -7284,3 +7284,17 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Prepare one new screen from the qualified hold125 config, changing only `GRT_RESIZER_SETUP_SLACK_MARGIN` to 2.5 ns. Keep hold125, 20 ns, SDC and all existing timing/electrical/antenna/overflow gates. Inspect real path slack, buffer/area growth and antenna results. Do not launch DRT unless the screen remains qualified; do not claim positive extracted setup until a routed/extracted result confirms it.
+
+## 2026-11-10: Codex (phase 2: prepare setup-margin screen)
+
+Done:
+- Prepared an isolated 8×4 stock screen `.github/workflows/gds-official-dev4-setup250-screen.yaml`, based on the exact qualified 125 ps hold screen 42681697462. Its only physical target delta is `GRT_RESIZER_SETUP_SLACK_MARGIN=2.5`; 20 ns, 125 ps hold, source, SDC, toolchain and all screen gates remain fixed.
+- Bound the new helper profile to reference run 42681697462, artifact 13708390816, and exact hold125 config SHA `4d71243f672fac34f004c43a8c8bfc46cffaae2b2929f7d3c788de1fac72a9f7`. Computed the candidate SHA as `7ad565b1cf34dbb50a950a693eaabe093751e566b0f168f794dffd7423088355`; only setup margin differs from the hold125 reference. The stock tile-preflight allowlist includes this hash.
+- Added the new profile to the existing parameterized unit coverage. A project-venv helper invocation confirmed the profile comparison and hash; no tests were run locally.
+- No RTL, SDC, official template workflow, or acceptance threshold changed. The screen has not yet been published or launched.
+
+Checklist boxes ticked (evidence):
+- None. The setup250 workflow is only prepared; it has no physical results.
+
+Next:
+- Commit the helper/test/preflight/workflow as a CI group and the evidence/worklog as a docs group, push main, and let CI validate the profile. Then launch the setup250 screen. Inspect actual reported path slack, all hold/electrical/antenna gates and overflow before considering DRT.

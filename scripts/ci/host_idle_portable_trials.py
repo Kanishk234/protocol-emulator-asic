@@ -8,6 +8,9 @@ BASE_PROFILE = 'rtl_shared_minbuf2_host_idle_ff'
 BASE_RUN = 42305323874
 BASE_CONFIG_SHA256 = '920caf31abceebb82e52707538061011689bdcfa02fcf1c13057c0cdf0abd567'
 CLOCK75_CONFIG_SHA256 = '35bacb325c12276dd63f7e33b99f94b5e0d4940f7b3a22a6bd1e63424bc4c97a'
+HOLD125_CONFIG_SHA256 = '4d71243f672fac34f004c43a8c8bfc46cffaae2b2929f7d3c788de1fac72a9f7'
+HOLD125_RUN = 42681697462
+HOLD125_ARTIFACT_ID = 13708390816
 VARIANTS = {
     'density64': {'PL_TARGET_DENSITY_PCT': 64},
     'clock75': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75},
@@ -25,6 +28,9 @@ VARIANTS = {
                         'GRT_RESIZER_HOLD_SLACK_MARGIN': 0.125},
     'clock75_hold100': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75,
                         'GRT_RESIZER_HOLD_SLACK_MARGIN': 0.10},
+    'clock75_hold125_setup250': {'CTS_SINK_CLUSTERING_MAX_DIAMETER': 75,
+                                 'GRT_RESIZER_HOLD_SLACK_MARGIN': 0.125,
+                                 'GRT_RESIZER_SETUP_SLACK_MARGIN': 2.5},
 }
 
 
@@ -69,6 +75,20 @@ def select(config, selected, variant):
         if reference_sha != CLOCK75_CONFIG_SHA256:
             raise ValueError('Clock75 comparison configuration drift')
         delta = {k: v for k, v in result.items() if reference.get(k) != v}
+        if variant == 'clock75_hold125_setup250':
+            hold125_reference = deepcopy(config)
+            hold125_reference.update(VARIANTS['clock75_hold125'])
+            hold125_sha = hashlib.sha256((json.dumps(hold125_reference, indent=2) + '\n').encode()).hexdigest()
+            if hold125_sha != HOLD125_CONFIG_SHA256:
+                raise ValueError('Hold125 comparison configuration drift')
+            setup_delta = {k: v for k, v in result.items() if hold125_reference.get(k) != v}
+            if setup_delta != {'GRT_RESIZER_SETUP_SLACK_MARGIN': 2.5}:
+                raise ValueError('Setup250 must change only the setup margin from hold125')
+            receipt.update(comparison_reference_run=HOLD125_RUN,
+                           comparison_reference_artifact_id=HOLD125_ARTIFACT_ID,
+                           comparison_reference_config_sha256=hold125_sha,
+                           additional_changes_from_reference=setup_delta)
+            return result, receipt
         source_variant = {'clock75_constants_drive': 'constants', 'clock75_all_drive': 'all_words'}.get(variant)
         if variant == 'clock75_constants_ff':
             if delta:

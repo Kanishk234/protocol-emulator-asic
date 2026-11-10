@@ -2,7 +2,8 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import pytest
-from host_idle_portable_trials import BASE_CONFIG_SHA256, BASE_PROFILE, VARIANTS, select, prepare
+from host_idle_portable_trials import (BASE_CONFIG_SHA256, BASE_PROFILE, HOLD125_CONFIG_SHA256,
+                                       HOLD125_RUN, VARIANTS, select, prepare)
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -25,8 +26,14 @@ def test_exact_source_one_variable_and_fixed_acceptance_inputs(variant):
     assert result['CLOCK_PERIOD']==20
     assert result['MACROS']==config['MACROS'] and result['MACROS'] is not config['MACROS']
     assert (config,selected)==original
-    assert receipt['comparison_reference_run']==(42456273203 if variant.startswith('clock75_') else 42305323874)
-    if not variant.startswith('clock75_'):assert receipt['comparison_reference_config_sha256']==BASE_CONFIG_SHA256
+    expected_reference = (HOLD125_RUN if variant=='clock75_hold125_setup250' else
+                          42456273203 if variant.startswith('clock75_') else 42305323874)
+    assert receipt['comparison_reference_run']==expected_reference
+    if variant=='clock75_hold125_setup250':
+        assert receipt['comparison_reference_config_sha256']==HOLD125_CONFIG_SHA256
+        assert receipt['additional_changes_from_reference']=={'GRT_RESIZER_SETUP_SLACK_MARGIN':2.5}
+    elif not variant.startswith('clock75_'):
+        assert receipt['comparison_reference_config_sha256']==BASE_CONFIG_SHA256
     assert receipt['manual_checkpoint_repairs'] is False and receipt['official_gds_signoff'] is False
     assert receipt['hardware_unchanged']==(variant not in ('mode_ff','debug_align','clock75_constants_drive','clock75_all_drive','clock75_constants_ff'))
     assert all(receipt[k] for k in ('c_select','idle_ff','host_port_align'))

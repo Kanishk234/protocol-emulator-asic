@@ -2,6 +2,11 @@ name: TRIPWIRE bitsync cache physical screen
 run-name: Bitsync cache FF stock 8x4 screen at 20 ns
 'on':
   workflow_dispatch: {}
+  push:
+    branches:
+    - tripwire/closure-8x4
+    paths:
+    - .github/workflows/tripwire-bitsync-cache-screen.yaml
 permissions:
   contents: read
   actions: read
@@ -38,33 +43,17 @@ jobs:
     - name: Require exact cache-trial cloud success
       env:
         GH_TOKEN: ${{ github.token }}
-      run: 'source .venv/bin/activate
-
-        set -euo pipefail
-
-        gh api "repos/$GITHUB_REPOSITORY/actions/runs/42724791204" > cache-functional-source.json
-
-        python - <<''PYCODE''
-
-        import json
-
-        from pathlib import Path
-
-        run = json.loads(Path(''cache-functional-source.json'').read_text())
-
-        assert run[''id''] == 42724791204 and run[''run_attempt''] == 1
-
-        assert run[''head_sha''] == ''a82fa831ad168ded41a65f6a3068db2e6eb3b833''
-
-        assert run[''head_branch''] == ''tripwire/closure-8x4''
-
-        assert run[''path''] == ''.github/workflows/tripwire-bitsync-cache-trial.yaml''
-
-        assert run[''status''] == ''completed'' and run[''conclusion''] == ''success''
-
-        PYCODE
-
-        '
+      run: "source .venv/bin/activate\nset -euo pipefail\npython - <<'PYCODE'\nimport json, os, subprocess,\
+        \ time\nfrom pathlib import Path\ndeadline = time.monotonic() + 1200\nwhile True:\n    raw = subprocess.check_output(['gh',\
+        \ 'api',\n        f\"repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs/42724791204\"], text=True)\n\
+        \    Path('cache-functional-source.json').write_text(raw)\n    run = json.loads(raw)\n    assert\
+        \ run['id'] == 42724791204 and run['run_attempt'] == 1\n    assert run['head_sha'] == 'a82fa831ad168ded41a65f6a3068db2e6eb3b833'\n\
+        \    assert run['head_branch'] == 'tripwire/closure-8x4'\n    assert run['path'] == '.github/workflows/tripwire-bitsync-cache-trial.yaml'\n\
+        \    if run['status'] == 'completed':\n        assert run['conclusion'] == 'success', 'Cache regression\
+        \ failed; no physical trial'\n        break\n    assert run['status'] in ('queued', 'in_progress',\
+        \ 'waiting')\n    assert time.monotonic() < deadline, 'Functional prerequisite timed out'\n  \
+        \  print('Waiting for exact cache regression:', run['status'], flush=True)\n    time.sleep(20)\n\
+        PYCODE\n"
     - name: Prepare the full design with strict stock project inputs
       run: "source .venv/bin/activate\nset -euo pipefail\ngit apply --check spikes/phase2_stock_flow/verified_design_only.patch\n\
         git apply spikes/phase2_stock_flow/verified_design_only.patch\ncp spikes/phase2_stock_flow/strict_project_config.json\

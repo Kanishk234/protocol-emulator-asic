@@ -9,7 +9,8 @@ import yaml
 TOOLS = '9d13ff3e3e6202090740110438c6a10c1d62ca0f'
 PDK = '89d42ee6d2fd9b50b86a1aada6fee6673c3e6008'
 CONFIGS = {'35bacb325c12276dd63f7e33b99f94b5e0d4940f7b3a22a6bd1e63424bc4c97a',
-           '4d71243f672fac34f004c43a8c8bfc46cffaae2b2929f7d3c788de1fac72a9f7'}
+           '4d71243f672fac34f004c43a8c8bfc46cffaae2b2929f7d3c788de1fac72a9f7',
+           '10f86189e185f681f3ad2485fbcbefd72cc284972fef0d21aa2e971b6111627d'}
 SIZES = {'6x4': '0 0 1289.28 710.64', '8x4': '0 0 1724.16 710.64'}
 
 
@@ -27,7 +28,7 @@ def inventory(root):
 def prepare(root, tiles):
     assert tiles in SIZES, 'Unknown tile selection'
     config_sha = digest(root / 'src/config.json')
-    assert config_sha in CONFIGS, 'Wrong clock75/hold125 control'
+    assert config_sha in CONFIGS, 'Wrong clock75 hold-target control'
     info = yaml.safe_load((root / 'info.yaml').read_text())
     assert info['project']['tiles'] == '6x4', 'Wrong source geometry'
     assert info['project']['clock_hz'] == 50000000

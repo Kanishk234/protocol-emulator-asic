@@ -7243,3 +7243,17 @@ Checklist boxes ticked (evidence):
 
 Next:
 - The user approved publishing these reviewed files and launching `gds-official-dev4-hold100-screen`; publish the helper/workflow and report/worklog in separate commits, then dispatch the screen. Review its timing and hold-cell list before deciding whether DRT is justified. Keep the 125 ps workflow intact for reproducibility.
+
+## 2026-11-10: Codex (phase 2: repair 100 ps screen preflight)
+
+Done:
+- Published CI screen/helper commit `12d4ca4` and timing-doc commit `9235e0c` to `main`; dispatched screen run [42774363507](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42774363507).
+- The screen failed in `official_nov9_preflight.py prepare 8x4`, before support-tool install or any physical-design stage. Root cause: the tile preflight whitelist accepted the 125 ps config SHA but not the new 100 ps config SHA. The rejected config was computed from the exact `clock75` reference with one delta, `GRT_RESIZER_HOLD_SLACK_MARGIN: 0.1`; its SHA is `10f86189e185f681f3ad2485fbcbefd72cc284972fef0d21aa2e971b6111627d`.
+- Added that exact digest to the preflight allowlist in `scripts/ci/official_nov9_preflight.py`; the existing 125 ps hashes remain accepted. This changes no source RTL, SDC, official workflow, or acceptance threshold.
+- `docs`, `test`, and `lint` on `9235e0c` passed; `unit` was still running when checked. No physical screen stage ran in 42774363507.
+
+Checklist boxes ticked (evidence):
+- None. Run 42774363507 is a setup/preflight failure, not a screen or phase pass.
+
+Next:
+- Publish preflight fix `01a54d2` with a separate worklog update, then rerun `gds-official-dev4-hold100-screen`. Confirm it passes the tile-preflight stage and reaches the stock synthesis/placement screen before estimating runtime or making a timing judgment. Do not route unless the screen's strict gates pass.

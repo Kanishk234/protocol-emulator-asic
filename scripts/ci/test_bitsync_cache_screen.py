@@ -26,4 +26,6 @@ def test_cache_screen_preserves_every_stock_measurement_and_gate():
         'Prepare the full design with strict stock project inputs')
     assert names.index('Apply only the bound bitsync cache storage change') < names.index(
         'Select only the comparison tile size')
-    assert trial['on'] == {'workflow_dispatch': {}}
+    assert trial['on']['workflow_dispatch'] == {}
+    assert trial['on']['push'] == dict(branches=['tripwire/closure-8x4'],
+        paths=['.github/workflows/tripwire-bitsync-cache-screen.yaml'])

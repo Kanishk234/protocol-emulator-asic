@@ -7298,3 +7298,16 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Commit the helper/test/preflight/workflow as a CI group and the evidence/worklog as a docs group, push main, and let CI validate the profile. Then launch the setup250 screen. Inspect actual reported path slack, all hold/electrical/antenna gates and overflow before considering DRT.
+
+## 2026-11-10: Codex (phase 2: launch setup250 screen)
+
+Done:
+- Published CI profile/screen commit `f3d5074` and timing plan commit `a505b78` to main. The pushes contain no RTL, `src/config.json`, `info.yaml`, macro or official template workflow changes.
+- Launched [gds-official-dev4-setup250-screen run 42858613687](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42858613687) on `a505b7890f14a736de2b181739cf4748766decf2`. It has passed strict full-design preparation, 8×4 tile selection and official support-tools checkout. Official Python setup is in progress; the stock physical flow has not started.
+- `test` 42858553557 and `lint` 42858553706 passed on the setup250 commit. `docs` 42858553568 and `unit` 42858553654 were still running at the last check.
+
+Checklist boxes ticked (evidence):
+- None. The setup250 screen has no physical/timing result yet.
+
+Next:
+- Monitor run 42858613687 through stock physical screening. Review actual path slack, all-corner hold, electrical/antenna results and overflow. Do not start DRT unless every screen gate qualifies.

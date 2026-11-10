@@ -2,13 +2,22 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-10 — Analyze exact dev4 detailed route and extracted timing
+
+- Route continuation [42716036741](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42716036741) used the exact full-design 8x4 checkpoint from screen run 42681697462. It passed source requalification and completed stock detailed routing after 43 DRT optimization iterations with final route DRC=0. Final extracted antenna audit also reports 0 violating nets and 0 pins.
+- Extracted electrical reports show 0 slew, fanout, and capacitance violations at fast, slow, and typical corners. Extracted hold slack is +0.283985ns fast, +0.867066ns slow, and +0.501490ns typical.
+- The extraction gate correctly failed setup: fast WS=0ns, slow WS=-1.982448ns, typical WS=0ns. Thus this is a successful DRT/zero-electrical/zero-antenna result, but not timing closure. The slow worst path starts at the `bitsync_active` latch and reaches an FF through the unit input path; full path report is in the run artifact. No final-netlist protocol replay or official GDS run was performed.
+
+Next:
+- Use the exact extracted slow-corner path and routed netlist to identify the dominant logic/route delay and decide on one general RTL/architecture timing change. Keep all protocol tests and the 20ns clock constraint, then screen the changed candidate before another detailed route. Do not claim positive setup based on the fast/typical zero summaries.
+
 ## 2026-11-09 — Retry exact dev4 checkpoint with persisted PDK resolution
 
 - Run [42714224766](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42714224766) failed before OpenROAD because the route job received the Ciel cache root rather than the versioned PDK root discovered during preparation. Added validated PDK-root persistence and rejection tests; focused suite passes 5/5 and `py_compile`/`git diff --check` pass.
-- Pushed fix `ef283e6` and dispatched [42716036741](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42716036741) against the same immutable screen artifact. It is in progress restoring the source artifact; DRT has not started yet. Local unrelated changes remain untouched.
+- Pushed fix `ef283e6` and dispatched [42716036741](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42716036741) against the same immutable screen artifact. That run has now completed DRT successfully; its extracted setup gate failed, as recorded in the newer entry above. Local unrelated changes remain untouched.
 
 Next:
-- Check run 42716036741 through source requalification and verify the exact resolved PDK path reaches LibreLane. Only once OpenROAD DRT starts can the outcome say anything about routeability; then require DRC0 and extracted all-corner gates.
+- Run 42716036741 passed source requalification and achieved DRC0. Analyze its extracted slow-corner setup path before selecting the next candidate change.
 
 ## 2026-11-09 — Fix dev4 route continuation PDK environment
 

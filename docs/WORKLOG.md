@@ -2,6 +2,38 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-10 — Complete source preparation rehearsal
+
+- Replayed the complete stock-source patch chain plus C-pad decode in /tmp/tripwire-cpad-preparation-review using cached SRAM views; preparation succeeds and candidate hashes match. No physical flow ran. An initial invocation used the repository working directory accidentally; its applied patch and config copy were reversed immediately, and git diff confirms src, info.yaml and test match HEAD.
+- Next dependency remains user publication of the prepared files, followed by dispatch of gds-official-dev4-cpad125-screen.
+
+## 2026-11-10 — Review candidate screen provenance
+
+- Corrected the new C-pad screen receipt to declare changed hardware and compare against hold125 run 42681697462. Added the exact apply receipt and candidate evidence to uploaded artifacts. YAML parsing, focused helper checks and whitespace checks pass. GitHub API status refresh failed due connectivity; no dispatch or publication occurred.
+- Next: publish the prepared candidate groups and dispatch the separate C-pad screen; Git operations remain reserved for the user by AGENTS.md.
+
+## 2026-11-10 — Build a critical-cone C-pad decode candidate
+
+- Rechecked `main` Actions: no workflows are queued or running. The latest physical result is still setup250 run 42858613687, which timed out in post-GRT timing repair; it is not a final timing or signoff result.
+- Applied the existing verified C-select screen profile in an isolated `/tmp` copy of the exact 2/4 source, then changed only C-pad selection in `trw_pin_io.v` to a 24-way masked-OR decode. The source patch is `spikes/phase2_stock_flow/c_pad_decode/c_pad_decode.patch`; its baseline/candidate SHA-256 values are 526b215c… and d11a8834… respectively.
+- Yosys equivalence proves 21/21 `trw_pin_io` points. Verilator L3 replay passes 22/22 protocol cases with independent waveform/reference-model checks and sigrok text annotation disabled due empty local decoder output. Focused apply-helper tests pass 3/3.
+- Matched full-chip Yosys/OpenSTA mapping (ideal 20 ns clock, no parasitics) reports mapped area 405784.5498→405746.7876 µm². Slow-corner target flop slack improves 5.498→5.685 ns and SRAM-origin slack 5.733→6.160 ns; typical values improve 10.618→10.694 ns and 11.066→11.302 ns. The generic aggregate summary stays −0.37 ns, so these estimates do not claim physical timing closure.
+- Added an exact-source apply helper/test and separate `.github/workflows/gds-official-dev4-cpad125-screen.yaml`. It applies only this source change after the existing C-select preparation and retains 20 ns, 0 setup repair, 125 ps hold, unchanged SDC/tool versions and screen gates. It does not edit the official `gds` workflow. YAML parsing and `git diff --check` pass. No phase box was ticked; no commit, push, screen dispatch, DRT or official GDS run occurred.
+- Rejected the parallel pad-owner mux for timing selection: it passes 22/22 L3, but its matched mapping degrades the worst slow flop slack by 0.142 ns despite improving the SRAM-origin slack; its earlier historical gain did not transfer to the current worst path.
+
+Next:
+- Review/publish the patch, evidence, helper/test, workflow and docs as grouped local changes, then run `gds-official-dev4-cpad125-screen`. The AGENTS.md Git rule reserves commits and pushes for the user. If the strict stock screen passes every timing/hold/electrical/antenna/overflow gate, continue with detailed routing and extracted timing on that exact source; otherwise diagnose that report before another hardening.
+
+## 2026-11-10 — Analyze setup250 screen timeout and exact setup path
+
+- [gds-official-dev4-setup250-screen run 42858613687](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42858613687) failed at the four-hour timeout in `44-openroad-resizertimingpostgrt`. Strict source prep, 8x4 selection and native flow setup passed. Global routing completed with zero overflow, but the setup resizer then found 2,124 endpoints violating its 2.5 ns target. The log reached roughly 970 iterations without reducing the reported violation count or WNS; only sparse gate resizing occurred. The step produced no post-resizer checkpoint, so no final screen timing/electrical/antenna qualification exists and no DRT was run. The 2.5 ns margin experiment is rejected as operationally non-convergent in this flow; do not rerun it or proceed to DRT.
+- Retrieved and inspected artifact 13801018660 locally at `/tmp/tripwire-setup250-42858613687`. The last saved 39-global-routing metrics (before timing/antenna repair) show zero routing overflow, slow setup WS −14.0717 ns, fast hold WS −0.4791 ns and slow hold WS −0.7084 ns; these are pre-repair checkpoint metrics, not final signoff. Native config confirms `GRT_RESIZER_SETUP_SLACK_MARGIN=2.5`, 20 ns clock and fixed 125 ps hold target. No infrastructure/input-preparation failure was found.
+- Rechecked exact extracted slow path from route 42716036741: pin-unit BITSYNC config latch → output-pad feedback/selected `a_in` → BITSYNC receive/token logic → `u_chip.g_unit[0].u_prod.tok[14]`; `hold10098` and `hold10099` add 1.421501 ns combined on the slow path. This motivates a same-owner pad-feedback bypass as an isolated semantics-preserving RTL spike; it must retain the resolved pad behavior whenever another owner or pin N is selected. Localize static-control fanout only as a separate candidate.
+- No RTL, main hardware/config or official template workflow was changed. No phase checklist box is newly satisfied. Other pre-existing modified/untracked files remain untouched.
+
+Next:
+- Prototype and prove the same-owner pad-feedback shortcut and high-fanout static-control localization separately, using top-level protocol replay/equivalence before any fresh physical screen. Keep the official workflow and 20 ns signoff constraints unchanged. Do not use another high setup-margin run as a substitute for reducing the actual critical cone.
+
 ## 2026-11-10 — Analyze exact dev4 detailed route and extracted timing
 
 - Route continuation [42716036741](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42716036741) used the exact full-design 8x4 checkpoint from screen run 42681697462. It passed source requalification and completed stock detailed routing after 43 DRT optimization iterations with final route DRC=0. Final extracted antenna audit also reports 0 violating nets and 0 pins.

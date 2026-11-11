@@ -2,6 +2,21 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-11 — Qualify C-pad screen and prepare exact routing
+
+- Downloaded artifact 13833267530 from successful screen 42964952931. Strict gates pass: zero overflow/electrical/antenna; unchanged-SDC estimated hold fast/typ/slow +0.270467/+0.467897/+0.815471 ns. Setup summaries are clamped zero, not proof of positive extracted setup.
+- Prepared separate C-pad route/extraction workflow and helper bound to run 42964952931 and SHA 6c79176d05f0d3309bbbcee11663795483a57b5d. Five provenance/PDK tests and YAML checks pass. Retained existing gates. User push authorization covers publication and launch.
+- Next: inspect exact-checkpoint DRT and extracted all-corner timing; official GDS remains outstanding.
+
+
+## 2026-11-11 — Check all Actions workflows
+
+- C-pad hold125 screen 42964952931 passes every step, including stock pre-routing STA, unchanged-SDC estimate and strict final screen gates (57 minutes). Latest test/docs/unit/lint also pass. Extracted timing is not established by this screen.
+- Nightly 43045354946 fails in both jobs while installing sigrok-cli; Python installation/tests were skipped. Exact installer root cause is unconfirmed because gh returned empty logs.
+- No in-progress runs. Two old runs remain queued since October 7: l3-placement-routed-gl 37655518919 and gds-placement-extracted-timing 37655518925. No cancellations or reruns performed.
+- Next: inspect the passing screen artifact and qualify exact-source routing; investigate nightly installation logs separately.
+
+
 ## 2026-11-10 — Complete source preparation rehearsal
 
 - Replayed the complete stock-source patch chain plus C-pad decode in /tmp/tripwire-cpad-preparation-review using cached SRAM views; preparation succeeds and candidate hashes match. No physical flow ran. An initial invocation used the repository working directory accidentally; its applied patch and config copy were reversed immediately, and git diff confirms src, info.yaml and test match HEAD.

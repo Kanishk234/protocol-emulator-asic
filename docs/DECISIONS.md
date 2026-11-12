@@ -1833,3 +1833,10 @@ The uploaded artifact `official-dev4-screen-8x4-42656422355.zip` is user-local e
 - **Reason:** hash-bound audit43270640598 shows net14163 Metal3 ratio231.39 before timing versus222.96 after, while allowed ratio drops14136 to200. Reduced conductor ratio with lost layer-specific protection credit is inconsistent with a wirelength-only explanation. Mixed repair may produce a more robust route; this remains a hypothesis, not proof of repair.
 - **General need/cost:** preserve antenna safety through native late rerouting for all signal nets; no protocol-specific primitive. Jumpers can add vias/metal/congestion; diode/cell locations and timing may change. No timing, electrical, antenna or overflow gate is relaxed.
 - **Status:** 97 focused checks and clean-source/8x4 preflight rehearsal pass. Physical measurement pending; no adoption or phase completion claimed.
+
+
+## D-174 (2026-11-12): measure a shorter native wire-repair bound on the better antenna recipe
+- **Decision:** isolated native-drive screen changes only GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH200 to175um; diode-only repair is retained from the one-violation reference. Mixed repair is rejected after43272195221 regresses to6 antenna nets/pins. Main config and official jobs unchanged.
+- **Evidence/need:** net14163 is a single latch-data branch from BUF2 wire14164 at(834.240,653.940)um to latch _48650_ at(639.360,646.380)um. Placement Manhattan separation202.44um is near the200um repair target; it is a proxy, not routed wirelength. A shorter target may create shorter buffered branches and preserve lower-layer protection through timing rerouting.
+- **Costs/alternatives:** more buffers, capacitance, hold repair and routing/antenna side effects are possible. Prior wire180 on a different older recipe failed; do not treat this as a guaranteed fix. Current source/gate policy and comparison are exact and different. Retain20ns/hold125/setup0 and every strict gate. No manual checkpoint repair.
+- **Status:** 99 focused checks and clean source/preflight rehearsal pass; physical result pending.

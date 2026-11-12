@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Reject mixed antenna mode; prepare bounded wire repair
+
+- Mixed screen43272195221 completes stock implementation/timing audits but fails final antenna6nets/6pins, overflow0, electrical0. Retire mixed policy; reference drive2 diode-only43178099947 remains better at1net/1pin. Standard test/unit/lint/docs pass.
+- Read reference DEF placement: wire14164 BUF2 at834240,653940 DBU and target latch _48650_ at639360,646380 DBU, units1000/um. Manhattan proxy202.44um lies near current200um wire target; no routed-length claim. This motivates one native175um target test, not a mode sweep.
+- Prepared exact baseline9074bd… helper and separate drive2-wire175 screen. Only max-wire target changes200->175; antenna diode-onlytrue, clock20ns, hold125, setup0, exclusions and all gates remain. Config SHAab65ecd9d8b14795ab798ceff13f528b67803586fc2a2da452019a1af0e50858. 99 focused checks and clean-source/tile-preflight rehearsal pass. D174 records costs and prior different-recipe failure. Next publish/run and require zero violations before DRT.
+
+
 ## 2026-11-12 — Antenna audit identifies protection-credit change; prepare mixed repair
 
 - Audit43270640598 passes, both ODB hashes remain fixed. Target net14163 Metal3 cumulative ratio231.39/required14136 before timing becomes222.96/required200 after timing. Wire-area ratio decreases while permitted ratio collapses; infer changed layer-specific diffusion/diode credit, not merely excessive added wire. This does not by itself prove physical diode deletion.

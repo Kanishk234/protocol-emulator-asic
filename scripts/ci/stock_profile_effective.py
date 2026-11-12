@@ -149,6 +149,13 @@ def validate(root, selected):
         if config.get('GRT_ANTENNA_REPAIR_JUMPER_ONLY') is True:
             raise ValueError('Conflicting native antenna modes')
         result['native_antenna_mode'] = 'diode_only'
+    if selected['changes'].get('GRT_ANTENNA_REPAIR_DIODE_ONLY') is False:
+        text = one(root, '*-openroad-repairantennas/*-openroad-diodeinsertion/openroad-diodeinsertion.log').read_text()
+        commands = re.findall(r'(?m)^\+ repair_antennas\b[^\n]*', text)
+        if (not commands or '-diode_only' in commands[-1] or '-jumper_only' in commands[-1]
+                or config.get('GRT_ANTENNA_REPAIR_JUMPER_ONLY', False)):
+            raise ValueError('Stock mixed antenna mode was not exercised')
+        result['native_antenna_mode'] = 'mixed'
     if 'GRT_ANTENNA_REPAIR_MARGIN' in selected['changes']:
         text = one(root, '*-openroad-repairantennas/*-openroad-diodeinsertion/openroad-diodeinsertion.log').read_text()
         value = number(text, 'repair_antennas', '-ratio_margin')

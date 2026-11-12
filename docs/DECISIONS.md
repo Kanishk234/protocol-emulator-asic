@@ -1826,3 +1826,10 @@ The uploaded artifact `official-dev4-screen-8x4-42656422355.zip` is user-local e
 - **Evidence:** fixed-SPEF top12 sizing improves slow setup -2.435476 to -1.285210 ns at unchanged fast hold +0.305366 ns and zero electrical counts. Broad combined exclusion maps at 411236.0280 versus 405746.7876 um2 (+1.35%); slow flop slack 5.614 versus 5.685 ns, SRAM 6.557 versus 6.160 ns. Local mapping is not physical evidence. NAND2-only and NOR3-only have worse overall mapping and are not selected.
 - **Cost/risk:** larger gates may increase upstream capacitance, area, clock/hold repair and congestion. Estimate the actual stock outcome; preserve 20 ns, hold125, setup target0 and every existing electrical/antenna/overflow gate. Do not route a failed screen.
 - **Status:** running as stock screen 43178099947 after exact config hash, source rehearsal and 93 focused checks; physical result pending. Any eventual main-config adoption requires separate review under repository rules.
+
+
+## D-173 (2026-11-12): measure mixed stock antenna repair on native-drive recipe
+- **Decision:** isolated screen changes only GRT_ANTENNA_REPAIR_DIODE_ONLY true to false from native-drive run43178099947; jumper-only remains false. Main src/config.json and official jobs remain untouched.
+- **Reason:** hash-bound audit43270640598 shows net14163 Metal3 ratio231.39 before timing versus222.96 after, while allowed ratio drops14136 to200. Reduced conductor ratio with lost layer-specific protection credit is inconsistent with a wirelength-only explanation. Mixed repair may produce a more robust route; this remains a hypothesis, not proof of repair.
+- **General need/cost:** preserve antenna safety through native late rerouting for all signal nets; no protocol-specific primitive. Jumpers can add vias/metal/congestion; diode/cell locations and timing may change. No timing, electrical, antenna or overflow gate is relaxed.
+- **Status:** 97 focused checks and clean-source/8x4 preflight rehearsal pass. Physical measurement pending; no adoption or phase completion claimed.

@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Antenna audit identifies protection-credit change; prepare mixed repair
+
+- Audit43270640598 passes, both ODB hashes remain fixed. Target net14163 Metal3 cumulative ratio231.39/required14136 before timing becomes222.96/required200 after timing. Wire-area ratio decreases while permitted ratio collapses; infer changed layer-specific diffusion/diode credit, not merely excessive added wire. This does not by itself prove physical diode deletion.
+- Prepared native-drive mixed antenna trial: only diode-only flag true->false, no jumper-only flag, same20ns/hold125/setup0/exclusions/source and all strict gates. Candidate config SHA1e5421d8e079ca099bac8123625fd12c9e74d712ff4d8c9cf2b916f94e84a46a. Exact baseline/config guards and actual mixed-mode command checks included.
+- Focused suites pass97 checks. Clean archived source prep and8x4 preflight rehearsal pass. D173 records inference/cost/scope. Next publish/run standalone screen, inspect all corners and new antenna geometry; no DRT from failed screen43178099947.
+
+
 ## 2026-11-12 — Bind read-only antenna before/after audit
 
 - Prepared gds-drive2-antenna-audit for exact run43178099947/991d07c6aabf1675bacdeaf9760ce35f98c3065b. Checks only net14163 on post-antenna and post-timing ODBs under exact stock engine digest; both database SHA256s independently verified locally. Sources hash-checked before/after; no design/constraint repair or geometry edits.

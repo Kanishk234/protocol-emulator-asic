@@ -2,6 +2,24 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Bind read-only antenna before/after audit
+
+- Prepared gds-drive2-antenna-audit for exact run43178099947/991d07c6aabf1675bacdeaf9760ce35f98c3065b. Checks only net14163 on post-antenna and post-timing ODBs under exact stock engine digest; both database SHA256s independently verified locally. Sources hash-checked before/after; no design/constraint repair or geometry edits.
+- Tcl uses check_antennas -net net14163 -verbose to expose nonviolating original ratios as well as final offending ratio. Python compilation/YAML parse/hash guards pass. Native execution is pending workflow; local Docker unavailable. Next choose antenna reserve from actual ratio change rather than a blind full rerun.
+
+
+## 2026-11-12 — Identify exact drive2 antenna offender
+
+- Native-drive artifact downloaded. Fresh violation is net14163 to _48650_/D, U1 configuration word3 bit3 latch, driven by BUF2 wire14164. Metal3 detailed cumulative area ratio222.96 exceeds200 (summary partial215.82). Antenna immediately after stock repair was clean; post-timing fresh check fails1/1. Net and sink already exist in input to timing repair, so this is not evidence of a newly inserted net; late routing/geometry changed the outcome.
+- Actual screen instance area684063um2/42483instances. Estimated fast/typ/slow hold0.125521/0.321904/0.662085ns; electrical0/overflow0. No positive extracted setup evidence or DRT. Next measure the same net before/after timing repair and choose a native antenna-protection adjustment; do not hand-edit checkpoint or relax ratio/gates.
+
+
+## 2026-11-12 — Native-drive screen fails one fresh antenna net
+
+- Run43178099947 completes stock physical flow and both timing audits but fails final strict screen solely on antenna nets/pins1/1; overflow0. Estimated fast/typ/slow hold +0.125521/+0.321904/+0.662085ns, electrical counts0. Setup summaries0 remain clamped; no positive extracted setup established. No DRT authorized from this checkpoint.
+- Downloading artifact13930453234 to /tmp/tripwire-drive2-43178099947 for exact antenna offender, physical area and functional timing reports. Latest standard test/lint/unit/docs and nightly43253315181 pass. Next diagnose exact violation and stock antenna-control options before any corrected screen; do not weaken gates.
+
+
 ## 2026-11-12 — Prepare actual functional path-margin reporting
 
 - Added read-only functional_setup_frontier Tcl plus parser to supplement ordinary all-endpoint timing checks. It retains every configuration-latch launch path while reporting max setup paths ending at standard-cell data flops and outputs; latch borrowing endpoints remain in original all-path checks. No acceptance gate or constraint changed.

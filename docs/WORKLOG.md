@@ -2,6 +2,22 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Prepare actual functional path-margin reporting
+
+- Added read-only functional_setup_frontier Tcl plus parser to supplement ordinary all-endpoint timing checks. It retains every configuration-latch launch path while reporting max setup paths ending at standard-cell data flops and outputs; latch borrowing endpoints remain in original all-path checks. No acceptance gate or constraint changed.
+- Four parser tests pass, rejecting clamped-only summaries, wrong corner, missing flop inventory and nonfinite values. Actual cached OpenSTA run counts2414 flop D endpoints/24outputs and reports worst5.685091ns on mapped baseline while aggregate summary stays0. This is no-parasitic tool validation only. Used compatible group_count/endpoint_count aliases after cached tool rejected newer option spellings; pinned runtime validation remains pending future diagnostic.
+- Appended reporting to future endpoint diagnostics. Native-drive screen43178099947 independently passed clean source/profile/tile/generated-input prep and remains active. Combined probe residual is U0mode latch to U3RXtimer rt[22], with six coarse hold cells totaling about4ns; historical global coarse-cell exclusion already failed, so do not repeat blindly.
+- Next evaluate the active native stock screen and use actual functional path margins plus all-endpoint gates before routing. Positive physical setup and official GDS still outstanding.
+
+
+## 2026-11-12 — Launch clean native-drive screen; combined probe reaches new limit
+
+- Published 3c24430/b2cbce0/991d07c and launched gds-official-dev4-drive2-screen 43178099947 on remote main991d07c. Confirmed in progress. Source/profile and exact generated-input rehearsal passed; 93 focused checks passed before publication. Official gds.yaml and main hardware/config unchanged.
+- Completed combined probe43176462551: baseline -2.435475890 ns; gates12 -1.285210197; gates12+delay2 -1.070480623; gates12+delay1 also -1.070480623. Fast hold remains0.305365686 except delay1 0.298156563; all electrical counts0. Identical residual setup for both delay policies indicates another limiting path; do not infer closure or remove buffers physically.
+- Output-feedback-buffer prototypes buf4/buf8 produce identical mapped slack, slow flop/SRAM5.327/5.327 ns versus baseline5.685/6.160; not selected. Native-drive policy is the active physical measurement; combined diagnostic artifacts downloading for remaining-path analysis. Updated timing plan to current state and roadmap.
+- Next review native screen and residual timing cone. No phase checklist change; actual extracted setup remains negative.
+
+
 ## 2026-11-12 — Prepare reproducible native minimum-drive screen
 
 - Confirmed stalled setup250 endpoint _48654_/D is a configuration latch, with repeated zero WNS and 2124 margin endpoints. Pinned OpenROAD dcf3613 lacks modern path-group repair option; do not assume current docs apply or rerun broad 2.5 ns target.

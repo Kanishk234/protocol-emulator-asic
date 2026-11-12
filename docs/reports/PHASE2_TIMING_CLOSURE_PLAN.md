@@ -1,4 +1,14 @@
-# Timing closure priorities (2026-10-06)
+# Timing closure priorities (updated 2026-11-12)
+
+## Current measurement and next physical test
+
+Latest physical route is C-pad run 43063738642: DRT completes, electrical/antenna counts are zero, fast/typ/slow hold is +0.305366/+0.540159/+0.916385 ns, but slow setup is -2.435476 ns. This regresses against prior hold125 route 42716036741 (-1.982448 ns). Passing pre-route screen 42964952931 therefore did not establish timing closure.
+
+Read-only fixed-SPEF probes reproduced this baseline. Twelve measured gate-strength changes improve estimated setup to -1.285210 ns; combining them with shorter delay cells across five failing path families reaches -1.070481 ns, fast hold +0.298157 ns, zero electrical counts. No physical changes were applied, and these hypotheses are not an adopted design. Their plateau shows that further blind sizing/hold-cell shortening is insufficient.
+
+Native minimum-drive screen 43178099947 is running from clean source at commit 991d07c. It changes only EXTRA_EXCLUDED_CELLS to exclude NAND2_1/NOR3_1 alongside existing BUF_1, using stock synthesis/PnR support. All source, 20 ns, hold125, setup0, toolchain, SDC and qualification gates remain fixed. Combined local mapping costs about 1.35% area; physical benefit is unmeasured. See D-172. No manual checkpoint ECO or official job edit is part of this candidate.
+
+Next: inspect this stock screen's area/overflow, actual path slack, hold and electrical/antenna gates. Route only if qualified; then require extracted timing and final-netlist protocols. Any adopted source/config must subsequently pass the unchanged official gds workflow. Phase 2 remains open; frozen 3/6 counts are distinct from the current 2/4 closure experiment.
 
 ## Acceptance
 
@@ -22,7 +32,7 @@ The exact 2/4 source prepared by the existing dev4 screen was extended with one 
 
 Yosys `equiv_simple` proves all 21 `trw_pin_io` points. Verilator 5.053 replay passes all 22 L3 firmware/protocol cases (UART, SPI, I2C and the additional shipped protocols), zero failures/skips. Local sigrok text annotation was disabled because `sigrok-cli` returned no annotations; the independent waveform and reference-model checks remained on. Matched full-chip Yosys/OpenSTA mapping at 20 ns, ideal clock and no parasitics reports area 405784.5498→405746.7876 µm² (−37.7622 µm²); slow-corner worst-flop slack 5.498→5.685 ns and SRAM-origin slack 5.733→6.160 ns. Typical values improve 10.618→10.694 ns and 11.066→11.302 ns, respectively. The aggregate summary remains −0.37 ns. This modest pre-layout gain does not establish routed improvement or a green screen.
 
-The candidate patch, hashes and measurements are in `spikes/phase2_stock_flow/c_pad_decode/`. A new separate workflow `.github/workflows/gds-official-dev4-cpad125-screen.yaml` is prepared from the 8×4 hold125 stock screen, applying this one-file patch after the verified C-select source preparation. It retains the 20 ns clock, zero setup-resizer target, 125 ps hold target, SDC, stock toolchain and strict screen gates. It does not edit the official `gds` workflow and stops before detailed routing. The workflow is local and has not been published or run.
+The candidate patch, hashes and measurements are in `spikes/phase2_stock_flow/c_pad_decode/`. A new separate workflow `.github/workflows/gds-official-dev4-cpad125-screen.yaml` is prepared from the 8×4 hold125 stock screen, applying this one-file patch after the verified C-select source preparation. It retains the 20 ns clock, zero setup-resizer target, 125 ps hold target, SDC, stock toolchain and strict screen gates. It does not edit the official `gds` workflow and stops before detailed routing. It ran successfully as 42964952931; exact route continuation 43063738642 then failed extracted setup at -2.435476 ns. This candidate has not closed timing.
 
 ## Ranked changes
 
@@ -40,7 +50,7 @@ The candidate patch, hashes and measurements are in `spikes/phase2_stock_flow/c_
 
 ## Experiment sequence
 
-Keep prior CTS and SRAM-GL evidence intact. The latest setup250 run confirms that a 2.5 ns stock resizer target is not operationally viable. The best current next measurement is the prepared C-pad decode hold125 screen: it is a single source change with full L3 replay, module equivalence and a small matched pre-layout improvement. Publish and run it only after reviewing the prepared changes; use the unchanged 20 ns stock recipe and do not continue to DRT unless all strict screen gates pass. If the screen qualifies, route/extract that exact source; otherwise inspect its timing/electrical/antenna reports before selecting another candidate. Keep high-fanout control localization and the same-owner feedback bypass as separate follow-on experiments. After an extracted-timing win, reproduce from clean synthesis without manual checkpoint edits and run the unchanged official `gds` workflow on the adopted full configuration. Keep phase 2 open until final timing and all other gates pass.
+Keep prior CTS and SRAM-GL evidence intact. The 2.5 ns resizer target is retired: the stalled worst endpoint was a configuration latch and the pinned optimizer lacks modern path-group repair. The C-pad source screen passed but its route regressed. Local fabric, timer, replica and feedback prototypes did not demonstrate a whole-chip mapping win. Use current measured fixed-RC findings to guide a reproducible native policy, with the minimum-drive screen as the current physical test. Do not replay the completed C-pad routing unchanged. After a qualified stock screen and extracted-timing win, verify the exact final netlist, integrate deliberately, and run unchanged official GDS.
 
 
 Implementation update: all three structural prototypes pass module equivalence and functional checks. Isolated mapped delay favors bs-resync strongly (13.809→10.669ns PERIOD→RX-load); CSA and parallel fabric qualification are slower under the same module-level probe. Prioritize bs-resync and the separate2ns optimization-margin screen; preserve other prototypes as lower-priority evidence. See PHASE2_TIMING_PROTOTYPES.md for limits and commands.

@@ -2,6 +2,14 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Prepare reproducible native minimum-drive screen
+
+- Confirmed stalled setup250 endpoint _48654_/D is a configuration latch, with repeated zero WNS and 2124 margin endpoints. Pinned OpenROAD dcf3613 lacks modern path-group repair option; do not assume current docs apply or rerun broad 2.5 ns target.
+- Evaluated stock cell exclusion locally without changing RTL: NAND2-only area409436.8236, slow flop3.751/SRAM6.289 ns; NOR3-only407047.1454,5.430/6.170; both411236.0280,5.614/6.557. Baseline405746.7876,5.685/6.160. Combined policy cost +1.35% and is selected for one physical measurement based on measured selective-gate benefits, not claimed timing closure.
+- Added exact-hash min_drive_profile helper, separate gds-official-dev4-drive2-screen, and native exclusion checks at synthesis/final checkpoint. Only one project-input field changes: EXTRA_EXCLUDED_CELLS=[BUF_1,NAND2_1,NOR3_1]. 20ns, hold125, setup0, source, SDC and stock engine retained. Main src/config.json and official gds.yaml unchanged. Exact candidate config hash9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac.
+- Focused suites pass93 checks. Clean archive preparation, all source patches, native profile and 8x4 preflight replay succeed. D172 records general need, cost and experimental scope. Next publish and run the separate stock screen; inspect area/overflow, all-corner timing and electrical/antenna before any detailed routing.
+
+
 ## 2026-11-12 — Prepare combined gate/delay endpoint sensitivity
 
 - Prepared four fixed-RC cases: baseline, measured top12 logic gates, gates plus delay2, gates plus delay1 on the twelve original delay3 cells in the five endpoint worst-path union. Exact original masters checked; each substitution preserves connectivity and permits only reviewed same-family masters. Python/YAML and all four source guards pass.

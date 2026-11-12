@@ -1818,3 +1818,11 @@ The user-provided full-design8x4 stock screen artifact shows the native flow's a
 Test one native project-control change on the same8x4 RTL: GRT_RESIZER_HOLD_SLACK_MARGIN 0.175→0.125ns. This may reduce unnecessary late hold-delay insertion and its antenna burden, but can reduce fast hold. Keep the strict >=0.05ns final fast-hold gate, all other-corner timing/electrical/antenna/overflow gates,20ns and stock timing flow unchanged. Do not proceed to DRT without every gate passing. The previous8x4 screen measured +0.145657ns fast hold; predicted outcome of the lower target is unknown until the fresh screen.
 
 The uploaded artifact `official-dev4-screen-8x4-42656422355.zip` is user-local evidence and must never be staged or published. The original saved final physical views are frozen in that artifact. No manual diode, post-flow ECO, timing waiver or official-job edit is allowed.
+
+
+## D-172 (2026-11-12): measure a native minimum-drive mapping policy
+- **Decision:** run a separate 2/4, 8x4 stock screen excluding NAND2_1 and NOR3_1 in addition to the existing BUF_1 exclusion. Use the built-in EXTRA_EXCLUDED_CELLS field; no flow/script repair or timing exception. Main src/config.json is unchanged. This is an experiment, not adoption or a frozen-spec change.
+- **General need:** reduce delay of loaded shared control/data gates independently of protocol behavior. It adds no instruction, mode, state or latency.
+- **Evidence:** fixed-SPEF top12 sizing improves slow setup -2.435476 to -1.285210 ns at unchanged fast hold +0.305366 ns and zero electrical counts. Broad combined exclusion maps at 411236.0280 versus 405746.7876 um2 (+1.35%); slow flop slack 5.614 versus 5.685 ns, SRAM 6.557 versus 6.160 ns. Local mapping is not physical evidence. NAND2-only and NOR3-only have worse overall mapping and are not selected.
+- **Cost/risk:** larger gates may increase upstream capacitance, area, clock/hold repair and congestion. Estimate the actual stock outcome; preserve 20 ns, hold125, setup target0 and every existing electrical/antenna/overflow gate. Do not route a failed screen.
+- **Status:** prepared with exact config hash and source-rehearsal checks; physical result pending. Any eventual main-config adoption requires separate review under repository rules.

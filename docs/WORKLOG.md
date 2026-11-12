@@ -2,6 +2,80 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Reject retained selector; prepare fixed-RC sensitivity
+
+- Retained masks raise area to 415422.4914 um2 and reduce slow mapped flop/SRAM slack to 3.275/4.605 ns versus 5.685/6.160 baseline. Reject; no physical screen.
+- Extracted critical path cell delays motivate six-case fixed-SPEF diagnostic: baseline; _24522_ NAND2 strength2; _30153_ NOR3 strength2; both; three delay3-to-delay2 substitutions; combined. Library availability and exact source-netlist connectivity guards pass for every case. A proposed NAND3 strength2 case was excluded because that master does not exist.
+- Separate gds-cpad-sizing-probe preserves source ODB/SPEF/SDC, binds netlist hash and requires baseline timing reproduction. These are sensitivity hypotheses, not physically applied/legal repair. Python/YAML parsing and six netlist guard checks pass. Next inspect all-corner setup/hold/electrical sensitivity before choosing one stock-flow change.
+
+
+## 2026-11-12 — Integrated selector replay passes; inspect synthesis refactoring
+
+- Integrated collapsed-selector candidate passes all 22 Verilator L3 cases (264.68 s), reference/waveform assertions enabled, optional sigrok annotations disabled.
+- Full-chip map worsens: area 405746.7876 to 407372.0364 um2; slow flop slack 5.685 to 5.204 ns; SRAM 6.160 to 5.627 ns. Worst mapped path still traverses uo_out[7] then BITSYNC a_in, indicating synthesis has shared/refactored data selection back through the output cone rather than preserving standalone selector gain. No physical-screen recommendation.
+- Started bounded retention variant with keep attributes on static ownership/pin decode masks only, preserving function. Mapping under /tmp/tripwire-feedback-retained. Next verify retained structure and delay; no repeated protocol replay needed for attribute-only change unless behavior or tool diagnostics change. Main RTL unchanged.
+
+
+## 2026-11-12 — Integrate collapsed feedback selector in scratch chip
+
+- Integrated general selected-output read network through trw_pins, trw_chip, trw_pin_unit and trw_pin_io in /tmp/tripwire-feedback-integrated. Output-pad reads use direct selected feedback; external/uio synchronization, pin-S override, defaults and previous-value sampling remain. Top explicitly supplies MISO/IRQ for host output pads. Adds no state/latency.
+- Full chip Icarus compilation passes. Routing module equivalence passes NU4/NU6; pin-input equivalence proves 21 points with feedback tied to original pad values. Initial routing proof reference incorrectly included uninitialized host-pad ownership; corrected fixture excludes host slots exactly as top host overrides do, then passes. No RTL change was needed for that fixture correction. These compositional proofs are not whole-chip formal verification.
+- Matched whole-chip mapping and 22-case Verilator L3 replay launched locally, sessions 85850/40494. Sigrok annotations disabled; independent waveform/reference checks enabled. Next inspect both results before any screen preparation. Main RTL and official flow untouched; no physical workflow launched.
+
+
+## 2026-11-11 — Prove and map collapsed feedback selector
+
+- Same-owner shortcut maps worse: area 405746.7876 to 406907.6634 um2, slow flop slack 5.685 to 5.397 ns; SRAM 6.160 to 5.762 ns. Do not physically screen this form.
+- New standalone prototype factors ownership/pin-index decisions ahead of late a_out/n_out data and collapses output pad mux followed by selected feedback mux into one masked OR network. Combinational read-output equivalence proves at NU=4 and NU=6, including A-before-N, invalid owner/index and host-pad exclusion. Raw source/proof /tmp/tripwire-feedback-select.
+- Matched typical-library synthesis and slow-library OpenSTA, virtual 20 ns clock, zero I/O delays, 0.01 pF load, no parasitics: data-input-to-read-output arrival 1.498224 to 0.559013 ns (-0.939211); single-read module area 1698.2028 to 1797.6924 um2 (+99.4896). This is an isolated routing-selector probe, not whole-chip WNS or physical gain.
+- Next integrate general selected-output feedback into pin input selection, preserving synchronized external/uio reads and host pads, prove composition and run full-chip mapping before a physical screen. No main RTL changes or new workflow launched.
+
+
+## 2026-11-11 — Prove same-owner output feedback shortcut
+
+- Implemented isolated per-unit output-pad feedback bypass in trw_pins/trw_chip under /tmp/tripwire-local-feedback. Only self-owned uo pads use direct local A/N output; all other owners use original resolved mux, A-before-N retained, host MISO/IRQ overrides remain in top, and uio sensing remains synchronized. No new state or latency.
+- Expanded pad-mux equivalence proves 107 points at NU=4 and also passes NU=6: each feedback vector equals original pad_out for arbitrary owner/pin/output combinations. This is module equivalence, not integrated chip proof. Matched whole-chip mapping launched; next evaluate area/timing and run integrated checks if suitable. Main src and official flow unchanged.
+
+
+## 2026-11-11 — Evaluate mode replica polarity
+
+- Complemented replica survives mapped synthesis (2072 vs 2071 latches) but mapped area rises 405746.7876 to 406087.6302 um2; slow worst-flop slack falls 5.685 to 5.164 ns, while SRAM-origin improves 6.160 to 6.475 ns. New worst path launches from U0 TX lvx flop, so replication shifts the limiting cone; no physical gain claimed.
+- Prepared same-polarity retained primary/replica variant to separate polarity mapping from load splitting. Configuration equivalence proves 494/494 points with behavioral clock-gate model and clock lowering. Matched mapping is running in /tmp/tripwire-mode-local-positive. Main hardware untouched. Next inspect retention, path-specific timing and overall tradeoff before selecting a physical experiment.
+
+
+## 2026-11-11 — Prototype localized mode storage
+
+- Reviewed unsuccessful broad mode_ff experiment before implementing a narrower isolated storage-copy experiment. One complemented retained mode latch per full unit feeds output gating, while original mode storage continues feeding engine logic. No architectural field or write latency changes. Scratch sources only: /tmp/tripwire-mode-local.
+- Configuration-module equivalence with behavioral clock-gate model, clk2fflogic and induction proves 495/495 points including the added replica observation output. This is config-module evidence, not whole-chip equivalence or physical validation. Direct initial proof attempts exposed unsupported async-latch/blackbox gate models and were replaced by the explicit behavioral gate model.
+- Matched full-chip mapping is running locally. Next verify replica survives synthesis and evaluate area/path timing, then validate integrated pin-unit behavior before any physical screen. No hardware promotion, workflow publication or phase checklist change.
+
+
+## 2026-11-11 — Reject parallel timer arithmetic after matched mapping
+
+- Matched chip mapping: area 405746.7876 to 406203.9030 um2 (+457.1154); slow worst-flop slack 5.685 to 5.305 ns; SRAM-origin slack 6.160 to 5.648 ns. Targeted U0 tb[24] slow mapped slack also worsens 6.133554 to 5.319210 ns. Reject this candidate; no protocol replay or physical screen warranted. Equivalence alone did not predict mapper quality.
+- Raw baseline/candidate sources, proof and mapping reports remain /tmp/tripwire-timer-parallel. No src or official workflow changes. Next focus on the measured mode-control/output feedback cone and native hold-repair interaction rather than distributing more timer arithmetic.
+
+
+## 2026-11-11 — Prove parallel BITSYNC timer next-state selection
+
+- Found edge-dependent tb1 selection feeding period addition and decrement after the late sensed-pad edge. Isolated candidate precomputes normal/hard-sync/resync timer updates before final edge selection, preserving modulo arithmetic and all existing state.
+- Yosys equivalence passes all 776 points at default sample-delta mode; alternate USE_SAMPLE_DELTA=1 also proves. Candidate exists only in /tmp/tripwire-timer-parallel. Matched full-chip mapping launched locally; no physical screen or hardware promotion. Next assess area and both global and targeted path timing before further replay or routing.
+
+
+## 2026-11-11 — Measure last_seq simplification
+
+- Matched full-chip mapping completes. Area 405746.7876 to 405505.8504 um2 (-240.9372); slow worst-flop slack 5.685 to 5.232 ns; SRAM-origin 6.160 to 5.232 ns. Thus reject as a stand-alone physical-screen choice despite equivalence.
+- Targeted no-parasitic slow STA to u_c0/u_c1/u_c8 last_seq shows sorted endpoint slacks 6.507443/6.594258/7.076669 to 6.929219/6.966951/7.825362 ns. This supports a local fabric benefit, but cannot overcome the new whole-chip bottleneck. Sorting is by slack, not a matched endpoint-by-endpoint delta. Raw evidence remains /tmp/tripwire-lastseq-direct.
+- No hardware or official workflow changed, no physical run launched. Next prioritize common mode-control/feedback cone and BITSYNC timer path; retain fabric simplification only for deliberate later combination after independently measuring the dominant path change.
+
+
+## 2026-11-11 — Targeted endpoint audit passes; prove fabric simplification
+
+- Read-only audit 43148328628 succeeds, reproduces baseline extracted metrics and preserves all source hashes. Fast minimum hold at slow-failing endpoints: u_c1.last_seq +0.642110 ns; u_c0.last_seq +0.447519; BITSYNC tb[24] +0.329496; u_c1.pending_drop +0.687281; u_c8.last_seq +0.657291. Their reported fastest paths include only one or none of the delay cells seen on worst slow setup paths. This supports investigation, not manual buffer removal.
+- Isolated last_seq write-enable simplification removes redundant last_seq!=s_seq qualification: copying s_seq when already equal has no observable effect. No state/latency/encoding changes. Yosys equivalence passes at N=1/5/6/7/9/16, including 74 points at N=9. Raw evidence /tmp/tripwire-lastseq-direct. Matched full-chip synthesis/STA is running locally; no hardware promotion or new physical screen launched.
+- Next inspect matched mapping result, then full protocol replay only if the candidate improves its probe.
+
+
 ## 2026-11-11 — Prepare targeted extracted endpoint audit
 
 - Added read-only fixed-SPEF STA diagnostic for five leading C-pad failing endpoints. It binds the extracted netlist SHA, retains original SDC/ODB/SPEF, requires baseline corner metrics to reproduce, and hashes source views before/after. Reports both min and max paths per endpoint at every corner.
@@ -7379,3 +7453,5 @@ Checklist boxes ticked (evidence):
 
 Next:
 - Monitor run 42858613687 through stock physical screening. Review actual path slack, all-corner hold, electrical/antenna results and overflow. Do not start DRT unless every screen gate qualifies.
+
+Mode-replica follow-up: same-polarity mapping completes at 406057.1634 um2, slow flop/SRAM slack 5.022/5.022 ns. It contains only 2071 latches, so synthesis merged the duplicate despite retained RTL signals. This variant does not establish physical load splitting and is rejected. Complemented variant retains the extra latch but worsens global mapped setup. Neither is promoted or physically screened.

@@ -11,3 +11,6 @@ foreach endpoint {_48106_ _48079_ _46963_ _48094_ _48293_} {
         puts "%OL_END_REPORT"
     }
 }
+
+# Actual functional path margins supplement, never replace, all-endpoint gates.
+source [file join [file dirname [info script]] functional_setup_frontier.tcl]

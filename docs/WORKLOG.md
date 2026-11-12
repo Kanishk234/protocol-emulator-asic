@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-11 — Prepare targeted extracted endpoint audit
+
+- Added read-only fixed-SPEF STA diagnostic for five leading C-pad failing endpoints. It binds the extracted netlist SHA, retains original SDC/ODB/SPEF, requires baseline corner metrics to reproduce, and hashes source views before/after. Reports both min and max paths per endpoint at every corner.
+- Separate workflow restores exact screen source and extracted artifact from 43063738642; no physical repair or routing. Python compilation, YAML parsing and whitespace checks pass. Runtime validation awaits workflow. Next inspect endpoint hold headroom and common logic before selecting one structural RTL change.
+
+
+## 2026-11-11 — Trace C-pad extracted regression
+
+- Inspected extracted artifact 13885415154 from run 43063738642. Electrical slew/fanout/capacitance counts are zero at all corners; fresh antenna nets/pins are zero.
+- New worst slow path starts at U0 bitsync_active mode latch and ends at fabric u_c1.last_seq, unlike prior producer tok[14] endpoint. Three delay cells add 1.971781 ns versus 1.421501 ns on prior worst path. Arrival increases 0.534058 ns; required time improves 0.081030 ns; net slack regresses 0.453028 ns. Different endpoints prevent treating this as a same-path subtraction or removal proof.
+- Slow max report contains 66 reported negative paths to 66 unique endpoints. Leading endpoints include u_c1.last_seq (-2.435476), u_c0.last_seq (-2.344059), U0 BITSYNC tb[24] (-2.316291), u_c1.pending_drop (-1.722764), u_c8.last_seq (-1.679743) ns. Fast min report does not include u_c1.last_seq, so its hold headroom is unconfirmed.
+- Next: obtain targeted fast-min/slow-max paths to these endpoints and evaluate U0 mode-control fanout/localization and late fabric load qualification separately. Do not remove hold cells or spend another full route on the C-pad rewrite without stronger evidence. No new workflow launched or gate relaxed.
+
+
+## 2026-11-11 — Review completed C-pad route and nightly rerun
+
+- Nightly 43045354946 attempt 2 passes both full and r1-fallback jobs; the original package-server DNS failure is resolved. Latest main test/unit/lint/docs all pass.
+- C-pad route 43063738642 completes detailed routing successfully, then fails extracted setup gates: slow setup -2.435475889896515 ns; fast/typ setup summaries 0 (clamped). Fast/typ/slow hold +0.3053656858253048/+0.5401594879828902/+0.9163846607585777 ns. Slow setup regresses by about 0.453 ns against prior -1.982448 ns; local mapped improvement did not survive routing.
+- No workflows running; two stale October 7 placement workflows remain queued. Next inspect actual extracted critical paths and electrical/antenna artifact before choosing another RTL candidate. No phase boxes ticked.
+
+
 ## 2026-11-11 — Qualify C-pad screen and prepare exact routing
 
 - Downloaded artifact 13833267530 from successful screen 42964952931. Strict gates pass: zero overflow/electrical/antenna; unchanged-SDC estimated hold fast/typ/slow +0.270467/+0.467897/+0.815471 ns. Setup summaries are clamped zero, not proof of positive extracted setup.

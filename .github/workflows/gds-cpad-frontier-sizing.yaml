@@ -1,0 +1,107 @@
+name: gds-cpad-frontier-sizing
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-cpad-frontier-sizing
+  cancel-in-progress: false
+jobs:
+  audit:
+    name: Cumulative sizing of measured failing paths
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SOURCE_RUN: '42964952931'
+      SOURCE_ARTIFACT: official-dev4-cpad125-42964952931
+      PDK_ROOT: /home/runner/pdk
+    steps:
+    - name: Check out route tools
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Restore the exact source screen checkpoint
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: "set -euo pipefail\ngh api \"repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN\"\
+        \ > official-dev4-source-run.json\ngh run download \"$SOURCE_RUN\" --repo\
+        \ \"$GITHUB_REPOSITORY\" --name \"$SOURCE_ARTIFACT\" --dir frozen-screen\n\
+        python - <<'PY'\nimport json, shutil\nfrom pathlib import Path\nrun = json.loads(Path('official-dev4-source-run.json').read_text())\n\
+        assert run['id'] == 42964952931\nassert run['head_sha'] == '6c79176d05f0d3309bbbcee11663795483a57b5d'\n\
+        assert run['head_branch'] == 'main' and run['conclusion'] == 'success'\nassert\
+        \ run['path'] == '.github/workflows/gds-official-dev4-cpad125-screen.yaml'\n\
+        frozen = Path('frozen-screen')\nfor name in ('runs', 'src', 'macro'):\n  \
+        \  target = Path(name)\n    if target.exists(): shutil.rmtree(target)\nfor\
+        \ name in ('runs', 'src', 'macro'):\n    source = frozen / name\n    if source.exists():\
+        \ shutil.copytree(source, Path(name))\nshutil.copy2(frozen / 'info.yaml',\
+        \ 'info.yaml')\nfor name in ('compatibility-input.json', 'compatibility-generated.json',\n\
+        \             'compatibility-engine.json', 'compatibility-image.json',\n \
+        \            'compatibility-openroad.txt'):\n    if (frozen / name).exists():\
+        \ shutil.copy2(frozen / name, name)\nPY\n"
+    - name: Download exact extracted checkpoint
+      uses: actions/download-artifact@v7
+      with:
+        name: official-dev4-cpad125-extracted-43063738642
+        path: extracted-artifact
+        run-id: 43063738642
+        github-token: ${{ github.token }}
+    - name: Restore extracted reports and SPEF
+      run: cp -a extracted-artifact/runs/extracted-timing runs/
+    - name: Install exact dev4 tools for extraction
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: 9d13ff3e3e6202090740110438c6a10c1d62ca0f
+        path: tt
+    - name: Set up extraction environment
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install stock tool dependencies
+      run: 'pip install -r tt/requirements.txt
+
+        pip install librelane==3.1.0.dev4
+
+        '
+    - name: Verify stock physical engine identity
+      run: 'set -euo pipefail
+
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev4
+
+        docker image inspect ghcr.io/librelane/librelane:3.1.0.dev4 > compatibility-image-extract.json
+
+        docker run --rm ghcr.io/librelane/librelane:3.1.0.dev4 openroad -version >
+        compatibility-openroad-extract.txt
+
+        python - <<''PY''
+
+        import json
+
+        from pathlib import Path
+
+        image = json.loads(Path(''compatibility-image-extract.json'').read_text())[0]
+
+        assert ''ghcr.io/librelane/librelane@sha256:af2405f5d48d8fe14d406ecce913811177a95e365e3b625859677307cace2469''
+        in image[''RepoDigests'']
+
+        assert Path(''compatibility-openroad-extract.txt'').read_text().strip() ==
+        ''dcf36133a369abc8f3c5e5738cd4d82e4903c0e0''
+
+        PY
+
+        '
+    - name: Report exact endpoint min and max paths
+      timeout-minutes: 75
+      run: python scripts/ci/cpad_frontier_sizing.py
+    - name: Upload extracted results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: cpad-frontier-sizing-${{ github.run_id }}
+        path: 'runs/cpad-endpoint-audit/**
+
+          runs/cpad-audit-pdk/**'
+        if-no-files-found: warn

@@ -2,6 +2,18 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Prepare combined gate/delay endpoint sensitivity
+
+- Prepared four fixed-RC cases: baseline, measured top12 logic gates, gates plus delay2, gates plus delay1 on the twelve original delay3 cells in the five endpoint worst-path union. Exact original masters checked; each substitution preserves connectivity and permits only reviewed same-family masters. Python/YAML and all four source guards pass.
+- This tests the remaining hold/setup tradeoff without physical repair, relaxed constraints, or official workflow edits. It does not qualify area, placement, routing or antenna after hypothetical substitutions. Next inspect all corners and endpoint reports; then choose a clean stock implementation if any candidate is viable. Phase 2 remains open.
+
+
+## 2026-11-12 — Cumulative sizing gains plateau
+
+- Fixed-RC diagnostic 43173658547 passes and reproduces baseline. Slow setup: baseline -2.435475890, top2 -1.844897620, top4 -1.475816844, top8 -1.299509870, top12 -1.285210197 ns. Fast hold remains +0.305365686 ns; all-corner electrical violations zero. Last four gates improve global setup by only 14.3 ps, so blindly expanding sizing is not justified.
+- Downloading residual reports to /tmp/cpad-frontier-43173658547 for limiting-path analysis. These are hypothetical cell substitutions with fixed RC, not routed candidates or official signoff. No design promotion or physical screen launched. Next identify residual cone and translate useful findings into a reproducible stock-source/flow change.
+
+
 ## 2026-11-12 — Sizing sensitivity identifies shared logic opportunity
 
 - Diagnostic 43170764302 passes all six cases and baseline reproduction. Slow setup baseline -2.435475890 ns; NAND2 _24522_ strength2 -2.090372379; NOR3 _30153_ strength2 -2.190008237; both gates -1.844897620; shorter delay cells alone -2.344059235; combined -1.753480966. Every case retains fast hold +0.305365686 ns and zero all-corner electrical counts. These fixed-SPEF estimates are not physical closure.
@@ -7462,3 +7474,5 @@ Next:
 - Monitor run 42858613687 through stock physical screening. Review actual path slack, all-corner hold, electrical/antenna results and overflow. Do not start DRT unless every screen gate qualifies.
 
 Mode-replica follow-up: same-polarity mapping completes at 406057.1634 um2, slow flop/SRAM slack 5.022/5.022 ns. It contains only 2071 latches, so synthesis merged the duplicate despite retained RTL signals. This variant does not establish physical load splitting and is rejected. Complemented variant retains the extra latch but worsens global mapped setup. Neither is promoted or physically screened.
+
+Cumulative sizing residual review: top12 worst path remains the same U0 bitsync_active latch to u_c1.last_seq endpoint _48106_, with unchanged three delay cells totaling about 1.971783 ns. Remaining largest logic arcs include NAND3 _37956_ 0.715549 ns, O21AI _24559_ 0.616114 ns, NAND4 _30152_ 0.562209 ns. Several have no stronger same-function master in the library, limiting simple upsizing. Next bounded sensitivity should combine measured gate changes with endpoint-aware delay-cell choices across failing paths, retaining all-corner hold/electrical checks; no physical buffer deletion is justified.

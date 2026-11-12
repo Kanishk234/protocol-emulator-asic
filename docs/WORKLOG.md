@@ -2,6 +2,13 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-12 — Sizing sensitivity identifies shared logic opportunity
+
+- Diagnostic 43170764302 passes all six cases and baseline reproduction. Slow setup baseline -2.435475890 ns; NAND2 _24522_ strength2 -2.090372379; NOR3 _30153_ strength2 -2.190008237; both gates -1.844897620; shorter delay cells alone -2.344059235; combined -1.753480966. Every case retains fast hold +0.305365686 ns and zero all-corner electrical counts. These fixed-SPEF estimates are not physical closure.
+- Shared gate sizing improves global setup more than shortening the three selected delay cells, which exposes another endpoint. Prepared five-case cumulative diagnostic using twelve eligible existing gate instances selected by largest arc delays across five slow failing endpoint reports: baseline/top2/top4/top8/top12. No delay-cell changes. Existing master/connectivity guards pass all cumulative candidates; Python and YAML parse.
+- Next inspect setup/hold/electrical tradeoffs and new limiting paths; any promising sizing result still needs a reproducible legal stock-flow implementation and routed validation. Main RTL and official workflow unchanged.
+
+
 ## 2026-11-12 — Reject retained selector; prepare fixed-RC sensitivity
 
 - Retained masks raise area to 415422.4914 um2 and reduce slow mapped flop/SRAM slack to 3.275/4.605 ns versus 5.685/6.160 baseline. Reject; no physical screen.

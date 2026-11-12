@@ -36,7 +36,8 @@ def validate(root, selected):
             matched = actual == expected
         elif isinstance(expected, list):
             allowed = ((key == 'EXTRA_EXCLUDED_CELLS' and expected in (
-                ['sg13cmos5l_dlygate4sd3_1'], ['sg13cmos5l_buf_1']))
+                ['sg13cmos5l_dlygate4sd3_1'], ['sg13cmos5l_buf_1'],
+                ['sg13cmos5l_buf_1', 'sg13cmos5l_nand2_1', 'sg13cmos5l_nor3_1']))
                 or (key == 'GRT_LAYER_ADJUSTMENTS' and expected == [0, 0, 0.08, 0, 0]))
             if not allowed:
                 raise ValueError('Unreviewed cell exclusion')
@@ -92,8 +93,18 @@ def validate(root, selected):
     if 'EXTRA_EXCLUDED_CELLS' in selected['changes']:
         text = one(root, '*-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v').read_text()
         excluded = selected['changes']['EXTRA_EXCLUDED_CELLS'][0]
-        if re.search(r'\b' + re.escape(excluded) + r'\s+\S+\s*\(', text):
-            raise ValueError('Excluded cell remains in final netlist: ' + excluded)
+        for master in selected['changes']['EXTRA_EXCLUDED_CELLS']:
+            if re.search(r'\b' + re.escape(master) + r'\s+\S+\s*\(', text):
+                raise ValueError('Excluded cell remains in final netlist: ' + master)
+        if len(selected['changes']['EXTRA_EXCLUDED_CELLS']) == 3:
+            synth = one(root, '*-yosys-synthesis/tt_um_tripwire.nl.v').read_text()
+            for master in selected['changes']['EXTRA_EXCLUDED_CELLS']:
+                if re.search(r'\b' + re.escape(master) + r'\s+\S+\s*\(', synth):
+                    raise ValueError('Excluded cell remains in synthesis: ' + master)
+            for master in ('sg13cmos5l_nand2_2', 'sg13cmos5l_nor3_2'):
+                if not re.search(r'\b' + re.escape(master) + r'\s+\S+\s*\(', synth):
+                    raise ValueError('Missing stronger mapped logic: ' + master)
+            result['native_gate_exclusions_verified'] = True
         counts = {master: len(re.findall(r'\b' + master + r'\s+\S+\s*\(', text))
                   for master in ('sg13cmos5l_dlygate4sd1_1', 'sg13cmos5l_dlygate4sd2_1',
                                  'sg13cmos5l_buf_1', 'sg13cmos5l_buf_2',

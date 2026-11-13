@@ -1,0 +1,15 @@
+--- a/src/trw_pin_tx.v
++++ b/src/trw_pin_tx.v
+@@ -207,7 +207,11 @@
+     wire [7:0]  r_b  = w_fire ? presc : r_eff;
+     wire [FRAC-1:0] cf_b = w_fire ? {FRAC{1'b0}} : cf_eff;
+ 
+-    wire [16:0] q_sub = {q_b[15], q_b} - {5'd0, h_d};                   // cursor + d * PRESC
++    // Evaluate the cursor subtract before selecting the late mode-dependent base.
++    wire [16:0] q_sub_eq = {eq[15], eq} - {5'd0, h_d};
++    wire [16:0] q_sub_zero = 17'd0 - {5'd0, h_d};
++    wire [16:0] q_sub_m1 = 17'h1ffff - {5'd0, h_d};
++    wire [16:0] q_sub = w_fire ? q_sub_m1 : use_pe ? (pe_m1 ? q_sub_m1 : q_sub_zero) : q_sub_eq;                   // cursor + d * PRESC
+     wire        q_uf  = (q_sub[16:15] == 2'b10);                       // below -32768 ticks (P-G3)
+     wire        late  = !q_sub[16];                                    // earlier than the earliest edge
+     wire        at_m1 = (q_sub[15:0] == 16'hffff) && (r_b == presc);   // exactly the earliest edge

@@ -1,0 +1,100 @@
+{
+  "reference_sha256": "29bdf26b9cf3d1939d8b8efe7833ac7d6ca1042c71e33c7065462f10e3c7951f",
+  "candidate_sha256": "a9833ed0fadaf6059269dc1c426f69b920e3034b26884494899cdaa365e47993",
+  "patch_sha256": "1aa2862a6db69d4fbece1ec11ac86295ff9b4c2a74d1d9ccdf195004327f33a4",
+  "reference_run": 43178099947,
+  "reference_artifact": 13930453234,
+  "reference_config_sha256": "9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac",
+  "changed_files": [
+    "src/trw_pin_tx.v"
+  ],
+  "proof": [
+    {
+      "full": 0,
+      "equivalence_points": 548
+    },
+    {
+      "full": 1,
+      "equivalence_points": 634
+    }
+  ],
+  "local_mapping": {
+    "reference_area_um2": 411236.028,
+    "candidate_area_um2": 415168.4376,
+    "reference_slow_flop_slack_ns": 5.614,
+    "candidate_slow_flop_slack_ns": 5.848,
+    "reference_slow_sram_slack_ns": 6.557,
+    "candidate_slow_sram_slack_ns": 5.848,
+    "scope": "Ideal clock, no routing parasitics; excludes NAND2_1/NOR3_1 in both mappings; not native physical qualification",
+    "endpoint_groups_slow_ns": {
+      "tx_timer": {
+        "reference": 5.901533,
+        "candidate": 7.755704
+      },
+      "fabric_last_seq": {
+        "reference": 6.67754,
+        "candidate": 6.844627
+      },
+      "bitsync_timer": {
+        "reference": 6.544236,
+        "candidate": 6.53256
+      }
+    }
+  },
+  "protocol_replay": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "tests": [
+      "test_l3_uart_tx",
+      "test_l3_uart_rx_framing",
+      "test_l3_midi_tx",
+      "test_l3_dmx_tx",
+      "test_l3_ws2812_tx",
+      "test_l3_dshot_tx",
+      "test_l3_servo_pwm",
+      "test_l3_i2s",
+      "test_l3_spi_controller",
+      "test_l3_i2c_controller",
+      "test_l3_spi_target",
+      "test_l3_i2c_target",
+      "test_l3_ps2_device_to_host",
+      "test_l3_ps2_host_to_device",
+      "test_l3_onewire_read_rom",
+      "test_l3_jtag_idcode",
+      "test_l3_smbus_word_pec",
+      "test_l3_swd_dpidr_read_with_wait_retry",
+      "test_l3_hdlc_tx_loopback",
+      "test_l3_lin_commander_publish_response",
+      "test_l3_can_standard_frame_and_ack",
+      "test_l3_ir_nec_repeat_rx"
+    ],
+    "xml_sha256": "4c2a42913261e9e3355668312f551b3d2ccf22d2f20656a61e8513099ad5a867",
+    "source_sha256": "a9833ed0fadaf6059269dc1c426f69b920e3034b26884494899cdaa365e47993",
+    "simulation": "Verilator RTL; TRIPWIRE_SKIP_SIGROK=1; independent waveform/model assertions enabled",
+    "seed": 1794529447,
+    "elapsed_seconds": 395.48
+  },
+  "physical_qualified": false,
+  "official_gds_signoff": false,
+  "reproduction": {
+    "proofs": [
+      {
+        "full": 0,
+        "frac": 8,
+        "equivalence_points": 548,
+        "induction_sequence_cap": 6
+      },
+      {
+        "full": 1,
+        "frac": 8,
+        "equivalence_points": 634,
+        "induction_sequence_cap": 6
+      }
+    ],
+    "arithmetic_negative_control_rejected": true,
+    "yosys": "Yosys 0.69+24 (git sha1 d0e71cfb7-dirty, Release, Clang /usr/bin/clang++ 21.1.8)",
+    "verifier_sha256": "557aea99824085267278c21df2b034481eba99c45252da43bfcd2a8b1e2996d2",
+    "scope": "TX module equivalence at FRAC=8, FULL=0/1; not full-chip formal or physical qualification"
+  }
+}

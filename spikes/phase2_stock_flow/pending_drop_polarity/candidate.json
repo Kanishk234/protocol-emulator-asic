@@ -62,7 +62,9 @@
     "seed": 1794556251,
     "scope": "Verilator RTL; optional sigrok annotations disabled, independent waveform/model assertions retained"
   },
-  "native_screen_prepared": false,
+  "native_screen_prepared": true,
   "physical_qualified": false,
-  "official_gds_signoff": false
+  "official_gds_signoff": false,
+  "reference_config_sha256": "9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac",
+  "antenna_audit_run": 43389395358
 }

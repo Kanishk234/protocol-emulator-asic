@@ -3,6 +3,10 @@ name: gds-official-dev4-tx-cursor-screen
 run-name: Stock dev4 TX cursor subtract-before-select screen (8x4)
 'on':
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+    - .github/workflows/gds-official-dev4-tx-cursor-screen.yaml
 permissions:
   contents: read
 concurrency:

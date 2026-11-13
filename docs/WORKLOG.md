@@ -7632,3 +7632,17 @@ Checklist boxes ticked: none.
 Next: publish/launch the read-only pending-drop antenna audit, finish the polarity trial replay, and choose the next native source trial from the actual geometry evidence. Keep every strict gate; no route continuation from the failed screen. A future green screen still requires extracted timing, zero physical/electrical violations, final-netlist verification and the unchanged official GDS flow.
 
 Pending-drop trial completion before publication: full22-case RTL replay passes22/22, zero failed/skipped (266.25s), source/XML hashes recorded. The read-only audit remains the next external measurement; no new physical screen is launched.
+
+Audit launch confirmed: published scoped commits44181bb/298902d/048a404/b0830b8 to remote main. [Read-only pending-drop geometry audit43389395358](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43389395358) is in progress; normal lint/test/docs/unit also started. No native repair screen or DRT was launched. This launch note is local to avoid another docs-only CI wave; next step is inspect its exact before/after ratios and then choose the physical source trial. All local protocol replays described above are complete.
+
+## 2026-11-13: Codex (phase 2: select pending-event native screen from audit)
+
+Done:
+- Read successful audit43389395358: same pending-drop pin's Metal3 cumulative247.10→299.34 and required19984→200. Protection credit is lost at Metal3 after late repair/reroute; final Metal4 has credit. This is not evidence of physical diode deletion. The selector bank is not selected for this offender.
+- Prepared a separate native pending-polarity screen with the exact TX source/config and one port-file delta. No new state/cycle, clock change, constraint change, checkpoint repair, selector bank or lint cleanup. It keeps the native engine commands and every acceptance step identical.
+- Four source/gate guards pass; actionlint passes. A fresh HEAD archive, verified cached macros and the exact preparation steps reproduce every tested Verilog/header and unchanged config9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac;8×4 preflight passes. Local harness was corrected to expand the Actions matrix expression before execution; no workflow fix was needed.
+- Recorded D-177 and audit measurements. Full22-case replay and six port-width proofs already pass. Actual physical benefit is pending; source/area/timing evidence is not an antenna guarantee.
+
+Checklist boxes ticked: none.
+
+Next: publish scoped helper, separate screen and evidence, then inspect its final native timing/electrical/antenna/overflow gates. No DRT unless all pass. Keep official GDS jobs and main hardware untouched until the chosen source qualifies for deliberate integration.

@@ -25,3 +25,9 @@ The narrow selector-word staging bank is not selected for this changed offender.
 A new local trial stores the pending-drop event with complemented internal polarity. It adds no state or architectural cycle, preserves public counter/clear/reset timing, and passes module equivalence at N=1/5/6/7/9/16 plus a wrong-polarity negative control. Local mapping retains the changed encoding; C2's final D driver is OR2 instead of the reference physical NOR4. Mapped area415168.4376→414910.6416µm², slow minimum5.848→5.944ns, SRAM5.848→6.588ns. These are matched no-wire estimates, not physical gains. Its full22-case replay passes22/22, zero failed/skipped (266.25s), with source/XML hashes recorded; no native screen is prepared or launched. Audit geometry first, then choose a source-based/native remedy with every acceptance gate retained.
 
 The official GDS jobs, main hardware/config and signoff constraints remain unchanged. Phase2 remains open.
+
+## Exact audit result and selected next screen
+
+Read-only audit43389395358 succeeds on both hash-bound ODBs. At Metal3 the same pin's cumulative ratio changes247.10→299.34, and the required ratio changes19984.00→200.00. At Metal2 it changes60.89→113.64 with required200 throughout. In the final view, protection credit is present at Metal4 (required19984); do not infer diode deletion from the layer-credit shift.
+
+Prepare the separate `gds-official-dev4-pending-polarity-screen` from the exact TX screen source, applying only the port encoding patch. Four source/gate tests pass, actionlint passes, and fresh source preparation plus8×4 preflight reproduces every tested Verilog/header and the unchanged config9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac. Local replay remains22/22 passed. The new physical result is pending; no gate is relaxed and no DRT is authorized from the failed TX checkpoint.

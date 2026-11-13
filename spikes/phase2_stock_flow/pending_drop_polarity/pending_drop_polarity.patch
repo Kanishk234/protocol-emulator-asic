@@ -1,0 +1,26 @@
+--- a/src/trw_chan_port.v
++++ b/src/trw_chan_port.v
+@@ -117,7 +117,8 @@
+     // Accumulation consumes the previous event; only the narrow event registers
+     // depend on the late producer/drop decision.
+     reg [7:0] count_base;
+-    reg pending_drop;
++    reg pending_drop_n;
++    wire pending_drop = !pending_drop_n;
+     reg pending_clear;
+     wire [7:0] count_incremented = (&count_base) ? count_base : count_base + 8'd1;
+     assign dropped = pending_drop ? count_incremented
+@@ -125,11 +126,11 @@
+     always @(posedge clk) begin
+         if (!rst_n) begin
+             count_base    <= 8'd0;
+-            pending_drop  <= 1'b0;
++            pending_drop_n <= 1'b1;
+             pending_clear <= 1'b0;
+         end else begin
+             count_base    <= dropped;
+-            pending_drop  <= drop_inc;
++            pending_drop_n <= !drop_inc;
+             pending_clear <= clr_dropped;
+         end
+     end

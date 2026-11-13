@@ -1,0 +1,68 @@
+{
+  "reference_run": 43338175616,
+  "reference_artifact_id": 14001142224,
+  "reference_source_sha": "b477486f2d3ba5fbcb1a98bb5a87b5c93375d9b3",
+  "reference_sha256": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb",
+  "candidate_sha256": "5adc1986d81d2ba17f535b85de6faa4661d00002141a6143d22227246ff373c2",
+  "patch_sha256": "c1401e0046b65831ed24a488b904c52838f0f0156561d0c0018370f9477ce435",
+  "changed_files": [
+    "src/trw_chan_port.v"
+  ],
+  "proofs": [
+    {
+      "sources": 1,
+      "equivalence_points": 117,
+      "induction_sequence_cap": 6
+    },
+    {
+      "sources": 5,
+      "equivalence_points": 121,
+      "induction_sequence_cap": 6
+    },
+    {
+      "sources": 6,
+      "equivalence_points": 122,
+      "induction_sequence_cap": 6
+    },
+    {
+      "sources": 7,
+      "equivalence_points": 123,
+      "induction_sequence_cap": 6
+    },
+    {
+      "sources": 9,
+      "equivalence_points": 125,
+      "induction_sequence_cap": 6
+    },
+    {
+      "sources": 16,
+      "equivalence_points": 132,
+      "induction_sequence_cap": 6
+    }
+  ],
+  "wrong_polarity_negative_control_rejected": true,
+  "scope": "Complement the internal pending-drop storage bit; public count/clear/reset/update timing unchanged; no added state or architectural cycle",
+  "mapped_encoding_retained": true,
+  "local_mapping": {
+    "reference_area_um2": 415168.4376,
+    "candidate_area_um2": 414910.6416,
+    "reference_slow_flop_slack_ns": 5.848,
+    "candidate_slow_flop_slack_ns": 5.944,
+    "reference_slow_sram_slack_ns": 5.848,
+    "candidate_slow_sram_slack_ns": 6.588,
+    "scope": "Matched full-chip ideal20ns STA, no routed parasitics; not native signoff or antenna closure"
+  },
+  "protocol_replay": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed_seconds": 266.25,
+    "source_sha256": "5adc1986d81d2ba17f535b85de6faa4661d00002141a6143d22227246ff373c2",
+    "xml_sha256": "92bf76112317ce490a2a66ddb7ebd3a3c4a8b2e4e9ce9bcc77099a91865ce76d",
+    "seed": 1794556251,
+    "scope": "Verilator RTL; optional sigrok annotations disabled, independent waveform/model assertions retained"
+  },
+  "native_screen_prepared": false,
+  "physical_qualified": false,
+  "official_gds_signoff": false
+}

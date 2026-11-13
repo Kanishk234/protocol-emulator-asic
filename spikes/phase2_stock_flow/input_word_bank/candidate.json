@@ -105,7 +105,19 @@
     "candidate_slow_flop_slack_ns": 5.854,
     "reference_slow_sram_slack_ns": 5.848,
     "candidate_slow_sram_slack_ns": 6.285,
-    "protocol_replay": "running locally; no result yet"
+    "protocol_replay": {
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "elapsed_seconds": 362.01,
+      "source_sha256": {
+        "trw_pin_cfg.v": "aebac8c221ee2033ee4705f3be881c6588f539e0496bc46a72aff89a6ffe7c7d",
+        "trw_pin_tx.v": "a9833ed0fadaf6059269dc1c426f69b920e3034b26884494899cdaa365e47993"
+      },
+      "xml_sha256": "0767cefac84542b38fa903055aa6bcdce7e24e65b4e061a90824f916d2d564bc",
+      "seed": 1794533020,
+      "scope": "Verilator RTL; sigrok annotations disabled, independent waveform/model assertions retained"
+    }
   },
   "source_application": {
     "tests_passed": 3,

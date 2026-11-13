@@ -7615,3 +7615,20 @@ Done:
 Checklist boxes ticked: none.
 
 Next: finish the combined-source replay and inspect the current native screen's all-corner timing, electrical, fresh antenna and overflow gates. Route only if all screen gates pass. If its antenna residual is still the selector-word branch, consider the narrow bank on that exact source; otherwise diagnose the actual remaining path before launching another physical job. Integrate the lint cleanup only with the selected source and retain the unchanged official GDS jobs and acceptance requirements.
+
+## 2026-11-13: Codex (phase 2: identify changed TX antenna offender)
+
+Done:
+- Checked main: lint43344530641, test43344530649, docs43344530828 and unit43344530678 pass. TX native screen43338175616 completes native generation and both timing audits, then fails only1antenna net/pin; final overflow/electrical counts0, estimated hold fast/typ/slow0.130753/0.326490/0.662409ns, setup0/clamped. No DRT launched.
+- Downloaded artifact14001142224 outside the repo. The offender is now `_01949_`→`_48904_/D`, Q=`u_chip.u_fab.u_c2.pending_drop`, driven by NOR4`_44864_`. The original selector-word offender is not reported, so the prepared selector-bank fallback is not selected for this result.
+- Identified a misleading summary display: partial ratio185.70/200 looks below limit, but the detailed violated Metal3 cumulative rule is299.34/200. Final failure is genuine. Placement Manhattan distance139.08µm is below wire200 and is not routed length.
+- Pre-timing antenna report is clean; native late hold repair inserts23 buffers and reroutes before the new violation appears. Prepared an exact read-only before/after ODB audit using the already proven stock audit command, bound to source/ODB hashes and target pin. Source/API/artifact binding, Python compilation and actionlint pass; runtime awaits publication.
+- Combined TX-plus-selector-bank local replay completes22/22 cases, zero failures/skips (362.01s). Updated source/XML receipt. Preserve as a fallback rather than applying it to an unrelated net.
+- Tested complemented internal pending-drop storage as a new general one-file implementation trial. Module proofs pass N=1/5/6/7/9/16 (117/121/122/123/125/132 points); wrong-polarity mutation fails. Mapped encoding remains, final C2 D driver becomes OR2. Area415168.4376→414910.6416µm², ideal slow minimum5.848→5.944ns and SRAM5.848→6.588ns. Full22-case replay is running; no physical benefit, integration or native-screen result claimed.
+- Recorded exact findings in docs/reports/PHASE2_TX_SCREEN_RESULT_43338175616.md. Main hardware/config, SDC and official jobs remain unchanged; unrelated dirty/untracked files preserved.
+
+Checklist boxes ticked: none.
+
+Next: publish/launch the read-only pending-drop antenna audit, finish the polarity trial replay, and choose the next native source trial from the actual geometry evidence. Keep every strict gate; no route continuation from the failed screen. A future green screen still requires extracted timing, zero physical/electrical violations, final-netlist verification and the unchanged official GDS flow.
+
+Pending-drop trial completion before publication: full22-case RTL replay passes22/22, zero failed/skipped (266.25s), source/XML hashes recorded. The read-only audit remains the next external measurement; no new physical screen is launched.

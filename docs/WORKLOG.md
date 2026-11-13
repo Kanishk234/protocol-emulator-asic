@@ -7572,3 +7572,6 @@ Next: require22/22 protocol replay and complete clean-source candidate/preflight
 
 
 TX cursor pre-publication completion: all22 L3 cases pass (395.48s), source-bound XML receipt recorded. Final one-file application and8×4 preflight pass in a fresh HEAD archive; every candidate Verilog/header matches the tested source and config remains9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac. Used verified cached macro views after restricted local network blocked an initial download. No gate or source workaround was applied. Ready for native screen; no physical result or checklist closure yet.
+
+
+TX cursor publication: pushed scoped tools7fb93d0, separate screenaf15194 and evidence91e2665 to remote main (remote SHA confirmed91e266533bf5e6ce0e3291d2f3ec5382ed95ae2f). GitHub starts the four normal push checks; lint/docs/test already pass at the latest check. Actions repeatedly returns404 for the new manual workflow despite the file existing on default main and passing actionlint. Add a push trigger restricted to this diagnostic workflow's own file as a registration/launch fallback; no official workflow, runtime, design or gate changes. Do not claim a physical launch until an actual run ID exists.

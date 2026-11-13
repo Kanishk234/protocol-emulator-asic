@@ -1,0 +1,124 @@
+{
+  "reference_run": 43178099947,
+  "reference_artifact_id": 13930453234,
+  "reference_config_sha256": "9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac",
+  "reference_sha256": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+  "candidate_sha256": "aebac8c221ee2033ee4705f3be881c6588f539e0496bc46a72aff89a6ffe7c7d",
+  "patch_sha256": "7d2676b2768e29bbe3c8449f18e870ecca5fc905ab50b9a686f5b342edeea064",
+  "changed_files": [
+    "src/trw_pin_cfg.v"
+  ],
+  "purpose": "Localize staged data for the pin-selector/event configuration word; preserve existing latches, word gates, carrier-predicate staging and write/reset visibility",
+  "proofs": [
+    {
+      "full": 0,
+      "equivalence_points": 461
+    },
+    {
+      "full": 1,
+      "equivalence_points": 560
+    }
+  ],
+  "phase_simulation": {
+    "full_modes": [
+      0,
+      1
+    ],
+    "cycles_each": 133152,
+    "comparisons_each": 665760,
+    "exhaustive_word": 3,
+    "data_values_per_reset_polarity": 65536
+  },
+  "wrong_word_negative_control_rejected": true,
+  "local_mapping": {
+    "scope": "Full chip, ideal20ns clock, no routing parasitics; same NAND2_1/NOR3_1 exclusions as reference",
+    "reference_area_um2": 411236.028,
+    "candidate_area_um2": 414652.8078,
+    "reference_flops": 2414,
+    "candidate_flops": 2458,
+    "latches": 2071,
+    "slow_flop_slack_ns": {
+      "reference": 5.614,
+      "candidate": 6.082
+    },
+    "slow_sram_slack_ns": {
+      "reference": 6.557,
+      "candidate": 6.173
+    },
+    "slow_group_slack_ns": {
+      "tx_timer": {
+        "reference": 5.901533,
+        "candidate": 6.483136
+      },
+      "fabric_last_seq": {
+        "reference": 6.67754,
+        "candidate": 6.841258
+      },
+      "bitsync_timer": {
+        "reference": 6.544236,
+        "candidate": 6.081669
+      }
+    }
+  },
+  "protocol_replay": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "tests": [
+      "test_l3_uart_tx",
+      "test_l3_uart_rx_framing",
+      "test_l3_midi_tx",
+      "test_l3_dmx_tx",
+      "test_l3_ws2812_tx",
+      "test_l3_dshot_tx",
+      "test_l3_servo_pwm",
+      "test_l3_i2s",
+      "test_l3_spi_controller",
+      "test_l3_i2c_controller",
+      "test_l3_spi_target",
+      "test_l3_i2c_target",
+      "test_l3_ps2_device_to_host",
+      "test_l3_ps2_host_to_device",
+      "test_l3_onewire_read_rom",
+      "test_l3_jtag_idcode",
+      "test_l3_smbus_word_pec",
+      "test_l3_swd_dpidr_read_with_wait_retry",
+      "test_l3_hdlc_tx_loopback",
+      "test_l3_lin_commander_publish_response",
+      "test_l3_can_standard_frame_and_ack",
+      "test_l3_ir_nec_repeat_rx"
+    ],
+    "elapsed_seconds": 415.76,
+    "seed": 1794532366,
+    "xml_sha256": "707e5fbd9a25430dc40ae0c047607edffad45d024ecb3ba14ffed8aaefcc2a04",
+    "source_sha256": "aebac8c221ee2033ee4705f3be881c6588f539e0496bc46a72aff89a6ffe7c7d",
+    "scope": "Verilator RTL, sigrok annotations disabled; independent protocol waveform/model assertions enabled"
+  },
+  "physical_screen_prepared": false,
+  "physical_qualified": false,
+  "official_gds_signoff": false,
+  "tx_source_interaction": {
+    "scope": "Local mapping of the existing TX candidate plus this configuration-only bank; not physical or protocol qualification",
+    "reference_area_um2": 415168.4376,
+    "candidate_area_um2": 417164.0508,
+    "reference_slow_flop_slack_ns": 5.848,
+    "candidate_slow_flop_slack_ns": 5.854,
+    "reference_slow_sram_slack_ns": 5.848,
+    "candidate_slow_sram_slack_ns": 6.285,
+    "protocol_replay": "running locally; no result yet"
+  },
+  "source_application": {
+    "tests_passed": 3,
+    "actual_prepared_reference_tested": true,
+    "tx_source_and_config_hashes_preserved": true
+  },
+  "liberty_verification": {
+    "local_cached_pdk_revision": "2bbec755dc67ca3db0261c3d6163e15735d66710",
+    "native_pdk_revision": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+    "identical_standard_cell_liberty_sha256": {
+      "typ_1p20V_25C": "34163f3e7de9f854afac57332ba06f1739b78e7ac35660a8a5ddd39c570124ad",
+      "slow_1p08V_125C": "3ee222c580ba33acb2131ac2bf224ff8ee9700751835b73aaec72b670bb31d3c"
+    },
+    "scope": "Two standard-cell timing files used in local mapping/STA are byte-identical; does not establish identity of engines, physical technology or constraints"
+  }
+}

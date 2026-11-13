@@ -1,0 +1,26 @@
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -166,6 +166,14 @@
+         end
+     end
+ 
++    // Local staging for the pin-selector/event word; word gates retain their visibility.
++    localparam integer INPUT_WORD = `TRW_PC_PIN_N_LSB / 16;
++    reg [15:0] wdata_input;
++    always @(posedge clk) begin
++        if (!rst_n) wdata_input <= 16'd0;
++        else if (we && (waddr == INPUT_WORD[4:0])) wdata_input <= wdata;
++    end
++
+     genvar w, b;
+     generate
+         for (w = 0; w < NW; w = w + 1) begin : g_word
+@@ -211,7 +219,7 @@
+                         end else begin : g_latched
+                             always @* begin
+                                 if (gclk)
+-                                    q = ((w % 2) != 0) ? wdata_odd[b] : wdata_even[b];
++                                    q = (w == INPUT_WORD) ? wdata_input[b] : ((w % 2) != 0) ? wdata_odd[b] : wdata_even[b];
+                             end
+                         end
+                         assign cfg[16*w + b] = q;

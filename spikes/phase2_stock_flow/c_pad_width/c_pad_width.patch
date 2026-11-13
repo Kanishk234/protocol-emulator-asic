@@ -1,0 +1,11 @@
+--- a/src/trw_pin_io.v
++++ b/src/trw_pin_io.v
+@@ -45,7 +45,7 @@
+     always @* begin
+         c_pad = 1'b0;
+         for (c_pi=0; c_pi<24; c_pi=c_pi+1)
+-            c_pad = c_pad | (pads[c_pi] && (pin_c == c_pi));
++            c_pad = c_pad | (pads[c_pi] && (pin_c == c_pi[4:0]));
+     end
+ 
+     assign a_in = a_on ? a_pad : idle;

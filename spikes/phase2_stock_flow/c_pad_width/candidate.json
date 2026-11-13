@@ -1,0 +1,37 @@
+{
+  "reference_sha256": "d11a88346a39378b0dc763b9a4c4cdb196e7069f88bc9c24b71564a1593e90b7",
+  "candidate_sha256": "a9ca5b64631524be4f41090e61abf507822317f02303b3054dca3060130c2958",
+  "patch_sha256": "d468e106fa2bda057e888e59992de49da2893d04f82849fa726619a8b6f78f6f",
+  "changed_files": [
+    "src/trw_pin_io.v"
+  ],
+  "reference_run": 43178099947,
+  "reference_artifact_id": 13930453234,
+  "reference_module": "trw_pin_io",
+  "equivalence": {
+    "passed": true,
+    "proven_points": 53,
+    "unproven_points": 0,
+    "scope": "Pin IO module, all public outputs and internal correspondence points; no input assumptions or blacklists",
+    "proof_commands": [
+      "read_verilog -Isrc gold.v gate.v",
+      "proc",
+      "opt",
+      "equiv_make trw_pin_io_gold trw_pin_io_gate equiv",
+      "hierarchy -top equiv",
+      "equiv_simple",
+      "equiv_induct -seq 6",
+      "equiv_status -assert"
+    ],
+    "negative_control": "Index truncated to4bits instead of5; rejected at c_pad equivalence point"
+  },
+  "whole_chip_lint": {
+    "passed": true,
+    "command": "verilator --lint-only -Wall scripts/ci/promoted_rtl.vlt -I<prepared-src> --top-module trw_chip <all chip RTL and macro model>",
+    "scope": "Both prepared native-drive2/4 reference and the active TX-cursor2/4 candidate with this sole width cleanup; no WIDTHEXPAND suppression"
+  },
+  "behavior_change": false,
+  "physical_timing_gain_claimed": false,
+  "main_source_modified": false,
+  "integration_pending": true
+}

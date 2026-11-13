@@ -1,0 +1,51 @@
+# Read-only comparison; no timing/placement/routing repair or official job changes.
+name: gds-tx-cursor-antenna-audit
+'on':
+  workflow_dispatch: {}
+  push:
+    branches:
+    - main
+    paths:
+    - .github/workflows/gds-tx-cursor-antenna-audit.yaml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-tx-cursor-antenna-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+    - name: Check out tools
+      uses: actions/checkout@v6
+    - name: Bind exact TX-cursor run
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: gh api repos/${{ github.repository }}/actions/runs/43338175616 > tx-cursor-source-run.json
+    - name: Download exact TX-cursor checkpoints
+      uses: actions/download-artifact@v7
+      with:
+        name: official-dev4-tx-cursor-43338175616
+        run-id: 43338175616
+        github-token: ${{ github.token }}
+        path: frozen-screen
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+    - name: Pull exact stock physical engine
+      run: docker pull ghcr.io/librelane/librelane@sha256:af2405f5d48d8fe14d406ecce913811177a95e365e3b625859677307cace2469
+    - name: Compare unchanged antenna geometry
+      run: python scripts/ci/tx_cursor_antenna_audit.py
+    - name: Upload target-net evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: tx-cursor-antenna-audit-${{ github.run_id }}
+        path: 'runs/tx-cursor-antenna-audit/**
+
+          tx-cursor-source-run.json'
+        if-no-files-found: warn
+run-name: TX pending-drop antenna geometry audit

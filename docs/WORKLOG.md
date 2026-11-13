@@ -7532,3 +7532,43 @@ Next:
 Mode-replica follow-up: same-polarity mapping completes at 406057.1634 um2, slow flop/SRAM slack 5.022/5.022 ns. It contains only 2071 latches, so synthesis merged the duplicate despite retained RTL signals. This variant does not establish physical load splitting and is rejected. Complemented variant retains the extra latch but worsens global mapped setup. Neither is promoted or physically screened.
 
 Cumulative sizing residual review: top12 worst path remains the same U0 bitsync_active latch to u_c1.last_seq endpoint _48106_, with unchanged three delay cells totaling about 1.971783 ns. Remaining largest logic arcs include NAND3 _37956_ 0.715549 ns, O21AI _24559_ 0.616114 ns, NAND4 _30152_ 0.562209 ns. Several have no stronger same-function master in the library, limiting simple upsizing. Next bounded sensitivity should combine measured gate changes with endpoint-aware delay-cell choices across failing paths, retaining all-corner hold/electrical checks; no physical buffer deletion is justified.
+
+## 2026-11-12: Codex (phase 2: retire wire175 and assess configuration storage)
+
+Done:
+- Checked main Actions: no active runs. Wire175 screen 43294055929 completed with failure at the strict antenna gate (2 nets/pins), with zero electrical violations and zero global-route overflow. No detailed routing launched.
+- Reviewed an isolated word-3 root-clock configuration-flop prototype. Configuration phase proofs pass 459/558 points for FULL=0/1; exhaustive phase simulations pass in both modes. A wrong-reset negative control fails after initialization as intended.
+- Matched full-chip local mapping increases area 411236.0280→413170.7832 µm² and regresses slow flop slack 5.614→5.137 ns without parasitics. This is not evidence of physical timing improvement; no screen was launched. Full 22-case L3 replay remains running locally.
+- Recorded measurements and limitations in docs/reports/PHASE2_CONFIG_WORD3_STORAGE_REVIEW.md. Main RTL/config and official template jobs are unchanged; unrelated working-tree files are preserved.
+
+Checklist boxes ticked: none.
+
+Next: finish local protocol replay; assess a bounded structural candidate against both the extracted setup paths and native antenna failure before spending another physical run. Require every screen gate before detailed routing, and extracted signoff before any Phase 2 closure claim.
+
+
+## 2026-11-12: Codex (phase 2: finish storage replay and reject narrow follow-up)
+
+Done:
+- Full word-3 storage prototype completed all 22 L3 RTL replay cases: 22 passed, zero failed/skipped, 420.53 seconds. This covers the suite's demonstrated protocol transactions, not every protocol behavior or routed timing.
+- Tested a narrower PIN_N-only flop variant locally. FULL=0/1 configuration proofs pass 461/560 points, and both exhaustive phase simulations pass. Mapped area is 411911.5896 µm²; slow flop/SRAM slack is 5.053/5.927 ns versus the matched reference 5.614/6.557 ns. Rejected it before physical screening.
+- Both candidates remain scratch-only; no hardware/config/template edits, publication or physical launch. Updated configuration-storage review with completed results. No main workflows are active at the latest check.
+
+Checklist boxes ticked: none. Phase 2 remains blocked by extracted slow setup and qualification of the stronger-drive recipe's antenna repair.
+
+Next: prepare a bounded setup-path structural experiment that addresses the mode-to-timer/control cone; preserve all config write/reset semantics, protocol timing, native flow and strict acceptance gates. Do not rerun the rejected storage variants.
+
+## 2026-11-12: Codex (phase 2: prepare subtract-before-select TX candidate)
+
+Done:
+- Implemented one isolated TX-file experiment that evaluates cursor subtraction before the late WAIT/burst base selection. Main RTL/config and official template jobs remain unchanged.
+- Reproduced TX equivalence for FULL=0/1, FRAC=8 (548/634 points, induction sequence cap6) and verified rejection of an arithmetic negative control.
+- Matched local mapping improves slow worst flop slack5.614→5.848ns and TX timer-group slack5.901533→7.755704ns, with mapped area411236.0280→415168.4376µm². SRAM slack regresses6.557→5.848ns; BITSYNC timer is nearly unchanged. These are no-wire estimates, not physical closure.
+- Prepared hash-bound source applicator, proof reproducer, separate native screen and D-175/report.34 focused checks pass; workflow shell blocks parse. Clean reference source/config preparation passes using verified cached macro views. Full protocol replay is on its final case (21/22 passed at this entry).
+- Strict local lint exposes an existing C-pad width warning in both reference and candidate. No additional lint warnings remain after locally filtering WIDTHEXPAND; this is not a strict-lint pass. Logged the open promotion-cleanup issue in BUGS.md without changing the IO file or screen acceptance gates.
+
+Checklist boxes ticked: none.
+
+Next: require22/22 protocol replay and complete clean-source candidate/preflight rehearsal, then publish and launch the one-file native screen under the standing publication approval. Do not launch detailed routing unless all strict screen gates pass.
+
+
+TX cursor pre-publication completion: all22 L3 cases pass (395.48s), source-bound XML receipt recorded. Final one-file application and8×4 preflight pass in a fresh HEAD archive; every candidate Verilog/header matches the tested source and config remains9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac. Used verified cached macro views after restricted local network blocked an initial download. No gate or source workaround was applied. Ready for native screen; no physical result or checklist closure yet.

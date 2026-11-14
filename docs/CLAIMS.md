@@ -47,6 +47,10 @@ D-138 is a prepared physical diagnostic, not a new passing-design claim. Its sou
 
 | 21 | The isolated constant-bank root-clock storage prototype preserves the checked slot-module behavior and passes the matched22-case RTL protocol suite | slot_root_storage/evidence.json; verify_slot_root_storage.py:768ASIC/752FPGA equivalence points, inductioncap6; mapped IHP-cell3125cycle/12288phase replay and wrong-reset negative control; XMLSHA880b91a24b74fcdc4e9d160948338da8f1d5249c9895d58cde6b4d0e8e16db79 | tested | Prototype only; no whole-chip formal, final routed GL, extracted timing, silicon or official GDS closure. Isolated mapped area is not final physical area. |
 
+| 22 | Candidate43390348317 passes the checked million-clock RTL/model scenario and chip/SRAM RTL tests | Source258186504e4b9f73d2711067e456494def705d2b; pending_drop_polarity/parallel_verification.json binds RTL and XML hashes:1,000,000clocks/zero divergences,6/6chip/SRAM checks | tested | Two lanes/four units/U0full. One deterministic scenario; not exhaustive, refreshed mutation, final GL, silicon, extracted timing or official GDS evidence. |
+
+| 23 | The same checkpoint has positive measured GRT-estimated setup reserve at functional flop/output endpoints | Native read-only audit43629200280: fast12.527966ns/typ8.897943ns/slow2.533495ns,2414flops/24outputs; source view hashes unchanged and ordinary metrics reproduced | tested | Estimated routing only; ordinary latch/all-endpoint checks retained. AggregateWS0 remains clamped. Does not establish extracted timing, antenna/DRC closure or Phase2 completion. |
+
 ## Known limits (state them wherever the related claim appears)
 
 

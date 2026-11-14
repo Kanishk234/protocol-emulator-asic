@@ -7662,3 +7662,33 @@ Done:
 Checklist boxes ticked: none.
 
 Next: publish scoped tools/workflows/evidence, launch the read-only audit and explicitly dispatch the one approved stock DRT diagnostic. Inspect native antenna repair, route DRC and all-corner extracted results; do not promote a failed or merely diagnostic result as Phase2 completion.
+
+Launch confirmed: tools a5a7b36, separate workflows088e0eb and evidence790ee7b pushed to remote main. Read-only functional setup audit43629200280 is in progress. Explicitly dispatched exactly one approved stock DRT diagnostic43629225955 with approved_diagnostic=true; it is restoring the source checkpoint with no failed steps. Push registration run43629200310 correctly skipped routing. No hardware, SDC or official-template edit; no phase box ticked. This run-link note stays local to avoid another docs-only CI wave. Next: inspect audit reports, native route/antenna repair and strict extraction results as each completes.
+
+## 2026-11-14: Codex (phase 2: rank closure ideas against current diagnostics)
+
+Done:
+- Checked active diagnostics: stock DRT43629225955 is rechecking source/timing/electrical admission with no failed step; read-only functional setup43629200280 is measuring endpoint reserve with no failed step. No additional physical experiment launched.
+- Ranked highest-value next actions: let native post-DRT antenna repair measure the systemic late-reroute issue; measure actual functional reserve and estimate/extraction error; optimize setup together with native hold-repair burden (latest source adds148late hold buffers versus23in priorTX source); consider configuration-time CRC width/mask/top-bit decode only if extracted critical paths include it; use directed macro/clock locality changes only when measured net/skew delay dominates; prepare exact-source integration and fresh final L2/GL/CI evidence.
+- Verified a material resource distinction directly in generated source: current diagnostic is TRW_LANES=2/TRW_UNITS=4, PULSE/CARRIER/BITSYNC mask0001 (U0full). Main remains3/6 with full-unit mask000011 (U0/U1). Do not describe passing2/4 evidence as validation of3/6 or assume two full engines in the diagnostic. Freeze/reconcile the intended adopted mask/counts when integrating, preserving the user's2/4-first direction.
+- Existing source prototypes that regress relevant endpoint groups remain rejected. No new cache/arithmetic/placement idea is claimed to have physical benefit or to pass Phase2.
+
+Checklist boxes ticked: none.
+
+Next: inspect the two diagnostic outputs, select the next change from actual extracted path delay/hold/clock/RC evidence, and retain the exact source fingerprint through final protocol GL, official GDS/precheck and main CI. Main hardware, official jobs and constraints unchanged.
+
+## 2026-11-14: Codex (phase 2: parallel verification and promotion readiness)
+
+Done:
+- Stock routing diagnostic43629225955 has entered DetailedRouting with no failed steps. Read-only setup audit43629200280 succeeds and preserves source views/baseline metrics.
+- Actual estimated functional setup reserve is fast12.527966ns, typical8.897943ns, slow2.533495ns, inventory2414flops/24outputs. This removes the earlier ambiguity from clamped-zero aggregate reports but does not establish extracted closure.
+- Decoded the current slow frontier: U1 PIN_A[4]→U2 RX rt[23]. Seven hold-cell arcs total4.752074ns. Do not subtract those delays or remove cells without per-endpoint fast-corner checks.
+- Ran exact-candidate chip/SRAM-rotation RTL checks:6/6 pass. Fresh one-million-clock L2 RTL/model lockstep is running with no divergence reported at the latest700000clock update; completion not yet claimed. Source_identity.json binds every RTL/header to the routing input.
+- Clean prepared candidate generator check passes. Reviewed clean-checkout promotion requirements without applying anything: main has no tracked macro views, whereas the candidate references8 local SRAM views totaling1,103,560bytes. Macro availability/provenance must be packaged without template edits.26 source/project config differences and intended2/4/U0full resource contract require explicit reconciliation.
+- Added docs/reports/PHASE2_SOURCE_PROMOTION_PLAN_43390348317.md, review-only. The withdrawn historical promotion bundle is not reused. Main hardware/config, spec, templates and unrelated local files are unchanged.
+
+Checklist boxes ticked: none.
+
+Next: collect million-clock L2 completion, run/refresh mutation evidence if this source is selected, then inspect stock DRT antenna/DRC and extracted all-corner results. Final GL and unchanged official GDS/precheck remain required on the eventual exact adopted source.
+
+Parallel L2 completion: exact candidate258186504e4b9f73d2711067e456494def705d2b compares1,000,000 clocks with zero divergences (527.82s). XML confirms1/1L2 and6/6chip/SRAM checks pass with no skips/failures. No phase checkbox changed; final-source mutation/GL/official physical gates remain outstanding.

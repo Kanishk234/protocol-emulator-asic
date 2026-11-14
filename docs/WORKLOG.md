@@ -7646,3 +7646,19 @@ Done:
 Checklist boxes ticked: none.
 
 Next: publish scoped helper, separate screen and evidence, then inspect its final native timing/electrical/antenna/overflow gates. No DRT unless all pass. Keep official GDS jobs and main hardware untouched until the chosen source qualifies for deliberate integration.
+
+Pending-polarity screen launch confirmed: scoped helperb548f18, screenb4baca6 and docs2581865 pushed to remote main. [Native screen43390348317](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43390348317) is in progress.25 focused checks pass;22 protocol cases and six port-width proofs pass. Latest push test43390348258 already succeeds; lint/docs/unit are running. No DRT or main hardware/template change. This run-link note is local to avoid another docs-only CI wave. Next: inspect the screen's actual final gates before routing or claiming physical improvement.
+
+## 2026-11-14: Codex (phase 2: source-bound stock DRT diagnostic approved)
+
+Done:
+- Screen43390348317 fails only1fresh antenna net/pin; electrical/overflow0 and native estimated hold fast/typ/slow0.107840/0.302408/0.644102ns pass. Setup0/clamped remains inconclusive about usable margin. No source fix is assumed from gate metrics.
+- Exact offender is lane0ot12→hold11230/A (dlygate4sd3), Metal2 ratio229.04/200. Corrected the initial description: this cell exists before antenna repair; the final timing pass adds148 other buffers and reroutes. Old pending-drop violation is no longer reported.
+- Inspected the pinned dev4 wheel: stock drt.tcl already contains post-DRT antenna check/repair/reroute. User approved one diagnostic of that stock stage on the exact antenna-only failed source, retaining unchanged final gates and no Phase2 claim.
+- Prepared separate manual opt-in routing/extraction workflow and source-bound diagnostic helper. Exact source/inventory/engine/config checks retained; only the initial antenna-only failure is admitted. Screen and diagnostic receipts remain qualified=false. No push can execute routing. Route DRC0 and final extracted gates stay unchanged; test compares the final gate AST with the existing helper.
+- Prepared a parallel read-only functional setup audit: report flop/output reserve, retain ordinary endpoint checks, reproduce baseline metrics and verify unchanged physical-view hashes. No routing/repair/constraint changes.
+-52 focused tests pass; both workflows pass actionlint and shell syntax. Actual downloaded archive inventory/config hash and exact allowed failure set pass. Main hardware/template jobs, SDC and unrelated local files unchanged.
+
+Checklist boxes ticked: none.
+
+Next: publish scoped tools/workflows/evidence, launch the read-only audit and explicitly dispatch the one approved stock DRT diagnostic. Inspect native antenna repair, route DRC and all-corner extracted results; do not promote a failed or merely diagnostic result as Phase2 completion.

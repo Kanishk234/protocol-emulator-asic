@@ -1,0 +1,88 @@
+{
+  "source_run": 43957277296,
+  "source_sha": "f00bf4903ebab1118d89d053de9e483f97a8c92a",
+  "source_hashes": {
+    "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json": "3712406a067835799dd150edec40c98116959b7e907115003328e7b35c14c016",
+    "src/signoff.sdc": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.odb": "5163a4b917e4ec52ce3de679b954f165e6fd3698fd0dfa7a6469952849179908",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.def": "41cfa0d189a5ee108fefc10d179df072900f4c23a660b084f805dc31f4a1f55f",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.nl.v": "ed3fcc3b4f3a67c6e6fa60d46f4163032fb26127be359be01c5f7168e00ff823",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.pnl.v": "3d305dba2f7bd102ade232936d38d07978e5c5664b26427162111908baaff31c",
+    "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/runs/stock-official-baseline/44-openroad-resizertimingpostgrt/tt_um_tripwire.sdc": "0ad3a7c3ea161ef7049b24f8c171a77ad2304f2860c48681fab2a55a16c2ceba"
+  },
+  "functional_setup": {
+    "before-nom_fast_1p32V_m40C": {
+      "corner": "nom_fast_1p32V_m40C",
+      "worst_reported_setup_slack_ns": 12.766801,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "after-nom_fast_1p32V_m40C": {
+      "corner": "nom_fast_1p32V_m40C",
+      "worst_reported_setup_slack_ns": 12.766801,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "before-nom_slow_1p08V_125C": {
+      "corner": "nom_slow_1p08V_125C",
+      "worst_reported_setup_slack_ns": 3.183562,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "after-nom_slow_1p08V_125C": {
+      "corner": "nom_slow_1p08V_125C",
+      "worst_reported_setup_slack_ns": 3.183562,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "before-nom_typ_1p20V_25C": {
+      "corner": "nom_typ_1p20V_25C",
+      "worst_reported_setup_slack_ns": 9.293901,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "after-nom_typ_1p20V_25C": {
+      "corner": "nom_typ_1p20V_25C",
+      "worst_reported_setup_slack_ns": 9.293901,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    }
+  },
+  "source_antenna_violations": 1,
+  "physical_repairs": false,
+  "detailed_routing_performed": false,
+  "stock_uncertainty_ns": 0.25,
+  "legacy_signoff_sdc_selected": false,
+  "qualified": false,
+  "official_signoff": false
+}

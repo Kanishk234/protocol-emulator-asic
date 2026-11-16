@@ -343,3 +343,18 @@ def test_earlier_repair_schedule_verifies_both_native_targets(tmp_path, early, l
     else:
         with pytest.raises(ValueError, match='not exercised'):
             validate(tmp_path, selected)
+
+
+@pytest.mark.parametrize('bad_stage', [None, 'synthesis', 'final'])
+def test_four_exclusions_require_absence_in_synthesis_and_final(tmp_path, bad_stage):
+    excluded=['sg13cmos5l_buf_1','sg13cmos5l_nand2_1','sg13cmos5l_nor3_1','sg13cmos5l_a22oi_1']
+    selected=fixture(tmp_path, {'EXTRA_EXCLUDED_CELLS':excluded,'SYNTH_BUFFER_CELL':'sg13cmos5l_buf_2/A/X'})
+    for stage,name in [('synthesis','11-yosys-synthesis'),('final','44-openroad-resizertimingpostgrt')]:
+        p=tmp_path/name/'tt_um_tripwire.nl.v'
+        p.parent.mkdir()
+        text='sg13cmos5l_buf_2 b (.A(a),.X(x));\nsg13cmos5l_nand2_2 n (.A(a),.Y(y));\nsg13cmos5l_nor3_2 r (.A(a),.Y(z));\n'
+        if stage==bad_stage:text+='sg13cmos5l_a22oi_1 bad (.A1(a),.Y(b));\n'
+        p.write_text(text)
+    if bad_stage:
+        with pytest.raises(ValueError,match='remains'):validate(tmp_path,selected)
+    else:assert validate(tmp_path,selected)['native_gate_exclusions_verified']

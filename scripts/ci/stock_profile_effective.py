@@ -37,7 +37,8 @@ def validate(root, selected):
         elif isinstance(expected, list):
             allowed = ((key == 'EXTRA_EXCLUDED_CELLS' and expected in (
                 ['sg13cmos5l_dlygate4sd3_1'], ['sg13cmos5l_buf_1'],
-                ['sg13cmos5l_buf_1', 'sg13cmos5l_nand2_1', 'sg13cmos5l_nor3_1']))
+                ['sg13cmos5l_buf_1', 'sg13cmos5l_nand2_1', 'sg13cmos5l_nor3_1'],
+                ['sg13cmos5l_buf_1', 'sg13cmos5l_nand2_1', 'sg13cmos5l_nor3_1', 'sg13cmos5l_a22oi_1']))
                 or (key == 'GRT_LAYER_ADJUSTMENTS' and expected == [0, 0, 0.08, 0, 0]))
             if not allowed:
                 raise ValueError('Unreviewed cell exclusion')
@@ -96,7 +97,7 @@ def validate(root, selected):
         for master in selected['changes']['EXTRA_EXCLUDED_CELLS']:
             if re.search(r'\b' + re.escape(master) + r'\s+\S+\s*\(', text):
                 raise ValueError('Excluded cell remains in final netlist: ' + master)
-        if len(selected['changes']['EXTRA_EXCLUDED_CELLS']) == 3:
+        if {'sg13cmos5l_buf_1', 'sg13cmos5l_nand2_1', 'sg13cmos5l_nor3_1'}.issubset(selected['changes']['EXTRA_EXCLUDED_CELLS']):
             synth = one(root, '*-yosys-synthesis/tt_um_tripwire.nl.v').read_text()
             for master in selected['changes']['EXTRA_EXCLUDED_CELLS']:
                 if re.search(r'\b' + re.escape(master) + r'\s+\S+\s*\(', synth):

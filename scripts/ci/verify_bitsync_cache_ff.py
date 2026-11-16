@@ -16,11 +16,11 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def prepare(reference, output):
+def prepare(reference, output, evidence=None):
     reference, output = Path(reference).resolve(), Path(output).resolve()
     if output == ROOT or ROOT in output.parents:
         raise ValueError('Use an experiment directory outside the repository')
-    evidence = ROOT / 'spikes/phase2_stock_flow/bitsync_cache_ff'
+    evidence = evidence or ROOT / 'spikes/phase2_stock_flow/bitsync_cache_ff'
     identity = json.loads((evidence / 'identity.json').read_text())
     if (sha(reference / 'src/trw_pin_cfg.v') != identity['reference_sha256']
             or sha(evidence / 'storage.patch') != identity['patch_sha256']):
@@ -37,16 +37,18 @@ def prepare(reference, output):
     return identity
 
 
-def verify(output, yosys, iverilog='iverilog', vvp='vvp'):
+def verify(output, yosys, iverilog='iverilog', vvp='vvp', bench=None,
+           phase_checks=665770, mutation=None):
+    bench = bench or ROOT / 'spikes/phase2_stock_flow/bitsync_cache_ff/tb_cache_ff.v'
     results = []
     for full in (0, 1):
         exe = output / f'phase{full}.vvp'
         subprocess.run([iverilog, '-g2005', '-Isrc', '-s', 'tb_mode_ff',
             f'-Ptb_mode_ff.FULL={full}', '-o', str(exe), 'gold.v', 'gate.v',
-            str(ROOT / 'spikes/phase2_stock_flow/bitsync_cache_ff/tb_cache_ff.v')], cwd=output, check=True)
+            str(bench)], cwd=output, check=True)
         log = subprocess.check_output([vvp, str(exe)], cwd=output, text=True, timeout=90)
         (output / f'phase{full}.log').write_text(log)
-        if f'PASS full={full} cycles=133152 phase_checks=665770' not in log:
+        if f'PASS full={full} cycles=133152 phase_checks={phase_checks}' not in log:
             raise ValueError('Missing complete phase comparison')
         for kind in ('gold', 'gate'):
             text = wrapper(kind, full).replace('output wire carrier_active, restart);',
@@ -75,18 +77,19 @@ equiv_status -assert
         points = re.search(r'Of those cells (\d+) are proven and 0 are unproven', proof)
         if not points or 'Equivalence successfully proven!' not in proof:
             raise ValueError('Missing complete equivalence receipt')
-        results.append(dict(full=full, phase_checks=665770,
+        results.append(dict(full=full, phase_checks=phase_checks,
                             equivalence_points=int(points[1]), induction_sequence_cap=6))
     original = (output / 'gate.v').read_text()
-    anchor = "if (mode_write) mode_q <= rst_n ? mode_value : 1'b0;"
+    anchor, replacement = mutation or (
+        "if (mode_write) mode_q <= rst_n ? mode_value : 1'b0;",
+        "if (!rst_n) mode_q <= 1'b0; else if (mode_write) mode_q <= mode_value;")
     if original.count(anchor) != 1:
         raise ValueError('Ambiguous mutation anchor')
-    (output / 'mutant.v').write_text(original.replace(anchor,
-        "if (!rst_n) mode_q <= 1'b0; else if (mode_write) mode_q <= mode_value;"))
+    (output / 'mutant.v').write_text(original.replace(anchor, replacement))
     exe = output / 'wrong_reset.vvp'
     subprocess.run([iverilog, '-g2005', '-Isrc', '-s', 'tb_mode_ff',
         '-Ptb_mode_ff.FULL=1', '-o', str(exe), 'gold.v', 'mutant.v',
-        str(ROOT / 'spikes/phase2_stock_flow/bitsync_cache_ff/tb_cache_ff.v')], cwd=output, check=True)
+        str(bench)], cwd=output, check=True)
     mutant = subprocess.run([vvp, str(exe)], cwd=output, text=True,
                             capture_output=True, timeout=90)
     (output / 'wrong_reset.log').write_text(mutant.stdout + mutant.stderr)

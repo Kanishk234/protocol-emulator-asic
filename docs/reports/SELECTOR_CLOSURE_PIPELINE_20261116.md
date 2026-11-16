@@ -1,5 +1,12 @@
 # Selector candidate closure pipeline
 
+**Completed outcome:** screen43951998125 fails one final data antenna.
+Route43956306270 and replay43957253552 stop at source gates as required.
+The previous configuration-clock violation is gone; see
+[D-175 density follow-up](DENSITY_CLOSURE_20261116.md). The sequence below
+records the originally queued pipeline, not a claim of passing results.
+
+
 The selected storage follow-up has passing functional evidence in regression
 43946078700, but it has **not** reached extracted timing closure or signoff.
 The original candidate's -1.982448040 ns failure remains a real failed result.

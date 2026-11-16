@@ -4,6 +4,10 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-11-16 — Continue density control through guarded final replay
 
+Full replay reconstruction smoke passes. All170 inputs equal the successful
+selector regression, except the sole intentional src/config.json density
+recipe delta to2b822640…. No source/model/test/metadata drift detected.
+
 - Density screen43961635994 at9e4c74f is active in stock physical flow;
   source/config/admission steps pass. No density-control measurements yet.
 - Verified full independent density source reconstruction: every RTL/macro/

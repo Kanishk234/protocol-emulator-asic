@@ -1,5 +1,13 @@
 # TRIPWIRE: physical design and CI
 
+**Latest measured result, November16:** selector screen43951998125 passes
+estimated timing/electrical/overflow but fails one final **data** antenna.
+The configuration-clock violation targeted by its RTL change is gone. The
+same RTL is now being screened at density60 instead of56;20ns stays fixed.
+See [the exact density comparison and gated continuation](../reports/DENSITY_CLOSURE_20261116.md).
+No current extracted timing closure, production promotion or phase exit.
+
+
 **November 16 follow-up:** The decoded-mode cache storage trial passes the
 335 model/compiler, 4 actual-top and 22 protocol tests in run 42724791204.
 Its physical screen 42725043665 passes estimated timing/electrical/overflow,

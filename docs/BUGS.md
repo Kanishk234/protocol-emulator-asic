@@ -416,3 +416,14 @@ native post-repair antenna check0 does not qualify final timing-repaired
 geometry. Existing final screen gate detects it; both queued downstream jobs
 stop. D-175 prepares one density-only physical control, with no claimed fix
 before fresh measured gates. Original failure is retained.
+
+### 2026-11-16: legacy diagnostic constraints must not qualify native closure
+
+The retained src/signoff.sdc sets hold uncertainty0.10ns, while native base
+constraints use0.25ns. Previous extracted diagnostic values remain labelled
+legacy-SDC evidence, not official/native qualification. New qualified routing
+explicitly selects stock base SDC, verifies actual min/max reports contain
+0.25ns uncertainty, and final replay rejects missing policy or lower-uncertainty
+reports. Setup failure on original route42693952530 remains a real failure;
+its setup uncertainty was already0.25ns. Only waiting downstream jobs are
+requeued; active source hardware and physical screen are unchanged.

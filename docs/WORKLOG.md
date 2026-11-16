@@ -21,8 +21,10 @@ Newest entry at the top. One entry per work session.
   or false policy metadata.134combined checks pass; actionlint/diff clean.
   Historical diagnostic reports retain their scope; no previous failed result
   is relabelled a pass. This branch's decision numbering remains unchanged.
-- New code/evidence commits8760d6e/f2d2524/7c880ad published. Prepare final
-  replay binding to replacement route before its publication. No hardware,
+- New code/evidence commits8760d6e/f2d2524/7c880ad published. Final binding
+  c4e21c5/30b7265 published; replay43965533327 is active at exact
+  30b726517442abab9fe0ebef25dec21deecdd9b3, awaiting route43965251793.
+  Density physical screen remains active in stock flow. No hardware,
   clock, gate waiver or phase-checklist change. Next inspect density result,
   then actual stock-constrained route/extraction and exact-netlist replay.
 

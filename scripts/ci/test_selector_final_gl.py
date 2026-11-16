@@ -68,3 +68,30 @@ def test_workflow_keeps_real_protocol_replay_and_verifies_selector_inputs():
     assert 'verify_expected' in by_name['Check actual XML and unchanged inputs']['run']
     admission = by_name['Authenticate qualified route and exact extracted-state netlist']['run']
     assert 'screen_archive=' in admission and 'screen_context(screen_run, screen_artifact)' in admission
+
+
+@pytest.mark.parametrize('wrong_views', [False, True])
+def test_shared_final_validator_keeps_all_gates_with_selector_provenance(tmp_path, monkeypatch, wrong_views):
+    import closure_final_gl as shared
+    from test_closure_final_gl import fixture
+    _, _, archive, expected, output = fixture(tmp_path, monkeypatch)
+    with zipfile.ZipFile(archive) as z:
+        members = {name: z.read(name) for name in z.namelist()}
+    key = 'runs/closure-route/completion.json'
+    completion = json.loads(members[key])
+    completion.update(source_run=SOURCE_RUN, source_sha=SOURCE_SHA)
+    members[key] = json.dumps(completion).encode()
+    with zipfile.ZipFile(archive, 'w') as z:
+        for name, data in members.items(): z.writestr(name, data)
+    run, artifact = context()
+    artifact.update(id=7, digest='sha256:' + hashlib.sha256(archive.read_bytes()).hexdigest())
+    views = {} if wrong_views else json.loads(shared.SCREEN_RECEIPT.read_text())['frozen_views']
+    kwargs = dict(admit=final.source_context, screen_identity=(SOURCE_RUN, SOURCE_SHA),
+                  route_identity=(final.ROUTE_RUN, final.ROUTE_SHA), frozen_views=views)
+    if wrong_views:
+        with pytest.raises(ValueError): shared.validate(run, artifact, archive, expected, output, **kwargs)
+        assert not output.exists()
+    else:
+        receipt = shared.validate(run, artifact, archive, expected, output, **kwargs)
+        assert receipt['route_run'] == final.ROUTE_RUN
+        assert receipt['exact_extracted_state_netlist'] is True

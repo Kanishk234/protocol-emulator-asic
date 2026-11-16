@@ -2,6 +2,29 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Explain timing evidence and inspect residual geometry read-only
+
+- User asks why timing remains unproven. Current fixes have estimated-routing
+  passes, not a completed detailed route/RC extraction. Last completed screen
+  fails1data antenna; original routed reference still has slow setup-1.982448ns.
+  Do not substitute simulation/estimated passes for current extracted closure.
+- Density screen43961635994 remains in stock physical execution. At22:04UTC
+  it had run about29minutes; prior selector screen took about49minutes total.
+  Continuations43965251793/43965533327 wait behind exact successful parents.
+  No source changes or reruns of the active hardware were introduced.
+- Read-only selected-branch comparison on failed selector43951998125: target
+  driverwire11656 and receiver_31624_ retain their masters, DEF origins and
+  orientations between post-GRT design repair and final timing repair.
+  Net11655 global-guide rectangles change6→9 and hashes differ; named cell
+  port connections also match in before/after netlists. This supports a
+  rerouting-side investigation, not proof of the exclusive CAR cause.
+- Compact geometry summary in reports/selector_residual_geometry_20261116.json.
+  Selected ZIP data CRC-checked; no local whole-archive digest claim. DEF
+  origins are not pin coordinates or detailed routed wirelength. Keep the
+  current single density control, native constraints and strict gates; no
+  speculative hardware change or phase checklist tick. Next inspect actual
+  density screen result and stock-constrained extraction if it qualifies.
+
 ## 2026-11-16 — Preserve independent hardware and enforce native timing checks
 
 - User clarifies this is a separate directed effort. No rebase, source

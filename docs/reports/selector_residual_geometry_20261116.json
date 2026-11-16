@@ -1,0 +1,47 @@
+{
+  "source_run": 43951998125,
+  "net": "net11655",
+  "units_dbu_per_um": 1000,
+  "stages": {
+    "41-openroad-repairdesignpostgrt": {
+      "cells": {
+        "_31624_": {
+          "master": "sg13cmos5l_a21oi_1",
+          "x_dbu": 611520,
+          "y_dbu": 449820,
+          "orientation": "N"
+        },
+        "wire11656": {
+          "master": "sg13cmos5l_buf_2",
+          "x_dbu": 439200,
+          "y_dbu": 442260,
+          "orientation": "FN"
+        }
+      },
+      "guide_rectangles": 6,
+      "guide_sha256": "00c57aa1d031fa9c295a51a2484059cd5850084e3ed783800b36333eacbadf8c"
+    },
+    "44-openroad-resizertimingpostgrt": {
+      "cells": {
+        "_31624_": {
+          "master": "sg13cmos5l_a21oi_1",
+          "x_dbu": 611520,
+          "y_dbu": 449820,
+          "orientation": "N"
+        },
+        "wire11656": {
+          "master": "sg13cmos5l_buf_2",
+          "x_dbu": 439200,
+          "y_dbu": 442260,
+          "orientation": "FN"
+        }
+      },
+      "guide_rectangles": 9,
+      "guide_sha256": "609bd2065e42e339d33542b2404ec1888c2485921d4c9a3c16cfae6e2568e9aa"
+    }
+  },
+  "unchanged_driver_receiver_masters_and_placements": true,
+  "global_guide_changed": true,
+  "scope": "Read-only selected-branch geometry comparison; not detailed wirelength, CAR attribution or timing closure",
+  "integrity_scope": "Selected ZIP members CRC-checked, whole archive not independently hashed locally"
+}

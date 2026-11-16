@@ -4,6 +4,15 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-11-16 — Complete gated screen-to-route-to-final-replay pipeline
 
+Publication receipt: 91f36bd shared/final tools,6f94182 replay workflow,
+ce810ca added provenance regression and5c73590 pipeline report pushed.
+Final replay [43957253552](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43957253552)
+is in progress at exact5c73590763d388c42c306dd377aff466b16df784;
+its guard/setup steps pass and it waits for exact route43956306270.
+Route guards pass and wait for exact screen43951998125, which remains in
+stock pre-routing physical execution. All three cloud stages are registered;
+no local watcher or new acceptance/physical success is claimed.
+
 - Published tools6a44968 /CI2b7077c /docs29c0e63. Selector continuation
   [43956306270](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43956306270)
   is active at exact29c0e63c40696c1f038035fa94234efa26c3e8d6,

@@ -15,7 +15,8 @@ The cloud sequence now continues through qualified dependencies:
    physical paths, repeats timing/antenna checks, then performs detailed routing,
    topology/DRC/connectivity/antenna checks and extracted three-corner STA.
    Fast hold must remain at least50ps; no timing/electrical violations allowed.
-3. `tripwire-selector-final-gl.yaml` waits for that exact route/29c0e63/attempt1
+3. [Final replay43957253552](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43957253552)
+   at5c73590 waits for that exact route/29c0e63/attempt1
    to pass. It independently authenticates both screen and route archives,
    reconciles all six frozen source views, requires passing extracted gates,
    selects the actual extracted-state netlist and compares its logical cells

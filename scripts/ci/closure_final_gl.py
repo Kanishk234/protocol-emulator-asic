@@ -39,8 +39,11 @@ def member(path, prefix):
     return str(p)
 
 
-def validate(run, artifact, archive, expected, output):
-    source_context(run, artifact)
+def validate(run, artifact, archive, expected, output, *, admit=None,
+             screen_identity=None, route_identity=None, frozen_views=None):
+    (admit or source_context)(run, artifact)
+    screen_run, screen_sha = screen_identity or (SOURCE_RUN, SOURCE_SHA)
+    route_run, route_sha = route_identity or (ROUTE_RUN, ROUTE_SHA)
     if 'sha256:' + digest(archive) != artifact['digest']:
         raise ValueError('Routed archive digest mismatch')
     if output.exists(): raise ValueError('Refusing to overwrite prior replay evidence')
@@ -49,7 +52,7 @@ def validate(run, artifact, archive, expected, output):
         if len(names) != len(set(names)): raise ValueError('Duplicate archive members')
         def read(name): return json.loads(bundle.read(name))
         completion = read('runs/closure-route/completion.json')
-        requirements = dict(source_run=SOURCE_RUN, source_sha=SOURCE_SHA,
+        requirements = dict(source_run=screen_run, source_sha=screen_sha,
             detailed_routing_completed=True, extracted_timing_passed=True,
             route_drc_errors=0, final_antenna_nets=0, final_antenna_pins=0,
             disconnected_pin_checker_passed=True, minimum_fast_hold_ns=0.05,
@@ -58,7 +61,7 @@ def validate(run, artifact, archive, expected, output):
             raise ValueError('Incomplete or failed route/extraction gates')
         views = {member(name, 'runs/stock-official-baseline'): sha
                  for name, sha in completion['source_views'].items()}
-        known = json.loads(SCREEN_RECEIPT.read_text())['frozen_views']
+        known = frozen_views if frozen_views is not None else json.loads(SCREEN_RECEIPT.read_text())['frozen_views']
         if views != {k: v for k, v in known.items() if k.startswith('runs/stock-official-baseline/')}:
             raise ValueError('Route did not preserve the authenticated source-view set')
         for key, sha in views.items():
@@ -105,7 +108,7 @@ def validate(run, artifact, archive, expected, output):
         timing_gate({'corners': rows})
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(data)
-    receipt = dict(route_run=ROUTE_RUN, route_sha=ROUTE_SHA, artifact_id=artifact['id'],
+    receipt = dict(route_run=route_run, route_sha=route_sha, artifact_id=artifact['id'],
         archive_sha256=artifact['digest'], netlist_member=nls['extracted'],
         netlist_sha256=hashlib.sha256(data).hexdigest(), final_route_sha256=hashlib.sha256(route_data).hexdigest(),
         exact_extracted_state_netlist=True, logical_cells_match_route=True,

@@ -1,0 +1,82 @@
+{
+  "cache_screen": {
+    "run": 42725043665,
+    "artifact_id": 13725312315,
+    "artifact_api_sha256": "c6ea91fd2cdee3f815e8c8e16cf1d3fd268f078c4aaee2baf35e79ce6788dce1",
+    "qualification": {
+      "qualified": false,
+      "failures": [
+        "antenna__violating__nets: 1",
+        "antenna__violating__pins: 1"
+      ],
+      "final_global_overflow": 0,
+      "source_state": "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json",
+      "minimum_fast_hold_ns": 0.05,
+      "detailed_routing_performed": false,
+      "official_gds_signoff": false
+    },
+    "corners": {
+      "nom_fast_1p32V_m40C": {
+        "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+        "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0959032,
+        "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+        "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+      },
+      "nom_slow_1p08V_125C": {
+        "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+        "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.649221,
+        "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+        "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+      },
+      "nom_typ_1p20V_25C": {
+        "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+        "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.314586,
+        "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+        "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+      }
+    },
+    "source_candidate_sha256": "5335d94f004dee28bd554b5ecf16050a3a9ead81d7704941ee40d702aa196e77",
+    "antenna": {
+      "net": "clknet_1_1__leaf_u_chip.g_unit[0].u_cfg.g_word[1].g_stored.gclk",
+      "pin": "_48786_/GATE",
+      "layer": "Metal3",
+      "ratio": 225.55,
+      "limit": 200
+    }
+  },
+  "clock_diagnostic": {
+    "run": 42724400182,
+    "artifact_id": 13722566113,
+    "artifact_api_sha256": "7277780fa9a1104bac409c6d501f1973688eb41df58e5210743e6540e061213d",
+    "baseline_20ns_reproduced": true,
+    "cases": {
+      "20": {
+        "slow_setup_ns": -1.9824480396180877,
+        "raw_metrics_sha256": "104e47f64d87b811af933d918b9ed1b2e076b1965f640deef75e4f32d013d420"
+      },
+      "21": {
+        "slow_setup_ns": -0.9824479285957821,
+        "raw_metrics_sha256": "9901106b854f12f569553f7cb34371ce6e8014e780a992cfea84c396cc09a1b9"
+      },
+      "22": {
+        "slow_setup_ns": 0,
+        "raw_metrics_sha256": "5d4069b46a8e76bd9a11fdbf9b19f852bbd2b1f20a967ef0ea8c7ba48dc0ff2d"
+      },
+      "24": {
+        "slow_setup_ns": 0,
+        "raw_metrics_sha256": "fa2d47e6a0a3a2808c654291d39e3f6686a0c9dda76aaeec810294fb80429350"
+      },
+      "25": {
+        "slow_setup_ns": 0,
+        "raw_metrics_sha256": "fb41b24c87434b1c96cfeedc3ac6ba19abe7c043d2651c86280b4a0875c1dae0"
+      }
+    },
+    "production_clock_changed": false
+  },
+  "integrity_scope": "Selected ZIP members CRC-checked; whole large artifact digests not independently verified locally",
+  "physical_qualified": false,
+  "phase_boxes_ticked": []
+}

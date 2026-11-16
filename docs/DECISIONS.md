@@ -1857,3 +1857,40 @@ and candidate hashes are in `spikes/phase2_stock_flow/bitsync_cache_ff/identity.
 No production source/config, clock target, protocol contract or official
 workflow job changes. Do not combine it with the older mode_ff experiment,
 which changes raw TXMODE/RXMODE storage rather than this decoded cache.
+
+## D-174 (2026-11-16): isolate pin-selector word storage after cache screen
+
+Cache trial 42724791204 passes the checked module proof, 335 model/compiler,
+4 top and 22 protocol tests. Its clean-from-RTL physical screen 42725043665
+passes estimated original/signoff timing, electrical checks and overflow,
+but final antenna fails one net/pin. The raw report identifies
+`clknet_1_1__leaf_u_chip.g_unit[0].u_cfg.g_word[1].g_stored.gclk`, latch
+`_48786_/GATE`, Metal3 cumulative area ratio 225.55 versus 200.
+The native antenna check immediately after repair reported zero; final
+post-timing physical views expose this violation. It is not another late
+hold-buffer data-net violation, so blindly changing hold margins is unwarranted.
+
+General need: distribute selectable pin/edge configuration without a long
+write-clock leaf feeding spatially separated consumers. Against the bound
+cache-FF source, replace stored word-1 latches with synchronous write-enabled
+root-clock flops. Word 1 holds pin A/B selections and RX/TX edge settings;
+this benefits every protocol using those selectors and adds no protocol block.
+Keep reset visibility write-only: reset without a word write retains the
+configuration. Same encodings, host interface, 20 ns target and D-066 live
+writes. All other words and the FPGA implementation stay unchanged.
+
+Local generic Yosys counts (both full/lean): 13 fewer latches, 11 additional
+`$sdffce`, 2 additional `$dffe`, one additional `$mux`. These are generic
+cell-count deltas, not mapped area or evidence of total-chip cost. Flops can
+increase area and root-clock load even for protocols not using these selectors.
+Physical cost, antenna elimination, timing and congestion require measurement.
+Hash-bound source and patch are in `spikes/phase2_stock_flow/pin_select_word_ff`.
+Local proof compares every configuration-module output under registered host
+writes: 459 lean/557 full points, induction sequence cap 6, no blacklists;
+665,780 phase comparisons per variant, including all word-1 write values under
+both reset polarities, plus a detected wrong-reset fault. No whole-chip proof.
+
+Prepare a separate full-chip regression before physical screening. Do not
+route the failed cache screen, waive antenna rules, combine source changes
+in its existing artifact, change production config, or adopt a slower clock.
+Updated session Git instructions leave commits/pushes to the user.

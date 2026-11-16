@@ -75,3 +75,20 @@ Details and XML/receipt hashes: `reports/CLOSURE_BRANCH_20261109.md`.
 
 
 - **Host link throughput.** At SCK = clk/8 (the §9 limit) one HOST_OUT read (status and data in one transaction) takes ~560 clocks, so the host drains at most ~89K tokens/s at 50 MHz. A program that turns every received byte into a HOST_OUT token overruns its pin unit (§4.5: the new token is dropped and OVERRUN set) when bytes arrive faster than that: continuous UART RX above ~460 kbaud (a byte every ~1,085 clocks). Found by L3 on the RTL, 2026-09-27. Faster streams need buffering in firmware (a lane or SRAM ring) or a faster host clock.
+
+## November 16 closure follow-up
+
+Cache-storage trial 42724791204 passes actual 335 model/compiler, 4 top and
+22 protocol cases with no skipped/failed/error cases. Full functional archive
+digest, XML and source delta were checked; see
+[the compact receipt](reports/cache_regression_42724791204.json).
+Its physical screen 42725043665 fails one final configuration-clock antenna
+violation despite passing estimated timing/electrical/overflow. It has no
+extracted closure or release qualification.
+
+The next pin-selector storage trial locally proves all configuration-module
+outputs under registered host writes (459 lean/557 full correspondence points,
+induction sequence cap 6, no blacklists), passes 665,780 phase comparisons per
+variant and detects the wrong-reset mutant. This is module evidence, not
+whole-chip formal or measured physical improvement. See
+[scope and pending gates](reports/PIN_SELECTOR_STORAGE_20261116.md).

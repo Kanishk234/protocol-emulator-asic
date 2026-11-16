@@ -2,6 +2,57 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Publish selector-clock follow-up under renewed session approval
+
+- User explicitly authorizes session commits and pushes again. Publish the
+  prepared selector-word storage trial, proof tools, cloud regression and
+  authenticated prior results in separate scoped commits, without attribution
+  trailers. This approval overrides the standing Git restriction for this
+  session; it does not authorize merging or promoting unqualified hardware.
+- Latest baseline test/lint/docs/unit all pass at da6783a. Cache physical screen
+  42725043665 remains failed on one antenna violation. No active owned
+  hardening is being cancelled, no production hardware/config changes, and
+  no phase checklist boxes ticked.
+- Recheck focused guards, both workflow files with actionlint and diff hygiene
+  before publication. Next inspect the exact new selector regression run and
+  its actual results before any physical screen or production integration.
+
+## 2026-11-16 — Authenticate completed cache trial; prepare selector-clock fix
+
+- User supplies replacement TRIPWIRE instructions: commits/pushes now belong
+  to the user. No Git history or remote mutation performed this session.
+- Inspect completed cloud runs: cache functional 42724791204 SUCCESS;
+  full artifact SHA256 e5388950… verified, actual XML 335 model/compiler,
+  4 top, 22 protocols, zero failures/errors/skips. Receipt inputs differ
+  only at the bound configuration source; available artifact files verified.
+- Cache physical 42725043665 FAILS final antenna 1 net/1 pin at U0 word-1
+  config clock, Metal3 ratio 225.55/200, `_48786_/GATE`. Estimated setup WS0
+  all corners, fast hold 0.0959032 ns, electrical0, final overflow0; early
+  native antenna check0. No DRT or signoff qualification. Selected large ZIP
+  members CRC-checked; no local whole-archive digest claim.
+- Clock diagnostic 42724400182 SUCCESS: exact original fixed-RC 20ns slow
+  setup -1.982448040 ns reproduced; 21ns -0.982447929 ns, 22/24/25ns WS0.
+  All retained per-period raw metrics match the summary. No clock adoption;
+  keep original 20ns failure and D-066 timed live configuration paths.
+- D-174 prepares exactly one source follow-up to the cache candidate:
+  root-clock write-enabled storage for pin A/B and edge-select word1.
+  Local all-output proof: 459 lean/557 full points, induction sequence cap6,
+  registered host writes, no blacklists. Both variants pass 665,780 phase
+  comparisons; deliberate wrong-reset fault detected. Generic Yosys delta
+  per unit is -13 latches, +13 enabled flops and +1 mux, not physical area.
+- Prepare new cloud workflow: reproduce cache proof then selector proof,
+  run full model/top/22-protocol regression, check entire source receipt with
+  the one bound file delta. Workflow actionlint and 78 focused guards pass.
+  Existing cache proof rerun after helper refactor also passes unchanged.
+  Use appended CAD-suite PATH and explicit system Icarus for module checks.
+- Reports/CLAIMS/BUGS/phase summary and physical front page updated. Raw logs
+  remain under /tmp and Actions artifacts. No phase boxes ticked.
+
+Next: user commits/pushes the grouped prepared changes to publish the new
+regression. Inspect its exact source/XML artifact before preparing a same-20ns
+physical screen. Antenna, extracted timing, final replay and official
+production integration all remain required; no stage gate is waived.
+
 ## 2026-11-09 — Target the measured bitsync cache timing path
 
 - Published fixed-route clock diagnostic in fcb1346/2d39306/79402ae;

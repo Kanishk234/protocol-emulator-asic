@@ -1,5 +1,16 @@
 # Phase 2: building and fitting the chip
 
+**November 16 follow-up:** The decoded-mode cache storage trial passes the
+335 model/compiler, 4 actual-top and 22 protocol tests in run 42724791204.
+Its physical screen 42725043665 passes estimated timing/electrical/overflow,
+but fails one configuration-clock antenna violation; no routing of that
+failed checkpoint is authorized. A separate pin-selector-word storage
+follow-up passes local module checks and has a prepared cloud regression,
+not a physical result. The original routed 20 ns setup failure remains open.
+See [the current follow-up report](../reports/PIN_SELECTOR_STORAGE_20261116.md). Production integration, final
+routed replay, official GDS/precheck and Phase 2 exit remain incomplete.
+
+
 **November 9 current status:** The unchanged two-lane/four-pin-unit candidate
 now passes a clean-source stock-flow **8x4** screen on the updated official
 toolchain. [Run 42681697462](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42681697462)

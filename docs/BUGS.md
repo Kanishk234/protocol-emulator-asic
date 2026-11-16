@@ -395,3 +395,14 @@ behavioral configuration-module comparison, matching the passing local run;
 keep pinned Yosys for proof and pinned Verilator for chip protocols. Native
 PDK-cell replay still requires Icarus 13 under BUG 1. No source normalization
 or hidden reference edits are introduced.
+
+### 2026-11-16: cache trial exposes a final configuration-clock antenna violation
+
+Screen 42725043665 passes native repair's antenna check, estimated timing,
+electrical checks and global routing overflow, then fails the final independent
+antenna check at U0 word-1 gated configuration-clock leaf, `_48786_/GATE`.
+Metal3 cumulative area ratio is 225.55 versus 200. Final post-timing geometry
+therefore remains unqualified even though the earlier checker reports zero.
+The existing final stock screen gate catches it and remains unchanged. D-174
+prepares a source-level root-clock selector-storage trial; physical efficacy
+is unmeasured. No failed checkpoint is routed and no antenna waiver is added.

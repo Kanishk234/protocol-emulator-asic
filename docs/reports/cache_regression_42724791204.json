@@ -1,0 +1,45 @@
+{
+  "run": 42724791204,
+  "source_sha": "a82fa831ad168ded41a65f6a3068db2e6eb3b833",
+  "artifact_id": 13723120945,
+  "artifact_sha256": "e53889508c4feab1c237e45855c1495a5c644beead2f82b6cbe43a5174fc4d79",
+  "whole_archive_digest_verified": true,
+  "xml_passed": {
+    "tools": 335,
+    "top": 4,
+    "protocols": 22
+  },
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "available_source_files_verified": 34,
+  "all_receipt_inputs": 170,
+  "single_changed_source": "src/trw_pin_cfg.v",
+  "module_proof": {
+    "identity": {
+      "reference_sha256": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+      "candidate_sha256": "5335d94f004dee28bd554b5ecf16050a3a9ead81d7704941ee40d702aa196e77",
+      "patch_sha256": "f5bc6031d3e09fa6fddf8fb317396a071ab020a466e46ed6c5ab4a9d4125e959",
+      "scope": "Unqualified isolated configuration cache storage experiment"
+    },
+    "checks": {
+      "checks": [
+        {
+          "full": 0,
+          "phase_checks": 665770,
+          "equivalence_points": 461,
+          "induction_sequence_cap": 6
+        },
+        {
+          "full": 1,
+          "phase_checks": 665770,
+          "equivalence_points": 559,
+          "induction_sequence_cap": 6
+        }
+      ],
+      "wrong_reset_mutant_rejected": true
+    },
+    "scope": "Configuration module with clocked host writes; no physical qualification"
+  },
+  "scope": "RTL/module functional evidence; no extracted timing or physical qualification"
+}

@@ -66,3 +66,10 @@ def test_workflow_preserves_every_native_control_and_gate():
         else: assert a==b, a['name']
     for s in steps:
         if 'run' in s: subprocess.run(['bash','-n'],input=s['run'],text=True,check=True)
+
+
+def test_reviewed_gate_config_hash_is_admitted_to_tile_preflight():
+    from official_nov9_preflight import CONFIGS
+    evidence=json.loads((ROOT/'spikes/phase2_stock_flow/cache_gate/candidate.json').read_text())
+    assert evidence['candidate_config_sha256'] in CONFIGS
+    assert evidence['changed_fields']==['EXTRA_EXCLUDED_CELLS']

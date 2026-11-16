@@ -1,8 +1,8 @@
 # Pin-selector storage follow-up
 
 The cache trial is functionally green, but its physical screen stops on one
-antenna violation. It is not eligible for detailed routing. This follow-up
-is prepared locally; no cloud or physical result exists for it yet.
+antenna violation. It is not eligible for detailed routing. The follow-up now passes cloud regression 43946078700; its physical
+screen is being prepared. It has no routed or extracted timing result yet.
 
 - Functional run: [42724791204](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42724791204),
   exact a82fa83, attempt 1. Complete 395,219-byte archive SHA256 matches API;
@@ -77,3 +77,19 @@ All corner values match the retained per-period raw metrics. This is a
 fixed-RC diagnostic that also changes stock period-derived constraints, not
 a clock-contract change, demonstrated positive setup reserve, or signoff.
 The repair effort keeps the 20 ns target.
+
+
+## Same-clock physical screening
+
+Selector regression 43946078700 is now independently checked: all 335/4/22
+actual test cases pass, the full archive digest matches API, and 34 available
+source files match the one-file-delta receipt. Compact evidence is in
+`selector_regression_43946078700.json`.
+
+`tripwire-pin-select-screen.yaml` admits that exact successful run before
+preparing the cache baseline plus the selector-only patch. Original stock
+measurement and acceptance scripts stay unchanged; the structural guard checks
+both cache and selector workflows. No change to 20 ns, live reconfiguration,
+production config or protected template jobs. A passing pre-routing screen
+will still need detailed routing, extracted timing, final replay and official
+GDS/precheck before release qualification.

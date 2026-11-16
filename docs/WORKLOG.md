@@ -2,6 +2,37 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Selector regression passes; advance same-clock physical screen
+
+Publication receipt: 7b4ce88 guard and 1258879 workflow pushed. Physical
+screen [43951998125](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43951998125)
+is in progress at exact1258879c18e288c84f12decb0860a01ddf68b74c.
+No physical result yet; this is a screen, not detailed routing or signoff.
+Initial docs staging found its compact receipt had not been written; wrote
+and reverified the receipt from the same whole authenticated functional ZIP
+before publishing docs. No hardware or gate change from that correction.
+
+- Clarify release status: historical checkpoints have shown extracted timing
+  passes, but the current stock-toolchain 8x4 submission candidate has not
+  passed extracted 20 ns timing. Original route 42693952530 fails slow setup
+  -1.982448040 ns; cache candidate 42725043665 stops on antenna before DRT.
+- Selector regression 43946078700 at exact 9ee952c SUCCESS. Full 525,437-byte
+  artifact SHA256 0b5f214e… matches API. Inspect actual XML: 335 model/compiler,
+  4 top, 22 protocols, zero failures/errors/skips. All 34 available candidate
+  files match their receipt; all 170 receipt inputs differ only at the bound
+  configuration source. Selector module mutation/proof receipt retained in
+  reports/selector_regression_43946078700.json. Cache control43946078462 passes.
+- Prepare a separate stock 8x4/20 ns selector physical screen. Exact successful
+  regression identity/attempt gates precede preparation. Reproduce cache
+  candidate, apply only selector patch, capture hash-bound delta before native
+  project generation. All original stock engine, environment, flow scripts,
+  timing/antenna/electrical/overflow gates retained; no gate waiver or config
+  edit. One hardware change compared with failed cache physical screen.
+- 79 focused guards and workflow actionlint pass. No phase boxes ticked.
+  Next publish and inspect actual physical screen, then route/extract only
+  after every screen gate passes. Main integration and final signoff remain
+  open. Session authorization permits grouped commits and pushes.
+
 ## 2026-11-16 — Publish selector-clock follow-up under renewed session approval
 
 Publication receipt: committed RTL 5280372, tools 00fcdce, CI fb6a2a8 and

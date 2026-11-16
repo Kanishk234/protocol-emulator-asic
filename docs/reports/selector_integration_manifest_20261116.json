@@ -1,0 +1,397 @@
+{
+  "baseline_revision": "e3e51c9464135fdaa7e1c3620fea78f69a4f7e76",
+  "regression_run": 43946078700,
+  "regression_archive_sha256": "0b5f214e7fa11136c33a05a8b09977e5e3d78c771e3e7768d1594ca615d3d026",
+  "source_input_count": 170,
+  "changes": [
+    {
+      "path": "info.yaml",
+      "before_sha256": "f4a183c734b4faee53fd37e984f32428fd9d363a98d3b95c5477b8fb93ea90d6",
+      "after_sha256": "e205d5e16f7e2c4ec48804f4aa589539f0996c7f3c1e9364e3d50f7f051bda7a",
+      "action": "change"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl",
+      "before_sha256": null,
+      "after_sha256": "030a8907bb0ad7896a4a80a2c21e46d7088f9d7dc3e1de18269d316759afc30d",
+      "action": "add"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.gds",
+      "before_sha256": null,
+      "after_sha256": "478b0e29801c2c3d285c42b668a2e51f3326efc31c67793b77a5ee7c4ea11bf6",
+      "action": "add"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.lef",
+      "before_sha256": null,
+      "after_sha256": "845c080938b5e9d1200774190430dad67eea7f1e209fb3094488614e70bb1c2c",
+      "action": "add"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.v",
+      "before_sha256": null,
+      "after_sha256": "fc8a03068bc692d3db8e836446b0376a7bbf97ef1cbfda8fd1f29d77255eba01",
+      "action": "add"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib",
+      "before_sha256": null,
+      "after_sha256": "4cb993f5108050e09de3bd01a5bf0ad433d25380f5dd873e9903f415e1d4c1e2",
+      "action": "add"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib",
+      "before_sha256": null,
+      "after_sha256": "cacb40bf9fd25a5fdde0493415455353c40160e25ef8aa17bcb67b29eee02df5",
+      "action": "add"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib",
+      "before_sha256": null,
+      "after_sha256": "44c6ff102ab0a3fc8766b92cbb40a9723bac5aa084a00a111a5a70a772d30a1e",
+      "action": "add"
+    },
+    {
+      "path": "macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_core_behavioral_bm_bist.v",
+      "before_sha256": null,
+      "after_sha256": "d0a6258f8e9c93d1d5b1f78c0a1d66f30d28b1ad8037e5e07f53d1a4e3670b12",
+      "action": "add"
+    },
+    {
+      "path": "spec/tripwire.yaml",
+      "before_sha256": "a75ad8beb4253e66389c8475cbd8c6fbf50bb8a9dab91e2da0fb34c80c57dd5a",
+      "after_sha256": "420c5123130f4e0bd5bdf4b705d529bd204fd2426ae5185ac94486cfd66e71cb",
+      "action": "change"
+    },
+    {
+      "path": "src/RM_IHPSG13_1P_512x16_c2_bm_bist.v",
+      "before_sha256": null,
+      "after_sha256": "4a03d7cd63892f1986493339803d6f323b497ae332b2207c2cfd48e3053eb602",
+      "action": "add"
+    },
+    {
+      "path": "src/config.json",
+      "before_sha256": "4b192dffa877dcefa4ab969af9dedf105375921aa179c677524fa88ac94bb510",
+      "after_sha256": "4d71243f672fac34f004c43a8c8bfc46cffaae2b2929f7d3c788de1fac72a9f7",
+      "action": "change"
+    },
+    {
+      "path": "src/pdn_cfg.tcl",
+      "before_sha256": null,
+      "after_sha256": "0614d6d24202f2e8106d39f08b975443797d36effb5060d03b5736e538d484db",
+      "action": "add"
+    },
+    {
+      "path": "src/signoff.sdc",
+      "before_sha256": null,
+      "after_sha256": "63a9ac8dc9d00741c26ea37cf8ee01345c2ebf178e1c408dd213619e080d0ffa",
+      "action": "add"
+    },
+    {
+      "path": "src/trw_chan_port.v",
+      "before_sha256": "4aec82bef1bb97aada11be1ff75f7e4c3ac5fb8638271f2444453002f58c1506",
+      "after_sha256": "79ba846ddf5a8036f47ec0c42e89f26c67d0d5b29eaa27f87aaa11ffda7f6abb",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_chip.v",
+      "before_sha256": "9c93d47e4aef7b233e30e66411502246214a43a66f7c2b56fed806f59890d1db",
+      "after_sha256": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_defs.vh",
+      "before_sha256": "3424523e376350131aa70e2cdb2d567656c23a09572ae3507dde4701c3951911",
+      "after_sha256": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_fabric.v",
+      "before_sha256": "b8a761849abc03d01e8377ce8fc126c77ada15415637be2b240cb952276f19b1",
+      "after_sha256": "f6f5af0e6c9b561bd68fabea949410b15b2b5a1b647d2d291909ef67632aed7f",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_host.v",
+      "before_sha256": "aed5401613c7f7403ee5750f4830b10828d3e9abafe8a25ee698d492cfd6d758",
+      "after_sha256": "0e5584c920c1491b1996d7d8ece5972f999b5f1ff52e19e8782f0f8afdda66e1",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_lane.v",
+      "before_sha256": "3d5bd1118faee6530513db2f87cc59bf859751694275a807421b4224b35ee7ed",
+      "after_sha256": "763d231dfc4b864c3d4d782d5c8854f776407a842a13fbe7fde23e7cec2a1eff",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_pin_bs.v",
+      "before_sha256": "0529f271dbb7a3aec1bab8e19c3596c877057c509c1995e5a7b3b40a5c2da341",
+      "after_sha256": "83f82e436b67d79efddae6dc60bdfa4902cf5b250b1cd587ffe2a4c9c1e08340",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_pin_cfg.v",
+      "before_sha256": "64c050f86f3b059709b2421e30f9b5b68f144107997a943a2d6cf780193ffbef",
+      "after_sha256": "55b90c37d0c786cca1d40db523ddc6406e8c021a0d654a97dbc5f1a9dcbab614",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_pin_io.v",
+      "before_sha256": "088c103cd41ad8d7cbbd118b90cdd30d1e38af41fa3f08fcbdc9bb1f5773760b",
+      "after_sha256": "526b215cae586282931c2832c2cebc1df88cc68e01ec90fc79ef7761a2260fd4",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_pin_tx.v",
+      "before_sha256": "77af652dc8a35a690fcb6eb15c0fecb2be425102ccd012b55b60e712b9af34c2",
+      "after_sha256": "29bdf26b9cf3d1939d8b8efe7833ac7d6ca1042c71e33c7065462f10e3c7951f",
+      "action": "change"
+    },
+    {
+      "path": "src/trw_pin_unit.v",
+      "before_sha256": "778f795bb4de07af738d4ba0f6efa981fbc5fc61035771031cd5c4bd154a8a7a",
+      "after_sha256": "e79409507fc9a9e29ebead7fea2d85e7a555c062815d1bf55fce6ca2067172fe",
+      "action": "change"
+    },
+    {
+      "path": "src/tt_um_tripwire.v",
+      "before_sha256": "637329df9d360d363070a128d34175915b9fbdab07840a94c4ea4f817e28efe5",
+      "after_sha256": "f92ba2a7fef45ebb3fb26c01fcb1c3598bb66ef9938c1641b5414ab0bc9c0de9",
+      "action": "change"
+    },
+    {
+      "path": "test/Makefile",
+      "before_sha256": "4cda4665dbeebdae2cfc17fb9f8d33b41408209a34191137acb6516365b82e55",
+      "after_sha256": "ea082406f323cab7d4055c54d819c87edd1103204e785b1cd7c1db0a605f2858",
+      "action": "change"
+    },
+    {
+      "path": "test/test.py",
+      "before_sha256": "d17e470fb8ee8d58199859358ec9c389c6b0dca10fd997125b94117b5ee0d9fe",
+      "after_sha256": "257047c3e1ab85b4204602c722462f5691f047058ea3d8d75817799b873e8cd6",
+      "action": "change"
+    },
+    {
+      "path": "tools/tripwire_spec.py",
+      "before_sha256": "3666d7f6d5116edd72e6980fcce62aa87916b378b3634599e142f3fed92ebf4d",
+      "after_sha256": "c4639854483651afcd78f49f1cfa4a31166483ac4e8a0bb9a332f1556b9a0669",
+      "action": "change"
+    }
+  ],
+  "config_changes": {
+    "CTS_APPLY_NDR": {
+      "before": null,
+      "after": "none"
+    },
+    "CTS_SINK_CLUSTERING_MAX_DIAMETER": {
+      "before": null,
+      "after": 75
+    },
+    "CTS_SINK_CLUSTERING_SIZE": {
+      "before": null,
+      "after": 8
+    },
+    "EXTRA_EXCLUDED_CELLS": {
+      "before": null,
+      "after": [
+        "sg13cmos5l_buf_1"
+      ]
+    },
+    "FP_PDN_VOFFSET": {
+      "before": null,
+      "after": 26.36
+    },
+    "FP_PDN_VPITCH": {
+      "before": 50.0,
+      "after": 67.44
+    },
+    "FP_PDN_VSPACING": {
+      "before": null,
+      "after": 3.52
+    },
+    "GRT_ADJUSTMENT": {
+      "before": null,
+      "after": 0.16
+    },
+    "GRT_ANTENNA_REPAIR_DIODE_ONLY": {
+      "before": null,
+      "after": true
+    },
+    "GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH": {
+      "before": null,
+      "after": 200
+    },
+    "GRT_OVERFLOW_ITERS": {
+      "before": null,
+      "after": 100
+    },
+    "GRT_RESIZER_HOLD_SLACK_MARGIN": {
+      "before": 0.05,
+      "after": 0.125
+    },
+    "GRT_RESIZER_SETUP_SLACK_MARGIN": {
+      "before": null,
+      "after": 0
+    },
+    "MACROS": {
+      "before": null,
+      "after": {
+        "RM_IHPSG13_1P_512x16_c2_bm_bist": {
+          "instances": {
+            "u_chip.u_sram.sram": {
+              "location": [
+                12,
+                40
+              ],
+              "orientation": "FS"
+            }
+          },
+          "gds": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.gds"
+          ],
+          "lef": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.lef"
+          ],
+          "lib": {
+            "*_typ_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib"
+            ],
+            "*_fast_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib"
+            ],
+            "*_slow_*": [
+              "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib"
+            ]
+          },
+          "nl": [
+            "dir::./RM_IHPSG13_1P_512x16_c2_bm_bist.v"
+          ],
+          "spice": [
+            "dir::../macro/RM_IHPSG13_1P_512x16_c2_bm_bist/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl"
+          ]
+        }
+      }
+    },
+    "MAGIC_EXT_ABSTRACT_CELLS": {
+      "before": null,
+      "after": [
+        "RM_IHPSG13_.*"
+      ]
+    },
+    "MAGIC_MACRO_STD_CELL_SOURCE": {
+      "before": null,
+      "after": "PDK"
+    },
+    "PDN_CFG": {
+      "before": null,
+      "after": "dir::pdn_cfg.tcl"
+    },
+    "PDN_MACRO_CONNECTIONS": {
+      "before": null,
+      "after": [
+        "u_chip.u_sram.sram VPWR VGND VDD! VSS!",
+        "u_chip.u_sram.sram VPWR VGND VDDARRAY! VSS!"
+      ]
+    },
+    "PL_RESIZER_HOLD_SLACK_MARGIN": {
+      "before": 0.1,
+      "after": 0.175
+    },
+    "PL_RESIZER_SETUP_SLACK_MARGIN": {
+      "before": null,
+      "after": 0
+    },
+    "PL_TARGET_DENSITY_PCT": {
+      "before": 60,
+      "after": 56
+    },
+    "RUN_POST_GRT_DESIGN_REPAIR": {
+      "before": null,
+      "after": true
+    },
+    "RUN_POST_GRT_RESIZER_TIMING": {
+      "before": null,
+      "after": true
+    },
+    "SYNTH_BUFFER_CELL": {
+      "before": null,
+      "after": "sg13cmos5l_buf_2/A/X"
+    },
+    "SYNTH_STRATEGY": {
+      "before": null,
+      "after": "DELAY 0"
+    }
+  },
+  "configuration_comment_changed": true,
+  "resource_contract": {
+    "before": {
+      "lanes": 3,
+      "units": 6,
+      "sel_bits": 4,
+      "sources": {
+        "Lk.I0": [
+          "U*.rx",
+          "HOST_IN",
+          "L(k-1).O1"
+        ],
+        "Lk.I1": [
+          "U*.rx",
+          "HOST_IN",
+          "L(k+1).O0",
+          "L(k-1).O1"
+        ],
+        "Un.tx": [
+          "L*.O0",
+          "L*.O1",
+          "HOST_IN"
+        ],
+        "HOST_OUT": [
+          "L*.O0",
+          "L*.O1",
+          "U0.rx",
+          "U1.rx"
+        ]
+      }
+    },
+    "after": {
+      "lanes": 2,
+      "units": 4,
+      "sel_bits": 4,
+      "sources": {
+        "Lk.I0": [
+          "U*.rx",
+          "HOST_IN",
+          "L(k-1).O1"
+        ],
+        "Lk.I1": [
+          "U*.rx",
+          "HOST_IN",
+          "L(k+1).O0",
+          "L(k-1).O1"
+        ],
+        "Un.tx": [
+          "L*.O0",
+          "L*.O1",
+          "HOST_IN"
+        ],
+        "HOST_OUT": [
+          "L*.O0",
+          "L*.O1",
+          "U0.rx",
+          "U1.rx"
+        ]
+      }
+    }
+  },
+  "physical_qualified": false,
+  "source_applied": false,
+  "production_config_changed": false,
+  "approval_required_before_application": [
+    "Finalize branch-only resource counts against the architecture contract",
+    "Review physical configuration keys outside the standing whitelist",
+    "Complete physical/extracted/replay/official qualification",
+    "Retain upstream SRAM attribution and review standalone license/NOTICE packaging"
+  ],
+  "scope": "Review-only committed-baseline delta; not an approved release or production edit"
+}

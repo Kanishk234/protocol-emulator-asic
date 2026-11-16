@@ -2,6 +2,30 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Prepare coherent production bundle while physical flow runs
+
+- Screen43951998125 is still in stock pre-routing physical execution; route
+  and final-replay dependencies remain safely waiting. No new physical
+  success, timing closure or phase completion is inferred from elapsed time.
+- Add review-only integration bundler. It validates the complete successful
+  selector-regression ZIP digest, all170 candidate input hashes, source-list
+  coherence and exact selector source identity. Compare committed production
+  baseline and copy only29 changed files into a fresh /tmp payload; verify
+  each copied hash. It never applies files, edits Git or runs physical tools.
+- Record exact production adoption surface: current spec3lanes/6units versus
+  tested branch floor2lanes/4units, plus25 meaningful physical config fields
+  and JSON comment metadata. Existing November9config review still applies.
+  Resource/spec and config adoption require explicit decisions after physical
+  evidence; session Git permission is not treated as an engineering waiver.
+- Include top/core/spec/generated tables/tests/source metadata/SRAM together
+  so promotion cannot accidentally leave the real core behind a placeholder.
+  Preserve existing source attribution; vendor standalone license/NOTICE
+  packaging review remains open before application. No production changes.
+- Generated review payload/manifest with exact functional artifact; output
+  preservation, worktree-target and unbound-archive rejection guards pass.
+  Next inspect physical result and downstream pipeline; apply no source bundle
+  before all necessary gates/decisions. No phase checklist boxes ticked.
+
 ## 2026-11-16 — Complete gated screen-to-route-to-final-replay pipeline
 
 Publication receipt: 91f36bd shared/final tools,6f94182 replay workflow,

@@ -2,6 +2,30 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Preserve independent hardware and enforce native timing checks
+
+- User clarifies this is a separate directed effort. No rebase, source
+  promotion or other-effort RTL was applied. Density screen43961635994 remains
+  active and unchanged. Latest measured selector result clears the clock
+  antenna, passes estimated50MHz timing/electrical/overflow, but fails one
+  data antenna. Extracted closure remains unproven.
+- Port only native-constraint verification routines from upstream f00bf49,
+  not hardware changes. Shared qualified routing now extracts with stock base
+  SDC and verifies actual0.25ns uncertainty in min/max reports at every corner.
+  Actual merged-candidate config passes the constraint-generation smoke.
+- Cancel only waiting route43962211849/replay43963239763, preserving the
+  running physical screen. Replacement route43965251793 is active at exact
+  7c880ad7e39675be6c2e7443980d9d3b91f11709 and waits for the same screen.
+- Final replay requires native constraint policy/completion flags, exact SDC
+  bytes/hash and actual0.25ns reports. Negative controls reject legacy0.10ns
+  or false policy metadata.134combined checks pass; actionlint/diff clean.
+  Historical diagnostic reports retain their scope; no previous failed result
+  is relabelled a pass. This branch's decision numbering remains unchanged.
+- New code/evidence commits8760d6e/f2d2524/7c880ad published. Prepare final
+  replay binding to replacement route before its publication. No hardware,
+  clock, gate waiver or phase-checklist change. Next inspect density result,
+  then actual stock-constrained route/extraction and exact-netlist replay.
+
 ## 2026-11-16 — Continue density control through guarded final replay
 
 Full replay reconstruction smoke passes. All170 inputs equal the successful

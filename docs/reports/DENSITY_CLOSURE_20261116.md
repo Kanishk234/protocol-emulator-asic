@@ -20,8 +20,8 @@ No margin-only repeat, manual diode, checkpoint ECO, new RTL or waiver.
 
 - [Density screen43961635994](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43961635994)
   at9e4c74f is active in the stock physical flow, with exact2b822640… config.
-- [Qualified route43962211849](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43962211849)
-  at7ba8d40 waits for that exact screen/attempt1 to pass. Full archive/source
+- [Qualified route43965251793](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43965251793)
+  at7c880ad waits for that exact screen/attempt1 to pass. Full archive/source
   binding, fresh timing/antenna checks, clean route, extracted three-corner
   timing/electrical and50psfast hold remain required.
 - `tripwire-density-final-gl.yaml` is bound to that exact route. It independently
@@ -36,3 +36,13 @@ successful selector regression except the reviewed project-config hash.
 strict by default; only the density-specific callers admit its exact new hash.
 Production source/config and architecture contract are unchanged. Phase2 stays
 open; no new extracted closure, GDS/precheck or main integration is claimed.
+
+
+Native-constraint safeguard: the waiting route/replay pair43962211849 /
+43963239763 was cancelled before routing so qualification can use the native
+base SDC with0.25ns uncertainty. The running density physical screen remains
+unchanged. Replacement route43965251793 verifies actual setup/hold report
+uncertainties in every corner; final replay also checks the native constraint
+bytes, policy/hash and actual reports. The retained legacy0.10ns hold-uncertainty
+SDC is diagnostic history and cannot qualify this path. No other-effort RTL,
+source rebase or hardware combination was applied.

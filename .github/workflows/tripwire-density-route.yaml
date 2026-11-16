@@ -156,7 +156,7 @@ jobs:
                           '--run-tag', output.name, '--force-run-dir', str(output), '--hide-progress-bar',
                           '--with-initial-state', str(source), str(path)], check=True)
           PY
-      - name: Recheck timing then route and extract with the unchanged recipe
+      - name: Recheck timing then route and extract with native stock constraints
         timeout-minutes: 300
         run: |
           set -euo pipefail

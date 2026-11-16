@@ -1,0 +1,31 @@
+{
+  "run": 43957277296,
+  "source_sha": "f00bf4903ebab1118d89d053de9e483f97a8c92a",
+  "qualified": false,
+  "native_hold_ns": {
+    "fast": 0.0765731,
+    "typical": 0.244206,
+    "slow": 0.548727
+  },
+  "minimum_fast_hold_gate_ns": 0.05,
+  "fast_hold_headroom_ns": 0.0265731,
+  "aggregate_setup_ws_ns": 0,
+  "functional_setup_reserve_measured": false,
+  "electrical_violations": 0,
+  "global_overflow": 0,
+  "antenna_violating_nets": 1,
+  "antenna_violating_pins": 1,
+  "antenna_summary": {
+    "net": "net14102",
+    "pin": "_35365_/B2",
+    "layer": "Metal3",
+    "partial_area_ratio": 137.46,
+    "required_cumulative_ratio": 200,
+    "cumulative_area_ratio": 221.37
+  },
+  "early_hold_buffers_inserted": 4922,
+  "final_hold_buffers_inserted": 57,
+  "detailed_routing_performed": false,
+  "official_signoff": false,
+  "final_odb_sha256": "5163a4b917e4ec52ce3de679b954f165e6fd3698fd0dfa7a6469952849179908"
+}

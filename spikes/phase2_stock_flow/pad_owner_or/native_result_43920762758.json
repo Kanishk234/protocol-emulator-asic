@@ -1,0 +1,73 @@
+{
+  "run_id": 43920762758,
+  "status": "failed_screen",
+  "failures": [
+    "antenna nets:2",
+    "antenna pins:2"
+  ],
+  "stock_hold_uncertainty_ns": 0.25,
+  "fresh_corner_metrics": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.0822082,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.648025,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.289468,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "final_global_overflow": 0,
+  "functional_positive_setup_reserve_measured": false,
+  "standard_slow_report_note": "First1000reported paths end at latches with0slack; cannot establish positive flop/output reserve.",
+  "antenna_clean_after_repair": true,
+  "after_final_timing_repair": {
+    "antenna_nets": 2,
+    "antenna_pins": 2,
+    "late_hold_buffers_inserted": 44,
+    "total_named_hold_cells": 5106
+  },
+  "offenders": [
+    {
+      "net": "_00381_",
+      "pin": "hold8723/A",
+      "downstream_register": "lane0 ex_asrc[1]",
+      "metal2_cumulative_ratio": 255.89,
+      "metal3_cumulative_ratio": 309.72,
+      "required_ratio": 200,
+      "present_before_final_timing_pass": true
+    },
+    {
+      "net": "net11460",
+      "pin": "_48450_/D",
+      "register": "fabric C1 pending_drop_n",
+      "metal3_partial_ratio": 159.33,
+      "metal3_cumulative_ratio": 207.03,
+      "required_ratio": 200,
+      "present_before_final_timing_pass": true
+    }
+  ],
+  "physical_area_um2": 690588,
+  "reference_43390348317": {
+    "physical_area_um2": 689744,
+    "total_named_hold_cells": 5087,
+    "late_hold_buffers_inserted": 148,
+    "fast_hold_ns": 0.10784,
+    "antenna_nets": 1
+  },
+  "qualified": false,
+  "detailed_routing_performed": false,
+  "official_signoff": false
+}

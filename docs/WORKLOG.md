@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Continue density control through guarded final replay
+
+- Density screen43961635994 at9e4c74f is active in stock physical flow;
+  source/config/admission steps pass. No density-control measurements yet.
+- Verified full independent density source reconstruction: every RTL/macro/
+  metadata byte equals successful selector regression, with only project
+  density56→60 and exact2b822640… recipe change. Same20ns contract and all
+  original final gates. Commit7ba8d40 publishes the source check.
+- Density route43962211849 at exact7ba8d40 waits for that exact screen to
+  succeed. Defaults preserve prior-source recipes; explicit density provenance
+  requires the exact reviewed new project hash. Unknown recipes rejected.
+- Prepare final replay bound to exact density route. Independently authenticate
+  screen and route archives and six source views, retain completion/DRC/antenna/
+  electrical/setup/hold gates, select exact extracted NL and compare logical
+  connectivity before22-case native replay. Reconstruct all firmware/model/test
+  inputs; the only additional intentional input delta is the reviewed config.
+  Superseded failed-source replay remains manually reproducible, not rerun.
+-124combined guards pass, including wrong-recipe restoration and final replay;
+  workflows actionlint clean. No new RTL, clock, production integration or
+  acceptance waiver. No phase boxes ticked. Next measure density screen,
+  continue only passing predecessors, and retain any failed result as evidence.
+
 ## 2026-11-16 — Selector clock fix works; isolate one data antenna residual
 
 Independent density-source reconstruction passes all original source guards and

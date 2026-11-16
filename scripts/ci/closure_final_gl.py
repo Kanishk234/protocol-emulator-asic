@@ -40,7 +40,8 @@ def member(path, prefix):
 
 
 def validate(run, artifact, archive, expected, output, *, admit=None,
-             screen_identity=None, route_identity=None, frozen_views=None):
+             screen_identity=None, route_identity=None, frozen_views=None,
+             config_sha=CONFIG_SHA):
     (admit or source_context)(run, artifact)
     screen_run, screen_sha = screen_identity or (SOURCE_RUN, SOURCE_SHA)
     route_run, route_sha = route_identity or (ROUTE_RUN, ROUTE_SHA)
@@ -67,7 +68,7 @@ def validate(run, artifact, archive, expected, output, *, admit=None,
         for key, sha in views.items():
             if hashlib.sha256(bundle.read(key)).hexdigest() != sha:
                 raise ValueError('Frozen source view hash mismatch')
-        if hashlib.sha256(bundle.read('src/config.json')).hexdigest() != CONFIG_SHA:
+        if hashlib.sha256(bundle.read('src/config.json')).hexdigest() != config_sha:
             raise ValueError('Foreign routed hardware recipe')
         for folder in ('src', 'macro'):
             local = {str(p.relative_to(expected)): hashlib.sha256(p.read_bytes()).hexdigest()

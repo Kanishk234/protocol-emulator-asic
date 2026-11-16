@@ -49,16 +49,18 @@ def prepare_expected(output):
     verify_expected(output)
 
 
-def verify_expected(root):
+def verify_expected(root, *, config_sha=None):
     baseline = json.loads((root / 'closure-candidate.json').read_text())
     identity = json.loads((ROOT / 'spikes/phase2_stock_flow/pin_select_word_ff/identity.json').read_text())
     expected = dict(baseline['inputs'], **{'src/trw_pin_cfg.v': identity['candidate_sha256']})
+    if config_sha is not None:
+        expected['src/config.json'] = config_sha
     if candidate_inputs(root) != expected or sha(root / baseline['workflow']) != baseline['workflow_sha256']:
         raise ValueError('Selector replay inputs changed')
 
 
-def screen_views(run, artifact, archive):
-    screen_context(run, artifact)
+def screen_views(run, artifact, archive, *, admit=screen_context):
+    admit(run, artifact)
     if 'sha256:' + digest(archive) != artifact['digest']:
         raise ValueError('Independent screen archive digest mismatch')
     with zipfile.ZipFile(archive) as bundle:

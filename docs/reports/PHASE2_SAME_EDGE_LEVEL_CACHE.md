@@ -69,3 +69,44 @@ lane1 slot[454] NAND2B input exceeds Metal3 cumulative 225.46/200 even though
 partial ratio is 199.88. The cache does not eliminate the post-repair antenna
 failure pattern. Final netlist has 5056 named hold cells, with 47 inserted in
 the last repair. Exact summary is level_cache/native_result_43941730264.json.
+
+## Cache-only native screen 43957277296
+The full native physical screen completes, but its strict final gate fails one
+antenna net/pin. All other final gate checks pass: electrical violations zero,
+global overflow zero, stock hold fast/typical/slow +0.0765731/+0.244206/+0.548727 ns.
+Fast hold is only 26.5731 ps above the 50 ps gate. Aggregate setup WS remains
+zero; functional flop/output setup reserve has not been measured on this source.
+No positive-setup-margin or routed/signoff pass is established.
+
+Compared with cache+owner, removing owner factoring reduces antenna violations
+from two to one, but reduces fast hold from +0.117026 to +0.0765731 ns. Compared
+with the earlier pending baseline, antenna count remains one and fast hold is
+worse (+0.107840 ns before). Thus this is not yet a demonstrated overall winner.
+The log again shows a clean antenna-repair checkpoint followed by a final
+hold-repair/reroute (57 inserted hold buffers) and a fresh antenna failure.
+The reported endpoint is net14102 -> _35365_/B2 on Metal3. Its displayed partial
+ratio137.46/200 does not by itself identify the failing cumulative ratio;
+inspect the full antenna report before selecting the remedy.
+
+Next: inspect that endpoint and its native repair history; query exact-source
+functional setup reserve if this source remains promising. No automatic detailed
+route from this failed screen, no acceptance-gate relaxation, and no change to
+official jobs. Routine main test/unit/lint/docs at f00bf49 all pass.
+
+Full report confirms net14102 cumulative Metal3 ratio221.37/200; driver
+wire14103 (BUF2) and sink _35365_/B2 (A22OI1) exist in the earlier checkpoint
+as well as final netlist. Thus final reroute, not a newly created sink alone,
+exposes this failure. Prepared read-only setup audit bound to exact source run,
+commit and final ODB5163a4b917e4ec52ce3de679b954f165e6fd3698fd0dfa7a6469952849179908.
+It preserves stock0.25ns uncertainty, repeats native metrics, checks unchanged
+views, and cannot qualify a failed source.25focused tests pass; real source
+config/ODB and workflow embedded scripts validate. A local mapping comparison
+excluding weak A22OI1 is running; it is not yet a selected physical experiment.
+
+A22OI1-exclusion local map completes: area419801.3568um2 (+1.39% vs cache-only
+414062.9388), slow flop5.582ns (was5.742), slow SRAM6.617ns (was6.331).
+This trades area and global timing for one possible antenna benefit; it is not
+selected for a native run yet. The gate's input is already on a BUF2 wire-repair
+chain; its output feeds a hold delay. Blanket upsizing is not a proven cure for
+the stock final-reroute pattern. Await actual cache-only setup reserve before
+committing another expensive physical trial.

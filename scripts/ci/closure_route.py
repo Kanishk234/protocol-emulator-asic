@@ -214,7 +214,9 @@ def route(root, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA, config_sha=CONF
     if any(type(antenna.get(k)) is not int or antenna[k] != 0
            for k in ('antenna__violating__nets', 'antenna__violating__pins')):
         raise ValueError('Final routed antenna gate fails')
-    extract(output)
+    # Qualify against native submission constraints, not the historical .10 ns
+    # hold-uncertainty diagnostic file retained in the candidate source tree.
+    extract(output, stock_constraints=True)
     timing = json.loads((root / 'runs/extracted-timing/corner_summary.json').read_text())
     electrical = json.loads((root / 'runs/extracted-timing/electrical_summary.json').read_text())
     rows = {}
@@ -229,6 +231,7 @@ def route(root, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA, config_sha=CONF
         detailed_routing_completed=True, extracted_timing_passed=True,
         final_antenna_nets=0, final_antenna_pins=0, route_drc_errors=0,
         disconnected_pin_checker_passed=True, minimum_fast_hold_ns=0.05,
+        stock_signoff_constraints=True, clock_uncertainty_ns=0.25,
         official_gds_signoff=False, routed_protocol_replay_performed=False), indent=2) + '\n')
 
 

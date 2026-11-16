@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -30,6 +31,32 @@ def preserve_signoff_constraints(source, output):
     return saved.resolve()
 
 
+def stock_signoff_constraints(config, output):
+    """Use the pinned native base SDC, with no legacy hold override."""
+    uncertainty = float(config.get("CLOCK_UNCERTAINTY_CONSTRAINT", 0.25))
+    if uncertainty != 0.25:
+        raise ValueError("Stock audit requires unchanged 0.25 ns uncertainty")
+    if config.get("PNR_SDC_FILE"):
+        raise ValueError("Stock audit must not inherit a custom PnR SDC")
+    saved = output / "effective-stock-signoff.sdc"
+    saved.write_text("source $::env(SCRIPTS_DIR)/base.sdc\n")
+    (output / "constraint_identity.json").write_text(json.dumps({
+        "policy": "stock-native-base-sdc",
+        "sta_constraint_file": str(saved.resolve()),
+        "sha256": hashlib.sha256(saved.read_bytes()).hexdigest(),
+        "clock_uncertainty_ns": uncertainty,
+        "legacy_source_sdc_used": False,
+        "official_signoff": False,
+    }, indent=2) + "\n")
+    return saved.resolve()
+
+
+def check_stock_report_uncertainty(text):
+    values = re.findall(r"([-+]?[0-9]+\.[0-9]+)\s+[-+0-9.]+\s+clock uncertainty", text)
+    if not values or any(abs(abs(float(v)) - 0.25) > 1e-9 for v in values):
+        raise ValueError("Fresh stock report does not confirm 0.25 ns uncertainty")
+
+
 def route_checkpoint(root):
     states = list(root.glob("*-openroad-detailedrouting/state_out.json"))
     if len(states) != 1:
@@ -43,7 +70,7 @@ def route_checkpoint(root):
     return states[0]
 
 
-def main(route_root=Path("runs/repaired-route/drt")):
+def main(route_root=Path("runs/repaired-route/drt"), *, stock_constraints=False):
     checkpoint = route_checkpoint(route_root)
     config = json.loads(Path("src/config_merged.json").read_text())
     if float(config["CLOCK_PERIOD"]) != 20:
@@ -54,7 +81,10 @@ def main(route_root=Path("runs/repaired-route/drt")):
     config["STA_CORNERS"] = ["nom_fast_1p32V_m40C", "nom_slow_1p08V_125C", "nom_typ_1p20V_25C"]
     output = Path("runs/extracted-timing")
     output.mkdir(parents=True, exist_ok=False)
-    config['SIGNOFF_SDC_FILE'] = str(preserve_signoff_constraints(Path('src/signoff.sdc'), output))
+    if stock_constraints:
+        config['SIGNOFF_SDC_FILE'] = str(stock_signoff_constraints(config, output))
+    else:
+        config['SIGNOFF_SDC_FILE'] = str(preserve_signoff_constraints(Path('src/signoff.sdc'), output))
     path = Path("src/config_extracted_timing.json")
     path.write_text(json.dumps(config, indent=2) + "\n")
     subprocess.run([sys.executable, "-m", "librelane", "--pdk-root", os.environ["PDK_ROOT"],
@@ -69,6 +99,9 @@ def main(route_root=Path("runs/repaired-route/drt")):
     for corner in config["STA_CORNERS"]:
         # Require reports from each newly executed corner, not just inherited state keys.
         corner_dir = states[0].parent / corner
+        if stock_constraints:
+            for filename in ("max.rpt", "min.rpt"):
+                check_stock_report_uncertainty((corner_dir / filename).read_text())
         for kind in ("setup", "hold"):
             report = corner_dir / ("ws.max.rpt" if kind == "setup" else "ws.min.rpt")
             if not report.is_file() or corner not in report.read_text():
@@ -86,4 +119,7 @@ def main(route_root=Path("runs/repaired-route/drt")):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--route-root", type=Path, default=Path("runs/repaired-route/drt"))
-    main(parser.parse_args().route_root)
+    parser.add_argument("--stock-constraints", action="store_true",
+                        help="Use native base SDC and verify 0.25 ns uncertainty; no legacy source override")
+    args = parser.parse_args()
+    main(args.route_root, stock_constraints=args.stock_constraints)

@@ -41,7 +41,7 @@ def member(path, prefix):
 
 def validate(run, artifact, archive, expected, output, *, admit=None,
              screen_identity=None, route_identity=None, frozen_views=None,
-             config_sha=CONFIG_SHA):
+             config_sha=CONFIG_SHA, require_stock_constraints=False):
     (admit or source_context)(run, artifact)
     screen_run, screen_sha = screen_identity or (SOURCE_RUN, SOURCE_SHA)
     route_run, route_sha = route_identity or (ROUTE_RUN, ROUTE_SHA)
@@ -60,6 +60,20 @@ def validate(run, artifact, archive, expected, output, *, admit=None,
             official_gds_signoff=False, routed_protocol_replay_performed=False)
         if any(type(completion.get(k)) is not type(v) or completion[k] != v for k, v in requirements.items()):
             raise ValueError('Incomplete or failed route/extraction gates')
+        if require_stock_constraints:
+            if (completion.get('stock_signoff_constraints') is not True
+                    or completion.get('clock_uncertainty_ns') != 0.25):
+                raise ValueError('Native stock timing qualification missing')
+            constraints = read('runs/extracted-timing/constraint_identity.json')
+            if (constraints.get('policy') != 'stock-native-base-sdc'
+                    or constraints.get('clock_uncertainty_ns') != 0.25
+                    or constraints.get('legacy_source_sdc_used') is not False):
+                raise ValueError('Legacy/custom constraints cannot qualify final replay')
+            path = member(constraints['sta_constraint_file'], 'runs/extracted-timing')
+            data = bundle.read(path)
+            if (data != b'source $::env(SCRIPTS_DIR)/base.sdc\n'
+                    or hashlib.sha256(data).hexdigest() != constraints.get('sha256')):
+                raise ValueError('Stock signoff constraint bytes differ')
         views = {member(name, 'runs/stock-official-baseline'): sha
                  for name, sha in completion['source_views'].items()}
         known = frozen_views if frozen_views is not None else json.loads(SCREEN_RECEIPT.read_text())['frozen_views']
@@ -85,6 +99,12 @@ def validate(run, artifact, archive, expected, output, *, admit=None,
             found = [n for n in names if n.startswith(prefix) and n.endswith(suffix)]
             if len(found) != 1: raise ValueError('Missing unique completed ' + label + ' state')
             stages[label] = read(found[0])
+            if require_stock_constraints and label == 'extracted':
+                from extracted_timing import check_stock_report_uncertainty
+                stage = str(PurePosixPath(found[0]).parent)
+                for corner in CORNERS:
+                    for report in ('max.rpt', 'min.rpt'):
+                        check_stock_report_uncertainty(bundle.read(f'{stage}/{corner}/{report}').decode())
         if type(stages['route']['metrics'].get('route__drc_errors')) is not int or stages['route']['metrics']['route__drc_errors'] != 0:
             raise ValueError('Final native route DRC is not zero')
         nls = {label: member(state['nl'], 'runs/closure-route' if label == 'route' else

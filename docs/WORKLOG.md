@@ -7692,3 +7692,24 @@ Checklist boxes ticked: none.
 Next: collect million-clock L2 completion, run/refresh mutation evidence if this source is selected, then inspect stock DRT antenna/DRC and extracted all-corner results. Final GL and unchanged official GDS/precheck remain required on the eventual exact adopted source.
 
 Parallel L2 completion: exact candidate258186504e4b9f73d2711067e456494def705d2b compares1,000,000 clocks with zero divergences (527.82s). XML confirms1/1L2 and6/6chip/SRAM checks pass with no skips/failures. No phase checkbox changed; final-source mutation/GL/official physical gates remain outstanding.
+
+### Workflow status check — 2026-11-14
+- Checked all active and queued GitHub Actions runs. Stock DRT diagnostic `43629225955` remains in native detailed routing; extracted timing has not started. Unit run `43634896907` is running chip RTL and Verilator suites; its Python unit job passed. Latest lint/docs/test runs passed.
+- Two old runs `37655518919` and `37655518925` remain queued since October 7 with no jobs assigned; left untouched.
+- No hardware, acceptance gates, or official workflow jobs changed. Next: inspect native routing and extraction results when available; no Phase 2 closure claimed.
+
+## 2026-11-15: Codex — extracted routing diagnosis
+- Run43629225955: native DRT succeeds, route DRC0, extracted antenna0 and electrical0 all corners. Strict extraction fails slow setup -0.783631ns (three endpoints, TNS -1.600791ns); fast/typical aggregate setup remains clamped0. Hold fast/typ/slow +0.301340/+0.510919/+0.880261ns. Latest normal CI/nightly pass.
+- Decoded all three setup failures: common launch U0 config word0bit7, endpoints fabric C3/C0 last_seq and U2 RX rt23. Worst path crosses A input selector and has2.039370ns explicit hold-cell delay. No unsafe buffer removal or gate relaxation.
+- Refreshed parallel A/S priority selector equivalence against exact source:46/46 points pass; inverted-pad mutant rejected. Prototype/receipt/proof in /tmp/tripwire-selector-refresh-43629225955. No main RTL or official workflow edits, publication, or new physical run.
+- Added PHASE2_PENDING_EXTRACTED_43629225955.md. No checklist ticked. Next: whole-chip mapping/area comparison and protocol regression of this narrow selector prototype before preparing a native screen. Official GDS/precheck still pending.
+
+## 2026-11-16: Codex — pad-owner screen prepared after local comparisons
+- Collected interrupted local replays: owner-OR and parallel A/S each22/22 pass, no skips/failures. Latest main CI/nightly passed.
+- Matched whole-chip mapping/STA reproduces reference414910.6416um2, slow flop/SRAM5.944/6.588ns and measured launch6.117116ns. Parallel A/S regresses launch/global reserve; reject. Joint decode improves launch7.108249ns but increases area/regresses overall/SRAM reserve; unselected.
+- Owner-OR factoring improves launch6.801030ns and global flop6.125ns, reduces area to414037.0080um2; SRAM reserve falls to6.125ns. NU4/6 equivalence147points each pass; negative-control owned-output polarity rejected. No physical improvement claimed.
+- Prepared hash-bound one-file patch/helper, evidence JSON, manual-only separate native screen and report PHASE2_PAD_OWNER_OR_NEXT_SCREEN.md. Eight focused checks pass, including workflow runtime/gate preservation and shell syntax. Actual source archive applies cleanly and matches replayed source.
+- Main RTL/config, official jobs, constraints and unrelated local files unchanged. No phase box ticked. No commit/push/launch under supplied AGENTS.md Git rule. Next: user publishes scoped groups, dispatch native pad-owner screen, then inspect all strict gates before routing.
+
+### 2026-11-16: Approved pad-owner publication
+User explicitly approved all reviewed publication/launch steps, overriding the supplied AGENTS.md Git restriction for these scoped changes. Rechecked8focused tests, embedded workflow Python and diff whitespace; all pass. No active hardening. Tools/evidence0f1a2f7 and separate manual screen79b45d2 committed; next push to remote main and dispatch exactly one pad-owner screen. No main hardware or official job changes.

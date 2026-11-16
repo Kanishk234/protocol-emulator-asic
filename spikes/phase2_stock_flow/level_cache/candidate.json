@@ -1,0 +1,63 @@
+{
+  "reference": "owner_or source from screen43920762758",
+  "reference_files": {
+    "trw_chip.v": "211e159ca99c2c3b17af8b2aba27e0e16e7491d3da6c9158448df02c13db0dfd",
+    "trw_pin_unit.v": "e79409507fc9a9e29ebead7fea2d85e7a555c062815d1bf55fce6ca2067172fe",
+    "trw_pin_tx.v": "a9833ed0fadaf6059269dc1c426f69b920e3034b26884494899cdaa365e47993",
+    "trw_pin_bs.v": "83f82e436b67d79efddae6dc60bdfa4902cf5b250b1cd587ffe2a4c9c1e08340"
+  },
+  "candidate_files": {
+    "trw_chip.v": "06f23459aca64c6660b69a0839f87e9c4a21eaba5162f8854629d138e86e93d4",
+    "trw_pin_unit.v": "1850fff765398ced39d39fe104291a6e191743f1ad2074537094c3822104ac8c",
+    "trw_pin_tx.v": "bf3716de0cf6f3a6956d6af8a7ed34f60c342f95cba5937c41b51ecfc404ef95",
+    "trw_pin_bs.v": "f06c3543ae08f99de296852e96fe842ae7f44df3734467f1d05900b1a474265c"
+  },
+  "patch_sha256": "20d7de684da1351ac4a032bf867d0d1bff0aa9ffeaf42fd5d2134fe0caf5c712",
+  "general_need": "Materialize timed-engine output functions at their existing state-update edge, avoiding late IDLE-to-pad feedback logic; no added protocol cycle.",
+  "configuration_contract": "ASIC root-clock IDLE storage; idle_next reproduces the configuration value immediately after the same edge. TRW_PIN_CFG_FLOPS fallback has not been integrated/qualified.",
+  "local_mapping": {
+    "reference_area_um2": 414037.008,
+    "candidate_area_um2": 414799.5474,
+    "reference_slow_flop_slack_ns": 6.125,
+    "candidate_slow_flop_slack_ns": 6.51,
+    "reference_slow_sram_slack_ns": 6.125,
+    "candidate_slow_sram_slack_ns": 6.51,
+    "reference_measured_launch_slack_ns": 6.80103,
+    "candidate_measured_launch_slack_ns": 8.817179,
+    "reference_flops": 2414,
+    "candidate_flops": 2418,
+    "scope": "Matched whole-chip ideal20ns clock, no extracted RC or physical repair; macro area excluded"
+  },
+  "module_equivalence": {
+    "TX_FULL0": 760,
+    "TX_FULL1": 844,
+    "TX_scope": "Root-clock IDLE input contract; unobservable optimized combinational nlvx correspondence excluded, all module ports and matched state retained; hierarchy elaborated before proof",
+    "BS_DELTA0": 1152,
+    "BS_DELTA1": 1152,
+    "BS_scope": "Root-clock IDLE contract, hierarchy elaborated; no blacklist",
+    "stale_IDLE_mutants_rejected": true,
+    "initial_unelaborated_TX_attempt_invalidated": true,
+    "independent_bounded_TX_miter": "Valid runs timed out; mutant rejected. No bounded-pass claim."
+  },
+  "top_port_phase_replay": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "xml_sha256": "014bc51f56a5ec5e359d7dbd0da2afb190e12decd29ecb6382fbb7560924c871",
+    "scope": "Original/candidate full-chip output ports compared2ns after both clock edges; includes live-IDLE writes in full/lean/BITSYNC and4smokes; not formal whole-chip proof"
+  },
+  "protocol_replay": {
+    "complete": true,
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "xml_sha256": "7019eb1dcfce8f32528504158e1540d351321fd3843ebf1ffe8e480c7f63ca86",
+    "scope": "Verilator RTL; optional sigrok annotations disabled, independent waveform/reference models retained",
+    "elapsed_seconds": 423.86468720436096
+  },
+  "physical_qualified": false,
+  "adoption_ready": false,
+  "official_gds_signoff": false,
+  "configuration_source_sha256": "aff0539d40e03fd6f7b929f840c9f96e9f4ff4ae8fdaa077dbe4c6fd99d8cd59",
+  "reference_config_sha256": "9074bd3491a40f63b66ce8f09e33c22f8b3e21601a76ffd749fd6add6b3dc9ac"
+}

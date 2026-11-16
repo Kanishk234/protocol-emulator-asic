@@ -2,6 +2,35 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Complete gated screen-to-route-to-final-replay pipeline
+
+- Published tools6a44968 /CI2b7077c /docs29c0e63. Selector continuation
+  [43956306270](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43956306270)
+  is active at exact29c0e63c40696c1f038035fa94234efa26c3e8d6,
+  waiting for screen43951998125 whole-workflow success. Screen remains in
+  stock physical flow; no new physical success or timing closure yet.
+- Prepare final native-cell 22-protocol replay bound to that exact route.
+  Require complete route SUCCESS, full route ZIP digest, complete extraction
+  gates, source equality, logical route/extracted connectivity equality and
+  exact extracted-state NL. Independently authenticate the original screen
+  ZIP and all six frozen physical views; compare route source-view hashes
+  to that separate screen rather than trusting route self-report alone.
+- Reconstruct complete selector replay sources, including unchanged firmware,
+  model and harness. Fresh committed-HEAD reconstruction passes and all170
+  candidate inputs match the authenticated successful selector regression.
+  Verify that same source set after replay; require22 executed cases with
+  zero failures/errors/skips, pinned PDK cells, Icarus13 and real sigrok.
+  This remains functional replay without SDF, not signoff or hardware testing.
+- Shared validator defaults preserve old-source behavior; explicit provenance
+  only adapts the source identity, retaining all timing/DRC/antenna checks.
+  Superseded old final replay is manual-only to avoid redundant old-source
+  jobs on helper changes. New dependency wait is bounded below GitHub6h cap.
+- All105 combined guards pass, including independent-screen corruption,
+  wrong-source/failure admission and shared-validator provenance regression;
+  actionlint passes. No production hardware/config or template job edits,
+  no phase boxes ticked. Next inspect actual screen, routing/extraction and
+  final replay results. A failed predecessor stops downstream work.
+
 ## 2026-11-16 — Queue exact-selector routing and extraction behind screen gate
 
 Independent committed-HEAD source reconstruction passes all original preparation

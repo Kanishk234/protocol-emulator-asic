@@ -79,3 +79,30 @@ def test_screen_keeps_native_controls_and_final_gates():
             subprocess.run(['bash', '-n'], input=s['run'], text=True, check=True)
     text = extra[0]['run'].split("<<'PYCODE'\n")[1].rsplit('\nPYCODE', 1)[0]
     compile(text, '<level-cache-workflow>', 'exec')
+
+
+def test_no_owner_screen_preserves_pending_controls_and_guards_source():
+    folder = ROOT / '.github/workflows'
+    old = yaml.safe_load((folder / 'gds-official-dev4-pending-polarity-screen.yaml').read_text())
+    new = yaml.safe_load((folder / 'gds-official-dev4-cache-no-owner-screen.yaml').read_text())
+    assert new['on'] == {'workflow_dispatch': {}}
+    assert old['jobs']['screen']['env'] == new['jobs']['screen']['env']
+    steps = new['jobs']['screen']['steps']
+    extra = [s for s in steps if s['name'] == 'Apply output cache on pre-owner baseline']
+    assert len(extra) == 1
+    assert "e['pad_mux_sha256']" in extra[0]['run']
+    assert "e['protocol_replay']['passed']==22" in extra[0]['run']
+    assert "e['top_port_phase_replay']['passed']==5" in extra[0]['run']
+    rest = [s for s in steps if s not in extra]
+    assert len(rest) == len(old['jobs']['screen']['steps'])
+    for a, b in zip(old['jobs']['screen']['steps'], rest):
+        if a.get('uses', '').startswith('actions/upload-artifact'):
+            assert a['uses'] == b['uses'] and b['if'] == 'always()'
+            assert b['with']['path'].startswith(a['with']['path'])
+        else:
+            assert a == b, a['name']
+    for s in steps:
+        if 'run' in s:
+            subprocess.run(['bash', '-n'], input=s['run'], text=True, check=True)
+    script = extra[0]['run'].split("<<'PYCODE'\n")[1].rsplit('\nPYCODE', 1)[0]
+    compile(script, '<cache-no-owner-workflow>', 'exec')

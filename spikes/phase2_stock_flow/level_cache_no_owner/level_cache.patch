@@ -1,0 +1,149 @@
+--- a/src/trw_chip.v
++++ b/src/trw_chip.v
+@@ -185,8 +185,10 @@
+                 .clk (clk), .rst_n (rst_n), .we (pcfg_we[u]), .waddr (pcfg_waddr), .wdata (hwd),
+                 .cfg (cfg), .carrier_active (carrier_active), .bitsync_active (bitsync_active), .sample_delta (sample_delta), .restart (restart)
+             );
+-            trw_pin_unit #(.FULL (FULL), .USE_SAMPLE_DELTA(1), .USE_BITSYNC_ACTIVE(1)) u_unit (
+-                .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg),
++            wire idle_next = (pcfg_we[u] && (pcfg_waddr == 5'd0))
++                           ? (rst_n && hwd[`TRW_PC_IDLE_LSB]) : cfg[`TRW_PC_IDLE_LSB];
++            trw_pin_unit #(.FULL (FULL), .USE_LEVEL_CACHE(1), .USE_SAMPLE_DELTA(1), .USE_BITSYNC_ACTIVE(1)) u_unit (
++                .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .idle_next(idle_next),
+                 .carrier_active (carrier_active), .bitsync_active (bitsync_active), .sample_delta (sample_delta), .pads (pads),
+                 .tx_avail (avail[C_U+u]), .tx_tag (head[18*(C_U+u)+16 +: 2]), .tx_data (head[18*(C_U+u) +: 16]),
+                 .tx_take (take[C_U+u]),
+--- a/src/trw_pin_unit.v
++++ b/src/trw_pin_unit.v
+@@ -22,6 +22,7 @@
+ 
+ module trw_pin_unit #(
+     parameter FULL = 0,
++    parameter USE_LEVEL_CACHE = 0,
+     parameter USE_SAMPLE_DELTA = 0,
+     parameter USE_BITSYNC_ACTIVE = 0,
+     parameter FRAC = 8           // time fraction bits; 8 is the spec (16.8). FRAC < 8 is a measurement
+@@ -31,6 +32,7 @@
+     input  wire                    rst_n,
+     input  wire                    restart,
+     input  wire                    live,
++    input  wire                    idle_next,
+     input  wire [`TRW_PC_BITS-1:0] cfg,
+     input  wire [24:0]             sample_delta,
+     input  wire                    carrier_active,
+@@ -128,9 +130,9 @@
+     // ------------------------------------------------------------------ TX half
+     wire lvl_t, oe, echo_t, rxset, smp, late_t, take_t;
+     wire [4:0] rxset_n;
+-    trw_pin_tx #(.FULL (FULL), .FRAC (FRAC)) u_tx (
++    trw_pin_tx #(.FULL (FULL), .USE_LEVEL_CACHE(USE_LEVEL_CACHE), .FRAC (FRAC)) u_tx (
+         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
+-        .txmode (txmode), .order (order), .idle (idle), .tx_lentok (tx_lentok), .tx_preload (tx_preload),
++        .txmode (txmode), .order (order), .idle (idle), .idle_next(idle_next), .tx_lentok (tx_lentok), .tx_preload (tx_preload),
+         .stretch (stretch), .tx_edge (tx_edge), .period (period), .presc (presc), .nbits (nbits),
+         .sym0_t1 (sym0_t1), .sym0_first (sym0_first), .sym0_t2 (sym0_t2),
+         .sym1_t1 (sym1_t1), .sym1_first (sym1_first), .sym1_t2 (sym1_t2), .carrier (carrier),
+@@ -170,9 +172,9 @@
+     wire [15:0] data_b;
+     generate
+         if (FULL != 0) begin : g_bs
+-            trw_pin_bs #(.USE_SAMPLE_DELTA(USE_SAMPLE_DELTA)) u_bs (
++            trw_pin_bs #(.USE_SAMPLE_DELTA(USE_SAMPLE_DELTA), .USE_LEVEL_CACHE(USE_LEVEL_CACHE)) u_bs (
+                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .active (bs_on),
+-                .idle (idle), .order (order), .tx_lentok (tx_lentok), .nrzi (nrzi), .oe_auto (oe_auto),
++                .idle (idle), .idle_next(idle_next), .order (order), .tx_lentok (tx_lentok), .nrzi (nrzi), .oe_auto (oe_auto),
+                 .delim (delim), .period (period),
+                 .sampleofs (sampleofs), .sample_delta (sample_delta), .sjw (sjw),
+                 .idle_bits (idle_bits), .resync_both (resync), .nbits (nbits), .rx_nbits (rx_nbits),
+--- a/src/trw_pin_tx.v
++++ b/src/trw_pin_tx.v
+@@ -32,7 +32,8 @@
+ `include "trw_defs.vh"
+ 
+ module trw_pin_tx #(
+-    parameter FULL = 0,          // 1: PULSE and carrier (U0-U1, D-040)
++    parameter FULL = 0,
++    parameter USE_LEVEL_CACHE = 0,          // 1: PULSE and carrier (U0-U1, D-040)
+     parameter FRAC = 8           // fraction bits of time arithmetic (8 = the spec's 16.8; less = measurement only)
+ ) (
+     input  wire        clk,
+@@ -43,6 +44,7 @@
+     input  wire [2:0]  txmode,
+     input  wire        order,
+     input  wire        idle,
++    input  wire        idle_next,
+     input  wire        tx_lentok,
+     input  wire        tx_preload,
+     input  wire        stretch,
+@@ -158,7 +160,22 @@
+             carrier_active_q <= carrier_active;
+     end
+     wire car_out_on = (FULL != 0) && carrier_active_q;
+-    assign lvl = (lvx && !(car_out_on && cph)) ^ idle;
++    generate if (USE_LEVEL_CACHE != 0) begin : g_level_cache
++        // Same-edge precomputation of the old output function, not a pipeline.
++        // idle_next is the configuration bit visible immediately after this edge.
++        wire cph_next = (!car_on || !nlvx[0] || !lvx) ? 1'b0
++                      : (ct[24:9] == 16'd0) ? !cph : cph;
++        reg lvl_q;
++        always @(posedge clk) begin
++            if (!rst_n || restart)
++                lvl_q <= idle_next;
++            else
++                lvl_q <= (nlvx[0] && !(car_on && cph_next)) ^ idle_next;
++        end
++        assign lvl = lvl_q;
++    end else begin : g_level_original
++        assign lvl = (lvx && !(car_out_on && cph)) ^ idle;
++    end endgenerate
+ 
+     // ------------------------------------------------------------------ the running shift / burst
+     wire [15:0] bt_i    = bt[BW-1:FRAC+1];
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -44,13 +44,14 @@
+ `include "trw_defs.vh"
+ `include "trw_assert.vh"
+ 
+-module trw_pin_bs #(parameter USE_SAMPLE_DELTA = 0) (
++module trw_pin_bs #(parameter USE_SAMPLE_DELTA = 0, parameter USE_LEVEL_CACHE = 0) (
+     input  wire        clk,
+     input  wire        rst_n,
+     input  wire        restart,
+     input  wire        live,
+     input  wire        active,       // TXMODE and RXMODE are bitsync (and this is a full unit)
+     // configuration (static while running)
++    input  wire        idle_next,
+     input  wire        idle,         // the recessive level
+     input  wire        order,
+     input  wire        tx_lentok,
+@@ -331,7 +332,28 @@
+     // right-aligned (area: no barrel shifter); bits above the word's length are never read
+     wire [15:0] ld_q     = k_crc ? ((crc_src ^ crc_xor) & cmask) : pay;
+ 
+-    assign tx_lvl = cur;                                        // no bit: released (recessive)
++    generate if (USE_LEVEL_CACHE != 0) begin : g_level_cache
++        reg lvl_q;
++        always @(posedge clk) begin
++            if (!rst_n || restart || !active || jm_off)
++                lvl_q <= idle_next;
++            else if (j_bit)
++                lvl_q <= j_lvl;
++            else if (deq)
++                lvl_q <= nl;
++            else if (se_go)
++                lvl_q <= 1'b0;
++            else if (jj_go)
++                lvl_q <= idle;
++            else if (bnd)
++                lvl_q <= idle_next;
++            else
++                lvl_q <= drv ? tlv : idle_next;
++        end
++        assign tx_lvl = lvl_q;
++    end else begin : g_level_original
++        assign tx_lvl = cur;
++    end endgenerate                                        // no bit: released (recessive)
+     assign tx_se0 = drv && se0_r;
+     assign tx_drv = drv;
+ 

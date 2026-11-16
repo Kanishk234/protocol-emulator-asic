@@ -110,3 +110,26 @@ selected for a native run yet. The gate's input is already on a BUF2 wire-repair
 chain; its output feeds a hold delay. Blanket upsizing is not a proven cure for
 the stock final-reroute pattern. Await actual cache-only setup reserve before
 committing another expensive physical trial.
+
+
+## Native functional audit 43970069989 and next controlled mapping test
+Exact-source read-only audit succeeds with setup fast/typical/slow
++12.766801/+9.293901/+3.183562 ns at stock0.25ns uncertainty. Source views and
+ordinary native metrics remain identical. Slow functional reserve improves
++0.650067 ns over pending-only +2.533495 ns. No extracted result or qualification
+is inferred: final antenna1 and narrow fast-hold headroom remain unresolved.
+Source-bound receipt is level_cache_no_owner/functional_setup_43970069989.json.
+
+Reconsider the small mapped area/timing tradeoff in light of this actual reserve:
+prepare one native screen excluding A22OI1 on exactly the same cache-only RTL.
+The library offers only A22OI1, so this is logic decomposition/remapping, not
+a direct A22OI2 replacement. The local trial directory's a22oi2 name does not
+identify an actual library cell. Area rises1.39%; local flop slack falls0.160ns
+and SRAM slack improves0.286ns. The native result could worsen; all final gates
+remain unchanged. Exact source/config binding, one-field config comparison,
+unchanged RTL inventory, native synthesis/final exclusion checks and workflow
+parity tests pass (73 focused checks). Actual frozen-source preparation produces
+config155c0c8efe5375f12cd34feb5d4a559c860d2f94970be7d2bf150fbb50b6e9af.
+No full protocol rerun for byte-identical RTL; the original22/22 evidence remains.
+This does not adopt non-default configuration into main or authorize routing an
+antenna-failed source.

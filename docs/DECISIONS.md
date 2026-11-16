@@ -1875,3 +1875,19 @@ The uploaded artifact `official-dev4-screen-8x4-42656422355.zip` is user-local e
 Cost measured on the owner-factor baseline: four net additional mapped flops, standard-cell area414037.0080→414799.5474um2 (+0.18%), unchanged2071latches. Ideal-wire slow setup reserve6.125→6.510ns; measured IDLE-launch frontier6.801030→8.817179ns. No routed gain claimed. TX-only and BS-only variants do not improve the overall frontier as well as the composed change.
 
 Evidence: level_cache/candidate.json and verify.py, named engine proofs under root-clock IDLE contract, stale-IDLE negative controls and five full-chip two-phase top-port comparisons. TX proof excludes one optimized private combinational correspondence, not an output/state. Expanded protocol replay is pending. TRW_PIN_CFG_FLOPS fallback requires separate integration before adoption. No change to main RTL, project settings, official jobs, resource counts, period or gates is approved by this experimental decision.
+
+
+## D-180 (2026-11-16): screen native A22OI mapping exclusion on cache-only source
+**Experimental, not adopted.** General need: eliminate a measured small-input
+cumulative antenna endpoint using native library mapping rather than per-net ECOs
+or changes to the official flow. Source43957277296 has one remaining A22OI1B2
+failure221.37/200 after final timing reroute; actual setup reserve is+3.183562ns
+slow in audit43970069989. Add only A22OI1 to the existing three native cell
+exclusions. Since the library has no stronger A22OI variant, ABC remaps equivalent
+logic. No RTL/ISA/protocol behavior change. Local ideal area+1.39%, slow flop
+5.742→5.582ns, SRAM6.331→6.617ns; native benefit unknown. Fast hold+.0765731ns
+has little margin, so unchanged timing/electrical/antenna/overflow gates remain
+mandatory. Helper binds source/config/RTL hashes; audit verifies all four exclusions
+in synthesis and final netlist, preserving the prior stronger NAND2/NOR3 checks.
+73focused checks and actual artifact preparation pass. Separate manual screen,
+no main config/source or official-job modification, no routing until qualified.

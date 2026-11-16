@@ -4,6 +4,10 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-11-16 — Selector clock fix works; isolate one data antenna residual
 
+Independent density-source reconstruction passes all original source guards and
+both bound storage patches. All selector RTL/macro/info bytes are unchanged;
+project JSON differs only at PL_TARGET_DENSITY_PCT56→60 and hashes2b822640….
+
 Publication receipt: 52d9790 helper/guards,572aa6f workflow and9e4c74f
 measurement/decision pushed. New density screen43961635994 at exact
 9e4c74f4f901059b56ae1fdf337b956cea10fa06 is active. Prepare its exact-source

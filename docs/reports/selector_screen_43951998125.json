@@ -1,0 +1,57 @@
+{
+  "run": 43951998125,
+  "artifact_id": 14273234160,
+  "artifact_api_sha256": "c5960d08c37756288ffa5d1bcb5be240a2617a192f5a37c9f038c07fc85fba26",
+  "integrity_scope": "Ten selected ZIP members CRC-checked; whole-archive digest not independently verified locally",
+  "qualification": {
+    "qualified": false,
+    "failures": [
+      "antenna__violating__nets: 1",
+      "antenna__violating__pins: 1"
+    ],
+    "final_global_overflow": 0,
+    "source_state": "runs/stock-official-baseline/45-openroad-stamidpnr-3/state_out.json",
+    "minimum_fast_hold_ns": 0.05,
+    "detailed_routing_performed": false,
+    "official_gds_signoff": false
+  },
+  "corners": {
+    "nom_fast_1p32V_m40C": {
+      "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+      "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.114093,
+      "design__max_slew_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_cap_violation__count__corner:nom_fast_1p32V_m40C": 0,
+      "design__max_fanout_violation__count__corner:nom_fast_1p32V_m40C": 0
+    },
+    "nom_slow_1p08V_125C": {
+      "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+      "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.628747,
+      "design__max_slew_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_cap_violation__count__corner:nom_slow_1p08V_125C": 0,
+      "design__max_fanout_violation__count__corner:nom_slow_1p08V_125C": 0
+    },
+    "nom_typ_1p20V_25C": {
+      "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+      "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.300703,
+      "design__max_slew_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_cap_violation__count__corner:nom_typ_1p20V_25C": 0,
+      "design__max_fanout_violation__count__corner:nom_typ_1p20V_25C": 0
+    }
+  },
+  "failed_net": {
+    "name": "net11655",
+    "driver": "wire11656/X",
+    "receiver": "_31624_/A2",
+    "cell": "sg13cmos5l_a21oi_1",
+    "layer": "Metal3",
+    "cumulative_ratio": 252.71,
+    "limit": 200,
+    "downstream_state": "u_chip.g_unit[2].u_prod.tok[5]"
+  },
+  "earlier_native_antenna": {
+    "nets": 0,
+    "pins": 0
+  },
+  "configuration_clock_violation_remaining": false,
+  "route_started": false
+}

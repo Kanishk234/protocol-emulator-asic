@@ -2,6 +2,30 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Selector clock fix works; isolate one data antenna residual
+
+- Screen43951998125 finishes FAIL: original estimated setupWS0 all corners,
+  fast hold0.114093ns, electrical0, global overflow0; antenna1net/1pin.
+  Both routing43956306270 and final43957253552 stop on predecessor failure;
+  no DRT or extracted timing is claimed. Read ten actual ZIP members with
+  CRC via bounded ranges; whole local ZIP hash not claimed.
+- Previous word1configuration-clock violation is gone. Sole new antenna is
+  net11655 →_31624_/A2(a21oi_1), Metal3CAR252.71/200. Source wire11656
+  buffers _31622_/Y; downstream _31624_/Y drives U2producer token bit5.
+  Earlier native antenna report0; final gate catches changed geometry.
+  Compact evidence in reports/selector_screen_43951998125.json.
+- D-175 chooses one stock density change56→60 on byte-identical selector RTL.
+  Root-clock storage fix remains; no new hardware, margin-only repetition,
+  manual diode, timing/antenna waiver, stage-order or production config change.
+  New helper binds exact source/config/profile hashes, rejects extra drift,
+  and effective-profile guard requires actual native density60. All original
+  screen measurement/gate scripts remain unchanged.
+- Actual prepared-selector smoke passes; only config density changes and RTL
+  stays identical. Source/config/rejection and structural workflow tests run
+  before publication. Next inspect fresh native screen, then bind new route
+  only on full success. Resource/config integration review remains unapplied;
+  no phase checklist boxes ticked.
+
 ## 2026-11-16 — Prepare coherent production bundle while physical flow runs
 
 - Screen43951998125 is still in stock pre-routing physical execution; route

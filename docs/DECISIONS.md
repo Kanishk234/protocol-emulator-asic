@@ -1894,3 +1894,31 @@ Prepare a separate full-chip regression before physical screening. Do not
 route the failed cache screen, waive antenna rules, combine source changes
 in its existing artifact, change production config, or adopt a slower clock.
 Updated session Git instructions leave commits/pushes to the user.
+
+## D-175 (2026-11-16): test density60 on unchanged selector RTL
+
+Selector screen43951998125 finishes with original estimated setup WS0 all
+corners, fast hold0.114093ns, electrical0 and global overflow0, but fails one
+final antenna net/pin. The prior word-1 configuration-clock violation is gone.
+The new failure is data branch net11655, driver wire11656/X, receiver
+_31624_/A2 (a21oi_1), feeding U2producer token bit5. Metal3 cumulative area
+ratio252.71 exceeds200. Native post-repair antenna check was0; final post-timing
+geometry is not qualified. Routing/final replay correctly stop on parent failure.
+
+Test exactly one stock setting against this measured selector candidate:
+PL_TARGET_DENSITY_PCT56→60. This is within the standing config whitelist;
+no production config is applied. A modest tighter placement target may shorten
+this newly exposed data branch. It can instead increase congestion or alter
+clock skew, hold repair, setup or other antennas. It is a measured-comparison
+hypothesis, not a guaranteed fix or attribution of the failure to density.
+Require the actual native density target60 (reject clamping), unchanged20ns,
+all original/signoff timing, electrical0, antenna0 and live final overflow0.
+Do not change the RTL, clocks, constraints, diode policy or native stage order.
+
+The existing D-138 research rejects antenna ratio-margin-only tuning as a
+direct cure for cumulative-rule failures; do not repeat it blindly. No manual
+diode, source-independent ECO, false path or antenna waiver is introduced.
+One scalar config delta and exact config/source hashes are guarded by
+selector_density_trial.py. Existing functional/proof evidence remains scoped
+to the byte-identical RTL; physical validity requires this new screen. If it
+passes, bind a new route/extraction continuation to its exact run/artifact.

@@ -406,3 +406,13 @@ therefore remains unqualified even though the earlier checker reports zero.
 The existing final stock screen gate catches it and remains unchanged. D-174
 prepares a source-level root-clock selector-storage trial; physical efficacy
 is unmeasured. No failed checkpoint is routed and no antenna waiver is added.
+
+### 2026-11-16: selector screen exposes one final data antenna
+
+Screen43951998125 clears the previous configuration-clock violation but final
+antenna fails net11655/_31624_/A2, a21oi_1, Metal3CAR252.71/200. It feeds
+U2producer token bit5 through native wire11656 and combinational logic. Earlier
+native post-repair antenna check0 does not qualify final timing-repaired
+geometry. Existing final screen gate detects it; both queued downstream jobs
+stop. D-175 prepares one density-only physical control, with no claimed fix
+before fresh measured gates. Original failure is retained.

@@ -27,3 +27,45 @@ TX-only maps slow overall reserve5.003ns; BS-only5.951ns. The composed represent
 - ASIC candidate only. TRW_PIN_CFG_FLOPS fallback/lookahead behavior requires integration before adoption. No new protocol block, resource-count cut, relaxed timing exception, changed clock or gate.
 
 Current owner physical screen43920762758 remains unchanged. If this prototype's protocol replay passes, prepare a separate native screen using the same physical settings. Choose physical follow-up from actual results; do not cancel a useful running source comparison. Final stock-constrained extraction and unchanged official GDS/precheck/GL remain required.
+
+
+## Follow-up selection, 2026-11-16
+Owner native functional reserve is only +0.295374 ns slow versus +2.533495 ns
+for the earlier pending-polarity source. Prepare a controlled cache-only rebase
+on that earlier source, retaining its original pin mux and all physical settings.
+The same four engine-cache files and their scoped module proofs apply. Exact
+whole-source replay remains separately required. Local ideal mapping for this
+rebase: area 414062.9388 vs 414910.6416 um2; slow flop 5.742 vs 5.944 ns,
+SRAM 6.331 vs 6.588 ns, IDLE-launch 8.375500 vs 6.117116 ns. Selection is a
+controlled physical comparison, not a claim that every ideal timing measure improves.
+
+Cheap local alternatives were rejected before spending native CI runs:
+
+| Trial | Slow flop slack, ns | Area, um2 | Decision |
+|---|---:|---:|---|
+| Early operand flags | 5.855 | 416283.1596 | Reject global regression |
+| Speculative full operands | 5.030 | 419355.6192 | Reject timing/area regression |
+| Root-clock mode FF | 5.355 | 413672.9184 | Reject critical timing regression |
+| Late mode mux factoring | 5.717 | 414401.7780 | Reject global regression |
+| Selected final output cache | 5.837 | 415279.0404 | Reject global regression |
+| Raw mode decode | 3.992 | 414069.1002 | Reject global regression |
+| RX timer speculative arithmetic | 5.793 | 423111.8430 | Reject timing/area regression |
+
+These are ideal-wire mapped results, not routed evidence. Scoped equivalence
+passed for the modified modules; only root-mode FF received separate full
+configuration phase replay. None is integrated or claimed as whole-design verified.
+
+
+Cache-only replay now completes: 22/22 protocols and 5/5 original/candidate
+chip phase comparisons, zero failures/skips. XML hashes and exact source
+inventories are in level_cache_no_owner/candidate.json. The phase golden uses
+the owner baseline; original/owner pin-mux equivalence supplies the compositional
+link. Optional sigrok annotations were disabled; independent protocol checks remain.
+The separate manual cache-only workflow is prepared locally, not yet launched.
+
+Cache+owner final violations are different from owner-only: U3 wdata_odd[8]
+to hold10179/A exceeds Metal2 cumulative ratio 252.73/200; net11554 to a
+lane1 slot[454] NAND2B input exceeds Metal3 cumulative 225.46/200 even though
+partial ratio is 199.88. The cache does not eliminate the post-repair antenna
+failure pattern. Final netlist has 5056 named hold cells, with 47 inserted in
+the last repair. Exact summary is level_cache/native_result_43941730264.json.

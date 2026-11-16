@@ -33,3 +33,22 @@ Inspected pinned OpenROADdcf36133a369abc8f3c5e5738cd4d82e4903c0e0, [AntennaCheck
 Owner stage44 setup repair was not a no-op: it corrected one -0.130ns endpoint at U0 RX rt21 with3buffers and1pin swap, before inserting44hold buffers. Disabling that stage is not an acceptable shortcut to use the clean stage43antenna report; it would also skip required timing work and final routing evidence. Merely increasing antenna-repair iterations also cannot anticipate geometry exposed only after that repair ends.
 
 Prepared manual read-only owner functional-setup audit: exact run/SHA/ODB binding, native engine/PDK checks, no repair/routing steps, repeated unchanged-baseline metrics, unchanged physical hashes and stock0.25ns report validation. It queries actual flop/output endpoints rather than the1000zero-slack latch paths.17focused tests pass; actual archived config and database hash validate. This does not admit the failed source to routing or waive any gate.
+
+
+## Functional reserve measured by read-only audit 43946058741
+The exact owner checkpoint has fast/typical/slow flop/output setup reserve
++11.541135/+7.437792/+0.295374 ns at stock 0.25 ns uncertainty. The audit
+repeats native metrics and hashes without repairing or routing. This is worse
+than the earlier pending source's measured slow +2.533495 ns; the owner rewrite
+is not a demonstrated physical improvement. The slow critical launch is U0's
+cached bitsync-active mode configuration, through pad feedback to RX rt[21].
+Four hold-cell arcs contribute 2.529031 ns; removing them without hold analysis
+would be invalid. Ordinary aggregate setup WS remains zero and all ordinary
+checks remain required. Audit success is measurement success, not qualification.
+
+Output-cache-plus-owner screen 43941730264 also completes but fails the final
+gate on two antenna nets/pins. Stock hold fast/typical/slow is
++0.117026/+0.321039/+0.672169 ns; final electrical counts and global overflow
+are zero. The later legacy-signoff audit's +0.15 ns hold increase is a constraint
+difference, not a physical gain. Positive functional setup reserve for this
+cache checkpoint has not yet been queried. No detailed route was launched.

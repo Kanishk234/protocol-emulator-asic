@@ -328,22 +328,24 @@ jobs:
         \ for p in paths}\nbefore = hashes()\noutput = Path('runs/stock-corner-audit')\n# Supplying the same checkpoint\
         \ twice makes this a repeatability/read-only audit.\n# No resizer, repair, placement or routing step is\
         \ invoked.\nscreen(Path('src/config_merged.json'), source, output, os.environ['PDK_ROOT'], repaired=source,\n\
-        \       sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])\n#\
-        \ Check antenna on the same final database; do not inherit pre-timing results.\nrun_step(json.loads(Path('src/config_merged.json').read_text()),\
-        \ source,\n         output / 'fresh-antenna', ['OpenROAD.CheckAntennas'])\nantenna_files = list((output\
-        \ / 'fresh-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))\nassert len(antenna_files) ==\
-        \ 1\nantenna_metrics = json.loads(antenna_files[0].read_text())\nantenna = {key: antenna_metrics[key] for\
-        \ key in ('antenna__violating__nets', 'antenna__violating__pins')}\nassert all(isinstance(v, int) and v\
-        \ >= 0 for v in antenna.values())\nassert hashes() == before, 'Read-only audit modified source physical\
-        \ views'\nresult = json.loads((output / 'comparison.json').read_text())\nrows = {}\nfor corner in CORNERS:\n\
-        \    metrics = result['corners'][corner]['before']\n    repeated = result['corners'][corner]['after']\n\
+        \       sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'],\n \
+        \      extra_tcl=Path('scripts/ci/functional_setup_frontier.tcl'))\n# Check antenna on the same final database;\
+        \ do not inherit pre-timing results.\nrun_step(json.loads(Path('src/config_merged.json').read_text()), source,\n\
+        \         output / 'fresh-antenna', ['OpenROAD.CheckAntennas'])\nantenna_files = list((output / 'fresh-antenna').glob('*-openroad-checkantennas/or_metrics_out.json'))\n\
+        assert len(antenna_files) == 1\nantenna_metrics = json.loads(antenna_files[0].read_text())\nantenna = {key:\
+        \ antenna_metrics[key] for key in ('antenna__violating__nets', 'antenna__violating__pins')}\nassert all(isinstance(v,\
+        \ int) and v >= 0 for v in antenna.values())\nassert hashes() == before, 'Read-only audit modified source\
+        \ physical views'\nresult = json.loads((output / 'comparison.json').read_text())\nrows = {}\nfor corner\
+        \ in CORNERS:\n    metrics = result['corners'][corner]['before']\n    repeated = result['corners'][corner]['after']\n\
         \    keys = [f'timing__{kind}__ws__corner:{corner}' for kind in ('setup', 'hold')]\n    keys += [f'design__max_{kind}_violation__count__corner:{corner}'\
         \ for kind in ('slew', 'cap', 'fanout')]\n    for key in keys:\n        assert key in metrics and key in\
         \ repeated, key\n        assert math.isfinite(metrics[key]) and abs(metrics[key] - repeated[key]) <= 1e-9,\
         \ key\n    rows[corner] = {key: metrics[key] for key in keys}\n(output / 'read_only_audit.json').write_text(json.dumps(dict(\n\
         \    source_state=str(source), unchanged_physical_view_hashes=before,\n    fresh_corner_metrics=rows, fresh_antenna_metrics=antenna,\
         \ physical_repairs_performed=False,\n    qualification_performed=False, detailed_routing_performed=False),\
-        \ indent=2) + '\\n')\nprint(json.dumps(rows, indent=2))\nPYCODE"
+        \ indent=2) + '\\n')\nprint(json.dumps(rows, indent=2))\nfrom screen_functional_setup import collect\nfunctional\
+        \ = collect(output)\n(output / 'functional_setup.json').write_text(json.dumps(functional, indent=2)+'\\\
+        n')\nprint(json.dumps({'functional_setup': functional}, indent=2))\nPYCODE"
     - name: Check unchanged signoff constraints on estimated routing
       timeout-minutes: 30
       run: "set -euo pipefail\nunset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH\n\
@@ -368,6 +370,7 @@ jobs:
         \ estimate fails: ' + '; '.join(failures))\nPYCODE"
     - name: Require all final screening gates
       run: python scripts/ci/stock_screen_gate.py --physical runs/stock-official-baseline --audit runs/stock-corner-audit
+        --require-functional-setup
     - name: Upload complete stock baseline measurements
       if: always()
       uses: actions/upload-artifact@v7

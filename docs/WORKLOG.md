@@ -2,6 +2,33 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Queue exact-selector routing and extraction behind screen gate
+
+Independent committed-HEAD source reconstruction passes all original preparation
+guards and both bound patches. All 34 functional-artifact hardware/macro/metadata
+files independently match the reconstructed source. No physical tools run locally.
+
+- User requests continued closure work. Selector screen43951998125 remains
+  in progress in stock physical flow; source preparation and stock engine
+  identity pass. No timing/antenna/congestion outcome claimed yet.
+- Add selector-specific continuation bound to screen43951998125 /1258879 /
+  attempt1. Wait for whole screen success; failed source stops before route.
+  Exact artifact/run identity and complete ZIP digest precede restoration.
+  Recompose the cache+selector source chain independently, compare all
+  hardware/macro/config/info inputs, preserve saved state paths, validate
+  saved original/signoff screen and fresh antenna/timing before DRT.
+- Reuse unchanged route, topology, route DRC, disconnected-pin and extraction
+  checks with explicit source provenance arguments. Defaults retain the old
+  source identity. Accept only the three additional selector provenance files
+  during archive recovery; unsafe paths remain rejected. Final strict timing,
+  fast hold >=50ps, electrical0, antenna0, routeDRC0 remain mandatory.
+- Make superseded original-source continuation manual-only so helper edits do
+  not launch a redundant old-candidate hardening. No protected template job,
+  production hardware/config, clock, physical repair or timing waiver changes.
+- All 93 combined source/archive/screen/extraction/closure guards and workflow
+  actionlint pass. No phase boxes ticked. Next publish gated continuation and
+  inspect actual screen/route outcomes; final replay and signoff remain open.
+
 ## 2026-11-16 — Selector regression passes; advance same-clock physical screen
 
 Publication receipt: 7b4ce88 guard and 1258879 workflow pushed. Physical

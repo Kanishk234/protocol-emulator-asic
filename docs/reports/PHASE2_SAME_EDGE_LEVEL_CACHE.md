@@ -133,3 +133,32 @@ config155c0c8efe5375f12cd34feb5d4a559c860d2f94970be7d2bf150fbb50b6e9af.
 No full protocol rerun for byte-identical RTL; the original22/22 evidence remains.
 This does not adopt non-default configuration into main or authorize routing an
 antenna-failed source.
+
+
+## A22OI exclusion screen 43972384723
+Corrected preparation passes; full native run completes and final gate fails only
+one antenna net/pin. Exclusions verified at synthesis/final, electrical0 and
+overflow0. Stock hold fast/typical/slow+0.107982/+0.306447/+0.637996ns, improving
+fast by31.4089ps vs cache-only. Aggregate setupWS0does not establish the actual
+functional reserve for this changed placement; earlier+3.183562ns is not this
+source's result. ANT repair again reacheszero before finaltiming/reroute;22late
+holdbuffers inserted. Fresh summary identifies net14132→hold10808/A onMetal2,
+ratio203.75/200. The previous A22OI endpoint is eliminated but another violation
+remains. This is not a qualified screen, detailed route or official GDS result.
+Full artifact inspection pending; no new experiment launched on summary alone.
+
+## Exact gate-mapping setup measurement and future early gate
+User requested setup be measured on this exact mapping before further promotion.
+Prepared bound read-only audit43972384723/source2f17b0c/config155c0c8e. It restores
+only the named GitHub artifact, verifies every original physical-view hash from
+the source audit receipt, repeats ordinary metrics and stock0.25ns uncertainty,
+and cannot qualify the antenna-failed design. Local artifact transfer times out;
+runner-side restoration avoids depending on that transfer. No setup result yet.
+
+For future executions of our separate mapping screen, add the functional-endpoint
+Tcl to the existing repeat-all-corner STA. Collect actual flop/output setup reports
+and require strictly positive reserve at every corner, in addition to all existing
+gates. Missing/repeated/malformed/nonstock reports fail closed. This changes our
+diagnostic workflow only; official jobs and constraints remain untouched.91focused
+checks pass; collector reproduces actual cache-only audit+12.766801/+3.183562/
++9.293901ns. Those values remain historical and are not gate-mapping measurements.

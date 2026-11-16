@@ -63,6 +63,12 @@ def test_workflow_preserves_every_native_control_and_gate():
         if a.get('uses','').startswith('actions/upload-artifact'):
             assert a['uses']==b['uses'] and b['if']=='always()'
             assert b['with']['path'].startswith(a['with']['path'])
+        elif a['name']=='Read-only all-corner STA on the final stock checkpoint':
+            expected=a['run'].replace("sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'])", "sta_grt_adjustment=json.loads(Path('src/config_merged.json').read_text())['GRT_ADJUSTMENT'],\n       extra_tcl=Path('scripts/ci/functional_setup_frontier.tcl'))")
+            expected=expected.replace("print(json.dumps(rows, indent=2))", "print(json.dumps(rows, indent=2))\nfrom screen_functional_setup import collect\nfunctional = collect(output)\n(output / 'functional_setup.json').write_text(json.dumps(functional, indent=2)+'\\n')\nprint(json.dumps({'functional_setup': functional}, indent=2))")
+            assert b=={**a,'run':expected}
+        elif a['name']=='Require all final screening gates':
+            assert b=={**a,'run':a['run']+' --require-functional-setup'}
         else: assert a==b, a['name']
     for s in steps:
         if 'run' in s: subprocess.run(['bash','-n'],input=s['run'],text=True,check=True)

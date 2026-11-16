@@ -117,3 +117,21 @@ def test_cli_status_matches_qualification_and_saves_report(tmp_path, antenna, ex
     assert result.returncode == expected_code, result.stderr
     report = json.loads((audit / 'screen_qualification.json').read_text())
     assert report['qualified'] is (expected_code == 0)
+
+
+@pytest.mark.parametrize('slack,antenna,passes', [(1.25,0,True),(0,0,False),(-.1,0,False),(1.25,1,False)])
+def test_functional_setup_is_additional_gate_without_antenna_waiver(tmp_path, slack, antenna, passes):
+    physical,audit=fixture(tmp_path,antenna=antenna)
+    for corner in CORNERS:
+        for phase in ('before','after'):
+            d=audit/f'{phase}-{corner}'/'1-openroad-stamidpnr'
+            (d/'functional_setup_frontier.rpt').write_text(f'TRIPWIRE_FUNCTIONAL_SETUP {corner}\nFLOP_DATA_ENDPOINTS 2418\nOUTPUT_ENDPOINTS 24\n{slack} slack (MET)\n')
+            for name in ('min.rpt','max.rpt'):
+                (d/name).write_text('0.250 19.750 clock uncertainty\n')
+    result=qualify(physical,audit,require_functional_setup=True)
+    assert result['qualified'] is passes
+
+
+def test_required_functional_report_missing_fails_closed(tmp_path):
+    with pytest.raises(ValueError,match='functional setup report'):
+        qualify(*fixture(tmp_path),require_functional_setup=True)

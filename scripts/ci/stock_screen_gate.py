@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 
 from postgrt_timing import CORNERS
+from screen_functional_setup import collect
 
 
 def one(root, pattern):
@@ -16,7 +17,7 @@ def one(root, pattern):
     return paths[0]
 
 
-def qualify(physical, audit):
+def qualify(physical, audit, *, require_functional_setup=False):
     physical, audit = Path(physical), Path(audit)
     receipt = json.loads((audit / 'read_only_audit.json').read_text())
     source = one(physical, '*-openroad-stamidpnr-3/state_out.json')
@@ -80,7 +81,14 @@ def qualify(physical, audit):
     overflow = int(totals[-1])
     if overflow:
         failures.append(f'final global-routing overflow: {overflow}')
+    functional = collect(audit) if require_functional_setup else None
+    if functional is not None:
+        for corner, row in functional.items():
+            value = row['worst_reported_setup_slack_ns']
+            if value <= 0:
+                failures.append(f'{corner} functional setup: {value} ns <= 0 ns')
     return dict(qualified=not failures, failures=failures,
+                functional_setup=functional,
                 final_global_overflow=overflow, source_state=str(source),
                 minimum_fast_hold_ns=0.05, detailed_routing_performed=False,
                 official_gds_signoff=False)
@@ -90,9 +98,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--physical', type=Path, required=True)
     parser.add_argument('--audit', type=Path, required=True)
+    parser.add_argument('--require-functional-setup', action='store_true')
     args = parser.parse_args()
     try:
-        result = qualify(args.physical, args.audit)
+        result = qualify(args.physical, args.audit, require_functional_setup=args.require_functional_setup)
     except (ValueError, KeyError, OSError) as error:
         result = dict(qualified=False, failures=[str(error)])
     (args.audit / 'screen_qualification.json').write_text(json.dumps(result, indent=2) + '\n')

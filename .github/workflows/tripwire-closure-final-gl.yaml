@@ -2,12 +2,6 @@ name: TRIPWIRE exact final-netlist protocol replay
 
 on:
   workflow_dispatch:
-  push:
-    branches: [tripwire/closure-8x4]
-    paths:
-      - .github/workflows/tripwire-closure-final-gl.yaml
-      - scripts/ci/closure_final_gl.py
-      - scripts/ci/test_closure_final_gl.py
 
 permissions:
   contents: read

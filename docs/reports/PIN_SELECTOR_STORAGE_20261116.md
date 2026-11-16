@@ -26,7 +26,9 @@ is prepared locally; no cloud or physical result exists for it yet.
 The new `tripwire-pin-select-trial.yaml` first reproduces the cache proof,
 then proves/applies this follow-up, runs model/compiler and actual-top/protocol
 suites, and checks that all receipt inputs remain unchanged except the bound
-configuration file. Publishing it will start that regression; physical
+configuration file. Published in 9ee952c, selector regression
+[43946078700](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43946078700)
+is queued on that exact source; physical
 screening must wait for its actual passing artifact. No production RTL/config
 or protected template job changes. No phase checklist boxes ticked.
 
@@ -35,7 +37,7 @@ CRC verification, not locally whole-archive hashed. Their API digests and this
 limitation are retained in `closure_followup_20261116.json`. The small functional
 archive was fully downloaded and digest verified.
 
-## Publish the prepared regression
+## Publication and reproduction
 
 The user subsequently renewed session approval for grouped commits and pushes.
 The commands below document the publication groups; the worklog records actual

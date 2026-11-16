@@ -4,6 +4,14 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-11-16 — Publish selector-clock follow-up under renewed session approval
 
+Publication receipt: committed RTL 5280372, tools 00fcdce, CI fb6a2a8 and
+evidence 9ee952c; pushed origin/tripwire/closure-8x4 successfully. Selector
+regression [43946078700](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/43946078700)
+is queued at exact 9ee952cefedbc90f2c093a405d0775f94c34c71f. Cache control
+43946078462 and standard test/lint/docs/unit are queued on the same SHA.
+All 78 focused guards, both actionlint checks and diff hygiene passed locally.
+No new cloud success, physical result, phase completion or main merge claimed.
+
 - User explicitly authorizes session commits and pushes again. Publish the
   prepared selector-word storage trial, proof tools, cloud regression and
   authenticated prior results in separate scoped commits, without attribution

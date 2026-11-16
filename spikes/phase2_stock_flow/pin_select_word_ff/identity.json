@@ -1,0 +1,6 @@
+{
+  "reference_sha256": "5335d94f004dee28bd554b5ecf16050a3a9ead81d7704941ee40d702aa196e77",
+  "candidate_sha256": "55b90c37d0c786cca1d40db523ddc6406e8c021a0d654a97dbc5f1a9dcbab614",
+  "patch_sha256": "8c65ba90c3c9d01ecab0a96986f5c20e5f2a5a55b1c140c153646f228431c32f",
+  "scope": "Unqualified follow-up: root-clock storage of pin A/B selectors and edge settings in word 1"
+}

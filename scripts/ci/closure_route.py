@@ -48,7 +48,7 @@ def provenance(run, artifact):
         raise ValueError('Missing whole-archive API digest')
 
 
-def unpack(archive, artifact, output):
+def unpack(archive, artifact, output, extra_roots=()):
     if 'sha256:' + digest(archive) != artifact['digest']:
         raise ValueError('Whole source archive digest mismatch')
     if output.exists():
@@ -60,7 +60,7 @@ def unpack(archive, artifact, output):
             mode = info.external_attr >> 16
             if (path.is_absolute() or '..' in path.parts or '\\' in info.filename
                     or not path.parts or (path.parts[0] not in (
-                        'runs', 'src', 'macro', 'spikes', 'info.yaml')
+                        'runs', 'src', 'macro', 'spikes', 'info.yaml', *extra_roots)
                     and not path.parts[0].startswith('compatibility-'))
                     or stat.S_ISLNK(mode) or str(path) in names):
                 raise ValueError('Unsafe or duplicate source archive entry')
@@ -111,7 +111,7 @@ def saved_screen(root):
         os.chdir(previous)
 
 
-def restore(root, frozen, expected):
+def restore(root, frozen, expected, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA):
     if inventory(frozen) != inventory(expected):
         raise ValueError('Artifact hardware/macro bytes differ from prepared source')
     for name in ('src/config.json', 'info.yaml'):
@@ -155,21 +155,21 @@ def restore(root, frozen, expected):
     paths = [source, root / 'src/signoff.sdc'] + [Path(state[k]) for k in ('odb', 'def', 'nl', 'pnl', 'sdc')]
     bound_hashes(root, signoff['unchanged_source_hashes'], paths)
     timing_gate(json.loads((root / 'runs/stock-signoff-estimate/comparison.json').read_text()))
-    result.update(source_run=SOURCE_RUN, source_sha=SOURCE_SHA,
+    result.update(source_run=source_run, source_sha=source_sha,
                   saved_state_rewritten=False, physical_repairs_performed=False)
     (root / 'runs/closure-restoration.json').write_text(json.dumps(result, indent=2) + '\n')
     return source
 
 
-def route(root):
+def route(root, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA):
     from native_stock_route import run_step
     from sram_bank_clean_route import validate_final_route
     from extracted_timing import route_checkpoint, main as extract
 
     source = one(root / 'runs/stock-official-baseline', '*-openroad-stamidpnr-3/state_out.json')
     restoration = json.loads((root / 'runs/closure-restoration.json').read_text())
-    if (restoration.get('qualified') is not True or restoration.get('source_run') != SOURCE_RUN
-            or restoration.get('source_sha') != SOURCE_SHA):
+    if (restoration.get('qualified') is not True or restoration.get('source_run') != source_run
+            or restoration.get('source_sha') != source_sha):
         raise ValueError('Missing qualified restoration')
     expected = Path(os.environ['CLOSURE_EXPECTED_SOURCE'])
     if inventory(root) != inventory(expected) or digest(root / 'src/config.json') != CONFIG_SHA:
@@ -224,7 +224,7 @@ def route(root):
         rows[corner] = {'before': row, 'after': row}
     timing_gate({'corners': rows})
     (output / 'completion.json').write_text(json.dumps(dict(
-        source_run=SOURCE_RUN, source_sha=SOURCE_SHA, source_views=before,
+        source_run=source_run, source_sha=source_sha, source_views=before,
         detailed_routing_completed=True, extracted_timing_passed=True,
         final_antenna_nets=0, final_antenna_pins=0, route_drc_errors=0,
         disconnected_pin_checker_passed=True, minimum_fast_hold_ns=0.05,

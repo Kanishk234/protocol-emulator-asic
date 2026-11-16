@@ -384,3 +384,9 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: flattening without an earlier hierarchy/elaboration pass did not activate the parameterized cache branch. Correct proof must derive USE_LEVEL_CACHE=1 before flattening.
 - Fix: reproduce hierarchy -check before processing/flattening. Valid TX output proofs pass FULL0/1 with one private optimized combinational nlvx correspondence excluded (all outputs/state retained); stale-IDLE mutants fail at lvl. BS proofs pass both SAMPLE_DELTA variants with no blacklist; mutants fail. Independent valid bounded TX miters timed out and are not claimed as passes.
 - Check: spikes/phase2_stock_flow/level_cache/verify.py reproduces both valid cases and required output-fault rejection for both engines. Five top-port two-phase comparisons also pass on the composed actual chip, including live IDLE writes. No whole-chip formal or physical closure claimed.
+
+### 2026-11-16 — New reviewed gate config missing from tile-preflight allowlist
+- Symptom: screen43971723310 passes cache/exclusion preparation then stops at Select only the comparison tile size, before tool installation or synthesis.
+- Root cause: the exact config hash was recorded in the candidate receipt but omitted from official_nov9_preflight.CONFIGS. Initial local checks stopped before that downstream preflight.
+- Fix: admit only reviewed155c0c8efe5375f12cd34feb5d4a559c860d2f94970be7d2bf150fbb50b6e9af; preserve all existing geometry/source/clock/macro/config checks. No constraint or gate change.
+- Check: test_cache_gate_profile.py now ties the reviewed candidate hash to the tile allowlist; actual frozen-source→one-setting prepare→8x4 preflight passes. Full official input generation checked separately before relaunch.

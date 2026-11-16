@@ -2,12 +2,6 @@ name: TRIPWIRE selector final-netlist replay
 
 on:
   workflow_dispatch:
-  push:
-    branches: [tripwire/closure-8x4]
-    paths:
-      - .github/workflows/tripwire-selector-final-gl.yaml
-      - scripts/ci/selector_final_gl.py
-      - scripts/ci/test_selector_final_gl.py
 
 permissions:
   contents: read

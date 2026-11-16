@@ -2,12 +2,6 @@ name: TRIPWIRE qualified 8x4 route
 
 on:
   workflow_dispatch:
-  push:
-    branches: [tripwire/closure-8x4]
-    paths:
-      - .github/workflows/tripwire-closure-route.yaml
-      - scripts/ci/closure_route.py
-      - scripts/ci/test_closure_route.py
 
 permissions:
   contents: read

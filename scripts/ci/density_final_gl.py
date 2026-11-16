@@ -5,8 +5,8 @@ from selector_final_gl import verify_expected as verify_selector, screen_views
 from density_route import SOURCE_RUN, SOURCE_SHA, context as screen_context
 from selector_density_trial import prepare as apply_density, CONFIG_SHA
 
-ROUTE_RUN = 43962211849
-ROUTE_SHA = '7ba8d40dfe52ff3801566ebfd598a6b52b9d1f02'
+ROUTE_RUN = 43965251793
+ROUTE_SHA = '7c880ad7e39675be6c2e7443980d9d3b91f11709'
 ARTIFACT_NAME = f'tripwire-density-route-{ROUTE_RUN}'
 
 
@@ -42,4 +42,4 @@ def validate(run, artifact, archive, expected, output, *, screen_run, screen_art
     verify_expected(expected)
     return validate_route(run, artifact, archive, expected, output, admit=source_context,
         screen_identity=(SOURCE_RUN, SOURCE_SHA), route_identity=(ROUTE_RUN, ROUTE_SHA),
-        frozen_views=views, config_sha=CONFIG_SHA)
+        frozen_views=views, config_sha=CONFIG_SHA, require_stock_constraints=True)

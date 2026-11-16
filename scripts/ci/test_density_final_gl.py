@@ -58,3 +58,39 @@ def test_shared_replay_requires_exact_density_recipe_and_provenance(tmp_path, mo
                                  config_sha=final.CONFIG_SHA, **kwargs)
         assert result['route_run'] == final.ROUTE_RUN
         assert result['exact_extracted_state_netlist'] is True
+
+
+@pytest.mark.parametrize('policy', ['legacy', 'wrong_report', 'stock'])
+def test_final_qualification_requires_actual_stock_constraints(tmp_path, monkeypatch, policy):
+    import closure_final_gl as shared
+    from test_closure_final_gl import fixture
+    run, artifact, archive, expected, output = fixture(tmp_path, monkeypatch)
+    with zipfile.ZipFile(archive) as z:
+        members = {name: z.read(name) for name in z.namelist()}
+    if policy != 'legacy':
+        key = 'runs/closure-route/completion.json'
+        completion = json.loads(members[key])
+        completion.update(stock_signoff_constraints=True, clock_uncertainty_ns=0.25)
+        members[key] = json.dumps(completion).encode()
+        sdc = 'runs/extracted-timing/effective-stock-signoff.sdc'
+        data = b'source $::env(SCRIPTS_DIR)/base.sdc\n'
+        members[sdc] = data
+        members['runs/extracted-timing/constraint_identity.json'] = json.dumps(dict(
+            policy='stock-native-base-sdc', clock_uncertainty_ns=0.25,
+            legacy_source_sdc_used=False, sta_constraint_file=sdc,
+            sha256=hashlib.sha256(data).hexdigest())).encode()
+        uncertainty = '0.100000' if policy == 'wrong_report' else '0.250000'
+        for corner in shared.CORNERS:
+            for report in ('max.rpt', 'min.rpt'):
+                members[f'runs/extracted-timing/10-openroad-stapostpnr/{corner}/{report}'] = (
+                    f'{corner}\n {uncertainty} 1.234567 clock uncertainty\n').encode()
+    with zipfile.ZipFile(archive, 'w') as z:
+        for name, data in members.items(): z.writestr(name, data)
+    artifact['digest'] = 'sha256:' + hashlib.sha256(archive.read_bytes()).hexdigest()
+    if policy != 'stock':
+        with pytest.raises(ValueError):
+            shared.validate(run, artifact, archive, expected, output, require_stock_constraints=True)
+        assert not output.exists()
+    else:
+        result = shared.validate(run, artifact, archive, expected, output, require_stock_constraints=True)
+        assert result['exact_extracted_state_netlist'] is True

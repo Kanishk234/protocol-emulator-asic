@@ -111,13 +111,14 @@ def saved_screen(root):
         os.chdir(previous)
 
 
-def restore(root, frozen, expected, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA):
+def restore(root, frozen, expected, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA,
+            config_sha=CONFIG_SHA):
     if inventory(frozen) != inventory(expected):
         raise ValueError('Artifact hardware/macro bytes differ from prepared source')
     for name in ('src/config.json', 'info.yaml'):
         if digest(frozen / name) != digest(expected / name):
             raise ValueError('Artifact project inputs differ: ' + name)
-    if digest(frozen / 'src/config.json') != CONFIG_SHA:
+    if digest(frozen / 'src/config.json') != config_sha:
         raise ValueError('Wrong hold125 project configuration')
     engine = json.loads((frozen / 'compatibility-engine.json').read_text())
     if any(engine.get(k) != v for k, v in dict(
@@ -161,7 +162,7 @@ def restore(root, frozen, expected, *, source_run=SOURCE_RUN, source_sha=SOURCE_
     return source
 
 
-def route(root, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA):
+def route(root, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA, config_sha=CONFIG_SHA):
     from native_stock_route import run_step
     from sram_bank_clean_route import validate_final_route
     from extracted_timing import route_checkpoint, main as extract
@@ -172,7 +173,7 @@ def route(root, *, source_run=SOURCE_RUN, source_sha=SOURCE_SHA):
             or restoration.get('source_sha') != source_sha):
         raise ValueError('Missing qualified restoration')
     expected = Path(os.environ['CLOSURE_EXPECTED_SOURCE'])
-    if inventory(root) != inventory(expected) or digest(root / 'src/config.json') != CONFIG_SHA:
+    if inventory(root) != inventory(expected) or digest(root / 'src/config.json') != config_sha:
         raise ValueError('Source changed after restoration')
     if digest(root / 'info.yaml') != digest(expected / 'info.yaml'):
         raise ValueError('Metadata changed after restoration')

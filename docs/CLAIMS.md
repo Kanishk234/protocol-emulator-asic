@@ -51,6 +51,10 @@ D-138 is a prepared physical diagnostic, not a new passing-design claim. Its sou
 
 | 23 | The same checkpoint has positive measured GRT-estimated setup reserve at functional flop/output endpoints | Native read-only audit43629200280: fast12.527966ns/typ8.897943ns/slow2.533495ns,2414flops/24outputs; source view hashes unchanged and ordinary metrics reproduced | tested | Estimated routing only; ordinary latch/all-endpoint checks retained. AggregateWS0 remains clamped. Does not establish extracted timing, antenna/DRC closure or Phase2 completion. |
 
+| 24 | Exact pad-owner candidate passes the checked million-clock scenario, both injection controls and required RTL decoder cases | pad_owner_or/parallel_verification.json binds source and XML hashes:1,000,000clocks/zero divergences; priority/cursor faults detected99/326; four UART/SPI/I2C cases pass with real sigrok | tested | Two lanes/four units/U0full; deterministic RTL evidence, not whole-chip formal, final routed GL, stock-constrained extracted closure or official GDS.18unselected cases in targeted decoder run are not credited. |
+
+| 25 | Same-edge engine output materialization improves the matched ideal-wire timing frontier and passes the checked RTL behaviors | level_cache/candidate.json: slow setup6.125→6.510ns, measured IDLE-launch6.801030→8.817179ns, +0.18% cell area/+4flops; scoped engine proofs/mutants,5two-phase chip comparisons,22/22protocol cases | tested | ASIC root-clock IDLE contract; optional sigrok disabled in expanded suite. Not whole-chip formal, FPGA fallback qualification, native physical or official GDS closure. |
+
 ## Known limits (state them wherever the related claim appears)
 
 

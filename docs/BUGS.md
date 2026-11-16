@@ -366,3 +366,21 @@ Symptom: Verilator 5.053 with `--lint-only -Wall scripts/ci/promoted_rtl.vlt` re
 ### 2026-11-12 — Four-bank prototype changed the cached carrier predicate (isolated trial)
 
 Symptom: the first four-bank configuration staging prototype fails the carrier-active proof; targeted zero/sparse-bit phase stimulation reproduces the mismatch at cycle13. Root cause: replacing parity stages used by the live cached carrier predicate with bank-specific stages changes the values available to that predicate during high-phase bus motion. Caught by full-output configuration phase equivalence; the ordinary2080-cycle randomized phase test had passed. The revised scratch prototype retains the original carrier-predicate staging and changes only word-data branches. It passes all429/561 phase proof points for FULL=0/1, the targeted carrier test and both133152-cycle exhaustive phase simulations. The trial is nevertheless rejected because mapped timing/area regress; none of this prototype is integrated. Regression evidence remains in /tmp/tripwire-cfg-four-banks/carrier.log and carrier_fixed.log.
+
+### 2026-11-16 — L2 priority mutation runner did not recognize shared-priority RTL
+- Symptom: refreshed exact-candidate L2-INJECT stops after its clean RX baseline with zero mutation-anchor matches; no mutation pass is claimed.
+- Root cause: the runner recognized only `onehot = cand & (~cand + 1)`, while the reviewed optimized lane computes `first_ready` and `first_urgent` separately.
+- Fix: accept exactly one of the two reviewed forms and reverse ordinary-ready priority in the optimized form; reject absent, duplicated or ambiguous anchors. Preserve isolated compilation, clean baselines and mandatory scoreboard-divergence checks.
+- Checks: `scripts/ci/test_promoted_checks.py` covers both forms and unknown/duplicate rejection. Fresh full mutation run remains pending until actual priority/cursor divergences are observed.
+
+### 2026-11-16 — Extracted diagnostic used legacy hold uncertainty rather than stock fallback
+- Symptom: diagnostic43629225955 fast hold+0.301340ns is measured with0.10ns hold uncertainty, while the stock native flow uses0.25ns. It must not be presented as stock-constrained extracted evidence.
+- Root cause: extracted_timing.py explicitly copies src/signoff.sdc, which sources native base.sdc then overrides hold uncertainty to0.10ns. Candidate config itself has no custom SIGNOFF_SDC_FILE or PNR_SDC_FILE, so the stock screen does not select that file.
+- Prepared fix: explicit --stock-constraints extraction mode uses native base.sdc without the legacy override; rejects custom PnR constraints/nonstock uncertainty and validates fresh max/min report uncertainty at every corner. Existing historical diagnostic mode remains available and is not relabeled.
+- Checks: test_extracted_timing.py covers stock wrapper, invalid config and report rejection; actual legacy min report is rejected and actual native0.25ns report accepted. Fresh stock-constrained extracted replay remains pending. Setup uncertainty is unchanged; do not infer a measured stock hold result by subtraction.
+
+### 2026-11-16 — Optional output-cache proof omitted parameter elaboration
+- Symptom: the first TX-cache proof passed even when a stale-IDLE negative control was introduced; that pass is invalidated.
+- Root cause: flattening without an earlier hierarchy/elaboration pass did not activate the parameterized cache branch. Correct proof must derive USE_LEVEL_CACHE=1 before flattening.
+- Fix: reproduce hierarchy -check before processing/flattening. Valid TX output proofs pass FULL0/1 with one private optimized combinational nlvx correspondence excluded (all outputs/state retained); stale-IDLE mutants fail at lvl. BS proofs pass both SAMPLE_DELTA variants with no blacklist; mutants fail. Independent valid bounded TX miters timed out and are not claimed as passes.
+- Check: spikes/phase2_stock_flow/level_cache/verify.py reproduces both valid cases and required output-fault rejection for both engines. Five top-port two-phase comparisons also pass on the composed actual chip, including live IDLE writes. No whole-chip formal or physical closure claimed.

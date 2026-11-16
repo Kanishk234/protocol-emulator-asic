@@ -11,6 +11,8 @@ Stock detailed routing succeeds, ending at iteration 21 with zero route DRC erro
 | Typical | 0 (clamped) | 0.510919 |
 | Slow | -0.783631 | 0.880261 |
 
+Constraint qualification: these hold values use the legacy explicit signoff SDC with0.10ns hold uncertainty. The unchanged stock project uses native0.25ns; fresh stock-constrained extraction is still required. Setup uncertainty is unchanged.
+
 The strict diagnostic fails. Fast/typical clamped zero does not establish positive functional reserve. Slow has three real setup violations, TNS -1.600791 ns. No gate or constraint was relaxed.
 
 ## Measured failure cone

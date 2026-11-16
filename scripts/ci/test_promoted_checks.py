@@ -61,3 +61,16 @@ module top(input wire g,d,output wire a,b); trw_slots s(g,d,a); other o(g,d,b); 
               'select -assert-none t:$dlatch t:$_DLATCH_* %u N:*trw_slots* N:*trw_pin_cfg* %u %d')
     result = subprocess.run(['yosys', '-Q', '-T', '-p', script], capture_output=True, text=True)
     assert (result.returncode != 0) == outside_latch
+
+
+@pytest.mark.parametrize('line', [
+    "wire [11:0] onehot = cand & (~cand + 12'd1);",
+    "wire [11:0] first_ready = ready & (~ready + 12'd1);",
+])
+def test_priority_injection_accepts_reviewed_forms_and_rejects_ambiguity(line):
+    before, after = injections.priority_mutation(line)
+    assert before == line and before != after and '>> 11' in after
+    with pytest.raises(RuntimeError):
+        injections.priority_mutation(line + '\n' + line)
+    with pytest.raises(RuntimeError):
+        injections.priority_mutation('unknown priority implementation')

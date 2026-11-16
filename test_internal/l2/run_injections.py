@@ -22,6 +22,21 @@ def mutate_file(tree: pathlib.Path, filename: str, before: str, after: str) -> N
     path.write_text(source.replace(before, after, 1))
 
 
+def priority_mutation(source: str) -> tuple[str, str]:
+    """Reverse ordinary ready priority in either reviewed selector form."""
+    forms = (
+        ("wire [11:0] onehot = cand & (~cand + 12'd1);", "cand"),
+        ("wire [11:0] first_ready = ready & (~ready + 12'd1);", "ready"),
+    )
+    found = [(line, signal) for line, signal in forms if source.count(line) == 1]
+    if len(found) != 1 or any(source.count(line) > 1 for line, _ in forms):
+        raise RuntimeError('Expected exactly one reviewed priority mutation form')
+    line, signal = found[0]
+    expression = ' | '.join(f'{signal} >> {shift}' for shift in range(1, 12))
+    replacement = f'{signal} & ~({expression})'
+    return line, line.replace(f"{signal} & (~{signal} + 12'd1)", replacement)
+
+
 def cursor_mutation(source: str) -> tuple[str, str]:
     """Inject the same normal-cursor increment fault in either reviewed form."""
     forms = (
@@ -89,13 +104,8 @@ def main() -> None:
     if not (RTL_DIR / "trw_lane.v").is_file():
         raise SystemExit(f"RTL candidate missing: {RTL_DIR}")
     run_baseline("rx", 1024)
-    run_mutation(
-        "priority-flip", "trw_lane.v",
-        "wire [11:0] onehot = cand & (~cand + 12'd1);",
-        "wire [11:0] onehot = cand & ~(cand >> 1 | cand >> 2 | cand >> 3 | cand >> 4 | "
-        "cand >> 5 | cand >> 6 | cand >> 7 | cand >> 8 | cand >> 9 | cand >> 10 | cand >> 11);",
-        "rx", 1024,
-    )
+    before, after = priority_mutation((RTL_DIR / 'trw_lane.v').read_text())
+    run_mutation("priority-flip", "trw_lane.v", before, after, "rx", 1024)
     run_baseline("cursor", 1024)
     before, after = cursor_mutation((RTL_DIR / 'trw_pin_tx.v').read_text())
     run_mutation(

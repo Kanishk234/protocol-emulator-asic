@@ -4,6 +4,14 @@ Newest entry at the top. One entry per work session.
 
 ## 2026-11-16 — Selector clock fix works; isolate one data antenna residual
 
+Publication receipt: 52d9790 helper/guards,572aa6f workflow and9e4c74f
+measurement/decision pushed. New density screen43961635994 at exact
+9e4c74f4f901059b56ae1fdf337b956cea10fa06 is active. Prepare its exact-source
+routing continuation now, requiring full screen success and exact2b822640…
+project recipe before any routing. Shared defaults retain original4d71243f…
+checks; explicit density config provenance cannot admit arbitrary recipes.
+118 combined source/restoration/closure controls and actionlint pass.
+
 - Screen43951998125 finishes FAIL: original estimated setupWS0 all corners,
   fast hold0.114093ns, electrical0, global overflow0; antenna1net/1pin.
   Both routing43956306270 and final43957253552 stop on predecessor failure;

@@ -72,8 +72,10 @@ Local implementation: scripts/ci/selector_drt_diagnostic.py, its16controls,
 and .github/workflows/tripwire-selector-drt-diagnostic.yaml. Combined related
 suite150passed; actionlint passed. Published at1ad120d and diagnostic
 [44025267292](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44025267292)
-is active. Source gate and exact archive restoration passed; environment
-installation is in progress. No completed route/extraction result yet.
+is active. Source gate, exact archive restoration, pinned environment checks
+and normal Ciel antenna initialization passed. The routing/extraction measurement
+step is active, beginning with fresh timing checks. No completed route/extraction
+result yet.
 The workflow push trigger covers only its own file on tripwire/closure-8x4.
 It emits its own diagnostic result and never a qualified-route completion.
 

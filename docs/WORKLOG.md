@@ -20,6 +20,12 @@ Newest entry at the top. One entry per work session.
   remains unmeasured. Do not replace models with unreviewed issue fits.
 - Next inspect fresh antenna reproduction, native DRT repair and all-corner
   stock0.25ns extraction. Keep current source/clock/gates and preserve negatives.
+- Follow-up: exact image/OpenROAD/drt.tcl checks and normal Ciel initialization
+  pass. Fresh antenna reproduction step passes. Run44025267292 now executes
+  Measure stock DRT and extracted timing without source promotion (including
+  fresh all-corner estimated checks before DRT). Do not yet claim DRT started
+  or completed, antenna repair success, or extracted timing closure. Latest
+  e02deac lint44025587713/test44025587707/docs44025587774 pass; unit still active.
 
 ## 2026-11-16 — Reject density60 and prepare bounded extracted measurement
 

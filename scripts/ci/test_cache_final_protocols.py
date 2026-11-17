@@ -48,3 +48,18 @@ def test_workflow_isolates_incompatible_dependency_pins():
     assert '-r requirements-dev.txt -r tt/requirements.txt' not in install
     models=next(s['run'] for s in steps if s.get('name')=='Acquire exact stock PDK models')
     assert '.physical-venv/bin/python scripts/ci/cache_final_protocols.py models' in models
+
+
+@pytest.mark.parametrize('shard',list(SHARDS))
+def test_filter_survives_cocotb_make_shell_expansion(tmp_path,shard):
+    import os
+    import re
+    import subprocess
+    from cache_final_protocols import shell_filter
+    # Reproduce the unquoted expansion used by Cocotb's Icarus recipe.
+    (tmp_path/'capture.py').write_text('import os; print(os.environ["COCOTB_TEST_FILTER"])\n')
+    (tmp_path/'Makefile').write_text('all:\n\t@COCOTB_TEST_FILTER=$(COCOTB_TEST_FILTER) '+__import__('sys').executable+' capture.py\n')
+    env={**os.environ,'COCOTB_TEST_FILTER':shell_filter(shard)}
+    pattern=subprocess.check_output(['make','--no-print-directory'],cwd=tmp_path,env=env,text=True).strip()
+    selected={name for name in ALL_TESTS if re.search(pattern,'test_l3.'+name)}
+    assert selected==set(SHARDS[shard])

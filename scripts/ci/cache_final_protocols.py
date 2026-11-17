@@ -7,6 +7,7 @@ import math
 from pathlib import Path
 import re
 import shutil
+import shlex
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -218,6 +219,13 @@ def prepare_models(root,pdk,identity):
     return identity
 
 
+def shell_filter(shard):
+    # Cocotb 2.0.1 expands this variable unquoted into its shell recipe.
+    # Keep shell quotes in the Make variable so the simulator receives the regex.
+    pattern=r'^test_l3\.(?:'+'|'.join(map(re.escape,SHARDS[shard]))+r')$'
+    return shlex.quote(pattern).replace("$", "$$")
+
+
 def main():
     import argparse
     import os
@@ -244,7 +252,7 @@ def main():
         print(json.dumps(row,indent=2))
     elif args.stage=='filter':
         if args.shard is None:raise ValueError('Missing shard')
-        print(r'^test_l3\.(?:'+'|'.join(map(re.escape,SHARDS[args.shard]))+r')$')
+        print(shell_filter(args.shard))
     elif args.stage=='receipt':
         if args.shard is None:raise ValueError('Missing shard')
         if os.environ.get('TRIPWIRE_SKIP_SIGROK')=='1' or shutil.which('sigrok-cli') is None:

@@ -4,10 +4,18 @@ SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 FULL ?= 0
 FRAC ?= 8
-SRC_DIR ?= $(PWD)/../../src
+SRC_DIR ?= $(abspath $(CURDIR)/../../src)
 # Keep the harness compatible with both the earlier and promoted interfaces.
 CACHED_CARRIER ?= $(shell grep -Eq 'output[[:space:]]+wire.*carrier_active' $(SRC_DIR)/trw_pin_cfg.v && echo 1 || echo 0)
 CACHED_SAMPLE_DELTA ?= $(shell grep -Eq 'output[[:space:]]+wire.*sample_delta' $(SRC_DIR)/trw_pin_cfg.v && echo 1 || echo 0)
+CACHED_BITSYNC_ACTIVE ?= $(shell grep -Eq 'output[[:space:]]+wire.*bitsync_active' $(SRC_DIR)/trw_pin_cfg.v && echo 1 || echo 0)
+CACHED_IDLE_NEXT ?= $(shell grep -Eq 'input[[:space:]]+wire.*idle_next' $(SRC_DIR)/trw_pin_unit.v && echo 1 || echo 0)
+ifeq ($(CACHED_BITSYNC_ACTIVE),1)
+COMPILE_ARGS += -DTRIPWIRE_BITSYNC_ACTIVE
+endif
+ifeq ($(CACHED_IDLE_NEXT),1)
+COMPILE_ARGS += -DTRIPWIRE_IDLE_NEXT
+endif
 ifeq ($(CACHED_CARRIER),1)
 COMPILE_ARGS += -DTRIPWIRE_CACHED_CARRIER
 endif
@@ -17,10 +25,10 @@ endif
 SIM_BUILD = sim_build/full$(FULL)_frac$(FRAC)
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_pin_cfg.v $(SRC_DIR)/trw_pin_io.v $(SRC_DIR)/trw_pin_tx.v \
-                  $(SRC_DIR)/trw_pin_rx.v $(SRC_DIR)/trw_pin_bs.v $(SRC_DIR)/trw_pin_unit.v $(PWD)/tb_pin.v
+                  $(SRC_DIR)/trw_pin_rx.v $(SRC_DIR)/trw_pin_bs.v $(SRC_DIR)/trw_pin_unit.v $(CURDIR)/tb_pin.v
 COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT
 ifeq ($(SIM),verilator)
-COMPILE_ARGS += -GFULL=$(FULL) -GFRAC=$(FRAC)
+COMPILE_ARGS += -GFULL=$(FULL) -GFRAC=$(FRAC) $(abspath $(CURDIR)/../../scripts/ci/promoted_rtl.vlt)
 else
 COMPILE_ARGS += -Ptb_pin.FULL=$(FULL) -Ptb_pin.FRAC=$(FRAC)
 endif

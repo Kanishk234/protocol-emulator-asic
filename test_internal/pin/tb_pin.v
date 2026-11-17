@@ -50,6 +50,13 @@ module tb_pin #(
 
     wire [`TRW_PC_BITS-1:0] cfg;
     wire restart;
+`ifdef TRIPWIRE_BITSYNC_ACTIVE
+    wire bitsync_active;
+`endif
+`ifdef TRIPWIRE_IDLE_NEXT
+    wire idle_next = (we && (waddr == 5'd0))
+                   ? (rst_n && wdata[`TRW_PC_IDLE_LSB]) : cfg[`TRW_PC_IDLE_LSB];
+`endif
 `ifdef TRIPWIRE_CACHED_CARRIER
     wire carrier_active;
 `endif
@@ -63,6 +70,9 @@ module tb_pin #(
 `endif
 `ifdef TRIPWIRE_SAMPLE_DELTA
         , .sample_delta (sample_delta)
+`endif
+`ifdef TRIPWIRE_BITSYNC_ACTIVE
+        , .bitsync_active (bitsync_active)
 `endif
     );
 
@@ -110,6 +120,12 @@ module tb_pin #(
 `endif
 `ifdef TRIPWIRE_SAMPLE_DELTA
         .sample_delta (sample_delta),
+`endif
+`ifdef TRIPWIRE_BITSYNC_ACTIVE
+        .bitsync_active (bitsync_active),
+`endif
+`ifdef TRIPWIRE_IDLE_NEXT
+        .idle_next (idle_next),
 `endif
         .tx_avail (tx_avail), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (tx_take),
         .rx_free (free), .rx_load (rload), .rx_tag (rtag), .rx_data (rdata),

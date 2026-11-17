@@ -69,9 +69,13 @@ jobs:
 
         sudo apt-get install -y sigrok-cli
 
-        pip install -r requirements-dev.txt -r tt/requirements.txt
+        pip install -r requirements-dev.txt
 
-        pip install librelane==3.1.0.dev4
+        python -m venv .physical-venv
+
+        .physical-venv/bin/pip install -r tt/requirements.txt
+
+        .physical-venv/bin/pip install librelane==3.1.0.dev4
 
         '
     - name: Verify stock physical engine identity
@@ -107,7 +111,7 @@ jobs:
 
         unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
 
-        python scripts/ci/cache_final_protocols.py models'
+        .physical-venv/bin/python scripts/ci/cache_final_protocols.py models'
     - name: Install Tiny Tapeout Icarus 13
       run: 'set -euo pipefail
 

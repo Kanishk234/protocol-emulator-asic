@@ -396,3 +396,9 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: added full GlobalRouting-1changes geometry after antenna repair; oldcleanreport no longer describes finalDB. Added reroute was intended to obtain numeric finaloverflowevidence, not a required original Classicstep.
 - Prepared correction: new clean D182config leaves antenna repairlast; retain exactnativecongestion rejection, zero precedingfull-routeoverflow and every freshfinalgate. Explicitly report verification method; do not relabel failed43994989722or skip an originalstep.
 - Checks: test_cache_post_antenna.py covers actualcheckpointchain, no laterroute, noallowcongestion, full originalgate preservation, fresh netlistconservation/repeatability and strictsetup. Physicalcorrectionpending; no passclaim.
+
+### 2026-11-17 — Routed protocol replay mixed incompatible Python lockfiles
+- Symptom: all four replay jobs in44120184714 fail during dependency installation, before artifact admission or simulation.
+- Root cause: one pip invocation combined project requirements (PyYAML6.0.3) and pinned Tiny Tapeout requirements (PyYAML6.0.2). Resolver correctly rejects the contradictory exact pins.
+- Fix: keep project replay dependencies in the replay interpreter; install pinned Tiny Tapeout/LibreLane dependencies into a separate .physical-venv and invoke only the physical model-acquisition stage there. No dependency pins, physical inputs, netlist or acceptance gates changed.
+- Checks: test_cache_final_protocols.py checks isolated installs and physical-stage interpreter; six tests and shell/YAML syntax pass. Pinned upstream requirements plus LibreLane dev4 resolve in a fresh-environment pip dry run. Actual replacement workflow remains pending.

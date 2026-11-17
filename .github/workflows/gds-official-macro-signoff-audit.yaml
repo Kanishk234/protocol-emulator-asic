@@ -1,0 +1,99 @@
+name: gds-official-macro-signoff-audit
+'on':
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: gds-official-macro-signoff-audit
+  cancel-in-progress: false
+jobs:
+  geometry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 230
+    env:
+      PDK_ROOT: /home/runner/pdk
+    steps:
+    - name: Check out route tools
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Restore exact failed official artifacts
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: "set -euo pipefail\ngh api \"repos/$GITHUB_REPOSITORY/actions/runs/44138149950\" > official-failure-run.json\n\
+        gh run download 44138149950 --repo \"$GITHUB_REPOSITORY\" --name GDS_logs --dir frozen-official\npython\
+        \ - <<'PYCODE'\nimport shutil\nfrom pathlib import Path\nfor name in ('src','runs'):\n    target=Path(name)\n\
+        \    if target.exists():shutil.rmtree(target)\n    shutil.copytree(Path('frozen-official')/name,target)\n\
+        PYCODE\n"
+    - name: Set up stock dev4 tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: 9d13ff3e3e6202090740110438c6a10c1d62ca0f
+        path: tt
+    - name: Install Python dependencies and LibreLane
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+        cache: pip
+        cache-dependency-path: tt/requirements.txt
+    - name: Install stock tool dependencies
+      run: 'pip install -r tt/requirements.txt
+
+        pip install librelane==3.1.0.dev4
+
+        '
+    - name: Verify stock physical engine identity
+      run: 'set -euo pipefail
+
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev4
+
+        docker image inspect ghcr.io/librelane/librelane:3.1.0.dev4 > compatibility-image-route.json
+
+        docker run --rm ghcr.io/librelane/librelane:3.1.0.dev4 openroad -version > compatibility-openroad-route.txt
+
+        python - <<''PY''
+
+        import json
+
+        from pathlib import Path
+
+        image = json.loads(Path(''compatibility-image-route.json'').read_text())[0]
+
+        assert ''ghcr.io/librelane/librelane@sha256:af2405f5d48d8fe14d406ecce913811177a95e365e3b625859677307cace2469''
+        in image[''RepoDigests'']
+
+        assert Path(''compatibility-openroad-route.txt'').read_text().strip() == ''dcf36133a369abc8f3c5e5738cd4d82e4903c0e0''
+
+        PY
+
+        '
+    - name: Verify source parity and inventory every Magic marker
+      run: 'python scripts/ci/verify_integrated_candidate.py
+
+        python scripts/ci/official_gds_signoff_audit.py audit'
+    - name: Check exact merged GDS with stock CMOS5L KLayout deck
+      timeout-minutes: 180
+      run: 'set -euo pipefail
+
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+
+        python scripts/ci/official_gds_signoff_audit.py klayout'
+    - name: Upload read-only geometry results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: official-macro-signoff-audit-${{ github.run_id }}
+        path: 'official-macro-failure-audit.json
+
+          official-failure-run.json
+
+          runs/official-klayout-audit/**
+
+          runs/official-signoff-pdk/**
+
+          compatibility-image-route.json
+
+          compatibility-openroad-route.txt'
+        if-no-files-found: warn

@@ -402,3 +402,9 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: one pip invocation combined project requirements (PyYAML6.0.3) and pinned Tiny Tapeout requirements (PyYAML6.0.2). Resolver correctly rejects the contradictory exact pins.
 - Fix: keep project replay dependencies in the replay interpreter; install pinned Tiny Tapeout/LibreLane dependencies into a separate .physical-venv and invoke only the physical model-acquisition stage there. No dependency pins, physical inputs, netlist or acceptance gates changed.
 - Checks: test_cache_final_protocols.py checks isolated installs and physical-stage interpreter; six tests and shell/YAML syntax pass. Pinned upstream requirements plus LibreLane dev4 resolve in a fresh-environment pip dry run. Actual replacement workflow remains pending.
+
+### 2026-11-17 — Cocotb Make recipe interpreted test-selection regex as shell syntax
+- Symptom:44122049305 passes physical artifact/model admission and netlist compilation, then every shard fails at vvp launch with shell syntax error near `(`. No protocol simulation executes.
+- Root cause: Cocotb2.0.1 expands COCOTB_TEST_FILTER unquoted into its Make recipe. Raw regex alternation/parentheses reach the shell. Make also consumes the end-anchor dollar unless escaped.
+- Fix: emit a shell-quoted, Make-dollar-escaped filter from the helper; keep the selected cases and strict XML aggregation unchanged.
+- Checks: four regression cases pass each shard filter through actual Make-to-shell expansion and verify exact selected names. All10 focused tests pass. Separate actual Cocotb/Icarus13 minimal-harness runs execute exactly7/4/6/5 selected cases and pass strict XML admission. This harness checks runner plumbing, not design behavior. Real netlist replay pending.

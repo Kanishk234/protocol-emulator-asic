@@ -1921,3 +1921,22 @@ execution pending. Source hold10808 existed before final repair; full artifact
 confirms M2cumulative203.75/200, so this targets late geometry rather than assuming
 the endpoint was newly inserted. Earlier native post-antenna trials used another
 recipe/tool version and are not evidence that this current recipe passes.
+
+## D-182 (2026-11-16): keep the configured antenna repair last
+**Experimental, not adopted.** D181run43994989722 repairs antennas to0then its
+added full reroute exposes3new failures. Setup slow+2.776346ns, hold fast+.109586ns,
+electrical0and full-route overflow0 remain positive/clean. Prepare a fresh clean
+run removing only the added GlobalRouting-1 substitution, not any original step.
+Keep native congestion rejection false-for-allow, zero preceding routing overflow,
+fresh antenna/electrical/timing checks, positive functional reserve and50pshold.
+
+Final incremental routing is checked via the exact pinned native repair command
+with congestion disallowed, alongside the preceding full-route report and bound
+ODB history. Record this verification explicitly; do not call it a fresh numeric
+full-route measurement. Reject any later full-route stage in this policy, so an
+earlier clean state cannot be used to hide a later failure. All original logic
+and connections must survive; only antenna diodes may be added on existing nets.
+Cost is native diode insertion/incremental routing and potential timing/area
+regression, measured on the final DB. SameRTL,20ns,8x4and unchanged officialjobs.
+120focused checks, actual official config generation and pinned one-insertion
+order pass. No acceptance limit relaxed; physical pass remains pending.

@@ -390,3 +390,9 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: the exact config hash was recorded in the candidate receipt but omitted from official_nov9_preflight.CONFIGS. Initial local checks stopped before that downstream preflight.
 - Fix: admit only reviewed155c0c8efe5375f12cd34feb5d4a559c860d2f94970be7d2bf150fbb50b6e9af; preserve all existing geometry/source/clock/macro/config checks. No constraint or gate change.
 - Check: test_cache_gate_profile.py now ties the reviewed candidate hash to the tile allowlist; actual frozen-source→one-setting prepare→8x4 preflight passes. Full official input generation checked separately before relaunch.
+
+### 2026-11-16 — Extra post-antenna full reroute recreates antenna failures
+- Symptom: configured screen43994989722late antenna repair reaches0but final fresh check reports3nets/pins; timing/electrical/overflowpass.
+- Root cause: added full GlobalRouting-1changes geometry after antenna repair; oldcleanreport no longer describes finalDB. Added reroute was intended to obtain numeric finaloverflowevidence, not a required original Classicstep.
+- Prepared correction: new clean D182config leaves antenna repairlast; retain exactnativecongestion rejection, zero precedingfull-routeoverflow and every freshfinalgate. Explicitly report verification method; do not relabel failed43994989722or skip an originalstep.
+- Checks: test_cache_post_antenna.py covers actualcheckpointchain, no laterroute, noallowcongestion, full originalgate preservation, fresh netlistconservation/repeatability and strictsetup. Physicalcorrectionpending; no passclaim.

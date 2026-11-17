@@ -199,3 +199,33 @@ functional setup plus all ordinary timing/hold/electrical/antenna/overflow gates
 remain.112focused tests plus real pinned config generation/order checks pass.
 Candidate config19e89d36297436bc7b078f54f8b02d2b72629ce04e886b93e9ad3d523c4a4c0e.
 No current physical result, main adoption, DRT or official GDS claim.
+
+## Late repair/full-reroute result43994989722 and correction
+Full flow and audits complete; final gate fails only3antenna nets/pins. Actual
+functional setup fast/typical/slow+12.565165/+8.966791/+2.776346ns; stock hold
++.109586/+.331108/+.683447ns, electrical0, final full-route overflow0. Native
+view/conservation/chain audits pass. All routine main CI at7834348passes.
+Direct individual-job logs work when gh run view returns an empty file.
+
+Artifact confirms native late repair reaches0antenna before the added full
+GlobalRouting-1. After that extra reroute, failing sinks are _20819_→wire12281/A,
+lane0time_now1→hold10555/A and net11763→wire11763/A. Do not treat the earlier
+clean checkpoint as a qualified result for this completed failed flow.
+
+D182 prepares a new clean config with antenna repair last: remove only the added
+GlobalRouting-1 substitution, preserving every original Classic step. Retain
+GRT_ALLOW_CONGESTION=false and prove zero preceding full-route overflow plus
+successful native congestion-prohibited incremental antenna repair; receipt
+explicitly identifies this verification rather than claiming a new numeric full
+routing report. Pinned Tcl sets allow_congestion from the command flag, and pinned
+GlobalRouter incremental repair rejects remaining overflow (GRT232). The newer
+report_congestion command is absent from this pinned Tcl/binding; do not backport
+it or reroute merely to obtain a report. Source references: [pinned Tcl](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/GlobalRouter.tcl),
+[pinned incremental routing](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/GlobalRouter.cpp#L5295).
+
+No waiver of antenna0, electrical0, fast hold50ps, stock constraints, positive
+functional setup or original routing checks. Reject any later extra-route evidence
+in final-antenna mode; retain six matching fresh NL/PNL readbacks and diode-only
+connectivity conservation.120focused checks and actual official generation/merge
+plus pinned exact step-order checks pass. New config0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc.
+Fresh native execution still required; no screen/route/official qualification yet.

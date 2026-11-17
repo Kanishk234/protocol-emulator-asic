@@ -59,3 +59,12 @@ raw unsupported Magic checks are waived in favor of whole-GDS KLayout DRC0plus
 LVS and all existing timing/electrical/antenna/routing checks. Main source/config
 and official workflows are unchanged. This policy requires an explicit decision;
 it must never be described as passing every raw Magic check or zero raw markers.
+
+
+## D-185: policy adopted for a fresh official run
+User continuation accepts the explicitly described policy after the geometry pass.
+Main now changes exactly the five proposed settings. Reference-config bytes and
+all other physical hashes stay bound;14focused checks and the package audit pass.
+No RTL, physical recipe, constraints, official jobs or action references change.
+RawMagic errors are not called zero. A fresh official full flow and downstream
+precheck/GL/viewer remain required; inspect final raw overlap inventory as well.

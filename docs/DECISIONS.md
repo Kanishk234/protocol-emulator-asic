@@ -1994,3 +1994,38 @@ Extracted slow functional setup reserve is only+0.163304ns; fast hold+0.15077328
 These are candidate results, not a guarantee of fresh official hardening. Phase2
 stays open until unchanged official GDS/precheck/GL/viewer and required main CI
 pass. No timing/electrical/antenna/DRC gate relaxed; no phase box ticked.
+
+## D-185 (2026-11-17): use the supported SRAM-aware CMOS5L signoff policy
+The user directs continuation after the explicit five-setting proposal and clean
+whole-GDS geometry audit44184319751. Adopt precisely that project-config policy:
+RUN_MAGIC_DRC=false, ERROR_ON_ILLEGAL_OVERLAPS=false, RUN_KLAYOUT_DRC=true,
+ERROR_ON_KLAYOUT_DRC=true, and KLAYOUT_DRC_RUNSET=
+pdk_dir::libs.tech/klayout/tech/drc/ihp-sg13cmos5l.drc.
+
+Official44138149950reproduces the proved routeODB/finalNL exactly and passes
+routing/antenna/LVS/timing/electrical checks, but fails57923Magic markers inside
+the SRAM plus10LEF obsm4/metal4power-column markers. The primary competition-linked
+SRAM integration guide documents this incompatibility and uses KLayout instead.
+Read-only44184319751 checks the exact merged GDS with the pinned stock CMOS5L
+deck and default options: fresh0errors, independently inspected empty report.
+This is a checker-policy change, not a physical remedy or a claim that rawMagic
+markers disappeared. The unsupported Magic DRC/overlap checks are explicitly
+waived. Whole-GDS KLayout DRC0is mandatory; NetgenLVS, routingDRC0, antenna0,
+timing/electrical requirements and original official jobs remain in force.
+Final evidence review must still identify the known macro overlap inventory and
+reject unexplained new markers; a green badge alone does not finish Phase2.
+
+General need: accurate signoff of licensed SRAM plus programmable logic, using the
+PDK's supported actual-geometry checker. No protocol-specific logic or hardware
+cost. Runtime adds whole-GDS KLayout DRC while removing unsupported Magic DRC;
+read-only KLayout took about9minutes for this layout. Do not infer a fresh full
+flow duration or official green result from the diagnostic.
+
+Only five settings change from configSHA0b7a388f... to9d522473b4e0a57c89e2759dd2473c01bd3e864023cbbd60530b4893ae7dd3c4.
+Retain the original config bytes as a hash-bound reference; verifier requires
+semantic equality except these exact five settings, and rejects physical-knob
+changes even if an approved-byte hash is updated. All other physical source/macro
+hashes and software encodings remain exact.14focusedtests,inputaudit,pinnedClassic
+flag inspection and unchanged official-job check pass. Next: fresh unchanged
+GDS/precheck/GL/viewer and final artifact/required-main-CI review. No phase box is
+ticked here. RawMagic-zero is not part of this adopted checker-policy claim.

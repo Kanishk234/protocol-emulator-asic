@@ -16,3 +16,11 @@ See `docs/design/ARCHITECTURE.md` for the register map, host framing, timing and
 ## External hardware
 
 A digital host is required to load programs, normally the demo-board microcontroller. Protocol connections depend on the program. Open-drain buses such as I2C require external pull-ups. Use appropriate external transceivers or level shifting for the attached device and board; the chip supplies digital I/O only.
+
+
+## Physical verification policy
+
+The SRAM uses the supported CMOS5L KLayout deck on the complete merged GDS,
+with zero KLayout DRC violations required. D-185 documents the unsupported Magic
+SRAM DRC and abstract-overlap checks being waived; this does not claim zero raw
+Magic markers. LVS, timing, electrical, antenna and routing checks remain required.

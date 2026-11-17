@@ -230,3 +230,13 @@ and supply SRAM models. Local checks:335Python,147core RTL,3top-port protocol
 cases and32focused integration checks pass, along with lint and generation.
 Integration manifest binds physical inputs to the routed/replayed source; official
 workflow is unchanged. Fresh official GDS/precheck/GL/viewer remain pending.
+
+
+### 2026-11-17: SRAM signoff compatibility resolved for official retry
+The first official integrated run reproduced the verified routed design but
+failed unsupported Magic checks inside the SRAM. A separate stock whole-GDS
+KLayout check passes with0errors. D-185adopts the documented SRAM-aware checker
+policy: require KLayoutDRC0and waive unsupported MagicDRC/abstract-overlap checks,
+keeping LVS, timing, electrical, antenna, routing and official jobs unchanged.
+This is an explicit policy change; rawMagic markers are not claimed zero.
+Fresh official GDS/precheck/GL/viewer and final artifact review remain pending.

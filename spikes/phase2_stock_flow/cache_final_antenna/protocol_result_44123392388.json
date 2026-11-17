@@ -1,0 +1,45 @@
+{
+  "passed": 22,
+  "failed": 0,
+  "unexecuted": 0,
+  "selected_skips": 0,
+  "identity": {
+    "source_run": 44017640255,
+    "route_run": 44031468510,
+    "netlist": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/extracted-artifact/runs/extracted-timing/08-openroad-fillinsertion/tt_um_tripwire.nl.v",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "routed_odb_sha256": "357f01366aea053ca83db4b035625033424378aecc5ff17addaf4711421b00d4",
+    "extracted_gates_independently_verified": true,
+    "official_gds_signoff": false,
+    "replay": {
+      "lanes": 2,
+      "units": 4,
+      "full_units": [
+        0
+      ],
+      "spec_sha256": "5f0629b17d2b98f0798cd4ad080d4fa4273de180066d5bd0c6fedbdbdd19694d",
+      "python_tables_sha256": "c4639854483651afcd78f49f1cfa4a31166483ac4e8a0bb9a332f1556b9a0669",
+      "protocol_suite_sha256": "bfd414a15fb5094b7ae2e2fc383c2dd770b409026681404f5a4d012415ef3339",
+      "expected_tests": 22,
+      "rtl_regenerated_for_simulation": false
+    },
+    "model_pdk_revision": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+    "model_hashes": {
+      "sg13cmos5l_stdcell.v": "485945f1b167daa68354548f46c95bdbff7d931516fc5b4edd47f2e2cd555735",
+      "sg13cmos5l_udp.v": "5491a3edf7468792b5222e7abe057e0583a407c01b2086d4fd44a55b6cf88055",
+      "RM_IHPSG13_1P_core_behavioral_bm_bist.v": "d0a6258f8e9c93d1d5b1f78c0a1d66f30d28b1ad8037e5e07f53d1a4e3670b12",
+      "RM_IHPSG13_1P_512x16_c2_bm_bist.v": "fc8a03068bc692d3db8e836446b0376a7bbf97ef1cbfda8fd1f29d77255eba01"
+    },
+    "sigrok_required": true,
+    "simulator": "Icarus Verilog 13",
+    "functional_gate_level_only": true,
+    "sdf_annotated_simulation": false
+  },
+  "full_protocol_replay_complete": true,
+  "functional_gate_level_only": true,
+  "sdf_annotated_simulation": false,
+  "official_gds_signoff": false,
+  "workflow_run": 44123392388,
+  "workflow_sha": "1c9a2788cc422559a9cc1a668a7fa7b2389c619f",
+  "independent_xml_review_complete": true
+}

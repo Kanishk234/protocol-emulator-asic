@@ -212,3 +212,12 @@ are zero. This is routed/extracted evidence, beyond the earlier screen. The setu
 margin is small. Independent artifact review passes. Next: complete routed protocol
 replay, exact source/config adoption and unchanged official GDS/precheck.
 Phase2is still open; no official full-design green run is claimed.
+
+
+### 2026-11-17: all22 routed protocol cases pass
+Replay44123392388 passes every group and combined coverage. Independent XML
+review confirms22 actual executions, zero skips/failures and the exact extracted
+netlist identity. The candidate now has clean detailed routing, positive extracted
+functional setup/hold and full routed protocol replay. Remaining work is coherent
+main integration (including replacing placeholder tests), integration checks and
+unchanged official GDS/precheck. Phase2 remains open.

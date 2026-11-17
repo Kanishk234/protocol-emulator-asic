@@ -59,3 +59,29 @@ Artifact14311359993(cache-final-drtroute-44031468510,149529385bytes) and
 reviewed: exact hashes, raw reports, constraints and logical conservation pass. The slow setup reserve is only163ps, so source/config/tool
 parity matters during main adoption and official hardening. Full routed protocol
 replay, official GDS/precheck and Phase2 completion remain outstanding.
+
+
+## Full routed protocol replay44123392388 passes
+All four groups and aggregation pass on1c9a278. Downloaded combined XML was
+independently checked:22 unique expected cases, each with positive simulated time,
+no failure/error/skipped entries. Netlist SHA537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9
+is the exact post-fill netlist used for extracted STA. Exact PDK89d42ee, frozen
+SRAM models, Icarus13, required sigrok and generated2-lane/4-unit tables are
+recorded in protocol_result_44123392388.json. This is functional gate-level
+simulation, not SDF-annotated simulation, official GDS signoff or silicon evidence.
+
+An isolated integration checkout is prepared locally; generated files match the
+frozen source and project config hash0b7a388f... is preserved. Main is still the
+placeholder-selected design. Before publication:
+1. Adopt matching2/4 spec/software tables, exact selected RTL/config/PDN/SRAM views
+   and real pinout/source list; keep test/Makefile source list synchronized.
+2. Replace counter-placeholder tests with real top-port host/protocol checks;
+   provide matching SRAM models to RTL and official gate-level simulation.
+3. Review two integration lint warnings (bounded integer comparison at
+   trw_pin_io.v:48 and unused car_out_on at trw_pin_tx.v:162), preserving proven
+   source identity where possible; then run generated-file/lint/regression checks.
+4. Confirm macro redistribution provenance/licenses and official-tool input parity.
+5. Publish coherent integration and run unchanged official GDS/precheck/GL/viewer.
+
+No Phase2 completion claim: the official full-design run remains outstanding,
+and extracted slow setup reserve is only163ps.

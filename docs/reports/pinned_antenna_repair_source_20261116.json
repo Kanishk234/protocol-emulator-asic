@@ -1,0 +1,15 @@
+{
+  "openroad_revision": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+  "files": {
+    "GlobalRouter.cpp": "71befc6541b5d2b0d22ec021e8c7f2d3edcd2c0dcf4575b0fb28ad21f5e5af83",
+    "RepairAntennas.cpp": "a1f0abcb18f65cec0902fb8a6fa22f6c728836e12776891a144f2fde317b534f",
+    "AntennaChecker.cc": "ab842999d3ccaf9de34347fa1f3b723e0a4a7d0b19a42271dfb4c8dede2c9ca7"
+  },
+  "source_findings": {
+    "jumper_insertion_requires_no_detailed_routes": true,
+    "detailed_repair_fixes_unrelated_instances_during_placement": true,
+    "cumulative_violation_fallback_requests_one_diode_per_non_antenna_gate": true,
+    "ratio_margin_not_used_by_checkCAR_or_checkCSR": true
+  },
+  "runtime_repair_outcome_measured": false
+}

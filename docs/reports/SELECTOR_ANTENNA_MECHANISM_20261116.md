@@ -54,6 +54,23 @@ Primary files at PDK89d42ee6d2fd9b50b86a1aada6fee6673c3e6008:
 
 ## Action sequence
 
+Exact-router follow-up: inspected OpenROADdcf36133 source, not latest docs.
+[GlobalRouter::repairAntennas](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/GlobalRouter.cpp#L480)
+only inserts jumpers when detailed routes are absent. After DRT it can insert
+diodes, incrementally update guides and let LibreLane reroute. Therefore a
+jumper-only switch is not a suitable post-DRT fallback at this version.
+[RepairAntennas](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/grt/src/RepairAntennas.cpp#L144)
+fixes unrelated instances during detailed-route diode placement and restores
+their placement status afterward. This is a more targeted repair opportunity
+than another full placement sweep, but its outcome still requires this run.
+
+[AntennaChecker](https://github.com/The-OpenROAD-Project/OpenROAD/blob/dcf36133a369abc8f3c5e5738cd4d82e4903c0e0/src/ant/src/AntennaChecker.cc#L986)
+uses a simple cumulative-violation fallback requesting one diode for each
+non-antenna gate in that violation group. Its CAR/CSR checks omit ratio_margin;
+increasing a partial-rule repair margin is not a direct fix for this cumulative
+failure. Source hashes are in pinned_antenna_repair_source_20261116.json. These
+are implementation findings, not proof of a successful repair on our net.
+
 1. Finish the unchanged native DRT repair/extraction trial already running.
 2. Read each repair iteration and the final per-layer antenna report. Identify
    whether the original sink remains, whether new violations appear, and when

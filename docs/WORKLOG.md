@@ -24,6 +24,19 @@ Newest entry at the top. One entry per work session.
 - Next publish tools/CI/docs in scoped commits, confirm one automatic waiting
   follow-up, and inspect the active physical result when GitHub exposes it.
   No hardware/config changes or phase checklist boxes ticked.
+- Published d57f223tools/34be59adocs/baa8e26CI. Automatic follow-up44026980046
+  atbaa8e26478efbb8b13a1e8fb01a31ab204b124b7 passes cloud guard checks and is
+  waiting for exact physical parent44025267292. No duplicate dispatch.
+- Full independent replay reconstruction succeeds at
+  /tmp/tripwire-selector-drt-replay-expected-20261117-v2; all170inputs verified.
+  Initial local fetch failed under network restriction; reviewed network-enabled
+  retry succeeded. This is source validation, not protocol replay evidence.
+- Inspect exact OpenROADdcf36133 source: jumper insertion is guarded by absence
+  of detailed routes; post-DRT repair uses diodes and fixes unrelated instances
+  during diode placement. CAR/CSR omit ratio_margin; cumulative fallback requests
+  one diode per non-antenna gate in its group. Record pinned source hashes and
+  implications in reports/pinned_antenna_repair_source_20261116.json and the
+  antenna mechanism report. No speculative switch or physical rerun introduced.
 
 ## 2026-11-16 — Prioritize extraction and investigate the remaining antenna
 

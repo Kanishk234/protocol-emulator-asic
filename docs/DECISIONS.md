@@ -1891,3 +1891,33 @@ mandatory. Helper binds source/config/RTL hashes; audit verifies all four exclus
 in synthesis and final netlist, preserving the prior stronger NAND2/NOR3 checks.
 73focused checks and actual artifact preparation pass. Separate manual screen,
 no main config/source or official-job modification, no routing until qualified.
+
+## D-181 (2026-11-16): evaluate supported config-only post-timing antenna repair
+**Experimental, not adopted.** User explicitly authorizes necessary project config
+changes while keeping official workflows unchanged. General need: repair antenna
+violations exposed by the last timing/routing pass, without protocol-specific
+hardware, per-net ECOs, relaxed constraints or patched tools.
+
+On exact cache/A22OI source43972384723 (setup slow+2.854549ns, fast hold+.107982ns),
+configure native `meta.flow=Classic` and `meta.substituting_steps` to append
+RepairAntennas after ResizerTimingPostGRT, then GlobalRouting after that antenna
+pass. Set GRT_ALLOW_CONGESTION=false. These are two project-config fields; all
+original Classic steps retain their order. Pinned dev4 API and actual official
+TT config generation preserve this declaration; official harden does not force
+a different flow. Do not modify official workflow jobs or tool scripts.
+
+Cost: additional antenna diodes and native routing runtime; potential area,
+setup/hold/electrical/congestion regressions must be measured. Final global route
+provides its own zero-overflow report. The antenna step inherits old NL/PNL, so
+read-only final ODB exports must agree across six STA runs and preserve every
+existing cell/connection, allowing only antenna diodes on existing nets. Preserve
+original native state; derive a separately audited state with fresh NL/PNL.
+All setup/hold, positive functional reserve, electrical0, fresh antenna0 and final
+route-overflow0 gates remain mandatory before DRT. No Phase2 pass inferred.
+
+Checks:112focused tests, exact pinned step-order inspection, source/macro/geometry
+parity, official8x4 config generation and embedded script syntax pass. Native
+execution pending. Source hold10808 existed before final repair; full artifact
+confirms M2cumulative203.75/200, so this targets late geometry rather than assuming
+the endpoint was newly inserted. Earlier native post-antenna trials used another
+recipe/tool version and are not evidence that this current recipe passes.

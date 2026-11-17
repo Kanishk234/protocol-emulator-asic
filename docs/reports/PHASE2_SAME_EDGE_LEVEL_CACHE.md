@@ -162,3 +162,40 @@ gates. Missing/repeated/malformed/nonstock reports fail closed. This changes our
 diagnostic workflow only; official jobs and constraints remain untouched.91focused
 checks pass; collector reproduces actual cache-only audit+12.766801/+3.183562/
 +9.293901ns. Those values remain historical and are not gate-mapping measurements.
+
+## Exact A22OI-exclusion setup result: audit 43984026662
+Read-only audit succeeds on source43972384723. Stock functional setup reserve
+fast/typical/slow+12.594728/+9.014820/+2.854549ns. All physical-view hashes,
+ordinary baseline metrics, repeated functional reports and stock0.25ns uncertainty
+checks pass. This source therefore has positive measured pre-routing functional
+setup as well as positive hold (fast+.107982ns). It remains unqualified because
+one antenna endpoint fails. This is not extracted/signoff evidence.
+
+Compared with cache-only: slow setup falls0.329013ns, fast hold improves0.0314089ns;
+antenna1persists at a different endpoint. Preserve both tradeoffs rather than
+calling it a universal improvement. Source-bound receipt saved in
+cache_gate/functional_setup_43984026662.json. Local artifact downloads remain
+unavailable after bounded timeout; runner audit restored and verified the exact
+source successfully. Final antenna endpoint history still needs inspection.
+
+## Config-only late antenna repair prepared on pinned dev4
+Full source artifact finally downloaded with a300sbound. hold10808/A is already
+present before the final timing pass; M2cumulative203.75/200 is confirmed. A native
+late repair therefore addresses changed final geometry, not just a new sink.
+
+Prepared D181 experiment: add native RepairAntennas after final timing, followed
+by native GlobalRouting, and set GRT_ALLOW_CONGESTION=false. All original Classic
+steps remain in order, as verified with the installed pinned dev4 API. The actual
+official TT generation/merge preserves the config on8x4, with source/macro/clock
+checks passing. Official hardening reads this config without a forced flow;
+o official workflow or tool edit is required. This is configured Classic with
+two added stock steps, not an unmodified Classic-sequence claim.
+
+Because native antenna/routing steps inherit NL/PNL, repeat final ODB readbacks
+at every corner/phase, allow only diode additions to existing nets, and create a
+separate audited state without modifying original native state. Gate uses the
+last full routing report and checks its database provenance. Strict positive
+functional setup plus all ordinary timing/hold/electrical/antenna/overflow gates
+remain.112focused tests plus real pinned config generation/order checks pass.
+Candidate config19e89d36297436bc7b078f54f8b02d2b72629ce04e886b93e9ad3d523c4a4c0e.
+No current physical result, main adoption, DRT or official GDS claim.

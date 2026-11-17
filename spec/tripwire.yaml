@@ -134,8 +134,8 @@ pads:
 # list in this order. Patterns: `Lk` = the consumer's own lane k, `L(k+1)` / `L(k-1)` = the next /
 # previous lane (mod lanes), `L*` = every lane, `U*` = every pin unit.
 fabric:
-  lanes: 3
-  units: 6
+  lanes: 2
+  units: 4
   sel_bits: 4
   sources:
     Lk.I0: [U*.rx, HOST_IN, L(k-1).O1]
@@ -163,10 +163,8 @@ pin_config:
     carrier: {fields: [carrier], modes: {}}
     bitsync: {fields: [nrzi, oe_auto, sjw, idle_bits, resync, delim, stuff_n, stuff_lvl, crc_width, crc_skip,
                        crc_poly, crc_init, crc_res, crc_xor], modes: {txmode: [bitsync], rxmode: [bitsync]}}
-  units:                      # D-040: the optional features of U0, U1, ... (U0-U1 full, U2-U5 lean)
+  units:                      # D-184: U0 full, U1-U3 lean
     - [pulse, carrier, bitsync]
-    - [pulse, carrier, bitsync]
-    - []
     - []
     - []
     - []
@@ -249,15 +247,15 @@ host_map:
     - {name: time,        addr: 0x0002,             access: R,        desc: "the 16-bit global time"}
     - {name: irq_en,      addr: 0x0003,             access: RW,       desc: "IRQ enable, bit layout of irq_status"}
     - {name: irq_status,  addr: 0x0004,             access: R,        desc: "live: [5:0] unit u OVERRUN or LATE, [8] HOST_OUT has a token, [9] HOST_IN free, [10] a DROPPED is nonzero"}
-    - {name: unit_flags,  addr: 0x0010, count: 6,   access: "R, W1C", desc: "unit u: [0] OVERRUN, [1] LATE (D-042)"}
+    - {name: unit_flags,  addr: 0x0010, count: 4,   access: "R, W1C", desc: "unit u: [0] OVERRUN, [1] LATE (D-042)"}
     - {name: version,     addr: 0x00FE,             access: R,        desc: "spec version: [15:8] major, [7:0] minor"}
     - {name: id,          addr: 0x00FF,             access: R,        desc: "chip ID (host_map.id)"}
     - {name: slots,       addr: 0x1000, count: 1024, access: W,       desc: "reflex slots and K: lane [9:8], slot [7:4] (12 = K), word [1:0]; [3:2] = 0. Written while the lane is halted"}
-    - {name: ports,       addr: 0x2000, count: 13,  access: RW,       desc: "fabric port c: [0] en, [1] tap, [5:2] sel, [9:6] accept (D-044)"}
-    - {name: dropped,     addr: 0x2040, count: 13,  access: "R, W clears", desc: "DROPPED of port c, [7:0] (D-044)"}
-    - {name: pin_cfg,     addr: 0x3000, count: 192, access: W,        desc: "pin-unit blocks, unit u at + 32u (§7.2)"}
+    - {name: ports,       addr: 0x2000, count: 9,  access: RW,       desc: "fabric port c: [0] en, [1] tap, [5:2] sel, [9:6] accept (D-044)"}
+    - {name: dropped,     addr: 0x2040, count: 9,  access: "R, W clears", desc: "DROPPED of port c, [7:0] (D-044)"}
+    - {name: pin_cfg,     addr: 0x3000, count: 128, access: W,        desc: "pin-unit blocks, unit u at + 32u (§7.2)"}
     - {name: owners,      addr: 0x30C0, count: 16,  access: RW,       desc: "owner of pad 8 + i: [2:0] unit, 7 = none (§7.1)"}
-    - {name: lanes,       addr: 0x5000, count: 96,  access: "R; W 0-4 while halted", desc: "lane k at + 32k, words in lane_words order (see below)"}
+    - {name: lanes,       addr: 0x5000, count: 64,  access: "R; W 0-4 while halted", desc: "lane k at + 32k, words in lane_words order (see below)"}
     - {name: host_in,     addr: 0x6000, count: 4,   access: W,        desc: "HOST_IN push, tag = addr[1:0]; refused while HOST_IN is not free"}
     - {name: host_status, addr: 0x6004,             access: R,        desc: "[15] HOST_OUT has a token, [14] HOST_IN free, [1:0] HOST_OUT tag"}
     - {name: host_out,    addr: 0x6005,             access: R,        desc: "HOST_OUT data; the read takes the token"}

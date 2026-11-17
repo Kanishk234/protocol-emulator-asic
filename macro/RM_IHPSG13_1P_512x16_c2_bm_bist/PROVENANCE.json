@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/IHP-GmbH/IHP-Open-PDK",
+  "revision": "2bbec755dc67ca3db0261c3d6163e15735d66710",
+  "upstream_directory": "ihp-sg13g2/libs.ref/sg13g2_sram",
+  "license": "Apache-2.0",
+  "origin": "Frozen physical candidate44017640255; original macro fetch pinned in spikes/r3_sram/fetch_macro.sh",
+  "files": {
+    "RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib": "4cb993f5108050e09de3bd01a5bf0ad433d25380f5dd873e9903f415e1d4c1e2",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.gds": "478b0e29801c2c3d285c42b668a2e51f3326efc31c67793b77a5ee7c4ea11bf6",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib": "cacb40bf9fd25a5fdde0493415455353c40160e25ef8aa17bcb67b29eee02df5",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib": "44c6ff102ab0a3fc8766b92cbb40a9723bac5aa084a00a111a5a70a772d30a1e",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.lef": "845c080938b5e9d1200774190430dad67eea7f1e209fb3094488614e70bb1c2c",
+    "RM_IHPSG13_1P_core_behavioral_bm_bist.v": "d0a6258f8e9c93d1d5b1f78c0a1d66f30d28b1ad8037e5e07f53d1a4e3670b12",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.cdl": "030a8907bb0ad7896a4a80a2c21e46d7088f9d7dc3e1de18269d316759afc30d",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.v": "fc8a03068bc692d3db8e836446b0376a7bbf97ef1cbfda8fd1f29d77255eba01"
+  }
+}

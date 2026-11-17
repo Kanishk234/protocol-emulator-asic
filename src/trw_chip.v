@@ -175,15 +175,21 @@ module trw_chip (
         for (u = 0; u < NU; u = u + 1) begin : g_unit
             localparam FULL = (`TRW_PC_UNITS_PULSE >> u) & 1;               // D-040: U0-U1 full
             wire [`TRW_PC_BITS-1:0] cfg;
+            wire        carrier_active;
+            wire        bitsync_active;
+            wire [24:0] sample_delta;
             wire        restart, rx_load, rx_free;
             wire [1:0]  rx_tag;
             wire [15:0] rx_data;
             trw_pin_cfg #(.FULL (FULL)) u_cfg (
                 .clk (clk), .rst_n (rst_n), .we (pcfg_we[u]), .waddr (pcfg_waddr), .wdata (hwd),
-                .cfg (cfg), .restart (restart)
+                .cfg (cfg), .carrier_active (carrier_active), .bitsync_active (bitsync_active), .sample_delta (sample_delta), .restart (restart)
             );
-            trw_pin_unit #(.FULL (FULL)) u_unit (
-                .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .pads (pads),
+            wire idle_next = (pcfg_we[u] && (pcfg_waddr == 5'd0))
+                           ? (rst_n && hwd[`TRW_PC_IDLE_LSB]) : cfg[`TRW_PC_IDLE_LSB];
+            trw_pin_unit #(.FULL (FULL), .USE_LEVEL_CACHE(1), .USE_SAMPLE_DELTA(1), .USE_BITSYNC_ACTIVE(1)) u_unit (
+                .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .cfg (cfg), .idle_next(idle_next),
+                .carrier_active (carrier_active), .bitsync_active (bitsync_active), .sample_delta (sample_delta), .pads (pads),
                 .tx_avail (avail[C_U+u]), .tx_tag (head[18*(C_U+u)+16 +: 2]), .tx_data (head[18*(C_U+u) +: 16]),
                 .tx_take (take[C_U+u]),
                 .rx_free (rx_free), .rx_load (rx_load), .rx_tag (rx_tag), .rx_data (rx_data),

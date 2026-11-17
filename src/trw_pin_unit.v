@@ -7,8 +7,9 @@
 // which owns takes, pin A (pin N's SE0, OE with OE_AUTO) and loads while TXMODE and RXMODE are both `bitsync`.
 //
 // Timing contract:
-//   - `cfg` is static while running (written while halted, §14 H1). `restart` (clock after a write to
-//     the block) restarts every register of the unit, including the sticky flags (P-G15).
+//   - Writes require halted lanes (§14 H1), but pin units remain live after activation; a config write
+//     restarts every register of the unit, including sticky flags (P-G15), and config paths stay timed
+//     (D-066).
 //   - `pads`: see trw_pin_io.v. Outputs `a_*` and `n_*` are registered (the level/OE registers of the
 //     TX half) and gated combinationally by OD, C_OE (P15) and the registered "selected".
 //   - `live` = 0 holds the unit off the fabric: it takes and loads nothing (P-G16).
@@ -21,6 +22,9 @@
 
 module trw_pin_unit #(
     parameter FULL = 0,
+    parameter USE_LEVEL_CACHE = 0,
+    parameter USE_SAMPLE_DELTA = 0,
+    parameter USE_BITSYNC_ACTIVE = 0,
     parameter FRAC = 8           // time fraction bits; 8 is the spec (16.8). FRAC < 8 is a measurement
                                  // variant only: it uses the top FRAC bits of the fraction fields
 ) (
@@ -28,7 +32,11 @@ module trw_pin_unit #(
     input  wire                    rst_n,
     input  wire                    restart,
     input  wire                    live,
+    input  wire                    idle_next,
     input  wire [`TRW_PC_BITS-1:0] cfg,
+    input  wire [24:0]             sample_delta,
+    input  wire                    carrier_active,
+    input  wire                    bitsync_active,
     input  wire [23:0]             pads,
     // consumer port head (TX half)
     input  wire                    tx_avail,
@@ -103,7 +111,8 @@ module trw_pin_unit #(
     wire        nrzi       = cfg[`TRW_PC_NRZI_LSB];
     wire        oe_auto    = cfg[`TRW_PC_OE_AUTO_LSB];
     wire [1:0]  delim      = cfg[`TRW_PC_DELIM_MSB:`TRW_PC_DELIM_LSB];
-    wire        bs_on      = (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
+    wire        bs_on      = USE_BITSYNC_ACTIVE ? bitsync_active
+                          : (FULL != 0) && (txmode == `TRW_PCE_TXMODE_BITSYNC)
                                          && (rxmode == `TRW_PCE_RXMODE_BITSYNC);
     // PIN_N only matters to the pad owner mux (trw_pins.v), which reads it from the same block.
 
@@ -121,12 +130,13 @@ module trw_pin_unit #(
     // ------------------------------------------------------------------ TX half
     wire lvl_t, oe, echo_t, rxset, smp, late_t, take_t;
     wire [4:0] rxset_n;
-    trw_pin_tx #(.FULL (FULL), .FRAC (FRAC)) u_tx (
+    trw_pin_tx #(.FULL (FULL), .USE_LEVEL_CACHE(USE_LEVEL_CACHE), .FRAC (FRAC)) u_tx (
         .clk (clk), .rst_n (rst_n), .restart (restart), .live (live),
-        .txmode (txmode), .order (order), .idle (idle), .tx_lentok (tx_lentok), .tx_preload (tx_preload),
+        .txmode (txmode), .order (order), .idle (idle), .idle_next(idle_next), .tx_lentok (tx_lentok), .tx_preload (tx_preload),
         .stretch (stretch), .tx_edge (tx_edge), .period (period), .presc (presc), .nbits (nbits),
         .sym0_t1 (sym0_t1), .sym0_first (sym0_first), .sym0_t2 (sym0_t2),
         .sym1_t1 (sym1_t1), .sym1_first (sym1_first), .sym1_t2 (sym1_t2), .carrier (carrier),
+        .carrier_active (carrier_active),
         .a_in (a_in), .b_rise (b_rise), .b_fall (b_fall), .sel (sel), .sel_fall (sel_fall),
         .tx_avail (tx_avail && !bs_on), .tx_tag (tx_tag), .tx_data (tx_data), .tx_take (take_t),
         .lvl (lvl_t), .oe (oe), .echo (echo_t),
@@ -162,11 +172,11 @@ module trw_pin_unit #(
     wire [15:0] data_b;
     generate
         if (FULL != 0) begin : g_bs
-            trw_pin_bs u_bs (
+            trw_pin_bs #(.USE_SAMPLE_DELTA(USE_SAMPLE_DELTA), .USE_LEVEL_CACHE(USE_LEVEL_CACHE)) u_bs (
                 .clk (clk), .rst_n (rst_n), .restart (restart), .live (live), .active (bs_on),
-                .idle (idle), .order (order), .tx_lentok (tx_lentok), .nrzi (nrzi), .oe_auto (oe_auto),
+                .idle (idle), .idle_next(idle_next), .order (order), .tx_lentok (tx_lentok), .nrzi (nrzi), .oe_auto (oe_auto),
                 .delim (delim), .period (period),
-                .sampleofs (sampleofs), .sjw (sjw),
+                .sampleofs (sampleofs), .sample_delta (sample_delta), .sjw (sjw),
                 .idle_bits (idle_bits), .resync_both (resync), .nbits (nbits), .rx_nbits (rx_nbits),
                 .stuff_n (stuff_n), .stuff_lvl (stuff_lvl), .crc_width (crc_width), .crc_skip (crc_skip),
                 .crc_poly (crc_poly), .crc_init (crc_init), .crc_res (crc_res), .crc_xor (crc_xor),

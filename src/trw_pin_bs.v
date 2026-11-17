@@ -44,13 +44,14 @@
 `include "trw_defs.vh"
 `include "trw_assert.vh"
 
-module trw_pin_bs (
+module trw_pin_bs #(parameter USE_SAMPLE_DELTA = 0, parameter USE_LEVEL_CACHE = 0) (
     input  wire        clk,
     input  wire        rst_n,
     input  wire        restart,
     input  wire        live,
     input  wire        active,       // TXMODE and RXMODE are bitsync (and this is a full unit)
     // configuration (static while running)
+    input  wire        idle_next,
     input  wire        idle,         // the recessive level
     input  wire        order,
     input  wire        tx_lentok,
@@ -58,6 +59,7 @@ module trw_pin_bs (
     input  wire        oe_auto,
     input  wire [1:0]  delim,        // 0 none, 1 flag, 2 se0
     input  wire [23:0] period,       // 16.8 clocks
+    input  wire [24:0] sample_delta,
     input  wire [23:0] sampleofs,    // 16.8 clocks after the bit start
     input  wire [23:0] sjw,          // 16.8 clocks, 0 = hard sync only
     input  wire [4:0]  idle_bits,
@@ -130,12 +132,18 @@ module trw_pin_bs (
     wire        done = !hsync && smp_done;
     // P22: e = time since the bit start; before the sample move later by min(e, SJW), after it end earlier
     wire [24:0] e    = per - tb;
-    wire [24:0] d    = !smp_done ? ((e < sj) ? e : sj) : ((tb < sj) ? tb : sj);
-    wire        rs_do = rs_edge && (d != 25'd0);
-    wire [24:0] tb_r = !smp_done ? tb + d : tb - d;             // the boundary after a resync
-    wire [24:0] sp   = sof - per;                               // sample time - boundary time
+    wire        rs_do = rs_edge && (sj != 25'd0) && (smp_done ? (tb != 25'd0) : (per != tb));
+    // Fold the min-and-add/subtract into the boundary value directly. Before the sample,
+    // tb + min(per - tb, sjw) is either per or tb + sjw. After it,
+    // tb - min(tb, sjw) is either zero or tb - sjw. This removes one 25-bit
+    // arithmetic stage from the resync path without changing its saturation behavior.
+    wire [24:0] tb_r = !smp_done ? ((e < sj) ? per : tb + sj) : ((tb < sj) ? 25'd0 : tb - sj);
+    wire [24:0] sp   = (USE_SAMPLE_DELTA != 0) ? sample_delta : sof - per;                               // sample time - boundary time
     wire [24:0] x_n  = sp + tb;                                 // the sample time, from this clock's start
-    wire [24:0] x_r  = sp + tb_r;                               // the same after a resync
+    // Cancel the saturated correction before doing sample-time arithmetic.
+    // These identities hold modulo 2^25, including timer wrap and live writes.
+    wire [24:0] x_r = !smp_done ? ((e < sj) ? sof : x_n + sj) :
+                                ((tb < sj) ? sp : x_n - sj);
     wire        s_n  = x_n[24] || (x_n < 25'd256);              // at or before the end of this clock
     wire        s_r  = x_r[24] || (x_r < 25'd256);
     wire        s_h  = sof < 25'd256;
@@ -324,7 +332,28 @@ module trw_pin_bs (
     // right-aligned (area: no barrel shifter); bits above the word's length are never read
     wire [15:0] ld_q     = k_crc ? ((crc_src ^ crc_xor) & cmask) : pay;
 
-    assign tx_lvl = cur;                                        // no bit: released (recessive)
+    generate if (USE_LEVEL_CACHE != 0) begin : g_level_cache
+        reg lvl_q;
+        always @(posedge clk) begin
+            if (!rst_n || restart || !active || jm_off)
+                lvl_q <= idle_next;
+            else if (j_bit)
+                lvl_q <= j_lvl;
+            else if (deq)
+                lvl_q <= nl;
+            else if (se_go)
+                lvl_q <= 1'b0;
+            else if (jj_go)
+                lvl_q <= idle;
+            else if (bnd)
+                lvl_q <= idle_next;
+            else
+                lvl_q <= drv ? tlv : idle_next;
+        end
+        assign tx_lvl = lvl_q;
+    end else begin : g_level_original
+        assign tx_lvl = cur;
+    end endgenerate                                        // no bit: released (recessive)
     assign tx_se0 = drv && se0_r;
     assign tx_drv = drv;
 
@@ -344,7 +373,13 @@ module trw_pin_bs (
     // ------------------------------------------------------------------ producer
     // frame tokens first; status EVENTs wait in `st` (P-G41). With OE_AUTO our own frames are not reported.
     wire        rep_ok   = !(oe_auto && own);
-    wire        fr_want  = live && rep_ok && (err_tok || ab_tok || v_tok || w_tok);
+    // Qualify the late sample event after state-only completion decisions.
+    wire        commit_ready = !s_due && !f6 && open_fr && (!dlf || hb_full);
+    wire        completion_ready = (fr_v && (dcnt1 == fr_n)) || (wn1 == wlen);
+    wire        frame_ready = (s_due && run_eq && !dlf && (words_on || post)) ||
+                              (f6 && words_on && (dcnt != 11'd0)) ||
+                              (commit_ready && words_on && completion_ready);
+    wire        fr_want = live && rep_ok && ((fbit && frame_ready) || (se0_s && words_on));
     wire [1:0]  fr_tag   = (err_tok || ab_tok) ? `TRW_TAG_ERR : v_tok ? (crc_ok ? `TRW_TAG_EVENT : `TRW_TAG_ERR) :
                            `TRW_TAG_DATA;
     wire [15:0] fr_data  = err_tok ? {4'h1, 1'b0, lcnt} : ab_tok ? {4'h2, 1'b0, lcnt} :

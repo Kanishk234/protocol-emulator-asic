@@ -206,10 +206,10 @@
 
 // chip size and fabric numbering (fabric_numbering: units, then lanes' O0/O1, then HOST_IN;
 // lanes' I0/I1, then units' tx, then HOST_OUT)
-`define TRW_LANES 3
-`define TRW_UNITS 6
-`define TRW_NPROD 13
-`define TRW_NCONS 13
+`define TRW_LANES 2
+`define TRW_UNITS 4
+`define TRW_NPROD 9
+`define TRW_NCONS 9
 
 // pin-unit configuration (ARCHITECTURE.md §7.2): positions inside a unit's block,
 // bit = 16 * word + bit in word; the block is TRW_PC_WORDS host words
@@ -408,9 +408,9 @@
 `define TRW_PC_MASK_CARRIER 352'h000000000000000000000000000000ffffff0000000000000000000000000000000000000000000000000000
 `define TRW_PC_MASK_BITSYNC 352'hffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006000
 // units that have each optional feature, bit u = unit u
-`define TRW_PC_UNITS_PULSE 6'b000011
-`define TRW_PC_UNITS_CARRIER 6'b000011
-`define TRW_PC_UNITS_BITSYNC 6'b000011
+`define TRW_PC_UNITS_PULSE 4'b0001
+`define TRW_PC_UNITS_CARRIER 4'b0001
+`define TRW_PC_UNITS_BITSYNC 4'b0001
 
 // host register map (ARCHITECTURE.md §9, D-046)
 `define TRW_HOST_ID 16'h7157
@@ -423,21 +423,21 @@
 `define TRW_HA_IRQ_EN 16'h0003
 `define TRW_HA_IRQ_STATUS 16'h0004
 `define TRW_HA_UNIT_FLAGS 16'h0010
-`define TRW_HA_UNIT_FLAGS_N 6
+`define TRW_HA_UNIT_FLAGS_N 4
 `define TRW_HA_VERSION 16'h00fe
 `define TRW_HA_ID 16'h00ff
 `define TRW_HA_SLOTS 16'h1000
 `define TRW_HA_SLOTS_N 1024
 `define TRW_HA_PORTS 16'h2000
-`define TRW_HA_PORTS_N 13
+`define TRW_HA_PORTS_N 9
 `define TRW_HA_DROPPED 16'h2040
-`define TRW_HA_DROPPED_N 13
+`define TRW_HA_DROPPED_N 9
 `define TRW_HA_PIN_CFG 16'h3000
-`define TRW_HA_PIN_CFG_N 192
+`define TRW_HA_PIN_CFG_N 128
 `define TRW_HA_OWNERS 16'h30c0
 `define TRW_HA_OWNERS_N 16
 `define TRW_HA_LANES 16'h5000
-`define TRW_HA_LANES_N 96
+`define TRW_HA_LANES_N 64
 `define TRW_HA_HOST_IN 16'h6000
 `define TRW_HA_HOST_IN_N 4
 `define TRW_HA_HOST_STATUS 16'h6004

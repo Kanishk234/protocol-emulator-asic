@@ -1,17 +1,13 @@
-/*
- * Copyright (c) 2026 Kanishk, Krithik
- * SPDX-License-Identifier: Apache-2.0
- */
-
-`default_nettype none
-
-// TRIPWIRE top level.
-// Phase 0 placeholder: an 8-bit counter on uo_out, advancing by one on every
-// clock while ui_in[0] is high. It exists only to prove the CI flow end to end
-// (test, gds, precheck, gl_test, viewer, docs). Replaced by the real design in phase 2.
+// R4 run 6 (branch spike/r4-floorplan only; never merged, DECISIONS D-043, D-049): the real chip
+// (src/trw_chip.v from main) at the protocol floor's counts, to measure whether that size routes on 6x4.
 //
-// Timing contract: uo_out = count, updated on the rising clock edge;
-// synchronous active-low reset clears it to 0.
+// The counts come from this branch's spec/tripwire.yaml: 2 lanes, 4 pin units, only U0 full (D-049: every
+// protocol still has what it needs, one at a time), 12 slots per lane, the 512-word SRAM. The fabric, the
+// host map and trw_defs.vh are regenerated from it (tools/gen/gen.py). Everything else is main's RTL as is.
+//
+// Pins (ARCHITECTURE.md §9, §10): ui[4] CS_n, ui[5] SCK, ui[6] MOSI, uo[3] MISO, uo[6] IRQ; the other
+// 19 pads belong to the pin units through the owner registers.
+`default_nettype none
 
 module tt_um_tripwire (
     input  wire [7:0] ui_in,    // Dedicated inputs
@@ -23,21 +19,8 @@ module tt_um_tripwire (
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-
-  reg [7:0] count;
-
-  always @(posedge clk) begin
-    if (!rst_n)
-      count <= 8'd0;
-    else if (ui_in[0])
-      count <= count + 8'd1;
-  end
-
-  assign uo_out  = count;
-  assign uio_out = 8'd0;
-  assign uio_oe  = 8'd0;
-
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, ui_in[7:1], uio_in, 1'b0};
-
+    trw_chip u_chip (
+        .ui_in (ui_in), .uo_out (uo_out), .uio_in (uio_in), .uio_out (uio_out), .uio_oe (uio_oe),
+        .ena (ena), .clk (clk), .rst_n (rst_n)
+    );
 endmodule

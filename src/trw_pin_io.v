@@ -37,15 +37,21 @@ module trw_pin_io (
     wire       b_on  = (pin_b < 5'd24);
     wire       c_on  = (pin_c < 5'd24);
 
-    // Index the pad vector only with in-range values (the `*_on` checks pick the default otherwise).
+    // A/B retain bounded indexing. C defaults mask any unattached index.
     wire       a_pad = pads[a_on ? a_idx : 5'd0];
     wire       b_pad = pads[b_on ? pin_b : 5'd0];
-    wire       c_pad = pads[c_on ? pin_c : 5'd0];
+    reg c_pad;
+    integer c_pi;
+    always @* begin
+        c_pad = 1'b0;
+        for (c_pi=0; c_pi<24; c_pi=c_pi+1)
+            c_pad = c_pad | (pads[c_pi] && (pin_c == c_pi));
+    end
 
     assign a_in = a_on ? a_pad : idle;
     assign b_in = b_on && b_pad;
     assign c_in = c_on ? c_pad : c_active;
-    assign sel  = (c_in == c_active);
+    assign sel = !c_on || (c_pad == c_active);
     assign sel_fall = sel_q && !sel;
 
     always @(posedge clk) begin

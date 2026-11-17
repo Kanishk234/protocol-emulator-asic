@@ -68,22 +68,18 @@ HOST_PADS = (4, 5, 6, 11, 14)
 
 FABRIC_SEL_BITS = 4
 LEGAL_SOURCES = {  # consumer port: sources in sel order (ARCHITECTURE.md §4.6)
-    'L0.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L2.O1'),
-    'L1.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L0.O1'),
-    'L2.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L1.O1'),
-    'L0.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L1.O0', 'L2.O1'),
-    'L1.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L2.O0', 'L0.O1'),
-    'L2.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'HOST_IN', 'L0.O0', 'L1.O1'),
-    'U0.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
-    'U1.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
-    'U2.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
-    'U3.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
-    'U4.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
-    'U5.tx': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'HOST_IN'),
-    'HOST_OUT': ('L0.O0', 'L1.O0', 'L2.O0', 'L0.O1', 'L1.O1', 'L2.O1', 'U0.rx', 'U1.rx'),
+    'L0.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'HOST_IN', 'L1.O1'),
+    'L1.I0': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'HOST_IN', 'L0.O1'),
+    'L0.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'HOST_IN', 'L1.O0', 'L1.O1'),
+    'L1.I1': ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'HOST_IN', 'L0.O0', 'L0.O1'),
+    'U0.tx': ('L0.O0', 'L1.O0', 'L0.O1', 'L1.O1', 'HOST_IN'),
+    'U1.tx': ('L0.O0', 'L1.O0', 'L0.O1', 'L1.O1', 'HOST_IN'),
+    'U2.tx': ('L0.O0', 'L1.O0', 'L0.O1', 'L1.O1', 'HOST_IN'),
+    'U3.tx': ('L0.O0', 'L1.O0', 'L0.O1', 'L1.O1', 'HOST_IN'),
+    'HOST_OUT': ('L0.O0', 'L1.O0', 'L0.O1', 'L1.O1', 'U0.rx', 'U1.rx'),
 }
-FABRIC_PRODUCERS = ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'U4.rx', 'U5.rx', 'L0.O0', 'L0.O1', 'L1.O0', 'L1.O1', 'L2.O0', 'L2.O1', 'HOST_IN')  # producer numbers in the RTL (trw_fabric.v)
-FABRIC_CONSUMERS = ('L0.I0', 'L0.I1', 'L1.I0', 'L1.I1', 'L2.I0', 'L2.I1', 'U0.tx', 'U1.tx', 'U2.tx', 'U3.tx', 'U4.tx', 'U5.tx', 'HOST_OUT')  # consumer port numbers in the RTL
+FABRIC_PRODUCERS = ('U0.rx', 'U1.rx', 'U2.rx', 'U3.rx', 'L0.O0', 'L0.O1', 'L1.O0', 'L1.O1', 'HOST_IN')  # producer numbers in the RTL (trw_fabric.v)
+FABRIC_CONSUMERS = ('L0.I0', 'L0.I1', 'L1.I0', 'L1.I1', 'U0.tx', 'U1.tx', 'U2.tx', 'U3.tx', 'HOST_OUT')  # consumer port numbers in the RTL
 
 PIN_CFG_BASE = 0x3000
 PIN_CFG_STRIDE = 32
@@ -162,8 +158,6 @@ PIN_FEATURES = {  # optional feature: (fields, {enum field: modes}) (D-040)
 }
 PIN_UNIT_FEATURES = (  # U0, U1, ...: the optional features each unit has
     ('pulse', 'carrier', 'bitsync'),
-    ('pulse', 'carrier', 'bitsync'),
-    (),
     (),
     (),
     (),
@@ -180,15 +174,15 @@ HOST_MAP = {  # name: (address, words) (ARCHITECTURE.md §9, D-046)
     'time': (0x0002, 1),
     'irq_en': (0x0003, 1),
     'irq_status': (0x0004, 1),
-    'unit_flags': (0x0010, 6),
+    'unit_flags': (0x0010, 4),
     'version': (0x00fe, 1),
     'id': (0x00ff, 1),
     'slots': (0x1000, 1024),
-    'ports': (0x2000, 13),
-    'dropped': (0x2040, 13),
-    'pin_cfg': (0x3000, 192),
+    'ports': (0x2000, 9),
+    'dropped': (0x2040, 9),
+    'pin_cfg': (0x3000, 128),
     'owners': (0x30c0, 16),
-    'lanes': (0x5000, 96),
+    'lanes': (0x5000, 64),
     'host_in': (0x6000, 4),
     'host_status': (0x6004, 1),
     'host_out': (0x6005, 1),

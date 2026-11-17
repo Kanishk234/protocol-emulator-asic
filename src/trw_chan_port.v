@@ -50,8 +50,18 @@ module trw_chan_port #(
     output reg  [3:0]      accept,
     output wire            blocking,
     output reg             last_seq,
-    output reg  [7:0]      dropped
+    output wire [7:0]      dropped
 );
+    reg [N-1:0] select_mask;
+    integer sm;
+    always @(posedge clk) begin
+        if (!rst_n)
+            select_mask <= {{(N-1){1'b0}}, 1'b1};
+        else if (cfg_we)
+            for (sm = 0; sm < N; sm = sm + 1)
+                select_mask[sm] <= ({28'd0, cfg_sel} == sm);
+    end
+
     // selected source; a sel beyond the list selects nothing
     reg        s_valid, s_seq, s_load, w_seq;
     reg [17:0] s_tok;
@@ -63,11 +73,11 @@ module trw_chan_port #(
         s_tok   = 18'd0;
         w_seq   = 1'b0;
         for (n = 0; n < N; n = n + 1) begin
-            if ({28'd0, sel} == n) begin
-                s_valid = src_valid[n];
-                s_seq   = src_seq[n];
-                s_load  = src_load[n];
-                s_tok   = src_tok[18*n +: 18];
+            if (select_mask[n]) begin
+                s_valid = s_valid | src_valid[n];
+                s_seq   = s_seq | src_seq[n];
+                s_load  = s_load | src_load[n];
+                s_tok   = s_tok | src_tok[18*n +: 18];
             end
             if ({28'd0, cfg_sel} == n)
                 w_seq = src_seq[n];          // F5: the newly selected source's seq
@@ -102,13 +112,27 @@ module trw_chan_port #(
         end
     end
 
+    wire drop_inc = drop && !cfg_we;
+    // The public count includes the pending event in the same architectural cycle.
+    // Accumulation consumes the previous event; only the narrow event registers
+    // depend on the late producer/drop decision.
+    reg [7:0] count_base;
+    reg pending_drop_n;
+    wire pending_drop = !pending_drop_n;
+    reg pending_clear;
+    wire [7:0] count_incremented = (&count_base) ? count_base : count_base + 8'd1;
+    assign dropped = pending_drop ? count_incremented
+                   : pending_clear ? 8'd0 : count_base;
     always @(posedge clk) begin
-        if (!rst_n)
-            dropped <= 8'd0;
-        else if (drop && !cfg_we)
-            dropped <= (dropped == 8'hff) ? 8'hff : dropped + 8'd1;
-        else if (clr_dropped)
-            dropped <= 8'd0;
+        if (!rst_n) begin
+            count_base    <= 8'd0;
+            pending_drop_n <= 1'b1;
+            pending_clear <= 1'b0;
+        end else begin
+            count_base    <= dropped;
+            pending_drop_n <= !drop_inc;
+            pending_clear <= clr_dropped;
+        end
     end
     `TRW_ASSERT(!(avail && !en), "a disabled port shows a token (F1)")
 endmodule

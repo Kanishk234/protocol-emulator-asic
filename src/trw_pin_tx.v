@@ -32,7 +32,8 @@
 `include "trw_defs.vh"
 
 module trw_pin_tx #(
-    parameter FULL = 0,          // 1: PULSE and carrier (U0-U1, D-040)
+    parameter FULL = 0,
+    parameter USE_LEVEL_CACHE = 0,          // 1: PULSE and carrier (U0-U1, D-040)
     parameter FRAC = 8           // fraction bits of time arithmetic (8 = the spec's 16.8; less = measurement only)
 ) (
     input  wire        clk,
@@ -43,6 +44,7 @@ module trw_pin_tx #(
     input  wire [2:0]  txmode,
     input  wire        order,
     input  wire        idle,
+    input  wire        idle_next,
     input  wire        tx_lentok,
     input  wire        tx_preload,
     input  wire        stretch,
@@ -57,6 +59,7 @@ module trw_pin_tx #(
     input  wire        sym1_first,
     input  wire [11:0] sym1_t2,
     input  wire [23:0] carrier,     // carrier period, 16.8 clocks (FULL; 0 = off)
+    input  wire        carrier_active, // cached P-G25 predicate from the configuration latch
     // pins
     input  wire        a_in,
     input  wire        b_rise,
@@ -146,8 +149,33 @@ module trw_pin_tx #(
     reg  [24:0] ct;          // carrier: 16.9 clocks from this clock to the next toggle
     reg         cph;         // carrier: in an off (IDLE) half
 
-    wire car_on = (FULL != 0) && (carrier[23:9] != 15'd0);           // P-G25: below 2 clocks = off
-    assign lvl = (lvx && !(car_on && cph)) ^ idle;
+    wire car_on = (FULL != 0) && carrier_active;                     // P-G25: below 2 clocks = off
+    // Capture the live configuration predicate at the pin-unit clock. The latch-to-flop
+    // path remains timed (D-066), while pad feedback sees the selected setting as state.
+    reg carrier_active_q;
+    always @(posedge clk) begin
+        if (!rst_n)
+            carrier_active_q <= 1'b0;
+        else
+            carrier_active_q <= carrier_active;
+    end
+    wire car_out_on = (FULL != 0) && carrier_active_q;
+    generate if (USE_LEVEL_CACHE != 0) begin : g_level_cache
+        // Same-edge precomputation of the old output function, not a pipeline.
+        // idle_next is the configuration bit visible immediately after this edge.
+        wire cph_next = (!car_on || !nlvx[0] || !lvx) ? 1'b0
+                      : (ct[24:9] == 16'd0) ? !cph : cph;
+        reg lvl_q;
+        always @(posedge clk) begin
+            if (!rst_n || restart)
+                lvl_q <= idle_next;
+            else
+                lvl_q <= (nlvx[0] && !(car_on && cph_next)) ^ idle_next;
+        end
+        assign lvl = lvl_q;
+    end else begin : g_level_original
+        assign lvl = (lvx && !(car_out_on && cph)) ^ idle;
+    end endgenerate
 
     // ------------------------------------------------------------------ the running shift / burst
     wire [15:0] bt_i    = bt[BW-1:FRAC+1];
@@ -196,7 +224,11 @@ module trw_pin_tx #(
     wire [7:0]  r_b  = w_fire ? presc : r_eff;
     wire [FRAC-1:0] cf_b = w_fire ? {FRAC{1'b0}} : cf_eff;
 
-    wire [16:0] q_sub = {q_b[15], q_b} - {5'd0, h_d};                   // cursor + d * PRESC
+    // Evaluate the cursor subtract before selecting the late mode-dependent base.
+    wire [16:0] q_sub_eq = {eq[15], eq} - {5'd0, h_d};
+    wire [16:0] q_sub_zero = 17'd0 - {5'd0, h_d};
+    wire [16:0] q_sub_m1 = 17'h1ffff - {5'd0, h_d};
+    wire [16:0] q_sub = w_fire ? q_sub_m1 : use_pe ? (pe_m1 ? q_sub_m1 : q_sub_zero) : q_sub_eq;                   // cursor + d * PRESC
     wire        q_uf  = (q_sub[16:15] == 2'b10);                       // below -32768 ticks (P-G3)
     wire        late  = !q_sub[16];                                    // earlier than the earliest edge
     wire        at_m1 = (q_sub[15:0] == 16'hffff) && (r_b == presc);   // exactly the earliest edge
@@ -269,7 +301,13 @@ module trw_pin_tx #(
         end
     end
     wire        r_wrap = (rn == presc);
-    wire [15:0] q_inc  = (r_wrap && (qn != 16'h7fff)) ? qn + 16'd1 : qn;
+    // Compute cursor arithmetic independently of the late token selection.
+    wire q_reset = tk && !h_ext && (c_sync || tk_late);
+    wire q_delay = tk && !h_ext && !(c_sync || tk_late) && (c_gap || tk_timed);
+    wire base_wrap = (r_b == presc);
+    wire [15:0] base_inc = (base_wrap && (q_b != 16'h7fff)) ? q_b + 16'd1 : q_b;
+    wire [15:0] delay_inc = (base_wrap && (q_sub[15:0] != 16'h7fff)) ? q_sub[15:0] + 16'd1 : q_sub[15:0];
+    wire [15:0] q_inc = q_reset ? 16'd0 : q_delay ? delay_inc : base_inc;
     wire [7:0]  r_inc  = r_wrap ? 8'h00 : rn + 8'd1;
 
     always @(posedge clk) begin

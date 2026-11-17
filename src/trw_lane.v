@@ -165,13 +165,16 @@ module trw_lane #(
     // R5: a waiting OUT whose output is not free is not a candidate.
     wire        rt_ok  = eval_en && st_v && (!st_out || ofree[st_prt]);
 
-    // §4.3: with a step waiting only urgent slots can beat it; one lowest-index encoder either way.
-    wire [11:0] cand   = ready & (rt_ok ? urgent : 12'hFFF);
-    wire [11:0] onehot = cand & (~cand + 12'd1);
-    wire        fire   = |cand;
-    wire        rt_take = rt_ok && !fire;
+    // Select the ready and urgent priority masks before late routine eligibility.
+    // Share the wide slot-data reduction; only its one-hot mask is selected late.
+    wire [11:0] urgent_ready = ready & urgent;
+    wire [11:0] first_ready = ready & (~ready + 12'd1);
+    wire [11:0] first_urgent = urgent_ready & (~urgent_ready + 12'd1);
+    wire [11:0] onehot = rt_ok ? first_urgent : first_ready;
+    wire fire = rt_ok ? (|urgent_ready) : (|ready);
+    wire rt_take = rt_ok && !fire;
 
-    reg [SB-1:0] ss;        // the selected slot
+    reg [SB-1:0] ss;
     integer j;
     always @* begin
         ss = {SB{1'b0}};
@@ -244,8 +247,15 @@ module trw_lane #(
     wire [1:0]  ia   = ex_rt ? (rt_ctl ? rt_crd : rt_ara) : ex_asrc[1:0];
     wire [1:0]  ib   = ex_rt ? (rt_ctl ? ((rt_sub == `TRW_RT_SUB_OUT) ? rt_ora : rt_mra) : rt_b[1:0])
                              : ex_imm[1:0];
-    wire [15:0] rd_a = regs[16*ia +: 16];
-    wire [15:0] rd_b = regs[16*ib +: 16];
+    // Parallel decoded reads, with unchanged cycle and register selection.
+    wire [15:0] rd_a = ({16{ia == 2'd0}} & regs[15:0])
+                     | ({16{ia == 2'd1}} & regs[31:16])
+                     | ({16{ia == 2'd2}} & regs[47:32])
+                     | ({16{ia == 2'd3}} & regs[63:48]);
+    wire [15:0] rd_b = ({16{ib == 2'd0}} & regs[15:0])
+                     | ({16{ib == 2'd1}} & regs[31:16])
+                     | ({16{ib == 2'd2}} & regs[47:32])
+                     | ({16{ib == 2'd3}} & regs[63:48]);
 
     reg  [3:0]  alu_op;
     reg  [15:0] alu_a, alu_b;

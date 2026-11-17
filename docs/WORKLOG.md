@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-17 — Run current-source lockstep and prepare SRAM provenance package
+
+- Published8ed717atests/b2dfd55docs/8580c43CI. Independent selector lockstep
+  44027736274 is active at8580c43c8f7232ba411f9b4fdd02f344a4850177 and has
+  reached the million-clock comparison step. No result claimed before XML/log
+  checks and both injected faults finish. Physical44025267292 is still active;
+  final-netlist follow-up44026980046 waits for its exact passing parent.
+- Prepare review-only docs/review/selector_macro_package: exact upstream
+  LICENSE at SRAM source2bbec755, README credits and8-view path/size/hash
+  manifest. All7text-view Apache headers verified. Source headers remain
+  unchanged; binary GDS has no asserted embedded copyright text. Record SRAM
+  pin separately from standard-cell89d42ee6. This package is not installed in
+  macro/ and changes no physical inputs. Update integration review accordingly.
+- Manual integrity check verifies license hash,8macro hashes and7headers;
+  independent selector170-input verification still passes.167related local
+  checks and actionlint pass. No extra low-impact packaging tests added.
+- Next collect current-source million-clock/mutation outcomes and physical
+  timing/antenna reports. Production architecture/config adoption and official
+  GDS/precheck remain separate open work; no phase boxes or closure claims.
+
 ## 2026-11-16 — Fill the current-selector whole-chip lockstep evidence gap
 
 - User asks for useful parallel progress while physical results are pending.

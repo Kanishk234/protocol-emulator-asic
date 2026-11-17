@@ -12,8 +12,11 @@ The coherent payload includes the actual Tiny Tapeout top and optimized core,
 pinned SRAM views/wrapper/PDN inputs, spec and regenerated Verilog/Python tables,
 source metadata, test Makefile and actual-top tests. Source-list consistency and
 the 8x4/50MHz metadata contract are checked before staging. Existing source
-copyright/license headers remain in the copied bytes. Vendor standalone
-license/NOTICE packaging still needs review before production integration.
+copyright/license headers remain in the copied bytes. Review-only standalone
+license, README and eight-view provenance manifest are now prepared in
+`docs/review/selector_macro_package/`. All seven text views retain upstream
+Apache headers; the exact upstream license is copied without changes. This
+package is not applied under macro/ and does not change the active170inputs.
 
 Two adoption decisions remain explicit:
 

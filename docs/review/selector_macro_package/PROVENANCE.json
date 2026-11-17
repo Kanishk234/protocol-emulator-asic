@@ -1,0 +1,60 @@
+{
+  "upstream_repository": "https://github.com/IHP-GmbH/IHP-Open-PDK",
+  "upstream_revision": "2bbec755dc67ca3db0261c3d6163e15735d66710",
+  "license_path": "LICENSE",
+  "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+  "files": {
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.cdl": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/cdl/RM_IHPSG13_1P_512x16_c2_bm_bist.cdl",
+      "bytes": 403966,
+      "sha256": "030a8907bb0ad7896a4a80a2c21e46d7088f9d7dc3e1de18269d316759afc30d",
+      "text_header_checked": true
+    },
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.gds": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_512x16_c2_bm_bist.gds",
+      "bytes": 466654,
+      "sha256": "478b0e29801c2c3d285c42b668a2e51f3326efc31c67793b77a5ee7c4ea11bf6",
+      "text_header_checked": false
+    },
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.lef": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_512x16_c2_bm_bist.lef",
+      "bytes": 74001,
+      "sha256": "845c080938b5e9d1200774190430dad67eea7f1e209fb3094488614e70bb1c2c",
+      "text_header_checked": true
+    },
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.v": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_512x16_c2_bm_bist.v",
+      "bytes": 7504,
+      "sha256": "fc8a03068bc692d3db8e836446b0376a7bbf97ef1cbfda8fd1f29d77255eba01",
+      "text_header_checked": true
+    },
+    "RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x16_c2_bm_bist_fast_1p32V_m55C.lib",
+      "bytes": 49139,
+      "sha256": "4cb993f5108050e09de3bd01a5bf0ad433d25380f5dd873e9903f415e1d4c1e2",
+      "text_header_checked": true
+    },
+    "RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib",
+      "bytes": 49203,
+      "sha256": "cacb40bf9fd25a5fdde0493415455353c40160e25ef8aa17bcb67b29eee02df5",
+      "text_header_checked": true
+    },
+    "RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x16_c2_bm_bist_typ_1p20V_25C.lib",
+      "bytes": 49142,
+      "sha256": "44c6ff102ab0a3fc8766b92cbb40a9723bac5aa084a00a111a5a70a772d30a1e",
+      "text_header_checked": true
+    },
+    "RM_IHPSG13_1P_core_behavioral_bm_bist.v": {
+      "source_path": "ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_core_behavioral_bm_bist.v",
+      "bytes": 3951,
+      "sha256": "d0a6258f8e9c93d1d5b1f78c0a1d66f30d28b1ad8037e5e07f53d1a4e3670b12",
+      "text_header_checked": true
+    }
+  },
+  "modified_vendor_files": false,
+  "review_only": true,
+  "production_package_applied": false,
+  "standard_cell_pdk_revision": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008"
+}

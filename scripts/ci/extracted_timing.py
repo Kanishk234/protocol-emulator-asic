@@ -70,7 +70,7 @@ def route_checkpoint(root):
     return states[0]
 
 
-def main(route_root=Path("runs/repaired-route/drt"), *, stock_constraints=False):
+def main(route_root=Path("runs/repaired-route/drt"), *, stock_constraints=False, functional_setup=False):
     checkpoint = route_checkpoint(route_root)
     config = json.loads(Path("src/config_merged.json").read_text())
     if float(config["CLOCK_PERIOD"]) != 20:
@@ -78,6 +78,8 @@ def main(route_root=Path("runs/repaired-route/drt"), *, stock_constraints=False)
     config.update(meta={"version": config.get("meta", {}).get("version", 1), "flow": STEPS},
                   OPENROAD_THREADS=4, STA_THREADS=3,
                   SIGNOFF_SDC_FILE=str(Path("src/signoff.sdc").resolve()))
+    if functional_setup:
+        config['STA_EXTRA_CORNER_TCL_FILE'] = str(Path('scripts/ci/functional_setup_frontier.tcl').resolve())
     config["STA_CORNERS"] = ["nom_fast_1p32V_m40C", "nom_slow_1p08V_125C", "nom_typ_1p20V_25C"]
     output = Path("runs/extracted-timing")
     output.mkdir(parents=True, exist_ok=False)
@@ -108,9 +110,21 @@ def main(route_root=Path("runs/repaired-route/drt"), *, stock_constraints=False)
                 raise ValueError(f"Fresh extracted {corner} {kind} report missing")
             key = f"timing__{kind}__ws__corner:{corner}"
             fresh[key] = metrics[key]
+            if functional_setup:
+                count_key = f"timing__{kind}_vio__count__corner:{corner}"
+                value = metrics.get(count_key)
+                if type(value) is not int or value < 0:
+                    raise ValueError("Missing/invalid extracted timing violation count")
+                fresh[count_key] = value
     (output / "corner_summary.json").write_text(json.dumps(fresh, indent=2) + "\n")
     electrical = audit_corners(states[0].parent, config['STA_CORNERS'])
     (output / 'electrical_summary.json').write_text(json.dumps(electrical, indent=2) + '\n')
+    if functional_setup:
+        from functional_setup_frontier import parse_report
+        functional = {c: parse_report((states[0].parent/c/'functional_setup_frontier.rpt').read_text(), c)
+                      for c in config['STA_CORNERS']}
+        (output/'functional_setup.json').write_text(json.dumps(functional, indent=2)+'\n')
+        print(json.dumps({'functional_setup': functional}, indent=2))
     print(json.dumps(fresh, indent=2))
     # Deliberately retain negative results as diagnostic evidence. This is not
     # the official full GDS/DRC/LVS/precheck signoff workflow.
@@ -121,5 +135,6 @@ if __name__ == "__main__":
     parser.add_argument("--route-root", type=Path, default=Path("runs/repaired-route/drt"))
     parser.add_argument("--stock-constraints", action="store_true",
                         help="Use native base SDC and verify 0.25 ns uncertainty; no legacy source override")
+    parser.add_argument('--functional-setup', action='store_true')
     args = parser.parse_args()
-    main(args.route_root, stock_constraints=args.stock_constraints)
+    main(args.route_root, stock_constraints=args.stock_constraints, functional_setup=args.functional_setup)

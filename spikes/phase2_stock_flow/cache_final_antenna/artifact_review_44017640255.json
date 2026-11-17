@@ -1,0 +1,44 @@
+{
+  "source_run": 44017640255,
+  "source_sha": "e04f800d2ab1701cd97ff801e464830054b2b145",
+  "source_odb_sha256": "b78055c7400228ff1e7b94808bbd71c490e9587cbd29c83beb1a69c5134ce74e",
+  "source_config_sha256": "0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc",
+  "source_state": "runs/stock-official-baseline/46-openroad-stamidpnr-3/audited_state.json",
+  "functional_setup": {
+    "nom_fast_1p32V_m40C": {
+      "corner": "nom_fast_1p32V_m40C",
+      "worst_reported_setup_slack_ns": 12.572991,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_slow_1p08V_125C": {
+      "corner": "nom_slow_1p08V_125C",
+      "worst_reported_setup_slack_ns": 2.784036,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_typ_1p20V_25C": {
+      "corner": "nom_typ_1p20V_25C",
+      "worst_reported_setup_slack_ns": 8.975251,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    }
+  },
+  "independent_saved_artifact_review": true,
+  "official_gds_signoff": false
+}

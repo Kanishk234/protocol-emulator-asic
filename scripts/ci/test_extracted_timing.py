@@ -74,3 +74,36 @@ def test_stock_report_requires_actual_uncertainty(value):
                  f' {value} 0.933253 clock uncertainty\n 0.100000 1.234567 clock uncertainty'):
         with pytest.raises(ValueError):
             check_stock_report_uncertainty(text)
+
+
+def test_stock_extraction_collects_actual_functional_reports(tmp_path,monkeypatch):
+    import extracted_timing as module
+    monkeypatch.chdir(tmp_path)
+    src=tmp_path/'src';src.mkdir()
+    (src/'config_merged.json').write_text(json.dumps({'CLOCK_PERIOD':20}))
+    route=tmp_path/'route';stage=route/'1-openroad-detailedrouting';stage.mkdir(parents=True)
+    path=stage/'chip.v';path.write_text('route')
+    (stage/'state_out.json').write_text(json.dumps({'metrics':{'route__drc_errors':0},**{k:str(path) for k in ('odb','def','nl','pnl')}}))
+    monkeypatch.setenv('PDK_ROOT','/pdk')
+    corners=('nom_fast_1p32V_m40C','nom_slow_1p08V_125C','nom_typ_1p20V_25C')
+    def run(command,**kwargs):
+        cfg=json.loads((src/'config_extracted_timing.json').read_text())
+        assert cfg['STA_EXTRA_CORNER_TCL_FILE'].endswith('functional_setup_frontier.tcl')
+        assert Path(cfg['SIGNOFF_SDC_FILE']).read_text()=='source $::env(SCRIPTS_DIR)/base.sdc\n'
+        out=tmp_path/'runs/extracted-timing/10-openroad-stapostpnr';out.mkdir()
+        metrics={}
+        for c in corners:
+            d=out/c;d.mkdir()
+            for name in ('max.rpt','min.rpt'):(d/name).write_text('0.250 19.750 clock uncertainty\n')
+            for kind,suffix in (('setup','max'),('hold','min')):
+                (d/f'ws.{suffix}.rpt').write_text(c)
+                metrics[f'timing__{kind}__ws__corner:{c}']=.2
+                metrics[f'timing__{kind}_vio__count__corner:{c}']=0
+            (d/'functional_setup_frontier.rpt').write_text(f'TRIPWIRE_FUNCTIONAL_SETUP {c}\nFLOP_DATA_ENDPOINTS 2418\nOUTPUT_ENDPOINTS 24\n1.25 slack (MET)\n')
+        (out/'state_out.json').write_text(json.dumps({'metrics':metrics}))
+    monkeypatch.setattr(module.subprocess,'run',run)
+    monkeypatch.setattr(module,'audit_corners',lambda *args:{c:{'no_reported_electrical_violations':True} for c in corners})
+    module.main(route,stock_constraints=True,functional_setup=True)
+    rows=json.loads((tmp_path/'runs/extracted-timing/functional_setup.json').read_text())
+    assert set(rows)==set(corners)
+    assert all(r['worst_reported_setup_slack_ns']==1.25 for r in rows.values())

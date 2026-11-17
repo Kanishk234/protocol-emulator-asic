@@ -1,0 +1,64 @@
+{
+  "qualified": true,
+  "failures": [],
+  "functional_setup": {
+    "nom_fast_1p32V_m40C": {
+      "corner": "nom_fast_1p32V_m40C",
+      "worst_reported_setup_slack_ns": 12.572991,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_slow_1p08V_125C": {
+      "corner": "nom_slow_1p08V_125C",
+      "worst_reported_setup_slack_ns": 2.784036,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_typ_1p20V_25C": {
+      "corner": "nom_typ_1p20V_25C",
+      "worst_reported_setup_slack_ns": 8.975251,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    }
+  },
+  "native_post_timing_antenna_repair": true,
+  "native_repair_congestion_disallowed": true,
+  "native_final_global_route_verified": false,
+  "final_antenna_is_last_physical_step": true,
+  "final_native_repair_state": "runs/stock-official-baseline/45-openroad-repairantennas-1/state_out.json",
+  "existing_logic_and_connections_preserved": true,
+  "fresh_netlist_readbacks_verified": true,
+  "overflow_verification": "zero pre-repair full-route report plus native congestion-prohibited incremental antenna repair",
+  "final_global_overflow": 0,
+  "source_state": "runs/stock-official-baseline/46-openroad-stamidpnr-3/audited_state.json",
+  "minimum_fast_hold_ns": 0.05,
+  "detailed_routing_performed": false,
+  "official_gds_signoff": false,
+  "run": 44017640255,
+  "source_sha": "e04f800d2ab1701cd97ff801e464830054b2b145",
+  "native_hold_ns": {
+    "fast": 0.102192,
+    "typical": 0.294138,
+    "slow": 0.614901
+  },
+  "electrical_violations": 0,
+  "antenna_violating_nets": 0,
+  "antenna_violating_pins": 0,
+  "aggregate_setup_ws_ns": 0,
+  "artifact_independent_review_complete": true
+}

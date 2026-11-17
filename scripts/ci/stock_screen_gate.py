@@ -17,10 +17,12 @@ def one(root, pattern):
     return paths[0]
 
 
-def qualify(physical, audit, *, require_functional_setup=False):
+def qualify(physical, audit, *, require_functional_setup=False, native_post_antenna=False):
     physical, audit = Path(physical), Path(audit)
+    if native_post_antenna and not require_functional_setup:
+        raise ValueError('Native final repair requires measured positive functional setup')
     receipt = json.loads((audit / 'read_only_audit.json').read_text())
-    source = one(physical, '*-openroad-stamidpnr-3/state_out.json')
+    source = one(physical, '*-openroad-stamidpnr-3/' + ('audited_state.json' if native_post_antenna else 'state_out.json'))
     if Path(receipt['source_state']).resolve() != source.resolve():
         raise ValueError('Qualification source is not the final checkpoint')
     state = json.loads(source.read_text())
@@ -72,7 +74,8 @@ def qualify(physical, audit, *, require_functional_setup=False):
             raise ValueError('Fresh raw antenna metric mismatch')
         if value:
             failures.append(f'{key}: {value}')
-    log = one(physical, '*-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log')
+    log = one(physical, '*-openroad-globalrouting-1/openroad-globalrouting*.log' if native_post_antenna
+              else '*-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log')
     if Path(state['odb']).resolve().parent != log.resolve().parent:
         raise ValueError('Routing evidence is not from the final physical checkpoint')
     totals = re.findall(r'(?m)^Total\s+\d+\s+\d+\s+[0-9.]+%\s+\d+\s*/\s*\d+\s*/\s*(\d+)\s*$', log.read_text())
@@ -81,6 +84,10 @@ def qualify(physical, audit, *, require_functional_setup=False):
     overflow = int(totals[-1])
     if overflow:
         failures.append(f'final global-routing overflow: {overflow}')
+    native = {}
+    if native_post_antenna:
+        from cache_post_antenna import validate_final
+        native = validate_final(physical, source, audit)
     functional = collect(audit) if require_functional_setup else None
     if functional is not None:
         for corner, row in functional.items():
@@ -88,7 +95,7 @@ def qualify(physical, audit, *, require_functional_setup=False):
             if value <= 0:
                 failures.append(f'{corner} functional setup: {value} ns <= 0 ns')
     return dict(qualified=not failures, failures=failures,
-                functional_setup=functional,
+                functional_setup=functional, **native,
                 final_global_overflow=overflow, source_state=str(source),
                 minimum_fast_hold_ns=0.05, detailed_routing_performed=False,
                 official_gds_signoff=False)
@@ -99,9 +106,10 @@ def main():
     parser.add_argument('--physical', type=Path, required=True)
     parser.add_argument('--audit', type=Path, required=True)
     parser.add_argument('--require-functional-setup', action='store_true')
+    parser.add_argument('--native-post-antenna', action='store_true')
     args = parser.parse_args()
     try:
-        result = qualify(args.physical, args.audit, require_functional_setup=args.require_functional_setup)
+        result = qualify(args.physical, args.audit, require_functional_setup=args.require_functional_setup, native_post_antenna=args.native_post_antenna)
     except (ValueError, KeyError, OSError) as error:
         result = dict(qualified=False, failures=[str(error)])
     (args.audit / 'screen_qualification.json').write_text(json.dumps(result, indent=2) + '\n')

@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Prioritize extraction and investigate the remaining antenna
+
+- User asks why timing is unproven and requests fixing timing/antenna. Check
+  current run44025267292: still active in routing/extraction measurement.
+  Earlier source, toolchain and antenna initialization gates pass. GitHub
+  withholds job logs until completion; no claim about the internal DRT stage.
+  Do not restart/cancel the run or infer a pass from its estimated checks.
+- Read pinned official LEFs and the retained failing report. Metal3 ratio
+  252.71/200 fails; Metal4 ratio366.18/14136 passes. Investigate the layer at
+  which diffusion protection connects after DRT. No exclusive cause claimed.
+  Pinned PWL rules permit diffusion credit; a generic constant-rule warning
+  is not an established explanation for this failure.
+- Quantify and reject a broad gate-exclusion shortcut:3111a21oi_1 instances;
+  blanket one-for-one upsize proxy adds16933.7952um². Larger receiver gate
+  area is only a sensitivity hypothesis, not an implemented repair or timing
+  prediction. Detailed evidence/next actions in
+  reports/SELECTOR_ANTENNA_MECHANISM_20261116.md.
+- Current a9015f0 lint44025892508/test44025892520/docs44025892423 pass;
+  unit44025892540 remains active. No hardware change, phase tick or closure
+  claim. Next collect the existing run's native repair and extracted reports,
+  then choose one targeted change based on its actual failing checks.
+
 ## 2026-11-16 — Publish bounded diagnostic under renewed Git authorization
 
 - User explicitly authorizes session commits/pushes again, superseding the

@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Publish bounded diagnostic under renewed Git authorization
+
+- User explicitly authorizes session commits/pushes again, superseding the
+  standing AGENTS prohibition. Approval review now succeeds. Published clean
+  scoped commits2bab9cdtools,0e9c0b0docs,1ad120dCI to tripwire/closure-8x4;
+  no attribution trailers. No hardware input or other effort's RTL changed.
+- Run44025267292 is active on1ad120d0e0952fc6a404947f9304dce0d851e91c.
+  Exact source admission and full archive restoration pass; pinned environment
+  installation is in progress. No manual duplicate dispatch.150local checks
+  and actionlint pass. No route/extraction result or phase box claimed.
+- Primary same-revision IHP file comparison confirms CMOS5L and SG13G2 RC
+  rules are byte-identical:50282bytes,SHA256ffda02d57a6ecb39b02268be9511d89ef072911f17bd2dcd095f3f3cbeb5a905,
+  LayerCount7. Retained original-baseline resolved config has LAYERS_RC={} and
+  VIAS_R=null. Scope and file identities recorded in
+  reports/pinned_rc_model_identity_20261116.json; selector runtime deck hash
+  remains unmeasured. Do not replace models with unreviewed issue fits.
+- Next inspect fresh antenna reproduction, native DRT repair and all-corner
+  stock0.25ns extraction. Keep current source/clock/gates and preserve negatives.
+
 ## 2026-11-16 — Reject density60 and prepare bounded extracted measurement
 
 - Density screen43961635994 completed failure: five antenna nets/pins,

@@ -1,0 +1,25 @@
+{
+  "pdk_revision": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+  "resolved_reference": "/tmp/tripwire-screen-20261116/runs/stock-signoff-estimate/after-nom_fast_1p32V_m40C/resolved.json",
+  "resolved_reference_sha256": "9320a145ecdc7224ada1fb5eb058291d4c8016125a48b000fe7ca2ed26ac7914",
+  "resolved_reference_scope": "original baseline estimate; not current selector runtime",
+  "resolved_values": {
+    "LAYERS_RC": {},
+    "VIAS_R": null,
+    "SIGNAL_WIRE_RC_LAYERS": null,
+    "CLOCK_WIRE_RC_LAYERS": null,
+    "RT_MIN_LAYER": "Metal2",
+    "RT_MAX_LAYER": "Metal4"
+  },
+  "official_repository_files": [
+    "ihp-sg13cmos5l/libs.tech/librelane/IHP_rcx_patterns.rules",
+    "ihp-sg13g2/libs.tech/librelane/openrcx/IHP_rcx_patterns.rules"
+  ],
+  "decoded_file_size_bytes": 50282,
+  "decoded_files_byte_identical": true,
+  "decoded_file_sha256": "ffda02d57a6ecb39b02268be9511d89ef072911f17bd2dcd095f3f3cbeb5a905",
+  "deck_header": "LayerCount 7",
+  "selector_runtime_deck_verified": false,
+  "replacement_model_adopted": false,
+  "timing_closure_established": false
+}

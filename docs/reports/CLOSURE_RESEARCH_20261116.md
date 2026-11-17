@@ -13,8 +13,15 @@ The exact pinned PDK89d42ee6 config sets an empty LAYERS_RC dictionary and
 selects IHP_rcx_patterns.rules. This establishes an estimation-model concern
 in our actual pinned source, independently of reports about newer dev:
 [pinned config, lines85–119](https://github.com/IHP-GmbH/IHP-Open-PDK/blob/89d42ee6d2fd9b50b86a1aada6fee6673c3e6008/ihp-sg13cmos5l/libs.tech/librelane/config.tcl#L85).
-We have not yet compared the resolved runtime layer values or extraction-rule
-contents. Empty source configuration alone does not quantify our timing error.
+Read-only follow-up: the original baseline estimate's retained dev4 resolved
+config has LAYERS_RC={}, VIAS_R=null, Metal2–Metal4. This is not a fresh selector
+runtime measurement. Official repository file downloads at that same PDK pin
+give byte-identical CMOS5L and SG13G2 IHP_rcx_patterns.rules contents,50282bytes,
+SHA256ffda02d57a6ecb39b02268be9511d89ef072911f17bd2dcd095f3f3cbeb5a905,
+header LayerCount7. See pinned_rc_model_identity_20261116.json. The SG13G2
+[reference file](https://github.com/IHP-GmbH/IHP-Open-PDK/blob/89d42ee6d2fd9b50b86a1aada6fee6673c3e6008/ihp-sg13g2/libs.tech/librelane/openrcx/IHP_rcx_patterns.rules)
+is under openrcx, unlike the CMOS5L path. Runtime extraction-deck hashing is
+still pending. These facts do not quantify our timing error.
 
 [IHP issue1282](https://github.com/IHP-GmbH/IHP-Open-PDK/issues/1282) reports
 underestimated wire capacitance relative to extraction in a different design
@@ -63,14 +70,18 @@ simulation passes remain useful functional evidence, not extracted timing.
 
 Local implementation: scripts/ci/selector_drt_diagnostic.py, its16controls,
 and .github/workflows/tripwire-selector-drt-diagnostic.yaml. Combined related
-suite150passed; actionlint passed. No diagnostic cloud run exists yet.
+suite150passed; actionlint passed. Published at1ad120d and diagnostic
+[44025267292](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44025267292)
+is active. Source gate and exact archive restoration passed; environment
+installation is in progress. No completed route/extraction result yet.
 The workflow push trigger covers only its own file on tripwire/closure-8x4.
 It emits its own diagnostic result and never a qualified-route completion.
 
-Automatic approval review could not complete the attempted commit because its
-service usage quota was exhausted; no commit/push was executed. Existing session
-authorization has been explicitly renewed. Publish after review service recovery
-or by the user. Do not bypass review. Before pushing, inspect active hardening and
+Earlier automatic approval review could not complete a commit because its
+service usage quota was exhausted; that attempt executed no commit/push.
+The user explicitly renewed session authorization; reviewed commits/push then
+succeeded:2bab9cdtools,0e9c0b0docs,1ad120dCI. No bypass was used.
+Before subsequent pushes, inspect active hardening and
 `git log origin/main..main -- src info.yaml macro` as required by AGENTS.md;
 these prepared changes contain no hardware inputs.
 

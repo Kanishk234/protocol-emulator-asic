@@ -420,3 +420,9 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root evidence: all57923text-report markers are inside the frozen SRAM;10feedback markers are obsm4-metal4in its power-column obstruction. Historical R3/R4 and competition-linked SRAM recipe document these limitations. Exact official routedODB/finalNL reproduce the prior qualified/replayed hashes. Geometry validity still needs fresh merged-GDS KLayout checking.
 - Readiness gap: source integration preserved strict Magic gates but did not resolve this known macro checker incompatibility before the official run. Earlier clean OpenROAD DRC is not equivalent to full Magic signoff.
 - Diagnostic: stock pinned KLayout DRC on the exact merged GDS, zero required; no physical edits, disabled main checks or official template changes. Five admission tests reject changed GDS/metadata, incomplete error inventories and markers outside macro. Actual artifact admission passes. No main signoff-policy fix or Phase2pass claimed yet.
+
+### 2026-11-17 — Read-only KLayout helper omitted required output-directory creation
+- Symptom: diagnostic44183621536 passes artifact/physical identity admission and PDK acquisition, then CLI rejects --force-run-dir because runs/official-klayout-audit does not exist. KLayout never runs.
+- Root cause: helper omitted mkdir before the pinned LibreLane CLI invocation; the bootstrap helper already follows this requirement.
+- Fix: create a fresh output directory before invoking LibreLane. Keep the exact source GDS, stock deck, checker and all main settings unchanged.
+- Check: regression executes the CLI handoff under a validating stub requiring the destination directory, exact read-only flow and enabled KLayout error gate; all6focused tests pass. Fresh actual geometry diagnostic remains required.

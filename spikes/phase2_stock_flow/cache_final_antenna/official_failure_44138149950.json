@@ -1,0 +1,42 @@
+{
+  "official_run": 44138149950,
+  "gds_sha256": "ddf9668fc20eba68fc936f408bdeee3446ba0dd026c8cf8b99ee8b0e12d5f9fb",
+  "routed_odb_matches_qualified": true,
+  "final_netlist_matches_22_case_replay": true,
+  "magic_error_count": 57923,
+  "magic_groups": [
+    {
+      "rule": "N-Diffusion spacing to N-well in SRAM < 54 (NW.d exception)",
+      "count": 229
+    },
+    {
+      "rule": "This layer can't abut or partially overlap between subcells",
+      "count": 376
+    },
+    {
+      "rule": "N-diffusion overlap of N-diffusion contact < 14 (Cnt.c)",
+      "count": 21
+    },
+    {
+      "rule": "Can't overlap those layers",
+      "count": 25944
+    },
+    {
+      "rule": "Metal2 minimum area < 5760 (M2.d)",
+      "count": 30720
+    },
+    {
+      "rule": "N-diffusion overlap of contact in SRAM < 4 (Cnt.c SRAM exception)",
+      "count": 39
+    },
+    {
+      "rule": "Extension of tie diffusion beyond tie contact < 6.0um (LU.d, LU.d1)",
+      "count": 594
+    }
+  ],
+  "magic_errors_outside_macro": 0,
+  "abstract_m4_overlap_markers": 10,
+  "real_geometry_klayout_drc_pending": true,
+  "official_signoff": false,
+  "phase2_complete": false
+}

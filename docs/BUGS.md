@@ -408,3 +408,9 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: Cocotb2.0.1 expands COCOTB_TEST_FILTER unquoted into its Make recipe. Raw regex alternation/parentheses reach the shell. Make also consumes the end-anchor dollar unless escaped.
 - Fix: emit a shell-quoted, Make-dollar-escaped filter from the helper; keep the selected cases and strict XML aggregation unchanged.
 - Checks: four regression cases pass each shard filter through actual Make-to-shell expansion and verify exact selected names. All10 focused tests pass. Separate actual Cocotb/Icarus13 minimal-harness runs execute exactly7/4/6/5 selected cases and pass strict XML admission. This harness checks runner plumbing, not design behavior. Real netlist replay pending.
+
+### 2026-11-17 — Pin harness omitted promoted interface ports in Verilator regression
+- Symptom: integrated unit44138150405 passes Python and Icarus jobs but Verilator stops compiling the pin harness after earlier suites pass. Missing bitsync_active/idle_next ports and a known width warning are fatal.
+- Root cause: pin harness compatibility wiring did not include the newer ports; its Makefile did not include the existing reviewed lint annotations. PWD-based feature probing also used the invocation directory during initial root-level make -C evaluation.
+- Fix: connect the added ports conditionally, derive idle_next using the same host-write timing contract as the chip, use CURDIR-based source/harness paths and include the existing narrow promoted_rtl.vlt annotations for Verilator. No RTL/config/official workflow or acceptance gate changes.
+- Check: all60pin cases pass in each lean/full build under Icarus and Verilator (240executions, zero failures/skips). Physical input verifier remains green; actual result paths recorded in WORKLOG.

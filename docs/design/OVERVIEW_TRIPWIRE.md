@@ -4,7 +4,7 @@ A protocol emulator ASIC for the Jane Street Protocol Emulator ASIC Competition.
 
 This is the single overarching document for the idea. It starts with what is new, then covers the concept, architecture, programming model, protocols, verification, CI, schedule with checklists, risks and open decisions.
 
-Status: **concept stage.** All numbers are paper estimates until synthesis.
+Status: **Phase 2 integration.** The adopted 2-lane/4-unit candidate has passing detailed routing, extracted timing and 22-case routed protocol replay. Official full-design GDS/precheck is still pending. Historical area estimates below retain their original scope.
 
 Companion documents: `ARCHITECTURE.md` (the hardware contract: datapath, formats, instruction sets) and `VERIFICATION.md` (tools, layers, proofs, CI). New to the project? Start with `docs/HOW_IT_WORKS.md`, the plain-language introduction.
 
@@ -264,7 +264,7 @@ Reference: Loom's README (checked 2026-09-23) reports 78.8% utilisation on 6x4 w
 | **Not planned** | USB low-speed | | Needs a clock-recovering receive mode and ~3 lanes |
 | | 10 Mbit Ethernet | | Too fast for the pads without extra hardware |
 
-**Concurrency:** 3 lanes, and small protocols can share a lane. The 19 free pins are the real cap.
+**Concurrency:** 2 lanes in the adopted design (D-184). At most two one-lane programs can run together; a two-lane program occupies both. Four pin units and 19 free pins further bound combinations.
 
 ---
 

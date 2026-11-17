@@ -1957,3 +1957,40 @@ and past results remain unchanged. Source/main/official workflows/constraints
 are not modified. Cost is one DRT/RCX run; only extracted evidence can show whether
 pre-route margin survives.135checks and actual artifact review pass; execution
 pending. Routed protocol verification and official GDS/precheck remain required.
+
+## D-184 (2026-11-17): adopt the routed and replayed 2-lane/4-unit candidate
+Under the user's approved2/4resource target, supported project-config changes and
+standing publication authorization, integrate the exact candidate from native
+screen44017640255, detailed route/stock extraction44031468510 and complete22-case
+protocol replay44123392388. Keep8x4,20ns,12slots/lane,512x16SRAM; U0full andU1–U3lean.
+The general need is programmable timed I/O with routable resource limits, not
+protocol-specific hardware. Cost: two lanes/four units limit concurrent programs;
+a two-lane program occupies both lanes, and onlyU0has optional full features.
+Each of the22exercised protocol cases still passes individually.
+
+Preserve every selected RTL byte, macro view, PDN input and project-config byte
+from the proven frozen source. Regenerate fabric/encodings/software from the
+semantically identical reduced spec; preserve the spec's comments/formatting.
+Record all physical input hashes in integration_manifest.json; reject mismatches.
+Adopt D-182supported Classic config with one added native post-timing antenna
+repair and congestion prohibited; retain all original Classic steps,20ns,stock
+0.25ns uncertainty and final acceptance gates. This explicitly adopts the exact
+reviewed extra project-config fields beyond the historical three-field whitelist,
+not a general permission to vary settings. Config SHA0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc.
+Official GDS jobs/action references are unchanged. Supported project config is
+used by the official flow; no diagnostic gate is substituted for official checks.
+
+Replace counter tests with required UART/SPI/I2C top-port cases shared with the
+reviewed suite. SRAM functional models are supplied by test/Makefile for both RTL
+and GL; upstream Apache2license, revision and view hashes are packaged. Template
+jobs install no sigrok, so their reference-model checks always run and sigrok runs
+when present. Independent required-sigrok evidence remains the full22-case replay
+and unit workflow. Narrow existing lint annotations cover only the bounded C-pad
+integer comparison and unused TX cache intermediate, preserving source identity.
+
+Validation: isolated integration generated-file check, lint,335Python tests,
+three top-port cases with sigrok and core RTL suites pass (see integration report).
+Extracted slow functional setup reserve is only+0.163304ns; fast hold+0.150773287ns.
+These are candidate results, not a guarantee of fresh official hardening. Phase2
+stays open until unchanged official GDS/precheck/GL/viewer and required main CI
+pass. No timing/electrical/antenna/DRC gate relaxed; no phase box ticked.

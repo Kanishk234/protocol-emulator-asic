@@ -1,6 +1,6 @@
 # How TRIPWIRE works (the intuitive version)
 
-This is the plain-language introduction to the chip. Read it first, before `docs/design/OVERVIEW_TRIPWIRE.md` and `docs/design/ARCHITECTURE.md`, which say the same things with the real names, numbers and exact rules. It describes the design as frozen at the end of phase 1 (spec v1.0, DECISIONS D-037).
+This is the plain-language introduction to the chip. Read it first, before `docs/design/OVERVIEW_TRIPWIRE.md` and `docs/design/ARCHITECTURE.md`, which say the same things with the real names, numbers and exact rules. It introduces the phase-1 architecture with the adopted phase-2 resource counts (DECISIONS D-184).
 
 ---
 
@@ -49,8 +49,8 @@ The recipe book (routines) is for jobs that aren't urgent. A cook works on a rec
 
 ## Our kitchen's size
 
-- **6 waiters** (pin units), who share **19 serving windows** (pins). Two are all-rounders; the other four do the common jobs, which is all most protocols need (DECISIONS D-040)
-- **3 cooks** (lanes), each with **12 reflexes**
+- **4 waiters** (pin units), who share **19 serving windows** (pins). One is an all-rounder; the other three do the common jobs, which is all most protocols need (DECISIONS D-040)
+- **2 cooks** (lanes), each with **12 reflexes**
 - **1 recipe book** (512 lines of SRAM), which the cooks take turns reading
 - **1 manager** (host), who talks to the chip over SPI from the Tiny Tapeout demo board
 

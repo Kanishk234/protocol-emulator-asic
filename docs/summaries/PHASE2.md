@@ -221,3 +221,12 @@ netlist identity. The candidate now has clean detailed routing, positive extract
 functional setup/hold and full routed protocol replay. Remaining work is coherent
 main integration (including replacing placeholder tests), integration checks and
 unchanged official GDS/precheck. Phase2 remains open.
+
+
+### 2026-11-17: proven candidate integrated for official hardening
+D-184adopts the exact proven2-lane/4-unit/U0-fullRTL, regenerated encodings,
+8x4pinout and native config. Project tests now exercise the real required protocols
+and supply SRAM models. Local checks:335Python,147core RTL,3top-port protocol
+cases and32focused integration checks pass, along with lint and generation.
+Integration manifest binds physical inputs to the routed/replayed source; official
+workflow is unchanged. Fresh official GDS/precheck/GL/viewer remain pending.

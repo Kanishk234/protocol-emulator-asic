@@ -1,6 +1,10 @@
 ![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
 
-# Tiny Tapeout Verilog Project Template
+# TRIPWIRE
+
+Firmware-programmable protocol emulator for the Jane Street ASIC competition: two reflex lanes, four timed pin units and a 512x16 SRAM on 8x4 IHP CMOS5L tiles.
+
+Phase2 integration uses the candidate with passing detailed routing, stock extracted timing and all22 routed protocol cases. Official full-design GDS/precheck is still pending. Start with [How it works](docs/HOW_IT_WORKS.md), [current evidence](docs/reports/PHASE2_QUALIFIED_ROUTE_44017640255.md) and [test instructions](test/README.md).
 
 - [Read the documentation for project](docs/info.md)
 

@@ -1,0 +1,16 @@
+{
+  "reference_run": 43972384723,
+  "reference_config_sha256": "155c0c8efe5375f12cd34feb5d4a559c860d2f94970be7d2bf150fbb50b6e9af",
+  "candidate_config_sha256": "0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc",
+  "native_substitutions": {
+    "+OpenROAD.ResizerTimingPostGRT": "OpenROAD.RepairAntennas"
+  },
+  "final_full_global_route": false,
+  "congestion_allowed": false,
+  "physical_qualified": false,
+  "official_signoff": false,
+  "adoption_ready": false,
+  "official_workflows_changed": false,
+  "routing_verification": "zero preceding full-route overflow plus congestion-prohibited native incremental repair",
+  "all_final_gates_preserved": true
+}

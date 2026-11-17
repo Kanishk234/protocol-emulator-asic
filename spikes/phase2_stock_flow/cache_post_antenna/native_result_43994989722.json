@@ -1,0 +1,61 @@
+{
+  "qualified": false,
+  "failures": [
+    "antenna__violating__nets: 3",
+    "antenna__violating__pins: 3"
+  ],
+  "functional_setup": {
+    "nom_fast_1p32V_m40C": {
+      "corner": "nom_fast_1p32V_m40C",
+      "worst_reported_setup_slack_ns": 12.565165,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_slow_1p08V_125C": {
+      "corner": "nom_slow_1p08V_125C",
+      "worst_reported_setup_slack_ns": 2.776346,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_typ_1p20V_25C": {
+      "corner": "nom_typ_1p20V_25C",
+      "worst_reported_setup_slack_ns": 8.966791,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    }
+  },
+  "native_post_timing_antenna_repair": true,
+  "native_repair_congestion_disallowed": true,
+  "native_final_global_route_verified": true,
+  "final_native_repair_state": "runs/stock-official-baseline/45-openroad-repairantennas-1/state_out.json",
+  "existing_logic_and_connections_preserved": true,
+  "fresh_netlist_readbacks_verified": true,
+  "final_global_overflow": 0,
+  "source_state": "runs/stock-official-baseline/47-openroad-stamidpnr-3/audited_state.json",
+  "minimum_fast_hold_ns": 0.05,
+  "detailed_routing_performed": false,
+  "official_gds_signoff": false,
+  "run": 43994989722,
+  "source_sha": "78343489180dab1315c12a9f5f199b799275a615",
+  "native_hold_ns": {
+    "fast": 0.109586,
+    "typical": 0.331108,
+    "slow": 0.683447
+  },
+  "electrical_violations": 0
+}

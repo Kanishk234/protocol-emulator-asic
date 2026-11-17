@@ -17,8 +17,10 @@ def one(root, pattern):
     return paths[0]
 
 
-def qualify(physical, audit, *, require_functional_setup=False, native_post_antenna=False):
+def qualify(physical, audit, *, require_functional_setup=False, native_post_antenna=False, native_final_antenna=False):
     physical, audit = Path(physical), Path(audit)
+    if native_final_antenna:
+        native_post_antenna = True
     if native_post_antenna and not require_functional_setup:
         raise ValueError('Native final repair requires measured positive functional setup')
     receipt = json.loads((audit / 'read_only_audit.json').read_text())
@@ -74,9 +76,9 @@ def qualify(physical, audit, *, require_functional_setup=False, native_post_ante
             raise ValueError('Fresh raw antenna metric mismatch')
         if value:
             failures.append(f'{key}: {value}')
-    log = one(physical, '*-openroad-globalrouting-1/openroad-globalrouting*.log' if native_post_antenna
+    log = one(physical, '*-openroad-globalrouting-1/openroad-globalrouting*.log' if native_post_antenna and not native_final_antenna
               else '*-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log')
-    if Path(state['odb']).resolve().parent != log.resolve().parent:
+    if not native_final_antenna and Path(state['odb']).resolve().parent != log.resolve().parent:
         raise ValueError('Routing evidence is not from the final physical checkpoint')
     totals = re.findall(r'(?m)^Total\s+\d+\s+\d+\s+[0-9.]+%\s+\d+\s*/\s*\d+\s*/\s*(\d+)\s*$', log.read_text())
     if not totals:
@@ -87,7 +89,7 @@ def qualify(physical, audit, *, require_functional_setup=False, native_post_ante
     native = {}
     if native_post_antenna:
         from cache_post_antenna import validate_final
-        native = validate_final(physical, source, audit)
+        native = validate_final(physical, source, audit, final_full_route=not native_final_antenna)
     functional = collect(audit) if require_functional_setup else None
     if functional is not None:
         for corner, row in functional.items():
@@ -96,6 +98,8 @@ def qualify(physical, audit, *, require_functional_setup=False, native_post_ante
                 failures.append(f'{corner} functional setup: {value} ns <= 0 ns')
     return dict(qualified=not failures, failures=failures,
                 functional_setup=functional, **native,
+                overflow_verification=('zero pre-repair full-route report plus native congestion-prohibited incremental antenna repair'
+                                       if native_final_antenna else 'final full-route report'),
                 final_global_overflow=overflow, source_state=str(source),
                 minimum_fast_hold_ns=0.05, detailed_routing_performed=False,
                 official_gds_signoff=False)
@@ -107,9 +111,10 @@ def main():
     parser.add_argument('--audit', type=Path, required=True)
     parser.add_argument('--require-functional-setup', action='store_true')
     parser.add_argument('--native-post-antenna', action='store_true')
+    parser.add_argument('--native-final-antenna', action='store_true')
     args = parser.parse_args()
     try:
-        result = qualify(args.physical, args.audit, require_functional_setup=args.require_functional_setup, native_post_antenna=args.native_post_antenna)
+        result = qualify(args.physical, args.audit, require_functional_setup=args.require_functional_setup, native_post_antenna=args.native_post_antenna, native_final_antenna=args.native_final_antenna)
     except (ValueError, KeyError, OSError) as error:
         result = dict(qualified=False, failures=[str(error)])
     (args.audit / 'screen_qualification.json').write_text(json.dumps(result, indent=2) + '\n')

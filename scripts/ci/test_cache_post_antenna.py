@@ -142,3 +142,89 @@ def test_final_gate_uses_actual_last_route_and_all_original_checks(tmp_path,over
         result=qualify(physical,audit,require_functional_setup=True,native_post_antenna=True)
         assert result['qualified'] is passes
         assert result['final_global_overflow']==overflow
+
+
+def fixture_final_antenna(tmp_path):
+    physical,source,audit=fixture(tmp_path)
+    import shutil
+    route=physical/'46-openroad-globalrouting-1'
+    ant=json.loads((route/'state_in.json').read_text())
+    source.write_text(json.dumps(ant))
+    shutil.rmtree(route)
+    for c in CORNERS:
+        for phase in ('before','after'):
+            (audit/f'{phase}-{c}'/'1-openroad-stamidpnr/state_in.json').write_text(json.dumps(ant))
+    (physical/'44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log').write_text('Total 100 80 80.00% 0 / 0 / 0\n')
+    return physical,source,audit
+
+
+def test_final_antenna_policy_keeps_native_congestion_check_and_actual_db(tmp_path):
+    physical,source,audit=fixture_final_antenna(tmp_path)
+    final=trial.promote(physical,source,audit,final_full_route=False)
+    result=trial.validate_final(physical,final,audit,final_full_route=False)
+    assert result['final_antenna_is_last_physical_step']
+    assert not result['native_final_global_route_verified']
+    assert result['native_repair_congestion_disallowed']
+    with pytest.raises(ValueError):trial.validate_final(physical,final,audit)
+
+
+def test_final_antenna_policy_cannot_hide_a_later_route(tmp_path):
+    physical,source,audit=fixture(tmp_path)
+    with pytest.raises(ValueError,match='later route'):
+        trial.promote(physical,source,audit,final_full_route=False)
+
+
+def test_final_antenna_flag_requires_positive_setup(tmp_path):
+    from stock_screen_gate import qualify
+    with pytest.raises(ValueError,match='positive functional setup'):
+        qualify(tmp_path,tmp_path,native_final_antenna=True)
+
+
+@pytest.mark.parametrize('antenna,slack,overflow,passes',[(0,2,0,True),(1,2,0,False),(0,0,0,False),(0,2,1,False)])
+def test_final_antenna_qualification_retains_every_gate(tmp_path,antenna,slack,overflow,passes):
+    from test_stock_screen_gate import fixture as raw_fixture
+    from stock_screen_gate import qualify
+    physical,source,audit=fixture_final_antenna(tmp_path)
+    import shutil
+    raw_root=tmp_path/'raw';raw_root.mkdir()
+    _,raw=raw_fixture(raw_root,antenna=antenna)
+    for p in raw.rglob('*'):
+        if p.is_file():
+            target=audit/p.relative_to(raw);target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,target)
+    for c in CORNERS:
+        for phase in ('before','after'):
+            d=audit/f'{phase}-{c}'/'1-openroad-stamidpnr'
+            (d/'functional_setup_frontier.rpt').write_text(f'TRIPWIRE_FUNCTIONAL_SETUP {c}\nFLOP_DATA_ENDPOINTS 2418\nOUTPUT_ENDPOINTS 24\n{slack} slack (MET)\n')
+            for name in ('min.rpt','max.rpt'):(d/name).write_text('0.250 19.750 clock uncertainty\n')
+    final=trial.promote(physical,source,audit,final_full_route=False)
+    state=json.loads(final.read_text());paths=[final]+[Path(state[k]) for k in ('odb','def','nl','pnl','sdc')]
+    receipt=json.loads((audit/'read_only_audit.json').read_text())
+    receipt.update(source_state=str(final),unchanged_physical_view_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths})
+    (audit/'read_only_audit.json').write_text(json.dumps(receipt))
+    (physical/'44-openroad-resizertimingpostgrt/openroad-resizertimingpostgrt.log').write_text(f'Total 100 80 80.00% 0 / 0 / {overflow}\n')
+    result=qualify(physical,audit,require_functional_setup=True,native_final_antenna=True)
+    assert result['qualified'] is passes
+    assert 'congestion-prohibited' in result['overflow_verification']
+    assert result['native_repair_congestion_disallowed']
+
+
+def test_final_antenna_workflow_preserves_comparison_steps_and_strict_gates():
+    folder=ROOT/'.github/workflows'
+    old=yaml.safe_load((folder/'gds-official-dev4-cache-post-antenna-screen.yaml').read_text())
+    new=yaml.safe_load((folder/'gds-official-dev4-cache-final-antenna-screen.yaml').read_text())
+    assert new['on']=={'workflow_dispatch':{}}
+    assert old['jobs']['screen']['env']==new['jobs']['screen']['env']
+    a,b=old['jobs']['screen']['steps'],new['jobs']['screen']['steps']
+    assert len(a)==len(b)
+    for first,last in zip(a,b):
+        assert first['name']==last['name']
+        name=first['name']
+        if name=='Prepare supported native post-timing antenna config':assert last=={**first,'run':first['run']+' --final-antenna'}
+        elif name.startswith('Verify pinned native'):assert last=={**first,'run':first['run'].replace("['OpenROAD.RepairAntennas-1','OpenROAD.GlobalRouting-1']","['OpenROAD.RepairAntennas-1']")}
+        elif name=='Read-only all-corner STA on the final stock checkpoint':assert last=={**first,'run':first['run'].replace('source = promote(root, source, output)','source = promote(root, source, output, final_full_route=False)')}
+        elif name=='Require all final screening gates':assert last=={**first,'run':first['run'].replace('--native-post-antenna','--native-final-antenna')}
+        elif first.get('uses','').startswith('actions/upload-artifact'):
+            assert first['uses']==last['uses'] and last['if']=='always()'
+            assert last['with']['path'].startswith(first['with']['path'])
+        else:assert first==last,name
+        if 'run' in last:subprocess.run(['bash','-n'],input=last['run'],text=True,check=True)

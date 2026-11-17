@@ -20,7 +20,7 @@ def one(root, pattern):
     return rows[0]
 
 
-def prepare(root):
+def prepare(root, *, final_full_route=True):
     root = Path(root)
     path = root/'src/config.json'
     before = path.read_bytes()
@@ -35,39 +35,46 @@ def prepare(root):
     selected = json.loads(p.read_text())
     if selected['profile'] != 'portable_cache_no_a22oi':
         raise ValueError('Wrong mapping source')
-    config['meta'] = {**config.get('meta', {'version': 1, 'flow': 'Classic'}), 'substituting_steps': SUBSTITUTIONS}
+    substitutions=SUBSTITUTIONS if final_full_route else dict(list(SUBSTITUTIONS.items())[:1])
+    config['meta'] = {**config.get('meta', {'version': 1, 'flow': 'Classic'}), 'substituting_steps': substitutions}
     config['GRT_ALLOW_CONGESTION'] = False
     blob = json.dumps(config, indent=2)+'\n'
     sha = hashlib.sha256(blob.encode()).hexdigest()
-    selected.update(profile='portable_cache_native_post_antenna', config_sha256=sha,
+    selected.update(profile='portable_cache_native_post_antenna' if final_full_route else 'portable_cache_native_final_antenna', config_sha256=sha,
                     comparison_reference_run=43972384723,
                     comparison_reference_config_sha256=BASE_SHA,
-                    additional_changes_from_reference={'meta.substituting_steps': SUBSTITUTIONS,
+                    additional_changes_from_reference={'meta.substituting_steps': substitutions,
                                                        'GRT_ALLOW_CONGESTION': False},
-                    native_post_antenna=True, stock_sequence=False)
+                    native_post_antenna=True, native_final_antenna=not final_full_route, stock_sequence=False)
     selected['changes']['GRT_ALLOW_CONGESTION'] = False
     path.write_text(blob)
     p.write_text(json.dumps(selected, indent=2)+'\n')
     out=root/'runs/cache-post-antenna'
     out.mkdir(parents=True,exist_ok=True)
     receipt=dict(reference_run=43972384723, reference_config_sha256=BASE_SHA,
-                 candidate_config_sha256=sha, native_substitutions=SUBSTITUTIONS,
+                 candidate_config_sha256=sha, native_substitutions=substitutions, final_full_global_route=final_full_route,
                  congestion_allowed=False, physical_qualified=False, official_signoff=False)
     (out/'recipe.json').write_text(json.dumps(receipt,indent=2)+'\n')
     return receipt
 
 
-def native_chain(physical, source):
+def native_chain(physical, source, *, final_full_route=True):
     physical, source = Path(physical), Path(source)
     timing = one(physical, '*-openroad-resizertimingpostgrt/state_out.json')
     antenna = one(physical, '*-openroad-repairantennas-1/state_out.json')
     original = one(physical, '*-openroad-stamidpnr-3/state_out.json')
-    routing = one(physical, '*-openroad-globalrouting-1/state_out.json')
-    old, ant, routed, final = [json.loads(p.read_text()) for p in (timing, antenna, routing, original)]
+    old, ant, final = [json.loads(p.read_text()) for p in (timing, antenna, original)]
     before = json.loads((antenna.parent/'state_in.json').read_text())
-    route_in = json.loads((routing.parent/'state_in.json').read_text())
-    if before['odb'] != old['odb'] or route_in['odb'] != ant['odb'] or final['odb'] != routed['odb']:
+    if before['odb'] != old['odb']:
         raise ValueError('Native repair is not directly after final timing')
+    if final_full_route:
+        routing = one(physical, '*-openroad-globalrouting-1/state_out.json')
+        routed=json.loads(routing.read_text())
+        route_in=json.loads((routing.parent/'state_in.json').read_text())
+        if route_in['odb']!=ant['odb'] or final['odb']!=routed['odb']:
+            raise ValueError('Final route/repair database chain differs')
+    elif list(physical.glob('*-openroad-globalrouting-1')) or final['odb']!=ant['odb']:
+        raise ValueError('Final antenna policy has an unexpected later route/database')
     current = json.loads(source.read_text())
     if any(current[k] != final[k] for k in ('odb', 'def', 'sdc')):
         raise ValueError('Audit is not the final repaired database')
@@ -78,15 +85,16 @@ def native_chain(physical, source):
     commands=re.findall(r'^\+ repair_antennas\b[^\n]*',log,re.M)
     if len(commands)!=1 or '-allow_congestion' in commands[0] or '-diode_only' not in commands[0]:
         raise ValueError('Wrong final native antenna command')
-    route_log=one(routing.parent,'openroad-globalrouting*.log').read_text()
-    route_commands=re.findall(r'^\+ global_route\b[^\n]*',route_log,re.M)
-    if len(route_commands)!=1 or '-allow_congestion' in route_commands[0]:
-        raise ValueError('Wrong final native global-routing command')
+    if final_full_route:
+        route_log=one(routing.parent,'openroad-globalrouting*.log').read_text()
+        route_commands=re.findall(r'^\+ global_route\b[^\n]*',route_log,re.M)
+        if len(route_commands)!=1 or '-allow_congestion' in route_commands[0]:
+            raise ValueError('Wrong final native global-routing command')
     return old, final, antenna
 
 
-def readbacks(physical, source, audit):
-    old, final, antenna = native_chain(physical, source)
+def readbacks(physical, source, audit, *, final_full_route=True):
+    old, final, antenna = native_chain(physical, source, final_full_route=final_full_route)
     exports=[]
     for corner in CORNERS:
         for phase in ('before','after'):
@@ -104,8 +112,8 @@ def readbacks(physical, source, audit):
     return final,exports[0],antenna
 
 
-def promote(physical, source, audit):
-    final,(nl,pnl),_ = readbacks(physical,source,audit)
+def promote(physical, source, audit, *, final_full_route=True):
+    final,(nl,pnl),_ = readbacks(physical,source,audit,final_full_route=final_full_route)
     source=Path(source)
     fresh={}
     for key,p in (('nl',nl),('pnl',pnl)):
@@ -118,19 +126,24 @@ def promote(physical, source, audit):
     return out
 
 
-def validate_final(physical, source, audit):
-    _,(nl,pnl),antenna=readbacks(physical,source,audit)
+def validate_final(physical, source, audit, *, final_full_route=True):
+    _,(nl,pnl),antenna=readbacks(physical,source,audit,final_full_route=final_full_route)
     state=json.loads(Path(source).read_text())
     for key,p in (('nl',nl),('pnl',pnl)):
         if Path(state[key]).read_bytes()!=p.read_bytes():
             raise ValueError('Qualification netlist is not fresh ODB readback')
     return dict(native_post_timing_antenna_repair=True,
                 native_repair_congestion_disallowed=True,
-                native_final_global_route_verified=True,
+                native_final_global_route_verified=final_full_route,
+                final_antenna_is_last_physical_step=not final_full_route,
                 final_native_repair_state=str(antenna),
                 existing_logic_and_connections_preserved=True,
                 fresh_netlist_readbacks_verified=True)
 
 
 if __name__=='__main__':
-    print(json.dumps(prepare(Path.cwd()),indent=2))
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--final-antenna',action='store_true')
+    args=parser.parse_args()
+    print(json.dumps(prepare(Path.cwd(),final_full_route=not args.final_antenna),indent=2))

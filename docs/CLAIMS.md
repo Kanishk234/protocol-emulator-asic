@@ -55,6 +55,8 @@ D-138 is a prepared physical diagnostic, not a new passing-design claim. Its sou
 
 | 25 | Same-edge engine output materialization improves the matched ideal-wire timing frontier and passes the checked RTL behaviors | level_cache/candidate.json: slow setup6.125→6.510ns, measured IDLE-launch6.801030→8.817179ns, +0.18% cell area/+4flops; scoped engine proofs/mutants,5two-phase chip comparisons,22/22protocol cases | tested | ASIC root-clock IDLE contract; optional sigrok disabled in expanded suite. Not whole-chip formal, FPGA fallback qualification, native physical or official GDS closure. |
 
+| 26 | The configured native8x4 full2-lane/4-unit candidate passes the current pre-route gates | Screen44017640255/e04f800: slow functional setup+2.784036ns, stock fast hold+.102192ns, fresh antenna/electrical0; source/view/netlist/engine checks and independent artifact review pass | tested | Supported final-antenna project config, not unmodified Classic ordering. Routing evidence: preceding full-route overflow0plus congestion-prohibited native incremental repair. Not extracted timing, routed protocol replay, main adoption, official GDS/precheck, silicon or Phase2 completion. |
+
 ## Known limits (state them wherever the related claim appears)
 
 

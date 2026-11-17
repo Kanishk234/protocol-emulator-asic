@@ -1940,3 +1940,20 @@ Cost is native diode insertion/incremental routing and potential timing/area
 regression, measured on the final DB. SameRTL,20ns,8x4and unchanged officialjobs.
 120focused checks, actual official config generation and pinned one-insertion
 order pass. No acceptance limit relaxed; physical pass remains pending.
+
+## D-183 (2026-11-17): continue the qualified final-antenna checkpoint with stock extraction
+Screen44017640255passes every current gate. Continue that exact DB/config in a
+separate manual workflow; no antenna exception, resynthesis, new placement or
+resizer pass. Independently inspect and requalify frozen inputs, then repeat
+fresh stock pre-route checks before DRT. Require fresh DRC0and connectivity
+conservation. Separate extraction job binds route hashes/workflow identity and
+runs native RCX/checkers with stock0.25ns uncertainty and fresh per-corner reports.
+
+Use current green-screen timing semantics: no negative ordinary path, zero timing
+violation counts, positive actual flop/output reserve and fast hold>=50ps. Preserve
+endpoint inventory. Ordinary setupWS0is not substituted for positive reserve;
+add actual functional reports to extracted STA. Old diagnostic helper defaults
+and past results remain unchanged. Source/main/official workflows/constraints
+are not modified. Cost is one DRT/RCX run; only extracted evidence can show whether
+pre-route margin survives.135checks and actual artifact review pass; execution
+pending. Routed protocol verification and official GDS/precheck remain required.

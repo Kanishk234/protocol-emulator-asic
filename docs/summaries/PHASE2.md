@@ -183,3 +183,23 @@ logic area/delay. Each is being screened independently with the same physical
 recipe in42259881584and42262602008. Neither has a measured physical gain yet;
 actual extracted slow setup remains-2.928ns. All local tests are finished; the
 next decision needs those physical results. Official GDS and Phase2remain open.
+
+### Current milestone — 2026-11-16: full configured-native screen passes
+Our current8x4 full2-lane/4-unit candidate passes every final screening gate in
+run44017640255. Slow functional setup reserve is+2.784ns and fast hold+.102ns;
+fresh antenna and electrical violations are zero. The supported project config
+keeps native antenna repair last and rejects routing congestion. All original
+Tiny Tapeout flow steps remain; official workflow files are unchanged. Fresh
+netlist readbacks verify the repaired database still has the same functional
+logic and connections, with only antenna diodes added.
+
+This is meaningful progress beyond the older results above, but it is still a
+pre-routing result. Next: independently review the exact artifact, detailed-route
+that same checkpoint, measure extracted timing with stock constraints, run the
+full routed protocol replay, then integrate the qualified design/config for an
+unchanged official GDS/precheck run. Phase2is not complete yet.
+
+Independent review of this exact artifact now passes. A source-bound two-job
+DRT/stock-extraction workflow is prepared; it repeats all pre-route gates, accepts
+only completed DRC-clean routing, and checks extracted functional setup/hold,
+electrical and antenna results before further promotion. No route result yet.

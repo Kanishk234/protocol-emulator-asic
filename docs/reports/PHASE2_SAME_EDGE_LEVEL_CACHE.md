@@ -229,3 +229,16 @@ in final-antenna mode; retain six matching fresh NL/PNL readbacks and diode-only
 connectivity conservation.120focused checks and actual official generation/merge
 plus pinned exact step-order checks pass. New config0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc.
 Fresh native execution still required; no screen/route/official qualification yet.
+
+## Current configured-native screen passes:44017640255
+All final gates pass on e04f800d2ab1701cd97ff801e464830054b2b145; gate reports
+qualified=true/failures=[]. Functional setup fast/typical/slow
++12.572991/+8.975251/+2.784036ns; stock hold+.102192/+.294138/+.614901ns.
+Fresh antenna nets/pins0/0, electrical0 and routing verification pass.
+Routing evidence is explicitly zero preceding full-route overflow plus native
+congestion-prohibited incremental antenna repair, not another full reroute.
+Fresh final ODB netlist readbacks and existing-logic/connectivity preservation
+pass. Aggregate setupWS0 remains distinct from the positive functional reserve.
+Latest main test/unit/lint/docs all green. Exact artifact downloading for
+independent review; detailed routing, extracted stock timing, routed replay and
+unchanged official GDS/precheck remain unproven. No Phase2 completion claim.

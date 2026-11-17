@@ -2,6 +2,36 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Reject density60 and prepare bounded extracted measurement
+
+- Density screen43961635994 completed failure: five antenna nets/pins,
+  final overflow0, no other saved screen failures. Reject density60; keep
+  the better density56 selector43951998125 with its one residual antenna.
+  Artifact14278227854 digest65bc80a354dbd8395ea379f56ce2270e030786be683fb0682455392c322c24aa;
+  selected reports CRC-checked locally, not a local whole-ZIP hash claim.
+- Prepare a separate D-176 diagnostic for exact selector artifact14273234160,
+  full archive digestc5960d08c37756288ffa5d1bcb5be240a2617a192f5a37c9f038c07fc85fba26.
+  Stock DRT antenna repair, native checks and all-corner extraction may measure
+  this sole failed antenna source; normal release restoration stays strict.
+  Source/release/official qualification remain false even if measurements pass.
+  Preserve failed final antenna in the result; never emit route completion.
+- Verify exact dev4 wheel drt.tcl repair loop and add runtime container hash
+  check. Do not infer pinned behavior from installed local LibreLane3.0.14.
+  Combined related tests150passed, including16diagnostic controls; actionlint
+  passed. New diagnostic files remain local; no cloud run launched.
+- User explicitly authorizes online research. Primary IHP pinned89 config
+  confirms empty LAYERS_RC and IHP_rcx_patterns.rules selection. Issues1282/
+  1151 and draft PR1237 identify estimation/extraction concerns; they do not
+  quantify our source's error or authorize replacement fit values. Ranked
+  measurement plan and direct links: reports/CLOSURE_RESEARCH_20261116.md.
+- Earlier attempted publication was not executed: automatic approval review
+  hit service usage quota. No bypass or repeated commit attempt. Current
+  user has since explicitly renewed session commit/push authorization. Exact
+  scoped commands are in the report. Unrelated untracked artifacts remain untouched.
+- No hardware/config adoption, phase checklist tick or timing closure claim.
+  Next publish the bounded diagnostic, confirm one run, inspect actual native
+  repair and extracted results, then compare resolved wire-RC/deck identities.
+
 ## 2026-11-16 — Explain timing evidence and inspect residual geometry read-only
 
 - User asks why timing remains unproven. Current fixes have estimated-routing

@@ -1922,3 +1922,29 @@ One scalar config delta and exact config/source hashes are guarded by
 selector_density_trial.py. Existing functional/proof evidence remains scoped
 to the byte-identical RTL; physical validity requires this new screen. If it
 passes, bind a new route/extraction continuation to its exact run/artifact.
+
+## D-176 (2026-11-16): measure stock DRT on the retained selector failure
+
+Density60 screen43961635994 fails five antenna nets/pins, versus one at
+density56. Reject density60. Preserve the better source43951998125 and its
+failed qualification. The user requests continued closure work and research.
+
+Permit one separate diagnostic continuation of that exact one-antenna-only
+failure, authenticated by run/SHA, artifact14273234160 and full archive digest.
+This changes D-175's prerequisite sequence for measurement only. Normal route
+and release admission continue to reject failed screens. Reject any additional
+source failure, altered source, engine, recipe or missing measurement.
+
+Use unchanged native DetailedRouting, including its default three antenna
+repair iterations, then native DRC/connectivity/antenna checks and stock0.25ns
+uncertainty extraction at all corners. Verify the pinned dev4 drt.tcl hash in
+the actual container. No manual ECO, timing exception, RTL or production config
+change. General need: measure actual wire delay and native repair effectiveness
+before selecting another hardware change. Cost: one bounded cloud routing job
+and retained diagnostic artifacts; no added hardware primitive.
+
+A completed connected zero-DRC route may be extracted even if its final antenna
+check fails, with that failure retained. No qualified-route completion receipt
+is emitted. Even all passing final measured gates leave source/release/official
+qualification false. Any eventual adoption needs a separate reviewed path and
+full release evidence. This diagnostic is prepared locally, not yet launched.

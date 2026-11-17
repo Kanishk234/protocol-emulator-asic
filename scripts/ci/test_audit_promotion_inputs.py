@@ -59,3 +59,11 @@ def test_macro_reference_cannot_escape_checkout(tmp_path):
     p.write_text(json.dumps(config))
     with pytest.raises(AssertionError, match='escapes'):
         audit(root, root)
+
+
+def test_unreviewed_meta_rejected(tmp_path):
+    root=package(tmp_path)
+    p=root/'src/config.json';config=json.loads(p.read_text())
+    config['meta']={'version':1,'flow':['OpenROAD.DetailedRouting']}
+    p.write_text(json.dumps(config))
+    with pytest.raises(AssertionError,match='Unreviewed project flow'):audit(root,root)

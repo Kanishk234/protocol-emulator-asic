@@ -1,0 +1,70 @@
+{
+  "source_screen": 44017640255,
+  "route_extraction": 44031468510,
+  "full_protocol_replay": 44123392388,
+  "config_sha256": "0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc",
+  "spec_sha256": "5f26b4313d58d51f99d9e6d884428e5f4d66231446335671a5619ce53cdbbc97",
+  "local_python_tests": {
+    "passed": 335,
+    "failed": 0,
+    "scope": "not slow; isolated integration semantically identical spec"
+  },
+  "top_port_tests": {
+    "passed": 3,
+    "failed": 0,
+    "sigrok_enabled": true,
+    "results_sha256": "ff10b1f09b1c65cc8fd2359c9e3cf71a66ce1a556d4f05a0a1acf44d16fab156"
+  },
+  "core_rtl": {
+    "test_internal/chan/results.xml": {
+      "passed": 7,
+      "skipped": 0,
+      "failed": 0
+    },
+    "test_internal/alu/results.xml": {
+      "passed": 4,
+      "skipped": 0,
+      "failed": 0
+    },
+    "test_internal/lane/results.xml": {
+      "passed": 6,
+      "skipped": 0,
+      "failed": 0
+    },
+    "test_internal/pins/results.xml": {
+      "passed": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "test_internal/host/results.xml": {
+      "passed": 7,
+      "skipped": 0,
+      "failed": 0
+    },
+    "test_internal/slots/results_flops0.xml": {
+      "passed": 2,
+      "skipped": 0,
+      "failed": 0
+    },
+    "test_internal/pin/results_full0_frac8.xml": {
+      "passed": 60,
+      "skipped": 0,
+      "failed": 0
+    },
+    "test_internal/pin/results_full1_frac8.xml": {
+      "passed": 60,
+      "skipped": 0,
+      "failed": 0
+    }
+  },
+  "focused_integration_tests": {
+    "passed": 32,
+    "failed": 0
+  },
+  "generated_files_current": true,
+  "verilator_lint_passed": true,
+  "physical_inputs_match": true,
+  "official_workflow_unchanged": true,
+  "official_gds_signoff": false,
+  "phase2_complete": false
+}

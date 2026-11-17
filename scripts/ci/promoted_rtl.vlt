@@ -15,3 +15,9 @@ lint_off -rule UNUSEDSIGNAL -file "*trw_pin_unit.v" -match "*'sample_delta'*"
 // Dead intermediates retained from the independently checked TX/resync rewrites.
 lint_off -rule UNUSEDSIGNAL -file "*trw_pin_tx.v" -match "*'qn'*"
 lint_off -rule UNUSEDSIGNAL -file "*trw_pin_bs.v" -match "*'w_tok'*"
+
+// C-pad decoder compares a five-bit pin number with the bounded integer0..23.
+// Both operands are nonnegative and representable; preserve proven source bytes.
+lint_off -rule WIDTH -file "*trw_pin_io.v" -lines 48
+// Unused intermediate retained in the proven same-edge TX output-cache source.
+lint_off -rule UNUSEDSIGNAL -file "*trw_pin_tx.v" -match "*'car_out_on'*"

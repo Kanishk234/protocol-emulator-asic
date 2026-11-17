@@ -23,7 +23,14 @@ def audit(root, reference):
         assert Path(name).name == name and (root / 'src' / name).is_file(), name
     config = json.loads((root / 'src/config.json').read_text())
     assert config['CLOCK_PERIOD'] == 20
-    assert 'meta' not in config, 'Generated runtime configuration is not a project input'
+    if 'meta' in config:
+        # D-182 configured Classic is a project input, not a generated step list.
+        # Admit only the byte-identical config that passed screen/DRT/RCX/L3.
+        expected = '0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc'
+        actual = hashlib.sha256((root / 'src/config.json').read_bytes()).hexdigest()
+        assert actual == expected, 'Unreviewed project flow configuration'
+        assert config['meta'] == {'version': 1, 'flow': 'Classic',
+            'substituting_steps': {'+OpenROAD.ResizerTimingPostGRT': 'OpenROAD.RepairAntennas'}}
     macro_files = {}
 
     def local_paths(value):

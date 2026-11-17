@@ -1,11 +1,15 @@
 # TRIPWIRE: physical design and CI
 
-**Latest measured result, November16:** selector screen43951998125 passes
-estimated timing/electrical/overflow but fails one final **data** antenna.
-The configuration-clock violation targeted by its RTL change is gone. The
-same RTL is now being screened at density60 instead of56;20ns stays fixed.
-See [the exact density comparison and gated continuation](../reports/DENSITY_CLOSURE_20261116.md).
-No current extracted timing closure, production promotion or phase exit.
+**Current closure work, November16:** density60 screen43961635994 failed
+five antennas and is rejected. Better density56 selector43951998125 passes
+estimated timing/electrical/overflow but fails one final **data** antenna;
+the previous configuration-clock violation is gone. Bounded diagnostic
+[44025267292](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44025267292)
+is active: stock detailed-routing repair, native physical checks and all-corner
+extraction at20ns/native0.25ns uncertainty. D-176 permits measurement of that
+exact sole antenna failure without changing normal release gates. No current
+extracted closure, production promotion or phase exit. See
+[current research and experiment scope](../reports/CLOSURE_RESEARCH_20261116.md).
 
 
 **November 16 follow-up:** The decoded-mode cache storage trial passes the

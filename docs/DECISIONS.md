@@ -1947,4 +1947,25 @@ A completed connected zero-DRC route may be extracted even if its final antenna
 check fails, with that failure retained. No qualified-route completion receipt
 is emitted. Even all passing final measured gates leave source/release/official
 qualification false. Any eventual adoption needs a separate reviewed path and
-full release evidence. This diagnostic is prepared locally, not yet launched.
+full release evidence. Published diagnostic44025267292 is active on1ad120d.
+
+## D-177 (2026-11-16): chain functional replay after measured diagnostic passes
+
+Do not require another interactive session to start the next verification step.
+Bind a separate cloud follow-up to exact diagnostic44025267292/1ad120d,
+attempt1. It waits for success, verifies the whole artifact digest and independently
+authenticated original screen views, and rechecks actual all-corner timing,
+electrical, antenna, DRC, connectivity and native0.25ns constraints before replay.
+
+Use the independently reconstructed selector candidate's unchanged22protocol
+tests, pinned Icarus13, new-PDK cells, SRAM behavioral model and independent
+sigrok decoding. Select only the netlist named by the actual extracted state;
+its logical connectivity must equal the completed DRT netlist. Source/input
+identity and actual XML must pass with no errors, failures or skips.
+
+This is functional simulation without SDF. It does not upgrade the original
+failed screen, make release/official qualification true or promote hardware.
+No source recipe, physical stage, clock, timing exception or silicon primitive
+changes. Cost: one waiting cloud dependency and one protocol replay if the
+measured physical/timing gates all pass. Any parent failure stops replay and
+preserves its diagnostic artifact for the next measured repair.

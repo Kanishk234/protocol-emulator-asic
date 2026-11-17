@@ -2,6 +2,29 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Chain final-netlist replay to the active physical measurement
+
+- Continue the active diagnostic44025267292 without restart or source edits.
+  It remains in routing/extraction measurement; no completed physical result
+  is available. Current9e5ade7 lint/test/docs pass, unit still active.
+- Prepare D-177 cloud follow-up bound to exact44025267292/1ad120d/attempt1.
+  It waits for success, authenticates full diagnostic and original-screen
+  archives, rechecks actual timing/electrical/antenna/DRC/connectivity and
+  native0.25ns report constraints, then replays all22protocol tests on the
+  exact netlist referenced by extracted state. No interactive prompt needed
+  between those stages. Failed parent or measured gate stops replay.
+- Keep diagnostic source/release/official/hardware-promotion flags false.
+  This is functional simulation without SDF; no performance or silicon claim.
+  Original normal qualified-route/replay validators remain unchanged.
+-166related checks pass, including16new follow-up controls. Negatives cover
+  wrong/failed parent, artifact drift, timing/antenna/disconnected pins, legacy
+  uncertainty, changed logic/source, wrong-stage netlist and scope promotion.
+  Actionlint and all3embedded Python blocks pass parsing. Update physical
+  documentation's stale density-running status to the measured rejection.
+- Next publish tools/CI/docs in scoped commits, confirm one automatic waiting
+  follow-up, and inspect the active physical result when GitHub exposes it.
+  No hardware/config changes or phase checklist boxes ticked.
+
 ## 2026-11-16 — Prioritize extraction and investigate the remaining antenna
 
 - User asks why timing is unproven and requests fixing timing/antenna. Check

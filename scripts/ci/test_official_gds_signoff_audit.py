@@ -40,3 +40,23 @@ def test_reject_unreviewed_or_incomplete_evidence(tmp_path,monkeypatch,fault):
     elif fault=='gds':(tmp_path/'runs/wokwi/61-klayout-streamout/tt_um_tripwire.gds').write_text('changed')
     else:metadata['head_sha']='wrong'
     with pytest.raises(ValueError):auditmod.audit(tmp_path,metadata)
+
+
+def test_klayout_destination_exists_before_cli(tmp_path,monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path/'src').mkdir()
+    (tmp_path/'src/config_merged.json').write_text('{}')
+    (tmp_path/'official-failure-run.json').write_text('{}')
+    monkeypatch.setattr(auditmod,'audit',lambda *args:{'official_signoff':False})
+    monkeypatch.setattr(auditmod,'bootstrap',lambda *args:None)
+    monkeypatch.setattr(auditmod.sys,'argv',['audit','klayout'])
+    def check_cli(command,check):
+        destination=Path(command[command.index('--force-run-dir')+1])
+        assert destination.is_dir(), 'Pinned CLI requires pre-existing output directory'
+        assert check is True
+        config=json.loads(Path(command[-1]).read_text())
+        assert config['meta']['flow']==['KLayout.DRC','Checker.KLayoutDRC']
+        assert config['ERROR_ON_KLAYOUT_DRC'] is True
+        raise RuntimeError('CLI handoff checked')
+    monkeypatch.setattr(auditmod.subprocess,'run',check_cli)
+    with pytest.raises(RuntimeError,match='CLI handoff checked'):auditmod.main()

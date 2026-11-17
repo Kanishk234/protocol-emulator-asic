@@ -74,9 +74,11 @@ def main():
     cfg={**config,'meta':{'version':1,'flow':['KLayout.DRC','Checker.KLayoutDRC']},
          'RUN_KLAYOUT_DRC':True,'ERROR_ON_KLAYOUT_DRC':True,'KLAYOUT_DRC_THREADS':2}
     target=Path('src/config_official_klayout_audit.json');target.write_text(json.dumps(cfg,indent=2)+'\n')
+    output=Path('runs/official-klayout-audit')
+    output.mkdir(parents=True,exist_ok=False)
     subprocess.run([sys.executable,'-m','librelane','--pdk-root','/home/runner/pdk',*container_flags(),
                     '--pdk','ihp-sg13cmos5l','--run-tag','official-klayout-audit',
-                    '--force-run-dir','runs/official-klayout-audit','--hide-progress-bar',
+                    '--force-run-dir',str(output),'--hide-progress-bar',
                     '--with-initial-state',SOURCE,str(target)],check=True)
     results=list(Path('runs/official-klayout-audit').glob('*-klayout-drc/state_out.json'))
     if len(results)!=1:raise ValueError('Missing unique fresh KLayout result')

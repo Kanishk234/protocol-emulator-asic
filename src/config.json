@@ -7,7 +7,7 @@
   "LINTER_INCLUDE_PDK_MODELS": 1,
   "CLOCK_PORT": "clk",
   "RUN_KLAYOUT_XOR": 0,
-  "RUN_KLAYOUT_DRC": 0,
+  "RUN_KLAYOUT_DRC": true,
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
   "TOP_MARGIN_MULT": 1,
   "BOTTOM_MARGIN_MULT": 1,
@@ -95,5 +95,9 @@
     "substituting_steps": {
       "+OpenROAD.ResizerTimingPostGRT": "OpenROAD.RepairAntennas"
     }
-  }
+  },
+  "RUN_MAGIC_DRC": false,
+  "ERROR_ON_ILLEGAL_OVERLAPS": false,
+  "ERROR_ON_KLAYOUT_DRC": true,
+  "KLAYOUT_DRC_RUNSET": "pdk_dir::libs.tech/klayout/tech/drc/ihp-sg13cmos5l.drc"
 }

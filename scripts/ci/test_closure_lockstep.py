@@ -44,3 +44,25 @@ def test_retained_control_evidence_is_not_deleted_or_overwritten(tmp_path, monke
     assert (path / 'actual.log').read_text() == 'retain'
     with pytest.raises(FileExistsError):
         with l2.evidence_directory('baseline-rx'): pass
+
+
+def test_selector_lockstep_uses_current_source_and_same_real_comparisons():
+    import ast
+    import re
+    import yaml
+    baseline = yaml.safe_load((ROOT / '.github/workflows/tripwire-closure-lockstep.yaml').read_text())
+    current = yaml.safe_load((ROOT / '.github/workflows/tripwire-selector-lockstep.yaml').read_text())
+    reference = {s.get('name'): s for s in baseline['jobs']['lockstep']['steps']}
+    steps = {s.get('name'): s for s in current['jobs']['lockstep']['steps']}
+    for name in ('Compare one million clocks on the current candidate',
+                 'Require clean controls then detect both injected RTL faults'):
+        assert steps[name]['run'] == reference[name]['run']
+    prepare = steps['Prepare project venv and injection guards']['run']
+    assert 'from selector_final_gl import prepare_expected, verify_expected' in prepare
+    assert 'prepare_expected(root)' in prepare and 'verify_expected(root)' in prepare
+    check = steps['Check actual outcomes and unchanged candidate']['run']
+    assert 'candidate_inputs(root) ==' in check and 'verify_expected(root)' in check
+    assert 'compared 1000000 clocks, zero divergences' in check
+    for step in steps.values():
+        for block in re.findall(r"python - <<'(PY(?:CODE)?)'\n(.*?)\n\1", step.get('run', ''), re.S):
+            ast.parse(block[1])

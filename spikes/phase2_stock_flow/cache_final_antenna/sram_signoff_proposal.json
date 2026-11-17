@@ -1,5 +1,5 @@
 {
-  "status": "proposal_not_applied",
+  "status": "adopted_D185_pending_official_run",
   "reference": "https://kdp1965.github.io/ihp-um-janestreet-prism/ihp_sram_macro.html",
   "evidence_run": 44184319751,
   "gds_sha256": "ddf9668fc20eba68fc936f408bdeee3446ba0dd026c8cf8b99ee8b0e12d5f9fb",
@@ -12,6 +12,8 @@
   },
   "physical_recipe_unchanged": true,
   "official_workflow_changes": false,
-  "requires_explicit_signoff_policy_decision": true,
-  "policy_note": "This explicitly waives unsupported Magic SRAM checks and requires whole-GDS KLayout DRC0. It does not make raw Magic markers zero."
+  "requires_explicit_signoff_policy_decision": false,
+  "policy_note": "This explicitly waives unsupported Magic SRAM checks and requires whole-GDS KLayout DRC0. It does not make raw Magic markers zero.",
+  "decision": "D-185",
+  "authorization": "User continued after explicit checker-policy proposal"
 }

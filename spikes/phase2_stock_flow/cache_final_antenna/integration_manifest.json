@@ -45,5 +45,19 @@
   "clock_period_ns": 20,
   "tiles": "8x4",
   "official_workflow_sha256": "b0f8ddf2e0f5a4fdaf824f662afdfc6ce84da791d127c299884481d099b1aa4e",
-  "official_gds_signoff": false
+  "official_gds_signoff": false,
+  "signoff_policy": {
+    "decision": "D-185",
+    "reference_config": "spikes/phase2_stock_flow/cache_final_antenna/sram_signoff_reference_config.json",
+    "approved_config_sha256": "9d522473b4e0a57c89e2759dd2473c01bd3e864023cbbd60530b4893ae7dd3c4",
+    "changes": {
+      "RUN_MAGIC_DRC": false,
+      "ERROR_ON_ILLEGAL_OVERLAPS": false,
+      "RUN_KLAYOUT_DRC": true,
+      "ERROR_ON_KLAYOUT_DRC": true,
+      "KLAYOUT_DRC_RUNSET": "pdk_dir::libs.tech/klayout/tech/drc/ihp-sg13cmos5l.drc"
+    },
+    "raw_magic_zero_claimed": false,
+    "klayout_evidence_run": 44184319751
+  }
 }

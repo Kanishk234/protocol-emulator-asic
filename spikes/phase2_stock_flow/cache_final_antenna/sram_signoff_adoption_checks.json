@@ -1,0 +1,13 @@
+{
+  "decision": "D-185",
+  "reference_config_sha256": "0b7a388f659ae287b20580fbfa0572b36809df2fd04b63988c5499f3b66598bc",
+  "candidate_config_sha256": "9d522473b4e0a57c89e2759dd2473c01bd3e864023cbbd60530b4893ae7dd3c4",
+  "only_five_signoff_settings_changed": true,
+  "other_physical_inputs_match": true,
+  "focused_tests_passed": 40,
+  "input_audit_passed": true,
+  "official_workflow_unchanged": true,
+  "klayout_evidence_run": 44184319751,
+  "raw_magic_zero_claimed": false,
+  "official_gds_signoff": false
+}

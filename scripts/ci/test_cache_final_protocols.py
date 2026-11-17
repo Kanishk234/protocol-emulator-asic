@@ -34,3 +34,17 @@ def test_reject_incomplete_execution(tmp_path,damage):
     else:root.remove(case)
     tree.write(p)
     with pytest.raises(ValueError):check_xml(p,'serial')
+
+
+def test_workflow_isolates_incompatible_dependency_pins():
+    import yaml
+    workflow=yaml.safe_load((Path(__file__).resolve().parents[2]/'.github/workflows/l3-cache-final-routed-gl.yaml').read_text())
+    steps=workflow['jobs']['replay']['steps']
+    install=next(s['run'] for s in steps if s.get('name')=='Install replay and stock tool dependencies')
+    assert 'pip install -r requirements-dev.txt\n' in install
+    assert 'python -m venv .physical-venv' in install
+    assert '.physical-venv/bin/pip install -r tt/requirements.txt' in install
+    assert '.physical-venv/bin/pip install librelane==3.1.0.dev4' in install
+    assert '-r requirements-dev.txt -r tt/requirements.txt' not in install
+    models=next(s['run'] for s in steps if s.get('name')=='Acquire exact stock PDK models')
+    assert '.physical-venv/bin/python scripts/ci/cache_final_protocols.py models' in models

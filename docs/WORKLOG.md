@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-16 — Fill the current-selector whole-chip lockstep evidence gap
+
+- User asks for useful parallel progress while physical results are pending.
+  Original million-clock run42697037494 covers the earlier candidate, not
+  the current two storage patches. Prepare a separate selector lockstep cloud
+  run using independently reconstructed current source and unchanged model,
+  million-clock RX comparison, two clean controls and both injected faults.
+- Preserve exact comparison/injection commands from the successful earlier
+  workflow. Snapshot all170candidate inputs before testing; require full
+  selector verification and unchanged hashes afterward. Retain actual XML,
+  output and mutant source evidence. This adds current-source functional
+  evidence only, not arbitrary-program proof or physical timing evidence.
+-11lockstep guards pass, including current-source preparation, identical
+  real comparison/injection commands and embedded Python syntax. Actionlint
+  passes. No RTL/model/firmware/physical recipe changes. Current physical
+  44025267292 remains active; automatic final replay44026980046 waits.
+- Next publish the independent lockstep workflow, collect its actual outcome,
+  and inspect source integration/license packaging while routing continues.
+  No phase checklist boxes ticked or new closure claims.
+
 ## 2026-11-16 — Chain final-netlist replay to the active physical measurement
 
 - Continue the active diagnostic44025267292 without restart or source edits.

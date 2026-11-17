@@ -6,7 +6,11 @@ SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_tripwire.v
+PROJECT_SOURCES = tt_um_tripwire.v trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v trw_host.v trw_spi.v trw_lane.v trw_alu.v trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v trw_pins.v
+
+MACRO_DIR = $(abspath $(SRC_DIR)/../macro/RM_IHPSG13_1P_512x16_c2_bm_bist)
+MACRO_MODELS = $(MACRO_DIR)/RM_IHPSG13_1P_core_behavioral_bm_bist.v $(MACRO_DIR)/RM_IHPSG13_1P_512x16_c2_bm_bist.v
+VERILOG_SOURCES += $(MACRO_MODELS)
 
 ifneq ($(GATES),yes)
 
@@ -32,7 +36,7 @@ VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 endif
 
 # Allow sharing configuration between design and testbench via `include`:
-COMPILE_ARGS 		+= -I$(SRC_DIR)
+COMPILE_ARGS 		+= -I$(SRC_DIR) -DFUNCTIONAL
 
 # Include the testbench sources:
 VERILOG_SOURCES += $(PWD)/tb.v

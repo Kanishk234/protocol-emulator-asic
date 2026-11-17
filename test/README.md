@@ -1,47 +1,23 @@
-# Sample testbench for a Tiny Tapeout project
+# TRIPWIRE top-port tests
 
-This is a sample testbench for a Tiny Tapeout project. It uses [cocotb](https://docs.cocotb.org/en/stable/) to drive the DUT and check the outputs.
-See below to get started or for more information, check the [website](https://tinytapeout.com/hdl/testing/).
+`test.py` runs the reviewed UART TX, SPI-controller and I2C-controller cases against the Tiny Tapeout top. Firmware is compiled and loaded over the host SPI pins; reference models check the protocol pins. The same tests run under the unchanged official RTL and gate-level jobs. No internal design signals are accessed.
 
-## Setting up
-
-1. Edit [Makefile](Makefile) and modify `PROJECT_SOURCES` to point to your Verilog files.
-2. Edit [tb.v](tb.v) and replace `tt_um_example` with your module name.
-
-## How to run
-
-To run the RTL simulation:
+From the repository root:
 
 ```sh
-make -B
+source .venv/bin/activate
+cd test
+make
 ```
 
-To run gatelevel simulation, first harden your project and copy `../runs/wokwi/results/final/verilog/gl/{your_module_name}.v` to `gate_level_netlist.v`.
+The Makefile includes the committed SRAM behavioral models in both modes. Its `PROJECT_SOURCES` matches `info.yaml`. Firmware compilation uses the generated 2-lane/4-unit software tables.
 
-Then run:
+For gate-level simulation, copy the official final netlist to `test/gate_level_netlist.v`, provide the matching PDK in `PDK_ROOT`, and use Tiny Tapeout's Icarus13:
 
 ```sh
-make -B GATES=yes
+make GATES=yes
 ```
 
-If you wish to save the waveform in VCD format instead of FST format, edit tb.v to use `$dumpfile("tb.vcd");` and then run:
+The official action performs these setup steps. Tests always compare with protocol reference models. Sigrok decoding also runs when `sigrok-cli` is installed; the official template jobs do not install it. Required-sigrok coverage for all22cases is recorded separately by routed replay44123392388 and the unit workflow. These are functional simulations, not SDF-annotated timing simulations.
 
-```sh
-make -B FST=
-```
-
-This will generate `tb.vcd` instead of `tb.fst`.
-
-## How to view the waveform file
-
-Using GTKWave
-
-```sh
-gtkwave tb.fst tb.gtkw
-```
-
-Using Surfer
-
-```sh
-surfer tb.fst
-```
+The harness supports pad loopback but does not dump the full SRAM/gate hierarchy by default. Results are written to `results.xml`; protocol traces are ignored local VCD files.

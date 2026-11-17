@@ -1,0 +1,17 @@
+{
+  "status": "proposal_not_applied",
+  "reference": "https://kdp1965.github.io/ihp-um-janestreet-prism/ihp_sram_macro.html",
+  "evidence_run": 44184319751,
+  "gds_sha256": "ddf9668fc20eba68fc936f408bdeee3446ba0dd026c8cf8b99ee8b0e12d5f9fb",
+  "changes": {
+    "RUN_MAGIC_DRC": false,
+    "ERROR_ON_ILLEGAL_OVERLAPS": false,
+    "RUN_KLAYOUT_DRC": true,
+    "ERROR_ON_KLAYOUT_DRC": true,
+    "KLAYOUT_DRC_RUNSET": "pdk_dir::libs.tech/klayout/tech/drc/ihp-sg13cmos5l.drc"
+  },
+  "physical_recipe_unchanged": true,
+  "official_workflow_changes": false,
+  "requires_explicit_signoff_policy_decision": true,
+  "policy_note": "This explicitly waives unsupported Magic SRAM checks and requires whole-GDS KLayout DRC0. It does not make raw Magic markers zero."
+}

@@ -41,3 +41,21 @@ Only after the actual geometry result can we propose a precise SRAM-aware
 signoff policy or fix real geometry. No failed check will be silently disabled,
 no thresholds relaxed, and no Phase2exit box ticked. A subsequent official run,
 precheck/GL/viewer and required main CI remain required.
+
+
+## Geometry audit44184319751 passes
+Stock pinned CMOS5L KLayout DRC and its checker pass on the exact merged GDS.
+Independent artifact inspection confirms fresh metric0, empty report item list,
+correct CMOS5L deck and default no_recommended=true/run_mode=deep options.
+No layers/cells/rule groups were selectively omitted by the diagnostic. The
+input hash remainsddf9668f.... This supports the documented SRAM/Magic mismatch;
+it does not turn raw Magic markers into0or make the original official run green.
+
+Prepared sram_signoff_proposal.json, NOT applied: RUN_MAGIC_DRC=false,
+ERROR_ON_ILLEGAL_OVERLAPS=false, RUN_KLAYOUT_DRC=true,
+ERROR_ON_KLAYOUT_DRC=true and explicit stock CMOS5L KLAYOUT_DRC_RUNSET.
+This follows the primary SRAM walkthrough and explicitly changes signoff policy:
+raw unsupported Magic checks are waived in favor of whole-GDS KLayout DRC0plus
+LVS and all existing timing/electrical/antenna/routing checks. Main source/config
+and official workflows are unchanged. This policy requires an explicit decision;
+it must never be described as passing every raw Magic check or zero raw markers.

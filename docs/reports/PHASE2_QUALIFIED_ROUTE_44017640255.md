@@ -45,3 +45,17 @@ reporting. No official workflow, main hardware, clock or resource change. Native
 execution pending. After a routed/extracted pass: full routed protocol replay,
 reviewed source/config integration, then unchanged official GDS/precheck. Phase2
 is not complete.
+
+## Routed and stock-extracted result44031468510
+Both jobs pass at c5824b6ba259155a312a92a8fa545d8319e1e9a9. DRT completion
+checks fresh raw/state DRC0and original connectivity. Extracted gate reports
+qualified=true/failures=[], all timing-violation counts0, electrical0 and antenna0.
+At stock0.25ns uncertainty, functional setup fast/typical/slow is
++11.807575/+7.647178/+0.163304ns; hold+.150773287/+.391302668/+.742154359ns.
+Ordinary aggregate setupWS0is retained and not called positive reserve.
+
+Artifact14311359993(cache-final-drtroute-44031468510,149529385bytes) and
+14313125675(cache-final-extracted-44031468510,144211986bytes) independently
+reviewed: exact hashes, raw reports, constraints and logical conservation pass. The slow setup reserve is only163ps, so source/config/tool
+parity matters during main adoption and official hardening. Full routed protocol
+replay, official GDS/precheck and Phase2 completion remain outstanding.

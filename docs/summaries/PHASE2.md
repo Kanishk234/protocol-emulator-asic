@@ -203,3 +203,12 @@ Independent review of this exact artifact now passes. A source-bound two-job
 DRT/stock-extraction workflow is prepared; it repeats all pre-route gates, accepts
 only completed DRC-clean routing, and checks extracted functional setup/hold,
 electrical and antenna results before further promotion. No route result yet.
+
+### 2026-11-17: detailed routing and extracted timing pass
+Workflow44031468510successfully routes the qualified full design and passes the
+stock-constrained extracted gates. Slow functional setup reserve is+0.163ns and
+fast hold+.151ns; timing-violation counts, route DRC, electrical and antenna checks
+are zero. This is routed/extracted evidence, beyond the earlier screen. The setup
+margin is small. Independent artifact review passes. Next: complete routed protocol
+replay, exact source/config adoption and unchanged official GDS/precheck.
+Phase2is still open; no official full-design green run is claimed.

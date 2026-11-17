@@ -1,0 +1,114 @@
+{
+  "qualified": true,
+  "source_run": 44017640255,
+  "source_sha": "e04f800d2ab1701cd97ff801e464830054b2b145",
+  "route_state": "runs/cache-final-route/1-openroad-detailedrouting/state_out.json",
+  "extracted_timing": {
+    "timing__setup__ws__corner:nom_fast_1p32V_m40C": 0,
+    "timing__setup_vio__count__corner:nom_fast_1p32V_m40C": 0,
+    "timing__hold__ws__corner:nom_fast_1p32V_m40C": 0.15077328701186685,
+    "timing__hold_vio__count__corner:nom_fast_1p32V_m40C": 0,
+    "timing__setup__ws__corner:nom_slow_1p08V_125C": 0,
+    "timing__setup_vio__count__corner:nom_slow_1p08V_125C": 0,
+    "timing__hold__ws__corner:nom_slow_1p08V_125C": 0.742154358974416,
+    "timing__hold_vio__count__corner:nom_slow_1p08V_125C": 0,
+    "timing__setup__ws__corner:nom_typ_1p20V_25C": 0,
+    "timing__setup_vio__count__corner:nom_typ_1p20V_25C": 0,
+    "timing__hold__ws__corner:nom_typ_1p20V_25C": 0.39130266801033264,
+    "timing__hold_vio__count__corner:nom_typ_1p20V_25C": 0
+  },
+  "functional_setup": {
+    "nom_fast_1p32V_m40C": {
+      "corner": "nom_fast_1p32V_m40C",
+      "worst_reported_setup_slack_ns": 11.807575,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_slow_1p08V_125C": {
+      "corner": "nom_slow_1p08V_125C",
+      "worst_reported_setup_slack_ns": 0.163304,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    },
+    "nom_typ_1p20V_25C": {
+      "corner": "nom_typ_1p20V_25C",
+      "worst_reported_setup_slack_ns": 7.647178,
+      "reported_paths": 5,
+      "endpoint_inventory": {
+        "FLOP_DATA_ENDPOINTS": 2418,
+        "OUTPUT_ENDPOINTS": 24
+      },
+      "scope": "Flop/output path reports only; ordinary all-endpoint checks still required",
+      "official_signoff": false
+    }
+  },
+  "electrical": {
+    "nom_fast_1p32V_m40C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    },
+    "nom_slow_1p08V_125C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    },
+    "nom_typ_1p20V_25C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    }
+  },
+  "antenna": {
+    "antenna__violating__nets": 0,
+    "antenna__violating__pins": 0,
+    "flow__warnings__count": 0,
+    "flow__errors__count": 0,
+    "flow__warnings__type_count": 0
+  },
+  "stock_uncertainty_ns": 0.25,
+  "failures": [],
+  "routed_protocol_replay_performed": false,
+  "official_gds_signoff": false,
+  "workflow_run": 44031468510,
+  "source_tools_sha": "c5824b6ba259155a312a92a8fa545d8319e1e9a9",
+  "completed_route_drc_errors": 0,
+  "artifact_independent_review_complete": true
+}

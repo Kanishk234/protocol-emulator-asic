@@ -1,0 +1,201 @@
+name: TRIPWIRE bounded selector DRT diagnostic
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: tripwire-selector-drt-diagnostic
+  cancel-in-progress: false
+env:
+  SOURCE_RUN: '43951998125'
+jobs:
+  source-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 200
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Prepare project virtual environment
+      run: bash scripts/setup_venv.sh
+    - name: Check source, archive and timing rejection controls
+      run: 'source .venv/bin/activate
+
+        python -m pytest -q scripts/ci/test_selector_drt_diagnostic.py scripts/ci/test_closure_route.py
+        scripts/ci/test_extracted_timing.py
+
+        '
+    - name: Authenticate the exact retained antenna-only source
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: "source .venv/bin/activate\npython - <<'PYCODE'\nimport json, os, subprocess, sys\nsys.path.insert(0,\
+        \ 'scripts/ci')\nfrom selector_drt_diagnostic import SOURCE_RUN, context\nrun = json.loads(subprocess.check_output(['gh','api',\n\
+        \    f'repos/{os.environ[\"GITHUB_REPOSITORY\"]}/actions/runs/{SOURCE_RUN}'], text=True))\ncontext(run)\n\
+        print('Diagnostic only: exact failed source retained; release admission remains false')\nPYCODE\n"
+  diagnostic:
+    needs: source-gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+    steps:
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Prepare project virtual environment
+      run: bash scripts/setup_venv.sh
+    - name: Prepare trusted full-core source for independent artifact comparison
+      run: 'source .venv/bin/activate
+
+        export CLOSURE_EXPECTED_SOURCE="$RUNNER_TEMP/closure-expected"
+
+        python scripts/ci/selector_drt_diagnostic.py prepare
+
+        echo "CLOSURE_EXPECTED_SOURCE=$RUNNER_TEMP/closure-expected" >> "$GITHUB_ENV"
+
+        '
+    - name: Restore the exact unqualified source for diagnostic measurement
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: "set -euo pipefail\nsource .venv/bin/activate\ngh api \"repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN\"\
+        \ > closure-source-run.json\ngh api \"repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN/artifacts\"\
+        \ > closure-artifact-list.json\npython - <<'PY'\nimport json, os, subprocess, sys\nfrom pathlib\
+        \ import Path\nsys.path.insert(0, 'scripts/ci')\nfrom selector_route import SOURCE_RUN, ARTIFACT_NAME\n\
+        from selector_drt_diagnostic import context as provenance\nartifacts = json.loads(Path('closure-artifact-list.json').read_text())['artifacts']\n\
+        matches = [a for a in artifacts if a['name'] == ARTIFACT_NAME]\nassert len(matches) == 1, 'Missing\
+        \ unique source artifact'\nartifact = matches[0]\nprovenance(json.loads(Path('closure-source-run.json').read_text()),\
+        \ artifact)\nPath('closure-source-artifact.json').write_text(json.dumps(artifact, indent=2) +\
+        \ '\\n')\nwith open('closure-source.zip', 'wb') as output:\n    subprocess.run(['gh', 'api', f'repos/{os.environ[\"\
+        GITHUB_REPOSITORY\"]}/actions/artifacts/{artifact[\"id\"]}/zip'],\n                   stdout=output,\
+        \ check=True)\nPY\npython scripts/ci/selector_drt_diagnostic.py restore\n"
+    - name: Check out exact current Tiny Tapeout tools
+      uses: actions/checkout@v6
+      with:
+        repository: TinyTapeout/tt-support-tools
+        ref: 9d13ff3e3e6202090740110438c6a10c1d62ca0f
+        path: tt
+    - name: Install stock flow prerequisites
+      uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+      with:
+        packages: librsvg2-bin pngquant ghdl-llvm
+        version: tinytapeout_gds_action
+    - name: Install and verify stock flow environment
+      run: 'set -euo pipefail
+
+        source .venv/bin/activate
+
+        python -m pip install -r tt/requirements.txt librelane==3.1.0.dev4
+
+        docker pull ghcr.io/librelane/librelane:3.1.0.dev4
+
+        docker image inspect ghcr.io/librelane/librelane:3.1.0.dev4 > closure-engine-image.json
+
+        docker run --rm ghcr.io/librelane/librelane:3.1.0.dev4 openroad -version > closure-openroad.txt
+
+        python - <<''PY''
+
+        import importlib.metadata, json, sys
+
+        from pathlib import Path
+
+        sys.path.insert(0, ''scripts/ci'')
+
+        from closure_route import IMAGE, IMAGE_DIGEST, PDK, TOOLS
+
+        from librelane.common import get_ciel_pdk_hash
+
+        assert importlib.metadata.version(''librelane'') == ''3.1.0.dev4''
+
+        assert get_ciel_pdk_hash(''ihp-sg13cmos5l'') == PDK
+
+        images = json.loads(Path(''closure-engine-image.json'').read_text())
+
+        assert len(images) == 1 and IMAGE.rsplit('':'', 1)[0] + ''@'' + IMAGE_DIGEST in images[0][''RepoDigests'']
+
+        assert Path(''closure-openroad.txt'').read_text().strip() == ''dcf36133a369abc8f3c5e5738cd4d82e4903c0e0''
+
+        PY
+
+
+        python - <<''PYCODE''
+
+        import subprocess, sys
+
+        from pathlib import Path
+
+        sys.path.insert(0, ''scripts/ci'')
+
+        from selector_drt_diagnostic import DRT_SCRIPT_SHA
+
+        from closure_route import IMAGE
+
+        code = "from pathlib import Path; import hashlib, librelane; p=Path(librelane.__file__).parent/''scripts/openroad/drt.tcl'';
+        print(hashlib.sha256(p.read_bytes()).hexdigest())"
+
+        value = subprocess.check_output([''docker'',''run'',''--rm'',IMAGE,''python3'',''-c'',code], text=True).strip()
+
+        assert value == DRT_SCRIPT_SHA, ''Pinned native DRT script differs; no diagnostic routing''
+
+        Path(''diagnostic-native-drt-sha256.txt'').write_text(value+''\n'')
+
+        PYCODE
+
+        '
+    - name: Initialize normal Ciel PDK and independently check restored antennas
+      timeout-minutes: 30
+      run: "set -euo pipefail\nsource .venv/bin/activate\nunset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME\
+        \ _LLN_OVERRIDE_OPENROAD PYTHONPATH\npython - <<'PY'\nimport json, subprocess, sys\nfrom pathlib\
+        \ import Path\nsys.path.insert(0, 'scripts/ci')\nfrom stock_screen_gate import one\nsource = one(Path('runs/stock-official-baseline'),\
+        \ '*-openroad-stamidpnr-3/state_out.json')\ncfg = json.loads(Path('src/config_merged.json').read_text())\n\
+        cfg['meta'] = {'version': 1, 'flow': ['OpenROAD.CheckAntennas']}\npath = Path('src/config_closure_initialize.json')\n\
+        path.write_text(json.dumps(cfg, indent=2) + '\\n')\noutput = Path('runs/closure-initialize');\
+        \ output.mkdir()\nsubprocess.run([sys.executable, '-m', 'librelane', '--docker-no-tty', '--dockerized',\n\
+        \                '--pdk-root', '/home/runner/pdk', '--pdk', 'ihp-sg13cmos5l',\n              \
+        \  '--run-tag', output.name, '--force-run-dir', str(output), '--hide-progress-bar',\n        \
+        \        '--with-initial-state', str(source), str(path)], check=True)\nPY\n"
+    - name: Measure stock DRT and extracted timing without source promotion
+      timeout-minutes: 300
+      run: 'set -euo pipefail
+
+        source .venv/bin/activate
+
+        unset LIBRELANE_IMAGE_OVERRIDE TRIPWIRE_NATIVE_RUNTIME _LLN_OVERRIDE_OPENROAD PYTHONPATH
+
+        python scripts/ci/selector_drt_diagnostic.py measure
+
+        '
+    - name: Retain source binding, route diagnostics and extraction
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: selector-drt-diagnostic-${{ github.run_id }}
+        retention-days: 90
+        if-no-files-found: warn
+        path: 'closure-source-run.json
+
+          closure-source-artifact.json
+
+          closure-engine-image.json
+
+          closure-openroad.txt
+
+          runs/
+
+          src/
+
+          macro/
+
+          info.yaml
+
+
+          diagnostic-native-drt-sha256.txt
+
+          '
+'on':
+  workflow_dispatch: null
+  push:
+    branches:
+    - tripwire/closure-8x4
+    paths:
+    - .github/workflows/tripwire-selector-drt-diagnostic.yaml

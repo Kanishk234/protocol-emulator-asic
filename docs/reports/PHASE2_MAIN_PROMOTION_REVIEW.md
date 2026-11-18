@@ -48,7 +48,7 @@ The Docker image cannot be built locally because Docker is unavailable. Package 
 
 ## Historical implementation instructions — withdrawn
 
-Apply the reviewed source/config/template patches, verify generation/source bindings, commit in scoped groups and push main once. That hardware push starts the actual official GDS workflow. Inspect its real GDS, timing/electrical/antenna/LVS, precheck, GL and viewer results before updating Phase2exit evidence. Preserve unrelated modified reports, local tools and the local-only FIPE note. No additional timing screen is planned unless an actual regression needs diagnosis.
+Apply the reviewed source/config/template patches, verify generation/source bindings, commit in scoped groups and push main once. That hardware push starts the actual official GDS workflow. Inspect its real GDS, timing/electrical/antenna/LVS, precheck, GL and viewer results before updating Phase2exit evidence. Preserve unrelated local work separately from the verified integration. No additional timing screen is planned unless an actual regression needs diagnosis.
 
 Final-export follow-up: fresh run39907035580 filled netlist SHA35875710de59c1403171a8157bf1810b3e1b3b0327cb6b5afef35a76f9aaaeff passes all4official-style GL cases (152.42s, zero failures/errors/skips). The wrapper exited127 after simulation because its script was replaced while Bash was reading it; the independent XML and cocotb summary both confirm4/4. This is a local wrapper invocation error, not a passing wrapper exit.
 

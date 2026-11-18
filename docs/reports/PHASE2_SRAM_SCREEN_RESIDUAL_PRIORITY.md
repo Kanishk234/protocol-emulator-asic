@@ -1,5 +1,7 @@
 # Selected SRAM screen: residual repair priorities
 
+> Historical report, superseded by [official green GDS evidence](PHASE2_OFFICIAL_GREEN_44189196098.md) and the [completed Phase 2 summary](../summaries/PHASE2.md). Earlier candidate instructions and timing numbers below are retained as history, not the current plan.
+
 Source: [screen 38111368461](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38111368461), artifact 11692116594. Preliminary global-route estimates; extracted continuation [38112320460](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38112320460) remains authoritative for the next physical repair.
 
 Exact final screen netlist SHA-256: `2c00046d787af2d045bbb61a9fab4e15b0356c34ffb6d7397a950f6ecf104a80`.

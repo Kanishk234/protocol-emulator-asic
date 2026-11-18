@@ -1,5 +1,7 @@
 # Official GDS readiness (2026-10-06)
 
+> Historical report, superseded by [official green GDS evidence](PHASE2_OFFICIAL_GREEN_44189196098.md) and the [completed Phase 2 summary](../summaries/PHASE2.md). Earlier candidate instructions and timing numbers below are retained as history, not the current plan.
+
 ## Banked candidate preparation (2026-10-07)
 
 Update after extraction: banked route37709856777 completes with zero route DRC errors, but extracted37714872507 has slow setup -2.475764ns and fast hold +0.094940ns. Independently verified routedGL37714872772 passes22/22. Reject banked promotion and retain original event-late125ps (-0.179789ns setup, +0.037290ns fast hold). See PHASE2_BANKED_EXTRACTED_REGRESSION.md. The isolated integration artifacts below remain review material, not a selected official candidate.

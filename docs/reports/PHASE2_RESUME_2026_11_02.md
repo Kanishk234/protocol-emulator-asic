@@ -8,7 +8,7 @@ Reviewed repository instructions, current worklog/decisions/bug evidence, archit
 - No workflows are in progress. Two queued diagnostics date from 2026-10-07: L3 37655518919 and extracted timing 37655518925. They are stale queues, not current work; no cancellation or rerun performed.
 - Latest main test 40808353191, lint 40808353158, unit 40808353207 and docs 40808353156 all pass. Nightly runs through 41487087016 (2026-11-02) pass. This does not make the failed physical screen green.
 - No local Icarus/VVP/Verilator/Yosys/OpenROAD/LibreLane processes were found. No watcher was started.
-- On arrival, four tracked documentation files were modified and older diagnostic notes/tools were untracked. They were preserved. The FIPE note stays local and unignored. No uncommitted main RTL, info.yaml, macro or official workflow edits were present.
+- On arrival, four tracked documentation files were modified and older diagnostic notes/tools were untracked. They were preserved. No uncommitted main RTL, info.yaml, macro or official workflow edits were present.
 - `src/tt_um_tripwire.v` is still the counter placeholder; info.yaml and test/Makefile both list only that top. Core modules exist, but the selected full optimized 2-lane/4-unit/U0-full/SRAM design is reconstructed by hash-guarded diagnostic patches. Official GDS on current source would not verify the full candidate. The official workflow hash still matches the frozen design manifest; its jobs remain unchanged.
 
 ## Last experiment: qualified timing, failed electrical/antenna/routing

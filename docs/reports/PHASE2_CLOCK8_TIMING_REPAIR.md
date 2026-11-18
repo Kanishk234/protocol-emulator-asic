@@ -107,7 +107,7 @@ Verification: 155 focused planner/screen/hold-route/fanout-route/native-route ch
 
 Additional clock-specific rejection checks cover altered source drivers, altered sink masters, absent placements, missing loads and unplanned rewires. The focused suite now passes 165 checks. Both route runs remain in progress at this session's status check. The shared wire-reset helper clears ordinary clock wires as well as data wires (preserving power/ground), so this screen cannot retain the old routed clock branches after the topology change. Actual physical behavior still needs CI measurement.
 
-Latest supplied AGENTS.md reserves history/remote commands for the user. Run these groups to publish only the prepared screen; unrelated local reports and FIPE are excluded. Before pushing while hardening runs, inspect the required hardware-history guard:
+Latest supplied AGENTS.md reserves history/remote commands for the user. Run these groups to publish only the prepared screen; unrelated local reports are excluded. Before pushing while hardening runs, inspect the required hardware-history guard:
 
 ```bash
 git log origin/main..main -- src info.yaml macro

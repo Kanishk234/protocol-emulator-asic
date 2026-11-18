@@ -1,5 +1,7 @@
 # SRAM electrical closure: targets and experiment order
 
+> Historical report, superseded by [official green GDS evidence](PHASE2_OFFICIAL_GREEN_44189196098.md) and the [completed Phase 2 summary](../summaries/PHASE2.md). Earlier candidate instructions and timing numbers below are retained as history, not the current plan.
+
 ## 2026-10-09 corrected checkpoint triage
 
 ### Clock8 continuation prepared after successful screen
@@ -26,7 +28,7 @@ Added local antenna_branch.py validates exact original NL hash and accepts only 
 
 The separate local wrapper/image/manual gds-antenna-branch-screen reuses only original strength route37954320974. Shared orchestration adds an independently selected antenna-branch target: fresh baseline/rewired views, DPL, old ordinary wire reset, one GRT with0overflow, one optional antenna cleanup, then fresh fully timed allcorner STA and50ps fast hold gate. Repair repeats and simultaneous other move receipts fail. No resizing, constraint change, weakened gate or diode deletion is introduced. Later routing/antenna repair can still add cells and recreate fanout violations; reject unsuccessful qualification, retain original route and require detailed extraction before claiming success. Clock-driver violations remain separate work.
 
-142 focused helper/orchestration/Tcl/wrapper/GL tests pass after local preparation. Physical APIs in tests are mocked; no branch physical run, new GL pass or timing benefit is claimed. REN and branch screens remain uncommitted/unlaunched; FIPE remains local. OpenROAD documents repair_design as a buffer/resizing electrical repair command ([primary documentation](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html)); pinned LibreLane3.1.0.dev3 uses stock repair before antenna insertion, so this controlled post-insertion branch experiment tests a concrete load that the earlier stage did not see.
+142 focused helper/orchestration/Tcl/wrapper/GL tests pass after local preparation. Physical APIs in tests are mocked; no branch physical run, new GL pass or timing benefit is claimed. REN and branch screens remain uncommitted/unlaunched. OpenROAD documents repair_design as a buffer/resizing electrical repair command ([primary documentation](https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html)); pinned LibreLane3.1.0.dev3 uses stock repair before antenna insertion, so this controlled post-insertion branch experiment tests a concrete load that the earlier stage did not see.
 
 ### Independent REN screen prepared after relocation continuation launch
 

@@ -16,7 +16,7 @@ The workflow runs fresh per-corner timing, checks execution evidence for both ph
 
 217 local helper tests pass, including exact source bounds, final headroom/antenna policy, malformed checkpoint-read refusal, injection ordering and five Tcl connectivity guards; no skips in the new Tcl checks. Bash syntax and git diff checks pass. Earlier RTL verification covers the source candidate:60pin/5chip/2048clock lockstep. Local physical execution remains untested because cached OpenROAD lacks libQt5Charts.so.5; pinned CI must establish real insertion/legalization/route/timing behavior. No workflow dispatched yet.
 
-Publication groups: tools/tests/image wrappers; new manual workflow; reports/BUGS/WORKLOG separately. Keep FIPE review and unrelated old SRAM addr0 helper local. Prepared gds-placement-route changes are not required for this repair-only dispatch and should remain separate until routed follow-up is justified.
+Publication groups: tools/tests/image wrappers; new manual workflow; reports/BUGS/WORKLOG separately. Keep unrelated old experimental helpers outside this publication. Prepared gds-placement-route changes are not required for this repair-only dispatch and should remain separate until routed follow-up is justified.
 
 Once the required tool/workflow groups are published, launch:
 

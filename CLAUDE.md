@@ -1,13 +1,13 @@
 # CLAUDE.md: TRIPWIRE
 
 ## Project goal
-TRIPWIRE is our entry to the **Jane Street Protocol Emulator ASIC Competition**. It is an open-source, firmware-programmable chip that emulates hardware protocols (UART, SPI and I2C required; more as stretch goals) on **Tiny Tapeout, IHP 130 nm CMOS5L, 6x4 tiles**. **Deadline: 2027-01-18** (we target Jan 11).
+TRIPWIRE is our entry to the **Jane Street Protocol Emulator ASIC Competition**. It is an open-source, firmware-programmable chip that emulates hardware protocols (UART, SPI and I2C required; more as stretch goals) on **Tiny Tapeout, IHP 130 nm CMOS5L, 8x4 tiles**. **Deadline: 2027-01-18** (we target Jan 11).
 
 Architecture in one line: lanes of **triggered "reflex" instructions** (no program counter on the fast path), plus bounded **routines** in SRAM, connected by a **multicast channel fabric**, with **timed pin units** at the pads.
 
 ## Key sources
 - Competition brief: https://blog.janestreet.com/protocol-emulator-asic-competition/
-- Template (our starting point): https://github.com/TinyTapeout/ttihp-verilog-template/tree/cmos5l
+- Template (our starting point): https://github.com/TinyTapeout/ttihp-verilog-template (current template main; original starting branch: cmos5l)
 - Tiny Tapeout docs: https://tinytapeout.com
 - SRAM on IHP (reference project): https://www.tinytapeout.com/chips/ttihp0p2/tt_um_urish_sram_test
 - Contact: asic-competition@janestreet.com
@@ -44,9 +44,9 @@ Architecture in one line: lanes of **triggered "reflex" instructions** (no progr
 - **Honesty:** claims go in `docs/CLAIMS.md` with their evidence. Never claim zero latency, sub-ns timing, USB/Ethernet support, real-hardware testing (we have none yet), or "formally verified" without naming the property and its bound.
 
 ## CI rules
-- Workflows: `test`, `gds` (gds, precheck, gl_test, viewer → GitHub Pages), `docs`, `fpga` (manual), plus our own `lint`, `unit`, `formal`, `nightly`, `hardcaml` (L9, D-021; added in phase 3).
+- Active workflows: official `test`, `gds` (gds, precheck, gl_test, viewer), `docs`, `fpga`; our own `lint`, `unit`, `nightly`, `repo-audit`, and manual `protocol-replay`. Separate formal/Hardcaml/Basys 3 workflows are Phase 3 plans, not completed checks. Historical screens live on the Phase 2 archive branch.
 - Never edit the template's jobs. Only the `gds` trigger block (paths filter, concurrency) is ours. Add new workflows as separate files.
-- Edit `src/config.json` only for `CLOCK_PERIOD`, `PL_TARGET_DENSITY_PCT` and the SRAM macro block, each with a DECISIONS entry.
+- The qualified physical config is frozen by D-184/D-185. Its SRAM/clock/pin/latch settings and explicit KLayout/Magic policy are reviewed exceptions to the original three-field whitelist. Any further physical/config change needs a DECISIONS entry and fresh qualification; never weaken a gate to obtain a pass.
 - Hardening takes ~4–5 h and GitHub stops any single job at 6 h (the `gds` job is the one at risk; the whole workflow may run longer). Make **one hardware change per hardening**, and judge changes by global-routing overflow, not cell count. A push touching `src/`, `info.yaml` or `macro/` cancels a running hardening.
 - Keep `info.yaml` `source_files` and `test/Makefile` `PROJECT_SOURCES` in sync.
 

@@ -1,5 +1,7 @@
 # Area estimate before the RTL (phase 2 task 2.0)
 
+Historical design-stage report. Current resource settings and qualification are in [the Phase 2 baseline](../BASELINE.md); original experiment sources are on the [archive branch](../archive/README.md).
+
 **Current validation (2026-11-17/18):** the adopted2-lane/4-unit/U0-full design fits the organizer-approved8x4 budget and passes unchanged official GDS/precheck44189196098. Reported utilization57.14%, routing1h26m04s, routing/KLayout/LVS/antenna errors0 under D-185. See AREA.md. The estimates below preserve the original6x4 scope and explain the resource-budget decisions.
 
 **Question:** does the frozen TRIPWIRE spec (v1.0, D-037) fit the 6x4 core, and if not, what are the options and what does each save?

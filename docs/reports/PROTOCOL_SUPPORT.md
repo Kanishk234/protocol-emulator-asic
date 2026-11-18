@@ -1,5 +1,7 @@
 # Protocol support roadmap
 
+Historical September roadmap. Current implementation evidence is in the [routed scenario matrix](../PROTOCOL_SUPPORT.md) and [qualified baseline](../BASELINE.md).
+
 Which protocols TRIPWIRE can support, how sure we are, and what each one still needs. Updated 2026-09-23.
 
 **Labels (honest by design, CLAUDE.md):**

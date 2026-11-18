@@ -1,5 +1,7 @@
 # programs
 
+For current implementation-level evidence, see the [22 routed scenarios](../docs/PROTOCOL_SUPPORT.md). The table below describes model coverage; its speed/mode entries are not broader ASIC conformance claims.
+
 TRIPWIRE firmware in the `.trw` language, compiled by `tools/tripc`. The language is documented at the top of `tools/tripc/compiler.py`.
 
 | Program | Role | Slots | Routines | Verified on the model (simulation) |

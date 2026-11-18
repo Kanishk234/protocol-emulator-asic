@@ -1,5 +1,7 @@
 # Pin unit RTL: what it costs (phase 2)
 
+Historical design-stage report. Current resource settings and qualification are in [the Phase 2 baseline](../BASELINE.md); original experiment sources are on the [archive branch](../archive/README.md).
+
 **Question:** how big is a real `trw_pin_unit`, and was the pre-RTL estimate (`AREA_ESTIMATE.md`) right? The estimate's biggest guess was the pin units' control logic ("glue", 45 % ± 15 % of the datapath), and the chip is at ~87 % of the 6x4 core against a routable ~50–60 %.
 
 **Status (2026-09-28): milestone A (lean feature set) done; milestone B in progress: B1 (PULSE, carrier), B2a (the BITSYNC receive core), B2b (RX stuffing, CRC, FRAME) and B2c (the TX queue) done; B3 next (§9).**

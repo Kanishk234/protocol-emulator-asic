@@ -1,5 +1,7 @@
 # R1: lane timing at 50 MHz (risk spike)
 
+Historical design-stage report. Current resource settings and qualification are in [the Phase 2 baseline](../BASELINE.md); original experiment sources are on the [archive branch](../archive/README.md).
+
 Phase 1 task 13. **Question:** can a lane evaluate all 12 reflex conditions, pick a slot and apply its static updates in one 20 ns clock (EVAL every clock), or must it fall back to firing every other clock? **Decision it drives:** the fire rate (ARCHITECTURE §14 L1). Decision: DECISIONS D-030.
 
 **Answer: fire every clock.** Before layout, the worst EVAL path is 3.4–7.5 ns at the typical corner and 5.3–11.7 ns at the slow corner across the runs of this lane (§3 has the committed RTL's run and the mapping-noise note). The worst case seen in any run (flop slots, no buffering, configuration treated as changing, slow corner) still has 7.9 ns of slack: the path could grow by 67 % before it fails. The buffered latch build has 3.3–3.5× margin.

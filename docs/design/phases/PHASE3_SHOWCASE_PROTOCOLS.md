@@ -12,18 +12,22 @@
 ## 1. Entry criteria
 - Phase 2 exit checklist passed.
 
+## Planning corrections before implementation
+
+Phase 2 closed November 18 on 8×4, two lanes and four units. The original dates below are planning targets, not completion evidence. MEM and CAPTURE helpers remain deferred by ARCHITECTURE §8; showcase programs must first use existing primitives and SRAM routines. Any helper proposal requires a separate architectural decision and approval before implementation. The stock `fpga` workflow targets the Tiny Tapeout template board; it is not evidence of a Basys 3 build.
+
 ## 2. Tasks
 
 ### 2.1 Protocol programs (owner: tools/firmware)
 
 | Program | Key checks | Oracles |
 |---|---|---|
-| `i2c_target_eeprom.trw` (24C02-style, uses MEM) | Address match/ignore, pointer, sequential read/write, **ACK deadline at 400 kHz and 1 MHz** | Model, sigrok `i2c`, **third-party I2C controller RTL** |
+| `i2c_target_eeprom.trw` (24C02-style, using existing SRAM routines) | Address match/ignore, pointer, sequential read/write, **ACK deadline at 400 kHz and 1 MHz** | Model, sigrok `i2c`, **third-party I2C controller RTL** |
 | `spi_target_flash.trw` (READ, FAST_READ) | Max SCK, dummy cycles | Model, sigrok `spi` / `spiflash` |
 | `onewire_master.trw` (standard + overdrive) | Reset/presence, ROM commands | Model, sigrok `onewire_link` / `onewire_network` |
 | `ps2_rx.trw` | Framing, parity | Model, sigrok `ps2` |
 | `ws2812.trw`, `dshot.trw` (PULSE mode) | Pulse widths within spec | Timing checker |
-| `uart_bridge_capture.trw` | UART RX multicast to lane **and** CAPTURE tap; TX loopback | Demonstrates multicast + tap with zero lane cost |
+| `uart_bridge_capture.trw` | UART RX multicast and TX loopback; a SRAM capture helper remains deferred | Demonstrates multicast; measure actual lane cost |
 
 - Adopt the ACK-path improvement noted in `ARCHITECTURE.md` §13 (preload the 1-bit SETN) and confirm the reaction bound in the compiler report.
 

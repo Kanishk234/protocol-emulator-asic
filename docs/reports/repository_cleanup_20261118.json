@@ -1,0 +1,64 @@
+{
+  "date_utc": "2026-11-18",
+  "scope": "Pre-Phase-3 repository organization; local working tree",
+  "archive_revision": "9b440582c489b228f8306a137f3a722bdfa8ed2a",
+  "retired_tracked_files": 1306,
+  "workflow_files_before": 249,
+  "workflow_files_after": 9,
+  "model_non_slow_tests": {
+    "passed": 335,
+    "failed": 0,
+    "log_sha256": "24037cfa4d1b1423d8ce28a9f1d5d22297b6a4fb07b9f22496cdbb7673313534"
+  },
+  "l1_executions": {
+    "passed": 147,
+    "failed": 0,
+    "log_sha256": "2824a08a166cf71c78132fbde6ea007f08ed8e82b96b747af89b8dc7ee64bf97"
+  },
+  "top_level_rtl": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "xml_sha256": "4728174d7758506f8221ce740fa0dc63a8e51a64aae6857b370e71037a09aedc"
+  },
+  "chip_protocol_rotation_rtl": {
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "xml_sha256": "bffaa902ad09792126438da107b8eef94bc84184d0e437d1d05bfad38b63b043"
+  },
+  "ci_helper_tests": {
+    "passed": 27,
+    "failed": 0
+  },
+  "synthesis_log_sha256": "b425692bcec1b1a2133e1d6afaec2135750a3c98cf3ca2fe926ac6194e1cca76",
+  "lint_log_sha256": "c83bd91243b9bfd4c554ac79b36ade7a56d5fa942b5df48042c0a1767943f52e",
+  "official_workflow_hashes": {
+    ".github/workflows/gds.yaml": "b0f8ddf2e0f5a4fdaf824f662afdfc6ce84da791d127c299884481d099b1aa4e",
+    ".github/workflows/test.yaml": "986c05a7f04a675871462b71b7401f6e1e368a141a38f348b4d6a7be390d0f63",
+    ".github/workflows/docs.yaml": "9a61ef97f6dabf654792ea040f2c0afb8f763d17483d0fba52ce9ae72893dbb0",
+    ".github/workflows/fpga.yaml": "695d07a4acf9de12b4e6846f7a37ac7180326aa2d609e4d21d1344316fdbdf5e"
+  },
+  "harness_hashes": {
+    "test/Makefile": "9a575146f6c37469ec35c88e243385b0bc1a7ca18b25e2ba6dae4f064163804b",
+    "test_internal/Makefile": "d41f140210f61d543c0fc1d736d74c25cbaef512e8dc0a80be434e1cc69f2704",
+    "test_internal/lane/Makefile": "5f11a3a88caa0d129d0c0f9fc3c9687f5d3e87a5746730f3ff31db5538333752",
+    "test_internal/chip/Makefile": "324d886cbdfbc5cfe90bf4ce9b7a1dee3a5582b57c0452811b3c67e73d31b9e2",
+    "test_internal/pin/Makefile": "57de8b4220a4baf33cfb987ce785cef738c4e13c708de9ace181e126fce5acb7",
+    "test_internal/alu/Makefile": "58231ac654a070c0cd87069aa22146d11e72cc3d98b68b96672cfd8ce2ea3e34",
+    "test_internal/pins/Makefile": "83a6ab02343a5eba15d76fb2324325225e18f7954bc34d286cb1220c3022d0a6",
+    "test_internal/l2/Makefile": "221697e47b589936fe9b816e3f9889f291b7b23b92b65a6124ce1b58325dae7a",
+    "test_internal/chan/Makefile": "1f27ded71e5eb710e094e0bdd22abe93281dc888b15f71e4b7ed7e808c735eda",
+    "test_internal/slots/Makefile": "c2c52d9ce2974317ba4ab8d8b7b369d93fddad9e040eccd0fa5cc60d7f8bb2f6",
+    "test_internal/host/Makefile": "d98200cb3903da06e729d277f0a8cc61d4c819430832e193eabfa2d2f9ff46b9",
+    "scripts/check_all.sh": "70bfd062841db100d3ecb99992cccf2cc5c77d003b769b5c28f8afce66489aa0",
+    "scripts/ci/protocol_replay.py": "b5af041ae3b25e6a5331214e452c1c4b69fe5cc9d3b9efd29ddbe59dcf5e4a85"
+  },
+  "limitations": [
+    "New replay workflow not yet executed in GitHub Actions",
+    "Devcontainer build not executed",
+    "Slow model tests not rerun",
+    "Interrupted Icarus chip run is not passing evidence",
+    "No new physical qualification or silicon result claimed"
+  ]
+}

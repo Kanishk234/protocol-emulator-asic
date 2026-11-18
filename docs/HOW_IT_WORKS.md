@@ -116,7 +116,7 @@ Our software copy of the chip shows the *design* works. But it assumes the real 
 - **R3:** does the recipe book (the SRAM block) fit into the kitchen's construction process? **Yes**, so we keep it (D-031).
 
 Still open:
-- **The kitchen is small** (6x4 tiles), and it isn't yet certain everything fits. The waiters' settings turned out bigger than expected, about 307 bits each. Checking the fit is the first job of phase 2.
+- **The kitchen fits in 8×4 tiles.** Phase 2 qualified the full two-lane, four-unit design in the official flow; see [the baseline](BASELINE.md) for measured timing and physical results.
 - **Everything so far is simulation.** We have no real hardware yet, so every result is from simulation with ideal wires (see `docs/CLAIMS.md`).
 
 ## Word list
@@ -127,7 +127,7 @@ Still open:
 | **Pin unit** (U0–U5) | A timing engine attached to up to two pins; sends and receives bits at exact times |
 | **Token** | One 16-bit word plus a 2-bit label (DATA, CTRL, EVENT, ERR), passed between blocks |
 | **Channel fabric** | The on-chip wiring that delivers tokens from producers to consumers |
-| **Lane** (L0–L2) | A decision engine that holds 12 rules, 4 registers, a state and flags |
+| **Lane** (L0–L1) | A decision engine that holds 12 rules, 4 registers, a state and flags |
 | **Rule / reflex slot** | "When this condition holds, do this one action"; all 12 are checked every clock |
 | **State** | Where the lane is in the protocol (e.g. "waiting for the address byte"), 16 possible values |
 | **Flag** | A yes/no remembered by a lane (e.g. "the address matched") |

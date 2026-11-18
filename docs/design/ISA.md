@@ -7,7 +7,7 @@ This document defines what a TRIPWIRE lane executes:
 
 It also explains *why* the instruction set looks the way it does, compared with other protocol engines.
 
-**Status: draft (phase 1, started early under DECISIONS D-006).** Choices here are proposals to be confirmed or reversed by the architecture model (`tripsim`, DECISIONS D-008) before the spec freeze. At the freeze, the bit encodings move into `spec/tripwire.yaml`. After that, the encoding tables in this document are generated from the YAML and never hand-edited.
+**Status: frozen Phase 2 contract.** Encodings come from `spec/tripwire.yaml`; generated tables are never hand-edited. Historical draft discussions below retain their original context.
 
 Companions: `ARCHITECTURE.md` (tokens, fabric, pin units, helpers, host interface, timing), `VERIFICATION.md`, `OVERVIEW_TRIPWIRE.md`.
 
@@ -228,7 +228,7 @@ This resolves:
 - Every loop is a `DJNZ` with a compile-time-known count, so the compiler can compute each routine's worst-case step count.
 
 ### 5.3 Routines and reflexes share EXEC (resolves Q1)
-- SRAM access rotates `cycle mod 4`: 0 → L0, 1 → L1, 2 → L2, 3 → HOST (`ARCHITECTURE.md` §6.2; MEM/CAPTURE are deferred, D-029).
+- SRAM access rotates `cycle mod 4`: 0 → L0, 1 → L1, 2 → idle, 3 → HOST (`ARCHITECTURE.md` §6.2; MEM/CAPTURE are deferred, D-029).
 - On its rotation slot, a lane with RB set and an empty RIR fetches `SRAM[RPC]` into RIR.
 - A valid RIR is a **candidate for EXEC**. It is beaten only by an **urgent** ready slot (§4.3). A non-urgent slot waits behind it.
 - Once the step executes, RIR empties and the next fetch happens at the next rotation slot.

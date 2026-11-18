@@ -426,3 +426,10 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: helper omitted mkdir before the pinned LibreLane CLI invocation; the bootstrap helper already follows this requirement.
 - Fix: create a fresh output directory before invoking LibreLane. Keep the exact source GDS, stock deck, checker and all main settings unchanged.
 - Check: regression executes the CLI handoff under a validating stub requiring the destination directory, exact read-only flow and enabled KLayout error gate; all6focused tests pass. Fresh actual geometry diagnostic remains required.
+
+
+### 2026-11-18 — Local check omitted internal suites and used retired source paths
+- Symptom: `check_all.sh` reported success without running white-box tests when `test_internal/Makefile` was absent. Several Makefiles used the caller's PWD, while chip/L2 defaults depended on an old cache or `/tmp` candidate.
+- Root cause: the aggregator was optional and never supplied; local source/model defaults were inherited from experiments rather than the maintained checkout.
+- Fix: add a mandatory internal-suite aggregator, resolve paths with Make's CURDIR, use committed SRAM behavioral models, and default L2 to current src with a working-tree identity label. Retire CI's experiment-specific SRAM fetch.
+- Check: the actual aggregator's L1 suites pass, both full/lean pin modes pass; model tests pass 335/335 outside the restricted sandbox. Full chip/protocol/rotation 28/28 and top-level 3/3 pass; hashed receipts are in repository_cleanup_20261118.json. No RTL or acceptance gate changes.

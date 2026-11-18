@@ -21,23 +21,20 @@ Companions: `OVERVIEW_TRIPWIRE.md`, `ARCHITECTURE.md`, `VERIFICATION.md`.
 |---|---|---|
 | Template | `TinyTapeout/ttihp-verilog-template`, branch **main** | November9 upstream reference update; D-169 |
 | Build action | `TinyTapeout/tt-gds-action@ttihp27a`, `pdk: ihp-sg13cmos5l` | Jobs match upstream template4b1204a; no custom job behavior |
-| Tile size | **8x4** (1724.16 × 710.64 µm die) | Final allocation confirmed November9; D-170. Main info.yaml selects8x4. Historical and explicit diagnostic6x4 controls remain frozen; full protocol-core promotion/closure is still pending |
+| Tile size | **8x4** (1724.16 × 710.64 µm die) | Final allocation confirmed November9; D-170. Main info.yaml selects8x4. Historical and explicit diagnostic6x4 controls remain frozen; full protocol core is qualified by official run 44189196098 (see ../BASELINE.md) |
 | Routing layers | Metal1–Metal4 for the project (TopMetal1 belongs to the Tiny Tapeout top level) | One fewer layer than SG13G2, so congestion matters more |
-| Clock | `CLOCK_PERIOD` 20 ns (50 MHz); `CLOCK_PORT` `clk` | Sign-off corner is typical; slow-corner results are reported honestly |
+| Clock | `CLOCK_PERIOD` 20 ns (50 MHz); `CLOCK_PORT` `clk` | Three-corner extracted checks; positive slow functional reserve reported separately from aggregate WS |
 | Pads | CMOS5L has no characterized pad timing numbers yet | Organizer email supplied2026-10-09; Tiny Tapeout is investigating comparable SG13G2 data. Do not assert a66MHz pad specification or measured pin timing |
 | Top module | `tt_um_tripwire` with the template's ports | All outputs assigned; unused inputs in a `_unused` wire; `ena` ignored |
-| Hardening time (6x4, macro design) | ~4–5 h per `gds` run in comparable public designs | GitHub kills jobs at **6 h** |
+| Qualified full-design runtime | GDS job 2h58m43s; workflow 3h07m50s | Run 44189196098; GitHub job limit 6h |
 
 ---
 
 ## 2. `src/config.json` rules
-- Start from the template's file.
-- Change only these, each with a `docs/DECISIONS.md` entry:
-  - `CLOCK_PERIOD`
-  - `PL_TARGET_DENSITY_PCT`
-  - the SRAM macro block (§3)
-- Never edit the part the template marks "do not change".
-- Keep a comment next to every changed key saying why.
+
+The qualified configuration is frozen by D-184 and D-185. The original three-field whitelist was superseded by those reviewed physical-integration decisions. Preserve the exact clock, pin, latch, macro and repair settings unless a new decision and fresh hardening justify a change.
+
+D-185 disables unsupported SRAM Magic DRC and abstract-overlap fatality; full-GDS CMOS5L KLayout DRC remains mandatory and fatal. Ten reviewed abstract markers remain. Never describe this as raw Magic zero. [The baseline](../BASELINE.md) records the accepted policy and hashes.
 
 ---
 
@@ -49,7 +46,7 @@ The chosen macro is the IHP `RM_IHPSG13_1P_512x16_c2_bm_bist` (1024x16 is option
 
 Credit both in `macro/README.md`.
 
-**Checklist for a macro-clean hardening:**
+**Integration recipe reference (already qualified; the Phase 2 checklist records completion):**
 - [ ] Vendor the macro views into `macro/<name>/`: GDS, LEF, three `.lib` corners, CDL, behavioural Verilog. Record the IHP-Open-PDK commit.
 - [ ] A port-only blackbox Verilog in `src/` for the `MACROS` `nl` entry. The behavioural model is used only in simulation.
 - [ ] `MACROS` block in `config.json` keyed by the macro name:
@@ -60,7 +57,7 @@ Credit both in `macro/README.md`.
 - [ ] A custom `PDN_CFG` so that the Metal4 power stripes line up with the macro's Metal4 power pins, with stripe pitch and offset derived from the macro LEF. On cmos5l the default macro grid (Metal4↔TopMetal1) is empty.
 - [ ] `MAGIC_EXT_ABSTRACT_CELLS` for the macro, because the IHP macros are not LVS-clean internally. Magic DRC errors inside the macro are not fatal; the precheck's KLayout DRC is the real gate.
 - [ ] Orientation keeps the signal pins facing the logic and the power columns vertical.
-- [ ] First try it in a **2x2 smoke project** (phase 1), then move to 6x4.
+- [ ] First try it in a **2x2 smoke project** (phase 1), then integrate into the full 8x4 design.
 - [ ] Ask Jane Street / Tiny Tapeout whether macros are accepted on the target shuttle. Record the answer.
 
 **Fallback if the macro fails precheck:** a flop or latch store behind the same `trw_sram` wrapper interface (`addr`, `rdata` one cycle later, `we`/`wdata`). It holds fewer routine words (e.g. 128x16).
@@ -101,14 +98,17 @@ Credit both in `macro/README.md`.
 | Workflow | Source | Trigger | Green when |
 |---|---|---|---|
 | `test` | Template (unchanged) | Every push | Pin-level cocotb suite passes under Icarus (`! grep failure results.xml`) |
-| `gds` → `gds` | Template jobs; trigger block ours | Push touching `src/**`, `info.yaml`, `macro/**`, the workflow itself; manual dispatch | LibreLane completes; DRC/LVS/antenna clean; timing met at the typical corner |
+| `gds` → `gds` | Template jobs; trigger block ours | Push touching `src/**`, `info.yaml`, `macro/**`, the workflow itself; manual dispatch | LibreLane completes; DRC/LVS/antenna clean; all-corner timing/electrical gates met under D-185 |
 | `gds` → `precheck` | Template | After `gds` | Tiny Tapeout precheck passes |
 | `gds` → `gl_test` | Template | After `gds` | Pin-level suite passes on the netlist |
 | `gds` → `viewer` | Template | After `gds` | 3D viewer deployed to GitHub Pages |
 | `docs` | Template | Every push | `info.yaml` valid, `docs/info.md` builds |
 | `fpga` | Template (manual; `branches: none`) | Manual dispatch | iCE40UP5K bitstream builds. Informational only; does not gate phases (D-022) |
 | `fpga_basys3` (or local Vivado script) | Ours (phase 3, D-022) | Manual / see §8 | Full-design Artix-7 bitstream builds with timing met (§8) |
-| `lint`, `unit`, `formal`, `nightly` | Ours (separate files) | See `VERIFICATION.md` §10 | Their checks pass |
+| `lint`, `unit`, `nightly` | Ours | Push / nightly schedule | Lint, model and RTL checks pass |
+| `repo-audit` | Ours | Push / manual | Baseline, navigation, generation and CI helper checks pass |
+| `protocol-replay` | Ours | Manual | All 22 existing cases pass on a selected official submission with exact coverage receipts |
+| `formal`, `hardcaml` | Planned Phase 3 | Not yet active | Do not count planned jobs as evidence |
 
 **Rules:**
 - **Never edit the template's jobs.** Only `gds.yaml`'s trigger block is ours:

@@ -1,5 +1,7 @@
 # TRIPWIRE decisions
 
+Current qualified settings are D-170 (8×4 allocation), D-184 (full 2-lane/4-unit integration), and D-185 (explicit SRAM signoff policy). See [the baseline](BASELINE.md). Earlier decisions and experiment outcomes below retain their dated context.
+
 Newest at the bottom. Each entry: date, decision, reason, alternatives, status.
 A spec change is proposed here first and implemented only after the team agrees.
 

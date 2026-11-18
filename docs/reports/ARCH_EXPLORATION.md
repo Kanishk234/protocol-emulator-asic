@@ -1,5 +1,7 @@
 # Architecture exploration (phase 1, DECISIONS D-008)
 
+Historical design-stage report. Current resource settings and qualification are in [the Phase 2 baseline](../BASELINE.md); original experiment sources are on the [archive branch](../archive/README.md).
+
 Numbers from `tools/tripsim` running protocol kernels (`tools/kernels`). Each row names the test that produces it, so every number can be re-run with `python -m pytest -q`.
 
 **Status: every `ISA.md` §9 row answered (2026-09-23); the resulting decisions are DECISIONS D-029 (accepted 2026-09-23).** All numbers are from simulation on the model, with ideal pads and buses (no rise times, no metastability).

@@ -8,7 +8,7 @@ The integrated design targets 50 MHz on 8x4 IHP CMOS5L tiles. UART, SPI and I2C 
 
 1. Assert synchronous active-low `rst_n` for several clock cycles, then release it with the host inactive (`ui[4]` high).
 2. Connect the host: `ui[4]` is CS_n, `ui[5]` SCK, `ui[6]` MOSI and `uo[3]` MISO. `uo[6]` is IRQ. The other 19 pads are assigned by firmware through owner registers.
-3. Use `tools/tripc.py` and `tools/host.py` to compile and load a program from `programs/`, initialize its pin configuration and start its lanes. Reload after power loss or deselection.
+3. Use the compiler in `tools/tripc/` and host-loading API in `tools/host/` to compile and load a program from `programs/`, initialize its pin configuration and start its lanes. Reload after power loss or deselection.
 4. `test/` exercises UART TX, SPI controller and I2C controller through the Tiny Tapeout ports. Run it from the project virtual environment; see `test/README.md`. The wider suite is in `test_internal/chip/test_l3.py`.
 
 See `docs/design/ARCHITECTURE.md` for the register map, host framing, timing and reset contract, and `docs/CLAIMS.md` for evidence and limitations.

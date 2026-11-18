@@ -2,6 +2,28 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Resume eFPGA with a measured configured-timing experiment
+
+- User requests diagnosis and execution on efpga, with standing session commit/
+  push authorization. Read current contracts, phase/CI policies and backlog;
+  preserve G1, hardware/ABI, retained physical controls and sealed inputs.
+- Authenticate40128859740/97f655a complete88,937,106-byte timing artifact, hash
+  d3ebcd915e82c6b9646648efe0053e2baf2d790312769beff707bb99e9d0f900.
+  Actual result:370registers,246endpoints,six16.122pspolicy-sensitive endpoints,
+  positive1.508933nsworst cell-only setup. No configured/physical closure.
+- Independent frame-to-native-latch comparison passes438/438bits in affected
+  LUT tile. Prepare full40tile/8736-bit check. Existing strong LE/LG feedback
+  counterexamples remain; coherent-boundary LG binary-constant SAT probe is
+  diagnostic only and does not resolve hazards/delay.
+- D-122 prepares one existing unused G.FF analysis-bit experiment, with exact
+  FASM/native-frame admission, matched unmodified controls and both loop policies.
+  No chip/image change or timing waiver. All acceptance flags stay false even
+  if sensitivity disappears.42focused checks/actionlint/embedded syntax pass;
+  exact original-capsule preparation succeeds. Source/core/input files unchanged.
+- Next publish scoped tool/test/docs/CI groups and inspect hosted configuration
+  and one-bit outcomes; then choose actual image/structural work from evidence.
+  No phase boxes ticked. Details:reports/R1_RESUMPTION_20261118.md.
+
 ## 2026-10-24 (stronger feedback cofactor counterexamples retained)
 **Finding:** own-feedback independence is insufficient. D121 now also compares every recursively encountered feedback cut fixed0 against independent arbitrary values, sharing all other boundaries. Local build/r1_boolean_support_v3:8own-feedback miters prove; of8stronger all-feedback miters,6prove and LE/LG produce counterexamples. Scratch individual-cut probes isolate native _0327_ (LE_I2 path, gate _0762_) and _0280_ (LG_I2 path, gate _0715_). These are counterexamples to the bounded expanded-cone claim, not silicon-defect witnesses; boundary cuts can overapproximate behavior. No timing waiver or acceptance.
 **Retained/next:**98focused tests PASS; an added guard ensures multiple feedback cuts vary independently, rather than all being forced to one shared value. Hosted40128629795 atbc13e60 runs the initial own-feedback diagnostic; preserve that source scope. The strengthened committed follow-up adds all-feedback cases without changing STA/physical hardware. Authenticate both hosted capsules, then reconcile the two I2 paths with selected routing and functional LUT support and establish hazard/delay treatment. G1 and all physical controls protected; no phase boxes/full-chip attempts.

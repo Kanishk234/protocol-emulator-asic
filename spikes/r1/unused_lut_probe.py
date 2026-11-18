@@ -123,7 +123,8 @@ def edge_trace():
         ('Tile_X2Y4_S_IO2/_097_', 'X', ('A0', 'A1', 'A2', 'A3', 'S0', 'S1'))]:
         lines += [f'puts "R1_EDGE_TRACE_CELL {cell}"', f'sta::report_constant {{{cell}}}']
         for pin in pins:
-            lines.append(f'sta::report_edges -from {{{cell}/{pin}}} -to {{{cell}/{output}}} -digits 6')
+            # Pinned OpenSTA2.7 accepts -from/-to here, but not newer -digits.
+            lines.append(f'sta::report_edges -from {{{cell}/{pin}}} -to {{{cell}/{output}}}')
     for endpoint in ('Tile_X2Y2_PRIM2T2S/_2158_/D', 'Tile_X2Y3_LUT4x8_ha/_1734_/D'):
         lines += [f'puts "R1_EDGE_TRACE_PATH {endpoint}"',
                   f'report_checks -to [get_pins {{{endpoint}}}] -path_delay max -group_path_count 1 -fields {{slew cap fanout}} -digits 6']

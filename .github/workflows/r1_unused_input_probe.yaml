@@ -51,7 +51,7 @@ jobs:
               bundle.extractall(root)
           Path('build/unused-lut-source.json').write_text(json.dumps(dict(run=run, artifact=artifact), indent=2)+'\n')
           PY
-          PYTHONPATH=tools python spikes/r1/unused_lut_probe.py prepare --capsule build/r1_timing --out build/r1_unused_input --target unused-input-select
+          PYTHONPATH=tools python spikes/r1/unused_lut_probe.py prepare --capsule build/r1_timing --out build/r1_unused_input --target unused-input-select --trace-edges
       - name: Measure original and one-bit candidate with both loop policies
         timeout-minutes: 10
         run: |

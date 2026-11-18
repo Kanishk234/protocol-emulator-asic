@@ -1,0 +1,6 @@
+{
+  ".github/workflows/gds.yaml": "b0f8ddf2e0f5a4fdaf824f662afdfc6ce84da791d127c299884481d099b1aa4e",
+  ".github/workflows/test.yaml": "986c05a7f04a675871462b71b7401f6e1e368a141a38f348b4d6a7be390d0f63",
+  ".github/workflows/docs.yaml": "9a61ef97f6dabf654792ea040f2c0afb8f763d17483d0fba52ce9ae72893dbb0",
+  ".github/workflows/fpga.yaml": "695d07a4acf9de12b4e6846f7a37ac7180326aa2d609e4d21d1344316fdbdf5e"
+}

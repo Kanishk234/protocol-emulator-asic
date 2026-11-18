@@ -5,7 +5,7 @@
 #   scripts/gl_local.sh                 synthesize src/ with Yosys onto the cmos5l cells, then test it
 #   scripts/gl_local.sh path/to/net.v   test a given netlist (e.g. the tt_submission/*.v from a gds run)
 #
-# Uses the same PDK revision and the same Tiny Tapeout Icarus 13 build as tt-gds-action's gl_test.
+# Uses the PDK revision and Tiny Tapeout Icarus 13 build recorded by official run 44189196098.
 # Stock Icarus 12 does not drive the cell models' delayed_* timing-check nets, so every flop reads X
 # (docs/BUGS.md #1). Downloads are cached in ${XDG_CACHE_HOME:-~/.cache}/tripwire.
 #
@@ -16,13 +16,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-# Pinned to tt-gds-action@ihp-cmos5l install_sg13cmos5l.sh (IHP-Open-PDK dev, 2026-09-08). Update together.
-PDK_REV="${PDK_REV:-2bbec755dc67ca3db0261c3d6163e15735d66710}"
+# Qualified official run 44189196098; override PDK_ROOT only with matching submission models.
+PDK_REV="${PDK_REV:-89d42ee6d2fd9b50b86a1aada6fee6673c3e6008}"
 IVERILOG_DEB_URL="https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb"
 LIB_CORNER="sg13cmos5l_stdcell_typ_1p20V_25C.lib"
 
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/tripwire"
-PDK_ROOT="$CACHE/pdk-$PDK_REV"
+PDK_ROOT="${PDK_ROOT:-$CACHE/pdk-$PDK_REV}"
 REF="$PDK_ROOT/ihp-sg13cmos5l/libs.ref"
 IV="$CACHE/iverilog-13"
 

@@ -15,6 +15,9 @@ fi
 # shellcheck disable=SC1091
 source .venv/bin/activate
 
+# This entry point promises the complete suite, independent of old shell filters.
+unset TESTCASE COCOTB_TESTCASE COCOTB_TEST_FILTER TRIPWIRE_SKIP_SIGROK COCOTB_RESOLVE_X
+
 # OSS CAD Suite: appended (not prepended) so the system Icarus, the one CI uses, wins.
 if ! command -v verilator >/dev/null && [ -d "$HOME/oss-cad-suite/bin" ]; then
   export PATH="$PATH:$HOME/oss-cad-suite/bin"
@@ -63,7 +66,7 @@ echo "ok"
 step "L0-SYNTH: yosys synth sanity"
 SYNTH_LIBRARY=""
 if [ -f src/RM_IHPSG13_1P_512x16_c2_bm_bist.v ]; then
-  CHECK_PDK_REV=2bbec755dc67ca3db0261c3d6163e15735d66710
+  CHECK_PDK_REV=89d42ee6d2fd9b50b86a1aada6fee6673c3e6008
   CHECK_PDK_ROOT="${PDK_ROOT:-${XDG_CACHE_HOME:-$HOME/.cache}/tripwire/pdk-$CHECK_PDK_REV}"
   CHECK_LIB="$CHECK_PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib"
   if [ ! -s "$CHECK_LIB" ]; then
@@ -80,7 +83,7 @@ step "sigrok: UART decode of a VCD (toolchain smoke test)"
 python scripts/sigrok_smoke.py
 
 step "tools: pytest (tripsim model tests)"
-python -m pytest -q -n auto          # everything, slow tests included, in parallel
+python -m pytest -q -n "${TRIPWIRE_TEST_WORKERS:-4}"  # includes slow tests; avoid oversubscribing WSL
 
 step "test/: pin-level cocotb suite (RTL)"
 make -C test clean >/dev/null
@@ -90,9 +93,7 @@ if grep -q failure test/results.xml; then
   exit 1
 fi
 
-if [ -f test_internal/Makefile ]; then
-  step "test_internal/: white-box tests"
-  make -C test_internal
-fi
+step "test_internal/: white-box tests"
+make -C test_internal
 
 echo; echo "check_all: PASS"

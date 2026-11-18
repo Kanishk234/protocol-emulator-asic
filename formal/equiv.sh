@@ -9,8 +9,8 @@ set -euo pipefail
 TOP="$1"; shift
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PATH="$PATH:$HOME/oss-cad-suite/bin"
-PDK_REV="${PDK_REV:-2bbec755dc67ca3db0261c3d6163e15735d66710}"
-LIB="${XDG_CACHE_HOME:-$HOME/.cache}/tripwire/pdk-$PDK_REV/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib"
+PDK_REV="${PDK_REV:-89d42ee6d2fd9b50b86a1aada6fee6673c3e6008}"
+LIB="${PDK_ROOT:-${XDG_CACHE_HOME:-$HOME/.cache}/tripwire/pdk-$PDK_REV}/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 yosys -q -p "read_verilog -I$ROOT/src $*; synth -top $TOP -flatten; dfflibmap -liberty $LIB; abc -liberty $LIB;
   opt_clean; write_verilog -noattr $W/net.v" >/dev/null 2>&1

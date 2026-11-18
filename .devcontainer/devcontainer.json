@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.183.0/containers/ubuntu
 {
-  "name": "Tiny Tapeout Dev Container",
+  "name": "TRIPWIRE Development",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
@@ -25,6 +25,5 @@
       "dockerDashComposeVersion": "none"
     }
   },
-  "postCreateCommand": "echo 'source /ttsetup/venv/bin/activate' >> ~/.bashrc",
-  "postStartCommand": "/ttsetup/copy_tt_support_tools.sh"
+  "postCreateCommand": "bash scripts/setup_venv.sh"
 }

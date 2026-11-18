@@ -27,7 +27,7 @@ $(error Set PDK_ROOT to the matching submission PDK)
 endif
 CELLS = $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog
 VERILOG_SOURCES = $(CELLS)/sg13cmos5l_stdcell.v $(CELLS)/sg13cmos5l_udp.v $(MACRO_MODELS) \
-                  $(NETLIST) $(CURDIR)/tb_chip.v
+                  $(NETLIST) $(CURDIR)/tb_chip_gl.v
 COMPILE_ARGS += -DFUNCTIONAL -DGL_TEST -DSIM
 COCOTB_RESULTS_FILE = results_gl.xml
 endif

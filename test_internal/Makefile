@@ -6,7 +6,7 @@ l1:
 	$(MAKE) -C pin FULL=0
 	$(MAKE) -C pin FULL=1
 chip:
-	$(MAKE) -C chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot
+	$(MAKE) -C chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3
 l2:
 	$(MAKE) -C l2 L2_CYCLES=1000000
 injections:

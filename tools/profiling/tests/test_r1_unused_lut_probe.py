@@ -95,3 +95,31 @@ def test_complete_negative_or_positive_measurement_never_becomes_acceptance(tmp_
     result = json.loads((tmp_path / 'result.json').read_text())
     assert result['hypothesis_supported'] is supported
     assert result['timing_acceptance'] is False and result['loaded_candidate_tested'] is False
+
+
+def input_fixture(init=0xA0A0):
+    features, spec, module, state = fixture()
+    entries = spec['TileSpecs']['X2Y3']; entries['J2END_CD_END1.LD_I1'] = entries['G.FF']
+    for bit in range(16):
+        key = 'D.INIT' if bit == 0 else f'D.INIT[{bit}]'
+        entries[key] = {355 + bit: '1'}
+        frame, offset = divmod(355 + bit, 32)
+        name = f'init{bit}'
+        module['cells'][name] = dict(type='sg13cmos5l_dlhq_1', connections={
+            'D': [module['ports']['FrameData']['bits'][offset]],
+            'GATE': [module['ports']['FrameStrobe']['bits'][frame]], 'Q': [300 + bit]})
+        state[name] = str((init >> bit) & 1)
+        if init >> bit & 1: features.append('X2Y3.' + key)
+    return features, spec, module, state
+
+
+@pytest.mark.parametrize('fault', [None, 'used_route', 'dependent', 'observation'])
+def test_rerouting_input_requires_both_unused_route_and_independent_observed_function(fault):
+    args = input_fixture(init=0xCCCC if fault == 'dependent' else 0xA0A0)
+    if fault == 'used_route': args[0].append('X2Y3.J2MID_CDa_END1.LD_I1')
+    if fault == 'observation': args[3]['init0'] = '1'
+    if fault is None:
+        bit = probe.unused_input_bit(*args)
+        assert bit['observed_init'] == 0xA0A0 and bit['cofactor_addresses_checked'] == 16
+    else:
+        with pytest.raises(ValueError): probe.unused_input_bit(*args)

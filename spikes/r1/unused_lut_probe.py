@@ -116,7 +116,22 @@ def change_case(text, bit):
     return text.replace(original, replacement, 1).replace(guard, changed_guard, 1)
 
 
-def prepare(capsule, out, target='unused-output-register'):
+def edge_trace():
+    lines = ['puts "R1_EDGE_TRACE_BEGIN"']
+    for cell, output, pins in [
+        ('Tile_X2Y3_LUT4x8_ha/_0776_', 'X', ('A0', 'A1', 'S')),
+        ('Tile_X2Y4_S_IO2/_097_', 'X', ('A0', 'A1', 'A2', 'A3', 'S0', 'S1'))]:
+        lines += [f'puts "R1_EDGE_TRACE_CELL {cell}"', f'sta::report_constant {{{cell}}}']
+        for pin in pins:
+            lines.append(f'sta::report_edges -from {{{cell}/{pin}}} -to {{{cell}/{output}}} -digits 6')
+    for endpoint in ('Tile_X2Y2_PRIM2T2S/_2158_/D', 'Tile_X2Y3_LUT4x8_ha/_1734_/D'):
+        lines += [f'puts "R1_EDGE_TRACE_PATH {endpoint}"',
+                  f'report_checks -to [get_pins {{{endpoint}}}] -path_delay max -group_path_count 1 -fields {{slew cap fanout}} -digits 6']
+    lines += ['puts "R1_EDGE_TRACE_END"']
+    return '\n'.join(lines) + '\n'
+
+
+def prepare(capsule, out, target='unused-output-register', trace_edges=False):
     capsule, out = Path(capsule).resolve(), Path(out).resolve()
     plan = json.loads((capsule / 'analysis/plan.json').read_text())
     def resolve(name):
@@ -169,6 +184,10 @@ def prepare(capsule, out, target='unused-output-register'):
     for policy in ('static', 'dynamic'):
         source = (capsule / 'analysis' / (policy + '.tcl')).read_text()
         for label, text in [('control', source), ('candidate', change_case(source, bit))]:
+            if trace_edges:
+                if text.count('puts "RUNSTA_END"') != 1:
+                    raise ValueError('Missing unique original report terminator')
+                text = text.replace('puts "RUNSTA_END"', edge_trace() + 'puts "RUNSTA_END"')
             name = label + '_' + policy + '.tcl'
             (out / name).write_text(relocate(text))
             scripts[name] = sha(out / name)
@@ -188,6 +207,7 @@ def prepare(capsule, out, target='unused-output-register'):
                  capsule / 'support/cases.json', resource / 'resource-control.json'):
         inputs[path] = sha(path)
     result = dict(source_run=SOURCE_RUN, source_sha=SOURCE_SHA, target=target, change=bit,
+                  read_only_edge_trace=trace_edges,
                   input_sha256={str(p): value for p, value in inputs.items()},
                   scripts_sha256=scripts, timing_acceptance=False,
                   loaded_candidate_tested=False, runner_paths_relocated=True)
@@ -215,7 +235,7 @@ def audit(out):
                   hypothesis_supported=not rows['candidate']['loop_policy_sensitive'],
                   timing_acceptance=False, physical_acceptance=False,
                   loaded_candidate_tested=False, production_hardware_changed=False,
-                  scope='One analysis-only unused LUT FF case bit; no delay/hazard, functional, extracted or full-chip qualification.')
+                  scope='One analysis-only existing configuration bit; no delay/hazard, functional, extracted or full-chip qualification.')
     (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
 
@@ -226,8 +246,9 @@ if __name__ == '__main__':
     parser.add_argument('--capsule', type=Path)
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--target', choices=('unused-output-register', 'unused-input-select'), default='unused-output-register')
+    parser.add_argument('--trace-edges', action='store_true')
     args = parser.parse_args()
     if args.mode == 'prepare':
-        prepare(args.capsule, args.out, args.target)
+        prepare(args.capsule, args.out, args.target, args.trace_edges)
     else:
         audit(args.out)

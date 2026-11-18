@@ -123,3 +123,10 @@ def test_rerouting_input_requires_both_unused_route_and_independent_observed_fun
         assert bit['observed_init'] == 0xA0A0 and bit['cofactor_addresses_checked'] == 16
     else:
         with pytest.raises(ValueError): probe.unused_input_bit(*args)
+
+
+def test_edge_observer_adds_reports_without_changing_timing_constraints():
+    trace = probe.edge_trace()
+    assert 'sta::report_edges' in trace and 'sta::report_constant' in trace
+    assert 'report_checks -to' in trace
+    assert not any(command in trace for command in ('set_case_analysis', 'set_disable_timing', 'set_false_path'))

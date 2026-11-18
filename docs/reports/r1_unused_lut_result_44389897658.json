@@ -1,0 +1,24 @@
+{
+  "run": 44389897658,
+  "source_sha": "24425252e1bd08e3cf395c2467cc8c2d4cc269df",
+  "artifact_id": 14468410669,
+  "archive_sha256": "ac20f4b48a1b3ffea605469a9f67a6136458a3ac381110663c11b492497b3ccc",
+  "configuration_tiles": 40,
+  "configuration_bits": 8736,
+  "configuration_audit_passed": true,
+  "change": {
+    "tile": "Tile_X2Y3_LUT4x8_ha",
+    "cell": "_1421_",
+    "frame": 9,
+    "data_bit": 12,
+    "tile_bit": 300,
+    "before": "0",
+    "after": "1",
+    "feature": "X2Y3.G.FF"
+  },
+  "hypothesis_supported": false,
+  "control_and_candidate_endpoint_results_identical": true,
+  "control_sensitive_endpoints": 6,
+  "timing_acceptance": false,
+  "physical_acceptance": false
+}

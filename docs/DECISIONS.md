@@ -1,5 +1,12 @@
 # Decisions
 
+## D-123: Reroute one provably irrelevant LUT input in the measured inter-tile cycle
+- **Date:**2026-11-18. **Status:** bounded analysis diagnostic, no production or bitstream adoption.
+- **Measured basis:** D122run44389897658 reproduces all six original timing sensitivities. G.FF0→1changes none of them; reject that hypothesis. Its independent full-grid audit compares all8736bits in40tiles to the loaded image with0mismatches. The actual loop report crosses X2Y3LUT→X2Y4southI/O→X2Y3LD_I1; single-tile root feedback probes alone miss this boundary cycle.
+- **General need/hypothesis:** unused LUT inputs still have physical default routes. Select an alternate existing source for LD_I1only after proving the loaded LUT truth table is independent of I1and FASM declares no route to LD_I1. Decode all16truth bits through the actual observed native-frame wiring and compare them with original FASM; INIT0xA0A0has identical I1cofactors at all16addresses. This is a binary function property, not a delay/hazard proof.
+- **Experiment:** change existing X2Y3.J2END_CD_END1.LD_I1selector bit213/frame6/data21/native latch_1526_,0→1in analysis only. Preserve original source/configuration, all active routes, LUT truth/modes, timing arcs and both original controls. Require exact original six-endpoint result before interpreting alternate selection. No random routing choice, timing exception, resynthesis, ABI change or G1modification.
+- **Cost/gate:** zero new hardware; one short cloud sensitivity measurement. A favorable observation only authorizes preparing the next reviewed actual-image functional experiment, not acceptance. Next would require actual loading/reset/reload/protocol parity and configuration cross-check; full extracted/macro/shell timing remains open.46focused guards pass plus full authenticated preparation and actionlint; hosted execution pending.
+
 ## D-122: Measure one unused LUT output-register case bit against the retained timing failure
 - **Date:**2026-11-18. **Status:** bounded analysis diagnostic, not a bitstream or hardware adoption.
 - **Evidence:** authenticated40128859740/97f655a capsule retains six loop-policy-sensitive endpoints despite positive ideal-wire setup. Existing all-feedback cofactors fail for LE/LG. New direct frame-pin comparison confirms all438observed LUT-tile configuration bits match the loaded quiescent image. G in X2Y3has no declared BEL feature or routed LG_O source in the original FASM; its INIT decodes as0and its existing FF-select bit is0.

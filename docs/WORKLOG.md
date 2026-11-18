@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Reject unused-output register change; trace inter-tile unused-input loop
+
+- Published153af66tools/6fd994ctests/03e3ffadocs/2442525CI. Run44389897658
+  completes, full result ZIP hash verified. Full-grid configuration check passes
+  all8736native latch bits across40tiles. D122G.FFcandidate is rejected: all
+  endpoint values and six timing-policy sensitivities remain exactly unchanged.
+  No image or hardware adoption. Receipt:reports/r1_unused_lut_result_44389897658.json.
+- Trace actual native loop through X2Y3LUT output76/S1BEG, X2Y4S_IO2_097_/
+  output53/N2BEG, returning via X2Y3N2MID/_0775_/_0776_/LD_I1. This loop
+  crosses tile boundaries; earlier single-tile LE/LG support is not its closure.
+- D123protects all active routes and proves observed D INIT0xA0A0independent
+  of unrouted I1using16cofactor checks and native frame/FASM agreement. Prepare
+  one existing alternate input-selector case bit213/frame6/data21/_1526_0→1.
+  No timing arcs disabled, no hardware/image change, no acceptance inferred.
+-46focused local tests pass, actionlint and original-capsule preparation pass.
+  Next publish/inspect this short sensitivity follow-up. If supported, actual
+  opt-in image/reset/reload/full-shell/protocol tests precede physical work.
+  No phase boxes ticked. G1and sealed held-out set remain untouched.
+
 ## 2026-11-18 — Resume eFPGA with a measured configured-timing experiment
 
 - User requests diagnosis and execution on efpga, with standing session commit/

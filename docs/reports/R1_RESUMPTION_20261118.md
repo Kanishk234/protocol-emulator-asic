@@ -38,6 +38,20 @@ preparation succeeds. An initial console-pytest invocation overrode import paths
 the project's python -m pytest invocation passes without bypasses. No tool or
 hardware failure is inferred from that invocation error.
 
+**Measured D-122 result:**44389897658/2442525SUCCESS means the diagnostic ran.
+Its candidate hypothesis is rejected: every endpoint result and all six timing
+sensitivities are identical to control. No actual configuration change adopted.
+The independent full-grid audit passes8736/8736bits in40tiles. Whole result ZIP
+14468410669verified against ac20f4b48a1b3ffea605469a9f67a6136458a3ac381110663c11b492497b3ccc.
+Compact receipt:r1_unused_lut_result_44389897658.json.
+
+**D-123 follow-up:** the actual loop includes LUTtileS1BEG→southI/O N2BEG→
+LUTtileN2MID→LD_I1. That input is unrouted in FASM and the observed LUT D truth
+0xA0A0is independent of I1at all16addresses. Probe only its existing alternate
+selector bit213/frame6/data21/_1526_ (0→1). Used routes and LUT behavior are
+protected by explicit guards; candidate remains analysis-only until real image
+load/reset/protocol testing.46focused tests and authenticated preparation pass.
+
 ## Work sequence
 
 1. Complete the full-grid configuration audit and one-bit sensitivity probe.

@@ -82,7 +82,7 @@ jobs:
           PYTHONPATH=tools python spikes/r1/finish_leaf.py prepare --capsule build/r1_timing \
             --routed build/finish_source/context_route --producer build/finish-producer.json --out build/leaf_finish
           bash spikes/cloud/fetch_pdk.sh
-      - name: Finish exact routed leaf with physical checks and extracted reports
+      - name: Finish exact routed leaf with repeated-stage-aware guards
         timeout-minutes: 55
         run: |
           set -euo pipefail

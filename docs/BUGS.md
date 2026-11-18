@@ -446,3 +446,12 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: equal-duty stimulus rounded an odd period without applying the protocol's low-time minimum; Standard-mode START spacing also inherited a quarter-period default.
 - Fix: use 60 high / 65 low clocks at 400 kHz and mode-specific START/STOP spacing. Enforce mode-specific high/low limits and ACK setup thresholds, including the first low phase after START; retain a valid 1 MHz / 260 ns high stress case.
 - Check: eight transaction scenarios plus five independent controller timing checks pass; chip RTL passes all three corrected scenarios. The final official-netlist replay is recorded in PHASE3_I2C_MEMORY.md. No hardware or signoff change.
+
+
+### 2026-11-18 — Phase 3 ACK setup oracle retained an interrupted low interval
+- Reported by: the external review supplied by the user, checked against main 5bd91d0.
+- Symptom: a sampled SDA sequence low/high/low before SCL rises was credited from the first low. The old checker accepted three reported setup clocks even though the final stable interval was only one clock. This is an oracle weakness, not an observed chip failure.
+- Root cause: setdefault(first_low) was never cleared when SDA returned high; the high-phase check alone could not detect a low-phase interruption. Controller drive and additional SCL edges could also mask an invalid ACK window.
+- Fix: restart the low timer whenever SDA is high or the controller stops releasing it. Freeze the measurement at the first SCL rise and reject subsequent rises, controller drive during ACK high, and high-phase data changes. Reserve one observation clock when converting the sampled interval to a conservative setup bound; retain the original protocol thresholds.
+- Check: eleven adversarial/boundary cases cover interruption, late assertion, recovery with enough setup, short setup, extra clock edges and ACK-high instability. The final suite fails ten cases on the original checker and passes all eleven after correction. Full model/RTL/official-netlist revalidation is recorded in the updated Phase 3 memory report and its correction receipt.
+- Scope: supersedes the Phase 3 ACK setup measurement interpretation. The checker did not exist at qualified Phase 2 revision e19556e. No Phase 2 RTL, signoff, official workflow or physical artifact is changed; functional peer/readback results are not silently reclassified as timing proofs.

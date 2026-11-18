@@ -1,5 +1,13 @@
 # Phase 3 first milestone: SRAM-backed I2C memory firmware
 
+## ACK checker correction
+
+An external review identified a reproduced weakness in the original setup oracle: it retained the first low observation even if SDA returned high before the ACK clock. Earlier setup figures in `phase3_i2c_memory_result.json` are historical sampled spans from that checker and must not be treated as validated conservative bounds. Functional readback and the independent RTL-peer evidence are separate from this oracle.
+
+The corrected monitor measures the final continuous sampled-low run while the controller releases SDA. It rejects ACK-high changes, controller drive and extra SCL rises. It also subtracts one observation clock to avoid treating the separation of sampled edges as exact physical time. This remains a digital sampled check, not analog/pad characterization or a proof that excludes unobserved sub-clock transients. Corrected model, RTL and exact-official-netlist revalidation all pass. Current hashes, the false-acceptance reproducer and XML hashes are in `phase3_i2c_ack_revalidation.json`; the original receipt is preserved rather than rewritten.
+
+No Phase 2 rollback is required: this checker was introduced in Phase 3 and is absent from the qualified Phase 2 source. The RTL, physical inputs, official workflow files and netlist remain unchanged.
+
 ## Implementation and scope
 
 `programs/i2c_target_eeprom.trw` is a volatile 256-byte I2C memory target with a configurable seven-bit address, eight-byte page-write wrap, a persistent current-address pointer between transactions, repeated-START random reads and sequential reads wrapping at 256 bytes. Writes commit immediately. It is not a drop-in emulation of every 24xx02 variant: there is no nonvolatile retention, write-protect pin, write-cycle busy interval or vendor-specific address aliasing. Start from the supplied 0xFF image. Host changes to SRAM need a pointer refresh before using the read cache.
@@ -21,18 +29,18 @@ The routine bounds come from tripc and exclude external output stalls as documen
 
 The shared external controller drives complete-byte transactions and monitors ACK at the pads. Its timing checks enforce 1.3 us SCL low at 400 kHz and mode-specific START/STOP spacing; separate edge tests include the first data clock after START. Expected read bytes are fixed independently from firmware. The scenario covers the initial image, nontrivial writes and readback, address mismatch, pointer-only writes, repeated START, current-address reads, eight-byte page wrap, 255-to-0 read wrap, final-byte NACK and recovery. Both model and RTL checks require sigrok; decoding cannot silently skip. RTL also checks that the target never drives SDA high or drives SCL. ACK assertions enforce the applicable NXP data-setup minimum, including 20 ns quantization, and reject SDA changes during the sampled ACK-high phase.
 
-- Model: eight combinations (addresses 0x50/0x2A; exact 100 kHz, 400 kHz, 1 MHz and 1 MHz short-high waveform) pass with no skips. Five additional checks reject an invalid 400 kHz low interval and independently inspect emitted SCL edges in all four profiles, including the first low phase after START.
+- Model: eight combinations (addresses 0x50/0x2A; exact 100 kHz, 400 kHz, 1 MHz and 1 MHz short-high waveform) pass with no skips. Five additional checks reject an invalid 400 kHz low interval and independently inspect emitted SCL edges in all four profiles, including the first low phase after START. Eleven oracle-focused adversarial/boundary cases also pass; ten fail on the original checker, demonstrating the regression coverage.
 - Chip RTL: one cocotb test executes three complete scenarios, at exact 400 kHz, exact 1 MHz and 1 MHz with SCL high for 13 clocks (260 ns).
-- Regular model/compiler regression: 349 passed, non-slow suite.
-- Exact official-netlist replay: 1/1 cocotb test passes all three corrected profiles with zero skips/failures, required sigrok decoding and explicit ACK setup checks (344.29 s runner wall time). The netlist is unchanged from successful official run 44189196098. Compact input hashes, XML hashes, resource usage and observations are in `phase3_i2c_memory_result.json`.
+- Regular model/compiler regression: 360 passed, non-slow suite.
+- Exact official-netlist replay: 1/1 cocotb test passes all three corrected profiles with zero skips/failures, required sigrok decoding and explicit ACK setup checks (329.28 s runner wall time). The netlist is unchanged from successful official run 44189196098. Current checker/revalidation hashes are in `phase3_i2c_ack_revalidation.json`; original resource/functional observations remain in `phase3_i2c_memory_result.json`.
 
-Observed minimum ACK setup before the SCL rising edge:
+Conservative sampled ACK setup bounds before the SCL rising edge (final low run minus one observation clock):
 
-| Controller period / high phase | Model / RTL setup minimum |
+| Controller period / high phase | RTL / official-gate setup bound |
 |---|---:|
-| 125 / 60 clocks (400 kHz) | 32 clocks / 640 ns |
-| 50 / 25 clocks (1 MHz) | 12 clocks / 240 ns |
-| 50 / 13 clocks (1 MHz, short high) | 18 clocks / 360 ns |
+| 125 / 60 clocks (400 kHz) | 31 clocks / 620 ns |
+| 50 / 25 clocks (1 MHz) | 11 clocks / 220 ns |
+| 50 / 13 clocks (1 MHz, short high) | 17 clocks / 340 ns |
 
 These are sampled digital pad-level observations at a 20 ns simulation clock, not WNS, extracted timing or characterized pad timing. The model additionally passes 100 kHz. Analog rise/fall behavior, mid-byte aborts, exhaustive traffic and a compiler-derived ACK bound remain unqualified. Independent RTL-peer interoperability is subsequently verified in [the peer milestone](PHASE3_I2C_PEER.md). The Phase 3 EEPROM exit item is not ticked by this milestone alone.
 

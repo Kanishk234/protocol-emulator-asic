@@ -1,0 +1,125 @@
+{
+  "scope": "Phase 3 ACK oracle correction and revalidation; no Phase 2 hardware/signoff change",
+  "base_commit": "5bd91d011081d0d5bef778a88aa3a9701fdffe8d",
+  "original_checker_sha256": "42fd4f5bf10b4cec47b70434cd9e243cda8c488995c8a463bde1b31a73093605",
+  "corrected_checker_sha256": "9b4a87173e25cf073c04a02c0d41d258b053db606acca3062d50d638896967b9",
+  "reproducer": {
+    "sampled_scl_sda": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "final_stable_run_clocks": 1,
+    "required_setup_clocks": 3,
+    "before": {
+      "recorded_setup_clocks": 3,
+      "accepted": true
+    },
+    "after": {
+      "recorded_setup_clocks": 0,
+      "accepted": false
+    }
+  },
+  "oracle_regressions": {
+    "cases": 11,
+    "original_failed": 10,
+    "original_passed": 1,
+    "corrected_passed": 11,
+    "before_log_sha256": "f381cb68b76ac6c57161ff59c55276f3e4156c6ba7d4a0243d20e3528cc67381"
+  },
+  "model_regression": {
+    "passed": 360,
+    "failed": 0,
+    "slow_excluded": true,
+    "focused_cases_included": 24,
+    "log_sha256": "716cc14897a476cce26bdc1149cbfb857590c79e3495c47a5b23e9949f46872e"
+  },
+  "edge_observation_reserve_clocks": 1,
+  "clock_ns": 20,
+  "results": {
+    "rtl": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "profiles": 3,
+      "setup_bound_clocks": [
+        31,
+        11,
+        17
+      ],
+      "setup_bound_ns": [
+        620,
+        220,
+        340
+      ],
+      "xml_sha256": "2198754edc491ce8c7b2f36660e1c67aabeb8418e002a443a5bdeeeea4cb3f88",
+      "log_sha256": "22917107a139967d34ab54a5896a2c70ee61363c193b3958c69071f5ed146614",
+      "simulation_ns": 7035900.0
+    },
+    "official_gate": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "profiles": 3,
+      "setup_bound_clocks": [
+        31,
+        11,
+        17
+      ],
+      "setup_bound_ns": [
+        620,
+        220,
+        340
+      ],
+      "xml_sha256": "a76e3260ce5997cc4c9abe0ce4a982722982b94bd9da17062d209b4da149a57d",
+      "log_sha256": "954eff664c6c7bd77b105b35257ecb1a6cf721e347918b1f78f6dd2265e03941",
+      "simulation_ns": 7035900.0
+    }
+  },
+  "official_run": 44189196098,
+  "official_netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+  "pdk_version": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+  "sigrok_required": true,
+  "sdf_annotated": false,
+  "supersedes": {
+    "file": "docs/reports/phase3_i2c_memory_result.json",
+    "sha256": "a1319fa263dc0aa72a4deb04f0e1237207aef5463da5d42d95123a4fc79af537",
+    "scope": "ACK setup interpretation only; preserve historical functional receipt"
+  },
+  "checker_absent_from_phase2_source": true,
+  "qualified_input_check": {
+    "physical_inputs_match": true,
+    "replay_encodings_match": true,
+    "official_workflow_unchanged": true,
+    "signoff_policy_changed": true,
+    "raw_magic_zero_claimed": false,
+    "screen_run": 44017640255,
+    "route_extraction_run": 44031468510,
+    "full_protocol_run": 44123392388,
+    "official_gds_signoff": false
+  },
+  "source_hashes": {
+    "tools/protomodels/i2c_memory.py": "9b4a87173e25cf073c04a02c0d41d258b053db606acca3062d50d638896967b9",
+    "tools/kernels/tests/test_i2c_target_eeprom.py": "4c9847528389cccb0f66d2e3e663f7ff18e087efd8f58b89f9fb76a62690766e",
+    "test_internal/chip/test_phase3.py": "bba69e23a84fef9e9d2e9b35de66596eb5c0f34e4e2fee5f0de7783c4576c065",
+    "programs/i2c_target_eeprom.trw": "c09703cddc20045ebeacaf43f58372c381f753f0e1c6238444bd567bab5b293d"
+  },
+  "limitations": [
+    "Conservative sampled digital setup bound, not analog/pad characterization",
+    "Unobserved sub-clock transients are outside this sampler",
+    "Compiler-derived bound and additional recovery cases remain open"
+  ]
+}

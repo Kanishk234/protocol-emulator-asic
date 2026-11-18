@@ -16,6 +16,13 @@
 
 Phase 2 closed November 18 on 8×4, two lanes and four units. The original dates below are planning targets, not completion evidence. MEM and CAPTURE helpers remain deferred by ARCHITECTURE §8; showcase programs must first use existing primitives and SRAM routines. Any helper proposal requires a separate architectural decision and approval before implementation. The stock `fpga` workflow targets the Tiny Tapeout template board; it is not evidence of a Basys 3 build.
 
+## Immediate execution order
+
+1. Correct the ACK setup oracle, add adversarial controls, and revalidate model/RTL/exact official-netlist timing. Completed locally; see `phase3_i2c_ack_revalidation.json` and the memory report. This is a Phase 3 verification correction, not a Phase 2 rollback.
+2. Add explicit recovery scenarios beyond the existing complete-byte NACK/STOP cases.
+3. Establish context-specific compiler reaction bounds; continue formal proofs against the actual RTL.
+4. Consider any hardware feasibility branch only after a measured workload demonstrates the missing capability. No second PULSE unit or architecture change is approved by this plan.
+
 ## Current implementation inventory
 
 The first new firmware personality is `i2c_target_eeprom.trw`; see [its scope and evidence](../../reports/PHASE3_I2C_MEMORY.md). The existing `onewire.trw`, `ps2_host.trw`, `ws2812.trw` and `dshot.trw` already have model/RTL/routed scenarios from Phase 2; audit the additional Phase 3 requirements rather than recreating those programs. L3B-PEER now passes on an independent controller; see [the evidence](../../reports/PHASE3_I2C_PEER.md). SPI flash, the UART multicast showcase, capture replay, metamorphic coverage, formal proofs, compiler analysis and the Basys 3 build remain open. D-021 still records the Hardcaml H0 import decision as not run; resolve it before any conditional H1 work. See [the in-progress summary](../../summaries/PHASE3.md).

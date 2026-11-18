@@ -4,6 +4,10 @@ For current implementation-level evidence, see the [22 routed scenarios](../docs
 
 TRIPWIRE firmware in the `.trw` language, compiled by `tools/tripc`. The language is documented at the top of `tools/tripc/compiler.py`.
 
+`analysis/i2c_memory_response.json` holds opt-in conditional lane-token response
+queries for the two memory examples at default address 0x50. It is analysis data,
+not loaded firmware. See [the 4/2-clock bounds and their assumptions](../docs/reports/PHASE3_ACK_TOKEN_BOUND.md).
+
 | Program | Role | Slots | Routines | Verified on the model (simulation) |
 |---|---|---|---|---|
 | `uart.trw` | UART 8N1, TX + RX in one lane, framing errors reported (also MIDI at 31 250 baud) | 4 | — | Reference line model and sigrok, up to 1 Mbaud; 256-byte loopback |

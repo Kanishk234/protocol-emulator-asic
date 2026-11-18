@@ -77,3 +77,7 @@ waits, competing arrivals and pin-unit scheduling under explicit environment
 contracts. Include the guarded variant's multicast/reset window. Then match
 the compiler bound to independent model/RTL pin observations. Do not substitute
 the conditional seven-clock primitive path for that workload proof.
+
+Follow-up: the [conditional token-response checker](PHASE3_ACK_TOKEN_BOUND.md)
+now accounts for the compare/flag/ACK action chain. Its lane-local bound remains
+separate from the unresolved queues, entry invariants and pin scheduling.

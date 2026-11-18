@@ -1,0 +1,217 @@
+{
+  "scope": "Conditional visible-input-token to visible-output-token lane bounds; no pin-to-pin or whole-program certificate",
+  "base_commit": "4265e0536c41e6f4a0240a3b42f6f546fdb170a1",
+  "sources_sha256": {
+    "tools/tripc/response.py": "e5a1c6855609aa732a6379e9e51d6be33420ea4721945042eda4ba576a6e876f",
+    "tools/tripc/__main__.py": "0465d30729989349215ca03c66876282d7835933a19ca59076564154a98cc7e5",
+    "programs/analysis/i2c_memory_response.json": "6186c6f450078d422fe0069471b04ef488cb84e58a3c45c70f380cb62f92f450",
+    "tools/tripc/tests/test_response.py": "2145ff55a1fe17fc0a538d04d77f670757cdbee44e70370d0eaf2528e5904c7e",
+    "test_internal/lane/test_response_contracts.py": "f339e91f7891cbd4d1f40762e016af72c75b85c2fe44d832dec4bc4d52b62b61",
+    "test_internal/lane/Makefile": "2c7c47f1d8f0224e7f0522aa8c0d28759d98bc529e4dd3af6f0a688426fdf897"
+  },
+  "programs": {
+    "i2c_target_eeprom": {
+      "compiled_image_sha256": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "full_result_sha256": "a4ecd03340b1cefaaf666e8bf5f64ed807c289c7210e66f5808dcf441c752138",
+      "queries": {
+        "address_ack": {
+          "bound_clocks": 4,
+          "cases": 16,
+          "input_values": 2,
+          "flag_mask": 0,
+          "flag_value": 0,
+          "example": {
+            "input": 160,
+            "initial_flags": 0,
+            "status": "bounded",
+            "reason": "Expected response visible",
+            "trace": [
+              {
+                "clock": 0,
+                "state": 1,
+                "flags": 0,
+                "pending": 0,
+                "slot": 2
+              },
+              {
+                "clock": 1,
+                "state": 2,
+                "flags": 0,
+                "pending": 1,
+                "slot": null
+              },
+              {
+                "clock": 2,
+                "state": 2,
+                "flags": 1,
+                "pending": 0,
+                "slot": 3
+              }
+            ],
+            "response_clocks": 4,
+            "response_tag": 0,
+            "response_data": 0
+          }
+        },
+        "write_ack": {
+          "bound_clocks": 2,
+          "cases": 1024,
+          "input_values": 256,
+          "flag_mask": 2,
+          "flag_value": 2,
+          "example": {
+            "input": 0,
+            "initial_flags": 2,
+            "status": "bounded",
+            "reason": "Expected response visible",
+            "trace": [
+              {
+                "clock": 0,
+                "state": 4,
+                "flags": 2,
+                "pending": 0,
+                "slot": 6
+              }
+            ],
+            "response_clocks": 2,
+            "response_tag": 0,
+            "response_data": 0
+          }
+        }
+      }
+    },
+    "i2c_target_eeprom_guard": {
+      "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "full_result_sha256": "a4ecd03340b1cefaaf666e8bf5f64ed807c289c7210e66f5808dcf441c752138",
+      "queries": {
+        "address_ack": {
+          "bound_clocks": 4,
+          "cases": 16,
+          "input_values": 2,
+          "flag_mask": 0,
+          "flag_value": 0,
+          "example": {
+            "input": 160,
+            "initial_flags": 0,
+            "status": "bounded",
+            "reason": "Expected response visible",
+            "trace": [
+              {
+                "clock": 0,
+                "state": 1,
+                "flags": 0,
+                "pending": 0,
+                "slot": 2
+              },
+              {
+                "clock": 1,
+                "state": 2,
+                "flags": 0,
+                "pending": 1,
+                "slot": null
+              },
+              {
+                "clock": 2,
+                "state": 2,
+                "flags": 1,
+                "pending": 0,
+                "slot": 3
+              }
+            ],
+            "response_clocks": 4,
+            "response_tag": 0,
+            "response_data": 0
+          }
+        },
+        "write_ack": {
+          "bound_clocks": 2,
+          "cases": 1024,
+          "input_values": 256,
+          "flag_mask": 2,
+          "flag_value": 2,
+          "example": {
+            "input": 0,
+            "initial_flags": 2,
+            "status": "bounded",
+            "reason": "Expected response visible",
+            "trace": [
+              {
+                "clock": 0,
+                "state": 4,
+                "flags": 2,
+                "pending": 0,
+                "slot": 6
+              }
+            ],
+            "response_clocks": 2,
+            "response_tag": 0,
+            "response_data": 0
+          }
+        }
+      }
+    }
+  },
+  "case_domain": {
+    "address_values": [
+      "0xa0",
+      "0xa1"
+    ],
+    "write_data": "Every byte 0x00..0xff",
+    "initial_flags": "All f0..f2 combinations for address; f1=1 for write data",
+    "register_values": "Unknown unless explicitly assumed",
+    "initial_pipeline": "No EXEC, pending flags or routine",
+    "environment": "One held token, empty other input, free outputs, no new arrivals or host writes"
+  },
+  "focused_python": {
+    "passed": 39,
+    "log_sha256": "96b62e43f7b38936b1b1a35f07f789e0fcd5f0330e4034c67d0f10c0a140f7bf"
+  },
+  "full_python": {
+    "passed": 636,
+    "failed": 0,
+    "slow_excluded": true,
+    "log_sha256": "e0a788f9f607fc8bea580f4cc3a8e345e6b240e5c0ae095a64d252ed08771917"
+  },
+  "independent_model": {
+    "cases": 2080,
+    "register_assignments_per_case": 3,
+    "runs": 6240,
+    "alu_random_cases": 10000,
+    "alu_seed": 2756
+  },
+  "icarus": {
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 7.628745079040527,
+    "xml_sha256": "26c473a0161a1eb4fc80ac1e00d2248661c7e3d548e55dc1937a3c75021063ee",
+    "log_sha256": "d9696bc011104ebd6664f576efe13277072b80aa2a61b41b3cbe36dacdbc2d6e"
+  },
+  "verilator": {
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 3.740553379058838,
+    "xml_sha256": "b83c256ddd3e9e79afcc06507b03d63ed74a71585dc5c85e9a737442ffb7bb9e",
+    "log_sha256": "af676de93670c47018fcdeaa60564b774785af5b99e63c9e2acefbec20cf263d"
+  },
+  "icarus_full_lane": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 11.128331422805786,
+    "xml_sha256": "dbed299a180159ce666f589e1717b331dc44191c351c6b3e5a8d52e1e0b4097c",
+    "log_sha256": "b4923327f76a2b8216d932c99352a613f488d52472d23490dc6cd280551eb02d"
+  },
+  "unchanged_compiled_images": {
+    "count": 22,
+    "compared_against": "phase3_reaction_selection_result.json",
+    "log_sha256": "177c1d40d7ab3e35f8bb80b2702bd791103f5871c1385a2f306cca994191bba9"
+  },
+  "new_phase_exit_checkboxes": 0,
+  "formal_proof": false,
+  "whole_program_deadlock_certificate": false,
+  "pin_to_pin_bound": false,
+  "physical_inputs_unchanged": true,
+  "official_workflows_unchanged": true
+}

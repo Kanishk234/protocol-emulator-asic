@@ -4,6 +4,13 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-18 — Extend frozen detailed-route qualification
 
+- First hosted results: lut0 and lut1 in 44394572610 pass with zero router
+  violations and all 1347 required nets wired per context. Root rechecks all
+  prepared input/script/final ODB hashes and replays frozen inventories.
+  Primitive1 control 44394572275 also passes; its final ODB hash matches the
+  earlier qualified route exactly. Other 23 campaign contexts are pending.
+  Receipt: reports/r1_detailed_contexts_44394572610.json. Three of 26 contexts
+  now have observed detailed-route passes; no full-layout acceptance.
 - Observer 44393291255 confirms the candidate select changes S=0 to S=1 and
   OpenSTA disables the unselected data edge. The unchanged timing result is
   not explained by failure to apply that case value. Static/dynamic reports

@@ -1,0 +1,46 @@
+{
+  "run": 44394572610,
+  "source_sha": "5db0b642a9ea3c5d1c7b9a76f1ed74edf1a52716",
+  "reviewed_contexts": [
+    {
+      "passed": true,
+      "case": "lut0",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 1243,
+      "configuration_latches": 438,
+      "power_terminals": 2486,
+      "required_signal_nets_with_wires": 1347,
+      "routed_odb_sha256": "26be066e77012ee21fef0662d9d3502945780a77efc6ce5ef4f29b7fb4b98304"
+    },
+    {
+      "passed": true,
+      "case": "lut1",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 1243,
+      "configuration_latches": 438,
+      "power_terminals": 2486,
+      "required_signal_nets_with_wires": 1347,
+      "routed_odb_sha256": "52f373dadd61ba65bc024cddba8e5ba734293c25b7e0a9ccc9aba4c94972ea40"
+    }
+  ],
+  "remaining_contexts_in_campaign": 23,
+  "local_review": "Input, script and final ODB hashes checked; frozen inventories and required wire coverage replayed.",
+  "repeated_primitive_control": {
+    "run": 44394572275,
+    "passed": true,
+    "router_violations": 0,
+    "required_signal_nets_with_wires": 1557,
+    "routed_odb_sha256": "1a12a86bd7b0a12e035ac0d17c40e9077c089b0bcd86ce296003dc984514bd38"
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "scope": "Partial campaign only; no aggregate or full-chip acceptance."
+}

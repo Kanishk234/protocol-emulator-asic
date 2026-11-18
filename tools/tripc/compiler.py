@@ -38,6 +38,7 @@ from tripsim import asm, isa, pinregs
 from tripsim.pinunit import PinConfig
 
 from .expr import ExprError, evaluate
+from .reaction import analyze_lane
 
 LANE_SLOTS = 12
 SRAM_WORDS = 512
@@ -491,16 +492,28 @@ class Compiler:
         L += ["", "## Pins", "", "| Unit | Settings |", "|---|---|"]
         L += [f"| {u} | " + ", ".join(f"{k}={v}" for k, v in cfg.items()) + " |" for u, cfg in image["pins"].items()]
         L += ["", "## Reaction", "",
-              "An urgent slot reacts pin to pin in 7 clocks (ARCHITECTURE.md §5.5) when it is the "
-              "lowest-index ready slot and its output is free. Lower-index slots that are ready at "
-              "the same time fire first and delay it. Per-slot bounds need the phase 3 analysis "
-              "(VERIFICATION.md L6); v0 lists the slots that can pre-empt each urgent slot."]
+              "Local selection at one eligible EVAL, from encoded readiness predicates (ISA §4.2–4.3). "
+              "With no issuable routine, all earlier ready slots compete, including non-urgent slots. "
+              "With an issuable routine, an urgent slot competes only with earlier urgent slots.", "",
+              "A next-EVAL guarantee applies only IF the slot is ready, including input availability, "
+              "pending flags and a free output. Possible competitors give unknown delay, not a finite "
+              "clock bound. Unreachable program states may be included conservatively. "
+              "No end-to-end pin response, channel-progress or deadlock bound is established here; "
+              "the conditional 7-clock hardware path in ARCHITECTURE.md §5.5 is not a program bound.", "",
+              "| Urgent slot | Possible earlier slots: no routine | With issuable routine | Selection if ready |",
+              "|---|---|---|---|"]
         for i, l in sorted(self.lanes.items()):
-            urg = [k for k, (_, u, _) in enumerate(l.info) if u]
-            for k in urg:
-                before = [j for j in urg if j < k]
-                if before:
-                    L.append(f"- {l.name} slot {k}: can be pre-empted by urgent slots {before}")
+            for item in analyze_lane(l.words):
+                if not item['predicate_possible']:
+                    guarantee = 'predicate impossible'
+                elif item['selected_if_ready']:
+                    guarantee = 'next eligible EVAL'
+                elif item['selected_if_ready_with_issuable_routine']:
+                    guarantee = 'next EVAL only with an issuable routine; otherwise unknown'
+                else:
+                    guarantee = 'unknown delay'
+                L.append(f"| {l.name} slot {item['slot']} | {item['competitors_no_routine']} | "
+                         f"{item['competitors_with_issuable_routine']} | {guarantee} |")
         if self.warnings:
             L += ["", "## Warnings", ""] + [f"- {w}" for w in self.warnings]
         return "\n".join(L) + "\n"

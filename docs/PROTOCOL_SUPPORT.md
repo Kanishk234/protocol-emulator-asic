@@ -30,3 +30,7 @@ The maintained manual `protocol-replay` workflow replays this existing suite aga
 | `ir_nec_repeat_rx` | Passed in 22/22 replay; exact scenario in `test_l3.py` |
 
 No real-hardware testing is claimed. USB/Ethernet model work is not an ASIC support claim. Formal results apply only to the named properties and bounds in the verification documents. The retained stock FPGA workflow is not evidence of a Basys 3 build. Phase 3 expands independent peers, robustness and showcase evidence using the qualified general primitives.
+
+## Additional Phase 3 showcase
+
+The SRAM-backed I2C memory personality is verified separately from the historical 22-case run. It passes the independent model, chip RTL and the exact official final netlist at 400 kHz and 1 MHz, including the short-high waveform, with required sigrok decoding. See [its scope and hashed evidence](reports/PHASE3_I2C_MEMORY.md). This is volatile immediate-write memory, not full EEPROM conformance; independent RTL-peer and compiler-bound tasks remain open.

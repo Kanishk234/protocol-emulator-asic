@@ -1,0 +1,128 @@
+{
+  "scope": "Phase 3 local firmware simulation milestone; not phase completion",
+  "base_commit": "82fef005a6788717669a7404975f2b7f3d9a0e52",
+  "official_run": 44189196098,
+  "official_netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+  "pdk_version": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+  "simulators": {
+    "rtl": "Verilator 5.053 devel",
+    "gate": "Tiny Tapeout Icarus 13.0"
+  },
+  "sdf_annotated": false,
+  "sigrok_required": true,
+  "model_checks": {
+    "passed": 13,
+    "failed": 0,
+    "log_sha256": "0f2b726d6e800f497a94fbcf2c7bac057981f5870eeed8adcee1db0a3620ef05"
+  },
+  "model_regression": {
+    "passed": 349,
+    "failed": 0,
+    "slow_excluded": true,
+    "log_sha256": "06bf5e1c8d10886fe9619b05a7928c97ce92d7e07abb7e60cabd8dbdabd29241"
+  },
+  "rtl": {
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "profiles": 3,
+    "xml_sha256": "2b09aeff71695905254905686ba0340716908ebcee1267dce034927a2d5053ad",
+    "simulation_ns": 7035900.0
+  },
+  "gate": {
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "profiles": 3,
+    "xml_sha256": "c28e5049e3019e9c53a35dd4fb4afd341f2ecf336d77b4bb83c60923483b6f77",
+    "simulation_ns": 7035900.0
+  },
+  "observed_ack_setup": {
+    "rtl": [
+      {
+        "period": 125,
+        "high": 60,
+        "ack_setup_clocks": 32,
+        "ack_setup_ns": 640,
+        "required_setup_clocks": 5
+      },
+      {
+        "period": 50,
+        "high": 25,
+        "ack_setup_clocks": 12,
+        "ack_setup_ns": 240,
+        "required_setup_clocks": 3
+      },
+      {
+        "period": 50,
+        "high": 13,
+        "ack_setup_clocks": 18,
+        "ack_setup_ns": 360,
+        "required_setup_clocks": 3
+      }
+    ],
+    "gate": [
+      {
+        "period": 125,
+        "high": 60,
+        "ack_setup_clocks": 32,
+        "ack_setup_ns": 640,
+        "required_setup_clocks": 5
+      },
+      {
+        "period": 50,
+        "high": 25,
+        "ack_setup_clocks": 12,
+        "ack_setup_ns": 240,
+        "required_setup_clocks": 3
+      },
+      {
+        "period": 50,
+        "high": 13,
+        "ack_setup_clocks": 18,
+        "ack_setup_ns": 360,
+        "required_setup_clocks": 3
+      }
+    ]
+  },
+  "resources": {
+    "lane_slots": {
+      "L0": 12,
+      "L1": 11
+    },
+    "sram_words": 304
+  },
+  "source_hashes": {
+    "programs/i2c_target_eeprom.trw": "c09703cddc20045ebeacaf43f58372c381f753f0e1c6238444bd567bab5b293d",
+    "tools/protomodels/i2c_memory.py": "42fd4f5bf10b4cec47b70434cd9e243cda8c488995c8a463bde1b31a73093605",
+    "tools/kernels/tests/test_i2c_target_eeprom.py": "a8c7c1f87838b560474723bfc719d6ff12f2aef6e0f4a357997f0f307cb6a1fd",
+    "test_internal/chip/test_phase3.py": "bba69e23a84fef9e9d2e9b35de66596eb5c0f34e4e2fee5f0de7783c4576c065",
+    "test_internal/chip/Makefile": "e731edc6cb617f3a0f2898a61e12b55f7fe4d0d8c8ff05fb82d89c17ecd45454",
+    "tools/tripc/compiler.py": "49ad28b709aff1aba3c579ac2b12fee2f5d28c9067bcae2d1a7aaeceff0fcbf0",
+    "tools/tripwire_spec.py": "c4639854483651afcd78f49f1cfa4a31166483ac4e8a0bb9a332f1556b9a0669"
+  },
+  "model_hashes": {
+    "sg13cmos5l_stdcell.v": "485945f1b167daa68354548f46c95bdbff7d931516fc5b4edd47f2e2cd555735",
+    "sg13cmos5l_udp.v": "5491a3edf7468792b5222e7abe057e0583a407c01b2086d4fd44a55b6cf88055",
+    "RM_IHPSG13_1P_core_behavioral_bm_bist.v": "d0a6258f8e9c93d1d5b1f78c0a1d66f30d28b1ad8037e5e07f53d1a4e3670b12",
+    "RM_IHPSG13_1P_512x16_c2_bm_bist.v": "fc8a03068bc692d3db8e836446b0376a7bbf97ef1cbfda8fd1f29d77255eba01"
+  },
+  "compiler_report_sha256": "31649e5852d47f98c3b0d3b9d3a6e58742559213abf79b2c69d4a3637c952bbc",
+  "qualified_input_check": {
+    "physical_inputs_match": true,
+    "replay_encodings_match": true,
+    "official_workflow_unchanged": true,
+    "signoff_policy_changed": true,
+    "raw_magic_zero_claimed": false,
+    "screen_run": 44017640255,
+    "route_extraction_run": 44031468510,
+    "full_protocol_run": 44123392388,
+    "official_gds_signoff": false
+  },
+  "limitations": [
+    "Volatile immediate-write memory, not complete 24xx02 device emulation",
+    "Complete-byte scenarios, no mid-byte-abort qualification",
+    "No analog pad/RC characterization",
+    "Third-party RTL peer and compiler ACK-path proof remain open"
+  ]
+}

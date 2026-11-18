@@ -433,3 +433,16 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: the aggregator was optional and never supplied; local source/model defaults were inherited from experiments rather than the maintained checkout.
 - Fix: add a mandatory internal-suite aggregator, resolve paths with Make's CURDIR, use committed SRAM behavioral models, and default L2 to current src with a working-tree identity label. Retire CI's experiment-specific SRAM fetch.
 - Check: the actual aggregator's L1 suites pass, both full/lean pin modes pass; model tests pass 335/335 outside the restricted sandbox. Full chip/protocol/rotation 28/28 and top-level 3/3 pass; hashed receipts are in repository_cleanup_20261118.json. No RTL or acceptance gate changes.
+
+
+### 2026-11-18 — Internal GL target selected the RTL wrapper
+- Symptom: the maintained internal GATES target paired a `tt_um_tripwire` submission netlist with `tb_chip.v`, which instantiates the RTL-only `trw_chip` module. The new Phase 3 replay exposed the mismatch during runner review.
+- Root cause: the old experiment workflows overrode the source list; the standalone Makefile retained the RTL wrapper in both branches.
+- Fix: select `tb_chip_gl.v` in GATES mode. Keep the official netlist and official workflow files unchanged.
+- Check: the new EEPROM showcase compiles and passes on the exact official submission netlist (SHA-256 537f41ad...), using Tiny Tapeout Icarus 13 and the matching 89d42ee6 PDK. Final strengthened timing results are recorded in PHASE3_I2C_MEMORY.md.
+
+### 2026-11-18 — I2C memory test controller checked period without mode-specific phase limits
+- Symptom: the first 400 kHz stimulus used 62 high / 63 low clocks, giving only 1.26 us low instead of the Fast-mode minimum 1.3 us. The target passed it, but it was not a conforming Fast-mode waveform.
+- Root cause: equal-duty stimulus rounded an odd period without applying the protocol's low-time minimum; Standard-mode START spacing also inherited a quarter-period default.
+- Fix: use 60 high / 65 low clocks at 400 kHz and mode-specific START/STOP spacing. Enforce mode-specific high/low limits and ACK setup thresholds, including the first low phase after START; retain a valid 1 MHz / 260 ns high stress case.
+- Check: eight transaction scenarios plus five independent controller timing checks pass; chip RTL passes all three corrected scenarios. The final official-netlist replay is recorded in PHASE3_I2C_MEMORY.md. No hardware or signoff change.

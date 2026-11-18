@@ -67,3 +67,10 @@ D-138 is a prepared physical diagnostic, not a new passing-design claim. Its sou
 
 
 - **Host link throughput.** At SCK = clk/8 (the §9 limit) one HOST_OUT read (status and data in one transaction) takes ~560 clocks, so the host drains at most ~89K tokens/s at 50 MHz. A program that turns every received byte into a HOST_OUT token overruns its pin unit (§4.5: the new token is dropped and OVERRUN set) when bytes arrive faster than that: continuous UART RX above ~460 kbaud (a byte every ~1,085 clocks). Found by L3 on the RTL, 2026-09-27. Faster streams need buffering in firmware (a lane or SRAM ring) or a faster host clock.
+
+
+## Phase 3 firmware evidence
+
+| ID | Claim | Evidence | Status | Limits |
+|---|---|---|---|---|
+| 29 | The existing qualified chip runs SRAM-backed I2C memory firmware in the exercised 400 kHz and 1 MHz scenarios | [Milestone report](reports/PHASE3_I2C_MEMORY.md), phase3_i2c_memory_result.json: 13 focused model/controller checks; 349 model/compiler regressions; RTL and exact official NL each pass all three profiles with required sigrok; minimum sampled ACK setup 640/240/360 ns | simulated only | No new hardware/GDS/timing claim; volatile immediate writes, not full 24xx02 or electrical conformance. Mid-byte aborts, independent RTL peer, compiler-derived ACK bound and silicon testing remain unqualified. |

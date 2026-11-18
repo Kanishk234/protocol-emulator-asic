@@ -10,6 +10,7 @@ Start with [How it works](HOW_IT_WORKS.md), then the [qualified baseline](BASELI
 | Build and physical flow | [Physical design and CI](design/PHYSICAL_DESIGN_AND_CI.md) |
 | Current evidence | [Phase 2 result](reports/PHASE2_OFFICIAL_GREEN_44189196098.md), [warnings](reports/PHASE2_WARNING_REVIEW_44189196098.md) |
 | Protocol evidence and limits | [Support matrix](PROTOCOL_SUPPORT.md) |
+| Phase 3 progress | [Summary](summaries/PHASE3.md), [I2C memory milestone](reports/PHASE3_I2C_MEMORY.md) |
 | Upcoming work | [Phase 3 plan](design/phases/PHASE3_SHOWCASE_PROTOCOLS.md) |
 | Decisions and bugs | [Decisions](DECISIONS.md), [bugs](BUGS.md) |
 | Recent sessions | [Worklog](WORKLOG.md) |

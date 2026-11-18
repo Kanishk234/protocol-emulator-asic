@@ -6,6 +6,8 @@ A firmware-programmable protocol emulator for the Jane Street ASIC competition. 
 
 **Phase 2 is complete.** The full design passed the unchanged official Tiny Tapeout GDS, precheck, gate-level tests and viewer in [run 44189196098](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44189196098). The exact final netlist passed all 22 routed protocol cases. See the [qualified baseline and explicit SRAM signoff policy](docs/BASELINE.md) for evidence and limitations.
 
+Phase 3 is underway: firmware showcases and deeper verification on the qualified hardware. See the [progress summary](docs/summaries/PHASE3.md).
+
 ## Start here
 
 - [How the chip works](docs/HOW_IT_WORKS.md)

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Dates** | Nov 9 → Nov 29, 2026 |
+| **Dates** | Started November 18, 2026; original November 29 target needs review against remaining exit gates |
 | **Goal** | Demonstrate what makes TRIPWIRE different (fast device emulation, multicast, fixed reaction) with more protocols, and build the novel verification layers: independent oracles, metamorphic tests, core formal proofs and the compiler's deadlock/overrun analysis. Build the full design for the Basys 3 FPGA (D-022). |
 | **Devices needed** | None. The Basys 3 bitstream builds without a board. Phase 7 is where a board comes in, if one becomes available. |
 | **References** | `../ARCHITECTURE.md` §7–8, 13; `../VERIFICATION.md` §6 (L3–L6); `../PHYSICAL_DESIGN_AND_CI.md` §8 |
@@ -10,11 +10,15 @@
 ---
 
 ## 1. Entry criteria
-- Phase 2 exit checklist passed.
+- [x] Phase 2 exit checklist passed; cleanup publication CI green on 82fef00 (test 44261361247, unit 44261361115, lint 44261361015, docs 44261360970, repo-audit 44261361423; nightly 44346919822).
 
 ## Planning corrections before implementation
 
 Phase 2 closed November 18 on 8×4, two lanes and four units. The original dates below are planning targets, not completion evidence. MEM and CAPTURE helpers remain deferred by ARCHITECTURE §8; showcase programs must first use existing primitives and SRAM routines. Any helper proposal requires a separate architectural decision and approval before implementation. The stock `fpga` workflow targets the Tiny Tapeout template board; it is not evidence of a Basys 3 build.
+
+## Current implementation inventory
+
+The first new firmware personality is `i2c_target_eeprom.trw`; see [its scope and evidence](../../reports/PHASE3_I2C_MEMORY.md). The existing `onewire.trw`, `ps2_host.trw`, `ws2812.trw` and `dshot.trw` already have model/RTL/routed scenarios from Phase 2; audit the additional Phase 3 requirements rather than recreating those programs. SPI flash, the UART multicast showcase, third-party peers, capture replay, metamorphic coverage, formal proofs, compiler analysis and the Basys 3 build remain open. D-021 still records the Hardcaml H0 import decision as not run; resolve it before any conditional H1 work. See [the in-progress summary](../../summaries/PHASE3.md).
 
 ## 2. Tasks
 
@@ -29,7 +33,7 @@ Phase 2 closed November 18 on 8×4, two lanes and four units. The original dates
 | `ws2812.trw`, `dshot.trw` (PULSE mode) | Pulse widths within spec | Timing checker |
 | `uart_bridge_capture.trw` | UART RX multicast and TX loopback; a SRAM capture helper remains deferred | Demonstrates multicast; measure actual lane cost |
 
-- Adopt the ACK-path improvement noted in `ARCHITECTURE.md` §13 (preload the 1-bit SETN) and confirm the reaction bound in the compiler report.
+- Confirm the ACK reaction bound in the compiler report. Current I2C firmware already uses length-in-token for a single-bit ACK without a separate SETN token; assess that actual path rather than adding the older illustrative SETN sequence.
 
 ### 2.2 Independent oracles (owner: verification)
 1. **L3B-PEER:** integrate at least one third-party I2C core (controller role) and co-simulate it against our I2C target. Check the licence and record the source.

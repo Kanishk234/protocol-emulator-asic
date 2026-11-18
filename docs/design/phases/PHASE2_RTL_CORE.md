@@ -128,7 +128,7 @@ unsupported SRAM MagicDRC/abstract-overlap checks; no rawMagic-zero claim.
 - [x] AREA.md includes the full-design official result. *(44189196098row, committed metrics receipt official_result_44189196098.json.)*
 - [x] Bugs found are recorded. *(BUGS.md includes runner/dependency/harness issues, SRAM Magic incompatibility and read-only geometry diagnostic correction. No known unrecorded functional bug.)*
 
-All exit items have evidence on verified revisione19556e. Final documentation-publication CI must be green before Phase3entry.
+All exit items pass on verified revisione19556e. Closure revision7f3ae9a has test44227558895,lint44227558861,unit44227558788and docs44227558977allSUCCESS. Phase2is complete under D-185; see PHASE2_WARNING_REVIEW_44189196098.md for remaining integration/power-analysis limitations.
 
 ## 5. Risks in this phase
 | Risk | Response |

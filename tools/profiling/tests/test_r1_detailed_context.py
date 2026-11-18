@@ -27,3 +27,13 @@ def test_failed_process_cannot_accept_even_with_success_markers(tmp_path, code):
         audit(tmp_path)
     result = json.loads((tmp_path/'result.json').read_text())
     assert not result['passed'] and not result['physical_acceptance'] and not result['timing_acceptance']
+
+
+@pytest.mark.parametrize('field', ['cells', 'configuration_latches', 'power_terminals'])
+def test_context_resource_census_cannot_drift(field):
+    expected = dict(cells=1, configuration_latches=1, power_terminals=2)
+    text = ('CELL\tc0\tsg13cmos5l_dlhq_1\t0\t0\t1\t1\tR0\tPLACED\n'
+            'PGTERMS\t2\n')
+    expected[field] += 1
+    with pytest.raises(ValueError, match='census'):
+        check_inventories(text+'REQUIRED_NET\tn\t0\n', text+'REQUIRED_NET\tn\t1\n', expected)

@@ -468,3 +468,10 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: gating memory-lane delimiter consumption on rb==0 allowed a bounded routine to hold up a multicast delimiter, delaying later guard commands. A single select pulse also failed the late read-address/repeated-START boundary because transmit words can arrive after the pulse.
 - Fix: separate firmware option uses repeated generic deselection pulses and urgent delimiter consumption while the routine continues. No RTL or architecture change; the original one-unit program's limitation remains documented.
 - Check: restoring the rb guard in a scratch negative control reproduces failure; corrected firmware recovers. All190guarded model vectors, including30additional clock alignments, pass. RTL includes the formerly failing phase and twelve consecutive recovery cases. Exact-netlist replay status is in [the guard report](reports/PHASE3_I2C_GUARD.md).
+
+
+### 2026-11-18 — Compiler reaction report omitted non-urgent selection competitors
+- Symptom: the v0 report listed only earlier urgent slots as potential pre-emptors. An earlier non-urgent slot can win when no routine step is issuable; the list also included mutually exclusive states and token predicates. It was not an end-to-end timing certificate.
+- Root cause: source-order enumeration of urgent slots rather than encoded readiness compatibility and both ISA priority modes.
+- Fix: intersect readiness predicates and report both modes. Unsatisfied readiness and possible competitors do not receive finite delay guarantees. Keep end-to-end clock/channel/deadlock claims explicitly open.
+- Check: 24focusedtests include a normal slot before an urgent one, flag/state/tag/head conflicts, CALL/RB, pending/output stalls and the guarded memory program. A10000snapshotcross-check validates readiness and selection against the independent lane model.597fullmodel/compiler tests pass; all22firmware image dictionaries are unchanged. See [selection report](reports/PHASE3_REACTION_SELECTION.md). No Phase2hardware/signoff claim changes.

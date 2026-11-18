@@ -1,0 +1,105 @@
+name: R1 routed LUT leaf finishing
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_finish_leaf.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-finish-leaf
+  cancel-in-progress: false
+jobs:
+  finish:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_finish_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Check finishing guards
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_finish_leaf.py tools/profiling/tests/test_r1_detailed_context.py tools/profiling/tests/test_r1_detailed_leaf.py
+      - name: Authenticate original capsule and exact routed LUT artifact
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib, json, os, subprocess, sys, zipfile
+          from pathlib import Path
+          sys.path.insert(0, 'spikes/r1')
+          from unused_lut_probe import SOURCE_RUN, ARTIFACT_ID, ARCHIVE_SHA, context
+          repo = os.environ['GITHUB_REPOSITORY']
+          run = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{SOURCE_RUN}']))
+          artifact = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/artifacts/{ARTIFACT_ID}']))
+          context(run, artifact)
+          archive = Path(os.environ['RUNNER_TEMP']) / 'original-timing.zip'
+          with archive.open('wb') as output:
+              subprocess.run(['gh','api',f'repos/{repo}/actions/artifacts/{ARTIFACT_ID}/zip'], stdout=output, check=True)
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == ARCHIVE_SHA
+          root = Path('build/r1_timing'); root.mkdir(parents=True, exist_ok=False)
+          with zipfile.ZipFile(archive) as bundle:
+              names = bundle.namelist()
+              assert len(names) == len(set(names))
+              assert all(not Path(n).is_absolute() and '..' not in Path(n).parts for n in names)
+              bundle.extractall(root)
+          Path('build/unused-lut-source.json').write_text(json.dumps(dict(run=run, artifact=artifact), indent=2)+'\n')
+          PY
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib, json, os, subprocess, zipfile
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, 'spikes/r1')
+          from finish_leaf import identity
+          repo = os.environ['GITHUB_REPOSITORY']
+          run = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/44394572610']))
+          identity(run)
+          Path('build/finish-producer.json').write_text(json.dumps(run)+'\n')
+          artifact = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/artifacts/14469624444']))
+          expected = 'b1e1ab426d2ce41d232e8412833c74fa491de0f5b4a470ab2c6ccd7676d39146'
+          assert artifact['workflow_run']['id'] == 44394572610 and not artifact['expired']
+          assert artifact['name'] == 'r1-detailed-context-44394572610-lut0'
+          assert artifact['digest'] == 'sha256:'+expected
+          Path('build/finish-artifact.json').write_text(json.dumps(artifact)+'\n')
+          archive = Path(os.environ['RUNNER_TEMP'])/'routed-lut0.zip'
+          with archive.open('wb') as stream:
+              subprocess.run(['gh','api',f'repos/{repo}/actions/artifacts/14469624444/zip'], stdout=stream, check=True)
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == expected
+          with zipfile.ZipFile(archive) as bundle:
+              names = bundle.namelist()
+              assert len(names) == len(set(names))
+              assert all(not Path(n).is_absolute() and '..' not in Path(n).parts for n in names)
+              bundle.extractall('build/finish_source')
+          PY
+          PYTHONPATH=tools python spikes/r1/finish_leaf.py prepare --capsule build/r1_timing \
+            --routed build/finish_source/context_route --producer build/finish-producer.json --out build/leaf_finish
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Finish exact routed leaf with physical checks and extracted reports
+        timeout-minutes: 55
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/leaf_finish/image.json
+          timeout 3000s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e PYTHONPATH=tools "$image" \
+            python3 spikes/r1/finish_leaf.py inside --out build/leaf_finish > build/leaf_finish/finish.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-finished-lut0-${{ github.run_id }}
+          path: |
+            build/leaf_finish/
+            build/finish-producer.json
+            build/finish-artifact.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

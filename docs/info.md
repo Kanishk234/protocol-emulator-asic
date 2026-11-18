@@ -2,7 +2,7 @@
 
 TRIPWIRE is a firmware-programmable protocol emulator for the Jane Street Protocol Emulator ASIC Competition. Two lanes of triggered reflex instructions exchange tokens through a multicast channel fabric. Four timed pin units drive and sample the protocol pads; U0 also provides PULSE, carrier and BITSYNC features. A 512x16 SRAM holds routines and data. Programs and configuration are loaded over the host SPI port.
 
-The integrated design targets 50 MHz on 8x4 IHP CMOS5L tiles. UART, SPI and I2C are exercised with firmware and reference models. The candidate also has a passing 22-case routed protocol replay; this describes tested cases, not complete implementation of every protocol variant. No fabricated-chip measurements are available. Official full-design GDS/precheck qualification is still pending.
+The integrated design targets 50 MHz on 8x4 IHP CMOS5L tiles. UART, SPI and I2C are exercised with firmware and reference models. The candidate also has a passing 22-case routed protocol replay; this describes tested cases, not complete implementation of every protocol variant. No fabricated-chip measurements are available. Official full-design GDS, precheck, gate-level tests and viewer pass in run44189196098, under the explicit SRAM signoff policy below.
 
 ## How to test
 

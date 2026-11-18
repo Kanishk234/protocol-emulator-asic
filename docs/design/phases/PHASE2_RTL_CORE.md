@@ -111,17 +111,24 @@ Not in this phase: the helper units CRC, MATCH, MEM and CAPTURE (deferred by D-0
 ---
 
 ## 4. Phase exit checklist (all must pass)
-- [ ] Area estimate done (`docs/reports/AREA_ESTIMATE.md`) and its budget decisions recorded in DECISIONS. *(Estimate done; tier 1 decided (D-038–D-040); open until the design fits a routable budget.)*
-- [x] All modules in the table exist and lint clean (`verilator --lint-only -Wall`); latches only where allowed, waived. *(Evidence: candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`, lint CI run 36799356097; standard GDS run 36799356107 reports no inferred latches and synthesis checks pass.)*
-- [x] **L1** unit tests all green (ALU, EVAL, PIPE, CHAN, OVR, PIN-TX, PIN-RX including BITSYNC, ROT, HOST). *(Evidence: `unit` CI run 36456739733 on `main` at c2a1c04; RTL suites pass under Icarus and Verilator.)*
-- [x] **L2** lockstep ≥ 10⁶ clocks with zero divergences; L2-INJECT catches both injected bugs. *(Evidence: candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284` (2 lanes, 4 pin units, U0 full); 1,000,000 clocks compared with zero divergences in 555.36 s using the main-branch `tripsim` model; clean RX and cursor baselines passed; isolated RTL priority-flip and cursor off-by-one mutations detected at clocks 99 and 326. Commands and results are in `docs/WORKLOG.md`, 2026-09-30 L2 rerun. Counts are the candidate under test, not approval of final hardware counts.)*
-- [x] **L3-UART, L3-SPI-C, L3-I2C-C** pass in RTL against reference models and **sigrok**. *(Evidence: `unit` CI run 36799356039 on exact R4 candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`; chip RTL tests `test_l3.py` pass 4/4 under both Icarus and Verilator. The workflow installed `sigrok-cli`; each case checks against its reference model and runs its sigrok decoder. Results: artifacts `rtl-results` and `rtl-verilator-results`, `chip/results.xml` and `chip/results_vl.xml`.)*
-- [x] The same L3 tests pass in **`gl_test`** on the hardened netlist. *(Evidence: workflow `l3-hardened-gl` run 36952644578, using Icarus 13 on the final hardened netlist from GDS run 36799356107 for candidate `3393eea9a58c5cad9077cc360a8515d0e5ec8284`; uploaded `results_l3_gl.xml` records 4/4 passing: UART TX, UART RX framing, SPI controller, and I2C controller. The workflow installed `sigrok-cli`; all tests also compare against their reference models.)*
-- [x] Full 6x4 `gds` run: DRC/LVS/antenna clean, precheck green, timing met at the typical corner, routing < 4 h. *(Evidence: GDS run 36799356107; detailed-route DRC 0, LVS errors/differences 0, antenna violations 0; precheck 9/9; typical setup 0 violations; detailed routing 3 h 15 min 40 s. Slow setup remains −10.698 ns / 1,132 paths, and global routing reported 821 overflow; both are recorded in `docs/reports/AREA.md`.)*
-- [x] `viewer` deployed; Pages shows the real design. *(Evidence: viewer job in run 36799356107 passed and its rendered GDS image shows the full routed design.)*
-- [x] `test`, `docs`, `lint`, `unit` workflows green on `main`. *(Evidence: commit `467012a`; test 37162474601, docs 37162474600, lint 37162474609, and unit 37162474623 all passed. Re-run after the eventual hardware switch and keep them green.)*
-- [x] `docs/reports/AREA.md` has the first full-design row. *(Evidence: run 36799356107, recorded as R4 run 8.)*
-- [x] Every bug found so far is in `BUGS.md`. *(Evidence: `docs/BUGS.md` has a continuous ledger through #59, including the D-066 timing-analysis exception (#57), IR NEC scratch-state initialization (#58), and the L3 sigrok assertion mismatch (#59).)*
+
+Current target: organizer-approved8x4, full2-lane/4-unit/U0-full design at20ns
+(D-170,D-184). D-185uses whole-GDS CMOS5L KLayoutDRC0and explicitly waives
+unsupported SRAM MagicDRC/abstract-overlap checks; no rawMagic-zero claim.
+
+- [x] Area estimate and budget decisions recorded; the adopted design fits a routable budget. *(AREA_ESTIMATE.md, AREA.md; D-038–D-040,D-184; official44189196098:57.14%utilization, routing1h26m04s, routingDRC0/precheck10of10.)*
+- [x] All modules exist and lint clean; only allowed latch stores. *(e19556e: lint44189196138, unit44189195981, successful official synthesis44189196098; narrow annotations described in D-184.)*
+- [x] L1 unit suites pass under Icarus and Verilator, including full/lean pin modes and SRAM rotation. *(unit44189195981 at e19556e; pin-harness correction validated with240local executions.)*
+- [x] L2 lockstep >=1,000,000 clocks with zero divergences on the integrated revision; both injected bugs caught. *(e19556e:1,000,000clocks/0divergences,4781.64s; clean RX/cursor baselines pass, priority/cursor faults detected99/326clocks. Evidence:l2_result_e19556e.json and WORKLOG2026-11-17/18; deterministic simulation, not an exhaustive proof.)*
+- [x] Required L3-UART/SPI-C/I2C-C pass RTL reference-model and sigrok checks. *(unit44189195981, Icarus and Verilator; full22-case suite. Firmware uses the generated2/4tables.)*
+- [x] Required L3 tests pass official gl_test on the hardened netlist. *(44189196098:3of3UART/SPI/I2C; independently reviewed XML, no skips. Exact finalNL SHA537f41ad... also passes required-sigrok22-case replay44123392388.)*
+- [x] Full8x4official GDS succeeds: routing/KLayoutDRC/LVS/antenna0, all-corner setup/hold/electrical violations0, fast hold>=50ps, precheck green, routing<4h. *(44189196098/e19556e; precheck10of10; fast hold+0.150773ns. Actual slow functional setup reserve+0.163304ns transfers from44031468510via exactODB/NL/sixSTAmax-minreports and SPEF differing onlyDATE. Ordinary aggregate setupWS remains0. D-185waivers explicitly retained.)*
+- [x] Viewer deploys the real design. *(viewer in44189196098success; actual rendered full-layout image inspected and includes SRAM plus full standard-cell design.)*
+- [x] Required test/docs/lint/unit CI green on main's verified design revision. *(e19556e: test44189195952, docs44189195946, lint44189196138, unit44189195981allSUCCESS.)*
+- [x] AREA.md includes the full-design official result. *(44189196098row, committed metrics receipt official_result_44189196098.json.)*
+- [x] Bugs found are recorded. *(BUGS.md includes runner/dependency/harness issues, SRAM Magic incompatibility and read-only geometry diagnostic correction. No known unrecorded functional bug.)*
+
+All exit items have evidence on verified revisione19556e. Final documentation-publication CI must be green before Phase3entry.
 
 ## 5. Risks in this phase
 | Risk | Response |

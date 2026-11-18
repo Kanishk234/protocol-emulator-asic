@@ -4,7 +4,7 @@
 
 Firmware-programmable protocol emulator for the Jane Street ASIC competition: two reflex lanes, four timed pin units and a 512x16 SRAM on 8x4 IHP CMOS5L tiles.
 
-Phase2 integration uses the candidate with passing detailed routing, stock extracted timing and all22 routed protocol cases. Official full-design GDS/precheck is still pending. Start with [How it works](docs/HOW_IT_WORKS.md), [current evidence](docs/reports/PHASE2_QUALIFIED_ROUTE_44017640255.md) and [test instructions](test/README.md).
+The full design passes unchanged official GDS, precheck, gate-level tests and viewer in [44189196098](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44189196098), with the explicit SRAM signoff policy in D-185. All22 routed protocol cases also pass. Phase2 closure evidence is tracked in the phase checklist. Start with [How it works](docs/HOW_IT_WORKS.md), [current evidence](docs/reports/PHASE2_QUALIFIED_ROUTE_44017640255.md) and [test instructions](test/README.md).
 
 - [Read the documentation for project](docs/info.md)
 

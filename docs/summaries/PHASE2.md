@@ -1,242 +1,66 @@
 # Phase 2: building and fitting the chip
 
-**2026-11-07 strict screen milestone:** The route-preserving experiment42394957445 is green in both arms. The edited full2/4design has no estimated setup failures, fast hold138.366ps, electrical0, antenna0 and global overflow0, with independent45192-net connectivity/pin coverage. Its exact checkpoint is being prepared for stock detailed routing. Extracted timing, routed protocol replay and official source/config reproduction are still open; main's official GDS workflow is unchanged and no Phase2completion is claimed.
-
-**2026-11-07 current status:** The combined host-word and critical-configuration-storage prototype passes all22local protocol cases and estimated timing/electrical checks, with138.366psfast hold. Its remaining screen failures are6antenna nets and2routing-overflow units. Stronger early hold repair regresses congestion; whole-net diode rerouting also regresses or exhausts the router search. A bounded local route-attachment experiment is prepared to preserve the long source trees. This is physical diagnosis, not an official green GDS result. The last measured extracted setup reference is still−2.9278ns on the earlier source; the new combined source has not passed detailed routing/extraction. Phase2,main integration and official source/config reproduction remain open. Historical successful custom-flow results below do not qualify this newer source or the unchanged official workflow.
-
-**2026-11-02 physical follow-up:** The write-address prototype reduces antennas from5to3but fails fast hold(−22.4ps)and has7overflow. Its worst hold path is an existing token-to-lane path with a large clock-arrival difference. A separate native200µmclock-buffer-spacing control is prepared on identical RTL; all gates remain fixed. Functional verification is intact but no stock screen,official GDS or Phase2completion is established.
-
-**2026-11-02 new prototype:** A small host write-address predecode now passes named interface/phase proofs and all22local protocol cases,plus host/chip/top tests. It is intended to reduce configuration-address distribution,one source of remaining antenna problems. It adds six mapped flops and keeps the clock100physical recipe unchanged. Physical closure is not yet established; main and official GDS remain unpromoted. The earlier repair-schedule experiment regressed and is not selected.
-
-**2026-11-02 resume status:** Phase2 remains open. No workflow is currently running. The last early275/late75 screen passes timing but regresses to10antennas,one fanout violation and174overflow. The stronger clock100reference passes measured timing/electrical/overflow and has5antennas left. Full optimized hardware is still assembled in diagnostics; the official top-level entry point remains the counter placeholder. Next resolve those five antennas and official recipe portability,then detailed routing/extraction,exact-netlist protocol replay,main integration and unchanged official GDS/precheck. See [resume review](../reports/PHASE2_RESUME_2026_11_02.md) for measured comparisons and the remaining steps. Earlier milestones below are historical evidence,not completion of this target.
-
-**2026-10-28 current stock-flow status:** The clock-clustering screen passes measured setup, fast-hold reserve, electrical checks and global-routing overflow, but still has five antenna violations. The RTL passes all22local protocol cases. Disabling mirroring worsened setup and congestion; a read-only audit showed the earlier antenna-clean checkpoint does not meet hold timing. The next controlled screen shifts hold optimizer targets earlier (275psbefore antenna repair,75psafterward), retaining the final native repair/reroute and every acceptance gate. No stock screen or official main GDS pass is established; Phase2 remains open. Earlier custom-flow milestones below do not substitute for that goal.
-
-**Fresh reproduction now passes:** [39907035580](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39907035580) rebuilds from RTL without downloaded physical checkpoints, passes repairs/routing/extraction, exports GDS with LVS0, and passes9/9unchanged TT prechecks. The CMOS5L DRC report has0violation items. Final netlist matches the22/22tested route. Remaining work is promoting the coherent source and carrying its physical recipe through main's official GDS workflow; no new timing candidate is planned.
-
-**2026-10-23 milestone:** [unchanged TT precheck39890538270](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39890538270) passes all9applicable checks, including full merged-GDS CMOS5L KLayout DRC, on the exact passing experimental route. Final protocol replay passes22/22 and LVS matches. The earlier raw Magic diagnostic remains failed on recorded macro-contained markers; no gate was suppressed. Remaining work is official continuous source/physical-recipe integration and a green main official GDS workflow. Phase2 is still open.
-
-**Status:** in progress, updated 2026-10-22. The current timing target is the complete design with2 lanes,4 pin units,U0 full and SRAM at20ns/50MHz in6x4 tiles. Close official timing at2/4 first, then consider3/6 if area permits (D-070). See [phase checklist](../design/phases/PHASE2_RTL_CORE.md).
-
-Current milestone: [single-mux route39868597887](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39868597887) passes measured extracted timing/electrical/antenna/routing gates after clean-source reproduction: setupWS0at all3corners, fast hold+107.281ps. Exact-final-route replay [39880054906](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39880054906) passes22/22cases with zero failures/errors/skips. Global setupWS0 is not positive setup margin. Stock physical verification [39883160399](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39883160399) exports GDS and passes LVS, but strict raw Magic checks fail:57924DRC markers all within SRAM footprint and10overlap markers within documented PDN obstruction gaps. Count/geometry match known macro-view behavior; no waiver or merged-GDS acceptance is inferred. Independent unchanged TT precheck on the exact primary GDS is the next test. Official-flow portability and main official GDS remain unfinished; Phase2 stays open.
-
-
-Latest preparation: [single-mux screen39856540600](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39856540600) passes clean synthesis reconstruction, slow capture3.735021ns, fast hold125.034ps and zero actual electrical/antenna violations with81buffers/14sizes. The mux change still needs detailed routing/extraction and exact-netlist replay; the previous81buffer/13size route missed setup by6.391ps. No official signoff or Phase2 completion yet.
-
-
-Latest detailed route: [39837795296](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39837795296) clears all actual electrical/antenna/routing DRC violations and has fast hold+104.631ps. Slow setup is−6.391ps, improved from−1.468ns but still failing. The matching preparation netlist passes22/22protocol tests. A single stronger mux adds1.8144µm² and gives+93.824ps slow capture margin with old extracted wires in a fresh-netlist diagnostic; actual clean screening and routing must verify it. No official timing closure or phase completion yet.
-
-
-Latest preparation: [39824026639](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39824026639) passes clean synthesis reproduction with the targeted81buffer/13size profile. Slow capture reserve3.735021ns, fast hold125.034ps, zero actual electrical/antenna violations and all conservative reserves pass. Detailed routing/extraction and exact-netlist replay for this new profile are still pending; its estimated reserve does not prove extracted timing closure.
-
-
-Latest routed result: [39806020090](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39806020090) finishes with zero routing DRC but fails slow extracted setup at−1.468ns and four fanout nets. Fast hold+118.720ps and slew/cap limits pass. The exact preparation netlist passes22/22protocol cases in39806026713. Eight diode loads added during DRT explain the new fanout failures. A targeted strength/partition follow-up now has positive slow capture sensitivity with old extracted wires, but new physical screening remains unproven; Phase2 is still open.
-
-
-Latest milestone: [clean synthesis reproduction39718836864](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39718836864) rebuilds the full delta8/wire600 candidate from RTL without a source checkpoint download. All eight reviewed source hashes match exactly. The same73identity buffers and2equivalent strength changes then pass every preparation gate: slow capture reserve3.871081ns, fast hold125.034ps, zero actual electrical/antenna violations, and all conservative electrical reserves. The last slow slew reserve is44.9812% of its limit against45%, leaving little preparation headroom. SetupWS0 is not positive global setup margin. Clean preparation is now reproduced; detailed routing/extraction and exact-netlist protocol replay are next. Official GDS and Phase2 remain incomplete. Earlier experiment paragraphs below record the progression to this result.
-
-
-Latest checkpoint experiment: [incremental routing39551558196](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39551558196) avoids a reproduced long wire detour, with zero actual electrical/antenna violations and fast hold+119.809ps. Its slow capture reserve improves to3.030177ns, below the3.5ns preparation target; one slew-reserve miss remains at47.70% utilization versus45%. This is an incomplete preparatory result, not routed or official signoff.
-
-The counter candidate simplifies the existing saturating drop counters without adding state or changing visible cycles. It passes equivalence for all1–16source counts,22/22protocol tests,7channel tests and2,048clock model/RTL lockstep. Local mapping reduces standard-cell area0.11% and improves worst FF setup slack from4.942to5.275ns, but these ideal-wire results did not predict its physical outcome. [Clean counter screen39629337108](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39629337108) clears all electrical reserve checks, actual electrical/antenna violations remain zero and fast hold is+123.867ps. Slow capture regresses to2.261562ns, so it fails preparation and will not proceed to detailed routing. The new limiting path starts at PERIOD[2] and crosses sample-time/resync arithmetic before reaching a drop counter; that is the next optimization target. No official timing closure claimed.
-
-A smaller follow-up caches the low eight bits and borrow of SAMPLEOFS−PERIOD during existing configuration staging. It passes22/22 RTL protocol tests,7fabric tests,2048model/RTL comparison clocks, four configuration phase/equivalence checks and a bit-time consumer proof. It adds9flops,9latches and1clock gate in the full pin unit. Local mapping improves the targeted timing-value launch paths but slightly worsens the whole-chip worst FF path; no physical improvement has been measured. [Clean cache screen39643357168](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39643357168) regresses slow capture reserve to1.545619ns and has one45.36% slew-reserve miss against45%; actual electrical/antenna counts stay0 and fast hold+91.875ps passes. It is rejected for promotion and will not proceed to detailed routing. Main RTL is unchanged.
-
-[Initial wire600 control39677316308](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39677316308), with identical delta8 RTL, improves slow capture headroom to3.595163ns and passes the3.5ns preparation target; fast hold+119.021ps and antenna0 also pass. Native wire-buffer insertion falls5642→369. However, six actual fanout violations and electrical reserve misses remain, so this screen fails and will not proceed to detailed routing. Only95ps of capture reserve above the preparation gate remains; targeted electrical repair still needs fresh timing proof.
-
-The next prepared checkpoint experiment (D-103) targets37measured electrical nets with68identity buffers, including SRAM output isolation and fanout partitioning after diode loads were counted. It preserves native timing/antenna checks and all strict gates. Connectivity and71tool checks pass locally. First checkpoint39688233973 inserts and legalizes all68buffers, but OpenROAD aborts hold repair with an inconsistent parasitics-state error before final gate measurements. Corrected run39692139740 completes native repair and antenna handling, but the timing runner then fails on relative SRAM path resolution (BUG132). Corrected measurement39696487052 clears all actual electrical/fanout/antenna violations and has fast hold+125.034ps. It still fails conservative preparation: slow capture3.212737ns is287ps below3.5ns, and six unique nets miss electrical reserves. The checkpoint is not qualified for routing or clean-flow promotion. A checkpoint pass would still require clean synthesis reproduction before detailed routing.
-
-D-104 prepares a small follow-up from the same original wire600 checkpoint: four additional identity buffers and two equivalent stronger cells target the six residual reserve nets. One weak driver is also on the worst setup path, so the repair may improve both problems. The slot-write enable keeps identical clock-gate connections. Functional resize proofs, full connection audits and40tool checks pass; physical success is still unproven.
-
-[Residual repair39700222717](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39700222717) now clears3.5ns slow capture reserve at3.871081ns, fast hold+125.034ps, all actual electrical/antenna counts0 and all capacitance reserves. One slow slew reserve source remains at67.05% versus45%, so the checkpoint still fails. D-105 prepares one additional identity buffer on that measured long data net; success and clean-build reproduction remain pending.
-
-Best repaired-checkpoint milestone: [routing/extraction 38784492656](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38784492656) passes all measured timing and electrical gates after detailed routing, with zero final routing DRC and antenna violations. Fast hold is +89.75 ps; setup WS is 0 at all three corners. The conservative screen and bounded incremental repair survived extraction for this checkpoint. [Exact-netlist protocol regression 38796998628](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/38796998628) also passes all 22 cases. Clean-build and official-flow reproduction are next. Phase 2 remains incomplete; setup WS 0 is not a claim of positive global setup margin. See [the measured baseline](../reports/PHASE2_CLEAN_EXTRACTED_BASELINE.md).
-
-Current clean-build result: [wire150/hold125 route39278561678, attempt2](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/39278561678/attempts/2) has zero electrical, antenna and detailed-route DRC violations, and fast hold+107.66ps. Slow setup still fails at−1.608ns, so it is not ready for official integration. A global positive setup-repair target timed out; delay-oriented synthesis added only~0.13ns of estimated setup headroom and lost the electrical reserve guard. The existing cycle-preserving resync/event RTL combination now passes module equivalence, focused checks and a fresh 22/22 expanded protocol replay. That replay exposed a SWD firmware missed-edge deadlock; preloading turnaround commands fixes it without changing hardware or reducing clock speed. The matched resync/event native screen then failed the setup reserve: slow capture headroom was only +0.165 ns, despite clean electrical/antenna checks. A separate unit-local configuration staging prototype now passes phase/equivalence and focused regression checks; local mapping reduces U0 staging loads from 153 latches to 22 at about 1.26% more standard-cell area. Its expanded protocol replay now passes 22/22 with no skips; its native screen then achieved +1.726 ns slow setup headroom and +100.7 ps fast hold with zero actual electrical/antenna violations, but failed electrical reserves and remained below the +3.5 ns setup guard. It is not qualified for routing. Exact-netlist diagnosis now identifies SJW[1] as the limiting launch field, so a combined staging/resync arithmetic trial has been prepared and passes a fresh 22/22 protocol replay; its native screen39458833532 improves slow capture headroom to+2.531ns with+116ps fast hold and zero actual electrical/antenna violations, but still fails setup and slew reserves. The new worst path is PERIOD[0]→dropped[22]. Independent sample-CSA and TX cursor prototypes pass equivalence and60pin tests each; matched local timing rejects CSA but favors TX cursor late selection. Physical improvement is not yet established; see [arithmetic follow-ups](../reports/PHASE2_ARITHMETIC_FOLLOWUPS.md). The stronger screen requires actual estimated slow FF-capture headroom≥3.5ns before another route. This is a test threshold, not a guarantee of extracted closure. See [the paired timing evidence](../reports/PHASE2_NATIVE_ROUTE_TIMING_GAP.md).
-
-Latest follow-up: native TX cursor screen39468700509 reaches+3.003ns slow capture/+77.5ps fast hold with zero actual electrical/antenna violations, but misses setup and two slew reserves. Saved-stage diagnosis traces the losses to design/timing repair; another broad late repair regresses setup to+2.008ns, while a wire2000 control makes no useful cell edits and reproduces the+3.003ns result. A separate general cached fabric source-selection prototype passes all legal parameter proofs,7fabric/5chip tests,2048model-comparison clocks and22/22protocol replay; its local standard-cell area cost is0.898%. Its native screen39486256185 now measures+2.918ns slow setup headroom,+120.883ps fast hold and zero actual electrical/antenna violations, but fails the3.5ns setup reserve and two45% slew reserve limits (worst47.75%). A subsequent parallel lane-read prototype passes2181equivalence checks,6lane tests and22/22protocol replay with no added flops and0.386% less mapped standard-cell area. Local ideal-wire control-path timing improves, but native screen39498376778 only reaches+2.952ns slow capture headroom with+119.808ps fast hold and zero actual electrical/antenna violations. It fails the3.5ns setup reserve and worsens maximum slow slew utilization to75.55% against45%; it is not qualified for routing. Saved-stage diagnosis is next. Main hardware and all phase gates remain unchanged.
-
-## The goal
-
-Build the lanes, token fabric, timed pin units, host interface and routine memory, verify them against an independent software model, and make the full chip pass physical checks and timing in the official GDS workflow.
-
-## What we did
-
-The core RTL exists. The frozen2/4 candidate passed one million model/RTL comparison clocks, and injection checks caught two deliberate bugs. UART, SPI and I2C have pin-level reference-model and sigrok evidence. Expanded routed gate-level checks pass22/22 for original event-late125ps run37581139271 and shared-RX run37659138336. These check function without SDF timing simulation; they do not prove physical timing.
-
-Historical official GDS run36799356107 passed DRC/LVS/antenna/precheck and typical timing, but slow setup was -10.698ns. Later full-design extracted experiments improved slow timing. An earlier baseline was original event-late plus125ps hold repair: slow setup -0.179789ns and fast hold +0.037290ns (extraction37581139249). Its two reported failures end at RX timer bits through live pin configuration and pin feedback.
-
-A larger shared-RX arithmetic change proved equivalent and passed function, but its extracted setup regressed to -1.427891ns at dropped-event counter/fabric endpoints. It is not promoted. The smaller banked pin selector retains original RX and passes60pin tests,5chip tests and2048model-comparison clocks. Its routing screen had one -22.37ps SRAM address hold failure.
-
-The banked candidate later routed cleanly and passed22/22 protocol tests, but extracted slow setup regressed to−2.475764ns. It is rejected for promotion.
-
-Small cell-sizing trials then targeted the live configuration→pin-unit decision→dropped-counter path. The hold-repaired route37807978035 is clean, and extracted fast hold improves to+0.109290ns, but slow setup is−0.603908ns. We independently reproduced that result and found8 printed failing paths sharing one upstream driver. Sizing that driver clears those failures on unchanged extracted wires, with small cell-area cost; it still needs fresh physical proof.
-
-Driver extraction37825505569 improved slow setup to−0.147084ns and passed22/22 routed protocol tests. A further three-cell repair then routed successfully37837038264; extraction37844735445 has setupWS0 at every corner and minimum hold+0.062789ns. Routed regression37844735520 passes22/22, no skips. Local all-corner extracted sweeps match CI and tolerate19.85ns against the20ns requirement, demonstrating150ps tested period reserve. This timing-passing checkpoint still reports91slow slew and6slow cap violations (7cap attyp/fast), so it is not electrically clean. Global zero setup remains dominated by latch time-borrowing reports; no strictly positive global setup claim is made.
-
-Clean-build stock screens37853023857 AREA0/AREA1 both report setupWS0 and positive hold; AREA1 fast hold+0.119326ns, final GRT zero overflow and cell area524688.31µm² including SRAM. Electrical checks still fail: AREA1 has21 slow slew violations and one cap violation per corner. Native AREA1 route37859526262 then completed but extracted slow setup regressed to−1.423654ns, with133slow slew and6cap failures. Stock design-repair screen37858535440 clears screen cap counts but leaves18slow slew failures. The earlier residual checkpoint remains the best measured candidate; clean-build closure and official electrical closure remain unproven.
-
-The latest repair screen38356513586 passes every requested estimated-routing gate: no reported setup violations, fast hold73.499ps, and zero slew, fanout, capacitance, antenna and overflow violations. Electrical repair now runs after antenna insertion in the same router process, resolving the cycle where new diode loads overloaded different nets. This is a checkpoint screen; its detailed routing/extraction, protocol regression and official clean-flow reproduction are still required.
-
-Its continuation38358706808 now completes0DRC detailed routing and passes antenna checks, but extraction fails slow setup at-0.230241ns and reports27 slow-slew rows plus5 fanout nets. Fast hold61.103ps passes our50ps gate; capacitance violations remain0. Detailed routing inserts27 antenna diodes, so electrical repair must also account for that later stage. A new source-bound decode-cone sizing diagnostic is prepared; no official integration has been made.
-
-The next combined repair screen38421594711 passes, and route38433037592 now clears extracted setup/hold, slew, capacitance, DRC and antenna checks. Fast hold is68.172ps. Nine fanout nets remain, including one clock-buffer net; this keeps the workflow red and blocks official adoption.
-
-Fanout-load screen38453218365 passes all gates. Its continuation38456657314 preserves clock connections and eliminates the clock fanout failure, with0DRC/antenna and69.901ps fast hold. Extraction still reports a36.168ps slow-setup deficit, four data fanout nets and15slow-slew rows on two weak drivers; capacitance remains0. A focused setup/slew strength study is prepared.
-
-## What we found
-
-Equivalent logic can shift mapping, placement and critical paths elsewhere in the chip. Faster local arithmetic did not guarantee better full-chip timing. Routing screens are useful filters, but extracted parasitics have repeatedly exposed regressions. Live configuration remains timed; no false paths or changed cycles hide failing behavior.
-
-Functional evidence is strong. Physical timing and area must still be judged together on the exact final candidate. Saved-checkpoint improvements also need a reproducible clean-build recipe in the official flow.
-
-## What's left
-
-- Close the latest36ps setup deficit, four data fanout nets and two slew-driver nets; preserve the clock/hold repairs and repeat all strict physical/extracted gates and routed protocol verification before official reproduction.
-- Preserve measured setup/hold reserve without losing protocol or live-configuration behavior; distinguish latch-reported zero WS from actual endpoint margins.
-- Reproduce the selected full design in official GDS; pass DRC/LVS/antenna/precheck and matching gate-level tests.
-- Complete the routable-budget decision, revalidate the adopted hardware and keep required CI green on final main. Phase2 stays open until all exit requirements pass.
-
-## One-line takeaway
-
-The latest route passes DRC, antenna and hold with clock fanout repaired; a small setup deficit and data electrical violations still block Phase2 and official GDS.
-
-Detailed evidence: [closure research](../reports/PHASE2_CLOSURE_RESEARCH.md), [baseline recovery](../reports/PHASE2_SHARED_RX_REGRESSION.md), [repair-only screen](../reports/PHASE2_BANKED_SRAM_HOLD_SCREEN.md), [routed follow-up review](../reports/PHASE2_BANKED_SRAM_HOLD_ROUTE.md).
-
-The latest strength study38479292241 identifies four small gate resizes that clear the reported setup and slew failures on the existing extracted wires. Four fanout violations remain, and fast hold stays69.901ps. A combined physical screen is prepared with those resizes,12fanout buffers and9local hold-delay cells (321.1488um2 additional footprint).45focused tests and actual-source connection audits pass. Fresh physical timing is still pending; this does not close Phase2 or establish positive global setup margin.
-
-Corrected physical screen38484835284 now passes all estimated-routing gates: no reported setup violations,77.0365psfast hold and zero electrical/antenna/overflow violations. Independent connection/placement audits pass; one post-antenna batch preserves earlier repairs and adds3buffers. An exact-checkpoint stock detailed-routing/extraction continuation is prepared. Actual extracted closure, routed protocol regression and official GDS/precheck still remain before Phase2 can close.
-
-Its detailed-routing continuation38499287760 now passes all-corner extracted setup and hold: fast hold86.049ps, typical185.395ps and slow357.429ps, with0DRC/0antenna/0capacitance failures. The workflow correctly fails sixfanout nets and fourslow-slew rows, all mapped to seven data sources. A targeted20BUF4residual electrical screen is prepared (290.304um2), retaining all earlier timing repairs and functional clocks/resets. We have extracted timing closure for this checkpoint, but not electrical or official Phase2 closure.
-
-Residual screen38505802817 passes every estimated-routing gate with76.6519psfast hold, no reported setup violations, and zero electrical/antenna/overflow violations.20newBUF4cells repair the seven measured electrical sources; no further sizing/hold cells or post-antenna batches were needed. Independent connection/placement audits and63focused tests pass. Its exact-checkpoint stock routing/extraction continuation is prepared; final extracted electrical checks and official evidence are still required.
-
-The next extracted route38507730942 retains setup closure and0DRC/0antenna/0capacitance failures, but fast hold falls to38.266ps, below our50psreserve. Threefanout nets and nine slow-slew rows remain. A combined correction is prepared:132local hold-delay cells for reported endpoints below100ps and11electrical buffers,2075.6736um2 added footprint, retaining existing timing repairs and clocks/resets.57focused tests and connection/placement/Tcl audits pass. Fresh screen and final extracted closure remain mandatory; this shows that a green estimated screen still does not guarantee extracted timing.
-
-Hold/electrical screen38512982007 passes every estimated-routing gate:78.7037psfast hold, no reported setup violations and0electrical/antenna/overflow failures. All143plannedcells are audited; original placements and functional clock/reset connections are retained.63focused tests pass and an exact-checkpoint stock DRT/extraction continuation is prepared. The selected100psendpoint reserve does not mean the measured minimum is100ps; final extracted hold and electrical closure still need verification.
-
-Route38515215944 improves extractedfast hold to96.233ps andpasses DRC/antenna/slew/capacitance checks. Slowsetup narrowlyfails at-5.887ps andthreefanout netsremain. A four-case exact-source strengthdiagnostic targets twosmall gates onthe printed failingpath;28focusedtests andactual-netlist audits pass. Its selectedresize mustbecombinedwithremainingdatafanout repairs,thenpass physicalscreenandfinalextraction. Officialclosure/Phase2exitremainopen.
-
-Focused study38583171270 identifies a singleNOR2strengthchange thatremoves thereported5.887pssetupdeficit onexistingextractedwires withoutchanging96.233psfast hold. A combinedphysicalscreen isprepared withthatresize and9datafanoutbuffers,134.2656um2footprintgrowth.62focusedtests andactual-source connection/placement/Tclchecks pass. Freshscreen/extractionstillmustproveclosure;officialGDSandPhase2exitremainopen.
-
-Combinedscreen38616858805 passesallestimated-routinggates:72.5852psfast hold,noreportedsetupviolations,andzeroelectrical/antenna/overflowfailures. OneNOR2resize,nineplannedbuffers andthreepost-antenna buffers areindependentlyaudited,retainingoriginalclock/resetconnections.63focusedtests pass;anexact-checkpointstockDRT/extractioncontinuationisprepared. Finalextractedclosure andofficialGDSstillmustbeproved.
-
-Route38621290574 now passes extracted timing at all corners, with88.855psfast hold and zero DRC/antenna violations. Remaining electrical checks are two fanout sources, one SRAM address slew violation and one SRAM output capacitance violation. An eight-BUF4 repair screen is prepared (116.1216um2);73focused tests and actual-netlist/SRAM-bit conservation audits pass. It retains all prior setup/hold repairs. Fresh screen and final extracted electrical closure still need proof before official GDS and Phase2 completion.
-
-SRAM/data screen38637997316 passes all estimated-routing gates:71.009psfast hold,no reported setup violations,andzeroelectrical/antenna/overflow failures. Eightplannedbuffers plus threepost-antenna buffers are independentlyaudited,includingeverySRAMaddressbit andoriginalclocks/resets.79focusedtests pass;theexact-checkpointstockDRT/extractioncontinuationisprepared. Extracted electricalclosure andofficialGDSstillneedverification.
-
-SRAM/data route38641675550 passes extracted timing (85.390psfast hold) andDRC/antenna/slew/capacitance checks. Onlytwofanout nets remain. A seven-BUF4correction isprepared,101.6064um2 addedfootprint,retaining all earlier timing/SRAM repairs.57focused tests andactual-source conservation/placement/Tcl audits pass. Freshscreen andfinalextractedfanout closure arestillrequired beforeofficialGDSandPhase2exit.
-
-Two-netfanout screen38652802189 passesallestimated-routinggates with78.496psfast hold,noreportedsetupviolations,andzeroelectrical/antenna/overflowfailures. Sevennewbuffersandpreservedexistingrepairs areindependentlyaudited;noadditionalpost-antbatchesneeded.63focusedtests pass andanexact-checkpointstockDRT/extractioncontinuationisprepared. Finalextractedclosure andofficialGDSstillneedverification.
-
-Route38668749394 retains extracted timing closure with92.313psfast hold and0DRC/antenna/capacitance violations, buttwo new fanout nets andseven slew rows remain. All slew rows share one diode-loaded NAND3 output. A measured three-net/eight-BUF4screen isprepared (116.1216um2),retaining earlier timing/SRAM repairs.70focusedtests andactual-source audits pass;small gate evidence willpublish beforebulk. Final electrical andofficialclosure remainopen.
-
-Fanout/slew screen38676308492 passes everyestimated-routinggate with72.176psfast hold,noreportedsetupviolations,andzeroelectrical/antenna/overflowfailures. Eightplannedbuffers plus threepost-antbuffers areindependentlyaudited;66focusedtests pass. The smallgateartifact worked,exposing the result beforethebulk upload. Anexact-checkpointstockDRT/extractioncontinuationisprepared;finalelectricalclosureandofficialGDSremainunproven.
-
-
-2026-10-28: We are still closing the clean stock-flow design. Global clock balancing made no physical change, and replacing the largest delay cell worsened the result. We found that a late SRAM decision goes through the reflex priority and selection logic. A new equivalent lane prototype makes both possible selections early and chooses between them late, without adding a clock cycle or state. Module equivalence, core simulation and lint pass; local mapping shows a shorter logic cone at an area cost. This is not yet a passing physical screen or official GDS result. The next evidence is the strict stock-flow screen of this one hardware change and the full existing protocol regression.
-
-The late arbitration prototype now also passes all22existing RTL protocol cases,with no failures or skips and independent offline decoding enabled. Its single stock-flow physical screen is running. Functional regression success does not establish timing closure.
-
-The full-width arbitration version failed physical screening: its extra area came with severe routing congestion and the worst setup path moved to pin-unit configuration. A smaller equivalent version now preselects priority masks while sharing the slot-data mux. It keeps a local logic-depth reduction at16extra cells perlane instead of455. Module proof,core simulation and lint pass; full protocol replay and physical closure remain to be verified for this smaller version.
-
-The smaller shared-priority version passes all22existing protocol cases and now has nonnegative setup at all corners,zero electrical violations and zero routing overflow. It still fails screening: fast hold is3.2psagainst our50psreserve,and six antenna nets remain. One is an unusually long clock leaf already present at CTS. The next controlled test limits clock sink-cluster diameter while retaining the verified RTL and all acceptance requirements. Phase2and official GDS remain open.
-
-
-The C-selector experiment now has a fully passing routing screen
-([42156980762](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42156980762)).
-Estimated setup and hold meet the checks, fast hold has86.8ps reserve, and
-antenna, electrical and routing-overflow counts are all zero together. Three
-passive protection cells, one buffer resize and two short via connections keep
-the original long routes intact. Native checks confirm legal placement and
-coverage of every routed pin. This is a useful milestone, but it does not prove
-extracted timing or official-flow closure. The exact saved checkpoint is now
-being detailed-routed in42158728020; extraction follows only after a clean route.
-Reproducing the repair through supported source/config changes and the unchanged
-official GDS flow remains necessary. Phase2is still open.
-
-
-The exact C-selector checkpoint also passes detailed routing
-([42158728020](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/42158728020)):
-zero route DRC and antenna violations, preserved logic, and no critical
-disconnected pins. The stock report lists one noncritical pin, the top-level
-ena input. Extraction and timing measurement are now running in42252231999.
-This will tell us whether the passing estimated timing survives actual routed
-parasitics. Official-flow reproduction and Phase2completion are still open.
-
-
-Extraction42252231999 finished and exposed the remaining timing gap: slow setup
-is-2.928ns. Hold passes at all corners, with179.8psfast hold; antenna checks stay
-clean. Two slow slew violations belong to one driver-to-buffer connection.
-The worst setup path runs from the unit0 IDLE setting through pad feedback to a
-fabric pending-drop register. The next repair targets this exact logic path and
-that slew connection. The passing screen and clean detailed route do not yet
-establish extracted or official timing closure. Phase2remains open.
-
-
-The extracted failure now points to two source-level repairs. A tiny storage
-change removes the gated-latch launch path from one shared configuration bit;
-it passes module equivalence, five chip smoke tests and all22RTL protocol cases,
-including offline decoders. A separate host read-mux cleanup passes complete
-host-module equivalence and five smoke tests, with substantially lower isolated
-logic area/delay. Each is being screened independently with the same physical
-recipe in42259881584and42262602008. Neither has a measured physical gain yet;
-actual extracted slow setup remains-2.928ns. All local tests are finished; the
-next decision needs those physical results. Official GDS and Phase2remain open.
-
-### Current milestone — 2026-11-16: full configured-native screen passes
-Our current8x4 full2-lane/4-unit candidate passes every final screening gate in
-run44017640255. Slow functional setup reserve is+2.784ns and fast hold+.102ns;
-fresh antenna and electrical violations are zero. The supported project config
-keeps native antenna repair last and rejects routing congestion. All original
-Tiny Tapeout flow steps remain; official workflow files are unchanged. Fresh
-netlist readbacks verify the repaired database still has the same functional
-logic and connections, with only antenna diodes added.
-
-This is meaningful progress beyond the older results above, but it is still a
-pre-routing result. Next: independently review the exact artifact, detailed-route
-that same checkpoint, measure extracted timing with stock constraints, run the
-full routed protocol replay, then integrate the qualified design/config for an
-unchanged official GDS/precheck run. Phase2is not complete yet.
-
-Independent review of this exact artifact now passes. A source-bound two-job
-DRT/stock-extraction workflow is prepared; it repeats all pre-route gates, accepts
-only completed DRC-clean routing, and checks extracted functional setup/hold,
-electrical and antenna results before further promotion. No route result yet.
-
-### 2026-11-17: detailed routing and extracted timing pass
-Workflow44031468510successfully routes the qualified full design and passes the
-stock-constrained extracted gates. Slow functional setup reserve is+0.163ns and
-fast hold+.151ns; timing-violation counts, route DRC, electrical and antenna checks
-are zero. This is routed/extracted evidence, beyond the earlier screen. The setup
-margin is small. Independent artifact review passes. Next: complete routed protocol
-replay, exact source/config adoption and unchanged official GDS/precheck.
-Phase2is still open; no official full-design green run is claimed.
-
-
-### 2026-11-17: all22 routed protocol cases pass
-Replay44123392388 passes every group and combined coverage. Independent XML
-review confirms22 actual executions, zero skips/failures and the exact extracted
-netlist identity. The candidate now has clean detailed routing, positive extracted
-functional setup/hold and full routed protocol replay. Remaining work is coherent
-main integration (including replacing placeholder tests), integration checks and
-unchanged official GDS/precheck. Phase2 remains open.
-
-
-### 2026-11-17: proven candidate integrated for official hardening
-D-184adopts the exact proven2-lane/4-unit/U0-fullRTL, regenerated encodings,
-8x4pinout and native config. Project tests now exercise the real required protocols
-and supply SRAM models. Local checks:335Python,147core RTL,3top-port protocol
-cases and32focused integration checks pass, along with lint and generation.
-Integration manifest binds physical inputs to the routed/replayed source; official
-workflow is unchanged. Fresh official GDS/precheck/GL/viewer remain pending.
-
-
-### 2026-11-17: SRAM signoff compatibility resolved for official retry
-The first official integrated run reproduced the verified routed design but
-failed unsupported Magic checks inside the SRAM. A separate stock whole-GDS
-KLayout check passes with0errors. D-185adopts the documented SRAM-aware checker
-policy: require KLayoutDRC0and waive unsupported MagicDRC/abstract-overlap checks,
-keeping LVS, timing, electrical, antenna, routing and official jobs unchanged.
-This is an explicit policy change; rawMagic markers are not claimed zero.
-Fresh official GDS/precheck/GL/viewer and final artifact review remain pending.
+**Current status:** the real design has a green unchanged official Tiny Tapeout
+workflow44189196098 on main revisione19556e. Final artifact review is complete.
+All Phase2exit items now have evidence on that revision, including the refreshed
+million-cycle RTL/model check and both fault injections. Final documentation-
+publication CI must be green before Phase3entry. No Phase3work starts here.
+
+## Goal
+
+Turn the programmable architecture into a chip that fits, behaves correctly and
+can be manufactured through the official flow. Firmware, rather than dedicated
+protocol blocks, defines what the chip speaks.
+
+## What we built
+
+Two lanes run triggered reflex instructions and bounded SRAM routines. A multicast
+fabric connects them to four timed pin units; U0has the optional PULSE, carrier and
+BITSYNC features. A512x16SRAM holds routines/data. Host SPI loads programs after
+reset or power loss. The chip targets50MHz in the organizer-approved8x4CMOS5Ltile.
+
+The smaller resource count is deliberate: it preserves every individually tested
+protocol, while limiting concurrency. A two-lane program occupies both lanes.
+Source, generated software tables, macro views and physical config are bound by
+an integration manifest so experimental results cannot be mistaken for main.
+
+## What passed
+
+The official GDS, precheck, gate-level tests and viewer all pass. So do required
+main test, lint, unit and docs workflows on the verified revision. Precheck passes
+10checks; official gate-level tests pass UART, SPI and I2C. The exact final netlist
+also passes the full22-case protocol replay with reference models and required
+sigrok decoding. Icarus and Verilator provide independent RTL simulation coverage.
+
+Final routing/KLayoutDRC/LVS/antenna violations are zero. Setup, hold, slew and
+capacitance checks pass every corner. Actual slow functional setup reserve is
++0.163ns and fast hold+0.151ns. Ordinary aggregate setupWS remains0; these are
+separate measurements. The official physical data/timing reports match the audited
+checkpoint. Routing takes1h26m, and the complete official workflow3h08m.
+The design fits at57.14%reported utilization excluding fill.
+
+## What we learned and what remains
+
+Timing needed changes to logic, fanout, clock distribution and configuration
+paths, followed by exact-source routing and extracted checks. Early estimates
+alone could not prove closure. Supported post-timing antenna repair and strict
+congestion rejection were also needed.
+
+The SRAM exposes a documented Magic limitation. D-185explicitly uses full merged-
+GDS CMOS5L KLayoutDRC as the authority and waives unsupported MagicSRAMDRC and
+abstract-overlap errors. Ten known macro abstraction markers remain; rawMagic-zero
+is not claimed. LVS, timing, electrical, antenna and routing gates remain required.
+
+Current-revision model/RTL lockstep passes1,000,000clocks with zero divergences.
+Both clean mutation baselines pass, and the checker catches priority and cursor
+faults at clocks99and326. This is deterministic simulation, not exhaustive formal
+verification. Phase3can next address protocol showcases, independent verification,
+formal/compiler analysis and FPGA support. The163pssetup reserve remains narrow, and no
+fabricated-chip or real-hardware behavior has been measured.
+
+**Takeaway:** the full design now passes official hardening, protocol tests and
+the refreshed model check; preserve this baseline as Phase3begins.
+
+Evidence: [official result](../reports/PHASE2_OFFICIAL_GREEN_44189196098.md),
+[checklist](../design/phases/PHASE2_RTL_CORE.md), [claims](../CLAIMS.md),
+[historical work](../WORKLOG.md) and [decisions](../DECISIONS.md).

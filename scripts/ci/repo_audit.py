@@ -10,9 +10,28 @@ from verify_integrated_candidate import verify
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def verify_vendor_sources(root):
+    """Keep external verification sources and their license bound to a pinned revision."""
+    count = 0
+    for metadata in (Path(root) / 'test_internal/vendor').glob('*/PROVENANCE.json'):
+        row = json.loads(metadata.read_text())
+        if not re.fullmatch(r'[0-9a-f]{40}', row['revision']):
+            raise ValueError('Unpinned verification dependency: ' + str(metadata))
+        if row['license_file'] not in row['files']:
+            raise ValueError('Verification dependency license is not hash-bound')
+        for name, item in row['files'].items():
+            source = metadata.parent / name
+            if not source.is_file(): raise ValueError('Missing vendor source/license: ' + name)
+            if hashlib.sha256(source.read_bytes()).hexdigest() != item['sha256']:
+                raise ValueError('Changed pinned vendor source/license: ' + name)
+        count += 1
+    return count
+
+
 def audit(root=ROOT):
     root = Path(root).resolve()
     verify(root)
+    vendor_packages = verify_vendor_sources(root)
     frozen = json.loads((root / 'scripts/ci/official_workflows.json').read_text())
     for name, expected in frozen.items():
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != expected:
@@ -31,7 +50,7 @@ def audit(root=ROOT):
     if broken: raise ValueError('Broken documentation links:\n' + '\n'.join(broken))
     subprocess.run(['python', 'tools/gen/gen.py', '--check'], cwd=root, check=True)
     return dict(qualified_inputs_match=True, official_workflows_unchanged=True, source_lists_match=True,
-                documentation_links_ok=True, generated_files_match=True)
+                documentation_links_ok=True, generated_files_match=True, verified_vendor_packages=vendor_packages)
 
 
 if __name__ == '__main__':

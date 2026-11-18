@@ -1,0 +1,104 @@
+{
+  "official_run": 44189196098,
+  "sha": "e19556e1df1e2f87d4c195af618adb67a8063852",
+  "official_workflow_unchanged": true,
+  "gds": "success",
+  "precheck_passed": 10,
+  "gl_tests_passed": 3,
+  "viewer": "success",
+  "full_22_case_replay_run": 44123392388,
+  "final_netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+  "gds_sha256": "2a16d4e6d8dc12d60ce355153b3e4c30fc58cdc7610dafe895a3224b299f28f8",
+  "routed_odb_sha256": "357f01366aea053ca83db4b035625033424378aecc5ff17addaf4711421b00d4",
+  "route_drc": 0,
+  "klayout_drc": 0,
+  "lvs_errors": 0,
+  "antenna_nets": 0,
+  "antenna_pins": 0,
+  "setup_violations": 0,
+  "hold_violations": 0,
+  "hold_ns": {
+    "nom_fast_1p32V_m40C": 0.15077328701186685,
+    "nom_slow_1p08V_125C": 0.742154358974416,
+    "nom_typ_1p20V_25C": 0.39130266801033264
+  },
+  "ordinary_setup_ws_ns": {
+    "nom_fast_1p32V_m40C": 0,
+    "nom_slow_1p08V_125C": 0,
+    "nom_typ_1p20V_25C": 0
+  },
+  "electrical": {
+    "nom_fast_1p32V_m40C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    },
+    "nom_slow_1p08V_125C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    },
+    "nom_typ_1p20V_25C": {
+      "counts": {
+        "slew": 0,
+        "fanout": 0,
+        "capacitance": 0
+      },
+      "violations": {
+        "slew": [],
+        "fanout": [],
+        "capacitance": []
+      },
+      "no_reported_electrical_violations": true,
+      "official_signoff": false
+    }
+  },
+  "functional_setup_reserve_ns": {
+    "nom_fast_1p32V_m40C": 11.807575,
+    "nom_typ_1p20V_25C": 7.647178,
+    "nom_slow_1p08V_125C": 0.163304
+  },
+  "functional_setup_evidence_run": 44031468510,
+  "functional_transfer_basis": {
+    "six_stock_max_min_reports_byte_identical": true,
+    "normalized_spef_hash": "2abe1c64d90e517c4b2362c2592ec642f93984cba168d1995b4045bc28be2e21",
+    "normalized_spef_matches": true,
+    "only_ignored_spef_line": "*DATE timestamp"
+  },
+  "signoff_policy": "D-185",
+  "magic_drc": "not run: documented unsupported SRAM checker",
+  "raw_abstract_overlap_markers": 10,
+  "overlap_inventory_byte_identical_to_reviewed": true,
+  "raw_magic_zero_claimed": false,
+  "independent_artifact_review_complete": true,
+  "phase2_complete": false,
+  "main_ci": {
+    "test": 44189195952,
+    "lint": 44189196138,
+    "unit": 44189195981,
+    "docs": 44189195946
+  },
+  "local_l2_refresh_pending": false,
+  "official_gds_signoff": true,
+  "l2_evidence": "l2_result_e19556e.json",
+  "phase2_exit_evidence_complete_on_verified_revision": true,
+  "closure_publication_ci_pending": true
+}

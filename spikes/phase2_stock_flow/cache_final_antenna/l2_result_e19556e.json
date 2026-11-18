@@ -1,0 +1,14 @@
+{
+  "revision": "e19556e1df1e2f87d4c195af618adb67a8063852",
+  "compared_clocks": 1000000,
+  "divergences": 0,
+  "sim_time_ns": 20787000.0,
+  "real_time_seconds": 4781.64076423645,
+  "xml_sha256": "25e75965ffd1af2750da98dfc76a3de020f0e9dc41573a22777c8ed643328031",
+  "log_sha256": "56c4c84580b3888ace2cb93f96a9ce73adceac18e57743aa85e8c96626b7a17e",
+  "mutation_log_sha256": "717e314eacd28ca1449cdcd04d6c881a9ba9cc8e5428173470a8ffbe78279c02",
+  "clean_rx_and_cursor_baselines_passed": true,
+  "priority_fault_detected_at_clock": 99,
+  "cursor_fault_detected_at_clock": 326,
+  "scope": "Deterministic legal pin stimulus and program; not exhaustive formal proof"
+}

@@ -2,6 +2,33 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Extend frozen detailed-route qualification
+
+- Observer 44393291255 confirms the candidate select changes S=0 to S=1 and
+  OpenSTA disables the unselected data edge. The unchanged timing result is
+  not explained by failure to apply that case value. Static/dynamic reports
+  for _2158_/D choose different launch points: X1Y3/_1736_ versus X2Y4_B_OUT_top.
+  This is a narrower next investigation, not proof of the global root cause.
+- D124 adds a bounded 25-context detailed-route campaign using the authenticated
+  original archive, unchanged placement/guides and pinned D120 routing policy.
+  Extend inventory checking to source-specific cell/latch/power counts, including
+  the zero-cell feedthrough context. Reject nonzero process exits even if logs
+  contain success markers. No source fabric or bitstream changes.
+- All 26 frozen contexts prepare locally; 57 focused tests and actionlint pass.
+  No phase boxes ticked. Next inspect hosted route results and continue tracing
+  the launch-path divergence; full-chip and extracted timing remain unqualified.
+
+## 2026-11-18 — Progress check after corrected observer
+
+- GitHub reports corrected observer run 44393291255 at 2872eedf successful.
+  Downloaded reports show diagnostic_complete=true, all 8736 configuration
+  bits matching across 40 tiles, and hypothesis_supported=false. Both loop
+  policies still differ at six endpoints; worst cell-only slack is 1.508933 ns.
+  Timing and physical acceptance remain false. Green means collection passed.
+- No phase boxes ticked or production changes adopted. Next inspect the newly
+  collected edge/path traces to select a justified repair; remaining detailed
+  leaf routes, assembled fabric/shell and extracted timing are still open.
+
 ## 2026-11-18 — Repair pinned edge-observer syntax
 
 - Observer44392597060/7d08c62fails after original static timing because pinned

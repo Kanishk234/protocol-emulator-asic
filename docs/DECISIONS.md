@@ -1,5 +1,28 @@
 # Decisions
 
+## D-124: Qualify every remaining frozen leaf context with bounded detailed routing
+
+- **Date:** 2026-11-18. **Status:** diagnostic campaign; no hardware change.
+- **Need:** D120 qualifies only primitive1. The other 25 globally routed contexts
+  need actual detailed wires before fabric assembly can be assessed. Identical
+  module netlists do not qualify different placement and power-phase contexts.
+- **Inputs:** download the exact D119 capsule from run 40128859740, validate
+  producer/artifact identity and the complete ZIP SHA256 before extraction.
+  Select exactly one existing case per job; retain its recorded zero-overflow,
+  power checks, ODB hash, placement and guides. No floorplan or netlist sweep.
+- **Policy/cost:** pinned D120 EDA image, Metal2–Metal4, four threads, 32 router
+  iterations, 1200-second process bound. Run 25 contexts with at most three jobs
+  concurrently. Original primitive1 remains a separate control. No new cells,
+  silicon area, protocol feature, configuration ABI or architecture change.
+- **Gates:** process exit zero, unique completion/violation markers, zero router
+  violations, identical cell/pin/placement/connectivity inventories and actual
+  wires on every required signal net. Wire-only NE_term must also have wires;
+  zero cells is no exemption. Record timeouts and failures without acceptance.
+- **Scope:** these are router diagnostics, not foundry DRC/LVS, assembled fabric,
+  shell integration or extracted timing. BUG133 stays open independently.
+- **Validation:** all 26 original contexts prepare locally; 57 focused checks
+  and actionlint pass. Hosted campaign results remain pending.
+
 ## D-123: Reroute one provably irrelevant LUT input in the measured inter-tile cycle
 - **Date:**2026-11-18. **Status:** bounded analysis diagnostic, no production or bitstream adoption.
 - **Measured basis:** D122run44389897658 reproduces all six original timing sensitivities. G.FF0→1changes none of them; reject that hypothesis. Its independent full-grid audit compares all8736bits in40tiles to the loaded image with0mismatches. The actual loop report crosses X2Y3LUT→X2Y4southI/O→X2Y3LD_I1; single-tile root feedback probes alone miss this boundary cycle.

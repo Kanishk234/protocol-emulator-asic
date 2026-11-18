@@ -1,0 +1,157 @@
+{
+  "scope": "Separate firmware select/abort guard on unchanged qualified hardware; finite recovery coverage",
+  "base_commit": "a7161a06ad2c4a2f1f90c4323ced5c6d19bb1cdf",
+  "source_sha256": {
+    "programs/i2c_target_eeprom_guard.trw": "de605e839863f6115c821cd344e06bb66e7334812c5f15a4ae9c77ef4ac36613",
+    "tools/protomodels/i2c_recovery.py": "464f32036fc33f3971bb62b3f453f67d6879fb10c8d4f1b7200c8691d7becd29",
+    "tools/kernels/tests/test_i2c_recovery.py": "bd3d775d8180e2bce5038d30743ab66a864339ae0a51e5a73e1a0dc5ef123138",
+    "test_internal/chip/test_phase3.py": "48ad1c11d7f6455f8fcdad2518436ad799ddf0e2dfffa5f06eb639b5ff8f717c",
+    "test_internal/i2c_peer/test_i2c_peer.py": "6b1b8518a840f5ac1a74f7e9ff59da1665a708d1afc20164dd666c153539cea8"
+  },
+  "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+  "resources": {
+    "lanes": 2,
+    "slots": [
+      12,
+      11
+    ],
+    "sram_words": 304,
+    "units": [
+      "U0",
+      "U1"
+    ],
+    "protocol_pins": [
+      "uio0",
+      "uio1"
+    ],
+    "reserved_output": "uo7",
+    "l0_constants": 4,
+    "l0_reserved_register": "r0"
+  },
+  "model": {
+    "total_passed": 573,
+    "guard_recovery_cases": 190,
+    "original_recovery_cases": 22,
+    "log_sha256": "5d78b545ea7a1f4db43500fae0c6fb9e428cece81456895edb37af0118b325c0"
+  },
+  "negative_control": {
+    "blocked_delimiters_failed": true,
+    "urgent_delimiters_recovered": true,
+    "log_sha256": "4513d413ad64eda7127f4722ca20f71c7c67f6a373a73ff2dc906c4a99a7afd7"
+  },
+  "rtl": {
+    "cases": [
+      {
+        "name": "test_i2c_memory_eeprom",
+        "skipped": false,
+        "simulation_ns": 7035900.0,
+        "seconds": 21.16980504989624
+      },
+      {
+        "name": "test_i2c_memory_recovery",
+        "skipped": false,
+        "simulation_ns": 6900560.0,
+        "seconds": 14.765409708023071
+      },
+      {
+        "name": "test_i2c_memory_guard",
+        "skipped": false,
+        "simulation_ns": 9645920.0,
+        "seconds": 28.075410842895508
+      }
+    ],
+    "xml_sha256": "b439d424ecc4500e76afe7d191605dd956734aa61152a83bcccc1290a3635eae",
+    "log_sha256": "d21464402f8e00ca59a86ff5ebd2c1037edc0a3694008507db70ae25511a3822"
+  },
+  "peer_rtl": {
+    "cases": [
+      {
+        "name": "test_eeprom_against_independent_controller",
+        "skipped": false,
+        "simulation_ns": 4813620.0,
+        "seconds": 15.908629655838013
+      },
+      {
+        "name": "test_guard_against_independent_controller",
+        "skipped": false,
+        "simulation_ns": 4813640.0,
+        "seconds": 13.87749195098877
+      }
+    ],
+    "xml_sha256": "bee4c72342267727c3b90eeb2f87b92ac2e46267298c7cf72df98b7c484f3893",
+    "log_sha256": "ab29593be2714e78bfccce83ef36fd1def0981f0793fe2a4896fc4f61ad0987b"
+  },
+  "guard_recovery_sequence": {
+    "cases": 12,
+    "host_reset_or_reload_between_cases": false,
+    "period_high_profiles": [
+      [
+        125,
+        60
+      ],
+      [
+        50,
+        13
+      ],
+      [
+        50,
+        25
+      ]
+    ]
+  },
+  "official_gate": {
+    "passed": 1,
+    "failed": 0,
+    "selected_skipped": 0,
+    "unrelated_filtered_out": 2,
+    "timing_profiles": 3,
+    "consecutive_recovery_cases": 12,
+    "simulation_ns": 9645900.0,
+    "seconds": 449.56654357910156,
+    "xml_sha256": "80027d0811a35565097c434d857d570c45315b5c7d790921b2b1c76179138e67",
+    "log_sha256": "b270108ba53e06034d8e4eada15411fb4b91a5401a2804b43b0374471fed2dc7",
+    "sampled_ack_setup_bound_clocks": [
+      31,
+      11,
+      17
+    ],
+    "sampled_ack_setup_bound_ns": [
+      620,
+      220,
+      340
+    ]
+  },
+  "peer_official_gate": {
+    "passed": 1,
+    "failed": 0,
+    "selected_skipped": 0,
+    "unrelated_filtered_out": 1,
+    "profiles": 2,
+    "simulation_ns": 4813620.0,
+    "seconds": 219.9968523979187,
+    "xml_sha256": "fa31cd360ce648f7c4563434233ecfc255f0b7402acb6a6657375bf4547ffdfc",
+    "log_sha256": "65f5398ff845193d403432ad7fb3960e1fbb71b47b98f2cb05f1f4970314fa8c",
+    "minimum_period_high_low_clocks": [
+      [
+        130,
+        65,
+        65
+      ],
+      [
+        50,
+        25,
+        25
+      ]
+    ],
+    "read_bytes_per_profile": 14,
+    "expected_nacks_per_profile": 3
+  },
+  "official_run": 44189196098,
+  "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+  "pdk_revision": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+  "sigrok_required": true,
+  "sdf_annotated": false,
+  "compiler_reaction_bound_proven": false,
+  "physical_inputs_unchanged": true,
+  "official_workflows_unchanged": true
+}

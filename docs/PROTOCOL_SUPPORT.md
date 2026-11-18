@@ -34,3 +34,5 @@ No real-hardware testing is claimed. USB/Ethernet model work is not an ASIC supp
 ## Additional Phase 3 showcase
 
 The SRAM-backed I2C memory personality is verified separately from the historical 22-case run. It passes the independent model, chip RTL and the exact official final netlist at 400 kHz and 1 MHz, including the short-high waveform, with required sigrok decoding. See [its scope and hashed evidence](reports/PHASE3_I2C_MEMORY.md). This is volatile immediate-write memory, not full EEPROM conformance; the [independent RTL peer](reports/PHASE3_I2C_PEER.md) now passes, while the compiler-bound task remains open.
+
+A separate [guarded memory personality](reports/PHASE3_I2C_GUARD.md) uses existing U1 and reserved output uo7 for select/abort recovery. Its finite recovery tests and replay status are recorded separately; the original one-unit example retains its documented late-ACK limitation. No hardware or full protocol-conformance claim is added.

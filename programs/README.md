@@ -12,6 +12,7 @@ TRIPWIRE firmware in the `.trw` language, compiled by `tools/tripc`. The languag
 | `i2c_controller.trw` | I2C controller: START/rSTART/STOP, read/write, stretching | 11 | 2 | Reference target and sigrok, 100 kHz / 400 kHz / 1 MHz |
 | `i2c_target.trw` | I2C target: address match, read/write | 12 | — | Reference controller and sigrok, 100 kHz / 400 kHz / 1 MHz |
 | `i2c_target_eeprom.trw` | Volatile 256-byte I2C memory, eight-byte page wrap and cached SRAM reads; not full EEPROM electrical/write-cycle emulation | 12 + 11 (2 lanes) | 3 | Model: addresses 0x50/0x2A at 100/400/1000 kHz, repeated START, NACK, wrap and sigrok; [Phase 3 evidence](../docs/reports/PHASE3_I2C_MEMORY.md) |
+| `i2c_target_eeprom_guard.trw` | Separate memory firmware with existing select/abort primitives; uses U0 + U1 and reserves uo7 | 12 + 11 (2 lanes) | 3 | 190 guarded recovery model cases; RTL/exact official netlist timing/recovery and independent RTL peer; [scope and replay status](../docs/reports/PHASE3_I2C_GUARD.md) |
 | `ws2812.trw` | WS2812/SK6812 LED strips (PULSE mode) | 2 | — | Datasheet-tolerance reference decoder and sigrok `rgb_led_ws281x` |
 | `dshot.trw` | DShot150–1200 motor ESCs; checksum computed in a routine | 2 | 1 | Reference decoder (frames, checksums, bit timing) |
 | `ps2_host.trw` | PS/2 host: both directions, parity/framing errors, device ACK check | 12 | 1 | Reference device (Chapweske) and sigrok `ps2` |

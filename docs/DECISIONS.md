@@ -2031,3 +2031,14 @@ hashes and software encodings remain exact.14focusedtests,inputaudit,pinnedClass
 flag inspection and unchanged official-job check pass. Next: fresh unchanged
 GDS/precheck/GL/viewer and final artifact/required-main-CI review. No phase box is
 ticked here. RawMagic-zero is not part of this adopted checker-policy claim.
+
+
+## D-186 (2026-11-18): evaluate a firmware select guard without reopening physical closure
+
+General need: recover a programmable external-clock transmitter from an interrupted transaction, including a queued response that survives a new delimiter. Existing SYNC/OE commands are serialized behind the active linked transfer. Use the existing generic deselect/abort primitive rather than introduce an I2C-specific block or change the ISA.
+
+Keep i2c_target_eeprom.trw as the one-unit example and add i2c_target_eeprom_guard.trw as a separate firmware option. U1 drives uo7 with short CLK sequences; U0 selects from that existing internal output feedback. Delimiter CTRL tokens multicast from L0 to both the memory lane and guard. The memory lane's delimiter reflexes remain urgent while a bounded routine runs, preventing multicast backpressure from delaying later cancellation. START uses nine two-clock cycles and STOP two; these are exercised firmware choices, not a general cancellation/timing proof.
+
+Cost: one existing lean unit U1, reserved output uo7, one additional L0 constant and r0 for the eight-bit length token. Both lanes still use12/11slots and304/512SRAMwords. No additional cells, RTL/config/spec/macros changes, external jumper or official workflow edit. The qualified physical baseline remains fixed. This does not authorize a hardware or architecture extension.
+
+Model and RTL evidence, negative control, limitations and exact-netlist replay status are in reports/PHASE3_I2C_GUARD.md. The phase-specific compiler bound remains open, so no Phase3exit checkbox is completed by this choice.

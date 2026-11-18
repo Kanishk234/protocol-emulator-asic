@@ -75,3 +75,7 @@ existing primitives. If a hardware change is required, propose its general
 purpose, cost and qualification plan before implementing it. Preserve the
 qualified baseline as the fallback. Compiler reaction bounds and the actual
 SRAM rotation proof remain open after this recovery work.
+
+Follow-up: [a separate guarded firmware option](PHASE3_I2C_GUARD.md) uses
+existing select/abort primitives with U1 and uo7. Its evidence does not remove
+the one-unit program's documented limitation or rewrite this historical receipt.

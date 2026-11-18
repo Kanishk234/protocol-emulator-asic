@@ -2,7 +2,7 @@
 # Run inside the project venv (source .venv/bin/activate): make
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
-SRC_DIR ?= $(PWD)/../../src
+SRC_DIR ?= $(CURDIR)/../../src
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_alu.v
 COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT

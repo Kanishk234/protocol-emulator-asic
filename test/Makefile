@@ -5,7 +5,7 @@
 SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
-SRC_DIR = $(PWD)/../src
+SRC_DIR = $(CURDIR)/../src
 PROJECT_SOURCES = tt_um_tripwire.v trw_chip.v trw_sync.v trw_fabric.v trw_chan_port.v trw_chan_prod.v trw_host.v trw_spi.v trw_lane.v trw_alu.v trw_slots.v trw_sram.v trw_pin_cfg.v trw_pin_io.v trw_pin_tx.v trw_pin_rx.v trw_pin_bs.v trw_pin_unit.v trw_pins.v
 
 MACRO_DIR = $(abspath $(SRC_DIR)/../macro/RM_IHPSG13_1P_512x16_c2_bm_bist)
@@ -31,7 +31,7 @@ VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilo
 VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog/sg13cmos5l_udp.v
 
 # this gets copied in by the GDS action workflow
-VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
+VERILOG_SOURCES += $(CURDIR)/gate_level_netlist.v
 
 endif
 
@@ -39,7 +39,7 @@ endif
 COMPILE_ARGS 		+= -I$(SRC_DIR) -DFUNCTIONAL
 
 # Include the testbench sources:
-VERILOG_SOURCES += $(PWD)/tb.v
+VERILOG_SOURCES += $(CURDIR)/tb.v
 TOPLEVEL = tb
 
 # List test modules to run, separated by commas and without the .py suffix:

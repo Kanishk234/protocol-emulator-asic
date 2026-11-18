@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-RTL_DIR = pathlib.Path(os.environ.get("RTL_DIR", "/tmp/r4-bitsync-work/src")).resolve()
+RTL_DIR = pathlib.Path(os.environ.get("RTL_DIR", str(ROOT / "src"))).resolve()
 RTL_REV = os.environ.get("RTL_REV", "unknown")
 MAKE = ["make", "-C", "test_internal/l2", "SIM=verilator"]
 

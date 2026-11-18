@@ -21,7 +21,7 @@ from tripsim.lockstep import first_difference  # noqa: E402
 from host import frame_write, slot_words  # noqa: E402
 from adapter import CandidateMap, model_snapshot, rtl_snapshot  # noqa: E402
 
-RTL_DIR = pathlib.Path(os.environ.get("RTL_DIR", "/tmp/r4-bitsync-work/src"))
+RTL_DIR = pathlib.Path(os.environ.get("RTL_DIR", str(ROOT / "src")))
 RTL_REV = os.environ.get("RTL_REV", "unknown")
 CSN, SCK, MOSI, MISO = 4, 5, 6, 3
 

@@ -2,10 +2,10 @@
 # Run inside the project venv (source .venv/bin/activate): make
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
-SRC_DIR ?= $(PWD)/../../src
+SRC_DIR ?= $(CURDIR)/../../src
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_sync.v $(SRC_DIR)/trw_spi.v $(SRC_DIR)/trw_host.v $(SRC_DIR)/trw_pins.v \
-                  $(SRC_DIR)/trw_chan_prod.v $(PWD)/tb_host.v
+                  $(SRC_DIR)/trw_chan_prod.v $(CURDIR)/tb_host.v
 COMPILE_ARGS += -I$(SRC_DIR) -DSIM_ASSERT
 TOPLEVEL = tb_host
 COCOTB_TEST_MODULES ?= test_host

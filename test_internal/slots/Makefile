@@ -3,7 +3,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 FLOPS ?= 0
-SRC_DIR ?= $(PWD)/../../src
+SRC_DIR ?= $(CURDIR)/../../src
 SIM_BUILD = sim_build/flops$(FLOPS)
 
 VERILOG_SOURCES = $(SRC_DIR)/trw_slots.v

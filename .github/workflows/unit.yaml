@@ -65,6 +65,9 @@ jobs:
       - name: Chip-level, L3, rotation and Phase 3 firmware tests
         run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3
 
+      - name: Independent I2C controller RTL peer
+        run: make -C test_internal/i2c_peer
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v7
@@ -73,6 +76,7 @@ jobs:
           path: |
             test_internal/**/results*.xml
             test_internal/chip/*.vcd
+            test_internal/i2c_peer/*.vcd
 
   # L-XSIM (VERIFICATION.md §6): the same RTL suites under Verilator. cocotb 2 needs Verilator >= 5.036, newer than
   # Ubuntu's, so this job uses the OSS CAD Suite (pinned and cached the same way as the efpga branch's workflows).
@@ -119,10 +123,13 @@ jobs:
           make -C test_internal/pin SIM=verilator FULL=1 SIM_BUILD=sim_build/vl1 COCOTB_RESULTS_FILE=results_vl1.xml
           make -C test_internal/chip SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml \
             COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3
+          make -C test_internal/i2c_peer SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml
 
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: rtl-verilator-results
-          path: test_internal/**/results_vl*.xml
+          path: |
+            test_internal/**/results_vl*.xml
+            test_internal/i2c_peer/*.vcd

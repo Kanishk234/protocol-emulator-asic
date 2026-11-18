@@ -1,0 +1,104 @@
+{
+  "scope": "L3B-PEER local simulation evidence, not whole Phase 3 completion",
+  "base_commit": "f1dbbaf5dd0e0cf67d507ecd1a9f3d619fe42d72",
+  "external_source_commit": "a65be4045e898a52e791c6ee71f8f79a7cd2e129",
+  "official_run": 44189196098,
+  "official_netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+  "pdk_version": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+  "sigrok_required": true,
+  "sdf_annotated": false,
+  "results": {
+    "verilator": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "profiles": 2,
+      "read_bytes_per_profile": 14,
+      "expected_missed_ack_pulses_per_profile": 3,
+      "minimum_period_high_low_clocks": {
+        "31": [
+          130,
+          65,
+          65
+        ],
+        "11": [
+          50,
+          25,
+          25
+        ]
+      },
+      "xml_sha256": "83a3b8632cc3a6dbba69dc3ef1cf92320dec6138d5f9e9635e06b9fbf03064a2",
+      "log_sha256": "b6040037326f2183f108247d1419d1d8ca818e1edd68e9b183c9ed550d2c116f",
+      "simulation_ns": 4813620.0
+    },
+    "icarus": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "profiles": 2,
+      "read_bytes_per_profile": 14,
+      "expected_missed_ack_pulses_per_profile": 3,
+      "minimum_period_high_low_clocks": {
+        "31": [
+          130,
+          65,
+          65
+        ],
+        "11": [
+          50,
+          25,
+          25
+        ]
+      },
+      "xml_sha256": "2cf8444d6c36db77469cd5ba22f46d75fa6249cfc488a0276a9cac0e6eabd987",
+      "log_sha256": "1acaa2059dbb1d06969a634353e29be263e8085d17e49f5d257356cd8a4f0d7a",
+      "simulation_ns": 4813620.0
+    },
+    "official_gate": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "profiles": 2,
+      "read_bytes_per_profile": 14,
+      "expected_missed_ack_pulses_per_profile": 3,
+      "minimum_period_high_low_clocks": {
+        "31": [
+          130,
+          65,
+          65
+        ],
+        "11": [
+          50,
+          25,
+          25
+        ]
+      },
+      "xml_sha256": "a348be14488e072135740103b5420958376b4f5663511806e5b0e24af8533eb2",
+      "log_sha256": "ccca5a53d6946f90ebb9388388ceca683238ebdf60dd275e23e629d5e9567f4c",
+      "simulation_ns": 4813620.0
+    }
+  },
+  "source_hashes": {
+    "test_internal/i2c_peer/Makefile": "fca1bb2800fa5087020b48e88d04c5e143045c4cfcbeef00b22c65cc89dea199",
+    "test_internal/i2c_peer/tb_i2c_peer.v": "adb9b90e404af3d732820b834c8bd51e9917d9daaffbbffe878c51c2855ff708",
+    "test_internal/i2c_peer/test_i2c_peer.py": "e6ba3cf37ad81637b7e8f2dc94000b31b3794d1f1853ccd8ed5d9655b2621da9",
+    "test_internal/chip/Makefile": "16df3f68179ebe6a7a04c1835fdbd7b69449cc998a0a0b26ef8d20d4fe101925",
+    "programs/i2c_target_eeprom.trw": "c09703cddc20045ebeacaf43f58372c381f753f0e1c6238444bd567bab5b293d",
+    "test_internal/vendor/verilog_i2c/i2c_master.v": "9c4e05759f356e9ddd91af6981a1fcc10466cad0af6e5afb6553787fe9ea0328",
+    "test_internal/vendor/verilog_i2c/COPYING": "9a3d2d9df500459598f939d20f659191c73881eb8d88fd24d0f81a12438320ea",
+    "test_internal/vendor/verilog_i2c/PROVENANCE.json": "271c37a9bfbbe24a7ca4851f536dbdd7116bf6c341151ca53fa8b14f7b87f0e9"
+  },
+  "repository_audit": {
+    "qualified_inputs_match": true,
+    "official_workflows_unchanged": true,
+    "source_lists_match": true,
+    "documentation_links_ok": true,
+    "generated_files_match": true,
+    "verified_vendor_packages": 1
+  },
+  "limitations": [
+    "One I2C memory firmware scenario, not exhaustive protocol conformance",
+    "Digital functional simulation, not analog pad characterization or silicon",
+    "Compiler-derived reaction bound and formal properties remain open"
+  ]
+}

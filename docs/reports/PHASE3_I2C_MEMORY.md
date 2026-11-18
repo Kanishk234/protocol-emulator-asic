@@ -34,7 +34,7 @@ Observed minimum ACK setup before the SCL rising edge:
 | 50 / 25 clocks (1 MHz) | 12 clocks / 240 ns |
 | 50 / 13 clocks (1 MHz, short high) | 18 clocks / 360 ns |
 
-These are sampled digital pad-level observations at a 20 ns simulation clock, not WNS, extracted timing or characterized pad timing. The model additionally passes 100 kHz. Analog rise/fall behavior, mid-byte aborts, exhaustive traffic, independent RTL-peer interoperability and a compiler-derived ACK bound remain unqualified. The Phase 3 EEPROM exit item is not ticked by this milestone alone.
+These are sampled digital pad-level observations at a 20 ns simulation clock, not WNS, extracted timing or characterized pad timing. The model additionally passes 100 kHz. Analog rise/fall behavior, mid-byte aborts, exhaustive traffic and a compiler-derived ACK bound remain unqualified. Independent RTL-peer interoperability is subsequently verified in [the peer milestone](PHASE3_I2C_PEER.md). The Phase 3 EEPROM exit item is not ticked by this milestone alone.
 
 ## References
 

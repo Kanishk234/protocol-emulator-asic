@@ -14,10 +14,10 @@ The independent model and chip RTL exercise address rejection, current/random/se
 
 ## Scope limits
 
-The memory is SRAM-backed and volatile, writes commit immediately, and EEPROM write-cycle busy timing is not implemented. Mid-byte abort behavior, analog rise/fall times and uncharacterized pads remain unqualified. The scenario tests are not a third-party RTL-peer result. The compiler still lacks a context-specific ACK/reaction-bound proof.
+The memory is SRAM-backed and volatile, writes commit immediately, and EEPROM write-cycle busy timing is not implemented. Mid-byte abort behavior, analog rise/fall times and uncharacterized pads remain unqualified. The independent RTL-peer milestone subsequently passes under both RTL simulators and on the exact official netlist; see [its separate evidence](../reports/PHASE3_I2C_PEER.md). The compiler still lacks a context-specific ACK/reaction-bound proof.
 
 ## Next
 
-Publish the first milestone evidence and require CI green; integrate an independent I2C controller peer; add the per-path compiler reaction analysis. Existing PS/2, 1-Wire, WS2812 and DShot examples should be audited and extended rather than recreated. The phase checklist remains authoritative, and its exit items stay unchecked until their full requirements pass.
+Require publication CI green, then add per-path compiler reaction analysis. L3B-PEER now passes, including measured 1 MHz, with pinned unmodified external RTL and sigrok. The peer implementation is isolated in test_internal/i2c_peer and its pinned source/license in test_internal/vendor; see [the peer report](../reports/PHASE3_I2C_PEER.md). Existing PS/2, 1-Wire, WS2812 and DShot examples should be audited and extended rather than recreated. For F-ROT-1, the arbitration is integrated into trw_chip plus lane/host enable gating; trw_sram only wraps the macro. Prove those actual logic cones and their composition rather than a copied standalone arbiter. The phase checklist remains authoritative, and its exit items stay unchecked until their full requirements pass.
 
 **Takeaway:** the qualified chip can gain a memory-device personality through firmware; Phase 3 is adding software and evidence, not reopening physical closure by default.

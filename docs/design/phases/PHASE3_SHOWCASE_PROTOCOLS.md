@@ -18,7 +18,7 @@ Phase 2 closed November 18 on 8×4, two lanes and four units. The original dates
 
 ## Current implementation inventory
 
-The first new firmware personality is `i2c_target_eeprom.trw`; see [its scope and evidence](../../reports/PHASE3_I2C_MEMORY.md). The existing `onewire.trw`, `ps2_host.trw`, `ws2812.trw` and `dshot.trw` already have model/RTL/routed scenarios from Phase 2; audit the additional Phase 3 requirements rather than recreating those programs. SPI flash, the UART multicast showcase, third-party peers, capture replay, metamorphic coverage, formal proofs, compiler analysis and the Basys 3 build remain open. D-021 still records the Hardcaml H0 import decision as not run; resolve it before any conditional H1 work. See [the in-progress summary](../../summaries/PHASE3.md).
+The first new firmware personality is `i2c_target_eeprom.trw`; see [its scope and evidence](../../reports/PHASE3_I2C_MEMORY.md). The existing `onewire.trw`, `ps2_host.trw`, `ws2812.trw` and `dshot.trw` already have model/RTL/routed scenarios from Phase 2; audit the additional Phase 3 requirements rather than recreating those programs. L3B-PEER now passes on an independent controller; see [the evidence](../../reports/PHASE3_I2C_PEER.md). SPI flash, the UART multicast showcase, capture replay, metamorphic coverage, formal proofs, compiler analysis and the Basys 3 build remain open. D-021 still records the Hardcaml H0 import decision as not run; resolve it before any conditional H1 work. See [the in-progress summary](../../summaries/PHASE3.md).
 
 ## 2. Tasks
 
@@ -89,7 +89,7 @@ The first new firmware personality is `i2c_target_eeprom.trw`; see [its scope an
 - [ ] I2C target (EEPROM) passes at **400 kHz and 1 MHz**; its ACK deadline is met in every run and matches the compiler's reported bound.
 - [ ] SPI target, 1-Wire, PS/2, WS2812 and DShot programs pass their L3 tests in RTL **and** `gl_test`.
 - [ ] Every L3 protocol is checked by **sigrok** in addition to our own model.
-- [ ] **L3B-PEER:** our I2C target interoperates with a third-party I2C controller core.
+- [x] **L3B-PEER:** our I2C target interoperates with a third-party I2C controller core. *(2026-11-18: unmodified MIT-licensed verilog-i2c a65be404; Verilator, Icarus and exact official final netlist each pass both profiles, including measured 1 MHz, required sigrok, wrong-address NACK and wrap checks. Evidence: [peer report](../../reports/PHASE3_I2C_PEER.md), phase3_i2c_peer_result.json. Simulation scope only.)*
 - [ ] **L3B-DUMPS:** at least one real capture each for UART, I2C and SPI decodes identically to sigrok.
 - [ ] **L4:** all five metamorphic relations pass for UART, SPI and I2C.
 - [ ] **Formal:** F-CHAN-1..4, F-SCHED-1..2, F-ROT-1, F-OWN-1, F-PIN-1, F-HOST-1 and F-DEC-1 proven, with each result's bounded/unbounded status recorded in `CLAIMS.md`.

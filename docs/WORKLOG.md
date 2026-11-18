@@ -17,6 +17,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - All 26 frozen contexts prepare locally; 57 focused tests and actionlint pass.
   No phase boxes ticked. Next inspect hosted route results and continue tracing
   the launch-path divergence; full-chip and extracted timing remain unqualified.
+- Published tool/test/docs/CI groups through 5db0b642. Cloud campaign
+  44394572610 and repeated primitive1 control 44394572275 are active. First
+  three contexts pass guard tests; two have reached routing while the other
+  authenticates its source. Test and lint workflows at that SHA pass; remaining
+  regressions are pending. Added census-drift guards bring focused tests to 60.
+- Confirm the alternate launch input is h_wvalid in the retained primary
+  testbench; it is an exercised host input, not a spare to tie off. See
+  reports/R1_EDGE_OBSERVER_20261118.md. No timing exception or repair adoption.
 
 ## 2026-11-18 — Progress check after corrected observer
 

@@ -2,6 +2,22 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Trace feedback across real tile boundaries
+
+- D126 expands the exact native 40-tile graph before applying D121 bounded
+  binary cofactors to X2Y3 D/E/G. Actual alias unification preserves the NE
+  feedthrough; all 8736 configuration latches remain bound to the snapshot.
+  Sequential outputs, top inputs, recursion and bound cuts remain free as
+  specified. No timing arc/constraint change or delay/hazard claim.
+- Actual-source preparation succeeds: 4119/5310/4497 cells, all below 8192;
+  each own-feedback and all-feedback variant retains its explicit cut map.
+  Positive and negative controls accompany the six cases. 74 combined focused
+  checks and actionlint pass. Hosted SAT outcomes remain pending.
+- D125 corrected finishing guard is published through bb7118e2 after recording
+  BUG136's pre-EDA failure; physical checks remain required. Next inspect both
+  cloud results and pursue only an evidence-supported repair. No phase boxes
+  ticked; G1/source images and sealed held-out set remain unchanged.
+
 ## 2026-11-18 — All frozen contexts route; prepare first leaf finishing gate
 
 - First finishing run 44402017507 stops before EDA: BUG136 guard requires an

@@ -1,5 +1,31 @@
 # Decisions
 
+## D-126: Expand binary feedback support across actual frozen tile connections
+
+- **Date:** 2026-11-18. **Status:** bounded diagnostic; no timing waiver.
+- **Need:** D121 stops at module-input boundaries while the measured native
+  timing paths cross X1Y3, X2Y3, X2Y4 and the primitive. Local-boundary feedback
+  counterexamples may overapproximate these real connections. D123's alternate
+  selector is applied correctly but does not remove six timing sensitivities.
+- **Method:** bind exact native JSON, structural top JSON, snapshot and slow
+  Liberty hashes from the authenticated original capsule. Unify actual tile
+  port aliases, including the NE wire feedthrough, before expanding every cell.
+  Require exactly 40 tiles and all 8736 native configuration latches. Preserve
+  sequential outputs as free boundaries and all top inputs as free signals.
+  Only the native constant tie cells become their specified binary values.
+- **Measurements:** D/E/G outputs in X2Y3, own-feedback and independently varying
+  all-feedback cofactors, with shared nonfeedback boundaries. Depth 128, at most
+  8192 expanded cells per cone; bound cuts remain unconstrained. Eight hosted
+  SAT cases including positive/negative controls, 120-second bound per case.
+- **Cost/scope:** software plus one bounded hosted job; no hardware, firmware,
+  constraints, source timing arcs or acceptance-policy change. This is stable
+  binary support only, not a settling/glitch/delay proof or permission to prune
+  any timing arc. Counterexamples/limits remain diagnostic, not chip defects.
+- **Validation:** actual-source preparation succeeds, with 4119/5310/4497 cells
+  in the three cones. Alias, configuration, unknown-literal and missing-port
+  guards pass; 74 combined focused checks and workflow actionlint pass.
+  Hosted outcomes pending. D125 leaf finishing proceeds independently.
+
 ## D-125: Finish the exact routed LUT0 leaf before expanding physical assembly
 
 - **Date:** 2026-11-18. **Status:** bounded leaf diagnostic, not promotion.

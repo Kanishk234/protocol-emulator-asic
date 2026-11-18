@@ -49,7 +49,7 @@ jobs:
             src/trw_chip.v src/trw_sync.v src/trw_fabric.v src/trw_chan_port.v src/trw_chan_prod.v \
             src/trw_host.v src/trw_spi.v src/trw_lane.v src/trw_alu.v src/trw_slots.v src/trw_sram.v \
             src/trw_pin_cfg.v src/trw_pin_io.v src/trw_pin_tx.v src/trw_pin_rx.v src/trw_pin_bs.v src/trw_pin_unit.v src/trw_pins.v \
-            spikes/r3_sram/overlay/src/RM_IHPSG13_1P_512x16_c2_bm_bist.v
+            src/RM_IHPSG13_1P_512x16_c2_bm_bist.v
 
       - name: L1 suites (fabric, ALU, lane, slot store, pad owners, host)
         run: |
@@ -61,9 +61,6 @@ jobs:
         run: |
           make -C test_internal/pin FULL=0
           make -C test_internal/pin FULL=1
-
-      - name: SRAM macro model (IHP-Open-PDK, pinned revision)
-        run: spikes/r3_sram/fetch_macro.sh
 
       - name: Chip-level tests, L3 and L1-ROT on the chip RTL
         run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot
@@ -120,7 +117,6 @@ jobs:
           done
           make -C test_internal/pin SIM=verilator FULL=0 SIM_BUILD=sim_build/vl0 COCOTB_RESULTS_FILE=results_vl0.xml
           make -C test_internal/pin SIM=verilator FULL=1 SIM_BUILD=sim_build/vl1 COCOTB_RESULTS_FILE=results_vl1.xml
-          spikes/r3_sram/fetch_macro.sh
           make -C test_internal/chip SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml \
             COCOTB_TEST_MODULES=test_chip,test_l3,test_rot
 

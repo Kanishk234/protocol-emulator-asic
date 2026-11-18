@@ -1,0 +1,99 @@
+name: protocol-replay
+# Functional replay of an existing successful official submission; no physical recipe changes.
+on:
+  workflow_dispatch:
+    inputs:
+      official_run:
+        description: Successful main-branch official GDS run ID
+        required: true
+        default: '44189196098'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [serial, pulse, debug, frames]
+    steps:
+      - uses: actions/checkout@v6
+      - name: Select official source revision
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.official_run }}
+        run: |
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]]
+          mkdir -p build/protocol-replay
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" > build/protocol-replay/source-run.json
+          jq -e '.status == "completed" and .conclusion == "success" and .head_branch == "main" and .path == ".github/workflows/gds.yaml"' build/protocol-replay/source-run.json
+          echo "sha=$(jq -r .head_sha build/protocol-replay/source-run.json)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.source.outputs.sha }}
+          path: candidate
+      - uses: actions/download-artifact@v7
+        with:
+          name: tt_submission
+          path: submission
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.official_run }}
+      - name: Read submission PDK
+        run: |
+          jq -e '.PDK == "ihp-sg13cmos5l"' submission/tt_submission/pdk.json
+          echo "PDK=$(jq -r .PDK submission/tt_submission/pdk.json)" >> "$GITHUB_ENV"
+          echo "PDK_VERSION=$(jq -r .PDK_VERSION submission/tt_submission/pdk.json)" >> "$GITHUB_ENV"
+      - uses: TinyTapeout/ciel-action@v1
+        with:
+          pdk_name: ${{ env.PDK }}
+          pdk_version: ${{ env.PDK_VERSION }}
+          pdk_root: /home/runner/pdk
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install simulation tools
+        run: |
+          pip install -r candidate/test/requirements.txt
+          sudo apt-get update && sudo apt-get install -y sigrok-cli
+          curl --fail --location -o "$RUNNER_TEMP/iverilog.deb" https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb
+          dpkg-deb -x "$RUNNER_TEMP/iverilog.deb" "$RUNNER_TEMP/iverilog-13"
+          echo "$RUNNER_TEMP/iverilog-13/usr/bin" >> "$GITHUB_PATH"
+      - name: Verify inputs and replay selected protocols
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          export IVERILOG_VPI_MODULE_PATH="$RUNNER_TEMP/iverilog-13/usr/lib/ivl"
+          export COMPILE_ARGS="-B $IVERILOG_VPI_MODULE_PATH -DFUNCTIONAL -DGL_TEST -DSIM"
+          unset TRIPWIRE_SKIP_SIGROK TESTCASE COCOTB_TESTCASE COCOTB_RESOLVE_X
+          python candidate/tools/gen/gen.py --check
+          python scripts/ci/protocol_replay.py prepare --pdk-root /home/runner/pdk
+          export COCOTB_TEST_FILTER="$(python scripts/ci/protocol_replay.py filter --shard "$SHARD")"
+          sources=$(python -c 'import json; print(" ".join(json.load(open("build/protocol-replay/compile.json"))["verilog_sources"]))')
+          make -C candidate/test_internal/chip SIM=icarus GATES=yes \
+            NETLIST="$PWD/submission/tt_submission/tt_um_tripwire.v" PDK_ROOT=/home/runner/pdk \
+            VERILOG_SOURCES="$sources" TOPLEVEL=tb_chip COCOTB_TEST_MODULES=test_l3 \
+            SIM_BUILD="$RUNNER_TEMP/replay-$SHARD" \
+            COCOTB_RESULTS_FILE="$PWD/build/protocol-replay/results_$SHARD.xml"
+          python scripts/ci/protocol_replay.py receipt --shard "$SHARD"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: protocol-${{ matrix.shard }}
+          path: build/protocol-replay/
+  aggregate:
+    needs: replay
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: protocol-*
+          path: build/shard-results
+      - run: python3 scripts/ci/protocol_replay.py aggregate
+      - uses: actions/upload-artifact@v7
+        with:
+          name: full-protocol-suite
+          path: build/protocol-replay/full-suite/

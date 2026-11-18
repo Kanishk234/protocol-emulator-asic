@@ -80,3 +80,57 @@ def test_controller_bus_phase_lengths(period, high, low_min, start_min):
         after = min(n for n in falls if n > rise)
         assert rise - before >= low_min
         assert after - rise == high
+
+
+def ack_oracle_trace(samples):
+    """Inject sampled pin levels into the monitor, without running a chip or controller FSM."""
+    ctrl = MemoryController(50, 25)
+    ctrl._gen = False
+    ctrl._ack_window = {'byte': 0xA0}
+    for sample in samples:
+        scl, sda = sample[:2]
+        ctrl.sda = sample[2] if len(sample) == 3 else 1
+        ctrl.step(scl, sda)
+    record = dict(ctrl._ack_window, acked=True)
+    ctrl.ack_records = [record,
+        {'byte': 0xA2, 'acked': False, 'sda_on_rise': 1, 'controller_released_on_rise': True},
+        {'byte': 0xA3, 'acked': False, 'sda_on_rise': 1, 'controller_released_on_rise': True}]
+    return ctrl, record
+
+
+@pytest.mark.parametrize('samples', [
+    [(0, 0), (0, 1), (0, 0), (1, 0)],
+    [(0, 0), (0, 1), (0, 1), (1, 0)],
+    [(0, 0)]*5 + [(0, 1), (0, 0), (1, 0)],
+    [(0, 0, 1), (0, 0, 0), (0, 0, 1), (1, 0, 1)],
+    [(0, 0)]*3 + [(1, 0), (0, 0), (1, 0)],
+])
+def test_ack_oracle_rejects_interrupted_or_invalid_setup(samples):
+    from protomodels.i2c_memory import check_result
+    ctrl, _ = ack_oracle_trace(samples)
+    with pytest.raises(AssertionError):
+        check_result(ctrl, [])
+
+
+@pytest.mark.parametrize('samples, expected', [
+    ([(0, 0)]*4 + [(1, 0)], 3),
+    ([(0, 0)]*5 + [(1, 0)], 4),
+    ([(0, 0), (0, 1)] + [(0, 0)]*4 + [(1, 0)], 3),
+])
+def test_ack_oracle_accepts_only_final_stable_low_interval(samples, expected):
+    from protomodels.i2c_memory import check_result
+    ctrl, record = ack_oracle_trace(samples)
+    assert record['setup_clocks'] == expected
+    assert check_result(ctrl, []) == expected
+
+
+@pytest.mark.parametrize('samples', [
+    [(0, 0)]*3 + [(1, 0)],  # two clocks after the observation-uncertainty reserve
+    [(0, 0)]*3 + [(1, 0), (1, 1), (1, 0)],
+    [(0, 0)]*3 + [(1, 0), (1, 0, 0), (1, 0, 1)],
+])
+def test_ack_oracle_rejects_short_setup_or_bad_high_phase(samples):
+    from protomodels.i2c_memory import check_result
+    ctrl, _ = ack_oracle_trace(samples)
+    with pytest.raises(AssertionError):
+        check_result(ctrl, [])

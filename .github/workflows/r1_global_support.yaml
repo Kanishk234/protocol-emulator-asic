@@ -62,8 +62,9 @@ jobs:
             sh -c 'set -eu; yosys -Q -T -s build/global_native/export.ys > build/global_native/export.log; python3 spikes/r1/global_support.py prepare --capsule build/r1_timing --native build/global_native/all-native.json --out build/global_support; for script in build/global_support/*.ys; do label=${script%.ys}; set +e; timeout 120s yosys -Q -T -s "$script" > "$label.log" 2>&1; code=$?; set -e; printf "%s\n" "$code" > "$label.exit"; done'
       - name: Require complete diagnostics and positive and negative controls
         run: |
-          source .venv/bin/activate
-          PYTHONPATH=tools python spikes/r1/global_support.py audit --out build/global_support
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" -e PYTHONPATH=tools \
+            ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a \
+            python3 spikes/r1/global_support.py audit --out build/global_support
       - uses: actions/upload-artifact@v7
         if: always()
         with:

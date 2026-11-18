@@ -119,13 +119,12 @@ def initialize(dut, prescale):
     dut.prescale.value = prescale
 
 
-@cocotb.test()
-async def test_eeprom_against_independent_controller(dut):
+async def exercise_peer(dut, program):
     """Page write/read, repeated START, controller NACK, wrong address and wrap."""
     for index, prescale in enumerate((31, 11)):
         initialize(dut, prescale)
         p = await start(dut, uio=0xFF, clock=index == 0)
-        await load(p, 'i2c_target_eeprom')
+        await load(p, program)
         peer = Peer(dut)
         try:
             await peer.write(0x50, [0x20, 0x11, 0xA5, 0x00, 0xFF])
@@ -145,7 +144,7 @@ async def test_eeprom_against_independent_controller(dut):
             assert peer.nacks == 3, peer.nacks
         finally:
             peer.task.cancel()
-        path = f'i2c_peer_{prescale}.vcd'
+        path = f'{program}_peer_{prescale}.vcd'
         write_vcd(path, peer.rec)
         decoded = sigrok(path, 'i2c:scl=scl:sda=sda', 'i2c')
         assert decoded is not None, 'Independent sigrok decode is required'
@@ -158,3 +157,13 @@ async def test_eeprom_against_independent_controller(dut):
             assert min(peer.highs) >= 13 and min(peer.lows) >= 25
         dut._log.info('Independent RTL peer prescale=%d: %d read bytes, %d expected NACKs; minimum period/high/low=%d/%d/%d clocks',
                       prescale, len(peer.received), peer.nacks, min(peer.periods), min(peer.highs), min(peer.lows))
+
+
+@cocotb.test()
+async def test_eeprom_against_independent_controller(dut):
+    await exercise_peer(dut, 'i2c_target_eeprom')
+
+
+@cocotb.test()
+async def test_guard_against_independent_controller(dut):
+    await exercise_peer(dut, 'i2c_target_eeprom_guard')

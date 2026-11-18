@@ -4,6 +4,7 @@ from cocotb.triggers import ClockCycles
 
 from chiplib import Wire, hex_bytes, load, sigrok, start, write_vcd
 from protomodels.i2c_memory import MemoryController, check_result, exercise
+from protomodels.i2c_recovery import RecoveryController
 
 
 @cocotb.test()
@@ -40,3 +41,43 @@ async def test_i2c_memory_eeprom(dut):
         decoded = sigrok(path, 'i2c:scl=scl:sda=sda', 'i2c')
         assert decoded is not None, 'Independent sigrok decode is required for this showcase'
         assert hex_bytes(decoded, 'Data read: ') == expected, decoded
+
+
+@cocotb.test()
+async def test_i2c_memory_recovery(dut):
+    """Pin-only abort/bus-clear checks, also usable with the official netlist."""
+    cases = [('address', 6, False), ('write', 6, False),
+             ('read', 0, True), ('read', 7, True)]
+    for index, (kind, bits, clear) in enumerate(cases):
+        p = await start(dut, uio=0xFF, clock=index == 0)
+        await load(p, 'i2c_target_eeprom')
+        ctrl = RecoveryController(kind, bits, clear)
+
+        def environment(uo, outputs, enables, bus):
+            assert not (enables & outputs & 1), 'SDA actively driven high'
+            assert not (enables & 2), 'Target drove SCL'
+            scl, sda = ctrl.step(bus >> 1 & 1, bus & 1)
+            return {}, {0: sda, 1: scl}
+
+        wire = Wire(p, environment, {'scl': lambda uo, bus: bus >> 1 & 1,
+                                     'sda': lambda uo, bus: bus & 1})
+        try:
+            for _ in range(1000):
+                if ctrl.done():
+                    break
+                await ClockCycles(dut.clk, 100)
+            ctrl.check_recovered()
+        finally:
+            wire.stop()
+        path = f'i2c_recovery_{kind}_{bits}.vcd'
+        write_vcd(path, wire.rec)
+        # Decode the subsequent complete transaction from its idle preamble.
+        # The decoder retains byte framing across a mid-byte STOP in the full
+        # malformed trace. Preserve that trace; do not treat it as read data.
+        verify_path = f'i2c_recovery_{kind}_{bits}_verify.vcd'
+        offset = ctrl.verify_start_clock - 1
+        assert all(wire.rec[name][offset] == 1 for name in ('scl', 'sda'))
+        write_vcd(verify_path, {name: samples[offset:] for name, samples in wire.rec.items()})
+        decoded = sigrok(verify_path, 'i2c:scl=scl:sda=sda', 'i2c')
+        assert decoded is not None, 'Recovery requires independent decode'
+        assert hex_bytes(decoded, 'Data read: ') == [0x12, 0xA5, 0, 0xFF], decoded

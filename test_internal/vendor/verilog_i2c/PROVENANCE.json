@@ -1,0 +1,18 @@
+{
+  "repository": "https://github.com/alexforencich/verilog-i2c",
+  "revision": "a65be4045e898a52e791c6ee71f8f79a7cd2e129",
+  "license": "MIT",
+  "scope": "Unmodified controller used only as an external verification peer; excluded from ASIC sources",
+  "upstream_status": "Deprecated in favor of fpganinja/taxi; pinned for reproducible verification",
+  "files": {
+    "i2c_master.v": {
+      "upstream_path": "rtl/i2c_master.v",
+      "sha256": "9c4e05759f356e9ddd91af6981a1fcc10466cad0af6e5afb6553787fe9ea0328"
+    },
+    "COPYING": {
+      "upstream_path": "COPYING",
+      "sha256": "9a3d2d9df500459598f939d20f659191c73881eb8d88fd24d0f81a12438320ea"
+    }
+  },
+  "license_file": "COPYING"
+}

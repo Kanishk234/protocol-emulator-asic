@@ -1,12 +1,14 @@
 # Run inside the project venv. Long lockstep/mutation runs remain explicit.
-.PHONY: all l1 chip l2 injections
-all: l1 chip
+.PHONY: all l1 chip peer l2 injections
+all: l1 chip peer
 l1:
 	@set -e; for suite in chan alu lane slots pins host; do $(MAKE) -C $$suite; done
 	$(MAKE) -C pin FULL=0
 	$(MAKE) -C pin FULL=1
 chip:
 	$(MAKE) -C chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3
+peer:
+	$(MAKE) -C i2c_peer
 l2:
 	$(MAKE) -C l2 L2_CYCLES=1000000
 injections:

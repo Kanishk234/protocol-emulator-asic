@@ -3,6 +3,8 @@
 # Uses the committed, licensed SRAM behavioral models.
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
+TB_DIR ?= $(CURDIR)
+EXTRA_VERILOG_SOURCES ?=
 SRC_DIR ?= $(CURDIR)/../../src
 MACRO_DIR ?= $(abspath $(CURDIR)/../../macro/RM_IHPSG13_1P_512x16_c2_bm_bist)
 
@@ -13,7 +15,7 @@ MACRO_MODELS = $(MACRO_DIR)/RM_IHPSG13_1P_core_behavioral_bm_bist.v $(MACRO_DIR)
 ifneq ($(GATES),yes)
 # RTL
 SIM_BUILD = sim_build/rtl
-VERILOG_SOURCES = $(addprefix $(SRC_DIR)/,$(CHIP_SOURCES)) $(MACRO_MODELS) $(CURDIR)/tb_chip.v
+VERILOG_SOURCES = $(addprefix $(SRC_DIR)/,$(CHIP_SOURCES)) $(MACRO_MODELS) $(TB_DIR)/tb_chip.v
 COMPILE_ARGS += -I$(SRC_DIR) -DFUNCTIONAL -DSIM_ASSERT
 else
 # Gate level: supply NETLIST and matching PDK_ROOT explicitly (with the UDP file,
@@ -27,11 +29,12 @@ $(error Set PDK_ROOT to the matching submission PDK)
 endif
 CELLS = $(PDK_ROOT)/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog
 VERILOG_SOURCES = $(CELLS)/sg13cmos5l_stdcell.v $(CELLS)/sg13cmos5l_udp.v $(MACRO_MODELS) \
-                  $(NETLIST) $(CURDIR)/tb_chip_gl.v
+                  $(NETLIST) $(TB_DIR)/tb_chip_gl.v
 COMPILE_ARGS += -DFUNCTIONAL -DGL_TEST -DSIM
 COCOTB_RESULTS_FILE = results_gl.xml
 endif
-TOPLEVEL = tb_chip
+VERILOG_SOURCES += $(EXTRA_VERILOG_SOURCES)
+TOPLEVEL ?= tb_chip
 ifeq ($(SIM),verilator)
 # L-XSIM: the macro's behavioural model has # delays (honour them, as Icarus does); its warnings are not ours
 EXTRA_ARGS += --timing -Wno-fatal

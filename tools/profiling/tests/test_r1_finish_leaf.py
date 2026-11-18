@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from finish_leaf import GATES, check_finished_inventory, gates_pass, identity
+from finish_leaf import GATES, check_finished_inventory, finishing_steps, gates_pass, identity
 
 
 def inventory():
@@ -45,3 +45,16 @@ def test_every_physical_gate_is_required_and_zero():
 def test_unrelated_producer_is_rejected():
     with pytest.raises(ValueError, match='producer'):
         identity(dict(id=44394572610, conclusion='success'))
+
+
+def test_repeated_antenna_stage_suffix_is_supported_but_absence_is_rejected():
+    from types import SimpleNamespace
+    ids = ['Odb.RemoveRoutingObstructions', 'OpenROAD.CheckAntennas-1',
+           'Checker.TrDRC', 'Checker.DisconnectedPins', 'OpenROAD.FillInsertion',
+           'OpenROAD.RCX', 'OpenROAD.STAPostPNR', 'KLayout.StreamOut', 'Magic.DRC',
+           'KLayout.DRC', 'Checker.MagicDRC', 'Checker.KLayoutDRC',
+           'Magic.SpiceExtraction', 'Netgen.LVS', 'Checker.LVS']
+    stages = [SimpleNamespace(id=name) for name in ids]
+    assert finishing_steps(stages) == stages
+    with pytest.raises(ValueError, match='CheckAntennas'):
+        finishing_steps([s for s in stages if s.id != 'OpenROAD.CheckAntennas-1'])

@@ -91,12 +91,15 @@ puts "R1_DRT_END"
     (out/'plan.json').write_text(json.dumps(plan,indent=2,sort_keys=True)+'\n')
 
 
-def check_inventories(before,after):
+def check_inventories(before,after,expected=None):
+    expected = expected or dict(cells=1453, configuration_latches=334, power_terminals=2906)
     prefixes=('CELL\t','ITERM\t','PORT\t','PBOX\t','PGTERMS\t')
     frozen=lambda text:sorted(line for line in text.splitlines() if line.startswith(prefixes))
     if frozen(before)!=frozen(after):raise ValueError('Detailed router changed cells, placement, pins or connectivity')
     cells=[line for line in after.splitlines() if line.startswith('CELL\t')]
-    if len(cells)!=1453 or sum('\tsg13cmos5l_dlhq_1\t' in line for line in cells)!=334 or 'PGTERMS\t2906' not in after.splitlines():
+    if (len(cells)!=expected['cells'] or
+        sum('\tsg13cmos5l_dlhq_1\t' in line for line in cells)!=expected['configuration_latches'] or
+        'PGTERMS\t'+str(expected['power_terminals']) not in after.splitlines()):
         raise ValueError('Detailed-route resource/power census differs')
     required=[line.split('\t') for line in after.splitlines() if line.startswith('REQUIRED_NET\t')]
     original=[line.split('\t') for line in before.splitlines() if line.startswith('REQUIRED_NET\t')]
@@ -105,7 +108,7 @@ def check_inventories(before,after):
     if not required or any(len(row)!=3 or row[2]!='1' for row in required):raise ValueError('Required signal net lacks a route wire')
     if len({row[1] for row in required})!=len(required):raise ValueError('Duplicate routed-net census')
     if {row[1] for row in required}!={row[1] for row in original}:raise ValueError('Required route-net population changed')
-    return dict(cells=1453,configuration_latches=334,power_terminals=2906,required_signal_nets_with_wires=len(required))
+    return dict(**expected,required_signal_nets_with_wires=len(required))
 
 
 def audit(out):

@@ -1,5 +1,18 @@
 # Bugs
 
+## 137: Cross-tile diagnostic audit could not write container-owned output
+
+- **Symptom/check:** 44403146357 completes all eight SAT cases, but the host
+  audit raises PermissionError when creating result.json. Workflow fails;
+  no completed diagnostic or timing acceptance is emitted.
+- **Root cause:** graph/cone preparation creates its directory inside the
+  container as root; the separate host audit runs as the runner user. Earlier
+  probes prepared their output directories on the host and did not expose this.
+- **Fix/coverage:** run the unchanged read-only input audit/result writer in
+  the same pinned container context as preparation. Retain all input hashes,
+  process/marker checks and positive/negative controls. Actionlint passes;
+  corrected hosted replay is required. No circuit, proof or timing-policy change.
+
 ## 136: Leaf-finishing stage guard missed a repeated-step suffix
 
 - **Symptom/check:** finishing run 44402017507 stops before EDA with missing

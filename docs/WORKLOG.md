@@ -4,6 +4,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-18 — Trace feedback across real tile boundaries
 
+- D125 corrected run 44402764510 at bb7118e2 passes all seven physical gates:
+  routing/disconnection/antenna-net/antenna-pin/Magic/KLayout/LVS counts zero.
+  Root verifies final ODB/GDS/netlist hashes and replays preservation of 1243
+  original cells, interface and 1347 wires; 503 standard filler/decap cells
+  added. Receipt: reports/r1_finished_lut0_44402764510.json. Null-clock leaf
+  virtual STA still reports 91 setup violations; no configured timing claim.
+- D126 run 44403146357 completes all eight SAT processes with correct controls.
+  Raw logs prove own-feedback D/E/G and stronger all-feedback D/G; stronger E
+  has a counterexample. Final host writer fails BUG137 container-owned directory
+  permissions, so no complete hosted result is claimed. Run unchanged audit
+  in the same pinned container and replay. No arc waiver or hardware change.
 - D126 expands the exact native 40-tile graph before applying D121 bounded
   binary cofactors to X2Y3 D/E/G. Actual alias unification preserves the NE
   feedthrough; all 8736 configuration latches remain bound to the snapshot.

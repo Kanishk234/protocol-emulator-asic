@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "scope": "One LUT0 leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "physical_gate_metrics": {
+    "route__drc_errors": 0,
+    "design__critical_disconnected_pin__count": 0,
+    "antenna__violating__nets": 0,
+    "antenna__violating__pins": 0,
+    "magic__drc_error__count": 0,
+    "klayout__drc_error__count": 0,
+    "design__lvs_error__count": 0
+  },
+  "original_cells": 1243,
+  "added_fill_or_decap_cells": 503,
+  "required_signal_nets_with_wires": 1347,
+  "odb_sha256": "2f5b74644950e1188ccaf9a75b787936155d788bb1d57b2a110f31cddaaf4a14",
+  "gds_sha256": "9e7c9c2cfd47893f4b3dee61f53148bc8174054b01f9b44e5e1b0805c553db8b",
+  "nl_sha256": "2dbe06f67577bfcdb7dff1203722713a188b0aec44c0eb6ad74e3fd1765ab04b",
+  "run": 44402764510,
+  "source_sha": "bb7118e2d58102359f75771a0ff5ec66ee6d3790",
+  "review": "Producer identity, final ODB/GDS/netlist hashes, original cell/interface/connectivity and all signal wires replayed.",
+  "virtual_clock_reports": {
+    "configured_timing_acceptance": false,
+    "setup_violations": 91,
+    "setup_worst_slack_ns": -19.734383574738384,
+    "scope": "Null-clock unconfigured leaf; virtual-clock reports do not qualify configured timing."
+  }
+}

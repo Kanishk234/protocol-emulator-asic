@@ -1,5 +1,20 @@
 # Bugs
 
+## 136: Leaf-finishing stage guard missed a repeated-step suffix
+
+- **Symptom/check:** finishing run 44402017507 stops before EDA with missing
+  required stages. No physical or timing result is accepted.
+- **Root cause:** SequentialFlow disambiguates repeated steps by adding a
+  numeric suffix. The post-route antenna stage is OpenROAD.CheckAntennas-1,
+  while the new guard required its unsuffixed name. Local tests did not inspect
+  the installed Classic stage IDs before the first cloud run.
+- **Fix/coverage:** strip only a final numeric suffix when testing required
+  stage membership; execute the original actual classes and retain their IDs.
+  A regression accepts the repeated stage and rejects its removal. Installed
+  Classic introspection now passes without EDA. Hosted corrected replay pending.
+- **Scope:** adapter guard only; no route, placement, configuration, physical
+  checker or acceptance metric changes. Original failed run remains recorded.
+
 ## 135: Edge observer used a newer OpenSTA formatting flag
 - **Date:**2026-11-18.
 - **Symptom/check:**44392597060runs original static timing, then the read-only trace fails because pinned OpenSTA2.7rejects report_edges -digits. No end marker or experiment acceptance is emitted.

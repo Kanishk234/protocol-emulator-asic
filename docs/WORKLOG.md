@@ -4,6 +4,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-18 — All frozen contexts route; prepare first leaf finishing gate
 
+- First finishing run 44402017507 stops before EDA: BUG136 guard requires an
+  unsuffixed stage name, but installed Classic calls its repeated post-route
+  antenna check OpenROAD.CheckAntennas-1. Correct only membership normalization,
+  retain actual stages/checks, and add a removal-rejection regression. Actual
+  installed Classic introspection finds all 27 post-route stages. Corrected
+  cloud replay follows; no physical result or route change claimed.
 - D124 campaign 44394572610 at 5db0b642 completes all 25 jobs successfully.
   Root downloads every artifact, verifies producer identity and replays all
   input/script/final ODB hashes plus frozen inventories and actual wire coverage.

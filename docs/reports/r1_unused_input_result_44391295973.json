@@ -1,0 +1,25 @@
+{
+  "run": 44391295973,
+  "source_sha": "cd5e58b0f9ce77f53099db410dfd490bddbb705a",
+  "artifact_id": 14468611828,
+  "archive_sha256": "b5e54bcd3d69e9b56672b4017f989bf55d174ab3207c2feea08788725976de92",
+  "change": {
+    "tile": "Tile_X2Y3_LUT4x8_ha",
+    "cell": "_1526_",
+    "frame": 6,
+    "data_bit": 21,
+    "tile_bit": 213,
+    "before": "0",
+    "after": "1",
+    "feature": "X2Y3.J2END_CD_END1.LD_I1",
+    "lut": "D",
+    "unused_input": 1,
+    "observed_init": 41120,
+    "cofactor_addresses_checked": 16,
+    "scope": "Unrouted I1, observed LUT function independent of I1; analysis only"
+  },
+  "hypothesis_supported": false,
+  "control_and_candidate_identical": true,
+  "timing_acceptance": false,
+  "production_change_adopted": false
+}

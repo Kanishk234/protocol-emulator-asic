@@ -2,6 +2,22 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Reject alternate unused input and observe actual STA edges
+
+- Publishede73fdd8tools/78383d9tests/b1a6956docs/cd5e58bCI. Diagnostic
+  44391295973completes; full artifact14468611828/hashb5e54bcd3d69e9b56672b4017f989bf55d174ab3207c2feea08788725976de92
+  verified. All8736configuration comparisons pass, but every endpoint and all
+  six sensitivities are identical after the one-bit selector change. Reject
+  this as a repair; no actual image or hardware is modified.
+- Add strictly read-only reports after original measurements: mux pin constants,
+  from/to edges including disable reasons, and two affected full paths. Need
+  to distinguish real source-route influence from STA case/graph behavior.
+  No assumed cause, new disabled timing arc or tolerance change. Original failed
+  control remains required. Fix generic result scope text to describe either
+  configuration-bit experiment accurately.47focused tests/actionlint pass.
+- Next inspect the pinned cloud edge/path evidence before any new repair.
+  G1/source/ABI/held-out set remain unchanged; no phase checklist boxes ticked.
+
 ## 2026-11-18 — Reject unused-output register change; trace inter-tile unused-input loop
 
 - Published153af66tools/6fd994ctests/03e3ffadocs/2442525CI. Run44389897658

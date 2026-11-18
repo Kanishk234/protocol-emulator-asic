@@ -52,6 +52,15 @@ selector bit213/frame6/data21/_1526_ (0→1). Used routes and LUT behavior are
 protected by explicit guards; candidate remains analysis-only until real image
 load/reset/protocol testing.46focused tests and authenticated preparation pass.
 
+**Measured D-123 result:**44391295973/cd5e58b finishes the diagnostic, but
+candidate/control results are identical, including all six sensitivities. No
+alternate route adopted. Whole artifact14468611828/hashb5e54bcd3d69e9b56672b4017f989bf55d174ab3207c2feea08788725976de92
+verified. Compact receipt:r1_unused_input_result_44391295973.json.
+Read-only follow-up adds actual mux constants/edge-disable reasons and detailed
+paths after the unchanged original measurements. It changes no case/arc policy.
+47focused checks pass. The first two hypotheses are rejected, not accumulated
+into the chip or used as permission to waive the guard.
+
 ## Work sequence
 
 1. Complete the full-grid configuration audit and one-bit sensitivity probe.

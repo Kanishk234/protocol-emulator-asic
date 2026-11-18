@@ -8,8 +8,9 @@ from .i2c import I2CController
 class MemoryController(I2CController):
     """Extend the bus controller with pointer-write/repeated-START reads.
 
-    ACK setup is counted in simulation clocks before SCL rises, while the
-    controller releases SDA. It measures observable pad behavior, not STA slack.
+    ACK setup is a conservative sampled lower bound before SCL rises while
+    the controller releases SDA: the final low run minus one observation clock.
+    It is not analog characterization or STA slack.
     """
 
     def __init__(self, clocks_per_bit, high_clocks=None):
@@ -45,15 +46,30 @@ class MemoryController(I2CController):
     def step(self, scl_bus, sda_bus):
         self.clocks += 1
         window = self._ack_window
-        if window is not None and self.sda:
-            if not scl_bus and not sda_bus:
-                window.setdefault('first_low', self.clocks)
+        if window is not None:
+            # Credit only the final continuous low interval observed while the
+            # controller releases SDA. A low/high/low pulse restarts the timer.
+            if self.sda and not sda_bus:
+                window.setdefault('low_since', self.clocks)
+            else:
+                window.pop('low_since', None)
             if not self._previous_scl and scl_bus:
-                window['sda_on_rise'] = sda_bus
-                first = window.get('first_low')
-                window['setup_clocks'] = None if first is None else self.clocks - first
-            if scl_bus and 'sda_on_rise' in window and sda_bus != window['sda_on_rise']:
-                window['changed_while_high'] = True
+                if 'sda_on_rise' in window:
+                    window['extra_rise'] = True
+                else:
+                    window['sda_on_rise'] = sda_bus
+                    window['controller_released_on_rise'] = bool(self.sda)
+                    since = window.get('low_since')
+                    span = None if since is None else self.clocks - since
+                    window['sample_span_clocks'] = span
+                    # Edges may occur between observations. Reserve one sample
+                    # rather than treating their sampled separation as exact time.
+                    window['setup_clocks'] = None if span is None else max(0, span - 1)
+            if scl_bus and 'sda_on_rise' in window:
+                if sda_bus != window['sda_on_rise']:
+                    window['changed_while_high'] = True
+                if not self.sda:
+                    window['controller_drove_high_phase'] = True
         self._previous_scl = scl_bus
         return super().step(scl_bus, sda_bus)
 
@@ -172,6 +188,9 @@ def check_result(controller, expected, addr=0x50):
     wrong = {(addr + 1) << 1, (addr + 1) << 1 | 1}
     # In this fixed scenario, only wrong-address control bytes should be NACKed.
     for record in controller.ack_records:
+        assert record.get('controller_released_on_rise') is True, record
+        assert not record.get('extra_rise'), record
+        assert not record.get('controller_drove_high_phase'), record
         if record['byte'] in wrong and not record['acked']:
             assert record.get('sda_on_rise') == 1, record
         else:

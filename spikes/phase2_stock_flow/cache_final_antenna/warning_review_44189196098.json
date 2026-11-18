@@ -1,0 +1,179 @@
+{
+  "official_run": 44189196098,
+  "revision": "e19556e1df1e2f87d4c195af618adb67a8063852",
+  "warning_log_sha256": "dd5ee3bf7e5dbc3a4c42e580d191150c05d4f19edc40daa9c24ee881ccf22d8c",
+  "warning_log_lines": 2077,
+  "tool_code_counts": {
+    "GRT-0281": 1,
+    "CTS-0041": 2,
+    "RSZ-0065": 1,
+    "EST-0026": 2002,
+    "DRT-0349": 7,
+    "DRT-0418": 47
+  },
+  "native_lint_categories": {
+    "WIDTHEXPAND": 7,
+    "UNUSEDSIGNAL": 8
+  },
+  "timing_coverage": {
+    "nom_fast_1p32V_m40C": {
+      "raw_unannotated_drivers": 77,
+      "unused_enable": 1,
+      "dummy_clockload_outputs": 76,
+      "all_dummy_outputs_omitted_in_netlist": true,
+      "filtered_unannotated_nets": 0,
+      "macro_liberty_loaded": true
+    },
+    "nom_typ_1p20V_25C": {
+      "raw_unannotated_drivers": 77,
+      "unused_enable": 1,
+      "dummy_clockload_outputs": 76,
+      "all_dummy_outputs_omitted_in_netlist": true,
+      "filtered_unannotated_nets": 0,
+      "macro_liberty_loaded": true
+    },
+    "nom_slow_1p08V_125C": {
+      "raw_unannotated_drivers": 77,
+      "unused_enable": 1,
+      "dummy_clockload_outputs": 76,
+      "all_dummy_outputs_omitted_in_netlist": true,
+      "filtered_unannotated_nets": 0,
+      "macro_liberty_loaded": true
+    }
+  },
+  "wire_length_review": {
+    "reported_nets": 42902,
+    "longest_nets": [
+      {
+        "net": "clknet_0_clk",
+        "length_um": 1105.07,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_3_2_0_clk",
+        "length_um": 947.69,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_1_1__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[1\\].g_stored.gclk",
+        "length_um": 930.19,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clk",
+        "length_um": 908.635,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_0_clk_regs",
+        "length_um": 844.9,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_3_4_0_clk",
+        "length_um": 745.995,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_3_3_0_clk",
+        "length_um": 735.59,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_3_1_0_clk",
+        "length_um": 718.3,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_1_0__leaf_u_chip.g_unit\\[0\\].u_cfg.g_word\\[3\\].g_stored.gclk",
+        "length_um": 638.2,
+        "def_use": "CLOCK"
+      },
+      {
+        "net": "clknet_3_0_0_clk",
+        "length_um": 608.655,
+        "def_use": "CLOCK"
+      }
+    ],
+    "longest_nonclock_nets": [
+      {
+        "net": "net11723",
+        "length_um": 585.63,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "net2293",
+        "length_um": 515.8,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "net2558",
+        "length_um": 437.455,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "_19871_",
+        "length_um": 436.725,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "net3154",
+        "length_um": 425.885,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "net3541",
+        "length_um": 425.0,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "net1993",
+        "length_um": 421.6,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "net2256",
+        "length_um": 402.99,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "net2396",
+        "length_um": 387.2,
+        "def_use": "SIGNAL"
+      },
+      {
+        "net": "_08254_",
+        "length_um": 385.32,
+        "def_use": "SIGNAL"
+      }
+    ],
+    "clock_net_count": 1293,
+    "counts_over_um": {
+      "100": 8516,
+      "250": 445,
+      "500": 15,
+      "1000": 1
+    },
+    "threshold_is_not_a_pass_fail_gate": true
+  },
+  "ir_drop": {
+    "scope": "Static typical-corner estimate with default flow supply sources; not package-aware or a measured dynamic maximum",
+    "external_supply_locations_defined": false,
+    "vpwr_worst_drop_v": 0.000356908,
+    "vgnd_worst_drop_v": 0.000284883,
+    "both_supply_grids_connected": true
+  },
+  "signoff_policy": "D-185",
+  "raw_abstract_overlap_markers": 10,
+  "hardware_change_justified_by_this_audit": false,
+  "remaining_actions": [
+    "Use actual shuttle/top-level supply connection data for a later boundary-source IR sensitivity check; do not invent pad coordinates.",
+    "Review wire growth against this baseline after future hardware changes; no arbitrary length cutoff substitutes for extracted timing/DRC.",
+    "Re-audit any new or changed warning family; explanations are bound to this run."
+  ],
+  "antenna_gate_information": {
+    "lef_input_pins": 19,
+    "only_missing_input": "ena",
+    "rtl_enable_intentionally_unused": true
+  }
+}

@@ -89,7 +89,7 @@
   "overlap_inventory_byte_identical_to_reviewed": true,
   "raw_magic_zero_claimed": false,
   "independent_artifact_review_complete": true,
-  "phase2_complete": false,
+  "phase2_complete": true,
   "main_ci": {
     "test": 44189195952,
     "lint": 44189196138,
@@ -100,5 +100,12 @@
   "official_gds_signoff": true,
   "l2_evidence": "l2_result_e19556e.json",
   "phase2_exit_evidence_complete_on_verified_revision": true,
-  "closure_publication_ci_pending": true
+  "closure_publication_ci_pending": false,
+  "closure_revision": "7f3ae9a670bcfc3810be40662d5493bd47e0313c",
+  "closure_ci": {
+    "test": 44227558895,
+    "lint": 44227558861,
+    "unit": 44227558788,
+    "docs": 44227558977
+  }
 }

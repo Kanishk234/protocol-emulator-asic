@@ -2,6 +2,15 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Repair pinned edge-observer syntax
+
+- Observer44392597060/7d08c62fails after original static timing because pinned
+  OpenSTA2.7does not support report_edges -digits. Actual select pin observation
+  reports S0in control. No full new observation result or acceptance claimed.
+- BUG135records tool-version mismatch; remove only formatting flag, preserving
+  from/toedge reports, original data, case changes, all constraints and guards.
+  No hardware/bitstream changes.47focused checks pass; launch corrected observer.
+
 ## 2026-11-18 — Reject alternate unused input and observe actual STA edges
 
 - Publishede73fdd8tools/78383d9tests/b1a6956docs/cd5e58bCI. Diagnostic

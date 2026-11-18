@@ -1,5 +1,11 @@
 # Bugs
 
+## 135: Edge observer used a newer OpenSTA formatting flag
+- **Date:**2026-11-18.
+- **Symptom/check:**44392597060runs original static timing, then the read-only trace fails because pinned OpenSTA2.7rejects report_edges -digits. No end marker or experiment acceptance is emitted.
+- **Root cause:** current upstream command documentation includes a formatting option absent from the pinned runtime. The graph/report observation did not change hardware or constraints.
+- **Fix/coverage:** omit only that formatting flag; retain supported -from/-toqueries and all original timing/configuration guards. Existing parse_log rejects incomplete/error logs and the edge-observer guard rejects added timing exceptions.47focused tests pass; hosted corrected observer replay required. Prior negative sensitivity experiments remain valid and unchanged.
+
 ## 134: Detailed-route wire observer swallowed an unsupported OpenDB method
 - **Symptom:** hosted40119792058 atdcf59af completes primitive1 detailed routing with zero router violations, but the audit incorrectly labels all1557required signal nets unwired.
 - **Root cause:** `dbWire.getId` is not exposed by this OpenDB Tcl interface. A broad `catch` converted that API error into a missing-wire flag. Synthetic inventory tests did not exercise the real getter; the unrouted input alone could not expose a false negative.

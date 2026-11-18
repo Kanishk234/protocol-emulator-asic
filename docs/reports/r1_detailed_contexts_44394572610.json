@@ -4,6 +4,20 @@
   "reviewed_contexts": [
     {
       "passed": true,
+      "case": "east_io",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 261,
+      "configuration_latches": 73,
+      "power_terminals": 522,
+      "required_signal_nets_with_wires": 332,
+      "routed_odb_sha256": "2ac6f684998b18fbcaf7678b454c73e4c3c28485a8859ef5789cdb918ad89dfd"
+    },
+    {
+      "passed": true,
       "case": "lut0",
       "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
       "physical_acceptance": false,
@@ -29,9 +43,317 @@
       "power_terminals": 2486,
       "required_signal_nets_with_wires": 1347,
       "routed_odb_sha256": "52f373dadd61ba65bc024cddba8e5ba734293c25b7e0a9ccc9aba4c94972ea40"
+    },
+    {
+      "passed": true,
+      "case": "lut2",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 1243,
+      "configuration_latches": 438,
+      "power_terminals": 2486,
+      "required_signal_nets_with_wires": 1347,
+      "routed_odb_sha256": "77a538f8079f49fe7d3001fcae15b701e27d2334df2bccec1eb6199bf5ffe3cd"
+    },
+    {
+      "passed": true,
+      "case": "lut3",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 1243,
+      "configuration_latches": 438,
+      "power_terminals": 2486,
+      "required_signal_nets_with_wires": 1347,
+      "routed_odb_sha256": "0d2fd3ff70c5ed03f464436eb1cf779ef3b12741ebe9b8c9aab65320e4dd89b5"
+    },
+    {
+      "passed": true,
+      "case": "lut4",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 1243,
+      "configuration_latches": 438,
+      "power_terminals": 2486,
+      "required_signal_nets_with_wires": 1347,
+      "routed_odb_sha256": "057ed8dbebd13c5bfa2d3fdea9bdf183b11d141dd922de298500f12b2d788435"
+    },
+    {
+      "passed": true,
+      "case": "lut5",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 1243,
+      "configuration_latches": 438,
+      "power_terminals": 2486,
+      "required_signal_nets_with_wires": 1347,
+      "routed_odb_sha256": "fb52c40e31fdc57fafb91bdca4c7eeee3150441e34cae5db3b25087f8acf57bb"
+    },
+    {
+      "passed": true,
+      "case": "north0",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 115,
+      "configuration_latches": 35,
+      "power_terminals": 230,
+      "required_signal_nets_with_wires": 183,
+      "routed_odb_sha256": "1fe368c20c679b68852c8018a29d10de4faf4b8f05c7a99c7c7beb0c64613c61"
+    },
+    {
+      "passed": true,
+      "case": "north1",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 115,
+      "configuration_latches": 35,
+      "power_terminals": 230,
+      "required_signal_nets_with_wires": 183,
+      "routed_odb_sha256": "93e436aa874683cb6aaf9a51416badade699d424cb25d7ac65cb9b7ec9b80aba"
+    },
+    {
+      "passed": true,
+      "case": "north2",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 115,
+      "configuration_latches": 35,
+      "power_terminals": 230,
+      "required_signal_nets_with_wires": 183,
+      "routed_odb_sha256": "0cfd6e688e56cbcc58b318ca7f219aacc7197277e48a9465c4dda681288e7f64"
+    },
+    {
+      "passed": true,
+      "case": "north3",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 115,
+      "configuration_latches": 35,
+      "power_terminals": 230,
+      "required_signal_nets_with_wires": 183,
+      "routed_odb_sha256": "205ff34fb3da154a44667d5a6a9c52aabaf733fbb630ccc9fc258e811c26d7f9"
+    },
+    {
+      "passed": true,
+      "case": "north4",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 115,
+      "configuration_latches": 35,
+      "power_terminals": 230,
+      "required_signal_nets_with_wires": 183,
+      "routed_odb_sha256": "d35ebc54ffdf266189340f453d6e1be086aa8405670a5baf1c67077da0817ab3"
+    },
+    {
+      "passed": true,
+      "case": "north5",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 115,
+      "configuration_latches": 35,
+      "power_terminals": 230,
+      "required_signal_nets_with_wires": 183,
+      "routed_odb_sha256": "d8cefd7abb41588bcc22095b3313c2b9bf09b1fcbab3e7305d416da1bc7725f4"
+    },
+    {
+      "passed": true,
+      "case": "northeast",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 0,
+      "configuration_latches": 0,
+      "power_terminals": 0,
+      "required_signal_nets_with_wires": 52,
+      "routed_odb_sha256": "687de066643a4f143c40484334eaa3e2d2ae20bbcd7bfb03a2be6791791cb623"
+    },
+    {
+      "passed": true,
+      "case": "northwest",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 15,
+      "configuration_latches": 4,
+      "power_terminals": 30,
+      "required_signal_nets_with_wires": 65,
+      "routed_odb_sha256": "b6b73eca90e1ffe4b473813a831ca95a65a807e06d34580cdc9b52bf54d45552"
+    },
+    {
+      "passed": true,
+      "case": "primitive4",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 1453,
+      "configuration_latches": 334,
+      "power_terminals": 2906,
+      "required_signal_nets_with_wires": 1557,
+      "routed_odb_sha256": "ace4de2c441ca1462827d9d805ee57430c1f187ff3b979f240b162e1a3d999dd"
+    },
+    {
+      "passed": true,
+      "case": "south0",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 203,
+      "configuration_latches": 60,
+      "power_terminals": 406,
+      "required_signal_nets_with_wires": 277,
+      "routed_odb_sha256": "02370cee3b07f41b2c4a9d402e82e72e0f3e8bd9100b6364d853daeb792cd93e"
+    },
+    {
+      "passed": true,
+      "case": "south1",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 203,
+      "configuration_latches": 60,
+      "power_terminals": 406,
+      "required_signal_nets_with_wires": 277,
+      "routed_odb_sha256": "a6708e66b14338c2ad943300a5317a75169596f7f37f80ce33324cff575d4dff"
+    },
+    {
+      "passed": true,
+      "case": "south2",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 203,
+      "configuration_latches": 60,
+      "power_terminals": 406,
+      "required_signal_nets_with_wires": 277,
+      "routed_odb_sha256": "3426981a76821c5f996a360287b287ef5a495c0c55e1f84e1cfca6c25d55a779"
+    },
+    {
+      "passed": true,
+      "case": "south3",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 203,
+      "configuration_latches": 60,
+      "power_terminals": 406,
+      "required_signal_nets_with_wires": 277,
+      "routed_odb_sha256": "2ce8ae29c93892de5ba20be94869de960c0c814db98a1cb1cd499f8f043be54d"
+    },
+    {
+      "passed": true,
+      "case": "south4",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 203,
+      "configuration_latches": 60,
+      "power_terminals": 406,
+      "required_signal_nets_with_wires": 277,
+      "routed_odb_sha256": "2a1c5593cacee5c828b7333a02603345fb8b517ff9f8acb004b26c4e67649e3b"
+    },
+    {
+      "passed": true,
+      "case": "south5",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 203,
+      "configuration_latches": 60,
+      "power_terminals": 406,
+      "required_signal_nets_with_wires": 277,
+      "routed_odb_sha256": "d94d43bab00a7425ea7b440ea8042919a3227e1718f29aef377d477a41400c6d"
+    },
+    {
+      "passed": true,
+      "case": "southeast",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 15,
+      "configuration_latches": 4,
+      "power_terminals": 30,
+      "required_signal_nets_with_wires": 69,
+      "routed_odb_sha256": "2501551f2ea581de7275758e21acdf75159abebf1170715e419c687593da5a57"
+    },
+    {
+      "passed": true,
+      "case": "southwest",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 82,
+      "configuration_latches": 20,
+      "power_terminals": 164,
+      "required_signal_nets_with_wires": 142,
+      "routed_odb_sha256": "ed38a5110f98f3254a394d4cf76a80b0b0823d11536cb029048bf6efa90a2d98"
+    },
+    {
+      "passed": true,
+      "case": "west_io",
+      "scope": "Frozen leaf routing only; no placement/netlist change, foundry signoff, LVS, extracted timing or assembled macro acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "tool_exit_code": 0,
+      "router_violations": 0,
+      "cells": 280,
+      "configuration_latches": 81,
+      "power_terminals": 560,
+      "required_signal_nets_with_wires": 355,
+      "routed_odb_sha256": "4132f8c123d9978b38c7d8436d14cf4176e2d89b8afcfc2bb4048049d0fc82e9"
     }
   ],
-  "remaining_contexts_in_campaign": 23,
+  "remaining_contexts_in_campaign": 0,
   "local_review": "Input, script and final ODB hashes checked; frozen inventories and required wire coverage replayed.",
   "repeated_primitive_control": {
     "run": 44394572275,
@@ -42,5 +364,133 @@
   },
   "timing_acceptance": false,
   "physical_acceptance": false,
-  "scope": "Partial campaign only; no aggregate or full-chip acceptance."
+  "scope": "All 26 leaf contexts have detailed router/wire/inventory passes, including separate primitive1 control. No leaf GDS signoff, assembled fabric, shell or timing acceptance.",
+  "all_frozen_contexts_with_detailed_route_passes": 26,
+  "artifact_metadata": [
+    {
+      "id": 14472077714,
+      "name": "r1-detailed-context-44394572610-south4",
+      "digest": "sha256:f959ad514602ff9899ce801ca1cce22121b4b47bea14aa260312e57a25dcf633"
+    },
+    {
+      "id": 14472021546,
+      "name": "r1-detailed-context-44394572610-north3",
+      "digest": "sha256:ae818c14973ff7284add65b6e7400f2daa47127c89ba5ad82e3c0538ae9e5814"
+    },
+    {
+      "id": 14472021065,
+      "name": "r1-detailed-context-44394572610-north0",
+      "digest": "sha256:7cf35d3750b59cdf22963cb2e611a628ebec6b2dd92ee004141b01eb133996e5"
+    },
+    {
+      "id": 14471975056,
+      "name": "r1-detailed-context-44394572610-primitive4",
+      "digest": "sha256:546fd8003488a41eaafb5922ebeb03f9262055702bfc0bf8fd39685751f14f8d"
+    },
+    {
+      "id": 14471881639,
+      "name": "r1-detailed-context-44394572610-north1",
+      "digest": "sha256:ded10ec13858f7909d0c26d7465f605a4c3f8c2f7ed0abd0b65e8f64b9ae9ece"
+    },
+    {
+      "id": 14471856002,
+      "name": "r1-detailed-context-44394572610-east_io",
+      "digest": "sha256:6bf7ae46eb00c6f1d49ef6b5c14bf63b5ddce3b814612427a406c2f254858b45"
+    },
+    {
+      "id": 14471835803,
+      "name": "r1-detailed-context-44394572610-lut4",
+      "digest": "sha256:c090146ebf4a94ab8c0632c8a8f09fe982d68d46b4f699f96195b6522a70beda"
+    },
+    {
+      "id": 14471665337,
+      "name": "r1-detailed-context-44394572610-lut2",
+      "digest": "sha256:8c8e0002e2574e177f0733958e2879f315a881ab799482476495c093a9134613"
+    },
+    {
+      "id": 14471617619,
+      "name": "r1-detailed-context-44394572610-south1",
+      "digest": "sha256:fca3467914e1b5078420b9f3017597e9b52d9f2d7b3b399ed4d8b61ef7c9cb27"
+    },
+    {
+      "id": 14471366189,
+      "name": "r1-detailed-context-44394572610-lut5",
+      "digest": "sha256:4bd664aa31ad74c67dbebd1c0ec68d330ba99d9afcc87d7f45ccf13c7cddcef9"
+    },
+    {
+      "id": 14471361700,
+      "name": "r1-detailed-context-44394572610-north2",
+      "digest": "sha256:ea6db726d24ba5fbe46f55ed715ce82602f1072927381013759d407bc2de316c"
+    },
+    {
+      "id": 14471327049,
+      "name": "r1-detailed-context-44394572610-north5",
+      "digest": "sha256:284b77d5ab3774ce206a38bb32d874fffa0f3b61adaba8a54b727a490204b8e9"
+    },
+    {
+      "id": 14471237033,
+      "name": "r1-detailed-context-44394572610-north4",
+      "digest": "sha256:9e979bc49d4f34414bd58c88e7a65d54aec08006aa8812dfdbdd007528e6e850"
+    },
+    {
+      "id": 14471186009,
+      "name": "r1-detailed-context-44394572610-southwest",
+      "digest": "sha256:f45002b5a6a61c1781bbb1b9cc7cec511505cba0006a765412bc5d259cf0b162"
+    },
+    {
+      "id": 14471162820,
+      "name": "r1-detailed-context-44394572610-south5",
+      "digest": "sha256:82cb304e7ae1a1d2730ea9d9f1a6a259e01675344ced79c33d0b2b14fa467689"
+    },
+    {
+      "id": 14471111518,
+      "name": "r1-detailed-context-44394572610-west_io",
+      "digest": "sha256:50ba1e6c8422bff661de79948a4858868f2082dc9574db80fc4d447eb9145298"
+    },
+    {
+      "id": 14470682900,
+      "name": "r1-detailed-context-44394572610-south3",
+      "digest": "sha256:e0785d474934638b50b94ad7cb6eb895bb363eb01712973341c9b36b35d243e1"
+    },
+    {
+      "id": 14470615008,
+      "name": "r1-detailed-context-44394572610-lut1",
+      "digest": "sha256:0a6787f8d20aed0db592f02ceece56e607fee9e4ff09d6a6bbc423122667c761"
+    },
+    {
+      "id": 14470562683,
+      "name": "r1-detailed-context-44394572610-south2",
+      "digest": "sha256:f472ee53ff71b65a2f872d8689f42437c0fb316ffab799db874f24e23aa7b9dd"
+    },
+    {
+      "id": 14470378519,
+      "name": "r1-detailed-context-44394572610-southeast",
+      "digest": "sha256:429a734706a6f5384ffdd792660ee06f5a4ed42fed11f51020ade415b497b713"
+    },
+    {
+      "id": 14470346149,
+      "name": "r1-detailed-context-44394572610-northwest",
+      "digest": "sha256:6ec1037e15568ddf3c62ef18dacde30102759830a06867f8a405d19c2e9837b7"
+    },
+    {
+      "id": 14470262664,
+      "name": "r1-detailed-context-44394572610-south0",
+      "digest": "sha256:5257b4bb2d99cf0b8ef9fce72167a279daab6f80993a0abaea783521fcf604c8"
+    },
+    {
+      "id": 14470245771,
+      "name": "r1-detailed-context-44394572610-lut3",
+      "digest": "sha256:060520f5c21a686fdd580bb8664bf5822f2397ca422c2abb6f979a27f3bb49cd"
+    },
+    {
+      "id": 14470077549,
+      "name": "r1-detailed-context-44394572610-northeast",
+      "digest": "sha256:a0932fe04e3fbd98f8067051a9abdce264ea261f65ad6ff6246177aa075545ad"
+    },
+    {
+      "id": 14469624444,
+      "name": "r1-detailed-context-44394572610-lut0",
+      "digest": "sha256:b1e1ab426d2ce41d232e8412833c74fa491de0f5b4a470ab2c6ccd7676d39146"
+    }
+  ]
 }

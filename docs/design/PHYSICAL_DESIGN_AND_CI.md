@@ -2,6 +2,15 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November18 R1 leaf routing:** D124 run44394572610 at5db0b642 passes all25
+remaining contexts, with zero router violations and frozen inventories/wires.
+Root replays every input/script/final ODB hash and inventory check. Wire-only
+NE_term has52wired feedthroughs. Primitive1 control44394572275 also passes
+with its prior final ODB hash. All26contexts now have detailed-route evidence;
+this is not leaf GDS/foundry DRC/LVS, assembled macro or configured timing
+acceptance. D125 starts exact-LUT0 post-route physical checks before expansion.
+See reports/r1_detailed_contexts_44394572610.json. BUG133 remains open.
+
 **October24 R1 leaf-stage measurement:** frozen primitive1 from40030916359
 completes its detailed-route stage in1m49s elapsed/4m11s CPU in40119792058 at
 dcf59af, with zero OpenROAD router violations. BUG134 makes that workflow's

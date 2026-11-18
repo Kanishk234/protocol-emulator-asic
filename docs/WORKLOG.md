@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — All frozen contexts route; prepare first leaf finishing gate
+
+- D124 campaign 44394572610 at 5db0b642 completes all 25 jobs successfully.
+  Root downloads every artifact, verifies producer identity and replays all
+  input/script/final ODB hashes plus frozen inventories and actual wire coverage.
+  Wire-only northeast has all 52 required wires. With repeated primitive1
+  control 44394572275, all 26 contexts now have detailed-route passes. Updated
+  reports/r1_detailed_contexts_44394572610.json retains every result/hash.
+- D125 prepares the exact routed lut0 for the pinned post-route Classic sequence
+  through antenna/disconnection/fill/RCX/STA/GDS/Magic/KLayout/GDS-based LVS.
+  All seven physical gates must exist and equal zero; original logic/placement,
+  interface and all 1347 signal wires stay protected. Only default physical
+  fillers/decaps may be added. No hardware architecture or source image change.
+- Actual capsule/result preparation succeeds. 68 focused checks and actionlint
+  pass, including missing physical evidence and unwanted cell/placement/wire
+  changes. Next inspect hosted finishing results, then expand only after its
+  gates pass. BUG133 timing, assembled fabric/shell and submission remain open.
+  No phase checklist boxes ticked or full-chip acceptance claimed.
+
 ## 2026-11-18 — Extend frozen detailed-route qualification
 
 - First hosted results: lut0 and lut1 in 44394572610 pass with zero router

@@ -1,5 +1,32 @@
 # Decisions
 
+## D-125: Finish the exact routed LUT0 leaf before expanding physical assembly
+
+- **Date:** 2026-11-18. **Status:** bounded leaf diagnostic, not promotion.
+- **Evidence:** all 25 D124 contexts pass detailed routing in 44394572610;
+  independent local input/script/final-ODB hash and inventory/wire replay passes.
+  Primitive1 control 44394572275 matches its prior routed ODB exactly. All 26
+  contexts now have detailed-route evidence, but no R1 leaf GDS signoff yet.
+- **Need:** actual antenna, disconnection, GDS DRC and LVS evidence is required
+  before treating routed wires as manufacturable geometry or assembling leaves.
+  Start with the exact lut0 ODB hash 26be066e77012ee21fef0662d9d3502945780a77efc6ce5ef4f29b7fb4b98304.
+- **Procedure:** authenticate the complete original capsule and exact new LUT0
+  artifact, relocate retained views explicitly, and resume the pinned Classic
+  sequence after detailed routing through Checker.LVS. Retain antenna and
+  disconnected-pin checks, standard fillers/decaps, RCX/STA reports, GDS output,
+  Magic/KLayout DRC, and GDS-based LVS. No placement, resizing or routing rerun.
+  Seed route DRC only from the authenticated actual detailed-router count.
+- **Gates:** every one of the seven physical metrics must be present and zero.
+  Preserve every original cell/master/location, signal pin and connection;
+  permit only standard fill/decap additions and require all 1347 signal wires.
+  Missing checks or nonzero results remain failures. No filler/DRC waiver.
+- **Cost/scope:** one cloud job, 3000-second tool bound, existing footprint and
+  logical resources unchanged. Standard physical fill occupies existing gaps.
+  The null-clock leaf's extracted reports cannot establish configured timing;
+  BUG133 and whole-fabric/shell qualification remain separate open gates.
+- **Validation:** actual-source preparation succeeds; 68 focused checks and
+  actionlint pass. Hosted finishing results pending.
+
 ## D-124: Qualify every remaining frozen leaf context with bounded detailed routing
 
 - **Date:** 2026-11-18. **Status:** diagnostic campaign; no hardware change.

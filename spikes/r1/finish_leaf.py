@@ -30,6 +30,20 @@ def gates_pass(metrics):
     return all(type(metrics.get(k)) in (int, float) and metrics[k] == 0 for k in GATES)
 
 
+def finishing_steps(classes):
+    ids = [s.id for s in classes]
+    steps = classes[ids.index('Odb.RemoveRoutingObstructions'):ids.index('Checker.LVS')+1]
+    required = {'OpenROAD.CheckAntennas', 'Checker.TrDRC', 'Checker.DisconnectedPins',
+                'OpenROAD.FillInsertion', 'OpenROAD.RCX', 'OpenROAD.STAPostPNR',
+                'KLayout.StreamOut', 'Magic.DRC', 'KLayout.DRC', 'Checker.MagicDRC',
+                'Checker.KLayoutDRC', 'Magic.SpiceExtraction', 'Netgen.LVS', 'Checker.LVS'}
+    # SequentialFlow suffixes repeated stages (the post-DRT antenna stage is -1).
+    actual = {re.sub(r'-[0-9]+$', '', s.id) for s in steps}
+    if not required <= actual:
+        raise ValueError('Missing required finishing stages: '+str(sorted(required-actual)))
+    return steps
+
+
 def check_finished_inventory(before, after):
     def rows(text):
         return [line.split('\t') for line in text.splitlines()]
@@ -120,14 +134,8 @@ def inside(out):
     plan = json.loads((out/'plan.json').read_text())
     if any(sha(p) != digest for p, digest in plan['input_sha256'].items()):
         raise ValueError('Finishing input changed')
-    ids = [s.id for s in Classic.Steps]
-    steps = Classic.Steps[ids.index('Odb.RemoveRoutingObstructions'):ids.index('Checker.LVS')+1]
-    required = {'OpenROAD.CheckAntennas', 'Checker.TrDRC', 'Checker.DisconnectedPins',
-                'OpenROAD.FillInsertion', 'OpenROAD.RCX', 'OpenROAD.STAPostPNR',
-                'KLayout.StreamOut', 'Magic.DRC', 'KLayout.DRC', 'Checker.MagicDRC',
-                'Checker.KLayoutDRC', 'Magic.SpiceExtraction', 'Netgen.LVS', 'Checker.LVS'}
-    if not required <= {s.id for s in steps}:
-        raise ValueError('Missing required finishing stages')
+    (out/'available-stages.json').write_text(json.dumps([s.id for s in Classic.Steps], indent=2)+'\n')
+    steps = finishing_steps(Classic.Steps)
     class Finish(Classic):
         Steps = steps
     result = dict(passed=False, scope=SCOPE, physical_acceptance=False, timing_acceptance=False)

@@ -1,0 +1,61 @@
+{
+  "scope": "Limited Phase 3 I2C recovery; late-byte STOP gap remains open",
+  "base_commit": "f334530e75579f9ea0a791b23d7d243b18e34acf",
+  "source_sha256": {
+    "tools/protomodels/i2c_recovery.py": "68a6562c64e6caa0477f0133873052eef6d234a26a021395ed367793ec09618c",
+    "tools/kernels/tests/test_i2c_recovery.py": "c430bfc4c20009f0e3f73de0f711697f28aef05602c62a7d25437ffb3a69b401",
+    "test_internal/chip/test_phase3.py": "8f59422eb9f2983c57d4d2bd0875394202fd7a86a6467a3989e70d66f2933385"
+  },
+  "model": {
+    "recovery_cases": 22,
+    "full_suite_passed": 382,
+    "log_sha256": "6d79ef02e0313c7d154dd19234a7a0eaebde1a7c06f95678e18a4ac9c42c158a"
+  },
+  "results": {
+    "rtl": {
+      "passed": 1,
+      "failed": 0,
+      "selected_skipped": 0,
+      "unrelated_tests_filtered_out": 1,
+      "cases": 4,
+      "xml_sha256": "9e0e2ae54d6ab0a3d18e995aedc2543c402e33d1ffe77e4d14a853bdb7386a2c",
+      "log_sha256": "b760bb50e5cbe8fa6cac83c6409e1b90427aa8f60c1ed48fafa3c97a1d47cb42",
+      "simulation_ns": 6900540,
+      "runtime_seconds": 16.67636466026306
+    },
+    "official_gate": {
+      "passed": 1,
+      "failed": 0,
+      "selected_skipped": 0,
+      "unrelated_tests_filtered_out": 1,
+      "cases": 4,
+      "xml_sha256": "6a0b306be5b5db36fccae78ab0443acb75f2194ddca97abe87455868f55c5203",
+      "log_sha256": "4d3d0fa08cbef2edeaa8786beaa983056ca166eac77a903643ee38700ac6aa87",
+      "simulation_ns": 6900540,
+      "runtime_seconds": 319.3387415409088
+    }
+  },
+  "official_run": 44189196098,
+  "official_netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+  "pdk_revision": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+  "sigrok_required": true,
+  "sdf_annotated": false,
+  "period_clocks": 50,
+  "high_clocks": 13,
+  "open_failure": "STOP after byte eight before ACK can leave the next address NACKed. Model pending ACK survives STOP/START; RTL external symptom reproduced.",
+  "late_ack_diagnostic": {
+    "scope": "Reproduces and characterizes the existing failure; not a successful recovery",
+    "simulator": "Icarus 12 RTL",
+    "passed_characterization_tests": 1,
+    "runtime_seconds": 27.71,
+    "log_sha256": "bef93808aa5992313bc6f202fc5ef113e777a6503d05b0b8168f842907bee704",
+    "script_sha256": "2df03d8f963c309be3f5573be28c265e3381693442bf63472f82e9459c5a7b5a",
+    "stop_pending_bits": 1,
+    "start_pending_bits": 1,
+    "first_address_bit": {
+      "controller_releases_sda": true,
+      "target_drives_low": true,
+      "resolved_sda": 0
+    }
+  }
+}

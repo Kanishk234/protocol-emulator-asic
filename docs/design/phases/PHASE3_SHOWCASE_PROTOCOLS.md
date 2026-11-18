@@ -19,7 +19,7 @@ Phase 2 closed November 18 on 8×4, two lanes and four units. The original dates
 ## Immediate execution order
 
 1. Correct the ACK setup oracle, add adversarial controls, and revalidate model/RTL/exact official-netlist timing. Completed locally; see `phase3_i2c_ack_revalidation.json` and the memory report. This is a Phase 3 verification correction, not a Phase 2 rollback.
-2. Add explicit recovery scenarios beyond the existing complete-byte NACK/STOP cases.
+2. Add explicit recovery scenarios beyond the existing complete-byte NACK/STOP cases. In progress: 22 model cases and four representative RTL/exact official-netlist cases pass; the late-byte STOP gap is tracked in [the recovery report](../../reports/PHASE3_I2C_RECOVERY.md). No exhaustive recovery claim.
 3. Establish context-specific compiler reaction bounds; continue formal proofs against the actual RTL.
 4. Consider any hardware feasibility branch only after a measured workload demonstrates the missing capability. No second PULSE unit or architecture change is approved by this plan.
 

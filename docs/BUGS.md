@@ -427,3 +427,14 @@ explicitly selects stock base SDC, verifies actual min/max reports contain
 reports. Setup failure on original route42693952530 remains a real failure;
 its setup uncertainty was already0.25ns. Only waiting downstream jobs are
 requeued; active source hardware and physical screen are unchanged.
+
+### 2026-11-18: upstream ACK setup monitor retains a stale low edge
+
+Upstream review2026-11-18 identifies an open Phase3 ACK-monitor issue at
+main f1dbbaf: first_low is not cleared when SDA rises during SCL low, so an
+early pulse followed by late reassertion can pass the setup check. Isolated
+reproducer reports37clocks for1continuous clock against a3clock requirement.
+Caught by review and directed waveform reproduction; proposed coverage is a
+pulse/reassertion negative control plus clean ACK cases. Upstream fix and
+regression are pending; no chip failure or fixed status is claimed. Details:
+`docs/reports/UPSTREAM_MAIN_REVIEW_20261118.md`.

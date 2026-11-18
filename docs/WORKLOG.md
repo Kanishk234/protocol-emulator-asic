@@ -2,6 +2,65 @@
 
 Newest entry at the top. One entry per work session.
 
+## 2026-11-18 — Preserve review and handoff before branch switch
+
+- User explicitly requests commit/push of pending session work. Stage only
+  upstream review, capability handoff, bug ledger and worklog documentation.
+  Whitespace check passes; no RTL/tests/config/workflows changed.
+- Preserve unrelated raw logs, GDS ZIP, sealed input, existing receipt and tt
+  symlink locally without reading/staging sealed content. Path-only check finds
+  no untracked collisions with local efpga or main. Leave branch switching to
+  the user; no checkout/rebase/stash/deletion needed for these pending docs.
+
+## 2026-11-18 — Assess whether to redirect independent effort to eFPGA
+
+- User asks whether to continue this closure fork or work on eFPGA. Read-only
+  fetch of main/efpga/efpga_Anish; no checkout, merge, rebase or implementation.
+  Current main5bd91d0 has moved on to independent I2C peer verification.
+- eFPGA/WARP97f655a latest hosted work is October24. Selected G1 has shell
+  GDS/precheck and gate-shell/RTL-fabric simulation evidence; its documents
+  explicitly do not establish full native configured-fabric timing. R1 has
+  one primitive leaf detailed-route pass, remaining assembly/extracted timing
+  open, and six loop-policy-sensitive endpoints plus stronger feedback-cut
+  counterexamples retained. Do not equate shell timing with full-fabric closure.
+- Recommend retiring duplicate TRIPWIRE closure as the primary task. If another
+  owner continues main Phase3/submission, allocate a bounded eFPGA feasibility
+  sprint with explicit evidence gates; otherwise prioritize qualified main.
+  Preserve TRIPWIRE baseline, avoid timing-arc waivers without a sound proof,
+  and do not assume8x4 solves configured feedback timing. Competition FAQ
+  permits eFPGA architecture but specifies one entry per team.
+- No files from held-out/sealed inputs read, no phase boxes ticked, no new
+  physical claim or experiment launched. This is an effort-allocation review.
+
+## 2026-11-18 — Prepare capability-restoration handoff
+
+- User requests the previous recommendation as Markdown for another AI.
+  Saved docs/review/CAPABILITY_RESTORATION_HANDOFF.md with the immediate
+  showcase/verification priorities, optional second-unit PULSE feasibility study,
+  qualified-baseline context and explicit uncertainty about physical impact.
+- No source, architecture, workflow or physical-input changes. Documentation
+  only; no tests or phase checklist updates needed.
+
+## 2026-11-18 — Review upstream main's qualified physical baseline
+
+- User requests a review of upstream main. Fetch/read f1dbbaf into isolated
+  /tmp/tripwire-main-review-20261118; no merge/rebase/source edits or publication.
+- Independently download/hash official44189196098fullGDSlogs/submission/
+  precheck/GL, extraction44031468510and full22-case replay44123392388.
+  Actual raw metrics confirm extracted timing/electrical/route/KLayout/LVS/
+  antenna passes. Precheck10/10,officialGL3/3,fullreplay22/22. Actual extracted
+  functional frontier slow+0.163304ns; all6stock reports and DATE-normalized
+  SPEF match official. Positive reserve is narrow; D-185Magic waiver explicit.
+- Main repo audit,27helper tests and5controller timing checks pass. Reproduce
+  ACK-oracle weakness: early SDA low pulse then late reassertion reports37
+  setup clocks for1continuous clock. Log open issue and reproduction; no
+  upstream fix or real-chip failure claimed. Review report contains evidence,
+  limitations and recommendation to use qualified main as development baseline.
+- Current main test/docs/repo-audit/lint pass; unit model/Verilator pass and
+  Icarus job remains active. Separate branch physical44025267292failed,
+  follow-up44026980046failed,selectorlockstep44027736274passed. No inferred
+  failure cause. No phase boxes ticked or branch/source migration performed.
+
 ## 2026-11-17 — Run current-source lockstep and prepare SRAM provenance package
 
 - Published8ed717atests/b2dfd55docs/8580c43CI. Independent selector lockstep

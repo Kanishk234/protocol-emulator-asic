@@ -58,3 +58,19 @@ def test_repeated_antenna_stage_suffix_is_supported_but_absence_is_rejected():
     assert finishing_steps(stages) == stages
     with pytest.raises(ValueError, match='CheckAntennas'):
         finishing_steps([s for s in stages if s.id != 'OpenROAD.CheckAntennas-1'])
+
+
+def test_wire_only_finishing_still_requires_all_feedthrough_wires():
+    expected = dict(cells=0, required_signal_nets_with_wires=52)
+    text = '\n'.join(f'REQUIRED_NET\tn{i}\t1' for i in range(52))+'\n'
+    assert check_finished_inventory(text, text, expected)['original_cells'] == 0
+    with pytest.raises(ValueError, match='signal wires'):
+        check_finished_inventory(text, text.replace('n0\t1', 'n0\t0'), expected)
+
+
+def test_finishing_context_requires_retained_campaign_evidence():
+    from finish_leaf import campaign_case
+    row, artifact = campaign_case('primitive4')
+    assert row['cells'] == 1453 and artifact['name'].endswith('-primitive4')
+    with pytest.raises(ValueError, match='context'):
+        campaign_case('unknown')

@@ -1,0 +1,220 @@
+{
+  "passed": false,
+  "scope": "Assembled R1 macro geometry diagnostic only; no extracted timing, complete clock/power/shell integration, replacement or submission acceptance.",
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "assembly_acceptance": false,
+  "database_inventory": {
+    "instances": 40,
+    "top_signal_pins": 447,
+    "power_pins": 2,
+    "signal_instance_terminals": 6895,
+    "power_instance_terminals": 80,
+    "distinct_logical_nets": 3831
+  },
+  "error": "One or more deferred errors were encountered:\n402 LVS errors found.",
+  "completed_stage_metrics": {
+    "magic__drc_error__count": 0,
+    "klayout__drc_error__count": 0,
+    "magic__illegal_overlap__count": 0,
+    "design__lvs_device_difference__count": 14,
+    "design__lvs_net_difference__count": 7,
+    "design__lvs_property_fail__count": 0,
+    "design__lvs_error__count": 402,
+    "design__lvs_unmatched_device__count": 1,
+    "design__lvs_unmatched_net__count": 1,
+    "design__lvs_unmatched_pin__count": 379
+  },
+  "run": 44465623376,
+  "source_sha": "53240408475d03c229851fded0990e865cbc958b",
+  "actual_gds_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+  "actual_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+  "archive_id": 14503110306,
+  "archive_sha256": "73c24f2ae6283f3d35ebfff76b50afa1678e1fa2d393f7c6508696173005d7cc",
+  "extracted_top_ports": 0,
+  "leaf_lvs_verdict_review": [
+    {
+      "case": "lut0",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "2514cecfda1c93344f4d38b473d217561f2f450cdf898014f49ac4ad0e112633"
+    },
+    {
+      "case": "primitive1",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "106603ccad3b8701aea780474bbed9897a29a2597d7ec61464e048b1f5f65f04"
+    },
+    {
+      "case": "northeast",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "67c915c2f90a5a95b99c6f40d45e2c47c543238dff0b8f22bd1320808a546d01"
+    },
+    {
+      "case": "primitive4",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "cf0d01744f36f1ddd37873de0712f30d8818039ae8b7f0fa65cfb431604122ad"
+    },
+    {
+      "case": "west_io",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "2848adcbb46ea0d6d912db0cfb116f5db5c721feef6d1d1585c52d898e2e19f8"
+    },
+    {
+      "case": "northwest",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "6c2b5687852a8ebc41437ba79d5452ae49fc17458996bea9f7dc93051c0217f8"
+    },
+    {
+      "case": "southwest",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "20a46f9010cf7230b2dce43b646165e860147d9c03944b64c249fb24b5a924e0"
+    },
+    {
+      "case": "east_io",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "10ea505d9809fd428868f265089960e3b72668ef0a2f89d13a10d9355b33283e"
+    },
+    {
+      "case": "north0",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "3643c7a8906337a9a0007dd1af76340fa76633ee2c69f3fcb4dfccf6a7f11aca"
+    },
+    {
+      "case": "south0",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "2645ff11571ef3f96b2d7f43f57caebfe775c6309a346a269bb9717a72943597"
+    },
+    {
+      "case": "southeast",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "721570f8aac1b6b07e613d86e0eab3000494b8f03a8a7b05f8187d2bd1fcf29d"
+    },
+    {
+      "case": "lut1",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "8f7c062af36c87650d96348cd8a6e580a9f20c4c1f5c329b24e8c6b8159bbbf6"
+    },
+    {
+      "case": "lut2",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "feff9276ce2d32dd665f2345d242a1244d53ad679b5ba4c7996f7009808ff7c5"
+    },
+    {
+      "case": "lut3",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "645da52b583ca7a8c141ece413b6115ea7917001c9faf9292f96f2ce2cfd98d3"
+    },
+    {
+      "case": "lut4",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "67693e83d72ed9b2fca1eee3c0838d337e607c819bb799066b9bb28ff28b3d1d"
+    },
+    {
+      "case": "lut5",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "db6f33671bfb54a5b95fb24b291fcd332b8ca6040d5ee2ea0f8438019dd60b61"
+    },
+    {
+      "case": "north1",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "f92b486ad042fe83dd9bdbf877d05b0889f321a58103a859ec52b1a65183eac7"
+    },
+    {
+      "case": "north2",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "9188f41f8e7913abc601ef9ba958bb6668cdf3e8c2a669118862598c0b0dcc68"
+    },
+    {
+      "case": "north3",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "63090acb5e743dc3db784de005f9fadc42eaffba5758f7c51838ccf9f333186a"
+    },
+    {
+      "case": "north4",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "43c8154f843d5233acfcb90d79e367cfacc5b37212aaa2bf6e97e1695b65a40c"
+    },
+    {
+      "case": "north5",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "3edbdcfc1970c62b5c049c45178529d48851d4c2fdb0b0013a8c9cf2bfb9b9d2"
+    },
+    {
+      "case": "south1",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "f840a24f439bb9ad153c947fdcfdae62e9a9c9f20cd94d02dc784005ead86780"
+    },
+    {
+      "case": "south2",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "7058285baee47be54ee0c778c83d116d6d9e6c09508b8dfa860bb6b802dc54a1"
+    },
+    {
+      "case": "south3",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "78192ad46392ac5045eba36a5b0dd4051c32166924bfcbfec79b05c928e1413d"
+    },
+    {
+      "case": "south4",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "aa2878a8fdefd99aa7f2849940f71d3b73c269fec6fe28cc58a23c074f11fa84"
+    },
+    {
+      "case": "south5",
+      "verdict": [
+        "Top level cell failed pin matching."
+      ],
+      "report_sha256": "aff3a62d933615627b6de262a9c66843467ca0937106f80aec3faf9ab7a1a07c"
+    }
+  ],
+  "root_review": "GDS/PNL hashes match preparation; whole-macro DRC/overlap zero; original detailed LVS fails. Summary-only leaf LVS qualification withdrawn for all26contexts."
+}

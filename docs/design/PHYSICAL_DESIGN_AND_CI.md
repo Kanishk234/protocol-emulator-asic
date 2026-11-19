@@ -2,6 +2,16 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November19 correction and actual macro result:**44465623376 at53240408
+passes whole-macro Magic DRC/KLayout DRC/overlap at zero, then fails402LVS
+differences. The extracted root has no declared ports; supply grouping also
+differs from the intended exported interface. All26old leaf detailed reports
+likewise fail pin matching despite zero summary metrics, so prior strict LVS
+qualification is withdrawn (BUG143); original reported counts remain intact.
+D137 requires exact root port metadata, the full449port declaration and a
+uniquely matching final Netgen verdict. Multi-access supply modeling does not
+establish physical enclosing-grid connectivity. See reports/r1_assembled_failure_44465623376.json.
+
 **November18 native candidate qualification:**44461373512 atafc68e55 passes
 parent/candidate direct UART/SPI/reset and candidate management-SPI/STOP/reload.
 All8736frame bits per case and the sole_1560_0→1 delta replay;222input hashes

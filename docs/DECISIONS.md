@@ -1,5 +1,37 @@
 # Decisions
 
+## D-137: Correct extraction port metadata and require the actual LVS verdict
+
+- **Date:**2026-11-19. **Evidence:** assembled44465623376 at53240408 has
+  zero Magic/KLayout/overlap metrics but402LVS errors. Its extracted top
+  subcircuit has no ports; source GDS/PNL hashes match local preparation.
+  Root additionally finds failed pin-matching verdicts in all26old leaf reports
+  despite zero summary metrics. BUG142/143 withdraw strict LVS qualification.
+- **Bounded correction:** reuse the exact failed assembly archive and original
+  passed geometry. Isolate a copy of pinned extract_spice.tcl, SHA
+  c4c88233a1770fc5bfbf0df240c4ebe1ffd12db8261ce5a097f1bc15046bce2a.
+  Promote all and only449root label names to ports; require exact names before
+  extraction and complete unique SPICE port declarations afterward. Upstream
+  code remains untouched. Enable its standard short-resistor representation
+  for aliased exported pins in both compared cases.
+- **Interface comparison:** first keep extract-unique=all; second test
+  notopports for the already-declared multi-access supply interface. Internal
+  labels stay unique in both. Prefer all if both pass. This is a macro
+  interface model: actual separate supply accesses must still be connected
+  and checked in the enclosing chip/shuttle grid. It does not repair or hide
+  an internal signal open, connect physical stripes, qualify IR drop or waive
+  full-chip power/timing. No production config, geometry or architecture change.
+- **Acceptance/cost:** all original LVS/device/overlap checks plus exactly one
+  uniquely matching Netgen verdict and all449extracted port names. Preserve
+  both outcomes and the failed402control. One bounded40-minute hosted job;
+  original whole-macro DRC is reused only for identical bytes.44assembly/port
+  tests and real-source preparation pass locally; hosted result pending.
+- **Primary references:** Magic port/extract command documentation and the
+  FABulous reference use notopports for supply accesses joined at integration:
+  https://github.com/RTimothyEdwards/magic/blob/master/doc/html/port.html,
+  https://opencircuitdesign.com/magic/commandref/extract.html,
+  https://github.com/mole99/tt-fabulous-sky-26b/blob/main/config.yaml.
+
 ## D-136: Assemble the qualified R1 leaves with exact context and contact guards
 
 - **Date:**2026-11-18. **Need:** all26leaf contexts now physically finish,

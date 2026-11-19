@@ -2,6 +2,29 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Macro DRC passes; correct extraction ports and LVS evidence
+
+- Assembled44465623376 at53240408 passes Magic/KLayout DRC and overlap at
+  zero. Full inventory/contacts pass and actual GDS/PNL SHA values match local
+  preparation. Workflow fails402LVS differences: extracted root has no ports,
+  and supply-domain/decap reductions differ. No physical/timing acceptance.
+- Root review finds all26old leaf detailed LVS verdicts fail pin matching,
+  despite zero summary metrics. BUG143 records the observer's zip/no-pin
+  limitation. Corrected CLAIMS and physical status withdraw strict leaf LVS
+  qualification while retaining actual DRC/routing/inventory evidence. No
+  frozen receipt is rewritten; no phase checkbox is ticked.
+- D137/BUG142 prepares a hash-checked isolated port-annotation script and paired
+  all/notopports extraction on identical geometry. Require all449root names
+  before/after extraction, original device/LVS checks and a uniquely matching
+  final verdict. Declared multi-access supplies still require real enclosing-
+  grid connectivity.44assembly/port tests/actionlint and real-source preparation
+  pass. Next authenticate hosted outcomes, then full-chip power and actual
+  extracted clock/data timing. G1 and its production configuration stay intact.
+- A separate flat-route extraction-view prototype is prepared locally but is
+  uncommitted/unqualified: it needs native import, inventories and independent
+  geometry XOR before any timing use. This prevents hierarchical SPEF read-
+  order/coverage assumptions from becoming unsupported timing claims.
+
 ## 2026-11-18 — Materialize complete R1 macro; prepare hosted geometry gates
 
 - D136 adds exact26artifact/fiveproducer admission and full40-instance context

@@ -1,5 +1,42 @@
 # Bugs
 
+## 143: Zero LVS summary counts do not establish a passing detailed verdict
+
+- **Symptom/check:** while reviewing failed assembled44465623376, root also
+  reads all26retained leaf lvs.netgen.rpt files. Each says "Top level cell
+  failed pin matching" despite a zero LibreLane LVS-error summary metric.
+  Earlier seven-metric results remain historical observations, not strict LVS
+  qualification. Claims/physical status are corrected; no phase gate is ticked.
+- **Root cause:** the summary observer compares paired pin entries using zip
+  and ignores entries marked "(no pin)". Unequal/aliased interface lists can
+  therefore produce a zero summary while Netgen's own final verdict fails.
+- **Fix/coverage:** our assembly acceptance additionally requires exactly one
+  "Circuits match uniquely." final verdict and every declared extracted top
+  port, with no duplicate/missing/extra ports. Negative tests reject the actual
+  failed verdict, absent/duplicate verdicts, port-error verdicts and incomplete
+  port lists. Original reports and metrics stay intact. Corrected interface
+  extraction must pass before claiming LVS.
+
+## 142: Assembled GDS root labels are not declared extraction ports
+
+- **Symptom:**44465623376 at53240408 passes whole-macro Magic DRC, KLayout
+  DRC and illegal-overlap metrics at zero, then reports402LVS differences.
+  The extracted .subckt warp_r1_candidate has no top ports. Other differences
+  include seven additional supply nets and14decap-device differences after
+  parallel reduction (eight supply groups versus one schematic supply port).
+- **Root cause/status:** translated GDS text labels do not carry Magic port
+  flags. The macro also exports multiple separate supply accesses intended
+  for connection in the enclosing Tiny Tapeout grid. A standalone extraction
+  must distinguish that declared interface from internal connectivity.
+- **Fix/check in progress:** D137 promotes only the exact449root interface
+  names in an isolated, hash-checked copy of the extraction script. Compare
+  unique=all against notopports, which preserves declared external port names
+  while making internal labels unique. Both retain standard short-resistor
+  representation of aliased ports, all internal device checks and exact GDS/
+  netlist bytes. Enclosing physical power connectivity stays an explicit gate;
+  no real stripe connection or full-chip timing is inferred from an interface
+  LVS result. No geometry/checker waiver or production change.
+
 ## 141: Contact audit must use independent expected and physical aliases
 
 - **Symptom/check:** the first local contact-audit negative test removed a

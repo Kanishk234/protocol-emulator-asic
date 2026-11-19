@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November18 complete leaf finishing:** primitive1 run44454944540 atb572c95f
+passes all seven physical metrics; final-view hashes and original1453cells/
+1557wires replay. Together with prior results, all26contexts have individual
+finishing passes. D132's read-only catalog maps40frozen instances to26distinct
+planned masters in1061.76x669.06um, preventing canonical-name layout collisions.
+No assembled geometry is emitted yet; context GDS/LEF renaming, shared-cell
+checks, full-macro DRC/LVS, shell and configured timing remain open.
+
 **November18 column finishing:**44450213740 at82727e35 passes all15remaining
 LUT/north/south column contexts. Every input/final-view hash and original
 inventory/wire check replays; seven physical metrics are zero per case. Combined

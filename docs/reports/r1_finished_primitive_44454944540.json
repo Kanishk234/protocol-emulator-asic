@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "case": "primitive1",
+  "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "physical_gate_metrics": {
+    "route__drc_errors": 0,
+    "design__critical_disconnected_pin__count": 0,
+    "antenna__violating__nets": 0,
+    "antenna__violating__pins": 0,
+    "magic__drc_error__count": 0,
+    "klayout__drc_error__count": 0,
+    "design__lvs_error__count": 0
+  },
+  "original_cells": 1453,
+  "added_fill_or_decap_cells": 675,
+  "required_signal_nets_with_wires": 1557,
+  "odb_sha256": "60ab00c4ed5e7015fdf79b933d815d499ee0312a6d5d1c32b4f910fe8f86d0fb",
+  "gds_sha256": "2ce959fec9fe0e6f4d3a937fd36d5c4d9a73d59ebf5e4fd515613a98df346827",
+  "nl_sha256": "88ca50a0e1d767558ae361390c38fd1b5060a85d63df7612fd7590507b0517bd",
+  "run": 44454944540,
+  "source_sha": "b572c95f",
+  "review": "Seven physical metrics, final ODB/GDS/netlist hashes and original inventories/1557wires replayed."
+}

@@ -2,6 +2,31 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — All leaf contexts physically finish; prepare safe assembly catalog
+
+- D133 prepares a read-only native-loop observation after rejecting all three
+  selector hypotheses. Both original controls retain their measurements and
+  constraints; appended reports cover all23reported loop cells/70pin pairs.
+  Actual-source preparation and97combined focused tests/actionlint pass.
+  Hosted evidence must preserve the original six-endpoint failure before being
+  interpreted. No additional case, arc, netlist or timing-model change.
+- Final primitive1 run44454944540 atb572c95f passes seven physical metrics.
+  Root replays final ODB/GDS/netlist hashes and preservation of1453original
+  cells/1557signal wires;675standard fill/decap cells added. Receipt:
+  reports/r1_finished_primitive_44454944540.json. All26frozen leaf contexts now
+  have individual physical finishing evidence. This is not assembled signoff.
+- D132 adds a read-only assembly catalog: require all26passed contexts and
+  their seven metrics/view hashes; map the exact frozen40-instance graph to
+  26distinct planned physical masters. Preserve differing column widths/power
+  phases and reverse north-to-south FABulous Y into physical coordinates.
+  Actual catalog passes with1061.76x669.06um extent. No geometry written.
+-94focused checks pass. Next materialize context-specific GDS/LEF masters,
+  validate shared-cell geometry before reuse, stitch the actual40instances,
+  and run macro geometry/LVS and fixed-shell integration. Timing BUG133 remains
+  open; all unused G/D/E one-bit probes are rejected, with no candidate adopted.
+  Next timing work must examine graph/model treatment against the pinned runtime,
+  preserving original controls and all active arcs. No phase boxes ticked.
+
 ## 2026-11-18 — Twenty-five contexts physically pass; reject unused E timing change
 
 - D130 run44450213740 at82727e35 passes all15column jobs. Root verifies every

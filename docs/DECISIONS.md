@@ -1,5 +1,50 @@
 # Decisions
 
+## D-133: Observe actual native edges in every reported structural-loop cell
+
+- **Date:**2026-11-18. **Need:** G/D/E one-bit probes leave every endpoint
+  unchanged. Stop repeating those selectors. Determine actual constant/disabled
+  edge treatment in the native cells reported by the unchanged timing control.
+- **Method:** authenticate the original capsule and native export; collect the
+  exact23cells in its eight-loop report. Append only supported report_constant
+  and report_edges queries for all70input/output pin pairs to both original
+  loop-policy controls, after their original measurements. No candidate case,
+  arc disabling, false path, netlist or Liberty change is executed.
+- **Gate/cost:** two90-second STA bounds in the pinned image. Require complete
+  query coverage, original input/script hashes and reproduction of the original
+  six sensitive endpoints/+1.508933ns cell-only worst slack. A green collector
+  is observation only, not timing acceptance. Common preparation's unused
+  candidate files are not executed; only control scripts feed this diagnostic.
+- **Research scope:** current upstream Levelize.cc searchThru does not visibly
+  filter constant-simulation edge flags. This motivates investigating structural
+  cut selection; it is not proof of the pinned2.7runtime cause or a reason to
+  patch/upgrade tools or disable arcs. See the linked source in the timing note.
+- **Validation:** actual-source preparation covers23cells/70pin pairs per policy;
+ 97combined focused checks/actionlint pass. Hosted observation pending.
+
+## D-132: Prepare an assembly catalog without merging unequal physical masters
+
+- **Date:**2026-11-18. **Basis:** primitive1 finishing44454944540 passes its
+  seven physical metrics and retained-view/inventory/wire replay, completing
+  individual finishing for26contexts. Fabric assembly is not yet qualified.
+- **Method:** admit all26passed context receipts and their GDS/ODB/netlist
+  hashes, including the separately corrected corner. Check the exact frozen
+  connectivity graph and40unique grid positions, map each instance to exactly
+  one qualified context, and allocate26distinct planned wp_r1 master names.
+  Respect FABulous north-to-south row numbering and physical upward Y.
+- **Need:** several layouts share a canonical tile name while their widths or
+  power phases differ. Merging by canonical name could silently choose the
+  wrong physical layout. A catalog must precede GDS/LEF context renaming and
+  shared standard-cell collision checks.
+- **Cost/scope:** standard-library read-only preflight, no EDA or hardware
+  change. Emit a plan for40instances in the frozen1061.76x669.06um footprint;
+  do not write geometry, claim assembled acceptance or alter clock/constraints.
+  Actual renaming/stitching, full-macro DRC/LVS and shell integration remain.
+- **Validation:** actual26receipt/40instance preflight passes. Tests reject
+  missing/failed/duplicate contexts, absent gates/hashes and duplicate positions,
+  and check distinct width variants plus north/south coordinates.94focused
+  checks pass. No phase box or configured timing acceptance follows.
+
 ## D-131: Admit and finish the original primitive1 routed checkpoint
 
 - **Date:**2026-11-18. **Basis:** all15D130column contexts pass44450213740;

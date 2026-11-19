@@ -55,7 +55,7 @@ jobs:
           prepare(source/'r1_assembly',Path('build/r1_macro_ports'),native_flat=flat/'r1_flat_extract')
           PY
           bash spikes/cloud/fetch_pdk.sh
-      - name: Preserve complete root interface in flat SPICE comparison
+      - name: Compare native alias merging with all original extraction controls
         timeout-minutes: 25
         run: |
           set -euo pipefail

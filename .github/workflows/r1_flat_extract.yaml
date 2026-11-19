@@ -29,7 +29,7 @@ jobs:
         run: |
           bash scripts/setup_venv.sh
           source .venv/bin/activate
-          python -m pytest -q tools/profiling/tests/test_r1_flat_routes.py tools/profiling/tests/test_r1_assemble.py tools/profiling/tests/test_r1_assembly_contacts.py
+          python -m pytest -q tools/profiling/tests/test_r1_flat_routes.py tools/profiling/tests/test_r1_spef_connectivity.py tools/profiling/tests/test_r1_assemble.py tools/profiling/tests/test_r1_assembly_contacts.py
           python spikes/r1/assembly_fetch.py --out build/r1_flat_sources
           python - <<'PY'
           import json,sys
@@ -42,7 +42,7 @@ jobs:
           flatten(Path('build/r1_flat_assembly'),sources['sources'],Path('build/r1_flat_extract'))
           PY
           bash spikes/cloud/fetch_pdk.sh
-      - name: Normalize marker regions and check every layer before RC extraction
+      - name: Prove contained pin centerlines preserve all layers before RC extraction
         timeout-minutes: 65
         run: |
           set -euo pipefail

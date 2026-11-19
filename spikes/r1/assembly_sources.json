@@ -1,0 +1,228 @@
+{
+  "producers": {
+    "44402764510": {
+      "id": 44402764510,
+      "head_sha": "bb7118e2d58102359f75771a0ff5ec66ee6d3790",
+      "run_attempt": 1,
+      "head_branch": "efpga",
+      "path": ".github/workflows/r1_finish_leaf.yaml",
+      "conclusion": "success"
+    },
+    "44445288959": {
+      "id": 44445288959,
+      "head_sha": "f25eaa791a7e9b6235af947f5f368fc90daefa35",
+      "run_attempt": 1,
+      "head_branch": "efpga",
+      "path": ".github/workflows/r1_finish_contexts.yaml",
+      "conclusion": "failure"
+    },
+    "44447843126": {
+      "id": 44447843126,
+      "head_sha": "9190efd0c137bd3425f006e2e3072252a9a7b5dd",
+      "run_attempt": 1,
+      "head_branch": "efpga",
+      "path": ".github/workflows/r1_finish_wire_corner.yaml",
+      "conclusion": "success"
+    },
+    "44450213740": {
+      "id": 44450213740,
+      "head_sha": "82727e352a25fbcae977fb7a14adc51755b7f99c",
+      "run_attempt": 1,
+      "head_branch": "efpga",
+      "path": ".github/workflows/r1_finish_columns.yaml",
+      "conclusion": "success"
+    },
+    "44454944540": {
+      "id": 44454944540,
+      "head_sha": "b572c95f6dd64149451210cb2bf6f6eecf33baf5",
+      "run_attempt": 1,
+      "head_branch": "efpga",
+      "path": ".github/workflows/r1_finish_primitive.yaml",
+      "conclusion": "success"
+    }
+  },
+  "contexts": {
+    "lut0": {
+      "id": 14473237318,
+      "name": "r1-finished-lut0-44402764510",
+      "digest": "sha256:859ec7dd663f5543740b90017405e56159aa4f17813ec89aa5c17a12b5fec2e8",
+      "size_in_bytes": 11376819,
+      "source_run": 44402764510
+    },
+    "east_io": {
+      "id": 14493890085,
+      "name": "r1-finished-context-44445288959-east_io",
+      "digest": "sha256:59605bb51e05b67b769b07b2a5bb67aec0da4153af96ae25b4f73d0c8148091f",
+      "size_in_bytes": 5605282,
+      "source_run": 44445288959
+    },
+    "north0": {
+      "id": 14494195021,
+      "name": "r1-finished-context-44445288959-north0",
+      "digest": "sha256:591fc7d2450d353f02aae57b4465df83e8e6e8d73b8133edf3f05c37f36e9a38",
+      "size_in_bytes": 2194363,
+      "source_run": 44445288959
+    },
+    "northwest": {
+      "id": 14492743221,
+      "name": "r1-finished-context-44445288959-northwest",
+      "digest": "sha256:14435c31e13ff89acee0fcd9265b998647402201036d7b80e4d2036dda9a63bd",
+      "size_in_bytes": 1751016,
+      "source_run": 44445288959
+    },
+    "primitive4": {
+      "id": 14492539627,
+      "name": "r1-finished-context-44445288959-primitive4",
+      "digest": "sha256:0024854ec9e207ba7ed178e15aa648eacda129f26929d5ba4e4eddd9475656e9",
+      "size_in_bytes": 11961601,
+      "source_run": 44445288959
+    },
+    "south0": {
+      "id": 14493715424,
+      "name": "r1-finished-context-44445288959-south0",
+      "digest": "sha256:2199997cb5195c5f10e6289e3edf5d43712213238141cc1d9ab5da2e8b65d411",
+      "size_in_bytes": 2831388,
+      "source_run": 44445288959
+    },
+    "southeast": {
+      "id": 14492699332,
+      "name": "r1-finished-context-44445288959-southeast",
+      "digest": "sha256:d95b172a7c213b4fab85ebfef54798ab17c3e204a93a1aa27832aae1aea4aa15",
+      "size_in_bytes": 1695986,
+      "source_run": 44445288959
+    },
+    "southwest": {
+      "id": 14493446234,
+      "name": "r1-finished-context-44445288959-southwest",
+      "digest": "sha256:9dd71638a89a59e9fc79b746f485e78cfc4ac77268828f033b50ab4613dd8a79",
+      "size_in_bytes": 2554629,
+      "source_run": 44445288959
+    },
+    "west_io": {
+      "id": 14493385946,
+      "name": "r1-finished-context-44445288959-west_io",
+      "digest": "sha256:2b7e96a76e7ef7ab6590e75ead08091cfa296fe509c9ece4212e863a25e7c937",
+      "size_in_bytes": 6601594,
+      "source_run": 44445288959
+    },
+    "northeast": {
+      "id": 14493633638,
+      "name": "r1-finished-wire-corner-44447843126",
+      "digest": "sha256:22d72535d4002b2f08e3d81972a0ea5faee814c1a417c394b6060f00c6da1ad9",
+      "size_in_bytes": 1448271,
+      "source_run": 44447843126
+    },
+    "lut1": {
+      "id": 14495167658,
+      "name": "r1-finished-column-44450213740-lut1",
+      "digest": "sha256:5ff9133e98a81010a58ec88c615122bfc72c0cc303e4c663cd5898697c75cc5a",
+      "size_in_bytes": 11139317,
+      "source_run": 44450213740
+    },
+    "lut2": {
+      "id": 14494909070,
+      "name": "r1-finished-column-44450213740-lut2",
+      "digest": "sha256:1525c234ec08aabdf8dbb4ad192178a0ee40e3ceaca4e78c2d4a303ac0cd60bc",
+      "size_in_bytes": 11286934,
+      "source_run": 44450213740
+    },
+    "lut3": {
+      "id": 14495337292,
+      "name": "r1-finished-column-44450213740-lut3",
+      "digest": "sha256:01b1f2a06e288d205f1f4137bf49e1c93673d65bd4897ae9a2430996ae10a79a",
+      "size_in_bytes": 11388877,
+      "source_run": 44450213740
+    },
+    "lut4": {
+      "id": 14494764929,
+      "name": "r1-finished-column-44450213740-lut4",
+      "digest": "sha256:72a3ac6c6a421de03e6e4a7f46c0327b77b1e3c163626e58b990f9761e44e284",
+      "size_in_bytes": 11107300,
+      "source_run": 44450213740
+    },
+    "lut5": {
+      "id": 14495183177,
+      "name": "r1-finished-column-44450213740-lut5",
+      "digest": "sha256:ce31f2a2583c3b331cc8ee4329bb5df47539d7c749765275f71510496fec49c9",
+      "size_in_bytes": 11325341,
+      "source_run": 44450213740
+    },
+    "north1": {
+      "id": 14494514442,
+      "name": "r1-finished-column-44450213740-north1",
+      "digest": "sha256:53353fc91ebef273619b9da6aeb1b49bdeae21566f14403ec4fa4f87e2777725",
+      "size_in_bytes": 2190810,
+      "source_run": 44450213740
+    },
+    "north2": {
+      "id": 14495717478,
+      "name": "r1-finished-column-44450213740-north2",
+      "digest": "sha256:ab0d5111893cd5bca551c1bbd27c9c0d24d988afa6c0089b8eaf739032cd1250",
+      "size_in_bytes": 2192800,
+      "source_run": 44450213740
+    },
+    "north3": {
+      "id": 14495014736,
+      "name": "r1-finished-column-44450213740-north3",
+      "digest": "sha256:ce17c481cfc657a2d5fa6702ef89643fe1569b7fea7833fc0fe4c916e6a15558",
+      "size_in_bytes": 2214405,
+      "source_run": 44450213740
+    },
+    "north4": {
+      "id": 14496175051,
+      "name": "r1-finished-column-44450213740-north4",
+      "digest": "sha256:94f2442b5be2e66261a00cb79c001aec9fbbf49ed418c5b354f8e8d0426b237a",
+      "size_in_bytes": 2161317,
+      "source_run": 44450213740
+    },
+    "north5": {
+      "id": 14495821745,
+      "name": "r1-finished-column-44450213740-north5",
+      "digest": "sha256:c9111068fa98867a7461ff065e9f308815b0897896649406455b7fd512255420",
+      "size_in_bytes": 2160009,
+      "source_run": 44450213740
+    },
+    "south1": {
+      "id": 14495423713,
+      "name": "r1-finished-column-44450213740-south1",
+      "digest": "sha256:c5713a91690674aee2efc1cb7bdad9d65f4737ce07a388a749d2821b2f3405b7",
+      "size_in_bytes": 2820736,
+      "source_run": 44450213740
+    },
+    "south2": {
+      "id": 14495274064,
+      "name": "r1-finished-column-44450213740-south2",
+      "digest": "sha256:fd3f0442d080b1736036cfa80c0a619a94ab81e9b94d3fab44fe0249b0a41eb5",
+      "size_in_bytes": 2817884,
+      "source_run": 44450213740
+    },
+    "south3": {
+      "id": 14496246523,
+      "name": "r1-finished-column-44450213740-south3",
+      "digest": "sha256:e7052dd64520b37933d0f22da601a7b8876e18e80243787545eaeadea42f7877",
+      "size_in_bytes": 2845689,
+      "source_run": 44450213740
+    },
+    "south4": {
+      "id": 14495284662,
+      "name": "r1-finished-column-44450213740-south4",
+      "digest": "sha256:3963bdaf2f948063bef5268b1cb0b140c5fcb10883ec6c44138aa4fb1deef1de",
+      "size_in_bytes": 2801403,
+      "source_run": 44450213740
+    },
+    "south5": {
+      "id": 14495788335,
+      "name": "r1-finished-column-44450213740-south5",
+      "digest": "sha256:fcf7238647009e570b7aceb2160f68bc37e41e3a9feff183777a89c5c39361a3",
+      "size_in_bytes": 2806863,
+      "source_run": 44450213740
+    },
+    "primitive1": {
+      "id": 14497825477,
+      "name": "r1-finished-primitive-44454944540",
+      "digest": "sha256:2771cb509a793dc75fce75230c9fdc768c1d75258d6a4cd316c1f2f5d5cf3daf",
+      "size_in_bytes": 11983105,
+      "source_run": 44454944540
+    }
+  }
+}

@@ -105,6 +105,56 @@ def unused_input_bit(features, spec, module, state, lut='D'):
     return bit
 
 
+def registered_h_source(module,select_bit):
+    drivers={bit:(name,c) for name,c in module['cells'].items()
+             for pin,d in c['port_directions'].items() if d=='output' for bit in c['connections'][pin]}
+    _,gate=drivers[module['netnames']['LH_O']['bits'][0]]
+    if gate['type']!='sg13cmos5l_a21oi_1' or gate['connections']['A2']!=[select_bit]:
+        raise ValueError('Registered H output gate differs')
+    _,nor=drivers[gate['connections']['B1'][0]]
+    if nor['type']!='sg13cmos5l_nor3_1' or [select_bit] not in list(nor['connections'].values()):
+        raise ValueError('Registered H combinational arm is not masked')
+    _,inv=drivers[gate['connections']['A1'][0]]
+    if inv['type']!='sg13cmos5l_inv_1':raise ValueError('Registered H output inversion differs')
+    name,register=drivers[inv['connections']['A'][0]]
+    if register['type']!='sg13cmos5l_dfrbpq_1' or register['connections']['Q']!=inv['connections']['A']:
+        raise ValueError('Alternate H source does not reach a user flip-flop')
+    return name
+
+
+def unused_upstream_bit(features,spec,module,state,words,pips):
+    from selected_route import selected_predecessors,trace_route
+    proof=unused_input_bit(features,spec,module,state)
+    entries=spec['TileSpecs'][TILE]
+    dest='J2MID_CDa_BEG1';alternate='JE2END4.'+dest
+    bits=entries[alternate]
+    for feature in features:
+        tile,source,target=feature.split('.')
+        if tile==TILE and (target==dest or set(entries[source+'.'+target]) & set(bits)):
+            raise ValueError('Upstream selector overlaps an active feature')
+    selected=parking_bit([],{'TileSpecs':{TILE:{'G.FF':bits}}},module,state)
+    h=entries['H.FF']
+    if len(h)!=1 or set(h.values())!={'1'}:raise ValueError('Unexpected H register encoding')
+    index=next(iter(h));frame,offset=divmod(index,32)
+    matches=[n for n,c in module['cells'].items() if c['type']=='sg13cmos5l_dlhq_1'
+             and c['connections'].get('D')==[module['ports']['FrameData']['bits'][offset]]
+             and c['connections'].get('GATE')==[module['ports']['FrameStrobe']['bits'][frame]]]
+    if len(matches)!=1 or state.get(matches[0])!='1' or f'{TILE}.H.FF' not in features:
+        raise ValueError('Alternate source is not observed registered H')
+    user_register=registered_h_source(module,module['cells'][matches[0]]['connections']['Q'][0])
+    before=trace_route(selected_predecessors(spec,words,pips),(TILE,'LD_I1'))
+    candidate=list(words);index=selected['tile_bit'];frame,offset=divmod(index,32)
+    candidate[1+(2*20+frame)*6+1+(4-3)]|=1<<offset
+    after=trace_route(selected_predecessors(spec,candidate,pips),(TILE,'LD_I1'))
+    if before[-1]!=(TILE,'LD_O') or after[-1]!=(TILE,'LH_O'):
+        raise ValueError('Expected feedback-to-registered-source topology not reproduced')
+    selected.update(feature=TILE+'.'+alternate,lut='D',unused_input=1,
+        observed_init=proof['observed_init'],cofactor_addresses_checked=16,
+        source_register_select_latch=matches[0],source_user_register=user_register,route_before=before,route_after=after,
+        scope='Unused D I1, one free upstream selector; observed H.FF=1. Analysis only; no image/functional/delay acceptance.')
+    return selected
+
+
 def change_case(text, bit):
     pin = bit['tile'] + '/' + bit['cell'] + '/Q'
     original = (f'set p [get_pins -quiet {{{pin}}}]\n'
@@ -121,6 +171,7 @@ def change_case(text, bit):
 def edge_trace():
     lines = ['puts "R1_EDGE_TRACE_BEGIN"']
     for cell, output, pins in [
+        ('Tile_X2Y3_LUT4x8_ha/_0775_', 'X', ('A0', 'A1', 'S')),
         ('Tile_X2Y3_LUT4x8_ha/_0776_', 'X', ('A0', 'A1', 'S')),
         ('Tile_X2Y4_S_IO2/_097_', 'X', ('A0', 'A1', 'A2', 'A3', 'S0', 'S1'))]:
         lines += [f'puts "R1_EDGE_TRACE_CELL {cell}"', f'sta::report_constant {{{cell}}}']
@@ -173,11 +224,25 @@ def prepare(capsule, out, target='unused-output-register', trace_edges=False):
     state = json.loads(state_path.read_text())['tiles'][NATIVE_TILE]['q']
     fasm = capsule / 'model/compile/uart_spi_11/design.fasm'
     spec = PlainSpec(io.BytesIO(spec_path.read_bytes())).load()
-    if target not in ('unused-output-register', 'unused-input-select', 'unused-e-input-select'):
+    if target not in ('unused-output-register', 'unused-input-select', 'unused-e-input-select', 'unused-d-upstream-select'):
         raise ValueError('Unknown experiment target')
     selector = parking_bit if target == 'unused-output-register' else unused_input_bit
     args = (fasm_features(fasm), spec, module, state)
-    bit = unused_input_bit(*args, lut='E') if target == 'unused-e-input-select' else selector(*args)
+    if target == 'unused-d-upstream-select':
+        from compile.bitfile import BitFile
+        image=capsule/'functional/quiescent/quiesced.wbit'
+        pips_path=resource/'macro/fabulous/.FABulous/pips.txt'
+        if sha(pips_path)!=manifest['generated_sha256']['macro/fabulous/.FABulous/pips.txt']:
+            raise ValueError('Changed frozen routing graph')
+        inputs[image]=sha(image);inputs[pips_path]=sha(pips_path)
+        inputs[Path(__file__).with_name('selected_route.py')]=sha(Path(__file__).with_name('selected_route.py'))
+        bit=unused_upstream_bit(*args,BitFile.load(image).words,pips_path.read_text())
+        report=capsule/'analysis/static.log';inputs[report]=sha(report)
+        register=parse_log(report.read_text())['ffs'].get(NATIVE_TILE+'/'+bit['source_user_register'])
+        if register is None or not register['clocked']:
+            raise ValueError('Registered alternate is not covered by the original RUN clock')
+    else:
+        bit = unused_input_bit(*args, lut='E') if target == 'unused-e-input-select' else selector(*args)
     out.mkdir(parents=True, exist_ok=False)
     def relocate(text):
         # Explicit path relocation only; no source/state/connectivity rewrite.
@@ -249,7 +314,7 @@ if __name__ == '__main__':
     parser.add_argument('mode', choices=('prepare', 'audit'))
     parser.add_argument('--capsule', type=Path)
     parser.add_argument('--out', type=Path, required=True)
-    parser.add_argument('--target', choices=('unused-output-register', 'unused-input-select', 'unused-e-input-select'), default='unused-output-register')
+    parser.add_argument('--target', choices=('unused-output-register', 'unused-input-select', 'unused-e-input-select', 'unused-d-upstream-select'), default='unused-output-register')
     parser.add_argument('--trace-edges', action='store_true')
     args = parser.parse_args()
     if args.mode == 'prepare':

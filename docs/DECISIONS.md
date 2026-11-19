@@ -1,5 +1,28 @@
 # Decisions
 
+## D-139: Retain source pin markers and original LVS wrapper policy
+
+- **Date:**2026-11-19. **Measured basis:**44577809055 preserves all45429cells/
+  183701terminals/449ports/26431required wires and all compared conductor,
+  via/device layers. XOR differs only on source internal pin markers10/2and
+  30/2; it detects its added-metal control and stops before RCX. Separately,
+  44577808696 exports all449ports but still fails12hierarchical LVS errors.
+- **Geometry correction:** preserve source final-ODB marker boxes during
+  flattening. Verify pinned PDK meanings Metal2.pin=10/2andMetal3.pin=30/2.
+  Restore missing marker polygons only within those boxes, rejecting extra
+  markers or any other layer change. Write a separate derived GDS; rerun the
+  complete all-layer XOR and negative control before RCX. No layer exclusion,
+  conductor edit, reroute, new cell or hardware/default change.
+- **LVS correction:** carry the original D136LVS_FLATTEN_CELLS list into both
+  D137cases. Validate exactly26distinct wp_r1_context masters, never a standard
+  cell or wildcard. Flattening those representation wrappers retains every
+  underlying standard-cell device/net; no new ignored cells or relaxed verdict.
+- **Validation/cost:** corrected native marker toy accepts exact restoration
+  and rejects actual conductor/unproven-area changes. Context-policy tests
+  reject standard-cell, wildcard and duplicate entries. Reuse the same bounded
+  cloud workflows; both original failed outcomes remain available. Actual
+  corrected full-geometry/RC and strict LVS results are still required.
+
 ## D-138: Flatten preserved physical routes before full-macro RC extraction
 
 - **Date:**2026-11-19. **Need:** actual clock/data delay requires routed

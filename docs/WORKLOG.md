@@ -2,6 +2,23 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Port list fixed; isolate marker and hierarchy mismatches
+
+- Actual44577808696 at20c782a5 now extracts all449declared ports with no
+  missing/extra names in the external-port case. LVS still fails12errors;
+  strict control retains456ports including seven split supply names. BUG147
+  traces the diagnostic's missing original26context-flattening policy; restore
+  it in both cases without ignoring any underlying standard-cell device/net.
+- Actual44577809055 at20c782a5 preserves all native import inventories and
+  26431required wires. All-layer XOR matches every compared conductor/via/
+  device layer; only10/2Metal2.pin and30/2Metal3.pin differ. Added-metal control
+  is detected; RCX does not run. BUG146/D139restore only missing metadata in
+  source-proven pin boxes, then require all layers to match. No layer is ignored.
+- Tiny native KLayout restoration passes; real metal and unproven-marker
+  mutations fail. Next authenticate corrected original-policy LVS and full
+  geometry/RC outcomes before configured timing. No phase box or full-macro
+  electrical/timing acceptance; production G1 remains untouched.
+
 ## 2026-11-19 — Verify full route import and launch guarded RC extraction
 
 - D138 prepares a flat physical extraction view from the exact original leaves.

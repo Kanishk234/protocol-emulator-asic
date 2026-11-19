@@ -1,5 +1,37 @@
 # Bugs
 
+## 147: Port diagnostic omitted the original context-flattening policy
+
+- **Symptom:**44577808696 at20c782a5 now extracts all449declared ports in
+  the external-port case, with no missing/extra names, but LVS reports12errors
+  (nine-net difference, no device difference, two unmatched-pin entries).
+  Its comparison still contains40context-wrapper instances and child alias
+  pin-matching errors. The original assembly comparison flattened those wrappers.
+- **Root cause:** D137's reduced extraction-only flow did not carry forward
+  LVS_FLATTEN_CELLS from D136. Hierarchical alias pin lists were compared and
+  altered before the underlying standard-cell networks were matched.
+- **Fix/coverage:** restore the original exact26context-wrapper names from
+  the authenticated source catalog in both cases. Reject incomplete/duplicate
+  names and any standard-cell/wildcard entry. No ignored device, disconnected
+  net or final-verdict relaxation. Strict control and failed12result remain;
+  a corrected detailed Netgen verdict is required before calling this resolved.
+
+## 146: Flattening internal ports drops their GDS pin-marker purposes
+
+- **Symptom/check:**44577809055 at20c782a5 imports every source cell/terminal/
+  port and required wire, then fails all-layer XOR on only10/2and30/2.
+  Every conductor/via/device and other compared layer matches; the added-metal
+  negative control is detected. RCX correctly does not run.
+- **Root cause:** leaf access metal is preserved as route rectangles, but
+  removing internal boundary ports also removes Metal2.pin/Metal3.pin markers.
+  The pinned PDK layer-properties file identifies those exact purposes.
+- **Fix/coverage:** retain translated source final-ODB pin boxes as a separate
+  ledger. Copy only missing marker geometry on10/2and30/2when contained in
+  those source-proven boxes. Reject extra markers, unproven area or any other
+  geometry difference. Recheck every layer after restoration; ignore no layer.
+  Tiny native KLayout calibration passes exact restoration and rejects a1DBU
+  conductor change and unproven marker area. Hosted replay/RCX remain required.
+
 ## 145: Magic port enumeration must prefix the port index
 
 - **Symptom/check:**44576476221 atae151aac admits the reviewed script but

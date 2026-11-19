@@ -1,0 +1,181 @@
+{
+  "passed": false,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Route-preserving flat geometry comparison and full-macro RC extraction only. Active annotation, configured setup/hold/corners, shell, physical power and submission remain unqualified.",
+  "import_inventory": {
+    "import_passed": true,
+    "cells": 45429,
+    "terminals": 183701,
+    "ports": 449,
+    "required_signal_nets_with_wires": 26431,
+    "geometry_xor_passed": false,
+    "physical_acceptance": false,
+    "timing_acceptance": false
+  },
+  "geometry_xor": {
+    "passed": false,
+    "layers_compared": 21,
+    "layers_with_differences": 2,
+    "negative_control_detected": true,
+    "layers": [
+      {
+        "layer": 1,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 5,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 6,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 2,
+        "different": true,
+        "difference_polygons": 1544,
+        "difference_area_dbu2": 468480000
+      },
+      {
+        "layer": 10,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 14,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 19,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 29,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 2,
+        "different": true,
+        "difference_polygons": 1840,
+        "difference_area_dbu2": 563200000
+      },
+      {
+        "layer": 30,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 31,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 49,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 189,
+        "datatype": 4,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      }
+    ],
+    "ignored_geometry_layers": [],
+    "reference_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+    "candidate_sha256": "01eb954e39bc32b75f3cc7b2a7f59071bf2bbaa1dabed7ac85cdd9cad71f73c8",
+    "scope": "All polygon/path/box geometry in the named macro hierarchy at1nmDBU; text/port metadata and electrical/timing acceptance are separate."
+  },
+  "error": "Flat geometry differs or XOR negative control failed",
+  "run": 44577809055,
+  "source_sha": "20c782a513eddc301d9da59723e68438e894c968",
+  "archive_id": 14556958189,
+  "archive_sha256": "e87bcbd39af7128ef26c4d6f2584598653a6981c7210108d49dedb7798f4bae2",
+  "root_review": "Native import inventories, complete wire set, DEF identity and streamed GDS digest replay. Difference limited to two pin-marker purposes; no RCX executed."
+}

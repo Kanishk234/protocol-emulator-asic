@@ -7,6 +7,7 @@ import collections
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import pickle
 import re
@@ -82,5 +83,19 @@ def derive(model,case,original_image,out):
                 changed_bits=sum((a^b).bit_count() for a,b in zip(original.words,derived)),changes=changes,
                 input_sha256={str(path):hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs},
                 scope='Existing padded GND selection on unrouted outputs only; no active feature or hardware change, no timing or physical acceptance.')
+    experiment=os.environ.get('R1_REGISTERED_INPUT_EXPERIMENT')
+    if experiment not in (None,'registered_h'):
+        raise ValueError('Unknown registered-input experiment')
+    if experiment:
+        from profiling.r1_registered_input import apply
+        image,parking,extra_inputs=apply(model,case,image,out)
+        record['policy']='unused-padded-GND-plus-registered-input'
+        record['parent_derived_image_sha256']=record['derived_image_sha256']
+        record['derived_image_sha256']=parking['image_sha256']
+        record['registered_input_experiment']=parking
+        record['changed_bits']=sum((a^b).bit_count() for a,b in zip(original.words,BitFile.load(image).words))
+        record['scope']='Opt-in one-bit registered-source image experiment after D118 grounding; no hardware change or timing/physical acceptance.'
+        inputs.extend(extra_inputs)
+        record['input_sha256'].update({str(path):hashlib.sha256(path.read_bytes()).hexdigest() for path in extra_inputs})
     (out/'quiescence.json').write_text(json.dumps(record,indent=2,sort_keys=True)+'\n')
     return image,record,inputs

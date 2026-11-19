@@ -52,7 +52,7 @@ jobs:
           roots=json.loads(Path('build/r1_routed_sources/locations.json').read_text())
           prepare(**roots,pdk=Path(os.environ['PDK_ROOT']),out=Path('build/r1_routed_timing'))
           PY
-      - name: Execute prepared setup and hold scripts with active annotation checks
+      - name: Capture stable endpoint pins before parasitic coverage queries
         timeout-minutes: 20
         run: |
           set -euo pipefail

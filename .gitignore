@@ -24,8 +24,11 @@ results.xml
 __pycache__/
 .pytest_cache/
 .hypothesis/
-# SymbiYosys work directories (the .sby files and props/ stay tracked)
+# SymbiYosys work directories; keep proof properties and compact input fixtures
 formal/*/
 !formal/props/
+!formal/fixtures/
+formal/fixtures/*
+!formal/fixtures/*.json
 # L1 cocotb suites in test_internal/ name their results per variant
 test_internal/**/results*.xml

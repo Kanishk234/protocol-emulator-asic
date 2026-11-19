@@ -1,0 +1,19 @@
+[tasks]
+safety proof
+reachable cover
+[options]
+proof: mode prove
+cover: mode cover
+cover: depth 20
+[engines]
+proof: abc pdr
+cover: smtbmc z3
+[script]
+read -formal -sv -I. trw_chan_prod.v trw_pin_rx.v pin_rx_overrun.sv
+prep -top pin_rx_overrun -flatten
+[files]
+../src/trw_assert.vh
+../src/trw_defs.vh
+../src/trw_chan_prod.v
+../src/trw_pin_rx.v
+props/pin_rx_overrun.sv

@@ -1,0 +1,19 @@
+[tasks]
+safety proof
+reachable cover
+[options]
+timeout 120
+proof: mode prove
+cover: mode cover
+cover: depth 12
+[engines]
+proof: abc pdr
+cover: smtbmc z3
+[script]
+read -formal -sv -DSTATUS_QUEUE_SEAM -I. status_queue_native.v status_queue_harness.sv
+prep -top status_queue_harness -flatten
+[files]
+../src/trw_defs.vh
+../src/status_queue_native.v
+props/status_queue_reference.vh
+props/status_queue_harness.sv

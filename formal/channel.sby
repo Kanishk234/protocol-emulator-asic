@@ -1,0 +1,31 @@
+[tasks]
+blocking proof
+ready proof
+taps proof
+blocking_cover cover
+tap_cover cover
+
+[options]
+proof: mode prove
+cover: mode cover
+cover: depth 40
+
+[engines]
+proof: abc pdr
+cover: smtbmc z3
+
+[script]
+read -formal -sv -I. trw_chan_prod.v trw_chan_port.v trw_fabric.v channel_composition.sv
+ready: chparam -set ALWAYS_READY 1 channel_blocking
+blocking: prep -top channel_blocking -flatten
+ready: prep -top channel_blocking -flatten
+taps: prep -top channel_taps -flatten
+blocking_cover: prep -top channel_blocking -flatten
+tap_cover: prep -top channel_taps -flatten
+
+[files]
+../src/trw_assert.vh
+../src/trw_chan_prod.v
+../src/trw_chan_port.v
+../src/trw_fabric.v
+props/channel_composition.sv

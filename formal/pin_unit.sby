@@ -1,0 +1,41 @@
+[tasks]
+lean proof
+lean_qualified proof
+full proof
+qualified proof
+lean_cover cover
+lean_qualified_cover cover
+full_cover cover
+qualified_cover cover
+[options]
+timeout 120
+proof: mode prove
+cover: mode cover
+cover: depth 16
+[engines]
+proof: abc pdr
+cover: smtbmc z3
+[script]
+read -formal -sv -I. trw_pin_unit.v trw_pin_io.v trw_pin_rx.v trw_pin_tx.v trw_pin_bs.v
+lean: chparam -set FULL 0 trw_pin_unit
+lean_cover: chparam -set FULL 0 trw_pin_unit
+full: chparam -set FULL 1 trw_pin_unit
+full_cover: chparam -set FULL 1 trw_pin_unit
+lean_qualified: chparam -set FULL 0 -set USE_SAMPLE_DELTA 1 -set USE_LEVEL_CACHE 1 -set USE_BITSYNC_ACTIVE 1 trw_pin_unit
+lean_qualified_cover: chparam -set FULL 0 -set USE_SAMPLE_DELTA 1 -set USE_LEVEL_CACHE 1 -set USE_BITSYNC_ACTIVE 1 trw_pin_unit
+qualified: chparam -set FULL 1 -set USE_SAMPLE_DELTA 1 -set USE_LEVEL_CACHE 1 -set USE_BITSYNC_ACTIVE 1 trw_pin_unit
+qualified_cover: chparam -set FULL 1 -set USE_SAMPLE_DELTA 1 -set USE_LEVEL_CACHE 1 -set USE_BITSYNC_ACTIVE 1 trw_pin_unit
+prep -top trw_pin_unit -flatten
+techmap
+opt -fast
+setundef -anyseq
+[files]
+../src/trw_defs.vh
+../src/trw_assert.vh
+../src/trw_pin_unit.v
+../src/trw_pin_io.v
+../src/trw_pin_rx.v
+../src/trw_pin_tx.v
+../src/trw_pin_bs.v
+props/pin_unit_flags.vh
+props/pin_bs_overrun.vh

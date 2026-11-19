@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Twenty-five contexts physically pass; reject unused E timing change
+
+- D130 run44450213740 at82727e35 passes all15column jobs. Root verifies every
+  input hash, final ODB/GDS/netlist hash, all seven physical metrics, original
+  inventories and wire populations. Receipt: reports/r1_finished_columns_44450213740.json.
+  Combined with ten representatives,25of26contexts have physical finishing passes.
+- D129 run44450213745 completes but the E-input candidate changes no timing
+  endpoint value or sensitivity. Reject it; source six-endpoint failure and
+  +1.508933ns cell-only worst setup remain. No actual image/hardware adoption.
+  Receipt: reports/r1_unused_e_input_44450213745.json. Do not combine this with
+  prior rejected D/G changes or turn collector success into timing acceptance.
+- D131 admits the last primitive1 checkpoint by its exact producer, old schema,
+  hashes and resource/wire census. Actual-source preparation passes and a foreign
+  producer fails. Same pinned physical gates, no rerouting or resizing.87focused
+  checks/actionlint pass. Next inspect hosted primitive finishing, then prepare
+  physical assembly with distinct context masters. BUG133 remains open; further
+  timing work must examine graph treatment rather than repeat rejected selectors.
+  No phase boxes ticked or complete-fabric/configured timing claim.
+
 ## 2026-11-18 — Corner correction passes; continue column and timing qualification
 
 - Published scoped tool/test/docs/CI groups through82727e35. Unused-E timing

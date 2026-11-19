@@ -1,5 +1,24 @@
 # Decisions
 
+## D-131: Admit and finish the original primitive1 routed checkpoint
+
+- **Date:**2026-11-18. **Basis:** all15D130column contexts pass44450213740;
+  root replays every input hash, final ODB/GDS/netlist hash, inventory/wire and
+  seven physical metrics. Combined physical coverage is25of26contexts.
+- **Admission:** primitive1's original artifact uses route/PRIM2T2S.odb and the
+  earlier result schema. Bind producer44394572275 at5db0b642, original workflow
+  path/attempt/success, artifact14469878774/digest8169f6049071018251346c362e9a5a53d5e87e4a255ca39b1185d9a8af704481,
+  and exact ODB1a12a86bd7b0a12e035ac0d17c40e9077c089b0bcd86ce296003dc984514bd38.
+  Require1453cells/334configuration latches/2906power terminals/1557wired nets,
+  zero router violations and successful process; validate every original route
+  input and script hash. Do not rewrite the artifact to impersonate newer data.
+- **Run/cost:** same pinned finishing sequence and seven physical gates; one
+  3000-second-bounded cloud job. No placement, route, logic, configuration or
+  footprint change. Reject unrelated/new-schema producers for this admission.
+- **Validation:** actual-source preparation passes; foreign producer is rejected.
+  87focused checks/actionlint pass. Hosted physical result pending. Even all26
+  leaf passes would not establish assembled macro, shell or configured timing.
+
 ## D-130: Finish the remaining fifteen LUT/north/south column contexts
 
 - **Date:**2026-11-18. **Basis:** LUT0, eight representatives in44445288959,

@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November18 column finishing:**44450213740 at82727e35 passes all15remaining
+LUT/north/south column contexts. Every input/final-view hash and original
+inventory/wire check replays; seven physical metrics are zero per case. Combined
+finishing coverage is25of26contexts. D131 admits the final primitive1 checkpoint
+by its original schema and exact hashes, then applies the unchanged finishing
+gates. No assembled macro/shell or configured timing acceptance. The independent
+E-input timing probe44450213745 is rejected: all endpoint values are unchanged.
+
 **November18 representative R1 results:** 44445288959 at f25eaa79 passes
 primitive4, west/east I/O, north0/south0, northwest/southwest/southeast through
 all seven physical gates. Root replays final ODB/GDS/netlist hashes and original

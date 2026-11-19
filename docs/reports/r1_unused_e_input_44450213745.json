@@ -1,0 +1,23 @@
+{
+  "run": 44450213745,
+  "source_sha": "82727e35",
+  "change": {
+    "tile": "Tile_X2Y3_LUT4x8_ha",
+    "cell": "_1532_",
+    "frame": 6,
+    "data_bit": 27,
+    "tile_bit": 219,
+    "before": "0",
+    "after": "1",
+    "feature": "X2Y3.J_l_EF_END1.LE_I1",
+    "lut": "E",
+    "unused_input": 1,
+    "observed_init": 1295,
+    "cofactor_addresses_checked": 16,
+    "scope": "Unrouted I1, observed LUT function independent of I1; analysis only"
+  },
+  "hypothesis_supported": false,
+  "control_and_candidate_identical": true,
+  "timing_acceptance": false,
+  "production_change_adopted": false
+}

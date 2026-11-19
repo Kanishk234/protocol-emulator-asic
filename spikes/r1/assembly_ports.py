@@ -1,5 +1,6 @@
 """Qualify exported macro ports without modifying geometry or internal nets."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -190,29 +191,52 @@ def inside(out,case_set='all'):
         hierarchical_merged_script.write_text(merge_flat_alias_script(all_script.read_text(),
             json.loads(Path(plan['native_inventory']).read_text())['ports'],flat=False))
     active_script=script
+    active_spice_reference=None
     class ExportPorts(Magic.SpiceExtraction):
         id='Magic.R1ExportPorts'
         def get_script_path(self):return str(active_script)
     class CheckPorts(Classic):
         Steps=[ExportPorts,Checker.IllegalOverlap,Netgen.LVS,Checker.LVS]
+    class SourceSpiceLVS(Netgen.LVS):
+        id='Netgen.R1SourceSpice'
+        def run_subprocess(self,cmd,*args,**kwargs):
+            from spice_reference import substitute_schematic_input
+            target=Path(self.get_script_path());original=target.read_text()
+            if active_spice_reference is None:raise ValueError('Missing proven source SPICE')
+            changed=substitute_schematic_input(original,flat_pnl,active_spice_reference)
+            (target.parent/'original-lvs-input.tcl').write_text(original)
+            target.write_text(changed)
+            (target.parent/'input-format-proof.json').write_text(json.dumps(dict(
+                original_sha256=hashlib.sha256(original.encode()).hexdigest(),
+                changed_sha256=sha(target),source_spice_sha256=sha(active_spice_reference),
+                scope='Change only source read format/path; original setup, layout, device checks and lvs command remain.'),indent=2)+'\n')
+            return super().run_subprocess(cmd,*args,**kwargs)
+    class CheckSpicePorts(Classic):
+        Steps=[ExportPorts,Checker.IllegalOverlap,SourceSpiceLVS,Checker.LVS]
     cases={}
     experiments=[('strict_control','all',source/(NAME+'.pnl.v'),False,False),('declared_external_ports','notopports',source/(NAME+'.pnl.v'),False,False)]
     if plan.get('native_inventory'):
         from flat_reference import prepare_and_verify
         liberty=Path(os.environ['PDK_ROOT'])/'ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib'
         flat_pnl=prepare_and_verify(source,plan['native_inventory'],liberty,out/'flat_reference')
+        from spice_reference import prepare as prepare_spice
+        spice_models=liberty.parent.parent/'spice/sg13cmos5l_stdcell.spice'
+        source_spice=prepare_spice(out/'flat_reference',plan['native_inventory'],spice_models,out/'spice_reference')
         experiments.append(('flat_native_reference','notopports',flat_pnl,False,False))
         experiments.append(('complete_context_ports','notopports',flat_pnl,True,False))
         experiments.append(('flat_spice_reference','notopports',flat_pnl,True,True))
         experiments.append(('flat_spice_merge_aliases','notopports',flat_pnl,True,True))
         experiments.append(('hierarchical_merge_aliases','notopports',flat_pnl,True,False))
-    if case_set=='hierarchical_aliases':
-        experiments=[e for e in experiments if e[0] in ('complete_context_ports','hierarchical_merge_aliases')]
-        if len(experiments)!=2:raise ValueError('Missing matched hierarchical alias controls')
+        experiments.append(('hierarchical_spice_reference','notopports',flat_pnl,True,False))
+    if case_set in ('hierarchical_aliases','source_spice'):
+        selected=('complete_context_ports','hierarchical_merge_aliases') if case_set=='hierarchical_aliases' else ('hierarchical_merge_aliases','hierarchical_spice_reference')
+        experiments=[e for e in experiments if e[0] in selected]
+        if len(experiments)!=2:raise ValueError('Missing matched source comparison controls')
     elif case_set!='all':raise ValueError('Unknown extraction case set')
     for name,unique,pnl,complete,flat in experiments:
-        merge_aliases=name in ('flat_spice_merge_aliases','hierarchical_merge_aliases')
-        active_script=(hierarchical_merged_script if name=='hierarchical_merge_aliases' else
+        active_spice_reference=source_spice if name=='hierarchical_spice_reference' else None
+        merge_aliases=name in ('flat_spice_merge_aliases','hierarchical_merge_aliases','hierarchical_spice_reference')
+        active_script=(hierarchical_merged_script if name in ('hierarchical_merge_aliases','hierarchical_spice_reference') else
                        merged_script if merge_aliases else (flat_script if flat else (all_script if complete else script)))
         masters=context_masters(json.loads((source/'catalog.json').read_text()))
         config=dict(DESIGN_NAME=NAME,VERILOG_FILES=[str(source/(NAME+'.v'))],
@@ -221,10 +245,12 @@ def inside(out,case_set='all'):
                     MAGIC_EXT_ABSTRACT=False,MAGIC_EXT_UNIQUE=unique,MAGIC_EXT_SHORT_RESISTOR=True,
                     LVS_IGNORE_CELLS=[],LVS_FLATTEN_CELLS=masters)
         row=dict(passed=False,extract_unique=unique,complete_context_ports=complete,flat_spice_export=flat,
-                 merge_extracted_aliases=merge_aliases,geometry_changed=False,reference_pnl_sha256=sha(pnl))
+                 merge_extracted_aliases=merge_aliases,geometry_changed=False,reference_pnl_sha256=sha(pnl),
+                 source_spice_sha256=sha(active_spice_reference) if active_spice_reference else None)
         folder=out/name;folder.mkdir(exist_ok=False)
         try:
-            flow=CheckPorts(config,design_dir=str(out),pdk='ihp-sg13cmos5l',pdk_root=os.environ['PDK_ROOT'])
+            flow_type=CheckSpicePorts if active_spice_reference else CheckPorts
+            flow=flow_type(config,design_dir=str(out),pdk='ihp-sg13cmos5l',pdk_root=os.environ['PDK_ROOT'])
             state=State.load({DesignFormat.GDS.id:str(source/(NAME+'.gds')),DesignFormat.DEF.id:str(source/(NAME+'.def')),
                              DesignFormat.POWERED_NETLIST.id:str(pnl)})
             final=flow.start(with_initial_state=state,_force_run_dir=str(folder/'run'))
@@ -249,12 +275,13 @@ def inside(out,case_set='all'):
         raise ValueError('Original assembly changed during extraction')
     chosen=next((n for n in cases if cases[n]['passed']),None)
     matched_control=None
-    if case_set=='hierarchical_aliases':
-        control=cases['complete_context_ports']
+    if case_set in ('hierarchical_aliases','source_spice'):
+        control=cases['complete_context_ports' if case_set=='hierarchical_aliases' else 'hierarchical_merge_aliases']
         matched_control=(not control['passed'] and control.get('extracted_ports')==449 and
             not control.get('missing_ports') and not control.get('extra_ports') and
             control.get('verdicts')==['Top level cell failed pin matching.'] and
-            '31 LVS errors found.' in control.get('flow_error',''))
+            ('31 LVS errors found.' in control.get('flow_error','') if case_set=='hierarchical_aliases' else
+             control.get('metrics',{}).get('design__lvs_error__count')==0))
         if not matched_control:chosen=None
     summary=dict(passed=chosen is not None,cases=cases,selected_interface_policy=chosen,
         case_set=case_set,matched_control_reproduced=matched_control,
@@ -274,5 +301,5 @@ if __name__=='__main__':
     prep=sub.add_parser('prepare');prep.add_argument('--source',type=Path,required=True);prep.add_argument('--out',type=Path,required=True)
     prep.add_argument('--native-flat',type=Path)
     run=sub.add_parser('inside');run.add_argument('--out',type=Path,required=True)
-    run.add_argument('--case-set',choices=['all','hierarchical_aliases'],default='all')
+    run.add_argument('--case-set',choices=['all','hierarchical_aliases','source_spice'],default='all')
     args=vars(p.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else inside)(**args)

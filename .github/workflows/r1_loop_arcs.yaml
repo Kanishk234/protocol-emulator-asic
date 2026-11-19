@@ -1,0 +1,74 @@
+name: R1 native loop arc observation
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_loop_arcs.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-loop-arcs
+  cancel-in-progress: false
+jobs:
+  support:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Check native alias and feedback guards
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_loop_arcs.py tools/profiling/tests/test_r1_run_timing.py tools/profiling/tests/test_r1_unused_lut_probe.py
+      - name: Authenticate original native/configured source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib, json, os, subprocess, sys, zipfile
+          from pathlib import Path
+          sys.path.insert(0, 'spikes/r1')
+          from unused_lut_probe import SOURCE_RUN, ARTIFACT_ID, ARCHIVE_SHA, context
+          repo = os.environ['GITHUB_REPOSITORY']
+          run = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{SOURCE_RUN}']))
+          artifact = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/artifacts/{ARTIFACT_ID}']))
+          context(run, artifact)
+          archive = Path(os.environ['RUNNER_TEMP']) / 'original-timing.zip'
+          with archive.open('wb') as output:
+              subprocess.run(['gh','api',f'repos/{repo}/actions/artifacts/{ARTIFACT_ID}/zip'], stdout=output, check=True)
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == ARCHIVE_SHA
+          root = Path('build/r1_timing'); root.mkdir(parents=True, exist_ok=False)
+          with zipfile.ZipFile(archive) as bundle:
+              names = bundle.namelist()
+              assert len(names) == len(set(names))
+              assert all(not Path(n).is_absolute() and '..' not in Path(n).parts for n in names)
+              bundle.extractall(root)
+          Path('build/unused-lut-source.json').write_text(json.dumps(dict(run=run, artifact=artifact), indent=2)+'\n')
+          PY
+          PYTHONPATH=tools python spikes/r1/unused_lut_probe.py prepare --capsule build/r1_timing --out build/global_native
+      - name: Collect original loop arcs without changing timing policy
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" -e PYTHONPATH=tools "$image" \
+            sh -c 'set -eu; yosys -Q -T -s build/global_native/export.ys > build/global_native/export.log; python3 spikes/r1/loop_arcs.py prepare --capsule build/r1_timing --native-dir build/global_native --out build/loop_arcs; for policy in static dynamic; do timeout 90s sta -no_init -no_splash -exit "build/loop_arcs/$policy.tcl" > "build/loop_arcs/$policy.log" 2>&1; done; python3 spikes/r1/loop_arcs.py audit --out build/loop_arcs'
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-loop-arcs-${{ github.run_id }}
+          path: |
+            build/loop_arcs/
+            build/global_native/plan.json
+            build/global_native/all-native.json
+            build/global_native/export.log
+            build/unused-lut-source.json
+          retention-days: 90
+          if-no-files-found: error

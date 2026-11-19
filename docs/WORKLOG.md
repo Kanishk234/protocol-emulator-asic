@@ -4,6 +4,11 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-18 — All leaf contexts physically finish; prepare safe assembly catalog
 
+- Published scoped tools/tests/docs/CI through3b87556f. Native-loop observation
+  44457609446 is active. Compact assembly-preflight receipt is retained in
+  reports/r1_assembly_catalog_20261118.json; actual catalog has26unique planned
+  masters and40placements, with no geometry written. BUG140 records the row-Y
+  orientation guard caught during local preparation before any geometry output.
 - D133 prepares a read-only native-loop observation after rejecting all three
   selector hypotheses. Both original controls retain their measurements and
   constraints; appended reports cover all23reported loop cells/70pin pairs.

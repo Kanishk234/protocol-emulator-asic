@@ -1,5 +1,18 @@
 # Bugs
 
+## 140: Assembly preflight must reverse FABulous row numbering
+
+- **Symptom/check:** initial local catalog prototype summed heights before Y,
+  placing north rowY0at the bottom. Review against the NW/SW tile identities
+  caught the direction error before commit or any geometry generation.
+- **Root cause:** FABulous numbers rows north-to-south; physical Y increases
+  upward. Nonuniform north/south edge heights make a simple index translation
+  unsafe.
+- **Fix/coverage:** originY is the sum of row heights after the selected row.
+  Regression requires SW=(0,0), NW=(0,612360)DBU and distinct physical masters
+  for unequal column contexts. Actual40-instance preflight passes; geometry
+  and assembly acceptance remain false until real generation/checks.
+
 ## 139: Pinned EDA image does not provide the patch executable
 
 - **Symptom:** isolated44447208177 stops before the flow with FileNotFoundError

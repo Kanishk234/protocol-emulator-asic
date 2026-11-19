@@ -1,0 +1,233 @@
+{
+  "preflight_passed": true,
+  "leaf_contexts": 26,
+  "grid_instances": 40,
+  "dbu_per_um": 1000,
+  "macro_size_dbu": [
+    1061760,
+    669060
+  ],
+  "geometry_written": false,
+  "assembly_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Read-only catalog and planned context master names. GDS/LEF renaming, shared-cell collision checks, stitching, macro DRC/LVS, shell and configured timing are not performed.",
+  "contexts": {
+    "lut0": {
+      "source_run": 44402764510,
+      "source_master": "LUT4x8_ha",
+      "planned_master": "wp_r1_lut0",
+      "width_dbu": 154080,
+      "height_dbu": 185220,
+      "gds_sha256": "9e7c9c2cfd47893f4b3dee61f53148bc8174054b01f9b44e5e1b0805c553db8b"
+    },
+    "east_io": {
+      "source_run": 44445288959,
+      "source_master": "E_IO4",
+      "planned_master": "wp_r1_east_io",
+      "width_dbu": 68640,
+      "height_dbu": 185220,
+      "gds_sha256": "4bee858e820632c00c9d184e40ade49eb37aaa844be2429ba9e7e6628b59161e"
+    },
+    "north0": {
+      "source_run": 44445288959,
+      "source_master": "N_IO",
+      "planned_master": "wp_r1_north0",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "c1527066859a17441ed13e30c6ccc63ef7355b4b0a1455dd0da6b4534429be23"
+    },
+    "northwest": {
+      "source_run": 44445288959,
+      "source_master": "NW_term",
+      "planned_master": "wp_r1_northwest",
+      "width_dbu": 47520,
+      "height_dbu": 56700,
+      "gds_sha256": "780e693009674b4b98ea2e0c0ac142921e630a89246e1a64eb5f1fbf351c5ce1"
+    },
+    "primitive4": {
+      "source_run": 44445288959,
+      "source_master": "PRIM2T2S",
+      "planned_master": "wp_r1_primitive4",
+      "width_dbu": 164640,
+      "height_dbu": 185220,
+      "gds_sha256": "28cfd5e594bd509e0f8fe108878ccf14e14eb1988481ce5d49a219f3231c7315"
+    },
+    "south0": {
+      "source_run": 44445288959,
+      "source_master": "S_IO2",
+      "planned_master": "wp_r1_south0",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "d38e52869873e2f1bf8b38a248007ef77cb793cd4a2b2f2b2a30f5df1a47c1b7"
+    },
+    "southeast": {
+      "source_run": 44445288959,
+      "source_master": "SE_term",
+      "planned_master": "wp_r1_southeast",
+      "width_dbu": 68640,
+      "height_dbu": 56700,
+      "gds_sha256": "00db3f3d1b6863dedf82c9723a9b6ef51e2b336c3f48e6e562d2f78d321ab077"
+    },
+    "southwest": {
+      "source_run": 44445288959,
+      "source_master": "SW_term",
+      "planned_master": "wp_r1_southwest",
+      "width_dbu": 47520,
+      "height_dbu": 56700,
+      "gds_sha256": "814768e5423b113845ce90a042ce0299bcab14897f7ee39728f971c3049bbf10"
+    },
+    "west_io": {
+      "source_run": 44445288959,
+      "source_master": "W_IO4",
+      "planned_master": "wp_r1_west_io",
+      "width_dbu": 47520,
+      "height_dbu": 185220,
+      "gds_sha256": "5dd37ec2bd269ec91f02b8b10a201fa02ae0babaca962fcb395967b08bb48ed2"
+    },
+    "northeast": {
+      "source_run": 44447843126,
+      "source_master": "NE_term",
+      "planned_master": "wp_r1_northeast",
+      "width_dbu": 68640,
+      "height_dbu": 56700,
+      "gds_sha256": "1eaf0e66ea743030879ad559203528bdf58d7587835295fe1e4e53e629c2fe8a"
+    },
+    "lut1": {
+      "source_run": 44450213740,
+      "source_master": "LUT4x8_ha",
+      "planned_master": "wp_r1_lut1",
+      "width_dbu": 164640,
+      "height_dbu": 185220,
+      "gds_sha256": "5ca2785be89617a4891260cec5750dd9ca13ca10c493f6cdbc57df5f18664f91"
+    },
+    "lut2": {
+      "source_run": 44450213740,
+      "source_master": "LUT4x8_ha",
+      "planned_master": "wp_r1_lut2",
+      "width_dbu": 154080,
+      "height_dbu": 185220,
+      "gds_sha256": "971c0c96efdac9ce7d09c186a2292d95a0cf3b25bd19896e67f27d8b50e1ee69"
+    },
+    "lut3": {
+      "source_run": 44450213740,
+      "source_master": "LUT4x8_ha",
+      "planned_master": "wp_r1_lut3",
+      "width_dbu": 154080,
+      "height_dbu": 185220,
+      "gds_sha256": "7ed8814e0761c52eb7c44c8a3272d181ab8511716563366c6cedd4232ec0f1db"
+    },
+    "lut4": {
+      "source_run": 44450213740,
+      "source_master": "LUT4x8_ha",
+      "planned_master": "wp_r1_lut4",
+      "width_dbu": 164640,
+      "height_dbu": 185220,
+      "gds_sha256": "c39d3b7d58178129a6d1a3bdf6338982d9ac613addb4b660418d6701d2cc4f07"
+    },
+    "lut5": {
+      "source_run": 44450213740,
+      "source_master": "LUT4x8_ha",
+      "planned_master": "wp_r1_lut5",
+      "width_dbu": 154080,
+      "height_dbu": 185220,
+      "gds_sha256": "04b37762bdab32dcf4e618f5d0d1a4d92fc434dc8d9310fba34304c4642a1a4e"
+    },
+    "north1": {
+      "source_run": 44450213740,
+      "source_master": "N_IO",
+      "planned_master": "wp_r1_north1",
+      "width_dbu": 164640,
+      "height_dbu": 56700,
+      "gds_sha256": "5725f4485ed1d8a71fbe6b5871199ec67800fe4e3bd0e3301183db19cf3ce61d"
+    },
+    "north2": {
+      "source_run": 44450213740,
+      "source_master": "N_IO",
+      "planned_master": "wp_r1_north2",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "6fbc1492c2572172fec79861f8481296fd58b1f79b4daa67e6e13526df210e29"
+    },
+    "north3": {
+      "source_run": 44450213740,
+      "source_master": "N_IO",
+      "planned_master": "wp_r1_north3",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "7f31b2c147ea140d3ea0ef6cacd1d1233ffd5fbb7a455dfcc8d1daa2d7ee09d9"
+    },
+    "north4": {
+      "source_run": 44450213740,
+      "source_master": "N_IO",
+      "planned_master": "wp_r1_north4",
+      "width_dbu": 164640,
+      "height_dbu": 56700,
+      "gds_sha256": "9951b45cb45ee9bfe983aba8fc3b6da10079ec795ea115dccb89089852fc2404"
+    },
+    "north5": {
+      "source_run": 44450213740,
+      "source_master": "N_IO",
+      "planned_master": "wp_r1_north5",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "eac5028b25ddf3d7ea03584c7bf39341402fccd4aaf4182b73641fc6eab9c493"
+    },
+    "south1": {
+      "source_run": 44450213740,
+      "source_master": "S_IO2",
+      "planned_master": "wp_r1_south1",
+      "width_dbu": 164640,
+      "height_dbu": 56700,
+      "gds_sha256": "45a59f55e1d45ec3d3cee830477fdb84b08b5e324a4c84849ac8348c768772e4"
+    },
+    "south2": {
+      "source_run": 44450213740,
+      "source_master": "S_IO2",
+      "planned_master": "wp_r1_south2",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "dc62a441967a989284bb0f197d022d025a2b9e8402982b3e779ac90e8c5000e8"
+    },
+    "south3": {
+      "source_run": 44450213740,
+      "source_master": "S_IO2",
+      "planned_master": "wp_r1_south3",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "46f89fab96d020178f6acb0a582e19d414e0ca44809c625da5b426192c466387"
+    },
+    "south4": {
+      "source_run": 44450213740,
+      "source_master": "S_IO2",
+      "planned_master": "wp_r1_south4",
+      "width_dbu": 164640,
+      "height_dbu": 56700,
+      "gds_sha256": "afe79f0ce3033305198a32b17fcf54d2952ec6564d6f15d20366d577cb9b0bed"
+    },
+    "south5": {
+      "source_run": 44450213740,
+      "source_master": "S_IO2",
+      "planned_master": "wp_r1_south5",
+      "width_dbu": 154080,
+      "height_dbu": 56700,
+      "gds_sha256": "85b33926cd2e7c3e676cbc6f58898050a149fc948c50db425068cba6160b0545"
+    },
+    "primitive1": {
+      "source_run": 44454944540,
+      "source_master": "PRIM2T2S",
+      "planned_master": "wp_r1_primitive1",
+      "width_dbu": 164640,
+      "height_dbu": 185220,
+      "gds_sha256": "2ce959fec9fe0e6f4d3a937fd36d5c4d9a73d59ebf5e4fd515613a98df346827"
+    }
+  },
+  "input_sha256": {
+    "assembly_catalog.py": "8bf1a3478a35529e6c47b488af53ed9b2e3669072919f323e3be88df07ccd0f4",
+    "connections.json": "075672b468c2a2caacdd82fad6b1efef1740f09892abce1f29960b9b8991d3cb",
+    "r1_finished_lut0_44402764510.json": "7c61008a264771febd374ac924b962fd7d44347370f0a2a889ff754420294a6e",
+    "r1_representative_physical_44445288959.json": "ed5be46c9eb8ab0869af0937f95b953da54ded8d3062ff449776682abf8749c1",
+    "r1_wire_corner_44447843126.json": "09907801c8a53f22e15a7b91372fd9ea9ba81b99e4f183137b4544d5d2d3b0ee",
+    "r1_finished_columns_44450213740.json": "8352eeae7da112adae70b2648a48f134f177c10602bfb3c46a8a1256c345457b",
+    "r1_finished_primitive_44454944540.json": "6c951a6bf012a458aa3061eb3daebb35e21f0232d6edb65d87776470920b6c36"
+  }
+}

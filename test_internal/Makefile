@@ -7,7 +7,7 @@ l1:
 	$(MAKE) -C pin FULL=1
 chip:
 	PYTHONPATH=../tools python -m capture_replay --fetch
-	$(MAKE) -C chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay
+	$(MAKE) -C chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay,test_metamorphic_tap
 peer:
 	$(MAKE) -C i2c_peer
 l2:

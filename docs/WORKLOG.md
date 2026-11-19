@@ -15,6 +15,13 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   outcomes, then diagnose the measured bottleneck. Strict LVS, full-chip timing,
   physical enclosing power and submission acceptance remain open. No phase
   boxes ticked; production G1 remains selected and unchanged.
+- Actual44590138579 fails31errors even with all context ports. Root observes
+  all four corner merges in native `.ext` but lost2/3aliases in hierarchical
+  SPICE (BUG151). D143next tests only native flat SPICE export, preserving all
+  previous controls and strict complete-interface/device checks.
+- Actual44591088608 authenticates/prepares all timing inputs, then stops on
+  an unnecessary FASM import before OpenSTA (BUG152). Move that dependency to
+  venv-only preparation and rerun; no extracted setup/hold numbers exist yet.
 
 ## 2026-11-19 — Full macro geometry and RC export pass; continue strict LVS/timing
 

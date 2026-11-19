@@ -1,5 +1,27 @@
 # Decisions
 
+## D-143: Compare flat SPICE export while retaining hierarchical failure controls
+
+- **Date:**2026-11-19.44590138579 at85ae112a reproduces31strict LVS errors
+  in the complete-context case; declaring all26interfaces is not a fix.
+  Its native `.ext` explicitly merges all four southeast E_GBUF_END↔N_GBUF_BEG
+  pairs, consistent with independent GDS metal/via connectivity. Hierarchical
+  SPICE contains only the pair0short resistor and loses pairs2/3, corresponding
+  to the two extra layout nets. This localizes a representation loss rather
+  than proving complete electrical acceptance.
+- **Next isolated case:** after exactly the same GDS extraction and port
+  declaration, set only `ext2spice hierarchy off` before native export. Let
+  Magic generate the flat device network; do not append manual shorts, ignore
+  ports/devices, alter the source schematic or change mask geometry. Keep all
+  four previous controls, original unique policy and complete449-port/strict
+  Netgen final-verdict/checker gates. Actual hosted evidence is required.
+- **Research:** Magic documents hierarchical/flat SPICE and duplicate-port
+  handling in its [command reference](https://github.com/RTimothyEdwards/magic/blob/master/doc/html/ext2spice.html).
+  Upstream [issue245](https://github.com/RTimothyEdwards/magic/issues/245)
+  describes lost short resistors despite `.ext` merge records in an older
+  release. Similarity supports this bounded experiment, not an assertion that
+  our pinned version has that exact upstream bug. No upstream/tool/PDK edits.
+
 ## D-142: Measure configured macro timing using source-proven views and full RC
 
 - **Date:**2026-11-19. D141's geometry-identical full-macro RC extraction now

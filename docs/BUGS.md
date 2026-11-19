@@ -1,5 +1,30 @@
 # Bugs
 
+## 152: Timing execution imports an unnecessary compiler dependency
+
+- **Symptom/check:**44591088608 at67e7d2b6 passes authenticated timing
+  preparation but stops before OpenSTA: module-level `unused_lut_probe` import
+  pulls FASM into the pinned EDA runtime, which does not contain that package.
+  No extracted timing was measured and no timing result is accepted.
+- **Fix:** import the unchanged one-bit case renderer only inside preparation
+  in the project venv. Runtime imports use only existing EDA-available modules;
+  all prepared file/input hashes and actual case/coverage guards remain.
+- **Coverage:** retain the failed runtime log and require the corrected hosted
+  invocation to reach all six native logs and strict timing/annotation audit.
+
+## 151: Hierarchical SPICE drops extracted corner port equivalences
+
+- **Symptom/check:** complete-context44590138579 still fails31LVS errors.
+  All26context name sets and449root ports pass, so extra port declarations
+  alone are rejected as the repair.
+- **Measured localization:** unchanged southeast `.ext` contains merge records
+  for all four E_GBUF_END↔N_GBUF_BEG pairs. Exported SPICE retains only pair0's
+  zero-ohm alias element; pairs2/3 remain split at LVS, matching its two extra
+  layout nets. Independent actual-mask connectivity agrees with the `.ext`.
+- **Next check:** D143 adds native flat SPICE export on the same extraction,
+  all ports, source schematic, device models and strict final verdict. The
+  original four cases remain; no hand-written connectivity or ignored pins.
+
 ## 150: Remaining corner alias ports need complete extraction metadata
 
 - **Measured status:**44583509216 at6e58ef20 proves both original source and

@@ -1,0 +1,15 @@
+{
+  "passed": false,
+  "run": 44591088608,
+  "source_sha": "67e7d2b6b38e11b96f7c8b20b725b273a9f6b01a",
+  "archive_id": 14562638166,
+  "archive_sha256": "7b6df0f976dfb65de0e8302343e65272727f3788f07f4c68e5066c434fd1be86",
+  "archive_bytes": 566366,
+  "failure_kind": "unnecessary_compiler_import",
+  "native_sta_executed": false,
+  "prepared_script_hashes_replayed": 6,
+  "log_sha256": "d53bfa02417399d501b73a9240d6d93d0cf318d57c69a586c8f2a3edd5a53e27",
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Authenticated preparation passed; runtime stopped before native timing. No extracted setup or hold result."
+}

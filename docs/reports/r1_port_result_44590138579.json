@@ -1,0 +1,100 @@
+{
+  "passed": false,
+  "cases": {
+    "strict_control": {
+      "passed": false,
+      "extract_unique": "all",
+      "complete_context_ports": false,
+      "geometry_changed": false,
+      "reference_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+      "flow_error": "One or more deferred errors were encountered:\n25 LVS errors found.",
+      "extracted_ports": 456,
+      "missing_ports": [],
+      "extra_ports": [
+        "VPWR_uq18",
+        "VPWR_uq23",
+        "VPWR_uq28",
+        "VPWR_uq33",
+        "VPWR_uq38",
+        "VPWR_uq8",
+        "VPWR_uq9"
+      ],
+      "verdicts": [
+        "Netlists do not match."
+      ],
+      "strict_error": "Detailed LVS report does not match uniquely: ['Netlists do not match.']"
+    },
+    "declared_external_ports": {
+      "passed": false,
+      "extract_unique": "notopports",
+      "complete_context_ports": false,
+      "geometry_changed": false,
+      "reference_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+      "flow_error": "One or more deferred errors were encountered:\n31 LVS errors found.",
+      "extracted_ports": 449,
+      "missing_ports": [],
+      "extra_ports": [],
+      "verdicts": [
+        "Top level cell failed pin matching."
+      ],
+      "strict_error": "Detailed LVS report does not match uniquely: ['Top level cell failed pin matching.']"
+    },
+    "flat_native_reference": {
+      "passed": false,
+      "extract_unique": "notopports",
+      "complete_context_ports": false,
+      "geometry_changed": false,
+      "reference_pnl_sha256": "dd69f3de8df8d1a9e9127cfe9d79b62fac541e665fc3245907a27e7a396ba618",
+      "flow_error": "One or more deferred errors were encountered:\n31 LVS errors found.",
+      "extracted_ports": 449,
+      "missing_ports": [],
+      "extra_ports": [],
+      "verdicts": [
+        "Top level cell failed pin matching."
+      ],
+      "strict_error": "Detailed LVS report does not match uniquely: ['Top level cell failed pin matching.']"
+    },
+    "complete_context_ports": {
+      "passed": false,
+      "extract_unique": "notopports",
+      "complete_context_ports": true,
+      "geometry_changed": false,
+      "reference_pnl_sha256": "dd69f3de8df8d1a9e9127cfe9d79b62fac541e665fc3245907a27e7a396ba618",
+      "flow_error": "One or more deferred errors were encountered:\n31 LVS errors found.",
+      "extracted_ports": 449,
+      "missing_ports": [],
+      "extra_ports": [],
+      "verdicts": [
+        "Top level cell failed pin matching."
+      ],
+      "strict_error": "Detailed LVS report does not match uniquely: ['Top level cell failed pin matching.']"
+    }
+  },
+  "selected_interface_policy": null,
+  "source_gds_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+  "source_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+  "geometry_changed": false,
+  "extraction_script_sha256": "10c8fc4f97c15749487b04d7bdab01081f03cd6f248d68d1e02b131ad9d81630",
+  "original_script_sha256": "461bf51e4226c283de33361bad02f48d0335ad7ab05965cbba43e2677e040660",
+  "complete_context_script_sha256": "588dde9e85d3f1d006a2058f224820ddcda9a522501727ae403e280ae3126472",
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Exported macro interface LVS only. Multiple accesses of declared supply ports require connection by the enclosing power grid; no physical power-grid, clock, timing or submission acceptance.",
+  "run": 44590138579,
+  "source_sha": "85ae112a494dedce50497e7f6ada61f0fbdad3f2",
+  "archive_id": 14563692625,
+  "archive_sha256": "081dff14bad1187df9de06cac02706a90084f48b0e38a54eba46fec54aa6b525",
+  "archive_bytes": 36052107,
+  "root_review": {
+    "context_interfaces_checked": 26,
+    "root_ports_checked": 449,
+    "southeast_ext_sha256": "03154c5bec6de25410b8b6346c31b2dbd585e8abb970e2463476ac9a6ac23839",
+    "original_merged_corner_pairs": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "geometry_changed": false
+  }
+}

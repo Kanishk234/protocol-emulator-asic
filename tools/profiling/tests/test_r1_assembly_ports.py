@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from assembly_ports import annotate_script,context_masters,context_port_block,flat_spice_script,retain_original_script,spice_ports,strict_verdict
+from assembly_ports import annotate_script,context_masters,context_port_block,flat_spice_script,merge_flat_alias_script,retain_original_script,spice_ports,strict_verdict
 
 
 def test_spice_ports_include_continuations_and_reject_empty_top_interface():
@@ -76,3 +76,12 @@ def test_flat_spice_export_changes_only_representation_after_unchanged_extractio
     assert changed.replace('ext2spice hierarchy off\next2spice subcircuits top on\n','')==source
     for invalid in [source+source,'extract\n',changed]:
         with pytest.raises(ValueError):flat_spice_script(invalid)
+
+
+def test_alias_merge_cannot_discard_a_shared_root_port_name():
+    source=flat_spice_script('ext2spice -o $netlist $::env(DESIGN_NAME).ext')
+    ports={p:p for p in ['VPWR','VGND']+[f'p{i}' for i in range(447)]}
+    changed=merge_flat_alias_script(source,ports)
+    assert changed.replace('ext2spice short none\n','')==source
+    ports['p0']=ports['p1']
+    with pytest.raises(ValueError):merge_flat_alias_script(source,ports)

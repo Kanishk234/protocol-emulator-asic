@@ -1,11 +1,12 @@
 from pathlib import Path
 import json
+import re
 import sys
 
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from flat_routes import check_import,component,net_record,section,translate_routes
+from flat_routes import check_import,component,net_record,pin_access_routes,section,translate_routes
 
 
 def test_absolute_points_translate_but_rect_deltas_extensions_and_wildcards_stay():
@@ -43,6 +44,28 @@ def test_sections_cannot_drop_or_duplicate_def_entries():
     assert section(text,'VIAS',optional=True)==[]
     with pytest.raises(ValueError):section(text.replace('NETS 1','NETS 2'),'NETS')
     with pytest.raises(ValueError):section(text+text,'NETS')
+
+
+def test_pin_centerlines_join_abutting_source_pins_without_extending_their_metal():
+    left=pin_access_routes('Metal3',(0,0,400,400),(0,0))
+    right=pin_access_routes('Metal3',(0,0,400,400),(400,0))
+    endpoint_sets=[]
+    for routes,bounds in [(left,(0,0,400,400)),(right,(400,0,800,400))]:
+        endpoints=set()
+        for route in routes[1:]:
+            m=re.fullmatch(r'\+ ROUTED Metal3 \( (\d+) (\d+) 0 \) \( (\d+) (\d+) 0 \)',route)
+            assert m
+            x0,y0,x1,y1=map(int,m.groups());endpoints.update([(x0,y0),(x1,y1)])
+            if y0==y1:metal=(x0,y0-100,x1,y1+100)
+            else:
+                assert x0==x1
+                metal=(x0-100,y0,x1+100,y1)
+            assert bounds[0]<=metal[0]<metal[2]<=bounds[2]
+            assert bounds[1]<=metal[1]<metal[3]<=bounds[3]
+        endpoint_sets.append(endpoints)
+    assert endpoint_sets[0]&endpoint_sets[1]=={(400,200)}
+    for layer,box in [('Metal1',(0,0,400,400)),('Metal3',(0,0,200,400))]:
+        with pytest.raises(ValueError):pin_access_routes(layer,box,(0,0))
 
 
 @pytest.mark.parametrize('fault',[None,'missing_wire','unwired','extra_wire','position','connection'])

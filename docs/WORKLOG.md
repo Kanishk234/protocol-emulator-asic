@@ -4,6 +4,11 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-19 — Macro DRC passes; correct extraction ports and LVS evidence
 
+- First D137hosted44570159418 at2f904256 stops before extraction: the pinned
+  cloud script differs from the locally inspected digest (BUG144). Retain its
+  original bytes/digest before rejection, inspect the diff and update only to
+  a reviewed exact cloud source. Neither extraction policy has run yet.
+
 - Assembled44465623376 at53240408 passes Magic/KLayout DRC and overlap at
   zero. Full inventory/contacts pass and actual GDS/PNL SHA values match local
   preparation. Workflow fails402LVS differences: extracted root has no ports,

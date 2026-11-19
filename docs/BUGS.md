@@ -1,5 +1,19 @@
 # Bugs
 
+## 144: Local extraction-script digest differs from the pinned cloud runtime
+
+- **Symptom/check:**44570159418 at2f904256 stops before either extraction
+  case because the exact script-SHA guard rejects the installed cloud source.
+  No geometry or policy result is produced.
+- **Root cause:** D137's first source digest came from the local LibreLane3.0.0
+  Nix installation, while the fixed cloud image contains a different package
+  revision. Tool-image identity does not establish local source-file equality.
+- **Fix/coverage:** retain the actual original script bytes and observed/expected
+  digest before rejecting. Inspect that diff and pin the reviewed cloud source;
+  do not remove the guard or edit installed upstream code. Negative test proves
+  a foreign script is retained but never patched/executed. Hosted capture and
+  reviewed-source replay are required; both interface cases remain untested.
+
 ## 143: Zero LVS summary counts do not establish a passing detailed verdict
 
 - **Symptom/check:** while reviewing failed assembled44465623376, root also

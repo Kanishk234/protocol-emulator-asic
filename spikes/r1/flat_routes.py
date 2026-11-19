@@ -66,6 +66,26 @@ def emit_section(name,rows):
     return f'{name} {len(rows)} ;\n'+'\n'.join('    - '+r+' ;' for r in rows)+f'\nEND {name}\n'
 
 
+def pin_access_routes(layer,box,origin):
+    """Expose connectivity inside existing pin metal without adding geometry.
+
+    RCX does not connect paths through isolated DEF RECT patches. Retain the
+    original rectangle and add zero-extension centerlines entirely inside it.
+    Native import checks the pinned200DBUdefault width on both allowed layers;
+    full all-layer XOR remains mandatory before extracting the real macro.
+    """
+    if (layer not in ('Metal2','Metal3') or len(box)!=4 or len(origin)!=2
+            or any(type(v) is not int for v in (*box,*origin))):
+        raise ValueError('Unqualified source pin-access geometry')
+    x0,y0,x1,y1=box
+    if x1-x0!=400 or y1-y0!=400:
+        raise ValueError('Source signal pin is not the measured400DBUsquare')
+    ox,oy=origin;x=(x0+x1)//2+ox;y=(y0+y1)//2+oy
+    return [f'+ ROUTED {layer} ( {x} {y} ) RECT ( -200 -200 200 200 )',
+            f'+ ROUTED {layer} ( {x0+ox} {y} 0 ) ( {x1+ox} {y} 0 )',
+            f'+ ROUTED {layer} ( {x} {y0+oy} 0 ) ( {x} {y1+oy} 0 )']
+
+
 def prepare(assembly,sources,out):
     assembly,sources,out=(Path(p).resolve() for p in (assembly,sources,out))
     plan=json.loads((assembly/'plan.json').read_text())
@@ -74,7 +94,8 @@ def prepare(assembly,sources,out):
     catalog=json.loads((assembly/'catalog.json').read_text());top=json.loads((assembly/'top.json').read_text())
     roots=json.loads(sources.read_text());union=Union();data={}
     paths=[Path(__file__),sources,assembly/'plan.json',assembly/'catalog.json',assembly/'top.json',
-           assembly/'pins.json',assembly/(NAME+'.gds'),Path(__file__).with_name('geometry_xor.py')]
+           assembly/'pins.json',assembly/(NAME+'.gds'),Path(__file__).with_name('geometry_xor.py'),
+           Path(__file__).with_name('spef_connectivity.py')]
     for p in catalog['instances']:
         tile=p['instance'];root=Path(roots[p['context']]);state=root/'run/27-checker-lvs/state_out.json'
         definition=view(root,json.loads(state.read_text()),'def');paths.extend([state,definition,root/'final.txt'])
@@ -128,9 +149,8 @@ def prepare(assembly,sources,out):
                 if layer in ('Metal2','Metal3'):
                     markers.append(dict(layer=10 if layer=='Metal2' else 30,datatype=2,
                         box_dbu=[x0+origin[0],y0+origin[1],x1+origin[0],y1+origin[1]]))
-                x,y=(x0+x1)//2,(y0+y1)//2
-                rect=f'+ ROUTED {layer} ( {x+origin[0]} {y+origin[1]} ) RECT ( {x0-x} {y0-y} {x1-x} {y1-y} )'
-                add_route(name,rect)
+                for access in pin_access_routes(layer,(x0,y0,x1,y1),origin):
+                    add_route(name,access)
         for row in (Path(roots[p['context']])/'final.txt').read_text().splitlines():
             r=row.split('\t')
             if r[0]=='CELL':
@@ -178,6 +198,9 @@ read_lef {{{cell_lef}}}
 read_def {{{out/(NAME+'.def')}}}
 set b [ord::get_db_block]
 if {{[[$b getTech] getDbUnitsPerMicron] != 1000}} {{error "wrong extraction DBU"}}
+foreach layer {{Metal2 Metal3}} {{
+    if {{[[[$b getTech] findLayer $layer] getWidth] != 200}} {{error "unqualified pin-access wire width"}}
+}}
 inventory {{{out/'imported.txt'}}}
 write_db {{{out/(NAME+'.odb')}}}
 write_def {{{out/'imported.def'}}}
@@ -261,6 +284,14 @@ def inside(out):
                 raise ValueError('Missing or empty full-macro SPEF')
             result['spef_views'][corner]=dict(path=str(p),sha256=sha(p),bytes=p.stat().st_size,
                                             extracted_net_records=content.count('*D_NET '))
+            from spef_connectivity import inspect_spef
+            connectivity=inspect_spef(content)
+            report=out/('spef-connectivity-'+corner.replace('*','all')+'.json')
+            report.write_text(json.dumps(connectivity,indent=2)+'\n')
+            result['spef_views'][corner]['resistive_connectivity']=dict(
+                passed=connectivity['passed'],disconnected_nets=len(connectivity['disconnected_nets']),
+                report=str(report),report_sha256=sha(report))
+            if not connectivity['passed']:raise ValueError('SPEF contains disconnected terminal resistor components')
         result['passed']=True
     except Exception as exc:result['error']=str(exc)
     if any(sha(p)!=d for p,d in frozen.items()):result.update(passed=False,error='Flat extraction inputs changed during execution')

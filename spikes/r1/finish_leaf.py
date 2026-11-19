@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 import re
 import subprocess
-import shutil
 
 from detailed_leaf import OBSERVER, sha
 
@@ -181,9 +180,11 @@ def inside(out):
         if sha(original) != '852fc895eb60ecde8aeb237f71cbd6c59de758d669e1e71424cfa863492411f0':
             raise ValueError('Pinned disconnected-pin checker source differs')
         patched = adapter/'disconnected_pins.py'
-        shutil.copyfile(original, patched)
         patch = ROOT/'patches/r1_wire_only_connectivity.patch'
-        subprocess.run(['patch', '--batch', '--fuzz=0', '-p1', '-d', str(adapter), '-i', str(patch)], check=True)
+        from profiling.r1_wire_connectivity import apply_unified_patch
+        patched.write_text(apply_unified_patch(original.read_text(), patch.read_text()))
+        if sha(patched) != 'd898717a0afa00697e5cc44a985dfeb975675c568a437354cd64531a03419d4b':
+            raise ValueError('Patched checker differs from reviewed recipe')
         (adapter/'provenance.json').write_text(json.dumps(dict(original_sha256=sha(original),
             patch_sha256=sha(patch),patched_sha256=sha(patched)), indent=2)+'\n')
         class FeedthroughConnections(Odb.ReportDisconnectedPins):

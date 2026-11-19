@@ -97,6 +97,16 @@ def flat_spice_script(annotated):
     return annotated.replace(anchor,'ext2spice hierarchy off\next2spice subcircuits top on\n'+anchor)
 
 
+def merge_flat_alias_script(flat_script,ports):
+    """Merge physically extracted internal aliases; every root name must survive."""
+    if len(ports)!=449 or len(set(ports.values()))!=449 or not {'VPWR','VGND'}<=set(ports):
+        raise ValueError('Flat alias merging needs449distinct original root nets')
+    anchor='ext2spice -o $netlist $::env(DESIGN_NAME).ext'
+    if flat_script.count(anchor)!=1 or flat_script.count('ext2spice hierarchy off')!=1:
+        raise ValueError('Require the original flat export with explicit root interface')
+    return flat_script.replace(anchor,'ext2spice short none\n'+anchor)
+
+
 def retain_original_script(original,out):
     original,out=Path(original),Path(out)
     content=original.read_bytes();digest=sha(original)
@@ -170,6 +180,11 @@ def inside(out):
     all_script=out/'extract_context_ports.tcl'
     all_script.write_text(annotate_script(original.read_text(),plan['expected_ports'],plan['context_ports']))
     flat_script=out/'extract_flat_spice.tcl';flat_script.write_text(flat_spice_script(all_script.read_text()))
+    merged_script=None
+    if plan.get('native_inventory'):
+        merged_script=out/'extract_merged_flat_spice.tcl'
+        merged_script.write_text(merge_flat_alias_script(flat_script.read_text(),
+            json.loads(Path(plan['native_inventory']).read_text())['ports']))
     active_script=script
     class ExportPorts(Magic.SpiceExtraction):
         id='Magic.R1ExportPorts'
@@ -185,15 +200,18 @@ def inside(out):
         experiments.append(('flat_native_reference','notopports',flat_pnl,False,False))
         experiments.append(('complete_context_ports','notopports',flat_pnl,True,False))
         experiments.append(('flat_spice_reference','notopports',flat_pnl,True,True))
+        experiments.append(('flat_spice_merge_aliases','notopports',flat_pnl,True,True))
     for name,unique,pnl,complete,flat in experiments:
-        active_script=flat_script if flat else (all_script if complete else script)
+        merge_aliases=name=='flat_spice_merge_aliases'
+        active_script=merged_script if merge_aliases else (flat_script if flat else (all_script if complete else script))
         masters=context_masters(json.loads((source/'catalog.json').read_text()))
         config=dict(DESIGN_NAME=NAME,VERILOG_FILES=[str(source/(NAME+'.v'))],
                     CLOCK_PERIOD=20,CLOCK_PORT=None,VDD_NETS=['VPWR'],GND_NETS=['VGND'],
                     PRIMARY_GDSII_STREAMOUT_TOOL='klayout',MAGIC_EXT_USE_GDS=True,
                     MAGIC_EXT_ABSTRACT=False,MAGIC_EXT_UNIQUE=unique,MAGIC_EXT_SHORT_RESISTOR=True,
                     LVS_IGNORE_CELLS=[],LVS_FLATTEN_CELLS=masters)
-        row=dict(passed=False,extract_unique=unique,complete_context_ports=complete,flat_spice_export=flat,geometry_changed=False,reference_pnl_sha256=sha(pnl))
+        row=dict(passed=False,extract_unique=unique,complete_context_ports=complete,flat_spice_export=flat,
+                 merge_extracted_aliases=merge_aliases,geometry_changed=False,reference_pnl_sha256=sha(pnl))
         folder=out/name;folder.mkdir(exist_ok=False)
         try:
             flow=CheckPorts(config,design_dir=str(out),pdk='ihp-sg13cmos5l',pdk_root=os.environ['PDK_ROOT'])
@@ -225,6 +243,7 @@ def inside(out):
         extraction_script_sha256=sha(script),original_script_sha256=SCRIPT_SHA,
         complete_context_script_sha256=sha(all_script),
         flat_spice_script_sha256=sha(flat_script),
+        merged_flat_script_sha256=sha(merged_script) if merged_script else None,
         physical_acceptance=False,timing_acceptance=False,scope=plan['scope'])
     (out/'result.json').write_text(json.dumps(summary,indent=2)+'\n')
     if chosen is None:raise SystemExit('No port extraction policy passed strict macro interface LVS')

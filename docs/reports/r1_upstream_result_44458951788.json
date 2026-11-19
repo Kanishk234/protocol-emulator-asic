@@ -1,0 +1,97 @@
+{
+  "run": 44458951788,
+  "source_sha": "d9c35451",
+  "hypothesis_supported": true,
+  "change": {
+    "tile": "Tile_X2Y3_LUT4x8_ha",
+    "cell": "_1560_",
+    "frame": 5,
+    "data_bit": 23,
+    "tile_bit": 183,
+    "before": "0",
+    "after": "1",
+    "feature": "X2Y3.JE2END4.J2MID_CDa_BEG1",
+    "lut": "D",
+    "unused_input": 1,
+    "observed_init": 41120,
+    "cofactor_addresses_checked": 16,
+    "source_register_select_latch": "_1440_",
+    "source_user_register": "_1736_",
+    "route_before": [
+      [
+        "X2Y3",
+        "LD_I1"
+      ],
+      [
+        "X2Y3",
+        "J2MID_CDa_END1"
+      ],
+      [
+        "X2Y3",
+        "J2MID_CDa_BEG1"
+      ],
+      [
+        "X2Y3",
+        "N2MID2"
+      ],
+      [
+        "X2Y4",
+        "N2BEG2"
+      ],
+      [
+        "X2Y4",
+        "S1END1"
+      ],
+      [
+        "X2Y3",
+        "S1BEG1"
+      ],
+      [
+        "X2Y3",
+        "JE2END7"
+      ],
+      [
+        "X2Y3",
+        "JE2BEG7"
+      ],
+      [
+        "X2Y3",
+        "LD_O"
+      ]
+    ],
+    "route_after": [
+      [
+        "X2Y3",
+        "LD_I1"
+      ],
+      [
+        "X2Y3",
+        "J2MID_CDa_END1"
+      ],
+      [
+        "X2Y3",
+        "J2MID_CDa_BEG1"
+      ],
+      [
+        "X2Y3",
+        "JE2END4"
+      ],
+      [
+        "X2Y3",
+        "JE2BEG4"
+      ],
+      [
+        "X2Y3",
+        "LH_O"
+      ]
+    ],
+    "scope": "Unused D I1, one free upstream selector; observed H.FF=1. Analysis only; no image/functional/delay acceptance."
+  },
+  "control_sensitive_endpoints": 6,
+  "candidate_sensitive_endpoints": 0,
+  "worst_cell_only_setup_slack_ns": 1.508933,
+  "timing_acceptance": false,
+  "loaded_candidate_tested": false,
+  "physical_acceptance": false,
+  "scope": "Positive analysis-only one-bit hypothesis; native actual loading/function/reload and extracted/assembled timing remain required."
+}

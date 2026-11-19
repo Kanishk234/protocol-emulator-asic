@@ -2,6 +2,24 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — First supported timing change; qualify the actual one-bit image
+
+- D134run44458951788 atd9c35451 succeeds with hypothesis_supported=true:
+  original six sensitivities reproduce; candidate has zero, with unchanged
+  +1.508933ns cell-only worst setup. All acceptance flags remain false. Receipt:
+  reports/r1_upstream_result_44458951788.json. No netlist, arc or margin waiver.
+- D135 adds an explicit opt-in to D118 derivation, leaving the default parent
+  byte-identical. The separate registered-input image has SHA25bfec380cbd5fb8cac4390389d1c1fa14d33ddb946e6499fc7467f79ee100b2,
+  exactly one bit beyond the parent (594from original compiled image). Require
+  supported measured evidence and repeat native route/H-register/truth proofs
+  before derivation. Frozen configured_smoke.py and hardware remain unchanged.
+- Prepare hosted parent-control, candidate-direct and candidate-management cases,
+  each with real loading, strict XML, independent8736-bit frame audit and exact
+  snapshot-delta agreement.104focused tests/actionlint and actual source/parent/
+  candidate derivations pass. Next authenticate native functional/reload results
+  before qualifying the candidate. No phase boxes ticked; extracted/full-macro
+  and shell timing remain open.
+
 ## 2026-11-18 — All leaf contexts physically finish; prepare safe assembly catalog
 
 - Native-loop observation44457609446 succeeds: both modes report all23cells/

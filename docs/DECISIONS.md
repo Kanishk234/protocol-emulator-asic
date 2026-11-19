@@ -1,5 +1,32 @@
 # Decisions
 
+## D-135: Test the supported one-bit image through native loading and reload
+
+- **Date:**2026-11-18. **Basis:** D134run44458951788 atd9c35451 reproduces
+  the original six sensitivities, while its candidate removes all six with
+  unchanged+1.508933ns cell-only worst setup. This is analysis evidence, not
+  actual image or extracted timing qualification.
+- **Derivation:** explicit R1_REGISTERED_INPUT_EXPERIMENT=registered_h opt-in
+  after D118 grounding. Require authenticated primary capsule paths, exact
+  parent image SHA9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410,
+  matching supported timing result and all D134route/truth/register proofs.
+  Change only frame word273bit23; preserve parent and write a separate image
+  SHA25bfec380cbd5fb8cac4390389d1c1fa14d33ddb946e6499fc7467f79ee100b2.
+  Architecture0xFE only; no G1/default/hardware change. Default derivation is
+  independently checked byte-identical to D118.
+- **Hosted checks:** parent direct loading/reset control; candidate direct
+  concurrent UART/SPI/reset/second transfer; candidate real management SPI,
+  error/load checks, reset, STOP/reload/second transfer. Use the exact ten
+  native exports/40instances and pinned Icarus binaries. Independently compare
+  all8736observations to loaded words after every case, then require only
+  X2Y3/_1560_0→1 between parent and candidate, with direct/shell states equal.
+- **Cost/scope:** one bounded cloud job with per-simulation wall limits. No
+  modification to the frozen configured_smoke.py control or production images.
+  Successful loading would bind D134's case values to a real native image, not
+  qualify SDF/extracted, assembled macro, clock distribution or final submission.
+- **Validation:** candidate and default-parent local derivations pass, including
+  exact image hashes.104focused checks/actionlint pass. Actual loading pending.
+
 ## D-134: Redirect an unused feedback input to an observed registered source
 
 - **Date:**2026-11-18. **Measured basis:** D133 observation44457609446

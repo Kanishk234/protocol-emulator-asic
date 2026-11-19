@@ -18,6 +18,8 @@ workload's queue/entry invariants or characterize pads.
 |---|---|---|---|---|
 | `uart_bridge_capture.trw` | Validated UART RX multicast to host capture and valid-byte echo; host must drain | L0:3, L1:2 | — | [Finite 115200/460800-baud evidence and replay status](../docs/reports/PHASE3_UART_MULTICAST.md); no SRAM recorder |
 | `uart.trw` | UART 8N1, TX + RX in one lane, framing errors reported (also MIDI at 31 250 baud) | 4 | — | Reference line model and sigrok, up to 1 Mbaud; 256-byte loopback |
+| `i2c_capture.trw` | Passive I2C byte/ACK + START/STOP capture, no bus drive | 1 | — | [Complete real PCA9571 recording replay](../docs/reports/PHASE3_RECORDED_CAPTURES.md); host must drain |
+| `spi_capture.trw` | Passive mode-0 MOSI capture into 64 SRAM words; host reads after traffic | 3 | 1 | [Real CC1101 recording, capacity and service controls](../docs/reports/PHASE3_RECORDED_CAPTURES.md); 99 total SRAM words, reload before a fresh capture |
 | `spi_controller.trw` | SPI controller, mode 0 | 4 | — | Reference target and sigrok, up to 12.5 MHz |
 | `spi_target.trw` | SPI target, mode 0 | 3 | — | Reference controller and sigrok, up to 12.5 MHz |
 | `spi_target_flash.trw` | Volatile read-only 256-byte SPI memory window, mode 0, READ/FAST_READ; high address aliasing, eight fast-read dummy clocks | 12 (1 lane, U0 + U1) | 2 | Model, both RTL simulators and exact official netlist pass at 250/333/500 kHz with abort/restart checks and independent spi/spiflash decoding; [scope and evidence](../docs/reports/PHASE3_SPI_MEMORY.md) |

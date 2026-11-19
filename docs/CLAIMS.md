@@ -6,11 +6,15 @@ Every public claim about the chip, with its evidence. If there is no evidence, i
 reported LVS summary metrics, but all26detailed reports end in failed top-pin
 matching. Their DRC/routing/inventory observations remain; strict leaf LVS
 qualification is withdrawn. A summary count alone cannot establish LVS. The
-assembled macro has passed Magic/KLayout/overlap checks but fails LVS; D137
-requires the actual final verdict and complete extracted port names.
+initial assembled macro passed Magic/KLayout/overlap but failed LVS. Later
+44627346549 qualifies declared macro-interface LVS on the same original GDS
+with all449ports and a unique final verdict; this does not retroactively
+qualify the old individual-leaf reports or enclosing chip/power integration.
 
 | # | Claim | Evidence (run ID / report / proof log) | Status |
 |---|---|---|---|
+| C-R1-interface-LVS | The original assembled macro matches an independently source-proven SPICE schematic with all449root ports,0device/net/property/pin differences and final `Circuits match uniquely.`; the original Verilog control still fails | 44627346549 at688b9ce8; reports/r1_port_result_44627346549.json; root complete source-byte/topology/PG/port/final-verdict and single-read-command replay | Strict declared macro-interface LVS only, including live configuration cells. No root pins/devices waived or forced. Physical enclosing power, full shell/chip and timing remain open |
+| C-R1-active-RC-timing | All active clock/data paths are annotated in both setup/hold policies, with370edge registers/8736loaded cases/246endpoints and exact loop-policy agreement; the measured nominal-RC primary macro fails20ns/0.25nsconditions: setup-11.108903ns, hold-1.870506ns | 44623006209 at5688fa36; reports/r1_routed_result_44623006209.json; root complete native/negative-control replay | Qualified diagnostic model under original zero-I/O-delay macro boundary, not a passing timing result or full-chip/loading/PVT acceptance. D148tests only proved unused-input image settings |
 | C-R1-connected-RC | The corrected flat representation preserves all21geometry layers and the original cell/terminal inventory; all93255named terminals across26765extracted nets share their proper resistor component, with0split nets | 44621669039 at7a3e549b; reports/r1_flat_result_44621669039.json; root native/SPEF/component/hash replay | Repairs the measured RC graph loss. Active configured setup/hold, full-chip shell/power/LVS and submission acceptance remain open |
 | C-R1-RC-coverage-control | Configured native timing now completes all six cases with stable endpoint pins and loop-policy agreement, but its active-annotation guard rejects the extracted model; an independent resistor graph confirms2567split nets | 44594242689 atcb96173a; reports/r1_routed_result_44594242689.json; original SPEF44583509050; reports/r1_pin_connectivity_calibration.json | Diagnosis only. D144corrects a representation loss inside existing pin metal; full geometry/RC/active timing must rerun. R1 remains unqualified |
 | C-R1-full-macro-RC | The route-preserving flat view matches the original macro on all21geometry layers, detects an added-metal control, and exports26765full-macro RC net records | 44583509050 at6e58ef20; reports/r1_flat_result_44583509050.json; complete native import/GDS/SPEF hashes replayed | Extracted model preparation only. Active annotation, propagated-clock setup/hold, loading and complete shell/power/LVS acceptance remain open |

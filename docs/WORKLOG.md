@@ -2,6 +2,32 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Review selector sweep and verify upstream SRAM use
+
+- Upstream main 2083973336a9ce7ae528bfa90a79c0ff09d148de still instantiates
+  the physical IHP 512x16 SRAM in `src/trw_sram.v`; `trw_lane.v` fetches
+  instructions through its shared routine/data interface. `src/config.json`
+  includes the macro GDS/LEF/Liberty and power connections. WARP instead uses
+  distributed configuration latches and has no instruction-fetch memory.
+- Hosted 44629098253 at 11a874c5 completed all seven selector variants. Root
+  replays native setup/hold models, active annotation and all 8736 expected
+  frame bits per variant. Best setup improves only 0.013203 ns; all variants
+  still fail setup and hold. Retain the actually loaded parent; no candidate
+  is adopted or claimed functionally loaded. Receipt:
+  reports/r1_unused_input_sweep_44629098253.json.
+- BUG158 adds carry-side-effect checking to the unused-input proof. Actual
+  F.I2 reaches ten disabled carry consumers and no enabled consumer. Guarded
+  local preparation reproduces the original images, expected states and frame
+  audits byte-for-byte; all 28 timing scripts agree apart from authenticated
+  input paths. This extra proof was reviewed after the cloud run. Final guarded
+  local preparation and 11 focused selector/timing tests pass.
+- Updated strict-interface LVS and active-timing status in BUGS, CLAIMS,
+  DECISIONS and PHYSICAL_DESIGN_AND_CI; original failed controls remain.
+- No phase boxes ticked. G1/defaults, hardware and timing constraints remain
+  unchanged. Next investigate a free upstream selector to route an unused
+  input to a proved constant, preserving active routing and carry semantics;
+  actual protocol loading/reset/reload tests precede any adoption.
+
 ## 2026-11-19 — Strict macro-interface LVS passes; begin proved image-only timing experiment
 
 - Actual44627346549 at688b9ce8 succeeds: matched Verilog control still

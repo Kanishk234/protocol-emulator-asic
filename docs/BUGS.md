@@ -1,5 +1,23 @@
 # Bugs
 
+## 158: Unused LUT-input proof must also cover carry side effects
+
+- **Symptom:** the initial D-148 selector preflight checked all LUT cofactors,
+  but did not independently exclude carry effects. FABulous LC inputs I1/I2
+  also feed `Co`, even when their LUT truth-table cofactors are identical.
+- **Caught by:** source review before adopting any analysis-only candidate.
+- **Fix/check:** decode all 128 actual carry-input modes and walk the selected
+  downstream carry graph, including each Ci-to-Co dependency. Reject enabled
+  or unknown carry consumers, non-carry fanout and external carry observers.
+  The actual F.I2 target reaches ten disabled carry consumers and no enabled
+  consumer. I3 does not enter the source carry equation.
+- **Evidence:** guarded local preparation reproduces all seven original images,
+  expected states and frame audits byte-for-byte; all 28 STA scripts agree
+  apart from authenticated source paths. The extra carry proof is a post-run
+  review of 44629098253, not a claim that its cloud source contained the guard.
+  Tests reject enabled/unknown consumers and non-carry fanout. No candidate
+  has been adopted; see reports/r1_unused_input_sweep_44629098253.json.
+
 ## 157: Remaining LVS final pin failure involves electrically unused root ports
 
 - **Measured status:** native alias merging44621668751 and44623601777 reports
@@ -14,6 +32,12 @@
   Verilog-source control and strict final verdict; no pin waiver/forced matches.
 - **Rejected inference:** small scalar/vector alias-versus-direct floating-port
   fixtures pass on local1.5.316. This does not prove a parser bug in cloud1.5.320.
+- **Actual representation repair:**44627346549 at688b9ce8 reproduces the
+  failed Verilog control, while the source-proven SPICE reference retains449
+  ports, has all difference metrics0and ends `Circuits match uniquely.` Root
+  regenerates its complete source bytes/topology and verifies exactly one
+  source read-format command change. No ignored pins or forced equivalences.
+  Declared macro-interface LVS is qualified; enclosing power/shell is separate.
 
 ## 156: Flat hierarchy does not remove resistor-preserved internal port aliases
 

@@ -2,6 +2,18 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November19 strict declared-interface LVS and active timing:**44627346549
+at688b9ce8 passes with all449ports, zero differences and a uniquely matching
+final verdict using the independently source-proven SPICE schematic. Original
+Verilog control still fails; no pin/device waiver or forced match. Same original
+GDS; physical enclosing power and whole-chip shell remain open. Separately,
+44623006209 at5688fa36 passes active annotation and both loop-policy checks,
+but nominal-RC primary macro setup-11.108903ns and hold-1.870506ns fail the
+unchanged20ns/0.25nsconditions at the original zero-I/O-delay boundary. D148's
+image-only unused-input sensitivity completed in 44629098253: all seven
+variants still fail; best setup gain is only 0.013203 ns and hold is unchanged.
+Retain the loaded parent. No R1 timing-closure claim.
+
 **November19 corrected RC graph:**44621669039 at7a3e549b passes the exact
 21-layer geometry comparison, original native inventory and every resistor
 network. All93255named terminals across26765nets share their correct resistor

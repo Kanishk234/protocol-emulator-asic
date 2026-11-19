@@ -1,0 +1,163 @@
+{
+  "run": "44629098253",
+  "source_sha": "11a874c58f1263dd98e486c05da1a80b8110c39a",
+  "workflow_conclusion": "success: bounded diagnostic completed, no timing acceptance",
+  "artifact": {
+    "id": 14580437495,
+    "name": "r1-unused-input-sweep-44629098253",
+    "bytes": 5293064,
+    "sha256": "a2f47dfad69c6c92a693a25d26b0179a2abc19fff8fd7c7cf3288f4652c5d9ad"
+  },
+  "result_sha256": "8412750500caa7d39a9b22a262ac174c3b68c4ea7f3208f4e3eefe6577c638d4",
+  "plan_sha256": "ff2a78fc0bae6cae6b971e65203b8df8dd61bb7e261024100ad7b79b841885c6",
+  "variants": {
+    "000": {
+      "setup_slack_ns": -11.108903,
+      "hold_slack_ns": -1.870506,
+      "actually_loaded_parent": true
+    },
+    "001": {
+      "setup_slack_ns": -18.652359,
+      "hold_slack_ns": -1.870506,
+      "configuration_bits_changed": 1,
+      "image_sha256": "00c5939f6eba8900bc7d0fe872130fc98992597973bf9ba53bd0852ef3fe908e",
+      "all_four_active_coverage_checks_pass": true,
+      "actually_loaded": false
+    },
+    "010": {
+      "setup_slack_ns": -11.136564,
+      "hold_slack_ns": -1.870506,
+      "configuration_bits_changed": 1,
+      "image_sha256": "48080462d264a6fbaf70dfa8cc09581a716ce32a72d1c8c22e449191ab0c1f0f",
+      "all_four_active_coverage_checks_pass": true,
+      "actually_loaded": false
+    },
+    "011": {
+      "setup_slack_ns": -18.656672,
+      "hold_slack_ns": -1.870506,
+      "configuration_bits_changed": 2,
+      "image_sha256": "00a0fb123f81b23ed8c0680d1b2d510b18d0400d2b5778be819ce6863d1cee94",
+      "all_four_active_coverage_checks_pass": true,
+      "actually_loaded": false
+    },
+    "100": {
+      "setup_slack_ns": -11.0957,
+      "hold_slack_ns": -1.870506,
+      "configuration_bits_changed": 1,
+      "image_sha256": "dd62b1409c1dea274fcf13dc4eae728a24500edaa3967e6c00060ceeedbbbf08",
+      "all_four_active_coverage_checks_pass": true,
+      "actually_loaded": false
+    },
+    "101": {
+      "setup_slack_ns": -18.639164,
+      "hold_slack_ns": -1.870506,
+      "configuration_bits_changed": 2,
+      "image_sha256": "8839cb5ec57502957226105dc25d41f047b3e82f7fe9f880876eb1c9a41a74fc",
+      "all_four_active_coverage_checks_pass": true,
+      "actually_loaded": false
+    },
+    "110": {
+      "setup_slack_ns": -11.123363,
+      "hold_slack_ns": -1.870506,
+      "configuration_bits_changed": 2,
+      "image_sha256": "c9e54e9f5dd1aa711bc0c73c007ad3fb9fafe2cad794822177ed02ee84f72583",
+      "all_four_active_coverage_checks_pass": true,
+      "actually_loaded": false
+    },
+    "111": {
+      "setup_slack_ns": -18.643469,
+      "hold_slack_ns": -1.870506,
+      "configuration_bits_changed": 3,
+      "image_sha256": "f055af47eb9efe9cf46913a681690c8204a10fb12f0822076a97392582aa48ef",
+      "all_four_active_coverage_checks_pass": true,
+      "actually_loaded": false
+    }
+  },
+  "best_analysis_case": "100",
+  "best_setup_gain_ns": 0.013203,
+  "adopted": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "review": {
+    "native_log_models_and_coverage_replayed": true,
+    "expected_frame_bits_per_variant": 8736,
+    "candidate_images_expected_states_and_frame_audits_byte_identical_to_guarded_local_preflight": true,
+    "candidate_sta_scripts_replayed": 28,
+    "script_differences": "Only authenticated Liberty/Verilog/SPEF source paths differ between cloud and local preflight; all remaining script bytes agree.",
+    "carry_safety_post_run": {
+      "primitive_sha256": "bfdff0c8b5a1da080f39a080d49abdb994413b9b45b736f5255375e38550a4be",
+      "scope": "Additional root review after hosted execution; cloud campaign did not contain this guard. Images and timing settings unchanged.",
+      "changes": [
+        {
+          "tile": "Tile_X1Y2_LUT4x8_ha",
+          "lut": "F",
+          "input": 2,
+          "carry_noninterference": {
+            "visited_nodes": 25,
+            "disabled_carry_consumers": [
+              [
+                "X1Y1",
+                "LA_Ci"
+              ],
+              [
+                "X1Y1",
+                "LB_Ci"
+              ],
+              [
+                "X1Y1",
+                "LC_Ci"
+              ],
+              [
+                "X1Y1",
+                "LD_Ci"
+              ],
+              [
+                "X1Y1",
+                "LE_Ci"
+              ],
+              [
+                "X1Y1",
+                "LF_Ci"
+              ],
+              [
+                "X1Y1",
+                "LG_Ci"
+              ],
+              [
+                "X1Y1",
+                "LH_Ci"
+              ],
+              [
+                "X1Y2",
+                "LG_Ci"
+              ],
+              [
+                "X1Y2",
+                "LH_Ci"
+              ]
+            ],
+            "enabled_consumers": 0
+          }
+        },
+        {
+          "tile": "Tile_X1Y2_LUT4x8_ha",
+          "lut": "F",
+          "input": 3,
+          "carry_noninterference": {
+            "scope": "I3 does not enter the native carry function"
+          }
+        },
+        {
+          "tile": "Tile_X1Y3_LUT4x8_ha",
+          "lut": "D",
+          "input": 3,
+          "carry_noninterference": {
+            "scope": "I3 does not enter the native carry function"
+          }
+        }
+      ]
+    }
+  },
+  "disposition": "Retain actually loaded registered-input parent. Best gain is only 0.013203 ns, setup and hold still fail. No derived image adopted or claimed functionally loaded.",
+  "scope": "Fixed physical geometry and connected nominal RC; unchanged 20 ns period and 0.25 ns uncertainty, original conditional zero-I/O-delay macro boundary. No shell/loading/PVT/full-chip acceptance."
+}

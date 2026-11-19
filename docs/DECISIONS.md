@@ -26,6 +26,16 @@
   Report sensitivity only. Actual loading, UART/SPI/reset/STOP/reload and full
   frame-state validation are mandatory before adopting any better candidate;
   full-chip and loading-mode timing remain separate gates.
+- **Carry safety:** BUG158 adds a separate proof for I1/I2 carry effects;
+  equal LUT cofactors alone are insufficient. All reachable carry consumers
+  must be known and disabled, with no non-carry or external observer.
+- **Actual outcome:** 44629098253 at 11a874c5 completes all seven variants
+  with qualified active coverage, zero structural loops and loop-policy
+  agreement. None closes timing. Best case 100 improves setup by only
+  0.013203 ns to -11.095700 ns; hold remains -1.870506 ns. Retain the actually
+  loaded parent. No derived image is adopted or claimed functionally loaded.
+  Root log/frame/script replay and the additional carry review are recorded
+  in reports/r1_unused_input_sweep_44629098253.json.
 
 ## D-147: Compare a source-proven SPICE schematic without dropping unused ports
 
@@ -50,6 +60,10 @@
   Netgen1.5.316; they do not establish the full failure's cause on pinned cloud
  1.5.320. Do not label that cause fixed until actual hosted evidence passes.
   This is source representation only, not timing or physical power acceptance.
+  **Actual outcome:**44627346549 at688b9ce8 passes unique final matching and
+  all449root ports with zero difference metrics; its unchanged Verilog control
+  still fails. Root replays source-byte regeneration, complete topology and
+  exactly one generated read-format substitution. See report44627346549.
 
 ## D-146: Compare extracted alias handling while preserving standard-cell hierarchy
 

@@ -23,9 +23,11 @@ def report(first='Found 0 unannotated drivers.\n', second='Found 0 partially una
 def test_missing_spef_control_and_partial_clock_annotation_are_detected():
     assert annotation(report())['passed']
     for text in [report('Found 1 unannotated drivers.\n u0/X\n'),
-                 report(second='Found 1 partially unannotated drivers.\n clock_buffer/X\n')]:
+                 report(second='Found 1 partially unannotated drivers.\n root_clock/X\n  clock_buffer/X\n')]:
         assert not annotation(text)['passed']
     assert annotation(report('Found 1 unannotated drivers.\n inactive/X\n'))['passed']
+    assert annotation(report(second='Found 1 partially unannotated drivers.\n u0/X\n  inactive/A\n'))['passed']
+    assert not annotation(report('Found 1 unannotated drivers.\n clock_buffer\\/X\n'))['passed']
 
 
 @pytest.mark.parametrize('text', [

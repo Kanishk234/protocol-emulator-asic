@@ -73,6 +73,6 @@ def test_context_annotation_is_complete_and_keeps_each_native_interface_separate
 def test_flat_spice_export_changes_only_representation_after_unchanged_extraction():
     source='extract\next2spice lvs\next2spice short resistor\next2spice -o $netlist $::env(DESIGN_NAME).ext\n'
     changed=flat_spice_script(source)
-    assert changed.replace('ext2spice hierarchy off\n','')==source
+    assert changed.replace('ext2spice hierarchy off\next2spice subcircuits top on\n','')==source
     for invalid in [source+source,'extract\n',changed]:
         with pytest.raises(ValueError):flat_spice_script(invalid)

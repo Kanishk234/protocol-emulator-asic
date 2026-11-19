@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Strict macro-interface LVS passes; begin proved image-only timing experiment
+
+- Actual44627346549 at688b9ce8 succeeds: matched Verilog control still
+  fails, while source-proven SPICE retains449root names,0device/net/property/
+  pin differences and exact final verdict `Circuits match uniquely.` Root
+  regenerates source SPICE byte-for-byte from original source JSON and PDK
+  pin order, reparses all signal partitions/power bindings, checks native
+  verdict/ports and confirms exactly one source read-format command change.
+  Receipt: reports/r1_port_result_44627346549.json. No pins/devices waived or
+  forced to match. This qualifies declared macro-interface LVS; physical
+  enclosing power, shell/full-chip and timing acceptance remain open.
+- D148preflight proves three unused combinational LUT inputs from actual
+  native truth tables, FASM/frame/selector identity and all16cofactors. Seven
+  derived images have only expected1–3bit changes and independently agree on
+  all8736expected image states. These are not new native loading observations.
+  Ten focused cofactor/runtime/timing tests and own workflow syntax pass;
+  hosted sensitivity is next. Actual functional loading/reset/reload is
+  mandatory before adopting any better candidate. G1/defaults stay unchanged.
+
 ## 2026-11-19 — Qualify active RC timing; isolate remaining floating-port LVS failure
 
 - Actual44623006209 at5688fa36 completes all six native cases. All four

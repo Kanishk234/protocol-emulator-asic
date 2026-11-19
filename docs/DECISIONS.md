@@ -1,5 +1,32 @@
 # Decisions
 
+## D-148: Test only proved unused primary-input selectors against qualified RC timing
+
+- **Date:**2026-11-19.44623006209 establishes complete active annotation,
+  loop-policy agreement and unchanged20ns/0.25nsconstraints, but primary macro
+  setup-11.108903ns and hold-1.870506ns. Trace the actual worst setup chain
+  before changing hardware or constraints.
+- **Bounded image experiment:** only X1Y2/F.I2, X1Y2/F.I3 and X1Y3/D.I3.
+  None has an active original FASM route. Derive actual LUT truth from all16
+  observed native configuration bits via physical frame wiring, verify against
+  original FASM and check every truth-table cofactor. Actual observed tables
+  are0x1111for F and0xfbfbfor D; use those, not pre-permutation PNR metadata.
+  Require observed combinational FF mode, unique existing two-way selectors,
+  exact selector-Q identity and exclusion from every active feature's bits.
+- **Image binding:** make all seven nonempty combinations, changing only their
+  existing0→1selector bits from the actually loaded registered-input parent.
+  Recompute the image CRC and independently audit all8736expected latch states
+  against words. These are expected candidate states, never new observations.
+- **Timing:** reproduce the real loaded parent first, including its negative
+  missing-SPEF controls; then run static/dynamic setup and hold for each image
+  on the same connected SPEF and unchanged source/clock/reset/I/O boundaries.
+  Require complete active annotation,370register coverage, zero structural loops
+  and the original1e-6nsloop-policy agreement guard. Retain every failed case.
+- **Limits/cost:** no hardware, resource, default/ABI or protocol RTL change.
+  Report sensitivity only. Actual loading, UART/SPI/reset/STOP/reload and full
+  frame-state validation are mandatory before adopting any better candidate;
+  full-chip and loading-mode timing remain separate gates.
+
 ## D-147: Compare a source-proven SPICE schematic without dropping unused ports
 
 - **Date:**2026-11-19. Both native alias-merge experiments44621668751 and

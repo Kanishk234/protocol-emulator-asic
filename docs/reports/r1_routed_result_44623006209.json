@@ -1,0 +1,132 @@
+{
+  "passed": false,
+  "diagnostic_complete": true,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Configured primary-image macro setup/hold diagnostic at 20ns, propagated clocks, 0.25ns uncertainty, nominal extracted RC and slow/fast cells. Macro I/O delays remain the original conditional zero-delay boundary. No shell, loading-mode, physical power/LVS, complete-corner or submission acceptance.",
+  "run": "44623006209",
+  "source_sha": "5688fa3687c14ac80ee0bb5b93872b0fddbd0265",
+  "cases": {
+    "cell_control_static": {
+      "returncode": 0
+    },
+    "cell_control_dynamic": {
+      "returncode": 0
+    },
+    "routed_setup_static": {
+      "returncode": 0
+    },
+    "routed_setup_dynamic": {
+      "returncode": 0
+    },
+    "routed_hold_static": {
+      "returncode": 0
+    },
+    "routed_hold_dynamic": {
+      "returncode": 0
+    }
+  },
+  "runtime_probe": {
+    "invalid_path_control": {
+      "returncode": -11,
+      "completed": false,
+      "script_sha256": "b94dae8b27ef0f157c467c754f03c4ef0c4c8bb645cbe0581ba2755119e14514",
+      "log_sha256": "344b63c328cbbd0d6e0e74ba5cd4cbeae4787c78d243bcbe68e35ea0d8c563f2"
+    },
+    "stable_pin_candidate": {
+      "returncode": 0,
+      "completed": true,
+      "script_sha256": "79f69263ffbe878d4a205379b39e6dd86485e8465a2b908d4ff6bd8ff59eaef3",
+      "log_sha256": "1f11011cb352bcd4d498337c21553e99f53e2b8ccbe26f125aba6ae4b03c8077"
+    }
+  },
+  "models": {
+    "cell_control": {
+      "edge_registers": 370,
+      "inactive_unobservable": 134,
+      "clocked_timed": 225,
+      "clocked_constant_data": 11,
+      "endpoints": 246,
+      "worst_slack_ns": 1.508933,
+      "worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2191_/D",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    },
+    "routed_setup": {
+      "edge_registers": 370,
+      "inactive_unobservable": 134,
+      "clocked_timed": 225,
+      "clocked_constant_data": 11,
+      "endpoints": 246,
+      "worst_slack_ns": -11.108903,
+      "worst_endpoint": "Tile_X2Y4_B_IN_top",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    },
+    "routed_hold": {
+      "edge_registers": 370,
+      "inactive_unobservable": 134,
+      "clocked_timed": 225,
+      "clocked_constant_data": 11,
+      "endpoints": 246,
+      "worst_slack_ns": -1.870506,
+      "worst_endpoint": "Tile_X6Y1_LUT4x8_ha/_1730_/D",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    }
+  },
+  "configured_macro_model_passed": false,
+  "error": "Configured macro setup/hold or loop-policy check fails",
+  "annotation_summary": {
+    "cell_control_static": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 26800,
+      "partially_missing_loads": 0,
+      "passed": false,
+      "active_missing_pins": 5580
+    },
+    "cell_control_dynamic": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 26800,
+      "partially_missing_loads": 0,
+      "passed": false,
+      "active_missing_pins": 5580
+    },
+    "routed_setup_static": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 0,
+      "passed": true,
+      "active_missing_pins": 0
+    },
+    "routed_setup_dynamic": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 0,
+      "passed": true,
+      "active_missing_pins": 0
+    },
+    "routed_hold_static": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 0,
+      "passed": true,
+      "active_missing_pins": 0
+    },
+    "routed_hold_dynamic": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 0,
+      "passed": true,
+      "active_missing_pins": 0
+    }
+  },
+  "archive_id": 14578571689,
+  "archive_sha256": "8b62b420dc5b11b25d16f263a91f768eeae621c79656a83aefd93af88d100dbb",
+  "archive_bytes": 1077992,
+  "raw_result_sha256": "a13dd6d07f516b6be80c5f0fdb49434ad63fa6370f8cb794c5d1c1297d0536a5",
+  "root_review": "Replay all six script hashes, complete cases/FF/endpoints, both loop policies and active parasitic coverage. Connected nominal-RC primary macro explicitly fails unchanged setup/hold constraints. No full-chip timing acceptance."
+}

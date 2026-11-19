@@ -1,11 +1,18 @@
 """Reject incomplete wire annotation and configuration substitutions."""
 from pathlib import Path
+import os
+import subprocess
 import sys
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'spikes/r1'))
 from routed_timing import annotation, assert_cases
+
+
+def test_prepared_runtime_imports_without_compiler_or_site_packages():
+    env = dict(os.environ, PYTHONPATH=str(Path(__file__).resolve().parents[3]/'spikes/r1'))
+    subprocess.run([sys.executable, '-S', '-c', 'import routed_timing'], env=env, check=True)
 
 
 def report(first='Found 0 unannotated drivers.\n', second='Found 0 partially unannotated drivers.\n'):

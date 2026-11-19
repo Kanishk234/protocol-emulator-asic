@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from assembly_ports import annotate_script,context_masters,context_port_block,retain_original_script,spice_ports,strict_verdict
+from assembly_ports import annotate_script,context_masters,context_port_block,flat_spice_script,retain_original_script,spice_ports,strict_verdict
 
 
 def test_spice_ports_include_continuations_and_reject_empty_top_interface():
@@ -68,3 +68,11 @@ def test_context_annotation_is_complete_and_keeps_each_native_interface_separate
     contexts['wp_r1_context_0']['pins'].append('bad];error injected')
     with pytest.raises(ValueError):context_port_block(contexts)
     with pytest.raises(ValueError):context_port_block({})
+
+
+def test_flat_spice_export_changes_only_representation_after_unchanged_extraction():
+    source='extract\next2spice lvs\next2spice short resistor\next2spice -o $netlist $::env(DESIGN_NAME).ext\n'
+    changed=flat_spice_script(source)
+    assert changed.replace('ext2spice hierarchy off\n','')==source
+    for invalid in [source+source,'extract\n',changed]:
+        with pytest.raises(ValueError):flat_spice_script(invalid)

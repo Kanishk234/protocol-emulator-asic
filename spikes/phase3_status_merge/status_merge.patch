@@ -1,0 +1,41 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -395,11 +395,18 @@
+     wire        ld_sth   = !fr_want && st_v && rx_free;
+     wire        ld_stn   = !fr_want && !st_v && st_new && rx_free;
+     wire        st_keep  = st_v && !ld_sth;
+-    wire        st_hold  = st_new && !ld_stn;
++    // Existing status entry plus this clock's output are the only two slots.
++    // Count independent status intents before the priority encoder merges them.
++    wire        st_second = (rb_ev && (sync_ev || ref_ev)) || (sync_ev && ref_ev);
++    wire        st_third  = rb_ev && sync_ev && ref_ev;
++    wire [15:0] st_second_data = (rb_ev && sync_ev) ? 16'h9001 : 16'hc001;
++    wire        st_hold  = st_new && (!ld_stn || st_second);
++    wire [15:0] st_wait_data = ld_stn ? st_second_data : st_nd;
++    wire        st_overflow = st_new && (st_keep || (st_second && !ld_stn) || st_third);
+     assign rx_load = ld_fr || ld_sth || ld_stn;
+     assign rx_tag  = fr_want ? fr_tag : `TRW_TAG_EVENT;
+     assign rx_data = fr_want ? fr_data : st_v ? st_d : st_nd;
+-    assign ovr_set = (fr_want && !rx_free) || (st_hold && st_keep);
++    assign ovr_set = (fr_want && !rx_free) || st_overflow;
+ 
+     // FRAME without [11] is LATE with no frame in progress, word framing stopped, or the count at/after n
+     wire f_now   = tx_take && c_frame && !arg[11];
+@@ -408,7 +415,7 @@
+ `ifdef TRW_ASSERT_ON
+     wire st_clash = (rb_ev && (sync_ev || ref_ev)) || (sync_ev && ref_ev);
+     wire q_clash  = (k_data || k_crc) && q_dbit;
+-    `TRW_ASSERT(!st_clash, "BITSYNC: two status EVENTs in one clock")
++    `TRW_ASSERT(!(st_new && st_clash) || ld_stn || ovr_set, "BITSYNC: status collision neither queued nor reported")
+     `TRW_ASSERT(!q_clash, "BITSYNC: a load of the TX queue while a queued bit leaves it")
+ `endif
+ 
+@@ -554,7 +561,7 @@
+             // ---------------------------------------------------------- status EVENT register
+             if (st_hold && !st_keep) begin
+                 st_v <= 1'b1;
+-                st_d <= st_nd;
++                st_d <= st_wait_data;
+             end else if (ld_sth) begin
+                 st_v <= 1'b0;
+             end

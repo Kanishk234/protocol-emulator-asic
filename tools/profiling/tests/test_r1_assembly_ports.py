@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from assembly_ports import annotate_script,retain_original_script,spice_ports,strict_verdict
+from assembly_ports import annotate_script,context_masters,retain_original_script,spice_ports,strict_verdict
 
 
 def test_spice_ports_include_continuations_and_reject_empty_top_interface():
@@ -50,3 +50,11 @@ def test_foreign_runtime_script_is_retained_but_never_patched_or_executed(tmp_pa
         retain_original_script(source,tmp_path)
     assert (tmp_path/'original-extract-spice.tcl').read_bytes()==source.read_bytes()
     assert not (tmp_path/'extract_ports.tcl').exists()
+
+
+def test_only_complete_context_wrappers_can_be_flattened_for_lvs():
+    catalog=dict(contexts={str(i):dict(planned_master='wp_r1_context_'+str(i)) for i in range(26)})
+    assert len(context_masters(catalog))==26
+    for bad in ['sg13cmos5l_dlhq_1','*','wp_r1_context_0']:
+        catalog['contexts']['25']['planned_master']=bad
+        with pytest.raises(ValueError):context_masters(catalog)

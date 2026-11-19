@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Corner correction passes; continue column and timing qualification
+
+- Corrected corner44447843126 at9190efd0 passes all seven physical gates,
+  including actual GDS-based LVS. Root checks the exact patched-checker SHA,
+  final ODB/GDS/netlist hashes, preserved original interface and52routed wires.
+  Original0logic cells remain;260standard fill/decap cells added. BUG138/139
+  coverage closes. Receipt: reports/r1_wire_corner_44447843126.json. Combined
+  with the prior LUT0 and eight representative passes, ten types are covered.
+- D129 prepares an independent, analysis-only unused LE_I1 selector experiment.
+  Observed INIT0x050F agrees with FASM/native frame bits and is independent of
+  I1; LE_I2 and every active route remain protected. Change only existing bit219
+  in candidate STA cases and matching guards, with original controls retained.
+  No actual image, arc, tolerance or hardware change. Hosted outcome pending.
+- D130 prepares the remaining15LUT/north/south column contexts with unchanged
+  physical gates. Original primitive1 finishing still needs separate artifact
+  admission, so these do not imply all26finished or assembled.81focused checks
+  and actionlint pass. Next inspect both cloud results; BUG133 and full-chip
+  gates remain open. No phase boxes ticked or configured timing claimed.
+
 ## 2026-11-18 — Diagnose failed representative workflow and correct wire-only observation
 
 - Latest f7aedb00 lint/unit/test/docs workflows pass. Fabric44445289237 also

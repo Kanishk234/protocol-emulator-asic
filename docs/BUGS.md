@@ -12,6 +12,8 @@
   No external patch dependency, fuzz or upstream edit. Tests reject changed
   source context and hunk counts; real pinned-source output matches the SHA
   and parses. Hosted corrected replay pending; checker semantics unchanged.
+- **Hosted coverage:**44447843126 at9190efd0 succeeds through all seven physical
+  gates; exact patched-script and final-view hashes plus52wires replayed.
 
 ## 138: Cell-terminal-only connectivity rejects a wire-only leaf
 
@@ -28,6 +30,10 @@
   blocks. Negative tests cover absent peers/wires/grids/geometry. Every original
   physical checker and actual52-wire/final-inventory check remains required.
   Original failure retained; hosted replay and full corner GDS/LVS pending.
+- **Hosted coverage:**44447843126 proves the isolated corrected observer runs
+  with zero critical disconnects and zero router/antenna/Magic/KLayout/LVS
+  metrics; original0cells, all52wires and interface remain.260standard physical
+  fill/decap cells are added. No complete-fabric or configured timing acceptance.
 
 ## 137: Cross-tile diagnostic audit could not write container-owned output
 

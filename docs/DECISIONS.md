@@ -1,5 +1,38 @@
 # Decisions
 
+## D-130: Finish the remaining fifteen LUT/north/south column contexts
+
+- **Date:**2026-11-18. **Basis:** LUT0, eight representatives in44445288959,
+  and corrected wire-only corner44447843126 pass their physical gates, with
+  retained final hashes and original inventories/wires replayed. All ten tile
+  types now have a representative physical pass; column phases remain distinct.
+- **Method/cost:** finish lut1–5, north1–5 and south1–5 with the same pinned
+  post-route policy and exact D124 artifact/ODB/census bindings. Fifteen jobs,
+  at most three concurrent,3000-second tool bounds. No new floorplan, placement,
+  route, resize, hardware or configuration. All seven physical gates remain.
+- **Limits:** these fifteen passes, if obtained, plus the ten representatives
+  cover25of26contexts. The original primitive1 still needs a separate finishing
+  admission for its older artifact schema. No complete macro or timing claim.
+
+## D-129: Measure the unused E input without altering its active I2 route
+
+- **Date:**2026-11-18. **Status:** analysis-only experiment.
+- **Basis:** corrected global diagnostic44404102388 leaves only E all-feedback
+  unproved among D/E/G. Its witness identifies active LE_I2; that routed input
+  is protected. Separately, LE_I1 has no FASM route and the actual observed E
+  INIT0x050F is independent of I1 at all16addresses, with native-frame/FASM
+  truth-bit agreement. Thus an existing unused-input selection is testable.
+- **Experiment:** analysis case bit219/frame6/data27/native latch_1532_,0→1,
+  selecting X2Y3.J_l_EF_END1.LE_I1. Preserve all8736configuration guards,
+  original six-endpoint control, both loop policies and every timing arc.
+  Do not combine with either previously rejected D or G probe.
+- **Cost/gates:** one short pinned cloud diagnostic; zero hardware or actual
+  bitstream change. Reproduce the original failure before interpreting the
+  candidate. Even removal of sensitivity would require real-image functional
+  loading/reset/reload and delay/hazard qualification before acceptance.
+- **Validation:** actual-source preparation succeeds; native truth and unused
+  guards pass.81combined focused tests/actionlint pass. Hosted result pending.
+
 ## D-128: Correct boundary incidence for the cell-free northeast leaf
 
 - **Date:** 2026-11-18. **Status:** isolated checker correction, hosted replay pending.

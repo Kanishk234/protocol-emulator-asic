@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "case": "northeast",
+  "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "physical_gate_metrics": {
+    "route__drc_errors": 0,
+    "design__critical_disconnected_pin__count": 0,
+    "antenna__violating__nets": 0,
+    "antenna__violating__pins": 0,
+    "magic__drc_error__count": 0,
+    "klayout__drc_error__count": 0,
+    "design__lvs_error__count": 0
+  },
+  "original_cells": 0,
+  "added_fill_or_decap_cells": 260,
+  "required_signal_nets_with_wires": 52,
+  "odb_sha256": "7fc6ea08d6cb5628370b97c0f1c0a53dbe188e043093a9722f82f39742786bf1",
+  "gds_sha256": "1eaf0e66ea743030879ad559203528bdf58d7587835295fe1e4e53e629c2fe8a",
+  "nl_sha256": "e87d64ce3ebfcd93bd4f0e55fe9f03a83e0cfb2a970bdb9ac8a1623555430ac1",
+  "run": 44447843126,
+  "source_sha": "9190efd0",
+  "adapter": {
+    "original_sha256": "852fc895eb60ecde8aeb237f71cbd6c59de758d669e1e71424cfa863492411f0",
+    "patch_sha256": "51899776da05639db9b30bdd0ef5a6ebc8fed1c4ef02fb6e3feb3ec379ddac4e",
+    "patched_sha256": "d898717a0afa00697e5cc44a985dfeb975675c568a437354cd64531a03419d4b"
+  },
+  "review": "All seven metrics, final hashes, exact patched checker and original inventories/52wires replayed."
+}

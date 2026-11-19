@@ -74,3 +74,18 @@ def test_finishing_context_requires_retained_campaign_evidence():
     assert row['cells'] == 1453 and artifact['name'].endswith('-primitive4')
     with pytest.raises(ValueError, match='context'):
         campaign_case('unknown')
+
+
+@pytest.mark.parametrize('field,value', [('run','wrong'),('source','wrong'),('attempt','2'),
+                                       ('cells',1452),('required_signal_nets_with_wires',1556),
+                                       ('routed_odb_sha256','wrong')])
+def test_original_primitive_admission_rejects_foreign_or_changed_result(field,value):
+    from finish_leaf import PRIMITIVE_RUN,SOURCE_SHA,admit_primitive_result
+    result = dict(run=str(PRIMITIVE_RUN),attempt='1',source=SOURCE_SHA,passed=True,
+                  tool_exit_code=0,router_violations=0,cells=1453,configuration_latches=334,
+                  power_terminals=2906,required_signal_nets_with_wires=1557,
+                  routed_odb_sha256='1a12a86bd7b0a12e035ac0d17c40e9077c089b0bcd86ce296003dc984514bd38')
+    assert admit_primitive_result(result)['cells']==1453
+    result[field]=value
+    with pytest.raises(ValueError,match='primitive routed result'):
+        admit_primitive_result(result)

@@ -1,0 +1,191 @@
+{
+  "passed": false,
+  "diagnostic_complete": true,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Configured primary-image macro setup/hold diagnostic at 20ns, propagated clocks, 0.25ns uncertainty, nominal extracted RC and slow/fast cells. Macro I/O delays remain the original conditional zero-delay boundary. No shell, loading-mode, physical power/LVS, complete-corner or submission acceptance.",
+  "run": "44594242689",
+  "source_sha": "cb96173acfb952b4ebe1e54e30ec0c94fcd3ca23",
+  "cases": {
+    "cell_control_static": {
+      "returncode": 0
+    },
+    "cell_control_dynamic": {
+      "returncode": 0
+    },
+    "routed_setup_static": {
+      "returncode": 0
+    },
+    "routed_setup_dynamic": {
+      "returncode": 0
+    },
+    "routed_hold_static": {
+      "returncode": 0
+    },
+    "routed_hold_dynamic": {
+      "returncode": 0
+    }
+  },
+  "runtime_probe": {
+    "invalid_path_control": {
+      "returncode": -11,
+      "completed": false,
+      "script_sha256": "b94dae8b27ef0f157c467c754f03c4ef0c4c8bb645cbe0581ba2755119e14514",
+      "log_sha256": "344b63c328cbbd0d6e0e74ba5cd4cbeae4787c78d243bcbe68e35ea0d8c563f2"
+    },
+    "stable_pin_candidate": {
+      "returncode": 0,
+      "completed": true,
+      "script_sha256": "79f69263ffbe878d4a205379b39e6dd86485e8465a2b908d4ff6bd8ff59eaef3",
+      "log_sha256": "1f11011cb352bcd4d498337c21553e99f53e2b8ccbe26f125aba6ae4b03c8077"
+    }
+  },
+  "models": {
+    "cell_control": {
+      "edge_registers": 370,
+      "inactive_unobservable": 134,
+      "clocked_timed": 225,
+      "clocked_constant_data": 11,
+      "endpoints": 246,
+      "worst_slack_ns": 1.508933,
+      "worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2191_/D",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    },
+    "routed_setup": {
+      "edge_registers": 370,
+      "inactive_unobservable": 134,
+      "clocked_timed": 225,
+      "clocked_constant_data": 11,
+      "endpoints": 246,
+      "worst_slack_ns": -6.005509,
+      "worst_endpoint": "Tile_X2Y4_B_IN_top",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    },
+    "routed_hold": {
+      "edge_registers": 370,
+      "inactive_unobservable": 134,
+      "clocked_timed": 225,
+      "clocked_constant_data": 11,
+      "endpoints": 246,
+      "worst_slack_ns": -1.100642,
+      "worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+      "structural_loops": 0,
+      "loop_policy_sensitive": false,
+      "loop_policy_differences": []
+    }
+  },
+  "error": "Active clock/data parasitics are incomplete",
+  "annotation_summary": {
+    "cell_control_static": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 26800,
+      "partially_missing_loads": 0,
+      "passed": false,
+      "active_missing_pins": 5580,
+      "first_missing_pins": [
+        "Tile_X0Y1_W_IO4/_191_/X",
+        "Tile_X0Y1_W_IO4/_193_/X",
+        "Tile_X0Y1_W_IO4/_194_/X",
+        "Tile_X0Y1_W_IO4/_198_/X",
+        "Tile_X0Y1_W_IO4/output13/X",
+        "Tile_X0Y1_W_IO4/output14/X",
+        "Tile_X0Y1_W_IO4/output16/X",
+        "Tile_X0Y1_W_IO4/output9/X"
+      ]
+    },
+    "cell_control_dynamic": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 26800,
+      "partially_missing_loads": 0,
+      "passed": false,
+      "active_missing_pins": 5580,
+      "first_missing_pins": [
+        "Tile_X0Y1_W_IO4/_191_/X",
+        "Tile_X0Y1_W_IO4/_193_/X",
+        "Tile_X0Y1_W_IO4/_194_/X",
+        "Tile_X0Y1_W_IO4/_198_/X",
+        "Tile_X0Y1_W_IO4/output13/X",
+        "Tile_X0Y1_W_IO4/output14/X",
+        "Tile_X0Y1_W_IO4/output16/X",
+        "Tile_X0Y1_W_IO4/output9/X"
+      ]
+    },
+    "routed_setup_static": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 24282,
+      "passed": false,
+      "active_missing_pins": 611,
+      "first_missing_pins": [
+        "Tile_X0Y1_W_IO4/_191_/A0",
+        "Tile_X0Y1_W_IO4/_193_/A1",
+        "Tile_X0Y1_W_IO4/_194_/A1",
+        "Tile_X0Y1_W_IO4/_198_/A0",
+        "Tile_X0Y2_W_IO4/_180_/A2",
+        "Tile_X0Y2_W_IO4/_191_/A1",
+        "Tile_X0Y2_W_IO4/_192_/A1",
+        "Tile_X0Y2_W_IO4/_193_/A1"
+      ]
+    },
+    "routed_setup_dynamic": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 24282,
+      "passed": false,
+      "active_missing_pins": 611,
+      "first_missing_pins": [
+        "Tile_X0Y1_W_IO4/_191_/A0",
+        "Tile_X0Y1_W_IO4/_193_/A1",
+        "Tile_X0Y1_W_IO4/_194_/A1",
+        "Tile_X0Y1_W_IO4/_198_/A0",
+        "Tile_X0Y2_W_IO4/_180_/A2",
+        "Tile_X0Y2_W_IO4/_191_/A1",
+        "Tile_X0Y2_W_IO4/_192_/A1",
+        "Tile_X0Y2_W_IO4/_193_/A1"
+      ]
+    },
+    "routed_hold_static": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 24282,
+      "passed": false,
+      "active_missing_pins": 611,
+      "first_missing_pins": [
+        "Tile_X0Y1_W_IO4/_191_/A0",
+        "Tile_X0Y1_W_IO4/_193_/A1",
+        "Tile_X0Y1_W_IO4/_194_/A1",
+        "Tile_X0Y1_W_IO4/_198_/A0",
+        "Tile_X0Y2_W_IO4/_180_/A2",
+        "Tile_X0Y2_W_IO4/_191_/A1",
+        "Tile_X0Y2_W_IO4/_192_/A1",
+        "Tile_X0Y2_W_IO4/_193_/A1"
+      ]
+    },
+    "routed_hold_dynamic": {
+      "active_pins": 13139,
+      "fully_missing_drivers": 35,
+      "partially_missing_loads": 24282,
+      "passed": false,
+      "active_missing_pins": 611,
+      "first_missing_pins": [
+        "Tile_X0Y1_W_IO4/_191_/A0",
+        "Tile_X0Y1_W_IO4/_193_/A1",
+        "Tile_X0Y1_W_IO4/_194_/A1",
+        "Tile_X0Y1_W_IO4/_198_/A0",
+        "Tile_X0Y2_W_IO4/_180_/A2",
+        "Tile_X0Y2_W_IO4/_191_/A1",
+        "Tile_X0Y2_W_IO4/_192_/A1",
+        "Tile_X0Y2_W_IO4/_193_/A1"
+      ]
+    }
+  },
+  "raw_result_sha256": "fb408c1d072f05a5499b11051a3b41601d9335d52e4adebdef9ba1af2663c3e8",
+  "archive_id": 14564947394,
+  "archive_sha256": "ee3a514e96f9d48f097cb7d51cc1719f5c48cde94c2ab738fae34e39af954425",
+  "archive_bytes": 1438841,
+  "root_review": "Replay all six rendered hashes, complete timing/FF/case/active annotation reports, static/dynamic agreement and missing-SPEF controls. Native execution is repaired; missing RC connectivity rejects timing acceptance."
+}

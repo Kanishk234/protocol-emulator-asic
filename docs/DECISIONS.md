@@ -1,5 +1,45 @@
 # Decisions
 
+## D-145: Let native flat SPICE merge physically extracted internal aliases
+
+- **Date:**2026-11-19.44594242580 atcb96173a proves that explicit root
+  wrapping retains449ports but flat export with resistor-preserved aliases
+  still has the same31LVS errors/two split corner nets. Flat hierarchy alone
+  is rejected as the fix. Original `.ext` still physically merges all four.
+- **Sixth isolated case:** retain all five controls; change only the native
+  flat writer's final `ext2spice short none` setting. This merges names of
+  existing extracted conductors instead of preserving internal wrapper port
+  aliases with synthesized ideal resistor elements. No manual wire/resistor,
+  source schematic, device model or conductive geometry change is introduced.
+- **Root-interface guard:** independent native inventory shows449distinct root
+  nets for449names, so this mode has no original shared root name to discard.
+  Reject any shared root-net mapping before creating that script; retain the
+  complete449-port census, original checker/zero errors and unique final verdict.
+  No full enclosing power, configured timing or submission acceptance follows.
+
+## D-144: Preserve pin-metal connectivity in the flat RC representation
+
+- **Date:**2026-11-19.44594242689 atcb96173a fixes the stale-path crash and
+  completes all six cases with identical loop-policy results. Active annotation
+  still fails. Independent SPEF resistor-graph replay finds2567nets with two
+  terminal components, exactly matching2567partially annotated driver reports;
+  having every pin in CONN was insufficient.
+- **Measured cause:** adjacent original400DBUpin squares form continuous
+  metal, but native RCX does not join the paths through their isolated DEF RECT
+  patches. Nine actual cells from r1_net_601 reproduce two resistor components.
+  Adding centerlines inside those same pin squares makes one component using
+  the identical pinned OpenROAD source, without moving a cell or a route.
+- **Correction:** retain every original pin rectangle and expose its existing
+  conductor with orthogonal centerlines and explicit zero end extensions. Only
+  original400DBUsquares on Metal2/3qualify; native default width must be200DBU.
+  Both centerline strips lie strictly inside that rectangle. Require the exact
+  same full-cell/terminal/native import audit, all21geometry layers to match
+  with no exception, and the added-metal negative control before new full RCX.
+- **Independent acceptance:** check that every CONN terminal within each new
+  D_NET shares a resistor component; fail disconnected networks. Then rerun
+  real configured clock/setup/hold and active annotation. Original incomplete
+  SPEF and timing failures remain controls; no hardware/default/ABI change.
+
 ## D-143: Compare flat SPICE export while retaining hierarchical failure controls
 
 - **Date:**2026-11-19.44590138579 at85ae112a reproduces31strict LVS errors

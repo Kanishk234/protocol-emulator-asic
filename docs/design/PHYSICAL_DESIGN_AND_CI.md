@@ -2,6 +2,16 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November19 electrical-model follow-up:**44594242689 atcb96173a completes
+all six configured native analyses without crashing and agrees across loop
+policies. Active annotation rejects the model. Independent SPEF graph replay
+finds2567disconnected nets matching the partial-driver count. D144exposes only
+the existing boundary-pin metal with contained centerlines; exact native
+inventories, all-layer XOR and a new resistor-component guard must pass before
+rerunning timing. Tiny nine-cell native control/candidate reproduces split/
+connected graphs. No hardware or clock-target change. Flat-root LVS44594242580
+still fails31errors; D145adds native alias merging with complete449-port guards.
+
 **November19 actual full-macro RC:**44583509050 at6e58ef20 passes exact native
 import, all21geometry layers at zero difference/no ignored layers, added-metal
 negative control and OpenRCX. SPEF has26765net records/35,585,561bytes, SHA

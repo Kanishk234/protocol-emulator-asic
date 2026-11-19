@@ -1,0 +1,37 @@
+{
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "source_rc_run": 44583509050,
+  "native_openroad": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+  "scope": "Tiny local9cell actual-net connectivity calibration; no whole-macro geometry/RC/timing acceptance.",
+  "cases": {
+    "control": {
+      "passed": false,
+      "nets": 1,
+      "terminals": 9,
+      "histogram": {
+        "2": 1
+      },
+      "member_sha256": {
+        "def": "043367f986b5ad6b000ab1a6fcecc6bc9534c64c144770a7b21770cf7618ca90",
+        "tcl": "888d3f9f50e97350cbc14531d3177f1248446fc4f6c933bcb1628de882f310a1",
+        "log": "e84ce63d9d85df371b925b180d8c139da337800cc2504c7d0a8334b475cf4af2",
+        "spef": "2e5afa8e6131bd854ff6be5b9f280e979547f1244cd7bf6f1b37b9f8bfe41b1c"
+      }
+    },
+    "candidate": {
+      "passed": true,
+      "nets": 1,
+      "terminals": 9,
+      "histogram": {
+        "1": 1
+      },
+      "member_sha256": {
+        "def": "510e8d384584343d8d7ededa3dc7e1b3318e5d597e661e070058152a3fba791c",
+        "tcl": "7136e5c674e5c19d01dc6efa64e9853836b478b4e59270864f4bc2f261cb0f15",
+        "log": "e4ba74dd757b23d93841c2ce78bbbb5a2d3b211a54fa073bbc7213189760c481",
+        "spef": "f0f1ef0baf375e3ac153eb80a644aab501a92fb0c225f3565ef3e1235e3e0278"
+      }
+    }
+  }
+}

@@ -2,6 +2,27 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Repair extracted pin connectivity before timing optimization
+
+- Read actual44594242689 atcb96173a: stale/fixed microfixture behaves as
+  expected, all six native cases complete and both loop policies agree. Actual
+  active annotation still fails; independent resistor-graph replay identifies
+  2567disconnected nets in26765, exactly the partial-driver count (BUG155).
+  No timing acceptance. Retain all raw reports and source identities.
+- A nine-cell actual-net native calibration localizes the cause to isolated
+  boundary-pin RECT records. Contained zero-extension centerlines connect all
+  nine terminals, while the original control remains split. D144applies that
+  representation repair with full native inventory/all-layer XOR and a new
+  independent SPEF component guard.31focused parser/import/interface tests
+  pass; heavy full-macro extraction stays in GitHub Actions.
+- Actual44594242580 atcb96173a retains449root ports but flat native export
+  still fails31LVS errors (BUG156). D145next tests native physical alias
+  merging with all five controls preserved; root449nets must be distinct and
+  complete strict Netgen/interface/device checks remain mandatory.
+- Next authenticate corrected full-macro geometry/RC graph, then active
+  configured setup/hold; diagnose actual remaining LVS differences. No phase
+  box, full-chip timing/LVS/submission claim or production G1/default change.
+
 ## 2026-11-19 — Launch complete context LVS and extracted timing checks
 
 - Pushed scoped tools/tests/docs/CI through85ae112a. Strict context-port run

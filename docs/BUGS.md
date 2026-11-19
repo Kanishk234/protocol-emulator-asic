@@ -1,5 +1,31 @@
 # Bugs
 
+## 156: Flat hierarchy does not remove resistor-preserved internal port aliases
+
+- **Symptom/check:**44594242580 atcb96173a exports the explicit449-port
+  flat root, but still fails31LVS errors with the same two extra corner nets.
+  Top wrapping is repaired; flat hierarchy alone does not repair connectivity.
+- **Next isolated check:** D145uses native alias merging in a sixth case on
+  unchanged GDS/extraction/source. Require449distinct original root nets before
+  that mode; keep all five previous controls and complete strict verdict gates.
+
+## 155: DEF pin rectangles preserve mask geometry but lose RC graph connections
+
+- **Symptom/check:**44594242689 completes six native cases and both loop
+  policies agree, but active parasitic coverage fails. Independent graph replay
+  finds2567of26765SPEF nets have two terminal components, matching native partial
+  annotation. The geometry/export success44583509050 is retained with its
+  original limited scope; it is not an electrically complete timing model.
+- **Measured cause:** original boundary pin rectangles join conductive metal
+  but are isolated RECT records in the flattened route representation. A tiny
+  actual r1_net_601fixture with nine cells has two resistor components; exposing
+  the existing pin metal with contained zero-extension centerlines makes one.
+- **Fix/coverage:** D144retains original squares and adds only contained
+  centerline representations. Guard exact source pin dimensions/layers/native
+  widths and all-layer XOR. Add an independent SPEF terminal-component check
+  that rejects the original full model and mutation controls; then require real
+  configured active annotation. No manual parasitic short or timing exception.
+
 ## 154: Flat SPICE export needs an explicit top-level subcircuit
 
 - **Symptom/check:**44592238395 at08f24bbe reaches the native flat export,

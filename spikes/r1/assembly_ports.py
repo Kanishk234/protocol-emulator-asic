@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import re
+from decimal import Decimal
 
 from assemble import NAME
 from assembly_catalog import sha
@@ -39,7 +40,29 @@ def strict_verdict(report, ports, expected):
     return True
 
 
-def annotate_script(original,pins):
+def context_port_block(contexts):
+    if len(contexts)!=26:raise ValueError('Incomplete context port metadata')
+    lines=[]
+    for master,row in sorted(contexts.items()):
+        pins=row['pins']
+        if (not re.fullmatch(r'wp_r1_[a-z0-9_]+',master) or len(pins)!=len(set(pins)) or not pins
+                or any(not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*(?:\[\d+\])?',p) for p in pins)):
+            raise ValueError('Invalid native context interface')
+        expected=' '.join('{'+p+'}' for p in sorted(pins))
+        width=Decimal(row['width_dbu']+1000)/1000;height=Decimal(row['height_dbu']+1000)/1000
+        lines.extend([f'load {master} -dereference',f'box values -1um -1um {width}um {height}um',
+            'port makeall','set actual_ports {}',
+            'for {set n [port first]} {$n >= 0} {set n [port $n next]} {lappend actual_ports [port $n name]}',
+            f'set expected_ports {{{expected}}}',
+            f'set pf [open $::env(STEP_DIR)/ports-{master}.txt w]',
+            'puts $pf [join $actual_ports "\\n"]','close $pf',
+            'if {[lsort -unique $actual_ports] ne [lsort -unique $expected_ports]} {',
+            f' error "R1 native context port metadata differs: {master}"','}',
+            f'puts "R1_CONTEXT_PORTS {master} [llength [lsort -unique $actual_ports]]"'])
+    return '\n'.join(lines)+'\n'
+
+
+def annotate_script(original,pins,contexts=None):
     anchor='load $::env(DESIGN_NAME) -dereference\n'
     if original.count(anchor)!=1 or len(pins)!=449 or set(pins)-{'VPWR','VGND'}==set():
         raise ValueError('Unexpected extraction script or macro port population')
@@ -63,7 +86,8 @@ if {[lsort -unique $actual_ports] ne [lsort -unique $expected_ports]} {
 }
 puts "R1_EXPORTED_PORTS [llength [lsort -unique $actual_ports]]"
 '''.replace('EXPECTED',expected)
-    return original.replace(anchor,anchor+addition)
+    prefix=context_port_block(contexts) if contexts is not None else ''
+    return original.replace(anchor,prefix+anchor+addition)
 
 
 def retain_original_script(original,out):
@@ -96,6 +120,16 @@ def prepare(source,out,native_flat=None):
     out.mkdir(parents=True,exist_ok=False)
     paths=[Path(__file__),source/'result.json',source/'pins.json',source/'catalog.json',source/(NAME+'.gds'),
            source/(NAME+'.pnl.v'),source/(NAME+'.def'),source/(NAME+'.v')]
+    contexts={}
+    for case,c in json.loads((source/'catalog.json').read_text())['contexts'].items():
+        lef=source/'contexts'/case/(c['planned_master']+'.lef');content=lef.read_text();paths.append(lef)
+        names=re.findall(r'^\s*PIN (\S+)\s*$',content,re.M)
+        sizes=re.findall(r'^\s*SIZE ([0-9.]+) BY ([0-9.]+) ;\s*$',content,re.M)
+        if (len(sizes)!=1 or [int(Decimal(v)*1000) for v in sizes[0]]!=[c['width_dbu'],c['height_dbu']]
+                or not names or len(names)!=len(set(names))):
+            raise ValueError('Original context LEF interface differs')
+        contexts[c['planned_master']]=dict(pins=names,width_dbu=c['width_dbu'],height_dbu=c['height_dbu'])
+    context_port_block(contexts)
     native_inventory=None
     if native_flat is not None:
         native_flat=Path(native_flat).resolve()
@@ -110,7 +144,7 @@ def prepare(source,out,native_flat=None):
             Path(__file__).with_name('flat_topology.py'),Path(__file__).with_name('flat_reference.py')])
         for case,c in json.loads((source/'catalog.json').read_text())['contexts'].items():
             paths.append(source/'contexts'/case/(c['planned_master']+'.nl.v'))
-    (out/'plan.json').write_text(json.dumps(dict(source=str(source),expected_ports=sorted(pins),native_inventory=str(native_inventory) if native_inventory else None,
+    (out/'plan.json').write_text(json.dumps(dict(source=str(source),expected_ports=sorted(pins),context_ports=contexts,native_inventory=str(native_inventory) if native_inventory else None,
         input_sha256={str(p):sha(p) for p in paths},geometry_changed=False,
         scope='Exported macro interface LVS only. Multiple accesses of declared supply ports require connection by the enclosing power grid; no physical power-grid, clock, timing or submission acceptance.'),indent=2)+'\n')
 
@@ -126,26 +160,31 @@ def inside(out):
     original=Path(Magic.SpiceExtraction.get_script_path(None))
     retain_original_script(original,out)
     script=out/'extract_ports.tcl';script.write_text(annotate_script(original.read_text(),plan['expected_ports']))
+    all_script=out/'extract_context_ports.tcl'
+    all_script.write_text(annotate_script(original.read_text(),plan['expected_ports'],plan['context_ports']))
+    active_script=script
     class ExportPorts(Magic.SpiceExtraction):
         id='Magic.R1ExportPorts'
-        def get_script_path(self):return str(script)
+        def get_script_path(self):return str(active_script)
     class CheckPorts(Classic):
         Steps=[ExportPorts,Checker.IllegalOverlap,Netgen.LVS,Checker.LVS]
     cases={}
-    experiments=[('strict_control','all',source/(NAME+'.pnl.v')),('declared_external_ports','notopports',source/(NAME+'.pnl.v'))]
+    experiments=[('strict_control','all',source/(NAME+'.pnl.v'),False),('declared_external_ports','notopports',source/(NAME+'.pnl.v'),False)]
     if plan.get('native_inventory'):
         from flat_reference import prepare_and_verify
         liberty=Path(os.environ['PDK_ROOT'])/'ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib'
         flat_pnl=prepare_and_verify(source,plan['native_inventory'],liberty,out/'flat_reference')
-        experiments.append(('flat_native_reference','notopports',flat_pnl))
-    for name,unique,pnl in experiments:
+        experiments.append(('flat_native_reference','notopports',flat_pnl,False))
+        experiments.append(('complete_context_ports','notopports',flat_pnl,True))
+    for name,unique,pnl,complete in experiments:
+        active_script=all_script if complete else script
         masters=context_masters(json.loads((source/'catalog.json').read_text()))
         config=dict(DESIGN_NAME=NAME,VERILOG_FILES=[str(source/(NAME+'.v'))],
                     CLOCK_PERIOD=20,CLOCK_PORT=None,VDD_NETS=['VPWR'],GND_NETS=['VGND'],
                     PRIMARY_GDSII_STREAMOUT_TOOL='klayout',MAGIC_EXT_USE_GDS=True,
                     MAGIC_EXT_ABSTRACT=False,MAGIC_EXT_UNIQUE=unique,MAGIC_EXT_SHORT_RESISTOR=True,
                     LVS_IGNORE_CELLS=[],LVS_FLATTEN_CELLS=masters)
-        row=dict(passed=False,extract_unique=unique,geometry_changed=False,reference_pnl_sha256=sha(pnl))
+        row=dict(passed=False,extract_unique=unique,complete_context_ports=complete,geometry_changed=False,reference_pnl_sha256=sha(pnl))
         folder=out/name;folder.mkdir(exist_ok=False)
         try:
             flow=CheckPorts(config,design_dir=str(out),pdk='ihp-sg13cmos5l',pdk_root=os.environ['PDK_ROOT'])
@@ -175,6 +214,7 @@ def inside(out):
     summary=dict(passed=chosen is not None,cases=cases,selected_interface_policy=chosen,
         source_gds_sha256=GDS_SHA,source_pnl_sha256=PNL_SHA,geometry_changed=False,
         extraction_script_sha256=sha(script),original_script_sha256=SCRIPT_SHA,
+        complete_context_script_sha256=sha(all_script),
         physical_acceptance=False,timing_acceptance=False,scope=plan['scope'])
     (out/'result.json').write_text(json.dumps(summary,indent=2)+'\n')
     if chosen is None:raise SystemExit('No port extraction policy passed strict macro interface LVS')

@@ -18,10 +18,12 @@ def odd_parity(byte):
 
 
 class PS2Device:
-    def __init__(self, half, send=(), bad_parity=()):
+    def __init__(self, half, send=(), bad_parity=(), bad_start=(), bad_stop=()):
         self.h = half                       # half a clock period, in 50 MHz clocks
         self.queue = list(send)
         self.bad_parity = set(bad_parity)   # indices of sent frames with a wrong parity bit
+        self.bad_start = set(bad_start)
+        self.bad_stop = set(bad_stop)
         self.received = []                  # (byte, parity_ok, stop_ok) from the host
         self.clk = self.data = 1
         self._gen = self._run()
@@ -65,8 +67,10 @@ class PS2Device:
 
     def _send(self, byte):
         par = odd_parity(byte) ^ (1 if self._sent in self.bad_parity else 0)
+        start = int(self._sent in self.bad_start)
+        stop = int(self._sent not in self.bad_stop)
         self._sent += 1
-        bits = [0] + [(byte >> i) & 1 for i in range(8)] + [par, 1]
+        bits = [start] + [(byte >> i) & 1 for i in range(8)] + [par, stop]
         for b in bits:
             self.data = b                               # change while CLK is high
             yield from self._wait(self.h // 2)

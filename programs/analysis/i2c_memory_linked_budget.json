@@ -1,0 +1,8 @@
+{
+  "unit": "U0",
+  "profiles": {
+    "standard_at_20ns": {"response_edge_min": 200, "sample_edge_min": 235, "required_setup": 13},
+    "fast_at_20ns": {"response_edge_min": 30, "sample_edge_min": 65, "required_setup": 5},
+    "fast_plus_at_20ns": {"response_edge_min": 13, "sample_edge_min": 25, "required_setup": 3}
+  }
+}

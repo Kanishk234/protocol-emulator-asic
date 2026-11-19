@@ -39,6 +39,7 @@ from tripsim.pinunit import PinConfig
 
 from .expr import ExprError, evaluate
 from .reaction import analyze_lane
+from .service import routine_service
 
 LANE_SLOTS = 12
 SRAM_WORDS = 512
@@ -483,9 +484,15 @@ class Compiler:
         if rinfo:
             L += ["", "## Routines", "",
                   "Steps exclude waits on a full output (`out`), which depend on the consumer.", "",
-                  "| Routine | Words | Worst-case steps | Time if not pre-empted |", "|---|---|---|---|"]
+                  "Conditional SRAM service is measured from the CALL EVAL to observed RET completion, "
+                  "assuming one rotation slot per four clocks, a running lane, no selected reflex actions "
+                  "and no host/configuration writes. Data stores must not alias entry/routine words. "
+                  "Step counts alone are not elapsed-clock bounds.", "",
+                  "| Routine | Words | Worst-case steps | Conditional SRAM service |", "|---|---|---|---|"]
             for name, nw, st in rinfo:
-                t = f"≤ {4 * st + 8} clocks" if st is not None else "unbounded"
+                service = routine_service(image, name)
+                t = (f"≤ {service['bound_clocks']} clocks" if service['status'] == 'conditional_bound'
+                     else f"unknown: {service['reason']}")
                 L.append(f"| {name} | {nw} | {st if st is not None else '—'} | {t} |")
             L.append(f"\nSRAM: {len(image['sram'])} of {SRAM_WORDS} words (entry table 32"
                      + (f" + tables {len(self.tables)}" if self.tables else "") + " + routines).")

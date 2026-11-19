@@ -5,6 +5,8 @@ Unknown register values propagate conservatively. This does not bound arrivals,
 fabric service, routines, pin scheduling, or pin-to-pin latency.
 """
 from collections.abc import Mapping
+import hashlib
+import json
 import re
 
 import tripwire_spec as S
@@ -223,7 +225,12 @@ def analyze_response(image, query):
     return {'status': status, 'bound_clocks': max(c['response_clocks'] for c in cases)
             if status == 'bounded' else None, 'query': q,
             'assumptions': ASSUMPTIONS.copy(), 'cases': cases,
-            'pin_to_pin_bound': False, 'deadlock_certificate': False}
+            'pin_to_pin_bound': False, 'deadlock_certificate': False,
+            'compiled_image_sha256': compiled_image_hash(image)}
+
+
+def compiled_image_hash(image):
+    return hashlib.sha256(json.dumps(image, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
 def analyze_queries(image, queries):

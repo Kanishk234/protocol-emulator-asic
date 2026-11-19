@@ -1,0 +1,28 @@
+# UART RX multicast: host capture plus valid-byte echo, 8N1.
+# ui0 -> U1 RX -> L0 framing -> blocking multicast to HOST_OUT and L1 -> U0 TX -> uo0.
+# Capture is the host token stream, not an SRAM recorder. No HOST_IN path.
+# Both consumers must keep up: there is no external UART flow control. A stalled
+# host eventually blocks the bridge and can overrun RX; no unbounded-lossless claim.
+program uart_bridge_capture
+param BAUD = 115200
+const PERIOD = 50000000 / BAUD
+pin U0: pin_a=uo0 txmode=shift nbits=10 period=PERIOD idle=1
+pin U1: pin_a=ui0 rxmode=shift_rx nbits=10 period=PERIOD idle=1
+own uo0 U0
+connect L0.I0 <- U1.rx
+connect HOST_OUT <- L0.O1
+connect L1.I0 <- L0.O1
+connect U0.tx <- L1.O0
+
+lane L0:
+    K0 = 0x201
+    K1 = 0x200
+    states RX CHK
+    slot: when RX, I0 is DATA do CMPM none <- I0, mask K0 val K1 -> f0 then CHK
+    slot: when CHK, f0 == 1 do EXT O1 <- I0, f=0x71, deq then RX
+    slot: when CHK, f0 == 0 do MOV O1 <- I0, tag ERR, deq then RX
+
+lane L1:
+    r1 = 0x200
+    slot: when I0 is DATA do SHOR O0 <- I0, f=0x11, deq
+    slot: when I0 is ERR do MOV none <- I0, deq

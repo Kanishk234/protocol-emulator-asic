@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/sigrokproject/libsigrokdecode",
+  "revision": "71f451443029322d57376214c330b518efd84f88",
+  "license": "GPL-2.0-or-later (per decoder headers; upstream COPYING retained)",
+  "license_file": "COPYING",
+  "scope": "Unmodified upstream PS/2 decoder for verification only; excluded from ASIC sources. Completes device-to-host frames on their real final rising edge.",
+  "files": {
+    "ps2/pd.py": {
+      "upstream_path": "decoders/ps2/pd.py",
+      "sha256": "c3140a2f9cbbdbbc607901967b8741de94616e1a76d4159ea05d98a7ffaaf1f8"
+    },
+    "ps2/__init__.py": {
+      "upstream_path": "decoders/ps2/__init__.py",
+      "sha256": "4d001bf46eaaf049818722d0d2232ba5dbb90152c8399f31d70af779f6c1bdea"
+    },
+    "COPYING": {
+      "upstream_path": "COPYING",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+    }
+  }
+}

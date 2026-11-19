@@ -14,14 +14,74 @@ The independent model and chip RTL exercise address rejection, current/random/se
 
 ## Scope limits
 
-The memory is SRAM-backed and volatile, writes commit immediately, and EEPROM write-cycle busy timing is not implemented. Recovery tests now cover incomplete-byte STOPs and nine-clock clearing of interrupted reads, with 22 model cases and four representative RTL/exact official-netlist cases passing. A completed-byte STOP before the ACK clock exposes an unresolved recovery gap; it is not included in the passing scope. See [the recovery report](../reports/PHASE3_I2C_RECOVERY.md). Analog rise/fall times and uncharacterized pads remain unqualified. The independent RTL-peer milestone subsequently passes under both RTL simulators and on the exact official netlist; see [its separate evidence](../reports/PHASE3_I2C_PEER.md). The compiler still lacks a context-specific ACK/reaction-bound proof.
+The memory is SRAM-backed and volatile, writes commit immediately, and EEPROM write-cycle busy timing is not implemented. The original one-unit program has a completed-byte STOP-before-ACK recovery gap; the separate guarded firmware addresses the tested boundary using existing U1/uo7 selection feedback. See [the recovery report](../reports/PHASE3_I2C_RECOVERY.md) and [guard report](../reports/PHASE3_I2C_GUARD.md). Analog rise/fall times and uncharacterized pads remain unqualified. The independent RTL-peer milestone passes under both RTL simulators and on the exact official netlist. Conditional compiler ACK bounds now match the exercised model/RTL paths; generalized queue/arrival and deadlock proofs remain open.
 
 ## Next
 
-Add per-path compiler reaction analysis after the guarded firmware milestone. The [guard option](../reports/PHASE3_I2C_GUARD.md) uses existing U1 and uo7 selection feedback; 190 guarded recovery model cases plus RTL/exact official-netlist timing/recovery and independent RTL-peer interoperability pass. It preserves the one-unit example and unchanged physical hardware. L3B-PEER now passes, including measured 1 MHz, with pinned unmodified external RTL and sigrok. The peer implementation is isolated in test_internal/i2c_peer and its pinned source/license in test_internal/vendor; see [the peer report](../reports/PHASE3_I2C_PEER.md). Existing PS/2, 1-Wire, WS2812 and DShot examples should be audited and extended rather than recreated. For F-ROT-1, the arbitration is integrated into trw_chip plus lane/host enable gating; trw_sram only wraps the macro. Prove those actual logic cones and their composition rather than a copied standalone arbiter. The phase checklist remains authoritative, and its exit items stay unchecked until their full requirements pass.
+Continue recorded UART/I2C/SPI capture replay and the remaining verification gates; the UART multicast showcase now passes on existing units. The PS/2 malformed-frame/raw-capture audit and WS2812/DShot evidence review now close the combined functional protocol checkpoint. Standard/overdrive 1-Wire and SPI memory now pass model/RTL/exact-netlist checks in their declared scopes. Continue the actual integrated SRAM-rotation proof: arbitration lives in trw_chip plus lane/host enable gating; trw_sram only wraps the macro. Prove those actual logic cones and their composition rather than a copied standalone arbiter. Other phase checklist items remain authoritative and unchecked until their full requirements pass.
 
 **Takeaway:** the qualified chip can gain a memory-device personality through firmware; Phase 3 is adding software and evidence, not reopening physical closure by default.
 
 The compiler now excludes incompatible priority competitors and checks both scheduler modes. Twenty-four focused tests include 10,000 independent-model scheduler snapshots; the full suite passes 597 tests and all 22 firmware images are unchanged. This [local selection result](../reports/PHASE3_REACTION_SELECTION.md) does not yet establish an end-to-end ACK or deadlock bound and does not complete L6-FUZZ.
 
 Opt-in [single-token ACK contracts](../reports/PHASE3_ACK_TOKEN_BOUND.md) now check the compare/flag/submission chain: address ACK becomes a visible output token within four clocks, write-data ACK within two, under explicit idle-pipeline/free-output/no-arrival assumptions. Both programs match the independent model and both RTL simulators for all 2,080 cases. The 636-test Python suite passes and all 22 firmware images remain unchanged. Full pin-path and environment-invariant bounds remain open; no additional exit box is complete.
+
+The next [conditional edge-budget milestone](../reports/PHASE3_ACK_EDGE_BUDGET.md)
+composes RX, lane and linked TX into 8/6 clocks to arm an ACK. The 716-test
+Python suite passes, including 1,120 observed workload ACK paths; both RTL
+simulators pass 350 internal ACK checks each. The exact official netlist passes
+40 port-only ACK checks. A continuous-low negative control corrected the new
+target-enable monitor before publication. All 22 images and qualified physical
+inputs remain unchanged. General queue/arrival and guard-window invariants still
+need analysis; this does not complete the EEPROM/compiler-bound exit gate.
+
+Memory-service analysis found and corrected a compiler report underestimate:
+the store routine needs up to 51 clocks, rather than the old 48-clock estimate,
+because its data write needs a separate SRAM slot. The new conditional
+[service envelope](../reports/PHASE3_MEMORY_SERVICE.md) is checked against 6,144
+model runs and 96 cases per RTL simulator. Firmware and hardware are unchanged.
+Delimiter interference and arrival contracts remain the next gap.
+
+The [delimiter-service sweep](../reports/PHASE3_DELIMITER_SERVICE.md) now checks
+one/two-command bursts at every active routine clock: 1,616 cases on the model
+and each RTL simulator. A two-action interference premise gives a conservative
+59-clock store envelope; the observed maximum is 52. The model's multicast
+commands are accepted in one clock and two-command guard bursts settle within
+25 clocks after first internal publication. A restored routine-busy guard
+reproduces delayed delivery. The full Python suite passes 810 tests. The
+wire-origin arrival count and external-event-to-guard bound remain unclosed.
+
+The subsequent [wire-origin review](../reports/PHASE3_I2C_DEADLINE_EVIDENCE.md)
+checks those premises in 198 guarded workloads: 1,586 delimiters and 2,354
+routine executions, guard settled within 26 clocks of each wire event and at
+least 12 clocks before the next first SCL rise. Actual reflex counts and every
+observed 59-clock delimiter window stay within the explicit two-action budget.
+The full suite passes 828 tests. Together with the existing compiler, RTL and
+exact-netlist ACK evidence, this completes the I2C showcase checkpoint for the
+declared tested guarded personality. Generalized arrival/deadlock certificates
+remain a separate open compiler checkpoint; Phase 3 is not complete.
+
+The next [SPI memory personality](../reports/PHASE3_SPI_MEMORY.md) serves
+READ/FAST_READ from a 256-byte volatile window without host refill during the
+transaction. It uses one lane, two existing units and 300 SRAM words. Model,
+Icarus and Verilator checks pass at 250/333/500 kHz; the full Python suite passes
+939 tests, with final four-phase model checks also passing. The official-netlist
+replay passes both complete-read and abort/restart tests, including all three
+rate profiles. An independent higher-level flash decoder also validates
+the six complete-frame RTL/gate captures. No new hardware or official workflow
+change; the combined protocol exit checkbox remains open.
+
+The [1-Wire master profiles](../reports/PHASE3_ONEWIRE_OVERDRIVE.md) add genuine
+standard-speed entry into overdrive, faster reset/ROM reads and standard-speed
+exit using idle host reconfiguration. The peer stays alive throughout. The full
+Python suite passes 952 tests; model and both RTL simulators plus the exact
+official netlist pass entry, four presence corners, absence and ROM checks.
+All three transition captures are byte-identical and independently decode.
+A retained stock-decoder recovery warning is isolated to its synthetic reset
+timestamp: actual bus recovery is 28.48 us, with independent control evidence.
+Each profile uses one lane, U0, nine slots and 51 SRAM words; the previous 23
+firmware images and all physical inputs remain unchanged. Phase 3 remains open.
+
+The [PS/2 framing milestone](../reports/PHASE3_PS2_FRAMING.md) checks all start/parity/stop combinations at three clock rates: 144 model scenarios and 288 frames. The full Python suite passes 1,117 tests. Icarus, Verilator and the exact official netlist each pass three focused chip tests, including sixteen clock-complete fault/recovery frames. A pinned unmodified upstream decoder removes the need for a fabricated recorder clock; valid-start captures independently decode with their actual stop/parity bits. All 24 emitted firmware images and physical inputs remain unchanged. The combined SPI/1-Wire/PS2/WS2812/DShot functional gate is checked with finite scoped evidence; the all-L3-sigrok gate remains open because DShot lacks a decoder. Phase 3 remains incomplete.
+
+The [UART multicast showcase](../reports/PHASE3_UART_MULTICAST.md) uses both existing lanes (3/2 slots) to send validated RX to the host and valid-byte echo. Eight model tests and both RTL simulators pass; exact official-netlist replay passes both 115200/460800-baud profiles in 97.01 seconds. Each profile captures seven DATA and three raw ERR tokens and echoes only valid bytes. All six TX captures independently decode. Host service is required: a deliberate sustained no-service test overruns RX. This is host capture, not the deferred SRAM recorder. The full non-slow Python suite passes 1,126 tests. Hardware remains qualified and unchanged; no extra phase exit gate is ticked.

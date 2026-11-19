@@ -1,0 +1,1032 @@
+{
+  "scope": "Conditional digital ACK edge budget plus finite entry-premise observations; no unconditional environment proof",
+  "base_commit": "af244724745e959be7f10a04030bef995c91a4ad",
+  "sources_sha256": {
+    "tools/tripc/linked_budget.py": "217304a226484d5b150822fbe058fe46575aa23a979a0b6b2e883d33b610bd0a",
+    "tools/tripc/response.py": "2c03e0455af1ec09a0a38ad407df38d5af008c51fc93e84217f73553d01eb5e9",
+    "tools/tripc/__main__.py": "47774917b2dac882843c7e81fd3c81f209a929316c0c0c971cb38a416c82165e",
+    "programs/analysis/i2c_memory_linked_budget.json": "f3139250499cecc1d0d195b5ecba15a54cf4a38baba45764c66aaf6f9e3fcc4c",
+    "programs/analysis/i2c_memory_response.json": "6186c6f450078d422fe0069471b04ef488cb84e58a3c45c70f380cb62f92f450",
+    "tools/tripc/tests/test_linked_budget.py": "b8388a56f720629aa4121d16d6abbfe62a90ef1482c1a27cda223163fcfa9202",
+    "tools/kernels/ack_path.py": "9e540d9e623fbd56b12f88c911f95cde300b5199a2ec243ced4d7631e35b0a52",
+    "tools/kernels/tests/test_ack_path.py": "14309378d5ce72529453d9f8f589f16a5af3618b146ee5c63395be50b64bc8c4",
+    "tools/kernels/tests/test_ack_path_monitor.py": "d00c1e528bb919b4f0b121d2dae45ee11cec3dbb79417ed8f2df712639e3d7ca",
+    "test_internal/chip/test_ack_path.py": "44684516ec25fa5dd36a0d041e640e6f8ba58f5f11d22d4f942ef6e1f6469b61",
+    "test_internal/Makefile": "0a88dd6eb2cb0965499aa33c39a67ff05714658b9829a45b2655c7cabe1955bc",
+    ".github/workflows/unit.yaml": "ecb2887e1f73b873af6a348789cef73f4130b4c271f252e4a3ca626840c148d9"
+  },
+  "entry_premises_proven": false,
+  "unconditional_pin_bound": false,
+  "programs": {
+    "i2c_target_eeprom": {
+      "compiled_image_sha256": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "budgets": {
+        "address_ack": {
+          "status": "conditional_pass",
+          "assumptions": [
+            "The final RX sampling edge completes the held token, with a free RX producer and no event collision.",
+            "Every entry and no-arrival premise of the single-token lane query holds.",
+            "The linked transmitter is initially idle, logically enabled, and selected; selection stays active through the following sample phase.",
+            "No configuration/owner/host writes occur, and the checked DATA-only stream remains in effect.",
+            "Declared edge gaps and setup requirements apply in clocks at the actual operating clock.",
+            "This is a sampled digital timing contract, not pad/metastability/analog characterization."
+          ],
+          "pipeline_clocks": {
+            "rx_publish": 3,
+            "tx_accept": 1,
+            "edge_to_drive": 3,
+            "observation_reserve": 1
+          },
+          "entry_premises_proven": false,
+          "unconditional_pin_bound": false,
+          "unit": "U0",
+          "profiles": {
+            "standard_at_20ns": {
+              "response_edge_min": 200,
+              "sample_edge_min": 235,
+              "required_setup": 13,
+              "armed_by_clocks": 8,
+              "ready_margin_clocks": 191,
+              "target_low_setup_bound_clocks": 231,
+              "passes": true
+            },
+            "fast_at_20ns": {
+              "response_edge_min": 30,
+              "sample_edge_min": 65,
+              "required_setup": 5,
+              "armed_by_clocks": 8,
+              "ready_margin_clocks": 21,
+              "target_low_setup_bound_clocks": 61,
+              "passes": true
+            },
+            "fast_plus_at_20ns": {
+              "response_edge_min": 13,
+              "sample_edge_min": 25,
+              "required_setup": 3,
+              "armed_by_clocks": 8,
+              "ready_margin_clocks": 4,
+              "target_low_setup_bound_clocks": 21,
+              "passes": true
+            }
+          }
+        },
+        "write_ack": {
+          "status": "conditional_pass",
+          "assumptions": [
+            "The final RX sampling edge completes the held token, with a free RX producer and no event collision.",
+            "Every entry and no-arrival premise of the single-token lane query holds.",
+            "The linked transmitter is initially idle, logically enabled, and selected; selection stays active through the following sample phase.",
+            "No configuration/owner/host writes occur, and the checked DATA-only stream remains in effect.",
+            "Declared edge gaps and setup requirements apply in clocks at the actual operating clock.",
+            "This is a sampled digital timing contract, not pad/metastability/analog characterization."
+          ],
+          "pipeline_clocks": {
+            "rx_publish": 3,
+            "tx_accept": 1,
+            "edge_to_drive": 3,
+            "observation_reserve": 1
+          },
+          "entry_premises_proven": false,
+          "unconditional_pin_bound": false,
+          "unit": "U0",
+          "profiles": {
+            "standard_at_20ns": {
+              "response_edge_min": 200,
+              "sample_edge_min": 235,
+              "required_setup": 13,
+              "armed_by_clocks": 6,
+              "ready_margin_clocks": 193,
+              "target_low_setup_bound_clocks": 231,
+              "passes": true
+            },
+            "fast_at_20ns": {
+              "response_edge_min": 30,
+              "sample_edge_min": 65,
+              "required_setup": 5,
+              "armed_by_clocks": 6,
+              "ready_margin_clocks": 23,
+              "target_low_setup_bound_clocks": 61,
+              "passes": true
+            },
+            "fast_plus_at_20ns": {
+              "response_edge_min": 13,
+              "sample_edge_min": 25,
+              "required_setup": 3,
+              "armed_by_clocks": 6,
+              "ready_margin_clocks": 6,
+              "target_low_setup_bound_clocks": 21,
+              "passes": true
+            }
+          }
+        }
+      }
+    },
+    "i2c_target_eeprom_guard": {
+      "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "budgets": {
+        "address_ack": {
+          "status": "conditional_pass",
+          "assumptions": [
+            "The final RX sampling edge completes the held token, with a free RX producer and no event collision.",
+            "Every entry and no-arrival premise of the single-token lane query holds.",
+            "The linked transmitter is initially idle, logically enabled, and selected; selection stays active through the following sample phase.",
+            "No configuration/owner/host writes occur, and the checked DATA-only stream remains in effect.",
+            "Declared edge gaps and setup requirements apply in clocks at the actual operating clock.",
+            "This is a sampled digital timing contract, not pad/metastability/analog characterization."
+          ],
+          "pipeline_clocks": {
+            "rx_publish": 3,
+            "tx_accept": 1,
+            "edge_to_drive": 3,
+            "observation_reserve": 1
+          },
+          "entry_premises_proven": false,
+          "unconditional_pin_bound": false,
+          "unit": "U0",
+          "profiles": {
+            "standard_at_20ns": {
+              "response_edge_min": 200,
+              "sample_edge_min": 235,
+              "required_setup": 13,
+              "armed_by_clocks": 8,
+              "ready_margin_clocks": 191,
+              "target_low_setup_bound_clocks": 231,
+              "passes": true
+            },
+            "fast_at_20ns": {
+              "response_edge_min": 30,
+              "sample_edge_min": 65,
+              "required_setup": 5,
+              "armed_by_clocks": 8,
+              "ready_margin_clocks": 21,
+              "target_low_setup_bound_clocks": 61,
+              "passes": true
+            },
+            "fast_plus_at_20ns": {
+              "response_edge_min": 13,
+              "sample_edge_min": 25,
+              "required_setup": 3,
+              "armed_by_clocks": 8,
+              "ready_margin_clocks": 4,
+              "target_low_setup_bound_clocks": 21,
+              "passes": true
+            }
+          }
+        },
+        "write_ack": {
+          "status": "conditional_pass",
+          "assumptions": [
+            "The final RX sampling edge completes the held token, with a free RX producer and no event collision.",
+            "Every entry and no-arrival premise of the single-token lane query holds.",
+            "The linked transmitter is initially idle, logically enabled, and selected; selection stays active through the following sample phase.",
+            "No configuration/owner/host writes occur, and the checked DATA-only stream remains in effect.",
+            "Declared edge gaps and setup requirements apply in clocks at the actual operating clock.",
+            "This is a sampled digital timing contract, not pad/metastability/analog characterization."
+          ],
+          "pipeline_clocks": {
+            "rx_publish": 3,
+            "tx_accept": 1,
+            "edge_to_drive": 3,
+            "observation_reserve": 1
+          },
+          "entry_premises_proven": false,
+          "unconditional_pin_bound": false,
+          "unit": "U0",
+          "profiles": {
+            "standard_at_20ns": {
+              "response_edge_min": 200,
+              "sample_edge_min": 235,
+              "required_setup": 13,
+              "armed_by_clocks": 6,
+              "ready_margin_clocks": 193,
+              "target_low_setup_bound_clocks": 231,
+              "passes": true
+            },
+            "fast_at_20ns": {
+              "response_edge_min": 30,
+              "sample_edge_min": 65,
+              "required_setup": 5,
+              "armed_by_clocks": 6,
+              "ready_margin_clocks": 23,
+              "target_low_setup_bound_clocks": 61,
+              "passes": true
+            },
+            "fast_plus_at_20ns": {
+              "response_edge_min": 13,
+              "sample_edge_min": 25,
+              "required_setup": 3,
+              "armed_by_clocks": 6,
+              "ready_margin_clocks": 6,
+              "target_low_setup_bound_clocks": 21,
+              "passes": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "unchanged_images": {
+    "count": 22,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816"
+    },
+    "reference_receipt": "phase3_reaction_selection_result.json"
+  },
+  "python": {
+    "full_non_slow_passed": 716,
+    "full_log_sha256": "73cdf8496e0dbdd1e0ad750b8625ad4c0a8b6f7ceba4bac8e6b22c43f8a7501f",
+    "focused_response_and_budget_passed": 65,
+    "focused_log_sha256": "7fcf35eba97e22ea330c2fe5ab0988375a6c5532c6f38acd634010ef35dcd364",
+    "monitor_passed": 22,
+    "monitor_log_sha256": "2a557b47d769357cf9d0d6738a8b46d8556877a31a6198701f4959182bb4ec93",
+    "model_workloads": 32,
+    "observed_model_acks": 1120
+  },
+  "negative_control": {
+    "old_helper_sha256": "0ca17be14dc33c06649d34683a034c09962440240002bbd8519072d7a7f1affc",
+    "before_log_sha256": "f2307caef5e4e7745bd97306c9e49d0587d86c39221bc7005a362929ca2b3d92",
+    "before_result": "Interrupted-low rejection assertion fails: old helper did not raise",
+    "after_result": "All 22 monitor tests pass, including interrupted-low rejection"
+  },
+  "simulations": {
+    "verilator": {
+      "log_sha256": "5807652e753a7f416e4149eaccb35073afef5815b8c628bd05b2ff5babd42a79",
+      "xml_sha256": "be85460b52877b9bf035bc723c3810b1fd94c13b1acf44a25b7bba9f9a4de3da",
+      "cases": [
+        {
+          "name": "test_ack_entry_path",
+          "selected": true,
+          "failed": false,
+          "seconds": 81.30558919906616
+        },
+        {
+          "name": "test_ack_edge_budget",
+          "selected": true,
+          "failed": false,
+          "seconds": 9.297476053237915
+        }
+      ],
+      "observations": [
+        {
+          "label": "i2c_target_eeprom_125_60_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              62
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_25_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_13_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_25_1",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_13_3",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_125_60_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              62
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_25_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_13_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_25_1",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_13_3",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_edges_25",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_edges_13",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_edges_25",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_edges_13",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        }
+      ],
+      "sigrok_required": true
+    },
+    "icarus_internal": {
+      "log_sha256": "fd264729cec1e53a844106e45ab9dd09c028e506a166150ba2871ca349af5a22",
+      "xml_sha256": "47fbb20eaf6a772f1c12af98ddc5cf4d357fc041715464422b4c6ca56d63d3d0",
+      "cases": [
+        {
+          "name": "test_ack_entry_path",
+          "selected": true,
+          "failed": false,
+          "seconds": 356.602205991745
+        },
+        {
+          "name": "test_ack_edge_budget",
+          "selected": false,
+          "failed": false,
+          "seconds": 0.0
+        }
+      ],
+      "observations": [
+        {
+          "label": "i2c_target_eeprom_125_60_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              62
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_25_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_13_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_25_1",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_50_13_3",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_125_60_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              62
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_25_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_13_0",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_25_1",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_50_13_3",
+          "entry_checked": true,
+          "acks": 35,
+          "metrics": {
+            "rx_publish": [
+              2
+            ],
+            "lane": [
+              2,
+              4
+            ],
+            "tx_accept": [
+              1
+            ],
+            "arm": [
+              5,
+              7
+            ],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        }
+      ],
+      "sigrok_required": true
+    },
+    "official_netlist": {
+      "log_sha256": "4039fc5af77132e9e039b3b7605933069de17ec1cd3454ac3a78358d1a89fe90",
+      "xml_sha256": "4699279a9340eac2ac55edc7d59937aa6291b3593e45d9e57aeb9c73919e205c",
+      "cases": [
+        {
+          "name": "test_ack_entry_path",
+          "selected": false,
+          "failed": false,
+          "seconds": 0.0
+        },
+        {
+          "name": "test_ack_edge_budget",
+          "selected": true,
+          "failed": false,
+          "seconds": 146.48238134384155
+        }
+      ],
+      "observations": [
+        {
+          "label": "i2c_target_eeprom_edges_25",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_edges_13",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_edges_25",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              22
+            ]
+          }
+        },
+        {
+          "label": "i2c_target_eeprom_guard_edges_13",
+          "entry_checked": false,
+          "acks": 10,
+          "metrics": {
+            "rx_publish": [],
+            "lane": [],
+            "tx_accept": [],
+            "arm": [],
+            "edge_to_drive": [
+              2
+            ],
+            "target_low_setup": [
+              34
+            ]
+          }
+        }
+      ],
+      "sigrok_required": true
+    }
+  },
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "sdf_annotated": false,
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+    "hardware_changed": false,
+    "official_workflows_changed": false
+  },
+  "published_base_ci": {
+    "head": "af244724745e959be7f10a04030bef995c91a4ad",
+    "all_success": {
+      "test": 44423002363,
+      "unit": 44423002354,
+      "lint": 44423002255,
+      "repo-audit": 44423002266,
+      "docs": 44423002326
+    }
+  }
+}

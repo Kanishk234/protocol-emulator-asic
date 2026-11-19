@@ -1,0 +1,259 @@
+{
+  "scope": "Finite UART host-capture and echo multicast with serviced host; no SRAM recorder or unbounded-lossless claim",
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008"
+  },
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "phase3_complete": false,
+  "base_commit": "af244724745e959be7f10a04030bef995c91a4ad",
+  "sources_sha256": {
+    "programs/uart_bridge_capture.trw": "5f7cd77ce0531316a5e9c149643b9fe148be685b9cc739c275273142142b727a",
+    "tools/kernels/tests/test_uart_bridge.py": "03acb5f3470294d09688f7a6a9f00dbd8e0a7342e411257a5f754973772cd303",
+    "test_internal/chip/test_uart_bridge.py": "e782633318046bc17f34063663f0f1d3c7813a88b17918e245bd63a2aad69a69",
+    ".github/workflows/unit.yaml": "a7a465344a87d66532c7cf3d094611f98dfe824644603aac71fd17fc6433f46e",
+    "test_internal/Makefile": "7d6e7f5f6e5599c163ce87550f397c8d6833e06273aa9f181e68877ec67b4a30"
+  },
+  "previous_firmware_images": {
+    "unchanged_count": 24,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816",
+      "spi_target_flash.trw": "44cf6326be28ad2f97eae83a2deb9c4f3458d2942b60e789bd4e3bc043ebbf47",
+      "onewire_master.trw": "1382bfbcf8c4459c23c1cc18cb4bf87bed4c32bafc0a4772282a4915cdcd91a9"
+    }
+  },
+  "profiles": {
+    "115200": {
+      "compiled_image_sha256": "dba51651e988d6adce99cdd99ce7e21a30f3d235031a1c3ace6810bbe519ed9d",
+      "lanes": 2,
+      "slots_L0": 3,
+      "slots_L1": 2,
+      "SRAM_words": 32,
+      "pins": {
+        "U0": {
+          "pin_a": 8,
+          "txmode": "shift",
+          "nbits": 10,
+          "period": 434.02777777777777,
+          "idle": 1
+        },
+        "U1": {
+          "pin_a": 0,
+          "rxmode": "shift_rx",
+          "nbits": 10,
+          "period": 434.02777777777777,
+          "idle": 1
+        }
+      }
+    },
+    "460800": {
+      "compiled_image_sha256": "63d4292b958662698efd6e204794dcfe61cda2f2a4c6eb06badae0a51723a756",
+      "lanes": 2,
+      "slots_L0": 3,
+      "slots_L1": 2,
+      "SRAM_words": 32,
+      "pins": {
+        "U0": {
+          "pin_a": 8,
+          "txmode": "shift",
+          "nbits": 10,
+          "period": 108.50694444444444,
+          "idle": 1
+        },
+        "U1": {
+          "pin_a": 0,
+          "rxmode": "shift_rx",
+          "nbits": 10,
+          "period": 108.50694444444444,
+          "idle": 1
+        }
+      }
+    }
+  },
+  "model": {
+    "focused_passed": 8,
+    "focused_log_sha256": "d94faf4bbd3c954d2eaefecbf8af084b74e60dc77d950f45ea763e9795844d2a",
+    "all_256_bytes_at_460800": true,
+    "host_queue_depth": 1,
+    "normal_host_drain_period_clocks": 560,
+    "disconnected_multicast_branch_detected": true,
+    "sustained_no_host_service_exposes_RX_OVERRUN": true
+  },
+  "simulations": {
+    "verilator": {
+      "status": "pass",
+      "passed": 1,
+      "failures": 0,
+      "skips": 0,
+      "seconds": 7.41152811050415,
+      "log_sha256": "dbad44a7d7388a8280bcaf4ddc8ed497007dcc4ec538f8396c34d5c34a33ffc4",
+      "xml_sha256": "3aed20dd825d3caa3591ad56183964582f7bc5162e49bdf7ed8806ed34c4fad2",
+      "per_profile": {
+        "host_tokens": 10,
+        "DATA": 7,
+        "ERR": 3,
+        "echoed_valid_frames": 7,
+        "pin_status": [
+          0,
+          0
+        ],
+        "sigrok_required": true
+      }
+    },
+    "icarus_rtl": {
+      "status": "pass",
+      "passed": 1,
+      "failures": 0,
+      "skips": 0,
+      "seconds": 31.47414541244507,
+      "log_sha256": "373cadc42ef0ec35923fe40044f53f3a039a33e9b76b667c155c11904d207493",
+      "xml_sha256": "bf2665343062da8008407f17ef341671b5ce5a4cfe8db7cdb12aed651bf10681",
+      "per_profile": {
+        "host_tokens": 10,
+        "DATA": 7,
+        "ERR": 3,
+        "echoed_valid_frames": 7,
+        "pin_status": [
+          0,
+          0
+        ],
+        "sigrok_required": true
+      }
+    },
+    "official_netlist": {
+      "status": "pass",
+      "passed": 1,
+      "failures": 0,
+      "skips": 0,
+      "seconds": 97.00473165512085,
+      "log_sha256": "8ae812966557040396b93842dd41fb55030721ce361b3c75824dedb409366a5d",
+      "xml_sha256": "ba5248348acc597ba8135ad6a200ad7988ddcb42b78ba479e13418ba1e2eee07",
+      "per_profile": {
+        "host_tokens": 10,
+        "DATA": 7,
+        "ERR": 3,
+        "echoed_valid_frames": 7,
+        "pin_status": [
+          0,
+          0
+        ],
+        "sigrok_required": true
+      }
+    }
+  },
+  "python": {
+    "passed": 1126,
+    "seconds": 136.41,
+    "log_sha256": "4d275498933ef3f140a422c171b50aadf9b2b5b4c427592cddbf232562ec4b49"
+  },
+  "capture_decoder_audits": {
+    "verilator_115200": {
+      "capture_sha256": "2627103a14992fb633cef504cb5aeccae91df4b77ef566200365329ef918866d",
+      "decode_sha256": "d203c0b880bbd5fd18510e025ded228cdef96faad76a461186cea7b1dbb0603b",
+      "bytes": [
+        255,
+        85,
+        1,
+        128,
+        28,
+        195,
+        90
+      ],
+      "waveform_changed": false
+    },
+    "verilator_460800": {
+      "capture_sha256": "d2aeb6f10920012136bc57a0692b1e70b4c4404ded62f6e11152881bee6ac369",
+      "decode_sha256": "d203c0b880bbd5fd18510e025ded228cdef96faad76a461186cea7b1dbb0603b",
+      "bytes": [
+        255,
+        85,
+        1,
+        128,
+        28,
+        195,
+        90
+      ],
+      "waveform_changed": false
+    },
+    "icarus_rtl_115200": {
+      "capture_sha256": "2627103a14992fb633cef504cb5aeccae91df4b77ef566200365329ef918866d",
+      "decode_sha256": "d203c0b880bbd5fd18510e025ded228cdef96faad76a461186cea7b1dbb0603b",
+      "bytes": [
+        255,
+        85,
+        1,
+        128,
+        28,
+        195,
+        90
+      ],
+      "waveform_changed": false
+    },
+    "icarus_rtl_460800": {
+      "capture_sha256": "d2aeb6f10920012136bc57a0692b1e70b4c4404ded62f6e11152881bee6ac369",
+      "decode_sha256": "d203c0b880bbd5fd18510e025ded228cdef96faad76a461186cea7b1dbb0603b",
+      "bytes": [
+        255,
+        85,
+        1,
+        128,
+        28,
+        195,
+        90
+      ],
+      "waveform_changed": false
+    },
+    "official_netlist_115200": {
+      "capture_sha256": "2627103a14992fb633cef504cb5aeccae91df4b77ef566200365329ef918866d",
+      "decode_sha256": "d203c0b880bbd5fd18510e025ded228cdef96faad76a461186cea7b1dbb0603b",
+      "bytes": [
+        255,
+        85,
+        1,
+        128,
+        28,
+        195,
+        90
+      ],
+      "waveform_changed": false
+    },
+    "official_netlist_460800": {
+      "capture_sha256": "d2aeb6f10920012136bc57a0692b1e70b4c4404ded62f6e11152881bee6ac369",
+      "decode_sha256": "d203c0b880bbd5fd18510e025ded228cdef96faad76a461186cea7b1dbb0603b",
+      "bytes": [
+        255,
+        85,
+        1,
+        128,
+        28,
+        195,
+        90
+      ],
+      "waveform_changed": false
+    }
+  }
+}

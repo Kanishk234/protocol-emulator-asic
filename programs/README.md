@@ -8,19 +8,28 @@ TRIPWIRE firmware in the `.trw` language, compiled by `tools/tripc`. The languag
 queries for the two memory examples at default address 0x50. It is analysis data,
 not loaded firmware. See [the 4/2-clock bounds and their assumptions](../docs/reports/PHASE3_ACK_TOKEN_BOUND.md).
 
+`analysis/i2c_memory_linked_budget.json` additionally declares edge-gap and setup
+requirements for the opt-in `--linked-budget` analysis at a 20 ns clock. The
+[conditional edge budget](../docs/reports/PHASE3_ACK_EDGE_BUDGET.md) composes
+RX publication, lane response and linked transmission; it does not prove the
+workload's queue/entry invariants or characterize pads.
+
 | Program | Role | Slots | Routines | Verified on the model (simulation) |
 |---|---|---|---|---|
+| `uart_bridge_capture.trw` | Validated UART RX multicast to host capture and valid-byte echo; host must drain | L0:3, L1:2 | — | [Finite 115200/460800-baud evidence and replay status](../docs/reports/PHASE3_UART_MULTICAST.md); no SRAM recorder |
 | `uart.trw` | UART 8N1, TX + RX in one lane, framing errors reported (also MIDI at 31 250 baud) | 4 | — | Reference line model and sigrok, up to 1 Mbaud; 256-byte loopback |
 | `spi_controller.trw` | SPI controller, mode 0 | 4 | — | Reference target and sigrok, up to 12.5 MHz |
 | `spi_target.trw` | SPI target, mode 0 | 3 | — | Reference controller and sigrok, up to 12.5 MHz |
+| `spi_target_flash.trw` | Volatile read-only 256-byte SPI memory window, mode 0, READ/FAST_READ; high address aliasing, eight fast-read dummy clocks | 12 (1 lane, U0 + U1) | 2 | Model, both RTL simulators and exact official netlist pass at 250/333/500 kHz with abort/restart checks and independent spi/spiflash decoding; [scope and evidence](../docs/reports/PHASE3_SPI_MEMORY.md) |
 | `i2c_controller.trw` | I2C controller: START/rSTART/STOP, read/write, stretching | 11 | 2 | Reference target and sigrok, 100 kHz / 400 kHz / 1 MHz |
 | `i2c_target.trw` | I2C target: address match, read/write | 12 | — | Reference controller and sigrok, 100 kHz / 400 kHz / 1 MHz |
 | `i2c_target_eeprom.trw` | Volatile 256-byte I2C memory, eight-byte page wrap and cached SRAM reads; not full EEPROM electrical/write-cycle emulation | 12 + 11 (2 lanes) | 3 | Model: addresses 0x50/0x2A at 100/400/1000 kHz, repeated START, NACK, wrap and sigrok; [Phase 3 evidence](../docs/reports/PHASE3_I2C_MEMORY.md) |
 | `i2c_target_eeprom_guard.trw` | Separate memory firmware with existing select/abort primitives; uses U0 + U1 and reserves uo7 | 12 + 11 (2 lanes) | 3 | 190 guarded recovery model cases; RTL/exact official netlist timing/recovery and independent RTL peer; [scope and replay status](../docs/reports/PHASE3_I2C_GUARD.md) |
-| `ws2812.trw` | WS2812/SK6812 LED strips (PULSE mode) | 2 | — | Datasheet-tolerance reference decoder and sigrok `rgb_led_ws281x` |
+| `ws2812.trw` | Classic WS2812B timing profile (PULSE mode) | 2 | — | Named Worldsemi timing-table reference decoder and sigrok `rgb_led_ws281x`; other LED variants remain unqualified |
 | `dshot.trw` | DShot150–1200 motor ESCs; checksum computed in a routine | 2 | 1 | Reference decoder (frames, checksums, bit timing) |
-| `ps2_host.trw` | PS/2 host: both directions, parity/framing errors, device ACK check | 12 | 1 | Reference device (Chapweske) and sigrok `ps2` |
+| `ps2_host.trw` | PS/2 host: both directions, parity/framing errors, device ACK check | 12 | 1 | Reference device and raw-clock framing oracle; [pinned upstream sigrok, unmodified captures](../docs/reports/PHASE3_PS2_FRAMING.md) |
 | `onewire.trw` | 1-Wire controller: reset/presence, byte write/read (AN126 standard speed) | 9 | 1 | DS18B20-like device (READ ROM + CRC-8) and sigrok `onewire_link`/`onewire_network` |
+| `onewire_master.trw` | Standard / overdrive profiles, with idle host reload after real speed entry | 9 | 1 | Model, both RTL simulators and exact official netlist pass entry, ROM reads, exit, presence corners and absence; independent decode and a specifically audited stock warning; [scope and evidence](../docs/reports/PHASE3_ONEWIRE_OVERDRIVE.md) |
 | `swd.trw` | SWD controller: DP/AP reads and writes, WAIT handling, turnarounds | 12 | 3 | ADIv5 target model and sigrok `swd`, SWCLK up to 8.3 MHz |
 | `jtag.trw` | JTAG scan engine: TMS/TDI chunks in, TDO chunks out | 8 | — | IEEE 1149.1 TAP model (IDCODE, USER, BYPASS) and sigrok `jtag`, TCK up to 12.5 MHz |
 | `can.trw` | CAN 2.0A/B: 11/29-bit IDs, remote frames, arbitration, ACK, error flags, TEC/REC, passive, bus-off | 12 + 12 (2 lanes) | 7 | Reference CAN 2.0 node (error frames, retries) and sigrok `can`, 125 k / 500 k / 1 Mbit/s |

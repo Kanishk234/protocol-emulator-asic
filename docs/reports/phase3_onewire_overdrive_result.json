@@ -1,0 +1,354 @@
+{
+  "scope": "Finite single-peer ROM-layer standard/overdrive controller interaction and sampled digital timing",
+  "base_commit": "af244724745e959be7f10a04030bef995c91a4ad",
+  "sources_sha256": {
+    "programs/onewire_master.trw": "2253c93fb973df5b3ef997dc8be812c1a3dd14a6dde8d0d753789c5eab556aab",
+    "programs/onewire.trw": "f9daa0b51fd0597f2a9eda4966795a612c6594822189cb8ce8dab71d81a5efea",
+    "tools/protomodels/onewire_overdrive.py": "a3d23cff05e160fef2d818cd3f6277e21c397c673228d660a75912988596f558",
+    "tools/protomodels/onewire.py": "5c45854bfee614b3419045615274601fc4226b25bb6b1e9d88e6a2805eef4a06",
+    "tools/kernels/tests/test_onewire_overdrive.py": "06d9f5e9edaa7bd42a9708e73a59577ef01a24c1f0268ef1ade49a8a9668d900",
+    "test_internal/chip/test_onewire_overdrive.py": "a1cb8591cd6412def509562064c4f40b02222243564471223cd47567b9ff481e",
+    ".github/workflows/unit.yaml": "2a7f4ace12e0060a1de18bfc89302da10338182891ad265ac1df8fec331a7f73",
+    "test_internal/Makefile": "913a681ea26ff06ec42b494716849fd1a374f5046a12c49b9b276fb8d5fa1525"
+  },
+  "profiles": {
+    "0": {
+      "compiled_image_sha256": "1382bfbcf8c4459c23c1cc18cb4bf87bed4c32bafc0a4772282a4915cdcd91a9",
+      "slots": 9,
+      "sram_words": 51,
+      "routines": {
+        "reset": {
+          "index": 0,
+          "words": 19,
+          "max_steps": 19
+        }
+      },
+      "pins": {
+        "U0": {
+          "pin_a": 16,
+          "od": true,
+          "idle": 1,
+          "presc": 50,
+          "txmode": "pulse",
+          "nbits": 8,
+          "order": "lsb",
+          "rx_nbits": 8,
+          "sym0_first": 0,
+          "sym0_t1": 60,
+          "sym0_t2": 10,
+          "sym1_first": 0,
+          "sym1_t1": 6,
+          "sym1_t2": 64
+        }
+      }
+    },
+    "1": {
+      "compiled_image_sha256": "f777a731566b9f5b638d9efd0d1b553899e02ee07b46dedebeef5be4924fd4b3",
+      "slots": 9,
+      "sram_words": 51,
+      "routines": {
+        "reset": {
+          "index": 0,
+          "words": 19,
+          "max_steps": 19
+        }
+      },
+      "pins": {
+        "U0": {
+          "pin_a": 16,
+          "od": true,
+          "idle": 1,
+          "presc": 25,
+          "txmode": "pulse",
+          "nbits": 8,
+          "order": "lsb",
+          "rx_nbits": 8,
+          "sym0_first": 0,
+          "sym0_t1": 15,
+          "sym0_t2": 5,
+          "sym1_first": 0,
+          "sym1_t1": 2,
+          "sym1_t2": 15
+        }
+      }
+    }
+  },
+  "standard_emitted_configuration_and_words_equal_legacy": true,
+  "python": {
+    "full_non_slow_passed": 952,
+    "full_log_sha256": "4b33a77d9af1d4080eb0fd8bf051b865d400e86042c755c437e399d2f48aa8b0",
+    "overdrive_tests": 12,
+    "unmodified_complete_capture_sha256": "ad6b448b7281161571135acc3ef4026ab7a688c4972382eccc948d6d12fac0a5"
+  },
+  "model_waveform_audit": {
+    "clock_ns": 20,
+    "master_reset_low_clocks": 3500,
+    "rom_command_write_low_clocks": [
+      50,
+      50,
+      375,
+      375,
+      50,
+      50,
+      375,
+      375
+    ],
+    "read_low_clocks": [
+      50
+    ],
+    "read_slot_start_separations_clocks": [
+      450
+    ],
+    "read_slots": 64,
+    "sampled_bus": "ideal digital, peer zero released at 2us",
+    "raw_pulses_kept_outside_git": true
+  },
+  "model_waveform_audit_log_sha256": "f62c68209cd1d1be71a3323c8da9d928e6c1fb0bf1405fe3c59fd4736612ad80",
+  "capture_decoder_audits": [
+    {
+      "capture_sha256": "98cca7fa26cd1cfbcb9027366de35a7112015b5f75a34e1b26589717f08fbf05",
+      "network_decode_sha256": "c379711d81fca899655cf7e5e618bbbb0cd2167bce5f9a1d2105bb6b76254d84",
+      "mode_decode_sha256": "8424f397fa9385d0d7714ecdd97277ac883df76bc684fe011085ecdf2689e7f1",
+      "rom_reads": 2,
+      "speed_entries": 1,
+      "speed_exits": 1,
+      "warning": "170805-170780 onewire_link-1: Recovery time not long enoughRecovery too short",
+      "actual_last_rise": 169381,
+      "next_fall": 170805,
+      "synthetic_rise": 170780,
+      "actual_recovery_us": 28.48,
+      "reset_high_us": 48.5,
+      "decoder_artificial_recovery_us": 0.5,
+      "artifact": "verilator"
+    },
+    {
+      "capture_sha256": "98cca7fa26cd1cfbcb9027366de35a7112015b5f75a34e1b26589717f08fbf05",
+      "network_decode_sha256": "c379711d81fca899655cf7e5e618bbbb0cd2167bce5f9a1d2105bb6b76254d84",
+      "mode_decode_sha256": "8424f397fa9385d0d7714ecdd97277ac883df76bc684fe011085ecdf2689e7f1",
+      "rom_reads": 2,
+      "speed_entries": 1,
+      "speed_exits": 1,
+      "warning": "170805-170780 onewire_link-1: Recovery time not long enoughRecovery too short",
+      "actual_last_rise": 169381,
+      "next_fall": 170805,
+      "synthetic_rise": 170780,
+      "actual_recovery_us": 28.48,
+      "reset_high_us": 48.5,
+      "decoder_artificial_recovery_us": 0.5,
+      "artifact": "icarus_rtl"
+    },
+    {
+      "capture_sha256": "98cca7fa26cd1cfbcb9027366de35a7112015b5f75a34e1b26589717f08fbf05",
+      "network_decode_sha256": "c379711d81fca899655cf7e5e618bbbb0cd2167bce5f9a1d2105bb6b76254d84",
+      "mode_decode_sha256": "8424f397fa9385d0d7714ecdd97277ac883df76bc684fe011085ecdf2689e7f1",
+      "rom_reads": 2,
+      "speed_entries": 1,
+      "speed_exits": 1,
+      "warning": "170805-170780 onewire_link-1: Recovery time not long enoughRecovery too short",
+      "actual_last_rise": 169381,
+      "next_fall": 170805,
+      "synthetic_rise": 170780,
+      "actual_recovery_us": 28.48,
+      "reset_high_us": 48.5,
+      "decoder_artificial_recovery_us": 0.5,
+      "artifact": "official_netlist"
+    }
+  ],
+  "decoder_synthetic_controls": {
+    "decoder_source_sha256": "08c440139dd0040a3aef5f0f694cf906e077fb4b08143b34d125f028b1b8a7d6",
+    "controls": [
+      {
+        "actual_recovery_us": 28.5,
+        "reset_release_to_first_slot_us": 48.5,
+        "warnings": "6425-6400 onewire_link-1: Recovery time not long enoughRecovery too short",
+        "capture_sha256": "ec6d1bbd834831dc7a1ae956d2ad2b9f94000793ad546d6020551c85f2103bf5",
+        "log_sha256": "e8075faa561ebbcbb926c6bdf6a222a183cd47066136e0cd9f551298c6c8e52d"
+      },
+      {
+        "actual_recovery_us": 29.5,
+        "reset_release_to_first_slot_us": 49.5,
+        "warnings": "",
+        "capture_sha256": "f856b46b74edc1d744829166603cb09ae9b4a80ffde5eb51dbef8913e81495bd",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "explanation": "Decoder replaces actual last rising edge with end of RSTH, then applies REC to that synthetic timestamp. Both controls meet actual DS2431 recovery and reset-high requirements."
+  },
+  "simulations": {
+    "verilator": {
+      "status": "pass",
+      "tests_passed": 2,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_onewire_speed_entry_read_and_exit",
+          "seconds": 44.11170792579651
+        },
+        {
+          "name": "test_onewire_entry_required_and_presence_corners",
+          "seconds": 22.120099306106567
+        }
+      ],
+      "reset_modes_and_low_clocks": [
+        [
+          false,
+          24000
+        ],
+        [
+          true,
+          3500
+        ],
+        [
+          false,
+          24000
+        ]
+      ],
+      "speed_entries": 1,
+      "rom": [
+        45,
+        145,
+        2,
+        165,
+        126,
+        19,
+        68,
+        127
+      ],
+      "four_presence_corners_and_absence_passed": true,
+      "sigrok_required_for_complete_capture": true,
+      "log_sha256": "91534099c393f771e2c5f04ce2a45a05ac765a4a3a8d48c4eef04f0a59197ca1",
+      "xml_sha256": "ff2c177057f66f5cd954cace6ac8880a1c1bd660e7d3adc5f2dd47ad44cfead2"
+    },
+    "icarus_rtl": {
+      "status": "pass",
+      "tests_passed": 2,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_onewire_speed_entry_read_and_exit",
+          "seconds": 175.180499792099
+        },
+        {
+          "name": "test_onewire_entry_required_and_presence_corners",
+          "seconds": 88.95507192611694
+        }
+      ],
+      "reset_modes_and_low_clocks": [
+        [
+          false,
+          24000
+        ],
+        [
+          true,
+          3500
+        ],
+        [
+          false,
+          24000
+        ]
+      ],
+      "speed_entries": 1,
+      "rom": [
+        45,
+        145,
+        2,
+        165,
+        126,
+        19,
+        68,
+        127
+      ],
+      "four_presence_corners_and_absence_passed": true,
+      "sigrok_required_for_complete_capture": true,
+      "log_sha256": "0d139c0d20a6208d1a1cbe92eb92b1eec94a07c29e32f31aa46ad5ac53439a33",
+      "xml_sha256": "fcb0daca680cbb5a00f85b33d53ed21d48975931b6ed3f73b7a9e8cca8d1c5fd"
+    },
+    "official_netlist": {
+      "status": "pass",
+      "tests_passed": 2,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_onewire_speed_entry_read_and_exit",
+          "seconds": 545.0828590393066
+        },
+        {
+          "name": "test_onewire_entry_required_and_presence_corners",
+          "seconds": 240.7436602115631
+        }
+      ],
+      "reset_modes_and_low_clocks": [
+        [
+          false,
+          24000
+        ],
+        [
+          true,
+          3500
+        ],
+        [
+          false,
+          24000
+        ]
+      ],
+      "speed_entries": 1,
+      "rom": [
+        45,
+        145,
+        2,
+        165,
+        126,
+        19,
+        68,
+        127
+      ],
+      "four_presence_corners_and_absence_passed": true,
+      "sigrok_required_for_complete_capture": true,
+      "log_sha256": "8faaf9c16ad9959d8b5aec6738c86ee8fac96da8e82362edbecd76ecd6a1d9f5",
+      "xml_sha256": "8dffd7b574a03b58f28ed24ba412333d86ca23448b7f6282a18bbcbab753d0ae"
+    }
+  },
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "sdf_annotated": false,
+  "silicon_tested": false,
+  "phase3_complete": false,
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008"
+  },
+  "previous_firmware_images": {
+    "unchanged_count": 23,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816",
+      "spi_target_flash.trw": "44cf6326be28ad2f97eae83a2deb9c4f3458d2942b60e789bd4e3bc043ebbf47"
+    },
+    "new_programs": 1
+  }
+}

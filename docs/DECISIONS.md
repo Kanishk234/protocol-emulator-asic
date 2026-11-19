@@ -2042,3 +2042,54 @@ Keep i2c_target_eeprom.trw as the one-unit example and add i2c_target_eeprom_gua
 Cost: one existing lean unit U1, reserved output uo7, one additional L0 constant and r0 for the eight-bit length token. Both lanes still use12/11slots and304/512SRAMwords. No additional cells, RTL/config/spec/macros changes, external jumper or official workflow edit. The qualified physical baseline remains fixed. This does not authorize a hardware or architecture extension.
 
 Model and RTL evidence, negative control, limitations and exact-netlist replay status are in reports/PHASE3_I2C_GUARD.md. The phase-specific compiler bound remains open, so no Phase3exit checkbox is completed by this choice.
+
+## D-187 (2026-11-18): SPI memory reads use existing linked units and a boundary wait
+
+General need: turn a command/address byte stream into indexed SRAM replies,
+with the first reply aligned to a following external clock boundary. Implement
+this as firmware on linked RX and preloaded linked TX, using the existing WAIT
+command for the final header/dummy falling edge. No dedicated protocol block,
+RTL, ISA, macro, physical configuration or official workflow change.
+
+The showcase personality accepts READ 03 and FAST_READ 0B, three address bytes
+and one dummy byte for FAST_READ. Its 256-byte volatile window aliases the high
+16 address bits and wraps within that window. The host replaces the read image
+while halted. Program/erase/status/ID and nonvolatile retention are outside the
+personality; header/dummy MISO is unspecified and may be driven while selected.
+
+Cost: one lane, all12reflex slots, two existing pin units (U0 RX/U1 TX),300of512
+SRAM words including the256-word byte table, and four K entries. Initial tested
+operating scope is mode0, at most500kHzSCKat50MHz,8clockCSsetup and128clockCSgap;
+faster model experiments do not extend RTL/netlist qualification. The first-reply
+wait prevents early preloading from losing a bit at the last header fall. Keeping
+that boundary in firmware preserves the general pin primitives for other uses.
+
+## D-188 (2026-11-18): 1-Wire rates are firmware timing profiles with explicit mode entry
+
+General need: change an open-drain pulse/sample controller's timing while keeping
+the attached peer's state. Add onewire_master.trw with standard and overdrive
+profiles using existing PULSE, timed LEVEL/SAMPLE/GAP, RX length and host reload
+primitives. Keep the original onewire.trw unchanged; the new default profile's
+encoded pin configuration, slots, constants and SRAM words are identical to it.
+No RTL, ISA, macro, clock/signoff setting or official workflow change.
+
+Overdrive uses a0.5ustick with separately chosen timings from AN126, rather than
+uniformly dividing the standard waveform by ten. A standard-speed3Ccommand
+enters overdrive on the external ROM-layer peer; an overdrive reset then allows
+ROM commands at the faster rate. A standard reset exits overdrive. The host
+halts/reloads only when the controller timeline is idle; tests keep the peer
+alive across reloads and do not reset its mode to manufacture success.
+
+Cost per loaded profile:1lane,9slots,U0(the existing full PULSE-capable unit),
+4Kentries and51SRAMwords including the entry table/19-word reset routine.
+Overdrive uses a70usreset,8.5uspresence sample and a2.5uspre-reset gap; this
+provides the required recovery after a preceding write-zero. Scope is ideal
+digital single-peer ROM-layer interaction and controller waveform timing, not
+EEPROM memory functions, multidrop discovery, parasite power or analog rise-time
+qualification. The DS18B20-like standard-only model remains separate.
+
+## D-189: Demonstrate multicast UART capture/echo with existing lanes (2026-11-19)
+
+General need: one validated event stream must reach two independent consumers without duplicating the producer's protocol parser. `uart_bridge_capture.trw` uses existing blocking multicast from L0.O1 to HOST_OUT and L1.I0. L0 validates raw UART frames; L1 re-frames DATA for TX and consumes ERR without echo. The host receives every processed DATA/ERR token in order. This is a host capture stream, not the deferred SRAM CAPTURE helper.
+
+Cost: both existing lanes, three L0 slots, two L1 slots, two K entries in L0, existing U0 shift TX and U1 shift RX; no SRAM routine/data allocation, new unit, ISA, RTL or physical configuration. Baud is a firmware parameter; demonstration profiles are 115200 and460800 at50MHz. Blocking capture makes host service part of the workload contract. The chip has no external UART flow control; sustained traffic with an unserviced host can overrun RX and must never be described as lossless recording. Test scope and replay status are in PHASE3_UART_MULTICAST.md. No architecture or hardware change is adopted.

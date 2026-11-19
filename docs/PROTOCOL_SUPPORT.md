@@ -33,6 +33,27 @@ No real-hardware testing is claimed. USB/Ethernet model work is not an ASIC supp
 
 ## Additional Phase 3 showcase
 
-The SRAM-backed I2C memory personality is verified separately from the historical 22-case run. It passes the independent model, chip RTL and the exact official final netlist at 400 kHz and 1 MHz, including the short-high waveform, with required sigrok decoding. See [its scope and hashed evidence](reports/PHASE3_I2C_MEMORY.md). This is volatile immediate-write memory, not full EEPROM conformance; the [independent RTL peer](reports/PHASE3_I2C_PEER.md) now passes, while the compiler-bound task remains open.
+The SRAM-backed I2C memory personality is verified separately from the historical 22-case run. It passes the independent model, chip RTL and the exact official final netlist at 400 kHz and 1 MHz, including the short-high waveform, with required sigrok decoding. See [its scope and hashed evidence](reports/PHASE3_I2C_MEMORY.md). This is volatile immediate-write memory, not full EEPROM conformance; the [independent RTL peer](reports/PHASE3_I2C_PEER.md) passes. The [guarded deadline evidence](reports/PHASE3_I2C_DEADLINE_EVIDENCE.md) now combines conditional compiler bounds and observed workload premises for the finite I2C showcase checkpoint. Generalized arrival/deadlock certificates remain open.
 
 A separate [guarded memory personality](reports/PHASE3_I2C_GUARD.md) uses existing U1 and reserved output uo7 for select/abort recovery. Its finite recovery tests and replay status are recorded separately; the original one-unit example retains its documented late-ACK limitation. No hardware or full protocol-conformance claim is added.
+
+The [SPI memory personality](reports/PHASE3_SPI_MEMORY.md) serves READ/FAST_READ
+from a host-loaded 256-byte volatile window using one lane and two existing
+units. Model, both RTL simulators and the exact official final netlist pass at
+250/333/500 kHz, including dummy/address/wrap checks and tested abort recovery.
+Independent spi/spiflash decoding validates complete captures. Mode, CS timing,
+address aliasing and unspecified header output are explicit in the report; this
+is a read-only command subset with no program/erase or nonvolatile behavior.
+
+The [1-Wire master profiles](reports/PHASE3_ONEWIRE_OVERDRIVE.md) pass genuine
+standard-speed overdrive entry, idle host reload, overdrive reset/ROM read and
+standard reset/exit on model, both RTL simulators and the exact official netlist.
+The ROM-layer peer, presence/absence cases and independent unmodified decoding
+are documented separately from the retained standard-only example. One stock
+decoder recovery warning has a reproduced timestamp-bookkeeping cause and
+explicit edge evidence; analog bus behavior and other device functions remain
+outside the claim.
+
+PS/2 now has [explicit framing-fault and raw-capture evidence](reports/PHASE3_PS2_FRAMING.md): 144 model scenarios plus three focused tests passing on both RTL simulators and the exact official netlist. The recorder-only clock workaround is removed; an unmodified pinned upstream sigrok decoder checks actual captures. The raw-clock oracle covers malformed starts separately. Retained WS2812 evidence applies to the classic WS2812B table, and DShot to the named rates/checker tolerances; neither establishes universal device compatibility. The separate all-L3-sigrok gate remains open.
+
+The [UART multicast showcase](reports/PHASE3_UART_MULTICAST.md) passes both 115200/460800 profiles on both RTL simulators and the exact official netlist: validated bytes and raw framing-error tokens go to the host, while a second lane echoes only valid bytes. Host capture is blocking and needs servicing; it is not an SRAM recorder or unbounded buffering. Six output captures independently decode.

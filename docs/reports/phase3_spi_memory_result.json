@@ -1,0 +1,378 @@
+{
+  "scope": "Volatile read-only SPI memory personality; mode0 READ/FAST_READ, tested500kHz ceiling",
+  "base_commit": "af244724745e959be7f10a04030bef995c91a4ad",
+  "sources_sha256": {
+    "programs/spi_target_flash.trw": "1474ec2b98c94eb64b7543f1f7ff4bae0534c8e9db3966b19dea801e40746fc6",
+    "tools/protomodels/spi_flash.py": "0870a742881700cfe3f968aaf9dec918b7b43c5f8a2b5806e2ff6e7ce113c3ce",
+    "tools/kernels/tests/test_spi_flash.py": "81defe52f74473b4080ecd353d649008224483bc6c031e2cad0b13085c75a44b",
+    "test_internal/chip/test_spi_flash.py": "f9bde4f97785af7cb741c6250abec4aea45e96f6f81559adbe2cd7f4c0e50b74",
+    ".github/workflows/unit.yaml": "d9f8190b30213727fe02ad779fb814b50e44daab97fed163c480e3984b60f5c2",
+    "test_internal/Makefile": "126b1f78419272520eb773e62cfa7ba8cd09f5fdf9cd09e697d6460a3d1b3c7e"
+  },
+  "compiled_image_sha256": "44cf6326be28ad2f97eae83a2deb9c4f3458d2942b60e789bd4e3bc043ebbf47",
+  "resources": {
+    "lanes": 1,
+    "slots_L0": 12,
+    "units": [
+      "U0",
+      "U1"
+    ],
+    "sram_words": 300,
+    "data_bytes": 256,
+    "routines": {
+      "fetch": {
+        "index": 0,
+        "words": 4,
+        "max_steps": 5
+      },
+      "advance": {
+        "index": 1,
+        "words": 8,
+        "max_steps": 9
+      }
+    }
+  },
+  "interface": {
+    "chip_clock_ns": 20,
+    "half_clocks": [
+      50,
+      75,
+      100
+    ],
+    "cs_setup_clocks": 8,
+    "cs_gap_clocks": 128,
+    "address_alias_bits": "23:8",
+    "mode": 0,
+    "header_miso": "unspecified; may drive while selected"
+  },
+  "python": {
+    "full_non_slow_passed": 939,
+    "full_log_sha256": "8a777c2d562abfd64cc6ba6900a7208d78d59e5ae22983876dd44d736e27ff28",
+    "full_spi_test_source_sha256_before_phase_clarification": "d798b02809d8a1983a4eb2f2061ccc12e580c3981ee5f28dbe1aa7a74980caed",
+    "final_focused_phase_tests_passed": 4,
+    "phase_log_sha256": "dcb8dfccb801a38b19e169680ac9fa7c3217108ecd47cadd2d9eceb1da39bb76",
+    "note": "After the full run, phase variation was clarified to shift the model SRAM rotation directly with the same wire waveform. All four affected cases were rerun; firmware and RTL test images are unchanged."
+  },
+  "model_speed_experiment": [
+    {
+      "half_clocks": 20,
+      "sck_hz_at_50MHz": 1250000.0,
+      "status": "counterexample",
+      "reason": "SPI memory data mismatch"
+    },
+    {
+      "half_clocks": 25,
+      "sck_hz_at_50MHz": 1000000.0,
+      "status": "counterexample",
+      "reason": "SPI memory data mismatch"
+    },
+    {
+      "half_clocks": 30,
+      "sck_hz_at_50MHz": 833333.3333333334,
+      "status": "counterexample",
+      "reason": "SPI memory data mismatch"
+    },
+    {
+      "half_clocks": 32,
+      "sck_hz_at_50MHz": 781250.0,
+      "status": "pass"
+    },
+    {
+      "half_clocks": 34,
+      "sck_hz_at_50MHz": 735294.1176470588,
+      "status": "pass"
+    },
+    {
+      "half_clocks": 36,
+      "sck_hz_at_50MHz": 694444.4444444445,
+      "status": "pass"
+    },
+    {
+      "half_clocks": 38,
+      "sck_hz_at_50MHz": 657894.7368421053,
+      "status": "pass"
+    },
+    {
+      "half_clocks": 40,
+      "sck_hz_at_50MHz": 625000.0,
+      "status": "pass"
+    },
+    {
+      "half_clocks": 45,
+      "sck_hz_at_50MHz": 555555.5555555555,
+      "status": "pass"
+    },
+    {
+      "half_clocks": 50,
+      "sck_hz_at_50MHz": 500000.0,
+      "status": "pass"
+    }
+  ],
+  "model_speed_log_sha256": "6c48158f8649fd54d2f90719e43b756ccc9be1a2b55a2d9e7b1fa1d86455219d",
+  "spiflash_capture_audit": [
+    {
+      "simulator": "Verilator",
+      "half_clocks": 50,
+      "capture_sha256": "6b4679cf21276cfa1259dd2dcb819b4a75b40d3f986df9dffeaeba67eca5e0fb",
+      "decode_log_sha256": "a27a30180c1b34f26d47b2026639ec1d90511f15c56794ff1555a6dd0260d651",
+      "decoded_read_transactions": 4,
+      "payload_bytes_checked": 48,
+      "dummy_bytes_checked": [
+        165,
+        255
+      ]
+    },
+    {
+      "simulator": "Verilator",
+      "half_clocks": 75,
+      "capture_sha256": "b80f66335c6b8953d68eb8a052ff6a55669a34c800768aadf9587dd7dc14db68",
+      "decode_log_sha256": "a27a30180c1b34f26d47b2026639ec1d90511f15c56794ff1555a6dd0260d651",
+      "decoded_read_transactions": 4,
+      "payload_bytes_checked": 48,
+      "dummy_bytes_checked": [
+        165,
+        255
+      ]
+    },
+    {
+      "simulator": "Verilator",
+      "half_clocks": 100,
+      "capture_sha256": "09387d47e24088719b1c02724763a05077f9447e63966bc186a1bb318aefeed1",
+      "decode_log_sha256": "a27a30180c1b34f26d47b2026639ec1d90511f15c56794ff1555a6dd0260d651",
+      "decoded_read_transactions": 4,
+      "payload_bytes_checked": 48,
+      "dummy_bytes_checked": [
+        165,
+        255
+      ]
+    },
+    {
+      "simulator": "Icarus_Verilog",
+      "half_clocks": 50,
+      "capture_sha256": "6b4679cf21276cfa1259dd2dcb819b4a75b40d3f986df9dffeaeba67eca5e0fb",
+      "decode_log_sha256": "a27a30180c1b34f26d47b2026639ec1d90511f15c56794ff1555a6dd0260d651",
+      "decoded_read_transactions": 4,
+      "payload_bytes_checked": 48,
+      "dummy_bytes_checked": [
+        165,
+        255
+      ]
+    },
+    {
+      "simulator": "Icarus_Verilog",
+      "half_clocks": 75,
+      "capture_sha256": "b80f66335c6b8953d68eb8a052ff6a55669a34c800768aadf9587dd7dc14db68",
+      "decode_log_sha256": "a27a30180c1b34f26d47b2026639ec1d90511f15c56794ff1555a6dd0260d651",
+      "decoded_read_transactions": 4,
+      "payload_bytes_checked": 48,
+      "dummy_bytes_checked": [
+        165,
+        255
+      ]
+    },
+    {
+      "simulator": "Icarus_Verilog",
+      "half_clocks": 100,
+      "capture_sha256": "09387d47e24088719b1c02724763a05077f9447e63966bc186a1bb318aefeed1",
+      "decode_log_sha256": "a27a30180c1b34f26d47b2026639ec1d90511f15c56794ff1555a6dd0260d651",
+      "decoded_read_transactions": 4,
+      "payload_bytes_checked": 48,
+      "dummy_bytes_checked": [
+        165,
+        255
+      ]
+    }
+  ],
+  "simulations": {
+    "verilator": {
+      "status": "pass",
+      "completed_observations": [
+        {
+          "label": "reads_50",
+          "half_clocks": 50,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 45
+        },
+        {
+          "label": "reads_75",
+          "half_clocks": 75,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 70
+        },
+        {
+          "label": "reads_100",
+          "half_clocks": 100,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 95
+        },
+        {
+          "label": "aborts",
+          "half_clocks": 50,
+          "transfers": 44,
+          "data_bits": 1469,
+          "setup_lower_clocks": 45
+        }
+      ],
+      "sigrok_required_for_complete_rate_captures": true,
+      "cases": [
+        {
+          "name": "test_spi_memory_reads",
+          "failed": false,
+          "skipped": false,
+          "seconds": 29.907946825027466
+        },
+        {
+          "name": "test_spi_memory_abort_recovery",
+          "failed": false,
+          "skipped": false,
+          "seconds": 27.345965147018433
+        }
+      ],
+      "log_sha256": "0f6241baf6b0e8b2c0fee033f17e015ba676781675105db005671e5d1ec61df7",
+      "xml_sha256": "88dc617bd1177a59c4ccaf44645d3cd57e73e7cf1c23bfe46c1a502189087a5e"
+    },
+    "icarus_rtl": {
+      "status": "pass",
+      "completed_observations": [
+        {
+          "label": "reads_50",
+          "half_clocks": 50,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 45
+        },
+        {
+          "label": "reads_75",
+          "half_clocks": 75,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 70
+        },
+        {
+          "label": "reads_100",
+          "half_clocks": 100,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 95
+        },
+        {
+          "label": "aborts",
+          "half_clocks": 50,
+          "transfers": 44,
+          "data_bits": 1469,
+          "setup_lower_clocks": 45
+        }
+      ],
+      "sigrok_required_for_complete_rate_captures": true,
+      "cases": [
+        {
+          "name": "test_spi_memory_reads",
+          "failed": false,
+          "skipped": false,
+          "seconds": 122.16628217697144
+        },
+        {
+          "name": "test_spi_memory_abort_recovery",
+          "failed": false,
+          "skipped": false,
+          "seconds": 114.2750985622406
+        }
+      ],
+      "log_sha256": "eb55e07724759d6831bfc0a125ce2486bba249ae65195bce69bf8ba422ce3572",
+      "xml_sha256": "37aa8f3ff183d5491040ca4de085abeed2cdc0e4c6eb3d8816ae2e176973b97a"
+    },
+    "official_netlist": {
+      "status": "pass",
+      "completed_observations": [
+        {
+          "label": "reads_50",
+          "half_clocks": 50,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 45
+        },
+        {
+          "label": "reads_75",
+          "half_clocks": 75,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 70
+        },
+        {
+          "label": "reads_100",
+          "half_clocks": 100,
+          "transfers": 4,
+          "data_bits": 384,
+          "setup_lower_clocks": 95
+        },
+        {
+          "label": "aborts",
+          "half_clocks": 50,
+          "transfers": 44,
+          "data_bits": 1469,
+          "setup_lower_clocks": 45
+        }
+      ],
+      "sigrok_required_for_complete_rate_captures": true,
+      "cases": [
+        {
+          "name": "test_spi_memory_reads",
+          "failed": false,
+          "skipped": false,
+          "seconds": 369.91429901123047
+        },
+        {
+          "name": "test_spi_memory_abort_recovery",
+          "failed": false,
+          "skipped": false,
+          "seconds": 296.1917939186096
+        }
+      ],
+      "log_sha256": "bd93fc8132672b8641c72585581c6cc4b000579669d33c052a538ca70d7ffaee",
+      "xml_sha256": "0fc0f813c3b071a6c1272c438f46fb0951fb4999e0b1e15b43c00252506272ab"
+    }
+  },
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "phase3_complete": false,
+  "full_gate_replay_complete": true,
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008",
+    "sdf_annotated": false
+  },
+  "previous_firmware_images": {
+    "unchanged_count": 22,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816"
+    },
+    "reference_receipt": "phase3_reaction_selection_result.json",
+    "new_program_count": 1
+  }
+}

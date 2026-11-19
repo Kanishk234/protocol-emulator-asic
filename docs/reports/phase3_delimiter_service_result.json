@@ -1,0 +1,359 @@
+{
+  "scope": "Conditional finite reflex budget and finite multicast/guard observations; no wire-origin arrival proof",
+  "base_commit": "af244724745e959be7f10a04030bef995c91a4ad",
+  "sources_sha256": {
+    "tools/tripc/service.py": "a32f6e29356d5078c655469e8a462645e96a21069dbbc062080c7cb34909478d",
+    "tools/tripc/tests/test_delimiter_service.py": "85293fcefd55f11168c66f87ca9fd273a66b31377a6a7889f357f4aaf2c2b60f",
+    "test_internal/lane/test_response_contracts.py": "82cd8bc002364ee372b521ec0ebfd9d95d5ffeac0614090b45a1522434ed8799",
+    "programs/i2c_target_eeprom_guard.trw": "de605e839863f6115c821cd344e06bb66e7334812c5f15a4ae9c77ef4ac36613"
+  },
+  "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+  "arrival_invariants_proven": false,
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "bounds": {
+    "refresh": {
+      "0": {
+        "status": "conditional_bound",
+        "bound_clocks": 19,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "No reflex action is selected until RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 0,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 2,
+        "data_reads": 1,
+        "data_writes": 0,
+        "entry_reads": 1,
+        "sram_accesses": 4,
+        "data_write_nonalias_proven": true
+      },
+      "1": {
+        "status": "conditional_bound",
+        "bound_clocks": 23,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "At most 1 reflex actions are selected before RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 1,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 2,
+        "data_reads": 1,
+        "data_writes": 0,
+        "entry_reads": 1,
+        "sram_accesses": 4,
+        "data_write_nonalias_proven": true
+      },
+      "2": {
+        "status": "conditional_bound",
+        "bound_clocks": 27,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "At most 2 reflex actions are selected before RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 2,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 2,
+        "data_reads": 1,
+        "data_writes": 0,
+        "entry_reads": 1,
+        "sram_accesses": 4,
+        "data_write_nonalias_proven": true
+      }
+    },
+    "store_byte": {
+      "0": {
+        "status": "conditional_bound",
+        "bound_clocks": 51,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "No reflex action is selected until RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 0,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 9,
+        "data_reads": 1,
+        "data_writes": 1,
+        "entry_reads": 1,
+        "sram_accesses": 12,
+        "data_write_nonalias_proven": false
+      },
+      "1": {
+        "status": "conditional_bound",
+        "bound_clocks": 55,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "At most 1 reflex actions are selected before RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 1,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 9,
+        "data_reads": 1,
+        "data_writes": 1,
+        "entry_reads": 1,
+        "sram_accesses": 12,
+        "data_write_nonalias_proven": false
+      },
+      "2": {
+        "status": "conditional_bound",
+        "bound_clocks": 59,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "At most 2 reflex actions are selected before RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 2,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 9,
+        "data_reads": 1,
+        "data_writes": 1,
+        "entry_reads": 1,
+        "sram_accesses": 12,
+        "data_write_nonalias_proven": false
+      }
+    },
+    "advance_read": {
+      "0": {
+        "status": "conditional_bound",
+        "bound_clocks": 31,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "No reflex action is selected until RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 0,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 5,
+        "data_reads": 1,
+        "data_writes": 0,
+        "entry_reads": 1,
+        "sram_accesses": 7,
+        "data_write_nonalias_proven": true
+      },
+      "1": {
+        "status": "conditional_bound",
+        "bound_clocks": 35,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "At most 1 reflex actions are selected before RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 1,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 5,
+        "data_reads": 1,
+        "data_writes": 0,
+        "entry_reads": 1,
+        "sram_accesses": 7,
+        "data_write_nonalias_proven": true
+      },
+      "2": {
+        "status": "conditional_bound",
+        "bound_clocks": 39,
+        "compiled_image_sha256": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+        "assumptions": [
+          "CALL has just been selected on a running lane with an initially idle routine pipeline.",
+          "The lane owns one SRAM slot in every four clocks; no host/configuration writes occur.",
+          "At most 2 reflex actions are selected before RET completes; the routine is not halted or stepped.",
+          "Data writes do not alias the entry table or executed routine words; encoded instructions remain unchanged.",
+          "This is a service envelope, not a proof of queue freedom, arrival spacing or protocol deadlines."
+        ],
+        "arrival_invariants_proven": false,
+        "reflex_budget": 2,
+        "reflex_budget_proven": false,
+        "instruction_fetches": 5,
+        "data_reads": 1,
+        "data_writes": 0,
+        "entry_reads": 1,
+        "sram_accesses": 7,
+        "data_write_nonalias_proven": true
+      }
+    }
+  },
+  "model": {
+    "cases": 1616,
+    "routines": {
+      "refresh": {
+        "clocks": 20,
+        "consumed_before_ret": 2,
+        "bound": 27,
+        "memory_accept": 1,
+        "guard_accept": 1,
+        "guard_settled": 25
+      },
+      "store_byte": {
+        "clocks": 52,
+        "consumed_before_ret": 2,
+        "bound": 59,
+        "memory_accept": 1,
+        "guard_accept": 1,
+        "guard_settled": 25
+      },
+      "advance_read": {
+        "clocks": 32,
+        "consumed_before_ret": 2,
+        "bound": 39,
+        "memory_accept": 1,
+        "guard_accept": 1,
+        "guard_settled": 25
+      }
+    },
+    "guard_settled_by_burst": {
+      "0x3009": 21,
+      "0x3002": 7,
+      "0x3009,0x3002": 25,
+      "0x3002,0x3009": 25
+    },
+    "negative_control": {
+      "normal": {
+        "clocks": 51,
+        "consumed_before_ret": 2,
+        "bound": 59,
+        "memory_accept": 1,
+        "guard_accept": 1,
+        "guard_settled": 25
+      },
+      "rb_gated": {
+        "clocks": 51,
+        "consumed_before_ret": 0,
+        "bound": 59,
+        "memory_accept": 50,
+        "guard_accept": 1,
+        "guard_settled": 58
+      }
+    },
+    "metrics_sha256": "b069d7bb13421bfbb91894c4aa2bc1751bcd294c19926be761855b309d218e5f",
+    "domain": "Three routines, four rotation offsets, four command bursts, every zero-interference-envelope clock; pointer7/payload0xA5. L0 halted, real L0.O1 producer and both subscribers retained.",
+    "guard_metrics_are_model_only": true
+  },
+  "python": {
+    "focused_passed": 54,
+    "focused_log_sha256": "a353328093c423b8a67cb3475541ca8fe581b9ec104266dbeb5804cc3349b695",
+    "full_non_slow_passed": 810,
+    "full_log_sha256": "ae41d0798712a8ed100bd1c476ff236315147eaf31b6638e5ccb653f4fbcee6e"
+  },
+  "rtl": {
+    "icarus": {
+      "tests_passed": 3,
+      "cases": [
+        {
+          "name": "test_compiler_ack_token_bounds",
+          "seconds": 9.556778907775879
+        },
+        {
+          "name": "test_compiler_memory_routine_service",
+          "seconds": 0.94083571434021
+        },
+        {
+          "name": "test_compiler_delimiter_interference",
+          "seconds": 17.748576402664185
+        }
+      ],
+      "injection_cases": 1616,
+      "maxima_clocks": {
+        "refresh": 20,
+        "store_byte": 52,
+        "advance_read": 32
+      },
+      "retained_ack_token_cases": 2080,
+      "retained_service_cases": 96,
+      "guard_present": false,
+      "log_sha256": "a706b4c5a49151dcf6cdc172e8bb3b5c3faf6fda419db7e0443ad4ab04a5c2f2",
+      "xml_sha256": "ce81e8f78ffed8dbcc1cd2def2e5ea00f3c47bed24fe9bf8fa004ce61453c5ce"
+    },
+    "verilator": {
+      "tests_passed": 3,
+      "cases": [
+        {
+          "name": "test_compiler_ack_token_bounds",
+          "seconds": 3.34551739692688
+        },
+        {
+          "name": "test_compiler_memory_routine_service",
+          "seconds": 0.4255383014678955
+        },
+        {
+          "name": "test_compiler_delimiter_interference",
+          "seconds": 7.088120937347412
+        }
+      ],
+      "injection_cases": 1616,
+      "maxima_clocks": {
+        "refresh": 20,
+        "store_byte": 52,
+        "advance_read": 32
+      },
+      "retained_ack_token_cases": 2080,
+      "retained_service_cases": 96,
+      "guard_present": false,
+      "log_sha256": "9bcd8937194dc00486d297ab1c50d93f54448b02702624b45e6f2b34527ca8b2",
+      "xml_sha256": "851b8b53f42a7dc673efe1a4771ab8475c10548350374865c00ea9d0c3ad9180"
+    }
+  },
+  "unchanged_images": {
+    "count": 22,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816"
+    },
+    "reference_receipt": "phase3_reaction_selection_result.json"
+  }
+}

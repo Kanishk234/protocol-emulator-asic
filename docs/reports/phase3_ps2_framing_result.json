@@ -1,0 +1,357 @@
+{
+  "scope": "Finite PS/2 framing and raw-capture checks; no hardware change, SDF or universal malformed-stream claim",
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008"
+  },
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "phase3_complete": false,
+  "sources_sha256": {
+    "tools/sigrok_support.py": "da9f59d7efb36715967e90b887947d24eaddf3267f8285a93b5030245788ecaf",
+    "tools/protomodels/ps2.py": "218167d8a1e841520e60fcddb187aab9521269e9d77a44bfb380a35a1870d6a4",
+    "tools/kernels/ps2_checks.py": "9cb391100371f0b65af2c21c3d159ae7beccdcbfda46d180a1d8e6caecb4dcb2",
+    "tools/kernels/tests/test_ps2.py": "17e815eeb4c8b42807c6996ac26038296a15fc0a6b9215c0c558ee7c7d134c42",
+    "tools/kernels/tests/test_ps2_framing.py": "f86dee14563b7bf9efffe0e7bcedeb870775e6ff325986340f9d776611ee359f",
+    "tools/kernels/tests/test_sigrok_ps2.py": "59d4ae2f80513dae9761cd57691fa0381cfbb5a2b7de6eef55809ebfd03468ee",
+    "tools/kernels/tests/test_sigrok_support.py": "de6f88b4289634c293ea28cb3ac7d99daf20da521b2bbfb25b85ca50a9032c5b",
+    "test_internal/chip/chiplib.py": "4a3cb78f8a6a932383b27b07132d8380b6dfb43f589805ff11de36646ba34df2",
+    "test_internal/chip/test_l3.py": "a26fbac50619c0638985196918f49f1f21dd8f141d13cb9841cb4c2f28533144",
+    "test_internal/chip/test_ps2_framing.py": "7634a24e5720de84a51e4ea703ccbf4a35b673fb0481d1479f5f139dcd040f87",
+    "test_internal/Makefile": "226fad0322da0db99d98975946ac12aebc1485abef173eaff7ddac88c98ec1b1",
+    ".github/workflows/unit.yaml": "f70381723fe990500c4ec8b2b87c3ace67c19d65500e31eb0b5ea394dcfc0b10",
+    "test_internal/vendor/libsigrokdecode_ps2/PROVENANCE.json": "dcb6934ae0b29658d82947e87c1a421e39cce8e973589d60ca35db4bb03c980c",
+    "programs/ws2812.trw": "7039a514d0a7cdc628b9aae554b3fdb914b4fcff235b06904e644d5b127a45b7"
+  },
+  "previous_firmware_images": {
+    "unchanged_count": 24,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816",
+      "spi_target_flash.trw": "44cf6326be28ad2f97eae83a2deb9c4f3458d2942b60e789bd4e3bc043ebbf47",
+      "onewire_master.trw": "1382bfbcf8c4459c23c1cc18cb4bf87bed4c32bafc0a4772282a4915cdcd91a9"
+    }
+  },
+  "vendor": {
+    "repository": "https://github.com/sigrokproject/libsigrokdecode",
+    "revision": "71f451443029322d57376214c330b518efd84f88",
+    "license": "GPL-2.0-or-later (per decoder headers; upstream COPYING retained)",
+    "license_file": "COPYING",
+    "scope": "Unmodified upstream PS/2 decoder for verification only; excluded from ASIC sources. Completes device-to-host frames on their real final rising edge.",
+    "files": {
+      "ps2/pd.py": {
+        "upstream_path": "decoders/ps2/pd.py",
+        "sha256": "c3140a2f9cbbdbbc607901967b8741de94616e1a76d4159ea05d98a7ffaaf1f8"
+      },
+      "ps2/__init__.py": {
+        "upstream_path": "decoders/ps2/__init__.py",
+        "sha256": "4d001bf46eaaf049818722d0d2232ba5dbb90152c8399f31d70af779f6c1bdea"
+      },
+      "COPYING": {
+        "upstream_path": "COPYING",
+        "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903"
+      }
+    }
+  },
+  "model_matrix": {
+    "scenarios": 144,
+    "frames": 288,
+    "half_period_clocks": [
+      1500,
+      2000,
+      2500
+    ],
+    "byte_patterns": [
+      0,
+      255,
+      90,
+      165,
+      1,
+      128
+    ],
+    "fault_combinations": 8,
+    "clean_recovery_each": true,
+    "scratch_mask_negative_rejected": true
+  },
+  "python": {
+    "non_slow_passed": 1117,
+    "seconds": 190.65,
+    "full_log_sha256": "ee7efcc6ea6a878d93db360a6022163a97a7d7100633166a52de6a321d75e85f",
+    "focused_framing_passed": 146,
+    "decoder_fixture_passed": 16,
+    "helper_passed": 3
+  },
+  "decoder_control": {
+    "capture_sha256": "e822003ae43c4877f91701261efd888bbc7c0ae4a30f93f1150b1ce3e844e2b2",
+    "falling_edges": 11,
+    "stock_decoder_sha256": "a9e766496e7e1236d1417e3853bb90f6778c207bd03dbde7b187a6695300aea8",
+    "stock_emitted_words": 0,
+    "pinned_emitted_words": [
+      90
+    ],
+    "stock_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pinned_log_sha256": "71b0fc4f67b55981aa189aa5197a0dafaa9ab6ff677a1994fe8de5c7edef7d0e",
+    "waveform_modified_between_decoders": false
+  },
+  "retained_qualified_scenarios": {
+    "run": 44123392388,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "rtl_unit_run": 44189195981,
+    "qualified_unit_workflow_sha256": "ba54de3b11a270f602c07a92ed18ffbf6bdac78a42f75f52815566effb4a4ec5",
+    "AST_identity": {
+      "test_l3_ws2812_tx": {
+        "unchanged_AST_sha256": "9307bbc78b3111f58297d8e1cbd91ae7ddc107631a8a5a8d429ae9f004a449d1"
+      },
+      "test_l3_dshot_tx": {
+        "unchanged_AST_sha256": "366e8bc2373071a144f7549b4d6e5c03e6fa3e7940de719bd0860c9799eb667b"
+      },
+      "test_l3_ps2_host_to_device": {
+        "unchanged_AST_sha256": "8b4325b1f0cf7df8f252cfb38ad5193fc760974bd93aba615219cdbc2e3c840a"
+      }
+    },
+    "WS2812_scope": "Classic Worldsemi WS2812B timing table; other variants unqualified",
+    "DShot_scope": "Five payload/telemetry pairs at 150/300/600/1200 program rates; checksum and declared checker tolerances; no sigrok DShot decoder installed"
+  },
+  "simulations": {
+    "verilator": {
+      "status": "pass",
+      "selected_passed": 3,
+      "selected_failures": 0,
+      "selected_skips": 0,
+      "unrelated_filtered": 20,
+      "cases": [
+        {
+          "name": "test_ps2_framing_and_unmodified_capture",
+          "seconds": 62.96993064880371
+        },
+        {
+          "name": "test_l3_ps2_device_to_host",
+          "seconds": 25.587666034698486
+        },
+        {
+          "name": "test_l3_ps2_host_to_device",
+          "seconds": 16.129626989364624
+        }
+      ],
+      "xml_sha256": "26664d395ffe6eeecfbf7f462f4938f49ad85bda466a3160e16d23dac858e076",
+      "log_sha256": "6759842c94941b9f860ff3cd2d64ed3709f5ad3c6482212edbf0d05f537ddc17",
+      "matrix": {
+        "clocked_frames": 16,
+        "clock_falls": 176,
+        "ERR": 7,
+        "DATA": 9,
+        "clean_recovery_frames": 8,
+        "sigrok_valid_start_prefix_frames": 8
+      }
+    },
+    "icarus_rtl": {
+      "status": "pass",
+      "selected_passed": 3,
+      "selected_failures": 0,
+      "selected_skips": 0,
+      "unrelated_filtered": 20,
+      "cases": [
+        {
+          "name": "test_ps2_framing_and_unmodified_capture",
+          "seconds": 240.1557846069336
+        },
+        {
+          "name": "test_l3_ps2_device_to_host",
+          "seconds": 109.33063745498657
+        },
+        {
+          "name": "test_l3_ps2_host_to_device",
+          "seconds": 71.98435378074646
+        }
+      ],
+      "xml_sha256": "ca5e220ef83a1ae4b3f9820146775c0b01df85c880ac7a09b9624e91938f5b88",
+      "log_sha256": "8a6beb81baffdceb0770bcce950699095f534995683dfefb6e44d732eb8c9f18",
+      "matrix": {
+        "clocked_frames": 16,
+        "clock_falls": 176,
+        "ERR": 7,
+        "DATA": 9,
+        "clean_recovery_frames": 8,
+        "sigrok_valid_start_prefix_frames": 8
+      }
+    },
+    "official_netlist": {
+      "status": "pass",
+      "selected_passed": 3,
+      "selected_failures": 0,
+      "selected_skips": 0,
+      "unrelated_filtered": 20,
+      "cases": [
+        {
+          "name": "test_ps2_framing_and_unmodified_capture",
+          "seconds": 763.7233760356903
+        },
+        {
+          "name": "test_l3_ps2_device_to_host",
+          "seconds": 320.3885147571564
+        },
+        {
+          "name": "test_l3_ps2_host_to_device",
+          "seconds": 286.20067739486694
+        }
+      ],
+      "xml_sha256": "2769f0b777cc975e34953c5742fccff37c48079c656346ed2afe46ed7cd38fd4",
+      "log_sha256": "ba25a0aa8fb176b430e8d1af30324039f6782b5846c3a696e4e09ac0dc6dea8c",
+      "matrix": {
+        "clocked_frames": 16,
+        "clock_falls": 176,
+        "ERR": 7,
+        "DATA": 9,
+        "clean_recovery_frames": 8,
+        "sigrok_valid_start_prefix_frames": 8
+      }
+    }
+  },
+  "capture_decoder_audits": {
+    "verilator_framing": {
+      "capture_sha256": "85fa1cf8dce750279b06f38db3af7da38c35f7ae2e24e035662d25894d44c2ce",
+      "decode_sha256": "578a70ed04b44bfb9c88f749dba574298e03b021212ee08972e6baff6bad17ef",
+      "bit_decode_sha256": "42faa9b64c0428d998575d537f08dc6b4f5ecf43917aeb0403dd63558291b845",
+      "decoded_bytes": [
+        0,
+        195,
+        255,
+        194,
+        90,
+        193,
+        165,
+        192,
+        128,
+        108,
+        56,
+        124,
+        160,
+        31,
+        16
+      ],
+      "parity_errors": 6,
+      "waveform_changed": false,
+      "scope": "first eight valid-start frames; later decoder resynchronization not asserted"
+    },
+    "verilator_RX": {
+      "capture_sha256": "d9137faafa926136bb7adcd76979b54b8386bbf9c71ec187f29309a7318b49d7",
+      "decode_sha256": "85986b43d0f13530e39ef47449c18a598642fe030ba4b7ea2e9a330009e26bc2",
+      "bit_decode_sha256": "19bec876fd5463ff6bb0045b274f2ca335ed72e0564771c4a2b5f87c72b4dc9c",
+      "decoded_bytes": [
+        28,
+        240,
+        28,
+        90,
+        0,
+        255
+      ],
+      "parity_errors": 1,
+      "waveform_changed": false,
+      "scope": "all six frames"
+    },
+    "icarus_rtl_framing": {
+      "capture_sha256": "85fa1cf8dce750279b06f38db3af7da38c35f7ae2e24e035662d25894d44c2ce",
+      "decode_sha256": "578a70ed04b44bfb9c88f749dba574298e03b021212ee08972e6baff6bad17ef",
+      "bit_decode_sha256": "42faa9b64c0428d998575d537f08dc6b4f5ecf43917aeb0403dd63558291b845",
+      "decoded_bytes": [
+        0,
+        195,
+        255,
+        194,
+        90,
+        193,
+        165,
+        192,
+        128,
+        108,
+        56,
+        124,
+        160,
+        31,
+        16
+      ],
+      "parity_errors": 6,
+      "waveform_changed": false,
+      "scope": "first eight valid-start frames; later decoder resynchronization not asserted"
+    },
+    "icarus_rtl_RX": {
+      "capture_sha256": "d9137faafa926136bb7adcd76979b54b8386bbf9c71ec187f29309a7318b49d7",
+      "decode_sha256": "85986b43d0f13530e39ef47449c18a598642fe030ba4b7ea2e9a330009e26bc2",
+      "bit_decode_sha256": "19bec876fd5463ff6bb0045b274f2ca335ed72e0564771c4a2b5f87c72b4dc9c",
+      "decoded_bytes": [
+        28,
+        240,
+        28,
+        90,
+        0,
+        255
+      ],
+      "parity_errors": 1,
+      "waveform_changed": false,
+      "scope": "all six frames"
+    },
+    "official_netlist_framing": {
+      "capture_sha256": "85fa1cf8dce750279b06f38db3af7da38c35f7ae2e24e035662d25894d44c2ce",
+      "decode_sha256": "578a70ed04b44bfb9c88f749dba574298e03b021212ee08972e6baff6bad17ef",
+      "bit_decode_sha256": "42faa9b64c0428d998575d537f08dc6b4f5ecf43917aeb0403dd63558291b845",
+      "decoded_bytes": [
+        0,
+        195,
+        255,
+        194,
+        90,
+        193,
+        165,
+        192,
+        128,
+        108,
+        56,
+        124,
+        160,
+        31,
+        16
+      ],
+      "parity_errors": 6,
+      "waveform_changed": false,
+      "scope": "first eight valid-start frames; later decoder resynchronization not asserted"
+    },
+    "official_netlist_RX": {
+      "capture_sha256": "d9137faafa926136bb7adcd76979b54b8386bbf9c71ec187f29309a7318b49d7",
+      "decode_sha256": "85986b43d0f13530e39ef47449c18a598642fe030ba4b7ea2e9a330009e26bc2",
+      "bit_decode_sha256": "19bec876fd5463ff6bb0045b274f2ca335ed72e0564771c4a2b5f87c72b4dc9c",
+      "decoded_bytes": [
+        28,
+        240,
+        28,
+        90,
+        0,
+        255
+      ],
+      "parity_errors": 1,
+      "waveform_changed": false,
+      "scope": "all six frames"
+    }
+  }
+}

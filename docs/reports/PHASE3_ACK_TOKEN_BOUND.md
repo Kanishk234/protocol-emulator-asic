@@ -88,3 +88,9 @@ unit's linked-edge scheduling. Include the guarded variant's multicast/reset
 window and compare the resulting full bound to independent pin observations.
 The existing pin-level and official-netlist timing evidence is retained, but
 the Phase 3 EEPROM/compiler-bound exit checkbox remains unchecked.
+
+The subsequent [conditional linked-edge budget](PHASE3_ACK_EDGE_BUDGET.md)
+composes the RX/TX interface bounds and checks actual entry premises in finite
+whole-chip workloads. It narrows the remaining gap to general queue/arrival and
+guard-window invariants; it does not convert these token contracts into an
+unconditional whole-program certificate.

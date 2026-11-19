@@ -130,3 +130,19 @@ def test_edge_observer_adds_reports_without_changing_timing_constraints():
     assert 'sta::report_edges' in trace and 'sta::report_constant' in trace
     assert 'report_checks -to' in trace
     assert not any(command in trace for command in ('set_case_analysis', 'set_disable_timing', 'set_false_path'))
+
+
+def test_measured_e_probe_requires_observed_independence_and_unused_input():
+    def e_fixture(init):
+        features, spec, module, state = input_fixture(init)
+        features = [f.replace('.D.', '.E.') for f in features]
+        entries = spec['TileSpecs']['X2Y3']
+        spec['TileSpecs']['X2Y3'] = {k.replace('D.INIT','E.INIT').replace('J2END_CD_END1.LD_I1','J_l_EF_END1.LE_I1'):v for k,v in entries.items()}
+        return features, spec, module, state
+    args = e_fixture(0x050F)
+    bit = probe.unused_input_bit(*args, lut='E')
+    assert bit['lut'] == 'E' and bit['observed_init'] == 0x050F
+    with pytest.raises(ValueError, match='declared route'):
+        probe.unused_input_bit([*args[0], 'X2Y3.source.LE_I1'], *args[1:], lut='E')
+    with pytest.raises(ValueError, match='depends on I1'):
+        probe.unused_input_bit(*e_fixture(0xCCCC), lut='E')

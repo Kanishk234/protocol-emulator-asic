@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from assembly_ports import annotate_script,context_masters,retain_original_script,spice_ports,strict_verdict
+from assembly_ports import annotate_script,context_masters,context_port_block,retain_original_script,spice_ports,strict_verdict
 
 
 def test_spice_ports_include_continuations_and_reject_empty_top_interface():
@@ -58,3 +58,13 @@ def test_only_complete_context_wrappers_can_be_flattened_for_lvs():
     for bad in ['sg13cmos5l_dlhq_1','*','wp_r1_context_0']:
         catalog['contexts']['25']['planned_master']=bad
         with pytest.raises(ValueError):context_masters(catalog)
+
+
+def test_context_annotation_is_complete_and_keeps_each_native_interface_separate():
+    contexts={'wp_r1_context_'+str(i):dict(pins=['FrameData[0]','VPWR','VGND'],width_dbu=10000,height_dbu=10000) for i in range(26)}
+    text=context_port_block(contexts)
+    assert text.count('port makeall')==26 and text.count('R1_CONTEXT_PORTS')==26
+    assert 'flatten' not in text and 'paint' not in text and 'erase' not in text
+    contexts['wp_r1_context_0']['pins'].append('bad];error injected')
+    with pytest.raises(ValueError):context_port_block(contexts)
+    with pytest.raises(ValueError):context_port_block({})

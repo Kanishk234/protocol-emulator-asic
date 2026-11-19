@@ -1,0 +1,23 @@
+{
+  "passed": false,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Route-preserving flat geometry comparison and full-macro RC extraction only. Active annotation, configured setup/hold/corners, shell, physical power and submission remain unqualified.",
+  "import_inventory": {
+    "import_passed": true,
+    "cells": 45429,
+    "terminals": 183701,
+    "ports": 449,
+    "required_signal_nets_with_wires": 26431,
+    "geometry_xor_passed": false,
+    "physical_acceptance": false,
+    "timing_acceptance": false
+  },
+  "pin_marker_pdk_source": {
+    "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_pdk/ihp-sg13cmos5l/libs.tech/klayout/tech/sg13cmos5l.lyp",
+    "sha256": "eca546db8246bcb44f2960577f11a6414048b97955fa10dad143a427c90b389f"
+  },
+  "error": "Command '['klayout', '-b', '-r', '/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/spikes/r1/geometry_xor.py', '-rd', 'reference=/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_assembly/warp_r1_candidate.gds', '-rd', 'candidate=/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_extract/stream/1-klayout-streamout/warp_r1_candidate.gds', '-rd', 'top_name=warp_r1_candidate', '-rd', 'out=/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_extract/geometry-xor.json', '-rd', 'allowed_boxes=/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_extract/source-pin-markers.json']' returned non-zero exit status 1.",
+  "run": 44579742194,
+  "source_sha": "788f048d95745196027c644b5f8c78987ffbef29"
+}

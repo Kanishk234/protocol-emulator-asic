@@ -1,0 +1,28 @@
+{
+  "local_proofs": {
+    "source": {
+      "passed": true,
+      "cells": 45429,
+      "configuration_latches": 8736,
+      "edge_registers": 370,
+      "scope": "Exact standard-cell masters and complete signal-net partitions versus physical source inventories. No behavioral, RC annotation or timing acceptance."
+    },
+    "analysis": {
+      "passed": true,
+      "cells": 45429,
+      "configuration_latches": 8736,
+      "edge_registers": 370,
+      "scope": "Exact standard-cell masters and complete signal-net partitions versus physical source inventories. No behavioral, RC annotation or timing acceptance."
+    }
+  },
+  "tool": "Yosys0.62; actual cloud proof must repeat on pinned0.66",
+  "analysis_sha256": "3db2dbd2bf5c9ef100925b97c99065cd6a4de2f0e6add954714639f38da3d9dc",
+  "powered_sha256": "dd69f3de8df8d1a9e9127cfe9d79b62fac541e665fc3245907a27e7a396ba618",
+  "original_native_export_topology_passed": false,
+  "original_split_source_partitions": 293,
+  "original_source_proof_passed": true,
+  "regenerated_analysis_proof_passed": true,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Exact complete source schematic and derived flat signal partitions versus independent physical inventories; explicit original supply bindings added only to powered reference. No geometry/timing or physical enclosing-grid acceptance."
+}

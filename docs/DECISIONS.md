@@ -1,5 +1,29 @@
 # Decisions
 
+## D-140: Prove flat analysis and schematic views against original source connectivity
+
+- **Date:**2026-11-19. **Need:** BUG148finds disconnected input aliases in the
+  native flat Verilog export before timing. Restored-wrapper44579742533 still
+  fails strict LVS (external-port case31errors,449ports), so preserving logical
+  aliases across representation tools must be checked explicitly.
+- **Source proof:** read every original functional context netlist and the
+  original40-instance connection graph; flatten only representation wrappers
+  with pinned Yosys. Normalize only its first instance-name separator. Compare
+  all45429cell masters and complete signal partitions to independent native
+  source inventories. Separately parse and compare a regenerated flat analysis
+  view with explicit input/output aliases. Require8736latches and370edge regs.
+- **Powered reference:** add only the original validated VDD/VSS bindings to
+  that proven flat signal view. Retain the original powered hierarchy as two
+  failed/control cases; compare the separate flat reference as a third LVS
+  case on identical GDS, annotation and declared-interface policy. Keep all
+  standard-cell/device checks and the unique-final-verdict/449-port gate.
+- **Scope/cost:** no geometry, chip-build constant tying, ABI, resource or
+  production/default change. A failed artifact supplies only authenticated
+  native inventory, not physical acceptance. Re-prove against original source
+  before using it. Cheap local Yosys0.62checks pass both full graphs; actual
+  cloud proof uses pinned0.66. Source/analysis hashes and failed exports remain.
+  This is not extracted timing, physical enclosing-grid or submission acceptance.
+
 ## D-139: Retain source pin markers and original LVS wrapper policy
 
 - **Date:**2026-11-19. **Measured basis:**44577809055 preserves all45429cells/

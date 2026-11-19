@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Prove original schematic aliases before LVS and timing
+
+- Independent source-inventory topology review catches293split partitions in
+  the native flat Verilog: declared inputs lack net aliases. BUG148/D140adds
+  an explicit-alias analysis view and powered reference, preserving actual
+  DEF/GDS and every cell. Separate Yosys0.62parses verify both original26source
+  context netlists and regenerated analysis against the physical inventories:
+  45429cells/8736latches/370edge regs. Retain the failed native export.
+- Restored-wrapper44579742533 at788f048d still fails strict LVS; external-port
+  case has449complete ports but31errors. New hosted third case must prove the
+  original signal hierarchy and derived flat view before comparing a powered
+  flat schematic, with original two controls preserved and no ignored devices.
+- Marker replay44579742194 stops on deferred empty text regions (BUG149),
+  before geometry acceptance or RCX. Root verifies0polygon/0area versus false
+  unnormalized emptiness and fixes region normalization. All layers, exact
+  containment and added-metal controls remain; no tolerance/exception added.
+- Next authenticate actual all-layer XOR/RCX and source-proven strict LVS,
+  then configured active annotation and real setup/hold/clock timing. No phase
+  boxes or complete timing/physical/submission claim. G1 remains unchanged.
+
 ## 2026-11-19 — Port list fixed; isolate marker and hierarchy mismatches
 
 - Actual44577808696 at20c782a5 now extracts all449declared ports with no

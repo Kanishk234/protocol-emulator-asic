@@ -1,5 +1,39 @@
 # Bugs
 
+## 149: Deferred empty KLayout regions need normalization before subtraction guards
+
+- **Symptom:**44579742194 at788f048d passes native import and pinned PDK
+  purpose checks, then marker restoration rejects8/25before reaching markers.
+  Root inspection finds0polygons/0area on both text-only regions, with XOR
+  empty but unnormalized subtraction regions reporting is_empty=false.
+- **Root cause:** regions built from recursive shape iterators can retain a
+  deferred empty representation. The restoration guard queried that state
+  rather than normalized polygon geometry. No actual mask difference is found
+  on the rejected text-purpose layer.
+- **Fix/coverage:** merge/materialize source and difference regions before
+  emptiness/containment checks. This preserves every layer and exact1nmgeometry;
+  no ignored layer or area tolerance. Root reproduces the deferred-state issue
+  and verifies merged emptiness; existing marker/conductor negative controls
+  remain required. Hosted corrected XOR/RCX is still pending.
+
+## 148: Flat native Verilog export omits input aliases with different net names
+
+- **Symptom/check:** an independent topology guard finds293source signal
+  partitions split in the native OpenROAD flat Verilog export. Input ports
+  are declared but their aliases to r1_net_* are absent; output aliases exist.
+  This was caught before any flat-view timing claim or analysis acceptance.
+- **Root cause/status:** native write_verilog on this imported DEF does not
+  emit those input aliases when the BTerm and net names differ. Physical DEF/
+  GDS/connectivity remain unchanged; the native export stays a failed control.
+- **Fix/coverage:** regenerate a separate analysis view from source inventories
+  with explicit input/output aliases. Check every cell master and full signal
+  partition independently through Yosys, including the original26context
+  netlists flattened from their source hierarchy. Both comparisons pass locally:
+  45429cells,8736configuration latches,370edge registers. A powered reference
+  adds only validated original VDD/VSS bindings. Tests reject swaps, missing
+  cells/pins/ports, master changes, bad supply mappings and unknown prefixes.
+  Actual pinned-cloud proof and strict LVS/timing are still required.
+
 ## 147: Port diagnostic omitted the original context-flattening policy
 
 - **Symptom:**44577808696 at20c782a5 now extracts all449declared ports in

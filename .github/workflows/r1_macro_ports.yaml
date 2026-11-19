@@ -44,10 +44,18 @@ jobs:
           source=artifact(repo,dict(id=ARCHIVE_ID,name='r1-assembled-geometry-44465623376',
               digest='sha256:'+ARCHIVE_SHA,size_in_bytes=11548241,source_run=SOURCE_RUN),out)
           (out/'producer.json').write_text(json.dumps(actual,indent=2)+'\n')
-          prepare(source/'r1_assembly',Path('build/r1_macro_ports'))
+          flat_run=44577809055
+          flat_expected=dict(id=flat_run,head_sha='20c782a513eddc301d9da59723e68438e894c968',
+              head_branch='efpga',run_attempt=1,conclusion='failure',path='.github/workflows/r1_flat_extract.yaml')
+          flat_actual=api(f'repos/{repo}/actions/runs/{flat_run}');admit_run(flat_actual,flat_expected)
+          flat=artifact(repo,dict(id=14556958189,name='r1-flat-extraction-44577809055',
+              digest='sha256:e87bcbd39af7128ef26c4d6f2584598653a6981c7210108d49dedb7798f4bae2',
+              size_in_bytes=45397961,source_run=flat_run),out)
+          (out/'flat-producer.json').write_text(json.dumps(flat_actual,indent=2)+'\n')
+          prepare(source/'r1_assembly',Path('build/r1_macro_ports'),native_flat=flat/'r1_flat_extract')
           PY
           bash spikes/cloud/fetch_pdk.sh
-      - name: Preserve original context flattening and verify exported ports
+      - name: Prove flat source equivalence and compare full macro LVS references
         timeout-minutes: 25
         run: |
           set -euo pipefail
@@ -65,6 +73,7 @@ jobs:
             build/r1_macro_ports/
             build/r1_ports_source/*.metadata.json
             build/r1_ports_source/producer.json
+            build/r1_ports_source/flat-producer.json
           include-hidden-files: true
           retention-days: 90
           if-no-files-found: error

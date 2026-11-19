@@ -1,0 +1,32 @@
+# Passive SPI mode-0 MOSI capture into 64 SRAM words, then host readback.
+# MOSI=ui0, SCK=ui1, CS_n=ui2. No pad ownership or output drive.
+# Stops accepting bytes when full; no wrapping or unbounded capture claim.
+# The sole table starts at word32 after the fixed entry table. Read all64words
+# after traffic ends; unused words remain0xFFFF. Reload before another capture.
+program spi_capture
+pin U0: pin_a=ui0 pin_b=ui1 pin_c=ui2 c_active=0 order=msb idle=1 rxmode=linked_rx rx_edge=rise rx_nbits=8 ev_pin=c ev_edge=both
+connect L0.I0 <- U0.rx accept=DATA
+
+table CAPTURE:
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF
+
+lane L0:
+    r0 = 0
+    K0 = 0xFFC0
+    K1 = 0
+    states CHECK TAKE STORE
+    slot: when CHECK, rb == 0 do CMPM none <- r0, mask K0 val K1 -> f0 then TAKE
+    slot: when TAKE, f0 == 1, I0 is DATA do MOV r3 <- I0, deq then STORE
+    slot: when STORE do CALL store then CHECK
+
+routine store:
+    st r3, r0, CAPTURE
+    add r0, r0, 1
+    ret

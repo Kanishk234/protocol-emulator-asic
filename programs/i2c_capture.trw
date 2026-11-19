@@ -1,0 +1,9 @@
+# Passive I2C wire capture. SDA=uio0, SCL=uio1. No ownership or output drive.
+# DATA is raw (byte << 1) | ACK/NACK; EVENT bit15 marks START=0 / STOP=1.
+# No address filter: the host interprets address/direction and ACK from the wire.
+program i2c_capture
+pin U0: pin_a=uio0 pin_b=uio1 order=msb idle=1 rxmode=linked_rx rx_edge=rise rx_nbits=9 ev_edge=both ev_qual=1 ev_reset=true
+connect L0.I0 <- U0.rx
+connect HOST_OUT <- L0.O1
+lane L0:
+    slot: do MOV O1 <- I0, deq, keep

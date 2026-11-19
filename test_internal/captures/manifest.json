@@ -1,0 +1,62 @@
+{
+  "repository": "https://github.com/sigrokproject/sigrok-dumps",
+  "revision": "0ad13477abc959d37fc9a5acbd23901c371c9c76",
+  "license": "Public domain unless noted otherwise; root README and per-capture README retained in verified cache",
+  "files": {
+    "uart/hello_world/8n1/hello_world_8n1_115200.sr": {
+      "sha256": "e72b96efdb30ef33e1a7a2a4e1bd814cd47d5474b67a1d5adb68d4c5ad47ab24"
+    },
+    "uart/hello_world/README": {
+      "sha256": "7af1c7841a603eb1f6dfecbe1402acd980e175e7e31cd62daf2fe2a0caed6f66"
+    },
+    "README": {
+      "sha256": "a8d7af65b9f367e5d33c2a8375e2df81ff8d90eb7e7ca5631ba1c9bb5c9a94b9"
+    },
+    "i2c/nxp_pca9571/pca9571_simple.sr": {
+      "sha256": "343cc534c980aca4a86b8398e2cb2622ba75a7aa9b19cca031a35c1049b9fa70"
+    },
+    "i2c/nxp_pca9571/README": {
+      "sha256": "9706fc068dbb001c70852d84d05a5516c2c3f1307c78c7cc5a9b579f8a2b5e7b"
+    },
+    "spi/cc1101/cc1101-command-strobe.sr": {
+      "sha256": "f48aa11c4eb0fd2baf504894d24239fde2001401047fee9eb3f1afa7a29240e4"
+    },
+    "spi/cc1101/README": {
+      "sha256": "612397d776a94954b41ee77c0f0216e4ca2587db2b69879753f12c746af5527c"
+    }
+  },
+  "captures": {
+    "uart": {
+      "path": "uart/hello_world/8n1/hello_world_8n1_115200.sr",
+      "readme": "uart/hello_world/README",
+      "channels": {
+        "rx": "TX"
+      },
+      "program": "uart",
+      "params": {
+        "BAUD": 115200
+      }
+    },
+    "i2c": {
+      "path": "i2c/nxp_pca9571/pca9571_simple.sr",
+      "readme": "i2c/nxp_pca9571/README",
+      "channels": {
+        "sda": "SDA",
+        "scl": "SCL"
+      },
+      "program": "i2c_capture",
+      "params": {}
+    },
+    "spi": {
+      "path": "spi/cc1101/cc1101-command-strobe.sr",
+      "readme": "spi/cc1101/README",
+      "channels": {
+        "mosi": "MOSI",
+        "clk": "CLK",
+        "cs": "CS"
+      },
+      "program": "spi_capture",
+      "params": {}
+    }
+  }
+}

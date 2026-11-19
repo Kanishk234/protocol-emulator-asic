@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from assembly_ports import annotate_script,spice_ports,strict_verdict
+from assembly_ports import annotate_script,retain_original_script,spice_ports,strict_verdict
 
 
 def test_spice_ports_include_continuations_and_reject_empty_top_interface():
@@ -42,3 +42,11 @@ def test_annotation_only_promotes_root_interface_and_keeps_extraction_commands()
     with pytest.raises(ValueError):annotate_script(source,pins[:-1])
     with pytest.raises(ValueError):annotate_script(source+source,pins)
     with pytest.raises(ValueError):annotate_script(source,pins[:-1]+['p];error danger'])
+
+
+def test_foreign_runtime_script_is_retained_but_never_patched_or_executed(tmp_path):
+    source=tmp_path/'foreign.tcl';source.write_text('error foreign\n')
+    with pytest.raises(ValueError,match='retained for review'):
+        retain_original_script(source,tmp_path)
+    assert (tmp_path/'original-extract-spice.tcl').read_bytes()==source.read_bytes()
+    assert not (tmp_path/'extract_ports.tcl').exists()

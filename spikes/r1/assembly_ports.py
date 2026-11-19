@@ -63,6 +63,16 @@ puts "R1_EXPORTED_PORTS [llength [lsort -unique $actual_ports]]"
     return original.replace(anchor,anchor+addition)
 
 
+def retain_original_script(original,out):
+    original,out=Path(original),Path(out)
+    content=original.read_bytes();digest=sha(original)
+    (out/'original-extract-spice.tcl').write_bytes(content)
+    (out/'script-provenance.json').write_text(json.dumps(dict(path=str(original),
+        expected_sha256=SCRIPT_SHA,observed_sha256=digest,matched=digest==SCRIPT_SHA),indent=2)+'\n')
+    if digest!=SCRIPT_SHA:
+        raise ValueError('Pinned extraction script changed; original bytes retained for review')
+
+
 def prepare(source,out):
     source,out=(Path(p).resolve() for p in (source,out))
     result=json.loads((source/'result.json').read_text());metrics=result['completed_stage_metrics']
@@ -90,7 +100,7 @@ def inside(out):
     for p,d in plan['input_sha256'].items():
         if sha(p)!=d:raise ValueError('Original assembly view changed')
     original=Path(Magic.SpiceExtraction.get_script_path(None))
-    if sha(original)!=SCRIPT_SHA:raise ValueError('Pinned extraction script changed')
+    retain_original_script(original,out)
     script=out/'extract_ports.tcl';script.write_text(annotate_script(original.read_text(),plan['expected_ports']))
     class ExportPorts(Magic.SpiceExtraction):
         id='Magic.R1ExportPorts'

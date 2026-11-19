@@ -10,6 +10,7 @@ from detailed_leaf import OBSERVER, sha
 
 SOURCE_RUN = 44394572610
 SOURCE_SHA = '5db0b642a9ea3c5d1c7b9a76f1ed74edf1a52716'
+PRIMITIVE_RUN = 44394572275
 ROOT = Path(__file__).resolve().parents[2]
 CAMPAIGN = ROOT/'docs/reports/r1_detailed_contexts_44394572610.json'
 CAMPAIGN_SHA = '865c170a300db97f2116360bd25ad7af809ed7803376d6d78762560b4a20a11a'
@@ -20,10 +21,10 @@ SCOPE = ('Frozen leaf finishing diagnostic; no assembled macro, shell, '
          'configured timing, replacement or submission acceptance.')
 
 
-def identity(data):
-    expected = dict(id=SOURCE_RUN, head_sha=SOURCE_SHA, run_attempt=1,
+def identity(data, primitive=False):
+    expected = dict(id=PRIMITIVE_RUN if primitive else SOURCE_RUN, head_sha=SOURCE_SHA, run_attempt=1,
                     status='completed', conclusion='success', head_branch='efpga',
-                    path='.github/workflows/r1_detailed_contexts.yaml')
+                    path='.github/workflows/r1_detailed_leaf.yaml' if primitive else '.github/workflows/r1_detailed_contexts.yaml')
     if any(data.get(k) != v for k, v in expected.items()):
         raise ValueError('Wrong detailed-route producer')
 
@@ -42,6 +43,17 @@ def campaign_case(case):
     if len(rows) != 1 or len(artifacts) != 1 or not rows[0]['passed']:
         raise ValueError('Unknown or unqualified finishing context')
     return rows[0], artifacts[0]
+
+
+def admit_primitive_result(result):
+    expected = dict(run=str(PRIMITIVE_RUN), attempt='1', source=SOURCE_SHA,
+                    passed=True, tool_exit_code=0, router_violations=0, cells=1453,
+                    configuration_latches=334, power_terminals=2906,
+                    required_signal_nets_with_wires=1557,
+                    routed_odb_sha256='1a12a86bd7b0a12e035ac0d17c40e9077c089b0bcd86ce296003dc984514bd38')
+    if any(result.get(k) != v for k, v in expected.items()):
+        raise ValueError('Wrong primitive routed result')
+    return expected
 
 
 def finishing_steps(classes):
@@ -88,17 +100,24 @@ def check_finished_inventory(before, after, expected=None):
 
 def prepare(capsule, routed, producer, out, case='lut0'):
     capsule, routed, producer, out = (Path(p).resolve() for p in (capsule, routed, producer, out))
-    identity(json.loads(producer.read_text()))
-    expected, _ = campaign_case(case)
+    primitive = case == 'primitive1'
+    identity(json.loads(producer.read_text()), primitive=primitive)
     result = json.loads((routed/'result.json').read_text())
-    if (result != expected or result['tool_exit_code'] != 0 or result['router_violations'] != 0
-            or sha(routed/'routed.odb') != expected['routed_odb_sha256']):
+    expected = admit_primitive_result(result) if primitive else campaign_case(case)[0]
+    odb = routed/('PRIM2T2S.odb' if primitive else 'routed.odb')
+    definition = routed/('PRIM2T2S.def' if primitive else 'routed.def')
+    if ((not primitive and result != expected) or result['tool_exit_code'] != 0 or result['router_violations'] != 0
+            or sha(odb) != expected['routed_odb_sha256']):
         raise ValueError('Require exact passed context route')
     route_plan = json.loads((routed/'plan.json').read_text())
     if route_plan['case'] != case:
         raise ValueError('Route plan context differs')
     for name, digest in route_plan['input_sha256'].items():
-        if '/build/r1_timing/' in name:
+        if primitive and '/build/r1_detailed/source/native/' in name:
+            path = capsule/'leaves/r1-balanced-leaf-40030916359-primitive1/native'/name.split('/build/r1_detailed/source/native/', 1)[1]
+        elif primitive and name.endswith('/build/r1_detailed/producer.json'):
+            path = routed.parent/'producer.json'
+        elif '/build/r1_timing/' in name:
             path = capsule/name.split('/build/r1_timing/', 1)[1]
         else:
             suffix = name.split('/protocol-emulator-asic/protocol-emulator-asic/', 1)[-1]
@@ -139,7 +158,7 @@ def prepare(capsule, routed, producer, out, case='lut0'):
             raise ValueError('Unrecognized source path')
         return value
     state = relocate(state)
-    state['odb'] = str(routed/'routed.odb');state['def'] = str(routed/'routed.def')
+    state['odb'] = str(odb);state['def'] = str(definition)
     # This value comes from the authenticated detailed router, not the GRT state.
     state['metrics']['route__drc_errors'] = result['router_violations']
     config = relocate(json.loads((folder/'policy.json').read_text())['config'])
@@ -148,7 +167,7 @@ def prepare(capsule, routed, producer, out, case='lut0'):
     (out/'initial.json').write_text(json.dumps(state)+'\n')
     (out/'config.json').write_text(json.dumps(config, indent=2)+'\n')
     inputs = [Path(__file__), CAMPAIGN, record, producer, routed/'result.json', routed/'plan.json',
-              routed/'routed.odb', routed/'routed.def', routed/'routed.txt',
+              odb, definition, routed/'routed.txt',
               out/'initial.json', out/'config.json']
     if case == 'northeast':
         inputs += [ROOT/'patches/r1_wire_only_connectivity.patch',
@@ -156,7 +175,7 @@ def prepare(capsule, routed, producer, out, case='lut0'):
     for key, value in state.items():
         if key != 'metrics' and isinstance(value, str):
             inputs.append(Path(value))
-    (out/'plan.json').write_text(json.dumps(dict(scope=SCOPE, source_run=SOURCE_RUN, case=case,
+    (out/'plan.json').write_text(json.dumps(dict(scope=SCOPE, source_run=PRIMITIVE_RUN if primitive else SOURCE_RUN, case=case,
         expected=dict(cells=expected['cells'], required_signal_nets_with_wires=expected['required_signal_nets_with_wires']),
         input_sha256={str(p):sha(p) for p in inputs}), indent=2)+'\n')
 

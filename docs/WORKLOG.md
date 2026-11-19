@@ -22,6 +22,21 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - Actual44591088608 authenticates/prepares all timing inputs, then stops on
   an unnecessary FASM import before OpenSTA (BUG152). Move that dependency to
   venv-only preparation and rerun; no extracted setup/hold numbers exist yet.
+- Corrected44592237966 at08f24bbe now executes all six native cases through
+  the full configuration/register/endpoint reports, then crashes before active
+  coverage (BUG153). Two-inverter reproduction confirms stale path handles
+  after setup checks; stable-pin capture passes. Preserve the original crash
+  control in the next hosted diagnostic. Negative extracted timing prefixes
+  are provisional, with no complete timing acceptance.
+- Flat-export44592238395 at08f24bbe lacks the root subcircuit wrapper and
+  never reaches a Netgen verdict (BUG154). Explicit native top wrapping is
+  next; no failed control, checker, device or source geometry is removed.
+  A tiny native SCMOS fixture with the corrected flat/top settings exports
+  all449original port names. This calibrates the API, not real macro LVS.
+  Updated port/timing tests pass19cases; original/fixed OpenSTA microfixtures
+  reproduce crash versus successful stable-pin traversal. Exact failure
+  receipts: reports/r1_port_result_44592238395.json and
+  reports/r1_routed_result_44592237966.json.
 
 ## 2026-11-19 — Full macro geometry and RC export pass; continue strict LVS/timing
 

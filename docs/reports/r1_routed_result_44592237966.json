@@ -1,0 +1,91 @@
+{
+  "passed": false,
+  "diagnostic_complete": false,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Configured primary-image macro setup/hold diagnostic at 20ns, propagated clocks, 0.25ns uncertainty, nominal extracted RC and slow/fast cells. Macro I/O delays remain the original conditional zero-delay boundary. No shell, loading-mode, physical power/LVS, complete-corner or submission acceptance.",
+  "run": "44592237966",
+  "source_sha": "08f24bbe573abaf0ae05587d9a31bd39f5334be9",
+  "cases": {
+    "cell_control_static": {
+      "returncode": -11
+    },
+    "cell_control_dynamic": {
+      "returncode": -11
+    },
+    "routed_setup_static": {
+      "returncode": -11
+    },
+    "routed_setup_dynamic": {
+      "returncode": -11
+    },
+    "routed_hold_static": {
+      "returncode": -11
+    },
+    "routed_hold_dynamic": {
+      "returncode": -11
+    }
+  },
+  "error": "Incomplete timing execution",
+  "archive_id": 14563619031,
+  "archive_sha256": "8f0851483eed9555603858d4be1d8341374f584202bda3f97ddae7e22426b606",
+  "archive_bytes": 1130062,
+  "failure_kind": "stale_path_objects_after_setup_check",
+  "root_prefix_observations": {
+    "cell_control_static": {
+      "log_sha256": "25d20d00eced99557c71e88f4eae9eee23da1a047084c2e691e4d7f08bc5fa1d",
+      "observed_endpoint_rows": 246,
+      "observed_register_rows": 370,
+      "observed_closed_configuration": 8736,
+      "provisional_worst_slack_ns": 1.508933,
+      "provisional_worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2191_/D",
+      "coverage_completed": false
+    },
+    "cell_control_dynamic": {
+      "log_sha256": "25d20d00eced99557c71e88f4eae9eee23da1a047084c2e691e4d7f08bc5fa1d",
+      "observed_endpoint_rows": 246,
+      "observed_register_rows": 370,
+      "observed_closed_configuration": 8736,
+      "provisional_worst_slack_ns": 1.508933,
+      "provisional_worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2191_/D",
+      "coverage_completed": false
+    },
+    "routed_setup_static": {
+      "log_sha256": "2b578281a305192747f5cbccb6e8b31b5673abc99cd004c1d2cdbf1ea5e4d8d0",
+      "observed_endpoint_rows": 246,
+      "observed_register_rows": 370,
+      "observed_closed_configuration": 8736,
+      "provisional_worst_slack_ns": -6.005509,
+      "provisional_worst_endpoint": "Tile_X2Y4_B_IN_top",
+      "coverage_completed": false
+    },
+    "routed_setup_dynamic": {
+      "log_sha256": "2b578281a305192747f5cbccb6e8b31b5673abc99cd004c1d2cdbf1ea5e4d8d0",
+      "observed_endpoint_rows": 246,
+      "observed_register_rows": 370,
+      "observed_closed_configuration": 8736,
+      "provisional_worst_slack_ns": -6.005509,
+      "provisional_worst_endpoint": "Tile_X2Y4_B_IN_top",
+      "coverage_completed": false
+    },
+    "routed_hold_static": {
+      "log_sha256": "060544d391f9ef5d1bf40e76dbc76c252b8967bb903d173991c6b78081b98000",
+      "observed_endpoint_rows": 246,
+      "observed_register_rows": 370,
+      "observed_closed_configuration": 8736,
+      "provisional_worst_slack_ns": -1.100642,
+      "provisional_worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+      "coverage_completed": false
+    },
+    "routed_hold_dynamic": {
+      "log_sha256": "060544d391f9ef5d1bf40e76dbc76c252b8967bb903d173991c6b78081b98000",
+      "observed_endpoint_rows": 246,
+      "observed_register_rows": 370,
+      "observed_closed_configuration": 8736,
+      "provisional_worst_slack_ns": -1.100642,
+      "provisional_worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+      "coverage_completed": false
+    }
+  },
+  "root_review": "All six rendered hashes/censuses/endpoint prefixes replay. All native processes crash before active coverage. Prefix values are provisional and confer no complete timing acceptance."
+}

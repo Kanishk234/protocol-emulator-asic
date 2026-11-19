@@ -8,8 +8,11 @@ negative control and OpenRCX. SPEF has26765net records/35,585,561bytes, SHA
 e3ba5b5b8f1c1db15633fa1df1aa792756ffade6f586fec68945d504bd2112a3.
 Member hashes/import replay and source markers are checked. Configured active
 annotation, propagated-clock setup/hold/corners and complete shell/power remain
-open. Source-proven flat-reference LVS44583509216 still fails31errors; D141
-tests complete context port declarations without changing geometry.
+open. Complete-context LVS44590138579 still fails31errors; the native `.ext`
+connects all four corner feedthroughs but hierarchical SPICE loses two aliases.
+D143tests native flat SPICE, with explicit root wrapping after BUG154. Actual
+timing44592237966 reaches all six endpoint reports but crashes on stale path
+handles (BUG153); its negative extracted prefixes remain unqualified.
 
 **November19 correction and actual macro result:**44465623376 at53240408
 passes whole-macro Magic DRC/KLayout DRC/overlap at zero, then fails402LVS

@@ -1,5 +1,34 @@
 # Bugs
 
+## 154: Flat SPICE export needs an explicit top-level subcircuit
+
+- **Symptom/check:**44592238395 at08f24bbe reaches the native flat export,
+  but Netgen cannot resolve `warp_r1_candidate` and produces no final report.
+  Root inspection confirms its52MBflat transistor deck lacks a `.subckt`
+  wrapper. No flat LVS acceptance or recovered net count is claimed.
+- **Fix/coverage:** retain `ext2spice hierarchy off` and explicitly enable
+  `ext2spice subcircuits top on`. This preserves the original root interface
+  around the native flattened device network. Exact449root port and uniquely
+  matching final verdict guards remain mandatory; all four controls remain.
+
+## 153: Setup checks invalidate OpenSTA timing-path handles before coverage
+
+- **Symptom/check:**44592237966 at08f24bbe reaches all8736configuration/
+  closed-gate guards,370register rows and246endpoint reports in each of six
+  cases, then all native processes exit-11before coverage completes. No timing
+  pass is accepted. Prefix cell control reproduces the earlier positive model;
+  extracted setup/hold prefixes contain violations but remain unqualified.
+- **Reproduction/root cause:** a two-inverter fixture on native OpenSTA2.7.0
+  reproduces exit139when accessing saved path objects after `check_setup`.
+  Capturing stable endpoint Pin handles before that report completes with
+  exit0and full fanin output. This tests object lifetime, without altering
+  the timing graph, configuration, period, uncertainty or path exceptions.
+- **Fix/coverage:** capture endpoint pins while reporting the original paths.
+  Add the tiny invalid-path/stable-pin pair to the pinned hosted diagnostic.
+  Parse native partial-annotation reports at load-pin granularity, preserving
+  their driver/load indentation and normalizing only escaped `/` names. Missing
+  annotation on active clock/data cones must still fail; retain native reports.
+
 ## 152: Timing execution imports an unnecessary compiler dependency
 
 - **Symptom/check:**44591088608 at67e7d2b6 passes authenticated timing

@@ -15,6 +15,9 @@
   ports/devices, alter the source schematic or change mask geometry. Keep all
   four previous controls, original unique policy and complete449-port/strict
   Netgen final-verdict/checker gates. Actual hosted evidence is required.
+  Actual44592238395 exports the flat transistor network without a top wrapper,
+  so Netgen never compares the named circuit (BUG154). Explicitly enable the
+  native top subcircuit wrapper; no devices/connections are inserted by us.
 - **Research:** Magic documents hierarchical/flat SPICE and duplicate-port
   handling in its [command reference](https://github.com/RTimothyEdwards/magic/blob/master/doc/html/ext2spice.html).
   Upstream [issue245](https://github.com/RTimothyEdwards/magic/issues/245)
@@ -41,6 +44,9 @@
   timing and clock fanin. A missing-SPEF control must fail that coverage check;
   extracted cases must pass it. Retain full native reports, clock skew, script
   hashes, library/SPEF hashes and endpoint/register inventories in artifacts.
+  BUG153's native two-inverter control reproduces stale PathEnd crashes after
+  setup checks. Preserve stable endpoint pins before those checks and require
+  the pinned invalid/fixed microfixture outcomes before the six macro cases.
 - **Limits/cost:** one bounded hosted diagnostic, no hardware/default/ABI
   change. This is conditional macro-boundary timing with original zero I/O
   delays, nominal RC and slow/fast cells. Full-chip shell, loading-mode timing,

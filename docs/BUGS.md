@@ -517,3 +517,29 @@ Symptom: the first four-bank configuration staging prototype fails the carrier-a
 - Root cause: the transition-only writer stopped at the last changed level, without emitting the actual final sample timestamp. A constant idle tail was simulated but absent from the file's duration.
 - Fix: serialize the final timestamp at the actual captured sample count, matching the established chip recorder. No signal edge, clock pulse, payload, firmware timing or extra simulated idle was added.
 - Check: required sigrok decodes both UART directions, both SPI directions and I2C writes/reads/START/STOP for every baseline and idle-seeded model run and all chip cases. Last-frame equality and marker counts catch the original truncation. This was a test-recorder issue caught before publication, not a chip failure.
+
+
+### 2026-11-19 — Open: BITSYNC readback and frame-start status can coincide in a native replay
+
+- Symptom: the qualified full pin-unit formal task fails the existing `st_clash` assertion. A compact11-clock replay on unmodified RTL with qualified cache parameters fires the same assertion at cycle9, with `rb_ev=1`, `sync_ev=1`, and combined overrun0. Source/fixture/log evidence: [integration report](reports/PHASE3_FORMAL_PIN_UNIT.md), phase3_pin_unit_status_replay_result.json.
+- Root cause observed: two status intents feed a one-intent `st_new`/priority-data path; the assertion assumes they cannot coincide. Whether the exact command/configuration sequence is excluded by the intended admission contract is unresolved. This is an open RTL/assertion/contract issue, not a confirmed supported-protocol or silicon failure.
+- Check that caught it: actual full-unit ABC PDR with native assertions retained, followed by `python scripts/replay_pin_unit_status.py` on original RTL. Earlier examples violated period/live or idle/stuffing premises; the retained later replay uses no stuffing, DELIM0, boundedSJW and IDLE_BITS1. Raising only IDLE_BITS to4 removes this particular finite failure, without proving a general restriction/fix.
+- Coverage/status: fixture and diagnostic runner reproduce assertion failure plus the idle4control; full/BITSYNC proof and F-CHAN-4 remain open. No hardware fix, assertion suppression or architectural restriction adopted. Next: review command/configuration admission, minimize the competing status sequence, and either establish its contract exclusion or prepare a generic loss-accounting fix with physical requalification if needed.
+
+
+#### Follow-up: minimized P26 loss-accounting defect and non-adopted repair
+
+The [four-token reduction](reports/PHASE3_STATUS_MERGE_CANDIDATE.md) resolves the earlier admission question for the retained case. LINE arbitration, DATA, SYNC, DATA are all taken under P25. At clock9 the prior bit sample and new frame start share a clock; the producer is blocked and pending status empty. Readback wins the one buffer entry, frame-start status is lost, and OVERRUN remains0, contrary to P26. Neither a protocol-specific restriction nor removal of the failing assertion is an adopted solution.
+
+A scratch generic merge patch preserves multiple intents until capacity allocation, retains the second status when output plus existing buffer permit, and flags excess loss. Two replays and64reference-matrix combinations pass; three corrupted variants fail. Existing FULL1pin suites pass60/60on Icarus and60/60on Verilator. Source hardware unchanged; candidate has no new registers but logic/timing/area costs are unmeasured. D-192records the prototype. Full formal/integration and physical requalification remain required before adoption; fix commit remains none.
+
+D-192formal follow-up: the independent queue oracle now passes unbounded on both the source-extracted candidate cone and actual qualified-cache full unit, with bounded reachability. The original cone and three corrupted candidates fail with witnesses. [Formal evidence](reports/PHASE3_STATUS_MERGE_FORMAL.md) does not adopt the patch or alter the qualified source; physical requalification remains required.
+
+D-192regression update: candidate now passes55/55selected whole-chip protocol/Phase3/metamorphic checks under Verilator with required independent decodes. Combined with the two unbounded proofs and prior pin suites, it is ready for physical evaluation. No main-source fix or new GDS result yet.
+
+### 2026-11-19 — Physical-screen draft assumed historical paths not produced by stock tools
+
+- Symptom: the initial, unlaunched screen draft would have required absent src/signoff.sdc and placed diagnostic configs under runs/audit, breaking their dir:: source/macro resolution.
+- Root cause: a historical experiment supplied its own SDC; the current official config generator does not. LibreLane resolves dir:: paths relative to the config directory, so moving a merged-config copy changes their meaning.
+- Caught by: inspection of the pinned official Project.create_user_config/create_merged_config implementation and the native config-loading convention before any physical workflow launch.
+- Fix/coverage: explicit wrapper sources the pinned stock base.sdc, rejects custom constraint policies, and diagnostic configs stay in src/. test_signoff_audit_uses_stock_base_instead_of_missing_generated_file and test_diagnostic_configs_preserve_source_relative_path_resolution cover both assumptions. CI-helper suite49PASS. This was a draft tooling defect; no physical run failed and no hardware/configuration gate was changed.

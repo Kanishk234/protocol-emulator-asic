@@ -1,0 +1,132 @@
+{
+  "scope": "Actual native fabric+producer, one HOST_IN producer, four blocking consumers, static accept-all config; channel safety/order and conditional progress; tap noninterference",
+  "hardware_changed": false,
+  "source_sha256": {
+    "src/trw_chan_prod.v": "6b41d58996b41970ab958ab0d7d71f1839ddae264856748f7c2d0aa08ecf56e6",
+    "src/trw_chan_port.v": "5adc1986d81d2ba17f535b85de6faa4661d00002141a6143d22227246ff373c2",
+    "src/trw_fabric.v": "f6f5af0e6c9b561bd68fabea949410b15b2b5a1b647d2d291909ef67632aed7f",
+    "src/trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9",
+    "formal/props/channel_composition.sv": "6a4a0f6b6ddced6fbfbb520322647bc8c4d74a14c9dc0a7ee423d5917ec60c4f",
+    "formal/channel.sby": "19c43e9223f57694d493a13797654bb1596b48c409443dd5e27e66b23de2d793"
+  },
+  "proofs": {
+    "blocking": {
+      "status": "PASS",
+      "seconds": 1.227,
+      "log_sha256": "d58d366d3a51444b30fdf3cacfd87d19de9ac32bd6b16cbfdebf6c743c6c8236",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "ready": {
+      "status": "PASS",
+      "seconds": 1.196,
+      "log_sha256": "56109484b52ff8455ef94c510abcea8c0f9e43ceb835fbbeb5bb02ad6d8f659e",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "taps": {
+      "status": "PASS",
+      "seconds": 1.908,
+      "log_sha256": "b4e66cd6a92b4aabe61ebf4ffb9b42bc6934e023e259ccbcaa3e79e048c6df77",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "blocking_cover": {
+      "status": "PASS",
+      "seconds": 1.3,
+      "log_sha256": "c7d3221ecf6123439c0e3cb4a69ebc60e89dd2755d82e2267c0249817c5cac6c",
+      "engine": "smtbmc z3",
+      "cover_steps": [
+        15,
+        16
+      ],
+      "witnesses_sha256": {
+        "engine_0/trace0.vcd": "16cae9e816cbaa4ad5bfb40dcc24677dfd9ca91038ca9191f953d20e01cd8b4a",
+        "engine_0/trace1.vcd": "dced087872739fe09ef9389db5305275f5ff6dfe051a417f872983843423f8ba"
+      }
+    },
+    "tap_cover": {
+      "status": "PASS",
+      "seconds": 1.648,
+      "log_sha256": "d3fed6e852eec6490f5f8177e15f0f499a3ab52529bb2427db7a64491258e70e",
+      "engine": "smtbmc z3",
+      "cover_steps": [
+        14
+      ],
+      "witnesses_sha256": {
+        "engine_0/trace0.vcd": "dd1a14a033a72e260504ef975d4f06557b65a84299cb0fd607309564edb881d0"
+      }
+    }
+  },
+  "mutation_controls": {
+    "consume_without_take": {
+      "status": "FAIL",
+      "seconds": 1.347,
+      "log_sha256": "7e379cad29aadc9847155b81e134b58662679735dfdcf8ff0b8471fd4c9fd234",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "1c2bf6be1baa5aa73bd8f1ab3c31d28545e6c8e9de81808710a32508c5995686"
+      },
+      "changed_file": "src/trw_chan_port.v",
+      "mutated_source_sha256": "7ee45764b09004bfaec34fdc5d7ba100cbf45d351bea4b6e77611d85af4c74b1"
+    },
+    "overwrite_full_producer": {
+      "status": "FAIL",
+      "seconds": 1.329,
+      "log_sha256": "c0b33a3af651cb0d4731b1738666cdf5fa1805c4f796d0f712accec476ca31a1",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "bfe2603753aeec7ee1170683e02ee12b236038531775bd51a3a4eee5b358ff8c"
+      },
+      "changed_file": "src/trw_chan_prod.v",
+      "mutated_source_sha256": "303710401f33c82394653e53a8a07c50735792604a77acc0fa6699db81dfd5a9"
+    },
+    "ignore_one_blocking_subscriber": {
+      "status": "FAIL",
+      "seconds": 1.576,
+      "log_sha256": "9148a9082aae9b2c69d97724c0e134847e6835c62f0c492b2f0df271382a58da",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "c825f52498238d12393faf04418425d5c967172b0c6746f213d721c31d413bcc"
+      },
+      "changed_file": "src/trw_fabric.v",
+      "mutated_source_sha256": "06eee162c911e3d82d800d6df54d81bd098737f9e98e7c368e73ea38bfc636e1"
+    },
+    "corrupt_token": {
+      "status": "FAIL",
+      "seconds": 1.395,
+      "log_sha256": "5a29a1c16313b646a04f3954be035bb53269f352f44f186270663a32363c3ec2",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "6094463074996de9aa085744efb5c96218b538986cf700fda621f40014bb4659"
+      },
+      "changed_file": "src/trw_chan_prod.v",
+      "mutated_source_sha256": "40ad448a0446b239cafe7a48713a594d1b0e0762f3047923eaffb0956ffeffc3"
+    },
+    "tap_blocks_release": {
+      "status": "FAIL",
+      "seconds": 2.327,
+      "log_sha256": "b72bc07043ad1ce17f2c7ab86efd46c1af14a272cefeb5967918bf80c30b429c",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "c7b9dfe1613f70fcbc69778d89a495310aacd14208111fb0b11066544e92b8a0"
+      },
+      "changed_file": "src/trw_chan_port.v",
+      "mutated_source_sha256": "27188e021263994757f872d0a60a0fb1ba23e76af1ac74472f07a43cfc376fe8"
+    }
+  },
+  "tool_versions": {
+    "yosys": "Yosys 0.69+24 (git sha1 d0e71cfb7-dirty, Release, Clang /usr/bin/clang++ 21.1.8)",
+    "sby": "SBY v0.69",
+    "z3": "Z3 version 4.15.5 - 64 bit"
+  },
+  "native_sources_unchanged": true
+}

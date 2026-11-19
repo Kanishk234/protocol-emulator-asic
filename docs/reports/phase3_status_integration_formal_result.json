@@ -1,0 +1,74 @@
+{
+  "scope": "Actual candidate full pin unit with qualified cache parameters and explicit static interface premises; all native assertions and independent queue oracle enabled",
+  "runner_sha256": "f2594762d670fbc1db786e04aab6ad1946d37b8f23121db8aaab9ccacb8fb3d4",
+  "source_sha256": {
+    "src/trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "src/trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9",
+    "src/trw_pin_unit.v": "1850fff765398ced39d39fe104291a6e191743f1ad2074537094c3822104ac8c",
+    "src/trw_pin_io.v": "d11a88346a39378b0dc763b9a4c4cdb196e7069f88bc9c24b71564a1593e90b7",
+    "src/trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+    "src/trw_pin_tx.v": "bf3716de0cf6f3a6956d6af8a7ed34f60c342f95cba5937c41b51ecfc404ef95",
+    "src/trw_pin_bs.v": "f06c3543ae08f99de296852e96fe842ae7f44df3734467f1d05900b1a474265c",
+    "formal/pin_unit.sby": "ad21b29c78479319fa7c624031a099dde021fb08d5173683a292d6419f9767a7",
+    "formal/props/pin_unit_flags.vh": "2d694a9a5174ec76d8a04ee594e055f5f9c613107ca300d8e55586ab2dc02418",
+    "formal/props/pin_bs_overrun.vh": "5a7a188abd3a57e1cbad72d31680020603196e7ac185b40317f808954fc07c50"
+  },
+  "helper_sha256": {
+    "scripts/formal_pin_unit.py": "fe75a9c9bc5e0768f62d523206d03062e57bf3eb962e7f0649df4558402d66db",
+    "scripts/formal_channels.py": "e2326ef43460ef63be39a87e3e511d87b7855abff710b8c64277577f3392a270"
+  },
+  "tool_versions": {
+    "yosys": "Yosys 0.69+24 (git sha1 d0e71cfb7-dirty, Release, Clang /usr/bin/clang++ 21.1.8)",
+    "sby": "SBY v0.69",
+    "z3": "Z3 version 4.15.5 - 64 bit"
+  },
+  "patch_sha256": "7d825584da3c2aa83d8eeb0929f2b2a20e45893d5652a35540f6984788cfee23",
+  "queue_oracle_sha256": "07a0ce3227f813641f0646c60328dea41d46c2ab3f4feac5fc337c08cc11dc95",
+  "artifact_source_sha256": {
+    "formal/pin_unit.sby": "d8bcd11e5257b2319a9845325ad5e61bcc5919d80da85b389c8f26abbf4e91b7",
+    "formal/props/pin_bs_overrun.vh": "5e233b3fe9594a1377e84785fe8b377af83c49ce24d87751faba173d13668d7e",
+    "formal/props/pin_unit_flags.vh": "2d694a9a5174ec76d8a04ee594e055f5f9c613107ca300d8e55586ab2dc02418",
+    "formal/props/status_queue_reference.vh": "07a0ce3227f813641f0646c60328dea41d46c2ab3f4feac5fc337c08cc11dc95",
+    "src/trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9",
+    "src/trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "src/trw_pin_bs.v": "4b411da1e10a353724d6f1ca7120e40ad0bd64dacfa784e19dead625eda2ccad",
+    "src/trw_pin_io.v": "d11a88346a39378b0dc763b9a4c4cdb196e7069f88bc9c24b71564a1593e90b7",
+    "src/trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+    "src/trw_pin_tx.v": "bf3716de0cf6f3a6956d6af8a7ed34f60c342f95cba5937c41b51ecfc404ef95",
+    "src/trw_pin_unit.v": "801c4671a004e769364d34d199e44559faa448543d7a81f13108963ebcd735ec"
+  },
+  "proofs": {
+    "qualified": {
+      "status": "PASS",
+      "seconds": 3.7,
+      "log_sha256": "8ce4354d01f60ab71d45dcc59c2f741cfc7a1f518823ce2f80fcdaf72eebfa21",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "qualified_cover": {
+      "status": "PASS",
+      "seconds": 18.768,
+      "log_sha256": "5c3649fca06ce3943ae967d73c09a20f1c3c155fac731fa52ac31f4fa90a41c0",
+      "engine": "smtbmc z3",
+      "cover_steps": [
+        3,
+        4,
+        4,
+        5,
+        7
+      ],
+      "witnesses_sha256": {
+        "engine_0/trace0.vcd": "4f1863f2873bdc17a21ddcf750fe423846b3bb8746d699c20c98c8d7e3d26786",
+        "engine_0/trace1.vcd": "11fb677511139cc69cd3779c66448b066e211d5dbfa500fde92abd5c3f0fb81a",
+        "engine_0/trace2.vcd": "7f7355b8a11f25cce3113aabf66a173385f6eae13879098b5d70532ab898a070",
+        "engine_0/trace3.vcd": "d0b8dfca0d9854e24e9385f05556ce67a796e8588b25677d1a3e7204579f1ceb",
+        "engine_0/trace4.vcd": "a3050ec98128961f3692df713c1240ccaf0490bab8d4d4821eca9c2ab506c317",
+        "engine_0/trace5.vcd": "1f1bd2a42920bcea3712ecd142a0bdbf6b3969fcd67e7aa7135cd9a97721236f"
+      }
+    }
+  },
+  "adopted": false,
+  "all_pass": true,
+  "native_sources_unchanged": true
+}

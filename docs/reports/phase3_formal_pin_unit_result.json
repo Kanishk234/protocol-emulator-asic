@@ -1,0 +1,145 @@
+{
+  "scope": "Native lean pin-unit sticky flags and RX merge; static cfg, legal period, monotonic live, stable pending TX; full/BITSYNC proof open",
+  "hardware_changed": false,
+  "source_sha256": {
+    "src/trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "src/trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9",
+    "src/trw_pin_unit.v": "1850fff765398ced39d39fe104291a6e191743f1ad2074537094c3822104ac8c",
+    "src/trw_pin_io.v": "d11a88346a39378b0dc763b9a4c4cdb196e7069f88bc9c24b71564a1593e90b7",
+    "src/trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+    "src/trw_pin_tx.v": "bf3716de0cf6f3a6956d6af8a7ed34f60c342f95cba5937c41b51ecfc404ef95",
+    "src/trw_pin_bs.v": "f06c3543ae08f99de296852e96fe842ae7f44df3734467f1d05900b1a474265c",
+    "formal/pin_unit.sby": "ad21b29c78479319fa7c624031a099dde021fb08d5173683a292d6419f9767a7",
+    "formal/props/pin_unit_flags.vh": "2d694a9a5174ec76d8a04ee594e055f5f9c613107ca300d8e55586ab2dc02418",
+    "formal/props/pin_bs_overrun.vh": "5a7a188abd3a57e1cbad72d31680020603196e7ac185b40317f808954fc07c50"
+  },
+  "runner_sha256": "fe75a9c9bc5e0768f62d523206d03062e57bf3eb962e7f0649df4558402d66db",
+  "shared_runner_sha256": "e2326ef43460ef63be39a87e3e511d87b7855abff710b8c64277577f3392a270",
+  "proofs": {
+    "lean": {
+      "status": "PASS",
+      "seconds": 1.667,
+      "log_sha256": "f29ee4241070135524bc39c469c6af74a08b00165265c277054653c88199bccf",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "lean_qualified": {
+      "status": "PASS",
+      "seconds": 1.898,
+      "log_sha256": "2b679b24344871603395d2674438e127cec69c8d27b2da9c985cd5ad8101bb62",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "lean_cover": {
+      "status": "PASS",
+      "seconds": 3.669,
+      "log_sha256": "a9dea96fda7fa5c569cc3e84c40f35557b90a2acd0d015cb266a2c8aa93a67eb",
+      "engine": "smtbmc z3",
+      "cover_steps": [
+        3,
+        4
+      ],
+      "witnesses_sha256": {
+        "engine_0/trace0.vcd": "7a4dc92c85def843b16ded049e9101ddc0b0cf6284d9104764f9c605caab6fa9",
+        "engine_0/trace1.vcd": "93aef822d822b97102f9f1696c69df503b6d740db075b648faf20741b40622ae"
+      }
+    },
+    "lean_qualified_cover": {
+      "status": "PASS",
+      "seconds": 3.924,
+      "log_sha256": "f3fbd82f27e2b02b564c05dbb253febe5d34099de04cc51c219bc3dd194ddadb",
+      "engine": "smtbmc z3",
+      "cover_steps": [
+        3,
+        4
+      ],
+      "witnesses_sha256": {
+        "engine_0/trace0.vcd": "b9c093fdddf189717ed8a930afefc0b68285b75477e3b9386e4416faec4acc1b",
+        "engine_0/trace1.vcd": "8bbdcfd2c7a20aa613ccd2fe8c93ddadd23350621158aa4c0bf7a0f1bc17f633"
+      }
+    }
+  },
+  "mutation_controls": {
+    "clear_beats_set": {
+      "status": "FAIL",
+      "seconds": 4.028,
+      "log_sha256": "83f1ae38a0ba58ae1c481094238e37788914b53da1f9c7203d8f83bcbaafa973",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "1904b6e09597cc09dcd0d3b4756feb97d573293eb409b7bfa1dd856da609b493"
+      },
+      "mutated_source_sha256": "1d088952469dc2823a8f46360da5de53234cfd4776b468db52975f1618d6c4ac"
+    },
+    "forget_sticky_overrun": {
+      "status": "FAIL",
+      "seconds": 3.176,
+      "log_sha256": "2dd9d1e231d822ea7edd3cc8d1ca2ebe6a82f6938dfba2ff363ec0797ba9af06",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "0f5307b2b6700ff31cf482ab1804be18151b05678931890de5f8f9c1e438e133"
+      },
+      "mutated_source_sha256": "e50e4d5c328fb9fd82270dcee091bdf3c207949bc8fe5f1136dd98f2c7b38ef1"
+    },
+    "ignore_overrun_clear": {
+      "status": "FAIL",
+      "seconds": 2.434,
+      "log_sha256": "cf0f459e8dbfbb5664abf1ef45b1038532cdf4bfbf9beeeddc7fe882209cd7f5",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "6942b1466b5d989277392ea29a9b8ae207f51c2510ec0e569a62d7cd5e9c012f"
+      },
+      "mutated_source_sha256": "7afe440cba96b78f695688ba926628cf5e43a4362833e3f20dea150202f82a24"
+    },
+    "ignore_restart": {
+      "status": "FAIL",
+      "seconds": 2.276,
+      "log_sha256": "ecb6ad349eb4574d7f74bf427b71de5ceebd8a5fe4b0389a7a4a4d56a77634a3",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "827d688cce00b82918b6c4172ace13efcb2c825a4142c907dd65d5d80b44f06f"
+      },
+      "mutated_source_sha256": "c528c691c7b25ffd8f9dfe6dd455902ee6621d64f310f12420b1e05e9cf38498"
+    },
+    "corrupt_rx_merge": {
+      "status": "FAIL",
+      "seconds": 2.086,
+      "log_sha256": "686e7c158399b5cb24b1b1ea2f6ee05a7e2e1bab858563cc01c3183c63866443",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "982087ce6b6149e07cc26ae8d0bf648837506c19ea6b2d4a185d5b909c2d8d97"
+      },
+      "mutated_source_sha256": "9fce1d91a353fc035c200596623b640e4b4ed564edd56957ad4d0919ad80cc53"
+    }
+  },
+  "tool_versions": {
+    "yosys": "Yosys 0.69+24 (git sha1 d0e71cfb7-dirty, Release, Clang /usr/bin/clang++ 21.1.8)",
+    "sby": "SBY v0.69",
+    "z3": "Z3 version 4.15.5 - 64 bit"
+  },
+  "native_sources_unchanged": true,
+  "qualified_full_diagnostic": {
+    "status": "FAIL",
+    "failed_property": "Existing native BITSYNC st_clash assertion (two status EVENTs in one clock)",
+    "log_sha256": "eca339ba252fcfdb43e8fc765858aede2927ee62a20f3f96c51607b828e2a3e0",
+    "witness_sha256": "c1b7ec379e13ef0200a756d2fad541be9033c1c95a38f52f824fb438a12cd7a2",
+    "artifact_source_sha256": {
+      "pin_bs_overrun.vh": "5a7a188abd3a57e1cbad72d31680020603196e7ac185b40317f808954fc07c50",
+      "pin_unit_flags.vh": "2d694a9a5174ec76d8a04ee594e055f5f9c613107ca300d8e55586ab2dc02418",
+      "trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9",
+      "trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+      "trw_pin_bs.v": "dcdd544b622d229570e29678f1272209e7411b57888ce64528c7c1e41967f2a7",
+      "trw_pin_io.v": "d11a88346a39378b0dc763b9a4c4cdb196e7069f88bc9c24b71564a1593e90b7",
+      "trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+      "trw_pin_tx.v": "bf3716de0cf6f3a6956d6af8a7ed34f60c342f95cba5937c41b51ecfc404ef95",
+      "trw_pin_unit.v": "801c4671a004e769364d34d199e44559faa448543d7a81f13108963ebcd735ec"
+    },
+    "counts_as_pass": false
+  }
+}

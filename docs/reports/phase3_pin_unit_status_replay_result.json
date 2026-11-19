@@ -1,0 +1,46 @@
+{
+  "scope": "Open native BITSYNC status collision diagnostic; command/configuration admission under review",
+  "fixture_sha256": "af479988ae5b014205d4ef93ac2782cb8cdd64ad2d839af7ab3a53b9ce6f956e",
+  "runner_sha256": "7ac6400ea5eeaa111bfabc4baef8bf0cf31f132e352f38da62a670dda00fc755",
+  "source_sha256": {
+    "src/trw_pin_unit.v": "1850fff765398ced39d39fe104291a6e191743f1ad2074537094c3822104ac8c",
+    "src/trw_pin_io.v": "d11a88346a39378b0dc763b9a4c4cdb196e7069f88bc9c24b71564a1593e90b7",
+    "src/trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+    "src/trw_pin_tx.v": "bf3716de0cf6f3a6956d6af8a7ed34f60c342f95cba5937c41b51ecfc404ef95",
+    "src/trw_pin_bs.v": "f06c3543ae08f99de296852e96fe842ae7f44df3734467f1d05900b1a474265c",
+    "src/trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "src/trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9"
+  },
+  "cases": {
+    "observed": {
+      "exit_code": 1,
+      "idle_bits": 1,
+      "log_sha256": "83c160a7bc91432d5948bf4fdfe82aada6f5125011d6e5b05e5aa57512740421",
+      "testbench_sha256": "398a0432a800ef73fef35c61a553aeb007800d48a0d773e76e47f71ada2d8713",
+      "fixture_sha256": "af479988ae5b014205d4ef93ac2782cb8cdd64ad2d839af7ab3a53b9ce6f956e"
+    },
+    "idle4_control": {
+      "exit_code": 0,
+      "idle_bits": 4,
+      "log_sha256": "5978420c954e5c1de7dee0f0245b9dce25bfc5b114160d9585328189058a3a9b",
+      "testbench_sha256": "5d754a5b6463430f107c1d03eb984b4951ded6019a8b45109e2aa11f67e9c192",
+      "fixture_sha256": "af479988ae5b014205d4ef93ac2782cb8cdd64ad2d839af7ab3a53b9ce6f956e"
+    },
+    "minimized": {
+      "exit_code": 1,
+      "idle_bits": 1,
+      "log_sha256": "b440a556e35f7df32e2905ef3ddd889b54f7422da97b480f5e030f8b593e0bb2",
+      "testbench_sha256": "8825fa4976de805467765e71d1d3b0b29cc26e14063b322d1baa98c4eb609963",
+      "fixture_sha256": "4e556109d14cda3aa607bdbd11f17a9b63315d649b13376c7bdf437ebc24166a"
+    },
+    "minimized_idle4_control": {
+      "exit_code": 0,
+      "idle_bits": 4,
+      "log_sha256": "fd36629b93df45d3a2b29c9de981d50c1607ea993b93879ddddee0aeb27a7814",
+      "testbench_sha256": "56ab42fdf8fb51c0342c9a9e0e8999d3283931cb9f93bfc3c18101455492d2a2",
+      "fixture_sha256": "4e556109d14cda3aa607bdbd11f17a9b63315d649b13376c7bdf437ebc24166a"
+    }
+  },
+  "hardware_changed": false,
+  "formal_gate_passed": false
+}

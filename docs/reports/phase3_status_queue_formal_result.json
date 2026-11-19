@@ -1,0 +1,90 @@
+{
+  "scope": "Source-extracted native candidate producer cone and status register, arbitrary boundary intents/data; not whole BITSYNC engine",
+  "runner_sha256": "a7a2ae7a6513921132dccd7a574eb103a658f5e8ecafa970b37242895ecba8be",
+  "shared_runner_sha256": "e2326ef43460ef63be39a87e3e511d87b7855abff710b8c64277577f3392a270",
+  "tool_versions": {
+    "yosys": "Yosys 0.69+24 (git sha1 d0e71cfb7-dirty, Release, Clang /usr/bin/clang++ 21.1.8)",
+    "sby": "SBY v0.69",
+    "z3": "Z3 version 4.15.5 - 64 bit"
+  },
+  "native_sha256": "f06c3543ae08f99de296852e96fe842ae7f44df3734467f1d05900b1a474265c",
+  "candidate_sha256": "adf33944c7735c003577d0e8781536b1eca9808b4c3a1a665533c489f0bce3da",
+  "patch_sha256": "7d825584da3c2aa83d8eeb0929f2b2a20e45893d5652a35540f6984788cfee23",
+  "extracted_sha256": "21e62b71ffb4ea3eecf40bd1ba1a1f2bcd576200352b8180fdab4f84767d2b74",
+  "property_sha256": {
+    "formal/props/status_queue_reference.vh": "07a0ce3227f813641f0646c60328dea41d46c2ab3f4feac5fc337c08cc11dc95",
+    "formal/props/status_queue_harness.sv": "840c81ae95c674c1aa93f2fc36451d2a355a34f8ee3accb6263da932c6ef528c",
+    "formal/status_queue.sby": "d66f1ff71f09eaee27c9a73f56445ebdc17663152bfd11dd8af6b34692c72fe3"
+  },
+  "proofs": {
+    "safety": {
+      "status": "PASS",
+      "seconds": 0.546,
+      "log_sha256": "fc5f01fc20770c6aa541479afac4313eecad8e609705f055ce7788358b429c93",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "reachable": {
+      "status": "PASS",
+      "seconds": 0.496,
+      "log_sha256": "6233c18c3063bc2ba9031cf2d83c6e376bf00b48a2e211660882035b95070c31",
+      "engine": "smtbmc z3",
+      "cover_steps": [
+        2,
+        2,
+        3,
+        3
+      ],
+      "witnesses_sha256": {
+        "engine_0/trace0.vcd": "33b4ebe7bba7c388d413ef1c7a91151fe08be0d1453c01ae6197e9310b3cd09c",
+        "engine_0/trace1.vcd": "0284793e734245acc51b0e48150436e3d51e89eb095755c0368bcf1a1eebfbdf",
+        "engine_0/trace2.vcd": "7081ff15f0a515152de28c2fe584447ea55ed9a7c0621762a90ead18735bc326",
+        "engine_0/trace3.vcd": "14e72513154e2322a7443bcc1b3b69f75a823afb4221d58403e3a60632e16b72"
+      }
+    }
+  },
+  "mutation_controls": {
+    "lose_second_pending": {
+      "status": "FAIL",
+      "seconds": 0.695,
+      "log_sha256": "10df6428baed1cec55bf10cf56208ed47ebd69c96d51b9691c94d531487169e8",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "9fddb553197d66e07818ac7273c7fc42a093f13540299a4c5b653078a920173a"
+      }
+    },
+    "suppress_loss": {
+      "status": "FAIL",
+      "seconds": 0.7,
+      "log_sha256": "ceea6de27eba5859899719de725cbd85530fabac82e368d6bb9734ad1e3181f4",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "1d11299e2d00c2e4b889a27f243143e4997a891bfad4549fae119b03d5bf579e"
+      }
+    },
+    "ignore_old_pending": {
+      "status": "FAIL",
+      "seconds": 0.621,
+      "log_sha256": "a271078be3bfedc44c40ec3323e29a6023bda7f7e40e374f8f5f8a6255d2b05e",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "748a686f66378509c9fc89ca4423e0964674e9381a6f4aa1fc0b4cfe89f25b61"
+      }
+    }
+  },
+  "baseline_control": {
+    "status": "FAIL",
+    "seconds": 0.7,
+    "log_sha256": "cd9ee7402716eba75a2fd9734e989c181ca437530d92d79573404437a431ed10",
+    "engine": "abc pdr",
+    "cover_steps": [],
+    "witnesses_sha256": {
+      "engine_0/trace.vcd": "96e95c4a2eb0f2b9f0c864562784bc57664a3eba36f784119db58f85e400774b"
+    }
+  },
+  "native_source_unchanged": true
+}

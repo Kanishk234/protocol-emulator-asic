@@ -217,6 +217,8 @@ Clock mismatch (±ppm), jitter, glitches shorter than one sample, and slow open-
 | F-HOST-1 | Host writes to slots/SRAM/config happen only while the targeted lane is halted | Host controller |
 | F-DEC-1 | Every encodable slot/routine word decodes to exactly the fields the YAML defines (generated properties) | Decoder |
 
+Current local evidence: [native channel composition](../reports/PHASE3_FORMAL_CHANNELS.md) proves scoped F-CHAN-1 safety, F-CHAN-2 order and F-CHAN-3 tap isolation with unbounded PDR. Eventual consumption requires readiness; the separate always-ready proof establishes next-clock progress. Covers use depth 40. [Native RX overrun preservation](../reports/PHASE3_FORMAL_PIN_RX.md) also passes unbounded PDR with depth-20 covers and five mutation controls; [Lean sticky-unit integration](../reports/PHASE3_FORMAL_PIN_UNIT.md) now passes unbounded for default/qualified cache parameters with explicit interface premises; full/BITSYNC integration remains open. Other formal obligations remain open; the separate `formal` workflow currently runs these channel/RX/lean-unit tasks and mutation controls; native full/BITSYNC remains a retained diagnostic FAIL. The [D-192candidate queue/full-unit proof](../reports/PHASE3_STATUS_MERGE_FORMAL.md) now passes under its explicit premises, but is outside main hardware and is not F-CHAN-4acceptance for main.
+
 ### L5b: program-specific formal (V4)
 The formal harness loads a shipped program (slot images via `$readmemh` into the slot arrays, bypassing the host) and constrains the pins to a legal protocol environment written as assumptions. It then proves:
 - **I2C target:** the ACK is driven before the next SCL fall at the configured speed; no drive on SDA while SCL is high except the intended START/STOP.
@@ -307,7 +309,7 @@ Priority: below L2, L3 and L5. If the schedule slips, L9 is cut first, with a DE
 | `fpga_basys3` or local Vivado script (ours, D-022) | Full-design Artix-7 bitstream, timing met | Manual / phase 3 |
 | `lint` (ours) | L0 checks, generated-file freshness | Every push |
 | `unit` (ours) | L1 + L2 short seeds + L4 + L6 under Verilator; the same suites under Icarus (L-XSIM); `SIM_ASSERT` on | Every push |
-| `formal` (ours) | L5 proofs; L5b for shipped programs; L8-EQY on the Yosys netlist | Push to `src/` or `spec/` |
+| `formal` (ours) | Scoped native channel L5 proofs, reachability and mutation controls; other L5/L5b/L8-EQY tasks remain planned | Push or manual |
 | `hardcaml` (ours) | L9: Hardcaml expect tests and the OCaml-model lockstep | Push to `src/`, `spec/` or `hardcaml/` |
 | `nightly` (ours) | Long L2 lockstep, L4-IMP sweeps, L7 mutation | Scheduled |
 

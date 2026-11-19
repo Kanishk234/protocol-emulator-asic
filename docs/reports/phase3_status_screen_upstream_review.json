@@ -1,0 +1,166 @@
+{
+  "baseline_tools": "9d13ff3e3e6202090740110438c6a10c1d62ca0f",
+  "reviewed_current_tools": "0922544e6c7f6126047c3fba720b0437fa32a1b8",
+  "ahead_by": 15,
+  "changed_files": [
+    {
+      "path": ".github/workflows/build-datasheet.yaml",
+      "blob_sha": "1a7859796d4ee9063eec850a3ecd342f8ce9bf59",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/.gitignore",
+      "blob_sha": "889f5e0c57ec93f79132d127a61dbf44d260dcd2",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/README.md",
+      "blob_sha": "66a3345dc605cbfb0a4003067124fd2b6ca5f552",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/OFL.txt",
+      "blob_sha": "8597481ebc941863ab228e79ea4305507cd73cc6",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/README.md",
+      "blob_sha": "e80eccb56a3b11ca09f9287c4e331cb7b93d8406",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/archivo.woff2",
+      "blob_sha": "70646c65a9bebc606be7f9f4994ae291802d5de0",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/bar-texture.png",
+      "blob_sha": "d0e8865d59555eddbd5a8f9270aede2eddb73c02",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/demoboard.jpg",
+      "blob_sha": "12e758183d395b180320ea6161d7cb2649746482",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/supporters/WIT.png",
+      "blob_sha": "3975175083aec2a02691ec5d9f649ad5db9f9103",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/supporters/chipfoundry.png",
+      "blob_sha": "abc5882a3fd80d2f1a8f63d2c7d5fb8718a8507c",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/supporters/swisschips.png",
+      "blob_sha": "4759bef11f6352ae4ebfa66c9604caecc135236e",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/supporters/texplained.jpg",
+      "blob_sha": "e5c528059570264aab65685c880acaf6cb7e610a",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/supporters/tillitis.png",
+      "blob_sha": "b8a280f794f1457fed5527b1cc54f3049c2d413e",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/assets/supporters/waferspace.png",
+      "blob_sha": "765e66d65d605e28b45d450a1ba70b973c3a620f",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/build.py",
+      "blob_sha": "5986af717d67f1741ccc4cbe087e89a98ded4942",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/datasheet-universities.yaml",
+      "blob_sha": "ec497b50a302c4ec2fbf5d6ead74c1c344daac2a",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/datasheet.html.mustache",
+      "blob_sha": "c5409e914ed8c41ec1bdf0ad1a4677317d17e2b3",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/datasheet.yaml",
+      "blob_sha": "6201e422c4672953f574a827e1ccf844d9fc9706",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/facts.py",
+      "blob_sha": "299d8a7bd27f1c5cd6fea4e2403a4fbae7ce6ed0",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/facts.yaml",
+      "blob_sha": "d1a84baf89ffe59d87a8b6ee7d193c14abe56e67",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/partials/footnote.mustache",
+      "blob_sha": "c89a67ae3a3c274a6dfef64294578650b5814646",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/partials/logo.mustache",
+      "blob_sha": "237052a6693bd07d99b4ea45aba7bf80dfa28e20",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/partials/secthead.mustache",
+      "blob_sha": "721d9e11006758596fc9599aad70ffa937971086",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/partials/table.mustache",
+      "blob_sha": "acf4a3e1689460ca3881d2119d873d32075e9c66",
+      "status": "added"
+    },
+    {
+      "path": "docs/product/requirements.txt",
+      "blob_sha": "c2c674cac23bc8f67d377386529445ddfc60ee59",
+      "status": "added"
+    },
+    {
+      "path": "precheck/precheck.py",
+      "blob_sha": "3f07a58c72ce2f7308ad96e3ae0b1f2a9a1fbf54",
+      "status": "modified"
+    },
+    {
+      "path": "precheck/tech-files/README.txt",
+      "blob_sha": "bc28ad1a0e983649926fbc82b4539f8b80110bce",
+      "status": "modified"
+    },
+    {
+      "path": "precheck/tech-files/nwell_hvtp.drc",
+      "blob_sha": "98cc116675ee07dc25c73031ff21e8b5e9d9eec6",
+      "status": "added"
+    },
+    {
+      "path": "precheck/tech-files/sky130A_mr.drc",
+      "blob_sha": "25f267582dadd94a4f5024f847b1e69fedd7324b",
+      "status": "modified"
+    },
+    {
+      "path": "precheck/test_precheck.py",
+      "blob_sha": "eab566299e5c08f7845a80b3438470de8e435b1b",
+      "status": "modified"
+    },
+    {
+      "path": "project_info.py",
+      "blob_sha": "d931861515f0e4169a0b851b3cd5d1fe36b66bde",
+      "status": "modified"
+    }
+  ],
+  "hardening_generation_files_changed": false,
+  "cmos5l_physical_tech_files_changed": false,
+  "requirements_changed": false,
+  "review": "Changes are product documentation, sky130A-only precheck additions, and extraction of the unchanged analog pin limit6 into a named constant. Official CMOS5L action still selects LibreLane3.1.0.dev4. Recheck floating upstream before final GDS; this receipt is not physical qualification."
+}

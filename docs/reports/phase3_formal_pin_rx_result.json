@@ -1,0 +1,108 @@
+{
+  "scope": "Native pin RX + producer; symbolic configuration, synchronized pins, TX commands and release; initial reset then deasserted; overrun output not sticky unit flag",
+  "hardware_changed": false,
+  "source_sha256": {
+    "src/trw_chan_prod.v": "6b41d58996b41970ab958ab0d7d71f1839ddae264856748f7c2d0aa08ecf56e6",
+    "src/trw_pin_rx.v": "96f8c642a6e28bf539b5bfe74c0e57d20e6826faa4f9b618d4ff36bfbc8d9fb5",
+    "src/trw_assert.vh": "e4acc452499db6ba401d09493578568540906139c91bbdf91b865cc0223c76b9",
+    "src/trw_defs.vh": "8291ac85fed90fbfa9d314436ae5c60e6944347e4115b3668431ed3044c60848",
+    "formal/props/pin_rx_overrun.sv": "95f8cdbad3d018adbf3055b1428f2971fe5931529485d6a71e86e7857c5e99cb",
+    "formal/pin_rx.sby": "80da1b7dee88d3c8fb12a5f603a3d191d02508a80153871f35bf88585379f576"
+  },
+  "runner_sha256": "c350648f62adea70d0b45728d6018d09b5348b26d1ad2bff6ff6e63d2485ad86",
+  "shared_runner_sha256": "e2326ef43460ef63be39a87e3e511d87b7855abff710b8c64277577f3392a270",
+  "proofs": {
+    "safety": {
+      "status": "PASS",
+      "seconds": 3.996,
+      "log_sha256": "18583819545ccf7cca3fa84fc581e377e7c936df941076db99e67e0e78eb9567",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {}
+    },
+    "reachable": {
+      "status": "PASS",
+      "seconds": 1.006,
+      "log_sha256": "758d0d69e69e8ef2d843fd5035cfb3af03fb1629a6f0f8a8d91e95a0f9fffae0",
+      "engine": "smtbmc z3",
+      "cover_steps": [
+        3,
+        3,
+        5
+      ],
+      "witnesses_sha256": {
+        "engine_0/trace0.vcd": "eeb25f8b5cbed0454ba0087e8704e8bf0c2e2a51168a1dfdb6c92792c1da0ac6",
+        "engine_0/trace1.vcd": "cd80fed260886923ae08503a0c7b020209d3fd892b594f217242e9b348476814",
+        "engine_0/trace2.vcd": "11bb515b0ff3ac99b68c2316856376d337078204ad5e3e443aa89014eb7d3be6"
+      }
+    }
+  },
+  "mutation_controls": {
+    "suppress_overrun": {
+      "status": "FAIL",
+      "seconds": 1.306,
+      "log_sha256": "71153b8ed56549a1e91f72c0a7733ab7855ec14f142a35bf7bacc9617c81f92b",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "75dc740d95500ad90a101f9ce4b12a8a9fb8c14de168ac70f116119aadacd514"
+      },
+      "changed_file": "src/trw_pin_rx.v",
+      "mutated_source_sha256": "0760d667075b0b500c1de075da30b77a7474fa362e1cdeca41a89462c1c714b9"
+    },
+    "rx_requests_while_full": {
+      "status": "FAIL",
+      "seconds": 1.246,
+      "log_sha256": "b7abf90f9ed002c04e7c87fed2dc61baa72fcb22fb1c587a2942f5050600b9f4",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "2505270cd2309c089cb07fdc5952eea5e59964327ec90b84a41b0e34646f0a03"
+      },
+      "changed_file": "src/trw_pin_rx.v",
+      "mutated_source_sha256": "988954b85a4fd599df4b2a4c4398aca1aaac4642fe4eb46111a712e85640fc45"
+    },
+    "erase_blocked_token": {
+      "status": "FAIL",
+      "seconds": 1.457,
+      "log_sha256": "101e0ef66e47556a0ba680f7317d8b9d28b226dbcef5de9cb731a4116c773eb1",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "71d5dd260d413098c5427ce238aacd743178c2ad66a006c89e3e59ee4af87e37"
+      },
+      "changed_file": "src/trw_chan_prod.v",
+      "mutated_source_sha256": "a91289e0cef9c8cbefd62e0b028fa06b949892c5dac96e43f3a655ed09f9403a"
+    },
+    "lose_event_completion": {
+      "status": "FAIL",
+      "seconds": 1.286,
+      "log_sha256": "38f2d34e043db90948936e4c47b14530fc4b09b52a1f12d8975278f5ab10d8df",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "7fb397afc4afdf5134220aea8b016d1ae72c880e7a84647c847ef64138f6097b"
+      },
+      "changed_file": "src/trw_pin_rx.v",
+      "mutated_source_sha256": "5a6fe1a6daab243b60f2c2daced47efa6070d46aee519965d740158a6fd0ff7a"
+    },
+    "corrupt_accepted_token": {
+      "status": "FAIL",
+      "seconds": 1.254,
+      "log_sha256": "30e6cf84bd374b91b38dbe31e1c68ff8868d5838ec4e3cd6337faa0410d3a0a3",
+      "engine": "abc pdr",
+      "cover_steps": [],
+      "witnesses_sha256": {
+        "engine_0/trace.vcd": "5cf8844f97846923b79017f2bd3b0ea4da404482600bbdad18a7af0333d65ad6"
+      },
+      "changed_file": "src/trw_chan_prod.v",
+      "mutated_source_sha256": "40ad448a0446b239cafe7a48713a594d1b0e0762f3047923eaffb0956ffeffc3"
+    }
+  },
+  "tool_versions": {
+    "yosys": "Yosys 0.69+24 (git sha1 d0e71cfb7-dirty, Release, Clang /usr/bin/clang++ 21.1.8)",
+    "sby": "SBY v0.69",
+    "z3": "Z3 version 4.15.5 - 64 bit"
+  },
+  "native_sources_unchanged": true
+}

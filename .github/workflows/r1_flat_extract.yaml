@@ -42,7 +42,7 @@ jobs:
           flatten(Path('build/r1_flat_assembly'),sources['sources'],Path('build/r1_flat_extract'))
           PY
           bash spikes/cloud/fetch_pdk.sh
-      - name: Native inventory all-layer XOR control then full-macro RC extraction
+      - name: Preserve source pin markers then check all layers before RC extraction
         timeout-minutes: 65
         run: |
           set -euo pipefail

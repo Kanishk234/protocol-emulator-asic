@@ -1,0 +1,174 @@
+name: R1 registered-input native loading and reload
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_registered_input_functional.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-registered-input-functional
+  cancel-in-progress: false
+jobs:
+  native:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/registered_pdk
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Check image mutation and route admission guards
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_registered_input.py tools/profiling/tests/test_r1_selected_route.py tools/profiling/tests/test_r1_quiesce.py tools/profiling/tests/test_r1_configuration_audit.py
+      - name: Authenticate original source and supported timing measurement
+        timeout-minutes: 15
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib, json, os, subprocess, sys, zipfile
+          from pathlib import Path
+          sys.path.insert(0, 'spikes/r1')
+          from unused_lut_probe import SOURCE_RUN, ARTIFACT_ID, ARCHIVE_SHA, context
+          repo = os.environ['GITHUB_REPOSITORY']
+          run = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{SOURCE_RUN}']))
+          artifact = json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/artifacts/{ARTIFACT_ID}']))
+          context(run, artifact)
+          archive = Path(os.environ['RUNNER_TEMP']) / 'original-timing.zip'
+          with archive.open('wb') as output:
+              subprocess.run(['gh','api',f'repos/{repo}/actions/artifacts/{ARTIFACT_ID}/zip'], stdout=output, check=True)
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == ARCHIVE_SHA
+          root = Path('build/r1_timing'); root.mkdir(parents=True, exist_ok=False)
+          with zipfile.ZipFile(archive) as bundle:
+              names = bundle.namelist()
+              assert len(names) == len(set(names))
+              assert all(not Path(n).is_absolute() and '..' not in Path(n).parts for n in names)
+              bundle.extractall(root)
+          Path('build/unused-lut-source.json').write_text(json.dumps(dict(run=run, artifact=artifact), indent=2)+'\n')
+          PY
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib,json,os,subprocess,zipfile
+          from pathlib import Path
+          repo=os.environ['GITHUB_REPOSITORY']
+          run=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/44458951788']))
+          assert run['head_sha']=='d9c3545134c43b4a3a4167c981c1b70dfd6a9e6d' and run['run_attempt']==1 and run['conclusion']=='success'
+          artifact=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/artifacts/14497944851']))
+          digest='a313d2dc24a5991d8efd71067e89fc493159ab7f913c22bdb5028b63f32c1c83'
+          assert artifact['workflow_run']['id']==44458951788 and not artifact['expired']
+          assert artifact['name']=='r1-unused-d-upstream-44458951788' and artifact['digest']=='sha256:'+digest
+          archive=Path(os.environ['RUNNER_TEMP'])/'registered-input-timing.zip'
+          with archive.open('wb') as stream:
+              subprocess.run(['gh','api',f'repos/{repo}/actions/artifacts/14497944851/zip'],stdout=stream,check=True)
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==digest
+          with zipfile.ZipFile(archive) as bundle:
+              names=bundle.namelist()
+              assert len(names)==len(set(names)) and all(not Path(n).is_absolute() and '..' not in Path(n).parts for n in names)
+              bundle.extractall('build/registered_timing')
+          Path('build/registered-timing-source.json').write_text(json.dumps(dict(run=run,artifact=artifact))+'\n')
+          capsule=Path('build/r1_timing').resolve()
+          audit=json.loads((capsule/'leaf-audit.json').read_text())
+          for row in audit['native_exports'].values():
+              suffix=row['path'].split('/build/r1_timing/',1)[1]
+              path=capsule/suffix
+              assert path.resolve().is_relative_to(capsule) and hashlib.sha256(path.read_bytes()).hexdigest()==row['sha256']
+              row['path']=str(path)
+          Path('build/registered-native-audit.json').write_text(json.dumps(audit)+'\n')
+          PY
+          PYTHONPATH=tools python spikes/r1/unused_lut_probe.py prepare --capsule build/r1_timing --out build/registered_native --target unused-d-upstream-select
+          bash spikes/cloud/fetch_pdk.sh
+          mkdir -p build/registered_iverilog
+          curl -sfL https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb -o build/registered_iverilog.deb
+          dpkg-deb -x build/registered_iverilog.deb build/registered_iverilog
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          expected=json.loads(Path('build/r1_timing/functional/quiescent/configured-smoke.json').read_text())['tool_binary_sha256']
+          for name,digest in expected.items():
+              assert hashlib.sha256((Path('build/registered_iverilog/usr/bin')/name).read_bytes()).hexdigest()==digest
+          PY
+      - name: Export exact native graph for independent frame audits
+        timeout-minutes: 8
+        run: |
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" "$image" \
+            yosys -Q -T -s build/registered_native/export.ys > build/registered_native/export.log
+      - name: Parent control actual loading and reset
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools timeout 240s python spikes/r1/configured_smoke.py \
+            --model build/r1_timing/model/resource --case build/r1_timing/model/compile/uart_spi_11 \
+            --mapped-bundle build/r1_timing/mapped/input --postphysical-complete build/registered-native-audit.json \
+            --pdk "$PDK_ROOT/ihp-sg13cmos5l" --icarus-root build/registered_iverilog \
+            --quiesce-unused --capture-configuration --restart-probe --out build/registered_functional/parent > build/registered-parent.log 2>&1
+      - name: Candidate native UART SPI reset and second transfer
+        timeout-minutes: 5
+        env:
+          R1_REGISTERED_INPUT_EXPERIMENT: registered_h
+          R1_REGISTERED_INPUT_TIMING_RESULT: build/registered_timing/r1_unused_input/result.json
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools timeout 240s python spikes/r1/configured_smoke.py \
+            --model build/r1_timing/model/resource --case build/r1_timing/model/compile/uart_spi_11 \
+            --mapped-bundle build/r1_timing/mapped/input --postphysical-complete build/registered-native-audit.json \
+            --pdk "$PDK_ROOT/ihp-sg13cmos5l" --icarus-root build/registered_iverilog \
+            --quiesce-unused --capture-configuration --restart-probe --out build/registered_functional/candidate > build/registered-candidate.log 2>&1
+      - name: Candidate real management SPI reset STOP and reload
+        timeout-minutes: 6
+        env:
+          R1_REGISTERED_INPUT_EXPERIMENT: registered_h
+          R1_REGISTERED_INPUT_TIMING_RESULT: build/registered_timing/r1_unused_input/result.json
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=tools timeout 300s python spikes/r1/configured_smoke.py \
+            --model build/r1_timing/model/resource --case build/r1_timing/model/compile/uart_spi_11 \
+            --mapped-bundle build/r1_timing/mapped/input --postphysical-complete build/registered-native-audit.json \
+            --pdk "$PDK_ROOT/ihp-sg13cmos5l" --icarus-root build/registered_iverilog \
+            --quiesce-unused --capture-configuration --management-shell --out build/registered_functional/shell > build/registered-shell.log 2>&1
+      - name: Compare every actual native configuration bit with loaded words
+        run: |
+          source .venv/bin/activate
+          for stage in parent candidate shell; do
+            image=quiesced.wbit
+            if [ "$stage" != parent ]; then image=registered-input.wbit; fi
+            PYTHONPATH=tools python spikes/r1/configuration_audit.py --native build/registered_native/all-native.json \
+              --snapshot "build/registered_functional/$stage/configuration-state.json" \
+              --image "build/registered_functional/$stage/$image" --out "build/registered_functional/$stage/frame-audit.json"
+          done
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          from profiling.r1_registered_input import audit_snapshots,PARENT_SHA
+          root=Path('build/registered_functional')
+          load=lambda stage:json.loads((root/stage/'configuration-state.json').read_text())
+          summary=audit_snapshots(load('parent'),load('candidate'),load('shell'))
+          assert hashlib.sha256((root/'parent/quiesced.wbit').read_bytes()).hexdigest()==PARENT_SHA
+          for stage in ('candidate','shell'):
+              assert hashlib.sha256((root/stage/'registered-input.wbit').read_bytes()).hexdigest()=='25bfec380cbd5fb8cac4390389d1c1fa14d33ddb946e6499fc7467f79ee100b2'
+              assert json.loads((root/stage/'configured-smoke.json').read_text())['passed']
+          summary.update(passed=True,timing_acceptance=False,physical_acceptance=False,
+              scope='Primary native loading/reset/reload and exact D134 case agreement; no SDF/extracted/assembled timing acceptance.')
+          (root/'result.json').write_text(json.dumps(summary,indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-registered-input-native-${{ github.run_id }}
+          path: |
+            build/registered_functional/
+            build/registered-*.log
+            build/registered-native-audit.json
+            build/registered-timing-source.json
+            build/registered_native/plan.json
+            build/registered_native/all-native.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

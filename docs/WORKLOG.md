@@ -4,6 +4,13 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-18 — Expand leaf physical checks; replay completed cross-tile results
 
+- Published scoped tools/tests/docs/CI through f25eaa79. Representative physical
+  campaign 44445288959 is queued; no outcomes claimed yet. Claims ledger now
+  records the all-context routing, one-leaf geometry and bounded feedback scopes.
+  Before assembly, preserve different physical contexts as distinct masters:
+  several outputs share the original module name despite different widths or
+  power phases. Do not merge GDS/LEF by canonical tile type alone. Regenerated
+  physical naming needs port/geometry/native-graph checks before integration.
 - Corrected D126 run 44404102388 at c7c36d20 succeeds. Root checks every
   recorded input hash and all eight process/proof markers: own-feedback D/E/G
   and stronger all-feedback D/G prove; stronger E has a counterexample.

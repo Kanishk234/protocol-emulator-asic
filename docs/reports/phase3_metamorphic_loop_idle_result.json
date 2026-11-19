@@ -1,0 +1,1092 @@
+{
+  "scope": "Finite L4-LOOP and L4-IDLE on two real lanes, UART/SPI/I2C pad loops; no full L4, formal or Phase3completion claim",
+  "base_commit": "fe2fda1d21232ad21a59eeaac6ec0d15c28b8922",
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "phase3_complete": false,
+  "L4_exit_complete": false,
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008"
+  },
+  "sources_sha256": {
+    "tools/kernels/metamorphic_loop.py": "a69e9dc7c03dfb3b435cb4b74940916a05800c488611a50c72a6a883cf6327d3",
+    "tools/kernels/tests/test_metamorphic_loop.py": "ceb2a1d4b5306aa27f6fcf69685e1552895a799bbb60210e6ad40aa9f4b4cacb",
+    "test_internal/chip/test_metamorphic_loop.py": "7d306cf86bac97f072c5816f684407e9c3d48680ffa5bd51e54103d49076a8a3",
+    ".github/workflows/unit.yaml": "1a38c81ad4ff630e9e93e67a6ef45d8f979945d498469fa305c2b0e123011d1c",
+    "test_internal/Makefile": "84cbe6ba75f1eeb92a67113a8de9aba01a1bd7e9fbcb7b84e5d7f9d9653d6960",
+    "test_internal/firmware/l4_i2c_loop.trw": "ec77426db8a7b032b4e715303da5c01e5548421f7c86036a7db5b8b85d9bce5f",
+    "test_internal/firmware/l4_spi_loop.trw": "ad820abd90d9786b067a77638510377fc3ccead4e848f172ce3051ab6774ae1b",
+    "test_internal/firmware/l4_uart_loop.trw": "f6475363d2612f4c422b2fc94357ee1c7479d3814b2cac1f446c27586bcde638"
+  },
+  "previous_firmware_images": {
+    "unchanged_count": 27,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816",
+      "spi_target_flash.trw": "44cf6326be28ad2f97eae83a2deb9c4f3458d2942b60e789bd4e3bc043ebbf47",
+      "onewire_master.trw": "1382bfbcf8c4459c23c1cc18cb4bf87bed4c32bafc0a4772282a4915cdcd91a9",
+      "uart_bridge_capture.trw": "dba51651e988d6adce99cdd99ce7e21a30f3d235031a1c3ace6810bbe519ed9d",
+      "i2c_capture.trw": "7df9cb38c398e40aeb973c82f409c1b671173db8533668fc1f33182ba8ceaa49",
+      "spi_capture.trw": "dbeb47015a1d8a5b476a9fe9bc00d3744e4d21725db4262af8dba443be719a9e"
+    }
+  },
+  "model": {
+    "passed": 11,
+    "profiles": 8,
+    "runs": 24,
+    "round_trips": 192,
+    "payload": [
+      0,
+      255,
+      1,
+      128,
+      85,
+      170,
+      60,
+      195
+    ],
+    "negative_disconnected_loops": 3,
+    "log_sha256": "69fa935195b0be3842d0f1a346738fc310ceae34f5fd87cfa51075a9672d0c34",
+    "observations": [
+      {
+        "bytes": 8,
+        "capture_sha256": "39760858cdb761b9c4b8cc80a51ef3cd0a9112bc6c30fbdb5ee2dceedbcfded8",
+        "clocks": 40628,
+        "frame_start_clocks": [
+          5,
+          5353,
+          10393,
+          15433,
+          20473,
+          25513,
+          30553,
+          35593
+        ],
+        "idle_clocks": 0,
+        "protocol": "uart",
+        "rate": 115200,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "e28dbc2dc434dda4931d7e50b208e6e7f7d83844b5feabe4e7698a0843a3dfe9",
+        "clocks": 47883,
+        "frame_start_clocks": [
+          5,
+          5504,
+          11989,
+          18517,
+          23933,
+          29874,
+          35810,
+          42068
+        ],
+        "idle_clocks": 5319,
+        "protocol": "uart",
+        "rate": 115200,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "01aa214498fbbc8f2fc5446de8867829a5c4e2b808bf05813e172d6d58bb3d1c",
+        "clocks": 51882,
+        "frame_start_clocks": [
+          5,
+          6737,
+          13145,
+          19730,
+          25938,
+          32736,
+          39047,
+          46286
+        ],
+        "idle_clocks": 9562,
+        "protocol": "uart",
+        "rate": 115200,
+        "seed": 19317
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "8693fe4e8b3097c4a541ac6e96a952ee137c2746ff255c0046e7178c2c9a3aad",
+        "clocks": 13098,
+        "frame_start_clocks": [
+          5,
+          1343,
+          3023,
+          4703,
+          6383,
+          8063,
+          9743,
+          11423
+        ],
+        "idle_clocks": 0,
+        "protocol": "uart",
+        "rate": 460800,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "c34f04535ddc152fc4feb7c2a81ad4f0d480fdfbb34912e1e09deceee4ee4ef0",
+        "clocks": 13232,
+        "frame_start_clocks": [
+          5,
+          1381,
+          3282,
+          5054,
+          6408,
+          8174,
+          9938,
+          11642
+        ],
+        "idle_clocks": 1332,
+        "protocol": "uart",
+        "rate": 460800,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "398fdc127f24ff10c3d2ca32af0179b76754c5a930d9ae325fccbc5b6f49249b",
+        "clocks": 13672,
+        "frame_start_clocks": [
+          5,
+          1689,
+          3291,
+          5078,
+          6630,
+          8469,
+          10047,
+          11857
+        ],
+        "idle_clocks": 2394,
+        "protocol": "uart",
+        "rate": 460800,
+        "seed": 19317
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "c67a9dc1bd2018f867cea75d72ba20a8b6dc524da939b9331383c4e1791f20fc",
+        "clocks": 4544,
+        "frame_start_clocks": [
+          5,
+          629,
+          1189,
+          1749,
+          2309,
+          2869,
+          3429,
+          3989
+        ],
+        "idle_clocks": 0,
+        "protocol": "spi",
+        "rate": 50,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "d3c3922f4498a8a0f800f2709ad5e8f60ff35de17111937085ced309143816f4",
+        "clocks": 6291,
+        "frame_start_clocks": [
+          5,
+          648,
+          1319,
+          2485,
+          3442,
+          4045,
+          4647,
+          5219
+        ],
+        "idle_clocks": 669,
+        "protocol": "spi",
+        "rate": 50,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "2db40f53c1fafe2c00bc81e5599b161e3e6170373693d40caedf3cd7d137751e",
+        "clocks": 8042,
+        "frame_start_clocks": [
+          5,
+          802,
+          1883,
+          3057,
+          4113,
+          5261,
+          6236,
+          6904
+        ],
+        "idle_clocks": 1031,
+        "protocol": "spi",
+        "rate": 50,
+        "seed": 19317
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "8d2cd0c0afb8ba7a59a9ea0386ddac2398bcc3260e007420c17e447ba18ec398",
+        "clocks": 4544,
+        "frame_start_clocks": [
+          5,
+          629,
+          1189,
+          1749,
+          2309,
+          2869,
+          3429,
+          3989
+        ],
+        "idle_clocks": 0,
+        "protocol": "spi",
+        "rate": 10,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "a6319f08e26d4699ce9d93f60e90aa361b8824f7cbcc33fff0101c2b5fc0f1bc",
+        "clocks": 4556,
+        "frame_start_clocks": [
+          5,
+          634,
+          1222,
+          1753,
+          2323,
+          2894,
+          3457,
+          4006
+        ],
+        "idle_clocks": 138,
+        "protocol": "spi",
+        "rate": 10,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "85a4e14d8030199a2b7a6215aabf645c1e8667fcf9e159c2139d75b9a3879b76",
+        "clocks": 4575,
+        "frame_start_clocks": [
+          5,
+          663,
+          1220,
+          1787,
+          2311,
+          2898,
+          3464,
+          4006
+        ],
+        "idle_clocks": 217,
+        "protocol": "spi",
+        "rate": 10,
+        "seed": 19317
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "7b02b5768ec47382f6b900bd2bbddcd8d0cac775556de1c26246cca91df90da2",
+        "clocks": 4544,
+        "frame_start_clocks": [
+          5,
+          629,
+          1189,
+          1749,
+          2309,
+          2869,
+          3429,
+          3989
+        ],
+        "idle_clocks": 0,
+        "protocol": "spi",
+        "rate": 6,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "2dc4d2b28d099664d8792711340835d9ed6421e2d9c4d624cf5089435d0805e4",
+        "clocks": 4553,
+        "frame_start_clocks": [
+          5,
+          632,
+          1206,
+          1771,
+          2311,
+          2876,
+          3442,
+          4003
+        ],
+        "idle_clocks": 87,
+        "protocol": "spi",
+        "rate": 6,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "00b3164361ae953bc1b599bd53ddba6019e5cd20855b61624ed8253d2e9f36a3",
+        "clocks": 4562,
+        "frame_start_clocks": [
+          5,
+          651,
+          1206,
+          1773,
+          2325,
+          2888,
+          3430,
+          4004
+        ],
+        "idle_clocks": 132,
+        "protocol": "spi",
+        "rate": 6,
+        "seed": 19317
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "0f069452de1900db21b16c1df8eb05bd78d6380bbfb7d794c34403f6fe14be30",
+        "clocks": 160950,
+        "frame_start_clocks": [
+          6,
+          20181,
+          40353,
+          60525,
+          80697,
+          100869,
+          121041,
+          141213
+        ],
+        "idle_clocks": 0,
+        "protocol": "i2c",
+        "rate": 500,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "885b137919cac1f56053d956a9bde3024ec3bfb1d0e44ce85094d746681136aa",
+        "clocks": 165157,
+        "frame_start_clocks": [
+          6,
+          20181,
+          40960,
+          62108,
+          82281,
+          103840,
+          124025,
+          144545
+        ],
+        "idle_clocks": 6600,
+        "protocol": "i2c",
+        "rate": 500,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "7b96b96751f2c8bf04d2cb05ec5cdb5342956d61d1a4580d2702e79dd696795a",
+        "clocks": 167516,
+        "frame_start_clocks": [
+          6,
+          21136,
+          41952,
+          63193,
+          83921,
+          105287,
+          126246,
+          147725
+        ],
+        "idle_clocks": 9562,
+        "protocol": "i2c",
+        "rate": 500,
+        "seed": 19317
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "7d8eb7e520dbfa4a86f505af758ac2d6368aed1c6af3928717a429a520aafedc",
+        "clocks": 41170,
+        "frame_start_clocks": [
+          6,
+          5141,
+          10273,
+          15405,
+          20537,
+          25830,
+          30965,
+          36097
+        ],
+        "idle_clocks": 0,
+        "protocol": "i2c",
+        "rate": 124,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "bc39123c5fc12e1c83f704ce88aca59f6cc6d96577917c128e3ba7533bf4f59a",
+        "clocks": 42843,
+        "frame_start_clocks": [
+          6,
+          5148,
+          10487,
+          16101,
+          21375,
+          26910,
+          32103,
+          37379
+        ],
+        "idle_clocks": 1652,
+        "protocol": "i2c",
+        "rate": 124,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "f486fbdfd60f96912c54aea6d5e2a3a9ce33fb9e2a5c8d199d30f51c1c43a4ff",
+        "clocks": 43758,
+        "frame_start_clocks": [
+          6,
+          5456,
+          10978,
+          16435,
+          21763,
+          27356,
+          32854,
+          38584
+        ],
+        "idle_clocks": 2394,
+        "protocol": "i2c",
+        "rate": 124,
+        "seed": 19317
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "817751b14fd7a532fdb18d43f69d3415f3fcc3946d601d564317a22a0bbf099c",
+        "clocks": 17984,
+        "frame_start_clocks": [
+          6,
+          2310,
+          4550,
+          6790,
+          9030,
+          11270,
+          13510,
+          15750
+        ],
+        "idle_clocks": 0,
+        "protocol": "i2c",
+        "rate": 50,
+        "seed": null
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "2f5a0a550b24f75eaa8ad3e9fe2c86b85ab745832ced33370659bc7ced3caaca",
+        "clocks": 21971,
+        "frame_start_clocks": [
+          6,
+          2329,
+          5240,
+          8086,
+          10723,
+          13566,
+          16408,
+          19220
+        ],
+        "idle_clocks": 669,
+        "protocol": "i2c",
+        "rate": 50,
+        "seed": 7129
+      },
+      {
+        "bytes": 8,
+        "capture_sha256": "5499701dc21dd2a4188162883362839526439e6fe342c99e5502cb593c3d3f44",
+        "clocks": 22042,
+        "frame_start_clocks": [
+          6,
+          2483,
+          5244,
+          8098,
+          10834,
+          13662,
+          16317,
+          19225
+        ],
+        "idle_clocks": 1031,
+        "protocol": "i2c",
+        "rate": 50,
+        "seed": 19317
+      }
+    ]
+  },
+  "fixture_images": {
+    "uart_115200": {
+      "compiled_image_sha256": "cf84ae6846cb2726f55a869ff871ac306e13ba9dcae5fb7d34c8b5ecfa4b0152",
+      "lanes": {
+        "L0": 1,
+        "L1": 3
+      },
+      "SRAM_words": 32,
+      "units": [
+        "U0",
+        "U1"
+      ]
+    },
+    "uart_460800": {
+      "compiled_image_sha256": "2aa6d281ab3707a4a7f450b18a072dba6ed7804203702a5a4f6c1b8f2bc16d47",
+      "lanes": {
+        "L0": 1,
+        "L1": 3
+      },
+      "SRAM_words": 32,
+      "units": [
+        "U0",
+        "U1"
+      ]
+    },
+    "spi_50": {
+      "compiled_image_sha256": "fe5bb0f7ee87a42e5b5ab3ee1cbcf11eebc7f7d600fc8c03a370552905f1b3cf",
+      "lanes": {
+        "L0": 4,
+        "L1": 1
+      },
+      "SRAM_words": 32,
+      "units": [
+        "U0",
+        "U1",
+        "U2",
+        "U3"
+      ]
+    },
+    "spi_10": {
+      "compiled_image_sha256": "edc30ed2224bb07211a3488639bbf078de9651858e7ea3155ed1524f74dcb1a7",
+      "lanes": {
+        "L0": 4,
+        "L1": 1
+      },
+      "SRAM_words": 32,
+      "units": [
+        "U0",
+        "U1",
+        "U2",
+        "U3"
+      ]
+    },
+    "spi_6": {
+      "compiled_image_sha256": "9cb06d69aba3c8beda2b358e3bfa473492712fdfb89da927a9c9a8a19bf253a8",
+      "lanes": {
+        "L0": 4,
+        "L1": 1
+      },
+      "SRAM_words": 32,
+      "units": [
+        "U0",
+        "U1",
+        "U2",
+        "U3"
+      ]
+    },
+    "i2c_500": {
+      "compiled_image_sha256": "329e6b1227ef062896871f178f777994af2d95a53aec492ce4d207ddd200aeb1",
+      "lanes": {
+        "L0": 11,
+        "L1": 12
+      },
+      "SRAM_words": 62,
+      "units": [
+        "U0",
+        "U1",
+        "U2"
+      ]
+    },
+    "i2c_124": {
+      "compiled_image_sha256": "6054ac9793c0ddaa96ea5f5b5df136370473bb2ffe89ebc9df5a502d6497b5d6",
+      "lanes": {
+        "L0": 11,
+        "L1": 12
+      },
+      "SRAM_words": 62,
+      "units": [
+        "U0",
+        "U1",
+        "U2"
+      ]
+    },
+    "i2c_50": {
+      "compiled_image_sha256": "d04834f9b8bd0059eee96b99d6ac300423f90af157f1bf3a5b79b6cf51485e03",
+      "lanes": {
+        "L0": 11,
+        "L1": 12
+      },
+      "SRAM_words": 62,
+      "units": [
+        "U0",
+        "U1",
+        "U2"
+      ]
+    }
+  },
+  "simulations": {
+    "verilator": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "payload": [
+        0,
+        255,
+        85,
+        170
+      ],
+      "observations": [
+        {
+          "bytes": 4,
+          "capture_sha256": "dfc0c87ae5d87e22fb5233771bf8e7f57a32163ff1cc94c3e955cd51a44fce5a",
+          "clocks": 11464,
+          "frame_start_clocks": [
+            857,
+            3527,
+            6197,
+            8867
+          ],
+          "idle_clocks": 0,
+          "protocol": "uart",
+          "rate": 460800,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "ef85f7522b69ae083956972d91840c0100b1847bea4a0be8616afe9a5177bff3",
+          "clocks": 12137,
+          "frame_start_clocks": [
+            857,
+            3565,
+            6494,
+            9515
+          ],
+          "idle_clocks": 673,
+          "protocol": "uart",
+          "rate": 460800,
+          "seed": 7129
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "fb50bd097177001fc77b0613768d6ac295dc408d52e4c3e94b5df5e826bae90d",
+          "clocks": 11428,
+          "frame_start_clocks": [
+            857,
+            3518,
+            6179,
+            8840
+          ],
+          "idle_clocks": 0,
+          "protocol": "spi",
+          "rate": 10,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "976d4a485f84b5d622f35ec8b0130325ebedeb5484440c8d00cd0b2401878d55",
+          "clocks": 11484,
+          "frame_start_clocks": [
+            857,
+            3523,
+            6217,
+            8882
+          ],
+          "idle_clocks": 56,
+          "protocol": "spi",
+          "rate": 10,
+          "seed": 7129
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "38b71ed3105579f7c830785e223b3fe9be41becde49615a25fc9c2493df03c5a",
+          "clocks": 42212,
+          "frame_start_clocks": [
+            858,
+            11215,
+            21572,
+            31929
+          ],
+          "idle_clocks": 0,
+          "protocol": "i2c",
+          "rate": 124,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "5feb56c4d805d50238f189b419f01c0117808b423e1e0883c36f7d9c4945536f",
+          "clocks": 42885,
+          "frame_start_clocks": [
+            858,
+            11253,
+            21869,
+            32577
+          ],
+          "idle_clocks": 673,
+          "protocol": "i2c",
+          "rate": 124,
+          "seed": 7129
+        }
+      ],
+      "cases": [
+        {
+          "name": "test_uart_two_lane_loop_and_idle",
+          "seconds": 5.86196231842041
+        },
+        {
+          "name": "test_spi_two_lane_loop_and_idle",
+          "seconds": 6.316969156265259
+        },
+        {
+          "name": "test_i2c_two_lane_loop_and_idle",
+          "seconds": 10.489364862442017
+        }
+      ],
+      "xml_sha256": "978e999c1a4fb8aa8e4185984d4f8fcf6b38ed11544507a1f8eb503f40644efb",
+      "log_sha256": "b80487f176e19377b15cd4f2dfd436e0598730485a7e843124b167bd69ec6f4b"
+    },
+    "icarus_rtl": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "payload": [
+        0,
+        255,
+        85,
+        170
+      ],
+      "observations": [
+        {
+          "bytes": 4,
+          "capture_sha256": "dfc0c87ae5d87e22fb5233771bf8e7f57a32163ff1cc94c3e955cd51a44fce5a",
+          "clocks": 11464,
+          "frame_start_clocks": [
+            857,
+            3527,
+            6197,
+            8867
+          ],
+          "idle_clocks": 0,
+          "protocol": "uart",
+          "rate": 460800,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "ef85f7522b69ae083956972d91840c0100b1847bea4a0be8616afe9a5177bff3",
+          "clocks": 12137,
+          "frame_start_clocks": [
+            857,
+            3565,
+            6494,
+            9515
+          ],
+          "idle_clocks": 673,
+          "protocol": "uart",
+          "rate": 460800,
+          "seed": 7129
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "fb50bd097177001fc77b0613768d6ac295dc408d52e4c3e94b5df5e826bae90d",
+          "clocks": 11428,
+          "frame_start_clocks": [
+            857,
+            3518,
+            6179,
+            8840
+          ],
+          "idle_clocks": 0,
+          "protocol": "spi",
+          "rate": 10,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "976d4a485f84b5d622f35ec8b0130325ebedeb5484440c8d00cd0b2401878d55",
+          "clocks": 11484,
+          "frame_start_clocks": [
+            857,
+            3523,
+            6217,
+            8882
+          ],
+          "idle_clocks": 56,
+          "protocol": "spi",
+          "rate": 10,
+          "seed": 7129
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "38b71ed3105579f7c830785e223b3fe9be41becde49615a25fc9c2493df03c5a",
+          "clocks": 42212,
+          "frame_start_clocks": [
+            858,
+            11215,
+            21572,
+            31929
+          ],
+          "idle_clocks": 0,
+          "protocol": "i2c",
+          "rate": 124,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "5feb56c4d805d50238f189b419f01c0117808b423e1e0883c36f7d9c4945536f",
+          "clocks": 42885,
+          "frame_start_clocks": [
+            858,
+            11253,
+            21869,
+            32577
+          ],
+          "idle_clocks": 673,
+          "protocol": "i2c",
+          "rate": 124,
+          "seed": 7129
+        }
+      ],
+      "cases": [
+        {
+          "name": "test_uart_two_lane_loop_and_idle",
+          "seconds": 28.03876256942749
+        },
+        {
+          "name": "test_spi_two_lane_loop_and_idle",
+          "seconds": 26.557063817977905
+        },
+        {
+          "name": "test_i2c_two_lane_loop_and_idle",
+          "seconds": 54.95759582519531
+        }
+      ],
+      "xml_sha256": "fca33cbc8f6d01962d663bb705dc149f2fa38ffb443072252daba4fcbddd9a27",
+      "log_sha256": "3aaa7c13701d3c4fbcd1b48a2d1a840e529e420af5c3f344629fd1e30fbea78a"
+    },
+    "official_netlist": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "payload": [
+        0,
+        255,
+        85,
+        170
+      ],
+      "observations": [
+        {
+          "bytes": 4,
+          "capture_sha256": "dfc0c87ae5d87e22fb5233771bf8e7f57a32163ff1cc94c3e955cd51a44fce5a",
+          "clocks": 11464,
+          "frame_start_clocks": [
+            857,
+            3527,
+            6197,
+            8867
+          ],
+          "idle_clocks": 0,
+          "protocol": "uart",
+          "rate": 460800,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "ef85f7522b69ae083956972d91840c0100b1847bea4a0be8616afe9a5177bff3",
+          "clocks": 12137,
+          "frame_start_clocks": [
+            857,
+            3565,
+            6494,
+            9515
+          ],
+          "idle_clocks": 673,
+          "protocol": "uart",
+          "rate": 460800,
+          "seed": 7129
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "fb50bd097177001fc77b0613768d6ac295dc408d52e4c3e94b5df5e826bae90d",
+          "clocks": 11428,
+          "frame_start_clocks": [
+            857,
+            3518,
+            6179,
+            8840
+          ],
+          "idle_clocks": 0,
+          "protocol": "spi",
+          "rate": 10,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "976d4a485f84b5d622f35ec8b0130325ebedeb5484440c8d00cd0b2401878d55",
+          "clocks": 11484,
+          "frame_start_clocks": [
+            857,
+            3523,
+            6217,
+            8882
+          ],
+          "idle_clocks": 56,
+          "protocol": "spi",
+          "rate": 10,
+          "seed": 7129
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "38b71ed3105579f7c830785e223b3fe9be41becde49615a25fc9c2493df03c5a",
+          "clocks": 42212,
+          "frame_start_clocks": [
+            858,
+            11215,
+            21572,
+            31929
+          ],
+          "idle_clocks": 0,
+          "protocol": "i2c",
+          "rate": 124,
+          "seed": null
+        },
+        {
+          "bytes": 4,
+          "capture_sha256": "5feb56c4d805d50238f189b419f01c0117808b423e1e0883c36f7d9c4945536f",
+          "clocks": 42885,
+          "frame_start_clocks": [
+            858,
+            11253,
+            21869,
+            32577
+          ],
+          "idle_clocks": 673,
+          "protocol": "i2c",
+          "rate": 124,
+          "seed": 7129
+        }
+      ],
+      "cases": [
+        {
+          "name": "test_uart_two_lane_loop_and_idle",
+          "seconds": 79.43588900566101
+        },
+        {
+          "name": "test_spi_two_lane_loop_and_idle",
+          "seconds": 113.8691725730896
+        },
+        {
+          "name": "test_i2c_two_lane_loop_and_idle",
+          "seconds": 224.34299182891846
+        }
+      ],
+      "xml_sha256": "5af7b4a70a6114a8c7583968361f41145686b77a43ee759ad71d5aed03b7028c",
+      "log_sha256": "7dab2e240d51cd5f41fef69b3b22930b472fdd61aa842537bd0f5f53346378b2"
+    }
+  },
+  "cross_simulator_capture_hashes_and_frame_markers_identical": true,
+  "full_python": {
+    "passed": 1175,
+    "seconds": 189.34,
+    "log_sha256": "8a9b295a76f2b1ebe2746f57de5ae0f9ff185ef81635aaff4e4145c03b43a160"
+  },
+  "alternate_scheduler": {
+    "passed": 11,
+    "seconds": 22.04,
+    "log_sha256": "fba237b3ce622c3547c1d8d4e07be0936f9f7641072c95499d2319d367a60102"
+  },
+  "supplementary_I2C_address_ACK_audits": {
+    "verilator_None": {
+      "capture_sha256": "38b71ed3105579f7c830785e223b3fe9be41becde49615a25fc9c2493df03c5a",
+      "decode_sha256": "32d40ef5966bc48a0a932268b76a58f0802bc020812ca6023957732910475c61",
+      "address": 80,
+      "counts": {
+        "Start": 4,
+        "Start repeat": 4,
+        "Stop": 4,
+        "ACK": 12,
+        "NACK": 4
+      },
+      "waveform_changed": false
+    },
+    "verilator_7129": {
+      "capture_sha256": "5feb56c4d805d50238f189b419f01c0117808b423e1e0883c36f7d9c4945536f",
+      "decode_sha256": "32d40ef5966bc48a0a932268b76a58f0802bc020812ca6023957732910475c61",
+      "address": 80,
+      "counts": {
+        "Start": 4,
+        "Start repeat": 4,
+        "Stop": 4,
+        "ACK": 12,
+        "NACK": 4
+      },
+      "waveform_changed": false
+    },
+    "icarus_rtl_None": {
+      "capture_sha256": "38b71ed3105579f7c830785e223b3fe9be41becde49615a25fc9c2493df03c5a",
+      "decode_sha256": "32d40ef5966bc48a0a932268b76a58f0802bc020812ca6023957732910475c61",
+      "address": 80,
+      "counts": {
+        "Start": 4,
+        "Start repeat": 4,
+        "Stop": 4,
+        "ACK": 12,
+        "NACK": 4
+      },
+      "waveform_changed": false
+    },
+    "icarus_rtl_7129": {
+      "capture_sha256": "5feb56c4d805d50238f189b419f01c0117808b423e1e0883c36f7d9c4945536f",
+      "decode_sha256": "32d40ef5966bc48a0a932268b76a58f0802bc020812ca6023957732910475c61",
+      "address": 80,
+      "counts": {
+        "Start": 4,
+        "Start repeat": 4,
+        "Stop": 4,
+        "ACK": 12,
+        "NACK": 4
+      },
+      "waveform_changed": false
+    },
+    "official_netlist_None": {
+      "capture_sha256": "38b71ed3105579f7c830785e223b3fe9be41becde49615a25fc9c2493df03c5a",
+      "decode_sha256": "32d40ef5966bc48a0a932268b76a58f0802bc020812ca6023957732910475c61",
+      "address": 80,
+      "counts": {
+        "Start": 4,
+        "Start repeat": 4,
+        "Stop": 4,
+        "ACK": 12,
+        "NACK": 4
+      },
+      "waveform_changed": false
+    },
+    "official_netlist_7129": {
+      "capture_sha256": "5feb56c4d805d50238f189b419f01c0117808b423e1e0883c36f7d9c4945536f",
+      "decode_sha256": "32d40ef5966bc48a0a932268b76a58f0802bc020812ca6023957732910475c61",
+      "address": 80,
+      "counts": {
+        "Start": 4,
+        "Start repeat": 4,
+        "Stop": 4,
+        "ACK": 12,
+        "NACK": 4
+      },
+      "waveform_changed": false
+    }
+  }
+}

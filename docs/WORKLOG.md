@@ -2,10 +2,10 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
-## 2026-11-19 — Diagnose failed representative workflow and correct wire-only observation
+## 2026-11-18 — Diagnose failed representative workflow and correct wire-only observation
 
-- Latest f7aedb00 lint/unit/test/docs workflows pass. Fabric44445289237 remains
-  active when checked. Representative physical44445288959 has eight passes and
+- Latest f7aedb00 lint/unit/test/docs workflows pass. Fabric44445289237 also
+  completes successfully. Representative physical44445288959 has eight passes and
   one failure: northeast stops on110critical disconnected pins. Root replays all
   eight passing final ODB/GDS/netlist hashes, original inventories/wires and
   seven physical metrics. Receipt: reports/r1_representative_physical_44445288959.json.
@@ -18,6 +18,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   pass. Next run the corner alone through all original physical gates, then
   review its actual OpenDB/GDS/LVS evidence before expansion or assembly.
   No phase boxes ticked; configured timing BUG133 and full-chip gates remain open.
+- Published scoped correction/guards/evidence/CI through2ea0c7ec. Isolated
+  corner replay44447208177 has reached physical checks; no outcome claimed yet.
+  The other eight physical passes are now reflected in the claims and physical
+  status ledgers with the failed-campaign scope explicit.
+- Replay44447208177 stops before physical checks because the pinned image lacks
+  the external patch executable (BUG139). Replace packaging only with strict
+  in-process unified-patch application and require the exact reviewed patched
+  script hash. Actual pinned source reproduces that hash and parses; source
+  drift and malformed hunk counts are rejected.80focused checks pass. Next
+  publish corrected isolated replay; original check semantics and all physical
+  requirements remain unchanged. No corner acceptance claimed yet.
 
 ## 2026-11-18 — Expand leaf physical checks; replay completed cross-tile results
 

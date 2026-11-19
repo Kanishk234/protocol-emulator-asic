@@ -2,6 +2,15 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November18 representative R1 results:** 44445288959 at f25eaa79 passes
+primitive4, west/east I/O, north0/south0, northwest/southwest/southeast through
+all seven physical gates. Root replays final ODB/GDS/netlist hashes and original
+inventories/wires. Northeast alone stops at the stock disconnected-pin observer:
+it requires cell terminals in a cell-free boundary-routing leaf. D128's isolated
+adapter correction is being checked in44447208177. The original110-pin failure
+remains recorded; no aggregate qualification until actual corner results pass.
+See reports/r1_representative_physical_44445288959.json.
+
 **November18 first R1 leaf geometry pass:** corrected D125 run44402764510
 atbb7118e2 passes all seven routing/disconnection/antenna/Magic/KLayout/LVS
 metrics at zero for LUT0. Original1243cells and1347signal wires remain;

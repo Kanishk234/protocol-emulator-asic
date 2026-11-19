@@ -1,5 +1,18 @@
 # Bugs
 
+## 139: Pinned EDA image does not provide the patch executable
+
+- **Symptom:** isolated44447208177 stops before the flow with FileNotFoundError
+  while materializing the wire-only adapter. No new physical result is emitted.
+- **Root cause:** adapter packaging assumed the host's patch executable was
+  available inside the pinned Nix EDA image. Source SHA validation passed.
+- **Fix/coverage:** apply the same reviewed single-file unified patch using
+  strict standard-library position/context/count checks; require the exact
+  reviewed output SHA d898717a0afa00697e5cc44a985dfeb975675c568a437354cd64531a03419d4b.
+  No external patch dependency, fuzz or upstream edit. Tests reject changed
+  source context and hunk counts; real pinned-source output matches the SHA
+  and parses. Hosted corrected replay pending; checker semantics unchanged.
+
 ## 138: Cell-terminal-only connectivity rejects a wire-only leaf
 
 - **Symptom:** northeast in44445288959 reports110critical disconnected pins

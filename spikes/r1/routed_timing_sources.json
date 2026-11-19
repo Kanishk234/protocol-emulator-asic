@@ -1,8 +1,8 @@
 {
   "sources": {
     "rc": {
-      "run": {"id": 44583509050, "head_sha": "6e58ef204fcb8964bfc1170348797c28adc66ab4", "head_branch": "efpga", "run_attempt": 1, "conclusion": "success", "path": ".github/workflows/r1_flat_extract.yaml"},
-      "artifact": {"id": 14561196111, "name": "r1-flat-extraction-44583509050", "digest": "sha256:248090a3ee60a766af9c50209882f5583d8376fceffc52d737accbdf555f1140", "size_in_bytes": 79483716, "source_run": 44583509050},
+      "run": {"id": 44621669039, "head_sha": "7a3e549b3c3881c3e529966459c7e1ca4e90e5eb", "head_branch": "efpga", "run_attempt": 1, "conclusion": "success", "path": ".github/workflows/r1_flat_extract.yaml"},
+      "artifact": {"id": 14577192398, "name": "r1-flat-extraction-44621669039", "digest": "sha256:93c3c7c4a9291dfca7f37c72d3263c6b3c39f51d7b862e031d95efef67066273", "size_in_bytes": 81175172, "source_run": 44621669039},
       "member": "r1_flat_extract"
     },
     "proof": {
@@ -21,5 +21,14 @@
       "member": "."
     }
   },
-  "scope": "Failed producers provide only original timing controls and independently proven signal views; their failed LVS/timing results remain failures. No promotion to physical acceptance."
+  "controls": {
+    "original_incomplete_rc": {
+      "run": 44583509050,
+      "artifact_id": 14561196111,
+      "archive_sha256": "248090a3ee60a766af9c50209882f5583d8376fceffc52d737accbdf555f1140",
+      "spef_sha256": "e3ba5b5b8f1c1db15633fa1df1aa792756ffade6f586fec68945d504bd2112a3",
+      "scope": "Original geometry/export pass; later resistor replay rejects2567disconnected nets. Retained failed annotation control."
+    }
+  },
+  "scope": "RC source must pass native import, all-layer geometry and every named terminal resistor component. Failed producers provide only original timing controls and independently proven signal views; their failed LVS/timing results remain failures. No promotion to physical acceptance."
 }

@@ -15,8 +15,9 @@ from assembly_catalog import sha
 from flat_reference import normalize_cells
 from flat_topology import verify
 from run_timing import LIB_SHA, compare, parse_log, quoted
+from spef_connectivity import inspect_spef
 
-SPEF_SHA = 'e3ba5b5b8f1c1db15633fa1df1aa792756ffade6f586fec68945d504bd2112a3'
+SPEF_SHA = 'd12012b932e9f979ff943f742f3f43426f5f86c9e653777b3d457ce2781420b4'
 ANALYSIS_SHA = '3db2dbd2bf5c9ef100925b97c99065cd6a4de2f0e6add954714639f38da3d9dc'
 SNAPSHOT_SHA = '5f9aa3bfb07e21b5238b0da1472980ba927842bc732b8e7cdde29923d6e06227'
 IMAGE_SHA = '25bfec380cbd5fb8cac4390389d1c1fa14d33ddb946e6499fc7467f79ee100b2'
@@ -155,10 +156,16 @@ def prepare(rc, proof, native, capsule, pdk, out):
             or not xor['negative_control_detected']):
         raise ValueError('Require complete source geometry equivalence before RC timing')
     spef = rc/'extract/1-openroad-rcx/nom/warp_r1_candidate.nom.spef'
-    if sha(spef) != SPEF_SHA or spef.stat().st_size != 35585561:
+    if sha(spef) != SPEF_SHA or spef.stat().st_size != 36568196:
         raise ValueError('Extracted full-macro SPEF differs')
-    if sum(line.startswith('*D_NET ') for line in spef.open()) != 26765:
+    content=spef.read_text()
+    if sum(line.startswith('*D_NET ') for line in content.splitlines()) != 26765:
         raise ValueError('Extracted net census differs')
+    connectivity=inspect_spef(content)
+    view=result['spef_views']['nom_*']
+    if (not connectivity['passed'] or not view['resistive_connectivity']['passed']
+            or view['sha256']!=sha(spef)):
+        raise ValueError('Full-macro resistor graph is not qualified')
     analysis = proof/'analysis.v'; source_proof = json.loads((proof/'proof.json').read_text())
     if not source_proof['passed'] or sha(analysis) != ANALYSIS_SHA or source_proof['analysis_sha256'] != ANALYSIS_SHA:
         raise ValueError('Require source-proven explicit-alias timing view')
@@ -204,10 +211,11 @@ def prepare(rc, proof, native, capsule, pdk, out):
     paths = [Path(__file__), Path(__file__).with_name('run_timing.py'), Path(__file__).with_name('unused_lut_probe.py'),
              rc/'result.json', inventory_path, spef, proof/'proof.json', analysis, proof/'source.json', proof/'analysis.json',
              snapshot, image, shell, functional/'configured-smoke.json', slow, fast, top_path,
-             capsule/'analysis/static.tcl', capsule/'analysis/dynamic.tcl']
+             capsule/'analysis/static.tcl', capsule/'analysis/dynamic.tcl',
+             Path(__file__).with_name('spef_connectivity.py')]
     plan = dict(input_sha256={str(p): sha(p) for p in paths}, rendered_sha256=cases,
                 source_proofs=proofs, observed_configuration=8736, candidate_image_sha256=IMAGE_SHA,
-                spef_sha256=SPEF_SHA, scope=SCOPE)
+                spef_sha256=SPEF_SHA,resistor_graph=connectivity,scope=SCOPE)
     (out/'plan.json').write_text(json.dumps(plan, indent=2)+'\n')
 
 

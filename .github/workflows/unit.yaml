@@ -69,7 +69,7 @@ jobs:
           make -C test_internal/pin FULL=1
 
       - name: Chip-level, L3, rotation and Phase 3 firmware tests
-        run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay,test_metamorphic_tap
+        run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay,test_metamorphic_tap,test_metamorphic_loop
 
       - name: Independent I2C controller RTL peer
         run: make -C test_internal/i2c_peer
@@ -131,7 +131,7 @@ jobs:
           make -C test_internal/pin SIM=verilator FULL=0 SIM_BUILD=sim_build/vl0 COCOTB_RESULTS_FILE=results_vl0.xml
           make -C test_internal/pin SIM=verilator FULL=1 SIM_BUILD=sim_build/vl1 COCOTB_RESULTS_FILE=results_vl1.xml
           make -C test_internal/chip SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml \
-            COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay,test_metamorphic_tap
+            COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay,test_metamorphic_tap,test_metamorphic_loop
           make -C test_internal/i2c_peer SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml
 
       - name: Upload results

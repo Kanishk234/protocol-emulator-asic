@@ -1,0 +1,204 @@
+{
+  "run": 44445288959,
+  "source_sha": "f25eaa791a7e9b6235af947f5f368fc90daefa35",
+  "passed_contexts": 8,
+  "failed_contexts": 1,
+  "results": [
+    {
+      "passed": true,
+      "case": "east_io",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 261,
+      "added_fill_or_decap_cells": 629,
+      "required_signal_nets_with_wires": 332,
+      "odb_sha256": "ad1bf813ed2b537dfe8c361e8a0c52c447d93cc605e8bb2b19086b3c474043d9",
+      "gds_sha256": "4bee858e820632c00c9d184e40ade49eb37aaa844be2429ba9e7e6628b59161e",
+      "nl_sha256": "9f5e91f45caa14129f6f5fe878063ad3f45465ac4f4cb53e76fc70be220680cc"
+    },
+    {
+      "passed": true,
+      "case": "north0",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 115,
+      "added_fill_or_decap_cells": 466,
+      "required_signal_nets_with_wires": 183,
+      "odb_sha256": "e75f6fc67fb97422db5e18c1c175a05150648e5155b4d58d6c27004f1b185a69",
+      "gds_sha256": "c1527066859a17441ed13e30c6ccc63ef7355b4b0a1455dd0da6b4534429be23",
+      "nl_sha256": "809da6096b3a137c80df27544c331800158a439dc616d79c5fd35c3f45ecc598"
+    },
+    {
+      "passed": false,
+      "case": "northeast",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "error": "110 critical disconnected pins found.",
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 110,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": null,
+        "klayout__drc_error__count": null,
+        "design__lvs_error__count": null
+      }
+    },
+    {
+      "passed": true,
+      "case": "northwest",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 15,
+      "added_fill_or_decap_cells": 168,
+      "required_signal_nets_with_wires": 65,
+      "odb_sha256": "728399d7e12329dfeb9a0eaa3a3112539aa97f07d6725c4e8eee70f0c1864bee",
+      "gds_sha256": "780e693009674b4b98ea2e0c0ac142921e630a89246e1a64eb5f1fbf351c5ce1",
+      "nl_sha256": "7e3bdd916adcc48096c1c6746c3f7e3de17adccbb9e909b26f1d88c1ee17e38d"
+    },
+    {
+      "passed": true,
+      "case": "primitive4",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 1453,
+      "added_fill_or_decap_cells": 661,
+      "required_signal_nets_with_wires": 1557,
+      "odb_sha256": "53160bd58b5573d24375e6b21945866c616e8ee42bcdcdc55332654eb3ee9336",
+      "gds_sha256": "28cfd5e594bd509e0f8fe108878ccf14e14eb1988481ce5d49a219f3231c7315",
+      "nl_sha256": "ee7ae4aa431680b198b5a22eaedf2cff6d6b0374d31d8e028bce1399748af005"
+    },
+    {
+      "passed": true,
+      "case": "south0",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 203,
+      "added_fill_or_decap_cells": 358,
+      "required_signal_nets_with_wires": 277,
+      "odb_sha256": "9e0c66b1be34c1595c7361155c4c47626d5bbe23fb170cb8ca13970c210d79e1",
+      "gds_sha256": "d38e52869873e2f1bf8b38a248007ef77cb793cd4a2b2f2b2a30f5df1a47c1b7",
+      "nl_sha256": "d5a7d4ef5bdb0d61e5f5d595b913da2808f6001d568d4bdf55d1f322eb1e44e1"
+    },
+    {
+      "passed": true,
+      "case": "southeast",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 15,
+      "added_fill_or_decap_cells": 253,
+      "required_signal_nets_with_wires": 69,
+      "odb_sha256": "ff98c37bbc662b63cbe75fd984cd423d530b7a014d48281b7a50f98a3a26bc78",
+      "gds_sha256": "00db3f3d1b6863dedf82c9723a9b6ef51e2b336c3f48e6e562d2f78d321ab077",
+      "nl_sha256": "feaa71699956dc7503d9def67a2b518f983efc6c3596126ceb19f5df3b37beb8"
+    },
+    {
+      "passed": true,
+      "case": "southwest",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 82,
+      "added_fill_or_decap_cells": 88,
+      "required_signal_nets_with_wires": 142,
+      "odb_sha256": "811b0a215929f2c3efa4d1d30e6aaff2107b5214498d20532d2d0a7fc5241282",
+      "gds_sha256": "814768e5423b113845ce90a042ce0299bcab14897f7ee39728f971c3049bbf10",
+      "nl_sha256": "249503b90621c1e85a892e971f2d50c0072603720b7cbe27f12c574e6e367829"
+    },
+    {
+      "passed": true,
+      "case": "west_io",
+      "scope": "Frozen leaf finishing diagnostic; no assembled macro, shell, configured timing, replacement or submission acceptance.",
+      "physical_acceptance": false,
+      "timing_acceptance": false,
+      "physical_gate_metrics": {
+        "route__drc_errors": 0,
+        "design__critical_disconnected_pin__count": 0,
+        "antenna__violating__nets": 0,
+        "antenna__violating__pins": 0,
+        "magic__drc_error__count": 0,
+        "klayout__drc_error__count": 0,
+        "design__lvs_error__count": 0
+      },
+      "original_cells": 280,
+      "added_fill_or_decap_cells": 284,
+      "required_signal_nets_with_wires": 355,
+      "odb_sha256": "72cbc17ce419c1ae6ab02ba9dcda4c23f53b1cb8a851e581c5fb983d1c9e1116",
+      "gds_sha256": "5dd37ec2bd269ec91f02b8b10a201fa02ae0babaca962fcb395967b08bb48ed2",
+      "nl_sha256": "bb4d057a1fd0a473733364dbfd1bc1e8709823c359015acd5703a718095204eb"
+    }
+  ],
+  "review": "Passing cases: all seven physical metrics, final ODB/GDS/netlist hashes and original inventories/wires replayed.",
+  "physical_acceptance": false,
+  "timing_acceptance": false
+}

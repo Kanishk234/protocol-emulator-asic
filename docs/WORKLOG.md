@@ -2,6 +2,23 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Diagnose failed representative workflow and correct wire-only observation
+
+- Latest f7aedb00 lint/unit/test/docs workflows pass. Fabric44445289237 remains
+  active when checked. Representative physical44445288959 has eight passes and
+  one failure: northeast stops on110critical disconnected pins. Root replays all
+  eight passing final ODB/GDS/netlist hashes, original inventories/wires and
+  seven physical metrics. Receipt: reports/r1_representative_physical_44445288959.json.
+- BUG138/D128 identify the stock observer's requirement for a cell terminal on
+  boundary nets. The zero-cell corner uses52routed boundary feedthrough nets.
+  Prepare a hash-bound upstream patch in an isolated adapter, enabled only for
+  that corner, recognizing routed boundary peers and physically present power
+  grids/pin geometry. No ignored module, metric override or disabled check.
+- Pinned-source patch/application/parser checks and79focused tests/actionlint
+  pass. Next run the corner alone through all original physical gates, then
+  review its actual OpenDB/GDS/LVS evidence before expansion or assembly.
+  No phase boxes ticked; configured timing BUG133 and full-chip gates remain open.
+
 ## 2026-11-18 — Expand leaf physical checks; replay completed cross-tile results
 
 - Published scoped tools/tests/docs/CI through f25eaa79. Representative physical

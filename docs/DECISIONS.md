@@ -1,5 +1,29 @@
 # Decisions
 
+## D-128: Correct boundary incidence for the cell-free northeast leaf
+
+- **Date:** 2026-11-18. **Status:** isolated checker correction, hosted replay pending.
+- **Evidence:** representative campaign44445288959 passes eight cases with all
+  seven physical metrics zero. Only northeast fails: stock boundary connectivity
+  requires cell terminals and labels110pins critical in a leaf with no cells.
+  Its52required feedthrough wires and router/antenna checks pass; downstream
+  geometry/LVS checks have not run. Preserve the original failure.
+- **Correction:** copy the exact pinned disconnected-pin script, require source
+  SHA852fc895eb60ecde8aeb237f71cbd6c59de758d669e1e71424cfa863492411f0,
+  and apply patches/r1_wire_only_connectivity.patch without editing upstream.
+  Activate this adapter only for the authenticated zero-cell northeast case.
+  Blocks containing cells retain the original predicate. In a cell-free block,
+  a signal boundary needs a peer boundary terminal and a route wire; a power
+  boundary needs special grid wires and pin geometry. Lone unwired signals and
+  absent grids remain disconnected. Existing top-level criticality rules stay.
+- **Gates/cost:** one bounded corner replay; no physical or logical resource,
+  routing, placement, bitstream or footprint change. No ignored modules, skipped
+  checker or overwritten disconnected-pin metric. All52wire/inventory checks
+  and all seven physical gates, including GDS-based LVS, remain required.
+- **Validation:** patch applies to the pinned source and parses;79focused checks
+  and actionlint pass, including missing peer/wire/grid/pin-geometry rejection.
+  Actual OpenDB runtime and final geometry/LVS still need the hosted replay.
+
 ## D-127: Expand physical finishing to representatives of the other nine tile types
 
 - **Date:** 2026-11-18. **Status:** bounded campaign; no full-fabric promotion.

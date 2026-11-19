@@ -1,5 +1,21 @@
 # Bugs
 
+## 138: Cell-terminal-only connectivity rejects a wire-only leaf
+
+- **Symptom:** northeast in44445288959 reports110critical disconnected pins
+  despite a zero-cell leaf with52routed feedthrough nets. Eight other physical
+  cases pass. Checker.DisconnectedPins stops the corner before GDS DRC/LVS.
+- **Root cause:** pinned disconnected_pins.py considers a top BTerm connected
+  only when its net has ITerms. Pure boundary-to-boundary routing and unloaded
+  power-grid ports have no cell terminals. This is a topology assumption in
+  the observer; it does not establish that the physical corner is qualified.
+- **Fix/coverage:** D128 patches an isolated copy of the pinned script for the
+  authenticated cell-free corner. Require boundary peers plus a route wire, or
+  grid wires plus power pin geometry; preserve original behavior for cell-based
+  blocks. Negative tests cover absent peers/wires/grids/geometry. Every original
+  physical checker and actual52-wire/final-inventory check remains required.
+  Original failure retained; hosted replay and full corner GDS/LVS pending.
+
 ## 137: Cross-tile diagnostic audit could not write container-owned output
 
 - **Symptom/check:** 44403146357 completes all eight SAT cases, but the host
@@ -12,6 +28,8 @@
   the same pinned container context as preparation. Retain all input hashes,
   process/marker checks and positive/negative controls. Actionlint passes;
   corrected hosted replay is required. No circuit, proof or timing-policy change.
+- **Hosted coverage:** corrected44404102388 succeeds; all eight process/proof
+  markers and input hashes replay. This closes the writer bug, not BUG133.
 
 ## 136: Leaf-finishing stage guard missed a repeated-step suffix
 
@@ -25,6 +43,8 @@
   stage membership; execute the original actual classes and retain their IDs.
   A regression accepts the repeated stage and rejects its removal. Installed
   Classic introspection now passes without EDA. Hosted corrected replay pending.
+- **Hosted coverage:** corrected44402764510 succeeds through all seven physical
+  gates for LUT0. The original pre-EDA failure remains retained.
 - **Scope:** adapter guard only; no route, placement, configuration, physical
   checker or acceptance metric changes. Original failed run remains recorded.
 

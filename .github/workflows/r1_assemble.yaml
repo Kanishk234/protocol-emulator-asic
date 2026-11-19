@@ -1,0 +1,66 @@
+name: R1 assembled macro geometry
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_assemble.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-assembly
+  cancel-in-progress: false
+jobs:
+  assemble:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_assembly_pdk
+      PYTHONPATH: tools:test_internal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Check assembly guards and authenticate all finished sources
+        timeout-minutes: 20
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_assembly_contacts.py tools/profiling/tests/test_r1_assembly_catalog.py tools/profiling/tests/test_r1_assemble.py
+          python spikes/r1/assembly_fetch.py --out build/r1_assembly_sources
+          python - <<'PY'
+          import json,sys
+          from pathlib import Path
+          sys.path.insert(0,'spikes/r1')
+          from assemble import prepare
+          locations=json.loads(Path('build/r1_assembly_sources/locations.json').read_text())
+          prepare(**locations,out=Path('build/r1_assembly'))
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Full macro Magic and KLayout DRC then GDS-based LVS
+        timeout-minutes: 90
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_assembly/image.json
+          timeout 5100s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e PYTHONPATH "$image" \
+            python3 spikes/r1/assemble.py inside --out build/r1_assembly > build/r1_assembly/geometry.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-assembled-geometry-${{ github.run_id }}
+          path: |
+            build/r1_assembly/
+            build/r1_assembly_sources/locations.json
+            build/r1_assembly_sources/sources.json
+            build/r1_assembly_sources/*.metadata.json
+            build/r1_assembly_sources/*.producer.json
+            build/r1_assembly_sources/original-source.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

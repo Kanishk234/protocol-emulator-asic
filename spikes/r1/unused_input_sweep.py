@@ -4,6 +4,7 @@ Derived states are expected image states, never new native observations. No
 candidate is adopted without actual loading and protocol/reset/reload tests.
 """
 import argparse
+from collections import defaultdict
 import copy
 import json
 import os
@@ -32,7 +33,43 @@ def latch(module,index):
     return matches[0]
 
 
-def prove_input(tile,lut,index,spec,module,state,features,words,pips):
+def carry_cone(graph,tile,lut,enabled):
+    """I1/I2 also feed carry: reject every reachable enabled carry consumer."""
+    successors=defaultdict(set)
+    for dest,preds in graph.items():
+        for source in preds:successors[source].add(dest)
+    for node in enabled:
+        successors[node].add((node[0],node[1].replace('_Ci','_Co')))
+    visited=set();todo=[(tile,'L'+lut+'_Co')];consumers=[]
+    while todo:
+        node=todo.pop()
+        if node in visited:continue
+        visited.add(node);name=node[1]
+        if not (name in ('CI0','CO0') or len(name)==5 and name[0]=='L' and name[1] in 'ABCDEFGH' and name[2:] in ('_Ci','_Co')):
+            raise ValueError('Unexpected non-carry fanout of changed carry input')
+        if name.endswith('_Ci'):
+            if node not in enabled or enabled[node]:raise ValueError('Changed input can reach an enabled carry consumer')
+            consumers.append(node)
+        todo.extend(successors[node])
+    return dict(visited_nodes=len(visited),disabled_carry_consumers=sorted(consumers),enabled_consumers=0)
+
+
+def carry_modes(spec,modules,state):
+    enabled={}
+    for native,row in state['tiles'].items():
+        if row['tile_type']!='LUT4x8_ha':continue
+        xy=native.split('_')[1]
+        for letter in 'ABCDEFGH':
+            mapping=spec['TileSpecs'][xy][letter+'.I0mux']
+            if len(mapping)!=1 or list(mapping.values())!=['1']:raise ValueError('Unexpected carry input mux encoding')
+            name,_=latch(modules['LUT4x8_ha'],next(iter(mapping)));value=row['q'][name]
+            if value not in ('0','1'):raise ValueError('Unknown actual carry input mode')
+            enabled[(xy,'L'+letter+'_Ci')]=value=='1'
+    if len(enabled)!=128:raise ValueError('Incomplete native carry-consumer census')
+    return enabled
+
+
+def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabled):
     from selected_route import selected_predecessors,trace_route
     native='Tile_'+tile+'_LUT4x8_ha';entries=spec['TileSpecs'][tile];target='L'+lut+'_I'+str(index)
     if any(f.split('.')[0]==tile and f.split('.')[2]==target for f in features):
@@ -67,8 +104,10 @@ def prove_input(tile,lut,index,spec,module,state,features,words,pips):
     word=1+(x*20+frame)*6+1+(4-y)
     if (words[word]>>offset)&1:raise ValueError('Parent image selector is not zero')
     candidate=list(words);candidate[word]|=1<<offset
+    carry=(carry_cone(selected_predecessors(spec,words,pips),tile,lut,carry_enabled)
+           if index in (1,2) else dict(scope='I3 does not enter the native carry function'))
     return dict(tile=native,cell=name,lut=lut,input=index,observed_init=init,cofactor_addresses_checked=16,
-                tile_bit=address,word=word,word_bit=offset,before='0',after='1',
+                tile_bit=address,word=word,word_bit=offset,before='0',after='1',carry_noninterference=carry,
                 route_before=trace_route(selected_predecessors(spec,words,pips),(tile,target)),
                 route_after=trace_route(selected_predecessors(spec,candidate,pips),(tile,target)))
 
@@ -91,7 +130,10 @@ def prepare(rc,proof,native,capsule,pdk,out):
     pips_path=capsule/'model/resource/macro/fabulous/.FABulous/pips.txt'
     fasm=capsule/'model/compile/uart_spi_11/design.fasm'
     spec=PlainSpec(io.BytesIO(spec_path.read_bytes())).load();features=fasm_features(fasm)
-    changes=[prove_input(t,l,i,spec,modules['LUT4x8_ha'],state,features,image.words,pips_path.read_text()) for t,l,i in TARGETS]
+    top=json.loads((capsule/'analysis/top.json').read_text())['modules']['eFPGA']
+    if any('CI0' in p or 'CO0' in p for p in top['ports']):raise ValueError('Original carry has an external root observer')
+    enabled=carry_modes(spec,modules,state)
+    changes=[prove_input(t,l,i,spec,modules['LUT4x8_ha'],state,features,image.words,pips_path.read_text(),enabled) for t,l,i in TARGETS]
     variants={}
     for mask in range(1,8):
         name=format(mask,'03b');folder=out/name;folder.mkdir()

@@ -37,6 +37,11 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   reproduce crash versus successful stable-pin traversal. Exact failure
   receipts: reports/r1_port_result_44592238395.json and
   reports/r1_routed_result_44592237966.json.
+- Corrected tools/tests/docs/own CI are committed and pushed throughcb96173a.
+  Hosted44594242689(extracted timing with native stale/fixed-path calibration)
+  and44594242580(flat SPICE with explicit449-port wrapper) are in progress.
+  Their outcomes are not yet accepted. Review these exact runs next; preserve
+  all previous negative controls. Full R1 timing/LVS remains open.
 
 ## 2026-11-19 — Full macro geometry and RC export pass; continue strict LVS/timing
 

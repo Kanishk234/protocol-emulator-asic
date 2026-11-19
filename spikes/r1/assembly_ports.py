@@ -76,6 +76,13 @@ def retain_original_script(original,out):
         raise ValueError('Pinned extraction script changed; original bytes retained for review')
 
 
+def context_masters(catalog):
+    masters=[v['planned_master'] for v in catalog['contexts'].values()]
+    if len(set(masters))!=26 or len(masters)!=26 or any(not re.fullmatch(r'wp_r1_[a-z0-9_]+',m) for m in masters):
+        raise ValueError('Unexpected context wrappers for original LVS flattening')
+    return masters
+
+
 def prepare(source,out):
     source,out=(Path(p).resolve() for p in (source,out))
     result=json.loads((source/'result.json').read_text());metrics=result['completed_stage_metrics']
@@ -87,7 +94,7 @@ def prepare(source,out):
     if len(pins)!=449 or pins['VPWR']['kind']!='POWER' or pins['VGND']['kind']!='GROUND':
         raise ValueError('Wrong exported macro interface')
     out.mkdir(parents=True,exist_ok=False)
-    paths=[Path(__file__),source/'result.json',source/'pins.json',source/(NAME+'.gds'),
+    paths=[Path(__file__),source/'result.json',source/'pins.json',source/'catalog.json',source/(NAME+'.gds'),
            source/(NAME+'.pnl.v'),source/(NAME+'.def'),source/(NAME+'.v')]
     (out/'plan.json').write_text(json.dumps(dict(source=str(source),expected_ports=sorted(pins),
         input_sha256={str(p):sha(p) for p in paths},geometry_changed=False,
@@ -112,11 +119,12 @@ def inside(out):
         Steps=[ExportPorts,Checker.IllegalOverlap,Netgen.LVS,Checker.LVS]
     cases={}
     for name,unique in [('strict_control','all'),('declared_external_ports','notopports')]:
+        masters=context_masters(json.loads((source/'catalog.json').read_text()))
         config=dict(DESIGN_NAME=NAME,VERILOG_FILES=[str(source/(NAME+'.v'))],
                     CLOCK_PERIOD=20,CLOCK_PORT=None,VDD_NETS=['VPWR'],GND_NETS=['VGND'],
                     PRIMARY_GDSII_STREAMOUT_TOOL='klayout',MAGIC_EXT_USE_GDS=True,
                     MAGIC_EXT_ABSTRACT=False,MAGIC_EXT_UNIQUE=unique,MAGIC_EXT_SHORT_RESISTOR=True,
-                    LVS_IGNORE_CELLS=[])
+                    LVS_IGNORE_CELLS=[],LVS_FLATTEN_CELLS=masters)
         row=dict(passed=False,extract_unique=unique,geometry_changed=False)
         folder=out/name;folder.mkdir(exist_ok=False)
         try:

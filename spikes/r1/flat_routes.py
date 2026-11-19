@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import os
 import subprocess
+import xml.etree.ElementTree as ET
 
 from assemble import NAME, view
 from assembly_catalog import sha
@@ -95,7 +96,7 @@ def prepare(assembly,sources,out):
     def net(tile,name):
         node=(tile,name)
         return canonical[union.find(node)] if node in union.parent else tile+'/'+name
-    vias={};components=[];connections=defaultdict(set);routes=defaultdict(list);kinds={};cells=[];terms=[]
+    vias={};components=[];connections=defaultdict(set);routes=defaultdict(list);kinds={};cells=[];terms=[];markers=[]
     def add_route(name,body):
         if body:
             routes[name].append(body if not routes[name] else re.sub(r'^\+ ROUTED\s+','NEW ',body,count=1))
@@ -124,6 +125,9 @@ def prepare(assembly,sources,out):
             if ports[pin]['kind'] in ('POWER','GROUND'):continue
             name=net(tile,ports[pin]['net'])
             for layer,(x0,y0,x1,y1) in bs:
+                if layer in ('Metal2','Metal3'):
+                    markers.append(dict(layer=10 if layer=='Metal2' else 30,datatype=2,
+                        box_dbu=[x0+origin[0],y0+origin[1],x1+origin[0],y1+origin[1]]))
                 x,y=(x0+x1)//2,(y0+y1)//2
                 rect=f'+ ROUTED {layer} ( {x+origin[0]} {y+origin[1]} ) RECT ( {x0-x} {y0-y} {x1-x} {y1-y} )'
                 add_route(name,rect)
@@ -154,6 +158,7 @@ def prepare(assembly,sources,out):
     output=header+emit_section('VIAS',list(vias.values()))+emit_section('COMPONENTS',components)
     output+=emit_section('PINS',pins)+emit_section('SPECIALNETS',special)+emit_section('NETS',nets)+'END DESIGN\n'
     out.mkdir(parents=True,exist_ok=False);(out/(NAME+'.def')).write_text(output)
+    (out/'source-pin-markers.json').write_text(json.dumps(markers)+'\n')
     (out/'expected.json').write_text(json.dumps(dict(cells=cells,terms=terms,ports=port_net))+'\n')
     result=dict(prepared=True,geometry_xor_passed=False,physical_acceptance=False,timing_acceptance=False,
         cells=len(cells),terminals=len(terms),signal_nets=len(nets),power_nets=len(special),pins=len(pins),
@@ -229,11 +234,18 @@ def inside(out):
         state=State.load({DesignFormat.DEF.id:str(out/'imported.def'),DesignFormat.ODB.id:str(out/(NAME+'.odb')),
                           DesignFormat.NETLIST.id:str(out/(NAME+'.nl.v'))})
         streamed=flow.start(with_initial_state=state,_force_run_dir=str(out/'stream'))
+        properties=Path(flow.config['KLAYOUT_PROPERTIES'])
+        bindings={(p.findtext('source','').strip(),p.findtext('name','').strip())
+                  for p in ET.parse(properties).getroot().iter('properties')}
+        if not {('10/2','Metal2.pin'),('30/2','Metal3.pin')}<=bindings:
+            raise ValueError('Pinned PDK pin-marker purposes differ')
+        result['pin_marker_pdk_source']=dict(path=str(properties),sha256=sha(properties))
         candidate=str(streamed[DesignFormat.GDS]);comparison=out/'geometry-xor.json'
         with (out/'geometry-xor.log').open('w') as log:
             subprocess.run(['klayout','-b','-r',str(Path(__file__).with_name('geometry_xor.py')),
                 '-rd','reference='+str(source/(NAME+'.gds')),'-rd','candidate='+candidate,
-                '-rd','top_name='+NAME,'-rd','out='+str(comparison)],
+                '-rd','top_name='+NAME,'-rd','out='+str(comparison),
+                '-rd','allowed_boxes='+str(out/'source-pin-markers.json')],
                 stdout=log,stderr=subprocess.STDOUT,check=True,timeout=900)
         xor=json.loads(comparison.read_text());result['geometry_xor']=xor
         if xor.get('passed') is not True or xor.get('negative_control_detected') is not True:

@@ -47,7 +47,7 @@ jobs:
           prepare(source/'r1_assembly',Path('build/r1_macro_ports'))
           PY
           bash spikes/cloud/fetch_pdk.sh
-      - name: Retain exact runtime script and compare declared interface policies
+      - name: Annotate reviewed cloud script and compare interface policies
         timeout-minutes: 25
         run: |
           set -euo pipefail

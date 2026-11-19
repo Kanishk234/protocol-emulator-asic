@@ -1,0 +1,25 @@
+{
+  "sources": {
+    "rc": {
+      "run": {"id": 44583509050, "head_sha": "6e58ef204fcb8964bfc1170348797c28adc66ab4", "head_branch": "efpga", "run_attempt": 1, "conclusion": "success", "path": ".github/workflows/r1_flat_extract.yaml"},
+      "artifact": {"id": 14561196111, "name": "r1-flat-extraction-44583509050", "digest": "sha256:248090a3ee60a766af9c50209882f5583d8376fceffc52d737accbdf555f1140", "size_in_bytes": 79483716, "source_run": 44583509050},
+      "member": "r1_flat_extract"
+    },
+    "proof": {
+      "run": {"id": 44583509216, "head_sha": "6e58ef204fcb8964bfc1170348797c28adc66ab4", "head_branch": "efpga", "run_attempt": 1, "conclusion": "failure", "path": ".github/workflows/r1_macro_ports.yaml"},
+      "artifact": {"id": 14561500677, "name": "r1-macro-ports-44583509216", "digest": "sha256:564243b18d8a41c7def26557cf3a04c72c6c9cd7c35ed1b3702950b82eb50ccb", "size_in_bytes": 27937479, "source_run": 44583509216},
+      "member": "r1_macro_ports/flat_reference"
+    },
+    "native": {
+      "run": {"id": 44461373512, "head_sha": "afc68e55411a4f582928e3dae2d11e46a22d5141", "head_branch": "efpga", "run_attempt": 1, "conclusion": "success", "path": ".github/workflows/r1_registered_input_functional.yaml"},
+      "artifact": {"id": 14499804479, "name": "r1-registered-input-native-44461373512", "digest": "sha256:cb142dcbf5856f400439472150bdb6dce04b97cb034647af88f7eb8b5dc7e4f2", "size_in_bytes": 8969665, "source_run": 44461373512},
+      "member": "."
+    },
+    "capsule": {
+      "run": {"id": 40128859740, "head_sha": "97f655a1e8ed574c553fdc3989154df77fdc314b", "head_branch": "efpga", "run_attempt": 1, "conclusion": "failure", "path": ".github/workflows/r1_run_timing.yaml"},
+      "artifact": {"id": 12574475845, "name": "r1-configured-timing-40128859740", "digest": "sha256:d3ebcd915e82c6b9646648efe0053e2baf2d790312769beff707bb99e9d0f900", "size_in_bytes": 88937106, "source_run": 40128859740},
+      "member": "."
+    }
+  },
+  "scope": "Failed producers provide only original timing controls and independently proven signal views; their failed LVS/timing results remain failures. No promotion to physical acceptance."
+}

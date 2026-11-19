@@ -14,6 +14,11 @@
   extraction and complete unique SPICE port declarations afterward. Upstream
   code remains untouched. Enable its standard short-resistor representation
   for aliased exported pins in both compared cases.
+- **Runtime source correction (BUG144):** initial local3.0.0digest above was
+  rejected before execution. Capture44571131088 provides reviewed cloud SHA
+  461bf51e4226c283de33361bad02f48d0335ad7ab05965cbba43e2677e040660:
+  only three startup commands differ, with no change to extraction/port logic.
+  The adapter now requires that exact cloud source; original rejections remain.
 - **Interface comparison:** first keep extract-unique=all; second test
   notopports for the already-declared multi-access supply interface. Internal
   labels stay unique in both. Prefer all if both pass. This is a macro

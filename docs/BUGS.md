@@ -13,6 +13,13 @@
   do not remove the guard or edit installed upstream code. Negative test proves
   a foreign script is retained but never patched/executed. Hosted capture and
   reviewed-source replay are required; both interface cases remain untested.
+- **Source review:** capture44571131088 atc624912e retains the installed source,
+  SHA461bf51e4226c283de33361bad02f48d0335ad7ab05965cbba43e2677e040660.
+  Full diff adds only drc off, crashbackups disable and locking disable after
+  loading common/read.tcl; extraction/port logic is otherwise identical. It
+  also matches the local3.0.14package bytes. Pin this reviewed cloud digest;
+  leave the exact guard and isolated-copy rule in force. Actual cases still
+  require hosted replay.
 
 ## 143: Zero LVS summary counts do not establish a passing detailed verdict
 

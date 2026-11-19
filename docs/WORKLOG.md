@@ -8,6 +8,10 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   cloud script differs from the locally inspected digest (BUG144). Retain its
   original bytes/digest before rejection, inspect the diff and update only to
   a reviewed exact cloud source. Neither extraction policy has run yet.
+- Capture44571131088 atc624912e succeeds in retaining the rejected source.
+  Full diff is only three startup commands; reviewed cloud SHA461bf51e… also
+  matches local3.0.14. Update the pin while retaining the guard. Core lint/unit/
+  test/docs/fabric checks on c624912e are green; corrected extraction pending.
 
 - Assembled44465623376 at53240408 passes Magic/KLayout DRC and overlap at
   zero. Full inventory/contacts pass and actual GDS/PNL SHA values match local

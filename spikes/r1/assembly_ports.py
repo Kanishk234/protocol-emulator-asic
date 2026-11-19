@@ -97,13 +97,13 @@ def flat_spice_script(annotated):
     return annotated.replace(anchor,'ext2spice hierarchy off\next2spice subcircuits top on\n'+anchor)
 
 
-def merge_flat_alias_script(flat_script,ports):
+def merge_flat_alias_script(flat_script,ports,flat=True):
     """Merge physically extracted internal aliases; every root name must survive."""
     if len(ports)!=449 or len(set(ports.values()))!=449 or not {'VPWR','VGND'}<=set(ports):
         raise ValueError('Flat alias merging needs449distinct original root nets')
     anchor='ext2spice -o $netlist $::env(DESIGN_NAME).ext'
-    if flat_script.count(anchor)!=1 or flat_script.count('ext2spice hierarchy off')!=1:
-        raise ValueError('Require the original flat export with explicit root interface')
+    if flat_script.count(anchor)!=1 or flat_script.count('ext2spice hierarchy off')!=int(flat):
+        raise ValueError('Unexpected export hierarchy for extracted alias merging')
     return flat_script.replace(anchor,'ext2spice short none\n'+anchor)
 
 
@@ -166,7 +166,7 @@ def prepare(source,out,native_flat=None):
         scope='Exported macro interface LVS only. Multiple accesses of declared supply ports require connection by the enclosing power grid; no physical power-grid, clock, timing or submission acceptance.'),indent=2)+'\n')
 
 
-def inside(out):
+def inside(out,case_set='all'):
     from librelane.flows.classic import Classic
     from librelane.state import State,DesignFormat
     from librelane.steps import Magic,Netgen,Checker
@@ -181,10 +181,14 @@ def inside(out):
     all_script.write_text(annotate_script(original.read_text(),plan['expected_ports'],plan['context_ports']))
     flat_script=out/'extract_flat_spice.tcl';flat_script.write_text(flat_spice_script(all_script.read_text()))
     merged_script=None
+    hierarchical_merged_script=None
     if plan.get('native_inventory'):
         merged_script=out/'extract_merged_flat_spice.tcl'
         merged_script.write_text(merge_flat_alias_script(flat_script.read_text(),
             json.loads(Path(plan['native_inventory']).read_text())['ports']))
+        hierarchical_merged_script=out/'extract_merged_hierarchical_spice.tcl'
+        hierarchical_merged_script.write_text(merge_flat_alias_script(all_script.read_text(),
+            json.loads(Path(plan['native_inventory']).read_text())['ports'],flat=False))
     active_script=script
     class ExportPorts(Magic.SpiceExtraction):
         id='Magic.R1ExportPorts'
@@ -201,9 +205,15 @@ def inside(out):
         experiments.append(('complete_context_ports','notopports',flat_pnl,True,False))
         experiments.append(('flat_spice_reference','notopports',flat_pnl,True,True))
         experiments.append(('flat_spice_merge_aliases','notopports',flat_pnl,True,True))
+        experiments.append(('hierarchical_merge_aliases','notopports',flat_pnl,True,False))
+    if case_set=='hierarchical_aliases':
+        experiments=[e for e in experiments if e[0] in ('complete_context_ports','hierarchical_merge_aliases')]
+        if len(experiments)!=2:raise ValueError('Missing matched hierarchical alias controls')
+    elif case_set!='all':raise ValueError('Unknown extraction case set')
     for name,unique,pnl,complete,flat in experiments:
-        merge_aliases=name=='flat_spice_merge_aliases'
-        active_script=merged_script if merge_aliases else (flat_script if flat else (all_script if complete else script))
+        merge_aliases=name in ('flat_spice_merge_aliases','hierarchical_merge_aliases')
+        active_script=(hierarchical_merged_script if name=='hierarchical_merge_aliases' else
+                       merged_script if merge_aliases else (flat_script if flat else (all_script if complete else script)))
         masters=context_masters(json.loads((source/'catalog.json').read_text()))
         config=dict(DESIGN_NAME=NAME,VERILOG_FILES=[str(source/(NAME+'.v'))],
                     CLOCK_PERIOD=20,CLOCK_PORT=None,VDD_NETS=['VPWR'],GND_NETS=['VGND'],
@@ -238,12 +248,22 @@ def inside(out):
     if any(sha(p)!=d for p,d in plan['input_sha256'].items()):
         raise ValueError('Original assembly changed during extraction')
     chosen=next((n for n in cases if cases[n]['passed']),None)
+    matched_control=None
+    if case_set=='hierarchical_aliases':
+        control=cases['complete_context_ports']
+        matched_control=(not control['passed'] and control.get('extracted_ports')==449 and
+            not control.get('missing_ports') and not control.get('extra_ports') and
+            control.get('verdicts')==['Top level cell failed pin matching.'] and
+            '31 LVS errors found.' in control.get('flow_error',''))
+        if not matched_control:chosen=None
     summary=dict(passed=chosen is not None,cases=cases,selected_interface_policy=chosen,
+        case_set=case_set,matched_control_reproduced=matched_control,
         source_gds_sha256=GDS_SHA,source_pnl_sha256=PNL_SHA,geometry_changed=False,
         extraction_script_sha256=sha(script),original_script_sha256=SCRIPT_SHA,
         complete_context_script_sha256=sha(all_script),
         flat_spice_script_sha256=sha(flat_script),
         merged_flat_script_sha256=sha(merged_script) if merged_script else None,
+        merged_hierarchical_script_sha256=sha(hierarchical_merged_script) if hierarchical_merged_script else None,
         physical_acceptance=False,timing_acceptance=False,scope=plan['scope'])
     (out/'result.json').write_text(json.dumps(summary,indent=2)+'\n')
     if chosen is None:raise SystemExit('No port extraction policy passed strict macro interface LVS')
@@ -253,5 +273,6 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='mode',required=True)
     prep=sub.add_parser('prepare');prep.add_argument('--source',type=Path,required=True);prep.add_argument('--out',type=Path,required=True)
     prep.add_argument('--native-flat',type=Path)
-    sub.add_parser('inside').add_argument('--out',type=Path,required=True)
+    run=sub.add_parser('inside');run.add_argument('--out',type=Path,required=True)
+    run.add_argument('--case-set',choices=['all','hierarchical_aliases'],default='all')
     args=vars(p.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else inside)(**args)

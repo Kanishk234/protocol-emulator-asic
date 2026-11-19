@@ -1,5 +1,20 @@
 # Bugs
 
+## 157: Remaining LVS final pin failure involves electrically unused root ports
+
+- **Measured status:** native alias merging44621668751 and44623601777 reports
+ 0device/net/property differences, with the exact449root names retained, but
+  final top-pin matching fails. Root replay identifies70FrameStrobe ports
+  marked `(no pin)` on the layout side; every one has0original functional
+  cell terminals. Summary metrics0still do not qualify a pass.
+- **Next check:** D147represents the original source schematic in SPICE using
+  original model pin order. Independently prove all cells, signal partitions,
+  power bindings and449root names after reparsing, then change only the source
+  read command in an isolated generated comparison script. Keep the original
+  Verilog-source control and strict final verdict; no pin waiver/forced matches.
+- **Rejected inference:** small scalar/vector alias-versus-direct floating-port
+  fixtures pass on local1.5.316. This does not prove a parser bug in cloud1.5.320.
+
 ## 156: Flat hierarchy does not remove resistor-preserved internal port aliases
 
 - **Symptom/check:**44594242580 atcb96173a exports the explicit449-port

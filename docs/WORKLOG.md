@@ -2,6 +2,42 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Qualify active RC timing; isolate remaining floating-port LVS failure
+
+- Actual44623006209 at5688fa36 completes all six native cases. All four
+  routed setup/hold cases have0active missing parasitic pins; missing-SPEF
+  controls fail as expected. Both loop policies agree and all370registers/
+  8736loaded cases/246endpoints are covered. Conditional nominal-RC macro
+  setup is-11.108903ns, hold-1.870506ns at20ns/0.25nsuncertainty. This is now
+  an explicit primary-image timing failure under these macro conditions;
+  complete shell/loading/PVT/physical acceptance remains open. No closure claim.
+- Actual flat native alias merge44621668751 at7a3e549b removes the two
+  corner-net mismatches:314182reduced devices and170046nets on both sides,
+  all difference metrics0. Final verdict still fails top-pin matching.
+- Matched hierarchical44623601777 at2a9ec6c5 reproduces the31-error control,
+  then its native alias merge likewise reports all difference metrics0and
+ 449ports but fails final top-pin matching. Root isolates70FrameStrobe ports
+  marked `(no pin)` by comparison; each has0original functional cell terminals,
+  yet all449names exist in the extracted/schematic headers. No pin waiver,
+  forced net equivalence or passing LVS claim. Next check source representation
+  and pinned Netgen handling of these electrically unused, still-declared pins.
+- Read-only primary path tracing identifies unused LUT inputs along the worst
+  setup chain. Next bounded experiment may change only their existing image
+  selectors after complete observed-truth-table cofactor, frame and active-PIP
+  exclusion proofs; hardware and actual timing constraints stay fixed. Actual
+  loading/native protocol tests remain required before any candidate adoption.
+- User SRAM question: current main20839733instantiates IHP512x16SRAM for
+  TRIPWIRE routine/instruction/data service (`src/trw_sram.v`, `trw_lane.v`).
+  WARP uses configuration latches and has no CPU instruction store. No SRAM
+  architecture change is part of the current closure work.
+- No phase boxes ticked. G1/defaults and all historical failure controls remain.
+- D147source-SPICE preflight independently preserves all45429devices,8736
+  configuration latches,370edge registers and449root pins, with exact source
+  signal partitions and explicit original supply bindings. A removed real
+  latch is rejected;14focused export/interface tests pass, including signal,
+  power and unused-root-port mutations. Separate hosted comparison will retain
+  the native Verilog control and original Netgen setup/checker/final verdict.
+
 ## 2026-11-19 — Repair extracted pin connectivity before timing optimization
 
 - Read actual44594242689 atcb96173a: stale/fixed microfixture behaves as

@@ -1,5 +1,29 @@
 # Decisions
 
+## D-147: Compare a source-proven SPICE schematic without dropping unused ports
+
+- **Date:**2026-11-19. Both native alias-merge experiments44621668751 and
+ 44623601777 remove the two extra corner nets and report0device/net/property
+  differences, but final top-pin matching fails. All449names remain in both
+  source headers; comparison marks70layout FrameStrobe ports `(no pin)`.
+  Independent original inventory shows each has0functional cell terminals.
+- **Bounded experiment:** render SPICE from the original source-hierarchy JSON,
+  not extracted signal data. Use original PDK model pin order and verified
+  VDD/VSS bindings, retaining all45429cells and449root pins, including every
+  electrically unused pin. Reparse the output and independently compare exact
+  source signal partitions against physical inventories. Removing a real
+  configuration latch must fail; signal and supply mutations must fail.
+- **Comparison:** preserve the native hierarchical alias-merge Verilog control.
+  Change only its generated source read command/format for the candidate;
+  retain original script bytes and source hashes, layout, PDK setup, full
+  device checks, zero-error checker and unique final verdict. This edits an
+  isolated generated script, never upstream package files. No forced pin/net
+  equivalence, ignored root pins, added source devices or geometric change.
+- **Limits:** simple scalar/vector floating-port fixtures match on local
+  Netgen1.5.316; they do not establish the full failure's cause on pinned cloud
+ 1.5.320. Do not label that cause fixed until actual hosted evidence passes.
+  This is source representation only, not timing or physical power acceptance.
+
 ## D-146: Compare extracted alias handling while preserving standard-cell hierarchy
 
 - **Date:**2026-11-19. D145's full transistor-flat comparison44621668751 is

@@ -67,15 +67,17 @@ def parking_bit(features, spec, module, state):
                 tile_bit=index, before='0', after='1', feature='X2Y3.G.FF')
 
 
-def unused_input_bit(features, spec, module, state):
+def unused_input_bit(features, spec, module, state, lut='D'):
     """Move only an unrouted input proved irrelevant by the observed LUT truth table."""
     features = set(features)
-    if any(f.split('.')[0] == TILE and f.split('.')[2] == 'LD_I1' for f in features):
+    if lut not in ('D', 'E'):
+        raise ValueError('Unsupported measured LUT input probe')
+    if any(f.split('.')[0] == TILE and f.split('.')[2] == f'L{lut}_I1' for f in features):
         raise ValueError('LUT input has a declared route; cannot change it')
     entries = spec['TileSpecs'][TILE]
     init = 0
     for bit in range(16):
-        key = 'D.INIT' if bit == 0 else f'D.INIT[{bit}]'
+        key = f'{lut}.INIT' if bit == 0 else f'{lut}.INIT[{bit}]'
         mapping = entries[key]
         if len(mapping) != 1 or set(mapping.values()) != {'1'}:
             raise ValueError('Unexpected LUT truth-bit encoding')
@@ -87,17 +89,17 @@ def unused_input_bit(features, spec, module, state):
         if len(matches) != 1 or state.get(matches[0]) not in ('0', '1'):
             raise ValueError('Missing observed native truth bit')
         value = int(state[matches[0]])
-        declared = f'{TILE}.{key}' in features or (bit == 0 and f'{TILE}.D.INIT[0]' in features)
+        declared = f'{TILE}.{key}' in features or (bit == 0 and f'{TILE}.{lut}.INIT[0]' in features)
         if value != declared:
             raise ValueError('Observed LUT truth differs from original FASM')
         init |= value << bit
     if any(((init >> address) & 1) != ((init >> (address ^ 2)) & 1) for address in range(16)):
         raise ValueError('LUT function depends on I1; input reroute forbidden')
     # Reuse strict native-frame localization for the one existing selector bit.
-    alternate = 'J2END_CD_END1.LD_I1'
+    alternate = 'J2END_CD_END1.LD_I1' if lut == 'D' else 'J_l_EF_END1.LE_I1'
     derived = {'TileSpecs': {TILE: {'G.FF': entries[alternate]}}}
     bit = parking_bit([], derived, module, state)
-    bit.update(feature=TILE + '.' + alternate, lut='D', unused_input=1,
+    bit.update(feature=TILE + '.' + alternate, lut=lut, unused_input=1,
                observed_init=init, cofactor_addresses_checked=16,
                scope='Unrouted I1, observed LUT function independent of I1; analysis only')
     return bit
@@ -171,10 +173,11 @@ def prepare(capsule, out, target='unused-output-register', trace_edges=False):
     state = json.loads(state_path.read_text())['tiles'][NATIVE_TILE]['q']
     fasm = capsule / 'model/compile/uart_spi_11/design.fasm'
     spec = PlainSpec(io.BytesIO(spec_path.read_bytes())).load()
-    if target not in ('unused-output-register', 'unused-input-select'):
+    if target not in ('unused-output-register', 'unused-input-select', 'unused-e-input-select'):
         raise ValueError('Unknown experiment target')
     selector = parking_bit if target == 'unused-output-register' else unused_input_bit
-    bit = selector(fasm_features(fasm), spec, module, state)
+    args = (fasm_features(fasm), spec, module, state)
+    bit = unused_input_bit(*args, lut='E') if target == 'unused-e-input-select' else selector(*args)
     out.mkdir(parents=True, exist_ok=False)
     def relocate(text):
         # Explicit path relocation only; no source/state/connectivity rewrite.
@@ -246,7 +249,7 @@ if __name__ == '__main__':
     parser.add_argument('mode', choices=('prepare', 'audit'))
     parser.add_argument('--capsule', type=Path)
     parser.add_argument('--out', type=Path, required=True)
-    parser.add_argument('--target', choices=('unused-output-register', 'unused-input-select'), default='unused-output-register')
+    parser.add_argument('--target', choices=('unused-output-register', 'unused-input-select', 'unused-e-input-select'), default='unused-output-register')
     parser.add_argument('--trace-edges', action='store_true')
     args = parser.parse_args()
     if args.mode == 'prepare':

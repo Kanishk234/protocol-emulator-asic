@@ -83,5 +83,8 @@ def test_alias_merge_cannot_discard_a_shared_root_port_name():
     ports={p:p for p in ['VPWR','VGND']+[f'p{i}' for i in range(447)]}
     changed=merge_flat_alias_script(source,ports)
     assert changed.replace('ext2spice short none\n','')==source
+    with pytest.raises(ValueError):merge_flat_alias_script(source,ports,flat=False)
+    hierarchical='ext2spice lvs\next2spice -o $netlist $::env(DESIGN_NAME).ext'
+    assert merge_flat_alias_script(hierarchical,ports,flat=False).replace('ext2spice short none\n','')==hierarchical
     ports['p0']=ports['p1']
     with pytest.raises(ValueError):merge_flat_alias_script(source,ports)

@@ -1,0 +1,71 @@
+name: status-merge-screen
+run-name: D-192 source-only repair on qualified 8x4 recipe (pre-routing)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: status-merge-screen-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  screen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      PDK_ROOT: /home/runner/pdk
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v6
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Prepare project venv and isolated verified candidate
+        run: |
+          scripts/setup_venv.sh
+          source .venv/bin/activate
+          python scripts/ci/status_merge_screen.py prepare
+      - name: Check out reviewed current official support-tools snapshot
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          ref: 0922544e6c7f6126047c3fba720b0437fa32a1b8
+          path: build/status_merge_screen/design/tt
+      - name: Install official prerequisites
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9
+        with:
+          packages: librsvg2-bin pngquant ghdl-llvm
+          version: tinytapeout_gds_action
+      - name: Install and bind the qualified physical engine
+        run: |
+          source .venv/bin/activate
+          pip install -r build/status_merge_screen/design/tt/requirements.txt
+          pip install librelane==3.1.0.dev4
+          docker pull ghcr.io/librelane/librelane:3.1.0.dev4
+          (
+            cd build/status_merge_screen/design
+            python tt/tt_tool.py --create-user-config --pdk ihp-sg13cmos5l
+          )
+          python scripts/ci/status_merge_screen.py generated
+      - name: Run unchanged native flow through final pre-routing STA
+        run: |
+          source .venv/bin/activate
+          python scripts/ci/status_merge_screen.py flow
+      - name: Fresh repeated all-corner timing and antenna audit
+        run: |
+          source .venv/bin/activate
+          python scripts/ci/status_merge_screen.py audit
+      - name: Upload candidate inputs and all screen evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: status-merge-screen-${{ github.run_id }}
+          path: |
+            build/status_merge_screen/design/trial_inputs.json
+            build/status_merge_screen/design/engine.json
+            build/status_merge_screen/design/info.yaml
+            build/status_merge_screen/design/macro/
+            build/status_merge_screen/design/src/
+            build/status_merge_screen/design/audit_helpers/
+            build/status_merge_screen/design/runs/
+          if-no-files-found: warn

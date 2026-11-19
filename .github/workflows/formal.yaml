@@ -1,0 +1,52 @@
+name: formal
+on: [push, workflow_dispatch]
+
+jobs:
+  channels:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      OSS_CAD_SUITE_TAG: '2026-06-29'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Cache OSS CAD Suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Install OSS CAD Suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          D=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$D.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+      - name: Prepare project venv
+        run: scripts/setup_venv.sh
+      - name: Native channel, RX and lean-unit formal checks
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          python scripts/formal_channels.py
+          python scripts/formal_pin_rx.py
+          python scripts/formal_pin_unit.py
+      - name: Scratch status-merge candidate proofs (not hardware adoption)
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          python scripts/formal_status_queue.py
+          python scripts/formal_status_candidate_integration.py
+      - name: Upload proof logs and counterexamples
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: formal-channels
+          path: |
+            build/formal_channels/
+            build/formal_pin_rx/
+            build/formal_pin_unit/
+            build/formal_status_queue/
+            build/formal_status_candidate_integration/

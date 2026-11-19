@@ -69,6 +69,8 @@ Inventory review after the guarded I2C milestone:
 ### 2.3 Metamorphic tests (L4)
 3. L4-LOOP, L4-SCALE, L4-PERM, L4-IDLE, L4-TAP, each for at least UART, SPI and I2C.
 
+   [L4-TAP progress](../../reports/PHASE3_METAMORPHIC_TAP.md):16positive whole-model pairs compare517,960clocks; three blocking-subscriber negatives are detected. Both RTL simulators and the exact official netlist pass3/3paired protocol cases with no failures/skips; trace hashes and host observation checkpoints match across simulators. The full Python suite passes1,164tests. LOOP/SCALE/PERM/IDLE remain open; a concrete UART scale audit distinguishes fixed launch latency from doubled bit intervals. No verification requirement or L4 exit checkbox is changed.
+
 ### 2.4 Formal (L5, owner: verification)
 4. Prove:
    - **F-CHAN-1..4**

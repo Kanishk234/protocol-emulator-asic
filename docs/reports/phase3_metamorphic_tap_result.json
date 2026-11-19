@@ -1,0 +1,465 @@
+{
+  "scope": "L4-TAP finite whole-model and chip-port paired UART/SPI/I2C workloads; all-five L4 gate remains open",
+  "base_commit": "96ae19d8735c6a629332e224c23eace60188cd53",
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "phase3_complete": false,
+  "L4_exit_complete": false,
+  "sources_sha256": {
+    "tools/kernels/metamorphic_tap.py": "317bf83091a4da04af4c4a9ff8276f5e5c1481d48f553d7d41e343cbc667bfe0",
+    "tools/kernels/tests/test_metamorphic_tap.py": "03541d3d8a970fcfdbdba3d9717331e20a6b86ea80d58b726811452d5f98b336",
+    "test_internal/chip/test_metamorphic_tap.py": "b4b011ecc8e67ce33cbd716bc6bf23a30aaed0dc2ffc0acb703561a1900d5b0f",
+    ".github/workflows/unit.yaml": "da905b4e7b0e77f3358bc058ff8c46cc07875ae954e5c6ae4b0d4ffe0591c632",
+    "test_internal/Makefile": "cf08a73d334b64523518cc1aeeb8b184866ac40e90c2b9d41cefb2c899825d56",
+    "programs/uart.trw": "5524ad1498318ffa795de8c6d5780d0fdcb1c15722e9c12a1d6accdad40a2e00",
+    "programs/spi_controller.trw": "dfd7b386a55a8ac1991c09c58d7a58b41594917083ff951c8e5e9b7fcd02a792",
+    "programs/i2c_controller.trw": "b2a04d6e0fddcf9cebb032c646a01c28b9ed99bfb9f10bae9fc7961699dfed7b"
+  },
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008"
+  },
+  "previous_firmware_images": {
+    "unchanged_count": 27,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816",
+      "spi_target_flash.trw": "44cf6326be28ad2f97eae83a2deb9c4f3458d2942b60e789bd4e3bc043ebbf47",
+      "onewire_master.trw": "1382bfbcf8c4459c23c1cc18cb4bf87bed4c32bafc0a4772282a4915cdcd91a9",
+      "uart_bridge_capture.trw": "dba51651e988d6adce99cdd99ce7e21a30f3d235031a1c3ace6810bbe519ed9d",
+      "i2c_capture.trw": "7df9cb38c398e40aeb973c82f409c1b671173db8533668fc1f33182ba8ceaa49",
+      "spi_capture.trw": "dbeb47015a1d8a5b476a9fe9bc00d3744e4d21725db4262af8dba443be719a9e"
+    }
+  },
+  "model": {
+    "passed": 19,
+    "positive_pairs": 16,
+    "negative_blocking_subscriber_controls": 3,
+    "compared_clocks": 517960,
+    "log_sha256": "8fd4d87766e39a51810f4ad1b7eb25c879dbc8d50b5fc19d3769d2b607be4ed6",
+    "pairs": [
+      {
+        "bad_stop": false,
+        "clocks_compared": 44535,
+        "host_items": 7,
+        "protocol": "uart",
+        "protocol_trace_sha256": "414d5a0b5c507fb952c76ed784ffca1828ea5c4383275580f7be21c103998e0b",
+        "rate": 115200,
+        "stretch": 0,
+        "tap_drops": 6,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 12634,
+        "host_items": 7,
+        "protocol": "uart",
+        "protocol_trace_sha256": "38ce30d5e075b1032c029ef329ad599316fcedb909166df355a96ce7b413158a",
+        "rate": 460800,
+        "stretch": 0,
+        "tap_drops": 6,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": true,
+        "clocks_compared": 44969,
+        "host_items": 7,
+        "protocol": "uart",
+        "protocol_trace_sha256": "89f4c21ece0b8335a9358ab2130d0a0067578bf7a3fd70fd6211f7bb3db82bf3",
+        "rate": 115200,
+        "stretch": 0,
+        "tap_drops": 6,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": true,
+        "clocks_compared": 12742,
+        "host_items": 7,
+        "protocol": "uart",
+        "protocol_trace_sha256": "eb232b5901821ded270bbc704bd670b4eeee2dc0ab91718d30cd07190ffadbfd",
+        "rate": 460800,
+        "stretch": 0,
+        "tap_drops": 6,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 16000,
+        "host_items": 6,
+        "protocol": "spi",
+        "protocol_trace_sha256": "c226007741a26a02232a70151970f17772cfa8b0bfdcbd3218b31a66ed8ead57",
+        "rate": 50,
+        "stretch": 0,
+        "tap_drops": 5,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 16000,
+        "host_items": 6,
+        "protocol": "spi",
+        "protocol_trace_sha256": "53b5d2cfe65463c7e93d8bf73a546c61510341fc2c0371301d7c54ac402bae77",
+        "rate": 10,
+        "stretch": 0,
+        "tap_drops": 5,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 16000,
+        "host_items": 6,
+        "protocol": "spi",
+        "protocol_trace_sha256": "c8ea9dc25bc48dd0eb7400793a13b5c7e8c8f45e862096e8359d2aa106b2a534",
+        "rate": 6,
+        "stretch": 0,
+        "tap_drops": 5,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 78000,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "415c645fff8310a3709f363f249b5076a413da1800232c2d3b049e1d55d7cef3",
+        "rate": 500,
+        "stretch": 0,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 25360,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "d1cd85a722df4d32fbc688d14dafabf64c1377b45bcd399edfa1c3259cf28f97",
+        "rate": 124,
+        "stretch": 0,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 15000,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "f3d382b21bbdd4e21cb4da9bc86032b005d0c3e4ade91e5ac89a3523697feba4",
+        "rate": 50,
+        "stretch": 0,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 78000,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "415c645fff8310a3709f363f249b5076a413da1800232c2d3b049e1d55d7cef3",
+        "rate": 500,
+        "stretch": 40,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 25360,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "d1cd85a722df4d32fbc688d14dafabf64c1377b45bcd399edfa1c3259cf28f97",
+        "rate": 124,
+        "stretch": 40,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 15000,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "17b847eee0be66eb729268c43abcec1c4efb1005702698c3f3a9aa2ded6db6d7",
+        "rate": 50,
+        "stretch": 40,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 78000,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "415c645fff8310a3709f363f249b5076a413da1800232c2d3b049e1d55d7cef3",
+        "rate": 500,
+        "stretch": 107,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 25360,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "51d3aa8b2d348cabd38a0cbc0103912113e923280094233e00a4051bf95b2017",
+        "rate": 124,
+        "stretch": 107,
+        "tap_drops": 30,
+        "tap_takes": 0
+      },
+      {
+        "bad_stop": false,
+        "clocks_compared": 15000,
+        "host_items": 10,
+        "protocol": "i2c",
+        "protocol_trace_sha256": "b615d5ae465098ca30c2bb4b21e7432cdda928fd13311cd9b2f08d050fc9005e",
+        "rate": 50,
+        "stretch": 107,
+        "tap_drops": 30,
+        "tap_takes": 0
+      }
+    ]
+  },
+  "SCALE_audit_not_a_pass": {
+    "1000000": {
+      "edge_clocks_from_first_step": [
+        4,
+        54,
+        104,
+        154,
+        204,
+        254,
+        304,
+        354,
+        404,
+        454
+      ],
+      "compiled_image_sha256": "39693e797abb91de67544221470cdc5931e1d33ef6dbdf068f392d8ef71db5da"
+    },
+    "500000": {
+      "edge_clocks_from_first_step": [
+        4,
+        104,
+        204,
+        304,
+        404,
+        504,
+        604,
+        704,
+        804,
+        904
+      ],
+      "compiled_image_sha256": "193ac5a1424b43ce8adcf3cb60bee5bff9d29c6314c5eabd52ea9319db158298"
+    },
+    "raw_edges_exactly_double": false,
+    "intervals_after_first_edge_exactly_double": true
+  },
+  "configuration_images": {
+    "uart_115200": {
+      "baseline": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "tap": "f1fe7113a6dac8648cdc7a7a7bb76b131217b5e8b6e601dc26ca50451dd5de96",
+      "blocking_negative": "00fd8501b12c2008695167fc0b7042e227ac6e6a89843bfbe97db915d9dfa771"
+    },
+    "uart_460800": {
+      "baseline": "3db8bb1542b20761b652b57a9e2d45ad03efb056158e14ade9aa03501f6605f6",
+      "tap": "73a3a7a3583826883ca482424a50ac3746d3089df956e3aa7f23ae9989953108",
+      "blocking_negative": "593a8ac676994dc3061a74d353cc2b483d3365b544b7403f808e2cc45e6d2957"
+    },
+    "spi_50": {
+      "baseline": "f596fe58b34d3cd2bc3b053fa9a8507a75f06a3e9aba7be7b728d55590aec6ed",
+      "tap": "bdc1bbb4486c4a0ba6ca7baf39eb9a063a684980d59a8e1395f0bbbb86805499",
+      "blocking_negative": "80417d303b06adf32beca0bcbce926733c981614df7b4d900551a1246c4e45e4"
+    },
+    "spi_10": {
+      "baseline": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "tap": "ecc2777eb0b6d38967c9f6772403fb4628e869a577538aa922229a652475d2e6",
+      "blocking_negative": "d5a0ed06f38db863695f6b1fcdee32fba64ae849b4f28df13d23b32aca76654a"
+    },
+    "spi_6": {
+      "baseline": "11ab4c0f480c918c588606af1c06bc11bb7494d12ec733350a1ca762eb703b12",
+      "tap": "7344172731e5434c556875a7856a083fbf3bbd325029c9fb52e9315991a503da",
+      "blocking_negative": "e5f2d13238b46b9345bcf850ade3e49fa482785d04c0c03d69e382209abd6862"
+    },
+    "i2c_500": {
+      "baseline": "6ed9a8fb02a6d43e2eaca6ad1c2906e84419f1691995cd0173cbf687bb140afc",
+      "tap": "a2ac514c383234f3b50f6e2bb1a1dd6bbfa61b6179625ecc60192f6d86ddf2c0",
+      "blocking_negative": "151191ac048539d35ca0f28ca73a40d3711e5de55d53193705ec04fa4aa159c3"
+    },
+    "i2c_124": {
+      "baseline": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "tap": "3574af509c9362c994c16ce036fd2ce83f5ff3249f121117f361c91e338efbaa",
+      "blocking_negative": "fb5cb241280e2ec06cefc81fe7f040d1a00de78e148765071f83fd6ed17d217b"
+    },
+    "i2c_50": {
+      "baseline": "0d5d85daaba4309980916bfd5050e82f6599639d69ac702d07b65766dbf469f9",
+      "tap": "dc722b1f15817b9d050c30e1b263790a4d97111ac2baf6ae8ca39284851ea77e",
+      "blocking_negative": "b1507058b021e53296f2c2212025ae460092de9ab038cbb83effaa4e3b5b79e9"
+    }
+  },
+  "simulations": {
+    "verilator": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_uart_tap_is_cycle_exact",
+          "seconds": 5.881798028945923
+        },
+        {
+          "name": "test_spi_tap_is_cycle_exact",
+          "seconds": 7.877568006515503
+        },
+        {
+          "name": "test_i2c_tap_is_cycle_exact",
+          "seconds": 9.63097333908081
+        }
+      ],
+      "observations": [
+        {
+          "protocol": "uart",
+          "clocks": 12841,
+          "tap_drops": 6,
+          "observed_host_checkpoints": 23,
+          "protocol_trace_sha256": "bfb31250c7f85a7817bcf58f06a6ded27f3a9af2f7e4c53028118a443d2fbd67"
+        },
+        {
+          "protocol": "spi",
+          "clocks": 16450,
+          "tap_drops": 5,
+          "observed_host_checkpoints": 26,
+          "protocol_trace_sha256": "b3e8e2a764b8403b8961ccc62e69cd2ac1d129d6e5772eee2fc52d21fa714e6e"
+        },
+        {
+          "protocol": "i2c",
+          "clocks": 25831,
+          "tap_drops": 30,
+          "observed_host_checkpoints": 21,
+          "protocol_trace_sha256": "e6bbe2ae0910f2208836b5fa6c3fa19c3dfbb526140661ebb328c16a85ebcbf3"
+        }
+      ],
+      "xml_sha256": "dac5cae3e74118b3e5b69e84fb7b9c9c64cc6da8043ec6fa7f6bf476300913c6",
+      "log_sha256": "abcaf50763e4a72fef3a5006cc3c11c4d228cd58e09dd47b91679dd88448279e"
+    },
+    "icarus_rtl": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_uart_tap_is_cycle_exact",
+          "seconds": 28.080833673477173
+        },
+        {
+          "name": "test_spi_tap_is_cycle_exact",
+          "seconds": 25.353240728378296
+        },
+        {
+          "name": "test_i2c_tap_is_cycle_exact",
+          "seconds": 36.6631600856781
+        }
+      ],
+      "observations": [
+        {
+          "protocol": "uart",
+          "clocks": 12841,
+          "tap_drops": 6,
+          "observed_host_checkpoints": 23,
+          "protocol_trace_sha256": "bfb31250c7f85a7817bcf58f06a6ded27f3a9af2f7e4c53028118a443d2fbd67"
+        },
+        {
+          "protocol": "spi",
+          "clocks": 16450,
+          "tap_drops": 5,
+          "observed_host_checkpoints": 26,
+          "protocol_trace_sha256": "b3e8e2a764b8403b8961ccc62e69cd2ac1d129d6e5772eee2fc52d21fa714e6e"
+        },
+        {
+          "protocol": "i2c",
+          "clocks": 25831,
+          "tap_drops": 30,
+          "observed_host_checkpoints": 21,
+          "protocol_trace_sha256": "e6bbe2ae0910f2208836b5fa6c3fa19c3dfbb526140661ebb328c16a85ebcbf3"
+        }
+      ],
+      "xml_sha256": "ffcf6213f30adba7d4f5c9bf713399bdeb8b2e448499ec6ddf31d68759d5190a",
+      "log_sha256": "c927a477444afd2e06457a2e372002e4129e640c48d83288aeddadf0f619c0f1"
+    },
+    "official_netlist": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_uart_tap_is_cycle_exact",
+          "seconds": 76.10878300666809
+        },
+        {
+          "name": "test_spi_tap_is_cycle_exact",
+          "seconds": 81.05953001976013
+        },
+        {
+          "name": "test_i2c_tap_is_cycle_exact",
+          "seconds": 118.49015045166016
+        }
+      ],
+      "observations": [
+        {
+          "protocol": "uart",
+          "clocks": 12841,
+          "tap_drops": 6,
+          "observed_host_checkpoints": 23,
+          "protocol_trace_sha256": "bfb31250c7f85a7817bcf58f06a6ded27f3a9af2f7e4c53028118a443d2fbd67"
+        },
+        {
+          "protocol": "spi",
+          "clocks": 16450,
+          "tap_drops": 5,
+          "observed_host_checkpoints": 26,
+          "protocol_trace_sha256": "b3e8e2a764b8403b8961ccc62e69cd2ac1d129d6e5772eee2fc52d21fa714e6e"
+        },
+        {
+          "protocol": "i2c",
+          "clocks": 25831,
+          "tap_drops": 30,
+          "observed_host_checkpoints": 21,
+          "protocol_trace_sha256": "e6bbe2ae0910f2208836b5fa6c3fa19c3dfbb526140661ebb328c16a85ebcbf3"
+        }
+      ],
+      "xml_sha256": "7dddd1bdbb0159cda5659669fa14c77e4e847e591cd1b71771b1c94c331d909a",
+      "log_sha256": "245a77b32d1b98dba59adfa659ea49184e8bab9c1765c6d3e3c82eedef3b9352"
+    }
+  },
+  "cross_simulator_observations_identical": true,
+  "full_python": {
+    "passed": 1164,
+    "seconds": 179.16,
+    "log_sha256": "f6f6d9393ba5c1f508a462b5d66497a768e7256d416c45fec4fcda2ef71e2eb8"
+  },
+  "alternate_scheduler": {
+    "passed": 19,
+    "seconds": 27.39,
+    "log_sha256": "cef769f5063d3c80e232c58f5173fe8d5ef260e97db4f53e5fa9c34120a204f4"
+  }
+}

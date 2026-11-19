@@ -146,3 +146,11 @@ def test_measured_e_probe_requires_observed_independence_and_unused_input():
         probe.unused_input_bit([*args[0], 'X2Y3.source.LE_I1'], *args[1:], lut='E')
     with pytest.raises(ValueError, match='depends on I1'):
         probe.unused_input_bit(*e_fixture(0xCCCC), lut='E')
+
+
+def test_upstream_probe_rejects_a_declared_active_mux_destination():
+    features,spec,module,state=input_fixture()
+    spec['TileSpecs']['X2Y3']['JE2END4.J2MID_CDa_BEG1']=spec['TileSpecs']['X2Y3']['G.FF']
+    features.append('X2Y3.source.J2MID_CDa_BEG1')
+    with pytest.raises(ValueError,match='active feature'):
+        probe.unused_upstream_bit(features,spec,module,state,[0]*962,'')

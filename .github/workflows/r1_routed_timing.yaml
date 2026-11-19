@@ -52,7 +52,7 @@ jobs:
           roots=json.loads(Path('build/r1_routed_sources/locations.json').read_text())
           prepare(**roots,pdk=Path(os.environ['PDK_ROOT']),out=Path('build/r1_routed_timing'))
           PY
-      - name: Capture stable endpoint pins before parasitic coverage queries
+      - name: Analyze the geometry-identical connected RC model with active coverage
         timeout-minutes: 20
         run: |
           set -euo pipefail

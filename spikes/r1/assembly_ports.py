@@ -51,9 +51,12 @@ def annotate_script(original,pins):
 box values -1um -1um 1062.76um 670.06um
 port makeall
 set actual_ports {}
-for {set n [port first]} {$n >= 0} {set n [port next $n]} {
+for {set n [port first]} {$n >= 0} {set n [port $n next]} {
     lappend actual_ports [port $n name]
 }
+set port_file [open $::env(STEP_DIR)/r1-port-names.txt w]
+puts $port_file [join $actual_ports "\n"]
+close $port_file
 set expected_ports {EXPECTED}
 if {[lsort -unique $actual_ports] ne [lsort -unique $expected_ports]} {
     error "R1 root port metadata differs from the declared interface"

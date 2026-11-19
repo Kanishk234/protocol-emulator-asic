@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Verify full route import and launch guarded RC extraction
+
+- D138 prepares a flat physical extraction view from the exact original leaves.
+  Native import independently preserves45429cells,183701terminals,449ports,
+  all placement/orientation/connectivity and26431required wired signal nets.
+  No reroute, cell change, geometry-signoff or timing acceptance.14parser/
+  import guards pass; missing/extra/unwired signal nets are rejected.
+- New hosted pipeline must compare every geometry layer against the actual
+  assembled GDS, detect a separate added-metal negative control, then extract
+  full-macro RC. Tiny local XOR calibration rejects a1DBUedge change. Until
+  hosted XOR and active annotation/timing gates pass, this is preparation only.
+- BUG145's corrected native enumeration also passes a449-name fixture with
+  the real bus names and duplicate supply labels. Retain enumerated names in
+  the actual cloud artifact before the strict interface/LVS check. Neither
+  original failure nor the summary-only leaf LVS issue is hidden or waived.
+- Next authenticate corrected interface extraction and full-route geometry/RC
+  results; follow any actual mismatches before configured clock/data timing.
+  No phase boxes ticked; G1/architecture/ABI/default images are unchanged.
+
 ## 2026-11-19 — Macro DRC passes; correct extraction ports and LVS evidence
 
 - First D137hosted44570159418 at2f904256 stops before extraction: the pinned
@@ -12,6 +31,11 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   Full diff is only three startup commands; reviewed cloud SHA461bf51e… also
   matches local3.0.14. Update the pin while retaining the guard. Core lint/unit/
   test/docs/fabric checks on c624912e are green; corrected extraction pending.
+- Reviewed-source44576476221 atae151aac reaches the new port-name guard, then
+  stops before extraction. BUG145 is the port-next argument order. A tiny
+  native Magic fixture reproduces and verifies the explicit-index correction;
+  enumerate names into the artifact before comparing the actual449-name set.
+  Neither interface policy has yet produced an LVS outcome.
 
 - Assembled44465623376 at53240408 passes Magic/KLayout DRC and overlap at
   zero. Full inventory/contacts pass and actual GDS/PNL SHA values match local

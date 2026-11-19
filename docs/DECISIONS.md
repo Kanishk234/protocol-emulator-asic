@@ -1,5 +1,38 @@
 # Decisions
 
+## D-138: Flatten preserved physical routes before full-macro RC extraction
+
+- **Date:**2026-11-19. **Need:** actual clock/data delay requires routed
+  parasitics. Reading separate leaf SPEFs without proving hierarchical stitching
+  and annotation is insufficient; OpenSTA's documented read-order requirement
+  is an additional model risk, not evidence of this design's actual timing.
+- **Representation:** consume the same authenticated26finished-route archives
+  and40-instance assembly. Preserve every component/master/orientation, source
+  via definition, terminal, route point/extension and relative patch rectangle.
+  Translate only absolute coordinates. Unify real port aliases, retain leaf
+  access metal as route rectangles when internal boundary ports disappear,
+  and export the same449external pins. Reject unknown DEF schema or conflicting
+  shared vias. No reroute, resizing, added functional cell or configuration tie.
+- **Independent gates:** compare imported45429cells/183701terminals and449ports
+  to source-derived inventories. Derive the complete required26431signal-net
+  set independently; every member needs a real wire. Stream the imported DEF
+  with pinned KLayout and XOR all geometry layers against the exact assembled
+  GDS. A separate added-metal calibration must be detected. No geometry layer
+  is ignored. Only then run full-macro OpenRCX with the pinned PDK rules.
+- **Scope/cost:** one bounded100-minute hosted diagnostic, independent of the
+  extraction-port correction; no production macro/config/default changes.
+  Preserve failures and never infer configured setup/hold, active annotation,
+  full-chip clock/power/shell or submission acceptance from a SPEF export.
+- **Validation:**14flat-route parser/import guards pass, including missing/
+  extra/unwired net failures. Cheap local native import preserves all counts,
+  positions, orientations, connectivity and required wires. A tiny local XOR
+  calibration accepts equal shapes and rejects a1DBUedge change. Full geometry
+  XOR/RCX must run hosted. See reports/r1_flat_route_preflight_20261119.json.
+- **Primary references:** https://opensta.readthedocs.io/en/latest/Commands/
+  (hierarchical read_spef) and https://github.com/parallaxsw/OpenSTA/issues/552
+  (maintainer requires top-level SPEF before block SPEFs). This does not assume
+  current upstream behavior identifies a defect in the pinned runtime.
+
 ## D-137: Correct extraction port metadata and require the actual LVS verdict
 
 - **Date:**2026-11-19. **Evidence:** assembled44465623376 at53240408 has

@@ -1,0 +1,30 @@
+{
+  "local_import": {
+    "import_passed": true,
+    "cells": 45429,
+    "terminals": 183701,
+    "ports": 449,
+    "required_signal_nets_with_wires": 26431,
+    "geometry_xor_passed": false,
+    "physical_acceptance": false,
+    "timing_acceptance": false
+  },
+  "tool": "OpenROAD dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+  "generated_def_sha256": "c495fcea658e0a882e64db66c543cea32c3d2c7a274245d4f385600e90586c6c",
+  "source_gds_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+  "geometry_xor_passed": false,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "tiny_local_xor_calibration": {
+    "equal_shapes_pass": true,
+    "one_dbu_edge_change_rejected": true,
+    "added_metal_detected": true
+  },
+  "port_enumeration_calibration": {
+    "declared_ports": 449,
+    "duplicate_supply_labels": true,
+    "passed": true,
+    "tool": "Magic8.3.623 SCMOS toy; not hosted CMOS5L extraction acceptance"
+  },
+  "scope": "Cheap local preparation only. Hosted all-layer geometry XOR and RCX, active annotation, configured setup/hold/corners and complete clock/power/shell remain required."
+}

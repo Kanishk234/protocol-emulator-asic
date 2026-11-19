@@ -1,5 +1,20 @@
 # Bugs
 
+## 145: Magic port enumeration must prefix the port index
+
+- **Symptom/check:**44576476221 atae151aac admits the reviewed script but
+  both cases stop at the exact root-name check before extraction. Magic says
+  the wide cursor box contains multiple labels; no LVS result is produced.
+- **Root cause:** the tested port command expects port <index> next. The first
+  implementation used port next <index>, which instead required a unique
+  selected label under the wide box. The Python renderer tests did not execute
+  that native API call.
+- **Fix/coverage:** use the explicit index prefix and retain enumerated names
+  before comparison. A tiny native Magic fixture with two disconnected VDD
+  labels and one signal reproduces the failure with the old call; the corrected
+  loop enumerates both unique port names. The actual449-name/strict-SPICE/LVS
+  guards remain mandatory. No geometry, extraction policy or acceptance change.
+
 ## 144: Local extraction-script digest differs from the pinned cloud runtime
 
 - **Symptom/check:**44570159418 at2f904256 stops before either extraction

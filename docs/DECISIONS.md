@@ -39,6 +39,10 @@
   D_NET shares a resistor component; fail disconnected networks. Then rerun
   real configured clock/setup/hold and active annotation. Original incomplete
   SPEF and timing failures remain controls; no hardware/default/ABI change.
+  **Actual result:**44621669039 at7a3e549b passes exact21-layer XOR and all
+  26765resistor components with93255named terminals and0split nets. Root
+  replay confirms native inventory and member hashes. Pin the new connected
+  SPEF in the configured timing workflow; retain the incomplete old archive.
 
 ## D-143: Compare flat SPICE export while retaining hierarchical failure controls
 

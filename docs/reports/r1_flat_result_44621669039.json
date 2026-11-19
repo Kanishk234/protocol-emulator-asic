@@ -1,0 +1,218 @@
+{
+  "passed": true,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Route-preserving flat geometry comparison and full-macro RC extraction only. Active annotation, configured setup/hold/corners, shell, physical power and submission remain unqualified.",
+  "import_inventory": {
+    "import_passed": true,
+    "cells": 45429,
+    "terminals": 183701,
+    "ports": 449,
+    "required_signal_nets_with_wires": 26431,
+    "geometry_xor_passed": false,
+    "physical_acceptance": false,
+    "timing_acceptance": false
+  },
+  "pin_marker_pdk_source": {
+    "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_pdk/ihp-sg13cmos5l/libs.tech/klayout/tech/sg13cmos5l.lyp",
+    "sha256": "eca546db8246bcb44f2960577f11a6414048b97955fa10dad143a427c90b389f"
+  },
+  "geometry_xor": {
+    "passed": true,
+    "layers_compared": 21,
+    "layers_with_differences": 0,
+    "negative_control_detected": true,
+    "layers": [
+      {
+        "layer": 1,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 5,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 6,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 14,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 19,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 29,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 31,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 49,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 189,
+        "datatype": 4,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      }
+    ],
+    "ignored_geometry_layers": [],
+    "reference_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+    "candidate_sha256": "8a360109e6d679caf0ab816b34bbf78a46112ae384234631744d7ba32c9d2b66",
+    "scope": "All polygon/path/box geometry in the named macro hierarchy at1nmDBU; text/port metadata and electrical/timing acceptance are separate.",
+    "pin_marker_restoration": {
+      "restored_markers": [
+        {
+          "layer": 10,
+          "datatype": 2,
+          "polygons": 1544,
+          "area_dbu2": 468480000
+        },
+        {
+          "layer": 30,
+          "datatype": 2,
+          "polygons": 1840,
+          "area_dbu2": 563200000
+        }
+      ],
+      "source_boxes_sha256": "aa444c13161225ca9c9eae3ee1357266c889d062eecad022ebf5c5210629a390",
+      "ignored_geometry_layers": [],
+      "scope": "Only missing Metal2.pin/Metal3.pin geometry inside original final-ODB pin boxes is copied; all other changes are rejected."
+    }
+  },
+  "spef_views": {
+    "nom_*": {
+      "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_extract/extract/1-openroad-rcx/nom/warp_r1_candidate.nom.spef",
+      "sha256": "d12012b932e9f979ff943f742f3f43426f5f86c9e653777b3d457ce2781420b4",
+      "bytes": 36568196,
+      "extracted_net_records": 26765,
+      "resistive_connectivity": {
+        "passed": true,
+        "disconnected_nets": 0,
+        "report": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_extract/spef-connectivity-nom_all.json",
+        "report_sha256": "8cab1ae67f2d38e5a5a69a8de3c28111ce769745164d52b5e245a0428e9bb5d8"
+      }
+    }
+  },
+  "run": 44621669039,
+  "source_sha": "7a3e549b3c3881c3e529966459c7e1ca4e90e5eb",
+  "archive_id": 14577192398,
+  "archive_sha256": "93c3c7c4a9291dfca7f37c72d3263c6b3c39f51d7b862e031d95efef67066273",
+  "archive_bytes": 81175172,
+  "root_review": "Replay complete native inventory, all21geometry comparison and connected resistor graph for every exported net, SPEF and graph-report hashes. Active configured timing remains separate."
+}

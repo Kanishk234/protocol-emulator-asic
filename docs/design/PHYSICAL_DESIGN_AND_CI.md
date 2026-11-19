@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November19 corrected RC graph:**44621669039 at7a3e549b passes the exact
+21-layer geometry comparison, original native inventory and every resistor
+network. All93255named terminals across26765nets share their correct resistor
+component;0nets remain split. Root replays these checks and SPEF/report hashes.
+New SPEF SHA d12012b932e9f979ff943f742f3f43426f5f86c9e653777b3d457ce2781420b4.
+Configured active annotation/setup/hold now reruns from this model; full-chip
+timing, shell/power and strict LVS are still open. G1/defaults are unchanged.
+
 **November19 electrical-model follow-up:**44594242689 atcb96173a completes
 all six configured native analyses without crashing and agrees across loop
 policies. Active annotation rejects the model. Independent SPEF graph replay

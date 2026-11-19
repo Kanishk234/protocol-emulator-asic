@@ -25,6 +25,10 @@
   widths and all-layer XOR. Add an independent SPEF terminal-component check
   that rejects the original full model and mutation controls; then require real
   configured active annotation. No manual parasitic short or timing exception.
+  **Actual correction:**44621669039 at7a3e549b passes all21geometry layers,
+  unchanged native inventory and26765connected resistor networks/93255named
+  terminals. Root replays0split nets and SPEF/report hashes. Configured active
+  annotation and full-chip timing remain separately required.
 
 ## 154: Flat SPICE export needs an explicit top-level subcircuit
 

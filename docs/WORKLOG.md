@@ -22,6 +22,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 - Next authenticate corrected full-macro geometry/RC graph, then active
   configured setup/hold; diagnose actual remaining LVS differences. No phase
   box, full-chip timing/LVS/submission claim or production G1/default change.
+- Actual44621669039 at7a3e549b now passes all21geometry layers with zero
+  differences and no exception, complete original native inventory, and all
+  26765resistor networks. Root replay verifies all93255named terminals share
+  their net's resistor component, with0split nets, plus exact SPEF/report
+  hashes. Receipt: reports/r1_flat_result_44621669039.json. This resolves the
+  measured RC graph loss, not configured timing/LVS or full-chip acceptance.
+- Timing preparation now independently rechecks that connected resistor graph
+  and binds the new exact SPEF while retaining the original incomplete source
+  as a control. Complete source/analysis/loaded-state preflight and12focused
+  timing/graph tests pass locally; actual heavy setup/hold runs on cloud next.
+  Alias-merge LVS44621668751 at7a3e549b remains in progress.
 
 ## 2026-11-19 — Launch complete context LVS and extracted timing checks
 

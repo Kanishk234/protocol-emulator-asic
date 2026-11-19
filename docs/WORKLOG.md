@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Full macro geometry and RC export pass; continue strict LVS/timing
+
+- Actual44583509050 at6e58ef20 passes: all45429cells/183701terminals/449ports/
+  26431required wires, all21geometry layers identical, added-metal control
+  detected, then full-macro RCX.26765net records/35,585,561-byte SPEF retained.
+  Root replays native import and member hashes; this is not active annotation,
+  configured clock/setup/hold or full-chip physical acceptance. Receipt:
+  reports/r1_flat_result_44583509050.json. No phase box ticked.
+- Actual44583509216 proves original and regenerated flat source connectivity
+  on pinned0.66,45429cells/8736latches/370edge registers. Root replays those
+  proofs. Strict LVS still fails31errors/two extra nets in the flat-reference
+  case; retain all controls, do not promote a matching device count alone.
+- A limited independent southeast GDS metal/via trace connects all four clock
+  feedthroughs, with full adjoining contact mask coverage. BUG150/D141now
+  tests complete native leaf port declarations as a fourth case; all26GDS
+  label sets match original LEF names. No geometry or source signal change.
+- Next run actual propagated-clock setup/hold with active parasitic-coverage
+  checks from the loaded candidate, and authenticate complete-context strict
+  LVS. G1/defaults/architecture/ABI and failed controls stay intact.
+
 ## 2026-11-19 — Prove original schematic aliases before LVS and timing
 
 - Independent source-inventory topology review catches293split partitions in

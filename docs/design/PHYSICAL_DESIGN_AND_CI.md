@@ -2,6 +2,15 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November19 actual full-macro RC:**44583509050 at6e58ef20 passes exact native
+import, all21geometry layers at zero difference/no ignored layers, added-metal
+negative control and OpenRCX. SPEF has26765net records/35,585,561bytes, SHA
+e3ba5b5b8f1c1db15633fa1df1aa792756ffade6f586fec68945d504bd2112a3.
+Member hashes/import replay and source markers are checked. Configured active
+annotation, propagated-clock setup/hold/corners and complete shell/power remain
+open. Source-proven flat-reference LVS44583509216 still fails31errors; D141
+tests complete context port declarations without changing geometry.
+
 **November19 correction and actual macro result:**44465623376 at53240408
 passes whole-macro Magic DRC/KLayout DRC/overlap at zero, then fails402LVS
 differences. The extracted root has no declared ports; supply grouping also

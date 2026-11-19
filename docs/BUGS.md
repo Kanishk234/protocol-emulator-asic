@@ -1,5 +1,24 @@
 # Bugs
 
+## 150: Remaining corner alias ports need complete extraction metadata
+
+- **Measured status:**44583509216 at6e58ef20 proves both original source and
+  regenerated flat signal topology on pinned Yosys0.66, but the flat powered
+  reference still fails31LVS errors. Both circuits have26439reduced devices;
+  layout has two additional nets at southeast E_GBUF[2:3]. All449root ports
+  remain present. Flat-reference substitution alone is rejected as a fix.
+- **Independent diagnosis:** a local Metal2/Metal3/Via2 component trace of the
+  actual southeast GDS connects all four E_GBUF_END→N_GBUF_BEG pairs. Both
+  adjacent leaf contacts have complete drawing-mask coverage and the frozen
+  pin-contact audit aligns them. This supports a hierarchical extraction/alias
+  metadata issue; it does not itself establish a passing LVS verdict.
+- **Next bounded check:** preserve the existing three cases, then add a fourth
+  that declares every original port of all26contexts before extraction. Use
+  exact LEF names/dimensions; source GDS label sets independently agree for all
+  contexts. Require every context's full name set and all449root names, then
+  unchanged device checks and a uniquely matching verdict. No geometric short,
+  inferred signal connection, ignored pin/device or tolerance is added.
+
 ## 149: Deferred empty KLayout regions need normalization before subtraction guards
 
 - **Symptom:**44579742194 at788f048d passes native import and pinned PDK

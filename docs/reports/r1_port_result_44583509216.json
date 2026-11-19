@@ -1,0 +1,69 @@
+{
+  "passed": false,
+  "cases": {
+    "strict_control": {
+      "passed": false,
+      "extract_unique": "all",
+      "geometry_changed": false,
+      "reference_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+      "flow_error": "One or more deferred errors were encountered:\n25 LVS errors found.",
+      "extracted_ports": 456,
+      "missing_ports": [],
+      "extra_ports": [
+        "VPWR_uq18",
+        "VPWR_uq23",
+        "VPWR_uq28",
+        "VPWR_uq33",
+        "VPWR_uq38",
+        "VPWR_uq8",
+        "VPWR_uq9"
+      ],
+      "verdicts": [
+        "Netlists do not match."
+      ],
+      "strict_error": "Detailed LVS report does not match uniquely: ['Netlists do not match.']"
+    },
+    "declared_external_ports": {
+      "passed": false,
+      "extract_unique": "notopports",
+      "geometry_changed": false,
+      "reference_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+      "flow_error": "One or more deferred errors were encountered:\n31 LVS errors found.",
+      "extracted_ports": 449,
+      "missing_ports": [],
+      "extra_ports": [],
+      "verdicts": [
+        "Top level cell failed pin matching."
+      ],
+      "strict_error": "Detailed LVS report does not match uniquely: ['Top level cell failed pin matching.']"
+    },
+    "flat_native_reference": {
+      "passed": false,
+      "extract_unique": "notopports",
+      "geometry_changed": false,
+      "reference_pnl_sha256": "dd69f3de8df8d1a9e9127cfe9d79b62fac541e665fc3245907a27e7a396ba618",
+      "flow_error": "One or more deferred errors were encountered:\n31 LVS errors found.",
+      "extracted_ports": 449,
+      "missing_ports": [],
+      "extra_ports": [],
+      "verdicts": [
+        "Top level cell failed pin matching."
+      ],
+      "strict_error": "Detailed LVS report does not match uniquely: ['Top level cell failed pin matching.']"
+    }
+  },
+  "selected_interface_policy": null,
+  "source_gds_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+  "source_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+  "geometry_changed": false,
+  "extraction_script_sha256": "10c8fc4f97c15749487b04d7bdab01081f03cd6f248d68d1e02b131ad9d81630",
+  "original_script_sha256": "461bf51e4226c283de33361bad02f48d0335ad7ab05965cbba43e2677e040660",
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Exported macro interface LVS only. Multiple accesses of declared supply ports require connection by the enclosing power grid; no physical power-grid, clock, timing or submission acceptance.",
+  "run": 44583509216,
+  "source_sha": "6e58ef204fcb8964bfc1170348797c28adc66ab4",
+  "original_source_topology_proof_replayed": true,
+  "analysis_topology_proof_replayed": true,
+  "root_input_hashes_replayed": 34
+}

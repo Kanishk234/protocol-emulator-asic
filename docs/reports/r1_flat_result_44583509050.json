@@ -1,0 +1,211 @@
+{
+  "passed": true,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "scope": "Route-preserving flat geometry comparison and full-macro RC extraction only. Active annotation, configured setup/hold/corners, shell, physical power and submission remain unqualified.",
+  "import_inventory": {
+    "import_passed": true,
+    "cells": 45429,
+    "terminals": 183701,
+    "ports": 449,
+    "required_signal_nets_with_wires": 26431,
+    "geometry_xor_passed": false,
+    "physical_acceptance": false,
+    "timing_acceptance": false
+  },
+  "pin_marker_pdk_source": {
+    "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_pdk/ihp-sg13cmos5l/libs.tech/klayout/tech/sg13cmos5l.lyp",
+    "sha256": "eca546db8246bcb44f2960577f11a6414048b97955fa10dad143a427c90b389f"
+  },
+  "geometry_xor": {
+    "passed": true,
+    "layers_compared": 21,
+    "layers_with_differences": 0,
+    "negative_control_detected": true,
+    "layers": [
+      {
+        "layer": 1,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 5,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 6,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 8,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 10,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 14,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 19,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 29,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 30,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 31,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 49,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 0,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 2,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 50,
+        "datatype": 25,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      },
+      {
+        "layer": 189,
+        "datatype": 4,
+        "different": false,
+        "difference_polygons": 0,
+        "difference_area_dbu2": 0
+      }
+    ],
+    "ignored_geometry_layers": [],
+    "reference_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+    "candidate_sha256": "b04bf070499fa3422e34401b066809de84d1a9e3717d00fcbdcca9c1dfea9bd6",
+    "scope": "All polygon/path/box geometry in the named macro hierarchy at1nmDBU; text/port metadata and electrical/timing acceptance are separate.",
+    "pin_marker_restoration": {
+      "restored_markers": [
+        {
+          "layer": 10,
+          "datatype": 2,
+          "polygons": 1544,
+          "area_dbu2": 468480000
+        },
+        {
+          "layer": 30,
+          "datatype": 2,
+          "polygons": 1840,
+          "area_dbu2": 563200000
+        }
+      ],
+      "source_boxes_sha256": "aa444c13161225ca9c9eae3ee1357266c889d062eecad022ebf5c5210629a390",
+      "ignored_geometry_layers": [],
+      "scope": "Only missing Metal2.pin/Metal3.pin geometry inside original final-ODB pin boxes is copied; all other changes are rejected."
+    }
+  },
+  "spef_views": {
+    "nom_*": {
+      "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_flat_extract/extract/1-openroad-rcx/nom/warp_r1_candidate.nom.spef",
+      "sha256": "e3ba5b5b8f1c1db15633fa1df1aa792756ffade6f586fec68945d504bd2112a3",
+      "bytes": 35585561,
+      "extracted_net_records": 26765
+    }
+  },
+  "run": 44583509050,
+  "source_sha": "6e58ef204fcb8964bfc1170348797c28adc66ab4",
+  "archive_id": 14561196111,
+  "archive_sha256": "248090a3ee60a766af9c50209882f5583d8376fceffc52d737accbdf555f1140",
+  "root_review": "Native import, complete wired-net set, restored GDS/SPEF/source-marker member hashes replay. Archive API identity retained; no active timing acceptance."
+}

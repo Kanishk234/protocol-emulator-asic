@@ -1,5 +1,28 @@
 # Decisions
 
+## D-141: Declare complete native context interfaces during macro extraction
+
+- **Date:**2026-11-19. **Basis:** D140's actual0.66source/analysis proofs pass
+  in44583509216, while strict macro LVS still fails31errors/two extra nets.
+  The actual southeast GDS and adjoining contact masks independently show
+  connected routes; source context aliases remain implicit in extraction.
+- **Correction under test:** add a fourth case to the existing three controls.
+  Derive each of26interfaces and dimensions from its original retained LEF;
+  verify that the GDS label set agrees. Declare those existing labels as ports
+  in isolated in-memory extraction, then return to the unchanged root export.
+  Require exact full names for every context and all449root ports. Only those
+  interface labels are promoted; standard-cell extraction/models stay intact.
+- **Scope/cost:** no conductive geometry, source schematic, configuration or
+  production/default change. Keep identical original GDS, all internal unique-
+  label handling, declared external power interface and strict final verdict.
+  One additional bounded extraction/LVS case; no blanket ignored pins/devices
+  or fabricated wire connection. A real passing result is required.
+- **Other measured progress:**44583509050 at6e58ef20 passes all21geometry
+  layers with no differences/ignored layers, detects added-metal control and
+  extracts26765full-macro nets into35,585,561-byte SPEF. This is RC model
+  preparation, not configured timing, full physical power/shell or submission
+  acceptance. See reports/r1_flat_result_44583509050.json.
+
 ## D-140: Prove flat analysis and schematic views against original source connectivity
 
 - **Date:**2026-11-19. **Need:** BUG148finds disconnected input aliases in the

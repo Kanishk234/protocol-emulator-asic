@@ -33,7 +33,9 @@
   emptiness/containment checks. This preserves every layer and exact1nmgeometry;
   no ignored layer or area tolerance. Root reproduces the deferred-state issue
   and verifies merged emptiness; existing marker/conductor negative controls
-  remain required. Hosted corrected XOR/RCX is still pending.
+  remain required. Hosted44583509050 at6e58ef20 now passes all21geometry layers,
+  detects the added-metal control and exports the full26765-net macro SPEF.
+  Configured annotation/setup/hold acceptance remains separate.
 
 ## 148: Flat native Verilog export omits input aliases with different net names
 

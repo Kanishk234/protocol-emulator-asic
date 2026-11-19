@@ -2,6 +2,20 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Launch complete context LVS and extracted timing checks
+
+- Pushed scoped tools/tests/docs/CI through85ae112a. Strict context-port run
+  44590138579 is in progress; no passing verdict claimed. All three previous
+  extraction failures remain controls, with identical original GDS/schematic.
+- D142 adds a source-proven full-RC timing diagnostic. Local preparation
+  rechecks both complete source signal graphs, all8736actual loaded cases,
+  candidate/management snapshot equality and exact full-macro SPEF.27focused
+  parser/topology/port checks and own workflow syntax pass. No local heavy STA.
+- Next authenticate actual hosted setup/hold/clock and missing-annotation
+  outcomes, then diagnose the measured bottleneck. Strict LVS, full-chip timing,
+  physical enclosing power and submission acceptance remain open. No phase
+  boxes ticked; production G1 remains selected and unchanged.
+
 ## 2026-11-19 — Full macro geometry and RC export pass; continue strict LVS/timing
 
 - Actual44583509050 at6e58ef20 passes: all45429cells/183701terminals/449ports/

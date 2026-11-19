@@ -1,5 +1,29 @@
 # Decisions
 
+## D-142: Measure configured macro timing using source-proven views and full RC
+
+- **Date:**2026-11-19. D141's geometry-identical full-macro RC extraction now
+  passes44583509050. Source-equivalent explicit input aliases are proven in
+  44583509216; its strict LVS failure is retained and provides no LVS acceptance.
+- **Experiment:** authenticate those exact archives, the real loaded primary
+  candidate44461373512 and frozen original timing40128859740. Recheck source
+  and analysis signal partitions against physical inventory. Match all8736
+  timing cases exactly to observed native/management-loaded latch states and
+  the original image SHA; preserve frame/reset/input and register coverage.
+- **Timing:** keep the cell-only/ideal-clock control and require its previous
+  positive result to reproduce. Add slow-cell setup and fast-cell hold using
+  actual26765-net nominal SPEF, propagated clocks,20ns period and0.25ns clock
+  uncertainty. Both original loop policies must agree within the existing
+  1e-6ns guard. No false paths, disabled arcs or multicycle exceptions.
+- **Coverage:** audit native missing/partial annotation lists against active
+  timing and clock fanin. A missing-SPEF control must fail that coverage check;
+  extracted cases must pass it. Retain full native reports, clock skew, script
+  hashes, library/SPEF hashes and endpoint/register inventories in artifacts.
+- **Limits/cost:** one bounded hosted diagnostic, no hardware/default/ABI
+  change. This is conditional macro-boundary timing with original zero I/O
+  delays, nominal RC and slow/fast cells. Full-chip shell, loading-mode timing,
+  physical power, strict LVS and complete signoff remain open even if it passes.
+
 ## D-141: Declare complete native context interfaces during macro extraction
 
 - **Date:**2026-11-19. **Basis:** D140's actual0.66source/analysis proofs pass

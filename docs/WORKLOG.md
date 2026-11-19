@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Materialize complete R1 macro; prepare hosted geometry gates
+
+- D136 adds exact26artifact/fiveproducer admission and full40-instance context
+  assembly. All3064actual signal abutments pass independently against native
+  aliases:6895endpoints/3162nets, zero opens/shorts. BUG141 records the negative
+  test that caught a self-referential expected-alias oracle before publication.
+- Materialized GDS contains26distinct context masters,41byte-identical shared
+  cell/via structures (timestamps excluded),40instances and447signal pins.
+  GDS/LEF/netlist names agree. No original geometry, hardware or compiler image
+  changed. Actual label positions are retained, not guessed by layer number.
+- Cheap local OpenROADdcf36133a import validates40exactplacements/masters,
+  447signal pins/6895signal terminals,80supply terminals and3831original graph
+  nets. This import is geometry/connectivity preparation, not hosted timing or
+  physical acceptance.37assembly guard tests/actionlint pass. Receipt:
+  reports/r1_assembly_preflight_20261118.json. No phase boxes ticked.
+- Next run pinned hosted whole-macro Magic/KLayout DRC and GDS-based LVS with
+  all original gates. Preserve any failure, then continue macro/shell power and
+  extracted actual-clock/data timing. G1 and the opt-in tested candidate remain
+  separate from full-chip/submission acceptance.
+
 ## 2026-11-18 — Native one-bit candidate passes loading, reset and reload
 
 - Hosted44461373512 atafc68e55 passes three strict executed native cases:

@@ -1,5 +1,20 @@
 # Bugs
 
+## 141: Contact audit must use independent expected and physical aliases
+
+- **Symptom/check:** the first local contact-audit negative test removed a
+  wire-only middle leaf's physical alias, yet the audit still passed. Caught
+  before any commit or hosted assembly run.
+- **Root cause:** the prototype derived both expected-net unions and physical
+  unions from the same final ODB port aliases. Removing the alias also removed
+  the expected connection, hiding the deliberate open.
+- **Fix/coverage:** derive expected aliases from the exact independently
+  authenticated native Yosys export, and physical aliases from final ODB
+  inventories. Tests now reject a removed internal alias, a gap, wrong metal,
+  corner-only contact, a short and malformed ports. Actual40-instance replay
+  passes6895endpoints/3162nets/3064contacts with no open or short. This is signal
+  pin-box preflight, not hidden-metal, power, via or GDS signoff.
+
 ## 140: Assembly preflight must reverse FABulous row numbering
 
 - **Symptom/check:** initial local catalog prototype summed heights before Y,

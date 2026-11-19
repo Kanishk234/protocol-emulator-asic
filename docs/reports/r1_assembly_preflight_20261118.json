@@ -1,0 +1,40 @@
+{
+  "materialized": true,
+  "scope": "Assembled R1 macro geometry diagnostic only; no extracted timing, complete clock/power/shell integration, replacement or submission acceptance.",
+  "geometry_written": true,
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "assembly_acceptance": false,
+  "leaf_contexts": 26,
+  "grid_instances": 40,
+  "unique_shared_gds_cells": 41,
+  "top_signal_pins": 447,
+  "exported_pin_labels": 527,
+  "signal_contacts": {
+    "passed": true,
+    "signal_endpoints": 6895,
+    "logical_signal_nets": 3162,
+    "abutting_pin_pairs": 3064,
+    "short_count": 0,
+    "open_net_count": 0
+  },
+  "local_database_import": {
+    "tool": "OpenROAD dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+    "scope": "Cheap geometry/connectivity import only; not hosted acceptance or timing",
+    "inventory": {
+      "instances": 40,
+      "top_signal_pins": 447,
+      "power_pins": 2,
+      "signal_instance_terminals": 6895,
+      "power_instance_terminals": 80,
+      "distinct_logical_nets": 3831
+    }
+  },
+  "materialized_gds_sha256": "21cdf462b8034b58b89a018ebd15cc295e3c3c44dec6e5cb1a86c357950877ad",
+  "materialized_pnl_sha256": "6639ad07e5b53486c06ac7cd83f9e225fe89645128bac410ce8facbd65042e71",
+  "source_manifest_sha256": "1e0620102387df94cbfa267e1d77ee29e7e4e264acb8b686d90fb32cd0f25abf",
+  "primary_sources": [
+    "https://www.klayout.de/doc/code/class_LoadLayoutOptions.html",
+    "https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/src/OpenRoad.i"
+  ]
+}

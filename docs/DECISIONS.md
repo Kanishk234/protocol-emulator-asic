@@ -1,5 +1,37 @@
 # Decisions
 
+## D-136: Assemble the qualified R1 leaves with exact context and contact guards
+
+- **Date:**2026-11-18. **Need:** all26leaf contexts now physically finish,
+  and D135's actual native primary candidate passes loading/reset/reload.
+  Full assembly and extracted timing remain the next qualification gates.
+- **Construction:** authenticate five original finishing producers and26exact
+  archive IDs/digests; preserve the failed representative workflow's successful
+  cases separately from its failed corner. Admit the corrected corner only
+  from its own passed producer. Reuse the exact frozen40-instance graph.
+- **Guards:** independent native port aliases define expected nets; final ODB
+  pin boxes/aliases define physical contacts. Require all3064abutment pairs
+  without opens/shorts. Rename each physical context's GDS STRNAME, LEF
+  MACRO/FOREIGN/END and netlist declaration consistently. Reuse a shared GDS
+  structure only if every record except its structure timestamps is identical.
+  Reject unit mismatches, foreign views, changed archives and unresolved cells.
+- **Views:** materialize a separate warp_r1_candidate, not a production macro.
+  Preserve source geometry and40R0placements; export actual outer-boundary
+  signal labels/pins and existing supply access. Add only the standard whole-
+  macro189/4placement boundary. New physical-database inventory must preserve
+  masters, boxes, directions,6895signal terminals and80supply connections.
+- **Hosted gates:** pinned Magic/KLayout whole-macro DRC, GDS-based extraction,
+  illegal-overlap check and Netgen LVS. No ignored cells or disabled geometry
+  checker; retain partial failures. Keep extract-unique=all. Do not use the
+  geometry-only abstract macros as configured timing models. No timing or
+  submission acceptance from this diagnostic, even if its geometry gates pass.
+- **Cost/validation:** one bounded120-minute cloud job, no added logic, reroute,
+  resizing or ABI/default/G1 change. Local materialization passes with26context
+  masters,41identical shared structures,40instances and447signal pins. A cheap
+  local import on OpenROADdcf36133a (not the hosted acceptance runtime) confirms
+  the complete database inventory/connectivity.37assembly guard tests pass;
+  hosted DRC/LVS is required. See reports/r1_assembly_preflight_20261118.json.
+
 ## D-135: Test the supported one-bit image through native loading and reload
 
 - **Date:**2026-11-18. **Basis:** D134run44458951788 atd9c35451 reproduces

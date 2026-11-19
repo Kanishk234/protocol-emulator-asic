@@ -173,7 +173,7 @@ def prepare(capsule, sources, native, out):
     source_paths=list(contact['input_sha256'])+paths+[Path(__file__),
         Path(__file__).with_name('gds_contexts.py'),Path(__file__).with_name('detailed_leaf.py'),
         Path(__file__).with_name('assembly_catalog.py'),Path(__file__).with_name('assembly_fetch.py'),
-        Path(__file__).with_name('assembly_sources.json')]
+        Path(__file__).with_name('assembly_sources.json'),Path(__file__).with_name('assembly_ports.py')]
     generated=[p for p in out.rglob('*') if p.is_file()]
     result=dict(materialized=True,scope=SCOPE,geometry_written=True,physical_acceptance=False,
                 timing_acceptance=False,assembly_acceptance=False,leaf_contexts=26,grid_instances=40,
@@ -297,6 +297,14 @@ def inside(out):
         result['physical_gate_metrics']={k:metrics.get(k) for k in gates}
         if any(type(metrics.get(k)) not in (int,float) or metrics[k]!=0 for k in gates):
             raise ValueError('Missing or nonzero assembled geometry gate')
+        from assembly_ports import spice_ports,strict_verdict
+        reports=list((out/'run').glob('*/reports/lvs.netgen.rpt'))
+        extracted=list((out/'run').glob('*/'+NAME+'.spice'))
+        if len(reports)!=1 or len(extracted)!=1:
+            raise ValueError('Missing detailed assembly LVS evidence')
+        strict_verdict(reports[0].read_text(),spice_ports(extracted[0].read_text(),NAME),
+                       json.loads((out/'pins.json').read_text()))
+        result['strict_lvs_verdict']='Circuits match uniquely.'
         result.update(passed=True,gds_sha256=sha(out/(NAME+'.gds')),pnl_sha256=sha(out/(NAME+'.pnl.v')))
     except Exception as exc:
         result['error']=str(exc)

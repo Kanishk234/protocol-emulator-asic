@@ -90,6 +90,13 @@ puts "R1_EXPORTED_PORTS [llength [lsort -unique $actual_ports]]"
     return original.replace(anchor,prefix+anchor+addition)
 
 
+def flat_spice_script(annotated):
+    anchor='ext2spice -o $netlist $::env(DESIGN_NAME).ext'
+    if annotated.count(anchor)!=1 or 'ext2spice hierarchy off' in annotated:
+        raise ValueError('Unexpected SPICE export script')
+    return annotated.replace(anchor,'ext2spice hierarchy off\n'+anchor)
+
+
 def retain_original_script(original,out):
     original,out=Path(original),Path(out)
     content=original.read_bytes();digest=sha(original)
@@ -162,6 +169,7 @@ def inside(out):
     script=out/'extract_ports.tcl';script.write_text(annotate_script(original.read_text(),plan['expected_ports']))
     all_script=out/'extract_context_ports.tcl'
     all_script.write_text(annotate_script(original.read_text(),plan['expected_ports'],plan['context_ports']))
+    flat_script=out/'extract_flat_spice.tcl';flat_script.write_text(flat_spice_script(all_script.read_text()))
     active_script=script
     class ExportPorts(Magic.SpiceExtraction):
         id='Magic.R1ExportPorts'
@@ -169,22 +177,23 @@ def inside(out):
     class CheckPorts(Classic):
         Steps=[ExportPorts,Checker.IllegalOverlap,Netgen.LVS,Checker.LVS]
     cases={}
-    experiments=[('strict_control','all',source/(NAME+'.pnl.v'),False),('declared_external_ports','notopports',source/(NAME+'.pnl.v'),False)]
+    experiments=[('strict_control','all',source/(NAME+'.pnl.v'),False,False),('declared_external_ports','notopports',source/(NAME+'.pnl.v'),False,False)]
     if plan.get('native_inventory'):
         from flat_reference import prepare_and_verify
         liberty=Path(os.environ['PDK_ROOT'])/'ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib'
         flat_pnl=prepare_and_verify(source,plan['native_inventory'],liberty,out/'flat_reference')
-        experiments.append(('flat_native_reference','notopports',flat_pnl,False))
-        experiments.append(('complete_context_ports','notopports',flat_pnl,True))
-    for name,unique,pnl,complete in experiments:
-        active_script=all_script if complete else script
+        experiments.append(('flat_native_reference','notopports',flat_pnl,False,False))
+        experiments.append(('complete_context_ports','notopports',flat_pnl,True,False))
+        experiments.append(('flat_spice_reference','notopports',flat_pnl,True,True))
+    for name,unique,pnl,complete,flat in experiments:
+        active_script=flat_script if flat else (all_script if complete else script)
         masters=context_masters(json.loads((source/'catalog.json').read_text()))
         config=dict(DESIGN_NAME=NAME,VERILOG_FILES=[str(source/(NAME+'.v'))],
                     CLOCK_PERIOD=20,CLOCK_PORT=None,VDD_NETS=['VPWR'],GND_NETS=['VGND'],
                     PRIMARY_GDSII_STREAMOUT_TOOL='klayout',MAGIC_EXT_USE_GDS=True,
                     MAGIC_EXT_ABSTRACT=False,MAGIC_EXT_UNIQUE=unique,MAGIC_EXT_SHORT_RESISTOR=True,
                     LVS_IGNORE_CELLS=[],LVS_FLATTEN_CELLS=masters)
-        row=dict(passed=False,extract_unique=unique,complete_context_ports=complete,geometry_changed=False,reference_pnl_sha256=sha(pnl))
+        row=dict(passed=False,extract_unique=unique,complete_context_ports=complete,flat_spice_export=flat,geometry_changed=False,reference_pnl_sha256=sha(pnl))
         folder=out/name;folder.mkdir(exist_ok=False)
         try:
             flow=CheckPorts(config,design_dir=str(out),pdk='ihp-sg13cmos5l',pdk_root=os.environ['PDK_ROOT'])
@@ -215,6 +224,7 @@ def inside(out):
         source_gds_sha256=GDS_SHA,source_pnl_sha256=PNL_SHA,geometry_changed=False,
         extraction_script_sha256=sha(script),original_script_sha256=SCRIPT_SHA,
         complete_context_script_sha256=sha(all_script),
+        flat_spice_script_sha256=sha(flat_script),
         physical_acceptance=False,timing_acceptance=False,scope=plan['scope'])
     (out/'result.json').write_text(json.dumps(summary,indent=2)+'\n')
     if chosen is None:raise SystemExit('No port extraction policy passed strict macro interface LVS')

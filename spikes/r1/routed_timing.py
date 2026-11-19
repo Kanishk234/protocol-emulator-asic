@@ -15,7 +15,6 @@ from assembly_catalog import sha
 from flat_reference import normalize_cells
 from flat_topology import verify
 from run_timing import LIB_SHA, compare, parse_log, quoted
-from unused_lut_probe import change_case
 
 SPEF_SHA = 'e3ba5b5b8f1c1db15633fa1df1aa792756ffade6f586fec68945d504bd2112a3'
 ANALYSIS_SHA = '3db2dbd2bf5c9ef100925b97c99065cd6a4de2f0e6add954714639f38da3d9dc'
@@ -70,6 +69,9 @@ puts "R1_ACTIVE_END"
 
 def render(template, values, liberty, analysis, spef, mode, hold=False):
     """Retain original observed-state, frame, reset and FF coverage guards."""
+    # The compiler/FASM dependency is only needed in the preparation venv.
+    # The pinned STA image consumes the prepared scripts without that package.
+    from unused_lut_probe import change_case
     if template.count('link_design eFPGA\n') != 1 or mode not in ('control', 'routed'):
         raise ValueError('Unexpected timing template or mode')
     body = template.split('link_design eFPGA\n', 1)[1]

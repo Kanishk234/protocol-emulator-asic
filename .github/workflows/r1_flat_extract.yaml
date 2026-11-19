@@ -1,0 +1,69 @@
+name: R1 flat route geometry and RC extraction
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_flat_extract.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-flat-extract
+  cancel-in-progress: false
+jobs:
+  extract:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_flat_pdk
+      PYTHONPATH: tools:test_internal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate original routes and build guarded flat view
+        timeout-minutes: 25
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_flat_routes.py tools/profiling/tests/test_r1_assemble.py tools/profiling/tests/test_r1_assembly_contacts.py
+          python spikes/r1/assembly_fetch.py --out build/r1_flat_sources
+          python - <<'PY'
+          import json,sys
+          from pathlib import Path
+          sys.path.insert(0,'spikes/r1')
+          from assemble import prepare as assemble
+          from flat_routes import prepare as flatten
+          sources=json.loads(Path('build/r1_flat_sources/locations.json').read_text())
+          assemble(**sources,out=Path('build/r1_flat_assembly'))
+          flatten(Path('build/r1_flat_assembly'),sources['sources'],Path('build/r1_flat_extract'))
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Native inventory all-layer XOR control then full-macro RC extraction
+        timeout-minutes: 65
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_flat_extract/image.json
+          timeout 3720s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e PYTHONPATH "$image" \
+            python3 spikes/r1/flat_routes.py inside --out build/r1_flat_extract > build/r1_flat_extract/extract.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-flat-extraction-${{ github.run_id }}
+          path: |
+            build/r1_flat_extract/
+            build/r1_flat_assembly/plan.json
+            build/r1_flat_assembly/contacts.json
+            build/r1_flat_assembly/catalog.json
+            build/r1_flat_sources/*.metadata.json
+            build/r1_flat_sources/*.producer.json
+            build/r1_flat_sources/sources.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

@@ -565,23 +565,12 @@ async def test_l3_ps2_device_to_host(dut):
     p = await start(dut, uio=0xFF, clock=True)
     await load(p, "ps2_host")
     device = PS2Device(half=1500, send=sent, bad_parity=bad_parity)
-    mark = {"n": 0, "t": 0}
-
-    def sigrok_clk(uo, bus):
-        # sigrok 0.5's PS/2 decoder needs a twelfth falling edge to finish an 11-bit frame.
-        # Add a short recorder-only clock pulse after each frame; the device and RTL see the real bus.
-        if device.frames_sent > mark["n"]:
-            mark["n"], mark["t"] = device.frames_sent, 20
-        if mark["t"]:
-            mark["t"] -= 1
-            return 0 if mark["t"] < 10 else (bus >> 1) & 1
-        return (bus >> 1) & 1
-
     def env(uo, uout, uoe, bus):
         clk_release, data_release = device.step((bus >> 1) & 1, bus & 1)
         return {}, {1: clk_release, 0: data_release}
 
-    wire = Wire(p, env, {"clk": sigrok_clk, "data": lambda uo, bus: bus & 1})
+    wire = Wire(p, env, {"clk": lambda uo,bus:bus >> 1 & 1,
+                         "data": lambda uo, bus: bus & 1})
     got = []
     for _ in range(1000):
         token = await p.pop()

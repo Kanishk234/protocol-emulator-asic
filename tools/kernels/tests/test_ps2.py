@@ -2,13 +2,13 @@
 
 import re
 import shutil
-import subprocess
 
 from kernels import load_program
 from protomodels.ps2 import PS2Device
 from tripsim import Chip
 from tripsim.isa import TAG_DATA, TAG_ERR
 from tripsim.vcd import VcdRecorder
+from sigrok_support import decode
 
 DATA, CLK = 0, 1
 HALF = 1500                                # 16.7 kHz device clock
@@ -17,18 +17,8 @@ HALF = 1500                                # 16.7 kHz device clock
 def run(dev, chip, clocks, vcd=None):
     rec = None
     if vcd:
-        # sigrok 0.5's ps2 decoder only finishes a frame on a 12th CLK fall (off by one), so it would
-        # take the next frame's start bit. The recorded clk gets a short extra low pulse (DATA idle high)
-        # after each device frame so every frame is decoded on its own; the chip never sees it.
-        mark = {"n": 0, "t": 0}
-        def clk_sig(c):
-            if dev.frames_sent > mark["n"]:
-                mark["n"], mark["t"] = dev.frames_sent, 20
-            if mark["t"]:
-                mark["t"] -= 1
-                return 0 if mark["t"] < 10 else (c.uio_in >> CLK) & 1
-            return (c.uio_in >> CLK) & 1
-        rec = VcdRecorder({"clk": clk_sig, "data": lambda c: (c.uio_in >> DATA) & 1})
+        rec = VcdRecorder({"clk": lambda c:(c.uio_in >> CLK) & 1,
+                           "data": lambda c:(c.uio_in >> DATA) & 1})
         chip.observers.append(rec)
     for _ in range(clocks):
         _, uio, oe = chip.outputs()
@@ -57,9 +47,7 @@ def test_device_to_host_with_parity_error(tmp_path):
     errs = [d for t, d in got if t == TAG_ERR]
     assert len(errs) == 1 and (errs[0] >> 1) & 0xFF == 0x5A            # the frame with bad parity
     if shutil.which("sigrok-cli"):
-        out = subprocess.run(["sigrok-cli", "-i", str(tmp_path / "ps2.vcd"), "-I", "vcd",
-                              "-P", "ps2:clk=clk:data=data", "-A", "ps2"],
-                             capture_output=True, text=True, check=True).stdout
+        out = decode(tmp_path/'ps2.vcd','ps2:clk=clk:data=data','ps2',required=True)
         data = [int(h, 16) for h in re.findall(r"Data: ([0-9A-Fa-f]{2})\b", out)]
         assert data == [0x1C, 0xF0, 0x1C, 0x5A, 0x00, 0xFF]
         assert out.count("Parity error") == 1

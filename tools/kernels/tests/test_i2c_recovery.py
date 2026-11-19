@@ -1,7 +1,9 @@
 """Recovery contracts on the independent model; incomplete-byte cases only."""
 import pytest
+import json
 import tripc
 from kernels import PROGRAMS
+from kernels.delimiter_path import DelimiterPathMonitor
 from protomodels.i2c_recovery import RecoveryController
 from tripsim import Chip
 
@@ -18,12 +20,15 @@ def run_controller(program, ctrl):
     chip = Chip(lanes=2)
     image, _ = tripc.compile_file(PROGRAMS / f'{program}.trw')
     tripc.load(chip, image)
+    monitor = DelimiterPathMonitor(image) if program == 'i2c_target_eeprom_guard' else None
     for _ in range(ctrl.period * 1600 + 10_000):
         _, outputs, enables = chip.outputs()
         assert not (outputs & enables & 1), 'SDA driven high'
         assert not (enables & 2), 'Target drove SCL'
         scl = ctrl.scl
         sda = int(ctrl.sda and not (enables & 1 and not (outputs & 1)))
+        if monitor is not None:
+            monitor.sample(chip, ctrl.clocks, scl, sda)
         chip.uio_in = 0xFC | scl << 1 | sda
         chip.step()
         ctrl.step(scl, sda)
@@ -31,6 +36,8 @@ def run_controller(program, ctrl):
             break
     ctrl.check_recovered()
     assert not any(pin.flags['OVERRUN'] for pin in chip.pins)
+    if monitor is not None:
+        print('DELIMITER_PATH ' + json.dumps(monitor.finish(), sort_keys=True))
 
 
 @pytest.mark.parametrize('period,high', [(500, 250), (125, 60), (50, 25), (50, 13)])

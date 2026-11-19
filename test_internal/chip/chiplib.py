@@ -7,11 +7,8 @@
   records named pad levels; `write_vcd` / `sigrok` turn the record into an independent decode.
 """
 
-import os
 import pathlib
 import re
-import shutil
-import subprocess
 import sys
 
 import cocotb
@@ -23,6 +20,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import tripc  # noqa: E402,F401
 import tripwire_spec as S  # noqa: E402
 from host import HM, frame_read, frame_write, load_sequence  # noqa: E402
+from sigrok_support import decode as decode_capture  # noqa: E402
 
 H = 4                                         # SCK half period (clk/8)
 CSN, SCK, MOSI, MISO = 4, 5, 6, 3
@@ -184,12 +182,7 @@ def write_vcd(path, rec):
 
 def sigrok(vcd, decoder, annotation=None):
     """sigrok-cli's decode of a VCD (stdout); None when unavailable or explicitly skipped locally."""
-    if os.environ.get("TRIPWIRE_SKIP_SIGROK") == "1" or shutil.which("sigrok-cli") is None:
-        return None
-    cmd = ["sigrok-cli", "-i", str(vcd), "-I", "vcd", "-P", decoder]
-    if annotation:
-        cmd += ["-A", annotation]
-    return subprocess.run(cmd, capture_output=True, text=True, check=True).stdout
+    return decode_capture(vcd,decoder,annotation)
 
 
 def hex_bytes(text, prefix):

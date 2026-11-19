@@ -1,0 +1,70 @@
+name: R1 macro interface extraction and LVS
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_macro_ports.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-macro-ports
+  cancel-in-progress: false
+jobs:
+  ports:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_ports_pdk
+      PYTHONPATH: tools:test_internal
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate original failed macro and check port guards
+        timeout-minutes: 12
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_assembly_ports.py
+          python - <<'PY'
+          import json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,'spikes/r1')
+          from assembly_fetch import api,admit_run,artifact
+          from assembly_ports import SOURCE_RUN,SOURCE_SHA,ARCHIVE_ID,ARCHIVE_SHA,prepare
+          repo=os.environ['GITHUB_REPOSITORY']
+          expected=dict(id=SOURCE_RUN,head_sha=SOURCE_SHA,head_branch='efpga',run_attempt=1,
+                        conclusion='failure',path='.github/workflows/r1_assemble.yaml')
+          actual=api(f'repos/{repo}/actions/runs/{SOURCE_RUN}');admit_run(actual,expected)
+          out=Path('build/r1_ports_source').resolve();out.mkdir(parents=True,exist_ok=False)
+          source=artifact(repo,dict(id=ARCHIVE_ID,name='r1-assembled-geometry-44465623376',
+              digest='sha256:'+ARCHIVE_SHA,size_in_bytes=11548241,source_run=SOURCE_RUN),out)
+          (out/'producer.json').write_text(json.dumps(actual,indent=2)+'\n')
+          prepare(source/'r1_assembly',Path('build/r1_macro_ports'))
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+      - name: Compare strict root ports and declared external supply accesses
+        timeout-minutes: 25
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_macro_ports/image.json
+          timeout 1380s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PDK_ROOT -e PYTHONPATH "$image" \
+            python3 spikes/r1/assembly_ports.py inside --out build/r1_macro_ports > build/r1_macro_ports/extraction.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-macro-ports-${{ github.run_id }}
+          path: |
+            build/r1_macro_ports/
+            build/r1_ports_source/*.metadata.json
+            build/r1_ports_source/producer.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

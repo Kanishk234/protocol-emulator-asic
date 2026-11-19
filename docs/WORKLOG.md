@@ -4,6 +4,16 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-18 — All leaf contexts physically finish; prepare safe assembly catalog
 
+- Native-loop observation44457609446 succeeds: both modes report all23cells/
+  70pin pairs and reproduce the original six sensitive endpoints. Six pin pairs
+  have loop-disabled flags in each report. Receipt: reports/r1_loop_arcs_44457609446.json.
+- Selected-PIP frame decoding exposes the earlier D probe's limitation: both
+  input choices return to LD_O. D134 tests a different, unused upstream selector
+  whose alternate path terminates at LH_O. Observed H.FF/native gate connectivity
+  exposes actual clocked user register_1736_, rather than another feedback path.
+  Only bit183changes in candidate analysis; all active feature bits and D input
+  truth remain protected. Actual source preparation and101focused checks pass.
+  No actual image or timing waiver adopted; hosted outcome pending.
 - Published scoped tools/tests/docs/CI through3b87556f. Native-loop observation
   44457609446 is active. Compact assembly-preflight receipt is retained in
   reports/r1_assembly_catalog_20261118.json; actual catalog has26unique planned

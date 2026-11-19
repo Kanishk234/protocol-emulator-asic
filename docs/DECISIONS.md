@@ -1,5 +1,31 @@
 # Decisions
 
+## D-134: Redirect an unused feedback input to an observed registered source
+
+- **Date:**2026-11-18. **Measured basis:** D133 observation44457609446
+  completes23cells/70pin-pair reports under both original controls, preserving
+  six endpoint sensitivities. Independent selected-PIP decoding of actual loaded
+  frame words shows both D123input-selector choices return to LD_O. They never
+  changed the terminal feedback source, explaining why that probe was insufficient.
+- **New hypothesis:** one free upstream mux can instead feed registered LH_O
+  into unused LD_I1. Original D INIT0xA0A0 is observed/FASM-matched and independent
+  of I1 at16addresses. Require the upstream selector unused by every active
+  feature and its bit mask disjoint from all active masks.
+- **Exact change:** X2Y3.JE2END4.J2MID_CDa_BEG1, existing bit183/frame5/data23/
+  native configuration latch_1560_,0→1 in analysis only. Preserve the direct
+  LD_I1 selector and all active routes. Decode selected paths before/after:
+  original terminates at LD_O; candidate terminates at LH_O. No prior candidate
+  changes are combined.
+- **Registered-source proof:** observed H.FF=1 at configuration latch_1440_;
+  native a21oi/nor3/inverter connectivity masks the combinational arm and exposes
+  user flip-flop_1736_. The original RUN timing classification covers that
+  register as clocked. Source graph, image and helper hashes are retained.
+- **Cost/gate:** one short pinned sensitivity measurement, no hardware or actual
+  image change. Require original controls/sanity guards and inspect native
+  upstream mux reports. Favorable timing would still require actual image
+  loading, functional/reset/reload and delay/extracted timing qualification.
+ 101focused checks and actual-source preparation pass; hosted outcome pending.
+
 ## D-133: Observe actual native edges in every reported structural-loop cell
 
 - **Date:**2026-11-18. **Need:** G/D/E one-bit probes leave every endpoint

@@ -1,0 +1,77 @@
+{
+  "diagnostic_complete": true,
+  "loop_cells": 23,
+  "observed_pin_pairs": 70,
+  "original_timing": {
+    "edge_registers": 370,
+    "inactive_unobservable": 134,
+    "clocked_timed": 225,
+    "clocked_constant_data": 11,
+    "endpoints": 246,
+    "worst_slack_ns": 1.508933,
+    "worst_endpoint": "Tile_X2Y2_PRIM2T2S/_2191_/D",
+    "structural_loops": 8,
+    "loop_policy_sensitive": true,
+    "loop_policy_differences": [
+      {
+        "endpoint": "Tile_X2Y2_PRIM2T2S/_2158_/D",
+        "static_slack_ns": 10.530046,
+        "dynamic_slack_ns": 10.513924,
+        "difference_ns": 0.01612200000000108
+      },
+      {
+        "endpoint": "Tile_X2Y2_PRIM2T2S/_2162_/D",
+        "static_slack_ns": 10.064149,
+        "dynamic_slack_ns": 10.048027,
+        "difference_ns": 0.01612200000000108
+      },
+      {
+        "endpoint": "Tile_X2Y2_PRIM2T2S/_2163_/D",
+        "static_slack_ns": 10.116281,
+        "dynamic_slack_ns": 10.100159,
+        "difference_ns": 0.01612200000000108
+      },
+      {
+        "endpoint": "Tile_X2Y2_PRIM2T2S/_2174_/D",
+        "static_slack_ns": 10.034735,
+        "dynamic_slack_ns": 10.018613,
+        "difference_ns": 0.016121999999999304
+      },
+      {
+        "endpoint": "Tile_X2Y3_LUT4x8_ha/_1734_/D",
+        "static_slack_ns": 9.948124,
+        "dynamic_slack_ns": 9.932001,
+        "difference_ns": 0.01612300000000033
+      },
+      {
+        "endpoint": "Tile_X2Y3_LUT4x8_ha/_1736_/D",
+        "static_slack_ns": 10.089479,
+        "dynamic_slack_ns": 10.073358,
+        "difference_ns": 0.016121000000000052
+      }
+    ]
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "scope": "Read-only reports of the original loop cells. No added case, disabled arc, netlist/model change or timing qualification.",
+  "run": 44457609446,
+  "source_sha": "3b87556f",
+  "loop_disabled_pin_pairs": {
+    "static": [
+      "Tile_X2Y3_LUT4x8_ha/_0778_/B->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1024_/B1->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1025_/A1->X",
+      "Tile_X2Y3_LUT4x8_ha/_1032_/B->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1032_/D->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1033_/A2->X"
+    ],
+    "dynamic": [
+      "Tile_X2Y3_LUT4x8_ha/_0778_/B->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1024_/B1->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1025_/A1->X",
+      "Tile_X2Y3_LUT4x8_ha/_1032_/B->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1032_/D->Y",
+      "Tile_X2Y3_LUT4x8_ha/_1033_/A2->X"
+    ]
+  }
+}

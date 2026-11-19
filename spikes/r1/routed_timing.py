@@ -56,10 +56,10 @@ ANNOTATION = '''
 puts "R1_ANNOTATION_BEGIN"
 report_parasitic_annotation -report_unannotated
 puts "R1_ANNOTATION_END"
-set active_targets {}
-foreach p $paths {lappend active_targets [get_property $p endpoint]}
+puts "R1_ACTIVE_BEGIN"
 set active_targets [concat $active_targets [all_registers -edge_triggered -clock run -clock_pins]]
 if {[llength $active_targets]==0} {error "no active timing targets"}
+puts "R1_ACTIVE_TARGETS [llength $active_targets]"
 set active_names [dict create]
 foreach p [get_fanin -to $active_targets -flat -trace_arcs timing] {dict set active_names [get_full_name $p] 1}
 foreach name [lsort [dict keys $active_names]] {puts "R1_ACTIVE_PIN\\t$name"}
@@ -85,6 +85,12 @@ def render(template, values, liberty, analysis, spef, mode, hold=False):
     delay = 'min' if hold else 'max'
     body = body.replace('-path_delay max', '-path_delay ' + delay)
     body = body.replace('report_checks -path_delay', 'report_checks -format full_clock_expanded -path_delay')
+    # PathEnd objects belong to OpenSTA's search and may be invalidated by a
+    # subsequent report. Capture stable endpoint Pin handles while paths live.
+    anchor = 'foreach p $paths {puts '
+    if body.count(anchor) != 1:
+        raise ValueError('Unexpected endpoint report')
+    body = body.replace(anchor, 'set active_targets {}\nforeach p $paths {lappend active_targets [get_property $p endpoint];puts ')
     suffix = ANNOTATION
     if mode == 'routed':
         suffix += 'report_clock_skew -' + ('hold' if hold else 'setup') + ' -digits 6\n'
@@ -102,24 +108,41 @@ def annotation(text):
         raise ValueError('Incomplete annotation evidence')
     block = text.split(begin)[1].split(end)[0]
     rows = block.splitlines()
-    missing = []
+    missing = []; partial_loads = []
     for kind in ('unannotated', 'partially unannotated'):
         if not rows:
             raise ValueError('Missing annotation census')
         match = re.fullmatch(r'Found (\d+) ' + kind + r' drivers\.', rows.pop(0))
         if not match:
             raise ValueError('Unknown annotation report format')
-        count = int(match[1]); names = rows[:count]; rows = rows[count:]
-        if len(names) != count or any(not n.startswith(' ') or not n.strip() for n in names):
-            raise ValueError('Truncated annotation report')
-        missing.extend(n.strip() for n in names)
+        count = int(match[1]); names = []; have_load = False
+        while rows and rows[0].startswith(' '):
+            line = rows.pop(0)
+            if line.startswith('  '):
+                if kind != 'partially unannotated' or not names or not line.strip():
+                    raise ValueError('Unexpected missing-load annotation')
+                partial_loads.append(line.strip().replace('\\/', '/'))
+                have_load = True
+            else:
+                if not line.strip():
+                    raise ValueError('Empty missing-driver annotation')
+                if kind == 'partially unannotated' and names and not have_load:
+                    raise ValueError('Partial driver report lacks missing loads')
+                names.append(line.strip().replace('\\/', '/'))
+                have_load = False
+        if len(names) != count or len(names) != len(set(names)):
+            raise ValueError('Truncated or duplicate annotation report')
+        if kind == 'unannotated':
+            missing.extend(names)
+        elif count and not have_load:
+            raise ValueError('Partial driver report lacks missing loads')
     if rows or len(missing) != len(set(missing)):
         raise ValueError('Unexpected or duplicate missing driver evidence')
     active = re.findall(r'^R1_ACTIVE_PIN\t(.+)$', text, re.M)
     if not active or len(active) != len(set(active)):
         raise ValueError('Empty or duplicate active timing cone')
-    uncovered = sorted(set(active) & set(missing))
-    return dict(active_pins=len(active), all_missing_drivers=len(missing),
+    uncovered = sorted(set(active) & set(missing+partial_loads))
+    return dict(active_pins=len(active), fully_missing_drivers=len(missing), partially_missing_loads=len(partial_loads),
                 active_missing_drivers=uncovered, passed=not uncovered)
 
 
@@ -188,6 +211,37 @@ def prepare(rc, proof, native, capsule, pdk, out):
     (out/'plan.json').write_text(json.dumps(plan, indent=2)+'\n')
 
 
+def runtime_probe(out, liberty):
+    """Reproduce PathEnd invalidation and validate stable pins in pinned STA."""
+    folder = out/'runtime_probe'; folder.mkdir(exist_ok=False)
+    netlist = folder/'probe.v'
+    netlist.write_text('module probe(input a,output z);wire n;'
+                      'sg13cmos5l_inv_1 u0(.A(a),.Y(n));'
+                      'sg13cmos5l_inv_1 u1(.A(n),.Y(z));endmodule\n')
+    common = ('read_liberty '+quoted(liberty)+'\nread_verilog '+quoted(netlist)+'\nlink_design probe\n'
+              'create_clock -name run -period 20\nset_input_delay 0 -clock run [all_inputs]\n'
+              'set_output_delay 0 -clock run [all_outputs]\n'
+              'set paths [find_timing_paths -path_delay max -group_path_count 100]\n')
+    capture = 'set targets {}\nforeach p $paths {lappend targets [get_property $p endpoint]}\n'
+    report = 'check_setup -loops -verbose\nreport_parasitic_annotation -report_unannotated\n'
+    suffix = ('foreach p [get_fanin -to $targets -flat -trace_arcs timing] {puts "PROBE_ACTIVE [get_full_name $p]"}\n'
+              'puts "PROBE_END"\n')
+    rows = {}
+    for name, text in [('invalid_path_control', common+report+capture+suffix),
+                       ('stable_pin_candidate', common+capture+report+suffix)]:
+        script = folder/(name+'.tcl'); script.write_text(text)
+        log = folder/(name+'.log')
+        with log.open('w') as stream:
+            proc = subprocess.run(['sta', '-exit', str(script)], stdout=stream, stderr=subprocess.STDOUT, timeout=20)
+        rows[name] = dict(returncode=proc.returncode, completed=log.read_text().endswith('PROBE_END\n'),
+                          script_sha256=sha(script), log_sha256=sha(log))
+    if (rows['invalid_path_control']['returncode'] != -11 or rows['invalid_path_control']['completed']
+            or rows['stable_pin_candidate']['returncode'] != 0 or not rows['stable_pin_candidate']['completed']):
+        raise ValueError('Native path-lifetime calibration differs')
+    (folder/'result.json').write_text(json.dumps(rows, indent=2)+'\n')
+    return rows
+
+
 def run(out):
     out = Path(out).resolve(); plan = json.loads((out/'plan.json').read_text())
     result = dict(passed=False, diagnostic_complete=False, physical_acceptance=False,
@@ -197,6 +251,10 @@ def run(out):
         for path, digest in plan['input_sha256'].items():
             if sha(path) != digest:
                 raise ValueError('Frozen timing input changed')
+        slow = [p for p in plan['input_sha256'] if p.endswith('/sg13cmos5l_stdcell_slow_1p08V_125C.lib')]
+        if len(slow) != 1:
+            raise ValueError('Missing pinned runtime calibration library')
+        result['runtime_probe'] = runtime_probe(out, slow[0])
         for name, digest in plan['rendered_sha256'].items():
             script = out/(name+'.tcl')
             if sha(script) != digest:

@@ -94,7 +94,7 @@ def flat_spice_script(annotated):
     anchor='ext2spice -o $netlist $::env(DESIGN_NAME).ext'
     if annotated.count(anchor)!=1 or 'ext2spice hierarchy off' in annotated:
         raise ValueError('Unexpected SPICE export script')
-    return annotated.replace(anchor,'ext2spice hierarchy off\n'+anchor)
+    return annotated.replace(anchor,'ext2spice hierarchy off\next2spice subcircuits top on\n'+anchor)
 
 
 def retain_original_script(original,out):

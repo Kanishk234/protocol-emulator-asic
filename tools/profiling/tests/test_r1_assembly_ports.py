@@ -1,0 +1,44 @@
+from pathlib import Path
+import sys
+
+import pytest
+
+sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
+from assembly_ports import annotate_script,spice_ports,strict_verdict
+
+
+def test_spice_ports_include_continuations_and_reject_empty_top_interface():
+    text='* generated\n.subckt top a b\n+ c d\n.ends\n'
+    assert spice_ports(text,'top')==list('abcd')
+    assert spice_ports('.subckt top\n.ends\n','top')==[]
+    with pytest.raises(ValueError):strict_verdict('Final result: Circuits match uniquely.\n',[],list('abcd'))
+
+
+@pytest.mark.parametrize('report',[
+    'Final result: Top level cell failed pin matching.\n',
+    'Netlists match uniquely.\n',
+    'Final result: Circuits match uniquely with port errors.\n',
+    'Final result: Circuits match uniquely.\nFinal result: Circuits match uniquely.\n'])
+def test_zero_summary_counts_cannot_override_failed_or_missing_final_verdict(report):
+    with pytest.raises(ValueError):strict_verdict(report,list('ab'),list('ab'))
+
+
+def test_unique_match_requires_complete_distinct_declared_ports():
+    report='Final result: Circuits match uniquely.\n'
+    assert strict_verdict(report,list('ab'),list('ab'))
+    for actual in [['a'],['a','b','c'],['a','a']]:
+        with pytest.raises(ValueError):strict_verdict(report,actual,list('ab'))
+    with pytest.raises(ValueError):spice_ports('.subckt top a a\n.ends','top')
+
+
+def test_annotation_only_promotes_root_interface_and_keeps_extraction_commands():
+    pins=['VPWR','VGND']+[f'p{i}' for i in range(447)]
+    source='load $::env(DESIGN_NAME) -dereference\nextract unique $::env(MAGIC_EXT_UNIQUE)\nextract\n'
+    patched=annotate_script(source,pins)
+    assert patched.count('port makeall')==1
+    assert 'R1_EXPORTED_PORTS' in patched
+    assert patched.endswith('extract unique $::env(MAGIC_EXT_UNIQUE)\nextract\n')
+    assert 'flatten' not in patched and 'erase' not in patched and 'paint' not in patched
+    with pytest.raises(ValueError):annotate_script(source,pins[:-1])
+    with pytest.raises(ValueError):annotate_script(source+source,pins)
+    with pytest.raises(ValueError):annotate_script(source,pins[:-1]+['p];error danger'])

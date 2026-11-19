@@ -1,0 +1,37 @@
+--- a/disconnected_pins.py
++++ b/disconnected_pins.py
+@@ -16,6 +16,7 @@
+ from typing import Dict, Literal, Optional, Sequence, Union
+ 
+ import odb
++from profiling.r1_wire_connectivity import wire_boundary_connected
+ import utl
+ 
+ from reader import click, click_odb, OdbReader
+@@ -24,13 +25,13 @@
+ from rich.console import Console
+ 
+ 
+-def is_connected(term: Union[odb.dbITerm, odb.dbBTerm]) -> bool:
++def is_connected(term: Union[odb.dbITerm, odb.dbBTerm], wire_only=False) -> bool:
+     if isinstance(term, odb.dbITerm):
+         return term.getNet() is not None
+     # all bterms have a net, we need to check if it has another
+     net = term.getNet()
+     iterms = net.getITerms()
+-    return len(iterms) != 0
++    return len(iterms) != 0 or (wire_only and wire_boundary_connected(term))
+ 
+ 
+ @dataclass
+@@ -146,7 +147,9 @@
+             self.ports[terminal.getName()] = Port(
+                 terminal.getIoType(),
+                 signal_type=terminal.getSigType(),
+-                connected=is_connected(terminal),
++                connected=is_connected(terminal, wire_only=(
++                    isinstance(object, odb.dbBlock) and len(object.getInsts()) == 0
++                )),
+             )
+         if not power_found:
+             print(

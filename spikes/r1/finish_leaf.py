@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import shutil
 
 from detailed_leaf import OBSERVER, sha
 
@@ -150,6 +151,9 @@ def prepare(capsule, routed, producer, out, case='lut0'):
     inputs = [Path(__file__), CAMPAIGN, record, producer, routed/'result.json', routed/'plan.json',
               routed/'routed.odb', routed/'routed.def', routed/'routed.txt',
               out/'initial.json', out/'config.json']
+    if case == 'northeast':
+        inputs += [ROOT/'patches/r1_wire_only_connectivity.patch',
+                   ROOT/'tools/profiling/r1_wire_connectivity.py']
     for key, value in state.items():
         if key != 'metrics' and isinstance(value, str):
             inputs.append(Path(value))
@@ -161,6 +165,7 @@ def prepare(capsule, routed, producer, out, case='lut0'):
 def inside(out):
     from librelane.flows.classic import Classic
     from librelane.state import State, DesignFormat
+    from librelane.steps import Odb
     from cloud_tile_harden import metric_json
     out = Path(out).resolve()
     plan = json.loads((out/'plan.json').read_text())
@@ -168,6 +173,24 @@ def inside(out):
         raise ValueError('Finishing input changed')
     (out/'available-stages.json').write_text(json.dumps([s.id for s in Classic.Steps], indent=2)+'\n')
     steps = finishing_steps(Classic.Steps)
+    if plan['case'] == 'northeast' and plan['expected']['cells'] == 0:
+        # Correct the boundary-incidence predicate for this cell-free leaf.
+        # Never change installed upstream code, ignore modules or seed metrics.
+        adapter = out/'connectivity_adapter';adapter.mkdir(exist_ok=False)
+        original = Path(Odb.ReportDisconnectedPins.get_script_path(None))
+        if sha(original) != '852fc895eb60ecde8aeb237f71cbd6c59de758d669e1e71424cfa863492411f0':
+            raise ValueError('Pinned disconnected-pin checker source differs')
+        patched = adapter/'disconnected_pins.py'
+        shutil.copyfile(original, patched)
+        patch = ROOT/'patches/r1_wire_only_connectivity.patch'
+        subprocess.run(['patch', '--batch', '--fuzz=0', '-p1', '-d', str(adapter), '-i', str(patch)], check=True)
+        (adapter/'provenance.json').write_text(json.dumps(dict(original_sha256=sha(original),
+            patch_sha256=sha(patch),patched_sha256=sha(patched)), indent=2)+'\n')
+        class FeedthroughConnections(Odb.ReportDisconnectedPins):
+            id = 'Odb.R1FeedthroughConnections'
+            def get_script_path(self):
+                return str(patched)
+        steps = [FeedthroughConnections if s is Odb.ReportDisconnectedPins else s for s in steps]
     class Finish(Classic):
         Steps = steps
     result = dict(passed=False, case=plan['case'], scope=SCOPE, physical_acceptance=False, timing_acceptance=False)

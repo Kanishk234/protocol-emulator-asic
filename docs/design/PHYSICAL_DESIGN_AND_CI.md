@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November18 native candidate qualification:**44461373512 atafc68e55 passes
+parent/candidate direct UART/SPI/reset and candidate management-SPI/STOP/reload.
+All8736frame bits per case and the sole_1560_0→1 delta replay;222input hashes
+and pinned tools/XML are checked. Together with44458951788, this resolves
+the six-endpoint cell-delay discrepancy for this opt-in primary image at
++1.508933ns worst setup. Full assembly, extracted timing and actual clock/shell
+integration remain open. No default image, architecture or G1 change.
+
 **November18 complete leaf finishing:** primitive1 run44454944540 atb572c95f
 passes all seven physical metrics; final-view hashes and original1453cells/
 1557wires replay. Together with prior results, all26contexts have individual

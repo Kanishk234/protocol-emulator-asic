@@ -25,7 +25,13 @@
   Successful loading would bind D134's case values to a real native image, not
   qualify SDF/extracted, assembled macro, clock distribution or final submission.
 - **Validation:** candidate and default-parent local derivations pass, including
-  exact image hashes.104focused checks/actionlint pass. Actual loading pending.
+  exact image hashes.104focused checks/actionlint pass. Hosted44461373512 at
+  afc68e55 passes all three strict native cases. Root replays222input hashes,
+  both pinned executable hashes, all8736frame observations per case and the
+  sole_1560_0→1 state delta; direct and management/reloaded candidate states
+  agree. See reports/r1_registered_input_native_44461373512.json. The old
+  six-endpoint cell-delay discrepancy is resolved for this tested primary
+  candidate; extracted/full-macro/clock-distribution timing remains open.
 
 ## D-134: Redirect an unused feedback input to an observed registered source
 

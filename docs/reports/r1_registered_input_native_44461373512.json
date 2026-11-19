@@ -1,0 +1,54 @@
+{
+  "native_tiles": 40,
+  "configuration_changes": [
+    [
+      "Tile_X2Y3_LUT4x8_ha",
+      "_1560_",
+      "0",
+      "1"
+    ]
+  ],
+  "analysis_case_matches_loaded_candidate": true,
+  "run": 44461373512,
+  "source_sha": "afc68e55411a4f582928e3dae2d11e46a22d5141",
+  "passed": true,
+  "cases": {
+    "parent": {
+      "passed": true,
+      "strict_executed_cases": 1,
+      "native_tiles": 40,
+      "configuration_bits_audited": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "input_files": 55,
+      "real_management_spi": false,
+      "user_restart_probe": true
+    },
+    "candidate": {
+      "passed": true,
+      "strict_executed_cases": 1,
+      "native_tiles": 40,
+      "configuration_bits_audited": 8736,
+      "image_sha256": "25bfec380cbd5fb8cac4390389d1c1fa14d33ddb946e6499fc7467f79ee100b2",
+      "input_files": 79,
+      "real_management_spi": false,
+      "user_restart_probe": true
+    },
+    "shell": {
+      "passed": true,
+      "strict_executed_cases": 1,
+      "native_tiles": 40,
+      "configuration_bits_audited": 8736,
+      "image_sha256": "25bfec380cbd5fb8cac4390389d1c1fa14d33ddb946e6499fc7467f79ee100b2",
+      "input_files": 88,
+      "real_management_spi": true,
+      "user_restart_probe": false
+    }
+  },
+  "root_input_hashes_replayed": 222,
+  "unavailable_local_input_paths": [],
+  "estimated_cell_delay_policy_discrepancy_resolved": true,
+  "worst_cell_only_setup_slack_ns": 1.508933,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "scope": "Native primary loading/reset/reload and exact analysis-case agreement. No SDF/extracted, assembled macro, clock-distribution or full-chip timing acceptance."
+}

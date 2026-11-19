@@ -93,10 +93,26 @@
 - **Scope:** this is a checker defect, not a hardware/routing change. The original run's overall failure stays recorded; zero router violations do not imply foundry DRC/LVS/extracted timing or full-macro acceptance.
 
 ## 133: Configured timing depends on automatic combinational-loop cuts
+- **Measured repair, primary candidate only:** D134run44458951788 retains
+  the original six differences, then removes all six by changing one unused
+  upstream-selector bit to select an observed clocked H register. Worst
+  cell-only setup stays+1.508933ns; no netlist/arc/constraint waiver. D135run
+  44461373512 atafc68e55 passes native parent/candidate/reset and candidate
+  management-SPI/reload tests, with8736-bit audits and exactly_1560_0→1.
+  Root222input hashes and tool/XML/state checks replay. This resolves the
+  discrepancy for that opt-in primary image only, not arbitrary programs,
+  extracted timing or assembled clock/shell timing. Original controls remain.
 - **Symptom:** the new configured native timing probe has complete clock/path classification, yet six endpoint results differ between static and dynamic OpenSTA loop handling. The same endpoint set is present in both views. A nonnegative worst setup report alone would conceal this model dependence.
-- **Root-cause status:** open timing-qualification issue, not a proven RTL or silicon defect. Reconfigurable mux networks contain structural loops; the selected configuration's inactive logic and loop cuts must be reconciled. Earlier ad-hoc source/read ordering did not expose the difference, so a reproducible, source-bound probe is necessary.
+- **Root-cause status:** the original image's selected unused D-input route
+  returns to its own output; selecting the registered H source removes the
+  measured discrepancy. Structural reconfigurable loops still exist; the exact
+  pinned-tool internal cause and broader physical timing remain unqualified.
+  Earlier ad-hoc source/read ordering did not expose the difference, so the
+  reproducible source-bound controls remain necessary.
 - **Coverage:** `spikes/r1/run_timing.py` checks every configuration gate/Q value, frozen topology, all edge-register classes, both endpoint sets and per-endpoint sensitivity; the guard remains failed while sensitivity is present. Seven focused tests reject missing paths, observable unclocked state, truncated/error/duplicate reports, nonfinite results and topology changes. No tolerance relaxation or blanket false paths.
-- **Next:** use the preserved reports and selected mux connectivity to prove which feedback arcs are inactive, or test a separately declared unused-routing grounding closure that preserves every active feature. Keep physical timing unqualified and G1 selected meanwhile.
+- **Next:** carry the tested candidate into complete-macro extracted timing
+  and actual clock/shell integration. Keep physical timing unqualified and
+  G1 selected meanwhile; preserve all original failed controls.
 
 - **D121 diagnostic:** source-bound local eight LA–LH binary cofactor miters in X2Y3 prove independence from their own feedback cut, with positive/negative SAT controls and438actual config Q values. This does not prove global acyclicity/glitch freedom/settling or justify disabling arcs. Stronger all-feedback cofactors prove6outputs but produce LE/LG expanded-cone counterexamples; individual-cut probes isolate I2 paths _0327_/_0280_. Own-feedback proof alone is insufficient. BUG133 remains open;98focused guards pass, hosted support replay pending.
 

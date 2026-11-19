@@ -2,6 +2,23 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Native one-bit candidate passes loading, reset and reload
+
+- Hosted44461373512 atafc68e55 passes three strict executed native cases:
+  parent control, registered-input candidate and real management-shell reload.
+  Root independently replays222input hashes, both pinned Icarus executable
+  hashes, exact image bytes,8736frame observations per case and all XML.
+  Candidate direct/reload snapshots agree; onlyX2Y3/_1560_changes0→1 versus
+  the parent. Receipt: reports/r1_registered_input_native_44461373512.json.
+- D134/D135 now resolve BUG133's six-endpoint cell-delay discrepancy for this
+  tested opt-in primary image. Worst setup remains+1.508933ns without an arc,
+  constraint or netlist waiver. No extracted/full-chip timing acceptance.
+- Current sourceafc68e55 lint/unit/test/docs/fabric and native critical-leaf
+  regressions are green, independently checked via Actions. No phase boxes
+  ticked; G1 and default derivation remain unchanged. Next audit physical
+  contacts/context master views, stitch all40instances, and establish complete
+  macro/shell geometry and extracted clock/data timing under original margins.
+
 ## 2026-11-18 — First supported timing change; qualify the actual one-bit image
 
 - D134run44458951788 atd9c35451 succeeds with hypothesis_supported=true:

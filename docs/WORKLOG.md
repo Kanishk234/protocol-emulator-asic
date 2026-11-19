@@ -4,6 +4,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-18 — Corner correction passes; continue column and timing qualification
 
+- Published scoped tool/test/docs/CI groups through82727e35. Unused-E timing
+  diagnostic44450213745 is active; fifteen-column physical44450213740 is queued.
+  Actual-source preparation passes for all fifteen contexts. Latest source
+  regressions are pending; prior9190efd0 lint/unit/test/docs and corrected corner
+  pass. No all-CI-green claim for82727e35 yet. Working tree otherwise clean apart
+  from the pre-existing unrelated untracked pin-select report left untouched.
 - Corrected corner44447843126 at9190efd0 passes all seven physical gates,
   including actual GDS-based LVS. Root checks the exact patched-checker SHA,
   final ODB/GDS/netlist hashes, preserved original interface and52routed wires.

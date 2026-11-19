@@ -6,7 +6,7 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from unused_input_sweep import independent
+from unused_input_sweep import carry_cone,independent
 
 
 def test_cofactor_proof_rejects_any_actual_dependence_on_the_changed_input():
@@ -20,3 +20,15 @@ def test_cofactor_proof_rejects_any_actual_dependence_on_the_changed_input():
 def test_native_sweep_runner_does_not_import_compiler_packages():
     env=dict(os.environ,PYTHONPATH=str(Path(__file__).resolve().parents[3]/'spikes/r1'))
     subprocess.run([sys.executable,'-S','-c','import unused_input_sweep'],check=True,env=env)
+
+
+def test_unused_lut_truth_does_not_waive_carry_side_effects():
+    graph={('X1Y1','LG_Ci'):[('X1Y1','LF_Co')],('X1Y1','LH_Ci'):[('X1Y1','LG_Co')]}
+    modes={('X1Y1','LG_Ci'):False,('X1Y1','LH_Ci'):False,('X2Y1','LA_Ci'):True}
+    assert carry_cone(graph,'X1Y1','F',modes)['enabled_consumers']==0
+    modes[('X1Y1','LH_Ci')]=True
+    with pytest.raises(ValueError):carry_cone(graph,'X1Y1','F',modes)
+    modes.pop(('X1Y1','LH_Ci'))
+    with pytest.raises(ValueError):carry_cone(graph,'X1Y1','F',modes)
+    graph={('X1Y1','LA_I0'):[('X1Y1','LF_Co')]}
+    with pytest.raises(ValueError):carry_cone(graph,'X1Y1','F',{})

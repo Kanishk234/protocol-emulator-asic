@@ -6,7 +6,7 @@ l1:
 	$(MAKE) -C pin FULL=0
 	$(MAKE) -C pin FULL=1
 chip:
-	$(MAKE) -C chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3
+	$(MAKE) -C chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge
 peer:
 	$(MAKE) -C i2c_peer
 l2:

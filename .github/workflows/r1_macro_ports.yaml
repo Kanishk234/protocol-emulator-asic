@@ -55,7 +55,7 @@ jobs:
           prepare(source/'r1_assembly',Path('build/r1_macro_ports'),native_flat=flat/'r1_flat_extract')
           PY
           bash spikes/cloud/fetch_pdk.sh
-      - name: Prove flat source equivalence and compare full macro LVS references
+      - name: Prove source equivalence and audit every context port in LVS
         timeout-minutes: 25
         run: |
           set -euo pipefail

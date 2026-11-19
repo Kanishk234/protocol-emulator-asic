@@ -189,10 +189,12 @@ Every test and proof names the check ID it covers. A script lists which IDs have
 | ID | Relation |
 |---|---|
 | L4-LOOP | TX → RX loopback on two lanes returns the identical byte stream (every protocol that has both halves) |
-| L4-SCALE | Doubling PERIOD, PRESC and delays yields a waveform exactly 2× longer with identical decoded data |
-| L4-PERM | Assigning the same programs to different lanes / pin units gives identical pad waveforms (modulo pin mapping) |
+| L4-SCALE | At exactly representable settings, doubling programmed timing values exactly doubles the declared UART bit-cell or SPI/I2C autonomous clock-burst intervals, with identical decoded payload. Fixed control/service latency and excluded intervals are named and measured separately; no whole-waveform or arbitrary-gap normalization claim (D-191). |
+| L4-PERM | Stated legal lane/unit mappings preserve exact sampled pad traces and host observations. Routine-based native programs require an explicitly matched relative SRAM grant phase established by actual pre-traffic clocks; retain the unaligned counterexample. No post-execution trace shifting or universal absolute-time/alternate-scheduler claim (D-191). |
 | L4-IDLE | Inserting random idle time between frames never changes decoded data |
 | L4-TAP | Adding or removing tap subscribers never changes any blocking-path behaviour, cycle for cycle |
+
+D-191clarifies the timing domains following measured counterexamples; it changes no hardware or physical signoff gate. Reports must name each compared interval, excluded fixed-latency interval and phase premise. A profile that fails its stated equality remains failed, and all protocol timing/deadline checks still apply. Approval of this wording is not completion evidence.
 
 ### L4-IMP: impairment sweeps (robustness numbers for the report)
 Clock mismatch (±ppm), jitter, glitches shorter than one sample, and slow open-drain rise. The result is a **tolerance envelope per receiver** (success rate vs impairment), plotted in the report. These are simulation-only numbers, labelled as such.

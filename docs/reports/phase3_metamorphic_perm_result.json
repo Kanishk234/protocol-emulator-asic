@@ -1,0 +1,758 @@
+{
+  "scope": "Finite exact fast-path lane/unit permutations; unaligned routine-controller counterexample retained; no unrestricted PERM/fullL4/Phase3completion claim",
+  "base_commit": "cbded4fa00cdbd409e81bb19d1cc9de2b822241c",
+  "hardware_changed": false,
+  "official_workflows_changed": false,
+  "phase3_complete": false,
+  "L4_exit_complete": false,
+  "D191_status": "wording approved and adopted; additional SCALE/hardware routine-phase evidence pending",
+  "sources_sha256": {
+    "tools/kernels/metamorphic_perm.py": "6b6321e96961853f761545b4257424ecc714dab6b3bf57b1e6f1b69bd73865e6",
+    "tools/kernels/tests/test_metamorphic_perm.py": "07db4769d100dc1b23dc2d487e8dbe9e93f90a84da385cca0b0c13ea145ee35e",
+    "test_internal/chip/test_metamorphic_perm.py": "73a2f056cc6a068d19d8f52142b0374a9f63c2076b7a73ede0c9fc87aa59cff3",
+    ".github/workflows/unit.yaml": "81c2358f993f84c7a2289601f696df0535a83807b16d22278e1ace4cd995071c",
+    "test_internal/Makefile": "337115900909561596e3d5e7ca7d1ae7e92a87c26ce079244e935b3d160b2dfd",
+    "programs/uart.trw": "5524ad1498318ffa795de8c6d5780d0fdcb1c15722e9c12a1d6accdad40a2e00",
+    "programs/spi_controller.trw": "dfd7b386a55a8ac1991c09c58d7a58b41594917083ff951c8e5e9b7fcd02a792",
+    "programs/i2c_target.trw": "6ef69851f0a5305e1f26c8e2bbf52428180971c5a5c2fe190c1f078ae9984146",
+    "programs/i2c_controller.trw": "b2a04d6e0fddcf9cebb032c646a01c28b9ed99bfb9f10bae9fc7961699dfed7b"
+  },
+  "physical_baseline": {
+    "official_run": 44189196098,
+    "source": "e19556e1df1e2f87d4c195af618adb67a8063852",
+    "netlist_sha256": "537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9",
+    "pdk_commit": "89d42ee6d2fd9b50b86a1aada6fee6673c3e6008"
+  },
+  "previous_firmware_images": {
+    "unchanged_count": 27,
+    "sha256": {
+      "can.trw": "0ab0dc7f70c03bd0c565bcd51e59c04e3e299a4831f7f67c0ba237d5d6a17338",
+      "dmx.trw": "5feb01c387522e1d888b86f288b5af461f9ab29334828c0cbd679d2a2fa33a01",
+      "dshot.trw": "40429e51318a63987df1f9580250f40f12a69f40c2bca50e9ea01a30d7763322",
+      "hdlc.trw": "57cf9eb78307d7f402dbb6134301aaa577456d05090d01d6dee76c1837015a3b",
+      "i2c_controller.trw": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+      "i2c_target.trw": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+      "i2c_target_eeprom.trw": "ae5b1ac0196b6348a13b05d9a5a98714d023b64fd9c2b99c449afab7338790bf",
+      "i2c_target_eeprom_guard.trw": "31cd04b388f486898f329b1d285a46d8e805b57fe04520c3734da9163829bfa8",
+      "i2s.trw": "642719a9ca68c495f275df6f0d3b129716b99e543b4388cfaf1273c0d01ba4eb",
+      "ir_nec.trw": "35a328d74193b5ed6608d460d6e252618e6f8e36414cb813127edf919732b1e2",
+      "jtag.trw": "e77bccdbeddbad5290f3ea74275272f977706c44022d0f852a79e48a76d82299",
+      "lin.trw": "9412c1c7ec327043fc6e120d979efa162fb0aca12dbbb2afa05e31af33fd3c3d",
+      "onewire.trw": "65288b84fbb37979cb4f4c9af37403125576451601760a99f7a0154e5ef65450",
+      "ps2_host.trw": "15a41bdce32a85d8661ef0d7b6fbf3067207cb9c7403588621ecc7198a92b97f",
+      "servo.trw": "22ae6c21e0a9a5430b3499a3aa64e6da8971c95ccb2dbbdf5f27cfa96e02edd1",
+      "smbus.trw": "8c891a4478914adf957717eae038b1966731850cb93c2da05a63f1ddf52f96bf",
+      "spi_controller.trw": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+      "spi_target.trw": "6bf42986956e0c9ab9c0071e6ac3c30f40bbdb12d973028cc8ed90423f4b92d9",
+      "swd.trw": "103a9838278245255048498265145aa25bd14b0add6d9e911f6c123690b6a503",
+      "uart.trw": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+      "usb_ls.trw": "5fb433ba5ba4ec620085b9f81f3c17fff4edbb098e61aa293666d0084bc27f28",
+      "ws2812.trw": "d265f5e4f966a089c1d4546782eb16b93c4be3d276480da7f0bb1428a9a0b816",
+      "spi_target_flash.trw": "44cf6326be28ad2f97eae83a2deb9c4f3458d2942b60e789bd4e3bc043ebbf47",
+      "onewire_master.trw": "1382bfbcf8c4459c23c1cc18cb4bf87bed4c32bafc0a4772282a4915cdcd91a9",
+      "uart_bridge_capture.trw": "dba51651e988d6adce99cdd99ce7e21a30f3d235031a1c3ace6810bbe519ed9d",
+      "i2c_capture.trw": "7df9cb38c398e40aeb973c82f409c1b671173db8533668fc1f33182ba8ceaa49",
+      "spi_capture.trw": "dbeb47015a1d8a5b476a9fe9bc00d3744e4d21725db4262af8dba443be719a9e"
+    }
+  },
+  "model": {
+    "passed": 12,
+    "profiles": 8,
+    "candidate_comparisons": 24,
+    "compared_clocks": 753633,
+    "wrong_owner_negatives": 3,
+    "log_sha256": "7be23bed77b2521e0f098243c495c140eadc32ea1e8aebdcfc8ddf2e1a6f0a22",
+    "observations": [
+      {
+        "clocks": 44969,
+        "host_items": 7,
+        "mapping": "units",
+        "protocol": "uart",
+        "rate": 115200,
+        "trace_sha256": "12594e4bf6c9d050f4d9610e71e1f1172eb0e368ed04bb0dc667539b6342ae9b"
+      },
+      {
+        "clocks": 44969,
+        "host_items": 7,
+        "mapping": "lane",
+        "protocol": "uart",
+        "rate": 115200,
+        "trace_sha256": "12594e4bf6c9d050f4d9610e71e1f1172eb0e368ed04bb0dc667539b6342ae9b"
+      },
+      {
+        "clocks": 44969,
+        "host_items": 7,
+        "mapping": "both",
+        "protocol": "uart",
+        "rate": 115200,
+        "trace_sha256": "12594e4bf6c9d050f4d9610e71e1f1172eb0e368ed04bb0dc667539b6342ae9b"
+      },
+      {
+        "clocks": 12742,
+        "host_items": 7,
+        "mapping": "units",
+        "protocol": "uart",
+        "rate": 460800,
+        "trace_sha256": "e87e377d081a5fe8384019b42ae21f40e65ae73bce1b3c105084ce7b7dd3de55"
+      },
+      {
+        "clocks": 12742,
+        "host_items": 7,
+        "mapping": "lane",
+        "protocol": "uart",
+        "rate": 460800,
+        "trace_sha256": "e87e377d081a5fe8384019b42ae21f40e65ae73bce1b3c105084ce7b7dd3de55"
+      },
+      {
+        "clocks": 12742,
+        "host_items": 7,
+        "mapping": "both",
+        "protocol": "uart",
+        "rate": 460800,
+        "trace_sha256": "e87e377d081a5fe8384019b42ae21f40e65ae73bce1b3c105084ce7b7dd3de55"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "units",
+        "protocol": "spi",
+        "rate": 50,
+        "trace_sha256": "80df1c9347722e031c15b67396c13f06740d95c15b2f22d9fefabd9e8fb8677b"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "lane",
+        "protocol": "spi",
+        "rate": 50,
+        "trace_sha256": "80df1c9347722e031c15b67396c13f06740d95c15b2f22d9fefabd9e8fb8677b"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "both",
+        "protocol": "spi",
+        "rate": 50,
+        "trace_sha256": "80df1c9347722e031c15b67396c13f06740d95c15b2f22d9fefabd9e8fb8677b"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "units",
+        "protocol": "spi",
+        "rate": 10,
+        "trace_sha256": "a9dad08c8be4d1eb1ae2a508683beadd139a2b50d6cc73f1dde430f4168fe414"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "lane",
+        "protocol": "spi",
+        "rate": 10,
+        "trace_sha256": "a9dad08c8be4d1eb1ae2a508683beadd139a2b50d6cc73f1dde430f4168fe414"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "both",
+        "protocol": "spi",
+        "rate": 10,
+        "trace_sha256": "a9dad08c8be4d1eb1ae2a508683beadd139a2b50d6cc73f1dde430f4168fe414"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "units",
+        "protocol": "spi",
+        "rate": 6,
+        "trace_sha256": "f87915181dfa66bdf334d45ed77f61c1a476491df8b74ae18777897e5aed21bb"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "lane",
+        "protocol": "spi",
+        "rate": 6,
+        "trace_sha256": "f87915181dfa66bdf334d45ed77f61c1a476491df8b74ae18777897e5aed21bb"
+      },
+      {
+        "clocks": 16000,
+        "host_items": 6,
+        "mapping": "both",
+        "protocol": "spi",
+        "rate": 6,
+        "trace_sha256": "f87915181dfa66bdf334d45ed77f61c1a476491df8b74ae18777897e5aed21bb"
+      },
+      {
+        "clocks": 98000,
+        "host_items": 5,
+        "mapping": "units",
+        "protocol": "i2c",
+        "rate": 500,
+        "trace_sha256": "37e59b13b43a8d0cc8e76622e041855a1fead8f4a13c68944d419377fb55d0fb"
+      },
+      {
+        "clocks": 98000,
+        "host_items": 5,
+        "mapping": "lane",
+        "protocol": "i2c",
+        "rate": 500,
+        "trace_sha256": "37e59b13b43a8d0cc8e76622e041855a1fead8f4a13c68944d419377fb55d0fb"
+      },
+      {
+        "clocks": 98000,
+        "host_items": 5,
+        "mapping": "both",
+        "protocol": "i2c",
+        "rate": 500,
+        "trace_sha256": "37e59b13b43a8d0cc8e76622e041855a1fead8f4a13c68944d419377fb55d0fb"
+      },
+      {
+        "clocks": 30500,
+        "host_items": 5,
+        "mapping": "units",
+        "protocol": "i2c",
+        "rate": 125,
+        "trace_sha256": "a22113c1b9b36fa6f26eadeb830f7f0117913330462384052f51f1bcd27f6d46"
+      },
+      {
+        "clocks": 30500,
+        "host_items": 5,
+        "mapping": "lane",
+        "protocol": "i2c",
+        "rate": 125,
+        "trace_sha256": "a22113c1b9b36fa6f26eadeb830f7f0117913330462384052f51f1bcd27f6d46"
+      },
+      {
+        "clocks": 30500,
+        "host_items": 5,
+        "mapping": "both",
+        "protocol": "i2c",
+        "rate": 125,
+        "trace_sha256": "a22113c1b9b36fa6f26eadeb830f7f0117913330462384052f51f1bcd27f6d46"
+      },
+      {
+        "clocks": 17000,
+        "host_items": 5,
+        "mapping": "units",
+        "protocol": "i2c",
+        "rate": 50,
+        "trace_sha256": "4e081ae8a9b74d22c325ffb49c01b5241d243fb1db9662a2f669936e04f8ecea"
+      },
+      {
+        "clocks": 17000,
+        "host_items": 5,
+        "mapping": "lane",
+        "protocol": "i2c",
+        "rate": 50,
+        "trace_sha256": "4e081ae8a9b74d22c325ffb49c01b5241d243fb1db9662a2f669936e04f8ecea"
+      },
+      {
+        "clocks": 17000,
+        "host_items": 5,
+        "mapping": "both",
+        "protocol": "i2c",
+        "rate": 50,
+        "trace_sha256": "4e081ae8a9b74d22c325ffb49c01b5241d243fb1db9662a2f669936e04f8ecea"
+      }
+    ]
+  },
+  "routine_controller_diagnostic_native_model_only": {
+    "different_clocks": 349,
+    "first_difference": 3542,
+    "host_delivery_equal": true,
+    "one_real_idle_clock_before_load_restores_trace": true,
+    "unaligned_not_cycle_exact": true
+  },
+  "mapping_images": {
+    "uart_115200": {
+      "baseline": {
+        "compiled_image_sha256": "caa5422bd5cc5419c438f78acb32639cfd747c5219692ebea93ebe09fe237d34",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "304bc3ca7e392c60284d0323bc797d03b7da88c7c5e85ce6940be4023c9f7428",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "f2052f6618b3fbd4da511d91b248550927d54d8a5cdfa00c6b53c6ed1f49945f",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "a3c7fedcc2b112329666e0d7ddad4466418a00e53ee44ffd4b1fd073a5cfa2ba",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    "uart_460800": {
+      "baseline": {
+        "compiled_image_sha256": "3db8bb1542b20761b652b57a9e2d45ad03efb056158e14ade9aa03501f6605f6",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "08bafad9fdd29e65e90f400f8b36f9abc3d2cdcce879cf8fc1ac4d5046b8bd72",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "62148740469ed298cdb2b9cd934e624191f6a86e43fe498de5ba4481c7e39cd2",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "ee60cd56fdffb0787aea05f4ef2e01b57592b49ddc08222fe167a5878e6f094a",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    "spi_50": {
+      "baseline": {
+        "compiled_image_sha256": "f596fe58b34d3cd2bc3b053fa9a8507a75f06a3e9aba7be7b728d55590aec6ed",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "fa7ae6e9298d7f9ad7197df8f12db6aa3db77907cd6f9d00c8bfcc2446a5db0e",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "5e760957161e55707147aea658b4cc46252a1d71367d7d81e61e57f22c1f5d8f",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "8cd016cd21f6debdb46413a4c820c31cd504f2d7b8bbbbdff07227fb379bea3b",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    "spi_10": {
+      "baseline": {
+        "compiled_image_sha256": "03a82f83a6db5382b9e7ac20d2e730a5e59b9a494d2b79903990db4e09e16968",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "8ecc5b1a524b8ed9257369e46eba3499b8907ca76e04c215d8f8ecf1e72a62f0",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "6b5887af77573c5f4b69d0f851629b57fce9759806e61f346a3f4587fb16cf16",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "21b1d130f70fec4d481b0102b2391d9437697418c2443b4026dd6bc55533dc22",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    "spi_6": {
+      "baseline": {
+        "compiled_image_sha256": "11ab4c0f480c918c588606af1c06bc11bb7494d12ec733350a1ca762eb703b12",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "ef05727af64613dc0172ff8f055f9575a2acefe7ffe7d57e33fd2bca24c54a0e",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "73599652088867888dc1259f93fcfe7a200bb68958946d973ad4c12db553412f",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "d969ac2718b0eae2e54b696c6031c77fff60be6dddc3bb42d6e7d4a9850e9ba0",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    "i2c_500": {
+      "baseline": {
+        "compiled_image_sha256": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "21f31eb48b49fef56ddcbe0408c5d9913790a7717c151d8cc300d684eef3f07f",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "b6cfab0af3661a27ee7e675e42b86aefae363c56182bbedfc1dba15a78f2445c",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "235249f5ea3845491b007509ff1c5bfbc8df29ebc683d3636c002076137e56ff",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    "i2c_125": {
+      "baseline": {
+        "compiled_image_sha256": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "21f31eb48b49fef56ddcbe0408c5d9913790a7717c151d8cc300d684eef3f07f",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "b6cfab0af3661a27ee7e675e42b86aefae363c56182bbedfc1dba15a78f2445c",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "235249f5ea3845491b007509ff1c5bfbc8df29ebc683d3636c002076137e56ff",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    },
+    "i2c_50": {
+      "baseline": {
+        "compiled_image_sha256": "f376c158bf88cc6baff89dbb65a6f1cbda47b1f4a7d96216dbc44129924251c4",
+        "lane": 0,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "units": {
+        "compiled_image_sha256": "21f31eb48b49fef56ddcbe0408c5d9913790a7717c151d8cc300d684eef3f07f",
+        "lane": 0,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      },
+      "lane": {
+        "compiled_image_sha256": "b6cfab0af3661a27ee7e675e42b86aefae363c56182bbedfc1dba15a78f2445c",
+        "lane": 1,
+        "units": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "both": {
+        "compiled_image_sha256": "235249f5ea3845491b007509ff1c5bfbc8df29ebc683d3636c002076137e56ff",
+        "lane": 1,
+        "units": [
+          2,
+          3,
+          0,
+          1
+        ]
+      }
+    }
+  },
+  "simulations": {
+    "verilator": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_uart_lane_and_unit_permutation",
+          "seconds": 5.920523643493652
+        },
+        {
+          "name": "test_spi_lane_and_unit_permutation",
+          "seconds": 6.700876235961914
+        },
+        {
+          "name": "test_i2c_target_lane_and_unit_permutation",
+          "seconds": 9.196043014526367
+        }
+      ],
+      "observations": [
+        {
+          "protocol": "uart",
+          "clocks": 13626,
+          "host_checkpoints": 23,
+          "trace_sha256": "9490a0b01e86dffbdad45298c62105b3ca282e1a761044574cee52abd61e1f86"
+        },
+        {
+          "protocol": "spi",
+          "clocks": 17235,
+          "host_checkpoints": 26,
+          "trace_sha256": "1edb26e18a5d7e894695f42c3008646d3a06c6199823fdefdf3b196beb42bcd7"
+        },
+        {
+          "protocol": "i2c",
+          "clocks": 31757,
+          "host_checkpoints": 43,
+          "trace_sha256": "e4aa619940cf7a73f6fd6b2d03fd9c78bdd6cf9ed00d982644e95a4ec1bcf436"
+        }
+      ],
+      "xml_sha256": "b3f5e2ea6b5810d9c9543644284ccd7c32a9004b968f71aa368b76c6bf5c4b09",
+      "log_sha256": "4a14a3216582921272806ad532a850ea9611638559e9f9a9adb7ded4f64f5150"
+    },
+    "icarus_rtl": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_uart_lane_and_unit_permutation",
+          "seconds": 24.39201593399048
+        },
+        {
+          "name": "test_spi_lane_and_unit_permutation",
+          "seconds": 25.35587167739868
+        },
+        {
+          "name": "test_i2c_target_lane_and_unit_permutation",
+          "seconds": 34.70831608772278
+        }
+      ],
+      "observations": [
+        {
+          "protocol": "uart",
+          "clocks": 13626,
+          "host_checkpoints": 23,
+          "trace_sha256": "9490a0b01e86dffbdad45298c62105b3ca282e1a761044574cee52abd61e1f86"
+        },
+        {
+          "protocol": "spi",
+          "clocks": 17235,
+          "host_checkpoints": 26,
+          "trace_sha256": "1edb26e18a5d7e894695f42c3008646d3a06c6199823fdefdf3b196beb42bcd7"
+        },
+        {
+          "protocol": "i2c",
+          "clocks": 31757,
+          "host_checkpoints": 43,
+          "trace_sha256": "e4aa619940cf7a73f6fd6b2d03fd9c78bdd6cf9ed00d982644e95a4ec1bcf436"
+        }
+      ],
+      "xml_sha256": "8d1d29c6c82e0c7aed449759c3125ed9c9ae5fad0db9d7150ae7bd1f6ac1a2f3",
+      "log_sha256": "ff5493ee925630143b82a3bcc3a20068a32691804cee0d9134d00417cdb9c9a8"
+    },
+    "official_netlist": {
+      "status": "pass",
+      "passed": 3,
+      "failures": 0,
+      "skips": 0,
+      "cases": [
+        {
+          "name": "test_uart_lane_and_unit_permutation",
+          "seconds": 74.0971291065216
+        },
+        {
+          "name": "test_spi_lane_and_unit_permutation",
+          "seconds": 83.67480444908142
+        },
+        {
+          "name": "test_i2c_target_lane_and_unit_permutation",
+          "seconds": 131.9372992515564
+        }
+      ],
+      "observations": [
+        {
+          "protocol": "uart",
+          "clocks": 13626,
+          "host_checkpoints": 23,
+          "trace_sha256": "9490a0b01e86dffbdad45298c62105b3ca282e1a761044574cee52abd61e1f86"
+        },
+        {
+          "protocol": "spi",
+          "clocks": 17235,
+          "host_checkpoints": 26,
+          "trace_sha256": "1edb26e18a5d7e894695f42c3008646d3a06c6199823fdefdf3b196beb42bcd7"
+        },
+        {
+          "protocol": "i2c",
+          "clocks": 31757,
+          "host_checkpoints": 43,
+          "trace_sha256": "e4aa619940cf7a73f6fd6b2d03fd9c78bdd6cf9ed00d982644e95a4ec1bcf436"
+        }
+      ],
+      "xml_sha256": "a309c538db66f4d8c965700173d2929c0cf3914184a5ba7620346cb793ca7e1f",
+      "log_sha256": "e685fb500a3c8d059c489f74e6247ba78f6d228b872128db1373159c79d24cc4"
+    }
+  },
+  "verification_contract": {
+    "decision": "D-191",
+    "user_reply": "do what you think is best, in response to explicit scope question",
+    "verification_sha256": "c72d38ca2f93f7f16db5178293ebfa52b9ae87799aa71b062c921eb59aa7a91c",
+    "not_completion_evidence": true
+  },
+  "routine_controller_images": {
+    "baseline": "dc74cd1cbad5478de8fbd80124813f8acb88e598ef18f344e49bbc2ca24c6177",
+    "units": "7d02c6e5792be5f913102c4d042e2bf55e4eb036e2408485fc755fb80fbdbd91",
+    "lane": "c8ee9bd7c1c087d511a02fbb24b870fe64c52413e0270ae6decc6adc185db62e",
+    "both": "f944ff686bcd4fa0f7fb672d4fcd36f304d363058bae93fe166d7736add2f0ba"
+  },
+  "compiled_local_program_SRAM_and_pad_roles_preserved": true,
+  "cross_simulator_traces_and_host_checkpoints_identical": true,
+  "full_python": {
+    "passed": 1187,
+    "seconds": 183.42,
+    "log_sha256": "2f3c4329a15740d193028d592e242d21f2a895a8c3a9d6d5f2de246093cb4191"
+  },
+  "alternate_scheduler": {
+    "passed": 12,
+    "seconds": 18.51,
+    "log_sha256": "3f9654ea9aeaa809ae54dc062bb9c603389fd6b52547df6ba2b5f9e6c6bad919",
+    "native_diagnostic_note": "The routine phase diagnostic explicitly uses fire_period=1; the other cases honor the fire_period=2 environment."
+  }
+}

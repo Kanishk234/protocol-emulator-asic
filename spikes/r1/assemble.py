@@ -49,8 +49,8 @@ def rename_netlist(source, original, renamed):
     return source
 
 
-def top_netlist(top, places):
-    ports = top['ports']; names = list(ports)+['VPWR','VGND']
+def top_netlist(top, places, powered=True):
+    ports = top['ports']; names = list(ports)+(['VPWR','VGND'] if powered else [])
     if any(not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', p) for p in names):
         raise ValueError('Unexpected top port name')
     lines = ['module '+NAME+' ('+', '.join(names)+');']
@@ -59,7 +59,7 @@ def top_netlist(top, places):
         if p.get('offset',0) or p.get('upto',0):
             raise ValueError('Unexpected top port indexing')
         lines.append(f'{p["direction"]} {size}{name};')
-    lines.extend(('inout VPWR;','inout VGND;'))
+    if powered:lines.extend(('inout VPWR;','inout VGND;'))
     bits={bit for c in top['cells'].values() for bs in c['connections'].values() for bit in bs}
     if any(type(b) is not int for b in bits):
         raise ValueError('Unexpected top connection constant')
@@ -72,7 +72,7 @@ def top_netlist(top, places):
             lines.append(f'assign n_{b} = {pin};' if p['direction']=='input' else f'assign {pin} = n_{b};')
     for row in places:
         cell=top['cells'][row['instance']]
-        conns=['.VPWR(VPWR)','.VGND(VGND)']
+        conns=['.VPWR(VPWR)','.VGND(VGND)'] if powered else []
         for pin,bs in cell['connections'].items():
             value='n_'+str(bs[0]) if len(bs)==1 else '{'+', '.join('n_'+str(b) for b in reversed(bs))+'}'
             conns.append('.'+pin+'('+value+')')

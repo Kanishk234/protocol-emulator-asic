@@ -83,7 +83,7 @@ def context_masters(catalog):
     return masters
 
 
-def prepare(source,out):
+def prepare(source,out,native_flat=None):
     source,out=(Path(p).resolve() for p in (source,out))
     result=json.loads((source/'result.json').read_text());metrics=result['completed_stage_metrics']
     if (result['passed'] is not False or metrics.get('design__lvs_error__count')!=402
@@ -96,7 +96,21 @@ def prepare(source,out):
     out.mkdir(parents=True,exist_ok=False)
     paths=[Path(__file__),source/'result.json',source/'pins.json',source/'catalog.json',source/(NAME+'.gds'),
            source/(NAME+'.pnl.v'),source/(NAME+'.def'),source/(NAME+'.v')]
-    (out/'plan.json').write_text(json.dumps(dict(source=str(source),expected_ports=sorted(pins),
+    native_inventory=None
+    if native_flat is not None:
+        native_flat=Path(native_flat).resolve()
+        native_result=native_flat/'result.json';native_plan=native_flat/'plan.json'
+        result=json.loads(native_result.read_text());flat_plan=json.loads(native_plan.read_text())
+        expected=dict(import_passed=True,cells=45429,terminals=183701,ports=449,required_signal_nets_with_wires=26431)
+        if (any(result.get('import_inventory',{}).get(k)!=v for k,v in expected.items())
+                or flat_plan.get('source_assembly_gds_sha256')!=GDS_SHA):
+            raise ValueError('Require the matching native flat import inventory')
+        native_inventory=native_flat/'expected.json'
+        paths.extend([native_inventory,native_result,native_plan,source/'top.json',
+            Path(__file__).with_name('flat_topology.py'),Path(__file__).with_name('flat_reference.py')])
+        for case,c in json.loads((source/'catalog.json').read_text())['contexts'].items():
+            paths.append(source/'contexts'/case/(c['planned_master']+'.nl.v'))
+    (out/'plan.json').write_text(json.dumps(dict(source=str(source),expected_ports=sorted(pins),native_inventory=str(native_inventory) if native_inventory else None,
         input_sha256={str(p):sha(p) for p in paths},geometry_changed=False,
         scope='Exported macro interface LVS only. Multiple accesses of declared supply ports require connection by the enclosing power grid; no physical power-grid, clock, timing or submission acceptance.'),indent=2)+'\n')
 
@@ -118,19 +132,25 @@ def inside(out):
     class CheckPorts(Classic):
         Steps=[ExportPorts,Checker.IllegalOverlap,Netgen.LVS,Checker.LVS]
     cases={}
-    for name,unique in [('strict_control','all'),('declared_external_ports','notopports')]:
+    experiments=[('strict_control','all',source/(NAME+'.pnl.v')),('declared_external_ports','notopports',source/(NAME+'.pnl.v'))]
+    if plan.get('native_inventory'):
+        from flat_reference import prepare_and_verify
+        liberty=Path(os.environ['PDK_ROOT'])/'ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_slow_1p08V_125C.lib'
+        flat_pnl=prepare_and_verify(source,plan['native_inventory'],liberty,out/'flat_reference')
+        experiments.append(('flat_native_reference','notopports',flat_pnl))
+    for name,unique,pnl in experiments:
         masters=context_masters(json.loads((source/'catalog.json').read_text()))
         config=dict(DESIGN_NAME=NAME,VERILOG_FILES=[str(source/(NAME+'.v'))],
                     CLOCK_PERIOD=20,CLOCK_PORT=None,VDD_NETS=['VPWR'],GND_NETS=['VGND'],
                     PRIMARY_GDSII_STREAMOUT_TOOL='klayout',MAGIC_EXT_USE_GDS=True,
                     MAGIC_EXT_ABSTRACT=False,MAGIC_EXT_UNIQUE=unique,MAGIC_EXT_SHORT_RESISTOR=True,
                     LVS_IGNORE_CELLS=[],LVS_FLATTEN_CELLS=masters)
-        row=dict(passed=False,extract_unique=unique,geometry_changed=False)
+        row=dict(passed=False,extract_unique=unique,geometry_changed=False,reference_pnl_sha256=sha(pnl))
         folder=out/name;folder.mkdir(exist_ok=False)
         try:
             flow=CheckPorts(config,design_dir=str(out),pdk='ihp-sg13cmos5l',pdk_root=os.environ['PDK_ROOT'])
             state=State.load({DesignFormat.GDS.id:str(source/(NAME+'.gds')),DesignFormat.DEF.id:str(source/(NAME+'.def')),
-                             DesignFormat.POWERED_NETLIST.id:str(source/(NAME+'.pnl.v'))})
+                             DesignFormat.POWERED_NETLIST.id:str(pnl)})
             final=flow.start(with_initial_state=state,_force_run_dir=str(folder/'run'))
             row['metrics']=json.loads(json.dumps(final.metrics.to_raw_dict(),default=metric_json))
         except Exception as exc:row['flow_error']=str(exc)
@@ -151,7 +171,7 @@ def inside(out):
         cases[name]=row
     if any(sha(p)!=d for p,d in plan['input_sha256'].items()):
         raise ValueError('Original assembly changed during extraction')
-    chosen=next((n for n in ('strict_control','declared_external_ports') if cases[n]['passed']),None)
+    chosen=next((n for n in cases if cases[n]['passed']),None)
     summary=dict(passed=chosen is not None,cases=cases,selected_interface_policy=chosen,
         source_gds_sha256=GDS_SHA,source_pnl_sha256=PNL_SHA,geometry_changed=False,
         extraction_script_sha256=sha(script),original_script_sha256=SCRIPT_SHA,
@@ -163,5 +183,6 @@ def inside(out):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='mode',required=True)
     prep=sub.add_parser('prepare');prep.add_argument('--source',type=Path,required=True);prep.add_argument('--out',type=Path,required=True)
+    prep.add_argument('--native-flat',type=Path)
     sub.add_parser('inside').add_argument('--out',type=Path,required=True)
     args=vars(p.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else inside)(**args)

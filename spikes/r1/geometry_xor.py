@@ -18,11 +18,11 @@ def restore_pin_markers(reference,candidate,top_name,allowed_boxes,out):
         if key not in allowed:raise ValueError('Unreviewed pin-marker purpose')
         allowed[key].insert(pya.Box(*row['box_dbu']))
     for key in sorted(set(la)|set(lb)):
-        ra=pya.Region(a.begin_shapes_rec(la[key])) if key in la else pya.Region()
-        rb=pya.Region(b.begin_shapes_rec(lb[key])) if key in lb else pya.Region()
-        missing=ra-rb;extra=rb-ra
+        ra=pya.Region(a.begin_shapes_rec(la[key])).merged() if key in la else pya.Region()
+        rb=pya.Region(b.begin_shapes_rec(lb[key])).merged() if key in lb else pya.Region()
+        missing=(ra-rb).merged();extra=(rb-ra).merged()
         if missing.is_empty() and extra.is_empty():continue
-        if key not in allowed or not extra.is_empty() or not (missing-allowed[key]).is_empty():
+        if key not in allowed or not extra.is_empty() or not (missing-allowed[key]).merged().is_empty():
             raise ValueError('Geometry change is not missing source-proven pin metadata: '+str(key))
         b.shapes(after.layer(*key)).insert(missing)
         restored.append(dict(layer=key[0],datatype=key[1],polygons=missing.count(),area_dbu2=missing.area()))

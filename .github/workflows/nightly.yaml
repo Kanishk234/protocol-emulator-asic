@@ -26,6 +26,9 @@ jobs:
       - name: Install Python packages
         run: pip install -r requirements-dev.txt
 
+      - name: Fetch pinned real-device captures
+        run: PYTHONPATH=tools python -m capture_replay --fetch
+
       - name: pytest (everything, including slow)
         run: python -m pytest -q -n auto --durations=15
 
@@ -45,6 +48,9 @@ jobs:
 
       - name: Install Python packages
         run: pip install -r requirements-dev.txt
+
+      - name: Fetch pinned real-device captures
+        run: PYTHONPATH=tools python -m capture_replay --fetch
 
       - name: Protocol kernels at fire period 2
         env:

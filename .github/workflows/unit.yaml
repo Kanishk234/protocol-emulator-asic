@@ -21,6 +21,9 @@ jobs:
       - name: Install Python packages
         run: pip install -r requirements-dev.txt
 
+      - name: Fetch pinned real-device captures
+        run: PYTHONPATH=tools python -m capture_replay --fetch
+
       - name: pytest (tripsim, kernels, generator; slow tests run in nightly)
         run: python -m pytest -q -n auto -m "not slow"
 
@@ -43,6 +46,9 @@ jobs:
       - name: Install Python packages
         run: pip install -r requirements-dev.txt
 
+      - name: Fetch pinned real-device captures
+        run: PYTHONPATH=tools python -m capture_replay --fetch
+
       - name: Verilator lint of the whole chip (trw_chip, macro blackboxed)
         run: |
           verilator --lint-only -Wall scripts/ci/promoted_rtl.vlt -Isrc --top-module trw_chip \
@@ -63,7 +69,7 @@ jobs:
           make -C test_internal/pin FULL=1
 
       - name: Chip-level, L3, rotation and Phase 3 firmware tests
-        run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge
+        run: make -C test_internal/chip COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay
 
       - name: Independent I2C controller RTL peer
         run: make -C test_internal/i2c_peer
@@ -112,6 +118,9 @@ jobs:
           sudo apt-get update && sudo apt-get install -y sigrok-cli
           pip install -r requirements-dev.txt
 
+      - name: Fetch pinned real-device captures
+        run: PYTHONPATH=tools python -m capture_replay --fetch
+
       - name: RTL suites under Verilator
         run: |
           export PATH="$PATH:$HOME/oss-cad-suite/bin"          # appended: our Python and cocotb stay first
@@ -122,7 +131,7 @@ jobs:
           make -C test_internal/pin SIM=verilator FULL=0 SIM_BUILD=sim_build/vl0 COCOTB_RESULTS_FILE=results_vl0.xml
           make -C test_internal/pin SIM=verilator FULL=1 SIM_BUILD=sim_build/vl1 COCOTB_RESULTS_FILE=results_vl1.xml
           make -C test_internal/chip SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml \
-            COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge
+            COCOTB_TEST_MODULES=test_chip,test_l3,test_rot,test_phase3,test_ack_path,test_spi_flash,test_onewire_overdrive,test_ps2_framing,test_uart_bridge,test_capture_replay
           make -C test_internal/i2c_peer SIM=verilator SIM_BUILD=sim_build/vl COCOTB_RESULTS_FILE=results_vl.xml
 
       - name: Upload results

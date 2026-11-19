@@ -82,6 +82,9 @@ echo "ok"
 step "sigrok: UART decode of a VCD (toolchain smoke test)"
 python scripts/sigrok_smoke.py
 
+step "captures: fetch checksum-pinned real-device recordings"
+PYTHONPATH=tools python -m capture_replay --fetch
+
 step "tools: pytest (tripsim model tests)"
 python -m pytest -q -n "${TRIPWIRE_TEST_WORKERS:-4}"  # includes slow tests; avoid oversubscribing WSL
 

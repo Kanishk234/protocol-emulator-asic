@@ -1,0 +1,39 @@
+{
+  "diagnostic_complete": true,
+  "cases": {
+    "LD_O_own_feedback": {
+      "binary_support_proved": true
+    },
+    "LD_O_all_feedback": {
+      "binary_support_proved": true
+    },
+    "LE_O_own_feedback": {
+      "binary_support_proved": true
+    },
+    "LE_O_all_feedback": {
+      "binary_support_proved": false
+    },
+    "LG_O_own_feedback": {
+      "binary_support_proved": true
+    },
+    "LG_O_all_feedback": {
+      "binary_support_proved": true
+    },
+    "positive_control": {
+      "binary_support_proved": true
+    },
+    "negative_control": {
+      "binary_support_proved": false
+    }
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "scope": "Stable binary support across real tile connections only; no delay/hazard/settling proof or timing waiver.",
+  "run": 44404102388,
+  "source_sha": "c7c36d20",
+  "depth": 128,
+  "cell_bound": 8192,
+  "tiles": 40,
+  "configuration_bits": 8736,
+  "review": "All recorded input hashes and eight process/proof markers replayed. E all-feedback counterexample remains diagnostic; no timing waiver."
+}

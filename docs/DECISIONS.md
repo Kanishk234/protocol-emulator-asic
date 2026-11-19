@@ -1,5 +1,26 @@
 # Decisions
 
+## D-127: Expand physical finishing to representatives of the other nine tile types
+
+- **Date:** 2026-11-18. **Status:** bounded campaign; no full-fabric promotion.
+- **Basis:** D125 LUT0 run 44402764510 passes all seven physical gates, final
+  ODB/GDS/netlist hashes and original logic/interface/wire preservation checks.
+- **Method:** use the identical post-route sequence on primitive4, west_io,
+  northwest, southwest, east_io, north0, south0, northeast and southeast. Bind
+  each case's producer/artifact/digest/final ODB and resource census to the
+  immutable D124 campaign receipt (SHA256 865c170a300db97f2116360bd25ad7af809ed7803376d6d78762560b4a20a11a).
+  Relocate only the two known source layouts. Keep every physical check and
+  original cell, placement, interface, connection and required wire protected.
+  The zero-cell northeast context still needs its 52 wires and all physical gates.
+- **Cost:** nine cloud jobs, at most three concurrent, same 3000-second bound
+  per tool run. Default physical fillers/decaps only; no logic, architecture,
+  placement, route, clock or constraint changes. No new footprint/seed sweep.
+- **Gate:** all seven metrics present and zero for each individual leaf. Any
+  failure is retained and investigated before expanding to more column contexts.
+  Macro assembly, shell integration and configured/extracted timing remain open.
+- **Validation:** actual inputs prepare for all ten representative tile types;
+  76 focused checks and actionlint pass. Hosted outcomes pending.
+
 ## D-126: Expand binary feedback support across actual frozen tile connections
 
 - **Date:** 2026-11-18. **Status:** bounded diagnostic; no timing waiver.

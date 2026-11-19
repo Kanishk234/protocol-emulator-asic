@@ -2,6 +2,15 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November18 first R1 leaf geometry pass:** corrected D125 run44402764510
+atbb7118e2 passes all seven routing/disconnection/antenna/Magic/KLayout/LVS
+metrics at zero for LUT0. Original1243cells and1347signal wires remain;
+503standard fill/decap cells are added. Final GDS/ODB/netlist hashes and
+inventory replay pass. This is one leaf, with no configured timing acceptance:
+its null-clock virtual STA reports91setup violations. D127 expands the same
+checks to representatives of the other nine tile types before assembly.
+See reports/r1_finished_lut0_44402764510.json.
+
 **November18 R1 leaf routing:** D124 run44394572610 at5db0b642 passes all25
 remaining contexts, with zero router violations and frozen inventories/wires.
 Root replays every input/script/final ODB hash and inventory check. Wire-only

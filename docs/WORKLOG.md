@@ -2,6 +2,24 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-18 — Expand leaf physical checks; replay completed cross-tile results
+
+- Corrected D126 run 44404102388 at c7c36d20 succeeds. Root checks every
+  recorded input hash and all eight process/proof markers: own-feedback D/E/G
+  and stronger all-feedback D/G prove; stronger E has a counterexample.
+  Controls agree. Receipt: reports/r1_global_support_44404102388.json.
+- E witness has one feedback cut set to 1: i861/native global bit8502,
+  X2Y3/_0327_, driven by _0762_ (a21oi). This matches the earlier local E
+  diagnostic. Primary FASM explicitly routes J2END_EF_END2 to LE_I2 and uses
+  LE_O; it is an active input, so it cannot be parked or tied off as unused.
+  This is a bounded binary counterexample, not proof of a chip defect or delay.
+- D127 extends D125 finishing to representatives of the other nine tile types,
+  using hash-bound campaign results and the unchanged post-route checks. Actual
+  preparations for all ten types pass; 76 focused tests and actionlint pass.
+  No phase boxes ticked. Next inspect hosted physical results and trace the
+  selected E source through its upstream reconvergent paths. BUG133 remains
+  open; no timing exception or production image/hardware change adopted.
+
 ## 2026-11-18 — Trace feedback across real tile boundaries
 
 - D125 corrected run 44402764510 at bb7118e2 passes all seven physical gates:

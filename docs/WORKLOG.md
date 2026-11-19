@@ -33,6 +33,11 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   as a control. Complete source/analysis/loaded-state preflight and12focused
   timing/graph tests pass locally; actual heavy setup/hold runs on cloud next.
   Alias-merge LVS44621668751 at7a3e549b remains in progress.
+- Connected-model timing44623006209 at5688fa36 is running after successful
+  complete local source/loaded-state/RC-graph preflight. While the full flat
+  transistor comparison continues, D146adds a separate matched hierarchical
+  resistor/merge-alias comparison, preserving all device checks and449root
+  names. Its old control must reproduce the exact prior31-error failure.
 
 ## 2026-11-19 — Launch complete context LVS and extracted timing checks
 

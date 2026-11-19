@@ -1,5 +1,22 @@
 # Decisions
 
+## D-146: Compare extracted alias handling while preserving standard-cell hierarchy
+
+- **Date:**2026-11-19. D145's full transistor-flat comparison44621668751 is
+  still running. In parallel, test the same native `short none` option with
+  the original standard-cell hierarchy retained. This changes representation
+  only, with identical GDS, extraction, source schematic, model and449distinct
+  root-net guard. No standard cell/device/pin is ignored.
+- **Matched pair:** a separate own workflow executes the exact prior complete-
+  context resistor-export control and the hierarchical alias-merge candidate.
+  The control must reproduce449correct names,31errors and failed top-pin
+  matching; the candidate still requires original zero-error checker plus
+  complete449ports and a uniquely matching final verdict. Fail changed controls.
+- **Preservation/scope:** original all-case workflow and every historical
+  failure/archive remain. The optional case-set selector is allowlisted and
+  defaults to the full campaign. No physical power, timing, hardware/default
+  or submission acceptance follows from this interface LVS experiment alone.
+
 ## D-145: Let native flat SPICE merge physically extracted internal aliases
 
 - **Date:**2026-11-19.44594242580 atcb96173a proves that explicit root

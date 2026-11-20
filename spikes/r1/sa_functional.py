@@ -29,20 +29,28 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
         'fixed_relocation':('44676960615','cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b'),
         'fixed_reroute':('44676960615','cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462'),
         'spi_timer_free_run':('44798802734','79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a'),
-        'spi_clock_d':('44827334401','4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a')}
+        'spi_clock_d':('44827334401','4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a'),
+        'spi_clock_fixed':('44831585287','97caee72e610700fddd885f21b7d07a3116f19b45540bc3c02423740df999d5e')}
     if trial_kind not in admitted:raise ValueError('Unknown fixed-source native trial')
     run_id,image_sha=admitted[trial_kind]
     if (str(result['run'])!=run_id or not result['diagnostic_complete'] or
         result['cases']['reroute' if trial_kind=='fixed_reroute' else 'candidate']['image_sha256']!=image_sha):
         raise ValueError('Require the authenticated fixed-source placement trial')
-    if trial_kind=='spi_clock_d':
+    if trial_kind in ('spi_clock_d','spi_clock_fixed'):
         if (result['cases']['control']['image_sha256']!='79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a' or
                 any(not row['logical_graph_preserved'] for row in result['cases'].values()) or
                 result['cases']['control']['clock_bank']!='X0Y4/A' or result['cases']['candidate']['clock_bank']!='X0Y4/D' or
                 result['cases']['control']['placed_utilisation']!=result['cases']['candidate']['placed_utilisation']):
             raise ValueError('Clock-bank source, graph or resource control changed')
+    if trial_kind=='spi_clock_fixed':
+        if (set(result['cases'])!={'control','reroute','candidate'} or
+                any(not row['placements_exact'] or row['placed_utilisation']!=result['cases']['control']['placed_utilisation'] for row in result['cases'].values()) or
+                result['cases']['reroute']['clock_bank']!='X0Y4/A' or
+                result['cases']['reroute']['image_sha256']!='dc929023b3fd8a83512e8c2b28c70479191d05db3f1844d16b50b28804bd218c'):
+            raise ValueError('Fixed user placement or reroute control changed')
     case_names={'control':'restore' if trial_kind in ('fixed_relocation','fixed_reroute') else 'control',
                 'candidate':'reroute' if trial_kind=='fixed_reroute' else 'candidate'}
+    if trial_kind=='spi_clock_fixed':case_names['reroute']='reroute'
     if trial_kind in ('fixed_relocation','fixed_reroute'):
         if trial_kind=='fixed_relocation':case_names['reroute']='reroute'
         if any(not r['logical_graph_preserved'] or not r['placements_exact'] for r in result['cases'].values()):
@@ -82,7 +90,7 @@ def run(out,pdk,icarus):
                 cases={},trial_kind=plan.get('trial_kind','sa'),timing_acceptance=False,physical_acceptance=False,adopted=False)
     try:
         stages=[('control','control',False)]
-        if plan.get('trial_kind')=='fixed_relocation':stages.append(('reroute','reroute',False))
+        if plan.get('trial_kind') in ('fixed_relocation','spi_clock_fixed'):stages.append(('reroute','reroute',False))
         stages += [('candidate','candidate',False),('shell','candidate',True)]
         for stage,name,shell in stages:
             try:
@@ -127,7 +135,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_clock_d'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_clock_d','spi_clock_fixed'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

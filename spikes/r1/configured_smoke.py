@@ -225,9 +225,10 @@ eFPGA fabric(
     extra_env['R1_ACTIVITY']=str(out/'activity.json')
     extra_env['R1_SHELL_RESTART_ONLY']='1' if shell_restart_only else '0'
     extra_env['R1_RESTART_PROBE']='1' if restart_probe else '0'
-    if capture_configuration:extra_env['R1_CFG_SNAPSHOT']=str(out/'configuration-state.json')
-    if capture_configuration and not management_shell:
-        extra_env['R1_RUNTIME_SNAPSHOT']=str(out/'runtime-failure.json')
+    extra_env['R1_CFG_SNAPSHOT']=str(out/'configuration-state.json') if capture_configuration else ''
+    observe=capture_configuration and not management_shell
+    extra_env['R1_RUNTIME_SNAPSHOT']=str(out/'runtime-failure.json') if observe else ''
+    extra_env['R1_RUNTIME_MODEL']=os.environ.get('R1_RUNTIME_MODEL','') if observe else ''
     runner.test(hdl_toplevel='r1_tb',test_module='test_shell' if management_shell else 'test_loaded',test_dir=ROOT/'test_internal/r1_configured',
                 results_xml=str(out/'results.xml'),extra_env=extra_env,test_args=['-v'])
     from autonomy.check_xml import check_xml

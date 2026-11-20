@@ -47,6 +47,7 @@ def run(out,pdk,icarus):
     plan=json.loads((out/'plan.json').read_text())
     if any(sha(p)!=h for p,h in plan['input_sha256'].items()):raise ValueError('Frozen functional input changed')
     cap=Path(plan['capsule']);modules=json.loads(Path(plan['native']).read_text())['modules']
+    os.environ['R1_RUNTIME_MODEL']=plan['native']
     result=dict(run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),passed=False,
                 cases={},timing_acceptance=False,physical_acceptance=False,adopted=False)
     try:
@@ -69,7 +70,16 @@ def run(out,pdk,icarus):
             raise ValueError('Direct and management/reload native observations differ')
         result['passed']=True
     except Exception as exc:
-        result['error']=str(exc);raise
+        result['error']=str(exc)
+        if stage=='candidate':
+            try:
+                smoke(cap/'model/resource',out/'candidate-case',out/'generated-rtl',
+                    quiesce_unused=True,restart_probe=True)
+                result['generated_rtl_candidate']=dict(passed=True,
+                    scope='Generated RTL diagnostic only; original native failure retained.')
+            except Exception as rtl_error:
+                result['generated_rtl_candidate']=dict(passed=False,error=str(rtl_error))
+        raise
     finally:(out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
 
 

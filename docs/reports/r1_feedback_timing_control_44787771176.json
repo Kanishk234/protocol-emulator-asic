@@ -1,0 +1,19 @@
+{
+  "run": 44787771176,
+  "source_sha": "a41e41d633ea870efafa7f060d7e25fc93a6c198",
+  "artifact_id": 14654652781,
+  "archive_sha256": "e0dab3687e052e6291186bc10ae628661a03fdf6f3a33401c086deb235353cc8",
+  "archive_bytes": 1455286,
+  "diagnostic_complete": false,
+  "model_qualified": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "failure": "BUG165: new case_analysis values were correct, but later Q/GATE assertions retained parent Q values. Original connected baseline reproduces; candidate aborts on stale assertion before coverage/completion.",
+  "member_sha256": {
+    "timing.log": "1a716ad84770912512408e51d1438b1c1799e3080e1d9d704575b9c5cf972857",
+    "routed_setup_static.log": "2ecab14f86413406467bac21c7f4a74de028f3ec9755c7988ad9e240daa98c65",
+    "routed_setup_static.tcl": "9548ef2e47b08c776660590fd6318a2d7dd48c5b2b51b8ccdcbb94df4fd0b426",
+    "baseline/result.json": "2fd5537a454587e4ad8f71fca6f67b1db669df7e58ba4a577cfab650696374f4"
+  }
+}

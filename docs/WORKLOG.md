@@ -4,6 +4,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Timing44787771176 at a41e41d6 reproduces the original control but rejects
+  stale parent Q expectations after new case values (BUG165). No qualified
+  candidate timing. Fix complete Q/GATE assertion replacement and reject
+  stale/missing/duplicate/wrong-latch guards. All four actual scripts now
+  validate 8736 cases plus 8736 guards; reverse replacement restores all
+  original bytes. Rerun hosted timing with the same real image/RC/constraints.
 - D-156 actual run 44786871916 at 144616d1 succeeds: original and reroute
   controls, repaired direct native reset/UART/SPI, full management error/CRC,
   USER_RESET/STOP/reload and traffic all pass. Root independently replays all

@@ -2,6 +2,15 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 functional relocation repair:**44786871916 at144616d1 passes
+original/reroute controls and the one-selector repaired moved image through
+native reset/UART/SPI and complete management STOP/reload. All four actual
+8736-bit audits pass; candidate/direct and shell/reload states match. Earlier
+44678070512 moved-image and44784239092 routing-only shell stalls remain
+failures. D156repairs the observed unused I0 feedback without hardware/model
+changes. Connected extracted timing of this exact loaded image is the next
+gate; no timing or whole-chip acceptance follows from functional success.
+
 **November19 strict declared-interface LVS and active timing:**44627346549
 at688b9ce8 passes with all449ports, zero differences and a uniquely matching
 final verdict using the independently source-proven SPICE schematic. Original

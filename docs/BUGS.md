@@ -1,5 +1,21 @@
 # Bugs
 
+## 165: Candidate timing retains parent values in closed-latch assertions
+
+- **Symptom/check:** 44787771176 at a41e41d6 reproduces the original connected
+  timing control, then candidate setup aborts with configuration case/gate
+  mismatch. The partial slack report has no timing qualification.
+- **Root cause:** replace_cases updated set_case_analysis values but left
+  later per-latch Q assertions at parent values. The synthetic test omitted
+  these guards and missed the inconsistency.
+- **Fix/coverage:** require complete unique old Q/GATE assertions, identical
+  latch identity and closed GATE=0; update only observed Q expectations, then
+  require complete new assertions. Reject stale, missing, duplicate and wrong
+  latch guards. Actual four-script preparation validates all 8736 cases and
+  8736 guards; reverse replacement restores original scripts byte-for-byte.
+  Retain reports/r1_feedback_timing_control_44787771176.json and rerun hosted
+  setup/hold. Native functionality remains separately proven by44786871916.
+
 ## 164: Routing-only image passes direct loading but stalls under shell traffic
 
 - **Symptom/check:** 44784239092 at 5ae78f18 passes original and routing-only

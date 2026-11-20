@@ -4,6 +4,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D162routing44827334401 ata7ee2883 succeeds: A-bank control reproduces
+  raw79db28... byte-for-byte; D-bank candidate raw
+  4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a.
+  Root independently verifies packed logical graphs, exact A/D banks and
+  identical102LC/3timer/3shift/19IO/1GBUFusage. Receipt:
+  reports/r1_clock_bank_trial_44827334401.json. Model estimates remain
+  uncharacterized. New exact-source native admission and29guards pass
+  locally; actual A-control/D-candidate reset/reload then extracted timing
+  is next. No old selector repairs or clock-target changes.
 - D161actual44802619585 at9f3f7b4f passes native/reset/reload and all
   three8736-bit audits; source rail feedback is repaired (zero loops under
   both policies). Root replays four zero execution codes, original control,

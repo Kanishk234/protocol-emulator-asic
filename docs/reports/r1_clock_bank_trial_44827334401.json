@@ -1,0 +1,100 @@
+{
+  "run": 44827334401,
+  "source_sha": "a7ee28838fdf3b32a313c5debd496d9e19e9f9fa",
+  "artifact_id": 14674177183,
+  "archive_sha256": "e7e9fcf423a01f73086c843cdb3623bc6ba4d86b3ed40e5a0bb7d0777524823e",
+  "archive_bytes": 194593,
+  "result": {
+    "run": "44827334401",
+    "source_sha": "a7ee28838fdf3b32a313c5debd496d9e19e9f9fa",
+    "cases": {
+      "control": {
+        "image_sha256": "79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a",
+        "clock_bank": "X0Y4/A",
+        "logical_graph_preserved": true,
+        "placed_utilisation": {
+          "FABULOUS_LC": {
+            "used": 102,
+            "available": 128
+          },
+          "wp_timer": {
+            "used": 3,
+            "available": 4
+          },
+          "wp_shift": {
+            "used": 3,
+            "available": 4
+          },
+          "IOBUF": {
+            "used": 19,
+            "available": 42
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "model_fmax_mhz": 37.88,
+        "model_timing_characterized": false
+      },
+      "candidate": {
+        "image_sha256": "4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a",
+        "clock_bank": "X0Y4/D",
+        "logical_graph_preserved": true,
+        "placed_utilisation": {
+          "FABULOUS_LC": {
+            "used": 102,
+            "available": 128
+          },
+          "wp_timer": {
+            "used": 3,
+            "available": 4
+          },
+          "wp_shift": {
+            "used": 3,
+            "available": 4
+          },
+          "IOBUF": {
+            "used": 19,
+            "available": 42
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "model_fmax_mhz": 44.64,
+        "model_timing_characterized": false
+      }
+    },
+    "diagnostic_complete": true,
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "scope": "Same proven SPI source, pins, seed1, model,50MHz request. Only candidate GBUF placement is USER-locked to original clock bank D; user-cell placement/routes may change. No transplanted image repairs or timing/hardware acceptance."
+  },
+  "independent_review": {
+    "control_image_byte_identical": true,
+    "packed_logical_graphs_equal": true,
+    "clock_banks_exact": true,
+    "resource_usage_identical": true,
+    "native_preparation_passes_locally": true
+  },
+  "member_sha256": {
+    "result.json": "70a952419bb55d5e023eefa85e331ecd72511f37e8c18cb7ce79bb6e99fa4bbf",
+    "control/concurrency.wbit": "79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a",
+    "candidate/concurrency.wbit": "4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a",
+    "candidate/design_pnr.json": "776972643d6a2f6470aa771305a59f602d2c2a70e1ed57bac6b028bf635fc70b"
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

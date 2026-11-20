@@ -70,9 +70,11 @@ clocked. The earlier bank-D result has 134 inactive registers. The new worst
 setup endpoint is a register at X1Y1/D with FF output select 0 and no placed
 user cell. D162 tests clock-bank allocation as a confounder: reproduce the
 same SPI source/control image, then constrain only the GBUF to X0Y4/D.
-Native local no-route placement honors the constraint. Actual routing,
-configuration loading and full timing must pass before drawing conclusions;
-no unused-register path is waived.
+44827334401 reproduces the A-bank image exactly and routes the D-bank
+candidate with identical packed logical graph and resource use. Raw D-bank
+image: `4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a`.
+Actual configuration loading/reset/reload and full timing are next; no
+unused-register path is waived.
 
 ## Failures kept as controls
 

@@ -13,15 +13,35 @@ from routed_timing import annotation,assert_cases,observed_cases,prepare as prep
 from run_timing import compare,parse_log
 
 
+
+GATE_CHECK=re.compile(
+    r'(if \{\[sta::pin_sim_logic_value \[lindex \[get_pins \{([^{}]+)/GATE\}\] 0\]\]!="0" \|\| '
+    r'\[sta::pin_sim_logic_value \[lindex \[get_pins \{([^{}]+/Q)\}\] 0\]\]!=")'
+    r'([01])("\} \{error "configuration case/gate mismatch"\}\nincr closed)')
+
+
+def assert_gate_checks(text,values):
+    matches=list(GATE_CHECK.finditer(text))
+    if (len(matches)!=len(values) or
+            any(m[2]+'/Q'!=m[3] for m in matches) or
+            len({m[3] for m in matches})!=len(matches) or
+            {m[3]:m[4] for m in matches}!=values or
+            text.count('configuration case/gate mismatch')!=len(matches)):
+        raise ValueError('Configuration gate checks differ from actual loaded state')
+
+
 def replace_cases(text,old,new):
     assert_cases(text,old)
+    assert_gate_checks(text,old)
     if set(new)!=set(old) or any(v not in ('0','1') for v in new.values()):
         raise ValueError('Candidate configuration identity or binary state differs')
     pattern=(r'(set p \[get_pins -quiet \{([^{}]+/Q)\}\]\n'
              r'if \{\[llength \$p\]!=1\} \{error "missing configuration pin"\}\n'
              r'set_case_analysis )([01])( \$p\nincr observed)')
     result=re.sub(pattern,lambda m:m[1]+new[m[2]]+m[4],text)
+    result=GATE_CHECK.sub(lambda m:m[1]+new[m[3]]+m[5],result)
     assert_cases(result,new)
+    assert_gate_checks(result,new)
     return result
 
 

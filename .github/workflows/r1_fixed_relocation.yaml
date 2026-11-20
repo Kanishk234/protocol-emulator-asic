@@ -48,7 +48,7 @@ jobs:
           prepare(capsule,Path('build/r1_placement_trial'))
           Path('build/r1_placement_trial/producer.json').write_text(json.dumps(producer,indent=2)+'\n')
           PY
-      - name: Restore exact image then reroute fixed placements and one targeted LC move
+      - name: Initialize locked placements then compare rerouting and targeted LC move
         timeout-minutes: 35
         run: |
           source .venv/bin/activate

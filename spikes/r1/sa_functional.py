@@ -28,12 +28,19 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
         'sa':('44653541979','0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f'),
         'fixed_relocation':('44676960615','cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b'),
         'fixed_reroute':('44676960615','cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462'),
-        'spi_timer_free_run':('44798802734','79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a')}
+        'spi_timer_free_run':('44798802734','79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a'),
+        'spi_clock_d':('44827334401','4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a')}
     if trial_kind not in admitted:raise ValueError('Unknown fixed-source native trial')
     run_id,image_sha=admitted[trial_kind]
     if (str(result['run'])!=run_id or not result['diagnostic_complete'] or
         result['cases']['reroute' if trial_kind=='fixed_reroute' else 'candidate']['image_sha256']!=image_sha):
         raise ValueError('Require the authenticated fixed-source placement trial')
+    if trial_kind=='spi_clock_d':
+        if (result['cases']['control']['image_sha256']!='79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a' or
+                any(not row['logical_graph_preserved'] for row in result['cases'].values()) or
+                result['cases']['control']['clock_bank']!='X0Y4/A' or result['cases']['candidate']['clock_bank']!='X0Y4/D' or
+                result['cases']['control']['placed_utilisation']!=result['cases']['candidate']['placed_utilisation']):
+            raise ValueError('Clock-bank source, graph or resource control changed')
     case_names={'control':'restore' if trial_kind in ('fixed_relocation','fixed_reroute') else 'control',
                 'candidate':'reroute' if trial_kind=='fixed_reroute' else 'candidate'}
     if trial_kind in ('fixed_relocation','fixed_reroute'):
@@ -120,7 +127,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_clock_d'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

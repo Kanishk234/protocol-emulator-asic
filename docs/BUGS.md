@@ -553,3 +553,7 @@ D-192regression update: candidate now passes55/55selected whole-chip protocol/Ph
 ### 2026-11-20 — ACK monitor helper lost its native default
 
 Unit run 44787221018 recorded 22 TypeErrors after the scheduler-aware change made fire_period a required argument. Existing synthetic ACK monitor tests call contracts(program) and exercise native timing. Restored the native default while whole-chip scheduler tests continue to pass their cadence explicitly. The 22 monitor tests pass with either environment cadence, and the 41 compiler response tests pass.
+
+### 2026-11-20 — Delimiter monitor read cadence from absent synthetic lane
+
+Nightly 44793036354 caught five synthetic delimiter tests failing with AttributeError. The monitor read scheduler cadence directly from lanes that the synthetic fixture deliberately omits. It now accepts explicit cadence, defaulting to native for synthetic callers. Chip workloads supply the actual cadence. The combined synthetic monitor suites pass 32 tests, and the fallback delimiter/recovery suite with its synthetic controls passes 230 tests.

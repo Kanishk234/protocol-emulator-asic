@@ -4,9 +4,29 @@ import copy
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 
 from assembly_catalog import sha
+
+
+def constant_sources(module):
+    """LUT constant pseudo-PIPs also occupy slots without real placed cells."""
+    sources={}
+    for net in module.get('netnames',{}).values():
+        text=net.get('attributes',{}).get('ROUTING','')
+        if not text:continue
+        fields=text.split(';')
+        if fields[-1]=='':fields.pop()
+        if len(fields)%3:raise ValueError('Malformed checkpoint routing records')
+        for wire,pip,strength in zip(fields[::3],fields[1::3],fields[2::3]):
+            match=re.fullmatch(r'(X\d+Y\d+)/\$CONST([01])/\1/L([A-H])_O',pip)
+            if not match:continue
+            xy,value,letter=match.groups();bel=xy+'/'+letter
+            if wire!=xy+'/L'+letter+'_O' or bel in sources and sources[bel]!=int(value):
+                raise ValueError('Conflicting constant-LUT routing metadata')
+            sources[bel]=int(value)
+    return sources
 
 
 def logical_graph(module):
@@ -29,7 +49,9 @@ def prepare(capsule,out):
     design=json.loads(source.read_text());module=design['modules']['top']
     original={n:c['attributes']['NEXTPNR_BEL'] for n,c in module['cells'].items()}
     matches=[n for n,b in original.items() if b=='X1Y2/F']
-    if len(matches)!=1 or 'X1Y1/C' in original.values():raise ValueError('Original source/free target placement changed')
+    constants=constant_sources(module)
+    if len(matches)!=1 or 'X1Y1/C' in original.values() or 'X1Y1/C' in constants:
+        raise ValueError('Original source/free target placement changed')
     moved=matches[0];cell=module['cells'][moved]
     if (cell['type']!='FABULOUS_LC' or cell['parameters']!={'INIT':'0001000100010001'} or
             set(cell['connections'])!={'I0','I1','I2','I3','O'} or cell['connections']['I2'] or cell['connections']['I3']):
@@ -54,7 +76,7 @@ def prepare(capsule,out):
     bound=[Path(__file__).resolve(),source,case/'concurrency.wbit',case/'report.json',
            *[resource/p for p in desc['generated_sha256']]]
     if any(sha(resource/p)!=h for p,h in desc['generated_sha256'].items()):raise ValueError('Frozen resource model changed')
-    (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),variants=variants,moved_cell=moved,
+    (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),variants=variants,moved_cell=moved,constant_source_bels=constants,
         input_sha256={str(p):sha(p) for p in bound},
         scope='Restore exact original image; then compare identical fixed placements rerouted from scratch versus one combinational LC moved X1Y2/F to free X1Y1/C. Same logical graph, seed1, 50MHz and hardware. No characterized timing or adoption.'),indent=2)+'\n')
 

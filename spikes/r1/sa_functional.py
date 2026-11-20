@@ -1,4 +1,4 @@
-"""Actually load the fixed-seed SA image into all forty native tiles."""
+"""Actually load admitted placement images into all forty native tiles."""
 import argparse
 import json
 import os
@@ -16,15 +16,17 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
     result=json.loads((trial/'result.json').read_text())
     admitted={
         'sa':('44653541979','0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f'),
-        'fixed_relocation':('44676960615','cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b')}
+        'fixed_relocation':('44676960615','cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b'),
+        'fixed_reroute':('44676960615','cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462')}
     if trial_kind not in admitted:raise ValueError('Unknown fixed-source native trial')
     run_id,image_sha=admitted[trial_kind]
     if (str(result['run'])!=run_id or not result['diagnostic_complete'] or
-        result['cases']['candidate']['image_sha256']!=image_sha):
+        result['cases']['reroute' if trial_kind=='fixed_reroute' else 'candidate']['image_sha256']!=image_sha):
         raise ValueError('Require the authenticated fixed-source placement trial')
-    case_names={'control':'restore' if trial_kind=='fixed_relocation' else 'control','candidate':'candidate'}
-    if trial_kind=='fixed_relocation':
-        case_names['reroute']='reroute'
+    case_names={'control':'restore' if trial_kind in ('fixed_relocation','fixed_reroute') else 'control',
+                'candidate':'reroute' if trial_kind=='fixed_reroute' else 'candidate'}
+    if trial_kind in ('fixed_relocation','fixed_reroute'):
+        if trial_kind=='fixed_relocation':case_names['reroute']='reroute'
         if any(not r['logical_graph_preserved'] or not r['placements_exact'] for r in result['cases'].values()):
             raise ValueError('Fixed-placement graph/source checks failed')
     out.mkdir(parents=True,exist_ok=False)
@@ -107,7 +109,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

@@ -13,6 +13,12 @@
   the completed XML and is withdrawn. Compare original source under the same
   environment; rerun all eight hosted cases before admission.
 
+- **Actual validation:**44797232291 passes all8formal/source cases using
+  system Icarus and project cocotb. Local original and candidate both fail
+  sigrok in the sandbox; outside it, candidate mode0/HALF4passes all4tests,
+  including sigrok. The restricted decoder failure matches previously documented
+  libusb initialization behavior; no failing XML was waived.
+
 ## 168: SPI experiment auditor rejects standard SBY PASS metadata
 
 - **Symptom/check:**44796314987 at6449167d completes unbounded PDR and
@@ -21,6 +27,9 @@
 - **Cause/fix:** admit the pinned numeric suffix only with one completed
   successful PDR log verdict; reject FAIL/UNKNOWN/malformed/incomplete output.
   Guard tests cover these mutations. Keep the original failed workflow.
+- **Actual corrected validation:**44797232291 passes all8PDR cases and32
+  source tests with project venv Python3.12/cocotb2.0.1 and system Icarus.
+  Root replays strict status/log/XML and parameter checks.
 - **Environment correction:** prepend the project venv before the suite,
   keeping project Python/cocotb in the venv. Invoke protocol make after cd so
   its PWD-based paths are correct. Rerun all modes/divisors before accepting

@@ -1,5 +1,21 @@
 # Decisions
 
+## D-160: Compile the proved SPI timer variant against an exact original control
+
+- **Date:**2026-11-20.44797232291 passes8unbounded PDR pin/host equivalence
+  cases and32source tests for D159. This is RTL evidence only.
+- **Trial:** keep the frozen R1 hardware/pin resource, original UART/SPI
+  sources/parameters, seed1 and explicit50MHz for both runs. Relocate only
+  the macro path in a derived compiler descriptor; do not edit frozen files.
+  Reproduce the original compiler image byte-for-byte before compiling the
+  one-expression SPI change. Keep the pinned Yosys e74db6dea and exact
+  nextpnr binary from the original campaign.
+- **Gates:** verify all8proof statuses/logs/executed XMLs and exact candidate
+  source bytes before compilation. A capacity/route result or placeholder
+  compiler Fmax is not extracted timing. New native reset/reload and actual
+  observed frame cases/connected RC remain mandatory. G1 and hardware stay
+  unchanged; the free-running timer is not adopted by production protocols.
+
 ## D-159: Prove a free-running SPI user timer before compiling a new image
 
 - **Date:**2026-11-20. Qualified timing44794158025 still fails setup

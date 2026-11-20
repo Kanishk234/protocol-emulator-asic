@@ -1,0 +1,133 @@
+{
+  "run": 44797232291,
+  "source_sha": "f3e10d58a785b8bfb0bcdf963f88fe3409d1f15c",
+  "artifact_catalog": "spikes/r1/spi_timer_proof_sources.json",
+  "cases": [
+    {
+      "mode": 0,
+      "half": 25,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 16",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "d4464383a11c369dab6fc0f523993ce0add4428efc0c9f2e11982b5f41c9c385",
+        "equiv/status": "457b80d6f7a2536b96d56dff265993f0d47bd372a336a03686ed6c23a0d81097",
+        "proof.log": "de3ef66f05628149b486e0ae301c95849b2e50ae9ab7a35f88ad49c08e30edef",
+        "results.xml": "b3c78eed2c8be91d552448e9ea0e322d03a4b5ba7a2e03d012ac53c3b07ac8f6",
+        "source-tests.log": "bd192d8cfc3ca3edb25fbc4c3c274391e02d750ea5175b2e3ebb0c0180b3ef38",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    },
+    {
+      "mode": 0,
+      "half": 4,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 1",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "57f63836872ca9fb5cf97a78efa2c09a26bd716346024903ffa9476deefd86cd",
+        "equiv/status": "82bc437cdb0ebaedde9abc25a1795f5b1cd22d37f1e4d1240fd300e529561df4",
+        "proof.log": "76ac71d0e35b2b1f827ac6a503a3528e50513c67b62eac13078280d74b3fac43",
+        "results.xml": "b1b10276c2a594e28385bf5553988efb6da7c36d94a75b8f57c51e44b80fbf6e",
+        "source-tests.log": "e07f2c5d7516d7aaa3041c0f5dfd60051b89f39c397448386f6d6488806f1fca",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    },
+    {
+      "mode": 1,
+      "half": 25,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 18",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "0194d81b4ef5816f6bede8319f890f56d96b75d16b472b4180f2f87d59d20499",
+        "equiv/status": "4efc184e649e6a5e02a3f9170acf7185d7f56ed55d02c9aa2c6354b9590a87b8",
+        "proof.log": "173e63bec046c3dc666f4b7cbef20679dca449f35c5db90ee432c70d3b2f75b2",
+        "results.xml": "8ae2c0bc0d962608b4db96678f1ebaf1df77a8389c71d1b26eee6943fa60625f",
+        "source-tests.log": "97f0cbc60b86f42b14c128de6869e295aefd7269394131d76658646df82ead3e",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    },
+    {
+      "mode": 1,
+      "half": 4,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 1",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "fb93b653e77ab6748fcaded1a7ebc5173f48d2ee4ceab79bba529d97bd0869aa",
+        "equiv/status": "82bc437cdb0ebaedde9abc25a1795f5b1cd22d37f1e4d1240fd300e529561df4",
+        "proof.log": "a240415db8d736a8bf22bd5bbb4877a530d03023531435be4eab99d686a96ce9",
+        "results.xml": "6f4a8635d1a17cc95f69d4b77c63b401842f66b5cf5dbb02c4d276eb5d7e0bbd",
+        "source-tests.log": "f1fd380821b5370951817ba51f3cc955a887cd864bf9ecb4c696e2ff8c9de8e6",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    },
+    {
+      "mode": 2,
+      "half": 25,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 15",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "729b0bf598167240b8e3c19f19f22aa4e4e07bce430f18a53dacefaa7dd1ec81",
+        "equiv/status": "56b86c52dce3fef734a32832cc5b19d04faa57ac4498c867e92f26341fb5e6f9",
+        "proof.log": "1e6cbe566e9c8950a815e31f713153e480d326ee2be7b4eb07269463150c18ed",
+        "results.xml": "bdfa8aa56d3cbcd9d4bceeeabffdecb80aaa4244537512eaf75bc04d9cf8228c",
+        "source-tests.log": "bbb8ab170b2a1f88c508db3248206fc8ea35957d4b67df3fa2d6f1e508c97a74",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    },
+    {
+      "mode": 2,
+      "half": 4,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 1",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "e0d0e2953733ed04f24f0c626c981bb51b65039667cf096ec5aeb21fff18a68c",
+        "equiv/status": "82bc437cdb0ebaedde9abc25a1795f5b1cd22d37f1e4d1240fd300e529561df4",
+        "proof.log": "cb155e9f01d8347a081e028c14c40027a75336132116055099ee68329cb0c75f",
+        "results.xml": "5224c991f8ecae1523790beb99658584e9e2c58b23d886299b2b655356918a3f",
+        "source-tests.log": "853b6dad245a7f2d82872404ea669ca5ee96496571c313aca45e1dd8df9f4f1a",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    },
+    {
+      "mode": 3,
+      "half": 25,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 17",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "7b7a4832c136f59dedd3012dba50f156814f7686b38188fcbb7c14bbb79ead3a",
+        "equiv/status": "0921db9ce6de92d4664af0d92613217d9294d481e65c412c8e31f0fd89935bed",
+        "proof.log": "ffe9bb2773c0734f79e0ca62e02c2bf4a377503a36ad5e6decc066f4fbcd04a2",
+        "results.xml": "602c5c3d8e3d32231f01c9d472950d00c010fa9c4091634cd228ea079890129f",
+        "source-tests.log": "dc541efea13ded7e4a8d256a52f7d5dfe6307d4d3d625764440c1086c4f0881a",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    },
+    {
+      "mode": 3,
+      "half": 4,
+      "formal_engine": "abc pdr",
+      "proof_status": "PASS 0 1",
+      "strict_source_tests": 4,
+      "hashes": {
+        "result.json": "d22ca14b3505488db7e44168ea8861d74bb75070a8e8780c3434590a86556e8e",
+        "equiv/status": "82bc437cdb0ebaedde9abc25a1795f5b1cd22d37f1e4d1240fd300e529561df4",
+        "proof.log": "c30138c4e1ee60a0dff5e431beb002166d6e9c6904b02412aabd6ebd9a0524a0",
+        "results.xml": "543196ef594f5864f5e05245153545ae9293a8b2a219bb4d5a91cd8c27a43261",
+        "source-tests.log": "81d33a573b7300ca9e4e6e6eb6c1ff071ae884b7ec33de3a5a456498fc1e060d",
+        "candidate/spi_ctrl_top.v": "fa2b41584cedd9fcc1b3ed2386e6cf70c232d64d2419012313298b603ca32de0"
+      }
+    }
+  ],
+  "unbounded_properties": "wp_spi_timer_equiv: original and candidate binary positive-edge SPI pin/host outputs equal after initial synchronous reset; arbitrary subsequent host, MISO and reset inputs; PRIMS1 at enumerated four modes and HALF4/25.",
+  "strict_source_tests_total": 32,
+  "independent_review": "PDR completion/status, executed XML, actual simulator parameters and project-venv Python/cocotb checked per case.",
+  "native_functional_passed": false,
+  "extracted_timing_passed": false,
+  "adopted": false
+}

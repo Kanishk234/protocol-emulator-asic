@@ -4,6 +4,18 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Corrected SPI campaign44797232291 atf3e10d58 succeeds in all8cases:
+  unbounded PDR pin/host equivalence after initial reset (4modes xHALF4/25),
+  plus32strict source tests. Root rechecks every proof/status/XML, actual
+  parameters and project-venv Python3.12/cocotb2.0.1. Receipt:
+  reports/r1_spi_timer_equivalence_44797232291.json. Local original and
+  candidate both reproduce sandbox sigrok failures; outside sandbox the
+  candidate executes all4mode0/HALF4tests including sigrok successfully.
+- Stage fresh frozen-resource control/candidate compilation, seed1 and
+  explicit50MHz request. Require original control image byte identity before
+  compiling the proved source variant; no native/timing claim until actual
+  new image loading and connected RC qualification. Local complete proof/
+  source/model admission passes and29focused tests pass.
 - Corrected SPI matrix44796772243 passes inspected PDR cases but source
   simulation fails before execution: bundled OSS libm cannot load hosted
   Python3.12 (BUG169). Switch source simulation to ordinary-CI system

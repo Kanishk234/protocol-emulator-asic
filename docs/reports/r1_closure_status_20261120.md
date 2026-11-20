@@ -46,8 +46,10 @@ change; setup improves modestly and hold remains negative.
 The new worst path maps from SPI state[1] through hard-timer enable/terminal
 count to nedge[1]. D159 tests a build-only free-running-timer user-program
 variant with full binary output equivalence and existing independent SPI
-tests across four modes and HALF values 4 and 25. No compile/native/timing
-result is claimed for that experiment yet.
+tests across four modes and HALF values 4 and 25. 44797232291 passes all eight unbounded equivalence cases and 32 source tests,
+with independently reviewed statuses, parameters and project Python runtime.
+A fresh fixed-seed compilation is next; no native/timing result is claimed
+for the free-running timer variant yet.
 
 ## Failures kept as controls
 

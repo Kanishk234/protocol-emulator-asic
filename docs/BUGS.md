@@ -14,6 +14,11 @@
 - **Coverage/next:** retain the timeout and original controls in
   reports/r1_fixed_native_44678070512.json. Qualify the passing routing-only
   image separately; do not force X, add arbitrary delays or waive the failure.
+- **Diagnostic replay:** isolate the existing read-only VPI observer in a
+  separate hosted process. Original control must pass with instrumentation;
+  the moved-cell case is diagnostic only. Local pinned Icarus 13 finite
+  fixture exits 0; intentional loop reports tick 2000 and exits 2. The cloud
+  workflow repeats both fixtures before replaying native inputs.
 - **Related routing guard:** free real-cell slots can be occupied by nextpnr
   LUT constant pseudo-PIPs. The relocation preflight now reads these routing
   triples and rejects constant-occupied targets; positive/malformed metadata

@@ -1,0 +1,139 @@
+{
+  "run": 44792141462,
+  "source_sha": "1fc91f31b067adfa889193df132f0bc8b39888d6",
+  "artifact_id": 14655994993,
+  "archive_sha256": "d45f8c366c47aac70f267e28d7c3eccc67b9c932f178a298fb50c26f2484bc0e",
+  "archive_bytes": 12809496,
+  "native": {
+    "run": "44792141462",
+    "source_sha": "1fc91f31b067adfa889193df132f0bc8b39888d6",
+    "passed": true,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      },
+      "reroute": {
+        "passed": true,
+        "image_sha256": "4b84bd934db00f35e36df31214a0ab8dfa0b0e9c76dc9579a8eee64e25c20dc4",
+        "observed_configuration_sha256": "c35b4ae891bf254712ae7474fab612efae01c75cedc8ac125a246bf8039a3a3b",
+        "configuration_bits": 8736
+      },
+      "candidate": {
+        "passed": true,
+        "image_sha256": "39e2aadc8b7f25b5838bde7bcff746910105a07f9e3cce6d49c0d29cf711b739",
+        "observed_configuration_sha256": "5fa930500df8c2db780c6d0ea025767e916da3cf109532a8c26e875bc5efc58f",
+        "configuration_bits": 8736
+      },
+      "shell": {
+        "passed": true,
+        "image_sha256": "39e2aadc8b7f25b5838bde7bcff746910105a07f9e3cce6d49c0d29cf711b739",
+        "observed_configuration_sha256": "5fa930500df8c2db780c6d0ea025767e916da3cf109532a8c26e875bc5efc58f",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "fixed_relocation",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "candidate_functional_passed": true
+  },
+  "timing": {
+    "run": "44792141462",
+    "source_sha": "1fc91f31b067adfa889193df132f0bc8b39888d6",
+    "diagnostic_complete": true,
+    "models": {
+      "setup": {
+        "edge_registers": 370,
+        "inactive_unobservable": 134,
+        "clocked_timed": 223,
+        "clocked_constant_data": 13,
+        "endpoints": 244,
+        "worst_slack_ns": -10.193067,
+        "worst_endpoint": "Tile_X3Y3_LUT4x8_ha/_1730_/D",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      },
+      "hold": {
+        "edge_registers": 370,
+        "inactive_unobservable": 134,
+        "clocked_timed": 223,
+        "clocked_constant_data": 13,
+        "endpoints": 244,
+        "worst_slack_ns": -1.867277,
+        "worst_endpoint": "Tile_X6Y1_LUT4x8_ha/_1730_/D",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      }
+    },
+    "coverage": {
+      "routed_setup_static": {
+        "active_pins": 12679,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_setup_dynamic": {
+        "active_pins": 12679,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_static": {
+        "active_pins": 12679,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_dynamic": {
+        "active_pins": 12679,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    },
+    "model_qualified": true,
+    "necessary_macro_constraints_met": false,
+    "actual_native_run": "44792141462",
+    "actually_loaded_image_sha256": "39e2aadc8b7f25b5838bde7bcff746910105a07f9e3cce6d49c0d29cf711b739",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "scope": "Actually loaded placement image on unchanged source-proven connected nominal RC, original 20ns/0.25ns/conditional zero-I/O boundary. Original failing parent retained. No full-chip/PVT/loading-mode acceptance."
+  },
+  "independent_review": {
+    "four_actual_frame_audits": 8736,
+    "direct_reload_states_identical": true,
+    "all_four_reverse_script_conversions_byte_identical_to_original_baseline": true,
+    "original_setup_hold_control_reproduces": true,
+    "all_four_active_annotations_pass": true,
+    "both_policies_zero_loops": true,
+    "both_policies_slacks_identical": true
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "member_sha256": {
+    "sa_functional/result.json": "e1a6d47f17c1a04ce6406eacb0ac59e4c91e5308a981493b7716a2456fbeadc6",
+    "sa_functional/candidate/quiesced.wbit": "39e2aadc8b7f25b5838bde7bcff746910105a07f9e3cce6d49c0d29cf711b739",
+    "sa_functional/candidate/configuration-state.json": "5fa930500df8c2db780c6d0ea025767e916da3cf109532a8c26e875bc5efc58f",
+    "sa_functional/shell/configuration-state.json": "5fa930500df8c2db780c6d0ea025767e916da3cf109532a8c26e875bc5efc58f",
+    "r1_loop_timing/result.json": "802abfd12d9e5a0d32935ff114562317b03d7240e989cce53506f950d640867a"
+  }
+}

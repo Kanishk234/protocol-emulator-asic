@@ -4,6 +4,20 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D157actual44792141462 at1fc91f31 passes native/reset/reload and qualified
+  connected timing analysis: all four8736-bit audits, byte-identical
+  direct/reload states, all370FFclassified,244endpoints,12679active pins
+  fully covered, zero loops in both policies and identical slacks. Timing
+  still fails setup-10.193067ns/hold-1.867277ns. Root replays every guard and
+  reverses all candidate scripts byte-for-byte to baseline. Receipt:
+  reports/r1_loop_cleanup_44792141462.json. No closure/adoption/phase boxes.
+- D158targets the measured long route into unused X2Y3/D.I1. Prove INITaa00,
+  carry safety, unique three-node selected fanout and existing registered H
+  alternate source. Change only upstream selector bit183, word273bit23.
+  Expected raw a7306047e903996e8488819ab428543389cc1ffd71fe2d95a7fb2475f720884e;
+  expected loaded33b768f80464046a1d718c0968a627537fd92d7815c45c9161064b69e26f64b6.
+  Local complete reconstruction and native-selector identity checks pass;
+  combined hosted actual reload then extracted timing is next.
 - Corrected timing44790210039 completes all four reports and passes active
   annotation but rejects one structural loop at X6Y3/E. Reported setup
   -10.193067 ns/hold-1.867277 ns are unqualified. Receipt:

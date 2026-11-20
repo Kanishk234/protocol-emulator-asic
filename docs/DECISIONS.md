@@ -1,5 +1,22 @@
 # Decisions
 
+## D-158: Test a free upstream selector on the measured unused-input critical path
+
+- **Date:**2026-11-20.44792141462 passes native/reset/reload and zero-loop
+  full-annotation timing qualification, but fails setup -10.193067 ns and
+  hold -1.867277 ns at20ns/0.25ns. The worst register path traverses X2Y3/D
+  with an unused I1 fed by a long selected route from X3Y3/LF_O.
+- **Proof:** actual D INIT0xaa00 ignores I1; FF=0. The existing upstream
+  selector JE2END4.J2MID_CDa_BEG1 overlaps no active feature. Its entire
+  selected fanout is three nodes ending only at unused D.I1. Carry traversal
+  reaches12disabled consumers and no enabled consumer. Native H output gate
+  tracing proves the alternate source is an already configured user register.
+- **Trial/gates:** change only tile bit183, word273 bit23, latch_1560_,0to1
+  after D157. This changes a routing selector, not H.FF or hardware. Require
+  raw/loaded one-bit delta and all8736expected frames, then fresh uninstrumented
+  native/reset/reload and connected timing. Keep previous passing functional
+  image and negative timing control; do not waive external-input hold paths.
+
 ## D-157: Remove the remaining unused-input timing loop with a registered source
 
 - **Date:** 2026-11-20.44790210039 completes all four candidate timing

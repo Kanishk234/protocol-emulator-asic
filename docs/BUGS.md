@@ -1,5 +1,17 @@
 # Bugs
 
+## 167: Qualified worst setup path traverses a truth-independent LUT input
+
+- **Symptom/check:**44792141462 passes native and timing-model gates but
+  setup slack is -10.193067 ns at X3Y3/_1730_/D. The reported path traverses
+  the long default source feeding X2Y3/D.I1 despite loaded INIT0xaa00
+  being independent of I1. This is a measured conservative timing path;
+  do not assert a unique physical hazard or exclude it from timing.
+- **Proposed fix/check:** D158redirects one inactive upstream selector to an
+  existing registered H source. Prove unique unused-input fanout, native
+  register/selector identities, all cofactors and carry noninterference; then
+  require actual reset/reload and unchanged extracted setup/hold.
+
 ## 166: Moved image retains an unused E input combinational timing loop
 
 - **Symptom/check:** 44790210039 completes candidate setup/hold with active
@@ -8,6 +20,10 @@
 - **Cause:** loaded INIT0x330f is independent of I0, but the selected
   unused I0 route returns the same LE_O. Native FF-selection and route
   decoding prove the alternate existing selector reaches registered X2Y3/F.
+- **Actual validation:**44792141462 passes uninstrumented native/reset/reload,
+  all four actual frame audits and all four connected timing/coverage reports
+  with zero loops in both policies. The observed loop is repaired; setup
+  -10.193067 ns and hold -1.867277 ns still fail.
 - **Proposed fix/coverage:** D157changes only that selector after D156.
   Local actual-state cofactor/carry/frame/route checks pass; reconstructed
   raw image differs from the moved compiler image by exactly two total bits.

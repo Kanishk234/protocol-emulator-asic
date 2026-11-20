@@ -1,7 +1,15 @@
 name: status-merge-screen
-run-name: D-192 source-only repair on qualified 8x4 recipe (pre-routing)
+run-name: D-192 ${{ inputs.variant }} on qualified 8x4 recipe (pre-routing)
 on:
   workflow_dispatch:
+    inputs:
+      variant:
+        description: D-192 physical trial
+        type: choice
+        default: status-merge
+        options:
+          - status-merge
+          - root-mode
 permissions:
   contents: read
 concurrency:
@@ -21,10 +29,12 @@ jobs:
         with:
           python-version: '3.11'
       - name: Prepare project venv and isolated verified candidate
+        env:
+          SCREEN_VARIANT: ${{ inputs.variant }}
         run: |
           scripts/setup_venv.sh
           source .venv/bin/activate
-          python scripts/ci/status_merge_screen.py prepare
+          python scripts/ci/status_merge_screen.py prepare --variant "$SCREEN_VARIANT"
       - name: Check out reviewed current official support-tools snapshot
         uses: actions/checkout@v6
         with:

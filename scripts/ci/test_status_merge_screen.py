@@ -101,3 +101,18 @@ def test_diagnostic_configs_preserve_source_relative_path_resolution(tmp_path):
 def test_staging_cannot_recurse_into_qualified_source():
     with pytest.raises(ValueError, match='outside qualified'):
         screen.prepare(screen.ROOT / 'src' / 'trial')
+
+
+def test_root_mode_adds_only_verified_config_rtl(tmp_path):
+    reference = tmp_path / 'reference'
+    root_mode = tmp_path / 'root-mode'
+    screen.prepare(reference)
+    screen.prepare(root_mode, variant='root-mode')
+    reference_receipt = screen.check_inputs(reference)
+    root_receipt = screen.check_inputs(root_mode)
+    assert reference_receipt['variant'] == 'status-merge'
+    assert root_receipt['variant'] == 'root-mode'
+    assert root_receipt['candidate_inputs'] == {
+        **reference_receipt['candidate_inputs'],
+        'src/trw_pin_cfg.v': '02a63f1d46ad7360a0f9a8a56b004478b629540ce4eb25234235b7b4b9c43581',
+    }

@@ -70,7 +70,9 @@ def check_inputs(design):
     return receipt
 
 
-def prepare(design):
+def prepare(design, *, variant="status-merge"):
+    if variant not in ("status-merge", "root-mode"):
+        raise ValueError("Unknown screen variant")
     if design == ROOT or any(design.is_relative_to(ROOT / folder) for folder in ('src', 'macro', '.git')):
         raise ValueError('Trial must be outside qualified source/macro/Git directories')
     from repo_audit import audit
@@ -99,10 +101,20 @@ def prepare(design):
     for folder in ('src', 'macro'):
         shutil.copytree(ROOT / folder, design / folder)
     shutil.copyfile(ROOT / 'info.yaml', design / 'info.yaml')
-    subprocess.run(['patch', '--batch', '-p1', '-i', str(patch)], cwd=design, check=True)
+    subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(patch)], cwd=design, check=True)
+    expected = {**before, 'src/trw_pin_bs.v': evidence['candidate_sha256']}
+    root_mode_patch_sha256 = None
+    if variant == 'root-mode':
+        root_mode_patch = patch.parent / 'root_mode/root_mode.patch'
+        root_mode_patch_sha256 = sha(root_mode_patch)
+        if root_mode_patch_sha256 != 'e7b6691ce4416e28ff26a7f941d72c8961223d40248420bb44123bd02edfc486':
+            raise ValueError('Root-mode patch differs from the tested candidate')
+        subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(root_mode_patch)],
+                       cwd=design, check=True)
+        expected['src/trw_pin_cfg.v'] = '02a63f1d46ad7360a0f9a8a56b004478b629540ce4eb25234235b7b4b9c43581'
     after = inventory(design)
-    if after != {**before, 'src/trw_pin_bs.v': evidence['candidate_sha256']}:
-        raise ValueError('Trial changes more than the reviewed one-file hardware patch')
+    if after != expected:
+        raise ValueError('Trial inputs differ from the selected candidate')
     if inventory(ROOT) != before:
         raise ValueError('Staging changed qualified inputs')
     (design / 'audit_helpers').mkdir()
@@ -113,6 +125,7 @@ def prepare(design):
         helpers[str(target.relative_to(design))] = sha(target)
     save(design / 'trial_inputs.json', dict(audit_helpers=helpers,
         baseline_inputs=before, candidate_inputs=after, patch_sha256=sha(patch),
+        variant=variant, root_mode_patch_sha256=root_mode_patch_sha256,
         screen_runner_sha256=sha(Path(__file__)), report_parser_sha256=sha(ROOT/'scripts/ci/functional_setup_frontier.py'),
         workflow_sha256=sha(ROOT/'.github/workflows/status-merge-screen.yaml'),
         evidence_sha256=sha(ROOT / 'docs/reports/phase3_status_merge_candidate_result.json'),
@@ -339,5 +352,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('stage', choices=['prepare', 'generated', 'flow', 'audit'])
     parser.add_argument('--design', type=Path, default=DEFAULT_DESIGN)
+    parser.add_argument('--variant', choices=('status-merge', 'root-mode'), default='status-merge')
     args = parser.parse_args()
-    globals()[args.stage](args.design.resolve())
+    if args.stage == 'prepare':
+        prepare(args.design.resolve(), variant=args.variant)
+    else:
+        globals()[args.stage](args.design.resolve())

@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 import pytest
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from sa_timing import prepare,replace_cases
+from sa_timing import prepare,replace_cases,validate_parent
 
 
 def script():
@@ -27,3 +27,21 @@ def test_failed_native_loading_cannot_prepare_candidate_timing(tmp_path):
     with pytest.raises(ValueError,match='actual native loading'):
         prepare(None,None,None,None,None,tmp_path,tmp_path/'timing')
     assert not (tmp_path/'timing').exists()
+
+
+def test_original_extracted_failure_must_reproduce_before_candidate():
+    import copy
+    control={'diagnostic_complete':True,
+             'error':'Configured macro setup/hold or loop-policy check fails',
+             'models':{'routed_'+kind:{'worst_slack_ns':slack,'structural_loops':0,
+                                       'loop_policy_sensitive':False}
+                       for kind,slack in (('setup',-11.108903),('hold',-1.870506))},
+             'annotation':{'routed_'+kind+'_'+policy:{'passed':True}
+                           for kind in ('setup','hold') for policy in ('static','dynamic')}}
+    validate_parent(control)
+    changed=copy.deepcopy(control);changed['models']['routed_setup']['worst_slack_ns']=1
+    with pytest.raises(ValueError,match='control changed'):validate_parent(changed)
+    changed=copy.deepcopy(control);changed['annotation']['routed_hold_dynamic']['passed']=False
+    with pytest.raises(ValueError,match='annotation'):validate_parent(changed)
+    changed=copy.deepcopy(control);changed['models']['routed_setup']['structural_loops']=1
+    with pytest.raises(ValueError,match='control changed'):validate_parent(changed)

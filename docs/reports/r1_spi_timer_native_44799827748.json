@@ -1,0 +1,54 @@
+{
+  "run": 44799827748,
+  "source_sha": "d5e057a88766d566df93b479dd28e45febb0bd18",
+  "artifact_id": 14659937162,
+  "archive_sha256": "1bd7668c936a6b4bfa78361b7d85d9a26214a47ffe6904f8295644873aba8b90",
+  "archive_bytes": 9847641,
+  "native": {
+    "run": "44799827748",
+    "source_sha": "d5e057a88766d566df93b479dd28e45febb0bd18",
+    "passed": true,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      },
+      "candidate": {
+        "passed": true,
+        "image_sha256": "5af46fa505caf0702ea91cb68cf0ede6ad51e80b6f2cabe7ec54752cabe08031",
+        "observed_configuration_sha256": "8f8f0f9a792af7d4b021226a226d1a316417def1fa48ba98676c09e3b4167341",
+        "configuration_bits": 8736
+      },
+      "shell": {
+        "passed": true,
+        "image_sha256": "5af46fa505caf0702ea91cb68cf0ede6ad51e80b6f2cabe7ec54752cabe08031",
+        "observed_configuration_sha256": "8f8f0f9a792af7d4b021226a226d1a316417def1fa48ba98676c09e3b4167341",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_timer_free_run",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "candidate_functional_passed": true
+  },
+  "independent_actual_frame_audits": 3,
+  "configuration_bits_per_audit": 8736,
+  "direct_reload_states_identical": true,
+  "timing_diagnostic_complete": false,
+  "model_qualified": false,
+  "timing_failure": "Static report reaches completion marker with four combinational loops, then process returns nonzero; exact return code was not recorded by the original runner. Other candidate timing cases do not execute. No candidate timing qualification.",
+  "member_sha256": {
+    "sa_functional/result.json": "352877f624f8ecb198b984e7d64504d0c47be95745991a58da046af45dc7d5b2",
+    "sa_functional/candidate/quiesced.wbit": "5af46fa505caf0702ea91cb68cf0ede6ad51e80b6f2cabe7ec54752cabe08031",
+    "sa_functional/candidate/configuration-state.json": "8f8f0f9a792af7d4b021226a226d1a316417def1fa48ba98676c09e3b4167341",
+    "sa_functional/shell/configuration-state.json": "8f8f0f9a792af7d4b021226a226d1a316417def1fa48ba98676c09e3b4167341",
+    "r1_loop_timing/routed_setup_static.log": "142382b5149cfe2ece5f782f1886d70de1533001c55db43c18f16d4930eebe06",
+    "r1_loop_timing/timing.log": "e3c2844156d4e80431d5439553c99b72e7dc3db18b973a89abe721647fd4b319"
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

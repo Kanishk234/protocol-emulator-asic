@@ -51,8 +51,11 @@ with independently reviewed statuses, parameters and project Python runtime.
 Fresh compilation 44798802734 reproduces the original control image exactly.
 The candidate fits at 102/128 logic cells versus 103 for the control, with
 identical pins/parameters/seed. Its compiler timing estimate is uncharacterized
-and worse; no performance improvement is claimed. Actual native/reset/reload
-and connected timing of this new image are next. Production RTL is unchanged.
+and worse; no performance improvement is claimed. 44799827748 passes actual native/reset/reload and all three frame audits, but
+STA reports four constant-rail feedback loops and exits nonzero. There is no
+qualified timing result for this variant yet. D161 tests one proved unused
+G.I0 selector at X4Y1, feeding an existing registered source, before repeating
+native/reset/reload and connected timing. Production RTL is unchanged.
 
 ## Failures kept as controls
 

@@ -1,5 +1,20 @@
 # Bugs
 
+## 170: Proved SPI source image passes native but STA reports constant-rail feedback
+
+- **Symptom/check:**44799827748 atd5e057a8 passes control/candidate/shell
+  tests and8736actual bits per case. Static STA completes its log with4
+  combinational loops, then returns nonzero; the original runner did not
+  retain the exact code. Other timing cases and model qualification do not
+  complete. Native success does not waive the failed timing execution.
+- **Observed route:** loops pass through constant-zero X4Y1/G and return
+  via unused I0 from X4Y3/LC_O. Cofactor, FF/mode, active-route and native
+  selector/register checks prove an existing one-bit alternate registered
+  source under D161. Actual repair validation remains pending.
+- **Runner observation:** future candidate timing executions record exact
+  return code, completion marker and log hash before checking success.
+  Nonzero return remains fatal; no timing result is recovered by waiver.
+
 ## 169: Bundled OSS simulation libc cannot load hosted Python 3.12
 
 - **Symptom/check:**44796772243 at87864afc again passes PDR, then venv

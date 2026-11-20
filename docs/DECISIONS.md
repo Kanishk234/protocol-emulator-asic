@@ -1,5 +1,21 @@
 # Decisions
 
+## D-161: Break the SPI image constant-zero LUT feedback with one selector
+
+- **Date:**2026-11-20.44799827748 passes actual native/reset/reload and
+  all three8736-bit audits, but candidate static STA reports4loops and exits
+  nonzero after its completion marker. No qualified candidate timing exists.
+- **Measured route:** all4reported cycles return through X4Y1/G logic; two
+  paths end at _1056_/B2 and two at C1, fed from that same B2 branch. Actual
+  G INIT0x0000/FF0/I0mux0 proves I0 irrelevant for all16cofactors. Selected
+  I0 source is X4Y3/LC_O; alternate is X4Y1/LE_O, whose existing FF output
+  is selected. Native mux/S-latch/Q tracing identifies the register.
+- **Trial/gates:** change only tile bit166, word515bit6, latch_1543_,0to1.
+  No active feature overlap or carry function changes; preserve all other
+  bits and prove expected8736frame agreement. Require fresh uninstrumented
+  native/reset/reload then zero-loop connected setup/hold at20ns/0.25ns.
+  Do not transplant old program repairs, waive loops or change hardware.
+
 ## D-160: Compile the proved SPI timer variant against an exact original control
 
 - **Date:**2026-11-20.44797232291 passes8unbounded PDR pin/host equivalence

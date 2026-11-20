@@ -4,6 +4,19 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- SPI native44799827748 atd5e057a8 passes original/candidate/reset/reload
+  with three8736-bit actual audits and identical direct/reload snapshots
+  (8f8f0f9a792af7d4b021226a226d1a316417def1fa48ba98676c09e3b4167341).
+  Loaded5af46fa505caf0702ea91cb68cf0ede6ad51e80b6f2cabe7ec54752cabe08031.
+  STA reports4loops and exits nonzero after completion; no qualified timing.
+  Receipt reports/r1_spi_timer_native_44799827748.json; BUG170.
+- D161proves unused constant-zero G.I0 feedback atX4Y1 and an alternate
+  actual registered E source. Derive only bit166/word515bit6; all other bits
+  and full expected8736frames agree. Expected raw218ac7799311951ed9f319ef151aa793128febbaaa6b67a3daa67fe07952920d,
+  expected loadedc8b8d1ecb085d798262843274ca7d24183582935502eba866b9a5a161b347c1b.
+  Local preparation and29focused tests pass; actual native/reset/reload
+  and connected zero-loop timing are next. New timing executions retain
+  per-case return codes/completion/log hashes; no failure is waived.
 - Fresh SPI compile44798802734 at693e3b6b succeeds: original control image
   reproduces byte-for-byte, exact pins/parameters/seed/strict ports preserved.
   Candidate uses102/128LCs (control103),3timers/3shifts, rawimage

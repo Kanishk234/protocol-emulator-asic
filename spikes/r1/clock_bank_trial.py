@@ -11,7 +11,7 @@ from assembly_catalog import sha
 from fixed_relocation import logical_graph
 
 
-def prepare(capsule,trial,current,out):
+def prepare(capsule,trial,current,out,fixed_placements=False):
     capsule,trial,current,out=(Path(p).resolve() for p in (capsule,trial,current,out))
     resource=capsule/'model/resource';desc=json.loads((resource/'resource-control.json').read_text())
     if any(sha(resource/p)!=h for p,h in desc['generated_sha256'].items()):raise ValueError('Frozen resource changed')
@@ -33,11 +33,33 @@ def prepare(capsule,trial,current,out):
     if logical_graph(module)!=logical_graph(pinned['modules']['warp_top']):raise ValueError('Pinning changed logic')
     out.mkdir(parents=True,exist_ok=False)
     shutil.copyfile(source/'design.json',out/'control.json');(out/'candidate.json').write_text(json.dumps(pinned)+'\n')
+    variants=None
+    if fixed_placements:
+        checkpoint=json.loads((source/'design_pnr.json').read_text())
+        original={n:c['attributes']['NEXTPNR_BEL'] for n,c in placed['cells'].items()}
+        variants={}
+        for name in ('control','reroute','candidate'):
+            derived=copy.deepcopy(checkpoint);positions=dict(original)
+            if name!='control':
+                for net in derived['modules']['top']['netnames'].values():
+                    net.get('attributes',{}).pop('ROUTING',None)
+                for cell in derived['modules']['top']['cells'].values():
+                    cell['attributes']['BEL_STRENGTH']=format(6,'032b')
+            if name=='candidate':
+                positions[cells[0]]='X0Y4/D'
+                derived['modules']['top']['cells'][cells[0]]['attributes']['NEXTPNR_BEL']='X0Y4/D'
+            if logical_graph(derived['modules']['top'])!=logical_graph(placed):raise ValueError('Fixed clock trial changes logic')
+            path=out/(name+'.json');path.write_text(json.dumps(derived)+'\n')
+            variants[name]=positions
     bound=[Path(__file__).resolve(),source/'result.json',source/'design.json',source/'design_pnr.json',source/'pins.pcf',
         source/'report.json',source/'concurrency.wbit',resource/'resource-control.json',*[resource/p for p in desc['generated_sha256']],
         current/'sa_functional/result.json',current/'r1_loop_timing/result.json',out/'control.json',out/'candidate.json']
-    (out/'plan.json').write_text(json.dumps(dict(resource=str(resource),source=str(source),clock_cell=cells[0],
-        inputs={str(p):sha(p) for p in bound},scope='Same proven SPI source, pins, seed1, model,50MHz request. Only candidate GBUF placement is USER-locked to original clock bank D; user-cell placement/routes may change. No transplanted image repairs or timing/hardware acceptance.'),indent=2)+'\n')
+    if variants:bound.append(out/'reroute.json')
+    scope=('Restore exact A checkpoint, then reroute A and D with every other user cell USER-locked to the same BEL. '
+           'Same packed graph, pins, seed1, model and50MHz request. No transplanted repairs or timing acceptance.' if variants else
+           'Same proven SPI source, pins, seed1, model,50MHz request. Only candidate GBUF placement is USER-locked to original clock bank D; user-cell placement/routes may change. No transplanted image repairs or timing/hardware acceptance.')
+    (out/'plan.json').write_text(json.dumps(dict(resource=str(resource),source=str(source),clock_cell=cells[0],fixed_placements=variants,
+        inputs={str(p):sha(p) for p in bound},scope=scope),indent=2)+'\n')
 
 
 def run(out):
@@ -53,11 +75,16 @@ def run(out):
     resource,source=Path(plan['resource']),Path(plan['source']);result=dict(run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),cases={},diagnostic_complete=False,timing_acceptance=False,physical_acceptance=False,adopted=False,scope=plan['scope'])
     control_graph=None
     try:
-        for name,bank in (('control','X0Y4/A'),('candidate','X0Y4/D')):
+        variants=plan.get('fixed_placements')
+        cases=(('control','X0Y4/A'),('reroute','X0Y4/A'),('candidate','X0Y4/D')) if variants else (('control','X0Y4/A'),('candidate','X0Y4/D'))
+        for name,bank in cases:
             folder=out/name;folder.mkdir()
             command=[binary,'--uarch','fabulous','--json',str(out/(name+'.json')),'--write',str(folder/'design_pnr.json'),
                 '-o','fasm='+str(folder/'design.fasm'),'-o','pcf='+str(source/'pins.pcf'),'-o','corner='+compiler.SLOW_CORNER,
                 '--seed','1','--freq','50','--timing-allow-fail','--log',str(folder/'pnr.log')]
+            if variants:
+                command.append('--no-pack')
+                if name=='control':command.append('--no-place')
             previous=os.environ.get('FAB_ROOT');os.environ['FAB_ROOT']=str(resource/'macro/fabulous')
             try:run_bounded(command,folder/'stdout.log')
             finally:
@@ -65,6 +92,8 @@ def run(out):
                 else:os.environ['FAB_ROOT']=previous
             module=json.loads((folder/'design_pnr.json').read_text())['modules']['top'];clock=module['cells'][plan['clock_cell']]
             if clock['attributes']['NEXTPNR_BEL']!=bank:raise ValueError('Clock bank constraint changed')
+            if variants and {n:c['attributes']['NEXTPNR_BEL'] for n,c in module['cells'].items()}!=variants[name]:
+                raise ValueError('Fixed clock trial moved another cell')
             graph=logical_graph(module)
             if name=='control':control_graph=graph
             elif graph!=control_graph:raise ValueError('Clock constraint changes logical graph')
@@ -76,7 +105,8 @@ def run(out):
             report=dict(params=json.loads((source/'report.json').read_text())['params'],provenance=dict(bitfile_sha256=sha(image),kind='Same proven SPI source with explicit clock-bank placement experiment',parent_report_sha256=sha(source/'report.json')))
             (folder/'report.json').write_text(json.dumps(report,indent=2)+'\n')
             result['cases'][name]=dict(image_sha256=sha(image),clock_bank=bank,logical_graph_preserved=True,placed_utilisation=util,model_fmax_mhz=estimate,model_timing_characterized=False)
-        if result['cases']['control']['placed_utilisation']!=result['cases']['candidate']['placed_utilisation']:raise ValueError('Resource usage changed')
+            if variants:result['cases'][name]['placements_exact']=True
+        if any(row['placed_utilisation']!=result['cases']['control']['placed_utilisation'] for row in result['cases'].values()):raise ValueError('Resource usage changed')
         result['diagnostic_complete']=True
     except Exception as exc:result['error']=str(exc);raise
     finally:(out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
@@ -86,5 +116,6 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='mode',required=True)
     x=sub.add_parser('prepare')
     for name in ('capsule','trial','current','out'):x.add_argument('--'+name,type=Path,required=True)
+    x.add_argument('--fixed-placements',action='store_true')
     sub.add_parser('run').add_argument('--out',type=Path,required=True)
     a=vars(p.parse_args());mode=a.pop('mode');(prepare if mode=='prepare' else run)(**a)

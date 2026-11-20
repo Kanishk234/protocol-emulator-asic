@@ -1,0 +1,78 @@
+name: R1 loaded feedback repair extracted timing
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_feedback_timing.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-feedback-timing
+  cancel-in-progress: false
+jobs:
+  timing:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_routed_pdk
+      PYTHONPATH: tools:test_internal:spikes/r1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate geometry, source proof, real image and timing controls
+        timeout-minutes: 20
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_routed_timing.py tools/profiling/tests/test_r1_sa_timing.py
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          repo=os.environ['GITHUB_REPOSITORY']
+          out=Path('build/r1_routed_sources').resolve();out.mkdir(parents=True,exist_ok=False)
+          roots={}
+          sources=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']
+          sources['functional']={'run': {'id': 44786871916, 'head_sha': '144616d15398b02a9d3ef92aba75d915d00619a2', 'head_branch': 'efpga', 'run_attempt': 1, 'conclusion': 'success', 'path': '.github/workflows/r1_unused_feedback.yaml'}, 'artifact': {'id': 14655216803, 'name': 'r1-unused-feedback-native-44786871916', 'digest': 'sha256:c2653d11d222188c551399b18be72271c222d1e7bf0718a75ab401f8b6e566ee', 'size_in_bytes': 11142768, 'source_run': 44786871916}, 'member': 'sa_functional'}
+          for name,row in sources.items():
+              actual=api(f'repos/{repo}/actions/runs/{row["run"]["id"]}')
+              admit_run(actual,row['run'])
+              (out/(name+'.producer.json')).write_text(json.dumps(actual,indent=2)+'\n')
+              roots[name]=str(artifact(repo,row['artifact'],out)/row['member'])
+          (out/'locations.json').write_text(json.dumps(roots,indent=2)+'\n')
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from sa_timing import prepare
+          roots=json.loads(Path('build/r1_routed_sources/locations.json').read_text())
+          prepare(**roots,pdk=Path(os.environ['PDK_ROOT']),out=Path('build/r1_routed_timing'))
+          PY
+      - name: Analyze the geometry-identical connected RC model with active coverage
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_routed_timing/image.json
+          timeout 1080s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PYTHONPATH -e GITHUB_RUN_ID -e GITHUB_SHA "$image" \
+            python3 spikes/r1/sa_timing.py run --out build/r1_routed_timing > build/r1_routed_timing/timing.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-feedback-timing-${{ github.run_id }}
+          path: |
+            build/r1_routed_timing/
+            build/r1_routed_sources/*.metadata.json
+            build/r1_routed_sources/*.producer.json
+            build/r1_routed_sources/locations.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

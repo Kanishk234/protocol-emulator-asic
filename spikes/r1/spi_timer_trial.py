@@ -1,6 +1,7 @@
 """Stage an isolated SPI free-running timer experiment; production sources unchanged."""
 import argparse
 import json
+import re
 from pathlib import Path
 
 from assembly_catalog import sha
@@ -51,11 +52,19 @@ def prepare(out,mode,half):
         adopted=False,timing_acceptance=False,scope='Only SPI user-program hard-timer enable changes to constant1; timer still reloads on accept. Idle timer activity may increase. Full binary pin/host equivalence after initial reset and independent protocol tests required; no fabric/hardware, native or timing acceptance.'),indent=2)+'\n')
 
 
+
+def admit_status(status,proof_log):
+    if (not re.fullmatch(r'PASS(?: \d+){0,2}',status.strip()) or
+            proof_log.count('DONE (PASS, rc=0)')!=1 or
+            'engine_0 (abc pdr) returned PASS' not in proof_log):
+        raise ValueError('No completed unbounded PDR equivalence pass')
+
+
 def audit(out):
     from autonomy.check_xml import check_xml
     out=Path(out).resolve();plan=json.loads((out/'plan.json').read_text())
     if any(sha(p)!=h for p,h in plan['inputs'].items()):raise ValueError('Protocol proof input changed')
-    if (out/'equiv/status').read_text().strip()!='PASS':raise ValueError('No unbounded equivalence pass')
+    admit_status((out/'equiv/status').read_text(),(out/'proof.log').read_text())
     tests=check_xml(out/'results.xml',4)
     result=dict(equivalence_passed=True,scope='Unbounded binary RTL output equivalence of original and free-running-timer SPI for this mode/HALF, PRIMS1, initial synchronous reset; arbitrary subsequent host/MISO/reset inputs. Independent source protocol tests separately executed.',
         mode=plan['mode'],half=plan['half'],strict_source_tests=len(tests),native_functional_passed=False,

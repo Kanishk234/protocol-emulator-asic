@@ -4,6 +4,20 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D161actual44802619585 at9f3f7b4f passes native/reset/reload and all
+  three8736-bit audits; source rail feedback is repaired (zero loops under
+  both policies). Root replays four zero execution codes, original control,
+  complete script identity and coverage, but timing is worse: setup
+  -21.419043ns/hold-2.660251ns. Receipt:
+  reports/r1_spi_timer_rail_44802619585.json. Keep earlier -9.795382ns
+  image as better measured candidate; no source-variant adoption.
+- New SPI PNR uses GBUF A; all370FFclocked versus134inactive earlier.
+  Worst setup ends at unused X1Y1/D FF (actual FF select0; no placed user
+  cell). D162isolates clock allocation: same synthesized SPI source and
+  seed, compare exact A control with only GBUF USER-pinned to original D.
+  Local no-route native placement honors D; logical input graph and frozen
+  resource preparation pass. Fresh hosted routing, then native/RC gates
+  remain next. Do not waive unused-register timing or copy old repairs.
 - SPI native44799827748 atd5e057a8 passes original/candidate/reset/reload
   with three8736-bit actual audits and identical direct/reload snapshots
   (8f8f0f9a792af7d4b021226a226d1a316417def1fa48ba98676c09e3b4167341).

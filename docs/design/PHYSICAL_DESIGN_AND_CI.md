@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 SPI source follow-up:**44802619585 passes native/reset/reload,
+all three actual frame audits, zero loops and complete active annotation but
+is worse: setup-21.419043ns/hold-2.660251ns. It is not adopted; earlier
+44794158025 remains the better measured candidate. New SPI placement uses
+GBUF A and clocks all370registers; the earlier D-bank result has134inactive.
+D162tests only clock-bank allocation on the same synthesized SPI source,
+without changing hardware, constraints or waiving unused-register timing.
+
 **November20 current qualified negative timing:**44794158025 ate5096f6a
 passes actual native/reset/reload and complete active annotation, all370FF
 classified/244endpoints, zero loops under both policies and identical slacks.

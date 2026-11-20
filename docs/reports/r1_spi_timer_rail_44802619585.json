@@ -1,0 +1,140 @@
+{
+  "run": 44802619585,
+  "source_sha": "9f3f7b4f8e3f43ae01e77f228b5e104cd1b4afb6",
+  "artifact_id": 14661194562,
+  "archive_sha256": "5b219d3fd47ca23835fd342d78bdafe6ba5c08a9aa354709847636261f6bf54e",
+  "archive_bytes": 10019750,
+  "native": {
+    "run": "44802619585",
+    "source_sha": "9f3f7b4f8e3f43ae01e77f228b5e104cd1b4afb6",
+    "passed": true,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      },
+      "candidate": {
+        "passed": true,
+        "image_sha256": "c8b8d1ecb085d798262843274ca7d24183582935502eba866b9a5a161b347c1b",
+        "observed_configuration_sha256": "9ce97c009b7845448cbc0b2678717fba830a5b09006ace736b3aa61e37135dbf",
+        "configuration_bits": 8736
+      },
+      "shell": {
+        "passed": true,
+        "image_sha256": "c8b8d1ecb085d798262843274ca7d24183582935502eba866b9a5a161b347c1b",
+        "observed_configuration_sha256": "9ce97c009b7845448cbc0b2678717fba830a5b09006ace736b3aa61e37135dbf",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_timer_free_run",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "candidate_functional_passed": true
+  },
+  "timing": {
+    "run": "44802619585",
+    "source_sha": "9f3f7b4f8e3f43ae01e77f228b5e104cd1b4afb6",
+    "diagnostic_complete": true,
+    "models": {
+      "setup": {
+        "edge_registers": 370,
+        "inactive_unobservable": 0,
+        "clocked_timed": 265,
+        "clocked_constant_data": 105,
+        "endpoints": 285,
+        "worst_slack_ns": -21.419043,
+        "worst_endpoint": "Tile_X1Y1_LUT4x8_ha/_1732_/D",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      },
+      "hold": {
+        "edge_registers": 370,
+        "inactive_unobservable": 0,
+        "clocked_timed": 265,
+        "clocked_constant_data": 105,
+        "endpoints": 285,
+        "worst_slack_ns": -2.660251,
+        "worst_endpoint": "Tile_X7Y1_E_IO4/_274_/D",
+        "structural_loops": 0,
+        "loop_policy_sensitive": false,
+        "loop_policy_differences": [],
+        "structural_loops_by_policy": {
+          "static": 0,
+          "dynamic": 0
+        }
+      }
+    },
+    "coverage": {
+      "routed_setup_static": {
+        "active_pins": 14434,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_setup_dynamic": {
+        "active_pins": 14434,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_static": {
+        "active_pins": 14434,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      },
+      "routed_hold_dynamic": {
+        "active_pins": 14434,
+        "fully_missing_drivers": 35,
+        "partially_missing_loads": 0,
+        "active_missing_drivers": [],
+        "passed": true
+      }
+    },
+    "model_qualified": true,
+    "necessary_macro_constraints_met": false,
+    "actual_native_run": "44802619585",
+    "actually_loaded_image_sha256": "c8b8d1ecb085d798262843274ca7d24183582935502eba866b9a5a161b347c1b",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "scope": "Actually loaded placement image on unchanged source-proven connected nominal RC, original 20ns/0.25ns/conditional zero-I/O boundary. Original failing parent retained. No full-chip/PVT/loading-mode acceptance."
+  },
+  "independent_review": {
+    "three_actual_frame_audits": 8736,
+    "direct_reload_states_identical": true,
+    "original_timing_control_and_four_complete_script_reversals": "pass",
+    "all_four_execution_codes_zero_and_loops_zero": true,
+    "full_active_annotation_and_slack_replay": "pass"
+  },
+  "clock_observation": {
+    "gbuf_bank": "X0Y4/A",
+    "clocked_edge_registers": 370,
+    "inactive_unobservable": 0,
+    "worst_setup_bel_has_no_placed_user_cell": true,
+    "worst_setup_bel_ff_output_selected": false,
+    "original_selected_clock_bank": "X0Y4/D",
+    "inference": "Test bank allocation as a confounder before judging the SPI source change; do not waive unused-register timing or adopt this worse image."
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "member_sha256": {
+    "sa_functional/result.json": "692d949b9089e4a774700e43658da0c99b2f0f226c080cbff6073fd94dca1f63",
+    "sa_functional/candidate/quiesced.wbit": "c8b8d1ecb085d798262843274ca7d24183582935502eba866b9a5a161b347c1b",
+    "sa_functional/candidate/configuration-state.json": "9ce97c009b7845448cbc0b2678717fba830a5b09006ace736b3aa61e37135dbf",
+    "sa_functional/shell/configuration-state.json": "9ce97c009b7845448cbc0b2678717fba830a5b09006ace736b3aa61e37135dbf",
+    "r1_loop_timing/result.json": "7d6ad78c48a90647f1a431d3bfaa28c732c7991e4f723770d266b732d4ae15ae"
+  }
+}

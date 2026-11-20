@@ -1,5 +1,26 @@
 # Decisions
 
+## D-162: Control global clock-bank allocation before comparing SPI implementations
+
+- **Date:**2026-11-20.44802619585 passes native/reload, all actual frames,
+  zero loops and active annotation, but setup -21.419043ns/hold-2.660251ns
+  are worse. All370registers are clocked versus134inactive in the earlier
+  D-bank implementation. Fresh SPI PNR allocates GBUF X0Y4/A; worst setup
+  ends at an unplaced-user-cell BEL X1Y1/D with actual FF output select0.
+- **Hypothesis:** allocation of bank A activates default clock selections on
+  unused resources. Do not waive their timing or promote the worse image.
+  Re-test the same proved SPI source with only GBUF constrained to the
+  original bank X0Y4/D. User-cell placement/routes may change; their logical
+  graph, primitive use, pins, seed1, model and50MHz request must not.
+- **Controls/gates:** reproduce the original fresh SPI raw image79db28...
+  in the unconstrained control. Candidate changes only two input attributes
+  on the single GBUF: NEXTPNR_BEL and USER strength6. Native no-route local
+  placement confirms the constraint is honored; heavy routing stays hosted.
+  No old selector repair may be transplanted to a new placement. Require
+  fresh actual native/reset/reload and complete connected timing, all actual
+  configuration cases, clock/FF coverage and both loop policies. Hardware,
+  G1 and20ns/0.25nsconditions remain fixed.
+
 ## D-161: Break the SPI image constant-zero LUT feedback with one selector
 
 - **Date:**2026-11-20.44799827748 passes actual native/reset/reload and

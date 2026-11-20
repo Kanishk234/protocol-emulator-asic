@@ -57,6 +57,23 @@ qualified timing result for this variant yet. D161 tests one proved unused
 G.I0 selector at X4Y1, feeding an existing registered source, before repeating
 native/reset/reload and connected timing. Production RTL is unchanged.
 
+## Latest SPI source measurement and clock-bank follow-up
+
+44802619585 passes the one-bit rail repair, actual native/reset/reload,
+all three 8736-bit audits and zero-loop fully annotated timing. Its measured
+setup is **−21.419043 ns**, hold **−2.660251 ns**, so it is worse and unadopted.
+The better measured prior image remains the −9.795382/−1.867277 ns result above.
+See [rail result](r1_spi_timer_rail_44802619585.json).
+
+The fresh placement allocates GBUF X0Y4/A, and all 370 edge registers are
+clocked. The earlier bank-D result has 134 inactive registers. The new worst
+setup endpoint is a register at X1Y1/D with FF output select 0 and no placed
+user cell. D162 tests clock-bank allocation as a confounder: reproduce the
+same SPI source/control image, then constrain only the GBUF to X0Y4/D.
+Native local no-route placement honors the constraint. Actual routing,
+configuration loading and full timing must pass before drawing conclusions;
+no unused-register path is waived.
+
 ## Failures kept as controls
 
 - 44678070512: moved image stalls during direct traffic; all 8736 observed bits match.

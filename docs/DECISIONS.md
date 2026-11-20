@@ -1,5 +1,21 @@
 # Decisions
 
+## D-150: Request the intended placement frequency in one matched primary trial
+
+- **Date:** 2026-11-19. BUG159: frozen primary nextpnr logs explicitly target
+  12 MHz because the compiler does not pass `--freq`. The chip target is 50 MHz.
+- **Experiment:** authenticate capsule 40128859740 and all generated model
+  hashes. Re-place the frozen synthesized primary netlist using the pinned
+  nextpnr, original pin constraints, seed 1 and original timeout. The control
+  must reproduce the original raw image byte-for-byte. The candidate adds
+  only `--freq 50`; require native frequency-target evidence for each case.
+- **Limits:** no model scaling, resynthesis, architecture, hardware, pin-map,
+  protocol or production-default change. Retain failures. Compiler estimates
+  remain explicitly uncharacterized; no native loading or physical timing is
+  inferred from a successful placement. Validate any resulting image through
+  actual native loading/reset/reload and the connected extracted model before
+  adoption. The standard-cell physical target stays 20 ns throughout.
+
 ## D-149: Separate timing endpoint and launch classes before choosing a repair
 
 - **Date:** 2026-11-19. The D-148 sweep does not close timing. A conservative

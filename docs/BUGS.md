@@ -1,5 +1,20 @@
 # Bugs
 
+## 159: Compiler placement target defaults to 12 MHz instead of requesting 50 MHz
+
+- **Symptom/evidence:** original primary compile in capsule 40128859740 logs
+  `PASS at 12.00 MHz`; `compile_design` passes no `--freq` argument. The
+  hardware target remains 20 ns. A reported model frequency is not closure.
+- **Root cause:** nextpnr's implicit default is used instead of explicitly
+  requesting the intended placement target.
+- **Next check:** D-150 reproduces the original same-seed image byte-for-byte,
+  then changes only the requested nextpnr frequency to 50 MHz. Preserve the
+  original synthesized netlist, pins, model and process-group time bounds.
+  The native log must name the requested target, even if model timing fails.
+- **Coverage:** focused admission tests reject a 12 MHz log as 50 MHz evidence.
+  No production compiler default changes or candidate adoption precede review;
+  native loading and extracted configured timing remain mandatory.
+
 ## 158: Unused LUT-input proof must also cover carry side effects
 
 - **Symptom:** the initial D-148 selector preflight checked all LUT cofactors,

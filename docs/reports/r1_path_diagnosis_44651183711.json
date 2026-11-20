@@ -1,0 +1,389 @@
+{
+  "run": "44651183711",
+  "source_sha": "bbdec58f1850d01a061307983a895dd2c93d6958",
+  "artifact": {
+    "id": 14591650897,
+    "name": "r1-path-diagnosis-44651183711",
+    "bytes": 1136735,
+    "sha256": "73db3ffff90b07e576ef198c1006fb6e0839f08d05e37253c886973f87426a17"
+  },
+  "diagnostic_complete": true,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "endpoint_groups": {
+    "routed_setup_static": {
+      "internal_register": {
+        "count": 225,
+        "negative_count": 55,
+        "worst": [
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2191_/D",
+            "slack_ns": -9.855256
+          },
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2184_/D",
+            "slack_ns": -9.776772
+          },
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2190_/D",
+            "slack_ns": -9.763021
+          }
+        ]
+      },
+      "macro_output": {
+        "count": 21,
+        "negative_count": 8,
+        "worst": [
+          {
+            "endpoint": "Tile_X2Y4_B_IN_top",
+            "slack_ns": -11.108903
+          },
+          {
+            "endpoint": "Tile_X0Y3_C_IN_top",
+            "slack_ns": -7.354153
+          },
+          {
+            "endpoint": "Tile_X1Y0_A_IN_top",
+            "slack_ns": -5.828526
+          }
+        ]
+      }
+    },
+    "routed_setup_dynamic": {
+      "internal_register": {
+        "count": 225,
+        "negative_count": 55,
+        "worst": [
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2191_/D",
+            "slack_ns": -9.855256
+          },
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2184_/D",
+            "slack_ns": -9.776772
+          },
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2190_/D",
+            "slack_ns": -9.763021
+          }
+        ]
+      },
+      "macro_output": {
+        "count": 21,
+        "negative_count": 8,
+        "worst": [
+          {
+            "endpoint": "Tile_X2Y4_B_IN_top",
+            "slack_ns": -11.108903
+          },
+          {
+            "endpoint": "Tile_X0Y3_C_IN_top",
+            "slack_ns": -7.354153
+          },
+          {
+            "endpoint": "Tile_X1Y0_A_IN_top",
+            "slack_ns": -5.828526
+          }
+        ]
+      }
+    },
+    "routed_hold_static": {
+      "internal_register": {
+        "count": 225,
+        "negative_count": 109,
+        "worst": [
+          {
+            "endpoint": "Tile_X6Y1_LUT4x8_ha/_1730_/D",
+            "slack_ns": -1.870506
+          },
+          {
+            "endpoint": "Tile_X4Y1_LUT4x8_ha/_1729_/D",
+            "slack_ns": -1.452879
+          },
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+            "slack_ns": -1.340387
+          }
+        ]
+      },
+      "macro_output": {
+        "count": 21,
+        "negative_count": 0,
+        "worst": [
+          {
+            "endpoint": "Tile_X2Y4_B_IN_top",
+            "slack_ns": 2.208777
+          },
+          {
+            "endpoint": "Tile_X6Y0_A_IN_top",
+            "slack_ns": 3.360052
+          },
+          {
+            "endpoint": "Tile_X2Y0_A_EN_top",
+            "slack_ns": 4.00674
+          }
+        ]
+      }
+    },
+    "routed_hold_dynamic": {
+      "internal_register": {
+        "count": 225,
+        "negative_count": 109,
+        "worst": [
+          {
+            "endpoint": "Tile_X6Y1_LUT4x8_ha/_1730_/D",
+            "slack_ns": -1.870506
+          },
+          {
+            "endpoint": "Tile_X4Y1_LUT4x8_ha/_1729_/D",
+            "slack_ns": -1.452879
+          },
+          {
+            "endpoint": "Tile_X2Y2_PRIM2T2S/_2201_/D",
+            "slack_ns": -1.340387
+          }
+        ]
+      },
+      "macro_output": {
+        "count": 21,
+        "negative_count": 0,
+        "worst": [
+          {
+            "endpoint": "Tile_X2Y4_B_IN_top",
+            "slack_ns": 2.208777
+          },
+          {
+            "endpoint": "Tile_X6Y0_A_IN_top",
+            "slack_ns": 3.360052
+          },
+          {
+            "endpoint": "Tile_X2Y0_A_EN_top",
+            "slack_ns": 4.00674
+          }
+        ]
+      }
+    }
+  },
+  "expanded_path_classes": {
+    "routed_setup_static": {
+      "register_to_register": [
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2191_",
+          "slack_ns": -9.855256
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2184_",
+          "slack_ns": -9.776772
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2190_",
+          "slack_ns": -9.763021
+        }
+      ],
+      "input_to_register": [
+        {
+          "launch": "Tile_X3Y4_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X1Y2_LUT4x8_ha/_1735_",
+          "slack_ns": -1.618007
+        },
+        {
+          "launch": "Tile_X3Y4_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X2Y1_LUT4x8_ha/_1730_",
+          "slack_ns": -0.646128
+        },
+        {
+          "launch": "Tile_X3Y4_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X2Y1_LUT4x8_ha/_1734_",
+          "slack_ns": -0.643771
+        }
+      ],
+      "register_to_output": [
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y4_B_IN_top (output port clocked by run)",
+          "slack_ns": -11.108903
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X0Y3_C_IN_top (output port clocked by run)",
+          "slack_ns": -7.354153
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X1Y0_A_IN_top (output port clocked by run)",
+          "slack_ns": -5.828526
+        }
+      ]
+    },
+    "routed_setup_dynamic": {
+      "register_to_register": [
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2191_",
+          "slack_ns": -9.855256
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2184_",
+          "slack_ns": -9.776772
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2190_",
+          "slack_ns": -9.763021
+        }
+      ],
+      "input_to_register": [
+        {
+          "launch": "Tile_X3Y4_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X1Y2_LUT4x8_ha/_1735_",
+          "slack_ns": -1.618007
+        },
+        {
+          "launch": "Tile_X3Y4_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X2Y1_LUT4x8_ha/_1730_",
+          "slack_ns": -0.646128
+        },
+        {
+          "launch": "Tile_X3Y4_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X2Y1_LUT4x8_ha/_1734_",
+          "slack_ns": -0.643771
+        }
+      ],
+      "register_to_output": [
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X2Y4_B_IN_top (output port clocked by run)",
+          "slack_ns": -11.108903
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X0Y3_C_IN_top (output port clocked by run)",
+          "slack_ns": -7.354153
+        },
+        {
+          "launch": "Tile_X6Y3_LUT4x8_ha/_1730_",
+          "capture": "Tile_X1Y0_A_IN_top (output port clocked by run)",
+          "slack_ns": -5.828526
+        }
+      ]
+    },
+    "routed_hold_static": {
+      "register_to_register": [
+        {
+          "launch": "Tile_X2Y2_PRIM2T2S/_2183_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2183_",
+          "slack_ns": -0.047458
+        },
+        {
+          "launch": "Tile_X5Y2_PRIM2T2S/_2183_",
+          "capture": "Tile_X5Y2_PRIM2T2S/_2183_",
+          "slack_ns": -0.042866
+        },
+        {
+          "launch": "Tile_X5Y2_PRIM2T2S/_2185_",
+          "capture": "Tile_X5Y2_PRIM2T2S/_2185_",
+          "slack_ns": -0.035167
+        }
+      ],
+      "input_to_register": [
+        {
+          "launch": "Tile_X7Y1_B_OUT_top (input port clocked by run)",
+          "capture": "Tile_X6Y1_LUT4x8_ha/_1730_",
+          "slack_ns": -1.870506
+        },
+        {
+          "launch": "Tile_X4Y0_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X4Y1_LUT4x8_ha/_1729_",
+          "slack_ns": -1.452879
+        },
+        {
+          "launch": "Tile_X2Y0_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2201_",
+          "slack_ns": -1.340387
+        }
+      ],
+      "register_to_output": [
+        {
+          "launch": "Tile_X6Y1_LUT4x8_ha/_1731_",
+          "capture": "Tile_X6Y0_A_IN_top (output port clocked by run)",
+          "slack_ns": 3.360052
+        },
+        {
+          "launch": "Tile_X1Y3_LUT4x8_ha/_1734_",
+          "capture": "Tile_X2Y4_B_IN_top (output port clocked by run)",
+          "slack_ns": 3.899009
+        },
+        {
+          "launch": "Tile_X1Y2_LUT4x8_ha/_1732_",
+          "capture": "Tile_X2Y0_A_EN_top (output port clocked by run)",
+          "slack_ns": 4.00674
+        }
+      ]
+    },
+    "routed_hold_dynamic": {
+      "register_to_register": [
+        {
+          "launch": "Tile_X2Y2_PRIM2T2S/_2183_",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2183_",
+          "slack_ns": -0.047458
+        },
+        {
+          "launch": "Tile_X5Y2_PRIM2T2S/_2183_",
+          "capture": "Tile_X5Y2_PRIM2T2S/_2183_",
+          "slack_ns": -0.042866
+        },
+        {
+          "launch": "Tile_X5Y2_PRIM2T2S/_2185_",
+          "capture": "Tile_X5Y2_PRIM2T2S/_2185_",
+          "slack_ns": -0.035167
+        }
+      ],
+      "input_to_register": [
+        {
+          "launch": "Tile_X7Y1_B_OUT_top (input port clocked by run)",
+          "capture": "Tile_X6Y1_LUT4x8_ha/_1730_",
+          "slack_ns": -1.870506
+        },
+        {
+          "launch": "Tile_X4Y0_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X4Y1_LUT4x8_ha/_1729_",
+          "slack_ns": -1.452879
+        },
+        {
+          "launch": "Tile_X2Y0_A_OUT_top (input port clocked by run)",
+          "capture": "Tile_X2Y2_PRIM2T2S/_2201_",
+          "slack_ns": -1.340387
+        }
+      ],
+      "register_to_output": [
+        {
+          "launch": "Tile_X6Y1_LUT4x8_ha/_1731_",
+          "capture": "Tile_X6Y0_A_IN_top (output port clocked by run)",
+          "slack_ns": 3.360052
+        },
+        {
+          "launch": "Tile_X1Y3_LUT4x8_ha/_1734_",
+          "capture": "Tile_X2Y4_B_IN_top (output port clocked by run)",
+          "slack_ns": 3.899009
+        },
+        {
+          "launch": "Tile_X1Y2_LUT4x8_ha/_1732_",
+          "capture": "Tile_X2Y0_A_EN_top (output port clocked by run)",
+          "slack_ns": 4.00674
+        }
+      ]
+    }
+  },
+  "native_log_sha256": {
+    "routed_hold_static.log": "cfd40e134f942997f2163f8ff25de3d7f84783b1dbf69d2ed1fc7ba2009800f2",
+    "routed_setup_dynamic.log": "48e87254bc7739919358e272564a9c78f451f420ca2508c053c91c8ba6cb2b97",
+    "routed_setup_static.log": "48e87254bc7739919358e272564a9c78f451f420ca2508c053c91c8ba6cb2b97",
+    "routed_hold_dynamic.log": "cfd40e134f942997f2163f8ff25de3d7f84783b1dbf69d2ed1fc7ba2009800f2"
+  },
+  "scope": "Additional path reports on the unchanged authenticated failing macro model. Internal endpoint means capture inside macro; launch can still be an external input. Expanded reports distinguish launch classes. No boundary waiver or full-chip acceptance.",
+  "review": "Root replays all four endpoint partitions, active annotation, loop-policy comparison and script hashes; original failure remains."
+}

@@ -4,6 +4,21 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-19 — Continue timing diagnosis while user is away
 
+- Expanded-path run 44651183711 at bbdec58f succeeds. Root replays endpoint
+  partitions, active annotation, loop-policy agreement and script hashes.
+  Worst register-to-register setup is -9.855256 ns; input-to-register setup
+  -1.618007 ns. Worst register-to-register hold is -0.047458 ns, versus
+  -1.870506 ns for input-to-register hold. Receipt:
+  reports/r1_path_diagnosis_44651183711.json. This is diagnosis, not closure.
+- BUG159/D-150: the original primary placement log targets 12 MHz, with no
+  explicit `--freq` in the compiler invocation. Prepare one matched original-
+  image control and an explicit 50 MHz placement trial on frozen synthesis.
+  No production compiler/model/hardware change or candidate adoption.
+- A read-only power-interface check finds ten full-height VPWR columns and
+  nine VGND columns in the assembled macro's declared access. Before using
+  the enclosing G1 stripe grid, check its missing ground-column position
+  against the actual PDN overlap guard. This is an integration question, not
+  a newly measured physical failure or a waiver of the existing guard.
 - GitHub confirms all five triggered workflows green at 06cb5498: docs
   44633094837, unit 44633094718, test 44633094678, lint 44633094763 and fabric
   44633094733. No new hardening was triggered by those checks/docs changes.

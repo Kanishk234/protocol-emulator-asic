@@ -7,8 +7,11 @@
   bundled libm without GLIBC_2.38. No source test executes in that case.
 - **Fix/coverage:** use the normal CI system Icarus for source simulation,
   with project venv Python/cocotb first in PATH; retain pinned OSS tools
-  for formal only. Local system-Icarus/venv mode0 HALF4 executes all four
-  source tests successfully. Rerun all eight hosted cases before admission.
+  for formal only. The local system-Icarus/venv mode0 HALF4 check executes
+  tests but fails three sigrok comparisons (empty decoded byte lists); only
+  overrun passes. A previous local-pass note was recorded before inspecting
+  the completed XML and is withdrawn. Compare original source under the same
+  environment; rerun all eight hosted cases before admission.
 
 ## 168: SPI experiment auditor rejects standard SBY PASS metadata
 

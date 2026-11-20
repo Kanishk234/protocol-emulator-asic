@@ -8,7 +8,8 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
   simulation fails before execution: bundled OSS libm cannot load hosted
   Python3.12 (BUG169). Switch source simulation to ordinary-CI system
   Icarus, preserving project venv; formal keeps pinned OSS. Local mode0
-  HALF4 on system Icarus executes four strict passing source tests.
+  HALF4 executes tests but fails three sigrok comparisons; overrun passes.
+  The prematurely recorded local-pass claim is withdrawn after XML review.
   Rerun all eight cases; no compiler/native/timing admission yet.
 - SPI experiment44796314987 at6449167d reaches actual PDR PASS and four
   source test passes in inspected mode0/HALF4, then status auditor rejects

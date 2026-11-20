@@ -4,6 +4,11 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- SPI experiment44796314987 at6449167d reaches actual PDR PASS and four
+  source test passes in inspected mode0/HALF4, then status auditor rejects
+  standard `PASS 0 1` metadata (BUG168). Correct strict status/log admission
+  and preserve project venv precedence; use cd for PWD-based protocol make.
+  Rerun the full eight-case matrix; no compiled/native/timing acceptance.
 - D158actual44794158025 ate5096f6a passes native/reset/reload and qualified
   timing with zero loops/full active coverage. Setup improves0.397685ns to
   -9.795382ns; hold unchanged-1.867277ns. Root replays all four8736-bit

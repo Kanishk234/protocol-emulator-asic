@@ -1,5 +1,18 @@
 # Bugs
 
+## 168: SPI experiment auditor rejects standard SBY PASS metadata
+
+- **Symptom/check:**44796314987 at6449167d completes unbounded PDR and
+  four independent source tests in the first inspected mode0/HALF4 case,
+  then audit fails. Pinned SBY writes `PASS 0 1`, not just `PASS`.
+- **Cause/fix:** admit the pinned numeric suffix only with one completed
+  successful PDR log verdict; reject FAIL/UNKNOWN/malformed/incomplete output.
+  Guard tests cover these mutations. Keep the original failed workflow.
+- **Environment correction:** prepend the project venv before the suite,
+  keeping project Python/cocotb in the venv. Invoke protocol make after cd so
+  its PWD-based paths are correct. Rerun all modes/divisors before accepting
+  the experiment; no compile/native/timing claim follows from partial output.
+
 ## 167: Qualified worst setup path traverses a truth-independent LUT input
 
 - **Symptom/check:**44792141462 passes native and timing-model gates but

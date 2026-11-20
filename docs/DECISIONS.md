@@ -1,5 +1,22 @@
 # Decisions
 
+## D-157: Remove the remaining unused-input timing loop with a registered source
+
+- **Date:** 2026-11-20.44790210039 completes all four candidate timing
+  reports with full active annotation, but one structural loop at X6Y3/E.
+  The original failing baseline reproduces. Candidate timing is unqualified;
+  reported setup -10.193067 ns and hold -1.867277 ns are not closure evidence.
+- **Measured cause:** actual loaded INIT 0x330f ignores E.I0, whose selected
+  route returns LE_O. Existing alternate route terminates X2Y3/LF_O; actual
+  native _1402_ configures its FF output (F.FF=1). No new register is inserted.
+- **Trial/gates:** add only tile bit218 (word759 bit26), native _1531_,0to1
+  on top of D156. Recheck all cofactors, no active-feature overlap, carry
+  noninterference, expected8736frames and exact one additional bit. Rebuild
+  D156 from its frozen sources before modifying anything. Original/reroute
+  controls and uninstrumented native/reset/reload must pass, then the same
+  connected RC runs automatically. Both loop policies must have zero loops.
+  G1, physical hardware, ABI and20ns/0.25nsconstraints remain fixed.
+
 ## D-156: Break the observed unused LUT feedback with one existing selector
 
 - **Date:** 2026-11-20. Read-only VPI run 44785764117 passes its original

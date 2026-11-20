@@ -4,6 +4,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Corrected timing44790210039 completes all four reports and passes active
+  annotation but rejects one structural loop at X6Y3/E. Reported setup
+  -10.193067 ns/hold-1.867277 ns are unqualified. Receipt:
+  reports/r1_feedback_timing_loop_44790210039.json. D157proves actual unused
+  E.I0 self feedback and an alternate existing registered F output. Only
+  additional tile bit218 (word759 bit26) changes; local full image/frame
+  checks and26focused tests pass. New combined workflow first requires actual
+  native/reset/reload, then automatically runs connected setup/hold.
+  Expected raw696cd708a5fad674134724bcbdf43c1ceed287b61a73d1bfa393ac301b70d187,
+  expected loaded39e2aadc8b7f25b5838bde7bcff746910105a07f9e3cce6d49c0d29cf711b739.
+  Expected states are not observations; no phase boxes or closure claim.
 - Timing44787771176 at a41e41d6 reproduces the original control but rejects
   stale parent Q expectations after new case values (BUG165). No qualified
   candidate timing. Fix complete Q/GATE assertion replacement and reject

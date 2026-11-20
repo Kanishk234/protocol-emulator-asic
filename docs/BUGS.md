@@ -1,5 +1,19 @@
 # Bugs
 
+## 166: Moved image retains an unused E input combinational timing loop
+
+- **Symptom/check:** 44790210039 completes candidate setup/hold with active
+  annotation but each policy reports one combinational loop at X6Y3/E.
+  Model qualification rejects it despite loop-policy agreement.
+- **Cause:** loaded INIT0x330f is independent of I0, but the selected
+  unused I0 route returns the same LE_O. Native FF-selection and route
+  decoding prove the alternate existing selector reaches registered X2Y3/F.
+- **Proposed fix/coverage:** D157changes only that selector after D156.
+  Local actual-state cofactor/carry/frame/route checks pass; reconstructed
+  raw image differs from the moved compiler image by exactly two total bits.
+  Fresh uninstrumented native/reset/reload and zero-loop connected timing
+  remain mandatory. No loop cut, exception or forced value is introduced.
+
 ## 165: Candidate timing retains parent values in closed-latch assertions
 
 - **Symptom/check:** 44787771176 at a41e41d6 reproduces the original connected

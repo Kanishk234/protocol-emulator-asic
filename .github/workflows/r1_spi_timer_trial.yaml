@@ -41,6 +41,8 @@ jobs:
           tag=${OSS_CAD_SUITE_TAG//-/}
           curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$tag.tgz"
           tar -xzf /tmp/ocs.tgz -C ~
+      - name: Install source simulator used by ordinary CI
+        run: sudo apt-get update && sudo apt-get install -y iverilog
       - name: Stage exactly one timer-enable source change
         run: |
           bash scripts/setup_venv.sh
@@ -59,7 +61,7 @@ jobs:
         timeout-minutes: 8
         run: |
           source .venv/bin/activate
-          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
+          export PATH="$VIRTUAL_ENV/bin:/usr/bin:/bin:$PATH"
           out="$PWD/build/spi_timer_trial"
           iverilog -V > "$out/iverilog-version.txt" 2>&1
           sources="$out/candidate/spi_ctrl_top.v $PWD/tools/compile/prims/warp_prims_sim.v $PWD/arch/prims/wp_timer.v $PWD/arch/prims/wp_shift.v"

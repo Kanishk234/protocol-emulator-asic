@@ -1,4 +1,4 @@
-"""Connected RC diagnostic for the actually loaded SA image; no acceptance."""
+"""Connected RC diagnostic for actually loaded placement images; no acceptance."""
 import argparse
 import json
 import os
@@ -28,15 +28,18 @@ def replace_cases(text,old,new):
 def prepare(rc,proof,native,capsule,pdk,functional,out):
     functional,out=Path(functional).resolve(),Path(out).resolve()
     data=json.loads((functional/'result.json').read_text())
-    if not data['passed'] or set(data['cases'])!={'control','candidate','shell'}:
+    if (not data['passed'] or not {'control','candidate','shell'}<=set(data['cases']) or
+            any(not row['passed'] for row in data['cases'].values())):
         raise ValueError('Require all actual native loading cases')
     if data['cases']['candidate']!=data['cases']['shell']:
         raise ValueError('Actual direct and management/reload observations differ')
     observed=json.loads((functional/'candidate/configuration-state.json').read_text())
     image=functional/'candidate/quiesced.wbit'
     quiescence=json.loads((functional/'candidate/quiescence.json').read_text())
-    if quiescence['source_image_sha256']!='0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f':
-        raise ValueError('Require the fixed-seed SA source image')
+    admitted={'0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f',
+              'cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b'}
+    if quiescence['source_image_sha256'] not in admitted:
+        raise ValueError('Require an admitted fixed-source placement image')
     if sha(image)!=data['cases']['candidate']['image_sha256'] or sha(functional/'candidate/configuration-state.json')!=data['cases']['candidate']['observed_configuration_sha256']:
         raise ValueError('Actual native evidence changed')
     modules=Path(native)/'registered_native/all-native.json'
@@ -86,7 +89,7 @@ def run(out):
         necessary_macro_constraints_met=qualified and all(m['worst_slack_ns']>=0 for m in models.values()),
         actual_native_run=plan['actual_native_run'],actually_loaded_image_sha256=plan['actually_loaded_image_sha256'],
         timing_acceptance=False,physical_acceptance=False,adopted=False,
-        scope='Actually loaded SA image on unchanged source-proven connected nominal RC, original 20ns/0.25ns/conditional zero-I/O boundary. Original failing parent retained. No full-chip/PVT/loading-mode acceptance.')
+        scope='Actually loaded placement image on unchanged source-proven connected nominal RC, original 20ns/0.25ns/conditional zero-I/O boundary. Original failing parent retained. No full-chip/PVT/loading-mode acceptance.')
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
     if not qualified:raise SystemExit('SA timing model coverage/loop qualification failed; retain failure')
 

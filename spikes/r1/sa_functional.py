@@ -11,12 +11,22 @@ from configured_smoke import complete_native_exports, run as smoke
 from compile.bitfile import BitFile
 
 
-def prepare(capsule,native,trial,out):
+def prepare(capsule,native,trial,out,trial_kind='sa'):
     capsule,native,trial,out=(Path(p).resolve() for p in (capsule,native,trial,out))
     result=json.loads((trial/'result.json').read_text())
-    if (result['run']!='44653541979' or not result['diagnostic_complete'] or
-        result['cases']['candidate']['image_sha256']!='0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f'):
-        raise ValueError('Require the authenticated fixed-seed SA trial')
+    admitted={
+        'sa':('44653541979','0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f'),
+        'fixed_relocation':('44676960615','cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b')}
+    if trial_kind not in admitted:raise ValueError('Unknown fixed-source native trial')
+    run_id,image_sha=admitted[trial_kind]
+    if (str(result['run'])!=run_id or not result['diagnostic_complete'] or
+        result['cases']['candidate']['image_sha256']!=image_sha):
+        raise ValueError('Require the authenticated fixed-source placement trial')
+    case_names={'control':'restore' if trial_kind=='fixed_relocation' else 'control','candidate':'candidate'}
+    if trial_kind=='fixed_relocation':
+        case_names['reroute']='reroute'
+        if any(not r['logical_graph_preserved'] or not r['placements_exact'] for r in result['cases'].values()):
+            raise ValueError('Fixed-placement graph/source checks failed')
     out.mkdir(parents=True,exist_ok=False)
     control=json.loads((capsule/'leaf-audit.json').read_text())
     for row in control['native_exports'].values():
@@ -26,18 +36,18 @@ def prepare(capsule,native,trial,out):
         row['path']=str(path)
     (out/'native-audit.json').write_text(json.dumps(control,indent=2)+'\n')
     complete_native_exports(out/'native-audit.json')
-    for name in ('control','candidate'):
+    for name,source_name in case_names.items():
         dest=out/(name+'-case');dest.mkdir()
         for filename in ('report.json','design.fasm','concurrency.wbit'):
-            shutil.copyfile(trial/name/filename,dest/filename)
-        if sha(dest/'concurrency.wbit')!=result['cases'][name]['image_sha256']:
+            shutil.copyfile(trial/source_name/filename,dest/filename)
+        if sha(dest/'concurrency.wbit')!=result['cases'][source_name]['image_sha256']:
             raise ValueError('Compiled image changed')
     modules=native/'registered_native/all-native.json'
     if sha(modules)!='64922d92969e229e8562d9cc0c4bd1cb5add15766ec10709576f0255ebf2ce06':
         raise ValueError('Native frame audit source changed')
-    (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),native=str(modules),
+    (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),native=str(modules),trial_kind=trial_kind,
         input_sha256={str(p):sha(p) for p in [Path(__file__).resolve(),trial/'result.json',modules,out/'native-audit.json',
-          *[out/(n+'-case')/f for n in ('control','candidate') for f in ('report.json','design.fasm','concurrency.wbit')]]}),indent=2)+'\n')
+          *[out/(n+'-case')/f for n in case_names for f in ('report.json','design.fasm','concurrency.wbit')]]}),indent=2)+'\n')
 
 
 def run(out,pdk,icarus):
@@ -49,13 +59,21 @@ def run(out,pdk,icarus):
     cap=Path(plan['capsule']);modules=json.loads(Path(plan['native']).read_text())['modules']
     os.environ['R1_RUNTIME_MODEL']=plan['native']
     result=dict(run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),passed=False,
-                cases={},timing_acceptance=False,physical_acceptance=False,adopted=False)
+                cases={},trial_kind=plan.get('trial_kind','sa'),timing_acceptance=False,physical_acceptance=False,adopted=False)
     try:
-        for stage,name,shell in [('control','control',False),('candidate','candidate',False),('shell','candidate',True)]:
-            smoke(cap/'model/resource',out/(name+'-case'),out/stage,
-                pdk=pdk,icarus_root=icarus,mapped_bundle=cap/'mapped/input',
-                postphysical_complete=out/'native-audit.json',capture_configuration=True,
-                management_shell=shell,quiesce_unused=True,restart_probe=not shell)
+        stages=[('control','control',False)]
+        if plan.get('trial_kind')=='fixed_relocation':stages.append(('reroute','reroute',False))
+        stages += [('candidate','candidate',False),('shell','candidate',True)]
+        for stage,name,shell in stages:
+            try:
+                smoke(cap/'model/resource',out/(name+'-case'),out/stage,
+                    pdk=pdk,icarus_root=icarus,mapped_bundle=cap/'mapped/input',
+                    postphysical_complete=out/'native-audit.json',capture_configuration=True,
+                    management_shell=shell,quiesce_unused=True,restart_probe=not shell)
+            except Exception as exc:
+                if stage!='reroute':raise
+                result['cases']['reroute']=dict(passed=False,error=str(exc))
+                continue
             proof=json.loads((out/stage/'configured-smoke.json').read_text())
             image=BitFile.load(out/stage/'quiesced.wbit')
             state=json.loads((out/stage/'configuration-state.json').read_text())
@@ -68,7 +86,9 @@ def run(out,pdk,icarus):
             (out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
         if result['cases']['candidate']!=result['cases']['shell']:
             raise ValueError('Direct and management/reload native observations differ')
-        result['passed']=True
+        result['candidate_functional_passed']=True
+        result['passed']=all(row['passed'] for row in result['cases'].values())
+        if not result['passed']:raise ValueError('Reroute control failed; candidate evidence retained separately')
     except Exception as exc:
         result['error']=str(exc)
         if stage=='candidate':
@@ -87,6 +107,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

@@ -1,0 +1,72 @@
+{
+  "run": "44654335485",
+  "source_sha": "f3b4daf9a089d06237f081c0bf5325d6ccb4328a",
+  "passed": false,
+  "cases": {
+    "control": {
+      "passed": true,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+      "configuration_bits": 8736
+    }
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "error": "XML contains failures, errors or skipped tests",
+  "candidate_frame_replay": {
+    "passed": true,
+    "tiles": 40,
+    "compared_configuration_bits": 8736,
+    "per_tile": {
+      "Tile_X0Y0_NW_term": 4,
+      "Tile_X0Y1_W_IO4": 81,
+      "Tile_X0Y2_W_IO4": 81,
+      "Tile_X0Y3_W_IO4": 81,
+      "Tile_X0Y4_SW_term": 20,
+      "Tile_X1Y0_N_IO": 35,
+      "Tile_X1Y1_LUT4x8_ha": 438,
+      "Tile_X1Y2_LUT4x8_ha": 438,
+      "Tile_X1Y3_LUT4x8_ha": 438,
+      "Tile_X1Y4_S_IO2": 60,
+      "Tile_X2Y0_N_IO": 35,
+      "Tile_X2Y1_LUT4x8_ha": 438,
+      "Tile_X2Y2_PRIM2T2S": 334,
+      "Tile_X2Y3_LUT4x8_ha": 438,
+      "Tile_X2Y4_S_IO2": 60,
+      "Tile_X3Y0_N_IO": 35,
+      "Tile_X3Y1_LUT4x8_ha": 438,
+      "Tile_X3Y2_LUT4x8_ha": 438,
+      "Tile_X3Y3_LUT4x8_ha": 438,
+      "Tile_X3Y4_S_IO2": 60,
+      "Tile_X4Y0_N_IO": 35,
+      "Tile_X4Y1_LUT4x8_ha": 438,
+      "Tile_X4Y2_LUT4x8_ha": 438,
+      "Tile_X4Y3_LUT4x8_ha": 438,
+      "Tile_X4Y4_S_IO2": 60,
+      "Tile_X5Y0_N_IO": 35,
+      "Tile_X5Y1_LUT4x8_ha": 438,
+      "Tile_X5Y2_PRIM2T2S": 334,
+      "Tile_X5Y3_LUT4x8_ha": 438,
+      "Tile_X5Y4_S_IO2": 60,
+      "Tile_X6Y0_N_IO": 35,
+      "Tile_X6Y1_LUT4x8_ha": 438,
+      "Tile_X6Y2_LUT4x8_ha": 438,
+      "Tile_X6Y3_LUT4x8_ha": 438,
+      "Tile_X6Y4_S_IO2": 60,
+      "Tile_X7Y0_NE_term": 0,
+      "Tile_X7Y1_E_IO4": 73,
+      "Tile_X7Y2_E_IO4": 73,
+      "Tile_X7Y3_E_IO4": 73,
+      "Tile_X7Y4_SE_term": 4
+    },
+    "scope": "Native frame-to-latch image agreement only; no functional or timing qualification."
+  },
+  "artifact": {
+    "id": 14592446678,
+    "name": "r1-sa-native-44654335485",
+    "bytes": 5388032,
+    "sha256": "5b131c98085980d7e909803829cf7a0f75b5e9bef660b892e7e857f5f9e18f40"
+  },
+  "root_review": "Original native control passes. SA candidate configuration has all 8736 correct defined latch values, but host-ready becomes X at 115941ns during first traffic. Functional failure retained; no loaded-functional or timing pass claimed."
+}

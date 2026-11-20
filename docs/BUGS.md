@@ -1,5 +1,19 @@
 # Bugs
 
+## 161: Annealed image loads correctly but host-ready becomes unknown during traffic
+
+- **Symptom:** 44654335485 at f3b4daf9 passes the original native control, then
+  rejects the SA candidate when `h_wready` becomes X at 115941 ns. Management
+  reload is not reached. Keep the failed test and image; do not force X to zero.
+- **Independent check:** root replays the candidate snapshot against its actual
+  quiesced image: all 8736 configuration latch values are defined and agree.
+  This excludes the measured frame mismatch hypothesis, not all loading faults.
+- **Root cause:** unresolved; inspect native combinational and FF/clock/reset
+  values at load completion and first unknown handshake. A read-only runtime
+  snapshot is added without waiving the failure or altering the circuit.
+- **Evidence:** reports/r1_sa_native_44654335485.json. Candidate remains
+  functionally unqualified and unadopted; successful-candidate timing is gated.
+
 ## 160: Per-column power feasibility does not screen every enclosing grid stripe
 
 - **Symptom:** the original regular grid, applied to the assembled R1 macro

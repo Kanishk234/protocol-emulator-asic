@@ -4,6 +4,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-19 — Continue timing diagnosis while user is away
 
+- Native SA loading 44654335485 at f3b4daf9 passes the original control but
+  fails candidate host-ready X during initial traffic. Root independently
+  verifies all 8736 observed candidate configuration bits against its actual
+  image. BUG161 records the unresolved runtime failure. Add read-only native
+  LUT/FF/clock/reset observations at load completion and first X; do not force
+  unknowns or claim candidate functionality/timing. Report:
+  reports/r1_sa_native_44654335485.json. Fourteen focused frame/quiescence/case
+  replacement tests pass; new successful-candidate timing preparation remains
+  gated on actual native functional success.
 - SA placement run 44653541979 at 6d344d1b succeeds: original control image
   reproduces, candidate raw image is 0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f,
   with the same 103 LUT cells/3 timers/3 shifts. Its uncharacterized compiler

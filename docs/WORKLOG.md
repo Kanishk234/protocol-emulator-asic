@@ -4,6 +4,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Status check: fixed native run 44678070512 at 7917817c finishes failed.
+  Retained result shows both original and fixed-placement rerouting controls
+  pass, with 8736 actual configuration bits audited in each. The moved-cell
+  candidate reaches loaded traffic at 115921 ns, then simulation stalls at
+  116000 ns until the bounded run terminates (12.8 billion other VVP events).
+  This is no native acceptance or timing improvement. Investigate the event
+  stall and qualify the passing reroute separately before extracted timing;
+  management reload and new candidate timing remain unproven.
 - Initialized fixed-placement run 44676960615 at 4ef3050a passes all three
   structural controls. Root independently verifies signal partitions, cell
   masters/parameters, exact planned positions and image encoding; restored

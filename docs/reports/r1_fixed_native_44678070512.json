@@ -1,0 +1,41 @@
+{
+  "run": 44678070512,
+  "source_sha": "7917817c0adaab5f7379f5d6e90d274f21267c3b",
+  "artifact_id": 14602878714,
+  "artifact_name": "r1-fixed-native-44678070512",
+  "result": {
+    "run": "44678070512",
+    "source_sha": "7917817c0adaab5f7379f5d6e90d274f21267c3b",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      },
+      "reroute": {
+        "passed": true,
+        "image_sha256": "4b84bd934db00f35e36df31214a0ab8dfa0b0e9c76dc9579a8eee64e25c20dc4",
+        "observed_configuration_sha256": "c35b4ae891bf254712ae7474fab612efae01c75cedc8ac125a246bf8039a3a3b",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "fixed_relocation",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false
+  },
+  "observations": {
+    "candidate": "Loaded traffic starts at 115921 ns; simulator stops advancing at 116000 ns, then bounded execution terminates. XML says Simulator shut down prematurely. Exact oscillation cause unproven.",
+    "vvp_other_events": 12807810806,
+    "candidate_management_reached": false
+  },
+  "member_sha256": {
+    "result.json": "6522dde38a6253da76447d60d1471ba35e7a244aceccd3c1dabbe16e208a767c",
+    "native.log": "9372d8d5cfe34788e1e37a98d1e6d4d9a708e9221b260987cd3dde670db5c4b7",
+    "candidate/results.xml": "04fa74027c051030bd3706825a171c3081f989920f089b0fe9a8bdf3051d6176"
+  },
+  "adopted": false,
+  "timing_acceptance": false
+}

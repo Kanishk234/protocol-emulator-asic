@@ -1,5 +1,22 @@
 # Bugs
 
+## 163: Targeted relocation stalls native event simulation during traffic
+
+- **Symptom/check:** 44678070512 at 7917817c passes original and reroute
+  controls, then the moved-cell image reaches traffic at 115921 ns and stalls
+  at 116000 ns. Bounded execution terminates; XML reports premature simulator
+  shutdown. VVP reports 12,807,810,806 other events.
+- **Root cause:** unresolved; excessive delta activity is consistent with
+  a combinational event oscillation, but the exact circuit is not localized.
+  This is not a functional pass or an established silicon timing failure.
+- **Coverage/next:** retain the timeout and original controls in
+  reports/r1_fixed_native_44678070512.json. Qualify the passing routing-only
+  image separately; do not force X, add arbitrary delays or waive the failure.
+- **Related routing guard:** free real-cell slots can be occupied by nextpnr
+  LUT constant pseudo-PIPs. The relocation preflight now reads these routing
+  triples and rejects constant-occupied targets; positive/malformed metadata
+  tests pass. Original X1Y1/C target is not occupied by such a constant.
+
 ## 162: Cold rerouting skips FABulous per-cell initialization with no-place
 
 - **Symptom:** 44676026324 at 5380598d restores the original image exactly,

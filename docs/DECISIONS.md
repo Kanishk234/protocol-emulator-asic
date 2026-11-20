@@ -1,5 +1,19 @@
 # Decisions
 
+## D-155: Qualify the passing fixed-placement reroute independently
+
+- **Date:** 2026-11-20. Run 44678070512 passes original and routing-only
+  native controls, including actual 8736-bit audits, while the moved-cell
+  candidate stalls during traffic. Retain the complete failed campaign.
+- **Trial:** admit only routing-only image cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462
+  from authenticated 44676960615. Repeat the original control, actual native
+  reset/protocol test and full management STOP/reload. No relocation, new seed,
+  hardware change or transplanted parent-specific bit repair.
+- **Gates:** direct and management/reload observations must match all 8736
+  actual bits before connected extracted timing at unchanged 20 ns/0.25 ns.
+  This is a separate routing-only experiment, not acceptance of the failed
+  relocation. Full-shell/PVT/loading and physical power gates remain open.
+
 ## D-154: Reroute fixed placements and move only the LUT on the observed false-input chain
 
 - **Date:** 2026-11-20. D-153 does not repair the SA image. Return to the

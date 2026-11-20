@@ -45,7 +45,7 @@ def run(out,pdk,icarus,watchdog):
                       postphysical_complete=out/'native-audit.json',capture_configuration=True,
                       quiesce_unused=True,restart_probe=True)
                 result['cases'][stage]=dict(instrumented_test_passed=True)
-            except Exception as exc:
+            except (Exception,SystemExit) as exc:
                 result['cases'][stage]=dict(instrumented_test_passed=False,error=str(exc))
                 if stage=='control':raise ValueError('Instrumented original control failed') from exc
         result['diagnostic_complete']=True

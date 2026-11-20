@@ -1,0 +1,38 @@
+{
+  "run": 44784239092,
+  "artifact_id": 14653373641,
+  "archive_sha256": "8fbed73a7d75c5d910f96b6c538eff657fe7538c2615feaeb59a7ee42de196f1",
+  "archive_bytes": 8299825,
+  "result": {
+    "run": "44784239092",
+    "source_sha": "5ae78f186521921205140bc3c1694279a1f30d30",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      },
+      "candidate": {
+        "passed": true,
+        "image_sha256": "4b84bd934db00f35e36df31214a0ab8dfa0b0e9c76dc9579a8eee64e25c20dc4",
+        "observed_configuration_sha256": "c35b4ae891bf254712ae7474fab612efae01c75cedc8ac125a246bf8039a3a3b",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "fixed_reroute",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false
+  },
+  "member_sha256": {
+    "result.json": "5f5212afb08780e1187c926b755136ea68b65d749e3b42259f33897680789804",
+    "native.log": "f4a479e87d4f34dbecc9a52f58b8dfcc0a148475d1aac7b7356a3c082ec9fad5",
+    "shell/results.xml": "67499c5ca4bd61922e39b6082220e006a0005d429ca54896d21863f175d5c4f9"
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "finding": "Original and routing-only direct cases pass with all 8736 bits audited. Shell loads and passes rejection checks, then stalls at 5333140 ns during initial traffic; timeout, no reload acceptance."
+}

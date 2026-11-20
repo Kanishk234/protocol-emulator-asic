@@ -1,5 +1,17 @@
 # Bugs
 
+## 164: Routing-only image passes direct loading but stalls under shell traffic
+
+- **Symptom/check:** 44784239092 at 5ae78f18 passes original and routing-only
+  direct reset/UART/SPI, then completes management load and rejection checks
+  but stops advancing at 5333140 ns during initial traffic. Bounded execution
+  terminates; management reload is not reached.
+- **Root cause:** unresolved. Do not extrapolate direct loading to shell
+  behavior. No repaired timing or submission acceptance follows from it.
+- **Coverage/next:** retain reports/r1_native_followup_44784239092.json.
+  D-156 instead tests the observed moved-image unused-input self feedback
+  with one selector; that repair has separate actual shell and timing gates.
+
 ## 163: Targeted relocation stalls native event simulation during traffic
 
 - **Symptom/check:** 44678070512 at 7917817c passes original and reroute
@@ -19,6 +31,10 @@
   the moved-cell case is diagnostic only. Local pinned Icarus 13 finite
   fixture exits 0; intentional loop reports tick 2000 and exits 2. The cloud
   workflow repeats both fixtures before replaying native inputs.
+- **Observed feedback:** 44785764117 passes its instrumented original control
+  and stops at tick 116000000 in X3Y3/D native logic. Actual loaded INIT
+  0x0fcc ignores I0; selected I0 route returns from the same LD_O. D-156
+  tests one existing selector without changing the LUT function or model.
 - **Related routing guard:** free real-cell slots can be occupied by nextpnr
   LUT constant pseudo-PIPs. The relocation preflight now reads these routing
   triples and rejects constant-occupied targets; positive/malformed metadata

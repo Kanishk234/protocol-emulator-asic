@@ -1,0 +1,33 @@
+{
+  "run": 44785764117,
+  "artifact_id": 14653782318,
+  "archive_sha256": "6a301de45d38b093264605dd7919af9f3ec01400bfe5d83c037accf7118d44ca",
+  "archive_bytes": 5640375,
+  "result": {
+    "run": "44785764117",
+    "source_sha": "edebd31b100349d86b29cb1f77b671da820833b2",
+    "diagnostic_complete": false,
+    "passed": false,
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "watchdog_sha256": "2c910ea741e77e118a0e0999fe56d3fb140b3c9419080779f1376ed5d1f92c62",
+    "observer_source_sha256": "453d85e8135b937a78ffa0a54ca0f7f5a4abc4acf96a6cc2f45322038df8d6c3",
+    "scope": "Instrumented native replay only. An observer stop or missing XML remains a failure. No forced values or added circuit delays.",
+    "cases": {
+      "control": {
+        "instrumented_test_passed": true
+      }
+    }
+  },
+  "member_sha256": {
+    "delta-result.json": "46fbedcc4dd088af59e24d3f201aff7c8306bc8171decb93b1b5a5ddebf00b90",
+    "delta.log": "20a9a6cc975e5b9345e82813c32125fef0a988f7b8953fbb12585cb3ba22d1df",
+    "delta-fixture-0.log": "489dacb9a247ef012f99e271526cc64fe6caffc90fe4adc05cf4bd692a9cffc9",
+    "delta-fixture-1.log": "95c591ad3da70304a9f5ef548de5f8a0dfda3d9031a3da4b287814fcd4728d8f"
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "finding": "Instrumented original control passes. Observer stops moved image at tick116000000 with repeated native Tile_X3Y3_LUT4x8_ha._1322_.A1 and related logic. VPI exit2 escapes runner as SystemExit; diagnostic_complete remains false. Native acceptance remains failed."
+}

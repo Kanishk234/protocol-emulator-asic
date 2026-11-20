@@ -1,5 +1,24 @@
 # Decisions
 
+## D-156: Break the observed unused LUT feedback with one existing selector
+
+- **Date:** 2026-11-20. Read-only VPI run 44785764117 passes its original
+  control and stops the moved image at tick 116000000. Native X3Y3/D logic
+  repeatedly changes. Actual frame decoding gives INIT 0x0fcc, independent
+  of physical I0 in all 16 cofactors. The selected unused I0 route terminates
+  at the same LD_O, establishing an irrelevant logical feedback path.
+- **Trial:** only existing X3Y3 LD_I0 selector, tile bit 212, native latch
+  _1525_, word 399 bit 20, 0 to 1. Its alternate route terminates at X1Y3/LH_O.
+  Require no active feature overlap, combinational mode, carry noninterference
+  and exact frame mapping. Preserve all other bits, logical features and G1.
+- **Gates:** regenerate original D118 quiescence from the derived raw image;
+  independently require exactly one bit difference from the failed loaded
+  image, and all 8736 expected frame bits. Expected states are not observations.
+  Repeat original and reroute controls, uninstrumented native reset/UART/SPI,
+  full management/reload, then connected extracted timing. No model delays,
+  forced values, timing exceptions or hardware/ABI changes. Retain both the
+  original moved-cell timeout and routing-only shell timeout.
+
 ## D-155: Qualify the passing fixed-placement reroute independently
 
 - **Date:** 2026-11-20. Run 44678070512 passes original and routing-only

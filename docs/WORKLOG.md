@@ -4,6 +4,20 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Actual D-155 run 44784239092 repeats both direct native passes, but shell
+  stalls at 5333140 ns after loading/rejection checks; no reload acceptance.
+  Read-only observer 44785764117 passes its original control and localizes
+  moved-cell delta activity to X3Y3/D at tick 116000000. Its VPI exit2 remains
+  a failed diagnostic job, not a functional pass. Receipts:
+  reports/r1_native_followup_44784239092.json and
+  reports/r1_native_followup_44785764117.json.
+- D-156 proves the moved image selects its own LD_O into truth-independent
+  I0. Prepare only existing selector bit 212 (word 399 bit 20), preserving
+  every other bit. Raw SHA 6a29427ad987091613795b89ef9dc463be0b7c2e1d85c6679e04312c23d72066;
+  expected loaded SHA cbf4300d88050502da6fcf167fcbbcbcd045ebd8b6aa7c36f92e05483c4aeb94.
+  Local derivation/cofactor/carry/frame guards and 25 focused tests pass.
+  Actual uninstrumented native/reset/reload is next, then extracted timing
+  only if functional qualification passes. No phase boxes or closure claim.
 - D-155 independently qualifies the routing-only image from 44676960615.
   Workflow 44784239092 at 5ae78f18 is running actual native control, reroute
   reset/protocol traffic and management STOP/reload. Local preparation verifies

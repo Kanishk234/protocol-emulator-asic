@@ -2,6 +2,13 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 clock-bank follow-up:**44829301770 rejects the D162 D-bank
+candidate before timing: native host-ready becomes unknown, despite exact
+8736-bit configuration and a passing matched A control. A generated RTL
+diagnostic passes; it cannot substitute for native qualification. D163
+preserves all other user-cell locations and compares restored A, rerouted A
+and rerouted D. No new timing result or closure claim.
+
 **November20 SPI source follow-up:**44802619585 passes native/reset/reload,
 all three actual frame audits, zero loops and complete active annotation but
 is worse: setup-21.419043ns/hold-2.660251ns. It is not adopted; earlier

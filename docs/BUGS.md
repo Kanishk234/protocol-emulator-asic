@@ -1,5 +1,21 @@
 # Bugs
 
+## 171: Clock-bank D placement fails native initialization despite exact configuration
+
+- **Symptom/check:**44829301770 at a7dad2be passes its matched A-bank
+  native control, then rejects the D-bank candidate: host-write ready becomes
+  unknown at115981ns. Generated RTL for the same image passes; management
+  candidate and timing are not reached. Independent audit matches all8736
+  actual configuration bits, so this is not evidence of a loader mismatch.
+- **Diagnosis:** native X cone contains two unknown register outputs at
+  X2Y3. A local read-only snapshot confirms they are already unknown before
+  reset release. A single cofactor/carry-proved F.I2 selector trial still
+  fails the same assertion; retain it as a rejected hypothesis.
+- **Coverage/status:** existing strict native XML rejection remains fatal.
+  Add optional pre-release runtime observation without changing reset
+  duration, driving internal values or weakening tests. Root cause and
+  functional repair remain open; no D-bank timing claim.
+
 ## 170: Proved SPI source image passes native but STA reports constant-rail feedback
 
 - **Symptom/check:**44799827748 atd5e057a8 passes control/candidate/shell

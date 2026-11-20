@@ -4,6 +4,23 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D162 native run44829301770 fails candidate initialization: unknown
+  host-ready at115981ns; matched A control passes, generated RTL diagnostic
+  passes, management candidate and timing are not reached. Root verifies
+  all8736actual candidate configuration bits; receipt
+  reports/r1_clock_bank_native_44829301770.json. BUG171 remains open.
+- Add read-only pre-reset-release snapshot. Local baseline reproduces
+  failure and shows two X2Y3 native registers already unknown while reset
+  is asserted. Separate local F.I2 and registered D.I0 unused-input trials
+  reproduce the same failure; neither is promoted. Initial D.I0 staging
+  used an incorrect frame word and was rejected by an assertion before
+  simulation; corrected frame279bit20 still fails native behavior.
+- D163 stages a tighter hosted experiment: restore exact A image, reroute
+  A and D with every other packed user cell USER-locked. Actual local
+  preparation verifies all positions, cleared routes, identical graphs
+  and the single GBUF difference. Focused29tests and workflow actionlint
+  pass. No phase boxes ticked; native qualification and timing remain open.
+
 - D162routing44827334401 ata7ee2883 succeeds: A-bank control reproduces
   raw79db28... byte-for-byte; D-bank candidate raw
   4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a.

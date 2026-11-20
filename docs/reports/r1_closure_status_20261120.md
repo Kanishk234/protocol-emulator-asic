@@ -1,5 +1,14 @@
 # R1 closure status — November 20, 2026
 
+Latest follow-up: run44829301770 rejects the fresh D-bank placement in
+native simulation (unknown host-ready at115981ns), while its matched A
+control and generated RTL diagnostic pass. All8736loaded configuration
+bits independently match. Management candidate and timing were not reached;
+the D-bank image remains unqualified. Local F.I2 and D.I0 selector trials
+also fail and are retained as rejected hypotheses. D163 next preserves
+every other user-cell location while comparing A/D rerouting. See
+[native failure receipt](r1_clock_bank_native_44829301770.json).
+
 R1 is still experimental. G1 remains the selected production baseline.
 No hardware, ABI, physical macro geometry or clock target changed in this work.
 

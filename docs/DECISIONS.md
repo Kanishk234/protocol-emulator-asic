@@ -1,5 +1,26 @@
 # Decisions
 
+## D-163: Separate clock-bank rerouting from user-cell replacement
+
+- **Date:** 2026-11-20. D162's fresh D-bank placement fails native
+  initialization in run44829301770, despite exact configuration and a
+  passing generated RTL diagnostic. It is rejected before timing. Local
+  single-selector F.I2 and D.I0 hypotheses reproduce the same failure.
+- **Experiment:** restore the exact successful A-bank compiler checkpoint,
+  reroute A with every user cell USER-locked, then reroute D with only the
+  GBUF moved from X0Y4/A to X0Y4/D. All packed cell locations are checked
+  individually after routing; logical graph and resource use must agree.
+  Constant pseudo-PIP sources and routes may change during rerouting.
+- **Controls:** exact restored raw79db28... image, same packed source,
+  pins, seed1, resource model and50MHz compiler request. Use normal placer
+  initialization with USER locks, not a cold --no-place reroute (BUG162).
+  Local preparation independently checks all locks, cleared routes,
+  identical logical graphs and the single clock-cell location difference.
+- **Gates:** routing alone cannot qualify native behavior or timing.
+  Retain both failed selector trials; require actual native/reset/reload,
+  all8736configuration bits and connected zero-loop timing before any
+  performance claim. No hardware, production default or clock-target change.
+
 ## D-162: Control global clock-bank allocation before comparing SPI implementations
 
 - **Date:**2026-11-20.44802619585 passes native/reload, all actual frames,

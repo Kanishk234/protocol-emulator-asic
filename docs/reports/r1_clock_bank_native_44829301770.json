@@ -1,0 +1,90 @@
+{
+  "run": 44829301770,
+  "source_sha": "a7dad2be82bb5393cd545858035a8e657c68456e",
+  "artifact_id": 14675497584,
+  "archive_bytes": 8654631,
+  "archive_sha256": "59b7a2438b9fa2512f87e8969d6b9f30458e0e075478ae2fab08501a401337fa",
+  "result": {
+    "run": "44829301770",
+    "source_sha": "a7dad2be82bb5393cd545858035a8e657c68456e",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "5af46fa505caf0702ea91cb68cf0ede6ad51e80b6f2cabe7ec54752cabe08031",
+        "observed_configuration_sha256": "8f8f0f9a792af7d4b021226a226d1a316417def1fa48ba98676c09e3b4167341",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_clock_d",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "error": "XML contains failures, errors or skipped tests",
+    "generated_rtl_candidate": {
+      "passed": true,
+      "scope": "Generated RTL diagnostic only; original native failure retained."
+    }
+  },
+  "candidate_frame_audit": {
+    "passed": true,
+    "tiles": 40,
+    "compared_configuration_bits": 8736,
+    "per_tile": {
+      "Tile_X0Y0_NW_term": 4,
+      "Tile_X0Y1_W_IO4": 81,
+      "Tile_X0Y2_W_IO4": 81,
+      "Tile_X0Y3_W_IO4": 81,
+      "Tile_X0Y4_SW_term": 20,
+      "Tile_X1Y0_N_IO": 35,
+      "Tile_X1Y1_LUT4x8_ha": 438,
+      "Tile_X1Y2_LUT4x8_ha": 438,
+      "Tile_X1Y3_LUT4x8_ha": 438,
+      "Tile_X1Y4_S_IO2": 60,
+      "Tile_X2Y0_N_IO": 35,
+      "Tile_X2Y1_LUT4x8_ha": 438,
+      "Tile_X2Y2_PRIM2T2S": 334,
+      "Tile_X2Y3_LUT4x8_ha": 438,
+      "Tile_X2Y4_S_IO2": 60,
+      "Tile_X3Y0_N_IO": 35,
+      "Tile_X3Y1_LUT4x8_ha": 438,
+      "Tile_X3Y2_LUT4x8_ha": 438,
+      "Tile_X3Y3_LUT4x8_ha": 438,
+      "Tile_X3Y4_S_IO2": 60,
+      "Tile_X4Y0_N_IO": 35,
+      "Tile_X4Y1_LUT4x8_ha": 438,
+      "Tile_X4Y2_LUT4x8_ha": 438,
+      "Tile_X4Y3_LUT4x8_ha": 438,
+      "Tile_X4Y4_S_IO2": 60,
+      "Tile_X5Y0_N_IO": 35,
+      "Tile_X5Y1_LUT4x8_ha": 438,
+      "Tile_X5Y2_PRIM2T2S": 334,
+      "Tile_X5Y3_LUT4x8_ha": 438,
+      "Tile_X5Y4_S_IO2": 60,
+      "Tile_X6Y0_N_IO": 35,
+      "Tile_X6Y1_LUT4x8_ha": 438,
+      "Tile_X6Y2_LUT4x8_ha": 438,
+      "Tile_X6Y3_LUT4x8_ha": 438,
+      "Tile_X6Y4_S_IO2": 60,
+      "Tile_X7Y0_NE_term": 0,
+      "Tile_X7Y1_E_IO4": 73,
+      "Tile_X7Y2_E_IO4": 73,
+      "Tile_X7Y3_E_IO4": 73,
+      "Tile_X7Y4_SE_term": 4
+    },
+    "scope": "Native frame-to-latch image agreement only; no functional or timing qualification."
+  },
+  "candidate_loaded_image_sha256": "c43285dd4ad59b4d9f4a7e4579c8f965876f33696e007aedc8549d4677c9fab0",
+  "candidate_observed_configuration_sha256": "f04a836c2bf4994ec186938d0c73718d8552f1b9f5261f6ef508fc63fed95915",
+  "failure": "configured host-write ready became unknown",
+  "failure_time_ns": 115981.0,
+  "native_candidate_passed": false,
+  "management_candidate_reached": false,
+  "timing_reached": false,
+  "local_single_unused_F_I2_trial": {
+    "passed": false,
+    "failure": "Same unknown host-ready assertion at 115981 ns; not promoted",
+    "scope": "Local diagnostic only, not hosted acceptance"
+  },
+  "scope": "Failed D-bank native result retained. Generated RTL pass and exact frame agreement do not qualify function or timing."
+}

@@ -38,7 +38,8 @@ def prepare(rc,proof,native,capsule,pdk,functional,out):
     quiescence=json.loads((functional/'candidate/quiescence.json').read_text())
     admitted={'0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f',
               'cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b',
-              'cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462'}
+              'cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462',
+              '6a29427ad987091613795b89ef9dc463be0b7c2e1d85c6679e04312c23d72066'}
     if quiescence['source_image_sha256'] not in admitted:
         raise ValueError('Require an admitted fixed-source placement image')
     if sha(image)!=data['cases']['candidate']['image_sha256'] or sha(functional/'candidate/configuration-state.json')!=data['cases']['candidate']['observed_configuration_sha256']:

@@ -105,7 +105,7 @@ def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabl
     if (words[word]>>offset)&1:raise ValueError('Parent image selector is not zero')
     candidate=list(words);candidate[word]|=1<<offset
     carry=(carry_cone(selected_predecessors(spec,words,pips),tile,lut,carry_enabled)
-           if index in (1,2) else dict(scope='I3 does not enter the native carry function'))
+           if index in (1,2) else dict(scope='I0/I3 do not enter the native carry function'))
     return dict(tile=native,cell=name,lut=lut,input=index,observed_init=init,cofactor_addresses_checked=16,
                 tile_bit=address,word=word,word_bit=offset,before='0',after='1',carry_noninterference=carry,
                 route_before=trace_route(selected_predecessors(spec,words,pips),(tile,target)),

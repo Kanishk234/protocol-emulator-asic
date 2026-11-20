@@ -55,24 +55,34 @@ def capture_configuration(d,path):
 
 def capture_runtime(d,path):
     """Read-only native port/FF observation; unknown values remain unknown."""
+    definitions={}
+    if os.environ.get('R1_RUNTIME_MODEL'):
+        definitions=json.loads(Path(os.environ['R1_RUNTIME_MODEL']).read_text())['modules']
     tiles={}
     for tile in d.fabric:
         if not isinstance(tile,HierarchyObject) or not tile._name.startswith('Tile_'):
             continue
-        signals={};flops={}
+        signals={};flops={};cells={}
         names=['UserCLK']+['L'+letter+'_'+pin for letter in 'ABCDEFGH'
                           for pin in ('I0','I1','I2','I3','O','Ci','Co')]
         for name in names:
             try:signals[name]=str(getattr(tile,name).value)
             except AttributeError:pass
         for cell in tile:
+            if (isinstance(cell,HierarchyObject) and cell._def_name in definitions and
+                    str(cell._def_name).startswith('sg13cmos5l_') and cell._def_name!='sg13cmos5l_dlhq_1'):
+                pins={}
+                for pin in definitions[cell._def_name]['ports']:
+                    try:pins[pin]=str(getattr(cell,pin).value)
+                    except AttributeError:pass
+                cells[cell._name]=dict(type=cell._def_name,pins=pins)
             if isinstance(cell,HierarchyObject) and str(cell._def_name).startswith('sg13cmos5l_df'):
                 pins={}
                 for pin in ('D','CLK','RESET_B','SET_B','Q'):
                     try:pins[pin]=str(getattr(cell,pin).value)
                     except AttributeError:pass
                 flops[cell._name]=pins
-        tiles[tile._name]=dict(tile_type=tile._def_name,signals=signals,flops=flops)
+        tiles[tile._name]=dict(tile_type=tile._def_name,signals=signals,flops=flops,cells=cells)
     Path(path).write_text(json.dumps(dict(time_ns=get_sim_time(unit='ns'),
         host_ready=str(d.h_wready.value),tiles=tiles,
         scope='Native runtime observation only; no values forced or tests waived.'),indent=2,sort_keys=True)+'\n')

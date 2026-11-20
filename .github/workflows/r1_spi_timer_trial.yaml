@@ -51,7 +51,7 @@ jobs:
         timeout-minutes: 12
         run: |
           source .venv/bin/activate
-          export PATH="$HOME/oss-cad-suite/bin:$PATH"
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
           out="$PWD/build/spi_timer_trial"
           yosys -V > "$out/yosys-version.txt"
           timeout --kill-after=10s 600s sby -f -d "$out/equiv" "$out/equiv.sby" > "$out/proof.log" 2>&1
@@ -59,12 +59,14 @@ jobs:
         timeout-minutes: 8
         run: |
           source .venv/bin/activate
-          export PATH="$HOME/oss-cad-suite/bin:$PATH"
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
           out="$PWD/build/spi_timer_trial"
           iverilog -V > "$out/iverilog-version.txt" 2>&1
-          make -C protocols/spi_ctrl/test MODE="${{ matrix.mode }}" HALF="${{ matrix.half }}" PRIMS=1 \
-            VERILOG_SOURCES="$out/candidate/spi_ctrl_top.v $PWD/tools/compile/prims/warp_prims_sim.v $PWD/arch/prims/wp_timer.v $PWD/arch/prims/wp_shift.v" \
-            SIM_BUILD="$out/sim" COCOTB_RESULTS_FILE="$out/results.xml" > "$out/source-tests.log" 2>&1
+          sources="$out/candidate/spi_ctrl_top.v $PWD/tools/compile/prims/warp_prims_sim.v $PWD/arch/prims/wp_timer.v $PWD/arch/prims/wp_shift.v"
+          (cd protocols/spi_ctrl/test
+          make MODE="${{ matrix.mode }}" HALF="${{ matrix.half }}" PRIMS=1 \
+            VERILOG_SOURCES="$sources" \
+            SIM_BUILD="$out/sim" COCOTB_RESULTS_FILE="$out/results.xml" > "$out/source-tests.log" 2>&1)
           python spikes/r1/spi_timer_trial.py audit --out "$out"
       - uses: actions/upload-artifact@v7
         if: always()

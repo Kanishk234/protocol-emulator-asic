@@ -1,5 +1,24 @@
 # Decisions
 
+## D-159: Prove a free-running SPI user timer before compiling a new image
+
+- **Date:**2026-11-20. Qualified timing44794158025 still fails setup
+  -9.795382ns. Native endpoint mapping identifies SPI state[1] to nedge[1],
+  through timing-state decode, hard-timer enable/terminal-count and edge logic.
+  More placement-only estimates are not evidence that this chain meets50MHz.
+- **Hypothesis:** in the SPI user program only, let the existing hard timer
+  run continuously. Every accepted byte reloads it; idle/HOLD ticks are not
+  used for edges, state completion or shift steps. This removes the state
+  decode from the timer enable path. Idle timer activity may increase.
+- **Scope/gates:** stage exactly one enable-expression change in build output;
+  leave production protocols, primitive RTL, architecture and G1 unchanged.
+  Compare original/candidate binary pin+host outputs after initial reset, with
+  arbitrary subsequent host/MISO/reset inputs, all4SPI modes atHALF4and25,
+  PRIMS1. Require actual unbounded proof PASS and the existing independent
+  source protocol tests for each case before compiling/adopting anything.
+  Fresh compilation, native/reset/reload and extracted timing remain separate
+  gates; this experiment makes no native/timing claim.
+
 ## D-158: Test a free upstream selector on the measured unused-input critical path
 
 - **Date:**2026-11-20.44792141462 passes native/reset/reload and zero-loop

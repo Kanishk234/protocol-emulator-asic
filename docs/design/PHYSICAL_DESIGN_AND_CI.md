@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 current qualified negative timing:**44794158025 ate5096f6a
+passes actual native/reset/reload and complete active annotation, all370FF
+classified/244endpoints, zero loops under both policies and identical slacks.
+Setup remains-9.795382ns and hold-1.867277ns at unchanged20ns/0.25ns, nominal
+RC/slow-fast cells/original conditional zero-I/O boundary. Root replays all
+frames, source scripts and results. G1 stays selected. D159next tests SPI
+user-program timer enable equivalence; no hardware change or timing adoption.
+
 **November20 functional relocation repair:**44786871916 at144616d1 passes
 original/reroute controls and the one-selector repaired moved image through
 native reset/UART/SPI and complete management STOP/reload. All four actual

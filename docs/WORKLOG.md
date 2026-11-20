@@ -4,6 +4,17 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D158actual44794158025 ate5096f6a passes native/reset/reload and qualified
+  timing with zero loops/full active coverage. Setup improves0.397685ns to
+  -9.795382ns; hold unchanged-1.867277ns. Root replays all four8736-bit
+  audits, byte-identical direct/reload states, complete reverse script byte
+  identity and exact setup/hold slacks. Receipt:
+  reports/r1_upstream_cleanup_44794158025.json. Still no closure/adoption.
+- Worst setup maps to SPI state[1] through timing decode/hard-timer tc to
+  nedge[1]. D159stages a one-expression user-program timer-enable experiment
+  outside production sources. Formal frontend passes;28focused guard tests
+  pass. Hosted unbounded output-equivalence and independent source tests
+  across4modes x HALF4/25 are required before fresh compilation.
 - D157actual44792141462 at1fc91f31 passes native/reset/reload and qualified
   connected timing analysis: all four8736-bit audits, byte-identical
   direct/reload states, all370FFclassified,244endpoints,12679active pins

@@ -1,0 +1,43 @@
+{
+  "run": "44672672250",
+  "source_sha": "d37b75b43318853cd609e34f2ab518457e458884",
+  "passed": false,
+  "cases": {
+    "control": {
+      "passed": true,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+      "configuration_bits": 8736
+    }
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "error": "XML contains failures, errors or skipped tests",
+  "artifact": {
+    "id": 14600912763,
+    "name": "r1-sa-native-44672672250",
+    "bytes": 5393849,
+    "sha256": "1ccd8295b729df4e40c98aa9ccff42e8a532e7e604d0313bb32fbd268f506827"
+  },
+  "runtime_observation": {
+    "after_load": {
+      "time_ns": 115921.0,
+      "host_ready": "1"
+    },
+    "first_failure": {
+      "time_ns": 115941.0,
+      "host_ready": "X"
+    },
+    "newly_unknown_flops": [
+      "Tile_X1Y2_LUT4x8_ha/_1736_",
+      "Tile_X1Y3_LUT4x8_ha/_1732_",
+      "Tile_X1Y3_LUT4x8_ha/_1733_"
+    ],
+    "scope": "Runtime snapshots reproduce ready 1 after load and X on the next traffic edge. This is not a complete causal cone proof; inactive tiles may legitimately have unobservable unknown FFs."
+  },
+  "snapshot_sha256": {
+    "runtime-after-load.json": "f196a4c9dd6d8b83a08221e58303491b21d254feaf3bc775e059ddbcfd72ea9a",
+    "runtime-failure.json": "5159c2543442250d1ed39af158ddcad3d35078229c2738980fb601fd4d31ea21"
+  }
+}

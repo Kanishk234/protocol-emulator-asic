@@ -13,6 +13,12 @@
   snapshot is added without waiving the failure or altering the circuit.
 - **Evidence:** reports/r1_sa_native_44654335485.json. Candidate remains
   functionally unqualified and unadopted; successful-candidate timing is gated.
+- **Runtime follow-up:** 44672672250 at d37b75b4 reproduces the control pass
+  and candidate failure. Host-ready is 1 after loading at 115921 ns, then X
+  at 115941 ns. New unknown FF states appear during the first traffic edge.
+  Inactive tiles also contain unobservable unknown FFs; do not assume every X
+  is an error. Next capture actual native cell pins and compare generated RTL
+  using the same image, keeping the native failure as the controlling result.
 
 ## 160: Per-column power feasibility does not screen every enclosing grid stripe
 

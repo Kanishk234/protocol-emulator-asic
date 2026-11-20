@@ -4,6 +4,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-19 — Continue timing diagnosis while user is away
 
+- Runtime observation 44672672250 at d37b75b4 preserves the control pass and
+  candidate failure: host-ready changes from 1 at 115921 ns to X at 115941 ns.
+  Commit scoped receipt reports/r1_sa_runtime_44672672250.json. Follow-up
+  captures native cell pins and runs generated-RTL comparison only as a
+  diagnostic after native failure; it cannot qualify or replace that failure.
+  Fifteen focused frame/quiescence/candidate-case tests and actionlint pass.
 - Native SA loading 44654335485 at f3b4daf9 passes the original control but
   fails candidate host-ready X during initial traffic. Root independently
   verifies all 8736 observed candidate configuration bits against its actual

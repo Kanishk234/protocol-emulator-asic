@@ -4,6 +4,15 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Fresh SPI compile44798802734 at693e3b6b succeeds: original control image
+  reproduces byte-for-byte, exact pins/parameters/seed/strict ports preserved.
+  Candidate uses102/128LCs (control103),3timers/3shifts, rawimage
+  79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a.
+  Its uncharacterized compiler estimate is worse; no timing improvement claim.
+  Receipt reports/r1_spi_timer_compile_44798802734.json. Admit only this
+  exact compiled source into native/reset/reload; connected timing follows
+  automatically only on actual success. Local new/old admission and29guard
+  tests pass. No transplanted selector repairs, production change or phase box.
 - Corrected SPI campaign44797232291 atf3e10d58 succeeds in all8cases:
   unbounded PDR pin/host equivalence after initial reset (4modes xHALF4/25),
   plus32strict source tests. Root rechecks every proof/status/XML, actual

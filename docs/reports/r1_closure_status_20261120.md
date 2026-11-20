@@ -48,8 +48,11 @@ count to nedge[1]. D159 tests a build-only free-running-timer user-program
 variant with full binary output equivalence and existing independent SPI
 tests across four modes and HALF values 4 and 25. 44797232291 passes all eight unbounded equivalence cases and 32 source tests,
 with independently reviewed statuses, parameters and project Python runtime.
-A fresh fixed-seed compilation is next; no native/timing result is claimed
-for the free-running timer variant yet.
+Fresh compilation 44798802734 reproduces the original control image exactly.
+The candidate fits at 102/128 logic cells versus 103 for the control, with
+identical pins/parameters/seed. Its compiler timing estimate is uncharacterized
+and worse; no performance improvement is claimed. Actual native/reset/reload
+and connected timing of this new image are next. Production RTL is unchanged.
 
 ## Failures kept as controls
 

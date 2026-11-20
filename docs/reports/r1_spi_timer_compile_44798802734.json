@@ -1,0 +1,104 @@
+{
+  "run": 44798802734,
+  "source_sha": "693e3b6bee9d082109c616431648646693c0a4be",
+  "artifact_id": 14660895812,
+  "archive_sha256": "bb767eb1a77a6eaa5e438ffbf2f519a58c772d21908ea00cbe16e6a8d59f0b44",
+  "archive_bytes": 274999,
+  "control": {
+    "case": "control",
+    "run": "44798802734",
+    "source_sha": "693e3b6bee9d082109c616431648646693c0a4be",
+    "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+    "placed_utilisation": {
+      "FABULOUS_LC": {
+        "used": 103,
+        "available": 128
+      },
+      "wp_timer": {
+        "used": 3,
+        "available": 4
+      },
+      "wp_shift": {
+        "used": 3,
+        "available": 4
+      },
+      "IOBUF": {
+        "used": 19,
+        "available": 42
+      },
+      "GBUF": {
+        "used": 1,
+        "available": 4
+      },
+      "SYS_RESET": {
+        "used": 0,
+        "available": 1
+      }
+    },
+    "model_fmax_mhz": 40.6,
+    "model_timing_characterized": false,
+    "requested_placement_frequency_mhz": 50,
+    "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+    "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+    "actual_native_loading": false,
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false
+  },
+  "candidate": {
+    "case": "candidate",
+    "run": "44798802734",
+    "source_sha": "693e3b6bee9d082109c616431648646693c0a4be",
+    "image_sha256": "79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a",
+    "placed_utilisation": {
+      "FABULOUS_LC": {
+        "used": 102,
+        "available": 128
+      },
+      "wp_timer": {
+        "used": 3,
+        "available": 4
+      },
+      "wp_shift": {
+        "used": 3,
+        "available": 4
+      },
+      "IOBUF": {
+        "used": 19,
+        "available": 42
+      },
+      "GBUF": {
+        "used": 1,
+        "available": 4
+      },
+      "SYS_RESET": {
+        "used": 0,
+        "available": 1
+      }
+    },
+    "model_fmax_mhz": 37.88,
+    "model_timing_characterized": false,
+    "requested_placement_frequency_mhz": 50,
+    "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+    "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+    "actual_native_loading": false,
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false
+  },
+  "independent_review": {
+    "original_control_bytes_exact": true,
+    "control_candidate_pin_constraints_identical": true,
+    "original_parameters_seed_strict_ports_and_capacity_pass": true,
+    "new_native_preparation": "passes locally; actual loading remains pending"
+  },
+  "member_sha256": {
+    "control/result.json": "9e5ff394af4c81d9ac236b8fec663cdce006f847ae1401b7940efe21fea7e125",
+    "candidate/result.json": "a4bba84b232f2f286da64abc55ac8143003731fb150c251c2db79f231df38246",
+    "candidate/concurrency.wbit": "79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a",
+    "candidate/design.fasm": "7509e2bbac963047cbfc28311543f5a5170569a7a7afd23cd18a8d28686ce025"
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

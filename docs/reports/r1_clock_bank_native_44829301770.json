@@ -81,10 +81,30 @@
   "native_candidate_passed": false,
   "management_candidate_reached": false,
   "timing_reached": false,
-  "local_single_unused_F_I2_trial": {
-    "passed": false,
-    "failure": "Same unknown host-ready assertion at 115981 ns; not promoted",
-    "scope": "Local diagnostic only, not hosted acceptance"
+  "scope": "Failed D-bank native result retained. Generated RTL pass and exact frame agreement do not qualify function or timing.",
+  "local_rejected_trials": {
+    "F.I2": {
+      "passed": false,
+      "failure": "configured host-write ready became unknown",
+      "failure_time_ns": 115981.0,
+      "loaded_image_sha256": "e3328294b7d53a3b387c2d8bbdf573e1b1a538492ed4822b3f4b0540b38626eb",
+      "actual_configuration_bits": 8736,
+      "frame_audit_passed": true,
+      "scope": "Local single-selector diagnostic only; not promoted"
+    },
+    "D.I0": {
+      "passed": false,
+      "failure": "configured host-write ready became unknown",
+      "failure_time_ns": 115981.0,
+      "loaded_image_sha256": "9845290d4b601cf7fecaae3ad2e3b43e6932b8282c65aaccd5bbd842c15f5aa9",
+      "actual_configuration_bits": 8736,
+      "frame_audit_passed": true,
+      "scope": "Local single-selector diagnostic only; not promoted"
+    }
   },
-  "scope": "Failed D-bank native result retained. Generated RTL pass and exact frame agreement do not qualify function or timing."
+  "local_new_observation_control": {
+    "passed": true,
+    "actual_configuration_bits": 8736,
+    "scope": "Matched A-bank image with new read-only pre-release observation; native concurrent UART/SPI and reset/second SPI pass. No new hosted timing claim."
+  }
 }

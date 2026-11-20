@@ -1,0 +1,128 @@
+{
+  "run": 44831585287,
+  "source_sha": "d9d7991ed2c27945bf7d56a583a2fc4921f3967d",
+  "artifact_id": 14677710079,
+  "archive_bytes": 281938,
+  "archive_sha256": "a5c5a97a3f7b37724cb63a28e46701eae47522834bb5d7db0c2862b3455f138b",
+  "result": {
+    "run": "44831585287",
+    "source_sha": "d9d7991ed2c27945bf7d56a583a2fc4921f3967d",
+    "cases": {
+      "control": {
+        "image_sha256": "79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a",
+        "clock_bank": "X0Y4/A",
+        "logical_graph_preserved": true,
+        "placed_utilisation": {
+          "FABULOUS_LC": {
+            "used": 102,
+            "available": 128
+          },
+          "wp_timer": {
+            "used": 3,
+            "available": 4
+          },
+          "wp_shift": {
+            "used": 3,
+            "available": 4
+          },
+          "IOBUF": {
+            "used": 19,
+            "available": 42
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "model_fmax_mhz": null,
+        "model_timing_characterized": false,
+        "placements_exact": true
+      },
+      "reroute": {
+        "image_sha256": "dc929023b3fd8a83512e8c2b28c70479191d05db3f1844d16b50b28804bd218c",
+        "clock_bank": "X0Y4/A",
+        "logical_graph_preserved": true,
+        "placed_utilisation": {
+          "FABULOUS_LC": {
+            "used": 102,
+            "available": 128
+          },
+          "wp_timer": {
+            "used": 3,
+            "available": 4
+          },
+          "wp_shift": {
+            "used": 3,
+            "available": 4
+          },
+          "IOBUF": {
+            "used": 19,
+            "available": 42
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "model_fmax_mhz": 36.76,
+        "model_timing_characterized": false,
+        "placements_exact": true
+      },
+      "candidate": {
+        "image_sha256": "97caee72e610700fddd885f21b7d07a3116f19b45540bc3c02423740df999d5e",
+        "clock_bank": "X0Y4/D",
+        "logical_graph_preserved": true,
+        "placed_utilisation": {
+          "FABULOUS_LC": {
+            "used": 102,
+            "available": 128
+          },
+          "wp_timer": {
+            "used": 3,
+            "available": 4
+          },
+          "wp_shift": {
+            "used": 3,
+            "available": 4
+          },
+          "IOBUF": {
+            "used": 19,
+            "available": 42
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "model_fmax_mhz": 36.76,
+        "model_timing_characterized": false,
+        "placements_exact": true
+      }
+    },
+    "diagnostic_complete": true,
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "scope": "Restore exact A checkpoint, then reroute A and D with every other user cell USER-locked to the same BEL. Same packed graph, pins, seed1, model and50MHz request. No transplanted repairs or timing acceptance."
+  },
+  "independent_checks": {
+    "all_three_graphs_equal": true,
+    "all_three_placements_exact": true,
+    "all_three_raw_images_match": true,
+    "native_admission_passed": true,
+    "wrong_reroute_clock_rejected": true
+  },
+  "scope": "Routing evidence only; native/reset/reload and extracted timing pending."
+}

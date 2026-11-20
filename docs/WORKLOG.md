@@ -4,6 +4,18 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D163 routing44831585287 atd9d7991e passes: restored A raw79db28...
+  is exact; rerouted A rawdc929023... and D raw97caee72... preserve all
+  expected user locations and identical logical graphs. Root independently
+  checks all three packed graphs/placements/raw hashes. Receipt:
+  reports/r1_clock_bank_fixed_44831585287.json. Native admission and a
+  negative wrong-clock-control check pass locally; actual hosted native
+  reset/reload and connected timing remain next, with no timing claim.
+- New read-only reset observation retains a passing matched A native
+  concurrent UART/SPI and second-SPI reset test locally. Actual8736-bit
+  audits pass for that control and both failed single-selector D trials;
+  failure receipt now retains their distinct loaded hashes and scope.
+
 - D162 native run44829301770 fails candidate initialization: unknown
   host-ready at115981ns; matched A control passes, generated RTL diagnostic
   passes, management candidate and timing are not reached. Root verifies

@@ -61,7 +61,7 @@ jobs:
           for name,digest in expected.items():
               assert hashlib.sha256((Path('build/sa_iverilog/usr/bin')/name).read_bytes()).hexdigest()==digest
           PY
-      - name: Actual native control and candidate UART SPI reset STOP reload
+      - name: Observe actual native control and candidate runtime without forcing unknowns
         timeout-minutes: 12
         run: |
           source .venv/bin/activate

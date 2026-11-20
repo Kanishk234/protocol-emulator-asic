@@ -1,5 +1,15 @@
 # Bugs
 
+## 169: Bundled OSS simulation libc cannot load hosted Python 3.12
+
+- **Symptom/check:**44796772243 at87864afc again passes PDR, then venv
+  cocotb cannot load libpython3.12 because the OSS vvp wrapper injects
+  bundled libm without GLIBC_2.38. No source test executes in that case.
+- **Fix/coverage:** use the normal CI system Icarus for source simulation,
+  with project venv Python/cocotb first in PATH; retain pinned OSS tools
+  for formal only. Local system-Icarus/venv mode0 HALF4 executes all four
+  source tests successfully. Rerun all eight hosted cases before admission.
+
 ## 168: SPI experiment auditor rejects standard SBY PASS metadata
 
 - **Symptom/check:**44796314987 at6449167d completes unbounded PDR and

@@ -4,6 +4,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Corrected SPI matrix44796772243 passes inspected PDR cases but source
+  simulation fails before execution: bundled OSS libm cannot load hosted
+  Python3.12 (BUG169). Switch source simulation to ordinary-CI system
+  Icarus, preserving project venv; formal keeps pinned OSS. Local mode0
+  HALF4 on system Icarus executes four strict passing source tests.
+  Rerun all eight cases; no compiler/native/timing admission yet.
 - SPI experiment44796314987 at6449167d reaches actual PDR PASS and four
   source test passes in inspected mode0/HALF4, then status auditor rejects
   standard `PASS 0 1` metadata (BUG168). Correct strict status/log admission

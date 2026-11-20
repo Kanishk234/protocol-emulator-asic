@@ -57,7 +57,9 @@ class DelimiterPathMonitor:
                 assert row['rx'] is not None, row
                 assert producer.data == (0x3009 if row['kind'] == 'START' else 0x3002), row
                 row['command'] = clock
-                assert 0 < clock - row['rx'] <= 2, row
+                # A single reflex needs one EVAL and one EXEC clock.
+                # EVAL can wait up to one additional clock in fallback mode.
+                assert 0 < clock - row['rx'] <= 1 + chip.lanes[0].fire_period, row
                 self.inflight.append(row)
                 self.current_command = row
         for row in list(self.inflight):
@@ -67,7 +69,10 @@ class DelimiterPathMonitor:
                     for key, port in [('memory', chip.lanes[1].inp[1]), ('guard', chip.pins[1].tx_port)]:
                         if row[key] is None and port.last_seq == producer.seq:
                             row[key] = clock
-                            assert clock - row['command'] == 1, row
+                            # The pin consumes every clock. A lane take can wait
+                            # for the next eligible EVAL after publication.
+                            limit = chip.lanes[1].fire_period if key == 'memory' else 1
+                            assert 0 < clock - row['command'] <= limit, row
             if (row['settled'] is None and row['memory'] is not None and row['guard'] is not None
                     and chip.pins[1].clk is None and unit._sel and unit._sel_next
                     and chip.outputs()[0] & 0x80):

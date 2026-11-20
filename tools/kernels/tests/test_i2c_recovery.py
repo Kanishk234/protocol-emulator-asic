@@ -35,6 +35,15 @@ def run_controller(program, ctrl):
         if ctrl.done():
             break
     ctrl.check_recovered()
+    if monitor is not None:
+        # The controller can finish before the final STOP's guard reopens.
+        # Observe the released bus for the existing 30-clock settling budget.
+        for clock in range(ctrl.clocks, ctrl.clocks + 30):
+            _, outputs, enables = chip.outputs()
+            assert not (outputs & enables & 1) and not (enables & 2)
+            monitor.sample(chip, clock, 1, int(not (enables & 1)))
+            chip.uio_in = 0xFF
+            chip.step()
     assert not any(pin.flags['OVERRUN'] for pin in chip.pins)
     if monitor is not None:
         print('DELIMITER_PATH ' + json.dumps(monitor.finish(), sort_keys=True))

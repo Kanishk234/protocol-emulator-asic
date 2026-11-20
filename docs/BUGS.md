@@ -543,3 +543,13 @@ D-192regression update: candidate now passes55/55selected whole-chip protocol/Ph
 - Root cause: a historical experiment supplied its own SDC; the current official config generator does not. LibreLane resolves dir:: paths relative to the config directory, so moving a merged-config copy changes their meaning.
 - Caught by: inspection of the pinned official Project.create_user_config/create_merged_config implementation and the native config-loading convention before any physical workflow launch.
 - Fix/coverage: explicit wrapper sources the pinned stock base.sdc, rejects custom constraint policies, and diagnostic configs stay in src/. test_signoff_audit_uses_stock_base_instead_of_missing_generated_file and test_diagnostic_configs_preserve_source_relative_path_resolution cover both assumptions. CI-helper suite49PASS. This was a draft tooling defect; no physical run failed and no hardware/configuration gate was changed.
+
+### 2026-11-20 — Candidate formal runner silently reversed an already-applied patch
+
+- Symptom: candidate formal run 44672634769 failed the status-queue safety proof.
+- Root cause: GNU patch batch mode detected an already-applied patch and automatically reversed it. A scratch experiment reproduced the reversal byte-for-byte to the known unfixed source.
+- Fix and coverage: both candidate formal runners bind source and patch hashes to the reviewed receipt, select forward or reverse explicitly in an isolated directory, and verify the resulting hash. The baseline control still proves against the known unfixed source. The queue and integration suites were rerun with both input source variants.
+
+### 2026-11-20 — ACK monitor helper lost its native default
+
+Unit run 44787221018 recorded 22 TypeErrors after the scheduler-aware change made fire_period a required argument. Existing synthetic ACK monitor tests call contracts(program) and exercise native timing. Restored the native default while whole-chip scheduler tests continue to pass their cadence explicitly. The 22 monitor tests pass with either environment cadence, and the 41 compiler response tests pass.

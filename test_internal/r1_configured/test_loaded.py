@@ -102,7 +102,10 @@ async def loaded_concurrent_uart_spi(d):
         # Let the stretched frame strobe finish before another frame header.
         # The real management SPI path spaces words much farther apart.
         d.cfg_strobe.value=0;await cycle(d,5)
-    await cycle(d,10);d.rst_n.value=1;await cycle(d,10)
+    await cycle(d,10)
+    if os.environ.get('R1_RUNTIME_SNAPSHOT'):
+        capture_runtime(d,Path(os.environ['R1_RUNTIME_SNAPSHOT']).with_name('runtime-before-reset-release.json'))
+    d.rst_n.value=1;await cycle(d,10)
     d._log.info('Compiler image loaded through frame FSM; starting pin-level traffic')
     if os.environ.get('R1_CFG_SNAPSHOT'):
         capture_configuration(d,os.environ['R1_CFG_SNAPSHOT'])

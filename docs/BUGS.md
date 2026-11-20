@@ -19,6 +19,11 @@
   Inactive tiles also contain unobservable unknown FFs; do not assume every X
   is an error. Next capture actual native cell pins and compare generated RTL
   using the same image, keeping the native failure as the controlling result.
+- **Further observation:** 44673352765 at def28bcd retains the native failure
+  and passes generated-RTL reset/protocol tests on the same image. Root reads
+  all native cell pins, with zero alias-value conflicts. D-153 tests only
+  three proved irrelevant inputs on constant LUT functions in the structural
+  unknown backward graph; actual native repair remains unproved.
 
 ## 160: Per-column power feasibility does not screen every enclosing grid stripe
 

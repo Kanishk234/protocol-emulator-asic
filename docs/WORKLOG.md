@@ -2,6 +2,21 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
+
+- 44673352765 at def28bcd reproduces the native failure, while generated RTL
+  passes on the same image. Root replays all cell-pin aliases: 26655 signal
+  bits, zero conflicts, structural X backward graph of 3727 bits. This is
+  observational scope, not proof of unique cause, hazards or timing behavior.
+- D-153 re-proves three existing selectors on actual constant LUT functions:
+  C.I0 (0xffff), F.I0 and F.I3 (0x0000) at X5Y1. All are absent from active
+  input routes, cofactor-independent, carry-safe and physically frame-bound.
+  Prepare seven combinations plus unchanged failing control. Every expected
+  image independently audits 8736 bits; these are not native observations.
+- Next run actual native control/variant reset and UART/SPI checks, then real
+  management reload for a passing variant. Keep all failed controls, G1,
+  hardware, ABI and timing constraints unchanged. No phase boxes ticked.
+
 ## 2026-11-19 — Continue timing diagnosis while user is away
 
 - Runtime observation 44672672250 at d37b75b4 preserves the control pass and

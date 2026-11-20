@@ -1,5 +1,26 @@
 # Decisions
 
+## D-153: Test cofactor-proved constant-LUT input changes in the failed SA image
+
+- **Date:** 2026-11-20. Native pin-trace run 44673352765 at def28bcd preserves
+  the native failure while the same image passes generated RTL. Root aliases
+  26655 observed signal bits with zero conflicts, then follows a structural
+  backward graph of 3727 X-valued bits from host-ready, including sequential
+  data dependencies. This is an overapproximation, not a causal timing proof.
+- **Bounded repair:** only X5Y1/C.I0, X5Y1/F.I0 and X5Y1/F.I3. The actual
+  configuration proves C's function is 0xffff and F's is 0x0000, combinational
+  mode, no active input routes and unique one-bit physical selectors. Check
+  all 16 cofactors and carry safety. The F alternatives lead to existing
+  D-118 grounded wires; C's alternative was known in the captured state.
+  Its logical irrelevance holds for every binary input value, not just that
+  observed value. Preserve every other configuration bit and active feature.
+- **Evidence/gates:** prepare all seven nonempty combinations plus unchanged
+  failed SA image. The actual native failed control must reproduce; compare
+  all 8736 observed bits per case. Never force X values. Require real reset,
+  UART/SPI, then management STOP/reload for any passing variant. No candidate
+  adoption or timing claim without connected extracted timing and remaining
+  full-chip/PVT/loading-mode gates. Production G1, ABI and hardware stay fixed.
+
 ## D-152: Calibrate the enclosing power-grid overlap against the assembled macro
 
 - **Date:** 2026-11-19. The static column budget requires a complete supply

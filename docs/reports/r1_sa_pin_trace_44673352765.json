@@ -1,0 +1,37 @@
+{
+  "run": "44673352765",
+  "source_sha": "def28bcd47386e31659238fb93263df46cb771e3",
+  "passed": false,
+  "cases": {
+    "control": {
+      "passed": true,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+      "configuration_bits": 8736
+    }
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "error": "XML contains failures, errors or skipped tests",
+  "generated_rtl_candidate": {
+    "passed": true,
+    "scope": "Generated RTL diagnostic only; original native failure retained."
+  },
+  "artifact": {
+    "id": 14601335480,
+    "name": "r1-sa-native-44673352765",
+    "bytes": 8667881,
+    "sha256": "5e707e39f53e41946637d38bb9823cf1f5333903a0ed95d46bb9428ef0c0837e"
+  },
+  "root_review": "Original native control passes; native candidate still fails. Generated RTL passes reset/restart and protocol checks with byte-identical D118-derived image. Root native pin-alias replay captures 26655 bits without conflict; unknown structural backward graph has 3727 bits. No timing or functional repair claim.",
+  "cofactor_candidates": {
+    "count": 17,
+    "selected_for_bounded_test": [
+      "X5Y1/C.I0",
+      "X5Y1/F.I0",
+      "X5Y1/F.I3"
+    ],
+    "scope": "Input irrelevance/frame/carry proofs only; no delay, hazard or successful repair inference."
+  }
+}

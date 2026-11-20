@@ -29,7 +29,8 @@
   "observations": {
     "candidate": "Loaded traffic starts at 115921 ns; simulator stops advancing at 116000 ns, then bounded execution terminates. XML says Simulator shut down prematurely. Exact oscillation cause unproven.",
     "vvp_other_events": 12807810806,
-    "candidate_management_reached": false
+    "candidate_management_reached": false,
+    "candidate_configuration": "Root independently compares all 8736 observed bits against the actually loaded moved-cell image; exact agreement. This excludes this measured frame mismatch, not runtime oscillation."
   },
   "member_sha256": {
     "result.json": "6522dde38a6253da76447d60d1471ba35e7a244aceccd3c1dabbe16e208a767c",
@@ -37,5 +38,53 @@
     "candidate/results.xml": "04fa74027c051030bd3706825a171c3081f989920f089b0fe9a8bdf3051d6176"
   },
   "adopted": false,
-  "timing_acceptance": false
+  "timing_acceptance": false,
+  "postfailure_candidate_frame_audit": {
+    "passed": true,
+    "tiles": 40,
+    "compared_configuration_bits": 8736,
+    "per_tile": {
+      "Tile_X0Y0_NW_term": 4,
+      "Tile_X0Y1_W_IO4": 81,
+      "Tile_X0Y2_W_IO4": 81,
+      "Tile_X0Y3_W_IO4": 81,
+      "Tile_X0Y4_SW_term": 20,
+      "Tile_X1Y0_N_IO": 35,
+      "Tile_X1Y1_LUT4x8_ha": 438,
+      "Tile_X1Y2_LUT4x8_ha": 438,
+      "Tile_X1Y3_LUT4x8_ha": 438,
+      "Tile_X1Y4_S_IO2": 60,
+      "Tile_X2Y0_N_IO": 35,
+      "Tile_X2Y1_LUT4x8_ha": 438,
+      "Tile_X2Y2_PRIM2T2S": 334,
+      "Tile_X2Y3_LUT4x8_ha": 438,
+      "Tile_X2Y4_S_IO2": 60,
+      "Tile_X3Y0_N_IO": 35,
+      "Tile_X3Y1_LUT4x8_ha": 438,
+      "Tile_X3Y2_LUT4x8_ha": 438,
+      "Tile_X3Y3_LUT4x8_ha": 438,
+      "Tile_X3Y4_S_IO2": 60,
+      "Tile_X4Y0_N_IO": 35,
+      "Tile_X4Y1_LUT4x8_ha": 438,
+      "Tile_X4Y2_LUT4x8_ha": 438,
+      "Tile_X4Y3_LUT4x8_ha": 438,
+      "Tile_X4Y4_S_IO2": 60,
+      "Tile_X5Y0_N_IO": 35,
+      "Tile_X5Y1_LUT4x8_ha": 438,
+      "Tile_X5Y2_PRIM2T2S": 334,
+      "Tile_X5Y3_LUT4x8_ha": 438,
+      "Tile_X5Y4_S_IO2": 60,
+      "Tile_X6Y0_N_IO": 35,
+      "Tile_X6Y1_LUT4x8_ha": 438,
+      "Tile_X6Y2_LUT4x8_ha": 438,
+      "Tile_X6Y3_LUT4x8_ha": 438,
+      "Tile_X6Y4_S_IO2": 60,
+      "Tile_X7Y0_NE_term": 0,
+      "Tile_X7Y1_E_IO4": 73,
+      "Tile_X7Y2_E_IO4": 73,
+      "Tile_X7Y3_E_IO4": 73,
+      "Tile_X7Y4_SE_term": 4
+    },
+    "scope": "Native frame-to-latch image agreement only; no functional or timing qualification."
+  }
 }

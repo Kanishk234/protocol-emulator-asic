@@ -6,6 +6,8 @@
   controls, then the moved-cell image reaches traffic at 115921 ns and stalls
   at 116000 ns. Bounded execution terminates; XML reports premature simulator
   shutdown. VVP reports 12,807,810,806 other events.
+- **Independent audit:** all 8736 moved-cell observed configuration bits match
+  its actually loaded image. This excludes that measured frame mismatch.
 - **Root cause:** unresolved; excessive delta activity is consistent with
   a combinational event oscillation, but the exact circuit is not localized.
   This is not a functional pass or an established silicon timing failure.

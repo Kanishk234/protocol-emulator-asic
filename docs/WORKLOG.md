@@ -4,6 +4,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D-155 independently qualifies the routing-only image from 44676960615.
+  Workflow 44784239092 at 5ae78f18 is running actual native control, reroute
+  reset/protocol traffic and management STOP/reload. Local preparation verifies
+  exact source digests; 22 focused timing/frame/placement guard tests pass.
+  Timing now requires exact reproduction of setup -11.108903 ns and hold
+  -1.870506 ns, zero loops and all four annotation controls before measurement.
+  Root postfailure audit also confirms all 8736 moved-cell configuration bits
+  match its loaded image; the runtime stall remains unresolved. No phase boxes.
 - Status check: fixed native run 44678070512 at 7917817c finishes failed.
   Retained result shows both original and fixed-placement rerouting controls
   pass, with 8736 actual configuration bits audited in each. The moved-cell

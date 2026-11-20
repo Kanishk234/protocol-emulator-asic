@@ -2,6 +2,25 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-19 — Continue timing diagnosis while user is away
+
+- GitHub confirms all five triggered workflows green at 06cb5498: docs
+  44633094837, unit 44633094718, test 44633094678, lint 44633094763 and fabric
+  44633094733. No new hardening was triggered by those checks/docs changes.
+- Read-only routing search retains active feature bits and every existing
+  set bit. Nine one-selector alternatives across the three D-148 targets
+  find only the already tested D.I3 constant route. Two additional distinct
+  two-selector F.I2 alternatives find no constant route. This bounded search
+  does not establish that all possible routing repairs are exhausted.
+- D-149 adds source-identified endpoint partitions and expanded native launch/
+  capture-class reports with the original failing model/constraints intact.
+  Ten focused partition/timing tests pass. Next authenticate preparation,
+  launch the separate cloud diagnostic, and inspect internal path structure
+  before choosing a placement, routing or shell-boundary repair.
+- User requests continued autonomous work during a 90-minute absence;
+  existing scoped commit/push authorization remains in force. No phase boxes
+  ticked, no candidate adopted and no production G1/default changes.
+
 ## 2026-11-19 — Review selector sweep and verify upstream SRAM use
 
 - Upstream main 2083973336a9ce7ae528bfa90a79c0ff09d148de still instantiates

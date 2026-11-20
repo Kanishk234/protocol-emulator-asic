@@ -1,5 +1,26 @@
 # Decisions
 
+## D-149: Separate timing endpoint and launch classes before choosing a repair
+
+- **Date:** 2026-11-19. The D-148 sweep does not close timing. A conservative
+  read-only search preserving active feature bits and existing set bits finds
+  no new constant route for F.I2 with one or two selector changes. Do not
+  promote the existing 13 ps improvement as a closure solution.
+- **Diagnostic:** preserve the authenticated parent image, connected RC,
+  source topology, all configuration cases, clock and I/O constraints. Add
+  expanded native reports for register-to-register, input-to-register and
+  register-to-output paths under both original loop policies and corners.
+  Independently partition every endpoint by exact source port/register identity;
+  reject unknown endpoints and reproduce the original timing failure/coverage.
+- **Initial evidence:** 44623006209 contains 225 register-data endpoints and
+  21 output endpoints. Setup fails at 55 register-data endpoints and eight
+  outputs. Worst internal capture is -9.855256 ns. Hold fails at 109 register
+  endpoints and zero outputs. Internal capture does not imply internal launch;
+  the expanded reports must distinguish that before prescribing a repair.
+- **Limits:** additional reports only. No false paths, boundary relaxation,
+  physical modification, compiler change or acceptance claim. Full shell and
+  physical clock/data loading still require separate integration evidence.
+
 ## D-148: Test only proved unused primary-input selectors against qualified RC timing
 
 - **Date:**2026-11-19.44623006209 establishes complete active annotation,

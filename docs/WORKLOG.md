@@ -4,6 +4,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Actual D-153 run 44674800066 at 8af0ebcc: original failure reproduces,
+  all seven variants still fail, all eight actual 8736-bit audits pass.
+  F.I3 resolves F output X to 0 but host-ready remains X. No repair/adoption.
+  Return to original working placement for D-154: restore original checkpoint,
+  compare fixed-placement rerouting with one targeted X1Y2/F to X1Y1/C move.
+  Local native checkpoint calibration reproduces original image words and
+  exact logical graph/placements after empty-port normalization; two mutation
+  tests and workflow syntax pass. New heavy routing remains hosted.
 - 44673352765 at def28bcd reproduces the native failure, while generated RTL
   passes on the same image. Root replays all cell-pin aliases: 26655 signal
   bits, zero conflicts, structural X backward graph of 3727 bits. This is

@@ -1,0 +1,74 @@
+{
+  "run": "44674800066",
+  "source_sha": "8af0ebcc230a1201f93c98aeea1459fcd97e6f1e",
+  "cases": {
+    "000": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "aaf4e356824b983365584f0caae903444863ce7e4691fab6ac894c344f906174"
+    },
+    "001": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "ff6f9fae040c35b750d82d7622b345af7b5212faee349829ec7dd4b6cbce3d9b"
+    },
+    "010": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "11072b72a9242c71385b7be36bcedcc80520fbe0706f5b811fee204f99f35c1b"
+    },
+    "011": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "b4b62dc01e93c3e1f1385b1405c3e59bee0a171cbbbb632fa18f9fb285fdc050"
+    },
+    "100": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "cb2451287a1c3a4c611bc1fbefacd737085504cce8db483d83fc9fe7d9a9fa89"
+    },
+    "101": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "f3e0698ec5ea76c1990007701d8203df96d92a70b58f31d2ab32ad25ccc7a0bb"
+    },
+    "110": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "d4b1fab8d4613a29668de0a96029f49a08986935bcde9b3339ccfa8209f5461f"
+    },
+    "111": {
+      "passed": false,
+      "error": "XML contains failures, errors or skipped tests",
+      "configuration_bits": 8736,
+      "image_sha256": "e1c9382481f056e384a553d3118e51d9af995c212754b1a0c30ce94a8030214d"
+    }
+  },
+  "diagnostic_complete": true,
+  "repair_functional_passed": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "control_reproduced": true,
+  "artifact": {
+    "id": 14601846491,
+    "name": "r1-sa-input-repair-44674800066",
+    "bytes": 23387747,
+    "sha256": "7c98267b001959fb0f900d64e3b7e982d6b15bca88534a145a824ccc59682a3f"
+  },
+  "root_replay": "All eight actual frame snapshots match their image words; all image deltas contain only the expected cofactor-proved selector bits. No variant passes functionality. No management reload or candidate timing is claimed.",
+  "partial_observation": {
+    "target": "X5Y1/F.I3",
+    "native_output_before": "X",
+    "native_output_after": "0",
+    "host_ready_after": "X",
+    "scope": "Observation of partial unknown resolution only; not a repair or timing pass."
+  }
+}

@@ -1,5 +1,27 @@
 # Decisions
 
+## D-154: Reroute fixed placements and move only the LUT on the observed false-input chain
+
+- **Date:** 2026-11-20. D-153 does not repair the SA image. Return to the
+  original working placement: the worst setup chain traverses an irrelevant
+  input of the two-input combinational LC at X1Y2/F. X1Y1/C is a free nearby
+  BEL whose original unused-input route reaches an existing grounded wire.
+  This motivates one location, not a placement/seed sweep. Grounding in a new
+  route must be rechecked; the original observation does not guarantee it.
+- **Controls:** pinned nextpnr can restore the original routed checkpoint with
+  packing/placement disabled and reproduce all original image words. Native
+  round-trip also preserves all placements and exact signal-net partitions,
+  cell masters/parameters, allowing only serialization of empty ports.
+- **Trial:** (1) restore exact old image, (2) clear only route attributes and
+  reroute with every placement fixed, (3) the same rerouting with only this
+  combinational LC moved to X1Y1/C. Preserve all logical connections/parameters,
+  I/O and GBUF locations, seed 1, explicit 50 MHz and existing time bounds.
+  The source LC has only I0/I1 connected, INIT 0x1111, and no carry or FF.
+- **Gates:** reject any unexpected placement or logical-graph change. Do not
+  infer functionality or physical timing from the compiler estimate. Require
+  actual native loading/reset/reload and connected RC timing before adoption.
+  No hardware, ABI, production defaults or timing constraints change.
+
 ## D-153: Test cofactor-proved constant-LUT input changes in the failed SA image
 
 - **Date:** 2026-11-20. Native pin-trace run 44673352765 at def28bcd preserves

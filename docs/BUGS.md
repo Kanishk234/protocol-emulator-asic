@@ -24,6 +24,12 @@
   all native cell pins, with zero alias-value conflicts. D-153 tests only
   three proved irrelevant inputs on constant LUT functions in the structural
   unknown backward graph; actual native repair remains unproved.
+- **D-153 outcome:** 44674800066 at 8af0ebcc reproduces the failed control
+  and all seven combinations still fail native traffic. All eight cases have
+  8736 correct observed configuration bits. F.I3 makes F's output resolve
+  from X to 0, reducing the structural unknown graph, but not the handshake
+  failure. No variant is adopted. Avoid treating this partial resolution as
+  a working repair; return to original-placement timing work in D-154.
 
 ## 160: Per-column power feasibility does not screen every enclosing grid stripe
 

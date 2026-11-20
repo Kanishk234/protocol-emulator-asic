@@ -13,11 +13,22 @@ from compile.bitfile import BitFile
 
 def prepare(capsule,native,trial,out,trial_kind='sa'):
     capsule,native,trial,out=(Path(p).resolve() for p in (capsule,native,trial,out))
-    result=json.loads((trial/'result.json').read_text())
+    trial_inputs=[trial/'result.json']
+    if trial_kind=='spi_timer_free_run':
+        trial_inputs=[trial/name/'result.json' for name in ('control','candidate')]
+        cases={name:json.loads(path.read_text()) for name,path in zip(('control','candidate'),trial_inputs)}
+        if any(str(row['run'])!='44798802734' or row['source_sha']!='693e3b6bee9d082109c616431648646693c0a4be' or
+               row['actual_native_loading'] or row['model_timing_characterized'] for row in cases.values()):
+            raise ValueError('Require the authenticated source-proven SPI compile campaign')
+        if cases['control']['image_sha256']!='c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f':
+            raise ValueError('Original compiler control did not reproduce')
+        result=dict(run='44798802734',diagnostic_complete=True,cases=cases)
+    else:result=json.loads(trial_inputs[0].read_text())
     admitted={
         'sa':('44653541979','0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f'),
         'fixed_relocation':('44676960615','cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b'),
-        'fixed_reroute':('44676960615','cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462')}
+        'fixed_reroute':('44676960615','cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462'),
+        'spi_timer_free_run':('44798802734','79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a')}
     if trial_kind not in admitted:raise ValueError('Unknown fixed-source native trial')
     run_id,image_sha=admitted[trial_kind]
     if (str(result['run'])!=run_id or not result['diagnostic_complete'] or
@@ -48,7 +59,7 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
     if sha(modules)!='64922d92969e229e8562d9cc0c4bd1cb5add15766ec10709576f0255ebf2ce06':
         raise ValueError('Native frame audit source changed')
     (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),native=str(modules),trial_kind=trial_kind,
-        input_sha256={str(p):sha(p) for p in [Path(__file__).resolve(),trial/'result.json',modules,out/'native-audit.json',
+        input_sha256={str(p):sha(p) for p in [Path(__file__).resolve(),*trial_inputs,modules,out/'native-audit.json',
           *[out/(n+'-case')/f for n in case_names for f in ('report.json','design.fasm','concurrency.wbit')]]}),indent=2)+'\n')
 
 
@@ -109,7 +120,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

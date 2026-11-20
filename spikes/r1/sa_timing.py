@@ -63,16 +63,29 @@ def prepare(rc,proof,native,capsule,pdk,functional,out):
          actual_native_run=data['run'],frame_audit=frame,actually_loaded_image_sha256=sha(image)),indent=2)+'\n')
 
 
+
+def validate_parent(parent):
+    if (not parent.get('diagnostic_complete') or
+            parent.get('error')!='Configured macro setup/hold or loop-policy check fails'):
+        raise ValueError('Original connected timing control did not reproduce')
+    for kind,expected in (('setup',-11.108903),('hold',-1.870506)):
+        model=parent['models']['routed_'+kind]
+        if (abs(model['worst_slack_ns']-expected)>0.000001 or
+                model['structural_loops']!=0 or model['loop_policy_sensitive']):
+            raise ValueError('Original connected timing control changed')
+    coverage=[parent['annotation']['routed_'+kind+'_'+policy]
+              for kind in ('setup','hold') for policy in ('static','dynamic')]
+    if any(not row['passed'] for row in coverage):
+        raise ValueError('Original active annotation is incomplete')
+
+
 def run(out):
     out=Path(out).resolve();plan=json.loads((out/'plan.json').read_text())
     if any(sha(p)!=h for p,h in plan['inputs'].items()):raise ValueError('Actual candidate evidence changed')
     try:run_parent(out/'baseline')
     except SystemExit:pass
     parent=json.loads((out/'baseline/result.json').read_text())
-    if not parent['diagnostic_complete'] or parent.get('error')!='Configured macro setup/hold or loop-policy check fails':
-        raise ValueError('Original connected timing control did not reproduce')
-    if any(not a['passed'] for k,a in parent['annotation'].items() if k.startswith('routed_')):
-        raise ValueError('Original active annotation is incomplete')
+    validate_parent(parent)
     models={};coverage={}
     for kind in ('setup','hold'):
         logs=[]

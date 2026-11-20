@@ -1,0 +1,87 @@
+{
+  "run": "44652966001",
+  "source_sha": "2b16f7a88c409d78f1e74c682f5ae39f075ccba4",
+  "scope": "Fixed seed1, original synthesized design/pins/model and routing budget. Reproduce implicit 12 MHz control, then explicitly request 50 MHz. Placeholder model remains uncharacterized; no timing or physical acceptance.",
+  "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+  "binary_sha256": "a36179428d1afb5c9b88950097f03473f22949a39be1ac5cf6e5f3a95b526829",
+  "cases": {
+    "control": {
+      "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "requested_placement_frequency_mhz": 12,
+      "model_fmax_mhz": 40.6,
+      "model_timing_characterized": false,
+      "actual_native_loading": false
+    },
+    "candidate": {
+      "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "requested_placement_frequency_mhz": 50,
+      "model_fmax_mhz": 40.6,
+      "model_timing_characterized": false,
+      "actual_native_loading": false
+    }
+  },
+  "diagnostic_complete": true,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "artifact": {
+    "id": 14590929103,
+    "name": "r1-placement-trial-44652966001",
+    "bytes": 152119,
+    "sha256": "d539a0f543a60c142ff31f063fd99989b0cd0f329cea65f8cf89c7824d6bf0c8"
+  },
+  "root_replay": "Both FASM files reproduce all image words. Both raw images are byte-identical to frozen original; target-only change did not change placement/routing.",
+  "repair_effective": false
+}

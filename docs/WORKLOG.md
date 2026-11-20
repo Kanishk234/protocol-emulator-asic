@@ -4,6 +4,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-19 — Continue timing diagnosis while user is away
 
+- Matched frequency trial 44652966001 at 2b16f7a8 succeeds as a diagnostic:
+  original image reproduced at both targets; explicit 50 MHz changes no image
+  bytes. Root replays both FASM encodings. Report:
+  reports/r1_placement_trial_44652966001.json. Reject target-only placement as
+  a closure fix. D-151 next compares full SA placement against the original
+  analytic/refinement control, both explicitly at 50 MHz and seed 1.
 - Expanded-path run 44651183711 at bbdec58f succeeds. Root replays endpoint
   partitions, active annotation, loop-policy agreement and script hashes.
   Worst register-to-register setup is -9.855256 ns; input-to-register setup

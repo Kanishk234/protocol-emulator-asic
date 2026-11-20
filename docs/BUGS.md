@@ -14,6 +14,10 @@
 - **Coverage:** focused admission tests reject a 12 MHz log as 50 MHz evidence.
   No production compiler default changes or candidate adoption precede review;
   native loading and extracted configured timing remain mandatory.
+- **Measured outcome:** 44652966001 at 2b16f7a8 names the correct 50 MHz
+  target, but its image is byte-identical to the 12 MHz control and frozen
+  original. Root replays FASM encoding and image bytes. Target-only placement
+  is ineffective as a closure repair; D-151 tests a different placement method.
 
 ## 158: Unused LUT-input proof must also cover carry side effects
 

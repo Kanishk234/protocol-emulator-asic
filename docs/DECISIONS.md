@@ -1,5 +1,20 @@
 # Decisions
 
+## D-151: Compare full annealing with the original analytic placement at a fixed seed
+
+- **Date:** 2026-11-19. D-150 run 44652966001 reproduces the original raw
+  image byte-for-byte at both 12 and 50 MHz. The explicit target corrects the
+  reported goal but does not change placement or routing; it is not a repair.
+- **Next isolated trial:** retain the frozen synthesis/model, same seed 1,
+  same pins and process-group timeout. Both cases request 50 MHz. The control
+  uses the original default HeAP placer plus refinement and must reproduce
+  the original image. The candidate changes only `--placer sa`, allowing a
+  different placement method rather than a random-seed sweep.
+- **Limits:** no new hardware, topology, protocols, timing-model scaling or
+  production defaults. Native nextpnr estimates remain uncharacterized.
+  Retain all failures and require real loading/reload plus connected extracted
+  timing before any adoption or timing claim.
+
 ## D-150: Request the intended placement frequency in one matched primary trial
 
 - **Date:** 2026-11-19. BUG159: frozen primary nextpnr logs explicitly target

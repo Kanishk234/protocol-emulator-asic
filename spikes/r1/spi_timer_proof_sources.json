@@ -1,0 +1,68 @@
+{
+  "run": {
+    "id": 44797232291,
+    "head_sha": "f3e10d58a785b8bfb0bcdf963f88fe3409d1f15c",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_spi_timer_trial.yaml"
+  },
+  "artifacts": [
+    {
+      "id": 14659406906,
+      "name": "r1-spi-timer-44797232291-mode0-half25",
+      "digest": "sha256:a0facbd146a3ecf636b32c98d56b0fe2b290918413d8c852d020e7460df795e2",
+      "size_in_bytes": 138629,
+      "source_run": 44797232291
+    },
+    {
+      "id": 14659880080,
+      "name": "r1-spi-timer-44797232291-mode0-half4",
+      "digest": "sha256:1e265a02cca5a44f30827d72599e83dd8e0702554fe65de1d849902277e622f7",
+      "size_in_bytes": 82142,
+      "source_run": 44797232291
+    },
+    {
+      "id": 14659406940,
+      "name": "r1-spi-timer-44797232291-mode1-half25",
+      "digest": "sha256:98343a2994014e3f8419482f692255059ca8cf757a59e80a957a0cc3ba4874d8",
+      "size_in_bytes": 140003,
+      "source_run": 44797232291
+    },
+    {
+      "id": 14658294641,
+      "name": "r1-spi-timer-44797232291-mode1-half4",
+      "digest": "sha256:fa970847bfe5dc91e0eaa5c4ce5ed60be09463cfedcf376e2f444251ef6252f0",
+      "size_in_bytes": 86015,
+      "source_run": 44797232291
+    },
+    {
+      "id": 14659437243,
+      "name": "r1-spi-timer-44797232291-mode2-half25",
+      "digest": "sha256:ae068183498541cc05dda141be3f59f9a66592b76e16c98ba2619120f0e9d257",
+      "size_in_bytes": 139065,
+      "source_run": 44797232291
+    },
+    {
+      "id": 14659712185,
+      "name": "r1-spi-timer-44797232291-mode2-half4",
+      "digest": "sha256:178d42a18a6773a89c8b5175719258b8ce03f1fcb2cf5965ed1b8656b378f8b8",
+      "size_in_bytes": 86022,
+      "source_run": 44797232291
+    },
+    {
+      "id": 14659033589,
+      "name": "r1-spi-timer-44797232291-mode3-half25",
+      "digest": "sha256:7e8cda4cb393a50b40501aa5fd93a52567b5e1b14204667de6e7c0639ca39f6a",
+      "size_in_bytes": 145620,
+      "source_run": 44797232291
+    },
+    {
+      "id": 14659841854,
+      "name": "r1-spi-timer-44797232291-mode3-half4",
+      "digest": "sha256:8bcf2a83b1747ec744d280a7cbfaa834801519fe04765e4a323b40d996159177",
+      "size_in_bytes": 85800,
+      "source_run": 44797232291
+    }
+  ]
+}

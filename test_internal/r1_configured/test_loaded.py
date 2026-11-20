@@ -17,6 +17,10 @@ async def cycle(d,n=1):
 async def put(d,value):
     d.h_wdata.value=value;d.h_wvalid.value=1
     for _ in range(20000):
+        if str(d.h_wready.value) not in ('0','1'):
+            if os.environ.get('R1_RUNTIME_SNAPSHOT'):
+                capture_runtime(d,os.environ['R1_RUNTIME_SNAPSHOT'])
+            raise AssertionError('configured host-write ready became unknown')
         ready=int(d.h_wready.value)
         await cycle(d)
         if ready:
@@ -48,6 +52,31 @@ def capture_configuration(d,path):
     Path(path).write_text(json.dumps(dict(tiles=tiles),indent=2,sort_keys=True)+'\n')
     return tiles
 
+
+def capture_runtime(d,path):
+    """Read-only native port/FF observation; unknown values remain unknown."""
+    tiles={}
+    for tile in d.fabric:
+        if not isinstance(tile,HierarchyObject) or not tile._name.startswith('Tile_'):
+            continue
+        signals={};flops={}
+        names=['UserCLK']+['L'+letter+'_'+pin for letter in 'ABCDEFGH'
+                          for pin in ('I0','I1','I2','I3','O','Ci','Co')]
+        for name in names:
+            try:signals[name]=str(getattr(tile,name).value)
+            except AttributeError:pass
+        for cell in tile:
+            if isinstance(cell,HierarchyObject) and str(cell._def_name).startswith('sg13cmos5l_df'):
+                pins={}
+                for pin in ('D','CLK','RESET_B','SET_B','Q'):
+                    try:pins[pin]=str(getattr(cell,pin).value)
+                    except AttributeError:pass
+                flops[cell._name]=pins
+        tiles[tile._name]=dict(tile_type=tile._def_name,signals=signals,flops=flops)
+    Path(path).write_text(json.dumps(dict(time_ns=get_sim_time(unit='ns'),
+        host_ready=str(d.h_wready.value),tiles=tiles,
+        scope='Native runtime observation only; no values forced or tests waived.'),indent=2,sort_keys=True)+'\n')
+
 @cocotb.test()
 async def loaded_concurrent_uart_spi(d):
     div=int(os.environ['R1_DIV'])
@@ -67,6 +96,8 @@ async def loaded_concurrent_uart_spi(d):
     d._log.info('Compiler image loaded through frame FSM; starting pin-level traffic')
     if os.environ.get('R1_CFG_SNAPSHOT'):
         capture_configuration(d,os.environ['R1_CFG_SNAPSHOT'])
+    if os.environ.get('R1_RUNTIME_SNAPSHOT'):
+        capture_runtime(d,Path(os.environ['R1_RUNTIME_SNAPSHOT']).with_name('runtime-after-load.json'))
 
     activity={}
     async def uart_tx():

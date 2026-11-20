@@ -21,6 +21,12 @@
   infer functionality or physical timing from the compiler estimate. Require
   actual native loading/reset/reload and connected RC timing before adoption.
   No hardware, ABI, production defaults or timing constraints change.
+- **Initialization correction (BUG162):** 44676026324 restores exactly but its
+  cold reroute aborts before the relocation. Pinned backend initialization is
+  in `prePlace`, so cold cases must execute placement with all cells locked at
+  USER strength, then independently verify every position. Native no-route
+  calibration passes. This preserves the intended experiment; it does not
+  relax placement constraints or change the graph/timing model.
 
 ## D-153: Test cofactor-proved constant-LUT input changes in the failed SA image
 

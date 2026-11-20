@@ -4,6 +4,12 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Fixed-route run 44676026324 at 5380598d restores the original image, then
+  aborts in the cold reroute control before reaching the moved cell. BUG162
+  localizes missing per-cell initialization to pinned FABulous `prePlace`.
+  Correct cold cases to run initialization with all cells USER-locked. Native
+  no-route calibration confirms exact original placements/logical graph; keep
+  the original crash as a control and rerun actual routing on GitHub.
 - Actual D-153 run 44674800066 at 8af0ebcc: original failure reproduces,
   all seven variants still fail, all eight actual 8736-bit audits pass.
   F.I3 resolves F output X to 0 but host-ready remains X. No repair/adoption.

@@ -1,0 +1,61 @@
+{
+  "run": "44676026324",
+  "source_sha": "5380598d7e78ebf65d417cf463a42f953024fa1b",
+  "cases": {
+    "restore": {
+      "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "model_fmax_mhz": null,
+      "model_timing_characterized": false,
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "logical_graph_preserved": true,
+      "placements_exact": true,
+      "actually_loaded": false
+    }
+  },
+  "diagnostic_complete": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "scope": "Restore exact original image; then compare identical fixed placements rerouted from scratch versus one combinational LC moved X1Y2/F to free X1Y1/C. Same logical graph, seed1, 50MHz and hardware. No characterized timing or adoption.",
+  "error": "Compile evidence worker failed (-6); inspect /home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_trial/reroute/stdout.log",
+  "artifact": {
+    "id": 14601418728,
+    "name": "r1-fixed-relocation-44676026324",
+    "bytes": 139226,
+    "sha256": "82baba4ed9a4b374af103250befcee4b00fde3fbb782ad423891cdf7dc551bad"
+  },
+  "diagnosis": {
+    "kind": "missing_backend_initialization",
+    "not_congestion_evidence": true,
+    "relocation_reached": false,
+    "source_revision": "c4fbb55a",
+    "source_path": "generic/viaduct/fabulous/fabulous.cc",
+    "source_observation": "prePlace initializes CellTagger and placement timing estimates; cold route with no-place skips this.",
+    "local_fixed_placement_calibration": "Native placement execution with every cell USER=6 preserves exact placements and logical graph; no routing performed."
+  }
+}

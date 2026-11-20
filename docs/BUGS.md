@@ -1,5 +1,20 @@
 # Bugs
 
+## 162: Cold rerouting skips FABulous per-cell initialization with no-place
+
+- **Symptom:** 44676026324 at 5380598d restores the original image exactly,
+  but the cold reroute control aborts with `std::out_of_range`, cell index 125
+  against a zero-sized vector. The relocation candidate is not reached.
+- **Root cause:** pinned FABulous backend `prePlace()` calls `assign_cell_info`
+  and timing-estimate initialization. A restored fully routed checkpoint needs
+  no new path searches, but clearing routes and skipping placement omits the
+  per-cell tag initialization needed by routing. This is not congestion evidence.
+- **Fix/check:** retain no-place for the exact restore control. For cold routing,
+  run placement initialization with every cell at `STRENGTH_USER=6`, as defined
+  by the pinned source, then require exact planned placements and logical graph.
+  Native no-route calibration preserves every placement and connection. Actual
+  cold rerouting still requires hosted validation; keep the original crash.
+
 ## 161: Annealed image loads correctly but host-ready becomes unknown during traffic
 
 - **Symptom:** 44654335485 at f3b4daf9 passes the original native control, then

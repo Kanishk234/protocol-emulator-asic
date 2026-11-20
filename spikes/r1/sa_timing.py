@@ -59,7 +59,8 @@ def prepare(rc,proof,native,capsule,pdk,functional,out):
     admitted={'0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f',
               'cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b',
               'cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462',
-              '6a29427ad987091613795b89ef9dc463be0b7c2e1d85c6679e04312c23d72066'}
+              '6a29427ad987091613795b89ef9dc463be0b7c2e1d85c6679e04312c23d72066',
+              '696cd708a5fad674134724bcbdf43c1ceed287b61a73d1bfa393ac301b70d187'}
     if quiescence['source_image_sha256'] not in admitted:
         raise ValueError('Require an admitted fixed-source placement image')
     if sha(image)!=data['cases']['candidate']['image_sha256'] or sha(functional/'candidate/configuration-state.json')!=data['cases']['candidate']['observed_configuration_sha256']:
@@ -118,6 +119,9 @@ def run(out):
             if proc.returncode:raise ValueError('Native SA timing execution failed')
             text=(out/(label+'.log')).read_text();logs.append(parse_log(text));coverage[label]=annotation(text)
         models[kind]=compare(*logs)
+        models[kind]['structural_loops_by_policy']={policy:row['structural_loops']
+            for policy,row in zip(('static','dynamic'),logs)}
+        models[kind]['structural_loops']=max(row['structural_loops'] for row in logs)
     qualified=all(a['passed'] for a in coverage.values()) and all(not m['loop_policy_sensitive'] and m['structural_loops']==0 for m in models.values())
     result=dict(run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),diagnostic_complete=True,
         models=models,coverage=coverage,model_qualified=qualified,

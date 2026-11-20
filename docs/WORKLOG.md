@@ -4,6 +4,20 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D-156 actual run 44786871916 at 144616d1 succeeds: original and reroute
+  controls, repaired direct native reset/UART/SPI, full management error/CRC,
+  USER_RESET/STOP/reload and traffic all pass. Root independently replays all
+  four 8736-bit frame audits and confirms byte-identical direct/reload states.
+  Loaded image cbf4300d88050502da6fcf167fcbbcbcd045ebd8b6aa7c36f92e05483c4aeb94;
+  snapshot 1e258a2de04e9bdfb46eb5417fc6fd5abae97cfa58412a3996297df9f6231a8b.
+  Receipt reports/r1_feedback_native_44786871916.json. Local frozen source,
+  connected SPEF and unchanged timing-script preparation pass. Dispatch actual
+  extracted setup/hold next; functional success is not timing closure.
+- Uninstrumented one-selector repair workflow 44786871916 at 144616d1
+  authenticates all inputs and is running original/reroute controls, repaired
+  direct reset/UART/SPI and full management reload. No acceptance while pending.
+  Separately correct future observer reports to retain runner SystemExit as a
+  failed instrumented case; the original partial diagnostic remains archived.
 - Actual D-155 run 44784239092 repeats both direct native passes, but shell
   stalls at 5333140 ns after loading/rejection checks; no reload acceptance.
   Read-only observer 44785764117 passes its original control and localizes

@@ -35,6 +35,11 @@
   and stops at tick 116000000 in X3Y3/D native logic. Actual loaded INIT
   0x0fcc ignores I0; selected I0 route returns from the same LD_O. D-156
   tests one existing selector without changing the LUT function or model.
+- **Actual repair validation:** 44786871916 at 144616d1 passes original and
+  reroute controls, uninstrumented repaired native traffic/reset and full
+  management STOP/reload. All four actual 8736-bit audits pass; direct and
+  shell/reload states match. One-selector repair resolves this observed
+  moved-image stall. Extracted timing and whole-chip acceptance remain open.
 - **Related routing guard:** free real-cell slots can be occupied by nextpnr
   LUT constant pseudo-PIPs. The relocation preflight now reads these routing
   triples and rejects constant-occupied targets; positive/malformed metadata

@@ -1,0 +1,58 @@
+{
+  "run": 44786871916,
+  "source_sha": "144616d15398b02a9d3ef92aba75d915d00619a2",
+  "artifact_id": 14655216803,
+  "archive_sha256": "c2653d11d222188c551399b18be72271c222d1e7bf0718a75ab401f8b6e566ee",
+  "archive_bytes": 11142768,
+  "result": {
+    "run": "44786871916",
+    "source_sha": "144616d15398b02a9d3ef92aba75d915d00619a2",
+    "passed": true,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      },
+      "reroute": {
+        "passed": true,
+        "image_sha256": "4b84bd934db00f35e36df31214a0ab8dfa0b0e9c76dc9579a8eee64e25c20dc4",
+        "observed_configuration_sha256": "c35b4ae891bf254712ae7474fab612efae01c75cedc8ac125a246bf8039a3a3b",
+        "configuration_bits": 8736
+      },
+      "candidate": {
+        "passed": true,
+        "image_sha256": "cbf4300d88050502da6fcf167fcbbcbcd045ebd8b6aa7c36f92e05483c4aeb94",
+        "observed_configuration_sha256": "1e258a2de04e9bdfb46eb5417fc6fd5abae97cfa58412a3996297df9f6231a8b",
+        "configuration_bits": 8736
+      },
+      "shell": {
+        "passed": true,
+        "image_sha256": "cbf4300d88050502da6fcf167fcbbcbcd045ebd8b6aa7c36f92e05483c4aeb94",
+        "observed_configuration_sha256": "1e258a2de04e9bdfb46eb5417fc6fd5abae97cfa58412a3996297df9f6231a8b",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "fixed_relocation",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "candidate_functional_passed": true
+  },
+  "independent_review": {
+    "all_four_actual_frame_audits": 8736,
+    "candidate_shell_observations_identical": true,
+    "source_proven_connected_RC_and_timing_preparation": "passed locally; actual STA still pending"
+  },
+  "member_sha256": {
+    "result.json": "3252e9ac45fd274d0b50bdd377c662c778fb6152908bed764496cf705b354bf5",
+    "repair-proof.json": "5c14f87596ee5a3c7475e9cee551944a254763583c5993fbdbec71213fbc833e",
+    "candidate/configuration-state.json": "1e258a2de04e9bdfb46eb5417fc6fd5abae97cfa58412a3996297df9f6231a8b",
+    "shell/configuration-state.json": "1e258a2de04e9bdfb46eb5417fc6fd5abae97cfa58412a3996297df9f6231a8b",
+    "candidate/quiesced.wbit": "cbf4300d88050502da6fcf167fcbbcbcd045ebd8b6aa7c36f92e05483c4aeb94"
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

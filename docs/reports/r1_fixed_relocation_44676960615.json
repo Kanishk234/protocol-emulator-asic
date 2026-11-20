@@ -1,0 +1,120 @@
+{
+  "run": "44676960615",
+  "source_sha": "4ef3050aeeedb37238a54509a526eb49e897a63b",
+  "cases": {
+    "restore": {
+      "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "model_fmax_mhz": null,
+      "model_timing_characterized": false,
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "logical_graph_preserved": true,
+      "placements_exact": true,
+      "actually_loaded": false
+    },
+    "reroute": {
+      "image_sha256": "cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462",
+      "model_fmax_mhz": 40.6,
+      "model_timing_characterized": false,
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "logical_graph_preserved": true,
+      "placements_exact": true,
+      "actually_loaded": false
+    },
+    "candidate": {
+      "image_sha256": "cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b",
+      "model_fmax_mhz": 40.6,
+      "model_timing_characterized": false,
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "logical_graph_preserved": true,
+      "placements_exact": true,
+      "actually_loaded": false
+    }
+  },
+  "diagnostic_complete": true,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "scope": "Restore exact original image; then compare identical fixed placements rerouted from scratch versus one combinational LC moved X1Y2/F to free X1Y1/C. Same logical graph, seed1, 50MHz and hardware. No characterized timing or adoption.",
+  "artifact": {
+    "id": 14602995056,
+    "name": "r1-fixed-relocation-44676960615",
+    "bytes": 264030,
+    "sha256": "45178670906bd43c1519c46e6c7c154eaf1dd47d2ce3e4b3db808420496cceeb"
+  },
+  "root_replay": "All logical signal partitions/cell parameters and planned positions replay exactly. All FASM files reproduce their images. Restore is byte-identical to frozen original; only candidate moves one real cell. Native loading/extracted timing pending."
+}

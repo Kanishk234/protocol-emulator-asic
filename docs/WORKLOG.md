@@ -4,6 +4,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Initialized fixed-placement run 44676960615 at 4ef3050a passes all three
+  structural controls. Root independently verifies signal partitions, cell
+  masters/parameters, exact planned positions and image encoding; restored
+  image is byte-identical to original. Candidate raw image cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b.
+  Receipt: reports/r1_fixed_relocation_44676960615.json. Native loading and
+  extracted timing remain pending. Admit this exact source into the existing
+  native harness, additionally retaining the routing-only control. A failed
+  control cannot be presented as a passing whole campaign.
 - Fixed-route run 44676026324 at 5380598d restores the original image, then
   aborts in the cold reroute control before reaching the moved cell. BUG162
   localizes missing per-cell initialization to pinned FABulous `prePlace`.

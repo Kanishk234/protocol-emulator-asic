@@ -14,6 +14,10 @@
   by the pinned source, then require exact planned placements and logical graph.
   Native no-route calibration preserves every placement and connection. Actual
   cold rerouting still requires hosted validation; keep the original crash.
+- **Actual validation:** 44676960615 at 4ef3050a completes restore, cold reroute
+  and targeted relocation. Root verifies exact planned positions, unchanged
+  logical graph and all image encodings. The initialization failure is repaired;
+  this does not establish native functionality or timing of the new images.
 
 ## 161: Annealed image loads correctly but host-ready becomes unknown during traffic
 

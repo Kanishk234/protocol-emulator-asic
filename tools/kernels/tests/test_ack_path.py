@@ -8,14 +8,16 @@ from kernels import PROGRAMS
 from kernels.ack_path import AckPathMonitor, AckTimingController
 from protomodels.i2c_memory import check_result, exercise
 from tripc.linked_budget import compose_linked_response
-from tripc.response import analyze_queries
+from tripc.response import analyze_response
 from tripsim import Chip
 
 
 @lru_cache
-def contracts(program):
+def contracts(program, fire_period):
     image, _ = tripc.compile_file(PROGRAMS / f'{program}.trw')
-    responses = analyze_queries(image, json.loads((PROGRAMS / 'analysis/i2c_memory_response.json').read_text()))
+    queries = json.loads((PROGRAMS / 'analysis/i2c_memory_response.json').read_text())
+    responses = {name: analyze_response(image, query, fire_period=fire_period)
+                 for name, query in queries.items()}
     budget = json.loads((PROGRAMS / 'analysis/i2c_memory_linked_budget.json').read_text())
     for r in responses.values():
         r['linked_budget'] = compose_linked_response(image, r, budget)
@@ -48,8 +50,9 @@ def model_snapshot(chip, controller, scl, outputs, enables):
     (50, 25, 'fast_plus_at_20ns'), (50, 13, 'fast_plus_at_20ns')])
 @pytest.mark.parametrize('phase', range(4))
 def test_whole_workload_ack_entry_and_path(program, period, high, profile, phase):
-    image, responses = contracts(program)
     chip = Chip(lanes=2)
+    fire_period = chip.lanes[0].fire_period
+    image, responses = contracts(program, fire_period)
     tripc.load(chip, image)
     controller = AckTimingController(period, high, phase)
     expected = exercise(controller)
@@ -70,5 +73,9 @@ def test_whole_workload_ack_entry_and_path(program, period, high, profile, phase
     records = monitor.finish()
     assert len(records) == 35
     assert all(r['rx_publish'] == 3 and r['tx_accept'] == 1 for r in records)
-    assert all(r['lane'] == (4 if r['role'] == 'address_ack' else 2) for r in records)
+    if fire_period == 1:
+        assert all(r['lane'] == (4 if r['role'] == 'address_ack' else 2) for r in records)
+    else:
+        assert all(r['lane'] in {case['response_clocks'] for case in responses[r['role']]['cases']}
+                   for r in records)
     assert not any(unit.flags['OVERRUN'] for unit in chip.pins)

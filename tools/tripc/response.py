@@ -128,7 +128,7 @@ def _alu(f, a, b, regs, constants):
     return data, flag
 
 
-def _case(lane, q, value, flags):
+def _case(lane, q, value, flags, fire_period=1, phase=0):
     words = [int(w, 16) for w in lane['slots']]
     fields = [_fields(w) for w in words]
     regs = [q['registers'].get(f'r{i}') for i in range(4)]
@@ -174,7 +174,8 @@ def _case(lane, q, value, flags):
                     return finish('unknown', 'Flag result depends on an unknown register or time')
                 write_flag = f['DF'], flag
 
-        snapshot = (state, flags, pending, tuple(regs), available, executing)
+        eligible = (clock + phase) % fire_period == 0
+        snapshot = (state, flags, pending, tuple(regs), available, executing, eligible)
         if snapshot in visited:
             return finish('unknown', 'Repeated abstract state before response')
         visited.add(snapshot)
@@ -184,7 +185,7 @@ def _case(lane, q, value, flags):
                   'i0_tag': S.TAGS[q['input_tag']], 'i1_tag': S.TAGS[q['input_tag']],
                   'i0_data': value, 'i1_data': value, 'o0_free': 1, 'o1_free': 1}
         context = {name: ((1 << WIDTHS[name]) - 1, val) for name, val in values.items()}
-        pick = next((i for i, word in enumerate(words) if readiness(word, context) is not None), None)
+        pick = next((i for i, word in enumerate(words) if readiness(word, context) is not None), None) if eligible else None
         trace.append({'clock': clock, 'state': state, 'flags': flags,
                       'pending': pending, 'slot': pick})
         if pick is not None:
@@ -193,7 +194,7 @@ def _case(lane, q, value, flags):
                 return finish('unknown', 'CALL requires a routine/SRAM progress contract')
             if f['DST'] in (S.DST['O0'], S.DST['O1']) and f['DST'] != target:
                 return finish('unknown', 'Earlier output requires a consumer-progress contract')
-        elif executing is None:
+        elif executing is None and eligible:
             return finish('counterexample', 'No ready action or future arrival under this contract')
 
         if write_reg is not None:
@@ -215,16 +216,27 @@ def _case(lane, q, value, flags):
     return finish('unknown', 'Clock horizon reached before response')
 
 
-def analyze_response(image, query):
+def analyze_response(image, query, *, fire_period=1):
     """Check a closed, single-token lane contract; never a pin timing certificate."""
+    if type(fire_period) is not int or fire_period not in (1, 2):
+        raise ValueError('fire_period must be 1 or 2')
     q, lane = _query(image, query)
-    cases = [_case(lane, q, value, flags) for value in q['input_values']
-             for flags in range(8) if flags & q['flag_mask'] == q['flag_value']]
+    cases = [_case(lane, q, value, flags, fire_period, phase) for value in q['input_values']
+             for flags in range(8) if flags & q['flag_mask'] == q['flag_value']
+             for phase in range(fire_period)]
+    assumptions = ASSUMPTIONS.copy()
+    if fire_period == 2:
+        assumptions[:2] = [
+            'Clock 0 begins with the input token visible. Both initial EVAL phases are checked.',
+            'EVAL runs every other clock; EXEC still commits each clock. No routine, pending flag or EXEC action exists initially.',
+        ]
+        for index, case in enumerate(cases):
+            case['initial_eval_phase'] = index % fire_period
     status = ('counterexample' if any(c['status'] == 'counterexample' for c in cases) else
               'unknown' if any(c['status'] == 'unknown' for c in cases) else 'bounded')
     return {'status': status, 'bound_clocks': max(c['response_clocks'] for c in cases)
             if status == 'bounded' else None, 'query': q,
-            'assumptions': ASSUMPTIONS.copy(), 'cases': cases,
+            'assumptions': assumptions, 'cases': cases,
             'pin_to_pin_bound': False, 'deadlock_certificate': False,
             'compiled_image_sha256': compiled_image_hash(image)}
 

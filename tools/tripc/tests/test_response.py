@@ -172,7 +172,7 @@ def test_known_alu_values_match_independent_model():
         assert got == (expected.d, expected.r)
 
 
-def model_response(image, q, case, rng):
+def model_response(image, q, case, rng, fire_period=1):
     fabric = Fabric()
     request = fabric.producer('request')
     inputs = [fabric.port('I0'), fabric.port('I1')]
@@ -181,7 +181,7 @@ def model_response(image, q, case, rng):
     request.load(S.TAGS[q['input_tag']], case['input'])
     fabric.commit()
     lane_image = image['lanes'][q['lane']]
-    lane = Lane(0, len(lane_image['slots']), inputs, outputs)
+    lane = Lane(0, len(lane_image['slots']), inputs, outputs, fire_period=fire_period)
     lane.slots = [isa.decode_slot(int(w, 16)) for w in lane_image['slots']]
     lane.k = list(lane_image['k'])
     lane.regs = [q['registers'].get(f'r{i}', rng.randrange(65536)) for i in range(4)]
@@ -192,8 +192,9 @@ def model_response(image, q, case, rng):
     for clock in range(q['max_clocks'] + 1):
         if target.valid:
             return clock, target.tag, target.data
-        lane.compute_exec(clock)
-        lane.compute_eval(clock)
+        absolute_clock = clock + case.get('initial_eval_phase', 0)
+        lane.compute_exec(absolute_clock)
+        lane.compute_eval(absolute_clock)
         if clock < len(case['trace']):
             assert lane._e.get('latch', {}).get('n') == case['trace'][clock]['slot']
         lane.commit()
@@ -212,6 +213,20 @@ def test_all_memory_cases_match_independent_pipeline_and_fabric(program):
             for _ in range(3):
                 assert model_response(image, r['query'], case, rng) == (
                     case['response_clocks'], S.TAGS['DATA'], 0)
+
+
+@pytest.mark.parametrize('program', ['i2c_target_eeprom', 'i2c_target_eeprom_guard'])
+def test_fallback_memory_bounds_match_model_at_both_phases(program):
+    image, _ = tripc.compile_file(PROGRAMS / f'{program}.trw')
+    rng = random.Random(0xACC)
+    for name, contract in json.loads(CONTRACTS.read_text()).items():
+        result = analyze_response(image, contract, fire_period=2)
+        assert result['status'] == 'bounded'
+        assert result['bound_clocks'] == {'address_ack': 5, 'write_ack': 3}[name]
+        assert {c['initial_eval_phase'] for c in result['cases']} == {0, 1}
+        for case in result['cases']:
+            assert model_response(image, result['query'], case, rng, fire_period=2) == (
+                case['response_clocks'], S.TAGS['DATA'], 0)
 
 
 def test_cli_queries_fail_closed_and_do_not_change_images(tmp_path):

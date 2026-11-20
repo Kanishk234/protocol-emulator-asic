@@ -1,0 +1,119 @@
+name: R1 unused upstream cleanup native reload and extracted timing diagnostic
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_upstream_cleanup.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-upstream-cleanup
+  cancel-in-progress: false
+jobs:
+  native:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/sa_pdk
+      PYTHONPATH: tools:test_internal:spikes/r1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate original native exports and new SA image
+        timeout-minutes: 18
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          from upstream_cleanup import prepare
+          sources=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']
+          sources={name:sources[name] for name in ('capsule','native')}
+          sources['trial']={
+            'run':{'id':44676960615,'head_sha':'4ef3050aeeedb37238a54509a526eb49e897a63b','head_branch':'efpga','run_attempt':1,'conclusion':'success','path':'.github/workflows/r1_fixed_relocation.yaml'},
+            'artifact':{'id':14602995056,'name':'r1-fixed-relocation-44676960615','digest':'sha256:45178670906bd43c1519c46e6c7c154eaf1dd47d2ce3e4b3db808420496cceeb','size_in_bytes':264030,'source_run':44676960615},'member':'.'}
+          sources['functional']={
+            'run':{'id':44678070512,'head_sha':'7917817c0adaab5f7379f5d6e90d274f21267c3b','head_branch':'efpga','run_attempt':1,'conclusion':'failure','path':'.github/workflows/r1_fixed_functional.yaml'},
+            'artifact':{'id':14602878714,'name':'r1-fixed-native-44678070512','digest':'sha256:8cc337076fee4c106e6a1e945261c7eebe1bd1f074fe72257191f71fcf28d05f','size_in_bytes':8428039,'source_run':44678070512},'member':'sa_functional'}
+          sources['diagnostic']={
+            'run':{'id':44785764117,'head_sha':'edebd31b100349d86b29cb1f77b671da820833b2','head_branch':'efpga','run_attempt':1,'conclusion':'failure','path':'.github/workflows/r1_delta_diagnosis.yaml'},
+            'artifact':{'id':14653782318,'name':'r1-delta-diagnosis-44785764117','digest':'sha256:6a301de45d38b093264605dd7919af9f3ec01400bfe5d83c037accf7118d44ca','size_in_bytes':5640375,'source_run':44785764117},'member':'sa_functional'}
+          sources['loaded']={
+            'run':{'id':44786871916,'head_sha':'144616d15398b02a9d3ef92aba75d915d00619a2','head_branch':'efpga','run_attempt':1,'conclusion':'success','path':'.github/workflows/r1_unused_feedback.yaml'},
+            'artifact':{'id':14655216803,'name':'r1-unused-feedback-native-44786871916','digest':'sha256:c2653d11d222188c551399b18be72271c222d1e7bf0718a75ab401f8b6e566ee','size_in_bytes':11142768,'source_run':44786871916},'member':'sa_functional'}
+          sources['timing']={
+            'run':{'id':44790210039,'head_sha':'72f1fe2eb8708b506041d94ce011f239680f10f5','head_branch':'efpga','run_attempt':1,'conclusion':'failure','path':'.github/workflows/r1_feedback_timing.yaml'},
+            'artifact':{'id':14654534728,'name':'r1-feedback-timing-44790210039','digest':'sha256:7c61732669466ffaf4b1776d913b605d22449347ca2c18ee7b26537b7e63034e','size_in_bytes':1663746,'source_run':44790210039},'member':'r1_routed_timing'}
+          frozen=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']
+          sources.update({name:frozen[name] for name in ('rc','proof')})
+          sources['current']={
+            'run':{'id':44792141462,'head_sha':'1fc91f31b067adfa889193df132f0bc8b39888d6','head_branch':'efpga','run_attempt':1,'conclusion':'success','path':'.github/workflows/r1_loop_cleanup.yaml'},
+            'artifact':{'id':14655994993,'name':'r1-loop-cleanup-native-timing-44792141462','digest':'sha256:d45f8c366c47aac70f267e28d7c3eccc67b9c932f178a298fb50c26f2484bc0e','size_in_bytes':12809496,'source_run':44792141462},'member':'.'}
+          repo=os.environ['GITHUB_REPOSITORY'];target=Path('build/sa_sources').resolve();target.mkdir(parents=True,exist_ok=False)
+          roots={}
+          for name,row in sources.items():
+              producer=api(f'repos/{repo}/actions/runs/{row["run"]["id"]}')
+              admit_run(producer,row['run'])
+              roots[name]=str(artifact(repo,row['artifact'],target)/row['member'])
+              (target/(name+'.producer.json')).write_text(json.dumps(producer,indent=2)+'\n')
+          (target/'locations.json').write_text(json.dumps(roots,indent=2)+'\n')
+          prepare(**{k:v for k,v in roots.items() if k not in ('rc','proof')},out=Path('build/sa_functional'))
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+          mkdir -p build/sa_iverilog
+          curl -sfL https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb -o build/sa_iverilog.deb
+          dpkg-deb -x build/sa_iverilog.deb build/sa_iverilog
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          roots=json.loads(Path('build/sa_sources/locations.json').read_text())
+          expected=json.loads((Path(roots['capsule'])/'functional/quiescent/configured-smoke.json').read_text())['tool_binary_sha256']
+          for name,digest in expected.items():
+              assert hashlib.sha256((Path('build/sa_iverilog/usr/bin')/name).read_bytes()).hexdigest()==digest
+          PY
+      - name: Test original controls and one selector repair through native and management interfaces
+        timeout-minutes: 12
+        run: |
+          source .venv/bin/activate
+          timeout --kill-after=10s 600s python spikes/r1/upstream_cleanup.py run --out build/sa_functional \
+            --pdk "$PDK_ROOT/ihp-sg13cmos5l" --icarus build/sa_iverilog > build/sa_functional/native.log 2>&1
+      - name: Prepare timing only after actual native reload succeeds
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from sa_timing import prepare
+          roots=json.loads(Path('build/sa_sources/locations.json').read_text())
+          prepare(**{k:roots[k] for k in ('rc','proof','native','capsule')},
+              pdk=Path(os.environ['PDK_ROOT']),functional=Path('build/sa_functional'),out=Path('build/r1_loop_timing'))
+          PY
+      - name: Measure connected RC with original clock and full active coverage
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_loop_timing/image.json
+          timeout 1080s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PYTHONPATH -e GITHUB_RUN_ID -e GITHUB_SHA "$image" \
+            python3 spikes/r1/sa_timing.py run --out build/r1_loop_timing > build/r1_loop_timing/timing.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-upstream-cleanup-native-timing-${{ github.run_id }}
+          path: |
+            build/sa_functional/
+            build/r1_loop_timing/
+            build/sa_sources/*.producer.json
+            build/sa_sources/*.metadata.json
+          include-hidden-files: true
+          retention-days: 90

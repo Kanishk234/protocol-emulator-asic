@@ -62,7 +62,8 @@ def prepare(rc,proof,native,capsule,pdk,functional,out):
               '6a29427ad987091613795b89ef9dc463be0b7c2e1d85c6679e04312c23d72066',
               '696cd708a5fad674134724bcbdf43c1ceed287b61a73d1bfa393ac301b70d187',
               'a7306047e903996e8488819ab428543389cc1ffd71fe2d95a7fb2475f720884e',
-              '79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a'}
+              '79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a',
+              '218ac7799311951ed9f319ef151aa793128febbaaa6b67a3daa67fe07952920d'}
     if quiescence['source_image_sha256'] not in admitted:
         raise ValueError('Require an admitted fixed-source placement image')
     if sha(image)!=data['cases']['candidate']['image_sha256'] or sha(functional/'candidate/configuration-state.json')!=data['cases']['candidate']['observed_configuration_sha256']:
@@ -118,8 +119,11 @@ def run(out):
             if sha(script)!=plan['scripts'][label]:raise ValueError('SA case script changed')
             with (out/(label+'.log')).open('w') as stream:
                 proc=subprocess.run(['sta','-exit',str(script)],stdout=stream,stderr=subprocess.STDOUT,timeout=240)
-            if proc.returncode:raise ValueError('Native SA timing execution failed')
-            text=(out/(label+'.log')).read_text();logs.append(parse_log(text));coverage[label]=annotation(text)
+            text=(out/(label+'.log')).read_text()
+            (out/(label+'.execution.json')).write_text(json.dumps(dict(returncode=proc.returncode,
+                completion_marker=text.endswith('RUNSTA_END\n'),log_sha256=sha(out/(label+'.log'))),indent=2)+'\n')
+            if proc.returncode:raise ValueError('Native timing execution failed ('+str(proc.returncode)+')')
+            logs.append(parse_log(text));coverage[label]=annotation(text)
         models[kind]=compare(*logs)
         models[kind]['structural_loops_by_policy']={policy:row['structural_loops']
             for policy,row in zip(('static','dynamic'),logs)}

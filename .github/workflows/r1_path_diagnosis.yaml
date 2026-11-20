@@ -1,0 +1,76 @@
+name: R1 expanded timing path diagnosis
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_path_diagnosis.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-path-diagnosis
+  cancel-in-progress: false
+jobs:
+  timing:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/r1_routed_pdk
+      PYTHONPATH: tools:test_internal:spikes/r1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate geometry, source proof, real image and timing controls
+        timeout-minutes: 20
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_routed_timing.py tools/profiling/tests/test_r1_path_diagnosis.py
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          repo=os.environ['GITHUB_REPOSITORY']
+          out=Path('build/r1_routed_sources').resolve();out.mkdir(parents=True,exist_ok=False)
+          roots={}
+          for name,row in json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources'].items():
+              actual=api(f'repos/{repo}/actions/runs/{row["run"]["id"]}')
+              admit_run(actual,row['run'])
+              (out/(name+'.producer.json')).write_text(json.dumps(actual,indent=2)+'\n')
+              roots[name]=str(artifact(repo,row['artifact'],out)/row['member'])
+          (out/'locations.json').write_text(json.dumps(roots,indent=2)+'\n')
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from path_diagnosis import prepare
+          roots=json.loads(Path('build/r1_routed_sources/locations.json').read_text())
+          prepare(**roots,pdk=Path(os.environ['PDK_ROOT']),out=Path('build/r1_path_diagnosis'))
+          PY
+      - name: Analyze the geometry-identical connected RC model with active coverage
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_path_diagnosis/image.json
+          timeout 1080s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PYTHONPATH -e GITHUB_RUN_ID -e GITHUB_SHA "$image" \
+            python3 spikes/r1/path_diagnosis.py run --out build/r1_path_diagnosis > build/r1_path_diagnosis/timing.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-path-diagnosis-${{ github.run_id }}
+          path: |
+            build/r1_path_diagnosis/
+            build/r1_routed_sources/*.metadata.json
+            build/r1_routed_sources/*.producer.json
+            build/r1_routed_sources/locations.json
+          include-hidden-files: true
+          retention-days: 90
+          if-no-files-found: error

@@ -20,7 +20,7 @@ def run_controller(program, ctrl):
     chip = Chip(lanes=2)
     image, _ = tripc.compile_file(PROGRAMS / f'{program}.trw')
     tripc.load(chip, image)
-    monitor = DelimiterPathMonitor(image) if program == 'i2c_target_eeprom_guard' else None
+    monitor = DelimiterPathMonitor(image, fire_period=chip.lanes[0].fire_period) if program == 'i2c_target_eeprom_guard' else None
     for _ in range(ctrl.period * 1600 + 10_000):
         _, outputs, enables = chip.outputs()
         assert not (outputs & enables & 1), 'SDA driven high'

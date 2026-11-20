@@ -18,7 +18,7 @@ def test_wire_delimiters_to_guard_and_memory_service(period, high, phase):
     tripc.load(chip, image)
     ctrl = AckTimingController(period, high, phase)
     expected = exercise(ctrl)
-    monitor = DelimiterPathMonitor(image)
+    monitor = DelimiterPathMonitor(image, fire_period=chip.lanes[0].fire_period)
     for _ in range(period * 1600 + 10_000):
         _, outputs, enables = chip.outputs()
         assert not enables & outputs & 1 and not enables & 2

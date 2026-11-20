@@ -8,8 +8,9 @@ from tripc.service import routine_service
 
 
 class DelimiterPathMonitor:
-    def __init__(self, image):
+    def __init__(self, image, *, fire_period=1):
         self.image = image
+        self.fire_period = fire_period
         self.rows = []
         self.jobs = []
         self.previous_wire = (1, 1)
@@ -59,7 +60,7 @@ class DelimiterPathMonitor:
                 row['command'] = clock
                 # A single reflex needs one EVAL and one EXEC clock.
                 # EVAL can wait up to one additional clock in fallback mode.
-                assert 0 < clock - row['rx'] <= 1 + chip.lanes[0].fire_period, row
+                assert 0 < clock - row['rx'] <= 1 + self.fire_period, row
                 self.inflight.append(row)
                 self.current_command = row
         for row in list(self.inflight):
@@ -71,7 +72,7 @@ class DelimiterPathMonitor:
                             row[key] = clock
                             # The pin consumes every clock. A lane take can wait
                             # for the next eligible EVAL after publication.
-                            limit = chip.lanes[1].fire_period if key == 'memory' else 1
+                            limit = self.fire_period if key == 'memory' else 1
                             assert 0 < clock - row['command'] <= limit, row
             if (row['settled'] is None and row['memory'] is not None and row['guard'] is not None
                     and chip.pins[1].clk is None and unit._sel and unit._sel_next

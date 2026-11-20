@@ -40,6 +40,10 @@ def prepare(capsule,out):
         derived=copy.deepcopy(design)
         if name!='restore':
             for net in derived['modules']['top']['netnames'].values():net.get('attributes',{}).pop('ROUTING',None)
+            # Pinned nextpnr PlaceStrength::STRENGTH_USER=6. Keep placement
+            # execution for FABulous prePlace timing/tag initialization.
+            for item in derived['modules']['top']['cells'].values():
+                item['attributes']['BEL_STRENGTH']=format(6,'032b')
         placements=dict(original)
         if name=='candidate':
             placements[moved]='X1Y1/C';derived['modules']['top']['cells'][moved]['attributes']['NEXTPNR_BEL']='X1Y1/C'
@@ -74,8 +78,9 @@ def run(out):
             folder=out/name
             if sha(folder/'input.json')!=row['input_sha256']:raise ValueError('Fixed placement input changed')
             command=[binary,'--uarch','fabulous','--json',str(folder/'input.json'),'--write',str(folder/'design_pnr.json'),
-                '--no-pack','--no-place','--seed','1','--freq','50','--timing-allow-fail',
+                '--no-pack','--seed','1','--freq','50','--timing-allow-fail',
                 '-o','corner='+compiler.SLOW_CORNER,'-o','fasm='+str(folder/'design.fasm'),'--log',str(folder/'pnr.log')]
+            if name=='restore':command+=['--no-place']
             prior=os.environ.get('FAB_ROOT');os.environ['FAB_ROOT']=str(resource/'macro/fabulous')
             try:run_bounded(command,folder/'stdout.log')
             finally:

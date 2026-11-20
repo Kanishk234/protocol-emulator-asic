@@ -13,7 +13,7 @@ from tripsim import Chip
 
 
 @lru_cache
-def contracts(program, fire_period):
+def contracts(program, fire_period=1):
     image, _ = tripc.compile_file(PROGRAMS / f'{program}.trw')
     queries = json.loads((PROGRAMS / 'analysis/i2c_memory_response.json').read_text())
     responses = {name: analyze_response(image, query, fire_period=fire_period)

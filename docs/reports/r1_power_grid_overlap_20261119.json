@@ -1,0 +1,45 @@
+{
+  "scope": "Local native interface-level PG overlap calibration. Same original macro LEF, source guard procedure and OpenROAD revision as cloud. Synthetic full-height stripes; not actual pdngen, full-chip connectivity, DRC, IR-drop, precheck or physical acceptance.",
+  "openroad_revision": "dcf36133a369abc8f3c5e5738cd4d82e4903c0e0",
+  "source_macro_run": "44465623376",
+  "input_sha256": {
+    "src/pdn_cfg.tcl": "1668b21b19effa795e7219a7b2e9c88cd852fd4acaf09cd9b16871fa4818bef6",
+    "src/config.json": "3f0c415e225ccfb4851e47d5b6ac3a0f28223cf4b0770f2ebbd423786503cd19",
+    "/tmp/warp-assembled-44465623376/r1_assembly/warp_r1_candidate.lef": "8b3919fa683b59b08284361364a8c6c0305206402e3afe7b6beedbce37c895b0",
+    "/tmp/warp-r1-pg-probe/control.tcl": "ebd4fc195d51a356668c190ce0f27df719a03c78a9154ef3d6de6f40583e058b",
+    "/tmp/warp-r1-pg-probe/candidate.tcl": "2a4ddae4e21deef2052d806edc3fc799db8b1199a847822014484f36c19d7362"
+  },
+  "macro_origin_um": [
+    121.44,
+    30.24
+  ],
+  "control": {
+    "existing_guard_rejected": true,
+    "offending_net": "VGND",
+    "stripe_box_um": [
+      796.01,
+      3.78,
+      798.11,
+      706.86
+    ],
+    "missing_same_net_coverage_y_um": [
+      30.24,
+      699.3
+    ]
+  },
+  "omission_probe": {
+    "existing_guard_passed": true,
+    "removed_stripe_center_um": 797.06,
+    "remaining_macro_supply_pins_all_covered": true,
+    "adopted": false
+  },
+  "physical_acceptance": false,
+  "timing_acceptance": false,
+  "reproduction": {
+    "script": "spikes/r1/power_grid_probe.tcl",
+    "script_sha256": "ca9eee8602b42141ee5069b6adb0cfc3b2977e05153c944a470e5da126d01368",
+    "control_marker": "PROBE_RESULT 1 LOOMPDN: 1 stripe shape(s)",
+    "omission_marker": "PROBE_RESULT 0",
+    "both_complete": true
+  }
+}

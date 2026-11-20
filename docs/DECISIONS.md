@@ -1,5 +1,25 @@
 # Decisions
 
+## D-152: Calibrate the enclosing power-grid overlap against the assembled macro
+
+- **Date:** 2026-11-19. The static column budget requires a complete supply
+  pair in every column, but does not prove that every enclosing regular-grid
+  stripe crosses a matching macro supply pin. The actual assembled LEF has
+  ten full-height VPWR columns and nine VGND columns.
+- **Native calibration:** use the original macro LEF, origin 121.44/30.24 um,
+  original source `loom_check_macro_stripes` procedure and unchanged 7 um gap
+  policy in OpenROAD dcf36133. Create only synthetic full-height grid shapes.
+  The original regular grid must reject exactly the VGND stripe centered at
+  797.06 um. A second probe omits only that stripe, retaining every source
+  macro pin and the original guard; all remaining overlaps/pins must pass.
+- **Measured result:** both outcomes reproduce locally; see
+  reports/r1_power_grid_overlap_20261119.json and power_grid_probe.tcl.
+  No guard is bypassed and no production PDN script is changed.
+- **Limits:** this is not actual pdngen or enclosing-chip power connectivity,
+  DRC, precheck, voltage-drop or timing acceptance. A future physical trial
+  must qualify any grid omission through all those applicable checks. Do not
+  simply copy the G1 grid into R1 or promote this interface probe as chip closure.
+
 ## D-151: Compare full annealing with the original analytic placement at a fixed seed
 
 - **Date:** 2026-11-19. D-150 run 44652966001 reproduces the original raw

@@ -4,6 +4,16 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-19 — Continue timing diagnosis while user is away
 
+- SA placement run 44653541979 at 6d344d1b succeeds: original control image
+  reproduces, candidate raw image is 0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f,
+  with the same 103 LUT cells/3 timers/3 shifts. Its uncharacterized compiler
+  estimate is worse, so no improvement/adoption claim. Prepare actual forty-
+  native-tile control/candidate reset and management STOP/reload checks using
+  D-118 grounding only; do not transplant the parent's H-bit repair blindly.
+- D-152/BUG160 native PG overlap calibration reproduces one rejected regular
+  VGND stripe and a passing omission probe with the unchanged original guard.
+  Commit the reproducible Tcl probe and scoped receipt. This is not actual
+  pdngen or full-chip PG/DRC/precheck/voltage-drop acceptance.
 - Matched frequency trial 44652966001 at 2b16f7a8 succeeds as a diagnostic:
   original image reproduced at both targets; explicit 50 MHz changes no image
   bytes. Root replays both FASM encodings. Report:

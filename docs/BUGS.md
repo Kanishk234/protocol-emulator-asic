@@ -1,5 +1,20 @@
 # Bugs
 
+## 160: Per-column power feasibility does not screen every enclosing grid stripe
+
+- **Symptom:** the original regular grid, applied to the assembled R1 macro
+  LEF at its planned origin, is rejected by the existing native PG guard at
+  VGND x 796.010..798.110 um. No matching macro pin spans that column.
+- **Root cause:** D-112's static screen checks supply-pair availability per
+  placement column, not coverage of every stripe crossing a leaf boundary.
+- **Caught by:** D-152 native overlap calibration against original LEF and
+  unchanged `loom_check_macro_stripes`, OpenROAD dcf36133. This is a probe of
+  the proposed enclosing grid, not an already executed whole-chip failure.
+- **Cover/check:** retain the one-stripe rejection control; omitting only its
+  synthetic shape makes the same guard pass with every original macro supply
+  pin still covered. Physical implementation, precheck and connectivity remain
+  open; no production PG change or guard waiver is applied.
+
 ## 159: Compiler placement target defaults to 12 MHz instead of requesting 50 MHz
 
 - **Symptom/evidence:** original primary compile in capsule 40128859740 logs

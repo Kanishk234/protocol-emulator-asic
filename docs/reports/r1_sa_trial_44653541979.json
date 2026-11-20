@@ -1,0 +1,86 @@
+{
+  "run": "44653541979",
+  "source_sha": "6d344d1b1eee9513ba99938fea4e39dadeafe832",
+  "scope": "Fixed seed1, original synthesized design/pins/model and routing budget. Both cases explicitly request 50 MHz; candidate changes only placer from default HeAP/refinement to full SA. Placeholder model remains uncharacterized; no timing or physical acceptance.",
+  "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+  "binary_sha256": "a36179428d1afb5c9b88950097f03473f22949a39be1ac5cf6e5f3a95b526829",
+  "cases": {
+    "control": {
+      "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "requested_placement_frequency_mhz": 50,
+      "model_fmax_mhz": 40.6,
+      "model_timing_characterized": false,
+      "actual_native_loading": false
+    },
+    "candidate": {
+      "image_sha256": "0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f",
+      "placed_utilisation": {
+        "FABULOUS_LC": {
+          "used": 103,
+          "available": 128
+        },
+        "wp_timer": {
+          "used": 3,
+          "available": 4
+        },
+        "wp_shift": {
+          "used": 3,
+          "available": 4
+        },
+        "IOBUF": {
+          "used": 19,
+          "available": 42
+        },
+        "GBUF": {
+          "used": 1,
+          "available": 4
+        },
+        "SYS_RESET": {
+          "used": 0,
+          "available": 1
+        }
+      },
+      "requested_placement_frequency_mhz": 50,
+      "model_fmax_mhz": 35.12,
+      "model_timing_characterized": false,
+      "actual_native_loading": false
+    }
+  },
+  "diagnostic_complete": true,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false,
+  "artifact": {
+    "id": 14592361174,
+    "name": "r1-sa-trial-44653541979",
+    "bytes": 152412,
+    "sha256": "41cb92f45abff2d18b8e947ea7fe44132adadcabf8107d2e4feb88f3799d6fea"
+  },
+  "root_replay": "Control reproduces original raw image; both FASM files independently reproduce their image words. Candidate is distinct with equal resource usage. Model estimate is worse; actual loading and extracted timing pending."
+}

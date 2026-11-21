@@ -557,3 +557,10 @@ Unit run 44787221018 recorded 22 TypeErrors after the scheduler-aware change mad
 ### 2026-11-20 — Delimiter monitor read cadence from absent synthetic lane
 
 Nightly 44793036354 caught five synthetic delimiter tests failing with AttributeError. The monitor read scheduler cadence directly from lanes that the synthetic fixture deliberately omits. It now accepts explicit cadence, defaulting to native for synthetic callers. Chip workloads supply the actual cadence. The combined synthetic monitor suites pass 32 tests, and the fallback delimiter/recovery suite with its synthetic controls passes 230 tests.
+
+### 2026-11-20 — SRAM and pin configuration writes lack the documented halt guard
+
+- Symptom: the F-HOST-1 hardware property cannot be claimed for SRAM and pin configuration under arbitrary host writes.
+- Root cause seen in source review: the slot write decode checks the addressed lane's RUN bit. The SRAM request capture and pin configuration write decode have no RUN check, although ARCHITECTURE §9 requires the affected lane to be halted. A normal host loader can obey the ordering contract.
+- Caught by: review of `trw_host.v` write decode and host SRAM request capture against F-HOST-1. A scratch Icarus test at the decoded SPI boundary set both RUN bits, verified that a slot write was blocked, and observed the pin configuration strobe and host-slot SRAM write. A chip-level replay using the SPI pins also read back the written SRAM word and observed a pin-config strobe with lane 0 running, while the slot strobe stayed low.
+- Status: open. Determine the policy for shared resources before changing host RTL or the contract, and keep the qualified physical baseline intact pending requalification.

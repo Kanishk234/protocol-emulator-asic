@@ -30,7 +30,7 @@ OPENROAD = 'dcf36133a369abc8f3c5e5738cd4d82e4903c0e0'
 CORNERS = ('nom_fast_1p32V_m40C', 'nom_slow_1p08V_125C', 'nom_typ_1p20V_25C')
 DEFAULT_DESIGN = ROOT / 'build/status_merge_screen/design'
 SYNTH_VARIANTS = ('root-mode-synth', 'root-mode-b-edge-synth')
-VARIANTS = ('status-merge', 'root-mode', 'root-mode-fanout7', *SYNTH_VARIANTS)
+VARIANTS = ('status-merge', 'root-mode', 'root-mode-fanout7', 'root-mode-b-edge', *SYNTH_VARIANTS)
 
 
 def sha(path):
@@ -114,7 +114,7 @@ def prepare(design, *, variant="status-merge"):
         subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(root_mode_patch)],
                        cwd=design, check=True)
         expected['src/trw_pin_cfg.v'] = '02a63f1d46ad7360a0f9a8a56b004478b629540ce4eb25234235b7b4b9c43581'
-    if variant == 'root-mode-b-edge-synth':
+    if variant in ('root-mode-b-edge', 'root-mode-b-edge-synth'):
         edge_patch = patch.parent / 'b_edge/share.patch'
         if sha(edge_patch) != '02cb9e6031cf1413ef48b91c254f7c1ffe903054c0290478bfa41cb8c3f6b5d5':
             raise ValueError('B-edge patch differs from the tested candidate')

@@ -145,3 +145,6 @@ def test_b_edge_synthesis_trial_changes_only_two_pin_rtl_files(tmp_path):
     assert {name for name in before if before[name] != after[name]} == {
         'src/trw_pin_rx.v', 'src/trw_pin_unit.v'
     }
+    physical = tmp_path / 'root-mode-b-edge'
+    screen.prepare(physical, variant=physical.name)
+    assert screen.check_inputs(physical)['candidate_inputs'] == after

@@ -11,6 +11,7 @@ on:
           - status-merge
           - root-mode
           - root-mode-fanout7
+          - root-mode-b-edge
           - root-mode-synth
           - root-mode-b-edge-synth
 permissions:

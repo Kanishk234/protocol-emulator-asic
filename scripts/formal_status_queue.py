@@ -5,10 +5,33 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+from tempfile import TemporaryDirectory
 from formal_channels import ROOT, run, sha
 
 PATCH=ROOT/'spikes/phase3_status_merge/status_merge.patch'
 PROPS=['formal/props/status_queue_reference.vh','formal/props/status_queue_harness.sv','formal/status_queue.sby']
+
+
+def verified_sources(source_path):
+    """Return the exact baseline and candidate bytes from either checkout."""
+    receipt = json.loads((ROOT/'docs/reports/phase3_status_merge_candidate_result.json').read_text())
+    baseline = receipt['source_sha256']['src/trw_pin_bs.v']
+    candidate = receipt['candidate_sha256']
+    current = sha(source_path)
+    if current not in (baseline, candidate) or sha(PATCH) != receipt['patch_sha256']:
+        raise ValueError('Unexpected BITSYNC source or patch hash')
+    direction = '--forward' if current == baseline else '--reverse'
+    with TemporaryDirectory() as directory:
+        target = Path(directory)/'src/trw_pin_bs.v'
+        target.parent.mkdir()
+        shutil.copyfile(source_path, target)
+        subprocess.run(['patch', '--batch', direction, '-p1', '-i', str(PATCH)],
+                       cwd=directory, check=True, capture_output=True)
+        expected = candidate if current == baseline else baseline
+        if sha(target) != expected:
+            raise ValueError('Patched BITSYNC source does not match verified evidence')
+        original, transformed = source_path.read_bytes(), target.read_bytes()
+    return (original, transformed) if current == baseline else (transformed, original)
 
 
 def extract(source):
@@ -47,14 +70,15 @@ def main():
     for rel in ['src/trw_pin_bs.v','src/trw_defs.vh',*PROPS]:
         target=scratch/rel;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/rel,target)
     before=sha(ROOT/'src/trw_pin_bs.v')
-    subprocess.run(['patch','--batch','-p1','-i',str(PATCH)],cwd=scratch,check=True,capture_output=True)
+    baseline, candidate = verified_sources(ROOT/'src/trw_pin_bs.v')
+    (scratch/'src/trw_pin_bs.v').write_bytes(candidate)
     source=(scratch/'src/trw_pin_bs.v').read_text();seam=scratch/'src/status_queue_native.v';seam.write_text(extract(source))
     report={'scope':'Source-extracted native candidate producer cone and status register, arbitrary boundary intents/data; not whole BITSYNC engine',
             'runner_sha256':sha(__file__),'shared_runner_sha256':sha(ROOT/'scripts/formal_channels.py'),'tool_versions':{t:subprocess.check_output(args,text=True).strip() for t,args in {'yosys':['yosys','-V'],'sby':['sby','--version'],'z3':['z3','--version']}.items()},'native_sha256':before,'candidate_sha256':sha(scratch/'src/trw_pin_bs.v'),
             'patch_sha256':sha(PATCH),'extracted_sha256':sha(seam),'property_sha256':{p:sha(ROOT/p) for p in PROPS},'proofs':{},'mutation_controls':{}}
     for task,engine in [('safety','abc pdr'),('reachable','smtbmc z3')]:
         report['proofs'][task]=run('status_queue.sby',scratch/'formal',task,output/task,'PASS',engine)
-    seam.write_text(extract((ROOT/'src/trw_pin_bs.v').read_text()))
+    seam.write_text(extract(baseline.decode()))
     report['baseline_control']=run('status_queue.sby',scratch/'formal','safety',output/'baseline_control','FAIL','abc pdr')
     for name,old,new in [
         ('lose_second_pending','st_d <= st_wait_data;','st_d <= st_nd;'),

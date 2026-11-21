@@ -23,9 +23,11 @@ MUTATIONS={
 }
 
 
-def prepare(path):
+def prepare(path, *, bitsync_source=None):
     for rel in FILES:
         target=path/rel;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/rel,target)
+    if bitsync_source is not None:
+        (path/'src/trw_pin_bs.v').write_bytes(bitsync_source)
     for rel,include in INSERTIONS.items():
         target=path/rel;text=target.read_text()
         if text.count('endmodule')!=1:raise RuntimeError('Unexpected module shape: '+rel)

@@ -1,0 +1,68 @@
+{
+  "run": {
+    "id": 44858684478,
+    "head_sha": "9688dbd3706ef67033137a4ae6951b0b81db4afd",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_spi_tick_pipeline.yaml"
+  },
+  "artifacts": [
+    {
+      "id": 14689475326,
+      "name": "r1-spi-tick-pipeline-44858684478-mode0-half25",
+      "digest": "sha256:4597d5de0e7e6c59189a04c7ce8aee6f0f96ae57ec04c02e3a8d3f27596b9915",
+      "size_in_bytes": 132020,
+      "source_run": 44858684478
+    },
+    {
+      "id": 14688811172,
+      "name": "r1-spi-tick-pipeline-44858684478-mode0-half4",
+      "digest": "sha256:249a0fd8d03cd944952a4756c05e5bf7850bd8cdd68d8f280a3c1ecc93a82b0a",
+      "size_in_bytes": 85420,
+      "source_run": 44858684478
+    },
+    {
+      "id": 14688394198,
+      "name": "r1-spi-tick-pipeline-44858684478-mode1-half25",
+      "digest": "sha256:c80bc5f979aff57e31b7d27cdccde1e5f6f23aa2a189cb05fe2898f67421d29c",
+      "size_in_bytes": 154269,
+      "source_run": 44858684478
+    },
+    {
+      "id": 14689095201,
+      "name": "r1-spi-tick-pipeline-44858684478-mode1-half4",
+      "digest": "sha256:36db85b5d8ef0be9f09847e9949132b9a20c34c8654b47b6e522ea419920ee74",
+      "size_in_bytes": 88634,
+      "source_run": 44858684478
+    },
+    {
+      "id": 14689450533,
+      "name": "r1-spi-tick-pipeline-44858684478-mode2-half25",
+      "digest": "sha256:69ba17a4f9245bcdc36071aca3d268aef06a1da1bd9fbc753a66504519550474",
+      "size_in_bytes": 136579,
+      "source_run": 44858684478
+    },
+    {
+      "id": 14688571854,
+      "name": "r1-spi-tick-pipeline-44858684478-mode2-half4",
+      "digest": "sha256:bab6afa61639b10305bcb7a228d4e5627c07851e66a9c872148fcefc818d28b6",
+      "size_in_bytes": 85127,
+      "source_run": 44858684478
+    },
+    {
+      "id": 14688503966,
+      "name": "r1-spi-tick-pipeline-44858684478-mode3-half25",
+      "digest": "sha256:6fe56b70badd960b51fafd0b1a2507f7a6ea8486b5f43e33311432e405237e6a",
+      "size_in_bytes": 146996,
+      "source_run": 44858684478
+    },
+    {
+      "id": 14688538397,
+      "name": "r1-spi-tick-pipeline-44858684478-mode3-half4",
+      "digest": "sha256:cccb826dad58565da186afe1bee941d1711c6e3d2914c10f071bc186670727f1",
+      "size_in_bytes": 89129,
+      "source_run": 44858684478
+    }
+  ]
+}

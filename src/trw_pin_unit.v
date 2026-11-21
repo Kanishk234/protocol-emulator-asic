@@ -158,7 +158,7 @@ module trw_pin_unit #(
         .rx_edge (rx_edge), .ev_pin (ev_pin), .ev_edge (ev_edge), .ev_qual (ev_qual), .ev_reset (ev_reset),
         .period (period), .sampleofs (sampleofs), .presc (presc), .nbits (nbits),
         .rx_nbits (rx_nbits), .rx_nbits2 (rx_nbits2),
-        .a_in (a_in), .a_prev (a_prev), .b_in (b_in), .b_prev (b_prev), .c_in (c_in), .c_prev (c_prev),
+        .a_in (a_in), .a_prev (a_prev), .b_in (b_in), .b_rise (b_rise), .b_fall (b_fall), .c_in (c_in), .c_prev (c_prev),
         .sel (sel),
         .echo (echo), .rxset (rxset), .rxset_n (rxset_n), .smp (smp),
         .rx_free (rx_free), .rx_load (load_h), .rx_tag (tag_h), .rx_data (data_h), .ovr_set (ovr_h)

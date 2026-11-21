@@ -240,29 +240,10 @@ module trw_pin_cfg #(
             else if (mode_write) mode_q <= mode_value;
         end
 `else
-        reg mode_stage;
-        always @(posedge clk) begin
-            if (!rst_n) mode_stage <= 1'b0;
-            else if (mode_write) mode_stage <= mode_value;
-        end
-        wire mode_gclk;
-`ifdef SYNTHESIS
-        sg13cmos5l_lgcp_1 u_icg_mode (.GCLK(mode_gclk), .CLK(clk), .GATE(mode_write));
-`else
-        reg mode_en_l;
-        /* verilator lint_off LATCH */
-        always @* begin
-            if (!clk) mode_en_l = mode_write;
-        end
-        /* verilator lint_on LATCH */
-        assign mode_gclk = clk & mode_en_l;
-`endif
         reg mode_q;
-        /* verilator lint_off LATCH */
-        always @* begin
-            if (mode_gclk) mode_q = mode_stage;
+        always @(posedge clk) begin
+            if (mode_write) mode_q <= rst_n && mode_value;
         end
-        /* verilator lint_on LATCH */
 `endif
         assign bitsync_active = mode_q;
     end else begin : g_no_bitsync_active

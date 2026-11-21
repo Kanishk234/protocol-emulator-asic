@@ -8,6 +8,17 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'spikes/r1'))
 from routed_timing import annotation, assert_cases
+from run_timing import parse_log
+
+
+@pytest.mark.parametrize(('warning', 'count'), [
+    ('', 0),
+    ('Warning: There is 1 combinational loop in the design.\n', 1),
+    ('Warning: There are 2 combinational loops in the design.\n', 2),
+])
+def test_loop_census_handles_singular_and_plural_reports(warning, count):
+    text = 'RUNSTA_CONFIGURATION 8736\nRUNSTA_CLOSED 8736\n'+warning+'RUNSTA_END\n'
+    assert parse_log(text)['structural_loops'] == count
 
 
 def test_prepared_runtime_imports_without_compiler_or_site_packages():

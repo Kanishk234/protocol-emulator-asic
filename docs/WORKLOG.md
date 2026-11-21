@@ -4,6 +4,11 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- Pushed scoped tools/test/evidence commits throughd568e924. Hosted native
+  replay44871227303 is in progress at that exact head with improved failure
+  snapshots. Loaded RTL44871205509/native44871205606, fabric44871205528
+  and normal checks are also in progress; no current-head green claim yet.
+
 - D170 hosted44866803565 at3127a10c fails native candidate UART TX at
   115921ns. Original native control and generated-RTL candidate pass;
   independent root audits match all8736actual configuration bits in both

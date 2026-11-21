@@ -113,9 +113,16 @@ async def loaded_concurrent_uart_spi(d):
         capture_runtime(d,Path(os.environ['R1_RUNTIME_SNAPSHOT']).with_name('runtime-after-load.json'))
 
     activity={}
+    def known_pin(signal,label):
+        if str(signal.value) not in ('0','1'):
+            if os.environ.get('R1_RUNTIME_SNAPSHOT'):
+                capture_runtime(d,os.environ['R1_RUNTIME_SNAPSHOT'])
+            raise AssertionError('configured '+label+' became unknown')
+        return int(signal.value)
+
     async def uart_tx():
         for _ in range(20000):
-            if int(d.tx_o.value)==0:break
+            if known_pin(d.tx_o,'UART TX')==0:break
             await cycle(d)
         else:raise AssertionError('configured UART never starts')
         start=get_sim_time(unit='ns')
@@ -137,18 +144,18 @@ async def loaded_concurrent_uart_spi(d):
 
     async def spi_peer(expected=0x3c,record=True):
         for _ in range(20000):
-            if not int(d.cs_n_o.value):break
+            if not known_pin(d.cs_n_o,'SPI CS'):break
             await cycle(d)
         else:raise AssertionError('configured SPI never selects')
         start=get_sim_time(unit='ns')
-        value=0;previous=int(d.sck_o.value);count=0;elapsed=0;last_edge=None
-        while not int(d.cs_n_o.value):
-            now=int(d.sck_o.value)
+        value=0;previous=known_pin(d.sck_o,'SPI SCK');count=0;elapsed=0;last_edge=None
+        while not known_pin(d.cs_n_o,'SPI CS'):
+            now=known_pin(d.sck_o,'SPI SCK')
             if not previous and now:
                 if last_edge is not None:
                     assert elapsed-last_edge==2*int(os.environ['R1_HALF'])
                 last_edge=elapsed
-                value=(value<<1)|int(d.mosi_o.value);count+=1
+                value=(value<<1)|known_pin(d.mosi_o,'SPI MOSI');count+=1
             previous=now;await cycle(d);elapsed+=1
         assert count==8 and value==expected
         if record:activity['spi']=(start,get_sim_time(unit='ns'))

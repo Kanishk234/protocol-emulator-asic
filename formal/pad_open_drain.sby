@@ -1,0 +1,36 @@
+[tasks]
+full proof
+lean proof
+full_cover cover
+lean_cover cover
+
+[options]
+proof: mode prove
+cover: mode cover
+cover: depth 8
+
+[engines]
+proof: abc pdr
+cover: smtbmc z3
+
+[script]
+# Read DUT RTL without unrelated assertions. The composition property is in the wrapper.
+read_verilog -sv -I. trw_pins.v trw_pin_unit.v trw_pin_tx.v trw_pin_rx.v trw_pin_io.v trw_pin_bs.v
+read -formal -sv -I. pad_open_drain.sv
+lean: chparam -set FULL 0 pad_open_drain
+lean_cover: chparam -set FULL 0 pad_open_drain
+prep -top pad_open_drain -flatten
+techmap
+opt -fast
+setundef -anyseq
+
+[files]
+../src/trw_defs.vh
+../src/trw_assert.vh
+../src/trw_pins.v
+../src/trw_pin_unit.v
+../src/trw_pin_tx.v
+../src/trw_pin_rx.v
+../src/trw_pin_io.v
+../src/trw_pin_bs.v
+props/pad_open_drain.sv

@@ -1,0 +1,25 @@
+[tasks]
+safety proof
+reachable cover
+
+[options]
+proof: mode prove
+cover: mode cover
+cover: depth 8
+
+[engines]
+proof: abc pdr
+cover: smtbmc z3
+
+[script]
+read -formal -sv -I. trw_pins.v pad_ownership.sv
+prep -top pad_ownership -flatten
+techmap
+opt -fast
+setundef -anyseq
+
+[files]
+../src/trw_pins.v
+../src/trw_defs.vh
+../src/trw_assert.vh
+props/pad_ownership.sv

@@ -564,3 +564,11 @@ Nightly 44793036354 caught five synthetic delimiter tests failing with Attribute
 - Root cause seen in source review: the slot write decode checks the addressed lane's RUN bit. The SRAM request capture and pin configuration write decode have no RUN check, although ARCHITECTURE §9 requires the affected lane to be halted. A normal host loader can obey the ordering contract.
 - Caught by: review of `trw_host.v` write decode and host SRAM request capture against F-HOST-1. A scratch Icarus test at the decoded SPI boundary set both RUN bits, verified that a slot write was blocked, and observed the pin configuration strobe and host-slot SRAM write. A chip-level replay using the SPI pins also read back the written SRAM word and observed a pin-config strobe with lane 0 running, while the slot strobe stayed low.
 - Status: open. Determine the policy for shared resources before changing host RTL or the contract, and keep the qualified physical baseline intact pending requalification.
+
+### D-192 RX proof harness used the pre-sharing pin interface
+
+Candidate-branch formal run 44871062203 stopped with an elaboration error in RX safety. The standalone proof wrapper still connected `b_prev` after the B-edge candidate moved edge formation to the pin unit. Commit 6a33678 adapts the scratch harness to either interface and derives the candidate edge inputs from the same symbolic current and previous pin levels. Both interfaces pass safety and reachability, and all five existing fault controls still produce counterexamples. This fix changes only proof tooling.
+
+### NEC L3 capture probed the wrong pad bus
+
+The NEC repeat test drove ui0 and checked the resulting EVENT, but its unused capture probe read bit zero of the bidirectional pad bus. The test now records ui0 and checks the captured repeat with the installed sigrok NEC decoder. The EVENT check remains in place.

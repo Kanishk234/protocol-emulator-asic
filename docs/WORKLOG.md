@@ -4,6 +4,31 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D170 hosted44866803565 at3127a10c fails native candidate UART TX at
+  115921ns. Original native control and generated-RTL candidate pass;
+  independent root audits match all8736actual configuration bits in both
+  control/candidate. Reload/timing are correctly blocked. BUG176 and
+  reports/r1_spi_tick_pipeline_native_44866803565.json retain the failure.
+- D171 adds opt-in registered-LUT unused-input proofs with actual FF-mode/
+  FASM/image agreement and primitive-control overlap rejection; default
+  combinational guard remains. Read-only cone selects snapshot/output.
+  UART/SPI unknown samples now capture runtime state without forcing data.
+ 36focused checks pass; original native control passes locally with current
+  diagnostics (strict XML and frozen input hashes). Hosted3127a10c test,
+  lint/unit/docs pass; fabric44864499270 passes at1d149b74.
+- Reject individual F/E/F/C selectors and seven-constant-input trial. The
+  registered X6Y1/C.I0 change initializes its receive-state FF but leaves
+  TX unknown. A jointly proved19-input trial clears the first TX unknown
+  sample but exposes SPI CS X at115921ns; final carry/FASM/frame guards
+  pass, native functionality still fails. Replayed with SPI runtime capture;
+  read-only CS cone has2862unknown bits and no further immediately proved
+  unknown-to-known input alternatives. Do not claim full UART success.
+- **Boxes ticked:** none. G1, production RTL, macro and20ns/0.25ns
+  constraints unchanged. Best measured R1 remains44794158025, setup
+  -9.795382ns/hold-1.867277ns; closure remains open. Next: trace actual
+  SPI state/reset dependencies in the joint trial, establish native/reload
+  success, then rerun original connected extracted timing. No image adopted.
+
 - D169 hosted44864499317 at1d149b74 succeeds: exact original c6bitstream,
   registered-tick candidate raw4a35f4d6...,106/128LCs,3timers/3shifts,
   actual GBUF D. Root replays complete bitstream/FASM encodings and exact

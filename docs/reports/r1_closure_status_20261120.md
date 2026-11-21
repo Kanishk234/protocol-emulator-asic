@@ -61,8 +61,11 @@ with arbitrary future host/MISO/reset inputs, plus32independent source tests.
 Root rechecks every input hash, actual parameters and XML. Compilation
 44864499317 reproduces the original-source bitstream exactly and fits the
 candidate in106/128LC with3timers/3shifts, actual GBUF D. Source/pinned JSON
-and complete FASM encodings independently agree. Actual native/reset/reload
-and extracted timing are next; compiler estimates remain uncharacterized.
+and complete FASM encodings independently agree. Native run44866803565 fails: UART TX is unknown at115921ns, despite
+all8736actual configuration bits matching. Original control and generated
+RTL pass. Reload/timing are not reached. D171 adds bounded native-state
+diagnostics and opt-in registered-LUT cofactor checks; no repaired image
+is accepted. Compiler estimates remain uncharacterized.
 See [source proof receipt](r1_spi_tick_pipeline_equivalence_44858684478.json)
 and [compile receipt](r1_spi_tick_pipeline_compile_44864499317.json).
 

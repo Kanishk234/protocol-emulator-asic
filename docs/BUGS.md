@@ -1,5 +1,25 @@
 # Bugs
 
+## 176: Registered-tick image fails native initialization despite exact configuration
+
+- **Symptom/check:**44866803565 at3127a10c fails at115921ns: UART TX
+  is X at the first traffic sample. Original control and generated-RTL
+  candidate pass. Independent native frame audit matches all8736bits in
+  both cases. Management reload and extracted timing are not reached.
+- **Diagnosis:** mapping/native initialization remains unresolved, rather
+  than a demonstrated loader-bit error. Unused LUT inputs can propagate
+  unknowns in the native model. A cofactor-proved X6Y1/C.I0 route change
+  initializes its UART receive-state register, but UART TX still fails.
+  This does not establish a complete root cause.
+- **Coverage:** D171 retains source/native separation and adds explicit
+  unknown-output assertions with runtime snapshots, registered-input mode
+  guards and carry/noninterference checks. Local individual and joint
+  trials are diagnostic only; none is accepted as a repaired image.
+  Joint19 changes clear the first TX unknown sample but SPI CS remains X
+  at115921ns; no complete UART/SPI success. Original control with the new
+  diagnostics passes locally.
+  See reports/r1_spi_tick_pipeline_native_44866803565.json.
+
 ## 175: One E-input loop remains after G repair; dynamic filtered search crashes
 
 - **Symptom/check:**44855809222 ata4f2cac8 passes all four native/reload

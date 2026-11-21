@@ -1,5 +1,26 @@
 # Decisions
 
+## D-171: Diagnose unused registered-LUT inputs without relaxing native acceptance
+
+- **Date:** 2026-11-20. The registered-tick source passes eight unbounded
+  equivalence cases and32source tests, but native44866803565 fails with
+  unknown UART TX after loading. Original control and generated RTL pass;
+  all8736actual candidate configuration bits match. No timing gate runs.
+- **Proof extension:** explicit opt-in permits a registered LUT only when
+  its actual FF mode agrees with FASM and the physical image. All16binary
+  cofactors, selector identity, active-feature locks and carry guards remain.
+  Reject selector overlap with any primitive parameter/control field.
+  Default callers still reject registered LUTs. Unchanged data function
+  and sequential controls establish binary transition preservation only;
+  native initialization, transient behavior and timing need separate tests.
+- **Diagnostics:** select the observed output/snapshot for read-only cone
+  searches. Capture actual runtime state on unknown UART/SPI output samples.
+  Do not force values or edit native/PDK models. Combined trials recheck
+  the final carry graph, full FASM encoding and expected frame image.
+- **Scope:** experimental tools/test diagnostics only; no new hardware,
+  resource cost, protocol feature, production source or constraint change.
+  Failed local hypotheses remain rejected; no phase box is checked.
+
 ## D-170: Admit only the measured registered-tick compiler image to native timing
 
 - **Date:** 2026-11-20.44864499317 at1d149b74 reproduces original rawc6

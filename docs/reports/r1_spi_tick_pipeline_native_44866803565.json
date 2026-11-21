@@ -1,0 +1,185 @@
+{
+  "run": 44866803565,
+  "source_sha": "3127a10cdeb73ecf22d697d1177d7c67eff917ac",
+  "artifact_id": 14691912475,
+  "archive_bytes": 8787019,
+  "archive_sha256": "1b0fcf50bc913858332b56618ddc65f9b12ad9c79deb09d1df1388dc5b10fa3c",
+  "passed": false,
+  "adopted": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "hosted_result": {
+    "run": "44866803565",
+    "source_sha": "3127a10cdeb73ecf22d697d1177d7c67eff917ac",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_tick_pipeline",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "error": "XML contains failures, errors or skipped tests",
+    "generated_rtl_candidate": {
+      "passed": true,
+      "scope": "Generated RTL diagnostic only; original native failure retained."
+    }
+  },
+  "independent_frame_audits": {
+    "control": {
+      "compared_configuration_bits": 8736,
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410"
+    },
+    "candidate": {
+      "compared_configuration_bits": 8736,
+      "snapshot_sha256": "87fcbbd359aed0d6e849d75298a8eb59389ea60bc094f7dee1360b256b65a989",
+      "image_sha256": "07b4e56802af402156549b5bf350c86dfba59acf788a22ca01cc0e12961e8d2c"
+    }
+  },
+  "local_rejected_trials": [
+    {
+      "name": "warp-tick-unused-X6Y1-F3",
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "error": {
+        "error_type": "ValueError",
+        "error_msg": "Cannot convert Logic('X') to int"
+      },
+      "xml_sha256": "884da0cbdde7e74e5c2113a1e24f800eb3891e06f2340d590e20c29cd870be2c",
+      "local_diagnostic_only": true,
+      "proof_sha256": "296762eebc4cd6099747bee452987980c631d0e366aac7c556caebae4e8ddcf4"
+    },
+    {
+      "name": "warp-tick-unused-X3Y2-E2",
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "error": {
+        "error_type": "AssertionError",
+        "error_msg": "configured UART TX became unknown"
+      },
+      "xml_sha256": "22afede585117bf31fa0fef8026f5645fb5fe5cbaea3b23521382090531bd12c",
+      "local_diagnostic_only": true,
+      "runtime_failure_sha256": "074dd62578d4098840a600029f44b0f0d078eb23952c4228e92de714d21b838e",
+      "proof_sha256": "75b6353aa0ed099a6c861743e9441871ffe98fd2157c01a237339b0f408246b7"
+    },
+    {
+      "name": "warp-tick-unused-X4Y1-F0",
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "error": {
+        "error_type": "AssertionError",
+        "error_msg": "configured UART TX became unknown"
+      },
+      "xml_sha256": "fdc543b282185f4ab15297f5c9fe367ed68f63a811f811ba76f498b710d33d29",
+      "local_diagnostic_only": true,
+      "runtime_failure_sha256": "18d53f40c3ba893314a64f0667fdfb6f9207bd391356cfb48556693852a0cb09",
+      "proof_sha256": "ec3d1d2453810b0dfeab4a3297396522ec24d66ecd2663a8af7d6e018049702b"
+    },
+    {
+      "name": "warp-tick-constant-rails-trial-v2",
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "error": {
+        "error_type": "AssertionError",
+        "error_msg": "configured UART TX became unknown"
+      },
+      "xml_sha256": "1a2ff4531278bfb1b46803aed1e559a59bb97713e3c80099c5d23a82383bd624",
+      "local_diagnostic_only": true,
+      "runtime_failure_sha256": "d1fc5cadcefe986015ce85e1fbb2dce44f7d23ff2fc7f530f4ccc9df5de6574a",
+      "proof_sha256": "3d52b6f1f447e594183328c14bddebbbe930b0d63aa4087c86603e3c98c97d92"
+    },
+    {
+      "name": "warp-tick-reg-unused-X6Y1-C0",
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "error": {
+        "error_type": "AssertionError",
+        "error_msg": "configured UART TX became unknown"
+      },
+      "xml_sha256": "c3ccc2bd4c9497e2453449e49b51887ea53f13b5e7d88c8a6f730e802757d6c8",
+      "local_diagnostic_only": true,
+      "runtime_failure_sha256": "cce00b841035710b658fca5af885e72417103af1cd2597b17f7eea122b0ec603",
+      "proof_sha256": "fa01f29cc7d9a16a3e124d0f5d6e346e1aecf363a9629e03c2eeaf99f7a35593"
+    },
+    {
+      "name": "warp-tick-joint-unused-trial",
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "error": {
+        "error_type": "ValueError",
+        "error_msg": "Cannot convert Logic('X') to int"
+      },
+      "xml_sha256": "110bc3f1a8459b536ea63f4137686cf091ecd91a557a613a6ec606e65ec5d535",
+      "local_diagnostic_only": true,
+      "proof_sha256": "9029909cd415dc22c109c6787a2b55490e7bf96faf398e5a26885fb4ead5eefd"
+    },
+    {
+      "name": "warp-tick-joint-unused-capture",
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "error": {
+        "error_type": "AssertionError",
+        "error_msg": "configured SPI CS became unknown"
+      },
+      "xml_sha256": "c087480e89e81892a7eaa68080409022baa5e60e9ef1496d206816e8743b5778",
+      "local_diagnostic_only": true,
+      "runtime_failure_sha256": "926ade63a766737daffb40cc6832b2d164e6a8c5e78dccc92bce3e6a980d681d",
+      "proof_sha256": "9029909cd415dc22c109c6787a2b55490e7bf96faf398e5a26885fb4ead5eefd"
+    }
+  ],
+  "local_original_control_with_current_diagnostics": {
+    "passed": true,
+    "configured_smoke_sha256": "ef9c0352fcb8a9eb47db43e13de1d1c8878f10c876030f3cb61ade4899b373c6",
+    "xml_sha256": "62b744cfc467dce81b5d2c7c380ecc7f87081b9dddc0b5b1b7fe89d02dcaaa1a",
+    "scope": "One actual native original-image UART/SPI/reset case; no candidate acceptance"
+  },
+  "finding": "Joint19 unused-input changes pass binary cofactor/final-carry/frame encoding guards and clear the first UART TX unknown sample, but SPI CS remains unknown at115921ns. No complete repair or root cause established.",
+  "next": "Trace the observed SPI CS cone and establish a passing actual native/reset/reload image before extracted timing.",
+  "joint_trial_spi_cs_diagnostic": {
+    "unknown_cone_bits": 2862,
+    "additional_immediate_proved_unknown_to_known_alternatives": 0,
+    "first_unknown_register_frontier_count": 55,
+    "nearest_three": [
+      {
+        "name": "Tile_X6Y3_LUT4x8_ha/_1736_",
+        "depth": 12,
+        "type": "sg13cmos5l_dfrbpq_1",
+        "pins": {
+          "CLK": "1",
+          "D": "X",
+          "Q": "X",
+          "RESET_B": "1"
+        }
+      },
+      {
+        "name": "Tile_X5Y3_LUT4x8_ha/_1730_",
+        "depth": 15,
+        "type": "sg13cmos5l_dfrbpq_1",
+        "pins": {
+          "CLK": "1",
+          "D": "X",
+          "Q": "X",
+          "RESET_B": "1"
+        }
+      },
+      {
+        "name": "Tile_X4Y3_LUT4x8_ha/_1732_",
+        "depth": 17,
+        "type": "sg13cmos5l_dfrbpq_1",
+        "pins": {
+          "CLK": "1",
+          "D": "X",
+          "Q": "X",
+          "RESET_B": "1"
+        }
+      }
+    ],
+    "scope": "Read-only backward graph at one failed sample; known mux2 selectors sensitized. Distances are graph depth, not timing, and this is not a complete causal or root-cause proof."
+  }
+}

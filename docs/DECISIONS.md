@@ -1,5 +1,23 @@
 # Decisions
 
+## D-168: Test a registered SPI terminal pulse before spending another compile
+
+- **Date:** 2026-11-20.44857324411 qualifies the F/B/G/E image's native
+  reload and timing model with zero loops/full annotation, but setup
+  -52.591743ns/hold-1.916775ns fail. Do not adopt this worse free-running
+  timer placement; prior44794158025 remains the better measured image.
+- **New source-only hypothesis:** start from the pinned original SPI source,
+  register the hard timer terminal pulse, use existing ONESHOT1 with
+  reload HALF-2, and reload on accept or that registered pulse. This should
+  cut the direct timer-to-state combinational path while preserving the
+  original half-period and pin/host behavior. It is not a hardware change
+  or a protocol-specific hard block; production source remains untouched.
+- **Gates:** separate generated candidate, exact reversible source delta,
+  unbounded output equivalence after initial reset for all four modes at
+  HALF4and25/PRIMS1, then32independent source protocol tests. Local mode0/
+  HALF4PDR passes. No new compilation/native/area/timing claim until these
+  complete and actual compiled images pass the existing later gates.
+
 ## D-167: Remove the measured E.I1 cyclic route without changing timing queries
 
 - **Date:** 2026-11-20.44855809222 passes four native/reload cases but

@@ -15,6 +15,12 @@
   checks; original filtered dynamic query then completes locally with zero
   loops/full active annotation. Hosted complete timing/reload remain open.
 
+- **Hosted repair validation:**44857324411 at32125b18 passes all four
+  actual native/reload cases, all four timing executions, zero loops under
+  both policies and complete active annotation. Original filtered queries
+  and constraints are unchanged; crash no longer occurs for this image.
+  Setup-52.591743ns/hold-1.916775ns still fail, so timing closure is open.
+
 ## 174: Removing B feedback exposes two G-input timing loops
 
 - **Symptom/check:**44854958011 at37bb1187 passes native/reset/reload

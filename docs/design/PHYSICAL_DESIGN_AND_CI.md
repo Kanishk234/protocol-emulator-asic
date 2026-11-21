@@ -2,6 +2,14 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 latest measured result:**44857324411 passes all native/reload
+cases and the complete configured timing model: four executions exit0,
+zero loops under both policies, all370FF classified/249endpoints/14235active
+pins fully annotated, exact policy agreement. Setup-52.591743ns and
+hold-1.916775ns fail, worse than44794158025. No adoption. D168 next proves
+an isolated registered-terminal-pulse SPI source before another compile;
+hardware, G1 and20ns/0.25nsconditions remain unchanged.
+
 **November20 E-loop follow-up:**44855809222 passes full native/reload
 but still has one static E loop and a dynamic-query crash. D167's additional
 E.I1 selector passes local native/reset/frame checks; original filtered

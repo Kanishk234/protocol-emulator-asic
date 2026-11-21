@@ -4,6 +4,22 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D167 hosted44857324411 at32125b18 completes successfully: all four
+  native/reset/reload cases and all four original timing queries pass
+  model checks, with zero loops/both policies agreeing/full active annotation.
+  Root independently replays four8736-bit audits, XML, all execution receipts,
+  original control, full script reversals and exact slacks. Setup-52.591743ns/
+  hold-1.916775ns fail; do not adopt. Receipt:
+  reports/r1_clock_fixed_e_loop_44857324411.json. Prior44794158025 remains
+  better measured; G1 unchanged. No phase box or closure claim.
+- D168 starts a different source-only hypothesis from original SPI: registered
+  timer terminal pulse, existing one-shot mode/reload HALF-2, reload on
+  accept or registered pulse. No production source edit. Local mode0/HALF4
+  unbounded PDR equivalence passes; next all8proofs/32source tests in CI,
+  then only on success fresh compile/native/timing. Local path search found
+  no immediately provable unused combinational input on the latest worst
+  path; no speculative route mutation was made.
+
 - D166 hosted44855809222 ata4f2cac8 passes all four native/reload cases;
   root verifies XML/8736-bit audits and four complete script reversals.
   Static still has **one E loop**; dynamic exits-11. A manual plural-only

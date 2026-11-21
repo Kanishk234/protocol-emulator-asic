@@ -1,126 +1,74 @@
 # R1 closure status — November 20, 2026
 
-Newest run44855809222 passes four native/reset/reload cases after F/B/G
-repairs, with four8736-bit audits and matching direct/reload states. Root
-independently rechecks XML, frames and four analysis-script reversals.
-One E loop remains; dynamic setup crashes(-11), and hold is not reached.
-D167's additional E.I1 selector passes local native/reset/frame checks.
-The original filtered dynamic query then completes locally with zero loops
-and full active annotation, but setup remains negative. Hosted full reload
-and all four timing executions remain next. See
-[hosted G repair](r1_clock_fixed_g_loop_44855809222.json) and
-[local E repair](r1_clock_fixed_e_loop_local_20261120.json).
+Timing is measured and still fails. R1 is experimental; G1 remains selected.
+The latest fixed-placement SPI image passes native/reset/reload and complete
+zero-loop timing-model checks, but setup is **−52.591743 ns** and hold is
+**−1.916775 ns** in run44857324411. It is worse than the earlier qualified
+image and is not adopted. A green diagnostic workflow does not mean closure.
 
-Latest follow-up: run44829301770 rejects the fresh D-bank placement in
-native simulation (unknown host-ready at115981ns), while its matched A
-control and generated RTL diagnostic pass. All8736loaded configuration
-bits independently match. Management candidate and timing were not reached;
-the D-bank image remains unqualified. Local F.I2 and D.I0 selector trials
-also fail and are retained as rejected hypotheses. D163 next preserves
-every other user-cell location while comparing A/D rerouting. See
-[native failure receipt](r1_clock_bank_native_44829301770.json).
+No physical macro geometry, hardware ABI, production source or clock target
+changed. All timing numbers below use the unchanged20ns period/0.25ns
+uncertainty, connected nominal RC, slow setup/fast hold cells and the original
+conditional zero-I/O-delay macro boundary.
 
-The tighter fixed-placement routing run44831585287 passes all three
-controls. Root independently rechecks logical graphs, exact cell locations
-and raw image hashes. Native/reload campaign44832060001 attempted restored
-A, rerouted A and rerouted D; its failed result is described above. See
-[fixed-placement routing receipt](r1_clock_bank_fixed_44831585287.json).
+## Evidence that remains valid
 
-R1 is still experimental. G1 remains the selected production baseline.
-No hardware, ABI, physical macro geometry or clock target changed in this work.
-
-## What is actually established
-
-| Gate | Latest relevant evidence | Result and scope |
+| Gate | Evidence | Result and scope |
 |---|---|---|
-| Declared macro-interface LVS | 44627346549 | All 449 root ports and devices match uniquely against independently source-proven SPICE. Enclosing chip/power integration is separate. |
-| Connected extracted RC | 44621669039 | Original geometry matches on all 21 layers; all named terminals have correct resistor connectivity. |
-| Moved image with three proved selector repairs | 44794158025 | Original/reroute controls, native UART/SPI/reset and full management error/CRC, USER_RESET, STOP/reload pass. All four actual 8736-bit audits pass; direct/reload states match. |
-| Configured timing model for that image | 44794158025 | All 370 edge registers classified, 244 endpoints, 12675 active pins fully annotated, zero loops under both policies, identical slacks. |
-| Timing closure | 44794158025 | **Fails:** setup −9.795382 ns, hold −1.867277 ns at the unchanged 20 ns period and 0.25 ns uncertainty. Nominal RC with slow/fast cells and the original conditional zero-I/O-delay macro boundary. |
-| Additional upstream selector | 44794158025 | Passes native/reload and timing qualification; setup improves 0.397685 ns, hold unchanged. Still negative. |
+| Declared macro-interface LVS | 44627346549 | All449root ports/devices match uniquely against independently source-proven SPICE. Enclosing chip/power integration is separate. |
+| Connected extracted RC | 44621669039 | Original geometry matches on all21layers; all named terminals have correct resistor connectivity. |
+| Better measured original-source image | 44794158025 | Native/reset/reload, four8736-bit audits, zero loops/full active annotation. Setup−9.795382ns/hold−1.867277ns still fail. |
+| Latest fixed-placement SPI image | 44857324411 | Original A control, repaired rerouted A, repaired D and management/reset/reload pass; four8736-bit audits and direct/reload states agree. |
+| Latest configured timing model | 44857324411 | Four completed zero-return-code executions;370FF classified,249endpoints,14235active pins fully annotated, zero loops and identical static/dynamic-policy slacks. |
+| Timing requirements | 44857324411 | Fail: setup−52.591743ns at X3Y3/_1734_/D, hold−1.916775ns at X6Y1/_1730_/D. No adoption. |
 
-A successful diagnostic workflow does not mean timing closed. Check
-`model_qualified` and `necessary_macro_constraints_met` separately.
-The qualified negative result is in
-[r1_upstream_cleanup_44794158025.json](r1_upstream_cleanup_44794158025.json).
+Root independently replays strict XML, every configuration frame, all four
+execution receipts and slacks, and reverses all four analysis scripts
+byte-for-byte to the original baseline. The original negative control is
+retained. See [latest qualified negative result](r1_clock_fixed_e_loop_44857324411.json)
+and [better measured image](r1_upstream_cleanup_44794158025.json).
 
-## What changed and why
+## What the latest work fixed
 
-The original fixed-placement reroute passes direct native traffic, but fails
-shell traffic. A targeted combinational LC move also initially stalls native
-simulation. The read-only VPI observer localizes the latter to an unused LUT
-input feeding from its own output. Actual truth-table and routing proofs
-justify two existing selector changes: X3Y3/D.I0 breaks the observed native
-stall; X6Y3/E.I0 removes the remaining timing loop using an existing registered
-source. Neither adds a register or changes the intended LUT function.
+The new source initially selected clock bank A, clocking all370registers and
+producing a worse qualified result in44802619585. A fresh bank-D placement
+failed native initialization in44829301770. Holding all other user-cell
+locations fixed still exposed a rerouted-A native stall in44832060001;
+clock bank alone did not explain it.
 
-The first two repairs are two bit changes relative to the moved, rerouted compiler image;
-they are not the total change relative to the original compiler placement.
-After the additional D158 selector change, the current loaded image is
-`33b768f80464046a1d718c0968a627537fd92d7815c45c9161064b69e26f64b6`.
+Read-only full-width and scalar VPI diagnostics localized non-advancing native
+activity. Four separately proved unused-input selector changes then address
+distinct failures: F.I1 atX3Y2 restores native traffic/reload; B.I3 atX1Y2,
+G.I2 atX6Y2 and E.I1 atX2Y3 remove successively exposed timing loops. Each
+uses actual truth-table/carry/active-route checks and exact image/frame
+reconstruction. No signal is forced and no timing arc is waived.
 
-The subsequent measured setup target was unused X2Y3/D.I1. Its loaded INIT is 0xaa00,
-independent of I1, but its default input route traverses a long chain. D158
-changes only upstream routing selector bit 183 (word 273 bit 23), redirecting
-that input to an existing registered H output. Complete selected fanout has
-three nodes and ends only at the unused input. Cofactor, carry, active-feature,
-native selector/register identity and expected frame checks pass locally.
-Run 44794158025 passes actual function/reload and timing qualification for this
-change; setup improves modestly and hold remains negative.
+Runs44853914939,44854958011 and44855809222 retain the failed timing controls.
+The final E repair recovers the original filtered dynamic query without a tool
+upgrade or query change. A manual plural-only search briefly missed the final
+singular loop warning; that commentary was corrected. The strict parser never
+accepted it, and explicit singular/plural regression cases now cover both forms.
 
-The new worst path maps from SPI state[1] through hard-timer enable/terminal
-count to nedge[1]. D159 tests a build-only free-running-timer user-program
-variant with full binary output equivalence and existing independent SPI
-tests across four modes and HALF values 4 and 25. 44797232291 passes all eight unbounded equivalence cases and 32 source tests,
-with independently reviewed statuses, parameters and project Python runtime.
-Fresh compilation 44798802734 reproduces the original control image exactly.
-The candidate fits at 102/128 logic cells versus 103 for the control, with
-identical pins/parameters/seed. Its compiler timing estimate is uncharacterized
-and worse; no performance improvement is claimed. 44799827748 passes actual native/reset/reload and all three frame audits, but
-STA reports four constant-rail feedback loops and exits nonzero. There is no
-qualified timing result for this variant yet. D161 tests one proved unused
-G.I0 selector at X4Y1, feeding an existing registered source, before repeating
-native/reset/reload and connected timing. Production RTL is unchanged.
+## Next experiment
 
-## Latest SPI source measurement and clock-bank follow-up
+D168 stages a registered hard-timer terminal pulse in an isolated SPI user
+source derived from the pinned original. Existing one-shot mode with HALF−2
+and reload on accept/registered pulse is intended to preserve the original
+pin/host cycle timing while cutting a timer-to-state combinational path.
+Production RTL is untouched. Local mode0/HALF4 passes unbounded PDR output
+equivalence after initial reset; arbitrary future host/MISO/reset inputs are
+covered for that configuration. All eight mode/HALF4and25 proofs and32source
+protocol tests are required before any compile. No fit, native or physical
+timing claim is made for this new source candidate.
 
-44802619585 passes the one-bit rail repair, actual native/reset/reload,
-all three 8736-bit audits and zero-loop fully annotated timing. Its measured
-setup is **−21.419043 ns**, hold **−2.660251 ns**, so it is worse and unadopted.
-The better measured prior image remains the −9.795382/−1.867277 ns result above.
-See [rail result](r1_spi_timer_rail_44802619585.json).
+## Remaining acceptance gates
 
-The fresh placement allocates GBUF X0Y4/A, and all 370 edge registers are
-clocked. The earlier bank-D result has 134 inactive registers. The new worst
-setup endpoint is a register at X1Y1/D with FF output select 0 and no placed
-user cell. D162 tests clock-bank allocation as a confounder: reproduce the
-same SPI source/control image, then constrain only the GBUF to X0Y4/D.
-44827334401 reproduces the A-bank image exactly and routes the D-bank
-candidate with identical packed logical graph and resource use. Raw D-bank
-image: `4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a`.
-Actual configuration loading/reset/reload and full timing are next; no
-unused-register path is waived.
+Both setup and hold must pass on the same real image and unchanged constraints.
+Native functionality and a qualified negative timing result are necessary
+progress, not closure. Do not promote the worse fixed-placement source image
+or tick a phase exit box.
 
-## Failures kept as controls
-
-- 44678070512: moved image stalls during direct traffic; all 8736 observed bits match.
-- 44784239092: routing-only image passes direct tests but stalls during shell traffic.
-- 44785764117: instrumented original passes; observer stops the moved image at tick 116000000. Partial diagnostic output remains a failed job.
-- 44787771176: candidate STA aborts on stale parent Q assertions (BUG165). Corrected complete gate/state checks reject stale, missing, duplicate and wrong-latch guards.
-- 44790210039: corrected STA completes with active coverage, but rejects one remaining structural loop.
-
-## What still blocks acceptance
-
-First establish passing setup and hold with the same real image and constraints.
-The current worst setup path launches and captures inside the macro; an external
-boundary adjustment cannot dispose of it. The worst hold path starts at the
-macro MISO input under the conditional zero-delay boundary. It needs a valid
-physical enclosing-shell timing model or a demonstrated implementation repair;
-no path is waived.
-
-Enclosing physical power, complete shell/chip integration, loading-mode timing
-and complete corner qualification remain open. The missing regular-grid VGND
-stripe was only calibrated in a synthetic overlap probe, not repaired and
-qualified in an actual full-chip PDN. Do not promote an image or tick a phase
-exit box based on the functional/diagnostic passes above.
+Enclosing physical power, full shell/chip integration, loading-mode timing and
+complete corner qualification remain open. The missing regular-grid VGND stripe
+was tested only in a synthetic overlap probe; an actual full-chip PDN repair,
+connectivity/DRC and timing qualification have not been established.

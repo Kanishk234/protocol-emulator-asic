@@ -4,6 +4,18 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D169 hosted44864499317 at1d149b74 succeeds: exact original c6bitstream,
+  registered-tick candidate raw4a35f4d6...,106/128LCs,3timers/3shifts,
+  actual GBUF D. Root replays complete bitstream/FASM encodings and exact
+  clock-only JSON changes. Receipt:
+  reports/r1_spi_tick_pipeline_compile_44864499317.json. Estimates remain
+  uncharacterized; native/timing remain unproven for this source.
+- D170 adds exact-source native admission, including pinned clock JSON
+  hashes and raw image identity. Positive new/old admission and negative
+  wrong-clock check pass locally. Next hosted original control/candidate/
+  full reset/reload, then connected timing only after actual success. No
+  old image repairs or hardware edits; G1 and all constraints preserved.
+
 - D168 hosted44858684478 at9688dbd3 passes all8unbounded equivalence
   cases and32strict SPI source tests. Root replays every proof/input hash,
   actual miter mode/HALF/PRIMS parameters and XML. Receipt:

@@ -58,11 +58,13 @@ pin/host cycle timing while cutting a timer-to-state combinational path.
 Production RTL is untouched. Run44858684478 passes all eight unbounded PDR
 output-equivalence cases (four modes, HALF4and25, PRIMS1) after initial reset,
 with arbitrary future host/MISO/reset inputs, plus32independent source tests.
-Root rechecks every input hash, actual parameters and XML. D169 now compiles
-against the frozen macro, requiring an exact original-source control and
-candidate-only GBUF constraint to original bank D. No fit, native or physical
-timing claim is made before the actual new results. See
-[source proof receipt](r1_spi_tick_pipeline_equivalence_44858684478.json).
+Root rechecks every input hash, actual parameters and XML. Compilation
+44864499317 reproduces the original-source bitstream exactly and fits the
+candidate in106/128LC with3timers/3shifts, actual GBUF D. Source/pinned JSON
+and complete FASM encodings independently agree. Actual native/reset/reload
+and extracted timing are next; compiler estimates remain uncharacterized.
+See [source proof receipt](r1_spi_tick_pipeline_equivalence_44858684478.json)
+and [compile receipt](r1_spi_tick_pipeline_compile_44864499317.json).
 
 ## Remaining acceptance gates
 

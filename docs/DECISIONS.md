@@ -1,5 +1,20 @@
 # Decisions
 
+## D-170: Admit only the measured registered-tick compiler image to native timing
+
+- **Date:** 2026-11-20.44864499317 at1d149b74 reproduces original rawc6
+  exactly; the candidate uses106/128LC,3timers/3shifts and actual clock D.
+  Root checks both complete FASM encodings, only clock attributes changed
+  in the separate synthesized JSON, and packed D placement. Compiler
+  estimate remains uncharacterized and is not timing acceptance.
+- **Admission:** exact producer/head/rawimage4a35f4d6... and exact source/
+  pinned JSON hashes with D constraint required. Wrong clock metadata is
+  rejected locally; original free-timer admission still passes unchanged.
+- **Gates:** fresh actual original control/candidate native UART/SPI/reset,
+  complete management/reset/reload and8736-bit audits, then only on success
+  original connected RC timing under both loop policies. No previous
+  placement's selectors are copied and no hardware or constraint changes.
+
 ## D-169: Compile the proved registered tick with an exact original control
 
 - **Date:** 2026-11-20.44858684478 at9688dbd3 passes all8unbounded PDR

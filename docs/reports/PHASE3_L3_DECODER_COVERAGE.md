@@ -12,10 +12,16 @@ credit a run that skipped sigrok or selected other cases.
 | PS/2 | Device-to-host includes bytes and parity annotations. Host-to-device uses the independent peer model. |
 | 1-Wire, JTAG, SMBus, SWD, LIN, CAN | Each has a direct decoder check in its L3 case. |
 | NEC IR | The repeat receive case now captures the actual ui0 level and checks exactly one repeat-code annotation. The device result is checked separately. |
-| DShot and HDLC | The L3 cases check the waveforms with project models. They have no direct sigrok protocol check. |
+| DShot | Sigrok's timing decoder measures high and low intervals at all four rates. The test reconstructs packet bits from those intervals and checks payload, telemetry, checksum and spacing. |
+| HDLC | Sigrok's timing decoder measures the transmit runs. The test reconstructs the flag-delimited bitstream and compares it with the stuffed payload and independently calculated FCS. |
 
-Eighteen cases now contain sigrok calls. DShot and HDLC remain the two
-protocol-level gaps in this L3 file. The installed decoder set contains
-`ir_nec` but has no decoder directory named for DShot or HDLC. The UART RX
+Twenty cases now use sigrok measurements. The installed set has no dedicated
+DShot or HDLC decoder, so those two cases pair the generic timing decoder
+with waveform checks in the test harness. The UART RX
 and PS/2 host-to-device gaps concern direction coverage within protocols
 that already have one sigrok-checked direction.
+
+The targeted DShot and HDLC checks passed on the exact B-edge candidate in
+Verilator with sigrok enabled. DShot covered five frames at each of four
+rates, and HDLC covered the existing 100 kbit/s stuffed-frame loopback.
+The updated checks have no new routed-netlist result yet.

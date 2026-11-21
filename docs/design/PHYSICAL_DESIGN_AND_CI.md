@@ -2,6 +2,12 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 remaining loop follow-up:**44854958011 passes full native/
+reload again. B feedback is absent, but two G loops remain and dynamic
+setup crashes(-11); hold is not reached. D166's additional G.I2 selector
+passes local native/reset and8736-bit checks. Actual hosted reload and
+both zero-loop policies remain mandatory; no new timing qualification.
+
 **November20 hosted native improvement:**44853914939 passes original
 control, repaired A/D and full management/reset/reload with four actual
 8736-bit audits. Static setup still reports seven B-input loops; dynamic

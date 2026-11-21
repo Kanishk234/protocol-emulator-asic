@@ -4,6 +4,19 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D165 hosted44854958011 at37bb1187 again passes all four native/reload
+  cases. Root verifies four strict XML/8736-bit audits, direct/reload byte
+  identity and all four complete script reversals. B feedback is absent;
+  two G-input loops are now reported and dynamic setup still crashes-11.
+  Receipt reports/r1_clock_fixed_b_loop_44854958011.json; BUG174. No qualified
+  new timing or hold result, and best qualified image remains44794158025.
+- D166 proves X6Y2/G.I2 against this actual passing F/B parent, including
+  all16cofactors,23carry nodes/nine disabled consumers/no active overlap.
+  Combined image passes local native/reset and8736actual bits. Receipt:
+  reports/r1_clock_fixed_g_loop_local_20261120.json. The earlier G-only
+  native failure is retained; new explicit STA evidence justifies this
+  different combined-image trial. Hosted full reload/zero-loop timing next.
+
 - D164 hosted44853914939 atb752e9c7 passes original control, repaired A,
   repaired D and full management/reset/reload. Root independently verifies
   all four strict XML/8736-bit audits, direct/reload byte identity and all

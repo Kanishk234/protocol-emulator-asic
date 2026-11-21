@@ -1,5 +1,18 @@
 # Bugs
 
+## 174: Removing B feedback exposes two G-input timing loops
+
+- **Symptom/check:**44854958011 at37bb1187 passes native/reset/reload
+  and all four actual8736-bit audits. B feedback is absent from the new
+  static loop report; two loops through X6Y2/G remain. Static exits0,
+  dynamic setup still exits-11/incomplete, and hold is not reached.
+- **Proof/repair:** D166 separately proves unused G.I2 at actual INIT0,
+  including its carry fanout, and changes one existing selector to remove
+  own-output feedback. Additional combined-image local native/reset and
+  frame checks pass. Hosted full reload/zero-loop timing remain pending.
+- **Acceptance:** retain all failed timing executions. Do not use partial
+  static slacks, suppress loop checks or treat the dynamic crash as a pass.
+
 ## 173: Passing fixed-image native reload exposes seven B-input timing loops
 
 - **Symptom/check:**44853914939 atb752e9c7 passes all four native cases,

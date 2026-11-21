@@ -1,5 +1,24 @@
 # Decisions
 
+## D-166: Break the newly exposed G.I2 timing loop on the passing F/B image
+
+- **Date:** 2026-11-20.44854958011 passes all four native/reload cases
+  and removes the reported B loop. Static analysis now reports two loops
+  through X6Y2/G; dynamic setup still crashes(-11). No qualified timing.
+- **Change:** candidate only, X6Y2/G.I2, native latch_1545_, tile bit168,
+  word754bit8,0to1. Actual INIT0 ignores I2 at all16addresses; no active
+  feature overlap. The23-node carry guard finds nine disabled consumers
+  and no enabled consumer. Route changes from own LG_O to X1Y1/LB_O.
+- **Why revisit:** the earlier G.I2-only local trial did not fix the F.I1
+  native stall. The parent now has passing hosted F/B repairs and an
+  explicit G timing loop. This new evidence justifies a separate STA repair;
+  retain the earlier failed trial rather than relabelling it a pass.
+- **Gates:** reconstruct the actual F/B parent byte-for-byte, change one
+  bit only through quiescence, then require all actual native/reload cases
+  and both timing policies. Local native/reset/frame checks pass for this
+  combined image. No hardware, source behavior, G1 or timing constraint
+  changes, and no adoption until complete qualification.
+
 ## D-165: Break the measured B.I3 timing loop using an existing selector
 
 - **Date:** 2026-11-20.44853914939 establishes the F repair through all

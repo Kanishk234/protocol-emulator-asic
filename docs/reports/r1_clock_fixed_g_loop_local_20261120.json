@@ -1,0 +1,255 @@
+{
+  "scope": "Local combined F/B/G image native/reset pass only; hosted reload and complete extracted timing remain pending.",
+  "parent_run": 44854958011,
+  "proof": {
+    "parent_native_run": "44854958011",
+    "change": {
+      "tile": "Tile_X6Y2_LUT4x8_ha",
+      "cell": "_1545_",
+      "lut": "G",
+      "input": 2,
+      "observed_init": 0,
+      "cofactor_addresses_checked": 16,
+      "tile_bit": 168,
+      "word": 754,
+      "word_bit": 8,
+      "before": "0",
+      "after": "1",
+      "carry_noninterference": {
+        "visited_nodes": 23,
+        "disabled_carry_consumers": [
+          [
+            "X6Y1",
+            "LA_Ci"
+          ],
+          [
+            "X6Y1",
+            "LB_Ci"
+          ],
+          [
+            "X6Y1",
+            "LC_Ci"
+          ],
+          [
+            "X6Y1",
+            "LD_Ci"
+          ],
+          [
+            "X6Y1",
+            "LE_Ci"
+          ],
+          [
+            "X6Y1",
+            "LF_Ci"
+          ],
+          [
+            "X6Y1",
+            "LG_Ci"
+          ],
+          [
+            "X6Y1",
+            "LH_Ci"
+          ],
+          [
+            "X6Y2",
+            "LH_Ci"
+          ]
+        ],
+        "enabled_consumers": 0
+      },
+      "route_before": [
+        [
+          "X6Y2",
+          "LG_I2"
+        ],
+        [
+          "X6Y2",
+          "J2MID_GHa_END2"
+        ],
+        [
+          "X6Y2",
+          "J2MID_GHa_BEG2"
+        ],
+        [
+          "X6Y2",
+          "W2MID0"
+        ],
+        [
+          "X7Y2",
+          "W2BEG0"
+        ],
+        [
+          "X7Y2",
+          "E1END3"
+        ],
+        [
+          "X6Y2",
+          "E1BEG3"
+        ],
+        [
+          "X6Y2",
+          "LG_O"
+        ]
+      ],
+      "route_after": [
+        [
+          "X6Y2",
+          "LG_I2"
+        ],
+        [
+          "X6Y2",
+          "J2MID_GHb_END2"
+        ],
+        [
+          "X6Y2",
+          "J2MID_GHb_BEG2"
+        ],
+        [
+          "X6Y2",
+          "S2MID1"
+        ],
+        [
+          "X6Y1",
+          "S2BEG1"
+        ],
+        [
+          "X6Y1",
+          "JS2END1"
+        ],
+        [
+          "X6Y1",
+          "JS2BEG1"
+        ],
+        [
+          "X6Y1",
+          "E1END0"
+        ],
+        [
+          "X5Y1",
+          "E1BEG0"
+        ],
+        [
+          "X5Y1",
+          "J2MID_CDb_END3"
+        ],
+        [
+          "X5Y1",
+          "J2MID_CDb_BEG3"
+        ],
+        [
+          "X5Y1",
+          "E2MID1"
+        ],
+        [
+          "X4Y1",
+          "E2BEG1"
+        ],
+        [
+          "X4Y1",
+          "JE2END5"
+        ],
+        [
+          "X4Y1",
+          "JE2BEG5"
+        ],
+        [
+          "X4Y1",
+          "E1END2"
+        ],
+        [
+          "X3Y1",
+          "E1BEG2"
+        ],
+        [
+          "X3Y1",
+          "JN2END1"
+        ],
+        [
+          "X3Y1",
+          "JN2BEG1"
+        ],
+        [
+          "X3Y1",
+          "E2END2"
+        ],
+        [
+          "X2Y1",
+          "E2BEGb2"
+        ],
+        [
+          "X2Y1",
+          "E2MID2"
+        ],
+        [
+          "X1Y1",
+          "E2BEG2"
+        ],
+        [
+          "X1Y1",
+          "JE2END6"
+        ],
+        [
+          "X1Y1",
+          "JE2BEG6"
+        ],
+        [
+          "X1Y1",
+          "LB_O"
+        ]
+      ]
+    },
+    "expected_states_are_not_observations": true,
+    "expected_frame_audit": {
+      "passed": true,
+      "tiles": 40,
+      "compared_configuration_bits": 8736,
+      "per_tile": {
+        "Tile_X0Y0_NW_term": 4,
+        "Tile_X0Y1_W_IO4": 81,
+        "Tile_X0Y2_W_IO4": 81,
+        "Tile_X0Y3_W_IO4": 81,
+        "Tile_X0Y4_SW_term": 20,
+        "Tile_X1Y0_N_IO": 35,
+        "Tile_X1Y1_LUT4x8_ha": 438,
+        "Tile_X1Y2_LUT4x8_ha": 438,
+        "Tile_X1Y3_LUT4x8_ha": 438,
+        "Tile_X1Y4_S_IO2": 60,
+        "Tile_X2Y0_N_IO": 35,
+        "Tile_X2Y1_LUT4x8_ha": 438,
+        "Tile_X2Y2_PRIM2T2S": 334,
+        "Tile_X2Y3_LUT4x8_ha": 438,
+        "Tile_X2Y4_S_IO2": 60,
+        "Tile_X3Y0_N_IO": 35,
+        "Tile_X3Y1_LUT4x8_ha": 438,
+        "Tile_X3Y2_LUT4x8_ha": 438,
+        "Tile_X3Y3_LUT4x8_ha": 438,
+        "Tile_X3Y4_S_IO2": 60,
+        "Tile_X4Y0_N_IO": 35,
+        "Tile_X4Y1_LUT4x8_ha": 438,
+        "Tile_X4Y2_LUT4x8_ha": 438,
+        "Tile_X4Y3_LUT4x8_ha": 438,
+        "Tile_X4Y4_S_IO2": 60,
+        "Tile_X5Y0_N_IO": 35,
+        "Tile_X5Y1_LUT4x8_ha": 438,
+        "Tile_X5Y2_PRIM2T2S": 334,
+        "Tile_X5Y3_LUT4x8_ha": 438,
+        "Tile_X5Y4_S_IO2": 60,
+        "Tile_X6Y0_N_IO": 35,
+        "Tile_X6Y1_LUT4x8_ha": 438,
+        "Tile_X6Y2_LUT4x8_ha": 438,
+        "Tile_X6Y3_LUT4x8_ha": 438,
+        "Tile_X6Y4_S_IO2": 60,
+        "Tile_X7Y0_NE_term": 0,
+        "Tile_X7Y1_E_IO4": 73,
+        "Tile_X7Y2_E_IO4": 73,
+        "Tile_X7Y3_E_IO4": 73,
+        "Tile_X7Y4_SE_term": 4
+      },
+      "scope": "Native frame-to-latch image agreement only; no functional or timing qualification."
+    },
+    "raw_image_sha256": "983a08f26cc001227265ce1a3ff16616d0acaee9b15cdd954aceb70a43e91be4",
+    "expected_loaded_image_sha256": "02eacca834b2d927aaedb9065faa1c6521ad19a08008c9828b85e4df70449b25"
+  },
+  "local_native_passed": true,
+  "actual_configuration_bits": 8736
+}

@@ -14,21 +14,29 @@ from compile.bitfile import BitFile
 def prepare(capsule,native,trial,out,trial_kind='sa'):
     capsule,native,trial,out=(Path(p).resolve() for p in (capsule,native,trial,out))
     trial_inputs=[trial/'result.json']
-    if trial_kind=='spi_timer_free_run':
+    if trial_kind in ('spi_timer_free_run','spi_tick_pipeline'):
         trial_inputs=[trial/name/'result.json' for name in ('control','candidate')]
         cases={name:json.loads(path.read_text()) for name,path in zip(('control','candidate'),trial_inputs)}
-        if any(str(row['run'])!='44798802734' or row['source_sha']!='693e3b6bee9d082109c616431648646693c0a4be' or
+        source_run,source_sha = (('44864499317','1d149b74550d3f217520c968371dec855dd4a300')
+            if trial_kind=='spi_tick_pipeline' else ('44798802734','693e3b6bee9d082109c616431648646693c0a4be'))
+        if any(str(row['run'])!=source_run or row['source_sha']!=source_sha or
                row['actual_native_loading'] or row['model_timing_characterized'] for row in cases.values()):
             raise ValueError('Require the authenticated source-proven SPI compile campaign')
         if cases['control']['image_sha256']!='c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f':
             raise ValueError('Original compiler control did not reproduce')
-        result=dict(run='44798802734',diagnostic_complete=True,cases=cases)
+        if trial_kind=='spi_tick_pipeline' and cases['candidate'].get('clock_constraint')!={
+                'cell':'u_X1Y4_A_gbuf','bel':'X0Y4/D','logical_graph_preserved':True,
+                'source_json_sha256':'96cbedc0d492e6ba829cc9926e33e9801fac21ccf45f7764c135d9ec38c50bc1',
+                'pinned_json_sha256':'997e14221ab06160fe9bcbc9f6a668e39cf90065f94d6bb0be56f0a56f01d9de'}:
+            raise ValueError('Registered tick clock constraint differs')
+        result=dict(run=source_run,diagnostic_complete=True,cases=cases)
     else:result=json.loads(trial_inputs[0].read_text())
     admitted={
         'sa':('44653541979','0834b13c09e5e23a35122f71258ceabfbe8a61d3dffbc31b6b0a1851921d241f'),
         'fixed_relocation':('44676960615','cf186c6d78f4b003ffc868b3f6d5e34f16aad4e1df14f2989195dbd03a7d049b'),
         'fixed_reroute':('44676960615','cbea6b084f843d95222cbb93cfd4a55ac0698a3d51b54689eb358d9678ff0462'),
         'spi_timer_free_run':('44798802734','79db28f92959f998faf2b6b00b65be3539abc5e03625f77bd80584601fa2fd6a'),
+        'spi_tick_pipeline':('44864499317','4a35f4d6f66bb0706f6c147934dd6ea520d6c7fd5c33e6c457b3c56b84b78300'),
         'spi_clock_d':('44827334401','4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a'),
         'spi_clock_fixed':('44831585287','97caee72e610700fddd885f21b7d07a3116f19b45540bc3c02423740df999d5e')}
     if trial_kind not in admitted:raise ValueError('Unknown fixed-source native trial')
@@ -135,7 +143,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_clock_d','spi_clock_fixed'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_tick_pipeline','spi_clock_d','spi_clock_fixed'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

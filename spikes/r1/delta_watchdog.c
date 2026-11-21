@@ -8,6 +8,7 @@
 typedef struct watch { vpiHandle h; char *name; uint64_t time; unsigned count; struct watch *next; } watch;
 static watch *head;
 static int done;
+static int scalar_only;
 static PLI_INT32 changed(p_cb_data cb) {
     watch *w=(watch *)cb->user_data;
     s_vpi_time t={.type=vpiSimTime};vpi_get_time(NULL,&t);
@@ -34,6 +35,7 @@ static void scan(vpiHandle scope) {
     for(int i=0;i<2;i++) {
         vpiHandle it=vpi_iterate(i?vpiReg:vpiNet,scope),h;
         if(it)while((h=vpi_scan(it))) {
+            if(scalar_only && vpi_get(vpiSize,h)!=1)continue;
             watch *w=calloc(1,sizeof(*w));w->h=h;w->name=strdup(vpi_get_str(vpiFullName,h));w->next=head;head=w;
             s_cb_data cb={.reason=cbValueChange,.cb_rtn=changed,.obj=h,.user_data=(PLI_BYTE8 *)w};
             s_vpi_time time={.type=vpiSuppressTime};s_vpi_value value={.format=vpiSuppressVal};cb.time=&time;cb.value=&value;
@@ -47,6 +49,8 @@ static PLI_INT32 enable(p_cb_data unused) {
     scan(NULL);unsigned n=0;for(watch *p=head;p;p=p->next)n++;vpi_printf("DELTA_WATCHDOG armed %u signals\n",n);fflush(stdout);return 0;
 }
 static PLI_INT32 startup(p_cb_data unused) {
+    const char *scalar=getenv("WARP_DELTA_SCALAR_ONLY");
+    scalar_only=scalar && !strcmp(scalar,"1");
     const char *requested=getenv("WARP_DELTA_START_TICKS");
     uint64_t target=requested?strtoull(requested,NULL,10):0;vpi_printf("DELTA_WATCHDOG startup target %llu\n",(unsigned long long)target);fflush(stdout);
     s_vpi_time time={.type=vpiSimTime,.high=target>>32,.low=target&0xffffffff};

@@ -26,7 +26,7 @@ def decoder_environment(decoder):
     return env
 
 
-def decode(vcd, decoder, annotation=None, *, required=False):
+def decode(vcd, decoder, annotation=None, *, required=False, sample_numbers=False):
     if os.environ.get('TRIPWIRE_SKIP_SIGROK') == '1' or shutil.which('sigrok-cli') is None:
         if required:
             raise RuntimeError('Required independent sigrok decoding unavailable or disabled')
@@ -34,5 +34,7 @@ def decode(vcd, decoder, annotation=None, *, required=False):
     command = ['sigrok-cli','-i',str(vcd),'-I','vcd','-P',decoder]
     if annotation:
         command += ['-A',annotation]
+    if sample_numbers:
+        command.append('--protocol-decoder-samplenum')
     return subprocess.run(command,env=decoder_environment(decoder),
                           capture_output=True,text=True,check=True).stdout

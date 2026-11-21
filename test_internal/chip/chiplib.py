@@ -180,9 +180,9 @@ def write_vcd(path, rec):
     pathlib.Path(path).write_text("\n".join(lines) + "\n")
 
 
-def sigrok(vcd, decoder, annotation=None):
+def sigrok(vcd, decoder, annotation=None, *, sample_numbers=False):
     """sigrok-cli's decode of a VCD (stdout); None when unavailable or explicitly skipped locally."""
-    return decode_capture(vcd,decoder,annotation)
+    return decode_capture(vcd,decoder,annotation,sample_numbers=sample_numbers)
 
 
 def hex_bytes(text, prefix):

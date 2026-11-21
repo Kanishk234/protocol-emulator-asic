@@ -17,6 +17,7 @@ The tests provide implementation-level evidence for these exercised cases only. 
 matching RTL and hardened-netlist checks before they have implementation-level evidence.
 """
 
+import binascii
 import importlib.util
 import os
 import re
@@ -229,6 +230,16 @@ async def test_l3_ws2812_tx(dut):
         assert [color.lower() for color in colors] == expected, out
 
 
+def _sigrok_edge_widths(path, channel):
+    measured = sigrok(path, f"timing:data={channel}:avg_period=0", "timing=time", sample_numbers=True)
+    if measured is None:
+        return None
+    edges = [(int(start), int(end)) for start, end in
+             re.findall(r"(?m)^(\d+)-(\d+) timing-\d+:", measured)]
+    assert edges and all(previous[1] == current[0] for previous, current in zip(edges, edges[1:])), measured
+    return [end - start for start, end in edges]
+
+
 @cocotb.test()
 async def test_l3_dshot_tx(dut):
     """L3-DShot TX: lane-computed checksums and 16-bit packets at all four roadmap rates."""
@@ -247,6 +258,30 @@ async def test_l3_dshot_tx(dut):
         frames, errs = pulse.dshot_decode(wire.rec["dshot"], bit)
         assert errs == [], (rate, errs)
         assert frames == [(throttle, telemetry, True) for throttle, telemetry in values], (rate, frames)
+        name = f"dshot_{rate}.vcd"
+        write_vcd(name, wire.rec)
+        widths = _sigrok_edge_widths(name, "dshot")
+        if widths is not None:
+            # Sigrok returns independent edge indices. The VCD starts at idle low,
+            # so intervals alternate high and low beginning at the first rise.
+            assert len(widths) == 32 * len(values) - 1, (rate, widths)
+            bits = []
+            for index, high in enumerate(widths[::2]):
+                possible = [value for value in (0, 1)
+                            if abs(high - bit * (6 if value else 3) // 8) <= 1]
+                assert len(possible) == 1, (rate, index, high)
+                bits.append(possible[0])
+                if 2 * index + 1 < len(widths):
+                    low = widths[2 * index + 1]
+                    if index % 16 == 15:
+                        assert low > bit
+                    else:
+                        assert abs(high + low - bit) <= 1
+            for index, (throttle, telemetry) in enumerate(values):
+                word = int("".join(map(str, bits[16 * index:16 * (index + 1)])), 2)
+                payload = (throttle << 1) | telemetry
+                checksum = (payload ^ (payload >> 4) ^ (payload >> 8)) & 0xf
+                assert word == ((payload << 4) | checksum), (rate, index, word)
 
 
 async def _servo_edge(dut, level):
@@ -854,6 +889,22 @@ async def test_l3_hdlc_tx_loopback(dut):
     write_vcd("hdlc_l3.vcd", wire.rec)
     decoded = hdlc.decode(sampled_bits)
     assert decoded == [(frame, True) for frame in frames], (decoded, got, first_zero, len(line))
+    widths = _sigrok_edge_widths("hdlc_l3.vcd", "tx")
+    if widths is not None:
+        assert line[0] == 1
+        assert all(width % period == 0 for width in widths), widths
+        # The first transition after idle high starts a zero run. Each measured
+        # run is an exact multiple of a bit period in this transmit case.
+        measured = "".join(str(index % 2) * (width // period) for index, width in enumerate(widths))
+        for frame in frames:
+            # Reflect around the standard library's forward CRC-CCITT routine
+            # to obtain the complemented, low-byte-first HDLC FCS.
+            reflected = bytes(int(f"{byte:08b}"[::-1], 2) for byte in frame)
+            forward_crc = binascii.crc_hqx(reflected, 0xffff)
+            fcs = int(f"{forward_crc:016b}"[::-1], 2) ^ 0xffff
+            body = "".join(f"{byte:08b}"[::-1] for byte in bytes(frame) + fcs.to_bytes(2, "little"))
+            expected = "01111110" + body.replace("11111", "111110") + "01111110"
+            assert measured.count(expected) == 1, measured
 
     received, current = [], []
     for tag, data in got:

@@ -29,7 +29,12 @@ module pin_rx_overrun(input wire clk);
             .ev_edge(ev_edge), .ev_qual(ev_qual), .ev_reset(ev_reset),
             .period(period), .sampleofs(sampleofs), .presc(presc), .nbits(nbits),
             .rx_nbits(rx_nbits), .rx_nbits2(rx_nbits2),
-            .a_in(a_in), .a_prev(a_prev), .b_in(b_in), .b_prev(b_prev),
+            .a_in(a_in), .a_prev(a_prev), .b_in(b_in),
+`ifdef TRW_RX_SHARED_EDGES
+            .b_rise(b_in && !b_prev), .b_fall(!b_in && b_prev),
+`else
+            .b_prev(b_prev),
+`endif
             .c_in(c_in), .c_prev(c_prev), .sel(sel), .echo(echo),
             .rxset(rxset), .rxset_n(rxset_n), .smp(smp),
             .rx_free(g == 0 ? free : 1'b1), .rx_load(candidate[g]),

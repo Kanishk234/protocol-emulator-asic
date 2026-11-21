@@ -21,6 +21,18 @@ MUTATIONS={
 }
 
 
+def prepare(root, scratch):
+    for rel in FILES:
+        target = scratch / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root / rel, target)
+    rx = (scratch / 'src/trw_pin_rx.v').read_text()
+    if 'input  wire        b_rise,' in rx and 'input  wire        b_fall,' in rx:
+        config = scratch / 'formal/pin_rx.sby'
+        config.write_text(config.read_text().replace(
+            'read -formal -sv', 'read -formal -sv -DTRW_RX_SHARED_EDGES', 1))
+
+
 def main(output):
     output=Path(output).resolve();output.mkdir(parents=True,exist_ok=True)
     for tool in ['sby','yosys','yosys-abc','z3']:
@@ -31,12 +43,13 @@ def main(output):
             'shared_runner_sha256':sha(ROOT/'scripts/formal_channels.py'),'proofs':{},'mutation_controls':{},
             'tool_versions':{t:subprocess.check_output(args,text=True).strip() for t,args in {
                 'yosys':['yosys','-V'],'sby':['sby','--version'],'z3':['z3','--version']}.items()}}
+    scratch = output / 'native_sources'
+    prepare(ROOT, scratch)
     for task,engine in [('safety','abc pdr'),('reachable','smtbmc z3')]:
-        report['proofs'][task]=run('pin_rx.sby',ROOT/'formal',task,output/task,'PASS',engine)
+        report['proofs'][task]=run('pin_rx.sby',scratch/'formal',task,output/task,'PASS',engine)
     for name,(file,old,new) in MUTATIONS.items():
         scratch=output/'mutation_sources'/name
-        for rel in FILES:
-            target=scratch/rel;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(ROOT/rel,target)
+        prepare(ROOT, scratch)
         target=scratch/file;text=target.read_text()
         if text.count(old)!=1:raise RuntimeError('Mutation anchor missing/ambiguous: '+name)
         target.write_text(text.replace(old,new))

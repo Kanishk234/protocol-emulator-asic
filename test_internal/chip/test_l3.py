@@ -986,7 +986,7 @@ async def test_l3_ir_nec_repeat_rx(dut):
                     state["remaining"] = segments[state["index"]][1]
         return {0: level}, None
 
-    wire = Wire(p, env, {"ir_rx": lambda uo, bus: bus & 1})
+    wire = Wire(p, env, {"ir_rx": lambda uo, bus: int(dut.ui_in.value) & 1})
     await ClockCycles(dut.clk, total_clocks + 100)
     wire.stop()
 
@@ -996,3 +996,7 @@ async def test_l3_ir_nec_repeat_rx(dut):
         if token is not None:
             got.append(token)
     assert got == [(EVENT, 0)], got
+    write_vcd("ir_nec_repeat.vcd", wire.rec)
+    out = sigrok("ir_nec_repeat.vcd", "ir_nec:ir=ir_rx", "ir_nec=repeat-code")
+    if out is not None:
+        assert out.count("Repeat code") == 1, out

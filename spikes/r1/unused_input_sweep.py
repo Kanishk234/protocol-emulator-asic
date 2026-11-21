@@ -69,7 +69,23 @@ def carry_modes(spec,modules,state):
     return enabled
 
 
-def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabled):
+def ff_mode(tile,lut,spec,module,state,features,words,allow_registered=False):
+    mapping=spec['TileSpecs'][tile][lut+'.FF']
+    if len(mapping)!=1 or list(mapping.values())!=['1']:
+        raise ValueError('Unexpected FF mode encoding')
+    address=next(iter(mapping));name,_=latch(module,address)
+    value=state['tiles']['Tile_'+tile+'_LUT4x8_ha']['q'][name]
+    if value not in ('0','1'):raise ValueError('Unknown actual FF mode')
+    if value=='1' and not allow_registered:raise ValueError('Require the measured combinational LUT')
+    if allow_registered:
+        x,y=map(int,tile[1:].split('Y'));frame,offset=divmod(address,32)
+        word=1+(x*20+frame)*6+1+(4-y)
+        if int(value)!=int(tile+'.'+lut+'.FF' in features) or (words[word]>>offset)&1!=int(value):
+            raise ValueError('Observed FF mode differs from image/FASM')
+    return value
+
+
+def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabled,allow_registered=False):
     from selected_route import selected_predecessors,trace_route
     native='Tile_'+tile+'_LUT4x8_ha';entries=spec['TileSpecs'][tile];target='L'+lut+'_I'+str(index)
     if any(f.split('.')[0]==tile and f.split('.')[2]==target for f in features):
@@ -83,9 +99,7 @@ def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabl
         if value not in ('0','1') or int(value)!=int(declared):raise ValueError('Observed truth differs from primary FASM')
         init|=int(value)<<bit
     if not independent(init,index):raise ValueError('LUT function depends on selected input')
-    ff=entries[lut+'.FF']
-    if len(ff)!=1 or state['tiles'][native]['q'][latch(module,next(iter(ff)))[0]]!='0':
-        raise ValueError('Require the measured combinational LUT')
+    mode=ff_mode(tile,lut,spec,module,state,features,words,allow_registered)
     alternatives=[(k,v) for k,v in entries.items() if k.endswith('.'+target)]
     if len(alternatives)!=2 or {tuple(v.values()) for k,v in alternatives}!={('0',),('1',)}:
         raise ValueError('Require one existing two-way input selector')
@@ -96,6 +110,9 @@ def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabl
         t,source,dest=f.split('.')
         if t==tile:locked.update(entries[source+'.'+dest])
     if address in locked:raise ValueError('Selector overlaps an active feature')
+    if allow_registered and any(address in mapping for key,mapping in entries.items()
+            if any(key.startswith(letter+'.') for letter in 'ABCDEFGH')):
+        raise ValueError('Input selector overlaps primitive state/clock/control fields')
     name,cell=latch(module,address)
     selector=module['netnames']['Inst_LUT4x8_ha_switch_matrix.inst_cus_mux21_'+target+'.S']['bits']
     if cell['connections']['Q']!=selector or state['tiles'][native]['q'][name]!='0':
@@ -106,10 +123,14 @@ def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabl
     candidate=list(words);candidate[word]|=1<<offset
     carry=(carry_cone(selected_predecessors(spec,words,pips),tile,lut,carry_enabled)
            if index in (1,2) else dict(scope='I0/I3 do not enter the native carry function'))
-    return dict(tile=native,cell=name,lut=lut,input=index,observed_init=init,cofactor_addresses_checked=16,
+    proof=dict(tile=native,cell=name,lut=lut,input=index,observed_init=init,cofactor_addresses_checked=16,
                 tile_bit=address,word=word,word_bit=offset,before='0',after='1',carry_noninterference=carry,
                 route_before=trace_route(selected_predecessors(spec,words,pips),(tile,target)),
                 route_after=trace_route(selected_predecessors(spec,candidate,pips),(tile,target)))
+    if allow_registered:
+        proof.update(observed_ff_select=mode,primitive_control_fields_preserved=True,
+            transition_scope='Binary LUT data equality; unchanged FF/clock/reset/enable modes preserve sequential transitions. No native initialization, glitch or timing acceptance.')
+    return proof
 
 
 def prepare(rc,proof,native,capsule,pdk,out):

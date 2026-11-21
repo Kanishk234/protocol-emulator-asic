@@ -6,7 +6,25 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from unused_input_sweep import carry_cone,independent
+from unused_input_sweep import carry_cone,independent,ff_mode
+
+
+def test_registered_input_proof_requires_explicit_opt_in_and_matching_actual_mode():
+    module=dict(ports={'FrameData':{'bits':list(range(32))},
+                       'FrameStrobe':{'bits':list(range(100,120))}},
+                cells={'cfg':{'type':'sg13cmos5l_dlhq_1',
+                              'connections':{'D':[0],'GATE':[100],'Q':[200]}}})
+    spec={'TileSpecs':{'X1Y1':{'A.FF':{0:'1'}}}}
+    state={'tiles':{'Tile_X1Y1_LUT4x8_ha':{'q':{'cfg':'1'}}}}
+    words=[0]*962;words[125]=1
+    features={'X1Y1.A.FF'}
+    with pytest.raises(ValueError):ff_mode('X1Y1','A',spec,module,state,features,words)
+    assert ff_mode('X1Y1','A',spec,module,state,features,words,True)=='1'
+    with pytest.raises(ValueError):ff_mode('X1Y1','A',spec,module,state,set(),words,True)
+    words[125]=0
+    with pytest.raises(ValueError):ff_mode('X1Y1','A',spec,module,state,features,words,True)
+    state['tiles']['Tile_X1Y1_LUT4x8_ha']['q']['cfg']='0'
+    assert ff_mode('X1Y1','A',spec,module,state,set(),words,True)=='0'
 
 
 def test_cofactor_proof_rejects_any_actual_dependence_on_the_changed_input():

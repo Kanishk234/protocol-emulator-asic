@@ -1,0 +1,71 @@
+{
+  "run": {
+    "id": 44858684478,
+    "head_sha": "9688dbd3706ef67033137a4ae6951b0b81db4afd",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_spi_tick_pipeline.yaml"
+  },
+  "cases": [
+    {
+      "mode": 0,
+      "half": 25,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    },
+    {
+      "mode": 0,
+      "half": 4,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    },
+    {
+      "mode": 1,
+      "half": 25,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    },
+    {
+      "mode": 1,
+      "half": 4,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    },
+    {
+      "mode": 2,
+      "half": 25,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    },
+    {
+      "mode": 2,
+      "half": 4,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    },
+    {
+      "mode": 3,
+      "half": 25,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    },
+    {
+      "mode": 3,
+      "half": 4,
+      "equivalence_passed": true,
+      "strict_source_tests": 4,
+      "all_input_hashes_replayed": true
+    }
+  ],
+  "unbounded_PDR_cases": 8,
+  "strict_source_tests": 32,
+  "scope": "Original versus registered terminal pulse SPI pin/host equivalence after initial reset, all modes, HALF4and25, PRIMS1; arbitrary future host/MISO/reset. No fit/native/extracted timing or adoption claim."
+}

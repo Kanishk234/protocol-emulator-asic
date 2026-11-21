@@ -1,5 +1,24 @@
 # Decisions
 
+## D-169: Compile the proved registered tick with an exact original control
+
+- **Date:** 2026-11-20.44858684478 at9688dbd3 passes all8unbounded PDR
+  cases and32independent source tests for the registered timer pulse.
+  Root rechecks every input hash, actual miter parameters, strict XML and
+  completed proof status. Source catalog pins all eight archive identities.
+- **Compile controls:** original source must reproduce rawc6b96ef0...
+  byte-for-byte before the candidate runs. Same frozen resource/physical
+  macro, pins, DIV434/HALF25/mode0/PRIMS1, seed1, tool binaries and50MHz
+  compiler request. Candidate alone USER-pins the single GBUF to original
+  bank X0Y4/D, avoiding the known bank-A confounder.
+- **Constraint proof:** write a separate JSON with only the two clock BEL/
+  strength attributes changed; preserve the synthesized logical graph and
+  original JSON. Require actual packed placement to honor D. Record both
+  JSON hashes and the clock constraint. No RTL/fabric/config/PDK edit.
+- **Acceptance:** fit/estimates are compiler evidence only. Require actual
+  bitstream loading/reset/reload and qualified extracted setup/hold before
+  any adoption; do not transplant repairs from older source placements.
+
 ## D-168: Test a registered SPI terminal pulse before spending another compile
 
 - **Date:** 2026-11-20.44857324411 qualifies the F/B/G/E image's native

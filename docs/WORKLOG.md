@@ -4,6 +4,19 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D168 hosted44858684478 at9688dbd3 passes all8unbounded equivalence
+  cases and32strict SPI source tests. Root replays every proof/input hash,
+  actual miter mode/HALF/PRIMS parameters and XML. Receipt:
+  reports/r1_spi_tick_pipeline_equivalence_44858684478.json. Production
+  source remains unchanged; no compiled/native/timing claim yet.
+- D169 stages fresh compilation only after that proof admission, exact
+  original rawc6control first, candidate clock USER-pinned to original D.
+  Separate synthesized JSON preserves every logical cell/net and the
+  original JSON; record hashes and require D in actual placement. Pure
+  constraint guards and actual frozen-resource proof/source preparation
+  pass. Next hosted compile, then fresh actual loading and timing; no
+  previous image-specific selector repair is transplanted.
+
 - D167 hosted44857324411 at32125b18 completes successfully: all four
   native/reset/reload cases and all four original timing queries pass
   model checks, with zero loops/both policies agreeing/full active annotation.

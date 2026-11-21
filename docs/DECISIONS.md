@@ -1,5 +1,31 @@
 # Decisions
 
+## D-164: Repair the proved-unused F input on both fixed-placement images
+
+- **Date:** 2026-11-20.44832060001 retains a passing original A control
+  and a stalled rerouted A control; local D also stalls. Read-only scalar
+  observation points to X3Y2/F. Its INIT0xa000 ignores I1, yet native
+  reconvergence through the unused input can prevent simulation advancing.
+- **Change:** separately prove one existing selector for each image:
+  X3Y2/F.I1, native latch_1538_, tile bit161, word394bit1,0to1.
+  The terminal changes from X5Y3/LA_O to X3Y3/LG_O. All16cofactors pass,
+  the selector overlaps no active route and the carry guard passes. No
+  source logic, macro or architecture change; this is image configuration.
+- **Evidence:** separate local repaired A and D native tests pass concurrent
+  UART/SPI and reset/second SPI; all8736actual bits agree for both images.
+  D rawc13edb09... loads e1dd87ce... . Hosted management/reload and complete
+  connected timing remain mandatory. Failed G.I0/G.I2 hypotheses remain.
+- **Proof provenance:** A parent state is observed in44832060001. D parent
+  state is explicitly projected from its own image/native frame wiring;
+  all F INIT/FF and carry-mode fields used in the proof must equal measured
+  A, and its own FASM/routes/selector are checked separately. Projection is
+  not a new observation. Complete prepared images match both local passing
+  replays exactly; the hosted actual audits still control acceptance.
+- **Controls:** unmodified original A, repaired rerouted A, repaired D,
+  full D management error/reset/reload; require every case to pass before
+  zero-loop extracted timing. Do not waive the failed unrepaired controls
+  or promote this image from local functional evidence alone.
+
 ## D-163: Separate clock-bank rerouting from user-cell replacement
 
 - **Date:** 2026-11-20. D162's fresh D-bank placement fails native

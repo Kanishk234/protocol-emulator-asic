@@ -1,0 +1,444 @@
+{
+  "scope": "Local functional evidence only. Hosted reset/reload and zero-loop extracted timing remain pending.",
+  "parent_run": 44832060001,
+  "proof": {
+    "parent_run": "44832060001",
+    "cases": {
+      "reroute": {
+        "change": {
+          "tile": "Tile_X3Y2_LUT4x8_ha",
+          "cell": "_1538_",
+          "lut": "F",
+          "input": 1,
+          "observed_init": 40960,
+          "cofactor_addresses_checked": 16,
+          "tile_bit": 161,
+          "word": 394,
+          "word_bit": 1,
+          "before": "0",
+          "after": "1",
+          "carry_noninterference": {
+            "visited_nodes": 25,
+            "disabled_carry_consumers": [
+              [
+                "X3Y1",
+                "LA_Ci"
+              ],
+              [
+                "X3Y1",
+                "LB_Ci"
+              ],
+              [
+                "X3Y1",
+                "LC_Ci"
+              ],
+              [
+                "X3Y1",
+                "LD_Ci"
+              ],
+              [
+                "X3Y1",
+                "LE_Ci"
+              ],
+              [
+                "X3Y1",
+                "LF_Ci"
+              ],
+              [
+                "X3Y1",
+                "LG_Ci"
+              ],
+              [
+                "X3Y1",
+                "LH_Ci"
+              ],
+              [
+                "X3Y2",
+                "LG_Ci"
+              ],
+              [
+                "X3Y2",
+                "LH_Ci"
+              ]
+            ],
+            "enabled_consumers": 0
+          },
+          "route_before": [
+            [
+              "X3Y2",
+              "LF_I1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFa_END1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFa_BEG1"
+            ],
+            [
+              "X3Y2",
+              "N2MID2"
+            ],
+            [
+              "X3Y3",
+              "N2BEG2"
+            ],
+            [
+              "X3Y3",
+              "JN2END6"
+            ],
+            [
+              "X3Y3",
+              "JN2BEG6"
+            ],
+            [
+              "X3Y3",
+              "W1END1"
+            ],
+            [
+              "X4Y3",
+              "W1BEG1"
+            ],
+            [
+              "X4Y3",
+              "JS2END0"
+            ],
+            [
+              "X4Y3",
+              "JS2BEG0"
+            ],
+            [
+              "X4Y3",
+              "W1END0"
+            ],
+            [
+              "X5Y3",
+              "W1BEG0"
+            ],
+            [
+              "X5Y3",
+              "JS2END5"
+            ],
+            [
+              "X5Y3",
+              "JS2BEG5"
+            ],
+            [
+              "X5Y3",
+              "LA_O"
+            ]
+          ],
+          "route_after": [
+            [
+              "X3Y2",
+              "LF_I1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFb_END1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFb_BEG1"
+            ],
+            [
+              "X3Y2",
+              "N2MID3"
+            ],
+            [
+              "X3Y3",
+              "N2BEG3"
+            ],
+            [
+              "X3Y3",
+              "JN2END3"
+            ],
+            [
+              "X3Y3",
+              "JN2BEG3"
+            ],
+            [
+              "X3Y3",
+              "LG_O"
+            ]
+          ]
+        },
+        "parent_state_observed": true,
+        "expected_states_are_not_observations": true,
+        "expected_frame_audit": {
+          "passed": true,
+          "tiles": 40,
+          "compared_configuration_bits": 8736,
+          "per_tile": {
+            "Tile_X0Y0_NW_term": 4,
+            "Tile_X0Y1_W_IO4": 81,
+            "Tile_X0Y2_W_IO4": 81,
+            "Tile_X0Y3_W_IO4": 81,
+            "Tile_X0Y4_SW_term": 20,
+            "Tile_X1Y0_N_IO": 35,
+            "Tile_X1Y1_LUT4x8_ha": 438,
+            "Tile_X1Y2_LUT4x8_ha": 438,
+            "Tile_X1Y3_LUT4x8_ha": 438,
+            "Tile_X1Y4_S_IO2": 60,
+            "Tile_X2Y0_N_IO": 35,
+            "Tile_X2Y1_LUT4x8_ha": 438,
+            "Tile_X2Y2_PRIM2T2S": 334,
+            "Tile_X2Y3_LUT4x8_ha": 438,
+            "Tile_X2Y4_S_IO2": 60,
+            "Tile_X3Y0_N_IO": 35,
+            "Tile_X3Y1_LUT4x8_ha": 438,
+            "Tile_X3Y2_LUT4x8_ha": 438,
+            "Tile_X3Y3_LUT4x8_ha": 438,
+            "Tile_X3Y4_S_IO2": 60,
+            "Tile_X4Y0_N_IO": 35,
+            "Tile_X4Y1_LUT4x8_ha": 438,
+            "Tile_X4Y2_LUT4x8_ha": 438,
+            "Tile_X4Y3_LUT4x8_ha": 438,
+            "Tile_X4Y4_S_IO2": 60,
+            "Tile_X5Y0_N_IO": 35,
+            "Tile_X5Y1_LUT4x8_ha": 438,
+            "Tile_X5Y2_PRIM2T2S": 334,
+            "Tile_X5Y3_LUT4x8_ha": 438,
+            "Tile_X5Y4_S_IO2": 60,
+            "Tile_X6Y0_N_IO": 35,
+            "Tile_X6Y1_LUT4x8_ha": 438,
+            "Tile_X6Y2_LUT4x8_ha": 438,
+            "Tile_X6Y3_LUT4x8_ha": 438,
+            "Tile_X6Y4_S_IO2": 60,
+            "Tile_X7Y0_NE_term": 0,
+            "Tile_X7Y1_E_IO4": 73,
+            "Tile_X7Y2_E_IO4": 73,
+            "Tile_X7Y3_E_IO4": 73,
+            "Tile_X7Y4_SE_term": 4
+          },
+          "scope": "Native frame-to-latch image agreement only; no functional or timing qualification."
+        },
+        "raw_image_sha256": "cae0af897bc7be087bf3dd395237f510de98828284c734d6cfc0ed2f500a0b7a",
+        "expected_loaded_image_sha256": "3c27f397aad0498aa52becc12ae8f8265886e526cf1be166a14ae4b1e5062c2c"
+      },
+      "candidate": {
+        "change": {
+          "tile": "Tile_X3Y2_LUT4x8_ha",
+          "cell": "_1538_",
+          "lut": "F",
+          "input": 1,
+          "observed_init": 40960,
+          "cofactor_addresses_checked": 16,
+          "tile_bit": 161,
+          "word": 394,
+          "word_bit": 1,
+          "before": "0",
+          "after": "1",
+          "carry_noninterference": {
+            "visited_nodes": 25,
+            "disabled_carry_consumers": [
+              [
+                "X3Y1",
+                "LA_Ci"
+              ],
+              [
+                "X3Y1",
+                "LB_Ci"
+              ],
+              [
+                "X3Y1",
+                "LC_Ci"
+              ],
+              [
+                "X3Y1",
+                "LD_Ci"
+              ],
+              [
+                "X3Y1",
+                "LE_Ci"
+              ],
+              [
+                "X3Y1",
+                "LF_Ci"
+              ],
+              [
+                "X3Y1",
+                "LG_Ci"
+              ],
+              [
+                "X3Y1",
+                "LH_Ci"
+              ],
+              [
+                "X3Y2",
+                "LG_Ci"
+              ],
+              [
+                "X3Y2",
+                "LH_Ci"
+              ]
+            ],
+            "enabled_consumers": 0
+          },
+          "route_before": [
+            [
+              "X3Y2",
+              "LF_I1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFa_END1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFa_BEG1"
+            ],
+            [
+              "X3Y2",
+              "N2MID2"
+            ],
+            [
+              "X3Y3",
+              "N2BEG2"
+            ],
+            [
+              "X3Y3",
+              "JN2END6"
+            ],
+            [
+              "X3Y3",
+              "JN2BEG6"
+            ],
+            [
+              "X3Y3",
+              "W1END3"
+            ],
+            [
+              "X4Y3",
+              "W1BEG3"
+            ],
+            [
+              "X4Y3",
+              "JS2END2"
+            ],
+            [
+              "X4Y3",
+              "JS2BEG2"
+            ],
+            [
+              "X4Y3",
+              "W1END3"
+            ],
+            [
+              "X5Y3",
+              "W1BEG3"
+            ],
+            [
+              "X5Y3",
+              "LA_O"
+            ]
+          ],
+          "route_after": [
+            [
+              "X3Y2",
+              "LF_I1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFb_END1"
+            ],
+            [
+              "X3Y2",
+              "J2MID_EFb_BEG1"
+            ],
+            [
+              "X3Y2",
+              "N2MID3"
+            ],
+            [
+              "X3Y3",
+              "N2BEG3"
+            ],
+            [
+              "X3Y3",
+              "JN2END3"
+            ],
+            [
+              "X3Y3",
+              "JN2BEG3"
+            ],
+            [
+              "X3Y3",
+              "LG_O"
+            ]
+          ]
+        },
+        "parent_state_observed": false,
+        "expected_states_are_not_observations": true,
+        "expected_frame_audit": {
+          "passed": true,
+          "tiles": 40,
+          "compared_configuration_bits": 8736,
+          "per_tile": {
+            "Tile_X0Y0_NW_term": 4,
+            "Tile_X0Y1_W_IO4": 81,
+            "Tile_X0Y2_W_IO4": 81,
+            "Tile_X0Y3_W_IO4": 81,
+            "Tile_X0Y4_SW_term": 20,
+            "Tile_X1Y0_N_IO": 35,
+            "Tile_X1Y1_LUT4x8_ha": 438,
+            "Tile_X1Y2_LUT4x8_ha": 438,
+            "Tile_X1Y3_LUT4x8_ha": 438,
+            "Tile_X1Y4_S_IO2": 60,
+            "Tile_X2Y0_N_IO": 35,
+            "Tile_X2Y1_LUT4x8_ha": 438,
+            "Tile_X2Y2_PRIM2T2S": 334,
+            "Tile_X2Y3_LUT4x8_ha": 438,
+            "Tile_X2Y4_S_IO2": 60,
+            "Tile_X3Y0_N_IO": 35,
+            "Tile_X3Y1_LUT4x8_ha": 438,
+            "Tile_X3Y2_LUT4x8_ha": 438,
+            "Tile_X3Y3_LUT4x8_ha": 438,
+            "Tile_X3Y4_S_IO2": 60,
+            "Tile_X4Y0_N_IO": 35,
+            "Tile_X4Y1_LUT4x8_ha": 438,
+            "Tile_X4Y2_LUT4x8_ha": 438,
+            "Tile_X4Y3_LUT4x8_ha": 438,
+            "Tile_X4Y4_S_IO2": 60,
+            "Tile_X5Y0_N_IO": 35,
+            "Tile_X5Y1_LUT4x8_ha": 438,
+            "Tile_X5Y2_PRIM2T2S": 334,
+            "Tile_X5Y3_LUT4x8_ha": 438,
+            "Tile_X5Y4_S_IO2": 60,
+            "Tile_X6Y0_N_IO": 35,
+            "Tile_X6Y1_LUT4x8_ha": 438,
+            "Tile_X6Y2_LUT4x8_ha": 438,
+            "Tile_X6Y3_LUT4x8_ha": 438,
+            "Tile_X6Y4_S_IO2": 60,
+            "Tile_X7Y0_NE_term": 0,
+            "Tile_X7Y1_E_IO4": 73,
+            "Tile_X7Y2_E_IO4": 73,
+            "Tile_X7Y3_E_IO4": 73,
+            "Tile_X7Y4_SE_term": 4
+          },
+          "scope": "Native frame-to-latch image agreement only; no functional or timing qualification."
+        },
+        "raw_image_sha256": "c13edb09ddfc73c9aa58ba4f4c99f08ec52faa2e172b2218cc20bbf1aa936a88",
+        "expected_loaded_image_sha256": "e1dd87ce230d471f61155d00c17b0add10c47bb3b96db8ec1960770d6cf1a054"
+      }
+    },
+    "scope": "A parent is observed. D parent is projected from its own image; all proof-relevant fields must equal measured A. Future actual native audits remain mandatory."
+  },
+  "local_cases": {
+    "reroute": {
+      "native_passed": true,
+      "configuration_bits": 8736,
+      "loaded_image_sha256": "3c27f397aad0498aa52becc12ae8f8265886e526cf1be166a14ae4b1e5062c2c",
+      "observed_configuration_sha256": "cf5af6596881d911f9a02c3127c6a3e992a1be62225635a67b36ff6cd466eaa6",
+      "scope": "Concurrent UART/SPI and reset/second SPI, no management shell or timing claim"
+    },
+    "candidate": {
+      "native_passed": true,
+      "configuration_bits": 8736,
+      "loaded_image_sha256": "e1dd87ce230d471f61155d00c17b0add10c47bb3b96db8ec1960770d6cf1a054",
+      "observed_configuration_sha256": "60757cfa166e9f6e427604130858d2234381217ea6a9b762110b4b201a0948c0",
+      "scope": "Concurrent UART/SPI and reset/second SPI, no management shell or timing claim"
+    }
+  }
+}

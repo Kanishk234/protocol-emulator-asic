@@ -4,6 +4,36 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D164 obtains a real local functional improvement: separately proved
+  X3Y2/F.I1 selector fixes both rerouted A and D native tests. Each passes
+  concurrent UART/SPI, reset/second SPI and8736actual bits. Receipt:
+  reports/r1_clock_fixed_f_input_local_20261120.json. D rawc13edb09...,
+  loaded e1dd87ce...; A rawcae0af89... . Neither is timing/adoption evidence.
+- New preparation reconstructs each image independently; A parent is
+  observed, D parent explicitly projected. All proof-relevant F INIT/FF
+  and carry-mode fields equal measured A, own FASM/routes checked, one
+  bit only after quiescence; complete outputs match both local passing
+  replays. Hosted controls/repaired A/repaired D/management reload must
+  all pass before connected STA.16focused guards, actual preflight and
+  actionlint pass; four VPI finite/loop fixture checks pass. No phase box.
+
+- D163 qualification44832060001 at23583b18 times out (exit124) in the
+  rerouted **A** control after original A passes. Hosted D, management
+  candidate and timing are not reached. Root audits all8736rerouted-A
+  configuration bits. Receipt: reports/r1_clock_fixed_native_44832060001.json;
+  BUG172. Clock-bank change alone cannot explain this failure.
+- A bounded local exact-D replay also times out at75seconds, with all8736
+  actual bits matching. Full-width and new scalar-only read-only VPI modes
+  both identify non-advancing activity at123980ns. Scalar pins expose
+  X3Y2/F combinational output and X6Y2/F datapath activity; no physical
+  oscillation or acceptance claim. Both observer modes pass finite/loop
+  fixture controls (four checks: exits0and2 as appropriate).
+- Local X4Y1/G.I0 and X6Y2/G.I2 one-bit cofactor/carry-proved trials both
+  time out and are rejected. X3Y2/F.I1 is the remaining proved-unused input
+  on the observed combinational F output; a bounded separate trial is next.
+  No hardware/default/constraint change or phase box. Best measured timing
+  remains44794158025 setup-9.795382ns/hold-1.867277ns.
+
 - D163 routing44831585287 atd9d7991e passes: restored A raw79db28...
   is exact; rerouted A rawdc929023... and D raw97caee72... preserve all
   expected user locations and identical logical graphs. Root independently

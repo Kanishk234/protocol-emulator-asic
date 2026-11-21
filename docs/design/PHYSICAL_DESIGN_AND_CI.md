@@ -2,6 +2,13 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 fixed-placement follow-up:**44832060001 times out in the
+rerouted A control after original A passes. Hosted D/reload/timing are not
+reached. D164's separately proved unused X3Y2/F.I1 selector passes local
+native traffic/reset and8736-bit audits on both repaired A and D. Hosted
+management reload and zero-loop extracted timing remain required; no new
+timing result, hardware adoption or closure claim.
+
 **November20 clock-bank follow-up:**44829301770 rejects the D162 D-bank
 candidate before timing: native host-ready becomes unknown, despite exact
 8736-bit configuration and a passing matched A control. A generated RTL

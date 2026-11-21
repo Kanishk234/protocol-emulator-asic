@@ -122,7 +122,8 @@
     "all_three_placements_exact": true,
     "all_three_raw_images_match": true,
     "native_admission_passed": true,
-    "wrong_reroute_clock_rejected": true
+    "wrong_reroute_clock_rejected": true,
+    "all_three_complete_FASM_encodings_match_raw_words": true
   },
   "scope": "Routing evidence only; native/reset/reload and extracted timing pending."
 }

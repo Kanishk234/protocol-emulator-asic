@@ -1,5 +1,13 @@
 # R1 closure status — November 20, 2026
 
+Newest qualification44832060001 times out in rerouted **A** (exit124)
+after original A passes. Hosted D, management candidate and timing are not
+reached. Local exact D also times out; read-only observers identify repeated
+activity at123980ns. D164's separately proved unused F.I1 selector then
+passes local native UART/SPI/reset on **both** repaired A and D images,
+with all8736actual bits matching. Hosted reload and extracted timing are
+the next gates. See [failed native receipt](r1_clock_fixed_native_44832060001.json).
+
 Latest follow-up: run44829301770 rejects the fresh D-bank placement in
 native simulation (unknown host-ready at115981ns), while its matched A
 control and generated RTL diagnostic pass. All8736loaded configuration
@@ -8,6 +16,12 @@ the D-bank image remains unqualified. Local F.I2 and D.I0 selector trials
 also fail and are retained as rejected hypotheses. D163 next preserves
 every other user-cell location while comparing A/D rerouting. See
 [native failure receipt](r1_clock_bank_native_44829301770.json).
+
+The tighter fixed-placement routing run44831585287 passes all three
+controls. Root independently rechecks logical graphs, exact cell locations
+and raw image hashes. Native/reload campaign44832060001 attempted restored
+A, rerouted A and rerouted D; its failed result is described above. See
+[fixed-placement routing receipt](r1_clock_bank_fixed_44831585287.json).
 
 R1 is still experimental. G1 remains the selected production baseline.
 No hardware, ABI, physical macro geometry or clock target changed in this work.

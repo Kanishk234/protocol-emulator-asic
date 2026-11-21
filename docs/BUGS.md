@@ -1,5 +1,32 @@
 # Bugs
 
+## 172: Fixed-placement rerouting stalls native simulation with clock bank unchanged
+
+- **Symptom/check:**44832060001 at23583b18 passes the restored A-bank
+  control, then spends the600-second native budget in the rerouted A case
+  and exits124. D candidate, management candidate and timing are not reached.
+  Exact cell placement and logical graph preservation do not ensure native
+  convergence. This is evidence against attributing the failure solely to D.
+- **Local diagnosis:** exact D image also times out after75seconds. The
+  read-only full-width observer stops at123980ns; scalar-only replay stops
+  at the same timestamp and exposes activity on X3Y2/_1093_, X6Y2/_1093_
+  and F datapath pins. These are diagnostic observations, not physical
+  oscillation or timing proof. A cofactor-proved X4Y1/G.I0 trial still times
+  out and is rejected.
+- **Next hypothesis:** selected routing contains a direct unused input
+  feedback on constant-zero X6Y2/G.I2. All16cofactors and23carry-cone nodes
+  pass the noninterference guard (nine disabled consumers). A separate
+  one-bit native trial also times out at75seconds and is rejected. Next
+  investigate proved-unused X3Y2/F.I1 on the observed F output. No repair
+  or closure claim yet.
+- **Diagnostic coverage:** optional scalar-only VPI mode reduces vector
+  alias noise. Both modes pass finite fixtures with exit0 and reject the
+  intentional loop with exit2. Neither changes or qualifies the circuit.
+- **Local repair:** D164 separately changes X3Y2/F.I1 on rerouted A and D.
+  Both actual native tests now pass concurrent UART/SPI and reset/second
+  SPI, with8736-bit agreement. Hosted reload and extracted timing remain
+  pending; do not mark this bug or closure complete from local evidence.
+
 ## 171: Clock-bank D placement fails native initialization despite exact configuration
 
 - **Symptom/check:**44829301770 at a7dad2be passes its matched A-bank

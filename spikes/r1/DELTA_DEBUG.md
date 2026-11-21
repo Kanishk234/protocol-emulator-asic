@@ -28,6 +28,12 @@ edge. Arming late avoids observing irrelevant configuration transients and
 reduces overhead. The tool observes module scopes; it is not a complete
 oscillation proof or a universal scheduler watchdog.
 
+Set `WARP_DELTA_SCALAR_ONLY=1` for a separate diagnostic replay when vector
+aliases crowd out native cell pins in the busiest-signal report. This observes
+only one-bit nets/registers and can miss activity confined to vectors. The
+default still observes all widths; neither mode qualifies a design or repairs
+a stalled acceptance run. Retain the full-width diagnosis alongside it.
+
 The adjacent fixture has an intentional zero-delay loop when `OSCILLATE=1`
 and a finite control when0. Compile it with the same Icarus runtime and verify
 the former prints `DELTA_WATCHDOG stuck` and exits2, while the latter reaches

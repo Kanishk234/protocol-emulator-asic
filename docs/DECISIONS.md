@@ -1,5 +1,23 @@
 # Decisions
 
+## D-165: Break the measured B.I3 timing loop using an existing selector
+
+- **Date:** 2026-11-20.44853914939 establishes the F repair through all
+  four actual native cases and reload, but static setup reports seven
+  loops and dynamic setup crashes(-11). Root independently checks all
+  four8736-bit snapshots/XML cases and reverses all four analysis scripts
+  byte-for-byte to the original baseline.
+- **Change:** candidate only, X1Y2/B.I3 native latch_1516_, tile bit203,
+  word160bit11,0to1. Actual INIT0x8888 is independent of I3 across all16
+  addresses; no active-route overlap and I3 has no carry fanout. The
+  selected route changes from own LB_O to X4Y0/A_OUT. Reconstruct the
+  actual F-repaired image exactly first; quiescence must add only this bit.
+- **Evidence/gates:** local additional-repair native UART/SPI/reset passes;
+  expected rawb242b24a..., load84490af7... . Expected states remain labelled
+  predictions. Hosted original control/repaired A/repaired D/full reload
+  and both zero-loop timing policies remain mandatory. Hardware, G1,
+  source programs,20ns/0.25nsconditions and all timing checks stay fixed.
+
 ## D-164: Repair the proved-unused F input on both fixed-placement images
 
 - **Date:** 2026-11-20.44832060001 retains a passing original A control

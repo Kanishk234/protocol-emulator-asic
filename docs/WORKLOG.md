@@ -4,6 +4,20 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D164 hosted44853914939 atb752e9c7 passes original control, repaired A,
+  repaired D and full management/reset/reload. Root independently verifies
+  all four strict XML/8736-bit audits, direct/reload byte identity and all
+  four full script reversals to the original baseline. Receipt:
+  reports/r1_clock_fixed_f_input_44853914939.json. Native blocker repaired
+  for these images; still no timing closure or adoption.
+- STA static setup completes/exit0 but reports seven X1Y2/B loops; dynamic
+  setup crashes-11/incomplete; hold is not reached. BUG173 retains the
+  failed executions. D165 proves unused B.I3 feedback with actual INIT8888,
+  all16cofactors, no active-route/carry impact, one existing selector only
+  (word160bit11). Additional repair passes strict local native/reset and
+  all8736actual bits; receipt reports/r1_clock_fixed_b_loop_local_20261120.json.
+  Hosted complete native/reload and zero-loop timing are next; no phase box.
+
 - D164 obtains a real local functional improvement: separately proved
   X3Y2/F.I1 selector fixes both rerouted A and D native tests. Each passes
   concurrent UART/SPI, reset/second SPI and8736actual bits. Receipt:

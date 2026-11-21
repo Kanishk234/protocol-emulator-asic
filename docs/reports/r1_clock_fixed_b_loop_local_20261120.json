@@ -1,0 +1,240 @@
+{
+  "scope": "Local native improvement only; hosted reload and complete extracted timing remain pending.",
+  "parent_run": 44853914939,
+  "proof": {
+    "parent_native_run": "44853914939",
+    "change": {
+      "tile": "Tile_X1Y2_LUT4x8_ha",
+      "cell": "_1516_",
+      "lut": "B",
+      "input": 3,
+      "observed_init": 34952,
+      "cofactor_addresses_checked": 16,
+      "tile_bit": 203,
+      "word": 160,
+      "word_bit": 11,
+      "before": "0",
+      "after": "1",
+      "carry_noninterference": {
+        "scope": "I0/I3 do not enter the native carry function"
+      },
+      "route_before": [
+        [
+          "X1Y2",
+          "LB_I3"
+        ],
+        [
+          "X1Y2",
+          "J2MID_ABa_END3"
+        ],
+        [
+          "X1Y2",
+          "J2MID_ABa_BEG3"
+        ],
+        [
+          "X1Y2",
+          "E2MID0"
+        ],
+        [
+          "X0Y2",
+          "E2BEG0"
+        ],
+        [
+          "X0Y2",
+          "W1END3"
+        ],
+        [
+          "X1Y2",
+          "W1BEG3"
+        ],
+        [
+          "X1Y2",
+          "LB_O"
+        ]
+      ],
+      "route_after": [
+        [
+          "X1Y2",
+          "LB_I3"
+        ],
+        [
+          "X1Y2",
+          "J2MID_ABb_END3"
+        ],
+        [
+          "X1Y2",
+          "J2MID_ABb_BEG3"
+        ],
+        [
+          "X1Y2",
+          "E2MID1"
+        ],
+        [
+          "X0Y2",
+          "E2BEG1"
+        ],
+        [
+          "X0Y2",
+          "W1END2"
+        ],
+        [
+          "X1Y2",
+          "W1BEG2"
+        ],
+        [
+          "X1Y2",
+          "JS2END6"
+        ],
+        [
+          "X1Y2",
+          "JS2BEG6"
+        ],
+        [
+          "X1Y2",
+          "W2END3"
+        ],
+        [
+          "X2Y2",
+          "W2BEGb3"
+        ],
+        [
+          "X2Y2",
+          "W2MID3"
+        ],
+        [
+          "X3Y2",
+          "W2BEG3"
+        ],
+        [
+          "X3Y2",
+          "JW2END7"
+        ],
+        [
+          "X3Y2",
+          "JW2BEG7"
+        ],
+        [
+          "X3Y2",
+          "S1END2"
+        ],
+        [
+          "X3Y1",
+          "S1BEG2"
+        ],
+        [
+          "X3Y1",
+          "J_l_GH_END0"
+        ],
+        [
+          "X3Y1",
+          "J_l_GH_BEG0"
+        ],
+        [
+          "X3Y1",
+          "E1END0"
+        ],
+        [
+          "X2Y1",
+          "E1BEG0"
+        ],
+        [
+          "X2Y1",
+          "JN2END5"
+        ],
+        [
+          "X2Y1",
+          "JN2BEG5"
+        ],
+        [
+          "X2Y1",
+          "W2END2"
+        ],
+        [
+          "X3Y1",
+          "W2BEGb2"
+        ],
+        [
+          "X3Y1",
+          "W2MID2"
+        ],
+        [
+          "X4Y1",
+          "W2BEG2"
+        ],
+        [
+          "X4Y1",
+          "JW2END2"
+        ],
+        [
+          "X4Y1",
+          "JW2BEG2"
+        ],
+        [
+          "X4Y1",
+          "S1END3"
+        ],
+        [
+          "X4Y0",
+          "S1BEG3"
+        ],
+        [
+          "X4Y0",
+          "A_OUT"
+        ]
+      ]
+    },
+    "expected_states_are_not_observations": true,
+    "expected_frame_audit": {
+      "passed": true,
+      "tiles": 40,
+      "compared_configuration_bits": 8736,
+      "per_tile": {
+        "Tile_X0Y0_NW_term": 4,
+        "Tile_X0Y1_W_IO4": 81,
+        "Tile_X0Y2_W_IO4": 81,
+        "Tile_X0Y3_W_IO4": 81,
+        "Tile_X0Y4_SW_term": 20,
+        "Tile_X1Y0_N_IO": 35,
+        "Tile_X1Y1_LUT4x8_ha": 438,
+        "Tile_X1Y2_LUT4x8_ha": 438,
+        "Tile_X1Y3_LUT4x8_ha": 438,
+        "Tile_X1Y4_S_IO2": 60,
+        "Tile_X2Y0_N_IO": 35,
+        "Tile_X2Y1_LUT4x8_ha": 438,
+        "Tile_X2Y2_PRIM2T2S": 334,
+        "Tile_X2Y3_LUT4x8_ha": 438,
+        "Tile_X2Y4_S_IO2": 60,
+        "Tile_X3Y0_N_IO": 35,
+        "Tile_X3Y1_LUT4x8_ha": 438,
+        "Tile_X3Y2_LUT4x8_ha": 438,
+        "Tile_X3Y3_LUT4x8_ha": 438,
+        "Tile_X3Y4_S_IO2": 60,
+        "Tile_X4Y0_N_IO": 35,
+        "Tile_X4Y1_LUT4x8_ha": 438,
+        "Tile_X4Y2_LUT4x8_ha": 438,
+        "Tile_X4Y3_LUT4x8_ha": 438,
+        "Tile_X4Y4_S_IO2": 60,
+        "Tile_X5Y0_N_IO": 35,
+        "Tile_X5Y1_LUT4x8_ha": 438,
+        "Tile_X5Y2_PRIM2T2S": 334,
+        "Tile_X5Y3_LUT4x8_ha": 438,
+        "Tile_X5Y4_S_IO2": 60,
+        "Tile_X6Y0_N_IO": 35,
+        "Tile_X6Y1_LUT4x8_ha": 438,
+        "Tile_X6Y2_LUT4x8_ha": 438,
+        "Tile_X6Y3_LUT4x8_ha": 438,
+        "Tile_X6Y4_S_IO2": 60,
+        "Tile_X7Y0_NE_term": 0,
+        "Tile_X7Y1_E_IO4": 73,
+        "Tile_X7Y2_E_IO4": 73,
+        "Tile_X7Y3_E_IO4": 73,
+        "Tile_X7Y4_SE_term": 4
+      },
+      "scope": "Native frame-to-latch image agreement only; no functional or timing qualification."
+    },
+    "raw_image_sha256": "b242b24acb04989e040c622fd96ad0dd9f8d44a80f99b267c5933b2c8c404564",
+    "expected_loaded_image_sha256": "84490af7ab13b0bed0bd63b956ebbdcc5c526c84d486f95e384e26e252b0f65c"
+  },
+  "local_native_passed": true,
+  "actual_configuration_bits": 8736
+}

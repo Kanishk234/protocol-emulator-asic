@@ -1,12 +1,14 @@
 # R1 closure status — November 20, 2026
 
-Newest qualification44832060001 times out in rerouted **A** (exit124)
-after original A passes. Hosted D, management candidate and timing are not
-reached. Local exact D also times out; read-only observers identify repeated
-activity at123980ns. D164's separately proved unused F.I1 selector then
-passes local native UART/SPI/reset on **both** repaired A and D images,
-with all8736actual bits matching. Hosted reload and extracted timing are
-the next gates. See [failed native receipt](r1_clock_fixed_native_44832060001.json).
+Newest run44853914939 passes all four native/reset/reload cases after
+D164's separately proved F.I1 repair, with four8736-bit audits and matching
+direct/reload states. Root independently rechecks XML, frames and all four
+analysis-script reversals. Timing remains unqualified: static setup reports
+seven X1Y2/B loops, dynamic setup crashes(-11), and hold is not reached.
+D165's additional one-bit B.I3 repair passes local native/reset/8736-bit
+checks; hosted reload and complete zero-loop timing are next. See
+[hosted F repair](r1_clock_fixed_f_input_44853914939.json) and
+[local B repair](r1_clock_fixed_b_loop_local_20261120.json).
 
 Latest follow-up: run44829301770 rejects the fresh D-bank placement in
 native simulation (unknown host-ready at115981ns), while its matched A

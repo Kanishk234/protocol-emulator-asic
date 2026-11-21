@@ -1,5 +1,20 @@
 # Bugs
 
+## 173: Passing fixed-image native reload exposes seven B-input timing loops
+
+- **Symptom/check:**44853914939 atb752e9c7 passes all four native cases,
+  including management/reset/reload and actual8736-bit audits. Static
+  setup exits0 and completes, but reports seven combinational loops through
+  X1Y2/B. Dynamic setup exits-11 before its completion marker; hold cases
+  are not reached. No new timing model is qualified.
+- **Route/proof:** actual INIT0x8888 ignores I3. Its unused default input
+  routes from its own LB_O through west I/O routing. D165 proves an existing
+  alternate to X4Y0/A_OUT with all16cofactors, no active-feature overlap
+  and no carry fanout. Only tile bit203/word160bit11 changes.
+- **Local status:** the additionally repaired candidate passes native
+  UART/SPI/reset locally. Hosted reload and both zero-loop timing policies
+  remain required. Do not suppress loop checks or waive the dynamic crash.
+
 ## 172: Fixed-placement rerouting stalls native simulation with clock bank unchanged
 
 - **Symptom/check:**44832060001 at23583b18 passes the restored A-bank

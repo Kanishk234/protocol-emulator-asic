@@ -2,6 +2,13 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 hosted native improvement:**44853914939 passes original
+control, repaired A/D and full management/reset/reload with four actual
+8736-bit audits. Static setup still reports seven B-input loops; dynamic
+setup crashes(-11), so no new timing qualification. D165's additional
+unused B.I3 selector passes local native/reset and frame checks; hosted
+reload and full zero-loop timing remain next. No hardware adoption.
+
 **November20 fixed-placement follow-up:**44832060001 times out in the
 rerouted A control after original A passes. Hosted D/reload/timing are not
 reached. D164's separately proved unused X3Y2/F.I1 selector passes local

@@ -116,3 +116,19 @@ def test_root_mode_adds_only_verified_config_rtl(tmp_path):
         **reference_receipt['candidate_inputs'],
         'src/trw_pin_cfg.v': '02a63f1d46ad7360a0f9a8a56b004478b629540ce4eb25234235b7b4b9c43581',
     }
+
+
+def test_fanout7_stages_only_the_config_override(tmp_path):
+    reference = tmp_path / 'root-mode'
+    trial = tmp_path / 'root-mode-fanout7'
+    screen.prepare(reference, variant='root-mode')
+    screen.prepare(trial, variant='root-mode-fanout7')
+    reference_inputs = screen.check_inputs(reference)['candidate_inputs']
+    trial_inputs = screen.check_inputs(trial)['candidate_inputs']
+    assert {name for name in reference_inputs if reference_inputs[name] != trial_inputs[name]} == {
+        'src/config.json'
+    }
+    assert screen.load(trial / 'src/config.json') == {
+        **screen.load(reference / 'src/config.json'),
+        'MAX_FANOUT_CONSTRAINT': 7,
+    }

@@ -1,5 +1,5 @@
 name: status-merge-screen
-run-name: D-192 ${{ inputs.variant }} on qualified 8x4 recipe (pre-routing)
+run-name: D-192 ${{ inputs.variant }} on 8x4 (pre-routing)
 on:
   workflow_dispatch:
     inputs:
@@ -10,6 +10,7 @@ on:
         options:
           - status-merge
           - root-mode
+          - root-mode-fanout7
 permissions:
   contents: read
 concurrency:

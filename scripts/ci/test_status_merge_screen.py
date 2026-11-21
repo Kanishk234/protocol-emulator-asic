@@ -132,3 +132,16 @@ def test_fanout7_stages_only_the_config_override(tmp_path):
         **screen.load(reference / 'src/config.json'),
         'MAX_FANOUT_CONSTRAINT': 7,
     }
+
+
+def test_b_edge_synthesis_trial_changes_only_two_pin_rtl_files(tmp_path):
+    base = tmp_path / 'root-mode-synth'
+    trial = tmp_path / 'root-mode-b-edge-synth'
+    screen.prepare(base, variant=base.name)
+    screen.prepare(trial, variant=trial.name)
+    before = screen.check_inputs(base)['candidate_inputs']
+    after = screen.check_inputs(trial)['candidate_inputs']
+    assert before.keys() == after.keys()
+    assert {name for name in before if before[name] != after[name]} == {
+        'src/trw_pin_rx.v', 'src/trw_pin_unit.v'
+    }

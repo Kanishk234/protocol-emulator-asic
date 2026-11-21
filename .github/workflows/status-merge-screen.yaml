@@ -1,5 +1,5 @@
 name: status-merge-screen
-run-name: D-192 ${{ inputs.variant }} on 8x4 (pre-routing)
+run-name: D-192 ${{ inputs.variant }} on 8x4
 on:
   workflow_dispatch:
     inputs:
@@ -11,6 +11,8 @@ on:
           - status-merge
           - root-mode
           - root-mode-fanout7
+          - root-mode-synth
+          - root-mode-b-edge-synth
 permissions:
   contents: read
 concurrency:
@@ -58,11 +60,12 @@ jobs:
             python tt/tt_tool.py --create-user-config --pdk ihp-sg13cmos5l
           )
           python scripts/ci/status_merge_screen.py generated
-      - name: Run unchanged native flow through final pre-routing STA
+      - name: Run native flow to the selected stopping point
         run: |
           source .venv/bin/activate
           python scripts/ci/status_merge_screen.py flow
       - name: Fresh repeated all-corner timing and antenna audit
+        if: inputs.variant != 'root-mode-synth' && inputs.variant != 'root-mode-b-edge-synth'
         run: |
           source .venv/bin/activate
           python scripts/ci/status_merge_screen.py audit

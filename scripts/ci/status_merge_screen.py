@@ -29,7 +29,8 @@ IMAGE_DIGEST = 'sha256:af2405f5d48d8fe14d406ecce913811177a95e365e3b625859677307c
 OPENROAD = 'dcf36133a369abc8f3c5e5738cd4d82e4903c0e0'
 CORNERS = ('nom_fast_1p32V_m40C', 'nom_slow_1p08V_125C', 'nom_typ_1p20V_25C')
 DEFAULT_DESIGN = ROOT / 'build/status_merge_screen/design'
-VARIANTS = ('status-merge', 'root-mode', 'root-mode-fanout7')
+SYNTH_VARIANTS = ('root-mode-synth', 'root-mode-b-edge-synth')
+VARIANTS = ('status-merge', 'root-mode', 'root-mode-fanout7', *SYNTH_VARIANTS)
 
 
 def sha(path):
@@ -105,7 +106,7 @@ def prepare(design, *, variant="status-merge"):
     subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(patch)], cwd=design, check=True)
     expected = {**before, 'src/trw_pin_bs.v': evidence['candidate_sha256']}
     root_mode_patch_sha256 = None
-    if variant in ('root-mode', 'root-mode-fanout7'):
+    if variant != 'status-merge':
         root_mode_patch = patch.parent / 'root_mode/root_mode.patch'
         root_mode_patch_sha256 = sha(root_mode_patch)
         if root_mode_patch_sha256 != 'e7b6691ce4416e28ff26a7f941d72c8961223d40248420bb44123bd02edfc486':
@@ -113,6 +114,14 @@ def prepare(design, *, variant="status-merge"):
         subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(root_mode_patch)],
                        cwd=design, check=True)
         expected['src/trw_pin_cfg.v'] = '02a63f1d46ad7360a0f9a8a56b004478b629540ce4eb25234235b7b4b9c43581'
+    if variant == 'root-mode-b-edge-synth':
+        edge_patch = patch.parent / 'b_edge/share.patch'
+        if sha(edge_patch) != '02cb9e6031cf1413ef48b91c254f7c1ffe903054c0290478bfa41cb8c3f6b5d5':
+            raise ValueError('B-edge patch differs from the tested candidate')
+        subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(edge_patch)],
+                       cwd=design, check=True)
+        expected['src/trw_pin_rx.v'] = '735334e1eb659bacc1eef6a63af4cb26dc78ab26841000a11d46cd144b0b761d'
+        expected['src/trw_pin_unit.v'] = '6e3b4cdf98d5d89fc99c92800e23828b6ba6823eed876ce647b59783c30f3073'
     if variant == 'root-mode-fanout7':
         baseline_config = load(ROOT / 'src/config.json')
         if 'MAX_FANOUT_CONSTRAINT' in baseline_config:
@@ -199,16 +208,53 @@ def invoke(design, config, output, pdk, *, source=None, stop=None, manual=True):
 
 
 def flow(design):
-    check_inputs(design)
+    receipt = check_inputs(design)
     engine = load(design / 'engine.json')
     if sha(design / 'src/config_merged.json') != engine['merged_config_sha256']:
         raise ValueError('Merged config changed after binding')
-    invoke(design, design / 'src/config_merged.json', design / 'runs/physical',
-           Path(os.environ['PDK_ROOT']), stop='OpenROAD.STAMidPNR-3', manual=False)
+    physical = design / 'runs/physical'
+    synthesis_only = receipt['variant'] in SYNTH_VARIANTS
+    stop = 'Yosys.Synthesis' if synthesis_only else 'OpenROAD.STAMidPNR-3'
+    invoke(design, design / 'src/config_merged.json', physical,
+           Path(os.environ['PDK_ROOT']), stop=stop, manual=False)
+    if synthesis_only:
+        netlist = one(physical, '*-yosys-synthesis/tt_um_tripwire.nl.v.json')
+        save(physical / 'synthesis_result.json', dict(
+            variant=receipt['variant'], netlist_sha256=sha(netlist),
+            trial_inputs_sha256=sha(design / 'trial_inputs.json'),
+            engine_sha256=sha(design / 'engine.json'),
+            **b_input_loads(load(netlist)), physical_qualified=False))
+        check_inputs(design)
+        return
     if list((design / 'runs/physical').glob('*-openroad-detailedrouting')):
         raise ValueError('Screen unexpectedly performed detailed routing')
     one(design / 'runs/physical', '*-openroad-stamidpnr-3/state_out.json')
     check_inputs(design)
+
+
+def b_input_loads(netlist):
+    module = netlist['modules']['tt_um_tripwire']
+    units = {}
+    for unit in range(4):
+        name = f'u_chip.g_unit[{unit}].u_unit.b_in'
+        bit, = module['netnames'][name]['bits']
+        loads = []
+        drivers = []
+        for instance, cell in module['cells'].items():
+            for pin, bits in cell['connections'].items():
+                if bit in bits:
+                    endpoint = dict(instance=instance, cell=cell['type'], pin=pin)
+                    direction = cell['port_directions'][pin]
+                    if direction == 'input':
+                        loads.append(endpoint)
+                    elif direction == 'output':
+                        drivers.append(endpoint)
+                    else:
+                        raise ValueError(f'Unexpected pin direction on {name}: {direction}')
+        if len(drivers) != 1 or not loads:
+            raise ValueError(f'Expected one driver and at least one load on {name}')
+        units[str(unit)] = dict(driver=drivers[0], loads=loads)
+    return dict(mapped_cells=len(module['cells']), b_inputs=units)
 
 
 def numeric(value, label):

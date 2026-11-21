@@ -1,0 +1,17 @@
+--- a/src/trw_pin_rx.v
++++ b/src/trw_pin_rx.v
+@@ -47 +47,2 @@
+-    input  wire        b_prev,
++    input  wire        b_rise,
++    input  wire        b_fall,
+@@ -90 +91 @@
+-    wire qual_ok = !((ev_qual == `TRW_PCE_EV_QUAL_0) || qlv) || ((b_in == qlv) && (b_prev == qlv));
++    wire qual_ok = !((ev_qual == `TRW_PCE_EV_QUAL_0) || qlv) || ((b_in == qlv) && !(b_rise || b_fall));
+@@ -107 +108 @@
+-    wire lrx_smp = m_lrx && sel && (rx_edge ? (b_prev && !b_in) : (!b_prev && b_in));
++    wire lrx_smp = m_lrx && sel && (rx_edge ? b_fall : b_rise);
+--- a/src/trw_pin_unit.v
++++ b/src/trw_pin_unit.v
+@@ -161 +161 @@
+-        .a_in (a_in), .a_prev (a_prev), .b_in (b_in), .b_prev (b_prev), .c_in (c_in), .c_prev (c_prev),
++        .a_in (a_in), .a_prev (a_prev), .b_in (b_in), .b_rise (b_rise), .b_fall (b_fall), .c_in (c_in), .c_prev (c_prev),

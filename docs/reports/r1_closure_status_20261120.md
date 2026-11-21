@@ -1,14 +1,15 @@
 # R1 closure status — November 20, 2026
 
-Newest run44854958011 passes all four native/reset/reload cases after
-the F/B repairs, with four8736-bit audits and matching direct/reload states.
-Root independently rechecks XML, frames and all four analysis-script
-reversals. B feedback is absent from static reporting, but two X6Y2/G
-loops remain; dynamic setup crashes(-11), and hold is not reached. D166's
-additional G.I2 selector passes local native/reset/8736-bit checks on the
-combined F/B/G image. Hosted reload and complete zero-loop timing are next.
-See [hosted B repair](r1_clock_fixed_b_loop_44854958011.json) and
-[local G repair](r1_clock_fixed_g_loop_local_20261120.json).
+Newest run44855809222 passes four native/reset/reload cases after F/B/G
+repairs, with four8736-bit audits and matching direct/reload states. Root
+independently rechecks XML, frames and four analysis-script reversals.
+One E loop remains; dynamic setup crashes(-11), and hold is not reached.
+D167's additional E.I1 selector passes local native/reset/frame checks.
+The original filtered dynamic query then completes locally with zero loops
+and full active annotation, but setup remains negative. Hosted full reload
+and all four timing executions remain next. See
+[hosted G repair](r1_clock_fixed_g_loop_44855809222.json) and
+[local E repair](r1_clock_fixed_e_loop_local_20261120.json).
 
 Latest follow-up: run44829301770 rejects the fresh D-bank placement in
 native simulation (unknown host-ready at115981ns), while its matched A

@@ -2,6 +2,13 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November20 E-loop follow-up:**44855809222 passes full native/reload
+but still has one static E loop and a dynamic-query crash. D167's additional
+E.I1 selector passes local native/reset/frame checks; original filtered
+dynamic setup then completes with zero loops/full active annotation locally.
+Setup remains negative. Hosted complete four-case timing/reload is next;
+no new qualified timing number or hardware adoption.
+
 **November20 remaining loop follow-up:**44854958011 passes full native/
 reload again. B feedback is absent, but two G loops remain and dynamic
 setup crashes(-11); hold is not reached. D166's additional G.I2 selector

@@ -4,6 +4,24 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
+- D166 hosted44855809222 ata4f2cac8 passes all four native/reload cases;
+  root verifies XML/8736-bit audits and four complete script reversals.
+  Static still has **one E loop**; dynamic exits-11. A manual plural-only
+  search briefly produced a wrong zero-loop commentary claim; corrected
+  immediately after the strict parser showed1. No acceptance/model passed.
+  Receipt reports/r1_clock_fixed_g_loop_44855809222.json; BUG175.
+- Bounded GDB reproduces CRPR arrival-pruning crash at filtered search.
+  Broader local query avoids crash but retains loop/policy differences;
+  not adopted. Upstream Search.tcl/API and unrelated CTS issue4330 reviewed;
+  no upstream/PDK patch or tool upgrade. Preserve original query/constraints.
+- D167 proves E.I1 against the actual parent (all16cofactors,29carry nodes,
+  11disabled consumers), one selector only. Combined F/B/G/E passes strict
+  local native/reset/8736bits. Original filtered dynamic query, changed only
+  to actual loaded cases/guards, now completes with zero loops/full active
+  annotation locally; setup remains negative. Receipt:
+  reports/r1_clock_fixed_e_loop_local_20261120.json. Hosted full reload and
+  four timing executions remain next; no phase box or new qualified number.
+
 - D165 hosted44854958011 at37bb1187 again passes all four native/reload
   cases. Root verifies four strict XML/8736-bit audits, direct/reload byte
   identity and all four complete script reversals. B feedback is absent;

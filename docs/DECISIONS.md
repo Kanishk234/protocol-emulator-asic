@@ -1,5 +1,28 @@
 # Decisions
 
+## D-167: Remove the measured E.I1 cyclic route without changing timing queries
+
+- **Date:** 2026-11-20.44855809222 passes four native/reload cases but
+  still has **one** static loop through X2Y3/E. Dynamic filtered STA crashes
+  in Path::minMax / ArrivalVisitor::pruneCrprArrivals / findFilteredArrivals.
+  A manual plural-only log search initially missed the singular warning;
+  the strict parser correctly rejected it throughout. Add singular/plural
+  regression checks; no timing result was accepted.
+- **Change:** X2Y3/E.I1 native latch_1532_, tile bit219, word279bit27,0to1.
+  Actual INIT0xaaa0 ignores I1 across all16addresses. No active-route overlap;
+  the29-node carry guard has11disabled consumers/no enabled consumer.
+  Route changes from X1Y3/LC_O to X2Y4/B_OUT. Reconstruct the actual F/B/G
+  parent exactly; require only this bit to change after quiescence.
+- **Evidence/gates:** combined F/B/G/E local native/reset and8736-bit
+  checks pass. Original filtered dynamic query, changed only to its actual
+  loaded configuration, now completes with zero loops and complete active
+  annotation locally. Setup is still negative; full hosted setup/hold,
+  both policies and management reload remain mandatory.
+- **Rejected query workaround:** a broader unfiltered local query also
+  avoids the crash on the old image, but still reports its loop and policy
+  differences. It is diagnostic only and is not adopted. Keep the original
+  query, CRPR, constraints, libraries and clock target unchanged.
+
 ## D-166: Break the newly exposed G.I2 timing loop on the passing F/B image
 
 - **Date:** 2026-11-20.44854958011 passes all four native/reload cases

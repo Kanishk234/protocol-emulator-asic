@@ -1,5 +1,20 @@
 # Bugs
 
+## 175: One E-input loop remains after G repair; dynamic filtered search crashes
+
+- **Symptom/check:**44855809222 ata4f2cac8 passes all four native/reload
+  cases and frame audits. Static setup completes but reports **one** loop
+  through X2Y3/E; dynamic setup exits-11/incomplete. The parser recognizes
+  singular and plural warnings. A manual search missed the singular form;
+  that commentary was corrected, and no model was accepted.
+- **Diagnosis:** bounded local GDB reproduces the crash inside CRPR arrival
+  pruning during findFilteredArrivals. A broader query completes but retains
+  the loop and timing differences; it is not an acceptance workaround.
+- **Local repair:** D167 proves unused E.I1 at INIT0xaaa0, including carry
+  noninterference. Additional image passes native/reset and full frame
+  checks; original filtered dynamic query then completes locally with zero
+  loops/full active annotation. Hosted complete timing/reload remain open.
+
 ## 174: Removing B feedback exposes two G-input timing loops
 
 - **Symptom/check:**44854958011 at37bb1187 passes native/reset/reload

@@ -6,7 +6,7 @@ import tripc
 import tripwire_spec as S
 from kernels import PROGRAMS
 from tripc.reaction import WIDTHS, analyze_lane, overlap_witness, readiness
-from tripsim import isa
+from tripsim import Chip, isa
 from tripsim.lane import Lane
 
 
@@ -164,3 +164,42 @@ def test_ten_thousand_selection_snapshots_against_independent_model():
                     assert selected == item['slot']
                     guarantees += 1
     assert ready_checked > 60_000 and witnessed > 500 and guarantees > 100
+
+
+@pytest.mark.parametrize('period', [1, 2])
+def test_compiled_urgent_slot_waits_for_blocked_consumer(period):
+    image, report = tripc.compile_text("""program blocked_sink
+connect L0.I0 <- HOST_IN
+connect HOST_OUT <- L0.O0
+lane L0:
+    slot urgent: when I0 is DATA do MOV O0 <- I0, deq
+""")
+    assert 'A next-EVAL guarantee applies only IF the slot is ready' in report
+    chip = Chip(fire_period=period, host_fifo_depth=1)
+    tripc.load(chip, image)
+    for data in (1, 2, 3):
+        chip.host_push(data)
+    chip.run_for(20)
+    assert list(chip.host_out) == [(0, 1)]
+    assert chip.lanes[0].stats['fired'][0] == 2
+    assert not chip.fabric.producers['L0.O0'].free()
+    assert chip.fabric.ports['L0.I0'].head() == (0, 3)
+    chip.host_out.popleft()
+    chip.run_for(10)
+    assert list(chip.host_out) == [(0, 2)]
+    assert chip.lanes[0].stats['fired'][0] == 3
+
+
+@pytest.mark.parametrize('period', [1, 2])
+def test_compiled_urgent_competitor_has_unknown_delay(period):
+    image, report = tripc.compile_text("""program urgent_priority
+lane L0:
+    slot urgent: do MOV r0 <- zero
+    slot urgent: do MOV r1 <- zero
+""")
+    assert 'L0 slot 1 | [0] | [0] | unknown delay' in report
+    chip = Chip(fire_period=period)
+    tripc.load(chip, image)
+    chip.run_for(32)
+    assert chip.lanes[0].stats['fired'][0] == 32 // period
+    assert chip.lanes[0].stats['fired'][1] == 0

@@ -1,0 +1,79 @@
+name: R1 SPI registered tick equivalence experiment
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_spi_tick_pipeline.yaml]
+permissions:
+  contents: read
+concurrency:
+  group: warp-r1-spi-tick-pipeline
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        mode: [0, 1, 2, 3]
+        half: [4, 25]
+    env:
+      OSS_CAD_SUITE_TAG: '2026-06-29'
+      PYTHONPATH: tools:test_internal:spikes/r1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Cache pinned formal suite
+        id: ocs
+        uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-${{ env.OSS_CAD_SUITE_TAG }}
+      - name: Install pinned formal suite
+        if: steps.ocs.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          tag=${OSS_CAD_SUITE_TAG//-/}
+          curl -sfL -o /tmp/ocs.tgz "https://github.com/YosysHQ/oss-cad-suite-build/releases/download/$OSS_CAD_SUITE_TAG/oss-cad-suite-linux-x64-$tag.tgz"
+          tar -xzf /tmp/ocs.tgz -C ~
+      - name: Install source simulator used by ordinary CI
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+      - name: Stage isolated registered timer pulse source change
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_spi_tick_pipeline_trial.py
+          python spikes/r1/spi_tick_pipeline_trial.py prepare --out build/spi_tick_pipeline_trial --spi-mode "${{ matrix.mode }}" --half "${{ matrix.half }}"
+      - name: Prove binary pin and host equivalence after reset
+        timeout-minutes: 12
+        run: |
+          source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
+          out="$PWD/build/spi_tick_pipeline_trial"
+          yosys -V > "$out/yosys-version.txt"
+          timeout --kill-after=10s 600s sby -f -d "$out/equiv" "$out/equiv.sby" > "$out/proof.log" 2>&1
+      - name: Run independent SPI protocol tests on the candidate source
+        timeout-minutes: 8
+        run: |
+          source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:/usr/bin:/bin:$PATH"
+          out="$PWD/build/spi_tick_pipeline_trial"
+          iverilog -V > "$out/iverilog-version.txt" 2>&1
+          sources="$out/candidate/spi_ctrl_top.v $PWD/tools/compile/prims/warp_prims_sim.v $PWD/arch/prims/wp_timer.v $PWD/arch/prims/wp_shift.v"
+          (cd protocols/spi_ctrl/test
+          make MODE="${{ matrix.mode }}" HALF="${{ matrix.half }}" PRIMS=1 \
+            VERILOG_SOURCES="$sources" \
+            SIM_BUILD="$out/sim" COCOTB_RESULTS_FILE="$out/results.xml" > "$out/source-tests.log" 2>&1)
+          python spikes/r1/spi_tick_pipeline_trial.py audit --out "$out"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-spi-tick-pipeline-${{ github.run_id }}-mode${{ matrix.mode }}-half${{ matrix.half }}
+          path: build/spi_tick_pipeline_trial/
+          include-hidden-files: true
+          retention-days: 90

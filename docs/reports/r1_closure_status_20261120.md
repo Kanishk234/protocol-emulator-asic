@@ -9,6 +9,8 @@ local trial; none passes full traffic/reset/reload or proceeds to timing.
 See [rejected trial evidence](r1_upstream_input_trials_20261126.json).
 The historical native workflow also lost its original downloadable archives;
 D173 restores exact retained inputs and keeps every audit/simulation gate.
+Hosted45890726100 passes the complete historical native baseline; root
+checks archive/XML/all50/55/64input hashes and simulator binaries.
 The latest fixed-placement SPI image passes native/reset/reload and complete
 zero-loop timing-model checks, but setup is **−52.591743 ns** and hold is
 **−1.916775 ns** in run44857324411. It is worse than the earlier qualified

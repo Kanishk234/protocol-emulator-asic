@@ -2,6 +2,11 @@
 
 ## D-173: Recover original native workflow inputs from the authenticated capsule
 
+- **Hosted validation:**45890726100 passes all stages at9d1c29ef. Root
+  authenticates archive and independently rechecks three strict XMLs, all
+  50/55/64input hashes and both simulator binaries. Original baseline
+  restored; no candidate/native timing acceptance.
+
 - **Date:** 2026-11-26. Native baseline44871205606 fails in source
   authentication, before audit/simulation. Original39696703659 and
   40013513454 artifact inventories are empty. The exact timing capsule
@@ -16,6 +21,12 @@
   timing acceptance follows from recovering inputs.
 
 ## D-172: Prove isolated upstream selectors for unused LUT inputs
+
+- Separate the LUT function/mode proof from the local-selector operation.
+  The upstream operation may preserve an already-selected local input
+  while changing a different free upstream selector. Active upstream
+  features remain locked, and original local-selector active-route
+  rejection remains tested. No target selector or sequential mode changes.
 
 - **Date:** 2026-11-26. Continue D171 native initialization diagnosis.
   An alternate local input source can itself be unknown; investigate

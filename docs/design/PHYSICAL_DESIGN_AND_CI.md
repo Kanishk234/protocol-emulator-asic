@@ -7,7 +7,9 @@ native44871227303 fails before timing. Isolated unused-input trials remain
 rejected on unknown host-ready despite exact8736-bit loading. D173 recovers
 expired historical native-workflow archives from the exact authenticated
 capsule; original producer/26-context audits and simulations remain required.
-No new timing result or closure claim.
+Hosted45890726100 passes all baseline stages; root authenticates archive/
+XML/all50/55/64input hashes and simulator binaries. No new timing result
+or closure claim.
 
 **November20 latest measured result:**44857324411 passes all native/reload
 cases and the complete configured timing model: four executions exit0,

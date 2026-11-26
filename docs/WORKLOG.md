@@ -5,6 +5,21 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-26 — Continue registered-tick native diagnosis and restore historical CI inputs
 
+- **Hosted recovery complete:**45890726100 at9d1c29ef passes original
+  native load, reset/second transfer and production management-shell
+  reload plus26-context audit. Root verifies exact archive and three
+  strict XMLs/all50/55/64input hashes/both simulator binaries. BUG177
+  resolved; receipt reports/r1_native_archive_recovery_45890726100.json.
+- Final diagnostic narrows the33-selector failure: only three FF outputs
+  become newly unknown after loading; two are compiled w_lane and w_last,
+  following three accepted host bytes. Keep this as a causal lead, not a
+  completed root-cause proof. Read-only full-route search finds no further
+  known-source alternative satisfying current isolation/feature guards.
+- Function-only cofactor checks now preserve an already-selected target
+  while proving a different upstream selector; original direct-input
+  active-route rejection remains intact/tested. All43focused checks pass.
+  Candidate timing is still blocked; no phase boxes ticked.
+
 - Cloud44871227303 confirms original control/generated RTL pass but native
   candidate UART TX X at115921ns; timing remains skipped. Original/current
   configuration audits remain mandatory; G1 and all constraints unchanged.

@@ -2,6 +2,13 @@
 
 ## 177: Historical native-control archives disappear before workflow replay
 
+- **Resolved in hosted45890726100 at9d1c29ef:** authentication, original
+  26-context audit, native load, reset/second SPI and management-shell
+  reload all pass. Root verifies archive size/digest, three strict XMLs,
+  all50/55/64input hashes and original simulator binary digests. Receipt:
+  reports/r1_native_archive_recovery_45890726100.json. This restores the
+  historical baseline only; registered-tick failure remains open.
+
 - **Symptom/check:**44871205606 fails source authentication before native
   audit/simulation. Original producer metadata matches, but the compiler
   and mapped runs list no downloadable artifacts. This is not evidence

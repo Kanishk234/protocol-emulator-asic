@@ -202,7 +202,9 @@ module trw_pin_cfg #(
                     if (STORE[16*w + b]) begin : g_latch
                         // Transparent while the gated clock is high (intentional latch).
                         reg q;
-                        if ((16*w + b) == `TRW_PC_IDLE_LSB) begin : g_timing_ff
+                        if ((16*w + b) == `TRW_PC_IDLE_LSB ||
+                            (FULL != 0 && (16*w + b) >= `TRW_PC_PERIOD_LSB &&
+                             (16*w + b) < `TRW_PC_PERIOD_LSB + 8)) begin : g_timing_ff
                             // Same write edge/visibility as the staged latch. Reset
                             // clears this stored bit only when its word is written.
                             always @(posedge clk) begin
@@ -240,29 +242,10 @@ module trw_pin_cfg #(
             else if (mode_write) mode_q <= mode_value;
         end
 `else
-        reg mode_stage;
-        always @(posedge clk) begin
-            if (!rst_n) mode_stage <= 1'b0;
-            else if (mode_write) mode_stage <= mode_value;
-        end
-        wire mode_gclk;
-`ifdef SYNTHESIS
-        sg13cmos5l_lgcp_1 u_icg_mode (.GCLK(mode_gclk), .CLK(clk), .GATE(mode_write));
-`else
-        reg mode_en_l;
-        /* verilator lint_off LATCH */
-        always @* begin
-            if (!clk) mode_en_l = mode_write;
-        end
-        /* verilator lint_on LATCH */
-        assign mode_gclk = clk & mode_en_l;
-`endif
         reg mode_q;
-        /* verilator lint_off LATCH */
-        always @* begin
-            if (mode_gclk) mode_q = mode_stage;
+        always @(posedge clk) begin
+            if (mode_write) mode_q <= rst_n && mode_value;
         end
-        /* verilator lint_on LATCH */
 `endif
         assign bitsync_active = mode_q;
     end else begin : g_no_bitsync_active

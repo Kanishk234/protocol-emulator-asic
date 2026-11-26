@@ -44,7 +44,8 @@ module trw_pin_rx #(
     input  wire        a_in,
     input  wire        a_prev,
     input  wire        b_in,
-    input  wire        b_prev,
+    input  wire        b_rise,
+    input  wire        b_fall,
     input  wire        c_in,
     input  wire        c_prev,
     input  wire        sel,
@@ -87,7 +88,7 @@ module trw_pin_rx #(
     wire edge_ok = (((ev_edge == `TRW_PCE_EV_EDGE_RISE) || (ev_edge == `TRW_PCE_EV_EDGE_BOTH)) && rise)
                 || (((ev_edge == `TRW_PCE_EV_EDGE_FALL) || (ev_edge == `TRW_PCE_EV_EDGE_BOTH)) && fall);
     wire qlv = (ev_qual == `TRW_PCE_EV_QUAL_1);
-    wire qual_ok = !((ev_qual == `TRW_PCE_EV_QUAL_0) || qlv) || ((b_in == qlv) && (b_prev == qlv));
+    wire qual_ok = !((ev_qual == `TRW_PCE_EV_QUAL_0) || qlv) || ((b_in == qlv) && !(b_rise || b_fall));
     wire ev = edge_ok && qual_ok;
 
     // ------------------------------------------------------------------ SHIFT_RX (P5, P15)
@@ -104,7 +105,7 @@ module trw_pin_rx #(
     wire [RW:0] rt_add = {1'b0, rt_cur} + (srx_smp ? {1'b0, per} : {(RW+1){1'b0}});
 
     // ------------------------------------------------------------------ LINKED_RX, SAMPLE
-    wire lrx_smp = m_lrx && sel && (rx_edge ? (b_prev && !b_in) : (!b_prev && b_in));
+    wire lrx_smp = m_lrx && sel && (rx_edge ? b_fall : b_rise);
     wire ms      = srx_smp || lrx_smp;         // the RX mode's sample
     wire smp_ok  = smp && sel;                  // SAMPLE bits are discarded while deselected (P15)
     wire smp_lost = ms && smp_ok;               // P-G11: two bits in one clock: the SAMPLE bit is lost

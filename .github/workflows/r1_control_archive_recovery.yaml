@@ -1,0 +1,125 @@
+name: R1 reconstruct expired RTL controls with exact passing hashes
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_control_archive_recovery.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-control-archive-recovery
+  cancel-in-progress: false
+jobs:
+  recover:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        tracks: [4, 8]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONPATH: tools:test_internal:spikes/r1
+      RECOVERY_TRACKS: ${{ matrix.tracks }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v5
+        with:
+          path: ~/oss-cad-suite
+          key: oss-cad-suite-2026-06-29
+      - name: Fetch pinned synthesis suite if absent
+        run: |
+          if [ ! -x "$HOME/oss-cad-suite/bin/yosys" ]; then
+            curl -sfL -o /tmp/ocs.tgz https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2026-06-29/oss-cad-suite-linux-x64-20260629.tgz
+            tar -xzf /tmp/ocs.tgz -C ~
+          fi
+      - uses: actions/cache@v5
+        with:
+          path: ~/.cache/warp/ocs-2026-09-27
+          key: oss-cad-suite-nextpnr-2026-09-27
+      - name: Authenticate retained control and original passing golden records
+        timeout-minutes: 15
+        run: |
+          sudo apt-get update && sudo apt-get install -y python3-tk iverilog
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python -m pytest -q tools/profiling/tests/test_r1_rtl_control_recovery.py
+          bash scripts/fetch_nextpnr.sh
+          mkdir -p build/r1_control_recovery build/r1_checks
+          python - <<'PY'
+          import json,os,shutil
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          repo=os.environ['GITHUB_REPOSITORY'];target=Path('build/r1_recovery_sources');target.mkdir()
+          source=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']['capsule']
+          admit_run(api(f'repos/{repo}/actions/runs/{source["run"]["id"]}'),source['run'])
+          capsule=artifact(repo,source['artifact'],target)/source['member']
+          golden=json.loads(Path('spikes/r1/rtl_control_recovery_sources.json').read_text())
+          admit_run(api(f'repos/{repo}/actions/runs/{golden["golden_run"]["id"]}'),golden['golden_run'])
+          row=golden['profiles'][os.environ['RECOVERY_TRACKS']]
+          saved=artifact(repo,row['artifact'],target)
+          data=json.loads((saved/'smoke/configured-smoke.json').read_text())
+          assert data['passed'] and data['model_manifest_sha256']==row['model_sha256']
+          images=[h for p,h in data['input_sha256'].items() if p.endswith('/concurrency.wbit')]
+          assert images==[row['image_sha256']]
+          shutil.copytree(capsule/'model/control',Path('build/r1_checks/control'))
+          Path('build/r1_control_recovery/sources.json').write_text(json.dumps(dict(
+              capsule=source,golden_run=golden['golden_run'],profile=row),indent=2)+'\n')
+          PY
+      - name: Reconstruct model and require the exact original manifest and generated hashes
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          from compile.compile import tool
+          from assembly_catalog import sha
+          version=subprocess.check_output([tool('yosys'),'-V'],text=True)
+          assert 'e74db6dea' in version
+          assert sha(tool('nextpnr-generic'))=='a36179428d1afb5c9b88950097f03473f22949a39be1ac5cf6e5f3a95b526829'
+          Path('build/r1_control_recovery/tools.json').write_text(json.dumps(dict(yosys=version,nextpnr_sha256=sha(tool('nextpnr-generic'))),indent=2)+'\n')
+          PY
+          python spikes/r1/resource_control.py --control build/r1_checks/control --out build/r1_checks/resource \
+            --tracks "$RECOVERY_TRACKS" --emit-rtl --radix full > build/r1_control_recovery/model.log 2>&1
+          python spikes/r1/rtl_control_recovery.py --model build/r1_checks/resource --tracks "$RECOVERY_TRACKS" \
+            --out build/r1_control_recovery/model-identity.json
+      - name: Recompile only the original primary and require byte-identical image
+        timeout-minutes: 12
+        run: |
+          source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:$HOME/oss-cad-suite/bin:$PATH"
+          mkdir -p build/r1_checks/compile
+          timeout --kill-after=10s 600s python - <<'PY' > build/r1_control_recovery/compile.log 2>&1
+          from pathlib import Path
+          from cloud_r1_resource import worker
+          worker('uart_spi_11',Path('build/r1_checks/resource'),Path('build/r1_checks/compile/uart_spi_11'))
+          PY
+          python spikes/r1/rtl_control_recovery.py --model build/r1_checks/resource --tracks "$RECOVERY_TRACKS" \
+            --case build/r1_checks/compile/uart_spi_11 --out build/r1_control_recovery/primary-identity.json
+      - name: Run current unchanged primary assertions on the recovered RTL control
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          export PATH="$VIRTUAL_ENV/bin:/usr/bin:/bin:$PATH"
+          python spikes/r1/configured_smoke.py --model build/r1_checks/resource \
+            --case build/r1_checks/compile/uart_spi_11 --out build/r1_control_recovery/smoke \
+            > build/r1_control_recovery/smoke.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-recovered-rtl-control-${{ github.run_id }}-tracks${{ matrix.tracks }}-full
+          path: |
+            build/r1_control_recovery/
+            build/r1_checks/resource/
+            build/r1_checks/compile/uart_spi_11/
+            build/r1_recovery_sources/*.metadata.json
+          retention-days: 90
+          include-hidden-files: true

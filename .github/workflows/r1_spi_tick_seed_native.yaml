@@ -1,0 +1,109 @@
+name: R1 registered SPI tick seed native reload and timing
+on:
+  workflow_dispatch:
+  push:
+    branches: [efpga]
+    paths: [.github/workflows/r1_spi_tick_seed_native.yaml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: warp-r1-spi-tick-seed-native
+  cancel-in-progress: false
+jobs:
+  native:
+    if: github.ref == 'refs/heads/efpga'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        seed: [2, 3]
+    env:
+      R1_CANDIDATE_SEED: ${{ matrix.seed }}
+      R1_RUNTIME_TRACE: '1'
+      GH_TOKEN: ${{ github.token }}
+      PDK_ROOT: ${{ github.workspace }}/build/sa_pdk
+      PYTHONPATH: tools:test_internal:spikes/r1
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Authenticate original native exports and proved SPI compiler image
+        timeout-minutes: 18
+        run: |
+          bash scripts/setup_venv.sh
+          source .venv/bin/activate
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          from sa_functional import prepare
+          sources=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']
+          seed=os.environ['R1_CANDIDATE_SEED']
+          catalog=json.loads(Path('spikes/r1/spi_tick_seed_compile_sources.json').read_text())
+          row=catalog['seeds'][seed]
+          sources['trial']={'run':catalog['run'],'artifact':row['artifact'],'member':row['member']}
+          repo=os.environ['GITHUB_REPOSITORY'];target=Path('build/sa_sources').resolve();target.mkdir(parents=True,exist_ok=False)
+          roots={}
+          for name,row in sources.items():
+              producer=api(f'repos/{repo}/actions/runs/{row["run"]["id"]}')
+              admit_run(producer,row['run'])
+              roots[name]=str(artifact(repo,row['artifact'],target)/row['member'])
+              (target/(name+'.producer.json')).write_text(json.dumps(producer,indent=2)+'\n')
+          (target/'locations.json').write_text(json.dumps(roots,indent=2)+'\n')
+          prepare(**{k:roots[k] for k in ('capsule','native','trial')},out=Path('build/sa_functional'),trial_kind='spi_tick_seed'+seed)
+          PY
+          bash spikes/cloud/fetch_pdk.sh
+          mkdir -p build/sa_iverilog
+          curl -sfL https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb -o build/sa_iverilog.deb
+          dpkg-deb -x build/sa_iverilog.deb build/sa_iverilog
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          roots=json.loads(Path('build/sa_sources/locations.json').read_text())
+          expected=json.loads((Path(roots['capsule'])/'functional/quiescent/configured-smoke.json').read_text())['tool_binary_sha256']
+          for name,digest in expected.items():
+              assert hashlib.sha256((Path('build/sa_iverilog/usr/bin')/name).read_bytes()).hexdigest()==digest
+          PY
+      - name: Load original control and registered tick through native and management interfaces
+        timeout-minutes: 12
+        run: |
+          source .venv/bin/activate
+          timeout --kill-after=10s 600s python spikes/r1/sa_functional.py run --out build/sa_functional \
+            --pdk "$PDK_ROOT/ihp-sg13cmos5l" --icarus build/sa_iverilog > build/sa_functional/native.log 2>&1
+      - name: Prepare timing only after actual native reload succeeds
+        timeout-minutes: 5
+        run: |
+          source .venv/bin/activate
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from sa_timing import prepare
+          roots=json.loads(Path('build/sa_sources/locations.json').read_text())
+          prepare(**{k:roots[k] for k in ('rc','proof','native','capsule')},
+              pdk=Path(os.environ['PDK_ROOT']),functional=Path('build/sa_functional'),out=Path('build/r1_loop_timing'))
+          PY
+      - name: Measure connected RC with original clock and full active coverage
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          image=ghcr.io/librelane/librelane@sha256:d109140b8f17fc54f4fca998beb8124f4949404ec52e339eebd2250854a18b5a
+          docker pull "$image"
+          docker image inspect "$image" > build/r1_loop_timing/image.json
+          timeout 1080s docker run --rm -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            -e PYTHONPATH -e GITHUB_RUN_ID -e GITHUB_SHA "$image" \
+            python3 spikes/r1/sa_timing.py run --out build/r1_loop_timing > build/r1_loop_timing/timing.log 2>&1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: r1-spi-tick-seed-${{ matrix.seed }}-native-timing-${{ github.run_id }}
+          path: |
+            build/sa_functional/
+            build/r1_loop_timing/
+            build/sa_sources/*.producer.json
+            build/sa_sources/*.metadata.json
+          include-hidden-files: true
+          retention-days: 90

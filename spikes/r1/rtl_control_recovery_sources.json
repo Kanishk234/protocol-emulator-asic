@@ -1,0 +1,38 @@
+{
+  "golden_run": {
+    "id": 44831585206,
+    "head_sha": "d9d7991ed2c27945bf7d56a583a2fc4921f3967d",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_loaded_controls.yaml"
+  },
+  "profiles": {
+    "4": {
+      "tracks": 4,
+      "radix": "full",
+      "model_sha256": "0fce259fb736ad23f08c4e1a8d557d2d49fca4742759d8a3a4f4f558c51537b1",
+      "image_sha256": "36aaad90de9c80588ef61476cf29ab2a5888ad0f9c79e0767ab485fbef5ef70a",
+      "artifact": {
+        "id": 14677265733,
+        "name": "r1-loaded-control-44831585206-tracks4-full",
+        "size_in_bytes": 3681183,
+        "digest": "sha256:60fc141fbc5e4e403f6e4bdc2ff630700d57192fbbc2536122c1bf7216a89e1e",
+        "source_run": 44831585206
+      }
+    },
+    "8": {
+      "tracks": 8,
+      "radix": "full",
+      "model_sha256": "bce20a681fe8594621d572a190bcfd4e9f3f094f47c73d67b4c662d3ac509e6f",
+      "image_sha256": "c935ca2a62b16897cc52682e4211b5d7f13c58a39c52a5d25ed8cdf48cc1e131",
+      "artifact": {
+        "id": 14676102756,
+        "name": "r1-loaded-control-44831585206-tracks8-full",
+        "size_in_bytes": 3756111,
+        "digest": "sha256:0bd1e17ae2b58accdf16a2b863af2ac2a290a2c9ff98c38b883514f0c72c1146",
+        "source_run": 44831585206
+      }
+    }
+  }
+}

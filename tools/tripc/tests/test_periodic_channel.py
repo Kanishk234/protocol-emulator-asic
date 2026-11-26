@@ -104,3 +104,46 @@ def test_channel_schedule_cli(tmp_path, monkeypatch, capsys, phase, exit_code, r
     assert 'Declared channel schedule' in output
     assert f'"status": "{result}"' in output
     assert '"producer": "HOST_IN"' in output
+
+
+def test_two_stage_pipeline_against_compiled_chip():
+    from itertools import product
+    from math import lcm
+
+    from tripc.periodic_channel import analyze_periodic_pipeline
+    from tripsim import Chip
+
+    image, _ = tripc.compile_text("""program scheduled
+connect L0.I0 <- HOST_IN
+connect HOST_OUT <- L0.O0
+lane L0:
+    slot urgent: do MOV O0 <- I0, deq
+""")
+    schedules = [(period, phase) for period in range(1, 7) for phase in range(period)]
+    observed = set()
+    for (arrivals, arrival_phase), (service, service_phase), cadence in product(
+            schedules, schedules, (1, 2)):
+        chip = Chip(fire_period=cadence)
+        tripc.load(chip, image)
+        source = chip.fabric.producers['HOST_IN']
+        first_overrun = None
+        # The reduced pipeline has three Boolean state bits at each combined
+        # phase boundary. Nine periods suffice to repeat or observe an overrun.
+        for clock in range(9 * lcm(arrivals, service, cadence)):
+            if clock % arrivals == arrival_phase:
+                if not source.free():
+                    first_overrun = clock
+                    break
+                source.load(0, clock)
+            chip.host_fifo_depth = int(clock % service == service_phase)
+            chip.step()
+            chip.host_out.clear()
+        actual = analyze_periodic_pipeline(
+            arrivals, service, arrival_phase=arrival_phase,
+            service_phase=service_phase, fire_period=cadence)
+        observed.add(actual['status'])
+        if first_overrun is None:
+            assert actual['status'] == 'no_overrun'
+        else:
+            assert actual == {'status': 'overrun', 'clock': first_overrun}
+    assert observed == {'overrun', 'no_overrun'}

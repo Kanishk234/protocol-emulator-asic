@@ -31,6 +31,8 @@ jobs:
             radix: radix8_2
     env:
       GH_TOKEN: ${{ github.token }}
+      CONTROL_TRACKS: ${{ matrix.tracks }}
+      CONTROL_RADIX: ${{ matrix.radix }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
@@ -45,7 +47,30 @@ jobs:
           gh api repos/$GITHUB_REPOSITORY/actions/runs/39696703659 > build/r1_loaded_control/compiler.json
           source .venv/bin/activate
           python -c 'import json; d=json.load(open("build/r1_loaded_control/compiler.json")); assert d["head_sha"]=="9768c77325ca34b93d408f526c0d8c902b62ce4a" and d["run_attempt"]==1'
-          gh run download 39696703659 --name r1-model-qualification-39696703659-tracks${{ matrix.tracks }}-${{ matrix.radix }} --dir build/r1_loaded_source
+          PYTHONPATH=tools:spikes/r1 python - <<'PY'
+          import json,os,shutil
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          from rtl_control_recovery import verify_primary
+          repo=os.environ['GITHUB_REPOSITORY'];tracks=os.environ['CONTROL_TRACKS'];radix=os.environ['CONTROL_RADIX']
+          catalog=json.loads(Path('spikes/r1/rtl_control_recovery_sources.json').read_text())
+          if radix=='radix8_2':
+              assert tracks=='4'
+              row=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']['capsule']
+              member='model';expected=catalog['radix8_2']
+          else:
+              assert radix=='full'
+              recovered=catalog['recovered_profiles'][tracks]
+              row=dict(run=catalog['recovered_run'],artifact=recovered['artifact'])
+              member=recovered['member'];expected=catalog['profiles'][tracks]
+          admit_run(api(f'repos/{repo}/actions/runs/{row["run"]["id"]}'),row['run'])
+          target=Path('build/r1_loaded_sources');target.mkdir()
+          source=artifact(repo,row['artifact'],target)/member
+          dest=Path('build/r1_loaded_source');shutil.copytree(source,dest)
+          proof=verify_primary(dest/'resource',dest/'compile/uart_spi_11',expected)
+          Path('build/r1_loaded_control/restore-identity.json').write_text(json.dumps(dict(
+              source=row,identity=proof,scope='Exact original frozen model/image restored; current simulation remains required.'),indent=2)+'\n')
+          PY
       - name: Check diagnostic input coverage
         run: |
           source .venv/bin/activate

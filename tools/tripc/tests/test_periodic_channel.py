@@ -62,3 +62,38 @@ def test_all_short_schedules_against_fabric():
             assert actual['status'] == 'no_overrun'
         else:
             assert actual == {'status': 'overrun', 'clock': first_overrun}
+
+
+@pytest.mark.parametrize('binding,other,error', [
+    ('tap', '', 'unfiltered blocking consumer'),
+    ('accept=DATA', '', 'unfiltered blocking consumer'),
+    ('', 'connect L1.I0 <- HOST_IN', 'more than one blocking consumer'),
+])
+def test_compiled_binding_rejections(binding, other, error):
+    import tripc
+    from tripc.periodic_channel import analyze_compiled_channel
+
+    image, _ = tripc.compile_text(f'program binding\nconnect L0.I0 <- HOST_IN {binding}\n{other}')
+    with pytest.raises(ValueError, match=error):
+        analyze_compiled_channel(image, {'consumer': 'L0.I0', 'arrival_period': 3, 'service_period': 3})
+
+
+@pytest.mark.parametrize('phase,exit_code,result', [(1, 0, 'no_overrun'), (0, 2, 'overrun')])
+def test_channel_schedule_cli(tmp_path, monkeypatch, capsys, phase, exit_code, result):
+    import json
+    import sys
+
+    from tripc.__main__ import main
+
+    program = tmp_path / 'pipe.trw'
+    program.write_text('program pipe\nconnect L0.I0 <- HOST_IN\nconnect L1.I0 <- HOST_IN tap\n')
+    schedule = tmp_path / 'schedule.json'
+    schedule.write_text(json.dumps({
+        'consumer': 'L0.I0', 'arrival_period': 3, 'service_period': 3, 'service_phase': phase,
+    }))
+    monkeypatch.setattr(sys, 'argv', ['tripc', str(program), '--channel-schedule', str(schedule)])
+    assert main() == exit_code
+    output = capsys.readouterr().out
+    assert 'Declared channel schedule' in output
+    assert f'"status": "{result}"' in output
+    assert '"producer": "HOST_IN"' in output

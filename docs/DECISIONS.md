@@ -1,5 +1,26 @@
 # Decisions
 
+## D-176: Qualify exactly the two measured seed images through native loading and timing
+
+- **Date:** 2026-11-26. Compile45892839965 ate752e5f3 passes both jobs.
+  Root authenticates both archives,427bound inputs per job, exact original
+  control, both full FASM encodings, source variant, clock-only JSON
+  transformation and actual GBUF D. Each candidate uses106LC/3timers/3shifts;
+  compiler estimates remain uncharacterized. Receipt:
+  reports/r1_spi_tick_seed_compile_45892839965.json.
+- Native admission pins producer/head/archive/raw image/seed/clock hashes
+  from spi_tick_seed_compile_sources.json. Keep original seed1 admission
+  unchanged. Positive preparation on both frozen artifacts passes; reject
+  wrong seed/type/control seed/clock/producer/raw/control image/native claim
+  before staging. No arbitrary image or earlier selector repair is admitted.
+- Two hosted jobs independently load original control, candidate and full
+  management/reset/reload, compare all8736actual configuration bits and
+  direct/reload states. Only on success run unchanged connected RC under
+  both loop policies, full annotation/clock census and20ns/0.25ns constraints.
+  Exact new raw hashes are added to timing admission; no timing query,
+  exception, hardware, PDK or macro change. Capture bounded passive traffic
+  traces separately in each direct native output directory, never the shell.
+
 ## D-175: Bound fresh registered-tick routing to two additional seeds
 
 - **Date:** 2026-11-26. D174 narrows the33-selector failure to the

@@ -5,6 +5,18 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-26 — Trace host capture and launch bounded fresh routing
 
+- D175 compile45892839965 ate752e5f3 passes both original controls and
+  both fresh candidates. Root authenticates archives and427bound inputs
+  each, source/clock-only JSONs, both full encodings and actual bank D.
+  Both candidates fit106/128LC,3timers/3shifts. Receipt:
+  reports/r1_spi_tick_seed_compile_45892839965.json. No native/timing claim.
+- D176 pins exact seed2/3 images for native qualification and only then
+  unchanged connected timing. Both real-artifact preparation checks and
+  original seed1 admission pass. Eight metadata mutations reject before
+  staging. Raw tests get16passive traces in separate output directories;
+  shell/constraints/PDK/geometry stay unchanged. All56focused source/
+  admission/frame/timing/adapter guards pass; new workflow lint passes.
+
 - D174 adds a16-sample passive traffic observer and top-level pin values
   to native runtime snapshots. Original control strictly passes with the
   same concurrent windows and220581ns completion as prior untraced control.

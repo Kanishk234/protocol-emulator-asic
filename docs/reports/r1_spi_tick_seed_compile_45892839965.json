@@ -1,0 +1,141 @@
+{
+  "run": {
+    "id": 45892839965,
+    "head_sha": "e752e5f301381f6e6175fe1fd3922bba7be81577",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_spi_tick_seed_compile.yaml"
+  },
+  "seeds": {
+    "2": {
+      "artifact": {
+        "id": 15151878797,
+        "name": "r1-spi-tick-seed-2-compile-45892839965",
+        "size_in_bytes": 294668,
+        "digest": "sha256:c9ec2a50254105695312c1a83c04eefb64e4d43346ddab381bc4c35bc87c6045",
+        "source_run": 45892839965
+      },
+      "bound_input_hashes_checked": 427,
+      "original_control_exact": true,
+      "complete_fasm_encodings_checked": 2,
+      "clock_only_json_change_verified": true,
+      "actual_clock_bank": "X0Y4/D",
+      "candidate": {
+        "case": "candidate",
+        "run": "45892839965",
+        "source_sha": "e752e5f301381f6e6175fe1fd3922bba7be81577",
+        "image_sha256": "5d15c67f4659a632be27fe45f5bd40499bb15f8793749f7174f7d7ab8759fe87",
+        "placed_utilisation": {
+          "FABULOUS_LC": {
+            "used": 106,
+            "available": 128
+          },
+          "wp_timer": {
+            "used": 3,
+            "available": 4
+          },
+          "wp_shift": {
+            "used": 3,
+            "available": 4
+          },
+          "IOBUF": {
+            "used": 19,
+            "available": 42
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "model_fmax_mhz": 35.36,
+        "model_timing_characterized": false,
+        "requested_placement_frequency_mhz": 50,
+        "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+        "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+        "clock_constraint": {
+          "cell": "u_X1Y4_A_gbuf",
+          "bel": "X0Y4/D",
+          "logical_graph_preserved": true,
+          "source_json_sha256": "96cbedc0d492e6ba829cc9926e33e9801fac21ccf45f7764c135d9ec38c50bc1",
+          "pinned_json_sha256": "997e14221ab06160fe9bcbc9f6a668e39cf90065f94d6bb0be56f0a56f01d9de"
+        },
+        "placement_seed": 2,
+        "actual_native_loading": false,
+        "timing_acceptance": false,
+        "physical_acceptance": false,
+        "adopted": false
+      }
+    },
+    "3": {
+      "artifact": {
+        "id": 15152581845,
+        "name": "r1-spi-tick-seed-3-compile-45892839965",
+        "size_in_bytes": 292134,
+        "digest": "sha256:d76cca6dff8f7c91d30d2ea85265e8c9530e75776d79f45d9aaefc5dabb0c8d6",
+        "source_run": 45892839965
+      },
+      "bound_input_hashes_checked": 427,
+      "original_control_exact": true,
+      "complete_fasm_encodings_checked": 2,
+      "clock_only_json_change_verified": true,
+      "actual_clock_bank": "X0Y4/D",
+      "candidate": {
+        "case": "candidate",
+        "run": "45892839965",
+        "source_sha": "e752e5f301381f6e6175fe1fd3922bba7be81577",
+        "image_sha256": "75b7c2cd84b846f2ed8cfee040e1b34c05498bc67bf6b12d69d119f3f0ea1cee",
+        "placed_utilisation": {
+          "FABULOUS_LC": {
+            "used": 106,
+            "available": 128
+          },
+          "wp_timer": {
+            "used": 3,
+            "available": 4
+          },
+          "wp_shift": {
+            "used": 3,
+            "available": 4
+          },
+          "IOBUF": {
+            "used": 19,
+            "available": 42
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "model_fmax_mhz": 38.64,
+        "model_timing_characterized": false,
+        "requested_placement_frequency_mhz": 50,
+        "yosys_version": "Yosys 0.66+179 (git sha1 e74db6dea, Release, Clang /usr/bin/clang++ 18.1.8)\n",
+        "nextpnr_version": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-34-gc4fbb55a)\n",
+        "clock_constraint": {
+          "cell": "u_X1Y4_A_gbuf",
+          "bel": "X0Y4/D",
+          "logical_graph_preserved": true,
+          "source_json_sha256": "96cbedc0d492e6ba829cc9926e33e9801fac21ccf45f7764c135d9ec38c50bc1",
+          "pinned_json_sha256": "997e14221ab06160fe9bcbc9f6a668e39cf90065f94d6bb0be56f0a56f01d9de"
+        },
+        "placement_seed": 3,
+        "actual_native_loading": false,
+        "timing_acceptance": false,
+        "physical_acceptance": false,
+        "adopted": false
+      }
+    }
+  },
+  "timing_acceptance": false,
+  "native_acceptance": false,
+  "adopted": false
+}

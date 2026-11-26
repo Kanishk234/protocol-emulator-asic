@@ -188,3 +188,55 @@ lane L0:
 """)
     with pytest.raises(ValueError, match='unconditional forwarding slot'):
         analyze_compiled_pipeline(image, {'lane': 'L0', 'arrival_period': 4, 'service_period': 1})
+
+
+def test_two_lane_chain_against_compiled_chip():
+    from itertools import product
+    from math import lcm
+
+    from tripsim import Chip
+
+    image, _ = tripc.compile_text("""program chain
+connect L0.I0 <- HOST_IN
+connect L1.I0 <- L0.O1
+connect HOST_OUT <- L1.O0
+lane L0:
+    slot urgent: do MOV O1 <- I0, deq
+lane L1:
+    slot urgent: do MOV O0 <- I0, deq
+""")
+    schedules = [(period, phase) for period in range(1, 7) for phase in range(period)]
+    observed = set()
+    for (arrivals, arrival_phase), (service, service_phase), cadence in product(
+            schedules, schedules, (1, 2)):
+        actual = analyze_compiled_pipeline(image, {
+            'lanes': ['L0', 'L1'], 'arrival_period': arrivals, 'service_period': service,
+            'arrival_phase': arrival_phase, 'service_phase': service_phase, 'fire_period': cadence,
+        })
+        assert actual.pop('lanes') == ['L0', 'L1']
+        assert actual.pop('inputs') == ['L0.I0', 'L1.I0']
+        assert actual.pop('outputs') == ['L0.O1', 'L1.O0']
+        chip = Chip(fire_period=cadence)
+        tripc.load(chip, image)
+        source = chip.fabric.producers['HOST_IN']
+        first_overrun = None
+        # Five Boolean state bits bound the number of distinct boundary states.
+        for clock in range(33 * lcm(arrivals, service, cadence)):
+            if clock % arrivals == arrival_phase:
+                if not source.free():
+                    first_overrun = clock
+                    break
+                source.load(0, clock)
+            chip.host_fifo_depth = int(clock % service == service_phase)
+            chip.step()
+            chip.host_out.clear()
+        observed.add(actual['status'])
+        if first_overrun is None:
+            assert actual['status'] == 'no_overrun'
+        else:
+            assert actual == {'status': 'overrun', 'clock': first_overrun}
+    assert observed == {'overrun', 'no_overrun'}
+    with pytest.raises(ValueError, match='HOST_IN to lane'):
+        analyze_compiled_pipeline(image, {
+            'lanes': ['L1', 'L0'], 'arrival_period': 4, 'service_period': 1,
+        })

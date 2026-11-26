@@ -6,7 +6,7 @@ separate acceptance gates; this function neither writes nor accepts an image.
 from collections import defaultdict
 
 from selected_route import selected_predecessors,trace_route
-from unused_input_sweep import prove_input,latch,carry_cone
+from unused_input_sweep import prove_lut_independent,latch,carry_cone
 
 
 def isolated_chain(graph,start,target):
@@ -27,8 +27,10 @@ def isolated_chain(graph,start,target):
 
 def prove_upstream(tile,lut,index,selector_tile,feature,spec,modules,state,features,words,pips,enabled):
     kind=state['tiles']['Tile_'+tile+'_LUT4x8_ha']['tile_type']
-    cofactor=prove_input(tile,lut,index,spec,modules[kind],state,features,words,pips,enabled,
-                         allow_registered=True)
+    init,mode=prove_lut_independent(tile,lut,index,spec,modules[kind],state,features,words,
+                                   allow_registered=True)
+    cofactor=dict(observed_init=init,cofactor_addresses_checked=16,observed_ff_select=mode,
+                  scope='Binary function independence only; the existing LUT input selector is preserved.')
     entries=spec['TileSpecs'][selector_tile]
     mapping=entries[feature]
     if len(mapping)!=1 or list(mapping.values())!=['1']:
@@ -53,6 +55,7 @@ def prove_upstream(tile,lut,index,selector_tile,feature,spec,modules,state,featu
     word=1+(x*20+frame)*6+1+(4-y)
     if words[word]>>offset&1:raise ValueError('Upstream image selector is not zero')
     graph=selected_predecessors(spec,words,pips);target=(tile,'L'+lut+'_I'+str(index))
+    if index in (1,2):carry_cone(graph,tile,lut,enabled)
     chain=isolated_chain(graph,(selector_tile,dest),target)
     before=trace_route(graph,target)
     if (selector_tile,dest) not in before:raise ValueError('Selector is outside the selected input route')

@@ -85,11 +85,9 @@ def ff_mode(tile,lut,spec,module,state,features,words,allow_registered=False):
     return value
 
 
-def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabled,allow_registered=False):
-    from selected_route import selected_predecessors,trace_route
-    native='Tile_'+tile+'_LUT4x8_ha';entries=spec['TileSpecs'][tile];target='L'+lut+'_I'+str(index)
-    if any(f.split('.')[0]==tile and f.split('.')[2]==target for f in features):
-        raise ValueError('Cannot change an actively routed LUT input')
+def prove_lut_independent(tile,lut,index,spec,module,state,features,words,allow_registered=False):
+    """Check the function/mode without proposing any routing-bit change."""
+    native='Tile_'+tile+'_LUT4x8_ha';entries=spec['TileSpecs'][tile]
     init=0
     for bit in range(16):
         key=lut+'.INIT'+('' if bit==0 else '['+str(bit)+']');mapping=entries[key]
@@ -100,6 +98,15 @@ def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabl
         init|=int(value)<<bit
     if not independent(init,index):raise ValueError('LUT function depends on selected input')
     mode=ff_mode(tile,lut,spec,module,state,features,words,allow_registered)
+    return init,mode
+
+
+def prove_input(tile,lut,index,spec,module,state,features,words,pips,carry_enabled,allow_registered=False):
+    from selected_route import selected_predecessors,trace_route
+    native='Tile_'+tile+'_LUT4x8_ha';entries=spec['TileSpecs'][tile];target='L'+lut+'_I'+str(index)
+    if any(f.split('.')[0]==tile and f.split('.')[2]==target for f in features):
+        raise ValueError('Cannot change an actively routed LUT input')
+    init,mode=prove_lut_independent(tile,lut,index,spec,module,state,features,words,allow_registered)
     alternatives=[(k,v) for k,v in entries.items() if k.endswith('.'+target)]
     if len(alternatives)!=2 or {tuple(v.values()) for k,v in alternatives}!={('0',),('1',)}:
         raise ValueError('Require one existing two-way input selector')

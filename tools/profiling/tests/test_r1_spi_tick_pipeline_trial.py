@@ -19,3 +19,14 @@ def test_registered_tick_edit_is_reversible_and_rejects_wrong_source():
             variant(wrong)
     with pytest.raises(ValueError):
         restore(original)
+
+
+def test_ungated_timer_registered_tick_remains_isolated_and_mode_specific():
+    source=ROOT/'protocols/spi_ctrl/spi_ctrl_top.v';original=source.read_text()
+    candidate=variant(original,ungated_timer=True)
+    assert ".en(1'b1), .tc(tick_early)" in candidate
+    assert restore(candidate,ungated_timer=True)==original
+    assert source.read_text()==original and sha(source)==SOURCE_SHA
+    with pytest.raises(ValueError):restore(candidate)
+    with pytest.raises(ValueError):restore(variant(original),ungated_timer=True)
+    with pytest.raises(ValueError):variant(original,ungated_timer='true')

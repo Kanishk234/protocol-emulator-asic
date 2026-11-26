@@ -23,27 +23,31 @@ TIMER_NEW = """            reg tick_q;
                 .clk(clk), .rst(!rst_n), .load(accept || tick_q), .half(1'b0), .en(timing), .tc(tick_early));"""
 RELOAD_OLD = 'localparam integer RELOAD_I = HALF - 1;'
 RELOAD_NEW = 'localparam integer RELOAD_I = HALF - 2;'
+TIMER_NEW_UNGATED = TIMER_NEW.replace('.en(timing)',".en(1'b1)")
 
 
-def variant(text):
+def variant(text,ungated_timer=False):
+    if type(ungated_timer) is not bool:raise ValueError('Explicit Boolean timer mode required')
     if text.count(TIMER_OLD) != 1 or text.count(RELOAD_OLD) != 1 or 'tick_q' in text:
         raise ValueError('Unexpected original SPI timer source')
-    return text.replace(TIMER_OLD, TIMER_NEW, 1).replace(RELOAD_OLD, RELOAD_NEW, 1)
+    return text.replace(TIMER_OLD, TIMER_NEW_UNGATED if ungated_timer else TIMER_NEW, 1).replace(RELOAD_OLD, RELOAD_NEW, 1)
 
 
-def restore(text):
-    if text.count(TIMER_NEW) != 1 or text.count(RELOAD_NEW) != 1:
+def restore(text,ungated_timer=False):
+    if type(ungated_timer) is not bool:raise ValueError('Explicit Boolean timer mode required')
+    timer=TIMER_NEW_UNGATED if ungated_timer else TIMER_NEW
+    if text.count(timer) != 1 or text.count(RELOAD_NEW) != 1:
         raise ValueError('Unexpected registered-tick SPI candidate')
-    return text.replace(TIMER_NEW, TIMER_OLD, 1).replace(RELOAD_NEW, RELOAD_OLD, 1)
+    return text.replace(timer, TIMER_OLD, 1).replace(RELOAD_NEW, RELOAD_OLD, 1)
 
 
-def prepare(out,mode,half):
+def prepare(out,mode,half,ungated_timer=False):
     if mode not in range(4) or half not in (4,25):raise ValueError('Unsupported bounded proof configuration')
     out=Path(out).resolve();source=ROOT/'protocols/spi_ctrl/spi_ctrl_top.v'
     if sha(source)!=SOURCE_SHA:raise ValueError('Original protocol source changed')
     out.mkdir(parents=True,exist_ok=False)
-    original=source.read_text();candidate=variant(original)
-    if restore(candidate)!=original:
+    original=source.read_text();candidate=variant(original,ungated_timer)
+    if restore(candidate,ungated_timer)!=original:
         raise ValueError('Unexpected source delta')
     (out/'candidate').mkdir();(out/'candidate/spi_ctrl_top.v').write_text(candidate)
     (out/'spi_ctrl_registered_tick_top.v').write_text(candidate.replace('module spi_ctrl_top #(','module spi_ctrl_registered_tick_top #(',1))
@@ -70,8 +74,8 @@ def prepare(out,mode,half):
         '\n'.join(str(p) for p in files)+'\n')
     inputs=[Path(__file__).resolve(),*files,out/'candidate/spi_ctrl_top.v',out/'equiv.sby',
             ROOT/'protocols/spi_ctrl/test/test_spi_ctrl.py']
-    (out/'plan.json').write_text(json.dumps(dict(mode=mode,half=half,inputs={str(p):sha(p) for p in inputs},
-        adopted=False,timing_acceptance=False,scope='Register the existing hard timer terminal pulse; use one-shot HALF-2 and reload on accept or registered pulse. Preserve original pins/cycle timing only if full equivalence and source tests pass. No production, fabric, native or timing adoption.'),indent=2)+'\n')
+    (out/'plan.json').write_text(json.dumps(dict(mode=mode,half=half,ungated_timer=ungated_timer,inputs={str(p):sha(p) for p in inputs},
+        adopted=False,timing_acceptance=False,scope='Register the existing hard timer terminal pulse; use one-shot HALF-2 and reload on accept or registered pulse. '+('Keep timer en high; the registered pulse remains qualified by original timing state. ' if ungated_timer else '')+'Preserve original pins/cycle timing only if full equivalence and source tests pass. No production, fabric, native or timing adoption.'),indent=2)+'\n')
 
 
 
@@ -88,7 +92,7 @@ def audit(out):
     if any(sha(p)!=h for p,h in plan['inputs'].items()):raise ValueError('Protocol proof input changed')
     admit_status((out/'equiv/status').read_text(),(out/'proof.log').read_text())
     tests=check_xml(out/'results.xml',4)
-    result=dict(equivalence_passed=True,scope='Unbounded binary RTL output equivalence of original and registered-tick SPI for this mode/HALF, PRIMS1, initial synchronous reset; arbitrary subsequent host/MISO/reset inputs. Independent source protocol tests separately executed.',
+    result=dict(equivalence_passed=True,ungated_timer=plan.get('ungated_timer',False),scope='Unbounded binary RTL output equivalence of original and registered-tick'+('/ungated-timer' if plan.get('ungated_timer',False) else '')+' SPI for this mode/HALF, PRIMS1, initial synchronous reset; arbitrary subsequent host/MISO/reset inputs. Independent source protocol tests separately executed.',
         mode=plan['mode'],half=plan['half'],strict_source_tests=len(tests),native_functional_passed=False,
         extracted_timing_passed=False,adopted=False)
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n')
@@ -97,6 +101,7 @@ def audit(out):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='mode',required=True)
     x=sub.add_parser('prepare');x.add_argument('--out',type=Path,required=True);x.add_argument('--spi-mode',type=int,required=True);x.add_argument('--half',type=int,required=True)
+    x.add_argument('--ungated-timer',action='store_true')
     sub.add_parser('audit').add_argument('--out',type=Path,required=True)
     a=vars(p.parse_args());action=a.pop('mode')
     if action=='prepare':a['mode']=a.pop('spi_mode');prepare(**a)

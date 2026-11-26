@@ -2,6 +2,12 @@
 from math import lcm
 
 
+def _validate_schedule(period, phase):
+    if (type(period) is not int or period <= 0
+            or type(phase) is not int or not 0 <= phase < period):
+        raise ValueError('Periods must be positive integers and phases within the period')
+
+
 def analyze_periodic_channel(arrival_period, service_period, *,
                              arrival_phase=0, service_phase=0, max_cycle=100_000):
     """Analyze an initially empty, one-token channel under fixed schedules.
@@ -12,9 +18,7 @@ def analyze_periodic_channel(arrival_period, service_period, *,
     Phase offsets select the first event, relative to clock zero.
     """
     for period, phase in ((arrival_period, arrival_phase), (service_period, service_phase)):
-        if (type(period) is not int or period <= 0
-                or type(phase) is not int or not 0 <= phase < period):
-            raise ValueError('Periods must be positive integers and phases within the period')
+        _validate_schedule(period, phase)
     if type(max_cycle) is not int or max_cycle <= 0:
         raise ValueError('Simulation limit must be a positive integer')
 
@@ -34,6 +38,41 @@ def analyze_periodic_channel(arrival_period, service_period, *,
         occupied = arrives or (occupied and not serves)
     if max_cycle % repeat == 0 and occupied in seen:
         return {'status': 'no_overrun', 'clocks_checked': max_cycle}
+    return {'status': 'unknown', 'clocks_checked': max_cycle}
+
+
+def analyze_periodic_pipeline(arrival_period, service_period, *,
+                              arrival_phase=0, service_phase=0, fire_period=1, max_cycle=100_000):
+    """Check two empty blocking channels joined by one unconditional reflex.
+
+    The reflex consumes at EVAL, reserves its output, and loads it at EXEC
+    one clock later. Both receivers can see only already-committed tokens.
+    """
+    _validate_schedule(arrival_period, arrival_phase)
+    _validate_schedule(service_period, service_phase)
+    _validate_schedule(fire_period, 0)
+    if type(max_cycle) is not int or max_cycle <= 0:
+        raise ValueError('Simulation limit must be a positive integer')
+
+    repeat = lcm(arrival_period, service_period, fire_period)
+    incoming = outgoing = reserved = False
+    seen = set()
+    for clock in range(max_cycle + 1):
+        if clock % repeat == 0:
+            state = incoming, outgoing, reserved
+            if state in seen:
+                return {'status': 'no_overrun', 'clocks_checked': clock}
+            seen.add(state)
+        if clock == max_cycle:
+            break
+        arrives = clock % arrival_period == arrival_phase
+        if arrives and incoming:
+            return {'status': 'overrun', 'clock': clock}
+        serves = clock % service_period == service_phase
+        evaluates = clock % fire_period == 0 and incoming and not (outgoing or reserved)
+        incoming = arrives or (incoming and not evaluates)
+        outgoing = reserved or (outgoing and not serves)
+        reserved = evaluates
     return {'status': 'unknown', 'clocks_checked': max_cycle}
 
 

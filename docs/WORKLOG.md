@@ -5,6 +5,21 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-26 — Trace host capture and launch bounded fresh routing
 
+- Fresh native45893638442 at3eadcd3e rejects both candidates: seed2
+  ready X at115981ns; seed3 at115921ns. Original controls/generated RTL
+  pass. Root authenticates archives/strict controls and all actual8736-bit
+  audits. No reload/timing. Seed2 unused self-input X6Y3/D.I1 bit213/
+  word759bit21 proves independent/no enabled carry consumers, but local
+  native still fails; combined10proved selectors fails at the same sample.
+  Receipt: reports/r1_spi_tick_seed_native_45893638442.json.
+- BUG178: old generated-RTL matrix45892839861 loses396967 archives.
+  Authenticate last passing44831585206 records to recover original model/
+  image hashes; D177 reconstructs only missing full-radix4/8 profiles from
+  the exact common qualified control. Require byte-identical manifests/
+  every generated hash/image/FASM plus current simulation before changing
+  ordinary inputs. Retained radix8_2 verifier checks all367model files.
+  Recovery workflow/helper guard pass locally; hosted result remains open.
+
 - D175 compile45892839965 ate752e5f3 passes both original controls and
   both fresh candidates. Root authenticates archives and427bound inputs
   each, source/clock-only JSONs, both full encodings and actual bank D.

@@ -1,5 +1,18 @@
 # Bugs
 
+## 178: All historical generated-RTL control profiles lose their compiler archives
+
+- **Symptom/check:**45892839861 fails authentication in all three matrix
+  jobs; no new RTL simulation ran. Original39696703659 inventory is empty.
+  This is independent of the registered-tick native failure.
+- **Recovery:** passing44831585206 artifacts retain exact original model/
+  bitstream hashes for full-radix4/8 and radix8_2. Radix8_2 inputs survive
+  in the authenticated timing capsule. D177 reconstructs only the missing
+  full-radix controls from the archived common qualified source; exact
+  manifest/every generated hash/image/FASM and current simulation must
+  pass before ordinary workflow inputs change. Recovery is not yet proven.
+
+
 ## 177: Historical native-control archives disappear before workflow replay
 
 - **Resolved in hosted45890726100 at9d1c29ef:** authentication, original
@@ -20,6 +33,13 @@
 
 
 ## 176: Registered-tick image fails native initialization despite exact configuration
+
+- **D176 fresh seeds:**45893638442 at3eadcd3e passes original controls/
+  generated RTL, but native seed2 fails ready at115981ns and seed3 at
+  115921ns. Both complete actual8736-bit audits pass; reload/timing are
+  not reached. Root verifies both artifact archives. One-bit and jointly
+  proved10-selector seed2 trials also fail at115981ns; neither accepted.
+  Receipt: reports/r1_spi_tick_seed_native_45893638442.json.
 
 - **D174 traffic trace:** original control passes with identical activity/
   completion time. Before the failing clock edge (115971ns), host03/

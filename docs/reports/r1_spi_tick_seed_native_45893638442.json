@@ -1,0 +1,139 @@
+{
+  "run": 45893638442,
+  "source_sha": "3eadcd3ecf804a5813b0d217cb419c6d6667b0ec",
+  "passed": false,
+  "adopted": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "seeds": {
+    "2": {
+      "artifact_id": 15153255735,
+      "archive_bytes": 11169221,
+      "archive_sha256": "872e0ed78fbaa7b771f045b0dbfb63dd5a104c3670db8af910d6c8616eba8451",
+      "archive_verified": true,
+      "producer_result": {
+        "run": "45893638442",
+        "source_sha": "3eadcd3ecf804a5813b0d217cb419c6d6667b0ec",
+        "passed": false,
+        "cases": {
+          "control": {
+            "passed": true,
+            "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+            "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+            "configuration_bits": 8736
+          }
+        },
+        "trial_kind": "spi_tick_seed2",
+        "timing_acceptance": false,
+        "physical_acceptance": false,
+        "adopted": false,
+        "error": "XML contains failures, errors or skipped tests",
+        "generated_rtl_candidate": {
+          "passed": true,
+          "scope": "Generated RTL diagnostic only; original native failure retained."
+        }
+      },
+      "actual_frame_audits": {
+        "control": {
+          "compared_configuration_bits": 8736,
+          "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+          "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+        },
+        "candidate": {
+          "compared_configuration_bits": 8736,
+          "image_sha256": "e797347efffdb4f1d223ea5419ac66375b1dec2fe3d29f8a383672a3c34015d0",
+          "snapshot_sha256": "b7d69e5211424c198ae763ecfeab0acc78056557511c2e809018249282597930"
+        }
+      },
+      "first_failure": {
+        "sim_time_ns": "115981.0",
+        "error": {
+          "error_type": "AssertionError",
+          "error_msg": "configured host-write ready became unknown"
+        }
+      },
+      "management_reload_reached": false,
+      "extracted_timing_reached": false
+    },
+    "3": {
+      "artifact_id": 15151964002,
+      "archive_bytes": 10812020,
+      "archive_sha256": "4702c936c211678bdaca9c9cd3e6a86cd8733072556091c9aace940e04c49b74",
+      "archive_verified": true,
+      "producer_result": {
+        "run": "45893638442",
+        "source_sha": "3eadcd3ecf804a5813b0d217cb419c6d6667b0ec",
+        "passed": false,
+        "cases": {
+          "control": {
+            "passed": true,
+            "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+            "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+            "configuration_bits": 8736
+          }
+        },
+        "trial_kind": "spi_tick_seed3",
+        "timing_acceptance": false,
+        "physical_acceptance": false,
+        "adopted": false,
+        "error": "XML contains failures, errors or skipped tests",
+        "generated_rtl_candidate": {
+          "passed": true,
+          "scope": "Generated RTL diagnostic only; original native failure retained."
+        }
+      },
+      "actual_frame_audits": {
+        "control": {
+          "compared_configuration_bits": 8736,
+          "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+          "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+        },
+        "candidate": {
+          "compared_configuration_bits": 8736,
+          "image_sha256": "1f4508beefa32fb798daeb0707365f143490497ea35c38bbbfe5590d443e4816",
+          "snapshot_sha256": "4bd5fbccbaa8d08c896e7e8140140cf212177d7be171b17e855e2c378d79d5dd"
+        }
+      },
+      "first_failure": {
+        "sim_time_ns": "115921.0",
+        "error": {
+          "error_type": "AssertionError",
+          "error_msg": "configured host-write ready became unknown"
+        }
+      },
+      "management_reload_reached": false,
+      "extracted_timing_reached": false
+    }
+  },
+  "local_rejected_trials": [
+    {
+      "name": "warp-tick-seed2-unused-X6Y3-D1",
+      "accepted": false,
+      "actual_configuration_bits": 8736,
+      "proof_sha256": "8c2795d4ab655f52bef24cda6c5aed2c0e2f20df9603dcf724b3f32c00d6a6ac",
+      "image_sha256": "8b14aa9867ff5e2b9cd1e78f0cd0c32ff1490688c793fcf6ed7e8a55ff052f51",
+      "first_failure": {
+        "sim_time_ns": "115981.0",
+        "error": {
+          "error_type": "AssertionError",
+          "error_msg": "configured host-write ready became unknown"
+        }
+      }
+    },
+    {
+      "name": "warp-tick-seed2-joint-ten",
+      "accepted": false,
+      "actual_configuration_bits": 8736,
+      "proof_sha256": "c9875ac0ae73d5eff2510a147d7f21f0fa4ec6b3791ab24633c505ff60063fe9",
+      "image_sha256": "bd256e07c3064594aa3a42b450dfcbb0dde6469843997afb8c1f75cb26f1d217",
+      "first_failure": {
+        "sim_time_ns": "115981.0",
+        "error": {
+          "error_type": "AssertionError",
+          "error_msg": "configured host-write ready became unknown"
+        }
+      }
+    }
+  ],
+  "finding": "Both original controls and generated-RTL candidates pass. Native seed2 fails ready at115981ns; seed3 at115921ns. Proved one-/ten-selector local seed2 trials still fail at115981ns. No reload or extracted timing is reached; no candidate accepted."
+}

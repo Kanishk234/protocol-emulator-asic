@@ -1,5 +1,26 @@
 # Decisions
 
+## D-177: Reconstruct expired comparison controls only against their original passing hashes
+
+- **Date:** 2026-11-26. RTL control45892839861 fails authentication for
+  all three profiles because39696703659 has no downloadable artifacts.
+  The radix8_2 inputs remain in the exact timing capsule. Full-radix4/8
+  originals are absent, but passing44831585206 retains authenticated
+  original model/image hashes. BUG178 tracks this separate CI problem.
+- Recover the archived common qualified G1 generator control from the
+  exact capsule, preserving its original qualification record. Relevant
+  resource generator/compiler/hardware sources have no diff from9768c773.
+  Rebuild full-radix4/8 in the original hosted build paths with pinned
+  synthesis/nextpnr. Require exact original resource manifest and every
+  generated-file hash before compiling only the primary workload. Then
+  require exact original bitstream bytes/full FASM encoding and current
+  RTL tests. Fail and retain artifacts on any mismatch; never substitute
+  a new model, spoof the original run ID or relax hashes to make CI green.
+- Bounded two-job recovery is independent of physical/native closure.
+  Preserve outputs90days for subsequent pinned retrieval; switch ordinary
+  controls only after successful recovery/authentication. No new coverage,
+  timing, architecture or adoption claim follows from reconstruction.
+
 ## D-176: Qualify exactly the two measured seed images through native loading and timing
 
 - **Date:** 2026-11-26. Compile45892839965 ate752e5f3 passes both jobs.

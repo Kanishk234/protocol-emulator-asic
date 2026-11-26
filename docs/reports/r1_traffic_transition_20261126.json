@@ -1,0 +1,152 @@
+{
+  "date": "2026-11-26",
+  "scope": "Passive midpoint observations of the rejected 33-selector image; no clock/stimulus/model forcing, native/timing acceptance or adoption.",
+  "trace_limit": 16,
+  "candidate_passed": false,
+  "adopted": false,
+  "timing_acceptance": false,
+  "control": {
+    "passed": true,
+    "strict_xml_cases": 1,
+    "sim_time_ns": 220581.0,
+    "activity": {
+      "overlap_ns": 8340.0,
+      "windows_ns": {
+        "spi": [
+          116001.0,
+          124501.0
+        ],
+        "uart_rx": [
+          116161.0,
+          202961.0
+        ],
+        "uart_tx": [
+          115961.0,
+          198421.0
+        ]
+      }
+    },
+    "same_activity_and_simulation_time_as_previous_control": true,
+    "trace_files": 16,
+    "source_result_sha256": "3ebe1aabd0532eaed6cc75e62b7e08d3ae159dc1edf4556f85d7109f11191d67"
+  },
+  "samples": [
+    {
+      "time_ns": 115931.0,
+      "pins": {
+        "clk": "0",
+        "cs_n_o": "1",
+        "h_rready": "0",
+        "h_rvalid": "X",
+        "h_wdata": "00000000",
+        "h_wready": "1",
+        "h_wvalid": "1",
+        "mosi_o": "1",
+        "rst_n": "1",
+        "sck_o": "X",
+        "tx_o": "1"
+      },
+      "w_lane": {
+        "CLK": "0",
+        "D": "0",
+        "Q": "0",
+        "RESET_B": "1"
+      },
+      "w_last": {
+        "CLK": "0",
+        "D": "0",
+        "Q": "0",
+        "RESET_B": "1"
+      },
+      "shared_enable_lut_output": "X",
+      "snapshot_sha256": "dd57019b4362040f8ecf0796a31259d4a87136f307e6d741895a92ef28500eb9"
+    },
+    {
+      "time_ns": 115951.0,
+      "pins": {
+        "clk": "0",
+        "cs_n_o": "1",
+        "h_rready": "0",
+        "h_rvalid": "X",
+        "h_wdata": "10100101",
+        "h_wready": "1",
+        "h_wvalid": "1",
+        "mosi_o": "1",
+        "rst_n": "1",
+        "sck_o": "X",
+        "tx_o": "1"
+      },
+      "w_lane": {
+        "CLK": "0",
+        "D": "0",
+        "Q": "0",
+        "RESET_B": "1"
+      },
+      "w_last": {
+        "CLK": "0",
+        "D": "0",
+        "Q": "0",
+        "RESET_B": "1"
+      },
+      "shared_enable_lut_output": "0",
+      "snapshot_sha256": "eac4df7369f4923ef1e4f2c1a1ea492a87b68d49c3de8613cb88eb60992a6f45"
+    },
+    {
+      "time_ns": 115971.0,
+      "pins": {
+        "clk": "0",
+        "cs_n_o": "1",
+        "h_rready": "0",
+        "h_rvalid": "X",
+        "h_wdata": "00000011",
+        "h_wready": "1",
+        "h_wvalid": "1",
+        "mosi_o": "1",
+        "rst_n": "1",
+        "sck_o": "X",
+        "tx_o": "0"
+      },
+      "w_lane": {
+        "CLK": "0",
+        "D": "X",
+        "Q": "0",
+        "RESET_B": "1"
+      },
+      "w_last": {
+        "CLK": "0",
+        "D": "X",
+        "Q": "0",
+        "RESET_B": "1"
+      },
+      "shared_enable_lut_output": "X",
+      "snapshot_sha256": "28d1743cb2ea3b38b40594937e95e624bffeb4cc1fb48fda1e6f7edc66cef911"
+    }
+  ],
+  "actual_configuration_audits": {
+    "control": {
+      "compared_configuration_bits": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+    },
+    "candidate": {
+      "compared_configuration_bits": 8736,
+      "image_sha256": "637897e7d3f36f6670a0aadad69a004a5edcef46c109122dd42d50d2b06be678",
+      "snapshot_sha256": "f068bcb622fec041ce1cb696d7aa898ba598a4bd2838e00f0e6967293d24503d"
+    }
+  },
+  "shared_enable_function": {
+    "tile": "X1Y3",
+    "lut": "F",
+    "observed_init": 204,
+    "observed_ff_select": "0",
+    "unused_input": 2,
+    "cofactor_addresses_checked": 16,
+    "source_of_unused_input": "X1Y2/LA_O (compiled SPI timer load)",
+    "selected_route_analysis": "At115971ns, I1=1 and I3=0 yield binary output1 independent of I0/I2. Observed native output remains X. This is a diagnostic discrepancy, not a completed whole-cone equivalence or root-cause proof."
+  },
+  "routing_search": {
+    "attempts": 3,
+    "plans": []
+  },
+  "next": "Fresh bounded routing seeds2/3 for the same eight-case-proved source, unchanged control seed1, pins, clock D and physical fabric. Require new native/reset/reload qualification before connected timing."
+}

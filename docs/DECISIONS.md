@@ -1,5 +1,41 @@
 # Decisions
 
+## D-175: Bound fresh registered-tick routing to two additional seeds
+
+- **Date:** 2026-11-26. D174 narrows the33-selector failure to the
+  shared host capture enable: selected-route/LUT truth analysis is binary
+  known, while the native output is X. One-/two-selector safe searches
+  find no known-source repair under current feature/fanout guards.
+- Compile the already8-case-proved SPI source at candidate seeds2and3
+  only, preserving source, pins, parameters, frozen physical fabric and
+  clock D. Each job first reproduces original source/rawc6 at seed1.
+  The original compile workflow retains default candidate seed1. Record
+  actual placement seed; reject values outside1/2/3, including bool/text.
+- Two independent cloud jobs, no fail-fast/cancellation and bounded12min
+  compile stages. Reauthenticate all8proof cases and original resource;
+  source/native/timing gates remain distinct. Compiler frequency estimates
+  are uncharacterized. Fresh native/reset/reload and original connected
+  timing are required before any timing/adoption claim. No previous
+  image-specific bit repairs are copied to a new placement.
+
+## D-174: Observe the first native host-capture failure without changing traffic
+
+- **Date:** 2026-11-26. Optional R1_RUNTIME_TRACE_DIR starts a read-only
+  observer at first traffic. Capture at falling clock edge plus1ns, at
+  most16samples; do not change clocks, stimulus or acceptance assertions.
+  Include driven/observed adapter pins in runtime snapshots. Snapshot
+  analysis may read subpaths only within the same candidate directory.
+- Original native control passes with16samples, identical concurrent
+  activity windows and220581ns completion time to the prior untraced
+  control. Candidate still fails ready at115981ns; all8736actual bits
+  agree in both cases. At115971ns with host byte03 and ready1, w_lane/
+  w_last Q remain0 while D is X. Common X1Y3/F output is X, despite
+  binary route/truth analysis yielding1. This is a causal lead, not a
+  completed whole-cone proof or a PDK/hardware fault attribution.
+- Preserve failure and all source/native separation. Receipt:
+  reports/r1_traffic_transition_20261126.json. No image accepted, timing
+  exception, reset extension, forced state or physical change.
+
 ## D-173: Recover original native workflow inputs from the authenticated capsule
 
 - **Hosted validation:**45890726100 passes all stages at9d1c29ef. Root

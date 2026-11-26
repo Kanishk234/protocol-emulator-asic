@@ -3,6 +3,32 @@
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
 
+## 2026-11-26 — Trace host capture and launch bounded fresh routing
+
+- D174 adds a16-sample passive traffic observer and top-level pin values
+  to native runtime snapshots. Original control strictly passes with the
+  same concurrent windows and220581ns completion as prior untraced control.
+  Candidate preserves115981ns ready failure; both actual8736-bit audits pass.
+- At115971ns before that edge, host03/ready1 are known, w_lane/w_last
+  Q=0/D=X. Their common X1Y3/F capture-enable output is X. Its actual
+  INIT0x00cc ignores input2, fed from unknown SPI timer-load logic; binary
+  selected-route analysis yields1. This is not a complete root-cause proof.
+  One-/two-selector searches find no safe known-source repair. Receipt:
+  reports/r1_traffic_transition_20261126.json.
+- D175 prepares two fresh candidate seeds2/3, each with original seed1/rawc6
+  control first and all8source proofs authenticated. Preserve frozen macro,
+  pins, source/parameters, clock D and constraints; no33-selector fixes are
+  copied. Both427-input frozen preparation checks and workflow lint pass.
+  Compile estimates remain uncharacterized. New images need fresh native/
+  reset/reload before original extracted timing; no new timing claim.
+- Prior head293bf100: test45891372096, lint45891372077,
+  docs45891372036 and unit45891372043 pass; fabric45891372145 was still
+  running when checked. Native baseline45890726100 remains passing.
+- **Boxes ticked:** none. Next: review cloud seed2/3 compiler images, pin
+  exact producer/artifact evidence, then actual native qualification. Keep
+  failed old image and passing baseline. Unrelated untracked report untouched.
+
+
 ## 2026-11-26 — Continue registered-tick native diagnosis and restore historical CI inputs
 
 - **Hosted recovery complete:**45890726100 at9d1c29ef passes original

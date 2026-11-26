@@ -21,6 +21,15 @@
 
 ## 176: Registered-tick image fails native initialization despite exact configuration
 
+- **D174 traffic trace:** original control passes with identical activity/
+  completion time. Before the failing clock edge (115971ns), host03/
+  ready1 are defined, w_lane/w_last Q=0 but D=X. Shared X1Y3/F capture
+  enable is X; its observed INIT0x00cc ignores I2, which receives unknown
+  compiled SPI-timer-load logic. Binary route analysis yields enable1.
+  This narrows the issue without proving the complete root cause.
+  Safe bounded reroutes found none; D175 compiles fresh seeds2/3 and
+  keeps all future native/timing gates mandatory.
+
 - **November26:** replay44871227303 confirms the same failure. D172
   isolated upstream selectors remove the initial SPI CS unknown sample
   only in a combined trial; host-write ready becomes X at115981ns. Further

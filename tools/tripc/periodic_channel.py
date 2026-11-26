@@ -35,3 +35,23 @@ def analyze_periodic_channel(arrival_period, service_period, *,
     if max_cycle % repeat == 0 and occupied in seen:
         return {'status': 'no_overrun', 'clocks_checked': max_cycle}
     return {'status': 'unknown', 'clocks_checked': max_cycle}
+
+
+def analyze_compiled_channel(image, schedule):
+    """Check a declared schedule on a compiled, unfiltered point-to-point binding."""
+    required = {'consumer', 'arrival_period', 'service_period'}
+    optional = {'arrival_phase', 'service_phase'}
+    if not isinstance(schedule, dict) or not required <= schedule.keys() <= required | optional:
+        raise ValueError('Expected consumer, arrival_period, service_period and optional phases')
+    consumer = schedule['consumer']
+    bindings = {port: (producer, mode, accept) for port, producer, mode, accept in image['connect']}
+    if not isinstance(consumer, str) or consumer not in bindings:
+        raise ValueError('Expected a configured consumer port')
+    producer, mode, accept = bindings[consumer]
+    if mode != 'blocking' or accept != 0xf:
+        raise ValueError('Expected an unfiltered blocking consumer')
+    if any(port != consumer and bound_producer == producer and bound_mode == 'blocking'
+           for port, (bound_producer, bound_mode, _) in bindings.items()):
+        raise ValueError('Producer has more than one blocking consumer')
+    args = {key: value for key, value in schedule.items() if key != 'consumer'}
+    return {'producer': producer, 'consumer': consumer, **analyze_periodic_channel(**args)}

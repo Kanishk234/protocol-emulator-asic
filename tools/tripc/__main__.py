@@ -9,6 +9,7 @@ from .compiler import TrwError, compile_file
 from .expr import evaluate
 from .response import analyze_queries, response_report
 from .linked_budget import compose_linked_response, linked_budget_report
+from .periodic_channel import analyze_compiled_channel
 
 
 def main():
@@ -20,6 +21,7 @@ def main():
     ap.add_argument('--response-queries', help='JSON mapping of conditional single-token response contracts')
     ap.add_argument('--response-results', help='write full conditional response results as JSON')
     ap.add_argument('--linked-budget', help='JSON edge-gap/setup assumptions for conditional linked-response composition')
+    ap.add_argument('--channel-schedule', help='JSON arrival and service schedule for one blocking channel')
     args = ap.parse_args()
     if args.response_results and not args.response_queries:
         ap.error('--response-results requires --response-queries')
@@ -35,6 +37,21 @@ def main():
         print(f"tripc: {e}", file=sys.stderr)
         return 1
     results = None
+    channel = None
+    if args.channel_schedule:
+        try:
+            schedule = json.loads(pathlib.Path(args.channel_schedule).read_text())
+            channel = analyze_compiled_channel(image, schedule)
+        except (OSError, ValueError) as e:
+            print(f'tripc: channel schedule: {e}', file=sys.stderr)
+            return 2
+        report += (
+            '\n## Declared channel schedule\n\n'
+            'Conditional on an initially empty channel, static bindings and the supplied '
+            'periodic arrival and service opportunities. The compiler does not establish '
+            'that the running program supplies those opportunities.\n\n'
+            f'```json\n{json.dumps({"schedule": schedule, "result": channel}, indent=2)}\n```\n'
+        )
     if args.response_queries:
         try:
             queries = json.loads(pathlib.Path(args.response_queries).read_text())
@@ -59,6 +76,8 @@ def main():
             f.write(report)
     else:
         print(report)
+    if channel and channel['status'] != 'no_overrun':
+        return 2
     return 2 if results and any(r['status'] != 'bounded' or
                               r.get('linked_budget', {}).get('status', 'conditional_pass') != 'conditional_pass'
                               for r in results.values()) else 0

@@ -5,7 +5,7 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from spi_tick_pipeline_compile import pin_global_clock,placement_seed
+from spi_tick_pipeline_compile import pin_global_clock,placement_seed,prepare
 from fixed_relocation import logical_graph
 
 
@@ -17,6 +17,19 @@ def test_bounded_candidate_seeds_never_change_original_compile_control():
     for seed in (0,4,-1,True,'2',None):
         with pytest.raises(ValueError):placement_seed({'candidate_seed':seed},'candidate')
     with pytest.raises(ValueError):placement_seed({},'unknown')
+
+
+@pytest.mark.parametrize('ungated',[False,True])
+def test_compiler_rejects_proof_for_other_timer_enable_variant(tmp_path,ungated):
+    import json
+    resource=tmp_path/'capsule/model/resource';resource.mkdir(parents=True)
+    (resource/'resource-control.json').write_text(json.dumps(dict(radix='radix8_2',generated_sha256={})))
+    case=tmp_path/'proofs/case';case.mkdir(parents=True)
+    (case/'result.json').write_text(json.dumps(dict(mode=0,half=4,equivalence_passed=True,
+        strict_source_tests=4,ungated_timer=not ungated)))
+    with pytest.raises(ValueError,match='different timer enable variant'):
+        prepare(tmp_path/'capsule',tmp_path/'proofs',tmp_path/'out',ungated_timer=ungated)
+    assert not (tmp_path/'out').exists()
 
 
 def test_clock_constraint_preserves_source_graph_and_rejects_ambiguous_controls():

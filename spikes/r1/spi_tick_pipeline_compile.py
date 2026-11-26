@@ -37,7 +37,7 @@ def placement_seed(plan,case):
     return 1 if case=='control' else seed
 
 
-def prepare(capsule,proofs,out,candidate_seed=1):
+def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False):
     from autonomy.check_xml import check_xml
     placement_seed({'candidate_seed':candidate_seed},'candidate')
     capsule,proofs,out=(Path(p).resolve() for p in (capsule,proofs,out))
@@ -46,13 +46,15 @@ def prepare(capsule,proofs,out,candidate_seed=1):
         raise ValueError('Frozen R1 resource changed')
     source=ROOT/'protocols/spi_ctrl/spi_ctrl_top.v'
     if sha(source)!=SOURCE_SHA:raise ValueError('SPI source changed')
-    candidate=variant(source.read_text());seen=set();bound=[]
+    candidate=variant(source.read_text(),ungated_timer=ungated_timer);seen=set();bound=[]
     import hashlib
     for folder in sorted(proofs.iterdir()):
         if not folder.is_dir():continue
         data=json.loads((folder/'result.json').read_text());identity=(data['mode'],data['half'])
         if identity in seen or not data['equivalence_passed'] or data['strict_source_tests']!=4:
             raise ValueError('Incomplete/duplicate SPI proof case')
+        if data.get('ungated_timer',False) is not ungated_timer:
+            raise ValueError('SPI proof uses a different timer enable variant')
         admit_status((folder/'equiv/status').read_text(),(folder/'proof.log').read_text())
         check_xml(folder/'results.xml',4)
         if sha(folder/'candidate/spi_ctrl_top.v')!=hashlib.sha256(candidate.encode()).hexdigest():
@@ -81,8 +83,8 @@ def prepare(capsule,proofs,out,candidate_seed=1):
               resource/'resource-control.json',*[resource/p for p in desc['generated_sha256']],
               out/'candidate-source/spi_ctrl_top.v',shadow/'arch.yaml',shadow/'pins.csv']
     (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),resource=str(resource),arch=str(shadow),
-        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,
-        scope=f'Source-proved registered SPI terminal pulse, same frozen physical fabric, pins and parameters; original control seed1, candidate seed{candidate_seed}, 50MHz request and GBUF USER-pinned to original bank D. Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
+        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,ungated_timer=ungated_timer,
+        scope=f'Source-proved registered SPI terminal pulse, timer enable '+('held high' if ungated_timer else 'state gated')+f', same frozen physical fabric, pins and parameters; original control seed1, candidate seed{candidate_seed}, 50MHz request and GBUF USER-pinned to original bank D. Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
 
 
 def run(out,case):
@@ -136,7 +138,7 @@ def run(out,case):
     (out/case/'result.json').write_text(json.dumps(dict(case=case,run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),
         image_sha256=sha(image),placed_utilisation=report['utilisation'],model_fmax_mhz=report['fmax_mhz'],model_timing_characterized=False,
         requested_placement_frequency_mhz=50,yosys_version=version,nextpnr_version=np,
-        clock_constraint=clock_constraint,placement_seed=seed,actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
+        clock_constraint=clock_constraint,placement_seed=seed,ungated_timer=plan.get('ungated_timer',False) if case=='candidate' else False,actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
 
 
 if __name__=='__main__':
@@ -144,5 +146,6 @@ if __name__=='__main__':
     x=sub.add_parser('prepare')
     for name in ('capsule','proofs','out'):x.add_argument('--'+name,type=Path,required=True)
     x.add_argument('--candidate-seed',type=int,choices=(1,2,3),default=1)
+    x.add_argument('--ungated-timer',action='store_true')
     x=sub.add_parser('run');x.add_argument('--out',type=Path,required=True);x.add_argument('--case',choices=('control','candidate'),required=True)
     a=vars(p.parse_args());mode=a.pop('mode');(prepare if mode=='prepare' else run)(**a)

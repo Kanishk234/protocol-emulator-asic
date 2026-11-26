@@ -30,8 +30,16 @@ def pin_global_clock(design):
     return pinned,clocks[0]
 
 
-def prepare(capsule,proofs,out):
+def placement_seed(plan,case):
+    seed=plan.get('candidate_seed',1)
+    if type(seed) is not int or seed not in (1,2,3):raise ValueError('Unapproved bounded placement seed')
+    if case not in ('control','candidate'):raise ValueError('Unknown compiler case')
+    return 1 if case=='control' else seed
+
+
+def prepare(capsule,proofs,out,candidate_seed=1):
     from autonomy.check_xml import check_xml
+    placement_seed({'candidate_seed':candidate_seed},'candidate')
     capsule,proofs,out=(Path(p).resolve() for p in (capsule,proofs,out))
     resource=capsule/'model/resource';desc=json.loads((resource/'resource-control.json').read_text())
     if desc['radix']!='radix8_2' or any(sha(resource/p)!=h for p,h in desc['generated_sha256'].items()):
@@ -73,8 +81,8 @@ def prepare(capsule,proofs,out):
               resource/'resource-control.json',*[resource/p for p in desc['generated_sha256']],
               out/'candidate-source/spi_ctrl_top.v',shadow/'arch.yaml',shadow/'pins.csv']
     (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),resource=str(resource),arch=str(shadow),
-        inputs={str(p):sha(p) for p in bound},params=report['params'],
-        scope='Source-proved registered SPI terminal pulse, same frozen physical fabric, pins, parameters, seed1 and50MHz request; candidate GBUF USER-pinned to original bank D. Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
+        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,
+        scope=f'Source-proved registered SPI terminal pulse, same frozen physical fabric, pins and parameters; original control seed1, candidate seed{candidate_seed}, 50MHz request and GBUF USER-pinned to original bank D. Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
 
 
 def run(out,case):
@@ -83,6 +91,7 @@ def run(out,case):
     if os.environ.get('GITHUB_ACTIONS')!='true' or case not in ('control','candidate'):
         raise ValueError('Fresh compilation runs hosted with explicit cases')
     out=Path(out).resolve();plan=json.loads((out/'plan.json').read_text())
+    seed=placement_seed(plan,case)
     if any(sha(p)!=h for p,h in plan['inputs'].items()):raise ValueError('Frozen compile/proof input changed')
     version=subprocess.check_output([compiler.tool('yosys'),'-V'],text=True)
     if 'e74db6dea' not in version:raise ValueError('Yosys differs from the original primary compiler')
@@ -112,7 +121,7 @@ def run(out,case):
                 command[index]=str(target)
         return original(command,log,cwd,env)
     compiler.run=request_frequency
-    try:image,report=compiler.compile_design(sources,pins,Path(plan['arch']),out/case,seed=1,set_params=params,strict_ports=True)
+    try:image,report=compiler.compile_design(sources,pins,Path(plan['arch']),out/case,seed=seed,set_params=params,strict_ports=True)
     finally:compiler.run=original
     if case=='control' and Path(image).read_bytes()!=(Path(plan['capsule'])/'model/compile/uart_spi_11/concurrency.wbit').read_bytes():
         raise ValueError('Original same-source compiler control image did not reproduce')
@@ -127,12 +136,13 @@ def run(out,case):
     (out/case/'result.json').write_text(json.dumps(dict(case=case,run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),
         image_sha256=sha(image),placed_utilisation=report['utilisation'],model_fmax_mhz=report['fmax_mhz'],model_timing_characterized=False,
         requested_placement_frequency_mhz=50,yosys_version=version,nextpnr_version=np,
-        clock_constraint=clock_constraint,actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
+        clock_constraint=clock_constraint,placement_seed=seed,actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
 
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);sub=p.add_subparsers(dest='mode',required=True)
     x=sub.add_parser('prepare')
     for name in ('capsule','proofs','out'):x.add_argument('--'+name,type=Path,required=True)
+    x.add_argument('--candidate-seed',type=int,choices=(1,2,3),default=1)
     x=sub.add_parser('run');x.add_argument('--out',type=Path,required=True);x.add_argument('--case',choices=('control','candidate'),required=True)
     a=vars(p.parse_args());mode=a.pop('mode');(prepare if mode=='prepare' else run)(**a)

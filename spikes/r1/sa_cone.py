@@ -9,12 +9,14 @@ from global_support import flatten
 from unused_input_sweep import prove_input,carry_modes
 parser=argparse.ArgumentParser(description=__doc__)
 for name in ('capsule','native','functional','out'):parser.add_argument('--'+name,type=Path,required=True)
-parser.add_argument('--snapshot',choices=('runtime-failure.json','runtime-after-load.json','runtime-before-reset-release.json'),default='runtime-failure.json')
+parser.add_argument('--snapshot',default='runtime-failure.json',help='Snapshot path within the candidate output directory')
 parser.add_argument('--root-port',default='Tile_X2Y4_B_IN_top')
 parser.add_argument('--include-registered',action='store_true')
 args=parser.parse_args()
 cap=args.capsule;native=args.native;case=args.functional/'candidate-case';root=args.functional/'candidate'
-state=json.loads((root/'configuration-state.json').read_text());runtime=json.loads((root/args.snapshot).read_text());mods=json.loads((native/'registered_native/all-native.json').read_text())['modules'];top=json.loads((cap/'analysis/top.json').read_text())['modules']['eFPGA'];flat,q=flatten(top,mods,state['tiles']);values={};conflicts=[]
+snapshot=(root/args.snapshot).resolve()
+if not snapshot.is_relative_to(root.resolve()):raise ValueError('Snapshot must remain within the candidate output directory')
+state=json.loads((root/'configuration-state.json').read_text());runtime=json.loads(snapshot.read_text());mods=json.loads((native/'registered_native/all-native.json').read_text())['modules'];top=json.loads((cap/'analysis/top.json').read_text())['modules']['eFPGA'];flat,q=flatten(top,mods,state['tiles']);values={};conflicts=[]
 for tile,row in runtime['tiles'].items():
  for name,c in row['cells'].items():
   model=flat['cells'].get(tile+'/'+name)

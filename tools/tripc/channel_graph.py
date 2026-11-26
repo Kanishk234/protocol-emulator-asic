@@ -28,7 +28,8 @@ def blocking_components(connections):
     })
 
 
-def _one_for_one(words):
+def forwarding_ports(words):
+    """Return the input/output indices of a single unconditional forwarding slot."""
     def field(word, name):
         shift, width = spec.SLOT_FIELDS[name]
         return (word >> shift) & ((1 << width) - 1)
@@ -36,22 +37,24 @@ def _one_for_one(words):
     slots = [int(word, 16) for word in words]
     slots = [word for word in slots if field(word, 'V')]
     if len(slots) != 1:
-        return False
+        return None
     word = slots[0]
-    return (
+    if (
         field(word, 'ASRC') in (spec.ASRC['I0'], spec.ASRC['I1'])
         and field(word, 'DST') in (spec.DST['O0'], spec.DST['O1'])
         and field(word, 'DQ')
         and field(word, 'OP') != spec.OPS['CALL']
         and not any(field(word, name) for name in ('SE', 'FM', 'TE', 'HE', 'NSE', 'DFE'))
-    )
+    ):
+        return field(word, 'ASRC') - spec.ASRC['I0'], field(word, 'DST') - spec.DST['O0']
+    return None
 
 
 def report_channel_graph(image):
     """Report structural risks without declaring queue progress or a rate bound."""
     cycles = blocking_components(image['connect'])
     stages = [lane for lane, data in sorted(image['lanes'].items())
-              if not _one_for_one(data['slots'])]
+              if forwarding_ports(data['slots']) is None]
     lines = [
         '## Channel graph', '',
         'Topology diagnostics only. Queue progress and overrun depend on token arrivals, '

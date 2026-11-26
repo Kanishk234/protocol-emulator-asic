@@ -9,7 +9,7 @@ from .compiler import TrwError, compile_file
 from .expr import evaluate
 from .response import analyze_queries, response_report
 from .linked_budget import compose_linked_response, linked_budget_report
-from .periodic_channel import analyze_compiled_channel
+from .periodic_channel import analyze_compiled_channel, analyze_compiled_pipeline
 
 
 def main():
@@ -21,7 +21,9 @@ def main():
     ap.add_argument('--response-queries', help='JSON mapping of conditional single-token response contracts')
     ap.add_argument('--response-results', help='write full conditional response results as JSON')
     ap.add_argument('--linked-budget', help='JSON edge-gap/setup assumptions for conditional linked-response composition')
-    ap.add_argument('--channel-schedule', help='JSON arrival and service schedule for one blocking channel')
+    schedule_group = ap.add_mutually_exclusive_group()
+    schedule_group.add_argument('--channel-schedule', help='JSON arrival and service schedule for one blocking channel')
+    schedule_group.add_argument('--pipeline-schedule', help='JSON arrival and service schedule for one forwarding lane')
     args = ap.parse_args()
     if args.response_results and not args.response_queries:
         ap.error('--response-results requires --response-queries')
@@ -38,16 +40,18 @@ def main():
         return 1
     results = None
     channel = None
-    if args.channel_schedule:
+    if args.channel_schedule or args.pipeline_schedule:
         try:
-            schedule = json.loads(pathlib.Path(args.channel_schedule).read_text())
-            channel = analyze_compiled_channel(image, schedule)
+            schedule = json.loads(pathlib.Path(args.channel_schedule or args.pipeline_schedule).read_text())
+            analyze = analyze_compiled_pipeline if args.pipeline_schedule else analyze_compiled_channel
+            channel = analyze(image, schedule)
         except (OSError, ValueError) as e:
             print(f'tripc: channel schedule: {e}', file=sys.stderr)
             return 2
+        heading = 'pipeline' if args.pipeline_schedule else 'channel'
         report += (
-            '\n## Declared channel schedule\n\n'
-            'Conditional on an initially empty channel, static bindings and the supplied '
+            f'\n## Declared {heading} schedule\n\n'
+            'Conditional on initially empty channels, static bindings and the supplied '
             'periodic arrival and service opportunities. The compiler does not establish '
             'that the running program supplies those opportunities.\n\n'
             f'```json\n{json.dumps({"schedule": schedule, "result": channel}, indent=2)}\n```\n'

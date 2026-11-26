@@ -1,6 +1,8 @@
 """Exact occupancy analysis for one blocking channel with periodic service."""
 from math import lcm
 
+from .channel_graph import forwarding_ports
+
 
 def _validate_schedule(period, phase):
     if (type(period) is not int or period <= 0
@@ -83,6 +85,12 @@ def analyze_compiled_channel(image, schedule):
     if not isinstance(schedule, dict) or not required <= schedule.keys() <= required | optional:
         raise ValueError('Expected consumer, arrival_period, service_period and optional phases')
     consumer = schedule['consumer']
+    producer = _blocking_producer(image, consumer)
+    args = {key: value for key, value in schedule.items() if key != 'consumer'}
+    return {'producer': producer, 'consumer': consumer, **analyze_periodic_channel(**args)}
+
+
+def _blocking_producer(image, consumer):
     bindings = {port: (producer, mode, accept) for port, producer, mode, accept in image['connect']}
     if not isinstance(consumer, str) or consumer not in bindings:
         raise ValueError('Expected a configured consumer port')
@@ -92,5 +100,24 @@ def analyze_compiled_channel(image, schedule):
     if any(port != consumer and bound_producer == producer and bound_mode == 'blocking'
            for port, (bound_producer, bound_mode, _) in bindings.items()):
         raise ValueError('Producer has more than one blocking consumer')
-    args = {key: value for key, value in schedule.items() if key != 'consumer'}
-    return {'producer': producer, 'consumer': consumer, **analyze_periodic_channel(**args)}
+    return producer
+
+
+def analyze_compiled_pipeline(image, schedule):
+    """Check a declared schedule on a host-to-host, single-reflex pipeline."""
+    required = {'lane', 'arrival_period', 'service_period'}
+    optional = {'arrival_phase', 'service_phase', 'fire_period'}
+    if not isinstance(schedule, dict) or not required <= schedule.keys() <= required | optional:
+        raise ValueError('Expected lane, arrival_period, service_period and optional phases or fire_period')
+    lane = schedule['lane']
+    if not isinstance(lane, str) or set(image['lanes']) != {lane}:
+        raise ValueError('Expected exactly one programmed forwarding lane')
+    ports = forwarding_ports(image['lanes'][lane]['slots'])
+    if ports is None:
+        raise ValueError('Expected one unconditional forwarding slot')
+    input_port, output_port = f'{lane}.I{ports[0]}', f'{lane}.O{ports[1]}'
+    if _blocking_producer(image, input_port) != 'HOST_IN' or _blocking_producer(image, 'HOST_OUT') != output_port:
+        raise ValueError('Expected a blocking HOST_IN to lane to HOST_OUT pipeline')
+    args = {key: value for key, value in schedule.items() if key != 'lane'}
+    return {'lane': lane, 'input': input_port, 'output': output_port,
+            **analyze_periodic_pipeline(**args)}

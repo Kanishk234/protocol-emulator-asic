@@ -34,5 +34,41 @@
         "source_run": 44831585206
       }
     }
+  },
+  "recovered_run": {
+    "id": 45895203188,
+    "head_sha": "b8c23ab08c6aadda8032df90dd3e3ccfe7185b1d",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_control_archive_recovery.yaml"
+  },
+  "recovered_profiles": {
+    "4": {
+      "artifact": {
+        "id": 15154035034,
+        "name": "r1-recovered-rtl-control-45895203188-tracks4-full",
+        "size_in_bytes": 5041983,
+        "digest": "sha256:2a01fcd58ab041fcb4dc867e19fc88c3e24dd333a3941ee19b9f9c90e64f0f44",
+        "source_run": 45895203188
+      },
+      "member": "r1_checks"
+    },
+    "8": {
+      "artifact": {
+        "id": 15153043515,
+        "name": "r1-recovered-rtl-control-45895203188-tracks8-full",
+        "size_in_bytes": 5198485,
+        "digest": "sha256:f1d468c06a0ed10474ca92db10623385429556e4ea9c4dddb94c388554f21ea1",
+        "source_run": 45895203188
+      },
+      "member": "r1_checks"
+    }
+  },
+  "radix8_2": {
+    "tracks": 4,
+    "radix": "radix8_2",
+    "model_sha256": "0db6598b69de56dcaaf6a31e8b81f8c8b652cd6def2e3f52a5dac4066edab8a9",
+    "image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f"
   }
 }

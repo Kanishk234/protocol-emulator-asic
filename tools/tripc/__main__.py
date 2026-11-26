@@ -23,7 +23,7 @@ def main():
     ap.add_argument('--linked-budget', help='JSON edge-gap/setup assumptions for conditional linked-response composition')
     schedule_group = ap.add_mutually_exclusive_group()
     schedule_group.add_argument('--channel-schedule', help='JSON arrival and service schedule for one blocking channel')
-    schedule_group.add_argument('--pipeline-schedule', help='JSON arrival and service schedule for one forwarding lane')
+    schedule_group.add_argument('--pipeline-schedule', help='JSON arrival and service schedule for a forwarding lane chain')
     args = ap.parse_args()
     if args.response_results and not args.response_queries:
         ap.error('--response-results requires --response-queries')

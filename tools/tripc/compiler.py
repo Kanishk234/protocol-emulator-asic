@@ -37,6 +37,7 @@ import tripwire_spec as S
 from tripsim import asm, isa, pinregs
 from tripsim.pinunit import PinConfig
 
+from .channel_graph import report_channel_graph
 from .expr import ExprError, evaluate
 from .reaction import analyze_lane
 from .service import routine_service
@@ -521,6 +522,7 @@ class Compiler:
                     guarantee = 'unknown delay'
                 L.append(f"| {l.name} slot {item['slot']} | {item['competitors_no_routine']} | "
                          f"{item['competitors_with_issuable_routine']} | {guarantee} |")
+        L += ["", *report_channel_graph(image)]
         if self.warnings:
             L += ["", "## Warnings", ""] + [f"- {w}" for w in self.warnings]
         return "\n".join(L) + "\n"

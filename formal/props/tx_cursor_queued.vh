@@ -1,5 +1,5 @@
-    // Queue a LEVEL action, then offer OE while the first action is pending.
-    (* anyconst *) reg test_prescale, test_long_first;
+    // Queue a LEVEL action, then offer a second action while it is pending.
+    (* anyconst *) reg test_prescale, test_long_first, test_same_pad;
     (* anyconst *) reg [1:0] test_second_delay;
     reg [3:0] test_phase = 0;
     wire [1:0] test_first_delay = {1'b1, test_long_first};
@@ -21,11 +21,13 @@
         assume(tx_tag == `TRW_TAG_CTRL);
         assume(tx_data == (test_phase == 1
                            ? {`TRW_CMD_LEVEL, 1'b1, 9'b0, test_first_delay}
-                           : {`TRW_CMD_OE, 1'b0, 9'b0, test_second_delay}));
+                           : {test_same_pad ? `TRW_CMD_LEVEL : `TRW_CMD_OE,
+                              1'b0, 9'b0, test_second_delay}));
         if (test_phase != 0) begin
             assert(tx_take == (test_phase == 1 || test_phase == test_first_due));
             assert(!late_set);
-            assert(lvl == (test_phase >= test_first_due + 2));
-            assert(oe == (test_phase < test_second_due + 2));
+            assert(lvl == (test_phase >= test_first_due + 2 &&
+                           (!test_same_pad || test_phase < test_second_due + 2)));
+            assert(oe == (test_same_pad || test_phase < test_second_due + 2));
         end
     end

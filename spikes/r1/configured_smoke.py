@@ -229,6 +229,9 @@ eFPGA fabric(
     observe=capture_configuration and not management_shell
     extra_env['R1_RUNTIME_SNAPSHOT']=str(out/'runtime-failure.json') if observe else ''
     extra_env['R1_RUNTIME_MODEL']=os.environ.get('R1_RUNTIME_MODEL','') if observe else ''
+    trace=os.environ.get('R1_RUNTIME_TRACE_DIR','')
+    if os.environ.get('R1_RUNTIME_TRACE')=='1':trace=str(out/'traffic-trace')
+    extra_env['R1_RUNTIME_TRACE_DIR']=trace if observe else ''
     runner.test(hdl_toplevel='r1_tb',test_module='test_shell' if management_shell else 'test_loaded',test_dir=ROOT/'test_internal/r1_configured',
                 results_xml=str(out/'results.xml'),extra_env=extra_env,test_args=['-v'])
     from autonomy.check_xml import check_xml

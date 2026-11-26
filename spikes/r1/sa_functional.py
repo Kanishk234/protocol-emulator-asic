@@ -14,11 +14,24 @@ from compile.bitfile import BitFile
 def prepare(capsule,native,trial,out,trial_kind='sa'):
     capsule,native,trial,out=(Path(p).resolve() for p in (capsule,native,trial,out))
     trial_inputs=[trial/'result.json']
-    if trial_kind in ('spi_timer_free_run','spi_tick_pipeline'):
+    seed_row=None
+    if trial_kind in ('spi_tick_seed2','spi_tick_seed3'):
+        catalog_path=Path(__file__).with_name('spi_tick_seed_compile_sources.json')
+        catalog=json.loads(catalog_path.read_text());seed=int(trial_kind[-1])
+        seed_row=catalog['seeds'][str(seed)]
+    if trial_kind in ('spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3'):
         trial_inputs=[trial/name/'result.json' for name in ('control','candidate')]
         cases={name:json.loads(path.read_text()) for name,path in zip(('control','candidate'),trial_inputs)}
         source_run,source_sha = (('44864499317','1d149b74550d3f217520c968371dec855dd4a300')
             if trial_kind=='spi_tick_pipeline' else ('44798802734','693e3b6bee9d082109c616431648646693c0a4be'))
+        if seed_row is not None:
+            source_run,source_sha=str(catalog['run']['id']),catalog['run']['head_sha']
+            if any(type(cases[name].get('placement_seed')) is not int or
+                   cases[name]['placement_seed']!=expected for name,expected in (('control',1),('candidate',seed))):
+                raise ValueError('Bounded tick compiler seed differs')
+            if cases['candidate'].get('clock_constraint')!=seed_row['clock_constraint']:
+                raise ValueError('Bounded tick clock constraint differs')
+            trial_inputs.append(catalog_path)
         if any(str(row['run'])!=source_run or row['source_sha']!=source_sha or
                row['actual_native_loading'] or row['model_timing_characterized'] for row in cases.values()):
             raise ValueError('Require the authenticated source-proven SPI compile campaign')
@@ -39,6 +52,7 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
         'spi_tick_pipeline':('44864499317','4a35f4d6f66bb0706f6c147934dd6ea520d6c7fd5c33e6c457b3c56b84b78300'),
         'spi_clock_d':('44827334401','4326eab8868442494239e0a413aa199158293b14cff856453ae8c37bd6d7403a'),
         'spi_clock_fixed':('44831585287','97caee72e610700fddd885f21b7d07a3116f19b45540bc3c02423740df999d5e')}
+    if seed_row is not None:admitted[trial_kind]=(str(catalog['run']['id']),seed_row['image_sha256'])
     if trial_kind not in admitted:raise ValueError('Unknown fixed-source native trial')
     run_id,image_sha=admitted[trial_kind]
     if (str(result['run'])!=run_id or not result['diagnostic_complete'] or
@@ -143,7 +157,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_tick_pipeline','spi_clock_d','spi_clock_fixed'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_clock_d','spi_clock_fixed'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

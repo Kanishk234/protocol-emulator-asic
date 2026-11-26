@@ -2,6 +2,14 @@
 
 ## 178: All historical generated-RTL control profiles lose their compiler archives
 
+- **Reconstruction validated:**45895203188 atb8c23ab0 passes both
+  profiles with original manifest/image bytes and current RTL assertions.
+  Root rechecks archives,367/358model files, two full FASM encodings,
+  strict XML and47simulation input hashes each. Ordinary retrieval now
+  uses pinned reconstructed archives/full radix and retained radix8_2.
+  Full three-profile regression replay is next; no new source model is
+  substituted. See reports/r1_rtl_control_recovery_45895203188.json.
+
 - **Symptom/check:**45892839861 fails authentication in all three matrix
   jobs; no new RTL simulation ran. Original39696703659 inventory is empty.
   This is independent of the registered-tick native failure.
@@ -10,7 +18,8 @@
   in the authenticated timing capsule. D177 reconstructs only the missing
   full-radix controls from the archived common qualified source; exact
   manifest/every generated hash/image/FASM and current simulation must
-  pass before ordinary workflow inputs change. Recovery is not yet proven.
+  pass before ordinary workflow inputs change. Reconstruction now passes;
+  ordinary regression replay remains pending.
 
 
 ## 177: Historical native-control archives disappear before workflow replay

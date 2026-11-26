@@ -2,6 +2,17 @@
 
 Timing is measured and still fails. R1 is experimental; G1 remains selected.
 
+Fresh seed2/3 compiles45892839965 pass, but native45893638442 rejects
+both on unknown host-ready. Original controls/generated RTL and all8736-bit
+audits pass; reload/timing remain blocked. D178 now tests an isolated
+unconditional timer enable with the registered pulse, requiring new direct
+equivalence/source tests before any compile or timing claim.
+
+Historical RTL control reconstruction45895203188 reproduces both missing
+full-radix manifests/bitstreams exactly and passes current RTL tests.
+Ordinary three-profile retrieval is restored against pinned artifacts; its
+full regression replay is next. No frozen control is replaced by a new one.
+
 Native replay44871227303 confirms the registered-tick failure. Additional
 proved isolated-input reroutes get past the initial SPI CS unknown sample
 but fail host-write ready at115981ns. All8736actual bits match in each

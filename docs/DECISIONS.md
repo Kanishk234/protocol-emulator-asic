@@ -1,6 +1,30 @@
 # Decisions
 
+## D-178: Prove an unconditional timer enable with the registered SPI pulse
+
+- **Date:** 2026-11-26. Timing diagnosis motivates removing state-dependent
+  en from the timer terminal-count cone. Stage an isolated variant of D168:
+  keep existing one-shot/reload HALF-2/registered pulse, set only timer en
+  to1, and retain accept/!timing pulse qualification. No production edit.
+- Require a new direct unbounded PDR comparison against the original, not
+  an inference from the two earlier separately proved variants. Same
+  four modes x HALF4/25, initial synchronous reset/arbitrary later inputs,
+  and32independent source tests. Source transformation must reverse exactly
+  and reject mixed modes. Existing default source/compiler preparation
+  still matches all eight original registered-tick proofs byte-for-byte.
+- This is source-only de-risking. No new compilation/native/area/timing/
+  physical acceptance or adoption until separate gates pass. No hardware,
+  ABI, parameter/rate compromise, timing exception or PDK change.
+
 ## D-177: Reconstruct expired comparison controls only against their original passing hashes
+
+- **Hosted reconstruction passes:**45895203188 atb8c23ab0 matches both
+  original manifests and bitstreams exactly, then current RTL tests pass.
+  Root authenticates archives,367/358generated-file hashes, both full FASM
+  encodings, two strict XMLs and47simulation input hashes per profile.
+  Ordinary three-profile retrieval is switched to these pinned full-radix
+  archives plus the exact retained radix8_2 capsule. Regression replay
+  remains required. Receipt: reports/r1_rtl_control_recovery_45895203188.json.
 
 - **Date:** 2026-11-26. RTL control45892839861 fails authentication for
   all three profiles because39696703659 has no downloadable artifacts.

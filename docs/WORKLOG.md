@@ -5,6 +5,20 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-26 — Trace host capture and launch bounded fresh routing
 
+- D177 reconstruction45895203188 atb8c23ab0 succeeds for full-radix4/8:
+  exact original manifests/bitstreams, current RTL tests. Root authenticates
+  archives/all367/358model files/full FASM/strict XML/all47simulation
+  input hashes per profile. Restore ordinary three-profile retrieval from
+  pinned archives plus retained radix8_2; replay remains required. Receipt:
+  reports/r1_rtl_control_recovery_45895203188.json. No control substitution.
+- D178 independently stages unconditional timer en with registered pulse
+  and original state qualification, targeting the enable-to-TC cone. This
+  is a new source-only hypothesis; direct8PDR/32source tests required.
+  Round-trip/mode guards and isolated miter preparation pass. Production
+  source stays35f29683; default old compiler still matches all8old proof
+  source files exactly. All58focused guards and workflow lint pass.
+  No compiled/native/timing claim for this variant.
+
 - Fresh native45893638442 at3eadcd3e rejects both candidates: seed2
   ready X at115981ns; seed3 at115921ns. Original controls/generated RTL
   pass. Root authenticates archives/strict controls and all actual8736-bit

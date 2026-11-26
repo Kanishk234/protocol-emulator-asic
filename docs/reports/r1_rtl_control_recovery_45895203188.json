@@ -1,0 +1,60 @@
+{
+  "run": {
+    "id": 45895203188,
+    "head_sha": "b8c23ab08c6aadda8032df90dd3e3ccfe7185b1d",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_control_archive_recovery.yaml"
+  },
+  "profiles": {
+    "4": {
+      "artifact": {
+        "id": 15154035034,
+        "name": "r1-recovered-rtl-control-45895203188-tracks4-full",
+        "size_in_bytes": 5041983,
+        "digest": "sha256:2a01fcd58ab041fcb4dc867e19fc88c3e24dd333a3941ee19b9f9c90e64f0f44",
+        "source_run": 45895203188
+      },
+      "archive_verified": true,
+      "identity": {
+        "passed": true,
+        "generated_files_checked": 367,
+        "model_sha256": "0fce259fb736ad23f08c4e1a8d557d2d49fca4742759d8a3a4f4f558c51537b1",
+        "image_sha256": "36aaad90de9c80588ef61476cf29ab2a5888ad0f9c79e0767ab485fbef5ef70a",
+        "original_control_bytes_reproduced": true,
+        "physical_acceptance": false,
+        "timing_acceptance": false,
+        "scope": "Historical model/image byte identity only; current RTL simulation is a separate required gate."
+      },
+      "strict_current_rtl_cases": 1,
+      "source_report_sha256": "b180113626554894c6cce55c6607610f4b440dca846e6539a9be42288145be2a",
+      "independently_rechecked_simulation_input_hashes": 47
+    },
+    "8": {
+      "artifact": {
+        "id": 15153043515,
+        "name": "r1-recovered-rtl-control-45895203188-tracks8-full",
+        "size_in_bytes": 5198485,
+        "digest": "sha256:f1d468c06a0ed10474ca92db10623385429556e4ea9c4dddb94c388554f21ea1",
+        "source_run": 45895203188
+      },
+      "archive_verified": true,
+      "identity": {
+        "passed": true,
+        "generated_files_checked": 358,
+        "model_sha256": "bce20a681fe8594621d572a190bcfd4e9f3f094f47c73d67b4c662d3ac509e6f",
+        "image_sha256": "c935ca2a62b16897cc52682e4211b5d7f13c58a39c52a5d25ed8cdf48cc1e131",
+        "original_control_bytes_reproduced": true,
+        "physical_acceptance": false,
+        "timing_acceptance": false,
+        "scope": "Historical model/image byte identity only; current RTL simulation is a separate required gate."
+      },
+      "strict_current_rtl_cases": 1,
+      "source_report_sha256": "51ad125064a10ae46d3daa17297b158997e4a05f2b6defcc0d7d62537814b72c",
+      "independently_rechecked_simulation_input_hashes": 47
+    }
+  },
+  "physical_acceptance": false,
+  "timing_acceptance": false
+}

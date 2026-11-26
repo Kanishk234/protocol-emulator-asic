@@ -1,0 +1,139 @@
+{
+  "run": {
+    "id": 45896227988,
+    "head_sha": "3cc674a640893442aa3e9a07cb7b0bf29ce3788d",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_spi_tick_ungated.yaml"
+  },
+  "cases": [
+    {
+      "mode": 1,
+      "half": 25,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15154585227,
+        "name": "r1-spi-tick-ungated-45896227988-mode1-half25",
+        "size_in_bytes": 141978,
+        "digest": "sha256:8efd1dfccbe661bf487853fd7067224e23aa0c679de74407d7531a8fd8be500a",
+        "source_run": 45896227988
+      }
+    },
+    {
+      "mode": 1,
+      "half": 4,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15154510434,
+        "name": "r1-spi-tick-ungated-45896227988-mode1-half4",
+        "size_in_bytes": 89105,
+        "digest": "sha256:a08ca12580d44c89e533ca26e230e20b8e2366533f0314c7d19cad8d43e45f05",
+        "source_run": 45896227988
+      }
+    },
+    {
+      "mode": 3,
+      "half": 4,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15154326515,
+        "name": "r1-spi-tick-ungated-45896227988-mode3-half4",
+        "size_in_bytes": 89867,
+        "digest": "sha256:51998955999304000bd47a813c1516cc456550fd78234b7ca497e3a17c480880",
+        "source_run": 45896227988
+      }
+    },
+    {
+      "mode": 3,
+      "half": 25,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15153702416,
+        "name": "r1-spi-tick-ungated-45896227988-mode3-half25",
+        "size_in_bytes": 155018,
+        "digest": "sha256:79d40f0e204856d5ae5eae549b622e81511c05fe9ea00e8c7323b6e040076e8a",
+        "source_run": 45896227988
+      }
+    },
+    {
+      "mode": 2,
+      "half": 25,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15153517800,
+        "name": "r1-spi-tick-ungated-45896227988-mode2-half25",
+        "size_in_bytes": 140795,
+        "digest": "sha256:6675bda9a74b41b0c297129d933def8e7d97072f000da9183e0a87e3b18eb911",
+        "source_run": 45896227988
+      }
+    },
+    {
+      "mode": 0,
+      "half": 4,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15153423717,
+        "name": "r1-spi-tick-ungated-45896227988-mode0-half4",
+        "size_in_bytes": 85755,
+        "digest": "sha256:fc1febf27c6a79077fc33d728a38efcd5ff412a9641cb2ca977ac31ad24a862f",
+        "source_run": 45896227988
+      }
+    },
+    {
+      "mode": 2,
+      "half": 4,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15153274588,
+        "name": "r1-spi-tick-ungated-45896227988-mode2-half4",
+        "size_in_bytes": 85833,
+        "digest": "sha256:806f4eb2a08c012c9f4a411f306f5062110c05ba5c26882410d08cd96bcc6658",
+        "source_run": 45896227988
+      }
+    },
+    {
+      "mode": 0,
+      "half": 25,
+      "unbounded_pdr_passed": true,
+      "strict_source_tests": 4,
+      "input_hashes_checked": 10,
+      "actual_miter_parameters_checked": true,
+      "archive": {
+        "id": 15153233997,
+        "name": "r1-spi-tick-ungated-45896227988-mode0-half25",
+        "size_in_bytes": 142412,
+        "digest": "sha256:586b54fd34cc83340adeafae31db261fccdc9dfccffe6293513b09470b623d83",
+        "source_run": 45896227988
+      }
+    }
+  ],
+  "unbounded_pdr_cases": 8,
+  "strict_source_tests": 32,
+  "production_source_changed": false,
+  "native_acceptance": false,
+  "extracted_timing_acceptance": false,
+  "adopted": false,
+  "scope": "Direct binary RTL output equivalence after initial synchronous reset for four modes and HALF4/25, PRIMS1, arbitrary later host/MISO/reset inputs; independent source tests. No native or timing acceptance."
+}

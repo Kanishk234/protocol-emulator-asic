@@ -5,6 +5,21 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-26 — Trace host capture and launch bounded fresh routing
 
+- BUG178 fully resolved: ordinary replay45896227686 at3cc674a6 passes
+  all3frozen profiles. Root authenticates archives, strict XML,47inputs
+  per profile and exact original traffic windows. Receipt:
+  reports/r1_restored_rtl_controls_45896227686.json.
+- D178 direct proof45896227988 at3cc674a6 passes8unbounded PDR cases/
+  32source tests. Root verifies every archive/10inputs/actual parameters/
+  source byte sequence/XML/proof status. Receipt:
+  reports/r1_spi_tick_ungated_equivalence_45896227988.json.
+- D179 gates fresh ungated compile on that exact proof set. Both source
+  preparations pass; old-to-new and new-to-old proof mixing reject.
+  Original rawc6control/seed1 first, candidate seed1/GBUF D, same fixed
+  resource/pins/params. Native/reset/reload and original extracted timing
+  remain required; no source-only proof is promoted to physical closure.
+  All60focused guards and compile-workflow lint pass.
+
 - D177 reconstruction45895203188 atb8c23ab0 succeeds for full-radix4/8:
   exact original manifests/bitstreams, current RTL tests. Root authenticates
   archives/all367/358model files/full FASM/strict XML/all47simulation

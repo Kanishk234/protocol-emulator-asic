@@ -1,6 +1,26 @@
 # Decisions
 
+## D-179: Compile only the directly proved ungated-timer source
+
+- **Date:** 2026-11-26.45896227988 at3cc674a6 passes all8unbounded PDR
+  cases and32independent SPI tests for D178. Root rechecks every archive,
+  all10input hashes per case, actual miter CPOL/CPHA/HALF/PRIMS parameters,
+  candidate source bytes, strict XML and completed proof logs. Receipt:
+  reports/r1_spi_tick_ungated_equivalence_45896227988.json.
+- Fresh compiler preparation requires the exact enable-variant marker and
+  candidate source matching all8proofs. Both actual new/old proof sets
+  prepare correctly; both cross-variant combinations reject before staging.
+  Original control remains rawc6/seed1; candidate also seed1, clock D,
+  same pins/parameters/frozen physical resource and50MHz compiler request.
+- No prior image-specific selector repairs, hardware or timing constraints
+  change. Compiler estimates remain uncharacterized. Fresh native/reset/
+  reload and connected timing are mandatory after any fitting compile.
+
 ## D-178: Prove an unconditional timer enable with the registered SPI pulse
+
+- **Hosted direct proof passes:**45896227988 at3cc674a6, all8unbounded
+  PDR cases/32source tests; root complete artifact/hash/miter/XML replay.
+  This establishes only the named binary source property/configurations.
 
 - **Date:** 2026-11-26. Timing diagnosis motivates removing state-dependent
   en from the timer terminal-count cone. Stage an isolated variant of D168:

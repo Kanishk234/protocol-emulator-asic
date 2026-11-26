@@ -1,0 +1,63 @@
+{
+  "run": {
+    "id": 45896227686,
+    "head_sha": "3cc674a640893442aa3e9a07cb7b0bf29ce3788d",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_loaded_controls.yaml"
+  },
+  "passed": true,
+  "profiles": {
+    "tracks4-full": {
+      "artifact": {
+        "id": 15154365600,
+        "name": "r1-loaded-control-45896227686-tracks4-full",
+        "size_in_bytes": 3681766,
+        "digest": "sha256:4e8c5b7bf591769e4eb3e7cd6d9aed121867cf24638c222fdfa0d010683e512e",
+        "source_run": 45896227686
+      },
+      "archive_verified": true,
+      "strict_smoke_cases": 1,
+      "adapter_guard_cases": 2,
+      "rechecked_input_hashes": 47,
+      "model_sha256": "0fce259fb736ad23f08c4e1a8d557d2d49fca4742759d8a3a4f4f558c51537b1",
+      "original_image_sha256": "36aaad90de9c80588ef61476cf29ab2a5888ad0f9c79e0767ab485fbef5ef70a",
+      "same_activity_as_original_control": true
+    },
+    "tracks8-full": {
+      "artifact": {
+        "id": 15154021186,
+        "name": "r1-loaded-control-45896227686-tracks8-full",
+        "size_in_bytes": 3757969,
+        "digest": "sha256:b797653759ce46f33a54def5c1232b4bcf2cd2b1df5535fc426bc296ff8345d7",
+        "source_run": 45896227686
+      },
+      "archive_verified": true,
+      "strict_smoke_cases": 1,
+      "adapter_guard_cases": 2,
+      "rechecked_input_hashes": 47,
+      "model_sha256": "bce20a681fe8594621d572a190bcfd4e9f3f094f47c73d67b4c662d3ac509e6f",
+      "original_image_sha256": "c935ca2a62b16897cc52682e4211b5d7f13c58a39c52a5d25ed8cdf48cc1e131",
+      "same_activity_as_original_control": true
+    },
+    "tracks4-radix8_2": {
+      "artifact": {
+        "id": 15153403775,
+        "name": "r1-loaded-control-45896227686-tracks4-radix8_2",
+        "size_in_bytes": 2899779,
+        "digest": "sha256:c004d662b4c49c4998be9087f6bc85412249fbe011f6b2301fc27cfaf31562a9",
+        "source_run": 45896227686
+      },
+      "archive_verified": true,
+      "strict_smoke_cases": 1,
+      "adapter_guard_cases": 2,
+      "rechecked_input_hashes": 47,
+      "model_sha256": "0db6598b69de56dcaaf6a31e8b81f8c8b652cd6def2e3f52a5dac4066edab8a9",
+      "original_image_sha256": "c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f",
+      "same_activity_as_original_control": true
+    }
+  },
+  "physical_acceptance": false,
+  "timing_acceptance": false
+}

@@ -2,6 +2,11 @@
 
 ## 178: All historical generated-RTL control profiles lose their compiler archives
 
+- **Resolved by full replay:**45896227686 at3cc674a6 passes all three
+  original profiles. Root authenticates all archives, strict smoke/adapter
+  XML,47simulation input hashes per profile and unchanged original traffic
+  windows. Receipt: reports/r1_restored_rtl_controls_45896227686.json.
+
 - **Reconstruction validated:**45895203188 atb8c23ab0 passes both
   profiles with original manifest/image bytes and current RTL assertions.
   Root rechecks archives,367/358model files, two full FASM encodings,

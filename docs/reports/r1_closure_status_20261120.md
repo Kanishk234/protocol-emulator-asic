@@ -6,12 +6,16 @@ Fresh seed2/3 compiles45892839965 pass, but native45893638442 rejects
 both on unknown host-ready. Original controls/generated RTL and all8736-bit
 audits pass; reload/timing remain blocked. D178 now tests an isolated
 unconditional timer enable with the registered pulse, requiring new direct
-equivalence/source tests before any compile or timing claim.
+equivalence/source tests before any compile or timing claim. Run45896227988
+now passes all8unbounded PDR cases and32source tests; fresh compilation is
+next, followed by separate native/reset/reload and extracted timing.
 
 Historical RTL control reconstruction45895203188 reproduces both missing
 full-radix manifests/bitstreams exactly and passes current RTL tests.
 Ordinary three-profile retrieval is restored against pinned artifacts; its
-full regression replay is next. No frozen control is replaced by a new one.
+full regression replay45896227686 passes all3profiles with exact original
+traffic windows and47input hashes independently checked per profile. No
+frozen control is replaced by a new one.
 
 Native replay44871227303 confirms the registered-tick failure. Additional
 proved isolated-input reroutes get past the initial SPI CS unknown sample

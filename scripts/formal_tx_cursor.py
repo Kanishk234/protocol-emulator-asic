@@ -13,6 +13,7 @@ def main():
         raise ValueError('Expected one module in the TX source')
     check(output, source, 'bounded', 'test_decision', 12)
     check(output, source, 'queued', 'test_second_due', 14)
+    check(output, source, 'sync_gap', 'test_decision', 18)
 
 
 def check(output, source, scenario, deadline, depth):

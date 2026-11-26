@@ -1,0 +1,588 @@
+{
+  "date": "2026-11-26",
+  "decision": "D172",
+  "accepted": false,
+  "adopted": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "trials": [
+    {
+      "name": "warp-tick-upstream-three-trial",
+      "local_only": true,
+      "changes": 22,
+      "accepted": false,
+      "sim_time_ns": "115921.0",
+      "failure": {
+        "error_type": "AssertionError",
+        "error_msg": "configured SPI CS became unknown"
+      },
+      "xml_sha256": "84b5421368ea9c5d5a408147a6d6cee9f8db364375b77979b85b280dd18afc3c",
+      "proof_sha256": "eaad34f892917ddc288e04f8c6b2b4abf571b4d164936e5f9eb929f2f898d608",
+      "actual_image_sha256": "16d7ad31430f207ad1d54b13277a2607c02f46a3fab02fb50ab73a2f7fbbd5b2",
+      "actual_configuration_bits": 8736,
+      "final_carry_and_isolation_rechecked": true,
+      "new_changes": [
+        {
+          "tile": "Tile_X2Y3_LUT4x8_ha",
+          "feature": "X2Y3.JS2END4.J2MID_CDa_BEG2",
+          "word": 273,
+          "word_bit": 24,
+          "target": [
+            "X2Y3",
+            "D",
+            2
+          ],
+          "observed_init": 0
+        },
+        {
+          "tile": "Tile_X4Y1_LUT4x8_ha",
+          "feature": "X4Y1.W2MID1.J2MID_EFb_BEG2",
+          "word": 509,
+          "word_bit": 12,
+          "target": [
+            "X4Y1",
+            "F",
+            2
+          ],
+          "observed_init": 65535
+        },
+        {
+          "tile": "Tile_X4Y1_LUT4x8_ha",
+          "feature": "X4Y1.W2END1.J2END_EF_BEG3",
+          "word": 509,
+          "word_bit": 29,
+          "target": [
+            "X4Y1",
+            "F",
+            3
+          ],
+          "observed_init": 65535
+        }
+      ]
+    },
+    {
+      "name": "warp-tick-upstream-eleven-trial",
+      "local_only": true,
+      "changes": 30,
+      "accepted": false,
+      "sim_time_ns": "115981.0",
+      "failure": {
+        "error_type": "AssertionError",
+        "error_msg": "configured host-write ready became unknown"
+      },
+      "xml_sha256": "22c0d251b9e4a301faa2c510c5ab45b7ad0f2bcdf83e0a5dfd5fb6e1f9bcfdc8",
+      "proof_sha256": "b4db895f29650e3b9da61c1761e24273f9ac3155ff14ca318bb5331ff4c7e596",
+      "actual_image_sha256": "09ed7186e6f12e0c3dd3eb5e676485eb323776e4166222089480ec0382ea7a2c",
+      "actual_configuration_bits": 8736,
+      "final_carry_and_isolation_rechecked": true,
+      "new_changes": [
+        {
+          "tile": "Tile_X2Y3_LUT4x8_ha",
+          "feature": "X2Y3.JS2END4.J2MID_CDa_BEG2",
+          "word": 273,
+          "word_bit": 24,
+          "target": [
+            "X2Y3",
+            "D",
+            2
+          ],
+          "observed_init": 0
+        },
+        {
+          "tile": "Tile_X4Y1_LUT4x8_ha",
+          "feature": "X4Y1.W2MID1.J2MID_EFb_BEG2",
+          "word": 509,
+          "word_bit": 12,
+          "target": [
+            "X4Y1",
+            "F",
+            2
+          ],
+          "observed_init": 65535
+        },
+        {
+          "tile": "Tile_X4Y1_LUT4x8_ha",
+          "feature": "X4Y1.W2END1.J2END_EF_BEG3",
+          "word": 509,
+          "word_bit": 29,
+          "target": [
+            "X4Y1",
+            "F",
+            3
+          ],
+          "observed_init": 65535
+        },
+        {
+          "tile": "Tile_X5Y3_LUT4x8_ha",
+          "feature": "X5Y3.W2END1.J2END_EF_BEG3",
+          "word": 627,
+          "word_bit": 29,
+          "target": [
+            "X5Y3",
+            "F",
+            3
+          ],
+          "observed_init": 14906
+        },
+        {
+          "tile": "Tile_X1Y1_LUT4x8_ha",
+          "feature": "X1Y1.S2MID3.J2MID_CDb_BEG1",
+          "word": 149,
+          "word_bit": 7,
+          "target": [
+            "X1Y1",
+            "C",
+            1
+          ],
+          "observed_init": 85
+        },
+        {
+          "tile": "Tile_X3Y3_LUT4x8_ha",
+          "feature": "X3Y3.E2END3.J2END_GH_BEG0",
+          "word": 387,
+          "word_bit": 30,
+          "target": [
+            "X3Y3",
+            "G",
+            0
+          ],
+          "observed_init": 240
+        },
+        {
+          "tile": "Tile_X3Y2_LUT4x8_ha",
+          "feature": "X3Y2.E2END3.J2END_GH_BEG0",
+          "word": 388,
+          "word_bit": 30,
+          "target": [
+            "X3Y2",
+            "G",
+            0
+          ],
+          "observed_init": 49344
+        },
+        {
+          "tile": "Tile_X4Y3_LUT4x8_ha",
+          "feature": "X4Y3.J2END_CD_END3.LC_I3",
+          "word": 519,
+          "word_bit": 17,
+          "target": [
+            "X4Y3",
+            "C",
+            3
+          ],
+          "observed_init": 2056
+        },
+        {
+          "tile": "Tile_X3Y3_LUT4x8_ha",
+          "feature": "X3Y3.JN2END5.J2MID_EFa_BEG0",
+          "word": 393,
+          "word_bit": 26,
+          "target": [
+            "X3Y3",
+            "F",
+            0
+          ],
+          "observed_init": 65532
+        },
+        {
+          "tile": "Tile_X1Y2_LUT4x8_ha",
+          "feature": "X1Y2.J_l_EF_END3.LF_I3",
+          "word": 154,
+          "word_bit": 3,
+          "target": [
+            "X1Y2",
+            "F",
+            3
+          ],
+          "observed_init": 47288
+        },
+        {
+          "tile": "Tile_X1Y2_LUT4x8_ha",
+          "feature": "X1Y2.J2END_GH_END3.LH_I3",
+          "word": 154,
+          "word_bit": 15,
+          "target": [
+            "X1Y2",
+            "H",
+            3
+          ],
+          "observed_init": 61680
+        }
+      ]
+    },
+    {
+      "name": "warp-tick-upstream-fourteen-trial",
+      "local_only": true,
+      "changes": 33,
+      "accepted": false,
+      "sim_time_ns": "115981.0",
+      "failure": {
+        "error_type": "AssertionError",
+        "error_msg": "configured host-write ready became unknown"
+      },
+      "xml_sha256": "b55ab0d10bc3323a42082e304c423ec9fa4e159a7eec356815f7b329e06767ad",
+      "proof_sha256": "b11c703c61a7aed2c594ef02b3188a5d740511d0b4385c2057e037f7da6de3b6",
+      "actual_image_sha256": "637897e7d3f36f6670a0aadad69a004a5edcef46c109122dd42d50d2b06be678",
+      "actual_configuration_bits": 8736,
+      "final_carry_and_isolation_rechecked": true,
+      "new_changes": [
+        {
+          "tile": "Tile_X2Y3_LUT4x8_ha",
+          "feature": "X2Y3.JS2END4.J2MID_CDa_BEG2",
+          "word": 273,
+          "word_bit": 24,
+          "target": [
+            "X2Y3",
+            "D",
+            2
+          ],
+          "observed_init": 0
+        },
+        {
+          "tile": "Tile_X4Y1_LUT4x8_ha",
+          "feature": "X4Y1.W2MID1.J2MID_EFb_BEG2",
+          "word": 509,
+          "word_bit": 12,
+          "target": [
+            "X4Y1",
+            "F",
+            2
+          ],
+          "observed_init": 65535
+        },
+        {
+          "tile": "Tile_X4Y1_LUT4x8_ha",
+          "feature": "X4Y1.W2END1.J2END_EF_BEG3",
+          "word": 509,
+          "word_bit": 29,
+          "target": [
+            "X4Y1",
+            "F",
+            3
+          ],
+          "observed_init": 65535
+        },
+        {
+          "tile": "Tile_X5Y3_LUT4x8_ha",
+          "feature": "X5Y3.W2END1.J2END_EF_BEG3",
+          "word": 627,
+          "word_bit": 29,
+          "target": [
+            "X5Y3",
+            "F",
+            3
+          ],
+          "observed_init": 14906
+        },
+        {
+          "tile": "Tile_X1Y1_LUT4x8_ha",
+          "feature": "X1Y1.S2MID3.J2MID_CDb_BEG1",
+          "word": 149,
+          "word_bit": 7,
+          "target": [
+            "X1Y1",
+            "C",
+            1
+          ],
+          "observed_init": 85
+        },
+        {
+          "tile": "Tile_X3Y3_LUT4x8_ha",
+          "feature": "X3Y3.E2END3.J2END_GH_BEG0",
+          "word": 387,
+          "word_bit": 30,
+          "target": [
+            "X3Y3",
+            "G",
+            0
+          ],
+          "observed_init": 240
+        },
+        {
+          "tile": "Tile_X3Y2_LUT4x8_ha",
+          "feature": "X3Y2.E2END3.J2END_GH_BEG0",
+          "word": 388,
+          "word_bit": 30,
+          "target": [
+            "X3Y2",
+            "G",
+            0
+          ],
+          "observed_init": 49344
+        },
+        {
+          "tile": "Tile_X4Y3_LUT4x8_ha",
+          "feature": "X4Y3.J2END_CD_END3.LC_I3",
+          "word": 519,
+          "word_bit": 17,
+          "target": [
+            "X4Y3",
+            "C",
+            3
+          ],
+          "observed_init": 2056
+        },
+        {
+          "tile": "Tile_X3Y3_LUT4x8_ha",
+          "feature": "X3Y3.JN2END5.J2MID_EFa_BEG0",
+          "word": 393,
+          "word_bit": 26,
+          "target": [
+            "X3Y3",
+            "F",
+            0
+          ],
+          "observed_init": 65532
+        },
+        {
+          "tile": "Tile_X1Y2_LUT4x8_ha",
+          "feature": "X1Y2.J_l_EF_END3.LF_I3",
+          "word": 154,
+          "word_bit": 3,
+          "target": [
+            "X1Y2",
+            "F",
+            3
+          ],
+          "observed_init": 47288
+        },
+        {
+          "tile": "Tile_X1Y2_LUT4x8_ha",
+          "feature": "X1Y2.J2END_GH_END3.LH_I3",
+          "word": 154,
+          "word_bit": 15,
+          "target": [
+            "X1Y2",
+            "H",
+            3
+          ],
+          "observed_init": 61680
+        },
+        {
+          "tile": "Tile_X1Y2_LUT4x8_ha",
+          "feature": "X1Y2.S2MID3.J2MID_GHb_BEG1",
+          "word": 148,
+          "word_bit": 15,
+          "target": [
+            "X1Y2",
+            "H",
+            1
+          ],
+          "observed_init": 61680
+        },
+        {
+          "tile": "Tile_X3Y2_LUT4x8_ha",
+          "feature": "X3Y2.J2MID_GHb_END0.LH_I0",
+          "word": 394,
+          "word_bit": 12,
+          "target": [
+            "X3Y2",
+            "H",
+            0
+          ],
+          "observed_init": 49344
+        },
+        {
+          "tile": "Tile_X4Y3_LUT4x8_ha",
+          "feature": "X4Y3.J_l_EF_END0.LE_I0",
+          "word": 519,
+          "word_bit": 26,
+          "target": [
+            "X4Y3",
+            "E",
+            0
+          ],
+          "observed_init": 3276
+        }
+      ]
+    }
+  ],
+  "finding": "Three selectors retain SPI CS failure at115921ns. Eleven and fourteen extra selectors reach115981ns then fail host-write ready. No complete UART/SPI/reset/reload pass; extracted timing not run.",
+  "retained_baseline_audit": {
+    "passed": true,
+    "leaf_contexts": 26,
+    "grid_instances": 40,
+    "prepared_hashes": 88,
+    "source_runs": {
+      "baseline": "40013513454",
+      "critical": "40030916359",
+      "remaining": "40033384495"
+    },
+    "wire_feedthroughs_with_guides": 52,
+    "scope": "Global-route leaf evidence only; no whole-chip, detailed routing, management shell or timing acceptance.",
+    "native_exports": {
+      "PRIM2T2S": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-leaf-40030916359-primitive1/native/width164_64/10-openroad-detailedplacement/PRIM2T2S.nl.v",
+        "sha256": "eae4727e546ab12e15978c780981a69b7d568222759d387f173ffbf5a0e28bf1"
+      },
+      "W_IO4": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-leaf-40030916359-west_io/native/width47_52/10-openroad-detailedplacement/W_IO4.nl.v",
+        "sha256": "979833b6a2d2b6c65067e5cd628f8812d0ab8525a52f00ab6445f7305ec620cc"
+      },
+      "SW_term": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-leaf-40030916359-southwest/native/width47_52/10-openroad-detailedplacement/SW_term.nl.v",
+        "sha256": "90a0f9a9a598ecdad2279324a85a9c200b45c6a04d2b0dd0ed44fddb88b7c0b2"
+      },
+      "NW_term": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-leaf-40030916359-northwest/native/width47_52/10-openroad-detailedplacement/NW_term.nl.v",
+        "sha256": "9998abeb3819c42ba50ab841316e6109c088f3eaad546f875ff41342c08739b3"
+      },
+      "N_IO": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-remaining-40033384495-north5/native/width154_08/10-openroad-detailedplacement/N_IO.nl.v",
+        "sha256": "e74836a3c019e84d2cf723b886a3c47ce6d82666ef9ac45cf11b14f3e936eab6"
+      },
+      "S_IO2": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-remaining-40033384495-south1/native/width164_64/10-openroad-detailedplacement/S_IO2.nl.v",
+        "sha256": "e561271cac3864b2a9d5539347e15ce6ee7c18a59e5725ec6f8742581e85b41c"
+      },
+      "LUT4x8_ha": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-remaining-40033384495-lut3/native/width154_08/10-openroad-detailedplacement/LUT4x8_ha.nl.v",
+        "sha256": "5d32817052df82d29993076e59ad4718e6c04b7d3ca86c461284681b2f3423a7"
+      },
+      "NE_term": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-remaining-40033384495-northeast/native/width68_64/4-openroad-generatepdn/NE_term.nl.v",
+        "sha256": "a3dcaff47a92d7aabc396114e6eaeae62c352565a274e5d1d83f17e01dfb842b"
+      },
+      "SE_term": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-remaining-40033384495-southeast/native/width68_64/10-openroad-detailedplacement/SE_term.nl.v",
+        "sha256": "69560dd40cd426096cc918ee149d55fa775d3c7173fca63c4fb52477b1927344"
+      },
+      "E_IO4": {
+        "path": "/tmp/warp-r1-configured-40128859740/leaves/r1-balanced-remaining-40033384495-east_io/native/width68_64/10-openroad-detailedplacement/E_IO4.nl.v",
+        "sha256": "e715751729ff6894eb362738381b82a6d5dc6f089ad9a2ec57af7c7d50bf494e"
+      }
+    },
+    "cases": [
+      {
+        "case": "east_io",
+        "utilization": 0.455741,
+        "configuration_latches": 73
+      },
+      {
+        "case": "lut0",
+        "utilization": 0.925429,
+        "configuration_latches": 438
+      },
+      {
+        "case": "lut1",
+        "utilization": 0.86392,
+        "configuration_latches": 438
+      },
+      {
+        "case": "lut2",
+        "utilization": 0.925429,
+        "configuration_latches": 438
+      },
+      {
+        "case": "lut3",
+        "utilization": 0.925429,
+        "configuration_latches": 438
+      },
+      {
+        "case": "lut4",
+        "utilization": 0.86392,
+        "configuration_latches": 438
+      },
+      {
+        "case": "lut5",
+        "utilization": 0.925429,
+        "configuration_latches": 438
+      },
+      {
+        "case": "northeast",
+        "utilization": 0,
+        "configuration_latches": 0
+      },
+      {
+        "case": "northwest",
+        "utilization": 0.0990274,
+        "configuration_latches": 4
+      },
+      {
+        "case": "north0",
+        "utilization": 0.31765,
+        "configuration_latches": 35
+      },
+      {
+        "case": "north1",
+        "utilization": 0.296537,
+        "configuration_latches": 35
+      },
+      {
+        "case": "north2",
+        "utilization": 0.31765,
+        "configuration_latches": 35
+      },
+      {
+        "case": "north3",
+        "utilization": 0.31765,
+        "configuration_latches": 35
+      },
+      {
+        "case": "north4",
+        "utilization": 0.296537,
+        "configuration_latches": 35
+      },
+      {
+        "case": "north5",
+        "utilization": 0.31765,
+        "configuration_latches": 35
+      },
+      {
+        "case": "primitive1",
+        "utilization": 0.900816,
+        "configuration_latches": 334
+      },
+      {
+        "case": "primitive4",
+        "utilization": 0.900816,
+        "configuration_latches": 334
+      },
+      {
+        "case": "southeast",
+        "utilization": 0.0657663,
+        "configuration_latches": 4
+      },
+      {
+        "case": "southwest",
+        "utilization": 0.685234,
+        "configuration_latches": 20
+      },
+      {
+        "case": "south0",
+        "utilization": 0.54817,
+        "configuration_latches": 60
+      },
+      {
+        "case": "south1",
+        "utilization": 0.511736,
+        "configuration_latches": 60
+      },
+      {
+        "case": "south2",
+        "utilization": 0.54817,
+        "configuration_latches": 60
+      },
+      {
+        "case": "south3",
+        "utilization": 0.54817,
+        "configuration_latches": 60
+      },
+      {
+        "case": "south4",
+        "utilization": 0.511736,
+        "configuration_latches": 60
+      },
+      {
+        "case": "south5",
+        "utilization": 0.54817,
+        "configuration_latches": 60
+      },
+      {
+        "case": "west_io",
+        "utilization": 0.741991,
+        "configuration_latches": 81
+      }
+    ]
+  }
+}

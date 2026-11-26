@@ -1,6 +1,24 @@
 # Bugs
 
+## 177: Historical native-control archives disappear before workflow replay
+
+- **Symptom/check:**44871205606 fails source authentication before native
+  audit/simulation. Original producer metadata matches, but the compiler
+  and mapped runs list no downloadable artifacts. This is not evidence
+  of a new RTL/native functional regression.
+- **Repair:** D173 retrieves the exact digest-pinned retained capsule and
+  restores original model/mapped/26-context files. Preserve original
+  producer checks and all independent audits/functional stages. Local
+  26-context/40-instance/88-hash audit passes; hosted replay pending.
+
+
 ## 176: Registered-tick image fails native initialization despite exact configuration
+
+- **November26:** replay44871227303 confirms the same failure. D172
+  isolated upstream selectors remove the initial SPI CS unknown sample
+  only in a combined trial; host-write ready becomes X at115981ns. Further
+  33-selector variant still fails. All8736actual bits match in each trial.
+  None is accepted; see reports/r1_upstream_input_trials_20261126.json.
 
 - **Symptom/check:**44866803565 at3127a10c fails at115921ns: UART TX
   is X at the first traffic sample. Original control and generated-RTL

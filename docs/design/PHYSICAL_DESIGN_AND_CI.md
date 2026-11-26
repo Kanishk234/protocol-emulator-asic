@@ -2,6 +2,13 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November26 follow-up:** registered-tick source proof/compile pass, but
+native44871227303 fails before timing. Isolated unused-input trials remain
+rejected on unknown host-ready despite exact8736-bit loading. D173 recovers
+expired historical native-workflow archives from the exact authenticated
+capsule; original producer/26-context audits and simulations remain required.
+No new timing result or closure claim.
+
 **November20 latest measured result:**44857324411 passes all native/reload
 cases and the complete configured timing model: four executions exit0,
 zero loops under both policies, all370FF classified/249endpoints/14235active

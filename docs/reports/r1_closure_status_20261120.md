@@ -1,6 +1,14 @@
-# R1 closure status — November 20, 2026
+# R1 closure status — updated November 26, 2026
 
 Timing is measured and still fails. R1 is experimental; G1 remains selected.
+
+Native replay44871227303 confirms the registered-tick failure. Additional
+proved isolated-input reroutes get past the initial SPI CS unknown sample
+but fail host-write ready at115981ns. All8736actual bits match in each
+local trial; none passes full traffic/reset/reload or proceeds to timing.
+See [rejected trial evidence](r1_upstream_input_trials_20261126.json).
+The historical native workflow also lost its original downloadable archives;
+D173 restores exact retained inputs and keeps every audit/simulation gate.
 The latest fixed-placement SPI image passes native/reset/reload and complete
 zero-loop timing-model checks, but setup is **−52.591743 ns** and hold is
 **−1.916775 ns** in run44857324411. It is worse than the earlier qualified

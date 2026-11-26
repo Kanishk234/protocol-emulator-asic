@@ -2,6 +2,33 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+
+## 2026-11-26 — Continue registered-tick native diagnosis and restore historical CI inputs
+
+- Cloud44871227303 confirms original control/generated RTL pass but native
+  candidate UART TX X at115921ns; timing remains skipped. Original/current
+  configuration audits remain mandatory; G1 and all constraints unchanged.
+- D172 adds a reusable proof for an existing upstream selector isolated to
+  one binary-unused LUT input. Two graph guard tests pass; actual frozen
+  inputs exercise cofactor/native-mode/frame/carry/FASM guards. Three
+  additional selectors on the19-input trial still fail SPI CS at115921ns.
+  Eight further isolated-input changes get past that sample but fail host
+  write-ready at115981ns. Three more (33total selector changes) still fail
+  the same ready sample. All three trials independently match8736actual
+  bits; final carry/isolation checks pass. Receipt:
+  reports/r1_upstream_input_trials_20261126.json. No protocol pass.
+  All42focused proof/source/timing/frame/auditor checks pass; actionlint
+  passes the changed workflow.
+- D173 repairs historical workflow input retrieval: original archive lists
+  are empty, but exact retained capsule has all original files. Independent
+  local audit passes26contexts/40instances/88prepared hashes/52wire paths.
+  Original producer gates, leaf audit and simulations stay intact; hosted
+  replay is required. BUG177 distinguishes this from native RTL failure.
+- **Boxes ticked:** none. No closure claim or adopted image. Next: inspect
+  remaining unknown ready cone, keep bounded configuration hypotheses,
+  run restored baseline in cloud, and require native/reset/reload before
+  original extracted timing. Unrelated untracked report remains untouched.
+
 ## 2026-11-20 — Trace SA native unknowns and prepare a bounded image repair
 
 - Pushed scoped tools/test/evidence commits throughd568e924. Hosted native

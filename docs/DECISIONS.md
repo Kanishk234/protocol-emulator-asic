@@ -1,5 +1,36 @@
 # Decisions
 
+## D-173: Recover original native workflow inputs from the authenticated capsule
+
+- **Date:** 2026-11-26. Native baseline44871205606 fails in source
+  authentication, before audit/simulation. Original39696703659 and
+  40013513454 artifact inventories are empty. The exact timing capsule
+  40128859740 retains model, mapped input and all26native leaf contexts.
+- Fetch that capsule through existing exact producer/archive ID, digest,
+  byte-count and safe-extraction gates. Copy only its original model/
+  mapped/leaves into the existing workflow paths. Keep original four
+  producer checks and every independent audit/simulation stage unchanged.
+- Local independent audit of retained files against the original source
+  identities passes26contexts/40instances/88prepared hashes and52wire
+  feedthroughs. Hosted replay remains required. No simulation pass or
+  timing acceptance follows from recovering inputs.
+
+## D-172: Prove isolated upstream selectors for unused LUT inputs
+
+- **Date:** 2026-11-26. Continue D171 native initialization diagnosis.
+  An alternate local input source can itself be unknown; investigate
+  existing upstream selectors whose only selected consumer is that input.
+- Require all16binary cofactors, actual FF mode, actual zero selector/
+  native latch wiring and image agreement, an existing one-bit two-way
+  selector, no active-feature/primitive-control overlap, and one acyclic
+  downstream chain ending at the unused LUT input. Recheck downstream
+  isolation and carry guards on combined images; verify complete FASM/
+  image derivation before native simulation.
+- Tools are proof/diagnostic only; they do not accept or write a chip image.
+  Local trials change configuration only. Native initialization, traffic,
+  reset/reload and original timing checks remain separate mandatory gates.
+  No hardware, production source, ABI, PDK or constraints change.
+
 ## D-171: Diagnose unused registered-LUT inputs without relaxing native acceptance
 
 - **Date:** 2026-11-20. The registered-tick source passes eight unbounded

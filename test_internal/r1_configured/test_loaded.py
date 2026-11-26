@@ -5,7 +5,7 @@ from pathlib import Path
 import cocotb
 from cocotb.handle import HierarchyObject
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge,Timer,with_timeout
+from cocotb.triggers import RisingEdge,FallingEdge,Timer,with_timeout
 from cocotb.utils import get_sim_time
 from compile.bitfile import BitFile
 
@@ -83,9 +83,21 @@ def capture_runtime(d,path):
                     except AttributeError:pass
                 flops[cell._name]=pins
         tiles[tile._name]=dict(tile_type=tile._def_name,signals=signals,flops=flops,cells=cells)
-    Path(path).write_text(json.dumps(dict(time_ns=get_sim_time(unit='ns'),
+    observed_pins={name:str(getattr(d,name).value) for name in
+                   ('clk','rst_n','h_wdata','h_wvalid','h_wready','h_rready',
+                    'h_rvalid','tx_o','cs_n_o','sck_o','mosi_o')}
+    Path(path).write_text(json.dumps(dict(time_ns=get_sim_time(unit='ns'),pins=observed_pins,
         host_ready=str(d.h_wready.value),tiles=tiles,
         scope='Native runtime observation only; no values forced or tests waived.'),indent=2,sort_keys=True)+'\n')
+
+
+async def trace_initial_traffic(d,directory):
+    """Bounded read-only observer; never changes stimulus or the clock."""
+    directory=Path(directory);directory.mkdir(parents=True,exist_ok=False)
+    for index in range(16):
+        await FallingEdge(d.clk)
+        await Timer(1,unit='ns')
+        capture_runtime(d,directory/('sample-'+str(index).zfill(2)+'.json'))
 
 @cocotb.test()
 async def loaded_concurrent_uart_spi(d):
@@ -111,6 +123,8 @@ async def loaded_concurrent_uart_spi(d):
         capture_configuration(d,os.environ['R1_CFG_SNAPSHOT'])
     if os.environ.get('R1_RUNTIME_SNAPSHOT'):
         capture_runtime(d,Path(os.environ['R1_RUNTIME_SNAPSHOT']).with_name('runtime-after-load.json'))
+    if os.environ.get('R1_RUNTIME_TRACE_DIR'):
+        cocotb.start_soon(trace_initial_traffic(d,os.environ['R1_RUNTIME_TRACE_DIR']))
 
     activity={}
     def known_pin(signal,label):

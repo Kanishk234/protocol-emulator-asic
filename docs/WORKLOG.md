@@ -5,6 +5,20 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-26 — Trace host capture and launch bounded fresh routing
 
+- Bounded local raw ungated replay still rejects host-ready at115981ns;
+  no local native pass or timing claim. Keep it as a diagnostic pending
+  hosted replay, not a reason to weaken the existing gate. All63focused
+  guards and new native-workflow lint pass.
+
+- Ungated compile45903143276 atbf3f7b66 passes original rawc6control
+  and candidate1406326c...,105/128LC/3timers/3shifts, actual bank D.
+  Root authenticates archive/all427inputs/both full encodings/source and
+  clock-only JSON changes. Receipt:
+  reports/r1_spi_tick_ungated_compile_45903143276.json. No timing claim.
+- D180 pins only that image for native/reset/reload and then original
+  connected timing. Positive new/old preparation passes; wrong timer
+  variant/type markers reject. Hardware/PDK/constraints remain unchanged.
+
 - BUG178 fully resolved: ordinary replay45896227686 at3cc674a6 passes
   all3frozen profiles. Root authenticates archives, strict XML,47inputs
   per profile and exact original traffic windows. Receipt:

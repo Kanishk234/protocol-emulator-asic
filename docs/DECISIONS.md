@@ -1,5 +1,23 @@
 # Decisions
 
+## D-180: Qualify exactly the compiled ungated timer image through native and RC gates
+
+- **Date:** 2026-11-26. Compile45903143276 atbf3f7b66 reproduces original
+  rawc6control and fits candidate1406326c... in105/128LCs/3timers/3shifts.
+  Root authenticates archive/all427inputs/both full FASM encodings/source
+  bytes/clock-only JSONs and actual bank D. Compiler estimates are still
+  uncharacterized. Receipt: reports/r1_spi_tick_ungated_compile_45903143276.json.
+- Native admission pins exact producer/head/raw image, actual seed1 and
+  clock-constraint hashes. Require candidate ungated marker true/control
+  false; type/variant mismatches reject. Actual new and original-source
+  preparations pass. No inherited selector repairs.
+- Hosted original control/candidate/reset/management reload and all8736
+  observed-bit audits remain required before original connected RC timing.
+  Add only this raw hash to timing admission. Keep20ns/0.25nsconditions,
+  all original queries/loop policies/active annotation and clock census.
+  Passive traces stay separate per raw case; no native/timing adoption
+  follows from a fitting compile or positive preparation.
+
 ## D-179: Compile only the directly proved ungated-timer source
 
 - **Date:** 2026-11-26.45896227988 at3cc674a6 passes all8unbounded PDR

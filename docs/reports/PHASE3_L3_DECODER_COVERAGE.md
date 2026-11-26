@@ -25,3 +25,13 @@ The targeted DShot and HDLC checks passed on the exact B-edge candidate in
 Verilator with sigrok enabled. DShot covered five frames at each of four
 rates, and HDLC covered the existing 100 kbit/s stuffed-frame loopback.
 The updated checks have no new routed-netlist result yet.
+
+## Qualified routed evidence
+
+The [required-sigrok 22-case replay](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44123392388) supplies the earlier coverage. The three added checks each passed on the exact [green Phase 2 routed netlist](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44189196098) using Tiny Tapeout Icarus 13. The netlist SHA-256 is `537f41adee4320df81a0b7e907f011510cc578ab3c2a17105e00a80e0bacbcc9`. Sigrok independently emitted one NEC repeat annotation from the captured ui0 waveform. Each targeted result has one pass, zero failures and zero skips among the selected cases.
+
+| Case | Local result XML SHA-256 |
+| --- | --- |
+| DShot | `bd995416fc74d4b59538970296fc5dbecbe67781989ba663c899f7f4e6d463ef` |
+| HDLC | `432955f4642fbdd86f4f9a83e472c8dbf94d20bb0ff8e453e1b5cd5c531af664` |
+| NEC repeat | `014288f018cf4755175aa88947cf4128d2968f073b6e493488b670aba93830c6` |

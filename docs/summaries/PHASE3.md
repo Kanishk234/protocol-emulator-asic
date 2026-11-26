@@ -109,3 +109,5 @@ The [four-token reduction and scratch repair](../reports/PHASE3_STATUS_MERGE_CAN
 The [D-192candidate queue and full-unit proofs](../reports/PHASE3_STATUS_MERGE_FORMAL.md) now pass unbounded with explicit interface premises, and their reachability tasks pass. Original native failure remains recorded; candidate adoption and physical qualification are still open.
 
 The exact D-192candidate also passes55/55whole-chip protocol/showcase/metamorphic scenarios under Verilator with no failures/skips. Current local candidate verification is complete; physical evaluation and official requalification are next before adoption.
+
+On November 26, the qualified routed netlist passed the added DShot, HDLC and NEC checks with sigrok enabled. Combined with the prior routed replay, this closes the protocol-level independent decoder gate. The BITSYNC replacement still needs physical qualification, and the formal, compiler, Basys 3 and final CI gates remain open. [Decoder evidence](../reports/PHASE3_L3_DECODER_COVERAGE.md)

@@ -55,10 +55,25 @@ jobs:
               assert d['head_sha']==revision and d['run_attempt']==1
               if conclusion is not None:assert d['conclusion']==conclusion
           PY
-          gh run download 39696703659 --name r1-model-qualification-39696703659-tracks4-radix8_2 --dir build/r1_post_model
-          gh run download 40013513454 --name r1-interfaces-40013513454 --dir build/r1_post_mapped
-          gh run download 40030916359 --dir build/r1_post_balanced
-          gh run download 40033384495 --dir build/r1_post_balanced
+          # The original archives expired; the authenticated timing capsule
+          # retains the same model, mapped inputs and all 26 native contexts.
+          # Keep the original producer checks above and independent audit below.
+          PYTHONPATH=tools:spikes/r1 python - <<'PY'
+          import json,os,shutil
+          from pathlib import Path
+          from assembly_fetch import api,admit_run,artifact
+          row=json.loads(Path('spikes/r1/routed_timing_sources.json').read_text())['sources']['capsule']
+          repo=os.environ['GITHUB_REPOSITORY']
+          producer=api(f'repos/{repo}/actions/runs/{row["run"]["id"]}')
+          admit_run(producer,row['run'])
+          target=Path('build/r1_post_retained');target.mkdir(parents=True,exist_ok=False)
+          capsule=artifact(repo,row['artifact'],target)/row['member']
+          for source,destination in [('model','r1_post_model'),('mapped','r1_post_mapped'),('leaves','r1_post_balanced')]:
+              shutil.copytree(capsule/source,Path('build')/destination)
+          Path('build/r1_postphysical/retained-capsule.json').write_text(json.dumps(dict(
+              producer=producer,archive=row['artifact'],
+              scope='Retained original inputs only; original 26-context audit and current simulation remain required.'),indent=2)+'\n')
+          PY
           bash spikes/cloud/fetch_pdk.sh
           mkdir -p "$HOME/.cache/warp/iverilog-13"
           curl -sfL https://github.com/TinyTapeout/iverilog/releases/download/v13.0/iverilog_13.0-1_amd64.deb -o /tmp/r1-post-iverilog13.deb

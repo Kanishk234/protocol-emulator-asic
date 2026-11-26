@@ -1,7 +1,9 @@
 import pytest
 
 import tripc
-from tripc.periodic_channel import analyze_compiled_channel, analyze_periodic_channel
+from tripc.periodic_channel import (
+    analyze_compiled_channel, analyze_compiled_pipeline, analyze_periodic_channel,
+)
 
 
 @pytest.mark.parametrize('arrival_phase,service_phase,expected', [
@@ -110,7 +112,6 @@ def test_two_stage_pipeline_against_compiled_chip():
     from itertools import product
     from math import lcm
 
-    from tripc.periodic_channel import analyze_periodic_pipeline
     from tripsim import Chip
 
     image, _ = tripc.compile_text("""program scheduled
@@ -138,12 +139,52 @@ lane L0:
             chip.host_fifo_depth = int(clock % service == service_phase)
             chip.step()
             chip.host_out.clear()
-        actual = analyze_periodic_pipeline(
-            arrivals, service, arrival_phase=arrival_phase,
-            service_phase=service_phase, fire_period=cadence)
+        actual = analyze_compiled_pipeline(image, {
+            'lane': 'L0', 'arrival_period': arrivals, 'service_period': service,
+            'arrival_phase': arrival_phase, 'service_phase': service_phase, 'fire_period': cadence,
+        })
+        assert actual.pop('lane') == 'L0'
+        assert actual.pop('input') == 'L0.I0'
+        assert actual.pop('output') == 'L0.O0'
         observed.add(actual['status'])
         if first_overrun is None:
             assert actual['status'] == 'no_overrun'
         else:
             assert actual == {'status': 'overrun', 'clock': first_overrun}
     assert observed == {'overrun', 'no_overrun'}
+
+
+@pytest.mark.parametrize('arrival,expected_exit,status', [(4, 0, 'no_overrun'), (1, 2, 'overrun')])
+def test_pipeline_schedule_cli(tmp_path, monkeypatch, capsys, arrival, expected_exit, status):
+    import json
+    import sys
+
+    from tripc.__main__ import main
+
+    program = tmp_path / 'pipeline.trw'
+    program.write_text("""program pipeline
+connect L0.I1 <- HOST_IN
+connect HOST_OUT <- L0.O1
+lane L0:
+    slot urgent: do MOV O1 <- I1, deq
+""")
+    schedule = tmp_path / 'schedule.json'
+    schedule.write_text(json.dumps({'lane': 'L0', 'arrival_period': arrival, 'service_period': 1}))
+    monkeypatch.setattr(sys, 'argv', ['tripc', str(program), '--pipeline-schedule', str(schedule)])
+    assert main() == expected_exit
+    output = capsys.readouterr().out
+    assert 'Declared pipeline schedule' in output
+    assert f'"status": "{status}"' in output
+    assert '"input": "L0.I1"' in output
+    assert '"output": "L0.O1"' in output
+
+
+def test_pipeline_rejects_conditional_lane():
+    image, _ = tripc.compile_text("""program guarded
+connect L0.I0 <- HOST_IN
+connect HOST_OUT <- L0.O0
+lane L0:
+    slot urgent: when I0 is DATA do MOV O0 <- I0, deq
+""")
+    with pytest.raises(ValueError, match='unconditional forwarding slot'):
+        analyze_compiled_pipeline(image, {'lane': 'L0', 'arrival_period': 4, 'service_period': 1})

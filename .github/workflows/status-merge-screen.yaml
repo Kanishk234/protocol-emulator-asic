@@ -12,6 +12,7 @@ on:
           - root-mode
           - root-mode-fanout7
           - root-mode-b-edge
+          - root-mode-b-edge-period
           - root-mode-synth
           - root-mode-b-edge-synth
 permissions:

@@ -1,0 +1,7 @@
+--- a/src/trw_pin_cfg.v
++++ b/src/trw_pin_cfg.v
+@@ -205 +205,3 @@
+-                        if ((16*w + b) == `TRW_PC_IDLE_LSB) begin : g_timing_ff
++                        if ((16*w + b) == `TRW_PC_IDLE_LSB ||
++                            (FULL != 0 && (16*w + b) >= `TRW_PC_PERIOD_LSB &&
++                             (16*w + b) < `TRW_PC_PERIOD_LSB + 8)) begin : g_timing_ff

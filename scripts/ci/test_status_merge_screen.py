@@ -148,3 +148,14 @@ def test_b_edge_synthesis_trial_changes_only_two_pin_rtl_files(tmp_path):
     physical = tmp_path / 'root-mode-b-edge'
     screen.prepare(physical, variant=physical.name)
     assert screen.check_inputs(physical)['candidate_inputs'] == after
+
+
+def test_period_trial_changes_only_b_edge_pin_config(tmp_path):
+    base = tmp_path / 'root-mode-b-edge'
+    trial = tmp_path / 'root-mode-b-edge-period'
+    screen.prepare(base, variant=base.name)
+    screen.prepare(trial, variant=trial.name)
+    before = screen.check_inputs(base)['candidate_inputs']
+    after = screen.check_inputs(trial)['candidate_inputs']
+    assert before.keys() == after.keys()
+    assert {name for name in before if before[name] != after[name]} == {'src/trw_pin_cfg.v'}

@@ -1,6 +1,7 @@
 import pytest
 
-from tripc.periodic_channel import analyze_periodic_channel
+import tripc
+from tripc.periodic_channel import analyze_compiled_channel, analyze_periodic_channel
 
 
 @pytest.mark.parametrize('arrival_phase,service_phase,expected', [
@@ -38,12 +39,18 @@ def test_all_short_schedules_against_fabric():
 
     from tripsim.fabric import Fabric
 
-    schedules = [(period, phase) for period in range(1, 8) for phase in range(period)]
+    image, _ = tripc.compile_text("""program scheduled
+connect L0.I0 <- HOST_IN
+connect L1.I0 <- HOST_IN tap
+""")
+    schedules = [(period, phase) for period in range(1, 15) for phase in range(period)]
     for (arrivals, arrival_phase), (service, service_phase) in product(schedules, repeat=2):
         fabric = Fabric()
-        producer = fabric.producer('producer')
-        consumer = fabric.port('consumer')
-        fabric.connect('consumer', 'producer')
+        producer = fabric.producer('HOST_IN')
+        consumer = fabric.port('L0.I0')
+        fabric.port('L1.I0')
+        for port, source, mode, accept in image['connect']:
+            fabric.connect(port, source, mode, accept)
         first_overrun = None
         for clock in range(2 * lcm(arrivals, service)):
             if clock % arrivals == arrival_phase:
@@ -55,9 +62,12 @@ def test_all_short_schedules_against_fabric():
                 consumer.take()
             fabric.commit()
 
-        actual = analyze_periodic_channel(
-            arrivals, service, arrival_phase=arrival_phase, service_phase=service_phase
-        )
+        actual = analyze_compiled_channel(image, {
+            'consumer': 'L0.I0', 'arrival_period': arrivals, 'arrival_phase': arrival_phase,
+            'service_period': service, 'service_phase': service_phase,
+        })
+        assert actual.pop('producer') == 'HOST_IN'
+        assert actual.pop('consumer') == 'L0.I0'
         if first_overrun is None:
             assert actual['status'] == 'no_overrun'
         else:
@@ -70,9 +80,6 @@ def test_all_short_schedules_against_fabric():
     ('', 'connect L1.I0 <- HOST_IN', 'more than one blocking consumer'),
 ])
 def test_compiled_binding_rejections(binding, other, error):
-    import tripc
-    from tripc.periodic_channel import analyze_compiled_channel
-
     image, _ = tripc.compile_text(f'program binding\nconnect L0.I0 <- HOST_IN {binding}\n{other}')
     with pytest.raises(ValueError, match=error):
         analyze_compiled_channel(image, {'consumer': 'L0.I0', 'arrival_period': 3, 'service_period': 3})

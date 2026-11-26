@@ -37,3 +37,23 @@ def test_bounded_seed_admission_rejects_wrong_identity(tmp_path,mutation):
     with pytest.raises(ValueError):
         prepare(tmp_path/'capsule',tmp_path/'native',trial,tmp_path/'out',trial_kind='spi_tick_seed2')
     assert not (tmp_path/'out').exists()
+
+
+@pytest.mark.parametrize('case,wrong',[('candidate',False),('candidate',1),('control',True)])
+def test_ungated_source_marker_cannot_reuse_other_variant(tmp_path,case,wrong):
+    catalog=json.loads((ROOT/'spikes/r1/spi_tick_ungated_compile_sources.json').read_text())
+    expected=catalog['seeds']['1'];common=dict(run=str(catalog['run']['id']),
+        source_sha=catalog['run']['head_sha'],actual_native_loading=False,
+        model_timing_characterized=False,placement_seed=1)
+    cases={'control':dict(common,ungated_timer=False,
+              image_sha256='c6b96ef02d052b405f58b9742acbff02c0fd0c4e31f6d278e09649d1a5e6991f'),
+           'candidate':dict(common,ungated_timer=True,image_sha256=expected['image_sha256'],
+              clock_constraint=expected['clock_constraint'])}
+    cases[case]['ungated_timer']=wrong
+    for name,data in cases.items():
+        folder=tmp_path/'trial'/name;folder.mkdir(parents=True)
+        (folder/'result.json').write_text(json.dumps(data))
+    with pytest.raises(ValueError,match='Ungated timer source identity differs'):
+        prepare(tmp_path/'capsule',tmp_path/'native',tmp_path/'trial',tmp_path/'out',
+                trial_kind='spi_tick_ungated')
+    assert not (tmp_path/'out').exists()

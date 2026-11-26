@@ -15,11 +15,15 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
     capsule,native,trial,out=(Path(p).resolve() for p in (capsule,native,trial,out))
     trial_inputs=[trial/'result.json']
     seed_row=None
-    if trial_kind in ('spi_tick_seed2','spi_tick_seed3'):
-        catalog_path=Path(__file__).with_name('spi_tick_seed_compile_sources.json')
-        catalog=json.loads(catalog_path.read_text());seed=int(trial_kind[-1])
+    fresh_tick_kinds={'spi_tick_seed2':('spi_tick_seed_compile_sources.json',2),
+                      'spi_tick_seed3':('spi_tick_seed_compile_sources.json',3),
+                      'spi_tick_ungated':('spi_tick_ungated_compile_sources.json',1)}
+    if trial_kind in fresh_tick_kinds:
+        filename,seed=fresh_tick_kinds[trial_kind]
+        catalog_path=Path(__file__).with_name(filename)
+        catalog=json.loads(catalog_path.read_text())
         seed_row=catalog['seeds'][str(seed)]
-    if trial_kind in ('spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3'):
+    if trial_kind in ('spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_tick_ungated'):
         trial_inputs=[trial/name/'result.json' for name in ('control','candidate')]
         cases={name:json.loads(path.read_text()) for name,path in zip(('control','candidate'),trial_inputs)}
         source_run,source_sha = (('44864499317','1d149b74550d3f217520c968371dec855dd4a300')
@@ -31,6 +35,9 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
                 raise ValueError('Bounded tick compiler seed differs')
             if cases['candidate'].get('clock_constraint')!=seed_row['clock_constraint']:
                 raise ValueError('Bounded tick clock constraint differs')
+            if trial_kind=='spi_tick_ungated' and any(cases[name].get('ungated_timer') is not expected
+                    for name,expected in (('control',False),('candidate',True))):
+                raise ValueError('Ungated timer source identity differs')
             trial_inputs.append(catalog_path)
         if any(str(row['run'])!=source_run or row['source_sha']!=source_sha or
                row['actual_native_loading'] or row['model_timing_characterized'] for row in cases.values()):
@@ -157,7 +164,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_clock_d','spi_clock_fixed'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_tick_ungated','spi_clock_d','spi_clock_fixed'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

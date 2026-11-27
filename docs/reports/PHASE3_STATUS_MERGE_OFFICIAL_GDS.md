@@ -67,3 +67,53 @@ The simulation source hashes match the staged inputs from synthesis run 44863438
 | Lean pin unit | `bb0e02fd49e191e61ecba9f7cb43f09df6b5ef994db335b269a7c985317239f5` |
 | Full pin unit | `072a605f5257fab6a3134d9388d1a5f81cfe563e0ed0c91950623fea55738577` |
 | Whole-chip L3 | `cdb15f92fd9275dbf279d48ee86c53033c45f1406f04128a26ae22677b2e9d19` |
+
+## Passing B-edge screen and official trial
+
+[Run 44864256912](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44864256912) passed the pre-routing audit with +2.042368 ns estimated slow functional setup reserve, +0.114573 ns fast hold, zero timing or electrical gate failures, zero antenna violations and zero preceding full-route overflow. The final pre-routing state contains 43,173 standard cells and 12,299 timing-repair buffers. Verified the screen result against its trial and engine hashes and matched all screened input hashes to the synthesis artifact. The exact four changed RTL files were published as ad30aad on `tripwire/d192-b-edge`. The unchanged [official GDS workflow 44871062205](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/44871062205) started on that branch. Extracted timing, detailed-route violations and official downstream jobs remain pending.
+
+## B-edge extracted setup failure
+
+Official run 44871062205 completed Build GDS with a setup failure. The
+final metrics report zero route DRC, antenna, electrical and KLayout DRC
+violations. Fast hold is +0.106438 ns. Precheck, gate-level tests and viewer
+were skipped. The slow-corner max-path report shows all six violations
+launching from `_50125_`, U0's configuration latch for `PERIOD[1]`.
+
+| Capture register | Slow setup slack |
+| --- | ---: |
+| U0 BITSYNC `ts_p` | −0.064993 ns |
+| Fabric consumer 0 `last_seq` | −0.270084 ns |
+| Fabric consumer 1 `last_seq` | −0.239508 ns |
+| Fabric consumer 2 `last_seq` | −0.280696 ns |
+| Fabric consumer 3 `last_seq` | −0.334733 ns |
+| Fabric consumer 8 `last_seq` | −0.890324 ns |
+
+The endpoint names come from the final netlist. The common hold cell
+`hold10175` adds 1.090065 ns on the worst setup path. Three downstream
+hold cells add another 1.889703 ns on that path. Removing those cells would
+change hold closure. The targeted scratch trial uses enabled root-clock
+flops for the eight fractional PERIOD bits in the full pin unit, following
+the existing IDLE write-edge behavior. Verify the phase behavior and
+re-measure hold before any physical adoption.
+
+The fractional PERIOD storage [screen 45889902134](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45889902134) passed with +1.918533 ns estimated slow functional setup reserve, +0.133569 ns fast hold, zero electrical and antenna violations, and zero preceding full-route overflow. The staged inputs matched the screen's complete candidate digest map. The exact candidate was committed at 9d9d1e1 on `tripwire/d192-period-root`, with only `trw_pin_cfg.v` changed among physical inputs compared with the earlier B-edge trial. The unchanged [official run 45900025983](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45900025983) started. Extracted timing and downstream checks remain pending.
+
+## Fractional PERIOD extracted result
+
+[Run 45900025983](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45900025983) completed detailed routing and missed slow setup at −0.831264 ns, with nine violating endpoints. Fast hold was +0.163210 ns. Electrical, antenna, detailed-route DRC and KLayout DRC counts were zero, and the LVS step was clear. Precheck, gate-level test and viewer were skipped.
+
+The extracted reports and final netlist show that all nine failures launch from U0 BITSYNC `drv_b` (`_48304_`) and share `hold10980`. The capture set is U0 BITSYNC `tb[24:22]`, U2 RX `rt[23]`, fabric consumer 0/2/8 `last_seq` and consumer 0/2 `pending_drop_n`. The earlier `PERIOD[1]` latch is absent from the failing path set. The worst `drv_b` to `tb[24]` path includes the common hold cell, several distribution buffers and two downstream hold cells. Evaluate the shared launch and pad-feedback segment before staging any further variant.
+
+All nine failing paths share the distribution prefix ending at
+`net12980`. Eight enter the AND3 at `_25188_`, and the U2 RX path enters
+its NAND3 counterpart at `_25189_`. Both cells combine the distributed
+`drv_b` with the registered SE0 state. A scoped induction proof on the
+exact candidate proved `se0_r -> drv` after reset, so the extra
+`drv &&` is redundant at `tx_se0`. The one-line variant passed all 60
+full pin-unit cases and 54 CI-helper tests. Diagnostic commit c071211
+launched [screen 45921497134](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45921497134)
+with only that BITSYNC RTL difference over the prior physical candidate.
+The mask-based self-drive comparator prototype remains parked.
+
+The SE0 follow-up [screen 45921497134](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45921497134) passed the repeated all-corner checks. It reported +2.485875 ns slow functional setup reserve, +0.120712 ns fast hold, zero slew/capacitance/fanout and antenna violations, and zero preceding full-route overflow. All 35 candidate input hashes matched the download. Relative to prior official trial 9d9d1e1, the only physical-input change is the one-line redundant SE0 qualifier removal in `trw_pin_bs.v`. Official GDS workflow bytes match. The screen stops before detailed routing and extraction. The exact follow-up patch is staged locally under `build/` for isolated official qualification.

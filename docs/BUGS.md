@@ -572,3 +572,15 @@ Candidate-branch formal run 44871062203 stopped with an elaboration error in RX 
 ### NEC L3 capture probed the wrong pad bus
 
 The NEC repeat test drove ui0 and checked the resulting EVENT, but its unused capture probe read bit zero of the bidirectional pad bus. The test now records ui0 and checks the captured repeat with the installed sigrok NEC decoder. The EVENT check remains in place.
+
+### Host halted-write requirement and RTL disagree
+
+The F-HOST-1 review found that the host decoder gates slot writes with the
+target lane's RUN bit, but pin configuration strobes and host SRAM requests
+have no equivalent RUN check. A scratch Icarus SPI probe using the native
+host harness ran lane 0, confirmed its slot write was dropped, observed a
+pin configuration strobe, and read back a newly written SRAM word while
+lane 0 was still running. This reproduces the mismatch with Architecture
+§9. F-HOST-1 stays open. No fix has landed. Before changing hardware,
+identify the affected lanes for shared SRAM and pin units and audit any
+existing firmware that writes these resources while a lane is running.

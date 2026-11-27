@@ -27,3 +27,43 @@ This preflight excludes board I/O mapping and physical implementation.
 D-022 still names three lanes and six pin units. Before closing the
 Basys 3 gate, resolve the intended size and validate the board pin map,
 clocking, bitstream and 50 MHz routed timing for that target.
+
+
+The board adapter in `fpga/basys3/tripwire_basys3.v` maps inputs to JA,
+outputs to JB and bidirectional pads to JC, each in the header's
+1–4, 7–10 order. For the SPI host, CS_n, SCK and MOSI are JA7, JA8 and JA9,
+MISO is JB4, and IRQ is JB9. The matching XDC uses the
+[Digilent Basys 3 rev B map](https://github.com/Digilent/digilent-xdc/blob/master/Basys-3-Master.xdc).
+The clock constraint is 10 ns at W5. The MMCM multiplies by 10 and divides
+by 20 to yield 50 MHz. The center button or loss of lock asserts reset,
+and the chip leaves reset after two 50 MHz edges. The adapter disables
+bidirectional output drivers while reset is asserted.
+
+Use `python scripts/check_basys3_synthesis.py --board` in the project
+venv to map the board top. The synthesis check requires one clock
+manager, eight bidirectional buffers and one block RAM. A local Icarus
+smoke test with behavioral primitive stubs exercised lock and button
+reset, synchronized release and direction control. Board implementation
+and 50 MHz routed timing remain unverified.
+
+With Vivado and its Artix-7 device support available, run
+`python scripts/build_basys3.py` from the project venv. The runner imports
+the project's source list and builds for the Basys 3
+[XC7A35T-1CPG236C](https://digilent.com/reference/_media/reference/programmable-logic/basys-3/basys3_rm.pdf).
+Each run writes its route status, utilization, timing and DRC reports and
+routed checkpoint to a fresh directory under `build/`. The Tcl driver
+checks the generated 20 ns clock and internal setup and hold slack
+before writing the bitstream. Pmod timing depends on external equipment,
+so inspect the unconstrained paths in the timing report when planning
+a board test. The Tcl driver and XDC ran with stub commands that checked
+package-pin uniqueness and verified that negative hold slack and an
+incorrect clock period prevent bitstream generation. Vivado was absent
+locally, so actual implementation and timing remain open.
+
+The runner also detects Windows Vivado under WSL. It checks the AMD and
+legacy Xilinx install layouts on C:, starts the batch file through
+`cmd.exe` from `/mnt/c`, and passes translated source and output paths
+to Tcl. Windows Vivado 2025.2 opened the WSL source tree and entered
+Artix-7 synthesis. The first live run exposed an XDC parsing restriction
+and Vivado's MMCM primitive rewrite. The corrected XDC uses explicit
+package assignments and timing checks accept the mapped MMCM primitive.

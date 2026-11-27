@@ -264,6 +264,10 @@ lane L1:
 """
     image, _ = tripc.compile_text(source)
     assert ('L1.I0', 'DATA', 'held') in list(undrainable_tags(image))
+    recurring, _ = tripc.compile_text(source.replace(
+        'when ACTIVE, I0 is DATA do MOV none <- I0, deq',
+        'when ACTIVE, I0 is DATA do MOV none <- I0, deq then IDLE',
+    ))
     for fire_period in (1, 2):
         for tags, stalled in ((('DATA',), True), (('EVENT', 'DATA'), False)):
             chip = Chip(fire_period=fire_period)
@@ -283,9 +287,14 @@ lane L1:
             chip.run_for(16)
             assert host.free() == (not stalled)
         for period in (8, 11, 16):
-            for first_tag in ('DATA', 'EVENT'):
+            for candidate, tags, overrun_index in (
+                (image, ('DATA',), 2),
+                (image, ('EVENT',) + ('DATA',) * 7, None),
+                (recurring, ('EVENT', 'DATA'), None),
+                (recurring, ('EVENT', 'DATA', 'DATA'), 4),
+            ):
                 chip = Chip(fire_period=fire_period)
-                tripc.load(chip, image)
+                tripc.load(chip, candidate)
                 host = chip.fabric.producers['HOST_IN']
                 first_overrun = None
                 for clock in range(8 * period):
@@ -293,11 +302,11 @@ lane L1:
                         if not host.free():
                             first_overrun = clock
                             break
-                        tag = first_tag if clock == 0 else 'DATA'
+                        tag = tags[(clock // period) % len(tags)]
                         host.load(TAGS[tag], clock)
                     chip.step()
-                # The stalled peer holds arrival one and HOST_IN holds arrival two.
-                assert first_overrun == (2 * period if first_tag == 'DATA' else None)
+                expected = None if overrun_index is None else overrun_index * period
+                assert first_overrun == expected, (tags, period, fire_period)
 
 
 def test_routine_state_transition_preserves_possible_dequeue():

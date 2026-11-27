@@ -1,0 +1,42 @@
+{
+  "run": 46043377371,
+  "source_sha": "16fab41dfca987ae5a7f5b698e7f47ad38003dc5",
+  "artifact_id": 15220524818,
+  "archive_sha256": "0d4e6ffacdd087892660a65114419437c30784b48a836d7d3f92d62ec9485653",
+  "archive_verified": true,
+  "actual_frame_audits": {
+    "control": {
+      "compared_configuration_bits": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+    },
+    "candidate": {
+      "compared_configuration_bits": 8736,
+      "image_sha256": "042ed50fb15748f5048fb339f8805f7d3fe7e48b3535250c75f9d1b5ee64b239",
+      "snapshot_sha256": "d177ed095779b53a088ea56db0e52773745d6ad8f3c42ce63318661d412cda3a"
+    }
+  },
+  "strict_original_control_passed": true,
+  "candidate_last_time_ns": 115921.0,
+  "candidate_last_pins": {
+    "clk": "1",
+    "cs_n_o": "1",
+    "h_rready": "0",
+    "h_rvalid": "0",
+    "h_wdata": "00000000",
+    "h_wready": "1",
+    "h_wvalid": "0",
+    "mosi_o": "1",
+    "rst_n": "1",
+    "sck_o": "0",
+    "tx_o": "1"
+  },
+  "candidate_strict_test_completed": false,
+  "management_reload_reached": false,
+  "extracted_timing_reached": false,
+  "scope": "Raw native run failed after traffic-start stall. Last snapshot is not a functional pass. Independent local delta diagnostic and repair are separate evidence.",
+  "passed": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

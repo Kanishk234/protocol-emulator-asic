@@ -1,6 +1,26 @@
 # Bugs
 
+## 180: Two-selector staging retains the raw compiler image report
+
+- **Symptom/check:**46044900302 atcc27e6df passes raw observation/proof
+  and original native control, then fails `Changed compiler image` before
+  repaired candidate simulation. Full repaired FASM encoding is correct.
+- **Cause:** helper updated bitstream/FASM and bound hashes but left the
+  copied report's bitstream SHA/CRC at the original compile values.
+- **Fix/coverage:** D185 retains original report separately, writes an
+  explicitly derived image report with current SHA/CRC/provenance and no
+  inherited compiler timing estimate. Integrity guard remains unchanged;
+  regression checks original immutability and wrong-source rejection.
+  Hosted replay remains required. Receipt:
+  reports/r1_known_input_repair_report_guard_46044900302.json.
+
 ## 179: Explicit-input image stalls at traffic start in native simulation
+
+- **Hosted raw confirmation:**46043377371 at16fab41d fails in native
+  replay. Root authenticates archive and independently verifies both8736
+  observed configuration bits/strict original control. Last candidate
+  snapshot remains115921ns; no completed candidate test/reload/timing.
+  Receipt: reports/r1_spi_tick_known_inputs_raw_native_46043377371.json.
 
 - **Symptom/check:** D182raw image3fd72f52... reaches defined idle pins
   then makes no simulation-time progress after host-valid changes at

@@ -1,5 +1,23 @@
 # Decisions
 
+## D-185: Give the repaired image a separate derived report
+
+- **Date:**2026-11-27. Hosted46044900302 atcc27e6df passes raw stall
+  observation/two-selector staging and original native control. The
+  unchanged image guard rejects candidate before simulation because its
+  copied report still hashes raw3fd72f52..., not repaired5901ac35... .
+  Receipt: reports/r1_known_input_repair_report_guard_46044900302.json.
+- Preserve the original compiler report byte for byte outside the derived
+  case, bind its SHA, and produce a separate report with repaired image
+  SHA/CRC/word count plus explicit original-image/repair provenance.
+  Clear inherited compiler Fmax and label it inapplicable to this image;
+  do not weaken the simulator's image-integrity guard. Bind both reports
+  in the native plan. Regression covers original immutability, SHA/CRC,
+  provenance, discarded timing estimate and rejection of wrong raw hash.
+- Fresh local staging passes. Native/reset/full management reload and
+  connected RC remain required on the corrected hosted replay. A staging
+  metadata failure supplies no repaired native or timing evidence.
+
 ## D-184: Require fresh raw observation before hosted two-selector qualification
 
 - **Date:**2026-11-27. A separate workflow authenticates D182sources,

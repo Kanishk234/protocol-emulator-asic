@@ -4,6 +4,21 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-27 — Explicit unused LUT input routing experiment
 
+- Repair46044900302 atcc27e6df passes raw observation/proof/control but
+  stops before repaired simulation at image-integrity guard. BUG180/D185:
+  derived bitstream retained raw compiler report SHA/CRC. Preserve original
+  report separately and bind a new derived report, clearing inherited
+  compiler timing. Guard unchanged; new report regression/14targeted tests
+  pass. Root authenticates archive/actual raw frame/complete repaired FASM.
+  Receipt: reports/r1_known_input_repair_report_guard_46044900302.json.
+
+- Raw native46043377371 at16fab41d fails after traffic-start stall.
+  Root authenticates archive, strict original control and both8736-bit
+  observations; no candidate completion/reload/timing. Receipt:
+  reports/r1_spi_tick_known_inputs_raw_native_46043377371.json.
+  D184repair46044900302 atcc27e6df is running; no hosted repair claim yet.
+  All80focused local guards pass.
+
 - D184 adds a separate hosted two-selector qualification: require fresh
   raw delta observation, strict original control and actual8736-bit frame
   agreement, then fresh exact cofactor/mode/carry/route proofs and full

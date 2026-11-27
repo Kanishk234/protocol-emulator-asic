@@ -1,0 +1,60 @@
+{
+  "run": 46044900302,
+  "source_sha": "cc27e6df26c5f969ec3d9d993536444bc8901536",
+  "artifact_id": 15222480533,
+  "archive_sha256": "8ca4fb6644ff3589db97b6aff53efc4a113d52a1d6979215587f2a98da5849fa",
+  "archive_verified": true,
+  "strict_original_control_passed": true,
+  "raw_native_frame_bits_checked": 8736,
+  "raw_delta_observation": {
+    "time_ns": 115921.0,
+    "events_at_same_time": 4096,
+    "signals": [
+      [
+        "Tile_X1Y1_LUT4x8_ha/LF_O",
+        2049
+      ],
+      [
+        "Tile_X1Y1_LUT4x8_ha/LC_O",
+        2046
+      ],
+      [
+        "Tile_X1Y1_LUT4x8_ha/LB_O",
+        1
+      ]
+    ],
+    "scope": "Passive same-time event observation only; not a loop proof or acceptance."
+  },
+  "complete_repaired_fasm_verified": true,
+  "repaired_raw_image_sha256": "5901ac357a973d4a5a72da105fd81f869be22ad0b5a5c475844cc90ddba691e7",
+  "producer_result": {
+    "run": "46044900302",
+    "source_sha": "cc27e6df26c5f969ec3d9d993536444bc8901536",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_tick_known_inputs_two_selectors",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "error": "Changed compiler image",
+    "generated_rtl_candidate": {
+      "passed": false,
+      "error": "Changed compiler image"
+    }
+  },
+  "repaired_candidate_simulated": false,
+  "root_cause": "Derived bitstream kept raw compiler report image hash; unchanged image-integrity guard rejected it before native simulation.",
+  "management_reload_reached": false,
+  "extracted_timing_reached": false,
+  "passed": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

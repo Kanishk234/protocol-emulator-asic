@@ -50,8 +50,8 @@ def forwarding_ports(words):
     return None
 
 
-def unseeded_forwarding_cycles(image, cycles):
-    """Find closed unconditional forwarding groups with no incoming token source."""
+def closed_forwarding_cycles(image, cycles):
+    """Find unconditional forwarding groups whose inputs use the whole internal ring."""
     ports = {lane: forwarding_ports(data['slots']) for lane, data in image['lanes'].items()}
     bindings = {port: (producer, mode, accept) for port, producer, mode, accept in image['connect']}
     for group in cycles:
@@ -59,7 +59,8 @@ def unseeded_forwarding_cycles(image, cycles):
             continue
         outputs = {f'{lane}.O{ports[lane][1]}' for lane in group}
         internal = {(output, 'blocking', 0xf) for output in outputs}
-        if all(bindings.get(f'{lane}.I{ports[lane][0]}') in internal for lane in group):
+        incoming = {bindings.get(f'{lane}.I{ports[lane][0]}') for lane in group}
+        if incoming == internal:
             yield group
 
 
@@ -80,9 +81,11 @@ def report_channel_graph(image):
     if stages:
         lines.append('- Service is unclassified for lanes with conditional, multiple or '
                      f'non-forwarding slots: {", ".join(stages)}.')
-    lines.extend(
-        f'- No forwarding can start from empty channels in {", ".join(group)} '
-        'under the compiled slot and binding configuration.'
-        for group in unseeded_forwarding_cycles(image, cycles)
-    )
+    for group in closed_forwarding_cycles(image, cycles):
+        group_names = ', '.join(group)
+        lines.append(f'- No forwarding can start from empty channels in {group_names} '
+                     'under the compiled slot and binding configuration.')
+        lines.append(f'- A fully occupied forwarding ring in {group_names} cannot advance '
+                     'while every internal blocking receiver is waiting on its full output. '
+                     'This check does not establish whether the full state is reachable.')
     return lines

@@ -76,3 +76,159 @@ lane L1:
     _, rewired = tripc.compile_text(source.replace('L0.I0 <- L1.O1', 'L0.I0 <- HOST_IN'))
     assert 'No forwarding can start' not in rewired
     assert 'fully occupied forwarding ring' not in rewired
+
+
+def test_accepted_tag_without_dequeuer_holds_producer():
+    from tripsim import Chip
+    from tripwire_spec import TAGS
+
+    source = """program guarded
+connect L0.I0 <- HOST_IN
+connect HOST_OUT <- L0.O0
+lane L0:
+    slot urgent: when I0 is DATA do MOV O0 <- I0, deq
+"""
+    image, report = tripc.compile_text(source)
+    warnings = [line for line in report.splitlines() if 'L0.I0 blocks its producer' in line]
+    assert any('EVENT' in line for line in warnings)
+    assert all('DATA' not in line for line in warnings)
+    no_warning = [
+        source.replace('HOST_IN', 'HOST_IN accept=DATA'),
+        source.replace('HOST_IN', 'HOST_IN tap'),
+        source + '    slot urgent: do MOV none <- I0, deq\n',
+    ]
+    for variant in no_warning:
+        assert 'L0.I0 blocks its producer' not in tripc.compile_text(variant)[1]
+
+    chip = Chip(fire_period=1)
+    tripc.load(chip, image)
+    producer = chip.fabric.producers['HOST_IN']
+    producer.load(TAGS['EVENT'], 1)
+    chip.fabric.commit()
+    chip.run_for(16)
+    assert not producer.free()
+
+    filtered, _ = tripc.compile_text(no_warning[0])
+    chip = Chip(fire_period=1)
+    tripc.load(chip, filtered)
+    producer = chip.fabric.producers['HOST_IN']
+    producer.load(TAGS['EVENT'], 1)
+    chip.fabric.commit()
+    chip.run_for(16)
+    assert producer.free()
+
+
+def test_accepted_tag_warning_uses_compiled_producer_output():
+    source = """program upstream
+connect L0.I0 <- HOST_IN
+connect L1.I0 <- L0.O1
+lane L0:
+    slot urgent: do MOV O1 <- I0, deq, tag DATA
+    slot: do MOV O0 <- zero, tag EVENT
+lane L1:
+    slot urgent: when I0 is DATA do MOV none <- I0, deq
+"""
+    assert 'L1.I0 blocks its producer' not in tripc.compile_text(source)[1]
+    for variant in (
+        source.replace('deq, tag DATA', 'deq, tag EVENT'),
+        source.replace('deq, tag DATA', 'deq, keep'),
+    ):
+        assert 'L1.I0 blocks its producer' in tripc.compile_text(variant)[1]
+    guarded_keep = source.replace('do MOV O1 <- I0, deq, tag DATA',
+                                  'when I0 is DATA do MOV O1 <- I0, deq, keep')
+    assert 'L1.I0 blocks its producer' not in tripc.compile_text(guarded_keep)[1]
+    control = source.replace('MOV O1 <- I0', 'MKCTL O1 <- I0')
+    warning = next(line for line in tripc.compile_text(control)[1].splitlines()
+                   if 'L1.I0 blocks its producer' in line)
+    assert 'CTRL' in warning
+
+
+def test_dequeue_guard_requires_reachable_state():
+    from tripsim import Chip
+    from tripwire_spec import TAGS
+
+    source = """program guarded_state
+connect L0.I0 <- HOST_IN accept=DATA
+lane L0:
+    states IDLE ACTIVE
+    slot urgent: when ACTIVE do MOV none <- I0, deq
+"""
+    image, report = tripc.compile_text(source)
+    assert 'STATE unreachable from reset' in report
+    enabled = source + '    slot: when IDLE do MOV none <- zero then ACTIVE\n'
+    enabled_image, report = tripc.compile_text(enabled)
+    assert 'STATE unreachable from reset' not in report
+    for candidate, releases in [(image, False), (enabled_image, True)]:
+        chip = Chip(fire_period=1)
+        tripc.load(chip, candidate)
+        producer = chip.fabric.producers['HOST_IN']
+        producer.load(TAGS['DATA'], 1)
+        chip.fabric.commit()
+        chip.run_for(16)
+        assert producer.free() == releases
+
+
+def test_held_tag_prevents_transition_to_dequeue_state():
+    from tripsim import Chip
+    from tripwire_spec import TAGS
+
+    source = """program blocked_transition
+connect L0.I0 <- HOST_IN accept=DATA|EVENT
+lane L0:
+    states IDLE ACTIVE
+    slot urgent: when ACTIVE, I0 is DATA do MOV none <- I0, deq
+    slot urgent: when IDLE, I0 is EVENT do MOV none <- I0, deq then ACTIVE
+"""
+    image, report = tripc.compile_text(source)
+    assert 'held tag rules out the transitions' in report
+    for tags in [['DATA'], ['EVENT', 'DATA']]:
+        chip = Chip(fire_period=1)
+        tripc.load(chip, image)
+        producer = chip.fabric.producers['HOST_IN']
+        for tag in tags:
+            producer.load(TAGS[tag], 1)
+            chip.fabric.commit()
+            chip.run_for(16)
+        assert producer.free() == (tags[0] == 'EVENT')
+
+
+def test_random_stateful_stall_warnings_match_model():
+    import random
+
+    from tripc.channel_graph import undrainable_tags
+    from tripsim import Chip
+    from tripwire_spec import TAGS
+
+    rng = random.Random(0x51A11)
+    stalls = 0
+    for _ in range(1000):
+        tag = rng.choice(list(TAGS))
+        states = [f'S{index}' for index in range(rng.randint(2, 6))]
+        slots = []
+        for state, target in zip(states, states[1:]):
+            guard_tag = rng.choice([None, tag, rng.choice(list(TAGS))])
+            guard = f', I0 is {guard_tag}' if guard_tag else ''
+            operand = 'I0' if guard_tag else 'zero'
+            slots.append(f'    slot: when {state}{guard} do MOV none <- {operand} then {target}')
+        slots.append(f'    slot: when {states[-1]}, I0 is {tag} do MOV none <- I0, deq')
+        source = '\n'.join([
+            'program randomized_state',
+            f'connect L0.I0 <- HOST_IN accept={tag}',
+            'lane L0:',
+            '    states ' + ' '.join(states),
+            *slots,
+        ])
+        image, _ = tripc.compile_text(source)
+        cadence = rng.choice([1, 2])
+        chip = Chip(fire_period=cadence)
+        tripc.load(chip, image)
+        producer = chip.fabric.producers['HOST_IN']
+        producer.load(TAGS[tag], rng.randrange(65536))
+        chip.fabric.commit()
+        chip.run_for((len(states) + 1) * cadence)
+        stalled = not producer.free()
+        stalls += stalled
+        flagged = any(port == 'L0.I0' and blocked_tag == tag
+                      for port, blocked_tag, _ in undrainable_tags(image))
+        assert flagged == stalled, source
+    assert 0 < stalls < 1000

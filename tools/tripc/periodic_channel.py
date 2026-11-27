@@ -11,34 +11,47 @@ def _validate_schedule(period, phase):
 
 
 def analyze_periodic_channel(arrival_period, service_period, *,
-                             arrival_phase=0, service_phase=0, max_cycle=100_000):
+                             arrival_phase=0, service_phase=0, max_cycle=100_000,
+                             arrival_tags=(0,), accept=0xf):
     """Analyze an initially empty, one-token channel under fixed schedules.
 
     Each arrival requests a load. A service opportunity takes the current
     token if present. A token taken at the current edge releases the producer
     for the next clock, so a simultaneous new arrival can still overrun.
     Phase offsets select the first event, relative to clock zero.
+    Arrival tags repeat in order. A rejected token releases at the next
+    edge without service, but still occupies the producer until that edge.
     """
     for period, phase in ((arrival_period, arrival_phase), (service_period, service_phase)):
         _validate_schedule(period, phase)
     if type(max_cycle) is not int or max_cycle <= 0:
         raise ValueError('Simulation limit must be a positive integer')
 
-    repeat = lcm(arrival_period, service_period)
-    occupied = False
+    if (not isinstance(arrival_tags, (list, tuple)) or not arrival_tags
+            or any(type(tag) is not int or not 0 <= tag <= 3 for tag in arrival_tags)):
+        raise ValueError('Arrival tags must be a nonempty sequence of integers from 0 to 3')
+    if type(accept) is not int or not 0 <= accept <= 0xf:
+        raise ValueError('Accept must be a four-bit mask')
+
+    repeat = lcm(arrival_period * len(arrival_tags), service_period)
+    pending = None
     seen = set()
     for clock in range(max_cycle):
         phase = clock % repeat
         if phase == 0:
-            if occupied in seen:
+            if pending in seen:
                 return {'status': 'no_overrun', 'clocks_checked': clock}
-            seen.add(occupied)
+            seen.add(pending)
         arrives = clock % arrival_period == arrival_phase
         serves = clock % service_period == service_phase
-        if arrives and occupied:
-            return {'status': 'overrun', 'clock': clock}
-        occupied = arrives or (occupied and not serves)
-    if max_cycle % repeat == 0 and occupied in seen:
+        if arrives:
+            if pending is not None:
+                return {'status': 'overrun', 'clock': clock}
+            index = clock // arrival_period % len(arrival_tags)
+            pending = bool(accept & (1 << arrival_tags[index]))
+        elif serves or pending is False:
+            pending = None
+    if max_cycle % repeat == 0 and pending in seen:
         return {'status': 'no_overrun', 'clocks_checked': max_cycle}
     return {'status': 'unknown', 'clocks_checked': max_cycle}
 
@@ -88,28 +101,30 @@ def analyze_periodic_pipeline(arrival_period, service_period, *,
 
 
 def analyze_compiled_channel(image, schedule):
-    """Check a declared schedule on a compiled, unfiltered point-to-point binding."""
+    """Check a declared schedule on a compiled point-to-point binding."""
     required = {'consumer', 'arrival_period', 'service_period'}
-    optional = {'arrival_phase', 'service_phase'}
+    optional = {'arrival_phase', 'service_phase', 'arrival_tags'}
     if not isinstance(schedule, dict) or not required <= schedule.keys() <= required | optional:
         raise ValueError('Expected consumer, arrival_period, service_period and optional phases')
     consumer = schedule['consumer']
-    producer = _blocking_producer(image, consumer)
+    producer, accept = _blocking_binding(image, consumer)
+    if accept != 0xf and 'arrival_tags' not in schedule:
+        raise ValueError('Expected an unfiltered blocking consumer or explicit arrival_tags')
     args = {key: value for key, value in schedule.items() if key != 'consumer'}
-    return {'producer': producer, 'consumer': consumer, **analyze_periodic_channel(**args)}
+    return {'producer': producer, 'consumer': consumer, **analyze_periodic_channel(accept=accept, **args)}
 
 
-def _blocking_producer(image, consumer):
+def _blocking_binding(image, consumer):
     bindings = {port: (producer, mode, accept) for port, producer, mode, accept in image['connect']}
     if not isinstance(consumer, str) or consumer not in bindings:
         raise ValueError('Expected a configured consumer port')
     producer, mode, accept = bindings[consumer]
-    if mode != 'blocking' or accept != 0xf:
-        raise ValueError('Expected an unfiltered blocking consumer')
+    if mode != 'blocking':
+        raise ValueError('Expected an unfiltered blocking consumer, or a filtered blocking consumer with arrival_tags')
     if any(port != consumer and bound_producer == producer and bound_mode == 'blocking'
            for port, (bound_producer, bound_mode, _) in bindings.items()):
         raise ValueError('Producer has more than one blocking consumer')
-    return producer
+    return producer, accept
 
 
 def analyze_compiled_pipeline(image, schedule):
@@ -130,7 +145,7 @@ def analyze_compiled_pipeline(image, schedule):
             raise ValueError(f'{lane}: expected one unconditional forwarding slot')
         inputs.append(f'{lane}.I{ports[0]}')
         outputs.append(f'{lane}.O{ports[1]}')
-    if any(_blocking_producer(image, port) != source
+    if any(_blocking_binding(image, port) != (source, 0xf)
            for port, source in zip((*inputs, 'HOST_OUT'), ('HOST_IN', *outputs))):
         raise ValueError('Expected a blocking HOST_IN to lane to HOST_OUT pipeline')
     args = {key: value for key, value in schedule.items() if key not in {'lane', 'lanes'}}

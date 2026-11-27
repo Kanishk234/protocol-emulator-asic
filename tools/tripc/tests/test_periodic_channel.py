@@ -240,3 +240,47 @@ lane L1:
         analyze_compiled_pipeline(image, {
             'lanes': ['L1', 'L0'], 'arrival_period': 4, 'service_period': 1,
         })
+
+
+def test_filtered_schedule_against_fabric():
+    from itertools import product
+    from math import lcm
+
+    from tripsim.fabric import Fabric
+
+    image, _ = tripc.compile_text(
+        'program filtered\nconnect L0.I0 <- HOST_IN accept=DATA\n'
+    )
+    port, source, mode, accept = image['connect'][0]
+    for arrivals, service, tags in product(range(1, 5), range(1, 5), product(range(4), repeat=2)):
+        for arrival_phase, service_phase in product(range(arrivals), range(service)):
+            schedule = {
+                'consumer': port, 'arrival_period': arrivals, 'service_period': service,
+                'arrival_phase': arrival_phase, 'service_phase': service_phase,
+                'arrival_tags': list(tags),
+            }
+            result = analyze_compiled_channel(image, schedule)
+            assert result['status'] in ('no_overrun', 'overrun')
+            fabric = Fabric()
+            producer = fabric.producer(source)
+            consumer = fabric.port(port)
+            fabric.connect(port, source, mode, accept)
+            first_overrun = None
+            stop = (result['clock'] + 1 if result['status'] == 'overrun'
+                    else result['clocks_checked'] + lcm(arrivals * len(tags), service))
+            for clock in range(stop):
+                if clock % arrivals == arrival_phase:
+                    if not producer.free():
+                        first_overrun = clock
+                        break
+                    producer.load(tags[(clock - arrival_phase) // arrivals % len(tags)], clock)
+                if clock % service == service_phase and consumer.avail():
+                    consumer.take()
+                fabric.commit()
+            assert first_overrun == result.get('clock'), schedule
+
+
+@pytest.mark.parametrize('tags', [[], '01', [True], [-1], [4]])
+def test_invalid_arrival_tags(tags):
+    with pytest.raises(ValueError, match='Arrival tags'):
+        analyze_periodic_channel(2, 3, arrival_tags=tags)

@@ -159,3 +159,14 @@ def test_period_trial_changes_only_b_edge_pin_config(tmp_path):
     after = screen.check_inputs(trial)['candidate_inputs']
     assert before.keys() == after.keys()
     assert {name for name in before if before[name] != after[name]} == {'src/trw_pin_cfg.v'}
+
+
+def test_se0_trial_changes_only_period_candidate_bitsync_rtl(tmp_path):
+    base = tmp_path / 'root-mode-b-edge-period'
+    trial = tmp_path / 'root-mode-b-edge-period-se0'
+    screen.prepare(base, variant=base.name)
+    screen.prepare(trial, variant=trial.name)
+    before = screen.check_inputs(base)['candidate_inputs']
+    after = screen.check_inputs(trial)['candidate_inputs']
+    assert before.keys() == after.keys()
+    assert {name for name in before if before[name] != after[name]} == {'src/trw_pin_bs.v'}

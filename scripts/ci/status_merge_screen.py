@@ -31,7 +31,7 @@ CORNERS = ('nom_fast_1p32V_m40C', 'nom_slow_1p08V_125C', 'nom_typ_1p20V_25C')
 DEFAULT_DESIGN = ROOT / 'build/status_merge_screen/design'
 SYNTH_VARIANTS = ('root-mode-synth', 'root-mode-b-edge-synth')
 VARIANTS = ('status-merge', 'root-mode', 'root-mode-fanout7', 'root-mode-b-edge',
-            'root-mode-b-edge-period', *SYNTH_VARIANTS)
+            'root-mode-b-edge-period', 'root-mode-b-edge-period-se0', *SYNTH_VARIANTS)
 
 
 def sha(path):
@@ -115,7 +115,7 @@ def prepare(design, *, variant="status-merge"):
         subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(root_mode_patch)],
                        cwd=design, check=True)
         expected['src/trw_pin_cfg.v'] = '02a63f1d46ad7360a0f9a8a56b004478b629540ce4eb25234235b7b4b9c43581'
-    if variant in ('root-mode-b-edge', 'root-mode-b-edge-synth', 'root-mode-b-edge-period'):
+    if variant.startswith('root-mode-b-edge'):
         edge_patch = patch.parent / 'b_edge/share.patch'
         if sha(edge_patch) != '02cb9e6031cf1413ef48b91c254f7c1ffe903054c0290478bfa41cb8c3f6b5d5':
             raise ValueError('B-edge patch differs from the tested candidate')
@@ -123,13 +123,20 @@ def prepare(design, *, variant="status-merge"):
                        cwd=design, check=True)
         expected['src/trw_pin_rx.v'] = '735334e1eb659bacc1eef6a63af4cb26dc78ab26841000a11d46cd144b0b761d'
         expected['src/trw_pin_unit.v'] = '6e3b4cdf98d5d89fc99c92800e23828b6ba6823eed876ce647b59783c30f3073'
-    if variant == 'root-mode-b-edge-period':
+    if variant.startswith('root-mode-b-edge-period'):
         period_patch = patch.parent / 'period_root/full_fraction.patch'
         if sha(period_patch) != 'bc5ed559101bf0d81ebaec6331d5762ebf4cf8a3358873f6c0d6195c52ec3bdb':
             raise ValueError('PERIOD patch differs from the tested candidate')
         subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(period_patch)],
                        cwd=design, check=True)
         expected['src/trw_pin_cfg.v'] = '79042fdd1f65ffb7ed1431cff806c3ab05e5e04f16f33f591ca03b10033e4c4d'
+    if variant == 'root-mode-b-edge-period-se0':
+        se0_patch = patch.parent / 'se0/drive.patch'
+        if sha(se0_patch) != '6ff5957080aef9e45d8e2f809017054d332b5cee9a813e2a4dbcf44347ace5d8':
+            raise ValueError('SE0 patch differs from the tested candidate')
+        subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(se0_patch)],
+                       cwd=design, check=True)
+        expected['src/trw_pin_bs.v'] = '4aa56240fde9420e6392e6ff3bb6d8b4c3685e7f166cb686c95b70264ca7d0f4'
     if variant == 'root-mode-fanout7':
         baseline_config = load(ROOT / 'src/config.json')
         if 'MAX_FANOUT_CONSTRAINT' in baseline_config:

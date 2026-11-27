@@ -1,0 +1,5 @@
+--- a/src/trw_pin_bs.v
++++ b/src/trw_pin_bs.v
+@@ -357 +357 @@
+-    assign tx_se0 = drv && se0_r;
++    assign tx_se0 = se0_r;

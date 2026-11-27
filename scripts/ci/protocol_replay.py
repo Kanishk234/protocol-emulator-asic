@@ -49,22 +49,22 @@ def shell_filter(shard):
 
 
 
-def validate_metadata(run,commit):
+def validate_metadata(run,commit,expected_branch='main'):
     if (run.get('status')!='completed' or run.get('conclusion')!='success'
-            or run.get('head_branch')!='main' or run.get('path')!='.github/workflows/gds.yaml'
+            or run.get('head_branch')!=expected_branch or run.get('path')!='.github/workflows/gds.yaml'
             or run.get('head_sha')!=commit.get('commit')
             or not re.fullmatch(r'[0-9a-f]{40}',str(run.get('head_sha','')))):
-        raise ValueError('Submission is not the selected successful official main run')
+        raise ValueError(f'Submission is not a successful official GDS run from {expected_branch}')
     if not str(commit.get('workflow_url','')).endswith('/runs/'+str(run['id'])):
         raise ValueError('Submission workflow identity differs')
 
 
-def prepare(candidate,submission,run,pdk_root,work):
+def prepare(candidate,submission,run,pdk_root,work,expected_branch='main'):
     import yaml
     candidate,submission,pdk_root,work=map(Path,(candidate,submission,pdk_root,work))
     package=submission/'tt_submission'
     commit=json.loads((package/'commit_id.json').read_text())
-    validate_metadata(run,commit)
+    validate_metadata(run,commit,expected_branch)
     head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=candidate,text=True).strip()
     if head!=run['head_sha']:raise ValueError('Candidate software differs from official source revision')
     pdk=json.loads((package/'pdk.json').read_text())
@@ -122,13 +122,16 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('stage',choices=['filter','prepare','receipt','aggregate'])
     p.add_argument('--shard',choices=tuple(SHARDS));p.add_argument('--candidate',default='candidate');p.add_argument('--submission',default='submission')
     p.add_argument('--pdk-root');p.add_argument('--metadata',default='build/protocol-replay/source-run.json')
-    args=p.parse_args();work=Path('build/protocol-replay')
+    p.add_argument('--expected-branch', default='main', help='Expected source branch for a local replay')
+    p.add_argument('--work-dir', type=Path, default=Path('build/protocol-replay'))
+    args=p.parse_args();work=args.work_dir
     if args.stage=='filter':
         if not args.shard:p.error('--shard required')
         print(shell_filter(args.shard));return
     if args.stage=='prepare':
         if not args.pdk_root:p.error('--pdk-root required')
-        print(json.dumps(prepare(args.candidate,args.submission,json.loads(Path(args.metadata).read_text()),args.pdk_root,work),indent=2));return
+        run = json.loads(Path(args.metadata).read_text())
+        print(json.dumps(prepare(args.candidate,args.submission,run,args.pdk_root,work,args.expected_branch),indent=2));return
     if args.stage=='aggregate':print(json.dumps(aggregate('build/shard-results',work/'full-suite'),indent=2));return
     if not args.shard:p.error('--shard required')
     import os

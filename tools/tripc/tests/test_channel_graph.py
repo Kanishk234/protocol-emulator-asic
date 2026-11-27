@@ -232,3 +232,67 @@ def test_random_stateful_stall_warnings_match_model():
                       for port, blocked_tag, _ in undrainable_tags(image))
         assert flagged == stalled, source
     assert 0 < stalls < 1000
+
+
+def test_upstream_lane_can_trigger_or_avoid_held_tag_stall():
+    from tripc.channel_graph import undrainable_tags
+    from tripsim import Chip
+    from tripwire_spec import TAGS
+
+    source = """program cross_lane
+connect L0.I0 <- HOST_IN accept=DATA|EVENT
+connect L1.I0 <- L0.O1 accept=DATA|EVENT
+lane L0:
+    slot urgent: do MOV O1 <- I0, deq, keep
+lane L1:
+    states IDLE ACTIVE
+    slot urgent: when ACTIVE, I0 is DATA do MOV none <- I0, deq
+    slot urgent: when IDLE, I0 is EVENT do MOV none <- I0, deq then ACTIVE
+"""
+    image, _ = tripc.compile_text(source)
+    assert ('L1.I0', 'DATA', 'held') in list(undrainable_tags(image))
+    for fire_period in (1, 2):
+        for tags, stalled in ((('DATA',), True), (('EVENT', 'DATA'), False)):
+            chip = Chip(fire_period=fire_period)
+            tripc.load(chip, image)
+            host = chip.fabric.producers['HOST_IN']
+            peer = chip.fabric.producers['L0.O1']
+            for tag in tags:
+                host.load(TAGS[tag], 1)
+                chip.fabric.commit()
+                chip.run_for(16)
+            assert host.free()
+            assert peer.free() == (not stalled)
+            # The next arrival can occupy HOST_IN but cannot be forwarded
+            # if the peer is still holding L0's first output.
+            host.load(TAGS['DATA'], 2)
+            chip.fabric.commit()
+            chip.run_for(16)
+            assert host.free() == (not stalled)
+
+
+def test_routine_state_transition_preserves_possible_dequeue():
+    from tripc.channel_graph import undrainable_tags
+    from tripsim import Chip
+    from tripwire_spec import TAGS
+
+    source = """program routine_unlock
+connect L0.I0 <- HOST_IN accept=DATA
+lane L0:
+    states IDLE ACTIVE
+    slot urgent: when ACTIVE do MOV none <- I0, deq
+    slot: when IDLE do CALL unlock
+routine unlock:
+    setst ACTIVE
+    ret
+"""
+    image, _ = tripc.compile_text(source)
+    assert list(undrainable_tags(image)) == []
+    for cadence in (1, 2):
+        chip = Chip(fire_period=cadence)
+        tripc.load(chip, image)
+        producer = chip.fabric.producers['HOST_IN']
+        producer.load(TAGS['DATA'], 1)
+        chip.fabric.commit()
+        chip.run_for(64)
+        assert producer.free()

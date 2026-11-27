@@ -57,6 +57,12 @@ def test_source_identity():
     run = dict(id=1, status='completed', conclusion='success', head_branch='main', path='.github/workflows/gds.yaml', head_sha='a'*40)
     commit = dict(commit='a'*40, workflow_url='https://github.com/owner/repo/actions/runs/1')
     validate_metadata(run, commit)
+    branch = 'tripwire/d192-se0-official'
+    candidate = dict(run, head_branch=branch)
+    with pytest.raises(ValueError): validate_metadata(candidate, commit)
+    validate_metadata(candidate, commit, expected_branch=branch)
+    with pytest.raises(ValueError): validate_metadata(candidate, dict(commit, commit='b'*40), expected_branch=branch)
+    with pytest.raises(ValueError): validate_metadata(dict(candidate, status='in_progress'), commit, expected_branch=branch)
     run['conclusion'] = 'failure'
     with pytest.raises(ValueError): validate_metadata(run, commit)
 

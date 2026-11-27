@@ -129,9 +129,9 @@ Scoped channel safety/order, conditional ready-consumer progress and tap isolati
 
 - [ ] **Formal:** F-CHAN-1..4, F-SCHED-1..2, F-ROT-1, F-OWN-1, F-PIN-1, F-HOST-1 and F-DEC-1 proven, with each result's bounded/unbounded status recorded in `CLAIMS.md`.
 - [ ] `tripc` deadlock/overrun analysis in place; L6-FUZZ has run ≥ 10⁴ random programs with no contradiction.
-- [ ] Full-design Basys 3 bitstream builds with timing met at 50 MHz: `fpga_basys3` run ID, or the local Vivado report in `docs/reports/` (D-022).
+- [x] Full-design Basys 3 bitstream builds with timing met at 50 MHz (D-022). Vivado 2025.2 on 447bd2e produced the bitstream with +3.063 ns setup, +0.102 ns hold and zero routing errors. [Local Vivado evidence](../../reports/PHASE3_BASYS3_PREFLIGHT.md#routed-50-mhz-baseline).
 - [ ] The latest `gds` run is fully green (gds, precheck, gl_test, viewer); routing < 4 h.
-- [ ] `formal` and `unit` workflows green on `main`.
+- [x] `formal` and `unit` workflows green on `main` at 447bd2e ([formal 45927006253](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45927006253), [unit 45927006250](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45927006250)). Recheck on the final Phase 3 revision.
 
 ## 5. Risks in this phase
 | Risk | Response |

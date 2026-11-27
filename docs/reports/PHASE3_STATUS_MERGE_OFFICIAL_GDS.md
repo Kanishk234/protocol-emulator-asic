@@ -117,3 +117,97 @@ with only that BITSYNC RTL difference over the prior physical candidate.
 The mask-based self-drive comparator prototype remains parked.
 
 The SE0 follow-up [screen 45921497134](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45921497134) passed the repeated all-corner checks. It reported +2.485875 ns slow functional setup reserve, +0.120712 ns fast hold, zero slew/capacitance/fanout and antenna violations, and zero preceding full-route overflow. All 35 candidate input hashes matched the download. Relative to prior official trial 9d9d1e1, the only physical-input change is the one-line redundant SE0 qualifier removal in `trw_pin_bs.v`. Official GDS workflow bytes match. The screen stops before detailed routing and extraction. The exact follow-up patch is staged locally under `build/` for isolated official qualification.
+
+## SE0 official extracted setup failure
+
+Official run [45926954285](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/45926954285)
+on bd023fc completed detailed routing but failed extracted slow setup at
+−1.437336 ns, with −19.197251 ns TNS and 52 failing register-to-register
+endpoints. Fast hold was +0.150384 ns. Final routing DRC, KLayout DRC,
+antenna, electrical and LVS checks were clear. Magic extraction reported
+10 illegal overlaps under the existing nonfatal policy. Build GDS failed
+and precheck, gl_test and viewer were skipped. The worst reported paths
+launch from U0 `bitsync_active` and pass through U0 `a_in`. This is a
+different launch cone from the preceding official trial's `drv_b` path.
+Next compare the extracted path to the matching screen path across
+placement and signoff before choosing an RTL experiment.
+
+### Matching the screen path to extraction
+
+Compared `_47918_/Q` to `_49360_/D` in the slow-corner screen frontier
+and the official post-route setup report. All 152 reported pin transitions
+match, including both clock paths. The routed netlist identifies the
+endpoint as `u_chip.u_fab.u_c8.last_seq`. The slack fell from +2.635313 ns
+to −1.437336 ns on this same path.
+
+| Segment | Screen (ns) | Extracted (ns) | Change (ns) |
+| --- | ---: | ---: | ---: |
+| Launch through clock-to-Q | 1.599 | 1.937 | +0.338 |
+| Launch Q to U0 `a_in` driver | 5.876 | 8.030 | +2.155 |
+| U0 `a_in` driver to fabric endpoint D | 10.688 | 12.596 | +1.908 |
+| Data required time | 20.798 | 21.126 | +0.328 |
+
+The largest individual data-path increments were +0.410 ns at
+`_25163_/Y`, +0.342 ns at `_25147_/Y`, and +0.289 ns at `_25040_/Y`.
+The degradation spans both the pad-feedback and downstream logic.
+Prioritize reducing the mode-to-feedback combinational path while
+preserving same-clock pad observation, and measure the downstream
+fabric endpoint as well. The matching path provides an extracted
+reference for judging a follow-up beyond its prescreen WNS.
+
+A scratch cone experiment moved the BITSYNC mux after ordinary-mode and
+BITSYNC-mode output calculations. Yosys SAT proved all four output bits
+equivalent for arbitrary cone inputs. Generic mapping grew from 11 to
+18 cells, while the longest `bs_on`-to-output depth stayed at four
+gates. Pin A data depth grew from two to three gates. The isolated
+result did not justify a physical run or production RTL change.
+
+A second scratch experiment replaced the bounded A-pad indexed read with a
+decoded 24-way reduction. Yosys proved all nine module equivalence points.
+In full-chip generic synthesis with matched source order, the U0
+`bitsync_active`-to-`a_in` path stayed at 18 logic levels and cell count rose
+from 31,843 to 32,063. The generic mapping did not expose a traceable path
+to the extracted fabric D endpoint, so it cannot serve as a proxy for that
+part of the path. The change was kept out of physical qualification.
+
+The 52 extracted failing endpoints all launch at U0 `bitsync_active`; 49
+reports also pass through U0 `a_in`. The endpoint split is 27 BITSYNC
+registers, 14 producer token bits, nine fabric bookkeeping registers and
+two RX timer bits. A fabric-only rewrite leaves most failing endpoints
+outside its scope. A same-edge `last_seq` toggle was equivalent at all 55
+points of the six-source port, but grew the full generic map by 146 cells.
+With enable pins included in the depth walk, the mode-to-fabric enable
+proxy worsened from 50 to 53 levels. No physical run was scheduled.
+
+A narrower scratch experiment distributed the pin N SE0 override into the
+BITSYNC arm alone. Yosys SAT checked the Boolean identity for arbitrary
+mode/data inputs. With identical source order, the full generic map grew
+from 31,843 to 31,910 cells. Mode-to-`a_in` depth went from 18 to 20 and
+mode-to-fabric enable depth from 50 to 53. This output-only rewrite was
+rejected before physical screening.
+
+### Remove redundant A-pad index guard
+
+The existing A-pad output already returns idle when the selected index
+is unattached. The scratch variant removes a second, inner index guard.
+All nine pin I/O equivalence points passed. An Icarus comparison matched
+98,304 observations across all pin-A/pin-S codes, idle polarities,
+walking pad values and injected unknowns on the pad bus.
+
+With matched source order, the full generic map dropped from 31,843 to
+31,807 cells. U0 mode-to-a_in depth dropped from 18 to 17 and mode-to-
+fabric enable depth from 50 to 47. These are logic-depth proxies.
+The separate diagnostic screen option stages exactly this one-file change
+over the previous SE0 candidate. All 35 physical input hashes matched
+the staged manifest. No official GDS workflow or production physical
+input changed.
+
+The saved qualified official run 44189196098 and the earlier B-edge
+official run 44871062205 also each report 10 Magic extraction overlaps
+and clear LVS. The SE0 overlap count matches both references. A count
+comparison alone establishes no geometric identity.
+
+Exact-candidate whole-chip Verilator L3 with sigrok enabled passed
+22/22 with zero failures or skips. Every simulated RTL file matched the
+staged screen input manifest. Protocol XML SHA-256:
+`5e400c47e650006ba9e800b864043debc5b873296d73358b6a3f7ec9d341db38`.

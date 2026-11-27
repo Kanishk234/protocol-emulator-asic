@@ -67,3 +67,34 @@ to Tcl. Windows Vivado 2025.2 opened the WSL source tree and entered
 Artix-7 synthesis. The first live run exposed an XDC parsing restriction
 and Vivado's MMCM primitive rewrite. The corrected XDC uses explicit
 package assignments and timing checks accept the mapped MMCM primitive.
+
+## Routed 50 MHz baseline
+
+Windows Vivado 2025.2 completed implementation and bitstream generation
+for the full board design published at `447bd2e`. The local run
+`build/basys3-vivado-jv8af139` reported a 20.000 ns generated clock,
++3.063 ns setup slack, +0.102 ns hold slack, zero failing timing endpoints,
+and all 12,010 routable nets routed with zero routing errors. Bitstream
+DRC reported zero errors. The bitstream SHA-256 is
+`b8be343b8a6b58bff4f1eb2b93bdcd8a21cbf0971fb7836e0872500ac4a22c62`,
+and the routed timing report SHA-256 is
+`48ac5b47e5c3de226f0b6712d08ba259d43c9d193c03eb289882b900df2cc5d1`.
+External Pmod timing and physical board testing are outside this result.
+
+Vivado's standalone DRC reported REQP-1840 on the asynchronously asserted
+reset path to the block RAM enable. A board-only follow-up registers the
+core reset synchronously and retains immediate bidirectional output
+disable. Its behavioral smoke test passed and a new Vivado implementation
+run has started. The routed numbers above apply to the published baseline.
+
+The synchronous-reset follow-up completed in Vivado 2025.2. All 12,009
+routable nets routed without errors. The 20 ns clock met setup and hold
+with +3.226 ns and +0.075 ns worst slack and zero failing endpoints.
+The DRC report found zero violations, including no REQP-1840, and
+bitstream generation succeeded. Local run: `build/basys3-vivado-m0q1g8ok`.
+
+| File | SHA-256 |
+| --- | --- |
+| Board adapter RTL | `251ac5eb7ea20ac8b8854c7a2cfd7a5fe6370161ce604cc4e35f5e3df57e83f5` |
+| Bitstream | `b4b1b215a7160cb2f6bd7730795d1ec97c03fee301bcc5a1f82cb260a915e23f` |
+| Timing report | `5b2adc87ac2228c7b3a20250429d994b1442ac1478b2fe63703141ad38856256` |

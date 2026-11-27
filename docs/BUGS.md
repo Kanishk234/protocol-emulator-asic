@@ -584,3 +584,47 @@ lane 0 was still running. This reproduces the mismatch with Architecture
 §9. F-HOST-1 stays open. No fix has landed. Before changing hardware,
 identify the affected lanes for shared SRAM and pin units and audit any
 existing firmware that writes these resources while a lane is running.
+
+The follow-up audit found that `tools/host/host.py:load_sequence` halts all
+lanes before pin configuration and SRAM initialization, then starts the
+loaded lanes. The independent model accepts direct SRAM writes during
+RUN, consistent with the reproduced RTL behavior. The loader and direct
+register interface therefore exercise different policies. A global halt
+guard would enforce a conservative policy for shared writes, but it
+would affect direct SPI clients and needs a contract decision plus fresh
+hardware qualification.
+
+### Basys 3 reset reaches the BRAM enable asynchronously
+
+Vivado 2025.2 DRC REQP-1840 flagged that the async-assert reset synchronizer
+fed the block RAM enable through the SRAM wrapper. The board adapter
+follow-up adds a synchronous core reset stage and retains immediate pad
+disable in reset. The behavioral board smoke passed. A fresh routed
+Vivado run is pending to verify removal of the warning and retain timing.
+
+The routed reset follow-up completed with zero DRC findings and no
+REQP-1840. The 50 MHz timing report and bitstream hashes are recorded in
+the Basys 3 evidence report.
+
+A direct model probe distinguished the two cases. With lane 0 running,
+the model rejects a pin-configuration write while the native SPI RTL
+emits its write strobe. Both the model and RTL accept and return the
+new SRAM word. Pin configuration therefore already has a model/RTL
+mismatch. SRAM requires a shared-resource policy decision in addition
+to any RTL and model update.
+
+A scratch all-lanes-halted guard passed an Icarus SPI check for halted
+pin configuration and SRAM writes, rejection during RUN, live SRAM
+readback, and writes succeeding after halt. The same test fails on
+native RTL at the live pin-configuration strobe. The prototype also
+suppresses and discards a pending SRAM write if RUN is asserted before
+its rotation slot. The SPI check does not exercise that pending-write
+race. This is evidence for a possible policy, pending review of the
+shared-resource contract and physical qualification.
+
+A separate induction check abstracted decoded SPI commands and proved
+that the scratch guard suppresses live pin strobes and SRAM write commits.
+It also proved that a pending write observed during RUN is cleared by the
+next clock. Removing the discard branch produced a counterexample in the
+three-step check. This extends the scratch evidence while the policy is
+under review.

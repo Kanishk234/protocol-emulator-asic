@@ -354,7 +354,7 @@ module trw_pin_bs #(parameter USE_SAMPLE_DELTA = 0, parameter USE_LEVEL_CACHE = 
     end else begin : g_level_original
         assign tx_lvl = cur;
     end endgenerate                                        // no bit: released (recessive)
-    assign tx_se0 = drv && se0_r;
+    assign tx_se0 = se0_r;
     assign tx_drv = drv;
 
     // ------------------------------------------------------------------ readback and errors (P26)

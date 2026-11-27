@@ -8,6 +8,8 @@
     reg [4:0] check_rx_pin;
     reg check_level, check_oe;
     reg check_started_burst, check_cancelled;
+    reg check_pad_oe, check_pad_level;
+    reg check_pad_level_valid;
     always @(posedge clk) begin
         check_started <= 1'b1;
         check_hold <= !check_cancel && pend_v && !pend_go;
@@ -16,6 +18,9 @@
         check_started_burst <= !check_cancel && ((pend_go && pend_k == K_START) ||
                                (tk_now && (h_shift || h_clk)));
         check_cancelled <= check_cancel;
+        check_pad_oe <= check_cancel || (due_oe_v ? due_oe : oe);
+        check_pad_level_valid <= !check_cancel && due_lvl_v && !d_hi;
+        check_pad_level <= due_lvl ^ idle;
         check_dispatch <= 4'b0000;
         if (!check_cancel) begin
             if (pend_go) begin
@@ -41,6 +46,11 @@
         if (!check_started)
             assume(!rst_n);
         if (check_started) begin
+            assert(oe == check_pad_oe);
+            if (check_pad_level_valid) begin
+                assert(lvx == check_pad_level);
+                assert(!echo);
+            end
             if (check_started_burst) assert(p_act);
             if (check_cancelled) assert(!p_act);
             if (pend_v && pend_k == K_START && pend_go)

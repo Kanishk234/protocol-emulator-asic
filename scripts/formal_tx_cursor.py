@@ -32,6 +32,11 @@ def main():
         raise ValueError('Expected one burst start assignment')
     verify(output, 'pending-lost-start', source.replace(start, "p_act   <= 1'b0;"),
            properties, '-seq 8', 'model found: FAIL!')
+    oe_update = 'oe <= due_oe;'
+    if source.count(oe_update) != 1:
+        raise ValueError('Expected one pad output-enable update')
+    verify(output, 'pending-lost-oe', source.replace(oe_update, 'oe <= oe;'),
+           properties, '-seq 8', 'model found: FAIL!')
 
 
 def check(output, source, scenario, deadline, depth):

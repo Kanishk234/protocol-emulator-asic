@@ -4,6 +4,32 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-27 — Explicit unused LUT input routing experiment
 
+- Corrected46045747168 at32796d4a passes native/reset/full management
+  reload. Root authenticates archive, all3strict XMLs/8736-bit observations,
+  all55/55/64simulation inputs,30native-plan/6timing-plan/20parent inputs,
+  four scripts/closed-config guards/execution/coverage and original failed
+  timing control. Qualified setup-34.141884ns/hold-1.226009ns still fail
+  20ns/0.25ns; zero loops/policy differences,13342active pins annotated.
+  Receipt: reports/r1_known_input_repair_native_timing_46045747168.json.
+  BUG180resolved; BUG179resolved only for this exact repaired image.
+- D186 targets the measured SPI-state to receive-capture control path:
+  candidate existing MIN_CTRL16, original control unchanged4. Same source,
+  seed/clock/resource/explicit inputs; no physical or timing-constraint edit.
+  Fresh proof/resource preparation passes. Next: hosted fit, then new exact
+  image native/reset/reload and timing if it fits; no inherited selector fix.
+  All87focused guards and the new compile-workflow lint pass.
+- **Boxes ticked:** none. Functional native/reload progress is established;
+  R1timing still fails and G1 remains selected.
+
+- Corrected-report local direct native/reset/second-transfer passes with
+  all55simulation input hashes/8736actual configuration bits verified;
+  original compiler report preserved byte for byte. Receipt:
+  reports/r1_derived_report_native_local_20261127.json. Local full shell
+  reaches STOP/restart and late second load but its150swall bound expires;
+  no local reload pass. Corrected hosted46045747168 at32796d4a remains
+  required with the existing600snative bound. All81focused guards and
+  all3new workflow lint checks pass. No R1timing closure or phase box.
+
 - Repair46044900302 atcc27e6df passes raw observation/proof/control but
   stops before repaired simulation at image-integrity guard. BUG180/D185:
   derived bitstream retained raw compiler report SHA/CRC. Preserve original

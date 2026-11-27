@@ -2,6 +2,12 @@
 
 ## 180: Two-selector staging retains the raw compiler image report
 
+- **Resolved in46045747168 at32796d4a:** repaired candidate and full
+  management reload pass, with three independently checked actual8736-bit
+  observations and55/55/64simulation inputs. Connected timing is qualified
+  but negative, independently of this report bug. Receipt:
+  reports/r1_known_input_repair_native_timing_46045747168.json.
+
 - **Symptom/check:**46044900302 atcc27e6df passes raw observation/proof
   and original native control, then fails `Changed compiler image` before
   repaired candidate simulation. Full repaired FASM encoding is correct.
@@ -11,10 +17,22 @@
   explicitly derived image report with current SHA/CRC/provenance and no
   inherited compiler timing estimate. Integrity guard remains unchanged;
   regression checks original immutability and wrong-source rejection.
-  Hosted replay remains required. Receipt:
+  Corrected local direct native/reset passes, with all55inputs and8736
+  actual bits checked; full hosted replay46045747168 remains required.
+  Local receipt: reports/r1_derived_report_native_local_20261127.json.
+  Failed hosted receipt:
   reports/r1_known_input_repair_report_guard_46044900302.json.
 
 ## 179: Explicit-input image stalls at traffic start in native simulation
+
+- **Exact repaired image validated:**46045747168 at32796d4a passes raw
+  observation, fresh two-selector proofs, native/reset and full management
+  reload. Root verifies all three8736-bit observations, strict XML and
+  55/55/64simulation inputs. Both timing policies have zero structural
+  loops and full active annotation, but setup/hold remain negative. This
+  resolves the stall for raw5901ac35.../loaded a4cbccd0... only; the raw
+  failing control is retained. No general mapper or timing-closure claim.
+  Receipt: reports/r1_known_input_repair_native_timing_46045747168.json.
 
 - **Hosted raw confirmation:**46043377371 at16fab41d fails in native
   replay. Root authenticates archive and independently verifies both8736

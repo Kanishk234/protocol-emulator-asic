@@ -1,5 +1,32 @@
 # Decisions
 
+## D-186: Test local mapping of small flip-flop enable groups
+
+- **Date:**2026-11-27. Corrected46045747168 at32796d4a passes native
+  concurrent UART/SPI/reset and full management reload. Root replays all
+  three8736-bit audits, strict XML/55/55/64simulation input hashes,
+  preparation hashes and four timing script/execution/coverage checks.
+  Qualified nominal-RC setup-34.141884ns/hold-1.226009ns still fail the
+  unchanged20ns/0.25nsconditions; zero loops and policy differences.
+  Receipt: reports/r1_known_input_repair_native_timing_46045747168.json.
+- Worst setup launches SPI state[2] atX2Y3/E and captures SPI read-data
+  bit7 atX2Y1/B through host/read-capture control routing. Worst hold is
+  the UART input to its first user synchronizer atX6Y1/C under the original
+  conditional zero-input-delay boundary. Do not waive either path or
+  change delays to manufacture closure; full-chip context stays open.
+- Test one existing compiler knob: candidate MIN_CTRL16 instead of4,
+  allowing small enable groups to map into local LUT logic rather than
+  shared tile controls. Hypothesis: relaxed shared-control placement and
+  routing may shorten the measured setup path. Fit and benefit are unknown.
+  Keep the same proved ungated source, explicit unused logical inputs,
+  seed1/clock D, physical resource/pins and50MHz compiler request. Original
+  rawc6control must reproduce with MIN_CTRL4 before candidate compilation.
+- Bound allowed thresholds to4/16, reject inherited environment changes,
+  restore compiler global after compilation, and verify reported option.
+  Fresh source/resource preparation and focused guards pass. Any fitting
+  image needs its own native observations/proofs/reset/reload and original
+  RC timing. Never copy the prior two-selector repair to a fresh mapping.
+
 ## D-185: Give the repaired image a separate derived report
 
 - **Date:**2026-11-27. Hosted46044900302 atcc27e6df passes raw stall

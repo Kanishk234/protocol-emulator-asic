@@ -1,0 +1,125 @@
+{
+  "date": "2026-11-27",
+  "scope": "Local direct native/reset/second-transfer only; zero-delay simulation, no management reload or extracted timing acceptance.",
+  "compile_run": 46042819260,
+  "source_compile_report_preserved": true,
+  "derived_report": {
+    "scope": "Original compiler inputs retained; image derived by two independently proved unused-input selector changes. No fresh compiler timing claim.",
+    "inputs": [
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_sources/r1-configured-timing-40128859740/model/resource/macro/fabulous/.FABulous/bel.txt",
+        "sha256": "aa8600cf960be6e19c08f4105b8f858db200d49d6d8e65ccd7732e8b244b4210"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_sources/r1-configured-timing-40128859740/model/resource/macro/fabulous/.FABulous/bel.v2.txt",
+        "sha256": "3f98bd0f3d5f4263f9feb769de962484897ca94cc739f36052e079d36fc40dc6"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_sources/r1-configured-timing-40128859740/model/resource/macro/fabulous/.FABulous/bel.v3.txt",
+        "sha256": "ebc8ebf7eabd608c3807f1d209398895ec277fbe36540778e01c5aca6684c5a4"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_sources/r1-configured-timing-40128859740/model/resource/macro/fabulous/.FABulous/pips.nom_slow_1p08V_125C.txt",
+        "sha256": "0d7384ec081c762f3de7314093a8f97873b0ba38b3ccfa55f86cecdb07cc5216"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_sources/r1-configured-timing-40128859740/model/resource/macro/fabulous/.FABulous/pips.txt",
+        "sha256": "0d7384ec081c762f3de7314093a8f97873b0ba38b3ccfa55f86cecdb07cc5216"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_sources/r1-configured-timing-40128859740/model/resource/macro/fabulous/.FABulous/placement_estimate.txt",
+        "sha256": "90705d484c11fee9ed2eef2d5d062d24caada3c07dac4723c5924d9dd8908dcc"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_sources/r1-configured-timing-40128859740/model/resource/macro/fabulous/bitStreamSpec.bin",
+        "sha256": "60615730140b5eadef23a1c62397536e4b4847c7b4096c9b11e392a67d22b4d3"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_trial/candidate-source/spi_ctrl_top.v",
+        "sha256": "c6858685bd2706ae6ed237fe22b8bc7cbebf9fe70db829c71540ab67d8859e02"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_trial/compiler-arch/arch.yaml",
+        "sha256": "ba531fb1380dcfe3b98490520967259ddca5cd8cc8582e267427988d4a67fb4f"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_trial/compiler-arch/pins.csv",
+        "sha256": "e763170abd63296e42e9f33bc2462d814f7b4f736d6b348d2865aaca7312d998"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/protocols/uart/uart_rx.v",
+        "sha256": "18b8d4d7253407a34db78f47afda13f9325d06931c7f90e62c6d035b5af282ad"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/protocols/uart/uart_rx_p.v",
+        "sha256": "9d8f1663a52f485604958387a203ed167aabc904b525816522203f451af888fb"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/protocols/uart/uart_top.v",
+        "sha256": "6b765f5f2c01a8716dea1e2a681a94f81d578e9a9d9c404361216bf8b6a78f67"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/protocols/uart/uart_tx.v",
+        "sha256": "a89e940896d39d5195359b1e0ab382a8d5a92e0bb30e39d0e9c88d9467a00c00"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/protocols/uart/uart_tx_p.v",
+        "sha256": "5aadfcdfde6c20c97e881764a910b0d651bfca1057fc08b847bebb4e5add023d"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/protocols/uart_spi/concurrency.yaml",
+        "sha256": "8e3c6538e77f6c5c892b8a93cc10112ada8a0f063c79c8cca944b86d471b2617"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/protocols/uart_spi/uart_spi_top.v",
+        "sha256": "06539fe0830b88f458ecca2c904c3f415c4b84d3c159928d74ce731bf0d84145"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/tools/compile/bitfile.py",
+        "sha256": "7bb51ad0172a6b9e3c6d1d3b7f186c9b1fc45f452b65167f6cf82a6279e63486"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/tools/compile/bitgen.py",
+        "sha256": "66d8723b775d3dd1fa7a83641d5f98f59c880c535b20669b3a66a1ca91948666"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/tools/compile/compile.py",
+        "sha256": "f61fdb84adca11be53ff2cccc97e475adae98d92a363dbd59b035deff526ead6"
+      },
+      {
+        "path": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/tools/compile/prims/warp_prims.v",
+        "sha256": "d5868deeae22378fe73aafe3238db9e81cbe75f9367f701b8d2a72dc3c12999b"
+      }
+    ],
+    "bitfile": "/home/runner/work/protocol-emulator-asic/protocol-emulator-asic/build/r1_placement_trial/candidate/concurrency.wbit",
+    "bitfile_sha256": "5901ac357a973d4a5a72da105fd81f869be22ad0b5a5c475844cc90ddba691e7",
+    "derived_from_bitfile_sha256": "3fd72f5299e42d6bae148aab2d6d912a009f73e5426ded0f13482d7f9e061d66"
+  },
+  "strict_tests": 1,
+  "simulation_inputs_checked": 55,
+  "actual_native_configuration_bits": 8736,
+  "image_sha256": "a4cbccd01be782a01a548e853f065076093de60221bdadda012874ed79206ec5",
+  "snapshot_sha256": "71c9c11bc0b8af802cdbfcf6baed78e5198b597f5f529ede618beacc048f9d36",
+  "activity": {
+    "overlap_ns": 8340.0,
+    "windows_ns": {
+      "spi": [
+        116001.0,
+        124501.0
+      ],
+      "uart_rx": [
+        116161.0,
+        202961.0
+      ],
+      "uart_tx": [
+        115961.0,
+        198421.0
+      ]
+    }
+  },
+  "native_reset_restart_passed": true,
+  "management_reload_tested": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

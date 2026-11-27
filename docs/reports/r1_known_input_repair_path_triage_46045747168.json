@@ -1,0 +1,27 @@
+{
+  "run": 46045747168,
+  "source_sha": "32796d4a62dcef8d6bbf4fcdc0754a829bbbf275",
+  "scope": "Read-only mapping of worst printed STA endpoints through exact native and placed netlists; no path exception or timing acceptance.",
+  "setup": {
+    "slack_ns": -34.141884,
+    "startpoint": "Tile_X2Y3_LUT4x8_ha/_1733_/Q",
+    "start_bel": "X2Y3/E",
+    "start_logical_net": "u_user.u_spi.state[2]",
+    "endpoint": "Tile_X2Y1_LUT4x8_ha/_1730_/D",
+    "capture_bel": "X2Y1/B",
+    "capture_logical_q_net": "u_user.srdata[7]",
+    "capture_cell": "$auto$ff.cc:337:slice$975",
+    "capture_has_shared_enable": true
+  },
+  "hold": {
+    "slack_ns": -1.226009,
+    "startpoint": "Tile_X7Y1_A_OUT_top",
+    "endpoint": "Tile_X6Y1_LUT4x8_ha/_1731_/D",
+    "capture_bel": "X6Y1/C",
+    "capture_logical_q_net": "u_user.u_uart.g_prims.u_rx.sync[0]",
+    "boundary": "Original conditional zero-I/O-delay macro model; full-chip source/clock context still required."
+  },
+  "next_hypothesis": "Test candidate MIN_CTRL16 with same source, pins, seed, clock bank and physical resource; require original rawc6 MIN_CTRL4 control and fresh native/reload/RC gates. No prior selector repair reuse.",
+  "timing_acceptance": false,
+  "adopted": false
+}

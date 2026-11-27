@@ -38,6 +38,7 @@ jobs:
           source .venv/bin/activate
           export PATH="$PATH:$HOME/oss-cad-suite/bin"
           python scripts/formal_decode.py
+          python scripts/formal_host_slots.py
           python scripts/formal_scheduler.py
           python scripts/formal_sram_rotation.py
           python scripts/formal_tx_arithmetic.py
@@ -68,6 +69,7 @@ jobs:
             build/formal_pin_rx/
             build/formal_pin_unit/
             build/formal_decode/
+            build/formal_host_slots/
             build/formal_scheduler/
             build/trw-rotation/
             build/formal_tx_arithmetic/

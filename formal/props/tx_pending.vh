@@ -7,11 +7,15 @@
     reg [3:0] check_dispatch;
     reg [4:0] check_rx_pin;
     reg check_level, check_oe;
+    reg check_started_burst, check_cancelled;
     always @(posedge clk) begin
         check_started <= 1'b1;
         check_hold <= !check_cancel && pend_v && !pend_go;
         check_empty <= check_cancel || (pend_go && !check_enqueue);
         check_payload <= {pend_k, pend_a};
+        check_started_burst <= !check_cancel && ((pend_go && pend_k == K_START) ||
+                               (tk_now && (h_shift || h_clk)));
+        check_cancelled <= check_cancel;
         check_dispatch <= 4'b0000;
         if (!check_cancel) begin
             if (pend_go) begin
@@ -37,6 +41,10 @@
         if (!check_started)
             assume(!rst_n);
         if (check_started) begin
+            if (check_started_burst) assert(p_act);
+            if (check_cancelled) assert(!p_act);
+            if (pend_v && pend_k == K_START && pend_go)
+                assert(!check_enqueue);
             assert({due_lvl_v, due_oe_v, rxset, smp} == check_dispatch);
             if (due_lvl_v) assert(due_lvl == check_level);
             if (due_oe_v) assert(due_oe == check_oe);

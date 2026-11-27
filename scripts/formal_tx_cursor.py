@@ -27,6 +27,11 @@ def main():
         raise ValueError('Expected one SAMPLE dispatch assignment')
     verify(output, 'pending-lost-sample', source.replace(sample, 'smp       <= (tk_now && c_smp);'),
            properties, '-seq 8', 'model found: FAIL!')
+    start = "p_act   <= 1'b1;"
+    if source.count(start) != 1:
+        raise ValueError('Expected one burst start assignment')
+    verify(output, 'pending-lost-start', source.replace(start, "p_act   <= 1'b0;"),
+           properties, '-seq 8', 'model found: FAIL!')
 
 
 def check(output, source, scenario, deadline, depth):

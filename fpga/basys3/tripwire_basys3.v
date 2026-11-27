@@ -29,13 +29,17 @@ module tripwire_basys3 (
         else
             reset_sync <= {reset_sync[0], 1'b1};
     end
+    // Keep the core reset, including the BRAM enable gate, synchronous.
+    reg core_rst_n;
+    always @(posedge clk50)
+        core_rst_n <= reset_sync[1];
 
     wire [7:0] pad_in, pad_out, pad_oe;
     genvar bit_index;
     generate
         for (bit_index = 0; bit_index < 8; bit_index = bit_index + 1) begin : g_pad
             IOBUF u_pad (
-                .I(pad_out[bit_index]), .T(!pad_oe[bit_index] || !reset_sync[1]),
+                .I(pad_out[bit_index]), .T(!pad_oe[bit_index] || !core_rst_n || reset_request),
                 .O(pad_in[bit_index]), .IO(jc[bit_index])
             );
         end
@@ -44,6 +48,6 @@ module tripwire_basys3 (
     tt_um_tripwire u_tripwire (
         .ui_in(ja), .uo_out(jb), .uio_in(pad_in),
         .uio_out(pad_out), .uio_oe(pad_oe),
-        .ena(1'b1), .clk(clk50), .rst_n(reset_sync[1])
+        .ena(1'b1), .clk(clk50), .rst_n(core_rst_n)
     );
 endmodule

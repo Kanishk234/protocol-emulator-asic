@@ -1,0 +1,32 @@
+[tasks]
+safety
+reachable
+peer_selected
+
+[options]
+safety: mode prove
+reachable: mode cover
+reachable: depth 8
+peer_selected: mode bmc
+peer_selected: depth 8
+peer_selected: expect fail
+
+[engines]
+safety: abc pdr
+reachable: smtbmc z3
+peer_selected: smtbmc z3
+
+[script]
+safety: read -formal -sv -I. trw_fabric.v trw_chan_port.v fabric_isolation.sv
+reachable: read -formal -sv -I. trw_fabric.v trw_chan_port.v fabric_isolation.sv
+peer_selected: read -formal -sv -I. -DISO_ALLOW_PEER trw_fabric.v trw_chan_port.v fabric_isolation.sv
+prep -top fabric_isolation -flatten
+techmap
+opt -fast
+setundef -anyseq
+
+[files]
+../src/trw_assert.vh
+../src/trw_fabric.v
+../src/trw_chan_port.v
+props/fabric_isolation.sv

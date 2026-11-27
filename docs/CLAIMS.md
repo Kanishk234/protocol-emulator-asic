@@ -215,3 +215,16 @@ Full and lean passed unbounded induction. Dropping queued SAMPLE
 dispatch produced a counterexample in both configurations. The proof
 covers dispatch signals and payloads. Exact due-clock arithmetic,
 burst start and final pad effects retain separate obligations.
+
+Native TX induction also proves an admitted immediate or due queued burst
+sets the active record on the next edge, a due queued burst cannot be
+replaced on that edge, and reset/restart clears activity. Both full and
+lean passed after an initial reset. Suppressing the active update produced
+a counterexample for both. Exact deadlines and burst waveform execution
+remain separate obligations.
+
+The recurring two-lane regression checks a consumer that returns to
+IDLE after each DATA. Alternating EVENT and DATA drains for eight
+arrivals at three periods and two scheduler cadences. Repeating EVENT,
+DATA, DATA stalls on the extra DATA and overruns at arrival five across
+the same six schedules.

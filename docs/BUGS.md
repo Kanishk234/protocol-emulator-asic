@@ -628,3 +628,10 @@ It also proved that a pending write observed during RUN is cleared by the
 next clock. Removing the discard branch produced a counterexample in the
 three-step check. This extends the scratch evidence while the policy is
 under review.
+
+The audited SRAM test writers initialize memory before RUN or after
+reset. The chip-level rotation test does depend on live host reads while
+lane routines use SRAM, and it passed on the scratch halted-write guard.
+No audited production loader depended on live SRAM writes. This audit
+covers the checked-in loader and named tests, with arbitrary external SPI
+clients still outside the evidence.

@@ -31,7 +31,8 @@ CORNERS = ('nom_fast_1p32V_m40C', 'nom_slow_1p08V_125C', 'nom_typ_1p20V_25C')
 DEFAULT_DESIGN = ROOT / 'build/status_merge_screen/design'
 SYNTH_VARIANTS = ('root-mode-synth', 'root-mode-b-edge-synth')
 VARIANTS = ('status-merge', 'root-mode', 'root-mode-fanout7', 'root-mode-b-edge',
-            'root-mode-b-edge-period', 'root-mode-b-edge-period-se0', *SYNTH_VARIANTS)
+            'root-mode-b-edge-period', 'root-mode-b-edge-period-se0',
+            'root-mode-b-edge-period-se0-a-index', *SYNTH_VARIANTS)
 
 
 def sha(path):
@@ -130,13 +131,20 @@ def prepare(design, *, variant="status-merge"):
         subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(period_patch)],
                        cwd=design, check=True)
         expected['src/trw_pin_cfg.v'] = '79042fdd1f65ffb7ed1431cff806c3ab05e5e04f16f33f591ca03b10033e4c4d'
-    if variant == 'root-mode-b-edge-period-se0':
+    if variant.startswith('root-mode-b-edge-period-se0'):
         se0_patch = patch.parent / 'se0/drive.patch'
         if sha(se0_patch) != '6ff5957080aef9e45d8e2f809017054d332b5cee9a813e2a4dbcf44347ace5d8':
             raise ValueError('SE0 patch differs from the tested candidate')
         subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(se0_patch)],
                        cwd=design, check=True)
         expected['src/trw_pin_bs.v'] = '4aa56240fde9420e6392e6ff3bb6d8b4c3685e7f166cb686c95b70264ca7d0f4'
+    if variant == 'root-mode-b-edge-period-se0-a-index':
+        index_patch = patch.parent / 'a_index/read.patch'
+        if sha(index_patch) != 'e4a97d774dc12d934bd3817f699dc7e060fa209a6a65a2db8232b458287e663f':
+            raise ValueError('A-index patch differs from the tested candidate')
+        subprocess.run(['patch', '--batch', '--forward', '-p1', '-i', str(index_patch)],
+                       cwd=design, check=True)
+        expected['src/trw_pin_io.v'] = '9b0ab13139d8383b8c5d86162dc5acdec73396fcd252138356ae8d14d0901145'
     if variant == 'root-mode-fanout7':
         baseline_config = load(ROOT / 'src/config.json')
         if 'MAX_FANOUT_CONSTRAINT' in baseline_config:

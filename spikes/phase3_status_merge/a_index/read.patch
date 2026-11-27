@@ -1,0 +1,8 @@
+--- a/src/trw_pin_io.v
++++ b/src/trw_pin_io.v
+@@ -41 +41 @@
+-    wire       a_pad = pads[a_on ? a_idx : 5'd0];
++    wire       a_pad_unmasked = pads[a_idx];
+@@ -51 +51 @@
+-    assign a_in = a_on ? a_pad : idle;
++    assign a_in = a_on ? a_pad_unmasked : idle;

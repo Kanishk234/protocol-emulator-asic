@@ -170,3 +170,14 @@ def test_se0_trial_changes_only_period_candidate_bitsync_rtl(tmp_path):
     after = screen.check_inputs(trial)['candidate_inputs']
     assert before.keys() == after.keys()
     assert {name for name in before if before[name] != after[name]} == {'src/trw_pin_bs.v'}
+
+
+def test_a_index_trial_changes_only_se0_candidate_pin_io(tmp_path):
+    base = tmp_path / 'root-mode-b-edge-period-se0'
+    trial = tmp_path / 'root-mode-b-edge-period-se0-a-index'
+    screen.prepare(base, variant=base.name)
+    screen.prepare(trial, variant=trial.name)
+    before = screen.check_inputs(base)['candidate_inputs']
+    after = screen.check_inputs(trial)['candidate_inputs']
+    assert before.keys() == after.keys()
+    assert {name for name in before if before[name] != after[name]} == {'src/trw_pin_io.v'}

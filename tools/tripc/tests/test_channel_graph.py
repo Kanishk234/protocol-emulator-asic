@@ -1,3 +1,5 @@
+import pytest
+
 import tripc
 
 
@@ -192,7 +194,8 @@ lane L0:
         assert producer.free() == (tags[0] == 'EVENT')
 
 
-def test_random_stateful_stall_warnings_match_model():
+@pytest.mark.parametrize('forwarded', [False, True], ids=['direct', 'two-lane'])
+def test_random_stateful_stall_warnings_match_model(forwarded):
     import random
 
     from tripc.channel_graph import undrainable_tags
@@ -201,6 +204,13 @@ def test_random_stateful_stall_warnings_match_model():
 
     rng = random.Random(0x51A11)
     stalls = 0
+    lane = 'L1' if forwarded else 'L0'
+    upstream = 'L0.O1' if forwarded else 'HOST_IN'
+    forwarding = [
+        'connect L0.I0 <- HOST_IN',
+        'lane L0:',
+        '    slot urgent: do MOV O1 <- I0, deq, keep',
+    ] if forwarded else []
     for _ in range(1000):
         tag = rng.choice(list(TAGS))
         states = [f'S{index}' for index in range(rng.randint(2, 6))]
@@ -213,8 +223,9 @@ def test_random_stateful_stall_warnings_match_model():
         slots.append(f'    slot: when {states[-1]}, I0 is {tag} do MOV none <- I0, deq')
         source = '\n'.join([
             'program randomized_state',
-            f'connect L0.I0 <- HOST_IN accept={tag}',
-            'lane L0:',
+            *forwarding,
+            f'connect {lane}.I0 <- {upstream} accept={tag}',
+            f'lane {lane}:',
             '    states ' + ' '.join(states),
             *slots,
         ])
@@ -222,13 +233,15 @@ def test_random_stateful_stall_warnings_match_model():
         cadence = rng.choice([1, 2])
         chip = Chip(fire_period=cadence)
         tripc.load(chip, image)
-        producer = chip.fabric.producers['HOST_IN']
-        producer.load(TAGS[tag], rng.randrange(65536))
+        host = chip.fabric.producers['HOST_IN']
+        host.load(TAGS[tag], rng.randrange(65536))
         chip.fabric.commit()
-        chip.run_for((len(states) + 1) * cadence)
+        chip.run_for((len(states) + 4) * cadence)
+        producer = chip.fabric.producers[upstream]
+        assert producer.loads == 1, source
         stalled = not producer.free()
         stalls += stalled
-        flagged = any(port == 'L0.I0' and blocked_tag == tag
+        flagged = any(port == f'{lane}.I0' and blocked_tag == tag
                       for port, blocked_tag, _ in undrainable_tags(image))
         assert flagged == stalled, source
     assert 0 < stalls < 1000

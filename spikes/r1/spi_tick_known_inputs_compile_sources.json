@@ -1,0 +1,41 @@
+{
+  "run": {
+    "id": 46042819260,
+    "head_sha": "6cbe445e3981500f06d382319898a59cd4337713",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_spi_tick_known_inputs_compile.yaml"
+  },
+  "seeds": {
+    "1": {
+      "artifact": {
+        "id": 15220268072,
+        "name": "r1-spi-tick-known-inputs-compile-46042819260",
+        "size_in_bytes": 319385,
+        "digest": "sha256:c86666687ff4d222c4a6d6e277b596e5888c90fdc75558d289cce6b16b015708",
+        "source_run": 46042819260
+      },
+      "member": "r1_placement_trial",
+      "image_sha256": "3fd72f5299e42d6bae148aab2d6d912a009f73e5426ded0f13482d7f9e061d66",
+      "clock_constraint": {
+        "cell": "u_X1Y4_A_gbuf",
+        "bel": "X0Y4/D",
+        "logical_graph_preserved": true,
+        "source_json_sha256": "23f94400f9b549d8fa870ec48cdcf68c057b290f1084e2ff1beeb27a4cd632e5",
+        "pinned_json_sha256": "81080f15b56a00c5e26ee64382a62dfd01b6f4b4f275d4257f5e6413f017c9d1"
+      },
+      "input_transform": {
+        "original_json_sha256": "6618257fed72354aad9e252efa72a49f0ad2f76037f65ce1d3bc148fdd4609f7",
+        "derived_json_sha256": "23f94400f9b549d8fa870ec48cdcf68c057b290f1084e2ff1beeb27a4cd632e5",
+        "proof_sha256": "e8fcd0b716ea6380ff5ca21ddce983c012d2491ca1c9f40a0fd1b30d09c56d2b",
+        "changed_cells": 58,
+        "reset_net": [
+          43
+        ],
+        "binary_cell_functions_preserved": true,
+        "sequential_and_hard_cells_preserved": true
+      }
+    }
+  }
+}

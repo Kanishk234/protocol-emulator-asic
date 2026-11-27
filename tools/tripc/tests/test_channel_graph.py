@@ -282,6 +282,22 @@ lane L1:
             chip.fabric.commit()
             chip.run_for(16)
             assert host.free() == (not stalled)
+        for period in (8, 11, 16):
+            for first_tag in ('DATA', 'EVENT'):
+                chip = Chip(fire_period=fire_period)
+                tripc.load(chip, image)
+                host = chip.fabric.producers['HOST_IN']
+                first_overrun = None
+                for clock in range(8 * period):
+                    if clock % period == 0:
+                        if not host.free():
+                            first_overrun = clock
+                            break
+                        tag = first_tag if clock == 0 else 'DATA'
+                        host.load(TAGS[tag], clock)
+                    chip.step()
+                # The stalled peer holds arrival one and HOST_IN holds arrival two.
+                assert first_overrun == (2 * period if first_tag == 'DATA' else None)
 
 
 def test_routine_state_transition_preserves_possible_dequeue():

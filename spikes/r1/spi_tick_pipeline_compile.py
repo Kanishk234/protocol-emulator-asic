@@ -37,9 +37,10 @@ def placement_seed(plan,case):
     return 1 if case=='control' else seed
 
 
-def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False):
+def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs=False):
     from autonomy.check_xml import check_xml
     placement_seed({'candidate_seed':candidate_seed},'candidate')
+    if type(known_inputs) is not bool:raise ValueError('Explicit Boolean input-routing mode required')
     capsule,proofs,out=(Path(p).resolve() for p in (capsule,proofs,out))
     resource=capsule/'model/resource';desc=json.loads((resource/'resource-control.json').read_text())
     if desc['radix']!='radix8_2' or any(sha(resource/p)!=h for p,h in desc['generated_sha256'].items()):
@@ -82,9 +83,10 @@ def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False):
               ROOT/'test_internal/cloud_fresh_baseline.py',source,parent/'report.json',parent/'concurrency.wbit',
               resource/'resource-control.json',*[resource/p for p in desc['generated_sha256']],
               out/'candidate-source/spi_ctrl_top.v',shadow/'arch.yaml',shadow/'pins.csv']
+    if known_inputs:bound.append(ROOT/'spikes/r1/known_lut_inputs.py')
     (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),resource=str(resource),arch=str(shadow),
-        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,ungated_timer=ungated_timer,
-        scope=f'Source-proved registered SPI terminal pulse, timer enable '+('held high' if ungated_timer else 'state gated')+f', same frozen physical fabric, pins and parameters; original control seed1, candidate seed{candidate_seed}, 50MHz request and GBUF USER-pinned to original bank D. Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
+        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,ungated_timer=ungated_timer,known_lut_inputs=known_inputs,
+        scope=f'Source-proved registered SPI terminal pulse, timer enable '+('held high' if ungated_timer else 'state gated')+f', same frozen physical fabric, pins and parameters; original control seed1, candidate seed{candidate_seed}, 50MHz request and GBUF USER-pinned to original bank D. '+('Candidate unused LUT inputs explicitly routed to existing reset with binary-equivalent truth tables. ' if known_inputs else '')+'Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
 
 
 def run(out,case):
@@ -109,13 +111,22 @@ def run(out,case):
         expected=Path(plan['capsule'])/'model/compile/uart_spi_11/concurrency.wbit'
         if control['case']!='control' or control['image_sha256']!=sha(expected) or control['source_sha']!=os.environ.get('GITHUB_SHA'):
             raise ValueError('Same-revision original compile control did not reproduce')
-    original=compiler.run;clock_constraint=None
+    original=compiler.run;clock_constraint=None;input_transform=None
     def request_frequency(command,log,cwd,env=None):
-        nonlocal clock_constraint
+        nonlocal clock_constraint,input_transform
         if Path(command[0]).name=='nextpnr-generic':
             command=[*command,'--freq','50']
             if case=='candidate':
                 index=command.index('--json')+1;source=Path(command[index])
+                if plan.get('known_lut_inputs',False):
+                    from known_lut_inputs import fill_inputs
+                    filled,proof=fill_inputs(json.loads(source.read_text()))
+                    derived=out/case/'design_known_inputs.json';derived.write_text(json.dumps(filled)+'\n')
+                    receipt=out/case/'known-input-proof.json';receipt.write_text(json.dumps(proof,indent=2)+'\n')
+                    input_transform=dict(original_json_sha256=sha(source),derived_json_sha256=sha(derived),
+                        proof_sha256=sha(receipt),changed_cells=proof['changed_cells'],reset_net=proof['reset_net'],
+                        binary_cell_functions_preserved=True,sequential_and_hard_cells_preserved=True)
+                    source=derived
                 pinned,clock=pin_global_clock(json.loads(source.read_text()))
                 target=out/case/'design_clock_d.json';target.write_text(json.dumps(pinned)+'\n')
                 clock_constraint=dict(cell=clock,bel='X0Y4/D',logical_graph_preserved=True,
@@ -138,7 +149,9 @@ def run(out,case):
     (out/case/'result.json').write_text(json.dumps(dict(case=case,run=os.environ.get('GITHUB_RUN_ID'),source_sha=os.environ.get('GITHUB_SHA'),
         image_sha256=sha(image),placed_utilisation=report['utilisation'],model_fmax_mhz=report['fmax_mhz'],model_timing_characterized=False,
         requested_placement_frequency_mhz=50,yosys_version=version,nextpnr_version=np,
-        clock_constraint=clock_constraint,placement_seed=seed,ungated_timer=plan.get('ungated_timer',False) if case=='candidate' else False,actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
+        clock_constraint=clock_constraint,placement_seed=seed,ungated_timer=plan.get('ungated_timer',False) if case=='candidate' else False,
+        known_lut_inputs=plan.get('known_lut_inputs',False) if case=='candidate' else False,input_transform=input_transform,
+        actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
 
 
 if __name__=='__main__':
@@ -147,5 +160,6 @@ if __name__=='__main__':
     for name in ('capsule','proofs','out'):x.add_argument('--'+name,type=Path,required=True)
     x.add_argument('--candidate-seed',type=int,choices=(1,2,3),default=1)
     x.add_argument('--ungated-timer',action='store_true')
+    x.add_argument('--known-inputs',action='store_true')
     x=sub.add_parser('run');x.add_argument('--out',type=Path,required=True);x.add_argument('--case',choices=('control','candidate'),required=True)
     a=vars(p.parse_args());mode=a.pop('mode');(prepare if mode=='prepare' else run)(**a)

@@ -206,3 +206,12 @@ reflex to a stateful consumer. In all six DATA-first schedules the
 compiler's warned stall propagated upstream and the third arrival was
 the first overrun. EVENT-first drained under the same periods and
 cadences for the eight-arrival observation window.
+
+The native TX pending check also proves registered LEVEL, OE, RXSET and
+SAMPLE dispatch matches the due record and any immediate command for
+arbitrary input histories after reset. When an immediate command and
+a due record target the same dispatch type, the immediate payload wins.
+Full and lean passed unbounded induction. Dropping queued SAMPLE
+dispatch produced a counterexample in both configurations. The proof
+covers dispatch signals and payloads. Exact due-clock arithmetic,
+burst start and final pad effects retain separate obligations.

@@ -50,6 +50,19 @@ def forwarding_ports(words):
     return None
 
 
+def unseeded_forwarding_cycles(image, cycles):
+    """Find closed unconditional forwarding groups with no incoming token source."""
+    ports = {lane: forwarding_ports(data['slots']) for lane, data in image['lanes'].items()}
+    bindings = {port: (producer, mode, accept) for port, producer, mode, accept in image['connect']}
+    for group in cycles:
+        if any(ports.get(lane) is None for lane in group):
+            continue
+        outputs = {f'{lane}.O{ports[lane][1]}' for lane in group}
+        internal = {(output, 'blocking', 0xf) for output in outputs}
+        if all(bindings.get(f'{lane}.I{ports[lane][0]}') in internal for lane in group):
+            yield group
+
+
 def report_channel_graph(image):
     """Report structural risks without declaring queue progress or a rate bound."""
     cycles = blocking_components(image['connect'])
@@ -67,4 +80,9 @@ def report_channel_graph(image):
     if stages:
         lines.append('- Service is unclassified for lanes with conditional, multiple or '
                      f'non-forwarding slots: {", ".join(stages)}.')
+    lines.extend(
+        f'- No forwarding can start from empty channels in {", ".join(group)} '
+        'under the compiled slot and binding configuration.'
+        for group in unseeded_forwarding_cycles(image, cycles)
+    )
     return lines

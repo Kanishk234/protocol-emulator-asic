@@ -5,7 +5,7 @@ from pathlib import Path
 import cocotb
 from cocotb.handle import HierarchyObject
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge,FallingEdge,Timer,with_timeout
+from cocotb.triggers import RisingEdge,FallingEdge,Timer,ValueChange,with_timeout
 from cocotb.utils import get_sim_time
 from compile.bitfile import BitFile
 
@@ -99,6 +99,41 @@ async def trace_initial_traffic(d,directory):
         await Timer(1,unit='ns')
         capture_runtime(d,directory/('sample-'+str(index).zfill(2)+'.json'))
 
+def start_delta_observer(d,directory):
+    """Optional read-only delta-activity snapshot; never advances or drives a net.
+
+    This is a diagnostic threshold, not a functional pass/fail condition.
+    Stop observing after one report; the original test/timeout keeps control.
+    """
+    directory=Path(directory);directory.mkdir(parents=True,exist_ok=False)
+    state={'time':None,'counts':{},'events':0,'done':False}
+    async def watch(signal,name):
+        while not state['done']:
+            await ValueChange(signal)
+            if state['done']:return
+            now=get_sim_time(unit='ns')
+            if now!=state['time']:
+                state.update(time=now,counts={},events=0)
+            state['events']+=1
+            counts=state['counts'];counts[name]=counts.get(name,0)+1
+            if state['events']>=4096:
+                state['done']=True
+                (directory/'activity.json').write_text(json.dumps(dict(
+                    time_ns=now,events_at_same_time=state['events'],
+                    signals=sorted(counts.items(),key=lambda row:(-row[1],row[0])),
+                    scope='Passive same-time event observation only; not a loop proof or acceptance.'),indent=2)+'\n')
+                capture_runtime(d,directory/'runtime.json')
+                return
+    for tile in d.fabric:
+        if not isinstance(tile,HierarchyObject) or not tile._name.startswith('Tile_'):continue
+        for letter in 'ABCDEFGH':
+            for pin in ('I0','I1','I2','I3','O','Ci','Co'):
+                name='L'+letter+'_'+pin
+                try:signal=getattr(tile,name)
+                except AttributeError:continue
+                cocotb.start_soon(watch(signal,tile._name+'/'+name))
+
+
 @cocotb.test()
 async def loaded_concurrent_uart_spi(d):
     div=int(os.environ['R1_DIV'])
@@ -125,6 +160,8 @@ async def loaded_concurrent_uart_spi(d):
         capture_runtime(d,Path(os.environ['R1_RUNTIME_SNAPSHOT']).with_name('runtime-after-load.json'))
     if os.environ.get('R1_RUNTIME_TRACE_DIR'):
         cocotb.start_soon(trace_initial_traffic(d,os.environ['R1_RUNTIME_TRACE_DIR']))
+    if os.environ.get('R1_DELTA_TRACE_DIR'):
+        start_delta_observer(d,os.environ['R1_DELTA_TRACE_DIR'])
 
     activity={}
     def known_pin(signal,label):

@@ -22,6 +22,11 @@ def main():
            '-seq 3 -tempinduct -verify', 'Induction step proven: SUCCESS!')
     verify(output, 'pending-unguarded', source.replace(guard, "wire pend_ok = 1'b1;"),
            properties, '-seq 6', 'model found: FAIL!')
+    sample = 'smp       <= (pend_go && pend_k == K_SMP) || (tk_now && c_smp);'
+    if source.count(sample) != 1:
+        raise ValueError('Expected one SAMPLE dispatch assignment')
+    verify(output, 'pending-lost-sample', source.replace(sample, 'smp       <= (tk_now && c_smp);'),
+           properties, '-seq 8', 'model found: FAIL!')
 
 
 def check(output, source, scenario, deadline, depth):

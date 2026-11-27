@@ -1,0 +1,18 @@
+{
+  "run": {
+    "id": 46045747168,
+    "head_sha": "32796d4a62dcef8d6bbf4fcdc0754a829bbbf275",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_spi_tick_known_inputs_repair.yaml"
+  },
+  "artifact": {
+    "id": 15222391642,
+    "name": "r1-spi-tick-known-inputs-repair-46045747168",
+    "source_run": 46045747168,
+    "size_in_bytes": 21904355,
+    "digest": "sha256:8793680f5c45d9a51876c360e8f9194c85d6862a294d34df6cbdc25a9ca24726"
+  },
+  "member": "."
+}

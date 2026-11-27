@@ -14,6 +14,14 @@ def main():
     check(output, source, 'bounded', 'test_decision', 28)
     check(output, source, 'queued', 'test_second_due', 24)
     check(output, source, 'sync_gap', 'test_decision', 29)
+    guard = 'wire pend_ok = !pend_v || (pend_go && (pend_k != K_START));'
+    if source.count(guard) != 1:
+        raise ValueError('Expected one pending admission guard')
+    properties = (ROOT / 'formal/props/tx_pending.vh').read_text()
+    verify(output, 'pending-native', source, properties,
+           '-seq 3 -tempinduct -verify', 'Induction step proven: SUCCESS!')
+    verify(output, 'pending-unguarded', source.replace(guard, "wire pend_ok = 1'b1;"),
+           properties, '-seq 6', 'model found: FAIL!')
 
 
 def check(output, source, scenario, deadline, depth):
@@ -26,21 +34,24 @@ def check(output, source, scenario, deadline, depth):
         ('actual', properties, 'no model found: SUCCESS!'),
         ('late_oracle', wrong_deadline, 'model found: FAIL!'),
     ):
-        design = output / f'{scenario}-{name}.v'
-        design.write_text(source.replace('endmodule', body + 'endmodule'))
-        for full in (0, 1):
-            cmd = (
-                f'read_verilog -formal -sv -I src build/formal_tx_cursor/{design.name}; '
-                f'hierarchy -top trw_pin_tx -chparam FULL {full} -chparam USE_LEVEL_CACHE {full}; '
-                'prep -top trw_pin_tx; chformal -lower; '
-                f'sat -seq {depth} -set-assumes -prove-asserts'
-            )
-            run = subprocess.run(['yosys', '-QT', '-p', cmd], cwd=ROOT,
-                                 check=True, capture_output=True, text=True)
-            (output / f'{scenario}-{name}-{full}.log').write_text(run.stdout + run.stderr)
-            if expected not in run.stdout:
-                raise RuntimeError(f'Unexpected SAT result for {scenario}/{name}, FULL={full}')
-            print(f'{scenario}/{name}, FULL={full}: {expected}')
+        verify(output, f'{scenario}-{name}', source, body, f'-seq {depth}', expected)
+
+
+def verify(output, name, source, properties, options, expected):
+    design = output / f'{name}.v'
+    design.write_text(source.replace('endmodule', properties + 'endmodule'))
+    for full in (0, 1):
+        cmd = (
+            f'read_verilog -formal -sv -I src build/formal_tx_cursor/{design.name}; '
+            f'hierarchy -top trw_pin_tx -chparam FULL {full} -chparam USE_LEVEL_CACHE {full}; '
+            f'prep -top trw_pin_tx; chformal -lower; sat {options} -set-assumes -prove-asserts'
+        )
+        run = subprocess.run(['yosys', '-QT', '-p', cmd], cwd=ROOT,
+                             check=True, capture_output=True, text=True)
+        (output / f'{name}-{full}.log').write_text(run.stdout + run.stderr)
+        if expected not in run.stdout:
+            raise RuntimeError(f'Unexpected SAT result for {name}, FULL={full}')
+        print(f'{name}, FULL={full}: {expected}')
 
 
 if __name__ == '__main__':

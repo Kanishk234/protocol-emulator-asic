@@ -4,6 +4,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-27 — Explicit unused LUT input routing experiment
 
+- Compile46042819260 at6cbe445e passes exact rawc6control and candidate
+  3fd72f52... in105/128LCs/3timers/3shifts, actual bank D. Root verifies
+  archive/all428inputs/both full encodings, recomputes transform/proof and
+  clock-only change; all82explicit connections retained after packing.
+  Receipt: reports/r1_spi_tick_known_inputs_compile_46042819260.json.
+  D182 admits only this exact image to fresh native/reset/reload and then
+  original connected timing. Flip-flop-only spare inputs remain a limit.
+
 - Confirm ungated native45905503235 rejects ready X at115981ns. Original
   control/generated RTL pass; downloaded archive SHA and both8736-bit
   actual configuration audits verified. No reload/timing claim. Receipt:

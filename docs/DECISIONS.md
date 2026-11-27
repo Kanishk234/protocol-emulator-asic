@@ -1,5 +1,24 @@
 # Decisions
 
+## D-182: Qualify only the measured explicit-input image through native and RC gates
+
+- **Date:**2026-11-27. Compile46042819260 at6cbe445e passes original
+  rawc6control and candidate3fd72f52... in105/128LCs/3timers/3shifts.
+  Root authenticates archive, all428input hashes and both complete FASM
+  encodings, recomputes the derived JSON/proof and clock-only constraint.
+  All82explicit reset connections survive packing; actual clock bank D.
+  Receipt: reports/r1_spi_tick_known_inputs_compile_46042819260.json.
+- Pin exact producer/image/seed/clock and transform hashes. Require exact
+  Boolean candidate/control mode markers and untouched control transform;
+  hash original/derived LUT JSON and proof before native staging. Keep
+  original40tile exports and all8736-bit loading/reset/management reload
+  checks before original connected RC20ns/0.25nstiming. No acceptance
+  follows from compilation; native unknown-state behavior remains open.
+- Packed cells used only as flip-flops still have spare LUT inputs; HA
+  carry-only cells retain carry pins. The82new connections do not imply
+  all physical LUT inputs are defined. Do not force private state or change
+  cell models to bypass that remaining diagnostic question.
+
 ## D-181: Route unused logical LUT inputs explicitly before placement
 
 - **Date:** 2026-11-27. Ungated native45905503235 rejects host-ready X

@@ -4,6 +4,8 @@ The timed-out raw run is diagnostic evidence only. The staged image still
 requires every original native/reset/reload and connected timing check.
 """
 import argparse
+import copy
+import hashlib
 import io
 import json
 from pathlib import Path
@@ -19,6 +21,19 @@ from unused_input_sweep import prove_input,carry_modes
 
 RAW='3fd72f5299e42d6bae148aab2d6d912a009f73e5426ded0f13482d7f9e061d66'
 REPAIRED='5901ac357a973d4a5a72da105fd81f869be22ad0b5a5c475844cc90ddba691e7'
+
+
+def derived_report(original,image,source_report_sha256):
+    if original['provenance']['bitfile_sha256']!=RAW:
+        raise ValueError('Original compiler report does not describe the raw image')
+    report=copy.deepcopy(original)
+    report.update(crc32=f'0x{image.crc:08X}',words=len(image.words),fmax_mhz=None,
+        meets_50mhz=False,compiler_timing_applies_to_image=False,
+        source_compile_report_sha256=source_report_sha256)
+    report['provenance'].update(bitfile_sha256=hashlib.sha256(image.to_bytes()).hexdigest(),
+        derived_from_bitfile_sha256=RAW,
+        scope='Original compiler inputs retained; image derived by two independently proved unused-input selector changes. No fresh compiler timing claim.')
+    return report
 
 
 def validate_trace(trace,runtime):
@@ -78,6 +93,10 @@ def prepare(capsule,native,trial,baseline,out):
     image=out/'candidate-case/concurrency.wbit';BitFile(raw.arch_version,changed).save(image)
     if sha(image)!=REPAIRED:raise ValueError('Repaired image differs from the local diagnostic')
     (out/'candidate-case/design.fasm').write_text('\n'.join(features)+'\n')
+    report_path=out/'candidate-case/report.json';source_report=out/'source-compile-report.json'
+    source_report.write_bytes(report_path.read_bytes())
+    report_path.write_text(json.dumps(derived_report(json.loads(source_report.read_text()),
+        BitFile.load(image),sha(source_report)),indent=2)+'\n')
     record=dict(raw_image_sha256=RAW,repaired_image_sha256=REPAIRED,changed_bits=2,
         actual_raw_frame_audit=frame,proofs=proofs,scope='Binary-unused routing repair only; fresh native/reload/timing required.',adopted=False)
     receipt=out/'two-selector-proof.json';receipt.write_text(json.dumps(record,indent=2)+'\n')
@@ -85,7 +104,7 @@ def prepare(capsule,native,trial,baseline,out):
     bound=[Path(__file__),Path(__file__).with_name('unused_input_sweep.py'),
         Path(__file__).with_name('selected_route.py'),baseline/'plan.json',trace,runtime,state_path,
         baseline/'candidate/quiesced.wbit',baseline/'control/configured-smoke.json',baseline/'control/results.xml',
-        spec_path,pips_path,receipt,out/'candidate-case/design.fasm',image,
+        spec_path,pips_path,receipt,out/'candidate-case/design.fasm',image,report_path,source_report,
         Path(__file__).parents[2]/'tools/profiling/r1_quiesce.py']
     staged['input_sha256'].update({str(p):sha(p) for p in bound})
     (out/'plan.json').write_text(json.dumps(staged,indent=2)+'\n')

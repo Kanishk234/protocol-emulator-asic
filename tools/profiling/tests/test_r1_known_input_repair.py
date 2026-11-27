@@ -5,7 +5,8 @@ import sys
 import pytest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[3]/'spikes/r1'))
-from known_input_repair import validate_trace
+from known_input_repair import validate_trace,derived_report,RAW
+from compile.bitfile import BitFile
 
 
 def observation():
@@ -13,6 +14,20 @@ def observation():
         ['Tile_X1Y1_LUT4x8_ha/LF_O',2049],['Tile_X1Y1_LUT4x8_ha/LC_O',2046],
         ['Tile_X1Y1_LUT4x8_ha/LB_O',1]]},
         {'time_ns':115921,'pins':{'h_wvalid':'1','h_wready':'1'}})
+
+
+def test_derived_image_gets_its_own_report_without_inheriting_compiler_timing():
+    import hashlib
+    original={'provenance':{'bitfile_sha256':RAW,'inputs':['unchanged']},
+              'params':{'DIV':434},'fmax_mhz':36.39,'crc32':'old'}
+    before=deepcopy(original);image=BitFile(0xfe,[0xfab0fab1,0])
+    report=derived_report(original,image,'a'*64)
+    assert original==before and report['params']==original['params']
+    assert report['provenance']['bitfile_sha256']==hashlib.sha256(image.to_bytes()).hexdigest()
+    assert report['crc32']==f'0x{image.crc:08X}' and report['source_compile_report_sha256']=='a'*64
+    assert report['fmax_mhz'] is None and report['compiler_timing_applies_to_image'] is False
+    original['provenance']['bitfile_sha256']='0'*64
+    with pytest.raises(ValueError,match='Original compiler report'):derived_report(original,image,'a'*64)
 
 
 @pytest.mark.parametrize('mutation',['time','budget','other_net','duplicate','unknown_ready','idle'])

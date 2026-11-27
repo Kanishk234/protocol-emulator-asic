@@ -192,3 +192,17 @@ The consecutive SYNC, GAP, and LEVEL check now covers 29 steps and
 prescaler encodings zero through three. Both full and lean passed for all
 modeled delays (zero to three ticks per command) and rejected the
 one-edge-late reference. The check remains bounded.
+
+An unbounded induction check on native pin TX proves the pending record
+cannot accept another timed action or change payload before it is due.
+After a due event with no replacement, or after reset/restart, the record
+is empty on the next clock. Both full and lean passed with arbitrary
+inputs after an initial reset. Removing the admission guard produces a
+counterexample in both variants. This proves queue safety for F-PIN-1.
+The exact deadline and complete action execution remain separate checks.
+
+A two-lane model regression drives periodic arrivals through a forwarding
+reflex to a stateful consumer. In all six DATA-first schedules the
+compiler's warned stall propagated upstream and the third arrival was
+the first overrun. EVENT-first drained under the same periods and
+cadences for the eight-arrival observation window.

@@ -9,6 +9,13 @@ from spi_tick_pipeline_compile import pin_global_clock,placement_seed,prepare
 from fixed_relocation import logical_graph
 
 
+@pytest.mark.parametrize('threshold',[True,'16',0,8,17,None])
+def test_control_sharing_change_is_bounded_before_staging(tmp_path,threshold):
+    with pytest.raises(ValueError,match='control-sharing threshold'):
+        prepare(tmp_path/'capsule',tmp_path/'proofs',tmp_path/'out',candidate_min_ctrl=threshold)
+    assert not (tmp_path/'out').exists()
+
+
 def test_bounded_candidate_seeds_never_change_original_compile_control():
     assert placement_seed({},'candidate')==1
     for seed in (1,2,3):

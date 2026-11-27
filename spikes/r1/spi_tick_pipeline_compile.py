@@ -37,10 +37,12 @@ def placement_seed(plan,case):
     return 1 if case=='control' else seed
 
 
-def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs=False):
+def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs=False,candidate_min_ctrl=4):
     from autonomy.check_xml import check_xml
     placement_seed({'candidate_seed':candidate_seed},'candidate')
     if type(known_inputs) is not bool:raise ValueError('Explicit Boolean input-routing mode required')
+    if type(candidate_min_ctrl) is not int or candidate_min_ctrl not in (4,16):
+        raise ValueError('Unapproved candidate control-sharing threshold')
     capsule,proofs,out=(Path(p).resolve() for p in (capsule,proofs,out))
     resource=capsule/'model/resource';desc=json.loads((resource/'resource-control.json').read_text())
     if desc['radix']!='radix8_2' or any(sha(resource/p)!=h for p,h in desc['generated_sha256'].items()):
@@ -85,8 +87,8 @@ def prepare(capsule,proofs,out,candidate_seed=1,ungated_timer=False,known_inputs
               out/'candidate-source/spi_ctrl_top.v',shadow/'arch.yaml',shadow/'pins.csv']
     if known_inputs:bound.append(ROOT/'spikes/r1/known_lut_inputs.py')
     (out/'plan.json').write_text(json.dumps(dict(capsule=str(capsule),resource=str(resource),arch=str(shadow),
-        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,ungated_timer=ungated_timer,known_lut_inputs=known_inputs,
-        scope=f'Source-proved registered SPI terminal pulse, timer enable '+('held high' if ungated_timer else 'state gated')+f', same frozen physical fabric, pins and parameters; original control seed1, candidate seed{candidate_seed}, 50MHz request and GBUF USER-pinned to original bank D. '+('Candidate unused LUT inputs explicitly routed to existing reset with binary-equivalent truth tables. ' if known_inputs else '')+'Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
+        inputs={str(p):sha(p) for p in bound},params=report['params'],candidate_seed=candidate_seed,candidate_min_ctrl=candidate_min_ctrl,ungated_timer=ungated_timer,known_lut_inputs=known_inputs,
+        scope=f'Source-proved registered SPI terminal pulse, timer enable '+('held high' if ungated_timer else 'state gated')+f', same frozen physical fabric, pins and parameters; original control seed1/MIN_CTRL4, candidate seed{candidate_seed}/MIN_CTRL{candidate_min_ctrl}, 50MHz request and GBUF USER-pinned to original bank D. '+('Candidate unused LUT inputs explicitly routed to existing reset with binary-equivalent truth tables. ' if known_inputs else '')+'Compiler timing remains uncharacterized; no native, extracted timing or adoption claim.'),indent=2)+'\n')
 
 
 def run(out,case):
@@ -96,6 +98,9 @@ def run(out,case):
         raise ValueError('Fresh compilation runs hosted with explicit cases')
     out=Path(out).resolve();plan=json.loads((out/'plan.json').read_text())
     seed=placement_seed(plan,case)
+    threshold=plan.get('candidate_min_ctrl',4) if case=='candidate' else 4
+    if type(threshold) is not int or threshold not in (4,16) or compiler.MIN_CTRL!=4:
+        raise ValueError('Compiler control-sharing threshold differs from explicit plan/default')
     if any(sha(p)!=h for p,h in plan['inputs'].items()):raise ValueError('Frozen compile/proof input changed')
     version=subprocess.check_output([compiler.tool('yosys'),'-V'],text=True)
     if 'e74db6dea' not in version:raise ValueError('Yosys differs from the original primary compiler')
@@ -133,9 +138,11 @@ def run(out,case):
                     source_json_sha256=sha(source),pinned_json_sha256=sha(target))
                 command[index]=str(target)
         return original(command,log,cwd,env)
-    compiler.run=request_frequency
+    compiler.run=request_frequency;compiler.MIN_CTRL=threshold
     try:image,report=compiler.compile_design(sources,pins,Path(plan['arch']),out/case,seed=seed,set_params=params,strict_ports=True)
-    finally:compiler.run=original
+    finally:compiler.run=original;compiler.MIN_CTRL=4
+    if report['build_options']['min_ctrl']!=threshold:
+        raise ValueError('Reported control-sharing threshold differs from requested compile')
     if case=='control' and Path(image).read_bytes()!=(Path(plan['capsule'])/'model/compile/uart_spi_11/concurrency.wbit').read_bytes():
         raise ValueError('Original same-source compiler control image did not reproduce')
     if case=='candidate' and not (out/'control/result.json').is_file():raise ValueError('Original compile control missing')
@@ -150,7 +157,7 @@ def run(out,case):
         image_sha256=sha(image),placed_utilisation=report['utilisation'],model_fmax_mhz=report['fmax_mhz'],model_timing_characterized=False,
         requested_placement_frequency_mhz=50,yosys_version=version,nextpnr_version=np,
         clock_constraint=clock_constraint,placement_seed=seed,ungated_timer=plan.get('ungated_timer',False) if case=='candidate' else False,
-        known_lut_inputs=plan.get('known_lut_inputs',False) if case=='candidate' else False,input_transform=input_transform,
+        known_lut_inputs=plan.get('known_lut_inputs',False) if case=='candidate' else False,input_transform=input_transform,min_ctrl=threshold,
         actual_native_loading=False,timing_acceptance=False,physical_acceptance=False,adopted=False),indent=2)+'\n')
 
 
@@ -161,5 +168,6 @@ if __name__=='__main__':
     x.add_argument('--candidate-seed',type=int,choices=(1,2,3),default=1)
     x.add_argument('--ungated-timer',action='store_true')
     x.add_argument('--known-inputs',action='store_true')
+    x.add_argument('--candidate-min-ctrl',type=int,choices=(4,16),default=4)
     x=sub.add_parser('run');x.add_argument('--out',type=Path,required=True);x.add_argument('--case',choices=('control','candidate'),required=True)
     a=vars(p.parse_args());mode=a.pop('mode');(prepare if mode=='prepare' else run)(**a)

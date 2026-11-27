@@ -2,13 +2,19 @@
 import cocotb
 from cocotb.triggers import ClockCycles, ReadOnly
 
-from chiplib import load, start
+from chiplib import HM, load, start
 
 
 @cocotb.test()
-async def xprop_after_firmware_load(dut):
-    pins = await start(dut, ui=1)
-    await load(pins, 'uart', BAUD=115200)
+@cocotb.parametrize(program=['uart', 'spi_controller', 'i2c_controller'])
+async def xprop_after_firmware_load(dut, program):
+    pins = await start(dut, ui=1, uio=0xff)
+    if program != 'uart':
+        # Exercise both ends of the SRAM address space through the SPI host.
+        for offset, word in ((0, 0xa659), (511, 0x59a6)):
+            await pins.write(HM['sram'] + offset, [word])
+            assert await pins.read(HM['sram'] + offset) == [word]
+    await load(pins, program)
     await ClockCycles(dut.clk, 32)
     observed = ('uo_out', 'uio_out', 'uio_oe', 'routed_flops')
     for offset in range(16):

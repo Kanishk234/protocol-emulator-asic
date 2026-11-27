@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check known pads and resettable flop outputs after a routed UART firmware load."""
+"""Check known pads and resettable flop outputs after routed firmware startup."""
 import argparse
 import os
 from pathlib import Path
@@ -48,7 +48,7 @@ def main():
             f'MACRO_DIR={ROOT / "macro/RM_IHPSG13_1P_512x16_c2_bm_bist"}',
             'COCOTB_TEST_MODULES=test_xprop_routed', 'COCOTB_RESULTS_FILE=results.xml',
         ], cwd=output, env=env, stdout=stream, stderr=subprocess.STDOUT, check=True)
-    print(f'Known pad and {len(instances)} flop outputs after UART firmware load. Evidence: {log}')
+    print(f'Known pad and {len(instances)} monitored flop outputs after firmware startup. Evidence: {log}')
 
 
 if __name__ == '__main__':

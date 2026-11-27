@@ -1,5 +1,35 @@
 # Decisions
 
+## D-187: Park twelve physical spare inputs on the qualified capture image
+
+- **Date:**2026-11-27. D186compile46047728814 at4009f0bb reproduces
+  original rawc6/MIN_CTRL4, but candidate MIN_CTRL16 times out at600s
+  with60routing arcs remaining (104/128LC pre-routing inventory). Root
+  authenticates archive/all428prepared hashes, control full FASM, derived
+  logical LUT proof and clock constraint. No candidate bitstream, native
+  or timing result. Retire this fixed point rather than increase its budget.
+  Receipt: reports/r1_local_enable_compile_46047728814.json.
+- Audit qualified46045747168 physical truth tables instead. The worst
+  capture cell's actual INITff00 uses I3, despite the logical packed LUT's
+  I0/INITaaaa representation. Pin permutation means spare-input decisions
+  must use actual frames/FASM/native modes, never logical port numbering.
+  Unused physical inputs currently receive timer/other control signals.
+  Their binary irrelevance is not permission to disable timing arcs.
+- Stage one fixed twelve-selector cohort across SPI receive-capture FFs.
+  Require the exact qualified native/reload/negative-RC parent, three
+  strict XMLs,8736actual frame bits, constant source hashes and runtime
+  alias consistency. Re-prove all16cofactor addresses, registered mode,
+  active-bit exclusion and carry noninterference per target; accept only
+  observed-defined terminal sources. Recheck carry fanout jointly and
+  require complete FASM reencoding/exactly12changed bits. Preserve original
+  parent report and bind a separate derived SHA/CRC/proof with no Fmax claim.
+- Candidate raw0d51924b... passes local native UART/SPI/reset/second
+  transfer; all55simulation inputs and8736observations checked, exactly12
+  latches differ from the qualified parent. Receipt:
+  reports/r1_capture_spare_native_local_20261127.json. Full hosted native/
+  management reload and original20ns/0.25nsRC remain mandatory. Parent
+  image/physical fabric/PDK/clock constraints stay fixed. No adoption yet.
+
 ## D-186: Test local mapping of small flip-flop enable groups
 
 - **Date:**2026-11-27. Corrected46045747168 at32796d4a passes native

@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-27",
+  "parent_run": 46045747168,
+  "scope": "Local direct native/reset/second-transfer only; full hosted reload and RC timing remain required.",
+  "candidate_raw_image_sha256": "0d51924b9ad26a1993e41889be1bf0756dd40870041304dd7db8947c85191657",
+  "loaded_image_sha256": "6ad9f95e7c415548b52ce739d88281b688b1ccdcbc85ed67047e3255049ea87f",
+  "observed_state_sha256": "49d625b3e80832460da997a4765dd2c1ffe91df21b0a200e0d4dbbf5272ebf8a",
+  "passed": true,
+  "strict_tests": 1,
+  "simulation_inputs_checked": 55,
+  "configuration_bits_checked": 8736,
+  "observed_latch_changes_from_qualified_parent": 12,
+  "activity": {
+    "overlap_ns": 8340.0,
+    "windows_ns": {
+      "spi": [
+        116001.0,
+        124501.0
+      ],
+      "uart_rx": [
+        116161.0,
+        202961.0
+      ],
+      "uart_tx": [
+        115961.0,
+        198421.0
+      ]
+    }
+  },
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

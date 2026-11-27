@@ -2,6 +2,31 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-27 — Physical spare-input timing and hold investigation
+
+- D18646047728814 at4009f0bb hits600s with60routing arcs remaining;
+  no candidate bitstream. Root authenticates archive/all428inputs/control
+  rawc6/full FASM and derived LUT/clock JSONs. Preserve measured failure;
+  do not repeat a blind seed/budget sweep. Receipt:
+  reports/r1_local_enable_compile_46047728814.json.
+- Read-only STA pin probe reproduces qualified setup-34.141884ns/zero
+  loops. Actual physical LUT/FF mode inspection identifies ignored capture
+  inputs fed by active timer/control routes. Frame truthff00 maps active
+  data to I3, so logical nextpnr port labels cannot identify unused inputs.
+- D187stages exactly12cofactor/carry/noninterference-proved physical
+  spare selectors on the positive native/reload parent. Full FASM and
+  runtime alias/defined-source guards pass; no source or hardware change.
+  Local native/reset/second transfer passes, all55inputs/8736actual bits
+  verified and exactly12observed latch changes. Receipt:
+  reports/r1_capture_spare_native_local_20261127.json. Full hosted reload
+  and original connected timing still required.
+  All90focused guards and the new workflow lint pass; fresh parent/source
+  staging revalidates the exact fixed candidate and metadata before push.
+- **Boxes ticked:** none. G1 remains selected; no R1timing closure.
+- **Next:** push/run D187qualification, then examine same-signal routing
+  alternatives for UART input hold and use the new measured setup path
+  to select the next single change. Preserve all timing constraints.
+
 ## 2026-11-27 — Explicit unused LUT input routing experiment
 
 - Corrected46045747168 at32796d4a passes native/reset/full management

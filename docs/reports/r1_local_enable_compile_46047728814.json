@@ -1,0 +1,24 @@
+{
+  "run": 46047728814,
+  "source_sha": "4009f0bb884c14dd28d32efca8fcc4be06f5a336",
+  "artifact_id": 15224225340,
+  "archive_sha256": "7e95bdfb06d0fddc51c344206799f150d82142850d7b07606f9ddc89ecbac2db",
+  "archive_verified": true,
+  "prepared_input_hashes_checked": 428,
+  "original_control_reproduced": true,
+  "original_min_ctrl": 4,
+  "candidate_min_ctrl": 16,
+  "derived_lut_json_proof_and_clock_constraint_recomputed": true,
+  "pre_routing_lc_inventory": {
+    "used": 104,
+    "available": 128
+  },
+  "candidate_route_budget_seconds": 600,
+  "exit_code": 124,
+  "last_remaining_routing_arcs": 60,
+  "complete_candidate_bitstream": false,
+  "scope": "One fixed source/seed/threshold did not route within its budget. No general unroutability claim; no native/reload/timing result.",
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

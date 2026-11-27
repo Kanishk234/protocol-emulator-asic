@@ -228,3 +228,10 @@ IDLE after each DATA. Alternating EVENT and DATA drains for eight
 arrivals at three periods and two scheduler cadences. Repeating EVENT,
 DATA, DATA stalls on the extra DATA and overruns at arrival five across
 the same six schedules.
+
+Native TX induction also checks the registered OE effect and reset
+default, and checks that a due LEVEL action updates the stored level and
+clears echo when no higher-priority burst effect owns the edge. Full and
+lean passed with arbitrary inputs after initial reset. Removing the OE
+update caused a counterexample in both. Carrier-modulated pad behavior
+and complete TX deadlines remain separate.

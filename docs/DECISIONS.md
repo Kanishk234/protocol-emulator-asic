@@ -1,5 +1,26 @@
 # Decisions
 
+## D-183: Observe delta activity and test two independent unused-input selectors
+
+- **Date:**2026-11-27. The raw D182image stalls at traffic start locally.
+  An optional read-only observer counts native LUT signal changes at one
+  simulation time, writes one bounded report at4096events and stops
+  observing. It changes neither stimulus nor pass/fail/timeout criteria.
+  Original control passes with unchanged traffic windows and no threshold
+  report. Candidate records X1Y1/F.O2049events and C.O2046events at
+  115921ns. This is observation, not a complete loop/analog proof.
+- Recheck actual configuration/FASM/native modes: F INITffff, C INIT0000.
+  Both unused I0selectors pass existing16-cofactor/native mode/active-bit
+  exclusion/carry guards. Toggle only C word161bit14 and F word155bit0,
+  selecting existing routes ending at observed-defined X1Y2/B.O and
+  X1Y3/A.O. No primitive, hardware, cell model, state force or timing edit.
+- Local two-bit diagnostic passes strict concurrent UART/SPI and reset/
+  second-transfer checks. Root verifies both8736-bit frame audits and
+  all55control/57candidate simulation input hashes; traffic windows equal
+  the original control. Management reload and hosted repair/timing remain
+  open. Receipt: reports/r1_explicit_input_delta_diagnostic_20261127.json.
+  Do not adopt a local pass or reuse repairs on another compiled image.
+
 ## D-182: Qualify only the measured explicit-input image through native and RC gates
 
 - **Date:**2026-11-27. Compile46042819260 at6cbe445e passes original

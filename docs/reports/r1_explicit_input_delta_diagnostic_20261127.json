@@ -1,0 +1,286 @@
+{
+  "date": "2026-11-27",
+  "scope": "Local diagnostic only; raw hosted replay remains separate. No hosted repair, management reload or extracted timing acceptance.",
+  "raw_compile_run": 46042819260,
+  "raw_image_sha256": "3fd72f5299e42d6bae148aab2d6d912a009f73e5426ded0f13482d7f9e061d66",
+  "passive_delta_activity": {
+    "time_ns": 115921.0,
+    "events_at_same_time": 4096,
+    "signals": [
+      [
+        "Tile_X1Y1_LUT4x8_ha/LF_O",
+        2049
+      ],
+      [
+        "Tile_X1Y1_LUT4x8_ha/LC_O",
+        2046
+      ],
+      [
+        "Tile_X1Y1_LUT4x8_ha/LB_O",
+        1
+      ]
+    ],
+    "scope": "Passive same-time event observation only; not a loop proof or acceptance."
+  },
+  "selector_proofs": [
+    {
+      "tile": "Tile_X1Y1_LUT4x8_ha",
+      "cell": "_1519_",
+      "lut": "C",
+      "input": 0,
+      "observed_init": 0,
+      "cofactor_addresses_checked": 16,
+      "tile_bit": 206,
+      "word": 161,
+      "word_bit": 14,
+      "before": "0",
+      "after": "1",
+      "carry_noninterference": {
+        "scope": "I0/I3 do not enter the native carry function"
+      },
+      "route_before": [
+        [
+          "X1Y1",
+          "LC_I0"
+        ],
+        [
+          "X1Y1",
+          "J2MID_CDa_END0"
+        ],
+        [
+          "X1Y1",
+          "J2MID_CDa_BEG0"
+        ],
+        [
+          "X1Y1",
+          "E2MID2"
+        ],
+        [
+          "X0Y1",
+          "E2BEG2"
+        ],
+        [
+          "X0Y1",
+          "W1END1"
+        ],
+        [
+          "X1Y1",
+          "W1BEG1"
+        ],
+        [
+          "X1Y1",
+          "JS2END0"
+        ],
+        [
+          "X1Y1",
+          "JS2BEG0"
+        ],
+        [
+          "X1Y1",
+          "LF_O"
+        ]
+      ],
+      "route_after": [
+        [
+          "X1Y1",
+          "LC_I0"
+        ],
+        [
+          "X1Y1",
+          "J2MID_CDb_END0"
+        ],
+        [
+          "X1Y1",
+          "J2MID_CDb_BEG0"
+        ],
+        [
+          "X1Y1",
+          "N2MID3"
+        ],
+        [
+          "X1Y2",
+          "N2BEG3"
+        ],
+        [
+          "X1Y2",
+          "JN2END7"
+        ],
+        [
+          "X1Y2",
+          "JN2BEG7"
+        ],
+        [
+          "X1Y2",
+          "LB_O"
+        ]
+      ],
+      "observed_ff_select": "0",
+      "primitive_control_fields_preserved": true,
+      "transition_scope": "Binary LUT data equality; unchanged FF/clock/reset/enable modes preserve sequential transitions. No native initialization, glitch or timing acceptance."
+    },
+    {
+      "tile": "Tile_X1Y1_LUT4x8_ha",
+      "cell": "_1537_",
+      "lut": "F",
+      "input": 0,
+      "observed_init": 65535,
+      "cofactor_addresses_checked": 16,
+      "tile_bit": 160,
+      "word": 155,
+      "word_bit": 0,
+      "before": "0",
+      "after": "1",
+      "carry_noninterference": {
+        "scope": "I0/I3 do not enter the native carry function"
+      },
+      "route_before": [
+        [
+          "X1Y1",
+          "LF_I0"
+        ],
+        [
+          "X1Y1",
+          "J2MID_EFa_END0"
+        ],
+        [
+          "X1Y1",
+          "J2MID_EFa_BEG0"
+        ],
+        [
+          "X1Y1",
+          "E2MID2"
+        ],
+        [
+          "X0Y1",
+          "E2BEG2"
+        ],
+        [
+          "X0Y1",
+          "W1END1"
+        ],
+        [
+          "X1Y1",
+          "W1BEG1"
+        ],
+        [
+          "X1Y1",
+          "JS2END0"
+        ],
+        [
+          "X1Y1",
+          "JS2BEG0"
+        ],
+        [
+          "X1Y1",
+          "LF_O"
+        ]
+      ],
+      "route_after": [
+        [
+          "X1Y1",
+          "LF_I0"
+        ],
+        [
+          "X1Y1",
+          "J2END_EF_END0"
+        ],
+        [
+          "X1Y1",
+          "J2END_EF_BEG0"
+        ],
+        [
+          "X1Y1",
+          "N2END3"
+        ],
+        [
+          "X1Y2",
+          "N2BEGb3"
+        ],
+        [
+          "X1Y2",
+          "N2MID3"
+        ],
+        [
+          "X1Y3",
+          "N2BEG3"
+        ],
+        [
+          "X1Y3",
+          "JN2END7"
+        ],
+        [
+          "X1Y3",
+          "JN2BEG7"
+        ],
+        [
+          "X1Y3",
+          "LA_O"
+        ]
+      ],
+      "observed_ff_select": "0",
+      "primitive_control_fields_preserved": true,
+      "transition_scope": "Binary LUT data equality; unchanged FF/clock/reset/enable modes preserve sequential transitions. No native initialization, glitch or timing acceptance."
+    }
+  ],
+  "cases": {
+    "control-delta": {
+      "passed": true,
+      "strict_tests": 1,
+      "simulation_input_hashes_checked": 55,
+      "configuration_bits": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "configuration_snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+      "activity": {
+        "overlap_ns": 8340.0,
+        "windows_ns": {
+          "spi": [
+            116001.0,
+            124501.0
+          ],
+          "uart_rx": [
+            116161.0,
+            202961.0
+          ],
+          "uart_tx": [
+            115961.0,
+            198421.0
+          ]
+        }
+      },
+      "reset_second_transfer_tested": true,
+      "management_reload_tested": false
+    },
+    "candidate-two-selectors": {
+      "passed": true,
+      "strict_tests": 1,
+      "simulation_input_hashes_checked": 57,
+      "configuration_bits": 8736,
+      "image_sha256": "a4cbccd01be782a01a548e853f065076093de60221bdadda012874ed79206ec5",
+      "configuration_snapshot_sha256": "71c9c11bc0b8af802cdbfcf6baed78e5198b597f5f529ede618beacc048f9d36",
+      "activity": {
+        "overlap_ns": 8340.0,
+        "windows_ns": {
+          "spi": [
+            116001.0,
+            124501.0
+          ],
+          "uart_rx": [
+            116161.0,
+            202961.0
+          ],
+          "uart_tx": [
+            115961.0,
+            198421.0
+          ]
+        }
+      },
+      "reset_second_transfer_tested": true,
+      "management_reload_tested": false
+    }
+  },
+  "changed_selector_bits": 2,
+  "original_control_delta_threshold_reached": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

@@ -1,5 +1,22 @@
 # Bugs
 
+## 179: Explicit-input image stalls at traffic start in native simulation
+
+- **Symptom/check:** D182raw image3fd72f52... reaches defined idle pins
+  then makes no simulation-time progress after host-valid changes at
+  115921ns. Passive delta recorder observes repeated X1Y1/F.O/C.O events.
+- **Diagnosis:** both LUT functions are binary constants (ffff/0000), but
+  their unassigned inputs/default routes remain in the native gate graph.
+  A complete hazard/loop root-cause proof is still open; do not conflate
+  stable binary truth-table independence with native settling.
+- **Local candidate:** two independently proved unused I0selector changes
+  remove the stall in the full concurrent/reset/second-transfer diagnostic.
+  Actual8736-bit agreement and input hashes pass. Full hosted management
+  reload and connected timing still required; bug remains open.
+- **Coverage:** optional passive4096-event snapshot, unchanged assertions
+  and bounded external timeout; original control passes with same traffic
+  windows. See reports/r1_explicit_input_delta_diagnostic_20261127.json.
+
 ## 178: All historical generated-RTL control profiles lose their compiler archives
 
 - **Resolved by full replay:**45896227686 at3cc674a6 passes all three

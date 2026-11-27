@@ -4,6 +4,16 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-27 — Explicit unused LUT input routing experiment
 
+- D183/BUG179: raw explicit-input local run stalls at115921ns. Passive
+  observer localizes same-time activity to X1Y1/F.O/C.O; original control
+  passes with unchanged traffic windows and no threshold report. Two
+  fresh cofactor/carry/noninterference-proved unused I0selector changes
+  pass local concurrent/reset/second-transfer tests. Root verifies both
+  actual8736-bit frames and all55/57simulation input hashes. Receipt:
+  reports/r1_explicit_input_delta_diagnostic_20261127.json. No hosted
+  repair/reload/timing acceptance. All74earlier guards/10adapter-frame
+  guards pass; native46043377371 remains a separate bounded raw replay.
+
 - Compile46042819260 at6cbe445e passes exact rawc6control and candidate
   3fd72f52... in105/128LCs/3timers/3shifts, actual bank D. Root verifies
   archive/all428inputs/both full encodings, recomputes transform/proof and

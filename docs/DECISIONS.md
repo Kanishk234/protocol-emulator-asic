@@ -1,5 +1,26 @@
 # Decisions
 
+## D-184: Require fresh raw observation before hosted two-selector qualification
+
+- **Date:**2026-11-27. A separate workflow authenticates D182sources,
+  runs the original control and observes the raw candidate within120s.
+  Require timeout124, strict passing original control, the expected4096
+  same-time event observation and all8736actual configuration bits.
+  A timeout alone cannot authorize a repair. Reproduce exact default
+  grounding from the raw FASM before using its observed configuration.
+- Re-run the D183two-selector proofs; require exact INIT/FF modes, bit
+  addresses, selected route terminals and observed-defined sources. Add
+  only those two existing PIPs to derived FASM, require complete reencoding
+  and exactly two changed raw bits. Pin resulting raw5901ac35... .
+  Keep compiler metadata/control intact; record a separate repair proof
+  and bind all source/observation/derived input hashes in the native plan.
+- Local fresh baseline/staging passes; the derived default-grounded image
+  equals the actual locally passing two-selector diagnostic byte for byte.
+  Require hosted original control/candidate/reset/management reload next,
+  then original connected20ns/0.25nsRC conditions and all existing guards.
+  Raw timeout is retained as a rejected baseline, never a functional pass.
+  No production/hardware, cell-model, PDK or timing-exception changes.
+
 ## D-183: Observe delta activity and test two independent unused-input selectors
 
 - **Date:**2026-11-27. The raw D182image stalls at traffic start locally.

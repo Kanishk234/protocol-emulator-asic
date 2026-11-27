@@ -4,6 +4,14 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-27 — Explicit unused LUT input routing experiment
 
+- D184 adds a separate hosted two-selector qualification: require fresh
+  raw delta observation, strict original control and actual8736-bit frame
+  agreement, then fresh exact cofactor/mode/carry/route proofs and full
+  FASM reencoding. Raw5901ac35... changes exactly two bits. Actual fresh
+  local preparation passes; derived grounded image equals the locally
+  passing diagnostic. All47targeted guards and workflow lint pass.
+  Next: hosted reset/management reload followed by unchanged connected RC.
+
 - D183/BUG179: raw explicit-input local run stalls at115921ns. Passive
   observer localizes same-time activity to X1Y1/F.O/C.O; original control
   passes with unchanged traffic windows and no threshold report. Two

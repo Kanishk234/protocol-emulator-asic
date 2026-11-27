@@ -187,3 +187,8 @@ to the model. Both campaigns exercise stalls and releases. A second
 10,000-program unconditional forwarding run at seed 0x5e0 agreed on
 4,837 safe schedules and 5,163 first overruns. These remain scoped
 results under declared inputs and service.
+
+The consecutive SYNC, GAP, and LEVEL check now covers 29 steps and
+prescaler encodings zero through three. Both full and lean passed for all
+modeled delays (zero to three ticks per command) and rejected the
+one-edge-late reference. The check remains bounded.

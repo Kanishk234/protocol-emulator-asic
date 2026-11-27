@@ -33,6 +33,25 @@ jobs:
           python scripts/formal_channels.py
           python scripts/formal_pin_rx.py
           python scripts/formal_pin_unit.py
+      - name: Fabric isolation, lane decode and scheduling, SRAM rotation, and TX cursor
+        run: |
+          source .venv/bin/activate
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          python scripts/formal_decode.py
+          python scripts/formal_scheduler.py
+          python scripts/formal_sram_rotation.py
+          python scripts/formal_tx_arithmetic.py
+          python scripts/formal_tx_cursor.py
+          mkdir -p build
+          cd formal
+          sby -f --prefix ../build/formal-fabric-isolation fabric_isolation.sby
+      - name: Pad ownership and open-drain proofs
+        run: |
+          export PATH="$PATH:$HOME/oss-cad-suite/bin"
+          mkdir -p build
+          cd formal
+          sby -f --prefix ../build/formal-pad-ownership pad_ownership.sby
+          sby -f --prefix ../build/formal-pad-open-drain pad_open_drain.sby
       - name: Scratch status-merge candidate proofs (not hardware adoption)
         run: |
           source .venv/bin/activate
@@ -48,5 +67,13 @@ jobs:
             build/formal_channels/
             build/formal_pin_rx/
             build/formal_pin_unit/
+            build/formal_decode/
+            build/formal_scheduler/
+            build/trw-rotation/
+            build/formal_tx_arithmetic/
+            build/formal_tx_cursor/
+            build/formal-fabric-isolation_*/
+            build/formal-pad-ownership_*/
+            build/formal-pad-open-drain_*/
             build/formal_status_queue/
             build/formal_status_candidate_integration/

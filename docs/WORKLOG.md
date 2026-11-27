@@ -2,6 +2,21 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-27 — Explicit unused LUT input routing experiment
+
+- Confirm ungated native45905503235 rejects ready X at115981ns. Original
+  control/generated RTL pass; downloaded archive SHA and both8736-bit
+  actual configuration audits verified. No reload/timing claim. Receipt:
+  reports/r1_spi_tick_ungated_native_45905503235.json; BUG176 stays open.
+- D181 adds an opt-in, binary-equivalent LUT promotion/cofactoring pass
+  using the existing input reset net. Actual source JSON changes58LUTs,
+  preserving ports/netnames/cell census. Exhaustive small-LUT functions,
+  constant/unknown/HA guards and existing native/timing guards:69pass.
+  Workflow lint passes. Original rawc6compile control remains untouched.
+- **Boxes ticked:** none. G1 remains selected; no R1 timing closure.
+- **Next:** hosted compile, inspect packed connections, then fresh exact
+  image native/reset/reload before original connected timing if it fits.
+
 
 ## 2026-11-26 — Trace host capture and launch bounded fresh routing
 

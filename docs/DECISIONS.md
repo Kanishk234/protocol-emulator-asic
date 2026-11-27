@@ -1,5 +1,28 @@
 # Decisions
 
+## D-181: Route unused logical LUT inputs explicitly before placement
+
+- **Date:** 2026-11-27. Ungated native45905503235 rejects host-ready X
+  at115981ns; original control and generated RTL pass. Both actual8736-bit
+  configuration audits pass. No reload or extracted timing was reached.
+- Test an opt-in compiler transform on the directly proved ungated source:
+  promote LUT1/2/3 to LUT4, cofactor constant inputs, and connect unused
+  inputs to the existing input-only reset IOBUF net. Reject an unknown
+  input when its truth-table cofactor affects the function. Preserve HA
+  carry pins/mode; only its unused I3 may receive the reset connection.
+  Sequential cells, primitives, clocks, ports and physical fabric stay fixed.
+- Exhaustively test every LUT1/2/3 truth table, binary input and both reset
+  values, plus constant, unknown-input and HA guards. The actual105-LC
+  source JSON yields58changed logical LUTs without changing cell census,
+  ports or netnames. Record original/derived/proof hashes separately from
+  the clock-only placement constraint. This proves binary cell behavior;
+  it does not establish native initialization or that packing retains pins.
+- Hosted compile must reproduce the untouched rawc6/seed1 control first.
+  Then measure routability and inspect packed connections. Any fitting
+  image needs fresh native/reset/reload and original20ns/0.25nsconnected
+  timing gates. No private-state initialization, cell-model, PDK or hardware
+  change, and no inherited image-specific selector repairs.
+
 ## D-180: Qualify exactly the compiled ungated timer image through native and RC gates
 
 - **Date:** 2026-11-26. Compile45903143276 atbf3f7b66 reproduces original

@@ -48,6 +48,13 @@
 
 ## 176: Registered-tick image fails native initialization despite exact configuration
 
+- **Ungated source:**45905503235 ate87185d2 also rejects host-ready X
+  at115981ns. Original native control and generated RTL pass; root checks
+  archive hash and independently replays both8736-bit configuration audits.
+  No reload/timing reached. Receipt:
+  reports/r1_spi_tick_ungated_native_45905503235.json. D181 tests explicit
+  unused logical LUT input routing; native acceptance remains open.
+
 - **D176 fresh seeds:**45893638442 at3eadcd3e passes original controls/
   generated RTL, but native seed2 fails ready at115981ns and seed3 at
   115921ns. Both complete actual8736-bit audits pass; reload/timing are

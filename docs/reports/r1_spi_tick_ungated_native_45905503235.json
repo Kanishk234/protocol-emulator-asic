@@ -1,0 +1,53 @@
+{
+  "run": 45905503235,
+  "source_sha": "e87185d211607053372718ce0239b7f27bfaad9f",
+  "artifact_id": 15157467610,
+  "archive_bytes": 11149983,
+  "archive_sha256": "aed4c56e839b33da75b9d9b4acd710bb5bb0d1435e1f6cc45d5457c9d04f0797",
+  "archive_verified": true,
+  "producer_result": {
+    "run": "45905503235",
+    "source_sha": "e87185d211607053372718ce0239b7f27bfaad9f",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_tick_ungated",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "error": "XML contains failures, errors or skipped tests",
+    "generated_rtl_candidate": {
+      "passed": true,
+      "scope": "Generated RTL diagnostic only; original native failure retained."
+    }
+  },
+  "actual_frame_audits": {
+    "control": {
+      "compared_configuration_bits": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+    },
+    "candidate": {
+      "compared_configuration_bits": 8736,
+      "image_sha256": "d82339bd4b0f378c05b24342273c9d156e080f5a4c0c0635fb4e29d86ad3379f",
+      "snapshot_sha256": "8b92618f937c8b377dffc49766a660fd1f1318c0277065ff99adab44f5363fd5"
+    }
+  },
+  "strict_control_and_generated_rtl_tests": 2,
+  "first_failure": {
+    "sim_time_ns": 115981,
+    "error": "configured host-write ready became unknown"
+  },
+  "management_reload_reached": false,
+  "extracted_timing_reached": false,
+  "passed": false,
+  "adopted": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false
+}

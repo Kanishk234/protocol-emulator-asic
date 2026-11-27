@@ -173,3 +173,17 @@ The compiler also warns when a token arriving in reset STATE prevents the transi
 A seeded compiler regression compared the accepted-tag stall diagnostic to the independent model on 1,000 compiled state chains with two to six states. It varied the held tag, transition guards, payload and scheduler cadence, and checked whether the head token drained. The warning and model agreed in every case, including both stalls and releases. This covers the generated single-input, no-routine programs; the general L6-FUZZ gate remains open.
 
 The host slot decoder in `scripts/formal_host_slots.py` passed a combinational SAT check with arbitrary decoded write commands and lane RUN state. Each lane's slot write strobe matches the slot address, lane select, word alignment and halted-state predicate. Removing the RUN guard produces a counterexample. This covers the slot portion of F-HOST-1 at the decoded SPI boundary. The shared SRAM and pin configuration obligations remain open.
+
+The single-action TX proof now runs for 28 steps and covers all prescaler
+encodings from zero through seven, including the 24-clock requested delay
+at the upper bound. Full and lean checks passed, and each rejected the
+one-clock-late reference. Sequential action histories remain separately
+bounded.
+
+The randomized state-chain warning test now runs 1,000 cases directly
+and another 1,000 through a forwarding lane, checking that the token
+actually arrives at the receiving producer before comparing the warning
+to the model. Both campaigns exercise stalls and releases. A second
+10,000-program unconditional forwarding run at seed 0x5e0 agreed on
+4,837 safe schedules and 5,163 first overruns. These remain scoped
+results under declared inputs and service.

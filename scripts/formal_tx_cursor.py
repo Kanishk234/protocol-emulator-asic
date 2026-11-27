@@ -11,7 +11,7 @@ def main():
     source = (ROOT / 'src/trw_pin_tx.v').read_text()
     if source.count('endmodule') != 1:
         raise ValueError('Expected one module in the TX source')
-    check(output, source, 'bounded', 'test_decision', 12)
+    check(output, source, 'bounded', 'test_decision', 28)
     check(output, source, 'queued', 'test_second_due', 24)
     check(output, source, 'sync_gap', 'test_decision', 18)
 

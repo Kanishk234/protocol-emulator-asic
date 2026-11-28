@@ -4,6 +4,28 @@ Newest entry at the top. One entry per session: what was done, boxes ticked (wit
 
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
+- UART-buffer qualification46175928642 at6c34b822 passes native/reset/
+  full management reload. Root archive/three8736-bit frames/55,55,64inputs/
+  17,6,20plan inputs/four scripts and timing reports checked. Qualified RC
+  setup-23.209684/hold-1.567830ns, zero loops,14501active pins annotated.
+  Targeted UART sync[0] hold is+2.093250ns; other inputs still fail hold.
+  No closure or production adoption. Receipt:
+  reports/r1_uart_buffer_native_timing_46175928642.json.
+- Selective-control46175430185 fails native readyX at115981ns; original
+  control and generated RTL pass. Root frame/archive checks retained;
+  no reload/STA. Three freshly proved selectors still fail at the same time;
+  fourth candidate rejected because its alternate source is undefined.
+  Receipt: reports/r1_local_capture_native_failure_46175430185.json. BUG182.
+- D191stages only four fresh cofactor/carry-proved unused selectors on
+  the qualified UART-buffer image, targeting the observed setup-path cone.
+  New1ad31736... passes local native traffic/restart;55input hashes,
+  all8736actual bits and exactly4changed latches independently checked.
+  Hosted full reload/RC pending; no inferred benefit.57focused guards pass;
+  exact-parent preparation and workflow lint pass. Original constraints kept.
+- **Next:** cloud D191native/reload/RC; inspect newly measured paths before
+  another mapping change. No phase boxes ticked; G1 remains selected.
+
+
 - Corrected UART compile46174945380 at6664e4ce succeeds with the same
   pinned compiler: rawc6and new31ed78fd...108/128LC/3timers/3shifts.
   Root verifies archive/all429inputs/full two encodings/recomputed buffer/

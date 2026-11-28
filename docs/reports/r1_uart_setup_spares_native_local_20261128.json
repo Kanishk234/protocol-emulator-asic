@@ -1,0 +1,15 @@
+{
+  "parent_run": 46175928642,
+  "source_raw_image_sha256": "31ed78fda6153babc0bbdb11e8c2a1501cf4000b400bfbdd097fd095a8e5ed47",
+  "candidate_raw_image_sha256": "1ad31736231b59f806f2b6bc1906351647af10aff1ec002cc9dd93027bcdc700",
+  "strict_native_tests": 1,
+  "input_hashes_checked": 55,
+  "actual_configuration_bits_checked": 8736,
+  "actual_loaded_changes": 4,
+  "loaded_image_sha256": "68f0496bf1b6c389ec87dc90df38d1fc6639a1cabd750cc047469045a8183e06",
+  "snapshot_sha256": "bfff20b860ac6166439ab862e87d7a73511552cedf14e1b11b87ee45b2af785a",
+  "scope": "Local native loading, primary traffic and restart only. Hosted management reload and extracted timing remain required.",
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

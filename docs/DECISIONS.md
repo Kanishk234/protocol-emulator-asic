@@ -1,5 +1,33 @@
 # Decisions
 
+## D-191: Test four setup-path spare selectors on the qualified UART-buffer image
+
+- **Date:**2026-11-28. UART-buffer qualification46175928642 at6c34b822
+  passes native/reset/full management reload and qualified connected RC:
+  setup -23.209684ns, hold -1.567830ns; zero loops/policy differences,
+  all14501active pins annotated. Root checks archive,55/55/64simulation
+  hashes,three8736-bit audits,17/6/20plan inputs and four script/case/
+  execution/coverage reports. The original failing timing control reproduces.
+  UART sync[0] atX6Y1/C has hold+2.093250ns (previous46045747168:
+  -1.226009ns); other endpoints fail. Whole mapping changes, so do not
+  attribute all slack changes to inserted buffers. Receipt:
+  reports/r1_uart_buffer_native_timing_46175928642.json.
+- Worst setup launches from logical u_user.srvalid atX3Y1/D and ends in
+  X5Y2primitive. A read-only selector-fanout/path search identifies possible
+  unused input participation; it is a search heuristic, not path sensitization
+  proof. Fresh actual-frame cofactor/carry proofs admit only X1Y1/H.I0,
+  X4Y3/H.I0,I3 and X5Y3/G.I3. Reject actively routed inputs and an undefined
+  alternate terminal. Four existing selector bits change; full FASM is checked,
+  original report retained and derived compiler Fmax cleared. No logical source,
+  resource, clock, PDK or timing-constraint change.
+- Exact parent native/reload/negative-RC identity is required before staging.
+  New image1ad31736... passes local native primary traffic/restart,55input
+  hashes/all8736actual bits/exactly4latch changes. Receipt:
+  reports/r1_uart_setup_spares_native_local_20261128.json. Hosted original
+  control, native/reset/full reload and original20ns/0.25nsRC remain required.
+  No timing benefit, physical acceptance or adoption claimed. G1 stays selected.
+
+
 ## D-190: Qualify the routed UART input-buffer image at the original capture site
 
 - **Date:**2026-11-28. Corrected compile46174945380 at6664e4ce passes

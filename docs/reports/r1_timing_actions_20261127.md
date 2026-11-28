@@ -35,3 +35,13 @@ proofs, compiler frequency estimates and successful workflow execution cannot
 substitute for nonnegative qualified setup and hold. Keep the original path
 policies and real state observations, leave held-out protocols sealed, and keep
 G1 selected until the complete replacement gates pass.
+
+
+November 28 measured update: UART-buffer46175928642 passes native,
+restart and full management reload; qualified setup/hold are -23.209684/
+-1.567830ns. Targeted UART sync[0] hold is +2.093250ns, but other boundary
+inputs fail. The whole mapping differs; this is not an isolated delay estimate.
+Selective capture controls46175430185 fail native ready definedness and do
+not reach timing. D191four freshly proved spare selectors on the UART-buffer
+image pass local native/restart; hosted reload/extracted timing remain required.
+G1 stays selected. No constraints or phase gates have been relaxed.

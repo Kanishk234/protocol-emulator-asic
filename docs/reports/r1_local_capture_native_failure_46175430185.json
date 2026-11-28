@@ -1,0 +1,52 @@
+{
+  "run": 46175430185,
+  "source_sha": "949714ca5203108f05353d1de26705cffcd2c975",
+  "artifact_id": 15275482195,
+  "archive_sha256": "3ae6432505521e6fc88d0618e204352561a028f74bad997b2b8a2eaee5f1d2a1",
+  "archive_verified": true,
+  "actual_frame_audits": {
+    "control": {
+      "configuration_bits": 8736,
+      "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+      "snapshot_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7"
+    },
+    "candidate": {
+      "configuration_bits": 8736,
+      "image_sha256": "ef2c7aca03681654207b5534763ebe8e4eacb67c6c1c0b6ce3f4f3d9b012c967",
+      "snapshot_sha256": "730441c94798fc089d45b2c866748627f8223b41efb37eeabec122c2178e7db5"
+    }
+  },
+  "strict_original_control_and_generated_rtl_passed": true,
+  "first_failure": {
+    "time_ns": 115981,
+    "error": "configured host-write ready became unknown"
+  },
+  "management_reload_reached": false,
+  "extracted_timing_reached": false,
+  "producer_result": {
+    "run": "46175430185",
+    "source_sha": "949714ca5203108f05353d1de26705cffcd2c975",
+    "passed": false,
+    "cases": {
+      "control": {
+        "passed": true,
+        "image_sha256": "9af858413aa8c39739f3f7bda8e290433d58cb1702f69a04c9c6e74657b90410",
+        "observed_configuration_sha256": "0491a427285f53b27db8166c875d76536fe237c4e619277be297d8791ed94ba7",
+        "configuration_bits": 8736
+      }
+    },
+    "trial_kind": "spi_tick_local_capture",
+    "timing_acceptance": false,
+    "physical_acceptance": false,
+    "adopted": false,
+    "error": "XML contains failures, errors or skipped tests",
+    "generated_rtl_candidate": {
+      "passed": true,
+      "scope": "Generated RTL diagnostic only; original native failure retained."
+    }
+  },
+  "passed": false,
+  "timing_acceptance": false,
+  "physical_acceptance": false,
+  "adopted": false
+}

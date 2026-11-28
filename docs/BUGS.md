@@ -1,5 +1,20 @@
 # Bugs
 
+## 182: Selective capture-control image fails native host-ready definedness
+
+- **Symptom/check:**46175430185 at949714ca fails host-write ready at
+  115981ns after exact8736-bit configuration. Original native control and
+  candidate generated RTL pass. Strict native test prevents reload/STA.
+- **Root cause:** unresolved native unknown propagation in this mapping;
+  binary local-control truth-table equality does not establish native startup.
+  Three fresh cofactor-safe selectors still fail at the same time locally.
+  A fourth is rejected because its alternate terminal is not observed-defined.
+- **Coverage/status:** preserve original failure, real configuration audit,
+  runtime cone and strict ready assertion. Do not force state or treat RTL
+  diagnostic success as native acceptance. Image is rejected pending a
+  demonstrated fix. Receipt:
+  reports/r1_local_capture_native_failure_46175430185.json.
+
 ## 181: Constrained temporary UART FF crashes pinned nextpnr after packing
 
 - **Workaround validated:**46174945380 at6664e4ce completes placement/

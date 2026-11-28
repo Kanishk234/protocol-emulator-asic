@@ -12,7 +12,6 @@
         if (test_phase != 31) test_phase <= test_phase + 1'b1;
     end
     always @* begin
-        assume(test_second_delay <= 2);
         assume(rst_n == (test_phase != 0));
         assume(!restart && live && !idle && !idle_next && !carrier_active);
         assume(txmode == `TRW_PCE_TXMODE_LEVEL);

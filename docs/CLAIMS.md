@@ -262,3 +262,10 @@ clears LIVE on a halt command produced a counterexample. This
 discharges the monotonic-LIVE premise of the candidate RX integration
 proof between resets. Stable configuration and pending TX are still
 interface premises.
+
+Native fabric composition also proves that each of the four pin-unit
+TX ports bound as a blocking, accept-all HOST_IN subscriber holds its
+available tag and payload until taken after configuration. ABC PDR
+passed unbounded and the bounded covers reached stall and drain.
+Reset and reconfiguration remain outside the hold interval. Tap-mode
+TX and other producer bindings remain outside this instance.

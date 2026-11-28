@@ -288,3 +288,10 @@ The pin TX fabric head proof also holds with independent static tag
 filters on the four blocking HOST_IN receivers. ABC PDR passed the
 unbounded stability property for each port, and bounded covers reached
 an accepted held token at each port with filtering enabled.
+
+The conditional routine-service envelope supports forward branches
+whose targets stay inside the routine. It charges every encoded fetch
+and data access, including skipped words, to upper-bound either path.
+Taken and fall-through traces stayed within that bound at all four SRAM
+rotation offsets. The same explicit no-interference premises apply.
+Backward branches, loops and output waits still need other contracts.

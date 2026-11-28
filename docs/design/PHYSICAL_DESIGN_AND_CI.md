@@ -2,6 +2,15 @@
 
 Status: v1, written 2026-09-26, chip-level results added 2026-09-27 (first fabric chip through TT's flow: run 36327510268).
 
+**November28 current R1 status:**46177440003 passes native/reset/full
+management reload and qualified connected nominal-RC measurement, but
+setup-6.517231ns/hold-1.567830ns fail20ns/0.25ns. Zero loops/policy
+sensitivity;14497active pins annotated. D192placement46178870330 fails
+native before timing and is rejected. D193screens58physical data buffers
+in the original primitive1footprint. It preserves CLOCK_PORT=null and is
+only a fit/global-route probe; no timing/physical acceptance follows. G1is
+still selected. See WORKLOG and reports/r1_hold_inventory_46177440003.json.
+
 **November26 follow-up:** registered-tick source proof/compile pass, but
 native44871227303 fails before timing. Isolated unused-input trials remain
 rejected on unknown host-ready despite exact8736-bit loading. D173 recovers

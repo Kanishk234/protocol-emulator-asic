@@ -2,6 +2,26 @@
 
 Newest entry at the top. One entry per session: what was done, boxes ticked (with evidence), next step.
 
+## 2026-11-28 — Physical primitive feedback hold-buffer screen
+
+- Reviewed latest D191/D192evidence and physical flow. Preserve qualified
+  D19146177440003 (-6.517231/-1.567830ns) and rejected placement controls.
+  Existing flat extraction ODB has no placement rows; use authenticated
+  primitive1global checkpoint for legal physical insertion instead.
+- D193adds one derived physical policy:58real buf_1cells before primitive
+  data-register D pins, no configuration/clock/reset/interface edits. Native
+  before/after and post-GRT guards collapse only these identity branches,
+  require all original placement/master/pins/configuration/PG preserved,
+  reject any other cells/connectivity changes and require zero overflow.
+- Original no-ECO control executes first. Routing policy/footprint/PGphase
+  remain fixed.17focused guards, exact native/source preparation and actionlint
+  pass. The first cloud run will measure fit/area/global routing only; no
+  extracted timing or physical acceptance claim. G1remains selected.
+- **Boxes ticked:** none. **Next:** run D193; if fit/routing passes, detailed
+  route and re-extract before measuring the feedback improvement and setup
+  cost. Continue boundary-input/full-shell timing separately. No waivers,
+  initialization forcing or reduced clock uncertainty.
+
 ## 2026-11-28 — Selective setup mapping and UART hold-buffer experiments
 
 - D192native46178870330 at2dc43c7d fails readyX at115981ns; original

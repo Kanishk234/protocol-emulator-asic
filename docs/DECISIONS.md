@@ -1,5 +1,39 @@
 # Decisions
 
+## D-193: Screen physical data buffering in the original primitive footprint
+
+- **Date:**2026-11-28. Qualified D19146177440003 remains setup
+  -6.517231ns/hold-1.567830ns. Independent launch inventory finds82short
+  self-feedback endpoint minima, including68across the two PRIM2T2S
+  instances; the worst primitive feedback path is-0.047458ns. There are
+  also23boundary-launch minima. See reports/r1_hold_inventory_46177440003.json.
+  Rejected D192placement/native46178870330 is not a timing improvement.
+- Test one physical policy on one authenticated primitive1 context: insert
+  sg13cmos5l_buf_1 at each of its58edge-register D pins. The primitive's
+  timer/shift resources serve UART, SPI and I2C; no protocol block or held-out
+  workload is added. All334configuration latches and original signal/PG/pin
+  connectivity are preserved except the58identity data branches. Every
+  original cell is fixed during new-buffer legalization, then its original
+  placement status restored. Check complete native before/after connectivity
+  after collapsing only the admitted buffers; reject other additions/changes.
+- Cost:58extra buffers, added native cell area and routing measured in CI;
+  no area figure is claimed yet. All users pay the extra D-path delay/area,
+  including those without these short paths. The fixed original footprint,
+  pins, power phase, Metal2–4/50iteration/0.3routing policy remain unchanged.
+  No production source/macro/config or primitive ABI change. G1protected.
+- Use the original row-bearing leaf ODB, not the row-free flat extraction
+  view. Reproduce a no-ECO control first, then buffer/legalize/global-route
+  the candidate. Require exact native branch/cell/placement/pin/PG inventory
+  and zero final overflow.17local guards, authenticated source preparation
+  and workflow lint pass. CLOCK_PORT=null remains explicit: this is only a
+  fit/routing screen, not CTS, timing or physical acceptance. Detailed route,
+  extraction, native/reset/reload, all affected contexts and full-chip gates
+  remain required before acceptance of any changed physical artifact.
+- OpenROAD's documented repair_timing flow expects propagated clocks after
+  CTS; do not run it on this unconstrained leaf and label that closure.
+  Reference: https://openroad.readthedocs.io/en/latest/main/src/rsz/README.html
+
+
 ## D-192: Place the response-lane register near the measured read-data endpoint
 
 - **Rejected native outcome:**46178870330 at2dc43c7d fails readyX at

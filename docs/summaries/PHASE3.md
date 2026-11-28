@@ -1,4 +1,12 @@
 # Phase 3 summary: specialize, compare, hardware freeze
+
+**November28 successor status:** R1is still experimental. Its qualified
+native/reload image46177440003 improves setup to-6.517231ns but hold is
+-1.567830ns, so it is not timing-closed or an accepted G1replacement.
+D193now screens physical input buffers on the primitive's data registers
+for the measured short feedback paths. Fit/routing, new extraction and
+full acceptance remain open. The historical G1freeze below stays selected.
+
 **October24 integration update:** BUG132 is repaired locally by D118 opt-in grounding of186unused padded GND mux outputs (593existing config bits), preserving all active features/hardware. All40native leaves now pass configured reset/secondSPI and full managementSPI/error/FIFO/USER_RESET/STOP/reload/secondSPI;8736Q remain defined and match across reload. Original-image failure is retained. Hosted repair40109928699 atd5d9228 passes; root source/XML/50+55+64input/two-binary checks pass; detailed routing/timing/runtime parity and replacement remain open. G1protected. See reports/r1_management_shell_20261024.md.
 
 **October24 physical follow-up:** primitive1 completes hosted detailed routing with zero router violations in40119792058; corrected local wire-observer replay verifies1557nets and frozen geometry after BUG134. Corrected hosted checker remains pending. Timing40119792005 has full coverage but six active loop-sensitive endpoints (BUG133); no configured timing or full-macro acceptance.

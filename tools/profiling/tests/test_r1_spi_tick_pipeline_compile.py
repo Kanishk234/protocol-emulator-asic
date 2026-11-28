@@ -9,6 +9,16 @@ from spi_tick_pipeline_compile import pin_global_clock,placement_seed,prepare
 from fixed_relocation import logical_graph
 
 
+@pytest.mark.parametrize('kwargs',[
+    {'local_capture':1},{'uart_buffer':1},{'local_capture':True},
+    {'uart_buffer':True},{'local_capture':True,'uart_buffer':True,'known_inputs':True,'ungated_timer':True},
+    {'local_capture':True,'known_inputs':True,'ungated_timer':True,'candidate_min_ctrl':16},
+])
+def test_targeted_mapping_variants_cannot_mix_or_skip_source_guards(tmp_path,kwargs):
+    with pytest.raises(ValueError):prepare(tmp_path/'capsule',tmp_path/'proofs',tmp_path/'out',**kwargs)
+    assert not (tmp_path/'out').exists()
+
+
 @pytest.mark.parametrize('threshold',[True,'16',0,8,17,None])
 def test_control_sharing_change_is_bounded_before_staging(tmp_path,threshold):
     with pytest.raises(ValueError,match='control-sharing threshold'):

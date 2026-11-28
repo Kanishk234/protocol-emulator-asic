@@ -295,3 +295,9 @@ and data access, including skipped words, to upper-bound either path.
 Taken and fall-through traces stayed within that bound at all four SRAM
 rotation offsets. The same explicit no-interference premises apply.
 Backward branches, loops and output waits still need other contracts.
+
+The acyclic routine-service checker now charges the longest SRAM-access
+path through forward branches and early RETs. Counts describe that
+path, while the no-alias premise is retained if any encoded path
+contains a store. Taken, fall-through and early-return model traces
+met the bound at all four SRAM rotation offsets.

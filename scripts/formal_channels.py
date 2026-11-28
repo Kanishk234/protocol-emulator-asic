@@ -14,8 +14,8 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE_FILES=['src/trw_chan_prod.v','src/trw_chan_port.v','src/trw_fabric.v','src/trw_assert.vh',
               'formal/props/channel_composition.sv','formal/channel.sby']
-PROOF_TASKS=['blocking','blocking_tx','ready','taps']
-TASKS=PROOF_TASKS+['blocking_cover','blocking_tx_cover','tap_cover']
+PROOF_TASKS=['blocking','blocking_tx','filtered_tx','ready','taps']
+TASKS=PROOF_TASKS+['blocking_cover','blocking_tx_cover','filtered_tx_cover','tap_cover']
 
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()

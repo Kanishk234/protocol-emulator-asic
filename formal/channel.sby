@@ -1,10 +1,12 @@
 [tasks]
 blocking proof
 blocking_tx proof
+filtered_tx proof
 ready proof
 taps proof
 blocking_cover cover
 blocking_tx_cover cover
+filtered_tx_cover cover
 tap_cover cover
 
 [options]
@@ -24,6 +26,8 @@ blocking_tx_cover: chparam -set BLOCK_TX 1 channel_blocking
 blocking: prep -top channel_blocking -flatten
 blocking_tx: prep -top channel_blocking -flatten
 blocking_tx_cover: prep -top channel_blocking -flatten
+filtered_tx: prep -top channel_filtered_tx -flatten
+filtered_tx_cover: prep -top channel_filtered_tx -flatten
 ready: prep -top channel_blocking -flatten
 taps: prep -top channel_taps -flatten
 blocking_cover: prep -top channel_blocking -flatten

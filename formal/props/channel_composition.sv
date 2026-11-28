@@ -9,6 +9,7 @@ module channel_native_box #(
     input wire request,
     input wire [17:0] input_token,
     input wire [3:0] blocking_take, tap_take, tap_accept, tap_clear,
+    input wire [15:0] blocking_accept,
     output wire producer_free, producer_load, producer_valid, producer_seq,
     output wire [17:0] producer_token,
     output wire [3:0] blocking_avail,
@@ -35,7 +36,7 @@ module channel_native_box #(
         .all_taken(all_taken), .take({1'b0,consumer_take}),
         .avail(avail), .head(head), .cfg_we(config_we),
         .cfg_en(stage < 4 || EXTRA_TAPS != 0), .cfg_tap(stage >= 4),
-        .cfg_sel(4'd4), .cfg_accept(stage < 4 ? 4'hf : tap_accept),
+        .cfg_sel(4'd4), .cfg_accept(stage < 4 ? blocking_accept[4*stage[1:0] +: 4] : tap_accept),
         .clr_dropped({1'b0,tap_clear,4'd0}), .port_state(state), .dropped(dropped)
     );
     assign blocking_avail = BLOCK_TX ? avail[7:4] : avail[3:0];
@@ -67,6 +68,7 @@ module channel_blocking #(
     channel_native_box #(.BLOCK_TX(BLOCK_TX)) box (
         .clk(clk),.rst_n(rst_n),.stage(stage),.request(request),.input_token(input_token),
         .blocking_take(take),.tap_take(4'd0),.tap_accept(4'hf),.tap_clear(4'd0),
+        .blocking_accept(16'hffff),
         .producer_free(free),.producer_load(load),.producer_valid(valid),
         .producer_seq(seq),.producer_token(token),.blocking_avail(avail),
         .blocking_head(head),.tap_dropped(unused_drops)
@@ -120,6 +122,40 @@ module channel_blocking #(
     end endgenerate
 endmodule
 
+module channel_filtered_tx(input wire clk);
+    (* anyseq *) reg rst_n, request;
+    (* anyseq *) reg [17:0] input_token;
+    (* anyseq *) reg [3:0] take;
+    (* anyconst *) reg [15:0] accept;
+    reg past_valid = 0;
+    reg [3:0] stage;
+    always @(posedge clk) begin
+        past_valid <= 1;
+        if (!past_valid) assume(!rst_n); else assume(rst_n);
+        if (!rst_n) stage <= 0;
+        else if (stage < 9) stage <= stage + 1'b1;
+    end
+    wire [3:0] avail;
+    wire [71:0] head;
+    channel_native_box #(.BLOCK_TX(1)) box (
+        .clk(clk),.rst_n(rst_n),.stage(stage),.request(request),.input_token(input_token),
+        .blocking_take(take),.tap_take(4'd0),.tap_accept(4'd0),.tap_clear(4'd0),
+        .blocking_accept(accept),.blocking_avail(avail),.blocking_head(head)
+    );
+    genvar port_index;
+    generate for (port_index=0;port_index<4;port_index=port_index+1) begin: filtered_head
+        wire [17:0] token = head[18*port_index +:18];
+        wire [3:0] mask = accept[4*port_index +:4];
+        always @(posedge clk) begin
+            if (past_valid && $past(rst_n && stage == 9 && avail[port_index] && !take[port_index])) begin
+                assert(avail[port_index]);
+                assert(token == $past(token));
+            end
+            cover(rst_n && stage == 9 && mask != 4'hf && avail[port_index] && !take[port_index]);
+        end
+    end endgenerate
+endmodule
+
 module channel_taps(input wire clk);
     (* anyseq *) reg rst_n, request;
     (* anyseq *) reg [17:0] input_token;
@@ -142,6 +178,7 @@ module channel_taps(input wire clk);
         channel_native_box #(.EXTRA_TAPS(g)) box (
             .clk(clk),.rst_n(rst_n),.stage(stage),.request(request),.input_token(input_token),
             .blocking_take(take),.tap_take(tap_take),.tap_accept(tap_accept),.tap_clear(tap_clear),
+            .blocking_accept(16'hffff),
             .producer_free(free[g]),.producer_load(load[g]),.producer_valid(valid[g]),
             .producer_seq(seq[g]),.producer_token(token[18*g +:18]),
             .blocking_avail(avail[4*g +:4]),.blocking_head(head[72*g +:72]),

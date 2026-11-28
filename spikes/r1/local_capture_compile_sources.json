@@ -1,0 +1,50 @@
+{
+  "run": {
+    "id": 46174326690,
+    "head_sha": "2ad3f6ebaae38c5dfedf760096d868548e778173",
+    "head_branch": "efpga",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "path": ".github/workflows/r1_local_capture_compile.yaml"
+  },
+  "seeds": {
+    "1": {
+      "artifact": {
+        "id": 15275440664,
+        "name": "r1-local-capture-compile-46174326690",
+        "source_run": 46174326690,
+        "size_in_bytes": 347631,
+        "digest": "sha256:d174f59d0bd742bc13d5cc5a259037c8293237cc7616a7f542e5a7bea4dc86be"
+      },
+      "member": "r1_placement_trial",
+      "image_sha256": "0d7858fb5c52ea2e65c2b2a2dcb435b6f6344c5f714ec3f82263de9174c341fc",
+      "clock_constraint": {
+        "cell": "u_X1Y4_A_gbuf",
+        "bel": "X0Y4/D",
+        "logical_graph_preserved": true,
+        "source_json_sha256": "68d8eb312263503e60d6693006a053f6c566ecfaba5fc9d28a02ed539b8e0102",
+        "pinned_json_sha256": "d0aa3a651965ecaebbbcd5aeb9cf39a06224024d61563b2ac378549d721a15c3"
+      },
+      "input_transform": {
+        "original_json_sha256": "c08b28fa382f60061a9fd2f8b8b16465a76cd599593b6c1a623aac763bec4ad3",
+        "derived_json_sha256": "68d8eb312263503e60d6693006a053f6c566ecfaba5fc9d28a02ed539b8e0102",
+        "proof_sha256": "e8fcd0b716ea6380ff5ca21ddce983c012d2491ca1c9f40a0fd1b30d09c56d2b",
+        "changed_cells": 58,
+        "reset_net": [
+          43
+        ],
+        "binary_cell_functions_preserved": true,
+        "sequential_and_hard_cells_preserved": true
+      },
+      "capture_transform": {
+        "original_json_sha256": "6618257fed72354aad9e252efa72a49f0ad2f76037f65ce1d3bc148fdd4609f7",
+        "derived_json_sha256": "c08b28fa382f60061a9fd2f8b8b16465a76cd599593b6c1a623aac763bec4ad3",
+        "proof_sha256": "4edc6222dd50ac7622edf6e80b2c2cdfaed3833716ddaa297760d26472b3d3f8",
+        "changed_flip_flops": 8,
+        "binary_transitions_per_ff": 16,
+        "same_ff_primitive_and_clock": true,
+        "vendor_cells_sha256": "292b61eede9ec5fe76a246a47a2269ba57f82e0f10b80bc7d53cba5fd96fdd64"
+      }
+    }
+  }
+}

@@ -7,7 +7,23 @@ import pytest
 
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'spikes/r1'))
-from sa_functional import prepare
+from sa_functional import prepare,admit_capture_identity
+
+
+@pytest.mark.parametrize('mutation',['candidate_marker','marker_type','control_marker','min_ctrl','other_variant','proof','chain'])
+def test_selective_capture_identity_is_separate_and_chained(mutation):
+    row=json.loads((ROOT/'spikes/r1/local_capture_compile_sources.json').read_text())['seeds']['1']
+    cases={'control':dict(local_capture=False,uart_buffer=False,min_ctrl=4,capture_transform=None),
+           'candidate':dict(local_capture=True,uart_buffer=False,min_ctrl=4,capture_transform=deepcopy(row['capture_transform']))}
+    admit_capture_identity(cases,row)
+    if mutation=='candidate_marker':cases['candidate']['local_capture']=False
+    elif mutation=='marker_type':cases['candidate']['local_capture']=1
+    elif mutation=='control_marker':cases['control']['local_capture']=True
+    elif mutation=='min_ctrl':cases['candidate']['min_ctrl']=16
+    elif mutation=='other_variant':cases['candidate']['uart_buffer']=True
+    elif mutation=='proof':cases['candidate']['capture_transform']['proof_sha256']='0'*64
+    elif mutation=='chain':row['input_transform']['original_json_sha256']='0'*64
+    with pytest.raises(ValueError,match='Selective capture'):admit_capture_identity(cases,row)
 
 
 @pytest.mark.parametrize('mutation',[

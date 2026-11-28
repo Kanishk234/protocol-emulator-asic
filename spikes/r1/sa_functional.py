@@ -11,6 +11,17 @@ from configured_smoke import complete_native_exports, run as smoke
 from compile.bitfile import BitFile
 
 
+def admit_capture_identity(cases,row):
+    if (any(cases[name].get('local_capture') is not expected for name,expected in (('control',False),('candidate',True)))
+            or any(cases[name].get('uart_buffer') is not False or type(cases[name].get('min_ctrl')) is not int
+                   or cases[name]['min_ctrl']!=4 for name in ('control','candidate'))
+            or cases['control'].get('capture_transform') is not None
+            or cases['candidate'].get('capture_transform')!=row['capture_transform']):
+        raise ValueError('Selective capture transform identity differs')
+    if row['capture_transform']['derived_json_sha256']!=row['input_transform']['original_json_sha256']:
+        raise ValueError('Selective capture transform chain differs')
+
+
 def prepare(capsule,native,trial,out,trial_kind='sa'):
     capsule,native,trial,out=(Path(p).resolve() for p in (capsule,native,trial,out))
     trial_inputs=[trial/'result.json']
@@ -18,13 +29,14 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
     fresh_tick_kinds={'spi_tick_seed2':('spi_tick_seed_compile_sources.json',2),
                       'spi_tick_seed3':('spi_tick_seed_compile_sources.json',3),
                       'spi_tick_ungated':('spi_tick_ungated_compile_sources.json',1),
-                      'spi_tick_known_inputs':('spi_tick_known_inputs_compile_sources.json',1)}
+                      'spi_tick_known_inputs':('spi_tick_known_inputs_compile_sources.json',1),
+                      'spi_tick_local_capture':('local_capture_compile_sources.json',1)}
     if trial_kind in fresh_tick_kinds:
         filename,seed=fresh_tick_kinds[trial_kind]
         catalog_path=Path(__file__).with_name(filename)
         catalog=json.loads(catalog_path.read_text())
         seed_row=catalog['seeds'][str(seed)]
-    if trial_kind in ('spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_tick_ungated','spi_tick_known_inputs'):
+    if trial_kind in ('spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_tick_ungated','spi_tick_known_inputs','spi_tick_local_capture'):
         trial_inputs=[trial/name/'result.json' for name in ('control','candidate')]
         cases={name:json.loads(path.read_text()) for name,path in zip(('control','candidate'),trial_inputs)}
         source_run,source_sha = (('44864499317','1d149b74550d3f217520c968371dec855dd4a300')
@@ -36,21 +48,31 @@ def prepare(capsule,native,trial,out,trial_kind='sa'):
                 raise ValueError('Bounded tick compiler seed differs')
             if cases['candidate'].get('clock_constraint')!=seed_row['clock_constraint']:
                 raise ValueError('Bounded tick clock constraint differs')
-            if trial_kind in ('spi_tick_ungated','spi_tick_known_inputs') and any(cases[name].get('ungated_timer') is not expected
+            if trial_kind in ('spi_tick_ungated','spi_tick_known_inputs','spi_tick_local_capture') and any(cases[name].get('ungated_timer') is not expected
                     for name,expected in (('control',False),('candidate',True))):
                 raise ValueError('Ungated timer source identity differs')
-            if trial_kind=='spi_tick_known_inputs':
+            if trial_kind=='spi_tick_local_capture':admit_capture_identity(cases,seed_row)
+            if trial_kind in ('spi_tick_known_inputs','spi_tick_local_capture'):
                 if (any(cases[name].get('known_lut_inputs') is not expected
                         for name,expected in (('control',False),('candidate',True))) or
                         cases['control'].get('input_transform') is not None or
                         cases['candidate'].get('input_transform')!=seed_row['input_transform']):
                     raise ValueError('Explicit LUT routing transform identity differs')
                 transform=seed_row['input_transform']
-                for filename,key in (('design.json','original_json_sha256'),
+                original_json='design_local_capture.json' if trial_kind=='spi_tick_local_capture' else 'design.json'
+                for filename,key in ((original_json,'original_json_sha256'),
                                      ('design_known_inputs.json','derived_json_sha256'),
                                      ('known-input-proof.json','proof_sha256')):
                     path=trial/'candidate'/filename
                     if sha(path)!=transform[key]:raise ValueError('Explicit LUT routing input changed')
+                    trial_inputs.append(path)
+            if trial_kind=='spi_tick_local_capture':
+                transform=seed_row['capture_transform']
+                for filename,key in (('design.json','original_json_sha256'),
+                                     ('design_local_capture.json','derived_json_sha256'),
+                                     ('local-capture-proof.json','proof_sha256')):
+                    path=trial/'candidate'/filename
+                    if sha(path)!=transform[key]:raise ValueError('Selective capture transform input changed')
                     trial_inputs.append(path)
             trial_inputs.append(catalog_path)
         if any(str(row['run'])!=source_run or row['source_sha']!=source_sha or
@@ -178,7 +200,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='mode',required=True)
     p=sub.add_parser('prepare')
     for name in ('capsule','native','trial','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_tick_ungated','spi_tick_known_inputs','spi_clock_d','spi_clock_fixed'),default='sa')
+    p.add_argument('--trial-kind',choices=('sa','fixed_relocation','fixed_reroute','spi_timer_free_run','spi_tick_pipeline','spi_tick_seed2','spi_tick_seed3','spi_tick_ungated','spi_tick_known_inputs','spi_tick_local_capture','spi_clock_d','spi_clock_fixed'),default='sa')
     p=sub.add_parser('run')
     for name in ('out','pdk','icarus'):p.add_argument('--'+name,type=Path,required=True)
     args=vars(parser.parse_args());mode=args.pop('mode');(prepare if mode=='prepare' else run)(**args)

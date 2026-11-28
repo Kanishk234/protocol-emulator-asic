@@ -242,3 +242,23 @@ idle polarity supplied for the post-edge configuration. The lean output
 check uses the live idle polarity. Removing the cached carrier mask
 produced a counterexample. Exact carrier periods remain a separate
 timing obligation.
+
+The queued TX deadline model covers all second delays from zero through
+three ticks at depth 29 with prescaler encodings zero through three.
+Both full and lean configurations passed, including the longest
+24-clock combined delay. The shifted-deadline controls failed as
+expected.
+
+The routine-unlock compiler regression also covers countdown branches
+with one and four iterations. At both scheduler cadences a one-clock
+arrival period overruns while the consumer is waiting. At a 64-clock
+period the observed four arrivals drain. This is a finite model check
+of the compiled programs.
+
+A scratch check of the exact A-pad host RTL proved by induction that
+LIVE remains set on the edge following an active clock with reset
+deasserted, across arbitrary decoded host writes. A mutation that
+clears LIVE on a halt command produced a counterexample. This
+discharges the monotonic-LIVE premise of the candidate RX integration
+proof between resets. Stable configuration and pending TX are still
+interface premises.

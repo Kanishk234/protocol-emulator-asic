@@ -309,7 +309,8 @@ lane L1:
                 assert first_overrun == expected, (tags, period, fire_period)
 
 
-def test_routine_state_transition_preserves_possible_dequeue():
+@pytest.mark.parametrize('delay_iterations', [0, 1, 4])
+def test_routine_state_transition_preserves_possible_dequeue(delay_iterations):
     from tripc.channel_graph import undrainable_tags
     from tripsim import Chip
     from tripwire_spec import TAGS
@@ -324,6 +325,11 @@ routine unlock:
     setst ACTIVE
     ret
 """
+    if delay_iterations:
+        source = source.replace('    setst ACTIVE', f'''    ldi r0, {delay_iterations}
+    delay:
+    djnz r0, delay
+    setst ACTIVE''')
     image, _ = tripc.compile_text(source)
     assert list(undrainable_tags(image)) == []
     for cadence in (1, 2):

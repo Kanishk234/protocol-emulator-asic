@@ -211,3 +211,24 @@ Exact-candidate whole-chip Verilator L3 with sigrok enabled passed
 22/22 with zero failures or skips. Every simulated RTL file matched the
 staged screen input manifest. Protocol XML SHA-256:
 `5e400c47e650006ba9e800b864043debc5b873296d73358b6a3f7ec9d341db38`.
+
+[A-pad screen 46046756683](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/46046756683)
+passed with +1.432584 ns slow functional setup reserve, +0.107614 ns
+fast hold, and zero electrical, antenna, and preceding full-route
+overflow. Compared with SE0 screening, the pre-route setup reserve
+fell by 1.053291 ns and the worst reported endpoint moved from U0
+pad-feedback/fabric logic to U1's RX timer. Final screened standard-cell
+count fell by 486 to 42,492. Matched all 35 staged inputs against the
+artifact and isolated official branch. The only physical input change
+from bd023fc is trw_pin_io.v. Exact candidate 250589c started
+[official GDS 46173741326](https://github.com/Kanishk234/protocol-emulator-asic/actions/runs/46173741326).
+Extracted setup and downstream signoff remain open.
+
+Local proofs used the hash-verified A-pad candidate RTL. The standalone
+RX and producer proof passed unbounded ABC PDR and reached its bounded
+covers. All five RX and producer fault controls produced counterexamples.
+The full pin-unit status queue and sticky-flag integration proof also
+passed unbounded ABC PDR, and its bounded covers were reached. The
+integration uses the existing static configuration, legal period,
+monotonic LIVE, and stable pending-TX premises. This evidence applies
+to the isolated candidate. It does not close the formal gate on main.
